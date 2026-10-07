@@ -1,0 +1,28 @@
+# gradle
+build/
+.gradle/
+out/
+run/
+run-data/
+repo/
+
+# ide
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+bin/
+.classpath
+.project
+.settings/
+
+# python
+__pycache__/
+*.pyc
+
+# generator cache
+src/generated/**/.cache
+
+# balance analysis output
+tools/balance/analysis.json
