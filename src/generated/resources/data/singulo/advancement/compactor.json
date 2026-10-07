@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:degenerate_compactor_controller"
+    },
+    "title": {
+      "translate": "advancement.singulo.compactor.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.compactor.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "formed/degenerate_compactor"
+      }
+    }
+  },
+  "parent": "singulo:bose"
+}

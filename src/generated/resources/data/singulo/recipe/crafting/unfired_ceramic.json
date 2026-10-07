@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "tag": "c:gems/quartz"
+    },
+    {
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "tag": "c:sands"
+    }
+  ],
+  "result": {
+    "id": "singulo:unfired_ceramic",
+    "count": 2
+  }
+}

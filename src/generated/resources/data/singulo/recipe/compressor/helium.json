@@ -1,0 +1,21 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 3,
+  "time": 160,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "singulo:helium_bearing_stone"
+      },
+      "count": 16
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "singulo:helium",
+      "amount": 20
+    }
+  ]
+}

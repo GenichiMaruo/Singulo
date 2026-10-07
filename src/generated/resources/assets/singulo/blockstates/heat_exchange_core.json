@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "singulo:block/heat_exchange_core"
+    }
+  }
+}

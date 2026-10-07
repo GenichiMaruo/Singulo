@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "item": "singulo:white_ceramic_composite"
+    },
+    {
+      "item": "singulo:white_ceramic_composite"
+    },
+    {
+      "item": "singulo:white_ceramic_composite"
+    },
+    {
+      "item": "singulo:white_ceramic_composite"
+    },
+    {
+      "tag": "c:dusts/redstone"
+    }
+  ],
+  "result": {
+    "id": "singulo:basic_frame",
+    "count": 1
+  }
+}

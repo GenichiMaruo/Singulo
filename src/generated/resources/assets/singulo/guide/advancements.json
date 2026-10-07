@@ -1,0 +1,214 @@
+{
+  "advancements": [
+    {
+      "id": "root",
+      "parent": null,
+      "stage": 1
+    },
+    {
+      "id": "steel",
+      "parent": "root",
+      "stage": 1
+    },
+    {
+      "id": "ceramic",
+      "parent": "steel",
+      "stage": 1
+    },
+    {
+      "id": "circuit",
+      "parent": "ceramic",
+      "stage": 1
+    },
+    {
+      "id": "thermo",
+      "parent": "circuit",
+      "stage": 1
+    },
+    {
+      "id": "compressor",
+      "parent": "thermo",
+      "stage": 1
+    },
+    {
+      "id": "projector",
+      "parent": "circuit",
+      "stage": 1
+    },
+    {
+      "id": "archive",
+      "parent": "compressor",
+      "stage": 1
+    },
+    {
+      "id": "ruin_observation",
+      "parent": "archive",
+      "stage": 1
+    },
+    {
+      "id": "tower",
+      "parent": "ruin_observation",
+      "stage": 2
+    },
+    {
+      "id": "coil",
+      "parent": "tower",
+      "stage": 2
+    },
+    {
+      "id": "assembler",
+      "parent": "coil",
+      "stage": 2
+    },
+    {
+      "id": "accelerator",
+      "parent": "coil",
+      "stage": 2
+    },
+    {
+      "id": "muon",
+      "parent": "accelerator",
+      "stage": 2
+    },
+    {
+      "id": "monopole",
+      "parent": "accelerator",
+      "stage": 2
+    },
+    {
+      "id": "anchor",
+      "parent": "muon",
+      "stage": 2
+    },
+    {
+      "id": "quantum",
+      "parent": "assembler",
+      "stage": 3
+    },
+    {
+      "id": "entangled",
+      "parent": "quantum",
+      "stage": 3
+    },
+    {
+      "id": "ruin_research",
+      "parent": "quantum",
+      "stage": 3
+    },
+    {
+      "id": "bose",
+      "parent": "entangled",
+      "stage": 3
+    },
+    {
+      "id": "gauntlet",
+      "parent": "quantum",
+      "stage": 3
+    },
+    {
+      "id": "detector",
+      "parent": "quantum",
+      "stage": 3
+    },
+    {
+      "id": "compactor",
+      "parent": "bose",
+      "stage": 4
+    },
+    {
+      "id": "ruin_culture",
+      "parent": "bose",
+      "stage": 4
+    },
+    {
+      "id": "crystal",
+      "parent": "ruin_culture",
+      "stage": 4
+    },
+    {
+      "id": "cavity",
+      "parent": "compactor",
+      "stage": 4
+    },
+    {
+      "id": "exotic",
+      "parent": "cavity",
+      "stage": 4
+    },
+    {
+      "id": "furnace",
+      "parent": "compactor",
+      "stage": 4
+    },
+    {
+      "id": "probe",
+      "parent": "crystal",
+      "stage": 4
+    },
+    {
+      "id": "ruin_final",
+      "parent": "exotic",
+      "stage": 5
+    },
+    {
+      "id": "warden",
+      "parent": "ruin_final",
+      "stage": 5
+    },
+    {
+      "id": "seed",
+      "parent": "warden",
+      "stage": 5
+    },
+    {
+      "id": "reactor",
+      "parent": "seed",
+      "stage": 5
+    },
+    {
+      "id": "ignite",
+      "parent": "reactor",
+      "stage": 5
+    },
+    {
+      "id": "core",
+      "parent": "ignite",
+      "stage": 5
+    },
+    {
+      "id": "shield",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "tipler",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "wormhole",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "dark",
+      "parent": "ignite",
+      "stage": 5
+    },
+    {
+      "id": "metric",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "manipulator",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "records",
+      "parent": "archive",
+      "stage": 5
+    }
+  ]
+}

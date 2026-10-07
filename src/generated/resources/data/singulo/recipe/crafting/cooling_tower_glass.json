@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "item": "singulo:steel_plate"
+    }
+  ],
+  "result": {
+    "id": "singulo:cooling_tower_glass",
+    "count": 4
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "singulo:item/explorer_compass_00"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "angle": 0.0
+      },
+      "model": "singulo:item/explorer_compass_00"
+    },
+    {
+      "predicate": {
+        "angle": 0.03125
+      },
+      "model": "singulo:item/explorer_compass_01"
+    },
+    {
+      "predicate": {
+        "angle": 0.09375
+      },
+      "model": "singulo:item/explorer_compass_02"
+    },
+    {
+      "predicate": {
+        "angle": 0.15625
+      },
+      "model": "singulo:item/explorer_compass_03"
+    },
+    {
+      "predicate": {
+        "angle": 0.21875
+      },
+      "model": "singulo:item/explorer_compass_04"
+    },
+    {
+      "predicate": {
+        "angle": 0.28125
+      },
+      "model": "singulo:item/explorer_compass_05"
+    },
+    {
+      "predicate": {
+        "angle": 0.34375
+      },
+      "model": "singulo:item/explorer_compass_06"
+    },
+    {
+      "predicate": {
+        "angle": 0.40625
+      },
+      "model": "singulo:item/explorer_compass_07"
+    },
+    {
+      "predicate": {
+        "angle": 0.46875
+      },
+      "model": "singulo:item/explorer_compass_08"
+    },
+    {
+      "predicate": {
+        "angle": 0.53125
+      },
+      "model": "singulo:item/explorer_compass_09"
+    },
+    {
+      "predicate": {
+        "angle": 0.59375
+      },
+      "model": "singulo:item/explorer_compass_10"
+    },
+    {
+      "predicate": {
+        "angle": 0.65625
+      },
+      "model": "singulo:item/explorer_compass_11"
+    },
+    {
+      "predicate": {
+        "angle": 0.71875
+      },
+      "model": "singulo:item/explorer_compass_12"
+    },
+    {
+      "predicate": {
+        "angle": 0.78125
+      },
+      "model": "singulo:item/explorer_compass_13"
+    },
+    {
+      "predicate": {
+        "angle": 0.84375
+      },
+      "model": "singulo:item/explorer_compass_14"
+    },
+    {
+      "predicate": {
+        "angle": 0.90625
+      },
+      "model": "singulo:item/explorer_compass_15"
+    },
+    {
+      "predicate": {
+        "angle": 0.96875
+      },
+      "model": "singulo:item/explorer_compass_00"
+    }
+  ]
+}

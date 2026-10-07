@@ -1,0 +1,41 @@
+{
+  "type": "singulo:machine",
+  "station": "laser_cooler",
+  "stage": 3,
+  "time": 800,
+  "energy": 8000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:cold_atoms"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_wire"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "singulo:muon_catalysts"
+      },
+      "count": 1
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_nitrogen",
+      "amount": 100
+    },
+    {
+      "fluid": "singulo:liquid_helium",
+      "amount": 25
+    }
+  ],
+  "result": {
+    "id": "singulo:bose_condensate_catalyst",
+    "count": 1
+  }
+}

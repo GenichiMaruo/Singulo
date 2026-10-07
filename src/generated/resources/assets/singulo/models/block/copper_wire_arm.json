@@ -1,0 +1,71 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/copper_wire",
+    "c": "singulo:block/copper_wire",
+    "e": "singulo:block/copper_wire_end"
+  },
+  "elements": [
+    {
+      "from": [
+        7,
+        7,
+        0
+      ],
+      "to": [
+        9,
+        9,
+        7
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            7,
+            7,
+            9
+          ],
+          "texture": "#c"
+        },
+        "west": {
+          "uv": [
+            0,
+            7,
+            7,
+            9
+          ],
+          "texture": "#c"
+        },
+        "up": {
+          "uv": [
+            0,
+            7,
+            7,
+            9
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            7,
+            7,
+            9
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "north": {
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ],
+          "texture": "#e"
+        }
+      }
+    }
+  ]
+}

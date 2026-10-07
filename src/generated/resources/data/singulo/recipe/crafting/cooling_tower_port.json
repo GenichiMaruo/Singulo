@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:cooling_tower_casing"
+    },
+    {
+      "item": "singulo:cooling_tower_casing"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    }
+  ],
+  "result": {
+    "id": "singulo:cooling_tower_port",
+    "count": 1
+  }
+}

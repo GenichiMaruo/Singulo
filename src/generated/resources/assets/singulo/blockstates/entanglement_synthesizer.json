@@ -1,0 +1,90 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer_on"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer_on",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer_on",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "singulo:block/entanglement_synthesizer_on",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "boosted": "true"
+      },
+      "apply": {
+        "model": "singulo:block/boost_overlay"
+      }
+    }
+  ]
+}

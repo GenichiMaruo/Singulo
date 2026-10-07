@@ -1,0 +1,62 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/horizon_bus",
+    "c": "singulo:block/horizon_bus",
+    "e": "singulo:block/horizon_bus_end"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        4,
+        4
+      ],
+      "to": [
+        12,
+        12,
+        12
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            4,
+            8,
+            12
+          ],
+          "texture": "#c"
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            8,
+            12
+          ],
+          "texture": "#c"
+        },
+        "up": {
+          "uv": [
+            0,
+            4,
+            8,
+            12
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            4,
+            8,
+            12
+          ],
+          "texture": "#c",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:magnetic_monopole"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:steel_plate"
+    },
+    {
+      "item": "singulo:steel_plate"
+    }
+  ],
+  "result": {
+    "id": "singulo:monopole_upgrade",
+    "count": 1
+  }
+}

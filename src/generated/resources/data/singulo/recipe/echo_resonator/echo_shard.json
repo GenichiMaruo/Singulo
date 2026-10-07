@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "echo_resonator",
+  "stage": 3,
+  "time": 2400,
+  "energy": 4000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:echo_shard"
+      },
+      "uses": 1
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:sculk"
+      },
+      "count": 16
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:amethyst_shard"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:echo_shard",
+    "count": 1
+  }
+}

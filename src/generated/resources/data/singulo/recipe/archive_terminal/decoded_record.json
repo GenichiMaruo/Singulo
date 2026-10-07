@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "archive_terminal",
+  "stage": 1,
+  "time": 300,
+  "energy": 60,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:record_fragment"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:decoded_record",
+    "count": 1
+  }
+}

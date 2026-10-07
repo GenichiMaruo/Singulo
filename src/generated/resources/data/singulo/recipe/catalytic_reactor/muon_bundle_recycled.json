@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "catalytic_reactor",
+  "stage": 2,
+  "time": 200,
+  "energy": 200,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:spent_muon_catalyst"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "singulo:muon_bundle",
+    "count": 2
+  }
+}

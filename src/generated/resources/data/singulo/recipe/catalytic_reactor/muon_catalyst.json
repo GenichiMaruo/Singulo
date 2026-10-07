@@ -1,0 +1,49 @@
+{
+  "type": "singulo:machine",
+  "station": "catalytic_reactor",
+  "stage": 2,
+  "time": 400,
+  "energy": 200,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:muon_bundle"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:ceramic_substrate"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "c:ingots/copper"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:dusts/redstone"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:data_card_observation_log"
+      },
+      "count": 1
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_nitrogen",
+      "amount": 100
+    }
+  ],
+  "result": {
+    "id": "singulo:muon_catalyst",
+    "count": 1
+  }
+}

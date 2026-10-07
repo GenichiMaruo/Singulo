@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "cryogenic_cooling_tower",
+  "stage": 4,
+  "time": 400,
+  "energy": 4000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_wire"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "singulo:topological_wire",
+    "count": 8
+  }
+}

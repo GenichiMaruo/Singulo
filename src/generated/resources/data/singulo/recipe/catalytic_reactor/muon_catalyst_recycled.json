@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "catalytic_reactor",
+  "stage": 3,
+  "time": 400,
+  "energy": 400,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:spent_bose_condensate_catalyst"
+      },
+      "count": 4
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_nitrogen",
+      "amount": 100
+    }
+  ],
+  "result": {
+    "id": "singulo:muon_catalyst",
+    "count": 1
+  }
+}

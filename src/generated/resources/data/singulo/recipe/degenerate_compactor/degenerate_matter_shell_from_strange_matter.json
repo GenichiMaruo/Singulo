@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "degenerate_compactor",
+  "stage": 4,
+  "time": 800,
+  "energy": 50000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:strange_matter"
+      },
+      "count": 32
+    },
+    {
+      "ingredient": {
+        "item": "singulo:compressed_metal_block_2"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_nitrogen",
+      "amount": 3000
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_matter_shell",
+    "count": 1
+  }
+}

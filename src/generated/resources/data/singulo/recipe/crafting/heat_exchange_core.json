@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "item": "singulo:steel_plate"
+    },
+    {
+      "item": "minecraft:blue_ice"
+    }
+  ],
+  "result": {
+    "id": "singulo:heat_exchange_core",
+    "count": 1
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:basic_frame"
+    },
+    {
+      "tag": "c:ender_pearls"
+    },
+    {
+      "tag": "c:ender_pearls"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    }
+  ],
+  "result": {
+    "id": "singulo:worldline_anchor_small",
+    "count": 1
+  }
+}

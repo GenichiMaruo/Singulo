@@ -1,0 +1,59 @@
+{
+  "hot": [
+    {
+      "block": "minecraft:campfire",
+      "temperature": 800,
+      "requires_lit": true
+    },
+    {
+      "block": "minecraft:soul_campfire",
+      "temperature": 800,
+      "requires_lit": true
+    },
+    {
+      "block": "minecraft:magma_block",
+      "temperature": 1000
+    },
+    {
+      "block": "minecraft:lava",
+      "temperature": 1300
+    },
+    {
+      "block": "singulo:kiln",
+      "temperature": 900,
+      "requires_lit": true
+    }
+  ],
+  "cold": [
+    {
+      "block": "minecraft:water",
+      "temperature": 293,
+      "tolerance": 200,
+      "becomes": "minecraft:air"
+    },
+    {
+      "block": "minecraft:snow_block",
+      "temperature": 268,
+      "tolerance": 300,
+      "becomes": "minecraft:water"
+    },
+    {
+      "block": "minecraft:ice",
+      "temperature": 263,
+      "tolerance": 400,
+      "becomes": "minecraft:water"
+    },
+    {
+      "block": "minecraft:packed_ice",
+      "temperature": 253,
+      "tolerance": 600,
+      "becomes": "minecraft:ice"
+    },
+    {
+      "block": "minecraft:blue_ice",
+      "temperature": 243,
+      "tolerance": 900,
+      "becomes": "minecraft:packed_ice"
+    }
+  ]
+}

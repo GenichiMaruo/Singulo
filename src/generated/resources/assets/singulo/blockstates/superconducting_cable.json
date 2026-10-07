@@ -1,0 +1,198 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "straight": "none",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_core"
+      }
+    },
+    {
+      "when": {
+        "straight": "z",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_straight"
+      }
+    },
+    {
+      "when": {
+        "straight": "x",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "straight": "y",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm"
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "true",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "straight": "none",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_core_on"
+      }
+    },
+    {
+      "when": {
+        "straight": "z",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_straight_on"
+      }
+    },
+    {
+      "when": {
+        "straight": "x",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_straight_on",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "straight": "y",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_straight_on",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm_on"
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm_on",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm_on",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm_on",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm_on",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "true",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/superconducting_cable_arm_on",
+        "x": 90
+      }
+    }
+  ]
+}

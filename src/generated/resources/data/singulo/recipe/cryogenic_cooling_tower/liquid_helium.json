@@ -1,0 +1,21 @@
+{
+  "type": "singulo:machine",
+  "station": "cryogenic_cooling_tower",
+  "stage": 3,
+  "time": 100,
+  "energy": 2000,
+  "ingredients": [],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:helium",
+      "amount": 100
+    }
+  ],
+  "min_size": 10,
+  "fluid_results": [
+    {
+      "id": "singulo:liquid_helium",
+      "amount": 100
+    }
+  ]
+}

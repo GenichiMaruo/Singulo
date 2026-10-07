@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 220,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:quantum_computing_module"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_furnace_controller",
+    "count": 1
+  }
+}

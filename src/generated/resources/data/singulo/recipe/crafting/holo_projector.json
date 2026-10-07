@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:basic_circuit"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "tag": "c:ingots/copper"
+    }
+  ],
+  "result": {
+    "id": "singulo:holo_projector",
+    "count": 1
+  }
+}

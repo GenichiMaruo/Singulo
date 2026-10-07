@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:singularity_seed"
+    },
+    "title": {
+      "translate": "advancement.singulo.seed.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.seed.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:singularity_seed"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:warden"
+}

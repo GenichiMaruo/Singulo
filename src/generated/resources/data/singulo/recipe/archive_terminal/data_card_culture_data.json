@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "archive_terminal",
+  "stage": 4,
+  "time": 200,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:culture_data"
+      },
+      "uses": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:blank_data_card"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:data_card_culture_data",
+    "count": 1
+  }
+}
