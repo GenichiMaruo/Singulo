@@ -119,6 +119,32 @@ public final class ReactorGameTests {
                 "ポートにつないだケーブルから点火の電力が入らない: " + r.state()));
     }
 
+    /** 抽出ポートはリングの炉殻のどこに置いてもよい（斜め45°でなくても、数が違っても形成でき、そこから電力に届く）。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 100)
+    public static void extractionPortsAnywhereOnRings(GameTestHelper helper) {
+        build(helper);
+        // 斜めのポートを1つ炉殻に戻し、斜めでない炉殻の位置を2つポートにする
+        BlockPos moved = null;
+        java.util.List<BlockPos> added = new java.util.ArrayList<>();
+        for (Map.Entry<BlockPos, MultiblockPart.Role> e : Structures.reactorLayout(CENTER).entrySet()) {
+            if (moved == null && e.getValue() == MultiblockPart.Role.EXTRACTION_PORT) {
+                moved = e.getKey();
+                helper.setBlock(moved, SinguloBlocks.REACTOR_SHELL.get());
+            } else if (added.size() < 2 && e.getValue() == MultiblockPart.Role.REACTOR_SHELL) {
+                added.add(e.getKey());
+                helper.setBlock(e.getKey(), SinguloBlocks.EXTRACTION_PORT.get());
+            }
+        }
+        BlockPos port = added.get(0);
+        helper.succeedWhen(() -> {
+            Structures.Reactor r = Structures.findReactor(helper.getLevel(), helper.absolutePos(CONTROLLER));
+            helper.assertTrue(r != null, "ポートを斜め以外に置くと形成されない");
+            helper.assertTrue(r.ports().size() == 13 && r.ports().contains(helper.absolutePos(port)), "置いたポートが数えられない: " + r.ports().size());
+            helper.assertTrue(helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, helper.absolutePos(port), null) != null,
+                    "斜め以外のポートから電力に届かない");
+        });
+    }
+
     @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 400)
     public static void ignitionFailsWithoutEnoughPowerButKeepsSeed(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
@@ -145,6 +171,38 @@ public final class ReactorGameTests {
             helper.assertTrue(used >= 8 && used <= 12, "エディントン限界（毎秒2個）で投入されない: " + used);
             helper.assertTrue(r.buffer() > 0, "発電していない");
             helper.assertTrue(r.mass() > 2000, "投入した質量の一部が炉心に加わらない: " + r.mass());
+            helper.succeed();
+        });
+    }
+
+    /** リングの内側に入ったものは中心へ吸い込まれ、どんなに頑丈でも（無敵・耐性・体力・不死のトーテム）必ず死ぬ。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    public static void eventHorizonKillsEvenTheToughest(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
+        Zombie zombie = helper.spawn(EntityType.ZOMBIE, CENTER.offset(3, -1, 0));
+        zombie.setInvulnerable(true);
+        zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1024);
+        zombie.setHealth(1024);
+        zombie.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,
+                100_000, 255));
+        zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.TOTEM_OF_UNDYING));
+        helper.succeedWhen(() -> helper.assertTrue(zombie.isDeadOrDying() || zombie.isRemoved(),
+                "事象の地平線で死なない: 体力 " + zombie.getHealth() + " 位置 " + zombie.position()));
+    }
+
+    /** リングの外にいるものは少し引き寄せられるだけで、吸い込まれたり死んだりはしない。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    public static void outsideTheRingsOnlyWeakPull(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
+        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(0, 1, 0));
+        Vec3 c = Vec3.atCenterOf(helper.absolutePos(CENTER));
+        helper.runAtTickTime(80, () -> {
+            helper.assertTrue(zombie.isAlive(), "リングの外で死んだ");
+            helper.assertTrue(zombie.position().distanceTo(c) > Structures.REACTOR_RADIUS + 0.5,
+                    "リングの外から吸い込まれた: " + zombie.position().distanceTo(c));
+            zombie.discard();
             helper.succeed();
         });
     }

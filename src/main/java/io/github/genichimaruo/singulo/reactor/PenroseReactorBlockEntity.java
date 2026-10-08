@@ -300,6 +300,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         ignitionStored = 0;
         int window = ServerConfig.SPEC.isLoaded() ? ServerConfig.IGNITION_WINDOW_SECONDS.get() : 10;
         ignitionTicks = window * 20;
+        if (level != null) {
+            // 点火の音（電力を注ぐ10秒のあいだの高まり）
+            Vec3 core = coreCenter();
+            level.playSound(null, core.x, core.y, core.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("penrose_reactor_ignition"),
+                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 1.0F);
+        }
         setChanged();
         return true;
     }
@@ -313,6 +319,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             items.extractItem(SLOT_SEED, 1, false);
             state = State.RUNNING;
             io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, worldPosition, 64, "ignite");
+            // ブラックホールができた音（炉心から、遠くまで）
+            Vec3 core = coreCenter();
+            level.playSound(null, core.x, core.y, core.z, io.github.genichimaruo.singulo.registry.SinguloSounds.BLACK_HOLE_FORMATION.get(),
+                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 1.0F);
             mass = START_MASS;
             spin = 0;
             ignitedBefore = true;
@@ -414,38 +424,129 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
     }
 
-    /** 引力帯（中心向きの加速、距離の二乗に反比例・上限つき）と潮汐帯（防具を無視する継続ダメージ）。 */
+    /** 事象の地平線（黒い球）の半径（ブロック）。炉心の質量で 0.6〜1.6。描画と、触れたものを消す判定に使う。 */
+    public double horizonRadius() {
+        return 0.6 + 1.0 * Math.min(1.0, mass / MAX_MASS);
+    }
+
+    /** リングの内側（強い引力）とみなす、中心からの距離（ブロック）。 */
+    public static final double INNER_RADIUS = Structures.REACTOR_RADIUS + 0.5;
+
+    /** 炉心の中心（ワールド座標）。サーバーでもクライアントでも同じ場所。 */
+    public Vec3 coreCenter() {
+        return Vec3.atCenterOf(center != null ? center : worldPosition.above(Structures.CONTROLLER_BELOW_CENTER));
+    }
+
+    /**
+     * 1 tick ぶんの引力をかけたあとの速さ。引力の外なら null。サーバー（モブ・アイテム）とクライアント（自分のプレイヤー）で同じ式を使う。
+     * <ul>
+     *   <li>リングの外（引力帯の半径まで）: 弱い引力（blackHolePullStrength、距離の二乗に反比例・上限つき）。歩けば逃げられる</li>
+     *   <li>リングの内側: 強い引力（blackHoleInnerPullStrength、中心に近いほど強い）。今の速さも中心向きに寄せて逃げられない</li>
+     * </ul>
+     */
+    @org.jetbrains.annotations.Nullable
+    public static Vec3 pulledVelocity(Vec3 velocity, Vec3 body, Vec3 c) {
+        Vec3 to = c.subtract(body);
+        double d = to.length();
+        if (d < 1e-3) {
+            return null;
+        }
+        if (d <= INNER_RADIUS) {
+            double innerStrength = ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_INNER_PULL_STRENGTH.get() : 0.25;
+            double accel = innerStrength * (1 + 3.5 * (1 - d / INNER_RADIUS));
+            Vec3 v = velocity.scale(0.85).add(to.scale(accel / d));
+            double max = 1.6;
+            return v.lengthSqr() > max * max ? v.normalize().scale(max) : v;
+        }
+        int radius = ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_RADIUS.get() : 24;
+        if (d > radius) {
+            return null;
+        }
+        double strength = ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_STRENGTH.get() : 0.04;
+        double accel = Math.min(strength, strength * 16 / (d * d));
+        return velocity.add(to.scale(accel / d));
+    }
+
+    /**
+     * 引力と潮汐と事象の地平線（サーバー、毎tick）。
+     * <ul>
+     *   <li>引力: {@link #pulledVelocity}。プレイヤーは自分のクライアントで同じ引力をかける（サーバーから速さを送ると歩きとぶつかってカクつくため）</li>
+     *   <li>潮汐帯: 防具を無視する継続ダメージ</li>
+     *   <li>事象の地平線に触れたもの: どんな体力・耐性でも必ず消える（{@link EventHorizon}）。プレイヤーもここはサーバーで判定する</li>
+     * </ul>
+     * クリエイティブとスペクテイターのプレイヤーは引き寄せも消滅も受けない（組み立てのため）。
+     */
     private void applyHazards(ServerLevel level) {
         if (center == null) {
             return;
         }
-        int interval = ServerConfig.SPEC.isLoaded() ? ServerConfig.PULL_CHECK_INTERVAL_TICKS.get() : 5;
-        if (level.getGameTime() % interval != 0) {
-            return;
-        }
-        int radius = ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_RADIUS.get() : 24;
-        double strength = ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_STRENGTH.get() : 0.02;
-        int tidal = ServerConfig.SPEC.isLoaded() ? ServerConfig.TIDAL_DAMAGE_RADIUS.get() : 4;
-        Vec3 c = Vec3.atCenterOf(center);
-        if (radius > 0) {
-            for (Entity e : level.getEntitiesOfClass(Entity.class, new AABB(center).inflate(radius),
-                    e -> !e.isSpectator() && !(e instanceof Player p && p.isCreative()))) {
-                Vec3 to = c.subtract(e.position().add(0, e.getBbHeight() / 2, 0));
-                double d = to.length();
-                if (d < 0.5 || d > radius) {
-                    continue;
+        Vec3 c = coreCenter();
+        boolean kill = !ServerConfig.SPEC.isLoaded() || ServerConfig.EVENT_HORIZON_KILL.get();
+        double horizon = horizonRadius();
+        int radius = Math.max((int) Math.ceil(INNER_RADIUS),
+                ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_RADIUS.get() : 24);
+        for (Entity e : level.getEntitiesOfClass(Entity.class, new AABB(center).inflate(radius), EventHorizonTargets::affected)) {
+            if (kill && touches(e.getBoundingBox(), c, horizon)) {
+                EventHorizon.consume(level, e);
+                continue;
+            }
+            if (e instanceof Player) {
+                continue;
+            }
+            Vec3 v = pulledVelocity(e.getDeltaMovement(), e.getBoundingBox().getCenter(), c);
+            if (v == null) {
+                continue;
+            }
+            e.setDeltaMovement(v);
+            e.hurtMarked = true;
+            if (e.getBoundingBox().getCenter().distanceTo(c) <= INNER_RADIUS) {
+                e.fallDistance = 0;
+                if (e instanceof net.minecraft.world.entity.Mob mob) {
+                    mob.getNavigation().stop();
                 }
-                double accel = Math.min(strength, strength * 16 / (d * d));
-                e.setDeltaMovement(e.getDeltaMovement().add(to.normalize().scale(accel * interval)));
-                e.hurtMarked = true;
             }
         }
-        if (tidal > 0 && level.getGameTime() % 10 < interval) {
+        int interval = ServerConfig.SPEC.isLoaded() ? ServerConfig.PULL_CHECK_INTERVAL_TICKS.get() : 5;
+        int tidal = ServerConfig.SPEC.isLoaded() ? ServerConfig.TIDAL_DAMAGE_RADIUS.get() : 4;
+        if (tidal > 0 && level.getGameTime() % 10 < interval && level.getGameTime() % interval == 0) {
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(center).inflate(tidal),
-                    e -> e.position().distanceTo(c) <= tidal)) {
+                    e -> e.position().distanceTo(c) <= tidal && EventHorizonTargets.affected(e))) {
                 e.hurt(SinguloDamageTypes.tidal(level, null), 4.0F);
             }
         }
+    }
+
+    // ------------------------------------------------------------------ クライアント: 自分のプレイヤーへの引力
+
+    /** クライアントで読み込まれているリアクター（自分のプレイヤーに引力をかけるため）。 */
+    private static final java.util.Set<PenroseReactorBlockEntity> CLIENT_LOADED =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && level.isClientSide) {
+            CLIENT_LOADED.add(this);
+        }
+    }
+
+    /** クライアントで、稼働中のリアクター。 */
+    public static java.util.List<PenroseReactorBlockEntity> clientRunning(Level level) {
+        java.util.List<PenroseReactorBlockEntity> out = new java.util.ArrayList<>();
+        for (PenroseReactorBlockEntity r : CLIENT_LOADED) {
+            if (!r.isRemoved() && r.level == level && r.state == State.RUNNING) {
+                out.add(r);
+            }
+        }
+        return out;
+    }
+
+    /** 当たり判定の箱が、中心 c・半径 r の球に触れているか。 */
+    static boolean touches(AABB box, Vec3 c, double r) {
+        double dx = Math.max(box.minX - c.x, Math.max(0, c.x - box.maxX));
+        double dy = Math.max(box.minY - c.y, Math.max(0, c.y - box.maxY));
+        double dz = Math.max(box.minZ - c.z, Math.max(0, c.z - box.maxZ));
+        return dx * dx + dy * dy + dz * dz <= r * r;
     }
 
     /** 炉心制御装置と抽出ポートの隣（リアクターの部品以外）へ電力を押し出す。1 tick の合計は penroseMaxOutput まで。 */
@@ -718,6 +819,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (level != null && !chunkUnloading) {
             link(level, ports, null);
         }
+        CLIENT_LOADED.remove(this);
         if (level != null) {
             TimeFields.remove(level, worldPosition);
             java.util.Set<PenroseReactorBlockEntity> running = RUNNING.get(level);
