@@ -37,7 +37,7 @@ public class SmesMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 64.0
+        return io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player, pos)
                 && player.level().getBlockEntity(pos) instanceof SmesCellBlockEntity;
     }
 }
