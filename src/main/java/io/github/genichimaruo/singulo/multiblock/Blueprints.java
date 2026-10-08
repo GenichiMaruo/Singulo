@@ -325,7 +325,8 @@ public final class Blueprints {
             case PENROSE_REACTOR -> Structures.findReactor(level, c) == null ? 0 : 13;
             case SHIELD_TOWER -> Structures.casingShape(level, c, Structures.shieldTowerLayout(c), 0) ? 9 : 0;
             case TIPLER_CYLINDER -> Structures.casingShape(level, c, Structures.tiplerLayout(c), 6) ? 7 : 0;
-            case WORMHOLE_GENERATOR -> Structures.casingShape(level, c, Structures.wormholeGeneratorLayout(c), 2) ? 3 : 0;
+            case WORMHOLE_GENERATOR -> Structures.casingShapeWithPorts(level, c, Structures.wormholeGeneratorLayout(c), 2,
+                    MultiblockPart.Role.WORMHOLE_IO, new java.util.ArrayList<>()) ? 3 : 0;
         };
     }
 
@@ -346,7 +347,31 @@ public final class Blueprints {
             }
             partBlocks = set;
         }
-        return partBlocks.contains(block);
+        return partBlocks.contains(block) || block == SinguloBlocks.WORMHOLE_GENERATOR_IO.get();
+    }
+
+    /**
+     * 画面を開いたままでいられる、コントローラーからの距離（ブロック）。
+     * どの部品を右クリックしても画面が開くので、ふつうの 8 ブロックに構造物の大きさを足す。
+     */
+    public static double menuReach(net.minecraft.world.level.Level level, BlockPos controller) {
+        Kind kind = kindOf(level.getBlockState(controller).getBlock());
+        if (kind == null) {
+            return 8;
+        }
+        int extent = switch (kind) {
+            case PARTICLE_ACCELERATOR -> Structures.RING_MAX_SIDE + 2;
+            case COOLING_TOWER -> Structures.TOWER_MAX_HEIGHT + 1;
+            case PENROSE_REACTOR -> Structures.REACTOR_RADIUS * 2 + 2;
+            default -> kind.defaultSize() + 1;
+        };
+        return 8 + extent;
+    }
+
+    /** 画面を開いたままでいられるか（プレイヤーとコントローラーの距離）。 */
+    public static boolean withinMenuReach(net.minecraft.world.entity.player.Player player, BlockPos pos) {
+        double reach = menuReach(player.level(), pos);
+        return player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= reach * reach;
     }
 
     /** 加速器の一辺の上限（部品からコントローラーを探す範囲）。 */

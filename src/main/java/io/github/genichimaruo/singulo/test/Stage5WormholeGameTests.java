@@ -72,6 +72,27 @@ public final class Stage5WormholeGameTests {
         });
     }
 
+    /** 外殻の代わりに入出力口を置いても形成でき、口から電力を入れ、できた口を取り出せる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void wormholeGeneratorIoPortAnywhere(GameTestHelper helper) {
+        BlockPos core = new BlockPos(3, 1, 3);
+        helper.setBlock(core, SinguloBlocks.WORMHOLE_GENERATOR_CORE.get());
+        java.util.List<BlockPos> layout = Structures.wormholeGeneratorLayout(helper.absolutePos(core));
+        BlockPos io = layout.get(layout.size() - 1);           // 上の段の角
+        for (BlockPos p : layout) {
+            helper.getLevel().setBlockAndUpdate(p, (p.equals(io) ? SinguloBlocks.WORMHOLE_GENERATOR_IO.get()
+                    : SinguloBlocks.DEGENERATE_CASING.get()).defaultBlockState());
+        }
+        WormholeGeneratorBlockEntity gen = helper.getBlockEntity(core);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(gen.formed(), "入出力口を置くと形成されない");
+            var energy = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, io, null);
+            helper.assertTrue(energy != null && energy.receiveEnergy(1000, true) > 0, "入出力口から電力が入らない");
+            var items = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, io, null);
+            helper.assertTrue(items != null, "入出力口から口を取り出せない");
+        });
+    }
+
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void stabilizerSealsMouthsAndRejectsExpiredOnes(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);

@@ -93,6 +93,9 @@ public final class SinguloBlocks {
     public static final DeferredBlock<PartBlock> GYRO_DRIVE = part("gyro_drive", MultiblockPart.Role.GYRO_DRIVE);
     public static final DeferredBlock<PortBlock> EXTRACTION_PORT = BLOCKS.register("extraction_port",
             () -> new PortBlock(partProperties(), MultiblockPart.Role.EXTRACTION_PORT));
+    /** ワームホール生成器の入出力口（外殻の代わりにどこにでも置ける）。 */
+    public static final DeferredBlock<PortBlock> WORMHOLE_GENERATOR_IO = BLOCKS.register("wormhole_generator_io",
+            () -> new PortBlock(partProperties(), MultiblockPart.Role.WORMHOLE_IO));
     /** 炉心制御装置（ペンローズ・リアクターのコントローラ）。 */
     public static final DeferredBlock<SimpleMachineBlock<PenroseReactorBlockEntity>> CORE_CONTROLLER = BLOCKS.register(
             "core_controller", () -> new SimpleMachineBlock<>(machineProperties(),

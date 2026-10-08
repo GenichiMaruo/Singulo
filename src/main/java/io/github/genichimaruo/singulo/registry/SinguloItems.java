@@ -101,6 +101,7 @@ public final class SinguloItems {
         block(SinguloBlocks.REACTOR_SHELL, 5);
         block(SinguloBlocks.GYRO_DRIVE, 5);
         block(SinguloBlocks.EXTRACTION_PORT, 5);
+        block(SinguloBlocks.WORMHOLE_GENERATOR_IO, 5);
         block(SinguloBlocks.CORE_CONTROLLER, 5);
         block(SinguloBlocks.HORIZON_BUS, 5);
         block(SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED, 5);

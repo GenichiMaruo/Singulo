@@ -70,7 +70,8 @@ public final class SinguloBlockEntities {
             REGISTER.register("smes_module", () -> build(SmesCellBlockEntity.Module::new, SinguloBlocks.SMES_MODULE.get()));
 
     public static final Supplier<BlockEntityType<PortBlockEntity>> PORT = REGISTER.register("port",
-            () -> build(PortBlockEntity::new, SinguloBlocks.COOLING_TOWER_PORT.get(), SinguloBlocks.EXTRACTION_PORT.get()));
+            () -> build(PortBlockEntity::new, SinguloBlocks.COOLING_TOWER_PORT.get(), SinguloBlocks.EXTRACTION_PORT.get(),
+                    SinguloBlocks.WORMHOLE_GENERATOR_IO.get()));
 
     public static final Supplier<BlockEntityType<PenroseReactorBlockEntity>> PENROSE_REACTOR = REGISTER.register(
             "penrose_reactor", () -> build(PenroseReactorBlockEntity::new, SinguloBlocks.CORE_CONTROLLER.get()));

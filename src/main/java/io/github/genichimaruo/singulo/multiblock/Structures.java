@@ -360,7 +360,7 @@ public final class Structures {
         RING_POINTS = out.toArray(new int[0][]);
     }
 
-    /** リングの点の役割: 軸上はジャイロ駆動部、斜め45°は抽出ポート、ほかは炉殻。 */
+    /** リングの点の役割（設計図の配置）: 軸上はジャイロ駆動部、斜め45°は抽出ポート、ほかは炉殻。抽出ポートは炉殻のどこに置いてもよい。 */
     static MultiblockPart.Role ringRole(int u, int v) {
         if (u == 0 || v == 0) {
             return MultiblockPart.Role.GYRO_DRIVE;
@@ -387,10 +387,13 @@ public final class Structures {
         java.util.Map<BlockPos, MultiblockPart.Role> layout = reactorLayout(c);
         List<BlockPos> ports = new ArrayList<>();
         for (java.util.Map.Entry<BlockPos, MultiblockPart.Role> e : layout.entrySet()) {
-            if (role(level.getBlockState(e.getKey())) != e.getValue()) {
+            MultiblockPart.Role have = role(level.getBlockState(e.getKey()));
+            boolean ring = e.getValue() == MultiblockPart.Role.REACTOR_SHELL || e.getValue() == MultiblockPart.Role.EXTRACTION_PORT;
+            if (ring ? have != MultiblockPart.Role.REACTOR_SHELL && have != MultiblockPart.Role.EXTRACTION_PORT
+                    : have != e.getValue()) {
                 return null;
             }
-            if (e.getValue() == MultiblockPart.Role.EXTRACTION_PORT) {
+            if (have == MultiblockPart.Role.EXTRACTION_PORT) {
                 ports.add(e.getKey());
             }
         }
@@ -478,6 +481,30 @@ public final class Structures {
             }
         }
         return out;
+    }
+
+    /**
+     * 縮退炉外殻で決まった形ができているか。ただし外殻の代わりに portRole の入出力口を置いてもよい（置いた場所を ports に入れる）。
+     */
+    public static boolean casingShapeWithPorts(Level level, BlockPos core, List<BlockPos> layout, int airAbove,
+                                               MultiblockPart.Role portRole, List<BlockPos> ports) {
+        ports.clear();
+        for (BlockPos p : layout) {
+            MultiblockPart.Role r = role(level.getBlockState(p));
+            if (r == portRole) {
+                ports.add(p.immutable());
+            } else if (r != MultiblockPart.Role.DEGENERATE_CASING) {
+                ports.clear();
+                return false;
+            }
+        }
+        for (int y = 1; y <= airAbove; y++) {
+            if (!level.getBlockState(core.above(y)).isAir()) {
+                ports.clear();
+                return false;
+            }
+        }
+        return true;
     }
 
     /** 縮退炉外殻で決まった形ができているか。airAbove は中央で空気でなければならない高さの数。 */

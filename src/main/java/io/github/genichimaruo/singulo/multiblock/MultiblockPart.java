@@ -25,8 +25,10 @@ public interface MultiblockPart {
         REACTOR_SHELL,
         /** ペンローズ・リアクターのリングが交わる軸の6点。リングを回す */
         GYRO_DRIVE,
-        /** ペンローズ・リアクターの対角8点。電力・燃料の出入り口 */
-        EXTRACTION_PORT
+        /** ペンローズ・リアクターの電力・燃料の出入り口（リングの炉殻のどこに置いてもよい） */
+        EXTRACTION_PORT,
+        /** ワームホール生成器の入出力口（外殻のどこに置いてもよい）。電力を入れ、できた口を取り出す */
+        WORMHOLE_IO
     }
 
     Role role();
