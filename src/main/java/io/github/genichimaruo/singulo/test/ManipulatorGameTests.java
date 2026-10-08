@@ -56,4 +56,85 @@ public final class ManipulatorGameTests {
         }
         helper.succeed();
     }
+
+    /** 右クリックでためて離すと、持ち上げたモブが前へ飛んでいき、1秒は持ち上げられない。 */
+    @GameTest(template = "huge", timeoutTicks = 140)
+    public static void manipulatorChargeAndThrow(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        try {
+            player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(2, 1, 1));
+            player.moveTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 0F);   // 南（+Z）を向く
+            var item = io.github.genichimaruo.singulo.registry.SinguloItems.GRAVITON_MANIPULATOR.get();
+            net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(item);
+            io.github.genichimaruo.singulo.item.GravityGauntletItem.energy(stack).receiveEnergy(Integer.MAX_VALUE, false);
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
+            net.minecraft.world.item.ItemStack tank = new net.minecraft.world.item.ItemStack(
+                    io.github.genichimaruo.singulo.registry.SinguloBlocks.CONTAINMENT_TANK.get());
+            tank.set(io.github.genichimaruo.singulo.registry.SinguloComponents.DARK_MATTER.get(), 4000);
+            player.getInventory().setItem(5, tank);
+            var zombie = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.core.BlockPos(2, 1, 5));
+            double[] startZ = new double[1];
+            helper.onEachTick(() -> GravitonManipulatorItem.onPlayerTick(
+                    new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player)));
+            // 左クリックで持ち上げ、押したまま右クリックでためる（実際の操作と同じ）
+            helper.runAtTickTime(2, () -> GravitonManipulatorItem.setInput(player, false, true));
+            helper.runAtTickTime(6, () -> GravitonManipulatorItem.setInput(player, true, true));
+            helper.runAtTickTime(40, () -> {
+                helper.assertTrue(zombie.getY() > base.getY() + 0.5, "ためている間に持ち上がらない: y=" + zombie.getY());
+                startZ[0] = zombie.getZ();
+                GravitonManipulatorItem.setInput(player, true, false);
+            });
+            String[] after = new String[1];
+            helper.runAtTickTime(41, () -> after[0] = "直後の速さ " + zombie.getDeltaMovement() + " 位置 " + zombie.position());
+            helper.runAtTickTime(50, () -> helper.assertTrue(player.getCooldowns().isOnCooldown(item), "投げたあとにクールタイムがない"));
+            // 左クリックは押したまま。クールタイムが明けても掴み直して引き戻さない
+            helper.runAtTickTime(75, () -> {
+                helper.assertTrue(zombie.getZ() > startZ[0] + 3, "離しても飛んでいかない: " + startZ[0] + " → " + zombie.getZ() + " / " + after[0]);
+                zombie.discard();
+                helper.succeed();
+            });
+        } finally {
+            // プレイヤーはテストの終わりまで残す（runAtTickTime の後で外す）
+            helper.runAtTickTime(85, () -> helper.getLevel().getServer().getPlayerList().remove(player));
+        }
+    }
+
+    /** 円錐（G キー）で持ち上げていても、ためて離すと投げられる。 */
+    @GameTest(template = "huge", timeoutTicks = 140)
+    public static void manipulatorThrowInConeMode(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        try {
+            player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(7, 1, 1));
+            player.moveTo(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 0F);
+            var item = io.github.genichimaruo.singulo.registry.SinguloItems.GRAVITON_MANIPULATOR.get();
+            net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(item);
+            io.github.genichimaruo.singulo.item.GravityGauntletItem.energy(stack).receiveEnergy(Integer.MAX_VALUE, false);
+            item.toggleCone(player, stack);
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
+            net.minecraft.world.item.ItemStack tank = new net.minecraft.world.item.ItemStack(
+                    io.github.genichimaruo.singulo.registry.SinguloBlocks.CONTAINMENT_TANK.get());
+            tank.set(io.github.genichimaruo.singulo.registry.SinguloComponents.DARK_MATTER.get(), 4000);
+            player.getInventory().setItem(5, tank);
+            var zombie = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.core.BlockPos(7, 1, 5));
+            double[] startZ = new double[1];
+            helper.onEachTick(() -> GravitonManipulatorItem.onPlayerTick(
+                    new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player)));
+            helper.runAtTickTime(2, () -> GravitonManipulatorItem.setInput(player, false, true));
+            helper.runAtTickTime(6, () -> GravitonManipulatorItem.setInput(player, true, true));
+            helper.runAtTickTime(40, () -> {
+                helper.assertTrue(zombie.getY() > base.getY() + 0.5, "円錐で持ち上がらない: y=" + zombie.getY());
+                startZ[0] = zombie.getZ();
+                GravitonManipulatorItem.setInput(player, true, false);
+            });
+            helper.runAtTickTime(55, () -> {
+                helper.assertTrue(zombie.getZ() > startZ[0] + 3, "円錐で持ち上げたものを投げられない: " + startZ[0] + " → " + zombie.getZ());
+                zombie.discard();
+                helper.succeed();
+            });
+        } finally {
+            helper.runAtTickTime(65, () -> helper.getLevel().getServer().getPlayerList().remove(player));
+        }
+    }
 }

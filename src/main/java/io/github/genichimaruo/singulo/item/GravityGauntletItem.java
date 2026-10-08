@@ -311,11 +311,22 @@ public class GravityGauntletItem extends SinguloItem {
         TARGETS.remove(player.getUUID());
     }
 
+    /** 浮遊で持ち上げた対象を置いておく距離（ブロック）。 */
+    protected double holdDistance() {
+        return HOLD_DISTANCE;
+    }
+
+    /** 電力の残りが毎tick変わるので、手に持った表示が持ち直しのたびに揺れないようにする（別のアイテムに替えたときだけ）。 */
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || !ItemStack.isSameItem(oldStack, newStack);
+    }
+
     /** 対象に効果を出す（毎tick）。 */
     protected void apply(ServerPlayer player, Entity target, Mode mode, int remaining) {
         Vec3 velocity = switch (mode) {
             case LEVITATE -> {
-                Vec3 hold = player.getEyePosition().add(player.getLookAngle().scale(HOLD_DISTANCE));
+                Vec3 hold = player.getEyePosition().add(player.getLookAngle().scale(holdDistance()));
                 Vec3 center = target.position().add(0, target.getBbHeight() / 2, 0);
                 yield hold.subtract(center).scale(0.3);
             }

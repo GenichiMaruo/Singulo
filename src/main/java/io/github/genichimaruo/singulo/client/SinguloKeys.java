@@ -22,14 +22,21 @@ public final class SinguloKeys {
         event.register(TOGGLE_AREA);
     }
 
-    /** グラビトン・マニピュレーターの左クリックの状態（変わったときだけサーバーへ送る）。 */
+    /** グラビトン・マニピュレーターの左右のクリックの状態（変わったときだけサーバーへ送る）。 */
     private static boolean leftDown;
+    private static boolean rightDown;
 
-    /** マニピュレーターを持っている間は、左クリックで叩いたり壊したりせず、重力の操作に使う。 */
+    /**
+     * マニピュレーターを持っている間は、左クリックで叩いたり壊したりせず、重力の操作に使う。
+     * 右クリックも（スニーク中のモード切替・充電を除いて）ブロックを開いたりせず、ために使う。
+     */
     static void onInteraction(net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft mc = Minecraft.getInstance();
-        if (event.isAttack() && mc.player != null
-                && mc.player.getMainHandItem().getItem() instanceof io.github.genichimaruo.singulo.item.GravitonManipulatorItem) {
+        if (mc.player == null || event.getHand() != InteractionHand.MAIN_HAND
+                || !(mc.player.getMainHandItem().getItem() instanceof io.github.genichimaruo.singulo.item.GravitonManipulatorItem)) {
+            return;
+        }
+        if (event.isAttack() || (event.isUseItem() && !mc.player.isShiftKeyDown())) {
             event.setCanceled(true);
             event.setSwingHand(false);
         }
@@ -42,7 +49,12 @@ public final class SinguloKeys {
         boolean down = holding && mc.options.keyAttack.isDown();
         if (down != leftDown && mc.getConnection() != null) {
             leftDown = down;
-            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorLeftPayload(down));
+            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(false, down));
+        }
+        boolean right = holding && mc.options.keyUse.isDown() && !mc.player.isShiftKeyDown();
+        if (right != rightDown && mc.getConnection() != null) {
+            rightDown = right;
+            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
         }
         while (TOGGLE_AREA.consumeClick()) {
             if (mc.player == null) {

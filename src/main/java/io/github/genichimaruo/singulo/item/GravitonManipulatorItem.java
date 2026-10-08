@@ -81,103 +81,202 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
     public static final int MAX_CHARGE = 40;
     /** ためた1 tick ごとの電力。 */
     public static final int FE_PER_CHARGE_TICK = 2_000;
+    /** 投げたあと、次に持ち上げられるまでの tick。 */
+    public static final int THROW_COOLDOWN = 20;
+    /** 持ち上げた対象を置いておく距離（ガントレットより遠い）。 */
+    public static final double MANIPULATOR_HOLD_DISTANCE = 5;
 
     /** 左クリックを押しているプレイヤー（サーバー側）。 */
     private static final java.util.Set<java.util.UUID> LEFT_DOWN = new java.util.HashSet<>();
+    /** 右クリックで力をためているプレイヤーと、ため始めた時刻。 */
+    private static final java.util.Map<java.util.UUID, Long> CHARGING = new java.util.HashMap<>();
+    /** 投げた直後の対象。ほかの処理（モブの移動の AI など）に初速を消されないよう、数tickのあいだ速さをかけ直す。 */
+    private record Thrown(java.util.List<Integer> entityIds, Vec3 velocity, int[] ticksLeft) {}
+    private static final java.util.Map<java.util.UUID, Thrown> THROWN = new java.util.HashMap<>();
+    private static final int THROW_HOLD_TICKS = 3;
+    /**
+     * 浮遊で持ち上げている対象と、最後に持ち上げた時刻（プレイヤーごと）。
+     * 1体を狙うときも、円錐（G キー）で何体も持ち上げるときも、実際に浮かせたものをここに記録して、投げるときに使う。
+     */
+    private static final java.util.Map<java.util.UUID, java.util.Map<Integer, Long>> LIFTED = new java.util.HashMap<>();
+    /** 何tick前まで持ち上げていれば「持ち上げている」とみなすか。 */
+    private static final int LIFT_GRACE = 3;
 
-    /** クライアントから、左クリックを押した・離したを受け取る。 */
-    public static void setLeftDown(ServerPlayer player, boolean down) {
+    @Override
+    protected double holdDistance() {
+        return MANIPULATOR_HOLD_DISTANCE;
+    }
+
+    /** いま浮遊で持ち上げている対象（生きているもの）。 */
+    private static java.util.List<Entity> lifted(ServerPlayer player) {
+        java.util.Map<Integer, Long> map = LIFTED.get(player.getUUID());
+        java.util.List<Entity> out = new java.util.ArrayList<>();
+        if (map == null) {
+            return out;
+        }
+        long now = player.level().getGameTime();
+        map.entrySet().removeIf(e -> now - e.getValue() > LIFT_GRACE);
+        for (int entityId : map.keySet()) {
+            Entity e = player.serverLevel().getEntity(entityId);
+            if (e != null && e.isAlive()) {
+                out.add(e);
+            }
+        }
+        return out;
+    }
+
+    private static void dropAll(ServerPlayer player) {
+        release(player);
+        LIFTED.remove(player.getUUID());
+    }
+
+    /**
+     * クライアントから、左クリック（right = false）・右クリックを押した・離したを受け取る。
+     * 右クリックのためは「アイテムを使う」状態にしない（使っている間は歩きが遅くなるため）。
+     */
+    public static void setInput(ServerPlayer player, boolean right, boolean down) {
+        java.util.UUID id = player.getUUID();
+        ItemStack stack = player.getMainHandItem();
+        if (!right) {
+            if (down) {
+                LEFT_DOWN.add(id);
+            } else {
+                LEFT_DOWN.remove(id);
+                if (!CHARGING.containsKey(id)) {
+                    dropAll(player);
+                }
+            }
+            return;
+        }
+        if (!(stack.getItem() instanceof GravitonManipulatorItem item)) {
+            CHARGING.remove(id);
+            return;
+        }
         if (down) {
-            LEFT_DOWN.add(player.getUUID());
+            if (player.getCooldowns().isOnCooldown(item)) {
+                return;
+            }
+            if (item.mode(stack) != Mode.LEVITATE) {
+                player.displayClientMessage(Component.translatable("gauntlet.singulo.left_click"), true);
+                return;
+            }
+            CHARGING.put(id, player.level().getGameTime());
         } else {
-            LEFT_DOWN.remove(player.getUUID());
-            if (!player.isUsingItem()) {
-                release(player);
+            Long start = CHARGING.remove(id);
+            if (start != null) {
+                item.fling(player, stack, (int) Math.min(MAX_CHARGE, player.level().getGameTime() - start));
             }
         }
     }
 
-    /** 左クリックを押している間、毎tick 今のモードで重力を操る。 */
+    /** 毎tick: 力をためている間は持ち上げたまま保ち、左クリックを押している間は今のモードで重力を操る。 */
     public static void onPlayerTick(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
-        if (!(event.getEntity() instanceof ServerPlayer player) || !LEFT_DOWN.contains(player.getUUID())) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        java.util.UUID id = player.getUUID();
+        Thrown thrown = THROWN.get(id);
+        if (thrown != null) {
+            if (thrown.ticksLeft()[0]-- > 0) {
+                for (int entityId : thrown.entityIds()) {
+                    Entity e = player.serverLevel().getEntity(entityId);
+                    if (e != null && e.isAlive()) {
+                        launch(e, thrown.velocity());
+                    }
+                }
+            } else {
+                THROWN.remove(id);
+            }
+        }
+        if (!LEFT_DOWN.contains(id) && !CHARGING.containsKey(id)) {
             return;
         }
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof GravitonManipulatorItem item)) {
-            LEFT_DOWN.remove(player.getUUID());
-            release(player);
+            LEFT_DOWN.remove(id);
+            CHARGING.remove(id);
+            dropAll(player);
+            return;
+        }
+        // 投げた直後は持ち上げられない
+        if (player.getCooldowns().isOnCooldown(item)) {
+            dropAll(player);
+            return;
+        }
+        Long start = CHARGING.get(id);
+        if (start != null) {
+            int charged = (int) Math.min(MAX_CHARGE, player.level().getGameTime() - start);
+            // ためている間も、狙っている対象（円錐なら範囲の対象）を持ち上げ続ける（左クリックと同じ）
+            if (!item.operate(player, stack, player.tickCount)) {
+                CHARGING.remove(id);
+                return;
+            }
+            if (charged % 4 == 0) {
+                for (Entity held : lifted(player)) {
+                    player.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,
+                            held.getX(), held.getY() + held.getBbHeight() / 2, held.getZ(), 2 + charged / 8, 0.3, 0.3, 0.3, 0.02);
+                }
+            }
+            if (charged % 5 == 0) {
+                player.displayClientMessage(Component.translatable("gauntlet.singulo.charging", charged * 100 / MAX_CHARGE), true);
+            }
             return;
         }
         if (!item.operate(player, stack, player.tickCount)) {
-            LEFT_DOWN.remove(player.getUUID());
-            release(player);
+            LEFT_DOWN.remove(id);
+            dropAll(player);
         }
     }
 
-    /** 右クリック: スニーク中はモード切替。浮遊モードでは投げる力をためる（左クリックで持ち上げている間）。 */
-    @Override
-    public net.minecraft.world.InteractionResultHolder<ItemStack> use(net.minecraft.world.level.Level level, Player player,
-                                                                       net.minecraft.world.InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (player.isShiftKeyDown()) {
-            return super.use(level, player, hand);
-        }
-        if (mode(stack) != Mode.LEVITATE) {
-            if (!level.isClientSide) {
-                player.displayClientMessage(Component.translatable("gauntlet.singulo.left_click"), true);
-            }
-            return net.minecraft.world.InteractionResultHolder.pass(stack);
-        }
-        player.startUsingItem(hand);
-        return net.minecraft.world.InteractionResultHolder.consume(stack);
-    }
-
-    /** ためている間は、持ち上げている対象を手放さず、力のたまり具合を出す。 */
-    @Override
-    public void onUseTick(net.minecraft.world.level.Level level, LivingEntity user, ItemStack stack, int remaining) {
-        if (level.isClientSide || !(user instanceof ServerPlayer player)) {
-            return;
-        }
-        int charged = Math.min(MAX_CHARGE, getUseDuration(stack, user) - remaining);
-        Entity held = heldTarget(player);
-        if (held != null && held.isAlive()) {
-            super.apply(player, held, Mode.LEVITATE, remaining);
-            if (charged % 4 == 0) {
-                ((ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,
-                        held.getX(), held.getY() + held.getBbHeight() / 2, held.getZ(), 2 + charged / 8, 0.3, 0.3, 0.3, 0.02);
-            }
-        }
-        if (charged % 5 == 0) {
-            player.displayClientMessage(Component.translatable("gauntlet.singulo.charging", charged * 100 / MAX_CHARGE), true);
-        }
-    }
-
-    /** 右クリックを離すと、持ち上げていた対象を視線の向きへ勢いよく吹き飛ばす（ためた時間ほど強い）。 */
-    @Override
-    public void releaseUsing(ItemStack stack, net.minecraft.world.level.Level level, LivingEntity user, int timeLeft) {
-        if (level.isClientSide || !(user instanceof ServerPlayer player)) {
-            return;
-        }
-        int charged = Math.min(MAX_CHARGE, getUseDuration(stack, user) - timeLeft);
-        Entity held = heldTarget(player);
-        if (held == null || !held.isAlive()) {
+    /** 持ち上げていた対象を視線の向きへ勢いよく吹き飛ばす（ためた時間ほど強い）。そのあと少しの間は持ち上げられない。 */
+    void fling(ServerPlayer player, ItemStack stack, int charged) {
+        java.util.List<Entity> held = lifted(player);
+        if (held.isEmpty()) {
             player.displayClientMessage(Component.translatable("gauntlet.singulo.nothing_held"), true);
             return;
         }
+        // 電力が足りなければ、ある分だけの力で投げる（投げられないことはない）
         var energy = energy(stack);
         int cost = FE_PER_CHARGE_TICK * Math.max(1, charged);
-        if (energy.extractEnergy(cost, true) < cost) {
-            player.displayClientMessage(Component.translatable("gauntlet.singulo.no_energy"), true);
-            return;
+        int paid = energy.extractEnergy(cost, false);
+        int power = Math.max(0, Math.min(charged, paid / FE_PER_CHARGE_TICK));
+        dropAll(player);
+        // 左クリックを押したままでも、投げた対象をすぐ掴み直して引き戻さないよう、押し直すまで操作を止める
+        LEFT_DOWN.remove(player.getUUID());
+        player.getCooldowns().addCooldown(this, THROW_COOLDOWN);
+        // プレイヤーが向いている方向へ初速を与える
+        Vec3 velocity = flingVelocity(player.getLookAngle(), power);
+        java.util.List<Integer> ids = new java.util.ArrayList<>();
+        for (Entity e : held) {
+            launch(e, velocity);
+            ids.add(e.getId());
         }
-        energy.extractEnergy(cost, false);
-        held.setDeltaMovement(flingVelocity(player.getLookAngle(), charged));
-        held.hasImpulse = true;
-        held.hurtMarked = true;
-        held.fallDistance = 0;
-        release(player);
-        level.playSound(null, held.blockPosition(), net.minecraft.sounds.SoundEvents.WIND_CHARGE_BURST.value(),
-                net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 0.6F + charged / 80.0F);
+        THROWN.put(player.getUUID(), new Thrown(ids, velocity, new int[]{THROW_HOLD_TICKS}));
+        player.displayClientMessage(Component.translatable("gauntlet.singulo.thrown", power * 100 / MAX_CHARGE), true);
+        player.level().playSound(null, player.getX(), player.getEyeY(), player.getZ(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("graviton_manipulator_throw"),
+                net.minecraft.sounds.SoundSource.PLAYERS, 1.2F, 0.85F + power / 160.0F);
+    }
+
+    /** 右クリック: スニーク中はモード切替。それ以外（ため）はキーの状態をクライアントから受け取って扱う。 */
+    @Override
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(net.minecraft.world.level.Level level, Player player,
+                                                                       net.minecraft.world.InteractionHand hand) {
+        if (player.isShiftKeyDown()) {
+            return super.use(level, player, hand);
+        }
+        return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
+    }
+
+    /** 対象に速さを与える（モブなら移動の AI を止めて、すぐ打ち消されないようにする）。 */
+    private static void launch(Entity target, Vec3 velocity) {
+        if (target instanceof net.minecraft.world.entity.Mob mob) {
+            mob.getNavigation().stop();
+        }
+        target.setOnGround(false);
+        target.setDeltaMovement(velocity);
+        target.hasImpulse = true;
+        target.hurtMarked = true;
+        target.fallDistance = 0;
     }
 
     /** 吹き飛ばす速さ（ためた tick から）。 */
@@ -235,6 +334,9 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
 
     @Override
     protected void apply(ServerPlayer player, Entity target, Mode mode, int remaining) {
+        if (mode == Mode.LEVITATE) {
+            LIFTED.computeIfAbsent(player.getUUID(), k -> new java.util.HashMap<>()).put(target.getId(), player.level().getGameTime());
+        }
         if (mode != Mode.CRUSH) {
             super.apply(player, target, mode, remaining);
             return;
