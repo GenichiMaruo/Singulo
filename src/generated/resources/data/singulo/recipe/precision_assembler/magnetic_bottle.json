@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 220,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:glass_blocks/colorless"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:magnetic_bottle",
+    "count": 1
+  }
+}

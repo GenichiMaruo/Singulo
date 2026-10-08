@@ -1,0 +1,28 @@
+{
+  "type": "singulo:machine",
+  "station": "archive_terminal",
+  "stage": 1,
+  "time": 600,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    }
+  ],
+  "restore": {
+    "item": "singulo:culture_data"
+  },
+  "result": {
+    "id": "singulo:culture_data",
+    "count": 1
+  }
+}

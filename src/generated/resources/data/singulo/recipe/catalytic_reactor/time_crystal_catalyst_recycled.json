@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "catalytic_reactor",
+  "stage": 5,
+  "time": 1200,
+  "energy": 20000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:spent_singularity_core"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:time_crystal_catalyst",
+    "count": 1
+  }
+}

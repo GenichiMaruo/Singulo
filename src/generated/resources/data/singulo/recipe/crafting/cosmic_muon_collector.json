@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:basic_frame"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:steel_plate"
+    },
+    {
+      "item": "singulo:steel_plate"
+    }
+  ],
+  "result": {
+    "id": "singulo:cosmic_muon_collector",
+    "count": 1
+  }
+}

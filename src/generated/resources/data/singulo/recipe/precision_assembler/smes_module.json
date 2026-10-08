@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:toroidal_magnetic_coil"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:smes_module",
+    "count": 1
+  }
+}

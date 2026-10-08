@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "singularity_encapsulator",
+  "stage": 5,
+  "time": 2400,
+  "energy": 200000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:jet_condensate"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:compressed_metal_block_2"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:artificial_star_core",
+    "count": 1
+  }
+}

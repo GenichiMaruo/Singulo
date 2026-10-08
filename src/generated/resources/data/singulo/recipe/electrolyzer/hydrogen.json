@@ -1,0 +1,24 @@
+{
+  "type": "singulo:machine",
+  "station": "electrolyzer",
+  "stage": 1,
+  "time": 20,
+  "energy": 80,
+  "ingredients": [],
+  "fluid_ingredients": [
+    {
+      "fluid": "minecraft:water",
+      "amount": 200
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "singulo:hydrogen",
+      "amount": 200
+    },
+    {
+      "id": "singulo:oxygen",
+      "amount": 100
+    }
+  ]
+}

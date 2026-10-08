@@ -1,0 +1,20 @@
+{
+    "vertex": "singulo:lensing",
+    "fragment": "singulo:lensing",
+    "samplers": [
+        { "name": "Sampler0" },
+        { "name": "Sampler1" }
+    ],
+    "uniforms": [
+        { "name": "Lens0", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Lens1", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Lens2", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Lens3", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "Sphere0", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "Sphere1", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "Sphere2", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "Sphere3", "type": "float", "count": 4, "values": [ 0.0, 1.0, 1.0, 0.0 ] },
+        { "name": "DepthParams", "type": "float", "count": 2, "values": [ 1.0, 0.1 ] },
+        { "name": "Aspect", "type": "float", "count": 1, "values": [ 1.0 ] }
+    ]
+}

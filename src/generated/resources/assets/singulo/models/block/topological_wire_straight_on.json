@@ -1,0 +1,62 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "singulo:block/topological_wire",
+    "c": "singulo:block/topological_wire_on",
+    "e": "singulo:block/topological_wire_end_on"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        5,
+        5
+      ],
+      "to": [
+        11,
+        11,
+        11
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            5,
+            6,
+            11
+          ],
+          "texture": "#c"
+        },
+        "west": {
+          "uv": [
+            0,
+            5,
+            6,
+            11
+          ],
+          "texture": "#c"
+        },
+        "up": {
+          "uv": [
+            0,
+            5,
+            6,
+            11
+          ],
+          "texture": "#c",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            5,
+            6,
+            11
+          ],
+          "texture": "#c",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "singulo:machine",
+  "station": "particle_accelerator",
+  "stage": 2,
+  "time": 80,
+  "energy": 300,
+  "ingredients": [],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:hydrogen",
+      "amount": 50
+    }
+  ],
+  "result": {
+    "id": "singulo:muon_bundle",
+    "count": 1
+  }
+}

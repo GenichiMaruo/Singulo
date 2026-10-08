@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:inertial_control_gauntlet"
+    },
+    "title": {
+      "translate": "advancement.singulo.gauntlet.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.gauntlet.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:inertial_control_gauntlet"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:quantum"
+}

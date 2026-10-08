@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:accelerator_controller"
+    },
+    "title": {
+      "translate": "advancement.singulo.accelerator.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.accelerator.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "formed/particle_accelerator"
+      }
+    }
+  },
+  "parent": "singulo:coil"
+}

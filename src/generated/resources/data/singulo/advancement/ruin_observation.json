@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:observation_log"
+    },
+    "title": {
+      "translate": "advancement.singulo.ruin_observation.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.ruin_observation.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "discover/observation_post"
+      }
+    }
+  },
+  "parent": "singulo:archive"
+}

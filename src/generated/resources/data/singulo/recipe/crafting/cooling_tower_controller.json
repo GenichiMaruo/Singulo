@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:basic_frame"
+    },
+    {
+      "item": "singulo:ceramic_substrate"
+    },
+    {
+      "item": "singulo:ceramic_substrate"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    },
+    {
+      "item": "singulo:heat_exchange_core"
+    },
+    {
+      "item": "singulo:heat_exchange_core"
+    }
+  ],
+  "result": {
+    "id": "singulo:cooling_tower_controller",
+    "count": 1
+  }
+}

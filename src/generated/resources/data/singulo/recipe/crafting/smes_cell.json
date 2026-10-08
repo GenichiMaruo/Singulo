@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:basic_frame"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:steel_plate"
+    },
+    {
+      "item": "singulo:steel_plate"
+    }
+  ],
+  "result": {
+    "id": "singulo:smes_cell",
+    "count": 1
+  }
+}

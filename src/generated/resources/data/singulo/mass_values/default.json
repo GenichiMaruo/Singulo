@@ -1,0 +1,216 @@
+{
+  "entries": [
+    {
+      "tag": "minecraft:logs",
+      "mass": 0.25
+    },
+    {
+      "tag": "minecraft:planks",
+      "mass": 0.25
+    },
+    {
+      "tag": "minecraft:leaves",
+      "mass": 0.25
+    },
+    {
+      "tag": "minecraft:saplings",
+      "mass": 0.25
+    },
+    {
+      "tag": "c:crops",
+      "mass": 0.25
+    },
+    {
+      "tag": "c:seeds",
+      "mass": 0.25
+    },
+    {
+      "tag": "minecraft:dirt",
+      "mass": 0.5
+    },
+    {
+      "tag": "c:sands",
+      "mass": 0.5
+    },
+    {
+      "tag": "c:gravels",
+      "mass": 0.5
+    },
+    {
+      "item": "minecraft:snow_block",
+      "mass": 0.5
+    },
+    {
+      "item": "minecraft:clay",
+      "mass": 0.5
+    },
+    {
+      "item": "minecraft:mud",
+      "mass": 0.5
+    },
+    {
+      "tag": "c:cobblestones",
+      "mass": 1
+    },
+    {
+      "tag": "c:stones",
+      "mass": 1
+    },
+    {
+      "tag": "minecraft:stone_bricks",
+      "mass": 1
+    },
+    {
+      "tag": "c:netherracks",
+      "mass": 1
+    },
+    {
+      "tag": "c:sandstone/blocks",
+      "mass": 1
+    },
+    {
+      "item": "minecraft:end_stone",
+      "mass": 1
+    },
+    {
+      "item": "minecraft:tuff",
+      "mass": 1
+    },
+    {
+      "item": "minecraft:calcite",
+      "mass": 1
+    },
+    {
+      "item": "minecraft:andesite",
+      "mass": 1
+    },
+    {
+      "item": "minecraft:diorite",
+      "mass": 1
+    },
+    {
+      "item": "minecraft:granite",
+      "mass": 1
+    },
+    {
+      "item": "minecraft:deepslate",
+      "mass": 1.2
+    },
+    {
+      "item": "minecraft:cobbled_deepslate",
+      "mass": 1.2
+    },
+    {
+      "item": "minecraft:basalt",
+      "mass": 1.2
+    },
+    {
+      "item": "minecraft:smooth_basalt",
+      "mass": 1.2
+    },
+    {
+      "item": "minecraft:blackstone",
+      "mass": 1.2
+    },
+    {
+      "tag": "c:obsidians",
+      "mass": 1.2
+    },
+    {
+      "tag": "c:storage_blocks/tin",
+      "mass": 2.7
+    },
+    {
+      "tag": "c:storage_blocks/aluminum",
+      "mass": 2.7
+    },
+    {
+      "tag": "c:storage_blocks/iron",
+      "mass": 3
+    },
+    {
+      "tag": "c:storage_blocks/copper",
+      "mass": 3
+    },
+    {
+      "tag": "c:storage_blocks/steel",
+      "mass": 3
+    },
+    {
+      "tag": "c:storage_blocks/silver",
+      "mass": 4
+    },
+    {
+      "tag": "c:storage_blocks/lead",
+      "mass": 4
+    },
+    {
+      "tag": "c:storage_blocks/uranium",
+      "mass": 7
+    },
+    {
+      "tag": "c:storage_blocks/gold",
+      "mass": 7
+    },
+    {
+      "tag": "c:storage_blocks/osmium",
+      "mass": 8
+    },
+    {
+      "item": "minecraft:netherite_block",
+      "mass": 20
+    },
+    {
+      "tag": "c:ingots/iron",
+      "mass": 0.3333
+    },
+    {
+      "tag": "c:ingots/copper",
+      "mass": 0.3333
+    },
+    {
+      "tag": "c:ingots/steel",
+      "mass": 0.3333
+    },
+    {
+      "tag": "c:ingots/gold",
+      "mass": 0.7778
+    },
+    {
+      "tag": "c:ingots/netherite",
+      "mass": 2.2222
+    },
+    {
+      "item": "singulo:compressed_block_1",
+      "mass": 9
+    },
+    {
+      "item": "singulo:compressed_block_2",
+      "mass": 81
+    },
+    {
+      "item": "singulo:compressed_block_3",
+      "mass": 729
+    },
+    {
+      "item": "singulo:compressed_metal_block_1",
+      "mass": 9
+    },
+    {
+      "item": "singulo:compressed_metal_block_2",
+      "mass": 81
+    },
+    {
+      "item": "singulo:degenerate_matter_shell",
+      "mass": 6561
+    },
+    {
+      "item": "singulo:mass_pellet",
+      "mass": 16
+    },
+    {
+      "item": "singulo:strange_matter",
+      "mass": 100
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "singulo:machine",
+  "station": "casimir_cavity",
+  "stage": 4,
+  "time": 20,
+  "energy": 20000,
+  "ingredients": [],
+  "fluid_results": [
+    {
+      "id": "singulo:axion_condensate",
+      "amount": 10
+    }
+  ]
+}

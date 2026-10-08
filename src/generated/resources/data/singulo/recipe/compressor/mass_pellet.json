@@ -1,0 +1,16 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 40,
+  "energy": 20,
+  "ingredients": [],
+  "mass": {
+    "amount": 16.0,
+    "metal_only": false
+  },
+  "result": {
+    "id": "singulo:mass_pellet",
+    "count": 1
+  }
+}

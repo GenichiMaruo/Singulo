@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:graviton_manipulator"
+    },
+    "title": {
+      "translate": "advancement.singulo.manipulator.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.manipulator.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:graviton_manipulator"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:core"
+}

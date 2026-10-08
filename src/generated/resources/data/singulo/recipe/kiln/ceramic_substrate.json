@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 1,
+  "time": 100,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:white_ceramic_composite"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:dusts/redstone"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:ceramic_substrate",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "cryogenic_cooling_tower",
+  "stage": 2,
+  "time": 200,
+  "energy": 200,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:superconducting_wire",
+    "count": 3
+  }
+}

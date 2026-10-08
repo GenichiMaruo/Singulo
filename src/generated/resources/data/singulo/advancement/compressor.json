@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:compressor"
+    },
+    "title": {
+      "translate": "advancement.singulo.compressor.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.compressor.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:compressor"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:thermo"
+}

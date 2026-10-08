@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "laser_cooler",
+  "stage": 3,
+  "time": 400,
+  "energy": 4000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "c:gems/quartz"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:optical_lattice_substrate",
+    "count": 2
+  }
+}

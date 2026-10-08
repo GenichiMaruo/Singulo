@@ -1,0 +1,398 @@
+{
+  "black_hole.ambient": {
+    "subtitle": "subtitles.singulo.black_hole.ambient",
+    "sounds": [
+      {
+        "name": "singulo:black_hole/ambient_loop",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "black_hole.formation": {
+    "subtitle": "subtitles.singulo.black_hole.formation",
+    "sounds": [
+      {
+        "name": "singulo:black_hole/formation",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "kiln_running": {
+    "subtitle": "subtitles.singulo.kiln_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/kiln_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "compressor_running": {
+    "subtitle": "subtitles.singulo.compressor_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/compressor_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "electrolyzer_running": {
+    "subtitle": "subtitles.singulo.electrolyzer_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/electrolyzer_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "archive_terminal_running": {
+    "subtitle": "subtitles.singulo.archive_terminal_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/archive_terminal_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "precision_assembler_running": {
+    "subtitle": "subtitles.singulo.precision_assembler_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/precision_assembler_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "catalytic_reactor_running": {
+    "subtitle": "subtitles.singulo.catalytic_reactor_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/catalytic_reactor_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "cooling_tower_running": {
+    "subtitle": "subtitles.singulo.cooling_tower_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/cooling_tower_running",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "particle_accelerator_running": {
+    "subtitle": "subtitles.singulo.particle_accelerator_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/particle_accelerator_running",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "entanglement_synthesizer_running": {
+    "subtitle": "subtitles.singulo.entanglement_synthesizer_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/entanglement_synthesizer_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "laser_cooler_running": {
+    "subtitle": "subtitles.singulo.laser_cooler_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/laser_cooler_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "echo_resonator_running": {
+    "subtitle": "subtitles.singulo.echo_resonator_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/echo_resonator_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "degenerate_compactor_running": {
+    "subtitle": "subtitles.singulo.degenerate_compactor_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/degenerate_compactor_running",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "casimir_cavity_running": {
+    "subtitle": "subtitles.singulo.casimir_cavity_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/casimir_cavity_running",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "time_crystal_incubator_running": {
+    "subtitle": "subtitles.singulo.time_crystal_incubator_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/time_crystal_incubator_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "singularity_encapsulator_running": {
+    "subtitle": "subtitles.singulo.singularity_encapsulator_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/singularity_encapsulator_running",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "thermoelectric_generator_running": {
+    "subtitle": "subtitles.singulo.thermoelectric_generator_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/thermoelectric_generator_running",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "cryogenic_turbine_running": {
+    "subtitle": "subtitles.singulo.cryogenic_turbine_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/cryogenic_turbine_running",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "quantum_heat_engine_running": {
+    "subtitle": "subtitles.singulo.quantum_heat_engine_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/quantum_heat_engine_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "smes_cell_running": {
+    "subtitle": "subtitles.singulo.smes_cell_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/smes_cell_running",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "muon_collector_running": {
+    "subtitle": "subtitles.singulo.muon_collector_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/muon_collector_running",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "worldline_anchor_running": {
+    "subtitle": "subtitles.singulo.worldline_anchor_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/worldline_anchor_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "advanced_worldline_anchor_running": {
+    "subtitle": "subtitles.singulo.advanced_worldline_anchor_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/advanced_worldline_anchor_running",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "advanced_worldline_anchor_embed": {
+    "subtitle": "subtitles.singulo.advanced_worldline_anchor_embed",
+    "sounds": [
+      {
+        "name": "singulo:machine/advanced_worldline_anchor_embed",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "inertial_stabilizer_running": {
+    "subtitle": "subtitles.singulo.inertial_stabilizer_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/inertial_stabilizer_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "degenerate_furnace_running": {
+    "subtitle": "subtitles.singulo.degenerate_furnace_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/degenerate_furnace_running",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "degenerate_furnace_press": {
+    "subtitle": "subtitles.singulo.degenerate_furnace_press",
+    "sounds": [
+      {
+        "name": "singulo:machine/degenerate_furnace_press",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "shield_tower_running": {
+    "subtitle": "subtitles.singulo.shield_tower_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/shield_tower_running",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "tipler_cylinder_running": {
+    "subtitle": "subtitles.singulo.tipler_cylinder_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/tipler_cylinder_running",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "wormhole_generator_charge": {
+    "subtitle": "subtitles.singulo.wormhole_generator_charge",
+    "sounds": [
+      {
+        "name": "singulo:machine/wormhole_generator_charge",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "wormhole_generator_open": {
+    "subtitle": "subtitles.singulo.wormhole_generator_open",
+    "sounds": [
+      {
+        "name": "singulo:machine/wormhole_generator_open",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "wormhole_mouth_ambient": {
+    "subtitle": "subtitles.singulo.wormhole_mouth_ambient",
+    "sounds": [
+      {
+        "name": "singulo:machine/wormhole_mouth_ambient",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "wormhole_stabilizer_running": {
+    "subtitle": "subtitles.singulo.wormhole_stabilizer_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/wormhole_stabilizer_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "halo_collector_running": {
+    "subtitle": "subtitles.singulo.halo_collector_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/halo_collector_running",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "containment_tank_running": {
+    "subtitle": "subtitles.singulo.containment_tank_running",
+    "sounds": [
+      {
+        "name": "singulo:machine/containment_tank_running",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "penrose_reactor_ignition": {
+    "subtitle": "subtitles.singulo.penrose_reactor_ignition",
+    "sounds": [
+      {
+        "name": "singulo:machine/penrose_reactor_ignition",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "probe_station_launch": {
+    "subtitle": "subtitles.singulo.probe_station_launch",
+    "sounds": [
+      {
+        "name": "singulo:machine/probe_station_launch",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "probe_station_return": {
+    "subtitle": "subtitles.singulo.probe_station_return",
+    "sounds": [
+      {
+        "name": "singulo:machine/probe_station_return",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "gravitational_wave_detector_ping": {
+    "subtitle": "subtitles.singulo.gravitational_wave_detector_ping",
+    "sounds": [
+      {
+        "name": "singulo:machine/gravitational_wave_detector_ping",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "multiblock_formed": {
+    "subtitle": "subtitles.singulo.multiblock_formed",
+    "sounds": [
+      {
+        "name": "singulo:machine/multiblock_formed",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "graviton_manipulator_active": {
+    "subtitle": "subtitles.singulo.graviton_manipulator_active",
+    "sounds": [
+      {
+        "name": "singulo:machine/graviton_manipulator_active",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "graviton_manipulator_charge": {
+    "subtitle": "subtitles.singulo.graviton_manipulator_charge",
+    "sounds": [
+      {
+        "name": "singulo:machine/graviton_manipulator_charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "graviton_manipulator_throw": {
+    "subtitle": "subtitles.singulo.graviton_manipulator_throw",
+    "sounds": [
+      {
+        "name": "singulo:machine/graviton_manipulator_throw",
+        "attenuation_distance": 24
+      }
+    ]
+  }
+}

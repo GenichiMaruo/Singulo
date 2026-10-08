@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "singulo:final_lab",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 80,
+    "separation": 32,
+    "salt": 19370504
+  }
+}

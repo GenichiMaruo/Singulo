@@ -1,0 +1,43 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 180,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:quantum_computing_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "c:gems/diamond"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:compass"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:gravitational_wave_detector",
+    "count": 1
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "type": "singulo:machine",
+  "station": "time_crystal_incubator",
+  "stage": 4,
+  "time": 24000,
+  "energy": 30000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_seed"
+      },
+      "uses": 1
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:echo_shard"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:time_crystal_catalyst",
+    "count": 1
+  }
+}

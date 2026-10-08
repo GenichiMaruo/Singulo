@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 4,
+  "time": 20,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:compressed_metal_block_1"
+      },
+      "count": 9
+    }
+  ],
+  "result": {
+    "id": "singulo:compressed_metal_block_2",
+    "count": 1
+  }
+}

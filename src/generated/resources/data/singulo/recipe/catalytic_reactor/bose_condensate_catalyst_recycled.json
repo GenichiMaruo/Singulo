@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "catalytic_reactor",
+  "stage": 4,
+  "time": 600,
+  "energy": 2000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:spent_time_crystal_catalyst"
+      },
+      "count": 4
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_helium",
+      "amount": 100
+    }
+  ],
+  "result": {
+    "id": "singulo:bose_condensate_catalyst",
+    "count": 1
+  }
+}

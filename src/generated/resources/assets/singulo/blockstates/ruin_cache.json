@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "sealed=false": {
+      "model": "singulo:block/ruin_cache"
+    },
+    "sealed=true": {
+      "model": "singulo:block/ruin_cache_sealed"
+    }
+  }
+}

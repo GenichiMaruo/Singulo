@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:basic_frame"
+    },
+    {
+      "item": "singulo:superconducting_coil"
+    },
+    {
+      "item": "singulo:ceramic_substrate"
+    },
+    {
+      "item": "singulo:ceramic_substrate"
+    },
+    {
+      "item": "minecraft:piston"
+    },
+    {
+      "item": "minecraft:piston"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    }
+  ],
+  "result": {
+    "id": "singulo:precision_assembler",
+    "count": 1
+  }
+}

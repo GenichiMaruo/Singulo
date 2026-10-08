@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:core_controller"
+    },
+    "title": {
+      "translate": "advancement.singulo.ignite.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.ignite.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "ignite"
+      }
+    }
+  },
+  "parent": "singulo:reactor"
+}

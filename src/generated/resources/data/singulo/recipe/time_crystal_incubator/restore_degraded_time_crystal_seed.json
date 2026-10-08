@@ -1,0 +1,34 @@
+{
+  "type": "singulo:machine",
+  "station": "time_crystal_incubator",
+  "stage": 4,
+  "time": 2400,
+  "energy": 10000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:amethyst_shard"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "count": 1
+    }
+  ],
+  "restore": {
+    "item": "singulo:degraded_time_crystal_seed"
+  },
+  "result": {
+    "id": "singulo:time_crystal_seed",
+    "count": 1
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "singulo:observation_post",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 24,
+    "separation": 8,
+    "salt": 19370501
+  }
+}

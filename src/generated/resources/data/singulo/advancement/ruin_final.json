@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:anomaly_sample"
+    },
+    "title": {
+      "translate": "advancement.singulo.ruin_final.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.ruin_final.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "discover/final_lab"
+      }
+    }
+  },
+  "parent": "singulo:exotic"
+}

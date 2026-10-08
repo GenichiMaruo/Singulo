@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 4,
+  "time": 20,
+  "energy": 40,
+  "priority": 1,
+  "ingredients": [
+    {
+      "ingredient": {
+        "type": "neoforge:components",
+        "items": "singulo:compressed_block_1",
+        "components": {
+          "singulo:mixed_source": true
+        },
+        "strict": false
+      },
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "singulo:compressed_block_2",
+    "count": 1
+  }
+}

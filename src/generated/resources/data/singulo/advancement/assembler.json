@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:precision_assembler"
+    },
+    "title": {
+      "translate": "advancement.singulo.assembler.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.assembler.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:precision_assembler"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:coil"
+}

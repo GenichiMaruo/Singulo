@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 1,
+  "time": 50,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:steel_blend"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:steel_ingot",
+    "count": 1
+  }
+}

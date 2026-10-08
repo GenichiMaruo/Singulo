@@ -1,0 +1,49 @@
+{
+  "type": "singulo:machine",
+  "station": "singularity_encapsulator",
+  "stage": 5,
+  "time": 6000,
+  "energy": 1000000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_matter_shell"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:hawking_condensate"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_catalyst"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "singulo:star_core"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:anomaly_sample"
+      },
+      "uses": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:singularity_core",
+    "count": 1
+  }
+}

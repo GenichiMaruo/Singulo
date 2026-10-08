@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:handbook"
+    },
+    "title": {
+      "translate": "advancement.singulo.root.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "singulo:textures/block/degenerate_casing.png"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

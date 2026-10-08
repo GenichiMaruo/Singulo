@@ -1,0 +1,113 @@
+{
+  "chapters": [
+    {
+      "id": "intro",
+      "icon": "singulo:handbook",
+      "pages": [
+        "intro.welcome",
+        "intro.howto",
+        "intro.basics"
+      ]
+    },
+    {
+      "id": "stage1",
+      "icon": "singulo:thermoelectric_generator",
+      "pages": [
+        "stage1.materials",
+        "stage1.power",
+        "stage1.machines",
+        "stage1.goal"
+      ]
+    },
+    {
+      "id": "stage2",
+      "icon": "singulo:superconducting_coil",
+      "pages": [
+        "stage2.tower",
+        "stage2.accelerator",
+        "stage2.others",
+        "stage2.goal"
+      ]
+    },
+    {
+      "id": "stage3",
+      "icon": "singulo:quantum_computing_module",
+      "pages": [
+        "stage3.quantum",
+        "stage3.tools",
+        "stage3.goal"
+      ]
+    },
+    {
+      "id": "stage4",
+      "icon": "singulo:time_crystal_catalyst",
+      "pages": [
+        "stage4.compression",
+        "stage4.time",
+        "stage4.power",
+        "stage4.goal"
+      ]
+    },
+    {
+      "id": "stage5",
+      "icon": "singulo:singularity_core",
+      "pages": [
+        "stage5.reactor",
+        "stage5.ignite",
+        "stage5.byproducts",
+        "stage5.endgame"
+      ]
+    },
+    {
+      "id": "multiblocks",
+      "icon": "singulo:holo_projector",
+      "pages": [
+        "multiblocks.projector",
+        "multiblocks.list"
+      ]
+    },
+    {
+      "id": "catalysts",
+      "icon": "singulo:muon_catalyst",
+      "pages": [
+        "catalysts.tiers",
+        "catalysts.slots",
+        "catalysts.time"
+      ]
+    },
+    {
+      "id": "power",
+      "icon": "singulo:superconducting_cable",
+      "pages": [
+        "power.cables",
+        "power.sides",
+        "power.wormhole"
+      ]
+    },
+    {
+      "id": "ruins",
+      "icon": "singulo:ruin_cache",
+      "pages": [
+        "ruins.list",
+        "ruins.records"
+      ]
+    },
+    {
+      "id": "romance",
+      "icon": "singulo:tipler_core",
+      "pages": [
+        "romance.shield",
+        "romance.tipler",
+        "romance.gear",
+        "romance.darkmatter"
+      ]
+    },
+    {
+      "id": "hazards",
+      "icon": "minecraft:tnt",
+      "pages": [
+        "hazards.list"
+      ]
+    }
+  ]
+}

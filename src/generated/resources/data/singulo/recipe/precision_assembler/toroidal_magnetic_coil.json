@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:topological_wire"
+      },
+      "count": 8
+    },
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:toroidal_magnetic_coil",
+    "count": 1
+  }
+}
