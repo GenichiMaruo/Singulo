@@ -49,7 +49,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
         ShieldTowerRenderer.ring(glow, pose.last(), r * 1.15F, r * 2.0F, 200, LightTexture.FULL_BRIGHT);
         pose.popPose();
         Vec3 c = Vec3.atBottomCenterOf(be.getBlockPos()).add(0, WormholeMouthBlockEntity.MOUTH_HEIGHT, 0);
-        GravitationalLensing.add(c, r * 1.5F, 0.6F);
+        GravitationalLensing.add(c, r * GravitationalLensing.EINSTEIN_PER_HORIZON, 0.6F);
     }
 
     private static void sphere(PoseStack.Pose last, VertexConsumer vc, float r) {
@@ -77,6 +77,12 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
 
     @Override
     public AABB getRenderBoundingBox(WormholeMouthBlockEntity be) {
-        return new AABB(be.getBlockPos()).inflate(2);
+        // 口が画面の外に出ても、周りの重力レンズが画面にかかっている間は描く
+        return new AABB(be.getBlockPos()).inflate(8);
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen(WormholeMouthBlockEntity be) {
+        return true;
     }
 }

@@ -38,7 +38,7 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
             return;
         }
         double mass = be.mass();
-        float horizon = (float) (0.35 + 0.65 * Math.min(1.0, mass / PenroseReactorBlockEntity.MAX_MASS));
+        float horizon = (float) be.horizonRadius();
         float time = be.getLevel().getGameTime() + partialTick;
         pose.pushPose();
         pose.translate(0.5, 0.5 + Structures.CONTROLLER_BELOW_CENTER, 0.5);
@@ -51,11 +51,13 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Vec3 center = Vec3.atCenterOf(be.getBlockPos().above(Structures.CONTROLLER_BELOW_CENTER));
         Vec3 toCamera = camera.subtract(center).normalize();
-        drawDisk(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE)), horizon * 1.6F, horizon * 3.6F,
+        drawDisk(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE)), horizon * 1.6F, horizon * 3.0F,
                 Math.toRadians(angle), toCamera, (float) be.spin());
         pose.popPose();
-        // 画面の重力レンズ（アインシュタイン半径は地平線の1.5倍）
-        GravitationalLensing.add(center, horizon * 1.5F, 1.0F);
+        // 画面の重力レンズ（アインシュタイン半径は地平線の2.2倍。黒い中心はシェーダー側で地平線の大きさに合わせる）
+        // 歪むのはリアクターの内側の空洞（リングの内側）だけ
+        GravitationalLensing.add(center, horizon * GravitationalLensing.EINSTEIN_PER_HORIZON, 1.0F,
+                Structures.REACTOR_RADIUS - 0.5F);
     }
 
     private static void drawSphere(PoseStack pose, VertexConsumer vc, float r) {
@@ -140,6 +142,6 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
 
     @Override
     public AABB getRenderBoundingBox(PenroseReactorBlockEntity be) {
-        return new AABB(be.getBlockPos().above(Structures.CONTROLLER_BELOW_CENTER)).inflate(Structures.REACTOR_RADIUS + 1);
+        return new AABB(be.getBlockPos().above(Structures.CONTROLLER_BELOW_CENTER)).inflate(Structures.REACTOR_RADIUS + 8); // 重力レンズは構造の外まで届く
     }
 }
