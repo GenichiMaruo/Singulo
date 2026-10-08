@@ -20,6 +20,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue QUANTUM_ENGINE_OUTPUT;
     public static final ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT;
     public static final ModConfigSpec.LongValue PENROSE_ENERGY_PER_PELLET;
+    public static final ModConfigSpec.IntValue WORMHOLE_GENERATOR_POWER;
     public static final ModConfigSpec.LongValue PENROSE_MAX_OUTPUT;
     public static final ModConfigSpec.DoubleValue EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS;
     public static final ModConfigSpec.LongValue IGNITION_ENERGY;
@@ -56,6 +57,8 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue SCULK_PER_SHARD;
     public static final ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS;
     public static final ModConfigSpec.DoubleValue BLACK_HOLE_PULL_STRENGTH;
+    public static final ModConfigSpec.DoubleValue BLACK_HOLE_INNER_PULL_STRENGTH;
+    public static final ModConfigSpec.BooleanValue EVENT_HORIZON_KILL;
     public static final ModConfigSpec.IntValue TIDAL_DAMAGE_RADIUS;
     public static final ModConfigSpec.BooleanValue EVAPORATION_BURST_DAMAGES_WORLD;
     public static final ModConfigSpec.BooleanValue STRANGELET_ENABLED;
@@ -87,6 +90,7 @@ public final class ServerConfig {
         ModConfigSpec.IntValue QUANTUM_ENGINE_OUTPUT_;
         ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT_;
         ModConfigSpec.LongValue PENROSE_ENERGY_PER_PELLET_;
+        ModConfigSpec.IntValue WORMHOLE_GENERATOR_POWER_;
         ModConfigSpec.LongValue PENROSE_MAX_OUTPUT_;
         ModConfigSpec.DoubleValue EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS_;
         ModConfigSpec.LongValue IGNITION_ENERGY_;
@@ -123,6 +127,8 @@ public final class ServerConfig {
         ModConfigSpec.IntValue SCULK_PER_SHARD_;
         ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS_;
         ModConfigSpec.DoubleValue BLACK_HOLE_PULL_STRENGTH_;
+        ModConfigSpec.DoubleValue BLACK_HOLE_INNER_PULL_STRENGTH_;
+        ModConfigSpec.BooleanValue EVENT_HORIZON_KILL_;
         ModConfigSpec.IntValue TIDAL_DAMAGE_RADIUS_;
         ModConfigSpec.BooleanValue EVAPORATION_BURST_DAMAGES_WORLD_;
         ModConfigSpec.BooleanValue STRANGELET_ENABLED_;
@@ -170,6 +176,8 @@ public final class ServerConfig {
         DEGENERATE_FURNACE_OUTPUT_ = b.defineInRange("degenerateFurnaceOutput", 20000000, 1, 1000000000);
         b.comment("質量ペレット1個の質量エネルギー（降着効率を掛ける前）", "範囲: 1〜（FE）");
         PENROSE_ENERGY_PER_PELLET_ = b.defineInRange("penroseEnergyPerPellet", 20000000000L, 1L, Long.MAX_VALUE);
+        b.comment("ワームホール生成器が10秒のあいだ毎tick必要とする電力", "範囲: 1〜2000000000（FE/t）");
+        WORMHOLE_GENERATOR_POWER_ = b.defineInRange("wormholeGeneratorPower", 100000000, 1, 2000000000);
         b.comment("Pリアクターの出力上限", "範囲: 1〜（FE/t）");
         PENROSE_MAX_OUTPUT_ = b.defineInRange("penroseMaxOutput", 2100000000L, 1L, Long.MAX_VALUE);
         b.comment("エディントン限界（炉心質量1,000あたり毎秒の投入上限）", "範囲: 0.1〜100.0");
@@ -250,8 +258,12 @@ public final class ServerConfig {
         b.push("hazards");
         b.comment("引力帯の半径。0で引力なし", "範囲: 0〜64（ブロック）");
         BLACK_HOLE_PULL_RADIUS_ = b.defineInRange("blackHolePullRadius", 24, 0, 64);
-        b.comment("引力の最大加速度（ブロック/tick²）", "範囲: 0.0〜1.0");
-        BLACK_HOLE_PULL_STRENGTH_ = b.defineInRange("blackHolePullStrength", 0.02, 0.0, 1.0);
+        b.comment("リングの外での弱い引力の最大加速度（ブロック/tick²）", "範囲: 0.0〜1.0");
+        BLACK_HOLE_PULL_STRENGTH_ = b.defineInRange("blackHolePullStrength", 0.04, 0.0, 1.0);
+        b.comment("リングの内側での強い引力の加速度（ブロック/tick²、中心に近いほど強い）", "範囲: 0.0〜2.0");
+        BLACK_HOLE_INNER_PULL_STRENGTH_ = b.defineInRange("blackHoleInnerPullStrength", 0.25, 0.0, 2.0);
+        b.comment("事象の地平線に触れたものを必ず消す（どんな体力・耐性・無敵も無視）", "範囲: true / false");
+        EVENT_HORIZON_KILL_ = b.define("eventHorizonKill", true);
         b.comment("潮汐ダメージ帯の半径。0で無効", "範囲: 0〜16（ブロック）");
         TIDAL_DAMAGE_RADIUS_ = b.defineInRange("tidalDamageRadius", 4, 0, 16);
         b.comment("炉心の蒸発バーストが外殻の外を壊すか", "範囲: true / false");
@@ -300,6 +312,7 @@ public final class ServerConfig {
         QUANTUM_ENGINE_OUTPUT = QUANTUM_ENGINE_OUTPUT_;
         DEGENERATE_FURNACE_OUTPUT = DEGENERATE_FURNACE_OUTPUT_;
         PENROSE_ENERGY_PER_PELLET = PENROSE_ENERGY_PER_PELLET_;
+        WORMHOLE_GENERATOR_POWER = WORMHOLE_GENERATOR_POWER_;
         PENROSE_MAX_OUTPUT = PENROSE_MAX_OUTPUT_;
         EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS = EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS_;
         IGNITION_ENERGY = IGNITION_ENERGY_;
@@ -336,6 +349,8 @@ public final class ServerConfig {
         SCULK_PER_SHARD = SCULK_PER_SHARD_;
         BLACK_HOLE_PULL_RADIUS = BLACK_HOLE_PULL_RADIUS_;
         BLACK_HOLE_PULL_STRENGTH = BLACK_HOLE_PULL_STRENGTH_;
+        BLACK_HOLE_INNER_PULL_STRENGTH = BLACK_HOLE_INNER_PULL_STRENGTH_;
+        EVENT_HORIZON_KILL = EVENT_HORIZON_KILL_;
         TIDAL_DAMAGE_RADIUS = TIDAL_DAMAGE_RADIUS_;
         EVAPORATION_BURST_DAMAGES_WORLD = EVAPORATION_BURST_DAMAGES_WORLD_;
         STRANGELET_ENABLED = STRANGELET_ENABLED_;

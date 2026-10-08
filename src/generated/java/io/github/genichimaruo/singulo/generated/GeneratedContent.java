@@ -169,6 +169,7 @@ public final class GeneratedContent {
             Map.entry("worldline_anchor_advanced", 5),
             Map.entry("tipler_core", 5),
             Map.entry("wormhole_generator_core", 5),
+            Map.entry("wormhole_generator_io", 5),
             Map.entry("wormhole_mouth", 5),
             Map.entry("wormhole_stabilizer", 5),
             Map.entry("wormhole_port", 5)

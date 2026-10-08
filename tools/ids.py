@@ -145,6 +145,7 @@ MOD = {
     'Tコア': ('tipler_core', 'T-Core', 'machine'),
     'Tシリンダー': ('tipler_cylinder', 'T-Cylinder', 'structure'),
     'ワームホール生成器コア': ('wormhole_generator_core', 'Wormhole Generator Core', 'machine'),
+    'ワームホール生成器入出力口': ('wormhole_generator_io', 'Wormhole Generator I/O Port', 'part_block'),
     'ワームホール生成器': ('wormhole_generator', 'Wormhole Generator', 'structure'),
     '不安定なワームホールの口': ('unstable_wormhole_mouth', 'Unstable Wormhole Mouth', 'tool'),
     'ワームホールの口': ('wormhole_mouth', 'Wormhole Mouth', 'machine'),

@@ -472,6 +472,7 @@ UI_LANG = {
     'jei.singulo.found_prefix': ('入手', 'Found in'),
     'gauntlet.singulo.left_click': ('左クリックを押している間、重力を操る', 'Hold left-click to manipulate gravity'),
     'gauntlet.singulo.charging': ('ためている… %s%%（離すと投げる）', 'Charging… %s%% (release to throw)'),
+    'gauntlet.singulo.thrown': ('投げた！（力 %s%%）', 'Thrown! (power %s%%)'),
     'gauntlet.singulo.nothing_held': ('持ち上げている対象がいない（浮遊モードで左クリック）', 'Nothing held (left-click in levitate mode)'),
     'tooltip.singulo.manipulator.hint': ('左クリック長押しで重力を操る。浮遊中に右クリック長押しでため、離すと投げ飛ばす。スニーク＋右クリックでモード切替',
                                          'Hold left-click to manipulate. While levitating, hold right-click to charge and release to throw. Sneak + right-click: mode'),
@@ -481,10 +482,10 @@ UI_LANG = {
     'jei.singulo.mb.degenerate_compactor': ('■ 組み立て: 3×3×3\n■ 起動: 電力をつなぐだけ（レシピ装置）\n■ 消費: レシピごとの電力・材料（コントローラーで調べるとレシピ一覧）', '■ Build: 3×3×3\n■ Start: just supply power (recipe machine)\n■ Uses: power and inputs per recipe (see controller recipes)'),
     'jei.singulo.mb.casimir_cavity': ('■ 組み立て: 5×5×5\n■ 起動: 電力をつなぐ。触媒スロットに触媒を入れる（レシピ装置）\n■ 消費: レシピごとの電力・材料・触媒の使用回数', '■ Build: 5×5×5\n■ Start: supply power, put a catalyst in its slot (recipe machine)\n■ Uses: power, inputs and catalyst uses per recipe'),
     'jei.singulo.mb.degenerate_furnace': ('■ 組み立て: 7×7、高さ9の炉\n■ 起動: 触媒スロットに時間結晶、燃料を入れると自動で燃える\n■ 燃料: 圧縮ブロック Lv2（10秒に1個）\n■ 出力: 20 MFE/t × 触媒の速さ', '■ Build: 7×7 furnace, 9 tall\n■ Start: time crystal in the catalyst slot, then add fuel\n■ Fuel: compressed block Lv2 (1 per 10 s)\n■ Output: 20 MFE/t × catalyst speed'),
-    'jei.singulo.mb.penrose_reactor': ('■ 組み立て: 13×13×13 の連続したリング（3面）＋殻\n■ 点火: 種の特異点を入れ、10秒以内に 50 GFE を入れる（ホライズン級の導線が必要）\n■ 燃料: 質量ペレット\n■ 効率: 自転の速さで 5.7〜42.3%\n■ 上限: エディントン限界＝炉心質量1,000あたり毎秒1個\n■ 最大出力: 約 2.1 GFE/t\n■ 副産物: 取り出し口の収集器から', '■ Build: 13×13×13 continuous rings (3 planes) + shells\n■ Ignite: insert a seed singularity, then 50 GFE within 10 s (horizon bus needed)\n■ Fuel: mass pellets\n■ Efficiency: 5.7-42.3% by spin\n■ Limit: Eddington — 1 pellet/s per 1000 core mass\n■ Max output: about 2.1 GFE/t\n■ Byproducts: from the collectors at the ports'),
+    'jei.singulo.mb.penrose_reactor': ('■ 組み立て: 13×13×13 の連続したリング（3面）＋殻\n■ 点火: 種の特異点を入れ、10秒以内に 50 GFE を入れる（ホライズン級の導線が必要）\n■ 燃料: 質量ペレット\n■ 効率: 自転の速さで 5.7〜42.3%\n■ 上限: エディントン限界＝炉心質量1,000あたり毎秒1個\n■ 最大出力: 約 2.1 GFE/t\n■ 副産物: 取り出し口の収集器から\n■ 抽出ポート: リングの炉殻のどこにでも、好きな数だけ置ける（電力の搬入出・燃料・副産物）', '■ Build: 13×13×13 continuous rings (3 planes) + shells\n■ Ignite: insert a seed singularity, then 50 GFE within 10 s (horizon bus needed)\n■ Fuel: mass pellets\n■ Efficiency: 5.7-42.3% by spin\n■ Limit: Eddington — 1 pellet/s per 1000 core mass\n■ Max output: about 2.1 GFE/t\n■ Byproducts: from the collectors at the ports\n■ Extraction ports: replace any ring shell block, as many as you like (power in/out, fuel, byproducts)'),
     'jei.singulo.mb.event_horizon_shield': ('■ 組み立て: 3×3、高さ9の塔\n■ 起動: 触媒スロットに時間結晶か特異点コア、電力をつなぐ\n■ 消費: 16,384 FE/t（半径の二乗に比例）\n■ 効果: 半径32の中の装置を守り、強化する', '■ Build: 3×3 tower, 9 tall\n■ Start: time crystal or singularity core in the catalyst slot, plus power\n■ Uses: 16,384 FE/t (∝ radius²)\n■ Effect: protects and boosts machines within radius 32'),
     'jei.singulo.mb.tipler_cylinder': ('■ 組み立て: 3×3、高さ7の円柱\n■ 起動: 触媒スロットに時間結晶、燃料と電力を入れる\n■ 燃料: エキゾチック物質（1分に1個）\n■ 消費: 100 kFE/t\n■ 効果: 半径8の中の装置が 2倍速', '■ Build: 3×3 column, 7 tall\n■ Start: time crystal in the catalyst slot, fuel and power\n■ Fuel: exotic matter (1 per minute)\n■ Uses: 100 kFE/t\n■ Effect: machines within radius 8 run ×2'),
-    'jei.singulo.mb.wormhole_generator': ('■ 組み立て: 3×3×3\n■ 起動: 1 GFE/t を10秒入れ続ける\n■ 結果: つながった一対のワームホールの口ができる', '■ Build: 3×3×3\n■ Start: feed 1 GFE/t for 10 s\n■ Result: a linked pair of wormhole mouths'),
+    'jei.singulo.mb.wormhole_generator': ('■ 組み立て: 3×3×3\n■ 起動: 100 MFE/t を10秒入れ続ける（トポロジカル導線で足りる。設定 wormholeGeneratorPower）\n■ 結果: つながった一対のワームホールの口ができる\n■ 入出力口: 外殻の代わりにどこにでも置ける（電力を入れ、できた口を取り出す）', '■ Build: 3×3×3\n■ Start: feed 100 MFE/t for 10 s (topological cable is enough; config wormholeGeneratorPower)\n■ Result: a linked pair of wormhole mouths\n■ I/O ports: replace any casing block (power in, mouths out)'),
     'message.singulo.multiblock.not_formed': ('%s はまだ未完成（ホロ投影機かJEIで形を確かめよう）', '%s is not formed yet (check the shape with the Holo Projector or JEI)'),
     'message.singulo.welcome': ('Singulo ハンドブックを受け取った。右クリックで開ける', 'You received the Singulo Handbook. Right-click to open it'),
     'gauntlet.singulo.area.cone': ('範囲: 前方の円錐', 'Area: forward cone'),
@@ -498,7 +499,50 @@ UI_LANG = {
     'tooltip.singulo.wormhole.unstable': ('不安定: あと %s 秒で消える', 'Unstable: collapses in %s s'),
     'gui.singulo.wormhole.mouth_collapsed': ('不安定なワームホールの口が崩壊した', 'An unstable wormhole mouth collapsed'),
     'gui.singulo.wormhole.generated': ('一対の口ができた。%s 秒以内に固定化すること', 'A pair of mouths formed. Stabilize within %s s'),
-    'gui.singulo.wormhole.generator': ('生成 %s / %s 秒（毎tick 1 GFE が必要）', 'Generating %s / %s s (needs 1 GFE/t)'),
+    'gui.singulo.wormhole.generator': ('生成 %s / %s 秒（毎tick 100 MFE が必要）', 'Generating %s / %s s (needs 100 MFE/t)'),
+    'gui.singulo.device.not_formed': ('未完成（形を確かめよう）', 'Not formed'),
+    'gui.singulo.device.generator.idle': ('電力を10秒注ぐと口ができる', 'Feed power for 10 s'),
+    'gui.singulo.device.generator.working': ('生成中 %s / %s 秒', 'Generating %s / %s s'),
+    'gui.singulo.device.generator.done': ('口ができた（取り出して固定化）', 'Mouths ready - stabilize them'),
+    'gui.singulo.device.generator.input': ('入力 %sFE/t （必要 %sFE/t）', 'Input %sFE/t (need %sFE/t)'),
+    'gui.singulo.device.generator.expires': ('残り %s秒', '%ss left'),
+    'gui.singulo.device.mouth.size': ('喉 %s×%s → 目標 %s×%s', 'Throat %sx%s -> %sx%s'),
+    'gui.singulo.device.mouth.no_partner': ('対の口がない', 'No partner'),
+    'gui.singulo.device.mouth.unloaded': ('対 %s, %s, %s（未読込）', 'Pair %s,%s,%s (unloaded)'),
+    'gui.singulo.device.mouth.linked': ('対 %s, %s, %s', 'Pair %s,%s,%s'),
+    'gui.singulo.device.mouth.cross': ('別の次元（維持3倍）', 'Cross-dimension (x3)'),
+    'gui.singulo.device.mouth.bandwidth': ('%sFE・%s個・%smB /t', '%sFE, %s items, %smB /t'),
+    'gui.singulo.device.mouth.upkeep': ('1個で %s 分もつ', '1 lasts %s min'),
+    'gui.singulo.device.mouth.upkeep_none': ('維持なし', 'No upkeep'),
+    'gui.singulo.device.mouth.starving': ('燃料切れ: %s秒で縮む', 'No fuel: shrinks in %ss'),
+    'gui.singulo.device.port.no_mouth': ('近くに口がない（8ブロック以内）', 'No mouth within 8 blocks'),
+    'gui.singulo.device.port.no_partner': ('口に対がない', 'Mouth has no partner'),
+    'gui.singulo.device.port.linked': ('つながっている', 'Linked'),
+    'gui.singulo.device.port.throat': ('喉 %s×%s', 'Throat %sx%s'),
+    'gui.singulo.device.port.targets': ('向こう側: 電力%s・物%s・液体%s', 'Far side: %s power, %s items, %s fluids'),
+    'gui.singulo.device.port.hint': ('隣の装置が向こうとつながる', 'Neighbours link through'),
+    'gui.singulo.device.tank.amount': ('ダークマター %s / %s mB', 'Dark matter %s / %s mB'),
+    'gui.singulo.device.tank.contained': ('閉じ込め中', 'Contained'),
+    'gui.singulo.device.tank.leaking': ('電力切れ: 毎秒1%%漏れている', 'No power: leaking 1%%/s'),
+    'gui.singulo.device.tank.upkeep': ('場の維持 %s FE/t', 'Field upkeep %s FE/t'),
+    'gui.singulo.device.energy_short': ('電力 %s / %s FE', 'Energy %s / %s FE'),
+    'gui.singulo.device.halo.core': ('炉心の質量 %s', 'Core mass %s'),
+    'gui.singulo.device.halo.no_core': ('%sブロック以内に炉心がない', 'No core within %s blocks'),
+    'gui.singulo.device.halo.rate': ('捕集 %s mB/秒', 'Collecting %s mB/s'),
+    'gui.singulo.device.halo.tank': ('内部 %s / %s mB', 'Buffer %s / %s mB'),
+    'gui.singulo.device.halo.leak': ('隣のタンクへ毎秒送る', 'Pushes to tanks each second'),
+    'gui.singulo.device.muon.altitude': ('高さ Y=%s', 'Altitude Y=%s'),
+    'gui.singulo.device.muon.rate': ('収集の速さ %s%%', 'Rate %s%%'),
+    'gui.singulo.device.muon.no_sky': ('空が見えない', 'No sky access'),
+    'gui.singulo.device.muon.hint': ('Y=100で0、Y=200で最大', '0 at Y100, max at Y200'),
+    'gui.singulo.device.detector.observe': ('観測', 'Observe'),
+    'gui.singulo.device.detector.cost': ('1回 %s FE', '%s FE each'),
+    'gui.singulo.device.detector.not_yet': ('まだ観測していない', 'Not observed yet'),
+    'gui.singulo.stabilizer.working': ('固定化 %s%%', 'Stabilizing %s%%'),
+    'gui.singulo.stabilizer.waiting': ('燃料・電力待ち', 'Waiting'),
+    'gui.singulo.stabilizer.done': ('完了', 'Done'),
+    'gui.singulo.stabilizer.empty': ('空き', 'Empty'),
+    'gui.singulo.stabilizer.fuel': ('エキゾチック物質', 'Exotic matter'),
     'gui.singulo.wormhole.stabilizer': ('固定化 %s%% / %s%%、エキゾチック物質 %s 個', 'Stabilizing %s%% / %s%%, exotic matter: %s'),
     'gui.singulo.wormhole.status': ('喉 %1$s×%1$s（目標 %2$s×%2$s）、エキゾチック物質 %3$s 個。スニーク＋右クリックで目標を変更',
                                     'Throat %1$s×%1$s (target %2$s×%2$s), exotic matter: %3$s. Sneak + right-click to change target'),
@@ -509,9 +553,11 @@ UI_LANG = {
     'gui.singulo.wormhole_port.status': ('向こう側の入れ物 %s 個とつながっている', 'Connected to %s handlers on the other side'),
     'entity.singulo.security_drone': ('警備ドローン', 'Security Drone'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
+    'entity.singulo.warden_singularity': ('ウォーデンの特異点', 'Warden Singularity'),
     'entity.singulo.horizon_bolt': ('光弾', 'Horizon Bolt'),
     'item.singulo.horizon_warden_spawn_egg': ('ホライズン・ウォーデンのスポーンエッグ', 'Horizon Warden Spawn Egg'),
     'death.attack.singulo.tidal': ('%1$s は潮汐力で引き裂かれた', '%1$s was torn apart by tidal forces'),
+    'death.attack.singulo.event_horizon': ('%1$s は事象の地平線を越えた', '%1$s crossed the event horizon'),
     'death.attack.singulo.tidal.player': ('%1$s は %2$s の特異点に引き裂かれた', "%1$s was torn apart by %2$s's singularity"),
     'gui.singulo.console.awakened': ('封印が破れた。ホライズン・ウォーデンが目を覚ました', 'The seal breaks. The Horizon Warden awakens'),
     'gui.singulo.console.active': ('守護機はすでに起動している', 'The warden is already active'),
@@ -583,6 +629,7 @@ def lang_files():
 def models():
     boost_overlay_model()
     black_hole_item_models()
+    manipulator_staff_model()
     compass_item_model()
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
@@ -633,7 +680,7 @@ def models():
             write_json(ASSETS / 'blockstates' / f'{iid}.json', {'multipart': multipart})
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
         else:
-            if iid in BLACK_HOLE_ITEMS or iid == 'explorer_compass':
+            if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'graviton_manipulator'):
                 continue                                       # 立体のモデル・針のモデルは別に作る
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json',
                        {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
@@ -764,19 +811,7 @@ def textures():
 
     # 警備ドローン（32×32）: 白い胴、正面の帯とレンズを強さの色（1=水色、2=琥珀、3=赤）で光らせる
     te = ASSETS / 'textures' / 'entity'
-    for tier, eye in ((1, (120, 210, 240, 255)), (2, (240, 180, 80, 255)), (3, (232, 96, 96, 255))):
-        im = Image.new('RGBA', (32, 32), (0, 0, 0, 0))
-        d = ImageDraw.Draw(im)
-        d.rectangle([0, 0, 31, 15], fill=white)                 # 胴（8×8×8 の展開図）
-        for x in (8, 16, 24):
-            d.line([(x, 8), (x, 15)], fill=seam)
-        d.line([(0, 8), (31, 8)], fill=seam)
-        d.rectangle([8, 11, 15, 12], fill=(57, 66, 74, 255))    # 正面の帯
-        d.rectangle([10, 11, 13, 12], fill=eye)
-        d.rectangle([0, 16, 9, 20], fill=(57, 66, 74, 255))     # レンズ
-        d.rectangle([1, 17, 4, 20], fill=eye)
-        d.rectangle([12, 16, 29, 22], fill=shade)               # 翼
-        save(im, te / f'security_drone_{tier}.png')
+    drone_textures(te, save)
     write_json(ASSETS / 'models' / 'item' / 'security_drone_spawn_egg.json',
                {'parent': 'minecraft:item/template_spawn_egg'})
 
@@ -825,21 +860,7 @@ def textures():
             d.rectangle([1, 2, 14, 13], outline=(255, 90, 90, 255))
             save(im, tb / 'ruin_cache_sealed.png')
 
-    # ホライズン・ウォーデン（64×64）。フェーズ1は白い外装、2・3は剥がれた黒い躯体に水色・赤の光
-    for phase, (base, glow) in {1: ((236, 238, 240, 255), (120, 210, 240, 255)),
-                                2: ((40, 44, 50, 255), (120, 210, 240, 255)),
-                                3: ((40, 44, 50, 255), (232, 96, 96, 255))}.items():
-        im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
-        d = ImageDraw.Draw(im)
-        for box in ((0, 0, 31, 15), (0, 16, 37, 36), (40, 16, 59, 36), (0, 40, 19, 58)):  # 頭・胴・腕・脚
-            d.rectangle(box, fill=base)
-            d.rectangle(box, outline=seam if phase == 1 else glow)
-        d.rectangle([8, 11, 15, 12], fill=glow)                   # 目の帯
-        d.line([(7, 30), (31, 30)], fill=glow)                    # 胴の光のライン
-        d.rectangle([24, 40, 51, 48], fill=white, outline=seam)   # 胸当て
-        d.rectangle([24, 52, 47, 60], fill=white, outline=seam)   # 肩当て
-        d.rectangle([52, 40, 61, 44], fill=glow)                  # 炉心
-        save(im, te / f'horizon_warden_{phase}.png')
+    warden_textures(te, save)
     write_json(ASSETS / 'models' / 'item' / 'horizon_warden_spawn_egg.json',
                {'parent': 'minecraft:item/template_spawn_egg'})
 
@@ -1034,6 +1055,7 @@ def art_textures():
     for k in range(16):
         art16.save(art16.compass_frame(k / 16), ti / f'explorer_compass_{k:02d}.png')
     black_hole_textures(art16, tb)
+    manipulator_staff_texture(art16)
     # 遺構の建材など、まだのっぺりしている絵にも汚し（使用感）を入れる
     from PIL import Image
     for name, (iid, _, kind) in MOD.items():
@@ -1107,6 +1129,455 @@ def black_hole_item_models():
                         'fixed': {'scale': [0.7, 0.7, 0.7]}},
         })
 
+def manipulator_staff_texture(art16):
+    """グラビトン・マニピュレーターの杖のテクスチャ（1枚にまとめ、uv は1ドット＝1ドット）。
+    x 0..2 / y 0..10: 柄（左が明るく右が暗い金属）, x 3..7 / y 0..2: 握りの帯（側面）, x 3..7 / y 3..7: 帯の上下,
+    x 8..12 / y 0..1: 襟（側面）, x 8..12 / y 2..6: 襟の上下, x 13..14 / y 0..2: 爪。"""
+    im, d = art16.new()
+    metal = (58, 60, 72)
+    for y in range(10):
+        for x, t in ((0, 0.18), (1, 0.0)):
+            c = art16.lighten(metal, t) if t > 0 else metal
+            if y in (0, 9):
+                c = art16.darken(c, 0.25)
+            im.putpixel((x, y), c + (255,))
+    gold = (214, 182, 104)
+    for y in range(2):
+        for x in range(3, 7):
+            im.putpixel((x, y), (art16.lighten(gold, 0.15) if y == 0 else art16.darken(gold, 0.12)) + (255,))
+    for y in range(3, 7):
+        for x in range(3, 7):
+            edge = x in (3, 6) or y in (3, 6)
+            im.putpixel((x, y), (art16.darken(gold, 0.18) if edge else gold) + (255,))
+    collar = (86, 90, 108)
+    for x in range(8, 12):
+        im.putpixel((x, 0), art16.lighten(collar, 0.12) + (255,))
+    for y in range(2, 6):
+        for x in range(8, 12):
+            edge = x in (8, 11) or y in (2, 5)
+            c = art16.darken(collar, 0.2) if edge else collar
+            if (x, y) in ((9, 3), (10, 4)):
+                c = (120, 200, 255)                                   # 襟の上の小さな光点
+            im.putpixel((x, y), c + (255,))
+    for y in range(2):
+        im.putpixel((13, y), (art16.lighten(gold, 0.1) if y == 0 else gold) + (255,))
+    art16.save(im, ASSETS / 'textures' / 'item' / 'graviton_staff.png')
+
+
+def manipulator_staff_model():
+    """グラビトン・マニピュレーター: 先端に小さなブラックホールを抱えた杖（立体）。
+    座標は整数（1ドット＝1）。同じ向きの面が同じ平面で重ならない。輪だけ傾けるので半ドットを使う。"""
+    t = '#t'
+
+    def box(f, to, uvs, skip=()):
+        faces = {}
+        for dname, uv in uvs.items():
+            if dname not in skip:
+                faces[dname] = {'uv': uv, 'texture': t}
+        return {'from': f, 'to': to, 'faces': faces}
+
+    def sides(uv):
+        return {d: uv for d in ('north', 'south', 'east', 'west')}
+
+    els = []
+    # 柄: 2x2、y 0..9（上面は襟に隠れる）
+    els.append(box([7, 0, 7], [9, 9, 9], {**sides([0, 0, 2, 9]), 'down': [0, 9, 2, 10]}))
+    # 握りの帯: 4x4、y 2..4（柄を包む）
+    els.append(box([6, 2, 6], [10, 4, 10], {**sides([3, 0, 7, 2]), 'up': [3, 3, 7, 7], 'down': [3, 3, 7, 7]}))
+    # 襟: 4x4、y 9..10
+    els.append(box([6, 9, 6], [10, 10, 10], {**sides([8, 0, 12, 1]), 'up': [8, 2, 12, 6], 'down': [8, 2, 12, 6]}))
+    # 爪: 襟の四隅の外、y 10..12（球を下から抱える）
+    for x, z in ((5, 5), (10, 5), (5, 10), (10, 10)):
+        els.append(box([x, 10, z], [x + 1, 12, z + 1], {**sides([13, 0, 14, 2]), 'up': [13, 0, 14, 1], 'down': [13, 1, 14, 2]}))
+    # ブラックホール: 1ドットずつの板を積んだ球（中心 y 13）
+    for y0, y1, half in ((10, 11, 1), (11, 12, 2), (12, 14, 3), (14, 15, 2), (15, 16, 1)):
+        u = 8 - half
+        els.append({'from': [8 - half, y0, 8 - half], 'to': [8 + half, y1, 8 + half],
+                    'faces': {dn: {'uv': [u, u, 16 - u, 16 - u] if dn in ('up', 'down') else [u, 8, 16 - u, 8 + (y1 - y0)],
+                                   'texture': '#s'} for dn in ('north', 'south', 'east', 'west', 'up', 'down')}})
+    # 光る輪（降着円盤）: 4本の棒を少し傾ける。角で重ならないよう、手前と奥は左右の間だけ
+    c, R, h = 8, 4, 0.5
+    bars = [([c - R - 1, 13 - h, c - R - 1], [c - R, 13 + h, c + R + 1]),
+            ([c + R, 13 - h, c - R - 1], [c + R + 1, 13 + h, c + R + 1]),
+            ([c - R, 13 - h, c - R - 1], [c + R, 13 + h, c - R]),
+            ([c - R, 13 - h, c + R], [c + R, 13 + h, c + R + 1])]
+    for f, to in bars:
+        els.append({'from': f, 'to': to, 'rotation': {'origin': [8, 13, 8], 'axis': 'x', 'angle': 22.5},
+                    'neoforge_data': {'block_light': 15, 'sky_light': 15},
+                    'faces': {dn: {'uv': [0, 6, 16, 7], 'texture': '#r'}
+                              for dn in ('north', 'south', 'east', 'west', 'up', 'down')}})
+    write_json(ASSETS / 'models' / 'item' / 'graviton_manipulator.json', {
+        'parent': 'minecraft:block/block',
+        'textures': {'particle': f'{MODID}:item/graviton_staff', 't': f'{MODID}:item/graviton_staff',
+                     's': f'{MODID}:block/bh_dark', 'r': f'{MODID}:block/bh_ring_white'},
+        'elements': els,
+        'display': {
+            'gui': {'rotation': [25, -45, 0], 'translation': [0, 0, 0], 'scale': [0.85, 0.85, 0.85]},
+            'ground': {'translation': [0, 2, 0], 'scale': [0.5, 0.5, 0.5]},
+            'fixed': {'rotation': [0, 90, 0], 'scale': [0.8, 0.8, 0.8]},
+            'thirdperson_righthand': {'rotation': [0, 0, 0], 'translation': [0, 3, 1], 'scale': [0.85, 0.85, 0.85]},
+            'thirdperson_lefthand': {'rotation': [0, 0, 0], 'translation': [0, 3, 1], 'scale': [0.85, 0.85, 0.85]},
+            'firstperson_righthand': {'rotation': [0, -20, 8], 'translation': [1, 3.5, 0], 'scale': [0.68, 0.68, 0.68]},
+            'firstperson_lefthand': {'rotation': [0, 20, -8], 'translation': [1, 3.5, 0], 'scale': [0.68, 0.68, 0.68]},
+        },
+    })
+
+
+# ホライズン・ウォーデンの部品とテクスチャの配置（HorizonWardenRenderer.createLayer と同じ）。
+# 名前: (u, v, 幅, 高さ, 奥行き, 素材)
+WARDEN_PARTS = {
+    'head': (0, 0, 8, 8, 8, 'head'),
+    'crest': (32, 0, 1, 4, 6, 'dark'),
+    'chest': (0, 16, 12, 8, 7, 'chest'),
+    'abdomen': (40, 16, 9, 6, 5, 'abdomen'),
+    'core': (70, 16, 4, 4, 1, 'core'),
+    'chest_plate': (0, 34, 13, 7, 1, 'armor'),
+    'arm': (0, 48, 5, 8, 5, 'dark'),
+    'forearm': (24, 48, 6, 9, 6, 'forearm'),
+    'blade': (52, 48, 1, 12, 3, 'blade'),
+    'pad': (0, 64, 7, 4, 7, 'armor'),
+    'thigh': (64, 48, 5, 6, 5, 'dark'),
+    'shin': (88, 48, 6, 6, 6, 'shin'),
+    'vane': (32, 64, 1, 14, 2, 'vane'),
+    'shard': (44, 64, 5, 6, 1, 'armor'),
+}
+
+
+def cube_faces(u, v, w, h, d):
+    """立方体の展開図の各面（x0, y0, x1, y1、右と下は含まない）。front はモデルの正面（-Z）。"""
+    return {
+        'up': (u + d, v, u + d + w, v + d),
+        'down': (u + d + w, v, u + d + 2 * w, v + d),
+        'side_a': (u, v + d, u + d, v + d + h),
+        'front': (u + d, v + d, u + d + w, v + d + h),
+        'side_b': (u + d + w, v + d, u + 2 * d + w, v + d + h),
+        'back': (u + 2 * d + w, v + d, u + 2 * d + 2 * w, v + d + h),
+    }
+
+
+# 警備ドローンの部品とテクスチャの配置（SecurityDroneRenderer.createLayer と同じ）。名前: (u, v, 幅, 高さ, 奥行き, 素材)
+DRONE_PARTS = {
+    'core': (0, 0, 6, 5, 6, 'shell'),
+    'belt': (0, 12, 7, 1, 7, 'belt'),
+    'cap': (28, 0, 4, 1, 4, 'shell'),
+    'antenna': (44, 0, 1, 3, 1, 'antenna'),
+    'lens': (48, 0, 3, 3, 1, 'lens'),
+    'barrel': (56, 0, 1, 1, 3, 'barrel'),
+    'ring_x': (0, 22, 12, 1, 1, 'ring'),
+    'ring_z': (0, 26, 1, 1, 10, 'ring'),
+    'strut': (28, 22, 1, 1, 4, 'dark'),
+    'pod': (40, 22, 3, 2, 3, 'pod'),
+    'blade': (28, 30, 6, 0, 1, 'blade'),
+}
+
+
+def drone_textures(te, save):
+    """警備ドローン: 白い胴と上のふた、暗い帯・腕・砲身、灰色の輪。光る線は別の画像（強さの色）。"""
+    import random as _r
+    from PIL import Image
+    rng = _r.Random(7)
+    shell = (232, 234, 238)
+    shell_sh = (200, 204, 212)
+    dark = (52, 56, 66)
+    ring = (176, 182, 194)
+    base = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+    glow = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+
+    def mix(c, k):
+        return tuple(max(0, min(255, int(x + k))) for x in c)
+
+    def fill(rect, col, edge=True):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                c = mix(col, rng.randint(-4, 4))
+                if edge and x1 - x0 >= 3 and y1 - y0 >= 3:
+                    if y == y0 or x == x0:
+                        c = mix(c, 12)
+                    elif y == y1 - 1 or x == x1 - 1:
+                        c = mix(c, -16)
+                base.putpixel((x, y), c + (255,))
+
+    def lit(rect):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                glow.putpixel((x, y), (255, 255, 255, 255))
+
+    for name, (u, v, w, h, d, mat) in DRONE_PARTS.items():
+        f = cube_faces(u, v, w, h, d)
+        col = {'shell': shell, 'ring': ring, 'lens': (14, 16, 20), 'blade': (70, 74, 84)}.get(mat, dark)
+        for k, r in f.items():
+            fill(r, shell_sh if mat == 'shell' and k in ('side_a', 'side_b', 'back') else col)
+        fx0, fy0, fx1, fy1 = f['front']
+        if name == 'core':
+            # 正面のパネルの継ぎ目と、側面の通気口
+            for x in range(fx0, fx1):
+                base.putpixel((x, fy0 + 3), mix(shell, -50) + (255,))
+            for side in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[side]
+                for x in range(x0 + 1, x1 - 1, 2):
+                    base.putpixel((x, y0 + 1), mix(shell, -70) + (255,))
+        elif name == 'lens':
+            lit(f['front'])
+        elif name == 'belt':
+            for k in ('front', 'back', 'side_a', 'side_b'):
+                x0, y0, x1, y1 = f[k]
+                cx = (x0 + x1) // 2
+                lit((cx - 1, y0, cx + 2, y1))
+        elif name == 'antenna':
+            lit(f['up'])
+        elif name == 'barrel':
+            lit(f['front'])
+        elif mat == 'ring':
+            x0, y0, x1, y1 = f['up']
+            for x in range(x0, x1):
+                if (x - x0) % 3 == 1:
+                    glow.putpixel((x, y0), (255, 255, 255, 255))
+        elif name == 'pod':
+            x0, y0, x1, y1 = f['down']
+            lit((x0 + 1, y0 + 1, x1 - 1, y1 - 1))
+    save(base, te / 'security_drone.png')
+    for tier, c in {1: (120, 210, 240), 2: (240, 180, 80), 3: (232, 96, 96)}.items():
+        im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+        for y in range(64):
+            for x in range(64):
+                if glow.getpixel((x, y))[3]:
+                    im.putpixel((x, y), c + (255,))
+        save(im, te / f'security_drone_glow_{tier}.png')
+    for old in (1, 2, 3):
+        p = te / f'security_drone_{old}.png'
+        if p.exists():
+            p.unlink()
+
+
+def warden_textures(te, save):
+    """ホライズン・ウォーデン: 黒い躯体（継ぎ目と擦れ）、白い陶磁の外装（金の縁）、鋼の刃。光る線は別の画像（フェーズで色が変わる）。"""
+    import random as _r
+    from PIL import Image
+    rng = _r.Random(42)
+    dark = (46, 48, 58)
+    seam = (28, 29, 36)
+    hi = (74, 78, 92)
+    armor = (228, 230, 234)
+    armor_sh = (192, 196, 205)
+    gold = (212, 178, 98)
+    gold_sh = (160, 128, 64)
+    steel = (150, 156, 170)
+
+    def mix(c, k):
+        return tuple(max(0, min(255, int(x + k))) for x in c)
+
+    base = Image.new('RGBA', (128, 128), (0, 0, 0, 0))
+    glow = Image.new('RGBA', (128, 128), (0, 0, 0, 0))
+    G = (255, 255, 255, 255)        # 光の位置（色はあとでフェーズごとに付ける）
+
+    def px(im, x, y, c):
+        im.putpixel((x, y), c if len(c) == 4 else c + (255,))
+
+    def face(rect, col, edge=True, noise=5):
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                c = mix(col, rng.randint(-noise, noise))
+                if edge and x1 - x0 >= 3 and y1 - y0 >= 3:
+                    if y == y0 or x == x0:
+                        c = mix(c, 14)
+                    elif y == y1 - 1 or x == x1 - 1:
+                        c = mix(c, -16)
+                px(base, x, y, c)
+
+    def wear(rect, col, n):
+        x0, y0, x1, y1 = rect
+        for _ in range(n):
+            if x1 - x0 > 2 and y1 - y0 > 2:
+                px(base, rng.randrange(x0 + 1, x1 - 1), rng.randrange(y0 + 1, y1 - 1), col)
+
+    def glow_line(points):
+        for x, y in points:
+            px(glow, x, y, G)
+
+    for name, (u, v, w, h, d, mat) in WARDEN_PARTS.items():
+        f = cube_faces(u, v, w, h, d)
+        if mat in ('armor',):
+            for k, r in f.items():
+                face(r, armor if k in ('front', 'up') else armor_sh)
+                x0, y0, x1, y1 = r
+                if x1 - x0 >= 3 and y1 - y0 >= 3:
+                    for x in range(x0, x1):
+                        px(base, x, y0, gold)
+                        px(base, x, y1 - 1, gold_sh)
+                    for y in range(y0, y1):
+                        px(base, x0, y, gold)
+                        px(base, x1 - 1, y, gold_sh)
+                wear(r, mix(armor, -40), 2)
+            if name == 'chest_plate':
+                x0, y0, x1, y1 = f['front']
+                cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
+                for dx, dy in ((-1, -1), (0, -2), (1, -1), (2, 0), (1, 1), (0, 2), (-1, 1), (-2, 0)):
+                    px(base, cx + dx, cy + dy, gold)
+            if name == 'shard':
+                x0, y0, x1, y1 = f['front']
+                glow_line([(x, y0) for x in range(x0, x1)] + [(x0, y) for y in range(y0, y1)])
+            continue
+        col = {'blade': steel, 'vane': mix(dark, 8)}.get(mat, dark)
+        for k, r in f.items():
+            face(r, col)
+            wear(r, hi, 1)
+        fx0, fy0, fx1, fy1 = f['front']
+        if mat == 'head':
+            # 白い面頬と、目の帯
+            for y in range(fy0 + 1, fy1 - 1):
+                for x in range(fx0 + 1, fx1 - 1):
+                    px(base, x, y, mix(armor, rng.randint(-6, 4)))
+            for x in range(fx0 + 1, fx1 - 1):
+                px(base, x, fy0 + 3, (12, 14, 18))
+                px(base, x, fy0 + 4, (12, 14, 18))
+            glow_line([(x, fy0 + 3) for x in range(fx0 + 2, fx1 - 2)] + [(x, fy0 + 4) for x in range(fx0 + 1, fx1 - 1)])
+            # 側面の通気口
+            for side in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[side]
+                for y in (y0 + 3, y0 + 5):
+                    for x in range(x0 + 2, x1 - 2):
+                        px(base, x, y, seam)
+            # 上面の稜線
+            x0, y0, x1, y1 = f['up']
+            for y in range(y0, y1):
+                px(base, (x0 + x1) // 2, y, hi)
+        elif name == 'crest':
+            glow_line([(x, y) for x, y in ((fx0, y) for y in range(fy0, fy1))])
+            x0, y0, x1, y1 = f['up']
+            glow_line([(x0, y) for y in range(y0, y1)])
+        elif mat == 'chest':
+            cx = (fx0 + fx1) // 2
+            for y in range(fy0, fy1):
+                px(base, cx, y, seam)
+            for x in range(fx0, fx1):
+                px(base, x, fy0 + 5, seam)
+            # 肩から炉心へ集まる光の線（V 字）
+            pts = []
+            for k in range(5):
+                pts += [(fx0 + 1 + k, fy0 + 1 + k), (fx1 - 2 - k, fy0 + 1 + k)]
+            glow_line(pts)
+        elif mat == 'abdomen':
+            for y in range(fy0 + 1, fy1, 2):
+                for x in range(fx0, fx1):
+                    px(base, x, y, seam)
+            glow_line([((fx0 + fx1) // 2, y) for y in range(fy0, fy1)])
+        elif mat == 'core':
+            for y in range(fy0, fy1):
+                for x in range(fx0, fx1):
+                    px(base, x, y, (6, 6, 10))
+            glow_line([(x, fy0) for x in range(fx0, fx1)] + [(x, fy1 - 1) for x in range(fx0, fx1)]
+                      + [(fx0, y) for y in range(fy0, fy1)] + [(fx1 - 1, y) for y in range(fy0, fy1)])
+        elif mat == 'forearm':
+            for side in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[side]
+                glow_line([((x0 + x1) // 2, y) for y in range(y0 + 1, y1 - 1)])
+            for x in range(fx0, fx1):
+                px(base, x, fy0 + 2, seam)
+        elif mat == 'blade':
+            glow_line([(x, y) for x in range(fx0, fx1) for y in range(fy0, fy1)])
+            for side in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[side]
+                for y in range(y0, y1):
+                    px(base, x0, y, mix(steel, 40))
+        elif mat == 'shin':
+            for x in range(fx0, fx1):
+                px(base, x, fy0, mix(dark, 20))
+                px(base, x, fy0 + 1, mix(dark, 12))
+            glow_line([(x, fy0 + 2) for x in range(fx0 + 1, fx1 - 1)])
+        elif mat == 'vane':
+            for side in ('side_a', 'side_b'):
+                x0, y0, x1, y1 = f[side]
+                glow_line([(x0, y) for y in range(y0, y1)])
+            x0, y0, x1, y1 = f['up']
+            glow_line([(x, y) for x in range(x0, x1) for y in range(y0, y1)])
+    save(base, te / 'horizon_warden.png')
+    for phase, c in {1: (150, 230, 255), 2: (110, 215, 255), 3: (255, 90, 90)}.items():
+        im = Image.new('RGBA', (128, 128), (0, 0, 0, 0))
+        for y in range(128):
+            for x in range(128):
+                if glow.getpixel((x, y))[3]:
+                    im.putpixel((x, y), c + (255,))
+        save(im, te / f'horizon_warden_glow_{phase}.png')
+    for old in (1, 2, 3):
+        p = te / f'horizon_warden_{old}.png'
+        if p.exists():
+            p.unlink()
+
+
+
+# 効果音: 名前 → (ファイル, 字幕（日本語, 英語）, 聞こえる距離)。ファイルは src/main/resources/assets/singulo/sounds/ の下。
+# 名前は SinguloSounds の登録名と同じ（"_running" で終わるものは装置が動いている間のくり返し）。
+SOUNDS = {
+    'black_hole.ambient': ('black_hole/ambient_loop', 'ブラックホールがうなる', 'Black hole hums', 32),
+    'black_hole.formation': ('black_hole/formation', 'ブラックホールができる', 'Black hole forms', 48),
+    'kiln_running': ('machine/kiln_running', '焼成炉が燃える', 'Kiln roars', 16),
+    'compressor_running': ('machine/compressor_running', '圧縮機がプレスする', 'Compressor presses', 16),
+    'electrolyzer_running': ('machine/electrolyzer_running', '電解槽が泡立つ', 'Electrolyzer bubbles', 16),
+    'archive_terminal_running': ('machine/archive_terminal_running', 'アーカイブ端末が読み込む', 'Archive terminal reads', 16),
+    'precision_assembler_running': ('machine/precision_assembler_running', '精密組立台が組み立てる', 'Assembler works', 16),
+    'catalytic_reactor_running': ('machine/catalytic_reactor_running', '触媒反応器が反応する', 'Catalytic reactor reacts', 16),
+    'cooling_tower_running': ('machine/cooling_tower_running', '冷却塔が冷やす', 'Cooling tower chills', 24),
+    'particle_accelerator_running': ('machine/particle_accelerator_running', '粒子加速器がうなる', 'Particle accelerator hums', 32),
+    'entanglement_synthesizer_running': ('machine/entanglement_synthesizer_running', '量子もつれ合成器が共鳴する', 'Entanglement synthesizer resonates', 16),
+    'laser_cooler_running': ('machine/laser_cooler_running', 'レーザー冷却器が動く', 'Laser cooler runs', 16),
+    'echo_resonator_running': ('machine/echo_resonator_running', '残響共鳴器が響く', 'Echo resonator rings', 16),
+    'degenerate_compactor_running': ('machine/degenerate_compactor_running', '縮退圧縮炉が押しつぶす', 'Degenerate compactor crushes', 24),
+    'casimir_cavity_running': ('machine/casimir_cavity_running', 'C空洞が震える', 'C-Cavity vibrates', 24),
+    'time_crystal_incubator_running': ('machine/time_crystal_incubator_running', '時間結晶育成槽が育てる', 'Time crystal incubator grows', 16),
+    'singularity_encapsulator_running': ('machine/singularity_encapsulator_running', '特異点封入台が封じ込める', 'Singularity encapsulator works', 20),
+    'thermoelectric_generator_running': ('machine/thermoelectric_generator_running', '熱電発電機が発電する', 'Thermoelectric generator hums', 12),
+    'cryogenic_turbine_running': ('machine/cryogenic_turbine_running', '極低温タービンが回る', 'Cryogenic turbine spins', 20),
+    'quantum_heat_engine_running': ('machine/quantum_heat_engine_running', '量子熱機関が動く', 'Quantum heat engine runs', 16),
+    'smes_cell_running': ('machine/smes_cell_running', 'SMESセルがうなる', 'SMES cell hums', 12),
+    'muon_collector_running': ('machine/muon_collector_running', 'ミュオン収集器が集める', 'Muon collector gathers', 12),
+    'worldline_anchor_running': ('machine/worldline_anchor_running', 'ワールドライン・アンカーが固定する', 'Worldline anchor holds', 16),
+    'advanced_worldline_anchor_running': ('machine/advanced_worldline_anchor_running', '上位アンカーが固定する', 'Advanced anchor holds', 20),
+    'advanced_worldline_anchor_embed': ('machine/advanced_worldline_anchor_embed', 'コアが埋め込まれる', 'Core embeds', 24),
+    'inertial_stabilizer_running': ('machine/inertial_stabilizer_running', '慣性スタビライザーが場を張る', 'Inertial stabilizer hums', 16),
+    'degenerate_furnace_running': ('machine/degenerate_furnace_running', '縮退熱炉が燃える', 'Degenerate furnace burns', 28),
+    'degenerate_furnace_press': ('machine/degenerate_furnace_press', 'ピストンが押しつぶす', 'Pistons crush fuel', 28),
+    'shield_tower_running': ('machine/shield_tower_running', 'シールドがうなる', 'Shield hums', 32),
+    'tipler_cylinder_running': ('machine/tipler_cylinder_running', 'Tシリンダーが回る', 'T-Cylinder spins', 28),
+    'wormhole_generator_charge': ('machine/wormhole_generator_charge', 'ワームホール生成器がためる', 'Wormhole generator charges', 32),
+    'wormhole_generator_open': ('machine/wormhole_generator_open', 'ワームホールが開く', 'Wormhole opens', 32),
+    'wormhole_mouth_ambient': ('machine/wormhole_mouth_ambient', 'ワームホールがざわめく', 'Wormhole murmurs', 20),
+    'wormhole_stabilizer_running': ('machine/wormhole_stabilizer_running', 'ワームホール固定化装置が動く', 'Wormhole stabilizer runs', 16),
+    'halo_collector_running': ('machine/halo_collector_running', 'ハロー捕集器が集める', 'Halo collector gathers', 16),
+    'containment_tank_running': ('machine/containment_tank_running', '閉じ込めタンクがうなる', 'Containment tank hums', 12),
+    'penrose_reactor_ignition': ('machine/penrose_reactor_ignition', 'Pリアクターが点火を始める', 'P-Reactor ignition begins', 48),
+    'probe_station_launch': ('machine/probe_station_launch', '探査機が飛び立つ', 'Probe launches', 24),
+    'probe_station_return': ('machine/probe_station_return', '探査機が帰ってくる', 'Probe returns', 24),
+    'gravitational_wave_detector_ping': ('machine/gravitational_wave_detector_ping', '重力波検出器が反応する', 'Detector pings', 16),
+    'multiblock_formed': ('machine/multiblock_formed', 'マルチブロックが完成する', 'Multiblock formed', 24),
+    'graviton_manipulator_active': ('machine/graviton_manipulator_active', '重力を操る', 'Gravity manipulated', 16),
+    'graviton_manipulator_charge': ('machine/graviton_manipulator_charge', '重力をためる', 'Gravity charges', 16),
+    'graviton_manipulator_throw': ('machine/graviton_manipulator_throw', '投げ飛ばす', 'Hurled', 24),
+}
+
+
+def sounds_json():
+    """assets/singulo/sounds.json と字幕。音のファイルがそろっているかも確かめる。"""
+    base = Path(__file__).resolve().parent.parent / 'src' / 'main' / 'resources' / 'assets' / MODID / 'sounds'
+    out = {}
+    missing = []
+    for name, (path, ja, en, dist) in SOUNDS.items():
+        if not (base / f'{path}.ogg').exists():
+            missing.append(path)
+        out[name] = {'subtitle': f'subtitles.{MODID}.{name}',
+                     'sounds': [{'name': f'{MODID}:{path}', 'attenuation_distance': dist}]}
+        UI_LANG[f'subtitles.{MODID}.{name}'] = (ja, en)
+    unused = sorted(str(p.relative_to(base)).replace('\\', '/')[:-4] for p in base.rglob('*.ogg')
+                    if str(p.relative_to(base)).replace('\\', '/')[:-4] not in {v[0] for v in SOUNDS.values()})
+    if missing:
+        raise SystemExit(f'効果音のファイルがない: {missing}')
+    if unused:
+        print(f'  使っていない効果音のファイル: {unused}')
+    write_json(ASSETS / 'sounds.json', out)
+
+
 def compass_item_model():
     """探索コンパス: 針の向き（minecraft:angle）で16コマを切り替える。"""
     overrides = []
@@ -1152,8 +1623,17 @@ def tags():
     write_json(t / 'c' / 'tags' / 'entity_type' / 'bosses.json', {'values': [mid_entity('horizon_warden')]})
     # 潮汐ダメージ（ウォーデンの特異点、のちにPリアクターの潮汐帯）は防具を無視する
     write_json(DATA / 'damage_type' / 'tidal.json', {'message_id': 'singulo.tidal', 'exhaustion': 0.0, 'scaling': 'never'})
-    write_json(t / 'minecraft' / 'tags' / 'damage_type' / 'bypasses_armor.json', {'values': [f'{MODID}:tidal']})
-    write_json(t / 'minecraft' / 'tags' / 'damage_type' / 'bypasses_shield.json', {'values': [f'{MODID}:tidal']})
+    # 事象の地平線: どんな守りも効かない（不死のトーテムも、無敵も、耐性も）
+    write_json(DATA / 'damage_type' / 'event_horizon.json',
+               {'message_id': 'singulo.event_horizon', 'exhaustion': 0.0, 'scaling': 'never'})
+    horizon_tags = ['bypasses_armor', 'bypasses_shield', 'bypasses_invulnerability', 'bypasses_cooldown',
+                    'bypasses_effects', 'bypasses_resistance', 'bypasses_enchantments', 'bypasses_wolf_armor',
+                    'no_knockback', 'always_kills_armor_stands', 'no_impact']
+    for tag in horizon_tags:
+        values = [f'{MODID}:event_horizon']
+        if tag in ('bypasses_armor', 'bypasses_shield'):
+            values.insert(0, f'{MODID}:tidal')
+        write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
     blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
@@ -1546,6 +2026,7 @@ def main():
         if d.exists():
             shutil.rmtree(d)
     recipes, skipped = recipe_files()
+    sounds_json()
     lang_files()
     models()
     textures()

@@ -32,6 +32,7 @@ SERVER = [
     ('power', 'quantumEngineOutput', '200000', '1〜100,000,000（FE/t）', '量子熱機関の出力'),
     ('power', 'degenerateFurnaceOutput', '20000000', '1〜1,000,000,000（FE/t）', '縮退熱炉の出力'),
     ('power', 'penroseEnergyPerPellet', '20000000000', '1〜（FE）', '質量ペレット1個の質量エネルギー（降着効率を掛ける前）'),
+    ('power', 'wormholeGeneratorPower', '100000000', '1〜2000000000（FE/t）', 'ワームホール生成器が10秒のあいだ毎tick必要とする電力'),
     ('power', 'penroseMaxOutput', '2100000000', '1〜（FE/t）', 'Pリアクターの出力上限'),
     ('power', 'eddingtonPelletsPerSecondPer1000Mass', '1.0', '0.1〜100.0', 'エディントン限界（炉心質量1,000あたり毎秒の投入上限）'),
     ('power', 'ignitionEnergy', '50000000000', '1〜（FE）', 'Pリアクターの点火エネルギー'),
@@ -77,7 +78,9 @@ SERVER = [
 
     # 危険・世界への影響
     ('hazards', 'blackHolePullRadius', '24', '0〜64（ブロック）', '引力帯の半径。0で引力なし'),
-    ('hazards', 'blackHolePullStrength', '0.02', '0.0〜1.0', '引力の最大加速度（ブロック/tick²）'),
+    ('hazards', 'blackHolePullStrength', '0.04', '0.0〜1.0', 'リングの外での弱い引力の最大加速度（ブロック/tick²）'),
+    ('hazards', 'blackHoleInnerPullStrength', '0.25', '0.0〜2.0', 'リングの内側での強い引力の加速度（ブロック/tick²、中心に近いほど強い）'),
+    ('hazards', 'eventHorizonKill', 'true', 'true / false', '事象の地平線に触れたものを必ず消す（どんな体力・耐性・無敵も無視）'),
     ('hazards', 'tidalDamageRadius', '4', '0〜16（ブロック）', '潮汐ダメージ帯の半径。0で無効'),
     ('hazards', 'evaporationBurstDamagesWorld', 'false', 'true / false', '炉心の蒸発バーストが外殻の外を壊すか'),
     ('hazards', 'strangeletEnabled', 'true', 'true / false', 'ストレンジレットの発生'),

@@ -425,6 +425,16 @@ def part_texture(iid):
         d.point((7, 7), fill=(255, 255, 255, 255))
         d.point((8, 8), fill=(255, 255, 255, 255))
         return im
+    if iid == 'wormhole_generator_io':
+        im = weathered((80, 82, 94), seed=21, strength=1.3)
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, S - 1, S - 1], outline=(40, 42, 50, 255))
+        edge_line(d, 1, (236, 238, 240, 200), gap=1)
+        d.ellipse([3, 3, 12, 12], fill=(14, 10, 24, 255), outline=(200, 120, 255, 255))
+        d.ellipse([5, 5, 10, 10], outline=(110, 220, 255, 255))
+        d.point((7, 7), fill=(255, 255, 255, 255))
+        d.point((8, 8), fill=(255, 255, 255, 255))
+        return im
     if iid == 'extraction_port':
         im = weathered((32, 32, 42), seed=18)
         d = ImageDraw.Draw(im)

@@ -57,6 +57,7 @@
     "singulo:worldline_anchor_advanced",
     "singulo:tipler_core",
     "singulo:wormhole_generator_core",
+    "singulo:wormhole_generator_io",
     "singulo:wormhole_mouth",
     "singulo:wormhole_stabilizer",
     "singulo:wormhole_port",
