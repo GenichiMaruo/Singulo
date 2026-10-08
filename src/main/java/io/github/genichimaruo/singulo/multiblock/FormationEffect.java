@@ -52,7 +52,7 @@ public final class FormationEffect {
                 n++;
             }
         }
-        level.playSound(null, controller, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0F, 1.2F);
+        io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, controller, "multiblock_formed", 1.5F, 1.0F);
     }
 
     public static void onServerTick(ServerTickEvent.Post event) {

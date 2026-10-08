@@ -102,7 +102,7 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
         if (!player.getAbilities().instabuild) {
             stack.shrink(1);
         }
-        player.level().playSound(null, worldPosition, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0F, 0.6F);
+        io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(player.level(), worldPosition, "advanced_worldline_anchor_embed", 1.5F, 1.0F);
         player.displayClientMessage(Component.translatable("gui.singulo.anchor.embedded"), true);
         return true;
     }

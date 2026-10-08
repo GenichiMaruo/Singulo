@@ -109,10 +109,14 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
         if (!active) {
             return;
         }
+        if (progress == 0) {
+            io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "probe_station_launch", 1.2F, 1.0F);
+        }
         progress += Math.max(1, (int) Math.round(effect.speed()));
         if (progress >= MISSION_TICKS) {
             progress = 0;
             completeMission(level, level.getGameTime());
+            io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "probe_station_return", 1.2F, 1.0F);
         }
     }
 

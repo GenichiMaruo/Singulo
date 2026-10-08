@@ -105,6 +105,8 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
             if (burn <= 0) {
                 fuel.extractItem(0, 1, false);
                 burn = BURN_TICKS;
+                // 上下のピストンが燃料を押しつぶす音
+                io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "degenerate_furnace_press", 1.5F, 1.0F);
             }
             burn--;
             output = (int) Math.min(Integer.MAX_VALUE, Math.round(ServerConfig.DEGENERATE_FURNACE_OUTPUT.get()

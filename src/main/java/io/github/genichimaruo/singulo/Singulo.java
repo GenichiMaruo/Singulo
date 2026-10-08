@@ -43,6 +43,7 @@ public final class Singulo {
         SinguloItems.ITEMS.register(modBus);
         SinguloBlockEntities.REGISTER.register(modBus);
         SinguloEntities.REGISTER.register(modBus);
+        io.github.genichimaruo.singulo.registry.SinguloSounds.REGISTER.register(modBus);
         RuinDiscovery.REGISTER.register(modBus);
         SinguloMenus.REGISTER.register(modBus);
         SinguloRecipes.TYPES.register(modBus);
