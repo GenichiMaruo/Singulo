@@ -143,8 +143,9 @@ public final class BossGameTests {
         warden.deploySingularity(zombie.position());
         helper.runAtTickTime(22, () -> {
             helper.assertTrue(zombie.getArmorValue() >= 20, "防具が着られていない: " + zombie.getArmorValue());
-            // 10 tick ごとに4ダメージ。防具（防御20）があっても減らない → 2回で 20 → 12
-            helper.assertTrue(zombie.getHealth() <= 12.01F && zombie.getHealth() >= 7.99F,
+            // 10 tick ごとに WardenSingularity.DAMAGE。防具（防御20）があっても減らない → 2回で 20 → 10
+            float twoHits = 20 - 2 * io.github.genichimaruo.singulo.ruin.WardenSingularity.DAMAGE;
+            helper.assertTrue(zombie.getHealth() <= twoHits + 0.01F && zombie.getHealth() >= twoHits - 4.01F,
                     "潮汐ダメージが防具で軽減されている: HP " + zombie.getHealth());
             helper.succeed();
         });
@@ -183,5 +184,47 @@ public final class BossGameTests {
         helper.assertTrue(warden.getType().is(Tags.EntityTypes.BOSSES), "ボス扱いになっていない");
         helper.assertTrue(!GravityGauntletItem.canAffect(warden), "ガントレットで操れてしまう");
         helper.succeed();
+    }
+
+    /** フェーズ2以降: 撃った矢を跳ね返し、撃った相手に当てる（ウォーデンは無傷）。 */
+    @GameTest(template = "huge", timeoutTicks = 200)
+    public static void phaseTwoReflectsProjectilesAtShooter(GameTestHelper helper) {
+        HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.setNoAi(false);
+        warden.setHealth(500);
+        net.minecraft.world.entity.monster.Skeleton skeleton = helper.spawn(EntityType.SKELETON, new BlockPos(4, 1, 13));
+        skeleton.setNoAi(true);
+        float[] wardenHealth = new float[1];
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(warden.phase() == 2, "フェーズ2にならない");
+            wardenHealth[0] = warden.getHealth();
+            net.minecraft.world.entity.projectile.Arrow arrow = new net.minecraft.world.entity.projectile.Arrow(
+                    EntityType.ARROW, helper.getLevel());
+            arrow.setOwner(skeleton);
+            arrow.setPos(skeleton.getX(), skeleton.getEyeY() - 0.1, skeleton.getZ());
+            net.minecraft.world.phys.Vec3 d = warden.getBoundingBox().getCenter().subtract(arrow.position()).normalize();
+            arrow.shoot(d.x, d.y, d.z, 1.6F, 0);
+            helper.getLevel().addFreshEntity(arrow);
+        });
+        helper.runAtTickTime(60, () -> {
+            helper.assertTrue(warden.getHealth() >= wardenHealth[0], "矢がウォーデンに当たった");
+            helper.assertTrue(skeleton.getHealth() < skeleton.getMaxHealth(), "跳ね返した矢が撃った相手に当たらない");
+            helper.succeed();
+        });
+    }
+
+    /** 重力の手: 持ち上げたあと強く叩き落とし、着地で大きな落下ダメージ（つかんでいる間のダメージとは別に8以上）。 */
+    @GameTest(template = "huge", timeoutTicks = 200)
+    public static void gravityGripSlamsWithFallDamage(GameTestHelper helper) {
+        HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(7, 1, 9));
+        warden.startGrip(zombie);
+        float held = 2 * HorizonWarden.GRIP_DAMAGE;
+        helper.runAtTickTime(HorizonWarden.GRIP_WARN + HorizonWarden.GRIP_HOLD + 30, () -> {
+            float lost = 20 - (zombie.isAlive() ? zombie.getHealth() : 0);
+            helper.assertTrue(lost >= held + 8, "叩き落としの落下ダメージが小さい: 減った体力 " + lost);
+            zombie.discard();
+            helper.succeed();
+        });
     }
 }

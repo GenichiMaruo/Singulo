@@ -26,6 +26,13 @@ public final class SinguloEntities {
             () -> EntityType.Builder.<HorizonBolt>of(HorizonBolt::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F).clientTrackingRange(6).updateInterval(2).build(Singulo.id("horizon_bolt").toString()));
 
+    /** ホライズン・ウォーデンの小型の特異点（保存しない）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.WardenSingularity>> WARDEN_SINGULARITY = REGISTER.register(
+            "warden_singularity", () -> EntityType.Builder.<io.github.genichimaruo.singulo.ruin.WardenSingularity>of(
+                    io.github.genichimaruo.singulo.ruin.WardenSingularity::new, MobCategory.MISC)
+                    .sized(1.0F, 1.0F).clientTrackingRange(8).updateInterval(10).noSave().fireImmune()
+                    .build(Singulo.id("warden_singularity").toString()));
+
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
