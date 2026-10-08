@@ -146,11 +146,19 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
 
     @Override
     public void openMenu(ServerPlayer player) {
-        if (PenroseReactorBlockEntity.nearestRunning(player.level(), worldPosition, RANGE) == null) {
-            player.displayClientMessage(Component.translatable("gui.singulo.halo.no_core", RANGE), true);
-        } else {
-            player.displayClientMessage(Component.translatable("gui.singulo.halo.status", rate, tank.getFluidAmount()), true);
-        }
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.HALO_COLLECTOR, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> {
+            PenroseReactorBlockEntity core = level == null ? null : PenroseReactorBlockEntity.nearestRunning(level, worldPosition, RANGE);
+            return switch (i) {
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.RATE -> rate;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.AMOUNT -> tank.getFluidAmount();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.BUFFER -> BUFFER;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.ENERGY -> energy.getEnergyStored();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.ENERGY_MAX -> energy.getMaxEnergyStored();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.CORE -> core == null ? 0 : 1;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.CORE_MASS -> core == null ? 0 : (int) core.mass();
+                default -> 0;
+            };
+        }, (p, id) -> false);
     }
 
     @Override

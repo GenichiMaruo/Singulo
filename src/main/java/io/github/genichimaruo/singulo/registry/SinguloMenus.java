@@ -29,5 +29,12 @@ public final class SinguloMenus {
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.machine.SmesMenu>> SMES = REGISTER.register(
             "smes", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.machine.SmesMenu::client));
 
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu>> WORMHOLE_STABILIZER =
+            REGISTER.register("wormhole_stabilizer",
+                    () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu::client));
+
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.machine.DeviceMenu>> DEVICE = REGISTER.register("device",
+            () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.machine.DeviceMenu::client));
+
     private SinguloMenus() {}
 }

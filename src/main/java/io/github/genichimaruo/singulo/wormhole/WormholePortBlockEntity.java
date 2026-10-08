@@ -147,10 +147,17 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     @Override
     public void openMenu(ServerPlayer player) {
         refresh();
-        String key = cachedMouth == null ? "gui.singulo.wormhole_port.no_mouth"
-                : cachedMouth.partner() == null ? "gui.singulo.wormhole_port.no_partner" : "gui.singulo.wormhole_port.status";
-        player.displayClientMessage(Component.translatable(key, energyTargets.size() + itemTargets.size() + fluidTargets.size()),
-                true);
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.WORMHOLE_PORT, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> {
+            refresh();
+            return switch (i) {
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE -> cachedMouth == null ? 0 : cachedMouth.partner() == null ? 1 : 2;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.SIZE -> cachedMouth == null ? 0 : cachedMouth.size();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.ENERGY -> energyTargets.size();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.ITEMS -> itemTargets.size();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.FLUIDS -> fluidTargets.size();
+                default -> 0;
+            };
+        }, (p, id) -> false);
     }
 
     // ------------------------------------------------------------------ エネルギー

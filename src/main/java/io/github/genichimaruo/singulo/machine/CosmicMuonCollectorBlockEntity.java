@@ -84,12 +84,13 @@ public class CosmicMuonCollectorBlockEntity extends BlockEntity implements Abstr
 
     @Override
     public void openMenu(ServerPlayer player) {
-        ItemStack stack = output.extractItem(0, 64, false);
-        if (!stack.isEmpty()) {
-            player.getInventory().placeItemBackInInventory(stack);
-        }
-        player.displayClientMessage(Component.translatable("gui.singulo.muon_collector.rate",
-                Math.round(rateAt(player.level(), worldPosition) * 100)), true);
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.MUON_COLLECTOR, output, i -> switch (i) {
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Muon.RATE -> (int) Math.round(rateAt(level, worldPosition) * 100);
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Muon.Y -> worldPosition.getY();
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Muon.SKY -> level != null && level.canSeeSky(worldPosition.above()) ? 1 : 0;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Muon.PROGRESS -> (int) Math.round(Math.min(1, progress) * 100);
+            default -> 0;
+        }, (p, id) -> false);
     }
 
     @Override

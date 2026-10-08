@@ -17,12 +17,17 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 /** ペンローズ・リアクターの画面。種・燃料・抽出装置3種・副産物4つ。ボタンは「点火」と「スピン目標」。 */
 public class PenroseReactorMenu extends AbstractContainerMenu {
     public static final int BUTTON_IGNITE = 0, BUTTON_SPIN = 1;
-    public static final int HEIGHT = 186;
+    public static final int WIDTH = 200;
+    public static final int HEIGHT = 212;
+    /** 持ち物の位置。 */
+    public static final int INV_X = 20;
+    public static final int INV_Y = 130;
+    public static final int HOTBAR_Y = 188;
     /** スロットの位置（menu と screen で共有）。 */
     public static final int[][] SLOT_POS = {
-            {8, 20}, {8, 42},                   // 種・燃料
-            {30, 20}, {30, 42}, {30, 64},       // ジェット・ホーキング・エルゴ
-            {152, 20}, {152, 38}, {152, 56}, {152, 74}, // 副産物
+            {10, 22}, {10, 46},                 // 種・燃料
+            {32, 22}, {32, 46}, {32, 70},       // ジェット・ホーキング・エルゴ
+            {176, 22}, {176, 42}, {176, 62}, {176, 82}, // 副産物
     };
 
     private final BlockPos pos;
@@ -48,11 +53,11 @@ public class PenroseReactorMenu extends AbstractContainerMenu {
         }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 104 + row * 18));
+                addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inventory, col, 8 + col * 18, 162));
+            addSlot(new Slot(inventory, col, INV_X + col * 18, HOTBAR_Y));
         }
         addDataSlots(data);
     }
@@ -112,7 +117,7 @@ public class PenroseReactorMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 64.0
+        return io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player, pos)
                 && player.level().getBlockEntity(pos) instanceof PenroseReactorBlockEntity;
     }
 }

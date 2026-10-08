@@ -10,18 +10,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 public class PenroseReactorScreen extends AbstractContainerScreen<PenroseReactorMenu> {
-    private static final int TEXT_X = 54;
-    private static final int BUTTON_Y = 84;
-    private static final int BUTTON_W = 44;
-    private static final int BUTTON_H = 12;
-    private static final int IGNITE_X = 54;
-    private static final int SPIN_X = 102;
+    private static final int TEXT_X = 56;
+    private static final int BUTTON_Y = 104;
+    private static final int BUTTON_W = 54;
+    private static final int BUTTON_H = 14;
+    private static final int IGNITE_X = 56;
+    private static final int SPIN_X = 114;
 
     public PenroseReactorScreen(PenroseReactorMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        imageWidth = 176;
+        imageWidth = PenroseReactorMenu.WIDTH;
         imageHeight = PenroseReactorMenu.HEIGHT;
-        inventoryLabelY = imageHeight - 94;
+        inventoryLabelX = PenroseReactorMenu.INV_X;
+        inventoryLabelY = PenroseReactorMenu.INV_Y - 11;
     }
 
     @Override
@@ -38,11 +39,11 @@ public class PenroseReactorScreen extends AbstractContainerScreen<PenroseReactor
         }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                Panel.slot(g, leftPos + 8 + col * 18, topPos + 104 + row * 18);
+                Panel.slot(g, leftPos + PenroseReactorMenu.INV_X + col * 18, topPos + PenroseReactorMenu.INV_Y + row * 18);
             }
         }
         for (int col = 0; col < 9; col++) {
-            Panel.slot(g, leftPos + 8 + col * 18, topPos + 162);
+            Panel.slot(g, leftPos + PenroseReactorMenu.INV_X + col * 18, topPos + PenroseReactorMenu.HOTBAR_Y);
         }
         button(g, IGNITE_X, mouseX, mouseY);
         button(g, SPIN_X, mouseX, mouseY);
@@ -58,15 +59,15 @@ public class PenroseReactorScreen extends AbstractContainerScreen<PenroseReactor
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
         g.drawString(font, title, titleLabelX, titleLabelY, Panel.TEXT, false);
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
-        int y = 20;
+        int y = 22;
         for (Component line : lines()) {
             g.drawString(font, line, TEXT_X, y, Panel.TEXT, false);
-            y += 10;
+            y += 11;
         }
         Component ignite = Component.translatable("gui.singulo.reactor.ignite");
         Component spin = Component.translatable("gui.singulo.reactor.spin_target");
-        g.drawString(font, ignite, IGNITE_X + (BUTTON_W - font.width(ignite)) / 2, BUTTON_Y + 2, 0xFFFFFFFF, false);
-        g.drawString(font, spin, SPIN_X + (BUTTON_W - font.width(spin)) / 2, BUTTON_Y + 2, 0xFFFFFFFF, false);
+        g.drawString(font, ignite, IGNITE_X + (BUTTON_W - font.width(ignite)) / 2, BUTTON_Y + 3, 0xFFFFFFFF, false);
+        g.drawString(font, spin, SPIN_X + (BUTTON_W - font.width(spin)) / 2, BUTTON_Y + 3, 0xFFFFFFFF, false);
     }
 
     private List<Component> lines() {

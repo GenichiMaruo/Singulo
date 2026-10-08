@@ -22,13 +22,20 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
- * ワームホール生成器（段階5、3×3×3 のマルチブロック。コアは底の中央）。毎tick REQUIRED_PER_TICK（1 GFE）を
+ * ワームホール生成器（段階5、3×3×3 のマルチブロック。コアは底の中央）。毎tick requiredPerTick()（設定 wormholeGeneratorPower、既定 100 MFE）を
  * GENERATE_TICKS（10秒）続けて受けると、一対の不安定な口を作る。途中で足りない tick があるとやり直し。
  * 口は出力に置かれ、空の手で右クリックするか搬出して受け取る。60秒以内に固定化しないと消える。
  */
 public class WormholeGeneratorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener {
-    public static final int REQUIRED_PER_TICK = 1_000_000_000;
+    /** 毎tick必要な電力の既定値（設定 wormholeGeneratorPower）。 */
+    public static final int DEFAULT_REQUIRED_PER_TICK = 100_000_000;
+
+    /** 毎tick必要な電力（設定 wormholeGeneratorPower、既定 100 MFE/t）。 */
+    public static int requiredPerTick() {
+        return io.github.genichimaruo.singulo.generated.ServerConfig.SPEC.isLoaded()
+                ? io.github.genichimaruo.singulo.generated.ServerConfig.WORMHOLE_GENERATOR_POWER.get() : DEFAULT_REQUIRED_PER_TICK;
+    }
     public static final int GENERATE_TICKS = 200;
     static final int CHECK_INTERVAL = 40;
 
@@ -50,7 +57,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
             if (!formed || !outputEmpty()) {
                 return 0;
             }
-            int take = Math.max(0, Math.min(amount, REQUIRED_PER_TICK - received));
+            int take = Math.max(0, Math.min(amount, requiredPerTick() - received));
             if (!simulate) {
                 received += take;
             }
@@ -69,7 +76,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
 
         @Override
         public int getMaxEnergyStored() {
-            return REQUIRED_PER_TICK;
+            return requiredPerTick();
         }
 
         @Override
@@ -84,6 +91,8 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     };
     /** 前の tick の処理のあとに受け取った電力。 */
     private int received;
+    /** 直前の tick に受け取った電力（画面に出す）。 */
+    private int lastReceived;
     private int progress;
     private boolean formed;
     private boolean firstCheck = true;
@@ -113,6 +122,32 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         return formed;
     }
 
+    /** 入出力口（外殻の代わりに置いたもの）。形成済みのときだけ、この生成器につながる。 */
+    private java.util.List<BlockPos> ioPorts = java.util.List.of();
+    private boolean chunkUnloading;
+
+    private static void linkPorts(Level level, java.util.List<BlockPos> ports, @javax.annotation.Nullable BlockPos controller) {
+        for (BlockPos p : ports) {
+            if (level.isLoaded(p) && level.getBlockEntity(p) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity port) {
+                port.link(controller);
+            }
+        }
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        chunkUnloading = true;
+        super.onChunkUnloaded();
+    }
+
+    @Override
+    public void setRemoved() {
+        if (level != null && !chunkUnloading) {
+            linkPorts(level, ioPorts, null);
+        }
+        super.setRemoved();
+    }
+
     private boolean outputEmpty() {
         return output.getStackInSlot(0).isEmpty() && output.getStackInSlot(1).isEmpty();
     }
@@ -125,7 +160,14 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         if (level.getGameTime() >= nextCheck) {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             boolean was = formed;
-            formed = Structures.casingShape(level, pos, Structures.wormholeGeneratorLayout(pos), 2);
+            java.util.List<BlockPos> found = new java.util.ArrayList<>();
+            formed = Structures.casingShapeWithPorts(level, pos, Structures.wormholeGeneratorLayout(pos), 2,
+                    io.github.genichimaruo.singulo.multiblock.MultiblockPart.Role.WORMHOLE_IO, found);
+            if (!found.equals(ioPorts)) {
+                linkPorts(level, ioPorts, null);
+                linkPorts(level, found, pos);
+                ioPorts = found;
+            }
             io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, pos, was, formed, firstCheck, 2, 0, 3);
             firstCheck = false;
         }
@@ -135,7 +177,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
                 output.setStackInSlot(i, ItemStack.EMPTY);
             }
         }
-        if (formed && outputEmpty() && received >= REQUIRED_PER_TICK) {
+        if (formed && outputEmpty() && received >= requiredPerTick()) {
             progress++;
             if (progress % 10 == 0) {
                 level.sendParticles(ParticleTypes.REVERSE_PORTAL, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5,
@@ -147,6 +189,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         } else {
             progress = 0;
         }
+        lastReceived = received;
         received = 0;
         boolean lit = progress > 0;
         if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != lit) {
@@ -160,26 +203,20 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         output.setStackInSlot(0, pair[0]);
         output.setStackInSlot(1, pair[1]);
         progress = 0;
-        level.playSound(null, worldPosition, SoundEvents.END_PORTAL_SPAWN, SoundSource.BLOCKS, 0.6F, 1.4F);
+        io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "wormhole_generator_open", 2.0F, 1.0F);
     }
 
     @Override
     public void openMenu(ServerPlayer player) {
-        boolean gave = false;
-        for (int i = 0; i < 2; i++) {
-            ItemStack s = output.extractItem(i, 1, false);
-            if (!s.isEmpty()) {
-                player.getInventory().placeItemBackInInventory(s);
-                gave = true;
-            }
-        }
-        if (gave) {
-            player.displayClientMessage(Component.translatable("gui.singulo.wormhole.generated", UnstableMouthItem.LIFETIME / 20), true);
-        } else if (!formed) {
-            player.displayClientMessage(Component.translatable("gui.singulo.status.not_formed"), true);
-        } else {
-            player.displayClientMessage(Component.translatable("gui.singulo.wormhole.generator", progress / 20, GENERATE_TICKS / 20), true);
-        }
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.WORMHOLE_GENERATOR, output, i -> switch (i) {
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Gen.PROGRESS -> progress;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Gen.FORMED -> formed ? 1 : 0;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Gen.RECEIVED -> lastReceived;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Gen.REQUIRED -> requiredPerTick();
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Gen.REMAIN_0, io.github.genichimaruo.singulo.machine.DeviceMenu.Gen.REMAIN_1 -> (int) Math.max(0,
+                    UnstableMouthItem.remaining(output.getStackInSlot(i - io.github.genichimaruo.singulo.machine.DeviceMenu.Gen.REMAIN_0), level));
+            default -> 0;
+        }, (p, id) -> false);
     }
 
     @Override

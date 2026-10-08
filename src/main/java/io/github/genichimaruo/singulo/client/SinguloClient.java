@@ -8,7 +8,6 @@ import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.neoforged.api.distmarker.Dist;
@@ -32,6 +31,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
+        modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
         modBus.addListener(SinguloKeys::register);
@@ -40,6 +40,9 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
+        NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
+        NeoForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
+        NeoForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
     }
 
@@ -77,6 +80,12 @@ public final class SinguloClient {
                     public boolean shouldRenderOffScreen(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be) {
                         return true;
                     }
+
+                    @Override
+                    public net.minecraft.world.phys.AABB getRenderBoundingBox(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be) {
+                        // 異常点（コンソールの3.5ブロック上）の歪みが画面にかかる間は描く
+                        return new net.minecraft.world.phys.AABB(be.getBlockPos()).expandTowards(0, 4, 0).inflate(6);
+                    }
                 });
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SHIELD_TOWER.get(),
                 ShieldTowerRenderer::new);
@@ -84,7 +93,8 @@ public final class SinguloClient {
                 WormholeMouthRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.TIPLER_CYLINDER.get(),
                 TiplerCylinderRenderer::new);
-        event.registerEntityRenderer(SinguloEntities.HORIZON_BOLT.get(), ctx -> new ThrownItemRenderer<>(ctx, 1.2F, true));
+        event.registerEntityRenderer(SinguloEntities.HORIZON_BOLT.get(), HorizonBoltRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.WARDEN_SINGULARITY.get(), WardenSingularityRenderer::new);
     }
 
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
@@ -98,6 +108,8 @@ public final class SinguloClient {
         event.register(SinguloMenus.CATALYST_DEVICE.get(), CatalystDeviceScreen::new);
         event.register(SinguloMenus.PENROSE_REACTOR.get(), PenroseReactorScreen::new);
         event.register(SinguloMenus.SMES.get(), SmesScreen::new);
+        event.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
+        event.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */

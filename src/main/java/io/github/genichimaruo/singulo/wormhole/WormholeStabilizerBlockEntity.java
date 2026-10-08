@@ -29,11 +29,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 口・エキゾチック物質は手に持って右クリックか搬入で入れ、できた口は空の手で右クリックか搬出で受け取る。
  */
 public class WormholeStabilizerBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
-        AbstractMachineBlock.BreakListener {
+        AbstractMachineBlock.BreakListener, net.minecraft.world.MenuProvider {
     public static final int STABILIZE_TICKS = 100;
     public static final int MATTER_PER_MOUTH = 2;
     public static final int FE_PER_TICK = 10_000;
-    static final int SLOT_FUEL = 2;
+    public static final int SLOT_FUEL = 2;
 
     private final ItemStackHandler items = new ItemStackHandler(3) {
         @Override
@@ -165,21 +165,28 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
         return false;
     }
 
+    /** 空の手で右クリックすると画面を開く（口や燃料を持っていれば、そのまま入れる＝useItem）。 */
     @Override
     public void openMenu(ServerPlayer player) {
-        boolean gave = false;
-        for (int i = 0; i < 2; i++) {
-            ItemStack s = automation.extractItem(i, 1, false);
-            if (!s.isEmpty()) {
-                player.getInventory().placeItemBackInInventory(s);
-                gave = true;
-            }
-        }
-        if (!gave) {
-            player.displayClientMessage(Component.translatable("gui.singulo.wormhole.stabilizer",
-                    progress[0] * 100 / STABILIZE_TICKS, progress[1] * 100 / STABILIZE_TICKS,
-                    items.getStackInSlot(SLOT_FUEL).getCount()), true);
-        }
+        player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable(getBlockState().getBlock().getDescriptionId());
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id, net.minecraft.world.entity.player.Inventory inv,
+                                                                          net.minecraft.world.entity.player.Player player) {
+        return new WormholeStabilizerMenu(id, inv, worldPosition, items,
+                io.github.genichimaruo.singulo.machine.SyncedInts.server(WormholeStabilizerMenu.COUNT, i -> switch (i) {
+                    case WormholeStabilizerMenu.D_PROGRESS_0 -> progress[0];
+                    case WormholeStabilizerMenu.D_PROGRESS_1 -> progress[1];
+                    case WormholeStabilizerMenu.D_ENERGY -> energy.getEnergyStored();
+                    case WormholeStabilizerMenu.D_CAPACITY -> energy.getMaxEnergyStored();
+                    default -> 0;
+                }), this);
     }
 
     @Override

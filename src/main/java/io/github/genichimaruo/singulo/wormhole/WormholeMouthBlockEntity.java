@@ -364,13 +364,31 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
 
     @Override
     public void openMenu(ServerPlayer player) {
-        if (player.isShiftKeyDown()) {
-            setTargetSize(target % MAX_SIZE + 1);
-        }
-        int side = 2 * target + 1;
-        String key = partnerPos() == null ? "gui.singulo.wormhole.no_partner"
-                : partner() == null ? "gui.singulo.wormhole.partner_unloaded" : "gui.singulo.wormhole.status";
-        player.displayClientMessage(Component.translatable(key, 2 * size + 1, side, fuel.getStackInSlot(0).getCount()), true);
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.WORMHOLE_MOUTH, fuel, i -> {
+            GlobalPos p = partnerPos();
+            return switch (i) {
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.SIZE -> size;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.TARGET -> target;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PARTNER -> p == null ? 0 : partner() == null ? 1 : 2;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PX -> p == null ? 0 : p.pos().getX();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PY -> p == null ? 0 : p.pos().getY();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PZ -> p == null ? 0 : p.pos().getZ();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.CROSS -> crossDimension ? 1 : 0;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.STARVE -> starve;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.TICKS_PER_MATTER -> upkeepPerTick() <= 0 ? 0 : (int) (TICKS_PER_MATTER / upkeepPerTick());
+                default -> 0;
+            };
+        }, (pl, id) -> {
+            if (id == io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.BUTTON_SMALLER) {
+                setTargetSize(Math.max(1, target - 1));
+                return true;
+            }
+            if (id == io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.BUTTON_BIGGER) {
+                setTargetSize(Math.min(MAX_SIZE, target + 1));
+                return true;
+            }
+            return false;
+        });
     }
 
     // ------------------------------------------------------------------ 保存・同期

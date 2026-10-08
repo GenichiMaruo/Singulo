@@ -82,8 +82,14 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.displayClientMessage(Component.translatable(contained ? "gui.singulo.containment.status"
-                : "gui.singulo.containment.leaking", amount(), CAPACITY), true);
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.CONTAINMENT_TANK, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> switch (i) {
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.AMOUNT -> amount();
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CAPACITY -> CAPACITY;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CONTAINED -> contained ? 1 : 0;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY -> energy.getEnergyStored();
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.ENERGY_MAX -> energy.getMaxEnergyStored();
+            default -> 0;
+        }, (p, id) -> false);
     }
 
     // ------------------------------------------------------------------ アイテムとの受け渡し（タンクごと運ぶ）

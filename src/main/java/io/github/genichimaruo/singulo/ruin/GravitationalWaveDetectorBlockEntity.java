@@ -77,13 +77,46 @@ public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements
 
     @Override
     public void openMenu(ServerPlayer player) {
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.DETECTOR, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> switch (i) {
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.ENERGY -> energy.getEnergyStored();
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.ENERGY_MAX -> energy.getMaxEnergyStored();
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.OBSERVED -> observed ? 1 : 0;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.FOUND -> found ? 1 : 0;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.DIRECTION -> lastDirection;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.BAND -> lastBand;
+            case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.COST -> OBSERVATION_COST;
+            default -> 0;
+        }, (p, id) -> id == io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.BUTTON_OBSERVE && observe(p));
+    }
+
+    /** 観測: 電力を使って、いちばん近い重力異常点の方角と距離帯を調べる（画面に出し、チャットにも残す）。 */
+    public boolean observe(ServerPlayer player) {
         if (!energy.consume(OBSERVATION_COST)) {
             player.displayClientMessage(Component.translatable("gui.singulo.detector.no_power", OBSERVATION_COST), true);
-            return;
+            return false;
         }
         Level level = player.level();
-        player.displayClientMessage(describe(worldPosition, locate((ServerLevel) level)), false);
+        BlockPos target = locate((ServerLevel) level);
+        observed = true;
+        found = target != null;
+        if (target != null) {
+            int dx = target.getX() - worldPosition.getX();
+            int dz = target.getZ() - worldPosition.getZ();
+            lastDirection = java.util.List.of("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest")
+                    .indexOf(direction(dx, dz));
+            lastBand = band(Math.sqrt((double) dx * dx + (double) dz * dz));
+        }
+        setChanged();
+        player.displayClientMessage(describe(worldPosition, target), false);
+        io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "gravitational_wave_detector_ping", 1.0F, 1.0F);
+        return true;
     }
+
+    /** 直前の観測の結果（画面に出す）。 */
+    private boolean observed;
+    private boolean found;
+    private int lastDirection;
+    private int lastBand;
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
