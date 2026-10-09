@@ -3,18 +3,18 @@
 プロジェクトを作ったあと、「Upload File」で入れる内容。
 
 ## File
-`build/libs/singulo-0.1.0.jar`（`./gradlew build` で作る）。
+`build/libs/singulo-0.2.0.jar`（`./gradlew build` で作る）。
 
 ## Display name
-Singulo 0.1.0
+Singulo 0.2.0 Beta
 
 ## Release type
 Beta
 
-最初の公開で、まだ遊んだ人が少ないため。安定したら Release にする。
+新機能と探索・操作の変更を含むベータ版。安定したら Release にする。
 
 ## Changelog
-[changelog-0.1.0.md](changelog-0.1.0.md) の中身を貼る（Markdown）。
+[changelog-0.2.0.md](changelog-0.2.0.md) の中身を貼る（Markdown）。
 
 ## Game versions
 - Minecraft: 1.21.1
