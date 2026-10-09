@@ -31,6 +31,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * ニュートリノ・スキャナー（段階3）。ニュートリノは地面をほぼ素通りするので、使うと半径 RADIUS の中の鉱石（共通タグ c:ores、
  * 他modの鉱石も）と遺構のブロックの輪郭を、地形越しに SHOW_TICKS（10秒）浮かび上がらせる。1回に FE_PER_SCAN を使う。
  * スニークして電力を持つブロックを右クリックすると充電する。
+ * <p>
+ * 映る鉱石は感度の段階（1〜3）で決まる（{@link #oreTier}）。はじめは段階1で、石炭・銅・鉄・ラピス・レッドストーンなどだけ。
+ * ニュートリノ感度モジュールで段階2（金・ダイヤモンド・エメラルド）、段階3（古代の残骸・ダイヤモンドのツルハシが要る鉱石）に上がる。
  */
 public class NeutrinoScannerItem extends SinguloItem {
     public static final int CAPACITY = 200_000;
@@ -38,6 +41,23 @@ public class NeutrinoScannerItem extends SinguloItem {
     public static final int RADIUS = 24;
     public static final int SHOW_TICKS = 200;
     public static final int MAX_MARKS = 600;
+    public static final int MAX_TIER = 3;
+
+    /** 見つけたもの。hidden は、感度が足りず映らなかった鉱石の数。 */
+    public record Result(List<BlockPos> ores, List<BlockPos> ruins, int hidden) {}
+
+    /** 鉱石が映るのに要る感度の段階。タグ singulo:scanner_tier_2・3 と、ダイヤモンドのツルハシが要るか（段階3）で決める。 */
+    public static int oreTier(BlockState state) {
+        if (state.is(SinguloTags.SCANNER_TIER_3) || state.is(net.minecraft.tags.BlockTags.NEEDS_DIAMOND_TOOL)) {
+            return 3;
+        }
+        return state.is(SinguloTags.SCANNER_TIER_2) ? 2 : 1;
+    }
+
+    /** スキャナーの感度の段階。 */
+    public static int tier(ItemStack stack) {
+        return Math.max(1, Math.min(MAX_TIER, stack.getOrDefault(SinguloComponents.SCANNER_TIER.get(), 1)));
+    }
 
     public NeutrinoScannerItem(Properties properties, int stage) {
         super(properties.stacksTo(1), stage, false);
@@ -47,10 +67,11 @@ public class NeutrinoScannerItem extends SinguloItem {
         return new ComponentEnergyStorage(stack, SinguloComponents.ENERGY.get(), CAPACITY);
     }
 
-    /** 鉱石と遺構のブロックを探す。[0] が鉱石、[1] が遺構。 */
-    public static List<List<BlockPos>> scan(Level level, BlockPos center) {
+    /** 感度 tier で、鉱石と遺構のブロックを探す。 */
+    public static Result scan(Level level, BlockPos center, int tier) {
         List<BlockPos> ores = new ArrayList<>();
         List<BlockPos> ruins = new ArrayList<>();
+        int hidden = 0;
         for (BlockPos p : BlockPos.betweenClosed(center.offset(-RADIUS, -RADIUS, -RADIUS), center.offset(RADIUS, RADIUS, RADIUS))) {
             if (ores.size() + ruins.size() >= MAX_MARKS) {
                 break;
@@ -60,12 +81,16 @@ public class NeutrinoScannerItem extends SinguloItem {
             }
             BlockState s = level.getBlockState(p);
             if (s.is(Tags.Blocks.ORES)) {
-                ores.add(p.immutable());
+                if (oreTier(s) <= tier) {
+                    ores.add(p.immutable());
+                } else {
+                    hidden++;
+                }
             } else if (s.is(SinguloTags.RUIN_BLOCKS)) {
                 ruins.add(p.immutable());
             }
         }
-        return List.of(ores, ruins);
+        return new Result(ores, ruins, hidden);
     }
 
     @Override
@@ -80,11 +105,15 @@ public class NeutrinoScannerItem extends SinguloItem {
             if (!sp.getAbilities().instabuild) {
                 e.extractEnergy(FE_PER_SCAN, false);
             }
-            List<List<BlockPos>> found = scan(level, sp.blockPosition());
+            Result found = scan(level, sp.blockPosition(), tier(stack));
             if (sp.connection.hasChannel(ScanPayload.TYPE)) {
-                PacketDistributor.sendToPlayer(sp, new ScanPayload(found.get(0), found.get(1)));
+                PacketDistributor.sendToPlayer(sp, new ScanPayload(found.ores(), found.ruins()));
             }
-            sp.displayClientMessage(Component.translatable("message.singulo.neutrino_scan", found.get(0).size(), found.get(1).size()), true);
+            var message = Component.translatable("message.singulo.neutrino_scan", found.ores().size(), found.ruins().size());
+            if (found.hidden() > 0) {
+                message.append(Component.translatable("message.singulo.neutrino_hidden", found.hidden()));
+            }
+            sp.displayClientMessage(message, true);
             ((ServerLevel) level).playSound(null, sp.blockPosition(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 0.7F);
             sp.getCooldowns().addCooldown(this, 40);
         }
@@ -132,5 +161,6 @@ public class NeutrinoScannerItem extends SinguloItem {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("tooltip.singulo.energy", energy(stack).getEnergyStored(), CAPACITY)
                 .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.singulo.scanner_tier", tier(stack), MAX_TIER).withStyle(ChatFormatting.GRAY));
     }
 }

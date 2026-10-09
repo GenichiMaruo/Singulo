@@ -7,8 +7,15 @@
 """
 import math
 import random
+import zlib
 
 from PIL import Image, ImageDraw
+
+
+def stable_hash(text):
+    """実行ごとに変わらないハッシュ（Python の hash() は起動ごとに変わり、絵が毎回変わってしまう）。"""
+    return zlib.crc32(text.encode("utf-8"))
+
 
 S = 32  # テクスチャの大きさ
 
@@ -337,7 +344,7 @@ def machine_front(iid, stage, on):
     import art16 as _a16
     if iid in _a16.CONTROLLER_FRONTS:
         return _a16.controller_front(iid, on).resize((S, S), Image.NEAREST)
-    im = casing(stage, 'side', seed=hash(iid) % 1000)
+    im = casing(stage, 'side', seed=stable_hash(iid) % 1000)
     d = ImageDraw.Draw(im)
     box = (7, 6, S - 8, S - 10)
     window(d, stage, box, on)

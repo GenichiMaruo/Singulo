@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 240,
+  "energy": 20000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:data_card_culture_data"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:temporal_key",
+    "count": 1
+  }
+}

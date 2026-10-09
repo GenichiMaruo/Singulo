@@ -44,12 +44,16 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
         NeoForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
         NeoForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
+        NeoForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
     }
 
     /** 型として使っている残響の欠片（バニラのアイテム）に使用回数を出す。Singulo のアイテムには説明と作り方・使い道を出す。 */
     private static void onTooltip(ItemTooltipEvent event) {
         describe(event);
+        if (Boolean.TRUE.equals(event.getItemStack().get(SinguloComponents.STABILIZED.get()))) {
+            event.getToolTip().add(Component.translatable("tooltip.singulo.catalyst_stabilized").withStyle(ChatFormatting.GOLD));
+        }
         Integer dark = event.getItemStack().get(SinguloComponents.DARK_MATTER.get());
         if (dark != null) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.dark_matter", dark).withStyle(ChatFormatting.GRAY));
@@ -64,6 +68,10 @@ public final class SinguloClient {
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ACCELERATOR_CONTROLLER.get(),
                 AcceleratorRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CABLE.get(),
+                CableRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEALED_CONTAINER.get(),
+                SealedContainerRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),

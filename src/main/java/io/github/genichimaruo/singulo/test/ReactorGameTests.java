@@ -126,6 +126,23 @@ public final class ReactorGameTests {
                 "ポートにつないだケーブルから点火の電力が入らない: " + r.state()));
     }
 
+    /** ホライズン・バスは 1 tick に int の上限（約 2.1 GFE）を超えて運ぶ: 50 GFE の点火電力が数 tick で入る。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 60)
+    public static void horizonBusCarriesBeyondIntPerTick(GameTestHelper helper) {
+        BlockPos port = PORT;
+        net.minecraft.core.Direction d = outward(port);
+        PenroseReactorBlockEntity r = build(helper);
+        helper.setBlock(port.relative(d), SinguloBlocks.HORIZON_BUS.get());
+        helper.setBlock(port.relative(d, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
+        r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
+        helper.runAtTickTime(5, () -> helper.assertTrue(r.ignite(), "点火を始められない"));
+        // int の上限なら 3 tick で約 6.4 GFE（13%）しか入らない
+        helper.runAtTickTime(9, () -> {
+            helper.assertTrue(r.ignitionCharge() >= 1F, "点火の電力が int の上限で止まっている: " + r.ignitionCharge());
+            helper.succeed();
+        });
+    }
+
     /** 抽出ポートと炉心質量警報器はリングの炉殻のどこに置いてもよく、警報器は質量が上限に達すると赤石信号を出す。 */
     @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 100)
     public static void portsAndAlarmsAnywhereOnRings(GameTestHelper helper) {

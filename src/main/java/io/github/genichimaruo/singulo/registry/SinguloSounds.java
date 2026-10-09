@@ -33,6 +33,9 @@ public final class SinguloSounds {
             "halo_collector_running", "containment_tank_running", "penrose_reactor_ignition", "probe_station_launch",
             "probe_station_return", "gravitational_wave_detector_ping", "multiblock_formed",
             "graviton_manipulator_active", "graviton_manipulator_charge", "graviton_manipulator_throw",
+            "sealed_container.denied", "sealed_container.insert", "sealed_container.scan", "sealed_container.unlock",
+            "sealed_container.vent", "sealed_container.open", "sealed_container.rise", "sealed_container.lock",
+            "gravity_boots.wall_jump", "dimensional_pocket.open", "dimensional_pocket.close",
     };
 
     static {

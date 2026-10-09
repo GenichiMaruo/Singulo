@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 2000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:cold_atoms"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:data_card_quantum_fragment"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:quantum_key",
+    "count": 1
+  }
+}

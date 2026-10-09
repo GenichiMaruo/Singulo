@@ -12,7 +12,8 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
- * クリエイティブ電源（クリエイティブ専用）。電力が尽きない。毎tick、隣の6面へ受け取れるだけ（1面あたり最大 int の上限）送り、
+ * クリエイティブ電源（クリエイティブ専用）。電力が尽きない。毎tick、隣の6面へ受け取れるだけ送り（mod のケーブルや装置へは
+ * int の上限を超えて、ほかの mod の装置へは1面あたり int まで）、
  * ケーブルや装置から取り出すこともできる。検証用。
  */
 public class CreativeEnergyBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
@@ -60,7 +61,7 @@ public class CreativeEnergyBlockEntity extends BlockEntity implements AbstractMa
         for (Direction dir : Direction.values()) {
             IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
             if (target != null && target.canReceive() && !(level.getBlockEntity(pos.relative(dir)) instanceof CreativeEnergyBlockEntity)) {
-                target.receiveEnergy(Integer.MAX_VALUE, false);
+                io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, Long.MAX_VALUE / 4, false);
             }
         }
     }

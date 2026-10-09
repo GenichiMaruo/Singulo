@@ -28,6 +28,10 @@ Minecraft **1.21.1** と NeoForge **21.1.256以上の1.21.1対応版**が必要�
 - [説明と実装の照合記録](docs/documentation-audit.md) — 修正したずれと、確認に使った実装。
 - [設計書](singulo_plan.md) — 開発の背景と構想。現行の遊び方は上の説明書を参照してください。
 
+## 作者を支援する
+
+Singulo を気に入ってもらえたら、[Ko-fi](https://ko-fi.com/graycat9) から支援できます。ゲーム内では、ハンドブックの右上の「作者を支援」から開けます。
+
 ## 開発するには
 
 GradleはJDK 25、Minecraftのコンパイルと実行はJDK 21を使用します。`gradle.properties` の `org.gradle.java.home` は開発者環境のパスなので、自分のJDK 25の場所に合わせてください。JDK 21はGradleのツールチェーンが取得します。

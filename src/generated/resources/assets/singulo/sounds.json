@@ -394,5 +394,104 @@
         "attenuation_distance": 24
       }
     ]
+  },
+  "sealed_container.denied": {
+    "subtitle": "subtitles.singulo.sealed_container.denied",
+    "sounds": [
+      {
+        "name": "singulo:sealed/denied",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "sealed_container.insert": {
+    "subtitle": "subtitles.singulo.sealed_container.insert",
+    "sounds": [
+      {
+        "name": "singulo:sealed/insert",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "sealed_container.scan": {
+    "subtitle": "subtitles.singulo.sealed_container.scan",
+    "sounds": [
+      {
+        "name": "singulo:sealed/scan",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sealed_container.unlock": {
+    "subtitle": "subtitles.singulo.sealed_container.unlock",
+    "sounds": [
+      {
+        "name": "singulo:sealed/unlock",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sealed_container.vent": {
+    "subtitle": "subtitles.singulo.sealed_container.vent",
+    "sounds": [
+      {
+        "name": "singulo:sealed/vent",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sealed_container.open": {
+    "subtitle": "subtitles.singulo.sealed_container.open",
+    "sounds": [
+      {
+        "name": "singulo:sealed/open",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sealed_container.rise": {
+    "subtitle": "subtitles.singulo.sealed_container.rise",
+    "sounds": [
+      {
+        "name": "singulo:sealed/rise",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sealed_container.lock": {
+    "subtitle": "subtitles.singulo.sealed_container.lock",
+    "sounds": [
+      {
+        "name": "singulo:sealed/lock",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "gravity_boots.wall_jump": {
+    "subtitle": "subtitles.singulo.gravity_boots.wall_jump",
+    "sounds": [
+      {
+        "name": "singulo:item/gravity_boots_wall_jump",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "dimensional_pocket.open": {
+    "subtitle": "subtitles.singulo.dimensional_pocket.open",
+    "sounds": [
+      {
+        "name": "singulo:item/dimensional_pocket_open",
+        "attenuation_distance": 8
+      }
+    ]
+  },
+  "dimensional_pocket.close": {
+    "subtitle": "subtitles.singulo.dimensional_pocket.close",
+    "sounds": [
+      {
+        "name": "singulo:item/dimensional_pocket_close",
+        "attenuation_distance": 8
+      }
+    ]
   }
 }

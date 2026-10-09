@@ -106,7 +106,12 @@ A **Singulo HD** resource pack with 32×32 textures is included.
 
 ## Languages
 
-English and Japanese (日本語).
+English, Japanese (日本語), Simplified Chinese (简体中文), Traditional Chinese (繁體中文) and Korean (한국어).
+
+## Support
+
+If you enjoy Singulo, you can support its development on [Ko-fi](https://ko-fi.com/graycat9).
+In game, the **Support** button at the top right of the handbook opens the same page.
 
 ## Feedback
 

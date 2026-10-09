@@ -24,6 +24,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 /**
  * ニュートリノ観測所（設置型のニュートリノ・スキャナー）。電力を使い、半径 RADIUS の中の鉱石と遺構のブロックを
  * 1 tick に1層ずつ調べ続ける。右クリックで表示を入れると、近くのプレイヤー全員に、見つけたものの輪郭が浮かび上がり続ける。
+ * 映る鉱石はスキャナーと同じく感度の段階で決まり、ニュートリノ感度モジュールを使って上げる。
  */
 public class NeutrinoObservatoryBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
     public static final int RADIUS = 48;
@@ -33,6 +34,8 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(400_000, 20_000, 0, this::setChanged);
     private boolean display = true;
+    /** 感度の段階（1〜3）。 */
+    private int tier = 1;
     private int layer;
     private final List<BlockPos> ores = new ArrayList<>();
     private final List<BlockPos> ruins = new ArrayList<>();
@@ -45,6 +48,20 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
 
     public SinguloEnergyStorage energy() {
         return energy;
+    }
+
+    public int tier() {
+        return tier;
+    }
+
+    /** 感度を上げる（ニュートリノ感度モジュールから）。上がったら true。 */
+    public boolean raiseTier(int to) {
+        if (to <= tier) {
+            return false;
+        }
+        tier = Math.min(io.github.genichimaruo.singulo.item.NeutrinoScannerItem.MAX_TIER, to);
+        setChanged();
+        return true;
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, NeutrinoObservatoryBlockEntity be) {
@@ -81,7 +98,9 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
                     }
                     BlockState s = level.getBlockState(p);
                     if (s.is(Tags.Blocks.ORES)) {
-                        ores.add(p.immutable());
+                        if (io.github.genichimaruo.singulo.item.NeutrinoScannerItem.oreTier(s) <= tier) {
+                            ores.add(p.immutable());
+                        }
                     } else if (s.is(SinguloTags.RUIN_BLOCKS)) {
                         ruins.add(p.immutable());
                     }
@@ -112,7 +131,7 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
         display = !display;
         setChanged();
         player.displayClientMessage(Component.translatable(display ? "gui.singulo.observatory.on" : "gui.singulo.observatory.off",
-                lastOres, lastRuins), true);
+                lastOres, lastRuins).append(Component.translatable("gui.singulo.observatory.tier", tier)), true);
         player.level().playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.0F, display ? 0.9F : 0.6F);
     }
 
@@ -121,6 +140,7 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());
         tag.putBoolean("display", display);
+        tag.putInt("tier", tier);
     }
 
     @Override
@@ -130,5 +150,6 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
         if (tag.contains("display")) {
             display = tag.getBoolean("display");
         }
+        tier = Math.max(1, tag.getInt("tier"));
     }
 }

@@ -2,8 +2,7 @@
   "multipart": [
     {
       "when": {
-        "straight": "none",
-        "powered": "false"
+        "straight": "none"
       },
       "apply": {
         "model": "singulo:block/topological_wire_core"
@@ -11,8 +10,7 @@
     },
     {
       "when": {
-        "straight": "z",
-        "powered": "false"
+        "straight": "z"
       },
       "apply": {
         "model": "singulo:block/topological_wire_straight"
@@ -20,8 +18,7 @@
     },
     {
       "when": {
-        "straight": "x",
-        "powered": "false"
+        "straight": "x"
       },
       "apply": {
         "model": "singulo:block/topological_wire_straight",
@@ -30,8 +27,7 @@
     },
     {
       "when": {
-        "straight": "y",
-        "powered": "false"
+        "straight": "y"
       },
       "apply": {
         "model": "singulo:block/topological_wire_straight",
@@ -40,8 +36,7 @@
     },
     {
       "when": {
-        "north": "true",
-        "powered": "false"
+        "north": "true"
       },
       "apply": {
         "model": "singulo:block/topological_wire_arm"
@@ -49,8 +44,7 @@
     },
     {
       "when": {
-        "east": "true",
-        "powered": "false"
+        "east": "true"
       },
       "apply": {
         "model": "singulo:block/topological_wire_arm",
@@ -59,8 +53,7 @@
     },
     {
       "when": {
-        "south": "true",
-        "powered": "false"
+        "south": "true"
       },
       "apply": {
         "model": "singulo:block/topological_wire_arm",
@@ -69,8 +62,7 @@
     },
     {
       "when": {
-        "west": "true",
-        "powered": "false"
+        "west": "true"
       },
       "apply": {
         "model": "singulo:block/topological_wire_arm",
@@ -79,8 +71,7 @@
     },
     {
       "when": {
-        "up": "true",
-        "powered": "false"
+        "up": "true"
       },
       "apply": {
         "model": "singulo:block/topological_wire_arm",
@@ -89,108 +80,10 @@
     },
     {
       "when": {
-        "down": "true",
-        "powered": "false"
+        "down": "true"
       },
       "apply": {
         "model": "singulo:block/topological_wire_arm",
-        "x": 90
-      }
-    },
-    {
-      "when": {
-        "straight": "none",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_core_on"
-      }
-    },
-    {
-      "when": {
-        "straight": "z",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_straight_on"
-      }
-    },
-    {
-      "when": {
-        "straight": "x",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_straight_on",
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "straight": "y",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_straight_on",
-        "x": 90
-      }
-    },
-    {
-      "when": {
-        "north": "true",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_arm_on"
-      }
-    },
-    {
-      "when": {
-        "east": "true",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_arm_on",
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "south": "true",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_arm_on",
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "west": "true",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_arm_on",
-        "y": 270
-      }
-    },
-    {
-      "when": {
-        "up": "true",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_arm_on",
-        "x": 270
-      }
-    },
-    {
-      "when": {
-        "down": "true",
-        "powered": "true"
-      },
-      "apply": {
-        "model": "singulo:block/topological_wire_arm_on",
         "x": 90
       }
     }

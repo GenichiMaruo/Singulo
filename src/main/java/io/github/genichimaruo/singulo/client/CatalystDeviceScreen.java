@@ -27,6 +27,10 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
             g.renderTooltip(font, net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
                     io.github.genichimaruo.singulo.Singulo.id(extraItem())).getDescription(), mouseX, mouseY);
         }
+        if (Panel.inside(mouseX, mouseY, leftPos + POWER_X, topPos + POWER_Y, 10, 10)) {
+            g.renderTooltip(font, Component.translatable(powered() ? "gui.singulo.power.on" : "gui.singulo.power.off"),
+                    mouseX, mouseY);
+        }
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + 17, 8, 52)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.energy",
                     menu.value(CatalystDeviceBlockEntity.D_ENERGY), menu.value(CatalystDeviceBlockEntity.D_CAPACITY)),
@@ -34,9 +38,29 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
         }
     }
 
+    /** 電源スイッチ（題名の行の右端）。 */
+    private static final int POWER_X = 158;
+    private static final int POWER_Y = 5;
+
+    private boolean powered() {
+        return menu.value(CatalystDeviceBlockEntity.D_ENABLED) != 0;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (Panel.inside(mouseX, mouseY, leftPos + POWER_X, topPos + POWER_Y, 10, 10) && minecraft != null
+                && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, CatalystDeviceMenu.BUTTON_POWER);
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         Panel.background(g, leftPos, topPos, imageWidth, imageHeight);
+        Panel.powerButton(g, leftPos + POWER_X, topPos + POWER_Y, powered(),
+                Panel.inside(mouseX, mouseY, leftPos + POWER_X, topPos + POWER_Y, 10, 10));
         int capacity = Math.max(1, menu.value(CatalystDeviceBlockEntity.D_CAPACITY));
         Panel.verticalBar(g, leftPos + 8, topPos + 17, 8, 52,
                 (double) menu.value(CatalystDeviceBlockEntity.D_ENERGY) / capacity, Panel.GLOW);
@@ -110,6 +134,7 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
             case NOT_FORMED -> out.add(Component.translatable("gui.singulo.status.not_formed"));
             case NO_FUEL -> out.add(Component.translatable("gui.singulo.device.no_fuel"));
             case NO_TARGET -> out.add(Component.translatable("gui.singulo.probe.no_target"));
+            case OFF -> out.add(Component.translatable("gui.singulo.status.off"));
             default -> {
                 int value = menu.value(CatalystDeviceBlockEntity.D_VALUE);
                 switch (menu.kind()) {

@@ -12,6 +12,11 @@ public final class SinguloTags {
     /** 遺構の建材（ニュートリノ・スキャナーが映す）。 */
     public static final TagKey<net.minecraft.world.level.block.Block> RUIN_BLOCKS =
             TagKey.create(Registries.BLOCK, Singulo.id("ruin_blocks"));
+    /** ニュートリノ・スキャナーの感度の段階2・3でないと映らない鉱石（それ以外の鉱石は段階1で映る）。 */
+    public static final TagKey<net.minecraft.world.level.block.Block> SCANNER_TIER_2 =
+            TagKey.create(Registries.BLOCK, Singulo.id("scanner_tier_2"));
+    public static final TagKey<net.minecraft.world.level.block.Block> SCANNER_TIER_3 =
+            TagKey.create(Registries.BLOCK, Singulo.id("scanner_tier_3"));
     public static final TagKey<EntityType<?>> GRAVITY_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Singulo.id("gravity_immune"));
 
     private SinguloTags() {}

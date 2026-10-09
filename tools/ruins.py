@@ -2,8 +2,10 @@
 """旧文明の遺構4種の構造物（.nbt）を作る。gen_data.py から呼ぶ。
 
 どれも白い無機質パネルの建物が黄ばみ・ひび割れ・植物に侵食された姿にする（設計書「コンセプトと世界観」）。
+地上に建つのは入口となる地表観測拠点だけで、ほかの3つは地下に埋もれている（深いほど後の段階）。
 崩れ方は乱数の種を固定しているので、毎回同じ形になる。
 """
+import math
 import random
 
 import nbt
@@ -20,6 +22,11 @@ CACHE = f'{MODID}:ruin_cache'
 DOCK = f'{MODID}:ruin_guard_dock'
 CONSOLE = f'{MODID}:seal_console'
 AIR = 'minecraft:air'
+# 骨組み・装置の暗い部分
+FRAME = 'minecraft:polished_deepslate'
+DARK = 'minecraft:deepslate_tiles'
+SCREEN = 'minecraft:tinted_glass'
+CHAIN_Y = ('minecraft:chain', {'axis': 'y', 'waterlogged': 'false'})
 
 
 class Builder:
@@ -48,6 +55,14 @@ class Builder:
         if x1 - x0 >= 2 and y1 - y0 >= 2 and z1 - z0 >= 2:
             self.fill(x0 + 1, y0 + 1, z0 + 1, x1 - 1, y1 - 1, z1 - 1, inside)
 
+    def each(self, test, y0, y1, name, props=None):
+        """y0〜y1 の各段で test(x, y, z) が真のマスを埋める。"""
+        for x in range(self.size[0]):
+            for z in range(self.size[2]):
+                for y in range(y0, y1 + 1):
+                    if test(x, y, z):
+                        self.set(x, y, z, name, props)
+
     def decay(self, cracked=0.15, mossy=0.1, missing=0.0, only_above=0):
         """パネルを確率でひび割れ・苔むし・欠けにする。"""
         for (x, y, z), (name, props, data) in list(self.blocks.items()):
@@ -61,19 +76,32 @@ class Builder:
             elif r < missing + cracked + mossy:
                 self.blocks[(x, y, z)] = (MOSSY, {}, None)
 
-    def scatter(self, name, count, y, area, props=None, on_air=True):
-        """床の上に count 個ばらまく（苔のじゅうたんなど）。"""
+    def break_glass(self, chance):
+        """割れて抜けたガラス。"""
+        for (x, y, z), (name, props, data) in list(self.blocks.items()):
+            if name == GLASS and self.rng.random() < chance:
+                self.blocks[(x, y, z)] = (AIR, {}, None)
+
+    def scatter(self, name, count, y, area, props=None, on_air=True, floor=None):
+        """y の段に count 個ばらまく（苔のじゅうたんなど）。floor を与えると、その下が floor のマスだけ。"""
         x0, z0, x1, z1 = area
         for _ in range(count):
             x, z = self.rng.randint(x0, x1), self.rng.randint(z0, z1)
-            if not on_air or self.get(x, y, z) in (None, AIR):
-                self.set(x, y, z, name, props)
+            if on_air and self.get(x, y, z) not in (None, AIR):
+                continue
+            if floor and self.get(x, y - 1, z) not in floor:
+                continue
+            self.set(x, y, z, name, props)
 
     def cache(self, x, y, z, ruin, sealed=False):
         self.set(x, y, z, CACHE, {'sealed': 'true' if sealed else 'false'}, {'ruin': ruin})
 
     def dock(self, x, y, z, tier):
         self.set(x, y, z, DOCK, None, {'tier': tier})
+
+    def sealed(self, x, y, z, tier):
+        """封印コンテナ（次の段階の鍵で開く。中身は初めて開いたときに loot table singulo:sealed/tier_N から入る）。"""
+        self.set(x, y, z, f'{MODID}:sealed_container_{tier}', None, {'Loot': 1})
 
     def to_nbt(self):
         palette, index, blocks = [], {}, []
@@ -93,134 +121,345 @@ class Builder:
                 'blocks': blocks, 'entities': []}
 
 
+def octagon(dx, dz, r):
+    """中心からの差 (dx, dz) が、半径 r の八角形の中か。"""
+    return max(abs(dx), abs(dz)) <= r and abs(dx) + abs(dz) <= r * 1.42
+
+
 def vines_on(b, x, y0, y1, z, side):
-    """壁の外側に垂れるツタ。side はツタが張り付く壁の方向。"""
+    """壁に垂れるツタ。side はツタが張り付く壁の方向。"""
     for y in range(y0, y1 + 1):
-        if b.rng.random() < 0.6:
+        if b.rng.random() < 0.6 and b.get(x, y, z) in (None, AIR):
             b.set(x, y, z, 'minecraft:vine', {side: 'true'})
+
+
+def tank(b, x, z, y0, y1, glass, top=LAMP, bottom=FRAME):
+    """縦長の培養槽・標本槽: 台座・色ガラスの筒・光る蓋。"""
+    b.set(x, y0, z, bottom)
+    b.fill(x, y0 + 1, z, x, y1 - 1, z, glass)
+    b.set(x, y1, z, top)
 
 
 # ---------------------------------------------------------------- 4種類の遺構
 
 def observation_post():
-    """地表観測拠点: 平原や砂漠に立つ小さな観測小屋。屋根に観測用のアンテナ。"""
-    b = Builder(9, 8, 9, seed=101)
-    b.fill(0, 0, 0, 8, 0, 8, PANEL)                       # 床
-    b.box(0, 0, 0, 8, 4, 8, PANEL)                        # 壁と屋根
-    b.fill(1, 1, 1, 7, 3, 7, AIR)
-    for x in (2, 6):                                      # 窓
-        b.set(x, 2, 0, GLASS)
-        b.set(x, 2, 8, GLASS)
-    b.set(0, 2, 4, GLASS)
-    b.fill(4, 1, 8, 4, 2, 8, AIR)                         # 南の入口
-    b.set(4, 4, 4, LAMP)
-    b.set(1, 3, 1, LAMP)
-    # 屋根のアンテナ
-    b.set(4, 5, 4, PANEL)
-    b.set(4, 6, 4, 'minecraft:end_rod', {'facing': 'up'})
-    b.set(3, 5, 4, 'minecraft:end_rod', {'facing': 'west'})
-    b.cache(2, 1, 2, 'observation_post')
-    b.dock(6, 1, 6, 1)
-    b.decay(cracked=0.2, mossy=0.15, missing=0.0)
+    """
+    地表観測拠点（地上）: 八角形の観測所。ガラスのドームから旧式の望遠鏡が空へ突き出し、屋根には折れかけた
+    アンテナ塔と太陽光パネルが並ぶ。中には計器の並ぶ観測室。
+    """
+    b = Builder(19, 19, 19, seed=101)
+    c = 9
+    # 基壇と床（外周は一段低い縁）
+    b.each(lambda x, y, z: octagon(x - c, z - c, 8), 0, 0, PANEL)
+    b.each(lambda x, y, z: octagon(x - c, z - c, 9) and not octagon(x - c, z - c, 8), 0, 0,
+           'minecraft:smooth_stone_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    # 外壁（窓の帯は2〜3段目）と天井
+    ring = lambda x, z: octagon(x - c, z - c, 8) and not octagon(x - c, z - c, 7)
+    b.each(lambda x, y, z: ring(x, z), 1, 5, PANEL)
+    b.each(lambda x, y, z: ring(x, z) and (x + z) % 3 != 0, 2, 3, GLASS)
+    b.each(lambda x, y, z: ring(x, z) and (x + z) % 3 == 0, 4, 4, LAMP)
+    b.each(lambda x, y, z: octagon(x - c, z - c, 7), 1, 5, AIR)
+    b.each(lambda x, y, z: octagon(x - c, z - c, 8), 6, 6, PANEL)
+    # 屋上の手すり（低い縁）
+    b.each(lambda x, y, z: ring(x, z) and (x + z) % 2 == 0, 7, 7, PANEL)
+    # 観測ドーム（半径5のガラス、縦のリブはパネル）。下の観測室と吹き抜け
+    for x in range(19):
+        for z in range(19):
+            for y in range(6, 13):
+                d = math.sqrt((x - c) ** 2 + (z - c) ** 2 + ((y - 6) * 1.1) ** 2)
+                if 4.3 <= d <= 5.3:
+                    rib = x == c or z == c or abs(x - c) == abs(z - c)
+                    b.set(x, y, z, PANEL if rib else GLASS)
+                elif d < 4.3:
+                    b.set(x, y, z, AIR)
+    b.set(c, 12, c, LAMP)
+    # 望遠鏡: 台座から北の空へ斜めに伸びる筒。ドームを突き破っている
+    b.fill(c, 1, c, c, 3, c, FRAME)
+    b.set(c, 4, c, LAMP)
+    for i, (y, z) in enumerate([(5, c), (6, c - 1), (7, c - 2), (8, c - 3), (9, c - 4), (10, c - 5), (11, c - 6)]):
+        b.set(c, y, z, DARK if i % 3 else FRAME)
+        if 1 <= i <= 4:
+            b.set(c - 1, y, z, FRAME)
+            b.set(c + 1, y, z, FRAME)
+    b.set(c, 12, c - 7, 'minecraft:end_rod', {'facing': 'north'})
+    # アンテナ塔（北西の屋上）: 鎖の柱と横木、先端は避雷針
+    mx, mz = c - 5, c - 5
+    b.set(mx, 7, mz, FRAME)
+    b.fill(mx, 8, mz, mx, 16, mz, *CHAIN_Y)
+    for y in (11, 14):
+        b.set(mx, y, mz, FRAME)
+        for dx, dz, f in ((-1, 0, 'west'), (1, 0, 'east'), (0, -1, 'north'), (0, 1, 'south')):
+            b.set(mx + dx, y, mz + dz, 'minecraft:end_rod', {'facing': f})
+    b.set(mx, 17, mz, 'minecraft:lightning_rod', {'facing': 'up', 'powered': 'false', 'waterlogged': 'false'})
+    # 太陽光パネル（東の屋上）
+    for x in range(c + 3, c + 8):
+        for z in range(c - 3, c + 4):
+            if octagon(x - c, z - c, 7) and (z - c) % 3 != 2:
+                b.set(x, 7, z, 'minecraft:daylight_detector', {'inverted': 'false', 'power': '0'})
+    # 南の入口と階段
+    b.fill(c - 1, 1, c + 8, c + 1, 3, c + 8, AIR)
+    b.fill(c - 1, 4, c + 8, c + 1, 4, c + 8, FRAME)
+    b.fill(c - 1, 0, c + 9, c + 1, 0, c + 9, 'minecraft:smooth_stone_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    # 観測室: 北の壁ぎわの計器盤（画面は黒いガラス）、西の記録棚、東の作業台
+    for x in range(c - 3, c + 4):
+        b.set(x, 1, c - 6, PANEL)
+        b.set(x, 2, c - 6, SCREEN if x % 2 else LAMP)
+        b.set(x, 1, c - 5, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    for z in range(c - 2, c + 3):
+        b.set(c - 6, 1, z, FRAME)
+        b.set(c - 6, 2, z, 'minecraft:chiseled_bookshelf' if z % 2 else FRAME,
+              {'facing': 'east', 'slot_0_occupied': 'false', 'slot_1_occupied': 'false', 'slot_2_occupied': 'false',
+               'slot_3_occupied': 'false', 'slot_4_occupied': 'false', 'slot_5_occupied': 'false'} if z % 2 else None)
+    b.cache(c + 5, 1, c, 'observation_post')
+    b.set(c + 5, 1, c + 2, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    b.dock(c - 4, 1, c + 4, 1)
+    b.sealed(c - 5, 1, c - 1, 1)
+    # 朽ちた跡
+    b.decay(cracked=0.2, mossy=0.15)
     for (x, y, z), blk in list(b.blocks.items()):         # 屋根の穴
-        if y == 4 and blk[0] in (PANEL, CRACKED, MOSSY) and b.rng.random() < 0.3 and (x, z) != (4, 4):
+        if y == 6 and blk[0] in (PANEL, CRACKED, MOSSY) and b.rng.random() < 0.18 and not octagon(x - c, z - c, 5):
             b.blocks[(x, y, z)] = (AIR, {}, None)
-    b.scatter('minecraft:moss_carpet', 8, 1, (1, 1, 7, 7))
-    vines_on(b, 1, 1, 3, 4, 'west')                       # 室内の西の壁に垂れるツタ
+    b.break_glass(0.15)
+    b.scatter('minecraft:moss_carpet', 14, 1, (c - 7, c - 7, c + 7, c + 7), floor=(PANEL, CRACKED, MOSSY))
+    b.scatter('minecraft:moss_carpet', 10, 7, (c - 7, c - 7, c + 7, c + 7), floor=(PANEL, CRACKED, MOSSY))
+    for z in range(c - 2, c + 3, 2):
+        vines_on(b, c - 9, 1, 5, z, 'east')
+        vines_on(b, c + 9, 1, 5, z, 'west')
     return b
 
 
 def research_building():
-    """研究棟: 2階建ての研究施設。入口は鉄の扉とボタンの電子ロック。"""
-    b = Builder(13, 10, 11, seed=202)
-    b.box(0, 0, 0, 12, 9, 10, PANEL)
-    b.fill(1, 5, 1, 11, 5, 9, PANEL)                      # 2階の床
-    for x in range(2, 11, 3):                             # 窓
-        b.fill(x, 2, 0, x, 3, 0, GLASS)
-        b.fill(x, 7, 0, x, 8, 0, GLASS)
-        b.fill(x, 2, 10, x, 3, 10, GLASS)
-    # 入口（南）: 電子ロックの鉄の扉。ボタンは内側にしかないので、外からはレッドストーンで開けるか壁を壊す
-    b.set(6, 1, 10, 'minecraft:iron_door', {'facing': 'north', 'half': 'lower', 'hinge': 'left', 'open': 'false', 'powered': 'false'})
-    b.set(6, 2, 10, 'minecraft:iron_door', {'facing': 'north', 'half': 'upper', 'hinge': 'left', 'open': 'false', 'powered': 'false'})
-    b.set(7, 2, 9, 'minecraft:stone_button', {'face': 'wall', 'facing': 'north', 'powered': 'false'})
-    # 2階へのはしごと穴
-    b.fill(1, 1, 1, 1, 5, 1, 'minecraft:ladder', {'facing': 'east', 'waterlogged': 'false'})
-    b.set(1, 5, 1, 'minecraft:ladder', {'facing': 'east', 'waterlogged': 'false'})
-    for x, y, z in ((3, 4, 3), (9, 4, 7), (6, 8, 5), (3, 8, 7)):
-        b.set(x, y, z, LAMP)
-    b.cache(10, 6, 8, 'research_building')
-    b.dock(3, 1, 5, 2)
-    b.dock(9, 6, 3, 2)
-    b.decay(cracked=0.2, mossy=0.1)
-    for (x, y, z), blk in list(b.blocks.items()):         # 屋根の崩れ
-        if y == 9 and blk[0] in (PANEL, CRACKED, MOSSY) and b.rng.random() < 0.2:
-            b.blocks[(x, y, z)] = (AIR, {}, None)
-    b.scatter('minecraft:cobweb', 6, 4, (1, 1, 11, 9))
-    b.scatter('minecraft:moss_carpet', 6, 1, (2, 2, 11, 9))
+    """
+    研究棟（地下）: 埋もれた2階建ての研究施設。吹き抜けの中央には古い実験装置のリング、西の棟には標本槽、
+    東の棟には記録装置の棚が並ぶ。2階の北東は電子ロックの扉で閉ざされた保管室。
+    """
+    b = Builder(27, 15, 23, seed=202)
+    X, Z = 26, 22
+    b.box(0, 0, 0, X, 14, Z, PANEL)
+    # 2階の床（中央は吹き抜け）
+    b.fill(1, 7, 1, X - 1, 7, Z - 1, PANEL)
+    b.fill(9, 7, 7, 17, 7, 15, AIR)
+    # 吹き抜けの縁の柱と、2階の手すり（低い板）
+    for x, z in ((8, 6), (18, 6), (8, 16), (18, 16)):
+        b.fill(x, 1, z, x, 13, z, FRAME)
+        b.set(x, 6, z, LAMP)
+        b.set(x, 13, z, LAMP)
+    for x in range(9, 18):
+        for z in (6, 16):
+            b.set(x, 8, z, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    for z in range(7, 16):
+        for x in (8, 18):
+            b.set(x, 8, z, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    # 1階の仕切り（ガラス張りの実験室）
+    for x in (7, 19):
+        b.fill(x, 1, 1, x, 6, Z - 1, PANEL)
+        b.fill(x, 2, 2, x, 5, Z - 2, GLASS)
+        b.fill(x, 1, 10, x, 3, 12, AIR)                     # 出入口
+    # 西の棟: 標本槽（色ガラスの筒）
+    for z in (3, 7, 11, 15, 19):
+        for x in (2, 5):
+            tank(b, x, z, 1, 5, 'minecraft:light_blue_stained_glass' if z % 8 == 3 else 'minecraft:cyan_stained_glass')
+    # 東の棟: 記録装置の棚（パネルと光る段が交互）
+    for z in range(2, Z - 1, 3):
+        for x in range(21, 25):
+            for y in range(1, 6):
+                b.set(x, y, z, LAMP if (y == 3 and x % 2 == 0) else (DARK if y % 2 else FRAME))
+    # 中央の実験装置: 床のリングと、天井まで伸びる鎖とエンドロッドの軸
+    cx, cz = 13, 11
+    for x in range(cx - 4, cx + 5):
+        for z in range(cz - 4, cz + 5):
+            d = math.hypot(x - cx, z - cz)
+            if 2.6 <= d <= 3.6:
+                b.set(x, 1, z, FRAME)
+                b.set(x, 2, z, LAMP if (x + z) % 2 == 0 else DARK)
+    b.set(cx, 1, cz, LAMP)
+    b.fill(cx, 2, cz, cx, 4, cz, 'minecraft:end_rod', {'facing': 'up'})
+    b.fill(cx, 5, cz, cx, 13, cz, *CHAIN_Y)
+    # 階段（南の壁ぎわ、西から東へ上る）と、2階の床の穴
+    for i in range(6):
+        for z in (Z - 2, Z - 1):
+            b.set(10 + i, 1 + i, z, 'minecraft:quartz_stairs', {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
+                                                                 'waterlogged': 'false'})
+            b.fill(10 + i, 2 + i, z, 10 + i, 6 + i if i < 5 else 7, z, AIR)
+    b.fill(10, 7, Z - 2, 15, 7, Z - 1, AIR)
+    # 2階: 北東の保管室（電子ロック。ボタンは内側だけ）
+    b.fill(17, 8, 1, 17, 13, 7, PANEL)
+    b.fill(17, 8, 7, X - 1, 13, 7, PANEL)
+    b.set(21, 8, 7, 'minecraft:iron_door', {'facing': 'south', 'half': 'lower', 'hinge': 'left', 'open': 'false', 'powered': 'false'})
+    b.set(21, 9, 7, 'minecraft:iron_door', {'facing': 'south', 'half': 'upper', 'hinge': 'left', 'open': 'false', 'powered': 'false'})
+    b.set(22, 9, 6, 'minecraft:stone_button', {'face': 'wall', 'facing': 'north', 'powered': 'false'})
+    b.cache(23, 8, 3, 'research_building')
+    b.set(24, 8, 2, LAMP)
+    b.set(19, 8, 2, FRAME)
+    b.set(19, 9, 2, SCREEN)
+    # 2階: 南西の事務区画（机と画面）
+    for x in range(2, 7):
+        for z in (14, 18):
+            b.set(x, 8, z, 'minecraft:smooth_quartz_slab', {'type': 'top', 'waterlogged': 'false'})
+            b.set(x, 9, z, SCREEN if x % 2 else AIR)
+    # 照明（天井）
+    for x in range(3, X, 5):
+        for z in range(3, Z, 5):
+            b.set(x, 6, z, LAMP)
+            b.set(x, 14, z, LAMP)
+    b.dock(13, 1, 4, 2)
+    b.sealed(4, 8, 16, 2)
+    b.dock(22, 8, 14, 2)
+    b.decay(cracked=0.2, mossy=0.08)
+    b.break_glass(0.2)
+    b.scatter('minecraft:cobweb', 12, 6, (1, 1, X - 1, Z - 1))
+    b.scatter('minecraft:cobweb', 10, 13, (1, 1, X - 1, Z - 1))
+    b.scatter('minecraft:moss_carpet', 10, 1, (1, 1, X - 1, Z - 1))
     return b
 
 
 def culture_facility():
-    """封鎖培養施設: 深層岩の層に埋まった密閉施設。奥に極低温区画。"""
-    b = Builder(15, 9, 15, seed=303)
-    b.box(0, 0, 0, 14, 8, 14, PANEL)
-    # 十字の通路で4部屋に区切る
-    b.fill(1, 1, 7, 13, 7, 7, PANEL)
-    b.fill(7, 1, 1, 7, 7, 13, PANEL)
-    for x, z in ((7, 3), (7, 11), (3, 7), (11, 7)):      # 部屋の間の出入口
-        b.fill(x, 1, z, x, 2, z, AIR)
-    # 北東の部屋は極低温区画
-    b.fill(8, 1, 1, 13, 1, 6, 'minecraft:packed_ice')
-    b.fill(8, 1, 1, 13, 1, 1, 'minecraft:blue_ice')
-    b.fill(9, 2, 2, 12, 2, 5, AIR)
-    for x, z in ((9, 2), (12, 5), (10, 4)):
-        b.set(x, 2, z, 'minecraft:powder_snow')
-    b.cache(11, 2, 3, 'culture_facility')
-    b.dock(3, 1, 3, 3)
-    b.dock(11, 1, 11, 3)
-    for x, y, z in ((3, 7, 3), (11, 7, 11), (3, 7, 11), (11, 7, 3)):
-        b.set(x, y, z, LAMP)
-    b.decay(cracked=0.15, mossy=0.05)
-    b.scatter('minecraft:cobweb', 8, 6, (1, 1, 13, 13))
+    """
+    封鎖培養施設（深い地下）: 円い密閉施設。中心は青氷の極低温コア（保管庫はその奥）、まわりの4つの培養室は
+    割れた培養槽からあふれた植物に覆われている。
+    """
+    b = Builder(29, 13, 29, seed=303)
+    c = 14
+    disk = lambda x, z, r: math.hypot(x - c, z - c) <= r
+    b.each(lambda x, y, z: disk(x, z, 14), 0, 0, PANEL)
+    b.each(lambda x, y, z: disk(x, z, 14) and not disk(x, z, 13), 1, 11, PANEL)
+    b.each(lambda x, y, z: disk(x, z, 14), 12, 12, PANEL)
+    b.each(lambda x, y, z: disk(x, z, 13), 1, 11, AIR)
+    # 天井の光の輪
+    b.each(lambda x, y, z: 9.5 <= math.hypot(x - c, z - c) <= 10.4 and (x + z) % 2 == 0, 11, 11, LAMP)
+    # 培養室を分ける放射状の壁（4方向、出入口つき）
+    for x in range(29):
+        for z in range(29):
+            d = math.hypot(x - c, z - c)
+            if 5.5 <= d <= 13 and (abs(x - c) <= 0 or abs(z - c) <= 0):
+                b.fill(x, 1, z, x, 10, z, PANEL)
+                if 8 <= d <= 9.5:
+                    b.fill(x, 1, z, x, 3, z, AIR)
+    # 極低温コア: ガラスの円筒（リブはパネル）、床は青氷、中は粉雪と氷の柱
+    for x in range(29):
+        for z in range(29):
+            d = math.hypot(x - c, z - c)
+            if 4.4 <= d <= 5.4:
+                rib = x == c or z == c or abs(x - c) == abs(z - c)
+                b.fill(x, 1, z, x, 9, z, PANEL if rib else 'minecraft:light_blue_stained_glass')
+                b.set(x, 10, z, FRAME)
+            elif d < 4.4:
+                b.set(x, 0, z, 'minecraft:blue_ice')
+                b.fill(x, 1, z, x, 9, z, AIR)
+                b.set(x, 10, z, 'minecraft:packed_ice')
+    b.fill(c, 1, c, c, 9, c, 'minecraft:packed_ice')
+    for x, z in ((c - 2, c - 1), (c + 2, c + 1), (c - 1, c + 2), (c + 1, c - 2)):
+        b.set(x, 1, z, 'minecraft:powder_snow')
+    b.fill(c - 1, 1, c + 5, c + 1, 3, c + 5, AIR)             # コアの入口（南）
+    b.cache(c + 2, 1, c - 2, 'culture_facility')
+    b.sealed(c - 2, 1, c + 1, 3)
+    # 培養室: 割れた培養槽、苔の床、天井の胞子の花、光るカエルの明かり
+    rooms = ((c - 6, c - 6), (c + 6, c - 6), (c - 6, c + 6), (c + 6, c + 6))
+    for rx, rz in rooms:
+        for dx, dz in ((-2, -2), (2, -2), (-2, 2), (2, 2), (0, 0)):
+            x, z = rx + dx, rz + dz
+            if (dx, dz) == (0, 0):
+                b.set(x, 1, z, FRAME)
+                b.set(x, 2, z, 'minecraft:verdant_froglight', {'axis': 'y'})
+            else:
+                tank(b, x, z, 1, 5, 'minecraft:lime_stained_glass', top='minecraft:ochre_froglight' if dx > 0 else LAMP)
+                if b.rng.random() < 0.5:
+                    b.set(x, 3, z, AIR)                             # 割れた槽
+        for _ in range(14):
+            x, z = rx + b.rng.randint(-3, 3), rz + b.rng.randint(-3, 3)
+            if b.get(x, 1, z) in (None, AIR) and disk(x, z, 12.5):
+                b.set(x, 0, z, 'minecraft:moss_block')
+                b.set(x, 1, z, 'minecraft:moss_carpet')
+        for _ in range(3):
+            x, z = rx + b.rng.randint(-3, 3), rz + b.rng.randint(-3, 3)
+            if b.get(x, 10, z) in (None, AIR):
+                b.set(x, 10, z, 'minecraft:spore_blossom')
+    b.dock(c - 9, 1, c - 5, 3)
+    b.dock(c + 9, 1, c + 5, 3)
+    b.decay(cracked=0.15, mossy=0.1)
+    b.break_glass(0.1)
+    b.scatter('minecraft:cobweb', 16, 10, (1, 1, 27, 27), floor=(AIR,))
     return b
 
 
 def final_lab():
-    """最終実験施設: 重力異常点の中心に建つ大ホール。中央の封印コンソールに触れると守護機ホライズン・ウォーデンが起動する。"""
-    b = Builder(21, 13, 21, seed=404)
-    b.fill(0, 0, 0, 20, 0, 20, PANEL)                     # 床
-    # 円形の壁（半径10）とドーム
-    for x in range(21):
-        for z in range(21):
-            d = ((x - 10) ** 2 + (z - 10) ** 2) ** 0.5
-            for y in range(1, 13):
-                dome = (d ** 2 + ((y - 1) * 0.9) ** 2) ** 0.5
-                if 9.3 <= dome <= 10.3:
-                    b.set(x, y, z, GLASS if (y % 3 == 0 and y < 8) else PANEL)
-                elif dome < 9.3:
+    """
+    最終実験施設（いちばん深い地下）: 重力異常点を封じた巨大なドーム。光の環が床に刻まれ、8本の柱が
+    天井を支え、宙には崩れた破片が浮いたまま止まっている。中央の壇の封印コンソールに触れると守護機
+    ホライズン・ウォーデンが起動する。保管庫は壇の上で、力場で封鎖されている。
+    """
+    b = Builder(35, 21, 35, seed=404)
+    c = 17
+    R = 16
+    # 床と、床に刻まれた光の環
+    for x in range(35):
+        for z in range(35):
+            d = math.hypot(x - c, z - c)
+            if d <= R:
+                b.set(x, 0, z, PANEL)
+                if 6.5 <= d <= 7.3 or 11.5 <= d <= 12.3:
+                    b.set(x, 0, z, LAMP)
+    # ドーム（縦に少しつぶした半球）
+    for x in range(35):
+        for z in range(35):
+            for y in range(1, 21):
+                d = math.sqrt((x - c) ** 2 + (z - c) ** 2 + ((y - 1) * 0.95) ** 2)
+                if R - 0.6 <= d <= R + 0.5:
+                    b.set(x, y, z, LAMP if (y % 5 == 0 and (x + z) % 3 == 0) else PANEL)
+                elif d < R - 0.6:
                     b.set(x, y, z, AIR)
-    b.fill(10, 1, 19, 10, 3, 20, AIR)                     # 南の入口
-    b.fill(9, 1, 20, 11, 3, 20, AIR)
-    # 中央の封印コンソール
-    b.fill(8, 1, 8, 12, 1, 12, PANEL)
-    b.set(10, 2, 10, CONSOLE)
-    b.set(10, 3, 10, LAMP)
-    b.set(10, 4, 10, 'minecraft:end_rod', {'facing': 'up'})
-    b.cache(10, 2, 12, 'final_lab', sealed=True)               # 守護機を倒すまで力場で封鎖
-    b.decay(cracked=0.25, mossy=0.15, only_above=1)
-    for (x, y, z), blk in list(b.blocks.items()):         # ドームの崩れ
-        if y >= 8 and blk[0] in (PANEL, CRACKED, MOSSY) and b.rng.random() < 0.25:
-            b.blocks[(x, y, z)] = (AIR, {}, None)
-    b.scatter('minecraft:moss_carpet', 20, 1, (2, 2, 18, 18))
+    # 8本の柱（上は鎖で天井へ）
+    for k in range(8):
+        a = math.pi * 2 * k / 8
+        x, z = round(c + math.cos(a) * 12), round(c + math.sin(a) * 12)
+        b.fill(x, 1, z, x, 9, z, FRAME)
+        b.set(x, 5, z, LAMP)
+        b.set(x, 10, z, LAMP)
+        top = next((y for y in range(11, 21) if b.get(x, y, z) not in (None, AIR)), 20)
+        b.fill(x, 11, z, x, top - 1, z, *CHAIN_Y)
+    # 中央の壇（3段）と封印コンソール。上は守護機が現れるので空けておく
+    for x in range(35):
+        for z in range(35):
+            d = math.hypot(x - c, z - c)
+            if d <= 5.3:
+                b.set(x, 1, z, PANEL)
+            if d <= 3.3:
+                b.set(x, 2, z, FRAME)
+    for dx, dz, f in ((0, 5, 'north'), (0, -5, 'south'), (5, 0, 'west'), (-5, 0, 'east')):
+        b.set(c + dx, 1, c + dz, 'minecraft:quartz_stairs', {'facing': f, 'half': 'bottom', 'shape': 'straight', 'waterlogged': 'false'})
+    b.set(c, 3, c, CONSOLE)
+    b.fill(c, 4, c, c, 9, c, AIR)
+    for dx, dz in ((-2, -2), (2, -2), (-2, 2), (2, 2)):
+        b.set(c + dx, 3, c + dz, 'minecraft:end_rod', {'facing': 'up'})
+    b.cache(c, 3, c + 3, 'final_lab', sealed=True)              # 守護機を倒すまで力場で封鎖
+    b.sealed(c, 3, c - 3, 4)
+    # 宙に止まった破片の環（重力異常）と、ばらばらに浮かぶ欠片
+    for k in range(28):
+        a = math.pi * 2 * k / 28
+        x, z = round(c + math.cos(a) * 8), round(c + math.sin(a) * 8)
+        y = 12 + round(math.sin(a * 2))
+        b.set(x, y, z, SCREEN if k % 4 == 0 else (CRACKED if k % 3 else FRAME))
+    for _ in range(26):
+        x, y, z = c + b.rng.randint(-11, 11), b.rng.randint(5, 15), c + b.rng.randint(-11, 11)
+        if b.get(x, y, z) == AIR and math.hypot(x - c, z - c) > 4:
+            b.set(x, y, z, b.rng.choice((PANEL, CRACKED, FRAME, 'minecraft:obsidian')))
+    # 南の通路（崩れた入口）
+    b.fill(c - 1, 1, c + R - 1, c + 1, 4, 34, AIR)
+    b.fill(c - 2, 0, c + R - 1, c + 2, 0, 34, PANEL)
+    b.fill(c - 2, 1, c + R, c - 2, 5, 34, PANEL)
+    b.fill(c + 2, 1, c + R, c + 2, 5, 34, PANEL)
+    b.fill(c - 2, 5, c + R, c + 2, 5, 34, PANEL)
+    b.decay(cracked=0.22, mossy=0.12, only_above=1)
+    b.scatter('minecraft:moss_carpet', 30, 1, (2, 2, 32, 32), floor=(PANEL, LAMP))
     return b
 
 
-# 遺構ID → (作る関数, 置き方)
+# 遺構ID → (作る関数, 置き方)。surface は地上、それ以外は地下に埋める（gen_data.RUIN_PLACEMENT の高さ）
 RUINS = {
     'observation_post': (observation_post, 'surface'),
-    'research_building': (research_building, 'surface'),
-    'culture_facility': (culture_facility, 'deep'),
-    'final_lab': (final_lab, 'surface'),
+    'research_building': (research_building, 'underground'),
+    'culture_facility': (culture_facility, 'underground'),
+    'final_lab': (final_lab, 'underground'),
 }
 
 # 設計書の遺構名 → 遺構ID

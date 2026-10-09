@@ -44,9 +44,25 @@ public final class AncientRecords {
                 copy.add(id);
                 player.setData(DECODED, copy);
                 sync(player);
-                if (copy.size() >= GeneratedContent.RECORDS.size()) {
+                if (copy.containsAll(GeneratedContent.RECORDS)) {
                     SinguloTriggers.milestone(player, "records_all");
                 }
+                return id;
+            }
+        }
+        return null;
+    }
+
+    /** 次の封印された記録（封印記録から）を読めるようにする。全部読んでいれば null。 */
+    @Nullable
+    public static String learnNextHidden(ServerPlayer player) {
+        List<String> have = decoded(player);
+        for (String id : GeneratedContent.HIDDEN_RECORDS) {
+            if (!have.contains(id)) {
+                List<String> copy = new ArrayList<>(have);
+                copy.add(id);
+                player.setData(DECODED, copy);
+                sync(player);
                 return id;
             }
         }

@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 240,
+  "energy": 20000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:scanner_module_2",
+    "count": 1
+  }
+}

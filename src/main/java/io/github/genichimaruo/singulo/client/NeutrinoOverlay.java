@@ -64,15 +64,20 @@ public final class NeutrinoOverlay {
         buffers.endBatch(XrayLines.TYPE);
     }
 
-    /** 深さを無視して描く線（地形越しに見える）。RenderType の保護された部品を使うために継承する。 */
+    /**
+     * 深さを無視して描く線（地形越しに見える）。RenderType の保護された部品を使うために継承する。
+     * NO_DEPTH_TEST は「深さの判定を何もしない」だけで、すでに有効な深さの判定を切らない（ワールドの描画中は有効なので、
+     * 地中の鉱石が地形に隠れて見えなかった）。そこで描く間だけ深さの判定を切る段（XRAY）を足す。
+     */
     private static final class XrayLines extends RenderType {
+        private static final LayeringStateShard XRAY = new LayeringStateShard("singulo_xray",
+                com.mojang.blaze3d.systems.RenderSystem::disableDepthTest, com.mojang.blaze3d.systems.RenderSystem::enableDepthTest);
         static final RenderType TYPE = create("singulo_xray_lines", DefaultVertexFormat.POSITION_COLOR_NORMAL,
                 VertexFormat.Mode.LINES, 4096, false, false, CompositeState.builder()
                         .setShaderState(RENDERTYPE_LINES_SHADER)
                         .setLineState(new LineStateShard(OptionalDouble.of(2.0)))
-                        .setLayeringState(VIEW_OFFSET_Z_LAYERING)
+                        .setLayeringState(XRAY)
                         .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                        .setOutputState(ITEM_ENTITY_TARGET)
                         .setWriteMaskState(COLOR_WRITE)
                         .setDepthTestState(NO_DEPTH_TEST)
                         .setCullState(NO_CULL)

@@ -946,7 +946,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 }
                 IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
                 if (target != null && target.canReceive()) {
-                    int sent = target.receiveEnergy((int) Math.min(Integer.MAX_VALUE, budget), false);
+                    // ケーブルなど mod の口へは int を超えて渡す
+                    long sent = io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, budget, false);
                     budget -= sent;
                     buffer -= sent;
                     lastOutput += sent;
@@ -1064,9 +1065,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     /** 点火中は点火エネルギーを受け取り、稼働中は蓄電から取り出せる。 */
-    private final class EnergyPort implements IEnergyStorage {
+    private final class EnergyPort implements io.github.genichimaruo.singulo.energy.LongEnergyStorage {
         @Override
-        public int receiveEnergy(int amount, boolean simulate) {
+        public long receiveLong(long amount, boolean simulate) {
             if (state != State.IGNITING) {
                 return 0;
             }
@@ -1074,16 +1075,26 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             if (!simulate) {
                 ignitionStored += take;
             }
-            return (int) take;
+            return take;
         }
 
         @Override
-        public int extractEnergy(int amount, boolean simulate) {
-            int take = (int) Math.min(amount, buffer);
+        public int receiveEnergy(int amount, boolean simulate) {
+            return (int) receiveLong(amount, simulate);
+        }
+
+        @Override
+        public long extractLong(long amount, boolean simulate) {
+            long take = Math.min(amount, buffer);
             if (!simulate) {
                 buffer -= take;
             }
             return take;
+        }
+
+        @Override
+        public int extractEnergy(int amount, boolean simulate) {
+            return (int) extractLong(amount, simulate);
         }
 
         @Override

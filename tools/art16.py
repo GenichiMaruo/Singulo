@@ -7,8 +7,15 @@
 """
 import math
 import random
+import zlib
 
 from PIL import Image, ImageDraw
+
+
+def stable_hash(text):
+    """実行ごとに変わらないハッシュ（Python の hash() は起動ごとに変わり、絵が毎回変わってしまう）。"""
+    return zlib.crc32(text.encode("utf-8"))
+
 
 S = 16
 
@@ -277,7 +284,7 @@ def put_icon(d, kind, ox, oy, col, hi):
 def front_frame(iid, stage, on, frame=0, frames=1):
     """正面の1コマ。窓の中に絵柄。動く装置は明るさの波と走査線を重ねる。"""
     t = TIERS[stage]
-    im = casing(stage, 'side', seed=hash(iid) % 97)
+    im = casing(stage, 'side', seed=stable_hash(iid) % 97)
     d = ImageDraw.Draw(im)
     # 窓（縁は段階の金属、ガラスは暗い）
     d.rectangle([3, 3, 12, 12], fill=rgba(t['trim']))
@@ -1353,11 +1360,33 @@ def compass_frame(angle):
     for k in range(4):
         a = k * math.pi / 2
         d.point((7.5 + 4.5 * math.cos(a), 7.5 + 4.5 * math.sin(a)), fill=(110, 205, 238, 255))
+    # 針: ドットを数点打つだけだと、斜めの向きで途切れる。画素ごとに、針（中心から先へ細くなる線分）に
+    # どれだけ覆われるかを 4×4 の点で数え、半分近く覆われていれば塗る（どの向きでも途切れない）
     a = angle * 2 * math.pi - math.pi / 2
-    for r in range(0, 4):
-        d.point((round(7.5 + r * math.cos(a)), round(7.5 + r * math.sin(a))), fill=(255, 120, 90, 255))
-        d.point((round(7.5 - r * math.cos(a) * 0.7), round(7.5 - r * math.sin(a) * 0.7)), fill=(220, 224, 230, 255))
-    d.point((7, 7), fill=(255, 255, 255, 255))
+    dx, dy = math.cos(a), math.sin(a)
+    px = im.load()
+
+    def coverage(x, y, length, width):
+        hit = 0
+        for sx in range(4):
+            for sy in range(4):
+                qx = x + (sx + 0.5) / 4 - 8
+                qy = y + (sy + 0.5) / 4 - 8
+                t = qx * dx + qy * dy                     # 針の向きに沿った位置
+                n = abs(-qx * dy + qy * dx)               # 針からの距離
+                if 0 <= t <= length and n <= width * (1 - 0.6 * t / length):
+                    hit += 1
+        return hit / 16
+
+    for y in range(3, 13):
+        for x in range(3, 13):
+            if coverage(x, y, 4.6, 0.75) >= 0.3:
+                px[x, y] = (255, 110, 80, 255)            # 北を指す赤い先
+    dx, dy = -dx, -dy
+    for y in range(3, 13):
+        for x in range(3, 13):
+            if px[x, y] != (255, 110, 80, 255) and coverage(x, y, 3.0, 0.6) >= 0.3:
+                px[x, y] = (210, 214, 222, 255)           # 反対側の白い尾
     return im
 
 
@@ -1435,7 +1464,153 @@ ITEM_ART = {
     'settings_card': lambda: settings_card(),
     'builder_wand': lambda: outlined(lambda d: (d.line([(3, 12), (10, 5)], fill=(150, 110, 70, 255), width=2),
                                                d.ellipse([10, 2, 13, 5], fill=(255, 120, 255, 255)))),
+    'scanner_module_2': lambda: module((60, 54, 90), (250, 200, 90)),
+    'scanner_module_3': lambda: module((40, 36, 60), (120, 230, 255)),
+    'magnetic_key': lambda: seal_key(1),
+    'quantum_key': lambda: seal_key(2),
+    'temporal_key': lambda: seal_key(3),
+    'singularity_key': lambda: seal_key(4),
+    'overclock_chip': lambda: overclock_chip(),
+    'gravity_boots': lambda: gravity_boots(),
+    'catalyst_stabilizer': lambda: catalyst_stabilizer(),
+    'dimensional_pocket': lambda: dimensional_pocket(),
+    'sealed_record': lambda: sealed_record(),
 }
+
+# ---------------------------------------------------------------- 封印コンテナと鍵
+
+# 封印の段階の色（鍵の芯・コンテナの継ぎ目の光）。Java の SealedContainerRenderer と同じ値
+SEAL_COLORS = {1: (110, 205, 238), 2: (190, 160, 255), 3: (250, 182, 84), 4: (255, 110, 150)}
+
+
+def seal_key(tier):
+    """封印コンテナの鍵: 白い持ち手と、段階の色に光る差し込み部（段が増えるほど歯が多い）。"""
+    im, d = new()
+    c = SEAL_COLORS[tier]
+    d.rounded_rectangle([1, 5, 7, 11], radius=2, fill=(232, 236, 240, 255), outline=(120, 126, 140, 255))
+    d.rectangle([3, 7, 5, 9], fill=rgba(c))
+    d.rectangle([7, 7, 14, 9], fill=(150, 156, 170, 255))
+    d.line([(8, 8), (14, 8)], fill=rgba(c))
+    for k in range(tier):
+        d.point((13 - k * 2, 10), fill=(120, 126, 140, 255))
+    d.point((2, 6), fill=(255, 255, 255, 255))
+    return im
+
+
+def overclock_chip():
+    """オーバークロック・チップ: 熱で赤く光るチップと放熱フィン。"""
+    im, d = new()
+    d.rectangle([3, 3, 12, 12], fill=(40, 40, 50, 255), outline=(120, 126, 140, 255))
+    for x in range(4, 12, 2):
+        d.line([(x, 1), (x, 2)], fill=(200, 180, 120, 255))
+        d.line([(x, 13), (x, 14)], fill=(200, 180, 120, 255))
+    d.rectangle([5, 5, 10, 10], fill=(255, 110, 60, 255))
+    d.rectangle([6, 6, 9, 9], fill=(255, 220, 120, 255))
+    d.point((7, 7), fill=(255, 255, 255, 255))
+    return im
+
+
+def gravity_boots():
+    """重力ブーツ: 白い装甲のブーツ。かかとに青く光る重力素子。"""
+    im, d = new()
+    d.polygon([(4, 2), (9, 2), (9, 10), (14, 11), (14, 14), (3, 14), (3, 9)], fill=(230, 234, 240, 255),
+              outline=(120, 126, 140, 255))
+    d.line([(4, 12), (13, 12)], fill=(70, 74, 84, 255))
+    d.line([(4, 6), (8, 6)], fill=(110, 205, 238, 255))
+    d.rectangle([3, 10, 5, 13], fill=(110, 205, 238, 255))
+    d.point((4, 11), fill=(255, 255, 255, 255))
+    return im
+
+
+def catalyst_stabilizer():
+    """触媒安定化剤: 金の口金の小瓶に、金色に光る液。"""
+    im, d = new()
+    d.rectangle([6, 1, 9, 3], fill=(220, 188, 108, 255))
+    d.ellipse([3, 4, 12, 14], fill=(230, 236, 244, 110), outline=(150, 160, 175, 255))
+    d.ellipse([4, 8, 11, 13], fill=(250, 200, 90, 255))
+    d.point((6, 9), fill=(255, 255, 220, 255))
+    d.point((5, 6), fill=(255, 255, 255, 220))
+    return im
+
+
+def dimensional_pocket():
+    """次元ポケット: 黒い小袋の口に、紫に渦巻く空間。"""
+    im, d = new()
+    d.polygon([(3, 5), (12, 5), (13, 14), (2, 14)], fill=(44, 40, 56, 255), outline=(120, 110, 150, 255))
+    d.rectangle([3, 3, 12, 5], fill=(220, 188, 108, 255))
+    d.ellipse([5, 7, 10, 12], fill=(20, 10, 30, 255), outline=(190, 140, 255, 255))
+    d.point((7, 9), fill=(255, 255, 255, 255))
+    d.point((9, 10), fill=(190, 140, 255, 255))
+    return im
+
+
+def sealed_record():
+    """封印記録: 黒い記録板に、桃色の封印の帯。"""
+    im = tablet((255, 110, 150))
+    d = ImageDraw.Draw(im)
+    d.line([(2, 8), (13, 8)], fill=(255, 110, 150, 255))
+    d.point((7, 8), fill=(255, 255, 255, 255))
+    return im
+
+
+def sealed_container_side(tier):
+    """封印コンテナの側面: 白いカプセルの外装と縦の継ぎ目。継ぎ目の芯は段階の色（描画で光らせる）。"""
+    c = SEAL_COLORS[tier]
+    im, d = new(fill=(230, 233, 237, 255))
+    d.rectangle([0, 0, 15, 15], outline=(196, 200, 206, 255))
+    d.line([(0, 2), (15, 2)], fill=(196, 200, 206, 255))
+    d.line([(0, 13), (15, 13)], fill=(196, 200, 206, 255))
+    for x in (3, 12):
+        d.line([(x, 3), (x, 12)], fill=(150, 156, 166, 255))
+    d.line([(7, 4), (7, 11)], fill=rgba(darken(c, 0.15)))
+    d.line([(8, 4), (8, 11)], fill=rgba(c))
+    for y in (5, 10):
+        d.point([(5, y), (10, y)], fill=(170, 176, 186, 255))
+    return weather_existing(im, seed=tier, strength=0.04)
+
+
+def sealed_container_base():
+    """封印コンテナの台座: 暗い金属の縁取り。"""
+    im, d = new(fill=(52, 56, 64, 255))
+    d.rectangle([0, 0, 15, 15], outline=(80, 86, 96, 255))
+    for x in range(1, 15, 3):
+        d.line([(x, 1), (x, 14)], fill=(44, 48, 55, 255))
+    return im
+
+
+def sealed_container_lid(tier):
+    """蓋の板（4枚で1つの蓋）: 白い板に、段階の色の筋と面取りの影。"""
+    c = SEAL_COLORS[tier]
+    im, d = new(fill=(236, 239, 243, 255))
+    d.rectangle([0, 0, 15, 15], outline=(190, 194, 200, 255))
+    d.line([(1, 14), (14, 14)], fill=(200, 204, 210, 255))
+    d.line([(2, 3), (13, 3)], fill=rgba(c))
+    d.rectangle([5, 7, 10, 10], fill=(200, 204, 212, 255), outline=(170, 176, 186, 255))
+    return im
+
+
+def sealed_container_inner():
+    """コンテナの内側: 冷えた暗い金属と、底の光る輪。"""
+    im, d = new(fill=(34, 38, 46, 255))
+    d.rectangle([0, 0, 15, 15], outline=(60, 66, 76, 255))
+    d.ellipse([3, 3, 12, 12], outline=(90, 150, 180, 255))
+    return im
+
+
+def gravity_boots_layer():
+    """重力ブーツを履いたときの絵（防具の1枚目、64×32）。ブーツは脚の下半分に描かれる。"""
+    from PIL import Image
+    im = Image.new('RGBA', (64, 32), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # 脚の展開図（u=0〜16, v=16〜32）。下側（足首から下）だけ塗る
+    d.rectangle([0, 22, 15, 31], fill=(230, 234, 240, 255))
+    d.rectangle([4, 16, 11, 19], fill=(230, 234, 240, 255))
+    d.line([(0, 22), (15, 22)], fill=(120, 126, 140, 255))
+    d.line([(0, 28), (15, 28)], fill=(70, 74, 84, 255))
+    for x in (1, 5, 9, 13):
+        d.point((x, 25), fill=(110, 205, 238, 255))
+    d.line([(0, 30), (15, 30)], fill=(110, 205, 238, 255))
+    return im
 
 
 def vessel(ring):
@@ -1496,10 +1671,139 @@ def permit_card():
     return im
 
 
+# ---------------------------------------------------------------- 動くアイテムの絵（縦に並べたコマ。gen_data.py が .mcmeta を付ける）
+
+def _glow_pt(d, x, y, c, a=255):
+    d.point((round(x), round(y)), fill=rgba(c, a))
+
+
+def anim_micro_black_hole(t):
+    """小型BH格納容器: 枠の中の黒い芯のまわりを、紫の降着円盤の光が回る。"""
+    im, d = new()
+    d.ellipse([3, 3, 12, 12], fill=(30, 18, 44, 255), outline=(150, 160, 175, 255))
+    # 円盤（傾いた楕円）の上を、明るい点が回る
+    d.ellipse([4, 7, 11, 9], outline=(120, 70, 170, 255))
+    for k in range(3):
+        a = (t + k / 3) * 2 * math.pi
+        x = 7.5 + 3.4 * math.cos(a)
+        y = 8 + 0.9 * math.sin(a)
+        _glow_pt(d, x, y, (230, 190, 255) if k == 0 else (190, 140, 255))
+    d.ellipse([6, 6, 9, 9], fill=(4, 2, 8, 255))
+    pulse = 0.5 + 0.5 * math.sin(t * 2 * math.pi)
+    d.point((8, 7), fill=rgba(mix((120, 80, 160), (255, 255, 255), pulse)))
+    for x in (2, 13):
+        d.line([(x, 4), (x, 11)], fill=(120, 126, 140, 255))
+    d.line([(4, 2), (11, 2)], fill=(120, 126, 140, 255))
+    d.line([(4, 13), (11, 13)], fill=(120, 126, 140, 255))
+    for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+        d.point((x, y), fill=(220, 188, 108, 255))
+    return im
+
+
+def anim_exotic_matter(t):
+    """エキゾチック物質: 紫の塊の中で渦がゆっくり回り、明るさが脈打つ。"""
+    pulse = 0.5 + 0.5 * math.sin(t * 2 * math.pi)
+    body = mix((60, 20, 80), (90, 34, 120), pulse * 0.6)
+
+    def f(d):
+        d.polygon([(8, 2), (13, 4), (13, 10), (10, 13), (4, 12), (3, 8), (4, 3)], fill=rgba(body))
+        for k in range(12):
+            a = k * 0.55 + t * 2 * math.pi
+            r = 0.5 + k * 0.4
+            c = mix((220, 160, 255), (255, 240, 255), pulse) if k > 8 else (220, 160, 255)
+            d.point((8 + r * math.cos(a), 8 + r * math.sin(a)), fill=rgba(c))
+    return outlined(f)
+
+
+def _anim_vial(t, liquid, glow, bubbles=True, sparkle=None):
+    """液の入った小瓶: 液面がゆれ、光る液なら泡が昇る。sparkle を与えると瓶の中に光の粒がまたたく。"""
+    wave = round(math.sin(t * 2 * math.pi))
+
+    def f(d):
+        d.rectangle([6, 2, 9, 3], fill=(150, 156, 164, 255))
+        d.polygon([(6, 4), (9, 4), (12, 13), (3, 13)], fill=(220, 236, 246, 120))
+        top = 8 + wave * 0.5
+        d.polygon([(5, top), (10, top - wave * 0.5), (12, 13), (3, 13)], fill=rgba(liquid))
+        if glow and bubbles:
+            for k in range(2):
+                y = 12 - ((t + k * 0.5) % 1.0) * 4
+                d.point((6 + k * 3, y), fill=(255, 255, 255, 255))
+        if sparkle:
+            for k in range(3):
+                ph = (t * 3 + k * 0.37) % 1.0
+                if ph < 0.35:
+                    d.point((5 + k * 2, 10 + (k % 2)), fill=rgba(sparkle))
+    return outlined(f)
+
+
+def anim_star_core(t):
+    """人工星核: 光の筋がまたたきながらゆっくり回り、芯が脈打つ。"""
+    pulse = 0.5 + 0.5 * math.sin(t * 2 * math.pi)
+
+    def f(d):
+        for k in range(8):
+            a = k * math.pi / 4 + t * math.pi / 2
+            r = (5 if k % 2 == 0 else 4) + (1 if (k + round(t * 8)) % 4 == 0 else 0)
+            d.line([(8, 8), (8 + r * math.cos(a), 8 + r * math.sin(a))], fill=rgba(mix((255, 180, 80), (255, 240, 200), pulse)))
+        d.ellipse([5, 5, 10, 10], fill=rgba(mix((255, 220, 120), (255, 250, 220), pulse)))
+        d.point((7, 6), fill=(255, 255, 255, 255))
+    return outlined(f)
+
+
+def anim_bomb(t):
+    """ブラックホール爆弾: 紫の筋が脈打ち、頭の信管が赤く点滅する。"""
+    pulse = 0.5 + 0.5 * math.sin(t * 2 * math.pi)
+    im, d = new()
+    d.ellipse([3, 4, 12, 13], fill=(30, 26, 40, 255), outline=(90, 80, 110, 255))
+    d.polygon([(7, 1), (9, 1), (9, 4), (7, 4)], fill=(150, 156, 170, 255))
+    d.line([(4, 8), (11, 8)], fill=rgba(mix((150, 90, 220), (230, 190, 255), pulse)))
+    d.line([(7, 5), (7, 12)], fill=rgba(mix((110, 60, 180), (200, 140, 255), pulse)))
+    d.point((6, 6), fill=(255, 255, 255, 255))
+    blink = (t * 2) % 1.0 < 0.5
+    d.point((10, 2), fill=(255, 90, 70, 255) if blink else (120, 60, 50, 255))
+    return im
+
+
+def anim_pocket(t):
+    """次元ポケット: 口の中の紫の空間が渦を巻く。"""
+    im, d = new()
+    d.polygon([(3, 5), (12, 5), (13, 14), (2, 14)], fill=(44, 40, 56, 255), outline=(120, 110, 150, 255))
+    d.rectangle([3, 3, 12, 5], fill=(220, 188, 108, 255))
+    d.ellipse([5, 7, 10, 12], fill=(20, 10, 30, 255), outline=(190, 140, 255, 255))
+    for k in range(3):
+        a = (t + k / 3) * 2 * math.pi
+        d.point((7.5 + 1.4 * math.cos(a), 9.5 + 1.4 * math.sin(a)), fill=(200, 160, 255, 255) if k else (255, 255, 255, 255))
+    return im
+
+
+# ID: (コマを描く関数（t は 0〜1）, コマ数, 1コマの tick 数)
+ANIMATED_ITEMS = {
+    'micro_black_hole': (anim_micro_black_hole, 12, 2),
+    'exotic_matter': (anim_exotic_matter, 12, 3),
+    'jet_condensate': (lambda t: _anim_vial(t, (120, 220, 255), True), 8, 3),
+    'hawking_condensate': (lambda t: _anim_vial(t, (255, 140, 80), True), 8, 3),
+    'anomaly_sample': (lambda t: _anim_vial(t, (60, 20, 80), True, bubbles=False, sparkle=(220, 160, 255)), 12, 3),
+    'degraded_anomaly_sample': (lambda t: _anim_vial(t, (90, 80, 100), False, sparkle=(150, 140, 160)), 12, 4),
+    'black_hole_bomb': (anim_bomb, 10, 2),
+    'artificial_star_core': (anim_star_core, 12, 2),
+    'dimensional_pocket': (anim_pocket, 12, 2),
+}
+
+
+def animated_item(iid):
+    """動くアイテムの絵（コマを縦に並べた1枚）と、1コマの tick 数。どのコマにも同じ汚しを入れる。"""
+    from PIL import Image
+    fn, frames, ticks = ANIMATED_ITEMS[iid]
+    sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
+    for k in range(frames):
+        sheet.paste(grain(fn(k / frames), seed=stable_hash(iid) % 1000), (0, k * S))
+    return sheet, ticks
+
+
 def item_texture(iid, stage):
     fn = ITEM_ART.get(iid)
     im = fn() if fn is not None else module((220, 224, 230), TIERS[stage]['glow'])
-    return grain(im, seed=hash(iid) % 1000)
+    return grain(im, seed=stable_hash(iid) % 1000)
 
 
 # ---------------------------------------------------------------- ケーブル

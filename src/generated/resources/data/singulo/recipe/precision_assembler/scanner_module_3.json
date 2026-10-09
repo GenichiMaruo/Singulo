@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 300,
+  "energy": 200000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:scanner_module_2"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:gravity_field_stabilizer"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_matter_shell"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:scanner_module_3",
+    "count": 1
+  }
+}

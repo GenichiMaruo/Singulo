@@ -3,7 +3,7 @@
   "biomes": "#singulo:has_structure/culture_facility",
   "step": "underground_structures",
   "spawn_overrides": {},
-  "terrain_adaptation": "none",
+  "terrain_adaptation": "encapsulate",
   "start_pool": "singulo:ruins/culture_facility",
   "size": 1,
   "max_distance_from_center": 80,
@@ -11,10 +11,10 @@
   "start_height": {
     "type": "minecraft:uniform",
     "min_inclusive": {
-      "absolute": -48
+      "absolute": -46
     },
     "max_inclusive": {
-      "absolute": -24
+      "absolute": -30
     }
   }
 }

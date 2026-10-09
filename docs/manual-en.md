@@ -43,9 +43,9 @@ These stages describe the material and technology progression. Unlocking an adva
 
 ## Power, logistics and catalysts
 
-Energy is measured in FE. Upgrade from Copper Wire to Superconducting Cable, Topological Wire and the Horizon Bus as your factory grows. Copper loses energy, and the weakest cable limits a connected network's capacity.
+Energy is measured in FE. Upgrade from Copper Wire to Superconducting Cable, Topological Wire and the Horizon Bus as your factory grows. Copper loses energy, and the weakest cable limits a connected network's capacity. The Horizon Bus has no limit: between Singulo devices it can move more than about 2.1 billion FE per tick (other mods' devices still accept up to about 2.1 billion FE/t each). Only cables that are actually carrying power glow, with a gentle wave running in the direction of flow; the brightness follows the amount of power.
 
-Ordinary processing machines have a Sides screen for face-specific input, output and auto-ejection. Multiblocks use shared Multiblock I/O Ports; the Penrose reactor uses its own Extraction Ports. Singulo's cables carry energy, not items or fluids.
+Ordinary processing machines have a Sides screen for face-specific input, output and auto-ejection. Machines that output two gases, such as the Electrolyzer, let you choose the output faces for each gas. The power button on the right of the screen stops a machine, and machines that can make something from power alone, such as liquid nitrogen in the cooling tower, have a switch to skip those recipes. Multiblocks use shared Multiblock I/O Ports; the Penrose reactor uses its own Extraction Ports. Singulo's cables carry energy, not items or fluids.
 
 Catalysts are consumables placed in dedicated slots. The progression is Muon Catalyst, BE Condensate Catalyst, Time Crystal Catalyst, then Singularity Core. Matching tiers give normal operation. One tier below gives half speed and twice the wear; two or more below cannot run the machine. Higher tiers provide speed and wear bonuses. Depleted catalysts increase power requirements, and insufficient power can affect catalyst wear or product quality.
 
@@ -78,7 +78,9 @@ The outer dimensions are only a starting point. Frames, windows, internal compon
 | Culture Facility | Culture Data and degraded Time Crystal Seeds for temporal technology and exotic matter |
 | Final Lab | Anomaly Samples and the initial Dormant Singularity Seed, guarded by the Horizon Warden |
 
-The Explorer Compass cycles between ruin types. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts and Research Buildings, or fourteen for Culture Facilities and Final Labs.
+Only the Observation Post stands on the surface; the Research Building is buried shallow underground, the Culture Facility deep underground and the Final Lab deepest of all. The Explorer Compass starts out finding only Observation Posts. Sneak-use it on the cache of a ruin you have cleared (opened yourself) to tune it for the next ruin; sneak-use it in the air to switch between the ruins it can find. Operators can place a ruin with `/singulo ruin <ruin> [pos]`. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts and Research Buildings, or fourteen for Culture Facilities and Final Labs.
+
+Every ruin hides a **sealed container** that opens only with the key of the next stage (magnetic, quantum, temporal, then singularity). Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: the Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. Once you reach a stage you can craft its container yourself, and sneak-use a key on it to seal it.
 
 A Probe Station only visits ruins a player has discovered by opening their caches. With default settings, the stage 4 station automates Observation Posts. Culture Facilities and Final Labs always require manual exploration. Decode Record Fragments in the Archive Terminal and read the decoded items to add ancient stories to your handbook.
 

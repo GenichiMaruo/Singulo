@@ -46,7 +46,7 @@ public class SettingsCardItem extends SinguloItem {
             tag.putString("kind", kind);
             if (be instanceof MachineBlockEntity m) {
                 tag.putInt("item_sides", m.itemSides().packed());
-                tag.putInt("fluid_sides", m.fluidSides().packed());
+                tag.putIntArray("tank_sides", m.tankSidesPacked());
             } else if (be instanceof PenroseReactorBlockEntity r) {
                 tag.putInt("spin_target", r.spinTargetIndex());
                 tag.putInt("feed_interval", r.feedInterval());
@@ -66,7 +66,7 @@ public class SettingsCardItem extends SinguloItem {
             return InteractionResult.FAIL;
         }
         if (be instanceof MachineBlockEntity m) {
-            m.pasteSides(tag.getInt("item_sides"), tag.getInt("fluid_sides"));
+            m.pasteSides(tag.getInt("item_sides"), tag.getIntArray("tank_sides"));
         } else if (be instanceof PenroseReactorBlockEntity r) {
             r.setSpinTargetIndex(tag.getInt("spin_target"));
             r.setFeedInterval(tag.getInt("feed_interval"));
