@@ -60,7 +60,7 @@ public class WardenSingularity extends Entity {
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 6, RADIUS / 2, 0.6, RADIUS / 2, 0.02);
         }
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(RADIUS),
-                e -> e != owner && e.isAlive() && !(e instanceof HorizonWarden))) {
+                e -> e != owner && e.isAlive() && !RuinGuards.isGuard(e))) {
             Vec3 toCenter = c.subtract(e.position());
             if (toCenter.lengthSqr() > RADIUS * RADIUS) {
                 continue;

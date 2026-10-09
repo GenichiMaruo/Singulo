@@ -121,6 +121,10 @@ public class HorizonWarden extends Monster {
     static final double REFLECT_RANGE = 3.0;
     public static final double REFLECT_SPEED = 1.5;
     static final double REFLECT_MIN_SPEED = 1.6;
+    /** ブラックホール爆弾を見張る範囲と、打ち返したあと開いてもよい自分からの距離（小型ブラックホールの引力が届かない所）。 */
+    static final double BOMB_WATCH_RANGE = 16;
+    public static final double BOMB_SAFE_DISTANCE = 13;
+    static final double BOMB_RETURN_SPEED = 1.9;
     public static final double REFLECT_ARROW_DAMAGE = 1.6;
 
     /** 技。 */
@@ -295,6 +299,7 @@ public class HorizonWarden extends Monster {
         if (busy()) {
             getNavigation().stop();
         }
+        deflectBombs(level);
         if (phase() >= 2) {
             reflectProjectiles(level);
         }
@@ -504,7 +509,7 @@ public class HorizonWarden extends Monster {
         Vec3 c = position();
         double cos = Math.cos(Math.toRadians(SWEEP_ARC / 2));
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(SWEEP_RANGE, 2, SWEEP_RANGE),
-                e -> e != this && e.isAlive() && !(e instanceof HorizonWarden))) {
+                e -> e != this && e.isAlive() && !RuinGuards.isGuard(e))) {
             Vec3 to = new Vec3(e.getX() - c.x, 0, e.getZ() - c.z);
             double d = to.length();
             if (d > SWEEP_RANGE + e.getBbWidth() / 2 || (d > 0.5 && to.normalize().dot(forward) < cos)) {
@@ -561,7 +566,7 @@ public class HorizonWarden extends Monster {
         getLookControl().setLookAt(end);
         if (l % LASER_HIT_INTERVAL == 0) {
             AABB box = new AABB(from, end).inflate(0.6);
-            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive())) {
+            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive() && !RuinGuards.isGuard(e))) {
                 if (!e.getBoundingBox().inflate(0.2).clip(from, end).isEmpty()) {
                     e.hurt(damageSources().indirectMagic(this, this), LASER_DAMAGE);
                 }
@@ -678,7 +683,7 @@ public class HorizonWarden extends Monster {
             }
         }
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(r + 1, 2, r + 1),
-                e -> e != this && e.isAlive() && !shockHit.contains(e.getId()))) {
+                e -> e != this && e.isAlive() && !RuinGuards.isGuard(e) && !shockHit.contains(e.getId()))) {
             double d = Math.sqrt(Mth.square(e.getX() - c.x) + Mth.square(e.getZ() - c.z));
             // 輪の縁にいて、地面に足がついている相手だけ（跳べばよけられる）
             if (Math.abs(d - r) > 0.9 || !e.onGround() || e.getY() > c.y + 1.5) {
@@ -747,7 +752,7 @@ public class HorizonWarden extends Monster {
         playSound(SoundEvents.WARDEN_SONIC_BOOM, 3.0F, 0.5F);
         Vec3 dir = end.subtract(from).normalize();
         AABB box = new AABB(from, end).inflate(1.0);
-        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive())) {
+        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive() && !RuinGuards.isGuard(e))) {
             if (e.getBoundingBox().inflate(0.4).clip(from, end).isEmpty()) {
                 continue;
             }
@@ -763,6 +768,19 @@ public class HorizonWarden extends Monster {
     }
 
     // ------------------------------------------------------------------ 飛び道具を跳ね返す（フェーズ2以降）
+
+    @Override
+    public boolean isAlliedTo(Entity other) {
+        return RuinGuards.isGuard(other) || super.isAlliedTo(other);
+    }
+
+    @Override
+    public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (RuinGuards.friendlyFire(source)) {
+            return false;
+        }
+        return super.hurt(source, amount);
+    }
 
     /** 跳ね返さない飛び道具（自分やドローンの光弾、すでに自分が跳ね返したもの）。 */
     private boolean ownProjectile(net.minecraft.world.entity.projectile.Projectile p) {
@@ -814,9 +832,60 @@ public class HorizonWarden extends Monster {
         playSound(SoundEvents.BREEZE_DEFLECT, 1.5F, 0.8F);
     }
 
-    /** 速すぎて見張りをすり抜けた飛び道具も、当たる瞬間に打ち返す（フェーズ2以降）。 */
+    // ------------------------------------------------------------------ ブラックホール爆弾を打ち返す（どのフェーズでも）
+
+    /**
+     * 近づいてくるブラックホール爆弾を、届く前に打ち返す。開いても自分が引き込まれない所（BOMB_SAFE_DISTANCE より遠く）へ飛ばす。
+     * 投げた相手が十分に遠ければその相手へ、近ければ相手の向こうへ高く放る。すでに開いたブラックホールには何もできない。
+     */
+    private void deflectBombs(ServerLevel level) {
+        for (io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb : level.getEntitiesOfClass(
+                io.github.genichimaruo.singulo.reactor.BlackHoleBomb.class, getBoundingBox().inflate(BOMB_WATCH_RANGE),
+                b -> b.isAlive() && !b.deflectedBy(this))) {
+            Vec3 toMe = getBoundingBox().getCenter().subtract(bomb.position());
+            if (bomb.getDeltaMovement().dot(toMe) <= 0 && toMe.lengthSqr() > BOMB_SAFE_DISTANCE * BOMB_SAFE_DISTANCE) {
+                continue;            // 離れていく爆弾は放っておく
+            }
+            deflectBomb(level, bomb);
+        }
+    }
+
+    private void deflectBomb(ServerLevel level, io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb) {
+        Entity shooter = bomb.getOwner();
+        Vec3 c = getBoundingBox().getCenter();
+        Vec3 v;
+        if (shooter != null && shooter.isAlive() && shooter.distanceTo(this) > BOMB_SAFE_DISTANCE + 2) {
+            v = shooter.getEyePosition().subtract(bomb.position()).normalize().scale(BOMB_RETURN_SPEED).add(0, 0.15, 0);
+        } else {
+            Vec3 away = new Vec3(bomb.getX() - c.x, 0, bomb.getZ() - c.z);
+            if (away.lengthSqr() < 1e-4) {
+                away = Vec3.directionFromRotation(0, yBodyRot);
+            }
+            v = away.normalize().scale(BOMB_RETURN_SPEED).add(0, 0.6, 0);
+        }
+        Vec3 dir = v;
+        bomb.deflect((proj, by, rnd) -> {
+            proj.setDeltaMovement(dir);
+            proj.hasImpulse = true;
+            proj.hurtMarked = true;
+        }, this, this, false);
+        bomb.markDeflected(this);
+        swing(InteractionHand.MAIN_HAND);
+        level.sendParticles(ParticleTypes.SONIC_BOOM, bomb.getX(), bomb.getY(), bomb.getZ(), 1, 0, 0, 0, 0);
+        level.sendParticles(ParticleTypes.END_ROD, bomb.getX(), bomb.getY(), bomb.getZ(), 12, 0.2, 0.2, 0.2, 0.25);
+        playSound(SoundEvents.BREEZE_DEFLECT, 2.0F, 0.6F);
+        playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 2.0F, 0.5F);
+    }
+
+    /** 速すぎて見張りをすり抜けた飛び道具も、当たる瞬間に打ち返す（フェーズ2以降。ブラックホール爆弾はいつでも）。 */
     @Override
     public net.minecraft.world.entity.projectile.ProjectileDeflection deflection(net.minecraft.world.entity.projectile.Projectile p) {
+        if (p instanceof io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb && !bomb.deflectedBy(this)
+                && level() instanceof ServerLevel server) {
+            deflectBomb(server, bomb);
+            return (proj, by, rnd) -> {
+            };
+        }
         if (phase() < 2 || ownProjectile(p) || !(level() instanceof ServerLevel level)) {
             return super.deflection(p);
         }

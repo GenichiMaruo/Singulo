@@ -122,6 +122,19 @@ public class SecurityDrone extends Monster {
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
+    @Override
+    public boolean isAlliedTo(net.minecraft.world.entity.Entity other) {
+        return RuinGuards.isGuard(other) || super.isAlliedTo(other);
+    }
+
+    @Override
+    public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (RuinGuards.friendlyFire(source)) {
+            return false;
+        }
+        return super.hurt(source, amount);
+    }
+
     /** 光弾を1発撃つ（段階3は追尾）。 */
     void shoot(LivingEntity target) {
         int t = tier() - 1;
