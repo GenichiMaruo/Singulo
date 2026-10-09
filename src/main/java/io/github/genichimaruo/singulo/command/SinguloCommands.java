@@ -23,6 +23,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 /**
  * /singulo build &lt;マルチブロック&gt; [大きさ] — クリエイティブ用。見ている向きの数ブロック先に、マルチブロックを一発で組み立てる。
  * /singulo blackhole [位置] [質量] — 野良ブラックホールを出す（消すには /setblock で空気にする）。
+ * /singulo ruin &lt;遺構&gt; [位置] — 遺構をその場に建てる（床の中心が位置。省くと足もと）。保管庫や警備機も入る。
  * コントローラが手前、形が奥に伸びる（ホロ投影機と同じ向き）。権限レベル2（オペレーター）が要る。
  */
 public final class SinguloCommands {
@@ -48,7 +49,54 @@ public final class SinguloCommands {
                                         DEFAULT_BLACK_HOLE_MASS))
                                 .then(Commands.argument("mass", com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(100, 20000))
                                         .executes(c -> blackHole(c, net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(c, "pos"),
-                                                com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c, "mass")))))));
+                                                com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c, "mass"))))))
+                .then(Commands.literal("ruin").requires(s -> s.hasPermission(2))
+                        .then(Commands.argument("ruin", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(RUINS, b))
+                                .executes(c -> ruin(c, null))
+                                .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
+                                        .executes(c -> ruin(c, net.minecraft.commands.arguments.coordinates.BlockPosArgument
+                                                .getLoadedBlockPos(c, "pos")))))));
+    }
+
+    /** 建てられる遺構。 */
+    static final java.util.List<String> RUINS = java.util.List.of(
+            io.github.genichimaruo.singulo.item.ExplorerCompassItem.TARGETS);
+
+    /** /singulo ruin &lt;遺構&gt; [位置] */
+    private static int ruin(CommandContext<CommandSourceStack> c, BlockPos pos) throws CommandSyntaxException {
+        String id = StringArgumentType.getString(c, "ruin");
+        if (!RUINS.contains(id)) {
+            c.getSource().sendFailure(Component.translatable("command.singulo.ruin.unknown", id));
+            return 0;
+        }
+        if (pos == null) {
+            pos = BlockPos.containing(c.getSource().getPosition());
+        }
+        net.minecraft.core.Vec3i size = placeRuin(c.getSource().getLevel(), id, pos);
+        if (size == null) {
+            c.getSource().sendFailure(Component.translatable("command.singulo.ruin.unknown", id));
+            return 0;
+        }
+        BlockPos at = pos;
+        c.getSource().sendSuccess(() -> Component.translatable("command.singulo.ruin.done",
+                Component.translatable("ruin.singulo." + id), at.getX(), at.getY(), at.getZ()), true);
+        return 1;
+    }
+
+    /** 遺構の構造物を、床の中心が center に来るように置く。置いた大きさを返す（構造物がなければ null）。 */
+    @javax.annotation.Nullable
+    public static net.minecraft.core.Vec3i placeRuin(ServerLevel level, String id, BlockPos center) {
+        var template = level.getStructureManager().get(io.github.genichimaruo.singulo.Singulo.id("ruins/" + id));
+        if (template.isEmpty()) {
+            return null;
+        }
+        net.minecraft.core.Vec3i size = template.get().getSize();
+        BlockPos origin = center.offset(-size.getX() / 2, 0, -size.getZ() / 2);
+        template.get().placeInWorld(level, origin, origin,
+                new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings(), level.getRandom(),
+                Block.UPDATE_CLIENTS);
+        return size;
     }
 
     private static int build(CommandContext<CommandSourceStack> c, int size) throws CommandSyntaxException {

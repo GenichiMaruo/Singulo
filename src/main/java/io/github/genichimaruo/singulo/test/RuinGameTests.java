@@ -150,4 +150,48 @@ public final class RuinGameTests {
         }
         helper.succeed();
     }
+
+    /** /singulo ruin と同じ置き方で、遺構を丸ごと建てられる（保管庫に遺構IDが入る）。 */
+    @GameTest(template = EMPTY)
+    public static void ruinCommandPlacesRuin(GameTestHelper helper) {
+        BlockPos center = helper.absolutePos(new BlockPos(4, 1, 4));
+        net.minecraft.core.Vec3i size = io.github.genichimaruo.singulo.command.SinguloCommands.placeRuin(
+                helper.getLevel(), "observation_post", center);
+        helper.assertTrue(size != null, "遺構の構造物が見つからない");
+        boolean found = false;
+        BlockPos origin = center.offset(-size.getX() / 2, 0, -size.getZ() / 2);
+        for (BlockPos p : BlockPos.betweenClosed(origin, origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1))) {
+            if (helper.getLevel().getBlockEntity(p) instanceof RuinCacheBlockEntity cache && "observation_post".equals(cache.ruin())) {
+                found = true;
+            }
+        }
+        helper.assertTrue(found, "建てた遺構に保管庫がない");
+        helper.succeed();
+    }
+
+    /** 探索コンパスは、攻略した遺構の保管庫で調整するまで、次の遺構を探せない。 */
+    @GameTest(template = EMPTY)
+    public static void compassUnlocksNextRuinOnlyAfterClearing(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
+        RuinCacheBlockEntity cache = helper.getBlockEntity(pos);
+        cache.setRuin("observation_post");
+        var player = helper.makeMockServerPlayerInLevel();
+        player.setShiftKeyDown(true);
+        net.minecraft.world.item.ItemStack compass = new net.minecraft.world.item.ItemStack(
+                io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get());
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, compass);
+        helper.assertTrue(io.github.genichimaruo.singulo.item.ExplorerCompassItem.level(compass) == 1, "はじめから次の遺構を探せる");
+        var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(helper.absolutePos(pos)),
+                net.minecraft.core.Direction.UP, helper.absolutePos(pos), false);
+        compass.useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+        helper.assertTrue(io.github.genichimaruo.singulo.item.ExplorerCompassItem.level(compass) == 1, "攻略していないのに調整できた");
+        io.github.genichimaruo.singulo.ruin.RuinDiscovery.record(player, "observation_post", helper.absolutePos(pos));
+        compass.useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+        helper.assertTrue(io.github.genichimaruo.singulo.item.ExplorerCompassItem.level(compass) == 2, "攻略したのに調整できない");
+        helper.assertTrue(io.github.genichimaruo.singulo.item.ExplorerCompassItem.TARGETS[
+                io.github.genichimaruo.singulo.item.ExplorerCompassItem.target(compass)].equals("research_building"),
+                "調整したら次の遺構を探す向きにならない");
+        helper.succeed();
+    }
 }

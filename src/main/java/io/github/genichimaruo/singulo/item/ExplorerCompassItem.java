@@ -28,8 +28,10 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 
 /**
  * 探索コンパス（段階1）。探す遺構を選んで右クリックすると、いちばん近いその遺構を探し、針がそちらを向く（距離も出る）。
- * スニークして右クリックすると探す遺構（地表観測拠点・研究棟・封鎖培養施設・最終実験施設）が切り替わる。
- * 探すのは少し重いので、使ったあとは数秒待つ。
+ * スニークして右クリックすると探す遺構が切り替わる。探すのは少し重いので、使ったあとは数秒待つ。
+ * <p>
+ * はじめは地表観測拠点しか探せない。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして右クリックすると、
+ * そこに残る記録でコンパスを調整し、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設）も探せるようになる。
  */
 public class ExplorerCompassItem extends SinguloItem {
     public static final String[] TARGETS = {"observation_post", "research_building", "culture_facility", "final_lab"};
@@ -39,8 +41,67 @@ public class ExplorerCompassItem extends SinguloItem {
         super(properties.stacksTo(1), stage, false);
     }
 
+    /** 探せる遺構の数（1〜4）。TARGETS の先頭からこの数だけ。 */
+    public static int level(ItemStack stack) {
+        return Math.max(1, Math.min(TARGETS.length, stack.getOrDefault(SinguloComponents.COMPASS_LEVEL.get(), 1)));
+    }
+
     public static int target(ItemStack stack) {
-        return Math.floorMod(stack.getOrDefault(SinguloComponents.HOLO_SIZE.get(), 0), TARGETS.length);
+        return Math.floorMod(stack.getOrDefault(SinguloComponents.HOLO_SIZE.get(), 0), level(stack));
+    }
+
+    /**
+     * コンパスの調整: 攻略した遺構の保管庫をスニークして右クリックする。調整できるのは、いま探せるいちばん奥の遺構の
+     * 保管庫で、その遺構の保管庫を自分で開けたことがある（RuinDiscovery）ときだけ。
+     */
+    @Override
+    public net.minecraft.world.InteractionResult useOn(net.minecraft.world.item.context.UseOnContext context) {
+        Player player = context.getPlayer();
+        Level level = context.getLevel();
+        if (player == null || !player.isSecondaryUseActive()
+                || !(level.getBlockEntity(context.getClickedPos()) instanceof io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity cache)) {
+            return net.minecraft.world.InteractionResult.PASS;
+        }
+        if (level.isClientSide) {
+            return net.minecraft.world.InteractionResult.SUCCESS;
+        }
+        ItemStack stack = context.getItemInHand();
+        int lv = level(stack);
+        if (lv >= TARGETS.length) {
+            player.displayClientMessage(Component.translatable("compass.singulo.max"), true);
+            return net.minecraft.world.InteractionResult.FAIL;
+        }
+        String deepest = TARGETS[lv - 1];
+        Component deepestName = Component.translatable("ruin.singulo." + deepest);
+        if (!deepest.equals(cache.ruin())) {
+            player.displayClientMessage(Component.translatable("compass.singulo.wrong_cache", deepestName), true);
+            return net.minecraft.world.InteractionResult.FAIL;
+        }
+        boolean cleared = io.github.genichimaruo.singulo.ruin.RuinDiscovery.discovered(player).stream()
+                .anyMatch(d -> d.ruin().equals(deepest));
+        if (!cleared) {
+            player.displayClientMessage(Component.translatable("compass.singulo.not_cleared", deepestName), true);
+            return net.minecraft.world.InteractionResult.FAIL;
+        }
+        upgrade(stack);
+        player.displayClientMessage(Component.translatable("compass.singulo.upgraded",
+                Component.translatable("ruin.singulo." + TARGETS[lv])), true);
+        level.playSound(null, context.getClickedPos(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 0.7F);
+        level.playSound(null, context.getClickedPos(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 1.2F);
+        if (level instanceof ServerLevel server) {
+            BlockPos p = context.getClickedPos();
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT, p.getX() + 0.5, p.getY() + 1.2, p.getZ() + 0.5,
+                    30, 0.4, 0.4, 0.4, 0.6);
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
+    }
+
+    /** 調整段階を1つ上げ、新しく探せるようになった遺構を選ぶ。 */
+    public static void upgrade(ItemStack stack) {
+        int lv = Math.min(TARGETS.length, level(stack) + 1);
+        stack.set(SinguloComponents.COMPASS_LEVEL.get(), lv);
+        stack.set(SinguloComponents.HOLO_SIZE.get(), lv - 1);
+        stack.remove(DataComponents.LODESTONE_TRACKER);
     }
 
     /** 今の針の向き先（なければ null）。クライアントの針の角度にも使う。 */
@@ -94,5 +155,11 @@ public class ExplorerCompassItem extends SinguloItem {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("compass.singulo.target", Component.translatable("ruin.singulo." + TARGETS[target(stack)]))
                 .withStyle(ChatFormatting.GRAY));
+        int lv = level(stack);
+        tooltip.add(Component.translatable("compass.singulo.level", lv, TARGETS.length).withStyle(ChatFormatting.GRAY));
+        if (lv < TARGETS.length) {
+            tooltip.add(Component.translatable("compass.singulo.hint",
+                    Component.translatable("ruin.singulo." + TARGETS[lv - 1])).withStyle(ChatFormatting.DARK_GRAY));
+        }
     }
 }

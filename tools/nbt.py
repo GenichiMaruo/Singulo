@@ -52,4 +52,5 @@ def _payload(v):
 def write_gzip(path, root):
     data = bytes([COMPOUND]) + _name('') + _payload(root)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(gzip.compress(data))
+    # 時刻を入れない（入れると生成のたびに中身が変わる）
+    path.write_bytes(gzip.compress(data, mtime=0))
