@@ -1,12 +1,15 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
+issueTrackerURL="https://github.com/GenichiMaruo/Singulo/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
+displayURL="https://github.com/GenichiMaruo/Singulo"
+logoFile="singulo_logo.png"
 description='''
 Recover the lost catalytic engineering of a vanished civilization and finish its rotating black hole power plant.
 '''
