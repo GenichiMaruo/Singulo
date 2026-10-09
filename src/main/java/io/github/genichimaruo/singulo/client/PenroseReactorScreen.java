@@ -25,17 +25,78 @@ public class PenroseReactorScreen extends AbstractContainerScreen<PenroseReactor
         inventoryLabelY = PenroseReactorMenu.INV_Y - 11;
     }
 
+    /** 入力スロットに入れる物（空のときにグレーの影を描く）。 */
+    private static final String[] SLOT_ITEMS = {"singularity_seed", "mass_pellet", "jet_collector", "hawking_collector", "ergosphere_ring"};
+    private static final int INTERVAL_Y = 124;
+    private net.minecraft.client.gui.components.EditBox interval;
+
+    @Override
+    protected void init() {
+        super.init();
+        interval = new net.minecraft.client.gui.components.EditBox(font, leftPos + 112, topPos + INTERVAL_Y - 2, 40, 12,
+                Component.translatable("gui.singulo.reactor.interval"));
+        interval.setMaxLength(4);
+        interval.setFilter(t -> t.isEmpty() || t.chars().allMatch(Character::isDigit));
+        interval.setValue(Integer.toString(menu.value(PenroseReactorBlockEntity.D_INTERVAL)));
+        interval.setResponder(t -> {
+            if (!t.isEmpty() && minecraft != null && minecraft.gameMode != null) {
+                int v = Math.min(PenroseReactorBlockEntity.MAX_FEED_INTERVAL, Integer.parseInt(t));
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, PenroseReactorMenu.BUTTON_INTERVAL + v);
+            }
+        });
+        addRenderableWidget(interval);
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        // 入力していない間は、装置の値に合わせる
+        if (interval != null && !interval.isFocused()) {
+            String v = Integer.toString(menu.value(PenroseReactorBlockEntity.D_INTERVAL));
+            if (!v.equals(interval.getValue())) {
+                interval.setValue(v);
+            }
+        }
+    }
+
+    @Override
+    public boolean keyPressed(int key, int scan, int modifiers) {
+        // 入力中は E などで画面が閉じないように
+        if (interval != null && interval.isFocused() && key != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
+            return interval.keyPressed(key, scan, modifiers) || interval.canConsumeInput();
+        }
+        return super.keyPressed(key, scan, modifiers);
+    }
+
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        if (menu.getCarried().isEmpty()) {
+            for (int i = 0; i < PenroseReactorMenu.SLOT_POS.length; i++) {
+                int[] p = PenroseReactorMenu.SLOT_POS[i];
+                if (!menu.getSlot(i).hasItem() && Panel.inside(mouseX, mouseY, leftPos + p[0], topPos + p[1], 16, 16)) {
+                    int k = Math.min(i, PenroseReactorBlockEntity.SLOT_OUT);
+                    g.renderTooltip(font, Component.translatable("gui.singulo.reactor.slot." + k), mouseX, mouseY);
+                    return;
+                }
+            }
+        }
+        if (Panel.inside(mouseX, mouseY, leftPos + TEXT_X, topPos + INTERVAL_Y - 2, 100, 12)) {
+            g.renderTooltip(font, Component.translatable("gui.singulo.reactor.interval.hint"), mouseX, mouseY);
+            return;
+        }
         renderTooltip(g, mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         Panel.background(g, leftPos, topPos, imageWidth, imageHeight);
-        for (int[] p : PenroseReactorMenu.SLOT_POS) {
+        for (int i = 0; i < PenroseReactorMenu.SLOT_POS.length; i++) {
+            int[] p = PenroseReactorMenu.SLOT_POS[i];
             Panel.slot(g, leftPos + p[0], topPos + p[1]);
+            if (i < SLOT_ITEMS.length && !menu.getSlot(i).hasItem()) {
+                Panel.ghost(g, leftPos + p[0], topPos + p[1], SLOT_ITEMS[i]);
+            }
         }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -67,6 +128,8 @@ public class PenroseReactorScreen extends AbstractContainerScreen<PenroseReactor
         Component ignite = Component.translatable("gui.singulo.reactor.ignite");
         Component spin = Component.translatable("gui.singulo.reactor.spin_target");
         g.drawString(font, ignite, IGNITE_X + (BUTTON_W - font.width(ignite)) / 2, BUTTON_Y + 3, 0xFFFFFFFF, false);
+        g.drawString(font, Component.translatable("gui.singulo.reactor.interval"), TEXT_X, INTERVAL_Y, Panel.TEXT, false);
+        g.drawString(font, Component.literal("tick"), 156, INTERVAL_Y, Panel.TEXT, false);
         g.drawString(font, spin, SPIN_X + (BUTTON_W - font.width(spin)) / 2, BUTTON_Y + 3, 0xFFFFFFFF, false);
     }
 

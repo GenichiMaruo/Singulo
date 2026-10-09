@@ -68,15 +68,30 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public static final double MAX_MASS = 5000;
     public static final double BURST_MASS = 100;
     public static final double PELLET_MASS = 16;
-    public static final double GROWTH_FRACTION = 0.1;
+    /** 投入したペレットの質量のうち、炉心質量になる割合（質量500→5000 は全力投入で約10分）。 */
+    public static final double GROWTH_FRACTION = 0.25;
     public static final double EVAPORATION_PER_SECOND = 0.006;
     public static final double MIN_INJECTION = 0.03;
     public static final long BUFFER_CAPACITY = 40_000_000_000L;
-    public static final long SPIN_POWER = 100_000_000L;
+    public static final long SPIN_POWER = 200_000_000L;
     /** スピンを 1 上げるのに要る電力 = SPIN_ENERGY × 炉心質量（FE）。質量5000・100 MFE/t で約5分。 */
     public static final double SPIN_ENERGY = 1.2e8;
     public static final double[] SPIN_TARGETS = {0.0, 0.5, 0.9, 0.99, 1.0};
     static final int CHECK_INTERVAL = 40;
+    /** ペレットの投入間隔の上限（tick）。0 は自動（負荷追従）。 */
+    public static final int MAX_FEED_INTERVAL = 1200;
+    /** モブ・アイテムを飲み込んだときの質量（低め）。モブは最大体力あたり、アイテムは質量値あたり。 */
+    public static final double MOB_MASS_PER_HEALTH = 0.05;
+    public static final double ITEM_MASS_RATE = 0.02;
+    /** 炉心質量が上限をこれだけ超えると、炉が耐えきれずに崩壊する（ペレットでは上限を超えないので、起きるのは物を投げ込んだときだけ）。 */
+    public static final double COLLAPSE_MARGIN = 200;
+    /** 崩壊の長さと、まわりを巻き込む半径（炉心の中心から）。 */
+    public static final int COLLAPSE_TICKS = 160;
+    public static final int COLLAPSE_SPREAD = 120;
+    public static final int COLLAPSE_RADIUS = 9;
+    public static final int COLLAPSE_MAX_BLOCKS = 700;
+    /** ペレットを飲み込んだ合図（描画用）。 */
+    static final int EVENT_PELLETS = 1;
     static final int JET_TICKS = 1200;
     static final int HAWKING_TICKS = 6000;
     static final int ERGO_TICKS = 1200;
@@ -145,6 +160,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     private long buffer;
     private long ignitionStored;
     private int ignitionTicks;
+    /** 点火を始めてからの tick と、点火の電力が満ちたか。 */
+    private int ignitionElapsed;
+    private boolean ignitionCharged;
+    /** 点火の演出の長さ（16秒）。最後の IGNITION_SOUND_TICKS（点火の音の長さ、10秒）のあいだ点火の音が鳴り、鳴り終わる瞬間に炉心ができる。 */
+    public static final int IGNITION_SEQUENCE_TICKS = 320;
+    public static final int IGNITION_SOUND_TICKS = 200;
     private double pelletCarry;
     private int jetTimer;
     private int hawkingTimer;
@@ -154,6 +175,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Nullable
     private BlockPos center;
     private List<BlockPos> ports = List.of();
+    /** 炉心質量警報器の位置。 */
+    private List<BlockPos> alarms = List.of();
     private boolean formed;
     private boolean firstCheck = true;
     private boolean ignitedBefore;
@@ -214,6 +237,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     private void tick(ServerLevel level) {
+        if (collapseStart >= 0) {
+            tickCollapse(level);
+            return;
+        }
         State before = state;
         if (level.getGameTime() >= nextCheck) {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
@@ -244,6 +271,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             }
         }
         pushEnergy(level);
+        if (level.getGameTime() % 10 == 0) {
+            updateAlarms(level);
+        }
         java.util.Set<PenroseReactorBlockEntity> running = RUNNING.computeIfAbsent(level,
                 l -> java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
         if (state == State.RUNNING) {
@@ -263,7 +293,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (bs.hasProperty(AbstractMachineBlock.LIT) && bs.getValue(AbstractMachineBlock.LIT) != lit) {
             level.setBlock(worldPosition, bs.setValue(AbstractMachineBlock.LIT, lit), Block.UPDATE_ALL);
         }
-        if (state != before || level.getGameTime() % 20 == 0) {
+        // 点火中は進み具合を描くので、こまめに送る
+        if (state != before || level.getGameTime() % 20 == 0 || state == State.IGNITING && level.getGameTime() % 4 == 0) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
@@ -271,6 +302,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     private void checkStructure(ServerLevel level) {
         Structures.Reactor r = Structures.findReactor(level, worldPosition);
         List<BlockPos> newPorts = r == null ? List.of() : r.ports();
+        alarms = r == null ? List.of() : r.alarms();
         if (!newPorts.equals(ports)) {
             link(level, ports, null);
             link(level, newPorts, worldPosition);
@@ -280,6 +312,16 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         firstCheck = false;
         formed = r != null;
         center = r == null ? worldPosition.above(Structures.CONTROLLER_BELOW_CENTER) : r.center();
+        if (formed && level.getBlockEntity(center) instanceof RogueBlackHoleBlockEntity rogue) {
+            // 野良ブラックホールを炉心として取り込む（崩壊したリアクターを組み直したとき）
+            mass = Math.min(MAX_MASS, rogue.mass());
+            spin = rogue.spin();
+            state = State.RUNNING;
+            ignitedBefore = true;
+            level.removeBlock(center, false);
+            broadcast(level, "gui.singulo.reactor.recaptured");
+            setChanged();
+        }
     }
 
     private static void link(Level level, List<BlockPos> ports, @Nullable BlockPos controller) {
@@ -298,16 +340,30 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
         state = State.IGNITING;
         ignitionStored = 0;
+        ignitionElapsed = 0;
+        ignitionCharged = false;
         int window = ServerConfig.SPEC.isLoaded() ? ServerConfig.IGNITION_WINDOW_SECONDS.get() : 10;
         ignitionTicks = window * 20;
-        if (level != null) {
-            // 点火の音（電力を注ぐ10秒のあいだの高まり）
-            Vec3 core = coreCenter();
-            level.playSound(null, core.x, core.y, core.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("penrose_reactor_ignition"),
-                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 1.0F);
-        }
         setChanged();
         return true;
+    }
+
+    private void stopIgnitionSound(ServerLevel level) {
+        Vec3 core = coreCenter();
+        var id = Singulo.id("penrose_reactor_ignition");
+        for (net.minecraft.server.level.ServerPlayer p : level.players()) {
+            if (p.distanceToSqr(core) < 96 * 96) {
+                p.connection.send(new net.minecraft.network.protocol.game.ClientboundStopSoundPacket(id, net.minecraft.sounds.SoundSource.BLOCKS));
+            }
+        }
+    }
+
+    /** 点火の電力がどれだけ満ちたか（0〜1。クライアントでは同期された値）。 */
+    public float ignitionCharge() {
+        if (level != null && level.isClientSide) {
+            return clientCharge;
+        }
+        return ignitionCharged ? 1F : (float) Math.min(1.0, ignitionStored / (double) Math.max(1, ignitionEnergy()));
     }
 
     static long ignitionEnergy() {
@@ -315,7 +371,18 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     private void tickIgnition(ServerLevel level) {
-        if (ignitionStored >= ignitionEnergy()) {
+        ignitionElapsed++;
+        if (ignitionElapsed == IGNITION_SEQUENCE_TICKS - IGNITION_SOUND_TICKS) {
+            // 点火の音（鳴り終わる瞬間に炉心ができる）
+            Vec3 core = coreCenter();
+            level.playSound(null, core.x, core.y, core.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("penrose_reactor_ignition"),
+                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 1.0F);
+        }
+        if (!ignitionCharged && ignitionStored >= ignitionEnergy()) {
+            ignitionCharged = true;                                    // 電力は満ちた。あとは演出の終わりを待つ
+            setChanged();
+        }
+        if (ignitionCharged && ignitionElapsed >= IGNITION_SEQUENCE_TICKS) {
             items.extractItem(SLOT_SEED, 1, false);
             state = State.RUNNING;
             io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, worldPosition, 64, "ignite");
@@ -334,10 +401,11 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             setChanged();
             return;
         }
-        if (--ignitionTicks <= 0) {
-            // 時間切れ。注いだ電力は失われるが、種は残る（重いが詰まない）
+        if (!ignitionCharged && --ignitionTicks <= 0) {
+            // 時間切れ。注いだ電力は失われるが、種は残る（重いが詰まない）。鳴り始めた点火の音も止める
             state = State.DORMANT;
             ignitionStored = 0;
+            stopIgnitionSound(level);
             broadcast(level, "gui.singulo.reactor.ignition_failed");
             setChanged();
         }
@@ -348,14 +416,17 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         long perPellet = Math.round(energyPerPellet() * eta);
         double max = eddingtonPerTick();
         double wanted = perPellet <= 0 ? 0 : (double) (BUFFER_CAPACITY - buffer) / perPellet;
-        double rate = Math.max(MIN_INJECTION * max, Math.min(max, wanted));
+        // 投入間隔を決めていればその間隔で（エディントン限界まで）、自動なら蓄電の減った分だけ
+        double rate = feedInterval > 0 ? Math.min(max, 1.0 / feedInterval) : Math.max(MIN_INJECTION * max, Math.min(max, wanted));
         pelletCarry += rate;
         int whole = (int) pelletCarry;
         int taken = whole <= 0 ? 0 : items.extractItem(SLOT_FUEL, whole, false).getCount();
         pelletCarry = taken < whole ? 0 : pelletCarry - whole;
         if (taken > 0) {
             buffer = Math.min(BUFFER_CAPACITY, buffer + taken * perPellet);
-            mass = Math.min(MAX_MASS, mass + taken * PELLET_MASS * GROWTH_FRACTION);
+            // ペレットでは上限を超えない（すでに超えていれば減らしもしない）
+            mass = Math.max(mass, Math.min(MAX_MASS, mass + taken * PELLET_MASS * GROWTH_FRACTION));
+            level.blockEvent(worldPosition, getBlockState().getBlock(), EVENT_PELLETS, Math.min(taken, 12));
         }
         evaporate(level);
         if (state != State.RUNNING) {
@@ -426,7 +497,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 事象の地平線（黒い球）の半径（ブロック）。炉心の質量で 0.6〜1.6。描画と、触れたものを消す判定に使う。 */
     public double horizonRadius() {
-        return 0.6 + 1.0 * Math.min(1.0, mass / MAX_MASS);
+        return horizonFor(mass);
+    }
+
+    /** 質量から地平線の半径（炉心と野良ブラックホールで同じ式。上限を超えた分はゆっくり大きくなる）。 */
+    public static double horizonFor(double mass) {
+        return 0.6 + Math.min(1.0, mass / MAX_MASS) + 0.2 * Math.max(0, mass - MAX_MASS) / MAX_MASS;
     }
 
     /** リングの内側（強い引力）とみなす、中心からの距離（ブロック）。 */
@@ -446,14 +522,22 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
      */
     @org.jetbrains.annotations.Nullable
     public static Vec3 pulledVelocity(Vec3 velocity, Vec3 body, Vec3 c) {
+        return pulledVelocity(velocity, body, c, INNER_RADIUS, 1.0);
+    }
+
+    /**
+     * 引き寄せたあとの速さ。inner は強く引く内側の半径、scale は強さの倍率（野良ブラックホールは質量で大きくなる）。
+     * 内側では逃げられないほど強く、外側では距離の二乗で弱まる。
+     */
+    public static Vec3 pulledVelocity(Vec3 velocity, Vec3 body, Vec3 c, double inner, double scale) {
         Vec3 to = c.subtract(body);
         double d = to.length();
         if (d < 1e-3) {
             return null;
         }
-        if (d <= INNER_RADIUS) {
+        if (d <= inner) {
             double innerStrength = ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_INNER_PULL_STRENGTH.get() : 0.25;
-            double accel = innerStrength * (1 + 3.5 * (1 - d / INNER_RADIUS));
+            double accel = innerStrength * scale * (1 + 3.5 * (1 - d / inner));
             Vec3 v = velocity.scale(0.85).add(to.scale(accel / d));
             double max = 1.6;
             return v.lengthSqr() > max * max ? v.normalize().scale(max) : v;
@@ -462,7 +546,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (d > radius) {
             return null;
         }
-        double strength = ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_STRENGTH.get() : 0.04;
+        double strength = (ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_STRENGTH.get() : 0.04) * scale;
         double accel = Math.min(strength, strength * 16 / (d * d));
         return velocity.add(to.scale(accel / d));
     }
@@ -487,6 +571,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 ServerConfig.SPEC.isLoaded() ? ServerConfig.BLACK_HOLE_PULL_RADIUS.get() : 24);
         for (Entity e : level.getEntitiesOfClass(Entity.class, new AABB(center).inflate(radius), EventHorizonTargets::affected)) {
             if (kill && touches(e.getBoundingBox(), c, horizon)) {
+                absorb(level, foreignMass(e));
+                returnRecord(level, e, c, horizon);
                 EventHorizon.consume(level, e);
                 continue;
             }
@@ -514,6 +600,298 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 e.hurt(SinguloDamageTypes.tidal(level, null), 4.0F);
             }
         }
+    }
+
+    // ------------------------------------------------------------------ 投入間隔
+
+    /** ペレットの投入間隔（tick）。0 は自動（蓄電の減った分だけ投入する）。 */
+    private int feedInterval;
+
+    public int feedInterval() {
+        return feedInterval;
+    }
+
+    public int spinTargetIndex() {
+        return spinTarget;
+    }
+
+    public void setSpinTargetIndex(int index) {
+        spinTarget = Math.max(0, Math.min(SPIN_TARGETS.length - 1, index));
+        setChanged();
+    }
+
+    public void setFeedInterval(int ticks) {
+        feedInterval = Math.max(0, Math.min(MAX_FEED_INTERVAL, ticks));
+        setChanged();
+    }
+
+    // ------------------------------------------------------------------ 飲み込んだ物の質量と、炉の崩壊
+
+    /** 地平線に飲み込まれた物の質量（低め）。モブは最大体力と身につけた物、アイテムは質量値から。 */
+    public static double foreignMass(Entity e) {
+        if (e instanceof net.minecraft.world.entity.item.ItemEntity item) {
+            return itemMass(item.getItem());
+        }
+        if (e instanceof LivingEntity living) {
+            double m = living.getMaxHealth() * MOB_MASS_PER_HEALTH;
+            for (net.minecraft.world.entity.EquipmentSlot slot : net.minecraft.world.entity.EquipmentSlot.values()) {
+                m += itemMass(living.getItemBySlot(slot));
+            }
+            return m;
+        }
+        return 0;
+    }
+
+    /** 地平線の向こうから記録片が戻ってくる確率（モブ1体・アイテム1つあたり）。 */
+    public static final double RECORD_FROM_MOB = 0.03;
+    public static final double RECORD_FROM_ITEM = 0.005;
+
+    /**
+     * 飲み込んだものから、まれに旧文明の記録片が戻ってくる（地平線の縁から外へ弾き出される）。
+     * 戻ってきた記録片はしばらく引き寄せられない。
+     */
+    public static void returnRecord(ServerLevel level, Entity swallowed, Vec3 c, double horizon) {
+        double chance = swallowed instanceof LivingEntity ? RECORD_FROM_MOB
+                : swallowed instanceof net.minecraft.world.entity.item.ItemEntity item && !EventHorizonTargets.isReturnedRecord(item)
+                ? RECORD_FROM_ITEM : 0;
+        if (chance <= 0 || level.random.nextDouble() >= chance) {
+            return;
+        }
+        Vec3 dir = new Vec3(level.random.nextGaussian(), Math.abs(level.random.nextGaussian()) + 0.5, level.random.nextGaussian()).normalize();
+        Vec3 at = c.add(dir.scale(horizon + 0.6));
+        var record = new net.minecraft.world.entity.item.ItemEntity(level, at.x, at.y, at.z, new ItemStack(item("record_fragment")));
+        record.setDeltaMovement(dir.scale(0.7));
+        record.getPersistentData().putLong(EventHorizonTargets.RETURNED, level.getGameTime());
+        level.addFreshEntity(record);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, at.x, at.y, at.z, 12, 0.2, 0.2, 0.2, 0.05);
+        level.playSound(null, at.x, at.y, at.z, net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_RESONATE,
+                net.minecraft.sounds.SoundSource.BLOCKS, 2.0F, 0.6F);
+    }
+
+    static double itemMass(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return 0;
+        }
+        double per = Math.max(1, io.github.genichimaruo.singulo.data.MassValues.INSTANCE.massOf(stack));
+        return per * stack.getCount() * ITEM_MASS_RATE;
+    }
+
+    /** 飲み込んだ物の質量を炉心に加える。上限を大きく超えると炉が崩壊する。 */
+    private void absorb(ServerLevel level, double m) {
+        if (m <= 0 || state != State.RUNNING) {
+            return;
+        }
+        mass += m;
+        setChanged();
+        if (mass > MAX_MASS + COLLAPSE_MARGIN && collapseStart < 0) {
+            startCollapse(level);
+        }
+    }
+
+    /** 炉心質量警報器の信号の強さ: 上限未満は0、上限で1、崩壊する質量で15。 */
+    public int alarmSignal() {
+        if (state != State.RUNNING || mass < MAX_MASS) {
+            return 0;
+        }
+        return (int) Math.min(15, 1 + Math.floor(14 * (mass - MAX_MASS) / COLLAPSE_MARGIN));
+    }
+
+    /** 警報器に信号を書き込み、上限を超えていれば警報音を鳴らす。 */
+    private void updateAlarms(ServerLevel level) {
+        int signal = alarmSignal();
+        boolean blink = signal > 0 && (signal == 1 || level.getGameTime() % 20 < 10);
+        for (BlockPos p : alarms) {
+            BlockState s = level.getBlockState(p);
+            if (s.getBlock() instanceof io.github.genichimaruo.singulo.multiblock.SignalPartBlock
+                    && (s.getValue(io.github.genichimaruo.singulo.multiblock.SignalPartBlock.POWER) != signal
+                    || s.getValue(io.github.genichimaruo.singulo.multiblock.SignalPartBlock.LIT) != blink)) {
+                level.setBlock(p, s.setValue(io.github.genichimaruo.singulo.multiblock.SignalPartBlock.POWER, signal)
+                        .setValue(io.github.genichimaruo.singulo.multiblock.SignalPartBlock.LIT, blink), Block.UPDATE_ALL);
+            }
+        }
+        if (signal > 1 && level.getGameTime() % 20 == 0) {
+            float pitch = 1.4F + 0.04F * signal;
+            Vec3 at = Vec3.atCenterOf(worldPosition);
+            level.playSound(null, at.x, at.y, at.z, net.minecraft.sounds.SoundEvents.NOTE_BLOCK_PLING.value(),
+                    net.minecraft.sounds.SoundSource.BLOCKS, 2.5F, pitch);
+            for (BlockPos p : alarms) {
+                level.playSound(null, p, net.minecraft.sounds.SoundEvents.NOTE_BLOCK_PLING.value(), net.minecraft.sounds.SoundSource.BLOCKS,
+                        1.5F, pitch);
+            }
+        }
+    }
+
+    /** 崩壊の始まった時刻（-1 は崩壊していない）と、吸い込まれていくブロック（近い順、最後がコントローラ）。 */
+    private long collapseStart = -1;
+    private List<BlockPos> collapseBlocks = List.of();
+    private int[] collapseStates = new int[0];
+    private int collapseDone;
+
+    public boolean collapsing() {
+        return collapseStart >= 0;
+    }
+
+    public long collapseStart() {
+        return collapseStart;
+    }
+
+    public List<BlockPos> collapseBlocks() {
+        return collapseBlocks;
+    }
+
+    public BlockState collapseState(int i) {
+        return Block.stateById(collapseStates[i]);
+    }
+
+    /** i 番目のブロックが吸い込まれ始める、崩壊の始まりからの tick。 */
+    public static int collapseDelay(int i, int n) {
+        return n <= 1 ? 0 : (int) (COLLAPSE_SPREAD * Math.pow(i / (double) (n - 1), 0.85));
+    }
+
+    private void startCollapse(ServerLevel level) {
+        BlockPos c = center != null ? center : worldPosition.above(Structures.CONTROLLER_BELOW_CENTER);
+        java.util.Set<BlockPos> picked = new java.util.LinkedHashSet<>();
+        for (BlockPos p : Structures.reactorLayout(c).keySet()) {
+            if (!level.getBlockState(p).isAir()) {
+                picked.add(p.immutable());
+            }
+        }
+        // まわりの物も巻き込む（壊せない物と、入れ物などのブロックエンティティは残す）
+        int r = COLLAPSE_RADIUS;
+        for (BlockPos p : BlockPos.betweenClosed(c.offset(-r, -r, -r), c.offset(r, r, r))) {
+            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition)) {
+                continue;
+            }
+            BlockState s = level.getBlockState(p);
+            if (s.isAir() || s.getDestroySpeed(level, p) < 0 || level.getBlockEntity(p) != null || !s.getFluidState().isEmpty()) {
+                continue;
+            }
+            picked.add(p.immutable());
+        }
+        List<BlockPos> list = new ArrayList<>(picked);
+        list.sort(java.util.Comparator.comparingDouble(p -> p.distSqr(c)));
+        if (list.size() > COLLAPSE_MAX_BLOCKS) {
+            list = new ArrayList<>(list.subList(0, COLLAPSE_MAX_BLOCKS));
+        }
+        list.add(worldPosition);                                      // 最後にコントローラ自身
+        collapseBlocks = List.copyOf(list);
+        collapseStates = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            collapseStates[i] = Block.getId(level.getBlockState(list.get(i)));
+        }
+        collapseStart = level.getGameTime();
+        collapseDone = 0;
+        broadcast(level, "gui.singulo.reactor.collapse");
+        Vec3 core = coreCenter();
+        level.playSound(null, core.x, core.y, core.z, net.minecraft.sounds.SoundEvents.WARDEN_SONIC_BOOM,
+                net.minecraft.sounds.SoundSource.BLOCKS, 4.0F, 0.5F);
+        setChanged();
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    private void tickCollapse(ServerLevel level) {
+        int t = (int) (level.getGameTime() - collapseStart);
+        int n = collapseBlocks.size();
+        // 引力と地平線は続く
+        applyHazards(level);
+        while (collapseDone < n - 1 && collapseDelay(collapseDone, n) <= t) {
+            BlockPos p = collapseBlocks.get(collapseDone);
+            if (!level.getBlockState(p).isAir()) {
+                level.setBlock(p, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
+            collapseDone++;
+        }
+        if (t % 12 == 0) {
+            Vec3 core = coreCenter();
+            level.playSound(null, core.x, core.y, core.z, net.minecraft.sounds.SoundEvents.DEEPSLATE_BREAK,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 3.0F, 0.5F + level.random.nextFloat() * 0.3F);
+        }
+        if (t >= COLLAPSE_TICKS) {
+            finishCollapse(level);
+        }
+    }
+
+    /** 崩壊の終わり: 炉心の中心に野良ブラックホールを残し、コントローラも飲み込まれて消える。 */
+    private void finishCollapse(ServerLevel level) {
+        BlockPos c = center != null ? center : worldPosition.above(Structures.CONTROLLER_BELOW_CENTER);
+        double m = mass;
+        double a = spin;
+        level.setBlock(c, io.github.genichimaruo.singulo.registry.SinguloBlocks.ROGUE_BLACK_HOLE.get().defaultBlockState(), Block.UPDATE_ALL);
+        if (level.getBlockEntity(c) instanceof RogueBlackHoleBlockEntity rogue) {
+            rogue.setCore(m, a);
+        }
+        Vec3 core = Vec3.atCenterOf(c);
+        level.playSound(null, core.x, core.y, core.z, io.github.genichimaruo.singulo.registry.SinguloSounds.BLACK_HOLE_FORMATION.get(),
+                net.minecraft.sounds.SoundSource.BLOCKS, 4.0F, 0.6F);
+        // 中身も飲み込まれる
+        for (int i = 0; i < SLOTS; i++) {
+            items.setStackInSlot(i, ItemStack.EMPTY);
+        }
+        collapseStart = -1;
+        state = State.UNFORMED;
+        mass = 0;
+        level.setBlock(worldPosition, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+    }
+
+    private void writeCollapse(CompoundTag tag) {
+        tag.putLong("collapse_start", collapseStart);
+        long[] ps = new long[collapseBlocks.size()];
+        for (int i = 0; i < ps.length; i++) {
+            ps[i] = collapseBlocks.get(i).asLong();
+        }
+        tag.putLongArray("collapse_pos", ps);
+        tag.putIntArray("collapse_state", collapseStates);
+        tag.putInt("collapse_done", collapseDone);
+    }
+
+    private void readCollapse(CompoundTag tag) {
+        if (!tag.contains("collapse_start")) {
+            if (level != null && level.isClientSide && tag.getBoolean("sync")) {
+                collapseStart = -1;
+            }
+            return;
+        }
+        collapseStart = tag.getLong("collapse_start");
+        long[] ps = tag.getLongArray("collapse_pos");
+        List<BlockPos> list = new ArrayList<>(ps.length);
+        for (long p : ps) {
+            list.add(BlockPos.of(p));
+        }
+        collapseBlocks = List.copyOf(list);
+        collapseStates = tag.getIntArray("collapse_state");
+        collapseDone = tag.getInt("collapse_done");
+    }
+
+    // ------------------------------------------------------------------ ペレットを飲み込む様子（クライアント）
+
+    /** 飲み込まれていくペレット（クライアント）: 出発した時刻と、どのポートから来たか。 */
+    public record PelletFlight(long start, int port, float twist) {}
+
+    private final java.util.ArrayDeque<PelletFlight> clientPellets = new java.util.ArrayDeque<>();
+    public static final int PELLET_FLIGHT_TICKS = 40;
+
+    public java.util.Collection<PelletFlight> clientPellets() {
+        if (level != null) {
+            long now = level.getGameTime();
+            while (!clientPellets.isEmpty() && now - clientPellets.peekFirst().start() > PELLET_FLIGHT_TICKS) {
+                clientPellets.pollFirst();
+            }
+        }
+        return clientPellets;
+    }
+
+    @Override
+    public boolean triggerEvent(int id, int param) {
+        if (id == EVENT_PELLETS) {
+            if (level != null && level.isClientSide && clientPellets.size() < 64) {
+                for (int i = 0; i < param; i++) {
+                    clientPellets.addLast(new PelletFlight(level.getGameTime() + i * 3L, level.random.nextInt(12),
+                            level.random.nextFloat() * 2 - 1));
+                }
+            }
+            return true;
+        }
+        return super.triggerEvent(id, param);
     }
 
     // ------------------------------------------------------------------ クライアント: 自分のプレイヤーへの引力
@@ -765,7 +1143,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     // ------------------------------------------------------------------ GUI・同期・保存
 
     public static final int D_STATE = 0, D_MASS_X10 = 1, D_SPIN_X1000 = 2, D_ETA_X10000 = 3, D_OUT_LO = 4, D_OUT_HI = 5,
-            D_BUFFER_MFE = 6, D_IGNITION_PCT = 7, D_IGNITION_SECS = 8, D_TARGET = 9, D_MODE = 10, COUNT = 11;
+            D_BUFFER_MFE = 6, D_IGNITION_PCT = 7, D_IGNITION_SECS = 8, D_TARGET = 9, D_MODE = 10, D_INTERVAL = 11, COUNT = 12;
 
     public SyncedInts syncData() {
         return SyncedInts.server(COUNT, i -> switch (i) {
@@ -777,9 +1155,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             case D_OUT_HI -> (int) (lastOutput >>> 32);
             case D_BUFFER_MFE -> (int) (buffer / 1_000_000L);
             case D_IGNITION_PCT -> (int) Math.min(100, ignitionStored * 100 / Math.max(1, ignitionEnergy()));
-            case D_IGNITION_SECS -> ignitionTicks / 20;
+            case D_IGNITION_SECS -> ignitionCharged ? Math.max(0, IGNITION_SEQUENCE_TICKS - ignitionElapsed) / 20 : ignitionTicks / 20;
             case D_TARGET -> spinTarget;
             case D_MODE -> mode().ordinal();
+            case D_INTERVAL -> feedInterval;
             default -> 0;
         });
     }
@@ -841,6 +1220,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         tag.putInt("hawking", hawkingTimer);
         tag.putInt("ergo", ergoTimer);
         tag.putBoolean("ignited_before", ignitedBefore);
+        tag.putInt("feed_interval", feedInterval);
+        if (collapseStart >= 0) {
+            writeCollapse(tag);
+        }
     }
 
     private void writeCore(CompoundTag tag) {
@@ -848,6 +1231,24 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         tag.putDouble("mass", mass);
         tag.putDouble("spin", spin);
     }
+
+    /** クライアントで受け取った点火の進み（0〜1。描画用）と、受け取った時刻・電力の満ち具合。 */
+    private float clientIgnition;
+    private long clientIgnitionAt;
+    private float clientCharge;
+
+    /** 点火の進み（0〜1）。サーバーでは注がれた電力の割合、クライアントでは同期された値。 */
+    public float ignitionProgress() {
+        if (level != null && level.isClientSide) {
+            // 同期の合間は時刻で進める（なめらかに）
+            if (state != State.IGNITING) {
+                return clientIgnition;
+            }
+            return Math.min(1F, clientIgnition + (level.getGameTime() - clientIgnitionAt) / (float) IGNITION_SEQUENCE_TICKS);
+        }
+        return Math.min(1F, ignitionElapsed / (float) IGNITION_SEQUENCE_TICKS);
+    }
+
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -860,9 +1261,13 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         } catch (IllegalArgumentException e) {
             state = State.UNFORMED;
         }
-        if (state == State.IGNITING) {
+        // 保存から読み込むとき、点火の途中だったものは止まった状態に戻す（描画のための同期では戻さない）
+        if (state == State.IGNITING && !tag.getBoolean("sync")) {
             state = State.DORMANT;
         }
+        clientIgnition = tag.getFloat("ignition");
+        clientCharge = tag.getFloat("charge");
+        clientIgnitionAt = level != null ? level.getGameTime() : 0;
         mass = tag.getDouble("mass");
         spin = tag.getDouble("spin");
         buffer = tag.getLong("buffer");
@@ -871,6 +1276,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         hawkingTimer = tag.getInt("hawking");
         ergoTimer = tag.getInt("ergo");
         ignitedBefore = tag.getBoolean("ignited_before");
+        if (tag.contains("feed_interval")) {
+            feedInterval = tag.getInt("feed_interval");
+        }
+        readCollapse(tag);
     }
 
     /** 描画用に状態・質量・スピンをクライアントへ送る。 */
@@ -878,6 +1287,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         writeCore(tag);
+        tag.putBoolean("sync", true);
+        tag.putFloat("ignition", ignitionProgress());
+        tag.putFloat("charge", ignitionCharge());
+        if (collapseStart >= 0) {
+            writeCollapse(tag);
+        }
         return tag;
     }
 

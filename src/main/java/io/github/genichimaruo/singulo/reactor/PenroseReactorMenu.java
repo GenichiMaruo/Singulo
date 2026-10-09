@@ -17,12 +17,14 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 /** ペンローズ・リアクターの画面。種・燃料・抽出装置3種・副産物4つ。ボタンは「点火」と「スピン目標」。 */
 public class PenroseReactorMenu extends AbstractContainerMenu {
     public static final int BUTTON_IGNITE = 0, BUTTON_SPIN = 1;
+    /** 投入間隔の設定は BUTTON_INTERVAL + 間隔（tick）で送る。 */
+    public static final int BUTTON_INTERVAL = 1000;
     public static final int WIDTH = 200;
-    public static final int HEIGHT = 212;
+    public static final int HEIGHT = 228;
     /** 持ち物の位置。 */
     public static final int INV_X = 20;
-    public static final int INV_Y = 130;
-    public static final int HOTBAR_Y = 188;
+    public static final int INV_Y = 146;
+    public static final int HOTBAR_Y = 204;
     /** スロットの位置（menu と screen で共有）。 */
     public static final int[][] SLOT_POS = {
             {10, 22}, {10, 46},                 // 種・燃料
@@ -86,6 +88,10 @@ public class PenroseReactorMenu extends AbstractContainerMenu {
         }
         if (id == BUTTON_SPIN) {
             reactor.cycleSpinTarget();
+            return true;
+        }
+        if (id >= BUTTON_INTERVAL && id <= BUTTON_INTERVAL + PenroseReactorBlockEntity.MAX_FEED_INTERVAL) {
+            reactor.setFeedInterval(id - BUTTON_INTERVAL);
             return true;
         }
         return false;
