@@ -6,7 +6,6 @@ import io.github.genichimaruo.singulo.item.ExoticCharge;
 import io.github.genichimaruo.singulo.item.GravityGauntletItem;
 import io.github.genichimaruo.singulo.item.GravitonManipulatorItem;
 import io.github.genichimaruo.singulo.machine.WorldlineAnchorBlockEntity;
-import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
@@ -51,15 +50,14 @@ public final class Stage5WormholeGameTests {
 
     // ------------------------------------------------------------------ 生成・固定化
 
+    /** ワームホール生成器（5×5×5 の球）を建てる。コントローラは (3,1,2)（底の手前の列の中央）、球は南（+Z）へ。 */
+    private static final BlockPos GENERATOR = new BlockPos(3, 1, 2);
+
     @GameTest(template = EMPTY, timeoutTicks = 260)
     public static void wormholeGeneratorMakesPairWithOneGigawattForTenSeconds(GameTestHelper helper) {
-        BlockPos core = new BlockPos(3, 1, 3);
-        helper.setBlock(core, SinguloBlocks.WORMHOLE_GENERATOR_CORE.get());
-        for (BlockPos p : Structures.wormholeGeneratorLayout(helper.absolutePos(core))) {
-            helper.getLevel().setBlockAndUpdate(p, SinguloBlocks.DEGENERATE_CASING.get().defaultBlockState());
-        }
-        WormholeGeneratorBlockEntity gen = helper.getBlockEntity(core);
-        helper.assertTrue(Structures.wormholeGeneratorLayout(BlockPos.ZERO).size() == 24, "外殻の数がレシピ（24個）と合わない");
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR, GENERATOR,
+                net.minecraft.core.Direction.SOUTH, 5);
+        WormholeGeneratorBlockEntity gen = helper.getBlockEntity(GENERATOR);
         helper.onEachTick(() -> gen.energy().receiveEnergy(Integer.MAX_VALUE, false));
         helper.runAtTickTime(100, () -> helper.assertTrue(gen.output().getStackInSlot(0).isEmpty(), "10秒たつ前にできた"));
         helper.succeedWhen(() -> {
@@ -69,27 +67,24 @@ public final class Stage5WormholeGameTests {
             WormholeData da = a.get(SinguloComponents.WORMHOLE.get());
             WormholeData db = b.get(SinguloComponents.WORMHOLE.get());
             helper.assertTrue(da != null && db != null && da.pair() == db.pair(), "2つの口が対になっていない");
+            helper.assertTrue(gen.core().equals(helper.absolutePos(new BlockPos(3, 3, 3))), "球の中心がずれている");
         });
     }
 
-    /** 外殻の代わりに入出力口を置いても形成でき、口から電力を入れ、できた口を取り出せる。 */
+    /** 外殻の代わりにマルチブロック搬入出ポートを置いても形成でき、ポートから電力を入れ、できた口を取り出せる。 */
     @GameTest(template = EMPTY, timeoutTicks = 100)
     public static void wormholeGeneratorIoPortAnywhere(GameTestHelper helper) {
-        BlockPos core = new BlockPos(3, 1, 3);
-        helper.setBlock(core, SinguloBlocks.WORMHOLE_GENERATOR_CORE.get());
-        java.util.List<BlockPos> layout = Structures.wormholeGeneratorLayout(helper.absolutePos(core));
-        BlockPos io = layout.get(layout.size() - 1);           // 上の段の角
-        for (BlockPos p : layout) {
-            helper.getLevel().setBlockAndUpdate(p, (p.equals(io) ? SinguloBlocks.WORMHOLE_GENERATOR_IO.get()
-                    : SinguloBlocks.DEGENERATE_CASING.get()).defaultBlockState());
-        }
-        WormholeGeneratorBlockEntity gen = helper.getBlockEntity(core);
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR, GENERATOR,
+                net.minecraft.core.Direction.SOUTH, 5);
+        BlockPos portPos = (TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR,
+                GENERATOR, net.minecraft.core.Direction.SOUTH, 5, 3, 4, 3));                // 天井の角寄り
+        WormholeGeneratorBlockEntity gen = helper.getBlockEntity(GENERATOR);
         helper.succeedWhen(() -> {
-            helper.assertTrue(gen.formed(), "入出力口を置くと形成されない");
-            var energy = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, io, null);
-            helper.assertTrue(energy != null && energy.receiveEnergy(1000, true) > 0, "入出力口から電力が入らない");
-            var items = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, io, null);
-            helper.assertTrue(items != null, "入出力口から口を取り出せない");
+            helper.assertTrue(gen.formed(), "ポートを置くと形成されない");
+            var energy = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, portPos, null);
+            helper.assertTrue(energy != null && energy.receiveEnergy(1000, true) > 0, "ポートから電力が入らない");
+            var items = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, portPos, null);
+            helper.assertTrue(items != null, "ポートから口を取り出せない");
         });
     }
 

@@ -36,6 +36,9 @@ public final class ReactorGameTests {
     private static final String BATCH = "reactor";
     private static final BlockPos CENTER = new BlockPos(7, 7, 7);
     private static final BlockPos CONTROLLER = CENTER.below(Structures.CONTROLLER_BELOW_CENTER);
+    /** テストで抽出ポートにする炉殻の位置（リングの最初の炉殻）。 */
+    private static final BlockPos PORT = Structures.reactorLayout(CENTER).entrySet().stream()
+            .filter(e -> e.getValue() == MultiblockPart.Role.REACTOR_SHELL).findFirst().orElseThrow().getKey();
 
     private ReactorGameTests() {}
 
@@ -47,11 +50,12 @@ public final class ReactorGameTests {
         for (Map.Entry<BlockPos, MultiblockPart.Role> e : Structures.reactorLayout(CENTER).entrySet()) {
             Block block = switch (e.getValue()) {
                 case GYRO_DRIVE -> SinguloBlocks.GYRO_DRIVE.get();
-                case EXTRACTION_PORT -> SinguloBlocks.EXTRACTION_PORT.get();
+                case REACTOR_STABILIZER -> SinguloBlocks.REACTOR_STABILIZER.get();
                 default -> SinguloBlocks.REACTOR_SHELL.get();
             };
             helper.setBlock(e.getKey(), block);
         }
+        helper.setBlock(PORT, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(CONTROLLER, SinguloBlocks.CORE_CONTROLLER.get());
         return helper.getBlockEntity(CONTROLLER);
     }
@@ -74,18 +78,21 @@ public final class ReactorGameTests {
             helper.assertTrue(r.isFormed(), "13×13×13 のリアクターとして形成されない");
             helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.DORMANT, "形成後は停止中のはず");
             IEnergyStorage viaPort = helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK,
-                    helper.absolutePos(CENTER.offset(4, 4, 0)), null);
+                    helper.absolutePos(PORT), null);
             helper.assertTrue(viaPort != null, "抽出ポートからリアクターの電力につながらない");
         });
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 400)
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 420)
     public static void ignitionNeeds50GFEWithinTenSeconds(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
         helper.runAtTickTime(3, () -> helper.assertTrue(r.ignite(), "点火を始められない"));
         // ホライズン・バス並みの 300 MFE/t を注ぐ（50 GFE / 10 秒 = 250 MFE/t が必要）
         helper.onEachTick(() -> r.energy().receiveEnergy(300_000_000, false));
+        // 電力は数秒で満ちるが、炉心ができるのは点火の演出（16秒）の終わり
+        helper.runAtTickTime(3 + PenroseReactorBlockEntity.IGNITION_SEQUENCE_TICKS - 40, () -> helper.assertTrue(
+                r.state() == PenroseReactorBlockEntity.State.IGNITING, "点火の演出の途中で炉心ができた"));
         helper.succeedWhen(() -> {
             helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.RUNNING, "点火して稼働しない");
             helper.assertTrue(Math.abs(r.mass() - PenroseReactorBlockEntity.START_MASS) < 1, "最初の炉心質量が500でない");
@@ -106,9 +113,9 @@ public final class ReactorGameTests {
     }
 
     /** 組み立てる前に抽出ポートへ敷いたホライズン・バスからも、点火の電力が入ること（形成したら接続し直す）。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 420)
     public static void ignitionPowerThroughPortCableLaidBeforeForming(GameTestHelper helper) {
-        BlockPos port = CENTER.offset(4, 4, 0);
+        BlockPos port = PORT;
         net.minecraft.core.Direction d = outward(port);
         helper.setBlock(port.relative(d), SinguloBlocks.HORIZON_BUS.get());
         helper.setBlock(port.relative(d, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
@@ -119,29 +126,27 @@ public final class ReactorGameTests {
                 "ポートにつないだケーブルから点火の電力が入らない: " + r.state()));
     }
 
-    /** 抽出ポートはリングの炉殻のどこに置いてもよい（斜め45°でなくても、数が違っても形成でき、そこから電力に届く）。 */
+    /** 抽出ポートと炉心質量警報器はリングの炉殻のどこに置いてもよく、警報器は質量が上限に達すると赤石信号を出す。 */
     @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 100)
-    public static void extractionPortsAnywhereOnRings(GameTestHelper helper) {
+    public static void portsAndAlarmsAnywhereOnRings(GameTestHelper helper) {
         build(helper);
-        // 斜めのポートを1つ炉殻に戻し、斜めでない炉殻の位置を2つポートにする
-        BlockPos moved = null;
-        java.util.List<BlockPos> added = new java.util.ArrayList<>();
-        for (Map.Entry<BlockPos, MultiblockPart.Role> e : Structures.reactorLayout(CENTER).entrySet()) {
-            if (moved == null && e.getValue() == MultiblockPart.Role.EXTRACTION_PORT) {
-                moved = e.getKey();
-                helper.setBlock(moved, SinguloBlocks.REACTOR_SHELL.get());
-            } else if (added.size() < 2 && e.getValue() == MultiblockPart.Role.REACTOR_SHELL) {
-                added.add(e.getKey());
-                helper.setBlock(e.getKey(), SinguloBlocks.EXTRACTION_PORT.get());
-            }
-        }
-        BlockPos port = added.get(0);
+        java.util.List<BlockPos> shells = Structures.reactorLayout(CENTER).entrySet().stream()
+                .filter(e -> e.getValue() == MultiblockPart.Role.REACTOR_SHELL).map(Map.Entry::getKey).toList();
+        BlockPos port2 = shells.get(20);
+        BlockPos alarm = shells.get(40);
+        helper.setBlock(port2, SinguloBlocks.EXTRACTION_PORT.get());
+        helper.setBlock(alarm, SinguloBlocks.REACTOR_MASS_ALARM.get());
+        PenroseReactorBlockEntity reactor = helper.getBlockEntity(CONTROLLER);
+        helper.runAtTickTime(3, () -> reactor.forceCore(PenroseReactorBlockEntity.MAX_MASS + 100, 0));
         helper.succeedWhen(() -> {
             Structures.Reactor r = Structures.findReactor(helper.getLevel(), helper.absolutePos(CONTROLLER));
-            helper.assertTrue(r != null, "ポートを斜め以外に置くと形成されない");
-            helper.assertTrue(r.ports().size() == 13 && r.ports().contains(helper.absolutePos(port)), "置いたポートが数えられない: " + r.ports().size());
-            helper.assertTrue(helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, helper.absolutePos(port), null) != null,
-                    "斜め以外のポートから電力に届かない");
+            helper.assertTrue(r != null, "ポートや警報器を置くと形成されない");
+            helper.assertTrue(r.ports().size() == 2 && r.ports().contains(helper.absolutePos(port2)), "置いたポートが数えられない: " + r.ports().size());
+            helper.assertTrue(r.alarms().contains(helper.absolutePos(alarm)), "警報器が数えられない");
+            helper.assertTrue(helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, helper.absolutePos(port2), null) != null,
+                    "置いたポートから電力に届かない");
+            helper.assertTrue(helper.getLevel().getSignal(helper.absolutePos(alarm), net.minecraft.core.Direction.UP) >= 7,
+                    "上限を超えても警報器が信号を出さない");
         });
     }
 
@@ -309,6 +314,54 @@ public final class ReactorGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(collector.rate() == 20, "炉心質量2000で毎秒20 mB にならない: " + collector.rate());
             helper.assertTrue(tank.amount() >= 30, "隣の重力閉じ込めタンクにダークマターが届かない: " + tank.amount());
+        });
+    }
+
+    /** ペレットでは炉心質量が上限を超えない（投入間隔を最短にしても、崩壊は起きない）。 */
+    @GameTest(template = HUGE, batch = "reactor_feed", timeoutTicks = 120)
+    public static void pelletsNeverOverfillCore(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
+        helper.runAtTickTime(3, () -> {
+            r.forceCore(PenroseReactorBlockEntity.MAX_MASS - 1, 0);
+            r.setFeedInterval(1);
+        });
+        helper.runAtTickTime(100, () -> {
+            helper.assertTrue(r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL).getCount() < 64, "投入間隔どおりに投入されない");
+            helper.assertTrue(r.mass() <= PenroseReactorBlockEntity.MAX_MASS, "ペレットで上限を超えた: " + r.mass());
+            helper.assertTrue(!r.collapsing(), "ペレットだけで崩壊した");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * 物を投げ込んで質量が上限を大きく超えると、炉が崩壊して中心に野良ブラックホールが残り、コントローラも消える。
+     * 同じ場所にリアクターを組み直すと、野良ブラックホールを炉心として取り込む。
+     */
+    @GameTest(template = HUGE, batch = "reactor_collapse", timeoutTicks = 320)
+    public static void overfilledReactorCollapsesAndCanBeRecaptured(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        double start = PenroseReactorBlockEntity.MAX_MASS + PenroseReactorBlockEntity.COLLAPSE_MARGIN - 0.5;
+        helper.runAtTickTime(3, () -> r.forceCore(start, 0.3));
+        helper.runAtTickTime(5, () -> {
+            var c = net.minecraft.world.phys.Vec3.atCenterOf(helper.absolutePos(CENTER));
+            var drop = new net.minecraft.world.entity.item.ItemEntity(helper.getLevel(), c.x, c.y, c.z,
+                    new ItemStack(net.minecraft.world.item.Items.IRON_BLOCK, 64));
+            drop.setNoGravity(true);
+            helper.getLevel().addFreshEntity(drop);
+        });
+        helper.runAtTickTime(20, () -> helper.assertTrue(r.collapsing(), "上限を超えても崩壊が始まらない: " + r.mass()));
+        helper.runAtTickTime(20 + PenroseReactorBlockEntity.COLLAPSE_TICKS, () -> {
+            helper.assertBlockPresent(SinguloBlocks.ROGUE_BLACK_HOLE.get(), CENTER);
+            helper.assertBlockNotPresent(SinguloBlocks.CORE_CONTROLLER.get(), CONTROLLER);
+            helper.assertBlockNotPresent(SinguloBlocks.REACTOR_SHELL.get(), CENTER.offset(6, 0, 0));
+            // 組み直す
+            build(helper);
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(helper.getLevel().getBlockEntity(helper.absolutePos(CONTROLLER)) instanceof PenroseReactorBlockEntity re
+                    && re.state() == PenroseReactorBlockEntity.State.RUNNING && re.mass() > 4000, "組み直しても取り込まない");
+            helper.assertBlockNotPresent(SinguloBlocks.ROGUE_BLACK_HOLE.get(), CENTER);
         });
     }
 }

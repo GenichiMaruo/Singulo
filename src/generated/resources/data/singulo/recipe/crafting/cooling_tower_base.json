@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WP",
+    "PW"
+  ],
+  "key": {
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "P": {
+      "item": "singulo:steel_plate"
+    }
+  },
+  "result": {
+    "id": "singulo:cooling_tower_base",
+    "count": 4
+  }
+}

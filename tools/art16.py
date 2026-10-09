@@ -151,16 +151,15 @@ def machine_frame(stage):
 
 
 def glass():
-    """装置の窓ガラス（半透明。うっすらした映り込みの斜線）。"""
-    im, d = new(fill=(200, 230, 245, 54))
-    for k in range(-S, S, 7):
-        for i in range(S):
-            x, y = k + i, S - 1 - i
-            if 0 <= x < S:
-                d.point((x, y), fill=(255, 255, 255, 96))
-                if x + 1 < S:
-                    d.point((x + 1, y), fill=(255, 255, 255, 60))
-    d.rectangle([0, 0, S - 1, S - 1], outline=(255, 255, 255, 80))
+    """装置の窓ガラス。切り抜きで描く（半透明だと、描く順番によって奥の壁が消え、向こうの景色が透けて見えるため）。
+    ガラス自体は透明で、映り込みの短い斜線だけを点で残す。"""
+    im, d = new()
+    for k in (-6, 3):
+        for i in range(4):
+            x, y = 9 + k + i, 3 + 3 - i + (0 if k < 0 else 5)
+            if 0 <= x < S and 0 <= y < S:
+                d.point((x, y), fill=(236, 246, 252, 255))
+    d.point((12, 4), fill=(236, 246, 252, 255))
     return im
 
 
@@ -262,6 +261,7 @@ MACHINE_ICONS = {
     'degenerate_compactor_controller': ('inward', None), 'casimir_cavity_controller': ('mirrors', None),
     'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'core_controller': ('blackhole', (255, 200, 140)),
     'creative_energy_source': ('star', (255, 120, 255)),
+    'neutrino_observatory': ('dish', (190, 150, 255)),
 }
 
 
@@ -286,9 +286,10 @@ def front_frame(iid, stage, on, frame=0, frames=1):
     kind, color = MACHINE_ICONS.get(iid, ('generic', None))
     c = color or t['glow']
     if on:
+        # 明るさの波は控えめに（強弱の差を小さく）
         pulse = 0.5 + 0.5 * math.sin(2 * math.pi * frame / max(1, frames)) if frames > 1 else 1.0
-        col = rgba(mix(c, lighten(c, 0.35), pulse * 0.6))
-        hi = rgba(lighten(c, 0.55 + 0.3 * pulse))
+        col = rgba(mix(c, lighten(c, 0.35), 0.35 + pulse * 0.2))
+        hi = rgba(lighten(c, 0.62 + 0.1 * pulse))
     else:
         col = rgba(mix(c, (30, 40, 50), 0.62))
         hi = rgba(mix(c, (30, 40, 50), 0.45))
@@ -298,61 +299,630 @@ def front_frame(iid, stage, on, frame=0, frames=1):
         sy = 4 + frame * 8 // frames
         for x in range(4, 12):
             p = im.getpixel((x, sy))
-            d.point((x, sy), fill=rgba(lighten(p, 0.22)))
+            d.point((x, sy), fill=rgba(lighten(p, 0.08)))
     # 状態ランプ（窓の下、縁に沿った短い線）
     lamp = t['glow'] if on else mix(t['glow'], (40, 50, 60), 0.7)
-    if on and frames > 1 and frame % 2 == 1:
-        lamp = lighten(lamp, 0.4)
+    if on and frames > 1:
+        lamp = lighten(lamp, 0.1 + 0.1 * math.sin(2 * math.pi * frame / frames))
     d.line([(6, 13), (9, 13)], fill=rgba(lamp))
+    return im
+
+
+# ---------------------------------------------------------------- クリエイティブ電源（無限の電力。星空と虹色の縁）
+
+CREATIVE_FRAMES = 8
+
+
+def creative_casing(frame=0, frames=CREATIVE_FRAMES):
+    """クリエイティブ電源の外装: 深い宇宙の黒紫に、またたく星。縁は虹色にゆっくり移ろう。"""
+    rnd = random.Random(77)
+    im, d = new(fill=(18, 10, 32, 255))
+    for y in range(S):
+        for x in range(S):
+            n = 0.5 + 0.5 * math.sin(x * 0.6 + y * 0.35) * math.cos(y * 0.5 - x * 0.2)
+            d.point((x, y), fill=rgba(mix((14, 8, 28), (52, 22, 78), n * 0.7)))
+    t = 2 * math.pi * frame / frames
+    for k in range(14):
+        x, y = rnd.randrange(2, S - 2), rnd.randrange(2, S - 2)
+        ph = rnd.random() * 2 * math.pi
+        b = 0.5 + 0.5 * math.sin(t + ph)
+        d.point((x, y), fill=rgba(mix((120, 90, 170), (255, 255, 255), b)))
+        if b > 0.8:
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                d.point((x + dx, y + dy), fill=rgba(mix((60, 40, 100), (220, 200, 255), b - 0.5)))
+    # 虹色の縁（色相が縁に沿って流れる）
+    import colorsys
+    edge = [(x, 0) for x in range(S)] + [(S - 1, y) for y in range(1, S)] + \
+           [(x, S - 1) for x in range(S - 2, -1, -1)] + [(0, y) for y in range(S - 2, 0, -1)]
+    for i, (x, y) in enumerate(edge):
+        h = (i / len(edge) + frame / frames) % 1.0
+        r, g, b = colorsys.hsv_to_rgb(h, 0.55, 1.0)
+        d.point((x, y), fill=(int(r * 255), int(g * 255), int(b * 255), 255))
+    for x, y in ((1, 1), (S - 2, 1), (1, S - 2), (S - 2, S - 2)):
+        d.point((x, y), fill=(255, 255, 255, 255))
+    return im
+
+
+def creative_casing_sheet():
+    sheet = Image.new('RGBA', (S, S * CREATIVE_FRAMES), (0, 0, 0, 0))
+    for f in range(CREATIVE_FRAMES):
+        sheet.paste(creative_casing(f), (0, S * f))
+    return sheet
+
+
+def creative_front(on, frame=0, frames=CREATIVE_FRAMES):
+    """クリエイティブ電源の正面: 星空の外装の中央に、脈打つ星（無限の電力のしるし）。"""
+    im = creative_casing(frame, frames)
+    d = ImageDraw.Draw(im)
+    t = 2 * math.pi * frame / frames
+    p = 0.5 + 0.5 * math.sin(t) if on else 0.0
+    core = mix((255, 150, 255), (255, 255, 255), p)
+    ray = mix((200, 90, 220), (255, 200, 255), p)
+    r = 4 + (1 if p > 0.6 else 0)
+    for k in range(1, r + 1):
+        a = 1 - k / (r + 1)
+        c = rgba(mix((40, 20, 60), ray, a))
+        for dx, dy in ((k, 0), (-k, 0), (0, k), (0, -k)):
+            d.point((7 + dx, 7 + dy), fill=c)
+            d.point((8 + dx, 8 + dy), fill=c)
+    for k in (1, 2):
+        for x, y in ((7 - k, 7 - k), (8 + k, 7 - k), (7 - k, 8 + k), (8 + k, 8 + k)):
+            d.point((x, y), fill=rgba(mix((60, 30, 90), ray, 0.7 - 0.25 * k)))
+    d.rectangle([6, 6, 9, 9], fill=rgba(core))
+    d.rectangle([7, 7, 8, 8], fill=(255, 255, 255, 255))
     return im
 
 
 def machine_front(iid, stage, on):
     """正面のテクスチャと、動く場合のコマ数を返す。段階3以上の稼働中は8コマ。"""
-    frames = 8 if on and stage >= 3 else 1
+    frames = 8 if on and stage >= 3 or iid == 'creative_energy_source' else 1
     sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
     for f in range(frames):
-        sheet.paste(front_frame(iid, stage, on, f, frames), (0, S * f))
+        if iid == 'creative_energy_source':
+            sheet.paste(creative_front(on, f, frames), (0, S * f))
+        elif iid == 'degenerate_furnace_controller':
+            sheet.paste(furnace_front(on, f, frames), (0, S * f))
+        elif iid in CONTROLLER_FRONTS:
+            sheet.paste(controller_front(iid, on, f, frames), (0, S * f))
+        else:
+            sheet.paste(front_frame(iid, stage, on, f, frames), (0, S * f))
     return sheet, frames
 
 
-def boost_overlay(frames=8):
-    """恩恵の模様: 縁に沿って流れる光（動くテクスチャ）。"""
+def boost_overlay(frames=16):
+    """恩恵の模様: 縁から少し内側の1本の道を、やわらかい光がゆっくり巡る（動くテクスチャ）。
+    縁そのものは光らせない。明るさの差は小さく、常にうっすら光っている道の上を、少しだけ明るい所が流れる。"""
     sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
-    path = [(x, 0) for x in range(S)] + [(S - 1, y) for y in range(1, S)] + \
-           [(x, S - 1) for x in range(S - 2, -1, -1)] + [(0, y) for y in range(S - 2, 0, -1)]
-    inner = [(x, 2) for x in range(2, S - 2)] + [(S - 3, y) for y in range(3, S - 2)] + \
-            [(x, S - 3) for x in range(S - 4, 1, -1)] + [(2, y) for y in range(S - 4, 2, -1)]
+    lane = [(x, 3) for x in range(3, S - 3)] + [(S - 4, y) for y in range(4, S - 3)] + \
+           [(x, S - 4) for x in range(S - 5, 2, -1)] + [(3, y) for y in range(S - 5, 3, -1)]
+    n = len(lane)
     for f in range(frames):
         im = Image.new('RGBA', (S, S), (0, 0, 0, 0))
         d = ImageDraw.Draw(im)
-        for p in path:
-            d.point(p, fill=(150, 235, 255, 60))
-        for lane, pts, speed in ((0, path, 1), (1, inner, -1)):
-            n = len(pts)
-            for k in range(2):
-                head = (speed * f * n // frames + k * n // 2) % n
-                for tail in range(6):
-                    x, y = pts[(head - speed * tail) % n]
-                    a = int(255 * (1 - tail / 6))
-                    d.point((x, y), fill=(255, 255, 255, a) if tail < 2 else (140, 230, 255, a))
+        for k, (x, y) in enumerate(lane):
+            # 道に沿ったなだらかな明るさの波（2つの山）。最も暗い所でも 0.6、明るい所で 1.0
+            phase = 2 * math.pi * (k / n * 2 - f / frames)
+            w = 0.8 + 0.2 * math.cos(phase)
+            d.point((x, y), fill=(int(150 + 60 * w), int(220 + 25 * w), 255, int(150 * w)))
         sheet.paste(im, (0, S * f))
     return sheet
+
+
+# ---------------------------------------------------------------- 縮退熱炉（コントローラと部品で同じ素材・配色）
+
+FURNACE = dict(
+    steel=(66, 64, 72),       # 外装板の黒鉄
+    frame=(44, 42, 50),       # 枠の重い鋼材
+    edge=(104, 100, 110),     # 面取りの明るい縁
+    copper=(186, 112, 62),    # 磨いた銅の金具
+    heat=(255, 138, 56),      # 熱の光
+    hot=(255, 226, 176),      # 白熱
+)
+
+
+def _bevel(d, color, light, dark, inset=0):
+    a, b = inset, S - 1 - inset
+    d.line([(a, a), (b, a)], fill=rgba(light))
+    d.line([(a, a), (a, b)], fill=rgba(light))
+    d.line([(a, b), (b, b)], fill=rgba(dark))
+    d.line([(b, a), (b, b)], fill=rgba(dark))
+
+
+def furnace_shell(seed=40):
+    """外装板: 黒鉄の板。面取りの縁と、四隅の銅の鋲。マルチブロック搬入出ポートと入れ替えられる板。"""
+    f = FURNACE
+    im = weathered(f['steel'], seed=seed, strength=1.2)
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(f['steel'], 0.45)))
+    _bevel(d, f['steel'], lighten(f['steel'], 0.18), darken(f['steel'], 0.25), inset=1)
+    # 板を留める細い溝
+    d.line([(4, 7), (11, 7)], fill=rgba(darken(f['steel'], 0.3)))
+    d.line([(4, 8), (11, 8)], fill=rgba(lighten(f['steel'], 0.08)))
+    for x, y in ((3, 3), (S - 4, 3), (3, S - 4), (S - 4, S - 4)):
+        d.point((x, y), fill=rgba(f['copper']))
+        d.point((x + 1, y + 1), fill=rgba(darken(f['copper'], 0.4)))
+    return im
+
+
+def furnace_part(iid):
+    f = FURNACE
+    if iid == 'degenerate_furnace_shell':
+        return furnace_shell()
+    if iid == 'degenerate_furnace_frame':
+        # 枠: 重い鋼材の梁。太い面取りと、銅のボルト
+        im = weathered(f['frame'], seed=41, strength=1.4)
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(f['frame'], 0.5)))
+        _bevel(d, f['frame'], f['edge'], darken(f['frame'], 0.35), inset=1)
+        _bevel(d, f['frame'], lighten(f['frame'], 0.12), darken(f['frame'], 0.2), inset=2)
+        d.rectangle([5, 5, 10, 10], outline=rgba(darken(f['frame'], 0.3)))
+        d.rectangle([6, 6, 9, 9], fill=rgba(lighten(f['frame'], 0.06)))
+        for x, y in ((3, 3), (S - 4, 3), (3, S - 4), (S - 4, S - 4)):
+            d.point((x, y), fill=rgba(lighten(f['copper'], 0.15)))
+        return im
+    if iid == 'degenerate_furnace_piston':
+        # 圧縮ピストン: 外から見える丸い頭。銅の輪の奥に、押しつぶす熱がわずかに見える
+        im = furnace_shell(seed=42)
+        d = ImageDraw.Draw(im)
+        d.ellipse([2, 2, 13, 13], fill=rgba(f['frame']), outline=rgba(f['copper']))
+        d.ellipse([4, 4, 11, 11], fill=rgba(lighten(f['frame'], 0.15)), outline=rgba(darken(f['copper'], 0.3)))
+        d.ellipse([6, 6, 9, 9], fill=rgba(darken(f['heat'], 0.25)))
+        d.point((7, 7), fill=rgba(f['heat']))
+        d.point((8, 8), fill=rgba(darken(f['heat'], 0.1)))
+        for x, y in ((7, 3), (7, 12), (3, 7), (12, 7)):
+            d.point((x, y), fill=rgba(f['edge']))
+        return im
+    if iid == 'degenerate_furnace_fin':
+        # 放熱フィン: 縦に並ぶ薄い板。すき間の奥がうっすら赤い
+        im = weathered(f['steel'], seed=43)
+        d = ImageDraw.Draw(im)
+        for x in range(1, S - 1):
+            if x % 3 == 1:
+                d.line([(x, 2), (x, S - 3)], fill=rgba(lighten(f['steel'], 0.22)))
+            elif x % 3 == 2:
+                d.line([(x, 2), (x, S - 3)], fill=rgba(darken(f['steel'], 0.15)))
+            else:
+                for y in range(2, S - 2):
+                    k = (y - 2) / (S - 5)
+                    d.point((x, y), fill=rgba(mix((26, 22, 26), (120, 52, 30), k * 0.8)))
+        d.rectangle([0, 0, S - 1, 1], fill=rgba(f['frame']))
+        d.rectangle([0, S - 2, S - 1, S - 1], fill=rgba(f['frame']))
+        d.line([(0, 1), (S - 1, 1)], fill=rgba(darken(f['copper'], 0.2)))
+        d.line([(0, S - 2), (S - 1, S - 2)], fill=rgba(darken(f['copper'], 0.2)))
+        return im
+    if iid == 'degenerate_furnace_tube':
+        # 熱交換管: 銅の管が3本。継ぎ目の帯
+        im, d = new(fill=rgba((30, 28, 32)))
+        for x0 in (1, 6, 11):
+            for x in range(x0, x0 + 4):
+                k = (x - x0) / 3
+                c = mix(lighten(f['copper'], 0.3), darken(f['copper'], 0.45), k)
+                d.line([(x, 0), (x, S - 1)], fill=rgba(c))
+            for y in (3, 12):
+                d.line([(x0, y), (x0 + 3, y)], fill=rgba(f['frame']))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(f['frame'], 0.4)))
+        return im
+    if iid == 'degenerate_furnace_window':
+        # 観察窓: 琥珀色の耐熱ガラス（半透明）。鋼の縁と銅の留め具
+        im, d = new(fill=(255, 176, 96, 64))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(f['frame']))
+        d.rectangle([1, 1, S - 2, S - 2], outline=rgba(darken(f['copper'], 0.15)))
+        for x, y in ((1, 1), (S - 2, 1), (1, S - 2), (S - 2, S - 2)):
+            d.point((x, y), fill=rgba(lighten(f['copper'], 0.2)))
+        for i in range(4, 9):
+            d.point((i, i - 1), fill=(255, 240, 220, 120))
+        d.point((10, 4), fill=(255, 240, 220, 90))
+        return im
+    return None
+
+
+def furnace_front(on, frame=0, frames=1):
+    """縮退熱炉コントローラの正面: 外装板と同じ黒鉄の板に、炉の中をのぞく窓と熱の計器。稼働中は炎がゆらぐ。"""
+    f = FURNACE
+    im = furnace_shell(seed=44)
+    d = ImageDraw.Draw(im)
+    # 窓の枠（銅）と、奥の炉
+    d.rectangle([3, 3, 12, 10], fill=rgba(f['frame']), outline=rgba(f['copper']))
+    t = 2 * math.pi * frame / max(1, frames)
+    for y in range(4, 10):
+        for x in range(4, 12):
+            if not on:
+                c = (30, 24, 26) if (x + y) % 5 else (40, 30, 30)
+            else:
+                # 下ほど熱い。ゆっくりした揺らぎ（強弱は控えめ）
+                k = (y - 4) / 5
+                w = 0.5 + 0.5 * math.sin(t + x * 0.9 + y * 0.4)
+                h = min(1.0, 0.35 + 0.55 * k + 0.12 * w)
+                c = mix(darken(f['heat'], 0.55), f['hot'], max(0.0, h - 0.45) * 1.6) if h > 0.45 else mix((60, 26, 18), darken(f['heat'], 0.55), h / 0.45)
+            d.point((x, y), fill=rgba(c))
+    # 押しつぶす2本のピストン（窓の上下から中心へ）
+    d.line([(7, 4), (7, 5)], fill=rgba(f['edge']))
+    d.line([(8, 4), (8, 5)], fill=rgba(f['edge']))
+    d.line([(7, 8), (7, 9)], fill=rgba(f['edge']))
+    d.line([(8, 8), (8, 9)], fill=rgba(f['edge']))
+    # 熱の計器（窓の下の横棒）
+    d.rectangle([3, 12, 12, 13], fill=rgba(darken(f['frame'], 0.3)))
+    if on:
+        n = 7 + int(round(1.5 + 1.5 * math.sin(t)))
+        for x in range(4, 4 + n):
+            k = (x - 4) / 9
+            d.point((x, 12), fill=rgba(mix(f['heat'], f['hot'], k)))
+            d.point((x, 13), fill=rgba(darken(mix(f['heat'], f['hot'], k), 0.25)))
+    else:
+        d.point((4, 12), fill=rgba(darken(f['heat'], 0.5)))
+    return im
+
+
+
+# ---------------------------------------------------------------- マルチブロックの素材（コントローラと部品で同じ素材・配色）
+
+MATERIALS = {
+    # 冷却塔: 白いコンクリートと鋼、氷の青
+    'tower': dict(plate=(198, 210, 220), frame=(118, 128, 140), edge=(236, 241, 246), trim=(96, 150, 190), glow=(150, 232, 255),
+                  hot=(232, 250, 255), dark=(40, 56, 72)),
+    # 縮退圧縮炉: 青黒い鋼と、縮退物質の紫
+    'compactor': dict(plate=(78, 80, 96), frame=(50, 50, 64), edge=(120, 120, 142), trim=(150, 110, 220), glow=(200, 160, 255),
+                      hot=(240, 228, 255), dark=(24, 22, 34)),
+    # C空洞: 白い実験容器と、真空のシアン
+    'cavity': dict(plate=(216, 222, 232), frame=(146, 156, 172), edge=(244, 247, 251), trim=(86, 168, 208), glow=(140, 230, 255),
+                   hot=(230, 252, 255), dark=(30, 44, 58)),
+    # シールド発生塔: 紺の石と白い装甲、金の縁
+    'shield': dict(plate=(206, 212, 226), frame=(54, 58, 80), edge=(236, 240, 250), trim=(220, 188, 108), glow=(170, 220, 255),
+                   hot=(242, 250, 255), dark=(26, 30, 46)),
+    # Tシリンダー: 黒と金、時間結晶の紫
+    'tipler': dict(plate=(46, 46, 58), frame=(28, 28, 36), edge=(92, 90, 106), trim=(220, 188, 108), glow=(200, 160, 255),
+                   hot=(250, 240, 255), dark=(14, 14, 20)),
+    # ワームホール生成器: 深い紫の殻と、マゼンタの場
+    'wormhole': dict(plate=(48, 36, 66), frame=(26, 20, 38), edge=(100, 80, 128), trim=(176, 112, 232), glow=(214, 144, 255),
+                     hot=(250, 232, 255), dark=(12, 8, 20)),
+}
+
+
+def mat_plate(m, seed, rivets=True, seam=True):
+    """外装板: 素材の板。面取りの縁と、四隅の鋲。"""
+    base = m['plate']
+    im = weathered(base, seed=seed, strength=1.1)
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(base, 0.4)))
+    _bevel(d, base, lighten(base, 0.18), darken(base, 0.22), inset=1)
+    if seam:
+        d.line([(4, 7), (11, 7)], fill=rgba(darken(base, 0.2)))
+        d.line([(4, 8), (11, 8)], fill=rgba(lighten(base, 0.08)))
+    if rivets:
+        for x, y in ((3, 3), (S - 4, 3), (3, S - 4), (S - 4, S - 4)):
+            d.point((x, y), fill=rgba(m['trim']))
+            d.point((x + 1, y + 1), fill=rgba(darken(m['trim'], 0.4)))
+    return im
+
+
+def mat_frame(m, seed):
+    """枠: 重い鋼材の梁。太い面取りと、縁取りの色のボルト。"""
+    base = m['frame']
+    im = weathered(base, seed=seed, strength=1.3)
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(base, 0.5)))
+    _bevel(d, base, m['edge'], darken(base, 0.35), inset=1)
+    _bevel(d, base, lighten(base, 0.12), darken(base, 0.2), inset=2)
+    d.rectangle([5, 5, 10, 10], outline=rgba(darken(base, 0.3)))
+    d.rectangle([6, 6, 9, 9], fill=rgba(lighten(base, 0.06)))
+    for x, y in ((3, 3), (S - 4, 3), (3, S - 4), (S - 4, S - 4)):
+        d.point((x, y), fill=rgba(lighten(m['trim'], 0.1)))
+    return im
+
+
+def mat_window(m, tint, alpha=64):
+    """観察窓: 色つきの半透明ガラス。枠と留め具。"""
+    im, d = new(fill=tint + (alpha,))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(m['frame']))
+    d.rectangle([1, 1, S - 2, S - 2], outline=rgba(darken(m['trim'], 0.1)))
+    for x, y in ((1, 1), (S - 2, 1), (1, S - 2), (S - 2, S - 2)):
+        d.point((x, y), fill=rgba(lighten(m['trim'], 0.2)))
+    for i in range(4, 9):
+        d.point((i, i - 1), fill=(255, 255, 255, 110))
+    d.point((10, 4), fill=(255, 255, 255, 80))
+    return im
+
+
+def mat_coil(m, seed, vertical=False):
+    """コイル: 枠の中に巻いた線。中心に光る芯。"""
+    im = weathered(m['dark'], seed=seed, strength=0.8)
+    d = ImageDraw.Draw(im)
+    for k in range(2, S - 2):
+        c = lighten(m['trim'], 0.25) if k % 2 == 0 else darken(m['trim'], 0.35)
+        if vertical:
+            d.line([(k, 2), (k, S - 3)], fill=rgba(c))
+        else:
+            d.line([(2, k), (S - 3, k)], fill=rgba(c))
+    if vertical:
+        d.line([(2, 7), (S - 3, 7)], fill=rgba(m['glow']))
+        d.line([(2, 8), (S - 3, 8)], fill=rgba(lighten(m['glow'], 0.4)))
+    else:
+        d.line([(7, 2), (7, S - 3)], fill=rgba(m['glow']))
+        d.line([(8, 2), (8, S - 3)], fill=rgba(lighten(m['glow'], 0.4)))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(m['frame']))
+    d.rectangle([1, 1, S - 2, S - 2], outline=rgba(darken(m['frame'], 0.3)))
+    return im
+
+
+def multiblock_part(iid):
+    """縮退熱炉以外のマルチブロックの部品。対応しないものは None。"""
+    T, C, V, SH, TI, W = (MATERIALS[k] for k in ('tower', 'compactor', 'cavity', 'shield', 'tipler', 'wormhole'))
+    # ---- 冷却塔
+    if iid == 'cooling_tower_base':
+        im = weathered((148, 152, 158), seed=50, strength=1.4)
+        d = ImageDraw.Draw(im)
+        for y in (4, 9, 14):
+            d.line([(0, y), (S - 1, y)], fill=(118, 122, 128, 255))
+        for y0, xs in ((0, (5, 12)), (5, (2, 9)), (10, (6, 13))):
+            for x in xs:
+                d.line([(x, y0), (x, y0 + 3)], fill=(118, 122, 128, 255))
+        d.rectangle([0, 0, S - 1, S - 1], outline=(96, 100, 106, 255))
+        return im
+    if iid == 'cooling_tower_casing':
+        im = mat_plate(T, 51, seam=False)
+        d = ImageDraw.Draw(im)
+        for x in (5, 10):
+            d.line([(x, 2), (x, S - 3)], fill=rgba(darken(T['plate'], 0.1)))
+            d.line([(x + 1, 2), (x + 1, S - 3)], fill=rgba(lighten(T['plate'], 0.1)))
+        return im
+    if iid == 'cooling_tower_glass':
+        return mat_window(T, (180, 228, 250), 60)
+    if iid == 'cooling_tower_coolant_band':
+        im = weathered(T['frame'], seed=52)
+        d = ImageDraw.Draw(im)
+        for y0 in (3, 9):
+            d.rectangle([0, y0, S - 1, y0 + 3], fill=rgba(darken(T['trim'], 0.2)))
+            d.line([(0, y0 + 1), (S - 1, y0 + 1)], fill=rgba(T['glow']))
+            d.line([(0, y0), (S - 1, y0)], fill=rgba(lighten(T['glow'], 0.6)))
+            for x in range(1, S, 5):
+                d.line([(x, y0), (x, y0 + 3)], fill=rgba(T['frame']))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(T['frame'], 0.3)))
+        return im
+    if iid == 'cooling_tower_rim':
+        im = mat_frame(T, 53)
+        d = ImageDraw.Draw(im)
+        d.line([(1, 2), (S - 2, 2)], fill=rgba(T['edge']))
+        d.line([(1, 3), (S - 2, 3)], fill=rgba(T['trim']))
+        return im
+    if iid == 'cooling_tower_grate':
+        im, d = new()
+        for k in range(0, S, 4):
+            d.line([(k, 0), (k, S - 1)], fill=rgba(T['frame']))
+            d.line([(0, k), (S - 1, k)], fill=rgba(T['frame']))
+            d.line([(k + 1, 0), (k + 1, S - 1)], fill=rgba(darken(T['frame'], 0.3)))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(T['frame'], 0.3)))
+        return im
+    # ---- 縮退圧縮炉
+    if iid == 'degenerate_compactor_plate':
+        return mat_plate(C, 54)
+    if iid == 'degenerate_compactor_frame':
+        return mat_frame(C, 55)
+    if iid == 'degenerate_compactor_ram':
+        im = mat_plate(C, 56, rivets=False, seam=False)
+        d = ImageDraw.Draw(im)
+        d.rectangle([2, 2, 13, 13], fill=rgba(C['frame']), outline=rgba(C['trim']))
+        for k in range(3, 13, 3):
+            d.line([(k, 3), (k + 2, 3)], fill=rgba((230, 200, 80)))
+            d.line([(k, 12), (k + 2, 12)], fill=rgba((230, 200, 80)))
+        d.rectangle([5, 5, 10, 10], fill=rgba(lighten(C['frame'], 0.2)), outline=rgba(C['edge']))
+        d.rectangle([7, 7, 8, 8], fill=rgba(C['glow']))
+        return im
+    if iid == 'degenerate_compactor_anvil':
+        im = weathered(C['dark'], seed=57, strength=1.2)
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(C['frame']))
+        d.rectangle([2, 2, 13, 13], fill=rgba(darken(C['plate'], 0.3)), outline=rgba(C['edge']))
+        d.line([(3, 3), (12, 12)], fill=rgba(darken(C['trim'], 0.3)))
+        d.line([(12, 3), (3, 12)], fill=rgba(darken(C['trim'], 0.3)))
+        d.rectangle([6, 6, 9, 9], fill=rgba(darken(C['glow'], 0.4)))
+        return im
+    if iid == 'degenerate_compactor_vent':
+        im = mat_plate(C, 58, rivets=False, seam=False)
+        d = ImageDraw.Draw(im)
+        for y in range(3, 13, 3):
+            d.rectangle([2, y, 13, y + 1], fill=rgba(C['dark']))
+            d.line([(2, y), (13, y)], fill=rgba(darken(C['trim'], 0.5)))
+        return im
+    if iid == 'degenerate_compactor_window':
+        return mat_window(C, (190, 150, 255), 60)
+    # ---- C空洞
+    if iid == 'casimir_cavity_wall':
+        im = mat_plate(V, 59, seam=False)
+        d = ImageDraw.Draw(im)
+        d.line([(3, 12), (12, 12)], fill=rgba(V['trim']))
+        return im
+    if iid == 'casimir_cavity_frame':
+        return mat_frame(V, 60)
+    if iid == 'casimir_cavity_pump':
+        im = mat_frame(V, 61)
+        d = ImageDraw.Draw(im)
+        d.ellipse([2, 2, 13, 13], fill=rgba(V['dark']), outline=rgba(V['edge']))
+        d.line([(7, 3), (8, 12)], fill=rgba(V['glow']))
+        d.line([(3, 8), (12, 7)], fill=rgba(V['glow']))
+        d.point((7, 7), fill=rgba(V['hot']))
+        d.point((8, 8), fill=rgba(V['hot']))
+        return im
+    if iid == 'casimir_cavity_shield':
+        return mat_coil(V, 62, vertical=True)
+    if iid == 'casimir_cavity_window':
+        return mat_window(V, (170, 236, 255), 56)
+    # ---- シールド発生塔
+    if iid == 'shield_tower_plinth':
+        im = weathered(SH['frame'], seed=63, strength=1.3)
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(SH['frame'], 0.4)))
+        _bevel(d, SH['frame'], lighten(SH['frame'], 0.25), darken(SH['frame'], 0.3), inset=1)
+        d.line([(2, 12), (13, 12)], fill=rgba(SH['trim']))
+        d.line([(2, 3), (13, 3)], fill=rgba(darken(SH['trim'], 0.3)))
+        return im
+    if iid == 'shield_tower_coil':
+        return mat_coil(SH, 64)
+    if iid == 'shield_tower_body':
+        im = mat_plate(SH, 65, rivets=True, seam=False)
+        d = ImageDraw.Draw(im)
+        d.line([(7, 2), (7, S - 3)], fill=rgba(darken(SH['plate'], 0.15)))
+        d.line([(8, 2), (8, S - 3)], fill=rgba(lighten(SH['plate'], 0.1)))
+        return im
+    if iid == 'shield_tower_waveguide':
+        im, d = new(fill=(170, 220, 255, 56))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(SH['trim']))
+        for x in (4, 11):
+            d.line([(x, 1), (x, S - 2)], fill=(220, 240, 255, 120))
+        d.line([(7, 1), (7, S - 2)], fill=(255, 255, 255, 90))
+        return im
+    if iid == 'shield_tower_crown':
+        im = weathered(darken(SH['trim'], 0.15), seed=66, strength=1.0)
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(darken(SH['trim'], 0.5)))
+        d.polygon([(8, 2), (13, 8), (8, 13), (3, 8)], fill=rgba(SH['edge']), outline=rgba(lighten(SH['trim'], 0.3)))
+        d.polygon([(8, 5), (10, 8), (8, 10), (6, 8)], fill=rgba(SH['glow']))
+        return im
+    # ---- Tシリンダー
+    if iid == 'tipler_housing':
+        return mat_plate(TI, 67)
+    if iid == 'tipler_frame':
+        return mat_frame(TI, 68)
+    if iid == 'tipler_bearing':
+        im = mat_plate(TI, 69, rivets=False, seam=False)
+        d = ImageDraw.Draw(im)
+        d.ellipse([2, 2, 13, 13], outline=rgba(TI['trim']))
+        d.ellipse([4, 4, 11, 11], fill=rgba(TI['frame']), outline=rgba(darken(TI['trim'], 0.3)))
+        d.ellipse([6, 6, 9, 9], fill=rgba(TI['edge']))
+        for x, y in ((7, 3), (7, 12), (3, 7), (12, 7)):
+            d.point((x, y), fill=rgba(lighten(TI['trim'], 0.3)))
+        return im
+    if iid == 'tipler_window':
+        return mat_window(TI, (200, 170, 255), 52)
+    if iid == 'tipler_holder':
+        im = mat_plate(TI, 70, rivets=False, seam=False)
+        d = ImageDraw.Draw(im)
+        d.rectangle([4, 2, 11, 13], fill=rgba(TI['dark']), outline=rgba(TI['trim']))
+        d.polygon([(8, 3), (10, 7), (8, 12), (6, 7)], fill=rgba(TI['glow']))
+        d.line([(8, 4), (8, 10)], fill=rgba(TI['hot']))
+        return im
+    # ---- ワームホール生成器
+    # ---- Pリアクターの追加部品（炉殻と同じ黒い素材）
+    if iid == 'reactor_stabilizer':
+        im = weathered((26, 26, 34), seed=74, strength=1.4)
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, S - 1, S - 1], outline=(236, 238, 240, 255))
+        d.ellipse([2, 2, 13, 13], outline=(220, 188, 108, 255))
+        d.ellipse([4, 4, 11, 11], outline=(150, 120, 70, 255))
+        d.ellipse([6, 6, 9, 9], fill=(150, 232, 255, 255))
+        for x, y in ((7, 1), (1, 7), (14, 8), (8, 14)):
+            d.point((x, y), fill=(220, 188, 108, 255))
+        return im
+    if iid == 'reactor_mass_alarm':
+        return alarm_texture(False)
+    if iid == 'wormhole_generator_shell':
+        im = mat_plate(W, 71, seam=False)
+        d = ImageDraw.Draw(im)
+        d.arc([2, 2, 13, 13], 200, 340, fill=rgba(darken(W['trim'], 0.25)))
+        return im
+    if iid == 'wormhole_generator_coil':
+        return mat_coil(W, 72)
+    if iid == 'wormhole_generator_focuser':
+        im = mat_plate(W, 73, rivets=False, seam=False)
+        d = ImageDraw.Draw(im)
+        d.ellipse([1, 1, 14, 14], fill=rgba(W['dark']), outline=rgba(W['trim']))
+        d.ellipse([4, 4, 11, 11], outline=rgba(W['glow']))
+        d.ellipse([6, 6, 9, 9], fill=rgba(W['hot']))
+        return im
+    if iid == 'wormhole_generator_window':
+        return mat_window(W, (200, 150, 255), 56)
+    return None
+
+
+def alarm_texture(on):
+    """炉心質量警報器: 黒い炉殻に、赤いランプと警告の縞。"""
+    im = weathered((26, 26, 34), seed=75, strength=1.3)
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, S - 1, S - 1], outline=(236, 238, 240, 255))
+    for k in range(0, S, 4):
+        d.line([(k, 1), (k + 2, 1)], fill=(230, 190, 60, 255))
+        d.line([(k + 2, S - 2), (k + 4, S - 2)], fill=(230, 190, 60, 255))
+    lamp = (255, 70, 60) if on else (110, 30, 30)
+    d.ellipse([4, 4, 11, 11], fill=rgba(darken(lamp, 0.3)), outline=(160, 160, 170, 255))
+    d.ellipse([5, 5, 10, 10], fill=rgba(lamp))
+    d.point((6, 6), fill=rgba(lighten(lamp, 0.6)))
+    return im
+
+
+# コントローラの正面: (外装の部品, 素材, 絵柄)
+CONTROLLER_FRONTS = {
+    'cooling_tower_controller': ('cooling_tower_casing', 'tower', 'snow'),
+    'degenerate_compactor_controller': ('degenerate_compactor_plate', 'compactor', 'inward'),
+    'casimir_cavity_controller': ('casimir_cavity_wall', 'cavity', 'mirrors'),
+    'shield_tower_core': ('shield_tower_plinth', 'shield', 'dome'),
+    'tipler_core': ('tipler_housing', 'tipler', 'cylinder'),
+    'wormhole_generator_core': ('wormhole_generator_shell', 'wormhole', 'swirl'),
+}
+
+
+def controller_front(iid, on, frame=0, frames=1):
+    """マルチブロックのコントローラの正面: 部品と同じ外装の板に、操作盤の画面と計器。"""
+    skin, mat, icon = CONTROLLER_FRONTS[iid]
+    m = MATERIALS[mat]
+    im = multiblock_part(skin)
+    d = ImageDraw.Draw(im)
+    d.rectangle([3, 3, 12, 10], fill=rgba(m['dark']), outline=rgba(m['trim']))
+    t = 2 * math.pi * frame / max(1, frames)
+    if on:
+        pulse = 0.5 + 0.5 * math.sin(t)
+        col = rgba(mix(m['glow'], lighten(m['glow'], 0.3), 0.35 + 0.2 * pulse))
+        hi = rgba(lighten(m['glow'], 0.62 + 0.1 * pulse))
+    else:
+        col = rgba(mix(m['glow'], m['dark'], 0.65))
+        hi = rgba(mix(m['glow'], m['dark'], 0.45))
+    # 8×8 の絵柄の中央 8×6 を画面に入れる
+    rows = ICONS.get(icon, ICONS['generic'])[1:7]
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch == '#':
+                d.point((4 + x, 4 + y), fill=col)
+            elif ch == '+':
+                d.point((4 + x, 4 + y), fill=hi)
+    d.rectangle([3, 12, 12, 13], fill=rgba(darken(m['frame'], 0.3)))
+    if on:
+        n = 7 + int(round(1.5 + 1.5 * math.sin(t)))
+        for x in range(4, 4 + n):
+            k = (x - 4) / 9
+            d.point((x, 12), fill=rgba(mix(m['glow'], m['hot'], k)))
+            d.point((x, 13), fill=rgba(darken(mix(m['glow'], m['hot'], k), 0.25)))
+    else:
+        d.point((4, 12), fill=rgba(darken(m['glow'], 0.5)))
+    return im
+
+
+# ---------------------------------------------------------------- マルチブロック搬入出ポート（どの機械にも置くので、落ち着いた中間の色）
+
+def multiblock_port():
+    im = weathered((84, 88, 96), seed=45, strength=1.1)
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, S - 1, S - 1], outline=(40, 42, 48, 255))
+    _bevel(d, (84, 88, 96), (128, 132, 140), (56, 58, 66), inset=1)
+    d.rectangle([3, 3, 12, 12], fill=(26, 28, 34, 255), outline=(150, 156, 166, 255))
+    # 入る矢印（白、右向き）と出る矢印（琥珀、左向き）
+    w, o = (230, 234, 238, 255), (255, 196, 110, 255)
+    d.line([(4, 6), (8, 6)], fill=w)
+    d.point([(7, 5), (7, 7), (6, 4), (6, 8)], fill=w)
+    d.line([(7, 9), (11, 9)], fill=o)
+    d.point([(8, 8), (8, 10), (9, 7), (9, 11)], fill=o)
+    for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+        d.point((x, y), fill=(200, 206, 214, 255))
+    return im
 
 
 # ---------------------------------------------------------------- 部品・ブロック
 
 def part_texture(iid):
-    if iid == 'cooling_tower_casing':
-        return casing(2, 'side', seed=3)
-    if iid == 'cooling_tower_glass':
-        im, d = new()
-        d.rectangle([0, 0, S - 1, S - 1], outline=(214, 224, 232, 255))
-        d.rectangle([1, 1, S - 2, S - 2], outline=(150, 182, 204, 255))
-        d.rectangle([2, 2, S - 3, S - 3], fill=(190, 230, 250, 50))
-        for i in range(3, 8):
-            d.point((i, i - 1), fill=(255, 255, 255, 140))
-        return im
+    fp = furnace_part(iid)
+    if fp is None:
+        fp = multiblock_part(iid)
+    if fp is not None:
+        return fp
+    if iid == 'multiblock_port':
+        return multiblock_port()
     if iid == 'heat_exchange_core':
         im = weathered((128, 82, 54), seed=11)
         d = ImageDraw.Draw(im)
@@ -360,13 +930,6 @@ def part_texture(iid):
             d.line([(x, 1), (x, S - 2)], fill=(214, 144, 92, 255))
         d.line([(0, 7), (S - 1, 7)], fill=(150, 230, 255, 255))
         d.line([(0, 8), (S - 1, 8)], fill=(110, 200, 240, 255))
-        return im
-    if iid == 'cooling_tower_port':
-        im = casing(2, 'side', seed=4)
-        d = ImageDraw.Draw(im)
-        d.ellipse([4, 4, 11, 11], fill=(40, 52, 64, 255), outline=(130, 150, 172, 255))
-        d.point((7, 7), fill=(150, 232, 255, 255))
-        d.point((8, 8), fill=(150, 232, 255, 255))
         return im
     if iid == 'accelerator_tube':
         im = weathered((206, 212, 220), seed=12)
@@ -383,14 +946,6 @@ def part_texture(iid):
         d.rectangle([2, 2, 6, S - 3], fill=(206, 72, 72, 255))
         d.rectangle([9, 2, S - 3, S - 3], fill=(72, 110, 206, 255))
         d.line([(7, 1), (8, S - 2)], fill=(255, 255, 255, 255))
-        return im
-    if iid == 'degenerate_casing':
-        im = weathered((80, 82, 94), seed=14, strength=1.3)
-        d = ImageDraw.Draw(im)
-        d.rectangle([0, 0, S - 1, S - 1], outline=(40, 42, 50, 255))
-        edge_line(d, 1, (236, 238, 240, 200), gap=1)
-        for x, y in ((3, 3), (S - 4, 3), (3, S - 4), (S - 4, S - 4)):
-            d.point((x, y), fill=(255, 190, 92, 255))
         return im
     if iid == 'mirror_plate':
         im, d = new()
@@ -422,16 +977,6 @@ def part_texture(iid):
         d.ellipse([2, 2, 13, 13], outline=(220, 188, 108, 255))
         d.ellipse([2, 5, 13, 10], outline=(255, 255, 255, 255))
         d.ellipse([5, 2, 10, 13], outline=(150, 232, 255, 255))
-        d.point((7, 7), fill=(255, 255, 255, 255))
-        d.point((8, 8), fill=(255, 255, 255, 255))
-        return im
-    if iid == 'wormhole_generator_io':
-        im = weathered((80, 82, 94), seed=21, strength=1.3)
-        d = ImageDraw.Draw(im)
-        d.rectangle([0, 0, S - 1, S - 1], outline=(40, 42, 50, 255))
-        edge_line(d, 1, (236, 238, 240, 200), gap=1)
-        d.ellipse([3, 3, 12, 12], fill=(14, 10, 24, 255), outline=(200, 120, 255, 255))
-        d.ellipse([5, 5, 10, 10], outline=(110, 220, 255, 255))
         d.point((7, 7), fill=(255, 255, 255, 255))
         d.point((8, 8), fill=(255, 255, 255, 255))
         return im
@@ -883,9 +1428,72 @@ ITEM_ART = {
     'record_fragment': lambda: scroll((200, 196, 186), (70, 80, 90), torn=True),
     'decoded_record': lambda: tablet(T1),
     'creative_catalyst': lambda: crystal_cluster((255, 120, 255), mark=(255, 255, 255)),
+    'shield_permit': lambda: permit_card(),
+    'bh_container': lambda: vessel(None),
+    'micro_black_hole': lambda: vessel((200, 140, 255)),
+    'black_hole_bomb': lambda: bomb_item(),
+    'settings_card': lambda: settings_card(),
     'builder_wand': lambda: outlined(lambda d: (d.line([(3, 12), (10, 5)], fill=(150, 110, 70, 255), width=2),
                                                d.ellipse([10, 2, 13, 5], fill=(255, 120, 255, 255)))),
 }
+
+
+def vessel(ring):
+    """BH格納容器: 鋼の枠に収まった球。中にブラックホールがあれば黒い芯と紫の輪。"""
+    im, d = new()
+    d.ellipse([3, 3, 12, 12], fill=(200, 220, 236, 90) if ring is None else (30, 18, 44, 255), outline=(150, 160, 175, 255))
+    if ring is not None:
+        d.ellipse([5, 7, 10, 9], outline=rgba(ring))
+        d.ellipse([6, 6, 9, 9], fill=(4, 2, 8, 255))
+        d.point((8, 7), fill=(255, 255, 255, 255))
+    else:
+        d.point((5, 5), fill=(255, 255, 255, 200))
+    for x in (2, 13):
+        d.line([(x, 4), (x, 11)], fill=(120, 126, 140, 255))
+    d.line([(4, 2), (11, 2)], fill=(120, 126, 140, 255))
+    d.line([(4, 13), (11, 13)], fill=(120, 126, 140, 255))
+    for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+        d.point((x, y), fill=(220, 188, 108, 255))
+    return im
+
+
+def bomb_item():
+    """ブラックホール爆弾: 黒い球に4枚のひれと、紫に光る筋。"""
+    im, d = new()
+    d.ellipse([3, 4, 12, 13], fill=(30, 26, 40, 255), outline=(90, 80, 110, 255))
+    d.polygon([(7, 1), (9, 1), (9, 4), (7, 4)], fill=(150, 156, 170, 255))
+    d.line([(4, 8), (11, 8)], fill=(200, 140, 255, 255))
+    d.line([(7, 5), (7, 12)], fill=(150, 90, 220, 255))
+    d.point((6, 6), fill=(255, 255, 255, 255))
+    d.point((10, 2), fill=(255, 200, 80, 255))
+    return im
+
+
+def settings_card():
+    """設定カード: 白いカードに、写す・貼るの矢印。"""
+    im, d = new()
+    d.rectangle([2, 3, 13, 12], fill=(236, 240, 246, 255), outline=(140, 150, 165, 255))
+    d.rectangle([3, 4, 12, 5], fill=(110, 205, 238, 255))
+    d.line([(4, 8), (8, 8)], fill=(60, 110, 170, 255))
+    d.point([(7, 7), (7, 9)], fill=(60, 110, 170, 255))
+    d.line([(7, 10), (11, 10)], fill=(240, 160, 60, 255))
+    d.point([(8, 9), (8, 11)], fill=(240, 160, 60, 255))
+    return im
+
+
+def permit_card():
+    """シールド許可証: 白いカードに、金の縁と青いシールドの紋章、名前の欄。"""
+    im, d = new()
+    d.rectangle([1, 3, 14, 12], fill=(236, 240, 248, 255), outline=(150, 156, 170, 255))
+    d.rectangle([2, 4, 13, 11], outline=(220, 188, 108, 255))
+    # シールドの紋章（左）
+    d.polygon([(4, 5), (8, 5), (8, 8), (6, 10), (4, 8)], fill=(110, 180, 240, 255), outline=(60, 110, 170, 255))
+    d.point((6, 7), fill=(255, 255, 255, 255))
+    # 名前の欄（右）
+    for y in (6, 8):
+        d.line([(9, y), (12, y)], fill=(120, 126, 140, 255))
+    d.line([(9, 10), (11, 10)], fill=(220, 188, 108, 255))
+    return im
 
 
 def item_texture(iid, stage):

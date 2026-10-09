@@ -37,6 +37,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloKeys::register);
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
@@ -61,6 +62,8 @@ public final class SinguloClient {
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ACCELERATOR_CONTROLLER.get(),
+                AcceleratorRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),
@@ -93,8 +96,22 @@ public final class SinguloClient {
                 WormholeMouthRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.TIPLER_CYLINDER.get(),
                 TiplerCylinderRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_FURNACE.get(),
+                DegenerateFurnaceRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_COMPACTOR_CONTROLLER.get(),
+                DegenerateCompactorRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CASIMIR_CAVITY_CONTROLLER.get(),
+                CasimirCavityRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.COOLING_TOWER_CONTROLLER.get(),
+                CoolingTowerRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.WORMHOLE_GENERATOR.get(),
+                WormholeGeneratorRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ROGUE_BLACK_HOLE.get(),
+                RogueBlackHoleRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_BOLT.get(), HorizonBoltRenderer::new);
         event.registerEntityRenderer(SinguloEntities.WARDEN_SINGULARITY.get(), WardenSingularityRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.BLACK_HOLE_BOMB.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.MICRO_BLACK_HOLE.get(), MicroBlackHoleRenderer::new);
     }
 
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {

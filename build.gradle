@@ -39,7 +39,8 @@ neoForge {
         }
         gameTestServer {
             type = "gameTestServer"
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
+            systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse(project.mod_id)
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

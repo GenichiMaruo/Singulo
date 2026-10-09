@@ -48,8 +48,6 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     public static final int MACHINE_TIER = 4;
     public static final int FE_PER_TICK = 100_000;
     public static final int FUEL_TICKS = 1200;
-    /** 円柱の中心（コアからの高さ）。 */
-    public static final int CENTER_HEIGHT = 3;
     static final int CHECK_INTERVAL = 40;
 
     private final ItemStackHandler fuel = new ItemStackHandler(1) {
@@ -66,6 +64,9 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     private final IItemHandler automation = new CombinedInvWrapper(slot, fuel);
     private int burn;
     private boolean formed;
+    /** 円柱の軸の根元（格納筒の底の内側の中心）。形成したときに決まる。 */
+    private BlockPos axis;
+    private final io.github.genichimaruo.singulo.multiblock.PortLinks ports = new io.github.genichimaruo.singulo.multiblock.PortLinks();
     private boolean firstCheck = true;
     private boolean running;
     private long nextCheck;
@@ -83,7 +84,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     public static int radius() {
-        return ServerConfig.SPEC.isLoaded() ? ServerConfig.TIPLER_RADIUS.get() : 8;
+        return ServerConfig.SPEC.isLoaded() ? ServerConfig.TIPLER_RADIUS.get() : 16;
     }
 
     public ItemStackHandler fuel() {
@@ -94,8 +95,24 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
         return running;
     }
 
+    /** 円柱（と時間の場）の中心。格納筒の中心。 */
+    @Override
+    public IItemHandler menuItems() {
+        return automation;
+    }
+
+    /** 形ができているか（クライアントでは同期された値。円柱は形ができてから描く）。 */
+    public boolean shownFormed() {
+        return formed;
+    }
+
     public BlockPos fieldCenter() {
-        return worldPosition.above(CENTER_HEIGHT);
+        return axis().above(3);
+    }
+
+    /** 円柱の軸の根元（格納筒の底の内側の中心、円柱の下端）。形がわからないうちはコントローラの位置。 */
+    public BlockPos axis() {
+        return axis != null ? axis : worldPosition;
     }
 
     @Override
@@ -118,8 +135,16 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
         if (level.getGameTime() >= nextCheck) {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             boolean was = formed;
-            formed = Structures.casingShape(level, worldPosition, Structures.tiplerLayout(worldPosition), 6);
-            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, worldPosition, was, formed, firstCheck, 2, 0, 7);
+            var found = io.github.genichimaruo.singulo.multiblock.Shapes.find(
+                    io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, level, worldPosition);
+            formed = found != null;
+            BlockPos newAxis = found == null ? null : found.pos(worldPosition, 2, 1, 2);
+            ports.update(level, worldPosition, found == null ? java.util.List.of() : found.ports());
+            if (!java.util.Objects.equals(newAxis, axis) || was != formed) {
+                axis = newAxis;
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+            }
+            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, worldPosition, was, formed, firstCheck, 4, 1, 8);
             firstCheck = false;
         }
         if (!formed) {
@@ -275,10 +300,17 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
+    public void onChunkUnloaded() {
+        ports.onChunkUnloaded();
+        super.onChunkUnloaded();
+    }
+
+    @Override
     public void setRemoved() {
         if (getLevel() != null) {
             TimeFields.remove(getLevel(), worldPosition);
         }
+        ports.onRemoved(getLevel());
         super.setRemoved();
     }
 
@@ -286,6 +318,8 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putBoolean("running", running);
+        tag.putBoolean("formed", formed);
+        tag.putLong("axis", axis().asLong());
         return tag;
     }
 
@@ -308,5 +342,9 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
         fuel.deserializeNBT(registries, tag.getCompound("fuel"));
         burn = tag.getInt("burn");
         running = tag.getBoolean("running");
+        if (tag.contains("axis")) {
+            axis = BlockPos.of(tag.getLong("axis"));
+            formed = tag.getBoolean("formed");
+        }
     }
 }

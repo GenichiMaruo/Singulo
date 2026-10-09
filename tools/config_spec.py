@@ -21,7 +21,6 @@ SERVER = [
     ('netherStar', 'starsPerExoticBatch', '1', '0〜16（整数）', 'エキゾチック物質1回の製作に要るネザースターの数。0で不要'),
     ('netherStar', 'exoticBatchSize', '8', '1〜64（整数）', 'エキゾチック物質1回の製作で出る数'),
     ('netherStar', 'starsPerSingularityCore', '1', '0〜16（整数）', 'シンギュラリティ・コア1個に要るネザースターの数'),
-    ('netherStar', 'starsPerGravitonManipulator', '1', '0〜16（整数）', 'グラビトン・マニピュレーターに要るネザースターの数'),
     ('netherStar', 'allowArtificialStarCore', 'true', 'true / false', '人工星核をネザースターの代わりに使えるか'),
     ('netherStar', 'artificialStarCoreJetCondensate', '4', '1〜64（整数）', '人工星核1個に要るジェット凝縮体の数'),
 
@@ -89,7 +88,7 @@ SERVER = [
     ('hazards', 'hydrogenLeakExplosion', 'true', 'true / false', '水素の容器が壊れたときの小爆発'),
     ('hazards', 'timeDilationEnabled', 'true', 'true / false', '重力時間膨張ゾーン（処理×0.8、触媒劣化×0.5）'),
     ('hazards', 'tiplerSpeedMultiplier', '2.0', '1.0〜10.0', 'Tシリンダーの加速倍率'),
-    ('hazards', 'tiplerRadius', '8', '1〜32（ブロック）', 'Tシリンダーが時間を加速する半径'),
+    ('hazards', 'tiplerRadius', '16', '1〜32（ブロック）', 'Tシリンダーが時間を加速する半径'),
     ('hazards', 'shieldRadius', '32', '4〜64（ブロック）', 'イベントホライズン・シールドの半径（電力は半径の二乗に比例）'),
 
     # 道具

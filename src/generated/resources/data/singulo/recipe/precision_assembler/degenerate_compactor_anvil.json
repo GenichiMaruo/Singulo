@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "tag": "c:obsidians"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_compactor_anvil",
+    "count": 1
+  }
+}

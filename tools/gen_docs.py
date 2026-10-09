@@ -84,7 +84,7 @@ def advancements(ctx, ja, en):
                    'description': {'translate': key + '.description'}, 'frame': frame,
                    'show_toast': parent is not None, 'announce_to_chat': parent is not None, 'hidden': False}
         if parent is None:
-            display['background'] = f'{MODID}:textures/block/degenerate_casing.png'
+            display['background'] = f'{MODID}:textures/block/degenerate_furnace_frame.png'
         kind = cond[0]
         if kind == 'tick':
             crit = {'trigger': 'minecraft:tick'}

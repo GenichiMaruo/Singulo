@@ -3,7 +3,6 @@ package io.github.genichimaruo.singulo.machine;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
-import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -21,14 +20,18 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 /**
- * 縮退熱炉のコントローラ（ティア4の発電機、7×7×9 のマルチブロック）。上下のピストンで圧縮ブロックLv2 を押しつぶし、
+ * 縮退熱炉のコントローラ（ティア4の発電機、5×5×7 のマルチブロック）。上下のピストンで圧縮ブロックLv2 を押しつぶし、
  * 縮退圧の熱で degenerateFurnaceOutput（既定 20 MFE/t）を出す。燃料は Lv2 1個で BURN_TICKS 燃え、時間結晶触媒を消費する。
- * 出力は触媒の速度倍率に比例する。
+ * 出力は触媒の速度倍率に比例する。電力はマルチブロック搬入出ポート（とコントローラ自身）から押し出す。
+ * ピストンは STROKE_TICKS ごとに1回打ち込む（描画と音はゲーム時刻で合わせる）。
  */
 public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     public static final int MACHINE_TIER = 4;
     public static final int BURN_TICKS = 200;
     public static final int PUSH_PER_TICK = 100_000_000;
+    /** ピストンの1往復（tick）。SLAM_TICK で打ち込む。 */
+    public static final int STROKE_TICKS = 60;
+    public static final int SLAM_TICK = 8;
     static final int CHECK_INTERVAL = 40;
 
     private final ItemStackHandler fuel = new ItemStackHandler(1) {
@@ -46,6 +49,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     private int burn;
     private int output;
     private int formed;
+    private final io.github.genichimaruo.singulo.multiblock.PortLinks ports = new io.github.genichimaruo.singulo.multiblock.PortLinks();
     private boolean firstCheck = true;
     private long nextCheck;
 
@@ -85,8 +89,11 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
         if (level.getGameTime() >= nextCheck) {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             int was = formed;
-            formed = Structures.findFurnace(level, worldPosition, getBlockState().getBlock());
-            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, worldPosition, was > 0, formed > 0, firstCheck, 7, 8, 8);
+            var found = io.github.genichimaruo.singulo.multiblock.Shapes.find(
+                    io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.DEGENERATE_FURNACE, level, worldPosition);
+            formed = found == null ? 0 : found.size();
+            ports.update(level, worldPosition, found == null ? java.util.List.of() : found.ports());
+            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, worldPosition, was > 0, formed > 0, firstCheck, 4, 1, 6);
             firstCheck = false;
         }
         if (formed == 0) {
@@ -105,8 +112,11 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
             if (burn <= 0) {
                 fuel.extractItem(0, 1, false);
                 burn = BURN_TICKS;
-                // 上下のピストンが燃料を押しつぶす音
-                io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "degenerate_furnace_press", 1.5F, 1.0F);
+            }
+            // 上下のピストンが打ち込む音（描画の打ち込みと同じ時刻）
+            if (level.getGameTime() % STROKE_TICKS == SLAM_TICK) {
+                io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition.above(2), "degenerate_furnace_press", 1.2F,
+                        0.9F + level.random.nextFloat() * 0.2F);
             }
             burn--;
             output = (int) Math.min(Integer.MAX_VALUE, Math.round(ServerConfig.DEGENERATE_FURNACE_OUTPUT.get()
@@ -131,6 +141,11 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
         return automation;
     }
 
+    @Override
+    public IItemHandler menuItems() {
+        return automation;
+    }
+
     /** 燃料（圧縮ブロックLv2）と触媒は手に持って右クリックでも入れられる。 */
     @Override
     public boolean useItem(ServerPlayer player, ItemStack stack, InteractionHand hand) {
@@ -140,6 +155,18 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        ports.onChunkUnloaded();
+        super.onChunkUnloaded();
+    }
+
+    @Override
+    public void setRemoved() {
+        ports.onRemoved(level);
+        super.setRemoved();
     }
 
     @Override

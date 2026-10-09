@@ -1,20 +1,19 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
-      "tag": "c:ingots/copper"
-    },
-    {
-      "tag": "c:ingots/copper"
-    },
-    {
-      "tag": "c:ingots/copper"
-    },
-    {
-      "item": "singulo:white_ceramic_composite"
-    }
+  "pattern": [
+    " W ",
+    "CCC",
+    " W "
   ],
+  "key": {
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "C": {
+      "tag": "c:ingots/copper"
+    }
+  },
   "result": {
     "id": "singulo:copper_wire",
     "count": 8

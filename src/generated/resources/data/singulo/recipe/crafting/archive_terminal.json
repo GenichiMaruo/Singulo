@@ -1,32 +1,25 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "GYG",
+    "GFG",
+    " B "
+  ],
+  "key": {
+    "G": {
+      "tag": "c:glass_blocks/colorless"
+    },
+    "Y": {
+      "tag": "c:dusts/glowstone"
+    },
+    "F": {
       "item": "singulo:basic_frame"
     },
-    {
-      "tag": "c:glass_blocks/colorless"
-    },
-    {
-      "tag": "c:glass_blocks/colorless"
-    },
-    {
-      "tag": "c:glass_blocks/colorless"
-    },
-    {
-      "tag": "c:glass_blocks/colorless"
-    },
-    {
+    "B": {
       "item": "singulo:basic_circuit"
-    },
-    {
-      "tag": "c:dusts/glowstone"
-    },
-    {
-      "tag": "c:dusts/glowstone"
     }
-  ],
+  },
   "result": {
     "id": "singulo:archive_terminal",
     "count": 1

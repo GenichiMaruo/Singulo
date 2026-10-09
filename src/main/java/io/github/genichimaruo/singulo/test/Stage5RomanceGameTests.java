@@ -57,13 +57,6 @@ public final class Stage5RomanceGameTests {
         helper.onEachTick(() -> be.energy().setEnergy(be.energy().getMaxEnergyStored()));
     }
 
-    /** コアと縮退炉外殻を並べる（相対座標のコア位置）。 */
-    private static void buildCasing(GameTestHelper helper, BlockPos core, java.util.List<BlockPos> absoluteLayout) {
-        for (BlockPos p : absoluteLayout) {
-            helper.getLevel().setBlockAndUpdate(p, SinguloBlocks.DEGENERATE_CASING.get().defaultBlockState());
-        }
-    }
-
     // ------------------------------------------------------------------ 時間の場
 
     @GameTest(template = EMPTY)
@@ -94,31 +87,34 @@ public final class Stage5RomanceGameTests {
 
     // ------------------------------------------------------------------ ティプラー・シリンダー
 
-    @GameTest(template = TALL, batch = "tipler", timeoutTicks = 160)
+    /** Tシリンダー（5×5×9）を建てる。コントローラは (7,2,2)、格納筒は南（+Z）へ。円柱の中心は (7,5,4)。 */
+    private static final BlockPos TIPLER = new BlockPos(7, 2, 2);
+
+    @GameTest(template = HUGE, batch = "tipler", timeoutTicks = 160)
     public static void tiplerCylinderDoublesFurnaceSpeed(GameTestHelper helper) {
-        BlockPos core = new BlockPos(2, 1, 2);
-        helper.setBlock(core, SinguloBlocks.TIPLER_CORE.get());
-        buildCasing(helper, core, Structures.tiplerLayout(helper.absolutePos(core)));
-        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(core);
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
+                net.minecraft.core.Direction.SOUTH, 9);
+        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(TIPLER);
         keepPowered(helper, tipler);
         tipler.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         tipler.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 2), false);
 
         // 普通なら200 tick かかる精錬が、×2 なら100 tick ほどで終わる
-        BlockPos furnacePos = new BlockPos(0, 1, 0);
+        BlockPos furnacePos = new BlockPos(7, 1, 0);
         helper.setBlock(furnacePos, Blocks.FURNACE);
         FurnaceBlockEntity furnace = helper.getBlockEntity(furnacePos);
         furnace.setItem(0, new ItemStack(Items.RAW_IRON));
         furnace.setItem(1, new ItemStack(Items.COAL));
 
         // 範囲内の装置には恩恵の模様が出る
-        BlockPos machinePos = new BlockPos(4, 1, 0);
+        BlockPos machinePos = new BlockPos(11, 1, 1);
         helper.setBlock(machinePos, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.COMPRESSOR).get());
         helper.runAtTickTime(30, () -> helper.assertTrue(helper.getBlockState(machinePos)
                 .getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.BOOSTED), "ティプラーの範囲の装置に恩恵の模様が出ない"));
         helper.runAtTickTime(5, () -> {
             helper.assertTrue(tipler.status() == CatalystDeviceBlockEntity.Status.RUNNING, "動かない: " + tipler.status());
             helper.assertTrue(tipler.fuel().getStackInSlot(0).getCount() == 1, "エキゾチック物質を使っていない");
+            helper.assertTrue(tipler.fieldCenter().equals(helper.absolutePos(new BlockPos(7, 5, 4))), "円柱の中心が格納筒の中心でない");
             helper.assertTrue(TimeFields.speed(helper.getLevel(), helper.absolutePos(furnacePos)) == 2.0, "範囲内が加速していない");
         });
         helper.succeedWhen(() -> {
@@ -127,47 +123,88 @@ public final class Stage5RomanceGameTests {
         });
     }
 
-    @GameTest(template = TALL, batch = "tipler")
+    @GameTest(template = HUGE, batch = "tipler")
     public static void tiplerCylinderNeedsFullShape(GameTestHelper helper) {
-        BlockPos core = new BlockPos(2, 1, 2);
-        helper.setBlock(core, SinguloBlocks.TIPLER_CORE.get());
-        java.util.List<BlockPos> layout = Structures.tiplerLayout(helper.absolutePos(core));
-        buildCasing(helper, core, layout.subList(1, layout.size()));   // 1個足りない
-        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(core);
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
+                net.minecraft.core.Direction.SOUTH, 9);
+        // 観察窓を1枚外す（中に入れてしまう）
+        helper.getLevel().setBlockAndUpdate(TestBuild.at(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER,
+                TIPLER, net.minecraft.core.Direction.SOUTH, 9, 2, 4, 0), Blocks.AIR.defaultBlockState());
+        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(TIPLER);
         keepPowered(helper, tipler);
         tipler.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         tipler.fuel().insertItem(0, new ItemStack(item("exotic_matter")), false);
         helper.runAtTickTime(5, () -> {
             helper.assertTrue(tipler.status() == CatalystDeviceBlockEntity.Status.NOT_FORMED, "未完成なのに動く");
-            helper.assertTrue(layout.size() == 36, "外殻の数がレシピ（36個）と合わない: " + layout.size());
             helper.succeed();
         });
     }
 
     // ------------------------------------------------------------------ イベントホライズン・シールド
 
+    /** シールド発生塔（5×5、高さ9）を建てる。コントローラは (7,2,2)、塔の軸は (7,2,4)。 */
+    private static final BlockPos SHIELD = new BlockPos(7, 2, 2);
+
     private static ShieldTowerBlockEntity buildShield(GameTestHelper helper, String catalyst) {
-        BlockPos core = new BlockPos(2, 1, 2);
-        helper.setBlock(core, SinguloBlocks.SHIELD_TOWER_CORE.get());
-        buildCasing(helper, core, Structures.shieldTowerLayout(helper.absolutePos(core)));
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.SHIELD_TOWER, SHIELD,
+                net.minecraft.core.Direction.SOUTH, 9);
+        BlockPos core = SHIELD;
         ShieldTowerBlockEntity shield = helper.getBlockEntity(core);
         keepPowered(helper, shield);
         shield.catalystSlot().insertItem(0, new ItemStack(item(catalyst)), false);
         return shield;
     }
 
-    @GameTest(template = TALL, batch = "shield", timeoutTicks = 40)
+    /**
+     * 許可証: 登録された人がいると、守りの中で登録されていない人は止められ、登録した人は止められない。
+     * 放射冠はだれでも壊せる扱いで、壊れるとシールドが止まる。
+     */
+    @GameTest(template = HUGE, batch = "shield_permit", timeoutTicks = 80)
+    public static void shieldPermitLocksOutsiders(GameTestHelper helper) {
+        ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
+        var player = helper.makeMockServerPlayerInLevel();
+        ItemStack permit = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.SHIELD_PERMIT.get());
+        shield.permit().setStackInSlot(0, permit);
+        BlockPos inside = helper.absolutePos(new BlockPos(2, 1, 2));
+        BlockPos crown = helper.absolutePos(new BlockPos(7, 9, 4));   // コントローラ (7,2,2) から上へ7・奥へ2
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(shield.protectionLevel() == 4, "守りが始まらない: " + shield.status());
+            helper.assertTrue(!ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "だれも登録されていないのに止められた");
+            // ほかの人だけを登録する
+            ItemStack card = shield.permit().getStackInSlot(0);
+            net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA, card, tag -> {
+                net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+                net.minecraft.nbt.CompoundTag other = new net.minecraft.nbt.CompoundTag();
+                other.putUUID("id", java.util.UUID.randomUUID());
+                other.putString("name", "someone");
+                list.add(other);
+                tag.put("permit_members", list);
+            });
+            helper.assertTrue(ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "登録されていない人が止められない");
+            io.github.genichimaruo.singulo.item.ShieldPermitItem.add(card, player);
+            helper.assertTrue(!ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "登録した人が止められた");
+            helper.assertTrue(ShieldTowerBlockEntity.isActiveCrown(helper.getLevel(), crown), "放射冠の位置がわからない");
+            helper.getLevel().destroyBlock(crown, false);
+            ShieldTowerBlockEntity.onCrownBroken(helper.getLevel(), crown);
+        });
+        helper.runAtTickTime(10, () -> {
+            helper.assertTrue(shield.protectionLevel() == 0, "放射冠を壊してもシールドが止まらない");
+            player.discard();
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = HUGE, batch = "shield", timeoutTicks = 40)
     public static void shieldTowerStopsExplosionsAndGriefing(GameTestHelper helper) {
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
-        BlockPos dirt = new BlockPos(0, 1, 0);
+        BlockPos dirt = new BlockPos(2, 1, 2);
         helper.setBlock(dirt, Blocks.DIRT);
         helper.runAtTickTime(5, () -> {
-            helper.assertTrue(Structures.shieldTowerLayout(BlockPos.ZERO).size() == 20, "外殻の数がレシピ（20個）と合わない");
             helper.assertTrue(shield.protectionLevel() == 4, "時間結晶触媒で守りが始まらない: " + shield.status());
             BlockPos at = helper.absolutePos(dirt.above());
             helper.getLevel().explode(null, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 3.0F,
                     Level.ExplosionInteraction.TNT);
-            Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 1, 4));
+            Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 1, 4));
             helper.assertTrue(!EventHooks.canEntityGrief(helper.getLevel(), zombie), "範囲内のモブがブロックを荒らせる");
             helper.assertTrue(!ShieldTowerBlockEntity.shielded(helper.getLevel(), zombie.position(), 5),
                     "時間結晶触媒なのに湧き止めまで効いている");
@@ -182,14 +219,14 @@ public final class Stage5RomanceGameTests {
     @GameTest(template = HUGE, batch = "shield_core", timeoutTicks = 60)
     public static void shieldTowerWithCoreRepelsHostiles(GameTestHelper helper) {
         ShieldTowerBlockEntity shield = buildShield(helper, "singularity_core");
-        BlockPos zombiePos = new BlockPos(6, 1, 2);
+        BlockPos zombiePos = new BlockPos(10, 1, 4);
         Zombie[] zombie = new Zombie[1];
         helper.runAtTickTime(3, () -> {
             helper.assertTrue(shield.protectionLevel() == 5, "コアで完全版にならない: " + shield.status());
             zombie[0] = helper.spawn(EntityType.ZOMBIE, zombiePos);
         });
         helper.runAtTickTime(20, () -> {
-            double d = zombie[0].position().distanceTo(Vec3.atCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+            double d = zombie[0].position().distanceTo(Vec3.atCenterOf(helper.absolutePos(new BlockPos(7, 1, 4))));
             helper.assertTrue(d > 5, "敵対モブが押し返されない（距離 " + d + "）");
             zombie[0].discard();
             helper.succeed();

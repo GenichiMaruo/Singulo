@@ -1,29 +1,28 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "KDK",
+    "OFO",
+    " B "
+  ],
+  "key": {
+    "K": {
+      "item": "singulo:ceramic_substrate"
+    },
+    "D": {
+      "tag": "c:gems/diamond"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "F": {
       "item": "singulo:basic_frame"
     },
-    {
-      "item": "singulo:superconducting_coil"
-    },
-    {
-      "item": "singulo:superconducting_coil"
-    },
-    {
-      "item": "singulo:ceramic_substrate"
-    },
-    {
-      "item": "singulo:ceramic_substrate"
-    },
-    {
+    "B": {
       "item": "singulo:basic_circuit"
-    },
-    {
-      "tag": "c:gems/diamond"
     }
-  ],
+  },
   "result": {
     "id": "singulo:accelerator_controller",
     "count": 1

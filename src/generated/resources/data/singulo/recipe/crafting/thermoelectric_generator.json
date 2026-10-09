@@ -1,26 +1,31 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
-      "item": "singulo:basic_frame"
+  "pattern": [
+    "CBC",
+    "TFT",
+    "IWI"
+  ],
+  "key": {
+    "C": {
+      "tag": "c:ingots/copper"
     },
-    {
-      "item": "singulo:thermocouple_module"
-    },
-    {
-      "item": "singulo:thermocouple_module"
-    },
-    {
+    "B": {
       "item": "singulo:basic_circuit"
     },
-    {
-      "tag": "c:ingots/copper"
+    "T": {
+      "item": "singulo:thermocouple_module"
     },
-    {
-      "tag": "c:ingots/copper"
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
     }
-  ],
+  },
   "result": {
     "id": "singulo:thermoelectric_generator",
     "count": 1

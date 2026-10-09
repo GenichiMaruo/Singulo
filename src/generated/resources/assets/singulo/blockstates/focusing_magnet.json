@@ -1,7 +1,31 @@
 {
   "variants": {
-    "": {
+    "segment=none": {
       "model": "singulo:block/focusing_magnet"
+    },
+    "segment=north": {
+      "model": "singulo:block/focusing_magnet_north"
+    },
+    "segment=east": {
+      "model": "singulo:block/focusing_magnet_east"
+    },
+    "segment=south": {
+      "model": "singulo:block/focusing_magnet_south"
+    },
+    "segment=west": {
+      "model": "singulo:block/focusing_magnet_west"
+    },
+    "segment=north_west": {
+      "model": "singulo:block/focusing_magnet_north_west"
+    },
+    "segment=north_east": {
+      "model": "singulo:block/focusing_magnet_north_east"
+    },
+    "segment=south_east": {
+      "model": "singulo:block/focusing_magnet_south_east"
+    },
+    "segment=south_west": {
+      "model": "singulo:block/focusing_magnet_south_west"
     }
   }
 }

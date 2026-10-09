@@ -1,5 +1,9 @@
 package io.github.genichimaruo.singulo.machine;
 
+import java.util.List;
+
+import net.minecraft.world.entity.player.Player;
+
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.multiblock.Structures;
@@ -45,6 +49,28 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     /** 0 は停止中、4 は防爆・防荒らし、5 はさらに湧き止めと押し返し。 */
     private int protection;
     private boolean formed;
+    /** 塔の軸の根元（基壇の上の中心）。形成したときに決まる。ドームと押し返しの中心。 */
+    private BlockPos axis;
+    /** 放射冠の位置（だれでも壊せ、壊すとシールドが止まる）。 */
+    private BlockPos crown;
+    /** 許可証のスロット。登録された人がいれば、守りの中で設置・破壊・取り出しができるのはその人たちだけ。 */
+    private final net.neoforged.neoforge.items.ItemStackHandler permit = new net.neoforged.neoforge.items.ItemStackHandler(1) {
+        @Override
+        public boolean isItemValid(int s, ItemStack stack) {
+            return stack.getItem() instanceof io.github.genichimaruo.singulo.item.ShieldPermitItem;
+        }
+
+        @Override
+        public int getSlotLimit(int s) {
+            return 1;
+        }
+
+        @Override
+        protected void onContentsChanged(int s) {
+            setChanged();
+        }
+    };
+    private final io.github.genichimaruo.singulo.multiblock.PortLinks ports = new io.github.genichimaruo.singulo.multiblock.PortLinks();
     private boolean firstCheck = true;
     private long nextCheck;
 
@@ -86,8 +112,17 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         if (world.getGameTime() >= nextCheck) {
             nextCheck = world.getGameTime() + CHECK_INTERVAL;
             boolean was = formed;
-            formed = Structures.casingShape(world, worldPosition, Structures.shieldTowerLayout(worldPosition), 0);
-            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(world, worldPosition, was, formed, firstCheck, 2, 0, 10);
+            var found = io.github.genichimaruo.singulo.multiblock.Shapes.find(
+                    io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.SHIELD_TOWER, world, worldPosition);
+            formed = found != null;
+            BlockPos newAxis = found == null ? null : found.pos(worldPosition, 2, 1, 2);
+            crown = found == null ? null : found.pos(worldPosition, 2, 8, 2);
+            ports.update(world, worldPosition, found == null ? java.util.List.of() : found.ports());
+            if (!java.util.Objects.equals(newAxis, axis) || was != formed) {
+                axis = newAxis;
+                world.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+            }
+            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(world, worldPosition, was, formed, firstCheck, 4, 1, 9);
             firstCheck = false;
         }
         return formed ? null : Status.NOT_FORMED;
@@ -114,8 +149,8 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     /** 範囲内の敵対モブを外へ押し出す。 */
     private void repel(ServerLevel world) {
         int r = radius();
-        Vec3 c = Vec3.atCenterOf(worldPosition);
-        for (Mob mob : world.getEntitiesOfClass(Mob.class, new AABB(worldPosition).inflate(r),
+        Vec3 c = Vec3.atCenterOf(axis());
+        for (Mob mob : world.getEntitiesOfClass(Mob.class, new AABB(axis()).inflate(r),
                 m -> m instanceof Enemy && !m.getType().is(Tags.EntityTypes.BOSSES) && m.position().distanceToSqr(c) <= (double) r * r)) {
             Vec3 out = mob.position().subtract(c).multiply(1, 0, 1);
             out = out.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : out.normalize();
@@ -149,12 +184,24 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         return shownRadius;
     }
 
-    /** ドームが降りきった割合（0〜1）。 */
-    public float domeProgress(float partialTick) {
+    /** 展開の段階（tick）: 充電 → 光の柱 → 球が降りる → 衝撃波。 */
+    public static final int DEPLOY_BEAM = 30, DEPLOY_DOME = 45, DEPLOY_DOME_TICKS = 60, DEPLOY_WAVE = 105, DEPLOY_END = 130;
+
+    /** 守りが始まってからの tick（クライアント。止まっていれば -1）。 */
+    public float deployTicks(float partialTick) {
         if (shownProtection <= 0 || getLevel() == null) {
+            return -1;
+        }
+        return getLevel().getGameTime() - activatedAt + partialTick;
+    }
+
+    /** 球が降りきった割合（0〜1）。 */
+    public float domeProgress(float partialTick) {
+        float t = deployTicks(partialTick);
+        if (t < 0) {
             return 0;
         }
-        return Math.min(1, (getLevel().getGameTime() - activatedAt + partialTick) / 40F);
+        return Math.min(1, Math.max(0, (t - DEPLOY_DOME) / DEPLOY_DOME_TICKS));
     }
 
     @Override
@@ -162,6 +209,8 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.putInt("protection", protection);
         tag.putInt("radius", radius());
+        tag.putLong("axis", axis().asLong());
+        tag.putBoolean("formed", formed);
         return tag;
     }
 
@@ -173,6 +222,9 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        if (tag.contains("permit")) {
+            permit.deserializeNBT(registries, tag.getCompound("permit"));
+        }
         if (tag.contains("protection")) {
             int p = tag.getInt("protection");
             if (shownProtection == 0 && p > 0 && getLevel() != null) {
@@ -180,12 +232,97 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
             }
             shownProtection = p;
             shownRadius = tag.getInt("radius");
+            axis = BlockPos.of(tag.getLong("axis"));
+            formed = tag.getBoolean("formed");
         }
     }
 
     public boolean covers(Vec3 pos, int minLevel) {
         int r = radius();
-        return protection >= minLevel && !isRemoved() && Vec3.atCenterOf(worldPosition).distanceToSqr(pos) <= (double) r * r;
+        return protection >= minLevel && !isRemoved() && Vec3.atCenterOf(axis()).distanceToSqr(pos) <= (double) r * r;
+    }
+
+    @Override
+    public net.neoforged.neoforge.items.IItemHandler menuItems() {
+        return new net.neoforged.neoforge.items.wrapper.CombinedInvWrapper(slot, permit);
+    }
+
+    public net.neoforged.neoforge.items.ItemStackHandler permit() {
+        return permit;
+    }
+
+    /** 形ができているか（クライアントでは同期された値。描画は形ができてから）。 */
+    public boolean shownFormed() {
+        return formed;
+    }
+
+    /** 放射冠が壊されたら、すぐに形を確かめ直す（シールドが止まる）。 */
+    void crownBroken() {
+        nextCheck = 0;
+    }
+
+    /** 守りの中で、この人が設置・破壊・取り出しを止められるか（許可証に登録された人がいて、その人が入っていない）。 */
+    private boolean locks(BlockPos pos, Player player) {
+        ItemStack card = permit.getStackInSlot(0);
+        if (protection <= 0 || card.isEmpty() || io.github.genichimaruo.singulo.item.ShieldPermitItem.members(card).isEmpty()) {
+            return false;
+        }
+        int r = radius();
+        if (Vec3.atCenterOf(axis()).distanceToSqr(Vec3.atCenterOf(pos)) > (double) r * r) {
+            return false;
+        }
+        return !io.github.genichimaruo.singulo.item.ShieldPermitItem.allows(card, player);
+    }
+
+    /** pos での操作を、どれかの動いているシールドが許可証で止めるか。 */
+    public static boolean locked(Level world, BlockPos pos, Player player) {
+        Set<ShieldTowerBlockEntity> set = ACTIVE.get(world);
+        if (set == null || player.isSpectator()) {
+            return false;
+        }
+        for (ShieldTowerBlockEntity shield : set) {
+            if (shield.locks(pos, player)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** pos が動いているシールドの放射冠か。放射冠はだれでも壊せる（壊すとシールドが止まる）。 */
+    public static boolean isActiveCrown(Level world, BlockPos pos) {
+        Set<ShieldTowerBlockEntity> set = ACTIVE.get(world);
+        if (set == null) {
+            return false;
+        }
+        for (ShieldTowerBlockEntity shield : set) {
+            if (pos.equals(shield.crown)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 放射冠が壊されたシールドに知らせる。 */
+    public static void onCrownBroken(Level world, BlockPos pos) {
+        Set<ShieldTowerBlockEntity> set = ACTIVE.get(world);
+        if (set != null) {
+            for (ShieldTowerBlockEntity shield : List.copyOf(set)) {
+                if (pos.equals(shield.crown)) {
+                    shield.crownBroken();
+                }
+            }
+        }
+    }
+
+    /** 塔の軸の根元（基壇の上の中心）。形がわからないうちはコントローラの位置。 */
+    public BlockPos axis() {
+        return axis != null ? axis : worldPosition;
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        ports.onChunkUnloaded();
+        super.onChunkUnloaded();
     }
 
     @Override
@@ -197,6 +334,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
             }
         }
         protection = 0;
+        ports.onRemoved(getLevel());
         super.setRemoved();
     }
 
@@ -246,5 +384,17 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
                 && shielded(event.getEntity().level(), new Vec3(event.getX(), event.getY(), event.getZ()), 5)) {
             event.setResult(MobSpawnEvent.PositionCheck.Result.FAIL);
         }
+    }
+
+    @Override
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put("permit", permit.serializeNBT(registries));
+    }
+
+    @Override
+    public void onBroken(Level level) {
+        super.onBroken(level);
+        net.minecraft.world.level.block.Block.popResource(level, worldPosition, permit.getStackInSlot(0));
     }
 }

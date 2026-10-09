@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 3
+    },
+    {
+      "ingredient": {
+        "tag": "c:obsidians"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:shield_tower_plinth",
+    "count": 4
+  }
+}

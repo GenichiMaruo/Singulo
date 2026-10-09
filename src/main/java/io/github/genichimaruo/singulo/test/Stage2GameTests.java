@@ -35,7 +35,6 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public final class Stage2GameTests {
     private static final String EMPTY = "empty";
     private static final String TALL = "tall";
-    private static final int[][] RING = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
 
     private Stage2GameTests() {}
 
@@ -53,47 +52,32 @@ public final class Stage2GameTests {
 
     // ------------------------------------------------------------------ 極低温冷却塔
 
-    private static final BlockPos TOWER_CONTROLLER = new BlockPos(2, 1, 1);
-    private static final BlockPos TOWER_PORT = new BlockPos(3, 3, 2);
-    private static final BlockPos TOWER_CASING = new BlockPos(1, 4, 3);
+    private static final BlockPos TOWER_CONTROLLER = new BlockPos(2, 1, 0);
+    private static BlockPos towerPort;
 
-    /** 中心 (2, y, 2) の 3×3 の塔を建て、コントローラを返す。熱交換コアは「高さ−2」個（上下の端は空気）。 */
+    /** 高さ height の冷却塔を (0..4, 0.., 0..4) に建て、手前の面の下から2段目の左の外装板を搬入出ポートにする。 */
     private static MachineBlockEntity buildTower(GameTestHelper helper, int height) {
-        for (int y = 1; y <= height; y++) {
-            for (int[] off : RING) {
-                BlockPos p = new BlockPos(2 + off[0], y, 2 + off[1]);
-                Block block;
-                if (p.equals(TOWER_CONTROLLER)) {
-                    block = SinguloBlocks.CONTROLLERS.get(MachineType.CRYOGENIC_COOLING_TOWER).get();
-                } else if (p.equals(TOWER_PORT)) {
-                    block = SinguloBlocks.COOLING_TOWER_PORT.get();
-                } else if (y == 2 && off[0] == -1 && off[1] == 0) {
-                    block = SinguloBlocks.COOLING_TOWER_GLASS.get();
-                } else {
-                    block = SinguloBlocks.COOLING_TOWER_CASING.get();
-                }
-                helper.setBlock(p, block);
-            }
-            if (y > 1 && y < height) {
-                helper.setBlock(new BlockPos(2, y, 2), SinguloBlocks.HEAT_EXCHANGE_CORE.get());
-            }
-        }
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
+                net.minecraft.core.Direction.SOUTH, height);
+        towerPort = TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
+                net.minecraft.core.Direction.SOUTH, height, 1, 1, 0);
         MachineBlockEntity controller = helper.getBlockEntity(TOWER_CONTROLLER);
         controller.energy().setEnergy(controller.energy().getMaxEnergyStored());
         return controller;
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(template = TALL, timeoutTicks = 200)
     public static void coolingTowerMakesLiquidNitrogen(GameTestHelper helper) {
-        MachineBlockEntity tower = buildTower(helper, 5);
-        // 高さ5では液体ヘリウムは作れない（高さ10以上が必要）
+        MachineBlockEntity tower = buildTower(helper, 7);
+        BlockPos port = towerPort;
+        // 高さ7では液体ヘリウムは作れない（高さ10以上が必要）
         tower.automationFluids().fill(new FluidStack(fluid("helium"), 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
-            helper.assertTrue(tower.structureSize() == 5, "高さ5の塔として形成されない: " + tower.structureSize());
+            helper.assertTrue(tower.structureSize() == 7, "高さ7の塔として形成されない: " + tower.structureSize());
             helper.assertTrue(drainable(tower.automationFluids(), "liquid_nitrogen") >= 200, "液体窒素が出ない");
-            helper.assertTrue(drainable(tower.automationFluids(), "liquid_helium") == 0, "高さ5で液体ヘリウムができた");
+            helper.assertTrue(drainable(tower.automationFluids(), "liquid_helium") == 0, "高さ7で液体ヘリウムができた");
             IFluidHandler viaPort = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK,
-                    helper.absolutePos(TOWER_PORT), null);
+                    port, null);
             helper.assertTrue(viaPort != null && drainable(viaPort, "liquid_nitrogen") > 0, "搬入出口から液体窒素を取れない");
         });
     }
@@ -108,9 +92,9 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 700)
+    @GameTest(template = TALL, timeoutTicks = 700)
     public static void coolingTowerMakesSuperconductingCoil(GameTestHelper helper) {
-        MachineBlockEntity tower = buildTower(helper, 5);
+        MachineBlockEntity tower = buildTower(helper, 7);
         // 30秒×400 FE/t は内部の蓄電を超えるので、電源の代わりに毎tick満たす
         helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
         tower.items().setStackInSlot(0, new ItemStack(Items.COPPER_INGOT, 8));
@@ -126,12 +110,12 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(template = TALL, timeoutTicks = 200)
     public static void coolingTowerBreaksWhenCasingRemoved(GameTestHelper helper) {
-        MachineBlockEntity tower = buildTower(helper, 5);
+        MachineBlockEntity tower = buildTower(helper, 7);
         helper.runAtTickTime(25, () -> {
-            helper.assertTrue(tower.structureSize() == 5, "形成されない");
-            helper.setBlock(TOWER_CASING, Blocks.AIR);
+            helper.assertTrue(tower.structureSize() == 7, "形成されない");
+            helper.setBlock(new BlockPos(3, 3, 1), Blocks.AIR);   // くびれの角の外壁
         });
         helper.runAtTickTime(60, () -> {
             helper.assertTrue(tower.structureSize() == 0, "外壁を外しても形成されたまま");

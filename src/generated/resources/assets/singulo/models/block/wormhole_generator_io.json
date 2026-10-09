@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "singulo:block/wormhole_generator_io"
-  }
-}

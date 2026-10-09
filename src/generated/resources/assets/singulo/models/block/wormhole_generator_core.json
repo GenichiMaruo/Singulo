@@ -1,13 +1,13 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t5",
-    "side": "singulo:block/machine_side_t5",
-    "bottom": "singulo:block/machine_bottom_t5",
+    "top": "singulo:block/wormhole_generator_shell",
+    "side": "singulo:block/wormhole_generator_shell",
+    "bottom": "singulo:block/wormhole_generator_shell",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/wormhole_generator_core_front",
-    "particle": "singulo:block/machine_side_t5"
+    "particle": "singulo:block/wormhole_generator_shell"
   },
   "elements": [
     {

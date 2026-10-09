@@ -37,7 +37,8 @@ public final class NeutrinoOverlay {
 
     static void onRenderStage(RenderLevelStageEvent event) {
         Minecraft mc = Minecraft.getInstance();
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL || mc.level == null || ores.isEmpty() && ruins.isEmpty()) {
+        // AFTER_LEVEL の PoseStack にはカメラの向きが入っていないので、ホロ投影と同じ段階で描く（地形にぴったり重なる）
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || mc.level == null || ores.isEmpty() && ruins.isEmpty()) {
             return;
         }
         long left = until - mc.level.getGameTime();

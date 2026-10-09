@@ -19,6 +19,7 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
     static final double MONOPOLE_CHANCE_AT_MAX = 0.001;
 
     private int side;
+    private final PortLinks ports = new PortLinks();
     private boolean firstCheck = true;
     private long nextCheck;
 
@@ -30,7 +31,18 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
     protected boolean canOperate(Level level) {
         if (level.getGameTime() >= nextCheck) {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
+            // Refresh old saves too, even when no placement notification has occurred.
+            if (level instanceof net.minecraft.server.level.ServerLevel server) {
+                for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.Plane.HORIZONTAL) {
+                    BlockPos start = worldPosition.relative(direction);
+                    if (level.getBlockState(start).getBlock() instanceof AcceleratorPartBlock) {
+                        AcceleratorPartBlock.refresh(server, start);
+                    }
+                }
+            }
             int newSide = Structures.findRing(level, worldPosition);
+            net.minecraft.core.Direction toRing = newSide > 0 ? Structures.ringDirection(level, worldPosition) : null;
+            ports.update(level, worldPosition, toRing == null ? java.util.List.of() : Structures.acceleratorPorts(level, worldPosition, toRing));
             if (newSide != side) {
                 if (level instanceof net.minecraft.server.level.ServerLevel server) {
                     FormationEffect.onChange(server, worldPosition, side > 0, newSide > 0, firstCheck, 33, 0, 0);
@@ -46,6 +58,18 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
     @Override
     public int structureSize() {
         return side;
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        ports.onChunkUnloaded();
+        super.onChunkUnloaded();
+    }
+
+    @Override
+    public void setRemoved() {
+        ports.onRemoved(level);
+        super.setRemoved();
     }
 
     @Override

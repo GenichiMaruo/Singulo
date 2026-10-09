@@ -41,7 +41,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 /**
  * 汎用加工装置。マルチブロックのコントローラはこれを継承し、形成状態・大きさ・速度を差し込む。
  */
-public class MachineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
+public class MachineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
+        io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED }
 
     /**
@@ -198,10 +199,36 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return SideConfig.faceOf(facing, side);
     }
 
+    /** 設定カードから面の設定を貼る。 */
+    public void pasteSides(int items, int fluids) {
+        itemSides.setPacked(items);
+        fluidSides.setPacked(fluids);
+        setChanged();
+        if (level != null) {
+            level.invalidateCapabilities(worldPosition);
+        }
+    }
+
+    /** マルチブロックのコントローラは面の設定を持たない（入出力は搬入出ポートで行い、どの面からでも出し入れできる）。 */
+    public boolean usesSideConfig() {
+        return !type.isMultiblock();
+    }
+
+    /** 搬入出ポートが押し出してよい出力（出力スロットと出力タンクだけ）。 */
+    @Override
+    public IItemHandler ejectItems() {
+        return type.hasOutput() ? new SidedItems(false, true) : null;
+    }
+
+    @Override
+    public IFluidHandler ejectFluids() {
+        return type.fluidOutputs() > 0 ? new SidedFluids(false, true) : null;
+    }
+
     /** 面ごとの設定に従うアイテムの入れ物（side が null なら制限なし）。無効の面は null。 */
     @javax.annotation.Nullable
     public IItemHandler itemsFor(@javax.annotation.Nullable net.minecraft.core.Direction side) {
-        if (side == null) {
+        if (side == null || !usesSideConfig()) {
             return automationItems;
         }
         SideConfig.Face f = faceOf(side);
@@ -219,7 +246,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (type.tanks() == 0) {
             return null;
         }
-        if (side == null) {
+        if (side == null || !usesSideConfig()) {
             return automationFluids;
         }
         SideConfig.Face f = faceOf(side);
@@ -317,7 +344,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     protected void tick(Level level, BlockPos pos, BlockState state) {
-        if (level.getGameTime() % 10 == 0) {
+        if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
             autoEject(level);
         }
         boolean active = false;

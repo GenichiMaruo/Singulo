@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 3
+    },
+    {
+      "ingredient": {
+        "tag": "c:obsidians"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_furnace_frame",
+    "count": 4
+  }
+}

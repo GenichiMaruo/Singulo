@@ -12,95 +12,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** マルチブロックの形の判定。コントローラの位置から探す。 */
+/** 粒子加速器とペンローズ・リアクターの形の判定（ほかの決まった形は Shapes）。コントローラの位置から探す。 */
 public final class Structures {
-    public static final int TOWER_MIN_HEIGHT = 5;
-    public static final int TOWER_MAX_HEIGHT = 15;
     public static final int RING_MIN_SIDE = 8;
     public static final int RING_MAX_SIDE = 32;
 
-    private static final int[][] RING = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
-
     private Structures() {}
-
-    /** 形成できた冷却塔。height は高さ、ports は搬入出口の位置。 */
-    public record Tower(int height, List<BlockPos> ports) {}
-
-    /**
-     * 極低温冷却塔: 3×3 の筒（高さ5〜15）。各段の外周8マスは外壁・ガラス・搬入出口・コントローラで、
-     * 中心の列は熱交換コアか空気（煙突）。熱交換コアは「高さ−2」個以上要る。コントローラは外周のどこか1つ。
-     */
-    @Nullable
-    public static Tower findTower(Level level, BlockPos controller, Block controllerBlock) {
-        for (int[] off : RING) {
-            BlockPos center = controller.offset(-off[0], 0, -off[1]);
-            Tower tower = towerAround(level, center, controller, controllerBlock);
-            if (tower != null) {
-                return tower;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    private static Tower towerAround(Level level, BlockPos center, BlockPos controller, Block controllerBlock) {
-        if (!towerLayer(level, center, controller.getY(), controllerBlock)) {
-            return null;
-        }
-        int bottom = controller.getY();
-        while (controller.getY() - bottom < TOWER_MAX_HEIGHT - 1 && towerLayer(level, center, bottom - 1, controllerBlock)) {
-            bottom--;
-        }
-        int top = controller.getY();
-        while (top - bottom < TOWER_MAX_HEIGHT - 1 && towerLayer(level, center, top + 1, controllerBlock)) {
-            top++;
-        }
-        int height = top - bottom + 1;
-        if (height < TOWER_MIN_HEIGHT) {
-            return null;
-        }
-        int cores = 0;
-        int controllers = 0;
-        List<BlockPos> ports = new ArrayList<>();
-        for (int y = bottom; y <= top; y++) {
-            BlockPos c = new BlockPos(center.getX(), y, center.getZ());
-            BlockState inner = level.getBlockState(c);
-            if (role(inner) == MultiblockPart.Role.HEAT_EXCHANGE_CORE) {
-                cores++;
-            } else if (!inner.isAir()) {
-                return null;
-            }
-            for (int[] off : RING) {
-                BlockPos p = c.offset(off[0], 0, off[1]);
-                BlockState s = level.getBlockState(p);
-                if (s.is(controllerBlock)) {
-                    controllers++;
-                } else if (role(s) == MultiblockPart.Role.TOWER_PORT) {
-                    ports.add(p);
-                }
-            }
-        }
-        if (controllers != 1 || cores < height - 2) {
-            return null;
-        }
-        return new Tower(height, ports);
-    }
-
-    private static boolean towerLayer(Level level, BlockPos center, int y, Block controllerBlock) {
-        if (y < level.getMinBuildHeight() || y >= level.getMaxBuildHeight()) {
-            return false;
-        }
-        for (int[] off : RING) {
-            BlockState s = level.getBlockState(new BlockPos(center.getX() + off[0], y, center.getZ() + off[1]));
-            MultiblockPart.Role r = role(s);
-            boolean shell = s.is(controllerBlock) || r == MultiblockPart.Role.TOWER_CASING
-                    || r == MultiblockPart.Role.TOWER_GLASS || r == MultiblockPart.Role.TOWER_PORT;
-            if (!shell) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * 粒子加速器: 加速管と収束磁石で作る、水平な正方形のリング（一辺8〜32）。
@@ -121,7 +38,31 @@ public final class Structures {
         return 0;
     }
 
-    private static int ringFrom(Level level, BlockPos start) {
+    /** コントローラからリングへの向き（形成できていなければ null）。搬入出ポートはコントローラの左右に置く。 */
+    @javax.annotation.Nullable
+    public static Direction ringDirection(Level level, BlockPos controller) {
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            BlockPos start = controller.relative(dir);
+            if (isRingBlock(level.getBlockState(start)) && ringFrom(level, start) > 0) {
+                return dir;
+            }
+        }
+        return null;
+    }
+
+    /** 加速器のコントローラの左右にある搬入出ポート。 */
+    public static List<BlockPos> acceleratorPorts(Level level, BlockPos controller, Direction toRing) {
+        List<BlockPos> out = new ArrayList<>();
+        for (Direction side : new Direction[]{toRing.getClockWise(), toRing.getCounterClockWise()}) {
+            BlockPos p = controller.relative(side);
+            if (role(level.getBlockState(p)) == MultiblockPart.Role.MULTIBLOCK_PORT) {
+                out.add(p.immutable());
+            }
+        }
+        return out;
+    }
+
+    static int ringFrom(Level level, BlockPos start) {
         int limit = 4 * (RING_MAX_SIDE - 1);
         Set<BlockPos> ring = new HashSet<>();
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
@@ -131,6 +72,9 @@ public final class Structures {
             BlockPos p = queue.poll();
             for (Direction dir : Direction.Plane.HORIZONTAL) {
                 BlockPos n = p.relative(dir);
+                if (!level.hasChunkAt(n)) {
+                    return 0;
+                }
                 if (!ring.contains(n) && isRingBlock(level.getBlockState(n))) {
                     if (ring.size() >= limit) {
                         return 0;
@@ -172,150 +116,6 @@ public final class Structures {
     private static boolean isRingBlock(BlockState s) {
         MultiblockPart.Role r = role(s);
         return r == MultiblockPart.Role.ACCELERATOR_TUBE || r == MultiblockPart.Role.FOCUSING_MAGNET;
-    }
-
-    // ------------------------------------------------------------------ 段階4
-
-    /**
-     * 縮退圧縮炉: 縮退炉外殻で作る 3×3×3 の箱（中心は空気）。コントローラは外殻のどこか1つ。
-     *
-     * @return 形成できたら 3、できなければ 0
-     */
-    public static int findCompactor(Level level, BlockPos controller, Block controllerBlock) {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) {
-                        continue;
-                    }
-                    BlockPos center = controller.offset(-dx, -dy, -dz);
-                    if (compactorAround(level, center, controllerBlock)) {
-                        return 3;
-                    }
-                }
-            }
-        }
-        return 0;
-    }
-
-    private static boolean compactorAround(Level level, BlockPos center, Block controllerBlock) {
-        if (!level.getBlockState(center).isAir()) {
-            return false;
-        }
-        int controllers = 0;
-        for (BlockPos p : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
-            if (p.equals(center)) {
-                continue;
-            }
-            BlockState s = level.getBlockState(p);
-            if (s.is(controllerBlock)) {
-                controllers++;
-            } else if (role(s) != MultiblockPart.Role.DEGENERATE_CASING) {
-                return false;
-            }
-        }
-        return controllers == 1;
-    }
-
-    /**
-     * カシミール空洞: 5×5×5。下の面と上の面が鏡面プレート（向かい合う2枚）で、間の3段は四隅の柱が縮退炉外殻。
-     * 鏡面の間（中の 3×3×3）は真空（空気）。側面の残りは空気か外殻。コントローラは間の3段の側面のどこか1つ。
-     *
-     * @return 形成できたら 5、できなければ 0
-     */
-    public static int findCavity(Level level, BlockPos controller, Block controllerBlock) {
-        for (int y = 1; y <= 3; y++) {
-            for (int x = 0; x <= 4; x++) {
-                for (int z = 0; z <= 4; z++) {
-                    boolean side = x == 0 || x == 4 || z == 0 || z == 4;
-                    if (side && cavityAt(level, controller.offset(-x, -y, -z), controllerBlock)) {
-                        return 5;
-                    }
-                }
-            }
-        }
-        return 0;
-    }
-
-    private static boolean cavityAt(Level level, BlockPos origin, Block controllerBlock) {
-        int controllers = 0;
-        for (int y = 0; y <= 4; y++) {
-            for (int x = 0; x <= 4; x++) {
-                for (int z = 0; z <= 4; z++) {
-                    BlockState s = level.getBlockState(origin.offset(x, y, z));
-                    MultiblockPart.Role r = role(s);
-                    boolean side = x == 0 || x == 4 || z == 0 || z == 4;
-                    boolean corner = (x == 0 || x == 4) && (z == 0 || z == 4);
-                    if (y == 0 || y == 4) {
-                        if (r != MultiblockPart.Role.MIRROR_PLATE) {
-                            return false;
-                        }
-                    } else if (!side) {
-                        if (!s.isAir()) {
-                            return false;
-                        }
-                    } else if (s.is(controllerBlock)) {
-                        controllers++;
-                    } else if (corner ? r != MultiblockPart.Role.DEGENERATE_CASING
-                            : !(s.isAir() || r == MultiblockPart.Role.DEGENERATE_CASING)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return controllers == 1;
-    }
-
-    /**
-     * 縮退熱炉: 7×7×9（高さ9）。上下の面は縮退炉外殻で、中心の十字の4か所が圧縮ピストン部。
-     * 間の7段は四隅の柱が外殻（コントローラは柱のどこか1つ）、中は空気（ピストンが押し込む空間）。
-     *
-     * @return 形成できたら 9（高さ）、できなければ 0
-     */
-    public static int findFurnace(Level level, BlockPos controller, Block controllerBlock) {
-        for (int cx : new int[]{0, 6}) {
-            for (int cz : new int[]{0, 6}) {
-                for (int y = 1; y <= 7; y++) {
-                    if (furnaceAt(level, controller.offset(-cx, -y, -cz), controllerBlock)) {
-                        return 9;
-                    }
-                }
-            }
-        }
-        return 0;
-    }
-
-    private static boolean furnaceAt(Level level, BlockPos origin, Block controllerBlock) {
-        int controllers = 0;
-        for (int y = 0; y <= 8; y++) {
-            for (int x = 0; x <= 6; x++) {
-                for (int z = 0; z <= 6; z++) {
-                    boolean face = y == 0 || y == 8;
-                    boolean corner = (x == 0 || x == 6) && (z == 0 || z == 6);
-                    boolean inside = x >= 1 && x <= 5 && z >= 1 && z <= 5;
-                    if (!face && !corner && !inside) {
-                        continue;                                  // 側面は開いていてよい（中が見える）
-                    }
-                    BlockState s = level.getBlockState(origin.offset(x, y, z));
-                    MultiblockPart.Role r = role(s);
-                    if (face) {
-                        boolean piston = (x == 3 && (z == 2 || z == 4)) || (z == 3 && (x == 2 || x == 4));
-                        if (r != (piston ? MultiblockPart.Role.FURNACE_PISTON : MultiblockPart.Role.DEGENERATE_CASING)) {
-                            return false;
-                        }
-                    } else if (corner) {
-                        if (s.is(controllerBlock)) {
-                            controllers++;
-                        } else if (r != MultiblockPart.Role.DEGENERATE_CASING) {
-                            return false;
-                        }
-                    } else if (!s.isAir()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return controllers == 1;
     }
 
     // ------------------------------------------------------------------ 段階5: ペンローズ・リアクター
@@ -360,16 +160,19 @@ public final class Structures {
         RING_POINTS = out.toArray(new int[0][]);
     }
 
-    /** リングの点の役割（設計図の配置）: 軸上はジャイロ駆動部、斜め45°は抽出ポート、ほかは炉殻。抽出ポートは炉殻のどこに置いてもよい。 */
+    /**
+     * リングの点の役割（設計図の配置）: 軸上はジャイロ駆動部、斜め45°は炉心安定化コイル、ほかは炉殻。
+     * 抽出ポートと炉心質量警報器は、炉殻の位置ならどこに置いてもよい。
+     */
     static MultiblockPart.Role ringRole(int u, int v) {
         if (u == 0 || v == 0) {
             return MultiblockPart.Role.GYRO_DRIVE;
         }
-        return Math.abs(u) == Math.abs(v) ? MultiblockPart.Role.EXTRACTION_PORT : MultiblockPart.Role.REACTOR_SHELL;
+        return Math.abs(u) == Math.abs(v) ? MultiblockPart.Role.REACTOR_STABILIZER : MultiblockPart.Role.REACTOR_SHELL;
     }
 
-    /** 形成できたリアクター。center は炉心の中心、ports は抽出ポート。 */
-    public record Reactor(BlockPos center, List<BlockPos> ports) {}
+    /** 形成できたリアクター。center は炉心の中心、ports は抽出ポート、alarms は炉心質量警報器。 */
+    public record Reactor(BlockPos center, List<BlockPos> ports, List<BlockPos> alarms) {}
 
     /**
      * Pリアクター: 13×13×13 のジャイロスコープ型。炉心の中心を通る直交3平面（XY・YZ・XZ）に、半径6の円環を
@@ -380,31 +183,38 @@ public final class Structures {
     public static Reactor findReactor(Level level, BlockPos controller) {
         BlockPos c = controller.above(CONTROLLER_BELOW_CENTER);
         for (BlockPos p : BlockPos.betweenClosed(c.offset(-1, -1, -1), c.offset(1, 1, 1))) {
-            if (!level.getBlockState(p).isAir()) {
+            BlockState s = level.getBlockState(p);
+            // 炉心の中心だけは、野良ブラックホールがあってもよい（組み直して取り込むため）
+            if (!s.isAir() && !(p.equals(c) && s.is(io.github.genichimaruo.singulo.registry.SinguloBlocks.ROGUE_BLACK_HOLE.get()))) {
                 return null;
             }
         }
         java.util.Map<BlockPos, MultiblockPart.Role> layout = reactorLayout(c);
         List<BlockPos> ports = new ArrayList<>();
+        List<BlockPos> alarms = new ArrayList<>();
         for (java.util.Map.Entry<BlockPos, MultiblockPart.Role> e : layout.entrySet()) {
             MultiblockPart.Role have = role(level.getBlockState(e.getKey()));
-            boolean ring = e.getValue() == MultiblockPart.Role.REACTOR_SHELL || e.getValue() == MultiblockPart.Role.EXTRACTION_PORT;
-            if (ring ? have != MultiblockPart.Role.REACTOR_SHELL && have != MultiblockPart.Role.EXTRACTION_PORT
-                    : have != e.getValue()) {
+            boolean shell = e.getValue() == MultiblockPart.Role.REACTOR_SHELL;
+            boolean ok = shell ? have == MultiblockPart.Role.REACTOR_SHELL || have == MultiblockPart.Role.EXTRACTION_PORT
+                    || have == MultiblockPart.Role.MASS_ALARM : have == e.getValue();
+            if (!ok) {
                 return null;
             }
             if (have == MultiblockPart.Role.EXTRACTION_PORT) {
                 ports.add(e.getKey());
+            } else if (have == MultiblockPart.Role.MASS_ALARM) {
+                alarms.add(e.getKey());
             }
         }
-        return new Reactor(c.immutable(), ports);
+        return new Reactor(c.immutable(), ports, alarms);
     }
 
     /** リアクターの部品（押し出し先から外す）。 */
     public static boolean isReactorPart(BlockState state) {
         MultiblockPart.Role r = role(state);
         return r == MultiblockPart.Role.REACTOR_SHELL || r == MultiblockPart.Role.GYRO_DRIVE
-                || r == MultiblockPart.Role.EXTRACTION_PORT;
+                || r == MultiblockPart.Role.EXTRACTION_PORT || r == MultiblockPart.Role.REACTOR_STABILIZER
+                || r == MultiblockPart.Role.MASS_ALARM;
     }
 
     /** 炉心の中心 c に対する部品の位置と役割（形の判定・ホロ設計図・テストが使う）。 */
@@ -417,109 +227,6 @@ public final class Structures {
             out.put(c.offset(pt[0], 0, pt[1]), r);
         }
         return out;
-    }
-
-    // ------------------------------------------------------------------ 段階5: 特異点技術（コントローラは底の中央）
-
-    /**
-     * イベントホライズン・シールド発生塔（3×3×9、縮退炉外殻20個）。底の層はコアの周りの8個、その上に中央の柱8個、
-     * 柱の根元（高さ1）の四隅に支え4個。
-     */
-    public static List<BlockPos> shieldTowerLayout(BlockPos core) {
-        List<BlockPos> out = new ArrayList<>();
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                if (x != 0 || z != 0) {
-                    out.add(core.offset(x, 0, z));
-                }
-                if (x != 0 && z != 0) {
-                    out.add(core.offset(x, 1, z));
-                }
-            }
-        }
-        for (int y = 1; y <= 8; y++) {
-            out.add(core.above(y));
-        }
-        return out;
-    }
-
-    /**
-     * ティプラー・シリンダー（3×3×7、縮退炉外殻36個）。底の層はコアの周りの8個、上の層（高さ6）は中央を空けた8個、
-     * その間の四隅に柱（高さ1〜5）。中央の高さ1〜6は空気（回る円柱が入る）。
-     */
-    public static List<BlockPos> tiplerLayout(BlockPos core) {
-        List<BlockPos> out = new ArrayList<>();
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                if (x == 0 && z == 0) {
-                    continue;
-                }
-                out.add(core.offset(x, 0, z));
-                out.add(core.offset(x, 6, z));
-                if (x != 0 && z != 0) {
-                    for (int y = 1; y <= 5; y++) {
-                        out.add(core.offset(x, y, z));
-                    }
-                }
-            }
-        }
-        return out;
-    }
-
-    /**
-     * ワームホール生成器（3×3×3、縮退炉外殻24個）。コアは底の中央。箱の中心と天井の中央は空気（口が生まれる穴）。
-     */
-    public static List<BlockPos> wormholeGeneratorLayout(BlockPos core) {
-        List<BlockPos> out = new ArrayList<>();
-        for (int y = 0; y <= 2; y++) {
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    if (x != 0 || z != 0) {
-                        out.add(core.offset(x, y, z));
-                    }
-                }
-            }
-        }
-        return out;
-    }
-
-    /**
-     * 縮退炉外殻で決まった形ができているか。ただし外殻の代わりに portRole の入出力口を置いてもよい（置いた場所を ports に入れる）。
-     */
-    public static boolean casingShapeWithPorts(Level level, BlockPos core, List<BlockPos> layout, int airAbove,
-                                               MultiblockPart.Role portRole, List<BlockPos> ports) {
-        ports.clear();
-        for (BlockPos p : layout) {
-            MultiblockPart.Role r = role(level.getBlockState(p));
-            if (r == portRole) {
-                ports.add(p.immutable());
-            } else if (r != MultiblockPart.Role.DEGENERATE_CASING) {
-                ports.clear();
-                return false;
-            }
-        }
-        for (int y = 1; y <= airAbove; y++) {
-            if (!level.getBlockState(core.above(y)).isAir()) {
-                ports.clear();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** 縮退炉外殻で決まった形ができているか。airAbove は中央で空気でなければならない高さの数。 */
-    public static boolean casingShape(Level level, BlockPos core, List<BlockPos> layout, int airAbove) {
-        for (BlockPos p : layout) {
-            if (role(level.getBlockState(p)) != MultiblockPart.Role.DEGENERATE_CASING) {
-                return false;
-            }
-        }
-        for (int y = 1; y <= airAbove; y++) {
-            if (!level.getBlockState(core.above(y)).isAir()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Nullable

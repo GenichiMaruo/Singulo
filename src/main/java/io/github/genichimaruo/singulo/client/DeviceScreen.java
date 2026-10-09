@@ -113,6 +113,20 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
         g.drawString(font, c, x, y, color, false);
     }
 
+    /** 文を幅 maxWidth に収まるよう折り返して描き、次の行の y を返す。 */
+    private int para(GuiGraphics g, Component c, int x, int y, int maxWidth, int color) {
+        for (var seq : font.split(c, maxWidth)) {
+            g.drawString(font, seq, x, y, color, false);
+            y += 10;
+        }
+        return y;
+    }
+
+    /** 右の電力バーの手前まで（白い画面の右側の文の幅）。 */
+    private static int widthTo(int x) {
+        return 178 - x;
+    }
+
     private static Component tr(String key, Object... args) {
         return Component.translatable("gui.singulo.device." + key, args);
     }
@@ -259,9 +273,9 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
 
     // ------------------------------------------------------------------ ワームホールの口
 
-    private static final int MOUTH_BTN_Y = 30;
-    private static final int MOUTH_MINUS_X = 132;
-    private static final int MOUTH_PLUS_X = 166;
+    private static final int MOUTH_BTN_Y = 22;
+    private static final int MOUTH_MINUS_X = 140;
+    private static final int MOUTH_PLUS_X = 170;
     private static final int BTN = 16;
 
     private void drawMouth(GuiGraphics g, int x, int y, float t, int mouseX, int mouseY) {
@@ -292,26 +306,28 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
         int size = v(DeviceMenu.Mouth.SIZE);
         int target = v(DeviceMenu.Mouth.TARGET);
         int side = 2 * size + 1;
-        line(g, tr("mouth.size", side, side, 2 * target + 1, 2 * target + 1), 96, 18, S_TEXT);
+        int x = 96;
+        int w = 194 - x;
+        int y = para(g, tr("mouth.size", side, side, 2 * target + 1, 2 * target + 1), x, 52, w, S_TEXT);
         int partner = v(DeviceMenu.Mouth.PARTNER);
         Component link = partner == 0 ? tr("mouth.no_partner") : partner == 1 ? tr("mouth.unloaded",
                 v(DeviceMenu.Mouth.PX), v(DeviceMenu.Mouth.PY), v(DeviceMenu.Mouth.PZ))
                 : tr("mouth.linked", v(DeviceMenu.Mouth.PX), v(DeviceMenu.Mouth.PY), v(DeviceMenu.Mouth.PZ));
-        line(g, link, 96, 52, partner == 2 ? GOOD : partner == 1 ? 0xFFFFC060 : WARN);
+        y = para(g, link, x, y + 2, w, partner == 2 ? GOOD : partner == 1 ? 0xFFFFC060 : WARN);
         if (v(DeviceMenu.Mouth.CROSS) != 0) {
-            line(g, tr("mouth.cross"), 96, 62, MAGENTA);
+            y = para(g, tr("mouth.cross"), x, y, w, MAGENTA);
         }
         int[] e = io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.ENERGY_PER_TICK;
         int[] it = io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.ITEMS_PER_TICK;
         int[] fl = io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.FLUID_PER_TICK;
-        line(g, tr("mouth.bandwidth", size >= 3 ? "∞" : power(e[size]), it[size], num(fl[size])), 96, 74, S_DIM);
+        para(g, tr("mouth.bandwidth", size >= 3 ? "∞" : power(e[size]), it[size], power(fl[size])), x, y + 2, w, S_DIM);
         int tpm = v(DeviceMenu.Mouth.TICKS_PER_MATTER);
         Component upkeep = tpm > 0 ? tr("mouth.upkeep", String.format("%.1f", tpm / 1200.0)) : tr("mouth.upkeep_none");
         int[] f = DeviceMenu.slotPos(kind)[0];
-        line(g, upkeep, f[0] + 22, f[1] + 4, S_DIM);
+        int fy = para(g, upkeep, f[0] + 22, f[1], 70, S_DIM);
         if (v(DeviceMenu.Mouth.STARVE) > 0) {
             int left = (io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.SHRINK_TICKS - v(DeviceMenu.Mouth.STARVE)) / 20;
-            line(g, tr("mouth.starving", left), f[0] + 22, f[1] + 14, WARN);
+            para(g, tr("mouth.starving", left), f[0] + 22, fy, 70, WARN);
         }
     }
 
@@ -332,16 +348,18 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
 
     private void labelsPort(GuiGraphics g) {
         int state = v(DeviceMenu.Port.STATE);
+        int x = 72;
+        int w = 194 - x;
         Component s = state == 0 ? tr("port.no_mouth") : state == 1 ? tr("port.no_partner") : tr("port.linked");
-        line(g, s, 72, 22, state == 2 ? GOOD : WARN);
+        int y = para(g, s, x, 20, w, state == 2 ? GOOD : WARN);
         if (state > 0) {
             int side = 2 * v(DeviceMenu.Port.SIZE) + 1;
-            line(g, tr("port.throat", side, side), 72, 36, S_TEXT);
+            y = para(g, tr("port.throat", side, side), x, y + 2, w, S_TEXT);
         }
         if (state == 2) {
-            line(g, tr("port.targets", v(DeviceMenu.Port.ENERGY), v(DeviceMenu.Port.ITEMS), v(DeviceMenu.Port.FLUIDS)), 72, 70, S_TEXT);
+            y = para(g, tr("port.targets", v(DeviceMenu.Port.ENERGY), v(DeviceMenu.Port.ITEMS), v(DeviceMenu.Port.FLUIDS)), x, y + 2, w, S_TEXT);
         }
-        line(g, tr("port.hint"), 72, 90, S_DIM);
+        para(g, tr("port.hint"), x, Math.max(y + 4, 84), w, S_DIM);
     }
 
     // ------------------------------------------------------------------ 重力閉じ込めタンク
@@ -376,12 +394,15 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
     }
 
     private void labelsTank(GuiGraphics g) {
-        int amount = v(DeviceMenu.Tank.AMOUNT);
-        line(g, tr("tank.amount", num(amount), num(v(DeviceMenu.Tank.CAPACITY))), 72, 24, Panel.TEXT);
+        int x = 72;
+        int w = widthTo(x);
+        int y = para(g, tr("tank.label"), x, 22, w, 0xFF7A8490);
+        y = para(g, Component.literal(num(v(DeviceMenu.Tank.AMOUNT)) + " / " + num(v(DeviceMenu.Tank.CAPACITY)) + " mB"), x, y, w, Panel.TEXT);
         boolean contained = v(DeviceMenu.Tank.CONTAINED) != 0;
-        line(g, contained ? tr("tank.contained") : tr("tank.leaking"), 72, 40, contained ? 0xFF2E9A5A : Panel.RED);
-        line(g, tr("tank.upkeep", num(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.FE_PER_TICK)), 72, 56, 0xFF7A8490);
-        line(g, tr("energy_short", power(v(DeviceMenu.Tank.ENERGY)), power(v(DeviceMenu.Tank.ENERGY_MAX))), 72, 72, 0xFF7A8490);
+        y = para(g, contained ? tr("tank.contained") : tr("tank.leaking"), x, y + 4, w, contained ? 0xFF2E9A5A : Panel.RED);
+        y = para(g, tr("tank.upkeep", num(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.FE_PER_TICK)), x, y + 4, w,
+                0xFF7A8490);
+        para(g, tr("energy_short", power(v(DeviceMenu.Tank.ENERGY)), power(v(DeviceMenu.Tank.ENERGY_MAX))), x, y, w, 0xFF7A8490);
     }
 
     // ------------------------------------------------------------------ ハロー捕集器
@@ -409,12 +430,14 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
     }
 
     private void labelsHalo(GuiGraphics g) {
+        int x = 76;
+        int w = widthTo(x);
         boolean core = v(DeviceMenu.Halo.CORE) != 0;
-        line(g, core ? tr("halo.core", num(v(DeviceMenu.Halo.CORE_MASS))) : tr("halo.no_core",
-                io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity.RANGE), 76, 22, core ? 0xFF2E9A5A : Panel.RED);
-        line(g, tr("halo.rate", v(DeviceMenu.Halo.RATE)), 76, 38, Panel.TEXT);
-        line(g, tr("halo.tank", num(v(DeviceMenu.Halo.AMOUNT)), num(v(DeviceMenu.Halo.BUFFER))), 76, 64, 0xFF7A8490);
-        line(g, tr("halo.leak"), 76, 88, 0xFF7A8490);
+        int y = para(g, core ? tr("halo.core", num(v(DeviceMenu.Halo.CORE_MASS))) : tr("halo.no_core",
+                io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity.RANGE), x, 20, w, core ? 0xFF2E9A5A : Panel.RED);
+        y = para(g, tr("halo.rate", v(DeviceMenu.Halo.RATE)), x, y + 2, w, Panel.TEXT);
+        para(g, tr("halo.tank", num(v(DeviceMenu.Halo.AMOUNT)), num(v(DeviceMenu.Halo.BUFFER))), x, Math.max(y + 2, 64), w, 0xFF7A8490);
+        para(g, tr("halo.leak"), x, 88, w, 0xFF7A8490);
     }
 
     // ------------------------------------------------------------------ 宇宙線ミュオン収集器
@@ -444,17 +467,19 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
     }
 
     private void labelsMuon(GuiGraphics g) {
+        int x = 44;
+        int w = 194 - x;
         boolean sky = v(DeviceMenu.Muon.SKY) != 0;
-        line(g, tr("muon.altitude", v(DeviceMenu.Muon.Y)), 44, 22, Panel.TEXT);
-        line(g, sky ? tr("muon.rate", v(DeviceMenu.Muon.RATE)) : tr("muon.no_sky"), 44, 36, sky ? Panel.TEXT : Panel.RED);
-        line(g, tr("muon.hint"), 44, 92, 0xFF7A8490);
+        int y = para(g, tr("muon.altitude", v(DeviceMenu.Muon.Y)), x, 20, w, Panel.TEXT);
+        para(g, sky ? tr("muon.rate", v(DeviceMenu.Muon.RATE)) : tr("muon.no_sky"), x, y + 2, w, sky ? Panel.TEXT : Panel.RED);
+        para(g, tr("muon.hint"), x, 92, 194 - x, 0xFF7A8490);
     }
 
     // ------------------------------------------------------------------ 重力波検出器
 
-    private static final int OBSERVE_X = 120;
-    private static final int OBSERVE_Y = 84;
-    private static final int OBSERVE_W = 60;
+    private static final int OBSERVE_X = 100;
+    private static final int OBSERVE_Y = 86;
+    private static final int OBSERVE_W = 72;
     private static final int OBSERVE_H = 16;
 
     private void drawDetector(GuiGraphics g, int x, int y, float t, int mouseX, int mouseY) {
@@ -490,18 +515,20 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
     }
 
     private void labelsDetector(GuiGraphics g) {
+        int x = 100;
+        int w = widthTo(x);
         Component b = tr("detector.observe");
         line(g, b, OBSERVE_X + (OBSERVE_W - font.width(b)) / 2, OBSERVE_Y + 4, 0xFFFFFFFF);
-        line(g, tr("detector.cost", num(v(DeviceMenu.Detector.COST))), 100, 70, 0xFF7A8490);
         if (v(DeviceMenu.Detector.OBSERVED) == 0) {
-            line(g, tr("detector.not_yet"), 100, 24, 0xFF7A8490);
+            para(g, tr("detector.not_yet"), x, 22, w, 0xFF7A8490);
         } else if (v(DeviceMenu.Detector.FOUND) == 0) {
-            line(g, Component.translatable("gui.singulo.detector.none"), 100, 24, Panel.RED);
+            para(g, Component.translatable("gui.singulo.detector.none"), x, 22, w, Panel.RED);
         } else {
             String[] dirs = {"north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"};
-            line(g, Component.translatable("direction.singulo." + dirs[v(DeviceMenu.Detector.DIRECTION) & 7]), 100, 24, Panel.TEXT);
-            line(g, Component.translatable("gui.singulo.detector.band." + v(DeviceMenu.Detector.BAND)), 100, 38, Panel.TEXT);
+            int y = para(g, Component.translatable("direction.singulo." + dirs[v(DeviceMenu.Detector.DIRECTION) & 7]), x, 22, w, Panel.TEXT);
+            para(g, Component.translatable("gui.singulo.detector.band." + v(DeviceMenu.Detector.BAND)), x, y + 2, w, Panel.TEXT);
         }
+        para(g, tr("detector.cost", num(v(DeviceMenu.Detector.COST))), x, 64, w, 0xFF7A8490);
     }
 
     // ------------------------------------------------------------------ ボタン

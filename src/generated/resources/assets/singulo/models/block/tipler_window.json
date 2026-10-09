@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "singulo:block/tipler_window"
+  },
+  "render_type": "minecraft:translucent"
+}

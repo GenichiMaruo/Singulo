@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "singulo:block/wormhole_generator_focuser"
+    }
+  }
+}

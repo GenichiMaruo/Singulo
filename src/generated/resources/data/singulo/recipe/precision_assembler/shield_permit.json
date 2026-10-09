@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:basic_circuit"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:shield_permit",
+    "count": 1
+  }
+}

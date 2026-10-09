@@ -1,17 +1,17 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
-      "item": "singulo:superconducting_coil"
-    },
-    {
-      "item": "singulo:steel_plate"
-    },
-    {
-      "item": "singulo:steel_plate"
-    }
+  "pattern": [
+    "POP"
   ],
+  "key": {
+    "P": {
+      "item": "singulo:steel_plate"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    }
+  },
   "result": {
     "id": "singulo:focusing_magnet",
     "count": 1

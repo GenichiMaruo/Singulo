@@ -1,35 +1,25 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
-      "item": "singulo:basic_frame"
-    },
-    {
-      "item": "singulo:superconducting_coil"
-    },
-    {
-      "item": "singulo:superconducting_coil"
-    },
-    {
-      "item": "singulo:steel_plate"
-    },
-    {
-      "item": "singulo:steel_plate"
-    },
-    {
-      "item": "singulo:steel_plate"
-    },
-    {
-      "item": "singulo:steel_plate"
-    },
-    {
-      "item": "singulo:heat_exchange_core"
-    },
-    {
-      "item": "singulo:heat_exchange_core"
-    }
+  "pattern": [
+    "PHP",
+    "OFO",
+    "PHP"
   ],
+  "key": {
+    "P": {
+      "item": "singulo:steel_plate"
+    },
+    "H": {
+      "item": "singulo:heat_exchange_core"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    }
+  },
   "result": {
     "id": "singulo:cryogenic_turbine",
     "count": 1

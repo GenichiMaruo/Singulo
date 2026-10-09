@@ -12,6 +12,7 @@ import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import io.github.genichimaruo.singulo.ruin.RuinDiscovery;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -94,14 +95,8 @@ public final class Stage4GameTests {
 
     @GameTest(template = EMPTY, timeoutTicks = 1400)
     public static void compactorMakesDegenerateShell(GameTestHelper helper) {
-        BlockPos center = new BlockPos(3, 2, 3);
-        BlockPos controllerPos = center.north();
-        for (BlockPos p : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
-            if (!p.equals(center)) {
-                helper.setBlock(p, SinguloBlocks.DEGENERATE_CASING.get());
-            }
-        }
-        helper.setBlock(controllerPos, SinguloBlocks.CONTROLLERS.get(MachineType.DEGENERATE_COMPACTOR).get());
+        BlockPos controllerPos = new BlockPos(3, 2, 1);
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.DEGENERATE_COMPACTOR, controllerPos, Direction.SOUTH, 5);
         MachineBlockEntity m = helper.getBlockEntity(controllerPos);
         keepPowered(helper, m);
         m.items().setStackInSlot(0, new ItemStack(item("compressed_block_3"), 8));
@@ -109,7 +104,7 @@ public final class Stage4GameTests {
         m.items().setStackInSlot(2, new ItemStack(item("entangled_element")));
         m.automationFluids().fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 6000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
-            helper.assertTrue(m.structureSize() == 3, "3×3×3 として形成されない");
+            helper.assertTrue(m.structureSize() == 5, "5×5×5 として形成されない");
             helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).is(item("degenerate_matter_shell")),
                     "縮退物質殻ができない");
             helper.assertTrue(drainable(m.automationFluids(), "liquid_nitrogen") == 0
@@ -117,23 +112,10 @@ public final class Stage4GameTests {
         });
     }
 
-    /** 5×5×5 のカシミール空洞を (1,1,1) から建てる。コントローラは間の段の側面。 */
+    /** 5×5×5 のC空洞を建てる。コントローラは手前の面の下から2段目の中央 (3,2,1)、空洞の中心は (3,3,3)。 */
     private static MachineBlockEntity buildCavity(GameTestHelper helper) {
-        BlockPos o = new BlockPos(1, 1, 1);
-        for (int x = 0; x <= 4; x++) {
-            for (int z = 0; z <= 4; z++) {
-                helper.setBlock(o.offset(x, 0, z), SinguloBlocks.MIRROR_PLATE.get());
-                helper.setBlock(o.offset(x, 4, z), SinguloBlocks.MIRROR_PLATE.get());
-                boolean corner = (x == 0 || x == 4) && (z == 0 || z == 4);
-                if (corner) {
-                    for (int y = 1; y <= 3; y++) {
-                        helper.setBlock(o.offset(x, y, z), SinguloBlocks.DEGENERATE_CASING.get());
-                    }
-                }
-            }
-        }
-        BlockPos controllerPos = o.offset(2, 2, 0);
-        helper.setBlock(controllerPos, SinguloBlocks.CONTROLLERS.get(MachineType.CASIMIR_CAVITY).get());
+        BlockPos controllerPos = new BlockPos(3, 2, 1);
+        TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.CASIMIR_CAVITY, controllerPos, Direction.SOUTH, 5);
         MachineBlockEntity m = helper.getBlockEntity(controllerPos);
         keepPowered(helper, m);
         return m;
@@ -194,32 +176,45 @@ public final class Stage4GameTests {
 
     // ------------------------------------------------------------------ 縮退熱炉
 
+    /** 縮退熱炉（5×5×7）を設計図どおりに建て、外装板の1枚を搬入出ポートに替える。コントローラの位置を返す。 */
+    private static BlockPos buildFurnace(GameTestHelper helper, BlockPos controllerRel, BlockPos portRel) {
+        BlockPos c = helper.absolutePos(controllerRel);
+        for (var e : io.github.genichimaruo.singulo.multiblock.Blueprints.layout(
+                io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.DEGENERATE_FURNACE, c, Direction.SOUTH, 7).entrySet()) {
+            helper.getLevel().setBlockAndUpdate(e.getKey(), e.getValue());
+        }
+        if (portRel != null) {
+            helper.setBlock(portRel, SinguloBlocks.MULTIBLOCK_PORT.get());
+        }
+        return controllerRel;
+    }
+
     @GameTest(template = LARGE, timeoutTicks = 100)
     public static void degenerateFurnaceBurnsLv2With20MFE(GameTestHelper helper) {
-        BlockPos o = new BlockPos(1, 1, 0);
-        for (int x = 0; x <= 6; x++) {
-            for (int z = 0; z <= 6; z++) {
-                boolean piston = (x == 3 && (z == 2 || z == 4)) || (z == 3 && (x == 2 || x == 4));
-                Block face = piston ? SinguloBlocks.DEGENERATE_FURNACE_PISTON.get() : SinguloBlocks.DEGENERATE_CASING.get();
-                helper.setBlock(o.offset(x, 0, z), face);
-                helper.setBlock(o.offset(x, 8, z), face);
-                if ((x == 0 || x == 6) && (z == 0 || z == 6)) {
-                    for (int y = 1; y <= 7; y++) {
-                        helper.setBlock(o.offset(x, y, z), SinguloBlocks.DEGENERATE_CASING.get());
-                    }
-                }
-            }
-        }
-        BlockPos controllerPos = o.offset(0, 3, 0);
-        helper.setBlock(controllerPos, SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER.get());
+        // コントローラは (3,2,1)、炉は南（+Z）へ。手前の面の最上段（高さ y=1+5）の外装板をポートにし、その前に蓄電池を置く
+        BlockPos controllerPos = buildFurnace(helper, new BlockPos(3, 2, 1), new BlockPos(3, 6, 1));
+        helper.setBlock(new BlockPos(3, 6, 0), SinguloBlocks.SMES_MODULE.get());
         DegenerateFurnaceBlockEntity f = helper.getBlockEntity(controllerPos);
         f.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         f.fuel().insertItem(0, new ItemStack(item("compressed_block_2"), 2), false);
-        helper.runAtTickTime(6, () -> {
-            helper.assertTrue(f.structureSize() == 9, "7×7×9 として形成されない");
-            long energy = f.energy().getEnergyStored();
-            helper.assertTrue(energy >= 20_000_000L * 4, "20 MFE/t で発電していない: " + energy);
+        helper.runAtTickTime(8, () -> {
+            helper.assertTrue(f.structureSize() == 7, "5×5×7 として形成されない");
             helper.assertTrue(f.fuel().getStackInSlot(0).getCount() == 1, "燃料を1個ずつ燃やしていない");
+            SmesCellBlockEntity sink = helper.getBlockEntity(new BlockPos(3, 6, 0));
+            long total = (long) f.energy().getEnergyStored() + sink.energy().getEnergyStored();
+            helper.assertTrue(total >= 20_000_000L * 5, "20 MFE/t で発電していない: " + total);
+            helper.assertTrue(sink.energy().getEnergyStored() > 0, "搬入出ポートから電力が押し出されない");
+            helper.succeed();
+        });
+    }
+
+    /** 縮退熱炉: 枠の位置にポートを置くと形成されない。中に入れない（中の空気の部屋は囲まれている）。 */
+    @GameTest(template = LARGE, timeoutTicks = 60)
+    public static void degenerateFurnaceRejectsPortOnFrame(GameTestHelper helper) {
+        BlockPos controllerPos = buildFurnace(helper, new BlockPos(3, 2, 1), new BlockPos(1, 4, 1));
+        DegenerateFurnaceBlockEntity f = helper.getBlockEntity(controllerPos);
+        helper.runAtTickTime(4, () -> {
+            helper.assertTrue(f.structureSize() == 0, "枠にポートを置いても形成されてしまう");
             helper.succeed();
         });
     }

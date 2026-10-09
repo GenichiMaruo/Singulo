@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "singulo:block/degenerate_compactor_anvil"
+    }
+  }
+}

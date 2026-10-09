@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "singulo:block/reactor_mass_alarm"
+    },
+    "lit=true": {
+      "model": "singulo:block/reactor_mass_alarm_on"
+    }
+  }
+}

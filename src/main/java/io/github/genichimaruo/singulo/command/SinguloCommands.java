@@ -22,6 +22,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * /singulo build &lt;マルチブロック&gt; [大きさ] — クリエイティブ用。見ている向きの数ブロック先に、マルチブロックを一発で組み立てる。
+ * /singulo blackhole [位置] [質量] — 野良ブラックホールを出す（消すには /setblock で空気にする）。
  * コントローラが手前、形が奥に伸びる（ホロ投影機と同じ向き）。権限レベル2（オペレーター）が要る。
  */
 public final class SinguloCommands {
@@ -39,7 +40,15 @@ public final class SinguloCommands {
                                         Arrays.stream(Blueprints.Kind.values()).map(Blueprints.Kind::id), b))
                                 .executes(c -> build(c, -1))
                                 .then(Commands.argument("size", IntegerArgumentType.integer(1, 64))
-                                        .executes(c -> build(c, IntegerArgumentType.getInteger(c, "size")))))));
+                                        .executes(c -> build(c, IntegerArgumentType.getInteger(c, "size"))))))
+                .then(Commands.literal("blackhole").requires(s -> s.hasPermission(2))
+                        .executes(c -> blackHole(c, null, DEFAULT_BLACK_HOLE_MASS))
+                        .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
+                                .executes(c -> blackHole(c, net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(c, "pos"),
+                                        DEFAULT_BLACK_HOLE_MASS))
+                                .then(Commands.argument("mass", com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(100, 20000))
+                                        .executes(c -> blackHole(c, net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(c, "pos"),
+                                                com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c, "mass")))))));
     }
 
     private static int build(CommandContext<CommandSourceStack> c, int size) throws CommandSyntaxException {
@@ -64,6 +73,25 @@ public final class SinguloCommands {
         c.getSource().sendSuccess(() -> Component.translatable("command.singulo.build.done",
                 Component.translatable("multiblock.singulo." + kind.id()), finalSize, placed), true);
         return placed;
+    }
+
+    static final double DEFAULT_BLACK_HOLE_MASS = 2000;
+
+    /** /singulo blackhole [位置] [質量] — 野良ブラックホールを出す。位置を省くと、見ている方向の8ブロック先。 */
+    private static int blackHole(CommandContext<CommandSourceStack> c, BlockPos pos, double mass) throws CommandSyntaxException {
+        ServerLevel level = c.getSource().getLevel();
+        if (pos == null) {
+            ServerPlayer player = c.getSource().getPlayerOrException();
+            pos = BlockPos.containing(player.getEyePosition().add(player.getLookAngle().scale(8)));
+        }
+        level.setBlock(pos, io.github.genichimaruo.singulo.registry.SinguloBlocks.ROGUE_BLACK_HOLE.get().defaultBlockState(), Block.UPDATE_ALL);
+        if (level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity hole) {
+            hole.setCore(mass, 0);
+        }
+        BlockPos at = pos;
+        c.getSource().sendSuccess(() -> Component.translatable("command.singulo.blackhole.done", at.getX(), at.getY(), at.getZ(),
+                String.format("%.0f", mass)), true);
+        return 1;
     }
 
     /** プレイヤーとコントローラの間の距離（形が手前に張り出す分だけ離す）。 */

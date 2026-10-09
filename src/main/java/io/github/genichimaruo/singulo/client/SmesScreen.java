@@ -11,7 +11,7 @@ public class SmesScreen extends AbstractContainerScreen<SmesMenu> {
     public SmesScreen(SmesMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         imageWidth = 176;
-        imageHeight = 96;
+        imageHeight = 116;
     }
 
     @Override
@@ -46,11 +46,28 @@ public class SmesScreen extends AbstractContainerScreen<SmesMenu> {
         int stored = menu.value(SmesMenu.D_STORED);
         int cap = Math.max(1, menu.value(SmesMenu.D_CAPACITY));
         String pct = String.format("%.1f%%", 100.0 * stored / cap);
-        g.drawString(font, Component.translatable("gui.singulo.energy", stored, cap), 10, 46, Panel.TEXT, false);
+        g.drawString(font, compact(stored) + " / " + compact(cap) + " FE", 10, 46, Panel.TEXT, false);
         g.drawString(font, pct, imageWidth - 10 - font.width(pct), 46, 0xFF2A8FB8, false);
-        g.drawString(font, Component.translatable("gui.singulo.smes.in", menu.value(SmesMenu.D_IN)), 10, 60, 0xFF3C9A5A, false);
-        g.drawString(font, Component.translatable("gui.singulo.smes.out", menu.value(SmesMenu.D_OUT)), 10, 72, 0xFFC08020, false);
-        Component hint = Component.translatable("gui.singulo.smes.hint", menu.value(SmesMenu.D_RATE));
-        g.drawString(font, hint, 10, 84, 0xFF8A949E, false);
+        g.drawString(font, Component.translatable("gui.singulo.smes.in", compact(menu.value(SmesMenu.D_IN))), 10, 60, 0xFF3C9A5A, false);
+        g.drawString(font, Component.translatable("gui.singulo.smes.out", compact(menu.value(SmesMenu.D_OUT))), 10, 72, 0xFFC08020, false);
+        int y = 86;
+        for (var seq : font.split(Component.translatable("gui.singulo.smes.hint", compact(menu.value(SmesMenu.D_RATE))), imageWidth - 20)) {
+            g.drawString(font, seq, 10, y, 0xFF8A949E, false);
+            y += 10;
+        }
+    }
+
+    /** 大きな数を短く（k・M・G）。 */
+    private static String compact(long n) {
+        if (n >= 1_000_000_000L) {
+            return String.format("%.2fG", n / 1e9);
+        }
+        if (n >= 1_000_000L) {
+            return String.format("%.1fM", n / 1e6);
+        }
+        if (n >= 10_000L) {
+            return String.format("%.1fk", n / 1e3);
+        }
+        return String.valueOf(n);
     }
 }

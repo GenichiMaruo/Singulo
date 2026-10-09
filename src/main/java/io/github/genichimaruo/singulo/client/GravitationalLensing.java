@@ -31,8 +31,12 @@ import org.lwjgl.opengl.GL30;
  * 重力レンズの画面効果。ブラックホール（リアクターの炉心）とワームホールの口の描画がフレームごとに「レンズ」を登録し、
  * ワールドを描き終えたあとで画面をコピーして、点質量レンズの式で背景を中心から外へ押し広げて描き直す。
  * 縁にはアインシュタインリングが光る。1フレームに効かせるのはカメラに近い4つまで。
- * クライアント設定 gravitationalLensing で切れる。Iris 系のシェーダーパックが入っていて lensingWithShaderPacks が
- * false のときは掛けない（歪みなしの表示に戻る）。
+ * クライアント設定 gravitationalLensing で切れる。
+ * <p>
+ * Iris 系のシェーダーパックを使っているとき（専用の処理）: シェーダーパックは自分の画面と深度で描き、最後に画面へ合成するので、
+ * ワールドを描き終えた時点ではまだ絵ができていない。そこで、レンズの位置だけをその時点で覚えておき、合成が終わったあと
+ * （GUI を描く直前）に掛ける。シェーダーパックの深度は読めないので、手前のものを除く処理は使わず、球の範囲の中だけを歪める。
+ * lensingWithShaderPacks が false なら、シェーダーパック使用時は掛けない。
  */
 public final class GravitationalLensing {
     /**
@@ -84,7 +88,7 @@ public final class GravitationalLensing {
         float pt = event.getPartialTick().getGameTimeDeltaPartialTick(false);
         for (net.minecraft.world.entity.player.Player p : mc.level.players()) {
             for (net.minecraft.world.InteractionHand hand : net.minecraft.world.InteractionHand.values()) {
-                if (!(p.getItemInHand(hand).getItem() instanceof io.github.genichimaruo.singulo.item.GravitonManipulatorItem)) {
+                if (!StaffTipTracker.distorts(p.getItemInHand(hand))) {
                     continue;
                 }
                 boolean right = (hand == net.minecraft.world.InteractionHand.MAIN_HAND)
@@ -141,8 +145,56 @@ public final class GravitationalLensing {
         if (ClientConfig.SPEC.isLoaded() && !ClientConfig.GRAVITATIONAL_LENSING.get()) {
             return false;
         }
-        boolean shaderPack = ModList.get().isLoaded("iris") || ModList.get().isLoaded("oculus");
-        return !shaderPack || !ClientConfig.SPEC.isLoaded() || ClientConfig.LENSING_WITH_SHADER_PACKS.get();
+        return !shaderPackInUse() || !ClientConfig.SPEC.isLoaded() || ClientConfig.LENSING_WITH_SHADER_PACKS.get();
+    }
+
+    /** Iris 系のシェーダーパックを使っているか（Iris の公開 API をリフレクションで呼ぶ。入っていなければ false）。 */
+    private static java.lang.reflect.Method shaderPackCheck;
+    private static Object irisApi;
+    private static boolean irisLooked;
+
+    static boolean shaderPackInUse() {
+        if (!irisLooked) {
+            irisLooked = true;
+            if (ModList.get().isLoaded("iris") || ModList.get().isLoaded("oculus")) {
+                try {
+                    Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+                    irisApi = api.getMethod("getInstance").invoke(null);
+                    shaderPackCheck = api.getMethod("isShaderPackInUse");
+                } catch (ReflectiveOperationException | LinkageError e) {
+                    Singulo.LOGGER.warn("Iris の API が見つからない（重力レンズはシェーダーパックなしの扱いにする）: {}", e.toString());
+                }
+            }
+        }
+        if (shaderPackCheck == null) {
+            return false;
+        }
+        try {
+            return (boolean) shaderPackCheck.invoke(irisApi);
+        } catch (ReflectiveOperationException e) {
+            return false;
+        }
+    }
+
+    /** シェーダーパック使用時に、合成のあとで掛けるために覚えておくレンズ（ワールドを描き終えた時点のもの）。 */
+    private record Pending(List<Source> sources, Vec3 cam, Matrix4f proj, Quaternionf rotation) {}
+
+    private static Pending pending;
+
+    /** GUI を描く直前（シェーダーパックの合成が終わったあと）に、覚えておいたレンズを掛ける。 */
+    static void onRenderGui(net.neoforged.neoforge.client.event.RenderGuiEvent.Pre event) {
+        Pending p = pending;
+        pending = null;
+        if (p == null || shader == null) {
+            return;
+        }
+        SOURCES.clear();
+        SOURCES.addAll(p.sources());
+        try {
+            apply(p.cam(), p.proj(), p.rotation(), false);
+        } finally {
+            SOURCES.clear();
+        }
     }
 
     static void onRenderStage(RenderLevelStageEvent event) {
@@ -155,21 +207,26 @@ public final class GravitationalLensing {
                 addHeldStaffs(event);
             }
             if (!SOURCES.isEmpty() && shader != null && enabled()) {
-                apply(event);
+                if (shaderPackInUse()) {
+                    // シェーダーパックの合成のあとで掛ける
+                    pending = new Pending(List.copyOf(SOURCES), event.getCamera().getPosition(), new Matrix4f(event.getProjectionMatrix()),
+                            new Quaternionf(event.getCamera().rotation()));
+                } else {
+                    apply(event.getCamera().getPosition(), event.getProjectionMatrix(), event.getCamera().rotation(), true);
+                }
             }
         } finally {
             SOURCES.clear();
         }
     }
 
-    private static void apply(RenderLevelStageEvent event) {
+    /** レンズを掛ける。useDepth が false なら深度を使わない（シェーダーパック使用時）。 */
+    private static void apply(Vec3 cam, Matrix4f proj, Quaternionf cameraRotation, boolean useDepth) {
         Minecraft mc = Minecraft.getInstance();
         RenderTarget main = mc.getMainRenderTarget();
         int w = main.width;
         int h = main.height;
-        Vec3 cam = event.getCamera().getPosition();
-        Matrix4f proj = event.getProjectionMatrix();
-        Matrix4f view = new Matrix4f().rotation(event.getCamera().rotation().conjugate(new Quaternionf()));
+        Matrix4f view = new Matrix4f().rotation(cameraRotation.conjugate(new Quaternionf()));
         float[][] lenses = new float[MAX_LENSES][];
         float[][] spheres = new float[MAX_LENSES][];
         int n = 0;
@@ -220,6 +277,7 @@ public final class GravitationalLensing {
         }
         shader.safeGetUniform("DepthParams").set(proj.m22(), proj.m32());
         shader.safeGetUniform("Aspect").set((float) w / h);
+        shader.safeGetUniform("UseDepth").set(useDepth ? 1.0F : 0.0F);
         // drawWithShader は描く直前に SamplerN を RenderSystem のシェーダーテクスチャで上書きするので、
         // setSampler ではなくそちらに画面のコピーを渡す（でないと別のテクスチャを読んで画面が真っ黒になる）
         int previous = RenderSystem.getShaderTexture(0);

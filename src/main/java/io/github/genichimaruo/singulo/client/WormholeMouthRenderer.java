@@ -46,7 +46,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
         pose.mulPose(Axis.YP.rotationDegrees(time * 4));
         pose.mulPose(Axis.XP.rotationDegrees(20));
         VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
-        ShieldTowerRenderer.ring(glow, pose.last(), r * 1.15F, r * 2.0F, 200, LightTexture.FULL_BRIGHT);
+        FxDraw.ring(pose.last(), glow, r * 1.15F, r * 2.0F, 0xC8C8FF, 230, 230);
         pose.popPose();
         Vec3 c = Vec3.atBottomCenterOf(be.getBlockPos()).add(0, WormholeMouthBlockEntity.MOUTH_HEIGHT, 0);
         GravitationalLensing.add(c, r * GravitationalLensing.EINSTEIN_PER_HORIZON, 0.6F);

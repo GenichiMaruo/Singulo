@@ -1,0 +1,46 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "top": "singulo:block/machine_top_t3",
+    "side": "singulo:block/machine_side_t3",
+    "bottom": "singulo:block/machine_bottom_t3",
+    "glass": "singulo:block/machine_glass",
+    "inner": "singulo:block/machine_inner",
+    "front": "singulo:block/neutrino_observatory_front_on",
+    "particle": "singulo:block/machine_side_t3"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "down": {
+          "texture": "#bottom"
+        }
+      }
+    }
+  ]
+}

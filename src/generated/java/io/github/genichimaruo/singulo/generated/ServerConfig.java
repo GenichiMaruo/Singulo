@@ -11,7 +11,6 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue STARS_PER_EXOTIC_BATCH;
     public static final ModConfigSpec.IntValue EXOTIC_BATCH_SIZE;
     public static final ModConfigSpec.IntValue STARS_PER_SINGULARITY_CORE;
-    public static final ModConfigSpec.IntValue STARS_PER_GRAVITON_MANIPULATOR;
     public static final ModConfigSpec.BooleanValue ALLOW_ARTIFICIAL_STAR_CORE;
     public static final ModConfigSpec.IntValue ARTIFICIAL_STAR_CORE_JET_CONDENSATE;
     public static final ModConfigSpec.DoubleValue GENERATOR_OUTPUT_MULTIPLIER;
@@ -81,7 +80,6 @@ public final class ServerConfig {
         ModConfigSpec.IntValue STARS_PER_EXOTIC_BATCH_;
         ModConfigSpec.IntValue EXOTIC_BATCH_SIZE_;
         ModConfigSpec.IntValue STARS_PER_SINGULARITY_CORE_;
-        ModConfigSpec.IntValue STARS_PER_GRAVITON_MANIPULATOR_;
         ModConfigSpec.BooleanValue ALLOW_ARTIFICIAL_STAR_CORE_;
         ModConfigSpec.IntValue ARTIFICIAL_STAR_CORE_JET_CONDENSATE_;
         ModConfigSpec.DoubleValue GENERATOR_OUTPUT_MULTIPLIER_;
@@ -156,8 +154,6 @@ public final class ServerConfig {
         EXOTIC_BATCH_SIZE_ = b.defineInRange("exoticBatchSize", 8, 1, 64);
         b.comment("シンギュラリティ・コア1個に要るネザースターの数", "範囲: 0〜16（整数）");
         STARS_PER_SINGULARITY_CORE_ = b.defineInRange("starsPerSingularityCore", 1, 0, 16);
-        b.comment("グラビトン・マニピュレーターに要るネザースターの数", "範囲: 0〜16（整数）");
-        STARS_PER_GRAVITON_MANIPULATOR_ = b.defineInRange("starsPerGravitonManipulator", 1, 0, 16);
         b.comment("人工星核をネザースターの代わりに使えるか", "範囲: true / false");
         ALLOW_ARTIFICIAL_STAR_CORE_ = b.define("allowArtificialStarCore", true);
         b.comment("人工星核1個に要るジェット凝縮体の数", "範囲: 1〜64（整数）");
@@ -281,7 +277,7 @@ public final class ServerConfig {
         b.comment("Tシリンダーの加速倍率", "範囲: 1.0〜10.0");
         TIPLER_SPEED_MULTIPLIER_ = b.defineInRange("tiplerSpeedMultiplier", 2.0, 1.0, 10.0);
         b.comment("Tシリンダーが時間を加速する半径", "範囲: 1〜32（ブロック）");
-        TIPLER_RADIUS_ = b.defineInRange("tiplerRadius", 8, 1, 32);
+        TIPLER_RADIUS_ = b.defineInRange("tiplerRadius", 16, 1, 32);
         b.comment("イベントホライズン・シールドの半径（電力は半径の二乗に比例）", "範囲: 4〜64（ブロック）");
         SHIELD_RADIUS_ = b.defineInRange("shieldRadius", 32, 4, 64);
         b.pop();
@@ -303,7 +299,6 @@ public final class ServerConfig {
         STARS_PER_EXOTIC_BATCH = STARS_PER_EXOTIC_BATCH_;
         EXOTIC_BATCH_SIZE = EXOTIC_BATCH_SIZE_;
         STARS_PER_SINGULARITY_CORE = STARS_PER_SINGULARITY_CORE_;
-        STARS_PER_GRAVITON_MANIPULATOR = STARS_PER_GRAVITON_MANIPULATOR_;
         ALLOW_ARTIFICIAL_STAR_CORE = ALLOW_ARTIFICIAL_STAR_CORE_;
         ARTIFICIAL_STAR_CORE_JET_CONDENSATE = ARTIFICIAL_STAR_CORE_JET_CONDENSATE_;
         GENERATOR_OUTPUT_MULTIPLIER = GENERATOR_OUTPUT_MULTIPLIER_;

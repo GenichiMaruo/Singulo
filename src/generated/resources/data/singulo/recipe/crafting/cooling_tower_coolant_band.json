@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CAC",
+    " P "
+  ],
+  "key": {
+    "C": {
+      "tag": "c:ingots/copper"
+    },
+    "A": {
+      "item": "minecraft:blue_ice"
+    },
+    "P": {
+      "item": "singulo:steel_plate"
+    }
+  },
+  "result": {
+    "id": "singulo:cooling_tower_coolant_band",
+    "count": 4
+  }
+}

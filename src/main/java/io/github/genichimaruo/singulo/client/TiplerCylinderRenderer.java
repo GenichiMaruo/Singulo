@@ -22,18 +22,27 @@ import net.minecraft.world.phys.AABB;
 public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinderBlockEntity> {
     private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
     private static final int SIDES = 16;
-    private static final float RADIUS = 0.42F;
-    private static final float BOTTOM = 1.0F;
-    private static final float TOP = 6.0F;
+    /** 円柱の半径と、軸の根元（格納筒の底の内側）からの下端・上端の高さ。中の 3×3×7 に収まる。 */
+    private static final float RADIUS = 1.1F;
+    private static final float BOTTOM = 0.05F;
+    private static final float TOP = 6.95F;
 
     public TiplerCylinderRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public void render(TiplerCylinderBlockEntity be, float partialTick, PoseStack pose, MultiBufferSource buffers,
                        int light, int overlay) {
+        if (!be.shownFormed()) {
+            return;                                                     // 格納筒ができるまでは円柱を描かない
+        }
         float spin = be.spin();
+        net.minecraft.core.BlockPos axis = be.axis();
         pose.pushPose();
-        pose.translate(0.5, 0, 0.5);
+        pose.translate(axis.getX() - be.getBlockPos().getX() + 0.5, axis.getY() - be.getBlockPos().getY(),
+                axis.getZ() - be.getBlockPos().getZ() + 0.5);
+        if (spin > 0.05F && be.getLevel() != null) {
+            timeMotes(be, pose, buffers, partialTick, spin);
+        }
         pose.mulPose(Axis.YP.rotationDegrees(be.angle(partialTick)));
         VertexConsumer vc = buffers.getBuffer(RenderType.entitySolid(WHITE));
         PoseStack.Pose last = pose.last();
@@ -73,8 +82,39 @@ public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinde
                 .setLight(light).setNormal(last, nx, ny, nz);
     }
 
+    /**
+     * 時間の粒: 円柱のまわりを、回転より速く巡りながら昇っていく紫の光の粒（時間が速く流れている）。
+     * 円柱の上下の端には、時の輪がゆっくり脈打つ。
+     */
+    private static void timeMotes(TiplerCylinderBlockEntity be, PoseStack pose, MultiBufferSource buffers, float partialTick, float spin) {
+        float time = be.getLevel().getGameTime() + partialTick;
+        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        for (int i = 0; i < 18; i++) {
+            float f = (time * 0.015F * (1 + spin) + i / 18F) % 1F;
+            float ang = time * 0.12F * (1 + spin) + i * 2.4F;
+            float r = RADIUS + 0.18F;
+            pose.pushPose();
+            pose.translate(Mth.cos(ang) * r, BOTTOM + f * (TOP - BOTTOM), Mth.sin(ang) * r);
+            FxDraw.billboard(pose, glow, camera, 0.12F, i % 3 == 0 ? 0xFFFFFF : 0xC8A0FF, (int) (230 * Mth.sin(f * Mth.PI) * spin));
+            pose.popPose();
+        }
+        for (float y : new float[]{BOTTOM + 0.05F, TOP - 0.05F}) {
+            float a = 0.5F + 0.5F * Mth.sin(time * 0.2F + y);
+            pose.pushPose();
+            pose.translate(0, y, 0);
+            FxDraw.ring(pose.last(), glow, RADIUS + 0.05F, RADIUS + 0.3F, 0xB890FF, (int) (160 * a * spin), 0);
+            pose.popPose();
+        }
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen(TiplerCylinderBlockEntity be) {
+        return true;
+    }
+
     @Override
     public AABB getRenderBoundingBox(TiplerCylinderBlockEntity be) {
-        return new AABB(be.getBlockPos()).expandTowards(0, 7, 0).inflate(1);
+        return new AABB(be.axis()).expandTowards(0, 8, 0).inflate(3);
     }
 }

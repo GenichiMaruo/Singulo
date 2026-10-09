@@ -33,6 +33,12 @@ public final class SinguloItems {
             "metric_drive", () -> new MetricDriveItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.wormhole.UnstableMouthItem> UNSTABLE_WORMHOLE_MOUTH = ITEMS.register(
             "unstable_wormhole_mouth", () -> new io.github.genichimaruo.singulo.wormhole.UnstableMouthItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlackHoleBombItem> BLACK_HOLE_BOMB = ITEMS.register(
+            "black_hole_bomb", () -> new io.github.genichimaruo.singulo.item.BlackHoleBombItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.SettingsCardItem> SETTINGS_CARD = ITEMS.register(
+            "settings_card", () -> new io.github.genichimaruo.singulo.item.SettingsCardItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.ShieldPermitItem> SHIELD_PERMIT = ITEMS.register(
+            "shield_permit", () -> new io.github.genichimaruo.singulo.item.ShieldPermitItem(new Item.Properties().rarity(Rarity.RARE), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.HoloProjectorItem> HOLO_PROJECTOR = ITEMS.register(
             "holo_projector", () -> new io.github.genichimaruo.singulo.item.HoloProjectorItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.HandbookItem> HANDBOOK = ITEMS.register(
@@ -56,6 +62,9 @@ public final class SinguloItems {
     private static final Map<String, Integer> TOOL_STAGES = Map.ofEntries(
             Map.entry("inertial_control_gauntlet", 3),
             Map.entry("graviton_manipulator", 5),
+            Map.entry("shield_permit", 5),
+            Map.entry("black_hole_bomb", 5),
+            Map.entry("settings_card", 1),
             Map.entry("metric_drive", 5),
             Map.entry("unstable_wormhole_mouth", 5),
             Map.entry("holo_projector", 1),
@@ -80,20 +89,54 @@ public final class SinguloItems {
             block(entry.getValue(), entry.getKey().stage());
         }
         TAB_ORDER.add(HANDBOOK);
+        TAB_ORDER.add(SETTINGS_CARD);
         TAB_ORDER.add(HOLO_PROJECTOR);
         TAB_ORDER.add(EXPLORER_COMPASS);
         TAB_ORDER.add(DECODED_RECORD);
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
+        block(SinguloBlocks.MULTIBLOCK_PORT, 2);
+        block(SinguloBlocks.COOLING_TOWER_BASE, 2);
         block(SinguloBlocks.COOLING_TOWER_CASING, 2);
         block(SinguloBlocks.COOLING_TOWER_GLASS, 2);
+        block(SinguloBlocks.COOLING_TOWER_COOLANT_BAND, 2);
+        block(SinguloBlocks.COOLING_TOWER_RIM, 2);
+        block(SinguloBlocks.COOLING_TOWER_GRATE, 2);
         block(SinguloBlocks.HEAT_EXCHANGE_CORE, 2);
-        block(SinguloBlocks.COOLING_TOWER_PORT, 2);
+        block(SinguloBlocks.DEGENERATE_COMPACTOR_FRAME, 4);
+        block(SinguloBlocks.DEGENERATE_COMPACTOR_PLATE, 4);
+        block(SinguloBlocks.DEGENERATE_COMPACTOR_RAM, 4);
+        block(SinguloBlocks.DEGENERATE_COMPACTOR_ANVIL, 4);
+        block(SinguloBlocks.DEGENERATE_COMPACTOR_VENT, 4);
+        block(SinguloBlocks.DEGENERATE_COMPACTOR_WINDOW, 4);
+        block(SinguloBlocks.CASIMIR_CAVITY_FRAME, 4);
+        block(SinguloBlocks.CASIMIR_CAVITY_PUMP, 4);
+        block(SinguloBlocks.MIRROR_PLATE, 4);
+        block(SinguloBlocks.CASIMIR_CAVITY_WALL, 4);
+        block(SinguloBlocks.CASIMIR_CAVITY_SHIELD, 4);
+        block(SinguloBlocks.CASIMIR_CAVITY_WINDOW, 4);
+        block(SinguloBlocks.DEGENERATE_FURNACE_FRAME, 4);
+        block(SinguloBlocks.DEGENERATE_FURNACE_SHELL, 4);
+        block(SinguloBlocks.DEGENERATE_FURNACE_PISTON, 4);
+        block(SinguloBlocks.DEGENERATE_FURNACE_FIN, 4);
+        block(SinguloBlocks.DEGENERATE_FURNACE_TUBE, 4);
+        block(SinguloBlocks.DEGENERATE_FURNACE_WINDOW, 4);
+        block(SinguloBlocks.SHIELD_TOWER_PLINTH, 5);
+        block(SinguloBlocks.SHIELD_TOWER_COIL, 5);
+        block(SinguloBlocks.SHIELD_TOWER_BODY, 5);
+        block(SinguloBlocks.SHIELD_TOWER_WAVEGUIDE, 5);
+        block(SinguloBlocks.SHIELD_TOWER_CROWN, 5);
+        block(SinguloBlocks.TIPLER_FRAME, 5);
+        block(SinguloBlocks.TIPLER_HOUSING, 5);
+        block(SinguloBlocks.TIPLER_BEARING, 5);
+        block(SinguloBlocks.TIPLER_WINDOW, 5);
+        block(SinguloBlocks.TIPLER_HOLDER, 5);
+        block(SinguloBlocks.WORMHOLE_GENERATOR_SHELL, 5);
+        block(SinguloBlocks.WORMHOLE_GENERATOR_COIL, 5);
+        block(SinguloBlocks.WORMHOLE_GENERATOR_FOCUSER, 5);
+        block(SinguloBlocks.WORMHOLE_GENERATOR_WINDOW, 5);
         block(SinguloBlocks.ACCELERATOR_TUBE, 2);
         block(SinguloBlocks.FOCUSING_MAGNET, 2);
-        block(SinguloBlocks.DEGENERATE_CASING, 4);
-        block(SinguloBlocks.MIRROR_PLATE, 4);
-        block(SinguloBlocks.DEGENERATE_FURNACE_PISTON, 4);
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
         block(SinguloBlocks.PROBE_STATION, 4);
         block(SinguloBlocks.SMES_MODULE, 4);
@@ -101,11 +144,14 @@ public final class SinguloItems {
         block(SinguloBlocks.REACTOR_SHELL, 5);
         block(SinguloBlocks.GYRO_DRIVE, 5);
         block(SinguloBlocks.EXTRACTION_PORT, 5);
-        block(SinguloBlocks.WORMHOLE_GENERATOR_IO, 5);
+        block(SinguloBlocks.REACTOR_STABILIZER, 5);
+        block(SinguloBlocks.REACTOR_MASS_ALARM, 5);
         block(SinguloBlocks.CORE_CONTROLLER, 5);
         block(SinguloBlocks.HORIZON_BUS, 5);
         block(SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED, 5);
         block(SinguloBlocks.SHIELD_TOWER_CORE, 5);
+        TAB_ORDER.add(SHIELD_PERMIT);
+        TAB_ORDER.add(BLACK_HOLE_BOMB);
         block(SinguloBlocks.TIPLER_CORE, 5);
         TAB_ORDER.add(GRAVITON_MANIPULATOR);
         TAB_ORDER.add(METRIC_DRIVE);
@@ -128,6 +174,7 @@ public final class SinguloItems {
         TAB_ORDER.add(NEUTRINO_SCANNER);
         TAB_ORDER.add(MAGNETIC_BOTTLE);
         block(SinguloBlocks.GRAVITATIONAL_WAVE_DETECTOR, 3);
+        block(SinguloBlocks.NEUTRINO_OBSERVATORY, 3);
         for (var ruin : java.util.List.of(SinguloBlocks.RUIN_PANEL, SinguloBlocks.CRACKED_RUIN_PANEL, SinguloBlocks.MOSSY_RUIN_PANEL,
                 SinguloBlocks.RUIN_LAMP)) {
             block(ruin, 1);

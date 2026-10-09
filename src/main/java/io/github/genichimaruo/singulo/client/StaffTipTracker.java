@@ -17,9 +17,17 @@ import org.joml.Vector4f;
  * 手はワールドのあとに描かれるので、重力レンズは1フレーム前の位置を使う。
  */
 public final class StaffTipTracker {
-    /** モデルの中での球の中心と半径（1 = 1ブロック。モデルは中心が原点になるよう 0.5 ずらして描かれる）。 */
-    private static final float TIP_Y = 13F / 16F - 0.5F;
-    private static final float TIP_RADIUS = 3F / 16F;
+    /** 歪みを置くアイテムと、モデルの中での歪みの中心の高さと半径（1 = 1ブロック。モデルは中心が原点になるよう 0.5 ずらして描かれる）。 */
+    private static final java.util.Map<String, float[]> TIPS = java.util.Map.of(
+            "graviton_manipulator", new float[]{13F / 16F - 0.5F, 3F / 16F},
+            "micro_black_hole", new float[]{0F, 4F / 16F},
+            "black_hole_bomb", new float[]{0F, 3F / 16F});
+
+    /** 歪みを置くアイテムか。 */
+    static boolean distorts(net.minecraft.world.item.ItemStack stack) {
+        var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+        return Singulo.MODID.equals(id.getNamespace()) && TIPS.containsKey(id.getPath());
+    }
 
     /** 腕ごと（0 = 右腕, 1 = 左腕）に、最後に描かれた位置（画面 -1〜1）と大きさ（縦の UV での半径）、そのフレーム番号。 */
     private static final float[] NDC_X = new float[2];
@@ -32,10 +40,12 @@ public final class StaffTipTracker {
 
     /** モデルの読み込みのあと、杖のモデルを包んで、描く位置を覚えられるようにする。 */
     static void wrapModel(ModelEvent.ModifyBakingResult event) {
-        ModelResourceLocation key = ModelResourceLocation.inventory(Singulo.id("graviton_manipulator"));
-        BakedModel original = event.getModels().get(key);
-        if (original != null) {
-            event.getModels().put(key, new Tracking(original));
+        for (var e : TIPS.entrySet()) {
+            ModelResourceLocation key = ModelResourceLocation.inventory(Singulo.id(e.getKey()));
+            BakedModel original = event.getModels().get(key);
+            if (original != null) {
+                event.getModels().put(key, new Tracking(original, e.getValue()[0], e.getValue()[1]));
+            }
         }
     }
 
@@ -53,11 +63,11 @@ public final class StaffTipTracker {
         return currentFrame - FRAME[i] <= 2 ? new float[]{NDC_X[i], NDC_Y[i], RADIUS_UV[i]} : null;
     }
 
-    private static void record(PoseStack pose, boolean leftArm) {
+    private static void record(PoseStack pose, boolean leftArm, float tipY, float tipRadius) {
         // 手は「カメラの向きの逆」から始まる PoseStack と、カメラの向きを持つ ModelView 行列の両方を通して描かれる
         Matrix4f m = new Matrix4f(RenderSystem.getModelViewMatrix()).mul(pose.last().pose());
-        Vector4f c = m.transform(new Vector4f(0, TIP_Y, 0, 1));
-        Vector4f e = m.transform(new Vector4f(TIP_RADIUS, TIP_Y, 0, 1));
+        Vector4f c = m.transform(new Vector4f(0, tipY, 0, 1));
+        Vector4f e = m.transform(new Vector4f(tipRadius, tipY, 0, 1));
         float viewRadius = (float) Math.sqrt((e.x - c.x) * (e.x - c.x) + (e.y - c.y) * (e.y - c.y) + (e.z - c.z) * (e.z - c.z));
         Matrix4f proj = RenderSystem.getProjectionMatrix();
         Vector4f clip = proj.transform(new Vector4f(c));
@@ -72,15 +82,20 @@ public final class StaffTipTracker {
     }
 
     private static final class Tracking extends BakedModelWrapper<BakedModel> {
-        Tracking(BakedModel original) {
+        private final float tipY;
+        private final float tipRadius;
+
+        Tracking(BakedModel original, float tipY, float tipRadius) {
             super(original);
+            this.tipY = tipY;
+            this.tipRadius = tipRadius;
         }
 
         @Override
         public BakedModel applyTransform(ItemDisplayContext context, PoseStack pose, boolean leftHand) {
             BakedModel result = super.applyTransform(context, pose, leftHand);
             if (context.firstPerson()) {
-                record(pose, context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND);
+                record(pose, context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND, tipY, tipRadius);
             }
             return result;
         }

@@ -24,6 +24,13 @@ final class Panel {
         g.fill(x + 4, y + 2, x + w - 4, y + 3, GLOW);
     }
 
+    /** 空のスロットに、入れる物のグレーの影を描く（textures/gui/ghost/<id>.png。データ生成で作る）。 */
+    static void ghost(GuiGraphics g, int x, int y, String id) {
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        g.blit(io.github.genichimaruo.singulo.Singulo.id("textures/gui/ghost/" + id + ".png"), x, y, 0, 0, 16, 16, 16, 16);
+        com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+    }
+
     static void slot(GuiGraphics g, int x, int y) {
         g.fill(x - 1, y - 1, x + 17, y + 17, WELL_EDGE);
         g.fill(x, y, x + 16, y + 16, WELL);

@@ -1,23 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "C I",
+    "CRI"
+  ],
+  "key": {
+    "C": {
       "tag": "c:ingots/copper"
     },
-    {
-      "tag": "c:ingots/copper"
-    },
-    {
+    "I": {
       "tag": "c:ingots/iron"
     },
-    {
-      "tag": "c:ingots/iron"
-    },
-    {
+    "R": {
       "tag": "c:dusts/redstone"
     }
-  ],
+  },
   "result": {
     "id": "singulo:thermocouple_module",
     "count": 1

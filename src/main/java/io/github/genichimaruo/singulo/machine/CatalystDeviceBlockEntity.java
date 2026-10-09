@@ -33,8 +33,29 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET }
 
     /** 画面の種類（表示する行が違う）。 */
-    public enum Kind { WORLDLINE_ANCHOR, INERTIAL_STABILIZER, QUANTUM_HEAT_ENGINE, DEGENERATE_FURNACE, PROBE_STATION, SHIELD_TOWER,
-        TIPLER_CYLINDER }
+    public enum Kind {
+        WORLDLINE_ANCHOR, INERTIAL_STABILIZER, QUANTUM_HEAT_ENGINE, DEGENERATE_FURNACE, PROBE_STATION, SHIELD_TOWER, TIPLER_CYLINDER;
+
+        /** 触媒のほかにもう1つあるスロットの名前（燃料・許可証）。なければ null。 */
+        @javax.annotation.Nullable
+        public String extraSlot() {
+            return switch (this) {
+                case DEGENERATE_FURNACE, TIPLER_CYLINDER -> "gui.singulo.slot.fuel";
+                case SHIELD_TOWER -> "gui.singulo.slot.permit";
+                default -> null;
+            };
+        }
+
+        /** もう1つのスロットに入れられる物（画面の側でも同じ判定をする）。 */
+        public boolean extraAccepts(ItemStack stack) {
+            return switch (this) {
+                case DEGENERATE_FURNACE -> DegenerateFurnaceBlockEntity.isFuel(stack);
+                case TIPLER_CYLINDER -> TiplerCylinderBlockEntity.isFuel(stack);
+                case SHIELD_TOWER -> stack.getItem() instanceof io.github.genichimaruo.singulo.item.ShieldPermitItem;
+                default -> false;
+            };
+        }
+    }
 
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_VALUE = 3, D_USAGE = 4, D_SPEED_X100 = 5,
             D_WEAR_X100 = 6, D_EXTRA = 7, COUNT = 8;
@@ -110,6 +131,11 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     @javax.annotation.Nullable
     protected CatalystHelper.Effect permanentEffect() {
         return null;
+    }
+
+    /** 画面に出すスロット。0 は触媒、もう1つあれば 1（Kind.extraSlot）。 */
+    public net.neoforged.neoforge.items.IItemHandler menuItems() {
+        return slot;
     }
 
     /** パイプやホッパーから見えるアイテムの入れ物。 */
@@ -213,7 +239,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new CatalystDeviceMenu(containerId, inventory, worldPosition, kind(), slot, syncData());
+        return new CatalystDeviceMenu(containerId, inventory, worldPosition, kind(), menuItems(), syncData());
     }
 
     @Override

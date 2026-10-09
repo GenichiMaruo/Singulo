@@ -61,6 +61,7 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onExplosionDetonate);
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onMobGriefing);
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onSpawnCheck);
+        io.github.genichimaruo.singulo.machine.ShieldPermits.register();
         NeoForge.EVENT_BUS.addListener(MetricDriveItem::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravitonManipulatorItem::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.MultiblockInteraction::onRightClickBlock);

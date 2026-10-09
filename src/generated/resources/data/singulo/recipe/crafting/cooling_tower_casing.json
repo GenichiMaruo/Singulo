@@ -1,19 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "W",
+    "P",
+    "W"
+  ],
+  "key": {
+    "W": {
       "item": "singulo:white_ceramic_composite"
     },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
+    "P": {
       "item": "singulo:steel_plate"
     }
-  ],
+  },
   "result": {
     "id": "singulo:cooling_tower_casing",
-    "count": 2
+    "count": 4
   }
 }
