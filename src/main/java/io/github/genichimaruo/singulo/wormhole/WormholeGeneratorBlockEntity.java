@@ -27,7 +27,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 口は出力に置かれ、空の手で右クリックするか搬出して受け取る。60秒以内に固定化しないと消える。
  */
 public class WormholeGeneratorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
-        AbstractMachineBlock.BreakListener {
+        AbstractMachineBlock.BreakListener, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
     /** 毎tick必要な電力の既定値（設定 wormholeGeneratorPower）。 */
     public static final int DEFAULT_REQUIRED_PER_TICK = 100_000_000;
 
@@ -122,29 +122,30 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         return formed;
     }
 
-    /** 入出力口（外殻の代わりに置いたもの）。形成済みのときだけ、この生成器につながる。 */
-    private java.util.List<BlockPos> ioPorts = java.util.List.of();
-    private boolean chunkUnloading;
+    /** マルチブロック搬入出ポート（外殻の代わりに置いたもの）。電力を入れ、できた口を押し出す。 */
+    private final io.github.genichimaruo.singulo.multiblock.PortLinks ports = new io.github.genichimaruo.singulo.multiblock.PortLinks();
+    /** 球の中心（口が生まれる所）。形成したときに決まる。 */
+    private BlockPos core;
 
-    private static void linkPorts(Level level, java.util.List<BlockPos> ports, @javax.annotation.Nullable BlockPos controller) {
-        for (BlockPos p : ports) {
-            if (level.isLoaded(p) && level.getBlockEntity(p) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity port) {
-                port.link(controller);
-            }
-        }
+    /** 球の中心。形がわからないうちはコントローラの2つ上。 */
+    public BlockPos core() {
+        return core != null ? core : worldPosition.above(2);
+    }
+
+    @Override
+    public IItemHandler ejectItems() {
+        return automation;
     }
 
     @Override
     public void onChunkUnloaded() {
-        chunkUnloading = true;
+        ports.onChunkUnloaded();
         super.onChunkUnloaded();
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !chunkUnloading) {
-            linkPorts(level, ioPorts, null);
-        }
+        ports.onRemoved(level);
         super.setRemoved();
     }
 
@@ -160,15 +161,12 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         if (level.getGameTime() >= nextCheck) {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
             boolean was = formed;
-            java.util.List<BlockPos> found = new java.util.ArrayList<>();
-            formed = Structures.casingShapeWithPorts(level, pos, Structures.wormholeGeneratorLayout(pos), 2,
-                    io.github.genichimaruo.singulo.multiblock.MultiblockPart.Role.WORMHOLE_IO, found);
-            if (!found.equals(ioPorts)) {
-                linkPorts(level, ioPorts, null);
-                linkPorts(level, found, pos);
-                ioPorts = found;
-            }
-            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, pos, was, formed, firstCheck, 2, 0, 3);
+            var found = io.github.genichimaruo.singulo.multiblock.Shapes.find(
+                    io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR, level, pos);
+            formed = found != null;
+            core = found == null ? null : found.pos(pos, 2, 2, 2);
+            ports.update(level, pos, found == null ? java.util.List.of() : found.ports());
+            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, pos, was, formed, firstCheck, 4, 0, 5);
             firstCheck = false;
         }
         // 出力の口は時間がたつと消える
@@ -180,14 +178,25 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         if (formed && outputEmpty() && received >= requiredPerTick()) {
             progress++;
             if (progress % 10 == 0) {
-                level.sendParticles(ParticleTypes.REVERSE_PORTAL, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5,
+                BlockPos c = core();
+                level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.getX() + 0.5, c.getY() + 0.5, c.getZ() + 0.5,
                         8, 0.3, 0.3, 0.3, 0.05);
+            }
+            // 渦の育ち具合を描くので、こまめに送る
+            if (progress % 5 == 0) {
+                level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
             }
             if (progress >= GENERATE_TICKS) {
                 generate(level);
             }
         } else {
             progress = 0;
+        }
+        // 渦が消えた・口を取り出したときもクライアントに知らせる
+        boolean shown = progress > 0 || !outputEmpty();
+        if (shown != sentShown) {
+            sentShown = shown;
+            level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
         }
         lastReceived = received;
         received = 0;
@@ -203,7 +212,8 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
         output.setStackInSlot(0, pair[0]);
         output.setStackInSlot(1, pair[1]);
         progress = 0;
-        io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, worldPosition, "wormhole_generator_open", 2.0F, 1.0F);
+        io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, core(), "wormhole_generator_open", 2.0F, 1.0F);
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
     @Override
@@ -233,6 +243,45 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
+        if (tag.contains("output")) {
+            output.deserializeNBT(registries, tag.getCompound("output"));
+        }
+        if (tag.contains("core")) {
+            core = BlockPos.of(tag.getLong("core"));
+            clientProgress = tag.getInt("progress");
+            clientReady = tag.getBoolean("ready");
+        }
+    }
+
+    // ------------------------------------------------------------------ 見た目（クライアント）
+
+    private int clientProgress;
+    /** 最後にクライアントへ送った「渦が見えているか」。 */
+    private boolean sentShown;
+    private boolean clientReady;
+
+    /** 口ができるまでの進み（0〜1。クライアントでは同期された値）。 */
+    public float shownProgress() {
+        int p = level != null && level.isClientSide ? clientProgress : progress;
+        return Math.min(1F, p / (float) GENERATE_TICKS);
+    }
+
+    /** できた口が出力に入っているか（渦が開いたまま待つ）。 */
+    public boolean shownReady() {
+        return level != null && level.isClientSide ? clientReady : !outputEmpty();
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        tag.putLong("core", core().asLong());
+        tag.putInt("progress", progress);
+        tag.putBoolean("ready", !outputEmpty());
+        return tag;
+    }
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
     }
 }

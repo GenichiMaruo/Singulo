@@ -23,15 +23,15 @@ public final class Blueprints {
     private Blueprints() {}
 
     public enum Kind {
-        COOLING_TOWER("cooling_tower", new int[]{5, 10, 15}),
+        COOLING_TOWER("cooling_tower", new int[]{Shapes.TOWER_MIN_HEIGHT, 11, Shapes.TOWER_MAX_HEIGHT}),
         PARTICLE_ACCELERATOR("particle_accelerator", new int[]{8, 16, 32}),
-        DEGENERATE_COMPACTOR("degenerate_compactor", new int[]{3}),
+        DEGENERATE_COMPACTOR("degenerate_compactor", new int[]{5}),
         CASIMIR_CAVITY("casimir_cavity", new int[]{5}),
-        DEGENERATE_FURNACE("degenerate_furnace", new int[]{9}),
+        DEGENERATE_FURNACE("degenerate_furnace", new int[]{7}),
         PENROSE_REACTOR("penrose_reactor", new int[]{13}),
         SHIELD_TOWER("event_horizon_shield", new int[]{9}),
-        TIPLER_CYLINDER("tipler_cylinder", new int[]{7}),
-        WORMHOLE_GENERATOR("wormhole_generator", new int[]{3});
+        TIPLER_CYLINDER("tipler_cylinder", new int[]{9}),
+        WORMHOLE_GENERATOR("wormhole_generator", new int[]{5});
 
         private final String id;
         private final int[] sizes;
@@ -56,7 +56,7 @@ public final class Blueprints {
 
         public boolean validSize(int size) {
             return switch (this) {
-                case COOLING_TOWER -> size >= Structures.TOWER_MIN_HEIGHT && size <= Structures.TOWER_MAX_HEIGHT;
+                case COOLING_TOWER -> size >= Shapes.TOWER_MIN_HEIGHT && size <= Shapes.TOWER_MAX_HEIGHT;
                 case PARTICLE_ACCELERATOR -> size >= Structures.RING_MIN_SIDE && size <= Structures.RING_MAX_SIDE;
                 default -> size == sizes[0];
             };
@@ -109,63 +109,11 @@ public final class Blueprints {
         Builder b = new Builder(controller, back);
         b.put(0, 0, 0, controllerBlock(kind).defaultBlockState().setValue(AbstractMachineBlock.FACING, back.getOpposite()));
         switch (kind) {
-            case COOLING_TOWER -> coolingTower(b, size);
             case PARTICLE_ACCELERATOR -> accelerator(b, size);
-            case DEGENERATE_COMPACTOR -> compactor(b);
-            case CASIMIR_CAVITY -> cavity(b);
-            case DEGENERATE_FURNACE -> furnace(b);
             case PENROSE_REACTOR -> reactor(b, controller);
-            case SHIELD_TOWER -> {
-                for (BlockPos p : Structures.shieldTowerLayout(controller)) {
-                    b.world(p, SinguloBlocks.DEGENERATE_CASING);
-                }
-            }
-            case TIPLER_CYLINDER -> {
-                for (BlockPos p : Structures.tiplerLayout(controller)) {
-                    b.world(p, SinguloBlocks.DEGENERATE_CASING);
-                }
-                for (int y = 1; y <= 6; y++) {
-                    b.air(0, y, 0);
-                }
-            }
-            case WORMHOLE_GENERATOR -> {
-                for (BlockPos p : Structures.wormholeGeneratorLayout(controller)) {
-                    b.world(p, SinguloBlocks.DEGENERATE_CASING);
-                }
-                b.air(0, 1, 0);
-                b.air(0, 2, 0);
-            }
+            default -> Shapes.spec(kind, size).place(controller, back, b.out::put);
         }
         return b.out;
-    }
-
-    /** 冷却塔: コントローラは最下段の手前の面の中央。中心の列は熱交換コア（最下段と最上段は空気）、奥の面の最下段に搬入出口。 */
-    private static void coolingTower(Builder b, int height) {
-        for (int y = 0; y < height; y++) {
-            for (int f = 0; f <= 2; f++) {
-                for (int r = -1; r <= 1; r++) {
-                    if (f == 1 && r == 0) {
-                        boolean core = y >= 1 && y <= height - 2;
-                        if (core) {
-                            b.put(f, y, r, SinguloBlocks.HEAT_EXCHANGE_CORE);
-                        } else {
-                            b.air(f, y, r);
-                        }
-                        continue;
-                    }
-                    if (y == 0 && f == 0 && r == 0) {
-                        continue;                                   // コントローラ
-                    }
-                    if (y == 0 && f == 2 && r == 0) {
-                        b.put(f, y, r, SinguloBlocks.COOLING_TOWER_PORT);
-                    } else if (y % 2 == 1 && (f == 1 || r == 0)) {
-                        b.put(f, y, r, SinguloBlocks.COOLING_TOWER_GLASS);   // 側面の中央は1段おきにガラス（中が見える）
-                    } else {
-                        b.put(f, y, r, SinguloBlocks.COOLING_TOWER_CASING);
-                    }
-                }
-            }
-        }
     }
 
     /** 加速器: コントローラの奥に一辺 side の正方形のリング。周に沿って4つおきと四隅が収束磁石。 */
@@ -193,76 +141,12 @@ public final class Blueprints {
         }
     }
 
-    /** 縮退圧縮炉: コントローラは 3×3×3 の手前の面の中央。中心は空気。 */
-    private static void compactor(Builder b) {
-        for (int f = 0; f <= 2; f++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int r = -1; r <= 1; r++) {
-                    if (f == 0 && y == 0 && r == 0) {
-                        continue;
-                    }
-                    if (f == 1 && y == 0 && r == 0) {
-                        b.air(f, y, r);
-                    } else {
-                        b.put(f, y, r, SinguloBlocks.DEGENERATE_CASING);
-                    }
-                }
-            }
-        }
-    }
-
-    /** カシミール空洞: コントローラは 5×5×5 の手前の面の中央（間の3段の真ん中）。 */
-    private static void cavity(Builder b) {
-        for (int f = 0; f <= 4; f++) {
-            for (int y = -2; y <= 2; y++) {
-                for (int r = -2; r <= 2; r++) {
-                    if (f == 0 && y == 0 && r == 0) {
-                        continue;
-                    }
-                    boolean side = f == 0 || f == 4 || r == -2 || r == 2;
-                    boolean corner = (f == 0 || f == 4) && (r == -2 || r == 2);
-                    if (y == -2 || y == 2) {
-                        b.put(f, y, r, SinguloBlocks.MIRROR_PLATE);
-                    } else if (corner) {
-                        b.put(f, y, r, SinguloBlocks.DEGENERATE_CASING);
-                    } else if (!side) {
-                        b.air(f, y, r);
-                    }
-                }
-            }
-        }
-    }
-
-    /** 縮退熱炉: コントローラは手前左の柱の下から2段目。7×7×9。 */
-    private static void furnace(Builder b) {
-        for (int y = -1; y <= 7; y++) {
-            for (int f = 0; f <= 6; f++) {
-                for (int r = 0; r <= 6; r++) {
-                    if (f == 0 && r == 0 && y == 0) {
-                        continue;
-                    }
-                    boolean face = y == -1 || y == 7;
-                    boolean corner = (f == 0 || f == 6) && (r == 0 || r == 6);
-                    boolean inside = f >= 1 && f <= 5 && r >= 1 && r <= 5;
-                    if (face) {
-                        boolean piston = (f == 3 && (r == 2 || r == 4)) || (r == 3 && (f == 2 || f == 4));
-                        b.put(f, y, r, piston ? SinguloBlocks.DEGENERATE_FURNACE_PISTON : SinguloBlocks.DEGENERATE_CASING);
-                    } else if (corner) {
-                        b.put(f, y, r, SinguloBlocks.DEGENERATE_CASING);
-                    } else if (inside) {
-                        b.air(f, y, r);
-                    }
-                }
-            }
-        }
-    }
-
     private static void reactor(Builder b, BlockPos controller) {
         BlockPos c = controller.above(Structures.CONTROLLER_BELOW_CENTER);
         for (Map.Entry<BlockPos, MultiblockPart.Role> e : Structures.reactorLayout(c).entrySet()) {
             Supplier<? extends Block> block = switch (e.getValue()) {
                 case GYRO_DRIVE -> SinguloBlocks.GYRO_DRIVE;
-                case EXTRACTION_PORT -> SinguloBlocks.EXTRACTION_PORT;
+                case REACTOR_STABILIZER -> SinguloBlocks.REACTOR_STABILIZER;
                 default -> SinguloBlocks.REACTOR_SHELL;
             };
             b.world(e.getKey(), block);
@@ -314,19 +198,12 @@ public final class Blueprints {
             return 0;
         }
         return switch (kind) {
-            case COOLING_TOWER -> {
-                Structures.Tower t = Structures.findTower(level, c, block);
-                yield t == null ? 0 : t.height();
-            }
             case PARTICLE_ACCELERATOR -> Structures.findRing(level, c);
-            case DEGENERATE_COMPACTOR -> Structures.findCompactor(level, c, block);
-            case CASIMIR_CAVITY -> Structures.findCavity(level, c, block);
-            case DEGENERATE_FURNACE -> Structures.findFurnace(level, c, block);
             case PENROSE_REACTOR -> Structures.findReactor(level, c) == null ? 0 : 13;
-            case SHIELD_TOWER -> Structures.casingShape(level, c, Structures.shieldTowerLayout(c), 0) ? 9 : 0;
-            case TIPLER_CYLINDER -> Structures.casingShape(level, c, Structures.tiplerLayout(c), 6) ? 7 : 0;
-            case WORMHOLE_GENERATOR -> Structures.casingShapeWithPorts(level, c, Structures.wormholeGeneratorLayout(c), 2,
-                    MultiblockPart.Role.WORMHOLE_IO, new java.util.ArrayList<>()) ? 3 : 0;
+            default -> {
+                Shapes.Found f = Shapes.find(kind, level, c);
+                yield f == null ? 0 : f.size();
+            }
         };
     }
 
@@ -347,7 +224,8 @@ public final class Blueprints {
             }
             partBlocks = set;
         }
-        return partBlocks.contains(block) || block == SinguloBlocks.WORMHOLE_GENERATOR_IO.get();
+        return partBlocks.contains(block) || block == SinguloBlocks.MULTIBLOCK_PORT.get() || block == SinguloBlocks.EXTRACTION_PORT.get()
+                || block == SinguloBlocks.REACTOR_MASS_ALARM.get();
     }
 
     /**
@@ -361,7 +239,7 @@ public final class Blueprints {
         }
         int extent = switch (kind) {
             case PARTICLE_ACCELERATOR -> Structures.RING_MAX_SIDE + 2;
-            case COOLING_TOWER -> Structures.TOWER_MAX_HEIGHT + 1;
+            case COOLING_TOWER -> Shapes.TOWER_MAX_HEIGHT + 1;
             case PENROSE_REACTOR -> Structures.REACTOR_RADIUS * 2 + 2;
             default -> kind.defaultSize() + 1;
         };
@@ -385,6 +263,12 @@ public final class Blueprints {
     public static BlockPos controllerOf(net.minecraft.world.level.Level level, BlockPos part) {
         if (!isPartBlock(level.getBlockState(part).getBlock())) {
             return null;
+        }
+        // 搬入出ポートは、つながっているコントローラーがわかっている（クライアントにも同期している）
+        if (level.getBlockEntity(part) instanceof PortBlockEntity port && port.controllerPos() != null) {
+            BlockPos c = port.controllerPos();
+            Kind kind = kindOf(level.getBlockState(c).getBlock());
+            return kind != null && formedSize(level, c, kind) > 0 ? c : null;
         }
         BlockPos best = null;
         double bestDist = Double.MAX_VALUE;

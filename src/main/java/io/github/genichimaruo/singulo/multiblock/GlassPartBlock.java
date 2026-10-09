@@ -5,19 +5,24 @@ import net.minecraft.world.level.block.TransparentBlock;
 
 /** 白縁の強化ガラス。中の部品が見える観察窓。 */
 public class GlassPartBlock extends TransparentBlock implements MultiblockPart {
-    public static final MapCodec<GlassPartBlock> CODEC = simpleCodec(GlassPartBlock::new);
+    private final Role role;
 
     public GlassPartBlock(Properties properties) {
+        this(properties, Role.STRUCTURE);
+    }
+
+    public GlassPartBlock(Properties properties, Role role) {
         super(properties);
+        this.role = role;
     }
 
     @Override
     public Role role() {
-        return Role.TOWER_GLASS;
+        return role;
     }
 
     @Override
     protected MapCodec<? extends TransparentBlock> codec() {
-        return CODEC;
+        return simpleCodec(p -> new GlassPartBlock(p, role));
     }
 }

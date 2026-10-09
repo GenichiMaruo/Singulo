@@ -8,14 +8,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * 極低温冷却塔のコントローラ。高さ5で標準速度、高いほど比例して速い。高さ10以上で液体ヘリウムを作れる。
- * 形は20 tick ごとに確かめ、崩れたら止まる。
+ * 極低温冷却塔のコントローラ。双曲面の塔（高さ7〜15、形は Shapes.tower）。高いほど速い（高さ÷5倍）。
+ * 高さ10以上で液体ヘリウムを作れる。形は20 tick ごとに確かめ、崩れたら止まる。
  */
 public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
     static final int CHECK_INTERVAL = 20;
 
     private int height;
-    private List<BlockPos> ports = List.of();
+    private final PortLinks ports = new PortLinks();
     private long nextCheck;
     private boolean firstCheck = true;
 
@@ -27,17 +27,14 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
     protected boolean canOperate(Level level) {
         if (level.getGameTime() >= nextCheck) {
             nextCheck = level.getGameTime() + CHECK_INTERVAL;
-            Structures.Tower tower = Structures.findTower(level, worldPosition, getBlockState().getBlock());
-            int newHeight = tower == null ? 0 : tower.height();
-            List<BlockPos> newPorts = tower == null ? List.of() : tower.ports();
-            if (newHeight != height || !newPorts.equals(ports)) {
+            Shapes.Found tower = Shapes.find(Blueprints.Kind.COOLING_TOWER, level, worldPosition);
+            int newHeight = tower == null ? 0 : tower.size();
+            boolean relinked = ports.update(level, worldPosition, tower == null ? List.of() : tower.ports());
+            if (newHeight != height || relinked) {
                 if (level instanceof net.minecraft.server.level.ServerLevel server) {
-                    FormationEffect.onChange(server, worldPosition, height > 0, newHeight > 0, firstCheck, 2, 15, 15);
+                    FormationEffect.onChange(server, worldPosition, height > 0, newHeight > 0, firstCheck, 4, 1, 15);
                 }
-                linkPorts(level, ports, null);
-                linkPorts(level, newPorts, worldPosition);
                 height = newHeight;
-                ports = newPorts;
                 markDirty();
             }
             firstCheck = false;
@@ -45,42 +42,26 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
         return height > 0;
     }
 
-    private static void linkPorts(Level level, List<BlockPos> ports, BlockPos controller) {
-        for (BlockPos p : ports) {
-            // 読み込まれていないチャンクには触れない（読み込み直しが起きる）
-            if (level.isLoaded(p) && level.getBlockEntity(p) instanceof PortBlockEntity port) {
-                port.link(controller);
-            }
-        }
-    }
-
     @Override
     public int structureSize() {
         return height;
     }
 
+    /** 高さ÷5 倍（高さ7で1.4倍、高さ10で2倍、高さ15で3倍）。 */
     @Override
     protected double speedMultiplier() {
         return height / 5.0;
     }
 
-    /**
-     * チャンクの読み込み解除でも setRemoved は呼ばれる。そのとき隣のチャンクのポートに触ると、解除中のチャンクを
-     * 読み込み直して解除が終わらなくなるので、ポートの切り離しはブロックが本当に壊されたときだけ行う。
-     */
-    private boolean chunkUnloading;
-
     @Override
     public void onChunkUnloaded() {
-        chunkUnloading = true;
+        ports.onChunkUnloaded();
         super.onChunkUnloaded();
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !chunkUnloading) {
-            linkPorts(level, ports, null);
-        }
+        ports.onRemoved(level);
         super.setRemoved();
     }
 }

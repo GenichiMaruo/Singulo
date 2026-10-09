@@ -109,17 +109,79 @@ final class FxDraw {
         }
     }
 
-    /** カメラの方を向いた光の板（中心が原点、一辺 size）。 */
+    /**
+     * カメラの方を向いた丸い光（中心が原点、見た目の大きさ size）。中心がいちばん明るく、外へ向かってなめらかに消える。
+     * 白いテクスチャに頂点の色と透明度で描くので、四角い板にならないよう扇形を重ねて描く。
+     */
     static void billboard(PoseStack pose, VertexConsumer vc, Quaternionf camera, float size, int rgb, int alpha) {
         pose.pushPose();
         pose.mulPose(camera);
         PoseStack.Pose last = pose.last();
-        float h = size / 2;
-        vertex(vc, last, -h, -h, 0, rgb, alpha, FULL_BRIGHT, 0, 0, 1);
-        vertex(vc, last, h, -h, 0, rgb, alpha, FULL_BRIGHT, 0, 0, 1);
-        vertex(vc, last, h, h, 0, rgb, alpha, FULL_BRIGHT, 0, 0, 1);
-        vertex(vc, last, -h, h, 0, rgb, alpha, FULL_BRIGHT, 0, 0, 1);
+        float r = size * 0.6F;
+        int seg = 20;
+        // 内側（芯: 明るさそのまま → 半分）と外側（半分 → 0）の2つの帯
+        float[][] bands = {{0F, 0.32F, 1F, 0.55F}, {0.32F, 1F, 0.55F, 0F}};
+        for (float[] b : bands) {
+            for (int k = 0; k < seg; k++) {
+                float a0 = Mth.TWO_PI * k / seg;
+                float a1 = Mth.TWO_PI * (k + 1) / seg;
+                float c0 = Mth.cos(a0), s0 = Mth.sin(a0), c1 = Mth.cos(a1), s1 = Mth.sin(a1);
+                int ai = (int) (alpha * b[2]);
+                int ao = (int) (alpha * b[3]);
+                vertex(vc, last, c0 * r * b[0], s0 * r * b[0], 0, rgb, ai, FULL_BRIGHT, 0, 0, 1);
+                vertex(vc, last, c0 * r * b[1], s0 * r * b[1], 0, rgb, ao, FULL_BRIGHT, 0, 0, 1);
+                vertex(vc, last, c1 * r * b[1], s1 * r * b[1], 0, rgb, ao, FULL_BRIGHT, 0, 0, 1);
+                vertex(vc, last, c1 * r * b[0], s1 * r * b[0], 0, rgb, ai, FULL_BRIGHT, 0, 0, 1);
+            }
+        }
         pose.popPose();
+    }
+
+    /** カメラの方を向いた光の筋（中心から両端へ細く消える。angle は画面内の向き、度）。 */
+    static void flare(PoseStack pose, VertexConsumer vc, Quaternionf camera, float length, float width, float angle, int rgb, int alpha) {
+        pose.pushPose();
+        pose.mulPose(camera);
+        pose.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(angle));
+        PoseStack.Pose last = pose.last();
+        float h = width / 2;
+        for (int side = -1; side <= 1; side += 2) {
+            float tip = side * length / 2;
+            vertex(vc, last, 0, -h, 0, rgb, alpha, FULL_BRIGHT, 0, 0, 1);
+            vertex(vc, last, tip, 0, 0, rgb, 0, FULL_BRIGHT, 0, 0, 1);
+            vertex(vc, last, tip, 0, 0, rgb, 0, FULL_BRIGHT, 0, 0, 1);
+            vertex(vc, last, 0, h, 0, rgb, alpha, FULL_BRIGHT, 0, 0, 1);
+        }
+        pose.popPose();
+    }
+
+    /** 中心を囲んで回る3本の光の輪（ジャイロスコープのように、それぞれ別の軸で傾いて回る）。 */
+    static void gyroRings(PoseStack pose, VertexConsumer vc, float radius, float width, float time, int rgb, int alpha) {
+        float[][] axes = {{1, 0, 0}, {0, 0, 1}, {0.7F, 0, 0.7F}};
+        for (int k = 0; k < 3; k++) {
+            pose.pushPose();
+            pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(time * (3 + k * 1.7F) + k * 60));
+            pose.mulPose(new org.joml.Quaternionf().rotationAxis((50 + k * 35) * Mth.DEG_TO_RAD, axes[k][0], axes[k][1], axes[k][2]));
+            ring(pose.last(), vc, radius - width / 2, radius + width / 2, rgb, alpha, alpha);
+            pose.popPose();
+        }
+    }
+
+    /** 光る正八面体（結晶）。中心が原点、頂点までの長さ size。 */
+    static void octahedron(PoseStack.Pose last, VertexConsumer vc, float size, float tall, int rgb, int alpha) {
+        float[][] eq = {{size, 0, 0}, {0, 0, size}, {-size, 0, 0}, {0, 0, -size}};
+        for (int k = 0; k < 4; k++) {
+            float[] a = eq[k], b = eq[(k + 1) % 4];
+            for (int sgn = -1; sgn <= 1; sgn += 2) {
+                float py = sgn * tall;
+                float nx = (a[0] + b[0]) / 2, ny = sgn * size * 0.6F, nz = (a[2] + b[2]) / 2;
+                float l = (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
+                int shade = sgn > 0 ? alpha : (int) (alpha * 0.75F);
+                vertex(vc, last, 0, py, 0, rgb, shade, FULL_BRIGHT, nx / l, ny / l, nz / l);
+                vertex(vc, last, sgn > 0 ? b[0] : a[0], 0, sgn > 0 ? b[2] : a[2], rgb, shade, FULL_BRIGHT, nx / l, ny / l, nz / l);
+                vertex(vc, last, sgn > 0 ? a[0] : b[0], 0, sgn > 0 ? a[2] : b[2], rgb, shade, FULL_BRIGHT, nx / l, ny / l, nz / l);
+                vertex(vc, last, 0, py, 0, rgb, shade, FULL_BRIGHT, nx / l, ny / l, nz / l);
+            }
+        }
     }
 
     /** from から to への光の帯（向きを変えた4枚の板を重ねて、どこから見ても太さが出るように）。座標は今の PoseStack の原点から。 */
@@ -149,4 +211,47 @@ final class FxDraw {
             vertex(vc, last, (float) (from.x - o.x), (float) (from.y - o.y), (float) (from.z - o.z), rgb, alpha, FULL_BRIGHT, -nx, -ny, -nz);
         }
     }
+
+    // ------------------------------------------------------------------ 箱（テクスチャを各面に1枚ずつ貼る）
+
+    static void box(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                            int light, int rgb) {
+        box(pose, vc, x0, y0, z0, x1, y1, z1, light, rgb, 255);
+    }
+
+    static void box(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                            int light, int rgb, int alpha) {
+        PoseStack.Pose p = pose.last();
+        // 下・上・北・南・西・東
+        quad(vc, p, light, rgb, alpha, 0, -1, 0, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1);
+        quad(vc, p, light, rgb, alpha, 0, 1, 0, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0);
+        quad(vc, p, light, rgb, alpha, 0, 0, -1, x0, y1, z0, x1, y1, z0, x1, y0, z0, x0, y0, z0);
+        quad(vc, p, light, rgb, alpha, 0, 0, 1, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1);
+        quad(vc, p, light, rgb, alpha, -1, 0, 0, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0);
+        quad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, x1, y1, z1, x1, y0, z1, x1, y0, z0);
+    }
+
+    private static void quad(VertexConsumer vc, PoseStack.Pose p, int light, int rgb, int alpha, float nx, float ny, float nz,
+                             float ax, float ay, float az, float bx, float by, float bz,
+                             float cx, float cy, float cz, float dx, float dy, float dz) {
+        uvVertex(vc, p, ax, ay, az, 0, 1, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, bx, by, bz, 1, 1, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, cx, cy, cz, 1, 0, light, rgb, alpha, nx, ny, nz);
+        uvVertex(vc, p, dx, dy, dz, 0, 0, light, rgb, alpha, nx, ny, nz);
+    }
+
+    private static void uvVertex(VertexConsumer vc, PoseStack.Pose p, float x, float y, float z, float u, float v, int light,
+                               int rgb, int alpha, float nx, float ny, float nz) {
+        vc.addVertex(p, x, y, z).setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(p, nx, ny, nz);
+    }
+
+    static int lerpRgb(int a, int b, float k) {
+        k = Mth.clamp(k, 0, 1);
+        int r = (int) (((a >> 16) & 0xFF) + (((b >> 16) & 0xFF) - ((a >> 16) & 0xFF)) * k);
+        int g = (int) (((a >> 8) & 0xFF) + (((b >> 8) & 0xFF) - ((a >> 8) & 0xFF)) * k);
+        int bl = (int) ((a & 0xFF) + ((b & 0xFF) - (a & 0xFF)) * k);
+        return (r << 16) | (g << 8) | bl;
+    }
+
 }
