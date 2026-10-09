@@ -16,38 +16,42 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 
 /**
- * イベントホライズン・シールド発生塔の見た目: オベリスクの先端に浮かんで回るリングと、守りが始まると上から降りてくる
- * 半透明のドーム（半径はシールドの半径）。ドームは縁（地面に近いところ）ほど濃く見え、コアのシールドは白く光る。
+ * イベントホライズン・シールド発生塔の見た目: 放射冠の上に浮かんで回るリングと、守りが始まると上から降りてくる
+ * 半透明の球（半径はシールドの半径、中心は塔の軸）。上から下へ包み込むように張られ、横から見た縁ほど濃く見え、コアのシールドは白く光る。
+ * 守っている間は、胴の中心をエネルギーの脈が昇り（導波管から見える）、放射冠が脈に合わせて光る。
  */
 public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlockEntity> {
     private static final ResourceLocation WHITE = Singulo.id("textures/misc/white.png");
     private static final int LAT = 16;
     private static final int LON = 48;
-    private static final float RING_HEIGHT = 10.0F;
+    /** 塔の軸の根元（基壇の上の段）からの、放射冠の高さ。 */
+    private static final float CROWN_HEIGHT = 7.5F;
 
     public ShieldTowerRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public void render(ShieldTowerBlockEntity be, float partialTick, PoseStack pose, MultiBufferSource buffers,
                        int light, int overlay) {
-        if (be.getLevel() == null) {
+        if (be.getLevel() == null || !be.shownFormed()) {                // 塔ができるまでは何も描かない
             return;
         }
         float time = be.getLevel().getGameTime() + partialTick;
         boolean active = be.shownProtection() > 0;
         boolean core = be.shownProtection() >= 5;
         VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
-
-        // 先端のリング
+        // ここから先は塔の軸の根元を原点にする
+        net.minecraft.core.BlockPos axis = be.axis();
         pose.pushPose();
-        pose.translate(0.5, RING_HEIGHT + Mth.sin(time * 0.05F) * 0.15F, 0.5);
-        pose.mulPose(Axis.YP.rotationDegrees(time * (active ? 3 : 0.5F)));
-        pose.mulPose(Axis.XP.rotationDegrees(15));
-        ring(vc, pose.last(), 1.0F, 1.5F, active ? 255 : 140, active ? LightTexture.FULL_BRIGHT : light);
-        pose.popPose();
+        pose.translate(axis.getX() - be.getBlockPos().getX(), axis.getY() - be.getBlockPos().getY(), axis.getZ() - be.getBlockPos().getZ());
+        float deploy = be.deployTicks(partialTick);
+        if (active) {
+            renderEnergy(pose, vc, time, core, deploy);
+        }
+        renderCrown(be, pose, vc, time, active, core, deploy);
 
         float progress = be.domeProgress(partialTick);
         if (progress <= 0) {
+            pose.popPose();
             return;
         }
         float r = be.shownRadius();
@@ -56,14 +60,22 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         int blue = 255;
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
+        // 降りきった直後: 赤道に衝撃波の輪が広がり、球全体が一度明るく光る
+        float wave = deploy < ShieldTowerBlockEntity.DEPLOY_WAVE ? 0
+                : Mth.clamp((deploy - ShieldTowerBlockEntity.DEPLOY_WAVE) / (ShieldTowerBlockEntity.DEPLOY_END - ShieldTowerBlockEntity.DEPLOY_WAVE), 0, 1);
+        if (wave > 0 && wave < 1) {
+            float wr = r * (1 + 0.25F * wave);
+            FxDraw.ring(pose.last(), vc, wr, wr + 1.5F + 2 * (1 - wave), core ? 0xEAF4FF : 0x9ED8FF, (int) (200 * (1 - wave)), 0);
+        }
+        float flash = wave > 0 && wave < 1 ? (1 - wave) : 0;
         PoseStack.Pose last = pose.last();
-        // 天頂から progress × 90° まで降ろす
-        float maxTheta = Mth.HALF_PI * progress;
+        // 天頂から progress × 180° まで降ろして、塔のまわりを球で包む（地面の下まで）
+        float maxTheta = Mth.PI * progress;
         for (int i = 0; i < LAT; i++) {
             float t0 = maxTheta * i / LAT;
             float t1 = maxTheta * (i + 1) / LAT;
-            int a0 = alpha(t0, time);
-            int a1 = alpha(t1, time);
+            int a0 = Math.min(255, alpha(t0, time) + (int) (90 * flash));
+            int a1 = Math.min(255, alpha(t1, time) + (int) (90 * flash));
             for (int j = 0; j < LON; j++) {
                 float p0 = Mth.TWO_PI * j / LON;
                 float p1 = Mth.TWO_PI * (j + 1) / LON;
@@ -79,11 +91,81 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
             }
         }
         pose.popPose();
+        pose.popPose();
+    }
+
+    /** 胴の中心を昇るエネルギーの脈（展開の充電のあいだは速く、太くなっていく）。 */
+    private static void renderEnergy(PoseStack pose, VertexConsumer vc, float time, boolean core, float deploy) {
+        int rgb = core ? 0xEAF4FF : 0x9ED8FF;
+        float charge = deploy < 0 ? 1 : Mth.clamp(deploy / ShieldTowerBlockEntity.DEPLOY_BEAM, 0, 1);
+        float rush = deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_DOME ? 1 + 2 * charge : 1;
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        pose.pushPose();
+        pose.translate(0.5, 0, 0.5);
+        FxDraw.beam(pose.last(), vc, new net.minecraft.world.phys.Vec3(0, 1, 0), new net.minecraft.world.phys.Vec3(0, CROWN_HEIGHT, 0),
+                0.08F + 0.08F * charge * rush / 3, rgb, (int) (60 + 60 * charge));
+        for (int i = 0; i < 4; i++) {
+            float f = (time * 0.03F * rush + i / 4F) % 1F;
+            float y = 1 + f * (CROWN_HEIGHT - 1);
+            pose.pushPose();
+            pose.translate(0, y, 0);
+            FxDraw.billboard(pose, vc, camera, 0.4F + 0.3F * Mth.sin(f * Mth.PI), rgb, (int) (220 * Mth.sin(f * Mth.PI)));
+            pose.popPose();
+        }
+        pose.popPose();
+    }
+
+    /**
+     * 放射冠の上: 回る正八面体の結晶と、それを囲んで別々の軸で回る3本の光の輪（ジャイロ）、やわらかい光。
+     * 展開のときは、輪が速さを増し（充電）、結晶から空へ光の柱が立ち、まぶしく光る。止まっている間は暗く、ゆっくり。
+     */
+    private static void renderCrown(ShieldTowerBlockEntity be, PoseStack pose, VertexConsumer vc, float time, boolean active,
+                                    boolean core, float deploy) {
+        int rgb = core ? 0xEAF4FF : 0x9ED8FF;
+        var camera = net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        float charge = deploy < 0 ? (active ? 1 : 0) : Mth.clamp(deploy / ShieldTowerBlockEntity.DEPLOY_BEAM, 0, 1);
+        float spinUp = deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_DOME ? 1 + 4 * charge : 1;
+        float crystalY = CROWN_HEIGHT + 1.4F + Mth.sin(time * 0.05F) * 0.12F;
+        pose.pushPose();
+        pose.translate(0.5, crystalY, 0.5);
+        // やわらかい光と結晶
+        FxDraw.billboard(pose, vc, camera, (active ? 2.2F : 1.2F) + 1.2F * charge * (spinUp - 1) / 4, rgb, active ? 120 : 50);
+        pose.pushPose();
+        pose.mulPose(Axis.YP.rotationDegrees(time * (active ? 2.5F : 0.6F) * spinUp));
+        FxDraw.octahedron(pose.last(), vc, 0.32F, 0.55F, active ? 0xFFFFFF : 0x9AB8D0, active ? 230 : 140);
+        pose.popPose();
+        // 3本の光の輪
+        FxDraw.gyroRings(pose, vc, 0.95F, 0.07F, time * (active ? 1.5F : 0.3F) * spinUp, rgb, active ? 200 : 90);
+        // 展開: 結晶から空へ立つ光の柱と、まぶしい光
+        if (deploy >= ShieldTowerBlockEntity.DEPLOY_BEAM && deploy < ShieldTowerBlockEntity.DEPLOY_DOME + 10) {
+            float k = (deploy - ShieldTowerBlockEntity.DEPLOY_BEAM) / (ShieldTowerBlockEntity.DEPLOY_DOME + 10 - ShieldTowerBlockEntity.DEPLOY_BEAM);
+            float height = be.shownRadius() * Math.min(1, k * 3);
+            int a = (int) (230 * (1 - k));
+            FxDraw.beam(pose.last(), vc, net.minecraft.world.phys.Vec3.ZERO, new net.minecraft.world.phys.Vec3(0, height, 0),
+                    0.5F * (1 - k) + 0.1F, 0xFFFFFF, a);
+            FxDraw.beam(pose.last(), vc, net.minecraft.world.phys.Vec3.ZERO, new net.minecraft.world.phys.Vec3(0, height, 0),
+                    1.2F * (1 - k) + 0.2F, rgb, a / 2);
+            FxDraw.billboard(pose, vc, camera, 6F * (1 - k) + 1, 0xFFFFFF, a);
+            for (int i = 0; i < 4; i++) {
+                FxDraw.flare(pose, vc, camera, 7F * (1 - k) + 2, 0.15F, i * 45 + time * 0.5F, rgb, a);
+            }
+        }
+        pose.popPose();
+        // 充電のあいだ、まわりから光の粒が結晶へ集まる
+        if (deploy >= 0 && deploy < ShieldTowerBlockEntity.DEPLOY_BEAM && be.getLevel() != null && be.getLevel().random.nextInt(2) == 0) {
+            var rnd = be.getLevel().random;
+            net.minecraft.core.BlockPos ax = be.axis();
+            double cx = ax.getX() + 0.5, cy = ax.getY() + crystalY, cz = ax.getZ() + 0.5;
+            net.minecraft.world.phys.Vec3 d = new net.minecraft.world.phys.Vec3(rnd.nextGaussian(), rnd.nextGaussian() * 0.5, rnd.nextGaussian())
+                    .normalize().scale(3);
+            be.getLevel().addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, cx + d.x, cy + d.y, cz + d.z,
+                    -d.x * 0.08, -d.y * 0.08, -d.z * 0.08);
+        }
     }
 
     /** 縁ほど濃く、ゆっくり降りる明るい帯が流れる。 */
     private static int alpha(float theta, float time) {
-        float rim = theta / Mth.HALF_PI;
+        float rim = Mth.sin(theta);                                       // 赤道（横から見た縁）ほど濃い
         float band = Mth.sin(theta * 6 - time * 0.05F) * 0.5F + 0.5F;
         return (int) (12 + 40 * rim * rim + 14 * band);
     }
@@ -95,29 +177,6 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         float z = Mth.sin(theta) * Mth.sin(phi);
         vc.addVertex(last, x * r, y * r, z * r).setColor(red, green, blue, alpha).setUv(0, 0)
                 .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, x, y, z);
-    }
-
-    /** 平たいリング（両面）。 */
-    static void ring(VertexConsumer vc, PoseStack.Pose last, float inner, float outer, int bright, int light) {
-        int seg = 32;
-        for (int s = 0; s < seg; s++) {
-            float a0 = Mth.TWO_PI * s / seg;
-            float a1 = Mth.TWO_PI * (s + 1) / seg;
-            float c0 = Mth.cos(a0);
-            float s0 = Mth.sin(a0);
-            float c1 = Mth.cos(a1);
-            float s1 = Mth.sin(a1);
-            for (int side = 0; side < 2; side++) {
-                float ny = side == 0 ? 1 : -1;
-                float[][] q = side == 0
-                        ? new float[][]{{c0 * inner, s0 * inner}, {c0 * outer, s0 * outer}, {c1 * outer, s1 * outer}, {c1 * inner, s1 * inner}}
-                        : new float[][]{{c1 * inner, s1 * inner}, {c1 * outer, s1 * outer}, {c0 * outer, s0 * outer}, {c0 * inner, s0 * inner}};
-                for (float[] p : q) {
-                    vc.addVertex(last, p[0], 0, p[1]).setColor(bright, bright, 255, 230).setUv(0, 0)
-                            .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(last, 0, ny, 0);
-                }
-            }
-        }
     }
 
     @Override
@@ -132,6 +191,6 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
 
     @Override
     public AABB getRenderBoundingBox(ShieldTowerBlockEntity be) {
-        return new AABB(be.getBlockPos()).inflate(Math.max(12, be.shownRadius()));
+        return new AABB(be.axis()).inflate(Math.max(12, be.shownRadius()));
     }
 }
