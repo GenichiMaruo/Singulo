@@ -65,6 +65,17 @@ final class Panel {
         }
     }
 
+    /** 電源スイッチ（10×10）。入っていれば緑、切れていれば赤で、電源の印（輪と縦の線）を描く。 */
+    static void powerButton(GuiGraphics g, int x, int y, boolean on, boolean hover) {
+        g.fill(x - 1, y - 1, x + 11, y + 11, WELL_EDGE);
+        g.fill(x, y, x + 10, y + 10, on ? (hover ? 0xFF6ACB8A : 0xFF50B870) : (hover ? 0xFFD07070 : 0xFFB05050));
+        int c = 0xFFFFFFFF;
+        g.fill(x + 4, y + 1, x + 6, y + 5, c);
+        g.fill(x + 2, y + 3, x + 3, y + 8, c);
+        g.fill(x + 7, y + 3, x + 8, y + 8, c);
+        g.fill(x + 3, y + 8, x + 7, y + 9, c);
+    }
+
     static boolean inside(double mx, double my, int x, int y, int w, int h) {
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }

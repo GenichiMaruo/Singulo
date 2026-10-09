@@ -30,7 +30,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 必要電力が足りないと不完全反応で減りが速くなり、まったくなければ止まる。使い切ると失活触媒が残る。
  */
 public abstract class CatalystDeviceBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
-    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET }
+    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET, OFF }
 
     /** 画面の種類（表示する行が違う）。 */
     public enum Kind {
@@ -58,7 +58,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     }
 
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_VALUE = 3, D_USAGE = 4, D_SPEED_X100 = 5,
-            D_WEAR_X100 = 6, D_EXTRA = 7, COUNT = 8;
+            D_WEAR_X100 = 6, D_EXTRA = 7, D_ENABLED = 8, COUNT = 9;
 
     protected final ItemStackHandler slot = new ItemStackHandler(1) {
         @Override
@@ -81,6 +81,8 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     private Status status = Status.NO_CATALYST;
     private int lastUsage;
     private CatalystHelper.Effect lastEffect = CatalystHelper.Effect.NONE;
+    /** 電源スイッチ。切ると効果を止め、触媒も電力も使わない。 */
+    private boolean enabled = true;
 
     protected CatalystDeviceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,
                                         int capacity, int maxReceive, int maxExtract) {
@@ -98,6 +100,12 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
     public Status status() {
         return status;
+    }
+
+    /** 電源スイッチ（GUIから）。 */
+    public void togglePower() {
+        enabled = !enabled;
+        setChanged();
     }
 
     public abstract Kind kind();
@@ -154,7 +162,9 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         lastUsage = 0;
         Status notReady = readiness(level);
         CatalystHelper.Effect permanent = permanentEffect();
-        if (notReady != null) {
+        if (!enabled) {
+            status = Status.OFF;
+        } else if (notReady != null) {
             status = notReady;
         } else if (permanent != null) {
             effect = permanent;
@@ -228,6 +238,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
             case D_SPEED_X100 -> (int) Math.round(lastEffect.speed() * 100);
             case D_WEAR_X100 -> (int) Math.round(lastEffect.consumption() * 100);
             case D_EXTRA -> extraValue();
+            case D_ENABLED -> enabled ? 1 : 0;
             default -> 0;
         });
     }
@@ -256,6 +267,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         tag.put("catalyst", slot.serializeNBT(registries));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("wear", wear);
+        tag.putBoolean("enabled", enabled);
     }
 
     @Override
@@ -264,5 +276,6 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         slot.deserializeNBT(registries, tag.getCompound("catalyst"));
         energy.setEnergy(tag.getInt("energy"));
         wear = tag.getDouble("wear");
+        enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
     }
 }

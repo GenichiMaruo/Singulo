@@ -14,7 +14,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class MachineMenu extends AbstractContainerMenu {
-    public static final int BUTTON_CYCLE_MODE = 0;
+    public static final int BUTTON_CYCLE_MODE = 0, BUTTON_POWER = 1, BUTTON_MAKE_FREE = 2;
 
     private final MachineType type;
     private final BlockPos pos;
@@ -30,7 +30,7 @@ public class MachineMenu extends AbstractContainerMenu {
     public static MachineMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
         MachineType type = MachineType.values()[buf.readVarInt()];
-        int synced = MachineBlockEntity.sidesIndex(type) + 2;
+        int synced = MachineBlockEntity.syncedCount(type);
         return new MachineMenu(containerId, inventory, type, pos, new ItemStackHandler(type.itemSlots()),
                 SyncedInts.client(synced), null);
     }
@@ -66,7 +66,7 @@ public class MachineMenu extends AbstractContainerMenu {
         addSlot(new SlotItemHandler(handler, type.upgradeSlot(), layout.sideColumnX + 4, MachineLayout.UPGRADE_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return MachineBlockEntity.isMonopoleUpgrade(stack);
+                return MachineBlockEntity.isUpgrade(stack);
             }
 
             @Override
@@ -99,11 +99,18 @@ public class MachineMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_CYCLE_MODE && machine != null) {
-            machine.cycleMode();
-            return true;
+        if (machine == null) {
+            return false;
         }
-        return false;
+        switch (id) {
+            case BUTTON_CYCLE_MODE -> machine.cycleMode();
+            case BUTTON_POWER -> machine.togglePower();
+            case BUTTON_MAKE_FREE -> machine.toggleMakeFree();
+            default -> {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -121,7 +128,7 @@ public class MachineMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, machineSlots, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (MachineBlockEntity.isMonopoleUpgrade(stack)) {
+        } else if (MachineBlockEntity.isUpgrade(stack)) {
             if (!moveItemStackTo(stack, upgradeIndex, upgradeIndex + 1, false)) {
                 return ItemStack.EMPTY;
             }

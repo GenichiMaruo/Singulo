@@ -12,7 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
- * クライアント → サーバー: 装置の面の設定を変える（channel 0 はアイテム、1 は液体。value は下位2ビットがモード、4 が自動排出）。
+ * クライアント → サーバー: 装置の面の設定を変える（channel 0 はアイテム、1 以降はタンクごと（1 + タンクの番号）。
+ * value は下位2ビットがモード、4 が自動排出）。
  * face が MASTER_FACE のときは自動排出の全体スイッチ（value の4がオン）。
  */
 public record SideConfigPayload(BlockPos pos, int channel, int face, int value) implements CustomPacketPayload {
@@ -33,9 +34,9 @@ public record SideConfigPayload(BlockPos pos, int channel, int face, int value) 
     static void handle(SideConfigPayload p, IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
-            if (p.face < 0 || p.face > MASTER_FACE || p.channel < 0 || p.channel > 1
+            if (p.face < 0 || p.face > MASTER_FACE
                     || player.distanceToSqr(p.pos.getX() + 0.5, p.pos.getY() + 0.5, p.pos.getZ() + 0.5) > 64
-                    || !(player.level().getBlockEntity(p.pos) instanceof MachineBlockEntity m)) {
+                    || !(player.level().getBlockEntity(p.pos) instanceof MachineBlockEntity m) || !m.validChannel(p.channel)) {
                 return;
             }
             if (p.face == MASTER_FACE) {

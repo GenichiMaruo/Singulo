@@ -43,14 +43,16 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  */
 public class MachineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
-    public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED }
+    public enum Status { IDLE, RUNNING, NO_POWER, OUTPUT_FULL, NOT_FORMED, OFF }
 
     /**
      * 同期する値の並び（SyncedInts の番号）。この後にタンクごとに 流体ID+1・量 が続く。
-     * D_STRUCTURE はマルチブロックの大きさ（-1 = マルチブロックでない、0 = 未形成）。
+     * D_STRUCTURE はマルチブロックの大きさ（-1 = マルチブロックでない、0 = 未形成）。D_FLAGS は FLAG_* のビット。
      */
     public static final int D_PROGRESS = 0, D_MAX_PROGRESS = 1, D_ENERGY = 2, D_CAPACITY = 3, D_USAGE = 4,
-            D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_TANKS = 10;
+            D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_TANKS = 11;
+    /** 動かす（電源スイッチ）・材料なしのレシピも作る・材料なしのレシピがある。 */
+    public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
     private final MachineType type;
     private final ItemStackHandler items;
@@ -78,6 +80,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private double timeCarry;
     /** 質量バッファに入れた元ブロックの種類（混成ボーナス用）。 */
     private final java.util.Set<net.minecraft.world.item.Item> massSources = new java.util.HashSet<>();
+    /** 電源スイッチ。切ると処理を止める（進み具合はそのまま残す）。 */
+    private boolean enabled = true;
+    /** 材料のいらないレシピ（電力だけで作るもの）も作るか。 */
+    private boolean makeFree = true;
+    /** この装置に材料のいらないレシピがあるか（画面にスイッチを出すか）。 */
+    private boolean hasFree;
 
     public MachineBlockEntity(BlockPos pos, BlockState state) {
         this(SinguloBlockEntities.MACHINE.get(), pos, state);
@@ -115,6 +123,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         this.energy = new SinguloEnergyStorage(capacity, capacity / 10, 0, this::setChanged);
         this.automationItems = new AutomationItems();
         this.automationFluids = new AutomationFluids();
+        this.tankSides = createTankSides(type);
     }
 
     public MachineType type() {
@@ -147,10 +156,24 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("monopole_upgrade")));
     }
 
+    public static boolean isOverclockChip(ItemStack stack) {
+        return stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("overclock_chip")));
+    }
+
+    /** アップグレード枠に入るもの（単極子アップグレードかオーバークロック・チップ）。 */
+    public static boolean isUpgrade(ItemStack stack) {
+        return isMonopoleUpgrade(stack) || isOverclockChip(stack);
+    }
+
+    /** オーバークロック・チップが挿さっているか（処理速度×3、電力×4）。 */
+    public boolean hasOverclock() {
+        return isOverclockChip(items.getStackInSlot(type.upgradeSlot()));
+    }
+
     /** そのスロットにそのアイテムを入れてよいか（触媒は専用スロットだけ、アップグレードはアップグレード枠だけ）。 */
     public boolean slotAccepts(int slot, ItemStack stack) {
         if (slot == type.upgradeSlot()) {
-            return isMonopoleUpgrade(stack);
+            return isUpgrade(stack);
         }
         if (slot == type.catalystSlot()) {
             return isCatalyst(stack);
@@ -167,25 +190,56 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private final SideConfig itemSides = new SideConfig();
-    private final SideConfig fluidSides = new SideConfig();
+    /**
+     * タンクごとの面の設定（タンクの番号順: 入力タンク → 出力タンク）。入力タンクは「無効・入力」、出力タンクは
+     * 「無効・出力」と自動排出を持つ。画面ではタンクの枠の色と、面の設定の色をそろえて見せる。
+     */
+    private final SideConfig[] tankSides;
+
+    /** はじめは、どの面からでも入力タンクへ入れられ、出力タンクから出せる（自動排出なし）。 */
+    private static SideConfig[] createTankSides(MachineType type) {
+        SideConfig[] out = new SideConfig[type.tanks()];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = new SideConfig();
+            int mode = i < type.fluidInputs() ? SideConfig.INPUT : SideConfig.OUTPUT;
+            for (SideConfig.Face f : SideConfig.Face.values()) {
+                out[i].set(f, mode, false);
+            }
+        }
+        return out;
+    }
+
+    /** 面の設定の種類。0 はアイテム、1 以降はタンクごと（1 + タンクの番号）。 */
+    public int sideChannels() {
+        return 1 + tankSides.length;
+    }
+
+    private SideConfig sides(int channel) {
+        return channel == 0 ? itemSides : tankSides[channel - 1];
+    }
+
+    public boolean validChannel(int channel) {
+        return channel >= 0 && channel < sideChannels();
+    }
 
     public SideConfig itemSides() {
         return itemSides;
     }
 
-    public SideConfig fluidSides() {
-        return fluidSides;
+    /** タンク tank の面の設定。 */
+    public SideConfig tankSides(int tank) {
+        return tankSides[tank];
     }
 
-    /** 面の設定を変える（GUIから）。channel 0 はアイテム、1 は液体。 */
     /** 自動排出の全体スイッチを切り替える。 */
     public void setEjectEnabled(int channel, boolean on) {
-        (channel == 0 ? itemSides : fluidSides).setEjectEnabled(on);
+        sides(channel).setEjectEnabled(on);
         setChanged();
     }
 
+    /** 面の設定を変える（GUIから）。channel は {@link #sideChannels()} の番号。 */
     public void setSide(int channel, SideConfig.Face face, int mode, boolean eject) {
-        (channel == 0 ? itemSides : fluidSides).set(face, mode, eject);
+        sides(channel).set(face, mode, eject);
         setChanged();
         if (level != null) {
             level.invalidateCapabilities(worldPosition);
@@ -199,10 +253,23 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return SideConfig.faceOf(facing, side);
     }
 
-    /** 設定カードから面の設定を貼る。 */
-    public void pasteSides(int items, int fluids) {
+    /** タンクごとの面の設定（設定カード用）。 */
+    public int[] tankSidesPacked() {
+        int[] out = new int[tankSides.length];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = tankSides[i].packed();
+        }
+        return out;
+    }
+
+    /** 設定カードから面の設定を貼る。tanks はタンクごとの設定（同じ種類の装置なので数は合う。合わなければ貼らない）。 */
+    public void pasteSides(int items, int[] tanks) {
         itemSides.setPacked(items);
-        fluidSides.setPacked(fluids);
+        if (tanks.length == tankSides.length) {
+            for (int i = 0; i < tanks.length; i++) {
+                tankSides[i].setPacked(tanks[i]);
+            }
+        }
         setChanged();
         if (level != null) {
             level.invalidateCapabilities(worldPosition);
@@ -222,7 +289,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     @Override
     public IFluidHandler ejectFluids() {
-        return type.fluidOutputs() > 0 ? new SidedFluids(false, true) : null;
+        return type.fluidOutputs() > 0 ? new SidedFluids(0, -1) : null;
     }
 
     /** 面ごとの設定に従うアイテムの入れ物（side が null なら制限なし）。無効の面は null。 */
@@ -250,12 +317,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             return automationFluids;
         }
         SideConfig.Face f = faceOf(side);
-        if (fluidSides.mode(f) == SideConfig.NONE) {
-            return null;
+        int inTanks = 0;
+        int outTanks = 0;
+        for (int i = 0; i < tankSides.length; i++) {
+            if (i < type.fluidInputs() ? tankSides[i].canInsert(f) : tankSides[i].canExtract(f)) {
+                if (i < type.fluidInputs()) {
+                    inTanks |= 1 << i;
+                } else {
+                    outTanks |= 1 << i;
+                }
+            }
         }
-        boolean in = fluidSides.canInsert(f);
-        boolean out = fluidSides.canExtract(f);
-        return in && out ? automationFluids : new SidedFluids(in, out);
+        return inTanks == 0 && outTanks == 0 ? null : new SidedFluids(inTanks, outTanks);
     }
 
     /** 自動排出: 「出力」を含み自動排出がオンの面へ、出力スロットと出力タンクの中身を押し出す。 */
@@ -282,12 +355,13 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                     }
                 }
             }
-            if (fluidSides.ejectEnabled() && fluidSides.eject(f) && fluidSides.canExtract(f) && type.fluidOutputs() > 0) {
+            if (type.fluidOutputs() > 0) {
                 IFluidHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
                         target, dir.getOpposite());
                 if (dest != null) {
                     for (int i = type.fluidInputs(); i < tanks.length; i++) {
-                        if (!tanks[i].isEmpty()) {
+                        SideConfig c = tankSides[i];
+                        if (c.ejectEnabled() && c.eject(f) && c.canExtract(f) && !tanks[i].isEmpty()) {
                             int moved = dest.fill(tanks[i].getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
                             if (moved > 0) {
                                 tanks[i].drain(moved, IFluidHandler.FluidAction.EXECUTE);
@@ -348,7 +422,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             autoEject(level);
         }
         boolean active = false;
-        if (!canOperate(level)) {
+        if (!enabled) {
+            usage = 0;
+            status = Status.OFF;
+        } else if (!canOperate(level)) {
             progress = 0;
             usage = 0;
             current = null;
@@ -462,14 +539,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             }
         } else {
             RecipeHolder<MachineRecipe> blocked = null;
+            hasFree = false;
             for (RecipeHolder<MachineRecipe> holder : stationRecipes(level)) {
                 MachineRecipe r = holder.value();
-                if (r.isMassRecipe() || !sizeAllows(r) || r.plan(inputs) == null || !fluidsAvailable(r)) {
+                boolean free = isFree(r);
+                hasFree |= free;
+                if (r.isMassRecipe() || !sizeAllows(r) || r.plan(inputs) == null || !fluidsAvailable(r)
+                        || free && !makeFree || found != null) {
                     continue;
                 }
                 if (canOutput(r)) {
                     found = holder;
-                    break;
+                    continue;
                 }
                 if (blocked == null) {
                     blocked = holder;
@@ -495,10 +576,38 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             if (hasMonopole()) {
                 speed *= 2;
             }
+            if (hasOverclock()) {
+                speed *= 3;
+            }
             maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
             usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
-                    / (hasMonopole() ? 1.5 : 1.0));
+                    / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
         }
+    }
+
+    /** 材料（アイテム・液体・質量・復元するもの）がいらず、電力だけで作るレシピか（冷却塔の液体窒素など）。 */
+    public static boolean isFree(MachineRecipe r) {
+        return r.ingredients().isEmpty() && r.fluidIngredients().isEmpty() && r.mass().isEmpty() && r.restore().isEmpty();
+    }
+
+    /** 電源スイッチ（GUIから）。 */
+    public void togglePower() {
+        enabled = !enabled;
+        markDirty();
+    }
+
+    /** 材料なしのレシピを作るかのスイッチ（GUIから）。 */
+    public void toggleMakeFree() {
+        makeFree = !makeFree;
+        markDirty();
+    }
+
+    public boolean enabled() {
+        return enabled;
+    }
+
+    public Status status() {
+        return status;
     }
 
     /** レシピの照合に使うスロット（入力 → 触媒）の中身。 */
@@ -704,9 +813,13 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     // ------------------------------------------------------------------ 同期・GUI
 
-    /** 同期する値の数。最後の2つは面の設定（アイテム・液体）。 */
+    /** 同期する値の数。最後は面の設定（アイテム・タンクごと）。 */
     public int syncedCount() {
-        return D_TANKS + tanks.length * 2 + 2;
+        return syncedCount(type);
+    }
+
+    public static int syncedCount(MachineType type) {
+        return sidesIndex(type) + 1 + type.tanks();
     }
 
     public static int sidesIndex(MachineType type) {
@@ -729,12 +842,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_MASS -> massTargetIsMetal() ? (int) Math.round(metalMass * 100) : (int) Math.round(mass * 100);
             case D_MASS_TARGET -> massTarget();
             case D_STRUCTURE -> structureSize();
+            case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
-                if (index == sidesIndex(type)) {
-                    yield itemSides.packed();
-                }
-                if (index == sidesIndex(type) + 1) {
-                    yield fluidSides.packed();
+                if (index >= sidesIndex(type)) {
+                    yield sides(index - sidesIndex(type)).packed();
                 }
                 int t = (index - D_TANKS) / 2;
                 FluidStack fluid = tanks[t].getFluid();
@@ -829,8 +940,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         super.saveAdditional(tag, registries);
         tag.put("items", items.serializeNBT(registries));
         tag.putInt("item_sides", itemSides.packed());
-        tag.putInt("fluid_sides", fluidSides.packed());
         tag.putBoolean("eject_master", true);
+        tag.putIntArray("tank_sides", tankSidesPacked());
+        tag.putBoolean("enabled", enabled);
+        tag.putBoolean("make_free", makeFree);
         ListTag tankList = new ListTag();
         for (FluidTank tank : tanks) {
             tankList.add(tank.writeToNBT(registries, new CompoundTag()));
@@ -857,12 +970,31 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
         if (tag.contains("item_sides")) {
             itemSides.setPacked(tag.getInt("item_sides"));
-            fluidSides.setPacked(tag.getInt("fluid_sides"));
             if (!tag.contains("eject_master")) {
                 itemSides.setEjectEnabled(true);
-                fluidSides.setEjectEnabled(true);
             }
         }
+        int[] savedTankSides = tag.getIntArray("tank_sides");
+        if (savedTankSides.length == tankSides.length) {
+            for (int i = 0; i < tankSides.length; i++) {
+                tankSides[i].setPacked(savedTankSides[i]);
+            }
+        } else if (tag.contains("fluid_sides")) {
+            // 古いデータ: 液体の設定が1つだけ。入力タンクは「入力」の面、出力タンクは「出力」の面と自動排出を引き継ぐ
+            SideConfig old = new SideConfig();
+            old.setPacked(tag.getInt("fluid_sides"));
+            for (int i = 0; i < tankSides.length; i++) {
+                boolean input = i < type.fluidInputs();
+                for (SideConfig.Face f : SideConfig.Face.values()) {
+                    boolean on = input ? old.canInsert(f) : old.canExtract(f);
+                    tankSides[i].set(f, on ? (input ? SideConfig.INPUT : SideConfig.OUTPUT) : SideConfig.NONE,
+                            !input && old.eject(f));
+                }
+                tankSides[i].setEjectEnabled(!tag.contains("eject_master") || old.ejectEnabled());
+            }
+        }
+        enabled = !tag.contains("enabled") || tag.getBoolean("enabled");
+        makeFree = !tag.contains("make_free") || tag.getBoolean("make_free");
         ListTag tankList = tag.getList("tanks", Tag.TAG_COMPOUND);
         for (int i = 0; i < tanks.length && i < tankList.size(); i++) {
             tanks[i].readFromNBT(registries, tankList.getCompound(i));
@@ -953,14 +1085,14 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
     }
 
-    /** 面の設定で入れるだけ・出すだけに絞った液体の入れ物。 */
+    /** 面の設定で絞った液体の入れ物。inTanks・outTanks は入れてよい・取り出してよいタンクのビット（-1 ならすべて）。 */
     private final class SidedFluids implements IFluidHandler {
-        private final boolean in;
-        private final boolean out;
+        private final int inTanks;
+        private final int outTanks;
 
-        SidedFluids(boolean in, boolean out) {
-            this.in = in;
-            this.out = out;
+        SidedFluids(int inTanks, int outTanks) {
+            this.inTanks = inTanks;
+            this.outTanks = outTanks;
         }
 
         @Override
@@ -980,23 +1112,51 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
         @Override
         public boolean isFluidValid(int tank, FluidStack stack) {
-            return in && automationFluids.isFluidValid(tank, stack);
+            return (inTanks & (1 << tank)) != 0 && automationFluids.isFluidValid(tank, stack);
         }
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            return in ? automationFluids.fill(resource, action) : 0;
+            return fillInputs(resource, action, inTanks);
         }
 
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            return out ? automationFluids.drain(resource, action) : FluidStack.EMPTY;
+            for (int i = type.fluidInputs(); i < tanks.length; i++) {
+                if ((outTanks & (1 << i)) != 0 && FluidStack.isSameFluidSameComponents(tanks[i].getFluid(), resource)) {
+                    return tanks[i].drain(resource, action);
+                }
+            }
+            return FluidStack.EMPTY;
         }
 
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
-            return out ? automationFluids.drain(maxDrain, action) : FluidStack.EMPTY;
+            for (int i = type.fluidInputs(); i < tanks.length; i++) {
+                if ((outTanks & (1 << i)) != 0 && !tanks[i].isEmpty()) {
+                    return tanks[i].drain(maxDrain, action);
+                }
+            }
+            return FluidStack.EMPTY;
         }
+    }
+
+    /** 入力タンクに入れる。同じ液体の入ったタンクを先に、なければ空のタンクへ。mask は入れてよいタンクのビット。 */
+    private int fillInputs(FluidStack resource, IFluidHandler.FluidAction action, int mask) {
+        for (int pass = 0; pass < 2; pass++) {
+            for (int i = 0; i < type.fluidInputs(); i++) {
+                if ((mask & (1 << i)) == 0) {
+                    continue;
+                }
+                FluidTank tank = tanks[i];
+                boolean candidate = pass == 0 ? FluidStack.isSameFluidSameComponents(tank.getFluid(), resource)
+                        : tank.isEmpty();
+                if (candidate) {
+                    return tank.fill(resource, action);
+                }
+            }
+        }
+        return 0;
     }
 
     /** 入力タンクへは入れるだけ、出力タンクからは取り出すだけ。 */
@@ -1023,17 +1183,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            for (int pass = 0; pass < 2; pass++) {
-                for (int i = 0; i < type.fluidInputs(); i++) {
-                    FluidTank tank = tanks[i];
-                    boolean candidate = pass == 0 ? FluidStack.isSameFluidSameComponents(tank.getFluid(), resource)
-                            : tank.isEmpty();
-                    if (candidate) {
-                        return tank.fill(resource, action);
-                    }
-                }
-            }
-            return 0;
+            return fillInputs(resource, action, -1);
         }
 
         @Override

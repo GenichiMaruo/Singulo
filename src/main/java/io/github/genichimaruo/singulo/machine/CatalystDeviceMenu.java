@@ -74,6 +74,17 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
         return data.getInt(index);
     }
 
+    public static final int BUTTON_POWER = 0;
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id == BUTTON_POWER && player.level().getBlockEntity(pos) instanceof CatalystDeviceBlockEntity device) {
+            device.togglePower();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);

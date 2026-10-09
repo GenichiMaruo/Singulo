@@ -17,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 
 public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     private static final int MODE_SIZE = 16;
@@ -40,7 +39,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     /** 面の設定の画面を開いているか。開いている間は装置の部分にかぶせて描く。 */
     private boolean sidesOpen;
-    /** 0 はアイテム、1 は液体。 */
+    /** 0 はアイテム、1 以降はタンクごと（1 + タンクの番号、MachineBlockEntity.sideChannels）。 */
     private int sidesChannel;
     private static final int FACE = 18;
     /** 面の設定の、ドラッグで回せる立方体。 */
@@ -105,6 +104,98 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         return !type().isMultiblock();
     }
 
+    /** タンクの色（画面の枠と、面の設定でそのタンクが使う面の色）。タンクの番号順。 */
+    private static final int[] TANK_COLORS = {0xFF3F8FE6, 0xFFE8962E, 0xFF45B86A, 0xFFB45FD8};
+
+    static int tankColor(int tank) {
+        return TANK_COLORS[tank % TANK_COLORS.length];
+    }
+
+    /** 面の設定のタブ: アイテムと、タンクごと（入力1・出力1・出力2…）。 */
+    private List<String> sideTabs() {
+        List<String> tabs = new ArrayList<>();
+        tabs.add(Component.translatable("gui.singulo.sides.items").getString());
+        for (int t = 0; t < type().tanks(); t++) {
+            boolean input = t < type().fluidInputs();
+            int n = input ? t + 1 : t - type().fluidInputs() + 1;
+            tabs.add(Component.translatable(input ? "gui.singulo.sides.tank_in" : "gui.singulo.sides.tank_out", n).getString());
+        }
+        return tabs;
+    }
+
+    /** 選んでいるタブのタンク（アイテムのタブなら -1）。 */
+    private int channelTank() {
+        return sidesChannel - 1;
+    }
+
+    private boolean channelIsInputTank() {
+        return channelTank() >= 0 && channelTank() < type().fluidInputs();
+    }
+
+    /** 面のモードの次の値。アイテムは4つを巡り、入力タンクは「無効・入力」、出力タンクは「無効・出力」を切り替える。 */
+    private int nextMode(int mode) {
+        if (channelTank() < 0) {
+            return (mode + 1) % 4;
+        }
+        int on = channelIsInputTank() ? io.github.genichimaruo.singulo.machine.SideConfig.INPUT : io.github.genichimaruo.singulo.machine.SideConfig.OUTPUT;
+        return mode == on ? 0 : on;
+    }
+
+    private int tabWidth(String label, int index) {
+        return font.width(label) + 8 + (index > 0 ? 6 : 0);
+    }
+
+    /** 面の色: アイテムはモードの色、タンクは使う面だけそのタンクの色。 */
+    private int faceColor(int mode) {
+        if (channelTank() < 0) {
+            return modeColor(mode);
+        }
+        return mode != 0 ? tankColor(channelTank()) : modeColor(0);
+    }
+
+    private int flags() {
+        return menu.value(MachineBlockEntity.D_FLAGS);
+    }
+
+    /** 電源スイッチと、材料なしのレシピのスイッチ（右の列の下）。 */
+    private int[] powerPos() {
+        return new int[]{leftPos + layout().sideColumnX + 2, topPos + 60, 10, 10};
+    }
+
+    private int[] freePos() {
+        return new int[]{leftPos + layout().sideColumnX + 13, topPos + 60, 10, 10};
+    }
+
+    private boolean showsFreeSwitch() {
+        return (flags() & MachineBlockEntity.FLAG_HAS_FREE) != 0;
+    }
+
+    private void drawSwitches(GuiGraphics g, int mouseX, int mouseY) {
+        int[] p = powerPos();
+        Panel.powerButton(g, p[0], p[1], (flags() & MachineBlockEntity.FLAG_ENABLED) != 0,
+                Panel.inside(mouseX, mouseY, p[0], p[1], p[2], p[3]));
+        if (!showsFreeSwitch()) {
+            return;
+        }
+        int c = 0xFFFFFFFF;
+        boolean free = (flags() & MachineBlockEntity.FLAG_MAKE_FREE) != 0;
+        int[] f = freePos();
+        boolean fh = Panel.inside(mouseX, mouseY, f[0], f[1], f[2], f[3]);
+        g.fill(f[0] - 1, f[1] - 1, f[0] + f[2] + 1, f[1] + f[3] + 1, Panel.WELL_EDGE);
+        g.fill(f[0], f[1], f[0] + f[2], f[1] + f[3], free ? (fh ? Panel.GLOW : 0xFF3A9CC0) : (fh ? 0xFFB0B8C0 : 0xFF9AA2AA));
+        // 稲妻の印（電力だけで作る）。作らないときは斜線を重ねる
+        g.fill(f[0] + 5, f[1] + 1, f[0] + 7, f[1] + 3, c);
+        g.fill(f[0] + 4, f[1] + 3, f[0] + 6, f[1] + 5, c);
+        g.fill(f[0] + 3, f[1] + 5, f[0] + 7, f[1] + 6, c);
+        g.fill(f[0] + 5, f[1] + 6, f[0] + 7, f[1] + 7, c);
+        g.fill(f[0] + 4, f[1] + 7, f[0] + 6, f[1] + 9, c);
+        if (!free) {
+            for (int i = 0; i < 9; i++) {
+                g.fill(f[0] + 1 + i, f[1] + 8 - i, f[0] + 2 + i, f[1] + 9 - i, 0xFFB05050);
+            }
+        }
+    }
+
     /** 面の設定ボタンの左端（右の列の中央）。 */
     private int sidesButtonX() {
         return layout().sideColumnX + (MachineLayout.SIDE_COLUMN - MachineLayout.SIDES_SIZE) / 2;
@@ -130,35 +221,41 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int h = 66;
         g.fill(x, y, x + w, y + h, 0xF0E9EDF0);
         g.fill(x, y, x + w, y + 1, Panel.SEAM);
-        // タブ
-        String[] tabs = {Component.translatable("gui.singulo.sides.items").getString(),
-                Component.translatable("gui.singulo.sides.fluids").getString()};
+        // タブ（タンクのタブはそのタンクの色。選んでいなければ左に色の印）
+        List<String> tabs = sideTabs();
         int tx = x + 4;
-        for (int i = 0; i < tabs.length; i++) {
-            if (i == 1 && type().tanks() == 0) {
-                break;
+        for (int i = 0; i < tabs.size(); i++) {
+            int tw = tabWidth(tabs.get(i), i);
+            int color = i == 0 ? 0xFF2A6F8A : tankColor(i - 1);
+            g.fill(tx, y + 3, tx + tw, y + 14, i == sidesChannel ? color : Panel.SHADE);
+            int text = tx + 4;
+            if (i > 0) {
+                g.fill(tx + 3, y + 5, tx + 7, y + 12, color);
+                text += 6;
             }
-            int tw = font.width(tabs[i]) + 8;
-            g.fill(tx, y + 3, tx + tw, y + 14, i == sidesChannel ? 0xFF2A6F8A : Panel.SHADE);
-            g.drawString(font, tabs[i], tx + 4, y + 5, i == sidesChannel ? 0xFFFFFFFF : Panel.TEXT, false);
+            g.drawString(font, tabs.get(i), text, y + 5, i == sidesChannel ? 0xFFFFFFFF : Panel.TEXT, false);
             tx += tw + 2;
         }
         int packed = sidesPacked();
         var quads = cubeQuads();
         io.github.genichimaruo.singulo.machine.SideConfig.Face hovered = cube.pick(quads, mouseX, mouseY);
-        cube.draw(g, font, quads, f -> modeColor(io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, f)),
+        cube.draw(g, font, quads, f -> faceColor(io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, f)),
                 f -> io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, f),
                 f -> Component.translatable("gui.singulo.sides.face." + f.name().toLowerCase()).getString().substring(0, 1), hovered);
-        // 自動排出の全体スイッチ
+        // 自動排出の全体スイッチ（入力タンクにはない）
         boolean master = io.github.genichimaruo.singulo.machine.SideConfig.ejectEnabled(packed);
-        int[] mp = masterPos();
-        boolean mh = Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3]);
-        g.fill(mp[0], mp[1], mp[0] + mp[2], mp[1] + mp[3], master ? (mh ? 0xFF6ACB8A : 0xFF50B870) : (mh ? 0xFFB0B8C0 : 0xFF9AA2AA));
-        g.drawString(font, Component.translatable(master ? "gui.singulo.sides.master_on" : "gui.singulo.sides.master_off"),
-                mp[0] + 4, mp[1] + 2, 0xFFFFFFFF, false);
+        if (!channelIsInputTank()) {
+            int[] mp = masterPos();
+            boolean mh = Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3]);
+            g.fill(mp[0], mp[1], mp[0] + mp[2], mp[1] + mp[3], master ? (mh ? 0xFF6ACB8A : 0xFF50B870) : (mh ? 0xFFB0B8C0 : 0xFF9AA2AA));
+            g.drawString(font, Component.translatable(master ? "gui.singulo.sides.master_on" : "gui.singulo.sides.master_off"),
+                    mp[0] + 4, mp[1] + 2, 0xFFFFFFFF, false);
+        }
         // 凡例
         int ly = y + h - 10;
-        g.drawString(font, Component.translatable("gui.singulo.sides.legend"), x + 4, ly, Panel.TEXT, false);
+        String legend = channelTank() < 0 ? "gui.singulo.sides.legend"
+                : channelIsInputTank() ? "gui.singulo.sides.legend_tank_in" : "gui.singulo.sides.legend_tank_out";
+        g.drawString(font, Component.translatable(legend), x + 4, ly, Panel.TEXT, false);
         g.pose().popPose();
         if (hovered != null) {
             int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, hovered);
@@ -176,13 +273,9 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int x = leftPos + 4;
         int y = topPos + 14;
         int tx = x + 4;
-        String[] tabs = {Component.translatable("gui.singulo.sides.items").getString(),
-                Component.translatable("gui.singulo.sides.fluids").getString()};
-        for (int i = 0; i < tabs.length; i++) {
-            if (i == 1 && type().tanks() == 0) {
-                break;
-            }
-            int tw = font.width(tabs[i]) + 8;
+        List<String> tabs = sideTabs();
+        for (int i = 0; i < tabs.size(); i++) {
+            int tw = tabWidth(tabs.get(i), i);
             if (Panel.inside(mouseX, mouseY, tx, y + 3, tw, 11)) {
                 sidesChannel = i;
                 return true;
@@ -191,7 +284,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         }
         int packed = sidesPacked();
         int[] mp = masterPos();
-        if (Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
+        if (!channelIsInputTank() && Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
             boolean master = io.github.genichimaruo.singulo.machine.SideConfig.ejectEnabled(packed);
             net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
                     menu.pos(), sidesChannel, io.github.genichimaruo.singulo.network.SideConfigPayload.MASTER_FACE, master ? 0 : 4));
@@ -214,9 +307,12 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, f);
         boolean eject = io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, f);
         if (button == 1) {
+            if (channelIsInputTank()) {
+                return;                                            // 入力タンクに自動排出はない
+            }
             eject = !eject;
         } else {
-            mode = (mode + 1) % 4;
+            mode = nextMode(mode);
         }
         net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
                 menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
@@ -291,6 +387,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             g.fill(sbx + 2, sby + 4, sbx + 8, sby + 6, ic);
             g.fill(sbx + 4, sby + 6, sbx + 6, sby + 8, ic);
         }
+        drawSwitches(g, mouseX, mouseY);
         if (type().hasCatalystSlot()) {
             drawSpecialSlot(g, x + l.catalystX, y + l.catalystY, Panel.AMBER, type().catalystSlot(), "time_crystal_catalyst");
         }
@@ -330,7 +427,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int color = switch (status) {
             case RUNNING -> 0xFF3A9CC0;
             case NOT_FORMED -> 0xFFC05050;
-            case IDLE -> 0xFF8A949E;
+            case IDLE, OFF -> 0xFF8A949E;
             default -> 0xFFC08020;
         };
         g.drawString(font, text, imageWidth - 8 - font.width(text), titleLabelY, color, false);
@@ -344,13 +441,17 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     private void drawTank(GuiGraphics g, int x, int y, int tank) {
         int fluidId = menu.value(MachineBlockEntity.D_TANKS + tank * 2);
         int amount = menu.value(MachineBlockEntity.D_TANKS + tank * 2 + 1);
-        int color = 0xFF78D2F0;
+        if (hasSides()) {
+            // 面の設定のタブと同じ色の枠（このタンクがどの面を使うかを色で対応させる）
+            g.fill(x - 2, y - 2, x + MachineLayout.TANK_WIDTH + 2, y + MachineLayout.BAR_HEIGHT + 2, tankColor(tank));
+        }
         if (fluidId > 0) {
             Fluid fluid = BuiltInRegistries.FLUID.byId(fluidId - 1);
-            color = 0xFF000000 | IClientFluidTypeExtensions.of(fluid).getTintColor();
+            FluidGauge.draw(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT,
+                    (double) amount / MachineType.TANK_CAPACITY, fluid);
+        } else {
+            Panel.well(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT);
         }
-        Panel.verticalBar(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT,
-                (double) amount / MachineType.TANK_CAPACITY, color);
     }
 
     private List<RecipeHolder<MachineRecipe>> massRecipes() {
@@ -374,6 +475,18 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         if (hasSides() && Panel.inside(mouseX, mouseY, x + sidesButtonX(), y + MachineLayout.SIDES_Y, MachineLayout.SIDES_SIZE,
                 MachineLayout.SIDES_SIZE)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.sides.button"), mouseX, mouseY);
+            return;
+        }
+        int[] pp = powerPos();
+        if (Panel.inside(mouseX, mouseY, pp[0], pp[1], pp[2], pp[3])) {
+            g.renderTooltip(font, Component.translatable((flags() & MachineBlockEntity.FLAG_ENABLED) != 0
+                    ? "gui.singulo.power.on" : "gui.singulo.power.off"), mouseX, mouseY);
+            return;
+        }
+        int[] fp = freePos();
+        if (showsFreeSwitch() && Panel.inside(mouseX, mouseY, fp[0], fp[1], fp[2], fp[3])) {
+            g.renderTooltip(font, Component.translatable((flags() & MachineBlockEntity.FLAG_MAKE_FREE) != 0
+                    ? "gui.singulo.make_free.on" : "gui.singulo.make_free.off"), mouseX, mouseY);
             return;
         }
         if (menu.getSlot(type().upgradeSlot()).getItem().isEmpty()
@@ -459,6 +572,18 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             }
             if (mouseY < topPos + 80) {
                 return true;                                       // 設定中は装置のスロットを触らない
+            }
+        }
+        if (!sidesOpen && minecraft != null && minecraft.gameMode != null) {
+            int[] pp = powerPos();
+            if (Panel.inside(mouseX, mouseY, pp[0], pp[1], pp[2], pp[3])) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_POWER);
+                return true;
+            }
+            int[] fp = freePos();
+            if (showsFreeSwitch() && Panel.inside(mouseX, mouseY, fp[0], fp[1], fp[2], fp[3])) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_MAKE_FREE);
+                return true;
             }
         }
         if (type().massMode() && Panel.inside(mouseX, mouseY, leftPos + layout().modeX, topPos + MachineLayout.MODE_Y,
