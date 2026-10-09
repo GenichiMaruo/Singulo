@@ -50,15 +50,15 @@ CHAPTERS = [
          '3. Make basic circuits and basic frames. Most machines need these.'),
         ('power', '最初の電源',
          '「熱電発電機」は、高温のブロックと低温のブロックに挟むと温度差で発電します。'
-         '溶岩や燃えているかまど・焚き火を片側に、水や氷をもう片側に置きます。温度差が大きいほど出力が上がります。\n'
+         '溶岩・マグマブロック・燃えている焚き火や焼成炉を片側に、水や氷をもう片側に置きます。温度差が大きいほど出力が上がります。\n'
          '電力は銅導線でつなぎます。長くつなぐと少しずつ損失があります。',
          'First power',
          'The Thermoelectric Generator produces power from a temperature difference: put something hot (lava, a lit '
-         'furnace, a campfire) on one side and something cold (water, ice) on the other.\n'
+         'kiln, a campfire) on one side and something cold (water, ice) on the other.\n'
          'Connect machines with copper wire.'),
         ('machines', '段階1の装置',
          '・焼成炉: セラミック基板などを焼く。鋼鉄も速く焼ける。\n'
-         '・圧縮機: 鋼板を作る。質量モードでは何でも「質量」に変えて圧縮ブロックや質量ペレットにする。\n'
+         '・圧縮機: 鋼板を作る。質量モードでは質量値のある素材を「質量」に変えて圧縮ブロックや質量ペレットにする。\n'
          '・電解槽: 水を水素と酸素に分ける。\n'
          '・アーカイブ端末: 遺構の記録をデータカードに書き写し、劣化した部品を修復する。記録片の解読もできる。',
          'Stage 1 machines',
@@ -128,12 +128,12 @@ CHAPTERS = [
     ]),
     ('stage4', 'singulo:time_crystal_catalyst', '段階4 時間', 'Stage 4: Temporal', [
         ('compression', '圧縮の連鎖',
-         '圧縮機の質量モードで何でも「質量」に変え、圧縮ブロックLv1→Lv2→Lv3 と固めます。'
+         '圧縮機の質量モードで質量値のある素材を「質量」に変え、圧縮ブロックLv1→Lv2→Lv3 と固めます。'
          '3種類以上の元ブロックから作った Lv1 は「混成」になり、8個で Lv2 にできます。金属だけを固めた金属圧縮ブロックもあります。\n'
          '縮退圧縮炉（5×5×5 の閉じたプレス）で、縮退物質殻やリアクターの炉殻を作ります。',
          'Compression chain',
-         'Mass mode turns anything into compressed blocks, Lv1 to Lv3. Lv1 made from 3+ kinds of blocks is "mixed" and '
-         'only 8 are needed for Lv2. The Degenerate Compactor (3×3×3 casing box) makes degenerate shells.'),
+         'Mass mode turns materials with mass values into compressed blocks, Lv1 to Lv3. Lv1 made from 3+ kinds of blocks is "mixed" and '
+         'only 8 are needed for Lv2. The Degenerate Compactor (closed 5×5×5 press) makes degenerate shells.'),
         ('time', '時間結晶とエキゾチック物質',
          '時間結晶育成槽は、実際に動いた時間で触媒を育てます（20分）。電力が足りないと純度が下がり、寿命も短くなります。\n'
          'C空洞（5×5×5 の真空容器、天面と底面の内側が鏡面）は、時間結晶触媒を使ってエキゾチック物質とアクシオン凝縮体を作ります。',
@@ -157,11 +157,11 @@ CHAPTERS = [
     ('stage5', 'singulo:singularity_core', '段階5 特異点', 'Stage 5: Singularity', [
         ('reactor', 'Pリアクターを組む',
          '炉心の中心を通る3つの直交面に、半径6の円環を途切れずにつなげて作ります（各48ブロック）。3本が交わる6点はジャイロ駆動部、'
-         '各円環の斜め45°の点（計12）は抽出ポート、残りは炉殻ブロック、中心の 3×3×3 は空気。炉心制御装置は中心の5ブロック下です。'
+         '各円環の斜め45°の点（計12）は炉心安定化コイル、残りは炉殻ブロック（抽出ポートと警報器に交換可）、中心の 3×3×3 は空気。炉心制御装置は中心の5ブロック下です。'
          'ホロ投影機を炉心制御装置に使えば、全体が浮かび上がります。',
          'Building the reactor',
-         'Three continuous orthogonal rings of radius 6 (48 blocks each): gyro drives where they cross, twelve extraction '
-         'ports at the 45° points, reactor shell elsewhere, an empty 3×3×3 core. The core controller sits 5 below the centre.'),
+         'Three continuous orthogonal rings of radius 6 (48 blocks each): gyro drives where they cross, twelve stabilizer '
+         'coils at the 45° points, reactor shell elsewhere (replace shell blocks with extraction ports or mass alarms), an empty 3×3×3 core. The core controller sits 5 below the centre.'),
         ('ignite', '点火と運転',
          '種を入れて「点火」を押し、10秒以内に 50 GFE をポートかコントローラに注ぎます（ホライズン・バスが必要）。'
          '燃料は質量ペレット。降着効率はスピンで決まり（5.7〜42.3%）、炉心質量5000・最大スピンで約 2.1 GFE/t。\n'
@@ -227,10 +227,10 @@ CHAPTERS = [
          'Cables',
          'Copper wire → superconducting cable → topological wire → horizon bus. A network carries what its weakest cable can.'),
         ('sides', '面ごとの設定',
-         '装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
-         '出力の面には、できたものを自動で押し出す（自動排出）設定もあります。',
+         '通常の加工装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
+         '出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。',
          'Side configuration',
-         'Use the Sides button in a machine screen to set each face to off / input / output / both, with optional auto-eject.'),
+         'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'),
         ('wormhole', 'ワームホール',
          '唯一の無線化。生成器で一対の口を作り、60秒以内に固定化して、片方を運んで置きます。'
          '口から8ブロック以内のワームホール・ポート同士が、電力・アイテム・液体を直結します。エキゾチック物質で維持します。',
@@ -257,7 +257,7 @@ CHAPTERS = [
          'Event Horizon Shield', 'Protects a 32-block radius. With a Singularity Core it also blocks hostile spawns.'),
         ('tipler', 'Tシリンダー',
          '半径16の時間を×2にする（5×5×9）。燃料と触媒はコアの画面から入れる。時間結晶触媒・エキゾチック物質（1分に1個）・100 kFE/t。',
-         'T-Cylinder', 'Doubles time within 16 blocks.'),
+         'T-Cylinder', 'Doubles supported machine processing within 16 blocks.'),
         ('gear', '身につける重力技術',
          '・メトリック・ドライブ: 持ち物に入れて、低重力・無重力（飛行）・高重力を切り替える。\n'
          '・グラビトン・マニピュレーター: 浮遊・牽引・斥力・圧壊。G キーで円錐範囲。\n'
