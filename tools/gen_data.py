@@ -663,6 +663,8 @@ def lang_files():
         en[f'record.{MODID}.{rid}.title'], en[f'record.{MODID}.{rid}.body'] = et, eb
     write_json(ASSETS / 'lang' / 'ja_jp.json', dict(sorted(ja.items())))
     write_json(ASSETS / 'lang' / 'en_us.json', dict(sorted(en.items())))
+    import localization
+    localization.generate(en)
 
 
 # ---------------------------------------------------------------- モデル・テクスチャ

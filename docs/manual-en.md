@@ -1,6 +1,6 @@
 # Singulo — English Manual
 
-[README](../README.md) · [日本語](manual-ja.md) · [Recipe gallery](recipes/README.md)
+[README](../README.md) · [日本語](manual-ja.md) · [English](manual-en.md) · [简体中文](manual-zh-cn.md) · [繁體中文](manual-zh-tw.md) · [한국어](manual-ko-kr.md) · [Recipes](recipes/README.md)
 
 ## What is Singulo?
 
