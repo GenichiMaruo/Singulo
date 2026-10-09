@@ -116,7 +116,8 @@ CHAPTERS = [
          '・慣性制御ガントレット: 右クリック長押しで小さなモブを浮かせる・引き寄せる。電力で動き、電力を持つブロックにスニーク＋右クリックで充電。\n'
          '・慣性スタビライザー: 半径16の中で爆発がブロックを壊さない。\n'
          '・重力波検出器: 最終実験施設（重力異常点）のおおよその方角と距離帯を示す。\n'
-         '・ニュートリノ・スキャナー: 地形越しに遺構と鉱石の輪郭を10秒間見せる。',
+         '・ニュートリノ・スキャナー: 地形越しに遺構と鉱石の輪郭を10秒間見せる。はじめは鉄やレッドストーンまでで、'
+         '感度モジュール（Mk2: 金・ダイヤモンド・エメラルド、Mk3: 古代の残骸）を使うと深い層の鉱石も映る。観測所にも使える。',
          'Tools and exploration',
          '- Inertial Control Gauntlet: levitate or pull small mobs.\n- Inertial Stabilizer: explosion-proofs a 16-block radius.\n'
          '- Gravitational Wave Detector: points to anomalies.\n- Neutrino Scanner: shows ruins and ores through terrain.'),
@@ -222,15 +223,18 @@ CHAPTERS = [
     ]),
     ('power', 'singulo:superconducting_cable', '電力と輸送', 'Power and Logistics', [
         ('cables', 'ケーブル',
-         '銅導線（2 kFE/t、損失あり）→ 超伝導ケーブル（1 MFE/t）→ トポロジカル導線（100 MFE/t）→ ホライズン・バス（約2.1 GFE/t）。'
+         '銅導線（2 kFE/t、損失あり）→ 超伝導ケーブル（1 MFE/t）→ トポロジカル導線（100 MFE/t）→ ホライズン・バス（上限なし。ほかの mod の装置へは1台あたり約2.1 GFE/t まで）。'
          'つながったケーブルの容量は、いちばん細いところで決まります。',
          'Cables',
          'Copper wire → superconducting cable → topological wire → horizon bus. A network carries what its weakest cable can.'),
         ('sides', '面ごとの設定',
          '通常の加工装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
-         '出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。',
+         '出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'
+         '2種類の気体を出す装置（電解槽など）は、気体ごとに出す面を決められます。画面右の電源ボタンで装置を止められ、'
+         '電力だけで作れるもの（冷却塔の液体窒素など）がある装置には、それを作るかどうかのスイッチがあります。',
          'Side configuration',
-         'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'),
+         'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'
+         ' Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.'),
         ('wormhole', 'ワームホール',
          '唯一の無線化。生成器で一対の口を作り、60秒以内に固定化して、片方を運んで置きます。'
          '口から8ブロック以内のワームホール・ポート同士が、電力・アイテム・液体を直結します。エキゾチック物質で維持します。',
@@ -239,12 +243,26 @@ CHAPTERS = [
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
         ('list', '4つの遺構',
-         '・地表観測拠点: 平原・砂漠などの地表。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
-         '・研究棟: 地表〜浅い地下。警備機と電子ロック。冷却原子トラップ・量子データ片（7日）。\n'
-         '・封鎖培養施設: 深層。極低温区画と強い警備機。時間結晶の種・培養データ（14日）。\n'
-         '・最終実験施設: 重力異常点の中心。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。',
+         '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
+         '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と電子ロック。冷却原子トラップ・量子データ片（7日）。\n'
+         '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機。時間結晶の種・培養データ（14日）。\n'
+         '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。',
          'The four ruins',
          'Observation Post, Research Building, Culture Facility, Final Lab — each guards loot for one catalyst tier.'),
+        ('compass', '探索コンパスの調整',
+         '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
+         '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設）も探せるようになります。'
+         '地下の遺構は、針の指す場所の下を掘って探します。',
+         'Tuning the Explorer Compass',
+         'At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it '
+         'for the next one: Research Building, then Culture Facility, then Final Lab. Underground ruins lie below the spot it points to.'),
+        ('sealed', '封印コンテナ',
+         '各遺構には、次の段階の鍵でしか開かない封印コンテナが眠っています（磁気錠 → 量子錠 → 時間錠 → 特異点錠）。'
+         '鍵は精密組立台で作り、1回で使い切ります。中には素材や色つきの照明のほか、ここでしか手に入らない珍しい道具'
+         '（オーバークロック・チップ・重力ブーツ・触媒安定化剤・次元ポケット）が入っていることがあります。'
+         '封印中のコンテナを無理に壊すと、中身ごと失われます。段階が進めば自分でもコンテナを作れ、鍵を持ってスニークして使うと封印できます。',
+         'Sealed containers',
+         'Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.'),
         ('records', '記録片',
          '遺構の保管庫からときどき「記録片」が出ます。アーカイブ端末で電力を使って解読すると、旧文明の記録が読めます'
          '（ハンドブックの「旧文明の記録」の章に追加されます）。全部集めると、文明が滅んだ理由が分かります。',

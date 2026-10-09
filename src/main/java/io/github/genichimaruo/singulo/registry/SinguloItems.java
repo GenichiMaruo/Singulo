@@ -59,7 +59,27 @@ public final class SinguloItems {
             () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
+    /** 封印コンテナからしか出ない道具。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
+            "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.CatalystStabilizerItem> CATALYST_STABILIZER = ITEMS.register(
+            "catalyst_stabilizer", () -> new io.github.genichimaruo.singulo.item.CatalystStabilizerItem(new Item.Properties().rarity(Rarity.RARE), 4));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.DimensionalPocketItem> DIMENSIONAL_POCKET = ITEMS.register(
+            "dimensional_pocket", () -> new io.github.genichimaruo.singulo.item.DimensionalPocketItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.SealedRecordItem> SEALED_RECORD = ITEMS.register(
+            "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_2 = ITEMS.register(
+            "scanner_module_2", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.RARE), 4, 2));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_3 = ITEMS.register(
+            "scanner_module_3", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.EPIC), 5, 3));
     private static final Map<String, Integer> TOOL_STAGES = Map.ofEntries(
+            Map.entry("scanner_module_2", 4),
+            Map.entry("scanner_module_3", 5),
+            Map.entry("gravity_boots", 3),
+            Map.entry("catalyst_stabilizer", 4),
+            Map.entry("dimensional_pocket", 5),
+            Map.entry("sealed_record", 5),
             Map.entry("inertial_control_gauntlet", 3),
             Map.entry("graviton_manipulator", 5),
             Map.entry("shield_permit", 5),
@@ -77,7 +97,7 @@ public final class SinguloItems {
             Map.entry("builder_wand", 6),
             Map.entry("creative_energy_source", 6));
 
-    /** クリエイティブタブの並び順（段階順）。 */
+    /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
     public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
 
     static {
@@ -172,6 +192,8 @@ public final class SinguloItems {
         block(SinguloBlocks.INERTIAL_STABILIZER, 3);
         TAB_ORDER.add(INERTIAL_CONTROL_GAUNTLET);
         TAB_ORDER.add(NEUTRINO_SCANNER);
+        TAB_ORDER.add(SCANNER_MODULE_2);
+        TAB_ORDER.add(SCANNER_MODULE_3);
         TAB_ORDER.add(MAGNETIC_BOTTLE);
         block(SinguloBlocks.GRAVITATIONAL_WAVE_DETECTOR, 3);
         block(SinguloBlocks.NEUTRINO_OBSERVATORY, 3);
@@ -184,6 +206,17 @@ public final class SinguloItems {
         block(SinguloBlocks.RUIN_GUARD_DOCK, 1);
         block(SinguloBlocks.SEAL_CONSOLE, 1);
         TAB_ORDER.add(SECURITY_DRONE_SPAWN_EGG);
+        for (var lamp : java.util.List.of(SinguloBlocks.RUIN_LAMP_AMBER, SinguloBlocks.RUIN_LAMP_VERDANT, SinguloBlocks.RUIN_LAMP_VIOLET,
+                SinguloBlocks.RUIN_LAMP_CRIMSON)) {
+            block(lamp, 1);
+        }
+        for (int i = 0; i < SinguloBlocks.SEALED_CONTAINERS.size(); i++) {
+            block(SinguloBlocks.SEALED_CONTAINERS.get(i), i + 2);
+        }
+        TAB_ORDER.add(GRAVITY_BOOTS);
+        TAB_ORDER.add(CATALYST_STABILIZER);
+        TAB_ORDER.add(DIMENSIONAL_POCKET);
+        TAB_ORDER.add(SEALED_RECORD);
         // クリエイティブ専用（並びの最後）
         block(SinguloBlocks.CREATIVE_ENERGY_SOURCE, 6);
         TAB_ORDER.add(CREATIVE_CATALYST);
@@ -196,7 +229,9 @@ public final class SinguloItems {
         for (ItemDef def : GeneratedContent.ITEMS) {
             TAB_ORDER.add(ITEMS.register(def.id(), () -> create(def)));
         }
-        TAB_ORDER.sort((a, b) -> Integer.compare(stageOf(a), stageOf(b)));
+        // 用途ごとのまとまり（GeneratedContent.TAB_ORDER の順）。そこにないものは最後に段階順で
+        TAB_ORDER.sort(java.util.Comparator.comparingInt((DeferredItem<? extends Item> item) -> tabIndex(item))
+                .thenComparingInt(SinguloItems::stageOf));
     }
 
     private static Item create(ItemDef def) {
@@ -217,6 +252,11 @@ public final class SinguloItems {
     private static void block(DeferredBlock<? extends Block> block, int stage) {
         TAB_ORDER.add(ITEMS.register(block.getId().getPath(),
                 () -> new SinguloBlockItem(block.get(), new Item.Properties(), stage)));
+    }
+
+    private static int tabIndex(DeferredItem<? extends Item> item) {
+        int i = GeneratedContent.TAB_ORDER.indexOf(item.getId().getPath());
+        return i < 0 ? Integer.MAX_VALUE : i;
     }
 
     private static int stageOf(DeferredItem<? extends Item> item) {

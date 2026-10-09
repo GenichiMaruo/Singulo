@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 400,
+  "energy": 200000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:sealed_container_3"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:gravity_field_stabilizer"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:ergosphere_ring"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:sealed_container_4",
+    "count": 1
+  }
+}

@@ -103,6 +103,14 @@
     "singulo:ruin_lamp",
     "singulo:ruin_cache",
     "singulo:ruin_guard_dock",
-    "singulo:seal_console"
+    "singulo:seal_console",
+    "singulo:ruin_lamp_amber",
+    "singulo:ruin_lamp_verdant",
+    "singulo:ruin_lamp_violet",
+    "singulo:ruin_lamp_crimson",
+    "singulo:sealed_container_1",
+    "singulo:sealed_container_2",
+    "singulo:sealed_container_3",
+    "singulo:sealed_container_4"
   ]
 }

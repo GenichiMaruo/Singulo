@@ -11,6 +11,7 @@ MOD: 日本語名 → (id, 英語名, 種類)
     catalyst   触媒（寿命つき）
     fluid      液体・ガス
     structure  マルチブロック本体など、アイテムとしては存在しないもの（登録しない）
+    container  封印コンテナ（Java側の専用クラス。鍵で開け閉めし、蓋の動きは専用の描画）
 VANILLA: 日本語名 → アイテムID（'#' で始まるものはタグ）
 """
 
@@ -90,6 +91,8 @@ MOD = {
     '重力波検出器': ('gravitational_wave_detector', 'Gravitational Wave Detector', 'machine'),
     'ニュートリノ・スキャナー': ('neutrino_scanner', 'Neutrino Scanner', 'tool'),
     'ニュートリノ観測所': ('neutrino_observatory', 'Neutrino Observatory', 'machine'),
+    'ニュートリノ感度モジュール（Mk2）': ('scanner_module_2', 'Neutrino Sensitivity Module Mk2', 'tool'),
+    'ニュートリノ感度モジュール（Mk3）': ('scanner_module_3', 'Neutrino Sensitivity Module Mk3', 'tool'),
     '慣性スタビライザー': ('inertial_stabilizer', 'Inertial Stabilizer', 'machine'),
     '残響共鳴器': ('echo_resonator', 'Echo Resonator', 'machine'),
     '慣性制御ガントレット': ('inertial_control_gauntlet', 'Inertial Control Gauntlet', 'tool'),
@@ -215,6 +218,26 @@ MOD = {
     '遺構保管庫': ('ruin_cache', 'Ruin Cache', 'ruin_block'),
     '警備機ドック': ('ruin_guard_dock', 'Guard Dock', 'ruin_block'),
     '封印コンソール': ('seal_console', 'Seal Console', 'ruin_block'),
+    '遺構の照明（琥珀）': ('ruin_lamp_amber', 'Ruin Lamp (Amber)', 'ruin_block'),
+    '遺構の照明（翠）': ('ruin_lamp_verdant', 'Ruin Lamp (Verdant)', 'ruin_block'),
+    '遺構の照明（菫）': ('ruin_lamp_violet', 'Ruin Lamp (Violet)', 'ruin_block'),
+    '遺構の照明（紅）': ('ruin_lamp_crimson', 'Ruin Lamp (Crimson)', 'ruin_block'),
+
+    # ---- 封印コンテナ（遺構に眠り、次の段階の鍵で開く。段階が進めば自分でも作れる） ----
+    '封印コンテナ（磁気錠）': ('sealed_container_1', 'Sealed Container (Magnetic Lock)', 'container'),
+    '封印コンテナ（量子錠）': ('sealed_container_2', 'Sealed Container (Quantum Lock)', 'container'),
+    '封印コンテナ（時間錠）': ('sealed_container_3', 'Sealed Container (Temporal Lock)', 'container'),
+    '封印コンテナ（特異点錠）': ('sealed_container_4', 'Sealed Container (Singularity Lock)', 'container'),
+    '磁気錠の鍵': ('magnetic_key', 'Magnetic Key', 'item'),
+    '量子錠の鍵': ('quantum_key', 'Quantum Key', 'item'),
+    '時間錠の鍵': ('temporal_key', 'Temporal Key', 'item'),
+    '特異点錠の鍵': ('singularity_key', 'Singularity Key', 'item'),
+    # 封印コンテナの中からしか出ないもの
+    'オーバークロック・チップ': ('overclock_chip', 'Overclock Chip', 'item'),
+    '重力ブーツ': ('gravity_boots', 'Gravity Boots', 'tool'),
+    '触媒安定化剤': ('catalyst_stabilizer', 'Catalyst Stabilizer', 'tool'),
+    '次元ポケット': ('dimensional_pocket', 'Dimensional Pocket', 'tool'),
+    '封印記録': ('sealed_record', 'Sealed Record', 'tool'),
 
     # ---- レシピ外で必要なもの ----
     '失活したミュオン触媒': ('spent_muon_catalyst', 'Spent Muon Catalyst', 'item'),

@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 240,
+  "energy": 2000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:sealed_container_1"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:sealed_container_2",
+    "count": 1
+  }
+}

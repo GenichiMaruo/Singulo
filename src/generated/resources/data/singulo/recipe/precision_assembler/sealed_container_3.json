@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 300,
+  "energy": 20000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:sealed_container_2"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_matter_shell"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:sealed_container_3",
+    "count": 1
+  }
+}

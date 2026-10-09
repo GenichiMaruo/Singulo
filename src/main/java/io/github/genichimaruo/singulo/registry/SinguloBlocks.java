@@ -231,6 +231,16 @@ public final class SinguloBlocks {
                     .isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)));
     public static final DeferredBlock<Block> RUIN_LAMP = BLOCKS.registerSimpleBlock("ruin_lamp",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.GLASS).lightLevel(s -> 12));
+    public static final DeferredBlock<Block> RUIN_LAMP_AMBER = ruinLamp("ruin_lamp_amber");
+    public static final DeferredBlock<Block> RUIN_LAMP_VERDANT = ruinLamp("ruin_lamp_verdant");
+    public static final DeferredBlock<Block> RUIN_LAMP_VIOLET = ruinLamp("ruin_lamp_violet");
+    public static final DeferredBlock<Block> RUIN_LAMP_CRIMSON = ruinLamp("ruin_lamp_crimson");
+    /** 封印コンテナ（段階1〜4の鍵で開く）。開いていれば普通に壊せ、封印中はとても硬い（SealedContainerBlock）。 */
+    public static final java.util.List<DeferredBlock<io.github.genichimaruo.singulo.ruin.SealedContainerBlock>> SEALED_CONTAINERS =
+            java.util.stream.IntStream.rangeClosed(1, 4).mapToObj(tier -> BLOCKS.register("sealed_container_" + tier,
+                    () -> new io.github.genichimaruo.singulo.ruin.SealedContainerBlock(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.SNOW).strength(5.0F, 1200.0F).requiresCorrectToolForDrops()
+                            .sound(SoundType.NETHERITE_BLOCK).noOcclusion(), tier))).toList();
     public static final DeferredBlock<RuinCacheBlock> RUIN_CACHE = BLOCKS.register("ruin_cache",
             () -> new RuinCacheBlock(unbreakable()));
     public static final DeferredBlock<GuardDockBlock> RUIN_GUARD_DOCK = BLOCKS.register("ruin_guard_dock",
@@ -253,9 +263,14 @@ public final class SinguloBlocks {
             () -> new CableBlock(cableProperties(SoundType.METAL), 1_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.SUPERCONDUCTING));
     public static final DeferredBlock<CableBlock> TOPOLOGICAL_WIRE = BLOCKS.register("topological_wire",
             () -> new CableBlock(cableProperties(SoundType.METAL), 100_000_000, 0, io.github.genichimaruo.singulo.cable.CableProfile.TOPOLOGICAL));
-    /** 設計は 4 GFE/t だが、電力のやり取りは int なので 1 tick あたり約 2.1 GFE が上限。 */
+    /** 上限なし。mod の装置どうしは int（約 2.1 GFE/t）を超えて受け渡す（ほかの mod の装置へは1台あたり int まで）。 */
     public static final DeferredBlock<CableBlock> HORIZON_BUS = BLOCKS.register("horizon_bus",
-            () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Integer.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
+            () -> new CableBlock(cableProperties(SoundType.NETHERITE_BLOCK), Long.MAX_VALUE, 0, io.github.genichimaruo.singulo.cable.CableProfile.HORIZON));
+
+    private static DeferredBlock<Block> ruinLamp(String id) {
+        return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F)
+                .sound(SoundType.GLASS).lightLevel(s -> 12));
+    }
 
     private static DeferredBlock<Block> ruinPanel(String id) {
         return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SAND)

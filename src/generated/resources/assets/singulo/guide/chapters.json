@@ -89,6 +89,8 @@
       "icon": "singulo:ruin_cache",
       "pages": [
         "ruins.list",
+        "ruins.compass",
+        "ruins.sealed",
         "ruins.records"
       ]
     },

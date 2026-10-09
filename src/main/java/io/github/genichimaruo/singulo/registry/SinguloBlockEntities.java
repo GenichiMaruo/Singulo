@@ -149,6 +149,10 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<RuinCacheBlockEntity>> RUIN_CACHE = REGISTER.register("ruin_cache",
             () -> build(RuinCacheBlockEntity::new, SinguloBlocks.RUIN_CACHE.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.SealedContainerBlockEntity>> SEALED_CONTAINER =
+            REGISTER.register("sealed_container", () -> build(io.github.genichimaruo.singulo.ruin.SealedContainerBlockEntity::new,
+                    SinguloBlocks.SEALED_CONTAINERS.stream().map(b -> (Block) b.get()).toArray(Block[]::new)));
+
     public static final Supplier<BlockEntityType<GuardDockBlockEntity>> GUARD_DOCK = REGISTER.register("guard_dock",
             () -> build(GuardDockBlockEntity::new, SinguloBlocks.RUIN_GUARD_DOCK.get()));
 

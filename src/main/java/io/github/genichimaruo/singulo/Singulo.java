@@ -45,6 +45,8 @@ public final class Singulo {
         SinguloEntities.REGISTER.register(modBus);
         io.github.genichimaruo.singulo.registry.SinguloSounds.REGISTER.register(modBus);
         RuinDiscovery.REGISTER.register(modBus);
+        io.github.genichimaruo.singulo.item.DimensionalPocketItem.REGISTER.register(modBus);
+        io.github.genichimaruo.singulo.item.GravityBootsItem.MATERIALS.register(modBus);
         SinguloMenus.REGISTER.register(modBus);
         SinguloRecipes.TYPES.register(modBus);
         SinguloRecipes.SERIALIZERS.register(modBus);
@@ -63,6 +65,7 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onSpawnCheck);
         io.github.genichimaruo.singulo.machine.ShieldPermits.register();
         NeoForge.EVENT_BUS.addListener(MetricDriveItem::onPlayerTick);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravityBootsItem::onFall);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravitonManipulatorItem::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.MultiblockInteraction::onRightClickBlock);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.HandbookItem::onLogin);

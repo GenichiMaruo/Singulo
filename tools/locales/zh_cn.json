@@ -623,6 +623,22 @@
     "source": "Ruin Lamp",
     "translation": "废墟灯"
   },
+  "block.singulo.ruin_lamp_amber": {
+    "source": "Ruin Lamp (Amber)",
+    "translation": "废墟灯（琥珀）"
+  },
+  "block.singulo.ruin_lamp_crimson": {
+    "source": "Ruin Lamp (Crimson)",
+    "translation": "废墟灯（深红）"
+  },
+  "block.singulo.ruin_lamp_verdant": {
+    "source": "Ruin Lamp (Verdant)",
+    "translation": "废墟灯（翠绿）"
+  },
+  "block.singulo.ruin_lamp_violet": {
+    "source": "Ruin Lamp (Violet)",
+    "translation": "废墟灯（紫罗兰）"
+  },
   "block.singulo.ruin_panel": {
     "source": "Ruin Panel",
     "translation": "废墟面板"
@@ -630,6 +646,22 @@
   "block.singulo.seal_console": {
     "source": "Seal Console",
     "translation": "密封控制台"
+  },
+  "block.singulo.sealed_container_1": {
+    "source": "Sealed Container (Magnetic Lock)",
+    "translation": "封印容器（磁力锁）"
+  },
+  "block.singulo.sealed_container_2": {
+    "source": "Sealed Container (Quantum Lock)",
+    "translation": "封印容器（量子锁）"
+  },
+  "block.singulo.sealed_container_3": {
+    "source": "Sealed Container (Temporal Lock)",
+    "translation": "封印容器（时间锁）"
+  },
+  "block.singulo.sealed_container_4": {
+    "source": "Sealed Container (Singularity Lock)",
+    "translation": "封印容器（奇点锁）"
   },
   "block.singulo.shield_tower_body": {
     "source": "Shield Tower Body",
@@ -771,9 +803,33 @@
     "source": "Unknown multiblock: %s",
     "translation": "未知多块：%1$s"
   },
+  "command.singulo.ruin.done": {
+    "source": "Placed %s at %s, %s, %s",
+    "translation": "已建造%s，位置 %s, %s, %s"
+  },
+  "command.singulo.ruin.unknown": {
+    "source": "Unknown ruin: %s",
+    "translation": "未知的废墟：%s"
+  },
   "compass.singulo.found": {
     "source": "%s is %s blocks away",
     "translation": "%1$s 与 %2$s 相距一个街区"
+  },
+  "compass.singulo.hint": {
+    "source": "Sneak-use on the cache of a cleared %s to tune it for the next ruin",
+    "translation": "潜行右键已攻略的%s的废墟缓存，即可调校以搜寻下一处废墟"
+  },
+  "compass.singulo.level": {
+    "source": "Tuning %s / %s",
+    "translation": "调校等级 %s / %s"
+  },
+  "compass.singulo.max": {
+    "source": "Fully tuned",
+    "translation": "已调校到最高"
+  },
+  "compass.singulo.not_cleared": {
+    "source": "Clear %s first by opening its cache",
+    "translation": "请先打开%s的废墟缓存完成攻略"
   },
   "compass.singulo.not_found": {
     "source": "No %s nearby",
@@ -782,6 +838,18 @@
   "compass.singulo.target": {
     "source": "Target: %s",
     "translation": "目标：%1$s"
+  },
+  "compass.singulo.upgraded": {
+    "source": "Compass tuned: it can now find %s",
+    "translation": "罗盘已调校：现在也能搜寻%s"
+  },
+  "compass.singulo.wrong_cache": {
+    "source": "Tuning needs the cache of %s",
+    "translation": "调校需要%s的废墟缓存"
+  },
+  "container.singulo.dimensional_pocket": {
+    "source": "Dimensional Pocket",
+    "translation": "次元口袋"
   },
   "death.attack.singulo.event_horizon": {
     "source": "%1$s crossed the event horizon",
@@ -870,6 +938,10 @@
   "desc.singulo.casimir_cavity_window": {
     "source": "Middle of each side; shows the vacuum between the mirrors.",
     "translation": "每边的中间；显示镜子之间的真空。"
+  },
+  "desc.singulo.catalyst_stabilizer": {
+    "source": "Use with a catalyst in your other hand to double its remaining life. Once per catalyst.",
+    "translation": "另一只手持催化剂时使用，可使其剩余寿命翻倍。每个催化剂仅限一次。"
   },
   "desc.singulo.catalytic_reactor": {
     "source": "Makes catalysts, starting with the muon catalyst.",
@@ -1087,6 +1159,10 @@
     "source": "Restore it to grow time crystals.",
     "translation": "恢复它以生长时间晶体。"
   },
+  "desc.singulo.dimensional_pocket": {
+    "source": "Right-click to open your own 27-slot storage from anywhere. The contents survive death.",
+    "translation": "右键即可随时随地打开专属的 27 格收纳空间。死亡后内容也不会消失。"
+  },
   "desc.singulo.dormant_singularity_seed": {
     "source": "Guarded by the Horizon Warden. Awaken it in the encapsulator.",
     "translation": "由 视界守卫 守护。在封装器中将其唤醒。"
@@ -1142,6 +1218,10 @@
   "desc.singulo.graviton_manipulator": {
     "source": "The full gravity tool. Hold left-click to use; while levitating, charge with right-click and release to throw.",
     "translation": "全重力工具。按住左键单击即可使用；悬浮时，右键单击蓄力，松开即可投掷。"
+  },
+  "desc.singulo.gravity_boots": {
+    "source": "No fall damage. Jump while touching a wall in mid-air to kick off it (three times before landing).",
+    "translation": "免疫摔落伤害。在空中贴着墙跳跃即可蹬墙再跳（落地前最多三次）。"
   },
   "desc.singulo.gravity_field_stabilizer": {
     "source": "A component of the core controller.",
@@ -1207,6 +1287,10 @@
     "source": "Captures strangelets and contains leaking strange matter.",
     "translation": "捕获奇异子并包含泄漏的奇异物质。"
   },
+  "desc.singulo.magnetic_key": {
+    "source": "Opens or seals a magnetic-lock container. Used up each time.",
+    "translation": "用于打开或封印磁力锁容器。每次使用都会消耗。"
+  },
   "desc.singulo.magnetic_monopole": {
     "source": "A theoretical particle born in about 1 of 1000 collisions.",
     "translation": "理论粒子在 1000 次碰撞中大约有 1 次诞生。"
@@ -1263,6 +1347,10 @@
     "source": "Atoms held in a lattice of light.",
     "translation": "原子被固定在光的晶格中。"
   },
+  "desc.singulo.overclock_chip": {
+    "source": "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole.",
+    "translation": "放入机器的升级槽：速度 ×3，但每 tick 耗电 ×4。不能与单极子同时使用。"
+  },
   "desc.singulo.particle_accelerator": {
     "source": "Collides particles into muon bundles and rare monopoles.",
     "translation": "将粒子碰撞成μ子束和稀有的单极子。"
@@ -1290,6 +1378,10 @@
   "desc.singulo.quantum_heat_engine": {
     "source": "A catalyst-driven generator.",
     "translation": "催化剂驱动的发电机。"
+  },
+  "desc.singulo.quantum_key": {
+    "source": "Opens or seals a quantum-lock container. Used up each time.",
+    "translation": "用于打开或封印量子锁容器。每次使用都会消耗。"
   },
   "desc.singulo.reactor_mass_alarm": {
     "source": "Replaces a shell on a reactor ring. Emits redstone when the core reaches its mass limit, stronger near collapse.",
@@ -1323,13 +1415,57 @@
     "source": "An ancient lamp that still glows.",
     "translation": "古老的灯，至今仍闪烁着光芒。"
   },
+  "desc.singulo.ruin_lamp_amber": {
+    "source": "An amber ancient lamp found in sealed containers.",
+    "translation": "在封印容器中发现的琥珀色古代灯。"
+  },
+  "desc.singulo.ruin_lamp_crimson": {
+    "source": "A crimson ancient lamp found in sealed containers.",
+    "translation": "在封印容器中发现的深红色古代灯。"
+  },
+  "desc.singulo.ruin_lamp_verdant": {
+    "source": "A green ancient lamp found in sealed containers.",
+    "translation": "在封印容器中发现的绿色古代灯。"
+  },
+  "desc.singulo.ruin_lamp_violet": {
+    "source": "A violet ancient lamp found in sealed containers.",
+    "translation": "在封印容器中发现的紫色古代灯。"
+  },
   "desc.singulo.ruin_panel": {
     "source": "Ancient building panel.",
     "translation": "古建筑板材。"
   },
+  "desc.singulo.scanner_module_2": {
+    "source": "Use with a Neutrino Scanner in your other hand, or on an observatory, to reach sensitivity 2: gold, diamond and emerald show up.",
+    "translation": "另一只手持中微子扫描仪时使用，或对观测站使用，可将灵敏度提升到 2：金、钻石、绿宝石也会显示。"
+  },
+  "desc.singulo.scanner_module_3": {
+    "source": "Raises sensitivity to 3: ancient debris and ores that need a diamond pickaxe show up.",
+    "translation": "将灵敏度提升到 3：远古残骸和需要钻石镐的矿石也会显示。"
+  },
   "desc.singulo.seal_console": {
     "source": "Touch it to wake the Horizon Warden.",
     "translation": "触摸它即可唤醒 视界守卫。"
+  },
+  "desc.singulo.sealed_container_1": {
+    "source": "Opens with a Magnetic Key; sneak-use a key to seal it again. Breaking it by force destroys the contents.",
+    "translation": "用磁力锁钥匙打开；潜行时使用钥匙可再次封印。强行破坏会连同内容物一起失去。"
+  },
+  "desc.singulo.sealed_container_2": {
+    "source": "Opens with a Quantum Key; sneak-use a key to seal it again. Breaking it by force destroys the contents.",
+    "translation": "用量子锁钥匙打开；潜行时使用钥匙可再次封印。强行破坏会连同内容物一起失去。"
+  },
+  "desc.singulo.sealed_container_3": {
+    "source": "Opens with a Temporal Key; sneak-use a key to seal it again. Breaking it by force destroys the contents.",
+    "translation": "用时间锁钥匙打开；潜行时使用钥匙可再次封印。强行破坏会连同内容物一起失去。"
+  },
+  "desc.singulo.sealed_container_4": {
+    "source": "Opens with a Singularity Key; sneak-use a key to seal it again. Breaking it by force destroys the contents.",
+    "translation": "用奇点锁钥匙打开；潜行时使用钥匙可再次封印。强行破坏会连同内容物一起失去。"
+  },
+  "desc.singulo.sealed_record": {
+    "source": "Right-click to read it and add a sealed ancient record to your handbook.",
+    "translation": "右键阅读，即可将一份被封印的古代记录加入手册。"
   },
   "desc.singulo.settings_card": {
     "source": "Copies a machine's settings to another.",
@@ -1370,6 +1506,10 @@
   "desc.singulo.singularity_encapsulator": {
     "source": "Encapsulates singularities.",
     "translation": "封装奇点。"
+  },
+  "desc.singulo.singularity_key": {
+    "source": "Opens or seals a singularity-lock container. Used up each time.",
+    "translation": "用于打开或封印奇点锁容器。每次使用都会消耗。"
   },
   "desc.singulo.singularity_seed": {
     "source": "Becomes a black hole core when ignited.",
@@ -1430,6 +1570,10 @@
   "desc.singulo.superconducting_wire": {
     "source": "Wire for coils and cables.",
     "translation": "用于线圈和电缆的电线。"
+  },
+  "desc.singulo.temporal_key": {
+    "source": "Opens or seals a temporal-lock container. Used up each time.",
+    "translation": "用于打开或封印时间锁容器。每次使用都会消耗。"
   },
   "desc.singulo.thermocouple_module": {
     "source": "Turns a temperature difference into electricity.",
@@ -2027,9 +2171,25 @@
     "source": "Stage %s",
     "translation": "阶段%1$s"
   },
+  "gui.singulo.handbook.support": {
+    "source": "Support",
+    "translation": "支持作者"
+  },
+  "gui.singulo.handbook.support_hint": {
+    "source": "Support the author on Ko-fi (opens in your browser)",
+    "translation": "在 Ko-fi 上支持作者（在浏览器中打开）"
+  },
   "gui.singulo.handbook.title": {
     "source": "Singulo Handbook",
     "translation": "Singulo 手册"
+  },
+  "gui.singulo.make_free.off": {
+    "source": "Skips recipes without ingredients",
+    "translation": "跳过无需材料的配方"
+  },
+  "gui.singulo.make_free.on": {
+    "source": "Also runs recipes without ingredients",
+    "translation": "也运行无需材料的配方"
   },
   "gui.singulo.mass_buffer": {
     "source": "Mass %s / %s",
@@ -2058,6 +2218,18 @@
   "gui.singulo.observatory.on": {
     "source": "Display on · ores %s · ruins %s",
     "translation": "显示于 · 矿石 %1$s · 废墟 %2$s"
+  },
+  "gui.singulo.observatory.tier": {
+    "source": " · sensitivity %s",
+    "translation": " · 灵敏度 %s"
+  },
+  "gui.singulo.power.off": {
+    "source": "Stopped (click to resume)",
+    "translation": "已停止（点击恢复）"
+  },
+  "gui.singulo.power.on": {
+    "source": "Running (click to stop)",
+    "translation": "运行中（点击停止）"
   },
   "gui.singulo.probe.no_target": {
     "source": "No known ruins",
@@ -2251,10 +2423,6 @@
     "source": "Top",
     "translation": "顶部"
   },
-  "gui.singulo.sides.fluids": {
-    "source": "Fluids",
-    "translation": "流体"
-  },
   "gui.singulo.sides.hint": {
     "source": "Drag to rotate · click to change · right-click for auto-eject",
     "translation": "拖动旋转·单击更改·右键自动弹出"
@@ -2266,6 +2434,14 @@
   "gui.singulo.sides.legend": {
     "source": "Grey off · Blue in · Orange out · Green both",
     "translation": "灰色关闭·蓝色输入·橙色输出·绿色两者"
+  },
+  "gui.singulo.sides.legend_tank_in": {
+    "source": "Coloured faces accept input · Grey off",
+    "translation": "彩色面可输入 · 灰色关闭"
+  },
+  "gui.singulo.sides.legend_tank_out": {
+    "source": "Coloured faces output · Grey off",
+    "translation": "彩色面可输出 · 灰色关闭"
   },
   "gui.singulo.sides.master_off": {
     "source": "Auto-eject OFF",
@@ -2291,6 +2467,14 @@
     "source": "Input & output",
     "translation": "输入输出"
   },
+  "gui.singulo.sides.tank_in": {
+    "source": "In %s",
+    "translation": "输入%s"
+  },
+  "gui.singulo.sides.tank_out": {
+    "source": "Out %s",
+    "translation": "输出%s"
+  },
   "gui.singulo.slot.catalyst": {
     "source": "Catalyst",
     "translation": "催化剂"
@@ -2304,8 +2488,8 @@
     "translation": "允许"
   },
   "gui.singulo.slot.upgrade": {
-    "source": "Monopole upgrade",
-    "translation": "单极升级"
+    "source": "Upgrade slot (monopole or overclock)",
+    "translation": "升级槽（单极子或超频）"
   },
   "gui.singulo.smes.hint": {
     "source": "Up to %s FE/t. Receives on the other five faces",
@@ -2350,6 +2534,10 @@
   "gui.singulo.status.not_formed": {
     "source": "Not formed",
     "translation": "未形成"
+  },
+  "gui.singulo.status.off": {
+    "source": "Off",
+    "translation": "关闭"
   },
   "gui.singulo.status.output_full": {
     "source": "Output full",
@@ -2540,8 +2728,8 @@
     "translation": "电缆"
   },
   "guide.singulo.power.sides.body": {
-    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.",
-    "translation": "使用普通加工机屏幕中的“侧面”按钮将每个面设置为关闭/输入/输出/两者，并可选择自动弹出。多块使用指定的 I/O 端口； 彭罗斯反应堆 使用提取端口。"
+    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports. Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.",
+    "translation": "使用普通加工机屏幕中的“侧面”按钮将每个面设置为关闭/输入/输出/两者，并可选择自动弹出。多块使用指定的 I/O 端口； 彭罗斯反应堆 使用提取端口。输出两种气体的装置（如电解槽）可为每种气体单独设置输出面。电源按钮可让装置停止；能仅靠电力制造产物的装置有开关，可跳过这些配方。"
   },
   "guide.singulo.power.sides.title": {
     "source": "Side configuration",
@@ -2595,6 +2783,14 @@
     "source": "Ruins",
     "translation": "废墟"
   },
+  "guide.singulo.ruins.compass.body": {
+    "source": "At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it for the next one: Research Building, then Culture Facility, then Final Lab. Underground ruins lie below the spot it points to.",
+    "translation": "罗盘起初只能搜寻地表观测站。潜行右键你已攻略的废墟的废墟缓存，即可调校以搜寻下一处：研究楼，然后是封闭培养设施，最后是最终实验室。地下废墟位于指针所指位置的下方。"
+  },
+  "guide.singulo.ruins.compass.title": {
+    "source": "Tuning the Explorer Compass",
+    "translation": "调校探索罗盘"
+  },
   "guide.singulo.ruins.list.body": {
     "source": "Observation Post, Research Building, Culture Facility, Final Lab — each guards loot for one catalyst tier.",
     "translation": "地表观测站、研究楼、封闭培养设施、最终实验室 — 每个守卫一层催化剂的战利品。"
@@ -2610,6 +2806,14 @@
   "guide.singulo.ruins.records.title": {
     "source": "Record fragments",
     "translation": "记录片段"
+  },
+  "guide.singulo.ruins.sealed.body": {
+    "source": "Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.",
+    "translation": "每座废墟都藏着一个封印容器，只能用下一阶段的钥匙打开：磁力锁、量子锁、时间锁，最后是奇点锁。钥匙在精密组装台制造，每次使用都会消耗。里面有材料、彩色灯，有时还有别处找不到的稀有道具：超频芯片、重力靴、催化剂稳定剂或次元口袋。强行破坏封印中的容器会连同内容物一起失去。你也可以自己制作容器，潜行时使用钥匙即可封印。"
+  },
+  "guide.singulo.ruins.sealed.title": {
+    "source": "Sealed containers",
+    "translation": "封印容器"
   },
   "guide.singulo.stage1": {
     "source": "Stage 1: Startup",
@@ -3199,6 +3403,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "制造地：精密组装台（第 4 阶段）"
   },
+  "howto.singulo.magnetic_key": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
   "howto.singulo.mass_pellet": {
     "source": "Made in: Compressor (stage 1)",
     "translation": "制造地：压缩机（第 1 阶段）"
@@ -3275,6 +3483,10 @@
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "制造地：精密组装台（第 3 阶段）"
   },
+  "howto.singulo.quantum_key": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "制造地：精密组装台（第 3 阶段）"
+  },
   "howto.singulo.reactor_mass_alarm": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
@@ -3284,6 +3496,30 @@
     "translation": "制造地：简并压缩炉（第 5 阶段）"
   },
   "howto.singulo.reactor_stabilizer": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "制造地：精密组装台（第 5 阶段）"
+  },
+  "howto.singulo.scanner_module_2": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "制造地：精密组装台（第 4 阶段）"
+  },
+  "howto.singulo.scanner_module_3": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "制造地：精密组装台（第 5 阶段）"
+  },
+  "howto.singulo.sealed_container_1": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.sealed_container_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "制造地：精密组装台（第 3 阶段）"
+  },
+  "howto.singulo.sealed_container_3": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "制造地：精密组装台（第 4 阶段）"
+  },
+  "howto.singulo.sealed_container_4": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
   },
@@ -3327,6 +3563,10 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
   },
+  "howto.singulo.singularity_key": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "制造地：精密组装台（第 5 阶段）"
+  },
   "howto.singulo.singularity_seed": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "制造地：奇点封装器（第 5 阶段）"
@@ -3362,6 +3602,10 @@
   "howto.singulo.superconducting_wire": {
     "source": "Made in: Cryogenic Cooling Tower (stage 2)",
     "translation": "制造地：低温冷却塔（第 2 阶段）"
+  },
+  "howto.singulo.temporal_key": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "制造地：精密组装台（第 4 阶段）"
   },
   "howto.singulo.thermocouple_module": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -3511,6 +3755,10 @@
     "source": "Builder's Wand",
     "translation": "建造者魔杖"
   },
+  "item.singulo.catalyst_stabilizer": {
+    "source": "Catalyst Stabilizer",
+    "translation": "催化剂稳定剂"
+  },
   "item.singulo.ceramic_substrate": {
     "source": "Ceramic Substrate",
     "translation": "陶瓷基板"
@@ -3571,6 +3819,10 @@
     "source": "Degraded Time Crystal Seed",
     "translation": "退化的时间水晶种子"
   },
+  "item.singulo.dimensional_pocket": {
+    "source": "Dimensional Pocket",
+    "translation": "次元口袋"
+  },
   "item.singulo.dormant_singularity_seed": {
     "source": "Dormant Singularity Seed",
     "translation": "休眠奇点种子"
@@ -3594,6 +3846,10 @@
   "item.singulo.graviton_manipulator": {
     "source": "Graviton Manipulator",
     "translation": "引力子操控器"
+  },
+  "item.singulo.gravity_boots": {
+    "source": "Gravity Boots",
+    "translation": "重力靴"
   },
   "item.singulo.gravity_field_stabilizer": {
     "source": "Gravity Field Stabilizer",
@@ -3635,6 +3891,10 @@
     "source": "Magnetic Bottle",
     "translation": "磁瓶"
   },
+  "item.singulo.magnetic_key": {
+    "source": "Magnetic Key",
+    "translation": "磁力锁钥匙"
+  },
   "item.singulo.magnetic_monopole": {
     "source": "Magnetic Monopole",
     "translation": "磁单极子"
@@ -3675,6 +3935,10 @@
     "source": "Optical Lattice Substrate",
     "translation": "光学晶格基板"
   },
+  "item.singulo.overclock_chip": {
+    "source": "Overclock Chip",
+    "translation": "超频芯片"
+  },
   "item.singulo.quantum_computing_module": {
     "source": "Quantum Computing Module",
     "translation": "量子计算模块"
@@ -3683,9 +3947,25 @@
     "source": "Quantum Data Fragment",
     "translation": "量子数据片段"
   },
+  "item.singulo.quantum_key": {
+    "source": "Quantum Key",
+    "translation": "量子锁钥匙"
+  },
   "item.singulo.record_fragment": {
     "source": "Record Fragment",
     "translation": "记录片段"
+  },
+  "item.singulo.scanner_module_2": {
+    "source": "Neutrino Sensitivity Module Mk2",
+    "translation": "中微子灵敏度模块 Mk2"
+  },
+  "item.singulo.scanner_module_3": {
+    "source": "Neutrino Sensitivity Module Mk3",
+    "translation": "中微子灵敏度模块 Mk3"
+  },
+  "item.singulo.sealed_record": {
+    "source": "Sealed Record",
+    "translation": "封印记录"
   },
   "item.singulo.security_drone_spawn_egg": {
     "source": "Security Drone Spawn Egg",
@@ -3763,6 +4043,10 @@
     "source": "Singularity Core",
     "translation": "奇点核心"
   },
+  "item.singulo.singularity_key": {
+    "source": "Singularity Key",
+    "translation": "奇点锁钥匙"
+  },
   "item.singulo.singularity_seed": {
     "source": "Singularity Seed",
     "translation": "奇点种子"
@@ -3802,6 +4086,10 @@
   "item.singulo.superconducting_wire": {
     "source": "Superconducting Wire",
     "translation": "超导线材"
+  },
+  "item.singulo.temporal_key": {
+    "source": "Temporal Key",
+    "translation": "时间锁钥匙"
   },
   "item.singulo.thermocouple_module": {
     "source": "Thermocouple Module",
@@ -3907,6 +4195,10 @@
     "source": "Toggle gravity tool area",
     "translation": "切换重力工具区域"
   },
+  "message.singulo.hidden_records_complete": {
+    "source": "You have read every sealed record",
+    "translation": "你已读完所有封印记录"
+  },
   "message.singulo.hydrogen_leak": {
     "source": "Leaking hydrogen ignited!",
     "translation": "泄漏的氢气被点燃！"
@@ -3914,6 +4206,10 @@
   "message.singulo.multiblock.not_formed": {
     "source": "%s is not complete yet",
     "translation": "%1$s 尚未完成"
+  },
+  "message.singulo.neutrino_hidden": {
+    "source": " (%s ores too deep for this sensitivity)",
+    "translation": "（%s 个矿石因灵敏度不足而未显示）"
   },
   "message.singulo.neutrino_scan": {
     "source": "Found %s ores and %s ruin blocks",
@@ -3926,6 +4222,42 @@
   "message.singulo.records_complete": {
     "source": "You have read every ancient record",
     "translation": "你已经读过所有的古代记载"
+  },
+  "message.singulo.scanner_module.already": {
+    "source": "Sensitivity is already %s",
+    "translation": "灵敏度已经是 %s"
+  },
+  "message.singulo.scanner_module.done": {
+    "source": "Sensitivity raised to %s",
+    "translation": "灵敏度已提升到 %s"
+  },
+  "message.singulo.scanner_module.need_scanner": {
+    "source": "Hold a Neutrino Scanner in your other hand, or use it on an observatory",
+    "translation": "请在另一只手持中微子扫描仪，或对观测站使用"
+  },
+  "message.singulo.sealed.busy": {
+    "source": "The seal is working",
+    "translation": "封印装置正在运作"
+  },
+  "message.singulo.sealed.lock_hint": {
+    "source": "Sneak-use a key to seal it",
+    "translation": "潜行时使用钥匙即可封印"
+  },
+  "message.singulo.sealed.need_key": {
+    "source": "Needs a %s",
+    "translation": "需要%s"
+  },
+  "message.singulo.stabilizer.already": {
+    "source": "This catalyst is already stabilized",
+    "translation": "这个催化剂已经稳定化"
+  },
+  "message.singulo.stabilizer.done": {
+    "source": "Catalyst stabilized: remaining life doubled",
+    "translation": "催化剂已稳定化：剩余寿命翻倍"
+  },
+  "message.singulo.stabilizer.need_catalyst": {
+    "source": "Hold a catalyst in your other hand",
+    "translation": "请在另一只手持催化剂"
   },
   "message.singulo.strangelet_contained": {
     "source": "Strangelet contained",
@@ -3994,6 +4326,30 @@
   "pack.singulo.hd": {
     "source": "Singulo HD (32×32 textures)",
     "translation": "Singulo HD（32×32纹理）"
+  },
+  "record.singulo.h01.body": {
+    "source": "Each container was locked with the key of the next stage, so that only those who reached it could open what came before. We give nothing to those in a hurry.",
+    "translation": "每个容器都用下一阶段的钥匙锁上，只有到达那个阶段的人，才能打开之前留下的遗产。我们不会把任何东西交给急躁的人。"
+  },
+  "record.singulo.h01.title": {
+    "source": "Seal Inventory",
+    "translation": "封印目录"
+  },
+  "record.singulo.h02.body": {
+    "source": "In case the reactor ran away, some staff were to sleep inside a time field. The field for the waking date was never filled in.",
+    "translation": "为防反应堆失控，曾计划让部分职员在时间场中沉睡。醒来日期那一栏，直到最后都是空白。"
+  },
+  "record.singulo.h02.title": {
+    "source": "Evacuation Plan (Unfinished)",
+    "translation": "撤离计划（未完成）"
+  },
+  "record.singulo.h03.body": {
+    "source": "If you are reading this, you too have lit the reactor. We will not tell you to turn back. Only keep a watcher at the limit beside you, and never silence the alarm.",
+    "translation": "如果你正在读这份记录，你也点燃了反应堆吧。我们不会叫你回头。只是，请在身边安排一个看守极限的人，并且绝不要关掉警报。"
+  },
+  "record.singulo.h03.title": {
+    "source": "To Whoever Reads This",
+    "translation": "致读到这份记录的人"
   },
   "record.singulo.r01.body": {
     "source": "Surface observation begins today. Our goal is simple: turn mass into energy, all of it. Stone, wood, the sea — all of it is frozen energy.",
@@ -4327,6 +4683,14 @@
     "source": "Degenerate furnace burns",
     "translation": "退化炉燃烧"
   },
+  "subtitles.singulo.dimensional_pocket.close": {
+    "source": "Pocket closes",
+    "translation": "次元口袋关闭"
+  },
+  "subtitles.singulo.dimensional_pocket.open": {
+    "source": "Pocket opens",
+    "translation": "次元口袋打开"
+  },
   "subtitles.singulo.echo_resonator_running": {
     "source": "Echo resonator rings",
     "translation": "回声谐振环"
@@ -4354,6 +4718,10 @@
   "subtitles.singulo.graviton_manipulator_throw": {
     "source": "Hurled",
     "translation": "投掷"
+  },
+  "subtitles.singulo.gravity_boots.wall_jump": {
+    "source": "Wall jump",
+    "translation": "蹬墙跳"
   },
   "subtitles.singulo.halo_collector_running": {
     "source": "Halo collector gathers",
@@ -4402,6 +4770,38 @@
   "subtitles.singulo.quantum_heat_engine_running": {
     "source": "Quantum heat engine runs",
     "translation": "量子热机运行"
+  },
+  "subtitles.singulo.sealed_container.denied": {
+    "source": "Seal rejects",
+    "translation": "封印拒绝了钥匙"
+  },
+  "subtitles.singulo.sealed_container.insert": {
+    "source": "Key inserted",
+    "translation": "插入钥匙"
+  },
+  "subtitles.singulo.sealed_container.lock": {
+    "source": "Container seals",
+    "translation": "容器被封印"
+  },
+  "subtitles.singulo.sealed_container.open": {
+    "source": "Lid opens",
+    "translation": "盖子打开"
+  },
+  "subtitles.singulo.sealed_container.rise": {
+    "source": "Pedestal rises",
+    "translation": "内部台座升起"
+  },
+  "subtitles.singulo.sealed_container.scan": {
+    "source": "Seal scans",
+    "translation": "封印读取钥匙"
+  },
+  "subtitles.singulo.sealed_container.unlock": {
+    "source": "Seal releases",
+    "translation": "封印解除"
+  },
+  "subtitles.singulo.sealed_container.vent": {
+    "source": "Cold gas vents",
+    "translation": "冷气喷出"
   },
   "subtitles.singulo.shield_tower_running": {
     "source": "Shield hums",
@@ -4458,6 +4858,10 @@
   "tooltip.singulo.builder_wand.size": {
     "source": "Size: %s",
     "translation": "尺寸：%1$s"
+  },
+  "tooltip.singulo.catalyst_stabilized": {
+    "source": "Stabilized",
+    "translation": "已稳定化"
   },
   "tooltip.singulo.creative_catalyst.tier": {
     "source": "Acts as a tier %s catalyst",
@@ -4531,6 +4935,14 @@
     "source": "Repaired %s / %s times",
     "translation": "已修复 %1$s / %2$s 次"
   },
+  "tooltip.singulo.scanner_tier": {
+    "source": "Sensitivity: %s / %s",
+    "translation": "灵敏度：%s / %s"
+  },
+  "tooltip.singulo.sealed.locked": {
+    "source": "Sealed",
+    "translation": "已封印"
+  },
   "tooltip.singulo.stage": {
     "source": "Stage %s: %s",
     "translation": "阶段 %1$s: %2$s"
@@ -4564,8 +4976,8 @@
     "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 12 个"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
-    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 29 个"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 30 more",
+    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 30 个"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -4612,8 +5024,8 @@
     "translation": "用于：冷原子"
   },
   "uses.singulo.cold_atoms": {
-    "source": "Used in: BE Condensate Catalyst",
-    "translation": "用于：玻色凝聚态催化剂"
+    "source": "Used in: BE Condensate Catalyst, Quantum Key",
+    "translation": "用于：玻色凝聚态催化剂、量子锁钥匙"
   },
   "uses.singulo.compressed_block_1": {
     "source": "Used in: Compressed Block Lv2, Compressed Block Lv2 (Mixed)",
@@ -4676,16 +5088,16 @@
     "translation": "用于：数据卡（培养数据）"
   },
   "uses.singulo.data_card_culture_data": {
-    "source": "Used in: Exotic Matter",
-    "translation": "用于：奇异物质"
+    "source": "Used in: Exotic Matter, Temporal Key",
+    "translation": "用于：奇异物质、时间锁钥匙"
   },
   "uses.singulo.data_card_observation_log": {
-    "source": "Used in: Muon Catalyst",
-    "translation": "用于：缪子催化剂"
+    "source": "Used in: Muon Catalyst, Magnetic Key",
+    "translation": "用于：缪子催化剂、磁力锁钥匙"
   },
   "uses.singulo.data_card_quantum_fragment": {
-    "source": "Used in: Entangled Element",
-    "translation": "用于：量子纠缠元件"
+    "source": "Used in: Entangled Element, Quantum Key",
+    "translation": "用于：量子纠缠元件、量子锁钥匙"
   },
   "uses.singulo.degenerate_compactor_anvil": {
     "source": "Used in: Degenerate Compactor",
@@ -4744,8 +5156,8 @@
     "translation": "用于：简并热炉"
   },
   "uses.singulo.degenerate_matter_shell": {
-    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core",
-    "translation": "用于：反应堆外壳、奇点种子、奇点核心"
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock)",
+    "translation": "用于：反应堆外壳、奇点种子、奇点核心、中微子灵敏度模块 Mk3、封印容器（时间锁）"
   },
   "uses.singulo.degraded_anomaly_sample": {
     "source": "Used in: Anomaly Sample",
@@ -4768,28 +5180,32 @@
     "translation": "用于：奇点种子"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer, Echo Resonator and 17 more",
-    "translation": "用于：量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器、回响共鸣器 等 17 个"
+    "source": "Used in: Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer, Echo Resonator and 19 more",
+    "translation": "用于：量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器、回响共鸣器 等 19 个"
+  },
+  "uses.singulo.ergosphere_ring": {
+    "source": "Used in: Sealed Container (Singularity Lock)",
+    "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 17 more",
-    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 17 个"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 20 more",
+    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 20 个"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
     "translation": "用于：粒子加速器"
   },
   "uses.singulo.gravity_field_stabilizer": {
-    "source": "Used in: Core Controller",
-    "translation": "用于：炉心控制器"
+    "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock)",
+    "translation": "用于：炉心控制器、中微子灵敏度模块 Mk3、奇点锁钥匙、封印容器（奇点锁）"
   },
   "uses.singulo.gyro_drive": {
     "source": "Used in: P-Reactor",
     "translation": "用于：彭罗斯反应堆"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core",
-    "translation": "用于：微型黑洞容器、奇点核心"
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key",
+    "translation": "用于：微型黑洞容器、奇点核心、奇点锁钥匙"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
@@ -4808,8 +5224,8 @@
     "translation": "用于：单极子升级模块"
   },
   "uses.singulo.micro_black_hole": {
-    "source": "Used in: Black Hole Bomb, Graviton Manipulator",
-    "translation": "用于：黑洞炸弹、引力子操控器"
+    "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
+    "translation": "用于：黑洞炸弹、引力子操控器、奇点锁钥匙"
   },
   "uses.singulo.mirror_plate": {
     "source": "Used in: C-Cavity",
@@ -4832,8 +5248,8 @@
     "translation": "用于：数据卡（观察日志）"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Exotic Matter and 18 more",
-    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、时间晶体催化剂、奇异物质 等 18 种"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Exotic Matter and 20 more",
+    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、时间晶体催化剂、奇异物质 等 20 个"
   },
   "uses.singulo.quantum_computing_module": {
     "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 15 more",
@@ -4854,6 +5270,22 @@
   "uses.singulo.record_fragment": {
     "source": "Used in: Decoded Record",
     "translation": "用于：解码记录"
+  },
+  "uses.singulo.scanner_module_2": {
+    "source": "Used in: Neutrino Sensitivity Module Mk3",
+    "translation": "用于：中微子灵敏度模块 Mk3"
+  },
+  "uses.singulo.sealed_container_1": {
+    "source": "Used in: Sealed Container (Quantum Lock)",
+    "translation": "用于：封印容器（量子锁）"
+  },
+  "uses.singulo.sealed_container_2": {
+    "source": "Used in: Sealed Container (Temporal Lock)",
+    "translation": "用于：封印容器（时间锁）"
+  },
+  "uses.singulo.sealed_container_3": {
+    "source": "Used in: Sealed Container (Singularity Lock)",
+    "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.shield_tower_body": {
     "source": "Used in: Event Horizon Shield Tower",
@@ -4888,12 +5320,12 @@
     "translation": "用于：基本框架、钢板、压缩机"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: Cooling Tower Base, Cooling Tower Casing, Cooling Tower Glass, Heat Exchange Core, Cooling Tower Coolant Band and 51 more",
-    "translation": "用于：冷却塔底座、冷却塔外壳、冷却塔玻璃、热交换核心、冷却塔冷却带 及其他 51 个"
+    "source": "Used in: Cooling Tower Base, Cooling Tower Casing, Cooling Tower Glass, Heat Exchange Core, Cooling Tower Coolant Band and 53 more",
+    "translation": "用于：冷却塔底座、冷却塔外壳、冷却塔玻璃、热交换核心、冷却塔冷却带 等 53 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 31 more",
-    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 31 种"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 35 more",
+    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 35 个"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",
@@ -4952,8 +5384,8 @@
     "translation": "用于：虫洞入口"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 7 more",
-    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 7 个"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 8 more",
+    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 8 个"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",

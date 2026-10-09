@@ -57,7 +57,7 @@ def mid(name):
 
 FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
-BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass')
+BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container')
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
@@ -73,7 +73,10 @@ def stage_of(name):
     for cat, spent in SPENT.items():
         if name == spent:
             return stage_of(cat)
-    return {'酸素': 1, '磁気単極子': 2}.get(name, 1)
+    # レシピのないもの（封印コンテナからしか出ないものは、そのコンテナの鍵の段階）
+    return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
+            '次元ポケット': 5, '封印記録': 5, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
+            '遺構の照明（紅）': 5}.get(name, 1)
 
 
 def max_uses(name):
@@ -434,7 +437,24 @@ UI_LANG = {
     'message.singulo.records_complete': ('旧文明の記録はすべて読んだ', 'You have read every ancient record'),
     'message.singulo.strangelet_contained': ('ストレンジレットを磁気瓶に封じ込めた', 'Strangelet contained'),
     'tooltip.singulo.magnetic_bottle': ('残り %s / %s 回', '%s / %s uses left'),
+    'message.singulo.sealed.need_key': ('%sが要る', 'Needs a %s'),
+    'message.singulo.sealed.busy': ('封印装置が作動中', 'The seal is working'),
+    'message.singulo.sealed.lock_hint': ('鍵を持ってスニークして使うと封印できる', 'Sneak-use a key to seal it'),
+    'tooltip.singulo.sealed.locked': ('封印されている', 'Sealed'),
+    'tooltip.singulo.catalyst_stabilized': ('安定化済み', 'Stabilized'),
+    'message.singulo.stabilizer.need_catalyst': ('もう片方の手に触媒を持って使う', 'Hold a catalyst in your other hand'),
+    'message.singulo.stabilizer.already': ('この触媒はもう安定化してある', 'This catalyst is already stabilized'),
+    'message.singulo.stabilizer.done': ('触媒を安定化した（残りの寿命が2倍）', 'Catalyst stabilized: remaining life doubled'),
+    'container.singulo.dimensional_pocket': ('次元ポケット', 'Dimensional Pocket'),
+    'message.singulo.hidden_records_complete': ('封印された記録はすべて読んだ', 'You have read every sealed record'),
     'message.singulo.neutrino_scan': ('鉱石 %s 個・遺構のブロック %s 個が見えた', 'Found %s ores and %s ruin blocks'),
+    'message.singulo.neutrino_hidden': ('（感度が足りず映らない鉱石 %s 個）', ' (%s ores too deep for this sensitivity)'),
+    'tooltip.singulo.scanner_tier': ('感度: 段階 %s / %s', 'Sensitivity: %s / %s'),
+    'gui.singulo.observatory.tier': ('　感度 %s', ' · sensitivity %s'),
+    'message.singulo.scanner_module.done': ('感度を段階 %s に上げた', 'Sensitivity raised to %s'),
+    'message.singulo.scanner_module.already': ('感度はもう段階 %s', 'Sensitivity is already %s'),
+    'message.singulo.scanner_module.need_scanner': ('もう片方の手にニュートリノ・スキャナーを持って使うか、観測所に使う',
+                                                    'Hold a Neutrino Scanner in your other hand, or use it on an observatory'),
     'message.singulo.hydrogen_leak': ('水素が漏れて引火した！', 'Leaking hydrogen ignited!'),
     'gui.singulo.slot.catalyst': ('触媒', 'Catalyst'),
     'gui.singulo.slot.fuel': ('燃料', 'Fuel'),
@@ -471,10 +491,28 @@ UI_LANG = {
     'gui.singulo.reactor.slot.3': ('Hコレクター', 'H-collector'),
     'gui.singulo.reactor.slot.4': ('エルゴスフィア・リング', 'Ergosphere ring'),
     'gui.singulo.reactor.slot.5': ('副産物', 'By-products'),
-    'gui.singulo.slot.upgrade': ('単極子アップグレード', 'Monopole upgrade'),
+    'gui.singulo.slot.upgrade': ('アップグレード枠（単極子・オーバークロック）', 'Upgrade slot (monopole or overclock)'),
     'gui.singulo.sides.button': ('面の設定', 'Sides'),
     'gui.singulo.sides.items': ('アイテム', 'Items'),
-    'gui.singulo.sides.fluids': ('液体', 'Fluids'),
+    'gui.singulo.handbook.support': ('作者を支援', 'Support'),
+    'gui.singulo.handbook.support_hint': ('Ko-fi で作者を支援する（ブラウザで開く）', 'Support the author on Ko-fi (opens in your browser)'),
+    'gui.singulo.sides.tank_in': ('入力%s', 'In %s'),
+    'gui.singulo.sides.tank_out': ('出力%s', 'Out %s'),
+    'gui.singulo.sides.legend_tank_in': ('色の面から入れられる\u3000灰:無効', 'Coloured faces accept input · Grey off'),
+    'gui.singulo.sides.legend_tank_out': ('色の面から出せる\u3000灰:無効', 'Coloured faces output · Grey off'),
+    'compass.singulo.level': ('調整段階 %s / %s', 'Tuning %s / %s'),
+    'compass.singulo.hint': ('攻略した%sの保管庫をスニークして右クリックすると、次の遺構を探せるよう調整できる', 'Sneak-use on the cache of a cleared %s to tune it for the next ruin'),
+    'compass.singulo.upgraded': ('コンパスを調整した: %s も探せる', 'Compass tuned: it can now find %s'),
+    'compass.singulo.not_cleared': ('先に%sの保管庫を開けて攻略しよう', 'Clear %s first by opening its cache'),
+    'compass.singulo.wrong_cache': ('調整には%sの保管庫が要る', 'Tuning needs the cache of %s'),
+    'compass.singulo.max': ('これ以上は調整できない', 'Fully tuned'),
+    'command.singulo.ruin.done': ('%sを %s, %s, %s に建てた', 'Placed %s at %s, %s, %s'),
+    'command.singulo.ruin.unknown': ('知らない遺構: %s', 'Unknown ruin: %s'),
+    'gui.singulo.power.on': ('稼働中（クリックで停止）', 'Running (click to stop)'),
+    'gui.singulo.power.off': ('停止中（クリックで再開）', 'Stopped (click to resume)'),
+    'gui.singulo.make_free.on': ('材料なしのレシピも作る', 'Also runs recipes without ingredients'),
+    'gui.singulo.make_free.off': ('材料なしのレシピは作らない', 'Skips recipes without ingredients'),
+    'gui.singulo.status.off': ('停止', 'Off'),
     'gui.singulo.sides.legend': ('灰:無効 青:入力 橙:出力 緑:入出力', 'Grey off · Blue in · Orange out · Green both'),
     'gui.singulo.sides.face.front': ('前', 'Front'),
     'gui.singulo.sides.face.back': ('後', 'Back'),
@@ -657,8 +695,8 @@ def lang_files():
     gen_docs.descriptions(ctx, ja, en)
     gen_docs.guide(ctx, ja, en)
     gen_docs.advancements(ctx, ja, en)
-    from records import RECORDS
-    for rid, _, jt, jb, et, eb in RECORDS:
+    from records import RECORDS, HIDDEN_RECORDS
+    for rid, _, jt, jb, et, eb in RECORDS + HIDDEN_RECORDS:
         ja[f'record.{MODID}.{rid}.title'], ja[f'record.{MODID}.{rid}.body'] = jt, jb
         en[f'record.{MODID}.{rid}.title'], en[f'record.{MODID}.{rid}.body'] = et, eb
     write_json(ASSETS / 'lang' / 'ja_jp.json', dict(sorted(ja.items())))
@@ -710,6 +748,8 @@ def models():
             if iid in ('accelerator_tube', 'focusing_magnet'):
                 import accelerator_assets
                 accelerator_assets.models(ASSETS)
+        elif kind == 'container':
+            sealed_container_models(iid)
         elif kind == 'machine':
             if iid in CABLES:
                 cable_models(iid)
@@ -764,14 +804,56 @@ def boost_overlay_model():
     })
 
 
+def sealed_container_models(iid):
+    """封印コンテナ: 暗い台座と、上の開いた白いカプセルの殻。蓋（4枚の板）・中の台・光は SealedContainerRenderer が描く。
+    手に持ったときの絵は、蓋を閉じた形。"""
+    tier = int(iid[-1])
+    tex = {'side': f'{MODID}:block/sealed_container_side_{tier}', 'base': f'{MODID}:block/sealed_container_base',
+           'inner': f'{MODID}:block/sealed_container_inner', 'lid': f'{MODID}:block/sealed_container_lid_{tier}',
+           'particle': f'{MODID}:block/sealed_container_side_{tier}'}
+
+    def el(frm, to, faces):
+        return {'from': frm, 'to': to, 'faces': {d: {'texture': t} for d, t in faces.items()}}
+
+    all6 = ('north', 'south', 'east', 'west', 'up', 'down')
+    elements = [
+        el([0, 0, 0], [16, 3, 16], {d: '#base' for d in all6}),
+        el([2, 3, 2], [14, 4, 14], {'up': '#inner'}),
+        el([1, 3, 1], [15, 13, 2], {'north': '#side', 'south': '#inner', 'east': '#side', 'west': '#side', 'up': '#base'}),
+        el([1, 3, 14], [15, 13, 15], {'south': '#side', 'north': '#inner', 'east': '#side', 'west': '#side', 'up': '#base'}),
+        el([1, 3, 2], [2, 13, 14], {'west': '#side', 'east': '#inner', 'up': '#base'}),
+        el([14, 3, 2], [15, 13, 14], {'east': '#side', 'west': '#inner', 'up': '#base'}),
+    ]
+    write_json(ASSETS / 'models' / 'block' / f'{iid}.json', {'parent': 'minecraft:block/block', 'textures': tex, 'elements': elements})
+    write_json(ASSETS / 'blockstates' / f'{iid}.json', {'variants': {'': {'model': f'{MODID}:block/{iid}'}}})
+    lid = el([1, 13, 1], [15, 15, 15], {d: '#lid' for d in all6})
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
+        'parent': 'minecraft:block/block', 'textures': tex, 'elements': elements + [lid],
+        'display': {'gui': {'rotation': [30, 225, 0], 'scale': [0.625, 0.625, 0.625]}}})
+
+
+def sealed_container_assets():
+    """封印コンテナのテクスチャ、色つきの遺構の照明、重力ブーツの防具の絵。"""
+    import art16
+    tb = ASSETS / 'textures' / 'block'
+    for tier in (1, 2, 3, 4):
+        art16.save(art16.sealed_container_side(tier), tb / f'sealed_container_side_{tier}.png')
+        art16.save(art16.sealed_container_lid(tier), tb / f'sealed_container_lid_{tier}.png')
+    art16.save(art16.sealed_container_base(), tb / 'sealed_container_base.png')
+    art16.save(art16.sealed_container_inner(), tb / 'sealed_container_inner.png')
+    armor = ASSETS / 'textures' / 'models' / 'armor'
+    armor.mkdir(parents=True, exist_ok=True)
+    art16.gravity_boots_layer().save(armor / 'gravity_layer_1.png')
+
+
 def cable_models(iid):
     """ケーブル: 一辺 w（偶数）の正方形の断面。腕は面から中心の箱の縁まで（z=0〜8-w/2）、中心はまっすぐなら同じ断面の
     短い筒、分かれ目では一辺 w の箱。座標はすべて整数で、テクスチャは1ドットを1ドットのまま貼る（UV の大きさ＝面の大きさ）。
-    側面は行 8-w/2〜8+w/2 の帯、切り口と分かれ目の箱は同じ帯が四角く広がる絵。段階2以上は電力が流れている間「_on」の絵。"""
+    側面は行 8-w/2〜8+w/2 の帯、切り口と分かれ目の箱は同じ帯が四角く広がる絵。
+    電力が通っているときの光は、ブロックエンティティの描画（CableRenderer）で通った道の芯だけに重ねる。"""
     import art16
     w = art16.CABLE_WIDTHS[iid]
     lo, hi = 8 - w // 2, 8 + w // 2
-    glowing = iid != 'copper_wire'
     tex = f'{MODID}:block/{iid}'
 
     def side(length):
@@ -784,8 +866,7 @@ def cable_models(iid):
             faces['north'] = {'uv': [lo, lo, hi, hi], 'texture': '#e'}
         return {'from': [lo, lo, z0], 'to': [hi, hi, z1], 'faces': faces}
 
-    variants = [('', tex, f'{tex}_end')] + ([('_on', f'{tex}_on', f'{tex}_end_on')] if glowing else [])
-    for suffix, side_tex, end_tex in variants:
+    for suffix, side_tex, end_tex in [('', tex, f'{tex}_end')]:
         textures = {'particle': tex, 'c': side_tex, 'e': end_tex}
         write_json(ASSETS / 'models' / 'block' / f'{iid}_arm{suffix}.json',
                    {'parent': 'minecraft:block/block', 'textures': textures, 'elements': [tube(0, lo, True)]})
@@ -798,9 +879,9 @@ def cable_models(iid):
     rot = {'north': {}, 'east': {'y': 90}, 'south': {'y': 180}, 'west': {'y': 270}, 'up': {'x': 270}, 'down': {'x': 90}}
     straight_rot = {'z': {}, 'x': {'y': 90}, 'y': {'x': 90}}
     multipart = []
-    for pw, suffix in ([('false', ''), ('true', '_on')] if glowing else [(None, '')]):
+    for suffix in ('',):
         def when(extra):
-            return dict(extra, powered=pw) if pw is not None else dict(extra)
+            return dict(extra)
         multipart.append({'when': when({'straight': 'none'}), 'apply': {'model': f'{MODID}:block/{iid}_core{suffix}'}})
         for axis, r in straight_rot.items():
             multipart.append({'when': when({'straight': axis}), 'apply': {'model': f'{MODID}:block/{iid}_straight{suffix}', **r}})
@@ -906,10 +987,12 @@ def textures():
             for _ in range(60):
                 x, y = rng.randint(0, 15), rng.randint(8, 15) if rng.random() < 0.7 else rng.randint(0, 15)
                 d.point((x, y), fill=(90, 130, 60, 255))
-        elif iid == 'ruin_lamp':
+        elif iid.startswith('ruin_lamp'):
+            glow = {'ruin_lamp': (150, 230, 255), 'ruin_lamp_amber': (255, 196, 100), 'ruin_lamp_verdant': (140, 240, 160),
+                    'ruin_lamp_violet': (200, 160, 255), 'ruin_lamp_crimson': (255, 110, 130)}[iid]
             d.rectangle([4, 4, 11, 11], fill=(60, 66, 70, 255))
-            d.rectangle([5, 5, 10, 10], fill=(150, 230, 255, 255))
-            d.point([(5, 5), (10, 10)], fill=(90, 120, 130, 255))
+            d.rectangle([5, 5, 10, 10], fill=glow + (255,))
+            d.point([(5, 5), (10, 10)], fill=tuple(c // 2 + 30 for c in glow) + (255,))
         elif iid == 'ruin_cache':
             d.rectangle([2, 3, 13, 12], fill=(57, 66, 74, 255), outline=aged_seam)
             d.line([(4, 7), (11, 7)], fill=(150, 230, 255, 255))
@@ -1108,18 +1191,19 @@ def art_textures():
             elif iid == 'strange_matter':
                 art16.save(art16.strange_matter(), tb / f'{iid}.png')
                 art.save(art.strange_matter(), hb / f'{iid}.png')
+        elif kind not in ('structure', 'fluid', 'machine') and kind not in BLOCK_KINDS and iid in art16.ANIMATED_ITEMS:
+            # 動くアイテム: コマを縦に並べた絵と .mcmeta。HD 版は作らない（標準の動く絵をそのまま使う）
+            sheet, ticks = art16.animated_item(iid)
+            art16.save(sheet, ti / f'{iid}.png')
+            write_json(ti / f'{iid}.png.mcmeta', {'animation': {'frametime': ticks, 'interpolate': False}})
         elif kind not in ('structure', 'fluid', 'machine') and kind not in BLOCK_KINDS:
             art16.save(art16.item_texture(iid, stage_of(name)), ti / f'{iid}.png')
             if iid in art.ITEM_ART:
                 art.save(art.item_texture(iid, stage_of(name)), hi / f'{iid}.png')
     # ケーブルの被覆（電力が流れている間の芯の色つき）
-    cable_glow = {'superconducting_cable': (220, 250, 255), 'topological_wire': (240, 220, 255), 'horizon_bus': (255, 255, 255)}
     for iid, core in CABLES.items():
         art16.save(art16.cable_texture(iid, core), tb / f'{iid}.png')
         art16.save(art16.cable_end(iid, core), tb / f'{iid}_end.png')
-        if iid in cable_glow:
-            art16.save(art16.cable_texture(iid, core, on=True, glow=cable_glow[iid]), tb / f'{iid}_on.png')
-            art16.save(art16.cable_end(iid, core, on=True, glow=cable_glow[iid]), tb / f'{iid}_end_on.png')
     # 探索コンパスの針（16コマ）
     for k in range(16):
         art16.save(art16.compass_frame(k / 16), ti / f'explorer_compass_{k:02d}.png')
@@ -1624,6 +1708,31 @@ SOUNDS = {
     'graviton_manipulator_active': ('machine/graviton_manipulator_active', '重力を操る', 'Gravity manipulated', 16),
     'graviton_manipulator_charge': ('machine/graviton_manipulator_charge', '重力をためる', 'Gravity charges', 16),
     'graviton_manipulator_throw': ('machine/graviton_manipulator_throw', '投げ飛ばす', 'Hurled', 24),
+    'sealed_container.denied': ('sealed/denied', '封印が鍵を拒む', 'Seal rejects', 12),
+    'sealed_container.insert': ('sealed/insert', '鍵が差し込まれる', 'Key inserted', 12),
+    'sealed_container.scan': ('sealed/scan', '封印が鍵を読み取る', 'Seal scans', 16),
+    'sealed_container.unlock': ('sealed/unlock', '封印が解ける', 'Seal releases', 16),
+    'sealed_container.vent': ('sealed/vent', '冷気が噴き出す', 'Cold gas vents', 16),
+    'sealed_container.open': ('sealed/open', '蓋が開く', 'Lid opens', 16),
+    'sealed_container.rise': ('sealed/rise', '中の台がせり上がる', 'Pedestal rises', 16),
+    'sealed_container.lock': ('sealed/lock', '蓋が閉じて封印される', 'Container seals', 16),
+    'gravity_boots.wall_jump': ('item/gravity_boots_wall_jump', '壁を蹴って跳ぶ', 'Wall jump', 12),
+    'dimensional_pocket.open': ('item/dimensional_pocket_open', '次元ポケットが開く', 'Pocket opens', 8),
+    'dimensional_pocket.close': ('item/dimensional_pocket_close', '次元ポケットが閉じる', 'Pocket closes', 8),
+}
+# 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
+SOUND_FALLBACKS = {
+    'sealed_container.denied': 'minecraft:block.dispenser.fail',
+    'sealed_container.insert': 'minecraft:block.vault.insert_item',
+    'sealed_container.scan': 'minecraft:block.beacon.activate',
+    'sealed_container.unlock': 'minecraft:block.vault.activate',
+    'sealed_container.vent': 'minecraft:block.fire.extinguish',
+    'sealed_container.open': 'minecraft:block.vault.open_shutter',
+    'sealed_container.rise': 'minecraft:block.beacon.power_select',
+    'sealed_container.lock': 'minecraft:block.vault.close_shutter',
+    'gravity_boots.wall_jump': 'minecraft:entity.breeze.jump',
+    'dimensional_pocket.open': 'minecraft:block.ender_chest.open',
+    'dimensional_pocket.close': 'minecraft:block.ender_chest.close',
 }
 
 
@@ -1632,11 +1741,16 @@ def sounds_json():
     base = Path(__file__).resolve().parent.parent / 'src' / 'main' / 'resources' / 'assets' / MODID / 'sounds'
     out = {}
     missing = []
+    pending = []
     for name, (path, ja, en, dist) in SOUNDS.items():
+        sound = {'name': f'{MODID}:{path}', 'attenuation_distance': dist}
         if not (base / f'{path}.ogg').exists():
-            missing.append(path)
-        out[name] = {'subtitle': f'subtitles.{MODID}.{name}',
-                     'sounds': [{'name': f'{MODID}:{path}', 'attenuation_distance': dist}]}
+            if name in SOUND_FALLBACKS:
+                sound = {'name': SOUND_FALLBACKS[name], 'type': 'event'}
+                pending.append(path)
+            else:
+                missing.append(path)
+        out[name] = {'subtitle': f'subtitles.{MODID}.{name}', 'sounds': [sound]}
         UI_LANG[f'subtitles.{MODID}.{name}'] = (ja, en)
     unused = sorted(str(p.relative_to(base)).replace('\\', '/')[:-4] for p in base.rglob('*.ogg')
                     if str(p.relative_to(base)).replace('\\', '/')[:-4] not in {v[0] for v in SOUNDS.values()})
@@ -1644,6 +1758,8 @@ def sounds_json():
         raise SystemExit(f'効果音のファイルがない: {missing}')
     if unused:
         print(f'  使っていない効果音のファイル: {unused}')
+    if pending:
+        print(f'  まだファイルがなく、バニラの音で代用している効果音: {len(pending)} 件')
     write_json(ASSETS / 'sounds.json', out)
 
 
@@ -1724,15 +1840,19 @@ def tags():
 
 
 RUIN_PLACEMENT = {
-    # 遺構ID: (間隔, 最小間隔, salt, バイオーム)
-    'observation_post': (24, 8, 19370501, ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:desert',
-                                           'minecraft:savanna', 'minecraft:savanna_plateau', 'minecraft:snowy_plains',
-                                           'minecraft:meadow', 'minecraft:badlands']),
-    'research_building': (32, 10, 19370502, ['#minecraft:is_forest', '#minecraft:is_taiga', 'minecraft:plains',
-                                             'minecraft:windswept_hills', 'minecraft:meadow', 'minecraft:cherry_grove']),
-    'culture_facility': (36, 12, 19370503, ['#minecraft:is_overworld']),
-    'final_lab': (80, 32, 19370504, ['minecraft:plains', 'minecraft:desert', 'minecraft:savanna', 'minecraft:snowy_plains',
-                                     'minecraft:badlands', 'minecraft:meadow', '#minecraft:is_forest', '#minecraft:is_taiga']),
+    # 遺構ID: (間隔, 最小間隔, salt, バイオーム)。間隔はチャンク（同じ遺構どうしのおおよその距離）
+    'observation_post': (40, 16, 19370501, ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:desert',
+                                            'minecraft:savanna', 'minecraft:savanna_plateau', 'minecraft:snowy_plains',
+                                            'minecraft:meadow', 'minecraft:badlands']),
+    'research_building': (56, 20, 19370502, ['#minecraft:is_overworld']),
+    'culture_facility': (64, 24, 19370503, ['#minecraft:is_overworld']),
+    'final_lab': (96, 40, 19370504, ['#minecraft:is_overworld']),
+}
+# 地下の遺構を埋める高さ（構造物の床の Y の範囲）。深い遺構ほど後の段階
+RUIN_DEPTH = {
+    'research_building': (-20, 4),
+    'culture_facility': (-46, -30),
+    'final_lab': (-56, -46),
 }
 
 
@@ -1753,7 +1873,8 @@ def ruins_data():
             'biomes': f'#{MODID}:has_structure/{rid}',
             'step': 'surface_structures' if placement == 'surface' else 'underground_structures',
             'spawn_overrides': {},
-            'terrain_adaptation': 'beard_thin' if placement == 'surface' else 'none',
+            # 地下は周りを岩で包む（洞窟や水とつながって崩れないように）
+            'terrain_adaptation': 'beard_thin' if placement == 'surface' else 'encapsulate',
             'start_pool': f'{MODID}:ruins/{rid}',
             'size': 1,
             'max_distance_from_center': 80,
@@ -1763,9 +1884,9 @@ def ruins_data():
             structure['start_height'] = {'absolute': 0}
             structure['project_start_to_heightmap'] = 'WORLD_SURFACE_WG'
         else:
-            # 深層岩の層（Y=-48〜-24）に埋める
+            lo, hi = RUIN_DEPTH[rid]
             structure['start_height'] = {'type': 'minecraft:uniform',
-                                         'min_inclusive': {'absolute': -48}, 'max_inclusive': {'absolute': -24}}
+                                         'min_inclusive': {'absolute': lo}, 'max_inclusive': {'absolute': hi}}
         write_json(DATA / 'worldgen' / 'structure' / f'{rid}.json', structure)
         write_json(DATA / 'worldgen' / 'structure_set' / f'{rid}.json', {
             'structures': [{'structure': f'{MODID}:{rid}', 'weight': 1}],
@@ -1793,6 +1914,41 @@ def ruins_data():
         write_json(DATA / 'loot_table' / 'ruins' / f'{rid}.json', {'type': 'minecraft:chest', 'pools': plist})
     for rid, plist in first.items():
         write_json(DATA / 'loot_table' / 'ruins' / f'{rid}_first.json', {'type': 'minecraft:chest', 'pools': plist})
+    sealed_loot()
+    write_json(DATA / 'tags' / 'block' / 'scanner_tier_2.json', {'values': [
+        {'id': f'#c:ores/{n}', 'required': False} for n in ('gold', 'diamond', 'emerald', 'silver', 'platinum')]})
+    write_json(DATA / 'tags' / 'block' / 'scanner_tier_3.json', {'values': [
+        {'id': f'#c:ores/{n}', 'required': False} for n in ('netherite_scrap', 'uranium', 'iridium')]})
+
+
+# 封印コンテナの中身: 段階ごとに (必ず入るもの, ばらつくもの（2回引く）, 珍しいもの, 珍しいものが出る確率, 照明の色)
+SEALED_LOOT = {
+    1: ([('記録片', 2, 3)], [('鋼鉄インゴット', 4, 8), ('基礎回路', 2, 4), ('熱電対モジュール', 2, 3), ('鋼板', 3, 6)],
+        'オーバークロック・チップ', 0.35, '遺構の照明（琥珀）'),
+    2: ([('冷却原子', 4, 4)], [('超伝導線材', 2, 4), ('ミュオン束', 1, 2), ('超伝導コイル', 1, 2), ('記録片', 1, 2)],
+        '重力ブーツ', 0.35, '遺構の照明（翠）'),
+    3: ([('エキゾチック物質', 2, 2)], [('圧縮ブロックLv2', 1, 2), ('縮退物質殻', 1, 1), ('超伝導コイル', 2, 4), ('記録片', 1, 3)],
+        '触媒安定化剤', 0.35, '遺構の照明（菫）'),
+    4: ([('封印記録', 1, 1)], [('ジェット凝縮体', 1, 2), ('H凝縮体', 1, 1), ('エキゾチック物質', 2, 4), ('記録片', 2, 3)],
+        '次元ポケット', 0.35, '遺構の照明（紅）'),
+}
+
+
+def sealed_loot():
+    """loot_table/sealed/tier_N: 遺構の封印コンテナの中身。"""
+    def entry(name, lo, hi, weight=1):
+        e = {'type': 'minecraft:item', 'name': mid(name), 'weight': weight}
+        if hi > 1:
+            e['functions'] = [{'function': 'minecraft:set_count',
+                               'count': lo if lo == hi else {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]
+        return e
+    for tier, (fixed, varied, rare, chance, lamp) in SEALED_LOOT.items():
+        pools = [{'rolls': 1, 'entries': [entry(n, lo, hi)]} for n, lo, hi in fixed]
+        pools.append({'rolls': 2, 'entries': [entry(n, lo, hi) for n, lo, hi in varied]})
+        pools.append({'rolls': 1, 'entries': [entry(rare, 1, 1, round(chance * 100)),
+                                              {'type': 'minecraft:empty', 'weight': round((1 - chance) * 100)}]})
+        pools.append({'rolls': 1, 'entries': [entry(lamp, 2, 4)]})
+        write_json(DATA / 'loot_table' / 'sealed' / f'tier_{tier}.json', {'type': 'minecraft:chest', 'pools': pools})
 
 
 def mass_values():
@@ -1847,6 +2003,78 @@ def thermal():
 
 # ---------------------------------------------------------------- Java
 
+
+# ---------------------------------------------------------------- クリエイティブタブ（と JEI）の並び
+# 用途ごとにまとめ、まとまりの中は段階順・レシピ順。並べ忘れたアイテムは「素材」の最後に入る。
+TAB_GROUPS = [
+    ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'settings_card', 'decoded_record']),
+    ('発電・蓄電・送電', ['thermoelectric_generator', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
+                       'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
+    ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
+               'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
+               'singularity_encapsulator', 'monopole_upgrade']),
+    # マルチブロック: 共通のポートのあと、形ごとにコントローラとその部品
+    ('マルチブロック', ['multiblock_port',
+                   'cooling_tower_controller', 'cooling_tower_base', 'cooling_tower_casing', 'cooling_tower_glass',
+                   'cooling_tower_coolant_band', 'cooling_tower_rim', 'cooling_tower_grate', 'heat_exchange_core',
+                   'accelerator_controller', 'accelerator_tube', 'focusing_magnet',
+                   'degenerate_compactor_controller', 'degenerate_compactor_frame', 'degenerate_compactor_plate',
+                   'degenerate_compactor_ram', 'degenerate_compactor_anvil', 'degenerate_compactor_vent',
+                   'degenerate_compactor_window',
+                   'casimir_cavity_controller', 'casimir_cavity_frame', 'casimir_cavity_pump', 'casimir_cavity_wall',
+                   'casimir_cavity_shield', 'casimir_cavity_window', 'mirror_plate',
+                   'degenerate_furnace_controller', 'degenerate_furnace_frame', 'degenerate_furnace_shell',
+                   'degenerate_furnace_piston', 'degenerate_furnace_fin', 'degenerate_furnace_tube', 'degenerate_furnace_window',
+                   'core_controller', 'reactor_shell', 'gyro_drive', 'reactor_stabilizer', 'extraction_port', 'reactor_mass_alarm',
+                   'shield_tower_core', 'shield_tower_plinth', 'shield_tower_coil', 'shield_tower_body', 'shield_tower_waveguide',
+                   'shield_tower_crown',
+                   'tipler_core', 'tipler_frame', 'tipler_housing', 'tipler_bearing', 'tipler_window', 'tipler_holder',
+                   'wormhole_generator_core', 'wormhole_generator_shell', 'wormhole_generator_coil', 'wormhole_generator_focuser',
+                   'wormhole_generator_window']),
+    ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravitational_wave_detector', 'neutrino_observatory',
+                     'probe_station', 'worldline_anchor_advanced', 'halo_collector', 'gravitational_containment_tank',
+                     'unstable_wormhole_mouth', 'wormhole_stabilizer', 'wormhole_mouth', 'wormhole_port']),
+    ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
+               'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
+               'dimensional_pocket']),
+    ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
+                 'temporal_key', 'sealed_container_4', 'singularity_key']),
+    ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core']),
+    ('素材', None),
+    ('回収物と記録', None),
+    ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
+            'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock',
+            'seal_console', 'security_drone_spawn_egg']),
+    ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg']),
+]
+
+
+def tab_order():
+    """クリエイティブタブの並び（アイテムIDの列）。素材はレシピの順（段階順）、回収物は回収物・復元品・データカード・失活触媒。"""
+    placed = {iid for _, ids in TAB_GROUPS if ids for iid in ids}
+    salvage_names = list(EXPLORE) + [n for n in MOD if MOD[n][0] in ('record_fragment', 'sealed_record')] + list(RESTORED) + [n for n in MOD if n.startswith('データカード') or n == '白紙データカード'] \
+        + list(SPENT.values())
+    salvage = []
+    for n in salvage_names:
+        iid = MOD[n][0] if n in MOD else None
+        if iid and iid not in placed and iid not in salvage:
+            salvage.append(iid)
+    placed |= set(salvage)
+    materials = []
+    names = [n for n in ORDER if n in MOD] + sorted((n for n in MOD if n not in RECIPES), key=stage_of)
+    # レシピのないもの（加速器の事故でできるストレンジ物質など）は、手に入る段階に置く
+    stage_hint = {'strange_matter': 2, 'strangelet': 2}
+    for n in sorted(names, key=lambda n: (stage_hint.get(MOD[n][0], stage_of(n)), names.index(n))):
+        iid, _, kind = MOD[n]
+        if kind in ('fluid', 'structure') or iid in placed or iid in materials:
+            continue
+        materials.append(iid)
+    out = []
+    for title, ids in TAB_GROUPS:
+        out += ids if ids else materials if title == '素材' else salvage
+    return out
+
+
 def java_content():
     lines = []
     simple = []
@@ -1885,6 +2113,11 @@ def java_content():
     lines.append(',\n'.join(f'            new BlockDef("{i}", {s})' for i, s in blocks))
     lines.append('    );')
     lines.append('')
+    lines.append('    /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */')
+    lines.append('    public static final List<String> TAB_ORDER = List.of(')
+    lines.append(',\n'.join(f'            "{i}"' for i in tab_order()))
+    lines.append('    );')
+    lines.append('')
     lines.append('    public static final List<FluidDef> FLUIDS = List.of(')
     lines.append(',\n'.join(f'            new FluidDef("{i}", {s}, 0x{fluid_colors[i]:08X}, {str(i in gases).lower()})'
                             for i, s in fluids))
@@ -1894,6 +2127,9 @@ def java_content():
     from records import RECORDS
     lines.append('    /** 旧文明の記録の ID（解読する順）。 */')
     lines.append('    public static final List<String> RECORDS = List.of(' + ', '.join(f'"{r[0]}"' for r in RECORDS) + ');')
+    from records import HIDDEN_RECORDS
+    lines.append('    /** 封印された記録の ID（封印記録を読む順）。 */')
+    lines.append('    public static final List<String> HIDDEN_RECORDS = List.of(' + ', '.join(f'"{r[0]}"' for r in HIDDEN_RECORDS) + ');')
     lines.append('')
     lines.append('    public static final Map<String, Integer> RUIN_REGEN_DAYS = Map.of(')
     lines.append((',' + chr(10)).join(f'            "{ruins.RUIN_IDS[k]}", {v}' for k, v in RUIN_REGEN_DAYS.items()))
@@ -1909,7 +2145,8 @@ def java_content():
     lines.append(',\n'.join(f'            "{a}", "{b}"' for a, b in worn.items()))
     lines.append('    );')
     lines.append('')
-    machines = [(iid, stage_of(n)) for n, (iid, _, kind) in MOD.items() if kind in ('machine', 'part_block', 'part_glass')]
+    machines = [(iid, stage_of(n)) for n, (iid, _, kind) in MOD.items()
+                if kind in ('machine', 'part_block', 'part_glass', 'container')]
     lines.append('    /** 実装済み装置ブロックの段階（ツールチップ用）。 */')
     lines.append('    public static final Map<String, Integer> BLOCK_STAGES = Map.ofEntries(')
     lines.append(',\n'.join(f'            Map.entry("{i}", {s})' for i, s in machines))
@@ -2179,6 +2416,7 @@ def main():
     ghost_textures()
     rogue_black_hole_assets()
     alarm_assets()
+    sealed_container_assets()
     tags()
     mass_values()
     thermal()

@@ -48,6 +48,18 @@ public final class SinguloComponents {
     public static final Supplier<DataComponentType<Integer>> HOLO_SIZE = REGISTER.registerComponentType("holo_size",
             b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    /** 探索コンパスの調整段階（探せる遺構の数、1〜4）。 */
+    public static final Supplier<DataComponentType<Integer>> COMPASS_LEVEL = REGISTER.registerComponentType("compass_level",
+            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    /** ニュートリノ・スキャナーの感度の段階（1〜3）。 */
+    public static final Supplier<DataComponentType<Integer>> SCANNER_TIER = REGISTER.registerComponentType("scanner_tier",
+            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    /** 触媒安定化剤を使った触媒（もう使えない）。 */
+    public static final Supplier<DataComponentType<Boolean>> STABILIZED = REGISTER.registerComponentType("stabilized",
+            b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
     /** 無限の触媒のティア。 */
     public static final Supplier<DataComponentType<Integer>> CATALYST_TIER = REGISTER.registerComponentType("catalyst_tier",
             b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
