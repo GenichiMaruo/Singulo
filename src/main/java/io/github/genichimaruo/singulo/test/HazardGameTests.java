@@ -64,13 +64,28 @@ public final class HazardGameTests {
         });
     }
 
+    /** スキャナーは感度の段階に応じて鉱石を映す: 段階1は鉄まで、段階2でダイヤモンド、段階3で古代の残骸。遺構はいつでも映る。 */
     @GameTest(template = EMPTY)
     public static void neutrinoScannerFindsOresAndRuins(GameTestHelper helper) {
-        helper.setBlock(new BlockPos(1, 1, 1), Blocks.DIAMOND_ORE);
-        helper.setBlock(new BlockPos(5, 1, 5), SinguloBlocks.RUIN_PANEL.get());
-        List<List<BlockPos>> found = NeutrinoScannerItem.scan(helper.getLevel(), helper.absolutePos(new BlockPos(3, 1, 3)));
-        helper.assertTrue(found.get(0).contains(helper.absolutePos(new BlockPos(1, 1, 1))), "鉱石が映らない");
-        helper.assertTrue(found.get(1).contains(helper.absolutePos(new BlockPos(5, 1, 5))), "遺構のブロックが映らない");
+        BlockPos iron = new BlockPos(1, 1, 1);
+        BlockPos diamond = new BlockPos(1, 1, 5);
+        BlockPos debris = new BlockPos(5, 1, 1);
+        BlockPos ruin = new BlockPos(5, 1, 5);
+        helper.setBlock(iron, Blocks.IRON_ORE);
+        helper.setBlock(diamond, Blocks.DIAMOND_ORE);
+        helper.setBlock(debris, Blocks.ANCIENT_DEBRIS);
+        helper.setBlock(ruin, SinguloBlocks.RUIN_PANEL.get());
+        BlockPos c = helper.absolutePos(new BlockPos(3, 1, 3));
+        NeutrinoScannerItem.Result t1 = NeutrinoScannerItem.scan(helper.getLevel(), c, 1);
+        NeutrinoScannerItem.Result t2 = NeutrinoScannerItem.scan(helper.getLevel(), c, 2);
+        NeutrinoScannerItem.Result t3 = NeutrinoScannerItem.scan(helper.getLevel(), c, 3);
+        helper.assertTrue(t1.ores().contains(helper.absolutePos(iron)), "段階1で鉄鉱石が映らない");
+        helper.assertFalse(t1.ores().contains(helper.absolutePos(diamond)), "段階1でダイヤモンドが映る");
+        helper.assertTrue(t1.hidden() == 2, "段階1で隠れた鉱石の数が違う: " + t1.hidden());
+        helper.assertTrue(t2.ores().contains(helper.absolutePos(diamond)) && !t2.ores().contains(helper.absolutePos(debris)),
+                "段階2の映り方が違う");
+        helper.assertTrue(t3.ores().contains(helper.absolutePos(debris)) && t3.hidden() == 0, "段階3で古代の残骸が映らない");
+        helper.assertTrue(t1.ruins().contains(helper.absolutePos(ruin)), "遺構のブロックが映らない");
         helper.succeed();
     }
 
