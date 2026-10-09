@@ -26,11 +26,10 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 /**
  * エネルギーケーブル。隣のケーブル（種類を問わない）と、電力を扱うブロックに自動で接続する。
  * capacity は1 tick に運べる量、lossPerBlock は1ブロックごとの損失の割合。
- * 電力が流れている間は powered が true になり、段階2以上のケーブルは芯の色が光る。
+ * 実際に電力が通っている道だけが光る（{@link CableBlockEntity} が通った面と量をクライアントへ送り、描画で光らせる）。
  */
 public class CableBlock extends BaseEntityBlock {
     public static final Map<Direction, BooleanProperty> CONNECTIONS = new EnumMap<>(Direction.class);
-    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final net.minecraft.world.level.block.state.properties.EnumProperty<CableProfile.Straight> STRAIGHT =
             net.minecraft.world.level.block.state.properties.EnumProperty.create("straight", CableProfile.Straight.class);
 
@@ -43,11 +42,11 @@ public class CableBlock extends BaseEntityBlock {
         CONNECTIONS.put(Direction.DOWN, BlockStateProperties.DOWN);
     }
 
-    private final int capacity;
+    private final long capacity;
     private final double lossPerBlock;
     private final CableProfile profile;
 
-    public CableBlock(Properties properties, int capacity, double lossPerBlock, CableProfile profile) {
+    public CableBlock(Properties properties, long capacity, double lossPerBlock, CableProfile profile) {
         super(properties);
         this.capacity = capacity;
         this.lossPerBlock = lossPerBlock;
@@ -56,7 +55,7 @@ public class CableBlock extends BaseEntityBlock {
         for (BooleanProperty p : CONNECTIONS.values()) {
             state = state.setValue(p, false);
         }
-        registerDefaultState(state.setValue(POWERED, false).setValue(STRAIGHT, CableProfile.Straight.NONE));
+        registerDefaultState(state.setValue(STRAIGHT, CableProfile.Straight.NONE));
     }
 
     public CableProfile profile() {
@@ -84,7 +83,8 @@ public class CableBlock extends BaseEntityBlock {
         return state.setValue(STRAIGHT, s);
     }
 
-    public int capacity() {
+    /** 1 tick に運べる量。Long.MAX_VALUE は上限なし。 */
+    public long capacity() {
         return capacity;
     }
 
@@ -100,7 +100,7 @@ public class CableBlock extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         CONNECTIONS.values().forEach(builder::add);
-        builder.add(POWERED, STRAIGHT);
+        builder.add(STRAIGHT);
     }
 
     @Override
