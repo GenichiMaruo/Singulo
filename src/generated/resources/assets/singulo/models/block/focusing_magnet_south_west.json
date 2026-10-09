@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "singulo:block/focusing_magnet_connected_side",
+    "up": "singulo:block/focusing_magnet_south_west",
+    "down": "singulo:block/focusing_magnet_south_west_bottom",
+    "north": "singulo:block/focusing_magnet_connected_side",
+    "east": "singulo:block/focusing_magnet_connected_side",
+    "south": "singulo:block/focusing_magnet_connected_side",
+    "west": "singulo:block/focusing_magnet_connected_side"
+  }
+}

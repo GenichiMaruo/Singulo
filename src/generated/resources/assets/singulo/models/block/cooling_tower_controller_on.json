@@ -1,13 +1,13 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t2",
-    "side": "singulo:block/machine_side_t2",
-    "bottom": "singulo:block/machine_bottom_t2",
+    "top": "singulo:block/cooling_tower_casing",
+    "side": "singulo:block/cooling_tower_casing",
+    "bottom": "singulo:block/cooling_tower_casing",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/cooling_tower_controller_front_on",
-    "particle": "singulo:block/machine_side_t2"
+    "particle": "singulo:block/cooling_tower_casing"
   },
   "elements": [
     {

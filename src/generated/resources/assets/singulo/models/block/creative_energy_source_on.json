@@ -1,13 +1,13 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t1",
-    "side": "singulo:block/machine_side_t1",
-    "bottom": "singulo:block/machine_bottom_t1",
+    "top": "singulo:block/creative_energy_casing",
+    "side": "singulo:block/creative_energy_casing",
+    "bottom": "singulo:block/creative_energy_casing",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/creative_energy_source_front_on",
-    "particle": "singulo:block/machine_side_t1"
+    "particle": "singulo:block/creative_energy_casing"
   },
   "elements": [
     {

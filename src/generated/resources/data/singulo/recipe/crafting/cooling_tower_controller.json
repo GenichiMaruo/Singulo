@@ -1,26 +1,24 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
-      "item": "singulo:basic_frame"
-    },
-    {
+  "pattern": [
+    "KBK",
+    "HFH"
+  ],
+  "key": {
+    "K": {
       "item": "singulo:ceramic_substrate"
     },
-    {
-      "item": "singulo:ceramic_substrate"
-    },
-    {
+    "B": {
       "item": "singulo:basic_circuit"
     },
-    {
+    "H": {
       "item": "singulo:heat_exchange_core"
     },
-    {
-      "item": "singulo:heat_exchange_core"
+    "F": {
+      "item": "singulo:basic_frame"
     }
-  ],
+  },
   "result": {
     "id": "singulo:cooling_tower_controller",
     "count": 1

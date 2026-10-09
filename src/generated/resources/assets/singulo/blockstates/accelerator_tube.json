@@ -1,7 +1,31 @@
 {
   "variants": {
-    "": {
+    "segment=none": {
       "model": "singulo:block/accelerator_tube"
+    },
+    "segment=north": {
+      "model": "singulo:block/accelerator_tube_north"
+    },
+    "segment=east": {
+      "model": "singulo:block/accelerator_tube_east"
+    },
+    "segment=south": {
+      "model": "singulo:block/accelerator_tube_south"
+    },
+    "segment=west": {
+      "model": "singulo:block/accelerator_tube_west"
+    },
+    "segment=north_west": {
+      "model": "singulo:block/accelerator_tube_north_west"
+    },
+    "segment=north_east": {
+      "model": "singulo:block/accelerator_tube_north_east"
+    },
+    "segment=south_east": {
+      "model": "singulo:block/accelerator_tube_south_east"
+    },
+    "segment=south_west": {
+      "model": "singulo:block/accelerator_tube_south_west"
     }
   }
 }

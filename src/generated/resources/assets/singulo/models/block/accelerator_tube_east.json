@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "singulo:block/accelerator_tube_connected_side",
+    "up": "singulo:block/accelerator_tube_east",
+    "down": "singulo:block/accelerator_tube_east_bottom",
+    "north": "singulo:block/accelerator_tube_connected_side",
+    "east": "singulo:block/accelerator_tube_connected_side",
+    "south": "singulo:block/accelerator_tube_connected_side",
+    "west": "singulo:block/accelerator_tube_connected_side"
+  }
+}

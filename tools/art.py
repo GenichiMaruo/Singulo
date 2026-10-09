@@ -328,6 +328,15 @@ MACHINE_ICONS = {
 
 
 def machine_front(iid, stage, on):
+    if iid == 'creative_energy_source':
+        import art16
+        return art16.creative_front(on).resize((S, S), Image.NEAREST)
+    if iid == 'degenerate_furnace_controller':
+        import art16
+        return art16.furnace_front(on).resize((S, S), Image.NEAREST)
+    import art16 as _a16
+    if iid in _a16.CONTROLLER_FRONTS:
+        return _a16.controller_front(iid, on).resize((S, S), Image.NEAREST)
     im = casing(stage, 'side', seed=hash(iid) % 1000)
     d = ImageDraw.Draw(im)
     box = (7, 6, S - 8, S - 10)
@@ -378,27 +387,22 @@ def boost_overlay(frames=8):
 
 # ---------------------------------------------------------------- マルチブロックの部品
 
+UPSCALED_FROM_16 = ('degenerate_furnace_frame', 'degenerate_furnace_shell', 'degenerate_furnace_piston', 'degenerate_furnace_fin',
+                    'degenerate_furnace_tube', 'degenerate_furnace_window', 'multiblock_port')
+
+
 def part_texture(iid):
+    import art16 as _a16
+    if iid in UPSCALED_FROM_16 or _a16.multiblock_part(iid) is not None:
+        import art16
+        return art16.part_texture(iid).resize((S, S), Image.NEAREST)
     im, d = new()
-    if iid == 'cooling_tower_casing':
-        im = casing(2, 'side', seed=1)
-    elif iid == 'cooling_tower_glass':
-        d.rectangle([0, 0, S - 1, S - 1], outline=(214, 224, 232, 255))
-        d.rectangle([1, 1, S - 2, S - 2], outline=(160, 190, 210, 255))
-        d.rectangle([2, 2, S - 3, S - 3], fill=(190, 230, 250, 60))
-        for i in range(6, 14):
-            d.point((i, i - 2), fill=(255, 255, 255, 150))
-    elif iid == 'heat_exchange_core':
+    if iid == 'heat_exchange_core':
         d.rectangle([0, 0, S - 1, S - 1], fill=(120, 76, 50, 255))
         for x in range(2, S - 1, 4):
             d.rectangle([x, 2, x + 1, S - 3], fill=(210, 140, 90, 255))
             d.line([(x, 2), (x, S - 3)], fill=(240, 180, 130, 255))
         d.rectangle([0, 14, S - 1, 17], fill=(150, 230, 255, 255))
-    elif iid == 'cooling_tower_port':
-        im = casing(2, 'side', seed=2)
-        d = ImageDraw.Draw(im)
-        d.ellipse([8, 8, S - 9, S - 9], fill=(40, 52, 64, 255), outline=(140, 160, 182, 255))
-        d.ellipse([12, 12, S - 13, S - 13], outline=(150, 232, 255, 255))
     elif iid == 'accelerator_tube':
         d.rectangle([0, 0, S - 1, S - 1], fill=(206, 212, 220, 255))
         d.rectangle([0, 9, S - 1, S - 10], fill=(150, 200, 230, 120))
@@ -414,13 +418,6 @@ def part_texture(iid):
         for y in range(6, S - 5, 4):
             d.line([(4, y), (13, y)], fill=(240, 120, 120, 255))
             d.line([(18, y), (S - 5, y)], fill=(120, 160, 240, 255))
-    elif iid == 'degenerate_casing':
-        d.rectangle([0, 0, S - 1, S - 1], fill=(64, 66, 76, 255))
-        for box in ((1, 1, 15, 15), (16, 1, S - 2, 15), (1, 16, 15, S - 2), (16, 16, S - 2, S - 2)):
-            bevel(d, box, (84, 86, 98), 0.2, 0.35)
-        d.line([(0, 15), (S - 1, 15)], fill=(236, 238, 240, 255))
-        d.line([(15, 0), (15, S - 1)], fill=(236, 238, 240, 255))
-        d.point((15, 15), fill=(255, 192, 96, 255))
     elif iid == 'mirror_plate':
         for y in range(S):
             for x in range(S):

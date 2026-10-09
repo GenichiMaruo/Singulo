@@ -187,6 +187,22 @@ def recipe_files():
             if slots > 9:
                 skipped.append(f'{name}（材料 {slots} 個で作業台に収まらない。組立台が必要）')
                 continue
+            if 'shape' in r:
+                # 形のあるレシピ（recipes.SHAPED の並び）
+                rows, key = r['shape']
+                width = max(len(row) for row in rows)
+                key_json = {}
+                for ch, mat in key.items():
+                    one, _, _ = item_inputs({mat: 1}, name)
+                    key_json[ch] = one[0]['ingredient']
+                add(f'crafting/{rid}', {
+                    'type': 'minecraft:crafting_shaped',
+                    'category': 'misc',
+                    'pattern': [row.ljust(width) for row in rows],
+                    'key': key_json,
+                    'result': {'id': result_id, 'count': r['out']},
+                })
+                continue
             ingredients = []
             for i in items:
                 ingredients += [i['ingredient']] * i['count']
@@ -285,7 +301,7 @@ UI_LANG = {
     # key: (ja, en)
     'itemGroup.singulo': ('Singulo', 'Singulo'),
     'tooltip.singulo.stage': ('段階%s: %s', 'Stage %s: %s'),
-    'tooltip.singulo.planned': ('この装置の動作は未実装（素材としてのみ使える）', 'Not functional yet (crafting material only)'),
+    'tooltip.singulo.planned': ('動作は未実装。素材として使える', 'Not functional yet; usable as a material'),
     'tooltip.singulo.uses': ('使用回数 %s / %s', 'Uses %s / %s'),
     'tooltip.singulo.lifetime': ('寿命 %s / %s', 'Lifetime %s / %s'),
     'tooltip.singulo.repairs': ('修復 %s / %s 回', 'Repaired %s / %s times'),
@@ -305,7 +321,7 @@ UI_LANG = {
     'gui.singulo.thermo.cold': ('低温側 %s K', 'Cold side %s K'),
     'gui.singulo.thermo.delta': ('温度差 %s K', 'Delta T %s K'),
     'gui.singulo.thermo.none': ('熱源か低温源が隣にない', 'No heat source or heat sink adjacent'),
-    'gui.singulo.thermo.melting': ('低温源が溶けている（維持できる温度差 %s K）', 'Heat sink is melting (holds up to %s K)'),
+    'gui.singulo.thermo.melting': ('低温源が溶けている　保てる温度差 %s K', 'Cold side melting: %s K difference'),
     'gui.singulo.status.idle': ('待機', 'Idle'),
     'gui.singulo.status.running': ('稼働', 'Running'),
     'gui.singulo.status.no_power': ('電力不足', 'Not enough power'),
@@ -314,22 +330,22 @@ UI_LANG = {
     'gui.singulo.structure.cryogenic_cooling_tower': ('高さ %s', 'Height %s'),
     'gui.singulo.structure.particle_accelerator': ('一辺 %s', 'Side %s'),
     'gui.singulo.thermo.coolant': ('液体窒素 %s mB', 'Liquid nitrogen %s mB'),
-    'gui.singulo.muon_collector.rate': ('収集速度 %s%%（空の下、Y=200以上で最大）', 'Collection rate %s%% (max under open sky at Y≥200)'),
+    'gui.singulo.muon_collector.rate': ('収集速度 %s%%', 'Collection %s%%'),
     'gui.singulo.anchor.status': ('半径 %s チャンク ・ %s ・ %s FE/t ・ 蓄電 %s FE',
                                   'Radius %s chunks · %s · %s FE/t · stored %s FE'),
     'gui.singulo.anchor.no_catalyst': ('触媒なし', 'No catalyst'),
     'gui.singulo.structure.degenerate_compactor': ('3×3×3', '3×3×3'),
     'gui.singulo.reactor.state.unformed': ('未形成', 'Not formed'),
     'gui.singulo.reactor.state.dormant': ('停止中', 'Dormant'),
-    'gui.singulo.reactor.state.igniting': ('点火中 %s%%（残り %s 秒）', 'Igniting %s%% (%s s left)'),
+    'gui.singulo.reactor.state.igniting': ('点火中 %s%%　あと %s 秒', 'Igniting %s%% · %s s'),
     'gui.singulo.reactor.state.running': ('稼働中', 'Running'),
     'gui.singulo.reactor.mass': ('炉心質量 %s', 'Core mass %s'),
-    'gui.singulo.reactor.spin': ('スピン %s（目標 %s）', 'Spin %s (target %s)'),
+    'gui.singulo.reactor.spin': ('スピン %s / 目標 %s', 'Spin %s / target %s'),
     'gui.singulo.reactor.eta': ('降着効率 %s%%', 'Accretion efficiency %s%%'),
     'gui.singulo.reactor.output': ('出力 %s FE/t', 'Output %s FE/t'),
     'gui.singulo.reactor.buffer': ('蓄電 %s GFE', 'Buffer %s GFE'),
     'gui.singulo.reactor.mode.power': ('発電モード', 'Power mode'),
-    'gui.singulo.reactor.mode.catalyst': ('触媒モード（ホーキング放射）', 'Catalyst mode (Hawking radiation)'),
+    'gui.singulo.reactor.mode.catalyst': ('触媒モード', 'Catalyst mode'),
     'gui.singulo.reactor.mode.ergo': ('エルゴ抽出モード', 'Ergo extraction mode'),
     'gui.singulo.reactor.mode.standby': ('待機', 'Standby'),
     'gui.singulo.reactor.mode.danger': ('蒸発の危険域', 'Evaporation danger zone'),
@@ -340,16 +356,14 @@ UI_LANG = {
     'gui.singulo.reactor.slot.collectors': ('抽出装置', 'Collectors'),
     'gui.singulo.reactor.burst': ('炉心が蒸発しきった。シンギュラリティ・コアと点火電力で再起動できる',
                                   'The core evaporated. Restart it with a Singularity Core and ignition power'),
-    'gui.singulo.reactor.ignition_failed': ('点火に失敗した（時間内に電力が足りなかった）',
-                                            'Ignition failed (not enough power in time)'),
+    'gui.singulo.reactor.ignition_failed': ('点火失敗　電力が間に合わなかった', 'Ignition failed: not enough power in time'),
     'gui.singulo.structure.casimir_cavity': ('5×5×5', '5×5×5'),
-    'gui.singulo.device.no_fuel': ('燃料（圧縮ブロックLv2）がない', 'No fuel (Compressed Block Lv2)'),
+    'gui.singulo.device.no_fuel': ('燃料がない', 'No fuel'),
     'gui.singulo.device.fuel': ('燃料 %s 個', 'Fuel: %s'),
-    'gui.singulo.probe.no_target': ('飛べる遺構が登録されていない（発見した人が開くと登録される）',
-                                    'No ruins registered (opened by whoever discovered them)'),
+    'gui.singulo.probe.no_target': ('飛べる遺構がない', 'No known ruins'),
     'gui.singulo.probe.targets': ('登録した遺構 %s か所', '%s ruins registered'),
     'gui.singulo.probe.return': ('次の帰還まで %s 秒', 'Next return in %s s'),
-    'tooltip.singulo.mixed_source': ('混成（3種類以上の元ブロック）: 8個で Lv2 にできる', 'Mixed (3+ source blocks): 8 make a Lv2'),
+    'tooltip.singulo.mixed_source': ('混成: 8個で Lv2 になる', 'Mixed: 8 make a Lv2'),
     'gui.singulo.catalyst.slot': ('触媒', 'Catalyst'),
     'gui.singulo.catalyst.none': ('触媒を入れてください', 'Insert a catalyst'),
     'gui.singulo.catalyst.unusable': ('この触媒はティアが低すぎる', 'Catalyst tier too low'),
@@ -361,28 +375,25 @@ UI_LANG = {
     'gui.singulo.device.output': ('出力 %s FE/t', 'Output %s FE/t'),
     'tooltip.singulo.energy': ('蓄電 %s / %s FE', 'Energy %s / %s FE'),
     'tooltip.singulo.gauntlet.mode': ('モード: %s', 'Mode: %s'),
-    'tooltip.singulo.gauntlet.hint': ('右クリック長押しで対象を操る。スニーク＋右クリックでモード切替。電力を持つブロックにスニーク＋右クリックで充電',
-                                      'Hold right-click to control a target. Sneak + right-click to switch mode. Sneak + right-click an energy block to charge'),
+    'tooltip.singulo.gauntlet.hint': ('右クリック長押しで操る　スニーク＋右クリックでモード切替', 'Hold use to manipulate · Sneak-use to switch mode'),
     'gauntlet.singulo.mode.levitate': ('浮遊', 'Levitate'),
     'gauntlet.singulo.mode.pull': ('牽引', 'Pull'),
-    'gauntlet.singulo.no_target': ('対象がいない（HP 40以下・射程%sブロック）', 'No target (max 40 HP, %s blocks)'),
+    'gauntlet.singulo.no_target': ('対象がいない', 'No target'),
     'gauntlet.singulo.no_energy': ('電力がない', 'Out of energy'),
     'gauntlet.singulo.charged': ('%s FE 充電した', 'Charged %s FE'),
     'gauntlet.singulo.mode.repel': ('斥力', 'Repel'),
     'gauntlet.singulo.mode.crush': ('圧壊', 'Crush'),
-    'gauntlet.singulo.no_target_manipulator': ('対象がいない（射程%sブロック）', 'No target (%s blocks)'),
+    'gauntlet.singulo.no_target_manipulator': ('対象がいない', 'No target'),
     'gauntlet.singulo.no_exotic': ('エキゾチック物質がない', 'No exotic matter'),
     'tooltip.singulo.exotic_charge': ('エキゾチック物質の残り: %s 秒', 'Exotic charge: %s s'),
     'metric_drive.singulo.mode.off': ('停止', 'Off'),
     'metric_drive.singulo.mode.low_gravity': ('低重力', 'Low gravity'),
-    'metric_drive.singulo.mode.zero_g': ('無重力（飛行）', 'Zero-G (flight)'),
-    'metric_drive.singulo.mode.high_gravity': ('高重力（ノックバック無効）', 'High gravity (no knockback)'),
+    'metric_drive.singulo.mode.zero_g': ('無重力', 'Zero-G'),
+    'metric_drive.singulo.mode.high_gravity': ('高重力', 'High gravity'),
     'metric_drive.singulo.no_exotic': ('メトリック・ドライブ: エキゾチック物質がない', 'Metric Drive: no exotic matter'),
-    'tooltip.singulo.metric_drive.hint': ('持ち物に入れておくと効く。右クリックでモード切替。動いている間エキゾチック物質を少しずつ使う',
-                                         'Works from your inventory. Right-click to switch modes. Uses exotic matter while active'),
-    'gui.singulo.anchor.core_embedded': ('シンギュラリティ・コア埋め込み済み（消費なし）', 'Singularity Core embedded (no upkeep)'),
-    'gui.singulo.anchor.confirm_embed': ('もう一度右クリックでコアを埋め込む（二度と取り出せない）',
-                                         'Right-click again to embed the core (it can never be removed)'),
+    'tooltip.singulo.metric_drive.hint': ('持っているだけで効く　右クリックでモード切替', 'Works from your inventory · Use to switch mode'),
+    'gui.singulo.anchor.core_embedded': ('コア埋め込み済み', 'Core embedded'),
+    'gui.singulo.anchor.confirm_embed': ('もう一度右クリックで埋め込む　取り出せなくなる', 'Use again to embed. It cannot be removed'),
     'gui.singulo.anchor.embedded': ('シンギュラリティ・コアを埋め込んだ', 'Singularity Core embedded'),
     'gui.singulo.anchor.already_embedded': ('すでにコアが埋め込まれている', 'A core is already embedded'),
     'gui.singulo.shield.basic': ('守り: 爆発・モブの荒らし', 'Guards: explosions, mob griefing'),
@@ -400,17 +411,15 @@ UI_LANG = {
     'multiblock.singulo.tipler_cylinder': ('Tシリンダー', 'T-Cylinder'),
     'multiblock.singulo.wormhole_generator': ('ワームホール生成器', 'Wormhole Generator'),
     'holo.singulo.not_controller': ('マルチブロックのコントローラに使う', 'Use it on a multiblock controller'),
-    'holo.singulo.header': ('%s（大きさ %s）に必要なブロック:', 'Blocks needed for %s (size %s):'),
-    'holo.singulo.line': ('  %s: %s 個（足りない %s 個）', '  %s: %s (missing %s)'),
-    'holo.singulo.blocking': ('空けるべき場所にブロックが %s 個ある（赤い枠）', '%s blocks are in the way (red boxes)'),
+    'holo.singulo.header': ('%s　大きさ %s　必要なブロック:', '%s · size %s · blocks needed:'),
+    'holo.singulo.line': ('  %s: %s 個　あと %s 個', '  %s: %s, %s missing'),
+    'holo.singulo.blocking': ('じゃまなブロックが %s 個ある', '%s blocks in the way'),
     'holo.singulo.complete': ('形が完成している', 'The structure is complete'),
     'tooltip.singulo.holo_projector.hint': ('コントローラに右クリックで投影、もう一度で消す。スニーク＋右クリックで大きさ切替',
                                            'Right-click a controller to project; again to hide. Sneak to change size'),
     'command.singulo.build.unknown': ('知らないマルチブロック: %s', 'Unknown multiblock: %s'),
     'command.singulo.build.size': ('その大きさは使えない: %s', 'Invalid size: %s'),
-    'command.singulo.build.done': ('%s（大きさ %s）を組み立てた（%s ブロック）', 'Built %s (size %s, %s blocks)'),
-    # 説明・ハンドブック
-    'tooltip.singulo.more': ('Shift で作り方と使い道', 'Hold Shift for recipe and uses'),
+    'command.singulo.build.done': ('%s を組み立てた　%s ブロック', 'Built %s with %s blocks'),
     'gui.singulo.handbook.title': ('Singulo ハンドブック', 'Singulo Handbook'),
     'gui.singulo.handbook.progress': ('進み具合', 'Progress'),
     'gui.singulo.handbook.records': ('旧文明の記録', 'Ancient Records'),
@@ -427,9 +436,43 @@ UI_LANG = {
     'tooltip.singulo.magnetic_bottle': ('残り %s / %s 回', '%s / %s uses left'),
     'message.singulo.neutrino_scan': ('鉱石 %s 個・遺構のブロック %s 個が見えた', 'Found %s ores and %s ruin blocks'),
     'message.singulo.hydrogen_leak': ('水素が漏れて引火した！', 'Leaking hydrogen ignited!'),
-    'gui.singulo.slot.catalyst': ('触媒スロット（触媒だけが入る）', 'Catalyst slot (catalysts only)'),
-    'gui.singulo.slot.upgrade': ('単極子アップグレード（速度×2・電力効率+50%）', 'Monopole upgrade (×2 speed, +50% efficiency)'),
-    'gui.singulo.sides.button': ('面の設定（搬入出と自動排出）', 'Side configuration (I/O and auto-eject)'),
+    'gui.singulo.slot.catalyst': ('触媒', 'Catalyst'),
+    'gui.singulo.slot.fuel': ('燃料', 'Fuel'),
+    'gui.singulo.slot.permit': ('許可証', 'Permit'),
+    'gui.singulo.shield.permit_on': ('許可証: %s人だけが中で作業できる', 'Permit: only %s players may build inside'),
+    'gui.singulo.shield.permit_off': ('許可証なし', 'No permit'),
+    'gui.singulo.shield.locked': ('許可証に登録されていない', 'Not on the permit'),
+    'item.singulo.shield_permit.added': ('%s を登録した　%s人', 'Registered %s · %s'),
+    'item.singulo.shield_permit.already': ('%s は登録済み　%s人', '%s already registered · %s'),
+    'item.singulo.shield_permit.reset': ('登録を %s だけにした', 'Only %s is registered now'),
+    'item.singulo.shield_permit.empty': ('まだだれも登録されていない', 'Nobody registered yet'),
+    'item.singulo.shield_permit.members': ('登録: %s人', 'Registered: %s'),
+    'item.singulo.shield_permit.more': ('ほか %s人', '%s more'),
+    'item.singulo.shield_permit.hint': ('右クリックで自分を、相手に右クリックでその人も登録', 'Use to register yourself; use on a player to add them'),
+    'gui.singulo.reactor.interval': ('投入間隔', 'Feed interval'),
+    'gui.singulo.reactor.interval.hint': ('0 で自動', '0 = auto'),
+    'gui.singulo.reactor.collapse': ('炉が質量に耐えきれず崩壊していく！', 'The reactor is collapsing under the mass!'),
+    'gui.singulo.reactor.recaptured': ('野良ブラックホールを炉心に取り込んだ', 'The rogue black hole is now the core'),
+    'block.singulo.rogue_black_hole': ('野良ブラックホール', 'Rogue Black Hole'),
+    'item.singulo.settings_card.copied': ('設定を写した', 'Settings copied'),
+    'item.singulo.settings_card.pasted': ('設定を貼った', 'Settings pasted'),
+    'item.singulo.settings_card.empty': ('まだ何も写していない', 'Nothing copied yet'),
+    'item.singulo.settings_card.mismatch': ('種類の違う装置には貼れない', 'Different kind of machine'),
+    'item.singulo.settings_card.blank': ('空', 'Blank'),
+    'item.singulo.settings_card.holds.machine': ('装置の面の設定', 'Machine side settings'),
+    'item.singulo.settings_card.holds.reactor': ('Pリアクターの設定', 'P-Reactor settings'),
+    'item.singulo.settings_card.hint': ('スニークして使うと写す　そのまま使うと貼る', 'Sneak-use to copy · Use to paste'),
+    'gui.singulo.observatory.on': ('表示 入　鉱石 %s　遺構 %s', 'Display on · ores %s · ruins %s'),
+    'gui.singulo.observatory.off': ('表示 切', 'Display off'),
+    'command.singulo.blackhole.done': ('%s, %s, %s に野良ブラックホールを出した　質量 %s', 'Rogue black hole at %s, %s, %s · mass %s'),
+    'gui.singulo.reactor.slot.0': ('特異点の種', 'Singularity seed'),
+    'gui.singulo.reactor.slot.1': ('質量ペレット', 'Mass pellets'),
+    'gui.singulo.reactor.slot.2': ('ジェット・コレクター', 'Jet collectors'),
+    'gui.singulo.reactor.slot.3': ('Hコレクター', 'H-collector'),
+    'gui.singulo.reactor.slot.4': ('エルゴスフィア・リング', 'Ergosphere ring'),
+    'gui.singulo.reactor.slot.5': ('副産物', 'By-products'),
+    'gui.singulo.slot.upgrade': ('単極子アップグレード', 'Monopole upgrade'),
+    'gui.singulo.sides.button': ('面の設定', 'Sides'),
     'gui.singulo.sides.items': ('アイテム', 'Items'),
     'gui.singulo.sides.fluids': ('液体', 'Fluids'),
     'gui.singulo.sides.legend': ('灰:無効 青:入力 橙:出力 緑:入出力', 'Grey off · Blue in · Orange out · Green both'),
@@ -447,9 +490,9 @@ UI_LANG = {
     'gui.singulo.sides.eject_off': ('自動排出: オフ', 'Auto-eject: off'),
     'gui.singulo.sides.master_on': ('自動排出 オン', 'Auto-eject ON'),
     'gui.singulo.sides.master_off': ('自動排出 オフ', 'Auto-eject OFF'),
-    'gui.singulo.sides.hint': ('左クリック: 切り替え／右クリック: 自動排出', 'Left-click: cycle · Right-click: auto-eject'),
+    'gui.singulo.sides.hint': ('ドラッグで回す　クリックで切り替え　右クリックで自動排出', 'Drag to rotate · click to change · right-click for auto-eject'),
     'gui.singulo.smes.in': ('受け取り: %s FE/t', 'In: %s FE/t'),
-    'gui.singulo.smes.out': ('送り出し: %s FE/t（正面から）', 'Out: %s FE/t (front face)'),
+    'gui.singulo.smes.out': ('送り出し %s FE/t', 'Output %s FE/t'),
     'gui.singulo.smes.hint': ('最大 %s FE/t。正面以外の5面から受け取る', 'Up to %s FE/t. Receives on the other five faces'),
     'ruin.singulo.observation_post': ('地表観測拠点', 'Observation Post'),
     'ruin.singulo.research_building': ('研究棟', 'Research Building'),
@@ -464,64 +507,63 @@ UI_LANG = {
     'tooltip.singulo.builder_wand.size': ('大きさ: %s', 'Size: %s'),
     'tooltip.singulo.creative_energy.hint': ('無限の電力を隣へ送っている', 'Pushing infinite energy to neighbours'),
     'pack.singulo.hd': ('Singulo HD（32×32 のテクスチャ）', 'Singulo HD (32×32 textures)'),
-    'jei.singulo.uses': ('使用回数を %s 使う（なくならない）', 'Uses %s durability (not consumed)'),
+    'jei.singulo.uses': ('使用回数を %s 使う', 'Uses %s'),
     'jei.singulo.mass': ('質量 %s', 'Mass %s'),
     'jei.singulo.metal_mass': ('金属質量 %s', 'Metal mass %s'),
     'jei.singulo.time_energy': ('%s 秒・%s FE/t', '%s s · %s FE/t'),
     'jei.singulo.min_size': ('大きさ %s 以上', 'Size %s+'),
     'jei.singulo.found_prefix': ('入手', 'Found in'),
     'gauntlet.singulo.left_click': ('左クリックを押している間、重力を操る', 'Hold left-click to manipulate gravity'),
-    'gauntlet.singulo.charging': ('ためている… %s%%（離すと投げる）', 'Charging… %s%% (release to throw)'),
-    'gauntlet.singulo.thrown': ('投げた！（力 %s%%）', 'Thrown! (power %s%%)'),
-    'gauntlet.singulo.nothing_held': ('持ち上げている対象がいない（浮遊モードで左クリック）', 'Nothing held (left-click in levitate mode)'),
-    'tooltip.singulo.manipulator.hint': ('左クリック長押しで重力を操る。浮遊中に右クリック長押しでため、離すと投げ飛ばす。スニーク＋右クリックでモード切替',
-                                         'Hold left-click to manipulate. While levitating, hold right-click to charge and release to throw. Sneak + right-click: mode'),
+    'gauntlet.singulo.charging': ('ためている %s%%', 'Charging %s%%'),
+    'gauntlet.singulo.thrown': ('投げた！　%s%%', 'Thrown! %s%%'),
+    'gauntlet.singulo.nothing_held': ('何も持ち上げていない', 'Nothing held'),
+    'tooltip.singulo.manipulator.hint': ('左クリック長押しで操る　浮遊中に右クリック長押しでため、離して投げる', 'Hold attack to manipulate · Hold use to charge, release to throw'),
     'jei.singulo.multiblock': ('マルチブロック装置', 'Multiblock Structures'),
-    'jei.singulo.mb.cooling_tower': ('■ 組み立て: 3×3、高さ5〜15の塔。下の形は高さ5のとき\n■ 起動: 電力をつなぐだけ（レシピ装置）\n■ 速さ: 高さ÷5 倍（高さ15で3倍）\n■ 高さ10以上: 液体ヘリウムのレシピが使える\n■ 消費: レシピごとの電力・材料', '■ Build: 3×3 tower, 5-15 tall. Parts shown for height 5\n■ Start: just supply power (recipe machine)\n■ Speed: height ÷ 5 (×3 at 15)\n■ Height ≥10: unlocks liquid helium recipes\n■ Uses: power and inputs per recipe'),
-    'jei.singulo.mb.particle_accelerator': ('■ 組み立て: 一辺8〜32の正方形の環。下は一辺8のとき\n■ 起動: 電力をつなぐだけ（レシピ装置）\n■ 速さ: 一辺÷8 倍\n■ 副産物: 磁気単極子 0.1%×一辺÷32\n■ 危険: 一辺24以上で電力バッファが20%未満だとストレンジレットが出ることがある', '■ Build: square ring, side 8-32. Parts shown for side 8\n■ Start: just supply power (recipe machine)\n■ Speed: side ÷ 8\n■ Byproduct: monopole 0.1% × side/32\n■ Hazard: side ≥24 with buffer <20% may spawn a strangelet'),
-    'jei.singulo.mb.degenerate_compactor': ('■ 組み立て: 3×3×3\n■ 起動: 電力をつなぐだけ（レシピ装置）\n■ 消費: レシピごとの電力・材料（コントローラーで調べるとレシピ一覧）', '■ Build: 3×3×3\n■ Start: just supply power (recipe machine)\n■ Uses: power and inputs per recipe (see controller recipes)'),
-    'jei.singulo.mb.casimir_cavity': ('■ 組み立て: 5×5×5\n■ 起動: 電力をつなぐ。触媒スロットに触媒を入れる（レシピ装置）\n■ 消費: レシピごとの電力・材料・触媒の使用回数', '■ Build: 5×5×5\n■ Start: supply power, put a catalyst in its slot (recipe machine)\n■ Uses: power, inputs and catalyst uses per recipe'),
-    'jei.singulo.mb.degenerate_furnace': ('■ 組み立て: 7×7、高さ9の炉\n■ 起動: 触媒スロットに時間結晶、燃料を入れると自動で燃える\n■ 燃料: 圧縮ブロック Lv2（10秒に1個）\n■ 出力: 20 MFE/t × 触媒の速さ', '■ Build: 7×7 furnace, 9 tall\n■ Start: time crystal in the catalyst slot, then add fuel\n■ Fuel: compressed block Lv2 (1 per 10 s)\n■ Output: 20 MFE/t × catalyst speed'),
-    'jei.singulo.mb.penrose_reactor': ('■ 組み立て: 13×13×13 の連続したリング（3面）＋殻\n■ 点火: 種の特異点を入れ、10秒以内に 50 GFE を入れる（ホライズン級の導線が必要）\n■ 燃料: 質量ペレット\n■ 効率: 自転の速さで 5.7〜42.3%\n■ 上限: エディントン限界＝炉心質量1,000あたり毎秒1個\n■ 最大出力: 約 2.1 GFE/t\n■ 副産物: 取り出し口の収集器から\n■ 抽出ポート: リングの炉殻のどこにでも、好きな数だけ置ける（電力の搬入出・燃料・副産物）', '■ Build: 13×13×13 continuous rings (3 planes) + shells\n■ Ignite: insert a seed singularity, then 50 GFE within 10 s (horizon bus needed)\n■ Fuel: mass pellets\n■ Efficiency: 5.7-42.3% by spin\n■ Limit: Eddington — 1 pellet/s per 1000 core mass\n■ Max output: about 2.1 GFE/t\n■ Byproducts: from the collectors at the ports\n■ Extraction ports: replace any ring shell block, as many as you like (power in/out, fuel, byproducts)'),
-    'jei.singulo.mb.event_horizon_shield': ('■ 組み立て: 3×3、高さ9の塔\n■ 起動: 触媒スロットに時間結晶か特異点コア、電力をつなぐ\n■ 消費: 16,384 FE/t（半径の二乗に比例）\n■ 効果: 半径32の中の装置を守り、強化する', '■ Build: 3×3 tower, 9 tall\n■ Start: time crystal or singularity core in the catalyst slot, plus power\n■ Uses: 16,384 FE/t (∝ radius²)\n■ Effect: protects and boosts machines within radius 32'),
-    'jei.singulo.mb.tipler_cylinder': ('■ 組み立て: 3×3、高さ7の円柱\n■ 起動: 触媒スロットに時間結晶、燃料と電力を入れる\n■ 燃料: エキゾチック物質（1分に1個）\n■ 消費: 100 kFE/t\n■ 効果: 半径8の中の装置が 2倍速', '■ Build: 3×3 column, 7 tall\n■ Start: time crystal in the catalyst slot, fuel and power\n■ Fuel: exotic matter (1 per minute)\n■ Uses: 100 kFE/t\n■ Effect: machines within radius 8 run ×2'),
-    'jei.singulo.mb.wormhole_generator': ('■ 組み立て: 3×3×3\n■ 起動: 100 MFE/t を10秒入れ続ける（トポロジカル導線で足りる。設定 wormholeGeneratorPower）\n■ 結果: つながった一対のワームホールの口ができる\n■ 入出力口: 外殻の代わりにどこにでも置ける（電力を入れ、できた口を取り出す）', '■ Build: 3×3×3\n■ Start: feed 100 MFE/t for 10 s (topological cable is enough; config wormholeGeneratorPower)\n■ Result: a linked pair of wormhole mouths\n■ I/O ports: replace any casing block (power in, mouths out)'),
-    'message.singulo.multiblock.not_formed': ('%s はまだ未完成（ホロ投影機かJEIで形を確かめよう）', '%s is not formed yet (check the shape with the Holo Projector or JEI)'),
+    'jei.singulo.mb.cooling_tower': ('■ 形: くびれた塔　高さ7〜15\n■ 速さ: 高さ÷5 倍\n■ 高さ10以上: 液体ヘリウム', '■ Shape: waisted tower, 7–15 high\n■ Speed: height ÷ 5\n■ 10+ high: liquid helium'),
+    'jei.singulo.mb.particle_accelerator': ('■ 形: 一辺8〜32の正方形の環\n■ 速さ: 一辺÷8 倍\n■ 副産物: 磁気単極子\n■ 危険: 大きな環で電力が減るとストレンジレットが出る', '■ Shape: square ring, side 8–32\n■ Speed: side ÷ 8\n■ By-product: magnetic monopoles\n■ Danger: strangelets when a large ring runs low on power'),
+    'jei.singulo.mb.degenerate_compactor': ('■ 形: 5×5×5 の閉じたプレス\n■ 起動: 電力をつなぐ', '■ Shape: closed 5×5×5 press\n■ Start: connect power'),
+    'jei.singulo.mb.casimir_cavity': ('■ 形: 5×5×5 の真空容器\n■ 起動: 電力と触媒', '■ Shape: 5×5×5 vacuum vessel\n■ Start: power and a catalyst'),
+    'jei.singulo.mb.degenerate_furnace': ('■ 形: 5×5×7 の閉じた炉\n■ 起動: 時間結晶触媒と燃料\n■ 燃料: 圧縮ブロック Lv2\n■ 出力: 20 MFE/t', '■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 20 MFE/t'),
+    'jei.singulo.mb.penrose_reactor': ('■ 形: 交わる3本のリング　13×13×13\n■ 点火: 種を入れ、50 GFE を注ぐ\n■ 燃料: 質量ペレット\n■ 最大出力: 約 2.1 GFE/t', '■ Shape: three crossing rings, 13×13×13\n■ Ignite: insert a seed and pour in 50 GFE\n■ Fuel: mass pellets\n■ Max output: about 2.1 GFE/t'),
+    'jei.singulo.mb.event_horizon_shield': ('■ 形: 基壇から尖塔へすぼまる塔　高さ9\n■ 起動: 時間結晶触媒かシンギュラリティ・コアと電力\n■ 効果: 半径32を守る', '■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32'),
+    'jei.singulo.mb.tipler_cylinder': ('■ 形: 5×5×9 の格納筒\n■ 起動: 時間結晶触媒・燃料・電力\n■ 燃料: エキゾチック物質\n■ 効果: 半径16が2倍速', '■ Shape: 5×5×9 housing\n■ Start: time crystal catalyst, fuel and power\n■ Fuel: exotic matter\n■ Effect: ×2 speed within 16'),
+    'jei.singulo.mb.wormhole_generator': ('■ 形: 5×5×5 の球\n■ 起動: 100 MFE/t を10秒\n■ 結果: 一対のワームホールの口', '■ Shape: 5×5×5 sphere\n■ Start: 100 MFE/t for 10 s\n■ Result: a pair of wormhole mouths'),
+    'message.singulo.multiblock.not_formed': ('%s はまだ未完成', '%s is not complete yet'),
     'message.singulo.welcome': ('Singulo ハンドブックを受け取った。右クリックで開ける', 'You received the Singulo Handbook. Right-click to open it'),
     'gauntlet.singulo.area.cone': ('範囲: 前方の円錐', 'Area: forward cone'),
     'key.singulo.toggle_area': ('重力操作の範囲を切り替え', 'Toggle gravity tool area'),
     'key.categories.singulo': ('Singulo', 'Singulo'),
     'tooltip.singulo.dark_matter': ('ダークマター: %s mB', 'Dark matter: %s mB'),
-    'gui.singulo.containment.status': ('ダークマター %s / %s mB（閉じ込め中）', 'Dark matter %s / %s mB (contained)'),
-    'gui.singulo.containment.leaking': ('ダークマター %s / %s mB（電力不足で漏れている）', 'Dark matter %s / %s mB (leaking: no power)'),
+    'gui.singulo.containment.status': ('ダークマター %s / %s mB', 'Dark matter %s / %s mB'),
+    'gui.singulo.containment.leaking': ('ダークマター %s / %s mB　漏れている', 'Dark matter %s / %s mB · leaking'),
     'gui.singulo.halo.no_core': ('%s ブロック以内に稼働中の炉心がない', 'No running core within %s blocks'),
-    'gui.singulo.halo.status': ('収集 %s mB/秒（中 %s mB、毎秒2%%漏れる）', 'Collecting %s mB/s (holding %s mB, leaks 2%%/s)'),
+    'gui.singulo.halo.status': ('収集 %s mB/秒　中に %s mB', 'Collecting %s mB/s · %s mB inside'),
     'tooltip.singulo.wormhole.unstable': ('不安定: あと %s 秒で消える', 'Unstable: collapses in %s s'),
     'gui.singulo.wormhole.mouth_collapsed': ('不安定なワームホールの口が崩壊した', 'An unstable wormhole mouth collapsed'),
     'gui.singulo.wormhole.generated': ('一対の口ができた。%s 秒以内に固定化すること', 'A pair of mouths formed. Stabilize within %s s'),
-    'gui.singulo.wormhole.generator': ('生成 %s / %s 秒（毎tick 100 MFE が必要）', 'Generating %s / %s s (needs 100 MFE/t)'),
-    'gui.singulo.device.not_formed': ('未完成（形を確かめよう）', 'Not formed'),
+    'gui.singulo.wormhole.generator': ('生成 %s / %s 秒', 'Generating %s / %s s'),
+    'gui.singulo.device.not_formed': ('未完成', 'Incomplete'),
     'gui.singulo.device.generator.idle': ('電力を10秒注ぐと口ができる', 'Feed power for 10 s'),
     'gui.singulo.device.generator.working': ('生成中 %s / %s 秒', 'Generating %s / %s s'),
-    'gui.singulo.device.generator.done': ('口ができた（取り出して固定化）', 'Mouths ready - stabilize them'),
-    'gui.singulo.device.generator.input': ('入力 %sFE/t （必要 %sFE/t）', 'Input %sFE/t (need %sFE/t)'),
+    'gui.singulo.device.generator.done': ('口ができた', 'Mouths ready'),
+    'gui.singulo.device.generator.input': ('入力 %sFE/t　必要 %sFE/t', 'Input %sFE/t · need %sFE/t'),
     'gui.singulo.device.generator.expires': ('残り %s秒', '%ss left'),
     'gui.singulo.device.mouth.size': ('喉 %s×%s → 目標 %s×%s', 'Throat %sx%s -> %sx%s'),
     'gui.singulo.device.mouth.no_partner': ('対の口がない', 'No partner'),
-    'gui.singulo.device.mouth.unloaded': ('対 %s, %s, %s（未読込）', 'Pair %s,%s,%s (unloaded)'),
+    'gui.singulo.device.mouth.unloaded': ('対 %s, %s, %s　未読込', 'Pair %s, %s, %s · unloaded'),
     'gui.singulo.device.mouth.linked': ('対 %s, %s, %s', 'Pair %s,%s,%s'),
-    'gui.singulo.device.mouth.cross': ('別の次元（維持3倍）', 'Cross-dimension (x3)'),
+    'gui.singulo.device.mouth.cross': ('別の次元', 'Other dimension'),
     'gui.singulo.device.mouth.bandwidth': ('%sFE・%s個・%smB /t', '%sFE, %s items, %smB /t'),
     'gui.singulo.device.mouth.upkeep': ('1個で %s 分もつ', '1 lasts %s min'),
     'gui.singulo.device.mouth.upkeep_none': ('維持なし', 'No upkeep'),
     'gui.singulo.device.mouth.starving': ('燃料切れ: %s秒で縮む', 'No fuel: shrinks in %ss'),
-    'gui.singulo.device.port.no_mouth': ('近くに口がない（8ブロック以内）', 'No mouth within 8 blocks'),
+    'gui.singulo.device.port.no_mouth': ('近くに口がない', 'No mouth nearby'),
     'gui.singulo.device.port.no_partner': ('口に対がない', 'Mouth has no partner'),
     'gui.singulo.device.port.linked': ('つながっている', 'Linked'),
     'gui.singulo.device.port.throat': ('喉 %s×%s', 'Throat %sx%s'),
     'gui.singulo.device.port.targets': ('向こう側: 電力%s・物%s・液体%s', 'Far side: %s power, %s items, %s fluids'),
     'gui.singulo.device.port.hint': ('隣の装置が向こうとつながる', 'Neighbours link through'),
-    'gui.singulo.device.tank.amount': ('ダークマター %s / %s mB', 'Dark matter %s / %s mB'),
+    'gui.singulo.device.tank.label': ('ダークマター', 'Dark matter'),
     'gui.singulo.device.tank.contained': ('閉じ込め中', 'Contained'),
     'gui.singulo.device.tank.leaking': ('電力切れ: 毎秒1%%漏れている', 'No power: leaking 1%%/s'),
     'gui.singulo.device.tank.upkeep': ('場の維持 %s FE/t', 'Field upkeep %s FE/t'),
@@ -544,8 +586,7 @@ UI_LANG = {
     'gui.singulo.stabilizer.empty': ('空き', 'Empty'),
     'gui.singulo.stabilizer.fuel': ('エキゾチック物質', 'Exotic matter'),
     'gui.singulo.wormhole.stabilizer': ('固定化 %s%% / %s%%、エキゾチック物質 %s 個', 'Stabilizing %s%% / %s%%, exotic matter: %s'),
-    'gui.singulo.wormhole.status': ('喉 %1$s×%1$s（目標 %2$s×%2$s）、エキゾチック物質 %3$s 個。スニーク＋右クリックで目標を変更',
-                                    'Throat %1$s×%1$s (target %2$s×%2$s), exotic matter: %3$s. Sneak + right-click to change target'),
+    'gui.singulo.wormhole.status': ('喉 %1$s×%1$s　目標 %2$s×%2$s　エキゾチック物質 %3$s 個', 'Throat %1$s×%1$s · target %2$s×%2$s · exotic matter %3$s'),
     'gui.singulo.wormhole.no_partner': ('つながる口がない', 'No paired mouth'),
     'gui.singulo.wormhole.partner_unloaded': ('向こう側の口のチャンクが読み込まれていない', 'The paired mouth is not loaded'),
     'gui.singulo.wormhole_port.no_mouth': ('8ブロック以内に開いた口がない', 'No open mouth within 8 blocks'),
@@ -626,6 +667,19 @@ def lang_files():
 
 # ---------------------------------------------------------------- モデル・テクスチャ
 
+# マルチブロックのコントローラの、正面以外の外装（部品と同じテクスチャ）
+CONTROLLER_SKINS = {
+    'degenerate_furnace_controller': 'degenerate_furnace_shell',
+    'cooling_tower_controller': 'cooling_tower_casing',
+    'degenerate_compactor_controller': 'degenerate_compactor_plate',
+    'casimir_cavity_controller': 'casimir_cavity_wall',
+    'shield_tower_core': 'shield_tower_plinth',
+    'creative_energy_source': 'creative_energy_casing',
+    'tipler_core': 'tipler_housing',
+    'wormhole_generator_core': 'wormhole_generator_shell',
+}
+
+
 def models():
     boost_overlay_model()
     black_hole_item_models()
@@ -636,7 +690,9 @@ def models():
             continue
         if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass'):
             model = {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}}
-            if kind in ('part_glass', 'ruin_glass'):
+            if kind == 'part_glass':
+                model['render_type'] = 'minecraft:translucent'      # 色つきの半透明ガラス（中が見える）
+            elif kind == 'ruin_glass':
                 model['render_type'] = 'minecraft:cutout'
             write_json(ASSETS / 'models' / 'block' / f'{iid}.json', model)
             if iid == 'ruin_cache':
@@ -649,12 +705,16 @@ def models():
             else:
                 write_json(ASSETS / 'blockstates' / f'{iid}.json', {'variants': {'': {'model': f'{MODID}:block/{iid}'}}})
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
+            if iid in ('accelerator_tube', 'focusing_magnet'):
+                import accelerator_assets
+                accelerator_assets.models(ASSETS)
         elif kind == 'machine':
             if iid in CABLES:
                 cable_models(iid)
                 continue
             st = stage_of(name)
             import shapes
+            skin = CONTROLLER_SKINS.get(iid)
             for state in ('', '_on'):
                 els, has_glass = shapes.machine_elements(iid, on=state == '_on')
                 model = {
@@ -665,8 +725,13 @@ def models():
                                  'front': f'{MODID}:block/{iid}_front{state}', 'particle': f'{MODID}:block/machine_side_t{st}'},
                     'elements': els,
                 }
+                if skin:
+                    # マルチブロックのコントローラは、部品と同じ外装で包む（見た目をそろえる）
+                    for key in ('top', 'side', 'bottom', 'particle'):
+                        model['textures'][key] = f'{MODID}:block/{skin}'
                 if has_glass:
-                    model['render_type'] = 'minecraft:translucent'
+                    # 窓は切り抜きで描く（半透明にすると、ガラスが先に描かれたときに奥のくぼみが消えて向こうが透ける）
+                    model['render_type'] = 'minecraft:cutout'
                 write_json(ASSETS / 'models' / 'block' / f'{iid}{state}.json', model)
             multipart = []
             for facing, rot in (('north', 0), ('east', 90), ('south', 180), ('west', 270)):
@@ -899,11 +964,6 @@ def textures():
                 d.ellipse([2, 2, 13, 13], fill=(57, 66, 74, 255), outline=glow)
                 d.line([(2, 7), (13, 7)], fill=white)
                 d.line([(7, 2), (7, 13)], fill=white)
-            elif iid == 'degenerate_casing':
-                im = Image.new('RGBA', (16, 16), (52, 56, 64, 255))
-                d = ImageDraw.Draw(im)
-                d.rectangle([0, 0, 15, 15], outline=white)
-                d.rectangle([4, 4, 11, 11], outline=(110, 116, 126, 255))
             elif iid == 'mirror_plate':
                 for y in range(16):
                     c = 200 + int(50 * (1 - abs(y - 5) / 11))
@@ -1007,6 +1067,9 @@ def art_textures():
     hd = RES / 'resourcepacks' / 'singulo_hd'
     hb = hd / 'assets' / MODID / 'textures' / 'block'
     hi = hd / 'assets' / MODID / 'textures' / 'item'
+    import accelerator_assets
+    accelerator_assets.textures(tb, 16)
+    accelerator_assets.textures(hb, 32)
     write_json(hd / 'pack.mcmeta', {'pack': {'description': 'Singulo HD (32x32)', 'pack_format': 34}})
     for stage in range(1, 6):
         for face in ('side', 'top', 'bottom'):
@@ -1023,10 +1086,14 @@ def art_textures():
                 path = tb / f'{iid}_front{"_on" if on else ""}.png'
                 art16.save(sheet, path)
                 if frames > 1:
-                    write_json(Path(str(path) + '.mcmeta'), {'animation': {'frametime': 3, 'interpolate': False}})
+                    write_json(Path(str(path) + '.mcmeta'), {'animation': {'frametime': 6, 'interpolate': True}})
                 art.save(art.machine_front(iid, stage_of(name), on), hb / f'{iid}_front{"_on" if on else ""}.png')
+    # クリエイティブ電源の外装（星空がまたたく、動くテクスチャ）
+    art16.save(art16.creative_casing_sheet(), tb / 'creative_energy_casing.png')
+    write_json(tb / 'creative_energy_casing.png.mcmeta', {'animation': {'frametime': 4, 'interpolate': True}})
+    art.save(art16.creative_casing(0).resize((32, 32), __import__('PIL').Image.NEAREST), hb / 'creative_energy_casing.png')
     art16.save(art16.boost_overlay(), tb / 'boost_overlay.png')
-    write_json(tb / 'boost_overlay.png.mcmeta', {'animation': {'frametime': 2, 'interpolate': True}})
+    write_json(tb / 'boost_overlay.png.mcmeta', {'animation': {'frametime': 5, 'interpolate': True}})
     for name, (iid, _, kind) in MOD.items():
         if kind in ('part_block', 'part_glass'):
             art16.save(art16.part_texture(iid), tb / f'{iid}.png')
@@ -1999,7 +2066,6 @@ def validate():
         'exoticBatchSize': r['エキゾチック物質']['out'],
         'starsPerExoticBatch': r['エキゾチック物質']['inputs']['ネザースター'],
         'starsPerSingularityCore': r['シンギュラリティ・コア']['inputs']['ネザースター'],
-        'starsPerGravitonManipulator': r['グラビトン・マニピュレーター']['inputs']['ネザースター'],
         'artificialStarCoreJetCondensate': r['人工星核']['inputs']['ジェット凝縮体'],
         'sculkPerShard': r['残響の欠片']['inputs']['スカルク'],
         'timeCrystalGrowthTicks': r['時間結晶触媒']['t'] * 20,
@@ -2013,6 +2079,83 @@ def validate():
 
 
 # ---------------------------------------------------------------- main
+
+
+# わざと透ける（ガラス・重ね絵）以外のブロックのテクスチャ
+SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay')
+
+
+GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind == 'part_glass'}
+
+
+# 空のスロットに描く、入れる物のグレーの影（textures/gui/ghost/<id>.png）
+GHOSTS = {'singularity_seed': 'item', 'mass_pellet': 'item', 'jet_collector': 'item', 'hawking_collector': 'item',
+          'ergosphere_ring': 'item', 'exotic_matter': 'item', 'shield_permit': 'item', 'compressed_block_2': 'block'}
+
+
+def ghost_textures():
+    """アイテムの絵を、色を抜いた薄いグレーの影にする（入っていると見まちがえないように）。"""
+    from PIL import Image
+    for iid, kind in GHOSTS.items():
+        src = ASSETS / 'textures' / kind / f'{iid}.png'
+        im = Image.open(src).convert('RGBA').crop((0, 0, 16, 16))
+        px = im.load()
+        for y in range(16):
+            for x in range(16):
+                r, g, b, a = px[x, y]
+                if a == 0:
+                    continue
+                lum = 0.3 * r + 0.59 * g + 0.11 * b
+                v = int(96 + lum * 0.25)                         # 暗めのグレーで、濃淡だけ残す
+                px[x, y] = (v, v + 4, v + 8, int(a * 0.6))
+        out = ASSETS / 'textures' / 'gui' / 'ghost' / f'{iid}.png'
+        out.parent.mkdir(parents=True, exist_ok=True)
+        im.save(out)
+
+
+def alarm_assets():
+    """炉心質量警報器: 光っているときは別のモデル。"""
+    import art16
+    tb = ASSETS / 'textures' / 'block'
+    art16.save(art16.alarm_texture(True), tb / 'reactor_mass_alarm_on.png')
+    write_json(ASSETS / 'models' / 'block' / 'reactor_mass_alarm_on.json',
+               {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/reactor_mass_alarm_on'}})
+    write_json(ASSETS / 'blockstates' / 'reactor_mass_alarm.json', {'variants': {
+        'lit=false': {'model': f'{MODID}:block/reactor_mass_alarm'},
+        'lit=true': {'model': f'{MODID}:block/reactor_mass_alarm_on'}}})
+
+
+def rogue_black_hole_assets():
+    """野良ブラックホール: 見た目はブロックエンティティの描画だけ（ブロックのモデルは粒子用のテクスチャだけ）。"""
+    write_json(ASSETS / 'models' / 'block' / 'rogue_black_hole.json',
+               {'textures': {'particle': f'{MODID}:block/creative_energy_casing'}})
+    write_json(ASSETS / 'blockstates' / 'rogue_black_hole.json', {'variants': {'': {'model': f'{MODID}:block/rogue_black_hole'}}})
+
+
+def opaque_block_textures():
+    """ブロックのテクスチャの半透明の画素を不透明にする（色はそのまま）。
+    普通の不透明ブロックでは半透明は無視されて同じ見た目だが、ガラス窓のある装置（半透明で描く）では、
+    半透明の線から奥（隣のブロックの面は省かれている）が透けて見えてしまうため。"""
+    from PIL import Image
+    roots = [ASSETS / 'textures' / 'block',
+             RES / 'resourcepacks' / 'singulo_hd' / 'assets' / MODID / 'textures' / 'block']
+    for root in roots:
+        if not root.exists():
+            continue
+        for png in root.glob('*.png'):
+            if png.stem in SEE_THROUGH_BLOCK_TEXTURES or png.stem in GLASS_PARTS:
+                continue
+            im = Image.open(png).convert('RGBA')
+            px = im.load()
+            changed = False
+            for y in range(im.height):
+                for x in range(im.width):
+                    r, g, b, a = px[x, y]
+                    if 0 < a < 255:
+                        px[x, y] = (r, g, b, 255)
+                        changed = True
+            if changed:
+                im.save(png)
 
 def main():
     errs = validate()
@@ -2030,6 +2173,10 @@ def main():
     lang_files()
     models()
     textures()
+    opaque_block_textures()
+    ghost_textures()
+    rogue_black_hole_assets()
+    alarm_assets()
     tags()
     mass_values()
     thermal()
@@ -2037,7 +2184,10 @@ def main():
     java_content()
     java_config()
     write_json(RES / 'pack.mcmeta', {'pack': {'description': 'Singulo generated resources', 'pack_format': 34}})
-    print(f'レシピ {len(recipes)} 件を生成')
+    # レシピの画像と一覧（docs/recipes）
+    import recipe_images
+    images = recipe_images.render_all(RECIPES, ORDER, STAGE_NAMES)
+    print(f'レシピ {len(recipes)} 件を生成（画像 {images} 枚）')
     if skipped:
         print(f'\n生成しなかったレシピ {len(skipped)} 件:')
         for s in skipped:

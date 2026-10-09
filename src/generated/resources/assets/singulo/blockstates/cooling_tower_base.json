@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "singulo:block/cooling_tower_base"
+    }
+  }
+}

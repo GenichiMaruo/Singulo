@@ -1,13 +1,13 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t5",
-    "side": "singulo:block/machine_side_t5",
-    "bottom": "singulo:block/machine_bottom_t5",
+    "top": "singulo:block/shield_tower_plinth",
+    "side": "singulo:block/shield_tower_plinth",
+    "bottom": "singulo:block/shield_tower_plinth",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/shield_tower_core_front",
-    "particle": "singulo:block/machine_side_t5"
+    "particle": "singulo:block/shield_tower_plinth"
   },
   "elements": [
     {

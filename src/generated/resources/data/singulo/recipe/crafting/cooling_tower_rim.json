@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PWP"
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:steel_plate"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    }
+  },
+  "result": {
+    "id": "singulo:cooling_tower_rim",
+    "count": 4
+  }
+}

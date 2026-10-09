@@ -1,35 +1,22 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "SWS",
+    "WRW",
+    "SWS"
+  ],
+  "key": {
+    "S": {
       "tag": "c:ingots/steel"
     },
-    {
-      "tag": "c:ingots/steel"
-    },
-    {
-      "tag": "c:ingots/steel"
-    },
-    {
-      "tag": "c:ingots/steel"
-    },
-    {
+    "W": {
       "item": "singulo:white_ceramic_composite"
     },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
+    "R": {
       "tag": "c:dusts/redstone"
     }
-  ],
+  },
   "result": {
     "id": "singulo:basic_frame",
     "count": 1

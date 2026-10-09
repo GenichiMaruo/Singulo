@@ -1,13 +1,13 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t4",
-    "side": "singulo:block/machine_side_t4",
-    "bottom": "singulo:block/machine_bottom_t4",
+    "top": "singulo:block/degenerate_furnace_shell",
+    "side": "singulo:block/degenerate_furnace_shell",
+    "bottom": "singulo:block/degenerate_furnace_shell",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/degenerate_furnace_controller_front",
-    "particle": "singulo:block/machine_side_t4"
+    "particle": "singulo:block/degenerate_furnace_shell"
   },
   "elements": [
     {
@@ -193,5 +193,5 @@
       }
     }
   ],
-  "render_type": "minecraft:translucent"
+  "render_type": "minecraft:cutout"
 }

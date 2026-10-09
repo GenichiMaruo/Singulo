@@ -70,8 +70,15 @@ public final class SinguloBlockEntities {
             REGISTER.register("smes_module", () -> build(SmesCellBlockEntity.Module::new, SinguloBlocks.SMES_MODULE.get()));
 
     public static final Supplier<BlockEntityType<PortBlockEntity>> PORT = REGISTER.register("port",
-            () -> build(PortBlockEntity::new, SinguloBlocks.COOLING_TOWER_PORT.get(), SinguloBlocks.EXTRACTION_PORT.get(),
-                    SinguloBlocks.WORMHOLE_GENERATOR_IO.get()));
+            () -> build(PortBlockEntity::new, SinguloBlocks.EXTRACTION_PORT.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity>> MULTIBLOCK_PORT =
+            REGISTER.register("multiblock_port", () -> build(io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity::new,
+                    SinguloBlocks.MULTIBLOCK_PORT.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity>> ROGUE_BLACK_HOLE =
+            REGISTER.register("rogue_black_hole", () -> build(io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity::new,
+                    SinguloBlocks.ROGUE_BLACK_HOLE.get()));
 
     public static final Supplier<BlockEntityType<PenroseReactorBlockEntity>> PENROSE_REACTOR = REGISTER.register(
             "penrose_reactor", () -> build(PenroseReactorBlockEntity::new, SinguloBlocks.CORE_CONTROLLER.get()));
@@ -147,6 +154,10 @@ public final class SinguloBlockEntities {
 
     public static final Supplier<BlockEntityType<SealConsoleBlockEntity>> SEAL_CONSOLE = REGISTER.register("seal_console",
             () -> build(SealConsoleBlockEntity::new, SinguloBlocks.SEAL_CONSOLE.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =
+            REGISTER.register("neutrino_observatory", () -> build(io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity::new,
+                    SinguloBlocks.NEUTRINO_OBSERVATORY.get()));
 
     public static final Supplier<BlockEntityType<GravitationalWaveDetectorBlockEntity>> GRAVITATIONAL_WAVE_DETECTOR =
             REGISTER.register("gravitational_wave_detector", () -> build(GravitationalWaveDetectorBlockEntity::new,

@@ -1,20 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "PMP",
+    " O "
+  ],
+  "key": {
+    "P": {
+      "item": "singulo:steel_plate"
+    },
+    "M": {
       "item": "singulo:magnetic_monopole"
     },
-    {
+    "O": {
       "item": "singulo:superconducting_coil"
-    },
-    {
-      "item": "singulo:steel_plate"
-    },
-    {
-      "item": "singulo:steel_plate"
     }
-  ],
+  },
   "result": {
     "id": "singulo:monopole_upgrade",
     "count": 1

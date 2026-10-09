@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IPI"
+  ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/iron"
+    },
+    "P": {
+      "item": "singulo:steel_plate"
+    }
+  },
+  "result": {
+    "id": "singulo:cooling_tower_grate",
+    "count": 4
+  }
+}

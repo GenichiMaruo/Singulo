@@ -75,11 +75,11 @@ CHAPTERS = [
     ]),
     ('stage2', 'singulo:superconducting_coil', '段階2 極低温', 'Stage 2: Cryogenic', [
         ('tower', '極低温冷却塔',
-         '3×3 の筒を高さ5〜15で積みます。外周は冷却塔外壁・ガラス・ポート、中心の列は熱交換コア（高さ−2個以上）。'
-         'コントローラは外周のどこか1つ。高いほど速く、高さ10以上で液体ヘリウムも作れます。\n'
+         '5×5 の土台から、くびれた双曲面の塔を高さ7〜15で建てます。中心の列は熱交換コア、てっぺんは通気格子でふさぎます。'
+         'コントローラは手前の面の下から2段目の中央。高いほど速く、高さ10以上で液体ヘリウムも作れます。\n'
          '何も入れなくても空気から液体窒素を作ります。銅・レッドストーン・鋼板・基板・制御ユニットと液体窒素で超伝導コイルを作ります。',
          'Cryogenic Cooling Tower',
-         'A 3×3 column, 5–15 high: casing/glass/ports around, heat exchange cores in the middle (height − 2 or more). '
+         'A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. '
          'It makes liquid nitrogen from air and superconducting coils.'),
         ('accelerator', '粒子加速器とミュオン触媒',
          '加速管と収束磁石で正方形のリング（一辺8〜32）を作り、コントローラをリングに接して置きます。四隅は収束磁石、'
@@ -130,22 +130,22 @@ CHAPTERS = [
         ('compression', '圧縮の連鎖',
          '圧縮機の質量モードで何でも「質量」に変え、圧縮ブロックLv1→Lv2→Lv3 と固めます。'
          '3種類以上の元ブロックから作った Lv1 は「混成」になり、8個で Lv2 にできます。金属だけを固めた金属圧縮ブロックもあります。\n'
-         '縮退圧縮炉（縮退炉外殻の 3×3×3 の箱）で、縮退物質殻やリアクターの炉殻を作ります。',
+         '縮退圧縮炉（5×5×5 の閉じたプレス）で、縮退物質殻やリアクターの炉殻を作ります。',
          'Compression chain',
          'Mass mode turns anything into compressed blocks, Lv1 to Lv3. Lv1 made from 3+ kinds of blocks is "mixed" and '
          'only 8 are needed for Lv2. The Degenerate Compactor (3×3×3 casing box) makes degenerate shells.'),
         ('time', '時間結晶とエキゾチック物質',
          '時間結晶育成槽は、実際に動いた時間で触媒を育てます（20分）。電力が足りないと純度が下がり、寿命も短くなります。\n'
-         'C空洞（5×5×5、上下が鏡面プレート）は、時間結晶触媒を使ってエキゾチック物質とアクシオン凝縮体を作ります。',
+         'C空洞（5×5×5 の真空容器、天面と底面の内側が鏡面）は、時間結晶触媒を使ってエキゾチック物質とアクシオン凝縮体を作ります。',
          'Time crystals and exotic matter',
          'The incubator grows time crystals over 20 minutes of real running time; underpowering lowers purity. '
          'The C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.'),
         ('power', '大型発電と自動化',
-         '・縮退熱炉（7×7×9）: 圧縮ブロックLv2 を押しつぶして 20 MFE/t。時間結晶触媒を使う。\n'
+         '・縮退熱炉（5×5×7）: 圧縮ブロックLv2 を押しつぶして 20 MFE/t。時間結晶触媒を使う。電力は搬入出ポートから自動で出る。\n'
          '・自動探査機ステーション: 発見済みの地表観測拠点へ探査機を飛ばし、回収物を半分の量で持ち帰る。\n'
          '・トポロジカル導線と SMESモジュールで大電力を運び、ためる。',
          'Big power and automation',
-         '- Degenerate Furnace (7×7×9): 20 MFE/t from Lv2 blocks.\n- Probe Station: automates trips to discovered ruins.\n'
+         '- Degenerate Furnace (5×5×7): 20 MFE/t from Lv2 blocks; power leaves through I/O ports.\n- Probe Station: automates trips to discovered ruins.\n'
          '- Topological wire and SMES modules for large power.'),
         ('goal', '段階5へ進むには',
          '最終実験施設（重力異常点）で封印コンソールに触れると、守護機ホライズン・ウォーデンが目覚めます。倒すと保管庫が開き、'
@@ -192,11 +192,11 @@ CHAPTERS = [
          '3. Fill the cyan boxes, clear the red ones. It lights up when complete.\n4. Sneak-use to change size.\n'
          'In creative: /singulo build <name> [size].'),
         ('list', 'マルチブロック一覧',
-         '・極低温冷却塔（3×3×5〜15）: cooling_tower\n・粒子加速器（リング8〜32）: particle_accelerator\n'
-         '・縮退圧縮炉（3×3×3）: degenerate_compactor\n・C空洞（5×5×5）: casimir_cavity\n'
-         '・縮退熱炉（7×7×9）: degenerate_furnace\n・Pリアクター（13×13×13）: penrose_reactor\n'
-         '・イベントホライズン・シールド発生塔（3×3×9）: event_horizon_shield\n・Tシリンダー（3×3×7）: tipler_cylinder\n'
-         '・ワームホール生成器（3×3×3）: wormhole_generator',
+         '・極低温冷却塔（5×5、高さ7〜15）: cooling_tower\n・粒子加速器（リング8〜32）: particle_accelerator\n'
+         '・縮退圧縮炉（5×5×5）: degenerate_compactor\n・C空洞（5×5×5）: casimir_cavity\n'
+         '・縮退熱炉（5×5×7）: degenerate_furnace\n・Pリアクター（13×13×13）: penrose_reactor\n'
+         '・イベントホライズン・シールド発生塔（5×5、高さ9）: event_horizon_shield\n・Tシリンダー（5×5×9）: tipler_cylinder\n'
+         '・ワームホール生成器（5×5×5の球）: wormhole_generator',
          'Multiblock list',
          'cooling_tower, particle_accelerator, degenerate_compactor, casimir_cavity, degenerate_furnace, penrose_reactor, '
          'event_horizon_shield, tipler_cylinder, wormhole_generator.'),
@@ -253,11 +253,11 @@ CHAPTERS = [
     ]),
     ('romance', 'singulo:tipler_core', '特異点技術', 'Singularity Tech', [
         ('shield', 'イベントホライズン・シールド',
-         '半径32の中を守る塔（3×3×9）。時間結晶触媒で爆発と荒らしを防ぎ、シンギュラリティ・コアなら敵の湧きと侵入も止める。電力16,384 FE/t。',
+         '半径32の中を守る塔（5×5、高さ9）。時間結晶触媒で爆発と荒らしを防ぎ、シンギュラリティ・コアなら敵の湧きと侵入も止める。電力16,384 FE/t。',
          'Event Horizon Shield', 'Protects a 32-block radius. With a Singularity Core it also blocks hostile spawns.'),
         ('tipler', 'Tシリンダー',
-         '半径8の時間を×2にする（3×3×7）。時間結晶触媒・エキゾチック物質（1分に1個）・100 kFE/t。',
-         'T-Cylinder', 'Doubles time within 8 blocks.'),
+         '半径16の時間を×2にする（5×5×9）。燃料と触媒はコアの画面から入れる。時間結晶触媒・エキゾチック物質（1分に1個）・100 kFE/t。',
+         'T-Cylinder', 'Doubles time within 16 blocks.'),
         ('gear', '身につける重力技術',
          '・メトリック・ドライブ: 持ち物に入れて、低重力・無重力（飛行）・高重力を切り替える。\n'
          '・グラビトン・マニピュレーター: 浮遊・牽引・斥力・圧壊。G キーで円錐範囲。\n'

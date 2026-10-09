@@ -74,28 +74,67 @@ public final class SinguloBlocks {
                 () -> new MultiblockControllerBlock(machineProperties(), MachineType.CASIMIR_CAVITY)));
     }
 
-    // ---- マルチブロックの部品
-    public static final DeferredBlock<PartBlock> COOLING_TOWER_CASING = part("cooling_tower_casing", MultiblockPart.Role.TOWER_CASING);
-    public static final DeferredBlock<GlassPartBlock> COOLING_TOWER_GLASS = BLOCKS.register("cooling_tower_glass",
-            () -> new GlassPartBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(2.0F, 6.0F)
-                    .sound(SoundType.GLASS).noOcclusion().isViewBlocking((s, l, p) -> false)
-                    .isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)));
-    public static final DeferredBlock<PartBlock> HEAT_EXCHANGE_CORE = part("heat_exchange_core", MultiblockPart.Role.HEAT_EXCHANGE_CORE);
-    public static final DeferredBlock<PortBlock> COOLING_TOWER_PORT = BLOCKS.register("cooling_tower_port",
-            () -> new PortBlock(partProperties(), MultiblockPart.Role.TOWER_PORT));
-    public static final DeferredBlock<PartBlock> ACCELERATOR_TUBE = part("accelerator_tube", MultiblockPart.Role.ACCELERATOR_TUBE);
-    public static final DeferredBlock<PartBlock> FOCUSING_MAGNET = part("focusing_magnet", MultiblockPart.Role.FOCUSING_MAGNET);
-    public static final DeferredBlock<PartBlock> DEGENERATE_CASING = part("degenerate_casing", MultiblockPart.Role.DEGENERATE_CASING);
-    public static final DeferredBlock<PartBlock> MIRROR_PLATE = part("mirror_plate", MultiblockPart.Role.MIRROR_PLATE);
-    public static final DeferredBlock<PartBlock> DEGENERATE_FURNACE_PISTON = part("degenerate_furnace_piston",
-            MultiblockPart.Role.FURNACE_PISTON);
+    // ---- マルチブロックの部品（決まった形のもの。形は multiblock/Shapes）
+    public static final DeferredBlock<PartBlock> COOLING_TOWER_BASE = part("cooling_tower_base", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> COOLING_TOWER_CASING = part("cooling_tower_casing", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> COOLING_TOWER_GLASS = glassPart("cooling_tower_glass");
+    public static final DeferredBlock<PartBlock> COOLING_TOWER_COOLANT_BAND = part("cooling_tower_coolant_band", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> COOLING_TOWER_RIM = part("cooling_tower_rim", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> COOLING_TOWER_GRATE = glassPart("cooling_tower_grate");
+    public static final DeferredBlock<PartBlock> HEAT_EXCHANGE_CORE = part("heat_exchange_core", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_COMPACTOR_FRAME = part("degenerate_compactor_frame", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_COMPACTOR_PLATE = part("degenerate_compactor_plate", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_COMPACTOR_RAM = part("degenerate_compactor_ram", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_COMPACTOR_ANVIL = part("degenerate_compactor_anvil", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_COMPACTOR_VENT = part("degenerate_compactor_vent", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> DEGENERATE_COMPACTOR_WINDOW = glassPart("degenerate_compactor_window");
+    public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_FRAME = part("casimir_cavity_frame", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_PUMP = part("casimir_cavity_pump", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> MIRROR_PLATE = part("mirror_plate", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_WALL = part("casimir_cavity_wall", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> CASIMIR_CAVITY_SHIELD = part("casimir_cavity_shield", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> CASIMIR_CAVITY_WINDOW = glassPart("casimir_cavity_window");
+    public static final DeferredBlock<PartBlock> DEGENERATE_FURNACE_FRAME = part("degenerate_furnace_frame", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_FURNACE_SHELL = part("degenerate_furnace_shell", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_FURNACE_PISTON = part("degenerate_furnace_piston", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_FURNACE_FIN = part("degenerate_furnace_fin", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> DEGENERATE_FURNACE_TUBE = part("degenerate_furnace_tube", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> DEGENERATE_FURNACE_WINDOW = glassPart("degenerate_furnace_window");
+    public static final DeferredBlock<PartBlock> SHIELD_TOWER_PLINTH = part("shield_tower_plinth", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> SHIELD_TOWER_COIL = part("shield_tower_coil", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> SHIELD_TOWER_BODY = part("shield_tower_body", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> SHIELD_TOWER_WAVEGUIDE = glassPart("shield_tower_waveguide");
+    public static final DeferredBlock<PartBlock> SHIELD_TOWER_CROWN = part("shield_tower_crown", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> TIPLER_FRAME = part("tipler_frame", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> TIPLER_HOUSING = part("tipler_housing", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> TIPLER_BEARING = part("tipler_bearing", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> TIPLER_WINDOW = glassPart("tipler_window");
+    public static final DeferredBlock<PartBlock> TIPLER_HOLDER = part("tipler_holder", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> WORMHOLE_GENERATOR_SHELL = part("wormhole_generator_shell", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> WORMHOLE_GENERATOR_COIL = part("wormhole_generator_coil", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<PartBlock> WORMHOLE_GENERATOR_FOCUSER = part("wormhole_generator_focuser", MultiblockPart.Role.STRUCTURE);
+    public static final DeferredBlock<GlassPartBlock> WORMHOLE_GENERATOR_WINDOW = glassPart("wormhole_generator_window");
+    // 粒子加速器・ペンローズ・リアクター
+    public static final DeferredBlock<PartBlock> ACCELERATOR_TUBE = BLOCKS.register("accelerator_tube", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.ACCELERATOR_TUBE));
+    public static final DeferredBlock<PartBlock> FOCUSING_MAGNET = BLOCKS.register("focusing_magnet", () -> new io.github.genichimaruo.singulo.multiblock.AcceleratorPartBlock(partProperties(), MultiblockPart.Role.FOCUSING_MAGNET));
     public static final DeferredBlock<PartBlock> REACTOR_SHELL = part("reactor_shell", MultiblockPart.Role.REACTOR_SHELL);
     public static final DeferredBlock<PartBlock> GYRO_DRIVE = part("gyro_drive", MultiblockPart.Role.GYRO_DRIVE);
     public static final DeferredBlock<PortBlock> EXTRACTION_PORT = BLOCKS.register("extraction_port",
             () -> new PortBlock(partProperties(), MultiblockPart.Role.EXTRACTION_PORT));
-    /** ワームホール生成器の入出力口（外殻の代わりにどこにでも置ける）。 */
-    public static final DeferredBlock<PortBlock> WORMHOLE_GENERATOR_IO = BLOCKS.register("wormhole_generator_io",
-            () -> new PortBlock(partProperties(), MultiblockPart.Role.WORMHOLE_IO));
+    public static final DeferredBlock<PartBlock> REACTOR_STABILIZER = part("reactor_stabilizer", MultiblockPart.Role.REACTOR_STABILIZER);
+    /** 炉心質量警報器（炉殻の代わりにどこにでも置ける。質量が上限に達すると赤石信号を出す）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.multiblock.SignalPartBlock> REACTOR_MASS_ALARM = BLOCKS.register(
+            "reactor_mass_alarm", () -> new io.github.genichimaruo.singulo.multiblock.SignalPartBlock(partProperties(),
+                    MultiblockPart.Role.MASS_ALARM));
+    /** マルチブロック搬入出ポート（どのマルチブロックでも、外装板の代わりに置ける。加速器はコントローラの左右）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock> MULTIBLOCK_PORT =
+            BLOCKS.register("multiblock_port", () -> new io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock(partProperties()));
+
+    /** 野良ブラックホール（リアクターが崩壊したあとに残る。壊せない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlock> ROGUE_BLACK_HOLE = BLOCKS.register(
+            "rogue_black_hole", () -> new io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3_600_000.0F).noLootTable().noCollission().noOcclusion()
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 炉心制御装置（ペンローズ・リアクターのコントローラ）。 */
     public static final DeferredBlock<SimpleMachineBlock<PenroseReactorBlockEntity>> CORE_CONTROLLER = BLOCKS.register(
             "core_controller", () -> new SimpleMachineBlock<>(machineProperties(),
@@ -198,6 +237,11 @@ public final class SinguloBlocks {
             () -> new GuardDockBlock(unbreakable()));
     public static final DeferredBlock<SealConsoleBlock> SEAL_CONSOLE = BLOCKS.register("seal_console",
             () -> new SealConsoleBlock(unbreakable().lightLevel(s -> 10)));
+    /** ニュートリノ観測所（設置型のニュートリノ・スキャナー）。 */
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =
+            BLOCKS.register("neutrino_observatory", () -> new SimpleMachineBlock<>(machineProperties(),
+                    SinguloBlockEntities.NEUTRINO_OBSERVATORY, io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity::new,
+                    io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<GravitationalWaveDetectorBlockEntity>> GRAVITATIONAL_WAVE_DETECTOR =
             BLOCKS.register("gravitational_wave_detector", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.GRAVITATIONAL_WAVE_DETECTOR, GravitationalWaveDetectorBlockEntity::new, (l, p, s, be) -> {}));
@@ -226,6 +270,13 @@ public final class SinguloBlocks {
 
     private static DeferredBlock<PartBlock> part(String id, MultiblockPart.Role role) {
         return BLOCKS.register(id, () -> new PartBlock(partProperties(), role));
+    }
+
+    /** 部品の窓（色つきの半透明ガラス。中が見える）。 */
+    private static DeferredBlock<GlassPartBlock> glassPart(String id) {
+        return BLOCKS.register(id, () -> new GlassPartBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(3.0F, 6.0F)
+                .sound(SoundType.GLASS).noOcclusion().isViewBlocking((s, l, p) -> false)
+                .isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)));
     }
 
     static BlockBehaviour.Properties partProperties() {

@@ -1,13 +1,13 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t4",
-    "side": "singulo:block/machine_side_t4",
-    "bottom": "singulo:block/machine_bottom_t4",
+    "top": "singulo:block/degenerate_compactor_plate",
+    "side": "singulo:block/degenerate_compactor_plate",
+    "bottom": "singulo:block/degenerate_compactor_plate",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/degenerate_compactor_controller_front_on",
-    "particle": "singulo:block/machine_side_t4"
+    "particle": "singulo:block/degenerate_compactor_plate"
   },
   "elements": [
     {

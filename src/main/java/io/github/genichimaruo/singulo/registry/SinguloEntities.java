@@ -26,6 +26,18 @@ public final class SinguloEntities {
             () -> EntityType.Builder.<HorizonBolt>of(HorizonBolt::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F).clientTrackingRange(6).updateInterval(2).build(Singulo.id("horizon_bolt").toString()));
 
+    /** 投げたブラックホール爆弾。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.reactor.BlackHoleBomb>> BLACK_HOLE_BOMB = REGISTER.register(
+            "black_hole_bomb", () -> EntityType.Builder.<io.github.genichimaruo.singulo.reactor.BlackHoleBomb>of(
+                    io.github.genichimaruo.singulo.reactor.BlackHoleBomb::new, MobCategory.MISC)
+                    .sized(0.3F, 0.3F).clientTrackingRange(6).updateInterval(5).build(Singulo.id("black_hole_bomb").toString()));
+    /** ブラックホール爆弾が開いた小さなブラックホール（保存しない）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.reactor.MicroBlackHole>> MICRO_BLACK_HOLE = REGISTER.register(
+            "micro_black_hole_entity", () -> EntityType.Builder.<io.github.genichimaruo.singulo.reactor.MicroBlackHole>of(
+                    io.github.genichimaruo.singulo.reactor.MicroBlackHole::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(20).noSave().fireImmune()
+                    .build(Singulo.id("micro_black_hole_entity").toString()));
+
     /** ホライズン・ウォーデンの小型の特異点（保存しない）。 */
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.WardenSingularity>> WARDEN_SINGULARITY = REGISTER.register(
             "warden_singularity", () -> EntityType.Builder.<io.github.genichimaruo.singulo.ruin.WardenSingularity>of(

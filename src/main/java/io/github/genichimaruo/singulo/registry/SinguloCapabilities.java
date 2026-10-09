@@ -27,6 +27,13 @@ public final class SinguloCapabilities {
                 (be, side) -> be.delegate(Capabilities.ItemHandler.BLOCK));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.PORT.get(),
                 (be, side) -> be.delegate(Capabilities.FluidHandler.BLOCK));
+        // マルチブロック搬入出ポートも同じ（出力の自動搬出はポート自身が行う）
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
+                (be, side) -> be.delegate(Capabilities.EnergyStorage.BLOCK));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
+                (be, side) -> be.delegate(Capabilities.ItemHandler.BLOCK));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
+                (be, side) -> be.delegate(Capabilities.FluidHandler.BLOCK));
 
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.THERMOELECTRIC_GENERATOR.get(),
                 (be, side) -> be.energy());
@@ -81,6 +88,8 @@ public final class SinguloCapabilities {
         event.registerItem(Capabilities.EnergyStorage.ITEM,
                 (stack, ctx) -> io.github.genichimaruo.singulo.item.NeutrinoScannerItem.energy(stack), SinguloItems.NEUTRINO_SCANNER.get());
 
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.NEUTRINO_OBSERVATORY.get(),
+                (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.GRAVITATIONAL_WAVE_DETECTOR.get(),
                 (be, side) -> be.energy());
 

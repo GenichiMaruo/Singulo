@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:piston"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:steel_plate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_compactor_ram",
+    "count": 1
+  }
+}
