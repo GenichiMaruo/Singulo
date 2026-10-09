@@ -39,36 +39,4 @@ Off
 
 ## Description（プロジェクトページの本文）
 
-**Singulo** is a technology mod that climbs from a humble thermocouple all the way to harvesting energy from a spinning black hole.
-Every stage is grounded in real physics: superconductors, particle accelerators, Casimir cavities, time crystals, Hawking radiation and the Penrose process.
-
-### Progression
-- **Stage 1 – Foundations:** thermoelectric generators, kilns, compressors and the first circuits.
-- **Stage 2 – Cryogenics:** a waisted cryogenic cooling tower, superconducting coils and a particle accelerator ring.
-- **Stage 3 – Quantum:** liquid helium, entanglement, laser cooling and neutrino scanning.
-- **Stage 4 – Degenerate matter:** a hydraulic compactor, a Casimir cavity for exotic matter and a degenerate furnace.
-- **Stage 5 – Singularity:** the Penrose reactor, shields, time fields and wormholes.
-
-### The Penrose reactor
-Three gyroscopic rings hold a black hole in place.
-Ignite a singularity seed with 50 GFE, feed it mass pellets and spin it up to extract up to 2.1 GFE/t.
-Overfeed it and the frame collapses into a rogue black hole that slowly evaporates over hours.
-
-### Multiblocks
-Every multiblock is a sealed machine with its own parts, windows and running animation.
-Plain panels can be swapped for a shared I/O port that auto-ejects outputs.
-
-### Gravity and spacetime
-- Real-time gravitational lensing around black holes.
-- Graviton manipulator, black hole bombs and gravity slingshots for elytra flight.
-- Event horizon shields with player permits, and T-cylinders that speed up time.
-- Paired wormholes that link power, items and fluids across distance and dimensions.
-
-### Exploration
-Ruins of a lost civilization hide records, damaged parts and guardians.
-The Horizon Warden waits at the end.
-
-### Requirements
-- Minecraft 1.21.1
-- NeoForge 21.1
-- JEI is optional and supported.
+本文は [description.md](description.md)。CurseForge の Description 欄（Markdown）にそのまま貼る。リンクは GitHub の絶対URLにしている。

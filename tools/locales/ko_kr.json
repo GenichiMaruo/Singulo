@@ -1,0 +1,4978 @@
+{
+  "advancement.singulo.accelerator.description": {
+    "source": "Form a particle accelerator",
+    "translation": "입자 가속기를 형성하다"
+  },
+  "advancement.singulo.accelerator.title": {
+    "source": "Collision Course",
+    "translation": "충돌 코스"
+  },
+  "advancement.singulo.anchor.description": {
+    "source": "Build a small worldline anchor",
+    "translation": "작은 세계선 닻을 건설하세요"
+  },
+  "advancement.singulo.anchor.title": {
+    "source": "Worldline Anchor",
+    "translation": "세계선 닻"
+  },
+  "advancement.singulo.archive.description": {
+    "source": "Build an archive terminal",
+    "translation": "아카이브 터미널 구축"
+  },
+  "advancement.singulo.archive.title": {
+    "source": "Ancient Terminal",
+    "translation": "고대 터미널"
+  },
+  "advancement.singulo.assembler.description": {
+    "source": "Build a precision assembler",
+    "translation": "정밀 어셈블러 구축"
+  },
+  "advancement.singulo.assembler.title": {
+    "source": "Precise Hands",
+    "translation": "정확한 손"
+  },
+  "advancement.singulo.bose.description": {
+    "source": "Make a BE condensate catalyst",
+    "translation": "보스 응축 촉매 만들기"
+  },
+  "advancement.singulo.bose.title": {
+    "source": "Condensate Choir",
+    "translation": "콘덴세이트 합창단"
+  },
+  "advancement.singulo.cavity.description": {
+    "source": "Form a C-Cavity",
+    "translation": "카시미르 공동을 형성하세요"
+  },
+  "advancement.singulo.cavity.title": {
+    "source": "The Force of Nothing",
+    "translation": "아무것도 아닌 힘"
+  },
+  "advancement.singulo.ceramic.description": {
+    "source": "Fire white ceramic",
+    "translation": "흰색 세라믹 굽기"
+  },
+  "advancement.singulo.ceramic.title": {
+    "source": "White Casing",
+    "translation": "흰색 케이스"
+  },
+  "advancement.singulo.circuit.description": {
+    "source": "Make a basic circuit",
+    "translation": "기본 회로를 만들어 보세요"
+  },
+  "advancement.singulo.circuit.title": {
+    "source": "First Circuit",
+    "translation": "첫 번째 회로"
+  },
+  "advancement.singulo.coil.description": {
+    "source": "Make a superconducting coil",
+    "translation": "초전도 코일을 만들어 보세요"
+  },
+  "advancement.singulo.coil.title": {
+    "source": "Zero Resistance",
+    "translation": "제로 저항"
+  },
+  "advancement.singulo.compactor.description": {
+    "source": "Form a degenerate compactor",
+    "translation": "축퇴 압축로를 형성하십시오"
+  },
+  "advancement.singulo.compactor.title": {
+    "source": "Degeneracy Pressure",
+    "translation": "퇴보 압력"
+  },
+  "advancement.singulo.compressor.description": {
+    "source": "Build a compressor",
+    "translation": "압축기 만들기"
+  },
+  "advancement.singulo.compressor.title": {
+    "source": "Everything Is Mass",
+    "translation": "모든 것은 질량이다"
+  },
+  "advancement.singulo.core.description": {
+    "source": "Make a singularity core",
+    "translation": "특이점 코어 만들기"
+  },
+  "advancement.singulo.core.title": {
+    "source": "Singularity",
+    "translation": "특이점"
+  },
+  "advancement.singulo.crystal.description": {
+    "source": "Grow a time crystal catalyst",
+    "translation": "시간 결정 촉매를 성장시키세요"
+  },
+  "advancement.singulo.crystal.title": {
+    "source": "Crystal of Time",
+    "translation": "시간의 수정"
+  },
+  "advancement.singulo.dark.description": {
+    "source": "Collect dark matter",
+    "translation": "암흑물질 수집"
+  },
+  "advancement.singulo.dark.title": {
+    "source": "Invisible Mass",
+    "translation": "보이지 않는 질량"
+  },
+  "advancement.singulo.detector.description": {
+    "source": "Build a gravitational wave detector",
+    "translation": "중력파 탐지기 만들기"
+  },
+  "advancement.singulo.detector.title": {
+    "source": "Ripples in Spacetime",
+    "translation": "시공간에서의 파문"
+  },
+  "advancement.singulo.entangled.description": {
+    "source": "Make entangled elements",
+    "translation": "얽힌 요소 만들기"
+  },
+  "advancement.singulo.entangled.title": {
+    "source": "Spooky Action",
+    "translation": "으스스한 액션"
+  },
+  "advancement.singulo.exotic.description": {
+    "source": "Make exotic matter",
+    "translation": "이국적인 물질을 만들어라"
+  },
+  "advancement.singulo.exotic.title": {
+    "source": "Negative Energy",
+    "translation": "부정적인 에너지"
+  },
+  "advancement.singulo.furnace.description": {
+    "source": "Form a degenerate furnace",
+    "translation": "축퇴 열로 형성"
+  },
+  "advancement.singulo.furnace.title": {
+    "source": "Neutron Star Furnace",
+    "translation": "중성자별로"
+  },
+  "advancement.singulo.gauntlet.description": {
+    "source": "Make an inertial control gauntlet",
+    "translation": "관성 제어 건틀릿 만들기"
+  },
+  "advancement.singulo.gauntlet.title": {
+    "source": "Inertia in Hand",
+    "translation": "관성"
+  },
+  "advancement.singulo.ignite.description": {
+    "source": "Ignite the reactor",
+    "translation": "원자로를 점화하다"
+  },
+  "advancement.singulo.ignite.title": {
+    "source": "Event Horizon",
+    "translation": "이벤트 호라이즌"
+  },
+  "advancement.singulo.manipulator.description": {
+    "source": "Make a graviton manipulator",
+    "translation": "중력 조작기 만들기"
+  },
+  "advancement.singulo.manipulator.title": {
+    "source": "Graviton",
+    "translation": "중력자"
+  },
+  "advancement.singulo.metric.description": {
+    "source": "Make a metric drive",
+    "translation": "미터법 드라이브 만들기"
+  },
+  "advancement.singulo.metric.title": {
+    "source": "Bending the Metric",
+    "translation": "미터법을 구부리다"
+  },
+  "advancement.singulo.monopole.description": {
+    "source": "Obtain a magnetic monopole",
+    "translation": "자기 단극 획득"
+  },
+  "advancement.singulo.monopole.title": {
+    "source": "North Only",
+    "translation": "북쪽만"
+  },
+  "advancement.singulo.muon.description": {
+    "source": "Make a muon catalyst",
+    "translation": "뮤온 촉매 만들기"
+  },
+  "advancement.singulo.muon.title": {
+    "source": "First Catalyst",
+    "translation": "첫 번째 촉매"
+  },
+  "advancement.singulo.probe.description": {
+    "source": "Build a probe station",
+    "translation": "프로브 스테이션 구축"
+  },
+  "advancement.singulo.probe.title": {
+    "source": "Unmanned Expedition",
+    "translation": "무인탐험대"
+  },
+  "advancement.singulo.projector.description": {
+    "source": "Make a holo projector and use it on a controller",
+    "translation": "홀로 프로젝터를 만들어 컨트롤러에서 사용해보세요"
+  },
+  "advancement.singulo.projector.title": {
+    "source": "Blueprints of Light",
+    "translation": "빛의 청사진"
+  },
+  "advancement.singulo.quantum.description": {
+    "source": "Make a quantum computing module",
+    "translation": "양자 컴퓨팅 모듈 만들기"
+  },
+  "advancement.singulo.quantum.title": {
+    "source": "Quantum Age",
+    "translation": "양자시대"
+  },
+  "advancement.singulo.reactor.description": {
+    "source": "Form a P-Reactor",
+    "translation": "펜로즈 반응로를 형성하세요"
+  },
+  "advancement.singulo.reactor.title": {
+    "source": "Gyroscope",
+    "translation": "자이로스코프"
+  },
+  "advancement.singulo.records.description": {
+    "source": "Decode every ancient record",
+    "translation": "모든 고대 기록을 해독하세요"
+  },
+  "advancement.singulo.records.title": {
+    "source": "Record of the Fall",
+    "translation": "가을의 기록"
+  },
+  "advancement.singulo.root.description": {
+    "source": "Extract energy from mass. Open the handbook to begin",
+    "translation": "질량에서 에너지를 추출합니다. 핸드북을 열어 시작하세요"
+  },
+  "advancement.singulo.root.title": {
+    "source": "Singulo",
+    "translation": "Singulo"
+  },
+  "advancement.singulo.ruin_culture.description": {
+    "source": "Open a culture facility cache",
+    "translation": "문화시설 캐시 오픈"
+  },
+  "advancement.singulo.ruin_culture.title": {
+    "source": "Sealed Section",
+    "translation": "밀봉된 섹션"
+  },
+  "advancement.singulo.ruin_final.description": {
+    "source": "Reach the final lab",
+    "translation": "마지막 연구실에 도달하세요"
+  },
+  "advancement.singulo.ruin_final.title": {
+    "source": "Gravitational Anomaly",
+    "translation": "중력 이상"
+  },
+  "advancement.singulo.ruin_observation.description": {
+    "source": "Open an observation post cache",
+    "translation": "관측소 캐시 열기"
+  },
+  "advancement.singulo.ruin_observation.title": {
+    "source": "Traces of the Ancients",
+    "translation": "고대인의 흔적"
+  },
+  "advancement.singulo.ruin_research.description": {
+    "source": "Open a research building cache",
+    "translation": "연구 건물 캐시를 엽니다"
+  },
+  "advancement.singulo.ruin_research.title": {
+    "source": "Research Building",
+    "translation": "연구동"
+  },
+  "advancement.singulo.seed.description": {
+    "source": "Awaken a singularity seed",
+    "translation": "특이점 씨앗을 깨워라"
+  },
+  "advancement.singulo.seed.title": {
+    "source": "Seed of a Singularity",
+    "translation": "특이점의 씨앗"
+  },
+  "advancement.singulo.shield.description": {
+    "source": "Form a shield tower",
+    "translation": "쉴드 타워를 형성하세요"
+  },
+  "advancement.singulo.shield.title": {
+    "source": "Horizon Shield",
+    "translation": "호라이즌 쉴드"
+  },
+  "advancement.singulo.steel.description": {
+    "source": "Make a steel ingot",
+    "translation": "강철 주괴를 만드세요"
+  },
+  "advancement.singulo.steel.title": {
+    "source": "Age of Steel",
+    "translation": "강철의 시대"
+  },
+  "advancement.singulo.thermo.description": {
+    "source": "Build a thermoelectric generator and put it between hot and cold",
+    "translation": "열전 발전기를 만들어서 뜨거운 것과 차가운 것 사이에 두세요"
+  },
+  "advancement.singulo.thermo.title": {
+    "source": "Temperature Gradient",
+    "translation": "온도 변화"
+  },
+  "advancement.singulo.tipler.description": {
+    "source": "Form a T-Cylinder",
+    "translation": "티플러 원통를 형성하세요"
+  },
+  "advancement.singulo.tipler.title": {
+    "source": "Spinning Time",
+    "translation": "회전 시간"
+  },
+  "advancement.singulo.tower.description": {
+    "source": "Form a cryogenic cooling tower",
+    "translation": "극저온 냉각탑 형성"
+  },
+  "advancement.singulo.tower.title": {
+    "source": "Toward Absolute Zero",
+    "translation": "절대영도를 향하여"
+  },
+  "advancement.singulo.warden.description": {
+    "source": "Defeat the Horizon Warden",
+    "translation": "지평선 감시자를 물리치세요"
+  },
+  "advancement.singulo.warden.title": {
+    "source": "Horizon Keeper",
+    "translation": "지평선 수호자"
+  },
+  "advancement.singulo.wormhole.description": {
+    "source": "Connect a pair of wormhole mouths",
+    "translation": "한 쌍의 웜홀 입을 연결하세요"
+  },
+  "advancement.singulo.wormhole.title": {
+    "source": "Bridge",
+    "translation": "다리"
+  },
+  "block.singulo.accelerator_controller": {
+    "source": "Accelerator Controller",
+    "translation": "가속기 제어기"
+  },
+  "block.singulo.accelerator_tube": {
+    "source": "Accelerator Tube",
+    "translation": "가속관"
+  },
+  "block.singulo.archive_terminal": {
+    "source": "Archive Terminal",
+    "translation": "기록 보관 단말기"
+  },
+  "block.singulo.casimir_cavity_controller": {
+    "source": "C-Cavity Controller",
+    "translation": "카시미르 공동 제어기"
+  },
+  "block.singulo.casimir_cavity_frame": {
+    "source": "C-Cavity Frame",
+    "translation": "카시미르 공동 프레임"
+  },
+  "block.singulo.casimir_cavity_pump": {
+    "source": "C-Cavity Vacuum Pump",
+    "translation": "카시미르 공동 진공 펌프"
+  },
+  "block.singulo.casimir_cavity_shield": {
+    "source": "C-Cavity Magnetic Shield",
+    "translation": "카시미르 공동 자기 차폐"
+  },
+  "block.singulo.casimir_cavity_wall": {
+    "source": "C-Cavity Vessel Wall",
+    "translation": "카시미르 공동 용기 벽"
+  },
+  "block.singulo.casimir_cavity_window": {
+    "source": "C-Cavity Window",
+    "translation": "카시미르 공동 창"
+  },
+  "block.singulo.catalytic_reactor": {
+    "source": "Catalytic Reactor",
+    "translation": "촉매 반응기"
+  },
+  "block.singulo.compressed_block_1": {
+    "source": "Compressed Block Lv1",
+    "translation": "압축 블록 Lv1"
+  },
+  "block.singulo.compressed_block_2": {
+    "source": "Compressed Block Lv2",
+    "translation": "압축 블록 Lv2"
+  },
+  "block.singulo.compressed_block_3": {
+    "source": "Compressed Block Lv3",
+    "translation": "압축 블록 Lv3"
+  },
+  "block.singulo.compressed_metal_block_1": {
+    "source": "Compressed Metal Block Lv1",
+    "translation": "압축 금속 블록 Lv1"
+  },
+  "block.singulo.compressed_metal_block_2": {
+    "source": "Compressed Metal Block Lv2",
+    "translation": "압축 금속 블록 Lv2"
+  },
+  "block.singulo.compressor": {
+    "source": "Compressor",
+    "translation": "압축기"
+  },
+  "block.singulo.cooling_tower_base": {
+    "source": "Cooling Tower Base",
+    "translation": "냉각탑 베이스"
+  },
+  "block.singulo.cooling_tower_casing": {
+    "source": "Cooling Tower Casing",
+    "translation": "냉각탑 케이싱"
+  },
+  "block.singulo.cooling_tower_controller": {
+    "source": "Cooling Tower Controller",
+    "translation": "냉각탑 제어기"
+  },
+  "block.singulo.cooling_tower_coolant_band": {
+    "source": "Cooling Tower Coolant Band",
+    "translation": "냉각탑 냉각수 밴드"
+  },
+  "block.singulo.cooling_tower_glass": {
+    "source": "Cooling Tower Glass",
+    "translation": "냉각탑 유리"
+  },
+  "block.singulo.cooling_tower_grate": {
+    "source": "Cooling Tower Vent Grate",
+    "translation": "냉각탑 환풍구"
+  },
+  "block.singulo.cooling_tower_rim": {
+    "source": "Cooling Tower Rim",
+    "translation": "냉각탑 림"
+  },
+  "block.singulo.copper_wire": {
+    "source": "Copper Wire",
+    "translation": "구리 전선"
+  },
+  "block.singulo.core_controller": {
+    "source": "Core Controller",
+    "translation": "노심 제어기"
+  },
+  "block.singulo.cosmic_muon_collector": {
+    "source": "Cosmic Muon Collector",
+    "translation": "우주선 뮤온 수집기"
+  },
+  "block.singulo.cracked_ruin_panel": {
+    "source": "Cracked Ruin Panel",
+    "translation": "깨진 폐허 패널"
+  },
+  "block.singulo.creative_energy_source": {
+    "source": "Creative Energy Source",
+    "translation": "창조적 에너지원"
+  },
+  "block.singulo.cryogenic_turbine": {
+    "source": "Cryogenic Turbine",
+    "translation": "극저온 터빈"
+  },
+  "block.singulo.degenerate_compactor_anvil": {
+    "source": "Degenerate Compactor Anvil",
+    "translation": "축퇴 압축로 앤빌"
+  },
+  "block.singulo.degenerate_compactor_controller": {
+    "source": "Degenerate Compactor Controller",
+    "translation": "축퇴 압축로 제어기"
+  },
+  "block.singulo.degenerate_compactor_frame": {
+    "source": "Degenerate Compactor Frame",
+    "translation": "축퇴 압축로 프레임"
+  },
+  "block.singulo.degenerate_compactor_plate": {
+    "source": "Degenerate Compactor Armor Plate",
+    "translation": "축퇴 압축로 장갑판"
+  },
+  "block.singulo.degenerate_compactor_ram": {
+    "source": "Degenerate Compactor Ram",
+    "translation": "축퇴 압축로 램"
+  },
+  "block.singulo.degenerate_compactor_vent": {
+    "source": "Degenerate Compactor Cooling Vent",
+    "translation": "축퇴 압축로 냉각 통풍구"
+  },
+  "block.singulo.degenerate_compactor_window": {
+    "source": "Degenerate Compactor Window",
+    "translation": "축퇴 압축로 창"
+  },
+  "block.singulo.degenerate_furnace_controller": {
+    "source": "Degenerate Furnace Controller",
+    "translation": "축퇴 열로 제어기"
+  },
+  "block.singulo.degenerate_furnace_fin": {
+    "source": "Degenerate Furnace Radiator Fin",
+    "translation": "축퇴 열로 라디에이터 핀"
+  },
+  "block.singulo.degenerate_furnace_frame": {
+    "source": "Degenerate Furnace Frame",
+    "translation": "축퇴 열로 프레임"
+  },
+  "block.singulo.degenerate_furnace_piston": {
+    "source": "Degenerate Furnace Piston",
+    "translation": "축퇴 열로 피스톤"
+  },
+  "block.singulo.degenerate_furnace_shell": {
+    "source": "Degenerate Furnace Shell",
+    "translation": "축퇴 열로 껍질"
+  },
+  "block.singulo.degenerate_furnace_tube": {
+    "source": "Degenerate Furnace Heat Exchange Tube",
+    "translation": "축퇴 열로 열교환 튜브"
+  },
+  "block.singulo.degenerate_furnace_window": {
+    "source": "Degenerate Furnace Window",
+    "translation": "축퇴 열로 창"
+  },
+  "block.singulo.echo_resonator": {
+    "source": "Echo Resonator",
+    "translation": "메아리 공명기"
+  },
+  "block.singulo.electrolyzer": {
+    "source": "Electrolyzer",
+    "translation": "전해조"
+  },
+  "block.singulo.entanglement_synthesizer": {
+    "source": "Entanglement Synthesizer",
+    "translation": "양자 얽힘 합성기"
+  },
+  "block.singulo.extraction_port": {
+    "source": "Extraction Port",
+    "translation": "추출 포트"
+  },
+  "block.singulo.focusing_magnet": {
+    "source": "Focusing Magnet",
+    "translation": "집속 자석"
+  },
+  "block.singulo.gravitational_containment_tank": {
+    "source": "Gravitational Containment Tank",
+    "translation": "중력 격납 탱크"
+  },
+  "block.singulo.gravitational_wave_detector": {
+    "source": "Gravitational Wave Detector",
+    "translation": "중력파 검출기"
+  },
+  "block.singulo.gyro_drive": {
+    "source": "Gyro Drive",
+    "translation": "자이로 구동 장치"
+  },
+  "block.singulo.halo_collector": {
+    "source": "Halo Collector",
+    "translation": "헤일로 수집기"
+  },
+  "block.singulo.heat_exchange_core": {
+    "source": "Heat Exchange Core",
+    "translation": "열교환 코어"
+  },
+  "block.singulo.horizon_bus": {
+    "source": "Horizon Bus",
+    "translation": "지평선 버스"
+  },
+  "block.singulo.inertial_stabilizer": {
+    "source": "Inertial Stabilizer",
+    "translation": "관성 안정기"
+  },
+  "block.singulo.kiln": {
+    "source": "Kiln",
+    "translation": "소성로"
+  },
+  "block.singulo.laser_cooler": {
+    "source": "Laser Cooler",
+    "translation": "레이저 냉각기"
+  },
+  "block.singulo.mirror_plate": {
+    "source": "Mirror Plate",
+    "translation": "거울판"
+  },
+  "block.singulo.mossy_ruin_panel": {
+    "source": "Mossy Ruin Panel",
+    "translation": "이끼 낀 폐허 패널"
+  },
+  "block.singulo.multiblock_port": {
+    "source": "Multiblock I/O Port",
+    "translation": "멀티블록 입출력 포트"
+  },
+  "block.singulo.neutrino_observatory": {
+    "source": "Neutrino Observatory",
+    "translation": "중성미자 관측소"
+  },
+  "block.singulo.precision_assembler": {
+    "source": "Precision Assembler",
+    "translation": "정밀 조립기"
+  },
+  "block.singulo.probe_station": {
+    "source": "Autonomous Probe Station",
+    "translation": "자동 탐사기 기지"
+  },
+  "block.singulo.quantum_heat_engine": {
+    "source": "Quantum Heat Engine",
+    "translation": "양자 열기관"
+  },
+  "block.singulo.reactor_mass_alarm": {
+    "source": "Reactor Mass Alarm",
+    "translation": "노심 질량 경보기"
+  },
+  "block.singulo.reactor_shell": {
+    "source": "Reactor Shell",
+    "translation": "반응로 외피"
+  },
+  "block.singulo.reactor_stabilizer": {
+    "source": "Reactor Stabilizer Coil",
+    "translation": "노심 안정화 코일"
+  },
+  "block.singulo.rogue_black_hole": {
+    "source": "Rogue Black Hole",
+    "translation": "제어 불능 블랙홀"
+  },
+  "block.singulo.ruin_cache": {
+    "source": "Ruin Cache",
+    "translation": "폐허 캐시"
+  },
+  "block.singulo.ruin_glass": {
+    "source": "Broken Ruin Glass",
+    "translation": "깨진 폐허 유리"
+  },
+  "block.singulo.ruin_guard_dock": {
+    "source": "Guard Dock",
+    "translation": "가드 독"
+  },
+  "block.singulo.ruin_lamp": {
+    "source": "Ruin Lamp",
+    "translation": "폐허 램프"
+  },
+  "block.singulo.ruin_panel": {
+    "source": "Ruin Panel",
+    "translation": "폐허 패널"
+  },
+  "block.singulo.seal_console": {
+    "source": "Seal Console",
+    "translation": "씰 콘솔"
+  },
+  "block.singulo.shield_tower_body": {
+    "source": "Shield Tower Body",
+    "translation": "쉴드타워 본체"
+  },
+  "block.singulo.shield_tower_coil": {
+    "source": "Shield Tower Power Coil",
+    "translation": "쉴드 타워 파워 코일"
+  },
+  "block.singulo.shield_tower_core": {
+    "source": "Shield Tower Core",
+    "translation": "실드 타워 코어"
+  },
+  "block.singulo.shield_tower_crown": {
+    "source": "Shield Tower Emitter Crown",
+    "translation": "실드 타워 이미터 크라운"
+  },
+  "block.singulo.shield_tower_plinth": {
+    "source": "Shield Tower Plinth",
+    "translation": "쉴드 타워 주각"
+  },
+  "block.singulo.shield_tower_waveguide": {
+    "source": "Shield Tower Waveguide",
+    "translation": "실드 타워 도파관"
+  },
+  "block.singulo.singularity_encapsulator": {
+    "source": "Singularity Encapsulator",
+    "translation": "특이점 캡슐화기"
+  },
+  "block.singulo.smes_cell": {
+    "source": "SMES Cell",
+    "translation": "SMES 셀"
+  },
+  "block.singulo.smes_module": {
+    "source": "SMES Module",
+    "translation": "SMES 모듈"
+  },
+  "block.singulo.strange_matter": {
+    "source": "Strange Matter",
+    "translation": "기묘한 물질"
+  },
+  "block.singulo.strangelet": {
+    "source": "Strangelet",
+    "translation": "스트레인지렛"
+  },
+  "block.singulo.superconducting_cable": {
+    "source": "Superconducting Cable",
+    "translation": "초전도 케이블"
+  },
+  "block.singulo.thermoelectric_generator": {
+    "source": "Thermoelectric Generator",
+    "translation": "열전 발전기"
+  },
+  "block.singulo.time_crystal_incubator": {
+    "source": "Time Crystal Incubator",
+    "translation": "시간 결정 배양기"
+  },
+  "block.singulo.tipler_bearing": {
+    "source": "T-Cylinder Bearing",
+    "translation": "티플러 원통 베어링"
+  },
+  "block.singulo.tipler_core": {
+    "source": "T-Core",
+    "translation": "티플러 코어"
+  },
+  "block.singulo.tipler_frame": {
+    "source": "T-Cylinder Frame",
+    "translation": "티플러 원통 프레임"
+  },
+  "block.singulo.tipler_holder": {
+    "source": "T-Cylinder Time Crystal Holder",
+    "translation": "티플러 원통 시간 결정 홀더"
+  },
+  "block.singulo.tipler_housing": {
+    "source": "T-Cylinder Housing",
+    "translation": "티플러 원통 하우징"
+  },
+  "block.singulo.tipler_window": {
+    "source": "T-Cylinder Window",
+    "translation": "티플러 원통 창"
+  },
+  "block.singulo.topological_wire": {
+    "source": "Topological Wire",
+    "translation": "위상 전선"
+  },
+  "block.singulo.worldline_anchor_advanced": {
+    "source": "Worldline Anchor (Advanced)",
+    "translation": "세계선 앵커 (고급)"
+  },
+  "block.singulo.worldline_anchor_small": {
+    "source": "Worldline Anchor (Small)",
+    "translation": "세계선 앵커 (소형)"
+  },
+  "block.singulo.wormhole_generator_coil": {
+    "source": "Wormhole Generator Field Coil",
+    "translation": "웜홀 생성기 필드 코일"
+  },
+  "block.singulo.wormhole_generator_core": {
+    "source": "Wormhole Generator Core",
+    "translation": "웜홀 생성기 코어"
+  },
+  "block.singulo.wormhole_generator_focuser": {
+    "source": "Wormhole Generator Focuser",
+    "translation": "웜홀 생성기 포커서"
+  },
+  "block.singulo.wormhole_generator_shell": {
+    "source": "Wormhole Generator Shell",
+    "translation": "웜홀 생성기 쉘"
+  },
+  "block.singulo.wormhole_generator_window": {
+    "source": "Wormhole Generator Window",
+    "translation": "웜홀 생성기 창"
+  },
+  "block.singulo.wormhole_mouth": {
+    "source": "Wormhole Mouth",
+    "translation": "웜홀 입구"
+  },
+  "block.singulo.wormhole_port": {
+    "source": "Wormhole Port",
+    "translation": "웜홀 포트"
+  },
+  "block.singulo.wormhole_stabilizer": {
+    "source": "Wormhole Stabilizer",
+    "translation": "웜홀 안정기"
+  },
+  "command.singulo.blackhole.done": {
+    "source": "Rogue black hole at %s, %s, %s · mass %s",
+    "translation": "%1$s, %2$s, %3$s · 질량 %4$s의 악성 블랙홀"
+  },
+  "command.singulo.build.done": {
+    "source": "Built %s with %s blocks",
+    "translation": "%2$s 블록으로 %1$s 구축"
+  },
+  "command.singulo.build.size": {
+    "source": "Invalid size: %s",
+    "translation": "잘못된 크기: %1$s"
+  },
+  "command.singulo.build.unknown": {
+    "source": "Unknown multiblock: %s",
+    "translation": "알 수 없는 다중 블록: %1$s"
+  },
+  "compass.singulo.found": {
+    "source": "%s is %s blocks away",
+    "translation": "%1$s는 %2$s 블록 떨어져 있습니다."
+  },
+  "compass.singulo.not_found": {
+    "source": "No %s nearby",
+    "translation": "근처에 %1$s가 없습니다"
+  },
+  "compass.singulo.target": {
+    "source": "Target: %s",
+    "translation": "대상: %1$s"
+  },
+  "death.attack.singulo.event_horizon": {
+    "source": "%1$s crossed the event horizon",
+    "translation": "%1$s가 사건의 지평선을 넘었습니다"
+  },
+  "death.attack.singulo.tidal": {
+    "source": "%1$s was torn apart by tidal forces",
+    "translation": "%1$s는 조석력에 의해 찢겨졌습니다"
+  },
+  "death.attack.singulo.tidal.player": {
+    "source": "%1$s was torn apart by %2$s's singularity",
+    "translation": "%1$s는 %2$s의 특이점에 의해 찢어졌습니다."
+  },
+  "desc.singulo.accelerator_controller": {
+    "source": "Controls a square ring 8–32 wide. Bigger rings are faster and yield more monopoles.",
+    "translation": "너비가 8~32인 사각형 링을 제어합니다. 링이 클수록 더 빠르고 더 많은 모노폴이 생성됩니다."
+  },
+  "desc.singulo.accelerator_tube": {
+    "source": "Tube segment of the Particle Accelerator ring.",
+    "translation": "입자 가속기 링의 튜브 세그먼트."
+  },
+  "desc.singulo.anomaly_sample": {
+    "source": "A restored anomaly sample.",
+    "translation": "복원된 변칙 샘플."
+  },
+  "desc.singulo.archive_terminal": {
+    "source": "Copies ruin records onto data cards, restores degraded parts and decodes record fragments.",
+    "translation": "폐허 기록을 데이터 카드에 복사하고, 저하된 부분을 복원하며, 기록 조각을 해독합니다."
+  },
+  "desc.singulo.artificial_star_core": {
+    "source": "A star core that replaces nether stars.",
+    "translation": "네더별을 대체하는 별핵."
+  },
+  "desc.singulo.basic_circuit": {
+    "source": "The brain of every early machine.",
+    "translation": "모든 초기 기계의 두뇌."
+  },
+  "desc.singulo.basic_frame": {
+    "source": "The frame almost every machine is built on.",
+    "translation": "거의 모든 기계가 프레임에 내장되어 있습니다."
+  },
+  "desc.singulo.bh_container": {
+    "source": "A vessel for holding a tiny black hole.",
+    "translation": "작은 블랙홀을 담아두는 용기."
+  },
+  "desc.singulo.black_hole_bomb": {
+    "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
+    "translation": "투척: 주변을 삼키는 작은 블랙홀을 엽니다."
+  },
+  "desc.singulo.blank_data_card": {
+    "source": "An empty card for copying records in the Archive Terminal.",
+    "translation": "기록 보관 단말기의 기록을 복사하기 위한 빈 카드입니다."
+  },
+  "desc.singulo.bose_condensate_catalyst": {
+    "source": "Tier 3 catalyst.",
+    "translation": "Tier 3 촉매."
+  },
+  "desc.singulo.builder_wand": {
+    "source": "Creative only. Instantly builds the multiblock of a controller. Sneak to change size.",
+    "translation": "크리에이티브 전용입니다. 컨트롤러의 멀티블록을 즉시 구축합니다. 몰래 크기를 변경합니다."
+  },
+  "desc.singulo.casimir_cavity": {
+    "source": "Creates negative energy between mirrors to make exotic matter.",
+    "translation": "거울 사이에 부정적인 에너지를 생성하여 이국적인 물질을 만듭니다."
+  },
+  "desc.singulo.casimir_cavity_controller": {
+    "source": "Middle of the front, second layer, of the 5×5×5 cavity.",
+    "translation": "5×5×5 캐비티의 전면 중앙, 두 번째 레이어."
+  },
+  "desc.singulo.casimir_cavity_frame": {
+    "source": "Frame along the cavity edges (not the corners).",
+    "translation": "캐비티 가장자리(모서리가 아님)를 따라 프레임을 만듭니다."
+  },
+  "desc.singulo.casimir_cavity_pump": {
+    "source": "Vacuum pumps on the eight corners.",
+    "translation": "8개 모서리에 진공 펌프가 있습니다."
+  },
+  "desc.singulo.casimir_cavity_shield": {
+    "source": "Magnetic shields either side of each window.",
+    "translation": "각 창 양쪽에 자기 차폐가 있습니다."
+  },
+  "desc.singulo.casimir_cavity_wall": {
+    "source": "Vessel wall; any can be swapped for an I/O port.",
+    "translation": "용기벽; 모두 I/O 포트로 교체할 수 있습니다."
+  },
+  "desc.singulo.casimir_cavity_window": {
+    "source": "Middle of each side; shows the vacuum between the mirrors.",
+    "translation": "각 측면의 중간; 거울 사이의 진공을 보여줍니다."
+  },
+  "desc.singulo.catalytic_reactor": {
+    "source": "Makes catalysts, starting with the muon catalyst.",
+    "translation": "뮤온 촉매를 시작으로 촉매를 만듭니다."
+  },
+  "desc.singulo.ceramic_substrate": {
+    "source": "A fired ceramic board for circuits.",
+    "translation": "회로용 소성 세라믹 기판입니다."
+  },
+  "desc.singulo.cold_atom_trap": {
+    "source": "A restored cold atom trap.",
+    "translation": "복원된 저온 원자 트랩."
+  },
+  "desc.singulo.cold_atoms": {
+    "source": "Atoms cooled close to absolute zero.",
+    "translation": "원자는 절대 영도에 가깝게 냉각되었습니다."
+  },
+  "desc.singulo.compressed_block_1": {
+    "source": "Nine units of mass pressed together. The start of the compression chain.",
+    "translation": "9개 단위의 질량이 함께 압축되었습니다. 압축 체인의 시작입니다."
+  },
+  "desc.singulo.compressed_block_2": {
+    "source": "Nine Lv1 blocks (eight if mixed). Fuel for the Degenerate Furnace.",
+    "translation": "9개의 Lv1 블록(혼합된 경우 8개). 축퇴 열로용 연료."
+  },
+  "desc.singulo.compressed_block_2_mixed": {
+    "source": "Lv1 made from 3+ kinds of blocks needs only 8 for Lv2.",
+    "translation": "3개 이상의 블록으로 만들어진 Lv1는 Lv2에 8개만 필요합니다."
+  },
+  "desc.singulo.compressed_block_3": {
+    "source": "An even denser block.",
+    "translation": "더욱 밀도가 높은 블록입니다."
+  },
+  "desc.singulo.compressed_metal_block_1": {
+    "source": "A compressed block made only of metals.",
+    "translation": "금속만으로 만들어진 압축 블록입니다."
+  },
+  "desc.singulo.compressed_metal_block_2": {
+    "source": "Denser metal block, used for artificial star cores.",
+    "translation": "인공 항성 코어에 사용되는 밀도가 높은 금속 블록입니다."
+  },
+  "desc.singulo.compressor": {
+    "source": "Presses plates. In mass mode it turns any item into mass for compressed blocks and pellets.",
+    "translation": "프레스 플레이트. 질량 모드에서는 모든 항목을 압축된 블록 및 펠릿의 질량으로 변환합니다."
+  },
+  "desc.singulo.control_unit": {
+    "source": "A restored ancient control unit with limited uses.",
+    "translation": "제한된 용도로 복원된 고대 제어 장치입니다."
+  },
+  "desc.singulo.cooling_tower_base": {
+    "source": "The 5×5 foundation of the tower.",
+    "translation": "타워의 5×5 기초."
+  },
+  "desc.singulo.cooling_tower_casing": {
+    "source": "Cooling Tower wall. Panels on the 5×5 rings can be swapped for I/O ports.",
+    "translation": "냉각탑 벽. 5×5 링의 패널은 I/O 포트로 교체할 수 있습니다."
+  },
+  "desc.singulo.cooling_tower_controller": {
+    "source": "Goes in the middle of the front, second layer. The tower is 7–15 high; taller is faster.",
+    "translation": "앞의 두 번째 레이어 중앙에 들어갑니다. 타워의 높이는 7-15입니다. 키가 클수록 빠릅니다."
+  },
+  "desc.singulo.cooling_tower_coolant_band": {
+    "source": "Coolant bands around the waist, every third layer.",
+    "translation": "세 번째 층마다 허리 둘레에 냉각수 밴드가 있습니다."
+  },
+  "desc.singulo.cooling_tower_extension": {
+    "source": "Build the tower 10+ high to liquefy helium.",
+    "translation": "헬륨을 액화시키기 위해 타워를 10+ 높이로 건설하세요."
+  },
+  "desc.singulo.cooling_tower_glass": {
+    "source": "Window in the tower waist; the cores glow blue inside.",
+    "translation": "타워 허리의 창; 코어는 내부에서 파란색으로 빛납니다."
+  },
+  "desc.singulo.cooling_tower_grate": {
+    "source": "Grate closing the top; the vapour escapes through it.",
+    "translation": "상단을 닫는 창살; 증기가 그것을 통해 빠져 나갑니다."
+  },
+  "desc.singulo.cooling_tower_rim": {
+    "source": "The 5×5 rim at the top of the tower.",
+    "translation": "타워 꼭대기의 5×5 테두리."
+  },
+  "desc.singulo.copper_wire": {
+    "source": "Tier 1 power cable. Loses a little energy over distance.",
+    "translation": "Tier 1 전원 케이블. 거리가 멀어지면 약간의 에너지가 손실됩니다."
+  },
+  "desc.singulo.core_controller": {
+    "source": "Placed 5 below the core centre. Ignite the reactor from its screen.",
+    "translation": "코어 중심 아래 5에 배치됩니다. 화면에서 원자로를 점화하십시오."
+  },
+  "desc.singulo.cosmic_muon_collector": {
+    "source": "Collects cosmic-ray muons for free high up under open sky.",
+    "translation": "열린 하늘 아래 높은 곳에서 무료로 우주선 뮤온을 수집합니다."
+  },
+  "desc.singulo.cracked_ruin_panel": {
+    "source": "Cracked ancient panel.",
+    "translation": "깨진 고대 패널."
+  },
+  "desc.singulo.creative_catalyst": {
+    "source": "Creative only. A catalyst that never wears out. Right-click to change its tier.",
+    "translation": "크리에이티브 전용입니다. 결코 마모되지 않는 촉매제입니다. 계층을 변경하려면 마우스 오른쪽 버튼을 클릭하세요."
+  },
+  "desc.singulo.creative_energy_source": {
+    "source": "Creative only. Endless power pushed into every neighbour.",
+    "translation": "크리에이티브 전용입니다. 끝없는 힘이 모든 이웃에게 쏟아졌습니다."
+  },
+  "desc.singulo.cryogenic_cooling_tower": {
+    "source": "Liquefies nitrogen (and helium at height 10+).",
+    "translation": "질소(및 높이 10+의 헬륨)를 액화합니다."
+  },
+  "desc.singulo.cryogenic_turbine": {
+    "source": "Generates power from evaporating cryogens.",
+    "translation": "증발하는 극저온유체로부터 전력을 생성합니다."
+  },
+  "desc.singulo.culture_data": {
+    "source": "A record from the culture facility.",
+    "translation": "문화시설의 기록입니다."
+  },
+  "desc.singulo.data_card_culture_data": {
+    "source": "A copy of culture data.",
+    "translation": "배양 데이터 사본."
+  },
+  "desc.singulo.data_card_observation_log": {
+    "source": "A copy of an observation log, usable in recipes.",
+    "translation": "레시피에 사용할 수 있는 관찰 기록의 사본입니다."
+  },
+  "desc.singulo.data_card_quantum_fragment": {
+    "source": "A copy of a quantum data fragment.",
+    "translation": "양자 데이터 조각의 복사본입니다."
+  },
+  "desc.singulo.decoded_record": {
+    "source": "Right-click to read it and add the next ancient record to your handbook.",
+    "translation": "마우스 오른쪽 버튼을 클릭하여 읽고 다음 고대 기록을 핸드북에 추가하세요."
+  },
+  "desc.singulo.degenerate_compactor": {
+    "source": "Crushes matter into degenerate shells and reactor parts.",
+    "translation": "물질을 축퇴된 껍질과 원자로 부품으로 분쇄합니다."
+  },
+  "desc.singulo.degenerate_compactor_anvil": {
+    "source": "Bottom centre; takes the blows.",
+    "translation": "하단 중앙; 타격을 입습니다."
+  },
+  "desc.singulo.degenerate_compactor_controller": {
+    "source": "Middle of the front, second layer, of the 5×5×5 press.",
+    "translation": "5×5×5 인쇄기의 전면 중앙, 두 번째 레이어."
+  },
+  "desc.singulo.degenerate_compactor_frame": {
+    "source": "Frame along the 12 edges of the press.",
+    "translation": "프레스의 12개 가장자리를 따라 프레임을 만듭니다."
+  },
+  "desc.singulo.degenerate_compactor_plate": {
+    "source": "Plating; any plate can be swapped for an I/O port.",
+    "translation": "도금; 모든 플레이트를 I/O 포트로 교체할 수 있습니다."
+  },
+  "desc.singulo.degenerate_compactor_ram": {
+    "source": "Top centre; hammers down onto the anvil.",
+    "translation": "상단 중앙; 모루에 망치질을 합니다."
+  },
+  "desc.singulo.degenerate_compactor_vent": {
+    "source": "Cooling vents along the top row of each side.",
+    "translation": "각 측면의 맨 윗줄에 있는 냉각 통풍구."
+  },
+  "desc.singulo.degenerate_compactor_window": {
+    "source": "Middle of each side; watch the ram strike.",
+    "translation": "각 측면의 중간; 램 파업을 지켜보세요."
+  },
+  "desc.singulo.degenerate_furnace": {
+    "source": "A large generator burning Lv2 blocks.",
+    "translation": "Lv2 블록을 태우는 대형 발전기."
+  },
+  "desc.singulo.degenerate_furnace_controller": {
+    "source": "Goes in the middle of a side, second layer from the bottom.",
+    "translation": "측면 중앙, 밑에서 두 번째 층에 들어갑니다."
+  },
+  "desc.singulo.degenerate_furnace_fin": {
+    "source": "Radiators on either side of each furnace window.",
+    "translation": "각 화로 창 양쪽에 라디에이터가 있습니다."
+  },
+  "desc.singulo.degenerate_furnace_frame": {
+    "source": "The heavy frame along the 12 edges of the 5×5×7 furnace.",
+    "translation": "5×5×7 용광로의 12개 모서리를 따라 있는 무거운 프레임."
+  },
+  "desc.singulo.degenerate_furnace_piston": {
+    "source": "Sits in the middle of the top and bottom faces and crushes the fuel.",
+    "translation": "윗면과 아랫면의 중앙에 위치하여 연료를 분쇄합니다."
+  },
+  "desc.singulo.degenerate_furnace_shell": {
+    "source": "Furnace plating. Any panel can be swapped for a Multiblock I/O Port.",
+    "translation": "용광로 도금. 모든 패널을 멀티블록 입출력 포트로 교체할 수 있습니다."
+  },
+  "desc.singulo.degenerate_furnace_tube": {
+    "source": "Copper pipes standing in the four inner corners of the furnace.",
+    "translation": "용광로의 안쪽 네 모퉁이에 구리관이 서 있습니다."
+  },
+  "desc.singulo.degenerate_furnace_window": {
+    "source": "The middle column of each furnace side; shows the glowing core.",
+    "translation": "각 로 측면의 중간 기둥; 빛나는 코어를 보여줍니다."
+  },
+  "desc.singulo.degenerate_matter_shell": {
+    "source": "A shell of neutron-star matter.",
+    "translation": "중성자별 물질의 껍질."
+  },
+  "desc.singulo.degraded_anomaly_sample": {
+    "source": "A sample from the final lab.",
+    "translation": "최종 연구실의 샘플입니다."
+  },
+  "desc.singulo.degraded_cold_atom_trap": {
+    "source": "Restore it in the Laser Cooler.",
+    "translation": "레이저 냉각기에서 복원하십시오."
+  },
+  "desc.singulo.degraded_control_unit": {
+    "source": "A degraded part. Restore it in the Archive Terminal.",
+    "translation": "성능이 저하된 부품입니다. 기록 보관 단말기에서 복원하십시오."
+  },
+  "desc.singulo.degraded_time_crystal_seed": {
+    "source": "Restore it to grow time crystals.",
+    "translation": "복원하여 시간 결정체를 성장시키세요."
+  },
+  "desc.singulo.dormant_singularity_seed": {
+    "source": "Guarded by the Horizon Warden. Awaken it in the encapsulator.",
+    "translation": "지평선 감시자에 의해 보호됩니다. 캡슐화기에서 깨우세요."
+  },
+  "desc.singulo.echo_resonator": {
+    "source": "Copies echo shards using a template shard.",
+    "translation": "템플릿 샤드를 사용하여 에코 샤드를 복사합니다."
+  },
+  "desc.singulo.electrolyzer": {
+    "source": "Splits water into hydrogen and oxygen.",
+    "translation": "물을 수소와 산소로 분리합니다."
+  },
+  "desc.singulo.entangled_element": {
+    "source": "Always made in pairs. Used in detectors and links.",
+    "translation": "항상 쌍으로 만들어집니다. 감지기와 링크에 사용됩니다."
+  },
+  "desc.singulo.entanglement_synthesizer": {
+    "source": "Produces entangled elements in pairs.",
+    "translation": "얽힌 요소를 쌍으로 생성합니다."
+  },
+  "desc.singulo.ergosphere_ring": {
+    "source": "Extracts exotic matter from a fast-spinning core.",
+    "translation": "빠르게 회전하는 핵에서 이국적인 물질을 추출합니다."
+  },
+  "desc.singulo.event_horizon_shield": {
+    "source": "Protects a 32-block radius from explosions, griefing and hostile spawns.",
+    "translation": "폭발, 슬픔, 적대적인 생성으로부터 32블록 반경을 보호합니다."
+  },
+  "desc.singulo.exotic_matter": {
+    "source": "Matter with negative energy density. Fuels gravity tech.",
+    "translation": "음의 에너지 밀도를 갖는 물질. 중력 기술에 연료를 공급합니다."
+  },
+  "desc.singulo.explorer_compass": {
+    "source": "Right-click to point at the nearest ruin of the chosen kind. Sneak-use to change the kind.",
+    "translation": "선택한 종류의 가장 가까운 폐허를 가리키려면 마우스 오른쪽 버튼을 클릭하세요. 종류를 바꾸려면 몰래 사용하십시오."
+  },
+  "desc.singulo.extraction_port": {
+    "source": "Power/fuel port for the reactor. Replaces any ring shell block (not the gyro drives).",
+    "translation": "원자로의 전원/연료 포트. 모든 링 쉘 블록을 교체합니다(자이로 드라이브 제외)."
+  },
+  "desc.singulo.focusing_magnet": {
+    "source": "Magnet for the ring corners and at least 1/4 of the ring.",
+    "translation": "링 모서리와 링의 최소 1/4을 위한 자석입니다."
+  },
+  "desc.singulo.gravitational_containment_tank": {
+    "source": "The only tank that holds dark matter. Keeps its contents when broken.",
+    "translation": "암흑물질을 담는 유일한 탱크. 파손 시 내용을 유지합니다."
+  },
+  "desc.singulo.gravitational_wave_detector": {
+    "source": "Points toward the nearest gravitational anomaly.",
+    "translation": "가장 가까운 중력 이상을 가리킵니다."
+  },
+  "desc.singulo.graviton_manipulator": {
+    "source": "The full gravity tool. Hold left-click to use; while levitating, charge with right-click and release to throw.",
+    "translation": "전체 중력 도구입니다. 사용하려면 왼쪽 버튼을 길게 클릭하세요. 공중에 떠 있는 동안 마우스 오른쪽 버튼을 클릭한 후 떼면 던집니다."
+  },
+  "desc.singulo.gravity_field_stabilizer": {
+    "source": "A component of the core controller.",
+    "translation": "코어 컨트롤러의 구성 요소입니다."
+  },
+  "desc.singulo.gyro_drive": {
+    "source": "Placed where the reactor rings cross.",
+    "translation": "원자로 링이 교차하는 곳에 배치됩니다."
+  },
+  "desc.singulo.halo_collector": {
+    "source": "Gathers dark matter near a running core.",
+    "translation": "작동 중인 코어 근처에 암흑 물질을 수집합니다."
+  },
+  "desc.singulo.handbook": {
+    "source": "Right-click to open. Explains goals, machines, multiblocks and shows your progress.",
+    "translation": "마우스 오른쪽 버튼을 클릭하여 엽니다. 목표, 기계, 멀티 블록을 설명하고 진행 상황을 보여줍니다."
+  },
+  "desc.singulo.hawking_collector": {
+    "source": "Collects H-Condensate in catalyst mode.",
+    "translation": "촉매 모드에서 호킹 응축물를 수집합니다."
+  },
+  "desc.singulo.hawking_condensate": {
+    "source": "Condensed Hawking radiation.",
+    "translation": "응축된 호킹 방사선."
+  },
+  "desc.singulo.heat_exchange_core": {
+    "source": "Heat exchangers stacked up the middle of the tower.",
+    "translation": "열교환기는 타워 중앙에 쌓여 있습니다."
+  },
+  "desc.singulo.holo_projector": {
+    "source": "Use on a multiblock controller to project its shape and list missing blocks. Sneak-use to change size.",
+    "translation": "멀티블록 컨트롤러에서 사용하여 모양을 투영하고 누락된 블록을 나열합니다. 몰래 사용하여 크기를 변경하세요."
+  },
+  "desc.singulo.horizon_bus": {
+    "source": "The tier 5 cable, needed to ignite the reactor.",
+    "translation": "원자로를 점화하는 데 필요한 Tier 5 케이블."
+  },
+  "desc.singulo.inertial_control_gauntlet": {
+    "source": "Hold right-click to levitate or pull one small mob. Sneak-use to switch modes.",
+    "translation": "작은 몹 하나를 공중에 띄우거나 끌어당기려면 마우스 오른쪽 버튼을 길게 클릭하세요. 몰래 사용하여 모드를 전환하세요."
+  },
+  "desc.singulo.inertial_stabilizer": {
+    "source": "Stops explosions from breaking blocks within 16 blocks.",
+    "translation": "16블록 내의 블록이 깨지는 폭발을 막습니다."
+  },
+  "desc.singulo.jet_collector": {
+    "source": "Collects jet condensate from the reactor.",
+    "translation": "반응기에서 제트 응축물를 수집합니다."
+  },
+  "desc.singulo.jet_condensate": {
+    "source": "Particles from the relativistic jet.",
+    "translation": "상대론적 제트의 입자."
+  },
+  "desc.singulo.kiln": {
+    "source": "Fires ceramics and boards. Oxygen makes it hotter.",
+    "translation": "도자기와 보드를 발사합니다. 산소가 더 뜨거워집니다."
+  },
+  "desc.singulo.laser_cooler": {
+    "source": "Laser-cools atoms into cold atoms, lattices and condensates.",
+    "translation": "원자를 레이저 냉각하여 냉각 원자, 격자 및 응축물로 만듭니다."
+  },
+  "desc.singulo.magnetic_bottle": {
+    "source": "Captures strangelets and contains leaking strange matter.",
+    "translation": "이상한 물질을 포착하고 누출된 이상한 물질을 포함합니다."
+  },
+  "desc.singulo.magnetic_monopole": {
+    "source": "A theoretical particle born in about 1 of 1000 collisions.",
+    "translation": "1000번의 충돌 중 약 1번의 충돌로 생성되는 이론적인 입자입니다."
+  },
+  "desc.singulo.mass_pellet": {
+    "source": "Packed mass fuel for the P-Reactor.",
+    "translation": "펜로즈 반응로용으로 포장된 대량 연료."
+  },
+  "desc.singulo.metric_drive": {
+    "source": "Switch between low gravity, flight and high gravity.",
+    "translation": "저중력, 비행, 고중력 간을 전환합니다."
+  },
+  "desc.singulo.micro_black_hole": {
+    "source": "Holds a tiny black hole. Bends light around it.",
+    "translation": "작은 블랙홀을 품고 있습니다. 주위에 빛을 구부립니다."
+  },
+  "desc.singulo.mirror_plate": {
+    "source": "Inner 3×3 of the cavity top and bottom: two facing mirrors.",
+    "translation": "캐비티 상단 및 하단의 내부 3×3: 두 개의 마주보는 거울."
+  },
+  "desc.singulo.monopole_upgrade": {
+    "source": "Insert into a machine's monopole slot: ×2 speed and 50% better power efficiency.",
+    "translation": "기계의 모노폴 슬롯에 삽입: 속도가 2배 증가하고 전력 효율성이 50% 향상됩니다."
+  },
+  "desc.singulo.mossy_ruin_panel": {
+    "source": "Mossy ancient panel.",
+    "translation": "이끼 낀 고대 패널."
+  },
+  "desc.singulo.multiblock_port": {
+    "source": "Replaces a plain shell panel of a multiblock (not frames or functional parts; for the accelerator, either side of the controller). Cables and pipes reach the controller, and outputs and generated power are pushed out automatically.",
+    "translation": "멀티블록의 일반 쉘 패널을 대체합니다(프레임이나 기능 부품 아님, 가속기의 경우 컨트롤러 양쪽). 케이블과 파이프가 컨트롤러에 도달하고 출력과 생성된 전력이 자동으로 밀려납니다."
+  },
+  "desc.singulo.muon_bundle": {
+    "source": "A bundle of muons, the base of muon catalysts.",
+    "translation": "뮤온 촉매의 기본인 뮤온 다발."
+  },
+  "desc.singulo.muon_catalyst": {
+    "source": "Tier 2 catalyst with a lifetime. Leaves a spent catalyst when used up.",
+    "translation": "수명이 긴 Tier 2 촉매. 다 사용하면 사용한 촉매가 남습니다."
+  },
+  "desc.singulo.neutrino_observatory": {
+    "source": "Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.",
+    "translation": "넓은 지역을 계속 스캔하며 근처 플레이어에게 광석과 폐허를 보여줍니다. 전환하는 데 사용합니다."
+  },
+  "desc.singulo.neutrino_scanner": {
+    "source": "Reveals ruins and ores through terrain for 10 seconds.",
+    "translation": "10초 동안 지형을 통해 폐허와 광석을 드러냅니다."
+  },
+  "desc.singulo.observation_log": {
+    "source": "A record from observation posts. Copy it onto data cards.",
+    "translation": "관측소의 기록입니다. 데이터 카드에 복사하세요."
+  },
+  "desc.singulo.optical_lattice_substrate": {
+    "source": "Atoms held in a lattice of light.",
+    "translation": "빛의 격자에 원자가 들어있습니다."
+  },
+  "desc.singulo.particle_accelerator": {
+    "source": "Collides particles into muon bundles and rare monopoles.",
+    "translation": "입자를 뮤온 다발과 희귀 단극체로 충돌시킵니다."
+  },
+  "desc.singulo.penrose_reactor": {
+    "source": "Draws energy from a spinning black hole.",
+    "translation": "회전하는 블랙홀에서 에너지를 끌어옵니다."
+  },
+  "desc.singulo.precision_assembler": {
+    "source": "Assembles most parts and machines from tier 2 on.",
+    "translation": "Tier 2부터는 대부분의 부품과 기계를 조립합니다."
+  },
+  "desc.singulo.probe_station": {
+    "source": "Sends probes to discovered ruins to fetch loot.",
+    "translation": "전리품을 가져오기 위해 탐사선을 발견된 폐허로 보냅니다."
+  },
+  "desc.singulo.quantum_computing_module": {
+    "source": "The brain of advanced machines.",
+    "translation": "첨단 기계의 두뇌."
+  },
+  "desc.singulo.quantum_data_fragment": {
+    "source": "A record from research buildings.",
+    "translation": "연구 건물의 기록입니다."
+  },
+  "desc.singulo.quantum_heat_engine": {
+    "source": "A catalyst-driven generator.",
+    "translation": "촉매 구동 발전기."
+  },
+  "desc.singulo.reactor_mass_alarm": {
+    "source": "Replaces a shell on a reactor ring. Emits redstone when the core reaches its mass limit, stronger near collapse.",
+    "translation": "원자로 링의 쉘을 교체합니다. 코어가 질량 한계에 도달하면 레드스톤을 방출하며, 붕괴에 가까워질수록 더 강해집니다."
+  },
+  "desc.singulo.reactor_shell": {
+    "source": "Shell of the reactor's three rings.",
+    "translation": "원자로의 세 고리의 껍질."
+  },
+  "desc.singulo.reactor_stabilizer": {
+    "source": "Coils at the 45° points of the reactor rings.",
+    "translation": "원자로 링의 45° 지점에 코일이 있습니다."
+  },
+  "desc.singulo.record_fragment": {
+    "source": "A fragment of an ancient record. Decode it in the Archive Terminal to add it to the handbook.",
+    "translation": "고대 기록의 일부입니다. 기록 보관 단말기에서 디코딩하여 핸드북에 추가하세요."
+  },
+  "desc.singulo.ruin_cache": {
+    "source": "Holds ruin loot. Refills some days after emptied.",
+    "translation": "폐허 전리품을 보유하고 있습니다. 비운 후 며칠 후에 다시 채워집니다."
+  },
+  "desc.singulo.ruin_glass": {
+    "source": "Ancient window glass.",
+    "translation": "고대 창문 유리."
+  },
+  "desc.singulo.ruin_guard_dock": {
+    "source": "Launches security drones.",
+    "translation": "보안 드론을 발사합니다."
+  },
+  "desc.singulo.ruin_lamp": {
+    "source": "An ancient lamp that still glows.",
+    "translation": "아직도 빛나고 있는 고대 램프."
+  },
+  "desc.singulo.ruin_panel": {
+    "source": "Ancient building panel.",
+    "translation": "고대 건물 패널."
+  },
+  "desc.singulo.seal_console": {
+    "source": "Touch it to wake the Horizon Warden.",
+    "translation": "지평선 감시자를 깨우려면 터치하세요."
+  },
+  "desc.singulo.settings_card": {
+    "source": "Copies a machine's settings to another.",
+    "translation": "기기의 설정을 다른 기기에 복사합니다."
+  },
+  "desc.singulo.shield_permit": {
+    "source": "Put it in a shield tower: only registered players may build, break or take items inside. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
+    "translation": "방패 타워에 넣으세요. 등록된 플레이어만 안에 아이템을 쌓거나 부수거나 가져갈 수 있습니다. 자신을 등록하는 데 사용합니다. 플레이어에서 사용하여 플레이어와 사용자를 등록하세요. 누구든지 이미터 크라운을 깰 수 있습니다."
+  },
+  "desc.singulo.shield_tower_body": {
+    "source": "Corners of the 3×3 body and the base of the spire.",
+    "translation": "3×3 몸체의 모서리와 첨탑의 밑면입니다."
+  },
+  "desc.singulo.shield_tower_coil": {
+    "source": "Inner 3×3 of the upper plinth layer.",
+    "translation": "상부 주각층 내부 3×3."
+  },
+  "desc.singulo.shield_tower_core": {
+    "source": "Front middle of the upper plinth layer.",
+    "translation": "상부 주각층의 전면 중앙."
+  },
+  "desc.singulo.shield_tower_crown": {
+    "source": "The top of the tower; the dome is cast from here.",
+    "translation": "탑 꼭대기; 돔은 여기에서 주조됩니다."
+  },
+  "desc.singulo.shield_tower_plinth": {
+    "source": "The 5×5 two-layer plinth; its upper edge takes I/O ports.",
+    "translation": "5×5 2층 주각; 위쪽 가장자리에는 I/O 포트가 있습니다."
+  },
+  "desc.singulo.shield_tower_waveguide": {
+    "source": "Middle of each body face; shows the rising energy.",
+    "translation": "각 신체 얼굴의 중앙; 상승하는 에너지를 보여줍니다."
+  },
+  "desc.singulo.singularity_core": {
+    "source": "The tier 5 catalyst.",
+    "translation": "5단계 촉매."
+  },
+  "desc.singulo.singularity_encapsulator": {
+    "source": "Encapsulates singularities.",
+    "translation": "특이점을 캡슐화합니다."
+  },
+  "desc.singulo.singularity_seed": {
+    "source": "Becomes a black hole core when ignited.",
+    "translation": "점화되면 블랙홀 코어가 됩니다."
+  },
+  "desc.singulo.smes_cell": {
+    "source": "Superconducting energy storage.",
+    "translation": "초전도 에너지 저장."
+  },
+  "desc.singulo.smes_module": {
+    "source": "High-capacity energy storage.",
+    "translation": "대용량 에너지 저장 장치."
+  },
+  "desc.singulo.spent_bose_condensate_catalyst": {
+    "source": "Recycle it into lower-tier catalysts.",
+    "translation": "더 낮은 단계의 촉매로 재활용하세요."
+  },
+  "desc.singulo.spent_muon_catalyst": {
+    "source": "A used-up catalyst. Partly recyclable.",
+    "translation": "다 쓴 촉매. 부분적으로 재활용 가능."
+  },
+  "desc.singulo.spent_singularity_core": {
+    "source": "Recycle it into lower-tier catalysts.",
+    "translation": "더 낮은 단계의 촉매로 재활용하세요."
+  },
+  "desc.singulo.spent_time_crystal_catalyst": {
+    "source": "Recycle it into lower-tier catalysts.",
+    "translation": "더 낮은 단계의 촉매로 재활용하세요."
+  },
+  "desc.singulo.steel_blend": {
+    "source": "A mix of iron and coal. Smelt it in a blast furnace to get steel.",
+    "translation": "철과 석탄의 혼합. 용광로에서 제련하면 강철을 얻을 수 있습니다."
+  },
+  "desc.singulo.steel_ingot": {
+    "source": "The basic structural metal. Steel from other mods works too.",
+    "translation": "기본적인 구조용 금속. 다른 모드의 강철도 작동합니다."
+  },
+  "desc.singulo.steel_plate": {
+    "source": "Pressed steel used for casings and parts.",
+    "translation": "케이싱 및 부품에 사용되는 프레스강입니다."
+  },
+  "desc.singulo.strange_matter": {
+    "source": "Ultra-dense matter left by strangelets. Worth 100 mass and usable for degenerate shells.",
+    "translation": "스트레인지렛이 남긴 초밀도 물질. 질량 100의 가치가 있으며 축퇴된 껍질에 사용할 수 있습니다."
+  },
+  "desc.singulo.strangelet": {
+    "source": "Converts nearby blocks into strange matter. Contain it with a Magnetic Bottle.",
+    "translation": "근처의 블록을 이상한 물질로 변환합니다. 자기 병로 격리하세요."
+  },
+  "desc.singulo.superconducting_cable": {
+    "source": "Tier 2 lossless high-capacity cable.",
+    "translation": "Tier 2 무손실 고용량 케이블."
+  },
+  "desc.singulo.superconducting_coil": {
+    "source": "A zero-resistance coil, core of tier 2 tech.",
+    "translation": "2티어 기술의 핵심인 무저항 코일입니다."
+  },
+  "desc.singulo.superconducting_wire": {
+    "source": "Wire for coils and cables.",
+    "translation": "코일 및 케이블용 와이어."
+  },
+  "desc.singulo.thermocouple_module": {
+    "source": "Turns a temperature difference into electricity.",
+    "translation": "온도차를 전기로 변환합니다."
+  },
+  "desc.singulo.thermoelectric_generator": {
+    "source": "Place it between something hot and something cold to generate power. Your first generator.",
+    "translation": "뜨거운 것과 차가운 것 사이에 놓아 전력을 생산합니다. 첫 번째 발전기."
+  },
+  "desc.singulo.time_crystal_catalyst": {
+    "source": "Tier 4 catalyst used by most advanced devices.",
+    "translation": "가장 진보된 장치에 사용되는 Tier 4 촉매."
+  },
+  "desc.singulo.time_crystal_incubator": {
+    "source": "Grows time crystal catalysts. Underpowering lowers their purity.",
+    "translation": "시간 결정 촉매를 성장시킵니다. 힘이 약하면 순도가 낮아집니다."
+  },
+  "desc.singulo.time_crystal_seed": {
+    "source": "Seed for time crystal catalysts.",
+    "translation": "시간 결정 촉매용 시드입니다."
+  },
+  "desc.singulo.tipler_bearing": {
+    "source": "Top and bottom centre; carries the cylinder axle.",
+    "translation": "상단 및 하단 중앙; 실린더 축을 운반합니다."
+  },
+  "desc.singulo.tipler_core": {
+    "source": "Middle of the front, second layer, of the 5×5×9 housing.",
+    "translation": "5×5×9 하우징의 전면 중앙, 두 번째 레이어."
+  },
+  "desc.singulo.tipler_cylinder": {
+    "source": "Speeds up time within 8 blocks.",
+    "translation": "8블록 이내의 시간이 단축됩니다."
+  },
+  "desc.singulo.tipler_frame": {
+    "source": "Frame along the 12 edges of the housing.",
+    "translation": "하우징의 12개 모서리를 따라 프레임을 만듭니다."
+  },
+  "desc.singulo.tipler_holder": {
+    "source": "Either side of each window, middle layer.",
+    "translation": "각 창의 양쪽, 중간 레이어."
+  },
+  "desc.singulo.tipler_housing": {
+    "source": "Housing; any panel can be swapped for an I/O port.",
+    "translation": "주택; 모든 패널을 I/O 포트로 교체할 수 있습니다."
+  },
+  "desc.singulo.tipler_window": {
+    "source": "Five-high slit in each side; shows the spinning cylinder.",
+    "translation": "각 면에 높이 5블록의 틈이 있어 회전하는 원통을 볼 수 있습니다."
+  },
+  "desc.singulo.topological_wire": {
+    "source": "Tier 4 high-capacity cable.",
+    "translation": "Tier 4 대용량 케이블."
+  },
+  "desc.singulo.toroidal_magnetic_coil": {
+    "source": "Makes a strong toroidal field.",
+    "translation": "강력한 토로이달 필드를 만듭니다."
+  },
+  "desc.singulo.unfired_ceramic": {
+    "source": "Clay, sand, Nether quartz and bone meal, ready to be fired into white ceramic.",
+    "translation": "점토, 모래, 네더 석영, 뼛가루, 흰색 세라믹으로 구워질 준비가 되었습니다."
+  },
+  "desc.singulo.unstable_wormhole_mouth": {
+    "source": "Collapses unless stabilized within 60 s.",
+    "translation": "60초 이내에 안정화되지 않으면 붕괴됩니다."
+  },
+  "desc.singulo.white_ceramic_composite": {
+    "source": "The white ceramic used for casings and circuit boards.",
+    "translation": "케이싱 및 회로 기판에 사용되는 백색 세라믹입니다."
+  },
+  "desc.singulo.worldline_anchor_advanced": {
+    "source": "Advanced chunk loader. Embedding a Singularity Core makes it free and maximal.",
+    "translation": "고급 청크 로더. 특이점 코어를 내장하면 무료이며 최대화됩니다."
+  },
+  "desc.singulo.worldline_anchor_small": {
+    "source": "Keeps nearby chunks loaded while fed a catalyst.",
+    "translation": "촉매제를 공급하는 동안 근처 청크를 로드된 상태로 유지합니다."
+  },
+  "desc.singulo.wormhole_generator": {
+    "source": "Creates a pair of wormhole mouths from 100 MFE/t for 10 s.",
+    "translation": "10초 동안 100 MFE/t로 한 쌍의 웜홀 입을 생성합니다."
+  },
+  "desc.singulo.wormhole_generator_coil": {
+    "source": "Equator, either side of each window.",
+    "translation": "적도, 각 창의 양쪽."
+  },
+  "desc.singulo.wormhole_generator_core": {
+    "source": "Front middle of the bottom 3×3 of the sphere.",
+    "translation": "구 바닥 3×3의 앞 중앙."
+  },
+  "desc.singulo.wormhole_generator_focuser": {
+    "source": "Top and bottom centre of the sphere.",
+    "translation": "구의 상단 및 하단 중심입니다."
+  },
+  "desc.singulo.wormhole_generator_shell": {
+    "source": "Sphere shell; any can be swapped for an I/O port.",
+    "translation": "구형 껍질; 모두 I/O 포트로 교체할 수 있습니다."
+  },
+  "desc.singulo.wormhole_generator_window": {
+    "source": "Middle of each face at the equator; shows the vortex.",
+    "translation": "적도에 있는 각 면의 중앙; 소용돌이를 보여줍니다."
+  },
+  "desc.singulo.wormhole_mouth": {
+    "source": "Links to its twin. Needs exotic matter upkeep.",
+    "translation": "쌍둥이에 대한 링크입니다. 이국적인 물질 유지가 필요합니다."
+  },
+  "desc.singulo.wormhole_port": {
+    "source": "Links machines through a wormhole.",
+    "translation": "웜홀을 통해 기계를 연결합니다."
+  },
+  "desc.singulo.wormhole_stabilizer": {
+    "source": "Stabilizes wormhole mouths.",
+    "translation": "웜홀 입을 안정시킵니다."
+  },
+  "direction.singulo.east": {
+    "source": "east",
+    "translation": "동쪽"
+  },
+  "direction.singulo.north": {
+    "source": "north",
+    "translation": "북쪽"
+  },
+  "direction.singulo.northeast": {
+    "source": "northeast",
+    "translation": "북동쪽"
+  },
+  "direction.singulo.northwest": {
+    "source": "northwest",
+    "translation": "북서쪽"
+  },
+  "direction.singulo.south": {
+    "source": "south",
+    "translation": "남쪽"
+  },
+  "direction.singulo.southeast": {
+    "source": "southeast",
+    "translation": "남동쪽"
+  },
+  "direction.singulo.southwest": {
+    "source": "southwest",
+    "translation": "남서쪽"
+  },
+  "direction.singulo.west": {
+    "source": "west",
+    "translation": "서쪽"
+  },
+  "entity.singulo.horizon_bolt": {
+    "source": "Horizon Bolt",
+    "translation": "호라이즌 볼트"
+  },
+  "entity.singulo.horizon_warden": {
+    "source": "Horizon Warden",
+    "translation": "지평선 감시자"
+  },
+  "entity.singulo.security_drone": {
+    "source": "Security Drone",
+    "translation": "경비 드론"
+  },
+  "entity.singulo.warden_singularity": {
+    "source": "Warden Singularity",
+    "translation": "수호자 특이점"
+  },
+  "fluid_type.singulo.axion_condensate": {
+    "source": "Axion Condensate",
+    "translation": "액시온 응축물"
+  },
+  "fluid_type.singulo.dark_matter": {
+    "source": "Dark Matter (WIMP)",
+    "translation": "암흑물질(WIMP)"
+  },
+  "fluid_type.singulo.helium": {
+    "source": "Helium",
+    "translation": "헬륨"
+  },
+  "fluid_type.singulo.hydrogen": {
+    "source": "Hydrogen",
+    "translation": "수소"
+  },
+  "fluid_type.singulo.liquid_helium": {
+    "source": "Liquid Helium",
+    "translation": "액체 헬륨"
+  },
+  "fluid_type.singulo.liquid_nitrogen": {
+    "source": "Liquid Nitrogen",
+    "translation": "액체질소"
+  },
+  "fluid_type.singulo.oxygen": {
+    "source": "Oxygen",
+    "translation": "산소"
+  },
+  "gauntlet.singulo.area.cone": {
+    "source": "Area: forward cone",
+    "translation": "지역: 앞으로 콘"
+  },
+  "gauntlet.singulo.area.single": {
+    "source": "Area: single target",
+    "translation": "지역: 단일 대상"
+  },
+  "gauntlet.singulo.charged": {
+    "source": "Charged %s FE",
+    "translation": "%1$s FE 충전됨"
+  },
+  "gauntlet.singulo.charging": {
+    "source": "Charging %s%%",
+    "translation": "%1$s%% 충전 중"
+  },
+  "gauntlet.singulo.left_click": {
+    "source": "Hold left-click to manipulate gravity",
+    "translation": "중력을 조작하려면 왼쪽 버튼을 길게 클릭하세요."
+  },
+  "gauntlet.singulo.mode.crush": {
+    "source": "Crush",
+    "translation": "크러쉬"
+  },
+  "gauntlet.singulo.mode.levitate": {
+    "source": "Levitate",
+    "translation": "공중에 뜨다"
+  },
+  "gauntlet.singulo.mode.pull": {
+    "source": "Pull",
+    "translation": "당기기"
+  },
+  "gauntlet.singulo.mode.repel": {
+    "source": "Repel",
+    "translation": "격퇴"
+  },
+  "gauntlet.singulo.no_energy": {
+    "source": "Out of energy",
+    "translation": "에너지 부족"
+  },
+  "gauntlet.singulo.no_exotic": {
+    "source": "No exotic matter",
+    "translation": "이국적인 물질 없음"
+  },
+  "gauntlet.singulo.no_target": {
+    "source": "No target",
+    "translation": "대상 없음"
+  },
+  "gauntlet.singulo.no_target_manipulator": {
+    "source": "No target",
+    "translation": "대상 없음"
+  },
+  "gauntlet.singulo.nothing_held": {
+    "source": "Nothing held",
+    "translation": "아무것도 개최되지 않았습니다"
+  },
+  "gauntlet.singulo.thrown": {
+    "source": "Thrown! %s%%",
+    "translation": "던져졌다! %1$s%%"
+  },
+  "gui.singulo.anchor.already_embedded": {
+    "source": "A core is already embedded",
+    "translation": "코어가 이미 내장되어 있습니다."
+  },
+  "gui.singulo.anchor.confirm_embed": {
+    "source": "Use again to embed. It cannot be removed",
+    "translation": "삽입하려면 다시 사용하세요. 제거할 수 없습니다."
+  },
+  "gui.singulo.anchor.core_embedded": {
+    "source": "Core embedded",
+    "translation": "코어 내장"
+  },
+  "gui.singulo.anchor.embedded": {
+    "source": "Singularity Core embedded",
+    "translation": "특이점 코어 내장"
+  },
+  "gui.singulo.anchor.no_catalyst": {
+    "source": "No catalyst",
+    "translation": "촉매 없음"
+  },
+  "gui.singulo.anchor.status": {
+    "source": "Radius %s chunks · %s · %s FE/t · stored %s FE",
+    "translation": "반경 %1$s 청크 · %2$s · %3$s FE/t · 저장됨 %4$s FE"
+  },
+  "gui.singulo.cache.sealed": {
+    "source": "Sealed by a force field. Wake and defeat the warden at the central console",
+    "translation": "역장으로 봉인되었습니다. 중앙 콘솔에서 수호자을 깨워 처치하세요"
+  },
+  "gui.singulo.catalyst.effect": {
+    "source": "Speed ×%s · Wear ×%s",
+    "translation": "속도 ×%1$s · 착용 ×%2$s"
+  },
+  "gui.singulo.catalyst.none": {
+    "source": "Insert a catalyst",
+    "translation": "촉매 삽입"
+  },
+  "gui.singulo.catalyst.slot": {
+    "source": "Catalyst",
+    "translation": "촉매"
+  },
+  "gui.singulo.catalyst.underpowered": {
+    "source": "Underpowered: catalyst wears faster",
+    "translation": "전력 부족: 촉매가 더 빨리 마모됩니다."
+  },
+  "gui.singulo.catalyst.unusable": {
+    "source": "Catalyst tier too low",
+    "translation": "촉매제 등급이 너무 낮습니다."
+  },
+  "gui.singulo.console.active": {
+    "source": "The warden is already active",
+    "translation": "수호자은 이미 활동 중입니다."
+  },
+  "gui.singulo.console.awakened": {
+    "source": "The seal breaks. The Horizon Warden awakens",
+    "translation": "씰이 파손됩니다. 지평선 감시자가 깨어납니다"
+  },
+  "gui.singulo.console.defeated": {
+    "source": "The warden falls silent. The vault field dissipates",
+    "translation": "수호자은 침묵한다. 볼트 필드가 소멸됩니다."
+  },
+  "gui.singulo.console.no_vault": {
+    "source": "No sealed vault nearby",
+    "translation": "근처에 봉인된 금고가 없습니다."
+  },
+  "gui.singulo.console.open": {
+    "source": "The vault is not sealed",
+    "translation": "금고는 봉인되지 않았습니다"
+  },
+  "gui.singulo.console.reset": {
+    "source": "No challenger remains. The warden returns to its seal",
+    "translation": "도전자는 남아있지 않습니다. 수호자은 봉인으로 돌아갑니다"
+  },
+  "gui.singulo.containment.leaking": {
+    "source": "Dark matter %s / %s mB · leaking",
+    "translation": "암흑 물질 %1$s / %2$s mB · 누출"
+  },
+  "gui.singulo.containment.status": {
+    "source": "Dark matter %s / %s mB",
+    "translation": "암흑물질 %1$s / %2$s mB"
+  },
+  "gui.singulo.detector.band.0": {
+    "source": "within 256 blocks",
+    "translation": "256블록 이내"
+  },
+  "gui.singulo.detector.band.1": {
+    "source": "256–512 blocks",
+    "translation": "256~512 블록"
+  },
+  "gui.singulo.detector.band.2": {
+    "source": "512–1024 blocks",
+    "translation": "512~1024 블록"
+  },
+  "gui.singulo.detector.band.3": {
+    "source": "1024–2048 blocks",
+    "translation": "1024~2048 블록"
+  },
+  "gui.singulo.detector.band.4": {
+    "source": "over 2048 blocks",
+    "translation": "2048개 이상의 블록"
+  },
+  "gui.singulo.detector.no_power": {
+    "source": "An observation needs %s FE",
+    "translation": "관찰에는 %1$s FE가 필요합니다."
+  },
+  "gui.singulo.detector.none": {
+    "source": "No gravity anomaly found",
+    "translation": "중력 이상이 발견되지 않음"
+  },
+  "gui.singulo.detector.result": {
+    "source": "Gravitational waves detected: %s, %s",
+    "translation": "중력파 감지됨: %1$s, %2$s"
+  },
+  "gui.singulo.device.detector.cost": {
+    "source": "%s FE each",
+    "translation": "%1$s FE 각"
+  },
+  "gui.singulo.device.detector.not_yet": {
+    "source": "Not observed yet",
+    "translation": "아직 관찰되지 않음"
+  },
+  "gui.singulo.device.detector.observe": {
+    "source": "Observe",
+    "translation": "관찰하다"
+  },
+  "gui.singulo.device.energy_short": {
+    "source": "Energy %s / %s FE",
+    "translation": "에너지 %1$s / %2$s FE"
+  },
+  "gui.singulo.device.exotic": {
+    "source": "Exotic matter: %s",
+    "translation": "이국적인 물질: %1$s"
+  },
+  "gui.singulo.device.fuel": {
+    "source": "Fuel: %s",
+    "translation": "연료: %1$s"
+  },
+  "gui.singulo.device.generator.done": {
+    "source": "Mouths ready",
+    "translation": "입이 준비됐어"
+  },
+  "gui.singulo.device.generator.expires": {
+    "source": "%ss left",
+    "translation": "%1$s 남음"
+  },
+  "gui.singulo.device.generator.idle": {
+    "source": "Feed power for 10 s",
+    "translation": "10초 동안 공급 전력"
+  },
+  "gui.singulo.device.generator.input": {
+    "source": "Input %sFE/t · need %sFE/t",
+    "translation": "입력 %1$sFE/t · 필요 %2$sFE/t"
+  },
+  "gui.singulo.device.generator.working": {
+    "source": "Generating %s / %s s",
+    "translation": "%1$s / %2$s 생성 중"
+  },
+  "gui.singulo.device.halo.core": {
+    "source": "Core mass %s",
+    "translation": "코어 질량 %1$s"
+  },
+  "gui.singulo.device.halo.leak": {
+    "source": "Pushes to tanks each second",
+    "translation": "매초마다 탱크로 밀립니다."
+  },
+  "gui.singulo.device.halo.no_core": {
+    "source": "No core within %s blocks",
+    "translation": "%1$s 블록 내에 코어가 없음"
+  },
+  "gui.singulo.device.halo.rate": {
+    "source": "Collecting %s mB/s",
+    "translation": "%1$s mB/s 수집 중"
+  },
+  "gui.singulo.device.halo.tank": {
+    "source": "Buffer %s / %s mB",
+    "translation": "버퍼 %1$s / %2$s mB"
+  },
+  "gui.singulo.device.mouth.bandwidth": {
+    "source": "%sFE, %s items, %smB /t",
+    "translation": "%1$sFE, 아이템 %2$s개, %3$smB /t"
+  },
+  "gui.singulo.device.mouth.cross": {
+    "source": "Other dimension",
+    "translation": "다른 차원"
+  },
+  "gui.singulo.device.mouth.linked": {
+    "source": "Pair %s,%s,%s",
+    "translation": "쌍 %1$s,%2$s,%3$s"
+  },
+  "gui.singulo.device.mouth.no_partner": {
+    "source": "No partner",
+    "translation": "파트너 없음"
+  },
+  "gui.singulo.device.mouth.size": {
+    "source": "Throat %sx%s -> %sx%s",
+    "translation": "목구멍 %1$sx%2$s -> %3$sx%4$s"
+  },
+  "gui.singulo.device.mouth.starving": {
+    "source": "No fuel: shrinks in %ss",
+    "translation": "연료 없음: %1$s에서 수축"
+  },
+  "gui.singulo.device.mouth.unloaded": {
+    "source": "Pair %s, %s, %s · unloaded",
+    "translation": "쌍 %1$s, %2$s, %3$s · 언로드됨"
+  },
+  "gui.singulo.device.mouth.upkeep": {
+    "source": "1 lasts %s min",
+    "translation": "1은 %1$s분 동안 지속됩니다."
+  },
+  "gui.singulo.device.mouth.upkeep_none": {
+    "source": "No upkeep",
+    "translation": "유지 보수 없음"
+  },
+  "gui.singulo.device.muon.altitude": {
+    "source": "Altitude Y=%s",
+    "translation": "고도 Y=%1$s"
+  },
+  "gui.singulo.device.muon.hint": {
+    "source": "0 at Y100, max at Y200",
+    "translation": "Y100에서는 0, Y200에서는 최대"
+  },
+  "gui.singulo.device.muon.no_sky": {
+    "source": "No sky access",
+    "translation": "스카이 액세스 불가"
+  },
+  "gui.singulo.device.muon.rate": {
+    "source": "Rate %s%%",
+    "translation": "평가 %1$s%%"
+  },
+  "gui.singulo.device.no_fuel": {
+    "source": "No fuel",
+    "translation": "연료 없음"
+  },
+  "gui.singulo.device.not_formed": {
+    "source": "Incomplete",
+    "translation": "미완성"
+  },
+  "gui.singulo.device.output": {
+    "source": "Output %s FE/t",
+    "translation": "출력 %1$s FE/t"
+  },
+  "gui.singulo.device.port.hint": {
+    "source": "Neighbours link through",
+    "translation": "이웃은 링크를 통해"
+  },
+  "gui.singulo.device.port.linked": {
+    "source": "Linked",
+    "translation": "연결됨"
+  },
+  "gui.singulo.device.port.no_mouth": {
+    "source": "No mouth nearby",
+    "translation": "근처에 입이 없음"
+  },
+  "gui.singulo.device.port.no_partner": {
+    "source": "Mouth has no partner",
+    "translation": "입에는 파트너가 없다"
+  },
+  "gui.singulo.device.port.targets": {
+    "source": "Far side: %s power, %s items, %s fluids",
+    "translation": "반대쪽: %1$s 전원, %2$s 품목, %3$s 유체"
+  },
+  "gui.singulo.device.port.throat": {
+    "source": "Throat %sx%s",
+    "translation": "목구멍 %1$sx%2$s"
+  },
+  "gui.singulo.device.radius_blocks": {
+    "source": "Radius %s blocks",
+    "translation": "반경 %1$s 블록"
+  },
+  "gui.singulo.device.radius_chunks": {
+    "source": "Radius %s chunks",
+    "translation": "반경 %1$s 청크"
+  },
+  "gui.singulo.device.tank.contained": {
+    "source": "Contained",
+    "translation": "격리됨"
+  },
+  "gui.singulo.device.tank.label": {
+    "source": "Dark matter",
+    "translation": "암흑물질"
+  },
+  "gui.singulo.device.tank.leaking": {
+    "source": "No power: leaking 1%%/s",
+    "translation": "전원 없음: 1%%/s 누출"
+  },
+  "gui.singulo.device.tank.upkeep": {
+    "source": "Field upkeep %s FE/t",
+    "translation": "현장 유지 %1$s FE/t"
+  },
+  "gui.singulo.device.usage": {
+    "source": "Uses %s FE/t",
+    "translation": "%1$s FE/t를 사용합니다."
+  },
+  "gui.singulo.empty_tank": {
+    "source": "Empty",
+    "translation": "비어 있음"
+  },
+  "gui.singulo.energy": {
+    "source": "%s / %s FE",
+    "translation": "%1$s / %2$s FE"
+  },
+  "gui.singulo.energy_rate": {
+    "source": "%s FE/t",
+    "translation": "%1$s FE/t"
+  },
+  "gui.singulo.fluid": {
+    "source": "%s: %s / %s mB",
+    "translation": "%1$s: %2$s / %3$s mB"
+  },
+  "gui.singulo.halo.no_core": {
+    "source": "No running core within %s blocks",
+    "translation": "%1$s 블록 내에는 실행 중인 코어가 없습니다."
+  },
+  "gui.singulo.halo.status": {
+    "source": "Collecting %s mB/s · %s mB inside",
+    "translation": "%1$s mB/s · %2$s mB 내부 수집"
+  },
+  "gui.singulo.handbook.done_count": {
+    "source": "Completed %s / %s",
+    "translation": "%1$s / %2$s 완료됨"
+  },
+  "gui.singulo.handbook.locked": {
+    "source": "???",
+    "translation": "???"
+  },
+  "gui.singulo.handbook.next": {
+    "source": "Next goals",
+    "translation": "다음 목표"
+  },
+  "gui.singulo.handbook.no_records": {
+    "source": "No records decoded yet. Find record fragments in ruins and decode them in the Archive Terminal.",
+    "translation": "아직 디코딩된 기록이 없습니다. 폐허가 된 기록 조각을 찾아 기록 보관 단말기에서 해독하세요."
+  },
+  "gui.singulo.handbook.page": {
+    "source": "%s / %s",
+    "translation": "%1$s / %2$s"
+  },
+  "gui.singulo.handbook.progress": {
+    "source": "Progress",
+    "translation": "진행상황"
+  },
+  "gui.singulo.handbook.records": {
+    "source": "Ancient Records",
+    "translation": "고대 기록"
+  },
+  "gui.singulo.handbook.stage": {
+    "source": "Stage %s",
+    "translation": "스테이지 %1$s"
+  },
+  "gui.singulo.handbook.title": {
+    "source": "Singulo Handbook",
+    "translation": "Singulo 핸드북"
+  },
+  "gui.singulo.mass_buffer": {
+    "source": "Mass %s / %s",
+    "translation": "질량 %1$s / %2$s"
+  },
+  "gui.singulo.mode.hint": {
+    "source": "Click to change mode",
+    "translation": "모드를 변경하려면 클릭하세요."
+  },
+  "gui.singulo.mode.mass": {
+    "source": "Compress: %s",
+    "translation": "압축: %1$s"
+  },
+  "gui.singulo.mode.normal": {
+    "source": "Normal processing",
+    "translation": "일반 처리"
+  },
+  "gui.singulo.muon_collector.rate": {
+    "source": "Collection %s%%",
+    "translation": "컬렉션 %1$s%%"
+  },
+  "gui.singulo.observatory.off": {
+    "source": "Display off",
+    "translation": "디스플레이 꺼짐"
+  },
+  "gui.singulo.observatory.on": {
+    "source": "Display on · ores %s · ruins %s",
+    "translation": "표시 · 광석 %1$s · 유적 %2$s"
+  },
+  "gui.singulo.probe.no_target": {
+    "source": "No known ruins",
+    "translation": "알려진 유적 없음"
+  },
+  "gui.singulo.probe.return": {
+    "source": "Next return in %s s",
+    "translation": "%1$s의 다음 반환"
+  },
+  "gui.singulo.probe.targets": {
+    "source": "%s ruins registered",
+    "translation": "%1$s 유적 등록됨"
+  },
+  "gui.singulo.reactor.buffer": {
+    "source": "Buffer %s GFE",
+    "translation": "버퍼 %1$s GFE"
+  },
+  "gui.singulo.reactor.burst": {
+    "source": "The core evaporated. Restart it with a Singularity Core and ignition power",
+    "translation": "코어가 증발했습니다. 특이점 코어 및 점화 전원으로 다시 시작하십시오."
+  },
+  "gui.singulo.reactor.collapse": {
+    "source": "The reactor is collapsing under the mass!",
+    "translation": "원자로가 질량 아래서 붕괴되고 있습니다!"
+  },
+  "gui.singulo.reactor.eta": {
+    "source": "Accretion efficiency %s%%",
+    "translation": "부착 효율 %1$s%%"
+  },
+  "gui.singulo.reactor.ignite": {
+    "source": "Ignite",
+    "translation": "점화하다"
+  },
+  "gui.singulo.reactor.ignition_failed": {
+    "source": "Ignition failed: not enough power in time",
+    "translation": "점화 실패: 제 시간에 전력이 부족함"
+  },
+  "gui.singulo.reactor.interval": {
+    "source": "Feed interval",
+    "translation": "공급 간격"
+  },
+  "gui.singulo.reactor.interval.hint": {
+    "source": "0 = auto",
+    "translation": "0 = 자동"
+  },
+  "gui.singulo.reactor.mass": {
+    "source": "Core mass %s",
+    "translation": "코어 질량 %1$s"
+  },
+  "gui.singulo.reactor.mode.catalyst": {
+    "source": "Catalyst mode",
+    "translation": "촉매 모드"
+  },
+  "gui.singulo.reactor.mode.danger": {
+    "source": "Evaporation danger zone",
+    "translation": "증발 위험 구역"
+  },
+  "gui.singulo.reactor.mode.ergo": {
+    "source": "Ergo extraction mode",
+    "translation": "Ergo 추출 모드"
+  },
+  "gui.singulo.reactor.mode.power": {
+    "source": "Power mode",
+    "translation": "전원 모드"
+  },
+  "gui.singulo.reactor.mode.standby": {
+    "source": "Standby",
+    "translation": "대기"
+  },
+  "gui.singulo.reactor.output": {
+    "source": "Output %s FE/t",
+    "translation": "출력 %1$s FE/t"
+  },
+  "gui.singulo.reactor.recaptured": {
+    "source": "The rogue black hole is now the core",
+    "translation": "이제 악성 블랙홀이 핵심이다"
+  },
+  "gui.singulo.reactor.slot.0": {
+    "source": "Singularity seed",
+    "translation": "특이점 씨앗"
+  },
+  "gui.singulo.reactor.slot.1": {
+    "source": "Mass pellets",
+    "translation": "대량 펠릿"
+  },
+  "gui.singulo.reactor.slot.2": {
+    "source": "Jet collectors",
+    "translation": "제트 수집가"
+  },
+  "gui.singulo.reactor.slot.3": {
+    "source": "H-collector",
+    "translation": "H-컬렉터"
+  },
+  "gui.singulo.reactor.slot.4": {
+    "source": "Ergosphere ring",
+    "translation": "작용권 링"
+  },
+  "gui.singulo.reactor.slot.5": {
+    "source": "By-products",
+    "translation": "부산물"
+  },
+  "gui.singulo.reactor.slot.collectors": {
+    "source": "Collectors",
+    "translation": "수집가"
+  },
+  "gui.singulo.reactor.slot.fuel": {
+    "source": "Fuel",
+    "translation": "연료"
+  },
+  "gui.singulo.reactor.slot.seed": {
+    "source": "Seed",
+    "translation": "종자"
+  },
+  "gui.singulo.reactor.spin": {
+    "source": "Spin %s / target %s",
+    "translation": "스핀 %1$s / 타겟 %2$s"
+  },
+  "gui.singulo.reactor.spin_target": {
+    "source": "Spin target",
+    "translation": "스핀 타겟"
+  },
+  "gui.singulo.reactor.state.dormant": {
+    "source": "Dormant",
+    "translation": "휴면"
+  },
+  "gui.singulo.reactor.state.igniting": {
+    "source": "Igniting %s%% · %s s",
+    "translation": "%1$s%% · %2$s 점화 중"
+  },
+  "gui.singulo.reactor.state.running": {
+    "source": "Running",
+    "translation": "달리기"
+  },
+  "gui.singulo.reactor.state.unformed": {
+    "source": "Not formed",
+    "translation": "형성되지 않음"
+  },
+  "gui.singulo.shield.basic": {
+    "source": "Guards: explosions, mob griefing",
+    "translation": "경비병: 폭발, 폭도의 슬픔"
+  },
+  "gui.singulo.shield.full": {
+    "source": "Guards: explosions, griefing, hostile spawns, intrusion",
+    "translation": "경비병: 폭발, 슬픔, 적대적인 출현, 침입"
+  },
+  "gui.singulo.shield.locked": {
+    "source": "Not on the permit",
+    "translation": "허가증에 없음"
+  },
+  "gui.singulo.shield.permit_off": {
+    "source": "No permit",
+    "translation": "허가 없음"
+  },
+  "gui.singulo.shield.permit_on": {
+    "source": "Permit: only %s players may build inside",
+    "translation": "허가: %1$s 플레이어만 내부에 건설할 수 있습니다."
+  },
+  "gui.singulo.sides.button": {
+    "source": "Sides",
+    "translation": "측면"
+  },
+  "gui.singulo.sides.eject_off": {
+    "source": "Auto-eject: off",
+    "translation": "자동 꺼내기: 꺼짐"
+  },
+  "gui.singulo.sides.eject_on": {
+    "source": "Auto-eject: on",
+    "translation": "자동 꺼내기: 켜짐"
+  },
+  "gui.singulo.sides.face.back": {
+    "source": "Back",
+    "translation": "뒤로"
+  },
+  "gui.singulo.sides.face.bottom": {
+    "source": "Bottom",
+    "translation": "바닥"
+  },
+  "gui.singulo.sides.face.front": {
+    "source": "Front",
+    "translation": "전면"
+  },
+  "gui.singulo.sides.face.left": {
+    "source": "Left",
+    "translation": "왼쪽"
+  },
+  "gui.singulo.sides.face.right": {
+    "source": "Right",
+    "translation": "오른쪽"
+  },
+  "gui.singulo.sides.face.top": {
+    "source": "Top",
+    "translation": "탑"
+  },
+  "gui.singulo.sides.fluids": {
+    "source": "Fluids",
+    "translation": "유체"
+  },
+  "gui.singulo.sides.hint": {
+    "source": "Drag to rotate · click to change · right-click for auto-eject",
+    "translation": "회전하려면 드래그하세요. 변경하려면 클릭하세요. 자동 꺼내려면 마우스 오른쪽 버튼을 클릭하세요."
+  },
+  "gui.singulo.sides.items": {
+    "source": "Items",
+    "translation": "품목"
+  },
+  "gui.singulo.sides.legend": {
+    "source": "Grey off · Blue in · Orange out · Green both",
+    "translation": "회색 꺼짐 · 파란색 켜짐 · 주황색 꺼짐 · 녹색 모두"
+  },
+  "gui.singulo.sides.master_off": {
+    "source": "Auto-eject OFF",
+    "translation": "자동 꺼내기 끄기"
+  },
+  "gui.singulo.sides.master_on": {
+    "source": "Auto-eject ON",
+    "translation": "자동 꺼내기 켜짐"
+  },
+  "gui.singulo.sides.mode.0": {
+    "source": "Disabled",
+    "translation": "장애인"
+  },
+  "gui.singulo.sides.mode.1": {
+    "source": "Input",
+    "translation": "입력"
+  },
+  "gui.singulo.sides.mode.2": {
+    "source": "Output",
+    "translation": "출력"
+  },
+  "gui.singulo.sides.mode.3": {
+    "source": "Input & output",
+    "translation": "입력 및 출력"
+  },
+  "gui.singulo.slot.catalyst": {
+    "source": "Catalyst",
+    "translation": "촉매"
+  },
+  "gui.singulo.slot.fuel": {
+    "source": "Fuel",
+    "translation": "연료"
+  },
+  "gui.singulo.slot.permit": {
+    "source": "Permit",
+    "translation": "허가"
+  },
+  "gui.singulo.slot.upgrade": {
+    "source": "Monopole upgrade",
+    "translation": "모노폴 업그레이드"
+  },
+  "gui.singulo.smes.hint": {
+    "source": "Up to %s FE/t. Receives on the other five faces",
+    "translation": "최대 %1$s FE/t. 나머지 5개 면에서 수신"
+  },
+  "gui.singulo.smes.in": {
+    "source": "In: %s FE/t",
+    "translation": "에서: %1$s FE/t"
+  },
+  "gui.singulo.smes.out": {
+    "source": "Output %s FE/t",
+    "translation": "출력 %1$s FE/t"
+  },
+  "gui.singulo.stabilizer.done": {
+    "source": "Done",
+    "translation": "완료"
+  },
+  "gui.singulo.stabilizer.empty": {
+    "source": "Empty",
+    "translation": "비어 있음"
+  },
+  "gui.singulo.stabilizer.fuel": {
+    "source": "Exotic matter",
+    "translation": "이국적인 물질"
+  },
+  "gui.singulo.stabilizer.waiting": {
+    "source": "Waiting",
+    "translation": "대기 중"
+  },
+  "gui.singulo.stabilizer.working": {
+    "source": "Stabilizing %s%%",
+    "translation": "%1$s%% 안정화 중"
+  },
+  "gui.singulo.status.idle": {
+    "source": "Idle",
+    "translation": "유휴"
+  },
+  "gui.singulo.status.no_power": {
+    "source": "Not enough power",
+    "translation": "힘이 부족해요"
+  },
+  "gui.singulo.status.not_formed": {
+    "source": "Not formed",
+    "translation": "형성되지 않음"
+  },
+  "gui.singulo.status.output_full": {
+    "source": "Output full",
+    "translation": "출력이 가득 참"
+  },
+  "gui.singulo.status.running": {
+    "source": "Running",
+    "translation": "달리기"
+  },
+  "gui.singulo.structure.casimir_cavity": {
+    "source": "5×5×5",
+    "translation": "5×5×5"
+  },
+  "gui.singulo.structure.cryogenic_cooling_tower": {
+    "source": "Height %s",
+    "translation": "높이 %1$s"
+  },
+  "gui.singulo.structure.degenerate_compactor": {
+    "source": "3×3×3",
+    "translation": "3×3×3"
+  },
+  "gui.singulo.structure.particle_accelerator": {
+    "source": "Side %s",
+    "translation": "측면 %1$s"
+  },
+  "gui.singulo.thermo.cold": {
+    "source": "Cold side %s K",
+    "translation": "차가운 쪽 %1$s K"
+  },
+  "gui.singulo.thermo.coolant": {
+    "source": "Liquid nitrogen %s mB",
+    "translation": "액체질소 %1$s mB"
+  },
+  "gui.singulo.thermo.delta": {
+    "source": "Delta T %s K",
+    "translation": "델타 T %1$s K"
+  },
+  "gui.singulo.thermo.hot": {
+    "source": "Hot side %s K",
+    "translation": "핫사이드 %1$s K"
+  },
+  "gui.singulo.thermo.melting": {
+    "source": "Cold side melting: %s K difference",
+    "translation": "냉측 용융 : %1$s K 차이"
+  },
+  "gui.singulo.thermo.none": {
+    "source": "No heat source or heat sink adjacent",
+    "translation": "열원이나 방열판이 인접하지 않음"
+  },
+  "gui.singulo.wormhole.generated": {
+    "source": "A pair of mouths formed. Stabilize within %s s",
+    "translation": "한 쌍의 입이 형성되었습니다. %1$s 내에서 안정화"
+  },
+  "gui.singulo.wormhole.generator": {
+    "source": "Generating %s / %s s",
+    "translation": "%1$s / %2$s 생성 중"
+  },
+  "gui.singulo.wormhole.mouth_collapsed": {
+    "source": "An unstable wormhole mouth collapsed",
+    "translation": "불안정한 웜홀 입이 무너졌다"
+  },
+  "gui.singulo.wormhole.no_partner": {
+    "source": "No paired mouth",
+    "translation": "입이 짝을 이루지 않음"
+  },
+  "gui.singulo.wormhole.partner_unloaded": {
+    "source": "The paired mouth is not loaded",
+    "translation": "페어링된 입이 로드되지 않습니다."
+  },
+  "gui.singulo.wormhole.stabilizer": {
+    "source": "Stabilizing %s%% / %s%%, exotic matter: %s",
+    "translation": "%1$s%% / %2$s%% 안정화, 이물질: %3$s"
+  },
+  "gui.singulo.wormhole.status": {
+    "source": "Throat %1$s×%1$s · target %2$s×%2$s · exotic matter %3$s",
+    "translation": "목구멍 %1$s×%1$s · 표적 %2$s×%2$s · 외래물질 %3$s"
+  },
+  "gui.singulo.wormhole_port.no_mouth": {
+    "source": "No open mouth within 8 blocks",
+    "translation": "8블록 내에서는 입을 벌릴 수 없습니다."
+  },
+  "gui.singulo.wormhole_port.no_partner": {
+    "source": "The mouth is not connected",
+    "translation": "입이 연결되지 않음"
+  },
+  "gui.singulo.wormhole_port.status": {
+    "source": "Connected to %s handlers on the other side",
+    "translation": "반대편의 %1$s 핸들러에 연결됨"
+  },
+  "guide.singulo.catalysts": {
+    "source": "Catalysts",
+    "translation": "촉매"
+  },
+  "guide.singulo.catalysts.slots.body": {
+    "source": "Catalyst machines have a dedicated slot that accepts only catalysts. Spent catalysts can be recycled into about 25% of a lower-tier catalyst.",
+    "translation": "촉매 기계에는 촉매만 수용하는 전용 슬롯이 있습니다. 사용한 촉매는 약 25%의 하위 촉매로 재활용될 수 있습니다."
+  },
+  "guide.singulo.catalysts.slots.title": {
+    "source": "Catalyst slots and recycling",
+    "translation": "촉매 슬롯 및 재활용"
+  },
+  "guide.singulo.catalysts.tiers.body": {
+    "source": "Muon (2), BE (3), Time crystal (4), Singularity core (5). Higher tier = faster and less wear; one lower = half speed and double wear; two lower = unusable. Underpowering wears catalysts faster.",
+    "translation": "뮤온(2), BE(3), 시간 결정(4), 특이점 코어(5). 높은 계층 = 더 빠르고 마모가 적습니다. 하나 더 낮음 = 절반 속도 및 이중 마모; 두 개 낮음 = 사용할 수 없음. 전력 부족은 촉매제를 더 빨리 마모시킵니다."
+  },
+  "guide.singulo.catalysts.tiers.title": {
+    "source": "Tiers and effects",
+    "translation": "등급 및 효과"
+  },
+  "guide.singulo.catalysts.time.body": {
+    "source": "Near a running reactor catalysts wear at ×0.5; inside a T-Cylinder field ×2. The two cancel out.",
+    "translation": "작동 중인 반응기 근처에서 촉매는 ×0.5로 마모됩니다. 티플러 원통 필드 내부 ×2. 두 사람은 취소합니다."
+  },
+  "guide.singulo.catalysts.time.title": {
+    "source": "Time fields",
+    "translation": "시간 필드"
+  },
+  "guide.singulo.hazards": {
+    "source": "Hazards",
+    "translation": "위험"
+  },
+  "guide.singulo.hazards.list.body": {
+    "source": "- Tidal zone ignores armour.\n- Leaking hydrogen near fire explodes.\n- Large accelerators may leak strangelets that convert blocks into strange matter; contain them with a Magnetic Bottle.",
+    "translation": "- 타이들 존은 방어구를 무시합니다.\n- 불 근처에서 수소가 누출되면 폭발합니다.\n- 대형 가속기는 블록을 이상한 물질로 변환하는 이상한 물질을 누출할 수 있습니다. 자기 병로 포함하세요."
+  },
+  "guide.singulo.hazards.list.title": {
+    "source": "Hazards",
+    "translation": "위험"
+  },
+  "guide.singulo.intro": {
+    "source": "Getting Started",
+    "translation": "시작하기"
+  },
+  "guide.singulo.intro.basics.body": {
+    "source": "Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods' pipes.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
+    "translation": "전력(FE)은 Singulo 케이블로 전달합니다. 아이템과 유체는 면 설정과 다른 모드의 파이프를 사용합니다.\n2단계부터 전용 슬롯에 수명이 있는 소모품인 촉매를 넣습니다. 기계보다 한 등급 높으면 빨라지고, 한 등급 낮으면 느려지며 마모가 늘어납니다. 두 등급 낮으면 사용할 수 없습니다.\n고대 유적에는 제작할 수 없는 기록과 부품이 있습니다. 일찍부터 지표 관측소를 찾아보세요."
+  },
+  "guide.singulo.intro.basics.title": {
+    "source": "Power, catalysts and ruins",
+    "translation": "전력, 촉매제 및 폐허"
+  },
+  "guide.singulo.intro.howto.body": {
+    "source": "- Pick a chapter on the left; flip pages with the arrows.\n- The Progress chapter shows finished and next goals (same as the Singulo advancement tab).\n- Hover items for a description; hold Shift for recipes and uses.\n- Use the Holo Projector on a multiblock controller to see its shape.",
+    "translation": "- 왼쪽에서 챕터를 선택하세요. 화살표로 페이지를 넘기세요.\n- 진행 상황 장에는 완료된 목표와 다음 목표가 표시됩니다(Singulo 발전 탭과 동일).\n- 설명을 보려면 항목을 가리키세요. 레시피와 용도를 확인하려면 Shift를 누르세요.\n- 멀티블록 컨트롤러에 홀로그램 투영기를 사용하여 모양을 확인하세요."
+  },
+  "guide.singulo.intro.howto.title": {
+    "source": "Using this book",
+    "translation": "이 책을 사용하여"
+  },
+  "guide.singulo.intro.welcome.body": {
+    "source": "Singulo is a tech mod about extracting energy from mass. Start with thermoelectric power, climb through cryogenic, quantum and temporal tech, and finally run a spinning black hole.\nThere are five stages. Read the stage chapters in order to know what to build next.",
+    "translation": "Singulo는 질량에서 에너지를 추출하는 기술 모드입니다. 열전 발전으로 시작하여 극저온, 양자 및 시간 기술을 거쳐 마지막으로 회전하는 블랙홀을 실행하세요.\n5단계가 있습니다. 다음에 무엇을 빌드할지 알아보려면 스테이지 장을 읽어보세요."
+  },
+  "guide.singulo.intro.welcome.title": {
+    "source": "Welcome to Singulo",
+    "translation": "Singulo에 오신 것을 환영합니다."
+  },
+  "guide.singulo.multiblocks": {
+    "source": "Multiblocks",
+    "translation": "멀티블록"
+  },
+  "guide.singulo.multiblocks.list.body": {
+    "source": "cooling_tower, particle_accelerator, degenerate_compactor, casimir_cavity, degenerate_furnace, penrose_reactor, event_horizon_shield, tipler_cylinder, wormhole_generator.",
+    "translation": "냉각탑, 입자_가속기, degenerate_compactor, casimir_cavity, degenerate_furnace, penrose_reactor, event_horizon_shield,tipler_cylinder, wormhole_generator."
+  },
+  "guide.singulo.multiblocks.list.title": {
+    "source": "Multiblock list",
+    "translation": "다중 차단 목록"
+  },
+  "guide.singulo.multiblocks.projector.body": {
+    "source": "1. Place the controller; the structure extends behind it.\n2. Use the projector on it to see the shape and a material list.\n3. Fill the cyan boxes, clear the red ones. It lights up when complete.\n4. Sneak-use to change size.\nIn creative: /singulo build <name> [size].",
+    "translation": "1. 컨트롤러를 배치합니다. 구조는 그 뒤에 확장됩니다.\n2. 프로젝터를 사용하여 모양과 재료 목록을 확인하세요.\n3. 청록색 상자를 채우고 빨간색 상자를 지웁니다. 완료되면 불이 들어옵니다.\n4. 몰래 사용하여 크기를 변경합니다.\n광고 소재: /singulo 빌드 <이름> [크기]."
+  },
+  "guide.singulo.multiblocks.projector.title": {
+    "source": "Using the Holo Projector",
+    "translation": "홀로그램 투영기 사용"
+  },
+  "guide.singulo.power": {
+    "source": "Power and Logistics",
+    "translation": "전력 및 물류"
+  },
+  "guide.singulo.power.cables.body": {
+    "source": "Copper wire → superconducting cable → topological wire → horizon bus. A network carries what its weakest cable can.",
+    "translation": "구리선 → 초전도 케이블 → 토폴로지 와이어 → 호라이즌 버스. 네트워크는 가장 약한 케이블을 운반할 수 있습니다."
+  },
+  "guide.singulo.power.cables.title": {
+    "source": "Cables",
+    "translation": "케이블"
+  },
+  "guide.singulo.power.sides.body": {
+    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.",
+    "translation": "일반 처리 기계 화면에서 측면 버튼을 사용하여 각 면을 끄기/입력/출력/모두로 설정하고 자동 배출 옵션도 제공합니다. 멀티블록은 지정된 I/O 포트를 사용합니다. 펜로즈 반응로는 추출 포트를 사용합니다."
+  },
+  "guide.singulo.power.sides.title": {
+    "source": "Side configuration",
+    "translation": "측면 구성"
+  },
+  "guide.singulo.power.wormhole.body": {
+    "source": "The only wireless link. Generate, stabilize, carry and place the mouths; ports near them link machines.",
+    "translation": "유일한 무선 링크입니다. 입을 생성, 안정화, 운반 및 배치합니다. 근처의 포트는 링크 머신을 연결합니다."
+  },
+  "guide.singulo.power.wormhole.title": {
+    "source": "Wormholes",
+    "translation": "웜홀"
+  },
+  "guide.singulo.romance": {
+    "source": "Singularity Tech",
+    "translation": "특이점 기술"
+  },
+  "guide.singulo.romance.darkmatter.body": {
+    "source": "Collect near a core, store in containment tanks, feed the core directly.",
+    "translation": "코어 근처에서 수집하고, 격리 탱크에 저장하고, 코어에 직접 공급합니다."
+  },
+  "guide.singulo.romance.darkmatter.title": {
+    "source": "Dark matter",
+    "translation": "암흑물질"
+  },
+  "guide.singulo.romance.gear.body": {
+    "source": "Metric Drive, Graviton Manipulator, Advanced Worldline Anchor.",
+    "translation": "계량 구동기, 중력자 조작기, 고급 월드라인 앵커."
+  },
+  "guide.singulo.romance.gear.title": {
+    "source": "Gravity gear",
+    "translation": "중력 장치"
+  },
+  "guide.singulo.romance.shield.body": {
+    "source": "Protects a 32-block radius. With a Singularity Core it also blocks hostile spawns.",
+    "translation": "32블록 반경을 보호합니다. 특이점 코어를 사용하면 적대적인 스폰도 차단합니다."
+  },
+  "guide.singulo.romance.shield.title": {
+    "source": "Event Horizon Shield",
+    "translation": "이벤트 호라이즌 실드"
+  },
+  "guide.singulo.romance.tipler.body": {
+    "source": "Doubles supported machine processing within 16 blocks.",
+    "translation": "16개 블록 내에서 지원되는 기계 처리를 두 배로 늘립니다."
+  },
+  "guide.singulo.romance.tipler.title": {
+    "source": "T-Cylinder",
+    "translation": "티플러 원통"
+  },
+  "guide.singulo.ruins": {
+    "source": "Ruins",
+    "translation": "유적"
+  },
+  "guide.singulo.ruins.list.body": {
+    "source": "Observation Post, Research Building, Culture Facility, Final Lab — each guards loot for one catalyst tier.",
+    "translation": "지표 관측소, 연구동, 봉쇄 배양 시설, 최종 실험 시설 — 각각 하나의 촉매 단계에 대한 전리품을 보호합니다."
+  },
+  "guide.singulo.ruins.list.title": {
+    "source": "The four ruins",
+    "translation": "네 개의 폐허"
+  },
+  "guide.singulo.ruins.records.body": {
+    "source": "Ruin caches sometimes hold record fragments. Decode them in the Archive Terminal to unlock the Ancient Records chapter.",
+    "translation": "폐허 캐시에는 때때로 기록 조각이 보관되어 있습니다. 기록 보관 단말기에서 해독하여 고대 기록 장을 잠금 해제하세요."
+  },
+  "guide.singulo.ruins.records.title": {
+    "source": "Record fragments",
+    "translation": "레코드 조각"
+  },
+  "guide.singulo.stage1": {
+    "source": "Stage 1: Startup",
+    "translation": "1단계: 시작"
+  },
+  "guide.singulo.stage1.goal.body": {
+    "source": "The key is the Superconducting Coil, made in the Cryogenic Cooling Tower. It needs a Control Unit from an Observation Post. Find one, restore the unit in the Archive Terminal, then build the tower.",
+    "translation": "핵심은 극저온 냉각탑에서 만들어진 초전도 코일이다. 지표 관측소의 제어 장치가 필요합니다. 하나를 찾아 기록 보관 단말기에서 장치를 복원한 다음 타워를 건설하세요."
+  },
+  "guide.singulo.stage1.goal.title": {
+    "source": "Reaching stage 2",
+    "translation": "2단계 도달"
+  },
+  "guide.singulo.stage1.machines.body": {
+    "source": "- Kiln: fires ceramic boards and steel.\n- Compressor: plates, and mass mode for compressed blocks.\n- Electrolyzer: water to hydrogen and oxygen.\n- Archive Terminal: copies records, restores parts, decodes fragments.",
+    "translation": "- 소성로: 세라믹 보드와 강철을 연소합니다.\n- 압축기: 플레이트 및 압축 블록용 질량 모드.\n- 전해조: 물을 수소와 산소로.\n- 기록 보관 단말기: 레코드 복사, 부분 복원, 조각 디코딩."
+  },
+  "guide.singulo.stage1.machines.title": {
+    "source": "Stage 1 machines",
+    "translation": "1단계 기계"
+  },
+  "guide.singulo.stage1.materials.body": {
+    "source": "1. Iron + coal = steel blend; smelt it in a blast furnace.\n2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic.\n3. Make basic circuits and basic frames. Most machines need these.",
+    "translation": "1. 철 + 석탄 = 강철 혼합; 용광로에서 제련해 보세요.\n2. 점토, 석영, 골분 및 모래는 소성되지 않은 세라믹을 만듭니다. 그것을 흰색 세라믹에 굽습니다.\n3. 기본 회로와 기본 프레임을 만듭니다. 대부분의 기계에는 이것이 필요합니다."
+  },
+  "guide.singulo.stage1.materials.title": {
+    "source": "First materials",
+    "translation": "첫 번째 재료"
+  },
+  "guide.singulo.stage1.power.body": {
+    "source": "The Thermoelectric Generator produces power from a temperature difference: put something hot (lava, a lit kiln, a campfire) on one side and something cold (water, ice) on the other.\nConnect machines with copper wire.",
+    "translation": "열전 발전기는 온도 차이를 통해 전력을 생산합니다. 한쪽에는 뜨거운 것(용암, 불이 켜진 가마, 모닥불)을 놓고 다른 쪽에 차가운 것(물, 얼음)을 놓습니다.\n구리선으로 기계를 연결하십시오."
+  },
+  "guide.singulo.stage1.power.title": {
+    "source": "First power",
+    "translation": "첫 번째 힘"
+  },
+  "guide.singulo.stage2": {
+    "source": "Stage 2: Cryogenic",
+    "translation": "2단계: 극저온"
+  },
+  "guide.singulo.stage2.accelerator.body": {
+    "source": "Build a square ring of tubes and magnets (8–32 wide), magnets on the corners and on at least a quarter of the ring. It turns hydrogen into muon bundles (and rare monopoles). The Catalytic Reactor turns them into muon catalysts.",
+    "translation": "튜브와 자석(너비 8~32)으로 정사각형 링을 만들고 모서리와 링의 최소 1/4에 자석을 배치합니다. 이는 수소를 뮤온 다발(및 희귀 단극)로 전환합니다. 촉매 반응기는 이를 뮤온 촉매로 전환합니다."
+  },
+  "guide.singulo.stage2.accelerator.title": {
+    "source": "Particle Accelerator and muon catalyst",
+    "translation": "입자 가속기 및 뮤온 촉매"
+  },
+  "guide.singulo.stage2.goal.body": {
+    "source": "You need liquid helium (tower 10+ high, helium from crushed deepslate) and quantum data from Research Buildings.",
+    "translation": "액체 헬륨(타워 10+ 높이, 분쇄된 딥슬레이트의 헬륨)과 연구 건물의 양자 데이터가 필요합니다."
+  },
+  "guide.singulo.stage2.goal.title": {
+    "source": "Reaching stage 3",
+    "translation": "3단계 도달"
+  },
+  "guide.singulo.stage2.others.body": {
+    "source": "- Precision Assembler: makes almost everything from stage 3 on.\n- Cryogenic Turbine: power from evaporating nitrogen.\n- SMES Cell: stores energy.\n- Small Worldline Anchor: chunk loader fed by catalysts.\n- Monopole Upgrade: ×2 speed, +50% efficiency in a machine's monopole slot.",
+    "translation": "- 정밀 조립기: 3단계부터 거의 모든 것을 만듭니다.\n- 극저온 터빈: 질소 증발을 통한 전력.\n- SMES 셀: 에너지를 저장합니다.\n- Small Worldline Anchor: 촉매제를 사용하는 청크 로더.\n- 홀극 업그레이드: 속도 2배, 기계 모노폴 슬롯 효율 50% 증가."
+  },
+  "guide.singulo.stage2.others.title": {
+    "source": "Other stage 2 devices",
+    "translation": "기타 2단계 장치"
+  },
+  "guide.singulo.stage2.tower.body": {
+    "source": "A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. It makes liquid nitrogen from air and superconducting coils.",
+    "translation": "허리 모양의 5×5 타워, 높이 7~15, 중앙에 열 교환 코어가 있습니다. 공기와 초전도 코일로부터 액체질소를 만듭니다."
+  },
+  "guide.singulo.stage2.tower.title": {
+    "source": "Cryogenic Cooling Tower",
+    "translation": "극저온 냉각탑"
+  },
+  "guide.singulo.stage3": {
+    "source": "Stage 3: Quantum",
+    "translation": "3단계: 양자"
+  },
+  "guide.singulo.stage3.goal.body": {
+    "source": "The key is exotic matter from the C-Cavity, which needs time crystal catalysts. Search the deep Culture Facility.",
+    "translation": "핵심은 시간 결정 촉매가 필요한 카시미르 공동의 외래 물질입니다. 깊은 봉쇄 배양 시설를 검색하세요."
+  },
+  "guide.singulo.stage3.goal.title": {
+    "source": "Reaching stage 4",
+    "translation": "4단계 도달"
+  },
+  "guide.singulo.stage3.quantum.body": {
+    "source": "- Entanglement Synthesizer: entangled elements, two at a time.\n- Laser Cooler: cold atoms, lattices, BE condensate catalyst.\n- Quantum Heat Engine: catalyst-driven generator.",
+    "translation": "- 양자 얽힘 합성기: 얽힌 요소, 한 번에 두 개.\n- 레이저 냉각기: 냉각 원자, 격자, BE 응축 촉매.\n- 양자 열기관: 촉매 구동 발전기."
+  },
+  "guide.singulo.stage3.quantum.title": {
+    "source": "Quantum machines",
+    "translation": "양자 기계"
+  },
+  "guide.singulo.stage3.tools.body": {
+    "source": "- Inertial Control Gauntlet: levitate or pull small mobs.\n- Inertial Stabilizer: explosion-proofs a 16-block radius.\n- Gravitational Wave Detector: points to anomalies.\n- Neutrino Scanner: shows ruins and ores through terrain.",
+    "translation": "- 관성 제어 건틀릿: 작은 몹을 공중에 띄우거나 끌어당깁니다.\n- 관성 안정기: 16블록 반경의 방폭형입니다.\n- 중력파 검출기: 이상 현상을 가리킵니다.\n- 중성미자 스캐너: 지형을 통해 폐허와 광석을 보여줍니다."
+  },
+  "guide.singulo.stage3.tools.title": {
+    "source": "Tools and exploration",
+    "translation": "도구 및 탐색"
+  },
+  "guide.singulo.stage4": {
+    "source": "Stage 4: Temporal",
+    "translation": "4단계: 일시적"
+  },
+  "guide.singulo.stage4.compression.body": {
+    "source": "Mass mode turns materials with mass values into compressed blocks, Lv1 to Lv3. Lv1 made from 3+ kinds of blocks is \"mixed\" and only 8 are needed for Lv2. The Degenerate Compactor (closed 5×5×5 press) makes degenerate shells.",
+    "translation": "질량 모드는 질량 값이 있는 재료를 압축 블록(Lv1 ~ Lv3)으로 변환합니다. 3개 이상의 블록으로 만들어진 Lv1는 \"혼합\"되며 Lv2에는 8개만 필요합니다. 축퇴 압축로(폐쇄형 5×5×5 프레스)는 축퇴된 껍질을 만듭니다."
+  },
+  "guide.singulo.stage4.compression.title": {
+    "source": "Compression chain",
+    "translation": "압축 체인"
+  },
+  "guide.singulo.stage4.goal.body": {
+    "source": "Wake and defeat the Horizon Warden at the Final Lab to get a dormant singularity seed, awaken it in the encapsulator and ignite it in the P-Reactor.",
+    "translation": "최종 실험 시설에서 지평선 감시자를 깨우고 물리쳐 휴면 특이점 시드를 얻은 다음 캡슐화기에서 깨우고 펜로즈 반응로에서 점화합니다."
+  },
+  "guide.singulo.stage4.goal.title": {
+    "source": "Reaching stage 5",
+    "translation": "5단계 도달"
+  },
+  "guide.singulo.stage4.power.body": {
+    "source": "- Degenerate Furnace (5×5×7): 20 MFE/t from Lv2 blocks; power leaves through I/O ports.\n- Probe Station: automates trips to discovered ruins.\n- Topological wire and SMES modules for large power.",
+    "translation": "- 축퇴 열로(5×5×7): Lv2 블록의 MFE/t 20개; 전원은 I/O 포트를 통해 나갑니다.\n- 프로브 스테이션: 발견된 폐허로의 이동을 자동화합니다.\n- 대용량용 토폴로지 와이어 및 SMES 모듈."
+  },
+  "guide.singulo.stage4.power.title": {
+    "source": "Big power and automation",
+    "translation": "큰 힘과 자동화"
+  },
+  "guide.singulo.stage4.time.body": {
+    "source": "The incubator grows time crystals over 20 minutes of real running time; underpowering lowers purity. The C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
+    "translation": "인큐베이터는 실제 실행 시간인 20분에 걸쳐 시간 결정체를 성장시킵니다. 힘이 부족하면 순도가 낮아집니다. 카시미르 공동(5×5×5, 상하 거울)는 이국적인 물질을 만듭니다."
+  },
+  "guide.singulo.stage4.time.title": {
+    "source": "Time crystals and exotic matter",
+    "translation": "시간 결정과 이국적인 물질"
+  },
+  "guide.singulo.stage5": {
+    "source": "Stage 5: Singularity",
+    "translation": "5단계: 특이점"
+  },
+  "guide.singulo.stage5.byproducts.body": {
+    "source": "Collectors produce jet condensate, H-Condensate and exotic matter. The Singularity Core is the tier 5 catalyst.",
+    "translation": "수집기는 제트 응축물, 호킹 응축물 및 이물질을 생성합니다. 특이점 코어는 Tier 5 촉매입니다."
+  },
+  "guide.singulo.stage5.byproducts.title": {
+    "source": "By-products and the Singularity Core",
+    "translation": "부산물 및 특이점 코어"
+  },
+  "guide.singulo.stage5.endgame.body": {
+    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes.",
+    "translation": "코어와 전력을 사용하면 쉴드, 티플러 원통, 웜홀과 같은 게임 후반 장치를 실행할 수 있습니다."
+  },
+  "guide.singulo.stage5.endgame.title": {
+    "source": "Beyond",
+    "translation": "너머"
+  },
+  "guide.singulo.stage5.ignite.body": {
+    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s. Burn mass pellets; efficiency depends on spin. Mind the 24-block pull zone (time runs slower there) and the 4-block tidal zone.",
+    "translation": "시드를 삽입하고 점화를 누른 후 10초 이내에 GFE 50개를 전달합니다. 대량 펠렛을 태우십시오. 효율성은 스핀에 따라 달라집니다. 24블록 풀 존(거기서는 시간이 더 느리게 흐릅니다)과 4블록 조석 지대를 염두에 두세요."
+  },
+  "guide.singulo.stage5.ignite.title": {
+    "source": "Ignition and operation",
+    "translation": "점화 및 작동"
+  },
+  "guide.singulo.stage5.reactor.body": {
+    "source": "Three continuous orthogonal rings of radius 6 (48 blocks each): gyro drives where they cross, twelve stabilizer coils at the 45° points, reactor shell elsewhere (replace shell blocks with extraction ports or mass alarms), an empty 3×3×3 core. The core controller sits 5 below the centre.",
+    "translation": "반지름 6의 연속된 직교 링 세 개(각각 48블록)를 만듭니다. 교차점에는 자이로 구동 장치, 45° 위치 열두 곳에는 노심 안정화 코일, 나머지에는 반응로 외피를 사용합니다. 외피는 추출 포트나 노심 질량 경보기로 대체할 수 있습니다. 중심은 빈 3×3×3 공간이며 노심 제어기는 중심에서 5블록 아래에 놓습니다."
+  },
+  "guide.singulo.stage5.reactor.title": {
+    "source": "Building the reactor",
+    "translation": "원자로 건설"
+  },
+  "holo.singulo.blocking": {
+    "source": "%s blocks in the way",
+    "translation": "%1$s가 방해를 차단함"
+  },
+  "holo.singulo.complete": {
+    "source": "The structure is complete",
+    "translation": "구조가 완성되었습니다"
+  },
+  "holo.singulo.header": {
+    "source": "%s · size %s · blocks needed:",
+    "translation": "%1$s · 크기 %2$s · 필요한 블록:"
+  },
+  "holo.singulo.line": {
+    "source": "  %s: %s, %s missing",
+    "translation": "%1$s: %2$s, %3$s 누락"
+  },
+  "holo.singulo.not_controller": {
+    "source": "Use it on a multiblock controller",
+    "translation": "멀티블록 컨트롤러에서 사용"
+  },
+  "howto.singulo.accelerator_controller": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.accelerator_tube": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.anomaly_sample": {
+    "source": "Restore a Degraded Anomaly Sample",
+    "translation": "저하된 변칙 샘플 복원"
+  },
+  "howto.singulo.archive_terminal": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.artificial_star_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.basic_circuit": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.basic_frame": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.bh_container": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.black_hole_bomb": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.blank_data_card": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.bose_condensate_catalyst": {
+    "source": "Made in: Laser Cooler (stage 3)",
+    "translation": "제작품: 레이저 냉각기(3단계)"
+  },
+  "howto.singulo.casimir_cavity": {
+    "source": "Made in: Multiblock assembly (stage 4)",
+    "translation": "제조: 멀티블록 조립(4단계)"
+  },
+  "howto.singulo.casimir_cavity_controller": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.casimir_cavity_frame": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.casimir_cavity_pump": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.casimir_cavity_shield": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.casimir_cavity_wall": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.casimir_cavity_window": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.catalytic_reactor": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.ceramic_substrate": {
+    "source": "Made in: Kiln (stage 1)",
+    "translation": "제작품: 소성로(1단계)"
+  },
+  "howto.singulo.cold_atom_trap": {
+    "source": "Restore a Degraded Cold Atom Trap",
+    "translation": "성능이 저하된 저온 원자 트랩 복원"
+  },
+  "howto.singulo.cold_atoms": {
+    "source": "Made in: Laser Cooler (stage 3)",
+    "translation": "제작품: 레이저 냉각기(3단계)"
+  },
+  "howto.singulo.compressed_block_1": {
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "제작품: 압축기(1단계)"
+  },
+  "howto.singulo.compressed_block_2": {
+    "source": "Made in: Compressor (stage 4)",
+    "translation": "제작품: 압축기(4단계)"
+  },
+  "howto.singulo.compressed_block_2_mixed": {
+    "source": "Made in: Compressor (stage 4)",
+    "translation": "제작품: 압축기(4단계)"
+  },
+  "howto.singulo.compressed_block_3": {
+    "source": "Made in: Compressor (stage 4)",
+    "translation": "제작품: 압축기(4단계)"
+  },
+  "howto.singulo.compressed_metal_block_1": {
+    "source": "Made in: Compressor (stage 4)",
+    "translation": "제작품: 압축기(4단계)"
+  },
+  "howto.singulo.compressed_metal_block_2": {
+    "source": "Made in: Compressor (stage 4)",
+    "translation": "제작품: 압축기(4단계)"
+  },
+  "howto.singulo.compressor": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.control_unit": {
+    "source": "Restore a Degraded Control Unit",
+    "translation": "저하된 제어 장치 복원"
+  },
+  "howto.singulo.cooling_tower_base": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.cooling_tower_casing": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.cooling_tower_controller": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.cooling_tower_coolant_band": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.cooling_tower_extension": {
+    "source": "Made in: Multiblock assembly (stage 3)",
+    "translation": "제조: 멀티블록 조립(3단계)"
+  },
+  "howto.singulo.cooling_tower_glass": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.cooling_tower_grate": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.cooling_tower_rim": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.copper_wire": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.core_controller": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.cosmic_muon_collector": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.cryogenic_cooling_tower": {
+    "source": "Made in: Multiblock assembly (stage 2)",
+    "translation": "제조: 멀티블록 조립(2단계)"
+  },
+  "howto.singulo.cryogenic_turbine": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.culture_data": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.data_card_culture_data": {
+    "source": "Made in: Archive Terminal (stage 4)",
+    "translation": "제작품: 기록 보관 단말기(4단계)"
+  },
+  "howto.singulo.data_card_observation_log": {
+    "source": "Made in: Archive Terminal (stage 1)",
+    "translation": "제작품: 기록 보관 단말기(1단계)"
+  },
+  "howto.singulo.data_card_quantum_fragment": {
+    "source": "Made in: Archive Terminal (stage 3)",
+    "translation": "제작품: 기록 보관 단말기(3단계)"
+  },
+  "howto.singulo.decoded_record": {
+    "source": "Made in: Archive Terminal (stage 1)",
+    "translation": "제작품: 기록 보관 단말기(1단계)"
+  },
+  "howto.singulo.degenerate_compactor": {
+    "source": "Made in: Multiblock assembly (stage 4)",
+    "translation": "제조: 멀티블록 조립(4단계)"
+  },
+  "howto.singulo.degenerate_compactor_anvil": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_compactor_controller": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_compactor_frame": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_compactor_plate": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_compactor_ram": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_compactor_vent": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_compactor_window": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_furnace": {
+    "source": "Made in: Multiblock assembly (stage 4)",
+    "translation": "제조: 멀티블록 조립(4단계)"
+  },
+  "howto.singulo.degenerate_furnace_controller": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_furnace_fin": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_furnace_frame": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_furnace_piston": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_furnace_shell": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_furnace_tube": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_furnace_window": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.degenerate_matter_shell": {
+    "source": "Made in: Degenerate Compactor (stage 4)",
+    "translation": "제작품: 축퇴 압축로(4단계)"
+  },
+  "howto.singulo.degraded_anomaly_sample": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.degraded_cold_atom_trap": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.degraded_control_unit": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.degraded_time_crystal_seed": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.dormant_singularity_seed": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.echo_resonator": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.electrolyzer": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.entangled_element": {
+    "source": "Made in: Entanglement Synthesizer (stage 3)",
+    "translation": "제작품: 양자 얽힘 합성기(3단계)"
+  },
+  "howto.singulo.entanglement_synthesizer": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.ergosphere_ring": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.event_horizon_shield": {
+    "source": "Made in: Multiblock assembly (stage 5)",
+    "translation": "제조: 멀티블록 조립(5단계)"
+  },
+  "howto.singulo.exotic_matter": {
+    "source": "Made in: C-Cavity (stage 4)",
+    "translation": "제작품: 카시미르 공동(4단계)"
+  },
+  "howto.singulo.explorer_compass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.extraction_port": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.focusing_magnet": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.gravitational_containment_tank": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.gravitational_wave_detector": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.graviton_manipulator": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.gravity_field_stabilizer": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.gyro_drive": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.halo_collector": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.handbook": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.hawking_collector": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.hawking_condensate": {
+    "source": "Made in: P-Reactor (stage 5)",
+    "translation": "제작품: 펜로즈 반응로(5단계)"
+  },
+  "howto.singulo.heat_exchange_core": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.holo_projector": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.horizon_bus": {
+    "source": "Made in: Degenerate Compactor (stage 5)",
+    "translation": "제작품: 축퇴 압축로(5단계)"
+  },
+  "howto.singulo.inertial_control_gauntlet": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.inertial_stabilizer": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.jet_collector": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.jet_condensate": {
+    "source": "Made in: P-Reactor (stage 5)",
+    "translation": "제작품: 펜로즈 반응로(5단계)"
+  },
+  "howto.singulo.kiln": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.laser_cooler": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.magnetic_bottle": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.mass_pellet": {
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "제작품: 압축기(1단계)"
+  },
+  "howto.singulo.metric_drive": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.micro_black_hole": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.mirror_plate": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.monopole_upgrade": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.multiblock_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.muon_bundle": {
+    "source": "Made in: Particle Accelerator (stage 2)",
+    "translation": "제작품: 입자 가속기(2단계)"
+  },
+  "howto.singulo.muon_catalyst": {
+    "source": "Made in: Catalytic Reactor (stage 2)",
+    "translation": "제작품: 촉매 반응기(2단계)"
+  },
+  "howto.singulo.neutrino_observatory": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.neutrino_scanner": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.observation_log": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.optical_lattice_substrate": {
+    "source": "Made in: Laser Cooler (stage 3)",
+    "translation": "제작품: 레이저 냉각기(3단계)"
+  },
+  "howto.singulo.particle_accelerator": {
+    "source": "Made in: Multiblock assembly (stage 2)",
+    "translation": "제조: 멀티블록 조립(2단계)"
+  },
+  "howto.singulo.penrose_reactor": {
+    "source": "Made in: Multiblock assembly (stage 5)",
+    "translation": "제조: 멀티블록 조립(5단계)"
+  },
+  "howto.singulo.precision_assembler": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.probe_station": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.quantum_computing_module": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.quantum_data_fragment": {
+    "source": "Found in: ruin caches",
+    "translation": "발견 장소: 캐시 파멸"
+  },
+  "howto.singulo.quantum_heat_engine": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작품: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.reactor_mass_alarm": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.reactor_shell": {
+    "source": "Made in: Degenerate Compactor (stage 5)",
+    "translation": "제작품: 축퇴 압축로(5단계)"
+  },
+  "howto.singulo.reactor_stabilizer": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.settings_card": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.shield_permit": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.shield_tower_body": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.shield_tower_coil": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.shield_tower_core": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.shield_tower_crown": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.shield_tower_plinth": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.shield_tower_waveguide": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.singularity_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.singularity_encapsulator": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.singularity_seed": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.smes_cell": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.smes_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.steel_blend": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.steel_ingot": {
+    "source": "Made in: Blast Furnace (stage 1)",
+    "translation": "Made in: 용광로(1단계)"
+  },
+  "howto.singulo.steel_plate": {
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "제작품: 압축기(1단계)"
+  },
+  "howto.singulo.superconducting_cable": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.superconducting_coil": {
+    "source": "Made in: Cryogenic Cooling Tower (stage 2)",
+    "translation": "제작품: 극저온 냉각탑(2단계)"
+  },
+  "howto.singulo.superconducting_wire": {
+    "source": "Made in: Cryogenic Cooling Tower (stage 2)",
+    "translation": "제작품: 극저온 냉각탑(2단계)"
+  },
+  "howto.singulo.thermocouple_module": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.thermoelectric_generator": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.time_crystal_catalyst": {
+    "source": "Made in: Time Crystal Incubator (stage 4)",
+    "translation": "제작품: 시간 결정 배양기(4단계)"
+  },
+  "howto.singulo.time_crystal_incubator": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.time_crystal_seed": {
+    "source": "Restore a Degraded Time Crystal Seed",
+    "translation": "저하된 시간 결정 씨앗 복원"
+  },
+  "howto.singulo.tipler_bearing": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.tipler_core": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.tipler_cylinder": {
+    "source": "Made in: Multiblock assembly (stage 5)",
+    "translation": "제조: 멀티블록 조립(5단계)"
+  },
+  "howto.singulo.tipler_frame": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.tipler_holder": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.tipler_housing": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.tipler_window": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.topological_wire": {
+    "source": "Made in: Cryogenic Cooling Tower (stage 4)",
+    "translation": "제작품: 극저온 냉각탑(4단계)"
+  },
+  "howto.singulo.toroidal_magnetic_coil": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "howto.singulo.unfired_ceramic": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "Made in: 제작대(1단계)"
+  },
+  "howto.singulo.unstable_wormhole_mouth": {
+    "source": "Made in: Wormhole Generator (stage 5)",
+    "translation": "제작품: 웜홀 생성기(5단계)"
+  },
+  "howto.singulo.white_ceramic_composite": {
+    "source": "Made in: Furnace (stage 1)",
+    "translation": "Made in: 용광로(1단계)"
+  },
+  "howto.singulo.worldline_anchor_advanced": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.worldline_anchor_small": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "Made in: 제작대(2단계)"
+  },
+  "howto.singulo.wormhole_generator": {
+    "source": "Made in: Multiblock assembly (stage 5)",
+    "translation": "제조: 멀티블록 조립(5단계)"
+  },
+  "howto.singulo.wormhole_generator_coil": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.wormhole_generator_core": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.wormhole_generator_focuser": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.wormhole_generator_shell": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.wormhole_generator_window": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.wormhole_mouth": {
+    "source": "Made in: Wormhole Stabilizer (stage 5)",
+    "translation": "제작품: 웜홀 안정기(5단계)"
+  },
+  "howto.singulo.wormhole_port": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.wormhole_stabilizer": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "item.singulo.anomaly_sample": {
+    "source": "Anomaly Sample",
+    "translation": "이상 샘플"
+  },
+  "item.singulo.artificial_star_core": {
+    "source": "Artificial Star Core",
+    "translation": "인공 항성 코어"
+  },
+  "item.singulo.basic_circuit": {
+    "source": "Basic Circuit",
+    "translation": "기본회로"
+  },
+  "item.singulo.basic_frame": {
+    "source": "Basic Frame",
+    "translation": "기본 프레임"
+  },
+  "item.singulo.bh_container": {
+    "source": "Empty BH Containment Vessel",
+    "translation": "빈 BH 격리 용기"
+  },
+  "item.singulo.black_hole_bomb": {
+    "source": "Black Hole Bomb",
+    "translation": "블랙홀 폭탄"
+  },
+  "item.singulo.blank_data_card": {
+    "source": "Blank Data Card",
+    "translation": "빈 데이터 카드"
+  },
+  "item.singulo.bose_condensate_catalyst": {
+    "source": "BE Condensate Catalyst",
+    "translation": "보스 응축 촉매"
+  },
+  "item.singulo.builder_wand": {
+    "source": "Builder's Wand",
+    "translation": "건축가의 지팡이"
+  },
+  "item.singulo.ceramic_substrate": {
+    "source": "Ceramic Substrate",
+    "translation": "세라믹 기판"
+  },
+  "item.singulo.cold_atom_trap": {
+    "source": "Cold Atom Trap",
+    "translation": "냉각 원자 트랩"
+  },
+  "item.singulo.cold_atoms": {
+    "source": "Cold Atoms",
+    "translation": "냉각 원자"
+  },
+  "item.singulo.control_unit": {
+    "source": "Control Unit",
+    "translation": "제어 장치"
+  },
+  "item.singulo.creative_catalyst": {
+    "source": "Infinite Catalyst",
+    "translation": "무한 촉매"
+  },
+  "item.singulo.culture_data": {
+    "source": "Culture Data",
+    "translation": "배양 데이터"
+  },
+  "item.singulo.data_card_culture_data": {
+    "source": "Data Card (Culture Data)",
+    "translation": "데이터 카드(배양 데이터)"
+  },
+  "item.singulo.data_card_observation_log": {
+    "source": "Data Card (Observation Log)",
+    "translation": "데이터 카드(관찰 기록)"
+  },
+  "item.singulo.data_card_quantum_fragment": {
+    "source": "Data Card (Quantum Data Fragment)",
+    "translation": "데이터 카드(양자 데이터 조각)"
+  },
+  "item.singulo.decoded_record": {
+    "source": "Decoded Record",
+    "translation": "디코딩된 기록"
+  },
+  "item.singulo.degenerate_matter_shell": {
+    "source": "Degenerate Matter Shell",
+    "translation": "축퇴 물질 껍질"
+  },
+  "item.singulo.degraded_anomaly_sample": {
+    "source": "Degraded Anomaly Sample",
+    "translation": "저하된 변칙 샘플"
+  },
+  "item.singulo.degraded_cold_atom_trap": {
+    "source": "Degraded Cold Atom Trap",
+    "translation": "성능이 저하된 저온 원자 트랩"
+  },
+  "item.singulo.degraded_control_unit": {
+    "source": "Degraded Control Unit",
+    "translation": "저하된 제어 장치"
+  },
+  "item.singulo.degraded_time_crystal_seed": {
+    "source": "Degraded Time Crystal Seed",
+    "translation": "저하된 시간 결정 씨앗"
+  },
+  "item.singulo.dormant_singularity_seed": {
+    "source": "Dormant Singularity Seed",
+    "translation": "휴면 특이점 씨앗"
+  },
+  "item.singulo.entangled_element": {
+    "source": "Entangled Element",
+    "translation": "양자 얽힘 소자"
+  },
+  "item.singulo.ergosphere_ring": {
+    "source": "Ergosphere Ring",
+    "translation": "에르고스피어 링"
+  },
+  "item.singulo.exotic_matter": {
+    "source": "Exotic Matter",
+    "translation": "특이 물질"
+  },
+  "item.singulo.explorer_compass": {
+    "source": "Explorer's Compass",
+    "translation": "탐험가의 나침반"
+  },
+  "item.singulo.graviton_manipulator": {
+    "source": "Graviton Manipulator",
+    "translation": "중력자 조작기"
+  },
+  "item.singulo.gravity_field_stabilizer": {
+    "source": "Gravity Field Stabilizer",
+    "translation": "중력장 안정기"
+  },
+  "item.singulo.handbook": {
+    "source": "Singulo Handbook",
+    "translation": "Singulo 핸드북"
+  },
+  "item.singulo.hawking_collector": {
+    "source": "H-Collector",
+    "translation": "호킹 수집기"
+  },
+  "item.singulo.hawking_condensate": {
+    "source": "H-Condensate",
+    "translation": "호킹 응축물"
+  },
+  "item.singulo.holo_projector": {
+    "source": "Holo Projector",
+    "translation": "홀로그램 투영기"
+  },
+  "item.singulo.horizon_warden_spawn_egg": {
+    "source": "Horizon Warden Spawn Egg",
+    "translation": "지평선 감시자 생성 알"
+  },
+  "item.singulo.inertial_control_gauntlet": {
+    "source": "Inertial Control Gauntlet",
+    "translation": "관성 제어 건틀릿"
+  },
+  "item.singulo.jet_collector": {
+    "source": "Jet Collector",
+    "translation": "제트 콜렉터"
+  },
+  "item.singulo.jet_condensate": {
+    "source": "Jet Condensate",
+    "translation": "제트 응축물"
+  },
+  "item.singulo.magnetic_bottle": {
+    "source": "Magnetic Bottle",
+    "translation": "자기 병"
+  },
+  "item.singulo.magnetic_monopole": {
+    "source": "Magnetic Monopole",
+    "translation": "자기 홀극"
+  },
+  "item.singulo.mass_pellet": {
+    "source": "Mass Pellet",
+    "translation": "질량 펠릿"
+  },
+  "item.singulo.metric_drive": {
+    "source": "Metric Drive",
+    "translation": "계량 구동기"
+  },
+  "item.singulo.micro_black_hole": {
+    "source": "Micro Black Hole Vessel",
+    "translation": "소형 블랙홀 용기"
+  },
+  "item.singulo.monopole_upgrade": {
+    "source": "Monopole Upgrade",
+    "translation": "홀극 업그레이드"
+  },
+  "item.singulo.muon_bundle": {
+    "source": "Muon Bundle",
+    "translation": "뮤온 다발"
+  },
+  "item.singulo.muon_catalyst": {
+    "source": "Muon Catalyst",
+    "translation": "뮤온 촉매"
+  },
+  "item.singulo.neutrino_scanner": {
+    "source": "Neutrino Scanner",
+    "translation": "중성미자 스캐너"
+  },
+  "item.singulo.observation_log": {
+    "source": "Observation Log",
+    "translation": "관찰 기록"
+  },
+  "item.singulo.optical_lattice_substrate": {
+    "source": "Optical Lattice Substrate",
+    "translation": "광학 격자 기판"
+  },
+  "item.singulo.quantum_computing_module": {
+    "source": "Quantum Computing Module",
+    "translation": "양자 연산 모듈"
+  },
+  "item.singulo.quantum_data_fragment": {
+    "source": "Quantum Data Fragment",
+    "translation": "양자 데이터 조각"
+  },
+  "item.singulo.record_fragment": {
+    "source": "Record Fragment",
+    "translation": "레코드 조각"
+  },
+  "item.singulo.security_drone_spawn_egg": {
+    "source": "Security Drone Spawn Egg",
+    "translation": "보안 드론 생성 알"
+  },
+  "item.singulo.settings_card": {
+    "source": "Settings Card",
+    "translation": "설정 카드"
+  },
+  "item.singulo.settings_card.blank": {
+    "source": "Blank",
+    "translation": "공백"
+  },
+  "item.singulo.settings_card.copied": {
+    "source": "Settings copied",
+    "translation": "설정이 복사되었습니다."
+  },
+  "item.singulo.settings_card.empty": {
+    "source": "Nothing copied yet",
+    "translation": "아직 복사된 항목이 없습니다."
+  },
+  "item.singulo.settings_card.hint": {
+    "source": "Sneak-use to copy · Use to paste",
+    "translation": "몰래 복사에 사용 · 붙여넣기에 사용"
+  },
+  "item.singulo.settings_card.holds.machine": {
+    "source": "Machine side settings",
+    "translation": "기계측 설정"
+  },
+  "item.singulo.settings_card.holds.reactor": {
+    "source": "P-Reactor settings",
+    "translation": "펜로즈 반응로 설정"
+  },
+  "item.singulo.settings_card.mismatch": {
+    "source": "Different kind of machine",
+    "translation": "다른 종류의 기계"
+  },
+  "item.singulo.settings_card.pasted": {
+    "source": "Settings pasted",
+    "translation": "설정을 붙여넣었습니다."
+  },
+  "item.singulo.shield_permit": {
+    "source": "Shield Permit",
+    "translation": "보호막 허가증"
+  },
+  "item.singulo.shield_permit.added": {
+    "source": "Registered %s · %s",
+    "translation": "%1$s · %2$s 등록됨"
+  },
+  "item.singulo.shield_permit.already": {
+    "source": "%s already registered · %s",
+    "translation": "%1$s가 이미 등록되었습니다 · %2$s"
+  },
+  "item.singulo.shield_permit.empty": {
+    "source": "Nobody registered yet",
+    "translation": "아직 등록된 사람이 없습니다."
+  },
+  "item.singulo.shield_permit.hint": {
+    "source": "Use to register yourself; use on a player to add them",
+    "translation": "자신을 등록하는 데 사용합니다. 플레이어에서 사용하여 추가하세요"
+  },
+  "item.singulo.shield_permit.members": {
+    "source": "Registered: %s",
+    "translation": "등록됨: %1$s"
+  },
+  "item.singulo.shield_permit.more": {
+    "source": "%s more",
+    "translation": "%1$s 더보기"
+  },
+  "item.singulo.shield_permit.reset": {
+    "source": "Only %s is registered now",
+    "translation": "현재는 %1$s만 등록되어 있습니다."
+  },
+  "item.singulo.singularity_core": {
+    "source": "Singularity Core",
+    "translation": "특이점 코어"
+  },
+  "item.singulo.singularity_seed": {
+    "source": "Singularity Seed",
+    "translation": "특이점 씨앗"
+  },
+  "item.singulo.spent_bose_condensate_catalyst": {
+    "source": "Spent BE Condensate Catalyst",
+    "translation": "사용된 보스 응축 촉매"
+  },
+  "item.singulo.spent_muon_catalyst": {
+    "source": "Spent Muon Catalyst",
+    "translation": "소모된 뮤온 촉매"
+  },
+  "item.singulo.spent_singularity_core": {
+    "source": "Spent Singularity Core",
+    "translation": "사용된 특이점 코어"
+  },
+  "item.singulo.spent_time_crystal_catalyst": {
+    "source": "Spent Time Crystal Catalyst",
+    "translation": "소비된 시간 결정 촉매"
+  },
+  "item.singulo.steel_blend": {
+    "source": "Steel Blend",
+    "translation": "스틸 블렌드"
+  },
+  "item.singulo.steel_ingot": {
+    "source": "Steel Ingot",
+    "translation": "강철 주괴"
+  },
+  "item.singulo.steel_plate": {
+    "source": "Steel Plate",
+    "translation": "강판"
+  },
+  "item.singulo.superconducting_coil": {
+    "source": "Superconducting Coil",
+    "translation": "초전도 코일"
+  },
+  "item.singulo.superconducting_wire": {
+    "source": "Superconducting Wire",
+    "translation": "초전도 선재"
+  },
+  "item.singulo.thermocouple_module": {
+    "source": "Thermocouple Module",
+    "translation": "열전대 모듈"
+  },
+  "item.singulo.time_crystal_catalyst": {
+    "source": "Time Crystal Catalyst",
+    "translation": "시간 결정 촉매"
+  },
+  "item.singulo.time_crystal_seed": {
+    "source": "Time Crystal Seed",
+    "translation": "시간 결정 씨앗"
+  },
+  "item.singulo.toroidal_magnetic_coil": {
+    "source": "Toroidal Magnetic Coil",
+    "translation": "토로이드 자기 코일"
+  },
+  "item.singulo.unfired_ceramic": {
+    "source": "Unfired Ceramic",
+    "translation": "소성되지 않은 세라믹"
+  },
+  "item.singulo.unstable_wormhole_mouth": {
+    "source": "Unstable Wormhole Mouth",
+    "translation": "불안정한 웜홀 입구"
+  },
+  "item.singulo.white_ceramic_composite": {
+    "source": "White Ceramic Composite",
+    "translation": "화이트 세라믹 복합재"
+  },
+  "itemGroup.singulo": {
+    "source": "Singulo",
+    "translation": "Singulo"
+  },
+  "jei.singulo.found_prefix": {
+    "source": "Found in",
+    "translation": "다음에서 발견됨"
+  },
+  "jei.singulo.mass": {
+    "source": "Mass %s",
+    "translation": "대량 %1$s"
+  },
+  "jei.singulo.mb.casimir_cavity": {
+    "source": "■ Shape: 5×5×5 vacuum vessel\n■ Start: power and a catalyst",
+    "translation": "■ 형태 : 5×5×5 진공용기\n■ 시작: 동력과 촉매"
+  },
+  "jei.singulo.mb.cooling_tower": {
+    "source": "■ Shape: waisted tower, 7–15 high\n■ Speed: height ÷ 5\n■ 10+ high: liquid helium",
+    "translation": "■ 모양: 웨이스트 타워, 높이 7~15\n■ 속도 : 높이 ¼ 5\n■ 10+ 높음: 액체 헬륨"
+  },
+  "jei.singulo.mb.degenerate_compactor": {
+    "source": "■ Shape: closed 5×5×5 press\n■ Start: connect power",
+    "translation": "■ 형태 : 닫힘형 5×5×5 프레스\n■ 시작: 전원 연결"
+  },
+  "jei.singulo.mb.degenerate_furnace": {
+    "source": "■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 20 MFE/t",
+    "translation": "■ 형태 : 폐쇄형 5×5×7 로\n■ 시작 : 시간결정 촉매 및 연료\n■ 연료: 압축 블록 Lv2\n■ 출력: 20 MFE/t"
+  },
+  "jei.singulo.mb.event_horizon_shield": {
+    "source": "■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32",
+    "translation": "■ 형상 : 테이퍼링 타워, 9단\n■ 시작: 시간 결정 또는 특이점 코어 및 전력\n■ 효과: 반경 32를 보호합니다."
+  },
+  "jei.singulo.mb.particle_accelerator": {
+    "source": "■ Shape: square ring, side 8–32\n■ Speed: side ÷ 8\n■ By-product: magnetic monopoles\n■ Danger: strangelets when a large ring runs low on power",
+    "translation": "■ 모양: 사각 링, 측면 8~32\n■ 속도 : 측면 ¼ 8\n■ 부산물: 자기 단극\n■ 위험: 대형 링의 전력이 부족할 때 이상한 소리가 발생합니다."
+  },
+  "jei.singulo.mb.penrose_reactor": {
+    "source": "■ Shape: three crossing rings, 13×13×13\n■ Ignite: insert a seed and pour in 50 GFE\n■ Fuel: mass pellets\n■ Max output: about 2.1 GFE/t",
+    "translation": "■ 구조: 서로 교차하는 세 링, 13×13×13\n■ 점화: 씨앗을 넣고 50 GFE 공급\n■ 연료: 질량 펠릿\n■ 최대 출력: 약 2.1 GFE/t"
+  },
+  "jei.singulo.mb.tipler_cylinder": {
+    "source": "■ Shape: 5×5×9 housing\n■ Start: time crystal catalyst, fuel and power\n■ Fuel: exotic matter\n■ Effect: ×2 speed within 16",
+    "translation": "■ 형태 : 5×5×9 하우징\n■ 시작 : 시간 결정 촉매, 연료 및 동력\n■ 연료: 이물질\n■ 효과 : 16이내 속도 2배"
+  },
+  "jei.singulo.mb.wormhole_generator": {
+    "source": "■ Shape: 5×5×5 sphere\n■ Start: 100 MFE/t for 10 s\n■ Result: a pair of wormhole mouths",
+    "translation": "■ 모양 : 5×5×5구\n■ 시작: 10초 동안 100 MFE/t\n■ 결과: 웜홀 입 한 쌍"
+  },
+  "jei.singulo.metal_mass": {
+    "source": "Metal mass %s",
+    "translation": "금속 덩어리 %1$s"
+  },
+  "jei.singulo.min_size": {
+    "source": "Size %s+",
+    "translation": "사이즈 %1$s+"
+  },
+  "jei.singulo.multiblock": {
+    "source": "Multiblock Structures",
+    "translation": "다중 블록 구조"
+  },
+  "jei.singulo.time_energy": {
+    "source": "%s s · %s FE/t",
+    "translation": "%1$s · %2$s FE/t"
+  },
+  "jei.singulo.uses": {
+    "source": "Uses %s",
+    "translation": "%1$s를 사용합니다."
+  },
+  "key.categories.singulo": {
+    "source": "Singulo",
+    "translation": "Singulo"
+  },
+  "key.singulo.toggle_area": {
+    "source": "Toggle gravity tool area",
+    "translation": "중력 도구 영역 전환"
+  },
+  "message.singulo.hydrogen_leak": {
+    "source": "Leaking hydrogen ignited!",
+    "translation": "누출된 수소에 불이 붙었습니다!"
+  },
+  "message.singulo.multiblock.not_formed": {
+    "source": "%s is not complete yet",
+    "translation": "%1$s는 아직 완료되지 않았습니다."
+  },
+  "message.singulo.neutrino_scan": {
+    "source": "Found %s ores and %s ruin blocks",
+    "translation": "%1$s 광석과 %2$s 폐허 블록을 발견했습니다."
+  },
+  "message.singulo.record_read": {
+    "source": "You read the ancient record \"%s\". Find it in the handbook",
+    "translation": "당신은 고대 기록 \"%1$s\"를 읽었습니다. 핸드북에서 찾아보세요"
+  },
+  "message.singulo.records_complete": {
+    "source": "You have read every ancient record",
+    "translation": "당신은 모든 고대 기록을 읽었습니다."
+  },
+  "message.singulo.strangelet_contained": {
+    "source": "Strangelet contained",
+    "translation": "스트레인지렛가 포함되어 있습니다."
+  },
+  "message.singulo.welcome": {
+    "source": "You received the Singulo Handbook. Right-click to open it",
+    "translation": "Singulo 핸드북을 받았습니다. 마우스 오른쪽 버튼을 클릭하여 엽니다."
+  },
+  "metric_drive.singulo.mode.high_gravity": {
+    "source": "High gravity",
+    "translation": "높은 중력"
+  },
+  "metric_drive.singulo.mode.low_gravity": {
+    "source": "Low gravity",
+    "translation": "낮은 중력"
+  },
+  "metric_drive.singulo.mode.off": {
+    "source": "Off",
+    "translation": "끄기"
+  },
+  "metric_drive.singulo.mode.zero_g": {
+    "source": "Zero-G",
+    "translation": "무중력"
+  },
+  "metric_drive.singulo.no_exotic": {
+    "source": "Metric Drive: no exotic matter",
+    "translation": "계량 구동기: 이상한 물질 없음"
+  },
+  "multiblock.singulo.casimir_cavity": {
+    "source": "C-Cavity",
+    "translation": "카시미르 공동"
+  },
+  "multiblock.singulo.cooling_tower": {
+    "source": "Cryogenic Cooling Tower",
+    "translation": "극저온 냉각탑"
+  },
+  "multiblock.singulo.degenerate_compactor": {
+    "source": "Degenerate Compactor",
+    "translation": "축퇴 압축로"
+  },
+  "multiblock.singulo.degenerate_furnace": {
+    "source": "Degenerate Furnace",
+    "translation": "축퇴 열로"
+  },
+  "multiblock.singulo.event_horizon_shield": {
+    "source": "Event Horizon Shield Tower",
+    "translation": "사건의 지평선 보호막 탑"
+  },
+  "multiblock.singulo.particle_accelerator": {
+    "source": "Particle Accelerator",
+    "translation": "입자 가속기"
+  },
+  "multiblock.singulo.penrose_reactor": {
+    "source": "P-Reactor",
+    "translation": "펜로즈 반응로"
+  },
+  "multiblock.singulo.tipler_cylinder": {
+    "source": "T-Cylinder",
+    "translation": "티플러 원통"
+  },
+  "multiblock.singulo.wormhole_generator": {
+    "source": "Wormhole Generator",
+    "translation": "웜홀 생성기"
+  },
+  "pack.singulo.hd": {
+    "source": "Singulo HD (32×32 textures)",
+    "translation": "Singulo HD(32×32 텍스처)"
+  },
+  "record.singulo.r01.body": {
+    "source": "Surface observation begins today. Our goal is simple: turn mass into energy, all of it. Stone, wood, the sea — all of it is frozen energy.",
+    "translation": "오늘부터 표면 관찰이 시작됩니다. 우리의 목표는 간단합니다. 질량을 모두 에너지로 바꾸는 것입니다. 돌, 나무, 바다 - 이 모든 것이 얼어붙은 에너지입니다."
+  },
+  "record.singulo.r01.title": {
+    "source": "Observation Log 1",
+    "translation": "관찰 기록 1"
+  },
+  "record.singulo.r02.body": {
+    "source": "Thermoelectric efficiency is below 0.0001%. Burning fuel for a gradient is like moving a mountain to pick up a grain of sand. Still, this is where we must begin.",
+    "translation": "열전 효율은 0.0001% 이하입니다. 경사도를 위해 연료를 태우는 것은 모래알을 집기 위해 산을 움직이는 것과 같습니다. 그럼에도 불구하고 우리는 여기서부터 시작해야 합니다."
+  },
+  "record.singulo.r02.title": {
+    "source": "Observation Log 7",
+    "translation": "관찰 기록 7"
+  },
+  "record.singulo.r03.body": {
+    "source": "All casings shall be white, so that every stain shows. Anomalies must be found while they are still visible.",
+    "translation": "모든 케이싱은 모든 얼룩이 보이도록 흰색이어야 합니다. 이상 현상은 눈에 보이는 동안 발견되어야 합니다."
+  },
+  "record.singulo.r03.title": {
+    "source": "Note from the Chief Designer",
+    "translation": "수석 디자이너의 메모"
+  },
+  "record.singulo.r04.body": {
+    "source": "Unmanned guards are stationed at every post. They do not tell intruders from staff. Anyone who carries records out is an intruder.",
+    "translation": "모든 초소에는 무인경비원이 배치되어 있습니다. 그들은 침입자에게 직원에게 알리지 않습니다. 기록을 옮기는 사람은 누구나 침입자입니다."
+  },
+  "record.singulo.r04.title": {
+    "source": "Security Regulation",
+    "translation": "보안 규정"
+  },
+  "record.singulo.r05.body": {
+    "source": "At zero resistance a current flows forever. We have obtained eternity — but only at 77 kelvin.",
+    "translation": "저항이 0이면 전류가 영원히 흐릅니다. 우리는 영원을 얻었지만 온도는 77켈빈에 불과합니다."
+  },
+  "record.singulo.r05.title": {
+    "source": "Cryogenic Programme",
+    "translation": "극저온 프로그램"
+  },
+  "record.singulo.r06.body": {
+    "source": "One collision in a thousand yields a magnet with only a north pole. The theorists were delighted. The engineers, finding it doubled a machine's speed, were more delighted still.",
+    "translation": "천 번에 한 번 충돌하면 북극만 있는 자석이 생성됩니다. 이론가들은 기뻐했습니다. 엔지니어들은 기계 속도가 두 배로 빨라졌다는 사실을 알고 더욱 기뻐했습니다."
+  },
+  "record.singulo.r06.title": {
+    "source": "Accelerator Logbook",
+    "translation": "액셀러레이터 로그북"
+  },
+  "record.singulo.r07.body": {
+    "source": "Someone argued catalysts should never wear out. Rejected: it is because they wear out that we reach for the next tier.",
+    "translation": "누군가는 촉매가 절대 마모되어서는 안 된다고 주장했습니다. 거부됨: 마모되어 다음 단계로 넘어갈 수 있기 때문입니다."
+  },
+  "record.singulo.r07.title": {
+    "source": "On Catalysts",
+    "translation": "촉매에"
+  },
+  "record.singulo.r08.body": {
+    "source": "When an anchor stops, time stops in its region. Those inside never notice. Not noticing was deemed not to be a problem.",
+    "translation": "닻이 멈추면 그 지역의 시간도 멈춥니다. 안에 있는 사람들은 전혀 눈치 채지 못합니다. 눈치채지 못하는 것은 문제가 되지 않는 것으로 간주되었습니다."
+  },
+  "record.singulo.r08.title": {
+    "source": "Ethics of Worldline Anchoring",
+    "translation": "세계선 고정의 윤리"
+  },
+  "record.singulo.r09.body": {
+    "source": "Entangled elements are always born in pairs. Break one and the other loses its meaning. Will our cities be the same?",
+    "translation": "얽힌 요소는 항상 쌍으로 탄생합니다. 하나를 깨면 다른 하나는 그 의미를 잃습니다. 우리 도시도 똑같을까?"
+  },
+  "record.singulo.r09.title": {
+    "source": "Quantum Division Report",
+    "translation": "양자분할 보고서"
+  },
+  "record.singulo.r10.body": {
+    "source": "In a Bose condensate every atom becomes one wave. One researcher called it a choir. She left the division that week.",
+    "translation": "보스 응축물에서는 모든 원자가 하나의 파동이 됩니다. 한 연구원은 그것을 합창단이라고 불렀습니다. 그녀는 그 주에 부서를 떠났습니다."
+  },
+  "record.singulo.r10.title": {
+    "source": "A Dream of Condensates",
+    "translation": "응축수의 꿈"
+  },
+  "record.singulo.r11.body": {
+    "source": "Something far away shook spacetime. We know the direction and the distance band. What we do not know is whether it was natural.",
+    "translation": "멀리 있는 무언가가 시공간을 뒤흔들었다. 우리는 방향과 거리 대역을 알고 있습니다. 우리가 모르는 것은 그것이 자연스러운 것인지 여부입니다."
+  },
+  "record.singulo.r11.title": {
+    "source": "First Gravitational Wave",
+    "translation": "첫 번째 중력파"
+  },
+  "record.singulo.r12.body": {
+    "source": "The research building is closed. No reason will be published. The lock codes have been replaced with redstone signals.",
+    "translation": "연구동은 폐쇄되었습니다. 이유는 공개되지 않습니다. 잠금 코드가 레드스톤 신호로 대체되었습니다."
+  },
+  "record.singulo.r12.title": {
+    "source": "Research Building Closure",
+    "translation": "연구동 클로저"
+  },
+  "record.singulo.r13.body": {
+    "source": "A time crystal ticks forever without spending energy. At last we can grow clocks themselves.",
+    "translation": "시간 결정은 에너지를 소비하지 않고도 영원히 똑딱거립니다. 마침내 우리는 스스로 시계를 키울 수 있게 되었습니다."
+  },
+  "record.singulo.r13.title": {
+    "source": "Time Crystals",
+    "translation": "시간의 결정체"
+  },
+  "record.singulo.r14.body": {
+    "source": "Put two mirrors around nothing and you get less than nothing. Negative energy. We turned it into matter.",
+    "translation": "아무것도 없는 곳에 두 개의 거울을 놓으면 아무 것도 얻을 수 없습니다. 부정적인 에너지. 우리는 그것을 물질로 바꾸었습니다."
+  },
+  "record.singulo.r14.title": {
+    "source": "C-Cavity Notes",
+    "translation": "카시미르 공동 참고"
+  },
+  "record.singulo.r15.body": {
+    "source": "Cryogenic control failed. Some seeds slipped out of the flow of time. The section is sealed. Staff remain inside.",
+    "translation": "극저온 제어에 실패했습니다. 어떤 씨앗은 시간의 흐름 속에서 미끄러져 나갔습니다. 섹션이 밀봉되어 있습니다. 직원들은 안에 남아있습니다."
+  },
+  "record.singulo.r15.title": {
+    "source": "Culture Facility Final Report",
+    "translation": "봉쇄 배양 시설 최종 보고서"
+  },
+  "record.singulo.r16.body": {
+    "source": "A teaspoon of neutron-star matter weighs as much as a mountain. We cut it into blocks and stacked it neatly.",
+    "translation": "중성자별 물질 1티스푼의 무게는 산만큼 무겁습니다. 우리는 그것을 블록으로 자르고 깔끔하게 쌓았습니다."
+  },
+  "record.singulo.r16.title": {
+    "source": "A Poem on Degeneracy",
+    "translation": "퇴보에 관한 시"
+  },
+  "record.singulo.r17.body": {
+    "source": "Energy will be drawn from the ergosphere of a spinning black hole. Theoretical efficiency: 42%. At last, all mass can become energy. The project is approved.",
+    "translation": "회전하는 블랙홀의 작용권에서 에너지가 끌어옵니다. 이론적 효율성: 42%. 마침내 모든 질량은 에너지가 될 수 있습니다. 프로젝트가 승인되었습니다."
+  },
+  "record.singulo.r17.title": {
+    "source": "Penrose Project Approved",
+    "translation": "펜로즈 프로젝트 승인"
+  },
+  "record.singulo.r18.body": {
+    "source": "Tomorrow we ignite the seed. The horizon warden is in place. Should the core escape, the procedure is to seal the entire facility.",
+    "translation": "내일 우리는 씨앗에 불을 붙입니다. 지평선 감시자가 자리를 잡았습니다. 코어가 탈출할 경우, 절차는 시설 전체를 봉쇄하는 것입니다."
+  },
+  "record.singulo.r18.title": {
+    "source": "The Night Before Ignition",
+    "translation": "점화 전날 밤"
+  },
+  "record.singulo.r19.body": {
+    "source": "...ignition successful. Output is... no, the spin will not stop... past the Eddington limit... stop the feed...",
+    "translation": "...점화 성공했습니다. 출력은... 아니요, 회전은 멈추지 않습니다... Eddington 한계를 초과하면... 피드를 중지합니다..."
+  },
+  "record.singulo.r19.title": {
+    "source": "Ignition Record (fragment)",
+    "translation": "점화 기록(조각)"
+  },
+  "record.singulo.r20.body": {
+    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.",
+    "translation": "우리는 모든 질량을 에너지로 바꾸고 싶었습니다. 원자로는 도시, 산, 바다 등 그 소원을 들어주었습니다. 남은 것은 변칙존재와 수호자, 그리고 이 기록뿐이다. 이 글을 읽는 분들은 피드를 멈추는 손을 절대 놓지 마세요."
+  },
+  "record.singulo.r20.title": {
+    "source": "The Last Record",
+    "translation": "마지막 기록"
+  },
+  "ruin.singulo.culture_facility": {
+    "source": "Culture Facility",
+    "translation": "봉쇄 배양 시설"
+  },
+  "ruin.singulo.final_lab": {
+    "source": "Final Lab",
+    "translation": "최종 실험 시설"
+  },
+  "ruin.singulo.observation_post": {
+    "source": "Observation Post",
+    "translation": "지표 관측소"
+  },
+  "ruin.singulo.research_building": {
+    "source": "Research Building",
+    "translation": "연구동"
+  },
+  "stage.singulo.1": {
+    "source": "Startup",
+    "translation": "시작"
+  },
+  "stage.singulo.2": {
+    "source": "Cryogenic",
+    "translation": "극저온"
+  },
+  "stage.singulo.3": {
+    "source": "Quantum",
+    "translation": "양자"
+  },
+  "stage.singulo.4": {
+    "source": "Temporal",
+    "translation": "일시적"
+  },
+  "stage.singulo.5": {
+    "source": "Singularity",
+    "translation": "특이점"
+  },
+  "station.singulo.archive_terminal": {
+    "source": "Archive Terminal",
+    "translation": "기록 보관 단말기"
+  },
+  "station.singulo.casimir_cavity": {
+    "source": "C-Cavity",
+    "translation": "카시미르 공동"
+  },
+  "station.singulo.catalytic_reactor": {
+    "source": "Catalytic Reactor",
+    "translation": "촉매 반응기"
+  },
+  "station.singulo.compressor": {
+    "source": "Compressor",
+    "translation": "압축기"
+  },
+  "station.singulo.cryogenic_cooling_tower": {
+    "source": "Cryogenic Cooling Tower",
+    "translation": "극저온 냉각탑"
+  },
+  "station.singulo.degenerate_compactor": {
+    "source": "Degenerate Compactor",
+    "translation": "축퇴 압축로"
+  },
+  "station.singulo.echo_resonator": {
+    "source": "Echo Resonator",
+    "translation": "메아리 공명기"
+  },
+  "station.singulo.electrolyzer": {
+    "source": "Electrolyzer",
+    "translation": "전해조"
+  },
+  "station.singulo.entanglement_synthesizer": {
+    "source": "Entanglement Synthesizer",
+    "translation": "양자 얽힘 합성기"
+  },
+  "station.singulo.halo_collector": {
+    "source": "Halo Collector",
+    "translation": "헤일로 수집기"
+  },
+  "station.singulo.kiln": {
+    "source": "Kiln",
+    "translation": "소성로"
+  },
+  "station.singulo.laser_cooler": {
+    "source": "Laser Cooler",
+    "translation": "레이저 냉각기"
+  },
+  "station.singulo.particle_accelerator": {
+    "source": "Particle Accelerator",
+    "translation": "입자 가속기"
+  },
+  "station.singulo.penrose_reactor_catalyst": {
+    "source": "P-Reactor",
+    "translation": "펜로즈 반응로"
+  },
+  "station.singulo.penrose_reactor_power": {
+    "source": "P-Reactor",
+    "translation": "펜로즈 반응로"
+  },
+  "station.singulo.precision_assembler": {
+    "source": "Precision Assembler",
+    "translation": "정밀 조립기"
+  },
+  "station.singulo.singularity_encapsulator": {
+    "source": "Singularity Encapsulator",
+    "translation": "특이점 캡슐화기"
+  },
+  "station.singulo.time_crystal_incubator": {
+    "source": "Time Crystal Incubator",
+    "translation": "시간 결정 배양기"
+  },
+  "station.singulo.wormhole_generator": {
+    "source": "Wormhole Generator",
+    "translation": "웜홀 생성기"
+  },
+  "station.singulo.wormhole_stabilizer": {
+    "source": "Wormhole Stabilizer",
+    "translation": "웜홀 안정기"
+  },
+  "subtitles.singulo.advanced_worldline_anchor_embed": {
+    "source": "Core embeds",
+    "translation": "핵심 내장"
+  },
+  "subtitles.singulo.advanced_worldline_anchor_running": {
+    "source": "Advanced anchor holds",
+    "translation": "고급 앵커 홀드"
+  },
+  "subtitles.singulo.archive_terminal_running": {
+    "source": "Archive terminal reads",
+    "translation": "아카이브 터미널 읽기"
+  },
+  "subtitles.singulo.black_hole.ambient": {
+    "source": "Black hole hums",
+    "translation": "블랙홀이 윙윙거린다"
+  },
+  "subtitles.singulo.black_hole.formation": {
+    "source": "Black hole forms",
+    "translation": "블랙홀 형태"
+  },
+  "subtitles.singulo.casimir_cavity_running": {
+    "source": "C-Cavity vibrates",
+    "translation": "카시미르 공동가 진동합니다."
+  },
+  "subtitles.singulo.catalytic_reactor_running": {
+    "source": "Catalytic reactor reacts",
+    "translation": "촉매 반응기가 반응하다"
+  },
+  "subtitles.singulo.compressor_running": {
+    "source": "Compressor presses",
+    "translation": "압축기 프레스"
+  },
+  "subtitles.singulo.containment_tank_running": {
+    "source": "Containment tank hums",
+    "translation": "격납탱크가 웅웅거린다"
+  },
+  "subtitles.singulo.cooling_tower_running": {
+    "source": "Cooling tower chills",
+    "translation": "냉각탑 냉각"
+  },
+  "subtitles.singulo.cryogenic_turbine_running": {
+    "source": "Cryogenic turbine spins",
+    "translation": "극저온 터빈 회전"
+  },
+  "subtitles.singulo.degenerate_compactor_running": {
+    "source": "Degenerate compactor crushes",
+    "translation": "축퇴 압축로 분쇄"
+  },
+  "subtitles.singulo.degenerate_furnace_press": {
+    "source": "Pistons crush fuel",
+    "translation": "피스톤은 연료를 분쇄합니다."
+  },
+  "subtitles.singulo.degenerate_furnace_running": {
+    "source": "Degenerate furnace burns",
+    "translation": "축퇴 열로 화상"
+  },
+  "subtitles.singulo.echo_resonator_running": {
+    "source": "Echo resonator rings",
+    "translation": "에코 공진기 링"
+  },
+  "subtitles.singulo.electrolyzer_running": {
+    "source": "Electrolyzer bubbles",
+    "translation": "전해조 버블"
+  },
+  "subtitles.singulo.entanglement_synthesizer_running": {
+    "source": "Entanglement synthesizer resonates",
+    "translation": "얽힘 합성기가 공명합니다."
+  },
+  "subtitles.singulo.gravitational_wave_detector_ping": {
+    "source": "Detector pings",
+    "translation": "감지기 핑"
+  },
+  "subtitles.singulo.graviton_manipulator_active": {
+    "source": "Gravity manipulated",
+    "translation": "중력 조작"
+  },
+  "subtitles.singulo.graviton_manipulator_charge": {
+    "source": "Gravity charges",
+    "translation": "중력 요금"
+  },
+  "subtitles.singulo.graviton_manipulator_throw": {
+    "source": "Hurled",
+    "translation": "던져진"
+  },
+  "subtitles.singulo.halo_collector_running": {
+    "source": "Halo collector gathers",
+    "translation": "헤일로 수집가 집결"
+  },
+  "subtitles.singulo.inertial_stabilizer_running": {
+    "source": "Inertial stabilizer hums",
+    "translation": "관성 안정 장치가 윙윙거립니다."
+  },
+  "subtitles.singulo.kiln_running": {
+    "source": "Kiln roars",
+    "translation": "소성로가 포효한다"
+  },
+  "subtitles.singulo.laser_cooler_running": {
+    "source": "Laser cooler runs",
+    "translation": "레이저 쿨러 작동"
+  },
+  "subtitles.singulo.multiblock_formed": {
+    "source": "Multiblock formed",
+    "translation": "멀티블록 형성"
+  },
+  "subtitles.singulo.muon_collector_running": {
+    "source": "Muon collector gathers",
+    "translation": "뮤온 수집가들이 모인다"
+  },
+  "subtitles.singulo.particle_accelerator_running": {
+    "source": "Particle accelerator hums",
+    "translation": "입자 가속기가 웅웅거린다"
+  },
+  "subtitles.singulo.penrose_reactor_ignition": {
+    "source": "P-Reactor ignition begins",
+    "translation": "펜로즈 반응로 점화 시작"
+  },
+  "subtitles.singulo.precision_assembler_running": {
+    "source": "Assembler works",
+    "translation": "어셈블러 작동"
+  },
+  "subtitles.singulo.probe_station_launch": {
+    "source": "Probe launches",
+    "translation": "프로브 출시"
+  },
+  "subtitles.singulo.probe_station_return": {
+    "source": "Probe returns",
+    "translation": "프로브 반환"
+  },
+  "subtitles.singulo.quantum_heat_engine_running": {
+    "source": "Quantum heat engine runs",
+    "translation": "양자열엔진이 작동한다"
+  },
+  "subtitles.singulo.shield_tower_running": {
+    "source": "Shield hums",
+    "translation": "쉴드가 윙윙거립니다."
+  },
+  "subtitles.singulo.singularity_encapsulator_running": {
+    "source": "Singularity encapsulator works",
+    "translation": "특이점 캡슐화기 작동"
+  },
+  "subtitles.singulo.smes_cell_running": {
+    "source": "SMES cell hums",
+    "translation": "SMES 셀이 윙윙거립니다."
+  },
+  "subtitles.singulo.thermoelectric_generator_running": {
+    "source": "Thermoelectric generator hums",
+    "translation": "열전 발전기가 웅웅거린다"
+  },
+  "subtitles.singulo.time_crystal_incubator_running": {
+    "source": "Time crystal incubator grows",
+    "translation": "시간 결정 인큐베이터 성장"
+  },
+  "subtitles.singulo.tipler_cylinder_running": {
+    "source": "T-Cylinder spins",
+    "translation": "티플러 원통 회전"
+  },
+  "subtitles.singulo.worldline_anchor_running": {
+    "source": "Worldline anchor holds",
+    "translation": "세계선 닻이 버티고 있다"
+  },
+  "subtitles.singulo.wormhole_generator_charge": {
+    "source": "Wormhole generator charges",
+    "translation": "웜홀 생성기 요금"
+  },
+  "subtitles.singulo.wormhole_generator_open": {
+    "source": "Wormhole opens",
+    "translation": "웜홀 열림"
+  },
+  "subtitles.singulo.wormhole_mouth_ambient": {
+    "source": "Wormhole murmurs",
+    "translation": "웜홀의 중얼거림"
+  },
+  "subtitles.singulo.wormhole_stabilizer_running": {
+    "source": "Wormhole stabilizer runs",
+    "translation": "웜홀 안정 장치 실행"
+  },
+  "tooltip.singulo.beyond_repair": {
+    "source": "Beyond repair",
+    "translation": "수리를 넘어서"
+  },
+  "tooltip.singulo.builder_wand.hint": {
+    "source": "Use on a controller to build instantly. Sneak to change size",
+    "translation": "컨트롤러에서 사용하여 즉시 구축하세요. 몰래 사이즈 변경"
+  },
+  "tooltip.singulo.builder_wand.size": {
+    "source": "Size: %s",
+    "translation": "크기: %1$s"
+  },
+  "tooltip.singulo.creative_catalyst.tier": {
+    "source": "Acts as a tier %s catalyst",
+    "translation": "계층 %1$s 촉매 역할을 합니다."
+  },
+  "tooltip.singulo.creative_energy.hint": {
+    "source": "Pushing infinite energy to neighbours",
+    "translation": "이웃에게 무한한 에너지를 전하다"
+  },
+  "tooltip.singulo.creative_only": {
+    "source": "Creative only",
+    "translation": "광고 소재만"
+  },
+  "tooltip.singulo.dark_matter": {
+    "source": "Dark matter: %s mB",
+    "translation": "암흑 물질: %1$s mB"
+  },
+  "tooltip.singulo.energy": {
+    "source": "Energy %s / %s FE",
+    "translation": "에너지 %1$s / %2$s FE"
+  },
+  "tooltip.singulo.exotic_charge": {
+    "source": "Exotic charge: %s s",
+    "translation": "이국적인 충전: %1$s s"
+  },
+  "tooltip.singulo.gauntlet.hint": {
+    "source": "Hold use to manipulate · Sneak-use to switch mode",
+    "translation": "조작을 위해 홀드 사용 · 모드 전환을 위해 몰래 사용"
+  },
+  "tooltip.singulo.gauntlet.mode": {
+    "source": "Mode: %s",
+    "translation": "모드: %1$s"
+  },
+  "tooltip.singulo.holo_projector.hint": {
+    "source": "Right-click a controller to project; again to hide. Sneak to change size",
+    "translation": "투영할 컨트롤러를 마우스 오른쪽 버튼으로 클릭합니다. 또 숨기려고. 몰래 사이즈 변경"
+  },
+  "tooltip.singulo.lifetime": {
+    "source": "Lifetime %s / %s",
+    "translation": "수명 %1$s / %2$s"
+  },
+  "tooltip.singulo.magnetic_bottle": {
+    "source": "%s / %s uses left",
+    "translation": "%1$s / %2$s는 왼쪽 사용"
+  },
+  "tooltip.singulo.manipulator.hint": {
+    "source": "Hold attack to manipulate · Hold use to charge, release to throw",
+    "translation": "공격을 길게 누르면 조작 · 길게 누르면 돌진, 떼면 던지기"
+  },
+  "tooltip.singulo.mass": {
+    "source": "Mass %s",
+    "translation": "대량 %1$s"
+  },
+  "tooltip.singulo.mass_metal": {
+    "source": "Mass %s (metal)",
+    "translation": "질량 %1$s(금속)"
+  },
+  "tooltip.singulo.metric_drive.hint": {
+    "source": "Works from your inventory · Use to switch mode",
+    "translation": "인벤토리에서 작동 · 모드 전환에 사용"
+  },
+  "tooltip.singulo.mixed_source": {
+    "source": "Mixed: 8 make a Lv2",
+    "translation": "혼합: 8개로 Lv2 만들기"
+  },
+  "tooltip.singulo.planned": {
+    "source": "Not functional yet; usable as a material",
+    "translation": "아직 작동하지 않습니다. 재료로 사용 가능"
+  },
+  "tooltip.singulo.repairs": {
+    "source": "Repaired %s / %s times",
+    "translation": "%1$s / %2$s 번 수리됨"
+  },
+  "tooltip.singulo.stage": {
+    "source": "Stage %s: %s",
+    "translation": "단계 %1$s: %2$s"
+  },
+  "tooltip.singulo.uses": {
+    "source": "Uses %s / %s",
+    "translation": "%1$s / %2$s를 사용합니다."
+  },
+  "tooltip.singulo.wormhole.unstable": {
+    "source": "Unstable: collapses in %s s",
+    "translation": "불안정: %1$s에서 축소됨"
+  },
+  "tooltip.singulo.worn_out": {
+    "source": "Exhausted. Repair it in the matching machine",
+    "translation": "지쳤습니다. 매칭 머신에서 수리"
+  },
+  "uses.singulo.accelerator_controller": {
+    "source": "Used in: Particle Accelerator",
+    "translation": "사용 제품: 입자 가속기"
+  },
+  "uses.singulo.accelerator_tube": {
+    "source": "Used in: Particle Accelerator",
+    "translation": "사용 제품: 입자 가속기"
+  },
+  "uses.singulo.anomaly_sample": {
+    "source": "Used in: Singularity Core",
+    "translation": "사용 제품: 특이점 코어"
+  },
+  "uses.singulo.basic_circuit": {
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 12 more",
+    "translation": "사용 제품: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 12개"
+  },
+  "uses.singulo.basic_frame": {
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 29 more",
+    "translation": "사용 제품: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 29개"
+  },
+  "uses.singulo.bh_container": {
+    "source": "Used in: Micro Black Hole Vessel",
+    "translation": "사용 제품: 소형 블랙홀 용기"
+  },
+  "uses.singulo.blank_data_card": {
+    "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
+    "translation": "사용 대상: 데이터 카드(관찰 기록), 데이터 카드(양자 데이터 조각), 데이터 카드(배양 데이터)"
+  },
+  "uses.singulo.bose_condensate_catalyst": {
+    "source": "Used in: Time Crystal Catalyst",
+    "translation": "사용 제품: 시간 결정 촉매"
+  },
+  "uses.singulo.casimir_cavity_controller": {
+    "source": "Used in: C-Cavity",
+    "translation": "사용 제품: 카시미르 공동"
+  },
+  "uses.singulo.casimir_cavity_frame": {
+    "source": "Used in: C-Cavity",
+    "translation": "사용 제품: 카시미르 공동"
+  },
+  "uses.singulo.casimir_cavity_pump": {
+    "source": "Used in: C-Cavity",
+    "translation": "사용 제품: 카시미르 공동"
+  },
+  "uses.singulo.casimir_cavity_shield": {
+    "source": "Used in: C-Cavity",
+    "translation": "사용 제품: 카시미르 공동"
+  },
+  "uses.singulo.casimir_cavity_wall": {
+    "source": "Used in: C-Cavity",
+    "translation": "사용 제품: 카시미르 공동"
+  },
+  "uses.singulo.casimir_cavity_window": {
+    "source": "Used in: C-Cavity",
+    "translation": "사용 제품: 카시미르 공동"
+  },
+  "uses.singulo.ceramic_substrate": {
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 4 more",
+    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 4개"
+  },
+  "uses.singulo.cold_atom_trap": {
+    "source": "Used in: Cold Atoms",
+    "translation": "사용 제품: 냉각 원자"
+  },
+  "uses.singulo.cold_atoms": {
+    "source": "Used in: BE Condensate Catalyst",
+    "translation": "사용 제품: 보스 응축 촉매"
+  },
+  "uses.singulo.compressed_block_1": {
+    "source": "Used in: Compressed Block Lv2, Compressed Block Lv2 (Mixed)",
+    "translation": "사용 대상: 압축 블록 Lv2, 압축 블록 Lv2(혼합)"
+  },
+  "uses.singulo.compressed_block_2": {
+    "source": "Used in: Compressed Block Lv3",
+    "translation": "사용 대상: 압축 블록 Lv3"
+  },
+  "uses.singulo.compressed_block_3": {
+    "source": "Used in: Degenerate Matter Shell",
+    "translation": "사용 제품: 축퇴 물질 껍질"
+  },
+  "uses.singulo.compressed_metal_block_1": {
+    "source": "Used in: Compressed Metal Block Lv2",
+    "translation": "사용 제품: 압축 금속 블록 Lv2"
+  },
+  "uses.singulo.compressed_metal_block_2": {
+    "source": "Used in: Degenerate Matter Shell, Artificial Star Core",
+    "translation": "사용 대상: 축퇴 물질 껍질, 인공 항성 코어"
+  },
+  "uses.singulo.control_unit": {
+    "source": "Used in: Superconducting Coil",
+    "translation": "사용 제품: 초전도 코일"
+  },
+  "uses.singulo.cooling_tower_base": {
+    "source": "Used in: Cryogenic Cooling Tower",
+    "translation": "사용 제품: 극저온 냉각탑"
+  },
+  "uses.singulo.cooling_tower_casing": {
+    "source": "Used in: Cryogenic Cooling Tower, Cooling Tower Extension",
+    "translation": "사용 제품: 극저온 냉각탑, 냉각탑 확장"
+  },
+  "uses.singulo.cooling_tower_controller": {
+    "source": "Used in: Cryogenic Cooling Tower",
+    "translation": "사용 제품: 극저온 냉각탑"
+  },
+  "uses.singulo.cooling_tower_coolant_band": {
+    "source": "Used in: Cryogenic Cooling Tower, Cooling Tower Extension",
+    "translation": "사용 제품: 극저온 냉각탑, 냉각탑 확장"
+  },
+  "uses.singulo.cooling_tower_glass": {
+    "source": "Used in: Cryogenic Cooling Tower, Cooling Tower Extension",
+    "translation": "사용 제품: 극저온 냉각탑, 냉각탑 확장"
+  },
+  "uses.singulo.cooling_tower_grate": {
+    "source": "Used in: Cryogenic Cooling Tower",
+    "translation": "사용 제품: 극저온 냉각탑"
+  },
+  "uses.singulo.cooling_tower_rim": {
+    "source": "Used in: Cryogenic Cooling Tower",
+    "translation": "사용 제품: 극저온 냉각탑"
+  },
+  "uses.singulo.core_controller": {
+    "source": "Used in: P-Reactor",
+    "translation": "사용 제품: 펜로즈 반응로"
+  },
+  "uses.singulo.culture_data": {
+    "source": "Used in: Data Card (Culture Data)",
+    "translation": "사용 제품: 데이터 카드(배양 데이터)"
+  },
+  "uses.singulo.data_card_culture_data": {
+    "source": "Used in: Exotic Matter",
+    "translation": "사용 제품: 특이 물질"
+  },
+  "uses.singulo.data_card_observation_log": {
+    "source": "Used in: Muon Catalyst",
+    "translation": "사용 제품: 뮤온 촉매"
+  },
+  "uses.singulo.data_card_quantum_fragment": {
+    "source": "Used in: Entangled Element",
+    "translation": "사용 제품: 양자 얽힘 소자"
+  },
+  "uses.singulo.degenerate_compactor_anvil": {
+    "source": "Used in: Degenerate Compactor",
+    "translation": "사용 제품: 축퇴 압축로"
+  },
+  "uses.singulo.degenerate_compactor_controller": {
+    "source": "Used in: Degenerate Compactor",
+    "translation": "사용 제품: 축퇴 압축로"
+  },
+  "uses.singulo.degenerate_compactor_frame": {
+    "source": "Used in: Degenerate Compactor",
+    "translation": "사용 제품: 축퇴 압축로"
+  },
+  "uses.singulo.degenerate_compactor_plate": {
+    "source": "Used in: Degenerate Compactor",
+    "translation": "사용 제품: 축퇴 압축로"
+  },
+  "uses.singulo.degenerate_compactor_ram": {
+    "source": "Used in: Degenerate Compactor",
+    "translation": "사용 제품: 축퇴 압축로"
+  },
+  "uses.singulo.degenerate_compactor_vent": {
+    "source": "Used in: Degenerate Compactor",
+    "translation": "사용 제품: 축퇴 압축로"
+  },
+  "uses.singulo.degenerate_compactor_window": {
+    "source": "Used in: Degenerate Compactor",
+    "translation": "사용 제품: 축퇴 압축로"
+  },
+  "uses.singulo.degenerate_furnace_controller": {
+    "source": "Used in: Degenerate Furnace",
+    "translation": "사용 제품: 축퇴 열로"
+  },
+  "uses.singulo.degenerate_furnace_fin": {
+    "source": "Used in: Degenerate Furnace",
+    "translation": "사용 제품: 축퇴 열로"
+  },
+  "uses.singulo.degenerate_furnace_frame": {
+    "source": "Used in: Degenerate Furnace",
+    "translation": "사용 제품: 축퇴 열로"
+  },
+  "uses.singulo.degenerate_furnace_piston": {
+    "source": "Used in: Degenerate Furnace",
+    "translation": "사용 제품: 축퇴 열로"
+  },
+  "uses.singulo.degenerate_furnace_shell": {
+    "source": "Used in: Degenerate Furnace",
+    "translation": "사용 제품: 축퇴 열로"
+  },
+  "uses.singulo.degenerate_furnace_tube": {
+    "source": "Used in: Degenerate Furnace",
+    "translation": "사용 제품: 축퇴 열로"
+  },
+  "uses.singulo.degenerate_furnace_window": {
+    "source": "Used in: Degenerate Furnace",
+    "translation": "사용 제품: 축퇴 열로"
+  },
+  "uses.singulo.degenerate_matter_shell": {
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core",
+    "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어"
+  },
+  "uses.singulo.degraded_anomaly_sample": {
+    "source": "Used in: Anomaly Sample",
+    "translation": "사용 제품: 이상 샘플"
+  },
+  "uses.singulo.degraded_cold_atom_trap": {
+    "source": "Used in: Cold Atom Trap",
+    "translation": "사용 제품: 냉각 원자 트랩"
+  },
+  "uses.singulo.degraded_control_unit": {
+    "source": "Used in: Control Unit",
+    "translation": "사용 제품: 제어 장치"
+  },
+  "uses.singulo.degraded_time_crystal_seed": {
+    "source": "Used in: Time Crystal Seed",
+    "translation": "사용 제품: 시간 결정 씨앗"
+  },
+  "uses.singulo.dormant_singularity_seed": {
+    "source": "Used in: Singularity Seed",
+    "translation": "사용 제품: 특이점 씨앗"
+  },
+  "uses.singulo.entangled_element": {
+    "source": "Used in: Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer, Echo Resonator and 17 more",
+    "translation": "사용 제품: 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기, 메아리 공명기 외 17개"
+  },
+  "uses.singulo.exotic_matter": {
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 17 more",
+    "translation": "사용 제품: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 17개"
+  },
+  "uses.singulo.focusing_magnet": {
+    "source": "Used in: Particle Accelerator",
+    "translation": "사용 제품: 입자 가속기"
+  },
+  "uses.singulo.gravity_field_stabilizer": {
+    "source": "Used in: Core Controller",
+    "translation": "사용 제품: 노심 제어기"
+  },
+  "uses.singulo.gyro_drive": {
+    "source": "Used in: P-Reactor",
+    "translation": "사용 제품: 펜로즈 반응로"
+  },
+  "uses.singulo.hawking_condensate": {
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core",
+    "translation": "사용 대상: 소형 블랙홀 용기, 특이점 코어"
+  },
+  "uses.singulo.heat_exchange_core": {
+    "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
+    "translation": "사용 제품: 냉각탑 제어기, 극저온 냉각탑, 냉각탑 확장, 극저온 터빈"
+  },
+  "uses.singulo.inertial_control_gauntlet": {
+    "source": "Used in: Graviton Manipulator",
+    "translation": "사용 제품: 중력자 조작기"
+  },
+  "uses.singulo.jet_condensate": {
+    "source": "Used in: Artificial Star Core",
+    "translation": "사용 제품: 인공 항성 코어"
+  },
+  "uses.singulo.magnetic_monopole": {
+    "source": "Used in: Monopole Upgrade",
+    "translation": "사용 제품: 홀극 업그레이드"
+  },
+  "uses.singulo.micro_black_hole": {
+    "source": "Used in: Black Hole Bomb, Graviton Manipulator",
+    "translation": "사용 대상: 블랙홀 폭탄, 중력자 조작기"
+  },
+  "uses.singulo.mirror_plate": {
+    "source": "Used in: C-Cavity",
+    "translation": "사용 제품: 카시미르 공동"
+  },
+  "uses.singulo.muon_bundle": {
+    "source": "Used in: Muon Catalyst",
+    "translation": "사용 제품: 뮤온 촉매"
+  },
+  "uses.singulo.muon_catalyst": {
+    "source": "Used in: BE Condensate Catalyst",
+    "translation": "사용 제품: 보스 응축 촉매"
+  },
+  "uses.singulo.neutrino_scanner": {
+    "source": "Used in: Neutrino Observatory",
+    "translation": "사용 제품: 중성미자 관측소"
+  },
+  "uses.singulo.observation_log": {
+    "source": "Used in: Data Card (Observation Log)",
+    "translation": "사용 제품: 데이터 카드(관찰 기록)"
+  },
+  "uses.singulo.optical_lattice_substrate": {
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Exotic Matter and 18 more",
+    "translation": "사용 제품: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 시간 결정 촉매, 특이 물질 외 18개"
+  },
+  "uses.singulo.quantum_computing_module": {
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 15 more",
+    "translation": "사용 제품: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 15개"
+  },
+  "uses.singulo.quantum_data_fragment": {
+    "source": "Used in: Data Card (Quantum Data Fragment)",
+    "translation": "사용 제품: 데이터 카드(양자 데이터 조각)"
+  },
+  "uses.singulo.reactor_shell": {
+    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator",
+    "translation": "사용 대상: 추출 포트, 노심 안정화 코일, 노심 질량 경보기, 펜로즈 반응로, 특이점 캡슐화기"
+  },
+  "uses.singulo.reactor_stabilizer": {
+    "source": "Used in: P-Reactor",
+    "translation": "사용 제품: 펜로즈 반응로"
+  },
+  "uses.singulo.record_fragment": {
+    "source": "Used in: Decoded Record",
+    "translation": "사용 제품: 디코딩된 기록"
+  },
+  "uses.singulo.shield_tower_body": {
+    "source": "Used in: Event Horizon Shield Tower",
+    "translation": "사용 제품: 사건의 지평선 보호막 탑"
+  },
+  "uses.singulo.shield_tower_coil": {
+    "source": "Used in: Event Horizon Shield Tower",
+    "translation": "사용 제품: 사건의 지평선 보호막 탑"
+  },
+  "uses.singulo.shield_tower_core": {
+    "source": "Used in: Event Horizon Shield Tower",
+    "translation": "사용 제품: 사건의 지평선 보호막 탑"
+  },
+  "uses.singulo.shield_tower_crown": {
+    "source": "Used in: Event Horizon Shield Tower",
+    "translation": "사용 제품: 사건의 지평선 보호막 탑"
+  },
+  "uses.singulo.shield_tower_plinth": {
+    "source": "Used in: Event Horizon Shield Tower",
+    "translation": "사용 제품: 사건의 지평선 보호막 탑"
+  },
+  "uses.singulo.shield_tower_waveguide": {
+    "source": "Used in: Event Horizon Shield Tower",
+    "translation": "사용 제품: 사건의 지평선 보호막 탑"
+  },
+  "uses.singulo.steel_blend": {
+    "source": "Used in: Steel Ingot",
+    "translation": "사용 제품: 강철 주괴"
+  },
+  "uses.singulo.steel_ingot": {
+    "source": "Used in: Basic Frame, Steel Plate, Compressor",
+    "translation": "사용 대상: 기본 프레임, 강판, 압축기"
+  },
+  "uses.singulo.steel_plate": {
+    "source": "Used in: Cooling Tower Base, Cooling Tower Casing, Cooling Tower Glass, Heat Exchange Core, Cooling Tower Coolant Band and 51 more",
+    "translation": "사용 제품: 냉각탑 베이스, 냉각탑 케이싱, 냉각탑 유리, 열교환 코어, 냉각탑 냉각수 밴드 외 51개"
+  },
+  "uses.singulo.superconducting_coil": {
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 31 more",
+    "translation": "사용 제품: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 31개"
+  },
+  "uses.singulo.superconducting_wire": {
+    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",
+    "translation": "사용 대상: 초전도 케이블, 양자 얽힘 소자, 보스 응축 촉매, 축퇴 열로 열교환 튜브, 위상 전선"
+  },
+  "uses.singulo.thermocouple_module": {
+    "source": "Used in: Thermoelectric Generator",
+    "translation": "사용 제품: 열전 발전기"
+  },
+  "uses.singulo.time_crystal_catalyst": {
+    "source": "Used in: Exotic Matter, Core Controller, Singularity Encapsulator, Singularity Core, Shield Tower Core and 3 more",
+    "translation": "사용 제품: 특이 물질, 노심 제어기, 특이점 캡슐화기, 특이점 코어, 실드 타워 코어 외 3개"
+  },
+  "uses.singulo.time_crystal_seed": {
+    "source": "Used in: Time Crystal Catalyst",
+    "translation": "사용 제품: 시간 결정 촉매"
+  },
+  "uses.singulo.tipler_bearing": {
+    "source": "Used in: T-Cylinder",
+    "translation": "사용 제품: 티플러 원통"
+  },
+  "uses.singulo.tipler_core": {
+    "source": "Used in: T-Cylinder",
+    "translation": "사용 제품: 티플러 원통"
+  },
+  "uses.singulo.tipler_frame": {
+    "source": "Used in: T-Cylinder",
+    "translation": "사용 제품: 티플러 원통"
+  },
+  "uses.singulo.tipler_holder": {
+    "source": "Used in: T-Cylinder",
+    "translation": "사용 제품: 티플러 원통"
+  },
+  "uses.singulo.tipler_housing": {
+    "source": "Used in: T-Cylinder",
+    "translation": "사용 제품: 티플러 원통"
+  },
+  "uses.singulo.tipler_window": {
+    "source": "Used in: T-Cylinder",
+    "translation": "사용 제품: 티플러 원통"
+  },
+  "uses.singulo.topological_wire": {
+    "source": "Used in: Toroidal Magnetic Coil, Horizon Bus, Gyro Drive, Shield Tower Power Coil, Metric Drive and 1 more",
+    "translation": "사용 제품: 토로이드 자기 코일, 지평선 버스, 자이로 구동 장치, 쉴드 타워 파워 코일, 계량 구동기 외 1개"
+  },
+  "uses.singulo.toroidal_magnetic_coil": {
+    "source": "Used in: SMES Module",
+    "translation": "사용 대상: SMES 모듈"
+  },
+  "uses.singulo.unfired_ceramic": {
+    "source": "Used in: White Ceramic Composite",
+    "translation": "사용 제품: 화이트 세라믹 복합재"
+  },
+  "uses.singulo.unstable_wormhole_mouth": {
+    "source": "Used in: Wormhole Mouth",
+    "translation": "사용 제품: 웜홀 입구"
+  },
+  "uses.singulo.white_ceramic_composite": {
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 7 more",
+    "translation": "사용 제품: 기본회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 7개"
+  },
+  "uses.singulo.wormhole_generator_coil": {
+    "source": "Used in: Wormhole Generator",
+    "translation": "사용 제품: 웜홀 생성기"
+  },
+  "uses.singulo.wormhole_generator_core": {
+    "source": "Used in: Wormhole Generator",
+    "translation": "사용 제품: 웜홀 생성기"
+  },
+  "uses.singulo.wormhole_generator_focuser": {
+    "source": "Used in: Wormhole Generator",
+    "translation": "사용 제품: 웜홀 생성기"
+  },
+  "uses.singulo.wormhole_generator_shell": {
+    "source": "Used in: Wormhole Generator",
+    "translation": "사용 제품: 웜홀 생성기"
+  },
+  "uses.singulo.wormhole_generator_window": {
+    "source": "Used in: Wormhole Generator",
+    "translation": "사용 제품: 웜홀 생성기"
+  }
+}
