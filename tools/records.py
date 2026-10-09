@@ -57,3 +57,19 @@ RECORDS = [
      'The Last Record', 'We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. '
      'All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.'),
 ]
+
+# 封印された記録（封印コンテナの特異点錠の中の「封印記録」を読むと、この順に加わる）。形は RECORDS と同じ
+HIDDEN_RECORDS = [
+    ('h01', 5, '封印目録', '封印コンテナには段階ごとの鍵をかけた。次の段階に届いた者だけが、前の段階の遺産を開けられるように。'
+     '急ぐ者には何も渡さない。', 'Seal Inventory',
+     'Each container was locked with the key of the next stage, so that only those who reached it could open what came before. '
+     'We give nothing to those in a hurry.'),
+    ('h02', 5, '避難計画（未完）', '炉の暴走に備えて、一部の職員を時間の場で眠らせる計画があった。目覚める日付の欄は、最後まで空白のままだった。',
+     'Evacuation Plan (Unfinished)', 'In case the reactor ran away, some staff were to sleep inside a time field. '
+     'The field for the waking date was never filled in.'),
+    ('h03', 5, 'これを読む誰かへ', 'これを読んでいるなら、あなたも炉に火を入れたのだろう。我々と同じ道を進むな、とは言わない。'
+     'ただ、限界を見張る者をそばに置け。警報を、決して切るな。', 'To Whoever Reads This',
+     'If you are reading this, you too have lit the reactor. We will not tell you to turn back. '
+     'Only keep a watcher at the limit beside you, and never silence the alarm.'),
+]
+
