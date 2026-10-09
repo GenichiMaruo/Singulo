@@ -36,6 +36,9 @@ public class HandbookScreen extends Screen {
     private static final int ROW = 16;
 
     /** 1ページぶんの中身。title と本文の行。 */
+    /** 作者への支援（Ko-fi）。題名の行の右端の小さなボタンから、確認の画面を出してブラウザで開く。 */
+    static final String SUPPORT_URL = "https://ko-fi.com/graycat9";
+
     private record Page(Component title, List<Line> lines) {}
 
     /** 本文の1行（色つき）。 */
@@ -203,6 +206,7 @@ public class HandbookScreen extends Screen {
         super.render(g, mouseX, mouseY, partialTick);
         Panel.background(g, left, top, W, H);
         g.drawString(font, title, left + 8, top + 7, Panel.TEXT, false);
+        drawSupport(g, mouseX, mouseY);
         // 章の一覧
         int listTop = top + 20;
         int listH = H - 28;
@@ -253,6 +257,32 @@ public class HandbookScreen extends Screen {
         drawArrow(g, px + pw / 2 + 28, navY, ">", page < c.pages.size() - 1, mouseX, mouseY);
     }
 
+    /** 支援ボタンの位置と大きさ（題名の行の右端）。 */
+    private int[] supportPos() {
+        int w = font.width(Component.translatable("gui.singulo.handbook.support")) + 16;
+        return new int[]{left + W - 6 - w, top + 4, w, 12};
+    }
+
+    private void drawSupport(GuiGraphics g, int mx, int my) {
+        int[] b = supportPos();
+        boolean hover = Panel.inside(mx, my, b[0], b[1], b[2], b[3]);
+        g.fill(b[0], b[1], b[0] + b[2], b[1] + b[3], hover ? 0xFFFF7A86 : 0xFFE8D6D8);
+        // 小さなハート
+        int hx = b[0] + 4;
+        int hy = b[1] + 4;
+        int c = hover ? 0xFFFFFFFF : 0xFFE0505E;
+        g.fill(hx, hy, hx + 2, hy + 2, c);
+        g.fill(hx + 3, hy, hx + 5, hy + 2, c);
+        g.fill(hx, hy + 1, hx + 5, hy + 3, c);
+        g.fill(hx + 1, hy + 3, hx + 4, hy + 4, c);
+        g.fill(hx + 2, hy + 4, hx + 3, hy + 5, c);
+        g.drawString(font, Component.translatable("gui.singulo.handbook.support"), b[0] + 11, b[1] + 2,
+                hover ? 0xFFFFFFFF : 0xFF8A3A44, false);
+        if (hover) {
+            g.renderTooltip(font, Component.translatable("gui.singulo.handbook.support_hint"), mx, my);
+        }
+    }
+
     private void drawArrow(GuiGraphics g, int x, int y, String s, boolean enabled, int mx, int my) {
         int color = !enabled ? Panel.SEAM : Panel.inside(mx, my, x, y, 12, 12) ? Panel.GLOW : Panel.TEXT;
         g.fill(x, y, x + 12, y + 12, enabled ? Panel.SHADE : Panel.BACKGROUND);
@@ -268,6 +298,11 @@ public class HandbookScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        int[] b = supportPos();
+        if (Panel.inside(mx, my, b[0], b[1], b[2], b[3])) {
+            net.minecraft.client.gui.screens.ConfirmLinkScreen.confirmLinkNow(this, SUPPORT_URL);
+            return true;
+        }
         int listTop = top + 20;
         int listH = H - 28;
         if (Panel.inside(mx, my, left + 6, listTop, LIST_W, listH)) {
