@@ -14,14 +14,19 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
     public CatalystDeviceScreen(CatalystDeviceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         imageWidth = 176;
-        imageHeight = 166;
-        inventoryLabelY = imageHeight - 94;
+        imageHeight = CatalystDeviceMenu.HEIGHT;
+        inventoryLabelY = CatalystDeviceMenu.INV_Y - 11;
     }
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
+        if (menu.kind().extraSlot() != null && !menu.getSlot(1).hasItem() && menu.getCarried().isEmpty()
+                && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.EXTRA_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
+            g.renderTooltip(font, net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                    io.github.genichimaruo.singulo.Singulo.id(extraItem())).getDescription(), mouseX, mouseY);
+        }
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + 17, 8, 52)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.energy",
                     menu.value(CatalystDeviceBlockEntity.D_ENERGY), menu.value(CatalystDeviceBlockEntity.D_CAPACITY)),
@@ -36,13 +41,19 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
         Panel.verticalBar(g, leftPos + 8, topPos + 17, 8, 52,
                 (double) menu.value(CatalystDeviceBlockEntity.D_ENERGY) / capacity, Panel.GLOW);
         Panel.slot(g, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y);
+        if (menu.kind().extraSlot() != null) {
+            Panel.slot(g, leftPos + CatalystDeviceMenu.EXTRA_X, topPos + CatalystDeviceMenu.SLOT_Y);
+            if (!menu.getSlot(1).hasItem()) {
+                Panel.ghost(g, leftPos + CatalystDeviceMenu.EXTRA_X, topPos + CatalystDeviceMenu.SLOT_Y, extraItem());
+            }
+        }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                Panel.slot(g, leftPos + 8 + col * 18, topPos + 84 + row * 18);
+                Panel.slot(g, leftPos + 8 + col * 18, topPos + CatalystDeviceMenu.INV_Y + row * 18);
             }
         }
         for (int col = 0; col < 9; col++) {
-            Panel.slot(g, leftPos + 8 + col * 18, topPos + 142);
+            Panel.slot(g, leftPos + 8 + col * 18, topPos + CatalystDeviceMenu.HOTBAR_Y);
         }
     }
 
@@ -53,12 +64,39 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
         Component label = Component.translatable("gui.singulo.catalyst.slot");
         g.drawString(font, label, CatalystDeviceMenu.SLOT_X - 4 - font.width(label), CatalystDeviceMenu.SLOT_Y + 4,
                 Panel.TEXT, false);
+        if (menu.kind().extraSlot() != null) {
+            Component extra = Component.translatable(menu.kind().extraSlot());
+            g.drawString(font, extra, CatalystDeviceMenu.EXTRA_X - 4 - font.width(extra), CatalystDeviceMenu.SLOT_Y + 4,
+                    Panel.TEXT, false);
+        }
 
         int y = 44;
         for (Component line : lines()) {
-            g.drawString(font, line, 22, y, Panel.TEXT, false);
-            y += 10;
+            for (var seq : font.split(line, imageWidth - 22 - 8)) {
+                if (y > CatalystDeviceMenu.INV_Y - 14) {
+                    return;
+                }
+                g.drawString(font, seq, 22, y, Panel.TEXT, false);
+                y += 10;
+            }
         }
+    }
+
+    /** 2つ目のスロットに入れる物。 */
+    private String extraItem() {
+        return switch (menu.kind()) {
+            case TIPLER_CYLINDER -> "exotic_matter";
+            case DEGENERATE_FURNACE -> "compressed_block_2";
+            default -> "shield_permit";
+        };
+    }
+
+    /** 許可証の状態（入っていれば登録された人数）。 */
+    private Component permitLine() {
+        var stack = menu.getSlot(1).getItem();
+        int n = io.github.genichimaruo.singulo.item.ShieldPermitItem.members(stack).size();
+        return n > 0 ? Component.translatable("gui.singulo.shield.permit_on", n)
+                : Component.translatable("gui.singulo.shield.permit_off");
     }
 
     private List<Component> lines() {
@@ -85,6 +123,7 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
                         out.add(Component.translatable("gui.singulo.device.radius_blocks", value));
                         out.add(Component.translatable(menu.value(CatalystDeviceBlockEntity.D_EXTRA) >= 5
                                 ? "gui.singulo.shield.full" : "gui.singulo.shield.basic"));
+                        out.add(permitLine());
                     }
                     case TIPLER_CYLINDER -> {
                         out.add(Component.translatable("gui.singulo.device.radius_blocks", value));

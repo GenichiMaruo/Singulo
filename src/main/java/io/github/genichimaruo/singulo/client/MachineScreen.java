@@ -43,6 +43,35 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     /** 0 はアイテム、1 は液体。 */
     private int sidesChannel;
     private static final int FACE = 18;
+    /** 面の設定の、ドラッグで回せる立方体。 */
+    private final SideCube cube = new SideCube();
+    private static final float CUBE_HALF = 13;
+    /** 立方体の上で押したボタンと位置（離したときに動かしていなければ、面をクリックしたことにする）。 */
+    private int cubePress = -1;
+    private double pressX;
+    private double pressY;
+    private boolean cubeDragged;
+
+    private float cubeX() {
+        return leftPos + layout().sideColumnX / 2F;
+    }
+
+    private float cubeY() {
+        return topPos + 46;
+    }
+
+    private java.util.List<SideCube.Quad> cubeQuads() {
+        return cube.visible(cubeX(), cubeY(), CUBE_HALF);
+    }
+
+    private static int modeColor(int mode) {
+        return switch (mode) {
+            case 1 -> 0xFF4A8FE0;        // 入力: 青
+            case 2 -> 0xFFF0A040;        // 出力: 橙
+            case 3 -> 0xFF50B870;        // 入出力: 緑
+            default -> 0xFF9AA2AA;       // 無効: 灰
+        };
+    }
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
@@ -69,6 +98,11 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             case RIGHT -> new int[]{cx + FACE + 2, cy};
             case BACK -> new int[]{cx + 2 * (FACE + 2), cy};
         };
+    }
+
+    /** 面の設定があるか。マルチブロックのコントローラにはない（入出力はマルチブロック搬入出ポートで行う）。 */
+    private boolean hasSides() {
+        return !type().isMultiblock();
     }
 
     /** 面の設定ボタンの左端（右の列の中央）。 */
@@ -110,27 +144,11 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             tx += tw + 2;
         }
         int packed = sidesPacked();
-        io.github.genichimaruo.singulo.machine.SideConfig.Face hovered = null;
-        for (io.github.genichimaruo.singulo.machine.SideConfig.Face f : io.github.genichimaruo.singulo.machine.SideConfig.Face.values()) {
-            int[] p = facePos(f);
-            int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, f);
-            int color = switch (mode) {
-                case 1 -> 0xFF4A8FE0;        // 入力: 青
-                case 2 -> 0xFFF0A040;        // 出力: 橙
-                case 3 -> 0xFF50B870;        // 入出力: 緑
-                default -> 0xFF9AA2AA;       // 無効: 灰
-            };
-            g.fill(p[0] - 1, p[1] - 1, p[0] + FACE + 1, p[1] + FACE + 1, Panel.WELL_EDGE);
-            g.fill(p[0], p[1], p[0] + FACE, p[1] + FACE, color);
-            String label = Component.translatable("gui.singulo.sides.face." + f.name().toLowerCase()).getString();
-            g.drawCenteredString(font, label.substring(0, 1), p[0] + FACE / 2, p[1] + 5, 0xFFFFFFFF);
-            if (io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, f)) {
-                g.fill(p[0] + FACE - 5, p[1] + 1, p[0] + FACE - 1, p[1] + 5, 0xFFFFFFFF);
-            }
-            if (Panel.inside(mouseX, mouseY, p[0], p[1], FACE, FACE)) {
-                hovered = f;
-            }
-        }
+        var quads = cubeQuads();
+        io.github.genichimaruo.singulo.machine.SideConfig.Face hovered = cube.pick(quads, mouseX, mouseY);
+        cube.draw(g, font, quads, f -> modeColor(io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, f)),
+                f -> io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, f),
+                f -> Component.translatable("gui.singulo.sides.face." + f.name().toLowerCase()).getString().substring(0, 1), hovered);
         // 自動排出の全体スイッチ
         boolean master = io.github.genichimaruo.singulo.machine.SideConfig.ejectEnabled(packed);
         int[] mp = masterPos();
@@ -179,22 +197,58 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
                     menu.pos(), sidesChannel, io.github.genichimaruo.singulo.network.SideConfigPayload.MASTER_FACE, master ? 0 : 4));
             return true;
         }
-        for (io.github.genichimaruo.singulo.machine.SideConfig.Face f : io.github.genichimaruo.singulo.machine.SideConfig.Face.values()) {
-            int[] p = facePos(f);
-            if (Panel.inside(mouseX, mouseY, p[0], p[1], FACE, FACE)) {
-                int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, f);
-                boolean eject = io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, f);
-                if (button == 1) {
-                    eject = !eject;
-                } else {
-                    mode = (mode + 1) % 4;
-                }
-                net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
-                        menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
-                return true;
-            }
+        // 立方体の上で押した: 離すまで待つ（動かしたら回すだけ、動かさなければ面をクリック）
+        if (Math.abs(mouseX - cubeX()) < CUBE_HALF * 2 && Math.abs(mouseY - cubeY()) < CUBE_HALF * 2) {
+            cubePress = button;
+            pressX = mouseX;
+            pressY = mouseY;
+            cubeDragged = false;
+            return true;
         }
         return false;
+    }
+
+    /** 立方体の面をクリックした: 左は入出力の切り替え、右は自動排出の切り替え。 */
+    private void clickFace(io.github.genichimaruo.singulo.machine.SideConfig.Face f, int button) {
+        int packed = sidesPacked();
+        int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, f);
+        boolean eject = io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, f);
+        if (button == 1) {
+            eject = !eject;
+        } else {
+            mode = (mode + 1) % 4;
+        }
+        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
+                menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+        if (sidesOpen && cubePress >= 0) {
+            if (Math.abs(mouseX - pressX) + Math.abs(mouseY - pressY) > 3) {
+                cubeDragged = true;
+            }
+            if (cubeDragged) {
+                cube.rotate(dx, dy);
+            }
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dx, dy);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (sidesOpen && cubePress >= 0 && button == cubePress) {
+            if (!cubeDragged) {
+                var face = cube.pick(cubeQuads(), mouseX, mouseY);
+                if (face != null) {
+                    clickFace(face, button);
+                }
+            }
+            cubePress = -1;
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
@@ -224,17 +278,19 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         // 右端の列: 単極子アップグレードと面の設定ボタン
         g.fill(x + l.sideColumnX, y + 14, x + l.sideColumnX + 1, y + 76, Panel.SEAM);
         drawSpecialSlot(g, x + l.sideColumnX + 4, y + MachineLayout.UPGRADE_Y, 0xFFB48CFF, type().upgradeSlot(), "monopole_upgrade");
-        int sbx = x + sidesButtonX();
-        int sby = y + MachineLayout.SIDES_Y;
-        int bs = MachineLayout.SIDES_SIZE;
-        boolean hover = Panel.inside(mouseX, mouseY, sbx, sby, bs, bs);
-        g.fill(sbx - 1, sby - 1, sbx + bs + 1, sby + bs + 1, Panel.WELL_EDGE);
-        g.fill(sbx, sby, sbx + bs, sby + bs, sidesOpen ? 0xFF2A6F8A : hover ? Panel.GLOW : Panel.SHADE);
-        // 立方体の展開図の小さなアイコン
-        int ic = sidesOpen ? 0xFFFFFFFF : Panel.TEXT;
-        g.fill(sbx + 4, sby + 2, sbx + 6, sby + 4, ic);
-        g.fill(sbx + 2, sby + 4, sbx + 8, sby + 6, ic);
-        g.fill(sbx + 4, sby + 6, sbx + 6, sby + 8, ic);
+        if (hasSides()) {
+            int sbx = x + sidesButtonX();
+            int sby = y + MachineLayout.SIDES_Y;
+            int bs = MachineLayout.SIDES_SIZE;
+            boolean hover = Panel.inside(mouseX, mouseY, sbx, sby, bs, bs);
+            g.fill(sbx - 1, sby - 1, sbx + bs + 1, sby + bs + 1, Panel.WELL_EDGE);
+            g.fill(sbx, sby, sbx + bs, sby + bs, sidesOpen ? 0xFF2A6F8A : hover ? Panel.GLOW : Panel.SHADE);
+            // 立方体の展開図の小さなアイコン
+            int ic = sidesOpen ? 0xFFFFFFFF : Panel.TEXT;
+            g.fill(sbx + 4, sby + 2, sbx + 6, sby + 4, ic);
+            g.fill(sbx + 2, sby + 4, sbx + 8, sby + 6, ic);
+            g.fill(sbx + 4, sby + 6, sbx + 6, sby + 8, ic);
+        }
         if (type().hasCatalystSlot()) {
             drawSpecialSlot(g, x + l.catalystX, y + l.catalystY, Panel.AMBER, type().catalystSlot(), "time_crystal_catalyst");
         }
@@ -315,7 +371,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         MachineLayout l = layout();
         int x = leftPos;
         int y = topPos;
-        if (Panel.inside(mouseX, mouseY, x + sidesButtonX(), y + MachineLayout.SIDES_Y, MachineLayout.SIDES_SIZE,
+        if (hasSides() && Panel.inside(mouseX, mouseY, x + sidesButtonX(), y + MachineLayout.SIDES_Y, MachineLayout.SIDES_SIZE,
                 MachineLayout.SIDES_SIZE)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.sides.button"), mouseX, mouseY);
             return;
@@ -392,7 +448,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (Panel.inside(mouseX, mouseY, leftPos + sidesButtonX(), topPos + MachineLayout.SIDES_Y,
+        if (hasSides() && Panel.inside(mouseX, mouseY, leftPos + sidesButtonX(), topPos + MachineLayout.SIDES_Y,
                 MachineLayout.SIDES_SIZE, MachineLayout.SIDES_SIZE)) {
             sidesOpen = !sidesOpen;
             return true;

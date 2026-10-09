@@ -22,6 +22,9 @@ uniform vec4 Sphere3;
 // 投影行列の (m22, m32)。深度から距離に戻すのに使う
 uniform vec2 DepthParams;
 uniform float Aspect;
+// 1 なら深度で手前のものを除く。0 なら深度を使わない（Iris 系のシェーダーパック使用時。深度バッファが読めないため、
+// 球の範囲の中をすべて奥の景色とみなす）
+uniform float UseDepth;
 
 in vec2 texCoord;
 
@@ -36,6 +39,9 @@ const float SOFT = 0.4;
 
 // 深度バッファの値 → カメラからの奥行き（ブロック）
 float dist(vec2 uv) {
+    if (UseDepth < 0.5) {
+        return 1.0e9;
+    }
     float ndc = texture(Sampler1, uv).r * 2.0 - 1.0;
     // 透視投影では ndc + m22 は常に負（m32 も負）。0 割りを避けるときも符号を保つ
     return DepthParams.y / min(ndc + DepthParams.x, -1e-6);
