@@ -35,6 +35,12 @@ Off
 - Source: https://github.com/GenichiMaruo/Singulo
 - Issues: https://github.com/GenichiMaruo/Singulo/issues
 
+## Donation（プロジェクトの設定）
+- 種類: Ko-fi
+- ID: graycat9（https://ko-fi.com/graycat9）
+
+プロジェクトページに支援ボタンが出る。説明文の最後の「Support」にも同じリンクを入れてある。
+
 ---
 
 ## Description（プロジェクトページの本文）
