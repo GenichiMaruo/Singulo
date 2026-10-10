@@ -269,6 +269,8 @@ MACHINE_ICONS = {
     'degenerate_furnace_controller': ('piston', (255, 180, 90)), 'core_controller': ('blackhole', (255, 200, 140)),
     'creative_energy_source': ('star', (255, 120, 255)),
     'neutrino_observatory': ('dish', (190, 150, 255)),
+    'deep_sea_collector': ('bubbles', (90, 150, 255)), 'void_collector': ('halo', (170, 120, 240)),
+    'keraunos_tower': ('star', (150, 220, 255)),
 }
 
 
@@ -837,6 +839,19 @@ def multiblock_part(iid):
         return im
     if iid == 'wormhole_generator_window':
         return mat_window(W, (200, 150, 255), 56)
+    if iid == 'wormhole_generator_port':
+        # 外殻と同じ板に、受電口（白い矢印）と搬出口（赤紫の矢印）
+        im = mat_plate(W, 74, seam=False)
+        d = ImageDraw.Draw(im)
+        d.rectangle([3, 3, 12, 12], fill=rgba(W['dark']), outline=rgba(W['trim']))
+        w, o = (230, 234, 238, 255), rgba(W['glow'])
+        d.line([(4, 6), (8, 6)], fill=w)
+        d.point([(7, 5), (7, 7), (6, 4), (6, 8)], fill=w)
+        d.line([(7, 9), (11, 9)], fill=o)
+        d.point([(8, 8), (8, 10), (9, 7), (9, 11)], fill=o)
+        for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+            d.point((x, y), fill=rgba(W['hot']))
+        return im
     return None
 
 
@@ -1291,6 +1306,190 @@ def pellet(c):
     return outlined(lambda d: (d.ellipse([4, 4, 11, 11], fill=rgba(c)), d.ellipse([5, 5, 7, 7], fill=rgba(lighten(c, 0.35)))))
 
 
+# ---------------------------------------------------------------- 隕石・雷・深海・虚空の素材と、中間素材
+
+def raw_meteoric_iron():
+    """隕鉄の原石: ごつごつした焦げ茶の塊に、銀色の金属の粒がのぞく。"""
+    body = (92, 78, 70)
+
+    def f(d):
+        d.polygon([(3, 7), (5, 3), (10, 2), (13, 5), (13, 10), (10, 13), (5, 13), (2, 10)], fill=rgba(body))
+        d.polygon([(5, 3), (10, 2), (12, 4), (7, 6)], fill=rgba(lighten(body, 0.18)))
+        d.polygon([(10, 13), (13, 10), (13, 8), (9, 11)], fill=rgba(darken(body, 0.3)))
+        for x, y in ((6, 8), (9, 6), (10, 9), (5, 11), (8, 10)):
+            d.point((x, y), fill=(206, 212, 220, 255))
+        d.point((9, 7), fill=(245, 248, 252, 255))
+    return outlined(f)
+
+
+def meteoric_ingot():
+    """隕鉄インゴット: 銀灰色の地に、鉄とニッケルの結晶の筋（ウィドマンシュテッテン構造）。"""
+    c = (150, 154, 164)
+
+    def f(d):
+        d.polygon([(2, 9), (6, 5), (13, 5), (9, 9)], fill=rgba(lighten(c, 0.3)))
+        d.rectangle([2, 9, 9, 12], fill=rgba(c))
+        d.polygon([(9, 9), (13, 5), (13, 8), (9, 12)], fill=rgba(darken(c, 0.25)))
+        for k in range(3):
+            d.line([(4 + k * 2, 8), (6 + k * 2, 6)], fill=rgba(darken(c, 0.12)))
+        d.line([(3, 11), (5, 9)], fill=rgba(darken(c, 0.15)))
+        d.line([(6, 12), (8, 10)], fill=rgba(darken(c, 0.15)))
+        d.point((7, 10), fill=rgba(lighten(c, 0.5)))
+    return outlined(f)
+
+
+def stardust():
+    """星屑: 小さな山に、水色と菫色にまたたく粒。"""
+    def f(d):
+        d.polygon([(2, 12), (5, 8), (8, 7), (11, 8), (14, 12), (8, 13)], fill=(70, 76, 110, 255))
+        d.polygon([(5, 9), (8, 7), (11, 8), (8, 10)], fill=(104, 112, 160, 255))
+        for x, y, col in ((5, 10, (150, 230, 255)), (8, 8, (255, 255, 255)), (10, 10, (210, 170, 255)), (7, 11, (150, 230, 255)),
+                          (12, 11, (210, 170, 255))):
+            d.point((x, y), fill=rgba(col))
+        # 上に舞う粒
+        for x, y in ((4, 4), (9, 3), (12, 5)):
+            d.point((x, y), fill=(200, 236, 255, 255))
+        d.line([(9, 2), (9, 4)], fill=(255, 255, 255, 200))
+        d.line([(8, 3), (10, 3)], fill=(255, 255, 255, 200))
+    return outlined(f)
+
+
+def fulgurite():
+    """雷ガラス: 枝分かれした管状の天然ガラス。外はざらついた砂色、中は溶けて光るガラス。"""
+    sand, glass = (196, 170, 120), (236, 224, 190)
+
+    def f(d):
+        d.line([(3, 13), (6, 9), (8, 7), (12, 2)], fill=rgba(sand), width=3)
+        d.line([(6, 9), (3, 5)], fill=rgba(sand), width=2)
+        d.line([(8, 7), (12, 9)], fill=rgba(sand), width=2)
+        d.line([(4, 12), (7, 8), (11, 3)], fill=rgba(glass))
+        d.point((11, 3), fill=(255, 255, 255, 255))
+        d.point((3, 5), fill=rgba(lighten(sand, 0.3)))
+    return outlined(f)
+
+
+def void_dust():
+    """虚空の塵: 黒紫の渦に、かすかな星の粒。"""
+    def f(d):
+        d.ellipse([3, 3, 12, 12], fill=(30, 18, 46, 255))
+        d.arc([4, 4, 11, 11], 200, 360, fill=(140, 90, 210, 255))
+        d.arc([5, 5, 10, 10], 20, 180, fill=(190, 140, 255, 255))
+        d.point((8, 8), fill=(240, 220, 255, 255))
+        for x, y in ((5, 6), (10, 5), (9, 10)):
+            d.point((x, y), fill=(170, 130, 230, 255))
+    return outlined(f)
+
+
+def coolant_cartridge():
+    """冷媒カートリッジ: 鋼の容器に水色の帯と霜。口金の弁。"""
+    steel = (176, 184, 196)
+
+    def f(d):
+        d.rectangle([5, 3, 10, 13], fill=rgba(steel))
+        d.rectangle([5, 3, 6, 13], fill=rgba(lighten(steel, 0.25)))
+        d.rectangle([9, 3, 10, 13], fill=rgba(darken(steel, 0.2)))
+        d.rectangle([5, 7, 10, 9], fill=(120, 220, 255, 255))
+        d.line([(6, 8), (9, 8)], fill=(230, 250, 255, 255))
+        d.rectangle([6, 1, 9, 2], fill=rgba(darken(steel, 0.35)))
+        for x, y in ((6, 11), (8, 5), (9, 12)):
+            d.point((x, y), fill=(236, 248, 255, 255))
+    return outlined(f)
+
+
+def phase_sync_plate():
+    """位相同期板: 薄い光格子の板に、そろった波の縞（琥珀と菫）。"""
+    def f(d):
+        d.polygon([(1, 7), (9, 3), (14, 6), (6, 10)], fill=(214, 220, 236, 255))
+        d.polygon([(1, 7), (6, 10), (6, 12), (1, 9)], fill=(150, 156, 176, 255))
+        d.polygon([(6, 10), (14, 6), (14, 8), (6, 12)], fill=(176, 182, 200, 255))
+        for k in range(4):
+            col = (255, 196, 110) if k % 2 == 0 else (200, 160, 255)
+            d.line([(3 + k * 2, 7 + (k % 2)), (7 + k * 2, 5 + (k % 2))], fill=rgba(col))
+    return outlined(f)
+
+
+def degenerate_precursor():
+    """縮退前駆体: 押し固められた黒い立方体。ひびから菫色の光が漏れる。"""
+    c = (40, 36, 56)
+
+    def f(d):
+        d.polygon([(3, 6), (8, 3), (13, 6), (8, 9)], fill=rgba(lighten(c, 0.25)))
+        d.polygon([(3, 6), (8, 9), (8, 14), (3, 11)], fill=rgba(c))
+        d.polygon([(8, 9), (13, 6), (13, 11), (8, 14)], fill=rgba(darken(c, 0.3)))
+        d.line([(5, 8), (6, 11)], fill=(200, 150, 255, 255))
+        d.line([(10, 9), (11, 11), (10, 12)], fill=(200, 150, 255, 255))
+        d.point((8, 6), fill=(230, 210, 255, 255))
+    return outlined(f)
+
+
+def crystal_memory():
+    """クリスタルメモリ（旧文明の記録媒体）: 透き通った六角の水晶板。中に光で刻まれた記録の層が、うっすら光って見える。
+    地は半透明で、向こうが透ける。縁と刻まれた層だけ不透明。"""
+    im, d = new()
+    body = (190, 236, 250)
+    pts = [(5, 2), (11, 2), (14, 7), (11, 13), (5, 13), (2, 7)]
+    d.polygon(pts, fill=rgba(body, 120))
+    # 上半分は光が当たって少し明るい（それでも透ける）
+    d.polygon([(5, 2), (11, 2), (14, 7), (2, 7)], fill=rgba(lighten(body, 0.35), 140))
+    # 中に刻まれた記録の層（細い光の線と、データの点）
+    for y, x0, x1 in ((5, 5, 11), (8, 4, 12), (10, 5, 11)):
+        d.line([(x0, y), (x1, y)], fill=(110, 220, 255, 200))
+    for x, y in ((6, 6), (9, 6), (7, 9), (10, 9), (6, 11), (9, 11)):
+        d.point((x, y), fill=(230, 252, 255, 255))
+    # 縁（面取りの稜線）と映り込み
+    d.line(pts + [pts[0]], fill=(120, 170, 196, 255))
+    d.line([(5, 3), (8, 3)], fill=(255, 255, 255, 230))
+    d.point((4, 5), fill=(255, 255, 255, 220))
+    return im
+
+
+def sentinel_core():
+    """番人の投影核: 白い枠にはまった細長い水色の八面体の結晶。中心が強く光り、まわりに投影の光の輪。
+    結晶は少し透け、枠と稜線だけ不透明。"""
+    im, d = new()
+    glow = (143, 234, 255)
+    # 投影の光の輪（薄く透ける）
+    d.ellipse([1, 4, 14, 11], outline=rgba(glow, 110))
+    # 結晶（縦長の八面体: 上下の三角を2色で）
+    d.polygon([(8, 1), (12, 7), (8, 8), (4, 7)], fill=rgba(lighten(glow, 0.35), 200))
+    d.polygon([(4, 7), (8, 8), (8, 15), ], fill=rgba(glow, 180))
+    d.polygon([(8, 8), (12, 7), (8, 15)], fill=rgba(darken(glow, 0.25), 200))
+    d.line([(8, 1), (12, 7), (8, 15), (4, 7), (8, 1)], fill=(90, 160, 196, 255))
+    # 白い留め枠（左右の爪）
+    d.rectangle([2, 7, 3, 8], fill=(232, 236, 240, 255))
+    d.rectangle([12, 7, 13, 8], fill=(232, 236, 240, 255))
+    # 中心の光
+    d.rectangle([7, 6, 8, 8], fill=(240, 254, 255, 255))
+    d.point((7, 3), fill=(255, 255, 255, 230))
+    return im
+
+
+def degenerate_nucleus():
+    """縮退核: 光を飲む黒い球に、菫色の縁の光と、傾いた細い輪。まわりに小さな瓦礫の粒が止まっている。"""
+    def f(d):
+        d.ellipse([2, 2, 13, 13], fill=(70, 40, 120, 255))
+        d.ellipse([3, 3, 12, 12], fill=(160, 110, 240, 255))
+        d.ellipse([4, 4, 11, 11], fill=(8, 6, 14, 255))
+        d.line([(1, 10), (5, 8), (10, 7), (14, 5)], fill=(225, 200, 255, 255))
+        d.point((6, 6), fill=(60, 50, 80, 255))
+        for x, y in ((1, 3), (13, 12), (14, 2)):
+            d.point((x, y), fill=(140, 140, 150, 255))
+    return outlined(f)
+
+
+def confinement_ring():
+    """磁気閉じ込め環: 銀の隕鉄の芯に、赤紫のトポロジカル導線を巻いた輪。"""
+    def f(d):
+        d.ellipse([2, 3, 13, 12], fill=(150, 154, 164, 255))
+        d.ellipse([5, 5, 10, 10], fill=(0, 0, 0, 0))
+        for a in range(0, 360, 40):
+            x = 7.5 + 5 * math.cos(math.radians(a))
+            y = 7.5 + 4.2 * math.sin(math.radians(a))
+            d.point((round(x), round(y)), fill=(220, 120, 255, 255))
+        d.arc([2, 3, 13, 12], 200, 300, fill=(230, 236, 246, 255))
+    return outlined(f)
+
+
 def tracks(c):
     def f(d):
         for k, a in enumerate((0.3, 1.5, 2.7, 3.9, 5.1)):
@@ -1378,9 +1577,17 @@ def compass_frame(angle):
                     hit += 1
         return hit / 16
 
+    # 真上・真下・真左・真右のときは、針の軸が画素の境目に重なって2ドットの太さになるので、
+    # 先端の2ドットぶんは片側だけ残して細く尖らせる
+    cardinal = abs(angle * 4 - round(angle * 4)) < 1 / 16
     for y in range(3, 13):
         for x in range(3, 13):
             if coverage(x, y, 4.6, 0.75) >= 0.3:
+                qx, qy = x + 0.5 - 8, y + 0.5 - 8
+                along = qx * dx + qy * dy
+                side = -qx * dy + qy * dx
+                if cardinal and along > 4.6 - 2.2 and side > 0:
+                    continue
                 px[x, y] = (255, 110, 80, 255)            # 北を指す赤い先
     dx, dy = -dx, -dy
     for y in range(3, 13):
@@ -1405,6 +1612,19 @@ ITEM_ART = {
     'explorer_compass': lambda: compass_frame(0.0),
     'thermocouple_module': lambda: module((220, 224, 230), (255, 130, 90)),
     'basic_frame': lambda: frame(STEEL, (236, 238, 240)),
+    'wormhole_mouth_casing': lambda: frame((58, 48, 82), (214, 144, 255)),
+    'raw_meteoric_iron': raw_meteoric_iron,
+    'meteoric_iron_ingot': meteoric_ingot,
+    'stardust': stardust,
+    'fulgurite': fulgurite,
+    'pressure_crystal': lambda: crystal_cluster((60, 104, 206), seed=5, mark=(210, 235, 255)),
+    'void_dust': void_dust,
+    'coolant_cartridge': coolant_cartridge,
+    'phase_sync_plate': phase_sync_plate,
+    'degenerate_precursor': degenerate_precursor,
+    'confinement_ring': confinement_ring,
+    'sentinel_core': sentinel_core,
+    'degenerate_nucleus': degenerate_nucleus,
     'steel_plate': lambda: plate(STEEL),
     'ceramic_substrate': lambda: plate((236, 238, 240), 3, COPPER),
     'blank_data_card': lambda: card((200, 206, 214), blank=True),
@@ -1454,7 +1674,7 @@ ITEM_ART = {
     'degraded_anomaly_sample': lambda: vial((90, 80, 100)),
     'anomaly_sample': lambda: vial((60, 20, 80), glow=True),
     'magnetic_monopole': magnet,
-    'record_fragment': lambda: scroll((200, 196, 186), (70, 80, 90), torn=True),
+    'record_fragment': crystal_memory,
     'decoded_record': lambda: tablet(T1),
     'creative_catalyst': lambda: crystal_cluster((255, 120, 255), mark=(255, 255, 255)),
     'shield_permit': lambda: permit_card(),
@@ -1579,13 +1799,26 @@ def sealed_container_base():
 
 
 def sealed_container_lid(tier):
-    """蓋の板（4枚で1つの蓋）: 白い板に、段階の色の筋と面取りの影。"""
+    """蓋（4枚の板で1つ）。ブロックの中のドットの位置そのままに貼る（板は x・z とも 1〜8 と 8〜15、厚さは y 13〜15）。
+    天面: 外周の縁と、十字の合わせ目、板ごとの段階の色の筋、中央の留め具。行1〜2は板の側面にも使う（縁の帯）。"""
     c = SEAL_COLORS[tier]
-    im, d = new(fill=(236, 239, 243, 255))
-    d.rectangle([0, 0, 15, 15], outline=(190, 194, 200, 255))
-    d.line([(1, 14), (14, 14)], fill=(200, 204, 210, 255))
-    d.line([(2, 3), (13, 3)], fill=rgba(c))
-    d.rectangle([5, 7, 10, 10], fill=(200, 204, 212, 255), outline=(170, 176, 186, 255))
+    white, rim, seam = (236, 239, 243), (190, 194, 200), (120, 126, 136)
+    im, d = new(fill=rgba(white))
+    # 外周の縁（側面の2段もここを使う）
+    d.rectangle([1, 1, 14, 14], outline=rgba(rim))
+    d.rectangle([2, 2, 13, 13], outline=rgba(lighten(white, 0.4)))
+    d.line([(1, 2), (14, 2)], fill=rgba(darken(c, 0.1)))
+    # 十字の合わせ目（4枚の板の境目）
+    d.line([(7, 1), (7, 14)], fill=rgba(seam))
+    d.line([(8, 1), (8, 14)], fill=rgba(darken(white, 0.12)))
+    d.line([(1, 7), (14, 7)], fill=rgba(seam))
+    d.line([(1, 8), (14, 8)], fill=rgba(darken(white, 0.12)))
+    # 板ごとの段階の色の筋（外の角へ向かう）
+    for x0, y0, dx, dy in ((3, 3, 1, 1), (12, 3, -1, 1), (3, 12, 1, -1), (12, 12, -1, -1)):
+        d.line([(x0, y0), (x0 + 2 * dx, y0 + 2 * dy)], fill=rgba(c))
+    # 中央の留め具
+    d.rectangle([6, 6, 9, 9], fill=(200, 204, 212, 255), outline=(170, 176, 186, 255))
+    d.point([(7, 7), (8, 8)], fill=rgba(lighten(c, 0.3)))
     return im
 
 
@@ -1810,7 +2043,7 @@ def item_texture(iid, stage):
 
 # 断面（ケーブルの軸に直交する面の長方形の集まり、0〜16 の座標）。上位ほど凹凸のある断面になる
 # 断面は中心に置いた正方形の一辺（偶数）。Java の CableProfile と同じ値
-CABLE_WIDTHS = {'copper_wire': 2, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8}
+CABLE_WIDTHS = {'copper_wire': 4, 'superconducting_cable': 4, 'topological_wire': 6, 'horizon_bus': 8}
 
 
 def cable_bands(iid, core, on, glow):
@@ -1819,12 +2052,13 @@ def cable_bands(iid, core, on, glow):
     c = glow if on and glow else core
     half = CABLE_WIDTHS[iid] // 2
     if iid == 'copper_wire':
-        return [c]                                                   # 銅むき出しの1本
+        return [c, darken(c, 0.22)]                                   # 銅むき出しの1本（縁は少し酸化した色）
     if iid == 'superconducting_cable':
         return [c, darken(jacket, 0.15)]                              # 芯と白い被覆
     if iid == 'topological_wire':
         return [c, lighten(c, 0.45) if on else mix(c, jacket, 0.5), darken(jacket, 0.18)]   # 芯・リブ・被覆
-    return [c, (40, 40, 50), lighten(jacket, 0.05)][:half - 1] + [(220, 188, 108)]          # 芯・黒い層・白・金の縁
+    return ([c, (40, 40, 50), lighten(jacket, 0.05)][:half - 1]
+            + [(220, 188, 108)])                                      # 芯・黒い層・白・金の縁
 
 
 def cable_texture(iid, core, on=False, glow=None):
