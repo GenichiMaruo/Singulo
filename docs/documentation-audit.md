@@ -11,7 +11,7 @@ This audit compares the repository's current implementation and default data wit
 | 英語ハンドブックの縮退圧縮炉が3×3×3 | 現行は5×5×5の閉じたプレス。英語本文を修正 | [Shapes.java](../src/main/java/io/github/genichimaruo/singulo/multiblock/Shapes.java) |
 | Pリアクターの斜め45度の12か所が抽出ポート | 必須部品は炉心安定化コイル。抽出ポートと警報器は炉殻位置に置く。日英ハンドブックと新説明書を修正 | [Structures.java](../src/main/java/io/github/genichimaruo/singulo/multiblock/Structures.java)、[Blueprints.java](../src/main/java/io/github/genichimaruo/singulo/multiblock/Blueprints.java) |
 | バニラの燃えているかまどを熱電発電機の熱源にできる | 既定の熱源は焚き火、魂の焚き火、マグマブロック、溶岩、稼働中のSingulo焼成炉。日英ハンドブックを修正 | [熱源生成処理](../tools/gen_data.py)、[ThermalData.java](../src/main/java/io/github/genichimaruo/singulo/data/ThermalData.java) |
-| 詳細資料の古い構造部品・装置寸法 | 現行のレシピ生成元から詳細資料を再生成 | [recipes.py](../tools/recipes.py)、[gen_md.py](../tools/balance/gen_md.py) |
+| 詳細資料の古い構造部品・装置寸法 | 当時のレシピ生成元から詳細資料を再生成（調査用スクリプトはその後削除） | [recipes.py](../tools/recipes.py) |
 | 専用ガスボンベで流体・ガスを運べる | 該当する登録と実装はない。対応容器・配管の説明へ変更し、生成元も修正 | [SinguloItems.java](../src/main/java/io/github/genichimaruo/singulo/registry/SinguloItems.java)、[MachineBlockEntity.java](../src/main/java/io/github/genichimaruo/singulo/machine/MachineBlockEntity.java) |
 | 上位段階の装置で共通の速度×2・効率+25%、最大4並列 | 現行にその共通処理はない。装置固有倍率・触媒・単極子・時間の場の説明へ変更。複数台による並列化と区別 | [MachineBlockEntity.java](../src/main/java/io/github/genichimaruo/singulo/machine/MachineBlockEntity.java)、[CatalystHelper.java](../src/main/java/io/github/genichimaruo/singulo/item/CatalystHelper.java) |
 | 圧縮機で「何でも」質量に変えられる | 質量値を持つ素材が対象。日英ハンドブックの表現を修正 | [MassValues.java](../src/main/java/io/github/genichimaruo/singulo/data/MassValues.java) |
@@ -41,6 +41,6 @@ This audit compares the repository's current implementation and default data wit
 ## 維持方法と検証の範囲
 
 - ゲーム内説明は [guide.py](../tools/guide.py) / [descriptions.py](../tools/descriptions.py) を修正し、生成済みの日英翻訳へ反映。
-- レシピ資料は [gen_md.py](../tools/balance/gen_md.py) の説明を修正し、現行レシピから再生成。バランス計算の所要時間は推定値で、実プレイ時間の保証ではない。
+- レシピ資料は当時の調査用スクリプトの説明を修正し、レシピから再生成。調査用スクリプトはその後削除。バランス計算の所要時間は推定値で、実プレイ時間の保証ではない。
 - ドキュメントのローカルリンク、翻訳と生成元の一致、レシピ・設定の整合性を検証。
 - 今回の確認はソースと既定データの照合。全機能の実プレイ確認や、任意の他mod・データパックとの互換性保証は含まない。

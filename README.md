@@ -56,7 +56,6 @@ WindowsのPowerShellでは `./gradlew.bat` を使います。ビルドしたJAR�
 ```sh
 uv run --no-project --python 3.12 --with pillow tools/gen_data.py
 uv run --no-project --python 3.12 tools/check_models.py
-uv run --no-project --python 3.12 tools/balance/gen_md.py
 ```
 
 `gen_data.py` は生成ディレクトリを作り直します。生成物への手修正は残りません。レシピと設定はサーバー設定・データパックによって変わるため、説明書の数値は既定値です。
