@@ -131,7 +131,8 @@ public final class ShapeSpec {
                     boolean ok = switch (slot.kind()) {
                         case PART -> s.is(slot.block().get());
                         case PANEL -> {
-                            if (s.is(SinguloBlocks.MULTIBLOCK_PORT.get())) {
+                            if (s.is(SinguloBlocks.MULTIBLOCK_PORT.get()) || (s.is(SinguloBlocks.WORMHOLE_GENERATOR_PORT.get())
+                                    && slot.block().get() == SinguloBlocks.WORMHOLE_GENERATOR_SHELL.get())) {
                                 ports.add(p.immutable());
                                 yield true;
                             }

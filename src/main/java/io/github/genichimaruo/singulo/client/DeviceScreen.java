@@ -61,6 +61,10 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
+        if (kind == Kind.WORMHOLE_PORT && Panel.inside(mouseX, mouseY, leftPos + BIT_X, topPos + BIT_Y,
+                bitX(DeviceMenu.Port.BITS) - BIT_GAP - BIT_X, BIT_SIZE)) {
+            g.renderTooltip(font, font.split(tr("port.channel_hint"), 180), mouseX, mouseY);
+        }
     }
 
     @Override
@@ -77,7 +81,10 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
         switch (kind) {
             case WORMHOLE_GENERATOR -> drawGenerator(g, x, y, t);
             case WORMHOLE_MOUTH -> drawMouth(g, x, y, t, mouseX, mouseY);
-            case WORMHOLE_PORT -> drawPort(g, x, y, t);
+            case WORMHOLE_PORT -> {
+                drawPort(g, x, y, t);
+                drawChannel(g, x, y, mouseX, mouseY);
+            }
             case CONTAINMENT_TANK -> drawTank(g, x, y, t);
             case HALO_COLLECTOR -> drawHalo(g, x, y, t);
             case MUON_COLLECTOR -> drawMuon(g, x, y, t);
@@ -133,6 +140,11 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
 
     private static String num(long n) {
         return String.format("%,d", n);
+    }
+
+    /** 帯域の上限（上限なしは ∞）。 */
+    private static String limit(long n) {
+        return n == io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.UNLIMITED ? "∞" : power(n);
     }
 
     /** 大きな電力（FE/t）を読みやすく（k・M・G）。 */
@@ -317,15 +329,24 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
         if (v(DeviceMenu.Mouth.CROSS) != 0) {
             y = para(g, tr("mouth.cross"), x, y, w, MAGENTA);
         }
-        int[] e = io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.ENERGY_PER_TICK;
-        int[] it = io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.ITEMS_PER_TICK;
-        int[] fl = io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.FLUID_PER_TICK;
-        para(g, tr("mouth.bandwidth", size >= 3 ? "∞" : power(e[size]), it[size], power(fl[size])), x, y + 2, w, S_DIM);
+        int s = Math.max(0, Math.min(3, size));
+        y = para(g, tr("mouth.bandwidth", limit(io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.ENERGY_PER_TICK[s]),
+                limit(io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.ITEMS_PER_TICK[s]),
+                limit(io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.FLUID_PER_TICK[s])), x, y + 2, w, S_DIM);
+        int ports = v(DeviceMenu.Mouth.PORTS);
+        int portLimit = v(DeviceMenu.Mouth.PORT_LIMIT);
+        y = para(g, tr("mouth.ports", Math.min(ports, portLimit), portLimit, ports), x, y, w, ports > portLimit ? WARN : S_DIM);
+        if (size <= 0) {
+            para(g, tr("mouth.dormant"), x, y + 2, w, WARN);
+        }
         int tpm = v(DeviceMenu.Mouth.TICKS_PER_MATTER);
         Component upkeep = tpm > 0 ? tr("mouth.upkeep", String.format("%.1f", tpm / 1200.0)) : tr("mouth.upkeep_none");
         int[] f = DeviceMenu.slotPos(kind)[0];
         int fy = para(g, upkeep, f[0] + 22, f[1], 70, S_DIM);
-        if (v(DeviceMenu.Mouth.STARVE) > 0) {
+        int grace = v(DeviceMenu.Mouth.GRACE);
+        if (grace > 0) {
+            para(g, tr("mouth.grace", grace / 20), f[0] + 22, fy, 70, GOOD);
+        } else if (v(DeviceMenu.Mouth.STARVE) > 0) {
             int left = (io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.SHRINK_TICKS - v(DeviceMenu.Mouth.STARVE)) / 20;
             para(g, tr("mouth.starving", left), f[0] + 22, fy, 70, WARN);
         }
@@ -333,9 +354,57 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
 
     // ------------------------------------------------------------------ ワームホール・ポート
 
+    /** ポート番号の7つの丸（左が 64、右が 1。押すとオンオフが切り替わり、オンの丸の和が番号）。 */
+    private static final int BIT_Y = 94;
+    private static final int BIT_X = 10;
+    private static final int BIT_SIZE = 12;
+    private static final int BIT_GAP = 6;
+
+    /** 丸 i（左から）の x。左の丸ほど上のビット。 */
+    private static int bitX(int i) {
+        return BIT_X + i * (BIT_SIZE + BIT_GAP);
+    }
+
+    private static int bitOf(int i) {
+        return DeviceMenu.Port.BITS - 1 - i;
+    }
+
+    /** 丸いボタン（12×12）。オンなら光る。 */
+    private static void roundButton(GuiGraphics g, int bx, int by, boolean on, boolean hover) {
+        int edge = hover ? 0xFFFFFFFF : on ? CYAN : S_FRAME_HI;
+        int fill = on ? CYAN : 0xFF161B33;
+        int[] rows = {4, 2, 1, 1, 0, 0, 0, 0, 1, 1, 2, 4};
+        for (int r = 0; r < BIT_SIZE; r++) {
+            int a = rows[r];
+            g.fill(bx + a, by + r, bx + BIT_SIZE - a, by + r + 1, edge);
+            if (r > 0 && r < BIT_SIZE - 1) {
+                int b = Math.max(a, 1) + (r == 1 || r == BIT_SIZE - 2 ? 1 : 0);
+                g.fill(bx + b, by + r, bx + BIT_SIZE - b, by + r + 1, fill);
+            }
+        }
+        if (on) {
+            g.fill(bx + 4, by + 3, bx + 6, by + 5, 0xFFFFFFFF);
+        }
+    }
+
+    private void drawChannel(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+        int channel = v(DeviceMenu.Port.CHANNEL);
+        for (int i = 0; i < DeviceMenu.Port.BITS; i++) {
+            int bx = x + bitX(i);
+            boolean on = (channel >> bitOf(i) & 1) != 0;
+            roundButton(g, bx, y + BIT_Y, on, Panel.inside(mouseX, mouseY, bx, y + BIT_Y, BIT_SIZE, BIT_SIZE));
+        }
+    }
+
     private void drawPort(GuiGraphics g, int x, int y, float t) {
         int state = v(DeviceMenu.Port.STATE);
         vortex(g, x + 40, y + 56, 18, t, state == 2 ? 0.06F : 0.015F, state == 2 ? 0.9F : 0.3F);
+        if (state == DeviceMenu.Port.STATE_OVER_LIMIT) {
+            // 止まっている印（渦に斜線）
+            for (int k = -12; k <= 12; k++) {
+                g.fill(x + 40 + k, y + 56 - k, x + 42 + k, y + 58 - k, WARN);
+            }
+        }
         if (state == 2) {
             for (int px = x + 62; px < x + 180; px++) {
                 float k = (px * 0.35F - t * 0.6F) % 4;
@@ -350,16 +419,24 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
         int state = v(DeviceMenu.Port.STATE);
         int x = 72;
         int w = 194 - x;
-        Component s = state == 0 ? tr("port.no_mouth") : state == 1 ? tr("port.no_partner") : tr("port.linked");
-        int y = para(g, s, x, 20, w, state == 2 ? GOOD : WARN);
-        if (state > 0) {
+        Component s = switch (state) {
+            case DeviceMenu.Port.STATE_NO_MOUTH -> tr("port.no_mouth");
+            case DeviceMenu.Port.STATE_NO_PARTNER -> tr("port.no_partner");
+            case DeviceMenu.Port.STATE_OVER_LIMIT -> tr("port.inactive");
+            default -> tr("port.linked");
+        };
+        int y = para(g, s, x, 20, w, state == DeviceMenu.Port.STATE_LINKED ? GOOD : WARN);
+        if (state != DeviceMenu.Port.STATE_NO_MOUTH) {
             int side = 2 * v(DeviceMenu.Port.SIZE) + 1;
             y = para(g, tr("port.throat", side, side), x, y + 2, w, S_TEXT);
+            int rank = v(DeviceMenu.Port.RANK);
+            int limit = v(DeviceMenu.Port.LIMIT);
+            y = para(g, tr("port.rank", rank, limit), x, y, w, rank > limit ? WARN : S_DIM);
         }
-        if (state == 2) {
-            y = para(g, tr("port.targets", v(DeviceMenu.Port.ENERGY), v(DeviceMenu.Port.ITEMS), v(DeviceMenu.Port.FLUIDS)), x, y + 2, w, S_TEXT);
+        if (state == DeviceMenu.Port.STATE_LINKED) {
+            para(g, tr("port.targets", v(DeviceMenu.Port.ENERGY), v(DeviceMenu.Port.ITEMS), v(DeviceMenu.Port.FLUIDS)), x, y + 2, w, S_TEXT);
         }
-        para(g, tr("port.hint"), x, Math.max(y + 4, 84), w, S_DIM);
+        line(g, tr("port.channel", v(DeviceMenu.Port.CHANNEL)), BIT_X, BIT_Y - 11, S_TEXT);
     }
 
     // ------------------------------------------------------------------ 重力閉じ込めタンク
@@ -542,6 +619,12 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
                     id = DeviceMenu.Mouth.BUTTON_SMALLER;
                 } else if (Panel.inside(mouseX, mouseY, leftPos + MOUTH_PLUS_X, topPos + MOUTH_BTN_Y, BTN, BTN)) {
                     id = DeviceMenu.Mouth.BUTTON_BIGGER;
+                }
+            } else if (kind == Kind.WORMHOLE_PORT) {
+                for (int i = 0; i < DeviceMenu.Port.BITS; i++) {
+                    if (Panel.inside(mouseX, mouseY, leftPos + bitX(i), topPos + BIT_Y, BIT_SIZE, BIT_SIZE)) {
+                        id = DeviceMenu.Port.BUTTON_BIT + bitOf(i);
+                    }
                 }
             } else if (kind == Kind.DETECTOR
                     && Panel.inside(mouseX, mouseY, leftPos + OBSERVE_X, topPos + OBSERVE_Y, OBSERVE_W, OBSERVE_H)) {

@@ -41,28 +41,38 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * ワームホールの口（段階5）。同じ対の口どうしがつながり、近く（PORT_RANGE 以内）のワームホール・ポートを通して
- * エネルギー・アイテム・液体を直結する。口はブロックの上に浮かんで見える。
+ * エネルギー・アイテム・液体を直結する。喉（小さな黒い球）は枠だけの筐体の中に浮かんで見える。
  * <ul>
- *   <li>喉の大きさ: 3×3・5×5・7×7（大きさ1〜3、空の手で右クリックして目標を切り替える）。帯域は大きさで決まる</li>
- *   <li>維持: エキゾチック物質を使い続ける。3×3 で TICKS_PER_MATTER tick に1個、面積に比例して増え、
- *       向こう側が別のディメンションなら3倍</li>
- *   <li>切れると SHRINK_TICKS ごとに喉が1段縮み、0 になると口は崩壊して消える（アイテムは残らない）</li>
+ *   <li>喉の大きさ: 3×3・5×5・7×7（大きさ1〜3、画面で目標を切り替える）。1 tick に通せるアイテム・エネルギー・液体と、
+ *       働けるポートの数（PORTS_PER_SIZE、口に近い順）は大きさで決まる。7×7 では通せる量の上限がなくなる
+ *       （エネルギーは 1 tick に int を超えて送ってもよい）</li>
+ *   <li>維持: エキゾチック物質を使い続ける。3×3 で TICKS_PER_MATTER tick（15分）に1個、喉の一辺に比例して増え
+ *       （5×5 で約9分、7×7 で約6.4分に1個）、向こう側が別のディメンションなら CROSS_DIMENSION_FACTOR 倍。初めて置いたときだけ、GRACE_TICKS（5分）は燃料なしで開いている</li>
+ *   <li>切れると SHRINK_TICKS ごとに喉が1段縮み、0 になると閉じて休止する（筐体は残る）。
+ *       エキゾチック物質を入れ直すと、また開く</li>
  *   <li>口は周りのエンティティをわずかに引き寄せる</li>
  * </ul>
  */
 public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener {
-    public static final int TICKS_PER_MATTER = 6000;
+    public static final int TICKS_PER_MATTER = 18_000;
+    /** 向こう側が別のディメンションのときの維持費の倍率。 */
+    public static final int CROSS_DIMENSION_FACTOR = 2;
     public static final int SHRINK_TICKS = 600;
     public static final int GROW_TICKS = 100;
     public static final int PORT_RANGE = 8;
     public static final int MAX_SIZE = 3;
-    /** 大きさごとの1 tick の帯域（0 は閉じている）。 */
-    public static final int[] ENERGY_PER_TICK = {0, 64_000_000, 512_000_000, Integer.MAX_VALUE};
-    public static final int[] ITEMS_PER_TICK = {0, 8, 32, 128};
-    public static final int[] FLUID_PER_TICK = {0, 1_000, 8_000, 64_000};
-    /** 口の中心（ブロックからの高さ）。 */
-    public static final double MOUTH_HEIGHT = 1.5;
+    /** 初めて置いたときに、燃料なしで開いていられる時間（5分）。 */
+    public static final int GRACE_TICKS = 6000;
+    /** 大きさごとの1 tick の帯域（0 は閉じている）。UNLIMITED は上限なし（いちばん大きい喉）。 */
+    public static final long UNLIMITED = Long.MAX_VALUE;
+    public static final long[] ITEMS_PER_TICK = {0, 8, 32, UNLIMITED};
+    public static final long[] ENERGY_PER_TICK = {0, 64_000_000L, 512_000_000L, UNLIMITED};
+    public static final long[] FLUID_PER_TICK = {0, 1_000, 8_000, UNLIMITED};
+    /** 大きさごとの、働けるポートの数（口に近い順）。 */
+    public static final int[] PORTS_PER_SIZE = {0, 8, 32, 128};
+    /** 口の中心（ブロックの底からの高さ）。喉は筐体の中に収まる。 */
+    public static final double MOUTH_HEIGHT = 0.5;
 
     private static final Map<Level, Set<WormholeMouthBlockEntity>> LOADED = new WeakHashMap<>();
 
@@ -82,14 +92,19 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     private int size = 1;
     private int target = 1;
     private double burn;
+    /** 初めて置いたときの猶予の残り（tick）。 */
+    private int grace;
     private int starve;
     private int grow;
     private boolean registered;
     private boolean crossDimension;
     private long budgetTick = -1;
+    private long itemsLeft;
     private long energyLeft;
-    private int itemsLeft;
-    private int fluidLeft;
+    private long fluidLeft;
+    /** この口を使うポート（口に近い順）と、それを数えた tick。 */
+    private List<WormholePortBlockEntity> ranked = List.of();
+    private long rankTick = -1;
 
     public WormholeMouthBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.WORMHOLE_MOUTH.get(), pos, state);
@@ -184,46 +199,97 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         return best;
     }
 
+    // ------------------------------------------------------------------ ポートの順位（口に近い順に、上限の数まで働く）
+
+    public int portLimit() {
+        return PORTS_PER_SIZE[Math.max(0, Math.min(MAX_SIZE, size))];
+    }
+
+    /** この口を使うポート（いちばん近い口がこの口のもの）を、口に近い順に並べたもの。1 tick に1回数え直す。 */
+    public List<WormholePortBlockEntity> rankedPorts() {
+        long now = level == null ? 0 : level.getGameTime();
+        if (now != rankTick && level != null) {
+            rankTick = now;
+            List<WormholePortBlockEntity> list = new ArrayList<>();
+            for (WormholePortBlockEntity port : WormholePortBlockEntity.loaded(level)) {
+                if (!port.isRemoved() && port.getBlockPos().distSqr(worldPosition) <= PORT_RANGE * PORT_RANGE
+                        && near(level, port.getBlockPos()) == this) {
+                    list.add(port);
+                }
+            }
+            list.sort(java.util.Comparator.comparingDouble((WormholePortBlockEntity p) -> p.getBlockPos().distSqr(worldPosition))
+                    .thenComparingLong(p -> p.getBlockPos().asLong()));
+            ranked = list;
+        }
+        return ranked;
+    }
+
+    /** ポートの順位（1 から。この口を使っていなければ 0）。 */
+    public int rankOf(WormholePortBlockEntity port) {
+        return rankedPorts().indexOf(port) + 1;
+    }
+
+    /** ポートが働けるか（口に近い順で、上限の数に入っている）。 */
+    public boolean portActive(WormholePortBlockEntity port) {
+        int rank = rankOf(port);
+        return rank > 0 && rank <= portLimit();
+    }
+
+    /** 働いているポートの数。 */
+    public int activePorts() {
+        return Math.min(rankedPorts().size(), portLimit());
+    }
+
     // ------------------------------------------------------------------ 帯域（1 tick ごとに口ごとに数え直す）
 
     private void refreshBudget() {
         long now = level == null ? 0 : level.getGameTime();
         if (now != budgetTick) {
             budgetTick = now;
-            energyLeft = ENERGY_PER_TICK[size];
-            itemsLeft = ITEMS_PER_TICK[size];
-            fluidLeft = FLUID_PER_TICK[size];
+            int s = Math.max(0, Math.min(MAX_SIZE, size));
+            itemsLeft = ITEMS_PER_TICK[s];
+            energyLeft = ENERGY_PER_TICK[s];
+            fluidLeft = FLUID_PER_TICK[s];
         }
     }
 
-    public int energyBudget() {
-        refreshBudget();
-        return (int) Math.min(Integer.MAX_VALUE, energyLeft);
-    }
-
-    public void useEnergy(int amount) {
-        refreshBudget();
-        energyLeft -= amount;
+    private static long spend(long left, long amount) {
+        return left == UNLIMITED ? UNLIMITED : Math.max(0, left - amount);
     }
 
     public int itemBudget() {
         refreshBudget();
-        return itemsLeft;
+        return (int) Math.min(Integer.MAX_VALUE, itemsLeft);
     }
 
     public void useItems(int amount) {
         refreshBudget();
-        itemsLeft -= amount;
+        itemsLeft = spend(itemsLeft, amount);
+    }
+
+    public long energyBudget() {
+        refreshBudget();
+        return energyLeft;
+    }
+
+    public void useEnergy(long amount) {
+        refreshBudget();
+        energyLeft = spend(energyLeft, amount);
     }
 
     public int fluidBudget() {
         refreshBudget();
-        return fluidLeft;
+        return (int) Math.min(Integer.MAX_VALUE, fluidLeft);
     }
 
     public void useFluid(int amount) {
         refreshBudget();
-        fluidLeft -= amount;
+        fluidLeft = spend(fluidLeft, amount);
+    }
+
+    /** 初めて置いたときの猶予の残り（tick）。 */
+    public int grace() {
+        return grace;
     }
 
     // ------------------------------------------------------------------ 毎tick
@@ -261,23 +327,32 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         }
     }
 
-    /** 1 tick に使う「3×3 換算の tick」。 */
+    /** 1 tick に使う「3×3 換算の tick」。喉の一辺（3・5・7）に比例する。 */
     public double upkeepPerTick() {
-        return area(size) / 9.0 * (crossDimension ? 3 : 1);
+        return (2 * size + 1) / 3.0 * (crossDimension ? CROSS_DIMENSION_FACTOR : 1);
     }
 
     private void upkeep(ServerLevel level) {
-        burn -= upkeepPerTick();
-        if (burn <= 0) {
-            if (!fuel.extractItem(0, 1, false).isEmpty()) {
+        boolean fed;
+        if (grace > 0) {
+            // 初めて置いたときの猶予（燃料を使わない）
+            grace--;
+            fed = true;
+            if (grace % 20 == 0) {
+                setChanged();
+            }
+        } else {
+            burn -= upkeepPerTick();
+            if (burn <= 0 && !fuel.extractItem(0, 1, false).isEmpty()) {
                 burn += TICKS_PER_MATTER;
             }
+            fed = burn > 0;
         }
         int before = size;
-        if (burn <= 0) {
+        if (!fed) {
             burn = 0;
             grow = 0;
-            if (++starve >= SHRINK_TICKS) {
+            if (size > 0 && ++starve >= SHRINK_TICKS) {
                 starve = 0;
                 size--;
             }
@@ -293,19 +368,17 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         if (size != before) {
             setChanged();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
-        if (size <= 0) {
-            collapse(level);
+            if (size == 0) {
+                close(level);
+            }
         }
     }
 
-    /** 喉が閉じて口が消える。 */
-    public void collapse(ServerLevel level) {
+    /** 喉が閉じて休止する（筐体は残り、エキゾチック物質を入れればまた開く）。 */
+    public void close(ServerLevel level) {
         Vec3 c = mouthCenter();
-        level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 60, 0.5, 0.5, 0.5, 0.2);
+        level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 30, 0.2, 0.2, 0.2, 0.1);
         level.playSound(null, worldPosition, SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(), SoundSource.BLOCKS, 1.0F, 0.5F);
-        unregister(level);
-        level.removeBlock(worldPosition, false);
     }
 
     private void pull(ServerLevel level) {
@@ -376,6 +449,9 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.CROSS -> crossDimension ? 1 : 0;
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.STARVE -> starve;
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.TICKS_PER_MATTER -> upkeepPerTick() <= 0 ? 0 : (int) (TICKS_PER_MATTER / upkeepPerTick());
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.GRACE -> grace;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PORTS -> rankedPorts().size();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Mouth.PORT_LIMIT -> portLimit();
                 default -> 0;
             };
         }, (pl, id) -> {
@@ -404,7 +480,16 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     @Override
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
-        data = input.get(SinguloComponents.WORMHOLE.get());
+        WormholeData placed = input.get(SinguloComponents.WORMHOLE.get());
+        if (placed != null && !placed.placed()) {
+            // 初めて置いた: 燃料なしでも5分は開いている
+            grace = GRACE_TICKS;
+            size = 1;
+        } else if (placed != null) {
+            // 置き直した口は閉じた状態から（エキゾチック物質を入れると開く）
+            size = 0;
+        }
+        data = placed == null ? null : placed.asPlaced();
     }
 
     @Override
@@ -435,6 +520,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         tag.putInt("size", size);
         tag.putInt("target", target);
         tag.putDouble("burn", burn);
+        tag.putInt("grace", grace);
         tag.putInt("starve", starve);
         tag.put("fuel", fuel.serializeNBT(registries));
     }
@@ -443,13 +529,14 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("pair")) {
-            data = new WormholeData(tag.getLong("pair"), tag.getLong("created"));
+            data = new WormholeData(tag.getLong("pair"), tag.getLong("created"), true);
         }
         size = tag.contains("size") ? tag.getInt("size") : 1;
         if (tag.contains("target")) {
             target = tag.getInt("target");
         }
         burn = tag.getDouble("burn");
+        grace = tag.getInt("grace");
         starve = tag.getInt("starve");
         if (tag.contains("fuel")) {
             fuel.deserializeNBT(registries, tag.getCompound("fuel"));

@@ -50,8 +50,8 @@ public final class Stage5WormholeGameTests {
 
     // ------------------------------------------------------------------ 生成・固定化
 
-    /** ワームホール生成器（5×5×5 の球）を建てる。コントローラは (3,1,2)（底の手前の列の中央）、球は南（+Z）へ。 */
-    private static final BlockPos GENERATOR = new BlockPos(3, 1, 2);
+    /** ワームホール生成器（5×5×5 の球）を建てる。コントローラは (3,2,1)（下から2段目の手前の中央）、球は南（+Z）へ。 */
+    private static final BlockPos GENERATOR = new BlockPos(3, 2, 1);
 
     @GameTest(template = EMPTY, timeoutTicks = 260)
     public static void wormholeGeneratorMakesPairWithOneGigawattForTenSeconds(GameTestHelper helper) {
@@ -103,6 +103,7 @@ public final class Stage5WormholeGameTests {
         st.automationItems().insertItem(0, pair[0], false);
         st.automationItems().insertItem(1, pair[1], false);
         st.automationItems().insertItem(2, new ItemStack(item("exotic_matter"), 4), false);
+        st.automationItems().insertItem(WormholeStabilizerBlockEntity.SLOT_CASING, new ItemStack(item("wormhole_mouth_casing"), 2), false);
         helper.succeedWhen(() -> {
             for (int i = 0; i < 2; i++) {
                 ItemStack s = st.items().getStackInSlot(i);
@@ -110,6 +111,7 @@ public final class Stage5WormholeGameTests {
                 helper.assertTrue(s.get(SinguloComponents.WORMHOLE.get()).pair() == pairId, "対が変わった");
             }
             helper.assertTrue(st.items().getStackInSlot(2).isEmpty(), "エキゾチック物質を2個ずつ使っていない");
+            helper.assertTrue(st.items().getStackInSlot(WormholeStabilizerBlockEntity.SLOT_CASING).isEmpty(), "筐体を1個ずつ使っていない");
         });
     }
 
@@ -161,6 +163,120 @@ public final class Stage5WormholeGameTests {
             helper.assertTrue(ma.partner() != null, "対の口が見つからない");
             helper.succeed();
         });
+    }
+
+    /** ポート番号がちがうとつながらず、そろえるとつながる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 60)
+    public static void wormholePortsLinkOnlyMatchingChannels(GameTestHelper helper) {
+        long pair = helper.getLevel().random.nextLong();
+        BlockPos mouthA = new BlockPos(1, 1, 1);
+        BlockPos mouthB = new BlockPos(6, 1, 6);
+        BlockPos portA = new BlockPos(2, 1, 1);
+        BlockPos portB = new BlockPos(5, 1, 6);
+        for (BlockPos m : new BlockPos[]{mouthA, mouthB}) {
+            helper.setBlock(m, SinguloBlocks.WORMHOLE_MOUTH.get());
+            WormholeMouthBlockEntity be = helper.getBlockEntity(m);
+            be.setData(new WormholeData(pair, 0));
+            be.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 4), false);
+        }
+        helper.setBlock(portA, SinguloBlocks.WORMHOLE_PORT.get());
+        helper.setBlock(portB, SinguloBlocks.WORMHOLE_PORT.get());
+        helper.setBlock(portB.west(), Blocks.CHEST);
+        io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity a = helper.getBlockEntity(portA);
+        io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity b = helper.getBlockEntity(portB);
+        a.setChannel(42);
+        b.setChannel(7);
+        helper.runAtTickTime(5, () -> {
+            IItemHandler items = helper.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, helper.absolutePos(portA), null);
+            helper.assertTrue(items != null && items.getSlots() == 0, "番号がちがうのにつながった");
+            b.setChannel(42);
+            helper.runAfterDelay(2, () -> {
+                IItemHandler linked = helper.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, helper.absolutePos(portA), null);
+                helper.assertTrue(linked != null && linked.getSlots() == 27, "同じ番号でつながらない");
+                helper.assertTrue(a.channel() == 42 && b.channel() == 42, "番号が保たれない");
+                b.setChannel(128);
+                helper.assertTrue(b.channel() == 0, "127を超えた番号が0に戻らない");
+                helper.succeed();
+            });
+        });
+    }
+
+    /** 3×3 の喉で働けるポートは口に近い順に8個まで。9個目は止まり、光らない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 60)
+    public static void wormholeMouthRunsOnlyNearestPorts(GameTestHelper helper) {
+        long pair = helper.getLevel().random.nextLong();
+        BlockPos mouthA = new BlockPos(1, 1, 1);
+        BlockPos mouthB = new BlockPos(1, 3, 6);
+        for (BlockPos m : new BlockPos[]{mouthA, mouthB}) {
+            helper.setBlock(m, SinguloBlocks.WORMHOLE_MOUTH.get());
+            WormholeMouthBlockEntity be = helper.getBlockEntity(m);
+            be.setData(new WormholeData(pair, 0, true));
+            be.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 4), false);
+        }
+        // 口から近い順: (2..5,1,1) と (2..5,1,2) の8個、いちばん遠いのは (6,1,1)
+        java.util.List<BlockPos> ports = new java.util.ArrayList<>();
+        for (int x = 2; x <= 5; x++) {
+            ports.add(new BlockPos(x, 1, 1));
+            ports.add(new BlockPos(x, 1, 2));
+        }
+        BlockPos far = new BlockPos(6, 1, 1);
+        ports.add(far);
+        for (BlockPos p : ports) {
+            helper.setBlock(p, SinguloBlocks.WORMHOLE_PORT.get());
+        }
+        helper.runAtTickTime(25, () -> {
+            WormholeMouthBlockEntity a = helper.getBlockEntity(mouthA);
+            helper.assertTrue(a.portLimit() == 8 && a.rankedPorts().size() == 9, "ポートの数え方が違う: " + a.rankedPorts().size());
+            for (BlockPos p : ports) {
+                io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity port = helper.getBlockEntity(p);
+                boolean lit = helper.getBlockState(p).getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.LIT);
+                if (p.equals(far)) {
+                    helper.assertFalse(port.active() || lit, "上限を超えたポートが働いている");
+                } else {
+                    helper.assertTrue(port.active() && lit, "近いポートが働かない（光らない）: " + p);
+                }
+            }
+            helper.succeed();
+        });
+    }
+
+    /** 燃料が切れても口は消えずに閉じて休み、エキゾチック物質を入れるとまた開く。 */
+    @GameTest(template = EMPTY, timeoutTicks = 800)
+    public static void wormholeMouthClosesInsteadOfVanishing(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(3, 1, 3);
+        helper.setBlock(pos, SinguloBlocks.WORMHOLE_MOUTH.get());
+        WormholeMouthBlockEntity m = helper.getBlockEntity(pos);
+        m.setData(new WormholeData(helper.getLevel().random.nextLong(), 0, true));
+        helper.runAtTickTime(WormholeMouthBlockEntity.SHRINK_TICKS + 20, () -> {
+            helper.assertBlockPresent(SinguloBlocks.WORMHOLE_MOUTH.get(), pos);
+            helper.assertTrue(m.size() == 0, "燃料が切れても閉じない: " + m.size());
+            m.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 1), false);
+            helper.runAfterDelay(WormholeMouthBlockEntity.GROW_TICKS + 10, () -> {
+                helper.assertTrue(m.size() == 1, "エキゾチック物質を入れても開かない: " + m.size());
+                helper.succeed();
+            });
+        });
+    }
+
+    /** 初めて置いた口は、燃料なしでも5分開いている。置き直した口は閉じた状態から。 */
+    @GameTest(template = EMPTY)
+    public static void wormholeMouthFirstPlacementGrace(GameTestHelper helper) {
+        ItemStack fresh = new ItemStack(SinguloBlocks.WORMHOLE_MOUTH.get());
+        fresh.set(SinguloComponents.WORMHOLE.get(), new WormholeData(5, 0));
+        BlockPos first = new BlockPos(2, 1, 2);
+        helper.setBlock(first, SinguloBlocks.WORMHOLE_MOUTH.get());
+        WormholeMouthBlockEntity a = helper.getBlockEntity(first);
+        a.applyComponentsFromItemStack(fresh);
+        helper.assertTrue(a.grace() == WormholeMouthBlockEntity.GRACE_TICKS && a.size() == 1, "初めて置いた口に猶予がない");
+        helper.assertTrue(a.data() != null && a.data().placed(), "置いた印がつかない");
+        ItemStack again = new ItemStack(SinguloBlocks.WORMHOLE_MOUTH.get());
+        again.set(SinguloComponents.WORMHOLE.get(), a.data());
+        BlockPos second = new BlockPos(5, 1, 5);
+        helper.setBlock(second, SinguloBlocks.WORMHOLE_MOUTH.get());
+        WormholeMouthBlockEntity b = helper.getBlockEntity(second);
+        b.applyComponentsFromItemStack(again);
+        helper.assertTrue(b.grace() == 0 && b.size() == 0, "置き直した口にまで猶予がつく");
+        helper.succeed();
     }
 
     @GameTest(template = EMPTY)

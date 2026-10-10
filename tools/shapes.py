@@ -163,3 +163,24 @@ def machine_elements(iid, on=False):
         faces[name] = {'texture': NATURAL[name]}
     els.append({'from': f, 'to': t, 'faces': faces})
     return els, has_glass
+
+
+def frame_elements(t=2):
+    """枠だけの筐体（立方体の12本の辺。太さ t ドット）。中が見通せるので、喉を筐体の中に浮かべて見せる。
+    柱（縦の4本）は上下いっぱい、梁（上下の各4本）は柱の間だけ。梁の端の面は柱に隠れるので出さない。
+    外に出ている面はふだんのテクスチャ、内側を向く面は暗い金属。"""
+    lo, hi = t, 16 - t
+    els = []
+
+    def add(f, to, exclude=()):
+        els.append({'from': f, 'to': to, 'faces': _box_faces(f, to, set(exclude))})
+
+    for x0 in (0, hi):
+        for z0 in (0, hi):
+            add([x0, 0, z0], [x0 + t, 16, z0 + t])
+    for y0 in (0, hi):
+        for z0 in (0, hi):
+            add([lo, y0, z0], [hi, y0 + t, z0 + t], exclude=('east', 'west'))
+        for x0 in (0, hi):
+            add([x0, y0, lo], [x0 + t, y0 + t, hi], exclude=('north', 'south'))
+    return els

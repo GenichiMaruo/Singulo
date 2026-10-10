@@ -224,7 +224,8 @@ public final class Blueprints {
             }
             partBlocks = set;
         }
-        return partBlocks.contains(block) || block == SinguloBlocks.MULTIBLOCK_PORT.get() || block == SinguloBlocks.EXTRACTION_PORT.get()
+        return partBlocks.contains(block) || block == SinguloBlocks.MULTIBLOCK_PORT.get()
+                || block == SinguloBlocks.WORMHOLE_GENERATOR_PORT.get() || block == SinguloBlocks.EXTRACTION_PORT.get()
                 || block == SinguloBlocks.REACTOR_MASS_ALARM.get();
     }
 

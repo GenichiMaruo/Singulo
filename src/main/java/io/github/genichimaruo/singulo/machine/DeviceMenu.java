@@ -49,12 +49,19 @@ public class DeviceMenu extends AbstractContainerMenu {
 
     public static final class Mouth {
         public static final int SIZE = 0, TARGET = 1, PARTNER = 2, PX = 3, PY = 4, PZ = 5, CROSS = 6, STARVE = 7,
-                TICKS_PER_MATTER = 8, COUNT = 9;
+                TICKS_PER_MATTER = 8, GRACE = 9, PORTS = 10, PORT_LIMIT = 11, COUNT = 12;
         public static final int BUTTON_SMALLER = 0, BUTTON_BIGGER = 1;
     }
 
     public static final class Port {
-        public static final int STATE = 0, SIZE = 1, ENERGY = 2, ITEMS = 3, FLUIDS = 4, COUNT = 5;
+        /** STATE: 0 口がない・1 口に対がない・2 つながっている・3 口のポートの上限を超えて止まっている。 */
+        public static final int STATE = 0, SIZE = 1, ENERGY = 2, ITEMS = 3, FLUIDS = 4, CHANNEL = 5, RANK = 6, LIMIT = 7,
+                COUNT = 8;
+        public static final int STATE_NO_MOUTH = 0, STATE_NO_PARTNER = 1, STATE_LINKED = 2, STATE_OVER_LIMIT = 3;
+        /** ポート番号は7つの丸（ビット）のオンオフで決める（BUTTON_BIT + ビットの番号で切り替え）。 */
+        public static final int BITS = 7;
+        public static final int BUTTON_BIT = 0;
+        public static final int MAX_CHANNEL = (1 << BITS) - 1;
     }
 
     public static final class Tank {

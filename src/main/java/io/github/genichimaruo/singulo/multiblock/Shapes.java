@@ -243,9 +243,9 @@ public final class Shapes {
     /**
      * ワームホール生成器: 球形の閉じ込め容器。上下は 3×3（中心は場の収束器）、間の3段は角を落とした輪で、
      * 赤道の段は各面の中央が観察窓、その両わきが場コイル。中の 3×3×3 は空気（口が生まれる）。
-     * コントローラは底の 3×3 の手前の列の中央（地面に接し、手前から見える）。
+     * コントローラは下から2段目の輪の手前の中央（底の 3×3 のすぐ上の段。手前から見える）。
      */
-    public static final ShapeSpec WORMHOLE_GENERATOR = new ShapeSpec(5, 5, 5, 2, 0, 1, (x, y, z) -> {
+    public static final ShapeSpec WORMHOLE_GENERATOR = new ShapeSpec(5, 5, 5, 2, 1, 0, (x, y, z) -> {
         int dx = Math.abs(x - 2), dz = Math.abs(z - 2), m = Math.max(dx, dz);
         if (y == 0 || y == 4) {
             if (m == 2) {
@@ -254,7 +254,7 @@ public final class Shapes {
             if (m == 0) {
                 return Slot.part(SinguloBlocks.WORMHOLE_GENERATOR_FOCUSER);
             }
-            return y == 0 && x == 2 && z == 1 ? Slot.CONTROLLER : Slot.panel(SinguloBlocks.WORMHOLE_GENERATOR_SHELL);
+            return Slot.panel(SinguloBlocks.WORMHOLE_GENERATOR_SHELL);
         }
         if (m < 2) {
             return Slot.AIR;
@@ -266,7 +266,7 @@ public final class Shapes {
             int u = dz == 2 ? x : z;
             return Slot.part(u == 2 ? SinguloBlocks.WORMHOLE_GENERATOR_WINDOW : SinguloBlocks.WORMHOLE_GENERATOR_COIL);
         }
-        return Slot.panel(SinguloBlocks.WORMHOLE_GENERATOR_SHELL);
+        return y == 1 && x == 2 && z == 0 ? Slot.CONTROLLER : Slot.panel(SinguloBlocks.WORMHOLE_GENERATOR_SHELL);
     });
 
     // ------------------------------------------------------------------ 種類ごと

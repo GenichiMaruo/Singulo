@@ -28,9 +28,11 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 /**
  * ワームホール・ポート（段階5）。ワームホールの口から PORT_RANGE ブロック以内に置くと、向こう側の口の近くにある
- * ポートの隣の装置と直結する。このポートにつないだケーブル・パイプからは、向こう側の装置がそのまま隣にあるように見える
- * （エネルギーは向こうの装置へ流れ、アイテムと液体は向こうの入れ物のスロットとして見える）。
- * 1 tick に通せる量は、手前の口の喉の大きさで決まる。
+ * 同じポート番号（0〜127）の、働いているポートの隣の装置と直結する。このポートにつないだケーブル・パイプからは、向こう側の装置が
+ * そのまま隣にあるように見える（エネルギーは向こうの装置へ流れ、アイテムと液体は向こうの入れ物のスロットとして見える）。
+ * つながるのは、手前の口と対になった口の近くのポートだけ。
+ * 1つの口で働けるポートは喉の大きさで決まる数（口に近い順）まで。通せる量も喉の大きさで決まり、いちばん大きい喉では上限なし
+ * （mod のケーブルからは 1 tick に int を超えて送れる）。番号は0〜127（画面の7つの丸のオンオフ）。
  */
 public class WormholePortBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
     private static final Map<Level, Set<WormholePortBlockEntity>> LOADED = new WeakHashMap<>();
@@ -40,9 +42,13 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     private final IEnergyStorage energy = new Energy();
     private final IItemHandler items = new Items();
     private final IFluidHandler fluids = new Fluids();
+    /** ポート番号。向こう側の同じ番号のポートとつながる。 */
+    private int channel;
     private long cacheTick = -1;
     @Nullable
     private WormholeMouthBlockEntity cachedMouth;
+    /** 手前の口の上限の数に入っていて、働けるか。 */
+    private boolean active;
     private List<IEnergyStorage> energyTargets = List.of();
     private List<IItemHandler> itemTargets = List.of();
     private List<IFluidHandler> fluidTargets = List.of();
@@ -61,6 +67,19 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
 
     public IFluidHandler fluids() {
         return fluids;
+    }
+
+    public int channel() {
+        return channel;
+    }
+
+    public void setChannel(int channel) {
+        int c = Math.floorMod(channel, io.github.genichimaruo.singulo.machine.DeviceMenu.Port.MAX_CHANNEL + 1);
+        if (c != this.channel) {
+            this.channel = c;
+            cacheTick = -1;
+            setChanged();
+        }
     }
 
     @Override
@@ -95,17 +114,16 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         }
         cacheTick = now;
         cachedMouth = WormholeMouthBlockEntity.near(level, worldPosition);
+        active = cachedMouth != null && cachedMouth.portActive(this);
         List<IEnergyStorage> e = new ArrayList<>();
         List<IItemHandler> it = new ArrayList<>();
         List<IFluidHandler> f = new ArrayList<>();
-        WormholeMouthBlockEntity remote = cachedMouth == null ? null : cachedMouth.partner();
+        WormholeMouthBlockEntity remote = active ? cachedMouth.partner() : null;
         if (remote != null && remote.getLevel() instanceof ServerLevel other) {
             Set<WormholePortBlockEntity> ports = LOADED.get(other);
             if (ports != null) {
                 for (WormholePortBlockEntity port : ports) {
-                    if (port == this || port.isRemoved()
-                            || port.worldPosition.distSqr(remote.getBlockPos()) > WormholeMouthBlockEntity.PORT_RANGE
-                            * WormholeMouthBlockEntity.PORT_RANGE) {
+                    if (port == this || port.isRemoved() || port.channel != channel || !remote.portActive(port)) {
                         continue;
                     }
                     for (Direction dir : Direction.values()) {
@@ -133,15 +151,44 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         }
     }
 
+    /** 働いている（上限の数に入っている）ときだけ、手前の口。 */
     @Nullable
     private WormholeMouthBlockEntity mouth() {
         refresh();
-        return cachedMouth;
+        return active ? cachedMouth : null;
     }
 
     public boolean connected() {
         refresh();
-        return cachedMouth != null && !(energyTargets.isEmpty() && itemTargets.isEmpty() && fluidTargets.isEmpty());
+        return active && !(energyTargets.isEmpty() && itemTargets.isEmpty() && fluidTargets.isEmpty());
+    }
+
+    /** 働いているか（口に近い順で上限の数に入り、口に対がある）。 */
+    public boolean active() {
+        refresh();
+        return active && cachedMouth.partner() != null;
+    }
+
+    /** 働いている間は光る（状態の LIT）。 */
+    public static void serverTick(Level level, BlockPos pos, BlockState state, WormholePortBlockEntity port) {
+        if ((level.getGameTime() + pos.asLong()) % 10 != 0) {
+            return;
+        }
+        boolean lit = port.active();
+        if (state.hasProperty(AbstractMachineBlock.LIT) && state.getValue(AbstractMachineBlock.LIT) != lit) {
+            level.setBlock(pos, state.setValue(AbstractMachineBlock.LIT, lit), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
+    }
+
+    private int state() {
+        if (cachedMouth == null) {
+            return io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE_NO_MOUTH;
+        }
+        if (!active) {
+            return io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE_OVER_LIMIT;
+        }
+        return cachedMouth.partner() == null ? io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE_NO_PARTNER
+                : io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE_LINKED;
     }
 
     @Override
@@ -150,27 +197,46 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.WORMHOLE_PORT, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> {
             refresh();
             return switch (i) {
-                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE -> cachedMouth == null ? 0 : cachedMouth.partner() == null ? 1 : 2;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE -> state();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.SIZE -> cachedMouth == null ? 0 : cachedMouth.size();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.ENERGY -> energyTargets.size();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.ITEMS -> itemTargets.size();
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.FLUIDS -> fluidTargets.size();
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.CHANNEL -> channel;
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.RANK -> cachedMouth == null ? 0 : cachedMouth.rankOf(this);
+                case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.LIMIT -> cachedMouth == null ? 0 : cachedMouth.portLimit();
                 default -> 0;
             };
-        }, (p, id) -> false);
+        }, (p, id) -> onButton(id));
     }
 
-    // ------------------------------------------------------------------ エネルギー
+    /** 画面のボタン: 7つの丸（ビット）のオンオフで番号（0〜127）を決める。 */
+    boolean onButton(int id) {
+        int bit = id - io.github.genichimaruo.singulo.machine.DeviceMenu.Port.BUTTON_BIT;
+        if (bit < 0 || bit >= io.github.genichimaruo.singulo.machine.DeviceMenu.Port.BITS) {
+            return false;
+        }
+        setChannel(channel ^ (1 << bit));
+        return true;
+    }
 
-    private final class Energy implements IEnergyStorage {
+    /** 読み込まれているポート（口が順位をつけるのに使う）。 */
+    static List<WormholePortBlockEntity> loaded(Level level) {
+        Set<WormholePortBlockEntity> set = LOADED.get(level);
+        return set == null ? List.of() : new ArrayList<>(set);
+    }
+
+    // ------------------------------------------------------------------ エネルギー（いちばん大きい喉では上限なし）
+
+    private final class Energy implements io.github.genichimaruo.singulo.energy.LongEnergyStorage {
         @Override
-        public int receiveEnergy(int amount, boolean simulate) {
+        public long receiveLong(long amount, boolean simulate) {
             WormholeMouthBlockEntity m = mouth();
             if (busy || m == null || amount <= 0) {
                 return 0;
             }
-            int budget = Math.min(amount, m.energyBudget());
-            int sent = 0;
+            long budget = Math.min(amount, m.energyBudget());
+            long sent = 0;
             busy = true;
             try {
                 for (IEnergyStorage t : energyTargets) {
@@ -178,7 +244,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                         break;
                     }
                     if (t.canReceive()) {
-                        sent += t.receiveEnergy(budget - sent, simulate);
+                        sent += io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(t, budget - sent, simulate);
                     }
                 }
             } finally {
@@ -191,13 +257,18 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         }
 
         @Override
-        public int extractEnergy(int amount, boolean simulate) {
+        public int receiveEnergy(int amount, boolean simulate) {
+            return (int) receiveLong(amount, simulate);
+        }
+
+        @Override
+        public long extractLong(long amount, boolean simulate) {
             WormholeMouthBlockEntity m = mouth();
             if (busy || m == null || amount <= 0) {
                 return 0;
             }
-            int budget = Math.min(amount, m.energyBudget());
-            int got = 0;
+            long budget = Math.min(amount, m.energyBudget());
+            long got = 0;
             busy = true;
             try {
                 for (IEnergyStorage t : energyTargets) {
@@ -205,7 +276,10 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                         break;
                     }
                     if (t.canExtract()) {
-                        got += t.extractEnergy(budget - got, simulate);
+                        long want = budget - got;
+                        got += t instanceof io.github.genichimaruo.singulo.energy.LongEnergyStorage big
+                                ? big.extractLong(want, simulate)
+                                : t.extractEnergy((int) Math.min(Integer.MAX_VALUE, want), simulate);
                     }
                 }
             } finally {
@@ -215,6 +289,11 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                 m.useEnergy(got);
             }
             return got;
+        }
+
+        @Override
+        public int extractEnergy(int amount, boolean simulate) {
+            return (int) extractLong(amount, simulate);
         }
 
         @Override
@@ -350,6 +429,18 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
             IItemHandler h = handler(slot, local);
             return h != null && h.isItemValid(local[0], stack);
         }
+    }
+
+    @Override
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putInt("channel", channel);
+    }
+
+    @Override
+    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        channel = tag.getInt("channel");
     }
 
     // ------------------------------------------------------------------ 液体

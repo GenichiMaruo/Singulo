@@ -22,9 +22,10 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
- * ワームホール生成器（段階5、3×3×3 のマルチブロック。コアは底の中央）。毎tick requiredPerTick()（設定 wormholeGeneratorPower、既定 100 MFE）を
+ * ワームホール生成器（段階5、5×5×5 の球のマルチブロック。コアは下から2段目の手前の中央）。毎tick requiredPerTick()（設定 wormholeGeneratorPower、既定 100 MFE）を
  * GENERATE_TICKS（10秒）続けて受けると、一対の不安定な口を作る。途中で足りない tick があるとやり直し。
  * 口は出力に置かれ、空の手で右クリックするか搬出して受け取る。60秒以内に固定化しないと消える。
+ * 外殻の代わりに置いた搬入出ポート（マルチブロック搬入出ポートか、ワームホール生成器ポート）から電力を入れ、できた口を押し出す。
  */
 public class WormholeGeneratorBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity.Outputs {
@@ -127,9 +128,9 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     /** 球の中心（口が生まれる所）。形成したときに決まる。 */
     private BlockPos core;
 
-    /** 球の中心。形がわからないうちはコントローラの2つ上。 */
+    /** 球の中心。形がわからないうちはコントローラの1つ上。 */
     public BlockPos core() {
-        return core != null ? core : worldPosition.above(2);
+        return core != null ? core : worldPosition.above();
     }
 
     @Override
@@ -166,7 +167,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
             formed = found != null;
             core = found == null ? null : found.pos(pos, 2, 2, 2);
             ports.update(level, pos, found == null ? java.util.List.of() : found.ports());
-            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, pos, was, formed, firstCheck, 4, 0, 5);
+            io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, pos, was, formed, firstCheck, 4, 1, 4);
             firstCheck = false;
         }
         // 出力の口は時間がたつと消える
