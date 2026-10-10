@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "natural=false": {
+      "model": "singulo:block/meteorite_crust"
+    },
+    "natural=true": {
+      "model": "singulo:block/meteorite_crust"
+    }
+  }
+}

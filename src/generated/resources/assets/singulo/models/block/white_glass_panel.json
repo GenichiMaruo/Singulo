@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "singulo:block/white_glass_panel"
+  },
+  "render_type": "minecraft:translucent"
+}

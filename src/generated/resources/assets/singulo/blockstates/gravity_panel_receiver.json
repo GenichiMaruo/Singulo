@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "singulo:block/gravity_panel_receiver"
+    },
+    "lit=true": {
+      "model": "singulo:block/gravity_panel_receiver_on"
+    }
+  }
+}

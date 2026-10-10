@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "singulo:block/pristine_ruin_pillar"
+    },
+    "axis=z": {
+      "model": "singulo:block/pristine_ruin_pillar_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "singulo:block/pristine_ruin_pillar_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

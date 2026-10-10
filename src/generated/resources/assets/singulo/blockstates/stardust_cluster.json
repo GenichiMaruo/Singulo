@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "singulo:block/stardust_cluster",
+      "x": 180
+    },
+    "facing=up": {
+      "model": "singulo:block/stardust_cluster"
+    },
+    "facing=north": {
+      "model": "singulo:block/stardust_cluster",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "singulo:block/stardust_cluster",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "singulo:block/stardust_cluster",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "singulo:block/stardust_cluster",
+      "x": 90,
+      "y": 270
+    }
+  }
+}
