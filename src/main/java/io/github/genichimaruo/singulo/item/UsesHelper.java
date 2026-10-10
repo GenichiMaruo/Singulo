@@ -43,7 +43,7 @@ public final class UsesHelper {
     }
 
     public static UsesData get(ItemStack stack) {
-        UsesData data = stack.get(SinguloComponents.USES.get());
+        UsesData data = SinguloComponents.get(stack, SinguloComponents.USES.get());
         return data != null ? data : new UsesData(0, baseMax(stack), 0);
     }
 
@@ -64,7 +64,7 @@ public final class UsesHelper {
         UsesData next = new UsesData(data.used() + amount, data.max(), data.repairs());
         if (next.remaining() > 0) {
             ItemStack copy = stack.copyWithCount(1);
-            copy.set(SinguloComponents.USES.get(), next);
+            SinguloComponents.set(copy, SinguloComponents.USES.get(), next);
             return copy;
         }
         return exhausted(stack, next);
@@ -85,12 +85,12 @@ public final class UsesHelper {
             // 復元品は劣化品に戻る。次の復元は修復1回ぶんとして数える
             Item wornItem = BuiltInRegistries.ITEM.get(Singulo.id(worn));
             ItemStack out = new ItemStack(wornItem);
-            out.set(SinguloComponents.USES.get(), new UsesData(0, 0, data.repairs() + 1));
+            SinguloComponents.set(out, SinguloComponents.USES.get(), new UsesData(0, 0, data.repairs() + 1));
             return out;
         }
         // データ系の原本は使い切った状態で残る
         ItemStack copy = stack.copyWithCount(1);
-        copy.set(SinguloComponents.USES.get(), data);
+        SinguloComponents.set(copy, SinguloComponents.USES.get(), data);
         return copy;
     }
 
@@ -113,12 +113,12 @@ public final class UsesHelper {
         int repairs = input.getItem() instanceof UsesItem ? repairsOf(input) + 1 : repairsOf(input);
         ItemStack out = result.copyWithCount(1);
         int max = Math.max(1, (int) Math.floor(baseMax(out) * Math.pow(repairWear(), repairs)));
-        out.set(SinguloComponents.USES.get(), new UsesData(0, max, repairs));
+        SinguloComponents.set(out, SinguloComponents.USES.get(), new UsesData(0, max, repairs));
         return out;
     }
 
     public static int repairsOf(ItemStack stack) {
-        UsesData data = stack.get(SinguloComponents.USES.get());
+        UsesData data = SinguloComponents.get(stack, SinguloComponents.USES.get());
         return data == null ? 0 : data.repairs();
     }
 

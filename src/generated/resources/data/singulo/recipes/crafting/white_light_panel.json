@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LLL",
+    "LYL",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "singulo:white_panel"
+    },
+    "Y": {
+      "tag": "forge:dusts/glowstone"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "singulo:white_light_panel"
+  }
+}

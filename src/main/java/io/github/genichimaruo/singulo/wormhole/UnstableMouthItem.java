@@ -30,14 +30,14 @@ public class UnstableMouthItem extends SinguloItem {
         ItemStack[] out = new ItemStack[2];
         for (int i = 0; i < 2; i++) {
             out[i] = new ItemStack(SinguloItems.UNSTABLE_WORMHOLE_MOUTH.get());
-            out[i].set(SinguloComponents.WORMHOLE.get(), new WormholeData(pair, level.getGameTime()));
+            SinguloComponents.set(out[i], SinguloComponents.WORMHOLE.get(), new WormholeData(pair, level.getGameTime()));
         }
         return out;
     }
 
     /** 残りの tick（すでに消えるべきなら 0 以下）。 */
     public static long remaining(ItemStack stack, @Nullable Level level) {
-        WormholeData data = stack.get(SinguloComponents.WORMHOLE.get());
+        WormholeData data = SinguloComponents.get(stack, SinguloComponents.WORMHOLE.get());
         if (data == null || level == null) {
             return 0;
         }
@@ -68,9 +68,9 @@ public class UnstableMouthItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        long left = remaining(stack, context.level());
+        long left = remaining(stack, context);
         tooltip.add(Component.translatable("tooltip.singulo.wormhole.unstable", Math.max(0, left / 20))
                 .withStyle(ChatFormatting.RED));
     }

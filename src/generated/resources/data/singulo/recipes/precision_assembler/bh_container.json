@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:confinement_ring"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:bh_container",
+    "count": 1
+  }
+}

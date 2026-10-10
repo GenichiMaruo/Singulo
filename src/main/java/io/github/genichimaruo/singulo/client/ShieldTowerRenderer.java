@@ -175,8 +175,8 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         float x = Mth.sin(theta) * Mth.cos(phi);
         float y = Mth.cos(theta);
         float z = Mth.sin(theta) * Mth.sin(phi);
-        vc.addVertex(last, x * r, y * r, z * r).setColor(red, green, blue, alpha).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, x, y, z);
+        vc.vertex(last.pose(), x * r, y * r, z * r).color(red, green, blue, alpha).uv(0, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(last.normal(), x, y, z).endVertex();
     }
 
     @Override
@@ -189,7 +189,6 @@ public class ShieldTowerRenderer implements BlockEntityRenderer<ShieldTowerBlock
         return 160;
     }
 
-    @Override
     public AABB getRenderBoundingBox(ShieldTowerBlockEntity be) {
         return new AABB(be.axis()).inflate(Math.max(12, be.shownRadius()));
     }

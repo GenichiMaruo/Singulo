@@ -72,11 +72,10 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
         float x = Mth.cos(theta) * Mth.cos(phi);
         float y = Mth.sin(theta);
         float z = Mth.cos(theta) * Mth.sin(phi);
-        vc.addVertex(last, x * r, y * r, z * r).setColor(0, 0, 0, 255).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(0).setNormal(last, x, y, z);
+        vc.vertex(last.pose(), x * r, y * r, z * r).color(0, 0, 0, 255).uv(0, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0).normal(last.normal(), x, y, z).endVertex();
     }
 
-    @Override
     public AABB getRenderBoundingBox(WormholeMouthBlockEntity be) {
         // 口が画面の外に出ても、周りの重力レンズが画面にかかっている間は描く
         return new AABB(be.getBlockPos()).inflate(8);

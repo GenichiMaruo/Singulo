@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WBW",
+    "WFW",
+    "ILI"
+  ],
+  "key": {
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "I": {
+      "tag": "forge:ingots/iron"
+    },
+    "L": {
+      "item": "minecraft:blast_furnace"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:kiln"
+  }
+}

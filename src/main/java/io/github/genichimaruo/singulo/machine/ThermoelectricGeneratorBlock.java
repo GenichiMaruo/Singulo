@@ -12,16 +12,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ThermoelectricGeneratorBlock extends AbstractMachineBlock {
-    public static final MapCodec<ThermoelectricGeneratorBlock> CODEC = simpleCodec(ThermoelectricGeneratorBlock::new);
 
     public ThermoelectricGeneratorBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

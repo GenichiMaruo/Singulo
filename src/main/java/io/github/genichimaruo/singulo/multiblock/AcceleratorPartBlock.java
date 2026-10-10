@@ -35,18 +35,14 @@ public class AcceleratorPartBlock extends PartBlock {
         registerDefaultState(stateDefinition.any().setValue(SEGMENT, Segment.NONE));
     }
 
-    @Override
-    protected MapCodec<? extends Block> codec() {
-        return simpleCodec(p -> new AcceleratorPartBlock(p, role()));
-    }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(SEGMENT);
     }
 
     @Override
-    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
         super.onPlace(state, level, pos, oldState, moved);
         if (!level.isClientSide && !oldState.is(state.getBlock())) {
             level.scheduleTick(pos, this, 1);
@@ -54,7 +50,7 @@ public class AcceleratorPartBlock extends PartBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
             LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         if (direction.getAxis().isHorizontal()) {
             level.scheduleTick(pos, this, 1);
@@ -63,7 +59,7 @@ public class AcceleratorPartBlock extends PartBlock {
     }
 
     @Override
-    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         refresh(level, pos);
     }
 

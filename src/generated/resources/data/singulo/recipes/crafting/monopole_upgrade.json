@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PMP",
+    " O "
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "M": {
+      "item": "singulo:magnetic_monopole"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:monopole_upgrade"
+  }
+}

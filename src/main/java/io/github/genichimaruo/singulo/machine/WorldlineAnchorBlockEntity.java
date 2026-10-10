@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.world.chunk.TicketController;
+
 
 /**
  * ワールドライン・アンカー（小、ティア2）。触媒を入れると周りのチャンクを常時ロードする。
@@ -22,14 +22,6 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     public static final int MACHINE_TIER = 2;
     public static final int MAX_RADIUS = 2;
     public static final int FE_PER_CHUNK = 20;
-
-    public static final TicketController TICKETS = new TicketController(Singulo.id("worldline_anchor"),
-            (level, helper) -> helper.getBlockTickets().keySet().forEach(pos -> {
-                // 読み込み時、アンカーが無くなった場所のチケットを捨てる
-                if (!(level.getBlockEntity(pos) instanceof WorldlineAnchorBlockEntity)) {
-                    helper.removeAllTickets(pos);
-                }
-            }));
 
     private int loadedRadius = -1;
 
@@ -112,7 +104,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
         ChunkPos center = new ChunkPos(worldPosition);
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                TICKETS.forceChunk(level, worldPosition, center.x + dx, center.z + dz, add, true);
+                net.minecraftforge.common.world.ForgeChunkManager.forceChunk(level, Singulo.MODID, worldPosition, center.x + dx, center.z + dz, add, true);
             }
         }
     }
@@ -127,14 +119,14 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("radius", loadedRadius);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         loadedRadius = tag.contains("radius") ? tag.getInt("radius") : -1;
     }
 }

@@ -1,26 +1,26 @@
 package io.github.genichimaruo.singulo.generated;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 /** tools/gen_data.py が config_spec.py から生成。手で編集しない。 */
 public final class ClientConfig {
     private ClientConfig() {}
 
     // ---- ClientConfig ----
-    public static final ModConfigSpec.BooleanValue GRAVITATIONAL_LENSING;
-    public static final ModConfigSpec.BooleanValue LENSING_WITH_SHADER_PACKS;
-    public static final ModConfigSpec.BooleanValue DOPPLER_BEAMING;
-    public static final ModConfigSpec.ConfigValue<String> LENSING_QUALITY;
-    public static final ModConfigSpec.BooleanValue FORMATION_EFFECTS;
-    public static final ModConfigSpec SPEC;
+    public static final ForgeConfigSpec.BooleanValue GRAVITATIONAL_LENSING;
+    public static final ForgeConfigSpec.BooleanValue LENSING_WITH_SHADER_PACKS;
+    public static final ForgeConfigSpec.BooleanValue DOPPLER_BEAMING;
+    public static final ForgeConfigSpec.ConfigValue<String> LENSING_QUALITY;
+    public static final ForgeConfigSpec.BooleanValue FORMATION_EFFECTS;
+    public static final ForgeConfigSpec SPEC;
 
     static {
-        ModConfigSpec.BooleanValue GRAVITATIONAL_LENSING_;
-        ModConfigSpec.BooleanValue LENSING_WITH_SHADER_PACKS_;
-        ModConfigSpec.BooleanValue DOPPLER_BEAMING_;
-        ModConfigSpec.ConfigValue<String> LENSING_QUALITY_;
-        ModConfigSpec.BooleanValue FORMATION_EFFECTS_;
-        ModConfigSpec.Builder b = new ModConfigSpec.Builder();
+        ForgeConfigSpec.BooleanValue GRAVITATIONAL_LENSING_;
+        ForgeConfigSpec.BooleanValue LENSING_WITH_SHADER_PACKS_;
+        ForgeConfigSpec.BooleanValue DOPPLER_BEAMING_;
+        ForgeConfigSpec.ConfigValue<String> LENSING_QUALITY_;
+        ForgeConfigSpec.BooleanValue FORMATION_EFFECTS_;
+        ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
         b.push("render");
         b.comment("重力レンズの歪み表示", "範囲: true / false");
         GRAVITATIONAL_LENSING_ = b.define("gravitationalLensing", true);

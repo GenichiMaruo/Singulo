@@ -21,9 +21,9 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** ストレンジレット・磁気瓶・ニュートリノ・スキャナー・水素漏れの確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -40,11 +40,11 @@ public final class HazardGameTests {
             helper.setBlock(p, Blocks.STONE);
         }
         helper.setBlock(pos, SinguloBlocks.STRANGELET.get());
-        StrangeletBlockEntity s = helper.getBlockEntity(pos);
+        StrangeletBlockEntity s = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         helper.runAtTickTime(120, () -> {
             helper.assertTrue(s.converted() >= 1, "ストレンジ物質に変わらない: " + s.converted());
             helper.assertBlockPresent(SinguloBlocks.STRANGELET.get(), pos);
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = TestBuild.mockPlayer(helper);
             try {
                 player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
                 ItemStack bottle = new ItemStack(SinguloItems.MAGNETIC_BOTTLE.get());
@@ -67,15 +67,15 @@ public final class HazardGameTests {
     /** スキャナーは感度の段階に応じて鉱石を映す: 段階1は鉄まで、段階2でダイヤモンド、段階3で古代の残骸。遺構はいつでも映る。 */
     @GameTest(template = EMPTY)
     public static void neutrinoScannerFindsOresAndRuins(GameTestHelper helper) {
-        BlockPos iron = new BlockPos(1, 1, 1);
-        BlockPos diamond = new BlockPos(1, 1, 5);
-        BlockPos debris = new BlockPos(5, 1, 1);
-        BlockPos ruin = new BlockPos(5, 1, 5);
+        BlockPos iron = new BlockPos(1, 1, 1).offset(20000, 200, 20000);
+        BlockPos diamond = new BlockPos(1, 1, 5).offset(20000, 200, 20000);
+        BlockPos debris = new BlockPos(5, 1, 1).offset(20000, 200, 20000);
+        BlockPos ruin = new BlockPos(5, 1, 5).offset(20000, 200, 20000);
         helper.setBlock(iron, Blocks.IRON_ORE);
         helper.setBlock(diamond, Blocks.DIAMOND_ORE);
         helper.setBlock(debris, Blocks.ANCIENT_DEBRIS);
         helper.setBlock(ruin, SinguloBlocks.RUIN_PANEL.get());
-        BlockPos c = helper.absolutePos(new BlockPos(3, 1, 3));
+        BlockPos c = helper.absolutePos(new BlockPos(3, 1, 3).offset(20000, 200, 20000));
         NeutrinoScannerItem.Result t1 = NeutrinoScannerItem.scan(helper.getLevel(), c, 1);
         NeutrinoScannerItem.Result t2 = NeutrinoScannerItem.scan(helper.getLevel(), c, 2);
         NeutrinoScannerItem.Result t3 = NeutrinoScannerItem.scan(helper.getLevel(), c, 3);
@@ -93,7 +93,7 @@ public final class HazardGameTests {
     public static void hydrogenLeakNearFireExplodes(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         // 出力の水素タンクに直接入れる（搬入では出力タンクに入らない）
         m.forceOutputTankForTest(new FluidStack(SinguloFluids.get("hydrogen"), 2000));
         helper.setBlock(new BlockPos(5, 1, 3), Blocks.CAMPFIRE);

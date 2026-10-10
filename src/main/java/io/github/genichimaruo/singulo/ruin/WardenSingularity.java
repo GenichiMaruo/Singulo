@@ -74,7 +74,7 @@ public class WardenSingularity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {}
+    protected void defineSynchedData() {}
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {}

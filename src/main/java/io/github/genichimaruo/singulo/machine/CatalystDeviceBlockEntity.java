@@ -20,9 +20,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * 触媒を入れて動く装置の共通部分（アンカー・スタビライザー・量子熱機関）。
@@ -142,12 +142,12 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     }
 
     /** 画面に出すスロット。0 は触媒、もう1つあれば 1（Kind.extraSlot）。 */
-    public net.neoforged.neoforge.items.IItemHandler menuItems() {
+    public net.minecraftforge.items.IItemHandler menuItems() {
         return slot;
     }
 
     /** パイプやホッパーから見えるアイテムの入れ物。 */
-    public net.neoforged.neoforge.items.IItemHandler automationItems() {
+    public net.minecraftforge.items.IItemHandler automationItems() {
         return slot;
     }
 
@@ -210,7 +210,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
             if (energy.getEnergyStored() <= 0) {
                 return;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK,
+            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK,
                     worldPosition.relative(dir), dir.getOpposite());
             if (target != null && target.canReceive()) {
                 int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), perTick), false);
@@ -255,25 +255,25 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.openMenu(this, buf -> {
+        net.minecraftforge.network.NetworkHooks.openScreen(player, this, buf -> {
             buf.writeBlockPos(worldPosition);
             buf.writeVarInt(kind().ordinal());
         });
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("catalyst", slot.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("catalyst", slot.serializeNBT());
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("wear", wear);
         tag.putBoolean("enabled", enabled);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        slot.deserializeNBT(registries, tag.getCompound("catalyst"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        slot.deserializeNBT(tag.getCompound("catalyst"));
         energy.setEnergy(tag.getInt("energy"));
         wear = tag.getDouble("wear");
         enabled = !tag.contains("enabled") || tag.getBoolean("enabled");

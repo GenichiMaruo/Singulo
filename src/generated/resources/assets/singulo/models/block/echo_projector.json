@@ -110,10 +110,6 @@
         13,
         10
       ],
-      "neoforge_data": {
-        "block_light": 15,
-        "sky_light": 15
-      },
       "faces": {
         "north": {
           "texture": "#lens"
@@ -130,6 +126,10 @@
         "up": {
           "texture": "#lens"
         }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
       }
     }
   ]

@@ -78,7 +78,6 @@ public class CoolingTowerRenderer implements BlockEntityRenderer<CoolingTowerCon
         return true;
     }
 
-    @Override
     public AABB getRenderBoundingBox(CoolingTowerControllerBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(6, 3, 6).expandTowards(0, Shapes.TOWER_MAX_HEIGHT + 6, 0);
     }

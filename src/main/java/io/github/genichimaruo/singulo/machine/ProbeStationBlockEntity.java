@@ -19,10 +19,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
-import net.neoforged.neoforge.items.wrapper.RangedWrapper;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import net.minecraftforge.items.wrapper.RangedWrapper;
 
 /**
  * 自動探査機ステーション（ティア4）。発見済みの遺構（段階の N−2 ルールで飛べるもの）へ探査機を送り、回収物を持ち帰る。
@@ -180,9 +180,9 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("output", output.serializeNBT());
         tag.putInt("progress", progress);
         ListTag list = new ListTag();
         for (Target t : targets) {
@@ -196,14 +196,14 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        output.deserializeNBT(tag.getCompound("output"));
         progress = tag.getInt("progress");
         targets.clear();
         for (Tag t : tag.getList("targets", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;
-            NbtUtils.readBlockPos(c, "pos").ifPresent(p -> targets.add(new Target(c.getString("ruin"), p, c.getLong("next"))));
+            io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(c, "pos").ifPresent(p -> targets.add(new Target(c.getString("ruin"), p, c.getLong("next"))));
         }
     }
 }

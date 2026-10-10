@@ -32,9 +32,9 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
 /**
  * ティプラー・シリンダー（ティア5、3×3×7 のマルチブロック。コアは底の中央）。中央で回る円柱が周りの時間を速め、
@@ -315,8 +315,8 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = super.getUpdateTag();
         tag.putBoolean("running", running);
         tag.putBoolean("formed", formed);
         tag.putLong("axis", axis().asLong());
@@ -329,17 +329,17 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("fuel", fuel.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("fuel", fuel.serializeNBT());
         tag.putInt("burn", burn);
         tag.putBoolean("running", running);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        fuel.deserializeNBT(registries, tag.getCompound("fuel"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        fuel.deserializeNBT(tag.getCompound("fuel"));
         burn = tag.getInt("burn");
         running = tag.getBoolean("running");
         if (tag.contains("axis")) {

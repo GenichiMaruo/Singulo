@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 2,
+  "time": 160,
+  "energy": 200,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:meteoric_iron_ingot"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:data_card_observation_log"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:magnetic_key",
+    "count": 1
+  }
+}

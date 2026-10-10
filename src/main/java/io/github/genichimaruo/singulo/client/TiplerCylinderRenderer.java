@@ -78,8 +78,8 @@ public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinde
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose last, float x, float y, float z, int shade, int blue,
                                int light, float nx, float ny, float nz) {
-        vc.addVertex(last, x, y, z).setColor(shade, shade, blue, 255).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(light).setNormal(last, nx, ny, nz);
+        vc.vertex(last.pose(), x, y, z).color(shade, shade, blue, 255).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light).normal(last.normal(), nx, ny, nz).endVertex();
     }
 
     /**
@@ -113,7 +113,6 @@ public class TiplerCylinderRenderer implements BlockEntityRenderer<TiplerCylinde
         return true;
     }
 
-    @Override
     public AABB getRenderBoundingBox(TiplerCylinderBlockEntity be) {
         return new AABB(be.axis()).expandTowards(0, 8, 0).inflate(3);
     }

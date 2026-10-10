@@ -52,7 +52,7 @@ public final class ThermalData extends SimpleJsonResourceReloadListener {
                 if (root.has("cold")) {
                     for (JsonElement e : root.getAsJsonArray("cold")) {
                         JsonObject o = e.getAsJsonObject();
-                        Block becomes = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(o.get("becomes").getAsString()));
+                        Block becomes = BuiltInRegistries.BLOCK.get(new ResourceLocation(o.get("becomes").getAsString()));
                         block(o).ifPresent(b -> newCold.put(b, new Cold(o.get("temperature").getAsInt(),
                                 o.get("tolerance").getAsInt(), becomes)));
                     }
@@ -66,7 +66,7 @@ public final class ThermalData extends SimpleJsonResourceReloadListener {
     }
 
     private static java.util.Optional<Block> block(JsonObject o) {
-        return BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse(o.get("block").getAsString()));
+        return BuiltInRegistries.BLOCK.getOptional(new ResourceLocation(o.get("block").getAsString()));
     }
 
     @Nullable

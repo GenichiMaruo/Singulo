@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.item.ExoticCharge;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,9 +12,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 /**
  * スロットの少ない装置の画面をまとめたもの（ワームホール生成器・口・ポート、閉じ込めタンク、ハロー捕集器、ミュオン収集器、重力波検出器）。
@@ -139,7 +139,7 @@ public class DeviceMenu extends AbstractContainerMenu {
     /** サーバー側で開く。 */
     public static void open(ServerPlayer player, BlockEntity be, Kind kind, IItemHandler items,
                             java.util.function.IntUnaryOperator values, Host host) {
-        player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new DeviceMenu(id, inv, kind, be.getBlockPos(),
+        net.minecraftforge.network.NetworkHooks.openScreen(player, new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new DeviceMenu(id, inv, kind, be.getBlockPos(),
                         items, SyncedInts.server(kind.data, values), host),
                 net.minecraft.network.chat.Component.translatable(be.getBlockState().getBlock().getDescriptionId())),
                 buf -> {
@@ -148,7 +148,7 @@ public class DeviceMenu extends AbstractContainerMenu {
                 });
     }
 
-    public static DeviceMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+    public static DeviceMenu client(int containerId, Inventory inventory, FriendlyByteBuf buf) {
         Kind kind = Kind.values()[buf.readVarInt()];
         return new DeviceMenu(containerId, inventory, kind, buf.readBlockPos(), new ItemStackHandler(Math.max(1, kind.slots)),
                 SyncedInts.client(kind.data), null);

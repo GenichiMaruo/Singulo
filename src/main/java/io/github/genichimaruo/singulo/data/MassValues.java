@@ -45,11 +45,11 @@ public final class MassValues extends SimpleJsonResourceReloadListener {
                     JsonObject o = e.getAsJsonObject();
                     double mass = o.get("mass").getAsDouble();
                     if (o.has("item")) {
-                        ResourceLocation id = ResourceLocation.parse(o.get("item").getAsString());
+                        ResourceLocation id = new ResourceLocation(o.get("item").getAsString());
                         BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> newItems.put(item, mass));
                     } else if (o.has("tag")) {
                         newTags.add(new TagEntry(TagKey.create(Registries.ITEM,
-                                ResourceLocation.parse(o.get("tag").getAsString())), mass));
+                                new ResourceLocation(o.get("tag").getAsString())), mass));
                     }
                 }
             } catch (RuntimeException ex) {

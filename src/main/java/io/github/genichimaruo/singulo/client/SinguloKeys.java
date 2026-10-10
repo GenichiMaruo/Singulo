@@ -6,9 +6,9 @@ import io.github.genichimaruo.singulo.network.ToggleAreaPayload;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import io.github.genichimaruo.singulo.network.SinguloNetwork;
 import org.lwjgl.glfw.GLFW;
 
 /** キー割り当て。重力操作道具の範囲切り替え（既定 G）。 */
@@ -30,7 +30,7 @@ public final class SinguloKeys {
      * マニピュレーターを持っている間は、左クリックで叩いたり壊したりせず、重力の操作に使う。
      * 右クリックも（スニーク中のモード切替・充電を除いて）ブロックを開いたりせず、ために使う。
      */
-    static void onInteraction(net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
+    static void onInteraction(net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || event.getHand() != InteractionHand.MAIN_HAND
                 || !(mc.player.getMainHandItem().getItem() instanceof io.github.genichimaruo.singulo.item.GravitonManipulatorItem)) {
@@ -42,19 +42,20 @@ public final class SinguloKeys {
         }
     }
 
-    static void onClientTick(ClientTickEvent.Post event) {
+    static void onClientTick(ClientTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         boolean holding = mc.player != null && mc.screen == null
                 && mc.player.getMainHandItem().getItem() instanceof io.github.genichimaruo.singulo.item.GravitonManipulatorItem;
         boolean down = holding && mc.options.keyAttack.isDown();
         if (down != leftDown && mc.getConnection() != null) {
             leftDown = down;
-            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(false, down));
+            SinguloNetwork.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(false, down));
         }
         boolean right = holding && mc.options.keyUse.isDown() && !mc.player.isShiftKeyDown();
         if (right != rightDown && mc.getConnection() != null) {
             rightDown = right;
-            PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
+            SinguloNetwork.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
         }
         while (TOGGLE_AREA.consumeClick()) {
             if (mc.player == null) {
@@ -62,7 +63,7 @@ public final class SinguloKeys {
             }
             for (InteractionHand hand : InteractionHand.values()) {
                 if (mc.player.getItemInHand(hand).getItem() instanceof GravityGauntletItem g && g.supportsCone()) {
-                    PacketDistributor.sendToServer(ToggleAreaPayload.INSTANCE);
+                    SinguloNetwork.sendToServer(ToggleAreaPayload.INSTANCE);
                     break;
                 }
             }

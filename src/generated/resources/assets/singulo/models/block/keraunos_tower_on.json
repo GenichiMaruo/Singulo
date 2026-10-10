@@ -100,7 +100,7 @@
           "texture": "#coil"
         }
       },
-      "neoforge_data": {
+      "forge_data": {
         "block_light": 15,
         "sky_light": 15
       }
@@ -136,7 +136,7 @@
           "texture": "#coil"
         }
       },
-      "neoforge_data": {
+      "forge_data": {
         "block_light": 15,
         "sky_light": 15
       }
@@ -172,7 +172,7 @@
           "texture": "#coil"
         }
       },
-      "neoforge_data": {
+      "forge_data": {
         "block_light": 15,
         "sky_light": 15
       }
@@ -208,7 +208,7 @@
           "texture": "#crown"
         }
       },
-      "neoforge_data": {
+      "forge_data": {
         "block_light": 15,
         "sky_light": 15
       }

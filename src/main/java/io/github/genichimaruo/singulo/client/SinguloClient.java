@@ -10,24 +10,26 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 
-@Mod(value = Singulo.MODID, dist = Dist.CLIENT)
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+
+
 public final class SinguloClient {
-    private static final ResourceLocation STILL = ResourceLocation.withDefaultNamespace("block/water_still");
-    private static final ResourceLocation FLOWING = ResourceLocation.withDefaultNamespace("block/water_flow");
+    private static final ResourceLocation STILL = new ResourceLocation("block/water_still");
+    private static final ResourceLocation FLOWING = new ResourceLocation("block/water_flow");
+
+    public static void init() { new SinguloClient(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()); }
 
     public SinguloClient(IEventBus modBus) {
-        modBus.addListener(SinguloClient::registerScreens);
-        modBus.addListener(SinguloClient::registerExtensions);
+
+
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
@@ -35,31 +37,44 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::addPacks);
         modBus.addListener(SinguloClient::clientSetup);
         modBus.addListener(SinguloKeys::register);
-        NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
-        NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
-        NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
-        NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
-        NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
-        NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
-        NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
-        NeoForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
-        NeoForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
-        NeoForge.EVENT_BUS.addListener(BossSounds::onClientTick);
-        NeoForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
-        NeoForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
+        MinecraftForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
+        MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
+        MinecraftForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(BossSounds::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
+        if (Boolean.getBoolean("singulo.clientSmokeTest")) {
+            MinecraftForge.EVENT_BUS.addListener(SinguloClient::smokeTest);
+        }
+    }
+
+    private static void smokeTest(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
+        var minecraft = net.minecraft.client.Minecraft.getInstance();
+        if (event.phase == net.minecraftforge.event.TickEvent.Phase.END
+                && minecraft.screen instanceof net.minecraft.client.gui.screens.TitleScreen
+                && minecraft.getOverlay() == null) {
+            org.slf4j.LoggerFactory.getLogger(SinguloClient.class).info("Singulo client smoke test passed: title screen and resources loaded");
+            minecraft.stop();
+        }
     }
 
     /** 型として使っている残響の欠片（バニラのアイテム）に使用回数を出す。Singulo のアイテムには説明と作り方・使い道を出す。 */
     private static void onTooltip(ItemTooltipEvent event) {
         describe(event);
-        if (Boolean.TRUE.equals(event.getItemStack().get(SinguloComponents.STABILIZED.get()))) {
+        if (Boolean.TRUE.equals(SinguloComponents.get(event.getItemStack(), SinguloComponents.STABILIZED.get()))) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.catalyst_stabilized").withStyle(ChatFormatting.GOLD));
         }
-        Integer dark = event.getItemStack().get(SinguloComponents.DARK_MATTER.get());
+        Integer dark = SinguloComponents.get(event.getItemStack(), SinguloComponents.DARK_MATTER.get());
         if (dark != null) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.dark_matter", dark).withStyle(ChatFormatting.GRAY));
         }
-        UsesData data = event.getItemStack().get(SinguloComponents.USES.get());
+        UsesData data = SinguloComponents.get(event.getItemStack(), SinguloComponents.USES.get());
         if (data != null && event.getItemStack().is(Items.ECHO_SHARD)) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.uses", data.remaining(), data.max())
                     .withStyle(ChatFormatting.GRAY));
@@ -100,11 +115,7 @@ public final class SinguloClient {
                         return true;
                     }
 
-                    @Override
-                    public net.minecraft.world.phys.AABB getRenderBoundingBox(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be) {
-                        // 異常点（コンソールの3.5ブロック上）の歪みが画面にかかる間は描く
-                        return new net.minecraft.world.phys.AABB(be.getBlockPos()).expandTowards(0, 4, 0).inflate(6);
-                    }
+
                 });
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SHIELD_TOWER.get(),
                 ShieldTowerRenderer::new);
@@ -135,27 +146,34 @@ public final class SinguloClient {
         event.registerLayerDefinition(HorizonWardenRenderer.LAYER, HorizonWardenRenderer::createLayer);
     }
 
-    private static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(SinguloMenus.MACHINE.get(), MachineScreen::new);
-        event.register(SinguloMenus.THERMOELECTRIC_GENERATOR.get(), ThermoelectricGeneratorScreen::new);
-        event.register(SinguloMenus.CATALYST_DEVICE.get(), CatalystDeviceScreen::new);
-        event.register(SinguloMenus.PENROSE_REACTOR.get(), PenroseReactorScreen::new);
-        event.register(SinguloMenus.SMES.get(), SmesScreen::new);
-        event.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
-        event.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
+    private static void registerScreens() {
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.MACHINE.get(), MachineScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.THERMOELECTRIC_GENERATOR.get(), ThermoelectricGeneratorScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.CATALYST_DEVICE.get(), CatalystDeviceScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.PENROSE_REACTOR.get(), PenroseReactorScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.SMES.get(), SmesScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
-    private static void addPacks(net.neoforged.neoforge.event.AddPackFindersEvent event) {
-        event.addPackFinders(Singulo.id("resourcepacks/singulo_hd"), net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
-                Component.translatable("pack.singulo.hd"), net.minecraft.server.packs.repository.PackSource.BUILT_IN, false,
-                net.minecraft.server.packs.repository.Pack.Position.TOP);
+    private static void addPacks(net.minecraftforge.event.AddPackFindersEvent event) {
+        if (event.getPackType() != net.minecraft.server.packs.PackType.CLIENT_RESOURCES) return;
+        event.addRepositorySource(consumer -> {
+            var file = net.minecraftforge.fml.ModList.get().getModFileById(Singulo.MODID).getFile();
+            var resources = new net.minecraft.server.packs.PathPackResources("singulo_hd", file.findResource("resourcepacks/singulo_hd"), false);
+            var pack = net.minecraft.server.packs.repository.Pack.readMetaAndCreate("singulo_hd", Component.translatable("pack.singulo.hd"), false,
+                    id -> resources, net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
+                    net.minecraft.server.packs.repository.Pack.Position.TOP, net.minecraft.server.packs.repository.PackSource.BUILT_IN);
+            if (pack != null) consumer.accept(pack);
+        });
     }
 
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
-    private static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+    private static void clientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
+        event.enqueueWork(SinguloClient::registerScreens);
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
+                io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), new ResourceLocation("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
     }
@@ -197,25 +215,11 @@ public final class SinguloClient {
         }
     }
 
-    private static void registerExtensions(RegisterClientExtensionsEvent event) {
-        for (SinguloFluids.Entry entry : SinguloFluids.ALL.values()) {
-            int color = entry.def().color();
-            event.registerFluidType(new IClientFluidTypeExtensions() {
-                @Override
-                public ResourceLocation getStillTexture() {
-                    return STILL;
-                }
-
-                @Override
-                public ResourceLocation getFlowingTexture() {
-                    return FLOWING;
-                }
-
-                @Override
-                public int getTintColor() {
-                    return color;
-                }
-            }, entry.type().get());
-        }
+    public static IClientFluidTypeExtensions fluidExtensions(int color) {
+        return new IClientFluidTypeExtensions() {
+            public ResourceLocation getStillTexture() { return STILL; }
+            public ResourceLocation getFlowingTexture() { return FLOWING; }
+            public int getTintColor() { return color; }
+        };
     }
 }

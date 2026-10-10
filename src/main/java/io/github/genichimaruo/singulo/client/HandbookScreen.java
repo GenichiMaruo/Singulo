@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -177,7 +177,7 @@ public class HandbookScreen extends Screen {
             return false;
         }
         ClientAdvancements adv = conn.getAdvancements();
-        AdvancementHolder holder = adv.get(Singulo.id(id));
+        Advancement holder = adv.getAdvancements().get(Singulo.id(id));
         if (holder == null) {
             return false;
         }
@@ -290,8 +290,8 @@ public class HandbookScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        renderTransparentBackground(g);
+    public void renderBackground(GuiGraphics g) {
+        super.renderBackground(g);
     }
 
     // ------------------------------------------------------------------ 操作
@@ -300,7 +300,7 @@ public class HandbookScreen extends Screen {
     public boolean mouseClicked(double mx, double my, int button) {
         int[] b = supportPos();
         if (Panel.inside(mx, my, b[0], b[1], b[2], b[3])) {
-            net.minecraft.client.gui.screens.ConfirmLinkScreen.confirmLinkNow(this, SUPPORT_URL);
+            net.minecraft.client.gui.screens.ConfirmLinkScreen.confirmLinkNow(SUPPORT_URL, this, true);
             return true;
         }
         int listTop = top + 20;
@@ -327,7 +327,7 @@ public class HandbookScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double dx, double dy) {
+    public boolean mouseScrolled(double mx, double my, double dy) {
         if (mx < left + LIST_W + 8) {
             int max = Math.max(0, chapters.size() * ROW - (H - 28));
             listScroll = Math.max(0, Math.min(max, listScroll - (int) (dy * ROW)));

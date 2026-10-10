@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities;
+import io.github.genichimaruo.singulo.compat.Capabilities;
 
 /**
  * エネルギーケーブル。隣のケーブル（種類を問わない）と、電力を扱うブロックに自動で接続する。
@@ -92,24 +92,20 @@ public class CableBlock extends BaseEntityBlock {
         return lossPerBlock;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(p -> new CableBlock(p, capacity, lossPerBlock, profile));
-    }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         CONNECTIONS.values().forEach(builder::add);
         builder.add(STRAIGHT);
     }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         // 見た目と同じ形: 断面を伸ばした腕と、中心（まっすぐなら腕と同じ断面、分かれ目なら断面を囲む箱）
         VoxelShape shape = profile.core(state.getValue(STRAIGHT));
         for (var e : CONNECTIONS.entrySet()) {
@@ -130,7 +126,7 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
+    public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
                                      BlockPos pos, BlockPos neighborPos) {
         if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
             cable.invalidateNetwork();
@@ -140,7 +136,7 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean moving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean moving) {
         // ブロックエンティティだけが変わった場合（装置の設置直後など）も接続を取り直す
         if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
             cable.invalidateNetwork();
@@ -156,7 +152,7 @@ public class CableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
             cable.invalidateNetwork();
         }
@@ -168,7 +164,7 @@ public class CableBlock extends BaseEntityBlock {
         if (level.getBlockState(other).getBlock() instanceof CableBlock) {
             return true;
         }
-        return level.getCapability(Capabilities.EnergyStorage.BLOCK, other, dir.getOpposite()) != null;
+        return Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, other, dir.getOpposite()) != null;
     }
 
     @Nullable

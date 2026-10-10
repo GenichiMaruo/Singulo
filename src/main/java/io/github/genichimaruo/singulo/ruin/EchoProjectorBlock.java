@@ -22,7 +22,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * 番人を起こすたびに、封印核が元の場所へ直す。
  */
 public class EchoProjectorBlock extends BaseEntityBlock {
-    public static final MapCodec<EchoProjectorBlock> CODEC = simpleCodec(EchoProjectorBlock::new);
     private static final VoxelShape SHAPE = Shapes.or(Block.box(3, 0, 3, 13, 3, 13), Block.box(5, 3, 5, 11, 10, 11),
             Block.box(4, 10, 4, 12, 13, 12));
 
@@ -30,18 +29,14 @@ public class EchoProjectorBlock extends BaseEntityBlock {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 

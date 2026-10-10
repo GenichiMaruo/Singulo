@@ -102,8 +102,8 @@ public class GuardDockBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("tier", tier);
         tag.putLong("next_wave", nextWave);
         ListTag list = new ListTag();
@@ -114,8 +114,8 @@ public class GuardDockBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         tier = tag.contains("tier") ? Mth.clamp(tag.getInt("tier"), 1, 3) : 1;
         nextWave = tag.getLong("next_wave");
         drones.clear();

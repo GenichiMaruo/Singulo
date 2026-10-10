@@ -22,7 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
+
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -69,7 +69,7 @@ public class SinguloJeiPlugin implements IModPlugin {
             return;
         }
         Map<MachineType, List<MachineRecipe>> byType = new EnumMap<>(MachineType.class);
-        for (RecipeHolder<MachineRecipe> h : Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+        for (MachineRecipe h : Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
             for (MachineType t : MachineType.values()) {
                 if (t.id().equals(h.value().station())) {
                     byType.computeIfAbsent(t, k -> new ArrayList<>()).add(h.value());

@@ -37,10 +37,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * ペンローズ・リアクター（ブラックホール発電機）の炉心制御装置。
@@ -125,7 +125,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
     };
     private final IEnergyStorage energyPort = new EnergyPort();
-    private final net.neoforged.neoforge.fluids.capability.IFluidHandler darkMatterPort = new DarkMatterPort();
+    private final net.minecraftforge.fluids.capability.IFluidHandler darkMatterPort = new DarkMatterPort();
 
     /** ダークマター 1 mB で炉心に加わる質量。 */
     public static final double DARK_MATTER_MASS_PER_MB = 0.01;
@@ -496,7 +496,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 items.setStackInSlot(i, stack.copy());
                 return;
             }
-            if (ItemStack.isSameItemSameComponents(here, stack) && here.getCount() < here.getMaxStackSize()) {
+            if (ItemStack.isSameItemSameTags(here, stack) && here.getCount() < here.getMaxStackSize()) {
                 items.setStackInSlot(i, here.copyWithCount(here.getCount() + 1));
                 return;
             }
@@ -952,7 +952,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 if (n.equals(worldPosition) || Structures.isReactorPart(level.getBlockState(n))) {
                     continue;
                 }
-                IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
+                IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
                 if (target != null && target.canReceive()) {
                     // ケーブルなど mod の口へは int を超えて渡す
                     long sent = io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, budget, false);
@@ -981,19 +981,19 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     /** ダークマターの投入口。光を出さないのでエディントン限界を受けず、そのまま炉心の質量になる（発電はしない）。 */
-    public net.neoforged.neoforge.fluids.capability.IFluidHandler darkMatterInput() {
+    public net.minecraftforge.fluids.capability.IFluidHandler darkMatterInput() {
         return darkMatterPort;
     }
 
-    private final class DarkMatterPort implements net.neoforged.neoforge.fluids.capability.IFluidHandler {
+    private final class DarkMatterPort implements net.minecraftforge.fluids.capability.IFluidHandler {
         @Override
         public int getTanks() {
             return 1;
         }
 
         @Override
-        public net.neoforged.neoforge.fluids.FluidStack getFluidInTank(int tank) {
-            return net.neoforged.neoforge.fluids.FluidStack.EMPTY;
+        public net.minecraftforge.fluids.FluidStack getFluidInTank(int tank) {
+            return net.minecraftforge.fluids.FluidStack.EMPTY;
         }
 
         @Override
@@ -1002,12 +1002,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
 
         @Override
-        public boolean isFluidValid(int tank, net.neoforged.neoforge.fluids.FluidStack stack) {
-            return stack.is(io.github.genichimaruo.singulo.registry.SinguloFluids.get("dark_matter"));
+        public boolean isFluidValid(int tank, net.minecraftforge.fluids.FluidStack stack) {
+            return stack.getFluid().isSame(io.github.genichimaruo.singulo.registry.SinguloFluids.get("dark_matter"));
         }
 
         @Override
-        public int fill(net.neoforged.neoforge.fluids.FluidStack resource, FluidAction action) {
+        public int fill(net.minecraftforge.fluids.FluidStack resource, FluidAction action) {
             if (!isFluidValid(0, resource) || state != State.RUNNING || !formed) {
                 return 0;
             }
@@ -1021,13 +1021,13 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
 
         @Override
-        public net.neoforged.neoforge.fluids.FluidStack drain(net.neoforged.neoforge.fluids.FluidStack resource, FluidAction action) {
-            return net.neoforged.neoforge.fluids.FluidStack.EMPTY;
+        public net.minecraftforge.fluids.FluidStack drain(net.minecraftforge.fluids.FluidStack resource, FluidAction action) {
+            return net.minecraftforge.fluids.FluidStack.EMPTY;
         }
 
         @Override
-        public net.neoforged.neoforge.fluids.FluidStack drain(int maxDrain, FluidAction action) {
-            return net.neoforged.neoforge.fluids.FluidStack.EMPTY;
+        public net.minecraftforge.fluids.FluidStack drain(int maxDrain, FluidAction action) {
+            return net.minecraftforge.fluids.FluidStack.EMPTY;
         }
     }
 
@@ -1194,7 +1194,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.openMenu(this, worldPosition);
+        net.minecraftforge.network.NetworkHooks.openScreen(player, this, worldPosition);
     }
 
     public void dropContents(Level level) {
@@ -1229,9 +1229,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("items", items.serializeNBT());
         writeCore(tag);
         tag.putLong("buffer", buffer);
         tag.putInt("spin_target", spinTarget);
@@ -1270,10 +1270,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("items")) {
-            items.deserializeNBT(registries, tag.getCompound("items"));
+            items.deserializeNBT(tag.getCompound("items"));
         }
         try {
             state = State.valueOf(tag.getString("state"));
@@ -1303,7 +1303,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 描画用に状態・質量・スピンをクライアントへ送る。 */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         writeCore(tag);
         tag.putBoolean("sync", true);

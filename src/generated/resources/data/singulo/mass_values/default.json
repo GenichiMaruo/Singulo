@@ -17,11 +17,11 @@
       "mass": 0.25
     },
     {
-      "tag": "c:crops",
+      "tag": "forge:crops",
       "mass": 0.25
     },
     {
-      "tag": "c:seeds",
+      "tag": "forge:seeds",
       "mass": 0.25
     },
     {
@@ -29,11 +29,11 @@
       "mass": 0.5
     },
     {
-      "tag": "c:sands",
+      "tag": "forge:sand",
       "mass": 0.5
     },
     {
-      "tag": "c:gravels",
+      "tag": "forge:gravel",
       "mass": 0.5
     },
     {
@@ -49,11 +49,11 @@
       "mass": 0.5
     },
     {
-      "tag": "c:cobblestones",
+      "tag": "forge:cobblestone",
       "mass": 1
     },
     {
-      "tag": "c:stones",
+      "tag": "forge:stone",
       "mass": 1
     },
     {
@@ -61,11 +61,11 @@
       "mass": 1
     },
     {
-      "tag": "c:netherracks",
+      "tag": "forge:netherrack",
       "mass": 1
     },
     {
-      "tag": "c:sandstone/blocks",
+      "tag": "forge:sandtone",
       "mass": 1
     },
     {
@@ -113,47 +113,47 @@
       "mass": 1.2
     },
     {
-      "tag": "c:obsidians",
+      "tag": "forge:obsidian",
       "mass": 1.2
     },
     {
-      "tag": "c:storage_blocks/tin",
+      "tag": "forge:storage_blocks/tin",
       "mass": 2.7
     },
     {
-      "tag": "c:storage_blocks/aluminum",
+      "tag": "forge:storage_blocks/aluminum",
       "mass": 2.7
     },
     {
-      "tag": "c:storage_blocks/iron",
+      "tag": "forge:storage_blocks/iron",
       "mass": 3
     },
     {
-      "tag": "c:storage_blocks/copper",
+      "tag": "forge:storage_blocks/copper",
       "mass": 3
     },
     {
-      "tag": "c:storage_blocks/steel",
+      "tag": "forge:storage_blocks/steel",
       "mass": 3
     },
     {
-      "tag": "c:storage_blocks/silver",
+      "tag": "forge:storage_blocks/silver",
       "mass": 4
     },
     {
-      "tag": "c:storage_blocks/lead",
+      "tag": "forge:storage_blocks/lead",
       "mass": 4
     },
     {
-      "tag": "c:storage_blocks/uranium",
+      "tag": "forge:storage_blocks/uranium",
       "mass": 7
     },
     {
-      "tag": "c:storage_blocks/gold",
+      "tag": "forge:storage_blocks/gold",
       "mass": 7
     },
     {
-      "tag": "c:storage_blocks/osmium",
+      "tag": "forge:storage_blocks/osmium",
       "mass": 8
     },
     {
@@ -161,23 +161,23 @@
       "mass": 20
     },
     {
-      "tag": "c:ingots/iron",
+      "tag": "forge:ingots/iron",
       "mass": 0.3333
     },
     {
-      "tag": "c:ingots/copper",
+      "tag": "forge:ingots/copper",
       "mass": 0.3333
     },
     {
-      "tag": "c:ingots/steel",
+      "tag": "forge:ingots/steel",
       "mass": 0.3333
     },
     {
-      "tag": "c:ingots/gold",
+      "tag": "forge:ingots/gold",
       "mass": 0.7778
     },
     {
-      "tag": "c:ingots/netherite",
+      "tag": "forge:ingots/netherite",
       "mass": 2.2222
     },
     {

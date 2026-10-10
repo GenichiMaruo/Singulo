@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GOG",
+    "GFG",
+    "P P"
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "P": {
+      "tag": "forge:plates/steel"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:cosmic_muon_collector"
+  }
+}

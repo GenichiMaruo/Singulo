@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WLW"
+  ],
+  "key": {
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "L": {
+      "item": "singulo:superconducting_wire"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:superconducting_cable"
+  }
+}

@@ -14,10 +14,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 /**
  * ハロー捕集器（段階5）。ペンローズ・リアクターの炉心から RANGE ブロック以内に置くと、炉心の重力で集まった
@@ -134,7 +134,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
             if (tank.isEmpty()) {
                 return;
             }
-            IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, pos.relative(dir), dir.getOpposite());
+            IFluidHandler target = Capabilities.get(level, Capabilities.FluidHandler.BLOCK, pos.relative(dir), dir.getOpposite());
             if (target != null) {
                 int moved = target.fill(tank.getFluid().copy(), IFluidHandler.FluidAction.EXECUTE);
                 if (moved > 0) {
@@ -146,7 +146,7 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
 
     @Override
     public void openMenu(ServerPlayer player) {
-        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.HALO_COLLECTOR, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> {
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.HALO_COLLECTOR, new net.minecraftforge.items.ItemStackHandler(0), i -> {
             PenroseReactorBlockEntity core = level == null ? null : PenroseReactorBlockEntity.nearestRunning(level, worldPosition, RANGE);
             return switch (i) {
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Halo.RATE -> rate;
@@ -162,17 +162,17 @@ public class HaloCollectorBlockEntity extends BlockEntity implements AbstractMac
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("tank", tank.writeToNBT(new CompoundTag()));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("carry", carry);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompound("tank"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        tank.readFromNBT(tag.getCompound("tank"));
         energy.setEnergy(tag.getInt("energy"));
         carry = tag.getDouble("carry");
     }

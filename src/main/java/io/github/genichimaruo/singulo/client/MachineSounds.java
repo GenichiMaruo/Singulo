@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 
 /**
  * 装置の動作音（クライアント）。近くで動いている（光っている）装置ごとに、その装置の音をくり返し鳴らす。
@@ -92,7 +92,8 @@ final class MachineSounds {
         return Singulo.MODID.equals(id.getNamespace()) ? BY_BLOCK.get(id.getPath()) : null;
     }
 
-    static void onClientTick(ClientTickEvent.Post event) {
+    static void onClientTick(ClientTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (mc.level == null || player == null) {

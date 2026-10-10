@@ -8,8 +8,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
 
 /**
  * 効果音。名前・ファイル・字幕・聞こえる距離は tools/gen_data.py の SOUNDS（assets/singulo/sounds.json を作る）と同じ。
@@ -17,7 +17,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  */
 public final class SinguloSounds {
     public static final DeferredRegister<SoundEvent> REGISTER = DeferredRegister.create(Registries.SOUND_EVENT, Singulo.MODID);
-    private static final Map<String, DeferredHolder<SoundEvent, SoundEvent>> BY_NAME = new HashMap<>();
+    private static final Map<String, RegistryObject<SoundEvent>> BY_NAME = new HashMap<>();
 
     static final String[] NAMES = {
             "black_hole.ambient", "black_hole.formation",
@@ -57,15 +57,15 @@ public final class SinguloSounds {
     }
 
     /** 稼働中のブラックホールのうなり（くり返し）。 */
-    public static final DeferredHolder<SoundEvent, SoundEvent> BLACK_HOLE_AMBIENT = BY_NAME.get("black_hole.ambient");
+    public static final RegistryObject<SoundEvent> BLACK_HOLE_AMBIENT = BY_NAME.get("black_hole.ambient");
     /** ブラックホールができる瞬間（リアクターの点火、ウォーデンの特異点）。 */
-    public static final DeferredHolder<SoundEvent, SoundEvent> BLACK_HOLE_FORMATION = BY_NAME.get("black_hole.formation");
+    public static final RegistryObject<SoundEvent> BLACK_HOLE_FORMATION = BY_NAME.get("black_hole.formation");
 
     private SinguloSounds() {}
 
     /** 名前で引く（NAMES にないものは例外）。 */
     public static SoundEvent get(String name) {
-        DeferredHolder<SoundEvent, SoundEvent> h = BY_NAME.get(name);
+        RegistryObject<SoundEvent> h = BY_NAME.get(name);
         if (h == null) {
             throw new IllegalArgumentException("効果音がない: " + name);
         }

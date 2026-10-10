@@ -30,7 +30,7 @@ public class TimeCrystalIncubatorBlockEntity extends MachineBlockEntity {
             return result;
         }
         int max = Math.max(1, (int) Math.round(UsesHelper.baseMax(result) * purity));
-        result.set(SinguloComponents.USES.get(), new UsesData(0, max, 0));
+        SinguloComponents.set(result, SinguloComponents.USES.get(), new UsesData(0, max, 0));
         return result;
     }
 }

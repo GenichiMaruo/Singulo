@@ -102,7 +102,7 @@ final class SideCube {
             int b = Math.min(255, (int) ((c & 0xFF) * shade));
             // 裏表のどちらから描いても見えるよう、両方の巻き順で描く
             for (int i : new int[]{0, 3, 2, 1, 0, 1, 2, 3}) {
-                vc.addVertex(pose, q.xs()[i], q.ys()[i], 0).setColor(r, gr, b, 255);
+                vc.vertex(pose, q.xs()[i], q.ys()[i], 0).color(r, gr, b, 255).endVertex();
             }
         }
         g.flush();

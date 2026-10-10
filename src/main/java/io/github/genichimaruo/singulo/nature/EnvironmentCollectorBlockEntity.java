@@ -14,8 +14,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * その場所に置かないと何も集まらない収集装置の共通部分（深海圧力収集器・虚空捕集器）。電力は要らない。
@@ -31,7 +31,7 @@ public abstract class EnvironmentCollectorBlockEntity extends BlockEntity implem
             setChanged();
         }
     };
-    private final IItemHandler automation = new net.neoforged.neoforge.items.wrapper.RangedWrapper(output, 0, 1) {
+    private final IItemHandler automation = new net.minecraftforge.items.wrapper.RangedWrapper(output, 0, 1) {
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             return stack;
@@ -110,16 +110,16 @@ public abstract class EnvironmentCollectorBlockEntity extends BlockEntity implem
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("output", output.serializeNBT());
         tag.putDouble("progress", progress);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        output.deserializeNBT(tag.getCompound("output"));
         progress = tag.getDouble("progress");
     }
 }

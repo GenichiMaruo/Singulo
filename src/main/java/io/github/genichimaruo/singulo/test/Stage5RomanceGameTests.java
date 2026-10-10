@@ -32,10 +32,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.common.ForgeMod;
+
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /**
  * 段階5の特異点技術の確認。シールドとティプラーは範囲が広く周りのテストに効いてしまうので、それぞれ別の組（batch）にする。
@@ -62,9 +62,9 @@ public final class Stage5RomanceGameTests {
     @GameTest(template = EMPTY)
     public static void timeFieldsDilateAccelerateAndCancel(GameTestHelper helper) {
         Level level = helper.getLevel();
-        BlockPos at = helper.absolutePos(new BlockPos(4, 1, 4));
-        BlockPos reactor = helper.absolutePos(new BlockPos(0, 1, 0));
-        BlockPos tipler = helper.absolutePos(new BlockPos(7, 1, 7));
+        BlockPos at = helper.absolutePos(new BlockPos(10004, 1, 10004));
+        BlockPos reactor = helper.absolutePos(new BlockPos(10000, 1, 10000));
+        BlockPos tipler = helper.absolutePos(new BlockPos(10007, 1, 10007));
         try {
             TimeFields.set(level, reactor, reactor, 10, false);
             helper.assertTrue(TimeFields.speed(level, at) == TimeFields.DILATION_SPEED
@@ -94,7 +94,7 @@ public final class Stage5RomanceGameTests {
     public static void tiplerCylinderDoublesFurnaceSpeed(GameTestHelper helper) {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
                 net.minecraft.core.Direction.SOUTH, 9);
-        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(TIPLER);
+        TiplerCylinderBlockEntity tipler = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TIPLER);
         keepPowered(helper, tipler);
         tipler.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         tipler.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 2), false);
@@ -102,7 +102,7 @@ public final class Stage5RomanceGameTests {
         // 普通なら200 tick かかる精錬が、×2 なら100 tick ほどで終わる
         BlockPos furnacePos = new BlockPos(7, 1, 0);
         helper.setBlock(furnacePos, Blocks.FURNACE);
-        FurnaceBlockEntity furnace = helper.getBlockEntity(furnacePos);
+        FurnaceBlockEntity furnace = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, furnacePos);
         furnace.setItem(0, new ItemStack(Items.RAW_IRON));
         furnace.setItem(1, new ItemStack(Items.COAL));
 
@@ -130,7 +130,7 @@ public final class Stage5RomanceGameTests {
         // 観察窓を1枚外す（中に入れてしまう）
         helper.getLevel().setBlockAndUpdate(TestBuild.at(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER,
                 TIPLER, net.minecraft.core.Direction.SOUTH, 9, 2, 4, 0), Blocks.AIR.defaultBlockState());
-        TiplerCylinderBlockEntity tipler = helper.getBlockEntity(TIPLER);
+        TiplerCylinderBlockEntity tipler = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TIPLER);
         keepPowered(helper, tipler);
         tipler.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         tipler.fuel().insertItem(0, new ItemStack(item("exotic_matter")), false);
@@ -149,7 +149,7 @@ public final class Stage5RomanceGameTests {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.SHIELD_TOWER, SHIELD,
                 net.minecraft.core.Direction.SOUTH, 9);
         BlockPos core = SHIELD;
-        ShieldTowerBlockEntity shield = helper.getBlockEntity(core);
+        ShieldTowerBlockEntity shield = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, core);
         keepPowered(helper, shield);
         shield.catalystSlot().insertItem(0, new ItemStack(item(catalyst)), false);
         return shield;
@@ -162,7 +162,7 @@ public final class Stage5RomanceGameTests {
     @GameTest(template = HUGE, batch = "shield_permit", timeoutTicks = 80)
     public static void shieldPermitLocksOutsiders(GameTestHelper helper) {
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = TestBuild.mockPlayer(helper);
         ItemStack permit = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.SHIELD_PERMIT.get());
         shield.permit().setStackInSlot(0, permit);
         BlockPos inside = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -172,14 +172,14 @@ public final class Stage5RomanceGameTests {
             helper.assertTrue(!ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "だれも登録されていないのに止められた");
             // ほかの人だけを登録する
             ItemStack card = shield.permit().getStackInSlot(0);
-            net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA, card, tag -> {
+            { net.minecraft.nbt.CompoundTag tag = card.getOrCreateTag();
                 net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
                 net.minecraft.nbt.CompoundTag other = new net.minecraft.nbt.CompoundTag();
                 other.putUUID("id", java.util.UUID.randomUUID());
                 other.putString("name", "someone");
                 list.add(other);
                 tag.put("permit_members", list);
-            });
+            }
             helper.assertTrue(ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "登録されていない人が止められない");
             io.github.genichimaruo.singulo.item.ShieldPermitItem.add(card, player);
             helper.assertTrue(!ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "登録した人が止められた");
@@ -205,7 +205,7 @@ public final class Stage5RomanceGameTests {
             helper.getLevel().explode(null, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 3.0F,
                     Level.ExplosionInteraction.TNT);
             Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 1, 4));
-            helper.assertTrue(!EventHooks.canEntityGrief(helper.getLevel(), zombie), "範囲内のモブがブロックを荒らせる");
+            helper.assertTrue(!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(helper.getLevel(), zombie), "範囲内のモブがブロックを荒らせる");
             helper.assertTrue(!ShieldTowerBlockEntity.shielded(helper.getLevel(), zombie.position(), 5),
                     "時間結晶触媒なのに湧き止めまで効いている");
             zombie.discard();
@@ -239,7 +239,7 @@ public final class Stage5RomanceGameTests {
     public static void advancedAnchorScalesAndEmbedsCore(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED.get());
-        AdvancedWorldlineAnchorBlockEntity anchor = helper.getBlockEntity(pos);
+        AdvancedWorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         anchor.energy().setEnergy(anchor.energy().getMaxEnergyStored());
         anchor.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         helper.runAtTickTime(2, () -> {
@@ -312,42 +312,42 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(template = EMPTY)
     public static void metricDriveChangesGravityAndUsesExoticMatter(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
             player.getAbilities().instabuild = false;
             ItemStack drive = new ItemStack(SinguloItems.METRIC_DRIVE.get());
-            drive.set(SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.LOW_GRAVITY.ordinal());
+            SinguloComponents.set(drive, SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.LOW_GRAVITY.ordinal());
             player.getInventory().setItem(0, drive);
             player.getInventory().setItem(1, new ItemStack(item("exotic_matter"), 2));
-            double normal = player.getAttributeValue(Attributes.GRAVITY);
+            double normal = player.getAttributeValue(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
             MetricDriveItem.tick(player);
             ItemStack held = player.getInventory().getItem(0);
-            helper.assertTrue(Math.abs(player.getAttributeValue(Attributes.GRAVITY) - normal * 0.25) < 1e-9,
-                    "低重力で重力が ×0.25 にならない: " + player.getAttributeValue(Attributes.GRAVITY));
+            helper.assertTrue(Math.abs(player.getAttributeValue(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get()) - normal * 0.25) < 1e-9,
+                    "低重力で重力が ×0.25 にならない: " + player.getAttributeValue(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get()));
             helper.assertTrue(player.getInventory().getItem(1).getCount() == 1, "エキゾチック物質を使っていない");
             helper.assertTrue(ExoticCharge.get(held) == MetricDriveItem.CHARGE_PER_MATTER - 1, "残量が減らない");
 
-            held.set(SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.ZERO_G.ordinal());
+            SinguloComponents.set(held, SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.ZERO_G.ordinal());
             MetricDriveItem.tick(player);
-            helper.assertTrue(player.getAttributeValue(NeoForgeMod.CREATIVE_FLIGHT) > 0, "無重力で飛べない");
-            helper.assertTrue(Math.abs(player.getAttributeValue(Attributes.GRAVITY) - normal) < 1e-9, "低重力が残っている");
+            helper.assertTrue(player.getAttributeValue(io.github.genichimaruo.singulo.compat.LegacyAttributes.FLIGHT.get()) > 0, "無重力で飛べない");
+            helper.assertTrue(Math.abs(player.getAttributeValue(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get()) - normal) < 1e-9, "低重力が残っている");
 
-            held.set(SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.HIGH_GRAVITY.ordinal());
+            SinguloComponents.set(held, SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.HIGH_GRAVITY.ordinal());
             MetricDriveItem.tick(player);
             helper.assertTrue(player.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE) >= 1, "高重力でノックバック無効にならない");
-            helper.assertTrue(player.getAttributeValue(NeoForgeMod.CREATIVE_FLIGHT) == 0, "飛行が残っている");
+            helper.assertTrue(player.getAttributeValue(io.github.genichimaruo.singulo.compat.LegacyAttributes.FLIGHT.get()) == 0, "飛行が残っている");
 
-            held.set(SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.OFF.ordinal());
+            SinguloComponents.set(held, SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.OFF.ordinal());
             MetricDriveItem.tick(player);
             helper.assertTrue(player.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE) == 0
-                    && Math.abs(player.getAttributeValue(Attributes.GRAVITY) - normal) < 1e-9, "停止しても効果が残る");
+                    && Math.abs(player.getAttributeValue(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get()) - normal) < 1e-9, "停止しても効果が残る");
 
             // 残量もエキゾチック物質もなければ効かない
-            held.set(SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.LOW_GRAVITY.ordinal());
-            held.set(SinguloComponents.EXOTIC_CHARGE.get(), 0);
+            SinguloComponents.set(held, SinguloComponents.GRAVITY_MODE.get(), MetricDriveItem.Mode.LOW_GRAVITY.ordinal());
+            SinguloComponents.set(held, SinguloComponents.EXOTIC_CHARGE.get(), 0);
             player.getInventory().setItem(1, ItemStack.EMPTY);
             MetricDriveItem.tick(player);
-            helper.assertTrue(Math.abs(player.getAttributeValue(Attributes.GRAVITY) - normal) < 1e-9,
+            helper.assertTrue(Math.abs(player.getAttributeValue(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get()) - normal) < 1e-9,
                     "エキゾチック物質がないのに効く");
             helper.succeed();
         } finally {

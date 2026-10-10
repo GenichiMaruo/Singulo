@@ -12,8 +12,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 重力パネル: 受電器からつながったパネルへの配電（近い順）、見た目の接続、乗ったときの重力。 */
 @GameTestHolder(Singulo.MODID)
@@ -37,7 +37,7 @@ public final class GravityPanelGameTests {
         for (int x = 2; x <= 6; x++) {
             helper.setBlock(new BlockPos(x, 1, 1), x == 4 ? SinguloBlocks.HIGH_GRAVITY_PANEL.get() : SinguloBlocks.LOW_GRAVITY_PANEL.get());
         }
-        GravityReceiverBlockEntity be = helper.getBlockEntity(receiver);
+        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
         int per = GravityReceiverBlockEntity.perPanel();
         helper.onEachTick(() -> be.energy().receiveLong(3L * per, false));
         helper.runAtTickTime(30, () -> {
@@ -57,7 +57,7 @@ public final class GravityPanelGameTests {
         BlockPos panel = new BlockPos(2, 1, 1);
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(panel, SinguloBlocks.LOW_GRAVITY_PANEL.get());
-        GravityReceiverBlockEntity be = helper.getBlockEntity(receiver);
+        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
         helper.onEachTick(() -> {
             if (!be.isRemoved()) {
                 be.energy().receiveLong(1_000, false);
@@ -81,7 +81,7 @@ public final class GravityPanelGameTests {
         helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
         helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
-        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = helper.getBlockEntity(gen);
+        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, gen);
         // 防具立て（AI がなく、まっすぐ落ちる）
         var pig = helper.spawn(EntityType.ARMOR_STAND, new BlockPos(2, 10, 2));
         float health = pig.getHealth();
@@ -116,7 +116,7 @@ public final class GravityPanelGameTests {
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(panel, SinguloBlocks.LOW_GRAVITY_PANEL.get());
         helper.setBlock(new BlockPos(5, 1, 2), Blocks.STONE);
-        GravityReceiverBlockEntity be = helper.getBlockEntity(receiver);
+        GravityReceiverBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
         helper.onEachTick(() -> be.energy().receiveLong(1_000, false));
         // 防具立て（AI を持たず、重力で動く生き物）
         var stand = helper.spawn(EntityType.ARMOR_STAND, panel.above());

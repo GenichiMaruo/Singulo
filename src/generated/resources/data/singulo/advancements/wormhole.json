@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:wormhole_port"
+    },
+    "title": {
+      "translate": "advancement.singulo.wormhole.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.wormhole.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "wormhole_open"
+      }
+    }
+  },
+  "parent": "singulo:core"
+}

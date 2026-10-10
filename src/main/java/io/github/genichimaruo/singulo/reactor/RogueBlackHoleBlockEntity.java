@@ -167,16 +167,16 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
     // ------------------------------------------------------------------ 保存と同期
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putDouble("mass", mass);
         tag.putDouble("spin", spin);
         tag.putLong("last_tick", lastTick);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("mass")) {
             mass = tag.getDouble("mass");
             spin = tag.getDouble("spin");
@@ -187,7 +187,7 @@ public class RogueBlackHoleBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         tag.putDouble("mass", mass);
         tag.putDouble("spin", spin);

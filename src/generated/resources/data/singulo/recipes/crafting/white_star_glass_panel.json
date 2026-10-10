@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LLL",
+    "LQL",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "singulo:white_glass_panel"
+    },
+    "Q": {
+      "tag": "forge:gems/quartz"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "singulo:white_star_glass_panel"
+  }
+}

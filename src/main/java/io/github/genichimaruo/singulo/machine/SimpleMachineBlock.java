@@ -43,10 +43,6 @@ public class SimpleMachineBlock<T extends BlockEntity> extends AbstractMachineBl
         this.clientTicker = clientTicker;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(p -> new SimpleMachineBlock<>(p, type, factory, ticker, clientTicker));
-    }
 
     @Nullable
     @Override

@@ -19,12 +19,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
+
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
 
 /**
  * ワームホール・ポート（段階5）。ワームホールの口から PORT_RANGE ブロック以内に置くと、向こう側の口の近くにある
@@ -144,8 +144,8 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
         fluidTargets = f;
     }
 
-    private static <T> void add(List<T> list, Level level, BlockCapability<T, Direction> cap, BlockPos pos, Direction side) {
-        T t = level.getCapability(cap, pos, side);
+    private static <T> void add(List<T> list, Level level, net.minecraftforge.common.capabilities.Capability<T> cap, BlockPos pos, Direction side) {
+        T t = Capabilities.get(level, cap, pos, side);
         if (t != null && !list.contains(t)) {
             list.add(t);
         }
@@ -194,7 +194,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     @Override
     public void openMenu(ServerPlayer player) {
         refresh();
-        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.WORMHOLE_PORT, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> {
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.WORMHOLE_PORT, new net.minecraftforge.items.ItemStackHandler(0), i -> {
             refresh();
             return switch (i) {
                 case io.github.genichimaruo.singulo.machine.DeviceMenu.Port.STATE -> state();
@@ -432,14 +432,14 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     }
 
     @Override
-    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("channel", channel);
     }
 
     @Override
-    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(net.minecraft.nbt.CompoundTag tag) {
+        super.load(tag);
         channel = tag.getInt("channel");
     }
 
@@ -508,7 +508,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                     if (filled >= budget) {
                         break;
                     }
-                    filled += h.fill(resource.copyWithAmount(budget - filled), action);
+                    filled += h.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, budget - filled), action);
                 }
             } finally {
                 busy = false;
@@ -533,7 +533,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
                     if (drained >= budget) {
                         break;
                     }
-                    drained += h.drain(resource.copyWithAmount(budget - drained), action).getAmount();
+                    drained += h.drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, budget - drained), action).getAmount();
                 }
             } finally {
                 busy = false;
@@ -541,7 +541,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
             if (action.execute()) {
                 m.useFluid(drained);
             }
-            return drained == 0 ? FluidStack.EMPTY : resource.copyWithAmount(drained);
+            return drained == 0 ? FluidStack.EMPTY : io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(resource, drained);
         }
 
         @Override
@@ -550,7 +550,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
             for (IFluidHandler h : fluidTargets) {
                 FluidStack peek = h.drain(maxDrain, FluidAction.SIMULATE);
                 if (!peek.isEmpty()) {
-                    return drain(peek.copyWithAmount(maxDrain), action);
+                    return drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(peek, maxDrain), action);
                 }
             }
             return FluidStack.EMPTY;

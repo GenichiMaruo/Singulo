@@ -416,8 +416,8 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         float x = Mth.cos(theta) * Mth.cos(phi);
         float y = Mth.sin(theta);
         float z = Mth.cos(theta) * Mth.sin(phi);
-        vc.addVertex(last, x * r, y * r, z * r).setColor(0, 0, 0, 255).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(0).setNormal(last, x, y, z);
+        vc.vertex(last.pose(), x * r, y * r, z * r).color(0, 0, 0, 255).uv(0, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0).normal(last.normal(), x, y, z).endVertex();
     }
 
     /**
@@ -462,8 +462,8 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
 
     private static void diskVertex(VertexConsumer vc, PoseStack.Pose last, float x, float z, int r, int g, int b, int a,
                                    float ny) {
-        vc.addVertex(last, x, 0, z).setColor(r, g, b, a).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, ny, 0);
+        vc.vertex(last.pose(), x, 0, z).color(r, g, b, a).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(LightTexture.FULL_BRIGHT).normal(last.normal(), 0, ny, 0).endVertex();
     }
 
     @Override
@@ -476,7 +476,6 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
         return 128;
     }
 
-    @Override
     public AABB getRenderBoundingBox(PenroseReactorBlockEntity be) {
         return new AABB(be.getBlockPos().above(Structures.CONTROLLER_BELOW_CENTER)).inflate(Structures.REACTOR_RADIUS + 8); // 重力レンズは構造の外まで届く
     }

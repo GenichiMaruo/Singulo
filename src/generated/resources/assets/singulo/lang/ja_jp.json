@@ -448,7 +448,7 @@
   "desc.singulo.stardust_cluster": "隕石の溶融殻に育つ、宇宙から運ばれた微粒子の結晶。壊すと星屑が出る。",
   "desc.singulo.steel_blend": "鉄と石炭を混ぜた鋼鉄の原料。溶鉱炉で焼くと鋼鉄インゴットになる。",
   "desc.singulo.steel_ingot": "Singulo の装置の骨組みになる基本の金属。他modの鋼鉄も使える。",
-  "desc.singulo.steel_plate": "圧縮機で鋼鉄をのばした板。外装や部品に広く使う。他modの鋼板（共通タグ c:plates/steel）も使える。",
+  "desc.singulo.steel_plate": "圧縮機で鋼鉄をのばした板。外装や部品に広く使う。他modの鋼板（共通タグ forge:plates/steel）も使える。",
   "desc.singulo.strange_matter": "ストレンジレットに変えられた超高密度の物質。良い燃料になる。",
   "desc.singulo.strangelet": "周りのブロックを少しずつストレンジ物質に変える。磁気瓶で回収する。",
   "desc.singulo.striped_ruin_panel": "かつて光っていた帯の残る旧文明の建材。",

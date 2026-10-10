@@ -16,8 +16,4 @@ public class PartBlock extends Block implements MultiblockPart {
         return role;
     }
 
-    @Override
-    protected MapCodec<? extends Block> codec() {
-        return simpleCodec(p -> new PartBlock(p, role));
-    }
 }

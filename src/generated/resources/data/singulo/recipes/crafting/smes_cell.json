@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "POP",
+    "OFO",
+    "POP"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:smes_cell"
+  }
+}

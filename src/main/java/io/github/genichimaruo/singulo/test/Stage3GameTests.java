@@ -20,11 +20,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 段階3（量子）の装置の動作確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -42,7 +42,7 @@ public final class Stage3GameTests {
     /** 装置を置き、テストの間ずっと電力を満たしておく（電源の代わり）。 */
     private static MachineBlockEntity poweredMachine(GameTestHelper helper, MachineType type) {
         helper.setBlock(POS, SinguloBlocks.MACHINES.get(type).get());
-        MachineBlockEntity be = helper.getBlockEntity(POS);
+        MachineBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
         helper.onEachTick(() -> be.energy().setEnergy(be.energy().getMaxEnergyStored()));
         return be;
     }
@@ -114,8 +114,8 @@ public final class Stage3GameTests {
         BlockPos b = new BlockPos(5, 1, 5);
         helper.setBlock(a, SinguloBlocks.QUANTUM_HEAT_ENGINE.get());
         helper.setBlock(b, SinguloBlocks.QUANTUM_HEAT_ENGINE.get());
-        QuantumHeatEngineBlockEntity bose = helper.getBlockEntity(a);
-        QuantumHeatEngineBlockEntity muon = helper.getBlockEntity(b);
+        QuantumHeatEngineBlockEntity bose = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, a);
+        QuantumHeatEngineBlockEntity muon = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, b);
         bose.catalystSlot().insertItem(0, new ItemStack(item("bose_condensate_catalyst")), false);
         muon.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
         helper.runAtTickTime(10, () -> {
@@ -131,7 +131,7 @@ public final class Stage3GameTests {
     private static void blastDirt(GameTestHelper helper, boolean powered) {
         BlockPos stabilizerPos = new BlockPos(1, 1, 1);
         helper.setBlock(stabilizerPos, SinguloBlocks.INERTIAL_STABILIZER.get());
-        InertialStabilizerBlockEntity stabilizer = helper.getBlockEntity(stabilizerPos);
+        InertialStabilizerBlockEntity stabilizer = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, stabilizerPos);
         if (powered) {
             stabilizer.energy().setEnergy(stabilizer.energy().getMaxEnergyStored());
         }

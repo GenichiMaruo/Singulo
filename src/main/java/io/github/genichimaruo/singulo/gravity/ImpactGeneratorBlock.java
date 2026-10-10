@@ -25,16 +25,11 @@ import net.minecraft.world.phys.BlockHitResult;
  * ためた電力は、接している重力パネルの集まりへ配る。
  */
 public class ImpactGeneratorBlock extends GravityReceiverBlock {
-    public static final MapCodec<ImpactGeneratorBlock> CODEC = simpleCodec(ImpactGeneratorBlock::new);
 
     public ImpactGeneratorBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override
@@ -62,7 +57,12 @@ public class ImpactGeneratorBlock extends GravityReceiverBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ImpactGeneratorBlockEntity be) {
             player.displayClientMessage(Component.translatable("message.singulo.impact_generator.status",
                     be.stored(), ImpactGeneratorBlockEntity.CAPACITY, be.activePanels(), be.panels()), true);

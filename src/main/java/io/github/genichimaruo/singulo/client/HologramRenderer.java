@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 
 /**
  * ホロ投影機の投影（クライアントだけ）。足りない位置には半分の大きさの見本ブロックと水色の枠、
@@ -66,7 +66,7 @@ public final class HologramRenderer {
         Vec3 cam = event.getCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         int wrong = 0;
-        float pulse = 0.55F + 0.25F * (float) Math.sin((level.getGameTime() + event.getPartialTick().getGameTimeDeltaPartialTick(false)) * 0.15);
+        float pulse = 0.55F + 0.25F * (float) Math.sin((level.getGameTime() + event.getPartialTick()) * 0.15);
         for (Map.Entry<BlockPos, BlockState> e : layout.entrySet()) {
             BlockPos p = e.getKey();
             BlockState want = e.getValue();

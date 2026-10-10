@@ -6,8 +6,8 @@ import io.github.genichimaruo.singulo.Singulo;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.model.BakedModelWrapper;
+import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.model.BakedModelWrapper;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -41,7 +41,7 @@ public final class StaffTipTracker {
     /** モデルの読み込みのあと、杖のモデルを包んで、描く位置を覚えられるようにする。 */
     static void wrapModel(ModelEvent.ModifyBakingResult event) {
         for (var e : TIPS.entrySet()) {
-            ModelResourceLocation key = ModelResourceLocation.inventory(Singulo.id(e.getKey()));
+            ModelResourceLocation key = new ModelResourceLocation(Singulo.id(e.getKey()), "inventory");
             BakedModel original = event.getModels().get(key);
             if (original != null) {
                 event.getModels().put(key, new Tracking(original, e.getValue()[0], e.getValue()[1]));

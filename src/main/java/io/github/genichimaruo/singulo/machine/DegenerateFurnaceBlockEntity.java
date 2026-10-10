@@ -15,9 +15,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
 /**
  * 縮退熱炉のコントローラ（ティア4の発電機、5×5×7 のマルチブロック）。上下のピストンで圧縮ブロックLv2 を押しつぶし、
@@ -176,16 +176,16 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("fuel", fuel.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("fuel", fuel.serializeNBT());
         tag.putInt("burn", burn);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        fuel.deserializeNBT(registries, tag.getCompound("fuel"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        fuel.deserializeNBT(tag.getCompound("fuel"));
         burn = tag.getInt("burn");
     }
 }

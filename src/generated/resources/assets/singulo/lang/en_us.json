@@ -448,7 +448,7 @@
   "desc.singulo.stardust_cluster": "Crystals of cosmic grains that grow on meteorite crust. Break them for stardust.",
   "desc.singulo.steel_blend": "A mix of iron and coal. Smelt it in a blast furnace to get steel.",
   "desc.singulo.steel_ingot": "The basic structural metal. Steel from other mods works too.",
-  "desc.singulo.steel_plate": "Pressed steel used for casings and parts. Steel plates from other mods (c:plates/steel) work too.",
+  "desc.singulo.steel_plate": "Pressed steel used for casings and parts. Steel plates from other mods (forge:plates/steel) work too.",
   "desc.singulo.strange_matter": "Ultra-dense matter left by strangelets. Worth 100 mass and usable for degenerate shells.",
   "desc.singulo.strangelet": "Converts nearby blocks into strange matter. Contain it with a Magnetic Bottle.",
   "desc.singulo.striped_ruin_panel": "Ancient panel with a long-dead light band.",

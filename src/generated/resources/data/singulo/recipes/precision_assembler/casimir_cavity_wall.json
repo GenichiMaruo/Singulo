@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "forge:glass_blocks/colorless"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:casimir_cavity_wall",
+    "count": 4
+  }
+}

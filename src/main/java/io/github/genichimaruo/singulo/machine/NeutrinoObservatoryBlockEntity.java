@@ -18,8 +18,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.common.Tags;
+import io.github.genichimaruo.singulo.network.SinguloNetwork;
 
 /**
  * ニュートリノ観測所（設置型のニュートリノ・スキャナー）。電力を使い、半径 RADIUS の中の鉱石と遺構のブロックを
@@ -114,8 +114,8 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
             if (display) {
                 ScanPayload payload = new ScanPayload(List.copyOf(ores), List.copyOf(ruins));
                 for (ServerPlayer player : level.players()) {
-                    if (player.blockPosition().distSqr(center) <= SHOW_RANGE * SHOW_RANGE && player.connection.hasChannel(ScanPayload.TYPE)) {
-                        PacketDistributor.sendToPlayer(player, payload);
+                    if (player.blockPosition().distSqr(center) <= SHOW_RANGE * SHOW_RANGE) {
+                        SinguloNetwork.sendToPlayer(player, payload);
                     }
                 }
             }
@@ -136,16 +136,16 @@ public class NeutrinoObservatoryBlockEntity extends BlockEntity implements Abstr
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("energy", energy.getEnergyStored());
         tag.putBoolean("display", display);
         tag.putInt("tier", tier);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         energy.setEnergy(tag.getInt("energy"));
         if (tag.contains("display")) {
             display = tag.getBoolean("display");

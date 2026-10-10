@@ -64,9 +64,9 @@ public abstract class RuinBoss extends Monster {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(EMERGE, 0);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(EMERGE, 0);
     }
 
     /** 出現の演出の残り tick。 */
@@ -148,7 +148,7 @@ public abstract class RuinBoss extends Monster {
         boolean reset = !ServerConfig.SPEC.isLoaded() || ServerConfig.WARDEN_RESET_ON_LEAVE.get();
         if (emptyChecks >= RESET_CHECKS && reset) {
             GuardianCoreBlockEntity core = core(level);
-            if (core != null) {
+            if (core != null && core.ownsBoss(this)) {
                 core.onBossReset(level);
             }
             discard();
@@ -186,7 +186,7 @@ public abstract class RuinBoss extends Monster {
         super.die(source);
         if (level() instanceof ServerLevel level && !isMinion()) {
             GuardianCoreBlockEntity core = core(level);
-            if (core != null) {
+            if (core != null && core.ownsBoss(this)) {
                 core.onBossDefeated(level);
             }
         }
@@ -236,7 +236,7 @@ public abstract class RuinBoss extends Monster {
     }
 
     @Override
-    public boolean canChangeDimensions(Level from, Level to) {
+    public boolean canChangeDimensions() {
         return false;
     }
 
@@ -267,7 +267,7 @@ public abstract class RuinBoss extends Monster {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         entityData.set(EMERGE, tag.getInt("emerge"));
-        home = NbtUtils.readBlockPos(tag, "home").orElse(null);
+        home = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(tag, "home").orElse(null);
         if (home != null) {
             restrictTo(home, ARENA_RADIUS);
         }

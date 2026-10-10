@@ -8,7 +8,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 
 /**
  * 雷ガラス（フルグライト）のでき方。雷が砂に落ちると、砂が一瞬で溶けて固まる（実在の閃電岩）。

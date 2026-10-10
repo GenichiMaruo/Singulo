@@ -85,7 +85,7 @@ public class SecurityDroneRenderer extends MobRenderer<SecurityDrone, SecurityDr
         public void render(PoseStack pose, MultiBufferSource buffers, int light, SecurityDrone drone, float limbSwing,
                            float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
             VertexConsumer vc = buffers.getBuffer(GLOW[Mth.clamp(drone.tier(), 1, 3) - 1]);
-            getParentModel().renderToBuffer(pose, vc, 0xF00000, OverlayTexture.NO_OVERLAY);
+            getParentModel().renderToBuffer(pose, vc, 0xF00000, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
         }
     }
 

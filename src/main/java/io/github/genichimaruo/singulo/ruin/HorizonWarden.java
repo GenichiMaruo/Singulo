@@ -186,22 +186,22 @@ public class HorizonWarden extends Monster {
                 .add(Attributes.MOVEMENT_SPEED, 0.28)
                 .add(Attributes.FOLLOW_RANGE, 32)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0)
-                .add(Attributes.STEP_HEIGHT, 1.0);
+                .add(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get(), 1.0);
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(PHASE, 1);
-        builder.define(BEAM_CHARGE, 0);
-        builder.define(BEAM_FLASH, 0);
-        builder.define(BEAM_END, new Vector3f());
-        builder.define(SWEEP, 0);
-        builder.define(LASER, 0);
-        builder.define(LASER_END, new Vector3f());
-        builder.define(GRIP, 0);
-        builder.define(GRIP_TARGET, -1);
-        builder.define(EMERGE, 0);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(PHASE, 1);
+        entityData.define(BEAM_CHARGE, 0);
+        entityData.define(BEAM_FLASH, 0);
+        entityData.define(BEAM_END, new Vector3f());
+        entityData.define(SWEEP, 0);
+        entityData.define(LASER, 0);
+        entityData.define(LASER_END, new Vector3f());
+        entityData.define(GRIP, 0);
+        entityData.define(GRIP_TARGET, -1);
+        entityData.define(EMERGE, 0);
     }
 
     public int phase() {
@@ -270,7 +270,7 @@ public class HorizonWarden extends Monster {
             // 目覚め: 衝撃波で近くの者を押し返し、戦いが始まる
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.SONIC_BOOM, core.x, core.y, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION, getX(), getY() + 0.3, getZ(), 12, 3, 0.2, 3, 0);
-            level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.5F, 0.6F);
+            level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 1.5F, 0.6F);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(8), e -> e != this)) {
                 Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
                 if (push.lengthSqr() > 1e-4) {
@@ -881,6 +881,12 @@ public class HorizonWarden extends Monster {
 
     @Override
     public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (source.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile projectile && level() instanceof ServerLevel server) {
+            if (projectile instanceof io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb && !bomb.deflectedBy(this)) {
+                deflectBomb(server, bomb); return false;
+            }
+            if (phase() >= 2 && !ownProjectile(projectile)) { reflect(server, projectile); return false; }
+        }
         if (emergeTicks() > 0 && !source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;            // 出現の演出のあいだは傷つかない
         }
@@ -915,7 +921,7 @@ public class HorizonWarden extends Monster {
     /** 飛び道具を、撃った相手の方へ、より強くして打ち返す（撃った相手がいなければ来た方へ）。 */
     private void reflect(ServerLevel level, net.minecraft.world.entity.projectile.Projectile p) {
         Entity shooter = p.getOwner();
-        p.deflect((proj, by, rnd) -> {
+        { net.minecraft.world.entity.projectile.Projectile proj = p;
             Vec3 v = proj.getDeltaMovement();
             double speed = Math.max(REFLECT_MIN_SPEED, v.length() * REFLECT_SPEED);
             Vec3 dir = shooter != null && shooter.isAlive()
@@ -934,13 +940,14 @@ public class HorizonWarden extends Monster {
                 arrow.setCritArrow(true);
             }
             if (proj instanceof net.minecraft.world.entity.projectile.AbstractHurtingProjectile hurting) {
-                hurting.accelerationPower = Math.max(hurting.accelerationPower, 0.1);
+                hurting.xPower = dir.x * 0.1; hurting.yPower = dir.y * 0.1; hurting.zPower = dir.z * 0.1;
             }
-        }, this, this, false);
+        }
+        p.setOwner(this);
         swing(InteractionHand.MAIN_HAND);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.getX(), p.getY(), p.getZ(), 8, 0.15, 0.15, 0.15, 0.3);
         level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY(), p.getZ(), 4, 0.1, 0.1, 0.1, 0.15);
-        playSound(SoundEvents.BREEZE_DEFLECT, 1.5F, 0.8F);
+        playSound(SoundEvents.SHIELD_BLOCK, 1.5F, 0.8F);
     }
 
     // ------------------------------------------------------------------ ブラックホール爆弾を打ち返す（どのフェーズでも）
@@ -975,37 +982,21 @@ public class HorizonWarden extends Monster {
             v = away.normalize().scale(BOMB_RETURN_SPEED).add(0, 0.6, 0);
         }
         Vec3 dir = v;
-        bomb.deflect((proj, by, rnd) -> {
+        { net.minecraft.world.entity.projectile.Projectile proj = bomb;
             proj.setDeltaMovement(dir);
             proj.hasImpulse = true;
             proj.hurtMarked = true;
-        }, this, this, false);
+        }
+        bomb.setOwner(this);
         bomb.markDeflected(this);
         swing(InteractionHand.MAIN_HAND);
         level.sendParticles(ParticleTypes.SONIC_BOOM, bomb.getX(), bomb.getY(), bomb.getZ(), 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.END_ROD, bomb.getX(), bomb.getY(), bomb.getZ(), 12, 0.2, 0.2, 0.2, 0.25);
-        playSound(SoundEvents.BREEZE_DEFLECT, 2.0F, 0.6F);
+        playSound(SoundEvents.SHIELD_BLOCK, 2.0F, 0.6F);
         playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 2.0F, 0.5F);
     }
 
     /** 速すぎて見張りをすり抜けた飛び道具も、当たる瞬間に打ち返す（フェーズ2以降。ブラックホール爆弾はいつでも）。 */
-    @Override
-    public net.minecraft.world.entity.projectile.ProjectileDeflection deflection(net.minecraft.world.entity.projectile.Projectile p) {
-        if (p instanceof io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb && !bomb.deflectedBy(this)
-                && level() instanceof ServerLevel server) {
-            deflectBomb(server, bomb);
-            return (proj, by, rnd) -> {
-            };
-        }
-        if (phase() < 2 || ownProjectile(p) || !(level() instanceof ServerLevel level)) {
-            return super.deflection(p);
-        }
-        reflect(level, p);
-        // 向きと持ち主はもう変えたので、当たったときの処理では何もしない（当たらない）
-        return (proj, by, rnd) -> {
-        };
-    }
-
     // ------------------------------------------------------------------ 移動・封印
 
     /** 離れたまま、または隠れたままの相手の背後へ跳ぶ。 */
@@ -1142,7 +1133,7 @@ public class HorizonWarden extends Monster {
     }
 
     @Override
-    public boolean canChangeDimensions(Level from, Level to) {
+    public boolean canChangeDimensions() {
         return false;
     }
 
@@ -1195,8 +1186,8 @@ public class HorizonWarden extends Monster {
             damageScale = Math.max(0.001F, tag.getFloat("damage_scale"));
         }
         entityData.set(EMERGE, tag.getInt("emerge"));
-        home = NbtUtils.readBlockPos(tag, "home").orElse(null);
-        console = NbtUtils.readBlockPos(tag, "console").orElse(null);
+        home = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(tag, "home").orElse(null);
+        console = io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(tag, "console").orElse(null);
         if (home != null) {
             restrictTo(home, ARENA_RADIUS);
         }

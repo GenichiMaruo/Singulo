@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "CGC",
+    " B "
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    "C": {
+      "tag": "forge:ingots/copper"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:holo_projector"
+  }
+}

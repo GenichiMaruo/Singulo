@@ -35,7 +35,7 @@ public class HoloProjectorItem extends SinguloItem {
 
     /** 今選んでいる大きさ（種類ごとの選択肢の番号）。 */
     public static int sizeIndex(ItemStack stack) {
-        return stack.getOrDefault(SinguloComponents.HOLO_SIZE.get(), 0);
+        return SinguloComponents.getOrDefault(stack, SinguloComponents.HOLO_SIZE.get(), 0);
     }
 
     public static int size(ItemStack stack, Blueprints.Kind kind) {
@@ -65,7 +65,7 @@ public class HoloProjectorItem extends SinguloItem {
         ItemStack stack = context.getItemInHand();
         boolean resize = player != null && player.isShiftKeyDown();
         if (resize) {
-            stack.set(SinguloComponents.HOLO_SIZE.get(), sizeIndex(stack) + 1);
+            SinguloComponents.set(stack, SinguloComponents.HOLO_SIZE.get(), sizeIndex(stack) + 1);
         }
         int size = size(stack, kind);
         Direction back = backOf(state);
@@ -114,7 +114,7 @@ public class HoloProjectorItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("tooltip.singulo.holo_projector.hint").withStyle(ChatFormatting.DARK_GRAY));
     }

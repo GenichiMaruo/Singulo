@@ -5,15 +5,15 @@ import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 /** ワームホール固定化装置の画面。左右の2つの喉（口を入れる）と、エキゾチック物質・口の筐体。 */
 public class WormholeStabilizerMenu extends AbstractContainerMenu {
@@ -56,7 +56,7 @@ public class WormholeStabilizerMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public static WormholeStabilizerMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+    public static WormholeStabilizerMenu client(int containerId, Inventory inventory, FriendlyByteBuf buf) {
         return new WormholeStabilizerMenu(containerId, inventory, buf.readBlockPos(), new ItemStackHandler(WormholeStabilizerBlockEntity.SLOTS),
                 SyncedInts.client(COUNT), null);
     }

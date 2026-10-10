@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -16,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 
 /**
@@ -41,11 +39,11 @@ public class ShieldPermitItem extends SinguloItem {
     /** 登録された人。 */
     public static List<Member> members(ItemStack stack) {
         List<Member> out = new ArrayList<>();
-        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag data = stack.getTag();
         if (data == null) {
             return out;
         }
-        ListTag list = data.copyTag().getList(KEY, Tag.TAG_COMPOUND);
+        ListTag list = data.getList(KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
             CompoundTag t = list.getCompound(i);
             if (t.hasUUID("id")) {
@@ -74,7 +72,7 @@ public class ShieldPermitItem extends SinguloItem {
             t.putString("name", m.name());
             list.add(t);
         }
-        CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.put(KEY, list));
+        stack.getOrCreateTag().put(KEY, list);
     }
 
     /** 登録する（もう入っていれば名前だけ新しくする）。新しく入ったら true。 */
@@ -126,7 +124,7 @@ public class ShieldPermitItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         List<Member> members = members(stack);
         if (members.isEmpty()) {

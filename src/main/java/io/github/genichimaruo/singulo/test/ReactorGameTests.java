@@ -21,10 +21,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /**
  * ペンローズ・リアクターの確認。引力帯が周りのテストに届かないよう、別の組（batch）にして順番に流す。
@@ -65,7 +65,7 @@ public final class ReactorGameTests {
         }
         helper.setBlock(PORT, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(CONTROLLER, SinguloBlocks.CORE_CONTROLLER.get());
-        return helper.getBlockEntity(CONTROLLER);
+        return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONTROLLER);
     }
 
     @GameTest(template = HUGE, batch = BATCH)
@@ -85,7 +85,7 @@ public final class ReactorGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(r.isFormed(), "13×13×13 のリアクターとして形成されない");
             helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.DORMANT, "形成後は停止中のはず");
-            IEnergyStorage viaPort = helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK,
+            IEnergyStorage viaPort = Capabilities.get(helper.getLevel(), Capabilities.EnergyStorage.BLOCK,
                     helper.absolutePos(PORT), null);
             helper.assertTrue(viaPort != null, "抽出ポートからリアクターの電力につながらない");
         });
@@ -161,14 +161,14 @@ public final class ReactorGameTests {
         BlockPos alarm = shells.get(40);
         helper.setBlock(port2, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(alarm, SinguloBlocks.REACTOR_MASS_ALARM.get());
-        PenroseReactorBlockEntity reactor = helper.getBlockEntity(CONTROLLER);
+        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONTROLLER);
         helper.runAtTickTime(3, () -> reactor.forceCore(PenroseReactorBlockEntity.MAX_MASS + 100, 0));
         helper.succeedWhen(() -> {
             Structures.Reactor r = Structures.findReactor(helper.getLevel(), helper.absolutePos(CONTROLLER));
             helper.assertTrue(r != null, "ポートや警報器を置くと形成されない");
             helper.assertTrue(r.ports().size() == 2 && r.ports().contains(helper.absolutePos(port2)), "置いたポートが数えられない: " + r.ports().size());
             helper.assertTrue(r.alarms().contains(helper.absolutePos(alarm)), "警報器が数えられない");
-            helper.assertTrue(helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, helper.absolutePos(port2), null) != null,
+            helper.assertTrue(Capabilities.get(helper.getLevel(), Capabilities.EnergyStorage.BLOCK, helper.absolutePos(port2), null) != null,
                     "置いたポートから電力に届かない");
             helper.assertTrue(helper.getLevel().getSignal(helper.absolutePos(alarm), net.minecraft.core.Direction.UP) >= 7,
                     "上限を超えても警報器が信号を出さない");
@@ -307,7 +307,7 @@ public final class ReactorGameTests {
     public static void encapsulatorMakesSingularityCore(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.SINGULARITY_ENCAPSULATOR).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
         m.items().setStackInSlot(0, new ItemStack(item("degenerate_matter_shell")));
         m.items().setStackInSlot(1, new ItemStack(item("hawking_condensate"), 4));
@@ -328,23 +328,23 @@ public final class ReactorGameTests {
         BlockPos tankPos = new BlockPos(2, 1, 1);
         helper.setBlock(collectorPos, SinguloBlocks.HALO_COLLECTOR.get());
         helper.setBlock(tankPos, SinguloBlocks.CONTAINMENT_TANK.get());
-        io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity collector = helper.getBlockEntity(collectorPos);
-        io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank = helper.getBlockEntity(tankPos);
+        io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity collector = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, collectorPos);
+        io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, tankPos);
         helper.onEachTick(() -> {
             collector.energy().setEnergy(collector.energy().getMaxEnergyStored());
             tank.energy().setEnergy(tank.energy().getMaxEnergyStored());
         });
         helper.runAtTickTime(2, () -> r.forceCore(2000, 0));
         helper.runAtTickTime(5, () -> {
-            var input = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(CONTROLLER), null);
+            var input = Capabilities.get(helper.getLevel(), Capabilities.FluidHandler.BLOCK, helper.absolutePos(CONTROLLER), null);
             helper.assertTrue(input != null, "炉心制御装置にダークマターを入れられない");
             double before = r.mass();
             int taken = input.fill(io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity.darkMatter(1000),
-                    net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                    net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
             helper.assertTrue(taken == 1000 && Math.abs(r.mass() - before - 10) < 1e-6,
                     "ダークマター1000 mB で炉心質量が10増えない: " + taken + " " + (r.mass() - before));
-            int water = input.fill(new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000),
-                    net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+            int water = input.fill(new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000),
+                    net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
             helper.assertTrue(water == 0, "水まで炉心に入る");
         });
         helper.succeedWhen(() -> {

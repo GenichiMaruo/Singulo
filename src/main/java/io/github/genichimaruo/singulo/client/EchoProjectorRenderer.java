@@ -91,7 +91,6 @@ public class EchoProjectorRenderer implements BlockEntityRenderer<EchoProjectorB
         return true;
     }
 
-    @Override
     public AABB getRenderBoundingBox(EchoProjectorBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(RANGE);
     }

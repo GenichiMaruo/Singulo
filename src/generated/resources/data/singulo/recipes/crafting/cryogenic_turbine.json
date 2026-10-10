@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "OFO",
+    "PHP"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "H": {
+      "item": "singulo:heat_exchange_core"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:cryogenic_turbine"
+  }
+}

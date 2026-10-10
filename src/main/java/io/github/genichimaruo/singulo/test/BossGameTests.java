@@ -21,9 +21,9 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** ホライズン・ウォーデンと封印コンソール・封鎖された保管庫の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -43,14 +43,14 @@ public final class BossGameTests {
     /** 最終実験施設の中央を再現する: 封鎖された保管庫と封印コンソール。 */
     private static SealConsoleBlockEntity arena(GameTestHelper helper) {
         helper.setBlock(VAULT, SinguloBlocks.RUIN_CACHE.get().defaultBlockState().setValue(RuinCacheBlock.SEALED, true));
-        RuinCacheBlockEntity vault = helper.getBlockEntity(VAULT);
+        RuinCacheBlockEntity vault = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT);
         vault.setRuin("final_lab");
         helper.setBlock(CONSOLE, SinguloBlocks.SEAL_CONSOLE.get());
-        return helper.getBlockEntity(CONSOLE);
+        return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONSOLE);
     }
 
     private static RuinCacheBlockEntity vault(GameTestHelper helper) {
-        return helper.getBlockEntity(VAULT);
+        return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT);
     }
 
     /** 起動すると出現の演出が始まり、そのあいだは動かず傷つかない。演出が終わると戦い始める。 */

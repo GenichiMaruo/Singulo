@@ -4,7 +4,6 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -16,9 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 /**
  * 次元ポケット（封印コンテナの特異点錠から）。右クリックで、どこからでも自分だけの収納（27枠）を開く。
@@ -26,11 +22,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
  */
 public class DimensionalPocketItem extends SinguloItem {
     public static final int SIZE = 27;
-    public static final DeferredRegister<AttachmentType<?>> REGISTER =
-            DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Singulo.MODID);
-    public static final Supplier<AttachmentType<List<ItemStack>>> CONTENTS = REGISTER.register("dimensional_pocket",
-            () -> AttachmentType.<List<ItemStack>>builder(() -> new ArrayList<>())
-                    .serialize(ItemStack.OPTIONAL_CODEC.listOf().xmap(ArrayList::new, l -> l)).copyOnDeath().build());
+    public static final String CONTENTS = "singulo:dimensional_pocket";
 
     public DimensionalPocketItem(Properties properties, int stage) {
         super(properties.stacksTo(1), stage, false);
@@ -57,7 +49,7 @@ public class DimensionalPocketItem extends SinguloItem {
             super(SIZE);
             this.player = player;
             loading = true;
-            List<ItemStack> saved = player.getData(CONTENTS);
+            List<ItemStack> saved = io.github.genichimaruo.singulo.compat.PlayerData.get(player, CONTENTS, ItemStack.CODEC.listOf(), new ArrayList<>());
             for (int i = 0; i < SIZE && i < saved.size(); i++) {
                 setItem(i, saved.get(i).copy());
             }
@@ -72,7 +64,7 @@ public class DimensionalPocketItem extends SinguloItem {
                 for (int i = 0; i < SIZE; i++) {
                     out.add(getItem(i).copy());
                 }
-                player.setData(CONTENTS, out);
+                io.github.genichimaruo.singulo.compat.PlayerData.set(player, CONTENTS, ItemStack.CODEC.listOf(), out);
             }
         }
 

@@ -143,7 +143,7 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose p, float x, float y, float z, int rgb, int alpha,
                                float nx, float ny, float nz) {
-        vc.addVertex(p, x, y, z).setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).setUv(0.5F, 0.5F)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(FxDraw.FULL_BRIGHT).setNormal(p, nx, ny, nz);
+        vc.vertex(p.pose(), x, y, z).color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).uv(0.5F, 0.5F)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(FxDraw.FULL_BRIGHT).normal(p.normal(), nx, ny, nz).endVertex();
     }
 }

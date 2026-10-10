@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeHolder;
+
 import net.minecraft.world.level.material.Fluid;
 
 public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
@@ -286,7 +286,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int[] mp = masterPos();
         if (!channelIsInputTank() && Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
             boolean master = io.github.genichimaruo.singulo.machine.SideConfig.ejectEnabled(packed);
-            net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
+            io.github.genichimaruo.singulo.network.SinguloNetwork.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
                     menu.pos(), sidesChannel, io.github.genichimaruo.singulo.network.SideConfigPayload.MASTER_FACE, master ? 0 : 4));
             return true;
         }
@@ -314,7 +314,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         } else {
             mode = nextMode(mode);
         }
-        net.neoforged.neoforge.network.PacketDistributor.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
+        io.github.genichimaruo.singulo.network.SinguloNetwork.sendToServer(new io.github.genichimaruo.singulo.network.SideConfigPayload(
                 menu.pos(), sidesChannel, f.ordinal(), mode | (eject ? 4 : 0)));
     }
 
@@ -454,14 +454,14 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         }
     }
 
-    private List<RecipeHolder<MachineRecipe>> massRecipes() {
+    private List<MachineRecipe> massRecipes() {
         return Minecraft.getInstance().level == null ? List.of()
                 : MachineBlockEntity.massRecipes(Minecraft.getInstance().level, type());
     }
 
     private ItemStack modeIcon() {
         int mode = menu.value(MachineBlockEntity.D_MODE);
-        List<RecipeHolder<MachineRecipe>> list = massRecipes();
+        List<MachineRecipe> list = massRecipes();
         if (mode > 0 && mode <= list.size()) {
             return list.get(mode - 1).value().result();
         }
@@ -526,7 +526,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         if (type().massMode() && Panel.inside(mouseX, mouseY, x + l.modeX, y + MachineLayout.MODE_Y, MODE_SIZE, MODE_SIZE)) {
             int mode = menu.value(MachineBlockEntity.D_MODE);
             List<Component> lines = new ArrayList<>();
-            List<RecipeHolder<MachineRecipe>> list = massRecipes();
+            List<MachineRecipe> list = massRecipes();
             lines.add(mode > 0 && mode <= list.size()
                     ? Component.translatable("gui.singulo.mode.mass", list.get(mode - 1).value().result().getHoverName())
                     : Component.translatable("gui.singulo.mode.normal"));

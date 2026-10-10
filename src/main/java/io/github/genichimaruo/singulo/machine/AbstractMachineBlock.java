@@ -5,7 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -39,7 +39,7 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, LIT, BOOSTED);
     }
 
@@ -81,22 +81,29 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        InteractionResult result = useItemOn(player.getItemInHand(hand), state, level, pos, player, hand, hit);
+        if (result.consumesAction()) return result;
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         // マルチブロックのコントローラーは、完成するまで画面を開かない（未完成と知らせる）
         var kind = io.github.genichimaruo.singulo.multiblock.Blueprints.kindOf(state.getBlock());
         if (kind != null && io.github.genichimaruo.singulo.multiblock.Blueprints.formedSize(level, pos, kind) <= 0) {
@@ -114,19 +121,18 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
     }
 
     /** 手に持ったアイテムで右クリックしたとき、ブロックエンティティが受け取れば使う（触媒を入れるなど）。 */
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         // クライアントは素通しし、使うかどうかはサーバーが決める（使わなければ通常どおりGUIを開く）
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof MenuOpener opener && opener.useItem(serverPlayer, stack, hand)) {
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BreakListener listener) {
@@ -145,6 +151,26 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
     }
 
     /** ブロックが壊されたとき（チャンクの読み込み解除では呼ばれない）に後始末をするブロックエンティティ。 */
+    @Override
+    public java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder params) {
+        var drops = super.getDrops(state, params);
+        var be = params.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY);
+        for (ItemStack stack : drops) {
+            if (!stack.is(state.getBlock().asItem())) continue;
+            if (be instanceof io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank) tank.collectImplicitComponents(stack);
+            if (be instanceof io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity mouth) mouth.collectImplicitComponents(stack);
+        }
+        return drops;
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        var be = level.getBlockEntity(pos);
+        if (be instanceof io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank) tank.applyComponentsFromItemStack(stack);
+        if (be instanceof io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity mouth) mouth.applyComponentsFromItemStack(stack);
+    }
+
     public interface BreakListener {
         void onBroken(Level level);
     }

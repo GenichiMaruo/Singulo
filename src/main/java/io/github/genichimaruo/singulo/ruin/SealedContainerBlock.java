@@ -10,7 +10,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -34,7 +34,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * 封印中は壊しにくく（黒曜石より硬い）、無理に壊すと中身ごと失われる（何も落とさない）。開いていれば普通のチェストと同じ。
  */
 public class SealedContainerBlock extends BaseEntityBlock {
-    public static final MapCodec<SealedContainerBlock> CODEC = simpleCodec(p -> new SealedContainerBlock(p, 1));
     private static final VoxelShape SHAPE = Shapes.or(box(0, 0, 0, 16, 3, 16), box(1, 3, 1, 15, 15, 15));
     /** 封印中の壊しにくさ（黒曜石は50）。 */
     static final float SEALED_HARDNESS = 80;
@@ -50,18 +49,14 @@ public class SealedContainerBlock extends BaseEntityBlock {
         return tier;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
@@ -79,24 +74,30 @@ public class SealedContainerBlock extends BaseEntityBlock {
     }
 
     /** 鍵を持って使う: 封印中なら開け、開いていてスニークしていれば封印する。 */
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof SealedContainerBlockEntity box)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
         boolean isKey = SealedContainerBlockEntity.isKey(stack, tier);
         if (box.phase() == SealedContainerBlockEntity.Phase.OPEN && !(isKey && player.isSecondaryUseActive())) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
         if (!level.isClientSide) {
             box.interact(player, stack);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        InteractionResult result = useItemOn(player.getItemInHand(hand), state, level, pos, player, hand, hit);
+        if (result.consumesAction()) return result;
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof SealedContainerBlockEntity box) {
             box.interact(player, ItemStack.EMPTY);
         }
@@ -107,7 +108,7 @@ public class SealedContainerBlock extends BaseEntityBlock {
      * スニーク中に物を持って右クリックすると、標準ではブロックの useItemOn が呼ばれない（手の物の使用だけになる）。
      * 開いているコンテナに鍵を持ってスニークして使ったときだけ、ブロックへの操作を通す（封印できるように）。
      */
-    public static void onRightClickBlock(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+    public static void onRightClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
         Player player = event.getEntity();
         if (!player.isSecondaryUseActive()
                 || !(event.getLevel().getBlockState(event.getPos()).getBlock() instanceof SealedContainerBlock block)
@@ -116,13 +117,13 @@ public class SealedContainerBlock extends BaseEntityBlock {
             return;
         }
         if (SealedContainerBlockEntity.isKey(event.getItemStack(), block.tier())) {
-            event.setUseBlock(net.neoforged.neoforge.common.util.TriState.TRUE);
+            event.setUseBlock(net.minecraftforge.eventbus.api.Event.Result.ALLOW);
         }
     }
 
     /** 封印中はとても硬い。 */
     @Override
-    protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
+    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof SealedContainerBlockEntity box && box.phase() != SealedContainerBlockEntity.Phase.OPEN) {
             float speed = player.getDigSpeed(state, pos);
             return speed / SEALED_HARDNESS / (player.hasCorrectToolForDrops(state) ? 30 : 100);
@@ -132,7 +133,7 @@ public class SealedContainerBlock extends BaseEntityBlock {
 
     /** 封印中に壊されたら何も落とさない（中身ごと失われる）。 */
     @Override
-    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         BlockEntity be = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (be instanceof SealedContainerBlockEntity box && box.phase() != SealedContainerBlockEntity.Phase.OPEN) {
             return List.of();
@@ -142,7 +143,7 @@ public class SealedContainerBlock extends BaseEntityBlock {
 
     /** 開いているときに壊したら、中身をまき散らす（チェストと同じ）。封印中は中身ごと消える。 */
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof SealedContainerBlockEntity box) {
             if (box.phase() == SealedContainerBlockEntity.Phase.OPEN) {
                 Containers.dropContents(level, pos, box);

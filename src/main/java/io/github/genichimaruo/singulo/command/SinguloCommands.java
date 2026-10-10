@@ -18,7 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 
 /**
  * /singulo build &lt;マルチブロック&gt; [大きさ] — クリエイティブ用。見ている向きの数ブロック先に、マルチブロックを一発で組み立てる。

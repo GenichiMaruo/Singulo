@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:quantum_computing_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "singulo:quantum_heat_engine",
+    "count": 1
+  }
+}

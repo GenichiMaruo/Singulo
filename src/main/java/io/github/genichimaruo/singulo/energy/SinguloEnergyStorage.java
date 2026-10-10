@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.energy;
 
-import net.neoforged.neoforge.energy.EnergyStorage;
+import net.minecraftforge.energy.EnergyStorage;
 
 /** 変更通知と直接の出し入れができる電力の入れ物。 */
 public class SinguloEnergyStorage extends EnergyStorage {

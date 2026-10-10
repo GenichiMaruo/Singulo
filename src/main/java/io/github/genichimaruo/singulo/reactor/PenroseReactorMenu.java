@@ -4,15 +4,15 @@ import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 /** ペンローズ・リアクターの画面。種・燃料・抽出装置3種・副産物4つ。ボタンは「点火」と「スピン目標」。 */
 public class PenroseReactorMenu extends AbstractContainerMenu {
@@ -64,7 +64,7 @@ public class PenroseReactorMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public static PenroseReactorMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+    public static PenroseReactorMenu client(int containerId, Inventory inventory, FriendlyByteBuf buf) {
         return new PenroseReactorMenu(containerId, inventory, buf.readBlockPos(),
                 new ItemStackHandler(PenroseReactorBlockEntity.SLOTS), SyncedInts.client(PenroseReactorBlockEntity.COUNT), null);
     }

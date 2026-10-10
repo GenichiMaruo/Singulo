@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentMap;
+
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -36,8 +36,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * ワームホールの口（段階5）。同じ対の口どうしがつながり、近く（PORT_RANGE 以内）のワームホール・ポートを通して
@@ -469,18 +469,16 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
 
     // ------------------------------------------------------------------ 保存・同期
 
-    @Override
-    protected void collectImplicitComponents(DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
+    public void collectImplicitComponents(net.minecraft.world.item.ItemStack components) {
+
         if (data != null) {
-            components.set(SinguloComponents.WORMHOLE.get(), data);
+            SinguloComponents.set(components, SinguloComponents.WORMHOLE.get(), data);
         }
     }
 
-    @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
-        super.applyImplicitComponents(input);
-        WormholeData placed = input.get(SinguloComponents.WORMHOLE.get());
+    public void applyComponentsFromItemStack(net.minecraft.world.item.ItemStack input) {
+
+        WormholeData placed = SinguloComponents.get(input, SinguloComponents.WORMHOLE.get());
         if (placed != null && !placed.placed()) {
             // 初めて置いた: 燃料なしでも5分は開いている
             grace = GRACE_TICKS;
@@ -492,14 +490,15 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         data = placed == null ? null : placed.asPlaced();
     }
 
-    @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        tag.remove("pair");
-        tag.remove("created");
+    public net.minecraft.world.item.ItemStack collectComponents() {
+        var stack = new net.minecraft.world.item.ItemStack(getBlockState().getBlock());
+        collectImplicitComponents(stack);
+        return stack;
     }
 
+
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("size", size);
         return tag;
@@ -511,8 +510,8 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         if (data != null) {
             tag.putLong("pair", data.pair());
             tag.putLong("created", data.created());
@@ -522,12 +521,12 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         tag.putDouble("burn", burn);
         tag.putInt("grace", grace);
         tag.putInt("starve", starve);
-        tag.put("fuel", fuel.serializeNBT(registries));
+        tag.put("fuel", fuel.serializeNBT());
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("pair")) {
             data = new WormholeData(tag.getLong("pair"), tag.getLong("created"), true);
         }
@@ -539,7 +538,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
         grace = tag.getInt("grace");
         starve = tag.getInt("starve");
         if (tag.contains("fuel")) {
-            fuel.deserializeNBT(registries, tag.getCompound("fuel"));
+            fuel.deserializeNBT(tag.getCompound("fuel"));
         }
     }
 

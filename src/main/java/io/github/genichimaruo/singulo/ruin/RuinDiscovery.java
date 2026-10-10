@@ -7,12 +7,8 @@ import io.github.genichimaruo.singulo.generated.ServerConfig;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 /**
  * 遺構の発見。保管庫を自分の手で開くと、その遺構を発見したことになる（プレイヤーごと、死んでも消えない）。
@@ -26,12 +22,7 @@ public final class RuinDiscovery {
         ).apply(i, Discovered::new));
     }
 
-    public static final DeferredRegister<AttachmentType<?>> REGISTER =
-            DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Singulo.MODID);
-
-    public static final Supplier<AttachmentType<List<Discovered>>> DISCOVERED = REGISTER.register("discovered_ruins",
-            () -> AttachmentType.<List<Discovered>>builder(() -> new ArrayList<>())
-                    .serialize(Discovered.CODEC.listOf().xmap(ArrayList::new, l -> l)).copyOnDeath().build());
+    public static final String DISCOVERED = "singulo:discovered_ruins";
 
     /**
      * 遺構のティア（その回収物が使われる触媒の段階）。段階Nの探査機は「N − probeAutomationOffset」以下の遺構に飛べる
@@ -51,17 +42,17 @@ public final class RuinDiscovery {
         if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
             io.github.genichimaruo.singulo.registry.SinguloTriggers.milestone(sp, "discover/" + ruin);
         }
-        List<Discovered> list = player.getData(DISCOVERED);
+        List<Discovered> list = io.github.genichimaruo.singulo.compat.PlayerData.get(player, DISCOVERED, Discovered.CODEC.listOf(), new ArrayList<>());
         Discovered d = new Discovered(ruin, pos.immutable());
         if (!list.contains(d)) {
             List<Discovered> copy = new ArrayList<>(list);
             copy.add(d);
-            player.setData(DISCOVERED, copy);
+            io.github.genichimaruo.singulo.compat.PlayerData.set(player, DISCOVERED, Discovered.CODEC.listOf(), copy);
         }
     }
 
     public static List<Discovered> discovered(Player player) {
-        return player.getData(DISCOVERED);
+        return io.github.genichimaruo.singulo.compat.PlayerData.get(player, DISCOVERED, Discovered.CODEC.listOf(), new ArrayList<>());
     }
 
     /** 段階 stationTier の探査機がこの遺構に飛べるか。 */

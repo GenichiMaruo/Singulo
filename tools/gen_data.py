@@ -45,6 +45,8 @@ def warn(msg):
 
 
 def write_json(path: Path, obj):
+    from legacy_data import convert
+    path, obj = convert(path, obj)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
@@ -2017,7 +2019,7 @@ CRATER_BIOMES = ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:de
 def craters_data():
     """隕石クレーター（地表の小さな構造物）。3通りの形から1つを選んで置く。地面の高さに合わせ、すり鉢を地面に掘り込む。"""
     import craters
-    craters.write_all(DATA / 'structure' / 'craters')
+    craters.write_all(DATA / 'structures' / 'craters')
     write_json(DATA / 'tags' / 'worldgen' / 'biome' / 'has_structure' / 'meteor_crater.json', {'values': CRATER_BIOMES})
     write_json(DATA / 'worldgen' / 'template_pool' / 'craters' / 'meteor_crater.json', {
         'fallback': 'minecraft:empty',
@@ -2066,7 +2068,7 @@ def boss_loot():
 
 def ruins_data():
     """遺構の構造物・配置・中身（loot table）。中身の数は recipes.py の EXPLORE（1回の遠征で拾える数）。"""
-    ruins.write_all(DATA / 'structure' / 'ruins')
+    ruins.write_all(DATA / 'structures' / 'ruins')
     for rid, (make, placement) in ruins.RUINS.items():
         spacing, separation, salt, biomes = RUIN_PLACEMENT[rid]
         write_json(DATA / 'tags' / 'worldgen' / 'biome' / 'has_structure' / f'{rid}.json', {'values': biomes})
@@ -2399,9 +2401,9 @@ def java_config():
         for sec, key, default, rng, desc in entries:
             if sec not in sections:
                 sections.append(sec)
-        out.append('    public static final ModConfigSpec SPEC;')
+        out.append('    public static final ForgeConfigSpec SPEC;')
         fields = []
-        body = ['        ModConfigSpec.Builder b = new ModConfigSpec.Builder();']
+        body = ['        ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();']
         for sec in sections:
             body.append(f'        b.push("{sec}");')
             for s, key, default, rng, desc in entries:
@@ -2413,20 +2415,20 @@ def java_config():
                 rng_s = rng.replace('"', '\\"')
                 body.append(f'        b.comment("{comment}", "範囲: {rng_s}");')
                 if typ == 'boolean':
-                    fields.append(f'    public static final ModConfigSpec.BooleanValue {const};')
+                    fields.append(f'    public static final ForgeConfigSpec.BooleanValue {const};')
                     body.append(f'        {const}_ = b.define("{key}", {default});')
                 elif typ == 'enum':
-                    fields.append(f'    public static final ModConfigSpec.ConfigValue<String> {const};')
+                    fields.append(f'    public static final ForgeConfigSpec.ConfigValue<String> {const};')
                     choices = ', '.join(f'"{c}"' for c in lo)
                     body.append(f'        {const}_ = b.defineInList("{key}", {default}, java.util.Arrays.asList({choices}));')
                 elif typ == 'double':
-                    fields.append(f'    public static final ModConfigSpec.DoubleValue {const};')
+                    fields.append(f'    public static final ForgeConfigSpec.DoubleValue {const};')
                     body.append(f'        {const}_ = b.defineInRange("{key}", {float(default)}, {lo}, {hi});')
                 elif typ == 'int':
-                    fields.append(f'    public static final ModConfigSpec.IntValue {const};')
+                    fields.append(f'    public static final ForgeConfigSpec.IntValue {const};')
                     body.append(f'        {const}_ = b.defineInRange("{key}", {default}, {lo}, {hi if hi is not None else "Integer.MAX_VALUE"});')
                 else:
-                    fields.append(f'    public static final ModConfigSpec.LongValue {const};')
+                    fields.append(f'    public static final ForgeConfigSpec.LongValue {const};')
                     body.append(f'        {const}_ = b.defineInRange("{key}", {default}L, {lo}L, {str(hi) + "L" if hi is not None else "Long.MAX_VALUE"});')
             body.append('        b.pop();')
         # static final は static ブロックで一度だけ代入する
@@ -2444,7 +2446,7 @@ def java_config():
 
     for entries, cls in ((config_spec.SERVER, 'ServerConfig'), (config_spec.CLIENT, 'ClientConfig')):
         lines = [f'package {PKG}.generated;', '',
-                 'import net.neoforged.neoforge.common.ModConfigSpec;', '',
+                 'import net.minecraftforge.common.ForgeConfigSpec;', '',
                  '/** tools/gen_data.py が config_spec.py から生成。手で編集しない。 */',
                  f'public final class {cls} {{', f'    private {cls}() {{}}', '']
         lines += emit(entries, cls)

@@ -1,4 +1,8 @@
-## Singulo-0.3.0-1.21.1N
+## Singulo-0.3.0-1.20.1F
+
+### Minecraft 1.20.1 compatibility
+- Backported to Forge 47.4.26 and Java 17, with optional JEI 15 integration.
+- Adapted networking, item and player NBT, capabilities, rendering, recipes, loot, tags and structures to Minecraft 1.20.1.
 
 ### Exploration and combat
 - Expanded ruins with additional building materials, glass panels, redesigned vaults and boss rooms.

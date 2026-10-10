@@ -26,7 +26,7 @@ public class BlackHoleBombItem extends SinguloItem {
             level.addFreshEntity(bomb);
         }
         player.getCooldowns().addCooldown(this, 30);
-        stack.consume(1, player);
+        stack.shrink(player.getAbilities().instabuild ? 0 : 1);
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 }

@@ -12,6 +12,25 @@ import net.minecraft.gametest.framework.GameTestHelper;
 final class TestBuild {
     private TestBuild() {}
 
+    /** Forge 1.20.1's vanilla mock uses a connection without a Netty channel. */
+    static net.minecraft.server.level.ServerPlayer mockPlayer(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var player = new net.minecraftforge.common.util.FakePlayer(level,
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-mock-player")) {
+            @Override public boolean isCreative() { return getAbilities().instabuild; }
+            @Override public boolean isSpectator() { return false; }
+            @Override public boolean setGameMode(net.minecraft.world.level.GameType mode) {
+                return gameMode.changeGameModeForPlayer(mode);
+            }
+        };
+        player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+        java.util.List<net.minecraft.server.level.ServerPlayer> players = net.minecraftforge.fml.util.ObfuscationReflectionHelper.getPrivateValue(
+                net.minecraft.server.players.PlayerList.class, level.getServer().getPlayerList(), "f_11196_");
+        players.add(player);
+        level.addNewPlayer(player);
+        return player;
+    }
+
     /** 設計図どおりに建てる（controllerRel はコントローラの相対位置、back は奥の向き）。 */
     static void build(GameTestHelper helper, Blueprints.Kind kind, BlockPos controllerRel, Direction back, int size) {
         BlockPos c = helper.absolutePos(controllerRel);

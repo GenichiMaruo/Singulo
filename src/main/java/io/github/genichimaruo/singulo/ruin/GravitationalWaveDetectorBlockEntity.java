@@ -77,7 +77,7 @@ public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements
 
     @Override
     public void openMenu(ServerPlayer player) {
-        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.DETECTOR, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> switch (i) {
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.DETECTOR, new net.minecraftforge.items.ItemStackHandler(0), i -> switch (i) {
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.ENERGY -> energy.getEnergyStored();
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.ENERGY_MAX -> energy.getMaxEnergyStored();
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Detector.OBSERVED -> observed ? 1 : 0;
@@ -119,14 +119,14 @@ public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements
     private int lastBand;
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("energy", energy.getEnergyStored());
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         energy.setEnergy(tag.getInt("energy"));
     }
 }

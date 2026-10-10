@@ -19,8 +19,8 @@ final class FxDraw {
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose last, float x, float y, float z, int rgb, int alpha,
                                int light, float nx, float ny, float nz) {
-        vc.addVertex(last, x, y, z).setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(last, nx, ny, nz);
+        vc.vertex(last.pose(), x, y, z).color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).uv(0, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(last.normal(), nx, ny, nz).endVertex();
     }
 
     /** 中心が原点の球（緯度・経度の帯で）。 */
@@ -272,8 +272,8 @@ final class FxDraw {
 
     private static void uvVertex(VertexConsumer vc, PoseStack.Pose p, float x, float y, float z, float u, float v, int light,
                                int rgb, int alpha, float nx, float ny, float nz) {
-        vc.addVertex(p, x, y, z).setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(p, nx, ny, nz);
+        vc.vertex(p.pose(), x, y, z).color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).uv(u, v)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(p.normal(), nx, ny, nz).endVertex();
     }
 
     static int lerpRgb(int a, int b, float k) {

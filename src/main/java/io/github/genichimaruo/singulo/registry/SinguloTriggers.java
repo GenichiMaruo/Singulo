@@ -15,16 +15,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.registries.DeferredRegister;
 
 /**
  * 進捗の条件。singulo:milestone は Singulo の出来事（id）で達成する:
  * formed/&lt;マルチブロック&gt;・discover/&lt;遺構&gt;・ignite・wormhole_open・dark_matter・records_all。
  */
 public final class SinguloTriggers {
-    public static final DeferredRegister<CriterionTrigger<?>> REGISTER = DeferredRegister.create(Registries.TRIGGER_TYPE, Singulo.MODID);
-
-    public static final Supplier<Milestone> MILESTONE = REGISTER.register("milestone", Milestone::new);
+    private static final Milestone TRIGGER = new Milestone();
+    public static final Supplier<Milestone> MILESTONE = () -> TRIGGER;
+    public static void register() { net.minecraft.advancements.CriteriaTriggers.register(TRIGGER); }
 
     private SinguloTriggers() {}
 
@@ -43,20 +43,18 @@ public final class SinguloTriggers {
     }
 
     public static final class Milestone extends SimpleCriterionTrigger<Milestone.Instance> {
-        @Override
-        public Codec<Instance> codec() {
-            return Instance.CODEC;
+        public net.minecraft.resources.ResourceLocation getId() { return Singulo.id("milestone"); }
+        protected Instance createInstance(com.google.gson.JsonObject json, ContextAwarePredicate player,
+                net.minecraft.advancements.critereon.DeserializationContext context) {
+            return new Instance(player, json.get("id").getAsString());
         }
-
-        public void trigger(ServerPlayer player, String id) {
-            trigger(player, i -> i.id.equals(id));
-        }
-
-        public record Instance(Optional<ContextAwarePredicate> player, String id) implements SimpleInstance {
-            public static final Codec<Instance> CODEC = RecordCodecBuilder.create(i -> i.group(
-                    EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(Instance::player),
-                    Codec.STRING.fieldOf("id").forGetter(Instance::id)
-            ).apply(i, Instance::new));
+        public void trigger(ServerPlayer player, String id) { trigger(player, i -> i.id.equals(id)); }
+        public static final class Instance extends net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance {
+            private final String id;
+            public Instance(ContextAwarePredicate player, String id) { super(Singulo.id("milestone"), player); this.id = id; }
+            public com.google.gson.JsonObject serializeToJson(net.minecraft.advancements.critereon.SerializationContext context) {
+                var json = super.serializeToJson(context); json.addProperty("id", id); return json;
+            }
         }
     }
 }

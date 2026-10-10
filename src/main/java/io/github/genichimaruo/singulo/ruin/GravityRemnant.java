@@ -92,12 +92,12 @@ public class GravityRemnant extends RuinBoss {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(SHELL, SHELL_PIECES);
-        builder.define(FLIP, 0);
-        builder.define(GATHER, 0);
-        builder.define(DEATH_SHELL, 0);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(SHELL, SHELL_PIECES);
+        entityData.define(FLIP, 0);
+        entityData.define(GATHER, 0);
+        entityData.define(DEATH_SHELL, 0);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class GravityRemnant extends RuinBoss {
     protected void onEmerged(ServerLevel level) {
         level.sendParticles(ParticleTypes.SONIC_BOOM, getX(), getY() + 0.6, getZ(), 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() - 1.5, getZ(), 10, 3, 0.3, 3, 0);
-        level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.5F, 0.5F);
+        level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 1.5F, 0.5F);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(8), e -> e != this)) {
             Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
             if (push.lengthSqr() > 1e-4) {

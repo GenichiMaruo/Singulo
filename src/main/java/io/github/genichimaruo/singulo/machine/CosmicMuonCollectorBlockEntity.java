@@ -14,8 +14,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * 宇宙線ミュオン収集器。宇宙線が大気にぶつかってできるミュオンは高い所ほど多い（実在）。
@@ -32,7 +32,7 @@ public class CosmicMuonCollectorBlockEntity extends BlockEntity implements Abstr
             setChanged();
         }
     };
-    private final IItemHandler automation = new net.neoforged.neoforge.items.wrapper.RangedWrapper(output, 0, 1) {
+    private final IItemHandler automation = new net.minecraftforge.items.wrapper.RangedWrapper(output, 0, 1) {
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             return stack;
@@ -94,16 +94,16 @@ public class CosmicMuonCollectorBlockEntity extends BlockEntity implements Abstr
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("output", output.serializeNBT());
         tag.putDouble("progress", progress);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        output.deserializeNBT(registries, tag.getCompound("output"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        output.deserializeNBT(tag.getCompound("output"));
         progress = tag.getDouble("progress");
     }
 }

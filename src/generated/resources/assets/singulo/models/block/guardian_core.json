@@ -76,10 +76,6 @@
         16,
         16
       ],
-      "neoforge_data": {
-        "block_light": 15,
-        "sky_light": 15
-      },
       "faces": {
         "north": {
           "texture": "#side",
@@ -125,6 +121,10 @@
           "texture": "#top",
           "cullface": "up"
         }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
       }
     }
   ]

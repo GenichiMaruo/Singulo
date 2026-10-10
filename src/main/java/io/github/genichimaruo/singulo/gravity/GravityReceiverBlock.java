@@ -25,7 +25,6 @@ import net.minecraft.world.phys.BlockHitResult;
  * パネルが働いている間は光る。右クリックで、働いているパネルの数を知らせる。
  */
 public class GravityReceiverBlock extends BaseEntityBlock {
-    public static final MapCodec<GravityReceiverBlock> CODEC = simpleCodec(GravityReceiverBlock::new);
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public GravityReceiverBlock(Properties properties) {
@@ -33,18 +32,14 @@ public class GravityReceiverBlock extends BaseEntityBlock {
         registerDefaultState(stateDefinition.any().setValue(LIT, false));
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT);
     }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
@@ -62,7 +57,12 @@ public class GravityReceiverBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity be) {
             player.displayClientMessage(Component.translatable("message.singulo.gravity_receiver.status",
                     be.activePanels(), be.panels(), GravityReceiverBlockEntity.perPanel()), true);
@@ -71,7 +71,7 @@ public class GravityReceiverBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity be) {
             be.onBroken(level);
         }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RKR"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:dusts/redstone"
+    },
+    "K": {
+      "item": "singulo:ceramic_substrate"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:blank_data_card"
+  }
+}

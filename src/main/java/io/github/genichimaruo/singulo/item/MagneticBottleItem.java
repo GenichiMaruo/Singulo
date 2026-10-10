@@ -44,8 +44,7 @@ public class MagneticBottleItem extends SinguloItem {
             Block.popResource(server, pos, new ItemStack(SinguloBlocks.SIMPLE.get("strange_matter").get(), YIELD));
             Player player = context.getPlayer();
             if (player != null) {
-                context.getItemInHand().hurtAndBreak(1, player, context.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND
-                        ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+                context.getItemInHand().hurtAndBreak(1, player, p -> p.broadcastBreakEvent(context.getHand()));
                 player.displayClientMessage(Component.translatable("message.singulo.strangelet_contained"), true);
             }
         }
@@ -53,7 +52,7 @@ public class MagneticBottleItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("tooltip.singulo.magnetic_bottle", stack.getMaxDamage() - stack.getDamageValue(),
                 stack.getMaxDamage()).withStyle(ChatFormatting.GRAY));

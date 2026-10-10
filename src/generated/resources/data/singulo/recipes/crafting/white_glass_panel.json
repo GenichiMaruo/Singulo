@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WGW",
+    "GGG",
+    "WGW"
+  ],
+  "key": {
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "G": {
+      "tag": "forge:glass_blocks/colorless"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "singulo:white_glass_panel"
+  }
+}

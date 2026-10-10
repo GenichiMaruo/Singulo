@@ -21,11 +21,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.energy.ComponentEnergyStorage;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.network.PacketDistributor;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.common.Tags;
+import io.github.genichimaruo.singulo.compat.ComponentEnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
+import io.github.genichimaruo.singulo.network.SinguloNetwork;
 
 /**
  * ニュートリノ・スキャナー（段階3）。ニュートリノは地面をほぼ素通りするので、使うと半径 RADIUS の中の鉱石（共通タグ c:ores、
@@ -56,7 +56,7 @@ public class NeutrinoScannerItem extends SinguloItem {
 
     /** スキャナーの感度の段階。 */
     public static int tier(ItemStack stack) {
-        return Math.max(1, Math.min(MAX_TIER, stack.getOrDefault(SinguloComponents.SCANNER_TIER.get(), 1)));
+        return Math.max(1, Math.min(MAX_TIER, SinguloComponents.getOrDefault(stack, SinguloComponents.SCANNER_TIER.get(), 1)));
     }
 
     public NeutrinoScannerItem(Properties properties, int stage) {
@@ -106,8 +106,8 @@ public class NeutrinoScannerItem extends SinguloItem {
                 e.extractEnergy(FE_PER_SCAN, false);
             }
             Result found = scan(level, sp.blockPosition(), tier(stack));
-            if (sp.connection.hasChannel(ScanPayload.TYPE)) {
-                PacketDistributor.sendToPlayer(sp, new ScanPayload(found.ores(), found.ruins()));
+            if (sp.connection != null) {
+                SinguloNetwork.sendToPlayer(sp, new ScanPayload(found.ores(), found.ruins()));
             }
             var message = Component.translatable("message.singulo.neutrino_scan", found.ores().size(), found.ruins().size());
             if (found.hidden() > 0) {
@@ -128,7 +128,7 @@ public class NeutrinoScannerItem extends SinguloItem {
             return InteractionResult.PASS;
         }
         Level level = context.getLevel();
-        IEnergyStorage source = level.getCapability(Capabilities.EnergyStorage.BLOCK, context.getClickedPos(), context.getClickedFace());
+        IEnergyStorage source = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, context.getClickedPos(), context.getClickedFace());
         if (source == null || !source.canExtract()) {
             return InteractionResult.PASS;
         }
@@ -157,7 +157,7 @@ public class NeutrinoScannerItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("tooltip.singulo.energy", energy(stack).getEnergyStored(), CAPACITY)
                 .withStyle(ChatFormatting.GRAY));

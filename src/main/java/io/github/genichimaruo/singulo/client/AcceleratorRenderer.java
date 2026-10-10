@@ -78,11 +78,11 @@ public class AcceleratorRenderer implements BlockEntityRenderer<AcceleratorContr
 
     private static void vertex(PoseStack.Pose pose, VertexConsumer buffer, AcceleratorRing.Point point,
             double width, float y, float u, float v, int rgb, int alpha, float normalY) {
-        buffer.addVertex(pose, (float) (point.x() - point.tangentZ() * width), y,
+        buffer.vertex(pose.pose(), (float) (point.x() - point.tangentZ() * width), y,
                         (float) (point.z() + point.tangentX() * width))
-                .setColor((rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255, alpha).setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT)
-                .setNormal(pose, 0, normalY, 0);
+                .color((rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255, alpha).uv(u, v)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT)
+                .normal(pose.normal(), 0, normalY, 0).endVertex();
     }
 
     @Override
@@ -95,7 +95,6 @@ public class AcceleratorRenderer implements BlockEntityRenderer<AcceleratorContr
         return 128;
     }
 
-    @Override
     public AABB getRenderBoundingBox(AcceleratorControllerBlockEntity be) {
         Cached cached = rings.get(be);
         if (cached != null && cached.ring() != null) {

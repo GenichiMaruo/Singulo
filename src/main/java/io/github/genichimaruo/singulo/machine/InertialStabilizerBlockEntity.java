@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 
 /**
  * 慣性スタビライザー（ティア3）。半径16ブロック内の爆発でブロックが壊れないようにする（防爆のみ。

@@ -65,7 +65,7 @@ public class ScannerModuleItem extends SinguloItem {
             return InteractionResultHolder.fail(module);
         }
         if (!level.isClientSide) {
-            scanner.set(SinguloComponents.SCANNER_TIER.get(), tier);
+            SinguloComponents.set(scanner, SinguloComponents.SCANNER_TIER.get(), tier);
             done(level, player, module);
         }
         return InteractionResultHolder.sidedSuccess(module, level.isClientSide);

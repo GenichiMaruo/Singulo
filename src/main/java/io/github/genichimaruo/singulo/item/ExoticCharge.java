@@ -14,7 +14,7 @@ public final class ExoticCharge {
     private ExoticCharge() {}
 
     public static int get(ItemStack stack) {
-        Integer v = stack.get(SinguloComponents.EXOTIC_CHARGE.get());
+        Integer v = SinguloComponents.get(stack, SinguloComponents.EXOTIC_CHARGE.get());
         return v == null ? 0 : v;
     }
 
@@ -41,7 +41,7 @@ public final class ExoticCharge {
             }
             charge = perMatter;
         }
-        stack.set(SinguloComponents.EXOTIC_CHARGE.get(), charge - 1);
+        SinguloComponents.set(stack, SinguloComponents.EXOTIC_CHARGE.get(), charge - 1);
         return true;
     }
 
@@ -63,13 +63,13 @@ public final class ExoticCharge {
 
     private static boolean consumeDarkMatter(Player player) {
         for (ItemStack s : player.getInventory().items) {
-            int amount = s.getOrDefault(SinguloComponents.DARK_MATTER.get(), 0);
+            int amount = SinguloComponents.getOrDefault(s, SinguloComponents.DARK_MATTER.get(), 0);
             if (amount >= DARK_MATTER_PER_CHARGE && s.getCount() == 1) {
                 int left = amount - DARK_MATTER_PER_CHARGE;
                 if (left > 0) {
-                    s.set(SinguloComponents.DARK_MATTER.get(), left);
+                    SinguloComponents.set(s, SinguloComponents.DARK_MATTER.get(), left);
                 } else {
-                    s.remove(SinguloComponents.DARK_MATTER.get());
+                    SinguloComponents.remove(s, SinguloComponents.DARK_MATTER.get());
                 }
                 return true;
             }

@@ -1796,8 +1796,8 @@
     "translation": "기본적인 구조용 금속. 다른 모드의 강철도 작동합니다."
   },
   "desc.singulo.steel_plate": {
-    "source": "Pressed steel used for casings and parts. Steel plates from other mods (c:plates/steel) work too.",
-    "translation": "케이싱 및 부품에 사용되는 프레스강입니다. 다른 모드의 강철판(c:plates/steel)도 사용할 수 있습니다."
+    "source": "Pressed steel used for casings and parts. Steel plates from other mods (forge:plates/steel) work too.",
+    "translation": "케이싱 및 부품에 사용되는 프레스강입니다. 다른 모드의 강철판(forge:plates/steel)도 사용할 수 있습니다."
   },
   "desc.singulo.strange_matter": {
     "source": "Ultra-dense matter left by strangelets. Worth 100 mass and usable for degenerate shells.",

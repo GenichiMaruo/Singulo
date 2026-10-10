@@ -9,11 +9,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 
 /**
  * シールド許可証による守り: 許可証の入ったシールドが動いている間、その半径の中で、登録されていない人は
@@ -24,12 +24,12 @@ public final class ShieldPermits {
     private ShieldPermits() {}
 
     public static void register() {
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onBreak);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onPlace);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onRightClickBlock);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onEntityInteract);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onEntityInteractSpecific);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onAttackEntity);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onBreak);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onPlace);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onRightClickBlock);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onEntityInteract);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onEntityInteractSpecific);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ShieldPermits::onAttackEntity);
     }
 
     private static boolean deny(Level level, BlockPos pos, Player player) {

@@ -16,19 +16,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** ストレンジレットのブロック。壊せず、磁気瓶でだけ取り除ける。 */
 public class StrangeletBlock extends BaseEntityBlock {
-    public static final MapCodec<StrangeletBlock> CODEC = simpleCodec(StrangeletBlock::new);
 
     public StrangeletBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 

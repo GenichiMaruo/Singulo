@@ -28,7 +28,7 @@ public class WormholeNetwork extends SavedData {
 
     public static WormholeNetwork get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(
-                new SavedData.Factory<>(WormholeNetwork::new, WormholeNetwork::load, null), NAME);
+                WormholeNetwork::load, WormholeNetwork::new, NAME);
     }
 
     public void register(long pair, GlobalPos pos) {
@@ -64,7 +64,7 @@ public class WormholeNetwork extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+    public CompoundTag save(CompoundTag tag) {
         ListTag list = new ListTag();
         mouths.forEach((pair, positions) -> {
             for (GlobalPos p : positions) {
@@ -79,7 +79,7 @@ public class WormholeNetwork extends SavedData {
         return tag;
     }
 
-    static WormholeNetwork load(CompoundTag tag, HolderLookup.Provider registries) {
+    static WormholeNetwork load(CompoundTag tag) {
         WormholeNetwork net = new WormholeNetwork();
         for (Tag t : tag.getList("mouths", Tag.TAG_COMPOUND)) {
             CompoundTag e = (CompoundTag) t;

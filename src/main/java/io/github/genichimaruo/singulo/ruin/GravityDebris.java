@@ -33,8 +33,8 @@ public class GravityDebris extends ThrowableProjectile {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(BLOCK, Blocks.COBBLED_DEEPSLATE.defaultBlockState());
+    protected void defineSynchedData() {
+        entityData.define(BLOCK, Blocks.COBBLED_DEEPSLATE.defaultBlockState());
     }
 
     public BlockState block() {
@@ -42,8 +42,8 @@ public class GravityDebris extends ThrowableProjectile {
     }
 
     @Override
-    protected double getDefaultGravity() {
-        return 0.01;
+    protected float getGravity() {
+        return 0.01F;
     }
 
     @Override

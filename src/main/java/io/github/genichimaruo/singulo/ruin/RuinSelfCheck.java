@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 
 /**
  * 開発用の自己点検。-Dsingulo.ruinSelfCheck=true（./gradlew runServer -PruinSelfCheck=true）で起動すると、

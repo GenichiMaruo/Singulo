@@ -17,10 +17,6 @@ public class MultiblockPortBlock extends PortBlock {
         super(properties, Role.MULTIBLOCK_PORT);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(MultiblockPortBlock::new);
-    }
 
     @Nullable
     @Override

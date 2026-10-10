@@ -1,18 +1,37 @@
 package io.github.genichimaruo.singulo.network;
 
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import io.github.genichimaruo.singulo.Singulo;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.simple.SimpleChannel;
 
-/** 通信の登録。 */
+/** Versioned Forge 1.20.1 channel; handlers execute on the game thread. */
 public final class SinguloNetwork {
-    private SinguloNetwork() {}
-
-    public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar r = event.registrar("1");
-        r.playToServer(ToggleAreaPayload.TYPE, ToggleAreaPayload.STREAM_CODEC, ToggleAreaPayload::handle);
-        r.playToClient(RecordsPayload.TYPE, RecordsPayload.STREAM_CODEC, RecordsPayload::handle);
-        r.playToClient(ScanPayload.TYPE, ScanPayload.STREAM_CODEC, ScanPayload::handle);
-        r.playToServer(SideConfigPayload.TYPE, SideConfigPayload.STREAM_CODEC, SideConfigPayload::handle);
-        r.playToServer(ManipulatorInputPayload.TYPE, ManipulatorInputPayload.STREAM_CODEC, ManipulatorInputPayload::handle);
+    private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(Singulo.id("main"),
+            () -> "1", "1"::equals, "1"::equals);
+    public static void register() {
+        CHANNEL.messageBuilder(ToggleAreaPayload.class, 0, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ToggleAreaPayload::encode).decoder(ToggleAreaPayload::decode)
+                .consumerMainThread((p, c) -> ToggleAreaPayload.handle(p, c.get())).add();
+        CHANNEL.messageBuilder(RecordsPayload.class, 1, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(RecordsPayload::encode).decoder(RecordsPayload::decode)
+                .consumerMainThread((p, c) -> RecordsPayload.handle(p, c.get())).add();
+        CHANNEL.messageBuilder(ScanPayload.class, 2, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ScanPayload::encode).decoder(ScanPayload::decode)
+                .consumerMainThread((p, c) -> ScanPayload.handle(p, c.get())).add();
+        CHANNEL.messageBuilder(SideConfigPayload.class, 3, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SideConfigPayload::encode).decoder(SideConfigPayload::decode)
+                .consumerMainThread((p, c) -> SideConfigPayload.handle(p, c.get())).add();
+        CHANNEL.messageBuilder(ManipulatorInputPayload.class, 4, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ManipulatorInputPayload::encode).decoder(ManipulatorInputPayload::decode)
+                .consumerMainThread((p, c) -> ManipulatorInputPayload.handle(p, c.get())).add();
     }
+    public static void sendToServer(Object packet) { CHANNEL.sendToServer(packet); }
+    public static void sendToPlayer(ServerPlayer player, Object packet) {
+        if (player.connection != null && player.connection.connection.channel() != null)
+            CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    }
+    private SinguloNetwork() {}
 }

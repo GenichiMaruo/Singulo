@@ -131,7 +131,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     }
 
     private static boolean glassLike(BlockState s) {
-        return s.is(net.neoforged.neoforge.common.Tags.Blocks.GLASS_BLOCKS) || s.is(SinguloBlocks.INTACT_RUIN_GLASS.get())
+        return s.is(net.minecraftforge.common.Tags.Blocks.GLASS) || s.is(SinguloBlocks.INTACT_RUIN_GLASS.get())
                 || s.is(SinguloBlocks.RUIN_GLASS.get());
     }
 
@@ -165,6 +165,11 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         }
         Entity e = level.getEntity(boss);
         return e instanceof RuinBoss b && b.isAlive() ? b : null;
+    }
+
+    /** Only the currently assigned guardian may change this encounter. */
+    public boolean ownsBoss(RuinBoss guardian) {
+        return guardian.getUUID().equals(boss);
     }
 
     /** 番人を起こす（保管庫が封鎖されていて、まだ起きていないときだけ）。起こしたらそれを返す。 */
@@ -287,8 +292,8 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         if (boss != null) {
             tag.putUUID("boss", boss);
         }
@@ -309,24 +314,24 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         boss = tag.hasUUID("boss") ? tag.getUUID("boss") : null;
         scanned = tag.getBoolean("scanned");
         projectors.clear();
-        for (Tag t : tag.getList("projectors", Tag.TAG_INT_ARRAY)) {
-            projectors.add(NbtUtils.readBlockPos(wrap(t), "p").orElse(BlockPos.ZERO));
+        for (Tag t : tag.getList("projectors", Tag.TAG_COMPOUND)) {
+            projectors.add(io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(wrap(t), "p").orElse(BlockPos.ZERO));
         }
         tankPos.clear();
         tankState.clear();
-        var blocks = registries.lookupOrThrow(Registries.BLOCK);
+        var blocks = net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup();
         for (Tag t : tag.getList("tank", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;
             BlockState s = NbtUtils.readBlockState(blocks, c.getCompound("state"));
             if (s.isAir()) {
                 s = Blocks.GLASS.defaultBlockState();
             }
-            tankPos.add(NbtUtils.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
+            tankPos.add(io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
             tankState.add(s);
         }
     }

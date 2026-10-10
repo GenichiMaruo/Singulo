@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XOX",
+    "KFK",
+    " B "
+  ],
+  "key": {
+    "X": {
+      "item": "minecraft:piston"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "K": {
+      "item": "singulo:ceramic_substrate"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:precision_assembler"
+  }
+}

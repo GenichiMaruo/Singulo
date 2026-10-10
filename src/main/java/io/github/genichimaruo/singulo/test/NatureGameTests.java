@@ -14,8 +14,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 隕石クレーターの自然物、雷ガラス、深海・虚空の収集装置。 */
 @GameTestHolder(Singulo.MODID)
@@ -34,7 +34,7 @@ public final class NatureGameTests {
         helper.setBlock(sand.below(), Blocks.STONE);
         helper.setBlock(sand, Blocks.SAND);
         helper.setBlock(sand.above(), Blocks.LIGHTNING_ROD);
-        KeraunosTowerBlockEntity be = helper.getBlockEntity(tower);
+        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, tower);
         be.energy().setEnergy(be.energy().getMaxEnergyStored());
         helper.assertTrue(be.fire(null), "撃てない");
         helper.assertFalse(be.fire(null), "ためている間にもう一度撃てる");
@@ -51,7 +51,7 @@ public final class NatureGameTests {
     public static void keraunosTowerNeedsALightningRod(GameTestHelper helper) {
         BlockPos tower = new BlockPos(1, 1, 1);
         helper.setBlock(tower, SinguloBlocks.KERAUNOS_TOWER.get());
-        KeraunosTowerBlockEntity be = helper.getBlockEntity(tower);
+        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, tower);
         be.energy().setEnergy(be.energy().getMaxEnergyStored());
         helper.assertFalse(be.fire(null), "避雷針がないのに撃った");
         helper.assertTrue(be.energy().getEnergyStored() == be.energy().getMaxEnergyStored(), "撃たないのに電力を使った");
@@ -117,7 +117,7 @@ public final class NatureGameTests {
         }
         var level = helper.getLevel();
         helper.assertTrue(DeepSeaCollectorBlockEntity.depth(level, helper.absolutePos(sea)) == 5, "水の深さの数え方が違う");
-        DeepSeaCollectorBlockEntity collector = helper.getBlockEntity(sea);
+        DeepSeaCollectorBlockEntity collector = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, sea);
         helper.assertTrue(collector.rate() == 0 && DeepSeaCollectorBlockEntity.depth(level, helper.absolutePos(sea)) < DeepSeaCollectorBlockEntity.MIN_DEPTH,
                 "浅いのに動く");
         BlockPos voidPos = new BlockPos(5, 3, 5);

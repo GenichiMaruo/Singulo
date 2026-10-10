@@ -10,7 +10,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 
 /**
  * ブラックホール（稼働中の炉心と野良ブラックホール）が出すうなり（くり返し）。炉心の位置から鳴り、離れるほど小さくなる（32ブロックまで）。
@@ -30,7 +30,8 @@ final class BlackHoleAmbience {
         boolean alive();
     }
 
-    static void onClientTick(ClientTickEvent.Post event) {
+    static void onClientTick(ClientTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) {
             PLAYING.clear();

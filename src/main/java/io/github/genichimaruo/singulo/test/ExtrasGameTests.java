@@ -20,8 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 小型ブラックホール・野良ブラックホールの蒸発・設定カード。 */
 @GameTestHolder(Singulo.MODID)
@@ -51,7 +51,7 @@ public final class ExtrasGameTests {
     public static void rogueBlackHoleEvaporates(GameTestHelper helper) {
         BlockPos pos = new BlockPos(4, 4, 4);
         helper.setBlock(pos, SinguloBlocks.ROGUE_BLACK_HOLE.get());
-        RogueBlackHoleBlockEntity hole = helper.getBlockEntity(pos);
+        RogueBlackHoleBlockEntity hole = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         hole.setCore(RogueBlackHoleBlockEntity.VANISH_MASS + 5, 0);
         helper.succeedWhen(() -> helper.assertBlockNotPresent(SinguloBlocks.ROGUE_BLACK_HOLE.get(), pos));
     }
@@ -72,11 +72,11 @@ public final class ExtrasGameTests {
         BlockPos b = new BlockPos(5, 1, 2);
         helper.setBlock(a, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
         helper.setBlock(b, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
-        MachineBlockEntity from = helper.getBlockEntity(a);
-        MachineBlockEntity to = helper.getBlockEntity(b);
+        MachineBlockEntity from = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, a);
+        MachineBlockEntity to = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, b);
         from.setSide(0, SideConfig.Face.TOP, SideConfig.INPUT, false);
         from.setSide(0, SideConfig.Face.BACK, SideConfig.OUTPUT, true);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = TestBuild.mockPlayer(helper);
         try {
             ItemStack card = new ItemStack(SinguloItems.SETTINGS_CARD.get());
             player.setItemInHand(InteractionHand.MAIN_HAND, card);

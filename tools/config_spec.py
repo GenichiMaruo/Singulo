@@ -111,11 +111,11 @@ CLIENT = [
 ]
 
 DATAPACK = [
-    ('data/singulo/recipe/*.json', 'すべてのレシピ', '個数・製作場所・時間・電力を差し替え・追加・削除'),
+    ('data/singulo/recipes/*.json', 'すべてのレシピ', '個数・製作場所・時間・電力を差し替え・追加・削除'),
     ('data/singulo/mass_values/*.json', '質量値', 'アイテム単位・タグ単位で質量値を変更。金属扱いにするタグも指定'),
     ('data/singulo/thermal/*.json', '熱電発電機の温度', '高温源・低温源のブロック温度と維持できる温度差'),
-    ('data/singulo/tags/item/star_core.json', 'ネザースターの代替', '#singulo:star_core に入れたアイテムをネザースターの代わりに使える'),
-    ('data/singulo/tags/item/metal_core.json', '金属の核に使える素材', '金属圧縮ブロックに入れられる金属ブロック'),
-    ('data/singulo/tags/entity_type/gravity_immune.json', '重力耐性', '浮遊・圧壊が効かないモブ'),
-    ('data/singulo/loot_table/ruins/*.json', '遺構の中身', '回収物の種類と個数'),
+    ('data/singulo/tags/items/star_core.json', 'ネザースターの代替', '#singulo:star_core に入れたアイテムをネザースターの代わりに使える'),
+    ('data/singulo/tags/items/metal_core.json', '金属の核に使える素材', '金属圧縮ブロックに入れられる金属ブロック'),
+    ('data/singulo/tags/entity_types/gravity_immune.json', '重力耐性', '浮遊・圧壊が効かないモブ'),
+    ('data/singulo/loot_tables/ruins/*.json', '遺構の中身', '回収物の種類と個数'),
 ]

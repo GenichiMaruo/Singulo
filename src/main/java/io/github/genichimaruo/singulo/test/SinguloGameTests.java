@@ -18,10 +18,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 段階1の装置の動作確認。`./gradlew runGameTestServer` で実行する。 */
 @GameTestHolder(Singulo.MODID)
@@ -38,7 +38,7 @@ public final class SinguloGameTests {
 
     private static MachineBlockEntity machine(GameTestHelper helper, MachineType type) {
         helper.setBlock(MACHINE, SinguloBlocks.MACHINES.get(type).get());
-        MachineBlockEntity be = helper.getBlockEntity(MACHINE);
+        MachineBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, MACHINE);
         be.energy().setEnergy(MachineType.ENERGY_CAPACITY);
         return be;
     }
@@ -165,7 +165,7 @@ public final class SinguloGameTests {
         ItemStack log = new ItemStack(item("observation_log"));
         ItemStack spent = UsesHelper.consume(log, 16);
         helper.assertTrue(spent.is(item("observation_log")) && UsesHelper.canRestore(spent), "原本は使い切っても残り、修復できる");
-        UsesData data = UsesHelper.restore(spent, spent).get(SinguloComponents.USES.get());
+        UsesData data = SinguloComponents.get(UsesHelper.restore(spent, spent), SinguloComponents.USES.get());
         helper.assertTrue(data != null && data.max() == 12 && data.repairs() == 1, "原本の修復で最大12回");
         helper.succeed();
     }
@@ -175,7 +175,7 @@ public final class SinguloGameTests {
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.CAMPFIRE);
         helper.setBlock(MACHINE.east(), Blocks.BLUE_ICE);
-        ThermoelectricGeneratorBlockEntity gen = helper.getBlockEntity(MACHINE);
+        ThermoelectricGeneratorBlockEntity gen = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, MACHINE);
         helper.runAtTickTime(60, () -> {
             // 焚き火 800 K と青氷 243 K → ΔT 557 K、0.10 × 557 ≈ 55.7 FE/t。最初の走査まで（テスト開始のずれを含めて）最大20 tick かかる
             int energy = gen.energy().getEnergyStored();
@@ -205,7 +205,7 @@ public final class SinguloGameTests {
         }
         BlockPos kilnPos = new BlockPos(5, 1, 1);
         helper.setBlock(kilnPos, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = helper.getBlockEntity(kilnPos);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, kilnPos);
         helper.succeedWhen(() -> helper.assertTrue(kiln.energy().getEnergyStored() > 200,
                 "導線の先の焼成炉に電力が届かない: " + kiln.energy().getEnergyStored()));
     }

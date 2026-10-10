@@ -448,7 +448,7 @@
   "desc.singulo.stardust_cluster": "长在陨石熔壳上的宇宙微粒晶体。破坏后掉落星尘。",
   "desc.singulo.steel_blend": "铁和煤的混合物。将其在高炉中熔炼以获得钢材。",
   "desc.singulo.steel_ingot": "基本结构金属。其他模组的钢铁也可以。",
-  "desc.singulo.steel_plate": "用于外壳和零件的压制钢。其他模组的钢板（c:plates/steel）也可使用。",
+  "desc.singulo.steel_plate": "用于外壳和零件的压制钢。其他模组的钢板（forge:plates/steel）也可使用。",
   "desc.singulo.strange_matter": "奇异子留下的超致密物质。质量为 100，可用于简并壳。",
   "desc.singulo.strangelet": "将附近的方块转化为奇怪的物质。用 磁瓶 包含它。",
   "desc.singulo.striped_ruin_panel": "留有早已熄灭的光带的古建筑板材。",

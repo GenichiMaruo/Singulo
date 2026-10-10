@@ -22,10 +22,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.event.entity.EntityMobGriefingEvent;
-import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.event.entity.EntityMobGriefingEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 
 /**
  * イベントホライズン・シールド発生塔（ティア5、3×3×9 のマルチブロック。コアは底の中央）。
@@ -54,7 +54,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     /** 放射冠の位置（だれでも壊せ、壊すとシールドが止まる）。 */
     private BlockPos crown;
     /** 許可証のスロット。登録された人がいれば、守りの中で設置・破壊・取り出しができるのはその人たちだけ。 */
-    private final net.neoforged.neoforge.items.ItemStackHandler permit = new net.neoforged.neoforge.items.ItemStackHandler(1) {
+    private final net.minecraftforge.items.ItemStackHandler permit = new net.minecraftforge.items.ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
             return stack.getItem() instanceof io.github.genichimaruo.singulo.item.ShieldPermitItem;
@@ -205,7 +205,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+    public net.minecraft.nbt.CompoundTag getUpdateTag() {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         tag.putInt("protection", protection);
         tag.putInt("radius", radius());
@@ -220,10 +220,10 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(net.minecraft.nbt.CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("permit")) {
-            permit.deserializeNBT(registries, tag.getCompound("permit"));
+            permit.deserializeNBT(tag.getCompound("permit"));
         }
         if (tag.contains("protection")) {
             int p = tag.getInt("protection");
@@ -243,11 +243,11 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
-    public net.neoforged.neoforge.items.IItemHandler menuItems() {
-        return new net.neoforged.neoforge.items.wrapper.CombinedInvWrapper(slot, permit);
+    public net.minecraftforge.items.IItemHandler menuItems() {
+        return new net.minecraftforge.items.wrapper.CombinedInvWrapper(slot, permit);
     }
 
-    public net.neoforged.neoforge.items.ItemStackHandler permit() {
+    public net.minecraftforge.items.ItemStackHandler permit() {
         return permit;
     }
 
@@ -356,7 +356,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
 
     /** 範囲内で起きた爆発は始まる前に打ち消す。 */
     public static void onExplosionStart(ExplosionEvent.Start event) {
-        if (shielded(event.getLevel(), event.getExplosion().center(), 4)) {
+        if (shielded(event.getLevel(), event.getExplosion().getPosition(), 4)) {
             event.setCanceled(true);
         }
     }
@@ -374,7 +374,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     /** 範囲内のモブはブロックを荒らせない。 */
     public static void onMobGriefing(EntityMobGriefingEvent event) {
         if (event.getEntity() != null && shielded(event.getEntity().level(), event.getEntity().position(), 4)) {
-            event.setCanGrief(false);
+            event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
         }
     }
 
@@ -382,14 +382,14 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     public static void onSpawnCheck(MobSpawnEvent.PositionCheck event) {
         if (event.getEntity() instanceof Enemy && event.getSpawner() == null
                 && shielded(event.getEntity().level(), new Vec3(event.getX(), event.getY(), event.getZ()), 5)) {
-            event.setResult(MobSpawnEvent.PositionCheck.Result.FAIL);
+            event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
         }
     }
 
     @Override
-    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("permit", permit.serializeNBT(registries));
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("permit", permit.serializeNBT());
     }
 
     @Override

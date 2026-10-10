@@ -13,8 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * SMESセル（超伝導磁気エネルギー貯蔵）。10 MFE を蓄える。正面から出し、ほかの5面から受け取る。
@@ -74,7 +74,7 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
         be.inThisTick = 0;
         be.lastOut = 0;
         if (be.energy.getEnergyStored() > 0) {
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(front), front.getOpposite());
+            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, pos.relative(front), front.getOpposite());
             if (target != null && target.canReceive()) {
                 int sent = target.receiveEnergy(Math.min(be.energy.getEnergyStored(), be.rate), false);
                 if (sent > 0) {
@@ -91,7 +91,7 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
+        net.minecraftforge.network.NetworkHooks.openScreen(player, this, buf -> buf.writeBlockPos(worldPosition));
     }
 
     @Override
@@ -113,14 +113,14 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("energy", energy.getEnergyStored());
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         energy.setEnergy(tag.getInt("energy"));
     }
 

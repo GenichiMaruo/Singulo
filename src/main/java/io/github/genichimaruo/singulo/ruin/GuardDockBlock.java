@@ -14,19 +14,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** 警備機ドック。遺構にだけ置かれ、壊せない。 */
 public class GuardDockBlock extends BaseEntityBlock {
-    public static final MapCodec<GuardDockBlock> CODEC = simpleCodec(GuardDockBlock::new);
 
     public GuardDockBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 

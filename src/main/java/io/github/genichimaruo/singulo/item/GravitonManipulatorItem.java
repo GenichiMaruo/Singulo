@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.Tags;
+import net.minecraftforge.common.Tags;
 
 /**
  * グラビトン・マニピュレーター（段階5）。慣性制御ガントレットの完全版。
@@ -173,8 +173,9 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
     }
 
     /** 毎tick: 力をためている間は持ち上げたまま保ち、左クリックを押している間は今のモードで重力を操る。 */
-    public static void onPlayerTick(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) {
+    public static void onPlayerTick(net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
+        if (!(event.player instanceof ServerPlayer player)) {
             return;
         }
         java.util.UUID id = player.getUUID();
@@ -399,7 +400,7 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("tooltip.singulo.exotic_charge", ExoticCharge.get(stack) / 20)
                 .withStyle(ChatFormatting.GRAY));

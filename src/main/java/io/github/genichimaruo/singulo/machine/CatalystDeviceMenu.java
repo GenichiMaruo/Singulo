@@ -3,15 +3,15 @@ package io.github.genichimaruo.singulo.machine;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 /** 触媒装置の画面。触媒スロットと（装置によって）燃料か許可証のスロット、状態表示。 */
 public class CatalystDeviceMenu extends AbstractContainerMenu {
@@ -59,7 +59,7 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public static CatalystDeviceMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+    public static CatalystDeviceMenu client(int containerId, Inventory inventory, FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
         CatalystDeviceBlockEntity.Kind kind = CatalystDeviceBlockEntity.Kind.values()[buf.readVarInt()];
         return new CatalystDeviceMenu(containerId, inventory, pos, kind, new ItemStackHandler(kind.extraSlot() != null ? 2 : 1),

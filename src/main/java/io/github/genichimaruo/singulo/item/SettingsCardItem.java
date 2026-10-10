@@ -4,14 +4,12 @@ import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -51,12 +49,12 @@ public class SettingsCardItem extends SinguloItem {
                 tag.putInt("spin_target", r.spinTargetIndex());
                 tag.putInt("feed_interval", r.feedInterval());
             }
-            CustomData.update(DataComponents.CUSTOM_DATA, stack, t -> t.put(KEY, tag));
+            stack.getOrCreateTag().put(KEY, tag);
             player.displayClientMessage(Component.translatable("item.singulo.settings_card.copied"), true);
             return InteractionResult.SUCCESS;
         }
-        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-        CompoundTag tag = data == null ? null : data.copyTag().getCompound(KEY);
+        CompoundTag data = stack.getTag();
+        CompoundTag tag = data == null ? null : data.getCompound(KEY);
         if (tag == null || tag.isEmpty()) {
             player.displayClientMessage(Component.translatable("item.singulo.settings_card.empty"), true);
             return InteractionResult.FAIL;
@@ -84,10 +82,10 @@ public class SettingsCardItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-        String kind = data == null ? "" : data.copyTag().getCompound(KEY).getString("kind");
+        CompoundTag data = stack.getTag();
+        String kind = data == null ? "" : data.getCompound(KEY).getString("kind");
         tooltip.add(Component.translatable(kind.isEmpty() ? "item.singulo.settings_card.blank" : "item.singulo.settings_card.holds." + kind)
                 .withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.singulo.settings_card.hint").withStyle(ChatFormatting.DARK_GRAY));

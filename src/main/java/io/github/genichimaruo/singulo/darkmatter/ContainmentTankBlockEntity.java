@@ -7,7 +7,7 @@ import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentMap;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,8 +15,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 /**
  * 重力閉じ込めタンク（段階5）。内部に重力場を張ってダークマターを閉じ込める、ダークマターを保管できる唯一の容器。
@@ -42,7 +42,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
     }
 
     public static boolean isDarkMatter(FluidStack stack) {
-        return stack.is(SinguloFluids.get("dark_matter"));
+        return stack.getFluid().isSame(SinguloFluids.get("dark_matter"));
     }
 
     public static FluidStack darkMatter(int amount) {
@@ -82,7 +82,7 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
 
     @Override
     public void openMenu(ServerPlayer player) {
-        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.CONTAINMENT_TANK, new net.neoforged.neoforge.items.ItemStackHandler(0), i -> switch (i) {
+        io.github.genichimaruo.singulo.machine.DeviceMenu.open(player, this, io.github.genichimaruo.singulo.machine.DeviceMenu.Kind.CONTAINMENT_TANK, new net.minecraftforge.items.ItemStackHandler(0), i -> switch (i) {
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.AMOUNT -> amount();
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CAPACITY -> CAPACITY;
             case io.github.genichimaruo.singulo.machine.DeviceMenu.Tank.CONTAINED -> contained ? 1 : 0;
@@ -94,37 +94,37 @@ public class ContainmentTankBlockEntity extends BlockEntity implements AbstractM
 
     // ------------------------------------------------------------------ アイテムとの受け渡し（タンクごと運ぶ）
 
-    @Override
-    protected void collectImplicitComponents(DataComponentMap.Builder components) {
-        super.collectImplicitComponents(components);
+    public void collectImplicitComponents(net.minecraft.world.item.ItemStack components) {
+
         if (amount() > 0) {
-            components.set(SinguloComponents.DARK_MATTER.get(), amount());
+            SinguloComponents.set(components, SinguloComponents.DARK_MATTER.get(), amount());
         }
     }
 
-    @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
-        super.applyImplicitComponents(input);
-        int amount = input.getOrDefault(SinguloComponents.DARK_MATTER.get(), 0);
+    public void applyComponentsFromItemStack(net.minecraft.world.item.ItemStack input) {
+
+        int amount = SinguloComponents.getOrDefault(input, SinguloComponents.DARK_MATTER.get(), 0);
         tank.setFluid(amount > 0 ? darkMatter(Math.min(CAPACITY, amount)) : FluidStack.EMPTY);
     }
 
-    @Override
-    public void removeComponentsFromTag(CompoundTag tag) {
-        tag.remove("tank");
+    public net.minecraft.world.item.ItemStack collectComponents() {
+        var stack = new net.minecraft.world.item.ItemStack(getBlockState().getBlock());
+        collectImplicitComponents(stack);
+        return stack;
     }
 
+
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("tank", tank.writeToNBT(new CompoundTag()));
         tag.putInt("energy", energy.getEnergyStored());
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        tank.readFromNBT(registries, tag.getCompound("tank"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        tank.readFromNBT(tag.getCompound("tank"));
         energy.setEnergy(tag.getInt("energy"));
     }
 }

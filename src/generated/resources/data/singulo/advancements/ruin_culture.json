@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:culture_data"
+    },
+    "title": {
+      "translate": "advancement.singulo.ruin_culture.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.ruin_culture.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "discover/culture_facility"
+      }
+    }
+  },
+  "parent": "singulo:bose"
+}

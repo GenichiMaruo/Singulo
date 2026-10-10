@@ -2,7 +2,7 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -22,7 +22,7 @@ public class SmesMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public static SmesMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+    public static SmesMenu client(int containerId, Inventory inventory, FriendlyByteBuf buf) {
         return new SmesMenu(containerId, inventory, buf.readBlockPos(), SyncedInts.client(COUNT));
     }
 

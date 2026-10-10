@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "forge:obsidian"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_furnace_shell",
+    "count": 4
+  }
+}

@@ -4,14 +4,14 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.generated.GeneratedContent;
 import io.github.genichimaruo.singulo.registry.SinguloItems;
 import io.github.genichimaruo.singulo.ruin.AncientRecords;
-import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 旧文明の記録と進捗の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -23,7 +23,7 @@ public final class GuideGameTests {
 
     @GameTest(template = EMPTY)
     public static void decodedRecordsUnlockInOrder(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
             player.getAbilities().instabuild = false;
             ItemStack rec = new ItemStack(SinguloItems.DECODED_RECORD.get(), 2);
@@ -43,7 +43,7 @@ public final class GuideGameTests {
     public static void advancementsAreLoaded(GameTestHelper helper) {
         var advancements = helper.getLevel().getServer().getAdvancements();
         for (String id : new String[]{"root", "tower", "ignite", "records"}) {
-            AdvancementHolder h = advancements.get(Singulo.id(id));
+            Advancement h = advancements.getAdvancement(Singulo.id(id));
             helper.assertTrue(h != null, "進捗 " + id + " が読み込まれていない");
         }
         helper.succeed();

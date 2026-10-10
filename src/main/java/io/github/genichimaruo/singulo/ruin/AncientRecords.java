@@ -7,31 +7,22 @@ import io.github.genichimaruo.singulo.network.RecordsPayload;
 import io.github.genichimaruo.singulo.registry.SinguloTriggers;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import io.github.genichimaruo.singulo.network.SinguloNetwork;
 
 /**
  * 旧文明の記録。プレイヤーごとに解読した記録の ID を持ち、解読した記録を読むたびに順番に1つずつ増える。
  * ハンドブックの「旧文明の記録」の章に出すため、クライアントへ送る。
  */
 public final class AncientRecords {
-    public static final DeferredRegister<AttachmentType<?>> REGISTER =
-            DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Singulo.MODID);
-
-    public static final Supplier<AttachmentType<List<String>>> DECODED = REGISTER.register("records",
-            () -> AttachmentType.<List<String>>builder(() -> List.of())
-                    .serialize(Codec.STRING.listOf()).copyOnDeath().build());
+    public static final String DECODED = "singulo:records";
 
     private AncientRecords() {}
 
     public static List<String> decoded(ServerPlayer player) {
-        return player.getData(DECODED);
+        return io.github.genichimaruo.singulo.compat.PlayerData.get(player, DECODED, Codec.STRING.listOf(), new ArrayList<>());
     }
 
     /** 次の記録を読めるようにする。全部読んでいれば null。 */
@@ -42,7 +33,7 @@ public final class AncientRecords {
             if (!have.contains(id)) {
                 List<String> copy = new ArrayList<>(have);
                 copy.add(id);
-                player.setData(DECODED, copy);
+                io.github.genichimaruo.singulo.compat.PlayerData.set(player, DECODED, Codec.STRING.listOf(), copy);
                 sync(player);
                 if (copy.containsAll(GeneratedContent.RECORDS)) {
                     SinguloTriggers.milestone(player, "records_all");
@@ -61,7 +52,7 @@ public final class AncientRecords {
             if (!have.contains(id)) {
                 List<String> copy = new ArrayList<>(have);
                 copy.add(id);
-                player.setData(DECODED, copy);
+                io.github.genichimaruo.singulo.compat.PlayerData.set(player, DECODED, Codec.STRING.listOf(), copy);
                 sync(player);
                 return id;
             }
@@ -70,8 +61,8 @@ public final class AncientRecords {
     }
 
     public static void sync(ServerPlayer player) {
-        if (player.connection != null && player.connection.hasChannel(RecordsPayload.TYPE)) {
-            PacketDistributor.sendToPlayer(player, new RecordsPayload(decoded(player)));
+        if (player.connection != null) {
+            SinguloNetwork.sendToPlayer(player, new RecordsPayload(decoded(player)));
         }
     }
 

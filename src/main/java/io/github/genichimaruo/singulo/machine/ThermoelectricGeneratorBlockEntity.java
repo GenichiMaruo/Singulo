@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * 熱電発電機（ゼーベック効果）。隣の最も熱いブロックと最も冷たいブロックの温度差 ΔT から
@@ -139,7 +139,7 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
             if (energy.getEnergyStored() <= 0) {
                 return;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
+            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
             if (target != null && target.canReceive()) {
                 int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
                 if (sent > 0) {
@@ -178,19 +178,19 @@ public class ThermoelectricGeneratorBlockEntity extends BlockEntity implements M
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.openMenu(this, worldPosition);
+        net.minecraftforge.network.NetworkHooks.openScreen(player, this, worldPosition);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("melt", meltProgress);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         energy.setEnergy(tag.getInt("energy"));
         meltProgress = tag.getDouble("melt");
     }

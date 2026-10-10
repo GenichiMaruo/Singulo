@@ -26,7 +26,6 @@ public class PortBlockEntity extends BlockEntity {
         if (!java.util.Objects.equals(this.controller, controller)) {
             this.controller = controller;
             if (level != null) {
-                level.invalidateCapabilities(worldPosition);
                 // 先に敷いてあったケーブルにつなぎ直させる
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
                 // クライアントにも知らせる（右クリックでコントローラーの画面を開くため）
@@ -36,7 +35,7 @@ public class PortBlockEntity extends BlockEntity {
     }
 
     @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+    public net.minecraft.nbt.CompoundTag getUpdateTag() {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         if (controller != null) {
             tag.putLong("controller", controller.asLong());
@@ -50,8 +49,8 @@ public class PortBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(net.minecraft.nbt.CompoundTag tag) {
+        super.load(tag);
         // 同期のときだけ入っている（保存はしない。読み込み後の形の判定で付け直す）
         if (level != null && level.isClientSide) {
             controller = tag.contains("controller") ? BlockPos.of(tag.getLong("controller")) : null;
@@ -66,13 +65,13 @@ public class PortBlockEntity extends BlockEntity {
 
     /** コントローラの能力をそのまま返す（未形成なら null）。 */
     @Nullable
-    public <T> T delegate(net.neoforged.neoforge.capabilities.BlockCapability<T, net.minecraft.core.Direction> capability) {
+    public <T> T delegate(net.minecraftforge.common.capabilities.Capability<T> capability) {
         if (controller == null || level == null || controller.equals(worldPosition)) {
             return null;
         }
         if (level.getBlockEntity(controller) instanceof MachineBlockEntity machine && machine.structureSize() <= 0) {
             return null;
         }
-        return level.getCapability(capability, controller, null);
+        return io.github.genichimaruo.singulo.compat.Capabilities.get(level, capability, controller, null);
     }
 }

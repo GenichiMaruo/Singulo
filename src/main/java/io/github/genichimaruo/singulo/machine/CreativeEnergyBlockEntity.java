@@ -8,8 +8,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * クリエイティブ電源（クリエイティブ専用）。電力が尽きない。毎tick、隣の6面へ受け取れるだけ送り（mod のケーブルや装置へは
@@ -59,7 +59,7 @@ public class CreativeEnergyBlockEntity extends BlockEntity implements AbstractMa
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CreativeEnergyBlockEntity be) {
         for (Direction dir : Direction.values()) {
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
+            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
             if (target != null && target.canReceive() && !(level.getBlockEntity(pos.relative(dir)) instanceof CreativeEnergyBlockEntity)) {
                 io.github.genichimaruo.singulo.energy.LongEnergyStorage.receive(target, Long.MAX_VALUE / 4, false);
             }

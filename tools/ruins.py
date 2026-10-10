@@ -10,7 +10,7 @@ import random
 
 import nbt
 
-DATA_VERSION = 3955  # 1.21.1
+DATA_VERSION = 3465  # 1.20.1
 MODID = 'singulo'
 
 PANEL = f'{MODID}:ruin_panel'

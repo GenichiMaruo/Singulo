@@ -155,7 +155,6 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         return true;
     }
 
-    @Override
     public AABB getRenderBoundingBox(FixedShapeControllerBlockEntity.Compactor be) {
         return new AABB(be.getBlockPos()).inflate(5, 5, 5);
     }

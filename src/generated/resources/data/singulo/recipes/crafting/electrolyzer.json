@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GVG",
+    "CFC",
+    " B "
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    "V": {
+      "item": "minecraft:bucket"
+    },
+    "C": {
+      "tag": "forge:ingots/copper"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:electrolyzer"
+  }
+}

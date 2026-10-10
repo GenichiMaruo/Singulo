@@ -186,7 +186,6 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
         return true;
     }
 
-    @Override
     public AABB getRenderBoundingBox(DegenerateFurnaceBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(5, 7, 5);
     }

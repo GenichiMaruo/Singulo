@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 /**
  * 形成済みのマルチブロックは、どの部品を右クリックしてもコントローラーの画面を開く。

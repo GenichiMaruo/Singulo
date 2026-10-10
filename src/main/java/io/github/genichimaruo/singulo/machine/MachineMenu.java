@@ -3,15 +3,15 @@ package io.github.genichimaruo.singulo.machine;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 public class MachineMenu extends AbstractContainerMenu {
     public static final int BUTTON_CYCLE_MODE = 0, BUTTON_POWER = 1, BUTTON_MAKE_FREE = 2;
@@ -27,7 +27,7 @@ public class MachineMenu extends AbstractContainerMenu {
         this(containerId, inventory, machine.type(), machine.getBlockPos(), machine.items(), machine.syncData(), machine);
     }
 
-    public static MachineMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+    public static MachineMenu client(int containerId, Inventory inventory, FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
         MachineType type = MachineType.values()[buf.readVarInt()];
         int synced = MachineBlockEntity.syncedCount(type);

@@ -23,7 +23,7 @@ public class SinguloItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         addStageLine(tooltip, stage);
         if (planned) {
             tooltip.add(Component.translatable("tooltip.singulo.planned").withStyle(ChatFormatting.DARK_GRAY));

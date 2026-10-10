@@ -49,7 +49,7 @@ import net.minecraft.world.phys.Vec3;
  * <p>
  * 遺構に置かれたコンテナは、初めて開いたときに loot table singulo:sealed/tier_N の中身が入る。
  */
-public class SealedContainerBlockEntity extends BaseContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
+public class SealedContainerBlockEntity extends net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
     private static final int[] NO_SLOTS = new int[0];
 
     /** ホッパーなどからは、どの面からも出し入れできない（開けて手で取り出す）。 */
@@ -137,7 +137,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
                     useKey(player, stack);
                     start(Phase.SEALING);
                 } else {
-                    player.openMenu(this);
+                    net.minecraftforge.network.NetworkHooks.openScreen((net.minecraft.server.level.ServerPlayer)player, this);
                 }
             }
         }
@@ -234,8 +234,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
 
     private void fillLoot(ServerLevel level) {
         lootPending = false;
-        var table = level.getServer().reloadableRegistries()
-                .getLootTable(ResourceKey.create(Registries.LOOT_TABLE, Singulo.id("sealed/tier_" + tier())));
+        var table = level.getServer().getLootData().getLootTable(Singulo.id("sealed/tier_" + tier()));
         LootParams params = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(worldPosition))
                 .create(LootContextParamSets.CHEST);
         int slot = 0;
@@ -288,6 +287,13 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     }
 
     @Override
+    public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> cap, net.minecraft.core.Direction side) {
+        if (cap == net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER)
+            return net.minecraftforge.common.util.LazyOptional.of(() -> net.minecraftforge.items.wrapper.EmptyHandler.INSTANCE).cast();
+        return super.getCapability(cap, side);
+    }
+
+    @Override
     protected Component getDefaultName() {
         return Component.translatable(getBlockState().getBlock().getDescriptionId());
     }
@@ -297,7 +303,6 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
         return items;
     }
 
-    @Override
     protected void setItems(NonNullList<ItemStack> items) {
         this.items = items;
     }
@@ -315,19 +320,19 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
     // ------------------------------------------------------------------ 保存・同期
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, items, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        ContainerHelper.saveAllItems(tag, items);
         tag.putString("Phase", phase.name());
         tag.putLong("PhaseStart", phaseStart);
         tag.putBoolean("Loot", lootPending);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, items, registries);
+        ContainerHelper.loadAllItems(tag, items);
         lootPending = tag.getBoolean("Loot");
         if (tag.contains("Phase")) {
             try {
@@ -342,12 +347,12 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
         shown.clear();
         ListTag list = tag.getList("Shown", Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
-            ItemStack.parse(registries, list.getCompound(i)).ifPresent(shown::add);
+            shown.add(ItemStack.of(list.getCompound(i)));
         }
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         tag.putString("Phase", phase.name());
         tag.putLong("PhaseStart", phaseStart);
@@ -356,7 +361,7 @@ public class SealedContainerBlockEntity extends BaseContainerBlockEntity impleme
         if (phase == Phase.OPEN || phase == Phase.SEALING) {
             for (ItemStack stack : items) {
                 if (!stack.isEmpty() && list.size() < 3) {
-                    list.add(stack.copyWithCount(1).save(registries));
+                    list.add(stack.copyWithCount(1).save(new CompoundTag()));
                 }
             }
         }

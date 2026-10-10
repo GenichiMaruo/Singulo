@@ -47,13 +47,13 @@ public class CatalystStabilizerItem extends SinguloItem {
     }
 
     public static boolean stabilized(ItemStack catalyst) {
-        return Boolean.TRUE.equals(catalyst.get(SinguloComponents.STABILIZED.get()));
+        return Boolean.TRUE.equals(SinguloComponents.get(catalyst, SinguloComponents.STABILIZED.get()));
     }
 
     /** 残りの寿命を2倍にする（残りの割合は変えない）。 */
     public static void stabilize(ItemStack catalyst) {
         UsesData d = UsesHelper.get(catalyst);
-        catalyst.set(SinguloComponents.USES.get(), new UsesData(d.used() * 2, d.max() * 2, d.repairs()));
-        catalyst.set(SinguloComponents.STABILIZED.get(), true);
+        SinguloComponents.set(catalyst, SinguloComponents.USES.get(), new UsesData(d.used() * 2, d.max() * 2, d.repairs()));
+        SinguloComponents.set(catalyst, SinguloComponents.STABILIZED.get(), true);
     }
 }

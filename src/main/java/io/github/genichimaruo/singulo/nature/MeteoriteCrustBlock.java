@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
  * 隣の空いた所に星屑の結晶を育てる（紫水晶の芽のように。持ち帰って置いた殻では育たない）。
  */
 public class MeteoriteCrustBlock extends Block {
-    public static final MapCodec<MeteoriteCrustBlock> CODEC = simpleCodec(MeteoriteCrustBlock::new);
     public static final BooleanProperty NATURAL = BooleanProperty.create("natural");
     /** ランダムtick 1回あたり、結晶が育つ割合。 */
     static final int GROW_CHANCE = 4;
@@ -29,13 +28,9 @@ public class MeteoriteCrustBlock extends Block {
         registerDefaultState(stateDefinition.any().setValue(NATURAL, false));
     }
 
-    @Override
-    protected MapCodec<? extends Block> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NATURAL);
     }
 
@@ -45,12 +40,12 @@ public class MeteoriteCrustBlock extends Block {
     }
 
     @Override
-    protected boolean isRandomlyTicking(BlockState state) {
+    public boolean isRandomlyTicking(BlockState state) {
         return state.getValue(NATURAL);
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (random.nextInt(GROW_CHANCE) != 0) {
             return;
         }

@@ -246,11 +246,10 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
     }
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose p, float x, float y, float z, int rgb, int alpha) {
-        vc.addVertex(p, x, y, z).setColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).setUv(0.5F, 0.5F)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(FxDraw.FULL_BRIGHT).setNormal(p, 0, 1, 0);
+        vc.vertex(p.pose(), x, y, z).color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).uv(0.5F, 0.5F)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(FxDraw.FULL_BRIGHT).normal(p.normal(), 0, 1, 0).endVertex();
     }
 
-    @Override
     public AABB getRenderBoundingBox(SealedContainerBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(0.5, 0.6, 0.5);
     }

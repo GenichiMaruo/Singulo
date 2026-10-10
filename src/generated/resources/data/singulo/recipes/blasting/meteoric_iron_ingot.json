@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "ingredient": {
+    "item": "singulo:raw_meteoric_iron"
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:meteoric_iron_ingot"
+  },
+  "experience": 0.1,
+  "cookingtime": 100
+}

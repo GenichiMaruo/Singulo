@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:quantum_data_fragment"
+    },
+    "title": {
+      "translate": "advancement.singulo.ruin_research.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.ruin_research.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "discover/research_building"
+      }
+    }
+  },
+  "parent": "singulo:quantum"
+}

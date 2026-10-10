@@ -25,7 +25,6 @@ import org.joml.Vector3f;
  * sealed のあいだは力場で封鎖され、開けない（最終実験施設は守護機を倒すまで）。
  */
 public class RuinCacheBlock extends BaseEntityBlock {
-    public static final MapCodec<RuinCacheBlock> CODEC = simpleCodec(RuinCacheBlock::new);
     public static final BooleanProperty SEALED = BooleanProperty.create("sealed");
     private static final DustParticleOptions FIELD = new DustParticleOptions(new Vector3f(1.0F, 0.35F, 0.35F), 1.0F);
     private static final DustParticleOptions GOLD = new DustParticleOptions(new Vector3f(1.0F, 0.82F, 0.36F), 0.6F);
@@ -35,18 +34,14 @@ public class RuinCacheBlock extends BaseEntityBlock {
         registerDefaultState(stateDefinition.any().setValue(SEALED, false));
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(SEALED);
     }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
@@ -57,7 +52,12 @@ public class RuinCacheBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof RuinCacheBlockEntity cache) {
             cache.refillIfDue((ServerLevel) level, level.getGameTime());
             if (cache.isSealed()) {

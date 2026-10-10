@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'net.neoforged.moddev' version '2.0.148'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.148'
     id 'idea'
 }
 
@@ -15,15 +15,16 @@ base {
     archivesName = mod_name
 }
 
-tasks.named('jar', Jar) {
+tasks.withType(net.neoforged.moddevgradle.legacyforge.tasks.RemapJar).configureEach {
     archiveFileName = "${mod_name}-${mod_version}-${minecraft_version}${mod_loader_suffix}.jar"
 }
 
-// Minecraft 1.21.1 ships Java 21, so compile and run with a Java 21 toolchain.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Minecraft 1.20.1 compiles and runs with Java 17.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-neoForge {
-    version = project.neo_version
+legacyForge {
+    accessTransformers.from('src/main/resources/META-INF/accesstransformer.cfg')
+    version = "${minecraft_version}-${forge_version}"
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -33,20 +34,21 @@ neoForge {
     runs {
         client {
             client()
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'singulo.clientSmokeTest', providers.gradleProperty('clientSmokeTest').getOrElse('false')
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
         server {
             server()
             programArgument '--nogui'
             systemProperty 'singulo.ruinSelfCheck', providers.gradleProperty('ruinSelfCheck').getOrElse('false')
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
         gameTestServer {
             type = "gameTestServer"
             // Keep tests separate from development worlds and local server settings.
             gameDirectory = project.file('build/gametest')
             // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
-            systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse(project.mod_id)
+            systemProperty 'forge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse(project.mod_id)
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -80,15 +82,15 @@ repositories {
 dependencies {
     // JEI は任意の連携。API だけでコンパイルし、開発中の起動では本体も入れる
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
-    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
+    modRuntimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            neo_version            : neo_version,
+            forge_version          : forge_version,
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
@@ -102,7 +104,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
     into "build/generated/sources/modMetadata"
 }
 sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
+legacyForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
@@ -114,3 +116,6 @@ idea {
         downloadJavadoc = true
     }
 }
+
+
+tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '1000'] }

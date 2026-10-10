@@ -21,10 +21,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 段階4（時間）の装置の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -53,7 +53,7 @@ public final class Stage4GameTests {
     public static void mixedSourcesMakeMixedLv1AndEightMakeLv2(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
-        MachineBlockEntity c = helper.getBlockEntity(pos);
+        MachineBlockEntity c = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         keepPowered(helper, c);
         c.cycleMode();                                       // 圧縮ブロックLv1（質量9）
         c.items().setStackInSlot(0, new ItemStack(Items.COBBLESTONE, 3));
@@ -62,7 +62,7 @@ public final class Stage4GameTests {
         helper.runAtTickTime(40, () -> {
             ItemStack lv1 = c.items().getStackInSlot(c.type().outputSlot());
             helper.assertTrue(lv1.is(item("compressed_block_1")), "Lv1 ができない");
-            helper.assertTrue(Boolean.TRUE.equals(lv1.get(SinguloComponents.MIXED_SOURCE.get())), "3種類から作ったのに混成にならない");
+            helper.assertTrue(Boolean.TRUE.equals(SinguloComponents.get(lv1, SinguloComponents.MIXED_SOURCE.get())), "3種類から作ったのに混成にならない");
             // 通常モードに戻し、混成の Lv1 を8個入れると Lv2 になる
             c.cycleMode();
             c.cycleMode();
@@ -82,7 +82,7 @@ public final class Stage4GameTests {
     public static void plainLv1NeedsNine(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
-        MachineBlockEntity c = helper.getBlockEntity(pos);
+        MachineBlockEntity c = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         keepPowered(helper, c);
         c.items().setStackInSlot(0, new ItemStack(item("compressed_block_1"), 8));
         helper.runAtTickTime(60, () -> {
@@ -97,7 +97,7 @@ public final class Stage4GameTests {
     public static void compactorMakesDegenerateShell(GameTestHelper helper) {
         BlockPos controllerPos = new BlockPos(3, 2, 1);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.DEGENERATE_COMPACTOR, controllerPos, Direction.SOUTH, 5);
-        MachineBlockEntity m = helper.getBlockEntity(controllerPos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
         keepPowered(helper, m);
         m.items().setStackInSlot(0, new ItemStack(item("compressed_block_3"), 4));
         m.items().setStackInSlot(1, new ItemStack(item("degenerate_precursor"), 4));
@@ -116,7 +116,7 @@ public final class Stage4GameTests {
     private static MachineBlockEntity buildCavity(GameTestHelper helper) {
         BlockPos controllerPos = new BlockPos(3, 2, 1);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.CASIMIR_CAVITY, controllerPos, Direction.SOUTH, 5);
-        MachineBlockEntity m = helper.getBlockEntity(controllerPos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
         keepPowered(helper, m);
         return m;
     }
@@ -156,7 +156,7 @@ public final class Stage4GameTests {
     public static void incubatorPurityHalvesLifeWhenHalfUnderpowered(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.TIME_CRYSTAL_INCUBATOR).get());
-        MachineBlockEntity m = helper.getBlockEntity(pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         m.items().setStackInSlot(0, new ItemStack(item("time_crystal_seed")));
         m.items().setStackInSlot(1, new ItemStack(Items.ECHO_SHARD, 2));
         m.items().setStackInSlot(2, new ItemStack(item("entangled_element"), 2));
@@ -194,13 +194,13 @@ public final class Stage4GameTests {
         // コントローラは (3,2,1)、炉は南（+Z）へ。手前の面の最上段（高さ y=1+5）の外装板をポートにし、その前に蓄電池を置く
         BlockPos controllerPos = buildFurnace(helper, new BlockPos(3, 2, 1), new BlockPos(3, 6, 1));
         helper.setBlock(new BlockPos(3, 6, 0), SinguloBlocks.SMES_MODULE.get());
-        DegenerateFurnaceBlockEntity f = helper.getBlockEntity(controllerPos);
+        DegenerateFurnaceBlockEntity f = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
         f.catalystSlot().insertItem(0, new ItemStack(item("time_crystal_catalyst")), false);
         f.fuel().insertItem(0, new ItemStack(item("compressed_block_2"), 2), false);
         helper.runAtTickTime(8, () -> {
             helper.assertTrue(f.structureSize() == 7, "5×5×7 として形成されない");
             helper.assertTrue(f.fuel().getStackInSlot(0).getCount() == 1, "燃料を1個ずつ燃やしていない");
-            SmesCellBlockEntity sink = helper.getBlockEntity(new BlockPos(3, 6, 0));
+            SmesCellBlockEntity sink = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, new BlockPos(3, 6, 0));
             long total = (long) f.energy().getEnergyStored() + sink.energy().getEnergyStored();
             helper.assertTrue(total >= 20_000_000L * 5, "20 MFE/t で発電していない: " + total);
             helper.assertTrue(sink.energy().getEnergyStored() > 0, "搬入出ポートから電力が押し出されない");
@@ -212,7 +212,7 @@ public final class Stage4GameTests {
     @GameTest(template = LARGE, timeoutTicks = 60)
     public static void degenerateFurnaceRejectsPortOnFrame(GameTestHelper helper) {
         BlockPos controllerPos = buildFurnace(helper, new BlockPos(3, 2, 1), new BlockPos(1, 4, 1));
-        DegenerateFurnaceBlockEntity f = helper.getBlockEntity(controllerPos);
+        DegenerateFurnaceBlockEntity f = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
         helper.runAtTickTime(4, () -> {
             helper.assertTrue(f.structureSize() == 0, "枠にポートを置いても形成されてしまう");
             helper.succeed();
@@ -231,8 +231,8 @@ public final class Stage4GameTests {
         helper.setBlock(new BlockPos(1, 1, 3), SinguloBlocks.COPPER_WIRE.get());
         helper.setBlock(new BlockPos(1, 1, 2), SinguloBlocks.TOPOLOGICAL_WIRE.get());
         helper.setBlock(to, SinguloBlocks.SMES_MODULE.get());
-        SmesCellBlockEntity source = helper.getBlockEntity(from);
-        SmesCellBlockEntity sink = helper.getBlockEntity(to);
+        SmesCellBlockEntity source = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, from);
+        SmesCellBlockEntity sink = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, to);
         source.energy().setEnergy(1_000_000_000);
         helper.runAtTickTime(21, () -> {
             int got = sink.energy().getEnergyStored();
@@ -249,8 +249,8 @@ public final class Stage4GameTests {
         helper.setBlock(new BlockPos(1, 1, 3), SinguloBlocks.TOPOLOGICAL_WIRE.get());
         helper.setBlock(new BlockPos(1, 1, 2), SinguloBlocks.TOPOLOGICAL_WIRE.get());
         helper.setBlock(to, SinguloBlocks.SMES_MODULE.get());
-        SmesCellBlockEntity source = helper.getBlockEntity(from);
-        SmesCellBlockEntity sink = helper.getBlockEntity(to);
+        SmesCellBlockEntity source = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, from);
+        SmesCellBlockEntity sink = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, to);
         source.energy().setEnergy(1_000_000_000);
         helper.runAtTickTime(5, () -> {
             int got = sink.energy().getEnergyStored();
@@ -263,13 +263,13 @@ public final class Stage4GameTests {
 
     @GameTest(template = EMPTY)
     public static void probeStationFetchesFromDiscoveredObservationPost(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
             RuinDiscovery.record(player, "observation_post", new BlockPos(100, 64, 100));
             RuinDiscovery.record(player, "culture_facility", new BlockPos(200, -40, 200));   // 常に手動
             BlockPos pos = new BlockPos(2, 1, 2);
             helper.setBlock(pos, SinguloBlocks.PROBE_STATION.get());
-            ProbeStationBlockEntity station = helper.getBlockEntity(pos);
+            ProbeStationBlockEntity station = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
             helper.assertTrue(station.registerFrom(player) == 1, "地表観測拠点だけが登録されるはず");
             long now = 1000;
             station.completeMission(helper.getLevel(), now);

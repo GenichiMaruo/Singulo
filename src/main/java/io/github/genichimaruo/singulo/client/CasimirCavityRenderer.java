@@ -103,7 +103,6 @@ public class CasimirCavityRenderer implements BlockEntityRenderer<FixedShapeCont
         return true;
     }
 
-    @Override
     public AABB getRenderBoundingBox(FixedShapeControllerBlockEntity.Cavity be) {
         return new AABB(be.getBlockPos()).inflate(5, 5, 5);
     }

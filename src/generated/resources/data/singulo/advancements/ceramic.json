@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "title": {
+      "translate": "advancement.singulo.ceramic.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.ceramic.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "singulo:white_ceramic_composite"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:steel"
+}

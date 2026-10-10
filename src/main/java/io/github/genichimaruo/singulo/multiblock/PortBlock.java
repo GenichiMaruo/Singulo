@@ -22,13 +22,9 @@ public class PortBlock extends BaseEntityBlock implements MultiblockPart {
         return role;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(p -> new PortBlock(p, role));
-    }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 

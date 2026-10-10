@@ -2,9 +2,6 @@ package io.github.genichimaruo.singulo.wormhole;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 /**
  * ワームホールの口の対（pair）と、生まれた時刻（ゲーム時間）。同じ pair を持つ2つの口がつながる。
@@ -17,11 +14,6 @@ public record WormholeData(long pair, long created, boolean placed) {
             Codec.BOOL.optionalFieldOf("placed", false).forGetter(WormholeData::placed)
     ).apply(i, WormholeData::new));
 
-    public static final StreamCodec<ByteBuf, WormholeData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_LONG, WormholeData::pair,
-            ByteBufCodecs.VAR_LONG, WormholeData::created,
-            ByteBufCodecs.BOOL, WormholeData::placed,
-            WormholeData::new);
 
     public WormholeData(long pair, long created) {
         this(pair, created, false);

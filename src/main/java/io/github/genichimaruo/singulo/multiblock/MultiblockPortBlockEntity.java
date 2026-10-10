@@ -8,12 +8,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 /**
  * マルチブロック搬入出ポート。つないだパイプやケーブルはコントローラへ届き（搬入）、コントローラの出力
@@ -75,7 +75,7 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
     }
 
     private static void pushEnergy(Level level, BlockPos target, Direction from, IEnergyStorage source) {
-        IEnergyStorage dest = level.getCapability(Capabilities.EnergyStorage.BLOCK, target, from);
+        IEnergyStorage dest = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, target, from);
         if (dest == null || !dest.canReceive()) {
             return;
         }
@@ -89,7 +89,7 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
     }
 
     private static void pushItems(Level level, BlockPos target, Direction from, IItemHandler source) {
-        IItemHandler dest = level.getCapability(Capabilities.ItemHandler.BLOCK, target, from);
+        IItemHandler dest = Capabilities.get(level, Capabilities.ItemHandler.BLOCK, target, from);
         if (dest == null) {
             return;
         }
@@ -107,7 +107,7 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
     }
 
     private static void pushFluids(Level level, BlockPos target, Direction from, IFluidHandler source) {
-        IFluidHandler dest = level.getCapability(Capabilities.FluidHandler.BLOCK, target, from);
+        IFluidHandler dest = Capabilities.get(level, Capabilities.FluidHandler.BLOCK, target, from);
         if (dest == null) {
             return;
         }
@@ -117,7 +117,7 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         }
         int moved = dest.fill(offer, IFluidHandler.FluidAction.EXECUTE);
         if (moved > 0) {
-            source.drain(offer.copyWithAmount(moved), IFluidHandler.FluidAction.EXECUTE);
+            source.drain(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(offer, moved), IFluidHandler.FluidAction.EXECUTE);
         }
     }
 }

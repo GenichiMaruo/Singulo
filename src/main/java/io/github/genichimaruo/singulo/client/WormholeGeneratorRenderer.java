@@ -81,7 +81,6 @@ public class WormholeGeneratorRenderer implements BlockEntityRenderer<WormholeGe
         return true;
     }
 
-    @Override
     public AABB getRenderBoundingBox(WormholeGeneratorBlockEntity be) {
         return new AABB(be.core()).inflate(3);
     }

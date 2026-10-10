@@ -17,19 +17,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** マルチブロックのコントローラ。加工の仕組みは汎用加工装置と同じで、形と大きさの判定を足したもの。 */
 public class MultiblockControllerBlock extends MachineBlock {
-    public static final MapCodec<MultiblockControllerBlock> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-            propertiesCodec(),
-            Codec.STRING.xmap(MachineType::valueOf, MachineType::name).fieldOf("machine").forGetter(MachineBlock::type)
-    ).apply(i, MultiblockControllerBlock::new));
 
     public MultiblockControllerBlock(Properties properties, MachineType type) {
         super(properties, type);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

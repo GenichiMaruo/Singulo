@@ -35,7 +35,6 @@ public class RogueBlackHoleRenderer implements BlockEntityRenderer<RogueBlackHol
         return 128;
     }
 
-    @Override
     public AABB getRenderBoundingBox(RogueBlackHoleBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(6);
     }

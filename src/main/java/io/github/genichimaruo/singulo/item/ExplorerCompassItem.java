@@ -10,7 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.component.DataComponents;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -22,7 +22,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.LodestoneTracker;
+
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
@@ -43,11 +43,11 @@ public class ExplorerCompassItem extends SinguloItem {
 
     /** 探せる遺構の数（1〜4）。TARGETS の先頭からこの数だけ。 */
     public static int level(ItemStack stack) {
-        return Math.max(1, Math.min(TARGETS.length, stack.getOrDefault(SinguloComponents.COMPASS_LEVEL.get(), 1)));
+        return Math.max(1, Math.min(TARGETS.length, SinguloComponents.getOrDefault(stack, SinguloComponents.COMPASS_LEVEL.get(), 1)));
     }
 
     public static int target(ItemStack stack) {
-        return Math.floorMod(stack.getOrDefault(SinguloComponents.HOLO_SIZE.get(), 0), level(stack));
+        return Math.floorMod(SinguloComponents.getOrDefault(stack, SinguloComponents.HOLO_SIZE.get(), 0), level(stack));
     }
 
     /**
@@ -99,15 +99,17 @@ public class ExplorerCompassItem extends SinguloItem {
     /** 調整段階を1つ上げ、新しく探せるようになった遺構を選ぶ。 */
     public static void upgrade(ItemStack stack) {
         int lv = Math.min(TARGETS.length, level(stack) + 1);
-        stack.set(SinguloComponents.COMPASS_LEVEL.get(), lv);
-        stack.set(SinguloComponents.HOLO_SIZE.get(), lv - 1);
-        stack.remove(DataComponents.LODESTONE_TRACKER);
+        SinguloComponents.set(stack, SinguloComponents.COMPASS_LEVEL.get(), lv);
+        SinguloComponents.set(stack, SinguloComponents.HOLO_SIZE.get(), lv - 1);
+        stack.getOrCreateTag().remove("LodestonePos"); stack.getOrCreateTag().remove("LodestoneDimension");
     }
 
     /** 今の針の向き先（なければ null）。クライアントの針の角度にも使う。 */
     public static GlobalPos pointing(ItemStack stack) {
-        LodestoneTracker t = stack.get(DataComponents.LODESTONE_TRACKER);
-        return t == null ? null : t.target().orElse(null);
+        var tag = stack.getTag();
+        if (tag == null || !tag.contains("LodestonePos")) return null;
+        return net.minecraft.world.level.Level.RESOURCE_KEY_CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, tag.get("LodestoneDimension"))
+                .result().map(d -> GlobalPos.of(d, net.minecraft.nbt.NbtUtils.readBlockPos(tag.getCompound("LodestonePos")))).orElse(null);
     }
 
     @Override
@@ -117,8 +119,8 @@ public class ExplorerCompassItem extends SinguloItem {
             return InteractionResultHolder.success(stack);
         }
         if (player.isShiftKeyDown()) {
-            stack.set(SinguloComponents.HOLO_SIZE.get(), target(stack) + 1);
-            stack.remove(DataComponents.LODESTONE_TRACKER);
+            SinguloComponents.set(stack, SinguloComponents.HOLO_SIZE.get(), target(stack) + 1);
+            stack.getOrCreateTag().remove("LodestonePos"); stack.getOrCreateTag().remove("LodestoneDimension");
             player.displayClientMessage(Component.translatable("compass.singulo.target",
                     Component.translatable("ruin.singulo." + TARGETS[target(stack)])), true);
             return InteractionResultHolder.success(stack);
@@ -131,13 +133,15 @@ public class ExplorerCompassItem extends SinguloItem {
                 .findNearestMapStructure(server, HolderSet.direct(holder.get()), player.blockPosition(), SEARCH_CHUNKS, false);
         player.getCooldowns().addCooldown(this, 60);
         if (found == null) {
-            stack.remove(DataComponents.LODESTONE_TRACKER);
+            stack.getOrCreateTag().remove("LodestonePos"); stack.getOrCreateTag().remove("LodestoneDimension");
             player.displayClientMessage(Component.translatable("compass.singulo.not_found",
                     Component.translatable("ruin.singulo." + rid)), true);
             return InteractionResultHolder.fail(stack);
         }
         BlockPos p = center(server, found.getFirst(), holder.get().value());
-        stack.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(level.dimension(), p)), false));
+        stack.getOrCreateTag().put("LodestonePos", net.minecraft.nbt.NbtUtils.writeBlockPos(p));
+        stack.getOrCreateTag().put("LodestoneDimension", net.minecraft.world.level.Level.RESOURCE_KEY_CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, level.dimension()).result().orElseThrow());
+        stack.getOrCreateTag().putBoolean("LodestoneTracked", false);
         int dist = (int) Math.sqrt(player.blockPosition().distSqr(new BlockPos(p.getX(), player.getBlockY(), p.getZ())));
         player.displayClientMessage(Component.translatable("compass.singulo.found",
                 Component.translatable("ruin.singulo." + rid), dist), true);
@@ -151,7 +155,7 @@ public class ExplorerCompassItem extends SinguloItem {
      */
     static BlockPos center(ServerLevel server, BlockPos found, Structure structure) {
         net.minecraft.world.level.ChunkPos cp = new net.minecraft.world.level.ChunkPos(found);
-        var start = server.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
+        var start = server.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.ChunkStatus.STRUCTURE_STARTS)
                 .getStartForStructure(structure);
         if (start == null || !start.isValid()) {
             return found;
@@ -166,7 +170,7 @@ public class ExplorerCompassItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("compass.singulo.target", Component.translatable("ruin.singulo." + TARGETS[target(stack)]))
                 .withStyle(ChatFormatting.GRAY));

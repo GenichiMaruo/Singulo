@@ -1,0 +1,24 @@
+{
+  "values": [
+    {
+      "id": "#forge:ores/gold",
+      "required": false
+    },
+    {
+      "id": "#forge:ores/diamond",
+      "required": false
+    },
+    {
+      "id": "#forge:ores/emerald",
+      "required": false
+    },
+    {
+      "id": "#forge:ores/silver",
+      "required": false
+    },
+    {
+      "id": "#forge:ores/platinum",
+      "required": false
+    }
+  ]
+}

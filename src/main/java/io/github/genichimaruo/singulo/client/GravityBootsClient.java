@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 
 /**
  * 重力ブーツの壁蹴り（クライアント）。空中で壁に触れているときにジャンプを押し直すと、壁から離れる向きへ跳ぶ。
@@ -20,7 +20,8 @@ final class GravityBootsClient {
 
     private GravityBootsClient() {}
 
-    static void onClientTick(ClientTickEvent.Post event) {
+    static void onClientTick(ClientTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || mc.isPaused()) {

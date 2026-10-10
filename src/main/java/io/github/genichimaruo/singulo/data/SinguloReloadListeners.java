@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.data;
 
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
 
 public final class SinguloReloadListeners {
     private SinguloReloadListeners() {}

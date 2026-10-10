@@ -77,10 +77,10 @@ public class SecurityDrone extends Monster {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(TIER, 1);
-        builder.define(STATE, STATE_ORBIT);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(TIER, 1);
+        entityData.define(STATE, STATE_ORBIT);
     }
 
     public int tier() {
@@ -152,7 +152,7 @@ public class SecurityDrone extends Monster {
 
     /** 段階3: 電磁パルスの輪を放つ。 */
     void pulse(ServerLevel level) {
-        playSound(SoundEvents.TRIDENT_THUNDER.value(), 0.8F, 1.6F);
+        playSound(SoundEvents.TRIDENT_THUNDER, 0.8F, 1.6F);
         for (int i = 0; i < 24; i++) {
             double a = Math.PI * 2 * i / 24;
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX() + Math.cos(a) * PULSE_RADIUS * 0.7, getY() + 0.3,

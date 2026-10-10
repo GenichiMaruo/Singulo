@@ -10,8 +10,8 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * つながったケーブルのまとまり。ケーブルの設置・撤去や隣のブロックの変化で無効になり、次に使われたときに作り直す。
@@ -78,7 +78,7 @@ final class EnergyNetwork {
                         cables.put(next, lossOf(level, next));
                         queue.add(next);
                     }
-                } else if (level.getCapability(Capabilities.EnergyStorage.BLOCK, next, dir.getOpposite()) != null) {
+                } else if (Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, next, dir.getOpposite()) != null) {
                     acceptors.add(new Acceptor(next, dir.getOpposite(), pos));
                 }
             }
@@ -149,7 +149,7 @@ final class EnergyNetwork {
             }
             long share = (remaining + left - 1) / left;
             left--;
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, a.pos(), a.side());
+            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, a.pos(), a.side());
             if (target == null || !target.canReceive()) {
                 continue;
             }

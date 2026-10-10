@@ -1,0 +1,16 @@
+{
+  "values": [
+    {
+      "id": "#forge:ores/netherite_scrap",
+      "required": false
+    },
+    {
+      "id": "#forge:ores/uranium",
+      "required": false
+    },
+    {
+      "id": "#forge:ores/iridium",
+      "required": false
+    }
+  ]
+}

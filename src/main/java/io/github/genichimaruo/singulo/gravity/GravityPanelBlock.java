@@ -55,13 +55,9 @@ public class GravityPanelBlock extends Block {
         return kind;
     }
 
-    @Override
-    protected MapCodec<? extends Block> codec() {
-        return simpleCodec(p -> new GravityPanelBlock(p, kind));
-    }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         CONNECTIONS.values().forEach(builder::add);
         builder.add(POWERED);
     }
@@ -83,7 +79,7 @@ public class GravityPanelBlock extends Block {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
+    public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
                                      BlockPos pos, BlockPos neighborPos) {
         return state.setValue(CONNECTIONS.get(dir), joins(neighborState));
     }

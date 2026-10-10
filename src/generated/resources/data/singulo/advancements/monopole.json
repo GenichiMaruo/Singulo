@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:magnetic_monopole"
+    },
+    "title": {
+      "translate": "advancement.singulo.monopole.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.monopole.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "singulo:magnetic_monopole"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:accelerator"
+}

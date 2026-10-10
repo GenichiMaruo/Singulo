@@ -1,8 +1,5 @@
 package io.github.genichimaruo.singulo.recipe;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.List;
@@ -11,18 +8,15 @@ import javax.annotation.Nullable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidStack;
 
 /**
  * 本modの装置で処理するレシピ（type: singulo:machine）。tools/gen_data.py が recipes.py から生成する。
@@ -41,27 +35,9 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                             ItemStack result, List<FluidStack> fluidResults, int minSize, int priority) implements Recipe<MachineRecipe.Input> {
 
     public record ItemInput(Ingredient ingredient, int count, int uses) {
-        public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(ItemInput::ingredient),
-                Codec.INT.optionalFieldOf("count", 1).forGetter(ItemInput::count),
-                Codec.INT.optionalFieldOf("uses", 0).forGetter(ItemInput::uses)
-        ).apply(i, ItemInput::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC, ItemInput::ingredient,
-                ByteBufCodecs.VAR_INT, ItemInput::count,
-                ByteBufCodecs.VAR_INT, ItemInput::uses,
-                ItemInput::new);
     }
 
     public record FluidInput(Fluid fluid, int amount) {
-        public static final Codec<FluidInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-                net.minecraft.core.registries.BuiltInRegistries.FLUID.byNameCodec().fieldOf("fluid").forGetter(FluidInput::fluid),
-                Codec.INT.fieldOf("amount").forGetter(FluidInput::amount)
-        ).apply(i, FluidInput::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, FluidInput> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.registry(Registries.FLUID), FluidInput::fluid,
-                ByteBufCodecs.VAR_INT, FluidInput::amount,
-                FluidInput::new);
 
         public boolean matches(FluidStack stack) {
             return stack.getFluid().isSame(fluid) && stack.getAmount() >= amount;
@@ -69,24 +45,18 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     public record MassInput(double amount, boolean metalOnly) {
-        public static final Codec<MassInput> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.DOUBLE.fieldOf("amount").forGetter(MassInput::amount),
-                Codec.BOOL.optionalFieldOf("metal_only", false).forGetter(MassInput::metalOnly)
-        ).apply(i, MassInput::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, MassInput> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.DOUBLE, MassInput::amount,
-                ByteBufCodecs.BOOL, MassInput::metalOnly,
-                MassInput::new);
     }
 
     /** 装置の入力スロットの中身。 */
-    public record Input(List<ItemStack> items) implements RecipeInput {
+    public static final class Input extends net.minecraft.world.SimpleContainer {
+        private final List<ItemStack> items;
+        public Input(List<ItemStack> items) { super(items.toArray(ItemStack[]::new)); this.items = items; }
+        public List<ItemStack> items() { return items; }
         @Override
         public ItemStack getItem(int index) {
             return items.get(index);
         }
 
-        @Override
         public int size() {
             return items.size();
         }
@@ -97,47 +67,6 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
      * restoreSlot は修復対象のスロット（なければ -1）。
      */
     public record Plan(int[] consume, int[] uses, int restoreSlot) {}
-
-    public static final MapCodec<MachineRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-            Codec.STRING.fieldOf("station").forGetter(MachineRecipe::station),
-            Codec.INT.optionalFieldOf("stage", 1).forGetter(MachineRecipe::stage),
-            Codec.INT.fieldOf("time").forGetter(MachineRecipe::time),
-            Codec.INT.optionalFieldOf("energy", 0).forGetter(MachineRecipe::energy),
-            ItemInput.CODEC.listOf().optionalFieldOf("ingredients", List.of()).forGetter(MachineRecipe::ingredients),
-            FluidInput.CODEC.listOf().optionalFieldOf("fluid_ingredients", List.of()).forGetter(MachineRecipe::fluidIngredients),
-            MassInput.CODEC.optionalFieldOf("mass").forGetter(MachineRecipe::mass),
-            Ingredient.CODEC_NONEMPTY.optionalFieldOf("restore").forGetter(MachineRecipe::restore),
-            ItemStack.CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MachineRecipe::result),
-            FluidStack.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResults),
-            Codec.INT.optionalFieldOf("min_size", 0).forGetter(MachineRecipe::minSize),
-            Codec.INT.optionalFieldOf("priority", 0).forGetter(MachineRecipe::priority)
-    ).apply(i, MachineRecipe::new));
-
-    public static final StreamCodec<RegistryFriendlyByteBuf, MachineRecipe> STREAM_CODEC = StreamCodec.of(
-            (buf, r) -> {
-                buf.writeUtf(r.station);
-                buf.writeVarInt(r.stage);
-                buf.writeVarInt(r.time);
-                buf.writeVarInt(r.energy);
-                ItemInput.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buf, r.ingredients);
-                FluidInput.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buf, r.fluidIngredients);
-                ByteBufCodecs.optional(MassInput.STREAM_CODEC).encode(buf, r.mass);
-                ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC).encode(buf, r.restore);
-                ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, r.result);
-                FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buf, r.fluidResults);
-                buf.writeVarInt(r.minSize);
-                buf.writeVarInt(r.priority);
-            },
-            buf -> new MachineRecipe(
-                    buf.readUtf(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
-                    ItemInput.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
-                    FluidInput.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
-                    ByteBufCodecs.optional(MassInput.STREAM_CODEC).decode(buf),
-                    ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC).decode(buf),
-                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf),
-                    FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
-                    buf.readVarInt(),
-                    buf.readVarInt()));
 
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable
@@ -211,7 +140,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     @Override
-    public ItemStack assemble(Input input, HolderLookup.Provider registries) {
+    public ItemStack assemble(Input input, net.minecraft.core.RegistryAccess registries) {
         return result.copy();
     }
 
@@ -221,7 +150,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries) {
+    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registries) {
         return result;
     }
 
@@ -248,15 +177,68 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
         return SinguloRecipes.MACHINE.get();
     }
 
-    public static final class Serializer implements RecipeSerializer<MachineRecipe> {
-        @Override
-        public MapCodec<MachineRecipe> codec() {
-            return CODEC;
-        }
+    @Override
+    public net.minecraft.resources.ResourceLocation getId() { return id(); }
 
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, MachineRecipe> streamCodec() {
-            return STREAM_CODEC;
+    // The id is supplied by RecipeManager in 1.20.1. A weak identity map avoids
+    // changing recipe equality or the constructor used throughout the game tests.
+    private static final java.util.Map<MachineRecipe, net.minecraft.resources.ResourceLocation> IDS =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+    public MachineRecipe value() { return this; }
+    public net.minecraft.resources.ResourceLocation id() { return IDS.getOrDefault(this, io.github.genichimaruo.singulo.Singulo.id(station)); }
+
+    public static final class Serializer implements RecipeSerializer<MachineRecipe> {
+        public MachineRecipe fromJson(net.minecraft.resources.ResourceLocation id, com.google.gson.JsonObject json) {
+            var ingredients = new java.util.ArrayList<ItemInput>();
+            if (json.has("ingredients")) for (var e : json.getAsJsonArray("ingredients")) {
+                var o = e.getAsJsonObject();
+                ingredients.add(new ItemInput(Ingredient.fromJson(o.get("ingredient")), integer(o, "count", 1), integer(o, "uses", 0)));
+            }
+            var fluids = new java.util.ArrayList<FluidInput>();
+            if (json.has("fluid_ingredients")) for (var e : json.getAsJsonArray("fluid_ingredients")) {
+                var o = e.getAsJsonObject();
+                fluids.add(new FluidInput(net.minecraft.core.registries.BuiltInRegistries.FLUID.get(new net.minecraft.resources.ResourceLocation(o.get(o.has("fluid") ? "fluid" : "id").getAsString())), integer(o, "amount", 0)));
+            }
+            var outputs = new java.util.ArrayList<FluidStack>();
+            if (json.has("fluid_results")) for (var e : json.getAsJsonArray("fluid_results")) {
+                var o = e.getAsJsonObject();
+                outputs.add(new FluidStack(net.minecraft.core.registries.BuiltInRegistries.FLUID.get(new net.minecraft.resources.ResourceLocation(o.get(o.has("fluid") ? "fluid" : "id").getAsString())), integer(o, "amount", 0)));
+            }
+            Optional<MassInput> mass = Optional.empty();
+            if (json.has("mass")) { var o = json.getAsJsonObject("mass"); mass = Optional.of(new MassInput(o.get("amount").getAsDouble(), o.has("metal_only") && o.get("metal_only").getAsBoolean())); }
+            ItemStack result = ItemStack.EMPTY;
+            if (json.has("result")) {
+                var o = json.getAsJsonObject("result");
+                String item = o.get(o.has("id") ? "id" : "item").getAsString();
+                result = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(item)), integer(o, "count", 1));
+                if (o.has("components")) {
+                    var c = o.getAsJsonObject("components");
+                    for (var entry : c.entrySet()) result.getOrCreateTag().put(entry.getKey(), com.mojang.serialization.JsonOps.INSTANCE.convertTo(net.minecraft.nbt.NbtOps.INSTANCE, entry.getValue()));
+                }
+            }
+            var recipe = new MachineRecipe(json.get("station").getAsString(), integer(json,"stage",1), integer(json,"time",1), integer(json,"energy",0), ingredients, fluids, mass,
+                    json.has("restore") ? Optional.of(Ingredient.fromJson(json.get("restore"))) : Optional.empty(), result, outputs, integer(json,"min_size",0), integer(json,"priority",0));
+            IDS.put(recipe,id);
+            return recipe;
+        }
+        private static int integer(com.google.gson.JsonObject o, String key, int fallback) { return o.has(key) ? o.get(key).getAsInt() : fallback; }
+        public MachineRecipe fromNetwork(net.minecraft.resources.ResourceLocation id, FriendlyByteBuf buf) {
+            var ingredients = buf.readList(b -> new ItemInput(Ingredient.fromNetwork(b), b.readVarInt(), b.readVarInt()));
+            var fluids = buf.readList(b -> new FluidInput(net.minecraft.core.registries.BuiltInRegistries.FLUID.byId(b.readVarInt()), b.readVarInt()));
+            Optional<MassInput> mass = buf.readBoolean() ? Optional.of(new MassInput(buf.readDouble(),buf.readBoolean())) : Optional.empty();
+            Optional<Ingredient> restore = buf.readBoolean() ? Optional.of(Ingredient.fromNetwork(buf)) : Optional.empty();
+            ItemStack result = buf.readItem();
+            var outputs = buf.readList(FluidStack::readFromPacket);
+            var recipe = new MachineRecipe(buf.readUtf(),buf.readVarInt(),buf.readVarInt(),buf.readVarInt(),ingredients,fluids,mass,restore,result,outputs,buf.readVarInt(),buf.readVarInt());
+            IDS.put(recipe,id); return recipe;
+        }
+        public void toNetwork(FriendlyByteBuf buf, MachineRecipe r) {
+            buf.writeCollection(r.ingredients(), (b,v) -> { v.ingredient().toNetwork(b); b.writeVarInt(v.count()); b.writeVarInt(v.uses()); });
+            buf.writeCollection(r.fluidIngredients(), (b,v) -> { b.writeVarInt(net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(v.fluid())); b.writeVarInt(v.amount()); });
+            buf.writeBoolean(r.mass().isPresent()); r.mass().ifPresent(v -> { buf.writeDouble(v.amount()); buf.writeBoolean(v.metalOnly()); });
+            buf.writeBoolean(r.restore().isPresent()); r.restore().ifPresent(v -> v.toNetwork(buf));
+            buf.writeItem(r.result()); buf.writeCollection(r.fluidResults(), (b,v) -> v.writeToPacket(b));
+            buf.writeUtf(r.station()); buf.writeVarInt(r.stage()); buf.writeVarInt(r.time()); buf.writeVarInt(r.energy()); buf.writeVarInt(r.minSize()); buf.writeVarInt(r.priority());
         }
     }
 }

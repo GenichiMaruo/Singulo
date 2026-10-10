@@ -19,8 +19,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 遺構（保管庫の中身と再生、警備機、重力波検出器、構造物ファイル）の確認。 */
 @GameTestHolder(Singulo.MODID)
@@ -48,7 +48,7 @@ public final class RuinGameTests {
 
     private static RuinCacheBlockEntity cache(GameTestHelper helper, String ruin) {
         helper.setBlock(POS, SinguloBlocks.RUIN_CACHE.get());
-        RuinCacheBlockEntity cache = helper.getBlockEntity(POS);
+        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
         cache.setRuin(ruin);
         return cache;
     }
@@ -95,7 +95,7 @@ public final class RuinGameTests {
     @GameTest(template = EMPTY)
     public static void guardDockLaunchesTieredDrones(GameTestHelper helper) {
         helper.setBlock(POS, SinguloBlocks.RUIN_GUARD_DOCK.get());
-        GuardDockBlockEntity dock = helper.getBlockEntity(POS);
+        GuardDockBlockEntity dock = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
         dock.setTier(2);
         dock.launch(helper.getLevel());
         List<SecurityDrone> drones = helper.getLevel().getEntitiesOfClass(SecurityDrone.class,
@@ -186,9 +186,9 @@ public final class RuinGameTests {
     public static void compassUnlocksNextRuinOnlyAfterClearing(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
-        RuinCacheBlockEntity cache = helper.getBlockEntity(pos);
+        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         cache.setRuin("observation_post");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = TestBuild.mockPlayer(helper);
         player.setShiftKeyDown(true);
         net.minecraft.world.item.ItemStack compass = new net.minecraft.world.item.ItemStack(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get());

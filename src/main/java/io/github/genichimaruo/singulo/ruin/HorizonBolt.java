@@ -75,10 +75,10 @@ public class HorizonBolt extends ThrowableItemProjectile {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(COLOR, 0x78D2F0);
-        builder.define(SIZE, 1.0F);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(COLOR, 0x78D2F0);
+        entityData.define(SIZE, 1.0F);
     }
 
     @Override
@@ -87,8 +87,8 @@ public class HorizonBolt extends ThrowableItemProjectile {
     }
 
     @Override
-    protected double getDefaultGravity() {
-        return 0.0;
+    protected float getGravity() {
+        return 0.0F;
     }
 
     @Override

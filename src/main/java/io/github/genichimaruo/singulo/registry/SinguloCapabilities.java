@@ -6,8 +6,8 @@ import io.github.genichimaruo.singulo.machine.CatalystDeviceBlockEntity;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.PortBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import io.github.genichimaruo.singulo.compat.RegisterCapabilitiesEvent;
 
 public final class SinguloCapabilities {
     private SinguloCapabilities() {}
@@ -91,9 +91,9 @@ public final class SinguloCapabilities {
                 (be, side) -> be.energy());
         // 遺構保管庫と封印コンテナの中身は、ホッパーやパイプからは出し入れできない（空の入れ物に見せる）
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.RUIN_CACHE.get(),
-                (be, side) -> net.neoforged.neoforge.items.wrapper.EmptyItemHandler.INSTANCE);
+                (be, side) -> net.minecraftforge.items.wrapper.EmptyHandler.INSTANCE);
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.SEALED_CONTAINER.get(),
-                (be, side) -> net.neoforged.neoforge.items.wrapper.EmptyItemHandler.INSTANCE);
+                (be, side) -> net.minecraftforge.items.wrapper.EmptyHandler.INSTANCE);
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_MODULE.get(),
                 (be, side) -> be.energyFor(side));
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> GravityGauntletItem.energy(stack),

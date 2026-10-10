@@ -19,10 +19,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 /**
  * 極低温タービン。液体窒素（77 K）を隣の高温源で一気に気化させ、その膨張でタービンを回す。
@@ -84,7 +84,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
             if (energy.getEnergyStored() <= 0) {
                 break;
             }
-            IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
+            IEnergyStorage target = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
             if (target != null && target.canReceive()) {
                 int sent = target.receiveEnergy(Math.min(energy.getEnergyStored(), PUSH_PER_TICK), false);
                 if (sent > 0) {
@@ -123,20 +123,20 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.openMenu(this, worldPosition);
+        net.minecraftforge.network.NetworkHooks.openScreen(player, this, worldPosition);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("energy", energy.getEnergyStored());
-        tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
+        tag.put("tank", tank.writeToNBT(new CompoundTag()));
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         energy.setEnergy(tag.getInt("energy"));
-        tank.readFromNBT(registries, tag.getCompound("tank"));
+        tank.readFromNBT(tag.getCompound("tank"));
     }
 }

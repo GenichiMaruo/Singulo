@@ -13,9 +13,9 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
 
 /**
  * 重力ブーツ（封印コンテナの量子錠から）。履いていると落下ダメージを受けない。
@@ -23,20 +23,21 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  */
 public class GravityBootsItem extends ArmorItem {
     public static final int WALL_JUMPS = 3;
-    public static final DeferredRegister<ArmorMaterial> MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, Singulo.MODID);
-    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> MATERIAL = MATERIALS.register("gravity", () -> {
-        EnumMap<ArmorItem.Type, Integer> defense = new EnumMap<>(ArmorItem.Type.class);
-        for (ArmorItem.Type t : ArmorItem.Type.values()) {
-            defense.put(t, t == ArmorItem.Type.BOOTS ? 3 : 0);
-        }
-        return new ArmorMaterial(defense, 15, SoundEvents.ARMOR_EQUIP_NETHERITE, () -> Ingredient.EMPTY,
-                List.of(new ArmorMaterial.Layer(Singulo.id("gravity"))), 2.0F, 0.0F);
-    });
+    public static final ArmorMaterial MATERIAL = new ArmorMaterial() {
+        public int getDurabilityForType(ArmorItem.Type type) { return 520; }
+        public int getDefenseForType(ArmorItem.Type type) { return type == ArmorItem.Type.BOOTS ? 3 : 0; }
+        public int getEnchantmentValue() { return 15; }
+        public net.minecraft.sounds.SoundEvent getEquipSound() { return SoundEvents.ARMOR_EQUIP_NETHERITE; }
+        public Ingredient getRepairIngredient() { return Ingredient.EMPTY; }
+        public String getName() { return "singulo:gravity"; }
+        public float getToughness() { return 2.0F; }
+        public float getKnockbackResistance() { return 0.0F; }
+    };
 
     private final int stage;
 
     public GravityBootsItem(Properties properties, int stage) {
-        super(MATERIAL, ArmorItem.Type.BOOTS, properties.durability(ArmorItem.Type.BOOTS.getDurability(40)));
+        super(MATERIAL, ArmorItem.Type.BOOTS, properties.durability(520));
         this.stage = stage;
     }
 
@@ -57,7 +58,7 @@ public class GravityBootsItem extends ArmorItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<net.minecraft.network.chat.Component> tooltip,
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<net.minecraft.network.chat.Component> tooltip,
                                 TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         SinguloItem.addStageLine(tooltip, stage);

@@ -26,17 +26,17 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
+
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * 汎用加工装置。マルチブロックのコントローラはこれを継承し、形成状態・大きさ・速度を差し込む。
@@ -70,7 +70,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private double mass;
     private double metalMass;
     @Nullable
-    private RecipeHolder<MachineRecipe> current;
+    private MachineRecipe current;
     /** 保存されていた処理途中のレシピ。読み込み後に同じレシピが選ばれたら進捗を引き継ぐ。 */
     @Nullable
     private ResourceLocation resumeRecipe;
@@ -242,7 +242,6 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         sides(channel).set(face, mode, eject);
         setChanged();
         if (level != null) {
-            level.invalidateCapabilities(worldPosition);
         }
     }
 
@@ -272,7 +271,6 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
         setChanged();
         if (level != null) {
-            level.invalidateCapabilities(worldPosition);
         }
     }
 
@@ -342,21 +340,21 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             net.minecraft.core.Direction dir = SideConfig.directionOf(facing, f);
             BlockPos target = worldPosition.relative(dir);
             if (itemSides.ejectEnabled() && itemSides.eject(f) && itemSides.canExtract(f) && type.hasOutput()) {
-                IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                IItemHandler dest = io.github.genichimaruo.singulo.compat.Capabilities.get(level, io.github.genichimaruo.singulo.compat.Capabilities.ItemHandler.BLOCK,
                         target, dir.getOpposite());
                 if (dest != null) {
                     for (int i = 0; i < type.outputSlots(); i++) {
                         int slot = type.outputSlot() + i;
                         ItemStack stack = items.getStackInSlot(slot);
                         if (!stack.isEmpty()) {
-                            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
+                            ItemStack rest = net.minecraftforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
                             items.setStackInSlot(slot, rest);
                         }
                     }
                 }
             }
             if (type.fluidOutputs() > 0) {
-                IFluidHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+                IFluidHandler dest = io.github.genichimaruo.singulo.compat.Capabilities.get(level, io.github.genichimaruo.singulo.compat.Capabilities.FluidHandler.BLOCK,
                         target, dir.getOpposite());
                 if (dest != null) {
                     for (int i = type.fluidInputs(); i < tanks.length; i++) {
@@ -417,7 +415,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         be.tick(level, pos, state);
     }
 
-    protected void tick(Level level, BlockPos pos, BlockState state) {
+    public void tick(Level level, BlockPos pos, BlockState state) {
         if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
             autoEject(level);
         }
@@ -493,23 +491,23 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      * この装置で処理できるレシピ。priority の大きいもの、次に材料の多いものを先に試すので、入力なしのレシピ
      * （冷却塔の液体窒素など）は、ほかに作れるものがないときだけ動く。
      */
-    private List<RecipeHolder<MachineRecipe>> stationRecipes(Level level) {
-        List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        for (RecipeHolder<MachineRecipe> holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+    private List<MachineRecipe> stationRecipes(Level level) {
+        List<MachineRecipe> out = new ArrayList<>();
+        for (MachineRecipe holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
             if (holder.value().station().equals(type.id())) {
                 out.add(holder);
             }
         }
-        out.sort(Comparator.comparingInt((RecipeHolder<MachineRecipe> h) -> -h.value().priority())
+        out.sort(Comparator.comparingInt((MachineRecipe h) -> -h.value().priority())
                 .thenComparingInt(h -> -(h.value().ingredients().size() + h.value().fluidIngredients().size()
                         + (h.value().restore().isPresent() ? 1 : 0))).thenComparing(h -> h.id().toString()));
         return out;
     }
 
     /** 質量モードで選べるレシピ（ID順）。クライアントの画面でも同じ順に並べる。 */
-    public static List<RecipeHolder<MachineRecipe>> massRecipes(Level level, MachineType type) {
-        List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        for (RecipeHolder<MachineRecipe> holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+    public static List<MachineRecipe> massRecipes(Level level, MachineType type) {
+        List<MachineRecipe> out = new ArrayList<>();
+        for (MachineRecipe holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
             if (holder.value().station().equals(type.id()) && holder.value().isMassRecipe()) {
                 out.add(holder);
             }
@@ -519,8 +517,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     @Nullable
-    private RecipeHolder<MachineRecipe> selectedMassRecipe(Level level) {
-        List<RecipeHolder<MachineRecipe>> list = massRecipes(level, type);
+    private MachineRecipe selectedMassRecipe(Level level) {
+        List<MachineRecipe> list = massRecipes(level, type);
         return mode > 0 && mode <= list.size() ? list.get(mode - 1) : null;
     }
 
@@ -529,18 +527,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void refreshRecipe(Level level) {
-        RecipeHolder<MachineRecipe> found = null;
+        MachineRecipe found = null;
         List<ItemStack> inputs = inputStacks();
         if (mode > 0) {
-            RecipeHolder<MachineRecipe> selected = selectedMassRecipe(level);
+            MachineRecipe selected = selectedMassRecipe(level);
             if (selected != null && massAvailable(selected.value()) && selected.value().plan(inputsExceptMassSlot()) != null
                     && fluidsAvailable(selected.value())) {
                 found = selected;
             }
         } else {
-            RecipeHolder<MachineRecipe> blocked = null;
+            MachineRecipe blocked = null;
             hasFree = false;
-            for (RecipeHolder<MachineRecipe> holder : stationRecipes(level)) {
+            for (MachineRecipe holder : stationRecipes(level)) {
                 MachineRecipe r = holder.value();
                 boolean free = isFree(r);
                 hasFree |= free;
@@ -653,7 +651,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void absorbMass(Level level) {
-        RecipeHolder<MachineRecipe> selected = selectedMassRecipe(level);
+        MachineRecipe selected = selectedMassRecipe(level);
         if (selected == null || selected.value().mass().isEmpty()) {
             return;
         }
@@ -724,7 +722,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             for (int pass = 0; pass < 2 && target < 0; pass++) {
                 for (int i = 0; i < type.fluidOutputs(); i++) {
                     FluidTank tank = tanks[type.fluidInputs() + i];
-                    boolean candidate = pass == 0 ? FluidStack.isSameFluidSameComponents(tank.getFluid(), result)
+                    boolean candidate = pass == 0 ? tank.getFluid().isFluidEqual(result)
                             : tank.isEmpty();
                     if (!used[i] && candidate && tank.getSpace() >= result.getAmount()) {
                         target = i;
@@ -797,7 +795,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         int minKinds = ServerConfig.SPEC.isLoaded() ? ServerConfig.MIXED_BONUS_MIN_KINDS.get() : 3;
         if (enabled && massSources.size() >= minKinds
                 && BuiltInRegistries.ITEM.getKey(out.getItem()).getPath().equals("compressed_block_1")) {
-            out.set(SinguloComponents.MIXED_SOURCE.get(), true);
+            SinguloComponents.set(out, SinguloComponents.MIXED_SOURCE.get(), true);
         }
     }
 
@@ -860,7 +858,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (level == null) {
             return false;
         }
-        RecipeHolder<MachineRecipe> r = selectedMassRecipe(level);
+        MachineRecipe r = selectedMassRecipe(level);
         return r != null && r.value().mass().map(MachineRecipe.MassInput::metalOnly).orElse(false);
     }
 
@@ -868,7 +866,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (level == null) {
             return 0;
         }
-        RecipeHolder<MachineRecipe> r = selectedMassRecipe(level);
+        MachineRecipe r = selectedMassRecipe(level);
         return r == null ? 0 : r.value().mass().map(m -> (int) Math.round(m.amount() * 100)).orElse(0);
     }
 
@@ -884,7 +882,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     @Override
     public void openMenu(ServerPlayer player) {
-        player.openMenu(this, buf -> {
+        net.minecraftforge.network.NetworkHooks.openScreen(player, this, buf -> {
             buf.writeBlockPos(worldPosition);
             buf.writeVarInt(type.ordinal());
         });
@@ -898,7 +896,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /** テスト用: 最初の出力タンクの中身を決める。 */
-    public void forceOutputTankForTest(net.neoforged.neoforge.fluids.FluidStack stack) {
+    public void forceOutputTankForTest(net.minecraftforge.fluids.FluidStack stack) {
         tanks[type.fluidInputs()].setFluid(stack);
     }
 
@@ -912,7 +910,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
         int hydrogen = 0;
         for (FluidTank tank : tanks) {
-            if (tank.getFluid().is(io.github.genichimaruo.singulo.registry.SinguloFluids.get("hydrogen"))) {
+            if (tank.getFluid().getFluid().isSame(io.github.genichimaruo.singulo.registry.SinguloFluids.get("hydrogen"))) {
                 hydrogen += tank.getFluidAmount();
             }
         }
@@ -936,9 +934,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     // ------------------------------------------------------------------ 保存
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("items", items.serializeNBT());
         tag.putInt("item_sides", itemSides.packed());
         tag.putBoolean("eject_master", true);
         tag.putIntArray("tank_sides", tankSidesPacked());
@@ -946,7 +944,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         tag.putBoolean("make_free", makeFree);
         ListTag tankList = new ListTag();
         for (FluidTank tank : tanks) {
-            tankList.add(tank.writeToNBT(registries, new CompoundTag()));
+            tankList.add(tank.writeToNBT(new CompoundTag()));
         }
         tag.put("tanks", tankList);
         tag.putInt("energy", energy.getEnergyStored());
@@ -960,11 +958,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         // スロット数が変わった古いデータでも読めるよう、いったん別の入れ物に読んでから写す
         ItemStackHandler loaded = new ItemStackHandler();
-        loaded.deserializeNBT(registries, tag.getCompound("items"));
+        loaded.deserializeNBT(tag.getCompound("items"));
         for (int i = 0; i < items.getSlots(); i++) {
             items.setStackInSlot(i, i < loaded.getSlots() ? loaded.getStackInSlot(i) : ItemStack.EMPTY);
         }
@@ -997,7 +995,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         makeFree = !tag.contains("make_free") || tag.getBoolean("make_free");
         ListTag tankList = tag.getList("tanks", Tag.TAG_COMPOUND);
         for (int i = 0; i < tanks.length && i < tankList.size(); i++) {
-            tanks[i].readFromNBT(registries, tankList.getCompound(i));
+            tanks[i].readFromNBT(tankList.getCompound(i));
         }
         energy.setEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
@@ -1123,7 +1121,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
             for (int i = type.fluidInputs(); i < tanks.length; i++) {
-                if ((outTanks & (1 << i)) != 0 && FluidStack.isSameFluidSameComponents(tanks[i].getFluid(), resource)) {
+                if ((outTanks & (1 << i)) != 0 && tanks[i].getFluid().isFluidEqual(resource)) {
                     return tanks[i].drain(resource, action);
                 }
             }
@@ -1149,7 +1147,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                     continue;
                 }
                 FluidTank tank = tanks[i];
-                boolean candidate = pass == 0 ? FluidStack.isSameFluidSameComponents(tank.getFluid(), resource)
+                boolean candidate = pass == 0 ? tank.getFluid().isFluidEqual(resource)
                         : tank.isEmpty();
                 if (candidate) {
                     return tank.fill(resource, action);
@@ -1189,7 +1187,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
             for (int i = type.fluidInputs(); i < tanks.length; i++) {
-                if (FluidStack.isSameFluidSameComponents(tanks[i].getFluid(), resource)) {
+                if (tanks[i].getFluid().isFluidEqual(resource)) {
                     return tanks[i].drain(resource, action);
                 }
             }

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GYG",
+    "GFG",
+    " B "
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    "Y": {
+      "tag": "forge:dusts/glowstone"
+    },
+    "F": {
+      "item": "singulo:basic_frame"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:archive_terminal"
+  }
+}

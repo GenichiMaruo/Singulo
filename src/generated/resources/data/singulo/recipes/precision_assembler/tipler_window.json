@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:glass_blocks/colorless"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:tipler_window",
+    "count": 2
+  }
+}

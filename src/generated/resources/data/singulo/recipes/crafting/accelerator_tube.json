@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "G",
+    "P"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "G": {
+      "tag": "forge:glass_blocks/colorless"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:accelerator_tube"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:time_crystal_catalyst"
+    },
+    "title": {
+      "translate": "advancement.singulo.crystal.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.crystal.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "singulo:time_crystal_catalyst"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:ruin_culture"
+}

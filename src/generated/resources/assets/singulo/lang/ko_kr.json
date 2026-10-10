@@ -448,7 +448,7 @@
   "desc.singulo.stardust_cluster": "운석 용융각에 자라는, 우주에서 온 미립자의 결정입니다. 부수면 별가루가 나옵니다.",
   "desc.singulo.steel_blend": "철과 석탄의 혼합. 용광로에서 제련하면 강철을 얻을 수 있습니다.",
   "desc.singulo.steel_ingot": "기본적인 구조용 금속. 다른 모드의 강철도 작동합니다.",
-  "desc.singulo.steel_plate": "케이싱 및 부품에 사용되는 프레스강입니다. 다른 모드의 강철판(c:plates/steel)도 사용할 수 있습니다.",
+  "desc.singulo.steel_plate": "케이싱 및 부품에 사용되는 프레스강입니다. 다른 모드의 강철판(forge:plates/steel)도 사용할 수 있습니다.",
   "desc.singulo.strange_matter": "스트레인지렛이 남긴 초밀도 물질. 질량 100의 가치가 있으며 축퇴된 껍질에 사용할 수 있습니다.",
   "desc.singulo.strangelet": "근처의 블록을 이상한 물질로 변환합니다. 자기 병로 격리하세요.",
   "desc.singulo.striped_ruin_panel": "오래전에 꺼진 빛의 띠가 남은 고대 건물 패널.",

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "POP",
+    " M "
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "O": {
+      "item": "singulo:superconducting_coil"
+    },
+    "M": {
+      "item": "singulo:meteoric_iron_ingot"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "singulo:focusing_magnet"
+  }
+}

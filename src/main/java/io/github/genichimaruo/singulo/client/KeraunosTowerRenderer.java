@@ -108,7 +108,6 @@ public class KeraunosTowerRenderer implements BlockEntityRenderer<KeraunosTowerB
         }
     }
 
-    @Override
     public AABB getRenderBoundingBox(KeraunosTowerBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(KeraunosTowerBlockEntity.RANGE + 1);
     }

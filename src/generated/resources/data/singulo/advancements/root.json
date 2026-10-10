@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:handbook"
+    },
+    "title": {
+      "translate": "advancement.singulo.root.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "singulo:textures/block/degenerate_furnace_frame.png"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

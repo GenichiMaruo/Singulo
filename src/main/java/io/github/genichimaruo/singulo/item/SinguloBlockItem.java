@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.item;
 
+import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -16,9 +17,9 @@ public class SinguloBlockItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         SinguloItem.addStageLine(tooltip, stage);
-        if (Boolean.TRUE.equals(stack.get(io.github.genichimaruo.singulo.registry.SinguloComponents.MIXED_SOURCE.get()))) {
+        if (Boolean.TRUE.equals(SinguloComponents.get(stack, io.github.genichimaruo.singulo.registry.SinguloComponents.MIXED_SOURCE.get()))) {
             tooltip.add(Component.translatable("tooltip.singulo.mixed_source")
                     .withStyle(net.minecraft.ChatFormatting.GREEN));
         }

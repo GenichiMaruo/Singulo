@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:basic_circuit"
+    },
+    "title": {
+      "translate": "advancement.singulo.circuit.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.circuit.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "singulo:basic_circuit"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:ceramic"
+}

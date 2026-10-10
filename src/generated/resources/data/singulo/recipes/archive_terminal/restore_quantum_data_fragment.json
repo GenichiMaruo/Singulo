@@ -1,0 +1,34 @@
+{
+  "type": "singulo:machine",
+  "station": "archive_terminal",
+  "stage": 1,
+  "time": 600,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_wire"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "forge:gems/diamond"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:dusts/redstone"
+      },
+      "count": 4
+    }
+  ],
+  "restore": {
+    "item": "singulo:quantum_data_fragment"
+  },
+  "result": {
+    "id": "singulo:quantum_data_fragment",
+    "count": 1
+  }
+}

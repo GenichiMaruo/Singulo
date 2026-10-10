@@ -2,9 +2,6 @@ package io.github.genichimaruo.singulo.item;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 /**
  * 使用回数の状態。
@@ -20,11 +17,6 @@ public record UsesData(int used, int max, int repairs) {
             Codec.INT.optionalFieldOf("repairs", 0).forGetter(UsesData::repairs)
     ).apply(i, UsesData::new));
 
-    public static final StreamCodec<ByteBuf, UsesData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, UsesData::used,
-            ByteBufCodecs.VAR_INT, UsesData::max,
-            ByteBufCodecs.VAR_INT, UsesData::repairs,
-            UsesData::new);
 
     public int remaining() {
         return Math.max(0, max - used);

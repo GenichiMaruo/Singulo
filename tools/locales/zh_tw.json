@@ -1796,8 +1796,8 @@
     "translation": "基本結構金屬。其他模組的鋼鐵也可以。"
   },
   "desc.singulo.steel_plate": {
-    "source": "Pressed steel used for casings and parts. Steel plates from other mods (c:plates/steel) work too.",
-    "translation": "用於外殼和零件的壓製鋼。其他模組的鋼板（c:plates/steel）也可使用。"
+    "source": "Pressed steel used for casings and parts. Steel plates from other mods (forge:plates/steel) work too.",
+    "translation": "用於外殼和零件的壓製鋼。其他模組的鋼板（forge:plates/steel）也可使用。"
   },
   "desc.singulo.strange_matter": {
     "source": "Ultra-dense matter left by strangelets. Worth 100 mass and usable for degenerate shells.",

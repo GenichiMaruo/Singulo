@@ -19,8 +19,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * ワームホール固定化装置（段階5）。不安定な口を入れると、エキゾチック物質 MATTER_PER_MOUTH 個で喉を支え、
@@ -155,7 +155,7 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
         }
         if (++progress[i] >= STABILIZE_TICKS) {
             ItemStack sealed = new ItemStack(SinguloBlocks.WORMHOLE_MOUTH.get());
-            sealed.set(SinguloComponents.WORMHOLE.get(), mouth.get(SinguloComponents.WORMHOLE.get()));
+            SinguloComponents.set(sealed, SinguloComponents.WORMHOLE.get(), SinguloComponents.get(mouth, SinguloComponents.WORMHOLE.get()));
             items.setStackInSlot(i, sealed);
             progress[i] = 0;
             level.playSound(null, worldPosition, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8F, 1.6F);
@@ -180,7 +180,7 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
     /** 空の手で右クリックすると画面を開く（口や燃料を持っていれば、そのまま入れる＝useItem）。 */
     @Override
     public void openMenu(ServerPlayer player) {
-        player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
+        net.minecraftforge.network.NetworkHooks.openScreen(player, this, buf -> buf.writeBlockPos(worldPosition));
     }
 
     @Override
@@ -213,19 +213,19 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("items", items.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("items", items.serializeNBT());
         tag.putInt("energy", energy.getEnergyStored());
         tag.putIntArray("progress", progress);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         // 筐体の枠がなかった頃の保存（3枠）も読めるように、一度別の入れ物に読んでから移す
         ItemStackHandler saved = new ItemStackHandler(SLOTS);
-        saved.deserializeNBT(registries, tag.getCompound("items"));
+        saved.deserializeNBT(tag.getCompound("items"));
         for (int i = 0; i < SLOTS; i++) {
             items.setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
         }

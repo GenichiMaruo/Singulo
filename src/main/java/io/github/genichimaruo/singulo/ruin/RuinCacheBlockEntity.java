@@ -35,7 +35,7 @@ import net.minecraft.world.phys.Vec3;
  * 初回だけ singulo:ruins/&lt;遺構ID&gt;_first も入れる（休眠した特異点の種など一回限りのもの）。
  * 再生の判定は開いたときに行うので、毎tickの負荷はない。
  */
-public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
+public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
     private static final int[] NO_SLOTS = new int[0];
 
     /** ホッパーなどからは、どの面からも出し入れできない（開けて手で取り出す）。 */
@@ -180,8 +180,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     private static List<ItemStack> roll(ServerLevel level, String path, BlockPos at) {
-        LootTable table = level.getServer().reloadableRegistries()
-                .getLootTable(ResourceKey.create(Registries.LOOT_TABLE, Singulo.id(path)));
+        LootTable table = level.getServer().getLootData().getLootTable(Singulo.id(path));
         LootParams params = new LootParams.Builder(level)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(at))
                 .create(LootContextParamSets.CHEST);
@@ -203,6 +202,13 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     @Override
+    public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> cap, net.minecraft.core.Direction side) {
+        if (cap == net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER)
+            return net.minecraftforge.common.util.LazyOptional.of(() -> net.minecraftforge.items.wrapper.EmptyHandler.INSTANCE).cast();
+        return super.getCapability(cap, side);
+    }
+
+    @Override
     protected Component getDefaultName() {
         return Component.translatable(getBlockState().getBlock().getDescriptionId());
     }
@@ -212,7 +218,6 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
         return items;
     }
 
-    @Override
     protected void setItems(NonNullList<ItemStack> items) {
         this.items = items;
     }
@@ -228,9 +233,9 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, items, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        ContainerHelper.saveAllItems(tag, items);
         tag.putString("ruin", ruin);
         tag.putBoolean("filled", filledOnce);
         tag.putLong("emptied_at", emptiedAt);
@@ -238,10 +243,10 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, items, registries);
+        ContainerHelper.loadAllItems(tag, items);
         ruin = tag.getString("ruin");
         filledOnce = tag.getBoolean("filled");
         emptiedAt = tag.contains("emptied_at") ? tag.getLong("emptied_at") : -1;

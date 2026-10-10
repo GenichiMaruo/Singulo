@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.test;
 
+import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.item.GravitonManipulatorItem;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
@@ -11,8 +12,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** マニピュレーターの投げる強さと、JEI に出すマルチブロックの部品表。 */
 @GameTestHolder(Singulo.MODID)
@@ -60,7 +61,7 @@ public final class ManipulatorGameTests {
     /** 右クリックでためて離すと、持ち上げたモブが前へ飛んでいき、1秒は持ち上げられない。 */
     @GameTest(template = "huge", timeoutTicks = 140)
     public static void manipulatorChargeAndThrow(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = TestBuild.mockPlayer(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(2, 1, 1));
@@ -71,12 +72,12 @@ public final class ManipulatorGameTests {
             player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
             net.minecraft.world.item.ItemStack tank = new net.minecraft.world.item.ItemStack(
                     io.github.genichimaruo.singulo.registry.SinguloBlocks.CONTAINMENT_TANK.get());
-            tank.set(io.github.genichimaruo.singulo.registry.SinguloComponents.DARK_MATTER.get(), 4000);
+            SinguloComponents.set(tank, io.github.genichimaruo.singulo.registry.SinguloComponents.DARK_MATTER.get(), 4000);
             player.getInventory().setItem(5, tank);
             var zombie = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.core.BlockPos(2, 1, 5));
             double[] startZ = new double[1];
             helper.onEachTick(() -> GravitonManipulatorItem.onPlayerTick(
-                    new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player)));
+                    new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END, player)));
             // 左クリックで持ち上げ、押したまま右クリックでためる（実際の操作と同じ）
             helper.runAtTickTime(2, () -> GravitonManipulatorItem.setInput(player, false, true));
             helper.runAtTickTime(6, () -> GravitonManipulatorItem.setInput(player, true, true));
@@ -103,7 +104,7 @@ public final class ManipulatorGameTests {
     /** 円錐（G キー）で持ち上げていても、ためて離すと投げられる。 */
     @GameTest(template = "huge", timeoutTicks = 140)
     public static void manipulatorThrowInConeMode(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = TestBuild.mockPlayer(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(7, 1, 1));
@@ -115,12 +116,12 @@ public final class ManipulatorGameTests {
             player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
             net.minecraft.world.item.ItemStack tank = new net.minecraft.world.item.ItemStack(
                     io.github.genichimaruo.singulo.registry.SinguloBlocks.CONTAINMENT_TANK.get());
-            tank.set(io.github.genichimaruo.singulo.registry.SinguloComponents.DARK_MATTER.get(), 4000);
+            SinguloComponents.set(tank, io.github.genichimaruo.singulo.registry.SinguloComponents.DARK_MATTER.get(), 4000);
             player.getInventory().setItem(5, tank);
             var zombie = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.core.BlockPos(7, 1, 5));
             double[] startZ = new double[1];
             helper.onEachTick(() -> GravitonManipulatorItem.onPlayerTick(
-                    new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player)));
+                    new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END, player)));
             helper.runAtTickTime(2, () -> GravitonManipulatorItem.setInput(player, false, true));
             helper.runAtTickTime(6, () -> GravitonManipulatorItem.setInput(player, true, true));
             helper.runAtTickTime(40, () -> {

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "CAC",
+    " P "
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "C": {
+      "tag": "forge:ingots/copper"
+    },
+    "A": {
+      "item": "minecraft:blue_ice"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:heat_exchange_core"
+  }
+}

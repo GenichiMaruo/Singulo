@@ -23,10 +23,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** 封印コンテナと鍵、コンテナから出る道具（オーバークロック・チップ、触媒安定化剤、次元ポケット、重力ブーツ）。 */
 @GameTestHolder(Singulo.MODID)
@@ -45,9 +45,9 @@ public final class SealedGameTests {
     public static void sealedContainerOpensWithKey(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
-        SealedContainerBlockEntity box = helper.getBlockEntity(pos);
+        SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         box.sealWithLoot();
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         box.interact(player, ItemStack.EMPTY);
         box.interact(player, item("quantum_key"));
@@ -66,7 +66,7 @@ public final class SealedGameTests {
     public static void breakingSealedContainerLosesContents(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(1).get());
-        SealedContainerBlockEntity box = helper.getBlockEntity(pos);
+        SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         box.setItem(0, new ItemStack(Items.DIAMOND, 10));
         box.sealWithLoot();
         helper.getLevel().destroyBlock(helper.absolutePos(pos), true);
@@ -82,10 +82,10 @@ public final class SealedGameTests {
     public static void craftedContainerCanBeSealedAndReopened(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
-        SealedContainerBlockEntity box = helper.getBlockEntity(pos);
+        SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         helper.assertTrue(box.phase() == Phase.OPEN, "置いたばかりなのに封印されている");
         box.setItem(3, new ItemStack(Items.EMERALD, 5));
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         player.setShiftKeyDown(true);
         box.interact(player, item("magnetic_key"));
         helper.assertTrue(box.phase() == Phase.SEALING, "鍵を持ってスニークしても封印されない");
@@ -110,8 +110,8 @@ public final class SealedGameTests {
     public static void sneakUseWithKeySealsThroughInteraction(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
-        SealedContainerBlockEntity box = helper.getBlockEntity(pos);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             player.setShiftKeyDown(true);
@@ -134,10 +134,10 @@ public final class SealedGameTests {
     public static void hoppersCannotTakeFromCacheOrContainer(GameTestHelper helper) {
         BlockPos box = new BlockPos(2, 2, 2);
         helper.setBlock(box, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
-        SealedContainerBlockEntity container = helper.getBlockEntity(box);
+        SealedContainerBlockEntity container = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, box);
         container.setItem(0, new ItemStack(Items.DIAMOND, 3));
         helper.setBlock(box.below(), net.minecraft.world.level.block.Blocks.HOPPER);
-        var handler = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+        var handler = io.github.genichimaruo.singulo.compat.Capabilities.get(helper.getLevel(), io.github.genichimaruo.singulo.compat.Capabilities.ItemHandler.BLOCK,
                 helper.absolutePos(box), net.minecraft.core.Direction.DOWN);
         helper.assertTrue(handler == null || handler.getSlots() == 0, "パイプから中身が見える");
         helper.runAtTickTime(30, () -> {
@@ -151,14 +151,14 @@ public final class SealedGameTests {
     public static void playerPlacedCacheDoesNotRefill(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
-        io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity cache = helper.getBlockEntity(pos);
+        io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         cache.setRuin("observation_post");
         cache.markPlacedByPlayer();
         cache.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
         helper.assertTrue(cache.isEmpty(), "置き直した保管庫に中身が入った");
         BlockPos other = new BlockPos(4, 1, 2);
         helper.setBlock(other, SinguloBlocks.RUIN_CACHE.get());
-        io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity natural = helper.getBlockEntity(other);
+        io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity natural = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, other);
         natural.setRuin("observation_post");
         natural.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
         helper.assertFalse(natural.isEmpty(), "遺構の保管庫に中身が入らない");
@@ -173,15 +173,15 @@ public final class SealedGameTests {
         helper.setBlock(new BlockPos(2, 1, 1), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         for (BlockPos p : new BlockPos[]{a, b}) {
             helper.setBlock(p, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
-            MachineBlockEntity m = helper.getBlockEntity(p);
+            MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, p);
             m.energy().setEnergy(m.energy().getMaxEnergyStored());
             m.automationFluids().fill(new FluidStack(Fluids.WATER, 8000), IFluidHandler.FluidAction.EXECUTE);
         }
-        MachineBlockEntity fast = helper.getBlockEntity(b);
+        MachineBlockEntity fast = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, b);
         helper.assertTrue(fast.slotAccepts(fast.type().upgradeSlot(), item("overclock_chip")), "アップグレード枠に入らない");
         fast.items().setStackInSlot(fast.type().upgradeSlot(), item("overclock_chip"));
         helper.runAtTickTime(80, () -> {
-            MachineBlockEntity slow = helper.getBlockEntity(a);
+            MachineBlockEntity slow = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, a);
             int h1 = hydrogen(slow);
             int h2 = hydrogen(fast);
             helper.assertTrue(h2 > h1, "オーバークロックで速くならない: " + h1 + " / " + h2);
@@ -197,9 +197,9 @@ public final class SealedGameTests {
     @GameTest(template = EMPTY)
     public static void stabilizerDoublesCatalystLife(GameTestHelper helper) {
         ItemStack catalyst = item("muon_catalyst");
-        catalyst.set(SinguloComponents.USES.get(), new UsesData(100, 1000, 0));
+        SinguloComponents.set(catalyst, SinguloComponents.USES.get(), new UsesData(100, 1000, 0));
         CatalystStabilizerItem.stabilize(catalyst);
-        UsesData d = catalyst.get(SinguloComponents.USES.get());
+        UsesData d = SinguloComponents.get(catalyst, SinguloComponents.USES.get());
         helper.assertTrue(d.remaining() == 1800 && d.max() == 2000, "残りが2倍にならない: " + d);
         helper.assertTrue(CatalystStabilizerItem.stabilized(catalyst), "安定化の印がない");
         helper.succeed();
@@ -208,7 +208,7 @@ public final class SealedGameTests {
     /** 次元ポケットの中身はプレイヤーに付いていて、開き直しても残る。 */
     @GameTest(template = EMPTY)
     public static void dimensionalPocketKeepsContents(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         DimensionalPocketItem.Pocket first = new DimensionalPocketItem.Pocket(player);
         first.setItem(5, new ItemStack(Items.GOLD_INGOT, 7));
         first.setChanged();
@@ -220,7 +220,7 @@ public final class SealedGameTests {
     /** 重力ブーツを履いていると落下ダメージを受けない。 */
     @GameTest(template = EMPTY)
     public static void gravityBootsPreventFallDamage(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestBuild.mockPlayer(helper);
         player.setItemSlot(EquipmentSlot.FEET, new ItemStack(SinguloItems.GRAVITY_BOOTS.get()));
         float before = player.getHealth();
         player.causeFallDamage(30, 1.0F, player.damageSources().fall());

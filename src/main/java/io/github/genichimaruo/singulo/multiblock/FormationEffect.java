@@ -8,7 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent.ServerTickEvent;
 
 /**
  * マルチブロックの形成演出: 正しく組み上がると、コントローラから近い順に部品の継ぎ目へ白い光が走り、起動音が鳴る。
@@ -55,7 +55,8 @@ public final class FormationEffect {
         io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, controller, "multiblock_formed", 1.5F, 1.0F);
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(ServerTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
         if (QUEUE.isEmpty()) {
             return;
         }

@@ -41,7 +41,7 @@
           "texture": "#bottom"
         }
       },
-      "neoforge_data": {
+      "forge_data": {
         "block_light": 15,
         "sky_light": 15
       }

@@ -1,68 +1,47 @@
 package io.github.genichimaruo.singulo.registry;
 
 import com.mojang.serialization.Codec;
-import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.item.UsesData;
+import io.github.genichimaruo.singulo.wormhole.WormholeData;
 import java.util.function.Supplier;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.world.item.ItemStack;
 
+/** Typed item state stored in stack NBT on Minecraft 1.20.1. */
 public final class SinguloComponents {
-    public static final DeferredRegister.DataComponents REGISTER = DeferredRegister.createDataComponents(Singulo.MODID);
-
-    /** 使用回数（遺構回収物・復元品・触媒・型の欠片）。 */
-    public static final Supplier<DataComponentType<UsesData>> USES = REGISTER.registerComponentType("uses",
-            b -> b.persistent(UsesData.CODEC).networkSynchronized(UsesData.STREAM_CODEC));
-
-    /** 道具に蓄えた電力（FE）。 */
-    public static final Supplier<DataComponentType<Integer>> ENERGY = REGISTER.registerComponentType("energy",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
-    /** 3種類以上の元ブロックから作った圧縮ブロックLv1（混成ボーナスの対象）。 */
-    public static final Supplier<DataComponentType<Boolean>> MIXED_SOURCE = REGISTER.registerComponentType("mixed_source",
-            b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-
-    /** 重力操作道具のモード（GravityMode の番号）。 */
-    public static final Supplier<DataComponentType<Integer>> GRAVITY_MODE = REGISTER.registerComponentType("gravity_mode",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
-    /** エキゾチック物質を使う道具の残量（tick）。 */
-    public static final Supplier<DataComponentType<Integer>> EXOTIC_CHARGE = REGISTER.registerComponentType("exotic_charge",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
-    /** 重力閉じ込めタンクに入っているダークマター（mB）。 */
-    public static final Supplier<DataComponentType<Integer>> DARK_MATTER = REGISTER.registerComponentType("dark_matter",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
-    /** ワームホールの口の対と生まれた時刻。 */
-    public static final Supplier<DataComponentType<io.github.genichimaruo.singulo.wormhole.WormholeData>> WORMHOLE =
-            REGISTER.registerComponentType("wormhole", b -> b.persistent(io.github.genichimaruo.singulo.wormhole.WormholeData.CODEC)
-                    .networkSynchronized(io.github.genichimaruo.singulo.wormhole.WormholeData.STREAM_CODEC));
-
-    /** 重力操作道具の範囲（true なら前方の円錐、false なら視線上の1体）。 */
-    public static final Supplier<DataComponentType<Boolean>> CONE = REGISTER.registerComponentType("cone",
-            b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-
-    /** ホロ投影機で選んでいる大きさ（選択肢の番号）。 */
-    public static final Supplier<DataComponentType<Integer>> HOLO_SIZE = REGISTER.registerComponentType("holo_size",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
-    /** 探索コンパスの調整段階（探せる遺構の数、1〜4）。 */
-    public static final Supplier<DataComponentType<Integer>> COMPASS_LEVEL = REGISTER.registerComponentType("compass_level",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
-    /** ニュートリノ・スキャナーの感度の段階（1〜3）。 */
-    public static final Supplier<DataComponentType<Integer>> SCANNER_TIER = REGISTER.registerComponentType("scanner_tier",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
-    /** 触媒安定化剤を使った触媒（もう使えない）。 */
-    public static final Supplier<DataComponentType<Boolean>> STABILIZED = REGISTER.registerComponentType("stabilized",
-            b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-
-    /** 無限の触媒のティア。 */
-    public static final Supplier<DataComponentType<Integer>> CATALYST_TIER = REGISTER.registerComponentType("catalyst_tier",
-            b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-
+    public record Key<T>(String name, Codec<T> codec) {}
+    private static <T> Supplier<Key<T>> key(String name, Codec<T> codec) {
+        Key<T> key = new Key<>("singulo:" + name, codec);
+        return () -> key;
+    }
+    public static final Supplier<Key<UsesData>> USES = key("uses", UsesData.CODEC);
+    public static final Supplier<Key<WormholeData>> WORMHOLE = key("wormhole", WormholeData.CODEC);
+    public static final Supplier<Key<Integer>> ENERGY = key("energy", Codec.INT);
+    public static final Supplier<Key<Integer>> GRAVITY_MODE = key("gravity_mode", Codec.INT);
+    public static final Supplier<Key<Integer>> EXOTIC_CHARGE = key("exotic_charge", Codec.INT);
+    public static final Supplier<Key<Integer>> DARK_MATTER = key("dark_matter", Codec.INT);
+    public static final Supplier<Key<Integer>> HOLO_SIZE = key("holo_size", Codec.INT);
+    public static final Supplier<Key<Integer>> COMPASS_LEVEL = key("compass_level", Codec.INT);
+    public static final Supplier<Key<Integer>> SCANNER_TIER = key("scanner_tier", Codec.INT);
+    public static final Supplier<Key<Integer>> CATALYST_TIER = key("catalyst_tier", Codec.INT);
+    public static final Supplier<Key<Boolean>> MIXED_SOURCE = key("mixed_source", Codec.BOOL);
+    public static final Supplier<Key<Boolean>> CONE = key("cone", Codec.BOOL);
+    public static final Supplier<Key<Boolean>> STABILIZED = key("stabilized", Codec.BOOL);
+    public static <T> T get(ItemStack stack, Key<T> key) {
+        if (stack.getTag() == null || !stack.getTag().contains(key.name())) return null;
+        return key.codec().parse(NbtOps.INSTANCE, stack.getTag().get(key.name())).result().orElse(null);
+    }
+    public static <T> T getOrDefault(ItemStack stack, Key<T> key, T fallback) {
+        T value = get(stack, key);
+        return value == null ? fallback : value;
+    }
+    public static <T> void set(ItemStack stack, Key<T> key, T value) {
+        if (value == null) { remove(stack, key); return; }
+        stack.getOrCreateTag().put(key.name(), key.codec().encodeStart(NbtOps.INSTANCE, value)
+                .getOrThrow(false, message -> { throw new IllegalArgumentException(message); }));
+    }
+    public static void remove(ItemStack stack, Key<?> key) {
+        if (stack.getTag() != null) stack.getTag().remove(key.name());
+    }
     private SinguloComponents() {}
 }

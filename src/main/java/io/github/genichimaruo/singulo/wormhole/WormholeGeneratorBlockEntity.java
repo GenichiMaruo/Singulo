@@ -17,9 +17,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 /**
  * ワームホール生成器（段階5、5×5×5 の球のマルチブロック。コアは下から2段目の手前の中央）。毎tick requiredPerTick()（設定 wormholeGeneratorPower、既定 100 MFE）を
@@ -46,7 +46,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
             setChanged();
         }
     };
-    private final IItemHandler automation = new net.neoforged.neoforge.items.wrapper.RangedWrapper(output, 0, 2) {
+    private final IItemHandler automation = new net.minecraftforge.items.wrapper.RangedWrapper(output, 0, 2) {
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             return stack;
@@ -236,16 +236,16 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("output", output.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("output", output.serializeNBT());
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("output")) {
-            output.deserializeNBT(registries, tag.getCompound("output"));
+            output.deserializeNBT(tag.getCompound("output"));
         }
         if (tag.contains("core")) {
             core = BlockPos.of(tag.getLong("core"));
@@ -273,7 +273,7 @@ public class WormholeGeneratorBlockEntity extends BlockEntity implements Abstrac
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         tag.putLong("core", core().asLong());
         tag.putInt("progress", progress);

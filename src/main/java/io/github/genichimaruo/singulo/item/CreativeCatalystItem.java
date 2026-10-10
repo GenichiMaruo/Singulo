@@ -21,7 +21,7 @@ public class CreativeCatalystItem extends UsesItem {
     }
 
     public static int tier(ItemStack stack) {
-        return Math.max(2, Math.min(5, stack.getOrDefault(SinguloComponents.CATALYST_TIER.get(), 5)));
+        return Math.max(2, Math.min(5, SinguloComponents.getOrDefault(stack, SinguloComponents.CATALYST_TIER.get(), 5)));
     }
 
     @Override
@@ -29,7 +29,7 @@ public class CreativeCatalystItem extends UsesItem {
         ItemStack stack = player.getItemInHand(hand);
         if (!level.isClientSide) {
             int next = tier(stack) >= 5 ? 2 : tier(stack) + 1;
-            stack.set(SinguloComponents.CATALYST_TIER.get(), next);
+            SinguloComponents.set(stack, SinguloComponents.CATALYST_TIER.get(), next);
             player.displayClientMessage(Component.translatable("tooltip.singulo.creative_catalyst.tier", next), true);
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
@@ -41,7 +41,7 @@ public class CreativeCatalystItem extends UsesItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("tooltip.singulo.creative_catalyst.tier", tier(stack)).withStyle(ChatFormatting.LIGHT_PURPLE));
         tooltip.add(Component.translatable("tooltip.singulo.creative_only").withStyle(ChatFormatting.DARK_PURPLE));
     }

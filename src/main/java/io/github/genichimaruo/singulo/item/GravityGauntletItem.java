@@ -26,10 +26,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.energy.ComponentEnergyStorage;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import io.github.genichimaruo.singulo.compat.Capabilities;
+import net.minecraftforge.common.Tags;
+import io.github.genichimaruo.singulo.compat.ComponentEnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * 慣性制御ガントレット（段階3）。右クリックを押している間、視線上の1体の重力を操る。
@@ -106,7 +106,7 @@ public class GravityGauntletItem extends SinguloItem {
     public static final int CONE_MAX_TARGETS = 8;
 
     public static boolean cone(ItemStack stack) {
-        return Boolean.TRUE.equals(stack.get(SinguloComponents.CONE.get()));
+        return Boolean.TRUE.equals(SinguloComponents.get(stack, SinguloComponents.CONE.get()));
     }
 
     /** 視線上の1体と前方の円錐を切り替える（キー割り当てから呼ばれる）。 */
@@ -115,7 +115,7 @@ public class GravityGauntletItem extends SinguloItem {
             return;
         }
         boolean next = !cone(stack);
-        stack.set(SinguloComponents.CONE.get(), next);
+        SinguloComponents.set(stack, SinguloComponents.CONE.get(), next);
         player.displayClientMessage(Component.translatable(next ? "gauntlet.singulo.area.cone" : "gauntlet.singulo.area.single"),
                 true);
     }
@@ -143,7 +143,7 @@ public class GravityGauntletItem extends SinguloItem {
     }
 
     public Mode mode(ItemStack stack) {
-        Integer m = stack.get(SinguloComponents.GRAVITY_MODE.get());
+        Integer m = SinguloComponents.get(stack, SinguloComponents.GRAVITY_MODE.get());
         for (Mode mode : modes()) {
             if (m != null && mode.ordinal() == m) {
                 return mode;
@@ -176,7 +176,7 @@ public class GravityGauntletItem extends SinguloItem {
                     }
                 }
                 Mode next = modes[(index + 1) % modes.length];
-                stack.set(SinguloComponents.GRAVITY_MODE.get(), next.ordinal());
+                SinguloComponents.set(stack, SinguloComponents.GRAVITY_MODE.get(), next.ordinal());
                 player.displayClientMessage(Component.translatable("tooltip.singulo.gauntlet.mode", modeName(next)), true);
             }
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
@@ -201,7 +201,7 @@ public class GravityGauntletItem extends SinguloItem {
             return InteractionResult.PASS;
         }
         Level level = context.getLevel();
-        IEnergyStorage source = level.getCapability(Capabilities.EnergyStorage.BLOCK, context.getClickedPos(),
+        IEnergyStorage source = Capabilities.get(level, Capabilities.EnergyStorage.BLOCK, context.getClickedPos(),
                 context.getClickedFace());
         if (source == null || !source.canExtract()) {
             return InteractionResult.PASS;
@@ -217,7 +217,7 @@ public class GravityGauntletItem extends SinguloItem {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(ItemStack stack) {
         return 72_000;
     }
 
@@ -388,7 +388,7 @@ public class GravityGauntletItem extends SinguloItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
         tooltip.add(Component.translatable("tooltip.singulo.energy", energy(stack).getEnergyStored(), capacity())
                 .withStyle(ChatFormatting.GRAY));

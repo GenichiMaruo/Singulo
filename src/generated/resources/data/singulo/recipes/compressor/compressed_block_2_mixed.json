@@ -1,0 +1,24 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 4,
+  "time": 20,
+  "energy": 40,
+  "priority": 1,
+  "ingredients": [
+    {
+      "ingredient": {
+        "type": "forge:partial_nbt",
+        "item": "singulo:compressed_block_1",
+        "nbt": {
+          "singulo:mixed_source": true
+        }
+      },
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "singulo:compressed_block_2",
+    "count": 1
+  }
+}

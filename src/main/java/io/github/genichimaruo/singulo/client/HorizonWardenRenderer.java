@@ -74,9 +74,9 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
 
     /** 倒されたときは倒れ込まず、膝をついて前へ傾き、震える。 */
     @Override
-    protected void setupRotations(HorizonWarden warden, PoseStack pose, float bob, float bodyYaw, float partialTick, float scale) {
+    protected void setupRotations(HorizonWarden warden, PoseStack pose, float bob, float bodyYaw, float partialTick) {
         if (!warden.isDeadOrDying()) {
-            super.setupRotations(warden, pose, bob, bodyYaw, partialTick, scale);
+            super.setupRotations(warden, pose, bob, bodyYaw, partialTick);
             return;
         }
         float d = warden.deathProgress(partialTick);
@@ -369,7 +369,7 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
                 return;                                   // 倒されたあとは、光る線がちらついて消えかける
             }
             VertexConsumer vc = buffers.getBuffer(GLOW[Mth.clamp(warden.phase(), 1, 3) - 1]);
-            getParentModel().renderToBuffer(pose, vc, 0xF00000, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+            getParentModel().renderToBuffer(pose, vc, 0xF00000, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
         }
     }
 

@@ -18,19 +18,14 @@ import net.minecraft.world.phys.BlockHitResult;
 
 /** 封印コンソール。最終実験施設の中央にあり、壊せない。 */
 public class SealConsoleBlock extends BaseEntityBlock {
-    public static final MapCodec<SealConsoleBlock> CODEC = simpleCodec(SealConsoleBlock::new);
 
     public SealConsoleBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
@@ -41,7 +36,12 @@ public class SealConsoleBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer sp && !sp.isSpectator()
                 && level.getBlockEntity(pos) instanceof SealConsoleBlockEntity console) {
             console.activate((ServerLevel) level, sp);

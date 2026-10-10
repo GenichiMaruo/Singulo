@@ -18,9 +18,9 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.event.RegisterShadersEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.client.event.RegisterShadersEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
@@ -85,7 +85,7 @@ public final class GravitationalLensing {
         if (mc.level == null) {
             return;
         }
-        float pt = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        float pt = event.getPartialTick();
         for (net.minecraft.world.entity.player.Player p : mc.level.players()) {
             for (net.minecraft.world.InteractionHand hand : net.minecraft.world.InteractionHand.values()) {
                 if (!StaffTipTracker.distorts(p.getItemInHand(hand))) {
@@ -182,7 +182,7 @@ public final class GravitationalLensing {
     private static Pending pending;
 
     /** GUI を描く直前（シェーダーパックの合成が終わったあと）に、覚えておいたレンズを掛ける。 */
-    static void onRenderGui(net.neoforged.neoforge.client.event.RenderGuiEvent.Pre event) {
+    static void onRenderGui(net.minecraftforge.client.event.RenderGuiEvent.Pre event) {
         Pending p = pending;
         pending = null;
         if (p == null || shader == null) {
@@ -290,12 +290,13 @@ public final class GravitationalLensing {
         RenderSystem.depthMask(false);
         RenderSystem.disableBlend();
         RenderSystem.setShader(() -> shader);
-        BufferBuilder b = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        b.addVertex(-1, -1, 0).setUv(0, 0);
-        b.addVertex(1, -1, 0).setUv(1, 0);
-        b.addVertex(1, 1, 0).setUv(1, 1);
-        b.addVertex(-1, 1, 0).setUv(0, 1);
-        BufferUploader.drawWithShader(b.buildOrThrow());
+        BufferBuilder b = Tesselator.getInstance().getBuilder();
+        b.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        b.vertex(-1, -1, 0).uv(0, 0).endVertex();
+        b.vertex(1, -1, 0).uv(1, 0).endVertex();
+        b.vertex(1, 1, 0).uv(1, 1).endVertex();
+        b.vertex(-1, 1, 0).uv(0, 1).endVertex();
+        BufferUploader.drawWithShader(b.end());
         RenderSystem.setShaderTexture(0, previous);
         RenderSystem.setShaderTexture(1, previousDepth);
         RenderSystem.depthMask(true);

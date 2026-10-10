@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 3
+    },
+    {
+      "ingredient": {
+        "tag": "forge:obsidian"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_compactor_frame",
+    "count": 4
+  }
+}

@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.BaseFlowingFluid;
-import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.minecraftforge.fluids.FluidType;
+import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * 液体・ガス。どれも設置できるブロックやバケツは持たず、装置のタンクと配管の中だけに存在する。
@@ -20,12 +20,12 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
  */
 public final class SinguloFluids {
     public static final DeferredRegister<FluidType> FLUID_TYPES =
-            DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES, Singulo.MODID);
+            DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, Singulo.MODID);
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Registries.FLUID, Singulo.MODID);
 
-    public record Entry(FluidDef def, DeferredHolder<FluidType, FluidType> type,
-                        DeferredHolder<Fluid, BaseFlowingFluid.Source> source,
-                        DeferredHolder<Fluid, BaseFlowingFluid.Flowing> flowing) {}
+    public record Entry(FluidDef def, RegistryObject<FluidType> type,
+                        RegistryObject<ForgeFlowingFluid.Source> source,
+                        RegistryObject<ForgeFlowingFluid.Flowing> flowing) {}
 
     public static final Map<String, Entry> ALL = new LinkedHashMap<>();
 
@@ -36,20 +36,25 @@ public final class SinguloFluids {
     }
 
     private static Entry create(FluidDef def) {
-        DeferredHolder<FluidType, FluidType> type = FLUID_TYPES.register(def.id(), () -> new FluidType(
+        RegistryObject<FluidType> type = FLUID_TYPES.register(def.id(), () -> new FluidType(
                 FluidType.Properties.create()
                         .descriptionId("fluid_type.singulo." + def.id())
                         .density(def.gas() ? -1000 : 1000)
                         .viscosity(def.gas() ? 200 : 1000)
                         .temperature(temperatureOf(def.id()))
-                        .canSwim(false).canDrown(false).canPushEntity(false)));
+                        .canSwim(false).canDrown(false).canPushEntity(false)) {
+            @Override
+            public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions> consumer) {
+                consumer.accept(io.github.genichimaruo.singulo.client.SinguloClient.fluidExtensions(def.color()));
+            }
+        });
         @SuppressWarnings("unchecked")
-        Supplier<BaseFlowingFluid.Properties>[] props = new Supplier[1];
-        DeferredHolder<Fluid, BaseFlowingFluid.Source> source =
-                FLUIDS.register(def.id(), () -> new BaseFlowingFluid.Source(props[0].get()));
-        DeferredHolder<Fluid, BaseFlowingFluid.Flowing> flowing =
-                FLUIDS.register("flowing_" + def.id(), () -> new BaseFlowingFluid.Flowing(props[0].get()));
-        BaseFlowingFluid.Properties properties = new BaseFlowingFluid.Properties(type, source, flowing);
+        Supplier<ForgeFlowingFluid.Properties>[] props = new Supplier[1];
+        RegistryObject<ForgeFlowingFluid.Source> source =
+                FLUIDS.register(def.id(), () -> new ForgeFlowingFluid.Source(props[0].get()));
+        RegistryObject<ForgeFlowingFluid.Flowing> flowing =
+                FLUIDS.register("flowing_" + def.id(), () -> new ForgeFlowingFluid.Flowing(props[0].get()));
+        ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(type, source, flowing);
         props[0] = () -> properties;
         return new Entry(def, type, source, flowing);
     }

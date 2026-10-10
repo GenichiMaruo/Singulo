@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 
 /**
  * 自分のプレイヤーへのブラックホールの引力（クライアントで毎tick）。
@@ -14,7 +14,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 final class BlackHolePull {
     private BlackHolePull() {}
 
-    static void onClientTick(ClientTickEvent.Post event) {
+    static void onClientTick(ClientTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || mc.level == null || mc.isPaused() || player.isCreative() || player.isSpectator()

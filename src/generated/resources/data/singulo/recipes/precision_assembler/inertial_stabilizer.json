@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 180,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "forge:obsidian"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:inertial_stabilizer",
+    "count": 1
+  }
+}

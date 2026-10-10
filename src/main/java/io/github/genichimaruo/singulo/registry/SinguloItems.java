@@ -16,66 +16,65 @@ import java.util.Map;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
 
 public final class SinguloItems {
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Singulo.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(net.minecraft.core.registries.Registries.ITEM, Singulo.MODID);
 
     /** 手持ちの道具（生成表ではなく専用クラスで作る）。 */
-    public static final DeferredItem<GravityGauntletItem> INERTIAL_CONTROL_GAUNTLET = ITEMS.register(
+    public static final RegistryObject<GravityGauntletItem> INERTIAL_CONTROL_GAUNTLET = ITEMS.register(
             "inertial_control_gauntlet", () -> new GravityGauntletItem(new Item.Properties().rarity(Rarity.UNCOMMON), 3));
-    public static final DeferredItem<GravitonManipulatorItem> GRAVITON_MANIPULATOR = ITEMS.register(
+    public static final RegistryObject<GravitonManipulatorItem> GRAVITON_MANIPULATOR = ITEMS.register(
             "graviton_manipulator", () -> new GravitonManipulatorItem(new Item.Properties().rarity(Rarity.EPIC), 5));
-    public static final DeferredItem<MetricDriveItem> METRIC_DRIVE = ITEMS.register(
+    public static final RegistryObject<MetricDriveItem> METRIC_DRIVE = ITEMS.register(
             "metric_drive", () -> new MetricDriveItem(new Item.Properties().rarity(Rarity.EPIC), 5));
-    public static final DeferredItem<io.github.genichimaruo.singulo.wormhole.UnstableMouthItem> UNSTABLE_WORMHOLE_MOUTH = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.wormhole.UnstableMouthItem> UNSTABLE_WORMHOLE_MOUTH = ITEMS.register(
             "unstable_wormhole_mouth", () -> new io.github.genichimaruo.singulo.wormhole.UnstableMouthItem(new Item.Properties().rarity(Rarity.EPIC), 5));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlackHoleBombItem> BLACK_HOLE_BOMB = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlackHoleBombItem> BLACK_HOLE_BOMB = ITEMS.register(
             "black_hole_bomb", () -> new io.github.genichimaruo.singulo.item.BlackHoleBombItem(new Item.Properties().rarity(Rarity.EPIC), 5));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.SettingsCardItem> SETTINGS_CARD = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.SettingsCardItem> SETTINGS_CARD = ITEMS.register(
             "settings_card", () -> new io.github.genichimaruo.singulo.item.SettingsCardItem(new Item.Properties(), 1));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.ShieldPermitItem> SHIELD_PERMIT = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.ShieldPermitItem> SHIELD_PERMIT = ITEMS.register(
             "shield_permit", () -> new io.github.genichimaruo.singulo.item.ShieldPermitItem(new Item.Properties().rarity(Rarity.RARE), 5));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.HoloProjectorItem> HOLO_PROJECTOR = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.HoloProjectorItem> HOLO_PROJECTOR = ITEMS.register(
             "holo_projector", () -> new io.github.genichimaruo.singulo.item.HoloProjectorItem(new Item.Properties(), 1));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.HandbookItem> HANDBOOK = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.HandbookItem> HANDBOOK = ITEMS.register(
             "handbook", () -> new io.github.genichimaruo.singulo.item.HandbookItem(new Item.Properties(), 1));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.DecodedRecordItem> DECODED_RECORD = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.DecodedRecordItem> DECODED_RECORD = ITEMS.register(
             "decoded_record", () -> new io.github.genichimaruo.singulo.item.DecodedRecordItem(new Item.Properties(), 1));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.MagneticBottleItem> MAGNETIC_BOTTLE = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.MagneticBottleItem> MAGNETIC_BOTTLE = ITEMS.register(
             "magnetic_bottle", () -> new io.github.genichimaruo.singulo.item.MagneticBottleItem(new Item.Properties().rarity(Rarity.RARE), 4));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.NeutrinoScannerItem> NEUTRINO_SCANNER = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.NeutrinoScannerItem> NEUTRINO_SCANNER = ITEMS.register(
             "neutrino_scanner", () -> new io.github.genichimaruo.singulo.item.NeutrinoScannerItem(new Item.Properties().rarity(Rarity.RARE), 3));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.ExplorerCompassItem> EXPLORER_COMPASS = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.ExplorerCompassItem> EXPLORER_COMPASS = ITEMS.register(
             "explorer_compass", () -> new io.github.genichimaruo.singulo.item.ExplorerCompassItem(new Item.Properties(), 1));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.CreativeCatalystItem> CREATIVE_CATALYST = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.CreativeCatalystItem> CREATIVE_CATALYST = ITEMS.register(
             "creative_catalyst", () -> new io.github.genichimaruo.singulo.item.CreativeCatalystItem(new Item.Properties().rarity(Rarity.EPIC)));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
             "builder_wand", () -> new io.github.genichimaruo.singulo.item.BuilderWandItem(new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.ECHO_SENTINEL, 0xBFEFFF, 0x3A8FB0, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
-            () -> new DeferredSpawnEggItem(SinguloEntities.GRAVITY_REMNANT, 0x16121E, 0x9A6CFF, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.ECHO_SENTINEL, 0xBFEFFF, 0x3A8FB0, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.GRAVITY_REMNANT, 0x16121E, 0x9A6CFF, new Item.Properties()));
     /** 封印コンテナからしか出ない道具。 */
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
             "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.CatalystStabilizerItem> CATALYST_STABILIZER = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.CatalystStabilizerItem> CATALYST_STABILIZER = ITEMS.register(
             "catalyst_stabilizer", () -> new io.github.genichimaruo.singulo.item.CatalystStabilizerItem(new Item.Properties().rarity(Rarity.RARE), 4));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.DimensionalPocketItem> DIMENSIONAL_POCKET = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.DimensionalPocketItem> DIMENSIONAL_POCKET = ITEMS.register(
             "dimensional_pocket", () -> new io.github.genichimaruo.singulo.item.DimensionalPocketItem(new Item.Properties().rarity(Rarity.EPIC), 5));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.SealedRecordItem> SEALED_RECORD = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.SealedRecordItem> SEALED_RECORD = ITEMS.register(
             "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_2 = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_2 = ITEMS.register(
             "scanner_module_2", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.RARE), 4, 2));
-    public static final DeferredItem<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_3 = ITEMS.register(
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.ScannerModuleItem> SCANNER_MODULE_3 = ITEMS.register(
             "scanner_module_3", () -> new io.github.genichimaruo.singulo.item.ScannerModuleItem(new Item.Properties().rarity(Rarity.EPIC), 5, 3));
     private static final Map<String, Integer> TOOL_STAGES = Map.ofEntries(
             Map.entry("scanner_module_2", 4),
@@ -102,7 +101,7 @@ public final class SinguloItems {
             Map.entry("creative_energy_source", 6));
 
     /** クリエイティブタブの並び順（用途ごと、その中は段階順）。 */
-    public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
+    public static final List<RegistryObject<? extends Item>> TAB_ORDER = new ArrayList<>();
 
     static {
         // 装置ブロック
@@ -263,7 +262,7 @@ public final class SinguloItems {
             TAB_ORDER.add(ITEMS.register(def.id(), () -> create(def)));
         }
         // 用途ごとのまとまり（GeneratedContent.TAB_ORDER の順）。そこにないものは最後に段階順で
-        TAB_ORDER.sort(java.util.Comparator.comparingInt((DeferredItem<? extends Item> item) -> tabIndex(item))
+        TAB_ORDER.sort(java.util.Comparator.comparingInt((RegistryObject<? extends Item> item) -> tabIndex(item))
                 .thenComparingInt(SinguloItems::stageOf));
     }
 
@@ -282,17 +281,17 @@ public final class SinguloItems {
         };
     }
 
-    private static void block(DeferredBlock<? extends Block> block, int stage) {
+    private static void block(RegistryObject<? extends Block> block, int stage) {
         TAB_ORDER.add(ITEMS.register(block.getId().getPath(),
                 () -> new SinguloBlockItem(block.get(), new Item.Properties(), stage)));
     }
 
-    private static int tabIndex(DeferredItem<? extends Item> item) {
+    private static int tabIndex(RegistryObject<? extends Item> item) {
         int i = GeneratedContent.TAB_ORDER.indexOf(item.getId().getPath());
         return i < 0 ? Integer.MAX_VALUE : i;
     }
 
-    private static int stageOf(DeferredItem<? extends Item> item) {
+    private static int stageOf(RegistryObject<? extends Item> item) {
         String id = item.getId().getPath();
         for (ItemDef def : GeneratedContent.ITEMS) {
             if (def.id().equals(id)) {

@@ -193,7 +193,7 @@ public class KeraunosTowerBlockEntity extends BlockEntity implements AbstractMac
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         tag.putLong("charge", chargeStart);
         tag.putLong("bolt", boltAt);
@@ -209,8 +209,8 @@ public class KeraunosTowerBlockEntity extends BlockEntity implements AbstractMac
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("energy", energy.getEnergyStored());
         tag.putLong("charge", chargeStart);
         tag.putString("mode", mode.name());
@@ -221,8 +221,8 @@ public class KeraunosTowerBlockEntity extends BlockEntity implements AbstractMac
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("energy")) {
             energy.setEnergy(tag.getInt("energy"));
         }

@@ -125,17 +125,17 @@ public class EchoSentinel extends RuinBoss {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(PROJECTORS, 0);
-        builder.define(STRIKE, 0);
-        builder.define(MINION, false);
-        builder.define(LANCE, 0);
-        builder.define(LANCE_FLASH, 0);
-        builder.define(LANCE_AT, new Vector3f());
-        builder.define(CIRCLE, 0);
-        builder.define(CIRCLE_FLASH, 0);
-        builder.define(CIRCLE_AT, new Vector3f());
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(PROJECTORS, 0);
+        entityData.define(STRIKE, 0);
+        entityData.define(MINION, false);
+        entityData.define(LANCE, 0);
+        entityData.define(LANCE_FLASH, 0);
+        entityData.define(LANCE_AT, new Vector3f());
+        entityData.define(CIRCLE, 0);
+        entityData.define(CIRCLE_FLASH, 0);
+        entityData.define(CIRCLE_AT, new Vector3f());
     }
 
     @Override
@@ -278,15 +278,20 @@ public class EchoSentinel extends RuinBoss {
     // ------------------------------------------------------------------ 戦闘
 
     @Override
+    public void tick() {
+        super.tick();
+        if (!level().isClientSide && tickCount % 10 == 0 && !isMinion()) {
+            countProjectors();
+        }
+    }
+
+    @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
         if (isDeadOrDying()) {
             return;
         }
         ServerLevel level = (ServerLevel) level();
-        if (tickCount % 10 == 0 && !isMinion()) {
-            countProjectors();
-        }
         if (isMinion() && ++life > MINION_LIFETIME) {
             vanish(level);
             return;
@@ -673,10 +678,10 @@ public class EchoSentinel extends RuinBoss {
         }
         life = tag.getInt("life");
         projectors.clear();
-        for (Tag t : tag.getList("projectors", Tag.TAG_INT_ARRAY)) {
+        for (Tag t : tag.getList("projectors", Tag.TAG_COMPOUND)) {
             CompoundTag c = new CompoundTag();
             c.put("p", t);
-            NbtUtils.readBlockPos(c, "p").ifPresent(projectors::add);
+            io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(c, "p").ifPresent(projectors::add);
         }
     }
 }

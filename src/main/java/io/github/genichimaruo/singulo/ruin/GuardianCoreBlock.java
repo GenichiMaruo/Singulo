@@ -16,19 +16,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** 番人の封印核。研究棟と封鎖培養施設のボス部屋の床にあり、壊せない（{@link GuardianCoreBlockEntity}）。 */
 public class GuardianCoreBlock extends BaseEntityBlock {
-    public static final MapCodec<GuardianCoreBlock> CODEC = simpleCodec(GuardianCoreBlock::new);
 
     public GuardianCoreBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 

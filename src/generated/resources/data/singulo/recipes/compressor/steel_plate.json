@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 40,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:ingots/steel"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:steel_plate",
+    "count": 1
+  }
+}

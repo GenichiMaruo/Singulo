@@ -1,6 +1,6 @@
 package io.github.genichimaruo.singulo.energy;
 
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * 1 tick に int の上限（約 21 億 FE）を超える量をやり取りできる電力の口。
