@@ -53,12 +53,27 @@ public final class BossGameTests {
         return helper.getBlockEntity(VAULT);
     }
 
+    /** 起動すると出現の演出が始まり、そのあいだは動かず傷つかない。演出が終わると戦い始める。 */
+    @GameTest(template = EMPTY, timeoutTicks = HorizonWarden.EMERGE_TICKS + 40)
+    public static void wardenEmergesBeforeFighting(GameTestHelper helper) {
+        HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        helper.assertTrue(warden != null && warden.emergeTicks() == HorizonWarden.EMERGE_TICKS && warden.isNoAi(), "出現の演出が始まらない");
+        helper.assertFalse(warden.hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
+        helper.runAtTickTime(HorizonWarden.EMERGE_TICKS + 5, () -> {
+            helper.assertTrue(warden.emergeTicks() == 0 && !warden.isNoAi(), "演出が終わっても動き出さない");
+            helper.assertTrue(warden.getHealth() == warden.getMaxHealth(), "演出の間に体力が減った");
+            helper.succeed();
+        });
+    }
+
     @GameTest(template = EMPTY)
     public static void consoleWakesWardenWhileVaultSealed(GameTestHelper helper) {
         SealConsoleBlockEntity console = arena(helper);
         HorizonWarden warden = console.activate(helper.getLevel(), null);
+        warden.skipEmerging();
         helper.assertTrue(warden != null, "守護機が起動しない");
-        helper.assertTrue(warden.getMaxHealth() == 800 && warden.getHealth() == 800, "HP800 で起動しない: " + warden.getHealth());
+        helper.assertTrue(Math.abs(warden.effectiveMaxHealth() - (float) HorizonWarden.HEALTH) < 0.5F && warden.getHealth() == warden.getMaxHealth(),
+                "HP1200 相当で起動しない: " + warden.getHealth() + " / " + warden.effectiveMaxHealth());
         helper.assertTrue(warden.phase() == 1 && warden.getAttributeValue(Attributes.ARMOR) == HorizonWarden.ARMOR_PHASE_1,
                 "フェーズ1の外装がない");
         helper.assertTrue(vault(helper).isSealed(), "戦っている間に保管庫が開いている");
@@ -69,6 +84,7 @@ public final class BossGameTests {
     @GameTest(template = EMPTY)
     public static void wardenPhasesFollowHealth(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         warden.setHealth(500);
         helper.runAtTickTime(3, () -> {
             helper.assertTrue(warden.phase() == 2, "HP 2/3 未満でフェーズ2にならない");
@@ -84,6 +100,7 @@ public final class BossGameTests {
     @GameTest(template = EMPTY)
     public static void defeatOpensVaultWithSeed(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         warden.kill();
         helper.runAtTickTime(2, () -> {
             RuinCacheBlockEntity vault = vault(helper);
@@ -102,6 +119,7 @@ public final class BossGameTests {
     public static void wardenReturnsToSealWithoutChallengers(GameTestHelper helper) {
         SealConsoleBlockEntity console = arena(helper);
         HorizonWarden warden = console.activate(helper.getLevel(), null);
+        warden.skipEmerging();
         warden.setHealth(300);
         helper.succeedWhen(() -> {
             helper.assertTrue(warden.isRemoved(), "挑戦者がいないのに守護機が残っている");
@@ -139,6 +157,7 @@ public final class BossGameTests {
     @GameTest(template = EMPTY)
     public static void singularityZoneDealsFullDamageThroughArmor(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         Zombie zombie = armoredZombie(helper, new BlockPos(6, 1, 1));
         warden.deploySingularity(zombie.position());
         helper.runAtTickTime(22, () -> {
@@ -154,6 +173,7 @@ public final class BossGameTests {
     @GameTest(template = EMPTY)
     public static void gravityAttackPullsThenLifts(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         Zombie zombie = armoredZombie(helper, new BlockPos(7, 1, 7));
         warden.gravityAttack(helper.getLevel(), zombie);
         net.minecraft.world.phys.Vec3 pull = zombie.getDeltaMovement();
@@ -167,6 +187,7 @@ public final class BossGameTests {
     @GameTest(template = EMPTY)
     public static void wardenShootsBoltsAtDistance(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         Zombie near = armoredZombie(helper, CONSOLE.east());
         helper.assertTrue(!warden.shootBolt(near), "近すぎる相手に光弾を撃った");
         Zombie far = armoredZombie(helper, new BlockPos(0, 1, 7));
@@ -181,6 +202,7 @@ public final class BossGameTests {
         helper.assertTrue(SinguloDamageTypes.tidal(helper.getLevel(), null).is(DamageTypeTags.BYPASSES_ARMOR),
                 "潮汐ダメージが防具を無視しない");
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         helper.assertTrue(warden.getType().is(Tags.EntityTypes.BOSSES), "ボス扱いになっていない");
         helper.assertTrue(!GravityGauntletItem.canAffect(warden), "ガントレットで操れてしまう");
         helper.succeed();
@@ -190,6 +212,7 @@ public final class BossGameTests {
     @GameTest(template = "huge", timeoutTicks = 200)
     public static void phaseTwoReflectsProjectilesAtShooter(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         warden.setNoAi(false);
         warden.setHealth(500);
         net.minecraft.world.entity.monster.Skeleton skeleton = helper.spawn(EntityType.SKELETON, new BlockPos(4, 1, 13));
@@ -217,6 +240,7 @@ public final class BossGameTests {
     @GameTest(template = "huge", timeoutTicks = 200)
     public static void gravityGripSlamsWithFallDamage(GameTestHelper helper) {
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(7, 1, 9));
         warden.startGrip(zombie);
         float held = 2 * HorizonWarden.GRIP_DAMAGE;
@@ -224,6 +248,33 @@ public final class BossGameTests {
             float lost = 20 - (zombie.isAlive() ? zombie.getHealth() : 0);
             helper.assertTrue(lost >= held + 8, "叩き落としの落下ダメージが小さい: 減った体力 " + lost);
             zombie.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 倒されると、演出のあいだは膝をついて残り、終わると消える。 */
+    @GameTest(template = EMPTY, timeoutTicks = HorizonWarden.DEATH_TICKS + 30)
+    public static void wardenDeathPlaysOut(GameTestHelper helper) {
+        HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
+        warden.kill();
+        helper.runAtTickTime(HorizonWarden.DEATH_TICKS / 2, () -> helper.assertFalse(warden.isRemoved(), "演出の途中で消えた"));
+        helper.runAtTickTime(HorizonWarden.DEATH_TICKS + 10, () -> {
+            helper.assertTrue(warden.isRemoved(), "演出が終わっても消えない");
+            helper.succeed();
+        });
+    }
+
+    /** フェーズ2からは、ビームが壁を抜ける（手加減なし）。 */
+    @GameTest(template = EMPTY)
+    public static void wardenPiercesFromPhaseTwo(GameTestHelper helper) {
+        HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
+        helper.assertFalse(warden.piercing(), "フェーズ1から貫通している");
+        warden.setHealth(warden.getMaxHealth() * 0.5F);
+        helper.runAtTickTime(3, () -> {
+            helper.assertTrue(warden.phase() == 2 && warden.piercing(), "フェーズ2で貫通しない: " + warden.phase());
+            warden.discard();
             helper.succeed();
         });
     }

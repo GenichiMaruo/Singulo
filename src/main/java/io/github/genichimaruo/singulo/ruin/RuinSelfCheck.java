@@ -47,11 +47,14 @@ public final class RuinSelfCheck {
                 Singulo.LOGGER.error("[ruin-check] {}: located at {} but no cache was generated", ruin, pos);
             } else if ("final_lab".equals(ruin) && !finalLabReady(level, cachePos)) {
                 Singulo.LOGGER.error("[ruin-check] {}: cache at {} is not sealed or has no seal console nearby", ruin, cachePos);
+            } else if (GuardianCoreBlockEntity.bossFor(ruin) != null && !bossRoomReady(level, cachePos)) {
+                Singulo.LOGGER.error("[ruin-check] {}: cache at {} is not sealed or has no guardian core nearby", ruin, cachePos);
             } else {
                 ok++;
                 Singulo.LOGGER.info("[ruin-check] {}: OK, located at {}, cache at {} ({} blocks from origin){}",
                         ruin, pos, cachePos, (int) Math.sqrt(cachePos.distSqr(BlockPos.ZERO)),
-                        "final_lab".equals(ruin) ? ", vault sealed, seal console present" : "");
+                        "final_lab".equals(ruin) ? ", vault sealed, seal console present"
+                                : GuardianCoreBlockEntity.bossFor(ruin) != null ? ", vault sealed, guardian core present" : "");
             }
         }
         Singulo.LOGGER.info("[ruin-check] {}/{} ruins generated with a cache", ok, RUINS.length);
@@ -65,6 +68,20 @@ public final class RuinSelfCheck {
         }
         for (BlockPos p : BlockPos.betweenClosed(cachePos.offset(-4, -2, -4), cachePos.offset(4, 2, 4))) {
             if (level.getBlockEntity(p) instanceof SealConsoleBlockEntity) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** ボス部屋: 保管庫が封鎖された状態で生成され、近くに番人の封印核があるか。 */
+    private static boolean bossRoomReady(ServerLevel level, BlockPos cachePos) {
+        if (!(level.getBlockEntity(cachePos) instanceof RuinCacheBlockEntity cache) || !cache.isSealed()) {
+            return false;
+        }
+        int r = GuardianCoreBlockEntity.VAULT_SEARCH_RADIUS;
+        for (BlockPos p : BlockPos.betweenClosed(cachePos.offset(-r, -8, -r), cachePos.offset(r, 4, r))) {
+            if (level.getBlockEntity(p) instanceof GuardianCoreBlockEntity) {
                 return true;
             }
         }

@@ -231,6 +231,36 @@ final class FxDraw {
         quad(vc, p, light, rgb, alpha, 1, 0, 0, x1, y1, z0, x1, y1, z1, x1, y0, z1, x1, y0, z0);
     }
 
+    /**
+     * 1ドットを1ドットのまま貼る箱（ブロックのモデルの既定の UV と同じ決め方）。
+     * 形は (x0..x1, y0..y1, z0..z1)（今の PoseStack の座標、ブロック単位）、絵の場所は (px0..px1, py0..py1, pz0..pz1)
+     * （ブロックの中のドット座標。箱が動いても、閉じた位置のドットを貼り続ける）。
+     */
+    static void pixelBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                         float px0, float py0, float pz0, float px1, float py1, float pz1, int light, int rgb) {
+        PoseStack.Pose p = pose.last();
+        float u0 = px0 / 16, u1 = px1 / 16, w0 = pz0 / 16, w1 = pz1 / 16;
+        float vTop = (16 - py1) / 16, vBottom = (16 - py0) / 16;
+        // 下・上: u は x、v は z
+        uvQuad(vc, p, light, rgb, 0, -1, 0, x0, y0, z0, u0, w0, x1, y0, z0, u1, w0, x1, y0, z1, u1, w1, x0, y0, z1, u0, w1);
+        uvQuad(vc, p, light, rgb, 0, 1, 0, x0, y1, z1, u0, w1, x1, y1, z1, u1, w1, x1, y1, z0, u1, w0, x0, y1, z0, u0, w0);
+        // 北・南: u は x、v は上から
+        uvQuad(vc, p, light, rgb, 0, 0, -1, x0, y1, z0, u1, vTop, x1, y1, z0, u0, vTop, x1, y0, z0, u0, vBottom, x0, y0, z0, u1, vBottom);
+        uvQuad(vc, p, light, rgb, 0, 0, 1, x0, y0, z1, u0, vBottom, x1, y0, z1, u1, vBottom, x1, y1, z1, u1, vTop, x0, y1, z1, u0, vTop);
+        // 西・東: u は z、v は上から
+        uvQuad(vc, p, light, rgb, -1, 0, 0, x0, y0, z0, w0, vBottom, x0, y0, z1, w1, vBottom, x0, y1, z1, w1, vTop, x0, y1, z0, w0, vTop);
+        uvQuad(vc, p, light, rgb, 1, 0, 0, x1, y1, z0, w1, vTop, x1, y1, z1, w0, vTop, x1, y0, z1, w0, vBottom, x1, y0, z0, w1, vBottom);
+    }
+
+    private static void uvQuad(VertexConsumer vc, PoseStack.Pose p, int light, int rgb, float nx, float ny, float nz,
+                               float ax, float ay, float az, float au, float av, float bx, float by, float bz, float bu, float bv,
+                               float cx, float cy, float cz, float cu, float cv, float dx, float dy, float dz, float du, float dv) {
+        uvVertex(vc, p, ax, ay, az, au, av, light, rgb, 255, nx, ny, nz);
+        uvVertex(vc, p, bx, by, bz, bu, bv, light, rgb, 255, nx, ny, nz);
+        uvVertex(vc, p, cx, cy, cz, cu, cv, light, rgb, 255, nx, ny, nz);
+        uvVertex(vc, p, dx, dy, dz, du, dv, light, rgb, 255, nx, ny, nz);
+    }
+
     private static void quad(VertexConsumer vc, PoseStack.Pose p, int light, int rgb, int alpha, float nx, float ny, float nz,
                              float ax, float ay, float az, float bx, float by, float bz,
                              float cx, float cy, float cz, float dx, float dy, float dz) {

@@ -5,6 +5,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.ruin.GravitationalWaveDetectorBlockEntity;
 import io.github.genichimaruo.singulo.ruin.GuardDockBlockEntity;
+import io.github.genichimaruo.singulo.ruin.GuardianCoreBlockEntity;
 import io.github.genichimaruo.singulo.ruin.RuinCacheBlock;
 import io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity;
 import io.github.genichimaruo.singulo.ruin.SecurityDrone;
@@ -140,13 +141,24 @@ public final class RuinGameTests {
                     new StructurePlaceSettings(), SinguloBlocks.RUIN_CACHE.get());
             helper.assertTrue(caches.size() == 1 && caches.get(0).nbt() != null
                     && ruin.equals(caches.get(0).nbt().getString("ruin")), "保管庫が1つ・遺構IDつきで入っていない: " + ruin);
-            // 最終実験施設は警備機の代わりに守護機（封印コンソール）。保管庫は封鎖された状態で置く
+            // 最終実験施設は警備機の代わりに守護機（封印コンソール）。研究棟・培養施設はボス部屋の封印核も持つ
             boolean finalLab = ruin.equals("final_lab");
             helper.assertTrue(!template.get().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
                     finalLab ? SinguloBlocks.SEAL_CONSOLE.get() : SinguloBlocks.RUIN_GUARD_DOCK.get()).isEmpty(),
                     (finalLab ? "封印コンソールがない: " : "警備機ドックがない: ") + ruin);
-            helper.assertTrue(caches.get(0).state().getValue(RuinCacheBlock.SEALED) == finalLab,
-                    "保管庫の封鎖が最終実験施設だけになっていない: " + ruin);
+            boolean bossRoom = GuardianCoreBlockEntity.bossFor(ruin) != null;
+            List<StructureTemplate.StructureBlockInfo> cores = template.get().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
+                    SinguloBlocks.GUARDIAN_CORE.get());
+            helper.assertTrue(cores.size() == (bossRoom ? 1 : 0), "ボス部屋の封印核の数がおかしい: " + ruin + " " + cores.size());
+            if (bossRoom) {
+                helper.assertTrue(cores.get(0).pos().distManhattan(caches.get(0).pos()) <= GuardianCoreBlockEntity.VAULT_SEARCH_RADIUS * 2,
+                        "保管庫が封印核から遠い: " + ruin);
+            }
+            int projectors = template.get().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
+                    SinguloBlocks.ECHO_PROJECTOR.get()).size();
+            helper.assertTrue(projectors == (ruin.equals("research_building") ? 4 : 0), "残響投影器の数がおかしい: " + ruin + " " + projectors);
+            helper.assertTrue(caches.get(0).state().getValue(RuinCacheBlock.SEALED) == RuinCacheBlockEntity.GUARDED.contains(ruin),
+                    "番人のいる遺構の保管庫だけが封鎖されていない: " + ruin);
         }
         helper.succeed();
     }

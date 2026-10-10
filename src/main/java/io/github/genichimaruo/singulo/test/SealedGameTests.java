@@ -102,6 +102,69 @@ public final class SealedGameTests {
         });
     }
 
+    /**
+     * 実際の右クリックの流れ（ServerPlayerGameMode.useItemOn）でも、鍵を持ってスニークして使うと封印できる。
+     * 標準ではスニーク中に物を持っているとブロックの操作が呼ばれないので、それを通しているかを確かめる。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 20)
+    public static void sneakUseWithKeySealsThroughInteraction(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
+        SealedContainerBlockEntity box = helper.getBlockEntity(pos);
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        try {
+            player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            player.setShiftKeyDown(true);
+            ItemStack key = item("magnetic_key");
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, key);
+            BlockPos abs = helper.absolutePos(pos);
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs),
+                    net.minecraft.core.Direction.UP, abs, false);
+            player.gameMode.useItemOn(player, helper.getLevel(), key, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            helper.assertTrue(box.phase() == Phase.SEALING, "右クリックの流れでは封印されない: " + box.phase());
+            helper.assertTrue(key.isEmpty(), "鍵が減らない");
+            helper.succeed();
+        } finally {
+            helper.getLevel().getServer().getPlayerList().remove(player);
+        }
+    }
+
+    /** 遺構保管庫と封印コンテナの中身は、ホッパーやパイプからは取り出せない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 40)
+    public static void hoppersCannotTakeFromCacheOrContainer(GameTestHelper helper) {
+        BlockPos box = new BlockPos(2, 2, 2);
+        helper.setBlock(box, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
+        SealedContainerBlockEntity container = helper.getBlockEntity(box);
+        container.setItem(0, new ItemStack(Items.DIAMOND, 3));
+        helper.setBlock(box.below(), net.minecraft.world.level.block.Blocks.HOPPER);
+        var handler = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                helper.absolutePos(box), net.minecraft.core.Direction.DOWN);
+        helper.assertTrue(handler == null || handler.getSlots() == 0, "パイプから中身が見える");
+        helper.runAtTickTime(30, () -> {
+            helper.assertTrue(container.getItem(0).getCount() == 3, "ホッパーに吸い出された");
+            helper.succeed();
+        });
+    }
+
+    /** プレイヤーが置いた遺構保管庫は、遺構の印があっても中身が入らない（壊して置き直しても補充されない）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 20)
+    public static void playerPlacedCacheDoesNotRefill(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
+        io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity cache = helper.getBlockEntity(pos);
+        cache.setRuin("observation_post");
+        cache.markPlacedByPlayer();
+        cache.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
+        helper.assertTrue(cache.isEmpty(), "置き直した保管庫に中身が入った");
+        BlockPos other = new BlockPos(4, 1, 2);
+        helper.setBlock(other, SinguloBlocks.RUIN_CACHE.get());
+        io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity natural = helper.getBlockEntity(other);
+        natural.setRuin("observation_post");
+        natural.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
+        helper.assertFalse(natural.isEmpty(), "遺構の保管庫に中身が入らない");
+        helper.succeed();
+    }
+
     /** オーバークロック・チップを挿した電解槽は、同じ時間でより多く水素を作る（電力は十分にある）。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void overclockChipSpeedsUpMachine(GameTestHelper helper) {

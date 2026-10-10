@@ -103,6 +103,23 @@ public class SealedContainerBlock extends BaseEntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
+    /**
+     * スニーク中に物を持って右クリックすると、標準ではブロックの useItemOn が呼ばれない（手の物の使用だけになる）。
+     * 開いているコンテナに鍵を持ってスニークして使ったときだけ、ブロックへの操作を通す（封印できるように）。
+     */
+    public static void onRightClickBlock(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+        Player player = event.getEntity();
+        if (!player.isSecondaryUseActive()
+                || !(event.getLevel().getBlockState(event.getPos()).getBlock() instanceof SealedContainerBlock block)
+                || !(event.getLevel().getBlockEntity(event.getPos()) instanceof SealedContainerBlockEntity box)
+                || box.phase() != SealedContainerBlockEntity.Phase.OPEN) {
+            return;
+        }
+        if (SealedContainerBlockEntity.isKey(event.getItemStack(), block.tier())) {
+            event.setUseBlock(net.neoforged.neoforge.common.util.TriState.TRUE);
+        }
+    }
+
     /** 封印中はとても硬い。 */
     @Override
     protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {

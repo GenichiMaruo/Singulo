@@ -35,6 +35,8 @@ public class HorizonBolt extends ThrowableItemProjectile {
     @Nullable
     private Entity homingTarget;
     private float damage = DAMAGE;
+    /** 防具と盾を無視する光弾か（ウォーデンのフェーズ2から）。 */
+    private boolean piercing;
 
     public HorizonBolt(EntityType<? extends HorizonBolt> type, Level level) {
         super(type, level);
@@ -47,6 +49,12 @@ public class HorizonBolt extends ThrowableItemProjectile {
     /** 相手を追いかける光弾にする。 */
     public HorizonBolt homing(Entity target) {
         this.homingTarget = target;
+        return this;
+    }
+
+    /** 防具と盾を無視する光弾にする。 */
+    public HorizonBolt piercing(boolean on) {
+        this.piercing = on;
         return this;
     }
 
@@ -105,15 +113,16 @@ public class HorizonBolt extends ThrowableItemProjectile {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         Entity hit = result.getEntity();
-        if (hit != getOwner() && !(hit instanceof HorizonWarden) && !(hit instanceof SecurityDrone)) {
-            hit.hurt(damageSources().indirectMagic(this, getOwner()), damage);
+        if (hit != getOwner() && !RuinGuards.isGuard(hit)) {
+            hit.hurt(piercing ? io.github.genichimaruo.singulo.registry.SinguloDamageTypes.tidal(level(), getOwner())
+                    : damageSources().indirectMagic(this, getOwner()), damage);
         }
     }
 
     @Override
     protected boolean canHitEntity(Entity target) {
         return super.canHitEntity(target) && !(target instanceof HorizonBolt) && !(target instanceof WardenSingularity)
-                && !(target instanceof SecurityDrone) && !(target instanceof HorizonWarden);
+                && !(target instanceof SecurityDrone) && !(target instanceof HorizonWarden) && !(target instanceof RuinBoss);
     }
 
     @Override
