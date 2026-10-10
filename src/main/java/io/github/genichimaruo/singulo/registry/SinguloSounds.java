@@ -36,6 +36,18 @@ public final class SinguloSounds {
             "sealed_container.denied", "sealed_container.insert", "sealed_container.scan", "sealed_container.unlock",
             "sealed_container.vent", "sealed_container.open", "sealed_container.rise", "sealed_container.lock",
             "gravity_boots.wall_jump", "dimensional_pocket.open", "dimensional_pocket.close",
+            "echo_sentinel.emerge", "echo_sentinel.ambient", "echo_sentinel.hurt", "echo_sentinel.bolt",
+            "echo_sentinel.blink", "echo_sentinel.strike_windup", "echo_sentinel.strike", "echo_sentinel.lance_aim",
+            "echo_sentinel.lance_fire", "echo_sentinel.circle_cast", "echo_sentinel.circle_erupt", "echo_sentinel.summon",
+            "echo_sentinel.echo_vanish", "echo_sentinel.death_unravel", "echo_sentinel.death_shatter", "echo_projector.power_down",
+            "gravity_remnant.emerge", "containment_tank.crack", "containment_tank.shatter", "gravity_remnant.ambient",
+            "gravity_remnant.hurt", "gravity_remnant.debris_launch", "gravity_debris.impact", "gravity_remnant.shell_regrow",
+            "gravity_remnant.lift", "gravity_remnant.slam", "gravity_remnant.well_loop", "gravity_remnant.death_collapse",
+            "gravity_remnant.death_implode", "horizon_warden.emerge", "horizon_warden.phase", "horizon_warden.beam_charge",
+            "horizon_warden.beam_fire", "horizon_warden.laser_loop", "horizon_warden.sweep", "horizon_warden.grip",
+            "horizon_warden.shockwave", "horizon_warden.death", "horizon_warden.ambient", "guardian_core.awaken", "vault.unseal",
+            "keraunos_tower.charge", "keraunos_tower.discharge", "keraunos_tower.mode", "impact_generator.absorb",
+            "deep_sea_collector.collect", "void_collector.collect", "fulgurite.form",
     };
 
     static {

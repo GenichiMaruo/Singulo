@@ -81,6 +81,19 @@ public final class SinguloCapabilities {
                 (be, side) -> be.items());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.WORMHOLE_PORT.get(),
                 (be, side) -> be.fluids());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.GRAVITY_RECEIVER.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DEEP_SEA_COLLECTOR.get(),
+                (be, side) -> be.automationItems());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.VOID_COLLECTOR.get(),
+                (be, side) -> be.automationItems());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.KERAUNOS_TOWER.get(),
+                (be, side) -> be.energy());
+        // 遺構保管庫と封印コンテナの中身は、ホッパーやパイプからは出し入れできない（空の入れ物に見せる）
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.RUIN_CACHE.get(),
+                (be, side) -> net.neoforged.neoforge.items.wrapper.EmptyItemHandler.INSTANCE);
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.SEALED_CONTAINER.get(),
+                (be, side) -> net.neoforged.neoforge.items.wrapper.EmptyItemHandler.INSTANCE);
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_MODULE.get(),
                 (be, side) -> be.energyFor(side));
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> GravityGauntletItem.energy(stack),

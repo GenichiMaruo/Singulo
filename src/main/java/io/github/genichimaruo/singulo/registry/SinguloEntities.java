@@ -45,9 +45,25 @@ public final class SinguloEntities {
                     .sized(1.0F, 1.0F).clientTrackingRange(8).updateInterval(10).noSave().fireImmune()
                     .build(Singulo.id("warden_singularity").toString()));
 
+    /** 研究棟のボス部屋の番人。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.EchoSentinel>> ECHO_SENTINEL = REGISTER.register(
+            "echo_sentinel", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.EchoSentinel::new, MobCategory.MONSTER)
+                    .sized(0.9F, 2.4F).clientTrackingRange(10).fireImmune().build(Singulo.id("echo_sentinel").toString()));
+    /** 封鎖培養施設のボス部屋の番人。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.GravityRemnant>> GRAVITY_REMNANT = REGISTER.register(
+            "gravity_remnant", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.GravityRemnant::new, MobCategory.MONSTER)
+                    .sized(1.8F, 1.8F).clientTrackingRange(10).fireImmune().build(Singulo.id("gravity_remnant").toString()));
+    /** 重力の澱が撃ち出す瓦礫。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.GravityDebris>> GRAVITY_DEBRIS = REGISTER.register(
+            "gravity_debris", () -> EntityType.Builder.<io.github.genichimaruo.singulo.ruin.GravityDebris>of(
+                    io.github.genichimaruo.singulo.ruin.GravityDebris::new, MobCategory.MISC)
+                    .sized(0.6F, 0.6F).clientTrackingRange(6).updateInterval(2).build(Singulo.id("gravity_debris").toString()));
+
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
+        event.put(ECHO_SENTINEL.get(), io.github.genichimaruo.singulo.ruin.EchoSentinel.createAttributes().build());
+        event.put(GRAVITY_REMNANT.get(), io.github.genichimaruo.singulo.ruin.GravityRemnant.createAttributes().build());
     }
 
     private SinguloEntities() {}

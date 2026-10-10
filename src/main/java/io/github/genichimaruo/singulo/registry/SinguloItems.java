@@ -59,6 +59,10 @@ public final class SinguloItems {
             () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.ECHO_SENTINEL, 0xBFEFFF, 0x3A8FB0, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.GRAVITY_REMNANT, 0x16121E, 0x9A6CFF, new Item.Properties()));
     /** 封印コンテナからしか出ない道具。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
             "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));
@@ -155,6 +159,7 @@ public final class SinguloItems {
         block(SinguloBlocks.WORMHOLE_GENERATOR_COIL, 5);
         block(SinguloBlocks.WORMHOLE_GENERATOR_FOCUSER, 5);
         block(SinguloBlocks.WORMHOLE_GENERATOR_WINDOW, 5);
+        block(SinguloBlocks.WORMHOLE_GENERATOR_PORT, 5);
         block(SinguloBlocks.ACCELERATOR_TUBE, 2);
         block(SinguloBlocks.FOCUSING_MAGNET, 2);
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
@@ -190,6 +195,17 @@ public final class SinguloItems {
         block(SinguloBlocks.SUPERCONDUCTING_CABLE, 2);
         block(SinguloBlocks.QUANTUM_HEAT_ENGINE, 3);
         block(SinguloBlocks.INERTIAL_STABILIZER, 3);
+        block(SinguloBlocks.LOW_GRAVITY_PANEL, 3);
+        block(SinguloBlocks.HIGH_GRAVITY_PANEL, 3);
+        block(SinguloBlocks.GRAVITY_PANEL_RECEIVER, 3);
+        block(SinguloBlocks.IMPACT_GENERATOR, 3);
+        block(SinguloBlocks.KERAUNOS_TOWER, 3);
+        block(SinguloBlocks.DEEP_SEA_COLLECTOR, 3);
+        block(SinguloBlocks.VOID_COLLECTOR, 4);
+        block(SinguloBlocks.METEORITE_CRUST, 2);
+        block(SinguloBlocks.METEORIC_IRON_CHUNK, 2);
+        block(SinguloBlocks.STARDUST_CLUSTER, 2);
+        block(SinguloBlocks.FULGURITE_BLOCK, 2);
         TAB_ORDER.add(INERTIAL_CONTROL_GAUNTLET);
         TAB_ORDER.add(NEUTRINO_SCANNER);
         TAB_ORDER.add(SCANNER_MODULE_2);
@@ -201,10 +217,25 @@ public final class SinguloItems {
                 SinguloBlocks.RUIN_LAMP)) {
             block(ruin, 1);
         }
+        for (var ruin : java.util.List.of(SinguloBlocks.TILED_RUIN_PANEL, SinguloBlocks.VENTED_RUIN_PANEL,
+                SinguloBlocks.STRIPED_RUIN_PANEL, SinguloBlocks.SCORCHED_RUIN_PANEL, SinguloBlocks.PRISTINE_RUIN_PANEL,
+                SinguloBlocks.PRISTINE_RUIN_TILES, SinguloBlocks.PRISTINE_RUIN_PILLAR, SinguloBlocks.PRISTINE_RUIN_LIGHT)) {
+            block(ruin, 1);
+        }
+        block(SinguloBlocks.WHITE_PANEL, 1);
+        block(SinguloBlocks.WHITE_LIGHT_PANEL, 1);
+        block(SinguloBlocks.BLACK_REINFORCED_PANEL, 1);
+        block(SinguloBlocks.WHITE_GLASS_PANEL, 1);
+        block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);
+        block(SinguloBlocks.BLACK_REINFORCED_GLASS, 1);
+        block(SinguloBlocks.BLACK_STAR_GLASS, 1);
         block(SinguloBlocks.RUIN_GLASS, 1);
+        block(SinguloBlocks.INTACT_RUIN_GLASS, 1);
         block(SinguloBlocks.RUIN_CACHE, 1);
         block(SinguloBlocks.RUIN_GUARD_DOCK, 1);
         block(SinguloBlocks.SEAL_CONSOLE, 1);
+        block(SinguloBlocks.GUARDIAN_CORE, 1);
+        block(SinguloBlocks.ECHO_PROJECTOR, 1);
         TAB_ORDER.add(SECURITY_DRONE_SPAWN_EGG);
         for (var lamp : java.util.List.of(SinguloBlocks.RUIN_LAMP_AMBER, SinguloBlocks.RUIN_LAMP_VERDANT, SinguloBlocks.RUIN_LAMP_VIOLET,
                 SinguloBlocks.RUIN_LAMP_CRIMSON)) {
@@ -222,6 +253,8 @@ public final class SinguloItems {
         TAB_ORDER.add(CREATIVE_CATALYST);
         TAB_ORDER.add(BUILDER_WAND);
         TAB_ORDER.add(HORIZON_WARDEN_SPAWN_EGG);
+        TAB_ORDER.add(ECHO_SENTINEL_SPAWN_EGG);
+        TAB_ORDER.add(GRAVITY_REMNANT_SPAWN_EGG);
         for (BlockDef def : GeneratedContent.BLOCKS) {
             block(SinguloBlocks.SIMPLE.get(def.id()), def.stage());
         }

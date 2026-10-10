@@ -74,7 +74,7 @@ public final class SinguloBlockEntities {
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity>> MULTIBLOCK_PORT =
             REGISTER.register("multiblock_port", () -> build(io.github.genichimaruo.singulo.multiblock.MultiblockPortBlockEntity::new,
-                    SinguloBlocks.MULTIBLOCK_PORT.get()));
+                    SinguloBlocks.MULTIBLOCK_PORT.get(), SinguloBlocks.WORMHOLE_GENERATOR_PORT.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity>> ROGUE_BLACK_HOLE =
             REGISTER.register("rogue_black_hole", () -> build(io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity::new,
@@ -129,6 +129,21 @@ public final class SinguloBlockEntities {
             REGISTER.register("wormhole_mouth", () -> build(io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity::new, SinguloBlocks.WORMHOLE_MOUTH.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity>> WORMHOLE_PORT =
             REGISTER.register("wormhole_port", () -> build(io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::new, SinguloBlocks.WORMHOLE_PORT.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity>> GRAVITY_RECEIVER =
+            REGISTER.register("gravity_panel_receiver", () -> build(io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity::new,
+                    SinguloBlocks.GRAVITY_PANEL_RECEIVER.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity>> DEEP_SEA_COLLECTOR =
+            REGISTER.register("deep_sea_collector", () -> build(io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity::new,
+                    SinguloBlocks.DEEP_SEA_COLLECTOR.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.nature.VoidCollectorBlockEntity>> VOID_COLLECTOR =
+            REGISTER.register("void_collector", () -> build(io.github.genichimaruo.singulo.nature.VoidCollectorBlockEntity::new,
+                    SinguloBlocks.VOID_COLLECTOR.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity>> KERAUNOS_TOWER =
+            REGISTER.register("keraunos_tower", () -> build(io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity::new,
+                    SinguloBlocks.KERAUNOS_TOWER.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity>> IMPACT_GENERATOR =
+            REGISTER.register("impact_generator_panel", () -> build(io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity::new,
+                    SinguloBlocks.IMPACT_GENERATOR.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.hazard.StrangeletBlockEntity>> STRANGELET =
             REGISTER.register("strangelet", () -> build(io.github.genichimaruo.singulo.hazard.StrangeletBlockEntity::new,
@@ -158,6 +173,14 @@ public final class SinguloBlockEntities {
 
     public static final Supplier<BlockEntityType<SealConsoleBlockEntity>> SEAL_CONSOLE = REGISTER.register("seal_console",
             () -> build(SealConsoleBlockEntity::new, SinguloBlocks.SEAL_CONSOLE.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.GuardianCoreBlockEntity>> GUARDIAN_CORE =
+            REGISTER.register("guardian_core", () -> build(io.github.genichimaruo.singulo.ruin.GuardianCoreBlockEntity::new,
+                    SinguloBlocks.GUARDIAN_CORE.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.EchoProjectorBlockEntity>> ECHO_PROJECTOR =
+            REGISTER.register("echo_projector", () -> build(io.github.genichimaruo.singulo.ruin.EchoProjectorBlockEntity::new,
+                    SinguloBlocks.ECHO_PROJECTOR.get()));
 
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =
             REGISTER.register("neutrino_observatory", () -> build(io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity::new,

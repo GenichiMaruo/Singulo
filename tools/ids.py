@@ -12,6 +12,10 @@ MOD: 日本語名 → (id, 英語名, 種類)
     fluid      液体・ガス
     structure  マルチブロック本体など、アイテムとしては存在しないもの（登録しない）
     container  封印コンテナ（Java側の専用クラス。鍵で開け閉めし、蓋の動きは専用の描画）
+    gravity    重力パネルと受電器（Java側の専用クラス。パネルは隣とつながる見た目）
+    deco       自分で作れる建材（ただ置けるだけ。Java側で登録）
+    deco_glass 自分で作れる透ける建材（半透明で描く。Java側で登録）
+    nature     自然にできるブロック（隕石クレーターの殻・隕鉄・星屑の結晶、雷ガラス塊。Java側で登録、落とす物は専用）
 VANILLA: 日本語名 → アイテムID（'#' で始まるものはタグ）
 """
 
@@ -56,6 +60,17 @@ MOD = {
     '冷却塔通気格子': ('cooling_tower_grate', 'Cooling Tower Vent Grate', 'part_glass'),
     'マルチブロック搬入出ポート': ('multiblock_port', 'Multiblock I/O Port', 'part_block'),
     '冷却塔コントローラ': ('cooling_tower_controller', 'Cooling Tower Controller', 'machine'),
+    '冷媒カートリッジ': ('coolant_cartridge', 'Coolant Cartridge', 'item'),
+    # 隕石クレーター（地表の小さな構造物）で採れるもの
+    '隕石の溶融殻': ('meteorite_crust', 'Meteorite Fusion Crust', 'nature'),
+    '隕鉄塊': ('meteoric_iron_chunk', 'Meteoric Iron Chunk', 'nature'),
+    '星屑の結晶': ('stardust_cluster', 'Stardust Cluster', 'nature'),
+    '隕鉄の原石': ('raw_meteoric_iron', 'Raw Meteoric Iron', 'item'),
+    '隕鉄インゴット': ('meteoric_iron_ingot', 'Meteoric Iron Ingot', 'item'),
+    '星屑': ('stardust', 'Stardust', 'item'),
+    # 雷が砂に落ちてできるもの（雷雨か、ケラウノス放電塔）
+    '雷ガラス塊': ('fulgurite_block', 'Fulgurite Block', 'nature'),
+    '雷ガラス': ('fulgurite', 'Fulgurite', 'item'),
     '極低温冷却塔': ('cryogenic_cooling_tower', 'Cryogenic Cooling Tower', 'structure'),
     '冷却塔拡張（高さ10）': ('cooling_tower_extension', 'Cooling Tower Extension', 'structure'),
     '液体窒素': ('liquid_nitrogen', 'Liquid Nitrogen', 'fluid'),
@@ -88,6 +103,9 @@ MOD = {
     '光格子基板': ('optical_lattice_substrate', 'Optical Lattice Substrate', 'item'),
     'BE凝縮触媒': ('bose_condensate_catalyst', 'BE Condensate Catalyst', 'catalyst'),
     '量子熱機関': ('quantum_heat_engine', 'Quantum Heat Engine', 'machine'),
+    'ケラウノス放電塔': ('keraunos_tower', 'Keraunos Discharge Tower', 'machine'),
+    '深海圧力収集器': ('deep_sea_collector', 'Deep-Sea Pressure Collector', 'machine'),
+    '高圧結晶': ('pressure_crystal', 'Pressure Crystal', 'item'),
     '重力波検出器': ('gravitational_wave_detector', 'Gravitational Wave Detector', 'machine'),
     'ニュートリノ・スキャナー': ('neutrino_scanner', 'Neutrino Scanner', 'tool'),
     'ニュートリノ観測所': ('neutrino_observatory', 'Neutrino Observatory', 'machine'),
@@ -96,6 +114,10 @@ MOD = {
     '慣性スタビライザー': ('inertial_stabilizer', 'Inertial Stabilizer', 'machine'),
     '残響共鳴器': ('echo_resonator', 'Echo Resonator', 'machine'),
     '慣性制御ガントレット': ('inertial_control_gauntlet', 'Inertial Control Gauntlet', 'tool'),
+    '重力パネル受電器': ('gravity_panel_receiver', 'Gravity Panel Receiver', 'gravity'),
+    '衝撃発電パネル': ('impact_generator_panel', 'Impact Generator Panel', 'gravity'),
+    '低重力パネル': ('low_gravity_panel', 'Low-Gravity Panel', 'gravity'),
+    '高重力パネル': ('high_gravity_panel', 'High-Gravity Panel', 'gravity'),
 
     # ---- 段階4 ----
     '圧縮ブロックLv2': ('compressed_block_2', 'Compressed Block Lv2', 'block'),
@@ -123,6 +145,12 @@ MOD = {
     'アクシオン凝縮体': ('axion_condensate', 'Axion Condensate', 'fluid'),
     'データカード（培養データ）': ('data_card_culture_data', 'Data Card (Culture Data)', 'item'),
     '時間結晶育成槽': ('time_crystal_incubator', 'Time Crystal Incubator', 'machine'),
+    '位相同期板': ('phase_sync_plate', 'Phase Sync Plate', 'item'),
+    '縮退前駆体': ('degenerate_precursor', 'Degenerate Precursor', 'item'),
+    '虚空捕集器': ('void_collector', 'Void Collector', 'machine'),
+    '虚空の塵': ('void_dust', 'Void Dust', 'item'),
+    '番人の投影核': ('sentinel_core', 'Sentinel Projection Core', 'item'),
+    '縮退核': ('degenerate_nucleus', 'Degenerate Nucleus', 'item'),
     '時間結晶触媒': ('time_crystal_catalyst', 'Time Crystal Catalyst', 'catalyst'),
     'エキゾチック物質': ('exotic_matter', 'Exotic Matter', 'item'),
     '縮退熱炉フレーム': ('degenerate_furnace_frame', 'Degenerate Furnace Frame', 'part_block'),
@@ -187,10 +215,13 @@ MOD = {
     'ワームホール生成器外殻': ('wormhole_generator_shell', 'Wormhole Generator Shell', 'part_block'),
     'ワームホール生成器場コイル': ('wormhole_generator_coil', 'Wormhole Generator Field Coil', 'part_block'),
     'ワームホール生成器収束器': ('wormhole_generator_focuser', 'Wormhole Generator Focuser', 'part_block'),
+    '磁気閉じ込め環': ('confinement_ring', 'Magnetic Confinement Ring', 'item'),
     'ワームホール生成器観察窓': ('wormhole_generator_window', 'Wormhole Generator Window', 'part_glass'),
+    'ワームホール生成器ポート': ('wormhole_generator_port', 'Wormhole Generator Port', 'part_block'),
     'ワームホール生成器コア': ('wormhole_generator_core', 'Wormhole Generator Core', 'machine'),
     'ワームホール生成器': ('wormhole_generator', 'Wormhole Generator', 'structure'),
     '不安定なワームホールの口': ('unstable_wormhole_mouth', 'Unstable Wormhole Mouth', 'tool'),
+    'ワームホールの口の筐体': ('wormhole_mouth_casing', 'Wormhole Mouth Casing', 'item'),
     'ワームホールの口': ('wormhole_mouth', 'Wormhole Mouth', 'machine'),
     'ワームホール固定化装置': ('wormhole_stabilizer', 'Wormhole Stabilizer', 'machine'),
     'ワームホール・ポート': ('wormhole_port', 'Wormhole Port', 'machine'),
@@ -213,15 +244,36 @@ MOD = {
     '遺構パネル': ('ruin_panel', 'Ruin Panel', 'ruin_block'),
     'ひび割れた遺構パネル': ('cracked_ruin_panel', 'Cracked Ruin Panel', 'ruin_block'),
     '苔むした遺構パネル': ('mossy_ruin_panel', 'Mossy Ruin Panel', 'ruin_block'),
+    '遺構のタイルパネル': ('tiled_ruin_panel', 'Tiled Ruin Panel', 'ruin_block'),
+    '遺構の通気パネル': ('vented_ruin_panel', 'Vented Ruin Panel', 'ruin_block'),
+    '遺構の帯パネル': ('striped_ruin_panel', 'Striped Ruin Panel', 'ruin_block'),
+    '焦げた遺構パネル': ('scorched_ruin_panel', 'Scorched Ruin Panel', 'ruin_block'),
+    # 深い遺構に残る、朽ちていない白い建材（硬く、鉄以上のツルハシで掘る）
+    '無垢の遺構パネル': ('pristine_ruin_panel', 'Pristine Ruin Panel', 'ruin_block'),
+    '無垢の遺構タイル': ('pristine_ruin_tiles', 'Pristine Ruin Tiles', 'ruin_block'),
+    '無垢の遺構柱': ('pristine_ruin_pillar', 'Pristine Ruin Pillar', 'ruin_block'),
+    '無垢の遺構導光板': ('pristine_ruin_light', 'Pristine Ruin Light Strip', 'ruin_block'),
     '割れた遺構ガラス': ('ruin_glass', 'Broken Ruin Glass', 'ruin_glass'),
+    '遺構ガラス': ('intact_ruin_glass', 'Ruin Glass', 'ruin_glass'),
     '遺構の照明': ('ruin_lamp', 'Ruin Lamp', 'ruin_block'),
     '遺構保管庫': ('ruin_cache', 'Ruin Cache', 'ruin_block'),
     '警備機ドック': ('ruin_guard_dock', 'Guard Dock', 'ruin_block'),
     '封印コンソール': ('seal_console', 'Seal Console', 'ruin_block'),
+    '番人の封印核': ('guardian_core', 'Guardian Seal Core', 'boss_block'),
+    '残響投影器': ('echo_projector', 'Echo Projector', 'boss_block'),
     '遺構の照明（琥珀）': ('ruin_lamp_amber', 'Ruin Lamp (Amber)', 'ruin_block'),
     '遺構の照明（翠）': ('ruin_lamp_verdant', 'Ruin Lamp (Verdant)', 'ruin_block'),
     '遺構の照明（菫）': ('ruin_lamp_violet', 'Ruin Lamp (Violet)', 'ruin_block'),
     '遺構の照明（紅）': ('ruin_lamp_crimson', 'Ruin Lamp (Crimson)', 'ruin_block'),
+
+    # ---- 建材（自分で作れる。遺構の建材とは別の、新しいパネル）
+    'ホワイトパネル': ('white_panel', 'White Panel', 'deco'),
+    '発光ホワイトパネル': ('white_light_panel', 'Glowing White Panel', 'deco'),
+    '黒色強化パネル': ('black_reinforced_panel', 'Black Reinforced Panel', 'deco'),
+    'ホワイトガラスパネル': ('white_glass_panel', 'White Glass Panel', 'deco_glass'),
+    '四芒星ホワイトガラスパネル': ('white_star_glass_panel', 'Starred White Glass Panel', 'deco_glass'),
+    '黒色強化ガラス': ('black_reinforced_glass', 'Black Reinforced Glass', 'deco_glass'),
+    '四芒星黒色強化ガラス': ('black_star_glass', 'Starred Black Reinforced Glass', 'deco_glass'),
 
     # ---- 封印コンテナ（遺構に眠り、次の段階の鍵で開く。段階が進めば自分でも作れる） ----
     '封印コンテナ（磁気錠）': ('sealed_container_1', 'Sealed Container (Magnetic Lock)', 'container'),
@@ -246,7 +298,7 @@ MOD = {
     '失活したシンギュラリティ・コア': ('spent_singularity_core', 'Spent Singularity Core', 'item'),
     '酸素': ('oxygen', 'Oxygen', 'fluid'),
     '磁気単極子': ('magnetic_monopole', 'Magnetic Monopole', 'item'),
-    '記録片': ('record_fragment', 'Record Fragment', 'item'),
+    'クリスタルメモリ': ('record_fragment', 'Crystal Memory', 'item'),
     '解読した記録': ('decoded_record', 'Decoded Record', 'tool'),
 }
 
@@ -286,6 +338,7 @@ VANILLA = {
     '砂': '#c:sands',
     '粘土玉': 'minecraft:clay_ball',
     '鉄インゴット': '#c:ingots/iron',
+    '避雷針': 'minecraft:lightning_rod',
     '銅インゴット': '#c:ingots/copper',
     '青氷': 'minecraft:blue_ice',
     '骨粉': 'minecraft:bone_meal',
@@ -305,6 +358,7 @@ MASS_INPUTS = {
 
 # 鋼鉄は他modの鋼鉄も受け付ける（設計の柱5）
 STEEL_TAG = '#c:ingots/steel'
+STEEL_PLATE_TAG = '#c:plates/steel'
 
 # 製作場所 → 装置ID（バニラの製作場所は別扱い）
 STATIONS = {

@@ -129,6 +129,9 @@ public final class SinguloBlocks {
     /** マルチブロック搬入出ポート（どのマルチブロックでも、外装板の代わりに置ける。加速器はコントローラの左右）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock> MULTIBLOCK_PORT =
             BLOCKS.register("multiblock_port", () -> new io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock(partProperties()));
+    /** ワームホール生成器ポート（生成器の外殻の代わりに置く受電・搬出口。働きはマルチブロック搬入出ポートと同じ）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock> WORMHOLE_GENERATOR_PORT =
+            BLOCKS.register("wormhole_generator_port", () -> new io.github.genichimaruo.singulo.multiblock.MultiblockPortBlock(partProperties()));
 
     /** 野良ブラックホール（リアクターが崩壊したあとに残る。壊せない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlock> ROGUE_BLACK_HOLE = BLOCKS.register(
@@ -204,8 +207,8 @@ public final class SinguloBlocks {
                     SinguloBlockEntities.WORMHOLE_MOUTH, io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity::new, io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity>> WORMHOLE_PORT =
             BLOCKS.register("wormhole_port", () -> new SimpleMachineBlock<>(machineProperties(),
-                    SinguloBlockEntities.WORMHOLE_PORT, io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::new, (l, p, s, be) -> {
-                    }));
+                    SinguloBlockEntities.WORMHOLE_PORT, io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::new,
+                    io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity::serverTick));
     /** クリエイティブ電源（クリエイティブ専用）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.CreativeEnergyBlockEntity>> CREATIVE_ENERGY_SOURCE =
             BLOCKS.register("creative_energy_source", () -> new SimpleMachineBlock<>(machineProperties().strength(-1.0F, 3_600_000.0F),
@@ -225,16 +228,97 @@ public final class SinguloBlocks {
     public static final DeferredBlock<Block> RUIN_PANEL = ruinPanel("ruin_panel");
     public static final DeferredBlock<Block> CRACKED_RUIN_PANEL = ruinPanel("cracked_ruin_panel");
     public static final DeferredBlock<Block> MOSSY_RUIN_PANEL = ruinPanel("mossy_ruin_panel");
-    public static final DeferredBlock<TransparentBlock> RUIN_GLASS = BLOCKS.register("ruin_glass",
-            () -> new TransparentBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(0.5F)
-                    .sound(SoundType.GLASS).noOcclusion().isViewBlocking((s, l, p) -> false)
-                    .isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)));
+    /** 割れた遺構ガラスと遺構ガラス（透けて見える。硬さ・爆発への強さ・音は遺構パネルと同じ）。 */
+    public static final DeferredBlock<TransparentBlock> RUIN_GLASS = glass("ruin_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.STONE);
+    public static final DeferredBlock<TransparentBlock> INTACT_RUIN_GLASS = glass("intact_ruin_glass", MapColor.NONE, 4.0F, 9.0F,
+            SoundType.STONE);
     public static final DeferredBlock<Block> RUIN_LAMP = BLOCKS.registerSimpleBlock("ruin_lamp",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.GLASS).lightLevel(s -> 12));
     public static final DeferredBlock<Block> RUIN_LAMP_AMBER = ruinLamp("ruin_lamp_amber");
     public static final DeferredBlock<Block> RUIN_LAMP_VERDANT = ruinLamp("ruin_lamp_verdant");
     public static final DeferredBlock<Block> RUIN_LAMP_VIOLET = ruinLamp("ruin_lamp_violet");
     public static final DeferredBlock<Block> RUIN_LAMP_CRIMSON = ruinLamp("ruin_lamp_crimson");
+    // 遺構パネルの変わり種（朽ちたもの）
+    public static final DeferredBlock<Block> TILED_RUIN_PANEL = ruinPanel("tiled_ruin_panel");
+    public static final DeferredBlock<Block> VENTED_RUIN_PANEL = ruinPanel("vented_ruin_panel");
+    public static final DeferredBlock<Block> STRIPED_RUIN_PANEL = ruinPanel("striped_ruin_panel");
+    public static final DeferredBlock<Block> SCORCHED_RUIN_PANEL = ruinPanel("scorched_ruin_panel");
+    // 深い遺構に残る、朽ちていない白い建材（硬く、鉄以上のツルハシで掘る）
+    public static final DeferredBlock<Block> PRISTINE_RUIN_PANEL = pristine("pristine_ruin_panel", 0);
+    public static final DeferredBlock<Block> PRISTINE_RUIN_TILES = pristine("pristine_ruin_tiles", 0);
+    /** 柱は原木のように、置く向きで縦・横に倒れる。 */
+    public static final DeferredBlock<net.minecraft.world.level.block.RotatedPillarBlock> PRISTINE_RUIN_PILLAR = BLOCKS.register(
+            "pristine_ruin_pillar", () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.SNOW).strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+    public static final DeferredBlock<Block> PRISTINE_RUIN_LIGHT = pristine("pristine_ruin_light", 11);
+
+    // ---- 自分で作れる建材（遺構の建材とは別の、新しい白いパネル）
+    public static final DeferredBlock<Block> WHITE_PANEL = BLOCKS.registerSimpleBlock("white_panel",
+            BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
+    public static final DeferredBlock<Block> WHITE_LIGHT_PANEL = BLOCKS.registerSimpleBlock("white_light_panel",
+            BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.GLASS).lightLevel(s -> 15));
+    /** 黒色強化パネル（黒曜石なみに爆発に強い）。 */
+    public static final DeferredBlock<Block> BLACK_REINFORCED_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_panel",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK));
+
+    /** 透けるパネル（ホワイトパネルと黒色強化パネルの系統と、四芒星の模様入り）。音はそれぞれのパネルと同じ。 */
+    public static final DeferredBlock<TransparentBlock> WHITE_GLASS_PANEL = glass("white_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
+            SoundType.METAL);
+    public static final DeferredBlock<TransparentBlock> WHITE_STAR_GLASS_PANEL = glass("white_star_glass_panel", MapColor.SNOW, 3.0F, 9.0F,
+            SoundType.METAL);
+    public static final DeferredBlock<TransparentBlock> BLACK_REINFORCED_GLASS = glass("black_reinforced_glass", MapColor.COLOR_BLACK,
+            20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
+    public static final DeferredBlock<TransparentBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
+            20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
+
+    // ---- 隕石クレーター（地表の小さな構造物）と、雷ガラス
+    /** 隕石の溶融殻（クレーターに最初からあるものだけ、星屑の結晶を育てる）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.nature.MeteoriteCrustBlock> METEORITE_CRUST = BLOCKS.register(
+            "meteorite_crust", () -> new io.github.genichimaruo.singulo.nature.MeteoriteCrustBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK).strength(5.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.BASALT)
+                    .randomTicks()));
+    /** 隕鉄塊（掘ると隕鉄の原石が出る。鉄以上のツルハシ）。 */
+    public static final DeferredBlock<Block> METEORIC_IRON_CHUNK = BLOCKS.registerSimpleBlock("meteoric_iron_chunk",
+            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(6.0F, 9.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.ANCIENT_DEBRIS));
+    /** 星屑の結晶（隕石の溶融殻の表面に育つ。壊すと星屑）。 */
+    public static final DeferredBlock<net.minecraft.world.level.block.AmethystClusterBlock> STARDUST_CLUSTER = BLOCKS.register(
+            "stardust_cluster", () -> new net.minecraft.world.level.block.AmethystClusterBlock(7.0F, 3.0F, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1.5F).sound(SoundType.AMETHYST_CLUSTER).noOcclusion()
+                    .lightLevel(s -> 6).forceSolidOn().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
+    /** 雷ガラス塊（雷が落ちた砂が溶けて固まったもの。壊すと雷ガラス）。 */
+    public static final DeferredBlock<Block> FULGURITE_BLOCK = BLOCKS.registerSimpleBlock("fulgurite_block",
+            BlockBehaviour.Properties.of().mapColor(MapColor.SAND).strength(0.8F).sound(SoundType.GLASS));
+    /** 深海圧力収集器と虚空捕集器（その場所に置かないと動かない）。 */
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity>> DEEP_SEA_COLLECTOR =
+            BLOCKS.register("deep_sea_collector", () -> new SimpleMachineBlock<>(machineProperties(),
+                    SinguloBlockEntities.DEEP_SEA_COLLECTOR, io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity::new,
+                    io.github.genichimaruo.singulo.nature.EnvironmentCollectorBlockEntity::serverTick));
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.nature.VoidCollectorBlockEntity>> VOID_COLLECTOR =
+            BLOCKS.register("void_collector", () -> new SimpleMachineBlock<>(machineProperties(),
+                    SinguloBlockEntities.VOID_COLLECTOR, io.github.genichimaruo.singulo.nature.VoidCollectorBlockEntity::new,
+                    io.github.genichimaruo.singulo.nature.EnvironmentCollectorBlockEntity::serverTick));
+    /** ケラウノス放電塔（人工の雷を避雷針へ撃つ）。 */
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity>> KERAUNOS_TOWER =
+            BLOCKS.register("keraunos_tower", () -> new SimpleMachineBlock<>(machineProperties().noOcclusion(),
+                    SinguloBlockEntities.KERAUNOS_TOWER, io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity::new,
+                    io.github.genichimaruo.singulo.nature.KeraunosTowerBlockEntity::serverTick));
+
+    // ---- 重力パネル（電力の届いたパネルに乗ると、次の着地まで重力が変わる）
+    public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> LOW_GRAVITY_PANEL = BLOCKS.register(
+            "low_gravity_panel", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.SNOW),
+                    io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.LOW));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> HIGH_GRAVITY_PANEL = BLOCKS.register(
+            "high_gravity_panel", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_BLACK),
+                    io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.HIGH));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityReceiverBlock> GRAVITY_PANEL_RECEIVER = BLOCKS.register(
+            "gravity_panel_receiver", () -> new io.github.genichimaruo.singulo.gravity.GravityReceiverBlock(machineProperties()));
+    /** 衝撃発電パネル（上に落ちても落下ダメージを受けず、落ちた高さに応じてわずかに発電し、重力パネルへ配る）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlock> IMPACT_GENERATOR = BLOCKS.register(
+            "impact_generator_panel", () -> new io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlock(gravityProperties(MapColor.SNOW)));
     /** 封印コンテナ（段階1〜4の鍵で開く）。開いていれば普通に壊せ、封印中はとても硬い（SealedContainerBlock）。 */
     public static final java.util.List<DeferredBlock<io.github.genichimaruo.singulo.ruin.SealedContainerBlock>> SEALED_CONTAINERS =
             java.util.stream.IntStream.rangeClosed(1, 4).mapToObj(tier -> BLOCKS.register("sealed_container_" + tier,
@@ -242,11 +326,18 @@ public final class SinguloBlocks {
                             .mapColor(MapColor.SNOW).strength(5.0F, 1200.0F).requiresCorrectToolForDrops()
                             .sound(SoundType.NETHERITE_BLOCK).noOcclusion(), tier))).toList();
     public static final DeferredBlock<RuinCacheBlock> RUIN_CACHE = BLOCKS.register("ruin_cache",
-            () -> new RuinCacheBlock(unbreakable()));
+            () -> new RuinCacheBlock(unbreakable().noOcclusion().lightLevel(s -> 6)));
     public static final DeferredBlock<GuardDockBlock> RUIN_GUARD_DOCK = BLOCKS.register("ruin_guard_dock",
             () -> new GuardDockBlock(unbreakable()));
     public static final DeferredBlock<SealConsoleBlock> SEAL_CONSOLE = BLOCKS.register("seal_console",
             () -> new SealConsoleBlock(unbreakable().lightLevel(s -> 10)));
+    /** 番人の封印核（研究棟・封鎖培養施設のボス部屋の床。壊せない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.GuardianCoreBlock> GUARDIAN_CORE = BLOCKS.register("guardian_core",
+            () -> new io.github.genichimaruo.singulo.ruin.GuardianCoreBlock(unbreakable().lightLevel(s -> 9)));
+    /** 残響投影器（素手でも壊せ、何も落とさない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.EchoProjectorBlock> ECHO_PROJECTOR = BLOCKS.register("echo_projector",
+            () -> new io.github.genichimaruo.singulo.ruin.EchoProjectorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIAMOND)
+                    .strength(1.5F, 6.0F).sound(SoundType.AMETHYST).lightLevel(s -> 8).noOcclusion()));
     /** ニュートリノ観測所（設置型のニュートリノ・スキャナー）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =
             BLOCKS.register("neutrino_observatory", () -> new SimpleMachineBlock<>(machineProperties(),
@@ -275,6 +366,25 @@ public final class SinguloBlocks {
     private static DeferredBlock<Block> ruinPanel(String id) {
         return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SAND)
                 .strength(4.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.STONE));
+    }
+
+    /** 朽ちていない遺構の建材: 硬く（鉄以上のツルハシ）、爆発にも強い。 */
+    private static DeferredBlock<Block> pristine(String id, int light) {
+        return BLOCKS.registerSimpleBlock(id, BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).lightLevel(s -> light));
+    }
+
+    /** 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。 */
+    private static DeferredBlock<TransparentBlock> glass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
+        return BLOCKS.register(id, () -> new TransparentBlock(BlockBehaviour.Properties.of().mapColor(color)
+                .strength(hardness, resistance).requiresCorrectToolForDrops().sound(sound).noOcclusion()
+                .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
+                .isValidSpawn((s, l, p, e) -> false)));
+    }
+
+    private static BlockBehaviour.Properties gravityProperties(MapColor color) {
+        return BlockBehaviour.Properties.of().mapColor(color).strength(4.0F, 12.0F).requiresCorrectToolForDrops()
+                .sound(SoundType.METAL);
     }
 
     /** 壊せない（保管庫やドックを持ち帰って自動化されないように）。 */
