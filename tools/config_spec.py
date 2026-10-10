@@ -26,12 +26,13 @@ SERVER = [
 
     # 電力
     ('power', 'generatorOutputMultiplier', '1.0', '0.1〜100.0', 'すべての発電機の出力倍率'),
-    ('power', 'thermoelectricCoefficient', '0.08', '0.001〜10.0（FE/t・K）', '熱電発電機の温度差1Kあたり出力'),
+    ('power', 'thermoelectricCoefficient', '0.10', '0.001〜10.0（FE/t・K）', '熱電発電機の温度差1Kあたり出力'),
     ('power', 'cryoTurbineOutput', '5000', '1〜1,000,000（FE/t）', '極低温タービンの出力'),
     ('power', 'quantumEngineOutput', '200000', '1〜100,000,000（FE/t）', '量子熱機関の出力'),
     ('power', 'degenerateFurnaceOutput', '20000000', '1〜1,000,000,000（FE/t）', '縮退熱炉の出力'),
     ('power', 'penroseEnergyPerPellet', '20000000000', '1〜（FE）', '質量ペレット1個の質量エネルギー（降着効率を掛ける前）'),
     ('power', 'wormholeGeneratorPower', '100000000', '1〜2000000000（FE/t）', 'ワームホール生成器が10秒のあいだ毎tick必要とする電力'),
+    ('power', 'gravityPanelPower', '40', '0〜1,000,000（FE/t）', '重力パネル1枚が働くのに毎tick必要な電力'),
     ('power', 'penroseMaxOutput', '2100000000', '1〜（FE/t）', 'Pリアクターの出力上限'),
     ('power', 'eddingtonPelletsPerSecondPer1000Mass', '1.0', '0.1〜100.0', 'エディントン限界（炉心質量1,000あたり毎秒の投入上限）'),
     ('power', 'ignitionEnergy', '50000000000', '1〜（FE）', 'Pリアクターの点火エネルギー'),
@@ -49,10 +50,10 @@ SERVER = [
     ('catalyst', 'underpowerThreshold', '0.8', '0.0〜1.0', '要求電力のこの割合を下回ると不完全反応になる'),
     ('catalyst', 'underpowerConsumption', '1.5', '1.0〜10.0', '不完全反応時の触媒消費倍率'),
     ('catalyst', 'spentRecycleRatio', '0.25', '0.0〜1.0', '失活触媒から1ティア下の原料を回収できる割合'),
-    ('catalyst', 'timeCrystalGrowthTicks', '24000', '20〜1,000,000（tick）', '時間結晶の育成に要る稼働tick（既定20分）'),
+    ('catalyst', 'timeCrystalGrowthTicks', '14400', '20〜1,000,000（tick）', '時間結晶の育成に要る稼働tick（既定12分）'),
 
     # 圧縮・質量
-    ('compression', 'shellRockLv3', '8', '0〜9（整数）', '縮退物質殻1個に要る岩石の圧縮ブロックLv3'),
+    ('compression', 'shellRockLv3', '4', '0〜9（整数）', '縮退物質殻1個に要る岩石の圧縮ブロックLv3'),
     ('compression', 'shellMetalCores', '2', '0〜9（整数）', '縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）'),
     ('compression', 'shellCoolantMb', '6000', '0〜1,000,000（mB）', '縮退物質殻1個の圧縮熱を除くのに要る液体窒素'),
     ('compression', 'reactorPlatesPerShell', '12', '1〜64（整数）', '縮退物質殻1個から作れる炉殻ブロックの数'),
@@ -68,7 +69,7 @@ SERVER = [
     ('ruins', 'maxRepairs', '3', '0〜100（整数）', '修復・再復元できる回数'),
     ('ruins', 'probeAutomationOffset', '2', '1〜4（整数）', '何ティア下の回収物を自動探査機で回収できるか（N−2ルール）'),
     ('ruins', 'probeYieldMultiplier', '0.5', '0.0〜1.0', '自動探査機の回収量（手動遠征比）'),
-    ('ruins', 'wardenHealth', '800', '1〜100,000', 'ホライズン・ウォーデンのHP'),
+    ('ruins', 'wardenHealth', '1200', '1〜100,000', 'ホライズン・ウォーデンのHP'),
     ('ruins', 'wardenResetOnLeave', 'true', 'true / false', '挑戦者が離れたら全回復するか'),
 
     # 残響の欠片

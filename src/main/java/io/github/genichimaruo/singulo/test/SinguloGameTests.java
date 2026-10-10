@@ -97,6 +97,7 @@ public final class SinguloGameTests {
         MachineBlockEntity assembler = machine(helper, MachineType.PRECISION_ASSEMBLER);
         assembler.items().setStackInSlot(0, new ItemStack(item("entangled_element"), 5));
         assembler.items().setStackInSlot(5, new ItemStack(item("basic_circuit")));
+        assembler.items().setStackInSlot(4, new ItemStack(item("coolant_cartridge")));
         helper.succeedWhen(() -> {
             helper.assertTrue(assembler.items().getStackInSlot(assembler.type().outputSlot()).is(item("quantum_computing_module")),
                     "量子演算モジュールが出ない");
@@ -176,9 +177,9 @@ public final class SinguloGameTests {
         helper.setBlock(MACHINE.east(), Blocks.BLUE_ICE);
         ThermoelectricGeneratorBlockEntity gen = helper.getBlockEntity(MACHINE);
         helper.runAtTickTime(60, () -> {
-            // 焚き火 800 K と青氷 243 K → ΔT 557 K、0.08 × 557 ≈ 44.6 FE/t。最初の走査まで最大10 tick かかる
+            // 焚き火 800 K と青氷 243 K → ΔT 557 K、0.10 × 557 ≈ 55.7 FE/t。最初の走査まで（テスト開始のずれを含めて）最大20 tick かかる
             int energy = gen.energy().getEnergyStored();
-            helper.assertTrue(energy >= 44 * 45 && energy <= 45 * 60, "発電量が設計値から外れている: " + energy);
+            helper.assertTrue(energy >= 55 * 40 && energy <= 56 * 60, "発電量が設計値から外れている: " + energy);
             helper.assertBlockPresent(Blocks.BLUE_ICE, MACHINE.east());
             helper.succeed();
         });

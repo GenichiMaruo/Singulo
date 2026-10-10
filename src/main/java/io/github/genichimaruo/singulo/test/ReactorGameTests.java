@@ -34,6 +34,14 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public final class ReactorGameTests {
     private static final String HUGE = "huge";
     private static final String BATCH = "reactor";
+
+    /** 点火したリアクターは、テストが終わっても動き続け、時間膨張の場が近くの別のテストに届く。組の終わりに止める。 */
+    @net.minecraft.gametest.framework.AfterBatch(batch = BATCH)
+    public static void stopReactors(net.minecraft.server.level.ServerLevel level) {
+        for (BlockPos pos : PenroseReactorBlockEntity.runningPositions(level)) {
+            level.removeBlock(pos, false);
+        }
+    }
     private static final BlockPos CENTER = new BlockPos(7, 7, 7);
     private static final BlockPos CONTROLLER = CENTER.below(Structures.CONTROLLER_BELOW_CENTER);
     /** テストで抽出ポートにする炉殻の位置（リングの最初の炉殻）。 */
@@ -247,7 +255,18 @@ public final class ReactorGameTests {
         helper.runAtTickTime(3, () -> r.forceCore(300, 0));
         helper.succeedWhen(() -> helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "質量150〜400で5分たってもホーキング凝縮体ができない"));
+                "質量150〜500で5分たってもホーキング凝縮体ができない"));
+    }
+
+    /** 点火したばかりの炉心（質量500）でも、そのままホーキング凝縮体ができる（蒸発で縮むのを待たなくてよい）。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 6200)
+    public static void freshlyIgnitedCoreRadiatesHawkingCondensate(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_HAWKING, new ItemStack(item("hawking_collector")));
+        helper.runAtTickTime(3, () -> r.forceCore(PenroseReactorBlockEntity.START_MASS, 0));
+        helper.succeedWhen(() -> helper.assertTrue(
+                r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
+                "点火直後の炉心でホーキング凝縮体ができない"));
     }
 
     @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 1400)

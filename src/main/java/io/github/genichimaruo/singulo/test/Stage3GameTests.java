@@ -69,7 +69,7 @@ public final class Stage3GameTests {
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void laserCoolerMakesColdAtoms(GameTestHelper helper) {
         MachineBlockEntity m = poweredMachine(helper, MachineType.LASER_COOLER);
-        m.items().setStackInSlot(0, new ItemStack(Items.AMETHYST_SHARD));
+        m.items().setStackInSlot(0, new ItemStack(item("stardust")));
         m.items().setStackInSlot(1, new ItemStack(Items.QUARTZ));
         m.items().setStackInSlot(2, new ItemStack(item("cold_atom_trap")));
         fill(m, "liquid_helium", 1000);

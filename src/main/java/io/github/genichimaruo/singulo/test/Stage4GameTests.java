@@ -99,9 +99,9 @@ public final class Stage4GameTests {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.DEGENERATE_COMPACTOR, controllerPos, Direction.SOUTH, 5);
         MachineBlockEntity m = helper.getBlockEntity(controllerPos);
         keepPowered(helper, m);
-        m.items().setStackInSlot(0, new ItemStack(item("compressed_block_3"), 8));
-        m.items().setStackInSlot(1, new ItemStack(item("compressed_metal_block_2"), 2));
-        m.items().setStackInSlot(2, new ItemStack(item("entangled_element")));
+        m.items().setStackInSlot(0, new ItemStack(item("compressed_block_3"), 4));
+        m.items().setStackInSlot(1, new ItemStack(item("degenerate_precursor"), 4));
+        m.items().setStackInSlot(2, new ItemStack(item("compressed_metal_block_2"), 2));
         m.automationFluids().fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 6000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
             helper.assertTrue(m.structureSize() == 5, "5×5×5 として形成されない");
@@ -160,11 +160,11 @@ public final class Stage4GameTests {
         m.items().setStackInSlot(0, new ItemStack(item("time_crystal_seed")));
         m.items().setStackInSlot(1, new ItemStack(Items.ECHO_SHARD, 2));
         m.items().setStackInSlot(2, new ItemStack(item("entangled_element"), 2));
-        m.items().setStackInSlot(3, new ItemStack(item("optical_lattice_substrate"), 2));
+        m.items().setStackInSlot(3, new ItemStack(item("phase_sync_plate")));
         m.items().setStackInSlot(4, new ItemStack(item("bose_condensate_catalyst")));
         int[] tick = {0};
         // 育成の前半は要求（30 kFE/t）の半分しか渡さず、後半は満たす
-        helper.onEachTick(() -> m.energy().setEnergy(tick[0]++ < 12_000 ? 15_000 : m.energy().getMaxEnergyStored()));
+        helper.onEachTick(() -> m.energy().setEnergy(tick[0]++ < 7_200 ? 15_000 : m.energy().getMaxEnergyStored()));
         helper.succeedWhen(() -> {
             ItemStack out = m.items().getStackInSlot(m.type().outputSlot());
             helper.assertTrue(out.is(item("time_crystal_catalyst")), "時間結晶触媒が育たない");

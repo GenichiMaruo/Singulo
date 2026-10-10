@@ -268,11 +268,19 @@ public final class Stage5RomanceGameTests {
         helper.assertTrue(!manipulator.affects(enderman, GravityGauntletItem.Mode.CRUSH), "重力耐性に圧壊が効く");
         var warden = helper.spawn(SinguloEntities.HORIZON_WARDEN.get(), new BlockPos(4, 1, 4));
         helper.assertTrue(!manipulator.affects(warden, GravityGauntletItem.Mode.LEVITATE), "ボスを持ち上げられてしまう");
-        helper.assertTrue(manipulator.affects(warden, GravityGauntletItem.Mode.CRUSH), "ボスに圧壊のダメージが入らない");
-        helper.assertTrue(GravitonManipulatorItem.crushDamage(warden) == GravitonManipulatorItem.BOSS_CRUSH_CAP,
-                "ボスへの圧壊ダメージに上限がない: " + GravitonManipulatorItem.crushDamage(warden));
+        helper.assertTrue(!manipulator.affects(warden, GravityGauntletItem.Mode.CRUSH), "遺構のボスに圧壊が効く");
+        for (var type : java.util.List.of(SinguloEntities.ECHO_SENTINEL.get(), SinguloEntities.GRAVITY_REMNANT.get())) {
+            var boss = type.create(helper.getLevel());
+            helper.assertTrue(boss != null && !manipulator.affects(boss, GravityGauntletItem.Mode.CRUSH), "遺構のボスに圧壊が効く: " + type);
+        }
+        // ほかのmodや本来のボスには、ダメージだけ（上限つき）入る
+        var wither = helper.spawn(EntityType.WITHER, new BlockPos(5, 1, 2));
+        helper.assertTrue(manipulator.affects(wither, GravityGauntletItem.Mode.CRUSH), "ほかのボスに圧壊のダメージが入らない");
+        helper.assertTrue(GravitonManipulatorItem.crushDamage(wither) == GravitonManipulatorItem.BOSS_CRUSH_CAP,
+                "ボスへの圧壊ダメージに上限がない: " + GravitonManipulatorItem.crushDamage(wither));
+        wither.discard();
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(2, 1, 2));
-        helper.assertTrue(GravitonManipulatorItem.crushDamage(zombie) == 3.0F, "圧壊が「2＋最大HPの5%」でない");
+        helper.assertTrue(GravitonManipulatorItem.crushDamage(zombie) == 6.0F, "圧壊が「4＋最大HPの10%」でない");
         warden.discard();
         golem.discard();
         enderman.discard();
