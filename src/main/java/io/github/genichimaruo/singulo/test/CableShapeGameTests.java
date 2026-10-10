@@ -27,7 +27,7 @@ public final class CableShapeGameTests {
         BlockState mid = helper.getBlockState(new BlockPos(3, 1, 2));
         helper.assertTrue(mid.getValue(CableBlock.STRAIGHT) == CableProfile.Straight.Z, "まっすぐ扱いにならない: " + mid);
         AABB box = mid.getShape(helper.getLevel(), helper.absolutePos(new BlockPos(3, 1, 2)), CollisionContext.empty()).bounds();
-        // トポロジカル導線の断面は 5〜11（十字）。まっすぐなら奥行きは 0〜16 で、幅・高さは断面のまま
+        // トポロジカル導線の断面は 5〜11。まっすぐなら奥行きは 0〜16 で、幅・高さは断面のまま
         helper.assertTrue(Math.abs(box.minX - 5 / 16.0) < 1e-6 && Math.abs(box.maxX - 11 / 16.0) < 1e-6
                 && box.minZ == 0 && box.maxZ == 1, "当たり判定が断面と合わない: " + box);
         BlockState end = helper.getBlockState(new BlockPos(3, 1, 1));

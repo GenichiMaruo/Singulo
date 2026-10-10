@@ -13,7 +13,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * 見た目（tools/art16.py の CABLE_WIDTHS）と同じ値にしておくこと。当たり判定も同じ形で作る。
  */
 public enum CableProfile {
-    COPPER(new double[][]{{7, 7, 9, 9}}),
+    COPPER(new double[][]{{6, 6, 10, 10}}),
     SUPERCONDUCTING(new double[][]{{6, 6, 10, 10}}),
     TOPOLOGICAL(new double[][]{{5, 5, 11, 11}}),
     HORIZON(new double[][]{{4, 4, 12, 12}});
