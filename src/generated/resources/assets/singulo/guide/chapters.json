@@ -15,6 +15,7 @@
       "pages": [
         "stage1.materials",
         "stage1.power",
+        "stage1.thermal_pairs",
         "stage1.machines",
         "stage1.goal"
       ]
@@ -89,9 +90,11 @@
       "icon": "singulo:ruin_cache",
       "pages": [
         "ruins.list",
+        "ruins.bosses",
         "ruins.compass",
         "ruins.sealed",
-        "ruins.records"
+        "ruins.records",
+        "ruins.gathering"
       ]
     },
     {

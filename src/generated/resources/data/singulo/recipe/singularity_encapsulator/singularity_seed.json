@@ -22,6 +22,18 @@
         "item": "singulo:degenerate_matter_shell"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:confinement_ring"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_nucleus"
+      },
+      "count": 1
     }
   ],
   "result": {

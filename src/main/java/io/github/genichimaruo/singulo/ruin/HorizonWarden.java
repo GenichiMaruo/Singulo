@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.InteractionHand;
@@ -70,6 +71,19 @@ public class HorizonWarden extends Monster {
     /** 重力の手（残り tick）と、つかんでいる相手の ID（-1 ならいない）。 */
     private static final EntityDataAccessor<Integer> GRIP = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> GRIP_TARGET = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
+    /** 出現の演出の残り tick（0 なら出現済み）。 */
+    private static final EntityDataAccessor<Integer> EMERGE = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
+    /** 出現の演出の長さ: 特異点が開き（〜30%）、体が組み上がり（〜75%）、目覚めの衝撃波（〜100%）。 */
+    public static final int EMERGE_TICKS = 120;
+    public static final int DEATH_TICKS = 100;
+    /** 体力の既定値（設定 wardenHealth）。 */
+    public static final double HEALTH = 1200;
+    /** ゲームの決まりの最大体力の上限。 */
+    static final double MAX_HEALTH_CAP = 1024;
+    /** フェーズごとの、技のあいだの間の倍率（フェーズが進むほど短い）。 */
+    static final float[] PACE = {0.7F, 0.5F, 0.35F};
+    /** フェーズごとの、技と技のあいだの最短の間（tick）。 */
+    static final int[] MIN_GAP = {22, 12, 7};
 
     public static final double ARMOR_PHASE_1 = 10;
     public static final int ARENA_RADIUS = 24;
@@ -137,6 +151,8 @@ public class HorizonWarden extends Monster {
     @Nullable
     private BlockPos console;
     private int specialCooldown = BOLT_INTERVAL;
+    /** 受けるダメージの倍率（体力が上限を超える設定のとき 1 より小さい）。 */
+    private float damageScale = (float) (MAX_HEALTH_CAP / HEALTH);
     private int blinkCooldown = BLINK_INTERVAL;
     private int unseenTicks;
     private boolean liftNext;
@@ -164,7 +180,7 @@ public class HorizonWarden extends Monster {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 800)
+                .add(Attributes.MAX_HEALTH, Math.min(HEALTH, MAX_HEALTH_CAP))
                 .add(Attributes.ATTACK_DAMAGE, 16)
                 .add(Attributes.ARMOR, ARMOR_PHASE_1)
                 .add(Attributes.MOVEMENT_SPEED, 0.28)
@@ -185,10 +201,87 @@ public class HorizonWarden extends Monster {
         builder.define(LASER_END, new Vector3f());
         builder.define(GRIP, 0);
         builder.define(GRIP_TARGET, -1);
+        builder.define(EMERGE, 0);
     }
 
     public int phase() {
         return entityData.get(PHASE);
+    }
+
+    /** 出現の演出の残り tick。 */
+    public int emergeTicks() {
+        return entityData.get(EMERGE);
+    }
+
+    /** 出現の演出の進み（0〜1。出現済みなら 1）。 */
+    public float emergeProgress(float partialTick) {
+        int left = emergeTicks();
+        return left <= 0 ? 1 : Math.min(1, 1 - (left - partialTick) / EMERGE_TICKS);
+    }
+
+    /** 出現の演出を始める（そのあいだは動かず、傷つかない）。 */
+    public void startEmerging() {
+        entityData.set(EMERGE, EMERGE_TICKS);
+        setNoAi(true);
+        setNoGravity(true);
+        bossBar.setVisible(false);
+    }
+
+    /** 出現の演出を飛ばす（テスト用）。 */
+    public void skipEmerging() {
+        entityData.set(EMERGE, 0);
+        setNoAi(false);
+        setNoGravity(false);
+        bossBar.setVisible(true);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!level().isClientSide && emergeTicks() > 0) {
+            tickEmerge((ServerLevel) level());
+        }
+    }
+
+    /** 出現の演出（サーバー側: 音・粒・終わりの衝撃波）。 */
+    private void tickEmerge(ServerLevel level) {
+        int left = emergeTicks() - 1;
+        int t = EMERGE_TICKS - left;
+        entityData.set(EMERGE, left);
+        setDeltaMovement(Vec3.ZERO);
+        Vec3 core = position().add(0, 2.2, 0);
+        if (t < EMERGE_TICKS * 3 / 10) {
+            // 特異点が開く: まわりから光の粒が吸い込まれていく
+            for (int i = 0; i < 6; i++) {
+                double a = random.nextDouble() * Math.PI * 2;
+                double r = 2.5 + random.nextDouble() * 2;
+                level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, core.x + Math.cos(a) * r,
+                        core.y + (random.nextDouble() - 0.5) * 2, core.z + Math.sin(a) * r, 0, -Math.cos(a), 0, -Math.sin(a), 0.3);
+            }
+        } else if (t < EMERGE_TICKS * 3 / 4) {
+            // 体が組み上がる: 足元から火花が昇る
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK, getX(), getY() + (t % 20) * 0.2, getZ(),
+                    4, 1.2, 0.1, 1.2, 0.05);
+        }
+        if (t == 1) {
+            level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.emerge"), SoundSource.HOSTILE, 3.0F, 1.0F);
+        }
+        if (left <= 0) {
+            // 目覚め: 衝撃波で近くの者を押し返し、戦いが始まる
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.SONIC_BOOM, core.x, core.y, core.z, 1, 0, 0, 0, 0);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION, getX(), getY() + 0.3, getZ(), 12, 3, 0.2, 3, 0);
+            level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.5F, 0.6F);
+            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(8), e -> e != this)) {
+                Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
+                if (push.lengthSqr() > 1e-4) {
+                    e.push(push.normalize().x * 1.2, 0.5, push.normalize().z * 1.2);
+                    e.hurtMarked = true;
+                }
+            }
+            setNoAi(false);
+            setNoGravity(false);
+            bossBar.setVisible(true);
+        }
     }
 
     /** ビームをためている残り tick（0 ならためていない）。 */
@@ -261,10 +354,18 @@ public class HorizonWarden extends Monster {
     public void awaken(BlockPos home, BlockPos console) {
         this.home = home;
         this.console = console;
-        double health = ServerConfig.SPEC.isLoaded() ? ServerConfig.WARDEN_HEALTH.get() : 800;
-        getAttribute(Attributes.MAX_HEALTH).setBaseValue(health);
-        setHealth((float) health);
+        double health = ServerConfig.SPEC.isLoaded() ? ServerConfig.WARDEN_HEALTH.get() : HEALTH;
+        // 最大体力はゲームの決まりで 1024 までなので、それを超える分は受けるダメージを減らして同じ硬さにする
+        double max = Math.min(health, MAX_HEALTH_CAP);
+        damageScale = (float) (max / health);
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
+        setHealth((float) max);
         restrictTo(home, ARENA_RADIUS);
+    }
+
+    /** 実際の硬さ（受けるダメージを減らした分を含めた体力。設定の wardenHealth と同じ）。 */
+    public float effectiveMaxHealth() {
+        return getMaxHealth() / damageScale;
     }
 
     @Override
@@ -334,9 +435,11 @@ public class HorizonWarden extends Monster {
         } else {
             moves.add(Move.GRAVITY);
             moves.add(Move.SHARDS);
+            moves.add(Move.LASER);
+            moves.add(Move.BEAM);
             if (seen) {
-                moves.add(Move.LASER);
                 moves.add(Move.GRIP);
+                moves.add(Move.LASER);
             }
             if (near && onGround()) {
                 moves.add(Move.SHOCKWAVE);
@@ -344,12 +447,11 @@ public class HorizonWarden extends Monster {
         }
         if (phase() == 3) {
             moves.add(Move.SINGULARITY);
-            if (seen) {
-                moves.add(Move.BEAM);
-            }
+            moves.add(Move.BEAM);
+            moves.add(Move.SHARDS);
         }
-        if (moves.size() > 1) {
-            moves.remove(lastMove);
+        if (moves.stream().anyMatch(m -> m != lastMove)) {
+            moves.removeIf(m -> m == lastMove);
         }
         if (moves.isEmpty()) {
             specialCooldown = 10;
@@ -369,7 +471,17 @@ public class HorizonWarden extends Monster {
             case BEAM -> startBeam(target);
         }
         // 技のあいだの間（フェーズが進むほど短い）
-        specialCooldown = Math.max(specialCooldown, phase() == 1 ? 34 : phase() == 2 ? 26 : 20);
+        specialCooldown = Math.max(specialCooldown, MIN_GAP[Mth.clamp(phase(), 1, 3) - 1]);
+    }
+
+    /** 技のあいだの間を、今のフェーズに合わせて縮める。 */
+    int pace(int ticks) {
+        return Math.max(4, Math.round(ticks * PACE[Mth.clamp(phase(), 1, 3) - 1]));
+    }
+
+    /** フェーズ2から: ビームとレーザーが壁を抜け、防具と盾を無視する（手加減なし）。 */
+    public boolean piercing() {
+        return phase() >= 2;
     }
 
     private void updatePhase(ServerLevel level) {
@@ -386,26 +498,26 @@ public class HorizonWarden extends Monster {
             // 外装が剥がれ、破片が周りを回り始める
             level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 1.5, getZ(), 4, 0.6, 0.8, 0.6, 0);
             level.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 1.8, getZ(), 40, 0.8, 1.0, 0.8, 0.15);
-            playSound(SoundEvents.IRON_GOLEM_DAMAGE, 2.0F, 0.5F);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.phase"), 3.0F, 1.0F);
         } else if (phase == 3) {
             // 炉心が赤く燃え、宙に浮く
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, getX(), getY() + 2, getZ(), 80, 1.0, 1.2, 1.0, 0.3);
-            playSound(SoundEvents.WARDEN_ROAR, 2.0F, 0.7F);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.phase"), 3.0F, 0.85F);
         }
-        specialCooldown = GRAVITY_INTERVAL / 2;
+        specialCooldown = pace(GRAVITY_INTERVAL / 2);
     }
 
     /** フェーズ3: その場所に小型の特異点を展開する（{@link WardenSingularity}）。 */
     public void deploySingularity(Vec3 at) {
         level().addFreshEntity(new WardenSingularity(level(), this, at));
-        specialCooldown = 40;
+        specialCooldown = pace(40);
         level().playSound(null, at.x, at.y, at.z, io.github.genichimaruo.singulo.registry.SinguloSounds.BLACK_HOLE_FORMATION.get(),
                 getSoundSource(), 1.6F, 1.4F);
     }
 
     /** 光弾を扇状に3発撃つ。近すぎるか見えないときは撃たない。撃ったら true。 */
     public boolean shootBolt(LivingEntity target) {
-        specialCooldown = BOLT_INTERVAL;
+        specialCooldown = pace(BOLT_INTERVAL);
         if (distanceToSqr(target) < 16 || !hasLineOfSight(target)) {
             return false;
         }
@@ -426,13 +538,13 @@ public class HorizonWarden extends Monster {
 
     /** フェーズ2以降: 周りを回る外装の破片から、追尾する光弾を撃つ。 */
     public void shardBarrage(LivingEntity target) {
-        specialCooldown = GRAVITY_INTERVAL;
+        specialCooldown = pace(GRAVITY_INTERVAL);
         double base = tickCount * 0.08;
         int rgb = phase() == 3 ? 0xFF5A5A : 0x78D2F0;
         for (int i = 0; i < SHARDS; i++) {
             double a = base + i * Math.PI * 2 / SHARDS;
             Vec3 from = position().add(Math.cos(a) * 1.8, getBbHeight() * 0.55, Math.sin(a) * 1.8);
-            HorizonBolt bolt = new HorizonBolt(level(), this).homing(target).style(rgb, 0.8F, HorizonBolt.DAMAGE * 0.8F);
+            HorizonBolt bolt = new HorizonBolt(level(), this).homing(target).style(rgb, 0.8F, HorizonBolt.DAMAGE * 0.8F).piercing(piercing());
             bolt.setPos(from);
             Vec3 d = from.subtract(position().add(0, getBbHeight() * 0.55, 0)).normalize().add(0, 0.4, 0);
             bolt.shoot(d.x, d.y, d.z, 0.7F, 0);
@@ -443,7 +555,7 @@ public class HorizonWarden extends Monster {
 
     /** 引き寄せと、浮かせて叩き落とすのを交互に。速度を直接与える。 */
     public void gravityAttack(ServerLevel level, LivingEntity target) {
-        specialCooldown = GRAVITY_INTERVAL;
+        specialCooldown = pace(GRAVITY_INTERVAL);
         if (distanceToSqr(target) > 20 * 20) {
             return;
         }
@@ -482,8 +594,8 @@ public class HorizonWarden extends Monster {
     /** 刃の腕を大きく振りかぶってから、前方を薙ぎ払う。振り抜く瞬間に大きな三日月と星が散る。 */
     public void startSweep() {
         entityData.set(SWEEP, SWEEP_TICKS);
-        specialCooldown = 30;
-        playSound(SoundEvents.TRIDENT_RIPTIDE_1.value(), 1.5F, 0.6F);
+        specialCooldown = pace(30);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.sweep"), 2.0F, 1.0F);
     }
 
     private void tickSweep(ServerLevel level, @Nullable LivingEntity target) {
@@ -503,8 +615,7 @@ public class HorizonWarden extends Monster {
 
     /** 振り抜き: 前方の扇（SWEEP_ARC 度、SWEEP_RANGE ブロック）の中の相手に当たる。 */
     private void sweepStrike(ServerLevel level) {
-        playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 2.5F, 0.5F);
-        playSound(SoundEvents.AMETHYST_BLOCK_CHIME, 2.0F, 1.6F);
+        playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.5F, 0.5F);
         Vec3 forward = Vec3.directionFromRotation(0, yBodyRot);
         Vec3 c = position();
         double cos = Math.cos(Math.toRadians(SWEEP_ARC / 2));
@@ -545,8 +656,8 @@ public class HorizonWarden extends Monster {
         entityData.set(LASER, LASER_TICKS);
         laserDir = target.getBoundingBox().getCenter().subtract(corePosition()).normalize()
                 .yRot((random.nextBoolean() ? 1 : -1) * 25 * Mth.DEG_TO_RAD);
-        specialCooldown = 30;
-        playSound(SoundEvents.BEACON_ACTIVATE, 2.0F, 1.5F);
+        specialCooldown = pace(30);
+        playSound(SoundEvents.BEACON_ACTIVATE, 1.0F, 1.5F);
     }
 
     private void tickLaser(ServerLevel level, @Nullable LivingEntity target) {
@@ -560,24 +671,20 @@ public class HorizonWarden extends Monster {
             laserDir = laserDir.lerp(want, LASER_TURN).normalize();
         }
         Vec3 to = from.add(laserDir.scale(LASER_RANGE));
-        HitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-        Vec3 end = hit.getType() == HitResult.Type.MISS ? to : hit.getLocation();
+        Vec3 end = piercing() ? to : clip(level, from, to);
         entityData.set(LASER_END, toVector(end));
         getLookControl().setLookAt(end);
         if (l % LASER_HIT_INTERVAL == 0) {
             AABB box = new AABB(from, end).inflate(0.6);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive() && !RuinGuards.isGuard(e))) {
                 if (!e.getBoundingBox().inflate(0.2).clip(from, end).isEmpty()) {
-                    e.hurt(damageSources().indirectMagic(this, this), LASER_DAMAGE);
+                    e.hurt(piercing() ? SinguloDamageTypes.tidal(level, this) : damageSources().indirectMagic(this, this), LASER_DAMAGE);
                 }
             }
         }
         if (l % 2 == 0) {
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, end.x, end.y, end.z, 3, 0.1, 0.1, 0.1, 0.15);
             level.sendParticles(ParticleTypes.SMOKE, end.x, end.y, end.z, 1, 0.05, 0.05, 0.05, 0.01);
-        }
-        if (l % 10 == 0) {
-            playSound(SoundEvents.BEACON_AMBIENT, 1.5F, 2.0F);
         }
         entityData.set(LASER, l - 1);
     }
@@ -588,8 +695,8 @@ public class HorizonWarden extends Monster {
     public void startGrip(LivingEntity target) {
         entityData.set(GRIP, GRIP_WARN + GRIP_HOLD);
         entityData.set(GRIP_TARGET, target.getId());
-        specialCooldown = 30;
-        playSound(SoundEvents.WARDEN_SONIC_CHARGE, 1.5F, 1.4F);
+        specialCooldown = pace(30);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.grip"), 2.5F, 1.0F);
     }
 
     private void tickGrip(ServerLevel level) {
@@ -609,9 +716,6 @@ public class HorizonWarden extends Monster {
                 double ang = a + i * Math.PI * 2 / 3;
                 level.sendParticles(ParticleTypes.WITCH, t.getX() + Math.cos(ang) * 1.2, t.getY() + 0.2 + (GRIP_WARN + GRIP_HOLD - g) * 0.1,
                         t.getZ() + Math.sin(ang) * 1.2, 1, 0, 0, 0, 0);
-            }
-            if (g == GRIP_HOLD + 1) {
-                playSound(SoundEvents.ENDERMAN_SCREAM, 1.0F, 0.5F);
             }
         } else {
             // 持ち上げて、目の前の空中で振り回す
@@ -658,9 +762,9 @@ public class HorizonWarden extends Monster {
         shockCenter = position();
         shockStart = tickCount;
         shockHit.clear();
-        specialCooldown = 30;
+        specialCooldown = pace(30);
         swing(InteractionHand.MAIN_HAND);
-        playSound(SoundEvents.GENERIC_EXPLODE.value(), 1.5F, 0.5F);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.shockwave"), 3.0F, 1.0F);
         level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 0.2, getZ(), 2, 0.3, 0, 0.3, 0);
     }
 
@@ -704,8 +808,8 @@ public class HorizonWarden extends Monster {
         entityData.set(BEAM_CHARGE, BEAM_CHARGE_TICKS);
         beamDir = target.getEyePosition().subtract(corePosition()).normalize();
         updateBeamEnd();
-        specialCooldown = 30;
-        playSound(SoundEvents.WARDEN_SONIC_CHARGE, 2.5F, 0.5F);
+        specialCooldown = pace(30);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.beam_charge"), 3.0F, 1.0F);
     }
 
     private void tickBeam(ServerLevel level, @Nullable LivingEntity target) {
@@ -717,9 +821,6 @@ public class HorizonWarden extends Monster {
         if (charge > BEAM_LOCK_TICKS && target != null && target.isAlive()) {
             beamDir = target.getEyePosition().subtract(corePosition()).normalize();
             getLookControl().setLookAt(target);
-        }
-        if (charge == BEAM_LOCK_TICKS) {
-            playSound(SoundEvents.BEACON_DEACTIVATE, 2.0F, 2.0F);
         }
         updateBeamEnd();
         Vec3 from = corePosition();
@@ -741,15 +842,19 @@ public class HorizonWarden extends Monster {
     private void updateBeamEnd() {
         Vec3 from = corePosition();
         Vec3 to = from.add(beamDir.scale(BEAM_RANGE));
-        HitResult hit = level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-        Vec3 end = hit.getType() == HitResult.Type.MISS ? to : hit.getLocation();
+        Vec3 end = piercing() ? to : clip(level(), from, to);
         entityData.set(BEAM_END, toVector(end));
     }
 
-    /** ビームを撃つ: 線上にいる相手に、防具を無視するダメージと吹き飛ばし。 */
+    private Vec3 clip(Level level, Vec3 from, Vec3 to) {
+        HitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        return hit.getType() == HitResult.Type.MISS ? to : hit.getLocation();
+    }
+
+    /** ビームを撃つ: 線上にいる相手に、防具を無視するダメージと吹き飛ばし（フェーズ2からは壁の向こうまで届く）。 */
     private void fireBeam(ServerLevel level, Vec3 from, Vec3 end) {
         entityData.set(BEAM_FLASH, 8);
-        playSound(SoundEvents.WARDEN_SONIC_BOOM, 3.0F, 0.5F);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.beam_fire"), 3.5F, 1.0F);
         Vec3 dir = end.subtract(from).normalize();
         AABB box = new AABB(from, end).inflate(1.0);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive() && !RuinGuards.isGuard(e))) {
@@ -776,8 +881,14 @@ public class HorizonWarden extends Monster {
 
     @Override
     public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (emergeTicks() > 0 && !source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            return false;            // 出現の演出のあいだは傷つかない
+        }
         if (RuinGuards.friendlyFire(source)) {
             return false;
+        }
+        if (!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            amount *= damageScale;
         }
         return super.hurt(source, amount);
     }
@@ -906,7 +1017,7 @@ public class HorizonWarden extends Monster {
         if (distanceToSqr(target) < BLINK_DISTANCE * BLINK_DISTANCE && unseenTicks < BLINK_UNSEEN_TICKS) {
             return;
         }
-        blinkCooldown = BLINK_INTERVAL;
+        blinkCooldown = pace(BLINK_INTERVAL);
         Vec3 behind = target.position().subtract(target.getLookAngle().multiply(1, 0, 1).normalize().scale(3));
         Vec3 before = position();
         if (!randomTeleport(behind.x, target.getY(), behind.z, false)) {
@@ -953,13 +1064,69 @@ public class HorizonWarden extends Monster {
     public void die(DamageSource source) {
         super.die(source);
         endGrip();
+        entityData.set(BEAM_CHARGE, 0);
+        entityData.set(LASER, 0);
+        entityData.set(SWEEP, 0);
         if (level() instanceof ServerLevel level) {
-            // 炉心がつぶれて消える
-            level.sendParticles(ParticleTypes.REVERSE_PORTAL, getX(), getY() + 2, getZ(), 200, 0.3, 0.3, 0.3, 1.2);
-            level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 2, getZ(), 3, 0.2, 0.2, 0.2, 0);
-            playSound(SoundEvents.BEACON_DEACTIVATE, 3.0F, 0.5F);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.death"), 3.5F, 1.0F);
             if (console != null && level.getBlockEntity(console) instanceof SealConsoleBlockEntity c) {
                 c.onWardenDefeated(level);
+            }
+        }
+    }
+
+    /** 倒されたときの演出の進み（0〜1）。倒されていなければ 0。 */
+    public float deathProgress(float partialTick) {
+        return deathTime <= 0 ? 0 : Math.min(1, (deathTime + partialTick) / DEATH_TICKS);
+    }
+
+    /**
+     * 倒されたときの演出（{@value #DEATH_TICKS} tick）: 外装が火花と爆ぜる音を立てて剥がれ落ち、膝をつく。
+     * 胸の炉心の特異点がふくらんで周りの光を吸い込み、最後に一点へつぶれて閃光と衝撃波を残す。
+     */
+    @Override
+    protected void tickDeath() {
+        ++deathTime;
+        if (level() instanceof ServerLevel level) {
+            setDeltaMovement(Vec3.ZERO);
+            deathTick(level, deathTime);
+        }
+        if (deathTime >= DEATH_TICKS && !level().isClientSide() && !isRemoved()) {
+            level().broadcastEntityEvent(this, (byte) 60);
+            remove(RemovalReason.KILLED);
+        }
+    }
+
+    private void deathTick(ServerLevel level, int t) {
+        Vec3 core = position().add(0, 2.0 - 0.6 * Math.min(1, t / 30.0), 0);
+        if (t < 55) {
+            // 外装が剥がれ、火花が散る
+            if (t % 9 == 1) {
+                level.sendParticles(ParticleTypes.EXPLOSION, getX() + (random.nextDouble() - 0.5) * 1.6, getY() + 1 + random.nextDouble() * 2,
+                        getZ() + (random.nextDouble() - 0.5) * 1.6, 1, 0, 0, 0, 0);
+            }
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1.5, getZ(), 3, 0.6, 1.0, 0.6, 0.2);
+        } else if (t < DEATH_TICKS - 10) {
+            // 特異点が胸からふくらみ、周りの光を吸い込む
+            for (int i = 0; i < 5; i++) {
+                double a = random.nextDouble() * Math.PI * 2;
+                double b = (random.nextDouble() - 0.5) * Math.PI;
+                double r = 3 + random.nextDouble() * 3;
+                Vec3 d = new Vec3(Math.cos(a) * Math.cos(b), Math.sin(b), Math.sin(a) * Math.cos(b));
+                level.sendParticles(ParticleTypes.REVERSE_PORTAL, core.x + d.x * r, core.y + d.y * r, core.z + d.z * r,
+                        0, -d.x, -d.y, -d.z, 0.8);
+            }
+        } else if (t == DEATH_TICKS - 10) {
+            level.sendParticles(ParticleTypes.FLASH, core.x, core.y, core.z, 3, 0.2, 0.2, 0.2, 0);
+            level.sendParticles(ParticleTypes.SONIC_BOOM, core.x, core.y, core.z, 1, 0, 0, 0, 0);
+            level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, core.x, core.y, core.z, 1, 0, 0, 0, 0);
+            level.sendParticles(ParticleTypes.END_ROD, core.x, core.y, core.z, 120, 0.2, 0.2, 0.2, 0.7);
+            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(10), e -> e != this)) {
+                Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
+                if (push.lengthSqr() > 1e-4) {
+                    e.push(push.normalize().x * 1.3, 0.5, push.normalize().z * 1.3);
+                    e.hurtMarked = true;
+                }
             }
         }
     }
@@ -993,7 +1160,7 @@ public class HorizonWarden extends Monster {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.BEACON_AMBIENT;
+        return null;                                  // 体から鳴り続ける音は、クライアントの BossSounds が鳴らす
     }
 
     @Override
@@ -1003,13 +1170,15 @@ public class HorizonWarden extends Monster {
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.WARDEN_DEATH;
+        return null;
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("phase", phase());
+        tag.putFloat("damage_scale", damageScale);
+        tag.putInt("emerge", emergeTicks());
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
@@ -1022,6 +1191,10 @@ public class HorizonWarden extends Monster {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         entityData.set(PHASE, Math.max(1, tag.getInt("phase")));
+        if (tag.contains("damage_scale")) {
+            damageScale = Math.max(0.001F, tag.getFloat("damage_scale"));
+        }
+        entityData.set(EMERGE, tag.getInt("emerge"));
         home = NbtUtils.readBlockPos(tag, "home").orElse(null);
         console = NbtUtils.readBlockPos(tag, "console").orElse(null);
         if (home != null) {

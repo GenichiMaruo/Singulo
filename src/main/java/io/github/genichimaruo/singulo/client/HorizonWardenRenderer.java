@@ -57,7 +57,47 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
 
     @Override
     protected void scale(HorizonWarden warden, PoseStack pose, float partialTick) {
-        pose.scale(SCALE, SCALE, SCALE);
+        float k = assembled(warden.emergeProgress(partialTick));
+        float d = warden.deathProgress(partialTick);
+        if (d > DEATH_SWALLOW) {
+            // 最後は胸の特異点へ吸い込まれて消える
+            float b = Mth.clamp((d - DEATH_SWALLOW) / (DEATH_COLLAPSE - DEATH_SWALLOW), 0, 1);
+            k *= 1 - b * b;
+        }
+        pose.scale(SCALE * k, SCALE * k, SCALE * k);
+    }
+
+    /** 倒されたとき: 特異点がふくらみ始める進み、体を吸い込み終える進み、一点につぶれる進み。 */
+    static final float DEATH_GROW = 0.55F;
+    static final float DEATH_SWALLOW = 0.75F;
+    static final float DEATH_COLLAPSE = 0.9F;
+
+    /** 倒されたときは倒れ込まず、膝をついて前へ傾き、震える。 */
+    @Override
+    protected void setupRotations(HorizonWarden warden, PoseStack pose, float bob, float bodyYaw, float partialTick, float scale) {
+        if (!warden.isDeadOrDying()) {
+            super.setupRotations(warden, pose, bob, bodyYaw, partialTick, scale);
+            return;
+        }
+        float d = warden.deathProgress(partialTick);
+        float kneel = Mth.clamp(d / 0.2F, 0, 1);
+        kneel = kneel * kneel * (3 - 2 * kneel);
+        pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
+        pose.translate(0, -0.45F * kneel, 0);
+        pose.mulPose(Axis.XP.rotationDegrees(-16 * kneel));
+        if (d < DEATH_SWALLOW) {
+            float t = warden.tickCount + partialTick;
+            pose.mulPose(Axis.ZP.rotationDegrees(Mth.sin(t * 2.7F) * (1.2F + 2.0F * d)));
+        }
+    }
+
+    /** 出現の演出で、体が組み上がった割合（特異点が開くまでは 0、そのあと 1 まで）。 */
+    static float assembled(float e) {
+        if (e >= 0.75F) {
+            return 1;
+        }
+        float b = Mth.clamp((e - 0.3F) / 0.45F, 0, 1);
+        return 0.02F + 0.98F * b * b * (3 - 2 * b);
     }
 
     /** フェーズ3で浮いている高さ（ブロック）。 */
@@ -70,6 +110,13 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
 
     @Override
     public void render(HorizonWarden warden, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
+        float e = warden.emergeProgress(partialTick);
+        if (e < 1) {
+            renderEmerge(warden, e, pose, buffers);
+            if (e < 0.3F) {
+                return;            // 特異点が開くまでは、まだ体はない
+            }
+        }
         float hover = hover(warden, partialTick);
         pose.pushPose();
         pose.translate(0, hover, 0);
@@ -78,10 +125,102 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
             renderHaloAndCore(warden, partialTick, pose, buffers);
         }
         pose.popPose();
+        if (warden.isDeadOrDying()) {
+            renderDeath(warden, warden.deathProgress(partialTick), pose, buffers);
+            return;
+        }
         renderBeam(warden, partialTick, pose, buffers, hover);
         renderSweep(warden, partialTick, pose, buffers, hover);
         renderLaser(warden, partialTick, pose, buffers);
         renderTether(warden, partialTick, pose, buffers);
+    }
+
+    /**
+     * 出現の演出（描画）。
+     * <ol>
+     *   <li>〜30%: 胸の高さに黒い特異点が開き、まわりを回る光の輪がすぼまっていく</li>
+     *   <li>〜75%: 特異点が胸へ沈み、足元から頭へ走査の光の輪が昇りながら、体が組み上がる</li>
+     *   <li>〜100%: 目覚めの閃光と、地面を走る衝撃波の輪</li>
+     * </ol>
+     */
+    private void renderEmerge(HorizonWarden warden, float e, PoseStack pose, MultiBufferSource buffers) {
+        int rgb = glowRgb(warden);
+        float t = warden.tickCount;
+        org.joml.Quaternionf camera = net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
+        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        pose.pushPose();
+        pose.translate(0, 2.2, 0);
+        if (e < 0.75F) {
+            float open = Mth.clamp(e / 0.3F, 0, 1);
+            float sink = Mth.clamp((e - 0.3F) / 0.45F, 0, 1);
+            float r = (0.15F + 0.55F * open) * (1 - sink);
+            if (r > 0.01F) {
+                FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+                // 別の描き方の入れ物を取ると前の入れ物は閉じられるので、光の入れ物は取り直す
+                glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                FxDraw.billboard(pose, glow, camera, r * 5 + 0.5F, rgb, (int) (140 * open));
+            }
+            FxDraw.gyroRings(pose, glow, 3.0F - 2.0F * open + 0.6F * sink, 0.06F, t * (4 + 10 * open), rgb, (int) (90 + 140 * open));
+        }
+        pose.popPose();
+        if (e >= 0.3F && e < 0.75F) {
+            float b = (e - 0.3F) / 0.45F;
+            for (int k = 0; k < 2; k++) {
+                pose.pushPose();
+                pose.translate(0, 4.4F * b - k * 0.35F, 0);
+                FxDraw.ring(pose.last(), glow, 1.5F - k * 0.2F, 2.1F - k * 0.2F, k == 0 ? rgb : 0xFFFFFF, 220, 0);
+                pose.popPose();
+            }
+        }
+        if (e >= 0.75F) {
+            float c = (e - 0.75F) / 0.25F;
+            pose.pushPose();
+            pose.translate(0, 0.05, 0);
+            FxDraw.ring(pose.last(), glow, 1 + 9 * c, 1.7F + 9 * c, rgb, (int) (230 * (1 - c)), 0);
+            pose.translate(0, 2.15, 0);
+            FxDraw.billboard(pose, glow, camera, 7 * (1 - c) + 0.5F, 0xFFFFFF, (int) (220 * (1 - c)));
+            pose.popPose();
+        }
+    }
+
+    /**
+     * 倒されたときの演出（描画）。
+     * <ol>
+     *   <li>〜55%: 膝をつき、震えながら胸の炉心が明滅する</li>
+     *   <li>〜90%: 胸の特異点がふくらみ、光の輪がすぼまりながら体を吸い込んでいく</li>
+     *   <li>〜100%: 一点につぶれ、閃光と地面を走る衝撃波の輪</li>
+     * </ol>
+     */
+    private void renderDeath(HorizonWarden warden, float d, PoseStack pose, MultiBufferSource buffers) {
+        int rgb = glowRgb(warden);
+        float t = warden.tickCount;
+        org.joml.Quaternionf camera = net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
+        float kneel = Mth.clamp(d / 0.2F, 0, 1);
+        pose.pushPose();
+        pose.translate(0, 2.2 - 0.75 * kneel, 0);
+        if (d < DEATH_GROW) {
+            // 明滅する炉心
+            if (((int) (t * 3)) % 4 != 0) {
+                VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                FxDraw.billboard(pose, glow, camera, 0.8F + 0.3F * Mth.sin(t * 1.3F), rgb, 200);
+            }
+        } else if (d < DEATH_COLLAPSE) {
+            float g = (d - DEATH_GROW) / (DEATH_COLLAPSE - DEATH_GROW);
+            float r = 0.2F + 1.4F * (g < 0.7F ? g / 0.7F : 1 - (g - 0.7F) / 0.3F * 0.85F);
+            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x000000, 0);
+            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            FxDraw.billboard(pose, glow, camera, r * 3.2F, rgb, 170);
+            FxDraw.gyroRings(pose, glow, r * 2.4F + 2.5F * (1 - g), 0.06F, t * (6 + 20 * g), rgb, 220);
+            GravitationalLensing.add(warden.position().add(0, 2.2 - 0.75 * kneel, 0), r * 2.5F, 0.8F);
+        } else {
+            float c = (d - DEATH_COLLAPSE) / (1 - DEATH_COLLAPSE);
+            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            FxDraw.billboard(pose, glow, camera, 1 + 9 * c, 0xFFFFFF, (int) (255 * (1 - c)));
+            FxDraw.billboard(pose, glow, camera, 2 + 13 * c, rgb, (int) (200 * (1 - c)));
+            pose.translate(0, -(2.2 - 0.75 * kneel) + 0.05, 0);
+            FxDraw.ring(pose.last(), glow, 1 + 12 * c, 1.8F + 12 * c, rgb, (int) (230 * (1 - c)), 0);
+        }
+        pose.popPose();
     }
 
     /** 薙ぎ払い: 振り抜く間、刃の軌跡に大きな三日月が走り、薄れていく。 */
@@ -226,6 +365,9 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
         @Override
         public void render(PoseStack pose, MultiBufferSource buffers, int light, HorizonWarden warden, float limbSwing,
                            float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+            if (warden.isDeadOrDying() && ((int) (ageInTicks * 2)) % 3 == 0) {
+                return;                                   // 倒されたあとは、光る線がちらついて消えかける
+            }
             VertexConsumer vc = buffers.getBuffer(GLOW[Mth.clamp(warden.phase(), 1, 3) - 1]);
             getParentModel().renderToBuffer(pose, vc, 0xF00000, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
         }

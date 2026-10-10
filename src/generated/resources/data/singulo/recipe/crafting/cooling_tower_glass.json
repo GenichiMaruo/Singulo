@@ -11,7 +11,7 @@
       "tag": "c:glass_blocks/colorless"
     },
     "P": {
-      "item": "singulo:steel_plate"
+      "tag": "c:plates/steel"
     }
   },
   "result": {

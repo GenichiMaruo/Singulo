@@ -136,13 +136,28 @@ public class ExplorerCompassItem extends SinguloItem {
                     Component.translatable("ruin.singulo." + rid)), true);
             return InteractionResultHolder.fail(stack);
         }
-        BlockPos p = found.getFirst();
+        BlockPos p = center(server, found.getFirst(), holder.get().value());
         stack.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(level.dimension(), p)), false));
         int dist = (int) Math.sqrt(player.blockPosition().distSqr(new BlockPos(p.getX(), player.getBlockY(), p.getZ())));
         player.displayClientMessage(Component.translatable("compass.singulo.found",
                 Component.translatable("ruin.singulo." + rid), dist), true);
         level.playSound(null, player.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 1.0F);
         return InteractionResultHolder.success(stack);
+    }
+
+    /**
+     * 見つかった遺構の、建物全体の中心（地面の高さはそのまま）。見つけた位置は配置の基準のチャンクなので、
+     * その構造物の始まりを読み、全体を囲む範囲の中心にする（読めなければ見つけた位置のまま）。
+     */
+    static BlockPos center(ServerLevel server, BlockPos found, Structure structure) {
+        net.minecraft.world.level.ChunkPos cp = new net.minecraft.world.level.ChunkPos(found);
+        var start = server.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.status.ChunkStatus.STRUCTURE_STARTS)
+                .getStartForStructure(structure);
+        if (start == null || !start.isValid()) {
+            return found;
+        }
+        BlockPos c = start.getBoundingBox().getCenter();
+        return new BlockPos(c.getX(), found.getY(), c.getZ());
     }
 
     @Override

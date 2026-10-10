@@ -1,9 +1,9 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t5",
-    "side": "singulo:block/machine_side_t5",
-    "bottom": "singulo:block/machine_bottom_t5",
+    "top": "singulo:block/wormhole_port_front_on",
+    "side": "singulo:block/wormhole_port_front_on",
+    "bottom": "singulo:block/wormhole_port_front_on",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/wormhole_port_front_on",
@@ -40,6 +40,10 @@
         "down": {
           "texture": "#bottom"
         }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
       }
     }
   ]

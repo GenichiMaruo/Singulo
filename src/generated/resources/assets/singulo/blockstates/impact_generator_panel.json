@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "singulo:block/impact_generator_panel"
+    },
+    "lit=true": {
+      "model": "singulo:block/impact_generator_panel_on"
+    }
+  }
+}

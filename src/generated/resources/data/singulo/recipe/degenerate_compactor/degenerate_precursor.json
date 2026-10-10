@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "degenerate_compactor",
+  "stage": 4,
+  "time": 200,
+  "energy": 20000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:compressed_block_2"
+      },
+      "count": 6
+    },
+    {
+      "ingredient": {
+        "item": "singulo:pressure_crystal"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_precursor",
+    "count": 1
+  }
+}

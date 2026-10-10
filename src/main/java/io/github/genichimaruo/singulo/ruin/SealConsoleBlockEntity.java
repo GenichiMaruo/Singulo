@@ -10,7 +10,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -41,7 +40,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
             for (int dy = -4; dy <= 4; dy++) {
                 for (int dz = -r; dz <= r; dz++) {
                     p.set(worldPosition.getX() + dx, worldPosition.getY() + dy, worldPosition.getZ() + dz);
-                    if (level.getBlockEntity(p) instanceof RuinCacheBlockEntity cache && cache.guardedByWarden()) {
+                    if (level.getBlockEntity(p) instanceof RuinCacheBlockEntity cache && cache.guarded() && "final_lab".equals(cache.ruin())) {
                         return cache;
                     }
                 }
@@ -86,10 +85,10 @@ public class SealConsoleBlockEntity extends BlockEntity {
         BlockPos spawn = worldPosition.above();
         w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
         w.awaken(worldPosition, worldPosition);
+        w.startEmerging();
         level.addFreshEntity(w);
         warden = w.getUUID();
         setChanged();
-        level.playSound(null, worldPosition, SoundEvents.WARDEN_EMERGE, SoundSource.HOSTILE, 2.0F, 0.7F);
         broadcast(level, "gui.singulo.console.awakened");
         return w;
     }
@@ -100,6 +99,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
         RuinCacheBlockEntity vault = vault(level);
         if (vault != null) {
             vault.setSealed(false);
+            level.playSound(null, vault.getBlockPos(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("vault.unseal"), net.minecraft.sounds.SoundSource.BLOCKS, 1.5F, 1.0F);
         }
         broadcast(level, "gui.singulo.console.defeated");
     }

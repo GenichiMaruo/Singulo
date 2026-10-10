@@ -1,5 +1,7 @@
 {
   "values": [
-    "singulo:horizon_warden"
+    "singulo:horizon_warden",
+    "singulo:echo_sentinel",
+    "singulo:gravity_remnant"
   ]
 }

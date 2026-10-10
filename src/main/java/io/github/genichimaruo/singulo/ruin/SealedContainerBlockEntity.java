@@ -49,7 +49,25 @@ import net.minecraft.world.phys.Vec3;
  * <p>
  * 遺構に置かれたコンテナは、初めて開いたときに loot table singulo:sealed/tier_N の中身が入る。
  */
-public class SealedContainerBlockEntity extends BaseContainerBlockEntity {
+public class SealedContainerBlockEntity extends BaseContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
+    private static final int[] NO_SLOTS = new int[0];
+
+    /** ホッパーなどからは、どの面からも出し入れできない（開けて手で取り出す）。 */
+    @Override
+    public int[] getSlotsForFace(net.minecraft.core.Direction side) {
+        return NO_SLOTS;
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @javax.annotation.Nullable net.minecraft.core.Direction side) {
+        return false;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, net.minecraft.core.Direction side) {
+        return false;
+    }
+
     public enum Phase { SEALED, UNSEALING, OPEN, SEALING }
 
     public static final int SIZE = 9;

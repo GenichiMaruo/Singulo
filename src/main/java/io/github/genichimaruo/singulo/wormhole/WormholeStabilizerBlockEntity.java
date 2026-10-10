@@ -24,26 +24,30 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * ワームホール固定化装置（段階5）。不安定な口を入れると、エキゾチック物質 MATTER_PER_MOUTH 個で喉を支え、
- * STABILIZE_TICKS で持ち運べる「ワームホールの口」（設置できる）にする。口は2つまで同時に扱える。
- * 固定化を始める前の口は時間切れで消える（始まれば装置が支える）。
- * 口・エキゾチック物質は手に持って右クリックか搬入で入れ、できた口は空の手で右クリックか搬出で受け取る。
+ * 口の筐体 CASING_PER_MOUTH 個に収めて、STABILIZE_TICKS で持ち運べる「ワームホールの口」（設置できる）にする。
+ * 口は2つまで同時に扱える。固定化を始める前の口は時間切れで消える（始まれば装置が支える）。
+ * 口・エキゾチック物質・筐体は手に持って右クリックか搬入で入れ、できた口は空の手で右クリックか搬出で受け取る。
  */
 public class WormholeStabilizerBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, net.minecraft.world.MenuProvider {
     public static final int STABILIZE_TICKS = 100;
     public static final int MATTER_PER_MOUTH = 2;
     public static final int FE_PER_TICK = 10_000;
+    public static final int CASING_PER_MOUTH = 1;
     public static final int SLOT_FUEL = 2;
+    public static final int SLOT_CASING = 3;
+    public static final int SLOTS = 4;
 
-    private final ItemStackHandler items = new ItemStackHandler(3) {
+    private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
         @Override
         public boolean isItemValid(int s, ItemStack stack) {
-            return s == SLOT_FUEL ? ExoticCharge.isExoticMatter(stack) : stack.getItem() instanceof UnstableMouthItem;
+            return s == SLOT_FUEL ? ExoticCharge.isExoticMatter(stack) : s == SLOT_CASING ? isCasing(stack)
+                    : stack.getItem() instanceof UnstableMouthItem;
         }
 
         @Override
         public int getSlotLimit(int s) {
-            return s == SLOT_FUEL ? 64 : 1;
+            return s >= SLOT_FUEL ? 64 : 1;
         }
 
         @Override
@@ -51,11 +55,11 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
             setChanged();
         }
     };
-    /** 搬入は不安定な口と燃料だけ、搬出はできた口だけ。 */
+    /** 搬入は不安定な口・燃料・筐体だけ、搬出はできた口だけ。 */
     private final IItemHandler automation = new IItemHandler() {
         @Override
         public int getSlots() {
-            return 3;
+            return SLOTS;
         }
 
         @Override
@@ -110,6 +114,12 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
         return stack.is(SinguloBlocks.WORMHOLE_MOUTH.get().asItem());
     }
 
+    /** 口の筐体（固定化した喉を収める入れ物）。 */
+    public static boolean isCasing(ItemStack stack) {
+        return !stack.isEmpty() && stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                io.github.genichimaruo.singulo.Singulo.id("wormhole_mouth_casing")));
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, WormholeStabilizerBlockEntity be) {
         boolean active = false;
         for (int i = 0; i < 2; i++) {
@@ -131,10 +141,12 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
                 items.setStackInSlot(i, ItemStack.EMPTY);
                 return false;
             }
-            if (items.getStackInSlot(SLOT_FUEL).getCount() < MATTER_PER_MOUTH || !energy.consume(FE_PER_TICK)) {
+            if (items.getStackInSlot(SLOT_FUEL).getCount() < MATTER_PER_MOUTH
+                    || items.getStackInSlot(SLOT_CASING).getCount() < CASING_PER_MOUTH || !energy.consume(FE_PER_TICK)) {
                 return false;
             }
             items.extractItem(SLOT_FUEL, MATTER_PER_MOUTH, false);
+            items.extractItem(SLOT_CASING, CASING_PER_MOUTH, false);
             progress[i] = 1;
             return true;
         }
@@ -154,9 +166,9 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
 
     @Override
     public boolean useItem(ServerPlayer player, ItemStack stack, InteractionHand hand) {
-        if (stack.getItem() instanceof UnstableMouthItem || ExoticCharge.isExoticMatter(stack)) {
+        if (stack.getItem() instanceof UnstableMouthItem || ExoticCharge.isExoticMatter(stack) || isCasing(stack)) {
             ItemStack rest = stack.copy();
-            for (int i = 0; i < 3 && !rest.isEmpty(); i++) {
+            for (int i = 0; i < SLOTS && !rest.isEmpty(); i++) {
                 rest = automation.insertItem(i, rest, false);
             }
             stack.setCount(rest.getCount());
@@ -191,10 +203,10 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
 
     @Override
     public void onBroken(Level level) {
-        // できた口と燃料は落とす（不安定な口は装置の外では保てない）
-        for (int i = 0; i < 3; i++) {
+        // できた口・燃料・筐体は落とす（不安定な口は装置の外では保てない）
+        for (int i = 0; i < SLOTS; i++) {
             ItemStack s = items.getStackInSlot(i);
-            if (i == SLOT_FUEL || isSealed(s)) {
+            if (i >= SLOT_FUEL || isSealed(s)) {
                 Block.popResource(level, worldPosition, s);
             }
         }
@@ -211,7 +223,12 @@ public class WormholeStabilizerBlockEntity extends BlockEntity implements Abstra
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        items.deserializeNBT(registries, tag.getCompound("items"));
+        // 筐体の枠がなかった頃の保存（3枠）も読めるように、一度別の入れ物に読んでから移す
+        ItemStackHandler saved = new ItemStackHandler(SLOTS);
+        saved.deserializeNBT(registries, tag.getCompound("items"));
+        for (int i = 0; i < SLOTS; i++) {
+            items.setStackInSlot(i, i < saved.getSlots() ? saved.getStackInSlot(i) : ItemStack.EMPTY);
+        }
         energy.setEnergy(tag.getInt("energy"));
         int[] p = tag.getIntArray("progress");
         for (int i = 0; i < Math.min(2, p.length); i++) {

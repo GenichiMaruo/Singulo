@@ -3,10 +3,12 @@
 プロジェクトを作ったあと、「Upload File」で入れる内容。
 
 ## File
-`build/libs/singulo-0.2.0.jar`（`./gradlew build` で作る）。
+`build/libs/Singulo-0.3.0-1.21.1N.jar`（`./gradlew build` で作る）。
 
 ## Display name
-Singulo 0.2.0 Beta
+Singulo-0.3.0-1.21.1N
+
+命名規則は `mod名-modバージョン-Minecraftバージョン＋ローダー記号`。`N` は NeoForge、`F` は Forge を表します。現在の対応ローダーは NeoForge です。Beta / Release は Release type で指定し、名前には入れません。
 
 ## Release type
 Beta
@@ -14,7 +16,7 @@ Beta
 新機能と探索・操作の変更を含むベータ版。安定したら Release にする。
 
 ## Changelog
-[changelog-0.2.0.md](changelog-0.2.0.md) の中身を貼る（Markdown）。
+[changelog-0.3.0.md](changelog-0.3.0.md) の中身を貼る（Markdown）。
 
 ## Game versions
 - Minecraft: 1.21.1

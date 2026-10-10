@@ -34,6 +34,12 @@
         "item": "minecraft:clock"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:sentinel_core"
+      },
+      "count": 1
     }
   ],
   "result": {

@@ -44,6 +44,7 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
         NeoForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
         NeoForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
+        NeoForge.EVENT_BUS.addListener(BossSounds::onClientTick);
         NeoForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
     }
@@ -70,10 +71,17 @@ public final class SinguloClient {
                 AcceleratorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CABLE.get(),
                 CableRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.KERAUNOS_TOWER.get(),
+                KeraunosTowerRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEALED_CONTAINER.get(),
                 SealedContainerRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.ECHO_SENTINEL.get(), EchoSentinelRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.GRAVITY_REMNANT.get(), GravityRemnantRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.GRAVITY_DEBRIS.get(), GravityDebrisRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ECHO_PROJECTOR.get(),
+                EchoProjectorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),
                 PenroseReactorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEAL_CONSOLE.get(),

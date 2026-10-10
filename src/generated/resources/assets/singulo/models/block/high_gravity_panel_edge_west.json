@@ -1,0 +1,67 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "singulo:block/high_gravity_panel",
+    "top": "singulo:block/high_gravity_panel_edge_top",
+    "bottom": "singulo:block/high_gravity_panel_edge_bottom",
+    "left": "singulo:block/high_gravity_panel_edge_left",
+    "right": "singulo:block/high_gravity_panel_edge_right"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#left",
+          "cullface": "up"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#left",
+          "cullface": "down"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#right",
+          "cullface": "north"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#left",
+          "cullface": "south"
+        }
+      }
+    }
+  ]
+}

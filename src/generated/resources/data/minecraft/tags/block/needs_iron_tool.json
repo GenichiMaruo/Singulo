@@ -1,10 +1,27 @@
 {
   "values": [
     "singulo:compressed_block_1",
+    "singulo:meteorite_crust",
+    "singulo:meteoric_iron_chunk",
+    "singulo:gravity_panel_receiver",
+    "singulo:impact_generator_panel",
+    "singulo:low_gravity_panel",
+    "singulo:high_gravity_panel",
     "singulo:compressed_block_2",
     "singulo:compressed_block_3",
     "singulo:compressed_metal_block_1",
     "singulo:compressed_metal_block_2",
-    "singulo:strange_matter"
+    "singulo:strange_matter",
+    "singulo:pristine_ruin_panel",
+    "singulo:pristine_ruin_tiles",
+    "singulo:pristine_ruin_pillar",
+    "singulo:pristine_ruin_light",
+    "singulo:white_panel",
+    "singulo:white_light_panel",
+    "singulo:black_reinforced_panel",
+    "singulo:white_glass_panel",
+    "singulo:white_star_glass_panel",
+    "singulo:black_reinforced_glass",
+    "singulo:black_star_glass"
   ]
 }

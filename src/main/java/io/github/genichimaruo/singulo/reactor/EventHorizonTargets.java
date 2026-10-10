@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 final class EventHorizonTargets {
     private EventHorizonTargets() {}
 
-    /** 地平線の向こうから戻ってきた記録片の印（戻った時刻）。しばらくは引き寄せない。 */
+    /** 地平線の向こうから戻ってきたクリスタルメモリの印（戻った時刻）。しばらくは引き寄せない。 */
     static final String RETURNED = "singulo_returned";
     static final long RETURN_GRACE = 600;
 

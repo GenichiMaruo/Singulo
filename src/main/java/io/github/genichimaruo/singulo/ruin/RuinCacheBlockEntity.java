@@ -35,7 +35,25 @@ import net.minecraft.world.phys.Vec3;
  * 初回だけ singulo:ruins/&lt;遺構ID&gt;_first も入れる（休眠した特異点の種など一回限りのもの）。
  * 再生の判定は開いたときに行うので、毎tickの負荷はない。
  */
-public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
+public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements net.minecraft.world.WorldlyContainer {
+    private static final int[] NO_SLOTS = new int[0];
+
+    /** ホッパーなどからは、どの面からも出し入れできない（開けて手で取り出す）。 */
+    @Override
+    public int[] getSlotsForFace(net.minecraft.core.Direction side) {
+        return NO_SLOTS;
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @javax.annotation.Nullable net.minecraft.core.Direction side) {
+        return false;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, net.minecraft.core.Direction side) {
+        return false;
+    }
+
     public static final int SIZE = 27;
     public static final long TICKS_PER_DAY = 24_000;
 
@@ -44,6 +62,8 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
     private boolean filledOnce;
     /** 空になったのに気づいたゲーム時刻。-1 なら中身がある（または未確認）。 */
     private long emptiedAt = -1;
+    /** プレイヤーが置いた（壊して置き直した）保管庫。中身を入れない・再生しない。 */
+    private boolean placedByPlayer;
 
     public RuinCacheBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.RUIN_CACHE.get(), pos, state);
@@ -58,7 +78,17 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
         setChanged();
     }
 
-    /** 力場で封鎖されているか（最終実験施設の保管庫は守護機を倒すまで）。 */
+    /** プレイヤーが置いた印をつける（遺構の構造物として置かれたものには付かない）。 */
+    public void markPlacedByPlayer() {
+        placedByPlayer = true;
+        setChanged();
+    }
+
+    public boolean placedByPlayer() {
+        return placedByPlayer;
+    }
+
+    /** 力場で封鎖されているか（番人に守られた保管庫は、番人を倒すまで）。 */
     public boolean isSealed() {
         return getBlockState().hasProperty(RuinCacheBlock.SEALED) && getBlockState().getValue(RuinCacheBlock.SEALED);
     }
@@ -69,9 +99,12 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
         }
     }
 
-    /** 再生したら封鎖し直す遺構（守護機に守られたもの）。 */
-    public boolean guardedByWarden() {
-        return "final_lab".equals(ruin);
+    /** 番人に守られた遺構（研究棟・封鎖培養施設はボス部屋の番人、最終実験施設は守護機）。 */
+    public static final java.util.Set<String> GUARDED = java.util.Set.of("research_building", "culture_facility", "final_lab");
+
+    /** 番人に守られた保管庫か。倒すまで封鎖され、再生したら封鎖し直す。 */
+    public boolean guarded() {
+        return GUARDED.contains(ruin);
     }
 
     /** 再生までの tick 数。0 以下なら再生しない。 */
@@ -93,7 +126,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
 
     /** 初回なら中身を入れ、空で再生の時期を過ぎていれば入れ直す。now はゲーム時刻。 */
     public void refillIfDue(ServerLevel level, long now) {
-        if (ruin.isEmpty()) {
+        if (ruin.isEmpty() || placedByPlayer) {
             return;
         }
         if (!filledOnce) {
@@ -137,8 +170,8 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
                 count -= n;
             }
         }
-        // 再生した中身は、守護機を倒し直すまで取り出せない
-        if (!first && guardedByWarden()) {
+        // 再生した中身は、番人を倒し直すまで取り出せない
+        if (!first && guarded()) {
             setSealed(true);
         }
         filledOnce = true;
@@ -201,6 +234,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
         tag.putString("ruin", ruin);
         tag.putBoolean("filled", filledOnce);
         tag.putLong("emptied_at", emptiedAt);
+        tag.putBoolean("placed", placedByPlayer);
     }
 
     @Override
@@ -211,5 +245,6 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity {
         ruin = tag.getString("ruin");
         filledOnce = tag.getBoolean("filled");
         emptiedAt = tag.contains("emptied_at") ? tag.getLong("emptied_at") : -1;
+        placedByPlayer = tag.getBoolean("placed");
     }
 }

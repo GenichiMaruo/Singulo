@@ -54,7 +54,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  *   <li>成長と蒸発: 投入した質量の10%が炉心質量になる（上限5000）。ホーキング放射で質量は 0.006/(M/1000)² /秒 ずつ減り、
  *       100 を割ると蒸発が暴走してバーストする</li>
  *   <li>スピン: 目標スピンまで、蓄電から最大 SPIN_POWER/t を使って回す（角運動量インジェクター）</li>
- *   <li>副産物: ジェット・コレクター（発電中、1基につき1分に1個のジェット凝縮体）、ホーキング・コレクター（質量150〜400で
+ *   <li>副産物: ジェット・コレクター（発電中、1基につき1分に1個のジェット凝縮体）、ホーキング・コレクター（質量150〜HAWKING_MAX_MASS（500）で
  *       5分に1個のホーキング凝縮体）、エルゴスフィア・リング（スピン0.7以上・質量400〜2000で1分に1個のエキゾチック物質。スピンが減る）</li>
  *   <li>危険: 引力帯（半径 blackHolePullRadius）と潮汐帯（半径 tidalDamageRadius、防具を無視）</li>
  * </ul>
@@ -65,6 +65,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public enum Mode { POWER, CATALYST, ERGO, STANDBY, DANGER }
 
     public static final double START_MASS = 500;
+    /** ホーキング凝縮体ができる質量の上限。点火直後（START_MASS）から作れるように、初期質量と同じにする。 */
+    public static final double HAWKING_MAX_MASS = START_MASS;
     public static final double MAX_MASS = 5000;
     public static final double BURST_MASS = 100;
     public static final double PELLET_MASS = 16;
@@ -130,6 +132,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
 
     /** 炉心がある（稼働中の）リアクター（ワールドごと）。ハロー捕集器が探す。 */
     private static final java.util.Map<Level, java.util.Set<PenroseReactorBlockEntity>> RUNNING = new java.util.WeakHashMap<>();
+
+    /** 稼働中のリアクターの位置（そのワールドの全部。テストの後片付け用）。 */
+    public static java.util.List<BlockPos> runningPositions(Level level) {
+        java.util.Set<PenroseReactorBlockEntity> set = RUNNING.get(level);
+        return set == null ? java.util.List.of() : set.stream().map(BlockEntity::getBlockPos).toList();
+    }
 
     /** pos から radius 以内に炉心の中心がある稼働中のリアクターのうち、いちばん近いもの。 */
     @Nullable
@@ -221,7 +229,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (mass < 150) {
             return Mode.DANGER;
         }
-        if (mass <= 400) {
+        if (mass <= HAWKING_MAX_MASS) {
             return Mode.CATALYST;
         }
         if (spin >= 0.7 && mass <= 2000) {
@@ -446,7 +454,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             jetTimer -= JET_TICKS;
             output(new ItemStack(item("jet_condensate")));
         }
-        if (mass >= 150 && mass <= 400 && !items.getStackInSlot(SLOT_HAWKING).isEmpty() && ++hawkingTimer >= HAWKING_TICKS) {
+        if (mass >= 150 && mass <= HAWKING_MAX_MASS && !items.getStackInSlot(SLOT_HAWKING).isEmpty() && ++hawkingTimer >= HAWKING_TICKS) {
             hawkingTimer = 0;
             output(new ItemStack(item("hawking_condensate")));
         }
@@ -642,13 +650,13 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         return 0;
     }
 
-    /** 地平線の向こうから記録片が戻ってくる確率（モブ1体・アイテム1つあたり）。 */
+    /** 地平線の向こうからクリスタルメモリが戻ってくる確率（モブ1体・アイテム1つあたり）。 */
     public static final double RECORD_FROM_MOB = 0.03;
     public static final double RECORD_FROM_ITEM = 0.005;
 
     /**
-     * 飲み込んだものから、まれに旧文明の記録片が戻ってくる（地平線の縁から外へ弾き出される）。
-     * 戻ってきた記録片はしばらく引き寄せられない。
+     * 飲み込んだものから、まれに旧文明のクリスタルメモリが戻ってくる（地平線の縁から外へ弾き出される）。
+     * 戻ってきたクリスタルメモリはしばらく引き寄せられない。
      */
     public static void returnRecord(ServerLevel level, Entity swallowed, Vec3 c, double horizon) {
         double chance = swallowed instanceof LivingEntity ? RECORD_FROM_MOB

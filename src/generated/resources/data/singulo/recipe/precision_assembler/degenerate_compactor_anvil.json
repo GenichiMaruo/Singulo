@@ -7,13 +7,19 @@
   "ingredients": [
     {
       "ingredient": {
-        "item": "singulo:steel_plate"
+        "tag": "c:plates/steel"
       },
-      "count": 4
+      "count": 2
     },
     {
       "ingredient": {
         "tag": "c:obsidians"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:pressure_crystal"
       },
       "count": 2
     }

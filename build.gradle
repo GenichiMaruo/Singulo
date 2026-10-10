@@ -12,7 +12,11 @@ sourceSets.main.resources.srcDir('src/generated/resources')
 sourceSets.main.java.srcDir('src/generated/java')
 
 base {
-    archivesName = mod_id
+    archivesName = mod_name
+}
+
+tasks.named('jar', Jar) {
+    archiveFileName = "${mod_name}-${mod_version}-${minecraft_version}${mod_loader_suffix}.jar"
 }
 
 // Minecraft 1.21.1 ships Java 21, so compile and run with a Java 21 toolchain.

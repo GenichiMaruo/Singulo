@@ -16,6 +16,12 @@
         "item": "singulo:basic_circuit"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:coolant_cartridge"
+      },
+      "count": 1
     }
   ],
   "result": {

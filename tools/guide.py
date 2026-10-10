@@ -49,18 +49,41 @@ CHAPTERS = [
          '2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic.\n'
          '3. Make basic circuits and basic frames. Most machines need these.'),
         ('power', '最初の電源',
-         '「熱電発電機」は、高温のブロックと低温のブロックに挟むと温度差で発電します。'
-         '溶岩・マグマブロック・燃えている焚き火や焼成炉を片側に、水や氷をもう片側に置きます。温度差が大きいほど出力が上がります。\n'
+         '「熱電発電機」は、高温のブロックと低温のブロックに挟むと温度差で発電します（温度差1Kにつき0.10 FE/t）。'
+         'マグマブロック・燃えている焚き火や焼成炉を片側に、青氷や氷塊をもう片側に置きます。\n'
+         '低温のブロックには保てる温度差があり、超えると溶けて別のブロックに変わります（水は蒸発します）。'
+         '溶けない組み合わせは次のページを見てください。\n'
          '電力は銅導線でつなぎます。長くつなぐと少しずつ損失があります。',
          'First power',
-         'The Thermoelectric Generator produces power from a temperature difference: put something hot (lava, a lit '
-         'kiln, a campfire) on one side and something cold (water, ice) on the other.\n'
+         'The Thermoelectric Generator produces power from a temperature difference (0.10 FE/t per kelvin): put something hot '
+         '(a magma block, a lit campfire or kiln) on one side and something cold (blue ice, packed ice) on the other.\n'
+         'Each cold block only tolerates so much difference; beyond that it melts into another block (water evaporates). '
+         'See the next page for pairs that last.\n'
          'Connect machines with copper wire.'),
+        ('thermal_pairs', '溶けない組み合わせ',
+         '低温のブロックが溶けずに使い続けられる組み合わせ（発電機1台の出力）:\n'
+         '・マグマブロック＋青氷: 約76 FE/t（いちばんおすすめ）\n'
+         '・焼成炉（稼働中）＋青氷: 約66 FE/t\n'
+         '・焚き火＋青氷: 約56 FE/t\n'
+         '・焚き火＋氷塊: 約55 FE/t\n'
+         '溶岩は熱すぎて、青氷でも約40秒で氷塊に変わり、さらに溶けていきます。焚き火に水・雪・氷を合わせると、1分足らずで溶けます。\n'
+         '段階2の極低温冷却塔（液体窒素で240 FE/t）を動かすには、マグマブロック＋青氷で4台以上、焚き火＋氷塊なら5台以上が目安です'
+         '（銅導線の損失は含めていません）。',
+         'Pairs that last',
+         'Pairs whose cold block never melts (output of one generator):\n'
+         '- Magma block + blue ice: about 76 FE/t (best)\n'
+         '- Running kiln + blue ice: about 66 FE/t\n'
+         '- Campfire + blue ice: about 56 FE/t\n'
+         '- Campfire + packed ice: about 55 FE/t\n'
+         'Lava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them '
+         'in under a minute.\n'
+         'To run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with '
+         'campfire + packed ice (before copper wire losses).'),
         ('machines', '段階1の装置',
          '・焼成炉: セラミック基板などを焼く。鋼鉄も速く焼ける。\n'
          '・圧縮機: 鋼板を作る。質量モードでは質量値のある素材を「質量」に変えて圧縮ブロックや質量ペレットにする。\n'
          '・電解槽: 水を水素と酸素に分ける。\n'
-         '・アーカイブ端末: 遺構の記録をデータカードに書き写し、劣化した部品を修復する。記録片の解読もできる。',
+         '・アーカイブ端末: 遺構の記録をデータカードに書き写し、劣化した部品を修復する。クリスタルメモリの解読もできる。',
          'Stage 1 machines',
          '- Kiln: fires ceramic boards and steel.\n- Compressor: plates, and mass mode for compressed blocks.\n'
          '- Electrolyzer: water to hydrogen and oxygen.\n- Archive Terminal: copies records, restores parts, decodes fragments.'),
@@ -236,19 +259,47 @@ CHAPTERS = [
          'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'
          ' Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.'),
         ('wormhole', 'ワームホール',
-         '唯一の無線化。生成器で一対の口を作り、60秒以内に固定化して、片方を運んで置きます。'
-         '口から8ブロック以内のワームホール・ポート同士が、電力・アイテム・液体を直結します。エキゾチック物質で維持します。',
+         '唯一の無線化。生成器で一対の口を作り、60秒以内に固定化装置でエキゾチック物質と口の筐体を使って固定化し、片方を運んで置きます。'
+         '口から8ブロック以内のワームホール・ポートは、向こう側の口の近くにある同じポート番号（0〜127、画面の7つの丸で決める）のポートとつながり、'
+         '電力・アイテム・液体を直結します。1つの口で働けるポートは喉の大きさで 8・32・128 個まで（口に近い順）で、働いているポートは光ります。'
+         '通せる量も喉の大きさで決まり、7×7 では上限がなくなります。口はエキゾチック物質で維持し、切れると閉じて休みます。'
+         '初めて置いたときは5分間、燃料なしで開いています。',
          'Wormholes',
-         'The only wireless link. Generate, stabilize, carry and place the mouths; ports near them link machines.'),
+         'The only wireless link. Generate a pair of mouths, stabilize them within 60 s using exotic matter and a mouth casing, then carry one away and place it.'
+         ' A port within 8 blocks of a mouth links to the port with the same number (0-127, set with the seven circles in its screen) near the twin mouth, joining power, items and fluids.'
+         ' Each mouth runs 8, 32 or 128 ports depending on its throat size, nearest first, and active ports glow. Throughput also grows with the throat and is unlimited at 7x7.'
+         ' Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.'),
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
         ('list', '4つの遺構',
          '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
-         '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と電子ロック。冷却原子トラップ・量子データ片（7日）。\n'
-         '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機。時間結晶の種・培養データ（14日）。\n'
+         '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。冷却原子トラップ・量子データ片（7日）。\n'
+         '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。時間結晶の種・培養データ（14日）。\n'
          '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。',
          'The four ruins',
          'Observation Post, Research Building, Culture Facility, Final Lab — each guards loot for one catalyst tier.'),
+        ('bosses', '遺構の番人',
+         '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。'
+         '番人は部屋から挑戦者がいなくなると元に戻ります。\n'
+         '・残響の番人（研究棟の記録保管室）: 部屋に入ると現れる警備ホログラム。宙を回りながら追いかける光弾を撃ち、'
+         'しばらく見ていないと背後へ跳んで斬りつけてきます（跳ぶ前に光が集まる）。残響投影器は番人を守るだけでなく、一斉に光の槍も撃ちます'
+         '（金色の狙いの線が出たら動くこと）。足元に光の陣が映ったら、柱が立つ前に陣の外へ。投影器が残っているほど攻撃が通りにくいので、先に壊すこと。'
+         '体力が半分を切ると、1撃で消える分身を呼びます。投影器の光は本体にしか伸びません。番人の投影核を落とします。\n'
+         '・重力の澱（封鎖培養施設の隔離槽室）: 封じ込め槽を破って出てくる黒い核。瓦礫の殻がある間は1撃ごとに殻が1つ剥がれる代わりにダメージが小さく、'
+         '殻の瓦礫を撃ち出します。周りの相手を浮かせてから床へ叩きつけるので、重力ブーツや衝撃発電パネルがあると楽です。'
+         '体力が半分を切ると重力井戸ができ、核へ引き寄せられます（核に触れると傷つく）。縮退核を落とします。\n'
+         '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。',
+         'Ruin guardians',
+         'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. '
+         'When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n'
+         '- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you '
+         'to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys '
+         '(move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it '
+         'summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n'
+         '- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts '
+         'it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, '
+         'so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n'
+         '- Horizon Warden (Final Lab): touch the central Seal Console to wake it.'),
         ('compass', '探索コンパスの調整',
          '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
          '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設）も探せるようになります。'
@@ -263,11 +314,26 @@ CHAPTERS = [
          '封印中のコンテナを無理に壊すと、中身ごと失われます。段階が進めば自分でもコンテナを作れ、鍵を持ってスニークして使うと封印できます。',
          'Sealed containers',
          'Each ruin hides a sealed container that opens only with the key of the next stage: magnetic, quantum, temporal, then singularity. Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. You can craft containers too, and sneak-use a key to seal one.'),
-        ('records', '記録片',
-         '遺構の保管庫からときどき「記録片」が出ます。アーカイブ端末で電力を使って解読すると、旧文明の記録が読めます'
+        ('records', 'クリスタルメモリ',
+         '遺構の保管庫からときどき「クリスタルメモリ」が出ます。アーカイブ端末で電力を使って解読すると、旧文明の記録が読めます'
          '（ハンドブックの「旧文明の記録」の章に追加されます）。全部集めると、文明が滅んだ理由が分かります。',
-         'Record fragments',
-         'Ruin caches sometimes hold record fragments. Decode them in the Archive Terminal to unlock the Ancient Records chapter.'),
+         'Crystal memories',
+         'Ruin caches sometimes hold crystal memories. Decode them in the Archive Terminal to unlock the Ancient Records chapter.'),
+        ('gathering', 'その場所でしか採れない素材',
+         '・隕石クレーター（平原・砂漠・森などの地表）: 差し渡し10ブロックほどの浅いすり鉢の中心に、半分埋まった隕石があります。'
+         '隕鉄塊（鉄以上のツルハシ）から隕鉄の原石、黒い溶融殻に育つ星屑の結晶から星屑が採れます。星屑の結晶は、クレーターに最初からある殻にだけ、少しずつ育ち直します。\n'
+         '・雷ガラス: 雷が砂に落ちると、砂が雷ガラス塊になります。避雷針を砂の上に立てておくと、雷雨のたびに避雷針の下にできます。'
+         '段階3のケラウノス放電塔があれば、電力で人工の雷を避雷針へ撃って、いつでも作れます。\n'
+         '・高圧結晶（段階3）: 深海圧力収集器を、真上に水が16ブロック以上ある海底に置くと、水圧で少しずつできます（深いほど速い）。\n'
+         '・虚空の塵（段階4〜5）: 虚空捕集器を、ジ・エンドで真下が奈落まで何もない所に置くと集まります。',
+         'Materials found in one place',
+         '- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. '
+         'Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. '
+         'Clusters slowly regrow, but only on crust still in its crater.\n'
+         '- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. '
+         'The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n'
+         '- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n'
+         '- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.'),
     ]),
     ('romance', 'singulo:tipler_core', '特異点技術', 'Singularity Tech', [
         ('shield', 'イベントホライズン・シールド',

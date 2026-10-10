@@ -20,6 +20,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT;
     public static final ModConfigSpec.LongValue PENROSE_ENERGY_PER_PELLET;
     public static final ModConfigSpec.IntValue WORMHOLE_GENERATOR_POWER;
+    public static final ModConfigSpec.IntValue GRAVITY_PANEL_POWER;
     public static final ModConfigSpec.LongValue PENROSE_MAX_OUTPUT;
     public static final ModConfigSpec.DoubleValue EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS;
     public static final ModConfigSpec.LongValue IGNITION_ENERGY;
@@ -89,6 +90,7 @@ public final class ServerConfig {
         ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT_;
         ModConfigSpec.LongValue PENROSE_ENERGY_PER_PELLET_;
         ModConfigSpec.IntValue WORMHOLE_GENERATOR_POWER_;
+        ModConfigSpec.IntValue GRAVITY_PANEL_POWER_;
         ModConfigSpec.LongValue PENROSE_MAX_OUTPUT_;
         ModConfigSpec.DoubleValue EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS_;
         ModConfigSpec.LongValue IGNITION_ENERGY_;
@@ -163,7 +165,7 @@ public final class ServerConfig {
         b.comment("すべての発電機の出力倍率", "範囲: 0.1〜100.0");
         GENERATOR_OUTPUT_MULTIPLIER_ = b.defineInRange("generatorOutputMultiplier", 1.0, 0.1, 100.0);
         b.comment("熱電発電機の温度差1Kあたり出力", "範囲: 0.001〜10.0（FE/t・K）");
-        THERMOELECTRIC_COEFFICIENT_ = b.defineInRange("thermoelectricCoefficient", 0.08, 0.001, 10.0);
+        THERMOELECTRIC_COEFFICIENT_ = b.defineInRange("thermoelectricCoefficient", 0.1, 0.001, 10.0);
         b.comment("極低温タービンの出力", "範囲: 1〜1,000,000（FE/t）");
         CRYO_TURBINE_OUTPUT_ = b.defineInRange("cryoTurbineOutput", 5000, 1, 1000000);
         b.comment("量子熱機関の出力", "範囲: 1〜100,000,000（FE/t）");
@@ -174,6 +176,8 @@ public final class ServerConfig {
         PENROSE_ENERGY_PER_PELLET_ = b.defineInRange("penroseEnergyPerPellet", 20000000000L, 1L, Long.MAX_VALUE);
         b.comment("ワームホール生成器が10秒のあいだ毎tick必要とする電力", "範囲: 1〜2000000000（FE/t）");
         WORMHOLE_GENERATOR_POWER_ = b.defineInRange("wormholeGeneratorPower", 100000000, 1, 2000000000);
+        b.comment("重力パネル1枚が働くのに毎tick必要な電力", "範囲: 0〜1,000,000（FE/t）");
+        GRAVITY_PANEL_POWER_ = b.defineInRange("gravityPanelPower", 40, 0, 1000000);
         b.comment("Pリアクターの出力上限", "範囲: 1〜（FE/t）");
         PENROSE_MAX_OUTPUT_ = b.defineInRange("penroseMaxOutput", 2100000000L, 1L, Long.MAX_VALUE);
         b.comment("エディントン限界（炉心質量1,000あたり毎秒の投入上限）", "範囲: 0.1〜100.0");
@@ -206,12 +210,12 @@ public final class ServerConfig {
         UNDERPOWER_CONSUMPTION_ = b.defineInRange("underpowerConsumption", 1.5, 1.0, 10.0);
         b.comment("失活触媒から1ティア下の原料を回収できる割合", "範囲: 0.0〜1.0");
         SPENT_RECYCLE_RATIO_ = b.defineInRange("spentRecycleRatio", 0.25, 0.0, 1.0);
-        b.comment("時間結晶の育成に要る稼働tick（既定20分）", "範囲: 20〜1,000,000（tick）");
-        TIME_CRYSTAL_GROWTH_TICKS_ = b.defineInRange("timeCrystalGrowthTicks", 24000, 20, 1000000);
+        b.comment("時間結晶の育成に要る稼働tick（既定12分）", "範囲: 20〜1,000,000（tick）");
+        TIME_CRYSTAL_GROWTH_TICKS_ = b.defineInRange("timeCrystalGrowthTicks", 14400, 20, 1000000);
         b.pop();
         b.push("compression");
         b.comment("縮退物質殻1個に要る岩石の圧縮ブロックLv3", "範囲: 0〜9（整数）");
-        SHELL_ROCK_LV3_ = b.defineInRange("shellRockLv3", 8, 0, 9);
+        SHELL_ROCK_LV3_ = b.defineInRange("shellRockLv3", 4, 0, 9);
         b.comment("縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）", "範囲: 0〜9（整数）");
         SHELL_METAL_CORES_ = b.defineInRange("shellMetalCores", 2, 0, 9);
         b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素", "範囲: 0〜1,000,000（mB）");
@@ -241,7 +245,7 @@ public final class ServerConfig {
         b.comment("自動探査機の回収量（手動遠征比）", "範囲: 0.0〜1.0");
         PROBE_YIELD_MULTIPLIER_ = b.defineInRange("probeYieldMultiplier", 0.5, 0.0, 1.0);
         b.comment("ホライズン・ウォーデンのHP", "範囲: 1〜100,000");
-        WARDEN_HEALTH_ = b.defineInRange("wardenHealth", 800, 1, 100000);
+        WARDEN_HEALTH_ = b.defineInRange("wardenHealth", 1200, 1, 100000);
         b.comment("挑戦者が離れたら全回復するか", "範囲: true / false");
         WARDEN_RESET_ON_LEAVE_ = b.define("wardenResetOnLeave", true);
         b.pop();
@@ -308,6 +312,7 @@ public final class ServerConfig {
         DEGENERATE_FURNACE_OUTPUT = DEGENERATE_FURNACE_OUTPUT_;
         PENROSE_ENERGY_PER_PELLET = PENROSE_ENERGY_PER_PELLET_;
         WORMHOLE_GENERATOR_POWER = WORMHOLE_GENERATOR_POWER_;
+        GRAVITY_PANEL_POWER = GRAVITY_PANEL_POWER_;
         PENROSE_MAX_OUTPUT = PENROSE_MAX_OUTPUT_;
         EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS = EDDINGTON_PELLETS_PER_SECOND_PER1000_MASS_;
         IGNITION_ENERGY = IGNITION_ENERGY_;

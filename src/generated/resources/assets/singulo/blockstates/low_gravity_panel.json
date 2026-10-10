@@ -1,0 +1,68 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "powered": "false"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_base"
+      }
+    },
+    {
+      "when": {
+        "powered": "true"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_base_on"
+      }
+    },
+    {
+      "when": {
+        "north": "false"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_edge_north"
+      }
+    },
+    {
+      "when": {
+        "south": "false"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_edge_south"
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_edge_east"
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_edge_west"
+      }
+    },
+    {
+      "when": {
+        "up": "false"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_edge_up"
+      }
+    },
+    {
+      "when": {
+        "down": "false"
+      },
+      "apply": {
+        "model": "singulo:block/low_gravity_panel_edge_down"
+      }
+    }
+  ]
+}

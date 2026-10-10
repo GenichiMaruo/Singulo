@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "entanglement_synthesizer",
+  "stage": 4,
+  "time": 800,
+  "energy": 4000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:amethyst_shard"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:cold_atoms"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:phase_sync_plate",
+    "count": 1
+  }
+}

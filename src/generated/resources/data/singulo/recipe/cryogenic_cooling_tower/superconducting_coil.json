@@ -3,7 +3,7 @@
   "station": "cryogenic_cooling_tower",
   "stage": 2,
   "time": 600,
-  "energy": 400,
+  "energy": 300,
   "ingredients": [
     {
       "ingredient": {
@@ -19,7 +19,7 @@
     },
     {
       "ingredient": {
-        "item": "singulo:steel_plate"
+        "tag": "c:plates/steel"
       },
       "count": 2
     },

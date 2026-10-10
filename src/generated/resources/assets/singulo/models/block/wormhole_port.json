@@ -1,9 +1,9 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "top": "singulo:block/machine_top_t5",
-    "side": "singulo:block/machine_side_t5",
-    "bottom": "singulo:block/machine_bottom_t5",
+    "top": "singulo:block/wormhole_port_front",
+    "side": "singulo:block/wormhole_port_front",
+    "bottom": "singulo:block/wormhole_port_front",
     "glass": "singulo:block/machine_glass",
     "inner": "singulo:block/machine_inner",
     "front": "singulo:block/wormhole_port_front",

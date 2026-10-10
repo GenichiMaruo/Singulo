@@ -10,7 +10,7 @@ import net.minecraft.world.inventory.Slot;
 
 /**
  * ワームホール固定化装置の専用画面。深い宇宙の暗い盤に星がまたたき、真ん中でワームホールの渦が回る（動いている間は速く明るく）。
- * 左右の喉（水色・赤紫）は、固定化が進むほど周りの光点が灯る。下は燃料（エキゾチック物質）、右は電力。
+ * 左右の喉（水色・赤紫）は、固定化が進むほど周りの光点が灯る。下は燃料（エキゾチック物質）と口の筐体、右は電力。
  */
 public class WormholeStabilizerScreen extends AbstractContainerScreen<WormholeStabilizerMenu> {
     private static final int BG = 0xFF090C17;
@@ -81,9 +81,11 @@ public class WormholeStabilizerScreen extends AbstractContainerScreen<WormholeSt
         }
         int[] fuel = WormholeStabilizerMenu.SLOT_POS[2];
         slot(g, x + fuel[0], y + fuel[1], 0xFF8A70D0);
+        int[] casing = WormholeStabilizerMenu.SLOT_POS[3];
+        slot(g, x + casing[0], y + casing[1], 0xFFB8C4E0);
         energyBar(g, x + BAR_X, y + BAR_Y, t);
         for (Slot s : menu.slots) {
-            if (s.index >= 3) {
+            if (s.index >= io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity.SLOTS) {
                 slot(g, x + s.x, y + s.y, 0xFF2E3658);
             }
         }
@@ -226,5 +228,7 @@ public class WormholeStabilizerScreen extends AbstractContainerScreen<WormholeSt
         int[] f = WormholeStabilizerMenu.SLOT_POS[2];
         Component fuel = Component.translatable("gui.singulo.stabilizer.fuel");
         g.drawString(font, fuel, f[0] - 6 - font.width(fuel), f[1] + 4, DIM, false);
+        int[] c = WormholeStabilizerMenu.SLOT_POS[3];
+        g.drawString(font, Component.translatable("gui.singulo.stabilizer.casing"), c[0] + 22, c[1] + 4, DIM, false);
     }
 }

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCP",
+    "COC",
+    "PCP"
+  ],
+  "key": {
+    "P": {
+      "tag": "c:plates/steel"
+    },
+    "C": {
+      "item": "minecraft:coal"
+    },
+    "O": {
+      "tag": "c:obsidians"
+    }
+  },
+  "result": {
+    "id": "singulo:black_reinforced_panel",
+    "count": 8
+  }
+}

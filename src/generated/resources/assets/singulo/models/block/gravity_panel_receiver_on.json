@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "singulo:block/gravity_panel_receiver_top_on",
+    "bottom": "singulo:block/white_panel",
+    "side": "singulo:block/gravity_panel_receiver_on"
+  }
+}

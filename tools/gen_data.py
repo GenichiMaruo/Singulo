@@ -27,7 +27,7 @@ from recipes import (RECIPES, ORDER, EXPLORE, REPAIR, RESTORED, CARDS, STAGE_NAM
                      REPAIR_WEAR, MAX_REPAIRS, ASSEMBLER_MAX_KINDS, WORKBENCH_MAX_ITEMS)
 import config_spec  # noqa: E402
 import ruins  # noqa: E402
-from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG,  # noqa: E402
+from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
                  STATIONS, STAGE_COLORS, SPENT, ACCEPTS_SPENT, MIN_SIZE)
 
 MODID = 'singulo'
@@ -57,7 +57,8 @@ def mid(name):
 
 FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
-BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container')
+BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
+               'boss_block')
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
@@ -75,8 +76,9 @@ def stage_of(name):
             return stage_of(cat)
     # レシピのないもの（封印コンテナからしか出ないものは、そのコンテナの鍵の段階）
     return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
-            '次元ポケット': 5, '封印記録': 5, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
-            '遺構の照明（紅）': 5}.get(name, 1)
+            '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
+            '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
+            '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4}.get(name, 1)
 
 
 def max_uses(name):
@@ -102,6 +104,8 @@ def resolve(name):
         return ('mass', MASS_INPUTS[name])
     if name == '鋼鉄インゴット':
         return ('tag', STEEL_TAG[1:])
+    if name == '鋼板':
+        return ('tag', STEEL_PLATE_TAG[1:])
     if name in OUTPUT_ALIASES:
         return ('item', OUTPUT_ALIASES[name])
     if name in VANILLA:
@@ -431,8 +435,8 @@ UI_LANG = {
     'gui.singulo.handbook.next': ('次の目標', 'Next goals'),
     'gui.singulo.handbook.done_count': ('達成 %s / %s', 'Completed %s / %s'),
     'gui.singulo.handbook.locked': ('？？？', '???'),
-    'gui.singulo.handbook.no_records': ('まだ解読した記録がない。遺構で記録片を探し、アーカイブ端末で解読しよう。',
-                                        'No records decoded yet. Find record fragments in ruins and decode them in the Archive Terminal.'),
+    'gui.singulo.handbook.no_records': ('まだ解読した記録がない。遺構でクリスタルメモリを探し、アーカイブ端末で解読しよう。',
+                                        'No records decoded yet. Find crystal memories in ruins and decode them in the Archive Terminal.'),
     'message.singulo.record_read': ('旧文明の記録「%s」を読んだ。ハンドブックの「旧文明の記録」で読める', 'You read the ancient record "%s". Find it in the handbook'),
     'message.singulo.records_complete': ('旧文明の記録はすべて読んだ', 'You have read every ancient record'),
     'message.singulo.strangelet_contained': ('ストレンジレットを磁気瓶に封じ込めた', 'Strangelet contained'),
@@ -445,6 +449,19 @@ UI_LANG = {
     'message.singulo.stabilizer.need_catalyst': ('もう片方の手に触媒を持って使う', 'Hold a catalyst in your other hand'),
     'message.singulo.stabilizer.already': ('この触媒はもう安定化してある', 'This catalyst is already stabilized'),
     'message.singulo.stabilizer.done': ('触媒を安定化した（残りの寿命が2倍）', 'Catalyst stabilized: remaining life doubled'),
+    'message.singulo.gravity_receiver.status': ('重力パネル %s / %s 枚が働いている（1枚 %s FE/t）', 'Gravity panels active: %s / %s (%s FE/t each)'),
+    'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が働いている', 'Stored %s / %s FE, gravity panels active: %s / %s'),
+    'message.singulo.deep_sea_collector.idle': ('水深が足りない（真上に水が16ブロック以上要る）', 'Not deep enough: needs 16+ blocks of water above'),
+    'message.singulo.deep_sea_collector.rate': ('水圧 %s%%: 高圧結晶が約%s秒に1個できる', 'Pressure %s%%: one Pressure Crystal every %ss'),
+    'message.singulo.void_collector.idle': ('ジ・エンドの、真下が奈落まで空いている所でしか動かない', 'Works only in the End, over open void'),
+    'message.singulo.void_collector.rate': ('虚空 %s%%: 虚空の塵が約%s秒に1個集まる', 'Void %s%%: one Void Dust every %ss'),
+    'message.singulo.keraunos.busy': ('放電の準備中', 'Charging or cooling down'),
+    'message.singulo.keraunos.no_rod': ('16ブロック以内に避雷針がない', 'No lightning rod within 16 blocks'),
+    'message.singulo.keraunos.no_power': ('電力が足りない（1回に1,000,000 FE）', 'Not enough power (1,000,000 FE per shot)'),
+    'message.singulo.keraunos.fire': ('放電！（蓄電 %s / %s FE）', 'Discharge! (%s / %s FE stored)'),
+    'message.singulo.keraunos.mode.manual': ('手動: 右クリックで撃つ', 'Manual: fire with a right-click'),
+    'message.singulo.keraunos.mode.redstone': ('赤石: 信号が入った瞬間に撃つ（右クリックでも撃てる）', 'Redstone: fires on a rising signal (right-click still fires)'),
+    'message.singulo.keraunos.mode.auto': ('自動: 電力がたまったら勝手に撃つ', 'Auto: fires whenever it is charged'),
     'container.singulo.dimensional_pocket': ('次元ポケット', 'Dimensional Pocket'),
     'message.singulo.hidden_records_complete': ('封印された記録はすべて読んだ', 'You have read every sealed record'),
     'message.singulo.neutrino_scan': ('鉱石 %s 個・遺構のブロック %s 個が見えた', 'Found %s ores and %s ruin blocks'),
@@ -595,12 +612,20 @@ UI_LANG = {
     'gui.singulo.device.mouth.upkeep': ('1個で %s 分もつ', '1 lasts %s min'),
     'gui.singulo.device.mouth.upkeep_none': ('維持なし', 'No upkeep'),
     'gui.singulo.device.mouth.starving': ('燃料切れ: %s秒で縮む', 'No fuel: shrinks in %ss'),
+    'gui.singulo.device.mouth.dormant': ('閉じている。エキゾチック物質を入れるとまた開く', 'Closed. Add exotic matter to reopen'),
+    'gui.singulo.device.mouth.grace': ('初回の猶予: あと%s秒', 'First-placement grace: %ss'),
+    'gui.singulo.device.mouth.ports': ('ポート %s / %s 個（近くに %s 個）', 'Ports %s / %s (%s nearby)'),
     'gui.singulo.device.port.no_mouth': ('近くに口がない', 'No mouth nearby'),
     'gui.singulo.device.port.no_partner': ('口に対がない', 'Mouth has no partner'),
     'gui.singulo.device.port.linked': ('つながっている', 'Linked'),
     'gui.singulo.device.port.throat': ('喉 %s×%s', 'Throat %sx%s'),
     'gui.singulo.device.port.targets': ('向こう側: 電力%s・物%s・液体%s', 'Far side: %s power, %s items, %s fluids'),
     'gui.singulo.device.port.hint': ('隣の装置が向こうとつながる', 'Neighbours link through'),
+    'gui.singulo.device.port.channel': ('ポート番号 %s', 'Port number %s'),
+    'gui.singulo.device.port.channel_hint': ('7つの丸を押してオンオフし、番号（0〜127）を決める。向こう側の同じ番号の、働いているポートとつながる',
+                                             'Toggle the seven circles to set the number (0-127). Links to the active port with the same number on the far side'),
+    'gui.singulo.device.port.inactive': ('口のポートの上限を超えて止まっている', 'Inactive: the mouth has too many ports'),
+    'gui.singulo.device.port.rank': ('口から%s番目 / 上限%s個', '#%s from the mouth / limit %s'),
     'gui.singulo.device.tank.label': ('ダークマター', 'Dark matter'),
     'gui.singulo.device.tank.contained': ('閉じ込め中', 'Contained'),
     'gui.singulo.device.tank.leaking': ('電力切れ: 毎秒1%%漏れている', 'No power: leaking 1%%/s'),
@@ -623,6 +648,7 @@ UI_LANG = {
     'gui.singulo.stabilizer.done': ('完了', 'Done'),
     'gui.singulo.stabilizer.empty': ('空き', 'Empty'),
     'gui.singulo.stabilizer.fuel': ('エキゾチック物質', 'Exotic matter'),
+    'gui.singulo.stabilizer.casing': ('筐体', 'Casing'),
     'gui.singulo.wormhole.stabilizer': ('固定化 %s%% / %s%%、エキゾチック物質 %s 個', 'Stabilizing %s%% / %s%%, exotic matter: %s'),
     'gui.singulo.wormhole.status': ('喉 %1$s×%1$s　目標 %2$s×%2$s　エキゾチック物質 %3$s 個', 'Throat %1$s×%1$s · target %2$s×%2$s · exotic matter %3$s'),
     'gui.singulo.wormhole.no_partner': ('つながる口がない', 'No paired mouth'),
@@ -635,6 +661,23 @@ UI_LANG = {
     'entity.singulo.warden_singularity': ('ウォーデンの特異点', 'Warden Singularity'),
     'entity.singulo.horizon_bolt': ('光弾', 'Horizon Bolt'),
     'item.singulo.horizon_warden_spawn_egg': ('ホライズン・ウォーデンのスポーンエッグ', 'Horizon Warden Spawn Egg'),
+    'entity.singulo.echo_sentinel': ('残響の番人', 'Echo Sentinel'),
+    'entity.singulo.gravity_remnant': ('重力の澱', 'Gravity Remnant'),
+    'entity.singulo.gravity_debris': ('瓦礫', 'Gravity Debris'),
+    'item.singulo.echo_sentinel_spawn_egg': ('残響の番人のスポーンエッグ', 'Echo Sentinel Spawn Egg'),
+    'item.singulo.gravity_remnant_spawn_egg': ('重力の澱のスポーンエッグ', 'Gravity Remnant Spawn Egg'),
+    'gui.singulo.guardian.awakened.echo_sentinel': ('記録保管室の残響が形を取った。残響の番人が現れた',
+                                                    'The echoes of the archive take shape. The Echo Sentinel appears'),
+    'gui.singulo.guardian.defeated.echo_sentinel': ('残響の番人がほどけて消えた。保管庫の力場が消えた',
+                                                    'The Echo Sentinel unravels. The vault field dissipates'),
+    'gui.singulo.guardian.reset.echo_sentinel': ('挑戦者がいなくなり、残響の番人は記録の中へ戻った',
+                                                 'No challenger remains. The Echo Sentinel returns to the records'),
+    'gui.singulo.guardian.awakened.gravity_remnant': ('封じ込め槽が砕けた。重力の澱が這い出してきた',
+                                                      'The containment tank shatters. The Gravity Remnant crawls out'),
+    'gui.singulo.guardian.defeated.gravity_remnant': ('重力の澱の核がつぶれた。保管庫の力場が消えた',
+                                                      'The Gravity Remnant collapses. The vault field dissipates'),
+    'gui.singulo.guardian.reset.gravity_remnant': ('挑戦者がいなくなり、重力の澱は槽の中へ沈んだ',
+                                                   'No challenger remains. The Gravity Remnant sinks back into its tank'),
     'death.attack.singulo.tidal': ('%1$s は潮汐力で引き裂かれた', '%1$s was torn apart by tidal forces'),
     'death.attack.singulo.event_horizon': ('%1$s は事象の地平線を越えた', '%1$s crossed the event horizon'),
     'death.attack.singulo.tidal.player': ('%1$s は %2$s の特異点に引き裂かれた', "%1$s was torn apart by %2$s's singularity"),
@@ -644,8 +687,8 @@ UI_LANG = {
     'gui.singulo.console.no_vault': ('封鎖された保管庫が近くにない', 'No sealed vault nearby'),
     'gui.singulo.console.defeated': ('守護機が沈黙した。保管庫の力場が消えた', 'The warden falls silent. The vault field dissipates'),
     'gui.singulo.console.reset': ('挑戦者がいなくなり、守護機は封印に戻った', 'No challenger remains. The warden returns to its seal'),
-    'gui.singulo.cache.sealed': ('力場で封鎖されている。中央の封印コンソールから守護機を起こして倒すこと',
-                                 'Sealed by a force field. Wake and defeat the warden at the central console'),
+    'gui.singulo.cache.sealed': ('力場で封鎖されている。この遺構を守る番人を倒すこと',
+                                 "Sealed by a force field. Defeat this ruin's guardian"),
     'item.singulo.security_drone_spawn_egg': ('警備ドローンのスポーンエッグ', 'Security Drone Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからない', 'No gravity anomaly found'),
@@ -722,18 +765,21 @@ CONTROLLER_SKINS = {
 
 def models():
     boost_overlay_model()
+    import blocks_extra
     black_hole_item_models()
     manipulator_staff_model()
     compass_item_model()
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
-        if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass'):
+        if kind in ('gravity', 'nature', 'boss_block'):
+            continue                                           # 重力パネル・受電器・自然物・ボス部屋の仕掛けは blocks_extra・blocks_extra4・blocks_extra5 が作る
+        if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'deco', 'deco_glass'):
             model = {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}}
             if kind == 'part_glass':
                 model['render_type'] = 'minecraft:translucent'      # 色つきの半透明ガラス（中が見える）
-            elif kind == 'ruin_glass':
-                model['render_type'] = 'minecraft:cutout'
+            elif kind in ('ruin_glass', 'deco_glass'):
+                model['render_type'] = 'minecraft:translucent'      # うっすら色のついたガラス（割れた穴は抜ける）
             write_json(ASSETS / 'models' / 'block' / f'{iid}.json', model)
             if iid == 'ruin_cache':
                 # 封鎖中（sealed=true）は別の見た目
@@ -758,7 +804,11 @@ def models():
             import shapes
             skin = CONTROLLER_SKINS.get(iid)
             for state in ('', '_on'):
-                els, has_glass = shapes.machine_elements(iid, on=state == '_on')
+                if iid == 'wormhole_mouth':
+                    # 枠だけの筐体（喉は中に浮かぶ。描くのは WormholeMouthRenderer）
+                    els, has_glass = shapes.frame_elements(), False
+                else:
+                    els, has_glass = shapes.machine_elements(iid, on=state == '_on')
                 model = {
                     'parent': 'minecraft:block/block',
                     'textures': {'top': f'{MODID}:block/machine_top_t{st}', 'side': f'{MODID}:block/machine_side_t{st}',
@@ -771,6 +821,13 @@ def models():
                     # マルチブロックのコントローラは、部品と同じ外装で包む（見た目をそろえる）
                     for key in ('top', 'side', 'bottom', 'particle'):
                         model['textures'][key] = f'{MODID}:block/{skin}'
+                if iid == 'wormhole_port':
+                    # どの面にもつなげるので、どの面も口の絵。働いている間は全体を明るく光らせる
+                    for key in ('top', 'side', 'bottom'):
+                        model['textures'][key] = model['textures']['front']
+                    if state == '_on':
+                        for e in els:
+                            e['neoforge_data'] = {'block_light': 15, 'sky_light': 15}
                 if has_glass:
                     # 窓は切り抜きで描く（半透明にすると、ガラスが先に描かれたときに奥のくぼみが消えて向こうが透ける）
                     model['render_type'] = 'minecraft:cutout'
@@ -785,12 +842,27 @@ def models():
             # 上位装置の恩恵を受けている間は、エネルギーの流れの模様を重ねる
             multipart.append({'when': {'boosted': 'true'}, 'apply': {'model': f'{MODID}:block/boost_overlay'}})
             write_json(ASSETS / 'blockstates' / f'{iid}.json', {'multipart': multipart})
-            write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
+            if iid == 'wormhole_mouth':
+                # 持ったときは、枠の中に黒い喉の芯を見せる
+                item = json.loads((ASSETS / 'models' / 'block' / f'{iid}.json').read_text(encoding='utf-8'))
+                item['textures']['core'] = f'{MODID}:block/bh_dark'
+                item['elements'] = item['elements'] + [{'from': [6, 6, 6], 'to': [10, 10, 10], 'faces': {
+                    d: {'texture': '#core'} for d in ('north', 'south', 'east', 'west', 'up', 'down')}}]
+                write_json(ASSETS / 'models' / 'item' / f'{iid}.json', item)
+            else:
+                write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
         else:
             if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'graviton_manipulator'):
                 continue                                       # 立体のモデル・針のモデルは別に作る
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json',
                        {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
+    blocks_extra.models(write_json, ASSETS)
+    import blocks_extra3
+    blocks_extra3.models(write_json, ASSETS)
+    import blocks_extra4
+    blocks_extra4.models(write_json, ASSETS)
+    import blocks_extra5
+    blocks_extra5.models(write_json, ASSETS)
 
 
 def boost_overlay_model():
@@ -1011,8 +1083,8 @@ def textures():
             save(im, tb / 'ruin_cache_sealed.png')
 
     warden_textures(te, save)
-    write_json(ASSETS / 'models' / 'item' / 'horizon_warden_spawn_egg.json',
-               {'parent': 'minecraft:item/template_spawn_egg'})
+    for egg in ('horizon_warden', 'echo_sentinel', 'gravity_remnant'):
+        write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # マルチブロックの部品
     glow = (150, 230, 255, 255)
@@ -1209,10 +1281,19 @@ def art_textures():
         art16.save(art16.compass_frame(k / 16), ti / f'explorer_compass_{k:02d}.png')
     black_hole_textures(art16, tb)
     manipulator_staff_texture(art16)
+    # あとから足したブロック（遺構の変わり種・建材・重力パネル）
+    import blocks_extra
+    blocks_extra.textures(tb, art16.save)
+    import blocks_extra3
+    blocks_extra3.textures(tb, art16.save, lambda im, seed: art16.weather_existing(im, seed=seed), write_json)
+    import blocks_extra4
+    blocks_extra4.textures(tb, art16.save)
+    import blocks_extra5
+    blocks_extra5.textures(tb, art16.save)
     # 遺構の建材など、まだのっぺりしている絵にも汚し（使用感）を入れる
     from PIL import Image
     for name, (iid, _, kind) in MOD.items():
-        if kind in ('ruin_block', 'ruin_glass'):
+        if kind in ('ruin_block', 'ruin_glass') and not blocks_extra3.skip_weathering(iid):
             for path in [tb / f'{iid}.png'] + ([tb / 'ruin_cache_sealed.png'] if iid == 'ruin_cache' else []):
                 if path.exists():
                     art16.save(art16.weather_existing(Image.open(path).convert('RGBA'), seed=len(iid)), path)
@@ -1719,9 +1800,58 @@ SOUNDS = {
     'gravity_boots.wall_jump': ('item/gravity_boots_wall_jump', '壁を蹴って跳ぶ', 'Wall jump', 12),
     'dimensional_pocket.open': ('item/dimensional_pocket_open', '次元ポケットが開く', 'Pocket opens', 8),
     'dimensional_pocket.close': ('item/dimensional_pocket_close', '次元ポケットが閉じる', 'Pocket closes', 8),
+    'echo_sentinel.emerge': ('boss/echo_sentinel_emerge', '残響の番人が姿を結ぶ', 'Echo Sentinel materializes', 32),
+    'echo_sentinel.ambient': ('boss/echo_sentinel_ambient', '残響の番人がざわめく', 'Echo Sentinel hums', 16),
+    'echo_sentinel.hurt': ('boss/echo_sentinel_hurt', '残響の番人の像が乱れる', 'Echo Sentinel glitches', 16),
+    'echo_sentinel.bolt': ('boss/echo_sentinel_bolt', '光弾が放たれる', 'Light bolts fire', 16),
+    'echo_sentinel.blink': ('boss/echo_sentinel_blink', '残響の番人が跳ぶ', 'Echo Sentinel blinks', 16),
+    'echo_sentinel.strike_windup': ('boss/echo_sentinel_strike_windup', '刃に光が集まる', 'Blade gathers light', 16),
+    'echo_sentinel.strike': ('boss/echo_sentinel_strike', '光の刃が斬る', 'Light blade slashes', 16),
+    'echo_sentinel.lance_aim': ('boss/echo_sentinel_lance_aim', '投影器が狙いを定める', 'Projectors take aim', 24),
+    'echo_sentinel.lance_fire': ('boss/echo_sentinel_lance_fire', '光の槍が放たれる', 'Light lances fire', 24),
+    'echo_sentinel.circle_cast': ('boss/echo_sentinel_circle_cast', '足元に光の陣が映る', 'A circle of light appears', 20),
+    'echo_sentinel.circle_erupt': ('boss/echo_sentinel_circle_erupt', '光の柱が立ち上がる', 'Pillar of light erupts', 24),
+    'echo_sentinel.summon': ('boss/echo_sentinel_summon', '分身が現れる', 'Echoes appear', 20),
+    'echo_sentinel.echo_vanish': ('boss/echo_sentinel_echo_vanish', '分身が消える', 'An echo vanishes', 16),
+    'echo_sentinel.death_unravel': ('boss/echo_sentinel_death_unravel', '投影がほどける', 'Projection unravels', 32),
+    'echo_sentinel.death_shatter': ('boss/echo_sentinel_death_shatter', '記録結晶が砕ける', 'Record crystal shatters', 32),
+    'echo_projector.power_down': ('boss/echo_projector_power_down', '投影器が止まる', 'Projector powers down', 16),
+    'gravity_remnant.emerge': ('boss/gravity_remnant_emerge', '槽の中で何かが脈打つ', 'Something throbs in the tank', 32),
+    'containment_tank.crack': ('boss/containment_tank_crack', '封じ込め槽にひびが走る', 'Containment tank cracks', 24),
+    'containment_tank.shatter': ('boss/containment_tank_shatter', '封じ込め槽が砕ける', 'Containment tank shatters', 32),
+    'gravity_remnant.ambient': ('boss/gravity_remnant_ambient', '重力の澱が脈打つ', 'Gravity Remnant throbs', 16),
+    'gravity_remnant.hurt': ('boss/gravity_remnant_hurt', '殻が欠ける', 'Shell chips', 16),
+    'gravity_remnant.debris_launch': ('boss/gravity_remnant_debris_launch', '瓦礫が撃ち出される', 'Rubble hurled', 20),
+    'gravity_debris.impact': ('boss/gravity_debris_impact', '瓦礫が砕ける', 'Rubble smashes', 16),
+    'gravity_remnant.shell_regrow': ('boss/gravity_remnant_shell_regrow', '瓦礫が集まる', 'Rubble gathers', 20),
+    'gravity_remnant.lift': ('boss/gravity_remnant_lift', '重力が反転する', 'Gravity inverts', 24),
+    'gravity_remnant.slam': ('boss/gravity_remnant_slam', '重力が叩きつける', 'Gravity slams down', 24),
+    'gravity_remnant.well_loop': ('boss/gravity_remnant_well_loop', '重力井戸が渦巻く', 'Gravity well swirls', 20),
+    'gravity_remnant.death_collapse': ('boss/gravity_remnant_death_collapse', '重力の澱が崩れる', 'Gravity Remnant collapses', 32),
+    'gravity_remnant.death_implode': ('boss/gravity_remnant_death_implode', '核がつぶれる', 'Core implodes', 48),
+    'horizon_warden.emerge': ('boss/horizon_warden_emerge', 'ホライズン・ウォーデンが目覚める', 'Horizon Warden awakens', 48),
+    'horizon_warden.phase': ('boss/horizon_warden_phase', '外装が弾け飛ぶ', 'Armor bursts off', 32),
+    'horizon_warden.beam_charge': ('boss/horizon_warden_beam_charge', 'ビームをためる', 'Beam charges', 32),
+    'horizon_warden.beam_fire': ('boss/horizon_warden_beam_fire', '事象の地平線ビームが放たれる', 'Event horizon beam fires', 48),
+    'horizon_warden.laser_loop': ('boss/horizon_warden_laser_loop', 'レーザーが焼く', 'Laser burns', 24),
+    'horizon_warden.sweep': ('boss/horizon_warden_sweep', '刃が薙ぎ払う', 'Blade sweeps', 20),
+    'horizon_warden.grip': ('boss/horizon_warden_grip', '重力の手がつかむ', 'Gravity grip seizes', 24),
+    'horizon_warden.shockwave': ('boss/horizon_warden_shockwave', '衝撃波が走る', 'Shockwave', 32),
+    'horizon_warden.death': ('boss/horizon_warden_death', 'ホライズン・ウォーデンが崩れ落ちる', 'Horizon Warden falls', 48),
+    'horizon_warden.ambient': ('boss/horizon_warden_ambient', 'ホライズン・ウォーデンがうなる', 'Horizon Warden hums', 20),
+    'guardian_core.awaken': ('boss/guardian_core_awaken', '封印核が目覚める', 'Guardian core awakens', 32),
+    'vault.unseal': ('boss/vault_unseal', '保管庫の力場が消える', 'Vault field dissipates', 24),
+    'keraunos_tower.charge': ('machine/keraunos_tower_charge', '放電塔が充電する', 'Discharge tower charges', 24),
+    'keraunos_tower.discharge': ('machine/keraunos_tower_discharge', '人工の雷が走る', 'Artificial lightning', 48),
+    'keraunos_tower.mode': ('machine/keraunos_tower_mode', '撃ち方が切り替わる', 'Firing mode switches', 8),
+    'impact_generator.absorb': ('machine/impact_generator_absorb', '衝撃が電気に変わる', 'Impact absorbed', 12),
+    'deep_sea_collector.collect': ('machine/deep_sea_collector_collect', '高圧結晶ができる', 'Pressure crystal forms', 12),
+    'void_collector.collect': ('machine/void_collector_collect', '虚空の塵が集まる', 'Void dust gathers', 12),
+    'fulgurite.form': ('nature/fulgurite_form', '砂が雷ガラスになる', 'Sand fuses into fulgurite', 20),
 }
 # 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
 SOUND_FALLBACKS = {
+    'horizon_warden.ambient': 'minecraft:block.beacon.ambient',
     'sealed_container.denied': 'minecraft:block.dispenser.fail',
     'sealed_container.insert': 'minecraft:block.vault.insert_item',
     'sealed_container.scan': 'minecraft:block.beacon.activate',
@@ -1742,18 +1872,30 @@ def sounds_json():
     out = {}
     missing = []
     pending = []
+    used = set()
     for name, (path, ja, en, dist) in SOUNDS.items():
-        sound = {'name': f'{MODID}:{path}', 'attenuation_distance': dist}
-        if not (base / f'{path}.ogg').exists():
-            if name in SOUND_FALLBACKS:
-                sound = {'name': SOUND_FALLBACKS[name], 'type': 'event'}
-                pending.append(path)
-            else:
-                missing.append(path)
-        out[name] = {'subtitle': f'subtitles.{MODID}.{name}', 'sounds': [sound]}
+        variants = sorted((q for q in (base / path).parent.glob(f'{Path(path).name}_*.ogg') if q.stem.rsplit('_', 1)[1].isdigit()),
+                          key=lambda q: int(q.stem.rsplit('_', 1)[1]))
+        if (base / f'{path}.ogg').exists():
+            sounds = [{'name': f'{MODID}:{path}', 'attenuation_distance': dist}]
+            used.add(path)
+        elif variants:
+            # 番号つきのファイル（<path>_1.ogg, _2.ogg …）は、ランダムに鳴らすバリエーション
+            sounds = []
+            for q in variants:
+                rel = str(q.relative_to(base)).replace('\\', '/')[:-4]
+                sounds.append({'name': f'{MODID}:{rel}', 'attenuation_distance': dist})
+                used.add(rel)
+        elif name in SOUND_FALLBACKS:
+            sounds = [{'name': SOUND_FALLBACKS[name], 'type': 'event'}]
+            pending.append(path)
+        else:
+            missing.append(path)
+            sounds = []
+        out[name] = {'subtitle': f'subtitles.{MODID}.{name}', 'sounds': sounds}
         UI_LANG[f'subtitles.{MODID}.{name}'] = (ja, en)
     unused = sorted(str(p.relative_to(base)).replace('\\', '/')[:-4] for p in base.rglob('*.ogg')
-                    if str(p.relative_to(base)).replace('\\', '/')[:-4] not in {v[0] for v in SOUNDS.values()})
+                    if str(p.relative_to(base)).replace('\\', '/')[:-4] not in used)
     if missing:
         raise SystemExit(f'効果音のファイルがない: {missing}')
     if unused:
@@ -1784,6 +1926,8 @@ def tags():
     t = RES / 'data'
     write_json(t / 'c' / 'tags' / 'item' / 'ingots' / 'steel.json', {'values': [mid('鋼鉄インゴット')]})
     write_json(t / 'c' / 'tags' / 'item' / 'ingots.json', {'values': [mid('鋼鉄インゴット')]})
+    write_json(t / 'c' / 'tags' / 'item' / 'plates' / 'steel.json', {'values': [mid('鋼板')]})
+    write_json(t / 'c' / 'tags' / 'item' / 'plates.json', {'values': [mid('鋼板')]})
     write_json(DATA / 'tags' / 'item' / 'star_core.json',
                {'values': ['minecraft:nether_star', mid('人工星核')]})
     metal_items = ['#c:storage_blocks/iron', '#c:storage_blocks/copper', '#c:storage_blocks/gold',
@@ -1801,11 +1945,12 @@ def tags():
     write_json(DATA / 'tags' / 'item' / 'helium_bearing_stone.json', {'values': [
         'minecraft:deepslate', 'minecraft:cobbled_deepslate', 'minecraft:basalt', 'minecraft:smooth_basalt']})
     write_json(DATA / 'tags' / 'block' / 'ruin_blocks.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] in ('ruin_block', 'ruin_glass')]})
+               {'values': [mid(n) for n, v in MOD.items() if v[2] in ('ruin_block', 'ruin_glass', 'boss_block')]})
     write_json(DATA / 'tags' / 'entity_type' / 'gravity_immune.json', {'values': [
         'minecraft:ender_dragon', 'minecraft:wither', 'minecraft:warden', 'minecraft:elder_guardian',
-        'minecraft:enderman', 'minecraft:shulker', mid_entity('horizon_warden')]})
-    write_json(t / 'c' / 'tags' / 'entity_type' / 'bosses.json', {'values': [mid_entity('horizon_warden')]})
+        'minecraft:enderman', 'minecraft:shulker', mid_entity('horizon_warden'), mid_entity('gravity_remnant')]})
+    write_json(t / 'c' / 'tags' / 'entity_type' / 'bosses.json', {'values': [mid_entity(b) for b in
+                                                                           ('horizon_warden', 'echo_sentinel', 'gravity_remnant')]})
     # 潮汐ダメージ（ウォーデンの特異点、のちにPリアクターの潮汐帯）は防具を無視する
     write_json(DATA / 'damage_type' / 'tidal.json', {'message_id': 'singulo.tidal', 'exhaustion': 0.0, 'scaling': 'never'})
     # 事象の地平線: どんな守りも効かない（不死のトーテムも、無敵も、耐性も）
@@ -1822,7 +1967,8 @@ def tags():
     blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block']})
+               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust')
+                          or v[0].startswith('pristine_')]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
@@ -1837,6 +1983,12 @@ def tags():
                 'pools': [{'rolls': 1, 'entries': [entry],
                            'conditions': [{'condition': 'minecraft:survives_explosion'}]}],
             })
+    # 掘ると別の物が出るブロック（隕鉄塊・星屑の結晶・雷ガラス塊）
+    import blocks_extra4
+    blocks_extra4.loot(write_json, DATA)
+    import blocks_extra5
+    blocks_extra5.loot(write_json, DATA)
+    boss_loot()
 
 
 RUIN_PLACEMENT = {
@@ -1854,6 +2006,62 @@ RUIN_DEPTH = {
     'culture_facility': (-46, -30),
     'final_lab': (-56, -46),
 }
+
+
+CRATER_BIOMES = ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:desert', 'minecraft:savanna',
+                 'minecraft:savanna_plateau', 'minecraft:snowy_plains', 'minecraft:meadow', 'minecraft:badlands',
+                 'minecraft:eroded_badlands', 'minecraft:forest', 'minecraft:birch_forest', 'minecraft:taiga',
+                 'minecraft:snowy_taiga', 'minecraft:windswept_hills', 'minecraft:stony_peaks']
+
+
+def craters_data():
+    """隕石クレーター（地表の小さな構造物）。3通りの形から1つを選んで置く。地面の高さに合わせ、すり鉢を地面に掘り込む。"""
+    import craters
+    craters.write_all(DATA / 'structure' / 'craters')
+    write_json(DATA / 'tags' / 'worldgen' / 'biome' / 'has_structure' / 'meteor_crater.json', {'values': CRATER_BIOMES})
+    write_json(DATA / 'worldgen' / 'template_pool' / 'craters' / 'meteor_crater.json', {
+        'fallback': 'minecraft:empty',
+        'elements': [{'weight': 1, 'element': {
+            'element_type': 'minecraft:single_pool_element', 'location': f'{MODID}:craters/{name}',
+            'projection': 'rigid', 'processors': 'minecraft:empty'}} for name in craters.VARIANTS],
+    })
+    write_json(DATA / 'worldgen' / 'structure' / 'meteor_crater.json', {
+        'type': 'minecraft:jigsaw',
+        'biomes': f'#{MODID}:has_structure/meteor_crater',
+        'step': 'surface_structures',
+        'spawn_overrides': {},
+        'terrain_adaptation': 'beard_thin',
+        'start_pool': f'{MODID}:craters/meteor_crater',
+        'size': 1,
+        'max_distance_from_center': 32,
+        'use_expansion_hack': False,
+        # テンプレートの y=SURFACE が、元の地面のすぐ上になるように
+        'start_height': {'absolute': -craters.SURFACE},
+        'project_start_to_heightmap': 'WORLD_SURFACE_WG',
+    })
+    write_json(DATA / 'worldgen' / 'structure_set' / 'meteor_crater.json', {
+        'structures': [{'structure': f'{MODID}:meteor_crater', 'weight': 1}],
+        'placement': {'type': 'minecraft:random_spread', 'spacing': 28, 'separation': 10, 'salt': 19370601},
+    })
+
+
+# 番人の落とす物: 番人 → [(アイテム, 最小, 最大)]
+BOSS_LOOT = {
+    'echo_sentinel': [('番人の投影核', 2, 2), ('クリスタルメモリ', 1, 2)],
+    'gravity_remnant': [('縮退核', 2, 2), ('高圧結晶', 2, 4)],
+}
+
+
+def boss_loot():
+    for boss, drops in BOSS_LOOT.items():
+        pools = []
+        for name, lo, hi in drops:
+            entry = {'type': 'minecraft:item', 'name': mid(name)}
+            if hi > 1:
+                entry['functions'] = [{'function': 'minecraft:set_count',
+                                       'count': lo if lo == hi else {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]
+            pools.append({'rolls': 1, 'entries': [entry]})
+        write_json(DATA / 'loot_table' / 'entities' / f'{boss}.json', {'type': 'minecraft:entity', 'pools': pools})
 
 
 def ruins_data():
@@ -1905,10 +2113,10 @@ def ruins_data():
             {'function': 'minecraft:set_count', 'count': lo if lo == hi else
              {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]}
         (first if info['kind'] == 'once' else pools).setdefault(rid, []).append(pool)
-    # 記録片（旧文明の記録）。深い遺構ほど多い
+    # クリスタルメモリ（旧文明の記録）。深い遺構ほど多い
     fragments = {'observation_post': (1, 2), 'research_building': (1, 2), 'culture_facility': (2, 3), 'final_lab': (2, 3)}
     for rid, (lo, hi) in fragments.items():
-        pools.setdefault(rid, []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid('記録片'), 'functions': [
+        pools.setdefault(rid, []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid('クリスタルメモリ'), 'functions': [
             {'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
     for rid, plist in pools.items():
         write_json(DATA / 'loot_table' / 'ruins' / f'{rid}.json', {'type': 'minecraft:chest', 'pools': plist})
@@ -1923,13 +2131,13 @@ def ruins_data():
 
 # 封印コンテナの中身: 段階ごとに (必ず入るもの, ばらつくもの（2回引く）, 珍しいもの, 珍しいものが出る確率, 照明の色)
 SEALED_LOOT = {
-    1: ([('記録片', 2, 3)], [('鋼鉄インゴット', 4, 8), ('基礎回路', 2, 4), ('熱電対モジュール', 2, 3), ('鋼板', 3, 6)],
+    1: ([('クリスタルメモリ', 2, 3)], [('鋼鉄インゴット', 4, 8), ('基礎回路', 2, 4), ('熱電対モジュール', 2, 3), ('鋼板', 3, 6)],
         'オーバークロック・チップ', 0.35, '遺構の照明（琥珀）'),
-    2: ([('冷却原子', 4, 4)], [('超伝導線材', 2, 4), ('ミュオン束', 1, 2), ('超伝導コイル', 1, 2), ('記録片', 1, 2)],
+    2: ([('冷却原子', 4, 4)], [('超伝導線材', 2, 4), ('ミュオン束', 1, 2), ('超伝導コイル', 1, 2), ('クリスタルメモリ', 1, 2)],
         '重力ブーツ', 0.35, '遺構の照明（翠）'),
-    3: ([('エキゾチック物質', 2, 2)], [('圧縮ブロックLv2', 1, 2), ('縮退物質殻', 1, 1), ('超伝導コイル', 2, 4), ('記録片', 1, 3)],
+    3: ([('エキゾチック物質', 2, 2)], [('圧縮ブロックLv2', 1, 2), ('縮退物質殻', 1, 1), ('超伝導コイル', 2, 4), ('クリスタルメモリ', 1, 3)],
         '触媒安定化剤', 0.35, '遺構の照明（菫）'),
-    4: ([('封印記録', 1, 1)], [('ジェット凝縮体', 1, 2), ('H凝縮体', 1, 1), ('エキゾチック物質', 2, 4), ('記録片', 2, 3)],
+    4: ([('封印記録', 1, 1)], [('ジェット凝縮体', 1, 2), ('H凝縮体', 1, 1), ('エキゾチック物質', 2, 4), ('クリスタルメモリ', 2, 3)],
         '次元ポケット', 0.35, '遺構の照明（紅）'),
 }
 
@@ -2030,22 +2238,31 @@ TAB_GROUPS = [
                    'shield_tower_crown',
                    'tipler_core', 'tipler_frame', 'tipler_housing', 'tipler_bearing', 'tipler_window', 'tipler_holder',
                    'wormhole_generator_core', 'wormhole_generator_shell', 'wormhole_generator_coil', 'wormhole_generator_focuser',
-                   'wormhole_generator_window']),
-    ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravitational_wave_detector', 'neutrino_observatory',
+                   'wormhole_generator_window', 'wormhole_generator_port']),
+    ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel', 'keraunos_tower', 'deep_sea_collector', 'void_collector',
+                     'low_gravity_panel',
+                     'high_gravity_panel', 'gravitational_wave_detector', 'neutrino_observatory',
                      'probe_station', 'worldline_anchor_advanced', 'halo_collector', 'gravitational_containment_tank',
-                     'unstable_wormhole_mouth', 'wormhole_stabilizer', 'wormhole_mouth', 'wormhole_port']),
+                     'unstable_wormhole_mouth', 'wormhole_stabilizer', 'wormhole_mouth_casing', 'wormhole_mouth', 'wormhole_port']),
     ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
                'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
                'dimensional_pocket']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core']),
+    ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'raw_meteoric_iron', 'meteoric_iron_ingot', 'stardust',
+            'fulgurite_block', 'fulgurite', 'pressure_crystal', 'void_dust']),
     ('素材', None),
     ('回収物と記録', None),
-    ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
+    ('建材', ['white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
+            'black_reinforced_glass', 'black_star_glass']),
+    ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',
+            'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel', 'pristine_ruin_tiles', 'pristine_ruin_pillar',
+            'pristine_ruin_light', 'intact_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
             'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock',
-            'seal_console', 'security_drone_spawn_egg']),
-    ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg']),
+            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
+    ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
+                     'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg']),
 ]
 
 
@@ -2146,7 +2363,7 @@ def java_content():
     lines.append('    );')
     lines.append('')
     machines = [(iid, stage_of(n)) for n, (iid, _, kind) in MOD.items()
-                if kind in ('machine', 'part_block', 'part_glass', 'container')]
+                if kind in ('machine', 'part_block', 'part_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature')]
     lines.append('    /** 実装済み装置ブロックの段階（ツールチップ用）。 */')
     lines.append('    public static final Map<String, Integer> BLOCK_STAGES = Map.ofEntries(')
     lines.append(',\n'.join(f'            Map.entry("{i}", {s})' for i, s in machines))
@@ -2324,7 +2541,7 @@ def validate():
 SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay')
 
 
-GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind == 'part_glass'}
+GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind in ('part_glass', 'ruin_glass', 'deco_glass')}
 
 
 # 空のスロットに描く、入れる物のグレーの影（textures/gui/ghost/<id>.png）
@@ -2421,6 +2638,7 @@ def main():
     mass_values()
     thermal()
     ruins_data()
+    craters_data()
     java_content()
     java_config()
     write_json(RES / 'pack.mcmeta', {'pack': {'description': 'Singulo generated resources', 'pack_format': 34}})

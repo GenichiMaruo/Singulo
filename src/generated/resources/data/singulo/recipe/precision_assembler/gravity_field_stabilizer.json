@@ -9,7 +9,7 @@
       "ingredient": {
         "item": "singulo:exotic_matter"
       },
-      "count": 4
+      "count": 3
     },
     {
       "ingredient": {
@@ -19,9 +19,9 @@
     },
     {
       "ingredient": {
-        "tag": "c:gems/diamond"
+        "item": "singulo:void_dust"
       },
-      "count": 2
+      "count": 4
     }
   ],
   "result": {

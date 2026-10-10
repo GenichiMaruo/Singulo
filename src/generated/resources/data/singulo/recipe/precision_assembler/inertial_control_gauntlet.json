@@ -7,7 +7,7 @@
   "ingredients": [
     {
       "ingredient": {
-        "item": "singulo:steel_plate"
+        "tag": "c:plates/steel"
       },
       "count": 3
     },

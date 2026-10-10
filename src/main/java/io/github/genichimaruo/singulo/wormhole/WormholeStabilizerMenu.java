@@ -15,13 +15,13 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
-/** ワームホール固定化装置の画面。左右の2つの喉（口を入れる）と、エキゾチック物質。 */
+/** ワームホール固定化装置の画面。左右の2つの喉（口を入れる）と、エキゾチック物質・口の筐体。 */
 public class WormholeStabilizerMenu extends AbstractContainerMenu {
     public static final int D_PROGRESS_0 = 0, D_PROGRESS_1 = 1, D_ENERGY = 2, D_CAPACITY = 3, COUNT = 4;
     public static final int WIDTH = 200;
     public static final int HEIGHT = 206;
-    /** スロットの位置（menu と screen で共有）: 左の喉・右の喉・燃料。 */
-    public static final int[][] SLOT_POS = {{38, 46}, {146, 46}, {92, 88}};
+    /** スロットの位置（menu と screen で共有）: 左の喉・右の喉・燃料・筐体。 */
+    public static final int[][] SLOT_POS = {{38, 46}, {146, 46}, {92, 88}, {116, 88}};
     public static final int INV_X = 20;
     public static final int INV_Y = 124;
     public static final int HOTBAR_Y = 182;
@@ -34,12 +34,13 @@ public class WormholeStabilizerMenu extends AbstractContainerMenu {
         super(SinguloMenus.WORMHOLE_STABILIZER.get(), containerId);
         this.pos = pos;
         this.data = data;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < WormholeStabilizerBlockEntity.SLOTS; i++) {
             final int index = i;
             addSlot(new SlotItemHandler(items, i, SLOT_POS[i][0], SLOT_POS[i][1]) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return index == WormholeStabilizerBlockEntity.SLOT_FUEL ? ExoticCharge.isExoticMatter(stack)
+                            : index == WormholeStabilizerBlockEntity.SLOT_CASING ? WormholeStabilizerBlockEntity.isCasing(stack)
                             : stack.getItem() instanceof UnstableMouthItem;
                 }
             });
@@ -56,7 +57,7 @@ public class WormholeStabilizerMenu extends AbstractContainerMenu {
     }
 
     public static WormholeStabilizerMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
-        return new WormholeStabilizerMenu(containerId, inventory, buf.readBlockPos(), new ItemStackHandler(3),
+        return new WormholeStabilizerMenu(containerId, inventory, buf.readBlockPos(), new ItemStackHandler(WormholeStabilizerBlockEntity.SLOTS),
                 SyncedInts.client(COUNT), null);
     }
 
@@ -77,12 +78,17 @@ public class WormholeStabilizerMenu extends AbstractContainerMenu {
         }
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
-        if (index < 3) {
-            if (!moveItemStackTo(stack, 3, slots.size(), true)) {
+        int machine = WormholeStabilizerBlockEntity.SLOTS;
+        if (index < machine) {
+            if (!moveItemStackTo(stack, machine, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
         } else if (ExoticCharge.isExoticMatter(stack)) {
             if (!moveItemStackTo(stack, WormholeStabilizerBlockEntity.SLOT_FUEL, WormholeStabilizerBlockEntity.SLOT_FUEL + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (WormholeStabilizerBlockEntity.isCasing(stack)) {
+            if (!moveItemStackTo(stack, WormholeStabilizerBlockEntity.SLOT_CASING, WormholeStabilizerBlockEntity.SLOT_CASING + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (stack.getItem() instanceof UnstableMouthItem) {

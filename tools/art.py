@@ -914,7 +914,8 @@ ITEM_ART = {
                                                               d.line([(10, 10), (16, 18), (13, 26)], fill=(60, 56, 50, 255)))),
     'spent_singularity_core': lambda: item_sphere_dark((120, 120, 128)),
     'magnetic_monopole': lambda: item_magnet(),
-    'record_fragment': lambda: item_scroll((200, 196, 186), (70, 80, 90), torn=True),
+    'record_fragment': lambda: __import__('art16').crystal_memory().resize((S, S), Image.NEAREST),
+    'sentinel_core': lambda: __import__('art16').sentinel_core().resize((S, S), Image.NEAREST),
     'decoded_record': lambda: item_tablet(T1),
 }
 

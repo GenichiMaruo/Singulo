@@ -6,7 +6,7 @@
   ],
   "key": {
     "P": {
-      "item": "singulo:steel_plate"
+      "tag": "c:plates/steel"
     },
     "W": {
       "item": "singulo:white_ceramic_composite"

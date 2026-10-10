@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "cryogenic_cooling_tower",
+  "stage": 2,
+  "time": 80,
+  "energy": 240,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "c:plates/steel"
+      },
+      "count": 1
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_nitrogen",
+      "amount": 400
+    }
+  ],
+  "result": {
+    "id": "singulo:coolant_cartridge",
+    "count": 4
+  }
+}

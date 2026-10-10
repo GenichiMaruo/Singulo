@@ -17,7 +17,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * ワームホールの口: 台座の上に浮かぶ黒い球（喉）と、その周りを回る薄紫の光の輪。喉の大きさに比例して大きくなる。
+ * ワームホールの口: 枠だけの筐体の中心に浮かぶ小さな黒い球（喉）と、その周りを回る薄紫の光の輪。
+ * 喉の大きさに比例して大きくなるが、いちばん大きくても輪まで筐体の内側（枠の2ドットの内側）に収まる。
  * 重力レンズを小さく掛けて、周りの景色をゆがめる。
  */
 public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthBlockEntity> {
@@ -28,7 +29,7 @@ public class WormholeMouthRenderer implements BlockEntityRenderer<WormholeMouthB
     public WormholeMouthRenderer(BlockEntityRendererProvider.Context context) {}
 
     public static float throatRadius(int size) {
-        return 0.2F + 0.15F * size;
+        return 0.08F + 0.02F * size;
     }
 
     @Override

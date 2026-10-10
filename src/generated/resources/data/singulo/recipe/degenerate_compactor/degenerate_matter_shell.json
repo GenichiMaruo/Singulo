@@ -2,26 +2,26 @@
   "type": "singulo:machine",
   "station": "degenerate_compactor",
   "stage": 4,
-  "time": 1200,
+  "time": 900,
   "energy": 50000,
   "ingredients": [
     {
       "ingredient": {
         "item": "singulo:compressed_block_3"
       },
-      "count": 8
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_precursor"
+      },
+      "count": 4
     },
     {
       "ingredient": {
         "item": "singulo:compressed_metal_block_2"
       },
       "count": 2
-    },
-    {
-      "ingredient": {
-        "item": "singulo:entangled_element"
-      },
-      "count": 1
     }
   ],
   "fluid_ingredients": [

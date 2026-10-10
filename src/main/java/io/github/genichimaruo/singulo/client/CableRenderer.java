@@ -61,7 +61,7 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
         float phase = be.distance() - time * SPEED;
 
         int w = switch (cable.profile()) {
-            case COPPER -> 2;
+            case COPPER -> 4;
             case SUPERCONDUCTING -> 4;
             case TOPOLOGICAL -> 6;
             case HORIZON -> 8;

@@ -10,7 +10,7 @@
       "item": "singulo:white_ceramic_composite"
     },
     "P": {
-      "item": "singulo:steel_plate"
+      "tag": "c:plates/steel"
     }
   },
   "result": {

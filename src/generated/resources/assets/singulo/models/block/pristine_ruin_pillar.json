@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "singulo:block/pristine_ruin_pillar_top",
+    "side": "singulo:block/pristine_ruin_pillar"
+  }
+}

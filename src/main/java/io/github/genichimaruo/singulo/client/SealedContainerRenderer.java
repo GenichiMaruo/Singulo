@@ -151,7 +151,10 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
                 pose.mulPose(new org.joml.Quaternionf().fromAxisAngleDeg(axis, -70 * out));
                 float x0 = sx > 0 ? -7 / 16F : 0;
                 float z0 = sz > 0 ? -7 / 16F : 0;
-                FxDraw.box(pose, vc, x0, 0, z0, x0 + 7 / 16F, 2 / 16F, z0 + 7 / 16F, light, 0xFFFFFF);
+                // 絵は閉じた位置のドット（x 1〜8 か 8〜15、z も同じ、y 13〜15）を1ドットずつ貼る
+                float pxa = sx > 0 ? 8 : 1;
+                float pza = sz > 0 ? 8 : 1;
+                FxDraw.pixelBox(pose, vc, x0, 0, z0, x0 + 7 / 16F, 2 / 16F, z0 + 7 / 16F, pxa, 13, pza, pxa + 7, 15, pza + 7, light, 0xFFFFFF);
                 pose.popPose();
             }
         }
@@ -164,7 +167,8 @@ public class SealedContainerRenderer implements BlockEntityRenderer<SealedContai
         }
         float top = (4 + 7 * rise) / 16F;
         VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(BASE));
-        FxDraw.box(pose, vc, 5.5F / 16F, 4 / 16F, 5.5F / 16F, 10.5F / 16F, top, 10.5F / 16F, light, 0xFFFFFF);
+        FxDraw.pixelBox(pose, vc, 5.5F / 16F, 4 / 16F, 5.5F / 16F, 10.5F / 16F, top, 10.5F / 16F, 5.5F, 4, 5.5F, 10.5F, top * 16, 10.5F,
+                light, 0xFFFFFF);
         VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
         float y = top + 0.003F;
         quad(pose.last(), glow, 6 / 16F, y, 6 / 16F, 6 / 16F, y, 10 / 16F, 10 / 16F, y, 10 / 16F, 10 / 16F, y, 6 / 16F,
