@@ -3,7 +3,7 @@
 [日本語](docs/manual-ja.md) · [English](docs/manual-en.md) · [简体中文](docs/manual-zh-cn.md) · [繁體中文](docs/manual-zh-tw.md) · [한국어](docs/manual-ko-kr.md) · [レシピ一覧](docs/recipes/README.md)
 
 **熱電発電から始めて、最後は回転ブラックホールを運用する工業modです。**
-Minecraft 1.20.1 / Forge 向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
+Minecraft 1.20.1 / NeoForge 向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
 
 ## 対応バージョン / Minecraft versions
 
@@ -14,6 +14,7 @@ Choose the download that matches your Minecraft version and mod loader.
 | --- | --- | --- | --- | --- |
 | **1.21.1** | **NeoForge** | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [0.3.0 · 1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/9118572) |
 | **1.20.1** | **Forge** | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [0.3.0 · 1.20.1F](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1F) |
+| **1.20.1** | **NeoForge** | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [0.3.0 · 1.20.1N](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1N) |
 
 ファイル名の末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) でも Minecraft バージョンとローダーで絞り込めます。
 
@@ -25,11 +26,11 @@ Choose the download that matches your Minecraft version and mod loader.
 - **ブラックホールを運用する** — Pリアクターの点火、燃料供給、質量・スピンの管理で発電し、副産物を回収。
 - **重力と時空を使う** — 重力操作の道具、拠点を守るシールド、対応装置の時間加速、チャンクローダー、遠隔拠点間で電力・アイテム・液体をつなぐワームホール。
 
-**Singulo** is a technology mod for Minecraft 1.20.1 / Forge. Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics. Start with the [English manual](docs/manual-en.md).
+**Singulo** is a technology mod for Minecraft 1.20.1 / NeoForge. Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics. Start with the [English manual](docs/manual-en.md).
 
 ## 遊び始めるには
 
-Minecraft **1.20.1** と Forge **47.4.26以上の1.20.1対応版**が必要です。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
+Minecraft **1.20.1** と NeoForge **47.1.106**（Java 17）が必要です。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
 
 初めてワールドに入ると **Singulo ハンドブック**を受け取ります。右クリックで開き、鋼鉄・セラミック・基礎回路から始めましょう。アイテムの説明はカーソルを合わせると表示され、Shiftで作り方と使い道を確認できます。
 
@@ -56,7 +57,7 @@ GradleはJDK 25、Minecraftのコンパイルと実行はJDK 17を使用しま�
 
 WindowsのPowerShellでは `./gradlew.bat` を使います。ビルドしたJARは `build/libs/` に出力されます。
 
-1.20.1版の変更内容と検証手順は [バックポート記録](docs/port-1.20.1.md) を参照してください。
+1.20.1 NeoForge版の変更内容と検証手順は [NeoForge対応記録](docs/port-1.20.1-neoforge.md)、共通の移植内容は [バックポート記録](docs/port-1.20.1.md) を参照してください。
 
 | 場所 | 内容 |
 | --- | --- |

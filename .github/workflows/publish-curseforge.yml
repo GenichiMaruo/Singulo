@@ -36,7 +36,7 @@ jobs:
           mod_name=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d '\r')
           minecraft=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')
           suffix=$(sed -n 's/^mod_loader_suffix=//p' gradle.properties | tr -d '\r')
-          [[ "$suffix" == F ]] || { echo 'This workflow publishes Forge builds (F)'; exit 1; }
+          [[ "$suffix" == N ]] || { echo 'This workflow publishes NeoForge builds (N)'; exit 1; }
           if [[ "$GITHUB_REF_TYPE" == tag && "$GITHUB_REF_NAME" != "v$version" && "$GITHUB_REF_NAME" != "v$version-$minecraft$suffix" ]]; then
             echo 'Tag must match mod_version, optionally followed by the Minecraft version and loader suffix'; exit 1
           fi
@@ -65,7 +65,7 @@ jobs:
           version: ${{ steps.version.outputs.version }}
           version-type: beta
           changelog-file: docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
-          loaders: forge
+          loaders: neoforge
           game-versions: ${{ steps.version.outputs.minecraft }}
           java: '17'
           dependencies: jei(optional)

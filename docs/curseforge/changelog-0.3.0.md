@@ -1,7 +1,7 @@
-## Singulo-0.3.0-1.20.1F
+## Singulo-0.3.0-1.20.1N
 
 ### Minecraft 1.20.1 compatibility
-- Backported to Forge 47.4.26 and Java 17, with optional JEI 15 integration.
+- Built for NeoForge 47.1.106 and Java 17, with optional JEI 15 integration.
 - Adapted networking, item and player NBT, capabilities, rendering, recipes, loot, tags and structures to Minecraft 1.20.1.
 
 ### Exploration and combat

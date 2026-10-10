@@ -12,7 +12,7 @@ Superconductivity, particle accelerators, the Casimir effect and Hawking radiati
 
 ## Requirements and installation
 
-- **Minecraft 1.20.1**, with a compatible **Forge 47.4.26 or later** build for that Minecraft version. Minecraft runs on Java 17.
+- **Minecraft 1.20.1**, with **NeoForge 47.1.106**. Minecraft runs on Java 17.
 - Put the Singulo JAR in `mods/`. Multiplayer needs the mod on both the client and server.
 - JEI is optional. Its integration shows machine recipes and multiblock construction information.
 - Singulo supplies energy cables. Compatible transport mods can provide pipes for item and fluid automation.

@@ -24,7 +24,9 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 legacyForge {
     accessTransformers.from('src/main/resources/META-INF/accesstransformer.cfg')
-    version = "${minecraft_version}-${forge_version}"
+    enable {
+        neoForgeVersion = "${minecraft_version}-${forge_version}"
+    }
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
