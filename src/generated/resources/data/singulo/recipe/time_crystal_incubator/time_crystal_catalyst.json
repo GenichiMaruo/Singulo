@@ -2,7 +2,7 @@
   "type": "singulo:machine",
   "station": "time_crystal_incubator",
   "stage": 4,
-  "time": 24000,
+  "time": 14400,
   "energy": 30000,
   "ingredients": [
     {
@@ -25,9 +25,9 @@
     },
     {
       "ingredient": {
-        "item": "singulo:optical_lattice_substrate"
+        "item": "singulo:phase_sync_plate"
       },
-      "count": 2
+      "count": 1
     },
     {
       "ingredient": {

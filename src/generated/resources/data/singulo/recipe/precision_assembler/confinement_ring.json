@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:topological_wire"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:meteoric_iron_ingot"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:confinement_ring",
+    "count": 1
+  }
+}

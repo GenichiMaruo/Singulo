@@ -3,7 +3,7 @@
   "station": "cryogenic_cooling_tower",
   "stage": 2,
   "time": 20,
-  "energy": 400,
+  "energy": 240,
   "ingredients": [],
   "fluid_results": [
     {

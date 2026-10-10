@@ -7,7 +7,7 @@
   ],
   "key": {
     "P": {
-      "item": "singulo:steel_plate"
+      "tag": "c:plates/steel"
     },
     "M": {
       "item": "singulo:magnetic_monopole"

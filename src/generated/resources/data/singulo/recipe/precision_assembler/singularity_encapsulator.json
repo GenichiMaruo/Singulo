@@ -34,6 +34,12 @@
         "item": "singulo:reactor_shell"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_nucleus"
+      },
+      "count": 1
     }
   ],
   "result": {

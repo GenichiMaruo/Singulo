@@ -7,15 +7,15 @@
   "ingredients": [
     {
       "ingredient": {
-        "item": "singulo:steel_plate"
+        "tag": "c:plates/steel"
       },
       "count": 4
     },
     {
       "ingredient": {
-        "item": "singulo:superconducting_coil"
+        "item": "singulo:confinement_ring"
       },
-      "count": 2
+      "count": 1
     },
     {
       "ingredient": {

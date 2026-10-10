@@ -13,7 +13,7 @@
       "item": "minecraft:blue_ice"
     },
     "P": {
-      "item": "singulo:steel_plate"
+      "tag": "c:plates/steel"
     }
   },
   "result": {

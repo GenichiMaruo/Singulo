@@ -16,6 +16,12 @@
         "item": "singulo:entangled_element"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:coolant_cartridge"
+      },
+      "count": 2
     }
   ],
   "result": {

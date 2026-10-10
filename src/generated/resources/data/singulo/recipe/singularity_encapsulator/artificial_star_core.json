@@ -16,6 +16,12 @@
         "item": "singulo:compressed_metal_block_2"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:stardust"
+      },
+      "count": 4
     }
   ],
   "result": {

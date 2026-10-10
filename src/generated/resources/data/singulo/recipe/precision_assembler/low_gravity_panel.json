@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 100,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:white_panel"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:phantom_membrane"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:low_gravity_panel",
+    "count": 4
+  }
+}

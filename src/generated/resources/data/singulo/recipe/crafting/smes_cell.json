@@ -8,7 +8,7 @@
   ],
   "key": {
     "P": {
-      "item": "singulo:steel_plate"
+      "tag": "c:plates/steel"
     },
     "O": {
       "item": "singulo:superconducting_coil"

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "WPW",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "P": {
+      "tag": "c:plates/steel"
+    }
+  },
+  "result": {
+    "id": "singulo:white_panel",
+    "count": 8
+  }
+}

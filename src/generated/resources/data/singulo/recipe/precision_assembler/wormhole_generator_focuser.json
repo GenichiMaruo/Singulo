@@ -22,6 +22,12 @@
         "item": "singulo:exotic_matter"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:void_dust"
+      },
+      "count": 2
     }
   ],
   "result": {

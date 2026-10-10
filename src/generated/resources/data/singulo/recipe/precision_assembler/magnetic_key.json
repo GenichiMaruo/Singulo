@@ -7,7 +7,7 @@
   "ingredients": [
     {
       "ingredient": {
-        "item": "singulo:superconducting_coil"
+        "item": "singulo:meteoric_iron_ingot"
       },
       "count": 1
     },
@@ -19,9 +19,9 @@
     },
     {
       "ingredient": {
-        "item": "singulo:steel_plate"
+        "tag": "c:plates/steel"
       },
-      "count": 2
+      "count": 1
     }
   ],
   "result": {

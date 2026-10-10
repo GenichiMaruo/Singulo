@@ -7,9 +7,15 @@
   "ingredients": [
     {
       "ingredient": {
+        "item": "singulo:fulgurite"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
         "tag": "c:gems/quartz"
       },
-      "count": 2
+      "count": 1
     },
     {
       "ingredient": {

@@ -8,7 +8,7 @@
   ],
   "key": {
     "P": {
-      "item": "singulo:steel_plate"
+      "tag": "c:plates/steel"
     },
     "H": {
       "item": "singulo:heat_exchange_core"

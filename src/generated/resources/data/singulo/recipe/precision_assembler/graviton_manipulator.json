@@ -34,6 +34,12 @@
         "item": "singulo:time_crystal_catalyst"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_nucleus"
+      },
+      "count": 1
     }
   ],
   "result": {
