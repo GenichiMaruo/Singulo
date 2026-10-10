@@ -14,6 +14,7 @@ Choose the download that matches your Minecraft version and mod loader.
 | --- | --- | --- | --- | --- |
 | **1.21.1** | **NeoForge** | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [0.3.0 · 1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/9118572) |
 | **1.20.1** | **Forge** | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [0.3.0 · 1.20.1F](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1F) |
+| **1.20.1** | **NeoForge** | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [0.3.0 · 1.20.1N](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1N) |
 
 ファイル名の末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) でも Minecraft バージョンとローダーで絞り込めます。
 

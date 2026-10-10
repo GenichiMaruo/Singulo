@@ -9,11 +9,12 @@
 | --- | --- | --- |
 | 1.21.1 / NeoForge | `main` | `build/libs/Singulo-0.3.0-1.21.1N.jar` |
 | 1.20.1 / Forge | `port/1.20.1-forge` | `build/libs/Singulo-0.3.0-1.20.1F.jar` |
+| 1.20.1 / NeoForge | `port/1.20.1-neoforge` | `build/libs/Singulo-0.3.0-1.20.1N.jar` |
 
 ## Display name
-Singulo-0.3.0-1.21.1N または Singulo-0.3.0-1.20.1F
+Singulo-0.3.0-1.21.1N、Singulo-0.3.0-1.20.1F、または Singulo-0.3.0-1.20.1N
 
-命名規則は `mod名-modバージョン-Minecraftバージョン＋ローダー記号`。`N` は NeoForge、`F` は Forge を表します。1.21.1版は NeoForge、1.20.1版は Forge です。Beta / Release は Release type で指定し、名前には入れません。
+命名規則は `mod名-modバージョン-Minecraftバージョン＋ローダー記号`。`N` は NeoForge、`F` は Forge を表します。1.21.1版は NeoForge、1.20.1版は Forge と NeoForge の専用ファイルを用意します。Beta / Release は Release type で指定し、名前には入れません。
 
 ## Release type
 Beta
@@ -28,6 +29,7 @@ Beta
 | --- | --- | --- |
 | 1.21.1 | NeoForge | Java 21 |
 | 1.20.1 | Forge | Java 17 |
+| 1.20.1 | NeoForge | Java 17 |
 
 - Environment: Client, Server（両方に必要）
 
@@ -48,7 +50,7 @@ Beta
 
 ## GitHub Actions で Beta を公開する
 
-[Publish CurseForge Beta](../../.github/workflows/publish-curseforge.yml) は、`main` では `v<mod_version>`、1.20.1ブランチでは `v<mod_version>-1.20.1F` タグの push または手動実行で動きます。`curseforge` 環境の `CURSEFORGE_PROJECT_ID`（Secret または Variable）と `CURSEFORGE_TOKEN`（Secret）を利用します。トークンをリポジトリに記載する必要はありません。
+[公開ワークフロー](../../.github/workflows/publish-curseforge.yml) は、`main` では `v<mod_version>`、1.20.1 Forgeブランチでは `v<mod_version>-1.20.1F`、NeoForgeブランチでは `v<mod_version>-1.20.1N` タグの push または手動実行で動きます。`curseforge` 環境の `CURSEFORGE_PROJECT_ID`（Secret または Variable）と `CURSEFORGE_TOKEN`（Secret）を利用します。トークンをリポジトリに記載する必要はありません。
 
 版番号・変更履歴・翻訳を検証し、ビルドと GameTest が成功した JAR を成果物として保存したあと、同じ JAR を **Beta** としてアップロードします。タグと `gradle.properties` の版番号が一致しない場合は公開しません。再実行すると重複アップロードになる可能性があるため、成功済みの公開ジョブは再実行しないでください。
 
