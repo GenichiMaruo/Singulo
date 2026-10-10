@@ -23,7 +23,8 @@ import net.neoforged.neoforge.common.Tags;
  *   <li>浮遊: HP の制限なし（ボスと重力耐性は除く）</li>
  *   <li>牽引: 射程（設定 manipulatorRange、既定24ブロック）。落ちているアイテムも引き寄せる</li>
  *   <li>斥力: 自分の周り半径6ブロックにモブを寄せ付けず、飛んでくる飛び道具をそらす</li>
- *   <li>圧壊: 対象の動きを止め、毎秒「2＋最大HPの5%」のダメージ（防具無視）。ボスは止まらず、ダメージは BOSS_CRUSH_CAP まで</li>
+ *   <li>圧壊: 対象の動きを止め、0.5秒ごとに「4＋最大HPの10%」のダメージ（防具無視）。ボスは止まらず、1回のダメージは BOSS_CRUSH_CAP まで。
+ *       遺構のボス（ホライズン・ウォーデン・残響の番人・重力の澱）には効かない</li>
  * </ul>
  * 操作: 左クリックを押している間、今のモードで重力を操る。浮遊モードでは、持ち上げたまま右クリックを押して力をため、
  * 離すと対象を視線の向きへ勢いよく吹き飛ばす。スニーク＋右クリックでモード切替。
@@ -36,7 +37,9 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
     /** 射程の既定値（設定 manipulatorRange）。 */
     public static final double RANGE = 24;
     public static final double REPEL_RADIUS = 6;
-    public static final float BOSS_CRUSH_CAP = 10;
+    public static final float BOSS_CRUSH_CAP = 20;
+    /** 圧壊のダメージの間隔（tick）。 */
+    public static final int CRUSH_INTERVAL = 10;
     public static final int CHARGE_PER_MATTER = 6000;
     private static final Mode[] MODES = Mode.values();
 
@@ -310,16 +313,25 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
         if (!(entity instanceof LivingEntity living) || entity instanceof Player || !living.isAlive()) {
             return false;
         }
-        // ボスは圧壊のダメージだけ受ける（拘束はされない）
+        // 遺構のボスは重力そのものを操るので、圧壊が効かない
+        if (mode == Mode.CRUSH && crushImmune(entity)) {
+            return false;
+        }
+        // ほかのボスは圧壊のダメージだけ受ける（拘束はされない）
         if (mode == Mode.CRUSH && entity.getType().is(Tags.EntityTypes.BOSSES)) {
             return true;
         }
         return !isGravityImmune(entity);
     }
 
-    /** 圧壊の1秒あたりのダメージ。 */
+    /** 圧壊が効かないもの（このmodの遺構のボス）。 */
+    public static boolean crushImmune(Entity entity) {
+        return entity instanceof io.github.genichimaruo.singulo.ruin.HorizonWarden || entity instanceof io.github.genichimaruo.singulo.ruin.RuinBoss;
+    }
+
+    /** 圧壊の1回（CRUSH_INTERVAL tick ごと）のダメージ。 */
     public static float crushDamage(LivingEntity target) {
-        float damage = 2 + target.getMaxHealth() * 0.05F;
+        float damage = 4 + target.getMaxHealth() * 0.1F;
         return target.getType().is(Tags.EntityTypes.BOSSES) ? Math.min(BOSS_CRUSH_CAP, damage) : damage;
     }
 
@@ -349,7 +361,9 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
             target.setDeltaMovement(0, Math.min(v.y, 0) - 0.08, 0);
             target.hurtMarked = true;
         }
-        if (remaining % 20 == 0) {
+        if (remaining % CRUSH_INTERVAL == 0) {
+            // 無敵時間（20 tick）より短い間隔で当てるので、そのぶんは外して毎回効かせる
+            living.invulnerableTime = 0;
             living.hurt(SinguloDamageTypes.tidal(player.level(), player), crushDamage(living));
         }
     }
