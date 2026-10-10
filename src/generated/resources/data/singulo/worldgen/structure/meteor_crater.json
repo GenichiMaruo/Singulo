@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#singulo:has_structure/meteor_crater",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin",
+  "start_pool": "singulo:craters/meteor_crater",
+  "size": 1,
+  "max_distance_from_center": 32,
+  "use_expansion_hack": false,
+  "start_height": {
+    "absolute": -5
+  },
+  "project_start_to_heightmap": "WORLD_SURFACE_WG"
+}
