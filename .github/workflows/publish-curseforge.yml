@@ -1,4 +1,4 @@
-name: Publish CurseForge Beta
+name: Publish CurseForge and GitHub Beta
 
 on:
   push:
@@ -16,6 +16,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: curseforge
+    outputs:
+      name: ${{ steps.version.outputs.name }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -68,3 +70,26 @@ jobs:
           java: '17'
           dependencies: jei(optional)
           fail-mode: fail
+
+  github-release:
+    needs: publish
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.publish.outputs.name }}
+          path: dist
+      - name: Publish version-specific GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_NAME: ${{ needs.publish.outputs.name }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "dist/$RELEASE_NAME.jar" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "$RELEASE_NAME (Beta)" \
+            --notes-file "docs/curseforge/changelog-$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r').md" \
+            --prerelease --latest=false

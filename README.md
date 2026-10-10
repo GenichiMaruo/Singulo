@@ -5,6 +5,18 @@
 **熱電発電から始めて、最後は回転ブラックホールを運用する工業modです。**
 Minecraft 1.20.1 / Forge 向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
 
+## 対応バージョン / Minecraft versions
+
+同じ Singulo 0.3.0 でも、Minecraft と mod ローダーに合うファイルを選んでください。
+Choose the download that matches your Minecraft version and mod loader.
+
+| Minecraft | ローダー / Loader | Java | ソース / Source | ダウンロード / Download |
+| --- | --- | --- | --- | --- |
+| **1.21.1** | **NeoForge** | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [0.3.0 · 1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/9118572) |
+| **1.20.1** | **Forge** | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [0.3.0 · 1.20.1F](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1F) |
+
+ファイル名の末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) でも Minecraft バージョンとローダーで絞り込めます。
+
 ## 何ができる？
 
 - **工場を育てる** — 温度差で発電し、素材の焼成・圧縮・電解から超伝導や量子部品の生産へ進む、5段階の技術体系。
