@@ -171,6 +171,7 @@ public final class SinguloClient {
         event.register(SinguloMenus.SMES.get(), SmesScreen::new);
         event.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
         event.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
+        event.register(SinguloMenus.GENESIS_CORE.get(), GenesisCoreScreen::new);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
@@ -194,6 +195,10 @@ public final class SinguloClient {
                 .getKey(event.getItemStack().getItem());
         if (!Singulo.MODID.equals(id.getNamespace())) {
             return;
+        }
+        if (io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.remembersUniverse(event.getItemStack())) {
+            event.getToolTip().add(1, Component.translatable("tooltip.singulo.genesis_core.memory")
+                    .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
         }
         String key = "desc.singulo." + id.getPath();
         if (!net.minecraft.client.resources.language.I18n.exists(key)) {

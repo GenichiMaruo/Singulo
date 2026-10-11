@@ -58,8 +58,12 @@ public class GenesisCoreBlock extends BaseEntityBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
-        if (!(level.getBlockEntity(pos) instanceof GenesisCoreBlockEntity core)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (stack.getItem() instanceof io.github.genichimaruo.singulo.item.HoloProjectorItem
+                || stack.getItem() instanceof io.github.genichimaruo.singulo.item.BuilderWandItem) {
+            return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;   // 形の投影・組み立ては道具の側で
+        }
+        if (stack.isEmpty() || !(level.getBlockEntity(pos) instanceof GenesisCoreBlockEntity core)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;   // 素手は画面を開く（useWithoutItem）
         }
         if (level.isClientSide) {
             return core.wouldUseItem(stack) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -79,14 +83,29 @@ public class GenesisCoreBlock extends BaseEntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    /** 動き出した炉は、つるはしでは崩せない（創造モードなら壊せる）。 */
+    /** 動き出した炉は、宇宙が生まれるまでつるはしでは崩せない（創造モードなら壊せる）。宇宙を生んだ後は壊して運べる。 */
     @Override
     protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
         if (!player.getAbilities().instabuild && level.getBlockEntity(pos) instanceof GenesisCoreBlockEntity core
-                && core.stage() >= GenesisCoreBlockEntity.KINDLING) {
+                && core.stage() >= GenesisCoreBlockEntity.KINDLING && core.stage() < GenesisCoreBlockEntity.COMPLETE) {
             return 0;
         }
         return super.getDestroyProgress(state, player, level, pos);
+    }
+
+    /** 宇宙を生んだ炉は、記憶を宿した核と、出来上がっていた物を落とす。 */
+    @Override
+    protected java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder params) {
+        java.util.List<ItemStack> drops = super.getDrops(state, params);
+        if (params.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY)
+                instanceof GenesisCoreBlockEntity core && core.remembersUniverse()) {
+            drops = new java.util.ArrayList<>(drops);
+            drops.replaceAll(s -> s.is(asItem()) ? core.memoryItem(s) : s);
+            if (!core.output().isEmpty()) {
+                drops.add(core.output().copy());
+            }
+        }
+        return drops;
     }
 
     @Override

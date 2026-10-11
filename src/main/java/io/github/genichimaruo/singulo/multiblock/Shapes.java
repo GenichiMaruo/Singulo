@@ -271,7 +271,7 @@ public final class Shapes {
 
     // ------------------------------------------------------------------ 種類ごと
 
-    /** 種類と大きさの形。粒子加速器とペンローズ・リアクターは null（別の判定）。 */
+    /** 種類と大きさの形。粒子加速器・ペンローズ・リアクター・創世炉は null（別の判定）。 */
     @Nullable
     public static ShapeSpec spec(Blueprints.Kind kind, int size) {
         return switch (kind) {
@@ -282,7 +282,7 @@ public final class Shapes {
             case SHIELD_TOWER -> SHIELD_TOWER;
             case TIPLER_CYLINDER -> TIPLER;
             case WORMHOLE_GENERATOR -> WORMHOLE_GENERATOR;
-            case PARTICLE_ACCELERATOR, PENROSE_REACTOR -> null;
+            case PARTICLE_ACCELERATOR, PENROSE_REACTOR, GENESIS_ENGINE -> null;
         };
     }
 

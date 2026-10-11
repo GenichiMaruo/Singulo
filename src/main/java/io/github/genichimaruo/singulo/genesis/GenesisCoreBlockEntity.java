@@ -51,12 +51,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
  *   <li><b>揺籃</b>: 形ができたら、原初の種を核に使う</li>
  *   <li><b>種火</b>: genesisSeedEnergy（既定 1.5 TFE）を注ぐ。1 tick に受け取るのは genesisMaxInput（既定 1 GFE）まで</li>
  *   <li><b>安定化</b>: 維持の電力（genesisUpkeep、既定 100 MFE/t）を受けながら {@value #STABILIZE_TICKS} tick 進める。
- *       ときどき暴走の兆し（警報）が来る。そのあいだは<b>投入を止める</b>（素手で核を使うか、核に赤石信号を入れる）と収まり、
+ *       ときどき暴走の兆し（警報）が来る。そのあいだは<b>投入を止める</b>（素手で核を使って開く画面のスイッチか、核に赤石信号を入れる）と収まり、
  *       止めないと不安定度が跳ね上がる。不安定度が 100% になると崩落し、進みが戻る。重力の漏れ・記録の残響・引力の波も起きる。
  *       シールドの中なら暴走と事件が弱まり、Tシリンダーの加速の場の中なら速く進む</li>
  *   <li><b>誕生</b>: {@value #BIRTH_TICKS} tick の演出（重力崩壊・静寂・閃光・膨張・銀河）。夜空に自分の銀河が昇る</li>
  *   <li><b>完成</b>: 質量生成。手に持った物を核に使うと、それを作る物に決める（{@link MassSynthesis} の表にある物だけ）。
- *       電力を注ぐと作り、素手で使うと受け取れる（下からホッパーなどでも取り出せる）</li>
+ *       電力を注ぐと作り、画面の出来上がりスロットから受け取れる（下からホッパーなどでも取り出せる）</li>
  * </ol>
  */
 public class GenesisCoreBlockEntity extends BlockEntity {
@@ -586,6 +586,9 @@ public class GenesisCoreBlockEntity extends BlockEntity {
 
     /** 手に持った物を使ったとき。true なら使い終わった（物を減らすかどうかはここで決める）。 */
     public boolean useItem(ServerPlayer player, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
         ServerLevel level = (ServerLevel) getLevel();
         if (stage == CRADLE && stack.is(primordialSeed())) {
             if (!formed) {
@@ -603,79 +606,169 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             return true;
         }
         if (stage == COMPLETE) {
-            MassSynthesis.Entry e = MassSynthesis.INSTANCE.entry(stack);
-            if (e == null) {
-                tell(player, "gui.singulo.genesis.not_synthesizable");
-                return true;
-            }
-            if (!ItemStack.isSameItemSameComponents(template, stack)) {
-                template = stack.copyWithCount(1);
-                synthProgress = 0;
-            }
-            player.displayClientMessage(Component.translatable("gui.singulo.genesis.template", stack.getHoverName(),
-                    formatFe(MassSynthesis.cost(e)), e.tier()), false);
-            markSync();
+            chooseTemplate(player, stack);
             return true;
         }
         return false;
     }
 
+    /** 作る物を決める（核に使う・画面の枠に置く）。表にない物は断る。持っている物は減らない。 */
+    public boolean chooseTemplate(ServerPlayer player, ItemStack stack) {
+        if (stage != COMPLETE || stack.isEmpty()) {
+            return false;
+        }
+        MassSynthesis.Entry e = MassSynthesis.INSTANCE.entry(stack);
+        if (e == null) {
+            tell(player, "gui.singulo.genesis.not_synthesizable");
+            return false;
+        }
+        if (!ItemStack.isSameItemSameComponents(template, stack)) {
+            template = stack.copyWithCount(1);
+            synthProgress = 0;
+        }
+        player.displayClientMessage(Component.translatable("gui.singulo.genesis.template", stack.getHoverName(),
+                formatFe(MassSynthesis.cost(e)), e.tier()), true);
+        markSync();
+        return true;
+    }
+
+    /** 作る物を外す（画面の枠を素手でクリック）。 */
+    public void clearTemplate() {
+        if (!template.isEmpty()) {
+            template = ItemStack.EMPTY;
+            synthProgress = 0;
+            markSync();
+        }
+    }
+
+    /** 画面の「作る物」の枠。見せるだけで、出し入れはメニューのクリック処理で扱う。 */
+    public net.minecraft.world.Container templateContainer() {
+        return new net.minecraft.world.SimpleContainer(1) {
+            @Override
+            public ItemStack getItem(int slot) {
+                return template;
+            }
+
+            @Override
+            public void setItem(int slot, ItemStack stack) {
+            }
+        };
+    }
+
+    // ------------------------------------------------------------------ 宇宙の記憶（壊しても残る）
+
+    /** 宇宙を生んだ炉か（壊すと、その記憶を核のアイテムに宿す）。 */
+    public boolean remembersUniverse() {
+        return stage == COMPLETE;
+    }
+
+    /** 壊したときに落とす核: 完成した炉なら、宇宙の記憶（段階・銀河・作る物）を宿して光る。置き直すとそのまま質量生成を続けられる。 */
+    public ItemStack memoryItem(ItemStack drop) {
+        if (!remembersUniverse()) {
+            return drop;
+        }
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("stage", COMPLETE);
+        tag.putLong("galaxy", galaxySeed);
+        if (!template.isEmpty() && level != null) {
+            tag.put("template", template.save(level.registryAccess()));
+        }
+        net.minecraft.world.item.BlockItem.setBlockEntityData(drop, SinguloBlockEntities.GENESIS_CORE.get(), tag);
+        drop.set(net.minecraft.core.component.DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+        return drop;
+    }
+
+    /** 宇宙の記憶を宿した核のアイテムか（説明に使う）。 */
+    public static boolean remembersUniverse(ItemStack stack) {
+        net.minecraft.world.item.component.CustomData data = stack.get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA);
+        return data != null && data.copyTag().getInt("stage") == COMPLETE;
+    }
+
     /** クライアント側の見込み（腕を振るかどうか）。 */
     public boolean wouldUseItem(ItemStack stack) {
-        return stage == CRADLE && stack.is(primordialSeed()) || stage == COMPLETE;
+        return !stack.isEmpty() && (stage == CRADLE && stack.is(primordialSeed()) || stage == COMPLETE);
     }
 
-    /** 素手で使ったとき。しゃがむと詳しい様子、完成後は出来上がった物を受け取る、それ以外は投入を止める／再開する。 */
+    /** 素手で使ったとき: 創世炉の画面を開く（段階・進み・不安定度・投入の切り替え・出来上がった物の受け取り）。 */
     public void useEmpty(ServerPlayer player) {
+        player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+                (id, inventory, p) -> new GenesisCoreMenu(id, inventory, worldPosition, outputContainer(), templateContainer()),
+                Component.translatable("multiblock.singulo.genesis_engine")), buf -> buf.writeBlockPos(worldPosition));
+    }
+
+    /** 投入を止められる段階か（種火・安定化・質量生成）。 */
+    public boolean canToggleFeed() {
+        return stage == KINDLING || stage == STABILIZING || stage == COMPLETE;
+    }
+
+    /** 投入を止める／再開する（画面のスイッチ）。赤石信号が入っている間は、再開しても止まったまま。 */
+    public void toggleFeed(ServerPlayer player) {
+        if (!canToggleFeed()) {
+            return;
+        }
         ServerLevel level = (ServerLevel) getLevel();
-        if (player.isShiftKeyDown()) {
-            describe(player);
-            return;
-        }
-        if (stage == COMPLETE && !output.isEmpty()) {
-            ItemStack give = output;
-            output = ItemStack.EMPTY;
-            if (!player.getInventory().add(give)) {
-                player.drop(give, false);
+        manualStop = !manualStop;
+        feeding = !manualStop && !level.hasNeighborSignal(worldPosition);
+        level.playSound(null, worldPosition, SinguloSounds.get("genesis.lever"), SoundSource.BLOCKS, 1.2F, manualStop ? 0.7F : 1.2F);
+        tell(player, manualStop ? "gui.singulo.genesis.stopped" : "gui.singulo.genesis.resumed");
+        markSync();
+    }
+
+    /** 手で投入を止めているか（false で feeding も false なら、赤石信号で止まっている）。 */
+    public boolean manualStop() {
+        return manualStop;
+    }
+
+    /** 画面の「出来上がり」スロット。取り出すだけで、入れることはできない。 */
+    public net.minecraft.world.Container outputContainer() {
+        return new net.minecraft.world.Container() {
+            @Override
+            public int getContainerSize() {
+                return 1;
             }
-            markSync();
-            return;
-        }
-        switch (stage) {
-            case UNFORMED -> tell(player, "gui.singulo.genesis.unformed");
-            case CRADLE -> tell(player, "gui.singulo.genesis.need_seed");
-            case BIRTH -> tell(player, "gui.singulo.genesis.birthing");
-            default -> {
-                manualStop = !manualStop;
-                feeding = !manualStop && !level.hasNeighborSignal(worldPosition);
-                level.playSound(null, worldPosition, SinguloSounds.get("genesis.lever"), SoundSource.BLOCKS, 1.2F, manualStop ? 0.7F : 1.2F);
-                tell(player, manualStop ? "gui.singulo.genesis.stopped" : "gui.singulo.genesis.resumed");
+
+            @Override
+            public boolean isEmpty() {
+                return output.isEmpty();
+            }
+
+            @Override
+            public ItemStack getItem(int slot) {
+                return output;
+            }
+
+            @Override
+            public ItemStack removeItem(int slot, int amount) {
+                return outputHandler.extractItem(0, amount, false);
+            }
+
+            @Override
+            public ItemStack removeItemNoUpdate(int slot) {
+                return outputHandler.extractItem(0, output.getCount(), false);
+            }
+
+            @Override
+            public void setItem(int slot, ItemStack stack) {
+                output = stack.isEmpty() ? ItemStack.EMPTY : stack;
                 markSync();
             }
-        }
-    }
 
-    private void describe(ServerPlayer player) {
-        player.displayClientMessage(Component.translatable("gui.singulo.genesis.stage." + stage).withStyle(ChatFormatting.GOLD), false);
-        switch (stage) {
-            case KINDLING -> player.displayClientMessage(Component.translatable("gui.singulo.genesis.detail.kindling",
-                    percent(chargeFraction()), formatFe(charge), formatFe(seedEnergy()), formatFe(intake), formatFe(maxInput())), false);
-            case STABILIZING -> player.displayClientMessage(Component.translatable("gui.singulo.genesis.detail.stabilizing",
-                    percent(progressFraction()), percent(instability / 100F), formatFe(upkeep()), formatFe(intake)), false);
-            case COMPLETE -> {
-                MassSynthesis.Entry e = MassSynthesis.INSTANCE.entry(template);
-                if (e != null) {
-                    player.displayClientMessage(Component.translatable("gui.singulo.genesis.detail.synth", template.getHoverName(),
-                            percent(synthFraction()), formatFe(MassSynthesis.cost(e)), formatFe(intake), output.getCount()), false);
-                } else {
-                    player.displayClientMessage(Component.translatable("gui.singulo.genesis.detail.synth_none"), false);
-                }
+            @Override
+            public void setChanged() {
+                markSync();
             }
-            default -> { }
-        }
-        if (stage >= KINDLING && stage != BIRTH) {
-            player.displayClientMessage(Component.translatable(feeding ? "gui.singulo.genesis.feeding" : "gui.singulo.genesis.not_feeding"), false);
-        }
+
+            @Override
+            public boolean stillValid(Player player) {
+                return !isRemoved() && player.distanceToSqr(Vec3.atCenterOf(worldPosition)) <= 64;
+            }
+
+            @Override
+            public void clearContent() {
+                output = ItemStack.EMPTY;
+                markSync();
+            }
+        };
     }
 
     /** 近くの人の画面下に、今の様子を出す。 */
