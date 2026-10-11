@@ -74,6 +74,9 @@ public final class SinguloItems {
             "catalyst_stabilizer", () -> new io.github.genichimaruo.singulo.item.CatalystStabilizerItem(new Item.Properties().rarity(Rarity.RARE), 4));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.DimensionalPocketItem> DIMENSIONAL_POCKET = ITEMS.register(
             "dimensional_pocket", () -> new io.github.genichimaruo.singulo.item.DimensionalPocketItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    /** 残光の翼（最後の記録者が落とす。クリエイティブのタブにも JEI にも出さない）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.AfterglowWingsItem> AFTERGLOW_WINGS = ITEMS.register(
+            "afterglow_wings", () -> new io.github.genichimaruo.singulo.item.AfterglowWingsItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.SealedRecordItem> SEALED_RECORD = ITEMS.register(
             "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */

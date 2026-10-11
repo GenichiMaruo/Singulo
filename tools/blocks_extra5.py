@@ -86,7 +86,43 @@ def projector_lens():
     return im
 
 
+HOLO_FRAMES = 16
+
+
+def hologram_frame(k):
+    """ホログラムの床（1コマ）: 赤い半透明の面に、光る縁と封印の紋。明るい走査の帯が上から下へ流れ、紋がゆっくり脈打つ。"""
+    from PIL import Image, ImageDraw
+    im = Image.new('RGBA', (S, S), (200, 28, 40, 64))
+    d = ImageDraw.Draw(im)
+    pulse = 0.5 + 0.5 * math.sin(k / HOLO_FRAMES * math.pi * 2)
+    edge = (255, 96, 96, 210)
+    d.rectangle([0, 0, S - 1, S - 1], outline=edge)
+    # 封印の紋: 菱形と、中の小さな環、四隅へ伸びる線
+    sig = (255, 120, 110, int(110 + 90 * pulse))
+    d.polygon([(7.5, 2), (13, 7.5), (7.5, 13), (2, 7.5)], outline=sig)
+    d.ellipse([5, 5, 10, 10], outline=sig)
+    for a, b in (((1, 1), (4, 4)), ((14, 1), (11, 4)), ((1, 14), (4, 11)), ((14, 14), (11, 11))):
+        d.line([a, b], fill=(255, 110, 100, int(70 + 60 * pulse)))
+    d.point([(7, 7), (8, 8), (7, 8), (8, 7)], fill=(255, 210, 200, int(150 + 100 * pulse)))
+    # 走査の帯
+    y = int(k / HOLO_FRAMES * (S + 4)) - 2
+    for dy, a in ((0, 120), (-1, 60), (1, 60)):
+        yy = y + dy
+        if 0 <= yy < S:
+            for x in range(S):
+                r, g, b, al = im.getpixel((x, yy))
+                im.putpixel((x, yy), (min(255, r + 55), min(255, g + 70), min(255, b + 60), min(255, al + a)))
+    return im
+
+
 def textures(tb, save):
+    from PIL import Image
+    sheet = Image.new('RGBA', (S, S * HOLO_FRAMES))
+    for k in range(HOLO_FRAMES):
+        sheet.paste(hologram_frame(k), (0, S * k))
+    save(sheet, tb / 'arena_hologram.png')
+    import json
+    (tb / 'arena_hologram.png.mcmeta').write_text(json.dumps({'animation': {'frametime': 2, 'interpolate': True}}), encoding='utf-8')
     save(core_top(), tb / 'guardian_core_top.png')
     save(core_side(), tb / 'guardian_core_side.png')
     save(core_bottom(), tb / 'guardian_core_bottom.png')
@@ -144,6 +180,13 @@ def models(write_json, assets):
             {'from': [6, 12, 6], 'to': [10, 13, 10], 'neoforge_data': glow, 'faces': _faces('#lens', ('down',))},
         ]})
     write_json(bs / 'echo_projector.json', {'variants': {'': {'model': f'{MODID}:block/echo_projector'}}})
+    # ホログラムの床: 赤い半透明で光る立方体（アイテムはないので、アイテムのモデルも作らない）
+    write_json(mb / 'arena_hologram.json', {
+        'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'ambientocclusion': False,
+        'textures': {'all': f'{MODID}:block/arena_hologram', 'particle': f'{MODID}:block/arena_hologram'},
+        'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'neoforge_data': glow,
+                      'faces': {d: {'texture': '#all', 'cullface': d} for d in ('north', 'south', 'east', 'west', 'up', 'down')}}]})
+    write_json(bs / 'arena_hologram.json', {'variants': {'': {'model': f'{MODID}:block/arena_hologram'}}})
     write_json(mi / 'echo_projector.json', {'parent': f'{MODID}:block/echo_projector'})
 
 

@@ -163,6 +163,7 @@ MOD = {
     '渦の断章': ('ergosphere_chapter', 'Chapter of the Vortex', 'item'),
     '終焉の記録': ('terminus_record', 'Terminus Record', 'item'),
     '記録者の光輪': ('archivist_halo', "Archivist's Halo", 'item'),
+    '残光の翼': ('afterglow_wings', 'Afterglow Wings', 'tool'),
     'エキゾチック物質': ('exotic_matter', 'Exotic Matter', 'item'),
     '縮退熱炉フレーム': ('degenerate_furnace_frame', 'Degenerate Furnace Frame', 'part_block'),
     '縮退熱炉外装板': ('degenerate_furnace_shell', 'Degenerate Furnace Shell', 'part_block'),

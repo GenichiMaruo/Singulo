@@ -39,6 +39,14 @@
     "source": "Precise Hands",
     "translation": "精准的双手"
   },
+  "advancement.singulo.awakened.description": {
+    "source": "Defeat the Awakened Horizon Warden",
+    "translation": "击败觉醒的视界守卫"
+  },
+  "advancement.singulo.awakened.title": {
+    "source": "Horizon Reawakened",
+    "translation": "苏醒的视界"
+  },
   "advancement.singulo.awakened_echo.description": {
     "source": "Defeat the Awakened Echo Sentinel",
     "translation": "击败觉醒的回响守卫"
@@ -182,6 +190,14 @@
   "advancement.singulo.gauntlet.title": {
     "source": "Inertia in Hand",
     "translation": "手中的惯性"
+  },
+  "advancement.singulo.hawking.description": {
+    "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
+    "translation": "从回收运行中的反应堆收集霍金凝聚体。第一个核心需要 6 个"
+  },
+  "advancement.singulo.hawking.title": {
+    "source": "Hawking Drop",
+    "translation": "霍金之滴"
   },
   "advancement.singulo.ignite.description": {
     "source": "Ignite the reactor",
@@ -335,6 +351,14 @@
     "source": "Horizon Shield",
     "translation": "地平线盾"
   },
+  "advancement.singulo.star_core.description": {
+    "source": "Make an artificial star core",
+    "translation": "制作人造星核"
+  },
+  "advancement.singulo.star_core.title": {
+    "source": "Forging a Star",
+    "translation": "铸造恒星"
+  },
   "advancement.singulo.steel.description": {
     "source": "Make a steel ingot",
     "translation": "制作钢锭"
@@ -394,6 +418,10 @@
   "block.singulo.archive_terminal": {
     "source": "Archive Terminal",
     "translation": "档案终端"
+  },
+  "block.singulo.arena_hologram": {
+    "source": "Hologram Floor",
+    "translation": "全息地板"
   },
   "block.singulo.black_reinforced_glass": {
     "source": "Black Reinforced Glass",
@@ -1039,6 +1067,10 @@
     "source": "Tube segment of the Particle Accelerator ring.",
     "translation": "粒子加速器 环的管段。"
   },
+  "desc.singulo.afterglow_wings": {
+    "source": "Wings of crystal feathers born from the Last Archivist's light. Wear them on your chest to glide; sneak while gliding to beat them and surge ahead. No fall damage.",
+    "translation": "由最后的记录者之光诞生的结晶羽翼。穿在胸甲栏即可滑翔，滑翔时潜行会振翅加速。不会受到摔落伤害。"
+  },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
     "translation": "恢复的异常样本。"
@@ -1066,6 +1098,10 @@
   "desc.singulo.awakening_gravity_core": {
     "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
     "translation": "注入了奇点之力的简并核。在封锁培养设施的守卫封印核心上使用，会召唤觉醒的重力残渣：生命 2.5 倍、伤害 1.5 倍、瓦砾更多、重力井更大更强，并会连续砸地。获胜后除了平常的掉落，还能获得超频芯片等奖励。"
+  },
+  "desc.singulo.awakening_record_core": {
+    "source": "A record of the defeated warden, reforged with singularity power. Use it on the Seal Console in the final lab to wake the Awakened Horizon Warden: 2.5× health, 1.5× damage, faster moves. Victory yields overclock chips and more.",
+    "translation": "用奇点之力重铸被击败守卫记录而成的核心。在最终实验室的密封控制台上使用，即可唤醒觉醒的视界守卫：生命 2.5 倍、伤害 1.5 倍、招式更快。获胜可获得超频芯片等奖励。"
   },
   "desc.singulo.basic_circuit": {
     "source": "The brain of every early machine.",
@@ -1931,6 +1967,10 @@
     "source": "Grows time crystal catalysts. Underpowering lowers their purity.",
     "translation": "生长时间晶体催化剂。动力不足会降低其纯度。"
   },
+  "desc.singulo.time_crystal_module": {
+    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
+    "translation": "封存了新品时间晶体寿命 2/3（默认设置下为 30 分钟）的可堆叠部件。用于炉心控制器、奇点封装器、盾塔核心等设备。剩余寿命不足此值的晶体（用过的或纯度低的）无法切割。改变寿命设置或预设时，所需量也会按比例变化。"
+  },
   "desc.singulo.time_crystal_seed": {
     "source": "Seed for time crystal catalysts.",
     "translation": "时间晶体催化剂的种子。"
@@ -2139,6 +2179,10 @@
     "source": "Horizon Warden",
     "translation": "视界守卫"
   },
+  "entity.singulo.horizon_warden.awakened": {
+    "source": "Awakened Horizon Warden",
+    "translation": "觉醒的视界守卫"
+  },
   "entity.singulo.last_archivist": {
     "source": "The Last Archivist",
     "translation": "最后的记录者"
@@ -2255,6 +2299,10 @@
     "source": "Singularity Core embedded",
     "translation": "奇点核心 嵌入式"
   },
+  "gui.singulo.anchor.limited": {
+    "source": "Anchor limit reached (%s per player)",
+    "translation": "已达到锚的上限（每人 %s 台）"
+  },
   "gui.singulo.anchor.no_catalyst": {
     "source": "No catalyst",
     "translation": "无催化剂"
@@ -2295,6 +2343,22 @@
     "source": "No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console",
     "translation": "挑战者已离开，记录者回到了时间场中。终焉之记录留在了控制台上"
   },
+  "gui.singulo.archivist.shield_down": {
+    "source": "The field sealing the chamber unravels.",
+    "translation": "封闭房间的力场消散了。"
+  },
+  "gui.singulo.archivist.shield_up": {
+    "source": "A field seals the chamber. No one leaves until it ends.",
+    "translation": "力场封闭了房间。在结束之前，谁也出不去。"
+  },
+  "gui.singulo.archivist.tide": {
+    "source": "I turn the page of gravity.",
+    "translation": "翻开重力的一页。"
+  },
+  "gui.singulo.archivist.tide_final": {
+    "source": "Do not fall. Float. All of it lies within my gravity.",
+    "translation": "不要坠落。漂浮吧。一切都在我的重力之中。"
+  },
   "gui.singulo.cache.sealed": {
     "source": "Sealed by a force field. Defeat this ruin's guardian",
     "translation": "被力场封印。击败守护这座废墟的守卫"
@@ -2326,6 +2390,14 @@
   "gui.singulo.console.awakened": {
     "source": "The seal breaks. The Horizon Warden awakens",
     "translation": "封印破裂。 视界守卫 苏醒"
+  },
+  "gui.singulo.console.awakened_defeated": {
+    "source": "The awakened warden is defeated. Fine parts spill from the wreck",
+    "translation": "觉醒的守卫被击退了。残骸中滚出了优质零件"
+  },
+  "gui.singulo.console.awakened_rematch": {
+    "source": "The record core resonates. The Awakened Horizon Warden rises",
+    "translation": "记录核发生共鸣。觉醒的视界守卫苏醒了"
   },
   "gui.singulo.console.defeated": {
     "source": "The warden falls silent. The vault field dissipates",
@@ -2571,6 +2643,14 @@
     "source": "Radius %s chunks",
     "translation": "半径 %1$s 块"
   },
+  "gui.singulo.device.standby": {
+    "source": "Standby (storage full)",
+    "translation": "待机中（储能已满）"
+  },
+  "gui.singulo.device.standby.hint": {
+    "source": "Fuel and catalyst are not used. Resumes when storage falls under 75%.",
+    "translation": "不消耗燃料和催化剂。储能低于 75% 时恢复"
+  },
   "gui.singulo.device.tank.contained": {
     "source": "Contained",
     "translation": "包含"
@@ -2815,13 +2895,45 @@
     "source": "Accretion efficiency %s%%",
     "translation": "吸积效率 %1$s%%"
   },
+  "gui.singulo.reactor.harvest": {
+    "source": "Harvest",
+    "translation": "回收"
+  },
+  "gui.singulo.reactor.harvest.hint": {
+    "source": "Keeps core mass at 480 or less so H condensate (needs a Hawking Collector) keeps forming every 5 minutes. Power output is small. An overgrown core sheds 2 mass per second through its jets until it is back. New reactors start in this mode",
+    "translation": "将核心质量保持在 480 以下，使霍金凝聚体（需要霍金收集器）每 5 分钟产生一个。发电量较小。质量过大的核心会通过喷流每秒释放 2 质量直至恢复。新反应堆以此模式启动"
+  },
+  "gui.singulo.reactor.harvest.off": {
+    "source": "Harvest mode: OFF (power mode)",
+    "translation": "回收运行：关（发电运行）"
+  },
+  "gui.singulo.reactor.harvest.on": {
+    "source": "Harvest mode: ON",
+    "translation": "回收运行：开"
+  },
   "gui.singulo.reactor.ignite": {
     "source": "Ignite",
     "translation": "点燃"
   },
+  "gui.singulo.reactor.ignition.band": {
+    "source": "Receiving %s / need %s MFE/t",
+    "translation": "受电 %s / 需要 %s MFE/t"
+  },
+  "gui.singulo.reactor.ignition.need": {
+    "source": "Ignition: %s GFE within %s s (avg %s MFE/t)",
+    "translation": "点火：%s 秒内 %s GFE（平均 %s MFE/t）"
+  },
+  "gui.singulo.reactor.ignition.reach": {
+    "source": "Reachable at this rate %s / %s GFE",
+    "translation": "按此速度可送达 %s / %s GFE"
+  },
   "gui.singulo.reactor.ignition_failed": {
     "source": "Ignition failed: not enough power in time",
     "translation": "点火失败：电量不足"
+  },
+  "gui.singulo.reactor.ignition_failed.detail": {
+    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake",
+    "translation": "送达 %s / %s GFE，最大受电 %s MFE/t（需要 %s MFE/t）。即使储能足够，网络中最细的线缆也会限制受电上限"
   },
   "gui.singulo.reactor.interval": {
     "source": "Feed interval",
@@ -2850,6 +2962,10 @@
   "gui.singulo.reactor.mode.power": {
     "source": "Power mode",
     "translation": "电源模式"
+  },
+  "gui.singulo.reactor.mode.shedding": {
+    "source": "Shedding mass (harvest mode)",
+    "translation": "正在释放质量（回收运行）"
   },
   "gui.singulo.reactor.mode.standby": {
     "source": "Standby",
@@ -3375,6 +3491,14 @@
     "source": "The four ruins",
     "translation": "四大废墟"
   },
+  "guide.singulo.ruins.plan.body": {
+    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
+    "translation": "后期阶段的目的地会一下子增多；提前收集可以让工厂不停工。\n- 第 2 阶段期间：陨石坑（陨铁、星尘），冰山或冰刺（浮冰和蓝冰）。\n- 第 3 阶段期间：研究楼。尽早放置深海压力收集器，囤积高压晶体（外壳和砧约需 30 个）。雷雨天在沙子上放避雷针。\n- 第 4 阶段之前：封闭培养设施、远古城市（幽匿块和回响碎片；回响共鸣器可以一直复制一片）、末地虚空（虚空收集器）、凋灵（下界之星；点火后可用人造星核代替）。\n- 原始记录可以修复：新品加三次修复约为 2.7 倍的使用次数。重刷遗迹之前先修复。"
+  },
+  "guide.singulo.ruins.plan.title": {
+    "source": "Planning expeditions",
+    "translation": "规划探索"
+  },
   "guide.singulo.ruins.records.body": {
     "source": "Ruin caches sometimes hold crystal memories. Decode them in the Archive Terminal to unlock the Ancient Records chapter.",
     "translation": "废墟保管库里有时会出现水晶存储器。在档案终端读取后，就能解锁“古代文明的记录”一章。"
@@ -3620,6 +3744,10 @@
     "translation": "制造地：奇点封装器（第 5 阶段）"
   },
   "howto.singulo.awakening_gravity_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "制造地：奇点封装器（第 5 阶段）"
+  },
+  "howto.singulo.awakening_record_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "制造地：奇点封装器（第 5 阶段）"
   },
@@ -4279,6 +4407,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "制造地：精密组装台（第 4 阶段）"
   },
+  "howto.singulo.time_crystal_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "制造地：精密组装台（第 4 阶段）"
+  },
   "howto.singulo.time_crystal_seed": {
     "source": "Restore a Degraded Time Crystal Seed",
     "translation": "恢复 退化的时间水晶种子"
@@ -4403,6 +4535,22 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
   },
+  "item.singulo.afterglow_wings": {
+    "source": "Afterglow Wings",
+    "translation": "残光之翼"
+  },
+  "item.singulo.afterglow_wings.tip_1": {
+    "source": "Wings of light worn on the chest. Glide like an elytra; they never break",
+    "translation": "穿在胸部的光之翼。可像鞘翅一样滑翔，永不损坏"
+  },
+  "item.singulo.afterglow_wings.tip_2": {
+    "source": "Sneak while gliding: beat the wings to surge forward",
+    "translation": "滑翔时潜行：振翅向前加速"
+  },
+  "item.singulo.afterglow_wings.tip_3": {
+    "source": "No fall damage while worn. Protects like a diamond chestplate",
+    "translation": "穿戴时不受摔落伤害。防护与钻石胸甲相同"
+  },
   "item.singulo.anomaly_sample": {
     "source": "Anomaly Sample",
     "translation": "异常样本"
@@ -4426,6 +4574,10 @@
   "item.singulo.awakening_gravity_core": {
     "source": "Awakened Gravity Core",
     "translation": "觉醒重力核"
+  },
+  "item.singulo.awakening_record_core": {
+    "source": "Awakening Record Core",
+    "translation": "觉醒记录核"
   },
   "item.singulo.basic_circuit": {
     "source": "Basic Circuit",
@@ -4878,6 +5030,10 @@
   "item.singulo.time_crystal_catalyst": {
     "source": "Time Crystal Catalyst",
     "translation": "时间晶体催化剂"
+  },
+  "item.singulo.time_crystal_module": {
+    "source": "Time Crystal Module",
+    "translation": "时间晶体模块"
   },
   "item.singulo.time_crystal_seed": {
     "source": "Time Crystal Seed",
@@ -6587,6 +6743,10 @@
     "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
     "translation": "用于：奇异物质、奇点核心、时间晶体模块"
   },
+  "uses.singulo.time_crystal_module": {
+    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 1 more",
+    "translation": "用于：炉心控制器、奇点封装器、盾塔核心、引力子操控器、蒂普勒核心 等 1 个"
+  },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
     "translation": "用于：时间晶体催化剂"
@@ -6670,125 +6830,5 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "用于：虫洞入口"
-  },
-  "advancement.singulo.awakened.description": {
-    "source": "Defeat the Awakened Horizon Warden",
-    "translation": "击败觉醒的视界守卫"
-  },
-  "advancement.singulo.awakened.title": {
-    "source": "Horizon Reawakened",
-    "translation": "苏醒的视界"
-  },
-  "advancement.singulo.hawking.description": {
-    "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
-    "translation": "从回收运行中的反应堆收集霍金凝聚体。第一个核心需要 6 个"
-  },
-  "advancement.singulo.hawking.title": {
-    "source": "Hawking Drop",
-    "translation": "霍金之滴"
-  },
-  "advancement.singulo.star_core.description": {
-    "source": "Make an artificial star core",
-    "translation": "制作人造星核"
-  },
-  "advancement.singulo.star_core.title": {
-    "source": "Forging a Star",
-    "translation": "铸造恒星"
-  },
-  "desc.singulo.awakening_record_core": {
-    "source": "A record of the defeated warden, reforged with singularity power. Use it on the Seal Console in the final lab to wake the Awakened Horizon Warden: 2.5× health, 1.5× damage, faster moves. Victory yields overclock chips and more.",
-    "translation": "用奇点之力重铸被击败守卫记录而成的核心。在最终实验室的密封控制台上使用，即可唤醒觉醒的视界守卫：生命 2.5 倍、伤害 1.5 倍、招式更快。获胜可获得超频芯片等奖励。"
-  },
-  "desc.singulo.time_crystal_module": {
-    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
-    "translation": "封存了新品时间晶体寿命 2/3（默认设置下为 30 分钟）的可堆叠部件。用于炉心控制器、奇点封装器、盾塔核心等设备。剩余寿命不足此值的晶体（用过的或纯度低的）无法切割。改变寿命设置或预设时，所需量也会按比例变化。"
-  },
-  "entity.singulo.horizon_warden.awakened": {
-    "source": "Awakened Horizon Warden",
-    "translation": "觉醒的视界守卫"
-  },
-  "gui.singulo.anchor.limited": {
-    "source": "Anchor limit reached (%s per player)",
-    "translation": "已达到锚的上限（每人 %s 台）"
-  },
-  "gui.singulo.console.awakened_defeated": {
-    "source": "The awakened warden is defeated. Fine parts spill from the wreck",
-    "translation": "觉醒的守卫被击退了。残骸中滚出了优质零件"
-  },
-  "gui.singulo.console.awakened_rematch": {
-    "source": "The record core resonates. The Awakened Horizon Warden rises",
-    "translation": "记录核发生共鸣。觉醒的视界守卫苏醒了"
-  },
-  "gui.singulo.device.standby": {
-    "source": "Standby (storage full)",
-    "translation": "待机中（储能已满）"
-  },
-  "gui.singulo.device.standby.hint": {
-    "source": "Fuel and catalyst are not used. Resumes when storage falls under 75%.",
-    "translation": "不消耗燃料和催化剂。储能低于 75% 时恢复"
-  },
-  "gui.singulo.reactor.harvest": {
-    "source": "Harvest",
-    "translation": "回收"
-  },
-  "gui.singulo.reactor.harvest.hint": {
-    "source": "Keeps core mass at 480 or less so H condensate (needs a Hawking Collector) keeps forming every 5 minutes. Power output is small. An overgrown core sheds 2 mass per second through its jets until it is back. New reactors start in this mode",
-    "translation": "将核心质量保持在 480 以下，使霍金凝聚体（需要霍金收集器）每 5 分钟产生一个。发电量较小。质量过大的核心会通过喷流每秒释放 2 质量直至恢复。新反应堆以此模式启动"
-  },
-  "gui.singulo.reactor.harvest.off": {
-    "source": "Harvest mode: OFF (power mode)",
-    "translation": "回收运行：关（发电运行）"
-  },
-  "gui.singulo.reactor.harvest.on": {
-    "source": "Harvest mode: ON",
-    "translation": "回收运行：开"
-  },
-  "gui.singulo.reactor.ignition.band": {
-    "source": "Receiving %s / need %s MFE/t",
-    "translation": "受电 %s / 需要 %s MFE/t"
-  },
-  "gui.singulo.reactor.ignition.need": {
-    "source": "Ignition: %s GFE within %s s (avg %s MFE/t)",
-    "translation": "点火：%s 秒内 %s GFE（平均 %s MFE/t）"
-  },
-  "gui.singulo.reactor.ignition.reach": {
-    "source": "Reachable at this rate %s / %s GFE",
-    "translation": "按此速度可送达 %s / %s GFE"
-  },
-  "gui.singulo.reactor.ignition_failed.detail": {
-    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake",
-    "translation": "送达 %s / %s GFE，最大受电 %s MFE/t（需要 %s MFE/t）。即使储能足够，网络中最细的线缆也会限制受电上限"
-  },
-  "gui.singulo.reactor.mode.shedding": {
-    "source": "Shedding mass (harvest mode)",
-    "translation": "正在释放质量（回收运行）"
-  },
-  "guide.singulo.ruins.plan.body": {
-    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
-    "translation": "后期阶段的目的地会一下子增多；提前收集可以让工厂不停工。\n- 第 2 阶段期间：陨石坑（陨铁、星尘），冰山或冰刺（浮冰和蓝冰）。\n- 第 3 阶段期间：研究楼。尽早放置深海压力收集器，囤积高压晶体（外壳和砧约需 30 个）。雷雨天在沙子上放避雷针。\n- 第 4 阶段之前：封闭培养设施、远古城市（幽匿块和回响碎片；回响共鸣器可以一直复制一片）、末地虚空（虚空收集器）、凋灵（下界之星；点火后可用人造星核代替）。\n- 原始记录可以修复：新品加三次修复约为 2.7 倍的使用次数。重刷遗迹之前先修复。"
-  },
-  "guide.singulo.ruins.plan.title": {
-    "source": "Planning expeditions",
-    "translation": "规划探索"
-  },
-  "howto.singulo.awakening_record_core": {
-    "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "制造地：奇点封装器（第 5 阶段）"
-  },
-  "howto.singulo.time_crystal_module": {
-    "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "制造地：精密组装台（第 4 阶段）"
-  },
-  "item.singulo.awakening_record_core": {
-    "source": "Awakening Record Core",
-    "translation": "觉醒记录核"
-  },
-  "item.singulo.time_crystal_module": {
-    "source": "Time Crystal Module",
-    "translation": "时间晶体模块"
-  },
-  "uses.singulo.time_crystal_module": {
-    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 1 more",
-    "translation": "用于：炉心控制器、奇点封装器、盾塔核心、引力子操控器、蒂普勒核心 等 1 个"
   }
 }

@@ -46,6 +46,7 @@ public final class Singulo {
         io.github.genichimaruo.singulo.registry.SinguloSounds.REGISTER.register(modBus);
         RuinDiscovery.REGISTER.register(modBus);
         io.github.genichimaruo.singulo.item.DimensionalPocketItem.REGISTER.register(modBus);
+        io.github.genichimaruo.singulo.item.AfterglowWingsItem.init();      // 翼の鎧の素材を、登録より先に用意する
         io.github.genichimaruo.singulo.item.GravityBootsItem.MATERIALS.register(modBus);
         SinguloMenus.REGISTER.register(modBus);
         SinguloRecipes.TYPES.register(modBus);
@@ -58,6 +59,9 @@ public final class Singulo {
         modBus.addListener(SinguloEntities::registerAttributes);
         modBus.addListener((RegisterTicketControllersEvent e) -> e.register(WorldlineAnchorBlockEntity.TICKETS));
         NeoForge.EVENT_BUS.addListener(SinguloReloadListeners::register);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onTeleport);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onBreak);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onExplosion);
         NeoForge.EVENT_BUS.addListener(InertialStabilizerBlockEntity::onExplosion);
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onExplosionStart);
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onExplosionDetonate);
@@ -66,6 +70,7 @@ public final class Singulo {
         io.github.genichimaruo.singulo.machine.ShieldPermits.register();
         NeoForge.EVENT_BUS.addListener(MetricDriveItem::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravityBootsItem::onFall);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.AfterglowWingsItem::onFall);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravitonManipulatorItem::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.MultiblockInteraction::onRightClickBlock);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.SealedContainerBlock::onRightClickBlock);

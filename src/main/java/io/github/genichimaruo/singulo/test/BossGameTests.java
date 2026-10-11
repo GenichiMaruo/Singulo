@@ -374,4 +374,112 @@ public final class BossGameTests {
                     e -> e.getItem().is(item("terminus_record"))).isEmpty(), "終焉の記録が返ってこない");
         });
     }
+
+    /** 封印コンソールの上の重力異常点は、守護機が現れると縮んで消え、倒されると元の大きさへ戻る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void anomalyShrinksWhileWardenAwake(GameTestHelper helper) {
+        SealConsoleBlockEntity console = arena(helper);
+        long now = helper.getLevel().getGameTime();
+        helper.assertTrue(console.anomalyScale(now) == 1, "眠っているのに重力異常点が小さい: " + console.anomalyScale(now));
+        HorizonWarden warden = console.activate(helper.getLevel(), null);
+        long woke = helper.getLevel().getGameTime();
+        helper.assertTrue(console.bossAwake(), "守護機が起きたのに分からない");
+        helper.assertTrue(console.anomalyScale(woke + SealConsoleBlockEntity.ANOMALY_SHRINK_TICKS / 2F) < 0.5F, "縮み始めない");
+        helper.assertTrue(console.anomalyScale(woke + SealConsoleBlockEntity.ANOMALY_SHRINK_TICKS) == 0, "縮みきって消えない");
+        warden.skipEmerging();
+        warden.kill();
+        helper.runAtTickTime(5, () -> {
+            long t = helper.getLevel().getGameTime();
+            helper.assertFalse(console.bossAwake(), "倒したのにまだ起きていることになっている");
+            helper.assertTrue(console.anomalyScale(t + SealConsoleBlockEntity.ANOMALY_RETURN_TICKS) == 1, "倒したあと元の大きさへ戻らない");
+            helper.succeed();
+        });
+    }
+
+    /** 最後の記録者が現れると部屋が力場で閉ざされ、力場を越える移動（エンダーパールなど）は止まる。倒すと力場は消える。 */
+    @GameTest(template = EMPTY, timeoutTicks = 60)
+    public static void archivistSealsTheChamber(GameTestHelper helper) {
+        SealConsoleBlockEntity console = arena(helper);
+        LastArchivist a = console.activateArchivist(helper.getLevel(), null);
+        helper.runAtTickTime(3, () -> {
+            helper.assertTrue(io.github.genichimaruo.singulo.ruin.ArenaShield.active(a.getUUID()), "出現しても力場が張られない");
+            net.minecraft.world.phys.Vec3 c = LastArchivist.shieldCenter(helper.absolutePos(CONSOLE));
+            net.minecraft.world.phys.Vec3 out = c.add(LastArchivist.SHIELD_RADIUS + 3, 0, 0);
+            helper.assertTrue(io.github.genichimaruo.singulo.ruin.ArenaShield.crosses(helper.getLevel(), c, out), "中から外への移動を止めない");
+            helper.assertFalse(io.github.genichimaruo.singulo.ruin.ArenaShield.crosses(helper.getLevel(), c, c.add(3, 0, 0)), "中での移動まで止める");
+            a.skipEmerging();
+            a.kill();
+        });
+        helper.runAtTickTime(8, () -> {
+            helper.assertFalse(io.github.genichimaruo.singulo.ruin.ArenaShield.active(a.getUUID()), "倒しても力場が消えない");
+            a.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 最後の記録者が現れると、部屋の床の欠けた所がホログラムの床で埋まり、床は壊せなくなる。いなくなると元に戻る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 40)
+    public static void archivistPatchesTheFloor(GameTestHelper helper) {
+        SealConsoleBlockEntity console = arena(helper);
+        BlockPos hole = helper.absolutePos(CONSOLE).offset(0, -3, 0);
+        BlockPos solid = hole.east();
+        helper.getLevel().setBlock(hole, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+        helper.getLevel().setBlock(solid, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 3);
+        LastArchivist a = console.activateArchivist(helper.getLevel(), null);
+        helper.runAtTickTime(3, () -> {
+            helper.assertTrue(helper.getLevel().getBlockState(hole).is(SinguloBlocks.ARENA_HOLOGRAM.get()), "床の穴がホログラムで埋まらない");
+            helper.assertTrue(helper.getLevel().getBlockState(solid).is(net.minecraft.world.level.block.Blocks.STONE), "残っている床まで置き換えた");
+            helper.assertTrue(io.github.genichimaruo.singulo.ruin.ArenaShield.protectedFloor(helper.getLevel(), solid), "床が守られていない");
+            helper.assertTrue(SinguloBlocks.ARENA_HOLOGRAM.get().defaultBlockState().getDestroySpeed(helper.getLevel(), hole) < 0,
+                    "ホログラムの床が壊せてしまう");
+            helper.assertTrue(SinguloBlocks.ARENA_HOLOGRAM.get().asItem() == net.minecraft.world.item.Items.AIR, "ホログラムの床にアイテムがある");
+            a.discard();
+        });
+        helper.runAtTickTime(6, () -> {
+            helper.assertTrue(helper.getLevel().getBlockState(hole).isAir(), "戦いが終わってもホログラムの床が残っている");
+            helper.assertFalse(io.github.genichimaruo.singulo.ruin.ArenaShield.protectedFloor(helper.getLevel(), solid), "終わっても床が守られたまま");
+            helper.getLevel().setBlock(solid, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            helper.succeed();
+        });
+    }
+
+    /** 戦いの最中に投げたブラックホール爆弾は着弾せず、記録者の頭の特異点に吸い込まれて体力が戻る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void archivistSwallowsBlackHoleBombs(GameTestHelper helper) {
+        LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
+        a.skipEmerging();
+        a.setHealth(a.getMaxHealth() * 0.5F);
+        float before = a.getHealth();
+        var bomb = io.github.genichimaruo.singulo.registry.SinguloEntities.BLACK_HOLE_BOMB.get().create(helper.getLevel());
+        BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
+        bomb.moveTo(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5);
+        bomb.setDeltaMovement(0, -0.5, 0);
+        helper.getLevel().addFreshEntity(bomb);
+        helper.runAtTickTime(60, () -> {
+            helper.assertTrue(bomb.isRemoved(), "爆弾が吸い込まれない");
+            helper.assertTrue(a.getHealth() > before, "吸い込んでも体力が戻らない: " + a.getHealth() + " / " + before);
+            helper.assertTrue(helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.reactor.MicroBlackHole.class,
+                    a.getBoundingBox().inflate(40)).isEmpty(), "爆弾が着弾してブラックホールが開いた");
+            a.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 最後の記録者を倒すと、残光の翼が落ちる。翼は胴に着けて滑空でき、壊れない。 */
+    @GameTest(template = EMPTY, timeoutTicks = LastArchivist.DEATH_TICKS + 40)
+    public static void archivistDropsAfterglowWings(GameTestHelper helper) {
+        LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
+        a.skipEmerging();
+        a.kill();
+        var wings = io.github.genichimaruo.singulo.registry.SinguloItems.AFTERGLOW_WINGS.get();
+        ItemStack stack = new ItemStack(wings);
+        helper.assertTrue(wings.getEquipmentSlot() == EquipmentSlot.CHEST, "翼を胴に着けられない");
+        helper.assertTrue(wings.canElytraFly(stack, a) && !stack.isDamageableItem(), "翼で滑空できないか、壊れてしまう");
+        helper.runAtTickTime(LastArchivist.DEATH_TICKS + 20, () -> {
+            boolean dropped = !helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(helper.absolutePos(CONSOLE)).inflate(24), e -> e.getItem().is(wings)).isEmpty();
+            helper.assertTrue(dropped, "倒しても残光の翼が落ちない");
+            helper.succeed();
+        });
+    }
 }

@@ -457,21 +457,21 @@ public class ErgosphereLeviathan extends RuinBoss {
                 }
             }
             if (t == 1) {
-                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.emerge"), SoundSource.HOSTILE, 2.0F, 1.4F);
+                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.emerge"), SoundSource.HOSTILE, 2.0F, 1.0F);
             }
             if (t == EMERGE_VORTEX) {
-                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.5F, 1.2F);
+                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.5F, 1.0F);
             }
             if (t > EMERGE_VORTEX && t % 20 == 0) {
                 Vec3 h = hatchlingPos(core, t);
-                level.playSound(null, h.x, h.y, h.z, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.0F, 1.5F);
+                level.playSound(null, h.x, h.y, h.z, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.0F, 1.15F);
             }
             if (t >= HATCH_SETTLE - 10) {
                 // 床が震え、割れ目から塵が噴く
                 level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE_TILES.defaultBlockState()),
                         core.x, core.y - 0.5, core.z, 12, 2.5, 0.1, 2.5, 0.25);
                 if (t == HATCH_SETTLE - 10) {
-                    level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.rumble"), SoundSource.HOSTILE, 3.5F, 0.6F);
+                    level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.rumble"), SoundSource.HOSTILE, 3.5F, 1.0F);
                 }
             }
             return;
@@ -491,7 +491,7 @@ public class ErgosphereLeviathan extends RuinBoss {
                 broadcastLine(level, "gui.singulo.leviathan.swallow");
             }
             if (t == SWALLOW + 5) {
-                playSound(SinguloSounds.get("ergosphere_leviathan.swallow"), 3.0F, 0.6F);
+                playSound(SinguloSounds.get("ergosphere_leviathan.swallow"), 3.0F, 1.0F);
             }
             return;
         }
@@ -624,7 +624,7 @@ public class ErgosphereLeviathan extends RuinBoss {
                     case 0 -> startDive();
                     case 1 -> {
                         setState(COIL, pace(COIL_TICKS));
-                        playSound(SinguloSounds.get("ergosphere_leviathan.coil"), 3.0F, 0.8F);
+                        playSound(SinguloSounds.get("ergosphere_leviathan.coil"), 3.0F, 1.0F);
                     }
                     case 2 -> shedShards(level);
                     default -> startBreath();
@@ -635,7 +635,7 @@ public class ErgosphereLeviathan extends RuinBoss {
                     case 0 -> {
                         setState(JET, JET_TICKS);
                         entityData.set(JET_YAW, getYRot());
-                        playSound(SinguloSounds.get("ergosphere_leviathan.jet_charge"), 4.0F, 0.7F);
+                        playSound(SinguloSounds.get("ergosphere_leviathan.jet_charge"), 4.0F, 1.0F);
                     }
                     case 1 -> startDive();
                     case 2 -> {
@@ -655,7 +655,7 @@ public class ErgosphereLeviathan extends RuinBoss {
 
     private void startBreath() {
         setState(BREATH_CHARGE, pace(BREATH_CHARGE_TICKS));
-        playSound(SinguloSounds.get("ergosphere_leviathan.breath_charge"), 3.0F, 0.8F);
+        playSound(SinguloSounds.get("ergosphere_leviathan.breath_charge"), 3.0F, 1.0F);
     }
 
     /** 突進の身構え: 相手の上の、部屋の外側寄りへ昇る。終わると狙いを決めて突進する。 */
@@ -676,7 +676,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             setAim(at);
             velocity = at.subtract(head).normalize().scale(form() == 3 ? DIVE_SPEED * 1.15 : DIVE_SPEED);
             setState(DIVE, DIVE_TICKS);
-            playSound(SinguloSounds.get("ergosphere_leviathan.dive"), 3.0F, 0.9F);
+            playSound(SinguloSounds.get("ergosphere_leviathan.dive"), 3.0F, 1.0F);
         }
     }
 
@@ -748,7 +748,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         if (ticks <= 1) {
             setAim(target.getBoundingBox().getCenter());
             setState(BREATH_FIRE, BREATH_FIRE_TICKS + (form() == 3 ? 12 : 0));
-            playSound(SinguloSounds.get("ergosphere_leviathan.breath_fire"), 4.0F, 0.8F);
+            playSound(SinguloSounds.get("ergosphere_leviathan.breath_fire"), 4.0F, 1.0F);
         }
     }
 
@@ -813,7 +813,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             return;
         }
         if (ticks == WHIP_STRIKE) {
-            playSound(SinguloSounds.get("ergosphere_leviathan.whip"), 3.0F, 0.9F);
+            playSound(SinguloSounds.get("ergosphere_leviathan.whip"), 3.0F, 1.0F);
             for (Player p : challengers(level, ARENA + 4)) {
                 for (int i = SEGMENTS - 3; i < SEGMENTS; i++) {
                     if (p.distanceTo(parts[i]) < WHIP_RANGE) {
@@ -879,7 +879,7 @@ public class ErgosphereLeviathan extends RuinBoss {
                 level.sendParticles(ParticleTypes.FLASH, p.getX(), p.getY() + 1, p.getZ(), 1, 0, 0, 0, 0);
                 level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1, p.getZ(), 12, 0.5, 0.5, 0.5, 0.3);
             }
-            playSound(SinguloSounds.get("ergosphere_leviathan.molt"), 5.0F, 0.8F);
+            playSound(SinguloSounds.get("ergosphere_leviathan.molt"), 5.0F, 1.0F);
             for (Player p : challengers(level, 12)) {
                 if (p.distanceTo(this) < 10) {
                     p.hurt(damageSources().mobAttack(this), MOLT_DAMAGE);
@@ -910,7 +910,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         if (ticks <= 1) {
             setPos(c.x, c.y - 8, c.z);
             setState(ASCEND, ASCEND_TICKS);
-            level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.rumble"), SoundSource.HOSTILE, 4.0F, 0.5F);
+            level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.rumble"), SoundSource.HOSTILE, 4.0F, 1.0F);
         }
     }
 
@@ -932,7 +932,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             level.sendParticles(ParticleTypes.FLASH, c.x, c.y + 1, c.z, 3, 0.2, 0.2, 0.2, 0);
             level.sendParticles(ParticleTypes.SONIC_BOOM, c.x, c.y + 1, c.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y + 1, c.z, 1, 0, 0, 0, 0);
-            playSound(SinguloSounds.get("ergosphere_leviathan.ascend"), 5.0F, 0.7F);
+            playSound(SinguloSounds.get("ergosphere_leviathan.ascend"), 5.0F, 1.0F);
             broadcastLine(level, "gui.singulo.leviathan.ascend");
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(14), e -> e != this && !RuinGuards.isGuard(e))) {
                 Vec3 push = e.position().subtract(c).multiply(1, 0, 1);
@@ -1024,7 +1024,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         for (int i = 0; i < n; i++) {
             fireShard(level, parts[random.nextInt(SEGMENTS)], targets.get(random.nextInt(targets.size())));
         }
-        playSound(SinguloSounds.get("ergosphere_leviathan.shed"), 3.0F, 1.3F);
+        playSound(SinguloSounds.get("ergosphere_leviathan.shed"), 3.0F, 1.2F);
         return n;
     }
 
@@ -1053,7 +1053,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             return;
         }
         if (t == JET_WINDUP) {
-            playSound(SinguloSounds.get("ergosphere_leviathan.jet"), 5.0F, 0.8F);
+            playSound(SinguloSounds.get("ergosphere_leviathan.jet"), 5.0F, 1.0F);
         }
         float speed = awakened() ? 3.4F : 2.6F;
         entityData.set(JET_YAW, jetYaw() + speed);
@@ -1135,7 +1135,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, plate), from.getX(), from.getY() + 1, from.getZ(),
                     10, 0.5, 0.5, 0.5, 0.1);
         }
-        playSound(SinguloSounds.get("ergosphere_leviathan.shed"), 3.0F, 0.9F);
+        playSound(SinguloSounds.get("ergosphere_leviathan.shed"), 3.0F, 1.0F);
         return n;
     }
 
@@ -1264,7 +1264,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         stormMarks.clear();
         stormTimers.clear();
         if (level() instanceof ServerLevel) {
-            playSound(SinguloSounds.get("ergosphere_leviathan.death"), 4.0F, 0.9F);
+            playSound(SinguloSounds.get("ergosphere_leviathan.death"), 4.0F, 1.0F);
         }
     }
 
@@ -1309,7 +1309,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             }
             level.sendParticles(form() == 3 ? ParticleTypes.REVERSE_PORTAL : ParticleTypes.SOUL_FIRE_FLAME, p.getX(), p.getY() + 1, p.getZ(),
                     10, 0.5, 0.5, 0.5, 0.05);
-            level.playSound(null, p.blockPosition(), SinguloSounds.get("ergosphere_leviathan.shed"), SoundSource.HOSTILE, 1.5F, 1.2F);
+            level.playSound(null, p.blockPosition(), SinguloSounds.get("ergosphere_leviathan.shed"), SoundSource.HOSTILE, 1.5F, 1.1F);
         }
         if (t > DEATH_WRITHE && t % 2 == 0) {
             for (int i = 0; i < 4; i++) {
@@ -1320,7 +1320,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             }
         }
         if (t == DEATH_TICKS - 14) {
-            level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.implode"), SoundSource.HOSTILE, 4.0F, 0.7F);
+            level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.implode"), SoundSource.HOSTILE, 4.0F, 1.0F);
         }
         if (t == DEATH_TICKS - 8) {
             level.sendParticles(ParticleTypes.FLASH, core.x, core.y + 1, core.z, 3, 0.1, 0.1, 0.1, 0);

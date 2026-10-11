@@ -1477,6 +1477,36 @@ def degenerate_nucleus():
     return outlined(f)
 
 
+def afterglow_wings():
+    """残光の翼: 左右へ広げた一対の天使の翼（中央に寄せて描く）。前縁は中央の付け根から外上へ反り上がり、
+    そこから白い風切羽が一枚ずつ下へ垂れる（羽根の先のあいだが透けて、扇のように見える）。羽根の先は淡い水色に光る。"""
+    im, d = new()
+    white = (255, 255, 255, 255)
+    shade = (206, 222, 244, 255)
+    glow = (130, 222, 255, 255)
+    for side in (-1, 1):
+        def X(x):
+            return 7.5 + side * (x + 0.5)
+        # 前縁: 付け根 (0, 9) から外上の (6, 3) へ
+        edge = [(0, 9), (1, 8), (2, 7), (3, 6), (4, 5), (5, 4), (6, 3)]
+        # 風切羽: 前縁の各点から下（少し外）へ。外ほど長い
+        for i, (ex, ey) in enumerate(edge[1:], start=1):
+            length = 3 + (i + 1) // 2
+            for k in range(1, length + 1):
+                x = ex + (k * i) // 12
+                y = ey + k
+                if y > 14:
+                    break
+                c = glow if k == length else (shade if (k + i) % 3 == 0 else white)
+                d.point((X(x), y), fill=c)
+                if k < length and x > 0:
+                    d.point((X(x - 1), y), fill=shade)         # 羽根の内側の重なり（ふっくら見せる）
+        for ex, ey in edge:
+            d.point((X(ex), ey), fill=white)
+        d.point((X(6), 3), fill=glow)
+    return im
+
+
 def confinement_ring():
     """磁気閉じ込め環: 銀の隕鉄の芯に、赤紫のトポロジカル導線を巻いた輪。"""
     def f(d):
@@ -1624,6 +1654,7 @@ ITEM_ART = {
     'degenerate_precursor': degenerate_precursor,
     'confinement_ring': confinement_ring,
     'sentinel_core': sentinel_core,
+    'afterglow_wings': afterglow_wings,
     'degenerate_nucleus': degenerate_nucleus,
     'steel_plate': lambda: plate(STEEL),
     'ceramic_substrate': lambda: plate((236, 238, 240), 3, COPPER),

@@ -306,6 +306,7 @@ public final class GeneratedContent {
             "horizon_chapter",
             "ergosphere_chapter",
             "archivist_halo",
+            "afterglow_wings",
             "observation_log",
             "degraded_control_unit",
             "quantum_data_fragment",

@@ -30,6 +30,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerExtensions);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
+        modBus.addListener(SinguloClient::addWingLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
@@ -66,6 +67,20 @@ public final class SinguloClient {
         }
     }
 
+    /** 残光の翼を、プレイヤー（両方の体型）と防具立てに描く。 */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void addWingLayers(EntityRenderersEvent.AddLayers event) {
+        for (net.minecraft.client.resources.PlayerSkin.Model skin : event.getSkins()) {
+            if (event.getSkin(skin) instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer r) {
+                r.addLayer(new AfterglowWingsLayer<>(r));
+            }
+        }
+        if (event.getRenderer(net.minecraft.world.entity.EntityType.ARMOR_STAND)
+                instanceof net.minecraft.client.renderer.entity.ArmorStandRenderer stand) {
+            stand.addLayer(new AfterglowWingsLayer(stand));
+        }
+    }
+
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ACCELERATOR_CONTROLLER.get(),
                 AcceleratorRenderer::new);
@@ -88,13 +103,19 @@ public final class SinguloClient {
                 PenroseReactorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEAL_CONSOLE.get(),
                 ctx -> new net.minecraft.client.renderer.blockentity.BlockEntityRenderer<>() {
-                    // 重力異常点: 封印コンソールの上の空間がゆがんで見える
+                    // 重力異常点: 封印コンソールの上の空間がゆがんで見える。ボスが現れると縮んで消え、倒されると戻る
                     @Override
                     public void render(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be, float pt,
                                        com.mojang.blaze3d.vertex.PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buf,
                                        int light, int overlay) {
-                        net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos()).add(0, 3.5, 0);
-                        GravitationalLensing.add(c, 1.2F, 0.5F);
+                        if (be.getLevel() == null) {
+                            return;
+                        }
+                        float scale = be.anomalyScale(be.getLevel().getGameTime() + pt);
+                        if (scale > 0.01F) {
+                            net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos()).add(0, 3.5, 0);
+                            GravitationalLensing.add(c, 1.2F * scale, 0.5F * Math.min(1, scale));
+                        }
                     }
 
                     @Override

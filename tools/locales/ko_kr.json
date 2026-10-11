@@ -39,6 +39,14 @@
     "source": "Precise Hands",
     "translation": "정확한 손"
   },
+  "advancement.singulo.awakened.description": {
+    "source": "Defeat the Awakened Horizon Warden",
+    "translation": "각성한 지평선 감시자를 쓰러뜨리세요"
+  },
+  "advancement.singulo.awakened.title": {
+    "source": "Horizon Reawakened",
+    "translation": "깨어난 지평선"
+  },
   "advancement.singulo.awakened_echo.description": {
     "source": "Defeat the Awakened Echo Sentinel",
     "translation": "각성한 메아리 파수꾼을 쓰러뜨리세요"
@@ -182,6 +190,14 @@
   "advancement.singulo.gauntlet.title": {
     "source": "Inertia in Hand",
     "translation": "관성"
+  },
+  "advancement.singulo.hawking.description": {
+    "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
+    "translation": "회수 운전 중인 반응로에서 호킹 응축물을 모으세요. 첫 코어에는 6개가 필요합니다"
+  },
+  "advancement.singulo.hawking.title": {
+    "source": "Hawking Drop",
+    "translation": "호킹의 물방울"
   },
   "advancement.singulo.ignite.description": {
     "source": "Ignite the reactor",
@@ -335,6 +351,14 @@
     "source": "Horizon Shield",
     "translation": "호라이즌 쉴드"
   },
+  "advancement.singulo.star_core.description": {
+    "source": "Make an artificial star core",
+    "translation": "인공 항성 코어를 만드세요"
+  },
+  "advancement.singulo.star_core.title": {
+    "source": "Forging a Star",
+    "translation": "별을 만들다"
+  },
   "advancement.singulo.steel.description": {
     "source": "Make a steel ingot",
     "translation": "강철 주괴를 만드세요"
@@ -394,6 +418,10 @@
   "block.singulo.archive_terminal": {
     "source": "Archive Terminal",
     "translation": "기록 보관 단말기"
+  },
+  "block.singulo.arena_hologram": {
+    "source": "Hologram Floor",
+    "translation": "홀로그램 바닥"
   },
   "block.singulo.black_reinforced_glass": {
     "source": "Black Reinforced Glass",
@@ -1039,6 +1067,10 @@
     "source": "Tube segment of the Particle Accelerator ring.",
     "translation": "입자 가속기 링의 튜브 세그먼트."
   },
+  "desc.singulo.afterglow_wings": {
+    "source": "Wings of crystal feathers born from the Last Archivist's light. Wear them on your chest to glide; sneak while gliding to beat them and surge ahead. No fall damage.",
+    "translation": "마지막 기록자의 빛에서 태어난, 결정 깃털의 날개입니다. 몸통에 착용하면 활공할 수 있고, 활공 중에 웅크리면 날갯짓으로 가속합니다. 낙하 피해를 받지 않습니다."
+  },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
     "translation": "복원된 변칙 샘플."
@@ -1066,6 +1098,10 @@
   "desc.singulo.awakening_gravity_core": {
     "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
     "translation": "특이점의 힘을 불어넣은 축퇴 핵입니다. 봉쇄 배양 시설의 수호자 봉인 핵에 사용하면 각성한 중력 잔재가 나타납니다. 체력 2.5배, 피해 1.5배, 더 많은 잔해, 더 넓고 강한 중력 우물, 연속 내려찍기를 씁니다. 이기면 평소 전리품에 더해 오버클럭 칩 등을 얻습니다."
+  },
+  "desc.singulo.awakening_record_core": {
+    "source": "A record of the defeated warden, reforged with singularity power. Use it on the Seal Console in the final lab to wake the Awakened Horizon Warden: 2.5× health, 1.5× damage, faster moves. Victory yields overclock chips and more.",
+    "translation": "쓰러뜨린 수호자의 기록을 특이점의 힘으로 다시 구운 핵입니다. 최종 실험 시설의 씰 콘솔에 사용하면 각성한 지평선 감시자가 깨어납니다. 체력 2.5배, 피해 1.5배, 기술이 더 빠릅니다. 이기면 오버클럭 칩 등을 얻습니다."
   },
   "desc.singulo.basic_circuit": {
     "source": "The brain of every early machine.",
@@ -1931,6 +1967,10 @@
     "source": "Grows time crystal catalysts. Underpowering lowers their purity.",
     "translation": "시간 결정 촉매를 성장시킵니다. 힘이 약하면 순도가 낮아집니다."
   },
+  "desc.singulo.time_crystal_module": {
+    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
+    "translation": "새 시간 결정 수명의 2/3(기본 설정에서 30분)를 봉인한, 겹쳐 쌓을 수 있는 부품입니다. 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등의 설비에 들어갑니다. 남은 수명이 그보다 적은 결정(쓰던 것·순도가 낮은 것)은 자를 수 없습니다. 수명 설정이나 프리셋을 바꾸면 필요량도 비례해서 바뀝니다."
+  },
   "desc.singulo.time_crystal_seed": {
     "source": "Seed for time crystal catalysts.",
     "translation": "시간 결정 촉매용 시드입니다."
@@ -2139,6 +2179,10 @@
     "source": "Horizon Warden",
     "translation": "지평선 감시자"
   },
+  "entity.singulo.horizon_warden.awakened": {
+    "source": "Awakened Horizon Warden",
+    "translation": "각성한 지평선 감시자"
+  },
   "entity.singulo.last_archivist": {
     "source": "The Last Archivist",
     "translation": "최후의 기록자"
@@ -2255,6 +2299,10 @@
     "source": "Singularity Core embedded",
     "translation": "특이점 코어 내장"
   },
+  "gui.singulo.anchor.limited": {
+    "source": "Anchor limit reached (%s per player)",
+    "translation": "앵커 상한(1인당 %s대)에 도달했습니다"
+  },
   "gui.singulo.anchor.no_catalyst": {
     "source": "No catalyst",
     "translation": "촉매 없음"
@@ -2295,6 +2343,22 @@
     "source": "No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console",
     "translation": "도전자가 없어져 기록자는 시간의 장으로 돌아갔습니다. 종언의 기록이 콘솔에 남았습니다"
   },
+  "gui.singulo.archivist.shield_down": {
+    "source": "The field sealing the chamber unravels.",
+    "translation": "방을 닫고 있던 역장이 풀렸다."
+  },
+  "gui.singulo.archivist.shield_up": {
+    "source": "A field seals the chamber. No one leaves until it ends.",
+    "translation": "역장이 방을 닫았다. 끝날 때까지 아무도 나갈 수 없다."
+  },
+  "gui.singulo.archivist.tide": {
+    "source": "I turn the page of gravity.",
+    "translation": "중력의 페이지를 넘긴다."
+  },
+  "gui.singulo.archivist.tide_final": {
+    "source": "Do not fall. Float. All of it lies within my gravity.",
+    "translation": "떨어지지 마라. 떠올라라. 모든 것은 나의 중력 안에 있다."
+  },
   "gui.singulo.cache.sealed": {
     "source": "Sealed by a force field. Defeat this ruin's guardian",
     "translation": "역장으로 봉쇄되어 있습니다. 이 폐허를 지키는 수호자를 쓰러뜨리세요"
@@ -2326,6 +2390,14 @@
   "gui.singulo.console.awakened": {
     "source": "The seal breaks. The Horizon Warden awakens",
     "translation": "씰이 파손됩니다. 지평선 감시자가 깨어납니다"
+  },
+  "gui.singulo.console.awakened_defeated": {
+    "source": "The awakened warden is defeated. Fine parts spill from the wreck",
+    "translation": "각성한 수호자를 물리쳤습니다. 잔해에서 상질의 부품이 굴러 나옵니다"
+  },
+  "gui.singulo.console.awakened_rematch": {
+    "source": "The record core resonates. The Awakened Horizon Warden rises",
+    "translation": "기록핵이 공명합니다. 각성한 지평선 감시자가 일어섭니다"
   },
   "gui.singulo.console.defeated": {
     "source": "The warden falls silent. The vault field dissipates",
@@ -2571,6 +2643,14 @@
     "source": "Radius %s chunks",
     "translation": "반경 %1$s 청크"
   },
+  "gui.singulo.device.standby": {
+    "source": "Standby (storage full)",
+    "translation": "대기 중(저장량 가득 참)"
+  },
+  "gui.singulo.device.standby.hint": {
+    "source": "Fuel and catalyst are not used. Resumes when storage falls under 75%.",
+    "translation": "연료와 촉매를 쓰지 않습니다. 저장량이 75% 미만이 되면 다시 가동합니다"
+  },
   "gui.singulo.device.tank.contained": {
     "source": "Contained",
     "translation": "격리됨"
@@ -2815,13 +2895,45 @@
     "source": "Accretion efficiency %s%%",
     "translation": "부착 효율 %1$s%%"
   },
+  "gui.singulo.reactor.harvest": {
+    "source": "Harvest",
+    "translation": "회수"
+  },
+  "gui.singulo.reactor.harvest.hint": {
+    "source": "Keeps core mass at 480 or less so H condensate (needs a Hawking Collector) keeps forming every 5 minutes. Power output is small. An overgrown core sheds 2 mass per second through its jets until it is back. New reactors start in this mode",
+    "translation": "노심 질량을 480 이하로 유지해 호킹 응축물(호킹 수집기 필요)이 5분마다 생기게 합니다. 발전량은 작습니다. 너무 커진 노심은 제트로 초당 질량 2씩 방출해 돌아옵니다. 새 반응로는 이 모드로 시작합니다"
+  },
+  "gui.singulo.reactor.harvest.off": {
+    "source": "Harvest mode: OFF (power mode)",
+    "translation": "회수 운전: 꺼짐(발전 운전)"
+  },
+  "gui.singulo.reactor.harvest.on": {
+    "source": "Harvest mode: ON",
+    "translation": "회수 운전: 켜짐"
+  },
   "gui.singulo.reactor.ignite": {
     "source": "Ignite",
     "translation": "점화하다"
   },
+  "gui.singulo.reactor.ignition.band": {
+    "source": "Receiving %s / need %s MFE/t",
+    "translation": "수전 %s / 필요 %s MFE/t"
+  },
+  "gui.singulo.reactor.ignition.need": {
+    "source": "Ignition: %s GFE within %s s (avg %s MFE/t)",
+    "translation": "점화: %s초 안에 %s GFE(평균 %s MFE/t)"
+  },
+  "gui.singulo.reactor.ignition.reach": {
+    "source": "Reachable at this rate %s / %s GFE",
+    "translation": "이 속도로 도달 %s / %s GFE"
+  },
   "gui.singulo.reactor.ignition_failed": {
     "source": "Ignition failed: not enough power in time",
     "translation": "점화 실패: 제 시간에 전력이 부족함"
+  },
+  "gui.singulo.reactor.ignition_failed.detail": {
+    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake",
+    "translation": "도달 %s / %s GFE, 최대 수전 %s MFE/t(필요 %s MFE/t). 저장량이 충분해도 네트워크에서 가장 가는 케이블이 수전 상한을 정합니다"
   },
   "gui.singulo.reactor.interval": {
     "source": "Feed interval",
@@ -2850,6 +2962,10 @@
   "gui.singulo.reactor.mode.power": {
     "source": "Power mode",
     "translation": "전원 모드"
+  },
+  "gui.singulo.reactor.mode.shedding": {
+    "source": "Shedding mass (harvest mode)",
+    "translation": "질량 방출 중(회수 운전)"
   },
   "gui.singulo.reactor.mode.standby": {
     "source": "Standby",
@@ -3375,6 +3491,14 @@
     "source": "The four ruins",
     "translation": "네 개의 폐허"
   },
+  "guide.singulo.ruins.plan.body": {
+    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
+    "translation": "후반 단계에는 가야 할 곳이 한꺼번에 늘어납니다. 미리 모아 두면 공장이 멈추지 않습니다.\n- 2단계 중: 운석 크레이터(운철, 별가루), 빙산이나 얼음 가시(꽁꽁 언 얼음, 푸른 얼음).\n- 3단계 중: 연구동. 심해 압력 수집기를 일찍 설치해 고압 결정을 모아 두세요(껍질과 앤빌에 약 30개). 뇌우 때는 모래 위에 피뢰침.\n- 4단계 전: 봉쇄 배양 시설, 고대 도시(스컬크와 메아리 조각. 메아리 공명기로 한 조각을 계속 복제할 수 있습니다), 엔드의 공허(공허 수집기), 위더(네더의 별. 점화 후에는 인공 항성 코어로 대신합니다).\n- 원본 기록은 수리할 수 있습니다. 새것과 수리 3회로 약 2.7배 쓸 수 있으니, 유적을 다시 돌기 전에 수리하세요."
+  },
+  "guide.singulo.ruins.plan.title": {
+    "source": "Planning expeditions",
+    "translation": "탐사 계획"
+  },
   "guide.singulo.ruins.records.body": {
     "source": "Ruin caches sometimes hold crystal memories. Decode them in the Archive Terminal to unlock the Ancient Records chapter.",
     "translation": "폐허 보관함에서 가끔 크리스털 메모리가 나옵니다. 기록 보관 단말기에서 읽어 내면 '고대 문명의 기록' 장이 열립니다."
@@ -3620,6 +3744,10 @@
     "translation": "제작품: 특이점 캡슐화기(5단계)"
   },
   "howto.singulo.awakening_gravity_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.awakening_record_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "제작품: 특이점 캡슐화기(5단계)"
   },
@@ -4279,6 +4407,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "제작품: 정밀 조립기(4단계)"
   },
+  "howto.singulo.time_crystal_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
   "howto.singulo.time_crystal_seed": {
     "source": "Restore a Degraded Time Crystal Seed",
     "translation": "저하된 시간 결정 씨앗 복원"
@@ -4403,6 +4535,22 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작품: 정밀 조립기(5단계)"
   },
+  "item.singulo.afterglow_wings": {
+    "source": "Afterglow Wings",
+    "translation": "잔광의 날개"
+  },
+  "item.singulo.afterglow_wings.tip_1": {
+    "source": "Wings of light worn on the chest. Glide like an elytra; they never break",
+    "translation": "몸통에 착용하는 빛의 날개. 겉날개처럼 활공하며, 부서지지 않는다"
+  },
+  "item.singulo.afterglow_wings.tip_2": {
+    "source": "Sneak while gliding: beat the wings to surge forward",
+    "translation": "활공 중 웅크리기: 날갯짓으로 앞으로 가속"
+  },
+  "item.singulo.afterglow_wings.tip_3": {
+    "source": "No fall damage while worn. Protects like a diamond chestplate",
+    "translation": "착용 중에는 낙하 피해를 받지 않는다. 방어력은 다이아몬드 흉갑과 같다"
+  },
   "item.singulo.anomaly_sample": {
     "source": "Anomaly Sample",
     "translation": "이상 샘플"
@@ -4426,6 +4574,10 @@
   "item.singulo.awakening_gravity_core": {
     "source": "Awakened Gravity Core",
     "translation": "각성의 중력핵"
+  },
+  "item.singulo.awakening_record_core": {
+    "source": "Awakening Record Core",
+    "translation": "각성의 기록핵"
   },
   "item.singulo.basic_circuit": {
     "source": "Basic Circuit",
@@ -4878,6 +5030,10 @@
   "item.singulo.time_crystal_catalyst": {
     "source": "Time Crystal Catalyst",
     "translation": "시간 결정 촉매"
+  },
+  "item.singulo.time_crystal_module": {
+    "source": "Time Crystal Module",
+    "translation": "시간 결정 모듈"
   },
   "item.singulo.time_crystal_seed": {
     "source": "Time Crystal Seed",
@@ -6587,6 +6743,10 @@
     "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
     "translation": "사용 대상: 특이 물질, 특이점 코어, 시간 결정 모듈"
   },
+  "uses.singulo.time_crystal_module": {
+    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 1 more",
+    "translation": "사용 대상: 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 중력자 조작기, 티플러 코어 외 1개"
+  },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
     "translation": "사용 제품: 시간 결정 촉매"
@@ -6670,125 +6830,5 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "사용 대상: 웜홀 입구"
-  },
-  "advancement.singulo.awakened.description": {
-    "source": "Defeat the Awakened Horizon Warden",
-    "translation": "각성한 지평선 감시자를 쓰러뜨리세요"
-  },
-  "advancement.singulo.awakened.title": {
-    "source": "Horizon Reawakened",
-    "translation": "깨어난 지평선"
-  },
-  "advancement.singulo.hawking.description": {
-    "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
-    "translation": "회수 운전 중인 반응로에서 호킹 응축물을 모으세요. 첫 코어에는 6개가 필요합니다"
-  },
-  "advancement.singulo.hawking.title": {
-    "source": "Hawking Drop",
-    "translation": "호킹의 물방울"
-  },
-  "advancement.singulo.star_core.description": {
-    "source": "Make an artificial star core",
-    "translation": "인공 항성 코어를 만드세요"
-  },
-  "advancement.singulo.star_core.title": {
-    "source": "Forging a Star",
-    "translation": "별을 만들다"
-  },
-  "desc.singulo.awakening_record_core": {
-    "source": "A record of the defeated warden, reforged with singularity power. Use it on the Seal Console in the final lab to wake the Awakened Horizon Warden: 2.5× health, 1.5× damage, faster moves. Victory yields overclock chips and more.",
-    "translation": "쓰러뜨린 수호자의 기록을 특이점의 힘으로 다시 구운 핵입니다. 최종 실험 시설의 씰 콘솔에 사용하면 각성한 지평선 감시자가 깨어납니다. 체력 2.5배, 피해 1.5배, 기술이 더 빠릅니다. 이기면 오버클럭 칩 등을 얻습니다."
-  },
-  "desc.singulo.time_crystal_module": {
-    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
-    "translation": "새 시간 결정 수명의 2/3(기본 설정에서 30분)를 봉인한, 겹쳐 쌓을 수 있는 부품입니다. 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등의 설비에 들어갑니다. 남은 수명이 그보다 적은 결정(쓰던 것·순도가 낮은 것)은 자를 수 없습니다. 수명 설정이나 프리셋을 바꾸면 필요량도 비례해서 바뀝니다."
-  },
-  "entity.singulo.horizon_warden.awakened": {
-    "source": "Awakened Horizon Warden",
-    "translation": "각성한 지평선 감시자"
-  },
-  "gui.singulo.anchor.limited": {
-    "source": "Anchor limit reached (%s per player)",
-    "translation": "앵커 상한(1인당 %s대)에 도달했습니다"
-  },
-  "gui.singulo.console.awakened_defeated": {
-    "source": "The awakened warden is defeated. Fine parts spill from the wreck",
-    "translation": "각성한 수호자를 물리쳤습니다. 잔해에서 상질의 부품이 굴러 나옵니다"
-  },
-  "gui.singulo.console.awakened_rematch": {
-    "source": "The record core resonates. The Awakened Horizon Warden rises",
-    "translation": "기록핵이 공명합니다. 각성한 지평선 감시자가 일어섭니다"
-  },
-  "gui.singulo.device.standby": {
-    "source": "Standby (storage full)",
-    "translation": "대기 중(저장량 가득 참)"
-  },
-  "gui.singulo.device.standby.hint": {
-    "source": "Fuel and catalyst are not used. Resumes when storage falls under 75%.",
-    "translation": "연료와 촉매를 쓰지 않습니다. 저장량이 75% 미만이 되면 다시 가동합니다"
-  },
-  "gui.singulo.reactor.harvest": {
-    "source": "Harvest",
-    "translation": "회수"
-  },
-  "gui.singulo.reactor.harvest.hint": {
-    "source": "Keeps core mass at 480 or less so H condensate (needs a Hawking Collector) keeps forming every 5 minutes. Power output is small. An overgrown core sheds 2 mass per second through its jets until it is back. New reactors start in this mode",
-    "translation": "노심 질량을 480 이하로 유지해 호킹 응축물(호킹 수집기 필요)이 5분마다 생기게 합니다. 발전량은 작습니다. 너무 커진 노심은 제트로 초당 질량 2씩 방출해 돌아옵니다. 새 반응로는 이 모드로 시작합니다"
-  },
-  "gui.singulo.reactor.harvest.off": {
-    "source": "Harvest mode: OFF (power mode)",
-    "translation": "회수 운전: 꺼짐(발전 운전)"
-  },
-  "gui.singulo.reactor.harvest.on": {
-    "source": "Harvest mode: ON",
-    "translation": "회수 운전: 켜짐"
-  },
-  "gui.singulo.reactor.ignition.band": {
-    "source": "Receiving %s / need %s MFE/t",
-    "translation": "수전 %s / 필요 %s MFE/t"
-  },
-  "gui.singulo.reactor.ignition.need": {
-    "source": "Ignition: %s GFE within %s s (avg %s MFE/t)",
-    "translation": "점화: %s초 안에 %s GFE(평균 %s MFE/t)"
-  },
-  "gui.singulo.reactor.ignition.reach": {
-    "source": "Reachable at this rate %s / %s GFE",
-    "translation": "이 속도로 도달 %s / %s GFE"
-  },
-  "gui.singulo.reactor.ignition_failed.detail": {
-    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake",
-    "translation": "도달 %s / %s GFE, 최대 수전 %s MFE/t(필요 %s MFE/t). 저장량이 충분해도 네트워크에서 가장 가는 케이블이 수전 상한을 정합니다"
-  },
-  "gui.singulo.reactor.mode.shedding": {
-    "source": "Shedding mass (harvest mode)",
-    "translation": "질량 방출 중(회수 운전)"
-  },
-  "guide.singulo.ruins.plan.body": {
-    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
-    "translation": "후반 단계에는 가야 할 곳이 한꺼번에 늘어납니다. 미리 모아 두면 공장이 멈추지 않습니다.\n- 2단계 중: 운석 크레이터(운철, 별가루), 빙산이나 얼음 가시(꽁꽁 언 얼음, 푸른 얼음).\n- 3단계 중: 연구동. 심해 압력 수집기를 일찍 설치해 고압 결정을 모아 두세요(껍질과 앤빌에 약 30개). 뇌우 때는 모래 위에 피뢰침.\n- 4단계 전: 봉쇄 배양 시설, 고대 도시(스컬크와 메아리 조각. 메아리 공명기로 한 조각을 계속 복제할 수 있습니다), 엔드의 공허(공허 수집기), 위더(네더의 별. 점화 후에는 인공 항성 코어로 대신합니다).\n- 원본 기록은 수리할 수 있습니다. 새것과 수리 3회로 약 2.7배 쓸 수 있으니, 유적을 다시 돌기 전에 수리하세요."
-  },
-  "guide.singulo.ruins.plan.title": {
-    "source": "Planning expeditions",
-    "translation": "탐사 계획"
-  },
-  "howto.singulo.awakening_record_core": {
-    "source": "Made in: Singularity Encapsulator (stage 5)",
-    "translation": "제작품: 특이점 캡슐화기(5단계)"
-  },
-  "howto.singulo.time_crystal_module": {
-    "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "제작품: 정밀 조립기(4단계)"
-  },
-  "item.singulo.awakening_record_core": {
-    "source": "Awakening Record Core",
-    "translation": "각성의 기록핵"
-  },
-  "item.singulo.time_crystal_module": {
-    "source": "Time Crystal Module",
-    "translation": "시간 결정 모듈"
-  },
-  "uses.singulo.time_crystal_module": {
-    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 1 more",
-    "translation": "사용 대상: 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 중력자 조작기, 티플러 코어 외 1개"
   }
 }

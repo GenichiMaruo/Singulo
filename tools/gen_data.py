@@ -79,7 +79,7 @@ def stage_of(name):
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
-            '渦の断章': 5, '記録者の光輪': 5}.get(name, 1)
+            '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5}.get(name, 1)
 
 
 def max_uses(name):
@@ -711,6 +711,15 @@ UI_LANG = {
     'gui.singulo.archivist.emerge_2': ('ならば、最後の頁を読ませよう。', 'Then let me show you the last page.'),
     'gui.singulo.archivist.phase_2': ('思い出せ。記録はすべて、ここにある。', 'Remember. Every record is here.'),
     'gui.singulo.archivist.phase_3': ('光も、記録も、やがてこの暗がりへ還る。', 'Light and record alike return to this dark.'),
+    'block.singulo.arena_hologram': ('ホログラムの床', 'Hologram Floor'),
+    'item.singulo.afterglow_wings.tip_1': ('胴に着ける光の翼。エリトラのように滑空でき、壊れない', 'Wings of light worn on the chest. Glide like an elytra; they never break'),
+    'item.singulo.afterglow_wings.tip_2': ('滑空中にスニーク: 羽ばたいて前へ加速する', 'Sneak while gliding: beat the wings to surge forward'),
+    'item.singulo.afterglow_wings.tip_3': ('着けていると落下ダメージを受けない。守りはダイヤモンドの胸当てと同じ',
+                                           'No fall damage while worn. Protects like a diamond chestplate'),
+    'gui.singulo.archivist.shield_up': ('力場が部屋を閉ざした。終わるまで、誰も出られない。', 'A field seals the chamber. No one leaves until it ends.'),
+    'gui.singulo.archivist.shield_down': ('部屋を閉ざしていた力場がほどけた。', 'The field sealing the chamber unravels.'),
+    'gui.singulo.archivist.tide': ('重力の頁をめくる。', 'I turn the page of gravity.'),
+    'gui.singulo.archivist.tide_final': ('落ちるな。浮かべ。すべては、私の重力の中に。', 'Do not fall. Float. All of it lies within my gravity.'),
     'gui.singulo.archivist.death_1': ('……長い夢を、見ていた。', '...I have been dreaming a long dream.'),
     'gui.singulo.archivist.death_2': ('記録は、読む者がいて初めて記録になる。', 'A record is only a record when someone reads it.'),
     'gui.singulo.archivist.death_3': ('ありがとう。投入を止める手を、離さないで。', 'Thank you. Never let go of the hand that stops the feed.'),
@@ -2030,6 +2039,14 @@ def sounds_json():
                     if str(p.relative_to(base)).replace('\\', '/')[:-4] not in used)
     if missing:
         raise SystemExit(f'効果音のファイルがない: {missing}')
+    # Java 側（SinguloSounds.NAMES）に登録がないと、鳴らした瞬間にゲームが落ちる
+    java = (Path(__file__).resolve().parent.parent / 'src' / 'main' / 'java' / 'io' / 'github' / 'genichimaruo' / 'singulo'
+            / 'registry' / 'SinguloSounds.java').read_text(encoding='utf-8')
+    names_block = java[java.index('NAMES = {'):java.index('};', java.index('NAMES = {'))]
+    registered = set(re.findall(r'"([a-z0-9_.]+)"', names_block))
+    if set(SOUNDS) != registered:
+        raise SystemExit(f'SinguloSounds.NAMES と SOUNDS が合わない: Java に足りない {sorted(set(SOUNDS) - registered)}、'
+                         f'余分 {sorted(registered - set(SOUNDS))}')
     if unused:
         print(f'  使っていない効果音のファイル: {unused}')
     if pending:
@@ -2685,7 +2702,7 @@ def validate():
 
 
 # わざと透ける（ガラス・重ね絵）以外のブロックのテクスチャ
-SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay')
+SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram')
 
 
 GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind in ('part_glass', 'ruin_glass', 'deco_glass')}

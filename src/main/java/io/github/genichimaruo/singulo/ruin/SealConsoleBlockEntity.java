@@ -32,6 +32,13 @@ public class SealConsoleBlockEntity extends BlockEntity {
     private UUID warden;
     @Nullable
     private UUID archivist;
+    /** 重力異常点が縮み始めた・戻り始めたゲーム時刻（描画用。0 ならずっと今の状態）。 */
+    private long anomalyChangedAt;
+
+    /** ボスが現れてから、重力異常点が縮んで消えるまでの tick。 */
+    public static final int ANOMALY_SHRINK_TICKS = 40;
+    /** ボスが倒されて（封印に戻って）から、重力異常点が元の大きさに戻るまでの tick。 */
+    public static final int ANOMALY_RETURN_TICKS = 60;
 
     public SealConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.SEAL_CONSOLE.get(), pos, state);
@@ -94,7 +101,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
         w.startEmerging();
         level.addFreshEntity(w);
         warden = w.getUUID();
-        setChanged();
+        anomalyChanged();
         broadcast(level, "gui.singulo.console.awakened");
         return w;
     }
@@ -132,7 +139,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
         w.startEmerging();
         level.addFreshEntity(w);
         warden = w.getUUID();
-        setChanged();
+        anomalyChanged();
         broadcast(level, "gui.singulo.console.awakened_rematch");
         return w;
     }
@@ -177,24 +184,24 @@ public class SealConsoleBlockEntity extends BlockEntity {
         a.startEmerging();
         level.addFreshEntity(a);
         archivist = a.getUUID();
-        setChanged();
+        anomalyChanged();
         return a;
     }
 
     void onArchivistDefeated(ServerLevel level) {
         archivist = null;
-        setChanged();
+        anomalyChanged();
     }
 
     void onArchivistReset(ServerLevel level) {
         archivist = null;
-        setChanged();
+        anomalyChanged();
         broadcast(level, "gui.singulo.archivist.reset");
     }
 
     void onWardenDefeated(ServerLevel level) {
         warden = null;
-        setChanged();
+        anomalyChanged();
         RuinCacheBlockEntity vault = vault(level);
         if (vault != null) {
             vault.setSealed(false);
@@ -205,8 +212,46 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     void onWardenReset(ServerLevel level) {
         warden = null;
-        setChanged();
+        anomalyChanged();
         broadcast(level, "gui.singulo.console.reset");
+    }
+
+    /** ボスが起きているか（守護機か最後の記録者）。クライアントでも分かる。 */
+    public boolean bossAwake() {
+        return warden != null || archivist != null;
+    }
+
+    /**
+     * 重力異常点の大きさ（0〜1）。ボスが現れると縮んで消え（ボスはこの異常点から生まれる）、
+     * 倒される・封印に戻ると、ゆっくり元の大きさへ戻る。time はゲーム時刻（部分 tick を含む）。
+     */
+    public float anomalyScale(float time) {
+        float since = anomalyChangedAt <= 0 ? Float.MAX_VALUE : time - anomalyChangedAt;
+        if (bossAwake()) {
+            float k = Math.min(1, Math.max(0, since / ANOMALY_SHRINK_TICKS));
+            return (1 - k) * (1 - k);                          // 速く縮み始め、最後はすっと消える
+        }
+        float k = Math.min(1, Math.max(0, since / ANOMALY_RETURN_TICKS));
+        // ゆっくり戻り、少しふくらみすぎてから落ち着く
+        return k >= 1 ? 1 : k * k * (3 - 2 * k) * (1 + 0.25F * (float) Math.sin(k * Math.PI));
+    }
+
+    private void anomalyChanged() {
+        anomalyChangedAt = level != null ? level.getGameTime() : 0;
+        setChanged();
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
+    }
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
     }
 
     private void broadcast(ServerLevel level, String key) {
@@ -230,6 +275,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
         if (archivist != null) {
             tag.putUUID("archivist", archivist);
         }
+        tag.putLong("anomaly_changed", anomalyChangedAt);
     }
 
     @Override
@@ -237,5 +283,6 @@ public class SealConsoleBlockEntity extends BlockEntity {
         super.loadAdditional(tag, registries);
         warden = tag.hasUUID("warden") ? tag.getUUID("warden") : null;
         archivist = tag.hasUUID("archivist") ? tag.getUUID("archivist") : null;
+        anomalyChangedAt = tag.getLong("anomaly_changed");
     }
 }

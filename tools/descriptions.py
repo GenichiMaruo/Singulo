@@ -220,6 +220,8 @@ DESC = {
              "A passage of records that surfaces after the Ergosphere Leviathan sinks: the rest of the second reactor's log. Also used for the Awakened Ergosphere Core."),
     '終焉の記録': ('4つの断章を特異点の力で束ね直した、最後の頁。最終実験施設の封印コンソールで使うと、時間の場で眠っていた何かが目を覚ます。やめて部屋を離れると記録は戻る。',
               'The four chapters bound back together with singularity power: the last page. Use it on the Seal Console of the Final Lab to wake what slept in the time field. Leave and the record is returned.'),
+    '残光の翼': ('最後の記録者の光から生まれた、結晶の羽根の翼。胴に着けると滑空でき、滑空中にスニークすると羽ばたいて加速する。落下ダメージを受けない。',
+              "Wings of crystal feathers born from the Last Archivist's light. Wear them on your chest to glide; sneak while gliding to beat them and surge ahead. No fall damage."),
     '記録者の光輪': ('最後の記録者が戴いていた光輪。いまも静かに温かく、かすかに古い言葉をささやいている。',
                'The halo the Last Archivist wore. It is still quietly warm and faintly whispers in an old tongue.'),
     '縮退前駆体': ('高圧結晶を種にして、圧縮ブロックLv2を縮退の手前まで押し固めたもの。縮退物質殻に使うと岩石が少なくて済む。',

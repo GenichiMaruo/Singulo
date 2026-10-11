@@ -70,7 +70,7 @@ public class EchoSentinel extends RuinBoss {
     public static final float HEALTH = 320;
     /** 残っている投影器の数（0〜4）ごとの、受けるダメージの倍率。 */
     public static final float[] PROJECTION_FACTOR = {1.0F, 0.65F, 0.4F, 0.22F, 0.1F};
-    public static final float BOLT_DAMAGE = 6;
+    public static final float BOLT_DAMAGE = 5;
     static final int BOLT_INTERVAL = 36;
     public static final int BLINK_UNSEEN_TICKS = 24;
     static final int BLINK_COOLDOWN = 90;
@@ -78,16 +78,16 @@ public class EchoSentinel extends RuinBoss {
     static final int BLINK_CHAIN = 2;
     /** 背後へ跳んでから斬るまでの tick（光が集まる間に避けられる）。 */
     public static final int STRIKE_WINDUP = 12;
-    public static final float STRIKE_DAMAGE = 10;
+    public static final float STRIKE_DAMAGE = 8.5F;
     static final double STRIKE_RANGE = 3.5;
     /** 投影槍・投影陣のどちらかを使う間隔（体力半分からは短い）。 */
     static final int SKILL_INTERVAL = 70;
     static final int SKILL_INTERVAL_ENRAGED = 46;
     public static final int LANCE_WINDUP = 24;
-    public static final float LANCE_DAMAGE = 7;
+    public static final float LANCE_DAMAGE = 6;
     public static final double LANCE_RANGE = 28;
     public static final int CIRCLE_WINDUP = 30;
-    public static final float CIRCLE_DAMAGE = 9;
+    public static final float CIRCLE_DAMAGE = 7.5F;
     public static final double CIRCLE_RADIUS = 3.5;
     public static final double CIRCLE_RADIUS_ENRAGED = 4.5;
     static final int FLASH_TICKS = 8;

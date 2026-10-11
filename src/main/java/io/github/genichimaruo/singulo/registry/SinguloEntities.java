@@ -30,7 +30,7 @@ public final class SinguloEntities {
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.reactor.BlackHoleBomb>> BLACK_HOLE_BOMB = REGISTER.register(
             "black_hole_bomb", () -> EntityType.Builder.<io.github.genichimaruo.singulo.reactor.BlackHoleBomb>of(
                     io.github.genichimaruo.singulo.reactor.BlackHoleBomb::new, MobCategory.MISC)
-                    .sized(0.3F, 0.3F).clientTrackingRange(6).updateInterval(5).build(Singulo.id("black_hole_bomb").toString()));
+                    .sized(0.3F, 0.3F).clientTrackingRange(6).updateInterval(2).build(Singulo.id("black_hole_bomb").toString()));
     /** ブラックホール爆弾が開いた小さなブラックホール（保存しない）。 */
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.reactor.MicroBlackHole>> MICRO_BLACK_HOLE = REGISTER.register(
             "micro_black_hole_entity", () -> EntityType.Builder.<io.github.genichimaruo.singulo.reactor.MicroBlackHole>of(

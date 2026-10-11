@@ -852,8 +852,16 @@
     "subtitle": "subtitles.singulo.horizon_warden.ambient",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.ambient",
-        "type": "event"
+        "name": "singulo:boss/horizon_warden_ambient_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/horizon_warden_ambient_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/horizon_warden_ambient_3",
+        "attenuation_distance": 20
       }
     ]
   },
@@ -942,8 +950,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.emerge",
     "sounds": [
       {
-        "name": "minecraft:entity.warden.emerge",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_emerge",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -951,8 +959,16 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.ambient",
     "sounds": [
       {
-        "name": "minecraft:entity.elder_guardian.ambient",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_ambient_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:boss/ergosphere_leviathan_ambient_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:boss/ergosphere_leviathan_ambient_3",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -960,8 +976,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.hurt",
     "sounds": [
       {
-        "name": "minecraft:entity.elder_guardian.hurt",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_hurt",
+        "attenuation_distance": 20
       }
     ]
   },
@@ -969,8 +985,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.roar",
     "sounds": [
       {
-        "name": "minecraft:entity.ender_dragon.growl",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_roar",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -978,8 +994,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.dive",
     "sounds": [
       {
-        "name": "minecraft:entity.phantom.swoop",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_dive",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -987,8 +1003,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.breath_charge",
     "sounds": [
       {
-        "name": "minecraft:entity.warden.sonic_charge",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_breath_charge",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -996,8 +1012,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.breath_fire",
     "sounds": [
       {
-        "name": "minecraft:entity.warden.sonic_boom",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_breath_fire",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1005,8 +1021,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.shed",
     "sounds": [
       {
-        "name": "minecraft:entity.shulker.shoot",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_shed",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1014,8 +1030,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.death",
     "sounds": [
       {
-        "name": "minecraft:entity.ender_dragon.death",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_death",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1023,8 +1039,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.implode",
     "sounds": [
       {
-        "name": "minecraft:entity.generic.explode",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_implode",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1032,8 +1048,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.hatchling",
     "sounds": [
       {
-        "name": "minecraft:entity.silverfish.ambient",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_hatchling",
+        "attenuation_distance": 16
       }
     ]
   },
@@ -1041,8 +1057,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.rumble",
     "sounds": [
       {
-        "name": "minecraft:entity.warden.dig",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_rumble",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1050,8 +1066,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.swallow",
     "sounds": [
       {
-        "name": "minecraft:entity.ravager.attack",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_swallow",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1059,8 +1075,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.whip",
     "sounds": [
       {
-        "name": "minecraft:entity.player.attack.sweep",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_whip",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1068,8 +1084,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.molt",
     "sounds": [
       {
-        "name": "minecraft:entity.zombie.break_wooden_door",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_molt",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1077,8 +1093,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.coil",
     "sounds": [
       {
-        "name": "minecraft:entity.ender_dragon.flap",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_coil",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1086,8 +1102,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.ascend",
     "sounds": [
       {
-        "name": "minecraft:entity.wither.spawn",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_ascend",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1095,8 +1111,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.jet_charge",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.power_select",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_jet_charge",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1104,8 +1120,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.jet",
     "sounds": [
       {
-        "name": "minecraft:entity.warden.sonic_boom",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_jet",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1113,8 +1129,8 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.storm",
     "sounds": [
       {
-        "name": "minecraft:block.respawn_anchor.deplete",
-        "type": "event"
+        "name": "singulo:boss/ergosphere_leviathan_storm",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1122,8 +1138,8 @@
     "subtitle": "subtitles.singulo.last_archivist.emerge",
     "sounds": [
       {
-        "name": "minecraft:block.end_portal.spawn",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_emerge",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1131,8 +1147,16 @@
     "subtitle": "subtitles.singulo.last_archivist.ambient",
     "sounds": [
       {
-        "name": "minecraft:block.conduit.ambient",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_ambient_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:boss/last_archivist_ambient_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:boss/last_archivist_ambient_3",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1140,8 +1164,8 @@
     "subtitle": "subtitles.singulo.last_archivist.hurt",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_block.hit",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_hurt",
+        "attenuation_distance": 20
       }
     ]
   },
@@ -1149,8 +1173,8 @@
     "subtitle": "subtitles.singulo.last_archivist.phase",
     "sounds": [
       {
-        "name": "minecraft:item.totem.use",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_phase",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1158,8 +1182,8 @@
     "subtitle": "subtitles.singulo.last_archivist.judgment_aim",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.activate",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_judgment_aim",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1167,8 +1191,8 @@
     "subtitle": "subtitles.singulo.last_archivist.judgment_fire",
     "sounds": [
       {
-        "name": "minecraft:entity.evoker.cast_spell",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_judgment_fire",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1176,8 +1200,8 @@
     "subtitle": "subtitles.singulo.last_archivist.verdict",
     "sounds": [
       {
-        "name": "minecraft:block.respawn_anchor.charge",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_verdict",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1185,8 +1209,8 @@
     "subtitle": "subtitles.singulo.last_archivist.collapse",
     "sounds": [
       {
-        "name": "minecraft:block.respawn_anchor.deplete",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_collapse",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1194,8 +1218,8 @@
     "subtitle": "subtitles.singulo.last_archivist.recall",
     "sounds": [
       {
-        "name": "minecraft:entity.illusioner.cast_spell",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_recall",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1203,8 +1227,8 @@
     "subtitle": "subtitles.singulo.last_archivist.nova_charge",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.power_select",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_nova_charge",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1212,8 +1236,8 @@
     "subtitle": "subtitles.singulo.last_archivist.nova",
     "sounds": [
       {
-        "name": "minecraft:entity.warden.sonic_boom",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_nova",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1221,8 +1245,8 @@
     "subtitle": "subtitles.singulo.last_archivist.death",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.deactivate",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_death",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1230,8 +1254,8 @@
     "subtitle": "subtitles.singulo.last_archivist.death_flash",
     "sounds": [
       {
-        "name": "minecraft:block.end_portal.spawn",
-        "type": "event"
+        "name": "singulo:boss/last_archivist_death_flash",
+        "attenuation_distance": 64
       }
     ]
   }

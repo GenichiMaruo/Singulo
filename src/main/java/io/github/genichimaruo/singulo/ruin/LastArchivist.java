@@ -38,6 +38,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -67,8 +68,19 @@ public class LastArchivist extends RuinBoss {
     private static final EntityDataAccessor<Vector3f> JUDGE_1 = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Vector3f> JUDGE_2 = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Vector3f> JUDGE_3 = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.VECTOR3);
+    /** 部屋の中心（封印コンソール）。部屋全体の演出をクライアントで描くのに使う。 */
+    private static final EntityDataAccessor<java.util.Optional<BlockPos>> HOME = SynchedEntityData.defineId(LastArchivist.class,
+            EntityDataSerializers.OPTIONAL_BLOCK_POS);
+    /** 力場: 張ってからの tick（正）、消え始めてからの tick（負）、0 なら張っていない。 */
+    private static final EntityDataAccessor<Integer> SHIELD = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
+    /** 力場に誰かがぶつかった光が残る tick。 */
+    private static final EntityDataAccessor<Integer> SHIELD_HIT = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
+    /** 重力潮汐の残り tick（TIDE_LOW より多い間は浮上、そのあと低重力）。 */
+    private static final EntityDataAccessor<Integer> TIDE = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
+    /** ブラックホール爆弾を吸い込んで回復している残り tick（演出用）。 */
+    private static final EntityDataAccessor<Integer> ABSORB = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
 
-    public static final int NONE = 0, JUDGMENT = 1, VERDICT = 2, RECALL_ECHO = 3, RECALL_GRAVITY = 4, RECALL_HORIZON = 5, NOVA = 6;
+    public static final int NONE = 0, JUDGMENT = 1, VERDICT = 2, RECALL_ECHO = 3, RECALL_GRAVITY = 4, RECALL_HORIZON = 5, NOVA = 6, GRAVITY_TIDE = 7;
 
     /** 体力の既定値（設定 archivistHealth）。 */
     public static final double HEALTH = 2400;
@@ -98,12 +110,38 @@ public class LastArchivist extends RuinBoss {
     public static final double PULL_RADIUS = 20, CORE_RADIUS = 2.5;
     public static final float CORE_DAMAGE = 4;
     static final int[] GAP = {70, 55, 45};
+    /** ボス部屋を包む力場の半径（部屋の中心＝コンソールの2ブロック下から）。最終実験施設のドームの内側に収まる。 */
+    public static final double SHIELD_RADIUS = 15.0;
+    /** 力場が張られる・消えるまでの tick。 */
+    public static final int SHIELD_RISE = 40;
+    /** 重力潮汐: 浮上の tick（終焉では長い）、そのあとの低重力の tick、終わってからも落下ダメージを受けない tick。 */
+    public static final int TIDE_LIFT = 40, TIDE_LIFT_FINAL = 55, TIDE_LOW = 120, TIDE_GRACE = 50;
+    /** 低重力のときの重力の倍率。 */
+    public static final double TIDE_GRAVITY = 0.15;
+    static final net.minecraft.resources.ResourceLocation TIDE_GRAVITY_ID = Singulo.id("archivist_tide_gravity");
+    static final net.minecraft.resources.ResourceLocation TIDE_FALL_ID = Singulo.id("archivist_tide_fall");
+    /** 守る床（コンソールの3ブロック下の段）の半径。最終実験施設の床の円に合わせる。 */
+    public static final double FLOOR_RADIUS = 15.4;
+    /** ブラックホール爆弾を吸い込んだとき回復する、最大体力の割合。 */
+    public static final float BOMB_HEAL = 0.12F;
+    /** 吸い込んで回復する演出の tick。 */
+    public static final int ABSORB_TICKS = 50;
+    /** 裁きの光が着いた所を中心に、まわりも焼く半径。 */
+    public static final double JUDGE_SPLASH = 2.2;
 
     private int moveCooldown = 60;
     private int cycle;
     private int recall;
     private final List<Vec3> verdictMarks = new ArrayList<>();
     private final Set<UUID> ringHit = new HashSet<>();
+    /** 力場を張っているか（保存する。読み込み直したら張り直す）。 */
+    private boolean shieldUp;
+    /** 力場の中に閉じ込めたプレイヤー。 */
+    private final Set<UUID> insiders = new HashSet<>();
+    private int bumpSoundCooldown;
+    private int tideGrace;
+    /** 床の欠けた所に置いたホログラムの床。 */
+    private final List<BlockPos> hologram = new ArrayList<>();
 
     public LastArchivist(EntityType<? extends LastArchivist> type, Level level) {
         super(type, level, BossEvent.BossBarColor.YELLOW);
@@ -134,6 +172,11 @@ public class LastArchivist extends RuinBoss {
         builder.define(JUDGE_1, new Vector3f());
         builder.define(JUDGE_2, new Vector3f());
         builder.define(JUDGE_3, new Vector3f());
+        builder.define(HOME, java.util.Optional.empty());
+        builder.define(SHIELD, 0);
+        builder.define(SHIELD_HIT, 0);
+        builder.define(TIDE, 0);
+        builder.define(ABSORB, 0);
     }
 
     @Override
@@ -197,6 +240,61 @@ public class LastArchivist extends RuinBoss {
     }
 
     @Override
+    public void awaken(BlockPos core) {
+        super.awaken(core);
+        entityData.set(HOME, java.util.Optional.of(core));
+    }
+
+    /** 部屋の中心（封印コンソール）。クライアントでも分かる。 */
+    public java.util.Optional<BlockPos> arenaHome() {
+        return entityData.get(HOME);
+    }
+
+    /** 力場の中心（部屋の床の中央あたり）。 */
+    public static Vec3 shieldCenter(BlockPos console) {
+        return Vec3.atCenterOf(console).subtract(0, 2, 0);
+    }
+
+    public int shieldTicks() {
+        return entityData.get(SHIELD);
+    }
+
+    public int shieldHit() {
+        return entityData.get(SHIELD_HIT);
+    }
+
+    public int tideTicks() {
+        return entityData.get(TIDE);
+    }
+
+    public int absorbTicks() {
+        return entityData.get(ABSORB);
+    }
+
+    /** 守る床の高さ（コンソールの3ブロック下）。 */
+    public static int floorY(BlockPos console) {
+        return console.getY() - 3;
+    }
+
+    /** 重力潮汐で、いま浮き上がっている最中か（残り tick から）。 */
+    public static boolean tideLifting(int left) {
+        return left > TIDE_LOW;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (level() instanceof ServerLevel level && !isRemoved()) {
+            tickShield(level);
+            tickTide(level);
+            captureBombs(level);
+            if (absorbTicks() > 0) {
+                entityData.set(ABSORB, absorbTicks() - 1);
+            }
+        }
+    }
+
+    @Override
     protected void registerGoals() {
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, false));
@@ -227,7 +325,8 @@ public class LastArchivist extends RuinBoss {
     protected void onEmergeTick(ServerLevel level, int t) {
         Vec3 c = position();
         if (t == 1) {
-            playSound(SinguloSounds.get("last_archivist.emerge"), 4.0F, 0.8F);
+            playSound(SinguloSounds.get("last_archivist.emerge"), 4.0F, 1.0F);
+            raiseShield(level);
         }
         if (t < 40) {
             for (int i = 0; i < 3; i++) {
@@ -253,7 +352,7 @@ public class LastArchivist extends RuinBoss {
         }
         if (t == 150) {
             broadcastLine(level, "gui.singulo.archivist.emerge_2");
-            playSound(SinguloSounds.get("last_archivist.phase"), 3.0F, 1.2F);
+            playSound(SinguloSounds.get("last_archivist.phase"), 3.0F, 1.0F);
         }
         if (t == 185) {
             level.sendParticles(ParticleTypes.FLASH, c.x, c.y + CHEST_Y, c.z, 2, 0.1, 0.1, 0.1, 0);
@@ -352,18 +451,23 @@ public class LastArchivist extends RuinBoss {
         if (phase() == 1) {
             kind = step % 2 == 0 ? JUDGMENT : VERDICT;
         } else if (phase() == 2) {
-            kind = switch (step % 4) {
+            kind = switch (step % 5) {
                 case 0 -> JUDGMENT;
-                case 2 -> VERDICT;
+                case 2 -> GRAVITY_TIDE;
+                case 3 -> VERDICT;
                 default -> nextRecall();
             };
         } else {
-            kind = switch (step % 4) {
+            kind = switch (step % 5) {
                 case 0 -> NOVA;
                 case 1 -> JUDGMENT;
-                case 2 -> nextRecall();
+                case 2 -> GRAVITY_TIDE;
+                case 3 -> nextRecall();
                 default -> VERDICT;
             };
+        }
+        if (kind == GRAVITY_TIDE && tideTicks() > 0) {
+            kind = JUDGMENT;
         }
         switch (kind) {
             case JUDGMENT -> startJudgment(level, target);
@@ -373,12 +477,17 @@ public class LastArchivist extends RuinBoss {
             case RECALL_HORIZON -> {
                 setMove(RECALL_HORIZON, HORIZON_WINDUP + HORIZON_SPREAD);
                 ringHit.clear();
-                playSound(SinguloSounds.get("last_archivist.recall"), 3.0F, 0.8F);
+                playSound(SinguloSounds.get("last_archivist.recall"), 3.0F, 1.0F);
             }
             case NOVA -> {
                 setMove(NOVA, NOVA_CHARGE + NOVA_SPREAD);
                 ringHit.clear();
-                playSound(SinguloSounds.get("last_archivist.nova_charge"), 4.0F, 0.6F);
+                playSound(SinguloSounds.get("last_archivist.nova_charge"), 4.0F, 1.0F);
+            }
+            case GRAVITY_TIDE -> {
+                // 部屋全体の重力をゆがめる。ゆがめている間も、ほかの技は続く
+                startTide(level);
+                moveCooldown = pace(30);
             }
             default -> { }
         }
@@ -467,6 +576,14 @@ public class LastArchivist extends RuinBoss {
                 level.sendParticles(ParticleTypes.END_ROD, q.x, q.y, q.z, 1, 0.05, 0.05, 0.05, 0.02);
             }
             level.sendParticles(ParticleTypes.FLASH, end.x, end.y, end.z, 1, 0, 0, 0, 0);
+            // 着いた所: 光が弾けて、まわりも焼く
+            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(end, end).inflate(JUDGE_SPLASH),
+                    e -> e.isAlive() && e != this && !RuinGuards.isGuard(e) && e.distanceToSqr(end) <= JUDGE_SPLASH * JUDGE_SPLASH)) {
+                e.hurt(damageSources().indirectMagic(this, this), JUDGE_DAMAGE * 0.6F);
+            }
+            level.sendParticles(ParticleTypes.EXPLOSION, end.x, end.y, end.z, 2, 0.4, 0.2, 0.4, 0);
+            level.sendParticles(ParticleTypes.END_ROD, end.x, end.y + 0.2, end.z, 40, 0.2, 0.1, 0.2, 0.35);
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, end.x, end.y + 0.2, end.z, 30, 1.2, 0.1, 1.2, 0.3);
         }
         entityData.set(FLASH, FLASH_TICKS);
         playSound(SinguloSounds.get("last_archivist.judgment_fire"), 3.5F, 1.0F);
@@ -494,6 +611,14 @@ public class LastArchivist extends RuinBoss {
 
     private void tickVerdict(ServerLevel level, int left) {
         for (Vec3 m : verdictMarks) {
+            if (left % 2 == 0) {
+                double top = m.y + 2 + 10 * Math.max(0, left) / Math.max(1.0, VERDICT_WINDUP);
+                level.sendParticles(ParticleTypes.REVERSE_PORTAL, m.x, top, m.z, 4, 0.25, 0.4, 0.25, 0.02);
+            }
+            if (left <= 0) {
+                level.sendParticles(ParticleTypes.EXPLOSION, m.x, m.y + 0.5, m.z, 1, 0, 0, 0, 0);
+                level.sendParticles(ParticleTypes.SQUID_INK, m.x, m.y + 0.5, m.z, 20, 1.0, 0.2, 1.0, 0.05);
+            }
             if (left % 3 == 0) {
                 for (int k = 0; k < 10; k++) {
                     double a = k * Math.PI / 5 + left * 0.1;
@@ -506,7 +631,7 @@ public class LastArchivist extends RuinBoss {
             }
         }
         if (left <= 0) {
-            playSound(SinguloSounds.get("last_archivist.collapse"), 3.0F, 0.8F);
+            playSound(SinguloSounds.get("last_archivist.collapse"), 3.0F, 1.0F);
             verdictMarks.clear();
         }
     }
@@ -525,13 +650,18 @@ public class LastArchivist extends RuinBoss {
         level.sendParticles(ParticleTypes.END_ROD, before.x, before.y + 1.5, before.z, 40, 0.4, 1, 0.4, 0.1);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 1.5, getZ(), 30, 0.4, 1, 0.4, 0.2);
         setMove(RECALL_ECHO, pace(ECHO_WINDUP));
-        playSound(SinguloSounds.get("last_archivist.recall"), 3.0F, 1.3F);
+        playSound(SinguloSounds.get("last_archivist.recall"), 3.0F, 1.3F);                 // 残響の番人の記録（高め）
         playSound(SinguloSounds.get("echo_sentinel.strike_windup"), 2.0F, 0.8F);
     }
 
     private void echoStrike(ServerLevel level, LivingEntity target) {
         playSound(SinguloSounds.get("echo_sentinel.strike"), 2.5F, 0.8F);
-        level.sendParticles(ParticleTypes.SWEEP_ATTACK, getX(), getY() + 1.5, getZ(), 3, 1, 0.3, 1, 0);
+        level.sendParticles(ParticleTypes.SWEEP_ATTACK, getX(), getY() + 1.5, getZ(), 8, 2.0, 0.5, 2.0, 0);
+        for (int k = 0; k < 24; k++) {
+            double a = k * Math.PI / 12;
+            level.sendParticles(ParticleTypes.END_ROD, getX() + Math.cos(a) * 3.5, getY() + 1.4, getZ() + Math.sin(a) * 3.5,
+                    0, Math.cos(a), 0.05, Math.sin(a), 0.4);
+        }
         for (Player p : challengers(level)) {
             if (p.distanceTo(this) <= 4.5 && p.hurt(damageSources().mobAttack(this), ECHO_DAMAGE)) {
                 Vec3 k = p.position().subtract(position()).multiply(1, 0, 1);
@@ -552,7 +682,7 @@ public class LastArchivist extends RuinBoss {
             }
         }
         setMove(RECALL_GRAVITY, GRAVITY_HOLD);
-        playSound(SinguloSounds.get("last_archivist.recall"), 3.0F, 0.9F);
+        playSound(SinguloSounds.get("last_archivist.recall"), 3.0F, 0.9F);                 // 重力の澱の記録（低め）
         playSound(SinguloSounds.get("gravity_remnant.lift"), 2.5F, 0.8F);
     }
 
@@ -565,6 +695,13 @@ public class LastArchivist extends RuinBoss {
             }
         }
         playSound(SinguloSounds.get("gravity_remnant.slam"), 2.5F, 0.8F);
+        if (home != null) {
+            Vec3 f = shieldCenter(home);
+            for (int k = 0; k < 32; k++) {
+                double a = k * Math.PI / 16;
+                level.sendParticles(ParticleTypes.SQUID_INK, f.x + Math.cos(a) * 6, f.y, f.z + Math.sin(a) * 6, 2, 0.4, 0.1, 0.4, 0.05);
+            }
+        }
     }
 
     /** ホライズン・ウォーデンの技: 床を走る衝撃波の輪（地に足がついていると当たる。跳べばよけられる）。 */
@@ -630,8 +767,10 @@ public class LastArchivist extends RuinBoss {
             return;
         }
         if (left == NOVA_SPREAD) {
-            playSound(SinguloSounds.get("last_archivist.nova"), 5.0F, 0.8F);
+            playSound(SinguloSounds.get("last_archivist.nova"), 5.0F, 1.0F);
             level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 2, 0.1, 0.1, 0.1, 0);
+            level.sendParticles(ParticleTypes.END_ROD, c.x, c.y, c.z, 200, 0.3, 0.3, 0.3, 0.9);
+            level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y, c.z, 1, 0, 0, 0, 0);
         }
         double r = novaRadius(left);
         for (Player p : challengers(level)) {
@@ -643,6 +782,293 @@ public class LastArchivist extends RuinBoss {
                 p.hurtMarked = true;
             }
         }
+    }
+
+    // ---- ボス部屋の力場
+
+    /** 部屋を力場で閉ざす（出現の最初）。中にいるプレイヤーは倒すまで出られず、外からは入れない。 */
+    private void raiseShield(ServerLevel level) {
+        if (home == null) {
+            return;
+        }
+        shieldUp = true;
+        Vec3 c = shieldCenter(home);
+        ArenaShield.raise(getUUID(), level, c, SHIELD_RADIUS, floorY(home), FLOOR_RADIUS);
+        fillFloor(level);
+        insiders.clear();
+        for (Player p : level.getEntitiesOfClass(Player.class, new AABB(c, c).inflate(SHIELD_RADIUS))) {
+            if (!ArenaShield.exempt(p) && p.position().add(0, p.getBbHeight() / 2, 0).distanceTo(c) < SHIELD_RADIUS) {
+                insiders.add(p.getUUID());
+            }
+        }
+        entityData.set(SHIELD, 1);
+        level.playSound(null, home, SinguloSounds.get("guardian_core.awaken"), SoundSource.HOSTILE, 3.0F, 0.7F);
+        broadcastLine(level, "gui.singulo.archivist.shield_up");
+    }
+
+    /** 力場を消す（倒されたとき・挑戦者がいなくなったとき・いなくなったとき）。 */
+    private void lowerShield(boolean announce) {
+        if (!shieldUp) {
+            return;
+        }
+        shieldUp = false;
+        ArenaShield.lower(getUUID());
+        insiders.clear();
+        entityData.set(SHIELD, -1);
+        if (announce && level() instanceof ServerLevel level && home != null) {
+            level.playSound(null, home, SinguloSounds.get("vault.unseal"), SoundSource.HOSTILE, 3.0F, 0.6F);
+            broadcastLine(level, "gui.singulo.archivist.shield_down");
+        }
+    }
+
+    private void tickShield(ServerLevel level) {
+        int s = shieldTicks();
+        if (shieldUp && home != null) {
+            if (!ArenaShield.active(getUUID())) {
+                ArenaShield.raise(getUUID(), level, shieldCenter(home), SHIELD_RADIUS, floorY(home), FLOOR_RADIUS);      // 読み込み直したとき
+            }
+            if (s < SHIELD_RISE + 2) {
+                entityData.set(SHIELD, Math.max(1, s + 1));
+            }
+            holdShield(level);
+            if (tickCount % 20 == 0) {
+                fillFloor(level);
+            }
+        } else if (s < 0) {
+            entityData.set(SHIELD, s <= -SHIELD_RISE ? 0 : s - 1);
+        }
+        if (shieldHit() > 0) {
+            entityData.set(SHIELD_HIT, shieldHit() - 1);
+        }
+        if (bumpSoundCooldown > 0) {
+            bumpSoundCooldown--;
+        }
+    }
+
+    /** 力場の内と外を分ける: 中から出ようとするプレイヤーは押し戻し、外から入ろうとするプレイヤーは押し返す。 */
+    private void holdShield(ServerLevel level) {
+        Vec3 c = shieldCenter(home);
+        double r = SHIELD_RADIUS;
+        for (Player p : level.getEntitiesOfClass(Player.class, new AABB(c, c).inflate(r + 4))) {
+            if (ArenaShield.exempt(p) || !p.isAlive()) {
+                continue;
+            }
+            Vec3 body = p.position().add(0, p.getBbHeight() / 2, 0);
+            Vec3 off = body.subtract(c);
+            double d = off.length();
+            if (d < 1e-3) {
+                continue;
+            }
+            Vec3 n = off.scale(1 / d);
+            boolean in = insiders.contains(p.getUUID());
+            if (!in && d < r - 1.5) {
+                insiders.add(p.getUUID());              // 中で目を覚ました（読み込み直しなど）
+                in = true;
+            }
+            if (in && d > r - 0.8) {
+                if (d > r) {
+                    Vec3 back = c.add(n.scale(r - 1.0)).subtract(0, p.getBbHeight() / 2, 0);
+                    p.teleportTo(back.x, back.y, back.z);
+                }
+                Vec3 v = p.getDeltaMovement();
+                p.setDeltaMovement(v.subtract(n.scale(Math.max(0, v.dot(n)) + 0.3)));
+                p.hurtMarked = true;
+                bump(level, c.add(n.scale(r)));
+            } else if (!in && d < r + 0.8) {
+                if (d < r) {
+                    Vec3 out = c.add(n.scale(r + 1.0)).subtract(0, p.getBbHeight() / 2, 0);
+                    p.teleportTo(out.x, out.y, out.z);
+                }
+                Vec3 v = p.getDeltaMovement();
+                p.setDeltaMovement(v.add(n.scale(Math.max(0, -v.dot(n)) + 0.3)));
+                p.hurtMarked = true;
+                bump(level, c.add(n.scale(r)));
+            }
+        }
+    }
+
+    private void bump(ServerLevel level, Vec3 at) {
+        entityData.set(SHIELD_HIT, 10);
+        level.sendParticles(ParticleTypes.END_ROD, at.x, at.y, at.z, 8, 0.3, 0.3, 0.3, 0.08);
+        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 10, 0.3, 0.3, 0.3, 0.2);
+        if (bumpSoundCooldown <= 0) {
+            bumpSoundCooldown = 10;
+            level.playSound(null, at.x, at.y, at.z, net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, SoundSource.HOSTILE, 1.2F, 1.6F);
+        }
+    }
+
+    // ---- 床
+
+    /** ボス部屋の床の欠けた所（空気・水・草など置き換えられるもの）を、ホログラムの床で埋める。 */
+    private void fillFloor(ServerLevel level) {
+        if (home == null) {
+            return;
+        }
+        BlockState holo = io.github.genichimaruo.singulo.registry.SinguloBlocks.ARENA_HOLOGRAM.get().defaultBlockState();
+        int r = (int) Math.ceil(FLOOR_RADIUS);
+        boolean placed = false;
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dz = -r; dz <= r; dz++) {
+                if (dx * dx + dz * dz > FLOOR_RADIUS * FLOOR_RADIUS) {
+                    continue;
+                }
+                BlockPos pos = home.offset(dx, -3, dz);
+                BlockState state = level.getBlockState(pos);
+                if (!state.is(holo.getBlock()) && (state.isAir() || state.canBeReplaced())) {
+                    level.setBlock(pos, holo, net.minecraft.world.level.block.Block.UPDATE_ALL);
+                    hologram.add(pos.immutable());
+                    placed = true;
+                    if (random.nextInt(3) == 0) {
+                        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5,
+                                3, 0.3, 0.02, 0.3, 0.05);
+                    }
+                }
+            }
+        }
+        if (placed) {
+            level.playSound(null, home, net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 1.5F, 0.6F);
+        }
+    }
+
+    /** ホログラムの床を消す（戦いが終わったとき）。 */
+    private void clearFloor(ServerLevel level) {
+        net.minecraft.world.level.block.Block holo = io.github.genichimaruo.singulo.registry.SinguloBlocks.ARENA_HOLOGRAM.get();
+        for (BlockPos pos : hologram) {
+            if (level.getBlockState(pos).is(holo)) {
+                level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, 2, 0.3, 0.2, 0.3, 0.05);
+            }
+        }
+        hologram.clear();
+    }
+
+    // ---- ブラックホール爆弾を吸い込む
+
+    /** 部屋の中に投げ込まれたブラックホール爆弾を捕らえる（着弾させず、頭の特異点へ吸い込む）。 */
+    private void captureBombs(ServerLevel level) {
+        if (home == null || isDeadOrDying()) {
+            return;
+        }
+        Vec3 c = shieldCenter(home);
+        for (io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb : level.getEntitiesOfClass(
+                io.github.genichimaruo.singulo.reactor.BlackHoleBomb.class, new AABB(c, c).inflate(SHIELD_RADIUS + 6), b -> !b.captured())) {
+            bomb.capture(this);
+            level.playSound(null, bomb.blockPosition(), SinguloSounds.BLACK_HOLE_FORMATION.get(), SoundSource.HOSTILE, 1.5F, 1.9F);
+            level.sendParticles(ParticleTypes.REVERSE_PORTAL, bomb.getX(), bomb.getY(), bomb.getZ(), 30, 0.2, 0.2, 0.2, 0.4);
+        }
+    }
+
+    /** 捕らえた爆弾を頭の特異点が飲み込み、体力が戻る（言葉ではなく、光と音で分かるように）。 */
+    public void absorbBomb(ServerLevel level, io.github.genichimaruo.singulo.reactor.BlackHoleBomb bomb) {
+        heal(getMaxHealth() * BOMB_HEAL);
+        entityData.set(ABSORB, ABSORB_TICKS);
+        Vec3 head = position().add(0, HEAD_Y, 0);
+        Vec3 chest = chest();
+        level.sendParticles(ParticleTypes.FLASH, head.x, head.y, head.z, 1, 0, 0, 0, 0);
+        level.sendParticles(ParticleTypes.REVERSE_PORTAL, head.x, head.y, head.z, 60, 0.1, 0.1, 0.1, 0.6);
+        level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, chest.x, chest.y, chest.z, 120, 0.6, 1.0, 0.6, 0.6);
+        level.sendParticles(ParticleTypes.HAPPY_VILLAGER, chest.x, chest.y, chest.z, 40, 0.9, 1.4, 0.9, 0.1);
+        level.playSound(null, blockPosition(), SinguloSounds.BLACK_HOLE_FORMATION.get(), SoundSource.HOSTILE, 3.0F, 1.6F);
+        level.playSound(null, blockPosition(), net.minecraft.sounds.SoundEvents.TOTEM_USE, SoundSource.HOSTILE, 2.0F, 0.8F);
+        level.playSound(null, blockPosition(), net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, SoundSource.HOSTILE, 2.5F, 0.7F);
+    }
+
+    // ---- 重力潮汐（部屋全体の重力のゆがみ）
+
+    /** 部屋じゅうの相手を宙へ浮かせ、そのあとしばらく低重力にする（終焉では高く、長く浮かせる）。 */
+    public void startTide(ServerLevel level) {
+        int lift = phase() == 3 ? TIDE_LIFT_FINAL : TIDE_LIFT;
+        entityData.set(TIDE, lift + TIDE_LOW);
+        playSound(SinguloSounds.get("gravity_remnant.lift"), 4.0F, 0.6F);
+        playSound(SinguloSounds.get("last_archivist.recall"), 3.0F, 0.7F);
+        broadcastLine(level, phase() == 3 ? "gui.singulo.archivist.tide_final" : "gui.singulo.archivist.tide");
+    }
+
+    private void tickTide(ServerLevel level) {
+        int left = tideTicks();
+        if (left > 0) {
+            entityData.set(TIDE, left - 1);
+            tideGrace = TIDE_GRACE;
+            boolean lifting = tideLifting(left);
+            double rise = phase() == 3 ? 0.2 : 0.14;
+            for (Player p : arenaPlayers(level)) {
+                if (lifting) {
+                    Vec3 v = p.getDeltaMovement();
+                    p.setDeltaMovement(v.x * 0.92, Mth.lerp(0.25, v.y, rise), v.z * 0.92);
+                    p.hurtMarked = true;
+                }
+                p.fallDistance = 0;
+                setTideModifiers(p, !lifting, true);
+            }
+            if (home != null && left % 2 == 0) {
+                // 床の塵と瓦礫が浮き上がる
+                Vec3 f = shieldCenter(home);
+                for (int i = 0; i < 6; i++) {
+                    double a = random.nextDouble() * Math.PI * 2;
+                    double r = random.nextDouble() * (SHIELD_RADIUS - 1);
+                    level.sendParticles(lifting ? ParticleTypes.END_ROD : ParticleTypes.REVERSE_PORTAL, f.x + Math.cos(a) * r, f.y,
+                            f.z + Math.sin(a) * r, 0, 0, 1, 0, lifting ? 0.25 : 0.08);
+                }
+            }
+            if (left == TIDE_LOW + 1) {
+                playSound(SinguloSounds.get("last_archivist.verdict"), 3.0F, 0.6F);
+            }
+        } else if (tideGrace > 0) {
+            tideGrace--;
+            for (Player p : arenaPlayers(level)) {
+                setTideModifiers(p, false, tideGrace > 0);
+            }
+        }
+    }
+
+    /** 重力潮汐を止め、プレイヤーの重力を元に戻す。 */
+    private void clearTide(ServerLevel level) {
+        entityData.set(TIDE, 0);
+        tideGrace = 0;
+        Vec3 c = home == null ? position() : shieldCenter(home);
+        for (Player p : level.getEntitiesOfClass(Player.class, new AABB(c, c).inflate(SHIELD_RADIUS + 16))) {
+            setTideModifiers(p, false, false);
+        }
+    }
+
+    /** 力場の中（張っていなければ部屋の広さの中）のプレイヤー。 */
+    private List<Player> arenaPlayers(ServerLevel level) {
+        Vec3 c = home == null ? position() : shieldCenter(home);
+        double r = SHIELD_RADIUS + 2;
+        return level.getEntitiesOfClass(Player.class, new AABB(c, c).inflate(r),
+                p -> !ArenaShield.exempt(p) && p.isAlive() && p.position().distanceToSqr(c) <= r * r);
+    }
+
+    private static void setTideModifiers(Player p, boolean low, boolean safe) {
+        setModifier(p.getAttribute(Attributes.GRAVITY), TIDE_GRAVITY_ID, low, TIDE_GRAVITY - 1);
+        setModifier(p.getAttribute(Attributes.FALL_DAMAGE_MULTIPLIER), TIDE_FALL_ID, safe, -1);
+    }
+
+    private static void setModifier(@javax.annotation.Nullable net.minecraft.world.entity.ai.attributes.AttributeInstance attribute,
+                                    net.minecraft.resources.ResourceLocation id, boolean on, double amount) {
+        if (attribute == null) {
+            return;
+        }
+        boolean has = attribute.hasModifier(id);
+        if (on && !has) {
+            attribute.addTransientModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(id, amount,
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        } else if (!on && has) {
+            attribute.removeModifier(id);
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        // どんな形でいなくなっても、力場と重力のゆがみは残さない（チャンクの読み込み直しなら、戻ったときに張り直す）
+        ArenaShield.lower(getUUID());
+        if (level() instanceof ServerLevel level) {
+            clearTide(level);
+            if (reason.shouldDestroy()) {
+                clearFloor(level);                     // 倒されて演出が終わったとき・消されたとき（チャンクの読み込み直しでは残す）
+            }
+        }
+        super.remove(reason);
     }
 
     /** 新星の殻の半径（残り tick から）。 */
@@ -660,6 +1086,9 @@ public class LastArchivist extends RuinBoss {
     /** 挑戦者がいなくなったら、コンソールに知らせ、呼び出しに使った終焉の記録を返す。 */
     @Override
     protected void onAbandoned(ServerLevel level) {
+        lowerShield(false);
+        clearTide(level);
+        clearFloor(level);
         if (home != null) {
             if (level.getBlockEntity(home) instanceof SealConsoleBlockEntity console) {
                 console.onArchivistReset(level);
@@ -672,8 +1101,10 @@ public class LastArchivist extends RuinBoss {
     public void die(DamageSource source) {
         super.die(source);
         setMove(NONE, 0);
+        lowerShield(true);
         if (level() instanceof ServerLevel level) {
-            playSound(SinguloSounds.get("last_archivist.death"), 4.0F, 0.8F);
+            clearTide(level);
+            playSound(SinguloSounds.get("last_archivist.death"), 4.0F, 1.0F);
             broadcastLine(level, "gui.singulo.archivist.death_1");
             if (home != null && level.getBlockEntity(home) instanceof SealConsoleBlockEntity console) {
                 console.onArchivistDefeated(level);
@@ -736,9 +1167,9 @@ public class LastArchivist extends RuinBoss {
         }
     }
 
-    /** 報酬: 記録者の光輪、オーバークロック・チップ、H凝縮体。近くの挑戦者は最後の記録を読めるようになる。 */
+    /** 報酬: 記録者の光輪、残光の翼、オーバークロック・チップ、H凝縮体。近くの挑戦者は最後の記録を読めるようになる。 */
     private void dropRewards(ServerLevel level) {
-        for (String[] r : new String[][] {{"archivist_halo", "1"}, {"overclock_chip", "4"}, {"hawking_condensate", "3"}}) {
+        for (String[] r : new String[][] {{"archivist_halo", "1"}, {"afterglow_wings", "1"}, {"overclock_chip", "4"}, {"hawking_condensate", "3"}}) {
             Item item = BuiltInRegistries.ITEM.get(Singulo.id(r[0]));
             spawnAtLocation(new ItemStack(item, Integer.parseInt(r[1])), (float) HEAD_Y);
         }
@@ -775,6 +1206,9 @@ public class LastArchivist extends RuinBoss {
         super.addAdditionalSaveData(tag);
         tag.putInt("phase", phase());
         tag.putInt("cycle", cycle);
+        tag.putBoolean("shield", shieldUp);
+        tag.putLongArray("hologram", hologram.stream().mapToLong(BlockPos::asLong).toArray());
+        tag.putInt("tide", tideTicks());
     }
 
     @Override
@@ -782,6 +1216,16 @@ public class LastArchivist extends RuinBoss {
         super.readAdditionalSaveData(tag);
         entityData.set(PHASE, Math.max(1, tag.getInt("phase")));
         cycle = tag.getInt("cycle");
+        if (home != null) {
+            entityData.set(HOME, java.util.Optional.of(home));
+        }
+        shieldUp = tag.getBoolean("shield");
+        hologram.clear();
+        for (long l : tag.getLongArray("hologram")) {
+            hologram.add(BlockPos.of(l));
+        }
+        entityData.set(SHIELD, shieldUp ? SHIELD_RISE + 2 : 0);
+        entityData.set(TIDE, tag.getInt("tide"));
         int p = phase();
         bossBar.setColor(p == 1 ? BossEvent.BossBarColor.YELLOW : p == 2 ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.WHITE);
     }

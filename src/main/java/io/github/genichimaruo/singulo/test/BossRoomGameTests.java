@@ -55,6 +55,9 @@ public final class BossRoomGameTests {
         helper.setBlock(core, SinguloBlocks.GUARDIAN_CORE.get());
         GuardianCoreBlockEntity be = helper.getBlockEntity(core);
         be.scan(helper.getLevel());
+        // 前の組のテストが残した投影器が近くにあると数がずれるので、このテストの場所の中のものだけにする
+        net.minecraft.world.phys.AABB bounds = helper.getBounds();
+        be.projectors().removeIf(p -> !bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(p)));
         return be;
     }
 
