@@ -285,7 +285,7 @@
   },
   "advancement.singulo.records.title": {
     "source": "Record of the Fall",
-    "translation": "秋天的記錄"
+    "translation": "滅亡的記錄"
   },
   "advancement.singulo.root.description": {
     "source": "Extract energy from mass. Open the handbook to begin",
@@ -2193,7 +2193,7 @@
   },
   "entity.singulo.warden_singularity": {
     "source": "Warden Singularity",
-    "translation": "典獄長奇點"
+    "translation": "守衛奇點"
   },
   "fluid_type.singulo.axion_condensate": {
     "source": "Axion Condensate",
@@ -2389,11 +2389,11 @@
   },
   "gui.singulo.console.active": {
     "source": "The warden is already active",
-    "translation": "典獄長已經活躍了"
+    "translation": "守衛已經啟動"
   },
   "gui.singulo.console.awakened": {
     "source": "The seal breaks. The Horizon Warden awakens",
-    "translation": "封印破裂。 視界守衛 甦醒"
+    "translation": "封印破裂。視界守衛甦醒了"
   },
   "gui.singulo.console.awakened_defeated": {
     "source": "The awakened warden is defeated. Fine parts spill from the wreck",
@@ -2405,7 +2405,7 @@
   },
   "gui.singulo.console.defeated": {
     "source": "The warden falls silent. The vault field dissipates",
-    "translation": "典獄長沉默了。穹頂場消散"
+    "translation": "守衛沉寂了。保管庫的力場消散了"
   },
   "gui.singulo.console.no_vault": {
     "source": "No sealed vault nearby",
@@ -2417,7 +2417,7 @@
   },
   "gui.singulo.console.reset": {
     "source": "No challenger remains. The warden returns to its seal",
-    "translation": "沒有挑戰者留下。典獄長恢復封印"
+    "translation": "挑戰者已離開，守衛回到了封印之中"
   },
   "gui.singulo.containment.leaking": {
     "source": "Dark matter %s / %s mB · leaking",
@@ -2941,7 +2941,7 @@
   },
   "gui.singulo.reactor.interval": {
     "source": "Feed interval",
-    "translation": "進給間隔"
+    "translation": "投料間隔"
   },
   "gui.singulo.reactor.interval.hint": {
     "source": "0 = auto",
@@ -3429,7 +3429,7 @@
   },
   "guide.singulo.romance.darkmatter.body": {
     "source": "Collect near a core, store in containment tanks, feed the core directly.",
-    "translation": "在岩心附近收集，儲存在密封槽中，直接向岩心供料。"
+    "translation": "在爐心附近收集，儲存在密封槽中，直接投入爐心。"
   },
   "guide.singulo.romance.darkmatter.title": {
     "source": "Dark matter",
@@ -5497,7 +5497,7 @@
   },
   "record.singulo.r19.body": {
     "source": "...ignition successful. Output is... no, the spin will not stop... past the Eddington limit... stop the feed...",
-    "translation": "....點火成功。輸出是...不，旋轉不會停止...超過愛丁頓極限...停止進給..."
+    "translation": "……點火成功。輸出比預期……不對，自旋停不下來……超過愛丁頓極限……停止投料……"
   },
   "record.singulo.r19.title": {
     "source": "Ignition Record (fragment)",
@@ -5505,7 +5505,7 @@
   },
   "record.singulo.r20.body": {
     "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.",
-    "translation": "我們想將所有質量轉化為能量。反應爐實現了這個願望──城市、山脈、海洋。剩下的只有異常、典獄長和這份紀錄。對於讀到這篇文章的人：永遠不要放開停止餵食的手。"
+    "translation": "我們曾想把一切質量都化為能量。反應爐實現了這個願望──城市、山脈、海洋。留下的只有重力異常、守衛，以及這份記錄。致讀到這份記錄的人：那隻停止投料的手，絕不要放開。"
   },
   "record.singulo.r20.title": {
     "source": "The Last Record",

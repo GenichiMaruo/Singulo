@@ -285,7 +285,7 @@
   },
   "advancement.singulo.records.title": {
     "source": "Record of the Fall",
-    "translation": "가을의 기록"
+    "translation": "멸망의 기록"
   },
   "advancement.singulo.root.description": {
     "source": "Extract energy from mass. Open the handbook to begin",
@@ -2193,7 +2193,7 @@
   },
   "entity.singulo.warden_singularity": {
     "source": "Warden Singularity",
-    "translation": "수호자 특이점"
+    "translation": "감시자의 특이점"
   },
   "fluid_type.singulo.axion_condensate": {
     "source": "Axion Condensate",
@@ -2389,11 +2389,11 @@
   },
   "gui.singulo.console.active": {
     "source": "The warden is already active",
-    "translation": "수호자은 이미 활동 중입니다."
+    "translation": "감시자는 이미 가동 중이다"
   },
   "gui.singulo.console.awakened": {
     "source": "The seal breaks. The Horizon Warden awakens",
-    "translation": "씰이 파손됩니다. 지평선 감시자가 깨어납니다"
+    "translation": "봉인이 깨졌다. 지평선 감시자가 눈을 떴다"
   },
   "gui.singulo.console.awakened_defeated": {
     "source": "The awakened warden is defeated. Fine parts spill from the wreck",
@@ -2405,7 +2405,7 @@
   },
   "gui.singulo.console.defeated": {
     "source": "The warden falls silent. The vault field dissipates",
-    "translation": "수호자은 침묵한다. 볼트 필드가 소멸됩니다."
+    "translation": "감시자가 침묵했다. 보관고의 역장이 사라졌다"
   },
   "gui.singulo.console.no_vault": {
     "source": "No sealed vault nearby",
@@ -2417,7 +2417,7 @@
   },
   "gui.singulo.console.reset": {
     "source": "No challenger remains. The warden returns to its seal",
-    "translation": "도전자는 남아있지 않습니다. 수호자은 봉인으로 돌아갑니다"
+    "translation": "도전자가 사라져, 감시자는 봉인으로 돌아갔다"
   },
   "gui.singulo.containment.leaking": {
     "source": "Dark matter %s / %s mB · leaking",
@@ -2493,7 +2493,7 @@
   },
   "gui.singulo.device.generator.idle": {
     "source": "Feed power for 10 s",
-    "translation": "10초 동안 공급 전력"
+    "translation": "10초 동안 전력을 공급"
   },
   "gui.singulo.device.generator.input": {
     "source": "Input %sFE/t · need %sFE/t",
@@ -2941,7 +2941,7 @@
   },
   "gui.singulo.reactor.interval": {
     "source": "Feed interval",
-    "translation": "공급 간격"
+    "translation": "투입 간격"
   },
   "gui.singulo.reactor.interval.hint": {
     "source": "0 = auto",
@@ -3429,7 +3429,7 @@
   },
   "guide.singulo.romance.darkmatter.body": {
     "source": "Collect near a core, store in containment tanks, feed the core directly.",
-    "translation": "코어 근처에서 수집하고, 격리 탱크에 저장하고, 코어에 직접 공급합니다."
+    "translation": "노심 근처에서 모아 격리 탱크에 저장하고, 노심에 직접 투입합니다."
   },
   "guide.singulo.romance.darkmatter.title": {
     "source": "Dark matter",
@@ -5497,7 +5497,7 @@
   },
   "record.singulo.r19.body": {
     "source": "...ignition successful. Output is... no, the spin will not stop... past the Eddington limit... stop the feed...",
-    "translation": "...점화 성공했습니다. 출력은... 아니요, 회전은 멈추지 않습니다... Eddington 한계를 초과하면... 피드를 중지합니다..."
+    "translation": "……점화 성공. 출력이 예상보다…… 아니, 스핀이 멈추지 않는다…… 에딩턴 한계를 넘어…… 투입을 멈춰라……"
   },
   "record.singulo.r19.title": {
     "source": "Ignition Record (fragment)",
@@ -5505,7 +5505,7 @@
   },
   "record.singulo.r20.body": {
     "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.",
-    "translation": "우리는 모든 질량을 에너지로 바꾸고 싶었습니다. 원자로는 도시, 산, 바다 등 그 소원을 들어주었습니다. 남은 것은 변칙존재와 수호자, 그리고 이 기록뿐이다. 이 글을 읽는 분들은 피드를 멈추는 손을 절대 놓지 마세요."
+    "translation": "우리는 모든 질량을 에너지로 바꾸려 했다. 반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과 감시자, 그리고 이 기록뿐이다. 이 글을 읽는 이에게. 투입을 멈추는 손을, 결코 놓지 마라."
   },
   "record.singulo.r20.title": {
     "source": "The Last Record",
