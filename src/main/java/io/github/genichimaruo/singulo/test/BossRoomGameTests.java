@@ -3,6 +3,7 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
+import io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan;
 import io.github.genichimaruo.singulo.ruin.GravityRemnant;
 import io.github.genichimaruo.singulo.ruin.GuardianCoreBlockEntity;
 import io.github.genichimaruo.singulo.ruin.RuinBoss;
@@ -441,5 +442,91 @@ public final class BossRoomGameTests {
             helper.assertTrue(core.activeBoss(helper.getLevel()) == null, "封印核が戦闘中のまま");
             helper.assertTrue(dropped(helper, item("awakening_gravity_core")) == 1, "覚醒核が返ってこない");
         });
+    }
+
+    // ------------------------------------------------------------------ エルゴ球の鯨（沈んだ炉心区画）
+
+    /** 沈んだ炉心区画の封印核は、エルゴ球の鯨を出現の演出つきで起こす。体は12節で、出現のあいだは傷つかない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_20", timeoutTicks = 40)
+    public static void coreWakesLeviathanForSunkenReactor(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        RuinBoss boss = core.awaken(helper.getLevel());
+        helper.assertTrue(boss instanceof ErgosphereLeviathan, "沈んだ炉心区画でエルゴ球の鯨が現れない: " + boss);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) boss;
+        helper.assertTrue(l.emergeTicks() == ErgosphereLeviathan.EMERGE_TICKS, "出現の演出が始まらない");
+        helper.assertTrue(l.getParts().length == ErgosphereLeviathan.SEGMENTS, "体の節の数がおかしい: " + l.getParts().length);
+        helper.assertFalse(l.segments()[3].hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で体が傷ついた");
+        helper.assertTrue(Math.abs(l.effectiveMaxHealth() - ErgosphereLeviathan.HEALTH) < 1.0, "体力が1600相当でない: " + l.effectiveMaxHealth());
+        l.discard();
+        helper.succeed();
+    }
+
+    /** 体の節は、頭の通った跡に沿って決まった間隔で並ぶ。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_21", timeoutTicks = 80)
+    public static void leviathanBodyFollowsHead(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        helper.runAtTickTime(60, () -> {
+            net.minecraft.world.phys.Vec3 prev = l.headCenter();
+            for (int i = 0; i < ErgosphereLeviathan.SEGMENTS; i++) {
+                net.minecraft.world.phys.Vec3 c = l.segments()[i].position().add(0, ErgosphereLeviathan.radius(i), 0);
+                double gap = c.distanceTo(prev);
+                double want = i == 0 ? ErgosphereLeviathan.HEAD_GAP : ErgosphereLeviathan.SPACING;
+                helper.assertTrue(gap <= want + 0.3 && gap >= want * 0.5, "節 " + i + " の間隔がおかしい: " + gap);
+                prev = c;
+            }
+            l.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 尾の光る芯は弱く（×1.6）、胴は硬い（×0.6）。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_22", timeoutTicks = 40)
+    public static void leviathanTailIsWeakPoint(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        float before = l.getHealth();
+        l.segments()[2].hurt(helper.getLevel().damageSources().magic(), 10);
+        float body = before - l.getHealth();
+        l.invulnerableTime = 0;
+        before = l.getHealth();
+        l.segments()[ErgosphereLeviathan.SEGMENTS - 1].hurt(helper.getLevel().damageSources().magic(), 10);
+        float tail = before - l.getHealth();
+        helper.assertTrue(body > 0 && Math.abs(tail / body - ErgosphereLeviathan.TAIL_FACTOR / ErgosphereLeviathan.BODY_FACTOR) < 0.2,
+                "尾と胴のダメージの比がおかしい: 胴 " + body + " / 尾 " + tail);
+        l.discard();
+        helper.succeed();
+    }
+
+    /** 倒すと保管庫が開き、渦の断章を落とす。演出のあいだ体は残り、終わると消える。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_23", timeoutTicks = ErgosphereLeviathan.DEATH_TICKS + 30)
+    public static void leviathanDefeatUnsealsVaultAndSinks(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        l.kill();
+        helper.runAtTickTime(5, () -> {
+            helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertTrue(dropped(helper, item("ergosphere_chapter")) == 1, "渦の断章を落とさない");
+        });
+        helper.runAtTickTime(ErgosphereLeviathan.DEATH_TICKS / 2, () -> helper.assertFalse(l.isRemoved(), "演出の途中で消えた"));
+        helper.runAtTickTime(ErgosphereLeviathan.DEATH_TICKS + 10, () -> {
+            helper.assertTrue(l.isRemoved(), "演出が終わっても消えない");
+            helper.succeed();
+        });
+    }
+
+    /** 覚醒の渦核で、覚醒したエルゴ球の鯨（体力×2.5）が現れる。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_24", timeoutTicks = 40)
+    public static void ergosphereCoreSummonsAwakenedLeviathan(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "sunken_reactor");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_ergosphere_core"));
+        helper.assertTrue(boss instanceof ErgosphereLeviathan && boss.awakened(), "覚醒の渦核で覚醒した鯨が現れない: " + boss);
+        double expected = ErgosphereLeviathan.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
+        boss.discard();
+        helper.succeed();
     }
 }

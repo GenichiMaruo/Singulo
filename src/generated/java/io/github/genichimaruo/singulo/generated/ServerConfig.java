@@ -57,6 +57,8 @@ public final class ServerConfig {
     public static final ModConfigSpec.BooleanValue WARDEN_RESET_ON_LEAVE;
     public static final ModConfigSpec.DoubleValue AWAKENED_WARDEN_HEALTH_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue AWAKENED_WARDEN_DAMAGE_MULTIPLIER;
+    public static final ModConfigSpec.IntValue LEVIATHAN_HEALTH;
+    public static final ModConfigSpec.IntValue ARCHIVIST_HEALTH;
     public static final ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_HEALTH_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER;
     public static final ModConfigSpec.IntValue TEMPLATE_USES;
@@ -133,6 +135,8 @@ public final class ServerConfig {
         ModConfigSpec.BooleanValue WARDEN_RESET_ON_LEAVE_;
         ModConfigSpec.DoubleValue AWAKENED_WARDEN_HEALTH_MULTIPLIER_;
         ModConfigSpec.DoubleValue AWAKENED_WARDEN_DAMAGE_MULTIPLIER_;
+        ModConfigSpec.IntValue LEVIATHAN_HEALTH_;
+        ModConfigSpec.IntValue ARCHIVIST_HEALTH_;
         ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_;
         ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_;
         ModConfigSpec.IntValue TEMPLATE_USES_;
@@ -268,7 +272,11 @@ public final class ServerConfig {
         AWAKENED_WARDEN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedWardenHealthMultiplier", 2.5, 1.0, 20.0);
         b.comment("覚醒したホライズン・ウォーデンが与えるダメージの倍率", "範囲: 1.0〜10.0");
         AWAKENED_WARDEN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedWardenDamageMultiplier", 1.5, 1.0, 10.0);
-        b.comment("覚醒した番人（残響の番人・重力の澱の再戦）の体力の倍率", "範囲: 1.0〜20.0");
+        b.comment("エルゴ球の鯨（沈んだ炉心区画のボス）のHP", "範囲: 1〜100,000");
+        LEVIATHAN_HEALTH_ = b.defineInRange("leviathanHealth", 1600, 1, 100000);
+        b.comment("最後の記録者（隠しボス）のHP", "範囲: 1〜100,000");
+        ARCHIVIST_HEALTH_ = b.defineInRange("archivistHealth", 2400, 1, 100000);
+        b.comment("覚醒した番人（残響の番人・重力の澱・エルゴ球の鯨の再戦）の体力の倍率", "範囲: 1.0〜20.0");
         AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedGuardianHealthMultiplier", 2.5, 1.0, 20.0);
         b.comment("覚醒した番人が与えるダメージの倍率", "範囲: 1.0〜10.0");
         AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedGuardianDamageMultiplier", 1.5, 1.0, 10.0);
@@ -373,6 +381,8 @@ public final class ServerConfig {
         WARDEN_RESET_ON_LEAVE = WARDEN_RESET_ON_LEAVE_;
         AWAKENED_WARDEN_HEALTH_MULTIPLIER = AWAKENED_WARDEN_HEALTH_MULTIPLIER_;
         AWAKENED_WARDEN_DAMAGE_MULTIPLIER = AWAKENED_WARDEN_DAMAGE_MULTIPLIER_;
+        LEVIATHAN_HEALTH = LEVIATHAN_HEALTH_;
+        ARCHIVIST_HEALTH = ARCHIVIST_HEALTH_;
         AWAKENED_GUARDIAN_HEALTH_MULTIPLIER = AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_;
         AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER = AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_;
         TEMPLATE_USES = TEMPLATE_USES_;

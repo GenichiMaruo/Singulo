@@ -69,6 +69,19 @@ public final class AncientRecords {
         return null;
     }
 
+    /** 決まった記録（最後の記録者を倒したときの記録など）を読めるようにする。もう読めるなら false。 */
+    public static boolean learn(ServerPlayer player, String id) {
+        List<String> have = decoded(player);
+        if (have.contains(id)) {
+            return false;
+        }
+        List<String> copy = new ArrayList<>(have);
+        copy.add(id);
+        player.setData(DECODED, copy);
+        sync(player);
+        return true;
+    }
+
     public static void sync(ServerPlayer player) {
         if (player.connection != null && player.connection.hasChannel(RecordsPayload.TYPE)) {
             PacketDistributor.sendToPlayer(player, new RecordsPayload(decoded(player)));

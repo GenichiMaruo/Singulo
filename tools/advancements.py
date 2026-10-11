@@ -9,6 +9,9 @@ ADVANCEMENTS は (id, 親, アイコン, 枠, 条件, 段階, 日本語の題, �
 枠: task / goal / challenge
 """
 
+# 隠し進捗（達成するまで一覧に出ない）
+HIDDEN_ADVANCEMENTS = {'archivist'}
+
 ADVANCEMENTS = [
     ('root', None, 'handbook', 'task', ('tick',), 1,
      'Singulo', '質量からエネルギーを取り出す。まずはハンドブックを開こう',
@@ -111,6 +114,14 @@ ADVANCEMENTS = [
      '鳴りやまない残響', '覚醒した残響の番人を倒す', 'Echoes That Linger', 'Defeat the Awakened Echo Sentinel'),
     ('awakened_gravity', 'hawking', 'awakening_gravity_core', 'challenge', ('milestone', 'awakened_gravity_remnant'), 5,
      '重さの記憶', '覚醒した重力の澱を倒す', 'Memory of Weight', 'Defeat the Awakened Gravity Remnant'),
+    ('ruin_sunken', 'warden', 'reactor_shell', 'goal', ('milestone', 'discover/sunken_reactor'), 5,
+     '沈んだ炉', '沈んだ炉心区画の保管庫を開ける', 'The Sunken Reactor', 'Open the cache of a Sunken Reactor Sector'),
+    ('leviathan', 'ruin_sunken', 'ergosphere_chapter', 'challenge', ('kill', 'singulo:ergosphere_leviathan'), 5,
+     '渦を泳ぐもの', 'エルゴ球の鯨を倒す', 'It Swims the Ergosphere', 'Defeat the Ergosphere Leviathan'),
+    ('awakened_leviathan', 'leviathan', 'awakening_ergosphere_core', 'challenge', ('milestone', 'awakened_ergosphere_leviathan'), 5,
+     '目覚めた渦', '覚醒したエルゴ球の鯨を倒す', 'The Vortex Wakes', 'Defeat the Awakened Ergosphere Leviathan'),
+    ('archivist', 'awakened', 'archivist_halo', 'challenge', ('milestone', 'last_archivist'), 5,
+     '最後の頁', '最後の記録者を眠らせる', 'The Last Page', 'Lay the Last Archivist to rest'),
     ('records', 'archive', 'record_fragment', 'challenge', ('milestone', 'records_all'), 5,
      '滅びの記録', '旧文明の記録をすべて解読する', 'Record of the Fall', 'Decode every ancient record'),
 ]

@@ -231,6 +231,26 @@
       "stage": 5
     },
     {
+      "id": "ruin_sunken",
+      "parent": "warden",
+      "stage": 5
+    },
+    {
+      "id": "leviathan",
+      "parent": "ruin_sunken",
+      "stage": 5
+    },
+    {
+      "id": "awakened_leviathan",
+      "parent": "leviathan",
+      "stage": 5
+    },
+    {
+      "id": "archivist",
+      "parent": "awakened",
+      "stage": 5
+    },
+    {
       "id": "records",
       "parent": "archive",
       "stage": 5

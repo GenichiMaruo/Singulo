@@ -1,0 +1,49 @@
+{
+  "type": "singulo:machine",
+  "station": "singularity_encapsulator",
+  "stage": 5,
+  "time": 2400,
+  "energy": 500000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:echo_chapter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:gravity_chapter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:horizon_chapter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:ergosphere_chapter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:hawking_condensate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "singulo:terminus_record",
+    "count": 1
+  }
+}

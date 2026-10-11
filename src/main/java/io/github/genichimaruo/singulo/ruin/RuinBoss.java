@@ -104,12 +104,8 @@ public abstract class RuinBoss extends Monster {
     /** 覚醒した個体にする（起こす前に呼ぶ）。体力を増やし、ボスバーの名前と色を変える。 */
     public void makeAwakened() {
         entityData.set(AWAKENED, true);
-        double health = getAttribute(Attributes.MAX_HEALTH).getBaseValue() * awakenedHealthMultiplier();
-        // 最大体力はゲームの決まりで 1024 までなので、それを超える分は受けるダメージを減らして同じ硬さにする
-        double max = Math.min(health, MAX_HEALTH_CAP);
-        damageScale = (float) (max / health);
-        getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
-        setHealth((float) max);
+        double health = effectiveMaxHealth() * awakenedHealthMultiplier();
+        setEffectiveHealth(health);
         xpReward = awakenedXp();
         applyAwakenedLook();
     }
@@ -189,7 +185,23 @@ public abstract class RuinBoss extends Monster {
     /** 起こした核を覚え、その周りから離れないようにする。 */
     public void awaken(BlockPos core) {
         this.home = core;
-        restrictTo(core, ARENA_RADIUS);
+        restrictTo(core, arenaRadius());
+    }
+
+    /** 守る広さ（核からのブロック数）。挑戦者がこの外（＋4）へ出ると戻る。 */
+    public int arenaRadius() {
+        return ARENA_RADIUS;
+    }
+
+    /**
+     * 体力を決める（最大体力の上限 1024 を超える分は、受けるダメージを減らして同じ硬さにする）。
+     * 生まれたときに呼ぶ。覚醒するときは、この硬さに倍率を掛ける。
+     */
+    protected void setEffectiveHealth(double health) {
+        double max = Math.min(health, MAX_HEALTH_CAP);
+        damageScale = (float) (max / health);
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
+        setHealth((float) max);
     }
 
     @Nullable
@@ -234,23 +246,28 @@ public abstract class RuinBoss extends Monster {
         if (home == null) {
             return;
         }
-        boolean present = !level.getEntitiesOfClass(Player.class, new AABB(home).inflate(ARENA_RADIUS + 4),
+        boolean present = !level.getEntitiesOfClass(Player.class, new AABB(home).inflate(arenaRadius() + 4),
                 p -> p.isAlive() && !p.isCreative() && !p.isSpectator()).isEmpty();
         emptyChecks = present ? 0 : emptyChecks + 1;
         boolean reset = !ServerConfig.SPEC.isLoaded() || ServerConfig.WARDEN_RESET_ON_LEAVE.get();
         if (emptyChecks >= RESET_CHECKS && reset) {
-            GuardianCoreBlockEntity core = core(level);
-            if (core != null) {
-                core.onBossReset(level, awakened());
-            }
-            if (awakened() && home != null) {
-                // 覚醒戦をやめたときは、呼び出しに使った覚醒核を返す（やり直しが重くなりすぎないように）
-                net.minecraft.world.item.Item item = GuardianCoreBlockEntity.awakeningCoreFor(getType());
-                if (item != null) {
-                    net.minecraft.world.level.block.Block.popResource(level, home.above(), new net.minecraft.world.item.ItemStack(item));
-                }
-            }
+            onAbandoned(level);
             discard();
+        }
+    }
+
+    /** 挑戦者がいなくなって戻るとき（このあと消える）。核に知らせ、覚醒戦なら呼び出しに使った覚醒核を返す。 */
+    protected void onAbandoned(ServerLevel level) {
+        GuardianCoreBlockEntity core = core(level);
+        if (core != null) {
+            core.onBossReset(level, awakened());
+        }
+        if (awakened() && home != null) {
+            // 覚醒戦をやめたときは、呼び出しに使った覚醒核を返す（やり直しが重くなりすぎないように）
+            net.minecraft.world.item.Item item = GuardianCoreBlockEntity.awakeningCoreFor(getType());
+            if (item != null) {
+                net.minecraft.world.level.block.Block.popResource(level, home.above(), new net.minecraft.world.item.ItemStack(item));
+            }
         }
     }
 
@@ -303,9 +320,9 @@ public abstract class RuinBoss extends Monster {
             spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
         }
         String id = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
-        io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), ARENA_RADIUS + 16, "awakened_" + id);
+        io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), arenaRadius() + 16, "awakened_" + id);
         Component msg = Component.translatable("gui.singulo.guardian.awakened_defeated");
-        for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(ARENA_RADIUS + 16))) {
+        for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(arenaRadius() + 16))) {
             p.displayClientMessage(msg, false);
         }
     }
@@ -393,7 +410,7 @@ public abstract class RuinBoss extends Monster {
         }
         home = NbtUtils.readBlockPos(tag, "home").orElse(null);
         if (home != null) {
-            restrictTo(home, ARENA_RADIUS);
+            restrictTo(home, arenaRadius());
         }
         if (hasCustomName()) {
             bossBar.setName(getDisplayName());

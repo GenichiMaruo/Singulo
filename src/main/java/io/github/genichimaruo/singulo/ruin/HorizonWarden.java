@@ -1143,10 +1143,11 @@ public class HorizonWarden extends Monster {
 
     /**
      * 覚醒した個体の報酬: オーバークロック・チップ2個（ほかでは封印コンテナからしか出ない）、エキゾチック物質8個、
-     * H凝縮体2個。呼び出しに使った記録核（エキゾチック物質4・H凝縮体1）より多く返るので、何度でも挑む意味がある。
+     * H凝縮体2個と、地平線の断章（終焉の記録の材料）。呼び出しに使った記録核（エキゾチック物質4・H凝縮体1）より多く返るので、
+     * 何度でも挑む意味がある。
      */
     private void dropAwakenedRewards(ServerLevel level) {
-        for (String[] r : new String[][] {{"overclock_chip", "2"}, {"exotic_matter", "8"}, {"hawking_condensate", "2"}}) {
+        for (String[] r : new String[][] {{"overclock_chip", "2"}, {"exotic_matter", "8"}, {"hawking_condensate", "2"}, {"horizon_chapter", "1"}}) {
             net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
             spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
         }

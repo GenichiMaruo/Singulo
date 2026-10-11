@@ -48,6 +48,13 @@ public final class SinguloSounds {
             "horizon_warden.shockwave", "horizon_warden.death", "horizon_warden.ambient", "guardian_core.awaken", "vault.unseal",
             "keraunos_tower.charge", "keraunos_tower.discharge", "keraunos_tower.mode", "impact_generator.absorb",
             "deep_sea_collector.collect", "void_collector.collect", "fulgurite.form",
+            "ergosphere_leviathan.emerge", "ergosphere_leviathan.ambient", "ergosphere_leviathan.hurt", "ergosphere_leviathan.roar",
+            "ergosphere_leviathan.dive", "ergosphere_leviathan.breath_charge", "ergosphere_leviathan.breath_fire",
+            "ergosphere_leviathan.shed", "ergosphere_leviathan.death", "ergosphere_leviathan.implode",
+            "last_archivist.emerge", "last_archivist.ambient", "last_archivist.hurt", "last_archivist.phase",
+            "last_archivist.judgment_aim", "last_archivist.judgment_fire", "last_archivist.verdict", "last_archivist.collapse",
+            "last_archivist.recall", "last_archivist.nova_charge", "last_archivist.nova", "last_archivist.death",
+            "last_archivist.death_flash",
     };
 
     static {

@@ -31,17 +31,17 @@ import net.minecraft.world.level.levelgen.structure.Structure;
  * スニークして右クリックすると探す遺構が切り替わる。探すのは少し重いので、使ったあとは数秒待つ。
  * <p>
  * はじめは地表観測拠点しか探せない。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして右クリックすると、
- * そこに残る記録でコンパスを調整し、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設）も探せるようになる。
+ * そこに残る記録でコンパスを調整し、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設 → 沈んだ炉心区画）も探せるようになる。
  */
 public class ExplorerCompassItem extends SinguloItem {
-    public static final String[] TARGETS = {"observation_post", "research_building", "culture_facility", "final_lab"};
+    public static final String[] TARGETS = {"observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor"};
     public static final int SEARCH_CHUNKS = 64;
 
     public ExplorerCompassItem(Properties properties, int stage) {
         super(properties.stacksTo(1), stage, false);
     }
 
-    /** 探せる遺構の数（1〜4）。TARGETS の先頭からこの数だけ。 */
+    /** 探せる遺構の数（1〜5）。TARGETS の先頭からこの数だけ。 */
     public static int level(ItemStack stack) {
         return Math.max(1, Math.min(TARGETS.length, stack.getOrDefault(SinguloComponents.COMPASS_LEVEL.get(), 1)));
     }

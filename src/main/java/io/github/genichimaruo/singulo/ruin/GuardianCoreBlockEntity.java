@@ -30,7 +30,8 @@ import net.minecraft.world.phys.AABB;
 /**
  * 番人の封印核。研究棟と封鎖培養施設のボス部屋の床に埋まっていて、壊せない。
  * <ul>
- *   <li>挑戦者が部屋に入ると、近くの封鎖された保管庫の遺構に応じた番人を起こす（研究棟は残響の番人、培養施設は重力の澱）</li>
+ *   <li>挑戦者が部屋に入ると、近くの封鎖された保管庫の遺構に応じた番人を起こす（研究棟は残響の番人、培養施設は重力の澱、
+ *       沈んだ炉心区画はエルゴ球の鯨）</li>
  *   <li>番人が倒されると保管庫の封鎖を解く。中身が再生すると保管庫はまた封鎖され、次に入ったときに番人が戻ってくる</li>
  *   <li>部屋の仕掛け（残響投影器・封じ込め槽）は最初に覚えておき、番人を起こすたびに元の形へ直す</li>
  *   <li>攻略後の再戦: その遺構の覚醒核（覚醒の残響核・覚醒の重力核）を手に持って核に使うと、保管庫が開いていても
@@ -71,6 +72,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         return switch (ruin) {
             case "research_building" -> SinguloEntities.ECHO_SENTINEL.get();
             case "culture_facility" -> SinguloEntities.GRAVITY_REMNANT.get();
+            case "sunken_reactor" -> SinguloEntities.ERGOSPHERE_LEVIATHAN.get();
             default -> null;
         };
     }
@@ -81,6 +83,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         return switch (ruin) {
             case "research_building" -> "awakening_echo_core";
             case "culture_facility" -> "awakening_gravity_core";
+            case "sunken_reactor" -> "awakening_ergosphere_core";
             default -> null;
         };
     }
@@ -89,13 +92,15 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     @Nullable
     public static net.minecraft.world.item.Item awakeningCoreFor(EntityType<?> type) {
         String id = type == SinguloEntities.ECHO_SENTINEL.get() ? "awakening_echo_core"
-                : type == SinguloEntities.GRAVITY_REMNANT.get() ? "awakening_gravity_core" : null;
+                : type == SinguloEntities.GRAVITY_REMNANT.get() ? "awakening_gravity_core"
+                : type == SinguloEntities.ERGOSPHERE_LEVIATHAN.get() ? "awakening_ergosphere_core" : null;
         return id == null ? null : net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id));
     }
 
     /** どれかの番人の覚醒核か。 */
     public static boolean isAwakeningCore(net.minecraft.world.item.ItemStack stack) {
-        return stack.is(awakeningCoreFor(SinguloEntities.ECHO_SENTINEL.get())) || stack.is(awakeningCoreFor(SinguloEntities.GRAVITY_REMNANT.get()));
+        return stack.is(awakeningCoreFor(SinguloEntities.ECHO_SENTINEL.get())) || stack.is(awakeningCoreFor(SinguloEntities.GRAVITY_REMNANT.get()))
+                || stack.is(awakeningCoreFor(SinguloEntities.ERGOSPHERE_LEVIATHAN.get()));
     }
 
     public List<BlockPos> projectors() {

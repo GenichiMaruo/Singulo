@@ -6,6 +6,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
 import io.github.genichimaruo.singulo.ruin.HorizonBolt;
 import io.github.genichimaruo.singulo.ruin.HorizonWarden;
+import io.github.genichimaruo.singulo.ruin.LastArchivist;
 import io.github.genichimaruo.singulo.ruin.RuinCacheBlock;
 import io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity;
 import io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity;
@@ -307,6 +308,70 @@ public final class BossGameTests {
             helper.assertTrue(warden.phase() == 2 && warden.piercing(), "フェーズ2で貫通しない: " + warden.phase());
             warden.discard();
             helper.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ 隠しボス: 最後の記録者
+
+    /** 終焉の記録で、最後の記録者が出現の演出つきで目覚める。そのあいだ守護機は呼べず、2体目も出ない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 40)
+    public static void terminusRecordWakesArchivist(GameTestHelper helper) {
+        SealConsoleBlockEntity console = arena(helper);
+        LastArchivist a = console.activateArchivist(helper.getLevel(), null);
+        helper.assertTrue(a != null && a.emergeTicks() == LastArchivist.EMERGE_TICKS, "最後の記録者が目覚めない");
+        helper.assertFalse(a.hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
+        helper.assertTrue(Math.abs(a.effectiveMaxHealth() - LastArchivist.HEALTH) < 1.0, "体力が2400相当でない: " + a.effectiveMaxHealth());
+        helper.assertTrue(console.activate(helper.getLevel(), null) == null, "記録者がいるのに守護機が起きた");
+        helper.assertTrue(console.activateArchivist(helper.getLevel(), null) == null, "2体目が目覚めた");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** 体力 2/3・1/3 で、回想・終焉の姿へ移る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 40)
+    public static void archivistPhasesFollowHealth(GameTestHelper helper) {
+        LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
+        a.skipEmerging();
+        a.setHealth(a.getMaxHealth() * 0.5F);
+        helper.runAtTickTime(3, () -> {
+            helper.assertTrue(a.phase() == 2, "体力半分で回想の姿にならない");
+            a.setHealth(a.getMaxHealth() * 0.2F);
+        });
+        helper.runAtTickTime(6, () -> {
+            helper.assertTrue(a.phase() == 3, "体力 1/3 未満で終焉の姿にならない");
+            a.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 倒すと演出のあと消え、記録者の光輪が残る。 */
+    @GameTest(template = EMPTY, timeoutTicks = LastArchivist.DEATH_TICKS + 40)
+    public static void archivistDeathLeavesHalo(GameTestHelper helper) {
+        LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
+        a.skipEmerging();
+        a.kill();
+        helper.runAtTickTime(LastArchivist.DEATH_TICKS / 2, () -> helper.assertFalse(a.isRemoved(), "演出の途中で消えた"));
+        helper.runAtTickTime(LastArchivist.DEATH_TICKS + 10, () -> {
+            helper.assertTrue(a.isRemoved(), "演出が終わっても消えない");
+            helper.assertTrue(!helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(helper.absolutePos(CONSOLE)).inflate(16),
+                    e -> e.getItem().is(item("archivist_halo"))).isEmpty(), "記録者の光輪が残らない");
+            helper.succeed();
+        });
+    }
+
+    /** 挑戦をやめて離れると、記録者は戻り、終焉の記録がコンソールの上に返る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void abandonedArchivistReturnsRecord(GameTestHelper helper) {
+        SealConsoleBlockEntity console = arena(helper);
+        LastArchivist a = console.activateArchivist(helper.getLevel(), null);
+        a.skipEmerging();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(a.isRemoved(), "挑戦者がいないのに記録者が残っている");
+            helper.assertTrue(console.activeArchivist(helper.getLevel()) == null, "コンソールが記録者を覚えたまま");
+            helper.assertTrue(!helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(helper.absolutePos(CONSOLE)).inflate(3),
+                    e -> e.getItem().is(item("terminus_record"))).isEmpty(), "終焉の記録が返ってこない");
         });
     }
 }

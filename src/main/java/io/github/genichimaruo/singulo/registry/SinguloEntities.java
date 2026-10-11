@@ -59,11 +59,23 @@ public final class SinguloEntities {
                     io.github.genichimaruo.singulo.ruin.GravityDebris::new, MobCategory.MISC)
                     .sized(0.6F, 0.6F).clientTrackingRange(6).updateInterval(2).build(Singulo.id("gravity_debris").toString()));
 
+    /** 沈んだ炉心区画のボス（体は部位 LeviathanSegment に分かれる）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan>> ERGOSPHERE_LEVIATHAN = REGISTER.register(
+            "ergosphere_leviathan", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan::new, MobCategory.MONSTER)
+                    .sized(2.2F, 2.2F).clientTrackingRange(12).updateInterval(1).fireImmune()
+                    .build(Singulo.id("ergosphere_leviathan").toString()));
+    /** 隠しボス（最終実験施設の封印コンソールで、終焉の記録を使うと目覚める）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.LastArchivist>> LAST_ARCHIVIST = REGISTER.register(
+            "last_archivist", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.LastArchivist::new, MobCategory.MONSTER)
+                    .sized(1.2F, 3.4F).clientTrackingRange(12).fireImmune().build(Singulo.id("last_archivist").toString()));
+
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
         event.put(ECHO_SENTINEL.get(), io.github.genichimaruo.singulo.ruin.EchoSentinel.createAttributes().build());
         event.put(GRAVITY_REMNANT.get(), io.github.genichimaruo.singulo.ruin.GravityRemnant.createAttributes().build());
+        event.put(ERGOSPHERE_LEVIATHAN.get(), io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan.createAttributes().build());
+        event.put(LAST_ARCHIVIST.get(), io.github.genichimaruo.singulo.ruin.LastArchivist.createAttributes().build());
     }
 
     private SinguloEntities() {}

@@ -58,6 +58,16 @@ RECORDS = [
      'All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.'),
 ]
 
+# 最後の記録者を倒すと加わる記録。形は RECORDS と同じ
+FINAL_RECORDS = [
+    ('x01', 5, '最後の頁', '私は眠りの番をしていた。時間の場が止まったとき、記録と、場を支えていた特異点が私の中へ流れ込んだ。'
+     '何千年が過ぎたのかは分からない。読む者が来るまで、私は記録そのものになって待っていた。'
+     'あなたは最後の頁まで読んだ。もう眠ってもいいだろう。炉の火は、どうか見張っていてほしい。', 'The Last Page',
+     'I kept watch over the sleepers. When the time field stopped, the records and the singularity that held the field flowed into me. '
+     'I do not know how many millennia have passed. Until a reader came, I waited as the records themselves. '
+     "You have read to the last page. I think I may sleep now. Please keep watch over the reactor's fire."),
+]
+
 # 封印された記録（封印コンテナの特異点錠の中の「封印記録」を読むと、この順に加わる）。形は RECORDS と同じ
 HIDDEN_RECORDS = [
     ('h01', 5, '封印目録', '封印コンテナには段階ごとの鍵をかけた。次の段階に届いた者だけが、前の段階の遺産を開けられるように。'

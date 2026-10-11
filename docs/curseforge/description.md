@@ -71,13 +71,16 @@ Bring them home, decode and restore them to reach the next stage.
 | Research Building | Quantum data and cold atom traps |
 | Culture Facility | Culture data and time crystal seeds |
 | Final Lab | Anomaly samples and the dormant singularity seed |
+| Sunken Reactor Sector | Exotic matter, jet condensate and H-Condensate from a dead second reactor |
 
 The **Horizon Warden** guards the Final Lab.
 It sweeps the ground with crescents, fires a chest laser, grabs you with gravity and slams you down.
 In its later phases it sends your projectiles back at you.
+Deepest of all, the **Ergosphere Leviathan** swims around the dead core of the Sunken Reactor Sector:
+a long serpent of reactor plates that dives through the chamber, drags you along its wake and breathes a vortex beam.
 After the endgame, every boss can be refought in an awakened form with more health, harder hits and faster moves:
-use an Awakening Record Core on the Final Lab's seal console, or an Awakened Echo Core / Awakened Gravity Core on the guardian core
-of a Research Building or Culture Facility.
+use an Awakening Record Core on the Final Lab's seal console, or an awakened core on the guardian core of the other ruins.
+Awakened guardians drop chapters of records... and someone is still waiting to be read.
 
 Decoded records add the story of the lost civilization to your handbook.
 

@@ -23,6 +23,14 @@
     "source": "Ancient Terminal",
     "translation": "古码头"
   },
+  "advancement.singulo.archivist.description": {
+    "source": "Lay the Last Archivist to rest",
+    "translation": "让最后的记录者安息"
+  },
+  "advancement.singulo.archivist.title": {
+    "source": "The Last Page",
+    "translation": "最后一页"
+  },
   "advancement.singulo.assembler.description": {
     "source": "Build a precision assembler",
     "translation": "构建精密装配机"
@@ -46,6 +54,14 @@
   "advancement.singulo.awakened_gravity.title": {
     "source": "Memory of Weight",
     "translation": "重量的记忆"
+  },
+  "advancement.singulo.awakened_leviathan.description": {
+    "source": "Defeat the Awakened Ergosphere Leviathan",
+    "translation": "击败觉醒的能层之鲸"
+  },
+  "advancement.singulo.awakened_leviathan.title": {
+    "source": "The Vortex Wakes",
+    "translation": "苏醒的漩涡"
   },
   "advancement.singulo.bose.description": {
     "source": "Make a BE condensate catalyst",
@@ -175,6 +191,14 @@
     "source": "Event Horizon",
     "translation": "事件视界"
   },
+  "advancement.singulo.leviathan.description": {
+    "source": "Defeat the Ergosphere Leviathan",
+    "translation": "击败能层之鲸"
+  },
+  "advancement.singulo.leviathan.title": {
+    "source": "It Swims the Ergosphere",
+    "translation": "游于能层之物"
+  },
   "advancement.singulo.manipulator.description": {
     "source": "Make a graviton manipulator",
     "translation": "制作一个引力子操纵器"
@@ -286,6 +310,14 @@
   "advancement.singulo.ruin_research.title": {
     "source": "Research Building",
     "translation": "研究楼"
+  },
+  "advancement.singulo.ruin_sunken.description": {
+    "source": "Open the cache of a Sunken Reactor Sector",
+    "translation": "打开沉没的堆芯区的宝库"
+  },
+  "advancement.singulo.ruin_sunken.title": {
+    "source": "The Sunken Reactor",
+    "translation": "沉没的反应堆"
   },
   "advancement.singulo.seed.description": {
     "source": "Awaken a singularity seed",
@@ -1015,6 +1047,10 @@
     "source": "Copies ruin records onto data cards, restores degraded parts and decodes crystal memories.",
     "translation": "将废墟记录抄写到数据卡上，修复劣化的零件，并读取水晶存储器。"
   },
+  "desc.singulo.archivist_halo": {
+    "source": "The halo the Last Archivist wore. It is still quietly warm and faintly whispers in an old tongue.",
+    "translation": "最后的记录者曾戴着的光环。至今仍静静地温热着，隐约低语着古老的语言。"
+  },
   "desc.singulo.artificial_star_core": {
     "source": "A star core that replaces nether stars.",
     "translation": "取代下界恒星的恒星核心。"
@@ -1022,6 +1058,10 @@
   "desc.singulo.awakening_echo_core": {
     "source": "A sentinel core overlaid with echo-shard records. Use it on the guardian core in a Research Building to call the Awakened Echo Sentinel: 2.5× health, 1.5× damage, faster moves, an extra echo, and it re-projects broken projectors when enraged. Victory adds an overclock chip and more to the usual drops.",
     "translation": "用回响碎片的记录覆写过的守卫投影核心。在研究楼的守卫封印核心上使用，会召唤觉醒的回响守卫：生命 2.5 倍、伤害 1.5 倍、招式更快、多一个分身，狂暴时会重新投影被破坏的投影器。获胜后除了平常的掉落，还能获得超频芯片等奖励。"
+  },
+  "desc.singulo.awakening_ergosphere_core": {
+    "source": "A Chapter of the Vortex spun up again with jet condensate and H-Condensate. Use it on the guardian core of a Sunken Reactor Sector to call the Awakened Ergosphere Leviathan: 2.5× health, 1.5× damage, faster swimming, chained dives and a breath that tracks you.",
+    "translation": "用喷射冷凝水和霍金凝聚体重新赋予旋转的漩涡断章。在沉没的堆芯区的守卫封印核心上使用，会召唤觉醒的能层之鲸：生命 2.5 倍、伤害 1.5 倍、游得更快、连续冲撞，漩涡吐息会追踪你。"
   },
   "desc.singulo.awakening_gravity_core": {
     "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
@@ -1343,6 +1383,10 @@
     "source": "Guarded by the Horizon Warden. Awaken it in the encapsulator.",
     "translation": "由 视界守卫 守护。在封装器中将其唤醒。"
   },
+  "desc.singulo.echo_chapter": {
+    "source": "A passage of records left behind when the Awakened Echo Sentinel unravels. It looks like part of a page. Bound with other chapters, it might be readable.",
+    "translation": "觉醒的回响守卫消散后留下的一段记录。似乎是某一页的一部分。与其他断章合在一起，或许就能读懂。"
+  },
   "desc.singulo.echo_projector": {
     "source": "Projects the Echo Sentinel. The more projectors remain, the less damage the sentinel takes. Breaks by hand.",
     "translation": "投射出回响守卫身影的底座。剩下的投影器越多，守卫受到的伤害越少。徒手也能破坏。"
@@ -1362,6 +1406,10 @@
   "desc.singulo.entanglement_synthesizer": {
     "source": "Produces entangled elements in pairs.",
     "translation": "产生成对的纠缠元素。"
+  },
+  "desc.singulo.ergosphere_chapter": {
+    "source": "A passage of records that surfaces after the Ergosphere Leviathan sinks: the rest of the second reactor's log. Also used for the Awakened Ergosphere Core.",
+    "translation": "能层之鲸沉入漩涡后浮现的一段记录：第二座反应堆运行记录的后续。也用于觉醒渦核。"
   },
   "desc.singulo.ergosphere_ring": {
     "source": "Extracts exotic matter from a fast-spinning core.",
@@ -1411,6 +1459,10 @@
     "source": "No fall damage. Jump while touching a wall in mid-air to kick off it (three times before landing).",
     "translation": "免疫摔落伤害。在空中贴着墙跳跃即可蹬墙再跳（落地前最多三次）。"
   },
+  "desc.singulo.gravity_chapter": {
+    "source": "A passage of records left in the collapse of the Awakened Gravity Remnant, etched with a memory of weight. Bound with other chapters, it might be readable.",
+    "translation": "觉醒的重力残渣坍缩后留下的一段记录，刻着关于重量的记忆。与其他断章合在一起，或许就能读懂。"
+  },
   "desc.singulo.gravity_field_stabilizer": {
     "source": "A component of the core controller.",
     "translation": "核心控制器的组成部分。"
@@ -1458,6 +1510,10 @@
   "desc.singulo.horizon_bus": {
     "source": "The tier 5 cable, needed to ignite the reactor.",
     "translation": "点燃反应堆所需的 5 级电缆。"
+  },
+  "desc.singulo.horizon_chapter": {
+    "source": "A passage of records found in the Awakened Horizon Warden's wreck, naming what the warden was guarding. Bound with other chapters, it might be readable.",
+    "translation": "在觉醒的视界守卫残骸中找到的一段记录，写着守卫所守护之物的名字。与其他断章合在一起，或许就能读懂。"
   },
   "desc.singulo.impact_generator_panel": {
     "source": "Landing on it causes no fall damage. Stores 1,000 FE per block fallen (up to 20,000 FE) and powers connected gravity panels.",
@@ -1851,6 +1907,10 @@
     "source": "Opens or seals a temporal-lock container. Used up each time.",
     "translation": "用于打开或封印时间锁容器。每次使用都会消耗。"
   },
+  "desc.singulo.terminus_record": {
+    "source": "The four chapters bound back together with singularity power: the last page. Use it on the Seal Console of the Final Lab to wake what slept in the time field. Leave and the record is returned.",
+    "translation": "用奇点之力把四段断章重新装订成的最后一页。在最终实验室的密封控制台上使用，在时间场中沉睡的某物将会醒来。离开房间时记录会返还。"
+  },
   "desc.singulo.thermocouple_module": {
     "source": "Turns a temperature difference into electricity.",
     "translation": "将温差转化为电能。"
@@ -2043,6 +2103,14 @@
     "source": "Awakened Echo Sentinel",
     "translation": "觉醒的回响守卫"
   },
+  "entity.singulo.ergosphere_leviathan": {
+    "source": "Ergosphere Leviathan",
+    "translation": "能层之鲸"
+  },
+  "entity.singulo.ergosphere_leviathan.awakened": {
+    "source": "Awakened Ergosphere Leviathan",
+    "translation": "觉醒的能层之鲸"
+  },
   "entity.singulo.gravity_debris": {
     "source": "Gravity Debris",
     "translation": "瓦砾"
@@ -2062,6 +2130,10 @@
   "entity.singulo.horizon_warden": {
     "source": "Horizon Warden",
     "translation": "视界守卫"
+  },
+  "entity.singulo.last_archivist": {
+    "source": "The Last Archivist",
+    "translation": "最后的记录者"
   },
   "entity.singulo.security_drone": {
     "source": "Security Drone",
@@ -2182,6 +2254,38 @@
   "gui.singulo.anchor.status": {
     "source": "Radius %s chunks · %s · %s FE/t · stored %s FE",
     "translation": "半径 %1$s 块 · %2$s · %3$s FE/t · 存储的 %4$s FE"
+  },
+  "gui.singulo.archivist.death_1": {
+    "source": "...I have been dreaming a long dream.",
+    "translation": "……我做了一个很长的梦。"
+  },
+  "gui.singulo.archivist.death_2": {
+    "source": "A record is only a record when someone reads it.",
+    "translation": "记录，只有在有人阅读时才成为记录。"
+  },
+  "gui.singulo.archivist.death_3": {
+    "source": "Thank you. Never let go of the hand that stops the feed.",
+    "translation": "谢谢你。请不要放开那只停止投料的手。"
+  },
+  "gui.singulo.archivist.emerge_1": {
+    "source": "...Someone has read the records.",
+    "translation": "……有人读了这些记录吗。"
+  },
+  "gui.singulo.archivist.emerge_2": {
+    "source": "Then let me show you the last page.",
+    "translation": "那么，就让你读到最后一页吧。"
+  },
+  "gui.singulo.archivist.phase_2": {
+    "source": "Remember. Every record is here.",
+    "translation": "回想起来吧。所有的记录都在这里。"
+  },
+  "gui.singulo.archivist.phase_3": {
+    "source": "Light and record alike return to this dark.",
+    "translation": "光也好，记录也好，终将回归这片黑暗。"
+  },
+  "gui.singulo.archivist.reset": {
+    "source": "No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console",
+    "translation": "挑战者已离开，记录者回到了时间场中。终焉之记录留在了控制台上"
   },
   "gui.singulo.cache.sealed": {
     "source": "Sealed by a force field. Defeat this ruin's guardian",
@@ -2503,6 +2607,10 @@
     "source": "The echoes of the archive take shape. The Echo Sentinel appears",
     "translation": "档案室的回响凝聚成形。回响守卫现身了"
   },
+  "gui.singulo.guardian.awakened.ergosphere_leviathan": {
+    "source": "A vortex opens in the dead core. The Ergosphere Leviathan surfaces",
+    "translation": "停止的堆芯中张开了漩涡。能层之鲸浮了出来"
+  },
   "gui.singulo.guardian.awakened.gravity_remnant": {
     "source": "The containment tank shatters. The Gravity Remnant crawls out",
     "translation": "收容槽碎裂了。重力残渣爬了出来"
@@ -2515,6 +2623,10 @@
     "source": "The core resonates. The Awakened Echo Sentinel appears",
     "translation": "觉醒核发生共鸣。觉醒的回响守卫现身了"
   },
+  "gui.singulo.guardian.awakened_rematch.ergosphere_leviathan": {
+    "source": "The core resonates. The Awakened Ergosphere Leviathan tears through the vortex",
+    "translation": "觉醒核发生共鸣。觉醒的能层之鲸撕裂漩涡现身了"
+  },
   "gui.singulo.guardian.awakened_rematch.gravity_remnant": {
     "source": "The core resonates. The Awakened Gravity Remnant crawls out",
     "translation": "觉醒核发生共鸣。觉醒的重力残渣爬了出来"
@@ -2522,6 +2634,10 @@
   "gui.singulo.guardian.defeated.echo_sentinel": {
     "source": "The Echo Sentinel unravels. The vault field dissipates",
     "translation": "回响守卫消散了。宝库的力场消失了"
+  },
+  "gui.singulo.guardian.defeated.ergosphere_leviathan": {
+    "source": "The Ergosphere Leviathan sinks into the vortex. The vault field dissipates",
+    "translation": "能层之鲸沉入了漩涡之底。宝库的力场消失了"
   },
   "gui.singulo.guardian.defeated.gravity_remnant": {
     "source": "The Gravity Remnant collapses. The vault field dissipates",
@@ -2534,6 +2650,10 @@
   "gui.singulo.guardian.reset.echo_sentinel": {
     "source": "No challenger remains. The Echo Sentinel returns to the records",
     "translation": "没有挑战者留下。回响守卫回到了记录之中"
+  },
+  "gui.singulo.guardian.reset.ergosphere_leviathan": {
+    "source": "No challenger remains. The Ergosphere Leviathan returns to the core",
+    "translation": "挑战者已离开，能层之鲸回到了堆芯的漩涡中"
   },
   "gui.singulo.guardian.reset.gravity_remnant": {
     "source": "No challenger remains. The Gravity Remnant sinks back into its tank",
@@ -3200,16 +3320,16 @@
     "translation": "废墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "研究楼、封锁培养设施和最终实验设施的宝库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间时，守卫也会复原。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封锁培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。掉落简并核。\n- 视界守卫（最终实验设施）：触碰中央的密封控制台即可唤醒。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。\n- 觉醒的守卫：击败回响守卫或重力残渣后，在房间地板上的守卫封印核心上使用觉醒回响核或觉醒重力核，即可再战（生命 2.5 倍、伤害 1.5 倍、招式更快、体力 65% 时狂暴）。回响守卫会多一个分身和一发光弹，狂暴时最多重新投影两个被破坏的投影器；重力残渣会射出更多瓦砾，重力井更大，并会连续砸地。离开房间时觉醒核会返还。"
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it surfaces from the vortex. Its head takes normal damage, its body is armored and the glowing gold core in its tail is a weak point. Its wake drags you along the way it swam: ride the flow to keep up. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Below half health it sheds armor plates at you. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "研究楼、封锁培养设施和最终实验设施的宝库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间时，守卫也会复原。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封锁培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。掉落简并核。\n- 视界守卫（最终实验设施）：触碰中央的密封控制台即可唤醒。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。\n- 能层之鲸（沉没的堆芯区）：靠近球形收容室地板上停止的堆芯，它就会从漩涡中浮出。头部受到正常伤害，躯干坚硬，尾部发金光的核心是弱点。它游过的轨迹会把你朝它游动的方向冲走：顺着水流追上去吧。头部发出青光是冲撞的信号（离开被锁定的地方）；巨口张开时不要站在正前方（先吸过去，再吐出光束）。体力低于一半时会剥下装甲板砸向你。掉落漩涡断章。\n- 觉醒的守卫：击败回响守卫或重力残渣后，在房间地板上的守卫封印核心上使用觉醒回响核或觉醒重力核，即可再战（生命 2.5 倍、伤害 1.5 倍、招式更快、体力 65% 时狂暴）。回响守卫会多一个分身和一发光弹，狂暴时最多重新投影两个被破坏的投影器；重力残渣会射出更多瓦砾，重力井更大，并会连续砸地。离开房间时觉醒核会返还。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
     "translation": "废墟的守卫"
   },
   "guide.singulo.ruins.compass.body": {
-    "source": "At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it for the next one: Research Building, then Culture Facility, then Final Lab. Underground ruins lie below the spot it points to.",
-    "translation": "罗盘起初只能搜寻地表观测站。潜行右键你已攻略的废墟的废墟缓存，即可调校以搜寻下一处：研究楼，然后是封闭培养设施，最后是最终实验室。地下废墟位于指针所指位置的下方。"
+    "source": "At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Underground ruins lie below the spot it points to.",
+    "translation": "罗盘起初只能搜寻地表观测站。潜行右键你已攻略的废墟的废墟缓存，即可调校以搜寻下一处：研究楼，然后是封闭培养设施，再是最终实验室，最后是沉没的堆芯区。地下废墟位于指针所指位置的下方。"
   },
   "guide.singulo.ruins.compass.title": {
     "source": "Tuning the Explorer Compass",
@@ -3404,8 +3524,8 @@
     "translation": "副产品和 奇点核心"
   },
   "guide.singulo.stage5.endgame.body": {
-    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.",
-    "translation": "有了核心和力量，你就可以运行游戏后期的设备：护盾、T 型气缸和虫洞。人造星核让你不必再寻找下界之星。\n想要真正的战斗，就在奇点封装器中制作觉醒记录核，并在最终实验室的密封控制台上使用：觉醒的视界守卫拥有 2.5 倍生命和 1.5 倍伤害。击败它可获得超频芯片等奖励，可反复挑战。\n研究楼和封锁培养设施的守卫也能再战：在它们的守卫封印核心上使用觉醒回响核或觉醒重力核即可。"
+    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
+    "translation": "有了核心和力量，你就可以运行游戏后期的设备：护盾、T 型气缸和虫洞。人造星核让你不必再寻找下界之星。\n想要真正的战斗，就在奇点封装器中制作觉醒记录核，并在最终实验室的密封控制台上使用：觉醒的视界守卫拥有 2.5 倍生命和 1.5 倍伤害。击败它可获得超频芯片等奖励，可反复挑战。\n研究楼和封锁培养设施的守卫也能再战：在它们的守卫封印核心上使用觉醒回响核或觉醒重力核即可。\n攻略最终实验室后，调校探索罗盘去寻找沉没的堆芯区：能层之鲸栖息在停止的第二座反应堆中。\n据说觉醒的守卫倒下时会掉落记录的断章。集齐所有断章后，能读到什么呢？"
   },
   "guide.singulo.stage5.endgame.title": {
     "source": "Beyond",
@@ -3468,6 +3588,10 @@
     "translation": "制造地：奇点封装器（第 5 阶段）"
   },
   "howto.singulo.awakening_echo_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "制造地：奇点封装器（第 5 阶段）"
+  },
+  "howto.singulo.awakening_ergosphere_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "制造地：奇点封装器（第 5 阶段）"
   },
@@ -4111,6 +4235,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "制造地：精密组装台（第 4 阶段）"
   },
+  "howto.singulo.terminus_record": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "制造地：奇点封装器（第 5 阶段）"
+  },
   "howto.singulo.thermocouple_module": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作地点：制作台（第 1 阶段）"
@@ -4255,6 +4383,10 @@
     "source": "Anomaly Sample",
     "translation": "异常样本"
   },
+  "item.singulo.archivist_halo": {
+    "source": "Archivist's Halo",
+    "translation": "记录者的光环"
+  },
   "item.singulo.artificial_star_core": {
     "source": "Artificial Star Core",
     "translation": "人造星核"
@@ -4262,6 +4394,10 @@
   "item.singulo.awakening_echo_core": {
     "source": "Awakened Echo Core",
     "translation": "觉醒回响核"
+  },
+  "item.singulo.awakening_ergosphere_core": {
+    "source": "Awakened Ergosphere Core",
+    "translation": "觉醒渦核"
   },
   "item.singulo.awakening_gravity_core": {
     "source": "Awakened Gravity Core",
@@ -4383,6 +4519,10 @@
     "source": "Dormant Singularity Seed",
     "translation": "休眠奇点种子"
   },
+  "item.singulo.echo_chapter": {
+    "source": "Chapter of Echoes",
+    "translation": "回响断章"
+  },
   "item.singulo.echo_sentinel_spawn_egg": {
     "source": "Echo Sentinel Spawn Egg",
     "translation": "回响守卫刷怪蛋"
@@ -4390,6 +4530,14 @@
   "item.singulo.entangled_element": {
     "source": "Entangled Element",
     "translation": "量子纠缠元件"
+  },
+  "item.singulo.ergosphere_chapter": {
+    "source": "Chapter of the Vortex",
+    "translation": "漩涡断章"
+  },
+  "item.singulo.ergosphere_leviathan_spawn_egg": {
+    "source": "Ergosphere Leviathan Spawn Egg",
+    "translation": "能层之鲸刷怪蛋"
   },
   "item.singulo.ergosphere_ring": {
     "source": "Ergosphere Ring",
@@ -4415,6 +4563,10 @@
     "source": "Gravity Boots",
     "translation": "重力靴"
   },
+  "item.singulo.gravity_chapter": {
+    "source": "Chapter of Weight",
+    "translation": "重量断章"
+  },
   "item.singulo.gravity_field_stabilizer": {
     "source": "Gravity Field Stabilizer",
     "translation": "重力场稳定器"
@@ -4439,6 +4591,10 @@
     "source": "Holo Projector",
     "translation": "全息投影仪"
   },
+  "item.singulo.horizon_chapter": {
+    "source": "Chapter of the Horizon",
+    "translation": "视界断章"
+  },
   "item.singulo.horizon_warden_spawn_egg": {
     "source": "Horizon Warden Spawn Egg",
     "translation": "地平线守望者刷怪蛋"
@@ -4454,6 +4610,10 @@
   "item.singulo.jet_condensate": {
     "source": "Jet Condensate",
     "translation": "喷射冷凝水"
+  },
+  "item.singulo.last_archivist_spawn_egg": {
+    "source": "Last Archivist Spawn Egg",
+    "translation": "最后的记录者刷怪蛋"
   },
   "item.singulo.magnetic_bottle": {
     "source": "Magnetic Bottle",
@@ -4682,6 +4842,10 @@
   "item.singulo.temporal_key": {
     "source": "Temporal Key",
     "translation": "时间锁钥匙"
+  },
+  "item.singulo.terminus_record": {
+    "source": "Terminus Record",
+    "translation": "终焉之记录"
   },
   "item.singulo.thermocouple_module": {
     "source": "Thermocouple Module",
@@ -5163,6 +5327,14 @@
     "source": "The Last Record",
     "translation": "最后的记录"
   },
+  "record.singulo.x01.body": {
+    "source": "I kept watch over the sleepers. When the time field stopped, the records and the singularity that held the field flowed into me. I do not know how many millennia have passed. Until a reader came, I waited as the records themselves. You have read to the last page. I think I may sleep now. Please keep watch over the reactor's fire.",
+    "translation": "我曾守护着沉睡的人们。时间场停止时，记录与支撑场的奇点流进了我的身体。我不知道过去了几千年。在有读者到来之前，我化作记录本身等待着。你已经读到了最后一页。我想，我可以睡了。请替我看守反应堆的火。"
+  },
+  "record.singulo.x01.title": {
+    "source": "The Last Page",
+    "translation": "最后一页"
+  },
   "ruin.singulo.culture_facility": {
     "source": "Culture Facility",
     "translation": "封闭培养设施"
@@ -5178,6 +5350,10 @@
   "ruin.singulo.research_building": {
     "source": "Research Building",
     "translation": "研究楼"
+  },
+  "ruin.singulo.sunken_reactor": {
+    "source": "Sunken Reactor Sector",
+    "translation": "沉没的堆芯区"
   },
   "stage.singulo.1": {
     "source": "Startup",
@@ -5431,6 +5607,46 @@
     "source": "Entanglement synthesizer resonates",
     "translation": "纠缠合成器共振"
   },
+  "subtitles.singulo.ergosphere_leviathan.ambient": {
+    "source": "Ergosphere Leviathan sings",
+    "translation": "能层之鲸在歌唱"
+  },
+  "subtitles.singulo.ergosphere_leviathan.breath_charge": {
+    "source": "The maw draws in",
+    "translation": "巨口的漩涡在吸入"
+  },
+  "subtitles.singulo.ergosphere_leviathan.breath_fire": {
+    "source": "Vortex breath fires",
+    "translation": "漩涡吐息射出"
+  },
+  "subtitles.singulo.ergosphere_leviathan.death": {
+    "source": "Ergosphere Leviathan sinks",
+    "translation": "能层之鲸在下沉"
+  },
+  "subtitles.singulo.ergosphere_leviathan.dive": {
+    "source": "Ergosphere Leviathan dives",
+    "translation": "能层之鲸冲撞"
+  },
+  "subtitles.singulo.ergosphere_leviathan.emerge": {
+    "source": "A vortex opens in the core",
+    "translation": "堆芯中张开漩涡"
+  },
+  "subtitles.singulo.ergosphere_leviathan.hurt": {
+    "source": "Scales grind",
+    "translation": "鳞片摩擦作响"
+  },
+  "subtitles.singulo.ergosphere_leviathan.implode": {
+    "source": "The vortex collapses",
+    "translation": "漩涡坍缩"
+  },
+  "subtitles.singulo.ergosphere_leviathan.roar": {
+    "source": "Ergosphere Leviathan roars",
+    "translation": "能层之鲸咆哮"
+  },
+  "subtitles.singulo.ergosphere_leviathan.shed": {
+    "source": "Scales shed",
+    "translation": "鳞片剥落"
+  },
   "subtitles.singulo.fulgurite.form": {
     "source": "Sand fuses into fulgurite",
     "translation": "沙子熔成闪电熔岩"
@@ -5574,6 +5790,58 @@
   "subtitles.singulo.laser_cooler_running": {
     "source": "Laser cooler runs",
     "translation": "激光冷却器运行"
+  },
+  "subtitles.singulo.last_archivist.ambient": {
+    "source": "The Last Archivist whispers",
+    "translation": "最后的记录者在低语"
+  },
+  "subtitles.singulo.last_archivist.collapse": {
+    "source": "Singularities fall",
+    "translation": "奇点落下"
+  },
+  "subtitles.singulo.last_archivist.death": {
+    "source": "The halo shatters",
+    "translation": "光环碎裂"
+  },
+  "subtitles.singulo.last_archivist.death_flash": {
+    "source": "The last light",
+    "translation": "最后的光"
+  },
+  "subtitles.singulo.last_archivist.emerge": {
+    "source": "Records gather",
+    "translation": "记录聚集"
+  },
+  "subtitles.singulo.last_archivist.hurt": {
+    "source": "The halo wavers",
+    "translation": "光环摇曳"
+  },
+  "subtitles.singulo.last_archivist.judgment_aim": {
+    "source": "The halo takes aim",
+    "translation": "光环锁定目标"
+  },
+  "subtitles.singulo.last_archivist.judgment_fire": {
+    "source": "Judgment falls",
+    "translation": "审判之光降下"
+  },
+  "subtitles.singulo.last_archivist.nova": {
+    "source": "Nova bursts",
+    "translation": "新星爆发"
+  },
+  "subtitles.singulo.last_archivist.nova_charge": {
+    "source": "Light gathers inward",
+    "translation": "光向内聚集"
+  },
+  "subtitles.singulo.last_archivist.phase": {
+    "source": "The Archivist transforms",
+    "translation": "记录者改变了姿态"
+  },
+  "subtitles.singulo.last_archivist.recall": {
+    "source": "The Archivist recites",
+    "translation": "记录者朗读记录"
+  },
+  "subtitles.singulo.last_archivist.verdict": {
+    "source": "Circles are drawn",
+    "translation": "光阵被描绘出来"
   },
   "subtitles.singulo.multiblock_formed": {
     "source": "Multiblock formed",
@@ -6047,17 +6315,25 @@
     "source": "Used in: Singularity Seed",
     "translation": "用于：奇点种子"
   },
+  "uses.singulo.echo_chapter": {
+    "source": "Used in: Terminus Record",
+    "translation": "用于：终焉之记录"
+  },
   "uses.singulo.entangled_element": {
     "source": "Used in: Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer, Echo Resonator and 18 more",
     "translation": "用于：量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器、回响共鸣器 等 18 个"
+  },
+  "uses.singulo.ergosphere_chapter": {
+    "source": "Used in: Awakened Ergosphere Core, Terminus Record",
+    "translation": "用于：觉醒渦核、终焉之记录"
   },
   "uses.singulo.ergosphere_ring": {
     "source": "Used in: Sealed Container (Singularity Lock)",
     "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 22 more",
-    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 22 个"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 24 more",
+    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 24 个"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -6066,6 +6342,10 @@
   "uses.singulo.fulgurite": {
     "source": "Used in: Optical Lattice Substrate",
     "translation": "用于：光学晶格基板"
+  },
+  "uses.singulo.gravity_chapter": {
+    "source": "Used in: Terminus Record",
+    "translation": "用于：终焉之记录"
   },
   "uses.singulo.gravity_field_stabilizer": {
     "source": "Used in: Core Controller, Neutrino Sensitivity Module Mk3, Singularity Key, Sealed Container (Singularity Lock)",
@@ -6080,20 +6360,24 @@
     "translation": "用于：彭罗斯反应堆"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 1 more",
-    "translation": "用于：微型黑洞容器、奇点核心、奇点锁钥匙、觉醒记录核、觉醒回响核 等 1 个"
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 3 more",
+    "translation": "用于：微型黑洞容器、奇点核心、奇点锁钥匙、觉醒记录核、觉醒回响核 等 3 个"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
     "translation": "用于：冷却塔控制器、低温冷却塔、冷却塔扩展、低温涡轮机"
+  },
+  "uses.singulo.horizon_chapter": {
+    "source": "Used in: Terminus Record",
+    "translation": "用于：终焉之记录"
   },
   "uses.singulo.inertial_control_gauntlet": {
     "source": "Used in: Graviton Manipulator",
     "translation": "用于：引力子操控器"
   },
   "uses.singulo.jet_condensate": {
-    "source": "Used in: Artificial Star Core",
-    "translation": "用于：人造星核"
+    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core",
+    "translation": "用于：人造星核、觉醒渦核"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",

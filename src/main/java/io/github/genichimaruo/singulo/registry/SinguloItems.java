@@ -63,6 +63,10 @@ public final class SinguloItems {
             () -> new DeferredSpawnEggItem(SinguloEntities.ECHO_SENTINEL, 0xBFEFFF, 0x3A8FB0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.GRAVITY_REMNANT, 0x16121E, 0x9A6CFF, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> ERGOSPHERE_LEVIATHAN_SPAWN_EGG = ITEMS.register("ergosphere_leviathan_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.ERGOSPHERE_LEVIATHAN, 0x1A1424, 0x8A5CFF, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> LAST_ARCHIVIST_SPAWN_EGG = ITEMS.register("last_archivist_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.LAST_ARCHIVIST, 0xECE4D2, 0xFFD27A, new Item.Properties()));
     /** 封印コンテナからしか出ない道具。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
             "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));

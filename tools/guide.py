@@ -234,12 +234,16 @@ CHAPTERS = [
          '人工星核を作れば、もうネザースターを探さなくて済みます。\n'
          '腕に自信があれば、特異点封入台で「覚醒の記録核」を作り、最終実験施設の封印コンソールで使ってみてください。'
          '体力2.5倍・攻撃1.5倍の覚醒したホライズン・ウォーデンが目覚めます。勝てばオーバークロック・チップなどが手に入り、何度でも挑めます。\n'
-         '研究棟と封鎖培養施設の番人も、「覚醒の残響核」「覚醒の重力核」を番人の封印核に使えば、覚醒した姿と再戦できます。',
+         '研究棟と封鎖培養施設の番人も、「覚醒の残響核」「覚醒の重力核」を番人の封印核に使えば、覚醒した姿と再戦できます。\n'
+         '最終実験施設を攻略したら、探索コンパスを調整して「沈んだ炉心区画」を探しましょう。止まった二基目の炉に、エルゴ球の鯨が棲んでいます。\n'
+         '覚醒した番人たちは、倒れるときに記録の断章を落とすといいます。断章がすべてそろったら、何が読めるでしょうか。',
          'Beyond',
          'With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\n'
          'For a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab\'s seal console: the Awakened Horizon Warden '
          'has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\n'
-         'The Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.'),
+         'The Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\n'
+         'Once the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\n'
+         'They say awakened guardians drop chapters of records as they fall. What might you read once you have them all?'),
     ]),
     ('multiblocks', 'singulo:holo_projector', 'マルチブロック', 'Multiblocks', [
         ('projector', 'ホロ投影機の使い方',
@@ -334,7 +338,11 @@ CHAPTERS = [
          'やめて部屋を離れると記録核は戻ります。\n'
          '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます'
          '（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増え、本気になると壊した投影器を2つまで映し直します。'
-         '重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。',
+         '重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。\n'
+         '・エルゴ球の鯨（沈んだ炉心区画）: 球形の封じ込め室の床の、止まった炉心に近づくと渦から這い出します。'
+         '体の長い鯨で、頭は普通に、胴は硬く、尾の金色に光る芯は弱点です。泳いだ跡の帯の中では泳ぐ向きへ流されるので、流れに乗って追いかけましょう。'
+         '頭が水色に光ったら突進の合図（狙われた場所から離れる）。口の渦が開いたら前に立たない（吸い寄せられてから光線が来る）。'
+         '体力半分からは鱗の板を剥がして降らせます。渦の断章を落とします。',
          'Ruin guardians',
          'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. '
          'When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n'
@@ -347,6 +355,10 @@ CHAPTERS = [
          'so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n'
          '- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console '
          'for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n'
+         '- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it surfaces from the vortex. '
+         'Its head takes normal damage, its body is armored and the glowing gold core in its tail is a weak point. Its wake drags you along the way it swam: '
+         'ride the flow to keep up. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front '
+         '(it pulls you in, then breathes a beam). Below half health it sheds armor plates at you. Drops Chapters of the Vortex.\n'
          '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core '
          'in the room\'s floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two '
          'broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
@@ -367,11 +379,11 @@ CHAPTERS = [
          '- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.'),
         ('compass', '探索コンパスの調整',
          '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
-         '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設）も探せるようになります。'
+         '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設 → 沈んだ炉心区画）も探せるようになります。'
          '地下の遺構は、針の指す場所の下を掘って探します。',
          'Tuning the Explorer Compass',
          'At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it '
-         'for the next one: Research Building, then Culture Facility, then Final Lab. Underground ruins lie below the spot it points to.'),
+         'for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Underground ruins lie below the spot it points to.'),
         ('sealed', '封印コンテナ',
          '各遺構には、次の段階の鍵でしか開かない封印コンテナが眠っています（磁気錠 → 量子錠 → 時間錠 → 特異点錠）。'
          '鍵は精密組立台で作り、1回で使い切ります。中には素材や色つきの照明のほか、ここでしか手に入らない珍しい道具'

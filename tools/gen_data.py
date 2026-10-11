@@ -78,7 +78,8 @@ def stage_of(name):
     return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
-            '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4}.get(name, 1)
+            '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
+            '渦の断章': 5, '記録者の光輪': 5}.get(name, 1)
 
 
 def max_uses(name):
@@ -568,6 +569,7 @@ UI_LANG = {
     'ruin.singulo.research_building': ('研究棟', 'Research Building'),
     'ruin.singulo.culture_facility': ('封鎖培養施設', 'Culture Facility'),
     'ruin.singulo.final_lab': ('最終実験施設', 'Final Lab'),
+    'ruin.singulo.sunken_reactor': ('沈んだ炉心区画', 'Sunken Reactor Sector'),
     'compass.singulo.target': ('探す遺構: %s', 'Target: %s'),
     'compass.singulo.found': ('%s は %s ブロック先', '%s is %s blocks away'),
     'compass.singulo.not_found': ('近くに %s が見つからない', 'No %s nearby'),
@@ -682,6 +684,28 @@ UI_LANG = {
     'entity.singulo.gravity_debris': ('瓦礫', 'Gravity Debris'),
     'item.singulo.echo_sentinel_spawn_egg': ('残響の番人のスポーンエッグ', 'Echo Sentinel Spawn Egg'),
     'item.singulo.gravity_remnant_spawn_egg': ('重力の澱のスポーンエッグ', 'Gravity Remnant Spawn Egg'),
+    'entity.singulo.ergosphere_leviathan': ('エルゴ球の鯨', 'Ergosphere Leviathan'),
+    'entity.singulo.ergosphere_leviathan.awakened': ('覚醒したエルゴ球の鯨', 'Awakened Ergosphere Leviathan'),
+    'item.singulo.ergosphere_leviathan_spawn_egg': ('エルゴ球の鯨のスポーンエッグ', 'Ergosphere Leviathan Spawn Egg'),
+    'entity.singulo.last_archivist': ('最後の記録者', 'The Last Archivist'),
+    'item.singulo.last_archivist_spawn_egg': ('最後の記録者のスポーンエッグ', 'Last Archivist Spawn Egg'),
+    'gui.singulo.guardian.awakened.ergosphere_leviathan': ('止まった炉心に渦が開いた。エルゴ球の鯨が這い出してきた',
+                                                           'A vortex opens in the dead core. The Ergosphere Leviathan surfaces'),
+    'gui.singulo.guardian.defeated.ergosphere_leviathan': ('エルゴ球の鯨は渦の底へ沈んだ。保管庫の力場が消えた',
+                                                           'The Ergosphere Leviathan sinks into the vortex. The vault field dissipates'),
+    'gui.singulo.guardian.reset.ergosphere_leviathan': ('挑戦者がいなくなり、エルゴ球の鯨は炉心の渦へ戻った',
+                                                        'No challenger remains. The Ergosphere Leviathan returns to the core'),
+    'gui.singulo.guardian.awakened_rematch.ergosphere_leviathan': ('覚醒核が共鳴する。覚醒したエルゴ球の鯨が渦を裂いて現れた',
+                                                                   'The core resonates. The Awakened Ergosphere Leviathan tears through the vortex'),
+    'gui.singulo.archivist.emerge_1': ('……誰かが、記録を読んだのか。', '...Someone has read the records.'),
+    'gui.singulo.archivist.emerge_2': ('ならば、最後の頁を読ませよう。', 'Then let me show you the last page.'),
+    'gui.singulo.archivist.phase_2': ('思い出せ。記録はすべて、ここにある。', 'Remember. Every record is here.'),
+    'gui.singulo.archivist.phase_3': ('光も、記録も、やがてこの暗がりへ還る。', 'Light and record alike return to this dark.'),
+    'gui.singulo.archivist.death_1': ('……長い夢を、見ていた。', '...I have been dreaming a long dream.'),
+    'gui.singulo.archivist.death_2': ('記録は、読む者がいて初めて記録になる。', 'A record is only a record when someone reads it.'),
+    'gui.singulo.archivist.death_3': ('ありがとう。投入を止める手を、離さないで。', 'Thank you. Never let go of the hand that stops the feed.'),
+    'gui.singulo.archivist.reset': ('挑戦者がいなくなり、記録者は時間の場へ還った。終焉の記録がコンソールに残された',
+                                    'No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console'),
     'gui.singulo.guardian.awakened.echo_sentinel': ('記録保管室の残響が形を取った。残響の番人が現れた',
                                                     'The echoes of the archive take shape. The Echo Sentinel appears'),
     'gui.singulo.guardian.defeated.echo_sentinel': ('残響の番人がほどけて消えた。保管庫の力場が消えた',
@@ -770,8 +794,8 @@ def lang_files():
     gen_docs.descriptions(ctx, ja, en)
     gen_docs.guide(ctx, ja, en)
     gen_docs.advancements(ctx, ja, en)
-    from records import RECORDS, HIDDEN_RECORDS
-    for rid, _, jt, jb, et, eb in RECORDS + HIDDEN_RECORDS:
+    from records import RECORDS, HIDDEN_RECORDS, FINAL_RECORDS
+    for rid, _, jt, jb, et, eb in RECORDS + HIDDEN_RECORDS + FINAL_RECORDS:
         ja[f'record.{MODID}.{rid}.title'], ja[f'record.{MODID}.{rid}.body'] = jt, jb
         en[f'record.{MODID}.{rid}.title'], en[f'record.{MODID}.{rid}.body'] = et, eb
     write_json(ASSETS / 'lang' / 'ja_jp.json', dict(sorted(ja.items())))
@@ -1115,7 +1139,7 @@ def textures():
             save(im, tb / 'ruin_cache_sealed.png')
 
     warden_textures(te, save)
-    for egg in ('horizon_warden', 'echo_sentinel', 'gravity_remnant'):
+    for egg in ('horizon_warden', 'echo_sentinel', 'gravity_remnant', 'ergosphere_leviathan', 'last_archivist'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # マルチブロックの部品
@@ -1880,9 +1904,55 @@ SOUNDS = {
     'deep_sea_collector.collect': ('machine/deep_sea_collector_collect', '高圧結晶ができる', 'Pressure crystal forms', 12),
     'void_collector.collect': ('machine/void_collector_collect', '虚空の塵が集まる', 'Void dust gathers', 12),
     'fulgurite.form': ('nature/fulgurite_form', '砂が雷ガラスになる', 'Sand fuses into fulgurite', 20),
+    'ergosphere_leviathan.emerge': ('boss/ergosphere_leviathan_emerge', '炉心に渦が開く', 'A vortex opens in the core', 48),
+    'ergosphere_leviathan.ambient': ('boss/ergosphere_leviathan_ambient', 'エルゴ球の鯨が歌う', 'Ergosphere Leviathan sings', 32),
+    'ergosphere_leviathan.hurt': ('boss/ergosphere_leviathan_hurt', '鱗がきしむ', 'Scales grind', 20),
+    'ergosphere_leviathan.roar': ('boss/ergosphere_leviathan_roar', 'エルゴ球の鯨が吠える', 'Ergosphere Leviathan roars', 48),
+    'ergosphere_leviathan.dive': ('boss/ergosphere_leviathan_dive', 'エルゴ球の鯨が突進する', 'Ergosphere Leviathan dives', 32),
+    'ergosphere_leviathan.breath_charge': ('boss/ergosphere_leviathan_breath_charge', '口の渦が吸い込む', 'The maw draws in', 32),
+    'ergosphere_leviathan.breath_fire': ('boss/ergosphere_leviathan_breath_fire', '渦の光線が放たれる', 'Vortex breath fires', 48),
+    'ergosphere_leviathan.shed': ('boss/ergosphere_leviathan_shed', '鱗が剥がれる', 'Scales shed', 24),
+    'ergosphere_leviathan.death': ('boss/ergosphere_leviathan_death', 'エルゴ球の鯨が沈んでいく', 'Ergosphere Leviathan sinks', 48),
+    'ergosphere_leviathan.implode': ('boss/ergosphere_leviathan_implode', '渦がつぶれる', 'The vortex collapses', 48),
+    'last_archivist.emerge': ('boss/last_archivist_emerge', '記録が集まる', 'Records gather', 48),
+    'last_archivist.ambient': ('boss/last_archivist_ambient', '最後の記録者がささやく', 'The Last Archivist whispers', 24),
+    'last_archivist.hurt': ('boss/last_archivist_hurt', '光輪が揺らぐ', 'The halo wavers', 20),
+    'last_archivist.phase': ('boss/last_archivist_phase', '記録者が姿を変える', 'The Archivist transforms', 48),
+    'last_archivist.judgment_aim': ('boss/last_archivist_judgment_aim', '光輪が狙いを定める', 'The halo takes aim', 32),
+    'last_archivist.judgment_fire': ('boss/last_archivist_judgment_fire', '裁きの光が降る', 'Judgment falls', 48),
+    'last_archivist.verdict': ('boss/last_archivist_verdict', '光の陣が描かれる', 'Circles are drawn', 32),
+    'last_archivist.collapse': ('boss/last_archivist_collapse', '小さな特異点が落ちる', 'Singularities fall', 32),
+    'last_archivist.recall': ('boss/last_archivist_recall', '記録者が記録を読み上げる', 'The Archivist recites', 32),
+    'last_archivist.nova_charge': ('boss/last_archivist_nova_charge', '光が内へ集まる', 'Light gathers inward', 48),
+    'last_archivist.nova': ('boss/last_archivist_nova', '新星が弾ける', 'Nova bursts', 64),
+    'last_archivist.death': ('boss/last_archivist_death', '光輪が砕ける', 'The halo shatters', 48),
+    'last_archivist.death_flash': ('boss/last_archivist_death_flash', '最後の光', 'The last light', 64),
 }
 # 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
 SOUND_FALLBACKS = {
+    'ergosphere_leviathan.emerge': 'minecraft:entity.warden.emerge',
+    'ergosphere_leviathan.ambient': 'minecraft:entity.elder_guardian.ambient',
+    'ergosphere_leviathan.hurt': 'minecraft:entity.elder_guardian.hurt',
+    'ergosphere_leviathan.roar': 'minecraft:entity.ender_dragon.growl',
+    'ergosphere_leviathan.dive': 'minecraft:entity.phantom.swoop',
+    'ergosphere_leviathan.breath_charge': 'minecraft:entity.warden.sonic_charge',
+    'ergosphere_leviathan.breath_fire': 'minecraft:entity.warden.sonic_boom',
+    'ergosphere_leviathan.shed': 'minecraft:entity.shulker.shoot',
+    'ergosphere_leviathan.death': 'minecraft:entity.ender_dragon.death',
+    'ergosphere_leviathan.implode': 'minecraft:entity.generic.explode',
+    'last_archivist.emerge': 'minecraft:block.end_portal.spawn',
+    'last_archivist.ambient': 'minecraft:block.conduit.ambient',
+    'last_archivist.hurt': 'minecraft:block.amethyst_block.hit',
+    'last_archivist.phase': 'minecraft:item.totem.use',
+    'last_archivist.judgment_aim': 'minecraft:block.beacon.activate',
+    'last_archivist.judgment_fire': 'minecraft:entity.evoker.cast_spell',
+    'last_archivist.verdict': 'minecraft:block.respawn_anchor.charge',
+    'last_archivist.collapse': 'minecraft:block.respawn_anchor.deplete',
+    'last_archivist.recall': 'minecraft:entity.illusioner.cast_spell',
+    'last_archivist.nova_charge': 'minecraft:block.beacon.power_select',
+    'last_archivist.nova': 'minecraft:entity.warden.sonic_boom',
+    'last_archivist.death': 'minecraft:block.beacon.deactivate',
+    'last_archivist.death_flash': 'minecraft:block.end_portal.spawn',
     'horizon_warden.ambient': 'minecraft:block.beacon.ambient',
     'sealed_container.denied': 'minecraft:block.dispenser.fail',
     'sealed_container.insert': 'minecraft:block.vault.insert_item',
@@ -2031,12 +2101,14 @@ RUIN_PLACEMENT = {
     'research_building': (56, 20, 19370502, ['#minecraft:is_overworld']),
     'culture_facility': (64, 24, 19370503, ['#minecraft:is_overworld']),
     'final_lab': (96, 40, 19370504, ['#minecraft:is_overworld']),
+    'sunken_reactor': (112, 48, 19370505, ['#minecraft:is_overworld']),
 }
 # 地下の遺構を埋める高さ（構造物の床の Y の範囲）。深い遺構ほど後の段階
 RUIN_DEPTH = {
     'research_building': (-20, 4),
     'culture_facility': (-46, -30),
     'final_lab': (-56, -46),
+    'sunken_reactor': (-60, -54),
 }
 
 
@@ -2077,10 +2149,14 @@ def craters_data():
     })
 
 
+# 沈んだ炉心区画の保管庫の中身（1回の遠征ぶん）: (アイテム, 最小, 最大)。ほかにクリスタルメモリと、ときどきオーバークロック・チップ
+SUNKEN_REACTOR_LOOT = [('エキゾチック物質', 3, 5), ('ジェット凝縮体', 2, 3), ('H凝縮体', 1, 2)]
+
 # 番人の落とす物: 番人 → [(アイテム, 最小, 最大)]
 BOSS_LOOT = {
     'echo_sentinel': [('番人の投影核', 2, 2), ('クリスタルメモリ', 1, 2)],
     'gravity_remnant': [('縮退核', 2, 2), ('高圧結晶', 2, 4)],
+    'ergosphere_leviathan': [('渦の断章', 1, 1), ('エキゾチック物質', 4, 6), ('H凝縮体', 2, 3)],
 }
 
 
@@ -2134,7 +2210,8 @@ def ruins_data():
         })
     write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'ruins.json',
                {'values': [f'{MODID}:{rid}' for rid in ruins.RUINS]})
-    write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'gravity_anomalies.json', {'values': [f'{MODID}:final_lab']})
+    write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'gravity_anomalies.json',
+               {'values': [f'{MODID}:final_lab', f'{MODID}:sunken_reactor']})
 
     # 中身: 遺構ごとに1つの保管庫へ、1回の遠征ぶんを入れる。一回限りのもの（特異点の種）は別表で初回だけ
     pools, first = {}, {}
@@ -2146,7 +2223,14 @@ def ruins_data():
              {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]}
         (first if info['kind'] == 'once' else pools).setdefault(rid, []).append(pool)
     # クリスタルメモリ（旧文明の記録）。深い遺構ほど多い
-    fragments = {'observation_post': (1, 2), 'research_building': (1, 2), 'culture_facility': (2, 3), 'final_lab': (2, 3)}
+    fragments = {'observation_post': (1, 2), 'research_building': (1, 2), 'culture_facility': (2, 3), 'final_lab': (2, 3),
+                 'sunken_reactor': (2, 3)}
+    # 沈んだ炉心区画（段階5）: 探索でしか手に入らない物はなく、点火後の素材をまとめて持ち帰れる
+    for name, lo, hi in SUNKEN_REACTOR_LOOT:
+        pools.setdefault('sunken_reactor', []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid(name), 'functions': [
+            {'function': 'minecraft:set_count', 'count': lo if lo == hi else {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
+    pools['sunken_reactor'].append({'rolls': 1, 'entries': [
+        {'type': 'minecraft:item', 'name': mid('オーバークロック・チップ'), 'weight': 35}, {'type': 'minecraft:empty', 'weight': 65}]})
     for rid, (lo, hi) in fragments.items():
         pools.setdefault(rid, []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid('クリスタルメモリ'), 'functions': [
             {'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
@@ -2294,7 +2378,8 @@ TAB_GROUPS = [
             'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock',
             'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
-                     'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg']),
+                     'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
+                     'last_archivist_spawn_egg']),
 ]
 
 

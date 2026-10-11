@@ -937,5 +937,212 @@
         "attenuation_distance": 20
       }
     ]
+  },
+  "ergosphere_leviathan.emerge": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.emerge",
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.emerge",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.ambient": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:entity.elder_guardian.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.hurt": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.elder_guardian.hurt",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.roar": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.roar",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ender_dragon.growl",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.dive": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.dive",
+    "sounds": [
+      {
+        "name": "minecraft:entity.phantom.swoop",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.breath_charge": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.breath_charge",
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.sonic_charge",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.breath_fire": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.breath_fire",
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.sonic_boom",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.shed": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.shed",
+    "sounds": [
+      {
+        "name": "minecraft:entity.shulker.shoot",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.death": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ender_dragon.death",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.implode": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.implode",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.emerge": {
+    "subtitle": "subtitles.singulo.last_archivist.emerge",
+    "sounds": [
+      {
+        "name": "minecraft:block.end_portal.spawn",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.ambient": {
+    "subtitle": "subtitles.singulo.last_archivist.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block.conduit.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.hurt": {
+    "subtitle": "subtitles.singulo.last_archivist.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.hit",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.phase": {
+    "subtitle": "subtitles.singulo.last_archivist.phase",
+    "sounds": [
+      {
+        "name": "minecraft:item.totem.use",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.judgment_aim": {
+    "subtitle": "subtitles.singulo.last_archivist.judgment_aim",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.activate",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.judgment_fire": {
+    "subtitle": "subtitles.singulo.last_archivist.judgment_fire",
+    "sounds": [
+      {
+        "name": "minecraft:entity.evoker.cast_spell",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.verdict": {
+    "subtitle": "subtitles.singulo.last_archivist.verdict",
+    "sounds": [
+      {
+        "name": "minecraft:block.respawn_anchor.charge",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.collapse": {
+    "subtitle": "subtitles.singulo.last_archivist.collapse",
+    "sounds": [
+      {
+        "name": "minecraft:block.respawn_anchor.deplete",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.recall": {
+    "subtitle": "subtitles.singulo.last_archivist.recall",
+    "sounds": [
+      {
+        "name": "minecraft:entity.illusioner.cast_spell",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.nova_charge": {
+    "subtitle": "subtitles.singulo.last_archivist.nova_charge",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.power_select",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.nova": {
+    "subtitle": "subtitles.singulo.last_archivist.nova",
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.sonic_boom",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.death": {
+    "subtitle": "subtitles.singulo.last_archivist.death",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.deactivate",
+        "type": "event"
+      }
+    ]
+  },
+  "last_archivist.death_flash": {
+    "subtitle": "subtitles.singulo.last_archivist.death_flash",
+    "sounds": [
+      {
+        "name": "minecraft:block.end_portal.spawn",
+        "type": "event"
+      }
+    ]
   }
 }

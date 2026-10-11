@@ -21,6 +21,8 @@ import net.minecraft.world.phys.AABB;
  * 守護機が倒されると保管庫の力場を消し、挑戦者がいなくなって守護機が封印に戻ると、また触れられる状態に戻る。
  * <p>
  * 攻略後の再戦: 覚醒の記録核を手に持って使うと、保管庫が開いていても覚醒した守護機を呼び出す（記録核を1個使う）。
+ * <p>
+ * 隠しボス: 終焉の記録を手に持って使うと、最後の記録者が目覚める（{@link #activateArchivist}）。
  */
 public class SealConsoleBlockEntity extends BlockEntity {
     public static final int VAULT_SEARCH_RADIUS = 12;
@@ -28,6 +30,8 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     @Nullable
     private UUID warden;
+    @Nullable
+    private UUID archivist;
 
     public SealConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.SEAL_CONSOLE.get(), pos, state);
@@ -65,7 +69,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
      */
     @Nullable
     public HorizonWarden activate(ServerLevel level, @Nullable ServerPlayer player) {
-        if (activeWarden(level) != null) {
+        if (activeWarden(level) != null || activeArchivist(level) != null) {
             tell(player, "gui.singulo.console.active");
             return null;
         }
@@ -106,7 +110,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
      */
     @Nullable
     public HorizonWarden activateAwakened(ServerLevel level, @Nullable ServerPlayer player) {
-        if (activeWarden(level) != null) {
+        if (activeWarden(level) != null || activeArchivist(level) != null) {
             tell(player, "gui.singulo.console.active");
             return null;
         }
@@ -131,6 +135,61 @@ public class SealConsoleBlockEntity extends BlockEntity {
         setChanged();
         broadcast(level, "gui.singulo.console.awakened_rematch");
         return w;
+    }
+
+    // ------------------------------------------------------------------ 隠しボス: 最後の記録者
+
+    /** 終焉の記録（4つの断章から作る。最後の記録者を呼び出す）。 */
+    public static net.minecraft.world.item.Item terminusRecord() {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("terminus_record"));
+    }
+
+    @Nullable
+    public LastArchivist activeArchivist(ServerLevel level) {
+        if (archivist == null) {
+            return null;
+        }
+        Entity e = level.getEntity(archivist);
+        return e instanceof LastArchivist a && a.isAlive() ? a : null;
+    }
+
+    /**
+     * 終焉の記録を使ったとき。最後の記録者を起こせたらそれを返す（呼んだ側が記録を1個減らす）。
+     * 守護機と同時には呼べない。保管庫が開いていても呼べる（保管庫の封鎖には関わらない）。
+     */
+    @Nullable
+    public LastArchivist activateArchivist(ServerLevel level, @Nullable ServerPlayer player) {
+        if (activeWarden(level) != null || activeArchivist(level) != null) {
+            tell(player, "gui.singulo.console.active");
+            return null;
+        }
+        if (vault(level) == null) {
+            tell(player, "gui.singulo.console.no_vault");
+            return null;
+        }
+        LastArchivist a = SinguloEntities.LAST_ARCHIVIST.get().create(level);
+        if (a == null) {
+            return null;
+        }
+        net.minecraft.world.phys.Vec3 at = LastArchivist.spawnAt(worldPosition);
+        a.moveTo(at.x, at.y, at.z, 180, 0);
+        a.awaken(worldPosition);
+        a.startEmerging();
+        level.addFreshEntity(a);
+        archivist = a.getUUID();
+        setChanged();
+        return a;
+    }
+
+    void onArchivistDefeated(ServerLevel level) {
+        archivist = null;
+        setChanged();
+    }
+
+    void onArchivistReset(ServerLevel level) {
+        archivist = null;
+        setChanged();
+        broadcast(level, "gui.singulo.archivist.reset");
     }
 
     void onWardenDefeated(ServerLevel level) {
@@ -168,11 +227,15 @@ public class SealConsoleBlockEntity extends BlockEntity {
         if (warden != null) {
             tag.putUUID("warden", warden);
         }
+        if (archivist != null) {
+            tag.putUUID("archivist", archivist);
+        }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         warden = tag.hasUUID("warden") ? tag.getUUID("warden") : null;
+        archivist = tag.hasUUID("archivist") ? tag.getUUID("archivist") : null;
     }
 }

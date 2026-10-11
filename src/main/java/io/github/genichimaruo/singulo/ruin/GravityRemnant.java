@@ -155,7 +155,7 @@ public class GravityRemnant extends RuinBoss {
 
     @Override
     protected String[][] awakenedRewards() {
-        return new String[][] {{"overclock_chip", "1"}, {"degenerate_nucleus", "2"}, {"exotic_matter", "4"}};
+        return new String[][] {{"overclock_chip", "1"}, {"degenerate_nucleus", "2"}, {"exotic_matter", "4"}, {"gravity_chapter", "1"}};
     }
 
     /** 殻の i 番目の瓦礫の見た目。 */

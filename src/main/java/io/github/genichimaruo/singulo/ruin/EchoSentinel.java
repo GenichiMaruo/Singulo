@@ -185,7 +185,7 @@ public class EchoSentinel extends RuinBoss {
 
     @Override
     protected String[][] awakenedRewards() {
-        return new String[][] {{"overclock_chip", "1"}, {"sentinel_core", "2"}, {"record_fragment", "2"}};
+        return new String[][] {{"overclock_chip", "1"}, {"sentinel_core", "2"}, {"record_fragment", "2"}, {"echo_chapter", "1"}};
     }
 
     /** 姿を映している投影器の位置（封印核が渡す）。 */

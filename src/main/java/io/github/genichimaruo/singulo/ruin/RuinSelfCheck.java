@@ -16,10 +16,10 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 /**
  * 開発用の自己点検。-Dsingulo.ruinSelfCheck=true（./gradlew runServer -PruinSelfCheck=true）で起動すると、
- * 4種類の遺構をそれぞれ探し、その周りのチャンクを生成して保管庫が置かれたかを確かめ、結果をログに出して止まる。
+ * 5種類の遺構をそれぞれ探し、その周りのチャンクを生成して保管庫が置かれたかを確かめ、結果をログに出して止まる。
  */
 public final class RuinSelfCheck {
-    static final String[] RUINS = {"observation_post", "research_building", "culture_facility", "final_lab"};
+    static final String[] RUINS = {"observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor"};
     static final int SEARCH_RADIUS_CHUNKS = 160;
 
     private RuinSelfCheck() {}
