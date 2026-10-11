@@ -36,6 +36,8 @@ import net.minecraft.world.phys.Vec3;
  * 攻略後の再戦: 覚醒核を封印核に使うと「覚醒した」個体が現れる（{@link #makeAwakened()}）。体力×awakenedGuardianHealthMultiplier、
  * 与えるダメージ×awakenedGuardianDamageMultiplier、技の間×{@value #AWAKENED_PACE}、本気になる体力の割合が早まる。
  * 倒すと追加の報酬（{@link #awakenedRewards()}）が出る。やめて部屋を離れると覚醒核は封印核の上に返る。
+ * <p>
+ * 挑戦人数: 部屋にいる挑戦者が増えると、体力（割合を保ったまま）・技の速さ・報酬の数が増える（{@link BossScaling}）。
  */
 public abstract class RuinBoss extends Monster {
     private static final EntityDataAccessor<Integer> EMERGE = SynchedEntityData.defineId(RuinBoss.class, EntityDataSerializers.INT);
@@ -58,6 +60,11 @@ public abstract class RuinBoss extends Monster {
     private int emptyChecks;
     /** 受けるダメージの倍率（最大体力の上限を超える硬さを、受けるダメージを減らして表す）。 */
     protected float damageScale = 1;
+    /** 強さに数えている挑戦者の数（増えるだけで、減らない）。 */
+    private int participants = 1;
+    /** ボスバーのもとの名前（人数を添える前）。null なら実体の名前。 */
+    @Nullable
+    private Component barName;
 
     protected RuinBoss(EntityType<? extends RuinBoss> type, Level level, BossEvent.BossBarColor color) {
         super(type, level);
@@ -112,9 +119,46 @@ public abstract class RuinBoss extends Monster {
 
     private void applyAwakenedLook() {
         if (!hasCustomName()) {
-            bossBar.setName(Component.translatable(getType().getDescriptionId() + ".awakened"));
+            setBarName(Component.translatable(getType().getDescriptionId() + ".awakened"));
         }
         bossBar.setColor(awakenedColor());
+    }
+
+    /** ボスバーの名前を変える（2人以上で挑んでいれば人数を添える）。 */
+    protected void setBarName(Component name) {
+        barName = name;
+        bossBar.setName(BossScaling.barName(name, participants));
+    }
+
+    // ------------------------------------------------------------------ 挑戦人数
+
+    /** 強さに数えている挑戦者の数。 */
+    public int participants() {
+        return participants;
+    }
+
+    /**
+     * 挑戦者の数を増やす（減らす方向は無視する）。体力をその時の割合を保ったまま増やし、ボスバーに人数を添える。
+     * 部屋の挑戦者を数えて呼ぶ（テストからも直接呼べる）。
+     */
+    public void setParticipants(int players) {
+        int n = BossScaling.clamp(players);
+        if (n <= participants) {
+            return;
+        }
+        rescaleHealth(BossScaling.healthFactor(n) / BossScaling.healthFactor(participants));
+        participants = n;
+        setBarName(barName != null ? barName : getDisplayName());
+    }
+
+    /** 体力を factor 倍にする（今の体力の割合は保つ。最大体力の上限を超える分は受けるダメージで表す）。 */
+    private void rescaleHealth(double factor) {
+        float fraction = getHealth() / getMaxHealth();
+        double effective = effectiveMaxHealth() * factor;
+        double max = Math.min(effective, MAX_HEALTH_CAP);
+        damageScale = (float) (max / effective);
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
+        setHealth((float) (max * fraction));
     }
 
     /** 実際の硬さ（受けるダメージを減らした分を含めた体力）。 */
@@ -137,9 +181,10 @@ public abstract class RuinBoss extends Monster {
         return new String[0][];
     }
 
-    /** 技の間（tick）。覚醒した個体は短い。 */
+    /** 技の間（tick）。覚醒した個体と、大勢で挑まれたときは短い。 */
     protected int pace(int ticks) {
-        return awakened() ? Math.max(4, Math.round(ticks * AWAKENED_PACE)) : ticks;
+        float k = (awakened() ? AWAKENED_PACE : 1F) * BossScaling.paceFactor(participants);
+        return k >= 1 ? ticks : Math.max(4, Math.round(ticks * k));
     }
 
     /** 本気になる体力の割合。 */
@@ -246,8 +291,12 @@ public abstract class RuinBoss extends Monster {
         if (home == null) {
             return;
         }
-        boolean present = !level.getEntitiesOfClass(Player.class, new AABB(home).inflate(arenaRadius() + 4),
-                p -> p.isAlive() && !p.isCreative() && !p.isSpectator()).isEmpty();
+        int players = level.getEntitiesOfClass(Player.class, new AABB(home).inflate(arenaRadius() + 4),
+                p -> p.isAlive() && !p.isCreative() && !p.isSpectator()).size();
+        boolean present = players > 0;
+        if (players > participants && emergeTicks() <= 0 && isAlive()) {
+            setParticipants(players);
+        }
         emptyChecks = present ? 0 : emptyChecks + 1;
         boolean reset = !ServerConfig.SPEC.isLoaded() || ServerConfig.WARDEN_RESET_ON_LEAVE.get();
         if (emptyChecks >= RESET_CHECKS && reset) {
@@ -315,9 +364,11 @@ public abstract class RuinBoss extends Monster {
     }
 
     private void dropAwakenedRewards(ServerLevel level) {
-        for (String[] r : awakenedRewards()) {
-            net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
-            spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
+        for (int roll = 0; roll < BossScaling.lootRolls(participants); roll++) {
+            for (String[] r : awakenedRewards()) {
+                net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
+                spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
+            }
         }
         String id = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
         io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), arenaRadius() + 16, "awakened_" + id);
@@ -353,10 +404,13 @@ public abstract class RuinBoss extends Monster {
         }
     }
 
+    /** 落とす物（大勢で挑んだら人数ぶん）。分身は落とさない。 */
     @Override
     protected void dropFromLootTable(DamageSource source, boolean recentlyHit) {
         if (!isMinion()) {
-            super.dropFromLootTable(source, recentlyHit);
+            for (int roll = 0; roll < BossScaling.lootRolls(participants); roll++) {
+                super.dropFromLootTable(source, recentlyHit);
+            }
         }
     }
 
@@ -395,6 +449,7 @@ public abstract class RuinBoss extends Monster {
         tag.putInt("emerge", emergeTicks());
         tag.putBoolean("awakened", awakened());
         tag.putFloat("damage_scale", damageScale);
+        tag.putInt("participants", participants);
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
@@ -408,13 +463,12 @@ public abstract class RuinBoss extends Monster {
         if (tag.contains("damage_scale")) {
             damageScale = Math.max(0.001F, tag.getFloat("damage_scale"));
         }
+        participants = Math.max(1, tag.getInt("participants"));
         home = NbtUtils.readBlockPos(tag, "home").orElse(null);
         if (home != null) {
             restrictTo(home, arenaRadius());
         }
-        if (hasCustomName()) {
-            bossBar.setName(getDisplayName());
-        }
+        setBarName(getDisplayName());
         if (awakened()) {
             xpReward = awakenedXp();
             applyAwakenedLook();

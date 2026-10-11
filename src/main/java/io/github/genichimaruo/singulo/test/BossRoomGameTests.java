@@ -552,4 +552,40 @@ public final class BossRoomGameTests {
             helper.succeed();
         });
     }
+
+    // ------------------------------------------------------------------ 挑戦人数
+
+    /** 挑戦者が増えると、体力の割合を保ったまま体力が増える。減っても弱くならない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_26", timeoutTicks = 40)
+    public static void guardianScalesWithChallengers(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
+        RuinBoss boss = core.awaken(helper.getLevel());
+        boss.skipEmerging();
+        float base = boss.effectiveMaxHealth();
+        boss.setHealth(boss.getMaxHealth() * 0.8F);
+        boss.setParticipants(3);
+        double expected = base * io.github.genichimaruo.singulo.ruin.BossScaling.healthFactor(3);
+        helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "3人で体力が " + expected + " 相当にならない: " + boss.effectiveMaxHealth());
+        helper.assertTrue(Math.abs(boss.getHealth() / boss.getMaxHealth() - 0.8F) < 0.01F, "体力の割合が保たれない: " + boss.getHealth() / boss.getMaxHealth());
+        helper.assertTrue(boss.participants() == 3, "人数を覚えていない");
+        boss.setParticipants(1);
+        helper.assertTrue(boss.participants() == 3 && Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "人が減って弱くなった");
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** 大勢で倒すと、落とす物が人数ぶん出る。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_27", timeoutTicks = 40)
+    public static void guardianDropsPerChallenger(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
+        RuinBoss boss = core.awaken(helper.getLevel());
+        boss.skipEmerging();
+        boss.setParticipants(2);
+        boss.kill();
+        helper.runAtTickTime(5, () -> {
+            int n = dropped(helper, item("sentinel_core"));
+            helper.assertTrue(n == 2 * io.github.genichimaruo.singulo.ruin.BossScaling.lootRolls(2), "2人ぶんの番人の投影核が出ない: " + n);
+            helper.succeed();
+        });
+    }
 }

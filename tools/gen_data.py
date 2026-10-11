@@ -739,6 +739,7 @@ UI_LANG = {
                                                               'The core resonates. The Awakened Gravity Remnant crawls out'),
     'gui.singulo.guardian.awakened_defeated': ('覚醒した番人を退けた。上質な欠片がこぼれ落ちた',
                                                'The awakened guardian is defeated. Fine fragments spill out'),
+    'gui.singulo.boss.party': ('%s ［挑戦者 %s人］', '%s [%s challengers]'),
     'gui.singulo.guardian.active': ('番人はすでに目覚めている', 'The guardian is already awake'),
     'gui.singulo.guardian.no_vault': ('番人に守られた保管庫が近くにない', 'No guarded vault nearby'),
     'gui.singulo.guardian.wrong_core': ('この遺構の番人の覚醒核ではない', "This is not the awakening core for this ruin's guardian"),

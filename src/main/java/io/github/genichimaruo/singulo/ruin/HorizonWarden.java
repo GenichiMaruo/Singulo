@@ -167,6 +167,11 @@ public class HorizonWarden extends Monster {
     @Nullable
     private Move lastMove;
     private int emptyChecks;
+    /** 強さに数えている挑戦者の数（増えるだけで、減らない。{@link BossScaling}）。 */
+    private int participants = 1;
+    /** ボスバーのもとの名前（人数を添える前）。null なら実体の名前。 */
+    @Nullable
+    private Component barName;
     /** 叩き落とす相手と、その時刻。 */
     @Nullable
     private LivingEntity slamTarget;
@@ -400,7 +405,7 @@ public class HorizonWarden extends Monster {
                 * io.github.genichimaruo.singulo.data.Difficulty.wardenHealth() * (awakened ? awakenedHealthMultiplier() : 1.0);
         if (awakened) {
             getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue() * AWAKENED_SPEED);
-            bossBar.setName(Component.translatable("entity.singulo.horizon_warden.awakened"));
+            setBarName(Component.translatable("entity.singulo.horizon_warden.awakened"));
             bossBar.setColor(BossEvent.BossBarColor.PURPLE);
             xpReward = 500;
         }
@@ -410,6 +415,33 @@ public class HorizonWarden extends Monster {
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
         setHealth((float) max);
         restrictTo(home, ARENA_RADIUS);
+    }
+
+    /** ボスバーの名前を変える（2人以上で挑んでいれば人数を添える）。 */
+    private void setBarName(Component name) {
+        barName = name;
+        bossBar.setName(BossScaling.barName(name, participants));
+    }
+
+    /** 強さに数えている挑戦者の数。 */
+    public int participants() {
+        return participants;
+    }
+
+    /** 挑戦者の数を増やす（減らす方向は無視する）。体力をその時の割合を保ったまま増やし、ボスバーに人数を添える。 */
+    public void setParticipants(int players) {
+        int n = BossScaling.clamp(players);
+        if (n <= participants) {
+            return;
+        }
+        float fraction = getHealth() / getMaxHealth();
+        double effective = effectiveMaxHealth() * BossScaling.healthFactor(n) / BossScaling.healthFactor(participants);
+        double max = Math.min(effective, MAX_HEALTH_CAP);
+        damageScale = (float) (max / effective);
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);
+        setHealth((float) (max * fraction));
+        participants = n;
+        setBarName(barName != null ? barName : getDisplayName());
     }
 
     /** 実際の硬さ（受けるダメージを減らした分を含めた体力。設定の wardenHealth と同じ）。 */
@@ -527,12 +559,14 @@ public class HorizonWarden extends Monster {
         }
         // 技のあいだの間（フェーズが進むほど短い。覚醒した個体はさらに短い）
         int gap = MIN_GAP[Mth.clamp(phase(), 1, 3) - 1];
-        specialCooldown = Math.max(specialCooldown, awakened() ? Math.max(4, Math.round(gap * AWAKENED_PACE)) : gap);
+        float k = (awakened() ? AWAKENED_PACE : 1F) * BossScaling.paceFactor(participants);
+        specialCooldown = Math.max(specialCooldown, Math.max(4, Math.round(gap * k)));
     }
 
     /** 技のあいだの間を、今のフェーズに合わせて縮める。 */
     int pace(int ticks) {
-        return Math.max(4, Math.round(ticks * PACE[Mth.clamp(phase(), 1, 3) - 1] * (awakened() ? AWAKENED_PACE : 1F)));
+        return Math.max(4, Math.round(ticks * PACE[Mth.clamp(phase(), 1, 3) - 1] * (awakened() ? AWAKENED_PACE : 1F)
+                * BossScaling.paceFactor(participants)));
     }
 
     /** フェーズ2から: ビームとレーザーが壁を抜け、防具と盾を無視する（手加減なし）。 */
@@ -1092,8 +1126,12 @@ public class HorizonWarden extends Monster {
         if (home == null) {
             return;
         }
-        boolean present = !level.getEntitiesOfClass(Player.class, new AABB(home).inflate(ARENA_RADIUS),
-                p -> p.isAlive() && !p.isCreative() && !p.isSpectator()).isEmpty();
+        int players = level.getEntitiesOfClass(Player.class, new AABB(home).inflate(ARENA_RADIUS),
+                p -> p.isAlive() && !p.isCreative() && !p.isSpectator()).size();
+        boolean present = players > 0;
+        if (players > participants && emergeTicks() <= 0 && isAlive()) {
+            setParticipants(players);
+        }
         emptyChecks = present ? 0 : emptyChecks + 1;
         boolean reset = !ServerConfig.SPEC.isLoaded() || ServerConfig.WARDEN_RESET_ON_LEAVE.get();
         if (emptyChecks >= RESET_CHECKS && reset) {
@@ -1147,9 +1185,11 @@ public class HorizonWarden extends Monster {
      * 何度でも挑む意味がある。
      */
     private void dropAwakenedRewards(ServerLevel level) {
-        for (String[] r : new String[][] {{"overclock_chip", "2"}, {"exotic_matter", "8"}, {"hawking_condensate", "2"}, {"horizon_chapter", "1"}}) {
-            net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
-            spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
+        for (int roll = 0; roll < BossScaling.lootRolls(participants); roll++) {
+            for (String[] r : new String[][] {{"overclock_chip", "2"}, {"exotic_matter", "8"}, {"hawking_condensate", "2"}, {"horizon_chapter", "1"}}) {
+                net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
+                spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
+            }
         }
         io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), ARENA_RADIUS + 16, "awakened_warden");
         Component msg = Component.translatable("gui.singulo.console.awakened_defeated");
@@ -1263,6 +1303,7 @@ public class HorizonWarden extends Monster {
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("emerge", emergeTicks());
         tag.putBoolean("awakened", awakened());
+        tag.putInt("participants", participants);
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
@@ -1288,10 +1329,11 @@ public class HorizonWarden extends Monster {
         if (home != null) {
             restrictTo(home, ARENA_RADIUS);
         }
+        participants = Math.max(1, tag.getInt("participants"));
         if (hasCustomName()) {
-            bossBar.setName(getDisplayName());
+            setBarName(getDisplayName());
         } else if (awakened()) {
-            bossBar.setName(Component.translatable("entity.singulo.horizon_warden.awakened"));
+            setBarName(Component.translatable("entity.singulo.horizon_warden.awakened"));
             bossBar.setColor(phase() == 1 ? BossEvent.BossBarColor.PURPLE : phase() == 2 ? BossEvent.BossBarColor.BLUE
                     : BossEvent.BossBarColor.RED);
         }

@@ -20,6 +20,13 @@
   - Wyrm form: it dives into the vortex and erupts as a black wyrm with wings of accretion, light horns and a singularity tail. Relativistic jets sweep from its horns, it rains small black holes from above, and its dives leave singularities behind.
   - Death: it writhes, crumbles from the tail and sinks in a spiral into the vortex, which collapses in a flash.
   - 1,600 health (`leviathanHealth`). Drops a Chapter of the Vortex, exotic matter and H-Condensate. An awakened rematch uses the new Awakened Ergosphere Core.
+- **Bosses scale with the number of challengers.** Every boss (including the Horizon Warden and the Last Archivist) counts the players in its arena:
+  - Each extra player adds half of the boss's health (`bossHealthPerPlayer`).
+  - Each extra player shortens the boss's attack gaps a little, down to 0.6× (`bossPacePerPlayer`).
+  - Up to six players count (`bossMaxScaledPlayers`).
+  - When someone joins mid-fight the health fraction is kept, and the boss never weakens when players leave.
+  - Drops and awakened rewards come once per challenger (`bossLootPerPlayer`), so everyone can collect their own chapters.
+  - The boss bar shows the challenger count.
 - **Awakened guardians look different.**
   - Echo Sentinel: a crimson crown, a large double halo, wings of light and burning blades.
   - Gravity Remnant: glowing seams on its shell, a ring of crying obsidian and light spikes.

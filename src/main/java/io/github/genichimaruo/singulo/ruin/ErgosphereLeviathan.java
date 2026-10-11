@@ -927,7 +927,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         }
         if (t == ASCEND_BURST) {
             entityData.set(FORM, 3);
-            bossBar.setName(Component.translatable(wyrmName()));
+            setBarName(Component.translatable(wyrmName()));
             bossBar.setColor(BossEvent.BossBarColor.RED);
             level.sendParticles(ParticleTypes.FLASH, c.x, c.y + 1, c.z, 3, 0.2, 0.2, 0.2, 0);
             level.sendParticles(ParticleTypes.SONIC_BOOM, c.x, c.y + 1, c.z, 1, 0, 0, 0, 0);
@@ -1374,7 +1374,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             entityData.set(HOME, home);
         }
         if (form() == 3 && !hasCustomName()) {
-            bossBar.setName(Component.translatable(wyrmName()));
+            setBarName(Component.translatable(wyrmName()));
             bossBar.setColor(BossEvent.BossBarColor.RED);
         }
         trail.clear();

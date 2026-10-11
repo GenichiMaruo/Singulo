@@ -87,6 +87,10 @@ SERVER = [
     ('ruins', 'archivistHealth', '2400', '1〜100,000', '最後の記録者（隠しボス）のHP'),
     ('ruins', 'awakenedGuardianHealthMultiplier', '2.5', '1.0〜20.0', '覚醒した番人（残響の番人・重力の澱・エルゴ球の大蛇の再戦）の体力の倍率'),
     ('ruins', 'awakenedGuardianDamageMultiplier', '1.5', '1.0〜10.0', '覚醒した番人が与えるダメージの倍率'),
+    ('ruins', 'bossHealthPerPlayer', '0.5', '0.0〜4.0', '挑戦者が1人増えるごとに増えるボスの体力（もとの体力に対する割合）'),
+    ('ruins', 'bossPacePerPlayer', '0.08', '0.0〜0.5', '挑戦者が1人増えるごとに、ボスの技の間が縮む割合（0.6倍まで）'),
+    ('ruins', 'bossMaxScaledPlayers', '6', '1〜32（整数）', 'ボスの強さに数える挑戦者の上限'),
+    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか'),
 
     # 残響の欠片
     ('echo', 'templateUses', '16', '1〜1000（整数）', '型の残響の欠片が割れるまでの回数'),

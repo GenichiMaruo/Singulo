@@ -312,7 +312,7 @@ public class LastArchivist extends RuinBoss {
 
     @Override
     public int pace(int ticks) {
-        return Math.max(4, Math.round(ticks * (phase() == 3 ? 0.8F : 1F)));
+        return Math.max(4, Math.round(ticks * (phase() == 3 ? 0.8F : 1F) * BossScaling.paceFactor(participants())));
     }
 
     // ------------------------------------------------------------------ 出現
@@ -1169,9 +1169,12 @@ public class LastArchivist extends RuinBoss {
 
     /** 報酬: 記録者の光輪、残光の翼、オーバークロック・チップ、H凝縮体。近くの挑戦者は最後の記録を読めるようになる。 */
     private void dropRewards(ServerLevel level) {
-        for (String[] r : new String[][] {{"archivist_halo", "1"}, {"afterglow_wings", "1"}, {"overclock_chip", "4"}, {"hawking_condensate", "3"}}) {
-            Item item = BuiltInRegistries.ITEM.get(Singulo.id(r[0]));
-            spawnAtLocation(new ItemStack(item, Integer.parseInt(r[1])), (float) HEAD_Y);
+        // 大勢で挑んだら、光輪と翼も人数ぶん（それぞれが持ち帰れるように）
+        for (int roll = 0; roll < BossScaling.lootRolls(participants()); roll++) {
+            for (String[] r : new String[][] {{"archivist_halo", "1"}, {"afterglow_wings", "1"}, {"overclock_chip", "4"}, {"hawking_condensate", "3"}}) {
+                Item item = BuiltInRegistries.ITEM.get(Singulo.id(r[0]));
+                spawnAtLocation(new ItemStack(item, Integer.parseInt(r[1])), (float) HEAD_Y);
+            }
         }
         SinguloTriggers.milestoneNear(level, blockPosition(), ARENA + 16, "last_archivist");
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(ARENA + 16))) {

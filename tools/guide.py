@@ -326,6 +326,8 @@ CHAPTERS = [
         ('bosses', '遺構の番人',
          '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。'
          '番人は部屋から挑戦者がいなくなると元に戻ります。\n'
+         '大勢で挑むと、番人は人数に合わせて強くなります（1人増えるごとに体力が5割増え、技の間も少し縮む。6人まで）。'
+         '途中で加わっても体力の割合は保たれ、人が抜けても弱くはなりません。そのかわり、落とす物は挑戦者の人数ぶん出ます。\n'
          '・残響の番人（研究棟の記録保管室）: 部屋に入ると現れる警備ホログラム。宙を回りながら追いかける光弾を撃ち、'
          'しばらく見ていないと背後へ跳んで斬りつけてきます（跳ぶ前に光が集まる）。残響投影器は番人を守るだけでなく、一斉に光の槍も撃ちます'
          '（金色の狙いの線が出たら動くこと）。足元に光の陣が映ったら、柱が立つ前に陣の外へ。投影器が残っているほど攻撃が通りにくいので、先に壊すこと。'
@@ -350,6 +352,9 @@ CHAPTERS = [
          'Ruin guardians',
          'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. '
          'When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n'
+         'Guardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their '
+         'attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. '
+         'In return they drop their loot once per challenger.\n'
          '- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you '
          'to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys '
          '(move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it '

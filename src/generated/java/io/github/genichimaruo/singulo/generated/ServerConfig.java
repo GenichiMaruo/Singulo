@@ -61,6 +61,10 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue ARCHIVIST_HEALTH;
     public static final ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_HEALTH_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue BOSS_HEALTH_PER_PLAYER;
+    public static final ModConfigSpec.DoubleValue BOSS_PACE_PER_PLAYER;
+    public static final ModConfigSpec.IntValue BOSS_MAX_SCALED_PLAYERS;
+    public static final ModConfigSpec.BooleanValue BOSS_LOOT_PER_PLAYER;
     public static final ModConfigSpec.IntValue TEMPLATE_USES;
     public static final ModConfigSpec.IntValue SCULK_PER_SHARD;
     public static final ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS;
@@ -139,6 +143,10 @@ public final class ServerConfig {
         ModConfigSpec.IntValue ARCHIVIST_HEALTH_;
         ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_;
         ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_;
+        ModConfigSpec.DoubleValue BOSS_HEALTH_PER_PLAYER_;
+        ModConfigSpec.DoubleValue BOSS_PACE_PER_PLAYER_;
+        ModConfigSpec.IntValue BOSS_MAX_SCALED_PLAYERS_;
+        ModConfigSpec.BooleanValue BOSS_LOOT_PER_PLAYER_;
         ModConfigSpec.IntValue TEMPLATE_USES_;
         ModConfigSpec.IntValue SCULK_PER_SHARD_;
         ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS_;
@@ -280,6 +288,14 @@ public final class ServerConfig {
         AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedGuardianHealthMultiplier", 2.5, 1.0, 20.0);
         b.comment("覚醒した番人が与えるダメージの倍率", "範囲: 1.0〜10.0");
         AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedGuardianDamageMultiplier", 1.5, 1.0, 10.0);
+        b.comment("挑戦者が1人増えるごとに増えるボスの体力（もとの体力に対する割合）", "範囲: 0.0〜4.0");
+        BOSS_HEALTH_PER_PLAYER_ = b.defineInRange("bossHealthPerPlayer", 0.5, 0.0, 4.0);
+        b.comment("挑戦者が1人増えるごとに、ボスの技の間が縮む割合（0.6倍まで）", "範囲: 0.0〜0.5");
+        BOSS_PACE_PER_PLAYER_ = b.defineInRange("bossPacePerPlayer", 0.08, 0.0, 0.5);
+        b.comment("ボスの強さに数える挑戦者の上限", "範囲: 1〜32（整数）");
+        BOSS_MAX_SCALED_PLAYERS_ = b.defineInRange("bossMaxScaledPlayers", 6, 1, 32);
+        b.comment("ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか", "範囲: true / false");
+        BOSS_LOOT_PER_PLAYER_ = b.define("bossLootPerPlayer", true);
         b.pop();
         b.push("echo");
         b.comment("型の残響の欠片が割れるまでの回数", "範囲: 1〜1000（整数）");
@@ -385,6 +401,10 @@ public final class ServerConfig {
         ARCHIVIST_HEALTH = ARCHIVIST_HEALTH_;
         AWAKENED_GUARDIAN_HEALTH_MULTIPLIER = AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_;
         AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER = AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_;
+        BOSS_HEALTH_PER_PLAYER = BOSS_HEALTH_PER_PLAYER_;
+        BOSS_PACE_PER_PLAYER = BOSS_PACE_PER_PLAYER_;
+        BOSS_MAX_SCALED_PLAYERS = BOSS_MAX_SCALED_PLAYERS_;
+        BOSS_LOOT_PER_PLAYER = BOSS_LOOT_PER_PLAYER_;
         TEMPLATE_USES = TEMPLATE_USES_;
         SCULK_PER_SHARD = SCULK_PER_SHARD_;
         BLACK_HOLE_PULL_RADIUS = BLACK_HOLE_PULL_RADIUS_;

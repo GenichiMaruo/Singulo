@@ -482,4 +482,18 @@ public final class BossGameTests {
             helper.succeed();
         });
     }
+
+    /** ホライズン・ウォーデンも、挑戦者が増えると体力の割合を保ったまま強くなる。 */
+    @GameTest(template = EMPTY)
+    public static void wardenScalesWithChallengers(GameTestHelper helper) {
+        HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
+        warden.skipEmerging();
+        float base = warden.effectiveMaxHealth();
+        warden.setParticipants(4);
+        double expected = base * io.github.genichimaruo.singulo.ruin.BossScaling.healthFactor(4);
+        helper.assertTrue(Math.abs(warden.effectiveMaxHealth() - expected) < 1.0, "4人で体力が " + expected + " 相当にならない: " + warden.effectiveMaxHealth());
+        helper.assertTrue(warden.getHealth() == warden.getMaxHealth(), "満タンのはずが減っている");
+        warden.discard();
+        helper.succeed();
+    }
 }
