@@ -1,0 +1,5 @@
+--- docs/merge-review-176ee06/repro/java/io/github/genichimaruo/singulo/test/MergedFixReviewGameTests.java
++++ docs/pr7-review-0df8684/repro/java/io/github/genichimaruo/singulo/test/MergedFixReviewGameTests.java
+@@
+-            h.assertTrue(r.fluidIngredients().isEmpty(), "alternative ignores shellCoolantMb=0, nitrogen=" + r.fluidIngredients().getFirst().amount());
++            h.assertTrue(r.fluidIngredients().isEmpty(), "alternative ignores shellCoolantMb=0, nitrogen=" + r.fluidIngredients().stream().mapToInt(MachineRecipe.FluidInput::amount).sum());

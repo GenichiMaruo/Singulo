@@ -70,10 +70,11 @@ stages=copy.deepcopy(MILESTONES)
 stages[5].pop('シンギュラリティ・コア')
 stages[5].pop('ジェット・コレクター')
 stages[6]={'ジェット・コレクター':1,'シンギュラリティ・コア':1}
-m=Model(); snapshots={}
+# Lower bound: catalyst lifetime is a fractional stock that pieces of different crystals can share.
+m=Model(); snapshots_lower={}
 for s,basket in stages.items():
     m.basket(basket,s)
-    snapshots[s]=m.snap()
+    snapshots_lower[s]=m.snap()
 
 # Audit actual generated recipes: a non-stackable catalyst can only enter one catalyst slot.
 cat_ids={v[0] for v in MOD.values() if v[2]=='catalyst'}
@@ -120,12 +121,15 @@ for n in [1, SHELLS_PRE, SHELLS_PRE + 1]:
     shells[n]={'rock_mass':rock,'copper_or_iron_ingots':metal_mass*3,'pressure_crystals':PRE*n,
         'nitrogen_mb':COOLANT*n,'compressor_minutes':compressor_seconds/60}
 
-# Time crystals as individual catalysts (SNG-026). The BOM above treats lifetime as a fractional stock, but a
-# leftover piece of one crystal cannot be combined with another. Here every module needs its own fresh crystal,
-# the basket's running catalysts are kept aside, leftovers of module crystals serve small per-batch uses
-# (exotic matter), and the rest needs extra fresh crystals.
+# Time crystals as individual catalysts (SNG-026). The lower-bound BOM treats lifetime as a fractional stock, but a
+# leftover piece of one crystal cannot be combined with another. Allocation order, per crystal:
+#   1. every module takes its own fresh crystal (2/3 of a fresh life);
+#   2. the basket's running catalysts are kept aside as fresh crystals;
+#   3. exotic-matter batches (2,400 ticks each) are served from module leftovers (7 batches per leftover);
+#   4. ingredients taking a whole crystal (count=1, e.g. the singularity core) use module leftovers that step 3 left untouched;
+#   5. anything left needs extra fresh crystals.
 def crystal_accounting(stage):
-    ss = snapshots[stage]['batches']
+    ss = snapshots_lower[stage]['batches']
     fresh = 45*60*20
     seed_uses = EXPLORE['劣化した時間結晶の種']['uses']
     growth_min = RECIPES['時間結晶触媒']['t']/60
@@ -143,13 +147,34 @@ def crystal_accounting(stage):
     per_leftover = (fresh - module_uses)//exotic_uses if modules else 0
     from_leftovers = min(exotic, modules*per_leftover)
     extra = math.ceil((exotic - from_leftovers)/(fresh//exotic_uses))
-    crystals = modules + running + direct + extra
+    untouched = modules - (math.ceil(from_leftovers/per_leftover) if per_leftover else 0)
+    direct_from_leftovers = min(direct, max(0, untouched))
+    crystals = modules + running + (direct - direct_from_leftovers) + extra
     restores = math.ceil(crystals/seed_uses)
-    return {'modules': modules, 'running_stock': running, 'direct_ingredient': direct, 'exotic_batches': exotic,
+    return {'modules': modules, 'running_stock': running, 'direct_ingredient': direct,
+            'direct_from_module_leftovers': direct_from_leftovers, 'spare_module_leftovers': max(0, untouched) - direct_from_leftovers,
+            'exotic_crystal_remainder': (extra*fresh - (exotic - from_leftovers)*exotic_uses)/fresh,
+            'exotic_batches': exotic,
             'exotic_from_module_leftovers': from_leftovers, 'extra_for_exotic': extra, 'fresh_crystals': crystals,
             'seed_restores': restores, 'incubator_minutes': crystals*growth_min + restores*restore_min,
             'fractional_model_crystals': ss.get('時間結晶触媒', 0)}
 crystals_integer = {'pre_ignition': crystal_accounting(5), 'first_core': crystal_accounting(6)}
+
+# Integer scenario: the same baskets, with the fresh crystals from crystal_accounting actually grown, so their
+# materials, power and processing (incubator, seed restores, BE catalysts ...) flow into every total below.
+# Original records (data cards) still use the fractional-use model. Tables and the CSV report this scenario.
+m=Model(); snapshots={}
+for s,basket in stages.items():
+    m.basket(basket,s)
+    acc = crystal_accounting(s)
+    deficit = acc['fresh_crystals'] - m.batches.get('時間結晶触媒', 0)
+    if deficit > 0:
+        m.stock['時間結晶触媒'] = F(0)          # leftovers cannot be pooled: grow whole crystals
+        m.need('時間結晶触媒', deficit, s)
+    # What carries over: whole leftover module crystals (usable where a recipe takes one crystal by count) and the rest
+    # of the crystal opened for exotic matter (only for later exotic batches), not lifetime pooled from every piece
+    m.stock['時間結晶触媒'] = F(acc['spare_module_leftovers']) + F(acc['exotic_crystal_remainder']).limit_denominator(45*60*20)
+    snapshots[s]=m.snap()
 
 # Tick simulation of Penrose run() in an isolated, continuously loaded reactor.
 # Applies feed, evaporation, spin injection and output. No entities, time fields, or dark matter.
@@ -195,7 +220,7 @@ all_java='\n'.join(p.read_text() for p in java)
 config=(ROOT/'src/generated/java/io/github/genichimaruo/singulo/generated/ServerConfig.java').read_text()
 constants=re.findall(r'public static final ModConfigSpec\.\w+(?:<[^>]+>)? (\w+);',config)
 unused=[c for c in constants if not re.search(r'\bServerConfig\.'+c+r'\b',all_java)]
-result={'scope_commit':scope_commit,'baskets':stages,'cumulative':snapshots,'verified_generated_item_recipe_tuples':len(verified_tuples),
+result={'scope_commit':scope_commit,'baskets':stages,'cumulative':snapshots,'cumulative_lifetime_lower_bound':snapshots_lower,'verified_generated_item_recipe_tuples':len(verified_tuples),
         'blocked_recipes':blocked,'config_no_main_java_reference':unused,'shells':shells,
         'shells_before_ignition':SHELLS_PRE,'time_crystals_integer':crystals_integer,
         'penrose_efficiency':{a:efficiency(a) for a in [0,.5,.9,.99,1]},
@@ -211,7 +236,8 @@ with (OUT/'penrose-simulation.csv').open('w',newline='') as f:
     for k,rows in sims.items():
         for row in rows:w.writerow({'scenario':k,**row})
 # Markdown numerical appendix is generated to prevent transcription errors.
-lines=['# 計算付表（自動生成）','','設備バスケットは calculation-results.json を参照。到達時間ではなく資材・加工負荷の計算。','',
+lines=['# 計算付表（自動生成）','','設備バスケットは calculation-results.json を参照。到達時間ではなく資材・加工負荷の計算。',
+'累計資材・加工負荷・CSVは、時間結晶を1個ずつ数えた実行可能なシナリオ（`cumulative`）。寿命を合算した下限は `cumulative_lifetime_lower_bound`。','',
 '| 累計資材 | T1 | T2 | T3 | T4 | 点火前 | 初コア後 |','|---|---:|---:|---:|---:|---:|---:|']
 for n in ['鉄インゴット','銅インゴット','石炭','ネザー水晶','ダイヤモンド','青氷','質量値','金属質量','高圧結晶','ネザースター','星屑','雷ガラス','残響の欠片（型）','H凝縮体','観測ログ','量子データ片','培養データ','劣化した制御ユニット','劣化した時間結晶の種']:
     lines.append('| '+n+' | '+' | '.join(f"{snapshots[s]['raw'].get(n,0):,.3f}".rstrip('0').rstrip('.') for s in snapshots)+' |')
@@ -220,10 +246,13 @@ for station in ['圧縮機','極低温冷却塔','レーザー冷却器','量子
     lines.append('| '+station+' | '+' | '.join(f"{snapshots[s]['machine_minutes'].get(station,0):,.1f}" for s in snapshots)+' |')
 lines+=['','| 時間結晶（個体で数える） | 点火前 | 初コア後 |','|---|---:|---:|']
 for k,label in [('modules','モジュール'),('running_stock','運転用に確保'),('direct_ingredient','材料として1個ずつ'),
+                ('direct_from_module_leftovers','うちモジュールの残り個体で賄う'),
                 ('exotic_batches','エキゾチック物質のバッチ'),('exotic_from_module_leftovers','うちモジュールの残り寿命で賄う'),
                 ('fresh_crystals','新品の時間結晶'),('fractional_model_crystals','（参考）寿命を合算したモデル'),
                 ('seed_restores','種の復元'),('incubator_minutes','育成＋復元（分・台）')]:
     lines.append(f'| {label} | {crystals_integer["pre_ignition"][k]:,.0f} | {crystals_integer["first_core"][k]:,.0f} |')
+lower_inc = [snapshots_lower[s]['machine_minutes'].get('時間結晶育成槽', 0) for s in (5, 6)]
+lines.append(f'| （参考）寿命を合算した下限の育成槽負荷（分・台） | {lower_inc[0]:,.0f} | {lower_inc[1]:,.0f} |')
 lines.insert(2, f'入力: `{scope_commit}`')
 (OUT/'calculation-tables.md').write_text('\n'.join(lines)+'\n')
 print(json.dumps({'scope_commit':scope_commit,'crystals_integer':crystals_integer,'blocked':blocked,'shells':shells,'sim_final':result['simulation_final'],'unused_config':unused},ensure_ascii=False,indent=2))

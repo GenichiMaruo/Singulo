@@ -1,0 +1,356 @@
+[general]
+	#難易度の倍率を個別の値の上に掛ける。casual: スター不要・触媒寿命×2・遺構の再生×0.5・ウォーデンHP×0.5・殻の圧縮量×0.5。expert: スター×2・触媒寿命×0.75・修復2回まで・殻の圧縮量×1.5・点火エネルギー×2。standard と custom は個別の値のまま
+	#範囲: "casual" / "standard" / "expert" / "custom"
+	preset = "standard"
+	#設定ファイルの版（移行の印。手で変えない）。0.3.0 のファイルを読んだとき、旧既定値のまま残っている縮退熱炉の出力・殻の金属の核・炉殻の数だけを新しい既定値に直し、1にする。自分で変えた値は残る
+	#範囲: 0〜100（整数）
+	# Default: 0
+	# Range: 0 ~ 100
+	settingsVersion = 0
+
+[netherStar]
+	#エキゾチック物質1回の製作に要るネザースターの数。0で不要
+	#範囲: 0〜16（整数）
+	# Default: 1
+	# Range: 0 ~ 16
+	starsPerExoticBatch = 1
+	#エキゾチック物質1回の製作で出る数
+	#範囲: 1〜64（整数）
+	# Default: 8
+	# Range: 1 ~ 64
+	exoticBatchSize = 8
+	#シンギュラリティ・コア1個に要るネザースターの数
+	#範囲: 0〜16（整数）
+	# Default: 1
+	# Range: 0 ~ 16
+	starsPerSingularityCore = 1
+	#人工星核をネザースターの代わりに使えるか（false ならSingulo の装置のレシピは本物のネザースターだけを受け付ける）
+	#範囲: true / false
+	allowArtificialStarCore = true
+	#人工星核1個に要るジェット凝縮体の数
+	#範囲: 1〜64（整数）
+	# Default: 4
+	# Range: 1 ~ 64
+	artificialStarCoreJetCondensate = 4
+
+[power]
+	#すべての発電機の出力倍率
+	#範囲: 0.1〜100.0
+	# Default: 1.0
+	# Range: 0.1 ~ 100.0
+	generatorOutputMultiplier = 1.0
+	#熱電発電機の温度差1Kあたり出力
+	#範囲: 0.001〜10.0（FE/t・K）
+	# Default: 0.1
+	# Range: 0.001 ~ 10.0
+	thermoelectricCoefficient = 0.1
+	#極低温タービンの出力
+	#範囲: 1〜1,000,000（FE/t）
+	# Default: 5000
+	# Range: 1 ~ 1000000
+	cryoTurbineOutput = 5000
+	#量子熱機関の出力
+	#範囲: 1〜100,000,000（FE/t）
+	# Default: 200000
+	# Range: 1 ~ 100000000
+	quantumEngineOutput = 200000
+	#縮退熱炉の出力
+	#範囲: 1〜1,000,000,000（FE/t）
+	# Default: 5000000
+	# Range: 1 ~ 1000000000
+	degenerateFurnaceOutput = 7000000
+	#量子熱機関・縮退熱炉に1段下の触媒を入れたときの出力（定格に対する割合）。装置の速度倍率 lowerTierSpeed とは別
+	#範囲: 0.0〜1.0
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	generatorLowerTierOutput = 0.25
+	#質量ペレット1個の質量エネルギー（降着効率を掛ける前）
+	#範囲: 1〜（FE）
+	# Default: 20000000000
+	# Range: 1 ~ 9223372036854775807
+	penroseEnergyPerPellet = 20000000000
+	#ワームホール生成器が10秒のあいだ毎tick必要とする電力
+	#範囲: 1〜2000000000（FE/t）
+	# Default: 100000000
+	# Range: 1 ~ 2000000000
+	wormholeGeneratorPower = 100000000
+	#重力パネル1枚が働くのに毎tick必要な電力
+	#範囲: 0〜1,000,000（FE/t）
+	# Default: 40
+	# Range: 0 ~ 1000000
+	gravityPanelPower = 40
+	#Pリアクターの出力上限
+	#範囲: 1〜（FE/t）
+	# Default: 2100000000
+	# Range: 1 ~ 9223372036854775807
+	penroseMaxOutput = 2100000000
+	#エディントン限界（炉心質量1,000あたり毎秒の投入上限）
+	#範囲: 0.1〜100.0
+	# Default: 1.0
+	# Range: 0.1 ~ 100.0
+	eddingtonPelletsPerSecondPer1000Mass = 1.0
+	#Pリアクターの点火エネルギー
+	#範囲: 1〜（FE）
+	# Default: 50000000000
+	# Range: 1 ~ 9223372036854775807
+	ignitionEnergy = 50000000000
+	#点火エネルギーを注ぎ込む制限時間
+	#範囲: 1〜600（秒）
+	# Default: 10
+	# Range: 1 ~ 600
+	ignitionWindowSeconds = 10
+	#加工装置の消費電力倍率
+	#範囲: 0.0〜100.0
+	# Default: 1.0
+	# Range: 0.0 ~ 100.0
+	machineEnergyMultiplier = 1.0
+
+[catalyst]
+	#すべての触媒の寿命倍率
+	#範囲: 0.1〜100.0
+	# Default: 1.0
+	# Range: 0.1 ~ 100.0
+	lifetimeMultiplier = 1.0
+	#ミュオン触媒の寿命
+	#範囲: 1〜1440（分）
+	# Default: 20
+	# Range: 1 ~ 1440
+	muonLifetimeMinutes = 20
+	#BE凝縮触媒の寿命
+	#範囲: 1〜1440（分）
+	# Default: 30
+	# Range: 1 ~ 1440
+	boseLifetimeMinutes = 30
+	#時間結晶触媒の寿命
+	#範囲: 1〜1440（分）
+	# Default: 45
+	# Range: 1 ~ 1440
+	timeCrystalLifetimeMinutes = 45
+	#シンギュラリティ・コアの寿命（埋め込み時は無期限）
+	#範囲: 1〜1440（分）
+	# Default: 60
+	# Range: 1 ~ 1440
+	singularityLifetimeMinutes = 60
+	#1段下の触媒を入れたときの速度倍率
+	#範囲: 0.0〜1.0
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	lowerTierSpeed = 0.5
+	#1段下の触媒を入れたときの消費倍率
+	#範囲: 1.0〜10.0
+	# Default: 2.0
+	# Range: 1.0 ~ 10.0
+	lowerTierConsumption = 2.0
+	#要求電力のこの割合を下回ると不完全反応になる
+	#範囲: 0.0〜1.0
+	# Default: 0.8
+	# Range: 0.0 ~ 1.0
+	underpowerThreshold = 0.8
+	#不完全反応時の触媒消費倍率
+	#範囲: 1.0〜10.0
+	# Default: 1.5
+	# Range: 1.0 ~ 10.0
+	underpowerConsumption = 1.5
+	#失活触媒から1ティア下の原料を回収できる割合（既定0.25で失活触媒4個から1個。0でリサイクルなし）
+	#範囲: 0.0〜1.0
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	spentRecycleRatio = 0.25
+	#時間結晶の育成に要る稼働tick（既定12分）
+	#範囲: 20〜1,000,000（tick）
+	# Default: 14400
+	# Range: 20 ~ 1000000
+	timeCrystalGrowthTicks = 14400
+
+[compression]
+	#縮退物質殻1個に要る岩石の圧縮ブロックLv3
+	#範囲: 0〜9（整数）
+	# Default: 4
+	# Range: 0 ~ 9
+	shellRockLv3 = 4
+	#縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）
+	#範囲: 0〜9（整数）
+	# Default: 1
+	# Range: 0 ~ 9
+	shellMetalCores = 3
+	#縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限
+	#範囲: 0〜8,000（mB）
+	# Default: 6000
+	# Range: 0 ~ 8000
+	shellCoolantMb = 6000
+	#縮退物質殻1個から作れる炉殻ブロックの数
+	#範囲: 1〜64（整数）
+	# Default: 24
+	# Range: 1 ~ 64
+	reactorPlatesPerShell = 17
+	#混成ボーナス（Lv1が3種類以上ならLv2を8個で作れる）
+	#範囲: true / false
+	mixedBonusEnabled = true
+	#混成ボーナスに要る元ブロックの種類数
+	#範囲: 2〜9（整数）
+	# Default: 3
+	# Range: 2 ~ 9
+	mixedBonusMinKinds = 3
+	#圧縮機の処理速度倍率
+	#範囲: 0.1〜100.0
+	# Default: 1.0
+	# Range: 0.1 ~ 100.0
+	compressorSpeedMultiplier = 1.0
+
+[ruins]
+	#遺構の中身が再生するまでの日数倍率。0で再生なし
+	#範囲: 0.0〜10.0
+	# Default: 1.0
+	# Range: 0.0 ~ 10.0
+	regenDaysMultiplier = 1.0
+	#1回の遠征で拾える回収物の数の倍率
+	#範囲: 0.1〜10.0
+	# Default: 1.0
+	# Range: 0.1 ~ 10.0
+	lootCountMultiplier = 1.0
+	#回収物（原本・復元品）の使用回数の倍率
+	#範囲: 0.1〜10.0
+	# Default: 1.0
+	# Range: 0.1 ~ 10.0
+	usesMultiplier = 1.0
+	#修復・再復元のたびに最大使用回数に掛かる倍率
+	#範囲: 0.1〜1.0
+	# Default: 0.75
+	# Range: 0.1 ~ 1.0
+	repairWear = 0.75
+	#修復・再復元できる回数
+	#範囲: 0〜100（整数）
+	# Default: 3
+	# Range: 0 ~ 100
+	maxRepairs = 3
+	#何ティア下の回収物を自動探査機で回収できるか（N−2ルール）
+	#範囲: 1〜4（整数）
+	# Default: 2
+	# Range: 1 ~ 4
+	probeAutomationOffset = 2
+	#自動探査機の回収量（手動遠征比）
+	#範囲: 0.0〜1.0
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	probeYieldMultiplier = 0.5
+	#ホライズン・ウォーデンのHP
+	#範囲: 1〜100,000
+	# Default: 1200
+	# Range: 1 ~ 100000
+	wardenHealth = 1200
+	#挑戦者が離れたら全回復するか
+	#範囲: true / false
+	wardenResetOnLeave = true
+	#覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）
+	#範囲: 1.0〜20.0
+	# Default: 2.5
+	# Range: 1.0 ~ 20.0
+	awakenedWardenHealthMultiplier = 2.5
+	#覚醒したホライズン・ウォーデンが与えるダメージの倍率
+	#範囲: 1.0〜10.0
+	# Default: 1.5
+	# Range: 1.0 ~ 10.0
+	awakenedWardenDamageMultiplier = 1.5
+
+[echo]
+	#型の残響の欠片が割れるまでの回数
+	#範囲: 1〜1000（整数）
+	# Default: 16
+	# Range: 1 ~ 1000
+	templateUses = 16
+	#残響の欠片1個の複製に要るスカルク
+	#範囲: 1〜64（整数）
+	# Default: 16
+	# Range: 1 ~ 64
+	sculkPerShard = 16
+
+[hazards]
+	#引力帯の半径。0で引力なし
+	#範囲: 0〜64（ブロック）
+	# Default: 24
+	# Range: 0 ~ 64
+	blackHolePullRadius = 24
+	#リングの外での弱い引力の最大加速度（ブロック/tick²）
+	#範囲: 0.0〜1.0
+	# Default: 0.04
+	# Range: 0.0 ~ 1.0
+	blackHolePullStrength = 0.04
+	#リングの内側での強い引力の加速度（ブロック/tick²、中心に近いほど強い）
+	#範囲: 0.0〜2.0
+	# Default: 0.25
+	# Range: 0.0 ~ 2.0
+	blackHoleInnerPullStrength = 0.25
+	#事象の地平線に触れたものを必ず消す（どんな体力・耐性・無敵も無視）
+	#範囲: true / false
+	eventHorizonKill = true
+	#潮汐ダメージ帯の半径。0で無効
+	#範囲: 0〜16（ブロック）
+	# Default: 4
+	# Range: 0 ~ 16
+	tidalDamageRadius = 4
+	#炉心の蒸発バーストが外殻の外を壊すか
+	#範囲: true / false
+	evaporationBurstDamagesWorld = false
+	#ストレンジレットの発生
+	#範囲: true / false
+	strangeletEnabled = true
+	#ストレンジレットが変換する最大ブロック数
+	#範囲: 0〜4096
+	# Default: 512
+	# Range: 0 ~ 4096
+	strangeletMaxBlocks = 512
+	#ストレンジレットが広がる最大半径
+	#範囲: 0〜32（ブロック）
+	# Default: 8
+	# Range: 0 ~ 32
+	strangeletMaxRadius = 8
+	#水素の容器が壊れたときの小爆発
+	#範囲: true / false
+	hydrogenLeakExplosion = true
+	#重力時間膨張ゾーン（処理×0.8、触媒劣化×0.5）
+	#範囲: true / false
+	timeDilationEnabled = true
+	#Tシリンダーの加速倍率
+	#範囲: 1.0〜10.0
+	# Default: 2.0
+	# Range: 1.0 ~ 10.0
+	tiplerSpeedMultiplier = 2.0
+	#Tシリンダーが時間を加速する半径
+	#範囲: 1〜32（ブロック）
+	# Default: 16
+	# Range: 1 ~ 32
+	tiplerRadius = 16
+	#イベントホライズン・シールドの半径（電力は半径の二乗に比例）
+	#範囲: 4〜64（ブロック）
+	# Default: 32
+	# Range: 4 ~ 64
+	shieldRadius = 32
+
+[gear]
+	#慣性制御ガントレットの射程
+	#範囲: 4〜32（ブロック）
+	# Default: 12
+	# Range: 4 ~ 32
+	gauntletRange = 12
+	#グラビトン・マニピュレーターの射程
+	#範囲: 8〜64（ブロック）
+	# Default: 24
+	# Range: 8 ~ 64
+	manipulatorRange = 24
+
+[performance]
+	#引力判定の間隔
+	#範囲: 1〜100（tick）
+	# Default: 5
+	# Range: 1 ~ 100
+	pullCheckIntervalTicks = 5
+	#ワールドライン・アンカーの最大半径
+	#範囲: 0〜16（チャンク）
+	# Default: 5
+	# Range: 0 ~ 16
+	maxAnchorChunkRadius = 5
+	#1人が同時に動かせるワールドライン・アンカー（小・上位の合計）の数。0で無制限。上限を超えたアンカーは置けるが動かない（先に動き出したものが優先）。この版より前に置いたアンカーは、置き直すまで数えない
+	#範囲: 0〜1000
+	# Default: 8
+	# Range: 0 ~ 1000
+	maxAnchorsPerPlayer = 8

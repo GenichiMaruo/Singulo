@@ -169,15 +169,17 @@ CHAPTERS = [
          '時間結晶育成槽は、実際に動いた時間で触媒を育てます（12分）。要求の80%（24 kFE/t）以上の電力なら純度は落ちません。'
          'それを割った時間の割合だけ純度が下がり、寿命も短くなります。\n'
          '設備（炉心制御装置・特異点封入台・シールド発生塔コアなど）には、時間結晶を精密組立台で「時間結晶モジュール」に加工して使います。'
-         '触媒枠の時間結晶から寿命を30分ぶん切り出し、残り15分の触媒はそのまま運転に使えます。寿命が30分に満たない触媒からは作れません。'
+         '触媒枠の時間結晶から新品の寿命の2/3（既定の設定で30分）を切り出し、残り（既定で15分）の触媒はエキゾチック物質の加工やコアの材料に使えます。'
+         '残りの寿命がそれに満たない触媒（使いかけ・純度の低いもの）からは作れません。寿命の設定やプリセットを変えると、切り出す量も比例して変わります。'
          '設備用と運転用の取り合いになるので、育成槽は2台あると楽です。\n'
          'C空洞（5×5×5 の真空容器、天面と底面の内側が鏡面）は、時間結晶触媒を使ってエキゾチック物質とアクシオン凝縮体を作ります。',
          'Time crystals and exotic matter',
          'The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; '
          'time spent below that lowers purity and lifetime.\n'
          'Equipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts '
-         '30 minutes of life from the crystal in its catalyst slot, and the remaining 15 minutes stay usable as a catalyst. Crystals with less than 30 minutes '
-         'left cannot be cut. Two incubators keep equipment and running needs from competing.\n'
+         'two thirds of a fresh crystal\'s life (30 minutes with default settings) from the crystal in its catalyst slot, and the rest (15 minutes by default) '
+         'stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime '
+         'settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\n'
          'The C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.'),
         ('power', '大型発電と自動化',
          '・縮退熱炉（5×5×7）: 圧縮ブロックLv2 を押しつぶして 5 MFE/t。時間結晶触媒を使う（BE凝縮触媒でも25%の 1.25 MFE/t で仮運転できる）。'

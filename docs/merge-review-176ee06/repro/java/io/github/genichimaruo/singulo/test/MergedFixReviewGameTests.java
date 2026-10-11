@@ -65,7 +65,7 @@ public final class MergedFixReviewGameTests {
         try {
             ServerConfig.SHELL_COOLANT_MB.set(0); invalidate();
             var r = recipe(h, "degenerate_compactor/degenerate_matter_shell_from_strange_matter");
-            h.assertTrue(r.fluidIngredients().isEmpty(), "alternative ignores shellCoolantMb=0, nitrogen=" + r.fluidIngredients().getFirst().amount());
+            h.assertTrue(r.fluidIngredients().isEmpty(), "alternative ignores shellCoolantMb=0, nitrogen=" + r.fluidIngredients().stream().mapToInt(MachineRecipe.FluidInput::amount).sum());
             h.succeed();
         } finally { ServerConfig.SHELL_COOLANT_MB.set(old); invalidate(); }
     }
