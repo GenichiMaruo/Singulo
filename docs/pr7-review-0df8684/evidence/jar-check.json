@@ -1,0 +1,7 @@
+{
+  "jar": "Singulo-0.3.1-1.21.1N.jar",
+  "metadata_version": "0.3.1",
+  "external_review_classes": [],
+  "module_description": "時間結晶触媒の寿命を30分ぶん切り出して封じた部品。触媒と違って重ねて持て、炉心制御装置・特異点封入台・シールド発生塔コアなどの設備に組み込む。寿命が30分以上残った触媒からしか作れない。",
+  "furnace_jei_description": "■ 形: 5×5×7 の閉じた炉\n■ 起動: 時間結晶触媒と燃料\n■ 燃料: 圧縮ブロック Lv2\n■ 出力: 20 MFE/t"
+}

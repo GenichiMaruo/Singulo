@@ -80,6 +80,9 @@ public final class Singulo {
             NeoForge.EVENT_BUS.addListener(RuinSelfCheck::onServerStarted);
         }
 
+        // 0.3.0 の設定ファイルに残った旧既定値を、新しい既定値へ一度だけ移す
+        modBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Loading e) -> io.github.genichimaruo.singulo.data.ConfigMigration.onConfig(e));
+        modBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) -> io.github.genichimaruo.singulo.data.ConfigMigration.onConfig(e));
         container.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
     }

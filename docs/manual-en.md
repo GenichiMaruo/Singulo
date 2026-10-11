@@ -55,7 +55,7 @@ Generators (Cryogenic Turbine, Quantum Heat Engine, Degenerate Furnace) wait whe
 
 Time crystal growth defaults to **14,400 running ticks**, or 12 minutes at 20 TPS. It does not progress in unloaded chunks. Time fields and server configuration can change the effective duration. Purity is kept at 80% of the requested power or more; time below that shortens the crystal's life. Spent catalysts have recycling recipes.
 
-Equipment such as the Core Controller, Singularity Encapsulator, Shield Tower Core and Wormhole Generator Core uses stackable **Time Crystal Modules** from the Precision Assembler. Each cuts 30 minutes of life from the crystal in the catalyst slot; the remaining 15 minutes stay usable. Crystals with less than 30 minutes left cannot be cut.
+Equipment such as the Core Controller, Singularity Encapsulator, Shield Tower Core and Wormhole Generator Core uses stackable **Time Crystal Modules** from the Precision Assembler. Each cuts two thirds of a fresh crystal's life (30 minutes by default) from the crystal in the catalyst slot; the rest (15 minutes by default) stays usable. Crystals with less than that left cannot be cut. Changing catalyst lifetime settings scales the amount.
 
 ## Building multiblocks
 

@@ -1,0 +1,8 @@
+{
+  "old_commit": "b45f478819fa205091358a0f715edd9761d45862",
+  "existing_keys_differ": [],
+  "new_keys": [
+    "shells_before_ignition",
+    "time_crystals_integer"
+  ]
+}

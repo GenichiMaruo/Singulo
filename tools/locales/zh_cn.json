@@ -1252,8 +1252,8 @@
     "translation": "每边的中间；观看公羊的撞击。"
   },
   "desc.singulo.degenerate_furnace": {
-    "source": "A large generator burning Lv2 blocks.",
-    "translation": "燃烧 Lv2 块的大型发电机。"
+    "source": "A large generator burning Lv2 blocks: 5 MFE/t on time crystals with default settings (25% on BE catalysts).",
+    "translation": "燃烧 Lv2 块的大型发电机。默认设置下使用时间晶体催化剂为 5 MFE/t（低一级的 BE 凝聚催化剂为 25%）。"
   },
   "desc.singulo.degenerate_furnace_controller": {
     "source": "Goes in the middle of a side, second layer from the bottom.",
@@ -3328,8 +3328,8 @@
     "translation": "大功率及自动化"
   },
   "guide.singulo.stage4.time.body": {
-    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts 30 minutes of life from the crystal in its catalyst slot, and the remaining 15 minutes stay usable as a catalyst. Crystals with less than 30 minutes left cannot be cut. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
-    "translation": "育成槽在 12 分钟的实际运行时间内培育时间晶体。供电达到需求的 80%（24 kFE/t）以上时纯度不变；低于此值的时间会降低纯度和寿命。\n设备（炉心控制器、奇点封装器、盾塔核心等）使用时间晶体模块：精密组装台从催化剂槽中的晶体切下 30 分钟寿命，剩余 15 分钟仍可作为催化剂使用。剩余不足 30 分钟的晶体无法切割。两台育成槽可避免设备用和运行用相互争夺。\n卡西米尔腔（5×5×5，顶部和底部为镜面）制造奇异物质。"
+    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
+    "translation": "育成槽在 12 分钟的实际运行时间内培育时间晶体。供电达到需求的 80%（24 kFE/t）以上时纯度不变；低于此值的时间会降低纯度和寿命。\n设备（炉心控制器、奇点封装器、盾塔核心等）使用时间晶体模块：精密组装台从催化剂槽中的晶体切下新品寿命的 2/3（默认设置下为 30 分钟），剩余部分（默认 15 分钟）可用于奇异物质或作为核心材料。剩余寿命不足此值的晶体（用过的或纯度低的）无法切割；寿命设置和预设会按比例改变所需量。两台育成槽可避免设备用和运行用相互争夺。\n卡西米尔腔（5×5×5，顶部和底部为镜面）制造奇异物质。"
   },
   "guide.singulo.stage4.time.title": {
     "source": "Time crystals and exotic matter",
@@ -4672,8 +4672,8 @@
     "translation": "■ 形状：闭式5×5×5压机\n■ 启动：接通电源"
   },
   "jei.singulo.mb.degenerate_furnace": {
-    "source": "■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 20 MFE/t",
-    "translation": "■ 形状：封闭式5×5×7炉\n■ 启动：时间晶体催化剂和燃料\n■ 燃料：压缩块Lv2\n■ 输出：20 MFE/t"
+    "source": "■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 5 MFE/t by default (25% on BE catalysts)",
+    "translation": "■ 形状：封闭式5×5×7炉\n■ 启动：时间晶体催化剂和燃料\n■ 燃料：压缩块Lv2\n■ 输出：默认 5 MFE/t（BE 凝聚催化剂为 25%）"
   },
   "jei.singulo.mb.event_horizon_shield": {
     "source": "■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32",
@@ -6280,8 +6280,8 @@
     "translation": "用奇点之力重铸被击败守卫记录而成的核心。在最终实验室的密封控制台上使用，即可唤醒觉醒的视界守卫：生命 2.5 倍、伤害 1.5 倍、招式更快。获胜可获得超频芯片等奖励。"
   },
   "desc.singulo.time_crystal_module": {
-    "source": "Thirty minutes of a time crystal's life sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Only crystals with at least 30 minutes left can be cut.",
-    "translation": "封存了时间晶体 30 分钟寿命的可堆叠部件。用于炉心控制器、奇点封装器、盾塔核心等设备。只有剩余寿命至少 30 分钟的晶体才能切割。"
+    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
+    "translation": "封存了新品时间晶体寿命 2/3（默认设置下为 30 分钟）的可堆叠部件。用于炉心控制器、奇点封装器、盾塔核心等设备。剩余寿命不足此值的晶体（用过的或纯度低的）无法切割。改变寿命设置或预设时，所需量也会按比例变化。"
   },
   "entity.singulo.horizon_warden.awakened": {
     "source": "Awakened Horizon Warden",

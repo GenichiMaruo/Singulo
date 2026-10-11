@@ -1252,8 +1252,8 @@
     "translation": "각 측면의 중간; 램 파업을 지켜보세요."
   },
   "desc.singulo.degenerate_furnace": {
-    "source": "A large generator burning Lv2 blocks.",
-    "translation": "Lv2 블록을 태우는 대형 발전기."
+    "source": "A large generator burning Lv2 blocks: 5 MFE/t on time crystals with default settings (25% on BE catalysts).",
+    "translation": "Lv2 블록을 태우는 대형 발전기. 기본 설정에서 시간 결정 촉매로 5 MFE/t(한 단계 낮은 BE 응축 촉매는 25%)."
   },
   "desc.singulo.degenerate_furnace_controller": {
     "source": "Goes in the middle of a side, second layer from the bottom.",
@@ -3328,8 +3328,8 @@
     "translation": "큰 힘과 자동화"
   },
   "guide.singulo.stage4.time.body": {
-    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts 30 minutes of life from the crystal in its catalyst slot, and the remaining 15 minutes stay usable as a catalyst. Crystals with less than 30 minutes left cannot be cut. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
-    "translation": "배양기는 실제 가동 시간 12분 동안 시간 결정을 키웁니다. 요구 전력의 80%(24 kFE/t) 이상이면 순도가 유지되고, 그보다 낮았던 시간만큼 순도와 수명이 줄어듭니다.\n설비(노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등)에는 시간 결정 모듈을 씁니다. 정밀 조립기가 촉매 슬롯의 결정에서 수명 30분을 잘라 내고, 남은 15분은 촉매로 계속 쓸 수 있습니다. 30분 미만 남은 결정은 자를 수 없습니다. 배양기를 2대 두면 설비용과 가동용이 겹치지 않습니다.\n카시미르 공동(5×5×5, 윗면과 아랫면이 거울)은 특이 물질을 만듭니다."
+    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
+    "translation": "배양기는 실제 가동 시간 12분 동안 시간 결정을 키웁니다. 요구 전력의 80%(24 kFE/t) 이상이면 순도가 유지되고, 그보다 낮았던 시간만큼 순도와 수명이 줄어듭니다.\n설비(노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등)에는 시간 결정 모듈을 씁니다. 정밀 조립기가 촉매 슬롯의 결정에서 새 결정 수명의 2/3(기본 설정에서 30분)를 잘라 내고, 나머지(기본 15분)는 특이 물질 가공이나 코어 재료에 쓸 수 있습니다. 남은 수명이 그보다 적은 결정(쓰던 것·순도가 낮은 것)은 자를 수 없고, 수명 설정과 프리셋에 따라 필요량이 비례해서 바뀝니다. 배양기를 2대 두면 설비용과 가동용이 겹치지 않습니다.\n카시미르 공동(5×5×5, 윗면과 아랫면이 거울)은 특이 물질을 만듭니다."
   },
   "guide.singulo.stage4.time.title": {
     "source": "Time crystals and exotic matter",
@@ -4672,8 +4672,8 @@
     "translation": "■ 형태 : 닫힘형 5×5×5 프레스\n■ 시작: 전원 연결"
   },
   "jei.singulo.mb.degenerate_furnace": {
-    "source": "■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 20 MFE/t",
-    "translation": "■ 형태 : 폐쇄형 5×5×7 로\n■ 시작 : 시간결정 촉매 및 연료\n■ 연료: 압축 블록 Lv2\n■ 출력: 20 MFE/t"
+    "source": "■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 5 MFE/t by default (25% on BE catalysts)",
+    "translation": "■ 형태 : 폐쇄형 5×5×7 로\n■ 시작 : 시간결정 촉매 및 연료\n■ 연료: 압축 블록 Lv2\n■ 출력: 기본 5 MFE/t(BE 응축 촉매는 25%)"
   },
   "jei.singulo.mb.event_horizon_shield": {
     "source": "■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32",
@@ -6280,8 +6280,8 @@
     "translation": "쓰러뜨린 수호자의 기록을 특이점의 힘으로 다시 구운 핵입니다. 최종 실험 시설의 씰 콘솔에 사용하면 각성한 지평선 감시자가 깨어납니다. 체력 2.5배, 피해 1.5배, 기술이 더 빠릅니다. 이기면 오버클럭 칩 등을 얻습니다."
   },
   "desc.singulo.time_crystal_module": {
-    "source": "Thirty minutes of a time crystal's life sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Only crystals with at least 30 minutes left can be cut.",
-    "translation": "시간 결정의 수명 30분을 봉인한, 겹쳐 쌓을 수 있는 부품입니다. 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등의 설비에 들어갑니다. 수명이 30분 이상 남은 결정만 잘라낼 수 있습니다."
+    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
+    "translation": "새 시간 결정 수명의 2/3(기본 설정에서 30분)를 봉인한, 겹쳐 쌓을 수 있는 부품입니다. 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등의 설비에 들어갑니다. 남은 수명이 그보다 적은 결정(쓰던 것·순도가 낮은 것)은 자를 수 없습니다. 수명 설정이나 프리셋을 바꾸면 필요량도 비례해서 바뀝니다."
   },
   "entity.singulo.horizon_warden.awakened": {
     "source": "Awakened Horizon Warden",

@@ -1,0 +1,137 @@
+Reusing configuration cache.
+> Task :generateModMetadata UP-TO-DATE
+> Task :createMinecraftArtifacts UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :downloadAssets UP-TO-DATE
+> Task :writeGameTestServerLegacyClasspath UP-TO-DATE
+> Task :prepareGameTestServerRun UP-TO-DATE
+> Task :compileJava
+> Task :classes
+
+> Task :runGameTestServer
+WARN StatusConsoleListener Advanced terminal features are not available in this environment
+[08:09:10] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgeserverdev, --gameDir, ., --fml.fmlVersion, 4.0.45, --fml.mcVersion, 1.21.1, --fml.neoForgeVersion, 21.1.256, --fml.neoFormVersion, 20240808.144430]
+[08:09:10] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.12.1+1-LTS
+[08:09:10] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.12.1 by Eclipse Adoptium; OS Linux arch amd64 version 6.18.44
+[08:09:10] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgeserverdev
+[08:09:10] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/workspace/gradle-review-cache/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.16.4+mixin.0.8.7/26d01f0567ab46e9ca0d2ed89d0ecc11aadbd433/sponge-mixin-0.16.4+mixin.0.8.7.jar%2394!/ Service=ModLauncher Env=SERVER
+[08:09:11] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 3 dependencies adding them to mods collection
+[08:09:11] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		Just Enough Items 19.57.0.451 (jei)
+		MezzConfig 0.5.12 (mezz_config)
+		Minecraft 1.21.1 (minecraft)
+		NeoForge 21.1.256 (neoforge)
+		Singulo 0.3.1 (singulo)
+[08:09:11] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeserverdev' with arguments [--gameDir, .]
+[08:09:12] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+[08:09:17] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[08:09:17] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
+[08:09:17] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[08:09:17] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[08:09:17] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[08:09:17] [modloading-worker-0/INFO] [ne.ne.ne.co.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.256, for MC 1.21.1
+[08:09:19] [main/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[08:09:19] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/workspace/Singulo-pr7/build/moddev/artifacts/neoforge-21.1.256.jar%23125!/assets/.mcassetsroot' uses unexpected schema
+[08:09:19] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/workspace/Singulo-pr7/build/moddev/artifacts/neoforge-21.1.256.jar%23125!/data/.mcassetsroot' uses unexpected schema
+[08:09:19] [main/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: [singulo_review]
+[08:09:20] [main/INFO] [minecraft/RecipeManager]: Loaded 1490 recipes
+[08:09:20] [main/INFO] [minecraft/AdvancementTree]: Loaded 1445 advancements
+[08:09:20] [main/INFO] [io.gi.ge.si.Singulo/]: Loaded 23 item and 30 tag mass values
+[08:09:22] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[08:09:22] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 2%
+[08:09:22] [Server thread/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 328 ms
+[08:09:22] [Server thread/INFO] [minecraft/GameTestServer]: Started game test server
+[08:09:22] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[08:09:22] [Server thread/INFO] [minecraft/GameTestServer]: 10 tests are now running at position -13478733, -59, -10384287!
+[08:09:23] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'pr7_lifetime_matrix:0' (1 tests)...
+[08:09:23] [Server thread/INFO] [minecraft/GameTestServer]: [          ]
+[08:09:23] [Server thread/INFO] [minecraft/GameTestServer]: [          ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'review_strange:0' (1 tests)...
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+         ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+         ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+         ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'pr7_core_leftover:0' (1 tests)...
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [++        ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [++        ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'review_anchor:0' (1 tests)...
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++       ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++       ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++       ]
+[08:09:24] [Yggdrasil Key Fetcher/ERROR] [mojang/YggdrasilServicesKeyInfo]: Failed to request yggdrasil public key
+com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from https://api.minecraftservices.com/publickeys due to Connection refused
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:108) ~[authlib-6.0.54.jar%2377!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.get(MinecraftClient.java:57) ~[authlib-6.0.54.jar%2377!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo.fetch(YggdrasilServicesKeyInfo.java:114) ~[authlib-6.0.54.jar%2377!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo$1.run(YggdrasilServicesKeyInfo.java:89) ~[authlib-6.0.54.jar%2377!/:?] {}
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[?:?] {}
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[?:?] {}
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[?:?] {}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[?:?] {}
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:694) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592) ~[?:?] {}
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327) ~[?:?] {}
+	at java.base/java.net.Socket.connect(Socket.java:751) ~[?:?] {}
+	at java.base/sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:304) ~[?:?] {}
+	at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:539) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:644) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:265) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:378) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:196) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1305) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1146) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:1075) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:181) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1707) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1632) ~[?:?] {}
+	at java.base/java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:531) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getResponseCode(HttpsURLConnectionImpl.java:307) ~[?:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:84) ~[authlib-6.0.54.jar%2377!/:?] {}
+	... 9 more
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++       ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'review_vault:0' (1 tests)...
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [++++      ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'pr7_anchor_reload:0' (1 tests)...
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++++     ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++++     ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++++     ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++++     ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++++_    ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'review_lifetime:0' (1 tests)...
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [++++++    ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [++++++    ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'review_expert:0' (1 tests)...
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++   ]
+[08:09:24] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++   ]
+[08:09:25] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++   ]
+[08:09:25] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'pr7_migration_guard:0' (1 tests)...
+[08:09:25] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++  ]
+[08:09:25] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'pr7_coolant_matrix:0' (1 tests)...
+[08:09:25] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++ ]
+[08:09:25] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++]
+[08:09:25] [Server thread/INFO] [minecraft/GameTestServer]: ========= 10 GAME TESTS COMPLETE IN 2.502 s ======================
+[08:09:25] [Server thread/INFO] [minecraft/GameTestServer]: All 10 required tests passed :)
+[08:09:25] [Server thread/INFO] [minecraft/GameTestServer]: ====================================================
+[08:09:25] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[08:09:25] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[08:09:25] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[08:09:25] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:overworld
+[08:09:26] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_nether
+[08:09:26] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_end
+[08:09:26] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[08:09:26] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[08:09:26] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[08:09:26] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[08:09:26] [Server thread/INFO] [minecraft/GameTestServer]: Game test server shutting down
+
+BUILD SUCCESSFUL in 18s
+8 actionable tasks: 2 executed, 6 up-to-date
+Configuration cache entry reused.
