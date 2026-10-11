@@ -172,7 +172,8 @@ def recipe_files():
         rid = result_id.split(':')[1]
         if name in OUTPUT_ALIASES:
             # 同じ成果物の別レシピ（リサイクル・ストレンジ物質）はパスを分ける
-            rid += '_from_strange_matter' if 'ストレンジ' in name else '_recycled' if 'リサイクル' in name else ''
+            rid += '_from_strange_matter' if 'ストレンジ' in name else '_recycled' if 'リサイクル' in name \
+                else '_from_flint' if '火打石' in name else '_from_packed_ice' if '氷塊' in name else ''
         if name == '圧縮ブロックLv2（混成）':
             # 3種類以上の元ブロックから作った Lv1（データ成分 singulo:mixed_source）なら8個で済む。通常のレシピより先に試す
             (src, q), = r['inputs'].items()
@@ -356,6 +357,17 @@ UI_LANG = {
     'gui.singulo.reactor.mode.ergo': ('エルゴ抽出モード', 'Ergo extraction mode'),
     'gui.singulo.reactor.mode.standby': ('待機', 'Standby'),
     'gui.singulo.reactor.mode.danger': ('蒸発の危険域', 'Evaporation danger zone'),
+    'gui.singulo.reactor.mode.shedding': ('質量を放出中（回収運転）', 'Shedding mass (harvest mode)'),
+    'gui.singulo.reactor.harvest': ('回収運転', 'Harvest'),
+    'gui.singulo.reactor.harvest.on': ('回収運転: オン', 'Harvest mode: ON'),
+    'gui.singulo.reactor.harvest.off': ('回収運転: オフ（発電運転）', 'Harvest mode: OFF (power mode)'),
+    'gui.singulo.reactor.harvest.hint': ('炉心質量を480以下に保ち、H凝縮体（Hコレクターが要る）を5分に1個作り続ける。発電は小さくなる。480を超えた炉心はジェットで毎秒2ずつ質量を放出して戻す。新しいリアクターはオンで始まる',
+                                         'Keeps core mass at 480 or less so H condensate (needs a Hawking Collector) keeps forming every 5 minutes. Power output is small. An overgrown core sheds 2 mass per second through its jets until it is back. New reactors start in this mode'),
+    'gui.singulo.reactor.ignition.need': ('点火: %s GFE を %s 秒で（平均 %s MFE/t）', 'Ignition: %s GFE within %s s (avg %s MFE/t)'),
+    'gui.singulo.reactor.ignition.band': ('受電 %s / 必要 %s MFE/t', 'Receiving %s / need %s MFE/t'),
+    'gui.singulo.reactor.ignition.reach': ('この速さで届く量 %s / %s GFE', 'Reachable at this rate %s / %s GFE'),
+    'gui.singulo.reactor.ignition_failed.detail': ('届いた電力 %s / %s GFE、最大の受電 %s MFE/t（必要 %s MFE/t）。蓄電が足りていても、網のいちばん細いケーブルが受電の上限になる',
+                                                   'Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake'),
     'gui.singulo.reactor.ignite': ('点火', 'Ignite'),
     'gui.singulo.reactor.spin_target': ('スピン目標', 'Spin target'),
     'gui.singulo.reactor.slot.seed': ('種', 'Seed'),
@@ -366,6 +378,9 @@ UI_LANG = {
     'gui.singulo.reactor.ignition_failed': ('点火失敗　電力が間に合わなかった', 'Ignition failed: not enough power in time'),
     'gui.singulo.structure.casimir_cavity': ('5×5×5', '5×5×5'),
     'gui.singulo.device.no_fuel': ('燃料がない', 'No fuel'),
+    'gui.singulo.device.standby': ('待機中（蓄電がいっぱい）', 'Standby (storage full)'),
+    'gui.singulo.device.standby.hint': ('燃料と触媒は減らない。蓄電が75%を割ると再開する', 'Fuel and catalyst are not used. Resumes when storage falls under 75%.'),
+    'gui.singulo.anchor.limited': ('アンカーの上限（1人%s台）に達している', 'Anchor limit reached (%s per player)'),
     'gui.singulo.device.fuel': ('燃料 %s 個', 'Fuel: %s'),
     'gui.singulo.probe.no_target': ('飛べる遺構がない', 'No known ruins'),
     'gui.singulo.probe.targets': ('登録した遺構 %s か所', '%s ruins registered'),
@@ -658,6 +673,7 @@ UI_LANG = {
     'gui.singulo.wormhole_port.status': ('向こう側の入れ物 %s 個とつながっている', 'Connected to %s handlers on the other side'),
     'entity.singulo.security_drone': ('警備ドローン', 'Security Drone'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
+    'entity.singulo.horizon_warden.awakened': ('覚醒したホライズン・ウォーデン', 'Awakened Horizon Warden'),
     'entity.singulo.warden_singularity': ('ウォーデンの特異点', 'Warden Singularity'),
     'entity.singulo.horizon_bolt': ('光弾', 'Horizon Bolt'),
     'item.singulo.horizon_warden_spawn_egg': ('ホライズン・ウォーデンのスポーンエッグ', 'Horizon Warden Spawn Egg'),
@@ -683,7 +699,12 @@ UI_LANG = {
     'death.attack.singulo.tidal.player': ('%1$s は %2$s の特異点に引き裂かれた', "%1$s was torn apart by %2$s's singularity"),
     'gui.singulo.console.awakened': ('封印が破れた。ホライズン・ウォーデンが目を覚ました', 'The seal breaks. The Horizon Warden awakens'),
     'gui.singulo.console.active': ('守護機はすでに起動している', 'The warden is already active'),
-    'gui.singulo.console.open': ('保管庫の封鎖は解かれている', 'The vault is not sealed'),
+    'gui.singulo.console.open': ('保管庫の封鎖は解かれている（覚醒の記録核を使うと、覚醒した守護機と再戦できる）',
+                                 'The vault is not sealed (use an Awakening Record Core to fight the awakened warden)'),
+    'gui.singulo.console.awakened_rematch': ('記録核が共鳴する。覚醒したホライズン・ウォーデンが目を覚ました',
+                                             'The record core resonates. The Awakened Horizon Warden rises'),
+    'gui.singulo.console.awakened_defeated': ('覚醒した守護機を退けた。残骸から上質な部品が転がり出た',
+                                              'The awakened warden is defeated. Fine parts spill from the wreck'),
     'gui.singulo.console.no_vault': ('封鎖された保管庫が近くにない', 'No sealed vault nearby'),
     'gui.singulo.console.defeated': ('守護機が沈黙した。保管庫の力場が消えた', 'The warden falls silent. The vault field dissipates'),
     'gui.singulo.console.reset': ('挑戦者がいなくなり、守護機は封印に戻った', 'No challenger remains. The warden returns to its seal'),

@@ -1,5 +1,7 @@
 # Singulo 装置・素材・レシピ詳細設計
 
+> 開発時の設計資料です（0.3.0 以前の数値を含む）。現行の値は [レシピ一覧](docs/recipes/README.md) と [説明書](docs/manual-ja.md)、0.3.1 の調整は [対応記録](docs/balance-review-0.3.0/RESOLUTION.md) を参照してください。
+
 対象: Minecraft 1.21.1 / NeoForge。この文書は `tools/recipes.py`（レシピの唯一の正）から `tools/balance/gen_md.py` で自動生成し、難易度の計算は `tools/balance/analyze.py`、整合性の検証は `tools/gen_data.py` で行っている。数値はプレイテスト前の初期値で、サーバー設定とデータパックで変更できる前提。
 
 ## 読み方

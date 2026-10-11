@@ -19,6 +19,8 @@ import net.minecraft.world.phys.AABB;
 /**
  * 封印コンソール。触れると守護機ホライズン・ウォーデンを起こす（近くに封鎖された保管庫があるときだけ）。
  * 守護機が倒されると保管庫の力場を消し、挑戦者がいなくなって守護機が封印に戻ると、また触れられる状態に戻る。
+ * <p>
+ * 攻略後の再戦: 覚醒の記録核を手に持って使うと、保管庫が開いていても覚醒した守護機を呼び出す（記録核を1個使う）。
  */
 public class SealConsoleBlockEntity extends BlockEntity {
     public static final int VAULT_SEARCH_RADIUS = 12;
@@ -90,6 +92,40 @@ public class SealConsoleBlockEntity extends BlockEntity {
         warden = w.getUUID();
         setChanged();
         broadcast(level, "gui.singulo.console.awakened");
+        return w;
+    }
+
+    /** 覚醒の記録核（覚醒した守護機を呼び出す）。 */
+    public static net.minecraft.world.item.Item awakeningCore() {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("awakening_record_core"));
+    }
+
+    /**
+     * 覚醒の記録核を使ったとき。覚醒した守護機を起こせたらそれを返す（呼んだ側が記録核を1個減らす）。
+     * 保管庫が封鎖されていてもいなくても呼べる（勝てば封鎖も解ける）。
+     */
+    @Nullable
+    public HorizonWarden activateAwakened(ServerLevel level, @Nullable ServerPlayer player) {
+        if (activeWarden(level) != null) {
+            tell(player, "gui.singulo.console.active");
+            return null;
+        }
+        if (vault(level) == null) {
+            tell(player, "gui.singulo.console.no_vault");
+            return null;
+        }
+        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level);
+        if (w == null) {
+            return null;
+        }
+        BlockPos spawn = worldPosition.above();
+        w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
+        w.awaken(worldPosition, worldPosition, true);
+        w.startEmerging();
+        level.addFreshEntity(w);
+        warden = w.getUUID();
+        setChanged();
+        broadcast(level, "gui.singulo.console.awakened_rematch");
         return w;
     }
 

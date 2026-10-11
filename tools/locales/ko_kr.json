@@ -1564,8 +1564,8 @@
     "translation": "회전하는 블랙홀에서 에너지를 끌어옵니다."
   },
   "desc.singulo.phase_sync_plate": {
-    "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes instead of 20.",
-    "translation": "냉각 원자의 진동을 광격자에 새긴 판입니다. 시간 결정의 진동 위상을 맞춰 배양 시간을 20분에서 12분으로 줄입니다."
+    "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
+    "translation": "냉각 원자의 진동을 광격자에 새긴 판입니다. 시간 결정의 진동 위상을 맞춰 배양 시간을 12분으로 만듭니다."
   },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
@@ -2192,8 +2192,8 @@
     "translation": "근처에 봉인된 금고가 없습니다."
   },
   "gui.singulo.console.open": {
-    "source": "The vault is not sealed",
-    "translation": "금고는 봉인되지 않았습니다"
+    "source": "The vault is not sealed (use an Awakening Record Core to fight the awakened warden)",
+    "translation": "금고는 봉인되지 않았습니다(각성의 기록핵을 사용하면 각성한 수호자와 재대결할 수 있습니다)"
   },
   "gui.singulo.console.reset": {
     "source": "No challenger remains. The warden returns to its seal",
@@ -3000,8 +3000,8 @@
     "translation": "촉매 슬롯 및 재활용"
   },
   "guide.singulo.catalysts.tiers.body": {
-    "source": "Muon (2), BE (3), Time crystal (4), Singularity core (5). Higher tier = faster and less wear; one lower = half speed and double wear; two lower = unusable. Underpowering wears catalysts faster.",
-    "translation": "뮤온(2), BE(3), 시간 결정(4), 특이점 코어(5). 높은 계층 = 더 빠르고 마모가 적습니다. 하나 더 낮음 = 절반 속도 및 이중 마모; 두 개 낮음 = 사용할 수 없음. 전력 부족은 촉매제를 더 빨리 마모시킵니다."
+    "source": "Muon (2), BE (3), Time crystal (4), Singularity core (5). Higher tier = faster and less wear; one lower = half speed and double wear (generators give 25% output); two lower = unusable. Underpowering wears catalysts faster.\nThese rules apply to devices that run on a catalyst slot. When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or amount of life and the speed does not change.",
+    "translation": "뮤온(2), BE(3), 시간 결정(4), 특이점 코어(5). 높은 계층 = 더 빠르고 마모가 적습니다. 하나 더 낮음 = 절반 속도 및 이중 마모; 두 개 낮음 = 사용할 수 없음. 전력 부족은 촉매제를 더 빨리 마모시킵니다.\n이 규칙은 촉매 슬롯으로 가동하는 장치에 적용됩니다(발전기는 한 단계 낮으면 출력 25%). 가공 레시피에 재료로 적힌 촉매는 정해진 개수나 수명만 쓰며 속도는 변하지 않습니다."
   },
   "guide.singulo.catalysts.tiers.title": {
     "source": "Tiers and effects",
@@ -3144,8 +3144,8 @@
     "translation": "유적"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it.",
-    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관함은 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나면 수호자는 원래대로 돌아갑니다.\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 씰 콘솔을 만지면 깨어납니다."
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
+    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관함은 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나면 수호자는 원래대로 돌아갑니다.\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 씰 콘솔을 만지면 깨어납니다. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 수호자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다."
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3212,8 +3212,8 @@
     "translation": "1단계 기계"
   },
   "guide.singulo.stage1.materials.body": {
-    "source": "1. Iron + coal = steel blend; smelt it in a blast furnace.\n2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic.\n3. Make basic circuits and basic frames. Most machines need these.",
-    "translation": "1. 철 + 석탄 = 강철 혼합; 용광로에서 제련해 보세요.\n2. 점토, 석영, 골분 및 모래는 소성되지 않은 세라믹을 만듭니다. 그것을 흰색 세라믹에 굽습니다.\n3. 기본 회로와 기본 프레임을 만듭니다. 대부분의 기계에는 이것이 필요합니다."
+    "source": "1. Iron + coal = steel blend; smelt it in a blast furnace.\n2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic. Before the Nether, two flint replace the quartz.\n3. Make basic circuits and basic frames. Most machines need these.",
+    "translation": "1. 철 + 석탄 = 강철 혼합; 용광로에서 제련해 보세요.\n2. 점토, 석영, 골분 및 모래는 소성되지 않은 세라믹을 만듭니다. 그것을 흰색 세라믹에 굽습니다.\n3. 기본 회로와 기본 프레임을 만듭니다. 대부분의 기계에는 이것이 필요합니다.\n(네더에 가기 전에는 석영 대신 부싯돌 2개를 쓸 수 있습니다.)"
   },
   "guide.singulo.stage1.materials.title": {
     "source": "First materials",
@@ -3228,8 +3228,8 @@
     "translation": "첫 번째 힘"
   },
   "guide.singulo.stage1.thermal_pairs.body": {
-    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nTo run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with campfire + packed ice (before copper wire losses).",
-    "translation": "차가운 블록이 녹지 않고 계속 쓸 수 있는 조합(발전기 1대의 출력):\n- 마그마 블록＋푸른 얼음: 약 76 FE/t(가장 추천)\n- 가동 중인 소성로＋푸른 얼음: 약 66 FE/t\n- 모닥불＋푸른 얼음: 약 56 FE/t\n- 모닥불＋단단한 얼음: 약 55 FE/t\n용암은 너무 뜨거워서, 푸른 얼음도 약 40초 만에 단단한 얼음으로 바뀌고 계속 녹습니다. 모닥불에 물, 눈, 얼음을 맞추면 1분도 안 되어 녹습니다.\n2단계 극저온 냉각탑(액체 질소 240 FE/t)을 돌리려면 마그마 블록＋푸른 얼음으로 4대 이상, 모닥불＋단단한 얼음이면 5대 이상이 기준입니다(구리 전선 손실 제외)."
+    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nTo run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.",
+    "translation": "차가운 블록이 녹지 않고 계속 쓸 수 있는 조합(발전기 1대의 출력):\n- 마그마 블록＋푸른 얼음: 약 76 FE/t(가장 추천)\n- 가동 중인 소성로＋푸른 얼음: 약 66 FE/t\n- 모닥불＋푸른 얼음: 약 56 FE/t\n- 모닥불＋단단한 얼음: 약 55 FE/t\n용암은 너무 뜨거워서, 푸른 얼음도 약 40초 만에 단단한 얼음으로 바뀌고 계속 녹습니다. 모닥불에 물, 눈, 얼음을 맞추면 1분도 안 되어 녹습니다.\n2단계 극저온 냉각탑(액체 질소 240 FE/t)을 돌리려면 마그마 블록＋푸른 얼음으로 4대 이상, 모닥불＋단단한 얼음이면 5대 이상이 기준입니다(구리 전선 손실 제외). 처음에는 2~4대로 장치를 하나씩 돌리며 늘려 가면 충분합니다."
   },
   "guide.singulo.stage1.thermal_pairs.title": {
     "source": "Pairs that last",
@@ -3264,8 +3264,8 @@
     "translation": "기타 2단계 장치"
   },
   "guide.singulo.stage2.tower.body": {
-    "source": "A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. It makes liquid nitrogen from air and superconducting coils.",
-    "translation": "허리 모양의 5×5 타워, 높이 7~15, 중앙에 열 교환 코어가 있습니다. 공기와 초전도 코일로부터 액체질소를 만듭니다."
+    "source": "A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. It makes liquid nitrogen from air and superconducting coils.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 cryogenic turbines and a 10-high tower 5 (less when it also processes coils; recipes with inputs run before nitrogen).",
+    "translation": "허리 모양의 5×5 타워, 높이 7~15, 중앙에 열 교환 코어가 있습니다. 공기와 초전도 코일로부터 액체질소를 만듭니다.\n열교환 코어와 냉각 밴드는 푸른 얼음 대신 꽁꽁 언 얼음 3개로도 만들 수 있습니다. 질소만 만들면 높이 7 탑은 극저온 터빈 약 3.5대, 높이 10 탑은 5대를 돌립니다(코일 등과 함께 가공하면 줄어듭니다. 재료가 있는 레시피가 질소보다 먼저 돌아갑니다)."
   },
   "guide.singulo.stage2.tower.title": {
     "source": "Cryogenic Cooling Tower",
@@ -3284,8 +3284,8 @@
     "translation": "4단계 도달"
   },
   "guide.singulo.stage3.quantum.body": {
-    "source": "- Entanglement Synthesizer: entangled elements, two at a time.\n- Laser Cooler: cold atoms, lattices, BE condensate catalyst.\n- Quantum Heat Engine: catalyst-driven generator.",
-    "translation": "- 양자 얽힘 합성기: 얽힌 요소, 한 번에 두 개.\n- 레이저 냉각기: 냉각 원자, 격자, BE 응축 촉매.\n- 양자 열기관: 촉매 구동 발전기."
+    "source": "- Entanglement Synthesizer: entangled elements, two at a time.\n- Laser Cooler: cold atoms, lattices, BE condensate catalyst.\n- Quantum Heat Engine: catalyst-driven generator, 200 kFE/t on BE catalysts; a muon catalyst runs it at 25% (50 kFE/t) as a stopgap. It waits without wearing the catalyst while its storage is full.",
+    "translation": "- 양자 얽힘 합성기: 얽힌 요소, 한 번에 두 개.\n- 레이저 냉각기: 냉각 원자, 격자, BE 응축 촉매.\n- 양자 열기관: 촉매 구동 발전기.\n(양자 열기관: BE 응축 촉매로 200 kFE/t. 뮤온 촉매로는 25%(50 kFE/t)로 임시 가동합니다. 저장량이 가득 차면 대기하며 촉매를 쓰지 않습니다.)"
   },
   "guide.singulo.stage3.quantum.title": {
     "source": "Quantum machines",
@@ -3320,16 +3320,16 @@
     "translation": "5단계 도달"
   },
   "guide.singulo.stage4.power.body": {
-    "source": "- Degenerate Furnace (5×5×7): 20 MFE/t from Lv2 blocks; power leaves through I/O ports.\n- Probe Station: automates trips to discovered ruins.\n- Topological wire and SMES modules for large power.",
-    "translation": "- 축퇴 열로(5×5×7): Lv2 블록의 MFE/t 20개; 전원은 I/O 포트를 통해 나갑니다.\n- 프로브 스테이션: 발견된 폐허로의 이동을 자동화합니다.\n- 대용량용 토폴로지 와이어 및 SMES 모듈."
+    "source": "- Degenerate Furnace (5×5×7): 5 MFE/t from Lv2 blocks on time crystals (1.25 MFE/t on BE catalysts); power leaves through I/O ports and it waits without burning fuel or catalyst while full.\n- Shells: one degenerate shell makes 24 reactor shell blocks; ignition needs 6 shells for plating plus 1 for the seed.\n- Probe Station: automates trips to discovered ruins.\n- Topological wire and SMES modules for large power.",
+    "translation": "- 축퇴 열로(5×5×7): Lv2 블록의 MFE/t 20개; 전원은 I/O 포트를 통해 나갑니다.\n- 프로브 스테이션: 발견된 폐허로의 이동을 자동화합니다.\n- 대용량용 토폴로지 와이어 및 SMES 모듈.\n(축퇴 열로는 시간 결정으로 5 MFE/t, BE 촉매로 1.25 MFE/t이며 저장량이 가득 차면 대기합니다. 축퇴 물질 껍질 1개로 반응로 외피 24개를 만들며, 점화에는 외피용 6개와 씨앗용 1개가 필요합니다.)"
   },
   "guide.singulo.stage4.power.title": {
     "source": "Big power and automation",
     "translation": "큰 힘과 자동화"
   },
   "guide.singulo.stage4.time.body": {
-    "source": "The incubator grows time crystals over 20 minutes of real running time; underpowering lowers purity. The C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
-    "translation": "인큐베이터는 실제 실행 시간인 20분에 걸쳐 시간 결정체를 성장시킵니다. 힘이 부족하면 순도가 낮아집니다. 카시미르 공동(5×5×5, 상하 거울)는 이국적인 물질을 만듭니다."
+    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts 30 minutes of life from the crystal in its catalyst slot, and the remaining 15 minutes stay usable as a catalyst. Crystals with less than 30 minutes left cannot be cut. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
+    "translation": "배양기는 실제 가동 시간 12분 동안 시간 결정을 키웁니다. 요구 전력의 80%(24 kFE/t) 이상이면 순도가 유지되고, 그보다 낮았던 시간만큼 순도와 수명이 줄어듭니다.\n설비(노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등)에는 시간 결정 모듈을 씁니다. 정밀 조립기가 촉매 슬롯의 결정에서 수명 30분을 잘라 내고, 남은 15분은 촉매로 계속 쓸 수 있습니다. 30분 미만 남은 결정은 자를 수 없습니다. 배양기를 2대 두면 설비용과 가동용이 겹치지 않습니다.\n카시미르 공동(5×5×5, 윗면과 아랫면이 거울)은 특이 물질을 만듭니다."
   },
   "guide.singulo.stage4.time.title": {
     "source": "Time crystals and exotic matter",
@@ -3348,16 +3348,16 @@
     "translation": "부산물 및 특이점 코어"
   },
   "guide.singulo.stage5.endgame.body": {
-    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes.",
-    "translation": "코어와 전력을 사용하면 쉴드, 티플러 원통, 웜홀과 같은 게임 후반 장치를 실행할 수 있습니다."
+    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.",
+    "translation": "코어와 전력을 사용하면 쉴드, 티플러 원통, 웜홀과 같은 게임 후반 장치를 실행할 수 있습니다. 인공 항성 코어가 있으면 더 이상 네더의 별을 찾지 않아도 됩니다.\n진짜 싸움을 원한다면 특이점 캡슐화기에서 각성의 기록핵을 만들어 최종 실험 시설의 씰 콘솔에 사용하세요. 각성한 지평선 감시자는 체력 2.5배, 피해 1.5배입니다. 이기면 오버클럭 칩 등을 얻고, 몇 번이든 도전할 수 있습니다."
   },
   "guide.singulo.stage5.endgame.title": {
     "source": "Beyond",
     "translation": "너머"
   },
   "guide.singulo.stage5.ignite.body": {
-    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s. Burn mass pellets; efficiency depends on spin. Mind the 24-block pull zone (time runs slower there) and the 4-block tidal zone.",
-    "translation": "시드를 삽입하고 점화를 누른 후 10초 이내에 GFE 50개를 전달합니다. 대량 펠렛을 태우십시오. 효율성은 스핀에 따라 달라집니다. 24블록 풀 존(거기서는 시간이 더 느리게 흐릅니다)과 4블록 조석 지대를 염두에 두세요."
+    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s (250 MFE/t on average). While igniting the screen shows the intake and what will arrive; a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below so H condensate forms every 5 minutes with a Hawking Collector. The first core needs six, so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nBurn mass pellets; efficiency depends on spin. Mind the 24-block pull zone (time runs slower there) and the 4-block tidal zone.",
+    "translation": "씨앗을 넣고 점화를 누른 뒤 10초 안에 50 GFE(평균 250 MFE/t)를 보내세요. 점화 중에는 수전 속도와 도달 예상량이 화면에 나옵니다. 네트워크 상한은 가장 가는 케이블이 정하므로, 위상 전선만으로 된 네트워크는 10초에 20 GFE만 보냅니다.\n새 노심은 회수 운전으로 시작합니다. 질량을 480 이하로 유지해 호킹 수집기가 있으면 5분마다 호킹 응축물이 생깁니다. 첫 코어에는 6개가 필요하니 약 30분 돌린 뒤 회수 운전을 끄고 발전하세요. 회수 운전은 너무 커진 노심에서 초당 질량 2를 방출하기도 합니다.\n질량 펠릿을 태우며, 효율은 스핀에 따라 달라집니다. 24블록 인력 구역(시간이 느려짐)과 4블록 조석 구역에 주의하세요."
   },
   "guide.singulo.stage5.ignite.title": {
     "source": "Ignition and operation",
@@ -5984,8 +5984,8 @@
     "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 20 more",
-    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 20개"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 21 more",
+    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 21개"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -6008,8 +6008,8 @@
     "translation": "사용 제품: 펜로즈 반응로"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key",
-    "translation": "사용 대상: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠"
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core",
+    "translation": "사용 대상: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠, 각성의 기록핵"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
@@ -6056,8 +6056,8 @@
     "translation": "사용 제품: 데이터 카드(관찰 기록)"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 21 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판, 특이 물질 외 21개"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 22 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판, 특이 물질 외 22개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -6068,8 +6068,8 @@
     "translation": "사용 대상: 축퇴 압축로 앤빌, 축퇴 전구체"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 16 more",
-    "translation": "사용 대상: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 16개"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 17 more",
+    "translation": "사용 대상: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 17개"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -6148,8 +6148,8 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 60 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 60개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 61 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 61개"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 40 more",
@@ -6164,8 +6164,8 @@
     "translation": "사용 대상: 열전 발전기, 충격 발전 패널"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Core Controller, Singularity Encapsulator, Singularity Core, Shield Tower Core and 3 more",
-    "translation": "사용 제품: 특이 물질, 노심 제어기, 특이점 캡슐화기, 특이점 코어, 실드 타워 코어 외 3개"
+    "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
+    "translation": "사용 대상: 특이 물질, 특이점 코어, 시간 결정 모듈"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -6250,5 +6250,125 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "사용 대상: 웜홀 입구"
+  },
+  "advancement.singulo.awakened.description": {
+    "source": "Defeat the Awakened Horizon Warden",
+    "translation": "각성한 지평선 감시자를 쓰러뜨리세요"
+  },
+  "advancement.singulo.awakened.title": {
+    "source": "Horizon Reawakened",
+    "translation": "깨어난 지평선"
+  },
+  "advancement.singulo.hawking.description": {
+    "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
+    "translation": "회수 운전 중인 반응로에서 호킹 응축물을 모으세요. 첫 코어에는 6개가 필요합니다"
+  },
+  "advancement.singulo.hawking.title": {
+    "source": "Hawking Drop",
+    "translation": "호킹의 물방울"
+  },
+  "advancement.singulo.star_core.description": {
+    "source": "Make an artificial star core",
+    "translation": "인공 항성 코어를 만드세요"
+  },
+  "advancement.singulo.star_core.title": {
+    "source": "Forging a Star",
+    "translation": "별을 만들다"
+  },
+  "desc.singulo.awakening_record_core": {
+    "source": "A record of the defeated warden, reforged with singularity power. Use it on the Seal Console in the final lab to wake the Awakened Horizon Warden: 2.5× health, 1.5× damage, faster moves. Victory yields overclock chips and more.",
+    "translation": "쓰러뜨린 수호자의 기록을 특이점의 힘으로 다시 구운 핵입니다. 최종 실험 시설의 씰 콘솔에 사용하면 각성한 지평선 감시자가 깨어납니다. 체력 2.5배, 피해 1.5배, 기술이 더 빠릅니다. 이기면 오버클럭 칩 등을 얻습니다."
+  },
+  "desc.singulo.time_crystal_module": {
+    "source": "Thirty minutes of a time crystal's life sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Only crystals with at least 30 minutes left can be cut.",
+    "translation": "시간 결정의 수명 30분을 봉인한, 겹쳐 쌓을 수 있는 부품입니다. 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등의 설비에 들어갑니다. 수명이 30분 이상 남은 결정만 잘라낼 수 있습니다."
+  },
+  "entity.singulo.horizon_warden.awakened": {
+    "source": "Awakened Horizon Warden",
+    "translation": "각성한 지평선 감시자"
+  },
+  "gui.singulo.anchor.limited": {
+    "source": "Anchor limit reached (%s per player)",
+    "translation": "앵커 상한(1인당 %s대)에 도달했습니다"
+  },
+  "gui.singulo.console.awakened_defeated": {
+    "source": "The awakened warden is defeated. Fine parts spill from the wreck",
+    "translation": "각성한 수호자를 물리쳤습니다. 잔해에서 상질의 부품이 굴러 나옵니다"
+  },
+  "gui.singulo.console.awakened_rematch": {
+    "source": "The record core resonates. The Awakened Horizon Warden rises",
+    "translation": "기록핵이 공명합니다. 각성한 지평선 감시자가 일어섭니다"
+  },
+  "gui.singulo.device.standby": {
+    "source": "Standby (storage full)",
+    "translation": "대기 중(저장량 가득 참)"
+  },
+  "gui.singulo.device.standby.hint": {
+    "source": "Fuel and catalyst are not used. Resumes when storage falls under 75%.",
+    "translation": "연료와 촉매를 쓰지 않습니다. 저장량이 75% 미만이 되면 다시 가동합니다"
+  },
+  "gui.singulo.reactor.harvest": {
+    "source": "Harvest",
+    "translation": "회수"
+  },
+  "gui.singulo.reactor.harvest.hint": {
+    "source": "Keeps core mass at 480 or less so H condensate (needs a Hawking Collector) keeps forming every 5 minutes. Power output is small. An overgrown core sheds 2 mass per second through its jets until it is back. New reactors start in this mode",
+    "translation": "노심 질량을 480 이하로 유지해 호킹 응축물(호킹 수집기 필요)이 5분마다 생기게 합니다. 발전량은 작습니다. 너무 커진 노심은 제트로 초당 질량 2씩 방출해 돌아옵니다. 새 반응로는 이 모드로 시작합니다"
+  },
+  "gui.singulo.reactor.harvest.off": {
+    "source": "Harvest mode: OFF (power mode)",
+    "translation": "회수 운전: 꺼짐(발전 운전)"
+  },
+  "gui.singulo.reactor.harvest.on": {
+    "source": "Harvest mode: ON",
+    "translation": "회수 운전: 켜짐"
+  },
+  "gui.singulo.reactor.ignition.band": {
+    "source": "Receiving %s / need %s MFE/t",
+    "translation": "수전 %s / 필요 %s MFE/t"
+  },
+  "gui.singulo.reactor.ignition.need": {
+    "source": "Ignition: %s GFE within %s s (avg %s MFE/t)",
+    "translation": "점화: %s초 안에 %s GFE(평균 %s MFE/t)"
+  },
+  "gui.singulo.reactor.ignition.reach": {
+    "source": "Reachable at this rate %s / %s GFE",
+    "translation": "이 속도로 도달 %s / %s GFE"
+  },
+  "gui.singulo.reactor.ignition_failed.detail": {
+    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake",
+    "translation": "도달 %s / %s GFE, 최대 수전 %s MFE/t(필요 %s MFE/t). 저장량이 충분해도 네트워크에서 가장 가는 케이블이 수전 상한을 정합니다"
+  },
+  "gui.singulo.reactor.mode.shedding": {
+    "source": "Shedding mass (harvest mode)",
+    "translation": "질량 방출 중(회수 운전)"
+  },
+  "guide.singulo.ruins.plan.body": {
+    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
+    "translation": "후반 단계에는 가야 할 곳이 한꺼번에 늘어납니다. 미리 모아 두면 공장이 멈추지 않습니다.\n- 2단계 중: 운석 크레이터(운철, 별가루), 빙산이나 얼음 가시(꽁꽁 언 얼음, 푸른 얼음).\n- 3단계 중: 연구동. 심해 압력 수집기를 일찍 설치해 고압 결정을 모아 두세요(껍질과 앤빌에 약 30개). 뇌우 때는 모래 위에 피뢰침.\n- 4단계 전: 봉쇄 배양 시설, 고대 도시(스컬크와 메아리 조각. 메아리 공명기로 한 조각을 계속 복제할 수 있습니다), 엔드의 공허(공허 수집기), 위더(네더의 별. 점화 후에는 인공 항성 코어로 대신합니다).\n- 원본 기록은 수리할 수 있습니다. 새것과 수리 3회로 약 2.7배 쓸 수 있으니, 유적을 다시 돌기 전에 수리하세요."
+  },
+  "guide.singulo.ruins.plan.title": {
+    "source": "Planning expeditions",
+    "translation": "탐사 계획"
+  },
+  "howto.singulo.awakening_record_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.time_crystal_module": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작품: 정밀 조립기(4단계)"
+  },
+  "item.singulo.awakening_record_core": {
+    "source": "Awakening Record Core",
+    "translation": "각성의 기록핵"
+  },
+  "item.singulo.time_crystal_module": {
+    "source": "Time Crystal Module",
+    "translation": "시간 결정 모듈"
+  },
+  "uses.singulo.time_crystal_module": {
+    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 1 more",
+    "translation": "사용 대상: 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 중력자 조작기, 티플러 코어 외 1개"
   }
 }

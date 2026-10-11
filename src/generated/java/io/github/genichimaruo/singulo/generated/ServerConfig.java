@@ -18,6 +18,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue CRYO_TURBINE_OUTPUT;
     public static final ModConfigSpec.IntValue QUANTUM_ENGINE_OUTPUT;
     public static final ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT;
+    public static final ModConfigSpec.DoubleValue GENERATOR_LOWER_TIER_OUTPUT;
     public static final ModConfigSpec.LongValue PENROSE_ENERGY_PER_PELLET;
     public static final ModConfigSpec.IntValue WORMHOLE_GENERATOR_POWER;
     public static final ModConfigSpec.IntValue GRAVITY_PANEL_POWER;
@@ -53,6 +54,8 @@ public final class ServerConfig {
     public static final ModConfigSpec.DoubleValue PROBE_YIELD_MULTIPLIER;
     public static final ModConfigSpec.IntValue WARDEN_HEALTH;
     public static final ModConfigSpec.BooleanValue WARDEN_RESET_ON_LEAVE;
+    public static final ModConfigSpec.DoubleValue AWAKENED_WARDEN_HEALTH_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue AWAKENED_WARDEN_DAMAGE_MULTIPLIER;
     public static final ModConfigSpec.IntValue TEMPLATE_USES;
     public static final ModConfigSpec.IntValue SCULK_PER_SHARD;
     public static final ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS;
@@ -88,6 +91,7 @@ public final class ServerConfig {
         ModConfigSpec.IntValue CRYO_TURBINE_OUTPUT_;
         ModConfigSpec.IntValue QUANTUM_ENGINE_OUTPUT_;
         ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT_;
+        ModConfigSpec.DoubleValue GENERATOR_LOWER_TIER_OUTPUT_;
         ModConfigSpec.LongValue PENROSE_ENERGY_PER_PELLET_;
         ModConfigSpec.IntValue WORMHOLE_GENERATOR_POWER_;
         ModConfigSpec.IntValue GRAVITY_PANEL_POWER_;
@@ -123,6 +127,8 @@ public final class ServerConfig {
         ModConfigSpec.DoubleValue PROBE_YIELD_MULTIPLIER_;
         ModConfigSpec.IntValue WARDEN_HEALTH_;
         ModConfigSpec.BooleanValue WARDEN_RESET_ON_LEAVE_;
+        ModConfigSpec.DoubleValue AWAKENED_WARDEN_HEALTH_MULTIPLIER_;
+        ModConfigSpec.DoubleValue AWAKENED_WARDEN_DAMAGE_MULTIPLIER_;
         ModConfigSpec.IntValue TEMPLATE_USES_;
         ModConfigSpec.IntValue SCULK_PER_SHARD_;
         ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS_;
@@ -146,7 +152,7 @@ public final class ServerConfig {
         ModConfigSpec.IntValue MAX_ANCHORS_PER_PLAYER_;
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
         b.push("general");
-        b.comment("下の項目をまとめて切り替える。個別の値を変えると自動で \"custom\" になる", "範囲: \"casual\" / \"standard\" / \"expert\" / \"custom\"");
+        b.comment("難易度の倍率を個別の値の上に掛ける。casual: スター不要・触媒寿命×2・遺構の再生×0.5・ウォーデンHP×0.5・殻の圧縮量×0.5。expert: スター×2・触媒寿命×0.75・修復2回まで・殻の圧縮量×1.5・点火エネルギー×2。standard と custom は個別の値のまま", "範囲: \"casual\" / \"standard\" / \"expert\" / \"custom\"");
         PRESET_ = b.defineInList("preset", "standard", java.util.Arrays.asList("casual", "standard", "expert", "custom"));
         b.pop();
         b.push("netherStar");
@@ -156,7 +162,7 @@ public final class ServerConfig {
         EXOTIC_BATCH_SIZE_ = b.defineInRange("exoticBatchSize", 8, 1, 64);
         b.comment("シンギュラリティ・コア1個に要るネザースターの数", "範囲: 0〜16（整数）");
         STARS_PER_SINGULARITY_CORE_ = b.defineInRange("starsPerSingularityCore", 1, 0, 16);
-        b.comment("人工星核をネザースターの代わりに使えるか", "範囲: true / false");
+        b.comment("人工星核をネザースターの代わりに使えるか（false ならSingulo の装置のレシピは本物のネザースターだけを受け付ける）", "範囲: true / false");
         ALLOW_ARTIFICIAL_STAR_CORE_ = b.define("allowArtificialStarCore", true);
         b.comment("人工星核1個に要るジェット凝縮体の数", "範囲: 1〜64（整数）");
         ARTIFICIAL_STAR_CORE_JET_CONDENSATE_ = b.defineInRange("artificialStarCoreJetCondensate", 4, 1, 64);
@@ -171,7 +177,9 @@ public final class ServerConfig {
         b.comment("量子熱機関の出力", "範囲: 1〜100,000,000（FE/t）");
         QUANTUM_ENGINE_OUTPUT_ = b.defineInRange("quantumEngineOutput", 200000, 1, 100000000);
         b.comment("縮退熱炉の出力", "範囲: 1〜1,000,000,000（FE/t）");
-        DEGENERATE_FURNACE_OUTPUT_ = b.defineInRange("degenerateFurnaceOutput", 20000000, 1, 1000000000);
+        DEGENERATE_FURNACE_OUTPUT_ = b.defineInRange("degenerateFurnaceOutput", 5000000, 1, 1000000000);
+        b.comment("量子熱機関・縮退熱炉に1段下の触媒を入れたときの出力（定格に対する割合）。装置の速度倍率 lowerTierSpeed とは別", "範囲: 0.0〜1.0");
+        GENERATOR_LOWER_TIER_OUTPUT_ = b.defineInRange("generatorLowerTierOutput", 0.25, 0.0, 1.0);
         b.comment("質量ペレット1個の質量エネルギー（降着効率を掛ける前）", "範囲: 1〜（FE）");
         PENROSE_ENERGY_PER_PELLET_ = b.defineInRange("penroseEnergyPerPellet", 20000000000L, 1L, Long.MAX_VALUE);
         b.comment("ワームホール生成器が10秒のあいだ毎tick必要とする電力", "範囲: 1〜2000000000（FE/t）");
@@ -208,7 +216,7 @@ public final class ServerConfig {
         UNDERPOWER_THRESHOLD_ = b.defineInRange("underpowerThreshold", 0.8, 0.0, 1.0);
         b.comment("不完全反応時の触媒消費倍率", "範囲: 1.0〜10.0");
         UNDERPOWER_CONSUMPTION_ = b.defineInRange("underpowerConsumption", 1.5, 1.0, 10.0);
-        b.comment("失活触媒から1ティア下の原料を回収できる割合", "範囲: 0.0〜1.0");
+        b.comment("失活触媒から1ティア下の原料を回収できる割合（既定0.25で失活触媒4個から1個。0でリサイクルなし）", "範囲: 0.0〜1.0");
         SPENT_RECYCLE_RATIO_ = b.defineInRange("spentRecycleRatio", 0.25, 0.0, 1.0);
         b.comment("時間結晶の育成に要る稼働tick（既定12分）", "範囲: 20〜1,000,000（tick）");
         TIME_CRYSTAL_GROWTH_TICKS_ = b.defineInRange("timeCrystalGrowthTicks", 14400, 20, 1000000);
@@ -217,11 +225,11 @@ public final class ServerConfig {
         b.comment("縮退物質殻1個に要る岩石の圧縮ブロックLv3", "範囲: 0〜9（整数）");
         SHELL_ROCK_LV3_ = b.defineInRange("shellRockLv3", 4, 0, 9);
         b.comment("縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）", "範囲: 0〜9（整数）");
-        SHELL_METAL_CORES_ = b.defineInRange("shellMetalCores", 2, 0, 9);
+        SHELL_METAL_CORES_ = b.defineInRange("shellMetalCores", 1, 0, 9);
         b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素", "範囲: 0〜1,000,000（mB）");
         SHELL_COOLANT_MB_ = b.defineInRange("shellCoolantMb", 6000, 0, 1000000);
         b.comment("縮退物質殻1個から作れる炉殻ブロックの数", "範囲: 1〜64（整数）");
-        REACTOR_PLATES_PER_SHELL_ = b.defineInRange("reactorPlatesPerShell", 12, 1, 64);
+        REACTOR_PLATES_PER_SHELL_ = b.defineInRange("reactorPlatesPerShell", 24, 1, 64);
         b.comment("混成ボーナス（Lv1が3種類以上ならLv2を8個で作れる）", "範囲: true / false");
         MIXED_BONUS_ENABLED_ = b.define("mixedBonusEnabled", true);
         b.comment("混成ボーナスに要る元ブロックの種類数", "範囲: 2〜9（整数）");
@@ -248,6 +256,10 @@ public final class ServerConfig {
         WARDEN_HEALTH_ = b.defineInRange("wardenHealth", 1200, 1, 100000);
         b.comment("挑戦者が離れたら全回復するか", "範囲: true / false");
         WARDEN_RESET_ON_LEAVE_ = b.define("wardenResetOnLeave", true);
+        b.comment("覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）", "範囲: 1.0〜20.0");
+        AWAKENED_WARDEN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedWardenHealthMultiplier", 2.5, 1.0, 20.0);
+        b.comment("覚醒したホライズン・ウォーデンが与えるダメージの倍率", "範囲: 1.0〜10.0");
+        AWAKENED_WARDEN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedWardenDamageMultiplier", 1.5, 1.0, 10.0);
         b.pop();
         b.push("echo");
         b.comment("型の残響の欠片が割れるまでの回数", "範囲: 1〜1000（整数）");
@@ -296,7 +308,7 @@ public final class ServerConfig {
         PULL_CHECK_INTERVAL_TICKS_ = b.defineInRange("pullCheckIntervalTicks", 5, 1, 100);
         b.comment("ワールドライン・アンカーの最大半径", "範囲: 0〜16（チャンク）");
         MAX_ANCHOR_CHUNK_RADIUS_ = b.defineInRange("maxAnchorChunkRadius", 5, 0, 16);
-        b.comment("1人が置けるアンカーの上限", "範囲: 0〜1000");
+        b.comment("1人が同時に動かせるワールドライン・アンカー（小・上位の合計）の数。0で無制限。上限を超えたアンカーは置けるが動かない（先に動き出したものが優先）。この版より前に置いたアンカーは、置き直すまで数えない", "範囲: 0〜1000");
         MAX_ANCHORS_PER_PLAYER_ = b.defineInRange("maxAnchorsPerPlayer", 8, 0, 1000);
         b.pop();
         PRESET = PRESET_;
@@ -310,6 +322,7 @@ public final class ServerConfig {
         CRYO_TURBINE_OUTPUT = CRYO_TURBINE_OUTPUT_;
         QUANTUM_ENGINE_OUTPUT = QUANTUM_ENGINE_OUTPUT_;
         DEGENERATE_FURNACE_OUTPUT = DEGENERATE_FURNACE_OUTPUT_;
+        GENERATOR_LOWER_TIER_OUTPUT = GENERATOR_LOWER_TIER_OUTPUT_;
         PENROSE_ENERGY_PER_PELLET = PENROSE_ENERGY_PER_PELLET_;
         WORMHOLE_GENERATOR_POWER = WORMHOLE_GENERATOR_POWER_;
         GRAVITY_PANEL_POWER = GRAVITY_PANEL_POWER_;
@@ -345,6 +358,8 @@ public final class ServerConfig {
         PROBE_YIELD_MULTIPLIER = PROBE_YIELD_MULTIPLIER_;
         WARDEN_HEALTH = WARDEN_HEALTH_;
         WARDEN_RESET_ON_LEAVE = WARDEN_RESET_ON_LEAVE_;
+        AWAKENED_WARDEN_HEALTH_MULTIPLIER = AWAKENED_WARDEN_HEALTH_MULTIPLIER_;
+        AWAKENED_WARDEN_DAMAGE_MULTIPLIER = AWAKENED_WARDEN_DAMAGE_MULTIPLIER_;
         TEMPLATE_USES = TEMPLATE_USES_;
         SCULK_PER_SHARD = SCULK_PER_SHARD_;
         BLACK_HOLE_PULL_RADIUS = BLACK_HOLE_PULL_RADIUS_;

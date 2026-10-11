@@ -69,7 +69,9 @@ public class SinguloJeiPlugin implements IModPlugin {
             return;
         }
         Map<MachineType, List<MachineRecipe>> byType = new EnumMap<>(MachineType.class);
-        for (RecipeHolder<MachineRecipe> h : Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
+        // 装置と同じく、サーバー設定（プリセット・殻の材料・育成時間など）を当てはめたレシピを見せる
+        for (RecipeHolder<MachineRecipe> h : io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(
+                Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()))) {
             for (MachineType t : MachineType.values()) {
                 if (t.id().equals(h.value().station())) {
                     byType.computeIfAbsent(t, k -> new ArrayList<>()).add(h.value());

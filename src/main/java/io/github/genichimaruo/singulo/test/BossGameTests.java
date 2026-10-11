@@ -115,6 +115,37 @@ public final class BossGameTests {
         });
     }
 
+    /** 攻略後の再戦: 覚醒の記録核で、保管庫が開いていても覚醒した守護機（体力×2.5）が起きる。 */
+    @GameTest(template = EMPTY)
+    public static void awakeningCoreSummonsStrongerWarden(GameTestHelper helper) {
+        SealConsoleBlockEntity console = arena(helper);
+        vault(helper).setSealed(false);
+        helper.assertTrue(console.activate(helper.getLevel(), null) == null, "保管庫が開いているのに普通の守護機が起きた");
+        HorizonWarden warden = console.activateAwakened(helper.getLevel(), null);
+        helper.assertTrue(warden != null && warden.awakened(), "覚醒の記録核で覚醒した守護機が起きない");
+        warden.skipEmerging();
+        double expected = HorizonWarden.HEALTH * HorizonWarden.awakenedHealthMultiplier();
+        helper.assertTrue(Math.abs(warden.effectiveMaxHealth() - expected) < 1.0,
+                "覚醒した守護機の体力が " + expected + " 相当でない: " + warden.effectiveMaxHealth());
+        helper.assertTrue(console.activateAwakened(helper.getLevel(), null) == null, "覚醒戦の最中に2体目が起きた");
+        helper.succeed();
+    }
+
+    /** 覚醒戦をやめて離れると、守護機は封印に戻り、記録核がコンソールの上に返る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void abandonedAwakenedFightReturnsCore(GameTestHelper helper) {
+        SealConsoleBlockEntity console = arena(helper);
+        vault(helper).setSealed(false);
+        HorizonWarden warden = console.activateAwakened(helper.getLevel(), null);
+        warden.skipEmerging();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(warden.isRemoved(), "挑戦者がいないのに覚醒した守護機が残っている");
+            helper.assertTrue(!helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(helper.absolutePos(CONSOLE)).inflate(3),
+                    e -> e.getItem().is(item("awakening_record_core"))).isEmpty(), "記録核が返ってこない");
+        });
+    }
+
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void wardenReturnsToSealWithoutChallengers(GameTestHelper helper) {
         SealConsoleBlockEntity console = arena(helper);

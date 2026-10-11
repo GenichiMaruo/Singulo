@@ -91,6 +91,7 @@
       "pages": [
         "ruins.list",
         "ruins.bosses",
+        "ruins.plan",
         "ruins.compass",
         "ruins.sealed",
         "ruins.records",

@@ -114,7 +114,8 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
 
     /** その遺構の中身が再生するまでの tick 数。0 以下なら再生しない。 */
     public static long regenTicks(String ruin) {
-        double mult = ServerConfig.SPEC.isLoaded() ? ServerConfig.REGEN_DAYS_MULTIPLIER.get() : 1.0;
+        double mult = (ServerConfig.SPEC.isLoaded() ? ServerConfig.REGEN_DAYS_MULTIPLIER.get() : 1.0)
+                * io.github.genichimaruo.singulo.data.Difficulty.regenDays();
         int days = GeneratedContent.RUIN_REGEN_DAYS.getOrDefault(ruin, 7);
         return mult <= 0 ? -1 : Math.round(days * TICKS_PER_DAY * mult);
     }
