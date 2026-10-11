@@ -75,6 +75,9 @@ Bring them home, decode and restore them to reach the next stage.
 The **Horizon Warden** guards the Final Lab.
 It sweeps the ground with crescents, fires a chest laser, grabs you with gravity and slams you down.
 In its later phases it sends your projectiles back at you.
+After the endgame, every boss can be refought in an awakened form with more health, harder hits and faster moves:
+use an Awakening Record Core on the Final Lab's seal console, or an Awakened Echo Core / Awakened Gravity Core on the guardian core
+of a Research Building or Culture Facility.
 
 Decoded records add the story of the lost civilization to your handbook.
 

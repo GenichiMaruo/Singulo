@@ -154,6 +154,8 @@ MOD = {
     '時間結晶触媒': ('time_crystal_catalyst', 'Time Crystal Catalyst', 'catalyst'),
     '時間結晶モジュール': ('time_crystal_module', 'Time Crystal Module', 'item'),
     '覚醒の記録核': ('awakening_record_core', 'Awakening Record Core', 'item'),
+    '覚醒の残響核': ('awakening_echo_core', 'Awakened Echo Core', 'item'),
+    '覚醒の重力核': ('awakening_gravity_core', 'Awakened Gravity Core', 'item'),
     'エキゾチック物質': ('exotic_matter', 'Exotic Matter', 'item'),
     '縮退熱炉フレーム': ('degenerate_furnace_frame', 'Degenerate Furnace Frame', 'part_block'),
     '縮退熱炉外装板': ('degenerate_furnace_shell', 'Degenerate Furnace Shell', 'part_block'),

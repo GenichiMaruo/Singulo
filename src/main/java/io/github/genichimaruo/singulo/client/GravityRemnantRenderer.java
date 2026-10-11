@@ -85,7 +85,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
             pose.pushPose();
             pose.mulPose(Axis.YP.rotationDegrees(-t * 3));
             for (int k = 0; k < 3; k++) {
-                float rr = (float) GravityRemnant.WELL_RADIUS * (0.35F + 0.22F * k);
+                float rr = (float) e.wellRadius() * (0.35F + 0.22F * k);
                 FxDraw.ring(pose.last(), glow, rr - 0.08F, rr, RIM, 70 - k * 15, 0);
             }
             pose.popPose();
@@ -93,7 +93,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         // 叩きつけの前触れ: 床へ向かって広がる輪
         int flip = e.flipTicks();
         if (flip > 0) {
-            float k = 1 - (flip - partialTick) / GravityRemnant.FLIP_HOLD;
+            float k = 1 - (flip - partialTick) / e.flipHold();
             pose.pushPose();
             pose.translate(0, -cy - 1.4 + 0.05, 0);
             float rr = 1 + k * (float) GravityRemnant.FLIP_RADIUS;

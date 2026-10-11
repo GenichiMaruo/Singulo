@@ -57,6 +57,8 @@ public final class ServerConfig {
     public static final ModConfigSpec.BooleanValue WARDEN_RESET_ON_LEAVE;
     public static final ModConfigSpec.DoubleValue AWAKENED_WARDEN_HEALTH_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue AWAKENED_WARDEN_DAMAGE_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_HEALTH_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER;
     public static final ModConfigSpec.IntValue TEMPLATE_USES;
     public static final ModConfigSpec.IntValue SCULK_PER_SHARD;
     public static final ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS;
@@ -131,6 +133,8 @@ public final class ServerConfig {
         ModConfigSpec.BooleanValue WARDEN_RESET_ON_LEAVE_;
         ModConfigSpec.DoubleValue AWAKENED_WARDEN_HEALTH_MULTIPLIER_;
         ModConfigSpec.DoubleValue AWAKENED_WARDEN_DAMAGE_MULTIPLIER_;
+        ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_;
+        ModConfigSpec.DoubleValue AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_;
         ModConfigSpec.IntValue TEMPLATE_USES_;
         ModConfigSpec.IntValue SCULK_PER_SHARD_;
         ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS_;
@@ -264,6 +268,10 @@ public final class ServerConfig {
         AWAKENED_WARDEN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedWardenHealthMultiplier", 2.5, 1.0, 20.0);
         b.comment("覚醒したホライズン・ウォーデンが与えるダメージの倍率", "範囲: 1.0〜10.0");
         AWAKENED_WARDEN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedWardenDamageMultiplier", 1.5, 1.0, 10.0);
+        b.comment("覚醒した番人（残響の番人・重力の澱の再戦）の体力の倍率", "範囲: 1.0〜20.0");
+        AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedGuardianHealthMultiplier", 2.5, 1.0, 20.0);
+        b.comment("覚醒した番人が与えるダメージの倍率", "範囲: 1.0〜10.0");
+        AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedGuardianDamageMultiplier", 1.5, 1.0, 10.0);
         b.pop();
         b.push("echo");
         b.comment("型の残響の欠片が割れるまでの回数", "範囲: 1〜1000（整数）");
@@ -365,6 +373,8 @@ public final class ServerConfig {
         WARDEN_RESET_ON_LEAVE = WARDEN_RESET_ON_LEAVE_;
         AWAKENED_WARDEN_HEALTH_MULTIPLIER = AWAKENED_WARDEN_HEALTH_MULTIPLIER_;
         AWAKENED_WARDEN_DAMAGE_MULTIPLIER = AWAKENED_WARDEN_DAMAGE_MULTIPLIER_;
+        AWAKENED_GUARDIAN_HEALTH_MULTIPLIER = AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_;
+        AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER = AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_;
         TEMPLATE_USES = TEMPLATE_USES_;
         SCULK_PER_SHARD = SCULK_PER_SHARD_;
         BLACK_HOLE_PULL_RADIUS = BLACK_HOLE_PULL_RADIUS_;

@@ -16,6 +16,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -336,6 +337,109 @@ public final class BossRoomGameTests {
         helper.runAtTickTime(GravityRemnant.DEATH_TICKS + 10, () -> {
             helper.assertTrue(r.isRemoved(), "演出が終わっても消えない");
             helper.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ 覚醒した番人（攻略後の再戦）
+
+    /** 倒したあと（保管庫が開いている）の部屋を作る。 */
+    private static GuardianCoreBlockEntity clearedRoom(GameTestHelper helper, String ruin) {
+        GuardianCoreBlockEntity core = room(helper, ruin, VAULT, CORE);
+        RuinCacheBlockEntity vault = helper.getBlockEntity(VAULT);
+        vault.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
+        vault.setSealed(false);
+        return core;
+    }
+
+    private static ItemStack stack(String id) {
+        return new ItemStack(item(id));
+    }
+
+    /** 覚醒の残響核で、保管庫が開いていても覚醒した残響の番人（体力×2.5）が現れる。ほかの遺構の覚醒核では現れない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_15", timeoutTicks = 40)
+    public static void echoCoreSummonsAwakenedSentinel(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
+        helper.assertTrue(core.awaken(helper.getLevel()) == null, "保管庫が開いているのに普通の番人が現れた");
+        helper.assertTrue(core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core")) == null,
+                "研究棟で覚醒の重力核が使えた");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
+        helper.assertTrue(boss instanceof EchoSentinel && boss.awakened(), "覚醒の残響核で覚醒した残響の番人が現れない: " + boss);
+        boss.skipEmerging();
+        double expected = EchoSentinel.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
+        helper.assertTrue(((EchoSentinel) boss).minionCount() == EchoSentinel.MINIONS + 1, "覚醒した番人の分身が増えない");
+        helper.assertTrue(core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core")) == null, "覚醒戦の最中に2体目が現れた");
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** 覚醒した重力の澱は体力が上限（1024）を超えるので、受けるダメージを減らして同じ硬さにする。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_16", timeoutTicks = 40)
+    public static void awakenedRemnantKeepsHealthBeyondCap(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
+        helper.assertTrue(boss instanceof GravityRemnant && boss.awakened(), "覚醒の重力核で覚醒した重力の澱が現れない: " + boss);
+        boss.skipEmerging();
+        double expected = GravityRemnant.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        helper.assertTrue(boss.getMaxHealth() <= 1024 && Math.abs(boss.effectiveMaxHealth() - expected) < 1.0,
+                "体力が " + expected + " 相当でない: " + boss.getMaxHealth() + " / " + boss.effectiveMaxHealth());
+        GravityRemnant r = (GravityRemnant) boss;
+        r.setHealth(r.getMaxHealth() * 0.6F);
+        helper.assertTrue(r.wellOpen() && r.wellRadius() == GravityRemnant.AWAKENED_WELL_RADIUS, "体力60%で広い重力井戸が開かない");
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** 覚醒した残響の番人は、本気になると壊された投影器を2つまで映し直す（1戦に1回）。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_17", timeoutTicks = 60)
+    public static void awakenedSentinelReprojects(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
+        EchoSentinel s = (EchoSentinel) core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
+        s.skipEmerging();
+        for (BlockPos p : PROJECTORS) {
+            helper.setBlock(p, Blocks.AIR);
+        }
+        s.setHealth(s.getMaxHealth() * 0.6F);
+        helper.runAtTickTime(5, () -> {
+            int intact = s.intactProjectors().size();
+            helper.assertTrue(intact == EchoSentinel.AWAKENED_REPROJECT, "投影器を2つ映し直さない: " + intact);
+            for (BlockPos p : PROJECTORS) {
+                helper.setBlock(p, Blocks.AIR);
+            }
+        });
+        helper.runAtTickTime(15, () -> {
+            helper.assertTrue(s.intactProjectors().isEmpty(), "2回目も映し直した");
+            s.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 覚醒した番人を倒すと、保管庫が開き、通常のドロップに加えて追加の報酬が出る。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_18", timeoutTicks = 40)
+    public static void awakenedSentinelDropsRewards(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
+        boss.skipEmerging();
+        boss.kill();
+        helper.runAtTickTime(5, () -> {
+            helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertTrue(dropped(helper, item("overclock_chip")) == 1, "オーバークロック・チップが出ない");
+            helper.assertTrue(dropped(helper, item("sentinel_core")) == 4, "番人の投影核が通常の2＋追加2にならない: "
+                    + dropped(helper, item("sentinel_core")));
+            helper.succeed();
+        });
+    }
+
+    /** 覚醒戦をやめて離れると、番人は戻り、覚醒核が封印核の上に返る。部屋の仕掛けは直さない（核に手が届くように）。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_19", timeoutTicks = 300)
+    public static void abandonedAwakenedFightReturnsCore(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
+        boss.skipEmerging();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(boss.isRemoved(), "挑戦者がいないのに覚醒した番人が残っている");
+            helper.assertTrue(core.activeBoss(helper.getLevel()) == null, "封印核が戦闘中のまま");
+            helper.assertTrue(dropped(helper, item("awakening_gravity_core")) == 1, "覚醒核が返ってこない");
         });
     }
 }

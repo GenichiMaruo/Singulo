@@ -233,11 +233,13 @@ CHAPTERS = [
          'イベントホライズン・シールドで拠点を守り、Tシリンダーで時間を速め、ワームホールで遠くの拠点をつなぎましょう。'
          '人工星核を作れば、もうネザースターを探さなくて済みます。\n'
          '腕に自信があれば、特異点封入台で「覚醒の記録核」を作り、最終実験施設の封印コンソールで使ってみてください。'
-         '体力2.5倍・攻撃1.5倍の覚醒したホライズン・ウォーデンが目覚めます。勝てばオーバークロック・チップなどが手に入り、何度でも挑めます。',
+         '体力2.5倍・攻撃1.5倍の覚醒したホライズン・ウォーデンが目覚めます。勝てばオーバークロック・チップなどが手に入り、何度でも挑めます。\n'
+         '研究棟と封鎖培養施設の番人も、「覚醒の残響核」「覚醒の重力核」を番人の封印核に使えば、覚醒した姿と再戦できます。',
          'Beyond',
          'With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\n'
          'For a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab\'s seal console: the Awakened Horizon Warden '
-         'has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.'),
+         'has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\n'
+         'The Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.'),
     ]),
     ('multiblocks', 'singulo:holo_projector', 'マルチブロック', 'Multiblocks', [
         ('projector', 'ホロ投影機の使い方',
@@ -329,7 +331,10 @@ CHAPTERS = [
          '体力が半分を切ると重力井戸ができ、核へ引き寄せられます（核に触れると傷つく）。縮退核を落とします。\n'
          '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。'
          '倒したあとは、覚醒の記録核をコンソールに使うと「覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。'
-         'やめて部屋を離れると記録核は戻ります。',
+         'やめて部屋を離れると記録核は戻ります。\n'
+         '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます'
+         '（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増え、本気になると壊した投影器を2つまで映し直します。'
+         '重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。',
          'Ruin guardians',
          'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. '
          'When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n'
@@ -341,7 +346,10 @@ CHAPTERS = [
          'it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, '
          'so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n'
          '- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console '
-         'for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.'),
+         'for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n'
+         '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core '
+         'in the room\'s floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two '
+         'broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
         ('plan', '探索の段取り',
          '段階が進むと探索先が一度に増えます。先に集めておくと、あとで工場が止まりません。\n'
          '・段階2のうち: 隕石クレーター（隕鉄・星屑）、氷山か氷樹（氷塊・青氷）。\n'

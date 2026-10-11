@@ -83,6 +83,8 @@ SERVER = [
     ('ruins', 'wardenResetOnLeave', 'true', 'true / false', '挑戦者が離れたら全回復するか'),
     ('ruins', 'awakenedWardenHealthMultiplier', '2.5', '1.0〜20.0', '覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）'),
     ('ruins', 'awakenedWardenDamageMultiplier', '1.5', '1.0〜10.0', '覚醒したホライズン・ウォーデンが与えるダメージの倍率'),
+    ('ruins', 'awakenedGuardianHealthMultiplier', '2.5', '1.0〜20.0', '覚醒した番人（残響の番人・重力の澱の再戦）の体力の倍率'),
+    ('ruins', 'awakenedGuardianDamageMultiplier', '1.5', '1.0〜10.0', '覚醒した番人が与えるダメージの倍率'),
 
     # 残響の欠片
     ('echo', 'templateUses', '16', '1〜1000（整数）', '型の残響の欠片が割れるまでの回数'),

@@ -1640,6 +1640,8 @@ ITEM_ART = {
     'time_crystal_catalyst': lambda: crystal_cluster((250, 182, 84), mark=(255, 250, 220)),
     'time_crystal_module': lambda: module((236, 238, 244), (250, 182, 84)),
     'awakening_record_core': lambda: crystal_cluster((176, 120, 255), mark=(255, 230, 255)),
+    'awakening_echo_core': lambda: crystal_cluster((112, 214, 255), mark=(230, 250, 255)),
+    'awakening_gravity_core': lambda: crystal_cluster((236, 96, 132), mark=(255, 225, 235)),
     'spent_muon_catalyst': lambda: crystal_cluster((96, 140, 236), spent=True),
     'spent_bose_condensate_catalyst': lambda: crystal_cluster((110, 220, 236), spent=True),
     'spent_time_crystal_catalyst': lambda: crystal_cluster((250, 182, 84), spent=True),

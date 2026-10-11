@@ -221,6 +221,16 @@
       "stage": 5
     },
     {
+      "id": "awakened_echo",
+      "parent": "hawking",
+      "stage": 5
+    },
+    {
+      "id": "awakened_gravity",
+      "parent": "hawking",
+      "stage": 5
+    },
+    {
       "id": "records",
       "parent": "archive",
       "stage": 5

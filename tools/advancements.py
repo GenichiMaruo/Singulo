@@ -107,6 +107,10 @@ ADVANCEMENTS = [
      '星を作る', '人工星核を作る。もうネザースターを探さなくていい', 'Forging a Star', 'Make an artificial star core'),
     ('awakened', 'core', 'awakening_record_core', 'challenge', ('milestone', 'awakened_warden'), 5,
      '目覚めた地平線', '覚醒したホライズン・ウォーデンを倒す', 'Horizon Reawakened', 'Defeat the Awakened Horizon Warden'),
+    ('awakened_echo', 'hawking', 'awakening_echo_core', 'challenge', ('milestone', 'awakened_echo_sentinel'), 5,
+     '鳴りやまない残響', '覚醒した残響の番人を倒す', 'Echoes That Linger', 'Defeat the Awakened Echo Sentinel'),
+    ('awakened_gravity', 'hawking', 'awakening_gravity_core', 'challenge', ('milestone', 'awakened_gravity_remnant'), 5,
+     '重さの記憶', '覚醒した重力の澱を倒す', 'Memory of Weight', 'Defeat the Awakened Gravity Remnant'),
     ('records', 'archive', 'record_fragment', 'challenge', ('milestone', 'records_all'), 5,
      '滅びの記録', '旧文明の記録をすべて解読する', 'Record of the Fall', 'Decode every ancient record'),
 ]

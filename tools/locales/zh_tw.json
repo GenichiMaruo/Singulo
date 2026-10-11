@@ -31,6 +31,22 @@
     "source": "Precise Hands",
     "translation": "精準的雙手"
   },
+  "advancement.singulo.awakened_echo.description": {
+    "source": "Defeat the Awakened Echo Sentinel",
+    "translation": "擊敗覺醒的回聲守衛"
+  },
+  "advancement.singulo.awakened_echo.title": {
+    "source": "Echoes That Linger",
+    "translation": "不絕的回聲"
+  },
+  "advancement.singulo.awakened_gravity.description": {
+    "source": "Defeat the Awakened Gravity Remnant",
+    "translation": "擊敗覺醒的重力殘渣"
+  },
+  "advancement.singulo.awakened_gravity.title": {
+    "source": "Memory of Weight",
+    "translation": "重量的記憶"
+  },
   "advancement.singulo.bose.description": {
     "source": "Make a BE condensate catalyst",
     "translation": "製作 玻色凝聚態催化劑"
@@ -1002,6 +1018,14 @@
   "desc.singulo.artificial_star_core": {
     "source": "A star core that replaces nether stars.",
     "translation": "取代下界恆星的恆星核心。"
+  },
+  "desc.singulo.awakening_echo_core": {
+    "source": "A sentinel core overlaid with echo-shard records. Use it on the guardian core in a Research Building to call the Awakened Echo Sentinel: 2.5× health, 1.5× damage, faster moves, an extra echo, and it re-projects broken projectors when enraged. Victory adds an overclock chip and more to the usual drops.",
+    "translation": "用回聲碎片的記錄覆寫過的守衛投影核心。在研究樓的守衛封印核心上使用，會召喚覺醒的回聲守衛：生命 2.5 倍、傷害 1.5 倍、招式更快、多一個分身，狂暴時會重新投影被破壞的投影器。獲勝後除了平常的掉落，還能獲得超頻晶片等獎勵。"
+  },
+  "desc.singulo.awakening_gravity_core": {
+    "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
+    "translation": "注入了奇點之力的簡併核。在封鎖培養設施的守衛封印核心上使用，會召喚覺醒的重力殘渣：生命 2.5 倍、傷害 1.5 倍、瓦礫更多、重力井更大更強，並會連續砸地。獲勝後除了平常的掉落，還能獲得超頻晶片等獎勵。"
   },
   "desc.singulo.basic_circuit": {
     "source": "The brain of every early machine.",
@@ -2015,6 +2039,10 @@
     "source": "Echo Sentinel",
     "translation": "回聲守衛"
   },
+  "entity.singulo.echo_sentinel.awakened": {
+    "source": "Awakened Echo Sentinel",
+    "translation": "覺醒的回聲守衛"
+  },
   "entity.singulo.gravity_debris": {
     "source": "Gravity Debris",
     "translation": "瓦礫"
@@ -2022,6 +2050,10 @@
   "entity.singulo.gravity_remnant": {
     "source": "Gravity Remnant",
     "translation": "重力殘渣"
+  },
+  "entity.singulo.gravity_remnant.awakened": {
+    "source": "Awakened Gravity Remnant",
+    "translation": "覺醒的重力殘渣"
   },
   "entity.singulo.horizon_bolt": {
     "source": "Horizon Bolt",
@@ -2463,6 +2495,10 @@
     "source": "%s: %s / %s mB",
     "translation": "%1$s: %2$s / %3$s mB"
   },
+  "gui.singulo.guardian.active": {
+    "source": "The guardian is already awake",
+    "translation": "守衛已經甦醒"
+  },
   "gui.singulo.guardian.awakened.echo_sentinel": {
     "source": "The echoes of the archive take shape. The Echo Sentinel appears",
     "translation": "檔案室的回聲凝聚成形。回聲守衛現身了"
@@ -2470,6 +2506,18 @@
   "gui.singulo.guardian.awakened.gravity_remnant": {
     "source": "The containment tank shatters. The Gravity Remnant crawls out",
     "translation": "收容槽碎裂了。重力殘渣爬了出來"
+  },
+  "gui.singulo.guardian.awakened_defeated": {
+    "source": "The awakened guardian is defeated. Fine fragments spill out",
+    "translation": "擊退了覺醒的守衛。上等的碎片散落出來"
+  },
+  "gui.singulo.guardian.awakened_rematch.echo_sentinel": {
+    "source": "The core resonates. The Awakened Echo Sentinel appears",
+    "translation": "覺醒核發生共鳴。覺醒的回聲守衛現身了"
+  },
+  "gui.singulo.guardian.awakened_rematch.gravity_remnant": {
+    "source": "The core resonates. The Awakened Gravity Remnant crawls out",
+    "translation": "覺醒核發生共鳴。覺醒的重力殘渣爬了出來"
   },
   "gui.singulo.guardian.defeated.echo_sentinel": {
     "source": "The Echo Sentinel unravels. The vault field dissipates",
@@ -2479,6 +2527,10 @@
     "source": "The Gravity Remnant collapses. The vault field dissipates",
     "translation": "重力殘渣的核心坍縮了。寶庫的力場消失了"
   },
+  "gui.singulo.guardian.no_vault": {
+    "source": "No guarded vault nearby",
+    "translation": "附近沒有受守衛保護的寶庫"
+  },
   "gui.singulo.guardian.reset.echo_sentinel": {
     "source": "No challenger remains. The Echo Sentinel returns to the records",
     "translation": "沒有挑戰者留下。回聲守衛回到了記錄之中"
@@ -2486,6 +2538,10 @@
   "gui.singulo.guardian.reset.gravity_remnant": {
     "source": "No challenger remains. The Gravity Remnant sinks back into its tank",
     "translation": "沒有挑戰者留下。重力殘渣沉回了槽中"
+  },
+  "gui.singulo.guardian.wrong_core": {
+    "source": "This is not the awakening core for this ruin's guardian",
+    "translation": "這不是這座廢墟守衛的覺醒核"
   },
   "gui.singulo.halo.no_core": {
     "source": "No running core within %s blocks",
@@ -3144,8 +3200,8 @@
     "translation": "廢墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
-    "translation": "研究棟、封鎖培養設施和最終實驗設施的寶庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封鎖培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗設施）：觸碰中央的密封控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。"
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "研究棟、封鎖培養設施和最終實驗設施的寶庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封鎖培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗設施）：觸碰中央的密封控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3348,8 +3404,8 @@
     "translation": "副產品和 奇點核心"
   },
   "guide.singulo.stage5.endgame.body": {
-    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.",
-    "translation": "有了核心和力量，你就可以運行遊戲後期的設備：護盾、T 型氣缸和蟲洞。人造星核讓你不必再尋找地獄之星。\n想要真正的戰鬥，就在奇點封裝器中製作覺醒記錄核，並在最終實驗室的密封控制台上使用：覺醒的視界守衛擁有 2.5 倍生命和 1.5 倍傷害。擊敗它可獲得超頻晶片等獎勵，可反覆挑戰。"
+    "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.",
+    "translation": "有了核心和力量，你就可以運行遊戲後期的設備：護盾、T 型氣缸和蟲洞。人造星核讓你不必再尋找地獄之星。\n想要真正的戰鬥，就在奇點封裝器中製作覺醒記錄核，並在最終實驗室的密封控制台上使用：覺醒的視界守衛擁有 2.5 倍生命和 1.5 倍傷害。擊敗它可獲得超頻晶片等獎勵，可反覆挑戰。\n研究樓和封鎖培養設施的守衛也能再戰：在它們的守衛封印核心上使用覺醒回聲核或覺醒重力核即可。"
   },
   "guide.singulo.stage5.endgame.title": {
     "source": "Beyond",
@@ -3408,6 +3464,14 @@
     "translation": "製作地點：製作台（第 1 階段）"
   },
   "howto.singulo.artificial_star_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "製造地：奇點封裝器（第 5 階段）"
+  },
+  "howto.singulo.awakening_echo_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "製造地：奇點封裝器（第 5 階段）"
+  },
+  "howto.singulo.awakening_gravity_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "製造地：奇點封裝器（第 5 階段）"
   },
@@ -4194,6 +4258,14 @@
   "item.singulo.artificial_star_core": {
     "source": "Artificial Star Core",
     "translation": "人造星核"
+  },
+  "item.singulo.awakening_echo_core": {
+    "source": "Awakened Echo Core",
+    "translation": "覺醒回聲核"
+  },
+  "item.singulo.awakening_gravity_core": {
+    "source": "Awakened Gravity Core",
+    "translation": "覺醒重力核"
   },
   "item.singulo.basic_circuit": {
     "source": "Basic Circuit",
@@ -5948,8 +6020,8 @@
     "translation": "用於：反應爐外殼、奇點種子、奇點核心、微中子靈敏度模組 Mk3、封印容器（時間鎖）"
   },
   "uses.singulo.degenerate_nucleus": {
-    "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator",
-    "translation": "用於：奇點封裝器、奇點種子、重力子操控器"
+    "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
+    "translation": "用於：奇點封裝器、奇點種子、重力子操控器、覺醒重力核"
   },
   "uses.singulo.degenerate_precursor": {
     "source": "Used in: Degenerate Matter Shell",
@@ -5984,8 +6056,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 21 more",
-    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 21 個"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 22 more",
+    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 22 個"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -6008,8 +6080,8 @@
     "translation": "用於：彭羅斯反應爐"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core",
-    "translation": "用於：微型黑洞容器、奇點核心、奇點鎖鑰匙、覺醒記錄核"
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 1 more",
+    "translation": "用於：微型黑洞容器、奇點核心、奇點鎖鑰匙、覺醒記錄核、覺醒回聲核 等 1 個"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
@@ -6108,8 +6180,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.sentinel_core": {
-    "source": "Used in: Echo Resonator, Time Crystal Incubator, Autonomous Probe Station",
-    "translation": "用於：回聲共鳴器、時間晶體培育槽、自動探測站"
+    "source": "Used in: Echo Resonator, Time Crystal Incubator, Autonomous Probe Station, Awakened Echo Core",
+    "translation": "用於：回聲共鳴器、時間晶體培育槽、自動探測站、覺醒回聲核"
   },
   "uses.singulo.shield_tower_body": {
     "source": "Used in: Event Horizon Shield Tower",
