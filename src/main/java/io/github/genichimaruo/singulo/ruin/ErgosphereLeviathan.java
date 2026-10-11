@@ -13,10 +13,12 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -42,17 +44,23 @@ import net.neoforged.neoforge.entity.PartEntity;
 import org.joml.Vector3f;
 
 /**
- * エルゴ球の鯨（沈んだ炉心区画のボス、段階5）。止まったペンローズ炉の渦に棲みついた、炉殻の板を鱗のように連ねた長い体の鯨。
+ * エルゴ球の大蛇（沈んだ炉心区画のボス、段階5）。止まったペンローズ炉の渦に棲みついた、長い体の大蛇。
+ * 頭と {@value #SEGMENTS} 節の体（{@link LeviathanSegment}）からなり、体は頭の通った跡をなぞってついてくる。
+ * 体力の 2/3・1/3 で姿を変える（そのあいだは傷つかない）。
+ * <ol>
+ *   <li><b>装甲</b>: 炉殻の板を鱗のように連ねた体。頭は普通に、胴は硬く（×{@value #BODY_FACTOR}）、尾の光る芯は弱い
+ *       （×{@value #TAIL_FACTOR}）。突進・渦の吐息・尾の薙ぎ払い</li>
+ *   <li><b>骨格</b>（脱皮）: 鱗をすべて弾き飛ばし、光の背骨と肋の輪だけになる。胴も効く（×{@value #BODY_FACTOR_2}）。
+ *       続けての突進・とぐろ（部屋の中で輪になって回り、まわりを押し流しながら光の欠片を撃つ）・噛みつき・光の欠片の雨</li>
+ *   <li><b>龍</b>（再臨）: 炉心の渦へ潜り、黒い体に金の降着の翼と光の角を持つ龍となって噴き上がる。
+ *       相対論的ジェット（頭の両角から回る2本の光線）・降着の嵐（上空を回りながら小さなブラックホールを降らせる）・
+ *       突進の着地に特異点を残す・相手を追う吐息</li>
+ * </ol>
  * <ul>
- *   <li>頭と {@value #SEGMENTS} 節の体（{@link LeviathanSegment}）。体は頭の通った跡をなぞってついてくる。
- *       頭は普通に、胴は硬く（×{@value #BODY_FACTOR}）、尾の光る芯は弱い（×{@value #TAIL_FACTOR}）</li>
- *   <li>部屋の上空を、輪を描いて泳ぎ続ける。体に触れると傷つく</li>
  *   <li>泳いだ跡にはエルゴ球の帯が残り、その中では泳ぐ向きへ押し流される（流れに乗ると追いつきやすい）</li>
- *   <li>突進: 相手の上へ昇って身構え（頭が光る）、狙った場所を一直線に突き抜ける</li>
- *   <li>渦の吐息: 止まって口の渦を開き、前にいる相手を吸い寄せてから、渦の光線を吐く</li>
- *   <li>体力半分から: 速くなり、突進が続けて来ることがあり、鱗（炉殻の板）を剥がして降らせる</li>
- *   <li>出現: 床の炉心に渦が開き、頭が螺旋を描いて這い出し、体が一節ずつ引き出される</li>
- *   <li>倒されると: 身をよじり、鱗が尾から剥がれ落ち、螺旋を描いて炉心の渦へ沈む。最後に渦がつぶれて閃光を残す</li>
+ *   <li>出現: 床の炉心に渦が開き、小さな蛇が這い出して頼りなく泳ぐ。直後、真下から巨大な顎が噴き上がってそれを丸呑みにし、
+ *       そのまま螺旋を描いて昇り、体を一節ずつ引き出す</li>
+ *   <li>倒されると: 身をよじり、体が尾から崩れ、螺旋を描いて炉心の渦へ沈む。最後に渦がつぶれて閃光を残す</li>
  * </ul>
  */
 public class ErgosphereLeviathan extends RuinBoss {
@@ -60,21 +68,28 @@ public class ErgosphereLeviathan extends RuinBoss {
     private static final EntityDataAccessor<Integer> STATE_TICKS = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Vector3f> AIM = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<BlockPos> HOME = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.BLOCK_POS);
+    private static final EntityDataAccessor<Integer> FORM = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> JET_YAW = SynchedEntityData.defineId(ErgosphereLeviathan.class, EntityDataSerializers.FLOAT);
 
-    public static final int SWIM = 0, DIVE_WINDUP = 1, DIVE = 2, BREATH_CHARGE = 3, BREATH_FIRE = 4;
+    public static final int SWIM = 0, DIVE_WINDUP = 1, DIVE = 2, BREATH_CHARGE = 3, BREATH_FIRE = 4, TAIL_WHIP = 5, MOLT = 6,
+            COIL = 7, BITE = 8, SUBMERGE = 9, ASCEND = 10, JET = 11, STORM = 12;
 
     /** 体の節の数（最後の1つが尾）。 */
     public static final int SEGMENTS = 12;
     /** 節と節の間（ブロック）。頭から最初の節までは HEAD_GAP。 */
     public static final float SPACING = 1.7F;
     public static final float HEAD_GAP = 1.9F;
-    public static final float BODY_FACTOR = 0.6F;
+    public static final float BODY_FACTOR = 0.6F, BODY_FACTOR_2 = 0.9F;
     public static final float TAIL_FACTOR = 1.6F;
     /** 体力の既定値（設定 leviathanHealth）。 */
     public static final double HEALTH = 1600;
-    public static final int EMERGE_TICKS = 140;
-    /** 出現の演出で、渦が開いてから頭が這い出すまで。 */
-    public static final int EMERGE_VORTEX = 40;
+
+    // ---- 出現: 渦が開く → 小さな蛇が這い出して泳ぐ → 真下から顎が噴き上がって丸呑み → 螺旋を描いて昇る
+    public static final int EMERGE_TICKS = 220;
+    public static final int EMERGE_VORTEX = 30;
+    /** 小さな蛇が炉心の上に戻って止まる tick と、大蛇が噴き上がる tick、飲み込み終える tick。 */
+    public static final int HATCH_SETTLE = 100, SWALLOW = 110, SWALLOW_END = 126;
+
     public static final int DEATH_TICKS = 120;
     /** 倒されたとき、身をよじってから沈み始めるまで・沈み終えるまで。 */
     public static final int DEATH_WRITHE = 20, DEATH_SINK = 100;
@@ -86,9 +101,18 @@ public class ErgosphereLeviathan extends RuinBoss {
     static final double DIVE_SPEED = 1.15;
     public static final int DIVE_WINDUP_TICKS = 36, DIVE_TICKS = 40;
     public static final int BREATH_CHARGE_TICKS = 40, BREATH_FIRE_TICKS = 24;
+    public static final int WHIP_TICKS = 18, WHIP_STRIKE = 8;
+    public static final int MOLT_TICKS = 80, MOLT_BURST = 40;
+    public static final int COIL_TICKS = 110;
+    public static final int BITE_TICKS = 22, BITE_WINDUP = 9;
+    public static final int SUBMERGE_TICKS = 50, ASCEND_TICKS = 80, ASCEND_BURST = 34;
+    public static final int JET_TICKS = 90, JET_WINDUP = 22;
+    public static final int STORM_TICKS = 100;
     static final int ATTACK_INTERVAL = 80;
-    public static final float CONTACT_DAMAGE = 5, DIVE_DAMAGE = 14, BREATH_DAMAGE = 7;
-    public static final double BREATH_RANGE = 26, BREATH_WIDTH = 1.6, BREATH_PULL_RANGE = 18;
+    public static final float CONTACT_DAMAGE = 5, DIVE_DAMAGE = 14, BREATH_DAMAGE = 7, WHIP_DAMAGE = 9, BITE_DAMAGE = 12,
+            JET_DAMAGE = 8, SHARD_DAMAGE = 5, MOLT_DAMAGE = 8;
+    public static final double BREATH_RANGE = 26, BREATH_WIDTH = 1.6, BREATH_PULL_RANGE = 18, JET_RANGE = 24, WHIP_RANGE = 5.5;
+    public static final double COIL_RADIUS = 7, COIL_REACH = 15;
     /** エルゴ球の帯が残る tick と、押し流す強さ・届く距離。 */
     public static final int WAKE_TICKS = 60;
     static final double WAKE_PUSH = 0.09, WAKE_REACH = 2.5;
@@ -100,10 +124,18 @@ public class ErgosphereLeviathan extends RuinBoss {
     private Vec3 velocity = Vec3.ZERO;
     private double orbitAngle;
     private int attackCooldown = ATTACK_INTERVAL;
-    private boolean diveNext = true;
+    private int whipCooldown;
+    private int cycle;
     private boolean chained;
+    /** 降着の嵐で、これから小さなブラックホールが落ちる場所（落ちるまでの tick）。 */
+    private final List<Vec3> stormMarks = new ArrayList<>();
+    private final List<Integer> stormTimers = new ArrayList<>();
     @Nullable
     private Vec3 deathStart;
+    /** とどめ（/kill など無敵を無視するダメージ）のときは、姿を変える前でも倒れる。 */
+    private boolean finishing;
+    /** セーブから読み込んでいる最中（体力をそのまま戻す）。 */
+    private boolean loading;
 
     /** 跡の1点: 位置・その時の泳ぐ向き・記録した tick。 */
     public record TrailPoint(Vec3 pos, Vec3 dir, int tick) {}
@@ -174,6 +206,8 @@ public class ErgosphereLeviathan extends RuinBoss {
         builder.define(STATE_TICKS, 0);
         builder.define(AIM, new Vector3f());
         builder.define(HOME, BlockPos.ZERO);
+        builder.define(FORM, 1);
+        builder.define(JET_YAW, 0F);
     }
 
     @Override
@@ -211,6 +245,16 @@ public class ErgosphereLeviathan extends RuinBoss {
         return entityData.get(STATE_TICKS);
     }
 
+    /** 姿（1: 装甲、2: 骨格、3: 龍）。 */
+    public int form() {
+        return entityData.get(FORM);
+    }
+
+    /** 相対論的ジェットの向き（度。頭の上で回る）。 */
+    public float jetYaw() {
+        return entityData.get(JET_YAW);
+    }
+
     public Vec3 aim() {
         Vector3f v = entityData.get(AIM);
         return new Vec3(v.x, v.y, v.z);
@@ -225,9 +269,15 @@ public class ErgosphereLeviathan extends RuinBoss {
         entityData.set(AIM, new Vector3f((float) at.x, (float) at.y, (float) at.z));
     }
 
-    /** 体力が半分（覚醒した個体は 65%）を切ったか。 */
+    /** 姿を変えている最中か（傷つかない）。 */
+    public boolean transforming() {
+        int s = state();
+        return s == MOLT || s == SUBMERGE || s == ASCEND;
+    }
+
+    /** 体力が半分（覚醒した個体は 65%）を切ったか（その姿の中で、技が増え速くなる目安）。 */
     public boolean enraged() {
-        return getHealth() <= getMaxHealth() * enrageFraction();
+        return form() >= 2 || getHealth() <= getMaxHealth() * enrageFraction();
     }
 
     /** 頭の中心（実体の位置は足元なので、その1ブロック上）。 */
@@ -242,6 +292,11 @@ public class ErgosphereLeviathan extends RuinBoss {
 
     public List<TrailPoint> trail() {
         return new ArrayList<>(trail);
+    }
+
+    /** 跡を、帯の描画用に新しいものから順に返す。 */
+    public Iterator<TrailPoint> trailIterator() {
+        return trail.iterator();
     }
 
     @Override
@@ -267,7 +322,7 @@ public class ErgosphereLeviathan extends RuinBoss {
 
     @Override
     public void travel(Vec3 input) {
-        // 動きは自分で決める（泳ぐ・突進・出現・倒されたときの沈み方）
+        // 動きは自分で決める（泳ぐ・突進・出現・姿を変える・倒されたときの沈み方）
     }
 
     // ------------------------------------------------------------------ 体（跡と節）
@@ -338,12 +393,51 @@ public class ErgosphereLeviathan extends RuinBoss {
         }
     }
 
-    /** 体のどこかに当たったとき（部位から呼ばれる）。 */
+    /** 体のどこかに当たったとき（部位から呼ばれる）。骨格からは胴も効く。 */
     public boolean hurtPart(LeviathanSegment part, DamageSource source, float amount) {
-        return hurt(source, amount * part.damageFactor);
+        float factor = part.index == SEGMENTS - 1 ? TAIL_FACTOR : form() >= 2 ? BODY_FACTOR_2 : BODY_FACTOR;
+        return hurt(source, amount * factor);
+    }
+
+    /** 姿を変えている最中は傷つかない。 */
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        boolean bypass = source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
+        if (transforming() && !bypass) {
+            return false;
+        }
+        finishing = bypass;
+        try {
+            return super.hurt(source, amount);
+        } finally {
+            finishing = false;
+        }
+    }
+
+    /** 体力は、今の姿の境目より下へは減らない（境目で姿を変える）。とどめは別。 */
+    @Override
+    public void setHealth(float health) {
+        boolean guard = !finishing && !loading && !level().isClientSide && emergeTicks() <= 0 && form() < 3;
+        if (guard && health > 0) {
+            float floor = getMaxHealth() * (form() == 1 ? 2F / 3 : 1F / 3) - 0.01F;
+            health = Math.max(health, Math.min(getHealth(), floor));
+        } else if (guard && !isDeadOrDying()) {
+            health = getMaxHealth() * (form() == 1 ? 2F / 3 : 1F / 3) - 0.01F;
+        }
+        super.setHealth(health);
     }
 
     // ------------------------------------------------------------------ 出現
+
+    /** 出現の演出の小さな蛇の位置（炉心の上。t は出現の tick）。クライアントの描画と同じ式。 */
+    public static Vec3 hatchlingPos(Vec3 core, float t) {
+        float k = Mth.clamp((t - EMERGE_VORTEX) / (HATCH_SETTLE - EMERGE_VORTEX), 0, 1);
+        float rise = Mth.clamp(k / 0.2F, 0, 1);
+        float r = 3.0F * Mth.clamp(k / 0.25F, 0, 1) * (1 - Mth.clamp((k - 0.75F) / 0.25F, 0, 1));
+        float a = k * Mth.TWO_PI * 2;
+        float y = -0.5F + 2.7F * rise + 0.3F * Mth.sin(t * 0.3F);
+        return core.add(Mth.cos(a) * r, y, Mth.sin(a) * r);
+    }
 
     @Override
     protected void onEmergeTick(ServerLevel level, int t) {
@@ -351,34 +445,65 @@ public class ErgosphereLeviathan extends RuinBoss {
             return;
         }
         Vec3 core = Vec3.atBottomCenterOf(home).add(0, 1.0, 0);
-        if (t <= EMERGE_VORTEX) {
-            // 炉心に渦が開く（頭はまだ炉心の中）
-            setPos(core.x, core.y - 2.5, core.z);
-            for (int i = 0; i < 4; i++) {
-                double a = random.nextDouble() * Math.PI * 2;
-                double r = 2 + random.nextDouble() * 5;
-                level.sendParticles(ParticleTypes.REVERSE_PORTAL, core.x + Math.cos(a) * r, core.y + random.nextDouble(),
-                        core.z + Math.sin(a) * r, 0, -Math.cos(a), -0.1, -Math.sin(a), 0.3);
+        if (t < SWALLOW) {
+            // 大蛇の頭はまだ炉心の下。渦が開き、小さな蛇が這い出して泳ぐ
+            setPos(core.x, core.y - 4, core.z);
+            if (t <= EMERGE_VORTEX) {
+                for (int i = 0; i < 4; i++) {
+                    double a = random.nextDouble() * Math.PI * 2;
+                    double r = 2 + random.nextDouble() * 5;
+                    level.sendParticles(ParticleTypes.REVERSE_PORTAL, core.x + Math.cos(a) * r, core.y + random.nextDouble(),
+                            core.z + Math.sin(a) * r, 0, -Math.cos(a), -0.1, -Math.sin(a), 0.3);
+                }
             }
             if (t == 1) {
-                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.emerge"), SoundSource.HOSTILE, 3.0F, 0.8F);
+                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.emerge"), SoundSource.HOSTILE, 2.0F, 1.4F);
+            }
+            if (t == EMERGE_VORTEX) {
+                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.5F, 1.2F);
+            }
+            if (t > EMERGE_VORTEX && t % 20 == 0) {
+                Vec3 h = hatchlingPos(core, t);
+                level.playSound(null, h.x, h.y, h.z, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.0F, 1.5F);
+            }
+            if (t >= HATCH_SETTLE - 10) {
+                // 床が震え、割れ目から塵が噴く
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE_TILES.defaultBlockState()),
+                        core.x, core.y - 0.5, core.z, 12, 2.5, 0.1, 2.5, 0.25);
+                if (t == HATCH_SETTLE - 10) {
+                    level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.rumble"), SoundSource.HOSTILE, 3.5F, 0.6F);
+                }
             }
             return;
         }
-        // 頭が螺旋を描いて這い出し、泳ぐ高さまで昇る（体は跡をなぞって炉心から引き出される）
-        double k = (double) (t - EMERGE_VORTEX) / (EMERGE_TICKS - EMERGE_VORTEX);
+        if (t < SWALLOW_END) {
+            // 真下から顎が噴き上がり、小さな蛇を丸呑みにする
+            double k = (double) (t - SWALLOW) / (SWALLOW_END - SWALLOW);
+            Vec3 at = core.add(0, -2 + 7 * Math.sqrt(k), 0);
+            setPos(at.x, at.y - getBbHeight() / 2, at.z);
+            setXRot(-80);
+            if (t == SWALLOW) {
+                level.sendParticles(ParticleTypes.SONIC_BOOM, core.x, core.y + 0.5, core.z, 1, 0, 0, 0, 0);
+                level.sendParticles(ParticleTypes.EXPLOSION, core.x, core.y, core.z, 8, 2, 0.3, 2, 0);
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE_TILES.defaultBlockState()),
+                        core.x, core.y, core.z, 80, 2.5, 0.5, 2.5, 0.5);
+                playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 4.0F, 0.7F);
+                broadcastLine(level, "gui.singulo.leviathan.swallow");
+            }
+            if (t == SWALLOW + 5) {
+                playSound(SinguloSounds.get("ergosphere_leviathan.swallow"), 3.0F, 0.6F);
+            }
+            return;
+        }
+        // 螺旋を描いて泳ぐ高さまで昇る（体は跡をなぞって炉心から引き出される）
+        double k = (double) (t - SWALLOW_END) / (EMERGE_TICKS - SWALLOW_END);
         double ease = k * k * (3 - 2 * k);
         double a = ease * Math.PI * 2.5;
-        double r = 1 + ORBIT * 0.75 * ease;
-        Vec3 at = core.add(Math.cos(a) * r, SWIM_HEIGHT * ease - 1.5 * (1 - ease), Math.sin(a) * r);
+        double r = 0.5 + ORBIT * 0.75 * ease;
+        Vec3 at = core.add(Math.cos(a) * r, 5 + (SWIM_HEIGHT - 5) * ease, Math.sin(a) * r);
         Vec3 before = headCenter();
         setPos(at.x, at.y - getBbHeight() / 2, at.z);
         face(at.subtract(before));
-        if (t == EMERGE_VORTEX + 1) {
-            level.sendParticles(ParticleTypes.SONIC_BOOM, core.x, core.y + 0.5, core.z, 1, 0, 0, 0, 0);
-            level.sendParticles(ParticleTypes.EXPLOSION, core.x, core.y, core.z, 6, 1.5, 0.3, 1.5, 0);
-            playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 4.0F, 0.9F);
-        }
         if (t % 3 == 0) {
             level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE_TILES.defaultBlockState()),
                     core.x, core.y, core.z, 8, 0.8, 0.2, 0.8, 0.2);
@@ -389,6 +514,7 @@ public class ErgosphereLeviathan extends RuinBoss {
     protected void onEmerged(ServerLevel level) {
         velocity = Vec3.directionFromRotation(getXRot(), getYRot()).scale(SWIM_SPEED);
         orbitAngle = home == null ? 0 : Math.atan2(getZ() - (home.getZ() + 0.5), getX() - (home.getX() + 0.5));
+        playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 4.0F, 0.9F);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(12), e -> e != this && !RuinGuards.isGuard(e))) {
             Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
             if (push.lengthSqr() > 1e-4) {
@@ -415,15 +541,30 @@ public class ErgosphereLeviathan extends RuinBoss {
         if (ticks > 0) {
             entityData.set(STATE_TICKS, ticks - 1);
         }
+        if (!transforming() && form() < 3 && getHealth() <= getMaxHealth() * (form() == 1 ? 2F / 3 : 1F / 3)) {
+            startTransform(level);
+            return;                 // 姿を変えるのは次の tick から
+        }
         switch (state()) {
             case DIVE_WINDUP -> tickDiveWindup(level, target, ticks);
             case DIVE -> tickDive(level, ticks);
             case BREATH_CHARGE -> tickBreathCharge(level, target, ticks);
             case BREATH_FIRE -> tickBreathFire(level, target, ticks);
+            case TAIL_WHIP -> tickTailWhip(level, ticks);
+            case MOLT -> tickMolt(level, ticks);
+            case COIL -> tickCoil(level, ticks);
+            case BITE -> tickBite(level, target, ticks);
+            case SUBMERGE -> tickSubmerge(level, ticks);
+            case ASCEND -> tickAscend(level, ticks);
+            case JET -> tickJet(level, target, ticks);
+            case STORM -> tickStorm(level, ticks);
             default -> tickSwim(level, target);
         }
-        pushWake(level);
-        contactDamage(level);
+        tickStormMarks(level);
+        if (!transforming()) {
+            pushWake(level);
+            contactDamage(level);
+        }
         if (awakened() && tickCount % 4 == 0) {
             Vec3 c = headCenter();
             level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, c.x, c.y, c.z, 2, 0.6, 0.6, 0.6, 0.01);
@@ -435,37 +576,86 @@ public class ErgosphereLeviathan extends RuinBoss {
     }
 
     private double swimSpeed() {
-        double s = enraged() ? ENRAGED_SPEED : SWIM_SPEED;
+        double s = form() == 3 ? ENRAGED_SPEED * 1.15 : enraged() ? ENRAGED_SPEED : SWIM_SPEED;
         return awakened() ? s * 1.15 : s;
     }
 
-    /** 部屋の上空を輪を描いて泳ぐ。間をおいて技を選ぶ。 */
+    /** 部屋の上空を輪を描いて泳ぐ。間をおいて技を選ぶ。尾のそばに相手がいれば薙ぎ払う。 */
     private void tickSwim(ServerLevel level, @Nullable LivingEntity target) {
         double speed = swimSpeed();
         orbitAngle += speed / ORBIT;
         Vec3 c = arenaCenter();
-        Vec3 goal = c.add(Math.cos(orbitAngle) * ORBIT, SWIM_HEIGHT + Math.sin(tickCount * 0.03) * 4, Math.sin(orbitAngle) * ORBIT);
+        double height = form() == 3 ? SWIM_HEIGHT + 2 : SWIM_HEIGHT;
+        Vec3 goal = c.add(Math.cos(orbitAngle) * ORBIT, height + Math.sin(tickCount * 0.03) * 4, Math.sin(orbitAngle) * ORBIT);
         steer(goal, speed, 0.08);
+        if (--whipCooldown <= 0 && form() == 1 && playerNearTail(level)) {
+            whipCooldown = pace(70);
+            setState(TAIL_WHIP, WHIP_TICKS);
+            playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 2.0F, 1.6F);
+            return;
+        }
         if (target != null && --attackCooldown <= 0) {
             chooseAttack(level, target);
         }
     }
 
     private void chooseAttack(ServerLevel level, LivingEntity target) {
-        attackCooldown = pace(ATTACK_INTERVAL + random.nextInt(30));
+        attackCooldown = pace((form() == 3 ? 60 : form() == 2 ? 70 : ATTACK_INTERVAL) + random.nextInt(30));
         chained = false;
-        if (enraged() && random.nextFloat() < 0.3F) {
-            shedScales(level);
-            return;
+        int step = cycle++;
+        double dist = target.position().distanceTo(headCenter());
+        switch (form()) {
+            case 1 -> {
+                if (enraged() && step % 3 == 2) {
+                    shedScales(level);
+                } else if (step % 2 == 0) {
+                    startDive();
+                } else {
+                    startBreath();
+                }
+            }
+            case 2 -> {
+                if (dist < 9 && step % 2 == 1) {
+                    setState(BITE, BITE_TICKS);
+                    playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 2.5F, 1.4F);
+                    return;
+                }
+                switch (step % 4) {
+                    case 0 -> startDive();
+                    case 1 -> {
+                        setState(COIL, pace(COIL_TICKS));
+                        playSound(SinguloSounds.get("ergosphere_leviathan.coil"), 3.0F, 0.8F);
+                    }
+                    case 2 -> shedShards(level);
+                    default -> startBreath();
+                }
+            }
+            default -> {
+                switch (step % 4) {
+                    case 0 -> {
+                        setState(JET, JET_TICKS);
+                        entityData.set(JET_YAW, getYRot());
+                        playSound(SinguloSounds.get("ergosphere_leviathan.jet_charge"), 4.0F, 0.7F);
+                    }
+                    case 1 -> startDive();
+                    case 2 -> {
+                        setState(STORM, STORM_TICKS);
+                        playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 4.0F, 0.6F);
+                    }
+                    default -> startBreath();
+                }
+            }
         }
-        if (diveNext) {
-            setState(DIVE_WINDUP, pace(DIVE_WINDUP_TICKS));
-            playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 3.0F, 1.1F);
-        } else {
-            setState(BREATH_CHARGE, pace(BREATH_CHARGE_TICKS));
-            playSound(SinguloSounds.get("ergosphere_leviathan.breath_charge"), 3.0F, 0.8F);
-        }
-        diveNext = !diveNext;
+    }
+
+    private void startDive() {
+        setState(DIVE_WINDUP, pace(DIVE_WINDUP_TICKS));
+        playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 3.0F, 1.1F);
+    }
+
+    private void startBreath() {
+        setState(BREATH_CHARGE, pace(BREATH_CHARGE_TICKS));
+        playSound(SinguloSounds.get("ergosphere_leviathan.breath_charge"), 3.0F, 0.8F);
     }
 
     /** 突進の身構え: 相手の上の、部屋の外側寄りへ昇る。終わると狙いを決めて突進する。 */
@@ -484,40 +674,50 @@ public class ErgosphereLeviathan extends RuinBoss {
         if (ticks <= 1) {
             Vec3 at = target.getBoundingBox().getCenter();
             setAim(at);
-            velocity = at.subtract(head).normalize().scale(DIVE_SPEED);
+            velocity = at.subtract(head).normalize().scale(form() == 3 ? DIVE_SPEED * 1.15 : DIVE_SPEED);
             setState(DIVE, DIVE_TICKS);
             playSound(SinguloSounds.get("ergosphere_leviathan.dive"), 3.0F, 0.9F);
         }
     }
 
-    /** 突進: 狙った場所を一直線に突き抜ける。部屋の端か床に近づくか、狙いを大きく越えたら終わる。 */
+    /** 突進: 狙った場所を一直線に突き抜ける。部屋の端か床に近づくか、狙いを大きく越えたら終わる。龍は着地点に特異点を残す。 */
     private void tickDive(ServerLevel level, int ticks) {
         Vec3 aim = aim();
         Vec3 head = headCenter();
         moveBy(velocity);
         Vec3 c = arenaCenter();
         boolean past = head.subtract(aim).dot(velocity) > 0 && head.distanceTo(aim) > 6;
-        boolean edge = head.subtract(c).horizontalDistance() > ARENA - 6 || head.y < c.y + 1.5 || head.y > c.y + SWIM_HEIGHT + 12;
+        boolean floor = head.y < c.y + 1.5;
+        boolean edge = head.subtract(c).horizontalDistance() > ARENA - 6 || floor || head.y > c.y + SWIM_HEIGHT + 12;
         if (tickCount % 2 == 0) {
-            level.sendParticles(ParticleTypes.CLOUD, head.x, head.y, head.z, 3, 0.4, 0.4, 0.4, 0.02);
+            level.sendParticles(form() == 3 ? ParticleTypes.REVERSE_PORTAL : ParticleTypes.CLOUD, head.x, head.y, head.z, 3, 0.4, 0.4, 0.4, 0.02);
         }
         if (ticks <= 1 || past || edge) {
-            if (edge && head.y < c.y + 1.5) {
+            if (floor) {
                 // 床をかすめて舞い上がる（床に土煙）
                 level.sendParticles(ParticleTypes.EXPLOSION, head.x, c.y, head.z, 3, 1, 0.2, 1, 0);
                 velocity = new Vec3(velocity.x, Math.abs(velocity.y) * 0.6 + 0.2, velocity.z);
             }
+            if (form() == 3) {
+                level.addFreshEntity(new WardenSingularity(level, this, new Vec3(head.x, c.y + 1, head.z)));
+            }
             LivingEntity target = getTarget();
-            if (enraged() && !chained && target != null && challenger(target) && random.nextFloat() < (awakened() ? 0.7F : 0.5F)) {
+            float chain = form() >= 2 ? 0.7F : 0.4F;
+            if (enraged() && !chained && target != null && challenger(target) && random.nextFloat() < (awakened() ? chain + 0.15F : chain)) {
                 chained = true;
                 setState(DIVE_WINDUP, pace(14));
                 playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 2.5F, 1.3F);
             } else {
-                velocity = velocity.normalize().scale(swimSpeed());
-                orbitAngle = Math.atan2(head.z - c.z, head.x - c.x);
-                setState(SWIM, 0);
+                backToSwim();
             }
         }
+    }
+
+    private void backToSwim() {
+        Vec3 c = arenaCenter();
+        velocity = velocity.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0).scale(swimSpeed()) : velocity.normalize().scale(swimSpeed());
+        orbitAngle = Math.atan2(getZ() - c.z, getX() - c.x);
+        setState(SWIM, 0);
     }
 
     /** 渦の吐息のため: 止まって相手へ向き、口の渦で前にいる相手を吸い寄せる。 */
@@ -547,44 +747,374 @@ public class ErgosphereLeviathan extends RuinBoss {
         }
         if (ticks <= 1) {
             setAim(target.getBoundingBox().getCenter());
-            setState(BREATH_FIRE, BREATH_FIRE_TICKS);
+            setState(BREATH_FIRE, BREATH_FIRE_TICKS + (form() == 3 ? 12 : 0));
             playSound(SinguloSounds.get("ergosphere_leviathan.breath_fire"), 4.0F, 0.8F);
         }
     }
 
-    /** 渦の光線を吐く。体力半分からは、相手を追って少しずつ向きを変える。 */
+    /** 渦の光線を吐く。体力半分から（と龍）は、相手を追って向きを変える。 */
     private void tickBreathFire(ServerLevel level, @Nullable LivingEntity target, int ticks) {
         velocity = Vec3.ZERO;
         Vec3 mouth = mouth();
         Vec3 dir = aim().subtract(mouth).normalize();
         if ((enraged() || awakened()) && target != null) {
             Vec3 want = target.getBoundingBox().getCenter().subtract(mouth).normalize();
-            dir = dir.scale(0.95).add(want.scale(0.05)).normalize();
+            double follow = form() == 3 ? 0.09 : 0.05;
+            dir = dir.scale(1 - follow).add(want.scale(follow)).normalize();
         }
         face(dir);
-        Vec3 to = mouth.add(dir.scale(BREATH_RANGE));
-        HitResult hit = level.clip(new ClipContext(mouth, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-        Vec3 end = hit.getType() == HitResult.Type.MISS ? to : hit.getLocation();
+        Vec3 end = fireRay(level, mouth, dir, BREATH_RANGE, BREATH_WIDTH, BREATH_DAMAGE, ticks % 4 == 0);
         setAim(end);
-        if (ticks % 4 == 0) {
-            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(mouth, end).inflate(BREATH_WIDTH),
-                    e -> e.isAlive() && e != this && !RuinGuards.isGuard(e))) {
-                if (!e.getBoundingBox().inflate(BREATH_WIDTH / 2).clip(mouth, end).isEmpty()) {
-                    e.hurt(damageSources().indirectMagic(this, this), BREATH_DAMAGE);
-                }
-            }
-        }
         for (int i = 0; i <= 10; i++) {
             Vec3 q = mouth.lerp(end, i / 10.0);
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, q.x, q.y, q.z, 1, 0.2, 0.2, 0.2, 0.05);
         }
         if (ticks <= 1) {
             velocity = dir.scale(swimSpeed());
-            Vec3 c = arenaCenter();
-            orbitAngle = Math.atan2(getZ() - c.z, getX() - c.x);
+            backToSwim();
+        }
+    }
+
+    /** from から dir へ光線を通し、当たった相手を傷つける（damageNow のとき）。光線の終わりを返す。 */
+    private Vec3 fireRay(ServerLevel level, Vec3 from, Vec3 dir, double range, double width, float damage, boolean damageNow) {
+        Vec3 to = from.add(dir.scale(range));
+        HitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        Vec3 end = hit.getType() == HitResult.Type.MISS ? to : hit.getLocation();
+        if (damageNow) {
+            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(from, end).inflate(width),
+                    e -> e.isAlive() && e != this && !RuinGuards.isGuard(e))) {
+                if (!e.getBoundingBox().inflate(width / 2).clip(from, end).isEmpty()) {
+                    e.hurt(damageSources().indirectMagic(this, this), damage);
+                }
+            }
+        }
+        return end;
+    }
+
+    // ---- 装甲: 尾の薙ぎ払い
+
+    private boolean playerNearTail(ServerLevel level) {
+        for (Player p : challengers(level, ARENA + 4)) {
+            for (int i = SEGMENTS - 3; i < SEGMENTS; i++) {
+                if (p.distanceTo(parts[i]) < WHIP_RANGE) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** 尾の薙ぎ払い: 尾が光って身構え、少しあとで尾のまわりを大きく払う。 */
+    private void tickTailWhip(ServerLevel level, int ticks) {
+        steer(arenaCenter().add(Math.cos(orbitAngle) * ORBIT, SWIM_HEIGHT, Math.sin(orbitAngle) * ORBIT), swimSpeed() * 0.5, 0.05);
+        LeviathanSegment tail = parts[SEGMENTS - 1];
+        if (ticks > WHIP_STRIKE) {
+            level.sendParticles(ParticleTypes.END_ROD, tail.getX(), tail.getY() + 0.5, tail.getZ(), 2, 0.3, 0.3, 0.3, 0.02);
+            return;
+        }
+        if (ticks == WHIP_STRIKE) {
+            playSound(SinguloSounds.get("ergosphere_leviathan.whip"), 3.0F, 0.9F);
+            for (Player p : challengers(level, ARENA + 4)) {
+                for (int i = SEGMENTS - 3; i < SEGMENTS; i++) {
+                    if (p.distanceTo(parts[i]) < WHIP_RANGE) {
+                        if (p.hurt(damageSources().mobAttack(this), WHIP_DAMAGE)) {
+                            Vec3 k = p.position().subtract(parts[i].position()).multiply(1, 0, 1);
+                            k = k.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : k.normalize();
+                            p.push(k.x * 1.6, 0.6, k.z * 1.6);
+                            p.hurtMarked = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            level.sendParticles(ParticleTypes.SWEEP_ATTACK, tail.getX(), tail.getY() + 0.5, tail.getZ(), 6, 2, 0.5, 2, 0);
+        }
+        if (ticks <= 1) {
             setState(SWIM, 0);
         }
     }
+
+    // ---- 姿を変える
+
+    private void startTransform(ServerLevel level) {
+        stormMarks.clear();
+        stormTimers.clear();
+        if (form() == 1) {
+            setState(MOLT, MOLT_TICKS);
+            playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 4.0F, 0.6F);
+            broadcastLine(level, "gui.singulo.leviathan.molt");
+        } else {
+            setState(SUBMERGE, SUBMERGE_TICKS);
+            playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 4.0F, 0.5F);
+            broadcastLine(level, "gui.singulo.leviathan.submerge");
+        }
+    }
+
+    /** 脱皮: 部屋の真上へ昇って身を震わせ、鱗をすべて弾き飛ばす（当たると痛い）。光の骨格が現れる。 */
+    private void tickMolt(ServerLevel level, int ticks) {
+        Vec3 c = arenaCenter();
+        if (ticks > MOLT_BURST) {
+            steer(c.add(Math.cos(orbitAngle) * 5, SWIM_HEIGHT + 3, Math.sin(orbitAngle) * 5), 0.18, 0.12);
+            orbitAngle += 0.06;
+            if (ticks % 4 == 0) {
+                LeviathanSegment p = parts[random.nextInt(SEGMENTS)];
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, plate()), p.getX(), p.getY() + 1, p.getZ(),
+                        10, 0.6, 0.6, 0.6, 0.1);
+            }
+            return;
+        }
+        velocity = velocity.scale(0.8);
+        moveBy(velocity);
+        if (ticks == MOLT_BURST) {
+            entityData.set(FORM, 2);
+            BlockState plate = plate();
+            for (LeviathanSegment p : parts) {
+                for (int k = 0; k < 2; k++) {
+                    GravityDebris d = new GravityDebris(level, this, plate);
+                    d.setPos(p.getX(), p.getY() + p.getBbHeight() / 2, p.getZ());
+                    double a = random.nextDouble() * Math.PI * 2;
+                    d.shoot(Math.cos(a), 0.2 + random.nextDouble() * 0.6, Math.sin(a), 0.8F + random.nextFloat() * 0.5F, 4.0F);
+                    level.addFreshEntity(d);
+                }
+                level.sendParticles(ParticleTypes.FLASH, p.getX(), p.getY() + 1, p.getZ(), 1, 0, 0, 0, 0);
+                level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1, p.getZ(), 12, 0.5, 0.5, 0.5, 0.3);
+            }
+            playSound(SinguloSounds.get("ergosphere_leviathan.molt"), 5.0F, 0.8F);
+            for (Player p : challengers(level, 12)) {
+                if (p.distanceTo(this) < 10) {
+                    p.hurt(damageSources().mobAttack(this), MOLT_DAMAGE);
+                }
+            }
+        }
+        if (ticks <= 1) {
+            attackCooldown = 40;
+            backToSwim();
+        }
+    }
+
+    /** 再臨の前半: 炉心の渦へ頭から潜る（体も渦へ吸い込まれる）。 */
+    private void tickSubmerge(ServerLevel level, int ticks) {
+        Vec3 c = arenaCenter();
+        Vec3 head = headCenter();
+        Vec3 goal = c.add(0, -6, 0);
+        Vec3 to = goal.subtract(head);
+        double speed = Math.min(0.9, 0.3 + (SUBMERGE_TICKS - ticks) * 0.02);
+        velocity = to.lengthSqr() < 1e-4 ? Vec3.ZERO : to.normalize().scale(Math.min(speed, to.length()));
+        moveBy(velocity);
+        for (int i = 0; i < 6; i++) {
+            double a = random.nextDouble() * Math.PI * 2;
+            double r = 3 + random.nextDouble() * 6;
+            level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x + Math.cos(a) * r, c.y + random.nextDouble() * 2, c.z + Math.sin(a) * r,
+                    0, -Math.cos(a), -0.1, -Math.sin(a), 0.5);
+        }
+        if (ticks <= 1) {
+            setPos(c.x, c.y - 8, c.z);
+            setState(ASCEND, ASCEND_TICKS);
+            level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.rumble"), SoundSource.HOSTILE, 4.0F, 0.5F);
+        }
+    }
+
+    /** 再臨の後半: 静けさのあと、黒い龍となって炉心から真上へ噴き上がる。 */
+    private void tickAscend(ServerLevel level, int ticks) {
+        Vec3 c = arenaCenter();
+        int t = ASCEND_TICKS - ticks;
+        if (t < ASCEND_BURST) {
+            setPos(c.x, c.y - 8, c.z);
+            if (t % 2 == 0) {
+                level.sendParticles(ParticleTypes.END_ROD, c.x, c.y + 0.2, c.z, 6, 4, 0.1, 4, 0.05);
+            }
+            return;
+        }
+        if (t == ASCEND_BURST) {
+            entityData.set(FORM, 3);
+            bossBar.setName(Component.translatable(wyrmName()));
+            bossBar.setColor(BossEvent.BossBarColor.RED);
+            level.sendParticles(ParticleTypes.FLASH, c.x, c.y + 1, c.z, 3, 0.2, 0.2, 0.2, 0);
+            level.sendParticles(ParticleTypes.SONIC_BOOM, c.x, c.y + 1, c.z, 1, 0, 0, 0, 0);
+            level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y + 1, c.z, 1, 0, 0, 0, 0);
+            playSound(SinguloSounds.get("ergosphere_leviathan.ascend"), 5.0F, 0.7F);
+            broadcastLine(level, "gui.singulo.leviathan.ascend");
+            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(14), e -> e != this && !RuinGuards.isGuard(e))) {
+                Vec3 push = e.position().subtract(c).multiply(1, 0, 1);
+                if (push.lengthSqr() > 1e-4) {
+                    e.push(push.normalize().x * 1.4, 0.7, push.normalize().z * 1.4);
+                    e.hurtMarked = true;
+                }
+            }
+        }
+        double k = Math.min(1, (t - ASCEND_BURST) / 20.0);
+        Vec3 at = c.add(0, -6 + (SWIM_HEIGHT + 8) * Math.sqrt(k), 0);
+        Vec3 before = headCenter();
+        setPos(at.x, at.y - getBbHeight() / 2, at.z);
+        face(at.subtract(before).lengthSqr() < 1e-6 ? new Vec3(0, 1, 0) : at.subtract(before));
+        if (ticks <= 1) {
+            velocity = new Vec3(0.3, 0, 0);
+            attackCooldown = 30;
+            backToSwim();
+        }
+    }
+
+    // ---- 骨格: とぐろ・噛みつき・光の欠片
+
+    /** とぐろ: 部屋の中央で輪になって速く回る。まわりの相手は回る向きへ押し流され、内へ少し引かれる。節から光の欠片を撃つ。 */
+    private void tickCoil(ServerLevel level, int ticks) {
+        Vec3 c = arenaCenter();
+        orbitAngle += 0.11;
+        Vec3 goal = c.add(Math.cos(orbitAngle) * COIL_RADIUS, 4 + Math.sin(tickCount * 0.1), Math.sin(orbitAngle) * COIL_RADIUS);
+        steer(goal, 0.75, 0.35);
+        for (Player p : challengers(level, COIL_REACH + 2)) {
+            Vec3 off = p.position().subtract(c).multiply(1, 0, 1);
+            double d = off.length();
+            if (d > COIL_REACH || d < 1e-3) {
+                continue;
+            }
+            Vec3 tangent = new Vec3(-off.z, 0, off.x).normalize();
+            p.setDeltaMovement(p.getDeltaMovement().add(tangent.scale(0.07)).add(off.normalize().scale(-0.025)));
+            p.hurtMarked = true;
+        }
+        if (ticks % pace(10) == 0) {
+            List<Player> players = challengers(level, ARENA + 4);
+            if (!players.isEmpty()) {
+                fireShard(level, parts[random.nextInt(SEGMENTS)], players.get(random.nextInt(players.size())));
+            }
+        }
+        if (ticks <= 1) {
+            backToSwim();
+        }
+    }
+
+    /** 噛みつき: 顎を開いて身構え、相手へ飛びかかる。顎に捕まると傷つき、引き寄せられる。 */
+    private void tickBite(ServerLevel level, @Nullable LivingEntity target, int ticks) {
+        if (target == null) {
+            backToSwim();
+            return;
+        }
+        int t = BITE_TICKS - ticks;
+        if (t < BITE_WINDUP) {
+            velocity = velocity.scale(0.7);
+            steer(target.getEyePosition(), Math.max(0.05, velocity.length()), 0.4);
+            if (t == BITE_WINDUP - 1) {
+                setAim(target.getBoundingBox().getCenter());
+                velocity = aim().subtract(headCenter()).normalize().scale(0.95);
+            }
+            return;
+        }
+        moveBy(velocity);
+        Vec3 mouth = mouth();
+        for (Player p : challengers(level, ARENA + 4)) {
+            if (p.getBoundingBox().inflate(1.2).contains(mouth) && p.hurt(damageSources().mobAttack(this), BITE_DAMAGE)) {
+                p.setDeltaMovement(velocity.scale(0.8));
+                p.hurtMarked = true;
+                playSound(SinguloSounds.get("ergosphere_leviathan.swallow"), 2.5F, 1.2F);
+                ticks = 1;
+            }
+        }
+        if (ticks <= 1) {
+            backToSwim();
+        }
+    }
+
+    /** 光の欠片の雨: 体のあちこちから、挑戦者へ光の欠片を撃つ。 */
+    public int shedShards(ServerLevel level) {
+        List<Player> targets = challengers(level, ARENA + 4);
+        if (targets.isEmpty()) {
+            return 0;
+        }
+        int n = 6 + (awakened() ? 2 : 0);
+        for (int i = 0; i < n; i++) {
+            fireShard(level, parts[random.nextInt(SEGMENTS)], targets.get(random.nextInt(targets.size())));
+        }
+        playSound(SinguloSounds.get("ergosphere_leviathan.shed"), 3.0F, 1.3F);
+        return n;
+    }
+
+    private void fireShard(ServerLevel level, LeviathanSegment from, Player p) {
+        HorizonBolt bolt = new HorizonBolt(level, this).style(0x9FEFFF, 0.6F, SHARD_DAMAGE);
+        Vec3 at = from.position().add(0, from.getBbHeight() / 2, 0);
+        bolt.setPos(at);
+        Vec3 d = p.getEyePosition().subtract(at).normalize();
+        bolt.shoot(d.x, d.y + 0.05, d.z, 0.9F, 3.0F);
+        level.addFreshEntity(bolt);
+    }
+
+    // ---- 龍: 相対論的ジェット・降着の嵐
+
+    /** 相対論的ジェット: 部屋の上空で止まり、頭の両角から2本の光線を伸ばして、ゆっくり回しながら薙ぐ。 */
+    private void tickJet(ServerLevel level, @Nullable LivingEntity target, int ticks) {
+        Vec3 c = arenaCenter();
+        steer(c.add(0, SWIM_HEIGHT + 2, 0), 0.25, 0.2);
+        velocity = velocity.scale(0.7);
+        int t = JET_TICKS - ticks;
+        if (t < JET_WINDUP) {
+            if (target != null) {
+                Vec3 to = target.position().subtract(headCenter());
+                entityData.set(JET_YAW, (float) (Mth.atan2(-to.x, to.z) * Mth.RAD_TO_DEG) - 60);
+            }
+            return;
+        }
+        if (t == JET_WINDUP) {
+            playSound(SinguloSounds.get("ergosphere_leviathan.jet"), 5.0F, 0.8F);
+        }
+        float speed = awakened() ? 3.4F : 2.6F;
+        entityData.set(JET_YAW, jetYaw() + speed);
+        for (Vec3 dir : jetDirections(jetYaw())) {
+            Vec3 end = fireRay(level, headCenter(), dir, JET_RANGE, 1.4, JET_DAMAGE, ticks % 4 == 0);
+            if (ticks % 2 == 0) {
+                level.sendParticles(ParticleTypes.END_ROD, end.x, end.y, end.z, 3, 0.2, 0.2, 0.2, 0.05);
+            }
+        }
+        if (ticks <= 1) {
+            backToSwim();
+        }
+    }
+
+    /** 2本のジェットの向き（yaw の向きと、その反対。斜め下へ）。 */
+    public static Vec3[] jetDirections(float yaw) {
+        Vec3 a = Vec3.directionFromRotation(32, yaw);
+        Vec3 b = Vec3.directionFromRotation(32, yaw + 180);
+        return new Vec3[] {a, b};
+    }
+
+    /** 降着の嵐: 高く昇って速く回りながら、挑戦者の足元へ小さなブラックホールを降らせる（光の柱が前触れ）。 */
+    private void tickStorm(ServerLevel level, int ticks) {
+        orbitAngle += 0.05;
+        Vec3 c = arenaCenter();
+        steer(c.add(Math.cos(orbitAngle) * (ORBIT + 2), SWIM_HEIGHT + 6, Math.sin(orbitAngle) * (ORBIT + 2)), swimSpeed() * 1.4, 0.12);
+        if (ticks % pace(14) == 0) {
+            for (Player p : challengers(level, ARENA + 4)) {
+                stormMarks.add(p.position());
+                stormTimers.add(18);
+            }
+            playSound(SinguloSounds.get("ergosphere_leviathan.storm"), 2.5F, 1.0F);
+        }
+        if (ticks <= 1) {
+            backToSwim();
+        }
+    }
+
+    private void tickStormMarks(ServerLevel level) {
+        for (int i = stormMarks.size() - 1; i >= 0; i--) {
+            Vec3 m = stormMarks.get(i);
+            int left = stormTimers.get(i) - 1;
+            if (left % 2 == 0) {
+                level.sendParticles(ParticleTypes.END_ROD, m.x, m.y + 0.5 + random.nextDouble() * 6, m.z, 2, 0.1, 0.6, 0.1, 0.0);
+                for (int k = 0; k < 6; k++) {
+                    double a = k * Math.PI / 3 + left * 0.2;
+                    level.sendParticles(ParticleTypes.REVERSE_PORTAL, m.x + Math.cos(a) * WardenSingularity.RADIUS, m.y + 0.1,
+                            m.z + Math.sin(a) * WardenSingularity.RADIUS, 1, 0, 0, 0, 0);
+                }
+            }
+            if (left <= 0) {
+                level.addFreshEntity(new WardenSingularity(level, this, m.add(0, 1, 0)));
+                stormMarks.remove(i);
+                stormTimers.remove(i);
+            } else {
+                stormTimers.set(i, left);
+            }
+        }
+    }
+
+    // ---- 共通
 
     /** 鱗（炉殻の板）を剥がして、挑戦者へ降らせる。 */
     public int shedScales(ServerLevel level) {
@@ -623,7 +1153,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         if (tickCount % 2 != 0) {
             return;
         }
-        double push = enraged() ? WAKE_PUSH * 1.35 : WAKE_PUSH;
+        double push = WAKE_PUSH * (form() == 3 ? 1.6 : enraged() ? 1.35 : 1);
         for (Player p : challengers(level, ARENA + 4)) {
             Vec3 at = p.position().add(0, 1, 0);
             TrailPoint best = null;
@@ -656,7 +1186,7 @@ public class ErgosphereLeviathan extends RuinBoss {
     /** 体に触れた相手を傷つける（突進中は強く、はね飛ばす）。 */
     private void contactDamage(ServerLevel level) {
         boolean dive = state() == DIVE;
-        float damage = dive ? DIVE_DAMAGE : CONTACT_DAMAGE;
+        float damage = dive ? DIVE_DAMAGE : form() == 3 ? CONTACT_DAMAGE + 3 : CONTACT_DAMAGE;
         List<AABB> boxes = new ArrayList<>();
         boxes.add(getBoundingBox().inflate(0.2));
         for (LeviathanSegment p : parts) {
@@ -713,19 +1243,33 @@ public class ErgosphereLeviathan extends RuinBoss {
         setXRot(pitch);
     }
 
+    private void broadcastLine(ServerLevel level, String key) {
+        Component msg = Component.translatable(key);
+        for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(arenaCenter(), arenaCenter()).inflate(ARENA + 16))) {
+            p.displayClientMessage(msg, false);
+        }
+    }
+
+    /** 龍の姿のボスバーの名前。 */
+    private String wyrmName() {
+        return "entity.singulo.ergosphere_leviathan.wyrm" + (awakened() ? ".awakened" : "");
+    }
+
     // ------------------------------------------------------------------ 倒されたとき
 
     @Override
     public void die(DamageSource source) {
         super.die(source);
         setState(SWIM, 0);
+        stormMarks.clear();
+        stormTimers.clear();
         if (level() instanceof ServerLevel) {
             playSound(SinguloSounds.get("ergosphere_leviathan.death"), 4.0F, 0.9F);
         }
     }
 
     /**
-     * 倒されたときの演出: しばらく身をよじり、鱗を尾から剥がして降らせながら、螺旋を描いて炉心の渦へ沈む。
+     * 倒されたときの演出: しばらく身をよじり、体を尾から崩しながら、螺旋を描いて炉心の渦へ沈む。
      * 体は跡をなぞって渦へ吸い込まれ、最後に渦がつぶれて閃光と衝撃波を残す。
      */
     @Override
@@ -739,7 +1283,6 @@ public class ErgosphereLeviathan extends RuinBoss {
         }
         Vec3 core = arenaCenter();
         if (t <= DEATH_WRITHE) {
-            // 身をよじる（その場で頭を左右へ振る）
             Vec3 wob = new Vec3(Math.sin(t * 1.3) * 0.5, Math.cos(t * 0.9) * 0.3, Math.cos(t * 1.3) * 0.5);
             Vec3 at = deathStart.add(wob);
             setPos(at.x, at.y - getBbHeight() / 2, at.z);
@@ -756,13 +1299,16 @@ public class ErgosphereLeviathan extends RuinBoss {
             setPos(at.x, at.y - getBbHeight() / 2, at.z);
             face(at.subtract(head));
         }
-        // 鱗が尾から順に剥がれ落ちる
+        // 体が尾から順に崩れる
         int peel = SEGMENTS - 1 - (t - 4) / 7;
         if (t >= 4 && (t - 4) % 7 == 0 && peel >= 0 && peel < SEGMENTS) {
             LeviathanSegment p = parts[peel];
-            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, plate()), p.getX(), p.getY() + 1, p.getZ(),
-                    30, 0.8, 0.8, 0.8, 0.15);
-            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, p.getX(), p.getY() + 1, p.getZ(), 8, 0.5, 0.5, 0.5, 0.05);
+            if (form() == 1) {
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, plate()), p.getX(), p.getY() + 1, p.getZ(),
+                        30, 0.8, 0.8, 0.8, 0.15);
+            }
+            level.sendParticles(form() == 3 ? ParticleTypes.REVERSE_PORTAL : ParticleTypes.SOUL_FIRE_FLAME, p.getX(), p.getY() + 1, p.getZ(),
+                    10, 0.5, 0.5, 0.5, 0.05);
             level.playSound(null, p.blockPosition(), SinguloSounds.get("ergosphere_leviathan.shed"), SoundSource.HOSTILE, 1.5F, 1.2F);
         }
         if (t > DEATH_WRITHE && t % 2 == 0) {
@@ -777,7 +1323,6 @@ public class ErgosphereLeviathan extends RuinBoss {
             level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.implode"), SoundSource.HOSTILE, 4.0F, 0.7F);
         }
         if (t == DEATH_TICKS - 8) {
-            // 渦がつぶれて弾ける（ダメージはない）
             level.sendParticles(ParticleTypes.FLASH, core.x, core.y + 1, core.z, 3, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.SONIC_BOOM, core.x, core.y + 1, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, core.x, core.y + 1, core.z, 1, 0, 0, 0, 0);
@@ -812,20 +1357,26 @@ public class ErgosphereLeviathan extends RuinBoss {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putDouble("orbit", orbitAngle);
+        tag.putInt("form", form());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
+        loading = true;
+        try {
+            super.readAdditionalSaveData(tag);
+        } finally {
+            loading = false;
+        }
         orbitAngle = tag.getDouble("orbit");
+        entityData.set(FORM, Mth.clamp(tag.getInt("form"), 1, 3));
         if (home != null) {
             entityData.set(HOME, home);
         }
+        if (form() == 3 && !hasCustomName()) {
+            bossBar.setName(Component.translatable(wyrmName()));
+            bossBar.setColor(BossEvent.BossBarColor.RED);
+        }
         trail.clear();
-    }
-
-    /** 跡の古い点を、帯の描画用に順に返す（新しいものから）。 */
-    public Iterator<TrailPoint> trailIterator() {
-        return trail.iterator();
     }
 }

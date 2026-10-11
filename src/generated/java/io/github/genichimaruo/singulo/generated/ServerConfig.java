@@ -272,11 +272,11 @@ public final class ServerConfig {
         AWAKENED_WARDEN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedWardenHealthMultiplier", 2.5, 1.0, 20.0);
         b.comment("覚醒したホライズン・ウォーデンが与えるダメージの倍率", "範囲: 1.0〜10.0");
         AWAKENED_WARDEN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedWardenDamageMultiplier", 1.5, 1.0, 10.0);
-        b.comment("エルゴ球の鯨（沈んだ炉心区画のボス）のHP", "範囲: 1〜100,000");
+        b.comment("エルゴ球の大蛇（沈んだ炉心区画のボス）のHP", "範囲: 1〜100,000");
         LEVIATHAN_HEALTH_ = b.defineInRange("leviathanHealth", 1600, 1, 100000);
         b.comment("最後の記録者（隠しボス）のHP", "範囲: 1〜100,000");
         ARCHIVIST_HEALTH_ = b.defineInRange("archivistHealth", 2400, 1, 100000);
-        b.comment("覚醒した番人（残響の番人・重力の澱・エルゴ球の鯨の再戦）の体力の倍率", "範囲: 1.0〜20.0");
+        b.comment("覚醒した番人（残響の番人・重力の澱・エルゴ球の大蛇の再戦）の体力の倍率", "範囲: 1.0〜20.0");
         AWAKENED_GUARDIAN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedGuardianHealthMultiplier", 2.5, 1.0, 20.0);
         b.comment("覚醒した番人が与えるダメージの倍率", "範囲: 1.0〜10.0");
         AWAKENED_GUARDIAN_DAMAGE_MULTIPLIER_ = b.defineInRange("awakenedGuardianDamageMultiplier", 1.5, 1.0, 10.0);

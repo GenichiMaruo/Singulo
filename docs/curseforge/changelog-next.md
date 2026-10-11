@@ -12,14 +12,19 @@
     - Gravity Remnant: 1 Overclock Chip, 2 Degenerate Nuclei, 4 Exotic Matter.
   - Leave the room and the core is returned on top of the guardian core.
 - **New stage 5 ruin: Sunken Reactor Sector.** A spherical containment chamber deep underground where a second Penrose reactor died. Tune the explorer compass at a cleared Final Lab cache to find it. Its cache gives exotic matter, jet condensate, H-Condensate, crystal memories and sometimes an overclock chip.
-- **New boss: Ergosphere Leviathan.** A long serpent of reactor plates (head plus 12 body segments) that surfaces from the dead core.
-  - Its head takes normal damage, its body is armored (×0.6) and the glowing tail core is a weak point (×1.6).
-  - It swims laps above the floor and leaves an ergosphere wake that drags you along its path.
-  - Dive: it climbs above you, glows cyan, then charges straight through the marked spot.
-  - Vortex breath: it stops, pulls you toward its maw, then breathes a beam.
-  - Below half health it swims faster, chains dives and sheds armor plates at you.
-  - Emergence: a vortex opens in the core and the leviathan spirals out segment by segment. Death: it writhes, sheds its scales from the tail and sinks in a spiral into the vortex, which collapses in a flash.
+- **New boss: Ergosphere Leviathan.** A long serpent (head plus 12 body segments) that lives in the dead core. It has three forms and changes at 2/3 and 1/3 health, staying invulnerable while it transforms.
+  - Emergence: a vortex opens and a small serpent crawls out and swims around. Moments later colossal jaws burst from the floor beneath it, swallow it whole and spiral up into the room.
+  - Its wake drags you along its path, and the glowing tail core is always a weak point (×1.6).
+  - Armored form: reactor-plate scales and an armored body (×0.6). Dives through a marked spot, breathes a vortex beam after pulling you in, lashes anyone near its tail.
+  - Skeleton form: it blasts its scales away and becomes a skeleton of light that takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites at close range and chains its dives.
+  - Wyrm form: it dives into the vortex and erupts as a black wyrm with wings of accretion, light horns and a singularity tail. Relativistic jets sweep from its horns, it rains small black holes from above, and its dives leave singularities behind.
+  - Death: it writhes, crumbles from the tail and sinks in a spiral into the vortex, which collapses in a flash.
   - 1,600 health (`leviathanHealth`). Drops a Chapter of the Vortex, exotic matter and H-Condensate. An awakened rematch uses the new Awakened Ergosphere Core.
+- **Awakened guardians look different.**
+  - Echo Sentinel: a crimson crown, a large double halo, wings of light and burning blades.
+  - Gravity Remnant: glowing seams on its shell, a ring of crying obsidian and light spikes.
+  - Horizon Warden: an outer halo with rays, light horns and six violet wings.
+  - Ergosphere Leviathan: dorsal fins of light and crimson eyes.
 - **Hidden boss: The Last Archivist.** Awakened guardians now drop chapters of records (Echoes, Weight, Horizon; the leviathan drops the Vortex). Bind all four into a Terminus Record and use it on the Final Lab's seal console.
   - A divine figure in an ivory robe with a golden halo and six wings of light, whose head is an event horizon and whose hem dissolves into an accretion veil.
   - Revelation: judgment beams from the halo and falling singularities. Recollection (below 2/3): it recites the guardians' techniques. Ending (below 1/3): the halo turns black, its singularity pulls you in and it releases a nova that only the eye at its feet escapes.

@@ -664,7 +664,7 @@ def sunken_reactor():
     """
     沈んだ炉心区画（最も深い地下、段階5）: 旧文明が二基目のペンローズ炉を据えた球形の封じ込め室。点火の事故で炉は止まり、
     区画ごと岩の底へ沈んだ。床の中心には止まった炉心の跡（番人の封印核）、まわりに6本の封じ込め柱と途切れた足場の環。
-    宙には剥がれた炉殻の破片が止まっている。炉心の渦にはエルゴ球の鯨が眠り、北の壇の保管庫は力場で封鎖されている。
+    宙には剥がれた炉殻の破片が止まっている。炉心の渦にはエルゴ球の大蛇が眠り、北の壇の保管庫は力場で封鎖されている。
     南の通路から入る。
     """
     b = Builder(47, 36, 56, seed=505)
@@ -687,7 +687,7 @@ def sunken_reactor():
                         b.set(x, y, z, PANEL)
                     else:
                         b.set(x, y, z, AIR)
-    # 床の模様: 止まった炉心の台（中心）、光の環、警告の縞の環（鯨が泳ぐ下）
+    # 床の模様: 止まった炉心の台（中心）、光の環、警告の縞の環（大蛇が泳ぐ下）
     for x in range(47):
         for z in range(47):
             if b.get(x, FLOOR, z) != PANEL:
@@ -701,7 +701,7 @@ def sunken_reactor():
                 b.set(x, FLOOR, z, STRIPED)
             elif 14.5 <= d <= 15.2 and (x + z) % 3 == 0:
                 b.set(x, FLOOR, z, LAMP)
-    b.set(cx, FLOOR, cz, CORE)              # 番人の封印核（上は鯨が這い出すので空けておく）
+    b.set(cx, FLOOR, cz, CORE)              # 番人の封印核（上は大蛇が這い出すので空けておく）
     for dx, dz in ((-2, 0), (2, 0), (0, -2), (0, 2)):
         b.set(cx + dx, FLOOR + 1, cz + dz, 'minecraft:end_rod', {'facing': 'up'})
     # 6本の封じ込め柱（白い柱と光、上は鎖で天井へ）
@@ -722,7 +722,7 @@ def sunken_reactor():
             if 14.6 <= d <= 16.4 and not any(abs(a - g) < 9 for g in (35, 125, 215, 305)):
                 if b.get(x, FLOOR + 9, z) == AIR:
                     b.set(x, FLOOR + 9, z, *slab)
-    # 北の壇と保管庫（鯨を倒すまで力場で封鎖）
+    # 北の壇と保管庫（大蛇を倒すまで力場で封鎖）
     vz = cz - 14
     for x in range(cx - 3, cx + 4):
         for z in range(vz - 2, vz + 2):

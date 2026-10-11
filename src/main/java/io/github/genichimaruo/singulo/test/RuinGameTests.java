@@ -142,7 +142,7 @@ public final class RuinGameTests {
             helper.assertTrue(caches.size() == 1 && caches.get(0).nbt() != null
                     && ruin.equals(caches.get(0).nbt().getString("ruin")), "保管庫が1つ・遺構IDつきで入っていない: " + ruin);
             // 最終実験施設は警備機の代わりに守護機（封印コンソール）。研究棟・培養施設はボス部屋の封印核も持つ
-            // 沈んだ炉心区画は、部屋全体が鯨の泳ぐボス部屋なので警備機を置かない
+            // 沈んだ炉心区画は、部屋全体が大蛇の泳ぐボス部屋なので警備機を置かない
             boolean finalLab = ruin.equals("final_lab");
             helper.assertTrue(ruin.equals("sunken_reactor") || !template.get().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
                     finalLab ? SinguloBlocks.SEAL_CONSOLE.get() : SinguloBlocks.RUIN_GUARD_DOCK.get()).isEmpty(),

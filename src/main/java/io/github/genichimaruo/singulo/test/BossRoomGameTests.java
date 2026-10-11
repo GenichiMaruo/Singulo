@@ -444,14 +444,14 @@ public final class BossRoomGameTests {
         });
     }
 
-    // ------------------------------------------------------------------ エルゴ球の鯨（沈んだ炉心区画）
+    // ------------------------------------------------------------------ エルゴ球の大蛇（沈んだ炉心区画）
 
-    /** 沈んだ炉心区画の封印核は、エルゴ球の鯨を出現の演出つきで起こす。体は12節で、出現のあいだは傷つかない。 */
+    /** 沈んだ炉心区画の封印核は、エルゴ球の大蛇を出現の演出つきで起こす。体は12節で、出現のあいだは傷つかない。 */
     @GameTest(template = EMPTY, batch = BATCH + "_20", timeoutTicks = 40)
     public static void coreWakesLeviathanForSunkenReactor(GameTestHelper helper) {
         GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
         RuinBoss boss = core.awaken(helper.getLevel());
-        helper.assertTrue(boss instanceof ErgosphereLeviathan, "沈んだ炉心区画でエルゴ球の鯨が現れない: " + boss);
+        helper.assertTrue(boss instanceof ErgosphereLeviathan, "沈んだ炉心区画でエルゴ球の大蛇が現れない: " + boss);
         ErgosphereLeviathan l = (ErgosphereLeviathan) boss;
         helper.assertTrue(l.emergeTicks() == ErgosphereLeviathan.EMERGE_TICKS, "出現の演出が始まらない");
         helper.assertTrue(l.getParts().length == ErgosphereLeviathan.SEGMENTS, "体の節の数がおかしい: " + l.getParts().length);
@@ -518,15 +518,35 @@ public final class BossRoomGameTests {
         });
     }
 
-    /** 覚醒の渦核で、覚醒したエルゴ球の鯨（体力×2.5）が現れる。 */
+    /** 覚醒の渦核で、覚醒したエルゴ球の大蛇（体力×2.5）が現れる。 */
     @GameTest(template = EMPTY, batch = BATCH + "_24", timeoutTicks = 40)
     public static void ergosphereCoreSummonsAwakenedLeviathan(GameTestHelper helper) {
         GuardianCoreBlockEntity core = clearedRoom(helper, "sunken_reactor");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_ergosphere_core"));
-        helper.assertTrue(boss instanceof ErgosphereLeviathan && boss.awakened(), "覚醒の渦核で覚醒した鯨が現れない: " + boss);
+        helper.assertTrue(boss instanceof ErgosphereLeviathan && boss.awakened(), "覚醒の渦核で覚醒した大蛇が現れない: " + boss);
         double expected = ErgosphereLeviathan.HEALTH * RuinBoss.awakenedHealthMultiplier();
         helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
         boss.discard();
         helper.succeed();
+    }
+
+    /** 体力 2/3 で脱皮して骨格になる。一撃で境目を飛び越えず、脱皮のあいだは傷つかない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_25", timeoutTicks = 100)
+    public static void leviathanMoltsAtTwoThirds(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        l.hurt(helper.getLevel().damageSources().magic(), 100000);
+        helper.assertTrue(l.isAlive() && l.getHealth() >= l.getMaxHealth() * 2F / 3 - 0.1F, "一撃で装甲の姿を飛び越えた: " + l.getHealth());
+        helper.runAtTickTime(3, () -> {
+            helper.assertTrue(l.state() == ErgosphereLeviathan.MOLT && l.transforming(), "脱皮が始まらない: " + l.state());
+            l.invulnerableTime = 0;
+            helper.assertFalse(l.hurt(helper.getLevel().damageSources().magic(), 10), "脱皮の最中に傷ついた");
+        });
+        helper.runAtTickTime(ErgosphereLeviathan.MOLT_TICKS + 6, () -> {
+            helper.assertTrue(l.form() == 2 && !l.transforming(), "脱皮のあと骨格にならない: " + l.form());
+            l.discard();
+            helper.succeed();
+        });
     }
 }

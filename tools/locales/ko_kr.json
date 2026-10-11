@@ -57,7 +57,7 @@
   },
   "advancement.singulo.awakened_leviathan.description": {
     "source": "Defeat the Awakened Ergosphere Leviathan",
-    "translation": "각성한 에르고구의 고래를 쓰러뜨리세요"
+    "translation": "각성한 에르고구의 거대 뱀을 쓰러뜨리세요"
   },
   "advancement.singulo.awakened_leviathan.title": {
     "source": "The Vortex Wakes",
@@ -193,7 +193,7 @@
   },
   "advancement.singulo.leviathan.description": {
     "source": "Defeat the Ergosphere Leviathan",
-    "translation": "에르고구의 고래를 쓰러뜨리세요"
+    "translation": "에르고구의 거대 뱀을 쓰러뜨리세요"
   },
   "advancement.singulo.leviathan.title": {
     "source": "It Swims the Ergosphere",
@@ -1061,7 +1061,7 @@
   },
   "desc.singulo.awakening_ergosphere_core": {
     "source": "A Chapter of the Vortex spun up again with jet condensate and H-Condensate. Use it on the guardian core of a Sunken Reactor Sector to call the Awakened Ergosphere Leviathan: 2.5× health, 1.5× damage, faster swimming, chained dives and a breath that tracks you.",
-    "translation": "소용돌이의 단장에 제트 응축물과 호킹 응축물로 다시 회전을 불어넣은 핵입니다. 가라앉은 노심 구획의 수호자 봉인 핵에 사용하면 각성한 에르고구의 고래가 나타납니다. 체력 2.5배, 피해 1.5배, 더 빠르게 헤엄치고, 연속으로 돌진하며, 소용돌이 숨결이 당신을 쫓습니다."
+    "translation": "소용돌이의 단장에 제트 응축물과 호킹 응축물로 다시 회전을 불어넣은 핵입니다. 가라앉은 노심 구획의 수호자 봉인 핵에 사용하면 각성한 에르고구의 거대 뱀이 나타납니다. 체력 2.5배, 피해 1.5배, 더 빠르게 헤엄치고, 연속으로 돌진하며, 소용돌이 숨결이 당신을 쫓습니다."
   },
   "desc.singulo.awakening_gravity_core": {
     "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
@@ -1409,7 +1409,7 @@
   },
   "desc.singulo.ergosphere_chapter": {
     "source": "A passage of records that surfaces after the Ergosphere Leviathan sinks: the rest of the second reactor's log. Also used for the Awakened Ergosphere Core.",
-    "translation": "에르고구의 고래가 소용돌이 바닥으로 가라앉은 뒤 떠오르는 기록의 한 구절입니다. 두 번째 반응로 운전 기록의 뒷부분입니다. 각성의 소용돌이핵의 재료로도 쓰입니다."
+    "translation": "에르고구의 거대 뱀이 소용돌이 바닥으로 가라앉은 뒤 떠오르는 기록의 한 구절입니다. 두 번째 반응로 운전 기록의 뒷부분입니다. 각성의 소용돌이핵의 재료로도 쓰입니다."
   },
   "desc.singulo.ergosphere_ring": {
     "source": "Extracts exotic matter from a fast-spinning core.",
@@ -2105,11 +2105,19 @@
   },
   "entity.singulo.ergosphere_leviathan": {
     "source": "Ergosphere Leviathan",
-    "translation": "에르고구의 고래"
+    "translation": "에르고구의 거대 뱀"
   },
   "entity.singulo.ergosphere_leviathan.awakened": {
     "source": "Awakened Ergosphere Leviathan",
-    "translation": "각성한 에르고구의 고래"
+    "translation": "각성한 에르고구의 거대 뱀"
+  },
+  "entity.singulo.ergosphere_leviathan.wyrm": {
+    "source": "Ergosphere Wyrm",
+    "translation": "에르고구의 용"
+  },
+  "entity.singulo.ergosphere_leviathan.wyrm.awakened": {
+    "source": "Awakened Ergosphere Wyrm",
+    "translation": "각성한 에르고구의 용"
   },
   "entity.singulo.gravity_debris": {
     "source": "Gravity Debris",
@@ -2608,8 +2616,8 @@
     "translation": "기록 보관실의 메아리가 형체를 이루었다. 메아리 파수꾼이 나타났다"
   },
   "gui.singulo.guardian.awakened.ergosphere_leviathan": {
-    "source": "A vortex opens in the dead core. The Ergosphere Leviathan surfaces",
-    "translation": "멈춘 노심에 소용돌이가 열렸습니다. 에르고구의 고래가 떠오릅니다"
+    "source": "A vortex opens in the dead core. Something small crawls out...",
+    "translation": "멈춘 노심에 소용돌이가 열렸습니다. 무언가 작은 것이 기어 나옵니다……"
   },
   "gui.singulo.guardian.awakened.gravity_remnant": {
     "source": "The containment tank shatters. The Gravity Remnant crawls out",
@@ -2625,7 +2633,7 @@
   },
   "gui.singulo.guardian.awakened_rematch.ergosphere_leviathan": {
     "source": "The core resonates. The Awakened Ergosphere Leviathan tears through the vortex",
-    "translation": "각성핵이 공명합니다. 각성한 에르고구의 고래가 소용돌이를 찢고 나타납니다"
+    "translation": "각성핵이 공명합니다. 각성한 에르고구의 거대 뱀이 소용돌이를 찢고 나타납니다"
   },
   "gui.singulo.guardian.awakened_rematch.gravity_remnant": {
     "source": "The core resonates. The Awakened Gravity Remnant crawls out",
@@ -2637,7 +2645,7 @@
   },
   "gui.singulo.guardian.defeated.ergosphere_leviathan": {
     "source": "The Ergosphere Leviathan sinks into the vortex. The vault field dissipates",
-    "translation": "에르고구의 고래가 소용돌이 바닥으로 가라앉았습니다. 보관고의 역장이 사라졌습니다"
+    "translation": "에르고구의 거대 뱀이 소용돌이 바닥으로 가라앉았습니다. 보관고의 역장이 사라졌습니다"
   },
   "gui.singulo.guardian.defeated.gravity_remnant": {
     "source": "The Gravity Remnant collapses. The vault field dissipates",
@@ -2653,7 +2661,7 @@
   },
   "gui.singulo.guardian.reset.ergosphere_leviathan": {
     "source": "No challenger remains. The Ergosphere Leviathan returns to the core",
-    "translation": "도전자가 없어져 에르고구의 고래는 노심의 소용돌이로 돌아갔습니다"
+    "translation": "도전자가 없어져 에르고구의 거대 뱀은 노심의 소용돌이로 돌아갔습니다"
   },
   "gui.singulo.guardian.reset.gravity_remnant": {
     "source": "No challenger remains. The Gravity Remnant sinks back into its tank",
@@ -2714,6 +2722,22 @@
   "gui.singulo.handbook.title": {
     "source": "Singulo Handbook",
     "translation": "Singulo 핸드북"
+  },
+  "gui.singulo.leviathan.ascend": {
+    "source": "The vortex tears open. A light-eating black wyrm ascends on wings of accretion",
+    "translation": "소용돌이가 찢어졌습니다. 빛을 삼키는 검은 용이 강착의 날개를 펼치고 솟아오릅니다"
+  },
+  "gui.singulo.leviathan.molt": {
+    "source": "The Leviathan shudders. Its reactor-plate scales burst away, baring a skeleton of light",
+    "translation": "거대 뱀이 몸을 떱니다. 반응로 외피 비늘이 튕겨 나가고 빛의 골격이 드러났습니다"
+  },
+  "gui.singulo.leviathan.submerge": {
+    "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
+    "translation": "거대 뱀이 노심의 소용돌이로 잠수합니다. 소용돌이가 넓어지며 빛을 빨아들입니다……"
+  },
+  "gui.singulo.leviathan.swallow": {
+    "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
+    "translation": "――바닥이 갈라지고 거대한 턱이 그것을 통째로 삼켰습니다. 에르고구의 거대 뱀이 모습을 드러냈습니다"
   },
   "gui.singulo.make_free.off": {
     "source": "Skips recipes without ingredients",
@@ -3320,8 +3344,8 @@
     "translation": "유적"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it surfaces from the vortex. Its head takes normal damage, its body is armored and the glowing gold core in its tail is a weak point. Its wake drags you along the way it swam: ride the flow to keep up. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Below half health it sheds armor plates at you. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관함은 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나면 수호자는 원래대로 돌아갑니다.\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 씰 콘솔을 만지면 깨어납니다. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 수호자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다.\n- 에르고구의 고래(가라앉은 노심 구획): 구형 격납실 바닥의 멈춘 노심에 다가가면 소용돌이에서 떠오릅니다. 머리는 보통으로 피해를 받고, 몸통은 단단하며, 꼬리의 금빛으로 빛나는 핵이 약점입니다. 헤엄친 자리의 띠 안에서는 헤엄친 방향으로 떠밀리니, 흐름을 타고 쫓아가세요. 머리가 하늘색으로 빛나면 돌진 신호입니다(노려진 곳에서 벗어나세요). 아가리의 소용돌이가 열리면 정면에 서지 마세요(빨아들인 뒤 광선을 뿜습니다). 체력이 절반 아래가 되면 장갑판 비늘을 벗겨 떨어뜨립니다. 소용돌이의 단장을 떨어뜨립니다.\n- 각성한 수호자: 메아리 파수꾼이나 중력 잔재를 쓰러뜨린 뒤 방 바닥의 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하면 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠른 기술, 체력 65%에서 분노). 메아리 파수꾼은 분신과 광탄이 하나씩 늘고, 분노하면 부서진 투영기를 두 개까지 다시 투영합니다. 중력 잔재는 잔해를 더 많이 쏘고, 중력 우물이 넓어지며, 연속으로 내려찍습니다. 방을 떠나면 각성핵은 돌려받습니다."
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관함은 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나면 수호자는 원래대로 돌아갑니다.\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 씰 콘솔을 만지면 깨어납니다. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 수호자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다.\n- 에르고구의 거대 뱀(가라앉은 노심 구획): 구형 격납실 바닥의 멈춘 노심에 다가가면 나타납니다. 체력 2/3과 1/3에서 모습을 바꿉니다(바뀌는 동안은 피해를 받지 않습니다). 헤엄친 자리의 띠 안에서는 헤엄친 방향으로 떠밀리니, 흐름을 타고 쫓아가세요. 꼬리의 금빛으로 빛나는 핵은 언제나 약점입니다.\n  장갑: 반응로 외피 비늘을 두르고 몸통이 단단합니다. 머리가 하늘색으로 빛나면 돌진(노려진 곳에서 벗어나세요), 아가리의 소용돌이가 열리면 정면에 서지 마세요(빨아들인 뒤 광선). 꼬리 근처에 있으면 휩쓸립니다.\n  골격: 비늘을 모두 튕겨 내고(가까이 있으면 아픕니다) 빛의 골격이 됩니다. 몸통도 제대로 피해를 받습니다. 방 중앙에서 똬리를 틀고 돌며 주변을 떠밀고 빛의 파편을 쏩니다. 다가가면 물고, 돌진이 연달아 옵니다.\n  용: 노심의 소용돌이로 잠수했다가 검은 용이 되어 솟구칩니다. 두 뿔에서 도는 두 줄기 광선(상대론적 제트), 하늘을 돌며 발밑에 작은 블랙홀을 떨어뜨리는 폭풍(빛의 기둥이 전조), 돌진의 착지점에도 특이점이 남습니다. 소용돌이의 단장을 떨어뜨립니다.\n- 각성한 수호자: 메아리 파수꾼이나 중력 잔재를 쓰러뜨린 뒤 방 바닥의 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하면 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠른 기술, 체력 65%에서 분노). 메아리 파수꾼은 분신과 광탄이 하나씩 늘고, 분노하면 부서진 투영기를 두 개까지 다시 투영합니다. 중력 잔재는 잔해를 더 많이 쏘고, 중력 우물이 넓어지며, 연속으로 내려찍습니다. 방을 떠나면 각성핵은 돌려받습니다."
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3525,7 +3549,7 @@
   },
   "guide.singulo.stage5.endgame.body": {
     "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
-    "translation": "코어와 전력을 사용하면 쉴드, 티플러 원통, 웜홀과 같은 게임 후반 장치를 실행할 수 있습니다. 인공 항성 코어가 있으면 더 이상 네더의 별을 찾지 않아도 됩니다.\n진짜 싸움을 원한다면 특이점 캡슐화기에서 각성의 기록핵을 만들어 최종 실험 시설의 씰 콘솔에 사용하세요. 각성한 지평선 감시자는 체력 2.5배, 피해 1.5배입니다. 이기면 오버클럭 칩 등을 얻고, 몇 번이든 도전할 수 있습니다.\n연구동과 봉쇄 배양 시설의 수호자와도 재대결할 수 있습니다. 각 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하세요.\n최종 실험 시설을 공략했다면 탐색 나침반을 조정해 가라앉은 노심 구획을 찾아보세요. 멈춘 두 번째 반응로에 에르고구의 고래가 살고 있습니다.\n각성한 수호자들은 쓰러질 때 기록의 단장을 떨어뜨린다고 합니다. 단장을 모두 모으면 무엇을 읽을 수 있을까요?"
+    "translation": "코어와 전력을 사용하면 쉴드, 티플러 원통, 웜홀과 같은 게임 후반 장치를 실행할 수 있습니다. 인공 항성 코어가 있으면 더 이상 네더의 별을 찾지 않아도 됩니다.\n진짜 싸움을 원한다면 특이점 캡슐화기에서 각성의 기록핵을 만들어 최종 실험 시설의 씰 콘솔에 사용하세요. 각성한 지평선 감시자는 체력 2.5배, 피해 1.5배입니다. 이기면 오버클럭 칩 등을 얻고, 몇 번이든 도전할 수 있습니다.\n연구동과 봉쇄 배양 시설의 수호자와도 재대결할 수 있습니다. 각 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하세요.\n최종 실험 시설을 공략했다면 탐색 나침반을 조정해 가라앉은 노심 구획을 찾아보세요. 멈춘 두 번째 반응로에 에르고구의 거대 뱀이 살고 있습니다.\n각성한 수호자들은 쓰러질 때 기록의 단장을 떨어뜨린다고 합니다. 단장을 모두 모으면 무엇을 읽을 수 있을까요?"
   },
   "guide.singulo.stage5.endgame.title": {
     "source": "Beyond",
@@ -4537,7 +4561,7 @@
   },
   "item.singulo.ergosphere_leviathan_spawn_egg": {
     "source": "Ergosphere Leviathan Spawn Egg",
-    "translation": "에르고구의 고래 생성 알"
+    "translation": "에르고구의 거대 뱀 생성 알"
   },
   "item.singulo.ergosphere_ring": {
     "source": "Ergosphere Ring",
@@ -5609,7 +5633,11 @@
   },
   "subtitles.singulo.ergosphere_leviathan.ambient": {
     "source": "Ergosphere Leviathan sings",
-    "translation": "에르고구의 고래가 노래한다"
+    "translation": "에르고구의 거대 뱀이 노래한다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.ascend": {
+    "source": "The wyrm erupts",
+    "translation": "용이 솟구친다"
   },
   "subtitles.singulo.ergosphere_leviathan.breath_charge": {
     "source": "The maw draws in",
@@ -5619,17 +5647,25 @@
     "source": "Vortex breath fires",
     "translation": "소용돌이 숨결이 뿜어진다"
   },
+  "subtitles.singulo.ergosphere_leviathan.coil": {
+    "source": "The Leviathan coils",
+    "translation": "거대 뱀이 똬리를 튼다"
+  },
   "subtitles.singulo.ergosphere_leviathan.death": {
     "source": "Ergosphere Leviathan sinks",
-    "translation": "에르고구의 고래가 가라앉는다"
+    "translation": "에르고구의 거대 뱀이 가라앉는다"
   },
   "subtitles.singulo.ergosphere_leviathan.dive": {
     "source": "Ergosphere Leviathan dives",
-    "translation": "에르고구의 고래가 돌진한다"
+    "translation": "에르고구의 거대 뱀이 돌진한다"
   },
   "subtitles.singulo.ergosphere_leviathan.emerge": {
     "source": "A vortex opens in the core",
     "translation": "노심에 소용돌이가 열린다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.hatchling": {
+    "source": "Something small chirps",
+    "translation": "작은 것이 운다"
   },
   "subtitles.singulo.ergosphere_leviathan.hurt": {
     "source": "Scales grind",
@@ -5639,13 +5675,41 @@
     "source": "The vortex collapses",
     "translation": "소용돌이가 붕괴한다"
   },
+  "subtitles.singulo.ergosphere_leviathan.jet": {
+    "source": "Relativistic jets sweep",
+    "translation": "상대론적 제트가 휩쓴다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.jet_charge": {
+    "source": "Light gathers in the horns",
+    "translation": "뿔에 빛이 모인다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.molt": {
+    "source": "Scales burst away",
+    "translation": "비늘이 튕겨 나간다"
+  },
   "subtitles.singulo.ergosphere_leviathan.roar": {
     "source": "Ergosphere Leviathan roars",
-    "translation": "에르고구의 고래가 포효한다"
+    "translation": "에르고구의 거대 뱀이 포효한다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.rumble": {
+    "source": "Something stirs beneath the floor",
+    "translation": "바닥 아래서 무언가 꿈틀거린다"
   },
   "subtitles.singulo.ergosphere_leviathan.shed": {
     "source": "Scales shed",
     "translation": "비늘이 벗겨진다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.storm": {
+    "source": "Singularities rain",
+    "translation": "특이점이 쏟아진다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.swallow": {
+    "source": "Jaws snap shut",
+    "translation": "턱이 닫힌다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.whip": {
+    "source": "The tail lashes",
+    "translation": "꼬리가 휩쓴다"
   },
   "subtitles.singulo.fulgurite.form": {
     "source": "Sand fuses into fulgurite",

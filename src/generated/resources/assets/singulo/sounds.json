@@ -1028,6 +1028,96 @@
       }
     ]
   },
+  "ergosphere_leviathan.hatchling": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.hatchling",
+    "sounds": [
+      {
+        "name": "minecraft:entity.silverfish.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.rumble": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.rumble",
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.dig",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.swallow": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.swallow",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.attack",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.whip": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.whip",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.molt": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.molt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.zombie.break_wooden_door",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.coil": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.coil",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ender_dragon.flap",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.ascend": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.ascend",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wither.spawn",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.jet_charge": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.jet_charge",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.power_select",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.jet": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.jet",
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.sonic_boom",
+        "type": "event"
+      }
+    ]
+  },
+  "ergosphere_leviathan.storm": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.storm",
+    "sounds": [
+      {
+        "name": "minecraft:block.respawn_anchor.deplete",
+        "type": "event"
+      }
+    ]
+  },
   "last_archivist.emerge": {
     "subtitle": "subtitles.singulo.last_archivist.emerge",
     "sounds": [

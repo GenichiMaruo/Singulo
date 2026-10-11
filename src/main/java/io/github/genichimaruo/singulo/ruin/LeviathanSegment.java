@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.entity.PartEntity;
 
 /**
- * エルゴ球の鯨の体の一節（エンダードラゴンの部位と同じ作り）。当たり判定だけを持ち、受けたダメージは本体へ渡す。
+ * エルゴ球の大蛇の体の一節（エンダードラゴンの部位と同じ作り）。当たり判定だけを持ち、受けたダメージは本体へ渡す。
  * 位置は本体が毎 tick、頭の通った跡に沿って並べ直す。保存しない。
  */
 public class LeviathanSegment extends PartEntity<ErgosphereLeviathan> {

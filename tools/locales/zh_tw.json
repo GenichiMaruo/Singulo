@@ -57,7 +57,7 @@
   },
   "advancement.singulo.awakened_leviathan.description": {
     "source": "Defeat the Awakened Ergosphere Leviathan",
-    "translation": "擊敗覺醒的能層之鯨"
+    "translation": "擊敗覺醒的能層巨蛇"
   },
   "advancement.singulo.awakened_leviathan.title": {
     "source": "The Vortex Wakes",
@@ -193,7 +193,7 @@
   },
   "advancement.singulo.leviathan.description": {
     "source": "Defeat the Ergosphere Leviathan",
-    "translation": "擊敗能層之鯨"
+    "translation": "擊敗能層巨蛇"
   },
   "advancement.singulo.leviathan.title": {
     "source": "It Swims the Ergosphere",
@@ -1061,7 +1061,7 @@
   },
   "desc.singulo.awakening_ergosphere_core": {
     "source": "A Chapter of the Vortex spun up again with jet condensate and H-Condensate. Use it on the guardian core of a Sunken Reactor Sector to call the Awakened Ergosphere Leviathan: 2.5× health, 1.5× damage, faster swimming, chained dives and a breath that tracks you.",
-    "translation": "用噴射冷凝水和霍金凝聚體重新賦予旋轉的漩渦斷章。在沉沒的爐心區的守衛封印核心上使用，會召喚覺醒的能層之鯨：生命 2.5 倍、傷害 1.5 倍、游得更快、連續衝撞，漩渦吐息會追蹤你。"
+    "translation": "用噴射冷凝水和霍金凝聚體重新賦予旋轉的漩渦斷章。在沉沒的爐心區的守衛封印核心上使用，會召喚覺醒的能層巨蛇：生命 2.5 倍、傷害 1.5 倍、游得更快、連續衝撞，漩渦吐息會追蹤你。"
   },
   "desc.singulo.awakening_gravity_core": {
     "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
@@ -1409,7 +1409,7 @@
   },
   "desc.singulo.ergosphere_chapter": {
     "source": "A passage of records that surfaces after the Ergosphere Leviathan sinks: the rest of the second reactor's log. Also used for the Awakened Ergosphere Core.",
-    "translation": "能層之鯨沉入漩渦後浮現的一段記錄：第二座反應爐運轉記錄的後續。也用於覺醒渦核。"
+    "translation": "能層巨蛇沉入漩渦後浮現的一段記錄：第二座反應爐運轉記錄的後續。也用於覺醒渦核。"
   },
   "desc.singulo.ergosphere_ring": {
     "source": "Extracts exotic matter from a fast-spinning core.",
@@ -2105,11 +2105,19 @@
   },
   "entity.singulo.ergosphere_leviathan": {
     "source": "Ergosphere Leviathan",
-    "translation": "能層之鯨"
+    "translation": "能層巨蛇"
   },
   "entity.singulo.ergosphere_leviathan.awakened": {
     "source": "Awakened Ergosphere Leviathan",
-    "translation": "覺醒的能層之鯨"
+    "translation": "覺醒的能層巨蛇"
+  },
+  "entity.singulo.ergosphere_leviathan.wyrm": {
+    "source": "Ergosphere Wyrm",
+    "translation": "能層之龍"
+  },
+  "entity.singulo.ergosphere_leviathan.wyrm.awakened": {
+    "source": "Awakened Ergosphere Wyrm",
+    "translation": "覺醒的能層之龍"
   },
   "entity.singulo.gravity_debris": {
     "source": "Gravity Debris",
@@ -2608,8 +2616,8 @@
     "translation": "檔案室的回聲凝聚成形。回聲守衛現身了"
   },
   "gui.singulo.guardian.awakened.ergosphere_leviathan": {
-    "source": "A vortex opens in the dead core. The Ergosphere Leviathan surfaces",
-    "translation": "停止的爐心中張開了漩渦。能層之鯨浮了出來"
+    "source": "A vortex opens in the dead core. Something small crawls out...",
+    "translation": "停止的爐心中張開了漩渦。有什麼小東西爬了出來……"
   },
   "gui.singulo.guardian.awakened.gravity_remnant": {
     "source": "The containment tank shatters. The Gravity Remnant crawls out",
@@ -2625,7 +2633,7 @@
   },
   "gui.singulo.guardian.awakened_rematch.ergosphere_leviathan": {
     "source": "The core resonates. The Awakened Ergosphere Leviathan tears through the vortex",
-    "translation": "覺醒核發生共鳴。覺醒的能層之鯨撕裂漩渦現身了"
+    "translation": "覺醒核發生共鳴。覺醒的能層巨蛇撕裂漩渦現身了"
   },
   "gui.singulo.guardian.awakened_rematch.gravity_remnant": {
     "source": "The core resonates. The Awakened Gravity Remnant crawls out",
@@ -2637,7 +2645,7 @@
   },
   "gui.singulo.guardian.defeated.ergosphere_leviathan": {
     "source": "The Ergosphere Leviathan sinks into the vortex. The vault field dissipates",
-    "translation": "能層之鯨沉入了漩渦之底。寶庫的力場消失了"
+    "translation": "能層巨蛇沉入了漩渦之底。寶庫的力場消失了"
   },
   "gui.singulo.guardian.defeated.gravity_remnant": {
     "source": "The Gravity Remnant collapses. The vault field dissipates",
@@ -2653,7 +2661,7 @@
   },
   "gui.singulo.guardian.reset.ergosphere_leviathan": {
     "source": "No challenger remains. The Ergosphere Leviathan returns to the core",
-    "translation": "挑戰者已離開，能層之鯨回到了爐心的漩渦中"
+    "translation": "挑戰者已離開，能層巨蛇回到了爐心的漩渦中"
   },
   "gui.singulo.guardian.reset.gravity_remnant": {
     "source": "No challenger remains. The Gravity Remnant sinks back into its tank",
@@ -2714,6 +2722,22 @@
   "gui.singulo.handbook.title": {
     "source": "Singulo Handbook",
     "translation": "Singulo 手冊"
+  },
+  "gui.singulo.leviathan.ascend": {
+    "source": "The vortex tears open. A light-eating black wyrm ascends on wings of accretion",
+    "translation": "漩渦被撕裂了。吞噬光的黑龍展開吸積之翼升了上來"
+  },
+  "gui.singulo.leviathan.molt": {
+    "source": "The Leviathan shudders. Its reactor-plate scales burst away, baring a skeleton of light",
+    "translation": "巨蛇渾身顫抖。反應爐外殼的鱗片四散彈飛，露出了光之骨骼"
+  },
+  "gui.singulo.leviathan.submerge": {
+    "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
+    "translation": "巨蛇潛入了爐心的漩渦。漩渦擴張，光被吸了進去……"
+  },
+  "gui.singulo.leviathan.swallow": {
+    "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
+    "translation": "——地板裂開，巨大的顎將牠一口吞下。能層巨蛇現身了"
   },
   "gui.singulo.make_free.off": {
     "source": "Skips recipes without ingredients",
@@ -3320,8 +3344,8 @@
     "translation": "廢墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it surfaces from the vortex. Its head takes normal damage, its body is armored and the glowing gold core in its tail is a weak point. Its wake drags you along the way it swam: ride the flow to keep up. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Below half health it sheds armor plates at you. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "研究棟、封鎖培養設施和最終實驗設施的寶庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封鎖培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗設施）：觸碰中央的密封控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層之鯨（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會從漩渦中浮出。頭部受到正常傷害，軀幹堅硬，尾部發金光的核心是弱點。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。體力低於一半時會剝下裝甲板砸向你。掉落漩渦斷章。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "研究棟、封鎖培養設施和最終實驗設施的寶庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封鎖培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗設施）：觸碰中央的密封控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也能造成全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞的落點也會留下奇點。掉落漩渦斷章。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3525,7 +3549,7 @@
   },
   "guide.singulo.stage5.endgame.body": {
     "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
-    "translation": "有了核心和力量，你就可以運行遊戲後期的設備：護盾、T 型氣缸和蟲洞。人造星核讓你不必再尋找地獄之星。\n想要真正的戰鬥，就在奇點封裝器中製作覺醒記錄核，並在最終實驗室的密封控制台上使用：覺醒的視界守衛擁有 2.5 倍生命和 1.5 倍傷害。擊敗它可獲得超頻晶片等獎勵，可反覆挑戰。\n研究樓和封鎖培養設施的守衛也能再戰：在它們的守衛封印核心上使用覺醒回聲核或覺醒重力核即可。\n攻略最終實驗室後，調校探索羅盤去尋找沉沒的爐心區：能層之鯨棲息在停止的第二座反應爐中。\n據說覺醒的守衛倒下時會掉落記錄的斷章。集齊所有斷章後，能讀到什麼呢？"
+    "translation": "有了核心和力量，你就可以運行遊戲後期的設備：護盾、T 型氣缸和蟲洞。人造星核讓你不必再尋找地獄之星。\n想要真正的戰鬥，就在奇點封裝器中製作覺醒記錄核，並在最終實驗室的密封控制台上使用：覺醒的視界守衛擁有 2.5 倍生命和 1.5 倍傷害。擊敗它可獲得超頻晶片等獎勵，可反覆挑戰。\n研究樓和封鎖培養設施的守衛也能再戰：在它們的守衛封印核心上使用覺醒回聲核或覺醒重力核即可。\n攻略最終實驗室後，調校探索羅盤去尋找沉沒的爐心區：能層巨蛇棲息在停止的第二座反應爐中。\n據說覺醒的守衛倒下時會掉落記錄的斷章。集齊所有斷章後，能讀到什麼呢？"
   },
   "guide.singulo.stage5.endgame.title": {
     "source": "Beyond",
@@ -4537,7 +4561,7 @@
   },
   "item.singulo.ergosphere_leviathan_spawn_egg": {
     "source": "Ergosphere Leviathan Spawn Egg",
-    "translation": "能層之鯨生怪蛋"
+    "translation": "能層巨蛇生怪蛋"
   },
   "item.singulo.ergosphere_ring": {
     "source": "Ergosphere Ring",
@@ -5609,7 +5633,11 @@
   },
   "subtitles.singulo.ergosphere_leviathan.ambient": {
     "source": "Ergosphere Leviathan sings",
-    "translation": "能層之鯨在歌唱"
+    "translation": "能層巨蛇在歌唱"
+  },
+  "subtitles.singulo.ergosphere_leviathan.ascend": {
+    "source": "The wyrm erupts",
+    "translation": "龍噴湧而出"
   },
   "subtitles.singulo.ergosphere_leviathan.breath_charge": {
     "source": "The maw draws in",
@@ -5619,17 +5647,25 @@
     "source": "Vortex breath fires",
     "translation": "漩渦吐息射出"
   },
+  "subtitles.singulo.ergosphere_leviathan.coil": {
+    "source": "The Leviathan coils",
+    "translation": "巨蛇盤成一圈"
+  },
   "subtitles.singulo.ergosphere_leviathan.death": {
     "source": "Ergosphere Leviathan sinks",
-    "translation": "能層之鯨在下沉"
+    "translation": "能層巨蛇在下沉"
   },
   "subtitles.singulo.ergosphere_leviathan.dive": {
     "source": "Ergosphere Leviathan dives",
-    "translation": "能層之鯨衝撞"
+    "translation": "能層巨蛇衝撞"
   },
   "subtitles.singulo.ergosphere_leviathan.emerge": {
     "source": "A vortex opens in the core",
     "translation": "爐心中張開漩渦"
+  },
+  "subtitles.singulo.ergosphere_leviathan.hatchling": {
+    "source": "Something small chirps",
+    "translation": "小東西在鳴叫"
   },
   "subtitles.singulo.ergosphere_leviathan.hurt": {
     "source": "Scales grind",
@@ -5639,13 +5675,41 @@
     "source": "The vortex collapses",
     "translation": "漩渦坍縮"
   },
+  "subtitles.singulo.ergosphere_leviathan.jet": {
+    "source": "Relativistic jets sweep",
+    "translation": "相對論性噴流橫掃"
+  },
+  "subtitles.singulo.ergosphere_leviathan.jet_charge": {
+    "source": "Light gathers in the horns",
+    "translation": "光聚集在角上"
+  },
+  "subtitles.singulo.ergosphere_leviathan.molt": {
+    "source": "Scales burst away",
+    "translation": "鱗片彈飛"
+  },
   "subtitles.singulo.ergosphere_leviathan.roar": {
     "source": "Ergosphere Leviathan roars",
-    "translation": "能層之鯨咆哮"
+    "translation": "能層巨蛇咆哮"
+  },
+  "subtitles.singulo.ergosphere_leviathan.rumble": {
+    "source": "Something stirs beneath the floor",
+    "translation": "地板下有東西在蠕動"
   },
   "subtitles.singulo.ergosphere_leviathan.shed": {
     "source": "Scales shed",
     "translation": "鱗片剝落"
+  },
+  "subtitles.singulo.ergosphere_leviathan.storm": {
+    "source": "Singularities rain",
+    "translation": "奇點降下"
+  },
+  "subtitles.singulo.ergosphere_leviathan.swallow": {
+    "source": "Jaws snap shut",
+    "translation": "巨顎合上"
+  },
+  "subtitles.singulo.ergosphere_leviathan.whip": {
+    "source": "The tail lashes",
+    "translation": "尾巴橫掃"
   },
   "subtitles.singulo.fulgurite.form": {
     "source": "Sand fuses into fulgurite",
