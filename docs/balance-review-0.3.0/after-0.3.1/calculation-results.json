@@ -1,5 +1,5 @@
 {
-  "scope_commit": "b45f478819fa205091358a0f715edd9761d45862",
+  "scope_commit": "ff4c4e159ee5f6ffd27217074df42458b0b2b502",
   "baskets": {
     "1": {
       "熱電発電機": 8,
@@ -932,24 +932,51 @@
   "shells": {
     "1": {
       "rock_mass": 4860,
-      "copper_or_iron_ingots": 486,
+      "copper_or_iron_ingots": 243,
       "pressure_crystals": 4,
       "nitrogen_mb": 6000,
-      "compressor_minutes": 5.816666666666666
+      "compressor_minutes": 5.725
     },
-    "13": {
-      "rock_mass": 63180,
-      "copper_or_iron_ingots": 6318,
-      "pressure_crystals": 52,
-      "nitrogen_mb": 78000,
-      "compressor_minutes": 75.61666666666666
+    "7": {
+      "rock_mass": 34020,
+      "copper_or_iron_ingots": 1701,
+      "pressure_crystals": 28,
+      "nitrogen_mb": 42000,
+      "compressor_minutes": 40.075
     },
-    "14": {
-      "rock_mass": 68040,
-      "copper_or_iron_ingots": 6804,
-      "pressure_crystals": 56,
-      "nitrogen_mb": 84000,
-      "compressor_minutes": 81.43333333333334
+    "8": {
+      "rock_mass": 38880,
+      "copper_or_iron_ingots": 1944,
+      "pressure_crystals": 32,
+      "nitrogen_mb": 48000,
+      "compressor_minutes": 45.8
+    }
+  },
+  "shells_before_ignition": 7,
+  "time_crystals_integer": {
+    "pre_ignition": {
+      "modules": 6,
+      "running_stock": 4,
+      "direct_ingredient": 0,
+      "exotic_batches": 4,
+      "exotic_from_module_leftovers": 4,
+      "extra_for_exotic": 0,
+      "fresh_crystals": 10,
+      "seed_restores": 2,
+      "incubator_minutes": 124.0,
+      "fractional_model_crystals": 9
+    },
+    "first_core": {
+      "modules": 6,
+      "running_stock": 4,
+      "direct_ingredient": 1,
+      "exotic_batches": 4,
+      "exotic_from_module_leftovers": 4,
+      "extra_for_exotic": 0,
+      "fresh_crystals": 11,
+      "seed_restores": 2,
+      "incubator_minutes": 136.0,
+      "fractional_model_crystals": 10
     }
   },
   "penrose_efficiency": {
