@@ -1,0 +1,32 @@
+{
+  "scope_commit": "176ee06e5250e5a28e2669dfe733b227bf40d217",
+  "preset": "standard",
+  "fresh_lifetime_ticks": 54000,
+  "module_cost_ticks": 36000,
+  "modules_from_one_fresh_crystal": 1,
+  "required_modules_before_ignition": 6,
+  "pooled_lifetime_model_crystals_for_modules": 4,
+  "physical_crystals_needed_for_modules": 6,
+  "published_model": {
+    "crystal_batches": 9,
+    "incubator_and_seed_restore_minutes": 112.0
+  },
+  "example_with_four_separate_operating_crystals_and_reused_module_leftovers": {
+    "fresh_crystals": 10,
+    "growth_minutes": 120,
+    "seed_restore_minutes": 4,
+    "total_machine_minutes": 124,
+    "exotic_matter_batches": 4,
+    "exotic_matter_catalyst_ticks": 9600,
+    "six_module_crystals_leftover_ticks": 108000,
+    "exclusions": [
+      "generator catalyst consumption",
+      "exploration",
+      "wall-clock completion time"
+    ]
+  },
+  "integer_module_model_without_reusing_leftovers": {
+    "fresh_crystals": 11,
+    "total_machine_minutes": 136
+  }
+}

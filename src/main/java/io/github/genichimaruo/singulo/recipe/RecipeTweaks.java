@@ -3,6 +3,10 @@ package io.github.genichimaruo.singulo.recipe;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.data.Difficulty;
 import io.github.genichimaruo.singulo.generated.ServerConfig;
+import io.github.genichimaruo.singulo.item.CreativeCatalystItem;
+import io.github.genichimaruo.singulo.item.UsesHelper;
+import io.github.genichimaruo.singulo.item.UsesItem;
+import io.github.genichimaruo.singulo.machine.MachineType;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -58,6 +62,12 @@ public final class RecipeTweaks {
         return cached == DISABLED ? null : cached;
     }
 
+    /** 当てはめた結果をすぐに捨てる（試験で設定を書き換えたとき。ふだんは1秒ごとに設定の変化を見ている）。 */
+    public static synchronized void invalidate() {
+        CACHE.clear();
+        stamp = "";
+    }
+
     /** レシピの一覧に当てはめる（無効になったものは除く）。 */
     public static List<RecipeHolder<MachineRecipe>> adjustAll(Iterable<RecipeHolder<MachineRecipe>> holders) {
         List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
@@ -82,7 +92,10 @@ public final class RecipeTweaks {
                 + '|' + ServerConfig.ARTIFICIAL_STAR_CORE_JET_CONDENSATE.get() + '|' + ServerConfig.SPENT_RECYCLE_RATIO.get()
                 + '|' + ServerConfig.TIME_CRYSTAL_GROWTH_TICKS.get() + '|' + ServerConfig.SHELL_ROCK_LV3.get()
                 + '|' + ServerConfig.SHELL_METAL_CORES.get() + '|' + ServerConfig.SHELL_COOLANT_MB.get()
-                + '|' + ServerConfig.REACTOR_PLATES_PER_SHELL.get() + '|' + ServerConfig.SCULK_PER_SHARD.get();
+                + '|' + ServerConfig.REACTOR_PLATES_PER_SHELL.get() + '|' + ServerConfig.SCULK_PER_SHARD.get()
+                + '|' + ServerConfig.LIFETIME_MULTIPLIER.get() + '|' + ServerConfig.MUON_LIFETIME_MINUTES.get()
+                + '|' + ServerConfig.BOSE_LIFETIME_MINUTES.get() + '|' + ServerConfig.TIME_CRYSTAL_LIFETIME_MINUTES.get()
+                + '|' + ServerConfig.SINGULARITY_LIFETIME_MINUTES.get();
         if (!s.equals(stamp)) {
             stamp = s;
             CACHE.clear();
@@ -139,11 +152,17 @@ public final class RecipeTweaks {
                 Predicate<Ingredient> metal = accepts(item("compressed_metal_block_2"));
                 setCount(items, rock, Difficulty.compression(configured(ServerConfig.SHELL_ROCK_LV3, countOf(items, rock))));
                 setCount(items, metal, Difficulty.compression(configured(ServerConfig.SHELL_METAL_CORES, countOf(items, metal))));
-                setNitrogen(fluids, amount -> Difficulty.compression(configured(ServerConfig.SHELL_COOLANT_MB, amount)));
+                setNitrogen(fluids, amount -> fitTank(Difficulty.compression(configured(ServerConfig.SHELL_COOLANT_MB, amount))));
             }
             case "degenerate_compactor/degenerate_matter_shell_from_strange_matter" -> {
                 Predicate<Ingredient> metal = accepts(item("compressed_metal_block_2"));
                 setCount(items, metal, Difficulty.compression(configured(ServerConfig.SHELL_METAL_CORES, countOf(items, metal))));
+                // ストレンジ物質はすでに縮退しているので、冷却材は通常の殻の半分（設定 shellCoolantMb も半分に換算する）
+                setNitrogen(fluids, amount -> {
+                    int v = ServerConfig.SHELL_COOLANT_MB.get();
+                    int base = v == ServerConfig.SHELL_COOLANT_MB.getDefault() ? amount : (int) Math.round(v / 2.0);
+                    return fitTank(Difficulty.compression(base));
+                });
             }
             case "degenerate_compactor/reactor_shell" ->
                     result = result.copyWithCount(Math.max(1, configured(ServerConfig.REACTOR_PLATES_PER_SHELL, result.getCount())));
@@ -173,6 +192,26 @@ public final class RecipeTweaks {
             }
         }
 
+        // 触媒を寿命（使用回数）で使う材料は、設定とプリセットで変えた新品の寿命に比例させる（JSONは既定の寿命での値）。
+        // 新品の寿命を基準にするので、純度の低い・使いかけの触媒が安く使えるようにはならない
+        for (int i = 0; i < items.size(); i++) {
+            MachineRecipe.ItemInput in = items.get(i);
+            if (in.uses() <= 0) {
+                continue;
+            }
+            for (ItemStack s : in.ingredient().getItems()) {
+                if (s.getItem() instanceof UsesItem u && u.isCatalyst() && !(s.getItem() instanceof CreativeCatalystItem)) {
+                    int fresh = UsesHelper.baseMax(new ItemStack(u));
+                    int def = u.defaultMax();
+                    if (def > 0 && fresh != def) {
+                        int scaled = (int) Math.max(1, Math.min(fresh, Math.round((double) in.uses() * fresh / def)));
+                        items.set(i, new MachineRecipe.ItemInput(in.ingredient(), in.count(), scaled));
+                    }
+                    break;
+                }
+            }
+        }
+
         // 人工星核を使わせない設定なら、ネザースターの材料を本物のネザースターだけにする
         if (!ServerConfig.ALLOW_ARTIFICIAL_STAR_CORE.get()) {
             Item artificial = item("artificial_star_core");
@@ -190,6 +229,11 @@ public final class RecipeTweaks {
         }
         return new MachineRecipe(r.station(), r.stage(), time, r.energy(), List.copyOf(items), List.copyOf(fluids), r.mass(),
                 r.restore(), result, r.fluidResults(), r.minSize(), r.priority());
+    }
+
+    /** 液体の材料は装置のタンク（{@link MachineType#TANK_CAPACITY}）1つに収まる量まで（超えると加工が始まらない）。 */
+    private static int fitTank(int amount) {
+        return Math.min(amount, MachineType.TANK_CAPACITY);
     }
 
     private static int countOf(List<MachineRecipe.ItemInput> items, Predicate<Ingredient> which) {

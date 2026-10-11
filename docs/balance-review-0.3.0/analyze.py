@@ -1,15 +1,27 @@
 #!/usr/bin/env python3
 """Reproduce the static balance model. Python 3.10+; plots require matplotlib.
-Run: MPLCONFIGDIR=/tmp/singulo-mpl python docs/balance-review-0.3.0/analyze.py
-No source/gameplay files are changed. Resource model is a construction BOM,
-not a survival completion simulation; see README.md for exclusions.
+
+Current source (writes after-0.3.1/ next to this file):
+    MPLCONFIGDIR=/tmp/singulo-mpl python docs/balance-review-0.3.0/analyze.py
+The 0.3.0 evaluation (b45f478) from a separate checkout, without touching the current results:
+    git worktree add /tmp/singulo-030 b45f478
+    python docs/balance-review-0.3.0/analyze.py --root /tmp/singulo-030 --out docs/balance-review-0.3.0
+Every value (shell recipe, generator output, catalyst lifetime) is read from the checkout given by --root,
+and scope_commit records that checkout's commit. No source/gameplay files are changed. Resource model is a
+construction BOM, not a survival completion simulation; see README.md for exclusions.
 """
 from pathlib import Path
 from collections import Counter, defaultdict
 from fractions import Fraction as F
-import sys, math, json, csv, re, copy
+import sys, math, json, csv, re, copy, argparse, subprocess
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
+_ap = argparse.ArgumentParser()
+_ap.add_argument('--root', default=str(HERE.parents[1]), help='checkout whose tools/ and generated data are analysed')
+_ap.add_argument('--out', default=str(HERE/'after-0.3.1'), help='directory for the generated results')
+_args = _ap.parse_args()
+ROOT = Path(_args.root).resolve()
+OUT = Path(_args.out).resolve()
+OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(ROOT/'tools'))
 from recipes import RECIPES, MILESTONES, RESTORED, REPAIR, EXPLORE
 from ids import MOD, STATIONS, OUTPUT_ALIASES
@@ -94,13 +106,50 @@ for name, recipe in RECIPES.items():
 assert RECIPES['基礎回路']['inputs']['銅インゴット']==2 # shaped override matters
 assert RECIPES['縮退物質殻']['inputs']['圧縮ブロックLv3']==4
 assert RECIPES['時間結晶触媒']['t']==720
-assert len(blocked)>=4
+# Shell numbers come from the analysed recipes (plates per shell, metal cores), not from constants.
+_shell = RECIPES['縮退物質殻']['inputs']; _pre = RECIPES['縮退前駆体']['inputs']
+LV3, PRE, METAL = _shell['圧縮ブロックLv3'], _shell['縮退前駆体'], _shell['金属圧縮ブロックLv2']
+LV2_PER_PRE = _pre['圧縮ブロックLv2']; COOLANT = _shell['液体窒素']
+PLATES = RECIPES['炉殻ブロック']['out']
+REACTOR_PLATES = 133    # P-Reactor 120 shells + 12 stabilizer coils + 1 for the singularity encapsulator
+SHELLS_PRE = math.ceil(REACTOR_PLATES / PLATES) + 1        # + the singularity seed
 shells={}
-for n in [1,13,14]:
-    rock=n*(4*729+4*6*81); metal_mass=n*2*81
-    compressor_seconds=n*((4*81+4*6*9)*.5+(4*9+4*6)*1+4*2+2*9*.5+2*1)
-    shells[n]={'rock_mass':rock,'copper_or_iron_ingots':metal_mass*3,'pressure_crystals':4*n,
-        'nitrogen_mb':6000*n,'compressor_minutes':compressor_seconds/60}
+for n in [1, SHELLS_PRE, SHELLS_PRE + 1]:
+    rock=n*(LV3*729+PRE*LV2_PER_PRE*81); metal_mass=n*METAL*81
+    compressor_seconds=n*((LV3*81+PRE*LV2_PER_PRE*9)*.5+(LV3*9+PRE*LV2_PER_PRE)*1+LV3*2+METAL*9*.5+METAL*1)
+    shells[n]={'rock_mass':rock,'copper_or_iron_ingots':metal_mass*3,'pressure_crystals':PRE*n,
+        'nitrogen_mb':COOLANT*n,'compressor_minutes':compressor_seconds/60}
+
+# Time crystals as individual catalysts (SNG-026). The BOM above treats lifetime as a fractional stock, but a
+# leftover piece of one crystal cannot be combined with another. Here every module needs its own fresh crystal,
+# the basket's running catalysts are kept aside, leftovers of module crystals serve small per-batch uses
+# (exotic matter), and the rest needs extra fresh crystals.
+def crystal_accounting(stage):
+    ss = snapshots[stage]['batches']
+    fresh = 45*60*20
+    seed_uses = EXPLORE['劣化した時間結晶の種']['uses']
+    growth_min = RECIPES['時間結晶触媒']['t']/60
+    restore_min = REPAIR['劣化した時間結晶の種']['t']/60
+    modules = ss.get('時間結晶モジュール', 0)
+    module_uses = int(RECIPES['時間結晶モジュール']['inputs']['時間結晶触媒']*fresh) if '時間結晶モジュール' in RECIPES else fresh
+    running = sum(b.get('時間結晶触媒', 0) for s2, b in stages.items() if s2 <= stage)
+    direct = 0
+    for name, r in RECIPES.items():
+        q = r['inputs'].get('時間結晶触媒')
+        if q is not None and F(q).denominator == 1 and name != '時間結晶モジュール':
+            direct += ss.get(name, 0)*int(q)
+    exotic_uses = int(RECIPES['エキゾチック物質']['inputs']['時間結晶触媒']*fresh)
+    exotic = ss.get('エキゾチック物質', 0)
+    per_leftover = (fresh - module_uses)//exotic_uses if modules else 0
+    from_leftovers = min(exotic, modules*per_leftover)
+    extra = math.ceil((exotic - from_leftovers)/(fresh//exotic_uses))
+    crystals = modules + running + direct + extra
+    restores = math.ceil(crystals/seed_uses)
+    return {'modules': modules, 'running_stock': running, 'direct_ingredient': direct, 'exotic_batches': exotic,
+            'exotic_from_module_leftovers': from_leftovers, 'extra_for_exotic': extra, 'fresh_crystals': crystals,
+            'seed_restores': restores, 'incubator_minutes': crystals*growth_min + restores*restore_min,
+            'fractional_model_crystals': ss.get('時間結晶触媒', 0)}
+crystals_integer = {'pre_ignition': crystal_accounting(5), 'first_core': crystal_accounting(6)}
 
 # Tick simulation of Penrose run() in an isolated, continuously loaded reactor.
 # Applies feed, evaporation, spin injection and output. No entities, time fields, or dark matter.
@@ -128,21 +177,35 @@ def simulate(load, target, seconds=1800, fuel=True):
     return rows
 sims={'no_fuel':simulate(0,0,fuel=False), 'auto_idle':simulate(0,0), 'full_load':simulate(2.1e9,1)}
 
+try:
+    scope_commit = subprocess.run(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip()
+    if subprocess.run(['git', '-C', str(ROOT), 'status', '--porcelain', '--', 'tools', 'src/generated'],
+                      capture_output=True, text=True).stdout.strip():
+        scope_commit += '+uncommitted'
+except (OSError, subprocess.CalledProcessError):
+    scope_commit = 'unknown'
+import config_spec
+_cfg = {k: d for _, k, d, _, _ in config_spec.SERVER}
+def cfg_num(key, fallback):
+    return float(_cfg[key]) if key in _cfg else fallback
+lower = cfg_num('generatorLowerTierOutput', 0.5)
+QUANTUM = cfg_num('quantumEngineOutput', 200000); FURNACE = cfg_num('degenerateFurnaceOutput', 20000000)
 java=(ROOT/'src/main/java').rglob('*.java')
 all_java='\n'.join(p.read_text() for p in java)
 config=(ROOT/'src/generated/java/io/github/genichimaruo/singulo/generated/ServerConfig.java').read_text()
 constants=re.findall(r'public static final ModConfigSpec\.\w+(?:<[^>]+>)? (\w+);',config)
 unused=[c for c in constants if not re.search(r'\bServerConfig\.'+c+r'\b',all_java)]
-result={'scope_commit':'b45f478819fa205091358a0f715edd9761d45862','baskets':stages,'cumulative':snapshots,'verified_generated_item_recipe_tuples':len(verified_tuples),
+result={'scope_commit':scope_commit,'baskets':stages,'cumulative':snapshots,'verified_generated_item_recipe_tuples':len(verified_tuples),
         'blocked_recipes':blocked,'config_no_main_java_reference':unused,'shells':shells,
+        'shells_before_ignition':SHELLS_PRE,'time_crystals_integer':crystals_integer,
         'penrose_efficiency':{a:efficiency(a) for a in [0,.5,.9,.99,1]},
         'simulation_final':{k:v[-1] for k,v in sims.items()}}
-(HERE/'calculation-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-with (HERE/'resource-costs.csv').open('w',newline='') as f:
+(OUT/'calculation-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+with (OUT/'resource-costs.csv').open('w',newline='') as f:
     w=csv.writer(f); w.writerow(['stage','resource','cumulative_quantity','unit_note'])
     for s,ss in snapshots.items():
         for n,v in sorted(ss['raw'].items()): w.writerow([s,n,v,'fractional originals=use equivalent; ceil for new originals'])
-with (HERE/'penrose-simulation.csv').open('w',newline='') as f:
+with (OUT/'penrose-simulation.csv').open('w',newline='') as f:
     w=csv.DictWriter(f,fieldnames=['scenario',*sims['no_fuel'][0]])
     w.writeheader()
     for k,rows in sims.items():
@@ -155,28 +218,35 @@ for n in ['鉄インゴット','銅インゴット','石炭','ネザー水晶','
 lines+=['','| 累計加工負荷（分・台） | T1 | T2 | T3 | T4 | 点火前 | 初コア後 |','|---|---:|---:|---:|---:|---:|---:|']
 for station in ['圧縮機','極低温冷却塔','レーザー冷却器','量子もつれ合成器','時間結晶育成槽','縮退圧縮炉','精密組立台','アーカイブ端末']:
     lines.append('| '+station+' | '+' | '.join(f"{snapshots[s]['machine_minutes'].get(station,0):,.1f}" for s in snapshots)+' |')
-(HERE/'calculation-tables.md').write_text('\n'.join(lines)+'\n')
-print(json.dumps({'blocked':blocked,'shells':shells,'sim_final':result['simulation_final'],'unused_config':unused},ensure_ascii=False,indent=2))
+lines+=['','| 時間結晶（個体で数える） | 点火前 | 初コア後 |','|---|---:|---:|']
+for k,label in [('modules','モジュール'),('running_stock','運転用に確保'),('direct_ingredient','材料として1個ずつ'),
+                ('exotic_batches','エキゾチック物質のバッチ'),('exotic_from_module_leftovers','うちモジュールの残り寿命で賄う'),
+                ('fresh_crystals','新品の時間結晶'),('fractional_model_crystals','（参考）寿命を合算したモデル'),
+                ('seed_restores','種の復元'),('incubator_minutes','育成＋復元（分・台）')]:
+    lines.append(f'| {label} | {crystals_integer["pre_ignition"][k]:,.0f} | {crystals_integer["first_core"][k]:,.0f} |')
+lines.insert(2, f'入力: `{scope_commit}`')
+(OUT/'calculation-tables.md').write_text('\n'.join(lines)+'\n')
+print(json.dumps({'scope_commit':scope_commit,'crystals_integer':crystals_integer,'blocked':blocked,'shells':shells,'sim_final':result['simulation_final'],'unused_config':unused},ensure_ascii=False,indent=2))
 
 try:
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     plt.rcParams.update({'font.family':'DejaVu Sans','font.size':10,'axes.spines.top':False,'axes.spines.right':False})
-    assets=HERE/'assets'; assets.mkdir(exist_ok=True)
+    assets=OUT/'assets'; assets.mkdir(exist_ok=True)
     fig,ax=plt.subplots(figsize=(10,4.6))
     labels=['T1 stable\nTEG x8','T2 cryo\nx2 (gross)','T3 muon\nbridge','T3 Bose','T4 Bose\nbridge','T4 time\ncrystal','T5 fresh\na=0','T5 max\na=1']
-    vals=[8*75.7,10000,100000,200000,10000000,20000000,500/1000/20*20e9*efficiency(0),2.1e9]
+    vals=[8*75.7,10000,QUANTUM*lower,QUANTUM,FURNACE*lower,FURNACE,500/1000/20*20e9*efficiency(0),2.1e9]
     ax.bar(labels,vals,color=['#648fff']*2+['#dc9d3a','#648fff','#dc9d3a','#648fff','#785ef0','#785ef0'])
     ax.set_yscale('log'); ax.set_ylabel('FE/t (log scale; gross output)'); ax.set_title('Power progression: large gains before matching-tier catalysts')
     for i,v in enumerate(vals): ax.text(i,v*1.25,f'{v:,.0f}',ha='center',fontsize=9)
     ax.set_ylim(100,1e10);fig.tight_layout();fig.savefig(assets/'power-progression.png',dpi=160);plt.close(fig)
     fig,axes=plt.subplots(1,2,figsize=(11,4.4))
     ns=[1,4,8,12,16]
-    axes[0].bar([str(x) for x in ns],[shells[13]['compressor_minutes']/x for x in ns],color='#648fff')
-    axes[0].set_xlabel('Compressors (ideal load balancing)'); axes[0].set_ylabel('Minutes'); axes[0].set_title('Pre-ignition: 13 shells, compression only')
-    axes[1].bar(['100/min','300/min','600/min','1200/min'],[shells[13]['rock_mass']/x/60 for x in [100,300,600,1200]],color='#dc9d3a')
-    axes[1].set_xlabel('Rock acquisition rate (assumption)');axes[1].set_ylabel('Hours');axes[1].set_title('Pre-ignition: 63,180 rock-equivalent blocks')
+    axes[0].bar([str(x) for x in ns],[shells[SHELLS_PRE]['compressor_minutes']/x for x in ns],color='#648fff')
+    axes[0].set_xlabel('Compressors (ideal load balancing)'); axes[0].set_ylabel('Minutes'); axes[0].set_title(f'Pre-ignition: {SHELLS_PRE} shells, compression only')
+    axes[1].bar(['100/min','300/min','600/min','1200/min'],[shells[SHELLS_PRE]['rock_mass']/x/60 for x in [100,300,600,1200]],color='#dc9d3a')
+    axes[1].set_xlabel('Rock acquisition rate (assumption)');axes[1].set_ylabel('Hours');axes[1].set_title(f"Pre-ignition: {shells[SHELLS_PRE]['rock_mass']:,} rock-equivalent blocks")
     fig.tight_layout();fig.savefig(assets/'bottlenecks.png',dpi=160);plt.close(fig)
     fig,axes=plt.subplots(1,2,figsize=(11,4.5))
     for k,c,label in [('no_fuel','#648fff','No fuel'),('auto_idle','#dc9d3a','Auto feed, no load'),('full_load','#785ef0','Auto feed, max load/spin')]:

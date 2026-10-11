@@ -1,0 +1,7 @@
+allprojects {
+    afterEvaluate {
+        def reviewRoot = rootProject.file('docs/merge-review-176ee06/repro')
+        sourceSets.main.java.srcDir(new File(reviewRoot, 'java'))
+        sourceSets.main.resources.srcDir(new File(reviewRoot, 'resources'))
+    }
+}

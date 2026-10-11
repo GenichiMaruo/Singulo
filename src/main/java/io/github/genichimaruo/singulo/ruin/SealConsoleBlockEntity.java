@@ -110,10 +110,14 @@ public class SealConsoleBlockEntity extends BlockEntity {
             tell(player, "gui.singulo.console.active");
             return null;
         }
-        if (vault(level) == null) {
+        RuinCacheBlockEntity vault = vault(level);
+        if (vault == null) {
             tell(player, "gui.singulo.console.no_vault");
             return null;
         }
+        // 通常戦と同じく、中身の再生期限が過ぎていればここで入れ直して封鎖を確定させる（勝てばその封鎖が解ける）。
+        // これをしないと、勝ったあとに保管庫を開こうとした時点で入れ直しが起きて、また封鎖されてしまう
+        vault.refillIfDue(level, level.getGameTime());
         HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level);
         if (w == null) {
             return null;

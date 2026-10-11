@@ -38,10 +38,13 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     private java.util.UUID owner;
 
     /**
-     * 持ち主ごとの、チャンクを読み込み中のアンカー（ディメンションと位置）。上限に達した持ち主の新しいアンカーは
-     * 動き出さない（先に動き出したものが優先。止める・壊す・触媒が切れると枠が空く）。
+     * 持ち主ごとの、チャンクを読み込み中のアンカー（ディメンションと位置 → 動き出したゲーム時刻）。上限に達した持ち主の
+     * 新しいアンカーは動き出さない。上限を下げたときは、動き出した時刻の遅いもの（同時なら位置の順）から止める。
+     * 止める・壊す・触媒が切れると枠が空く。動き出した時刻は保存するので、再起動しても同じものが残る。
      */
-    private static final java.util.Map<java.util.UUID, java.util.Set<String>> ACTIVE = new java.util.HashMap<>();
+    private static final java.util.Map<java.util.UUID, java.util.Map<String, Long>> ACTIVE = new java.util.HashMap<>();
+    /** 動き出したゲーム時刻（止まっていれば -1）。 */
+    private long startedAt = -1;
 
     public void setOwner(java.util.UUID owner) {
         this.owner = owner;
@@ -59,37 +62,70 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
 
     /** 持ち主が今動かしているアンカーの数。 */
     public static int activeCount(java.util.UUID owner) {
-        java.util.Set<String> set = ACTIVE.get(owner);
-        return set == null ? 0 : set.size();
+        java.util.Map<String, Long> m = ACTIVE.get(owner);
+        return m == null ? 0 : m.size();
     }
 
     private void claim(boolean on) {
+        if (on) {
+            if (startedAt < 0) {
+                startedAt = level != null ? level.getGameTime() : 0;
+                setChanged();
+            }
+        } else if (startedAt >= 0) {
+            startedAt = -1;
+            setChanged();
+        }
         if (owner == null) {
             return;
         }
         if (on) {
-            ACTIVE.computeIfAbsent(owner, k -> new java.util.HashSet<>()).add(key());
+            ACTIVE.computeIfAbsent(owner, k -> new java.util.HashMap<>()).put(key(), startedAt);
         } else {
-            java.util.Set<String> set = ACTIVE.get(owner);
-            if (set != null) {
-                set.remove(key());
-                if (set.isEmpty()) {
-                    ACTIVE.remove(owner);
-                }
+            unregister();
+        }
+    }
+
+    /** 数え先から外すだけ（動き出した時刻は残す。チャンクの読み込み解除や終了のとき）。 */
+    private void unregister() {
+        java.util.Map<String, Long> m = owner == null ? null : ACTIVE.get(owner);
+        if (m != null) {
+            m.remove(key());
+            if (m.isEmpty()) {
+                ACTIVE.remove(owner);
             }
         }
     }
 
+    /** 持ち主の動いているアンカーの中での順番（動き出した時刻順、同時なら位置の順。0 が最初）。 */
+    private int rank(java.util.Map<String, Long> m) {
+        String me = key();
+        long mine = m.getOrDefault(me, startedAt);
+        int r = 0;
+        for (java.util.Map.Entry<String, Long> e : m.entrySet()) {
+            if (e.getValue() < mine || e.getValue() == mine && e.getKey().compareTo(me) < 0) {
+                r++;
+            }
+        }
+        return r;
+    }
+
+    /**
+     * 上限の判定。動いていないアンカーは、持ち主の枠が埋まっていれば動き出さない。動いているアンカーも、上限を下げて
+     * 枠からあふれたら（後から動き出した順に）止まる。
+     */
     @Override
     protected Status readiness(ServerLevel level) {
         int limit = anchorLimit();
-        if (owner != null && limit > 0 && loadedRadius < 0 && activeCount(owner) >= limit) {
-            java.util.Set<String> set = ACTIVE.get(owner);
-            if (set == null || !set.contains(key())) {
-                return Status.LIMITED;
-            }
+        if (owner == null || limit <= 0) {
+            return null;
         }
-        return null;
+        java.util.Map<String, Long> m = ACTIVE.get(owner);
+        boolean claimed = m != null && m.containsKey(key());
+        if (!claimed) {
+            return activeCount(owner) >= limit ? Status.LIMITED : null;
+        }
+        return m.size() > limit && rank(m) >= limit ? Status.LIMITED : null;
     }
 
     public WorldlineAnchorBlockEntity(BlockPos pos, BlockState state) {
@@ -199,7 +235,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     public void setRemoved() {
         if (level != null && !level.isClientSide) {
-            claim(false);
+            unregister();
         }
         super.setRemoved();
     }
@@ -208,6 +244,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("radius", loadedRadius);
+        tag.putLong("started_at", startedAt);
         if (owner != null) {
             tag.putUUID("owner", owner);
         }
@@ -218,5 +255,6 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
         super.loadAdditional(tag, registries);
         loadedRadius = tag.contains("radius") ? tag.getInt("radius") : -1;
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        startedAt = tag.contains("started_at") ? tag.getLong("started_at") : (loadedRadius >= 0 ? 0 : -1);
     }
 }

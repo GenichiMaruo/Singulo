@@ -8,6 +8,7 @@ public final class ServerConfig {
 
     // ---- ServerConfig ----
     public static final ModConfigSpec.ConfigValue<String> PRESET;
+    public static final ModConfigSpec.IntValue SETTINGS_VERSION;
     public static final ModConfigSpec.IntValue STARS_PER_EXOTIC_BATCH;
     public static final ModConfigSpec.IntValue EXOTIC_BATCH_SIZE;
     public static final ModConfigSpec.IntValue STARS_PER_SINGULARITY_CORE;
@@ -81,6 +82,7 @@ public final class ServerConfig {
 
     static {
         ModConfigSpec.ConfigValue<String> PRESET_;
+        ModConfigSpec.IntValue SETTINGS_VERSION_;
         ModConfigSpec.IntValue STARS_PER_EXOTIC_BATCH_;
         ModConfigSpec.IntValue EXOTIC_BATCH_SIZE_;
         ModConfigSpec.IntValue STARS_PER_SINGULARITY_CORE_;
@@ -154,6 +156,8 @@ public final class ServerConfig {
         b.push("general");
         b.comment("難易度の倍率を個別の値の上に掛ける。casual: スター不要・触媒寿命×2・遺構の再生×0.5・ウォーデンHP×0.5・殻の圧縮量×0.5。expert: スター×2・触媒寿命×0.75・修復2回まで・殻の圧縮量×1.5・点火エネルギー×2。standard と custom は個別の値のまま", "範囲: \"casual\" / \"standard\" / \"expert\" / \"custom\"");
         PRESET_ = b.defineInList("preset", "standard", java.util.Arrays.asList("casual", "standard", "expert", "custom"));
+        b.comment("設定ファイルの版（移行の印。手で変えない）。0.3.0 のファイルを読んだとき、旧既定値のまま残っている縮退熱炉の出力・殻の金属の核・炉殻の数だけを新しい既定値に直し、1にする。自分で変えた値は残る", "範囲: 0〜100（整数）");
+        SETTINGS_VERSION_ = b.defineInRange("settingsVersion", 0, 0, 100);
         b.pop();
         b.push("netherStar");
         b.comment("エキゾチック物質1回の製作に要るネザースターの数。0で不要", "範囲: 0〜16（整数）");
@@ -226,8 +230,8 @@ public final class ServerConfig {
         SHELL_ROCK_LV3_ = b.defineInRange("shellRockLv3", 4, 0, 9);
         b.comment("縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）", "範囲: 0〜9（整数）");
         SHELL_METAL_CORES_ = b.defineInRange("shellMetalCores", 1, 0, 9);
-        b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素", "範囲: 0〜1,000,000（mB）");
-        SHELL_COOLANT_MB_ = b.defineInRange("shellCoolantMb", 6000, 0, 1000000);
+        b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限", "範囲: 0〜8,000（mB）");
+        SHELL_COOLANT_MB_ = b.defineInRange("shellCoolantMb", 6000, 0, 8000);
         b.comment("縮退物質殻1個から作れる炉殻ブロックの数", "範囲: 1〜64（整数）");
         REACTOR_PLATES_PER_SHELL_ = b.defineInRange("reactorPlatesPerShell", 24, 1, 64);
         b.comment("混成ボーナス（Lv1が3種類以上ならLv2を8個で作れる）", "範囲: true / false");
@@ -312,6 +316,7 @@ public final class ServerConfig {
         MAX_ANCHORS_PER_PLAYER_ = b.defineInRange("maxAnchorsPerPlayer", 8, 0, 1000);
         b.pop();
         PRESET = PRESET_;
+        SETTINGS_VERSION = SETTINGS_VERSION_;
         STARS_PER_EXOTIC_BATCH = STARS_PER_EXOTIC_BATCH_;
         EXOTIC_BATCH_SIZE = EXOTIC_BATCH_SIZE_;
         STARS_PER_SINGULARITY_CORE = STARS_PER_SINGULARITY_CORE_;
