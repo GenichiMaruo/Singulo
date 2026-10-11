@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -73,6 +74,8 @@ public class HorizonWarden extends Monster {
     private static final EntityDataAccessor<Integer> GRIP_TARGET = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
     /** 出現の演出の残り tick（0 なら出現済み）。 */
     private static final EntityDataAccessor<Integer> EMERGE = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.INT);
+    /** 覚醒した個体（攻略後の再戦。覚醒の記録核で呼び出す）。 */
+    private static final EntityDataAccessor<Boolean> AWAKENED = SynchedEntityData.defineId(HorizonWarden.class, EntityDataSerializers.BOOLEAN);
     /** 出現の演出の長さ: 特異点が開き（〜30%）、体が組み上がり（〜75%）、目覚めの衝撃波（〜100%）。 */
     public static final int EMERGE_TICKS = 120;
     public static final int DEATH_TICKS = 100;
@@ -84,6 +87,11 @@ public class HorizonWarden extends Monster {
     static final float[] PACE = {0.7F, 0.5F, 0.35F};
     /** フェーズごとの、技と技のあいだの最短の間（tick）。 */
     static final int[] MIN_GAP = {22, 12, 7};
+    /** 覚醒した個体の技の間（通常の何倍か）と、フェーズが移る体力の割合（通常は 2/3 と 1/3）。 */
+    static final float AWAKENED_PACE = 0.75F;
+    static final float AWAKENED_PHASE_2 = 0.8F, AWAKENED_PHASE_3 = 0.45F;
+    /** 覚醒した個体の歩く速さの倍率。 */
+    static final double AWAKENED_SPEED = 1.15;
 
     public static final double ARMOR_PHASE_1 = 10;
     public static final int ARENA_RADIUS = 24;
@@ -202,6 +210,31 @@ public class HorizonWarden extends Monster {
         builder.define(GRIP, 0);
         builder.define(GRIP_TARGET, -1);
         builder.define(EMERGE, 0);
+        builder.define(AWAKENED, false);
+    }
+
+    /** 覚醒した個体か（攻略後の再戦）。 */
+    public boolean awakened() {
+        return entityData.get(AWAKENED);
+    }
+
+    /** 覚醒した個体の体力・与えるダメージの倍率（設定 awakenedWardenHealthMultiplier・awakenedWardenDamageMultiplier）。 */
+    public static double awakenedHealthMultiplier() {
+        return ServerConfig.SPEC.isLoaded() ? ServerConfig.AWAKENED_WARDEN_HEALTH_MULTIPLIER.get() : 2.5;
+    }
+
+    public static double awakenedDamageMultiplier() {
+        return ServerConfig.SPEC.isLoaded() ? ServerConfig.AWAKENED_WARDEN_DAMAGE_MULTIPLIER.get() : 1.5;
+    }
+
+    /**
+     * 覚醒した個体が与えるダメージを増やす（近接・光弾・ビーム・特異点など、出どころがこの個体のものすべて）。
+     * NeoForge のイベントで受け手の側から掛ける。
+     */
+    public static void onIncomingDamage(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent event) {
+        if (event.getSource().getEntity() instanceof HorizonWarden w && w.awakened() && !(event.getEntity() instanceof HorizonWarden)) {
+            event.setAmount((float) (event.getAmount() * awakenedDamageMultiplier()));
+        }
     }
 
     public int phase() {
@@ -352,9 +385,25 @@ public class HorizonWarden extends Monster {
 
     /** 起動するときに呼ぶ。守る場所と、倒されたとき知らせるコンソール。体力は設定の wardenHealth。 */
     public void awaken(BlockPos home, BlockPos console) {
+        awaken(home, console, false);
+    }
+
+    /**
+     * 起動するときに呼ぶ。awakened なら覚醒した個体（体力×awakenedWardenHealthMultiplier、与えるダメージ×
+     * awakenedWardenDamageMultiplier、技の間×0.75、フェーズが早く移る、少し速く歩く）。
+     */
+    public void awaken(BlockPos home, BlockPos console, boolean awakened) {
         this.home = home;
         this.console = console;
-        double health = ServerConfig.SPEC.isLoaded() ? ServerConfig.WARDEN_HEALTH.get() : HEALTH;
+        entityData.set(AWAKENED, awakened);
+        double health = (ServerConfig.SPEC.isLoaded() ? ServerConfig.WARDEN_HEALTH.get() : HEALTH)
+                * io.github.genichimaruo.singulo.data.Difficulty.wardenHealth() * (awakened ? awakenedHealthMultiplier() : 1.0);
+        if (awakened) {
+            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue() * AWAKENED_SPEED);
+            bossBar.setName(Component.translatable("entity.singulo.horizon_warden.awakened"));
+            bossBar.setColor(BossEvent.BossBarColor.PURPLE);
+            xpReward = 500;
+        }
         // 最大体力はゲームの決まりで 1024 までなので、それを超える分は受けるダメージを減らして同じ硬さにする
         double max = Math.min(health, MAX_HEALTH_CAP);
         damageScale = (float) (max / health);
@@ -403,6 +452,12 @@ public class HorizonWarden extends Monster {
         deflectBombs(level);
         if (phase() >= 2) {
             reflectProjectiles(level);
+        }
+        if (awakened() && tickCount % 4 == 0) {
+            // 覚醒した個体: 胸の炉心から菫色の炎がこぼれる
+            Vec3 core = corePosition();
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, core.x, core.y, core.z, 2, 0.5, 0.6, 0.5, 0.02);
+            level.sendParticles(ParticleTypes.DRAGON_BREATH, getX(), getY() + 0.2, getZ(), 2, 0.8, 0.1, 0.8, 0.01);
         }
         tickSweep(level, target);
         tickLaser(level, target);
@@ -470,13 +525,14 @@ public class HorizonWarden extends Monster {
             case SINGULARITY -> deploySingularity(target.position().add(0, 1, 0));
             case BEAM -> startBeam(target);
         }
-        // 技のあいだの間（フェーズが進むほど短い）
-        specialCooldown = Math.max(specialCooldown, MIN_GAP[Mth.clamp(phase(), 1, 3) - 1]);
+        // 技のあいだの間（フェーズが進むほど短い。覚醒した個体はさらに短い）
+        int gap = MIN_GAP[Mth.clamp(phase(), 1, 3) - 1];
+        specialCooldown = Math.max(specialCooldown, awakened() ? Math.max(4, Math.round(gap * AWAKENED_PACE)) : gap);
     }
 
     /** 技のあいだの間を、今のフェーズに合わせて縮める。 */
     int pace(int ticks) {
-        return Math.max(4, Math.round(ticks * PACE[Mth.clamp(phase(), 1, 3) - 1]));
+        return Math.max(4, Math.round(ticks * PACE[Mth.clamp(phase(), 1, 3) - 1] * (awakened() ? AWAKENED_PACE : 1F)));
     }
 
     /** フェーズ2から: ビームとレーザーが壁を抜け、防具と盾を無視する（手加減なし）。 */
@@ -486,14 +542,16 @@ public class HorizonWarden extends Monster {
 
     private void updatePhase(ServerLevel level) {
         float f = getHealth() / getMaxHealth();
-        int phase = f > 2.0F / 3 ? 1 : f > 1.0F / 3 ? 2 : 3;
+        float p2 = awakened() ? AWAKENED_PHASE_2 : 2.0F / 3;
+        float p3 = awakened() ? AWAKENED_PHASE_3 : 1.0F / 3;
+        int phase = f > p2 ? 1 : f > p3 ? 2 : 3;
         if (phase == phase()) {
             return;
         }
         entityData.set(PHASE, phase);
         getAttribute(Attributes.ARMOR).setBaseValue(phase == 1 ? ARMOR_PHASE_1 : 0);
-        bossBar.setColor(phase == 1 ? BossEvent.BossBarColor.WHITE : phase == 2 ? BossEvent.BossBarColor.BLUE
-                : BossEvent.BossBarColor.RED);
+        bossBar.setColor(phase == 1 ? (awakened() ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.WHITE)
+                : phase == 2 ? BossEvent.BossBarColor.BLUE : BossEvent.BossBarColor.RED);
         if (phase == 2) {
             // 外装が剥がれ、破片が周りを回り始める
             level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 1.5, getZ(), 4, 0.6, 0.8, 0.6, 0);
@@ -1042,6 +1100,11 @@ public class HorizonWarden extends Monster {
             if (console != null && level.getBlockEntity(console) instanceof SealConsoleBlockEntity c) {
                 c.onWardenReset(level);
             }
+            if (awakened() && console != null) {
+                // 覚醒戦をやめたときは、呼び出しに使った記録核を返す（やり直しが重くなりすぎないように）
+                net.minecraft.world.level.block.Block.popResource(level, console.above(),
+                        new net.minecraft.world.item.ItemStack(SealConsoleBlockEntity.awakeningCore()));
+            }
             discard();
         }
     }
@@ -1072,6 +1135,25 @@ public class HorizonWarden extends Monster {
             if (console != null && level.getBlockEntity(console) instanceof SealConsoleBlockEntity c) {
                 c.onWardenDefeated(level);
             }
+            if (awakened()) {
+                dropAwakenedRewards(level);
+            }
+        }
+    }
+
+    /**
+     * 覚醒した個体の報酬: オーバークロック・チップ2個（ほかでは封印コンテナからしか出ない）、エキゾチック物質8個、
+     * H凝縮体2個。呼び出しに使った記録核（エキゾチック物質4・H凝縮体1）より多く返るので、何度でも挑む意味がある。
+     */
+    private void dropAwakenedRewards(ServerLevel level) {
+        for (String[] r : new String[][] {{"overclock_chip", "2"}, {"exotic_matter", "8"}, {"hawking_condensate", "2"}}) {
+            net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
+            spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
+        }
+        io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), ARENA_RADIUS + 16, "awakened_warden");
+        Component msg = Component.translatable("gui.singulo.console.awakened_defeated");
+        for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(ARENA_RADIUS + 16))) {
+            p.displayClientMessage(msg, false);
         }
     }
 
@@ -1179,6 +1261,7 @@ public class HorizonWarden extends Monster {
         tag.putInt("phase", phase());
         tag.putFloat("damage_scale", damageScale);
         tag.putInt("emerge", emergeTicks());
+        tag.putBoolean("awakened", awakened());
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
@@ -1195,6 +1278,10 @@ public class HorizonWarden extends Monster {
             damageScale = Math.max(0.001F, tag.getFloat("damage_scale"));
         }
         entityData.set(EMERGE, tag.getInt("emerge"));
+        entityData.set(AWAKENED, tag.getBoolean("awakened"));
+        if (awakened()) {
+            xpReward = 500;
+        }
         home = NbtUtils.readBlockPos(tag, "home").orElse(null);
         console = NbtUtils.readBlockPos(tag, "console").orElse(null);
         if (home != null) {
@@ -1202,6 +1289,10 @@ public class HorizonWarden extends Monster {
         }
         if (hasCustomName()) {
             bossBar.setName(getDisplayName());
+        } else if (awakened()) {
+            bossBar.setName(Component.translatable("entity.singulo.horizon_warden.awakened"));
+            bossBar.setColor(phase() == 1 ? BossEvent.BossBarColor.PURPLE : phase() == 2 ? BossEvent.BossBarColor.BLUE
+                    : BossEvent.BossBarColor.RED);
         }
     }
 }

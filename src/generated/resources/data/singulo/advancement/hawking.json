@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:hawking_condensate"
+    },
+    "title": {
+      "translate": "advancement.singulo.hawking.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.hawking.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:hawking_condensate"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:ignite"
+}

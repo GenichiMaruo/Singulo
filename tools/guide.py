@@ -41,12 +41,13 @@ CHAPTERS = [
     ('stage1', 'singulo:thermoelectric_generator', '段階1 起動', 'Stage 1: Startup', [
         ('materials', '最初の素材',
          '1. 鉄と石炭で「鋼の素」を作り、溶鉱炉で鋼鉄インゴットにする。\n'
-         '2. 粘土・ネザー水晶・骨粉・砂で「未焼成セラミック」を作り、かまどでホワイトセラミック複合材にする。\n'
+         '2. 粘土・ネザー水晶・骨粉・砂で「未焼成セラミック」を作り、かまどでホワイトセラミック複合材にする。'
+         'ネザーへ行く前なら、ネザー水晶の代わりに火打石2個でも作れる。\n'
          '3. セラミック・レッドストーン・銅で「基礎回路」、鋼鉄とセラミックで「基礎フレーム」を作る。\n'
          'この3つ（鋼鉄・セラミック・回路）がほとんどの装置の材料です。',
          'First materials',
          '1. Iron + coal = steel blend; smelt it in a blast furnace.\n'
-         '2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic.\n'
+         '2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic. Before the Nether, two flint replace the quartz.\n'
          '3. Make basic circuits and basic frames. Most machines need these.'),
         ('power', '最初の電源',
          '「熱電発電機」は、高温のブロックと低温のブロックに挟むと温度差で発電します（温度差1Kにつき0.10 FE/t）。'
@@ -68,7 +69,7 @@ CHAPTERS = [
          '・焚き火＋氷塊: 約55 FE/t\n'
          '溶岩は熱すぎて、青氷でも約40秒で氷塊に変わり、さらに溶けていきます。焚き火に水・雪・氷を合わせると、1分足らずで溶けます。\n'
          '段階2の極低温冷却塔（液体窒素で240 FE/t）を動かすには、マグマブロック＋青氷で4台以上、焚き火＋氷塊なら5台以上が目安です'
-         '（銅導線の損失は含めていません）。',
+         '（銅導線の損失は含めていません）。いきなり全部そろえず、2〜4台で装置を1つずつ交互に動かし、増やしていけば十分です。',
          'Pairs that last',
          'Pairs whose cold block never melts (output of one generator):\n'
          '- Magma block + blue ice: about 76 FE/t (best)\n'
@@ -78,7 +79,7 @@ CHAPTERS = [
          'Lava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them '
          'in under a minute.\n'
          'To run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with '
-         'campfire + packed ice (before copper wire losses).'),
+         'campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.'),
         ('machines', '段階1の装置',
          '・焼成炉: セラミック基板などを焼く。鋼鉄も速く焼ける。\n'
          '・圧縮機: 鋼板を作る。質量モードでは質量値のある素材を「質量」に変えて圧縮ブロックや質量ペレットにする。\n'
@@ -100,10 +101,14 @@ CHAPTERS = [
         ('tower', '極低温冷却塔',
          '5×5 の土台から、くびれた双曲面の塔を高さ7〜15で建てます。中心の列は熱交換コア、てっぺんは通気格子でふさぎます。'
          'コントローラは手前の面の下から2段目の中央。高いほど速く、高さ10以上で液体ヘリウムも作れます。\n'
-         '何も入れなくても空気から液体窒素を作ります。銅・レッドストーン・鋼板・基板・制御ユニットと液体窒素で超伝導コイルを作ります。',
+         '何も入れなくても空気から液体窒素を作ります。銅・レッドストーン・鋼板・基板・制御ユニットと液体窒素で超伝導コイルを作ります。\n'
+         '熱交換コアと冷却帯は青氷の代わりに氷塊3個でも作れます。窒素だけを作らせれば、高さ7で極低温タービン約3.5台、高さ10で5台を回せます'
+         '（コイルなどの加工と共用すると、そのぶん減ります。材料のある加工が窒素より先に動きます）。',
          'Cryogenic Cooling Tower',
          'A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. '
-         'It makes liquid nitrogen from air and superconducting coils.'),
+         'It makes liquid nitrogen from air and superconducting coils.\n'
+         'Heat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 '
+         'cryogenic turbines and a 10-high tower 5 (less when it also processes coils; recipes with inputs run before nitrogen).'),
         ('accelerator', '粒子加速器とミュオン触媒',
          '加速管と収束磁石で正方形のリング（一辺8〜32）を作り、コントローラをリングに接して置きます。四隅は収束磁石、'
          '収束磁石はリングの1/4以上。水素からミュオン束を作り、ごく稀に磁気単極子が生まれます。\n'
@@ -131,10 +136,12 @@ CHAPTERS = [
         ('quantum', '量子の装置',
          '・量子もつれ合成器: 量子もつれ素子を2個1組で作る。\n'
          '・レーザー冷却器: 冷却原子・光格子基板・BE凝縮触媒（ティア3）を作る。冷却原子トラップの復元もここ。\n'
-         '・量子熱機関: 触媒で動く発電機。触媒のティアが高いほど出力が上がる。',
+         '・量子熱機関: 触媒で動く発電機。BE凝縮触媒で 200 kFE/t。1段下のミュオン触媒でも定格の25%（50 kFE/t）で仮運転でき、'
+         'BE凝縮触媒を作るまでのつなぎになる。蓄電がいっぱいの間は待機して触媒を減らさない。',
          'Quantum machines',
          '- Entanglement Synthesizer: entangled elements, two at a time.\n- Laser Cooler: cold atoms, lattices, BE condensate catalyst.\n'
-         '- Quantum Heat Engine: catalyst-driven generator.'),
+         '- Quantum Heat Engine: catalyst-driven generator, 200 kFE/t on BE catalysts; a muon catalyst runs it at 25% (50 kFE/t) as a stopgap. '
+         'It waits without wearing the catalyst while its storage is full.'),
         ('tools', '道具と探索',
          '・慣性制御ガントレット: 右クリック長押しで小さなモブを浮かせる・引き寄せる。電力で動き、電力を持つブロックにスニーク＋右クリックで充電。\n'
          '・慣性スタビライザー: 半径16の中で爆発がブロックを壊さない。\n'
@@ -159,17 +166,29 @@ CHAPTERS = [
          'Mass mode turns materials with mass values into compressed blocks, Lv1 to Lv3. Lv1 made from 3+ kinds of blocks is "mixed" and '
          'only 8 are needed for Lv2. The Degenerate Compactor (closed 5×5×5 press) makes degenerate shells.'),
         ('time', '時間結晶とエキゾチック物質',
-         '時間結晶育成槽は、実際に動いた時間で触媒を育てます（20分）。電力が足りないと純度が下がり、寿命も短くなります。\n'
+         '時間結晶育成槽は、実際に動いた時間で触媒を育てます（12分）。要求の80%（24 kFE/t）以上の電力なら純度は落ちません。'
+         'それを割った時間の割合だけ純度が下がり、寿命も短くなります。\n'
+         '設備（炉心制御装置・特異点封入台・シールド発生塔コアなど）には、時間結晶を精密組立台で「時間結晶モジュール」に加工して使います。'
+         '触媒枠の時間結晶から寿命を30分ぶん切り出し、残り15分の触媒はそのまま運転に使えます。寿命が30分に満たない触媒からは作れません。'
+         '設備用と運転用の取り合いになるので、育成槽は2台あると楽です。\n'
          'C空洞（5×5×5 の真空容器、天面と底面の内側が鏡面）は、時間結晶触媒を使ってエキゾチック物質とアクシオン凝縮体を作ります。',
          'Time crystals and exotic matter',
-         'The incubator grows time crystals over 20 minutes of real running time; underpowering lowers purity. '
+         'The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; '
+         'time spent below that lowers purity and lifetime.\n'
+         'Equipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts '
+         '30 minutes of life from the crystal in its catalyst slot, and the remaining 15 minutes stay usable as a catalyst. Crystals with less than 30 minutes '
+         'left cannot be cut. Two incubators keep equipment and running needs from competing.\n'
          'The C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.'),
         ('power', '大型発電と自動化',
-         '・縮退熱炉（5×5×7）: 圧縮ブロックLv2 を押しつぶして 20 MFE/t。時間結晶触媒を使う。電力は搬入出ポートから自動で出る。\n'
+         '・縮退熱炉（5×5×7）: 圧縮ブロックLv2 を押しつぶして 5 MFE/t。時間結晶触媒を使う（BE凝縮触媒でも25%の 1.25 MFE/t で仮運転できる）。'
+         '電力は搬入出ポートから自動で出る。蓄電がいっぱいの間は待機し、燃料も触媒も減らさない。\n'
+         '・殻と炉殻: 縮退物質殻1個から炉殻24枚。点火までに要る殻は炉殻用6個＋特異点の種用1個。岩石と金属をまとめて集めておくと楽です。\n'
          '・自動探査機ステーション: 発見済みの地表観測拠点へ探査機を飛ばし、回収物を半分の量で持ち帰る。\n'
          '・トポロジカル導線と SMESモジュールで大電力を運び、ためる。',
          'Big power and automation',
-         '- Degenerate Furnace (5×5×7): 20 MFE/t from Lv2 blocks; power leaves through I/O ports.\n- Probe Station: automates trips to discovered ruins.\n'
+         '- Degenerate Furnace (5×5×7): 5 MFE/t from Lv2 blocks on time crystals (1.25 MFE/t on BE catalysts); power leaves through I/O ports and it '
+         'waits without burning fuel or catalyst while full.\n- Shells: one degenerate shell makes 24 reactor shell blocks; ignition needs 6 shells for '
+         'plating plus 1 for the seed.\n- Probe Station: automates trips to discovered ruins.\n'
          '- Topological wire and SMES modules for large power.'),
         ('goal', '段階5へ進むには',
          '最終実験施設（重力異常点）で封印コンソールに触れると、守護機ホライズン・ウォーデンが目覚めます。倒すと保管庫が開き、'
@@ -188,10 +207,19 @@ CHAPTERS = [
          'coils at the 45° points, reactor shell elsewhere (replace shell blocks with extraction ports or mass alarms), an empty 3×3×3 core. The core controller sits 5 below the centre.'),
         ('ignite', '点火と運転',
          '種を入れて「点火」を押し、10秒以内に 50 GFE をポートかコントローラに注ぎます（ホライズン・バスが必要）。'
+         '画面には点火に要る受電（既定は平均 250 MFE/t）が出ます。点火中は受電の速さと届く見込みが出るので、足りなければ配線を見直します。'
+         'ケーブル網の上限はいちばん細いケーブルで決まり、トポロジカル導線1本の網では10秒に20 GFEしか届きません。\n'
+         '点火した炉心は「回収運転」で始まります。質量を480以下に保ち、Hコレクターを入れておけばH凝縮体が5分に1個できます。'
+         '最初のシンギュラリティ・コアには6個（直接4・アノマリー・サンプルの復元2）要るので、約30分そのまま回し、集まったら回収運転を切って発電運転にします。'
+         '育ちすぎた炉心も、回収運転にすると毎秒2ずつ質量を放出して戻ります。\n'
          '燃料は質量ペレット。降着効率はスピンで決まり（5.7〜42.3%）、炉心質量5000・最大スピンで約 2.1 GFE/t。\n'
          'リングの外（半径24まで）は弱い引力、リングの内側は逃げられない強い引力で、黒い球に触れたものはどんなに頑丈でも必ず消えます。半径4は防具を無視する潮汐帯です。引力帯の中は時間が遅れ、装置が×0.8、触媒の減りが×0.5になります。',
          'Ignition and operation',
-         'Insert the seed, press Ignite and deliver 50 GFE within 10 s. Burn mass pellets; efficiency depends on spin. '
+         'Insert the seed, press Ignite and deliver 50 GFE within 10 s (250 MFE/t on average). While igniting the screen shows the intake and what will arrive; '
+         'a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\n'
+         'A new core starts in harvest mode: it keeps mass at 480 or below so H condensate forms every 5 minutes with a Hawking Collector. '
+         'The first core needs six, so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\n'
+         'Burn mass pellets; efficiency depends on spin. '
          'Mind the 24-block pull zone (time runs slower there) and the 4-block tidal zone.'),
         ('byproducts', '副産物とシンギュラリティ・コア',
          'ジェット・コレクター・Hコレクター・エルゴスフィア・リングを入れると、運用モードに応じて'
@@ -200,9 +228,14 @@ CHAPTERS = [
          'Collectors produce jet condensate, H-Condensate and exotic matter. The Singularity Core is the tier 5 catalyst.'),
         ('endgame', 'その先',
          'シンギュラリティ・コアと大電力で「特異点技術」が動かせます（特異点技術の章）。'
-         'イベントホライズン・シールドで拠点を守り、Tシリンダーで時間を速め、ワームホールで遠くの拠点をつなぎましょう。',
+         'イベントホライズン・シールドで拠点を守り、Tシリンダーで時間を速め、ワームホールで遠くの拠点をつなぎましょう。'
+         '人工星核を作れば、もうネザースターを探さなくて済みます。\n'
+         '腕に自信があれば、特異点封入台で「覚醒の記録核」を作り、最終実験施設の封印コンソールで使ってみてください。'
+         '体力2.5倍・攻撃1.5倍の覚醒したホライズン・ウォーデンが目覚めます。勝てばオーバークロック・チップなどが手に入り、何度でも挑めます。',
          'Beyond',
-         'With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes.'),
+         'With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\n'
+         'For a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab\'s seal console: the Awakened Horizon Warden '
+         'has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.'),
     ]),
     ('multiblocks', 'singulo:holo_projector', 'マルチブロック', 'Multiblocks', [
         ('projector', 'ホロ投影機の使い方',
@@ -228,11 +261,15 @@ CHAPTERS = [
     ('catalysts', 'singulo:muon_catalyst', '触媒', 'Catalysts', [
         ('tiers', 'ティアと効き方',
          'ミュオン（2）・BE凝縮（3）・時間結晶（4）・シンギュラリティ・コア（5）。\n'
-         '・装置と同じティア: 標準\n・1つ上: 速度+25%、減り−20%（2つ上まで重なる）\n・1つ下: 速度0.5倍、減り2倍\n・2つ下: 使えない\n'
-         '残りが減るほど必要電力が増え（最大1.6倍）、電力が80%を割ると不完全反応で減りが1.5倍になります。',
+         '・装置と同じティア: 標準\n・1つ上: 速度+25%、減り−20%（2つ上まで重なる）\n・1つ下: 速度0.5倍、減り2倍（発電機は出力が定格の25%）\n・2つ下: 使えない\n'
+         '残りが減るほど必要電力が増え（最大1.6倍）、電力が80%を割ると不完全反応で減りが1.5倍になります。\n'
+         'この決まりは触媒枠で「運転」する装置（アンカー・スタビライザー・発電機・シールドなど）のものです。加工装置のレシピに材料として書かれた触媒は、'
+         '個数か寿命を決まった分だけ使い、速さは変わりません（例: BE凝縮触媒の加工はミュオン触媒1個で40秒）。',
          'Tiers and effects',
-         'Muon (2), BE (3), Time crystal (4), Singularity core (5). Higher tier = faster and less wear; one lower = half speed and double wear; '
-         'two lower = unusable. Underpowering wears catalysts faster.'),
+         'Muon (2), BE (3), Time crystal (4), Singularity core (5). Higher tier = faster and less wear; one lower = half speed and double wear '
+         '(generators give 25% output); two lower = unusable. Underpowering wears catalysts faster.\n'
+         'These rules apply to devices that run on a catalyst slot. When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or '
+         'amount of life and the speed does not change.'),
         ('slots', '触媒スロットとリサイクル',
          '触媒を使う装置には、触媒だけが入る専用スロットがあります（画面で触媒のマークが付いた枠）。ほかのアイテムは入りません。\n'
          '使い切った触媒は失活触媒になります。触媒反応器で、1ティア下の触媒の材料として約25%を回収できます。',
@@ -288,7 +325,9 @@ CHAPTERS = [
          '・重力の澱（封鎖培養施設の隔離槽室）: 封じ込め槽を破って出てくる黒い核。瓦礫の殻がある間は1撃ごとに殻が1つ剥がれる代わりにダメージが小さく、'
          '殻の瓦礫を撃ち出します。周りの相手を浮かせてから床へ叩きつけるので、重力ブーツや衝撃発電パネルがあると楽です。'
          '体力が半分を切ると重力井戸ができ、核へ引き寄せられます（核に触れると傷つく）。縮退核を落とします。\n'
-         '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。',
+         '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。'
+         '倒したあとは、覚醒の記録核をコンソールに使うと「覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。'
+         'やめて部屋を離れると記録核は戻ります。',
          'Ruin guardians',
          'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. '
          'When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n'
@@ -299,7 +338,23 @@ CHAPTERS = [
          '- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts '
          'it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, '
          'so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n'
-         '- Horizon Warden (Final Lab): touch the central Seal Console to wake it.'),
+         '- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console '
+         'for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.'),
+        ('plan', '探索の段取り',
+         '段階が進むと探索先が一度に増えます。先に集めておくと、あとで工場が止まりません。\n'
+         '・段階2のうち: 隕石クレーター（隕鉄・星屑）、氷山か氷樹（氷塊・青氷）。\n'
+         '・段階3のうち: 研究棟。深海圧力収集器は早めに置いて、高圧結晶を貯めておく（殻とアンビルで約30個）。雷雨の日は砂に避雷針。\n'
+         '・段階4の前に: 封鎖培養施設、古代都市（スカルク・残響の欠片。欠片は残響共鳴器で複製し続けられるので、1つあれば足りる）、'
+         'エンドの虚空（虚空捕集器）、ウィザー（ネザースター。点火後は人工星核で代わりになる）。\n'
+         '・原本の記録は修復でき、新品＋修復3回で約2.7倍使えます。何度も遠征し直すより、修復を使いましょう。',
+         'Planning expeditions',
+         'Destinations pile up in later stages; gathering early keeps the factory running.\n'
+         '- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n'
+         '- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). '
+         'Put lightning rods on sand in thunderstorms.\n'
+         '- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void '
+         '(void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n'
+         '- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.'),
         ('compass', '探索コンパスの調整',
          '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
          '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設）も探せるようになります。'

@@ -75,6 +75,7 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.AncientRecords::onLogin);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.command.SinguloCommands::register);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.FormationEffect::onServerTick);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
         if (RuinSelfCheck.enabled()) {
             NeoForge.EVENT_BUS.addListener(RuinSelfCheck::onServerStarted);
         }

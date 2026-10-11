@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:awakening_record_core"
+    },
+    "title": {
+      "translate": "advancement.singulo.awakened.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.awakened.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "awakened_warden"
+      }
+    }
+  },
+  "parent": "singulo:core"
+}

@@ -40,6 +40,22 @@ public class SealConsoleBlock extends BaseEntityBlock {
         return new SealConsoleBlockEntity(pos, state);
     }
 
+    /** 覚醒の記録核を持って使うと、覚醒した守護機を呼び出す（攻略後の再戦）。 */
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+                                                                  BlockPos pos, Player player, net.minecraft.world.InteractionHand hand,
+                                                                  BlockHitResult hit) {
+        if (!stack.is(SealConsoleBlockEntity.awakeningCore())) {
+            return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (!level.isClientSide && player instanceof ServerPlayer sp && !sp.isSpectator()
+                && level.getBlockEntity(pos) instanceof SealConsoleBlockEntity console
+                && console.activateAwakened((ServerLevel) level, sp) != null && !sp.getAbilities().instabuild) {
+            stack.shrink(1);
+        }
+        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer sp && !sp.isSpectator()

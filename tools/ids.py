@@ -152,6 +152,8 @@ MOD = {
     '番人の投影核': ('sentinel_core', 'Sentinel Projection Core', 'item'),
     '縮退核': ('degenerate_nucleus', 'Degenerate Nucleus', 'item'),
     '時間結晶触媒': ('time_crystal_catalyst', 'Time Crystal Catalyst', 'catalyst'),
+    '時間結晶モジュール': ('time_crystal_module', 'Time Crystal Module', 'item'),
+    '覚醒の記録核': ('awakening_record_core', 'Awakening Record Core', 'item'),
     'エキゾチック物質': ('exotic_matter', 'Exotic Matter', 'item'),
     '縮退熱炉フレーム': ('degenerate_furnace_frame', 'Degenerate Furnace Frame', 'part_block'),
     '縮退熱炉外装板': ('degenerate_furnace_shell', 'Degenerate Furnace Shell', 'part_block'),
@@ -310,6 +312,9 @@ OUTPUT_ALIASES = {
     'BE凝縮触媒（リサイクル）': 'singulo:bose_condensate_catalyst',
     '時間結晶触媒（リサイクル）': 'singulo:time_crystal_catalyst',
     '残響の欠片': 'minecraft:echo_shard',
+    '未焼成セラミック（火打石）': 'singulo:unfired_ceramic',
+    '熱交換コア（氷塊）': 'singulo:heat_exchange_core',
+    '冷却塔冷却帯（氷塊）': 'singulo:cooling_tower_coolant_band',
 }
 
 VANILLA = {
@@ -341,6 +346,8 @@ VANILLA = {
     '避雷針': 'minecraft:lightning_rod',
     '銅インゴット': '#c:ingots/copper',
     '青氷': 'minecraft:blue_ice',
+    '氷塊': 'minecraft:packed_ice',
+    '火打石': 'minecraft:flint',
     '骨粉': 'minecraft:bone_meal',
     '黒曜石': '#c:obsidians',
 }

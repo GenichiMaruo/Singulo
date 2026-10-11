@@ -27,7 +27,8 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 /**
  * 極低温タービン。液体窒素（77 K）を隣の高温源で一気に気化させ、その膨張でタービンを回す。
  * 出力は高温源の温度に比例し、溶岩（1300 K）で cryoTurbineOutput（既定 5 kFE/t）。
- * 液体窒素を毎tick 2 mB 使う（冷却塔1基で約2.5基を回せる）。
+ * 液体窒素を毎tick 2 mB 使う（窒素だけを作らせた冷却塔なら、高さ7で約3.5基・高さ10で5基を回せる。ほかの加工と
+ * 共用するとそのぶん減る）。蓄電がほぼいっぱいの間は待機して、窒素を減らさない。
  */
 public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         GeneratorInfo {
@@ -46,6 +47,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     };
     private int hot;
     private double rate;
+    private boolean standby;
 
     public CryogenicTurbineBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.CRYOGENIC_TURBINE.get(), pos, state);
@@ -74,7 +76,12 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
             }
         }
         rate = 0;
-        if (hot > COOLANT_TEMPERATURE && tank.getFluidAmount() >= COOLANT_PER_TICK) {
+        // 蓄電がいっぱいなら待機（窒素を捨てない）。75%を割ったら再開する
+        double fill = (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
+        if (standby ? fill < 0.75 : fill >= 0.98) {
+            standby = !standby;
+        }
+        if (!standby && hot > COOLANT_TEMPERATURE && tank.getFluidAmount() >= COOLANT_PER_TICK) {
             double f = Math.min(1.0, (hot - COOLANT_TEMPERATURE) / (double) (REFERENCE_HOT - COOLANT_TEMPERATURE));
             rate = ServerConfig.CRYO_TURBINE_OUTPUT.get() * f * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get();
             tank.drain(COOLANT_PER_TICK, IFluidHandler.FluidAction.EXECUTE);

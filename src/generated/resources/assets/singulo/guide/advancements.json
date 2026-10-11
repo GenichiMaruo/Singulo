@@ -171,8 +171,13 @@
       "stage": 5
     },
     {
-      "id": "core",
+      "id": "hawking",
       "parent": "ignite",
+      "stage": 5
+    },
+    {
+      "id": "core",
+      "parent": "hawking",
       "stage": 5
     },
     {
@@ -202,6 +207,16 @@
     },
     {
       "id": "manipulator",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "star_core",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "awakened",
       "parent": "core",
       "stage": 5
     },

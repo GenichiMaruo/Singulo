@@ -880,6 +880,8 @@ ITEM_ART = {
     'inertial_control_gauntlet': lambda: item_glove((220, 224, 230)),
     'degenerate_matter_shell': lambda: item_sphere_dark(None, white_seams=True),
     'time_crystal_catalyst': lambda: item_gem((255, 190, 90)),
+    'time_crystal_module': lambda: item_module((236, 238, 244), (255, 190, 90)),
+    'awakening_record_core': lambda: item_gem((180, 120, 255)),
     'exotic_matter': lambda: item_blob((60, 20, 80), (220, 160, 255)),
     'toroidal_magnetic_coil': lambda: item_torus(COPPER, T2),
     'magnetic_bottle': item_bottle,

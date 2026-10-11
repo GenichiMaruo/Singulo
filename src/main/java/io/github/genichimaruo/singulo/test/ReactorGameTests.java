@@ -303,6 +303,38 @@ public final class ReactorGameTests {
         });
     }
 
+    /** 回収運転: 質量が上限（480）を超えるならペレットを入れず、H凝縮体のできる質量に保つ。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    public static void harvestModeKeepsMassBelowCeiling(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
+        helper.runAtTickTime(3, () -> {
+            r.forceCore(470, 0);
+            r.toggleHarvestMode();
+        });
+        helper.runAtTickTime(150, () -> {
+            helper.assertTrue(r.harvestMode(), "回収運転になっていない");
+            helper.assertTrue(r.mass() <= PenroseReactorBlockEntity.HARVEST_CEILING + 1e-6 && r.mass() > 460,
+                    "回収運転で質量が上限の下に保たれない: " + r.mass());
+            helper.succeed();
+        });
+    }
+
+    /** 回収運転: 育ちすぎた炉心は毎秒2ずつ質量を放出して戻る。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    public static void harvestModeShedsOvergrownCore(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        helper.runAtTickTime(3, () -> {
+            r.forceCore(1000, 0);
+            r.toggleHarvestMode();
+        });
+        helper.runAtTickTime(103, () -> {
+            helper.assertTrue(r.mode() == PenroseReactorBlockEntity.Mode.SHEDDING, "放出中の表示にならない: " + r.mode());
+            helper.assertTrue(r.mass() < 991 && r.mass() > 985, "5秒で質量が約10減らない: " + r.mass());
+            helper.succeed();
+        });
+    }
+
     @GameTest(template = "empty", timeoutTicks = 6200)
     public static void encapsulatorMakesSingularityCore(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);

@@ -30,7 +30,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * 必要電力が足りないと不完全反応で減りが速くなり、まったくなければ止まる。使い切ると失活触媒が残る。
  */
 public abstract class CatalystDeviceBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
-    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET, OFF }
+    /**
+     * STANDBY: 発電機の蓄電がいっぱいなので待機中（燃料・触媒を使わない）。LIMITED: 持ち主のアンカーが上限に達している。
+     * 番号で同期するので、新しい値は後ろに足す。
+     */
+    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET, OFF, STANDBY, LIMITED }
 
     /** 画面の種類（表示する行が違う）。 */
     public enum Kind {
@@ -134,6 +138,29 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     }
 
     /**
+     * 発電機なら true。蓄電が {@link #STANDBY_FULL} 以上になると待機し（燃料・触媒を使わない）、{@link #STANDBY_RESUME} を
+     * 割ると再開する（毎tickの入り切りを避けるため、間をあける）。
+     */
+    protected boolean isGenerator() {
+        return false;
+    }
+
+    public static final double STANDBY_FULL = 0.98, STANDBY_RESUME = 0.75;
+    private boolean standby;
+
+    /** 待機中か（発電機の蓄電がいっぱい）。 */
+    private boolean checkStandby() {
+        if (!isGenerator()) {
+            return false;
+        }
+        double fill = energy.getMaxEnergyStored() <= 0 ? 0 : (double) energy.getEnergyStored() / energy.getMaxEnergyStored();
+        if (standby ? fill < STANDBY_RESUME : fill >= STANDBY_FULL) {
+            standby = !standby;
+        }
+        return standby;
+    }
+
+    /**
      * 触媒も電力も使わずに動く場合の効き方（シンギュラリティ・コアを埋め込んだアンカー）。普通は null。
      */
     @javax.annotation.Nullable
@@ -166,6 +193,8 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
             status = Status.OFF;
         } else if (notReady != null) {
             status = notReady;
+        } else if (checkStandby()) {
+            status = Status.STANDBY;
         } else if (permanent != null) {
             effect = permanent;
             status = Status.RUNNING;

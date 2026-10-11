@@ -25,7 +25,7 @@ This audit compares the repository's current implementation and default data wit
 
 [singulo_plan.md](../singulo_plan.md) は構想と変更前の案も含みます。冒頭に現行説明書への案内を追加しました。特に次は、設計書を現行仕様として読むと誤解につながります。
 
-- **時間結晶の育成：** 現行の既定レシピは24,000稼働tick、20 TPSで20分。設計書の72,000tick・60分とは異なる。未ロード中は処理されない。[レシピ](../tools/recipes.py)と[育成槽](../src/main/java/io/github/genichimaruo/singulo/machine/TimeCrystalIncubatorBlockEntity.java)を確認。
+- **時間結晶の育成：** 現行の既定レシピは14,400稼働tick、20 TPSで12分（位相同期板を使う。0.3.1の監査で24,000tick・20分の記述を訂正）。設計書の72,000tick・60分とは異なる。未ロード中は処理されない。[レシピ](../tools/recipes.py)と[育成槽](../src/main/java/io/github/genichimaruo/singulo/machine/TimeCrystalIncubatorBlockEntity.java)を確認。
 - **装着枠：** メトリック・ドライブは持ち物に入れる実装で、Curios依存ではない。[MetricDriveItem.java](../src/main/java/io/github/genichimaruo/singulo/item/MetricDriveItem.java)を確認。
 - **他modの熱との連携：** Mekanism専用の熱連携実装は確認できないため、新説明書では対応をうたわない。FE・アイテム・流体の能力連携と、専用の熱API連携を区別。
 - **炉心の成長：** 旧README内でペレット質量の10%と25%が混在。現行は `PELLET_MASS = 16`、`GROWTH_FRACTION = 0.25`、ペレット由来の成長には上限がある。[PenroseReactorBlockEntity.java](../src/main/java/io/github/genichimaruo/singulo/reactor/PenroseReactorBlockEntity.java)を確認。初見向け手引きでは運転条件と危険を中心に説明。
@@ -37,6 +37,24 @@ This audit compares the repository's current implementation and default data wit
 自動探査機は発見済み遺構だけが対象で、既定の段階4ステーションは地表観測拠点を自動化します。培養施設と最終実験施設は常に手動です。[RuinDiscovery.java](../src/main/java/io/github/genichimaruo/singulo/ruin/RuinDiscovery.java)と[ProbeStationBlockEntity.java](../src/main/java/io/github/genichimaruo/singulo/machine/ProbeStationBlockEntity.java)を確認しました。
 
 数式が物理学由来でも、すべての挙動が現実の物理を再現するわけではありません。公開原稿も「物理学を題材にしたゲーム」と分かる表現へ変更しました。
+
+## 0.3.1 の調整で同期した記述（2026-10-11）
+
+[バランス評価](balance-review-0.3.0/README.md) と [課題一覧](balance-review-0.3.0/issue.md) の指摘に合わせて実装を変え、説明もそろえました。対応の一覧は [対応記録](balance-review-0.3.0/RESOLUTION.md) にあります。
+
+| 記述 | 現行 |
+| --- | --- |
+| 時間結晶の育成 24,000tick・20分（説明書） | 14,400tick・12分。80%以上の給電なら純度は落ちない |
+| 設備レシピの時間結晶触媒 2個・4個 | 重ねられる「時間結晶モジュール」に置き換え（触媒の寿命を30分ぶん切り出す。30分未満の触媒からは作れない） |
+| 縮退熱炉 20 MFE/t | 5 MFE/t。1段下の触媒の発電機は定格の25%（設定 generatorLowerTierOutput） |
+| 炉殻 12枚／殻、殻の金属の核2個 | 24枚／殻、金属の核1個 |
+| タービンのコメント「塔1基で約2.5基」 | 窒素専用運転で高さ7は約3.5基、高さ10は5基。共用時は減る |
+| ホライズン・バスの旧注記 4 GFE/t | Singulo どうしは実質無制限、他modの装置へは1台あたり約21億FE/tまで |
+| 残響の欠片「拾った1個から最大17個ぶん」 | 型は16回で割れるが、できた欠片も型にでき、複製を続けられる |
+| 粒子加速器「最小直径9」 | 最小は一辺8の環。成立する最小構成は加速管21・磁石7、ホロ投影の既定は加速管18・磁石10 |
+| preset・殻・スター数などの設定が未接続 | 既定値から変えた個別設定とプリセットを、実行時にレシピとJEIへ当てはめる（RecipeTweaks） |
+| maxAnchorsPerPlayer が未接続 | 置いた人ごとに同時に動かせる数を制限。0で無制限 |
+| 触媒の一般規則が加工レシピにも当てはまるように読める | 運転用（触媒スロット）と加工材料としての触媒を区別して記載 |
 
 ## 維持方法と検証の範囲
 

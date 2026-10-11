@@ -22,12 +22,14 @@ For building from source, see the [development instructions in the README](../RE
 ## Your first session
 
 1. **Open the handbook.** You receive the Singulo Handbook on your first login. Right-click it and read Stage 1 and Progress for your first goals.
-2. **Make steel and ceramic.** Craft Steel Blend from iron and coal, then smelt it in a blast furnace. Craft Unfired Ceramic from clay, Nether quartz, bone meal and sand, then fire it in a furnace.
+2. **Make steel and ceramic.** Craft Steel Blend from iron and coal, then smelt it in a blast furnace. Craft Unfired Ceramic from clay, Nether quartz, bone meal and sand, then fire it in a furnace. Before visiting the Nether, two flint can replace the quartz.
 3. **Make circuits and frames.** Steel, ceramic, copper and redstone form the early material base. Check the [recipe gallery](recipes/README.md) for exact quantities.
 4. **Generate and distribute power.** Place a Thermoelectric Generator next to a supported heat source, such as a lit campfire, magma block or lava, and a cold source, such as water, a snow block or ice. Connect it to machines with Copper Wire.
 5. **Build and explore together.** Establish a Kiln, Compressor, Electrolyzer and Archive Terminal. Use an Explorer Compass to find an Observation Post, bring back its records and damaged components, restore them, and work toward your first cooling tower.
 
-Larger temperature differences produce more power, but exceeding the cold source's tolerance consumes or degrades water and ice. Check the generator screen rather than assuming a cold block lasts forever.
+Larger temperature differences produce more power, but exceeding the cold source's tolerance consumes or degrades water and ice. Check the generator screen rather than assuming a cold block lasts forever. Magma block + blue ice (about 76 FE/t) and campfire + packed ice (about 55 FE/t) never melt; lava + blue ice gives about 106 FE/t but the ice starts melting within about 40 seconds. Two to four generators running one machine at a time are enough to start.
+
+Cooling tower heat exchange cores and coolant bands can use three packed ice instead of blue ice.
 
 ## The five stages
 
@@ -47,9 +49,13 @@ Energy is measured in FE. Upgrade from Copper Wire to Superconducting Cable, Top
 
 Ordinary processing machines have a Sides screen for face-specific input, output and auto-ejection. Machines that output two gases, such as the Electrolyzer, let you choose the output faces for each gas. The power button on the right of the screen stops a machine, and machines that can make something from power alone, such as liquid nitrogen in the cooling tower, have a switch to skip those recipes. Multiblocks use shared Multiblock I/O Ports; the Penrose reactor uses its own Extraction Ports. Singulo's cables carry energy, not items or fluids.
 
-Catalysts are consumables placed in dedicated slots. The progression is Muon Catalyst, BE Condensate Catalyst, Time Crystal Catalyst, then Singularity Core. Matching tiers give normal operation. One tier below gives half speed and twice the wear; two or more below cannot run the machine. Higher tiers provide speed and wear bonuses. Depleted catalysts increase power requirements, and insufficient power can affect catalyst wear or product quality.
+Catalysts are consumables placed in dedicated slots. The progression is Muon Catalyst, BE Condensate Catalyst, Time Crystal Catalyst, then Singularity Core. Matching tiers give normal operation. One tier below gives half speed and twice the wear; two or more below cannot run the machine. Higher tiers provide speed and wear bonuses. Depleted catalysts increase power requirements, and insufficient power can affect catalyst wear or product quality. The Quantum Heat Engine and Degenerate Furnace give 25% of their rated output on a catalyst one tier below. These rules apply to devices running from a catalyst slot; a catalyst listed as a recipe ingredient just uses a fixed count or amount of life and does not change processing speed.
 
-Time crystal growth defaults to **24,000 running ticks**, or 20 minutes at 20 TPS. It does not progress in unloaded chunks. Time fields and server configuration can change the effective duration. Spent catalysts have recycling recipes.
+Generators (Cryogenic Turbine, Quantum Heat Engine, Degenerate Furnace) wait when their storage is nearly full and use no nitrogen, fuel or catalyst until it drops below 75%.
+
+Time crystal growth defaults to **14,400 running ticks**, or 12 minutes at 20 TPS. It does not progress in unloaded chunks. Time fields and server configuration can change the effective duration. Purity is kept at 80% of the requested power or more; time below that shortens the crystal's life. Spent catalysts have recycling recipes.
+
+Equipment such as the Core Controller, Singularity Encapsulator, Shield Tower Core and Wormhole Generator Core uses stackable **Time Crystal Modules** from the Precision Assembler. Each cuts 30 minutes of life from the crystal in the catalyst slot; the remaining 15 minutes stay usable. Crystals with less than 30 minutes left cannot be cut.
 
 ## Building multiblocks
 
@@ -61,7 +67,7 @@ Place the controller and **right-click it with a Holo Projector**. Follow the pr
 | Particle Accelerator | Horizontal square ring, side length 8–32. Magnets at all corners and at least one quarter of the perimeter; controller beside the ring |
 | Degenerate Compactor | Closed 5×5×5 press |
 | C-Cavity | 5×5×5 vessel with facing mirror plates inside the top and bottom |
-| Degenerate Furnace | 5×5×7 furnace, powered by Lv2 compressed blocks and a Time Crystal Catalyst |
+| Degenerate Furnace | 5×5×7 furnace, 5 MFE/t from Lv2 compressed blocks and a Time Crystal Catalyst (1.25 MFE/t on BE catalysts) |
 | Penrose Reactor | Three orthogonal rings within 13×13×13; radius 6, controller five blocks below the center |
 | Event Horizon Shield Tower | 5×5, nine blocks high |
 | T-Cylinder | 5×5×9; its field accelerates supported machine processing |
@@ -86,9 +92,13 @@ A Probe Station only visits ruins a player has discovered by opening their cache
 
 ## Black holes and late-game technology
 
-Insert your first Singularity Seed into the Core Controller, start ignition, and supply **50 GFE within ten seconds** under default settings. The formation sequence then creates the core. Prepare a high-capacity power network before attempting ignition.
+Insert your first Singularity Seed into the Core Controller, start ignition, and supply **50 GFE within ten seconds** under default settings. The formation sequence then creates the core. Prepare a high-capacity power network before attempting ignition: 50 GFE in ten seconds averages 250 MFE/t, and a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE. While igniting the screen shows the intake and what will arrive, and a failure reports what was missing.
+
+A new core starts in **harvest mode**: it keeps mass at 480 or below, so H-Condensate forms every five minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the Anomaly Sample). Turn harvest mode off afterwards for full power. Harvest mode also sheds 2 mass per second from an overgrown core.
 
 During operation, feed Mass Pellets and manage core mass and spin. Spin determines accretion efficiency; mass affects the fuel injection limit. Collectors produce Jet Condensate, H-Condensate (Hawking Condensate) and exotic matter under their respective operating conditions. Pellet-driven growth is capped, but feeding other matter beyond safe limits can collapse the reactor and leave a rogue black hole.
+
+**Rematch:** an Awakening Record Core from the Singularity Encapsulator, used on the Final Lab's seal console, wakes the Awakened Horizon Warden (2.5× health, 1.5× damage, faster moves and earlier phases). Victory yields two Overclock Chips, eight exotic matter and two H-Condensate, and you can fight again. If you give up and leave, the core is returned.
 
 Late-game devices protect a base, accelerate supported machines, keep chunks loaded and manipulate gravity. The Metric Drive works from your inventory and does not require a Curios equipment slot. Wormholes are paired mouths that you generate, stabilize and place; nearby ports link distant energy, items and fluids. Exotic matter maintains the mouths, and the destination chunks must remain loaded.
 
@@ -96,9 +106,12 @@ Late-game devices protect a base, accelerate supported machines, keep chunks loa
 
 - **A machine will not run:** check power, ingredients, catalyst tier and remaining life, output space and required fluids. For multiblocks, check the structure and port positions too.
 - **Tool controls differ:** hold right-click for the Inertial Control Gauntlet. Hold left-click for the Graviton Manipulator; while levitating a target, charge right-click and release to throw it. Check your configured key bindings in-game.
-- **The factory stops when you leave:** unloaded chunks do not process. Worldline Anchors also need their operating requirements maintained.
+- **A generator is idle:** it is on standby because its storage is full; it resumes when power is used.
+- **The factory stops when you leave:** unloaded chunks do not process. Worldline Anchors also need their operating requirements maintained. Each player can run up to 8 anchors at once by default (server setting `maxAnchorsPerPlayer`, 0 for no limit).
 - **Dangerous equipment:** black holes exert pull, deal tidal damage and consume entities at the event horizon. Hydrogen leaks near fire can explode. Large accelerators with low stored energy can leak strangelets; prepare Magnetic Bottles and protective equipment.
 
 Standard textures are 16×16. Enable the bundled **Singulo HD** resource pack for 32×32 textures. Accelerator sides and corners connect automatically, with a circulating light effect while operating.
+
+The server setting `preset` changes difficulty: `casual` removes nether stars, doubles catalyst life and halves ruin regrowth, Warden health and shell compression; `expert` doubles stars, uses 0.75× catalyst life, allows two repairs, uses 1.5× shell compression and doubles ignition energy. Individual settings such as star counts, shell materials and growth time also apply to recipes and JEI when changed from their defaults.
 
 This manual describes the current implementation and default settings. See the [recipe gallery](recipes/README.md) and [documentation audit](documentation-audit.md) for references. Server settings and data packs may change recipes or behavior; use the actual in-game information for your world.
