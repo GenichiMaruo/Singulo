@@ -254,6 +254,21 @@
       "id": "records",
       "parent": "archive",
       "stage": 5
+    },
+    {
+      "id": "genesis_formed",
+      "parent": "leviathan",
+      "stage": 5
+    },
+    {
+      "id": "genesis_birth",
+      "parent": "genesis_formed",
+      "stage": 5
+    },
+    {
+      "id": "synth_legendary",
+      "parent": "genesis_birth",
+      "stage": 5
     }
   ]
 }

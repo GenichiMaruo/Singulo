@@ -67,6 +67,19 @@ FINAL_RECORDS = [
      'I do not know how many millennia have passed. Until a reader came, I waited as the records themselves. '
      "You have read to the last page. I think I may sleep now. Please keep watch over the reactor's fire."),
 ]
+# 創世炉で宇宙を生むと加わる記録。x03 は最後の記録者を倒した人だけ
+GENESIS_RECORDS = [
+    ('x02', 5, '最初の頁', 'すべての質量はエネルギーになった。その炉の火で、私たちはもう一度、宇宙をひとつ生んだ。'
+     '星がともり、銀河が渦を巻く。いつかそこにも、記録を残す誰かが生まれるだろう。'
+     'その誰かが、投入を止める手を知っていますように。', 'The First Page',
+     'All mass became energy. With that same fire, we made a universe once more. '
+     'Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. '
+     'May they know the hand that stops the feed.'),
+    ('x03', 5, '記録者への返信', '最後の頁のその先に、新しい最初の頁を書いた。眠る番人へ。あなたの記録は読まれ、'
+     'そして宇宙になった。もう見張らなくていい。火は、私たちが見ている。', 'A Reply to the Archivist',
+     'Beyond the last page, I wrote a new first page. To the watcher who sleeps: your records were read, '
+     'and they became a universe. You need not keep watch any longer. We are watching the fire now.'),
+]
 
 # 封印された記録（封印コンテナの特異点錠の中の「封印記録」を読むと、この順に加わる）。形は RECORDS と同じ
 HIDDEN_RECORDS = [

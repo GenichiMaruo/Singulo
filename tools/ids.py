@@ -237,6 +237,10 @@ MOD = {
     'ワームホールの口': ('wormhole_mouth', 'Wormhole Mouth', 'machine'),
     'ワームホール固定化装置': ('wormhole_stabilizer', 'Wormhole Stabilizer', 'machine'),
     'ワームホール・ポート': ('wormhole_port', 'Wormhole Port', 'machine'),
+    '創世炉の枠': ('genesis_frame', 'Genesis Frame', 'block'),
+    '創世炉の柱': ('genesis_pylon', 'Genesis Pylon', 'block'),
+    '創世炉の核': ('genesis_core', 'Genesis Core', 'genesis'),
+    '原初の種': ('primordial_seed', 'Primordial Seed', 'item'),
 
     # ---- 遺構回収物・復元品 ----
     '観測ログ': ('observation_log', 'Observation Log', 'uses'),

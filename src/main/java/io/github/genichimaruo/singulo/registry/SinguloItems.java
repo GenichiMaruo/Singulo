@@ -195,6 +195,7 @@ public final class SinguloItems {
         TAB_ORDER.add(ITEMS.register("wormhole_mouth", () -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
                 new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5)));
         block(SinguloBlocks.WORMHOLE_PORT, 5);
+        block(SinguloBlocks.GENESIS_CORE, 5);
         block(SinguloBlocks.CRYOGENIC_TURBINE, 2);
         block(SinguloBlocks.SMES_CELL, 2);
         block(SinguloBlocks.COSMIC_MUON_COLLECTOR, 2);

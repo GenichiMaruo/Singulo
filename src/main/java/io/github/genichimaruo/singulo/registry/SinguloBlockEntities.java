@@ -190,6 +190,10 @@ public final class SinguloBlockEntities {
             REGISTER.register("gravitational_wave_detector", () -> build(GravitationalWaveDetectorBlockEntity::new,
                     SinguloBlocks.GRAVITATIONAL_WAVE_DETECTOR.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity>> GENESIS_CORE =
+            REGISTER.register("genesis_core", () -> build(io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity::new,
+                    SinguloBlocks.GENESIS_CORE.get()));
+
     public static final Supplier<BlockEntityType<CableBlockEntity>> CABLE = REGISTER.register("cable",
             () -> build(CableBlockEntity::new, SinguloBlocks.COPPER_WIRE.get(), SinguloBlocks.SUPERCONDUCTING_CABLE.get(),
                     SinguloBlocks.TOPOLOGICAL_WIRE.get(), SinguloBlocks.HORIZON_BUS.get()));

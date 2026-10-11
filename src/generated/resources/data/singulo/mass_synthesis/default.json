@@ -1,0 +1,259 @@
+{
+  "entries": [
+    {
+      "tag": "c:stones",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "c:cobblestones",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:dirt",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "c:sands",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "c:gravels",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:logs",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "c:netherracks",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:end_stone",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "c:obsidians",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:deepslate",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:cobbled_deepslate",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:clay",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:snow_block",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:ice",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "c:ingots/iron",
+      "mass": 0.3333,
+      "tier": 1
+    },
+    {
+      "tag": "c:ingots/copper",
+      "mass": 0.3333,
+      "tier": 1
+    },
+    {
+      "tag": "c:ingots/gold",
+      "mass": 0.7778,
+      "tier": 1
+    },
+    {
+      "tag": "c:storage_blocks/iron",
+      "mass": 3,
+      "tier": 1
+    },
+    {
+      "tag": "c:storage_blocks/copper",
+      "mass": 3,
+      "tier": 1
+    },
+    {
+      "tag": "c:storage_blocks/gold",
+      "mass": 7,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:coal",
+      "mass": 0.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:redstone",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:lapis_lazuli",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:quartz",
+      "mass": 0.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:glowstone_dust",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:amethyst_shard",
+      "mass": 0.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:slime_ball",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:gunpowder",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:string",
+      "mass": 0.05,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:bone",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:leather",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:diamond",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:emerald",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:ender_pearl",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:blaze_rod",
+      "mass": 0.3,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:prismarine_shard",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:ghast_tear",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:phantom_membrane",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:netherite_scrap",
+      "mass": 0.6,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:netherite_ingot",
+      "mass": 2.2222,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:ancient_debris",
+      "mass": 2,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:echo_shard",
+      "mass": 0.3,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:shulker_shell",
+      "mass": 0.5,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:heart_of_the_sea",
+      "mass": 1,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:totem_of_undying",
+      "mass": 1,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:nether_star",
+      "mass": 5,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:heavy_core",
+      "mass": 4,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:dragon_breath",
+      "mass": 0.5,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:elytra",
+      "mass": 3,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:enchanted_golden_apple",
+      "mass": 3,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:dragon_egg",
+      "mass": 10,
+      "tier": 4
+    }
+  ]
+}

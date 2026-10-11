@@ -58,7 +58,7 @@ def mid(name):
 FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
 BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
-               'boss_block')
+               'boss_block', 'genesis')
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
@@ -782,6 +782,68 @@ UI_LANG = {
     'direction.singulo.southwest': ('南西', 'southwest'),
     'direction.singulo.west': ('西', 'west'),
     'direction.singulo.northwest': ('北西', 'northwest'),
+    'gui.singulo.genesis.formed': ('創世炉の形ができた。原初の種を核に使うと、宇宙の誕生が始まる',
+                                   'The Genesis Engine takes shape. Use a Primordial Seed on the core to begin'),
+    'gui.singulo.genesis.unformed': ('形ができていない（枠8と柱12で核を囲む）',
+                                     'Not formed (surround the core with 8 frames and 12 pylons)'),
+    'gui.singulo.genesis.need_seed': ('原初の種を核に使うこと', 'Use a Primordial Seed on the core'),
+    'gui.singulo.genesis.seeded': ('原初の種が沈んだ。種火のための電力を注げ', 'The seed sinks in. Pour in power to kindle it'),
+    'gui.singulo.genesis.kindled': ('種火がともった。宇宙が膨らみはじめる。維持の電力を絶やさず、暴走を抑えよ',
+                                    'The seed ignites. A universe begins to swell. Keep the upkeep flowing and hold back the surges'),
+    'gui.singulo.genesis.surge': ('暴走の兆し！投入を止めろ（素手で核を使うか、赤石信号）',
+                                  'Surge warning! Stop the feed (use the core empty-handed, or a redstone signal)'),
+    'gui.singulo.genesis.surge_end': ('宇宙のうねりが静まった。投入を再開してよい', 'The surge subsides. You may resume the feed'),
+    'gui.singulo.genesis.collapse': ('生まれかけの宇宙が崩れかけた。進みが戻った', 'The proto-universe nearly collapses. Progress is lost'),
+    'gui.singulo.genesis.event.leak': ('重力が漏れ出した', 'Gravity leaks out'),
+    'gui.singulo.genesis.event.echoes': ('記録の残響が引き寄せられてきた', 'Echoes of the records are drawn in'),
+    'gui.singulo.genesis.event.wave': ('引力の波が来る。着地に備えよ', 'A wave of gravity rises. Brace for the fall'),
+    'gui.singulo.genesis.birth_1': ('光が、一点へ落ちていく……', 'The light falls into a single point...'),
+    'gui.singulo.genesis.birth_2': ('すべての質量はエネルギーになった。だから今度は、', 'All mass became energy. So now,'),
+    'gui.singulo.genesis.birth_3': ('エネルギーから、宇宙をひとつ。', 'from energy, a universe.'),
+    'gui.singulo.genesis.birth_sky': ('生まれた銀河が、夜空へ昇った', 'The newborn galaxy rises into the night sky'),
+    'gui.singulo.genesis.complete': ('創世炉は質量を生めるようになった。作りたい物を持って核を使うこと',
+                                     'The Genesis Engine can now create mass. Use an item on the core to choose what to make'),
+    'gui.singulo.genesis.birthing': ('宇宙が生まれている', 'A universe is being born'),
+    'gui.singulo.genesis.stopped': ('投入を止めた', 'Feed stopped'),
+    'gui.singulo.genesis.resumed': ('投入を再開した', 'Feed resumed'),
+    'gui.singulo.genesis.not_synthesizable': ('それは創世炉では作れない', 'The Genesis Engine cannot make that'),
+    'gui.singulo.genesis.template': ('作る物: %s（1個 %s、希少度 %s）', 'Making: %s (%s each, rarity %s)'),
+    'gui.singulo.genesis.stage.0': ('創世炉: 未形成', 'Genesis Engine: not formed'),
+    'gui.singulo.genesis.stage.1': ('創世炉: 揺籃（原初の種を待っている）', 'Genesis Engine: cradle (awaiting a Primordial Seed)'),
+    'gui.singulo.genesis.stage.2': ('創世炉: 種火', 'Genesis Engine: kindling'),
+    'gui.singulo.genesis.stage.3': ('創世炉: 安定化', 'Genesis Engine: stabilizing'),
+    'gui.singulo.genesis.stage.4': ('創世炉: 誕生', 'Genesis Engine: birth'),
+    'gui.singulo.genesis.stage.5': ('創世炉: 完成（質量生成）', 'Genesis Engine: complete (mass synthesis)'),
+    'gui.singulo.genesis.detail.kindling': ('種火 %s（%s / %s）　受電 %s/t（上限 %s/t）',
+                                            'Kindling %s (%s / %s)  Intake %s/t (max %s/t)'),
+    'gui.singulo.genesis.detail.stabilizing': ('安定化 %s　不安定度 %s　維持 %s/t　受電 %s/t',
+                                               'Stabilization %s  Instability %s  Upkeep %s/t  Intake %s/t'),
+    'gui.singulo.genesis.detail.synth': ('%s を生成中 %s（1個 %s）　受電 %s/t　出来上がり %s個',
+                                         'Making %s: %s (%s each)  Intake %s/t  Ready: %s'),
+    'gui.singulo.genesis.detail.synth_none': ('作る物が決まっていない（物を持って核を使う）', 'Nothing chosen (use an item on the core)'),
+    'gui.singulo.genesis.feeding': ('投入: 続けている', 'Feed: on'),
+    'gui.singulo.genesis.not_feeding': ('投入: 止めている', 'Feed: stopped'),
+    'gui.singulo.genesis.bar.kindling': ('種火 %s　受電 %s/t', 'Kindling %s  Intake %s/t'),
+    'gui.singulo.genesis.bar.stabilizing': ('安定化 %s　不安定度 %s', 'Stabilization %s  Instability %s'),
+    'gui.singulo.genesis.bar.surge': ('⚠ 暴走中　投入を止めろ！　不安定度 %s', '⚠ Surging: stop the feed!  Instability %s'),
+    'gui.singulo.genesis.bar.surge_held': ('暴走を抑えている　不安定度 %s', 'Holding the surge  Instability %s'),
+    'gui.singulo.genesis.bar.synth': ('%s %s　出来上がり %s個', '%s %s  Ready: %s'),
+    'gui.singulo.genesis.bar.paused': ('［投入停止］ %s', '[Feed stopped] %s'),
+    'ending.singulo.line.1': ('かつて、ある文明は、すべての質量をエネルギーに変えようとした。',
+                              'Once, a civilization tried to turn all mass into energy.'),
+    'ending.singulo.line.2': ('炉はその願いを叶えた。都市も、山も、海も。残ったのは重力の異常と、記録だけだった。',
+                              'The reactor granted that wish: the cities, the mountains, the sea. Only the anomaly and the records remained.'),
+    'ending.singulo.line.3': ('あなたはその記録を読み、同じ炉に火を入れた。そして、投入を止める手を離さなかった。',
+                              'You read those records and lit the same fire. And you never let go of the hand that stops the feed.'),
+    'ending.singulo.line.4': ('だから今、エネルギーは還る。質量へ。星へ。銀河へ。',
+                              'So now the energy returns: to mass, to stars, to a galaxy.'),
+    'ending.singulo.line.5': ('夜空を見上げてほしい。あの光は、あなたが生んだ宇宙だ。',
+                              'Look up at the night sky. That light is the universe you made.'),
+    'ending.singulo.archivist': ('――記録者の声がする。「最後の頁の、その先を。読ませてくれて、ありがとう」',
+                                 '— The Archivist\'s voice: "Beyond the last page. Thank you for letting me read it."'),
+    'ending.singulo.thanks': ('Thank you for playing', 'Thank you for playing'),
+    'ending.singulo.credit': ('Singulo', 'Singulo'),
+    'ending.singulo.skip': ('Esc で閉じる', 'Press Esc to close'),
 }
 
 
@@ -814,8 +876,8 @@ def lang_files():
     gen_docs.descriptions(ctx, ja, en)
     gen_docs.guide(ctx, ja, en)
     gen_docs.advancements(ctx, ja, en)
-    from records import RECORDS, HIDDEN_RECORDS, FINAL_RECORDS
-    for rid, _, jt, jb, et, eb in RECORDS + HIDDEN_RECORDS + FINAL_RECORDS:
+    from records import RECORDS, HIDDEN_RECORDS, FINAL_RECORDS, GENESIS_RECORDS
+    for rid, _, jt, jb, et, eb in RECORDS + HIDDEN_RECORDS + FINAL_RECORDS + GENESIS_RECORDS:
         ja[f'record.{MODID}.{rid}.title'], ja[f'record.{MODID}.{rid}.body'] = jt, jb
         en[f'record.{MODID}.{rid}.title'], en[f'record.{MODID}.{rid}.body'] = et, eb
     write_json(ASSETS / 'lang' / 'ja_jp.json', dict(sorted(ja.items())))
@@ -848,7 +910,7 @@ def models():
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
-        if kind in ('gravity', 'nature', 'boss_block'):
+        if kind in ('gravity', 'nature', 'boss_block', 'genesis'):
             continue                                           # 重力パネル・受電器・自然物・ボス部屋の仕掛けは blocks_extra・blocks_extra4・blocks_extra5 が作る
         if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'deco', 'deco_glass'):
             model = {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}}
@@ -939,6 +1001,8 @@ def models():
     blocks_extra4.models(write_json, ASSETS)
     import blocks_extra5
     blocks_extra5.models(write_json, ASSETS)
+    import genesis_assets
+    genesis_assets.models(write_json, ASSETS)
 
 
 def boost_overlay_model():
@@ -1366,6 +1430,8 @@ def art_textures():
     blocks_extra4.textures(tb, art16.save)
     import blocks_extra5
     blocks_extra5.textures(tb, art16.save)
+    import genesis_assets
+    genesis_assets.textures(tb, ti, art16.save)
     # 遺構の建材など、まだのっぺりしている絵にも汚し（使用感）を入れる
     from PIL import Image
     for name, (iid, _, kind) in MOD.items():
@@ -1957,6 +2023,18 @@ SOUNDS = {
     'last_archivist.nova': ('boss/last_archivist_nova', '新星が弾ける', 'Nova bursts', 64),
     'last_archivist.death': ('boss/last_archivist_death', '光輪が砕ける', 'The halo shatters', 48),
     'last_archivist.death_flash': ('boss/last_archivist_death_flash', '最後の光', 'The last light', 64),
+    'genesis.form': ('genesis/form', '創世炉が組み上がる', 'Genesis Engine assembles', 24),
+    'genesis.ambient': ('genesis/ambient', '創世炉が脈打つ', 'Genesis Engine pulses', 32),
+    'genesis.seed': ('genesis/seed', '原初の種が沈む', 'Primordial Seed sinks in', 32),
+    'genesis.ignite': ('genesis/ignite', '種火がともる', 'The seed ignites', 64),
+    'genesis.surge': ('genesis/surge', '宇宙がうねる', 'Proto-universe surges', 48),
+    'genesis.alarm': ('genesis/alarm', '暴走の兆し', 'Surge warning', 64),
+    'genesis.collapse': ('genesis/collapse', '宇宙が崩れかける', 'Proto-universe collapses', 64),
+    'genesis.lever': ('genesis/lever', '投入が切り替わる', 'Feed toggles', 16),
+    'genesis.birth_collapse': ('genesis/birth_collapse', '光が一点に落ちる', 'Light falls into a point', 96),
+    'genesis.big_bang': ('genesis/big_bang', '宇宙が生まれる', 'A universe is born', 128),
+    'genesis.sky': ('genesis/sky', '銀河が空へ昇る', 'A galaxy rises into the sky', 128),
+    'genesis.synth': ('genesis/synth', '質量が生まれる', 'Mass is synthesized', 24),
 }
 # 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
 SOUND_FALLBACKS = {
@@ -1993,6 +2071,18 @@ SOUND_FALLBACKS = {
     'last_archivist.nova': 'minecraft:entity.warden.sonic_boom',
     'last_archivist.death': 'minecraft:block.beacon.deactivate',
     'last_archivist.death_flash': 'minecraft:block.end_portal.spawn',
+    'genesis.form': 'minecraft:block.beacon.activate',
+    'genesis.ambient': 'minecraft:block.beacon.ambient',
+    'genesis.seed': 'minecraft:block.respawn_anchor.charge',
+    'genesis.ignite': 'minecraft:block.end_portal_frame.fill',
+    'genesis.surge': 'minecraft:block.respawn_anchor.deplete',
+    'genesis.alarm': 'minecraft:block.bell.resonate',
+    'genesis.collapse': 'minecraft:entity.generic.explode',
+    'genesis.lever': 'minecraft:block.lever.click',
+    'genesis.birth_collapse': 'minecraft:block.portal.trigger',
+    'genesis.big_bang': 'minecraft:entity.wither.spawn',
+    'genesis.sky': 'minecraft:ui.toast.challenge_complete',
+    'genesis.synth': 'minecraft:block.amethyst_block.resonate',
     'horizon_warden.ambient': 'minecraft:block.beacon.ambient',
     'sealed_container.denied': 'minecraft:block.dispenser.fail',
     'sealed_container.insert': 'minecraft:block.vault.insert_item',
@@ -2353,6 +2443,43 @@ def mass_values():
     write_json(DATA / 'mass_values' / 'default.json', {'entries': out})
 
 
+def mass_synthesis():
+    """創世炉の質量生成の表: (アイテムかタグ, 質量, 希少度 0〜4)。1個の電力 = 質量 × genesisBaseCost × 10^希少度。
+    質量は mass_values と同じ尺度（石1ブロック = 1）。Singulo の物（圧縮ブロック・質量ペレットなど）は載せない。"""
+    entries = [
+        # 0: ありふれた物
+        ('#c:stones', 1, 0), ('#c:cobblestones', 1, 0), ('#minecraft:dirt', 0.5, 0), ('#c:sands', 0.5, 0),
+        ('#c:gravels', 0.5, 0), ('#minecraft:logs', 0.25, 0), ('#c:netherracks', 1, 0), ('minecraft:end_stone', 1, 0),
+        ('#c:obsidians', 1.2, 0), ('minecraft:deepslate', 1.2, 0), ('minecraft:cobbled_deepslate', 1.2, 0),
+        ('minecraft:clay', 0.5, 0), ('minecraft:snow_block', 0.5, 0), ('minecraft:ice', 0.5, 0),
+        # 1: 普通の資源
+        ('#c:ingots/iron', 3 / 9, 1), ('#c:ingots/copper', 3 / 9, 1), ('#c:ingots/gold', 7 / 9, 1),
+        ('#c:storage_blocks/iron', 3, 1), ('#c:storage_blocks/copper', 3, 1), ('#c:storage_blocks/gold', 7, 1),
+        ('minecraft:coal', 0.2, 1), ('minecraft:redstone', 0.1, 1), ('minecraft:lapis_lazuli', 0.1, 1),
+        ('minecraft:quartz', 0.2, 1), ('minecraft:glowstone_dust', 0.1, 1), ('minecraft:amethyst_shard', 0.2, 1),
+        ('minecraft:slime_ball', 0.1, 1), ('minecraft:gunpowder', 0.1, 1), ('minecraft:string', 0.05, 1),
+        ('minecraft:bone', 0.1, 1), ('minecraft:leather', 0.1, 1),
+        # 2: 貴重な物
+        ('minecraft:diamond', 1, 2), ('minecraft:emerald', 1, 2), ('minecraft:ender_pearl', 0.5, 2),
+        ('minecraft:blaze_rod', 0.3, 2), ('minecraft:prismarine_shard', 0.2, 2), ('minecraft:ghast_tear', 0.2, 2),
+        ('minecraft:phantom_membrane', 0.2, 2),
+        # 3: 稀少な物
+        ('minecraft:netherite_scrap', 0.6, 3), ('minecraft:netherite_ingot', 20 / 9, 3), ('minecraft:ancient_debris', 2, 3),
+        ('minecraft:echo_shard', 0.3, 3), ('minecraft:shulker_shell', 0.5, 3), ('minecraft:heart_of_the_sea', 1, 3),
+        ('minecraft:totem_of_undying', 1, 3),
+        # 4: 伝説の物
+        ('minecraft:nether_star', 5, 4), ('minecraft:heavy_core', 4, 4), ('minecraft:dragon_breath', 0.5, 4),
+        ('minecraft:elytra', 3, 4), ('minecraft:enchanted_golden_apple', 3, 4), ('minecraft:dragon_egg', 10, 4),
+    ]
+    out = []
+    for k, m, tier in entries:
+        e = {'tag': k[1:]} if k.startswith('#') else {'item': k}
+        e['mass'] = round(m, 4)
+        e['tier'] = tier
+        out.append(e)
+    write_json(DATA / 'mass_synthesis' / 'default.json', {'entries': out})
+
+
 def thermal():
     """設計書「段階1の発電: 熱電発電機」の表。"""
     write_json(DATA / 'thermal' / 'default.json', {
@@ -2402,7 +2529,8 @@ TAB_GROUPS = [
                    'shield_tower_crown',
                    'tipler_core', 'tipler_frame', 'tipler_housing', 'tipler_bearing', 'tipler_window', 'tipler_holder',
                    'wormhole_generator_core', 'wormhole_generator_shell', 'wormhole_generator_coil', 'wormhole_generator_focuser',
-                   'wormhole_generator_window', 'wormhole_generator_port']),
+                   'wormhole_generator_window', 'wormhole_generator_port',
+                   'genesis_core', 'genesis_frame', 'genesis_pylon', 'primordial_seed']),
     ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel', 'keraunos_tower', 'deep_sea_collector', 'void_collector',
                      'low_gravity_panel',
                      'high_gravity_panel', 'gravitational_wave_detector', 'neutrino_observatory',
@@ -2801,6 +2929,7 @@ def main():
     sealed_container_assets()
     tags()
     mass_values()
+    mass_synthesis()
     thermal()
     ruins_data()
     craters_data()

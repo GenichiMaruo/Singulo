@@ -6508,8 +6508,8 @@
     "translation": "用于：简并热炉"
   },
   "uses.singulo.degenerate_matter_shell": {
-    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock)",
-    "translation": "用于：反应堆外壳、奇点种子、奇点核心、中微子灵敏度模块 Mk3、封印容器（时间锁）"
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 1 more",
+    "translation": "用于：反应堆外壳、奇点种子、奇点核心、中微子灵敏度模块 Mk3、封印容器（时间锁） 等 1 个"
   },
   "uses.singulo.degenerate_nucleus": {
     "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
@@ -6548,16 +6548,16 @@
     "translation": "用于：量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器、回响共鸣器 等 18 个"
   },
   "uses.singulo.ergosphere_chapter": {
-    "source": "Used in: Awakened Ergosphere Core, Terminus Record",
-    "translation": "用于：觉醒渦核、终焉之记录"
+    "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
+    "translation": "用于：觉醒渦核、终焉之记录、原初之种"
   },
   "uses.singulo.ergosphere_ring": {
     "source": "Used in: Sealed Container (Singularity Lock)",
     "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 24 more",
-    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 24 个"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 27 more",
+    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 27 个"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -6584,8 +6584,8 @@
     "translation": "用于：彭罗斯反应堆"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 3 more",
-    "translation": "用于：微型黑洞容器、奇点核心、奇点锁钥匙、觉醒记录核、觉醒回响核 等 3 个"
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 5 more",
+    "translation": "用于：微型黑洞容器、奇点核心、奇点锁钥匙、觉醒记录核、觉醒回响核 等 5 个"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
@@ -6600,8 +6600,8 @@
     "translation": "用于：引力子操控器"
   },
   "uses.singulo.jet_condensate": {
-    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core",
-    "translation": "用于：人造星核、觉醒渦核"
+    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon",
+    "translation": "用于：人造星核、觉醒渦核、创世炉支柱"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
@@ -6636,8 +6636,8 @@
     "translation": "用于：数据卡（观察日志）"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 22 more",
-    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、相位同步板、奇异物质 等 22 个"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",
+    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、相位同步板、奇异物质 等 23 个"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -6648,8 +6648,8 @@
     "translation": "用于：简并压实砧、简并前驱体"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 17 more",
-    "translation": "用于：量子热机、引力波探测器、中微子观测站、简并压缩炉控制器、卡西米尔腔控制器 等 17 个"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 18 more",
+    "translation": "用于：量子热机、引力波探测器、中微子观测站、简并压缩炉控制器、卡西米尔腔控制器 等 18 个"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -6660,8 +6660,8 @@
     "translation": "用于：陨铁锭"
   },
   "uses.singulo.reactor_shell": {
-    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator",
-    "translation": "用于：提取端口、炉心稳定线圈、炉心质量警报器、彭罗斯反应堆、奇点封装器"
+    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 1 more",
+    "translation": "用于：提取端口、炉心稳定线圈、炉心质量警报器、彭罗斯反应堆、奇点封装器 等 1 个"
   },
   "uses.singulo.reactor_stabilizer": {
     "source": "Used in: P-Reactor",
@@ -6728,12 +6728,12 @@
     "translation": "用于：基本框架、钢板、压缩机"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 61 more",
-    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 61 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 62 more",
+    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 62 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 40 more",
-    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 40 个"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 41 more",
+    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 41 个"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",
@@ -6748,8 +6748,8 @@
     "translation": "用于：奇异物质、奇点核心、时间晶体模块"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 1 more",
-    "translation": "用于：炉心控制器、奇点封装器、盾塔核心、引力子操控器、蒂普勒核心 等 1 个"
+    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 2 more",
+    "translation": "用于：炉心控制器、奇点封装器、盾塔核心、引力子操控器、蒂普勒核心 等 2 个"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -6834,5 +6834,365 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "用于：虫洞入口"
+  },
+  "advancement.singulo.genesis_birth.description": {
+    "source": "Give birth to a universe in the Genesis Engine",
+    "translation": "在创世炉中孕育一个宇宙"
+  },
+  "advancement.singulo.genesis_birth.title": {
+    "source": "The First Page",
+    "translation": "最初的一页"
+  },
+  "advancement.singulo.genesis_formed.description": {
+    "source": "Assemble a Genesis Engine",
+    "translation": "组建创世炉"
+  },
+  "advancement.singulo.genesis_formed.title": {
+    "source": "The Cradle",
+    "translation": "摇篮"
+  },
+  "advancement.singulo.synth_legendary.description": {
+    "source": "Synthesize a legendary item (rarity 4) in the Genesis Engine",
+    "translation": "在创世炉中合成一件传说级物品（稀有度4）"
+  },
+  "advancement.singulo.synth_legendary.title": {
+    "source": "Something from Nothing",
+    "translation": "无中生有"
+  },
+  "block.singulo.genesis_core": {
+    "source": "Genesis Core",
+    "translation": "创世炉核心"
+  },
+  "block.singulo.genesis_frame": {
+    "source": "Genesis Frame",
+    "translation": "创世炉框架"
+  },
+  "block.singulo.genesis_pylon": {
+    "source": "Genesis Pylon",
+    "translation": "创世炉支柱"
+  },
+  "desc.singulo.genesis_core": {
+    "source": "The heart of an engine that makes a universe from energy. Surround it with 8 frames and 12 pylons, use a Primordial Seed and pour in 1.5 TFE to begin. Once born, the universe turns power into mass (items).",
+    "translation": "从能量中孕育宇宙之炉的核心。用8个框架和12根支柱（4根×3层）围住它，使用原初之种并注入 1.5 TFE，宇宙便开始诞生。诞生后的宇宙能将电力转化为质量（物品）。"
+  },
+  "desc.singulo.genesis_frame": {
+    "source": "Placed level with the Genesis Core in an octagon three blocks out (four on the axes, four on the 2-2 diagonals).",
+    "translation": "与创世炉核心放在同一高度，排成距核心3格的八边形（十字方向4个，斜向各2格处4个）。"
+  },
+  "desc.singulo.genesis_pylon": {
+    "source": "Stacked three high on each diagonal frame of the Genesis Engine; they focus power into the newborn universe.",
+    "translation": "在创世炉的每个斜向框架上叠放3层，将电力汇聚并送入将生未生的宇宙。"
+  },
+  "desc.singulo.primordial_seed": {
+    "source": "A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.",
+    "translation": "依照漩涡断章中刻下的最初运行记录，将点火步骤逆向追溯而制成的种子。对创世炉核心使用，宇宙便开始诞生。"
+  },
+  "ending.singulo.archivist": {
+    "source": "— The Archivist's voice: \"Beyond the last page. Thank you for letting me read it.\"",
+    "translation": "——记录者的声音传来：“最后一页的，那之后。谢谢你让我读到。”"
+  },
+  "ending.singulo.credit": {
+    "source": "Singulo",
+    "translation": "Singulo"
+  },
+  "ending.singulo.line.1": {
+    "source": "Once, a civilization tried to turn all mass into energy.",
+    "translation": "曾经，有一个文明试图将所有质量化为能量。"
+  },
+  "ending.singulo.line.2": {
+    "source": "The reactor granted that wish: the cities, the mountains, the sea. Only the anomaly and the records remained.",
+    "translation": "炉实现了那个愿望。城市、山峦、海洋，皆是如此。留下的只有引力异常，和记录。"
+  },
+  "ending.singulo.line.3": {
+    "source": "You read those records and lit the same fire. And you never let go of the hand that stops the feed.",
+    "translation": "你读了那些记录，为同样的炉点燃了火。而你始终没有放开那只停止投料的手。"
+  },
+  "ending.singulo.line.4": {
+    "source": "So now the energy returns: to mass, to stars, to a galaxy.",
+    "translation": "所以此刻，能量归还了。归于质量。归于星辰。归于银河。"
+  },
+  "ending.singulo.line.5": {
+    "source": "Look up at the night sky. That light is the universe you made.",
+    "translation": "请抬头仰望夜空。那光芒，就是你孕育的宇宙。"
+  },
+  "ending.singulo.skip": {
+    "source": "Press Esc to close",
+    "translation": "按 Esc 关闭"
+  },
+  "ending.singulo.thanks": {
+    "source": "Thank you for playing",
+    "translation": "Thank you for playing"
+  },
+  "gui.singulo.genesis.bar.kindling": {
+    "source": "Kindling %s  Intake %s/t",
+    "translation": "火种 %s  受电 %s/t"
+  },
+  "gui.singulo.genesis.bar.paused": {
+    "source": "[Feed stopped] %s",
+    "translation": "［投料停止］ %s"
+  },
+  "gui.singulo.genesis.bar.stabilizing": {
+    "source": "Stabilization %s  Instability %s",
+    "translation": "稳定化 %s  不稳定度 %s"
+  },
+  "gui.singulo.genesis.bar.surge": {
+    "source": "⚠ Surging: stop the feed!  Instability %s",
+    "translation": "⚠ 失控中：停止投料！  不稳定度 %s"
+  },
+  "gui.singulo.genesis.bar.surge_held": {
+    "source": "Holding the surge  Instability %s",
+    "translation": "正在压制失控  不稳定度 %s"
+  },
+  "gui.singulo.genesis.bar.synth": {
+    "source": "%s %s  Ready: %s",
+    "translation": "%s %s  已完成：%s"
+  },
+  "gui.singulo.genesis.birth_1": {
+    "source": "The light falls into a single point...",
+    "translation": "光，向一点坠落……"
+  },
+  "gui.singulo.genesis.birth_2": {
+    "source": "All mass became energy. So now,",
+    "translation": "所有质量都化作了能量。所以这一次，"
+  },
+  "gui.singulo.genesis.birth_3": {
+    "source": "from energy, a universe.",
+    "translation": "从能量中，孕育一个宇宙。"
+  },
+  "gui.singulo.genesis.birth_sky": {
+    "source": "The newborn galaxy rises into the night sky",
+    "translation": "新生的银河升上了夜空"
+  },
+  "gui.singulo.genesis.birthing": {
+    "source": "A universe is being born",
+    "translation": "宇宙正在诞生"
+  },
+  "gui.singulo.genesis.collapse": {
+    "source": "The proto-universe nearly collapses. Progress is lost",
+    "translation": "将生未生的宇宙险些崩塌。进度倒退了"
+  },
+  "gui.singulo.genesis.complete": {
+    "source": "The Genesis Engine can now create mass. Use an item on the core to choose what to make",
+    "translation": "创世炉现已能够孕育质量。手持物品对核心使用，即可选择要制造的物品"
+  },
+  "gui.singulo.genesis.detail.kindling": {
+    "source": "Kindling %s (%s / %s)  Intake %s/t (max %s/t)",
+    "translation": "火种 %s（%s / %s）  受电 %s/t（上限 %s/t）"
+  },
+  "gui.singulo.genesis.detail.stabilizing": {
+    "source": "Stabilization %s  Instability %s  Upkeep %s/t  Intake %s/t",
+    "translation": "稳定化 %s  不稳定度 %s  维持 %s/t  受电 %s/t"
+  },
+  "gui.singulo.genesis.detail.synth": {
+    "source": "Making %s: %s (%s each)  Intake %s/t  Ready: %s",
+    "translation": "正在制造 %s：%s（每个 %s）  受电 %s/t  已完成：%s"
+  },
+  "gui.singulo.genesis.detail.synth_none": {
+    "source": "Nothing chosen (use an item on the core)",
+    "translation": "尚未选择（手持物品对核心使用）"
+  },
+  "gui.singulo.genesis.event.echoes": {
+    "source": "Echoes of the records are drawn in",
+    "translation": "记录的残响被吸引而来"
+  },
+  "gui.singulo.genesis.event.leak": {
+    "source": "Gravity leaks out",
+    "translation": "引力泄漏了出来"
+  },
+  "gui.singulo.genesis.event.wave": {
+    "source": "A wave of gravity rises. Brace for the fall",
+    "translation": "引力波涌起。做好落地准备"
+  },
+  "gui.singulo.genesis.feeding": {
+    "source": "Feed: on",
+    "translation": "投料：进行中"
+  },
+  "gui.singulo.genesis.formed": {
+    "source": "The Genesis Engine takes shape. Use a Primordial Seed on the core to begin",
+    "translation": "创世炉已成形。对核心使用原初之种即可开始"
+  },
+  "gui.singulo.genesis.kindled": {
+    "source": "The seed ignites. A universe begins to swell. Keep the upkeep flowing and hold back the surges",
+    "translation": "火种点燃了。宇宙开始膨胀。保持维持电力不断，并压制失控"
+  },
+  "gui.singulo.genesis.need_seed": {
+    "source": "Use a Primordial Seed on the core",
+    "translation": "对核心使用原初之种"
+  },
+  "gui.singulo.genesis.not_feeding": {
+    "source": "Feed: stopped",
+    "translation": "投料：已停止"
+  },
+  "gui.singulo.genesis.not_synthesizable": {
+    "source": "The Genesis Engine cannot make that",
+    "translation": "创世炉无法制造该物品"
+  },
+  "gui.singulo.genesis.resumed": {
+    "source": "Feed resumed",
+    "translation": "投料已恢复"
+  },
+  "gui.singulo.genesis.seeded": {
+    "source": "The seed sinks in. Pour in power to kindle it",
+    "translation": "原初之种沉了下去。注入电力，点燃火种"
+  },
+  "gui.singulo.genesis.stage.0": {
+    "source": "Genesis Engine: not formed",
+    "translation": "创世炉：未成形"
+  },
+  "gui.singulo.genesis.stage.1": {
+    "source": "Genesis Engine: cradle (awaiting a Primordial Seed)",
+    "translation": "创世炉：摇篮（等待原初之种）"
+  },
+  "gui.singulo.genesis.stage.2": {
+    "source": "Genesis Engine: kindling",
+    "translation": "创世炉：火种"
+  },
+  "gui.singulo.genesis.stage.3": {
+    "source": "Genesis Engine: stabilizing",
+    "translation": "创世炉：稳定化"
+  },
+  "gui.singulo.genesis.stage.4": {
+    "source": "Genesis Engine: birth",
+    "translation": "创世炉：诞生"
+  },
+  "gui.singulo.genesis.stage.5": {
+    "source": "Genesis Engine: complete (mass synthesis)",
+    "translation": "创世炉：完成（质量合成）"
+  },
+  "gui.singulo.genesis.stopped": {
+    "source": "Feed stopped",
+    "translation": "投料已停止"
+  },
+  "gui.singulo.genesis.surge": {
+    "source": "Surge warning! Stop the feed (use the core empty-handed, or a redstone signal)",
+    "translation": "失控警报！停止投料（空手使用核心，或给予红石信号）"
+  },
+  "gui.singulo.genesis.surge_end": {
+    "source": "The surge subsides. You may resume the feed",
+    "translation": "失控平息了。可以恢复投料"
+  },
+  "gui.singulo.genesis.template": {
+    "source": "Making: %s (%s each, rarity %s)",
+    "translation": "制造：%s（每个 %s，稀有度 %s）"
+  },
+  "gui.singulo.genesis.unformed": {
+    "source": "Not formed (surround the core with 8 frames and 12 pylons)",
+    "translation": "未成形（用8个框架和12根支柱围住核心）"
+  },
+  "guide.singulo.genesis": {
+    "source": "Genesis Engine",
+    "translation": "创世炉"
+  },
+  "guide.singulo.genesis.birth.body": {
+    "source": "1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n2. Stabilizing: hold 100 MFE/t for about four minutes. Now and then a surge alarm sounds: stop the feed while it lasts (use the core empty-handed, or give it a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe collapses and progress is lost. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; a T-Cylinder field speeds things up.\n3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\nSneak-use the core empty-handed for details.",
+    "translation": "1. 火种：注入 1.5 TFE（每 tick 最多 1 GFE）。彭罗斯反应堆全功率运行约一分多钟。\n2. 稳定化：保持 100 MFE/t 约四分钟。期间不时会响起失控警报：警报持续时请停止投料（空手使用核心，或给核心红石信号）。若继续投料，不稳定度会急剧上升；达到 100% 时将生未生的宇宙会崩塌，进度倒退。还要提防引力泄漏、记录残响和引力波。在护盾内，失控与事件会减弱；在蒂普勒圆柱的加速场内，进度会更快。\n3. 诞生：光坠向一点，宇宙诞生。它的银河会升上主世界的夜空。\n潜行时空手使用核心可查看详情。"
+  },
+  "guide.singulo.genesis.birth.title": {
+    "source": "Birth of a universe",
+    "translation": "宇宙的诞生"
+  },
+  "guide.singulo.genesis.build.body": {
+    "source": "The old civilization fell trying to turn all mass into energy. The Genesis Engine does the reverse.\n- Eight Genesis Frames level with the core: three blocks out on each axis, and two-and-two on each diagonal.\n- Three Genesis Pylons stacked on each of the four diagonal frames (twelve in all).\nThe core chimes when formed. Use a Primordial Seed on it to begin. Power enters from any side.",
+    "translation": "旧文明试图将所有质量化为能量，因而灭亡。创世炉则反其道而行之。\n- 与核心同一高度放置8个创世炉框架：十字方向距核心3格处各一个，斜向各2格、2格处各一个。\n- 在4个斜向框架上各叠放3根创世炉支柱（共12根）。\n成形时核心会发出鸣响。对它使用原初之种即可开始。电力可从任意一面输入。"
+  },
+  "guide.singulo.genesis.build.title": {
+    "source": "Building the Genesis Engine",
+    "translation": "建造创世炉"
+  },
+  "guide.singulo.genesis.synth.body": {
+    "source": "A born universe turns power into items. Use an item on the core to choose it; use the core empty-handed to collect (or pull from below with a hopper).\nCost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). The table is a datapack (mass_synthesis).",
+    "translation": "诞生了宇宙的创世炉能将电力转化为物品。手持物品对核心使用即可选定；空手使用核心可取出成品（也可在下方用漏斗抽取）。\n每个物品的耗电 = 质量 × 1 GFE × 10^稀有度，稀有度从 0（石头、泥土）到 4（下界之星、鞘翅、龙蛋）。配方表由数据包（mass_synthesis）定义。"
+  },
+  "guide.singulo.genesis.synth.title": {
+    "source": "Mass synthesis",
+    "translation": "质量合成"
+  },
+  "howto.singulo.genesis_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "制造地：奇点封装器（第 5 阶段）"
+  },
+  "howto.singulo.genesis_frame": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "制造地：精密组装台（第 5 阶段）"
+  },
+  "howto.singulo.genesis_pylon": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "制造地：精密组装台（第 5 阶段）"
+  },
+  "howto.singulo.primordial_seed": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "制造地：奇点封装器（第 5 阶段）"
+  },
+  "item.singulo.primordial_seed": {
+    "source": "Primordial Seed",
+    "translation": "原初之种"
+  },
+  "record.singulo.x02.body": {
+    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they know the hand that stops the feed.",
+    "translation": "所有质量都化作了能量。我们用那座炉的火，再一次孕育了一个宇宙。星辰点亮，银河旋转。总有一天，那里也会诞生留下记录的某人。愿那个人，知道那只停止投料的手。"
+  },
+  "record.singulo.x02.title": {
+    "source": "The First Page",
+    "translation": "最初的一页"
+  },
+  "record.singulo.x03.body": {
+    "source": "Beyond the last page, I wrote a new first page. To the watcher who sleeps: your records were read, and they became a universe. You need not keep watch any longer. We are watching the fire now.",
+    "translation": "在最后一页的那之后，我写下了新的第一页。致沉睡的守望者：你的记录已被读过，并化作了宇宙。你不必再守望了。如今，由我们看守着那团火。"
+  },
+  "record.singulo.x03.title": {
+    "source": "A Reply to the Archivist",
+    "translation": "致记录者的回信"
+  },
+  "subtitles.singulo.genesis.alarm": {
+    "source": "Surge warning",
+    "translation": "失控警报"
+  },
+  "subtitles.singulo.genesis.ambient": {
+    "source": "Genesis Engine pulses",
+    "translation": "创世炉搏动"
+  },
+  "subtitles.singulo.genesis.big_bang": {
+    "source": "A universe is born",
+    "translation": "宇宙诞生"
+  },
+  "subtitles.singulo.genesis.birth_collapse": {
+    "source": "Light falls into a point",
+    "translation": "光坠向一点"
+  },
+  "subtitles.singulo.genesis.collapse": {
+    "source": "Proto-universe collapses",
+    "translation": "宇宙濒临崩塌"
+  },
+  "subtitles.singulo.genesis.form": {
+    "source": "Genesis Engine assembles",
+    "translation": "创世炉组建完成"
+  },
+  "subtitles.singulo.genesis.ignite": {
+    "source": "The seed ignites",
+    "translation": "火种点燃"
+  },
+  "subtitles.singulo.genesis.lever": {
+    "source": "Feed toggles",
+    "translation": "投料切换"
+  },
+  "subtitles.singulo.genesis.seed": {
+    "source": "Primordial Seed sinks in",
+    "translation": "原初之种沉入"
+  },
+  "subtitles.singulo.genesis.sky": {
+    "source": "A galaxy rises into the sky",
+    "translation": "银河升上天空"
+  },
+  "subtitles.singulo.genesis.surge": {
+    "source": "Proto-universe surges",
+    "translation": "宇宙翻涌"
+  },
+  "subtitles.singulo.genesis.synth": {
+    "source": "Mass is synthesized",
+    "translation": "质量被合成"
+  },
+  "uses.singulo.artificial_star_core": {
+    "source": "Used in: Genesis Core, Primordial Seed",
+    "translation": "用于：创世炉核心、原初之种"
   }
 }

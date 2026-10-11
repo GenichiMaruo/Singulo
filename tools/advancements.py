@@ -124,4 +124,10 @@ ADVANCEMENTS = [
      '最後の頁', '最後の記録者を眠らせる', 'The Last Page', 'Lay the Last Archivist to rest'),
     ('records', 'archive', 'record_fragment', 'challenge', ('milestone', 'records_all'), 5,
      '滅びの記録', '旧文明の記録をすべて解読する', 'Record of the Fall', 'Decode every ancient record'),
+    ('genesis_formed', 'leviathan', 'genesis_core', 'goal', ('milestone', 'genesis_formed'), 5,
+     '揺籃', '創世炉を組み上げる', 'The Cradle', 'Assemble a Genesis Engine'),
+    ('genesis_birth', 'genesis_formed', 'primordial_seed', 'challenge', ('milestone', 'genesis_birth'), 5,
+     '最初の頁', '創世炉で宇宙を生む', 'The First Page', 'Give birth to a universe in the Genesis Engine'),
+    ('synth_legendary', 'genesis_birth', 'genesis_pylon', 'challenge', ('milestone', 'synth_legendary'), 5,
+     '無から有へ', '創世炉で伝説の物（希少度4）を作る', 'Something from Nothing', 'Synthesize a legendary item (rarity 4) in the Genesis Engine'),
 ]

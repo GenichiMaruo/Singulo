@@ -58,6 +58,8 @@ public final class SinguloSounds {
             "last_archivist.judgment_aim", "last_archivist.judgment_fire", "last_archivist.verdict", "last_archivist.collapse",
             "last_archivist.recall", "last_archivist.nova_charge", "last_archivist.nova", "last_archivist.death",
             "last_archivist.death_flash",
+            "genesis.form", "genesis.ambient", "genesis.seed", "genesis.ignite", "genesis.surge", "genesis.alarm",
+            "genesis.collapse", "genesis.lever", "genesis.birth_collapse", "genesis.big_bang", "genesis.sky", "genesis.synth",
     };
 
     static {

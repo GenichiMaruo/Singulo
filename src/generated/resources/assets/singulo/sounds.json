@@ -1258,5 +1258,113 @@
         "attenuation_distance": 64
       }
     ]
+  },
+  "genesis.form": {
+    "subtitle": "subtitles.singulo.genesis.form",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.activate",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.ambient": {
+    "subtitle": "subtitles.singulo.genesis.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.seed": {
+    "subtitle": "subtitles.singulo.genesis.seed",
+    "sounds": [
+      {
+        "name": "minecraft:block.respawn_anchor.charge",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.ignite": {
+    "subtitle": "subtitles.singulo.genesis.ignite",
+    "sounds": [
+      {
+        "name": "minecraft:block.end_portal_frame.fill",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.surge": {
+    "subtitle": "subtitles.singulo.genesis.surge",
+    "sounds": [
+      {
+        "name": "minecraft:block.respawn_anchor.deplete",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.alarm": {
+    "subtitle": "subtitles.singulo.genesis.alarm",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.collapse": {
+    "subtitle": "subtitles.singulo.genesis.collapse",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.lever": {
+    "subtitle": "subtitles.singulo.genesis.lever",
+    "sounds": [
+      {
+        "name": "minecraft:block.lever.click",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.birth_collapse": {
+    "subtitle": "subtitles.singulo.genesis.birth_collapse",
+    "sounds": [
+      {
+        "name": "minecraft:block.portal.trigger",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.big_bang": {
+    "subtitle": "subtitles.singulo.genesis.big_bang",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wither.spawn",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.sky": {
+    "subtitle": "subtitles.singulo.genesis.sky",
+    "sounds": [
+      {
+        "name": "minecraft:ui.toast.challenge_complete",
+        "type": "event"
+      }
+    ]
+  },
+  "genesis.synth": {
+    "subtitle": "subtitles.singulo.genesis.synth",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.resonate",
+        "type": "event"
+      }
+    ]
   }
 }

@@ -76,6 +76,7 @@ public final class GeneratedContent {
             new ItemDef("singularity_core", "catalyst", 5, 72000),
             new ItemDef("confinement_ring", "item", 5, 0),
             new ItemDef("wormhole_mouth_casing", "item", 5, 0),
+            new ItemDef("primordial_seed", "item", 5, 0),
             new ItemDef("observation_log", "uses", 1, 16),
             new ItemDef("degraded_control_unit", "item", 1, 0),
             new ItemDef("control_unit", "uses", 1, 16),
@@ -107,7 +108,9 @@ public final class GeneratedContent {
             new BlockDef("compressed_block_3", 4),
             new BlockDef("compressed_metal_block_1", 4),
             new BlockDef("compressed_metal_block_2", 4),
-            new BlockDef("strange_matter", 1)
+            new BlockDef("strange_matter", 1),
+            new BlockDef("genesis_frame", 5),
+            new BlockDef("genesis_pylon", 5)
     );
 
     /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */
@@ -196,6 +199,10 @@ public final class GeneratedContent {
             "wormhole_generator_focuser",
             "wormhole_generator_window",
             "wormhole_generator_port",
+            "genesis_core",
+            "genesis_frame",
+            "genesis_pylon",
+            "primordial_seed",
             "worldline_anchor_small",
             "inertial_stabilizer",
             "gravity_panel_receiver",

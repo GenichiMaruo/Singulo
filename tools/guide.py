@@ -443,6 +443,43 @@ CHAPTERS = [
          '炉心に直接入れると、エディントン限界を受けずに質量になる。',
          'Dark matter', 'Collect near a core, store in containment tanks, feed the core directly.'),
     ]),
+    ('genesis', 'singulo:genesis_core', '創世炉', 'Genesis Engine', [
+        ('build', '創世炉を組む',
+         '旧文明は「すべての質量をエネルギーに」変えようとして滅びました。創世炉はその逆、エネルギーから宇宙を生む炉です。\n'
+         '・核のまわり、同じ高さに創世炉の枠を8個: 核から十字に3マスの4か所と、斜めに2マス・2マスの4か所。\n'
+         '・斜めの4つの枠の上に、創世炉の柱を3段ずつ（12個）。\n'
+         '形ができると核が鳴ります。原初の種（渦の断章が要る）を核に使うと始まります。電力はどの面からでも入ります。',
+         'Building the Genesis Engine',
+         'The old civilization fell trying to turn all mass into energy. The Genesis Engine does the reverse.\n'
+         '- Eight Genesis Frames level with the core: three blocks out on each axis, and two-and-two on each diagonal.\n'
+         '- Three Genesis Pylons stacked on each of the four diagonal frames (twelve in all).\n'
+         'The core chimes when formed. Use a Primordial Seed on it to begin. Power enters from any side.'),
+        ('birth', '宇宙の誕生',
+         '1. 種火: 1.5 TFE を注ぐ（1 tick に 1 GFE まで）。Pリアクターを全開にして1分あまり。\n'
+         '2. 安定化: 100 MFE/t を保ったまま約4分。ときどき「暴走の兆し」の警報が鳴ります。警報のあいだは投入を止めること'
+         '（素手で核を使うか、核に赤石信号）。止めないと不安定度が跳ね上がり、100% で崩れて進みが戻ります。'
+         '重力の漏れ・記録の残響・引力の波にも備えて。シールドの中なら暴走と事件が弱まり、Tシリンダーの加速の場の中なら速く進みます。\n'
+         '3. 誕生: 光が一点に落ち、宇宙が生まれます。生まれた銀河は、オーバーワールドの夜空に昇ります。\n'
+         'しゃがんで素手で核を使うと、詳しい様子が見られます。',
+         'Birth of a universe',
+         '1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n'
+         '2. Stabilizing: hold 100 MFE/t for about four minutes. Now and then a surge alarm sounds: stop the feed while it lasts '
+         '(use the core empty-handed, or give it a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe '
+         'collapses and progress is lost. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; '
+         'a T-Cylinder field speeds things up.\n'
+         '3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\n'
+         'Sneak-use the core empty-handed for details.'),
+        ('synth', '質量生成',
+         '宇宙が生まれた創世炉は、電力から物を作れます。作りたい物を持って核を使うと、それを作る物に決まります。'
+         '素手で使うと出来上がった物を受け取れます（下からホッパーなどでも取り出せます）。\n'
+         '1個の電力 = 質量 × 1 GFE × 10^希少度。希少度は 0（石・土など）から 4（ネザースター・エリトラ・ドラゴンの卵など）まで。'
+         '希少な物ほど桁違いに重くなります。作れる物はデータパック（mass_synthesis）で変えられます。',
+         'Mass synthesis',
+         'A born universe turns power into items. Use an item on the core to choose it; use the core empty-handed to collect '
+         '(or pull from below with a hopper).\n'
+         'Cost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). '
+         'The table is a datapack (mass_synthesis).'),
+    ]),
     ('hazards', 'minecraft:tnt', '危険', 'Hazards', [
         ('list', '気をつけること',
          '・リアクターの潮汐帯（半径4）は防具を無視してダメージを受ける。\n'

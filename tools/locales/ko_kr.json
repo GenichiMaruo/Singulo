@@ -6508,8 +6508,8 @@
     "translation": "사용 제품: 축퇴 열로"
   },
   "uses.singulo.degenerate_matter_shell": {
-    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock)",
-    "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금)"
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 1 more",
+    "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금) 외 1개"
   },
   "uses.singulo.degenerate_nucleus": {
     "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
@@ -6548,16 +6548,16 @@
     "translation": "사용 대상: 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기, 메아리 공명기 외 18개"
   },
   "uses.singulo.ergosphere_chapter": {
-    "source": "Used in: Awakened Ergosphere Core, Terminus Record",
-    "translation": "사용 대상: 각성의 소용돌이핵, 종언의 기록"
+    "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
+    "translation": "사용 대상: 각성의 소용돌이핵, 종언의 기록, 원초의 씨앗"
   },
   "uses.singulo.ergosphere_ring": {
     "source": "Used in: Sealed Container (Singularity Lock)",
     "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 24 more",
-    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 24개"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 27 more",
+    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 27개"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -6584,8 +6584,8 @@
     "translation": "사용 제품: 펜로즈 반응로"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 3 more",
-    "translation": "사용 대상: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠, 각성의 기록핵, 각성의 메아리핵 외 3개"
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 5 more",
+    "translation": "사용 대상: 소형 블랙홀 용기, 특이점 코어, 특이점 잠금 열쇠, 각성의 기록핵, 각성의 메아리핵 외 5개"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
@@ -6600,8 +6600,8 @@
     "translation": "사용 제품: 중력자 조작기"
   },
   "uses.singulo.jet_condensate": {
-    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core",
-    "translation": "사용 대상: 인공 항성 코어, 각성의 소용돌이핵"
+    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon",
+    "translation": "사용 대상: 인공 항성 코어, 각성의 소용돌이핵, 창세로 기둥"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
@@ -6636,8 +6636,8 @@
     "translation": "사용 제품: 데이터 카드(관찰 기록)"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 22 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판, 특이 물질 외 22개"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판, 특이 물질 외 23개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -6648,8 +6648,8 @@
     "translation": "사용 대상: 축퇴 압축로 앤빌, 축퇴 전구체"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 17 more",
-    "translation": "사용 대상: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 17개"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 18 more",
+    "translation": "사용 대상: 양자 열기관, 중력파 검출기, 중성미자 관측소, 축퇴 압축로 제어기, 카시미르 공동 제어기 외 18개"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -6660,8 +6660,8 @@
     "translation": "사용 대상: 운철 주괴"
   },
   "uses.singulo.reactor_shell": {
-    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator",
-    "translation": "사용 대상: 추출 포트, 노심 안정화 코일, 노심 질량 경보기, 펜로즈 반응로, 특이점 캡슐화기"
+    "source": "Used in: Extraction Port, Reactor Stabilizer Coil, Reactor Mass Alarm, P-Reactor, Singularity Encapsulator and 1 more",
+    "translation": "사용 대상: 추출 포트, 노심 안정화 코일, 노심 질량 경보기, 펜로즈 반응로, 특이점 캡슐화기 외 1개"
   },
   "uses.singulo.reactor_stabilizer": {
     "source": "Used in: P-Reactor",
@@ -6728,12 +6728,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 61 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 61개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 62 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 62개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 40 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 40개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 41 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 41개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",
@@ -6748,8 +6748,8 @@
     "translation": "사용 대상: 특이 물질, 특이점 코어, 시간 결정 모듈"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 1 more",
-    "translation": "사용 대상: 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 중력자 조작기, 티플러 코어 외 1개"
+    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 2 more",
+    "translation": "사용 대상: 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 중력자 조작기, 티플러 코어 외 2개"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -6834,5 +6834,365 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "사용 대상: 웜홀 입구"
+  },
+  "advancement.singulo.genesis_birth.description": {
+    "source": "Give birth to a universe in the Genesis Engine",
+    "translation": "창세로에서 우주를 탄생시키세요"
+  },
+  "advancement.singulo.genesis_birth.title": {
+    "source": "The First Page",
+    "translation": "최초의 페이지"
+  },
+  "advancement.singulo.genesis_formed.description": {
+    "source": "Assemble a Genesis Engine",
+    "translation": "창세로를 조립하세요"
+  },
+  "advancement.singulo.genesis_formed.title": {
+    "source": "The Cradle",
+    "translation": "요람"
+  },
+  "advancement.singulo.synth_legendary.description": {
+    "source": "Synthesize a legendary item (rarity 4) in the Genesis Engine",
+    "translation": "창세로에서 전설의 물건(희귀도 4)을 합성하세요"
+  },
+  "advancement.singulo.synth_legendary.title": {
+    "source": "Something from Nothing",
+    "translation": "무에서 유로"
+  },
+  "block.singulo.genesis_core": {
+    "source": "Genesis Core",
+    "translation": "창세로 코어"
+  },
+  "block.singulo.genesis_frame": {
+    "source": "Genesis Frame",
+    "translation": "창세로 프레임"
+  },
+  "block.singulo.genesis_pylon": {
+    "source": "Genesis Pylon",
+    "translation": "창세로 기둥"
+  },
+  "desc.singulo.genesis_core": {
+    "source": "The heart of an engine that makes a universe from energy. Surround it with 8 frames and 12 pylons, use a Primordial Seed and pour in 1.5 TFE to begin. Once born, the universe turns power into mass (items).",
+    "translation": "에너지로 우주를 만들어 내는 노(爐)의 심장입니다. 프레임 8개와 기둥 12개로 둘러싸고, 원초의 씨앗을 사용한 뒤 1.5 TFE를 쏟아부으면 시작됩니다. 태어난 우주는 전력을 질량(아이템)으로 바꿉니다."
+  },
+  "desc.singulo.genesis_frame": {
+    "source": "Placed level with the Genesis Core in an octagon three blocks out (four on the axes, four on the 2-2 diagonals).",
+    "translation": "창세로 코어와 같은 높이에, 코어에서 3블록 떨어진 팔각형으로 놓습니다(십자 방향 4개, 대각선 2·2 위치 4개)."
+  },
+  "desc.singulo.genesis_pylon": {
+    "source": "Stacked three high on each diagonal frame of the Genesis Engine; they focus power into the newborn universe.",
+    "translation": "창세로의 대각선 프레임 위에 3단씩 쌓습니다. 갓 태어나려는 우주로 전력을 모아 보냅니다."
+  },
+  "desc.singulo.primordial_seed": {
+    "source": "A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.",
+    "translation": "소용돌이의 단장에 새겨진 점화 기록을 거꾸로 거슬러 올라가 만든 씨앗입니다. 창세로 코어에 사용하면 우주의 탄생이 시작됩니다."
+  },
+  "ending.singulo.archivist": {
+    "source": "— The Archivist's voice: \"Beyond the last page. Thank you for letting me read it.\"",
+    "translation": "— 기록자의 목소리가 들린다. \"마지막 페이지의, 그 너머를. 읽게 해 주어서, 고맙다.\""
+  },
+  "ending.singulo.credit": {
+    "source": "Singulo",
+    "translation": "Singulo"
+  },
+  "ending.singulo.line.1": {
+    "source": "Once, a civilization tried to turn all mass into energy.",
+    "translation": "옛날, 한 문명은 모든 질량을 에너지로 바꾸려 했다."
+  },
+  "ending.singulo.line.2": {
+    "source": "The reactor granted that wish: the cities, the mountains, the sea. Only the anomaly and the records remained.",
+    "translation": "반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과, 기록뿐이었다."
+  },
+  "ending.singulo.line.3": {
+    "source": "You read those records and lit the same fire. And you never let go of the hand that stops the feed.",
+    "translation": "당신은 그 기록을 읽고, 같은 불을 지폈다. 그리고 투입을 멈추는 손을 끝내 놓지 않았다."
+  },
+  "ending.singulo.line.4": {
+    "source": "So now the energy returns: to mass, to stars, to a galaxy.",
+    "translation": "그래서 이제, 에너지는 돌아간다. 질량으로. 별로. 은하로."
+  },
+  "ending.singulo.line.5": {
+    "source": "Look up at the night sky. That light is the universe you made.",
+    "translation": "밤하늘을 올려다보길. 저 빛은, 당신이 만든 우주다."
+  },
+  "ending.singulo.skip": {
+    "source": "Press Esc to close",
+    "translation": "Esc를 눌러 닫기"
+  },
+  "ending.singulo.thanks": {
+    "source": "Thank you for playing",
+    "translation": "Thank you for playing"
+  },
+  "gui.singulo.genesis.bar.kindling": {
+    "source": "Kindling %s  Intake %s/t",
+    "translation": "불씨 %s  수전 %s/t"
+  },
+  "gui.singulo.genesis.bar.paused": {
+    "source": "[Feed stopped] %s",
+    "translation": "[투입 정지] %s"
+  },
+  "gui.singulo.genesis.bar.stabilizing": {
+    "source": "Stabilization %s  Instability %s",
+    "translation": "안정화 %s  불안정도 %s"
+  },
+  "gui.singulo.genesis.bar.surge": {
+    "source": "⚠ Surging: stop the feed!  Instability %s",
+    "translation": "⚠ 폭주 중: 투입을 멈춰라!  불안정도 %s"
+  },
+  "gui.singulo.genesis.bar.surge_held": {
+    "source": "Holding the surge  Instability %s",
+    "translation": "폭주를 억누르는 중  불안정도 %s"
+  },
+  "gui.singulo.genesis.bar.synth": {
+    "source": "%s %s  Ready: %s",
+    "translation": "%s %s  완성: %s개"
+  },
+  "gui.singulo.genesis.birth_1": {
+    "source": "The light falls into a single point...",
+    "translation": "빛이, 한 점으로 떨어져 간다……"
+  },
+  "gui.singulo.genesis.birth_2": {
+    "source": "All mass became energy. So now,",
+    "translation": "모든 질량은 에너지가 되었다. 그러니 이번에는,"
+  },
+  "gui.singulo.genesis.birth_3": {
+    "source": "from energy, a universe.",
+    "translation": "에너지로부터, 우주를 하나."
+  },
+  "gui.singulo.genesis.birth_sky": {
+    "source": "The newborn galaxy rises into the night sky",
+    "translation": "갓 태어난 은하가 밤하늘로 떠올랐다"
+  },
+  "gui.singulo.genesis.birthing": {
+    "source": "A universe is being born",
+    "translation": "우주가 태어나고 있다"
+  },
+  "gui.singulo.genesis.collapse": {
+    "source": "The proto-universe nearly collapses. Progress is lost",
+    "translation": "태어나려던 우주가 무너질 뻔했다. 진행도가 줄어들었다"
+  },
+  "gui.singulo.genesis.complete": {
+    "source": "The Genesis Engine can now create mass. Use an item on the core to choose what to make",
+    "translation": "창세로가 이제 질량을 만들어 낼 수 있다. 만들고 싶은 아이템을 들고 코어에 사용해 선택하자"
+  },
+  "gui.singulo.genesis.detail.kindling": {
+    "source": "Kindling %s (%s / %s)  Intake %s/t (max %s/t)",
+    "translation": "불씨 %s (%s / %s)  수전 %s/t (최대 %s/t)"
+  },
+  "gui.singulo.genesis.detail.stabilizing": {
+    "source": "Stabilization %s  Instability %s  Upkeep %s/t  Intake %s/t",
+    "translation": "안정화 %s  불안정도 %s  유지 %s/t  수전 %s/t"
+  },
+  "gui.singulo.genesis.detail.synth": {
+    "source": "Making %s: %s (%s each)  Intake %s/t  Ready: %s",
+    "translation": "%s 생성 중: %s (1개당 %s)  수전 %s/t  완성: %s개"
+  },
+  "gui.singulo.genesis.detail.synth_none": {
+    "source": "Nothing chosen (use an item on the core)",
+    "translation": "만들 물건이 정해지지 않았다 (아이템을 들고 코어에 사용)"
+  },
+  "gui.singulo.genesis.event.echoes": {
+    "source": "Echoes of the records are drawn in",
+    "translation": "기록의 잔향이 끌려 들어왔다"
+  },
+  "gui.singulo.genesis.event.leak": {
+    "source": "Gravity leaks out",
+    "translation": "중력이 새어 나왔다"
+  },
+  "gui.singulo.genesis.event.wave": {
+    "source": "A wave of gravity rises. Brace for the fall",
+    "translation": "중력의 파도가 밀려온다. 착지에 대비하라"
+  },
+  "gui.singulo.genesis.feeding": {
+    "source": "Feed: on",
+    "translation": "투입: 계속 중"
+  },
+  "gui.singulo.genesis.formed": {
+    "source": "The Genesis Engine takes shape. Use a Primordial Seed on the core to begin",
+    "translation": "창세로의 형태가 갖추어졌다. 원초의 씨앗을 코어에 사용하면 시작된다"
+  },
+  "gui.singulo.genesis.kindled": {
+    "source": "The seed ignites. A universe begins to swell. Keep the upkeep flowing and hold back the surges",
+    "translation": "씨앗에 불이 붙었다. 우주가 부풀기 시작한다. 유지 전력을 끊지 말고, 폭주를 억눌러라"
+  },
+  "gui.singulo.genesis.need_seed": {
+    "source": "Use a Primordial Seed on the core",
+    "translation": "원초의 씨앗을 코어에 사용할 것"
+  },
+  "gui.singulo.genesis.not_feeding": {
+    "source": "Feed: stopped",
+    "translation": "투입: 정지 중"
+  },
+  "gui.singulo.genesis.not_synthesizable": {
+    "source": "The Genesis Engine cannot make that",
+    "translation": "그것은 창세로로 만들 수 없다"
+  },
+  "gui.singulo.genesis.resumed": {
+    "source": "Feed resumed",
+    "translation": "투입을 재개했다"
+  },
+  "gui.singulo.genesis.seeded": {
+    "source": "The seed sinks in. Pour in power to kindle it",
+    "translation": "원초의 씨앗이 가라앉았다. 불씨를 위해 전력을 쏟아부어라"
+  },
+  "gui.singulo.genesis.stage.0": {
+    "source": "Genesis Engine: not formed",
+    "translation": "창세로: 미형성"
+  },
+  "gui.singulo.genesis.stage.1": {
+    "source": "Genesis Engine: cradle (awaiting a Primordial Seed)",
+    "translation": "창세로: 요람 (원초의 씨앗을 기다리는 중)"
+  },
+  "gui.singulo.genesis.stage.2": {
+    "source": "Genesis Engine: kindling",
+    "translation": "창세로: 불씨"
+  },
+  "gui.singulo.genesis.stage.3": {
+    "source": "Genesis Engine: stabilizing",
+    "translation": "창세로: 안정화"
+  },
+  "gui.singulo.genesis.stage.4": {
+    "source": "Genesis Engine: birth",
+    "translation": "창세로: 탄생"
+  },
+  "gui.singulo.genesis.stage.5": {
+    "source": "Genesis Engine: complete (mass synthesis)",
+    "translation": "창세로: 완성 (질량 생성)"
+  },
+  "gui.singulo.genesis.stopped": {
+    "source": "Feed stopped",
+    "translation": "투입을 멈췄다"
+  },
+  "gui.singulo.genesis.surge": {
+    "source": "Surge warning! Stop the feed (use the core empty-handed, or a redstone signal)",
+    "translation": "폭주의 조짐! 투입을 멈춰라 (맨손으로 코어를 사용하거나, 레드스톤 신호)"
+  },
+  "gui.singulo.genesis.surge_end": {
+    "source": "The surge subsides. You may resume the feed",
+    "translation": "우주의 요동이 가라앉았다. 투입을 재개해도 좋다"
+  },
+  "gui.singulo.genesis.template": {
+    "source": "Making: %s (%s each, rarity %s)",
+    "translation": "만들 물건: %s (1개당 %s, 희귀도 %s)"
+  },
+  "gui.singulo.genesis.unformed": {
+    "source": "Not formed (surround the core with 8 frames and 12 pylons)",
+    "translation": "형성되지 않음 (프레임 8개와 기둥 12개로 코어를 둘러쌀 것)"
+  },
+  "guide.singulo.genesis": {
+    "source": "Genesis Engine",
+    "translation": "창세로"
+  },
+  "guide.singulo.genesis.birth.body": {
+    "source": "1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n2. Stabilizing: hold 100 MFE/t for about four minutes. Now and then a surge alarm sounds: stop the feed while it lasts (use the core empty-handed, or give it a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe collapses and progress is lost. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; a T-Cylinder field speeds things up.\n3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\nSneak-use the core empty-handed for details.",
+    "translation": "1. 불씨: 1.5 TFE를 쏟아붓습니다(1 tick당 최대 1 GFE). 펜로즈 반응로를 최대 출력으로 돌리면 1분 남짓 걸립니다.\n2. 안정화: 100 MFE/t를 유지한 채 약 4분. 이따금 폭주 경보가 울립니다. 경보가 울리는 동안에는 투입을 멈추세요(맨손으로 코어를 사용하거나, 코어에 레드스톤 신호를 주기). 계속 투입하면 불안정도가 치솟고, 100%에 이르면 태어나려던 우주가 무너져 진행도가 줄어듭니다. 중력 누출, 기록의 잔향, 중력의 파도에도 대비하세요. 보호막 안에서는 폭주와 이변이 약해지고, 티플러 원통의 가속장 안에서는 더 빨리 진행됩니다.\n3. 탄생: 빛이 한 점으로 떨어지고 우주가 태어납니다. 태어난 은하는 오버월드의 밤하늘로 떠오릅니다.\n웅크린 채 맨손으로 코어를 사용하면 자세한 상태를 볼 수 있습니다."
+  },
+  "guide.singulo.genesis.birth.title": {
+    "source": "Birth of a universe",
+    "translation": "우주의 탄생"
+  },
+  "guide.singulo.genesis.build.body": {
+    "source": "The old civilization fell trying to turn all mass into energy. The Genesis Engine does the reverse.\n- Eight Genesis Frames level with the core: three blocks out on each axis, and two-and-two on each diagonal.\n- Three Genesis Pylons stacked on each of the four diagonal frames (twelve in all).\nThe core chimes when formed. Use a Primordial Seed on it to begin. Power enters from any side.",
+    "translation": "옛 문명은 모든 질량을 에너지로 바꾸려다 멸망했습니다. 창세로는 그 반대, 에너지로 우주를 만들어 내는 노(爐)입니다.\n- 코어와 같은 높이에 창세로 프레임 8개: 각 축 방향으로 3블록 떨어진 곳, 그리고 각 대각선 방향으로 2·2 떨어진 곳.\n- 대각선의 프레임 4개 위에 창세로 기둥을 3단씩(총 12개).\n형성되면 코어가 울립니다. 원초의 씨앗을 코어에 사용하면 시작됩니다. 전력은 어느 면으로든 들어갑니다."
+  },
+  "guide.singulo.genesis.build.title": {
+    "source": "Building the Genesis Engine",
+    "translation": "창세로 짓기"
+  },
+  "guide.singulo.genesis.synth.body": {
+    "source": "A born universe turns power into items. Use an item on the core to choose it; use the core empty-handed to collect (or pull from below with a hopper).\nCost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). The table is a datapack (mass_synthesis).",
+    "translation": "우주가 태어난 창세로는 전력으로 아이템을 만듭니다. 만들고 싶은 아이템을 들고 코어에 사용하면 선택되고, 맨손으로 사용하면 완성된 아이템을 받습니다(아래에서 호퍼로 빼낼 수도 있습니다).\n아이템 1개당 비용 = 질량 × 1 GFE × 10^희귀도. 희귀도는 0(돌, 흙)부터 4(네더의 별, 겉날개, 드래곤 알)까지입니다. 목록은 데이터팩(mass_synthesis)으로 정해집니다."
+  },
+  "guide.singulo.genesis.synth.title": {
+    "source": "Mass synthesis",
+    "translation": "질량 생성"
+  },
+  "howto.singulo.genesis_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "howto.singulo.genesis_frame": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.genesis_pylon": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작품: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.primordial_seed": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "제작품: 특이점 캡슐화기(5단계)"
+  },
+  "item.singulo.primordial_seed": {
+    "source": "Primordial Seed",
+    "translation": "원초의 씨앗"
+  },
+  "record.singulo.x02.body": {
+    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they know the hand that stops the feed.",
+    "translation": "모든 질량은 에너지가 되었다. 그 같은 불로, 우리는 다시 한번 우주를 하나 만들었다. 별이 켜지고, 은하가 소용돌이친다. 언젠가 그곳에서도 기록을 남길 누군가가 태어나겠지. 그 누군가가, 투입을 멈추는 손을 알게 되기를."
+  },
+  "record.singulo.x02.title": {
+    "source": "The First Page",
+    "translation": "최초의 페이지"
+  },
+  "record.singulo.x03.body": {
+    "source": "Beyond the last page, I wrote a new first page. To the watcher who sleeps: your records were read, and they became a universe. You need not keep watch any longer. We are watching the fire now.",
+    "translation": "마지막 페이지의 그 너머에, 새로운 첫 페이지를 썼다. 잠든 파수꾼에게. 당신의 기록은 읽혔고, 그리고 우주가 되었다. 이제 더는 지켜보지 않아도 된다. 불은, 이제 우리가 지켜보고 있다."
+  },
+  "record.singulo.x03.title": {
+    "source": "A Reply to the Archivist",
+    "translation": "기록자에게 보내는 답장"
+  },
+  "subtitles.singulo.genesis.alarm": {
+    "source": "Surge warning",
+    "translation": "폭주 경보"
+  },
+  "subtitles.singulo.genesis.ambient": {
+    "source": "Genesis Engine pulses",
+    "translation": "창세로가 맥동한다"
+  },
+  "subtitles.singulo.genesis.big_bang": {
+    "source": "A universe is born",
+    "translation": "우주가 태어난다"
+  },
+  "subtitles.singulo.genesis.birth_collapse": {
+    "source": "Light falls into a point",
+    "translation": "빛이 한 점으로 떨어진다"
+  },
+  "subtitles.singulo.genesis.collapse": {
+    "source": "Proto-universe collapses",
+    "translation": "태어나려던 우주가 무너진다"
+  },
+  "subtitles.singulo.genesis.form": {
+    "source": "Genesis Engine assembles",
+    "translation": "창세로가 조립된다"
+  },
+  "subtitles.singulo.genesis.ignite": {
+    "source": "The seed ignites",
+    "translation": "씨앗에 불이 붙는다"
+  },
+  "subtitles.singulo.genesis.lever": {
+    "source": "Feed toggles",
+    "translation": "투입이 전환된다"
+  },
+  "subtitles.singulo.genesis.seed": {
+    "source": "Primordial Seed sinks in",
+    "translation": "원초의 씨앗이 가라앉는다"
+  },
+  "subtitles.singulo.genesis.sky": {
+    "source": "A galaxy rises into the sky",
+    "translation": "은하가 하늘로 떠오른다"
+  },
+  "subtitles.singulo.genesis.surge": {
+    "source": "Proto-universe surges",
+    "translation": "태어나려는 우주가 요동친다"
+  },
+  "subtitles.singulo.genesis.synth": {
+    "source": "Mass is synthesized",
+    "translation": "질량이 생성된다"
+  },
+  "uses.singulo.artificial_star_core": {
+    "source": "Used in: Genesis Core, Primordial Seed",
+    "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   }
 }

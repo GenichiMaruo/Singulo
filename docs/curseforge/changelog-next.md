@@ -36,4 +36,20 @@
   - A divine figure in an ivory robe with a golden halo and six wings of light, whose head is an event horizon and whose hem dissolves into an accretion veil.
   - Revelation: judgment beams from the halo and falling singularities. Recollection (below 2/3): it recites the guardians' techniques. Ending (below 1/3): the halo turns black, its singularity pulls you in and it releases a nova that only the eye at its feet escapes.
   - Full emergence and death sequences, with lines of dialogue. 2,400 health (`archivistHealth`). Drops the Archivist's Halo and unlocks the final record.
+- **Endgame goal: the Genesis Engine.** The old civilization turned all mass into energy and perished. The Genesis Engine does the reverse: it makes a universe from energy.
+  - Build: a **Genesis Core** surrounded by 8 **Genesis Frames** (three blocks out on each axis and two-and-two on the diagonals) and 12 **Genesis Pylons** (three high on each diagonal frame).
+  - Ignite it with a **Primordial Seed**, which needs a Chapter of the Vortex.
+  - Kindling: pour in 1.5 TFE, at most 1 GFE per tick (`genesisSeedEnergy`, `genesisMaxInput`).
+  - Stabilizing: hold 100 MFE/t for about four minutes (`genesisUpkeep`).
+    - Surge alarms come now and then. Stop the feed while the alarm lasts, either by using the core empty-handed or by giving it a redstone signal. If you keep feeding, instability spikes, and at 100% the proto-universe collapses and loses progress.
+    - Gravity leaks, echoes and gravity waves also appear. A shield softens surges and events, and a T-Cylinder field speeds things up.
+  - Birth: a 30-second cinematic.
+    - The light collapses into a point, silence, a flash, and then a galaxy unfurls and rises into the sky.
+    - Your galaxy then appears in the overworld night sky for every player, and a short epilogue plays (`genesisEndingScreen`).
+    - Two new records are unlocked, one of them only for those who laid the Last Archivist to rest.
+  - Afterwards the engine performs **mass synthesis**. Use an item on the core to choose what to make.
+    - Cost per item = mass × 1 GFE × 10^rarity, with rarity 0 (stone) to 4 (nether star, elytra, dragon egg). Rarer items are orders of magnitude more expensive.
+    - Base cost: `genesisBaseCost`. The list of items can be changed by datapack (`data/<ns>/mass_synthesis/`).
+    - The cost per unit of mass is always higher than what a P-Reactor extracts from that mass, so there is no energy loop.
+- New advancements: The Cradle, The First Page, Something from Nothing.
 - New advancements: Echoes That Linger, Memory of Weight, The Sunken Reactor, It Swims the Ergosphere, The Vortex Wakes, and a hidden one.

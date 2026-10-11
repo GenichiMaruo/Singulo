@@ -40,6 +40,9 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) ->
+                ClientGalaxies.set(java.util.List.of(), false));
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
@@ -135,6 +138,8 @@ public final class SinguloClient {
                 WormholeMouthRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.TIPLER_CYLINDER.get(),
                 TiplerCylinderRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.GENESIS_CORE.get(),
+                GenesisCoreRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_FURNACE.get(),
                 DegenerateFurnaceRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_COMPACTOR_CONTROLLER.get(),
