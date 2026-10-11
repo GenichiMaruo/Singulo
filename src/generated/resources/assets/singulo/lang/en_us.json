@@ -508,7 +508,7 @@
   "desc.singulo.time_crystal_seed": "Seed for time crystal catalysts.",
   "desc.singulo.tipler_bearing": "Top and bottom centre; carries the cylinder axle.",
   "desc.singulo.tipler_core": "Middle of the front, second layer, of the 5×5×9 housing.",
-  "desc.singulo.tipler_cylinder": "Speeds up time within 8 blocks.",
+  "desc.singulo.tipler_cylinder": "Speeds up time within 16 blocks: machines and crops nearby run twice as fast.",
   "desc.singulo.tipler_frame": "Frame along the 12 edges of the housing.",
   "desc.singulo.tipler_holder": "Either side of each window, middle layer.",
   "desc.singulo.tipler_housing": "Housing; any panel can be swapped for an I/O port.",

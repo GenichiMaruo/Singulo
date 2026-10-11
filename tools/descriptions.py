@@ -294,7 +294,7 @@ DESC = {
     'グラビトン・マニピュレーター': ('重力を操る杖。持ち上げた物をためて投げ飛ばせる。',
                      'The full gravity tool. Hold left-click to use; while levitating, charge with right-click and release to throw.'),
     'Tコア': ('Tシリンダーの頭脳。5×5×9 の手前の面の下から2段目の中央に置く。', 'Middle of the front, second layer, of the 5×5×9 housing.'),
-    'Tシリンダー': ('周りの時間を速め、半径16の装置や作物を2倍速にする。', 'Speeds up time within 8 blocks.'),
+    'Tシリンダー': ('周りの時間を速め、半径16の装置や作物を2倍速にする。', 'Speeds up time within 16 blocks: machines and crops nearby run twice as fast.'),
     'ワームホール生成器コア': ('ワームホール生成器の頭脳。球の下から2段目の輪の、手前の中央に置く。', 'Front middle of the second ring from the bottom of the sphere.'),
     'ワームホール生成器': ('100 MFE/t を10秒受けて、一対のワームホールの口を作る。', 'Creates a pair of wormhole mouths from 100 MFE/t for 10 s.'),
     '不安定なワームホールの口': ('60秒以内に固定化装置へ入れないと崩壊する。', 'Collapses unless stabilized within 60 s.'),

@@ -38,7 +38,7 @@ import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 /**
  * ティプラー・シリンダー（ティア5、3×3×7 のマルチブロック。コアは底の中央）。中央で回る円柱が周りの時間を速め、
- * 半径 tiplerRadius（既定8）の中の装置・作物・かまど・醸造台の処理を ×tiplerSpeedMultiplier（既定2）にする。
+ * 半径 tiplerRadius（既定16）の中の装置・作物・かまど・醸造台の処理を ×tiplerSpeedMultiplier（既定2）にする。
  * 範囲内の触媒装置は触媒の減りも同じ倍率で速くなる。重力時間膨張ゾーンと重なった場所では打ち消し合う。
  * <p>
  * 時間結晶触媒（ティア4）で動き、エキゾチック物質を FUEL_TICKS ごとに1個と、大電力（FE_PER_TICK）を使う。
