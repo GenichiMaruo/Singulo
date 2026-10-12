@@ -1,9 +1,18 @@
-name: Publish CurseForge Beta
+name: Publish CurseForge
 
+# 公開の種類（release type）:
+#   auto（既定）: 版番号が 1.0.0 以上で、-alpha / -beta / -rc などの付かない正式な版なら Release、それ以外（0.x や 1.0.0-beta.1）は Beta
+#   手動実行では beta / release / alpha を選んで上書きできる
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'CurseForge release type (auto: Release for 1.0.0 and later without a pre-release suffix, otherwise Beta)'
+        type: choice
+        options: [auto, beta, release, alpha]
+        default: auto
 
 permissions:
   contents: read
@@ -39,6 +48,16 @@ jobs:
             echo 'Tag must match mod_version'; exit 1
           fi
           test -f "docs/curseforge/changelog-$version.md"
+          type="${{ inputs.release_type }}"
+          if [[ -z "$type" || "$type" == auto ]]; then
+            if [[ "$version" =~ ^([0-9]+)\.[0-9]+\.[0-9]+$ ]] && (( BASH_REMATCH[1] >= 1 )); then
+              type=release
+            else
+              type=beta
+            fi
+          fi
+          echo "Release type: $type"
+          echo "type=$type" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "name=$mod_name-$version-$minecraft$suffix" >> "$GITHUB_OUTPUT"
           echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
@@ -53,7 +72,7 @@ jobs:
           name: ${{ steps.version.outputs.name }}
           path: build/libs/${{ steps.version.outputs.name }}.jar
           if-no-files-found: error
-      - name: Publish Beta to CurseForge
+      - name: Publish to CurseForge (${{ steps.version.outputs.type }})
         uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3
         with:
           curseforge-id: ${{ secrets.CURSEFORGE_PROJECT_ID || vars.CURSEFORGE_PROJECT_ID }}
@@ -61,7 +80,7 @@ jobs:
           files: build/libs/${{ steps.version.outputs.name }}.jar
           name: ${{ steps.version.outputs.name }}
           version: ${{ steps.version.outputs.version }}
-          version-type: beta
+          version-type: ${{ steps.version.outputs.type }}
           changelog-file: docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
           loaders: neoforge
           game-versions: ${{ steps.version.outputs.minecraft }}

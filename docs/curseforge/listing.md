@@ -7,7 +7,7 @@ Singulo
 `docs/curseforge/logo.png`（512×512）。400×400 版は `logo_400.png`。作り直すときは `tools/curseforge_logo.py`。
 
 ## Summary
-Tech progression from thermocouples to rotating black holes: physics-inspired machines, multiblocks, wormholes and gravity tools.
+Tech progression from thermocouples to rotating black holes and the birth of a universe: physics-inspired machines, multiblocks, guarded ruins and gravity tools.
 
 ## Class
 Mods

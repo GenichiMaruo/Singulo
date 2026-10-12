@@ -6,7 +6,7 @@
 
 Singulo is a **technology mod that takes your factory from a small generator to a rotating black hole reactor**. Process materials, supply power and catalysts, build multiblock machines, and unlock increasingly advanced technology.
 
-Exploration is part of that progression. Guarded ruins contain records and damaged components you cannot simply manufacture. Recovering and restoring them opens the next stage of your factory. Late-game devices add gravity manipulation, shields, time acceleration and remote logistics.
+Exploration is part of that progression. Guarded ruins contain records and damaged components you cannot simply manufacture. Recovering and restoring them opens the next stage of your factory. Late-game devices add gravity manipulation, shields, time acceleration and remote logistics. The final goal is the Genesis Engine, which uses a black hole's power to create a universe.
 
 Superconductivity, particle accelerators, the Casimir effect and Hawking radiation provide the themes. Mechanics and numbers are adapted for gameplay; this is not a complete physical simulation.
 
@@ -40,6 +40,8 @@ Cooling tower heat exchange cores and coolant bands can use three packed ice ins
 | 3: Quantum | Research Building salvage and liquid helium | Quantum components, laser cooling, BE Condensate Catalysts, exploration tools and inertial control |
 | 4: Temporal | Culture Facility salvage and time crystal growth | Degenerate Compactors, exotic matter from C-Cavities, Degenerate Furnaces and Probe Stations |
 | 5: Singularity | Defeat the Final Lab guardian and awaken a singularity seed | Penrose reactors, Singularity Cores, shields, time acceleration, gravity tools and wormhole logistics |
+
+After stage 5, awakened rematches, a hidden boss and the final goal, the Genesis Engine, are waiting.
 
 These stages describe the material and technology progression. Unlocking an advancement does not replace the recipes, power supply or components you need.
 
@@ -83,12 +85,13 @@ The outer dimensions are only a starting point. Frames, windows, internal compon
 | Research Building | Quantum Data Fragments and degraded Cold Atom Traps for quantum technology |
 | Culture Facility | Culture Data and degraded Time Crystal Seeds for temporal technology and exotic matter |
 | Final Lab | Anomaly Samples and the initial Dormant Singularity Seed, guarded by the Horizon Warden |
+| Sunken Reactor Sector | A dead second reactor: exotic matter, Jet Condensate and H-Condensate, guarded by the Ergosphere Leviathan |
 
-Only the Observation Post stands on the surface; the Research Building is buried shallow underground, the Culture Facility deep underground and the Final Lab deepest of all. The Explorer Compass starts out finding only Observation Posts. Sneak-use it on the cache of a ruin you have cleared (opened yourself) to tune it for the next ruin; sneak-use it in the air to switch between the ruins it can find. Operators can place a ruin with `/singulo ruin <ruin> [pos]`. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts and Research Buildings, or fourteen for Culture Facilities and Final Labs.
+Only the Observation Post stands on the surface; the Research Building is buried shallow underground, the Culture Facility deep underground, the Final Lab deeper still, and the Sunken Reactor Sector below it (around Y −60 to −54). The Explorer Compass starts out finding only Observation Posts. Sneak-use it on the cache of a ruin you have cleared (opened yourself) to tune it for the next ruin; sneak-use it in the air to switch between the ruins it can find. Operators can place a ruin with `/singulo ruin <ruin> [pos]`. Gravitational Wave Detectors and Neutrino Scanners provide further exploration support. After a cache is emptied, contents replenish by default after seven in-game days for Observation Posts and Research Buildings, or fourteen for Culture Facilities, Final Labs and Sunken Reactor Sectors.
 
 Every ruin hides a **sealed container** that opens only with the key of the next stage (magnetic, quantum, temporal, then singularity). Keys are made in the Precision Assembler and used up each time. Inside are materials, coloured lamps and sometimes a rare item found nowhere else: the Overclock Chip, Gravity Boots, Catalyst Stabilizer or Dimensional Pocket. Breaking a sealed container destroys its contents. Once you reach a stage you can craft its container yourself, and sneak-use a key on it to seal it.
 
-A Probe Station only visits ruins a player has discovered by opening their caches. With default settings, the stage 4 station automates Observation Posts. Culture Facilities and Final Labs always require manual exploration. Decode Record Fragments in the Archive Terminal and read the decoded items to add ancient stories to your handbook.
+A Probe Station only visits ruins a player has discovered by opening their caches. With default settings, the stage 4 station automates Observation Posts. Culture Facilities, Final Labs and Sunken Reactor Sectors always require manual exploration. Decode Record Fragments in the Archive Terminal and read the decoded items to add ancient stories to your handbook.
 
 ## Black holes and late-game technology
 
@@ -98,9 +101,27 @@ A new core starts in **harvest mode**: it keeps mass at 480 or below, so H-Conde
 
 During operation, feed Mass Pellets and manage core mass and spin. Spin determines accretion efficiency; mass affects the fuel injection limit. Collectors produce Jet Condensate, H-Condensate (Hawking Condensate) and exotic matter under their respective operating conditions. Pellet-driven growth is capped, but feeding other matter beyond safe limits can collapse the reactor and leave a rogue black hole.
 
-**Rematch:** an Awakening Record Core from the Singularity Encapsulator, used on the Final Lab's seal console, wakes the Awakened Horizon Warden (2.5× health, 1.5× damage, faster moves and earlier phases). Victory yields two Overclock Chips, eight exotic matter and two H-Condensate, and you can fight again. If you give up and leave, the core is returned.
+**Bosses and rematches:** the Echo Sentinel guards the Research Building, the Gravity Remnant the Culture Facility, the Horizon Warden the Final Lab and the Ergosphere Leviathan the Sunken Reactor Sector; each cache stays sealed until its guardian falls. After the endgame, awakening cores made in the Singularity Encapsulator (Awakening Record Core, Awakened Echo, Gravity and Ergosphere Cores) can be used on the seal console or a guardian core to fight an awakened version (2.5× health, 1.5× damage, faster moves) as often as you like. Victory adds Overclock Chips and more to the usual drops. If you give up and leave, the core is returned.
+
+**Chapters of records:** the three awakened guardians (Echo Sentinel, Gravity Remnant, Horizon Warden) drop chapters of records, and the Ergosphere Leviathan drops the Chapter of the Vortex. Bind all four into a Terminus Record in the Singularity Encapsulator and use it on the Final Lab's seal console, and something that slept in the time field wakes up. The chamber is sealed until the fight ends, and some attacks change gravity, so prepare for falls. The Genesis Engine also needs one chapter of the Vortex, so collect extras if you want both.
+
+**Playing together:** bosses grow stronger with the number of challengers in the room (each extra player adds 50% health and slightly shortens their attack gaps, up to six players). Everyone's attacks land independently, so a larger party defeats a boss faster. Drops come once per challenger present when the fight begins; players who join later do not add more. Server settings `bossHealthPerPlayer`, `bossMaxScaledPlayers` and `bossLootPerPlayer` adjust this.
 
 Late-game devices protect a base, accelerate supported machines, keep chunks loaded and manipulate gravity. The Metric Drive works from your inventory and does not require a Curios equipment slot. Wormholes are paired mouths that you generate, stabilize and place; nearby ports link distant energy, items and fluids. Exotic matter maintains the mouths, and the destination chunks must remain loaded.
+
+## The final goal: the Genesis Engine
+
+The old civilization tried to turn all mass into energy and perished. The Genesis Engine does the reverse: it uses a black hole's power to make a universe.
+
+1. **Build:** place eight Genesis Frames level with the Genesis Core, three blocks out on each axis and two blocks out on each diagonal. Stack three Genesis Pylons on each of the four diagonal frames (twelve in all). One recipe makes two frames. The Holo Projector and the Builder Wand support it.
+2. **Primordial Seed:** craft it in the Singularity Encapsulator from a Chapter of the Vortex and use it on the core.
+3. **Kindling:** pour in 1.5 TFE, at most 1 GFE per tick (a little over a minute at full P-Reactor output).
+4. **Stabilizing:** hold 100 MFE/t for about four minutes of active progress. Now and then a surge alarm sounds, and four seconds later the surge begins. Stop the feed while it surges, with the switch on the screen (use the core empty-handed) or a redstone signal on the core. If you keep feeding, instability rises, and at 100% the proto-universe collapses and progress is lost. While stopped, upkeep still drains the buffer and events (gravity leaks, echoes, gravity waves) still happen. A shield softens surges and events; a T-Cylinder field speeds progress up.
+5. **Birth:** after a 30-second cinematic, the newborn galaxy rises into the overworld night sky, visible to every player.
+
+A born universe performs **mass synthesis**. Put the item you want in the frame on the screen, and the engine makes it from power. One item costs `mass × 1 GFE × 10^rarity`, with rarity 0 (stone, wood) to 4 (nether star, elytra, dragon egg). It makes the plain item: enchantments and names on the sample are not copied. Processing synthesized items and feeding them to the P-Reactor never produces a power surplus.
+
+A broken core keeps the memory of its universe (stage, galaxy, chosen item) when placed again, but stored power and partial progress are lost. The list of items is a datapack (`data/<namespace>/mass_synthesis/`).
 
 ## Troubleshooting and hazards
 
