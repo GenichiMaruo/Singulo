@@ -1,4 +1,4 @@
-## Next release (draft)
+## Singulo-0.4.0-1.21.1N
 
 ### New
 - **Awakened guardian rematches.** The Echo Sentinel and the Gravity Remnant can now be refought after the endgame, like the Horizon Warden.
@@ -37,9 +37,13 @@
 - **Hidden boss: The Last Archivist.** Awakened guardians now drop chapters of records (Echoes, Weight, Horizon; the leviathan drops the Vortex). Bind all four into a Terminus Record and use it on the Final Lab's seal console.
   - A divine figure in an ivory robe with a golden halo and six wings of light, whose head is an event horizon and whose hem dissolves into an accretion veil.
   - Revelation: judgment beams from the halo and falling singularities. Recollection (below 2/3): it recites the guardians' techniques. Ending (below 1/3): the halo turns black, its singularity pulls you in and it releases a nova that only the eye at its feet escapes.
-  - Full emergence and death sequences, with lines of dialogue. 2,400 health (`archivistHealth`). Drops the Archivist's Halo and unlocks the final record.
+  - The fight is sealed: a force field closes the chamber until it ends, gaps in the floor are filled with a hologram floor (restored afterwards), and a gravity tide lifts everyone into low gravity. Thrown black hole bombs are swallowed by its singularity and heal it.
+  - Full emergence and death sequences, with lines of dialogue. 2,400 health (`archivistHealth`). Drops the Archivist's Halo, unlocks the final record and drops the **Afterglow Wings**.
+- **Afterglow Wings** (chest): glide like an elytra, sneak while gliding to beat the wings and surge ahead, no fall damage, armor like a diamond chestplate and no durability loss.
+- New boss sounds, including ambient sounds for the Leviathan, the Last Archivist and the Horizon Warden. Security drones and the Echo Sentinel hit slightly softer.
 - **Endgame goal: the Genesis Engine.** The old civilization turned all mass into energy and perished. The Genesis Engine does the reverse: it makes a universe from energy.
-  - Build: a **Genesis Core** surrounded by 8 **Genesis Frames** (one recipe makes 2) (three blocks out on each axis and two-and-two on the diagonals) and 12 **Genesis Pylons** (three high on each diagonal frame).
+  - Build: a **Genesis Core** surrounded by 8 **Genesis Frames** (three blocks out on each axis and two-and-two on the diagonals; one recipe makes 2) and 12 **Genesis Pylons** (three high on each diagonal frame). The Holo Projector, the Builder Wand, `/singulo build` and JEI's multiblock page support it.
+  - Use the core empty-handed to open its screen: stage, a live view of the proto-universe, progress and instability, the feed switch, the item to make and the output slot.
   - Ignite it with a **Primordial Seed**, which needs a Chapter of the Vortex.
   - Kindling: pour in 1.5 TFE, at most 1 GFE per tick (`genesisSeedEnergy`, `genesisMaxInput`).
   - Stabilizing: hold 100 MFE/t for about four minutes of active progress (`genesisUpkeep`). Progress pauses while the feed is stopped or power runs short.
@@ -50,13 +54,21 @@
     - The light collapses into a point, silence, a flash, and then a galaxy unfurls and rises into the sky.
     - Your galaxy then appears in the overworld night sky for every player, and a short epilogue plays (`genesisEndingScreen`).
     - Two new records are unlocked, one of them only for those who laid the Last Archivist to rest.
-  - Afterwards the engine performs **mass synthesis**. Use an item on the core to choose what to make.
+  - Afterwards the engine performs **mass synthesis**. Put the item you want in the frame on the screen (or use it on the core).
+    - The default table has 190 entries (157 items and 33 tags): stone and wood, crops, ores and metals, gems, treasure and a few legendary items.
     - Cost per item = mass × 1 GFE × 10^rarity, with rarity 0 (stone) to 4 (nether star, elytra, dragon egg). Rarer items are orders of magnitude more expensive. Consumables (dragon's breath, enchanted golden apples) are rarity 3.
     - The engine makes the plain item: enchantments, names, damage and contents of the sample are not copied.
     - Base cost: `genesisBaseCost`. The list of items can be changed by datapack (`data/<ns>/mass_synthesis/`).
+    - A core that has given birth keeps its memory (stage, galaxy, chosen item) when broken and placed again. Stored power and partial progress are not kept.
     - The cost per unit of mass is always higher than what a P-Reactor extracts from that mass, so there is no energy loop. This also holds after crafting: logs and pumpkins are priced by what they craft into (4 planks, 4 seeds). A GameTest walks every registered recipe to check this.
 - New advancements: The Cradle, The First Page, Something from Nothing.
 - New advancements: Echoes That Linger, Memory of Weight, The Sunken Reactor, It Swims the Ergosphere, The Vortex Wakes, and a hidden one.
+- Genesis Engine sounds (12, with variations for the pulse and synthesis).
+
+### Changes
+- Japanese text reviewed throughout. Records and chat messages read more naturally, outdated guide pages were updated, and a few overly dramatic lines were toned down.
+- Simplified Chinese, Traditional Chinese and Korean were reviewed against the Japanese. Many machine-translation errors in names, terms and lore were fixed.
+- The English T-Cylinder description now says radius 16, matching the game.
 
 ### Fixes
 - The Horizon Warden kept its toughness only at default settings: with very high `wardenHealth` (or many challengers), saving and reloading the world made it much weaker. Saved toughness is now kept as is.
