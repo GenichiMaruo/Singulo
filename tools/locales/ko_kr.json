@@ -3648,8 +3648,8 @@
     "translation": "창세로"
   },
   "guide.singulo.genesis.birth.body": {
-    "source": "1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n2. Stabilizing: hold 100 MFE/t for about four minutes. Now and then a surge alarm sounds: stop the feed while it lasts (the switch on the screen that opens when you use the core empty-handed, or a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe collapses and progress is lost. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; a T-Cylinder field speeds things up.\n3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\nUse the core empty-handed to open its screen: stage, progress, instability and input.",
-    "translation": "1. 불씨: 1.5 TFE를 쏟아붓습니다(1 tick당 최대 1 GFE). 펜로즈 반응로를 최대 출력으로 돌리면 1분 남짓 걸립니다.\n2. 안정화: 100 MFE/t를 유지한 채 약 4분. 이따금 폭주 경보가 울립니다. 경보가 울리는 동안에는 투입을 멈추세요(맨손으로 코어를 사용해 여는 화면의 스위치, 또는 코어에 레드스톤 신호). 계속 투입하면 불안정도가 치솟고, 100%에 이르면 태어나려던 우주가 무너져 진행도가 줄어듭니다. 중력 누출, 기록의 잔향, 중력의 파도에도 대비하세요. 보호막 안에서는 폭주와 이변이 약해지고, 티플러 원통의 가속장 안에서는 더 빨리 진행됩니다.\n3. 탄생: 빛이 한 점으로 떨어지고 우주가 태어납니다. 태어난 은하는 오버월드의 밤하늘로 떠오릅니다.\n맨손으로 코어를 사용하면 화면이 열리고, 단계·진행도·불안정도·수전을 볼 수 있습니다."
+    "source": "1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n2. Stabilizing: hold 100 MFE/t for about four minutes of active progress (it pauses while the feed is stopped or power runs short, so expect a little longer). Now and then a surge alarm sounds: stop the feed while it lasts (the switch on the screen that opens when you use the core empty-handed, or a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe collapses and progress is lost. Upkeep still drains the buffer and events still happen while stopped. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; a T-Cylinder field speeds things up.\n3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\nUse the core empty-handed to open its screen: stage, progress, instability and input.",
+    "translation": "1. 불씨: 1.5 TFE를 쏟아붓습니다(1 tick당 최대 1 GFE). 펜로즈 반응로를 최대 출력으로 돌리면 1분 남짓 걸립니다.\n2. 안정화: 100 MFE/t를 유지한 채, 실제로 진행되는 시간으로 약 4분(투입을 멈추거나 전력이 부족한 동안에는 진행되지 않으니 실제로는 조금 더 걸립니다). 이따금 폭주 경보가 울립니다. 경보가 울리는 동안에는 투입을 멈추세요(맨손으로 코어를 사용해 여는 화면의 스위치, 또는 코어에 레드스톤 신호). 계속 투입하면 불안정도가 치솟고, 100%에 이르면 태어나려던 우주가 무너져 진행도가 줄어듭니다. 투입을 멈춘 동안에도 저장된 전력에서 유지 전력이 빠져나가고, 이변도 일어납니다. 중력 누출, 기록의 잔향, 중력의 파도에도 대비하세요. 보호막 안에서는 폭주와 이변이 약해지고, 티플러 원통의 가속장 안에서는 더 빨리 진행됩니다.\n3. 탄생: 빛이 한 점으로 떨어지고 우주가 태어납니다. 태어난 은하는 오버월드의 밤하늘로 떠오릅니다.\n맨손으로 코어를 사용하면 화면이 열리고, 단계·진행도·불안정도·수전을 볼 수 있습니다."
   },
   "guide.singulo.genesis.birth.title": {
     "source": "Birth of a universe",
@@ -7270,5 +7270,9 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "사용 대상: 웜홀 입구"
+  },
+  "gui.singulo.genesis.screen.feed_tip_stabilizing": {
+    "source": "While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability",
+    "translation": "멈춘 동안에도 저장된 전력에서 유지 전력이 빠져나가고, 이변도 일어난다. 전력이 부족한 채로 투입을 계속하면 불안정해진다"
   }
 }

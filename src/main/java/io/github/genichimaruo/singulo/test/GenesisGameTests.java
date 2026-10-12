@@ -155,6 +155,42 @@ public final class GenesisGameTests {
         helper.succeed();
     }
 
+    /** 受電の上限をとても大きく設定しても（設定で許される範囲）、蓄えの大きさがあふれずに受電できる。 */
+    @GameTest(template = LARGE)
+    public static void hugeInputSettingStillAccepts(GameTestHelper helper) {
+        long old = io.github.genichimaruo.singulo.generated.ServerConfig.GENESIS_MAX_INPUT.get();
+        try {
+            io.github.genichimaruo.singulo.generated.ServerConfig.GENESIS_MAX_INPUT.set(1L << 61);
+            helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
+            GenesisCoreBlockEntity core = helper.getBlockEntity(CORE);
+            net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+            tag.putInt("stage", GenesisCoreBlockEntity.KINDLING);
+            tag.putBoolean("formed", true);
+            tag.putBoolean("feeding", true);
+            core.loadCustomOnly(tag, helper.getLevel().registryAccess());
+            helper.assertTrue(core.energy().receiveLong(1, false) == 1, "大きな受電の設定で受電できない");
+        } finally {
+            io.github.genichimaruo.singulo.generated.ServerConfig.GENESIS_MAX_INPUT.set(old);
+        }
+        helper.succeed();
+    }
+
+    /** 作る物は素の形で登録される（見本のエンチャント・名前は写さない）。 */
+    @GameTest(template = LARGE)
+    public static void templateIsThePlainItem(GameTestHelper helper) {
+        helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
+        GenesisCoreBlockEntity core = helper.getBlockEntity(CORE);
+        net.minecraft.nbt.CompoundTag done = new net.minecraft.nbt.CompoundTag();
+        done.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
+        core.loadCustomOnly(done, helper.getLevel().registryAccess());
+        ItemStack fancy = new ItemStack(Items.DIAMOND);
+        fancy.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("宝"));
+        helper.assertTrue(core.chooseTemplate(helper.makeMockServerPlayerInLevel(), fancy), "ダイヤモンドを登録できない");
+        helper.assertTrue(core.template().is(Items.DIAMOND) && !core.template().has(net.minecraft.core.component.DataComponents.CUSTOM_NAME),
+                "見本の名前まで写している");
+        helper.succeed();
+    }
+
     /** 質量生成の電力は希少度ごとに10倍。表にない物は作れず、ネザースターは伝説（希少度4）。 */
     @GameTest(template = LARGE)
     public static void synthesisCostScalesByRarity(GameTestHelper helper) {
@@ -178,6 +214,100 @@ public final class GenesisGameTests {
         helper.assertTrue(MassSynthesis.cost(star) >= star.mass() * base * 10_000 - 1, "希少度4は1万倍");
         // 質量1あたり 1 GFE 以上: Pリアクターが質量から取り出せる電力（質量1あたり最大約 0.5 GFE）より重い
         helper.assertTrue(base >= 1_000_000_000L, "生成した物を炉に戻しても電力は増えない");
+        helper.succeed();
+    }
+
+    /**
+     * 生成した物を加工してから炉に入れても、電力は増えない（原木→板材のように加工で質量値が増える道も含める）。
+     * 各アイテムを「生成した物から作る」いちばん安い電力を、登録されたすべてのレシピ（作業台・かまど類・石切台・
+     * Singulo の装置）でたどって求め、質量値1あたりの電力が、Pリアクターが質量値1から取り出せる最大の電力
+     * （スピン1.0の効率で、ペレット1個の電力÷ペレットの質量）を上回ることを確かめる。燃料・装置の電力は数えない（厳しめ）。
+     */
+    @GameTest(template = LARGE)
+    public static void synthesizedItemsNeverFeedAProfit(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var registries = level.registryAccess();
+        var itemRegistry = net.minecraft.core.registries.BuiltInRegistries.ITEM;
+        java.util.Map<net.minecraft.world.item.Item, Double> cost = new java.util.HashMap<>();
+        java.util.Map<net.minecraft.world.item.Item, String> via = new java.util.HashMap<>();
+        for (var item : itemRegistry) {
+            MassSynthesis.Entry e = MassSynthesis.INSTANCE.entry(new ItemStack(item));
+            if (e != null) {
+                cost.put(item, MassSynthesis.cost(e));
+                via.put(item, "生成");
+            }
+        }
+        // レシピを 材料（Ingredient と個数）→ 成果物 の形にそろえる
+        record Step(java.util.List<net.minecraft.world.item.crafting.Ingredient> inputs, java.util.List<Integer> counts, ItemStack result,
+                    String id) {}
+        java.util.List<Step> steps = new java.util.ArrayList<>();
+        for (var holder : level.getRecipeManager().getRecipes()) {
+            var recipe = holder.value();
+            ItemStack result = recipe.getResultItem(registries);
+            if (result.isEmpty()) {
+                continue;
+            }
+            java.util.List<net.minecraft.world.item.crafting.Ingredient> inputs = new java.util.ArrayList<>();
+            java.util.List<Integer> counts = new java.util.ArrayList<>();
+            if (recipe instanceof io.github.genichimaruo.singulo.recipe.MachineRecipe machine) {
+                if (machine.isMassRecipe()) {
+                    continue;                                   // 質量そのものを材料にするレシピ（ペレット・圧縮）は、下の比べ方で扱う
+                }
+                for (var in : machine.ingredients()) {
+                    inputs.add(in.ingredient());
+                    counts.add(in.count());
+                }
+            } else {
+                for (var in : recipe.getIngredients()) {
+                    if (!in.isEmpty()) {
+                        inputs.add(in);
+                        counts.add(1);
+                    }
+                }
+            }
+            if (!inputs.isEmpty()) {
+                steps.add(new Step(inputs, counts, result, holder.id().toString()));
+            }
+        }
+        // いちばん安い作り方を、変わらなくなるまでたどる（加工を何段重ねても）
+        for (int pass = 0; pass < 12; pass++) {
+            boolean changed = false;
+            for (Step s : steps) {
+                double total = 0;
+                for (int i = 0; i < s.inputs().size() && total < Double.MAX_VALUE; i++) {
+                    double best = Double.MAX_VALUE;
+                    for (ItemStack option : s.inputs().get(i).getItems()) {
+                        best = Math.min(best, cost.getOrDefault(option.getItem(), Double.MAX_VALUE));
+                    }
+                    total = best == Double.MAX_VALUE ? Double.MAX_VALUE : total + best * s.counts().get(i);
+                }
+                if (total == Double.MAX_VALUE) {
+                    continue;
+                }
+                double each = total / s.result().getCount();
+                var out = s.result().getItem();
+                if (each < cost.getOrDefault(out, Double.MAX_VALUE) * 0.999999) {
+                    cost.put(out, each);
+                    via.put(out, s.id());
+                    changed = true;
+                }
+            }
+            if (!changed) {
+                break;
+            }
+        }
+        double perPellet = io.github.genichimaruo.singulo.generated.ServerConfig.PENROSE_ENERGY_PER_PELLET.get()
+                * io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.efficiency(1.0);
+        double yieldPerMass = perPellet / io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.PELLET_MASS;
+        StringBuilder bad = new StringBuilder();
+        for (var entry : cost.entrySet()) {
+            double mass = io.github.genichimaruo.singulo.data.MassValues.INSTANCE.massOf(new ItemStack(entry.getKey()));
+            if (mass > 0 && entry.getValue() <= mass * yieldPerMass) {
+                bad.append(String.format("%n  %s: 生成から %.3f GFE（%s）で質量値 %.3f → 炉で最大 %.3f GFE", itemRegistry.getKey(entry.getKey()),
+                        entry.getValue() / 1e9, via.get(entry.getKey()), mass, mass * yieldPerMass / 1e9));
+            }
+        }
+        helper.assertTrue(bad.isEmpty(), "生成した物を加工して炉に入れると電力が増える:" + bad);
         helper.succeed();
     }
 }

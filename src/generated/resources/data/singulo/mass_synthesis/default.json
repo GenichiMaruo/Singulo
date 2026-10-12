@@ -192,7 +192,7 @@
     },
     {
       "item": "minecraft:moss_block",
-      "mass": 0.25,
+      "mass": 0.5,
       "tier": 0
     },
     {
@@ -202,12 +202,17 @@
     },
     {
       "tag": "minecraft:logs",
-      "mass": 0.25,
+      "mass": 1,
       "tier": 0
     },
     {
       "tag": "minecraft:planks",
       "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:pumpkin",
+      "mass": 1,
       "tier": 0
     },
     {
@@ -906,6 +911,16 @@
       "tier": 3
     },
     {
+      "item": "minecraft:dragon_breath",
+      "mass": 0.5,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:enchanted_golden_apple",
+      "mass": 3,
+      "tier": 3
+    },
+    {
       "item": "minecraft:nether_star",
       "mass": 5,
       "tier": 4
@@ -921,22 +936,12 @@
       "tier": 4
     },
     {
-      "item": "minecraft:dragon_breath",
-      "mass": 0.5,
-      "tier": 4
-    },
-    {
       "item": "minecraft:dragon_head",
       "mass": 2,
       "tier": 4
     },
     {
       "item": "minecraft:elytra",
-      "mass": 3,
-      "tier": 4
-    },
-    {
-      "item": "minecraft:enchanted_golden_apple",
       "mass": 3,
       "tier": 4
     },

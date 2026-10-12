@@ -86,7 +86,7 @@ public class GenesisCoreBlockEntity extends BlockEntity {
     /** 誕生の演出の節目: 光が集まって崩れ落ちる・静寂・閃光・膨張・銀河が落ち着く・夜空へ・エピローグ。 */
     public static final int BIRTH_COLLAPSE = 100, BIRTH_BANG = 120, BIRTH_EXPAND = 400, BIRTH_SKY = 420, BIRTH_ENDING = 520;
     /** 暴走の兆し: 警報の長さと、暴走している長さ。 */
-    public static final int SURGE_WARN = 40, SURGE_ACTIVE = 200;
+    public static final int SURGE_WARN = 80, SURGE_ACTIVE = 200;
     static final int CHECK_INTERVAL = 40;
     static final int SYNC_INTERVAL = 10;
 
@@ -622,8 +622,10 @@ public class GenesisCoreBlockEntity extends BlockEntity {
             tell(player, "gui.singulo.genesis.not_synthesizable");
             return false;
         }
-        if (!ItemStack.isSameItemSameComponents(template, stack)) {
-            template = stack.copyWithCount(1);
+        // 作るのはその物の素の形（エンチャント・名前・損傷・中身などは写さない）。見本の付加データまで電力で複製しないように
+        ItemStack plain = new ItemStack(stack.getItem());
+        if (!ItemStack.isSameItemSameComponents(template, plain)) {
+            template = plain;
             synthProgress = 0;
         }
         player.displayClientMessage(Component.translatable("gui.singulo.genesis.template", stack.getHoverName(),
@@ -835,8 +837,10 @@ public class GenesisCoreBlockEntity extends BlockEntity {
 
     /** 電力の口。種火・安定化・質量生成のときだけ、genesisMaxInput まで受け取る（投入を止めている間は受け取らない）。 */
     private final class Energy implements LongEnergyStorage {
+        /** 蓄えの大きさ（1 tick の上限の4倍。とても大きな設定でも long をあふれない）。 */
         private long capacity() {
-            return maxInput() * 4;
+            long max = maxInput();
+            return max > Long.MAX_VALUE / 4 ? Long.MAX_VALUE : max * 4;
         }
 
         private boolean accepting() {

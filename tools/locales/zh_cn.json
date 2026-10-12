@@ -3648,8 +3648,8 @@
     "translation": "创世炉"
   },
   "guide.singulo.genesis.birth.body": {
-    "source": "1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n2. Stabilizing: hold 100 MFE/t for about four minutes. Now and then a surge alarm sounds: stop the feed while it lasts (the switch on the screen that opens when you use the core empty-handed, or a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe collapses and progress is lost. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; a T-Cylinder field speeds things up.\n3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\nUse the core empty-handed to open its screen: stage, progress, instability and input.",
-    "translation": "1. 火种：注入 1.5 TFE（每 tick 最多 1 GFE）。彭罗斯反应堆全功率运行约一分多钟。\n2. 稳定化：保持 100 MFE/t 约四分钟。期间不时会响起失控警报：警报持续时请停止投料（空手使用核心打开界面并按开关，或给核心红石信号）。若继续投料，不稳定度会急剧上升；达到 100% 时将生未生的宇宙会崩塌，进度倒退。还要提防引力泄漏、记录残响和引力波。在护盾内，失控与事件会减弱；在蒂普勒圆柱的加速场内，进度会更快。\n3. 诞生：光坠向一点，宇宙诞生。它的银河会升上主世界的夜空。\n空手使用核心会打开界面，可查看阶段、进度、不稳定度和受电。"
+    "source": "1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n2. Stabilizing: hold 100 MFE/t for about four minutes of active progress (it pauses while the feed is stopped or power runs short, so expect a little longer). Now and then a surge alarm sounds: stop the feed while it lasts (the switch on the screen that opens when you use the core empty-handed, or a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe collapses and progress is lost. Upkeep still drains the buffer and events still happen while stopped. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; a T-Cylinder field speeds things up.\n3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\nUse the core empty-handed to open its screen: stage, progress, instability and input.",
+    "translation": "1. 火种：注入 1.5 TFE（每 tick 最多 1 GFE）。彭罗斯反应堆全功率运行约一分多钟。\n2. 稳定化：保持 100 MFE/t，实际推进约四分钟（停止投料或电力不足时不会推进，所以实际会稍久一些）。期间不时会响起失控警报：警报持续时请停止投料（空手使用核心打开界面并按开关，或给核心红石信号）。若继续投料，不稳定度会急剧上升；达到 100% 时将生未生的宇宙会崩塌，进度倒退。停止投料期间，储能仍会被维持电力消耗，事件也照样发生。还要提防引力泄漏、记录残响和引力波。在护盾内，失控与事件会减弱；在蒂普勒圆柱的加速场内，进度会更快。\n3. 诞生：光坠向一点，宇宙诞生。它的银河会升上主世界的夜空。\n空手使用核心会打开界面，可查看阶段、进度、不稳定度和受电。"
   },
   "guide.singulo.genesis.birth.title": {
     "source": "Birth of a universe",
@@ -7270,5 +7270,9 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "用于：虫洞入口"
+  },
+  "gui.singulo.genesis.screen.feed_tip_stabilizing": {
+    "source": "While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability",
+    "translation": "停止期间仍会从储能中消耗维持电力，事件也照样发生。电力不足时继续投料，不稳定度会上升"
   }
 }

@@ -456,17 +456,18 @@ CHAPTERS = [
          'The core chimes when formed. Use a Primordial Seed on it to begin. Power enters from any side.'),
         ('birth', '宇宙の誕生',
          '1. 種火: 1.5 TFE を注ぎます（1 tick あたり最大 1 GFE）。Pリアクターを全開にして、1分あまりかかります。\n'
-         '2. 安定化: 100 MFE/t を保ったまま約4分。ときどき「暴走の兆し」の警報が鳴ります。警報が鳴っている間は、投入を止めてください'
+         '2. 安定化: 100 MFE/t を保ったまま、進めている時間で約4分（止めている間や電力が足りない間は進まないので、実際はもう少しかかります）。ときどき「暴走の兆し」の警報が鳴ります。警報が鳴っている間は、投入を止めてください'
          '（核を素手で使って開く画面のスイッチか、核への赤石信号で止められます）。止めずにいると不安定度が跳ね上がり、100% に達すると'
-         '宇宙が崩れて進行が巻き戻ります。重力の漏れ・記録の残響・引力の波にも備えましょう。シールドの中では暴走と異変が弱まり、'
+         '宇宙が崩れて進行が巻き戻ります。止めている間も蓄えから維持の電力は使われ、異変も起きます。重力の漏れ・記録の残響・引力の波にも備えましょう。シールドの中では暴走と異変が弱まり、'
          'Tシリンダーの加速の場の中では速く進みます。\n'
          '3. 誕生: 光が一点に落ち、宇宙が生まれます。生まれた銀河は、オーバーワールドの夜空に昇ります。\n'
          '核を素手で使うと画面が開き、段階・進行・不安定度・受電を確かめられます。',
          'Birth of a universe',
          '1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n'
-         '2. Stabilizing: hold 100 MFE/t for about four minutes. Now and then a surge alarm sounds: stop the feed while it lasts '
+         '2. Stabilizing: hold 100 MFE/t for about four minutes of active progress (it pauses while the feed is stopped or power runs short, '
+         'so expect a little longer). Now and then a surge alarm sounds: stop the feed while it lasts '
          '(the switch on the screen that opens when you use the core empty-handed, or a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe '
-         'collapses and progress is lost. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; '
+         'collapses and progress is lost. Upkeep still drains the buffer and events still happen while stopped. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; '
          'a T-Cylinder field speeds things up.\n'
          '3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\n'
          'Use the core empty-handed to open its screen: stage, progress, instability and input.'),

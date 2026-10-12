@@ -63,7 +63,16 @@ public class GenesisCoreScreen extends AbstractContainerScreen<GenesisCoreMenu> 
         super.render(g, mouseX, mouseY, partialTick);
         GenesisCoreBlockEntity core = core();
         if (core != null && core.canToggleFeed() && Panel.inside(mouseX, mouseY, leftPos + FEED_X - 1, topPos + FEED_Y - 1, 12, 12)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.genesis.screen.feed_tip"), mouseX, mouseY);
+            if (core.stage() == GenesisCoreBlockEntity.STABILIZING) {
+                // 止めても危険が全部止まるわけではないことを、押す前に知らせる
+                java.util.List<net.minecraft.util.FormattedCharSequence> lines = new java.util.ArrayList<>();
+                lines.add(Component.translatable("gui.singulo.genesis.screen.feed_tip").getVisualOrderText());
+                lines.addAll(font.split(Component.translatable("gui.singulo.genesis.screen.feed_tip_stabilizing")
+                        .withStyle(net.minecraft.ChatFormatting.GRAY), 180));
+                g.renderTooltip(font, lines, mouseX, mouseY);
+            } else {
+                g.renderTooltip(font, Component.translatable("gui.singulo.genesis.screen.feed_tip"), mouseX, mouseY);
+            }
         }
         Slot out = menu.getSlot(0);
         if (out.isActive() && !out.hasItem() && Panel.inside(mouseX, mouseY, leftPos + out.x, topPos + out.y, 16, 16)) {

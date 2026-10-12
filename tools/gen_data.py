@@ -838,6 +838,8 @@ UI_LANG = {
     'gui.singulo.genesis.screen.feed_off': ('投入停止中', 'Feed stopped'),
     'gui.singulo.genesis.screen.feed_redstone': ('赤石信号で停止中', 'Stopped by redstone'),
     'gui.singulo.genesis.screen.feed_tip': ('クリックで投入を止める／再開する', 'Click to stop or resume the feed'),
+    'gui.singulo.genesis.screen.feed_tip_stabilizing': ('止めている間も蓄えから維持の電力を使い、異変は起きる。電力が足りないまま投入を続けると不安定になる',
+                                                        'While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability'),
     'gui.singulo.genesis.screen.no_template': ('作る物が未登録', 'Nothing chosen yet'),
     'gui.singulo.genesis.screen.cost': ('1個あたり %s', '%s each'),
     'gui.singulo.genesis.screen.synth': ('生成中 %s', 'Making %s'),
@@ -2463,6 +2465,8 @@ def mass_synthesis():
     """創世炉の質量生成の表: (アイテムかタグ, 質量, 希少度 0〜4)。1個の電力 = 質量 × genesisBaseCost × 10^希少度。
     質量は mass_values と同じ尺度（石1ブロック = 1）。Singulo の物（圧縮ブロック・質量ペレットなど）は載せない。
     生成した物を炉に戻して得をしないよう、質量は mass_values の値以上にする（作物は #c:crops で一括、品目ごとに下げない）。
+    加工すると質量値が増える物（原木→板材4枚、かぼちゃ→種4粒）は、加工したあとの質量にする。
+    GameTest synthesizedItemsNeverFeedAProfit が、登録されたすべてのレシピをたどって確かめる。
     c:ingots・c:plates には Singulo の鋼が入るので、金属は種類ごとのタグで指定する。"""
     entries = [
         # 0: ありふれた物（石・土・木・植物・食べ物・色）
@@ -2477,8 +2481,8 @@ def mass_synthesis():
         ('minecraft:magma_block', 1, 0), ('minecraft:soul_sand', 0.5, 0), ('minecraft:soul_soil', 0.5, 0),
         ('minecraft:clay', 0.5, 0), ('minecraft:clay_ball', 0.1, 0), ('minecraft:mud', 0.5, 0), ('minecraft:brick', 0.1, 0),
         ('minecraft:snow_block', 0.5, 0), ('minecraft:snowball', 0.1, 0), ('minecraft:ice', 0.5, 0), ('minecraft:packed_ice', 1, 0),
-        ('minecraft:moss_block', 0.25, 0), ('minecraft:flint', 0.1, 0),
-        ('#minecraft:logs', 0.25, 0), ('#minecraft:planks', 0.25, 0), ('#minecraft:leaves', 0.25, 0),
+        ('minecraft:moss_block', 0.5, 0), ('minecraft:flint', 0.1, 0),
+        ('#minecraft:logs', 1, 0), ('#minecraft:planks', 0.25, 0), ('minecraft:pumpkin', 1, 0), ('#minecraft:leaves', 0.25, 0),
         ('#minecraft:saplings', 0.25, 0), ('#minecraft:flowers', 0.25, 0), ('#c:mushrooms', 0.25, 0),
         ('#c:crops', 0.25, 0), ('#c:seeds', 0.25, 0), ('#minecraft:wool', 0.25, 0), ('#minecraft:wool_carpets', 0.1, 0),
         ('#c:dyes', 0.1, 0), ('minecraft:stick', 0.1, 0), ('minecraft:bamboo', 0.25, 0), ('minecraft:kelp', 0.25, 0),
@@ -2532,10 +2536,10 @@ def mass_synthesis():
         ('minecraft:echo_shard', 0.3, 3), ('minecraft:shulker_shell', 0.5, 3), ('minecraft:heart_of_the_sea', 1, 3),
         ('minecraft:conduit', 1, 3), ('minecraft:trident', 3, 3), ('minecraft:totem_of_undying', 1, 3),
         ('minecraft:wither_skeleton_skull', 0.5, 3), ('minecraft:sniffer_egg', 1, 3), ('minecraft:ominous_trial_key', 0.3, 3),
+        ('minecraft:dragon_breath', 0.5, 3), ('minecraft:enchanted_golden_apple', 3, 3),
         # 4: 伝説の物
         ('minecraft:nether_star', 5, 4), ('minecraft:beacon', 6, 4), ('minecraft:heavy_core', 4, 4),
-        ('minecraft:dragon_breath', 0.5, 4), ('minecraft:dragon_head', 2, 4), ('minecraft:elytra', 3, 4),
-        ('minecraft:enchanted_golden_apple', 3, 4), ('minecraft:dragon_egg', 10, 4),
+        ('minecraft:dragon_head', 2, 4), ('minecraft:elytra', 3, 4), ('minecraft:dragon_egg', 10, 4),
     ]
     out = []
     for k, m, tier in entries:

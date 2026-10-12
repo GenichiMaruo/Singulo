@@ -169,6 +169,8 @@ public class HorizonWarden extends Monster {
     private int emptyChecks;
     /** 強さに数えている挑戦者の数（増えるだけで、減らない。{@link BossScaling}）。 */
     private int participants = 1;
+    /** 報酬に数える挑戦者の数。目覚めたときの人数で決まり、途中で合流しても増えない。0 ならまだ決まっていない。 */
+    private int rewardParticipants;
     /** ボスバーのもとの名前（人数を添える前）。null なら実体の名前。 */
     @Nullable
     private Component barName;
@@ -319,6 +321,27 @@ public class HorizonWarden extends Monster {
             setNoAi(false);
             setNoGravity(false);
             bossBar.setVisible(true);
+            // 戦いの始まり: いま部屋にいる人数で強さと報酬の人数を決める（途中で合流しても報酬は増えない）
+            if (home != null) {
+                int players = BossScaling.count(level, Vec3.atCenterOf(home), ARENA_RADIUS);
+                if (players > participants) {
+                    setParticipants(players);
+                }
+            }
+            lockRewardParticipants();
+        }
+    }
+
+    /** 報酬に数える挑戦者の数（まだ決まっていなければ、今の人数で決める）。 */
+    public int rewardParticipants() {
+        lockRewardParticipants();
+        return rewardParticipants;
+    }
+
+    /** 報酬に数える人数を、今の人数で決める（一度決めたら変わらない）。 */
+    public void lockRewardParticipants() {
+        if (rewardParticipants <= 0) {
+            rewardParticipants = participants;
         }
     }
 
@@ -1132,6 +1155,9 @@ public class HorizonWarden extends Monster {
         if (players > participants && emergeTicks() <= 0 && isAlive()) {
             setParticipants(players);
         }
+        if (emergeTicks() <= 0) {
+            lockRewardParticipants();
+        }
         emptyChecks = present ? 0 : emptyChecks + 1;
         boolean reset = !ServerConfig.SPEC.isLoaded() || ServerConfig.WARDEN_RESET_ON_LEAVE.get();
         if (emptyChecks >= RESET_CHECKS && reset) {
@@ -1185,7 +1211,7 @@ public class HorizonWarden extends Monster {
      * 何度でも挑む意味がある。
      */
     private void dropAwakenedRewards(ServerLevel level) {
-        for (int roll = 0; roll < BossScaling.lootRolls(participants); roll++) {
+        for (int roll = 0; roll < BossScaling.lootRolls(rewardParticipants()); roll++) {
             for (String[] r : new String[][] {{"overclock_chip", "2"}, {"exotic_matter", "8"}, {"hawking_condensate", "2"}, {"horizon_chapter", "1"}}) {
                 net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(r[0]));
                 spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
@@ -1304,6 +1330,7 @@ public class HorizonWarden extends Monster {
         tag.putInt("emerge", emergeTicks());
         tag.putBoolean("awakened", awakened());
         tag.putInt("participants", participants);
+        tag.putInt("reward_participants", rewardParticipants);
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
@@ -1317,7 +1344,7 @@ public class HorizonWarden extends Monster {
         super.readAdditionalSaveData(tag);
         entityData.set(PHASE, Math.max(1, tag.getInt("phase")));
         if (tag.contains("damage_scale")) {
-            damageScale = Math.max(0.001F, tag.getFloat("damage_scale"));
+            damageScale = BossScaling.validDamageScale(tag.getFloat("damage_scale"));
         }
         entityData.set(EMERGE, tag.getInt("emerge"));
         entityData.set(AWAKENED, tag.getBoolean("awakened"));
@@ -1330,6 +1357,8 @@ public class HorizonWarden extends Monster {
             restrictTo(home, ARENA_RADIUS);
         }
         participants = Math.max(1, tag.getInt("participants"));
+        rewardParticipants = tag.contains("reward_participants") ? tag.getInt("reward_participants")
+                : emergeTicks() <= 0 ? participants : 0;
         if (hasCustomName()) {
             setBarName(getDisplayName());
         } else if (awakened()) {

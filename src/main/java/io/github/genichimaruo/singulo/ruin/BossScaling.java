@@ -57,6 +57,14 @@ public final class BossScaling {
         return lootPerPlayer() ? clamp(players) : 1;
     }
 
+    /**
+     * 保存してあった「受けるダメージの倍率」を確かめる。正の有限値ならそのまま使う（高い体力の設定と大人数では、
+     * とても小さい値になる）。壊れた値（0以下・NaN・無限大）だけ 1 に戻す。
+     */
+    public static float validDamageScale(float saved) {
+        return Float.isFinite(saved) && saved > 0 ? Math.min(saved, 1F) : 1F;
+    }
+
     /** center のまわり radius の中の挑戦者の数。 */
     public static int count(ServerLevel level, Vec3 center, double radius) {
         return level.getEntitiesOfClass(Player.class, new AABB(center, center).inflate(radius),

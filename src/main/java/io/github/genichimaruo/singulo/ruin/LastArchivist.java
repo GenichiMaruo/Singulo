@@ -136,12 +136,16 @@ public class LastArchivist extends RuinBoss {
     private final Set<UUID> ringHit = new HashSet<>();
     /** 力場を張っているか（保存する。読み込み直したら張り直す）。 */
     private boolean shieldUp;
-    /** 力場の中に閉じ込めたプレイヤー。 */
+    /** 力場の中に閉じ込めたプレイヤー（保存する。読み込み直しても、中にいた人は中のまま）。 */
     private final Set<UUID> insiders = new HashSet<>();
+    /** 中にいた人を保存していない古いデータを読んだとき: 最初の一度だけ、力場の中にいる人をみな中の人とみなす。 */
+    private boolean adoptInsiders;
     private int bumpSoundCooldown;
     private int tideGrace;
-    /** 床の欠けた所に置いたホログラムの床。 */
-    private final List<BlockPos> hologram = new ArrayList<>();
+    /** 重力潮汐で重力を変えたプレイヤー（どこへ行っても、潮汐が終われば必ず元に戻す）。 */
+    private final Set<UUID> tideAffected = new HashSet<>();
+    /** 床の欠けた所に置いたホログラムの床と、そこにもとあったもの（水・草など。消すときに戻す）。 */
+    private final java.util.Map<BlockPos, BlockState> hologram = new java.util.LinkedHashMap<>();
 
     public LastArchivist(EntityType<? extends LastArchivist> type, Level level) {
         super(type, level, BossEvent.BossBarColor.YELLOW);
@@ -861,7 +865,7 @@ public class LastArchivist extends RuinBoss {
             }
             Vec3 n = off.scale(1 / d);
             boolean in = insiders.contains(p.getUUID());
-            if (!in && d < r - 1.5) {
+            if (!in && (d < r - 1.5 || adoptInsiders && d < r)) {
                 insiders.add(p.getUUID());              // 中で目を覚ました（読み込み直しなど）
                 in = true;
             }
@@ -885,6 +889,7 @@ public class LastArchivist extends RuinBoss {
                 bump(level, c.add(n.scale(r)));
             }
         }
+        adoptInsiders = false;
     }
 
     private void bump(ServerLevel level, Vec3 at) {
@@ -915,8 +920,8 @@ public class LastArchivist extends RuinBoss {
                 BlockPos pos = home.offset(dx, -3, dz);
                 BlockState state = level.getBlockState(pos);
                 if (!state.is(holo.getBlock()) && (state.isAir() || state.canBeReplaced())) {
+                    hologram.putIfAbsent(pos.immutable(), state);
                     level.setBlock(pos, holo, net.minecraft.world.level.block.Block.UPDATE_ALL);
-                    hologram.add(pos.immutable());
                     placed = true;
                     if (random.nextInt(3) == 0) {
                         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5,
@@ -930,12 +935,13 @@ public class LastArchivist extends RuinBoss {
         }
     }
 
-    /** ホログラムの床を消す（戦いが終わったとき）。 */
+    /** ホログラムの床を消し、もとあったもの（水・草など）に戻す（戦いが終わったとき）。いまもホログラムの所だけ戻す。 */
     private void clearFloor(ServerLevel level) {
         net.minecraft.world.level.block.Block holo = io.github.genichimaruo.singulo.registry.SinguloBlocks.ARENA_HOLOGRAM.get();
-        for (BlockPos pos : hologram) {
+        for (var e : hologram.entrySet()) {
+            BlockPos pos = e.getKey();
             if (level.getBlockState(pos).is(holo)) {
-                level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+                level.setBlock(pos, e.getValue(), net.minecraft.world.level.block.Block.UPDATE_ALL);
                 level.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, 2, 0.3, 0.2, 0.3, 0.05);
             }
         }
@@ -999,7 +1005,9 @@ public class LastArchivist extends RuinBoss {
                 }
                 p.fallDistance = 0;
                 setTideModifiers(p, !lifting, true);
+                tideAffected.add(p.getUUID());
             }
+            releaseLeavers(level);
             if (home != null && left % 2 == 0) {
                 // 床の塵と瓦礫が浮き上がる
                 Vec3 f = shieldCenter(home);
@@ -1015,28 +1023,87 @@ public class LastArchivist extends RuinBoss {
             }
         } else if (tideGrace > 0) {
             tideGrace--;
-            for (Player p : arenaPlayers(level)) {
-                setTideModifiers(p, false, tideGrace > 0);
+            if (tideGrace > 0) {
+                for (Player p : arenaPlayers(level)) {
+                    setTideModifiers(p, false, true);
+                }
+                releaseLeavers(level);
+            } else {
+                releaseAllTide(level);
             }
         }
+    }
+
+    /** 部屋から出た人の重力を元に戻す（潮汐を受けたまま外へ出ても、低重力・落下無効を持ち出さない）。 */
+    private void releaseLeavers(ServerLevel level) {
+        if (tideAffected.isEmpty()) {
+            return;
+        }
+        Set<UUID> inArena = new HashSet<>();
+        for (Player p : arenaPlayers(level)) {
+            inArena.add(p.getUUID());
+        }
+        tideAffected.removeIf(id -> {
+            if (inArena.contains(id)) {
+                return false;
+            }
+            Player p = level.getServer().getPlayerList().getPlayer(id);
+            if (p != null) {
+                setTideModifiers(p, false, false);
+            }
+            return true;
+        });
+    }
+
+    /** 重力を変えたすべての人を、どこにいても元に戻す。 */
+    private void releaseAllTide(ServerLevel level) {
+        for (UUID id : tideAffected) {
+            Player p = level.getServer().getPlayerList().getPlayer(id);
+            if (p != null) {
+                setTideModifiers(p, false, false);
+            }
+        }
+        tideAffected.clear();
     }
 
     /** 重力潮汐を止め、プレイヤーの重力を元に戻す。 */
     private void clearTide(ServerLevel level) {
         entityData.set(TIDE, 0);
         tideGrace = 0;
+        releaseAllTide(level);
         Vec3 c = home == null ? position() : shieldCenter(home);
         for (Player p : level.getEntitiesOfClass(Player.class, new AABB(c, c).inflate(SHIELD_RADIUS + 16))) {
             setTideModifiers(p, false, false);
         }
     }
 
-    /** 力場の中（張っていなければ部屋の広さの中）のプレイヤー。 */
+    /** 力場の中のプレイヤー（張っている間は中に閉じ込めた人だけ。張っていなければ部屋の広さの中）。 */
     private List<Player> arenaPlayers(ServerLevel level) {
         Vec3 c = home == null ? position() : shieldCenter(home);
         double r = SHIELD_RADIUS + 2;
         return level.getEntitiesOfClass(Player.class, new AABB(c, c).inflate(r),
-                p -> !ArenaShield.exempt(p) && p.isAlive() && p.position().distanceToSqr(c) <= r * r);
+                p -> !ArenaShield.exempt(p) && p.isAlive() && p.position().distanceToSqr(c) <= r * r
+                        && (!shieldUp || insiders.contains(p.getUUID())));
+    }
+
+    /**
+     * 強さと、戦いを続けるかに数える挑戦者。力場を張っている間は、中に閉じ込めた人だけを数える
+     * （外で待つ人は強さにも報酬にも入らず、中の全員が倒れれば戦いは終わる）。
+     */
+    @Override
+    protected int countChallengers(ServerLevel level) {
+        if (!shieldUp || home == null) {
+            return super.countChallengers(level);
+        }
+        Vec3 c = shieldCenter(home);
+        double r = SHIELD_RADIUS + 1;
+        int n = 0;
+        for (UUID id : insiders) {
+            if (level.getEntity(id) instanceof Player p && challenger(p) && p.position().distanceToSqr(c) <= r * r) {
+                n++;
+            }
+        }
+        return n;
     }
 
     private static void setTideModifiers(Player p, boolean low, boolean safe) {
@@ -1210,7 +1277,19 @@ public class LastArchivist extends RuinBoss {
         tag.putInt("phase", phase());
         tag.putInt("cycle", cycle);
         tag.putBoolean("shield", shieldUp);
-        tag.putLongArray("hologram", hologram.stream().mapToLong(BlockPos::asLong).toArray());
+        net.minecraft.nbt.ListTag floor = new net.minecraft.nbt.ListTag();
+        hologram.forEach((pos, was) -> {
+            CompoundTag e = new CompoundTag();
+            e.putLong("pos", pos.asLong());
+            e.put("was", net.minecraft.nbt.NbtUtils.writeBlockState(was));
+            floor.add(e);
+        });
+        tag.put("floor", floor);
+        net.minecraft.nbt.ListTag inside = new net.minecraft.nbt.ListTag();
+        for (UUID id : insiders) {
+            inside.add(net.minecraft.nbt.NbtUtils.createUUID(id));
+        }
+        tag.put("insiders", inside);
         tag.putInt("tide", tideTicks());
     }
 
@@ -1224,9 +1303,22 @@ public class LastArchivist extends RuinBoss {
         }
         shieldUp = tag.getBoolean("shield");
         hologram.clear();
-        for (long l : tag.getLongArray("hologram")) {
-            hologram.add(BlockPos.of(l));
+        var blocks = level().holderLookup(net.minecraft.core.registries.Registries.BLOCK);
+        for (net.minecraft.nbt.Tag t : tag.getList("floor", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            CompoundTag e = (CompoundTag) t;
+            hologram.put(BlockPos.of(e.getLong("pos")), net.minecraft.nbt.NbtUtils.readBlockState(blocks, e.getCompound("was")));
         }
+        for (long l : tag.getLongArray("hologram")) {
+            // 以前の版の保存（もとのものを覚えていない）: 空気に戻す
+            hologram.putIfAbsent(BlockPos.of(l), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+        }
+        insiders.clear();
+        if (tag.contains("insiders")) {
+            for (net.minecraft.nbt.Tag t : tag.getList("insiders", net.minecraft.nbt.Tag.TAG_INT_ARRAY)) {
+                insiders.add(net.minecraft.nbt.NbtUtils.loadUUID(t));
+            }
+        }
+        adoptInsiders = tag.getBoolean("shield") && !tag.contains("insiders");
         entityData.set(SHIELD, shieldUp ? SHIELD_RISE + 2 : 0);
         entityData.set(TIDE, tag.getInt("tide"));
         int p = phase();
