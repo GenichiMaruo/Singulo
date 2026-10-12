@@ -289,6 +289,11 @@ public final class SinguloBlocks {
             "stardust_cluster", () -> new net.minecraft.world.level.block.AmethystClusterBlock(7.0F, 3.0F, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1.5F).sound(SoundType.AMETHYST_CLUSTER).noOcclusion()
                     .lightLevel(s -> 6).forceSolidOn().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
+    /** 隕石の核（隕石の芯に1つだけ。隕石コンパスが指す。掘ると隕鉄の原石と星屑。鉄以上のツルハシ）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.nature.MeteoriteCoreBlock> METEORITE_CORE = BLOCKS.register(
+            "meteorite_core", () -> new io.github.genichimaruo.singulo.nature.MeteoriteCoreBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(8.0F, 12.0F).requiresCorrectToolForDrops().sound(SoundType.ANCIENT_DEBRIS)
+                    .lightLevel(s -> 7)));
     /** 雷ガラス塊（雷が落ちた砂が溶けて固まったもの。壊すと雷ガラス）。 */
     public static final DeferredBlock<Block> FULGURITE_BLOCK = BLOCKS.registerSimpleBlock("fulgurite_block",
             BlockBehaviour.Properties.of().mapColor(MapColor.SAND).strength(0.8F).sound(SoundType.GLASS));

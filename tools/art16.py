@@ -1581,14 +1581,27 @@ def shell_sphere():
                                d.line([(8, 3), (8, 12)], fill=(80, 80, 96, 255))))
 
 
-def compass_frame(angle):
-    """探索コンパスの1コマ（angle は 0〜1、北が上）。"""
+# コンパスの色: (外枠, 縁, 文字盤, 目盛り, 針の先, 針の尾)
+EXPLORER_COMPASS = ((236, 238, 240), (190, 118, 66), (30, 40, 52), (110, 205, 238), (255, 110, 80), (210, 214, 222))
+# 隕石コンパス: 焼けた隕鉄の枠に、星屑の光る目盛りと針
+METEOR_COMPASS = ((92, 88, 94), (52, 46, 50), (20, 18, 30), (190, 160, 255), (150, 225, 255), (170, 150, 200))
+
+
+def compass_frame(angle, palette=EXPLORER_COMPASS):
+    """コンパスの1コマ（angle は 0〜1、北が上）。"""
+    body, rim, face, mark, tip, tail = palette
+    tip = tip + (255,)
     im, d = new()
-    d.ellipse([1, 1, 14, 14], fill=(236, 238, 240, 255), outline=(190, 118, 66, 255))
-    d.ellipse([3, 3, 12, 12], fill=(30, 40, 52, 255))
+    d.ellipse([1, 1, 14, 14], fill=body + (255,), outline=rim + (255,))
+    d.ellipse([3, 3, 12, 12], fill=face + (255,))
+    if palette is METEOR_COMPASS:
+        # 枠の焼けた筋と、文字盤の星屑の粒
+        d.arc([1, 1, 14, 14], 200, 260, fill=(130, 110, 100, 255))
+        d.point((5, 9), fill=(120, 110, 170, 255))
+        d.point((10, 5), fill=(120, 110, 170, 255))
     for k in range(4):
         a = k * math.pi / 2
-        d.point((7.5 + 4.5 * math.cos(a), 7.5 + 4.5 * math.sin(a)), fill=(110, 205, 238, 255))
+        d.point((7.5 + 4.5 * math.cos(a), 7.5 + 4.5 * math.sin(a)), fill=mark + (255,))
     # 針: ドットを数点打つだけだと、斜めの向きで途切れる。画素ごとに、針（中心から先へ細くなる線分）に
     # どれだけ覆われるかを 4×4 の点で数え、半分近く覆われていれば塗る（どの向きでも途切れない）
     a = angle * 2 * math.pi - math.pi / 2
@@ -1618,12 +1631,12 @@ def compass_frame(angle):
                 side = -qx * dy + qy * dx
                 if cardinal and along > 4.6 - 2.2 and side > 0:
                     continue
-                px[x, y] = (255, 110, 80, 255)            # 北を指す赤い先
+                px[x, y] = tip                            # 指す先
     dx, dy = -dx, -dy
     for y in range(3, 13):
         for x in range(3, 13):
-            if px[x, y] != (255, 110, 80, 255) and coverage(x, y, 3.0, 0.6) >= 0.3:
-                px[x, y] = (210, 214, 222, 255)           # 反対側の白い尾
+            if px[x, y] != tip and coverage(x, y, 3.0, 0.6) >= 0.3:
+                px[x, y] = tail + (255,)                  # 反対側の尾
     return im
 
 
@@ -1640,6 +1653,7 @@ ITEM_ART = {
     'handbook': lambda: book((40, 90, 130), T1),
     'holo_projector': lambda: device((220, 224, 230), (40, 70, 90), T1),
     'explorer_compass': lambda: compass_frame(0.0),
+    'meteor_compass': lambda: compass_frame(0.0, METEOR_COMPASS),
     'thermocouple_module': lambda: module((220, 224, 230), (255, 130, 90)),
     'basic_frame': lambda: frame(STEEL, (236, 238, 240)),
     'wormhole_mouth_casing': lambda: frame((58, 48, 82), (214, 144, 255)),

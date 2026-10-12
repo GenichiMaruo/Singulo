@@ -40,6 +40,8 @@ public final class Singulo {
         SinguloFluids.FLUID_TYPES.register(modBus);
         SinguloFluids.FLUIDS.register(modBus);
         SinguloBlocks.BLOCKS.register(modBus);
+        io.github.genichimaruo.singulo.registry.SinguloWorldgen.STRUCTURE_TYPES.register(modBus);
+        io.github.genichimaruo.singulo.registry.SinguloWorldgen.PIECES.register(modBus);
         SinguloItems.ITEMS.register(modBus);
         SinguloBlockEntities.REGISTER.register(modBus);
         SinguloEntities.REGISTER.register(modBus);

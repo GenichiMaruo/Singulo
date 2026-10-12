@@ -125,4 +125,69 @@ public final class NatureGameTests {
         helper.assertFalse(VoidCollectorBlockEntity.overVoid(level, helper.absolutePos(voidPos)), "ジ・エンドの外で虚空とみなした");
         helper.succeed();
     }
+
+    /**
+     * 隕石クレーター: 地面の高さを読んで描き込む。すり鉢は地面より低く、中心の隕石には核が1つ。描き込む範囲の外の地面は
+     * 元のまま（四角く削らない）。核を掘り出すと、コンパスはもう指さない。
+     */
+    // テストの場所から遠く離れた所に描く（ほかのテストの場所を荒らさないように）
+    @GameTest(template = EMPTY, batch = "meteor_crater", timeoutTicks = 100)
+    public static void craterIsCarvedIntoTheGround(GameTestHelper helper) {
+        net.minecraft.server.level.ServerLevel level = helper.getLevel();
+        BlockPos base = helper.absolutePos(BlockPos.ZERO).offset(0, 0, 4000);
+        var heightmap = net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE;
+        // テストの世界は薄い平地なので、厚さ10ブロックの地面（石の上に土と草）を作る
+        int ground = base.getY() + 12;
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int x = -18; x <= 18; x++) {
+            for (int z = -18; z <= 18; z++) {
+                for (int y = base.getY(); y <= ground; y++) {
+                    level.setBlock(p.set(base.getX() + x, y, base.getZ() + z),
+                            (y == ground ? Blocks.GRASS_BLOCK : y >= ground - 2 ? Blocks.DIRT : Blocks.STONE).defaultBlockState(), 2);
+                }
+            }
+        }
+        BlockPos center = new BlockPos(base.getX(), ground, base.getZ());
+        int corner = level.getHeight(heightmap, center.getX() + 14, center.getZ() + 14) - 1;
+        helper.assertTrue(corner == ground, "地面を作れていない: " + corner + " / " + ground);
+        io.github.genichimaruo.singulo.nature.MeteorCraterPiece piece = new io.github.genichimaruo.singulo.nature.MeteorCraterPiece(center, 1234L);
+        var box = piece.getBoundingBox();
+        for (int cx = box.minX() >> 4; cx <= box.maxX() >> 4; cx++) {
+            for (int cz = box.minZ() >> 4; cz <= box.maxZ() >> 4; cz++) {
+                var chunkBox = new net.minecraft.world.level.levelgen.structure.BoundingBox(cx * 16, level.getMinBuildHeight(), cz * 16,
+                        cx * 16 + 15, level.getMaxBuildHeight(), cz * 16 + 15);
+                piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random, chunkBox,
+                        new net.minecraft.world.level.ChunkPos(cx, cz), center);
+            }
+        }
+        BlockPos core = piece.corePos();
+        helper.assertTrue(level.getBlockState(core).is(SinguloBlocks.METEORITE_CORE.get()), "隕石の芯に核がない: " + core);
+        // すり鉢（縁の内側。隕石とそのかけらの上は数えない）は元の地面より低い
+        int lower = 0;
+        int counted = 0;
+        for (int i = 0; i < 16; i++) {
+            double a = Math.PI * 2 * i / 16;
+            double d = piece.radius(a) * 0.75;
+            int x = (int) Math.floor(center.getX() + 0.5 + Math.cos(a) * d);
+            int z = (int) Math.floor(center.getZ() + 0.5 + Math.sin(a) * d);
+            int top = level.getHeight(heightmap, x, z) - 1;
+            var state = level.getBlockState(new BlockPos(x, top, z));
+            if (state.is(SinguloBlocks.METEORITE_CRUST.get()) || state.is(SinguloBlocks.METEORIC_IRON_CHUNK.get())
+                    || state.is(SinguloBlocks.STARDUST_CLUSTER.get()) || state.is(SinguloBlocks.METEORITE_CORE.get())) {
+                continue;
+            }
+            counted++;
+            if (top < ground) {
+                lower++;
+            }
+        }
+        helper.assertTrue(counted >= 8 && lower == counted, "すり鉢が地面より低くない: " + lower + " / " + counted);
+        helper.assertTrue(level.getHeight(heightmap, center.getX() + 14, center.getZ() + 14) - 1 == corner, "描き込む範囲の外の地面が変わった");
+        helper.assertFalse(io.github.genichimaruo.singulo.nature.MeteorCores.mined(level, core), "掘る前から掘り出し済みになっている");
+        level.destroyBlock(core, false);
+        helper.assertTrue(io.github.genichimaruo.singulo.nature.MeteorCores.mined(level, core), "核を掘り出しても覚えていない");
+        level.setBlock(core, SinguloBlocks.METEORITE_CORE.get().defaultBlockState(), 3);
+        helper.assertTrue(io.github.genichimaruo.singulo.nature.MeteorCores.mined(level, core), "置き直した核をまた指す");
+        helper.succeed();
+    }
 }

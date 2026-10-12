@@ -51,6 +51,8 @@ public final class SinguloItems {
             "neutrino_scanner", () -> new io.github.genichimaruo.singulo.item.NeutrinoScannerItem(new Item.Properties().rarity(Rarity.RARE), 3));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ExplorerCompassItem> EXPLORER_COMPASS = ITEMS.register(
             "explorer_compass", () -> new io.github.genichimaruo.singulo.item.ExplorerCompassItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.MeteorCompassItem> METEOR_COMPASS = ITEMS.register(
+            "meteor_compass", () -> new io.github.genichimaruo.singulo.item.MeteorCompassItem(new Item.Properties(), 2));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.CreativeCatalystItem> CREATIVE_CATALYST = ITEMS.register(
             "creative_catalyst", () -> new io.github.genichimaruo.singulo.item.CreativeCatalystItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
@@ -123,6 +125,7 @@ public final class SinguloItems {
         TAB_ORDER.add(SETTINGS_CARD);
         TAB_ORDER.add(HOLO_PROJECTOR);
         TAB_ORDER.add(EXPLORER_COMPASS);
+        TAB_ORDER.add(METEOR_COMPASS);
         TAB_ORDER.add(DECODED_RECORD);
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
@@ -213,6 +216,7 @@ public final class SinguloItems {
         block(SinguloBlocks.METEORITE_CRUST, 2);
         block(SinguloBlocks.METEORIC_IRON_CHUNK, 2);
         block(SinguloBlocks.STARDUST_CLUSTER, 2);
+        block(SinguloBlocks.METEORITE_CORE, 2);
         block(SinguloBlocks.FULGURITE_BLOCK, 2);
         TAB_ORDER.add(INERTIAL_CONTROL_GAUNTLET);
         TAB_ORDER.add(NEUTRINO_SCANNER);

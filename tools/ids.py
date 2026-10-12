@@ -30,6 +30,7 @@ MOD = {
     'ホロ投影機': ('holo_projector', 'Holo Projector', 'tool'),
     '設定カード': ('settings_card', 'Settings Card', 'tool'),
     '探索コンパス': ('explorer_compass', 'Explorer\'s Compass', 'tool'),
+    '隕石コンパス': ('meteor_compass', 'Meteor Compass', 'tool'),
     # クリエイティブ専用（レシピなし）
     'クリエイティブ電源': ('creative_energy_source', 'Creative Energy Source', 'machine'),
     '無限の触媒': ('creative_catalyst', 'Infinite Catalyst', 'tool'),
@@ -65,6 +66,7 @@ MOD = {
     '隕石の溶融殻': ('meteorite_crust', 'Meteorite Fusion Crust', 'nature'),
     '隕鉄塊': ('meteoric_iron_chunk', 'Meteoric Iron Chunk', 'nature'),
     '星屑の結晶': ('stardust_cluster', 'Stardust Cluster', 'nature'),
+    '隕石の核': ('meteorite_core', 'Meteorite Core', 'nature'),
     '隕鉄の原石': ('raw_meteoric_iron', 'Raw Meteoric Iron', 'item'),
     '隕鉄インゴット': ('meteoric_iron_ingot', 'Meteoric Iron Ingot', 'item'),
     '星屑': ('stardust', 'Stardust', 'item'),

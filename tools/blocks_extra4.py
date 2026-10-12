@@ -59,15 +59,92 @@ def meteoric_iron_chunk():
 
 
 def stardust_cluster():
-    """星屑の結晶（交差する2枚の板に描く絵。背景は透明）: 細い結晶が束になって伸び、先が光る。"""
+    """
+    星屑の結晶（交差する2枚の板に描く絵。背景は透明）: 細い結晶が束になって伸び、先が光る。
+    根元は殻の煤と土で汚れて暗く、先へ行くほど澄む。面ごとに明るさが違い、ところどころ欠けて濁った所や、
+    こびりついた塵の粒がある。
+    """
+    rnd = random.Random(67)
     im, d = new()
-    spikes = [(4, 15, 3, 6), (7, 15, 7, 2), (10, 15, 12, 5), (6, 15, 5, 9), (9, 15, 10, 8)]
-    for x0, y0, x1, y1 in spikes:
-        d.line([(x0, y0), (x1, y1)], fill=(120, 110, 200, 255), width=2)
-        d.line([(x0, y0), (x1, y1)], fill=(160, 210, 255, 255))
-        d.point((x1, y1), fill=(255, 255, 255, 255))
+    px = im.load()
+    # (根元 x, 根元 y, 先 x, 先 y, 太さ)
+    spikes = [(4, 15, 3, 6, 2), (7, 15, 7, 2, 3), (10, 15, 12, 5, 2), (6, 15, 5, 9, 2), (9, 15, 10, 8, 2), (12, 15, 14, 11, 1)]
+    deep = (78, 64, 140)          # 影の面
+    body = (126, 116, 210)        # 結晶の面
+    lit = (168, 214, 255)         # 光の当たる面
+    soot = (54, 46, 52)           # 根元の煤
+    for x0, y0, x1, y1, w in spikes:
+        n = max(abs(x1 - x0), abs(y1 - y0))
+        for i in range(n + 1):
+            t = i / n
+            x = x0 + (x1 - x0) * t
+            y = y0 + (y1 - y0) * t
+            half = max(0, round((w - 1) * (1 - t * 0.8) / 2 + 0.2))
+            for k in range(-half, half + 1):
+                qx, qy = round(x) + k, round(y)
+                if not (0 <= qx < 16 and 0 <= qy < 16):
+                    continue
+                # 左の面は影、真ん中の筋は光る面、右は結晶の色
+                c = deep if k < 0 else (lit if k == 0 else body)
+                if k == 0 and half == 0:
+                    c = mix(body, lit, 0.6)
+                # 根元ほど煤で汚れ、先ほど澄む
+                dirt = max(0.0, 0.75 - t * 1.6)
+                c = mix(c, soot, dirt)
+                # ざらつき（面ごとの明るさの揺らぎ）
+                j = rnd.uniform(-0.08, 0.08)
+                c = mix(c, (255, 255, 255), j) if j > 0 else mix(c, (0, 0, 0), -j)
+                px[qx, qy] = rgba(c)
+        # 先の光と、欠けて濁った所
+        px[x1, y1] = (240, 248, 255, 255)
+        if n > 5:
+            mx, my = round(x0 + (x1 - x0) * 0.55), round(y0 + (y1 - y0) * 0.55)
+            if px[mx, my][3]:
+                px[mx, my] = rgba(mix(body, (150, 140, 150), 0.55))
+    # こびりついた塵と土の粒（結晶の上だけ）
+    for _ in range(9):
+        x, y = rnd.randint(2, 14), rnd.randint(6, 15)
+        if px[x, y][3]:
+            px[x, y] = rgba(rnd.choice([(92, 78, 70), (70, 62, 66), (110, 98, 120)]))
+    # 根元の土くれ
+    for x in range(3, 14):
+        if rnd.random() < 0.6:
+            px[x, 15] = rgba(rnd.choice([(58, 48, 44), (74, 62, 54), (46, 40, 44)]))
     for x, y in ((6, 4), (11, 3), (3, 8)):
-        d.point((x, y), fill=(220, 190, 255, 255))
+        if not px[x, y][3]:
+            px[x, y] = (220, 190, 255, 200)
+    return im
+
+
+def meteorite_core():
+    """隕石の核: 溶けた隕鉄の地に、星屑が溶け込んで光る脈が走る。中心ほど明るい。"""
+    rnd = random.Random(113)
+    iron = (88, 90, 102)
+    im, d = new(rgba(iron))
+    px = im.load()
+    for y in range(S):
+        for x in range(S):
+            n = rnd.uniform(-0.09, 0.07)
+            px[x, y] = rgba(mix(iron, (255, 255, 255), n) if n > 0 else mix(iron, (0, 0, 0), -n))
+    # 焼けた殻の名残（四隅が暗い）
+    for y in range(S):
+        for x in range(S):
+            e = max(abs(x - 7.5), abs(y - 7.5)) / 7.5
+            if e > 0.8:
+                r, g, b, a = px[x, y]
+                px[x, y] = rgba(mix((r, g, b), (30, 26, 30), (e - 0.8) * 3))
+    # 光る脈（枝分かれ）
+    veins = [[(1, 3), (5, 6), (8, 7), (12, 5), (15, 7)], [(8, 7), (7, 11), (9, 15)], [(5, 6), (3, 10), (0, 12)],
+             [(12, 5), (11, 1)]]
+    for v in veins:
+        d.line(v, fill=(120, 96, 210, 255), width=2)
+    for v in veins:
+        d.line(v, fill=(170, 220, 255, 255))
+    # 中心の明るい塊
+    d.ellipse([6, 5, 10, 9], fill=(150, 200, 255, 255))
+    d.ellipse([7, 6, 9, 8], fill=(235, 245, 255, 255))
+    for _ in range(5):
+        d.point((rnd.randint(1, 14), rnd.randint(1, 14)), fill=(210, 190, 255, 255))
     return im
 
 
@@ -117,6 +194,7 @@ def textures(tb, save):
     save(meteorite_crust(), tb / 'meteorite_crust.png')
     save(meteoric_iron_chunk(), tb / 'meteoric_iron_chunk.png')
     save(stardust_cluster(), tb / 'stardust_cluster.png')
+    save(meteorite_core(), tb / 'meteorite_core.png')
     save(fulgurite_block(), tb / 'fulgurite_block.png')
     for on in (False, True):
         suffix = '_on' if on else ''
@@ -161,13 +239,13 @@ def models(write_json, assets):
     mb = assets / 'models' / 'block'
     mi = assets / 'models' / 'item'
     bs = assets / 'blockstates'
-    for iid in ('meteorite_crust', 'meteoric_iron_chunk', 'fulgurite_block'):
+    for iid in ('meteorite_crust', 'meteoric_iron_chunk', 'meteorite_core', 'fulgurite_block'):
         write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}})
         write_json(mi / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
     write_json(bs / 'meteorite_crust.json', {'variants': {
         'natural=false': {'model': f'{MODID}:block/meteorite_crust'},
         'natural=true': {'model': f'{MODID}:block/meteorite_crust'}}})
-    for iid in ('meteoric_iron_chunk', 'fulgurite_block'):
+    for iid in ('meteoric_iron_chunk', 'meteorite_core', 'fulgurite_block'):
         write_json(bs / f'{iid}.json', {'variants': {'': {'model': f'{MODID}:block/{iid}'}}})
     # 星屑の結晶（紫水晶の芽と同じく、向きで回す）
     write_json(mb / 'stardust_cluster.json', {'parent': 'minecraft:block/cross', 'render_type': 'minecraft:cutout',
@@ -211,4 +289,12 @@ def loot(write_json, data):
     lt = data / 'loot_table' / 'blocks'
     write_json(lt / 'meteoric_iron_chunk.json', _ore_like('meteoric_iron_chunk', 'raw_meteoric_iron', 2, 3))
     write_json(lt / 'stardust_cluster.json', _ore_like('stardust_cluster', 'stardust', 2, 4))
+    # 隕石の核: 隕鉄の原石と星屑をまとめて（シルクタッチならブロックそのもの。置いてもコンパスは指さない）
+    core = _ore_like('meteorite_core', 'raw_meteoric_iron', 4, 6)
+    core['pools'].append({'rolls': 1, 'conditions': [{'condition': 'minecraft:inverted', 'term': _silk()}], 'entries': [
+        {'type': 'minecraft:item', 'name': f'{MODID}:stardust', 'functions': [
+            {'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': 3, 'max': 5}},
+            {'function': 'minecraft:apply_bonus', 'enchantment': 'minecraft:fortune', 'formula': 'minecraft:ore_drops'},
+            {'function': 'minecraft:explosion_decay'}]}]})
+    write_json(lt / 'meteorite_core.json', core)
     write_json(lt / 'fulgurite_block.json', _ore_like('fulgurite_block', 'fulgurite', 2, 3))
