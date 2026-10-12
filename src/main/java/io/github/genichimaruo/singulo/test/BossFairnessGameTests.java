@@ -254,4 +254,121 @@ public final class BossFairnessGameTests {
         reloaded.discard();
         helper.succeed();
     }
+
+    private static int wings(GameTestHelper helper, Vec3 at) {
+        return helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(at, at).inflate(12))
+                .stream().filter(e -> e.getItem().is(io.github.genichimaruo.singulo.registry.SinguloItems.AFTERGLOW_WINGS.get()))
+                .mapToInt(e -> e.getItem().getCount()).sum();
+    }
+
+    /** 最後の記録者の報酬（光輪・翼など）も、戦いが始まったときの人数で決まる。中へ戻ってきた人で強さは増えても、報酬は増えない。 */
+    @GameTest(template = EMPTY, batch = "boss_fair_hidden_rewards")
+    public static void archivistRewardsUseTheLockedCount(GameTestHelper helper) {
+        LastArchivist b = archivist(helper);
+        Vec3 c = LastArchivist.shieldCenter(b.home());
+        java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
+        try {
+            players.add(survivor(helper, c.add(1, 0, 0)));
+            call(b, LastArchivist.class, "raiseShield", helper);
+            b.lockRewardParticipants();
+            for (int i = 2; i <= 6; i++) {
+                players.add(survivor(helper, c.add(i * 0.5, 0, 0)));     // 中でログインし直した人たち
+            }
+            call(b, LastArchivist.class, "holdShield", helper);
+            call(b, RuinBoss.class, "checkChallengers", helper);
+            helper.assertTrue(b.participants() == 6 && b.rewardParticipants() == 1, "人数の数え方が想定と違う: " + b.participants() + "/" + b.rewardParticipants());
+            int before = wings(helper, b.position());
+            call(b, LastArchivist.class, "dropRewards", helper);
+            int n = wings(helper, b.position()) - before;
+            helper.assertTrue(n == BossScaling.lootRolls(1), "始めた人数より多く翼が落ちた: " + n);
+        } finally {
+            b.discard();
+            leave(helper, players.toArray(ServerPlayer[]::new));
+        }
+        helper.succeed();
+    }
+
+    /** 潮汐が終わったあとの猶予の間に中へ来た人も、猶予が終われば落下無効が外れる。外へ出てボスが消えても残らない。 */
+    @GameTest(template = EMPTY, batch = "boss_fair_tide_grace")
+    public static void graceEntrantsAreReleasedToo(GameTestHelper helper) {
+        LastArchivist b = archivist(helper);
+        Vec3 c = LastArchivist.shieldCenter(b.home());
+        java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
+        try {
+            players.add(survivor(helper, c.add(1, 0, 0)));
+            call(b, LastArchivist.class, "raiseShield", helper);
+            b.startTide(helper.getLevel());
+            for (int i = 0; i < LastArchivist.TIDE_LIFT + LastArchivist.TIDE_LOW; i++) {
+                call(b, LastArchivist.class, "tickTide", helper);
+            }
+            helper.assertTrue(b.tideTicks() == 0, "猶予の間に入っていない");
+            ServerPlayer late = survivor(helper, c.add(2, 0, 0));
+            players.add(late);
+            call(b, LastArchivist.class, "holdShield", helper);
+            call(b, LastArchivist.class, "tickTide", helper);
+            helper.assertTrue(late.getAttribute(Attributes.FALL_DAMAGE_MULTIPLIER).hasModifier(TIDE_FALL), "猶予の間に来た人に落下無効が付かない");
+            for (int i = 0; i < LastArchivist.TIDE_GRACE + 2; i++) {
+                call(b, LastArchivist.class, "tickTide", helper);
+            }
+            helper.assertTrue(late.getAttributeValue(Attributes.FALL_DAMAGE_MULTIPLIER) == 1, "猶予が終わっても落下無効が残る");
+            // もう一度、猶予の途中で付いた人が外へ出て、ボスが消える
+            b.startTide(helper.getLevel());
+            for (int i = 0; i < LastArchivist.TIDE_LIFT + LastArchivist.TIDE_LOW + 3; i++) {
+                call(b, LastArchivist.class, "tickTide", helper);
+            }
+            late.teleportTo(helper.getLevel(), c.x + 50, c.y, c.z, 0, 0);
+            b.discard();
+            helper.assertTrue(late.getAttributeValue(Attributes.FALL_DAMAGE_MULTIPLIER) == 1, "外へ出てボスが消えても落下無効が残る");
+        } finally {
+            b.discard();
+            leave(helper, players.toArray(ServerPlayer[]::new));
+        }
+        helper.succeed();
+    }
+
+    /**
+     * 中にいた人を保存していない以前の版のデータでは、誰もいないうちに力場の処理が動いても、
+     * あとから中でログインしてきた人は中の人のまま（別々に戻ってきても）。歩いて外から来た人は入れない。
+     */
+    @GameTest(template = EMPTY, batch = "boss_fair_legacy")
+    public static void legacySaveAdoptsPlayersWhoLogInInside(GameTestHelper helper) {
+        LastArchivist original = archivist(helper);
+        Vec3 c = LastArchivist.shieldCenter(original.home());
+        call(original, LastArchivist.class, "raiseShield", helper);
+        CompoundTag old = original.saveWithoutId(new CompoundTag());
+        old.remove("insiders");
+        old.remove("legacy_insiders");
+        original.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
+        LastArchivist loaded = archivist(helper);
+        loaded.load(old);
+        java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
+        try {
+            call(loaded, LastArchivist.class, "holdShield", helper);     // まだ誰もいない
+            ServerPlayer first = survivor(helper, c.add(14, -0.9, 0));
+            players.add(first);
+            call(loaded, LastArchivist.class, "holdShield", helper);
+            helper.assertTrue(bodyDistance(first, c) < 15, "ログインして戻った人が外へ追い出された: " + bodyDistance(first, c));
+            // 読み込み直しても移行の途中のまま（別の人があとから戻ってくる）
+            LastArchivist again = archivist(helper);
+            again.load(loaded.saveWithoutId(new CompoundTag()));
+            loaded.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
+            loaded = again;
+            call(loaded, LastArchivist.class, "holdShield", helper);
+            ServerPlayer second = survivor(helper, c.add(-14, -0.9, 0));
+            players.add(second);
+            call(loaded, LastArchivist.class, "holdShield", helper);
+            helper.assertTrue(bodyDistance(second, c) < 15 && bodyDistance(first, c) < 15, "あとから戻った人が追い出された");
+            // ずっと外にいた人（ログインしたばかりではない）は、入ろうとしても中に入れない
+            ServerPlayer walker = survivor(helper, c.add(20, -0.9, 0));
+            players.add(walker);
+            walker.tickCount = LastArchivist.LOGIN_GRACE + 1;
+            walker.teleportTo(helper.getLevel(), c.x + 14.5, c.y - 0.9, c.z + 1, 0, 0);
+            call(loaded, LastArchivist.class, "holdShield", helper);
+            helper.assertTrue(bodyDistance(walker, c) > 15, "外から来た人が中へ入れた: " + bodyDistance(walker, c));
+        } finally {
+            loaded.discard();
+            leave(helper, players.toArray(ServerPlayer[]::new));
+        }
+        helper.succeed();
+    }
 }

@@ -140,6 +140,13 @@ public class LastArchivist extends RuinBoss {
     private final Set<UUID> insiders = new HashSet<>();
     /** 中にいた人を保存していない古いデータを読んだとき: 最初の一度だけ、力場の中にいる人をみな中の人とみなす。 */
     private boolean adoptInsiders;
+    /**
+     * 古いデータから続く戦い（中にいた人がわからない）。この戦いのあいだは、力場の中でログインしてきた人
+     * （ログインしたばかりの人）も中の人とみなす。保存する（戻ってくる人が別々でも、何度読み込み直しても）。
+     */
+    private boolean legacyInsiders;
+    /** ログインしたばかりとみなす tick（旧データの移行のときだけ使う）。 */
+    public static final int LOGIN_GRACE = 100;
     private int bumpSoundCooldown;
     private int tideGrace;
     /** 重力潮汐で重力を変えたプレイヤー（どこへ行っても、潮汐が終われば必ず元に戻す）。 */
@@ -818,6 +825,7 @@ public class LastArchivist extends RuinBoss {
         shieldUp = false;
         ArenaShield.lower(getUUID());
         insiders.clear();
+        legacyInsiders = false;
         entityData.set(SHIELD, -1);
         if (announce && level() instanceof ServerLevel level && home != null) {
             level.playSound(null, home, SinguloSounds.get("vault.unseal"), SoundSource.HOSTILE, 3.0F, 0.6F);
@@ -865,7 +873,8 @@ public class LastArchivist extends RuinBoss {
             }
             Vec3 n = off.scale(1 / d);
             boolean in = insiders.contains(p.getUUID());
-            if (!in && (d < r - 1.5 || adoptInsiders && d < r)) {
+            boolean adopt = d < r && (adoptInsiders || legacyInsiders && p.tickCount < LOGIN_GRACE);
+            if (!in && (d < r - 1.5 || adopt)) {
                 insiders.add(p.getUUID());              // 中で目を覚ました（読み込み直しなど）
                 in = true;
             }
@@ -1004,8 +1013,7 @@ public class LastArchivist extends RuinBoss {
                     p.hurtMarked = true;
                 }
                 p.fallDistance = 0;
-                setTideModifiers(p, !lifting, true);
-                tideAffected.add(p.getUUID());
+                applyTide(p, !lifting, true);
             }
             releaseLeavers(level);
             if (home != null && left % 2 == 0) {
@@ -1025,7 +1033,7 @@ public class LastArchivist extends RuinBoss {
             tideGrace--;
             if (tideGrace > 0) {
                 for (Player p : arenaPlayers(level)) {
-                    setTideModifiers(p, false, true);
+                    applyTide(p, false, true);
                 }
                 releaseLeavers(level);
             } else {
@@ -1104,6 +1112,14 @@ public class LastArchivist extends RuinBoss {
             }
         }
         return n;
+    }
+
+    /** 潮汐の効果を付け、付けた人を覚える（あとで、どこにいても必ず外せるように）。効果を付けるときはいつもこれを使う。 */
+    private void applyTide(Player p, boolean low, boolean safe) {
+        setTideModifiers(p, low, safe);
+        if (low || safe) {
+            tideAffected.add(p.getUUID());
+        }
     }
 
     private static void setTideModifiers(Player p, boolean low, boolean safe) {
@@ -1237,7 +1253,7 @@ public class LastArchivist extends RuinBoss {
     /** 報酬: 記録者の光輪、残光の翼、オーバークロック・チップ、H凝縮体。近くの挑戦者は最後の記録を読めるようになる。 */
     private void dropRewards(ServerLevel level) {
         // 大勢で挑んだら、光輪と翼も人数ぶん（それぞれが持ち帰れるように）
-        for (int roll = 0; roll < BossScaling.lootRolls(participants()); roll++) {
+        for (int roll = 0; roll < BossScaling.lootRolls(rewardParticipants()); roll++) {
             for (String[] r : new String[][] {{"archivist_halo", "1"}, {"afterglow_wings", "1"}, {"overclock_chip", "4"}, {"hawking_condensate", "3"}}) {
                 Item item = BuiltInRegistries.ITEM.get(Singulo.id(r[0]));
                 spawnAtLocation(new ItemStack(item, Integer.parseInt(r[1])), (float) HEAD_Y);
@@ -1290,6 +1306,7 @@ public class LastArchivist extends RuinBoss {
             inside.add(net.minecraft.nbt.NbtUtils.createUUID(id));
         }
         tag.put("insiders", inside);
+        tag.putBoolean("legacy_insiders", legacyInsiders);
         tag.putInt("tide", tideTicks());
     }
 
@@ -1319,6 +1336,7 @@ public class LastArchivist extends RuinBoss {
             }
         }
         adoptInsiders = tag.getBoolean("shield") && !tag.contains("insiders");
+        legacyInsiders = adoptInsiders || tag.getBoolean("legacy_insiders");
         entityData.set(SHIELD, shieldUp ? SHIELD_RISE + 2 : 0);
         entityData.set(TIDE, tag.getInt("tide"));
         int p = phase();

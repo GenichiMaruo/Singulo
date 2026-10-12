@@ -191,6 +191,45 @@ public final class GenesisGameTests {
         helper.succeed();
     }
 
+    /**
+     * 以前の版で保存された見本（エンチャント・名前・損傷つき）も、読み込むと素の形になり、作られる物に写らない。
+     * 出来上がっていた物はそのまま残る。
+     */
+    @GameTest(template = LARGE)
+    public static void legacyTemplateLoadsAsPlainItem(GameTestHelper helper) {
+        var registries = helper.getLevel().registryAccess();
+        helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
+        GenesisCoreBlockEntity core = helper.getBlockEntity(CORE);
+        ItemStack sample = new ItemStack(Items.TRIDENT);
+        sample.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("古い見本"));
+        sample.enchant(registries.registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.LOYALTY), 3);
+        sample.set(net.minecraft.core.component.DataComponents.DAMAGE, 17);
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        tag.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
+        tag.putBoolean("formed", true);
+        tag.putBoolean("feeding", true);
+        tag.put("template", sample.save(registries));
+        tag.putDouble("synth", MassSynthesis.cost(MassSynthesis.INSTANCE.entry(sample)));
+        core.loadCustomOnly(tag, registries);
+        helper.assertTrue(core.template().is(Items.TRIDENT) && ItemStack.isSameItemSameComponents(core.template(), new ItemStack(Items.TRIDENT)),
+                "読み込んだ見本が素の形にならない");
+        try {
+            var m = GenesisCoreBlockEntity.class.getDeclaredMethod("tickSynthesis", net.minecraft.server.level.ServerLevel.class);
+            m.setAccessible(true);
+            m.invoke(core, helper.getLevel());
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+        ItemStack made = core.output();
+        helper.assertTrue(made.is(Items.TRIDENT) && ItemStack.isSameItemSameComponents(made, new ItemStack(Items.TRIDENT)),
+                "見本のエンチャント・名前・損傷が作った物に写った: " + made.getComponentsPatch());
+        // 宇宙の記憶を宿した核から置き直しても、見本は素の形
+        ItemStack drop = core.memoryItem(new ItemStack(SinguloBlocks.GENESIS_CORE.get()));
+        helper.assertTrue(GenesisCoreBlockEntity.remembersUniverse(drop), "記憶を宿した核にならない");
+        helper.succeed();
+    }
+
     /** 質量生成の電力は希少度ごとに10倍。表にない物は作れず、ネザースターは伝説（希少度4）。 */
     @GameTest(template = LARGE)
     public static void synthesisCostScalesByRarity(GameTestHelper helper) {

@@ -987,7 +987,10 @@ public class GenesisCoreBlockEntity extends BlockEntity {
         birthTicks = tag.getInt("birth");
         galaxySeed = tag.getLong("galaxy");
         synthProgress = tag.getDouble("synth");
-        template = tag.contains("template") ? ItemStack.parseOptional(registries, tag.getCompound("template")) : ItemStack.EMPTY;
+        // 見本は素の形で持つ（以前の版で保存されたエンチャント・名前・損傷つきの見本も、ここで素に戻す。
+        // 出来上がった物はプレイヤーの物なので、そのまま残す）
+        ItemStack saved = tag.contains("template") ? ItemStack.parseOptional(registries, tag.getCompound("template")) : ItemStack.EMPTY;
+        template = saved.isEmpty() ? ItemStack.EMPTY : new ItemStack(saved.getItem());
         output = tag.contains("output") ? ItemStack.parseOptional(registries, tag.getCompound("output")) : ItemStack.EMPTY;
     }
 
