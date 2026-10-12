@@ -13,19 +13,21 @@ CHAPTERS = [
          '段階は5つ。各段階には目標の装置と、次の段階に進むための鍵になる素材があります。'
          '左の「段階1」から順に読めば、何を作ればよいかが分かります。',
          'Welcome to Singulo',
-         'Singulo is a tech mod about extracting energy from mass. Start with thermoelectric power, climb through '
-         'cryogenic, quantum and temporal tech, and finally run a spinning black hole.\n'
-         'There are five stages. Read the stage chapters in order to know what to build next.'),
+         'Singulo is a tech mod about extracting energy from mass. Start with thermoelectric power, build up '
+         'cryogenic, quantum and temporal technology stage by stage, and finally generate power from a '
+         'spinning black hole (the P-Reactor).\nThere are five stages. Each has a goal machine and a key '
+         'material that opens the next stage. Read from "Stage 1" on the left to know what to build next.'),
         ('howto', 'このハンドブックの使い方',
          '・左の章を選ぶと、右にページが出ます。下の矢印でページをめくります。\n'
          '・「進み具合」の章で、達成した目標と次の目標が分かります（進捗画面［L キー］の Singulo タブとも同じです）。\n'
          '・アイテムにカーソルを合わせると説明が出ます。Shift を押すと作り方と使い道も出ます。\n'
          '・マルチブロックは「ホロ投影機」をコントローラに使うと、正しい形が半透明で浮かび上がります。',
          'Using this book',
-         '- Pick a chapter on the left; flip pages with the arrows.\n'
-         '- The Progress chapter shows finished and next goals (same as the Singulo advancement tab).\n'
-         '- Hover items for a description; hold Shift for recipes and uses.\n'
-         '- Use the Holo Projector on a multiblock controller to see its shape.'),
+         '- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the '
+         'bottom.\n- The Progress chapter shows the goals you have reached and the next ones (the same as the '
+         'Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift '
+         'to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller '
+         'to show the correct shape as a translucent outline.'),
         ('basics', '電力・触媒・遺構',
          '電力（FE）は自前のケーブルで運びます。アイテムと液体は装置の面ごとの設定と、他modのパイプで運びます。\n'
          '段階2から「触媒」が登場します。触媒は寿命のある消耗品で、触媒を入れる装置は触媒専用のスロットを持ちます。'
@@ -46,9 +48,11 @@ CHAPTERS = [
          '3. セラミック・レッドストーン・銅で「基礎回路」、鋼鉄とセラミックで「基礎フレーム」を作る。\n'
          'この3つ（鋼鉄・セラミック・回路）がほとんどの装置の材料です。',
          'First materials',
-         '1. Iron + coal = steel blend; smelt it in a blast furnace.\n'
-         '2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic. Before the Nether, two flint replace the quartz.\n'
-         '3. Make basic circuits and basic frames. Most machines need these.'),
+         '1. Mix iron and coal into steel blend and smelt it into steel ingots in a blast furnace.\n2. Make '
+         'unfired ceramic from clay, nether quartz, bone meal and sand, and fire it in a furnace into white '
+         'ceramic composite. Before you reach the Nether, two flint can replace the nether quartz.\n3. Make '
+         'basic circuits from ceramic, redstone and copper, and basic frames from steel and ceramic.\nThese '
+         'three (steel, ceramic and circuits) go into almost every machine.'),
         ('power', '最初の電源',
          '「熱電発電機」は、高温のブロックと低温のブロックに挟むと温度差で発電します（温度差1Kにつき0.10 FE/t）。'
          'マグマブロック・燃えている焚き火や焼成炉を片側に、青氷や氷塊をもう片側に置きます。\n'
@@ -86,16 +90,21 @@ CHAPTERS = [
          '・電解槽: 水を水素と酸素に分ける。\n'
          '・アーカイブ端末: 遺構の記録をデータカードに書き写し、劣化した部品を修復する。クリスタルメモリの解読もできる。',
          'Stage 1 machines',
-         '- Kiln: fires ceramic boards and steel.\n- Compressor: plates, and mass mode for compressed blocks.\n'
-         '- Electrolyzer: water to hydrogen and oxygen.\n- Archive Terminal: copies records, restores parts, decodes fragments.'),
+         '- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel '
+         'plates. In mass mode it turns materials with a mass value into "mass" and presses it into compressed '
+         'blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen.\n- Archive Terminal: '
+         'copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.'),
         ('goal', '段階2へ進むには',
          '段階2の鍵は「超伝導コイル」です。これは極低温冷却塔で作り、材料に地表観測拠点で拾う「制御ユニット」が要ります。\n'
          '・地表観測拠点（平原・砂漠などの地表）を探し、保管庫から劣化した制御ユニットと観測ログを持ち帰る。\n'
          '・アーカイブ端末で制御ユニットを修復する。\n'
          '・冷却塔の部品をそろえ、ホロ投影機で組み立てる。',
          'Reaching stage 2',
-         'The key is the Superconducting Coil, made in the Cryogenic Cooling Tower. It needs a Control Unit from an '
-         'Observation Post. Find one, restore the unit in the Archive Terminal, then build the tower.'),
+         'The key to stage 2 is the Superconducting Coil. It is made in the Cryogenic Cooling Tower and needs '
+         'a Control Unit found at an Observation Post.\n- Find an Observation Post (on plains, deserts and '
+         'other surfaces) and bring back the degraded control unit and observation log from its cache.\n- '
+         'Restore the control unit in the Archive Terminal.\n- Gather the cooling tower parts and build it with '
+         'the Holo Projector.'),
     ]),
     ('stage2', 'singulo:superconducting_coil', '段階2 極低温', 'Stage 2: Cryogenic', [
         ('tower', '極低温冷却塔',
@@ -105,17 +114,24 @@ CHAPTERS = [
          '熱交換コアと冷却帯は青氷の代わりに氷塊3個でも作れます。窒素だけを作らせれば、高さ7で極低温タービン約3.5台、高さ10で5台を回せます'
          '（コイルなどの加工と共用すると、そのぶん減ります。材料のある加工が窒素より先に動きます）。',
          'Cryogenic Cooling Tower',
-         'A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. '
-         'It makes liquid nitrogen from air and superconducting coils.\n'
-         'Heat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 '
-         'cryogenic turbines and a 10-high tower 5 (less when it also processes coils; recipes with inputs run before nitrogen).'),
+         'Build a waisted hyperboloid tower 7–15 high on a 5×5 base. The middle column is heat exchange cores '
+         'and the top is closed with a vent grate. The controller goes in the middle of the front face, second '
+         'layer from the bottom. Taller towers are faster, and at 10 or more they also make liquid helium.\nIt '
+         'makes liquid nitrogen from the air with no inputs. Superconducting coils are made from copper, '
+         'redstone, steel plates, substrates, a control unit and liquid nitrogen.\nHeat exchange cores and '
+         'coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds '
+         'about 3.5 cryogenic turbines and a 10-high tower 5 (fewer when it also processes coils; recipes with '
+         'inputs run before nitrogen).'),
         ('accelerator', '粒子加速器とミュオン触媒',
          '加速管と収束磁石で正方形のリング（一辺8〜32）を作り、コントローラをリングに接して置きます。四隅は収束磁石、'
          '収束磁石はリングの1/4以上。水素からミュオン束を作り、ごく稀に磁気単極子が生まれます。\n'
          '触媒反応器でミュオン束からミュオン触媒（ティア2）を作ります。宇宙線ミュオン収集器を高所に置けば、電力なしでもミュオン束が少しずつ集まります。',
          'Particle Accelerator and muon catalyst',
-         'Build a square ring of tubes and magnets (8–32 wide), magnets on the corners and on at least a quarter of the ring. '
-         'It turns hydrogen into muon bundles (and rare monopoles). The Catalytic Reactor turns them into muon catalysts.'),
+         'Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller '
+         'against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter '
+         'of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic '
+         'Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up '
+         'slowly gathers muon bundles without power.'),
         ('others', 'そのほかの段階2の装置',
          '・精密組立台: 段階3以降の部品と装置はほぼすべてここで作ります。\n'
          '・極低温タービン: 液体窒素の気化で発電（5 kFE/t）。\n'
@@ -123,14 +139,18 @@ CHAPTERS = [
          '・ワールドライン・アンカー（小）: 触媒を入れると周りのチャンクを読み込み続ける。\n'
          '・単極子アップグレード: 磁気単極子から作り、装置の単極子スロットに挿すと速度×2・電力効率+50%。',
          'Other stage 2 devices',
-         '- Precision Assembler: makes almost everything from stage 3 on.\n- Cryogenic Turbine: power from evaporating nitrogen.\n'
-         '- SMES Cell: stores energy.\n- Small Worldline Anchor: chunk loader fed by catalysts.\n'
-         '- Monopole Upgrade: ×2 speed, +50% efficiency in a machine\'s monopole slot.'),
+         '- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Cryogenic Turbine: '
+         'generates power from evaporating liquid nitrogen (5 kFE/t).\n- SMES Cell: stores a large amount of '
+         'power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- '
+         "Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and "
+         '+50% power efficiency.'),
         ('goal', '段階3へ進むには',
          '段階3の鍵は「量子演算モジュール」と液体ヘリウムです。冷却塔を高さ10以上にし、圧縮機で深層岩を砕いて出るヘリウムを液化します。'
          '研究棟（地表〜浅い地下）で量子データ片も集めましょう。',
          'Reaching stage 3',
-         'You need liquid helium (tower 10+ high, helium from crushed deepslate) and quantum data from Research Buildings.'),
+         'The keys to stage 3 are the Quantum Computing Module and liquid helium. Build the cooling tower 10 '
+         'or more blocks high and liquefy helium released by crushing deepslate in the compressor. Also '
+         'collect quantum data fragments from Research Buildings (surface to shallow underground).'),
     ]),
     ('stage3', 'singulo:quantum_computing_module', '段階3 量子', 'Stage 3: Quantum', [
         ('quantum', '量子の装置',
@@ -149,13 +169,20 @@ CHAPTERS = [
          '・ニュートリノ・スキャナー: 地形越しに遺構と鉱石の輪郭を10秒間見せる。はじめは鉄やレッドストーンまでで、'
          '感度モジュール（Mk2: 金・ダイヤモンド・エメラルド、Mk3: 古代の残骸）を使うと深い層の鉱石も映る。観測所にも使える。',
          'Tools and exploration',
-         '- Inertial Control Gauntlet: levitate or pull small mobs.\n- Inertial Stabilizer: explosion-proofs a 16-block radius.\n'
-         '- Gravitational Wave Detector: points to anomalies.\n- Neutrino Scanner: shows ruins and ores through terrain.'),
+         '- Inertial Control Gauntlet: hold right-click to levitate or pull small mobs. It runs on power; '
+         'sneak-right-click a block that holds power to charge it.\n- Inertial Stabilizer: stops explosions '
+         'from breaking blocks within a radius of 16.\n- Gravitational Wave Detector: shows the rough direction '
+         'and distance band of the Final Lab (gravity anomaly).\n- Neutrino Scanner: shows the outlines of '
+         'ruins and ores through terrain for 10 seconds. At first it shows up to iron and redstone; '
+         'sensitivity modules (Mk2: gold, diamond, emerald; Mk3: ancient debris) reveal deeper ores. It also '
+         'works on the observatory.'),
         ('goal', '段階4へ進むには',
          '段階4の鍵は「エキゾチック物質」です。C空洞で作り、時間結晶触媒が要ります。'
          '封鎖培養施設（ディープスレート層）で時間結晶の種と培養データを探しましょう。極低温区画と強い警備機に注意。',
          'Reaching stage 4',
-         'The key is exotic matter from the C-Cavity, which needs time crystal catalysts. Search the deep Culture Facility.'),
+         'The key to stage 4 is exotic matter. It is made in the C-Cavity and needs time crystal catalysts. '
+         'Search the Culture Facility (deepslate layer) for time crystal seeds and culture data. Watch out for '
+         'the cryogenic section and the stronger security machines.'),
     ]),
     ('stage4', 'singulo:time_crystal_catalyst', '段階4 時間', 'Stage 4: Temporal', [
         ('compression', '圧縮の連鎖',
@@ -163,8 +190,10 @@ CHAPTERS = [
          '3種類以上の元ブロックから作った Lv1 は「混成」になり、8個で Lv2 にできます。金属だけを固めた金属圧縮ブロックもあります。\n'
          '縮退圧縮炉（5×5×5 の閉じたプレス）で、縮退物質殻やリアクターの炉殻を作ります。',
          'Compression chain',
-         'Mass mode turns materials with mass values into compressed blocks, Lv1 to Lv3. Lv1 made from 3+ kinds of blocks is "mixed" and '
-         'only 8 are needed for Lv2. The Degenerate Compactor (closed 5×5×5 press) makes degenerate shells.'),
+         'In mass mode the compressor turns materials with a mass value into "mass" and presses it into '
+         'compressed blocks, Lv1 → Lv2 → Lv3. Lv1 made from three or more kinds of source blocks is "mixed", '
+         'and only 8 are needed for Lv2. There are also compressed metal blocks made of metals only.\nThe '
+         'Degenerate Compactor (a closed 5×5×5 press) makes degenerate matter shells and reactor shell blocks.'),
         ('time', '時間結晶とエキゾチック物質',
          '時間結晶育成槽は、実際に動いた時間で触媒を育てます（12分）。要求の80%（24 kFE/t）以上の電力なら純度は落ちません。'
          'それを割った時間の割合だけ純度が下がり、寿命も短くなります。\n'
@@ -188,16 +217,20 @@ CHAPTERS = [
          '・自動探査機ステーション: 発見済みの地表観測拠点へ探査機を飛ばし、回収物を半分の量で持ち帰る。\n'
          '・トポロジカル導線と SMESモジュールで大電力を運び、ためる。',
          'Big power and automation',
-         '- Degenerate Furnace (5×5×7): 5 MFE/t from Lv2 blocks on time crystals (1.25 MFE/t on BE catalysts); power leaves through I/O ports and it '
-         'waits without burning fuel or catalyst while full.\n- Shells: one degenerate shell makes 24 reactor shell blocks; ignition needs 6 shells for '
-         'plating plus 1 for the seed.\n- Probe Station: automates trips to discovered ruins.\n'
-         '- Topological wire and SMES modules for large power.'),
+         '- Degenerate Furnace (5×5×7): crushes compressed blocks Lv2 for 5 MFE/t. It uses a time crystal '
+         'catalyst (a BE condensate catalyst runs it at 25%, 1.25 MFE/t, as a stopgap). Power leaves through '
+         'its I/O ports automatically; while its storage is full it waits without using fuel or catalyst.\n- '
+         'Shells: one degenerate matter shell makes 24 reactor shell blocks. Ignition needs 6 shells for the '
+         'plating plus 1 for the singularity seed. Gathering rock and metal in bulk helps.\n- Probe Station: '
+         'sends probes to discovered Observation Posts and brings back half the loot.\n- Topological wire and '
+         'SMES modules carry and store large amounts of power.'),
         ('goal', '段階5へ進むには',
          '最終実験施設（重力異常点）で封印コンソールに触れると、守護機ホライズン・ウォーデンが目覚めます。倒すと保管庫が開き、'
          '「休眠した特異点の種」が手に入ります。特異点封入台で目覚めさせ、Pリアクターに入れて点火します。',
          'Reaching stage 5',
-         'Wake and defeat the Horizon Warden at the Final Lab to get a dormant singularity seed, awaken it in the '
-         'encapsulator and ignite it in the P-Reactor.'),
+         'At the Final Lab (gravity anomaly), touch the seal console to wake the Horizon Warden. Defeat it and '
+         'the cache opens, giving you a dormant singularity seed. Awaken it in the Singularity Encapsulator, '
+         'then load it into the P-Reactor and ignite it.'),
     ]),
     ('stage5', 'singulo:singularity_core', '段階5 特異点', 'Stage 5: Singularity', [
         ('reactor', 'Pリアクターを組む',
@@ -205,8 +238,11 @@ CHAPTERS = [
          '各円環の斜め45°の点（計12）は炉心安定化コイル、残りは炉殻ブロック（抽出ポートと警報器に交換可）、中心の 3×3×3 は空気。炉心制御装置は中心の5ブロック下です。'
          'ホロ投影機を炉心制御装置に使えば、全体が浮かび上がります。',
          'Building the reactor',
-         'Three continuous orthogonal rings of radius 6 (48 blocks each): gyro drives where they cross, twelve stabilizer '
-         'coils at the 45° points, reactor shell elsewhere (replace shell blocks with extraction ports or mass alarms), an empty 3×3×3 core. The core controller sits 5 below the centre.'),
+         'Build three continuous rings of radius 6 (48 blocks each) on the three orthogonal planes through the '
+         'core centre. The six points where they cross are gyro drives, the 45° points of each ring (twelve in '
+         'all) are reactor stabilizer coils, and the rest is reactor shell (which can be swapped for '
+         'extraction ports and mass alarms). The central 3×3×3 is air. The core controller sits 5 blocks below '
+         'the centre. Use the Holo Projector on the core controller to show the whole structure.'),
         ('ignite', '点火と運転',
          '種を入れて「点火」を押し、10秒以内に 50 GFE をポートかコントローラに注ぎます（ホライズン・バスが必要）。'
          '画面には点火に要る受電（既定は平均 250 MFE/t）が出ます。点火中は受電の速さと届く見込みが出るので、足りなければ配線を見直します。'
@@ -217,17 +253,26 @@ CHAPTERS = [
          '燃料は質量ペレット。降着効率はスピンで決まり（5.7〜42.3%）、炉心質量5000・最大スピンで約 2.1 GFE/t。\n'
          'リングの外（半径24まで）は弱い引力、リングの内側は逃げられない強い引力で、黒い球に触れたものはどんなに頑丈でも必ず消えます。半径4は防具を無視する潮汐帯です。引力帯の中は時間が遅れ、装置が×0.8、触媒の減りが×0.5になります。',
          'Ignition and operation',
-         'Insert the seed, press Ignite and deliver 50 GFE within 10 s (250 MFE/t on average). While igniting the screen shows the intake and what will arrive; '
-         'a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\n'
-         'A new core starts in harvest mode: it keeps mass at 480 or below so H condensate forms every 5 minutes with a Hawking Collector. '
-         'The first core needs six, so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\n'
-         'Burn mass pellets; efficiency depends on spin. '
-         'Mind the 24-block pull zone (time runs slower there) and the 4-block tidal zone.'),
+         'Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a '
+         'horizon bus is required). The screen shows the intake needed (250 MFE/t on average by default). '
+         'While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a '
+         'network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 '
+         's.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 '
+         'minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to '
+         'restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. '
+         'Harvest mode also sheds 2 mass per second from an overgrown core.\nThe fuel is mass pellets. '
+         'Accretion efficiency depends on spin (5.7–42.3%); a core of mass 5000 at full spin gives about 2.1 '
+         'GFE/t.\nOutside the ring (out to radius 24) a weak pull acts, inside the ring a pull you cannot '
+         'escape, and anything that touches the black sphere is destroyed no matter how tough. Radius 4 is a '
+         'tidal zone that ignores armour. Time runs slower in the pull zone: machines at ×0.8, catalyst wear '
+         'at ×0.5.'),
         ('byproducts', '副産物とシンギュラリティ・コア',
          'ジェット・コレクター・Hコレクター・エルゴスフィア・リングを入れると、運用モードに応じて'
          'ジェット凝縮体・H凝縮体・エキゾチック物質が生まれます。H凝縮体などからシンギュラリティ・コア（ティア5の触媒）を作れます。',
          'By-products and the Singularity Core',
-         'Collectors produce jet condensate, H-Condensate and exotic matter. The Singularity Core is the tier 5 catalyst.'),
+         'With a Jet Collector, a Hawking Collector or an Ergosphere Ring installed, the reactor produces jet '
+         'condensate, H-Condensate or exotic matter depending on how it is running. H-Condensate and other '
+         'materials make the Singularity Core (the tier 5 catalyst).'),
         ('endgame', 'その先',
          'シンギュラリティ・コアと大電力で「特異点技術」が動かせます（特異点技術の章）。'
          'イベントホライズン・シールドで拠点を守り、Tシリンダーで時間を速め、ワームホールで遠くの拠点をつなぎましょう。'
@@ -253,9 +298,13 @@ CHAPTERS = [
          '4. 大きさを選べる装置（冷却塔・加速器）は、スニークして使うと大きさが切り替わる。\n'
          'クリエイティブでは /singulo build <名前> [大きさ] で一発で組み立てられます。',
          'Using the Holo Projector',
-         '1. Place the controller; the structure extends behind it.\n2. Use the projector on it to see the shape and a material list.\n'
-         '3. Fill the cyan boxes, clear the red ones. It lights up when complete.\n4. Sneak-use to change size.\n'
-         'In creative: /singulo build <name> [size].'),
+         '1. Place the controller (its front faces you and the structure extends behind it).\n2. Right-click '
+         'the controller with the Holo Projector. The correct shape is projected, and the required and missing '
+         'counts appear in chat.\n3. Place the shown blocks in the cyan boxes and remove the blocks in the red '
+         'ones. When everything is in place the projection disappears, light runs along the seams and the '
+         'machine starts.\n4. For machines with a choice of size (the cooling tower and the accelerator), '
+         'sneak-use the projector to switch sizes.\nIn creative mode, /singulo build <name> [size] builds it in '
+         'one go.'),
         ('list', 'マルチブロック一覧',
          '・極低温冷却塔（5×5、高さ7〜15）: cooling_tower\n・粒子加速器（リング8〜32）: particle_accelerator\n'
          '・縮退圧縮炉（5×5×5）: degenerate_compactor\n・C空洞（5×5×5）: casimir_cavity\n'
@@ -263,8 +312,11 @@ CHAPTERS = [
          '・イベントホライズン・シールド発生塔（5×5、高さ9）: event_horizon_shield\n・Tシリンダー（5×5×9）: tipler_cylinder\n'
          '・ワームホール生成器（5×5×5の球）: wormhole_generator',
          'Multiblock list',
-         'cooling_tower, particle_accelerator, degenerate_compactor, casimir_cavity, degenerate_furnace, penrose_reactor, '
-         'event_horizon_shield, tipler_cylinder, wormhole_generator.'),
+         '- Cryogenic Cooling Tower (5×5, 7–15 high): cooling_tower\n- Particle Accelerator (ring 8–32 wide): '
+         'particle_accelerator\n- Degenerate Compactor (5×5×5): degenerate_compactor\n- C-Cavity (5×5×5): '
+         'casimir_cavity\n- Degenerate Furnace (5×5×7): degenerate_furnace\n- P-Reactor (13×13×13): '
+         'penrose_reactor\n- Event Horizon Shield Tower (5×5, 9 high): event_horizon_shield\n- T-Cylinder '
+         '(5×5×9): tipler_cylinder\n- Wormhole Generator (5×5×5 sphere): wormhole_generator'),
     ]),
     ('catalysts', 'singulo:muon_catalyst', '触媒', 'Catalysts', [
         ('tiers', 'ティアと効き方',
@@ -274,27 +326,37 @@ CHAPTERS = [
          'この決まりは触媒枠で「運転」する装置（アンカー・スタビライザー・発電機・シールドなど）のものです。加工装置のレシピに材料として書かれた触媒は、'
          '個数か寿命を決まった分だけ使い、速さは変わりません（例: BE凝縮触媒の加工はミュオン触媒1個で40秒）。',
          'Tiers and effects',
-         'Muon (2), BE (3), Time crystal (4), Singularity core (5). Higher tier = faster and less wear; one lower = half speed and double wear '
-         '(generators give 25% output); two lower = unusable. Underpowering wears catalysts faster.\n'
-         'These rules apply to devices that run on a catalyst slot. When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or '
-         'amount of life and the speed does not change.'),
+         'Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: '
+         'standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: '
+         '×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a '
+         'catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions '
+         'make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, '
+         'stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an '
+         'ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE '
+         'condensate catalyst takes one muon catalyst and 40 seconds).'),
         ('slots', '触媒スロットとリサイクル',
          '触媒を使う装置には、触媒だけが入る専用スロットがあります（画面で触媒のマークが付いた枠）。ほかのアイテムは入りません。\n'
          '使い切った触媒は失活触媒になります。触媒反応器で、1ティア下の触媒の材料として約25%を回収できます。',
          'Catalyst slots and recycling',
-         'Catalyst machines have a dedicated slot that accepts only catalysts. Spent catalysts can be recycled into about 25% of a lower-tier catalyst.'),
+         'Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with '
+         'a catalyst icon). Nothing else fits.\nA used-up catalyst becomes a spent catalyst. In the Catalytic '
+         'Reactor, about 25% of it can be recovered as material for the catalyst one tier lower.'),
         ('time', '時間の場',
          'Pリアクターの引力帯では時間が遅れ、触媒の減りが×0.5（装置は×0.8）。Tシリンダーの範囲では逆に×2。'
          '重なると打ち消し合います。触媒倉庫を炉の近くに置くと長持ちします。',
          'Time fields',
-         'Near a running reactor catalysts wear at ×0.5; inside a T-Cylinder field ×2. The two cancel out.'),
+         "In a P-Reactor's pull zone time slows down: catalysts wear at ×0.5 (machines run at ×0.8). Inside a "
+         'T-Cylinder field it is the reverse, ×2. The two cancel out where they overlap. Keeping catalyst '
+         'storage near the reactor makes them last longer.'),
     ]),
     ('power', 'singulo:superconducting_cable', '電力と輸送', 'Power and Logistics', [
         ('cables', 'ケーブル',
          '銅導線（2 kFE/t、損失あり）→ 超伝導ケーブル（1 MFE/t）→ トポロジカル導線（100 MFE/t）→ ホライズン・バス（上限なし。ほかの mod の装置へは1台あたり約2.1 GFE/t まで）。'
          'つながったケーブルの容量は、いちばん細いところで決まります。',
          'Cables',
-         'Copper wire → superconducting cable → topological wire → horizon bus. A network carries what its weakest cable can.'),
+         'Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) '
+         '→ horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). A connected network '
+         'carries only what its thinnest cable can.'),
         ('sides', '面ごとの設定',
          '通常の加工装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
          '出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'
@@ -324,8 +386,16 @@ CHAPTERS = [
          '・沈んだ炉心区画: 最終実験施設よりさらに深い地下（Y−60〜−54あたり）の、止まった二基目の炉。'
          '最終実験施設を攻略したあと、探索コンパスを調整すると探せる。エルゴ球の大蛇。エキゾチック物質・ジェット凝縮体・H凝縮体（14日）。',
          'The five ruins',
-         'Observation Post, Research Building, Culture Facility, Final Lab and the Sunken Reactor Sector — each deeper and better guarded '
-         'than the last. The Sunken Reactor Sector (around Y −60 to −54) is found by tuning the explorer compass after the Final Lab.'),
+         '- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White '
+         'security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow '
+         'underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the '
+         'back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground '
+         '(around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the '
+         'containment room at the back. Time crystal seeds and culture data (14 days).\n- Final Lab: a gravity '
+         'anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds '
+         'and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the '
+         'Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. '
+         'The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).'),
         ('bosses', '遺構の番人',
          '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。'
          '番人は部屋から挑戦者がいなくなると元に戻ります。\n'
@@ -414,7 +484,9 @@ CHAPTERS = [
          '遺構の保管庫からときどき「クリスタルメモリ」が出ます。アーカイブ端末で電力を使って解読すると、旧文明の記録が読めます'
          '（ハンドブックの「旧文明の記録」の章に追加されます）。全部集めると、文明が滅んだ理由が分かります。',
          'Crystal memories',
-         'Ruin caches sometimes hold crystal memories. Decode them in the Archive Terminal to unlock the Ancient Records chapter.'),
+         'Ruin caches sometimes hold crystal memories. Decode them with power in the Archive Terminal to read '
+         'the records of the old civilization (they are added to the Ancient Records chapter of this '
+         'handbook). Collect them all to learn why the civilization fell.'),
         ('gathering', 'その場所でしか採れない素材',
          '・隕石クレーター（平原・砂漠・森などの地表）: 差し渡し10ブロックほどの浅いすり鉢の中心に、半分埋まった隕石があります。'
          '隕鉄塊（鉄以上のツルハシ）から隕鉄の原石、黒い溶融殻に育つ星屑の結晶から星屑が採れます。星屑の結晶は、クレーターに最初からある殻にだけ、少しずつ育ち直します。\n'
@@ -434,19 +506,26 @@ CHAPTERS = [
     ('romance', 'singulo:tipler_core', '特異点技術', 'Singularity Tech', [
         ('shield', 'イベントホライズン・シールド',
          '半径32の中を守る塔（5×5、高さ9）。時間結晶触媒で爆発と荒らしを防ぎ、シンギュラリティ・コアなら敵の湧きと侵入も止める。電力16,384 FE/t。',
-         'Event Horizon Shield', 'Protects a 32-block radius. With a Singularity Core it also blocks hostile spawns.'),
+         'Event Horizon Shield', 'A tower (5×5, 9 high) that protects a radius of 32. A time crystal catalyst stops explosions and '
+                                 'griefing; a Singularity Core also stops hostile spawns and intruders. Uses 16,384 FE/t.'),
         ('tipler', 'Tシリンダー',
          '半径16の時間を×2にする（5×5×9）。燃料と触媒はコアの画面から入れる。時間結晶触媒・エキゾチック物質（1分に1個）・100 kFE/t。',
-         'T-Cylinder', 'Doubles supported machine processing within 16 blocks.'),
+         'T-Cylinder', "Speeds up time within a radius of 16 (×2; 5×5×9). Fuel and catalyst go in through the core's screen: "
+                       'a time crystal catalyst, exotic matter (one per minute) and 100 kFE/t.'),
         ('gear', '身につける重力技術',
          '・メトリック・ドライブ: 持ち物に入れて、低重力・無重力（飛行）・高重力を切り替える。\n'
          '・グラビトン・マニピュレーター: 浮遊・牽引・斥力・圧壊。G キーで円錐範囲。\n'
          '・ワールドライン・アンカー（上位）: コアを埋め込むと消費なしで半径5。',
-         'Gravity gear', 'Metric Drive, Graviton Manipulator, Advanced Worldline Anchor.'),
+         'Gravity gear', '- Metric Drive: keep it in your inventory and switch between low gravity, zero gravity (flight) and '
+                         'high gravity.\n- Graviton Manipulator: levitate, pull, repel and crush. The G key switches to a cone '
+                         'area.\n- Advanced Worldline Anchor: with a core embedded, it keeps a radius of 5 loaded with no '
+                         'upkeep.'),
         ('darkmatter', 'ダークマター',
          'ハロー捕集器を炉心から16ブロック以内に置くと集まる。普通の入れ物からは漏れるので、重力閉じ込めタンクに入れる。'
          '炉心に直接入れると、エディントン限界を受けずに質量になる。',
-         'Dark matter', 'Collect near a core, store in containment tanks, feed the core directly.'),
+         'Dark matter', 'A Halo Collector placed within 16 blocks of a core collects it. It leaks from ordinary containers, '
+                        'so keep it in a Gravitational Containment Tank. Fed directly into the core, it becomes mass without '
+                        'the Eddington limit.'),
     ]),
     ('genesis', 'singulo:genesis_core', '創世炉', 'Genesis Engine', [
         ('build', '創世炉を組む',
@@ -483,12 +562,13 @@ CHAPTERS = [
          '希少な物ほど桁違いに電力を食います。宇宙を生んだ核は壊しても記憶を宿したままで、別の場所に置き直せばそのまま使えます（ただし、溜めた電力と作りかけの進み具合は引き継がれません。高価な物を作っている途中では壊さないこと）。'
          '作れる物はデータパック（mass_synthesis）で変えられます。',
          'Mass synthesis',
-         'A born universe turns power into items. Use the core empty-handed to open its screen and put the item you want in the left frame '
-         '(or use the item on the core). Collect results from the slot on the right (or pull from below with a hopper).\n'
-         'Cost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). '
-         'A broken core keeps the memory of its universe and works again wherever you place it, but stored power and partial progress are lost, '
-         'so avoid moving it in the middle of an expensive item. '
-         'The table is a datapack (mass_synthesis).'),
+         'A Genesis Engine that has given birth can make items from power. Use the core empty-handed to open '
+         'its screen and put the item you want in the left frame (or use the item on the core). Collect '
+         'results from the slot on the right (or pull them from below with a hopper).\nCost per item = mass × 1 '
+         'GFE × 10^rarity. Rarity runs from 0 (stone, dirt) to 4 (nether star, elytra, dragon egg), so rarer '
+         'items cost orders of magnitude more power. A broken core keeps the memory of its universe and works '
+         'again wherever you place it, but stored power and partial progress are lost, so do not break it in '
+         'the middle of an expensive item. The list of items is a datapack (mass_synthesis).'),
     ]),
     ('hazards', 'minecraft:tnt', '危険', 'Hazards', [
         ('list', '気をつけること',
@@ -497,7 +577,9 @@ CHAPTERS = [
          '・粒子加速器を大きく回していると、まれにストレンジレットが漏れ、周りのブロックを毎秒1個ずつストレンジ物質に変えていく'
          '（半径8・最大512個で止まる。シールドの中には広がらない）。磁気瓶を使うと封じ込めて回収できる。',
          'Hazards',
-         '- Tidal zone ignores armour.\n- Leaking hydrogen near fire explodes.\n'
-         '- Large accelerators may leak strangelets that convert blocks into strange matter; contain them with a Magnetic Bottle.'),
+         "- The reactor's tidal zone (radius 4) deals damage that ignores armour.\n- A broken hydrogen "
+         'container causes a small explosion near fire.\n- A large particle accelerator may occasionally leak a '
+         'strangelet, which turns one nearby block per second into strange matter (it stops at radius 8 or 512 '
+         'blocks and does not spread inside a shield). Contain and collect it with a Magnetic Bottle.'),
     ]),
 ]
