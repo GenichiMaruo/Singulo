@@ -17,7 +17,11 @@ import net.minecraft.world.entity.player.Player;
  * バニラでは、攻撃を受けると 20 tick の無敵時間が始まり、前半の 10 tick は同じ強さ以下の攻撃を受け付けない。
  * これは全員で共有なので、大勢で殴っても約 0.5 秒に1撃しか通らず、人数で体力を増やすと協力するほど長期戦になる。
  * ここでは、プレイヤーの攻撃についてだけ、そのプレイヤーが最後に当てた時刻と強さで無敵時間を判定する
- * （ひとりひとりにはバニラと同じ間隔がかかり、他の人の攻撃には邪魔されない）。プレイヤー以外の攻撃は今までどおり。
+ * （ひとりひとりにはバニラと同じ間隔がかかり、他の人の攻撃には邪魔されない）。
+ * <p>
+ * 実体の無敵時間（invulnerableTime・lastHurt）は、プレイヤー以外の攻撃（環境・モブ・ゴーレムなど）だけの共有の記録として使う。
+ * プレイヤーの攻撃はそこへ一時的に自分の記録を入れて受け、終わったら必ず元に戻す。だから、プレイヤーの攻撃で
+ * プレイヤー以外の攻撃の無敵時間が短くなったり、伸びたり、強さの記録が書き換わったりはしない（逆も同じ）。
  */
 final class HurtWindows {
     /** 同じ強さ以下の攻撃を受け付けない間（バニラの無敵時間 20 tick の前半）。 */
@@ -68,10 +72,10 @@ final class HurtWindows {
             // 受け付けない間に強い攻撃で上書きしたときは、間の始まりはそのまま（バニラと同じ）
             long start = h != null && now - h.start() < WINDOW ? h.start() : now;
             hits.put(p.getUUID(), new Hit(start, lastHurt.get()));
-        } else {
-            self.invulnerableTime = sharedInvulnerable;
-            setLastHurt.accept(sharedLast);
         }
+        // 通っても通らなくても、プレイヤー以外の攻撃の記録は元のまま
+        self.invulnerableTime = sharedInvulnerable;
+        setLastHurt.accept(sharedLast);
         if (hits.size() > 16) {
             hits.values().removeIf(x -> now - x.start() >= FULL);
         }

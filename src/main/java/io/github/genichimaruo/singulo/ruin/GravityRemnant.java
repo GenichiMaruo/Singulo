@@ -390,14 +390,20 @@ public class GravityRemnant extends RuinBoss {
             return super.hurt(source, amount);
         }
         boolean bypass = source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
-        if (shell() > 0 && !bypass && amount > 0 && !inHurtWindow(source)) {
-            int piece = shell() - 1;
-            setShell(piece);
-            if (level() instanceof ServerLevel level) {
-                level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, rubble(piece)),
-                        getX(), getY() + 0.6, getZ(), 20, 0.6, 0.6, 0.6, 0.1);
+        if (shell() > 0 && !bypass && amount > 0) {
+            // 殻がある間は、無敵時間の中でも外でも同じように軽くする（連打で軽減を外せないように）。
+            // 殻が剥がれるのは、無敵時間の外で受けた一撃（その攻撃者にとって新しい一撃）が通ったときだけ
+            boolean fresh = !inHurtWindow(source);
+            boolean hurt = super.hurt(source, amount * SHELL_FACTOR);
+            if (hurt && fresh && shell() > 0) {
+                int piece = shell() - 1;
+                setShell(piece);
+                if (level() instanceof ServerLevel level) {
+                    level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, rubble(piece)),
+                            getX(), getY() + 0.6, getZ(), 20, 0.6, 0.6, 0.6, 0.1);
+                }
             }
-            return super.hurt(source, amount * SHELL_FACTOR);
+            return hurt;
         }
         return super.hurt(source, amount);
     }

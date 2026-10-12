@@ -1263,8 +1263,8 @@
     "subtitle": "subtitles.singulo.genesis.form",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.activate",
-        "type": "event"
+        "name": "singulo:genesis/form",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1272,8 +1272,16 @@
     "subtitle": "subtitles.singulo.genesis.ambient",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.ambient",
-        "type": "event"
+        "name": "singulo:genesis/ambient_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:genesis/ambient_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:genesis/ambient_3",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1281,8 +1289,8 @@
     "subtitle": "subtitles.singulo.genesis.seed",
     "sounds": [
       {
-        "name": "minecraft:block.respawn_anchor.charge",
-        "type": "event"
+        "name": "singulo:genesis/seed",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1290,8 +1298,8 @@
     "subtitle": "subtitles.singulo.genesis.ignite",
     "sounds": [
       {
-        "name": "minecraft:block.end_portal_frame.fill",
-        "type": "event"
+        "name": "singulo:genesis/ignite",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1299,8 +1307,8 @@
     "subtitle": "subtitles.singulo.genesis.surge",
     "sounds": [
       {
-        "name": "minecraft:block.respawn_anchor.deplete",
-        "type": "event"
+        "name": "singulo:genesis/surge",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1308,8 +1316,8 @@
     "subtitle": "subtitles.singulo.genesis.alarm",
     "sounds": [
       {
-        "name": "minecraft:block.bell.resonate",
-        "type": "event"
+        "name": "singulo:genesis/alarm",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1317,8 +1325,8 @@
     "subtitle": "subtitles.singulo.genesis.collapse",
     "sounds": [
       {
-        "name": "minecraft:entity.generic.explode",
-        "type": "event"
+        "name": "singulo:genesis/collapse",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1326,8 +1334,8 @@
     "subtitle": "subtitles.singulo.genesis.lever",
     "sounds": [
       {
-        "name": "minecraft:block.lever.click",
-        "type": "event"
+        "name": "singulo:genesis/lever",
+        "attenuation_distance": 16
       }
     ]
   },
@@ -1335,8 +1343,8 @@
     "subtitle": "subtitles.singulo.genesis.birth_collapse",
     "sounds": [
       {
-        "name": "minecraft:block.portal.trigger",
-        "type": "event"
+        "name": "singulo:genesis/birth_collapse",
+        "attenuation_distance": 96
       }
     ]
   },
@@ -1344,8 +1352,8 @@
     "subtitle": "subtitles.singulo.genesis.big_bang",
     "sounds": [
       {
-        "name": "minecraft:entity.wither.spawn",
-        "type": "event"
+        "name": "singulo:genesis/big_bang",
+        "attenuation_distance": 128
       }
     ]
   },
@@ -1353,8 +1361,8 @@
     "subtitle": "subtitles.singulo.genesis.sky",
     "sounds": [
       {
-        "name": "minecraft:ui.toast.challenge_complete",
-        "type": "event"
+        "name": "singulo:genesis/sky",
+        "attenuation_distance": 128
       }
     ]
   },
@@ -1362,8 +1370,16 @@
     "subtitle": "subtitles.singulo.genesis.synth",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event"
+        "name": "singulo:genesis/synth_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:genesis/synth_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:genesis/synth_3",
+        "attenuation_distance": 24
       }
     ]
   }

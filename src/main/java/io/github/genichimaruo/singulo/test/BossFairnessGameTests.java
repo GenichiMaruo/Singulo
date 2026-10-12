@@ -445,11 +445,101 @@ public final class BossFairnessGameTests {
                 b.tick();
             }
             helper.assertTrue(b.hurt(sources.playerAttack(one), 10), "無敵時間が終わっても通らない");
-            // プレイヤー以外の攻撃は今までどおり（共有の無敵時間）
-            helper.assertFalse(b.hurt(sources.generic(), 5), "プレイヤー以外の攻撃が無敵時間を無視した");
+            // プレイヤー以外の攻撃は、プレイヤー以外どうしの共有の無敵時間で決まる（プレイヤーの攻撃には止められない）
+            helper.assertTrue(b.hurt(sources.generic(), 5), "プレイヤーの攻撃のせいで、プレイヤー以外の攻撃が止められた");
+            helper.assertFalse(b.hurt(sources.generic(), 5), "プレイヤー以外の攻撃が、その共有の無敵時間を無視した");
         } finally {
             b.discard();
             leave(helper, one, two);
+        }
+        helper.succeed();
+    }
+
+    /** 重力の澱（殻・防具なし、AIなし）。 */
+    private static io.github.genichimaruo.singulo.ruin.GravityRemnant remnant(GameTestHelper helper, int shell) {
+        var r = SinguloEntities.GRAVITY_REMNANT.get().create(helper.getLevel());
+        BlockPos home = helper.absolutePos(new BlockPos(3, 4, 3));
+        r.awaken(home);
+        r.skipEmerging();
+        r.setShell(shell);
+        r.setNoAi(true);
+        r.getAttribute(Attributes.ARMOR).setBaseValue(0);
+        r.setPos(Vec3.atCenterOf(home));
+        return r;
+    }
+
+    private static void ticks(net.minecraft.world.entity.Mob mob, int n) {
+        for (int i = 0; i < n; i++) {
+            mob.tick();
+        }
+    }
+
+    /**
+     * 殻の軽減は、無敵時間の中でも外でも同じ。同じ人の同じ強さの連打は通らず、殻も減らない。
+     * 強い連撃は軽減したあとの差だけ通り、殻は剥がれない。別の人の一撃は、それぞれ殻を1枚剥がす。
+     */
+    @GameTest(template = EMPTY, batch = "boss_fair_shell")
+    public static void shellMitigationCannotBeSkippedByRepeating(GameTestHelper helper) {
+        Vec3 c = Vec3.atCenterOf(helper.absolutePos(new BlockPos(3, 4, 3)));
+        ServerPlayer a = survivor(helper, c.add(2, 0, 0));
+        ServerPlayer b = survivor(helper, c.add(-2, 0, 0));
+        var r = remnant(helper, 8);
+        var sources = helper.getLevel().damageSources();
+        try {
+            float start = r.getHealth();
+            helper.assertTrue(r.hurt(sources.playerAttack(a), 20), "最初の一撃が通らない");
+            helper.assertTrue(Math.abs(start - r.getHealth() - 6) < 1e-4 && r.shell() == 7, "殻の軽減か剥離がおかしい: "
+                    + (start - r.getHealth()) + " / " + r.shell());
+            float after = r.getHealth();
+            helper.assertFalse(r.hurt(sources.playerAttack(a), 20), "同じ人の同じ強さの連打が通った");
+            helper.assertTrue(r.getHealth() == after && r.shell() == 7, "通らなかった連打で体力か殻が減った");
+            helper.assertTrue(r.hurt(sources.playerAttack(a), 40), "強い連撃が通らない");
+            helper.assertTrue(Math.abs(after - r.getHealth() - 6) < 1e-4, "強い連撃が軽減後の差（6）にならない: " + (after - r.getHealth()));
+            helper.assertTrue(r.shell() == 7, "無敵時間の中の連撃で殻が剥がれた");
+            helper.assertTrue(r.hurt(sources.playerAttack(b), 20) && r.shell() == 6, "別の人の一撃で殻が剥がれない");
+            ticks(r, 10);
+            helper.assertTrue(r.hurt(sources.playerAttack(a), 20) && r.shell() == 5, "無敵時間のあとの一撃で殻が剥がれない");
+        } finally {
+            r.discard();
+            leave(helper, a, b);
+        }
+        helper.succeed();
+    }
+
+    /**
+     * プレイヤーの攻撃は、プレイヤー以外の攻撃の無敵時間（強さ・残り時間）を書き換えない。
+     * A: 環境の30のあとにプレイヤーの20が通っても、同じ環境の30はまだ通らない。
+     * B: プレイヤーたちの攻撃が続いても、環境の無敵時間は環境の一撃からの時間だけで減っていく。
+     */
+    @GameTest(template = EMPTY, batch = "boss_fair_shared_window")
+    public static void playerHitsLeaveTheSharedWindowAlone(GameTestHelper helper) {
+        Vec3 c = Vec3.atCenterOf(helper.absolutePos(new BlockPos(3, 4, 3)));
+        ServerPlayer a = survivor(helper, c.add(2, 0, 0));
+        ServerPlayer b = survivor(helper, c.add(-2, 0, 0));
+        var sources = helper.getLevel().damageSources();
+        var first = remnant(helper, 0);
+        var second = remnant(helper, 0);
+        try {
+            helper.assertTrue(first.hurt(sources.generic(), 30), "環境の一撃が通らない");
+            ticks(first, 2);
+            helper.assertTrue(first.hurt(sources.playerAttack(a), 20), "プレイヤーの一撃が通らない");
+            float before = first.getHealth();
+            helper.assertFalse(first.hurt(sources.generic(), 30), "プレイヤーの一撃のあと、同じ強さの環境の攻撃が通った");
+            helper.assertTrue(first.getHealth() == before, "環境の攻撃で体力が減った");
+            // B
+            helper.assertTrue(second.hurt(sources.generic(), 30), "環境の一撃が通らない");
+            ticks(second, 2);
+            helper.assertTrue(second.hurt(sources.playerAttack(a), 10), "Aの一撃が通らない");
+            ticks(second, 3);
+            helper.assertTrue(second.hurt(sources.playerAttack(b), 10), "Bの一撃が通らない");
+            ticks(second, 4);
+            helper.assertTrue(second.hurt(sources.playerAttack(a), 30), "Aの強い一撃が通らない");
+            helper.assertTrue(second.invulnerableTime == 11, "環境の無敵時間が書き換わった: " + second.invulnerableTime);
+            helper.assertFalse(second.hurt(sources.generic(), 30), "環境の無敵時間が短くなった");
+        } finally {
+            first.discard();
+            second.discard();
+            leave(helper, a, b);
         }
         helper.succeed();
     }
