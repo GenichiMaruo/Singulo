@@ -5,7 +5,7 @@
 - 進捗: data/singulo/advancement/*.json と advancement.singulo.* の文
 """
 
-from advancements import ADVANCEMENTS
+from advancements import ADVANCEMENTS, HIDDEN_ADVANCEMENTS
 from descriptions import DESC
 from guide import CHAPTERS
 
@@ -82,7 +82,8 @@ def advancements(ctx, ja, en):
         en[key + '.title'], en[key + '.description'] = et, ed
         display = {'icon': {'id': icon_id}, 'title': {'translate': key + '.title'},
                    'description': {'translate': key + '.description'}, 'frame': frame,
-                   'show_toast': parent is not None, 'announce_to_chat': parent is not None, 'hidden': False}
+                   'show_toast': parent is not None, 'announce_to_chat': parent is not None,
+                   'hidden': aid in HIDDEN_ADVANCEMENTS}
         if parent is None:
             display['background'] = f'{MODID}:textures/block/degenerate_furnace_frame.png'
         kind = cond[0]

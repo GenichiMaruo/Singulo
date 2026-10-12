@@ -233,11 +233,17 @@ CHAPTERS = [
          'イベントホライズン・シールドで拠点を守り、Tシリンダーで時間を速め、ワームホールで遠くの拠点をつなぎましょう。'
          '人工星核を作れば、もうネザースターを探さなくて済みます。\n'
          '腕に自信があれば、特異点封入台で「覚醒の記録核」を作り、最終実験施設の封印コンソールで使ってみてください。'
-         '体力2.5倍・攻撃1.5倍の覚醒したホライズン・ウォーデンが目覚めます。勝てばオーバークロック・チップなどが手に入り、何度でも挑めます。',
+         '体力2.5倍・攻撃1.5倍の覚醒したホライズン・ウォーデンが目覚めます。勝てばオーバークロック・チップなどが手に入り、何度でも挑めます。\n'
+         '研究棟と封鎖培養施設の番人も、「覚醒の残響核」「覚醒の重力核」を番人の封印核に使えば、覚醒した姿と再戦できます。\n'
+         '最終実験施設を攻略したら、探索コンパスを調整して「沈んだ炉心区画」を探しましょう。止まった二基目の炉に、エルゴ球の大蛇が棲んでいます。\n'
+         '覚醒した番人たちは、倒れるときに記録の断章を落とすといいます。断章がすべてそろったら、何が読めるでしょうか。',
          'Beyond',
          'With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\n'
          'For a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab\'s seal console: the Awakened Horizon Warden '
-         'has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.'),
+         'has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\n'
+         'The Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\n'
+         'Once the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\n'
+         'They say awakened guardians drop chapters of records as they fall. What might you read once you have them all?'),
     ]),
     ('multiblocks', 'singulo:holo_projector', 'マルチブロック', 'Multiblocks', [
         ('projector', 'ホロ投影機の使い方',
@@ -310,16 +316,22 @@ CHAPTERS = [
          ' Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.'),
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
-        ('list', '4つの遺構',
+        ('list', '5つの遺構',
          '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
          '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。冷却原子トラップ・量子データ片（7日）。\n'
          '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。時間結晶の種・培養データ（14日）。\n'
-         '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。',
-         'The four ruins',
-         'Observation Post, Research Building, Culture Facility, Final Lab — each guards loot for one catalyst tier.'),
+         '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。\n'
+         '・沈んだ炉心区画: 最終実験施設よりさらに深い地下（Y−60〜−54あたり）の、止まった二基目の炉。'
+         '最終実験施設を攻略したあと、探索コンパスを調整すると探せる。エルゴ球の大蛇。エキゾチック物質・ジェット凝縮体・H凝縮体（14日）。',
+         'The five ruins',
+         'Observation Post, Research Building, Culture Facility, Final Lab and the Sunken Reactor Sector — each deeper and better guarded '
+         'than the last. The Sunken Reactor Sector (around Y −60 to −54) is found by tuning the explorer compass after the Final Lab.'),
         ('bosses', '遺構の番人',
          '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。'
          '番人は部屋から挑戦者がいなくなると元に戻ります。\n'
+         '大勢で挑むと、番人は人数に合わせて強くなります（1人増えるごとに体力が5割増え、技の間も少し縮む。6人まで）。'
+         '途中で加わっても体力の割合は保たれ、人が抜けても弱くはなりません。そのかわり、落とす物は戦いが始まったときの挑戦者の人数ぶん出ます（あとから加わった人のぶんは増えません）。'
+         '大勢で攻撃しても、ほかの人の攻撃に邪魔されず全員の攻撃が通ります（同じ人の連打は、これまでどおり少し間を置かないと通りません）。\n'
          '・残響の番人（研究棟の記録保管室）: 部屋に入ると現れる警備ホログラム。宙を回りながら追いかける光弾を撃ち、'
          'しばらく見ていないと背後へ跳んで斬りつけてきます（跳ぶ前に光が集まる）。残響投影器は番人を守るだけでなく、一斉に光の槍も撃ちます'
          '（金色の狙いの線が出たら動くこと）。足元に光の陣が映ったら、柱が立つ前に陣の外へ。投影器が残っているほど攻撃が通りにくいので、先に壊すこと。'
@@ -329,10 +341,25 @@ CHAPTERS = [
          '体力が半分を切ると重力井戸ができ、核へ引き寄せられます（核に触れると傷つく）。縮退核を落とします。\n'
          '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。'
          '倒したあとは、覚醒の記録核をコンソールに使うと「覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。'
-         'やめて部屋を離れると記録核は戻ります。',
+         'やめて部屋を離れると記録核は戻ります。\n'
+         '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます'
+         '（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増え、本気になると壊した投影器を2つまで映し直します。'
+         '重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。\n'
+         '・エルゴ球の大蛇（沈んだ炉心区画）: 球形の封じ込め室の床の、止まった炉心に近づくと現れます。体力の 2/3・1/3 で姿を変えます（変える間は傷つきません）。'
+         '泳いだ跡の帯の中では泳ぐ向きへ流されるので、流れに乗って追いかけましょう。尾の金色に光る芯はいつも弱点です。\n'
+         '　装甲: 炉殻の鱗をまとい、胴は硬い。頭が水色に光ったら突進（狙われた場所から離れる）、口の渦が開いたら前に立たない（吸い寄せてから光線）。'
+         '尾のそばにいると薙ぎ払われます。\n'
+         '　骨格: 鱗を弾き飛ばし（近くにいると痛い）、光の骨格になる。胴も効くようになります。部屋の中央でとぐろを巻いて回り、'
+         'まわりを押し流しながら光の欠片を撃つ。近づくと噛みつき、突進は続けて来ます。\n'
+         '　龍: 炉心の渦へ潜り、黒い龍となって噴き上がる。頭の両角から回る2本の光線（相対論的ジェット）、上空を回りながら足元に'
+         '小さなブラックホールを降らせる嵐（光の柱が前触れ）、突進の着地にも特異点が残ります。渦の断章を落とします。',
          'Ruin guardians',
          'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. '
          'When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n'
+         'Guardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their '
+         'attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. '
+         'In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). '
+         'Everyone\'s attacks land without blocking each other, though each player still needs the usual short pause between hits.\n'
          '- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you '
          'to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys '
          '(move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it '
@@ -341,7 +368,19 @@ CHAPTERS = [
          'it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, '
          'so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n'
          '- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console '
-         'for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.'),
+         'for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n'
+         '- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. '
+         'It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. '
+         'The glowing gold core in its tail is always a weak point.\n'
+         '  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, '
+         'do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n'
+         '  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. '
+         'It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n'
+         '  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high '
+         'and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n'
+         '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core '
+         'in the room\'s floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two '
+         'broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
         ('plan', '探索の段取り',
          '段階が進むと探索先が一度に増えます。先に集めておくと、あとで工場が止まりません。\n'
          '・段階2のうち: 隕石クレーター（隕鉄・星屑）、氷山か氷樹（氷塊・青氷）。\n'
@@ -359,11 +398,11 @@ CHAPTERS = [
          '- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.'),
         ('compass', '探索コンパスの調整',
          '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
-         '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設）も探せるようになります。'
+         '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設 → 沈んだ炉心区画）も探せるようになります。'
          '地下の遺構は、針の指す場所の下を掘って探します。',
          'Tuning the Explorer Compass',
          'At first the compass only finds Observation Posts. Sneak-use it on the cache of a ruin you have cleared to tune it '
-         'for the next one: Research Building, then Culture Facility, then Final Lab. Underground ruins lie below the spot it points to.'),
+         'for the next one: Research Building, then Culture Facility, then Final Lab, then Sunken Reactor Sector. Underground ruins lie below the spot it points to.'),
         ('sealed', '封印コンテナ',
          '各遺構には、次の段階の鍵でしか開かない封印コンテナが眠っています（磁気錠 → 量子錠 → 時間錠 → 特異点錠）。'
          '鍵は精密組立台で作り、1回で使い切ります。中には素材や色つきの照明のほか、ここでしか手に入らない珍しい道具'
@@ -408,6 +447,48 @@ CHAPTERS = [
          'ハロー捕集器を炉心から16ブロック以内に置くと集まる。普通の入れ物からは漏れるので、重力閉じ込めタンクに入れる。'
          '炉心に直接入れると、エディントン限界を受けずに質量になる。',
          'Dark matter', 'Collect near a core, store in containment tanks, feed the core directly.'),
+    ]),
+    ('genesis', 'singulo:genesis_core', '創世炉', 'Genesis Engine', [
+        ('build', '創世炉を組む',
+         '旧文明は「すべての質量をエネルギーに」変えようとして滅びました。創世炉はその逆で、エネルギーから宇宙を生み出す炉です。\n'
+         '・核と同じ高さに、創世炉の枠を8個置きます。核から十字方向に3マスの4か所と、斜めに2マスずつ離れた4か所です。\n'
+         '・斜めの4つの枠の上に、創世炉の柱を3段ずつ（計12個）積みます。\n'
+         '形ができると核が鳴ります。原初の種（作るには渦の断章が必要）を核に使うと始まります。電力はどの面からでも入ります。',
+         'Building the Genesis Engine',
+         'The old civilization fell trying to turn all mass into energy. The Genesis Engine does the reverse.\n'
+         '- Eight Genesis Frames level with the core: three blocks out on each axis, and two-and-two on each diagonal.\n'
+         '- Three Genesis Pylons stacked on each of the four diagonal frames (twelve in all).\n'
+         'The core chimes when formed. Use a Primordial Seed on it to begin. Power enters from any side.'),
+        ('birth', '宇宙の誕生',
+         '1. 種火: 1.5 TFE を注ぎます（1 tick あたり最大 1 GFE）。Pリアクターを全開にして、1分あまりかかります。\n'
+         '2. 安定化: 100 MFE/t を保ったまま、進めている時間で約4分（止めている間や電力が足りない間は進まないので、実際はもう少しかかります）。ときどき「暴走の兆し」の警報が鳴ります。警報が鳴っている間は、投入を止めてください'
+         '（核を素手で使って開く画面のスイッチか、核への赤石信号で止められます）。止めずにいると不安定度が跳ね上がり、100% に達すると'
+         '宇宙が崩れて進行が巻き戻ります。止めている間も蓄えから維持の電力は使われ、異変も起きます。重力の漏れ・記録の残響・引力の波にも備えましょう。シールドの中では暴走と異変が弱まり、'
+         'Tシリンダーの加速の場の中では速く進みます。\n'
+         '3. 誕生: 光が一点に落ち、宇宙が生まれます。生まれた銀河は、オーバーワールドの夜空に昇ります。\n'
+         '核を素手で使うと画面が開き、段階・進行・不安定度・受電を確かめられます。',
+         'Birth of a universe',
+         '1. Kindling: pour in 1.5 TFE (at most 1 GFE per tick) — a little over a minute at full P-Reactor output.\n'
+         '2. Stabilizing: hold 100 MFE/t for about four minutes of active progress (it pauses while the feed is stopped or power runs short, '
+         'so expect a little longer). Now and then a surge alarm sounds: stop the feed while it lasts '
+         '(the switch on the screen that opens when you use the core empty-handed, or a redstone signal). Keep feeding and instability spikes; at 100% the proto-universe '
+         'collapses and progress is lost. Upkeep still drains the buffer and events still happen while stopped. Watch out for gravity leaks, echoes and gravity waves. A shield softens surges and events; '
+         'a T-Cylinder field speeds things up.\n'
+         '3. Birth: the light falls into a point and a universe is born. Its galaxy rises into the overworld night sky.\n'
+         'Use the core empty-handed to open its screen: stage, progress, instability and input.'),
+        ('synth', '質量生成',
+         '宇宙を生んだ創世炉は、電力から物を作り出せます。核を素手で使って画面を開き、作りたい物を左の枠に登録してください'
+         '（物を持って核を使っても登録できます）。完成品は画面右のスロットから受け取れます（下からホッパーなどで取り出すこともできます）。\n'
+         '1個に必要な電力 = 質量 × 1 GFE × 10^希少度。希少度は 0（石・土など）から 4（ネザースター・エリトラ・ドラゴンの卵など）まであり、'
+         '希少な物ほど桁違いに電力を食います。宇宙を生んだ核は壊しても記憶を宿したままで、別の場所に置き直せばそのまま使えます（ただし、溜めた電力と作りかけの進み具合は引き継がれません。高価な物を作っている途中では壊さないこと）。'
+         '作れる物はデータパック（mass_synthesis）で変えられます。',
+         'Mass synthesis',
+         'A born universe turns power into items. Use the core empty-handed to open its screen and put the item you want in the left frame '
+         '(or use the item on the core). Collect results from the slot on the right (or pull from below with a hopper).\n'
+         'Cost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). '
+         'A broken core keeps the memory of its universe and works again wherever you place it, but stored power and partial progress are lost, '
+         'so avoid moving it in the middle of an expensive item. '
+         'The table is a datapack (mass_synthesis).'),
     ]),
     ('hazards', 'minecraft:tnt', '危険', 'Hazards', [
         ('list', '気をつけること',

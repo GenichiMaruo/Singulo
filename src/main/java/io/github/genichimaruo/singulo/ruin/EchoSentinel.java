@@ -49,6 +49,8 @@ import org.joml.Vector3f;
  *   <li>体力が半分を切ると、1撃で消える分身を2体呼び、自分も跳んで入れ替わる</li>
  *   <li>倒されると、投影が足元からほどけ、最後に胸の記録結晶が砕ける</li>
  * </ul>
+ * 覚醒した個体（覚醒の残響核で呼ぶ攻略後の再戦）は、{@link RuinBoss} の強化に加えて、光弾が1発多く、分身が1体多い。
+ * 本気になった瞬間に、壊された投影器を {@value #AWAKENED_REPROJECT} つまで映し直す（1戦に1回）。
  */
 public class EchoSentinel extends RuinBoss {
     private static final EntityDataAccessor<Integer> PROJECTORS = SynchedEntityData.defineId(EchoSentinel.class, EntityDataSerializers.INT);
@@ -68,7 +70,7 @@ public class EchoSentinel extends RuinBoss {
     public static final float HEALTH = 320;
     /** 残っている投影器の数（0〜4）ごとの、受けるダメージの倍率。 */
     public static final float[] PROJECTION_FACTOR = {1.0F, 0.65F, 0.4F, 0.22F, 0.1F};
-    public static final float BOLT_DAMAGE = 6;
+    public static final float BOLT_DAMAGE = 5;
     static final int BOLT_INTERVAL = 36;
     public static final int BLINK_UNSEEN_TICKS = 24;
     static final int BLINK_COOLDOWN = 90;
@@ -76,16 +78,16 @@ public class EchoSentinel extends RuinBoss {
     static final int BLINK_CHAIN = 2;
     /** 背後へ跳んでから斬るまでの tick（光が集まる間に避けられる）。 */
     public static final int STRIKE_WINDUP = 12;
-    public static final float STRIKE_DAMAGE = 10;
+    public static final float STRIKE_DAMAGE = 8.5F;
     static final double STRIKE_RANGE = 3.5;
     /** 投影槍・投影陣のどちらかを使う間隔（体力半分からは短い）。 */
     static final int SKILL_INTERVAL = 70;
     static final int SKILL_INTERVAL_ENRAGED = 46;
     public static final int LANCE_WINDUP = 24;
-    public static final float LANCE_DAMAGE = 7;
+    public static final float LANCE_DAMAGE = 6;
     public static final double LANCE_RANGE = 28;
     public static final int CIRCLE_WINDUP = 30;
-    public static final float CIRCLE_DAMAGE = 9;
+    public static final float CIRCLE_DAMAGE = 7.5F;
     public static final double CIRCLE_RADIUS = 3.5;
     public static final double CIRCLE_RADIUS_ENRAGED = 4.5;
     static final int FLASH_TICKS = 8;
@@ -95,6 +97,8 @@ public class EchoSentinel extends RuinBoss {
     /** 相手の周りを回る距離と高さ。 */
     static final double ORBIT = 6;
     static final double HOVER = 2.0;
+    /** 覚醒した個体が本気になったとき映し直す投影器の数。 */
+    public static final int AWAKENED_REPROJECT = 2;
 
     private final List<BlockPos> projectors = new ArrayList<>();
     private int boltCooldown = BOLT_INTERVAL;
@@ -106,6 +110,8 @@ public class EchoSentinel extends RuinBoss {
     private int unseenTicks;
     private int life;
     private double orbitAngle;
+    /** 覚醒した個体が投影器を映し直したか。 */
+    private boolean reprojected;
 
     public EchoSentinel(EntityType<? extends EchoSentinel> type, Level level) {
         super(type, level, BossEvent.BossBarColor.BLUE);
@@ -167,9 +173,19 @@ public class EchoSentinel extends RuinBoss {
         bossBar.setVisible(false);
     }
 
-    /** 体力が半分を切ったか（技が増え、速くなる）。 */
+    /** 体力が半分（覚醒した個体は 65%）を切ったか（技が増え、速くなる）。 */
     public boolean enraged() {
-        return getHealth() <= getMaxHealth() / 2;
+        return getHealth() <= getMaxHealth() * enrageFraction();
+    }
+
+    /** 呼ぶ分身の数。 */
+    public int minionCount() {
+        return MINIONS + (awakened() ? 1 : 0);
+    }
+
+    @Override
+    protected String[][] awakenedRewards() {
+        return new String[][] {{"overclock_chip", "1"}, {"sentinel_core", "2"}, {"record_fragment", "2"}, {"echo_chapter", "1"}};
     }
 
     /** 姿を映している投影器の位置（封印核が渡す）。 */
@@ -292,6 +308,9 @@ public class EchoSentinel extends RuinBoss {
             return;
         }
         tickFlashes();
+        if (awakened() && !isMinion()) {
+            tickAwakened(level);
+        }
         LivingEntity target = getTarget();
         drift(target);
         tickLance(level);
@@ -312,7 +331,7 @@ public class EchoSentinel extends RuinBoss {
             shootBolts(target);
         }
         if (!isMinion() && --skillCooldown <= 0 && lanceTicks() == 0 && circleTicks() == 0) {
-            skillCooldown = enraged() ? SKILL_INTERVAL_ENRAGED : SKILL_INTERVAL;
+            skillCooldown = pace(enraged() ? SKILL_INTERVAL_ENRAGED : SKILL_INTERVAL);
             if (lanceNext && projectorCount() > 0) {
                 startLance(target);
             } else {
@@ -327,6 +346,26 @@ public class EchoSentinel extends RuinBoss {
         }
         if (!isMinion() && enraged() && --minionCooldown <= 0) {
             summonEchoes(level, target);
+        }
+    }
+
+    /** 覚醒した個体: 青紫の残光をまとい、本気になったとき壊された投影器を映し直す。 */
+    private void tickAwakened(ServerLevel level) {
+        if (tickCount % 4 == 0) {
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, getX(), getY() + 1.2, getZ(), 2, 0.3, 0.6, 0.3, 0.01);
+        }
+        if (!reprojected && enraged()) {
+            reprojected = true;
+            int left = AWAKENED_REPROJECT;
+            for (BlockPos p : projectors) {
+                if (left > 0 && !level.getBlockState(p).is(SinguloBlocks.ECHO_PROJECTOR.get())) {
+                    level.setBlock(p, SinguloBlocks.ECHO_PROJECTOR.get().defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+                    level.sendParticles(ParticleTypes.END_ROD, p.getX() + 0.5, p.getY() + 1.0, p.getZ() + 0.5, 30, 0.3, 0.5, 0.3, 0.1);
+                    level.playSound(null, p, SinguloSounds.get("echo_sentinel.summon"), SoundSource.HOSTILE, 1.5F, 0.8F);
+                    left--;
+                }
+            }
+            countProjectors();
         }
     }
 
@@ -372,13 +411,13 @@ public class EchoSentinel extends RuinBoss {
     }
 
     public void shootBolts(LivingEntity target) {
-        boltCooldown = BOLT_INTERVAL + random.nextInt(16);
+        boltCooldown = pace(BOLT_INTERVAL + random.nextInt(16));
         if (!hasLineOfSight(target)) {
             return;
         }
         Vec3 from = position().add(0, getBbHeight() * 0.6, 0);
         float damage = isMinion() ? BOLT_DAMAGE / 2 : BOLT_DAMAGE;
-        int n = !isMinion() && enraged() ? 5 : 3;
+        int n = (!isMinion() && enraged() ? 5 : 3) + (awakened() ? 1 : 0);
         for (int i = 0; i < n; i++) {
             double a = (i - (n - 1) / 2.0) * 0.5;
             Vec3 side = Vec3.directionFromRotation(0, getYRot() + 90).scale(Math.sin(a) * 0.8);
@@ -393,7 +432,7 @@ public class EchoSentinel extends RuinBoss {
 
     /** 見られていない間に、相手の背後へ跳んで構える。 */
     public boolean blinkBehind(ServerLevel level, LivingEntity target) {
-        blinkCooldown = enraged() ? BLINK_COOLDOWN * 2 / 3 : BLINK_COOLDOWN;
+        blinkCooldown = pace(enraged() ? BLINK_COOLDOWN * 2 / 3 : BLINK_COOLDOWN);
         Vec3 look = target.getLookAngle().multiply(1, 0, 1);
         if (look.lengthSqr() < 1e-4) {
             look = new Vec3(0, 0, 1);
@@ -528,15 +567,16 @@ public class EchoSentinel extends RuinBoss {
 
     /** 1撃で消える分身を呼び、自分も跳んで入れ替わる。 */
     public void summonEchoes(ServerLevel level, LivingEntity target) {
-        minionCooldown = MINION_INTERVAL;
+        minionCooldown = pace(MINION_INTERVAL);
+        int count = minionCount();
         long alive = level.getEntitiesOfClass(EchoSentinel.class, getBoundingBox().inflate(32), EchoSentinel::isMinion).size();
-        for (int i = (int) alive; i < MINIONS; i++) {
+        for (int i = (int) alive; i < count; i++) {
             EchoSentinel echo = SinguloEntities.ECHO_SENTINEL.get().create(level);
             if (echo == null) {
                 continue;
             }
             echo.makeMinion();
-            double a = orbitAngle + Math.PI * 2 * (i + 1) / (MINIONS + 1);
+            double a = orbitAngle + Math.PI * 2 * (i + 1) / (count + 1);
             echo.moveTo(target.getX() + Math.cos(a) * ORBIT, target.getY() + HOVER, target.getZ() + Math.sin(a) * ORBIT, getYRot(), 0);
             echo.orbitAngle = a;
             echo.setTarget(target);
@@ -546,7 +586,7 @@ public class EchoSentinel extends RuinBoss {
             level.addFreshEntity(echo);
             level.sendParticles(ParticleTypes.FLASH, echo.getX(), echo.getY() + 1.2, echo.getZ(), 1, 0, 0, 0, 0);
         }
-        orbitAngle += Math.PI * 2 / (MINIONS + 1) * (1 + random.nextInt(MINIONS));
+        orbitAngle += Math.PI * 2 / (count + 1) * (1 + random.nextInt(count));
         Vec3 swap = target.position().add(Math.cos(orbitAngle) * ORBIT, HOVER, Math.sin(orbitAngle) * ORBIT);
         randomTeleport(swap.x, swap.y, swap.z, false);
         level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
@@ -658,6 +698,7 @@ public class EchoSentinel extends RuinBoss {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("minion", isMinion());
         tag.putInt("life", life);
+        tag.putBoolean("reprojected", reprojected);
         ListTag list = new ListTag();
         for (BlockPos p : projectors) {
             list.add(NbtUtils.writeBlockPos(p));
@@ -672,6 +713,7 @@ public class EchoSentinel extends RuinBoss {
             makeMinion();
         }
         life = tag.getInt("life");
+        reprojected = tag.getBoolean("reprojected");
         projectors.clear();
         for (Tag t : tag.getList("projectors", Tag.TAG_INT_ARRAY)) {
             CompoundTag c = new CompoundTag();

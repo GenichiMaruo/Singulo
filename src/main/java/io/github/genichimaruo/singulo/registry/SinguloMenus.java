@@ -36,5 +36,8 @@ public final class SinguloMenus {
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.machine.DeviceMenu>> DEVICE = REGISTER.register("device",
             () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.machine.DeviceMenu::client));
 
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.genesis.GenesisCoreMenu>> GENESIS_CORE = REGISTER.register(
+            "genesis_core", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.genesis.GenesisCoreMenu::client));
+
     private SinguloMenus() {}
 }

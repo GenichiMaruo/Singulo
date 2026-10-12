@@ -53,6 +53,10 @@ public final class SinguloCapabilities {
         catalystDevice(event, SinguloBlockEntities.WORLDLINE_ANCHOR_ADVANCED.get());
         catalystDevice(event, SinguloBlockEntities.SHIELD_TOWER.get());
         catalystDevice(event, SinguloBlockEntities.TIPLER_CYLINDER.get());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.GENESIS_CORE.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.GENESIS_CORE.get(),
+                (be, side) -> be.items());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.CREATIVE_ENERGY.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.PENROSE_REACTOR.get(),

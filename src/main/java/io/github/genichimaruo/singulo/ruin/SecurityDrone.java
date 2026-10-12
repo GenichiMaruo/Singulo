@@ -48,13 +48,13 @@ public class SecurityDrone extends Monster {
 
     static final double[] HEALTH = {10, 24, 40};
     /** 突進のダメージ。 */
-    static final double[] DAMAGE = {4, 7, 10};
+    static final double[] DAMAGE = {3, 5, 7};
     /** 光弾のダメージと、1回に撃つ数。 */
-    static final float[] BOLT_DAMAGE = {3, 5, 7};
+    static final float[] BOLT_DAMAGE = {2, 3.5F, 5};
     static final int[] BURST = {1, 3, 3};
     /** 段階ごとの光の色（レンズ・光弾）。 */
     public static final int[] COLORS = {0x78D2F0, 0xF0B450, 0xE86060};
-    static final float PULSE_DAMAGE = 8;
+    static final float PULSE_DAMAGE = 6;
     static final double PULSE_RADIUS = 4.5;
     static final int RAM_WINDUP = 12;
     static final int RAM_TICKS = 16;

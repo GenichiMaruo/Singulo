@@ -30,6 +30,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerExtensions);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
+        modBus.addListener(SinguloClient::addWingLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
@@ -39,6 +40,9 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) ->
+                ClientGalaxies.set(java.util.List.of(), false));
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
@@ -66,6 +70,20 @@ public final class SinguloClient {
         }
     }
 
+    /** 残光の翼を、プレイヤー（両方の体型）と防具立てに描く。 */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void addWingLayers(EntityRenderersEvent.AddLayers event) {
+        for (net.minecraft.client.resources.PlayerSkin.Model skin : event.getSkins()) {
+            if (event.getSkin(skin) instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer r) {
+                r.addLayer(new AfterglowWingsLayer<>(r));
+            }
+        }
+        if (event.getRenderer(net.minecraft.world.entity.EntityType.ARMOR_STAND)
+                instanceof net.minecraft.client.renderer.entity.ArmorStandRenderer stand) {
+            stand.addLayer(new AfterglowWingsLayer(stand));
+        }
+    }
+
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ACCELERATOR_CONTROLLER.get(),
                 AcceleratorRenderer::new);
@@ -80,19 +98,27 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.ECHO_SENTINEL.get(), EchoSentinelRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_REMNANT.get(), GravityRemnantRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_DEBRIS.get(), GravityDebrisRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.ERGOSPHERE_LEVIATHAN.get(), ErgosphereLeviathanRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.LAST_ARCHIVIST.get(), LastArchivistRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ECHO_PROJECTOR.get(),
                 EchoProjectorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),
                 PenroseReactorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEAL_CONSOLE.get(),
                 ctx -> new net.minecraft.client.renderer.blockentity.BlockEntityRenderer<>() {
-                    // 重力異常点: 封印コンソールの上の空間がゆがんで見える
+                    // 重力異常点: 封印コンソールの上の空間がゆがんで見える。ボスが現れると縮んで消え、倒されると戻る
                     @Override
                     public void render(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be, float pt,
                                        com.mojang.blaze3d.vertex.PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buf,
                                        int light, int overlay) {
-                        net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos()).add(0, 3.5, 0);
-                        GravitationalLensing.add(c, 1.2F, 0.5F);
+                        if (be.getLevel() == null) {
+                            return;
+                        }
+                        float scale = be.anomalyScale(be.getLevel().getGameTime() + pt);
+                        if (scale > 0.01F) {
+                            net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos()).add(0, 3.5, 0);
+                            GravitationalLensing.add(c, 1.2F * scale, 0.5F * Math.min(1, scale));
+                        }
                     }
 
                     @Override
@@ -112,6 +138,8 @@ public final class SinguloClient {
                 WormholeMouthRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.TIPLER_CYLINDER.get(),
                 TiplerCylinderRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.GENESIS_CORE.get(),
+                GenesisCoreRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_FURNACE.get(),
                 DegenerateFurnaceRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_COMPACTOR_CONTROLLER.get(),
@@ -143,6 +171,7 @@ public final class SinguloClient {
         event.register(SinguloMenus.SMES.get(), SmesScreen::new);
         event.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
         event.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
+        event.register(SinguloMenus.GENESIS_CORE.get(), GenesisCoreScreen::new);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
@@ -166,6 +195,10 @@ public final class SinguloClient {
                 .getKey(event.getItemStack().getItem());
         if (!Singulo.MODID.equals(id.getNamespace())) {
             return;
+        }
+        if (io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.remembersUniverse(event.getItemStack())) {
+            event.getToolTip().add(1, Component.translatable("tooltip.singulo.genesis_core.memory")
+                    .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
         }
         String key = "desc.singulo." + id.getPath();
         if (!net.minecraft.client.resources.language.I18n.exists(key)) {

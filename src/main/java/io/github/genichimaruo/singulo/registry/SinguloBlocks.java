@@ -331,6 +331,19 @@ public final class SinguloBlocks {
             () -> new GuardDockBlock(unbreakable()));
     public static final DeferredBlock<SealConsoleBlock> SEAL_CONSOLE = BLOCKS.register("seal_console",
             () -> new SealConsoleBlock(unbreakable().lightLevel(s -> 10)));
+    /**
+     * ホログラムの床。最後の記録者が現れたとき、ボス部屋の床の欠けた所を埋める仮の床（赤い半透明の投影）。
+     * 壊せず、何も落とさず、アイテムもない。戦いが終わると消える。
+     */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.ArenaHologramBlock> ARENA_HOLOGRAM = BLOCKS.register("arena_hologram",
+            () -> new io.github.genichimaruo.singulo.ruin.ArenaHologramBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
+                    .strength(-1.0F, 3_600_000.0F).noLootTable().sound(SoundType.AMETHYST).lightLevel(s -> 6).noOcclusion()
+                    .isValidSpawn((s, l, p, e) -> false).isRedstoneConductor((s, l, p) -> false).isSuffocating((s, l, p) -> false)
+                    .isViewBlocking((s, l, p) -> false).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** 創世炉の核（GenesisCoreBlock）。動き出したらサバイバルでは壊せない。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.genesis.GenesisCoreBlock> GENESIS_CORE = BLOCKS.register("genesis_core",
+            () -> new io.github.genichimaruo.singulo.genesis.GenesisCoreBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                    .strength(8.0F, 1200.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 12)));
     /** 番人の封印核（研究棟・封鎖培養施設のボス部屋の床。壊せない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.GuardianCoreBlock> GUARDIAN_CORE = BLOCKS.register("guardian_core",
             () -> new io.github.genichimaruo.singulo.ruin.GuardianCoreBlock(unbreakable().lightLevel(s -> 9)));

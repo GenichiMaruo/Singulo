@@ -3,6 +3,7 @@ package io.github.genichimaruo.singulo.test;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
+import io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan;
 import io.github.genichimaruo.singulo.ruin.GravityRemnant;
 import io.github.genichimaruo.singulo.ruin.GuardianCoreBlockEntity;
 import io.github.genichimaruo.singulo.ruin.RuinBoss;
@@ -16,6 +17,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -53,6 +55,9 @@ public final class BossRoomGameTests {
         helper.setBlock(core, SinguloBlocks.GUARDIAN_CORE.get());
         GuardianCoreBlockEntity be = helper.getBlockEntity(core);
         be.scan(helper.getLevel());
+        // 前の組のテストが残した投影器が近くにあると数がずれるので、このテストの場所の中のものだけにする
+        net.minecraft.world.phys.AABB bounds = helper.getBounds();
+        be.projectors().removeIf(p -> !bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(p)));
         return be;
     }
 
@@ -335,6 +340,251 @@ public final class BossRoomGameTests {
         helper.runAtTickTime(GravityRemnant.DEATH_TICKS / 2, () -> helper.assertFalse(r.isRemoved(), "演出の途中で消えた"));
         helper.runAtTickTime(GravityRemnant.DEATH_TICKS + 10, () -> {
             helper.assertTrue(r.isRemoved(), "演出が終わっても消えない");
+            helper.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ 覚醒した番人（攻略後の再戦）
+
+    /** 倒したあと（保管庫が開いている）の部屋を作る。 */
+    private static GuardianCoreBlockEntity clearedRoom(GameTestHelper helper, String ruin) {
+        GuardianCoreBlockEntity core = room(helper, ruin, VAULT, CORE);
+        RuinCacheBlockEntity vault = helper.getBlockEntity(VAULT);
+        vault.refillIfDue(helper.getLevel(), helper.getLevel().getGameTime());
+        vault.setSealed(false);
+        return core;
+    }
+
+    private static ItemStack stack(String id) {
+        return new ItemStack(item(id));
+    }
+
+    /** 覚醒の残響核で、保管庫が開いていても覚醒した残響の番人（体力×2.5）が現れる。ほかの遺構の覚醒核では現れない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_15", timeoutTicks = 40)
+    public static void echoCoreSummonsAwakenedSentinel(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
+        helper.assertTrue(core.awaken(helper.getLevel()) == null, "保管庫が開いているのに普通の番人が現れた");
+        helper.assertTrue(core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core")) == null,
+                "研究棟で覚醒の重力核が使えた");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
+        helper.assertTrue(boss instanceof EchoSentinel && boss.awakened(), "覚醒の残響核で覚醒した残響の番人が現れない: " + boss);
+        boss.skipEmerging();
+        double expected = EchoSentinel.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
+        helper.assertTrue(((EchoSentinel) boss).minionCount() == EchoSentinel.MINIONS + 1, "覚醒した番人の分身が増えない");
+        helper.assertTrue(core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core")) == null, "覚醒戦の最中に2体目が現れた");
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** 覚醒した重力の澱は体力が上限（1024）を超えるので、受けるダメージを減らして同じ硬さにする。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_16", timeoutTicks = 40)
+    public static void awakenedRemnantKeepsHealthBeyondCap(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
+        helper.assertTrue(boss instanceof GravityRemnant && boss.awakened(), "覚醒の重力核で覚醒した重力の澱が現れない: " + boss);
+        boss.skipEmerging();
+        double expected = GravityRemnant.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        helper.assertTrue(boss.getMaxHealth() <= 1024 && Math.abs(boss.effectiveMaxHealth() - expected) < 1.0,
+                "体力が " + expected + " 相当でない: " + boss.getMaxHealth() + " / " + boss.effectiveMaxHealth());
+        GravityRemnant r = (GravityRemnant) boss;
+        r.setHealth(r.getMaxHealth() * 0.6F);
+        helper.assertTrue(r.wellOpen() && r.wellRadius() == GravityRemnant.AWAKENED_WELL_RADIUS, "体力60%で広い重力井戸が開かない");
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** 覚醒した残響の番人は、本気になると壊された投影器を2つまで映し直す（1戦に1回）。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_17", timeoutTicks = 60)
+    public static void awakenedSentinelReprojects(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
+        EchoSentinel s = (EchoSentinel) core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
+        s.skipEmerging();
+        for (BlockPos p : PROJECTORS) {
+            helper.setBlock(p, Blocks.AIR);
+        }
+        s.setHealth(s.getMaxHealth() * 0.6F);
+        helper.runAtTickTime(5, () -> {
+            int intact = s.intactProjectors().size();
+            helper.assertTrue(intact == EchoSentinel.AWAKENED_REPROJECT, "投影器を2つ映し直さない: " + intact);
+            for (BlockPos p : PROJECTORS) {
+                helper.setBlock(p, Blocks.AIR);
+            }
+        });
+        helper.runAtTickTime(15, () -> {
+            helper.assertTrue(s.intactProjectors().isEmpty(), "2回目も映し直した");
+            s.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 覚醒した番人を倒すと、保管庫が開き、通常のドロップに加えて追加の報酬が出る。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_18", timeoutTicks = 40)
+    public static void awakenedSentinelDropsRewards(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "research_building");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
+        boss.skipEmerging();
+        boss.kill();
+        helper.runAtTickTime(5, () -> {
+            helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertTrue(dropped(helper, item("overclock_chip")) == 1, "オーバークロック・チップが出ない");
+            helper.assertTrue(dropped(helper, item("sentinel_core")) == 4, "番人の投影核が通常の2＋追加2にならない: "
+                    + dropped(helper, item("sentinel_core")));
+            helper.succeed();
+        });
+    }
+
+    /** 覚醒戦をやめて離れると、番人は戻り、覚醒核が封印核の上に返る。部屋の仕掛けは直さない（核に手が届くように）。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_19", timeoutTicks = 300)
+    public static void abandonedAwakenedFightReturnsCore(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
+        boss.skipEmerging();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(boss.isRemoved(), "挑戦者がいないのに覚醒した番人が残っている");
+            helper.assertTrue(core.activeBoss(helper.getLevel()) == null, "封印核が戦闘中のまま");
+            helper.assertTrue(dropped(helper, item("awakening_gravity_core")) == 1, "覚醒核が返ってこない");
+        });
+    }
+
+    // ------------------------------------------------------------------ エルゴ球の大蛇（沈んだ炉心区画）
+
+    /** 沈んだ炉心区画の封印核は、エルゴ球の大蛇を出現の演出つきで起こす。体は12節で、出現のあいだは傷つかない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_20", timeoutTicks = 40)
+    public static void coreWakesLeviathanForSunkenReactor(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        RuinBoss boss = core.awaken(helper.getLevel());
+        helper.assertTrue(boss instanceof ErgosphereLeviathan, "沈んだ炉心区画でエルゴ球の大蛇が現れない: " + boss);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) boss;
+        helper.assertTrue(l.emergeTicks() == ErgosphereLeviathan.EMERGE_TICKS, "出現の演出が始まらない");
+        helper.assertTrue(l.getParts().length == ErgosphereLeviathan.SEGMENTS, "体の節の数がおかしい: " + l.getParts().length);
+        helper.assertFalse(l.segments()[3].hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で体が傷ついた");
+        helper.assertTrue(Math.abs(l.effectiveMaxHealth() - ErgosphereLeviathan.HEALTH) < 1.0, "体力が1600相当でない: " + l.effectiveMaxHealth());
+        l.discard();
+        helper.succeed();
+    }
+
+    /** 体の節は、頭の通った跡に沿って決まった間隔で並ぶ。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_21", timeoutTicks = 80)
+    public static void leviathanBodyFollowsHead(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        helper.runAtTickTime(60, () -> {
+            net.minecraft.world.phys.Vec3 prev = l.headCenter();
+            for (int i = 0; i < ErgosphereLeviathan.SEGMENTS; i++) {
+                net.minecraft.world.phys.Vec3 c = l.segments()[i].position().add(0, ErgosphereLeviathan.radius(i), 0);
+                double gap = c.distanceTo(prev);
+                double want = i == 0 ? ErgosphereLeviathan.HEAD_GAP : ErgosphereLeviathan.SPACING;
+                helper.assertTrue(gap <= want + 0.3 && gap >= want * 0.5, "節 " + i + " の間隔がおかしい: " + gap);
+                prev = c;
+            }
+            l.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 尾の光る芯は弱く（×1.6）、胴は硬い（×0.6）。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_22", timeoutTicks = 40)
+    public static void leviathanTailIsWeakPoint(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        float before = l.getHealth();
+        l.segments()[2].hurt(helper.getLevel().damageSources().magic(), 10);
+        float body = before - l.getHealth();
+        l.invulnerableTime = 0;
+        before = l.getHealth();
+        l.segments()[ErgosphereLeviathan.SEGMENTS - 1].hurt(helper.getLevel().damageSources().magic(), 10);
+        float tail = before - l.getHealth();
+        helper.assertTrue(body > 0 && Math.abs(tail / body - ErgosphereLeviathan.TAIL_FACTOR / ErgosphereLeviathan.BODY_FACTOR) < 0.2,
+                "尾と胴のダメージの比がおかしい: 胴 " + body + " / 尾 " + tail);
+        l.discard();
+        helper.succeed();
+    }
+
+    /** 倒すと保管庫が開き、渦の断章を落とす。演出のあいだ体は残り、終わると消える。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_23", timeoutTicks = ErgosphereLeviathan.DEATH_TICKS + 30)
+    public static void leviathanDefeatUnsealsVaultAndSinks(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        l.kill();
+        helper.runAtTickTime(5, () -> {
+            helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
+            helper.assertTrue(dropped(helper, item("ergosphere_chapter")) == 1, "渦の断章を落とさない");
+        });
+        helper.runAtTickTime(ErgosphereLeviathan.DEATH_TICKS / 2, () -> helper.assertFalse(l.isRemoved(), "演出の途中で消えた"));
+        helper.runAtTickTime(ErgosphereLeviathan.DEATH_TICKS + 10, () -> {
+            helper.assertTrue(l.isRemoved(), "演出が終わっても消えない");
+            helper.succeed();
+        });
+    }
+
+    /** 覚醒の渦核で、覚醒したエルゴ球の大蛇（体力×2.5）が現れる。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_24", timeoutTicks = 40)
+    public static void ergosphereCoreSummonsAwakenedLeviathan(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = clearedRoom(helper, "sunken_reactor");
+        RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_ergosphere_core"));
+        helper.assertTrue(boss instanceof ErgosphereLeviathan && boss.awakened(), "覚醒の渦核で覚醒した大蛇が現れない: " + boss);
+        double expected = ErgosphereLeviathan.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** 体力 2/3 で脱皮して骨格になる。一撃で境目を飛び越えず、脱皮のあいだは傷つかない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_25", timeoutTicks = 100)
+    public static void leviathanMoltsAtTwoThirds(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "sunken_reactor", VAULT, CORE);
+        ErgosphereLeviathan l = (ErgosphereLeviathan) core.awaken(helper.getLevel());
+        l.skipEmerging();
+        l.hurt(helper.getLevel().damageSources().magic(), 100000);
+        helper.assertTrue(l.isAlive() && l.getHealth() >= l.getMaxHealth() * 2F / 3 - 0.1F, "一撃で装甲の姿を飛び越えた: " + l.getHealth());
+        helper.runAtTickTime(3, () -> {
+            helper.assertTrue(l.state() == ErgosphereLeviathan.MOLT && l.transforming(), "脱皮が始まらない: " + l.state());
+            l.invulnerableTime = 0;
+            helper.assertFalse(l.hurt(helper.getLevel().damageSources().magic(), 10), "脱皮の最中に傷ついた");
+        });
+        helper.runAtTickTime(ErgosphereLeviathan.MOLT_TICKS + 6, () -> {
+            helper.assertTrue(l.form() == 2 && !l.transforming(), "脱皮のあと骨格にならない: " + l.form());
+            l.discard();
+            helper.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------ 挑戦人数
+
+    /** 挑戦者が増えると、体力の割合を保ったまま体力が増える。減っても弱くならない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_26", timeoutTicks = 40)
+    public static void guardianScalesWithChallengers(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
+        RuinBoss boss = core.awaken(helper.getLevel());
+        boss.skipEmerging();
+        float base = boss.effectiveMaxHealth();
+        boss.setHealth(boss.getMaxHealth() * 0.8F);
+        boss.setParticipants(3);
+        double expected = base * io.github.genichimaruo.singulo.ruin.BossScaling.healthFactor(3);
+        helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "3人で体力が " + expected + " 相当にならない: " + boss.effectiveMaxHealth());
+        helper.assertTrue(Math.abs(boss.getHealth() / boss.getMaxHealth() - 0.8F) < 0.01F, "体力の割合が保たれない: " + boss.getHealth() / boss.getMaxHealth());
+        helper.assertTrue(boss.participants() == 3, "人数を覚えていない");
+        boss.setParticipants(1);
+        helper.assertTrue(boss.participants() == 3 && Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "人が減って弱くなった");
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** 大勢で倒すと、落とす物が人数ぶん出る。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_27", timeoutTicks = 40)
+    public static void guardianDropsPerChallenger(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
+        RuinBoss boss = core.awaken(helper.getLevel());
+        boss.skipEmerging();
+        boss.setParticipants(2);
+        boss.kill();
+        helper.runAtTickTime(5, () -> {
+            int n = dropped(helper, item("sentinel_core"));
+            helper.assertTrue(n == 2 * io.github.genichimaruo.singulo.ruin.BossScaling.lootRolls(2), "2人ぶんの番人の投影核が出ない: " + n);
             helper.succeed();
         });
     }

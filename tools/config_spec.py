@@ -83,6 +83,14 @@ SERVER = [
     ('ruins', 'wardenResetOnLeave', 'true', 'true / false', '挑戦者が離れたら全回復するか'),
     ('ruins', 'awakenedWardenHealthMultiplier', '2.5', '1.0〜20.0', '覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）'),
     ('ruins', 'awakenedWardenDamageMultiplier', '1.5', '1.0〜10.0', '覚醒したホライズン・ウォーデンが与えるダメージの倍率'),
+    ('ruins', 'leviathanHealth', '1600', '1〜100,000', 'エルゴ球の大蛇（沈んだ炉心区画のボス）のHP'),
+    ('ruins', 'archivistHealth', '2400', '1〜100,000', '最後の記録者（隠しボス）のHP'),
+    ('ruins', 'awakenedGuardianHealthMultiplier', '2.5', '1.0〜20.0', '覚醒した番人（残響の番人・重力の澱・エルゴ球の大蛇の再戦）の体力の倍率'),
+    ('ruins', 'awakenedGuardianDamageMultiplier', '1.5', '1.0〜10.0', '覚醒した番人が与えるダメージの倍率'),
+    ('ruins', 'bossHealthPerPlayer', '0.5', '0.0〜4.0', '挑戦者が1人増えるごとに増えるボスの体力（もとの体力に対する割合）'),
+    ('ruins', 'bossPacePerPlayer', '0.08', '0.0〜0.5', '挑戦者が1人増えるごとに、ボスの技の間が縮む割合（0.6倍まで）'),
+    ('ruins', 'bossMaxScaledPlayers', '6', '1〜32（整数）', 'ボスの強さに数える挑戦者の上限'),
+    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか'),
 
     # 残響の欠片
     ('echo', 'templateUses', '16', '1〜1000（整数）', '型の残響の欠片が割れるまでの回数'),
@@ -103,6 +111,13 @@ SERVER = [
     ('hazards', 'tiplerSpeedMultiplier', '2.0', '1.0〜10.0', 'Tシリンダーの加速倍率'),
     ('hazards', 'tiplerRadius', '16', '1〜32（ブロック）', 'Tシリンダーが時間を加速する半径'),
     ('hazards', 'shieldRadius', '32', '4〜64（ブロック）', 'イベントホライズン・シールドの半径（電力は半径の二乗に比例）'),
+
+    # 創世炉
+    ('genesis', 'genesisSeedEnergy', '1500000000000', '1〜（FE）', '創世炉の種火に注ぐ電力'),
+    ('genesis', 'genesisMaxInput', '1000000000', '1〜（FE/t）', '創世炉が1 tick に受け取る電力の上限'),
+    ('genesis', 'genesisUpkeep', '100000000', '0〜（FE/t）', '安定化のあいだ、進むのに要る維持の電力'),
+    ('genesis', 'genesisBaseCost', '1000000000', '1〜（FE）', '質量生成で、質量1あたりの電力（これに 10^希少度 を掛ける）'),
+    ('genesis', 'genesisEndingScreen', 'true', 'true / false', '宇宙が生まれたとき、エピローグの画面を出すか'),
 
     # 道具
     ('gear', 'gauntletRange', '12', '4〜32（ブロック）', '慣性制御ガントレットの射程'),
@@ -125,6 +140,7 @@ CLIENT = [
 DATAPACK = [
     ('data/singulo/recipe/*.json', 'すべてのレシピ', '個数・製作場所・時間・電力を差し替え・追加・削除'),
     ('data/singulo/mass_values/*.json', '質量値', 'アイテム単位・タグ単位で質量値を変更。金属扱いにするタグも指定'),
+    ('data/singulo/mass_synthesis/*.json', '創世炉の質量生成', '作れる物（アイテム単位・タグ単位）と、その質量・希少度（0〜4）'),
     ('data/singulo/thermal/*.json', '熱電発電機の温度', '高温源・低温源のブロック温度と維持できる温度差'),
     ('data/singulo/tags/item/star_core.json', 'ネザースターの代替', '#singulo:star_core に入れたアイテムをネザースターの代わりに使える'),
     ('data/singulo/tags/item/metal_core.json', '金属の核に使える素材', '金属圧縮ブロックに入れられる金属ブロック'),

@@ -31,7 +31,8 @@ public final class Blueprints {
         PENROSE_REACTOR("penrose_reactor", new int[]{13}),
         SHIELD_TOWER("event_horizon_shield", new int[]{9}),
         TIPLER_CYLINDER("tipler_cylinder", new int[]{9}),
-        WORMHOLE_GENERATOR("wormhole_generator", new int[]{5});
+        WORMHOLE_GENERATOR("wormhole_generator", new int[]{5}),
+        GENESIS_ENGINE("genesis_engine", new int[]{7});
 
         private final String id;
         private final int[] sizes;
@@ -95,6 +96,7 @@ public final class Blueprints {
             case SHIELD_TOWER -> SinguloBlocks.SHIELD_TOWER_CORE.get();
             case TIPLER_CYLINDER -> SinguloBlocks.TIPLER_CORE.get();
             case WORMHOLE_GENERATOR -> SinguloBlocks.WORMHOLE_GENERATOR_CORE.get();
+            case GENESIS_ENGINE -> SinguloBlocks.GENESIS_CORE.get();
         };
     }
 
@@ -107,6 +109,10 @@ public final class Blueprints {
             size = kind.defaultSize();
         }
         Builder b = new Builder(controller, back);
+        if (kind == Kind.GENESIS_ENGINE) {
+            genesis(b, controller);
+            return b.out;
+        }
         b.put(0, 0, 0, controllerBlock(kind).defaultBlockState().setValue(AbstractMachineBlock.FACING, back.getOpposite()));
         switch (kind) {
             case PARTICLE_ACCELERATOR -> accelerator(b, size);
@@ -138,6 +144,17 @@ public final class Blueprints {
             boolean corner = (p[0] == 1 || p[0] == side) && (p[1] == left || p[1] == left + side - 1);
             b.put(p[0], 0, p[1], corner || k % 4 == 0 ? SinguloBlocks.FOCUSING_MAGNET : SinguloBlocks.ACCELERATOR_TUBE);
             k++;
+        }
+    }
+
+    /** 創世炉: 核を中心に、同じ高さの八角形の枠8と、斜めの枠の上の柱（4本×3段）。向きはない（どの向きでも同じ形）。 */
+    private static void genesis(Builder b, BlockPos core) {
+        b.world(core, SinguloBlocks.GENESIS_CORE);
+        for (BlockPos p : io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.FRAMES) {
+            b.world(core.offset(p), () -> SinguloBlocks.SIMPLE.get("genesis_frame").get());
+        }
+        for (BlockPos p : io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.PYLONS) {
+            b.world(core.offset(p), () -> SinguloBlocks.SIMPLE.get("genesis_pylon").get());
         }
     }
 
@@ -200,6 +217,7 @@ public final class Blueprints {
         return switch (kind) {
             case PARTICLE_ACCELERATOR -> Structures.findRing(level, c);
             case PENROSE_REACTOR -> Structures.findReactor(level, c) == null ? 0 : 13;
+            case GENESIS_ENGINE -> io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.checkShape(level, c) ? 7 : 0;
             default -> {
                 Shapes.Found f = Shapes.find(kind, level, c);
                 yield f == null ? 0 : f.size();
@@ -214,6 +232,9 @@ public final class Blueprints {
         if (partBlocks == null) {
             java.util.Set<Block> set = new java.util.HashSet<>();
             for (Kind k : Kind.values()) {
+                if (k == Kind.GENESIS_ENGINE) {
+                    continue;   // 創世炉には画面がない（枠や柱を右クリックしても核の画面は開かない）
+                }
                 for (int size : k.sizes()) {
                     for (BlockState s : layout(k, BlockPos.ZERO, Direction.NORTH, size).values()) {
                         if (!s.isAir() && kindOf(s.getBlock()) == null) {

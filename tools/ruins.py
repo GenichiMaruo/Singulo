@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""旧文明の遺構4種の構造物（.nbt）を作る。gen_data.py から呼ぶ。
+"""旧文明の遺構5種の構造物（.nbt）を作る。gen_data.py から呼ぶ。
 
 どれも白い無機質パネルの建物が黄ばみ・ひび割れ・植物に侵食された姿にする（設計書「コンセプトと世界観」）。
 地上に建つのは入口となる地表観測拠点だけで、ほかの3つは地下に埋もれている（深いほど後の段階）。
@@ -660,12 +660,112 @@ def final_lab():
     return b
 
 
+def sunken_reactor():
+    """
+    沈んだ炉心区画（最も深い地下、段階5）: 旧文明が二基目のペンローズ炉を据えた球形の封じ込め室。点火の事故で炉は止まり、
+    区画ごと岩の底へ沈んだ。床の中心には止まった炉心の跡（番人の封印核）、まわりに6本の封じ込め柱と途切れた足場の環。
+    宙には剥がれた炉殻の破片が止まっている。炉心の渦にはエルゴ球の大蛇が眠り、北の壇の保管庫は力場で封鎖されている。
+    南の通路から入る。
+    """
+    b = Builder(47, 36, 56, seed=505)
+    cx, cz, cy = 23, 23, 18                 # 球の中心
+    R, RY = 21, 16                          # 水平の半径と、縦の半径（少しつぶした球）
+    FLOOR = 8
+    def dist(x, y, z):
+        return math.sqrt((x - cx) ** 2 + (z - cz) ** 2 + ((y - cy) * R / RY) ** 2)
+    for x in range(47):
+        for z in range(47):
+            for y in range(0, 36):
+                d = dist(x, y, z)
+                if R - 0.8 <= d <= R + 0.5:
+                    seam = y % 6 == 0 and (x + z) % 3 == 0
+                    b.set(x, y, z, LAMP if seam else (FRAME if (x * 7 + z * 3 + y) % 11 == 0 else PANEL))
+                elif d < R - 0.8:
+                    if y < FLOOR:
+                        b.set(x, y, z, DARK)
+                    elif y == FLOOR:
+                        b.set(x, y, z, PANEL)
+                    else:
+                        b.set(x, y, z, AIR)
+    # 床の模様: 止まった炉心の台（中心）、光の環、警告の縞の環（大蛇が泳ぐ下）
+    for x in range(47):
+        for z in range(47):
+            if b.get(x, FLOOR, z) != PANEL:
+                continue
+            d = math.hypot(x - cx, z - cz)
+            if d <= 3.3:
+                b.set(x, FLOOR, z, FRAME)
+            elif 5.5 <= d <= 6.2 and (x + z) % 2 == 0:
+                b.set(x, FLOOR, z, LAMP)
+            elif 9.5 <= d <= 10.4:
+                b.set(x, FLOOR, z, STRIPED)
+            elif 14.5 <= d <= 15.2 and (x + z) % 3 == 0:
+                b.set(x, FLOOR, z, LAMP)
+    b.set(cx, FLOOR, cz, CORE)              # 番人の封印核（上は大蛇が這い出すので空けておく）
+    for dx, dz in ((-2, 0), (2, 0), (0, -2), (0, 2)):
+        b.set(cx + dx, FLOOR + 1, cz + dz, 'minecraft:end_rod', {'facing': 'up'})
+    # 6本の封じ込め柱（白い柱と光、上は鎖で天井へ）
+    for k in range(6):
+        a = math.pi * 2 * k / 6
+        x, z = round(cx + math.cos(a) * 13), round(cz + math.sin(a) * 13)
+        b.fill(x, FLOOR + 1, z, x, FLOOR + 11, z, PRISTINE_PILLAR)
+        b.set(x, FLOOR + 6, z, PRISTINE_LIGHT)
+        b.set(x, FLOOR + 12, z, LAMP)
+        top = next((y for y in range(FLOOR + 13, 36) if b.get(x, y, z) not in (None, AIR)), 35)
+        b.fill(x, FLOOR + 13, z, x, top - 1, z, *CHAIN_Y)
+    # 途切れた足場の環（高さ FLOOR+9、半径15〜16。4か所が崩れ落ちている）
+    slab = ('minecraft:polished_deepslate_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    for x in range(47):
+        for z in range(47):
+            d = math.hypot(x - cx, z - cz)
+            a = math.degrees(math.atan2(z - cz, x - cx)) % 360
+            if 14.6 <= d <= 16.4 and not any(abs(a - g) < 9 for g in (35, 125, 215, 305)):
+                if b.get(x, FLOOR + 9, z) == AIR:
+                    b.set(x, FLOOR + 9, z, *slab)
+    # 北の壇と保管庫（大蛇を倒すまで力場で封鎖）
+    vz = cz - 14
+    for x in range(cx - 3, cx + 4):
+        for z in range(vz - 2, vz + 2):
+            if b.get(x, FLOOR + 1, z) == AIR:
+                b.set(x, FLOOR + 1, z, PANEL)
+    for dx in range(-3, 4):
+        if b.get(cx + dx, FLOOR + 1, vz + 2) == AIR:
+            b.set(cx + dx, FLOOR + 1, vz + 2, 'minecraft:quartz_stairs', {'facing': 'north', 'half': 'bottom', 'shape': 'straight',
+                                                                      'waterlogged': 'false'})
+    b.cache(cx, FLOOR + 2, vz, 'sunken_reactor', sealed=True)
+    b.set(cx, FLOOR + 2, vz - 1, SCREEN)
+    b.set(cx, FLOOR + 3, vz - 1, LAMP)
+    b.sealed(cx - 2, FLOOR + 2, vz, 4)
+    b.set(cx + 2, FLOOR + 2, vz, FRAME)
+    b.set(cx + 2, FLOOR + 3, vz, 'minecraft:end_rod', {'facing': 'up'})
+    # 南の通路（崩れた入口）
+    for z in range(cz + 14, 56):
+        b.fill(cx - 2, FLOOR, z, cx + 2, FLOOR + 5, z, PANEL)
+        b.fill(cx - 1, FLOOR + 1, z, cx + 1, FLOOR + 4, z, AIR)
+        if z % 4 == 0:
+            b.set(cx, FLOOR + 5, z, LAMP)
+    # 剥がれた炉殻の破片が宙に止まっている（重力の乱れ）
+    for _ in range(60):
+        x, y, z = cx + b.rng.randint(-17, 17), b.rng.randint(FLOOR + 3, 32), cz + b.rng.randint(-17, 17)
+        if b.get(x, y, z) == AIR and math.hypot(x - cx, z - cz) > 4 and dist(x, y, z) < R - 3:
+            b.set(x, y, z, b.rng.choice((FRAME, DARK, CRACKED, 'minecraft:obsidian', 'minecraft:crying_obsidian')))
+    # 床の割れ目
+    for _ in range(30):
+        x, z = cx + b.rng.randint(-15, 15), cz + b.rng.randint(-15, 15)
+        if b.get(x, FLOOR, z) == PANEL and math.hypot(x - cx, z - cz) > 4:
+            b.set(x, FLOOR, z, CRACKED)
+    b.decay(cracked=0.18, mossy=0.04, only_above=FLOOR + 1)
+    b.scatter('minecraft:cobweb', 14, 30, (6, 6, 40, 40), floor=(AIR,))
+    return b
+
+
 # 遺構ID → (作る関数, 置き方)。surface は地上、それ以外は地下に埋める（gen_data.RUIN_PLACEMENT の高さ）
 RUINS = {
     'observation_post': (observation_post, 'surface'),
     'research_building': (research_building, 'underground'),
     'culture_facility': (culture_facility, 'underground'),
     'final_lab': (final_lab, 'underground'),
+    'sunken_reactor': (sunken_reactor, 'underground'),
 }
 
 # 設計書の遺構名 → 遺構ID
@@ -674,6 +774,7 @@ RUIN_IDS = {
     '研究棟': 'research_building',
     '封鎖培養施設': 'culture_facility',
     '最終実験施設': 'final_lab',
+    '沈んだ炉心区画': 'sunken_reactor',
 }
 
 
@@ -683,6 +784,7 @@ VARIETY = {
     'research_building': (0.12, 0.04),
     'culture_facility': (0.12, 0.10),
     'final_lab': (0.08, 0.30),
+    'sunken_reactor': (0.10, 0.20),
 }
 
 

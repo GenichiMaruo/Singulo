@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:genesis_core"
+    },
+    "title": {
+      "translate": "advancement.singulo.genesis_formed.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.genesis_formed.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "genesis_formed"
+      }
+    }
+  },
+  "parent": "singulo:leviathan"
+}

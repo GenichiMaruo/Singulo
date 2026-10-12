@@ -31,6 +31,8 @@ import net.minecraft.world.phys.Vec3;
  *   <li>胸に小さなブラックホールの炉心、頭の後ろに回る光輪。光る線は別の層（暗くても光る）で、フェーズで色が変わる（水色→赤）</li>
  *   <li>フェーズ1: 白い陶磁の胸当てと肩当て（金の縁）。フェーズ2: 外装が剥がれ、破片が体の周りを回る。翼板が開く</li>
  *   <li>フェーズ3: 宙に浮き、脚が垂れる。破片が速く回り、翼板が大きく開く。事象の地平線ビームをためて撃つ</li>
+ *   <li>覚醒した個体: 光輪の外にもう1本の菫の環と8本の放射、兜に2本の光の角、背中から菫の光の翼が6枚伸びる。
+ *       胸の炉心にも菫の輪がもう1本回る</li>
  * </ul>
  */
 public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWardenRenderer.Model> {
@@ -312,12 +314,72 @@ public class HorizonWardenRenderer extends MobRenderer<HorizonWarden, HorizonWar
         // 別の描き方（黒い球）を挟んだので、光る描き方を取り直す（前のものは閉じられている）
         FxDraw.ring(pose.last(), buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE)), 0.17F, 0.34F, rgb, 240, 0);
         pose.popPose();
+        if (warden.awakened()) {
+            awakenedParts(warden, bodyYaw, t, pose, buffers);
+        }
         if (warden.phase() == 3) {
             // フェーズ3: 炉心の周りの景色が歪む
             Vec3 forward = Vec3.directionFromRotation(0, bodyYaw);
             Vec3 core = warden.getPosition(partialTick).add(0, 2.2 + hover(warden, partialTick), 0).add(forward.scale(0.5));
             GravitationalLensing.addDistortion(core, 0.3F, 0.9F, 1.0F);
         }
+    }
+
+    static final int AWAKE = 0xB070FF;
+    static final int AWAKE_HOT = 0xFF5AD2;
+
+    /**
+     * 覚醒した個体の追加の部位: 光輪の外の菫の環と8本の放射、兜の2本の光の角、背中の6枚の菫の光の翼、胸の炉心のもう1本の輪。
+     * 体と同じ向き（180 - 体の向き）で、光輪側（+Z）が背中。
+     */
+    private static void awakenedParts(HorizonWarden warden, float bodyYaw, float t, PoseStack pose, MultiBufferSource buffers) {
+        VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+        pose.pushPose();
+        pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
+        // 光輪の外の環と放射
+        pose.pushPose();
+        pose.translate(0, 3.35, 0.46);
+        pose.mulPose(Axis.XP.rotationDegrees(90));
+        pose.mulPose(Axis.YP.rotationDegrees(-t * 2.2F));
+        FxDraw.ring(pose.last(), glow, 1.02F, 1.1F, AWAKE, 230, 230);
+        for (int k = 0; k < 8; k++) {
+            pose.pushPose();
+            pose.mulPose(Axis.YP.rotationDegrees(k * 45));
+            pose.mulPose(Axis.XP.rotationDegrees(90));
+            pose.translate(1.08F, 0, 0);
+            LastArchivistRenderer.blade(pose, glow, 1, 0.7F, 0.08F, AWAKE_HOT, 230, AWAKE, 0);
+            pose.popPose();
+        }
+        pose.popPose();
+        // 兜の2本の光の角（後ろ上へ）
+        for (int s = -1; s <= 1; s += 2) {
+            pose.pushPose();
+            pose.translate(s * 0.22F, 3.25, 0.05);
+            pose.mulPose(Axis.YP.rotationDegrees(s * 90 - s * 35));
+            pose.mulPose(Axis.ZP.rotationDegrees(s * 40));
+            LastArchivistRenderer.blade(pose, glow, s, 1.0F, 0.16F, AWAKE_HOT, 240, AWAKE, 0);
+            pose.popPose();
+        }
+        // 背中の6枚の光の翼
+        for (int s = -1; s <= 1; s += 2) {
+            for (int f = 0; f < 3; f++) {
+                pose.pushPose();
+                pose.translate(s * 0.3F, 2.75 - f * 0.25F, 0.45);
+                pose.mulPose(Axis.YP.rotationDegrees(-s * 20));
+                pose.mulPose(Axis.ZP.rotationDegrees(s * (40 - f * 25 + Mth.sin(t * 0.08F) * 6)));
+                LastArchivistRenderer.blade(pose, glow, s, 2.4F - f * 0.4F, 0.4F, AWAKE, 200, AWAKE_HOT, 0);
+                LastArchivistRenderer.blade(pose, glow, s, 2.0F - f * 0.35F, 0.1F, 0xFFFFFF, 200, AWAKE, 0);
+                pose.popPose();
+            }
+        }
+        // 胸の炉心のもう1本の輪
+        pose.pushPose();
+        pose.translate(0, 2.2, -0.5);
+        pose.mulPose(Axis.XP.rotationDegrees(-40));
+        pose.mulPose(Axis.YP.rotationDegrees(-t * 15));
+        FxDraw.ring(pose.last(), glow, 0.38F, 0.5F, AWAKE_HOT, 230, 0);
+        pose.popPose();
+        pose.popPose();
     }
 
     /** 事象の地平線ビーム: ためている間は細い狙いの線（固定すると太く明るく）、撃った瞬間は太い光の帯。 */

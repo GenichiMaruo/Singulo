@@ -30,9 +30,12 @@ import net.minecraft.world.phys.AABB;
 /**
  * 番人の封印核。研究棟と封鎖培養施設のボス部屋の床に埋まっていて、壊せない。
  * <ul>
- *   <li>挑戦者が部屋に入ると、近くの封鎖された保管庫の遺構に応じた番人を起こす（研究棟は残響の番人、培養施設は重力の澱）</li>
+ *   <li>挑戦者が部屋に入ると、近くの封鎖された保管庫の遺構に応じた番人を起こす（研究棟は残響の番人、培養施設は重力の澱、
+ *       沈んだ炉心区画はエルゴ球の大蛇）</li>
  *   <li>番人が倒されると保管庫の封鎖を解く。中身が再生すると保管庫はまた封鎖され、次に入ったときに番人が戻ってくる</li>
  *   <li>部屋の仕掛け（残響投影器・封じ込め槽）は最初に覚えておき、番人を起こすたびに元の形へ直す</li>
+ *   <li>攻略後の再戦: その遺構の覚醒核（覚醒の残響核・覚醒の重力核）を手に持って核に使うと、保管庫が開いていても
+ *       覚醒した番人を起こす（{@link #awakenAwakened}）</li>
  * </ul>
  */
 public class GuardianCoreBlockEntity extends BlockEntity {
@@ -69,8 +72,35 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         return switch (ruin) {
             case "research_building" -> SinguloEntities.ECHO_SENTINEL.get();
             case "culture_facility" -> SinguloEntities.GRAVITY_REMNANT.get();
+            case "sunken_reactor" -> SinguloEntities.ERGOSPHERE_LEVIATHAN.get();
             default -> null;
         };
+    }
+
+    /** 遺構ID → 覚醒した番人を呼ぶ覚醒核のアイテムID。番人のいない遺構は null。 */
+    @Nullable
+    public static String awakeningCoreId(String ruin) {
+        return switch (ruin) {
+            case "research_building" -> "awakening_echo_core";
+            case "culture_facility" -> "awakening_gravity_core";
+            case "sunken_reactor" -> "awakening_ergosphere_core";
+            default -> null;
+        };
+    }
+
+    /** 番人の種類 → その覚醒核。 */
+    @Nullable
+    public static net.minecraft.world.item.Item awakeningCoreFor(EntityType<?> type) {
+        String id = type == SinguloEntities.ECHO_SENTINEL.get() ? "awakening_echo_core"
+                : type == SinguloEntities.GRAVITY_REMNANT.get() ? "awakening_gravity_core"
+                : type == SinguloEntities.ERGOSPHERE_LEVIATHAN.get() ? "awakening_ergosphere_core" : null;
+        return id == null ? null : net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id));
+    }
+
+    /** どれかの番人の覚醒核か。 */
+    public static boolean isAwakeningCore(net.minecraft.world.item.ItemStack stack) {
+        return stack.is(awakeningCoreFor(SinguloEntities.ECHO_SENTINEL.get())) || stack.is(awakeningCoreFor(SinguloEntities.GRAVITY_REMNANT.get()))
+                || stack.is(awakeningCoreFor(SinguloEntities.ERGOSPHERE_LEVIATHAN.get()));
     }
 
     public List<BlockPos> projectors() {
@@ -181,6 +211,44 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         if (!vault.isSealed()) {
             return null;
         }
+        RuinBoss b = spawn(level, vault, false);
+        if (b != null) {
+            broadcast(level, "gui.singulo.guardian.awakened." + typeName(b.getType()));
+        }
+        return b;
+    }
+
+    /**
+     * 覚醒核を使ったとき。覚醒した番人を起こせたらそれを返す（呼んだ側が覚醒核を1個減らす）。
+     * 保管庫が封鎖されていてもいなくても呼べる（勝てば封鎖も解ける）。core は使われた覚醒核で、この遺構のものでなければ断る。
+     */
+    @Nullable
+    public RuinBoss awakenAwakened(ServerLevel level, @Nullable ServerPlayer player, net.minecraft.world.item.ItemStack core) {
+        if (activeBoss(level) != null) {
+            tell(player, "gui.singulo.guardian.active");
+            return null;
+        }
+        RuinCacheBlockEntity vault = vault(level);
+        if (vault == null) {
+            tell(player, "gui.singulo.guardian.no_vault");
+            return null;
+        }
+        String id = awakeningCoreId(vault.ruin());
+        if (id == null || !core.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id)))) {
+            tell(player, "gui.singulo.guardian.wrong_core");
+            return null;
+        }
+        // 封印コンソールと同じく、中身の再生期限が過ぎていればここで入れ直して封鎖を確定させる（勝てばその封鎖が解ける）
+        vault.refillIfDue(level, level.getGameTime());
+        RuinBoss b = spawn(level, vault, true);
+        if (b != null) {
+            broadcast(level, "gui.singulo.guardian.awakened_rematch." + typeName(b.getType()));
+        }
+        return b;
+    }
+
+    @Nullable
+    private RuinBoss spawn(ServerLevel level, RuinCacheBlockEntity vault, boolean awakened) {
         EntityType<? extends RuinBoss> type = bossFor(vault.ruin());
         RuinBoss b = type == null ? null : type.create(level);
         if (b == null) {
@@ -193,6 +261,9 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         tankStage = 0;
         b.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1.0 + b.spawnHeight(), worldPosition.getZ() + 0.5, 0, 0);
         b.awaken(worldPosition);
+        if (awakened) {
+            b.makeAwakened();
+        }
         if (b instanceof EchoSentinel s) {
             s.setProjectors(projectors);
         }
@@ -200,8 +271,8 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         level.addFreshEntity(b);
         boss = b.getUUID();
         setChanged();
-        level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("guardian_core.awaken"), SoundSource.HOSTILE, 2.0F, 1.0F);
-        broadcast(level, "gui.singulo.guardian.awakened." + typeName(type));
+        level.playSound(null, worldPosition, io.github.genichimaruo.singulo.registry.SinguloSounds.get("guardian_core.awaken"), SoundSource.HOSTILE, 2.0F,
+                awakened ? 0.8F : 1.0F);
         return b;
     }
 
@@ -254,11 +325,14 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         broadcast(level, "gui.singulo.guardian.defeated." + typeName(type));
     }
 
-    void onBossReset(ServerLevel level) {
+    /** 挑戦者がいなくなって番人が戻ったとき。覚醒戦なら、核に手が届くように部屋の仕掛け（割れた槽）は直さない。 */
+    void onBossReset(ServerLevel level, boolean awakened) {
         EntityType<?> type = bossType(level);
         boss = null;
         setChanged();
-        restoreProps(level);
+        if (!awakened) {
+            restoreProps(level);
+        }
         broadcast(level, "gui.singulo.guardian.reset." + typeName(type));
     }
 
@@ -278,6 +352,12 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         }
         var key = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(type);
         return key.getPath();
+    }
+
+    private static void tell(@Nullable ServerPlayer player, String key) {
+        if (player != null) {
+            player.displayClientMessage(Component.translatable(key), true);
+        }
     }
 
     private void broadcast(ServerLevel level, String key) {

@@ -63,6 +63,10 @@ public final class SinguloItems {
             () -> new DeferredSpawnEggItem(SinguloEntities.ECHO_SENTINEL, 0xBFEFFF, 0x3A8FB0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.GRAVITY_REMNANT, 0x16121E, 0x9A6CFF, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> ERGOSPHERE_LEVIATHAN_SPAWN_EGG = ITEMS.register("ergosphere_leviathan_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.ERGOSPHERE_LEVIATHAN, 0x1A1424, 0x8A5CFF, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> LAST_ARCHIVIST_SPAWN_EGG = ITEMS.register("last_archivist_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.LAST_ARCHIVIST, 0xECE4D2, 0xFFD27A, new Item.Properties()));
     /** 封印コンテナからしか出ない道具。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
             "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));
@@ -70,6 +74,9 @@ public final class SinguloItems {
             "catalyst_stabilizer", () -> new io.github.genichimaruo.singulo.item.CatalystStabilizerItem(new Item.Properties().rarity(Rarity.RARE), 4));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.DimensionalPocketItem> DIMENSIONAL_POCKET = ITEMS.register(
             "dimensional_pocket", () -> new io.github.genichimaruo.singulo.item.DimensionalPocketItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    /** 残光の翼（最後の記録者が落とす。クリエイティブのタブにも JEI にも出さない）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.AfterglowWingsItem> AFTERGLOW_WINGS = ITEMS.register(
+            "afterglow_wings", () -> new io.github.genichimaruo.singulo.item.AfterglowWingsItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.SealedRecordItem> SEALED_RECORD = ITEMS.register(
             "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */
@@ -188,6 +195,7 @@ public final class SinguloItems {
         TAB_ORDER.add(ITEMS.register("wormhole_mouth", () -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
                 new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5)));
         block(SinguloBlocks.WORMHOLE_PORT, 5);
+        block(SinguloBlocks.GENESIS_CORE, 5);
         block(SinguloBlocks.CRYOGENIC_TURBINE, 2);
         block(SinguloBlocks.SMES_CELL, 2);
         block(SinguloBlocks.COSMIC_MUON_COLLECTOR, 2);

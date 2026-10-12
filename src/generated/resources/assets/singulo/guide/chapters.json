@@ -109,6 +109,15 @@
       ]
     },
     {
+      "id": "genesis",
+      "icon": "singulo:genesis_core",
+      "pages": [
+        "genesis.build",
+        "genesis.birth",
+        "genesis.synth"
+      ]
+    },
+    {
       "id": "hazards",
       "icon": "minecraft:tnt",
       "pages": [

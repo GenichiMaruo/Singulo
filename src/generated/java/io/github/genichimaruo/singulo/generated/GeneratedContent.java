@@ -52,6 +52,15 @@ public final class GeneratedContent {
             new ItemDef("time_crystal_catalyst", "catalyst", 4, 54000),
             new ItemDef("time_crystal_module", "item", 4, 0),
             new ItemDef("awakening_record_core", "item", 5, 0),
+            new ItemDef("awakening_echo_core", "item", 5, 0),
+            new ItemDef("awakening_gravity_core", "item", 5, 0),
+            new ItemDef("awakening_ergosphere_core", "item", 5, 0),
+            new ItemDef("echo_chapter", "item", 5, 0),
+            new ItemDef("gravity_chapter", "item", 5, 0),
+            new ItemDef("horizon_chapter", "item", 5, 0),
+            new ItemDef("ergosphere_chapter", "item", 5, 0),
+            new ItemDef("terminus_record", "item", 5, 0),
+            new ItemDef("archivist_halo", "item", 5, 0),
             new ItemDef("exotic_matter", "item", 4, 0),
             new ItemDef("toroidal_magnetic_coil", "item", 4, 0),
             new ItemDef("bh_container", "item", 5, 0),
@@ -67,6 +76,7 @@ public final class GeneratedContent {
             new ItemDef("singularity_core", "catalyst", 5, 72000),
             new ItemDef("confinement_ring", "item", 5, 0),
             new ItemDef("wormhole_mouth_casing", "item", 5, 0),
+            new ItemDef("primordial_seed", "item", 5, 0),
             new ItemDef("observation_log", "uses", 1, 16),
             new ItemDef("degraded_control_unit", "item", 1, 0),
             new ItemDef("control_unit", "uses", 1, 16),
@@ -98,7 +108,9 @@ public final class GeneratedContent {
             new BlockDef("compressed_block_3", 4),
             new BlockDef("compressed_metal_block_1", 4),
             new BlockDef("compressed_metal_block_2", 4),
-            new BlockDef("strange_matter", 1)
+            new BlockDef("strange_matter", 1),
+            new BlockDef("genesis_frame", 5),
+            new BlockDef("genesis_pylon", 5)
     );
 
     /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */
@@ -187,6 +199,10 @@ public final class GeneratedContent {
             "wormhole_generator_focuser",
             "wormhole_generator_window",
             "wormhole_generator_port",
+            "genesis_core",
+            "genesis_frame",
+            "genesis_pylon",
+            "primordial_seed",
             "worldline_anchor_small",
             "inertial_stabilizer",
             "gravity_panel_receiver",
@@ -288,6 +304,16 @@ public final class GeneratedContent {
             "hawking_condensate",
             "singularity_seed",
             "awakening_record_core",
+            "awakening_echo_core",
+            "awakening_gravity_core",
+            "awakening_ergosphere_core",
+            "terminus_record",
+            "echo_chapter",
+            "gravity_chapter",
+            "horizon_chapter",
+            "ergosphere_chapter",
+            "archivist_halo",
+            "afterglow_wings",
             "observation_log",
             "degraded_control_unit",
             "quantum_data_fragment",
@@ -346,7 +372,9 @@ public final class GeneratedContent {
             "builder_wand",
             "horizon_warden_spawn_egg",
             "echo_sentinel_spawn_egg",
-            "gravity_remnant_spawn_egg"
+            "gravity_remnant_spawn_egg",
+            "ergosphere_leviathan_spawn_egg",
+            "last_archivist_spawn_egg"
     );
 
     public static final List<FluidDef> FLUIDS = List.of(
@@ -369,7 +397,8 @@ public final class GeneratedContent {
             "observation_post", 7,
             "research_building", 7,
             "culture_facility", 14,
-            "final_lab", 14
+            "final_lab", 14,
+            "sunken_reactor", 14
     );
 
     /** 触媒 → 使い切ったときに残る失活触媒。 */

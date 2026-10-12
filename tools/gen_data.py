@@ -58,7 +58,7 @@ def mid(name):
 FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
 BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
-               'boss_block')
+               'boss_block', 'genesis')
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
@@ -78,7 +78,8 @@ def stage_of(name):
     return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
-            '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4}.get(name, 1)
+            '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
+            '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5}.get(name, 1)
 
 
 def max_uses(name):
@@ -342,7 +343,7 @@ UI_LANG = {
     'gui.singulo.anchor.status': ('半径 %s チャンク ・ %s ・ %s FE/t ・ 蓄電 %s FE',
                                   'Radius %s chunks · %s · %s FE/t · stored %s FE'),
     'gui.singulo.anchor.no_catalyst': ('触媒なし', 'No catalyst'),
-    'gui.singulo.structure.degenerate_compactor': ('3×3×3', '3×3×3'),
+    'gui.singulo.structure.degenerate_compactor': ('5×5×5', '5×5×5'),
     'gui.singulo.reactor.state.unformed': ('未形成', 'Not formed'),
     'gui.singulo.reactor.state.dormant': ('停止中', 'Dormant'),
     'gui.singulo.reactor.state.igniting': ('点火中 %s%%　あと %s 秒', 'Igniting %s%% · %s s'),
@@ -366,23 +367,23 @@ UI_LANG = {
     'gui.singulo.reactor.ignition.need': ('点火: %s GFE を %s 秒で（平均 %s MFE/t）', 'Ignition: %s GFE within %s s (avg %s MFE/t)'),
     'gui.singulo.reactor.ignition.band': ('受電 %s / 必要 %s MFE/t', 'Receiving %s / need %s MFE/t'),
     'gui.singulo.reactor.ignition.reach': ('この速さで届く量 %s / %s GFE', 'Reachable at this rate %s / %s GFE'),
-    'gui.singulo.reactor.ignition_failed.detail': ('届いた電力 %s / %s GFE、最大の受電 %s MFE/t（必要 %s MFE/t）。蓄電が足りていても、網のいちばん細いケーブルが受電の上限になる',
+    'gui.singulo.reactor.ignition_failed.detail': ('届いた電力 %s / %s GFE、最大受電 %s MFE/t（必要 %s MFE/t）。蓄電が足りていても、送電網でいちばん細いケーブルが受電の上限になる',
                                                    'Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake'),
     'gui.singulo.reactor.ignite': ('点火', 'Ignite'),
     'gui.singulo.reactor.spin_target': ('スピン目標', 'Spin target'),
     'gui.singulo.reactor.slot.seed': ('種', 'Seed'),
     'gui.singulo.reactor.slot.fuel': ('燃料', 'Fuel'),
     'gui.singulo.reactor.slot.collectors': ('抽出装置', 'Collectors'),
-    'gui.singulo.reactor.burst': ('炉心が蒸発しきった。シンギュラリティ・コアと点火電力で再起動できる',
+    'gui.singulo.reactor.burst': ('炉心が蒸発しきった。シンギュラリティ・コアと点火用の電力があれば再起動できる',
                                   'The core evaporated. Restart it with a Singularity Core and ignition power'),
-    'gui.singulo.reactor.ignition_failed': ('点火失敗　電力が間に合わなかった', 'Ignition failed: not enough power in time'),
+    'gui.singulo.reactor.ignition_failed': ('点火に失敗した。電力の供給が間に合わなかった', 'Ignition failed: not enough power in time'),
     'gui.singulo.structure.casimir_cavity': ('5×5×5', '5×5×5'),
     'gui.singulo.device.no_fuel': ('燃料がない', 'No fuel'),
     'gui.singulo.device.standby': ('待機中（蓄電がいっぱい）', 'Standby (storage full)'),
     'gui.singulo.device.standby.hint': ('燃料と触媒は減らない。蓄電が75%を割ると再開する', 'Fuel and catalyst are not used. Resumes when storage falls under 75%.'),
-    'gui.singulo.anchor.limited': ('アンカーの上限（1人%s台）に達している', 'Anchor limit reached (%s per player)'),
+    'gui.singulo.anchor.limited': ('アンカーの上限（1人 %s 台）に達している', 'Anchor limit reached (%s per player)'),
     'gui.singulo.device.fuel': ('燃料 %s 個', 'Fuel: %s'),
-    'gui.singulo.probe.no_target': ('飛べる遺構がない', 'No known ruins'),
+    'gui.singulo.probe.no_target': ('飛んでいける遺構がない', 'No known ruins'),
     'gui.singulo.probe.targets': ('登録した遺構 %s か所', '%s ruins registered'),
     'gui.singulo.probe.return': ('次の帰還まで %s 秒', 'Next return in %s s'),
     'tooltip.singulo.mixed_source': ('混成: 8個で Lv2 になる', 'Mixed: 8 make a Lv2'),
@@ -415,7 +416,7 @@ UI_LANG = {
     'metric_drive.singulo.no_exotic': ('メトリック・ドライブ: エキゾチック物質がない', 'Metric Drive: no exotic matter'),
     'tooltip.singulo.metric_drive.hint': ('持っているだけで効く　右クリックでモード切替', 'Works from your inventory · Use to switch mode'),
     'gui.singulo.anchor.core_embedded': ('コア埋め込み済み', 'Core embedded'),
-    'gui.singulo.anchor.confirm_embed': ('もう一度右クリックで埋め込む　取り出せなくなる', 'Use again to embed. It cannot be removed'),
+    'gui.singulo.anchor.confirm_embed': ('もう一度右クリックすると埋め込む（二度と取り出せない）', 'Use again to embed. It cannot be removed'),
     'gui.singulo.anchor.embedded': ('シンギュラリティ・コアを埋め込んだ', 'Singularity Core embedded'),
     'gui.singulo.anchor.already_embedded': ('すでにコアが埋め込まれている', 'A core is already embedded'),
     'gui.singulo.shield.basic': ('守り: 爆発・モブの荒らし', 'Guards: explosions, mob griefing'),
@@ -432,16 +433,17 @@ UI_LANG = {
     'multiblock.singulo.event_horizon_shield': ('イベントホライズン・シールド発生塔', 'Event Horizon Shield Tower'),
     'multiblock.singulo.tipler_cylinder': ('Tシリンダー', 'T-Cylinder'),
     'multiblock.singulo.wormhole_generator': ('ワームホール生成器', 'Wormhole Generator'),
-    'holo.singulo.not_controller': ('マルチブロックのコントローラに使う', 'Use it on a multiblock controller'),
-    'holo.singulo.header': ('%s　大きさ %s　必要なブロック:', '%s · size %s · blocks needed:'),
-    'holo.singulo.line': ('  %s: %s 個　あと %s 個', '  %s: %s, %s missing'),
-    'holo.singulo.blocking': ('じゃまなブロックが %s 個ある', '%s blocks in the way'),
-    'holo.singulo.complete': ('形が完成している', 'The structure is complete'),
+    'multiblock.singulo.genesis_engine': ('創世炉', 'Genesis Engine'),
+    'holo.singulo.not_controller': ('マルチブロックのコントローラに使ってください', 'Use it on a multiblock controller'),
+    'holo.singulo.header': ('%s（大きさ %s）に必要なブロック:', '%s · size %s · blocks needed:'),
+    'holo.singulo.line': ('  %s: %s 個（あと %s 個）', '  %s: %s, %s missing'),
+    'holo.singulo.blocking': ('邪魔なブロックが %s 個ある', '%s blocks in the way'),
+    'holo.singulo.complete': ('形は完成している', 'The structure is complete'),
     'tooltip.singulo.holo_projector.hint': ('コントローラに右クリックで投影、もう一度で消す。スニーク＋右クリックで大きさ切替',
                                            'Right-click a controller to project; again to hide. Sneak to change size'),
-    'command.singulo.build.unknown': ('知らないマルチブロック: %s', 'Unknown multiblock: %s'),
-    'command.singulo.build.size': ('その大きさは使えない: %s', 'Invalid size: %s'),
-    'command.singulo.build.done': ('%s を組み立てた　%s ブロック', 'Built %s with %s blocks'),
+    'command.singulo.build.unknown': ('不明なマルチブロック: %s', 'Unknown multiblock: %s'),
+    'command.singulo.build.size': ('その大きさは指定できない: %s', 'Invalid size: %s'),
+    'command.singulo.build.done': ('%s を組み立てた（%s ブロック）', 'Built %s with %s blocks'),
     'gui.singulo.handbook.title': ('Singulo ハンドブック', 'Singulo Handbook'),
     'gui.singulo.handbook.progress': ('進み具合', 'Progress'),
     'gui.singulo.handbook.records': ('旧文明の記録', 'Ancient Records'),
@@ -452,40 +454,40 @@ UI_LANG = {
     'gui.singulo.handbook.locked': ('？？？', '???'),
     'gui.singulo.handbook.no_records': ('まだ解読した記録がない。遺構でクリスタルメモリを探し、アーカイブ端末で解読しよう。',
                                         'No records decoded yet. Find crystal memories in ruins and decode them in the Archive Terminal.'),
-    'message.singulo.record_read': ('旧文明の記録「%s」を読んだ。ハンドブックの「旧文明の記録」で読める', 'You read the ancient record "%s". Find it in the handbook'),
-    'message.singulo.records_complete': ('旧文明の記録はすべて読んだ', 'You have read every ancient record'),
+    'message.singulo.record_read': ('旧文明の記録「%s」を読んだ。ハンドブックの「旧文明の記録」から読み返せる', 'You read the ancient record "%s". Find it in the handbook'),
+    'message.singulo.records_complete': ('旧文明の記録をすべて読み終えた', 'You have read every ancient record'),
     'message.singulo.strangelet_contained': ('ストレンジレットを磁気瓶に封じ込めた', 'Strangelet contained'),
     'tooltip.singulo.magnetic_bottle': ('残り %s / %s 回', '%s / %s uses left'),
-    'message.singulo.sealed.need_key': ('%sが要る', 'Needs a %s'),
-    'message.singulo.sealed.busy': ('封印装置が作動中', 'The seal is working'),
-    'message.singulo.sealed.lock_hint': ('鍵を持ってスニークして使うと封印できる', 'Sneak-use a key to seal it'),
+    'message.singulo.sealed.need_key': ('%sが必要だ', 'Needs a %s'),
+    'message.singulo.sealed.busy': ('封印装置が作動している', 'The seal is working'),
+    'message.singulo.sealed.lock_hint': ('鍵を持ってスニークしながら使うと封印できる', 'Sneak-use a key to seal it'),
     'tooltip.singulo.sealed.locked': ('封印されている', 'Sealed'),
     'tooltip.singulo.catalyst_stabilized': ('安定化済み', 'Stabilized'),
-    'message.singulo.stabilizer.need_catalyst': ('もう片方の手に触媒を持って使う', 'Hold a catalyst in your other hand'),
-    'message.singulo.stabilizer.already': ('この触媒はもう安定化してある', 'This catalyst is already stabilized'),
-    'message.singulo.stabilizer.done': ('触媒を安定化した（残りの寿命が2倍）', 'Catalyst stabilized: remaining life doubled'),
-    'message.singulo.gravity_receiver.status': ('重力パネル %s / %s 枚が働いている（1枚 %s FE/t）', 'Gravity panels active: %s / %s (%s FE/t each)'),
-    'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が働いている', 'Stored %s / %s FE, gravity panels active: %s / %s'),
-    'message.singulo.deep_sea_collector.idle': ('水深が足りない（真上に水が16ブロック以上要る）', 'Not deep enough: needs 16+ blocks of water above'),
-    'message.singulo.deep_sea_collector.rate': ('水圧 %s%%: 高圧結晶が約%s秒に1個できる', 'Pressure %s%%: one Pressure Crystal every %ss'),
-    'message.singulo.void_collector.idle': ('ジ・エンドの、真下が奈落まで空いている所でしか動かない', 'Works only in the End, over open void'),
-    'message.singulo.void_collector.rate': ('虚空 %s%%: 虚空の塵が約%s秒に1個集まる', 'Void %s%%: one Void Dust every %ss'),
-    'message.singulo.keraunos.busy': ('放電の準備中', 'Charging or cooling down'),
+    'message.singulo.stabilizer.need_catalyst': ('もう片方の手に触媒を持って使うこと', 'Hold a catalyst in your other hand'),
+    'message.singulo.stabilizer.already': ('この触媒はすでに安定化してある', 'This catalyst is already stabilized'),
+    'message.singulo.stabilizer.done': ('触媒を安定化した（残りの寿命が2倍になった）', 'Catalyst stabilized: remaining life doubled'),
+    'message.singulo.gravity_receiver.status': ('重力パネル %s / %s 枚が稼働中（1枚あたり %s FE/t）', 'Gravity panels active: %s / %s (%s FE/t each)'),
+    'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中', 'Stored %s / %s FE, gravity panels active: %s / %s'),
+    'message.singulo.deep_sea_collector.idle': ('水深が足りない（真上に16ブロック以上の水が必要）', 'Not deep enough: needs 16+ blocks of water above'),
+    'message.singulo.deep_sea_collector.rate': ('水圧 %s%%: 約%s秒ごとに高圧結晶が1個できる', 'Pressure %s%%: one Pressure Crystal every %ss'),
+    'message.singulo.void_collector.idle': ('ジ・エンドの、真下が奈落まで吹き抜けている場所でしか動かない', 'Works only in the End, over open void'),
+    'message.singulo.void_collector.rate': ('虚空 %s%%: 約%s秒ごとに虚空の塵が1個集まる', 'Void %s%%: one Void Dust every %ss'),
+    'message.singulo.keraunos.busy': ('放電の準備をしている', 'Charging or cooling down'),
     'message.singulo.keraunos.no_rod': ('16ブロック以内に避雷針がない', 'No lightning rod within 16 blocks'),
-    'message.singulo.keraunos.no_power': ('電力が足りない（1回に1,000,000 FE）', 'Not enough power (1,000,000 FE per shot)'),
+    'message.singulo.keraunos.no_power': ('電力が足りない（1回あたり 1,000,000 FE）', 'Not enough power (1,000,000 FE per shot)'),
     'message.singulo.keraunos.fire': ('放電！（蓄電 %s / %s FE）', 'Discharge! (%s / %s FE stored)'),
-    'message.singulo.keraunos.mode.manual': ('手動: 右クリックで撃つ', 'Manual: fire with a right-click'),
-    'message.singulo.keraunos.mode.redstone': ('赤石: 信号が入った瞬間に撃つ（右クリックでも撃てる）', 'Redstone: fires on a rising signal (right-click still fires)'),
-    'message.singulo.keraunos.mode.auto': ('自動: 電力がたまったら勝手に撃つ', 'Auto: fires whenever it is charged'),
+    'message.singulo.keraunos.mode.manual': ('手動: 右クリックで発射する', 'Manual: fire with a right-click'),
+    'message.singulo.keraunos.mode.redstone': ('赤石: 信号を受けた瞬間に発射する（右クリックでも撃てる）', 'Redstone: fires on a rising signal (right-click still fires)'),
+    'message.singulo.keraunos.mode.auto': ('自動: 電力がたまると自動で発射する', 'Auto: fires whenever it is charged'),
     'container.singulo.dimensional_pocket': ('次元ポケット', 'Dimensional Pocket'),
-    'message.singulo.hidden_records_complete': ('封印された記録はすべて読んだ', 'You have read every sealed record'),
-    'message.singulo.neutrino_scan': ('鉱石 %s 個・遺構のブロック %s 個が見えた', 'Found %s ores and %s ruin blocks'),
-    'message.singulo.neutrino_hidden': ('（感度が足りず映らない鉱石 %s 個）', ' (%s ores too deep for this sensitivity)'),
+    'message.singulo.hidden_records_complete': ('封印された記録をすべて読み終えた', 'You have read every sealed record'),
+    'message.singulo.neutrino_scan': ('鉱石 %s 個と遺構のブロック %s 個を検出した', 'Found %s ores and %s ruin blocks'),
+    'message.singulo.neutrino_hidden': ('（感度が足りず、映らない鉱石が %s 個ある）', ' (%s ores too deep for this sensitivity)'),
     'tooltip.singulo.scanner_tier': ('感度: 段階 %s / %s', 'Sensitivity: %s / %s'),
     'gui.singulo.observatory.tier': ('　感度 %s', ' · sensitivity %s'),
     'message.singulo.scanner_module.done': ('感度を段階 %s に上げた', 'Sensitivity raised to %s'),
-    'message.singulo.scanner_module.already': ('感度はもう段階 %s', 'Sensitivity is already %s'),
-    'message.singulo.scanner_module.need_scanner': ('もう片方の手にニュートリノ・スキャナーを持って使うか、観測所に使う',
+    'message.singulo.scanner_module.already': ('感度はすでに段階 %s だ', 'Sensitivity is already %s'),
+    'message.singulo.scanner_module.need_scanner': ('もう片方の手にニュートリノ・スキャナーを持って使うか、観測所に使うこと',
                                                     'Hold a Neutrino Scanner in your other hand, or use it on an observatory'),
     'message.singulo.hydrogen_leak': ('水素が漏れて引火した！', 'Leaking hydrogen ignited!'),
     'gui.singulo.slot.catalyst': ('触媒', 'Catalyst'),
@@ -503,7 +505,7 @@ UI_LANG = {
     'item.singulo.shield_permit.hint': ('右クリックで自分を、相手に右クリックでその人も登録', 'Use to register yourself; use on a player to add them'),
     'gui.singulo.reactor.interval': ('投入間隔', 'Feed interval'),
     'gui.singulo.reactor.interval.hint': ('0 で自動', '0 = auto'),
-    'gui.singulo.reactor.collapse': ('炉が質量に耐えきれず崩壊していく！', 'The reactor is collapsing under the mass!'),
+    'gui.singulo.reactor.collapse': ('炉が質量に耐えきれず、崩壊していく！', 'The reactor is collapsing under the mass!'),
     'gui.singulo.reactor.recaptured': ('野良ブラックホールを炉心に取り込んだ', 'The rogue black hole is now the core'),
     'block.singulo.rogue_black_hole': ('野良ブラックホール', 'Rogue Black Hole'),
     'item.singulo.settings_card.copied': ('設定を写した', 'Settings copied'),
@@ -516,7 +518,7 @@ UI_LANG = {
     'item.singulo.settings_card.hint': ('スニークして使うと写す　そのまま使うと貼る', 'Sneak-use to copy · Use to paste'),
     'gui.singulo.observatory.on': ('表示 入　鉱石 %s　遺構 %s', 'Display on · ores %s · ruins %s'),
     'gui.singulo.observatory.off': ('表示 切', 'Display off'),
-    'command.singulo.blackhole.done': ('%s, %s, %s に野良ブラックホールを出した　質量 %s', 'Rogue black hole at %s, %s, %s · mass %s'),
+    'command.singulo.blackhole.done': ('%s, %s, %s に野良ブラックホールを出現させた（質量 %s）', 'Rogue black hole at %s, %s, %s · mass %s'),
     'gui.singulo.reactor.slot.0': ('特異点の種', 'Singularity seed'),
     'gui.singulo.reactor.slot.1': ('質量ペレット', 'Mass pellets'),
     'gui.singulo.reactor.slot.2': ('ジェット・コレクター', 'Jet collectors'),
@@ -538,8 +540,8 @@ UI_LANG = {
     'compass.singulo.not_cleared': ('先に%sの保管庫を開けて攻略しよう', 'Clear %s first by opening its cache'),
     'compass.singulo.wrong_cache': ('調整には%sの保管庫が要る', 'Tuning needs the cache of %s'),
     'compass.singulo.max': ('これ以上は調整できない', 'Fully tuned'),
-    'command.singulo.ruin.done': ('%sを %s, %s, %s に建てた', 'Placed %s at %s, %s, %s'),
-    'command.singulo.ruin.unknown': ('知らない遺構: %s', 'Unknown ruin: %s'),
+    'command.singulo.ruin.done': ('%s を %s, %s, %s に生成した', 'Placed %s at %s, %s, %s'),
+    'command.singulo.ruin.unknown': ('不明な遺構: %s', 'Unknown ruin: %s'),
     'gui.singulo.power.on': ('稼働中（クリックで停止）', 'Running (click to stop)'),
     'gui.singulo.power.off': ('停止中（クリックで再開）', 'Stopped (click to resume)'),
     'gui.singulo.make_free.on': ('材料なしのレシピも作る', 'Also runs recipes without ingredients'),
@@ -568,6 +570,7 @@ UI_LANG = {
     'ruin.singulo.research_building': ('研究棟', 'Research Building'),
     'ruin.singulo.culture_facility': ('封鎖培養施設', 'Culture Facility'),
     'ruin.singulo.final_lab': ('最終実験施設', 'Final Lab'),
+    'ruin.singulo.sunken_reactor': ('沈んだ炉心区画', 'Sunken Reactor Sector'),
     'compass.singulo.target': ('探す遺構: %s', 'Target: %s'),
     'compass.singulo.found': ('%s は %s ブロック先', '%s is %s blocks away'),
     'compass.singulo.not_found': ('近くに %s が見つからない', 'No %s nearby'),
@@ -598,7 +601,8 @@ UI_LANG = {
     'jei.singulo.mb.event_horizon_shield': ('■ 形: 基壇から尖塔へすぼまる塔　高さ9\n■ 起動: 時間結晶触媒かシンギュラリティ・コアと電力\n■ 効果: 半径32を守る', '■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32'),
     'jei.singulo.mb.tipler_cylinder': ('■ 形: 5×5×9 の格納筒\n■ 起動: 時間結晶触媒・燃料・電力\n■ 燃料: エキゾチック物質\n■ 効果: 半径16が2倍速', '■ Shape: 5×5×9 housing\n■ Start: time crystal catalyst, fuel and power\n■ Fuel: exotic matter\n■ Effect: ×2 speed within 16'),
     'jei.singulo.mb.wormhole_generator': ('■ 形: 5×5×5 の球\n■ 起動: 100 MFE/t を10秒\n■ 結果: 一対のワームホールの口', '■ Shape: 5×5×5 sphere\n■ Start: 100 MFE/t for 10 s\n■ Result: a pair of wormhole mouths'),
-    'message.singulo.multiblock.not_formed': ('%s はまだ未完成', '%s is not complete yet'),
+    'jei.singulo.mb.genesis_engine': ('■ 形: 核を八角形に囲む枠8個と、柱4本×3段　7×4×7\n■ 起動: 原初の種を核に使ってから、電力を注ぐ\n■ 完成後: 画面に登録した物を、電力から生み出す', '■ Shape: 8 frames in an octagon around the core and 4 pylons 3 high, 7×4×7\n■ Start: use a Primordial Seed on the core, then pour in power\n■ Once complete: makes the item chosen on its screen from power'),
+    'message.singulo.multiblock.not_formed': ('%s はまだ完成していない', '%s is not complete yet'),
     'message.singulo.welcome': ('Singulo ハンドブックを受け取った。右クリックで開ける', 'You received the Singulo Handbook. Right-click to open it'),
     'gauntlet.singulo.area.cone': ('範囲: 前方の円錐', 'Area: forward cone'),
     'key.singulo.toggle_area': ('重力操作の範囲を切り替え', 'Toggle gravity tool area'),
@@ -666,9 +670,9 @@ UI_LANG = {
     'gui.singulo.stabilizer.casing': ('筐体', 'Casing'),
     'gui.singulo.wormhole.stabilizer': ('固定化 %s%% / %s%%、エキゾチック物質 %s 個', 'Stabilizing %s%% / %s%%, exotic matter: %s'),
     'gui.singulo.wormhole.status': ('喉 %1$s×%1$s　目標 %2$s×%2$s　エキゾチック物質 %3$s 個', 'Throat %1$s×%1$s · target %2$s×%2$s · exotic matter %3$s'),
-    'gui.singulo.wormhole.no_partner': ('つながる口がない', 'No paired mouth'),
-    'gui.singulo.wormhole.partner_unloaded': ('向こう側の口のチャンクが読み込まれていない', 'The paired mouth is not loaded'),
-    'gui.singulo.wormhole_port.no_mouth': ('8ブロック以内に開いた口がない', 'No open mouth within 8 blocks'),
+    'gui.singulo.wormhole.no_partner': ('つながる相手の口がない', 'No paired mouth'),
+    'gui.singulo.wormhole.partner_unloaded': ('向こう側の口があるチャンクが読み込まれていない', 'The paired mouth is not loaded'),
+    'gui.singulo.wormhole_port.no_mouth': ('8ブロック以内に開いている口がない', 'No open mouth within 8 blocks'),
     'gui.singulo.wormhole_port.no_partner': ('口の向こう側がつながっていない', 'The mouth is not connected'),
     'gui.singulo.wormhole_port.status': ('向こう側の入れ物 %s 個とつながっている', 'Connected to %s handlers on the other side'),
     'entity.singulo.security_drone': ('警備ドローン', 'Security Drone'),
@@ -682,38 +686,91 @@ UI_LANG = {
     'entity.singulo.gravity_debris': ('瓦礫', 'Gravity Debris'),
     'item.singulo.echo_sentinel_spawn_egg': ('残響の番人のスポーンエッグ', 'Echo Sentinel Spawn Egg'),
     'item.singulo.gravity_remnant_spawn_egg': ('重力の澱のスポーンエッグ', 'Gravity Remnant Spawn Egg'),
-    'gui.singulo.guardian.awakened.echo_sentinel': ('記録保管室の残響が形を取った。残響の番人が現れた',
+    'entity.singulo.ergosphere_leviathan': ('エルゴ球の大蛇', 'Ergosphere Leviathan'),
+    'entity.singulo.ergosphere_leviathan.awakened': ('覚醒したエルゴ球の大蛇', 'Awakened Ergosphere Leviathan'),
+    'item.singulo.ergosphere_leviathan_spawn_egg': ('エルゴ球の大蛇のスポーンエッグ', 'Ergosphere Leviathan Spawn Egg'),
+    'entity.singulo.last_archivist': ('最後の記録者', 'The Last Archivist'),
+    'item.singulo.last_archivist_spawn_egg': ('最後の記録者のスポーンエッグ', 'Last Archivist Spawn Egg'),
+    'gui.singulo.guardian.awakened.ergosphere_leviathan': ('止まった炉心に渦が開いた。何か小さなものが這い出してくる……',
+                                                           'A vortex opens in the dead core. Something small crawls out...'),
+    'entity.singulo.ergosphere_leviathan.wyrm': ('エルゴ球の龍', 'Ergosphere Wyrm'),
+    'entity.singulo.ergosphere_leviathan.wyrm.awakened': ('覚醒したエルゴ球の龍', 'Awakened Ergosphere Wyrm'),
+    'gui.singulo.leviathan.swallow': ('――床が裂け、巨大な顎がそれを丸呑みにした。エルゴ球の大蛇が姿を現した',
+                                      '--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises'),
+    'gui.singulo.leviathan.molt': ('大蛇が身を震わせた。炉殻の鱗が弾け飛び、光の骨格があらわになる',
+                                   'The Leviathan shudders. Its reactor-plate scales burst away, baring a skeleton of light'),
+    'gui.singulo.leviathan.submerge': ('大蛇が炉心の渦へ潜っていく。渦は広がり、光を呑み込んでいく……',
+                                       'The Leviathan dives into the core vortex. The vortex widens and swallows the light...'),
+    'gui.singulo.leviathan.ascend': ('渦が裂け、黒い龍が昇ってくる。翼のように広がるのは、降着円盤の光だ',
+                                     'The vortex tears open and a black wyrm rises, its wings a spread of accretion-disk light'),
+    'gui.singulo.guardian.defeated.ergosphere_leviathan': ('エルゴ球の大蛇は渦の底へ沈んでいった。保管庫の力場が消えた',
+                                                           'The Ergosphere Leviathan sinks into the vortex. The vault field dissipates'),
+    'gui.singulo.guardian.reset.ergosphere_leviathan': ('挑戦者がいなくなり、エルゴ球の大蛇は炉心の渦へ帰っていった',
+                                                        'No challenger remains. The Ergosphere Leviathan returns to the core'),
+    'gui.singulo.guardian.awakened_rematch.ergosphere_leviathan': ('覚醒核が共鳴する。覚醒したエルゴ球の大蛇が、渦を裂いて現れた',
+                                                                   'The core resonates. The Awakened Ergosphere Leviathan tears through the vortex'),
+    'gui.singulo.archivist.emerge_1': ('……誰かが、記録を読んだのか。', '...Someone has read the records.'),
+    'gui.singulo.archivist.emerge_2': ('ならば、最後の頁を見せよう。', 'Then let me show you the last page.'),
+    'gui.singulo.archivist.phase_2': ('覚えているか。記録はすべて、ここにある。', 'Do you remember? Every record is here.'),
+    'gui.singulo.archivist.phase_3': ('光も記録も、いつかはこの暗がりに沈む。', 'Light and records alike sink into this dark in the end.'),
+    'block.singulo.arena_hologram': ('ホログラムの床', 'Hologram Floor'),
+    'item.singulo.afterglow_wings.tip_1': ('胴に着ける光の翼。エリトラのように滑空でき、壊れない', 'Wings of light worn on the chest. Glide like an elytra; they never break'),
+    'item.singulo.afterglow_wings.tip_2': ('滑空中にスニーク: 羽ばたいて前へ加速する', 'Sneak while gliding: beat the wings to surge forward'),
+    'item.singulo.afterglow_wings.tip_3': ('着けていると落下ダメージを受けない。守りはダイヤモンドの胸当てと同じ',
+                                           'No fall damage while worn. Protects like a diamond chestplate'),
+    'gui.singulo.archivist.shield_up': ('力場が部屋を閉ざした。決着がつくまで、誰も外へは出られない。', 'A field seals the chamber. No one leaves until it ends.'),
+    'gui.singulo.archivist.shield_down': ('部屋を閉ざしていた力場がほどけた。', 'The field sealing the chamber unravels.'),
+    'gui.singulo.archivist.tide': ('重さの記録を、読み上げよう。', 'Let me read you the record of weight.'),
+    'gui.singulo.archivist.tide_final': ('もう、どこにも落ちられない。', 'There is nowhere left to fall.'),
+    'gui.singulo.archivist.death_1': ('……長い、夢を見ていた。', '...I have been dreaming a long dream.'),
+    'gui.singulo.archivist.death_2': ('記録は、読む者がいて初めて記録になる。', 'A record is only a record when someone reads it.'),
+    'gui.singulo.archivist.death_3': ('ありがとう。投入を止めるその手を、離さないで。', 'Thank you. Never let go of the hand that stops the feed.'),
+    'gui.singulo.archivist.reset': ('挑戦者がいなくなり、記録者は時間の場へ還っていった。コンソールには終焉の記録が残されている',
+                                    'No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console'),
+    'gui.singulo.guardian.awakened.echo_sentinel': ('記録保管室の残響が形をとった。残響の番人が現れた',
                                                     'The echoes of the archive take shape. The Echo Sentinel appears'),
-    'gui.singulo.guardian.defeated.echo_sentinel': ('残響の番人がほどけて消えた。保管庫の力場が消えた',
+    'gui.singulo.guardian.defeated.echo_sentinel': ('残響の番人は、ほどけるように消えた。保管庫の力場が消えた',
                                                     'The Echo Sentinel unravels. The vault field dissipates'),
-    'gui.singulo.guardian.reset.echo_sentinel': ('挑戦者がいなくなり、残響の番人は記録の中へ戻った',
+    'gui.singulo.guardian.reset.echo_sentinel': ('挑戦者がいなくなり、残響の番人は記録の中へ還っていった',
                                                  'No challenger remains. The Echo Sentinel returns to the records'),
+    'entity.singulo.echo_sentinel.awakened': ('覚醒した残響の番人', 'Awakened Echo Sentinel'),
+    'entity.singulo.gravity_remnant.awakened': ('覚醒した重力の澱', 'Awakened Gravity Remnant'),
+    'gui.singulo.guardian.awakened_rematch.echo_sentinel': ('覚醒核が共鳴する。覚醒した残響の番人が現れた',
+                                                            'The core resonates. The Awakened Echo Sentinel appears'),
+    'gui.singulo.guardian.awakened_rematch.gravity_remnant': ('覚醒核が共鳴する。覚醒した重力の澱が這い出してきた',
+                                                              'The core resonates. The Awakened Gravity Remnant crawls out'),
+    'gui.singulo.guardian.awakened_defeated': ('覚醒した番人を退けた。上質な欠片がこぼれ落ちた',
+                                               'The awakened guardian is defeated. Fine fragments spill out'),
+    'gui.singulo.boss.party': ('%s ［挑戦者 %s人］', '%s [%s challengers]'),
+    'gui.singulo.guardian.active': ('番人はすでに目覚めている', 'The guardian is already awake'),
+    'gui.singulo.guardian.no_vault': ('番人に守られた保管庫が近くにない', 'No guarded vault nearby'),
+    'gui.singulo.guardian.wrong_core': ('これは、この遺構の番人の覚醒核ではない', "This is not the awakening core for this ruin's guardian"),
     'gui.singulo.guardian.awakened.gravity_remnant': ('封じ込め槽が砕けた。重力の澱が這い出してきた',
                                                       'The containment tank shatters. The Gravity Remnant crawls out'),
-    'gui.singulo.guardian.defeated.gravity_remnant': ('重力の澱の核がつぶれた。保管庫の力場が消えた',
+    'gui.singulo.guardian.defeated.gravity_remnant': ('重力の澱の核が潰れた。保管庫の力場が消えた',
                                                       'The Gravity Remnant collapses. The vault field dissipates'),
-    'gui.singulo.guardian.reset.gravity_remnant': ('挑戦者がいなくなり、重力の澱は槽の中へ沈んだ',
+    'gui.singulo.guardian.reset.gravity_remnant': ('挑戦者がいなくなり、重力の澱は槽の底へ沈んでいった',
                                                    'No challenger remains. The Gravity Remnant sinks back into its tank'),
     'death.attack.singulo.tidal': ('%1$s は潮汐力で引き裂かれた', '%1$s was torn apart by tidal forces'),
     'death.attack.singulo.event_horizon': ('%1$s は事象の地平線を越えた', '%1$s crossed the event horizon'),
     'death.attack.singulo.tidal.player': ('%1$s は %2$s の特異点に引き裂かれた', "%1$s was torn apart by %2$s's singularity"),
-    'gui.singulo.console.awakened': ('封印が破れた。ホライズン・ウォーデンが目を覚ました', 'The seal breaks. The Horizon Warden awakens'),
+    'gui.singulo.console.awakened': ('封印が破れ、ホライズン・ウォーデンが目を覚ました', 'The seal breaks. The Horizon Warden awakens'),
     'gui.singulo.console.active': ('守護機はすでに起動している', 'The warden is already active'),
-    'gui.singulo.console.open': ('保管庫の封鎖は解かれている（覚醒の記録核を使うと、覚醒した守護機と再戦できる）',
+    'gui.singulo.console.open': ('保管庫の封鎖はすでに解かれている（覚醒の記録核を使えば、覚醒した守護機と再戦できる）',
                                  'The vault is not sealed (use an Awakening Record Core to fight the awakened warden)'),
     'gui.singulo.console.awakened_rematch': ('記録核が共鳴する。覚醒したホライズン・ウォーデンが目を覚ました',
                                              'The record core resonates. The Awakened Horizon Warden rises'),
     'gui.singulo.console.awakened_defeated': ('覚醒した守護機を退けた。残骸から上質な部品が転がり出た',
                                               'The awakened warden is defeated. Fine parts spill from the wreck'),
     'gui.singulo.console.no_vault': ('封鎖された保管庫が近くにない', 'No sealed vault nearby'),
-    'gui.singulo.console.defeated': ('守護機が沈黙した。保管庫の力場が消えた', 'The warden falls silent. The vault field dissipates'),
-    'gui.singulo.console.reset': ('挑戦者がいなくなり、守護機は封印に戻った', 'No challenger remains. The warden returns to its seal'),
-    'gui.singulo.cache.sealed': ('力場で封鎖されている。この遺構を守る番人を倒すこと',
+    'gui.singulo.console.defeated': ('守護機は沈黙した。保管庫の力場が消えた', 'The warden falls silent. The vault field dissipates'),
+    'gui.singulo.console.reset': ('挑戦者がいなくなり、守護機は封印の中へ戻った', 'No challenger remains. The warden returns to its seal'),
+    'gui.singulo.cache.sealed': ('力場で封鎖されている。この遺構を守る番人を倒さなければ開かない',
                                  "Sealed by a force field. Defeat this ruin's guardian"),
     'item.singulo.security_drone_spawn_egg': ('警備ドローンのスポーンエッグ', 'Security Drone Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
-    'gui.singulo.detector.none': ('重力異常は見つからない', 'No gravity anomaly found'),
-    'gui.singulo.detector.no_power': ('観測には %s FE 必要', 'An observation needs %s FE'),
+    'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
+    'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
     'gui.singulo.detector.band.0': ('256ブロック以内', 'within 256 blocks'),
     'gui.singulo.detector.band.1': ('256〜512ブロック', '256–512 blocks'),
     'gui.singulo.detector.band.2': ('512〜1024ブロック', '512–1024 blocks'),
@@ -727,6 +784,85 @@ UI_LANG = {
     'direction.singulo.southwest': ('南西', 'southwest'),
     'direction.singulo.west': ('西', 'west'),
     'direction.singulo.northwest': ('北西', 'northwest'),
+    'gui.singulo.genesis.formed': ('創世炉の形が整った。原初の種を核に使えば、宇宙の誕生が始まる',
+                                   'The Genesis Engine takes shape. Use a Primordial Seed on the core to begin'),
+    'gui.singulo.genesis.unformed': ('形ができていない（核のまわりを、枠8個と柱12個で囲むこと）',
+                                     'Not formed (surround the core with 8 frames and 12 pylons)'),
+    'gui.singulo.genesis.seeded': ('原初の種が核の中へ沈んでいった。種火をともすために電力を注げ', 'The seed sinks in. Pour in power to kindle it'),
+    'gui.singulo.genesis.kindled': ('種火がともり、宇宙が膨らみはじめた。電力を絶やさず、暴走の兆しに備えること',
+                                    'The seed ignites and a universe begins to swell. Keep the upkeep flowing and watch for surges'),
+    'gui.singulo.genesis.surge': ('暴走の兆し！投入を止めろ（核の画面のスイッチか、赤石信号で）',
+                                  'Surge warning! Stop the feed (the switch on the core screen, or a redstone signal)'),
+    'gui.singulo.genesis.surge_end': ('宇宙のうねりが静まった。投入を再開してよい', 'The surge subsides. You may resume the feed'),
+    'gui.singulo.genesis.collapse': ('生まれかけの宇宙が崩れかけ、進行が巻き戻った', 'The proto-universe nearly collapses. Progress is lost'),
+    'gui.singulo.genesis.event.leak': ('重力が漏れ出している', 'Gravity leaks out'),
+    'gui.singulo.genesis.event.echoes': ('記録の残響が引き寄せられてきた', 'Echoes of the records are drawn in'),
+    'gui.singulo.genesis.event.wave': ('引力の波が来る。落下に備えろ', 'A wave of gravity rises. Brace for the fall'),
+    'gui.singulo.genesis.birth_1': ('光が、一点へ落ちていく……', 'The light falls into a single point...'),
+    'gui.singulo.genesis.birth_2': ('すべての質量はエネルギーになった。だから今度は、', 'All mass became energy. So now,'),
+    'gui.singulo.genesis.birth_3': ('エネルギーから、宇宙をひとつ。', 'from energy, a universe.'),
+    'gui.singulo.genesis.birth_sky': ('生まれた銀河が、夜空へ昇っていった', 'The newborn galaxy rises into the night sky'),
+    'gui.singulo.genesis.complete': ('創世炉は質量を生み出せるようになった。核の画面で、作りたい物を登録しよう',
+                                     'The Genesis Engine can now make mass. Choose an item on the core\'s screen'),
+    'gui.singulo.genesis.stopped': ('投入を止めた', 'Feed stopped'),
+    'gui.singulo.genesis.resumed': ('投入を再開した', 'Feed resumed'),
+    'gui.singulo.genesis.not_synthesizable': ('それは創世炉では作れない', 'The Genesis Engine cannot make that'),
+    'gui.singulo.genesis.template': ('作る物: %s（1個あたり %s、希少度 %s）', 'Making: %s (%s each, rarity %s)'),
+    'gui.singulo.genesis.bar.kindling': ('種火 %s　受電 %s/t', 'Kindling %s  Intake %s/t'),
+    'gui.singulo.genesis.bar.stabilizing': ('安定化 %s　不安定度 %s', 'Stabilization %s  Instability %s'),
+    'gui.singulo.genesis.bar.surge': ('⚠ 暴走中！投入を止めろ　不安定度 %s', '⚠ Surging: stop the feed!  Instability %s'),
+    'gui.singulo.genesis.bar.surge_held': ('暴走を抑え込んでいる　不安定度 %s', 'Holding the surge  Instability %s'),
+    'gui.singulo.genesis.bar.synth': ('%s を生成中 %s　完成品 %s個', '%s %s  Ready: %s'),
+    'gui.singulo.genesis.bar.paused': ('［投入停止中］ %s', '[Feed stopped] %s'),
+    'gui.singulo.genesis.phase.0': ('未形成', 'Not formed'),
+    'gui.singulo.genesis.phase.1': ('揺籃', 'Cradle'),
+    'gui.singulo.genesis.phase.2': ('種火', 'Kindling'),
+    'gui.singulo.genesis.phase.3': ('安定化', 'Stabilizing'),
+    'gui.singulo.genesis.phase.4': ('誕生', 'Birth'),
+    'gui.singulo.genesis.phase.5': ('完成', 'Complete'),
+    'gui.singulo.genesis.hint.0': ('核のまわりを、枠8個と柱12個で囲む', 'Surround the core with 8 frames and 12 pylons'),
+    'gui.singulo.genesis.hint.1': ('原初の種を持って、核に使う', 'Use a Primordial Seed on the core'),
+    'gui.singulo.genesis.hint.2': ('電力を注ぎ、種火を育てる', 'Pour in power to grow the kindling'),
+    'gui.singulo.genesis.hint.3': ('電力を絶やさないこと。暴走の兆しが来たら投入を止める', 'Keep power up; stop the feed on a surge'),
+    'gui.singulo.genesis.hint.4': ('宇宙が生まれようとしている', 'A universe is being born'),
+    'gui.singulo.genesis.hint.5': ('作りたい物を左の枠に登録すると、電力から作り出す', 'Put an item in the frame to make it'),
+    'gui.singulo.genesis.screen.charge': ('種火', 'Kindling'),
+    'gui.singulo.genesis.screen.progress': ('安定化', 'Stability'),
+    'gui.singulo.genesis.screen.instability': ('不安定度', 'Instability'),
+    'gui.singulo.genesis.screen.birth': ('誕生', 'Birth'),
+    'gui.singulo.genesis.screen.intake': ('受電 %s/t', 'Input %s/t'),
+    'gui.singulo.genesis.screen.intake_cap': ('受電上限 %s/t', 'Max input %s/t'),
+    'gui.singulo.genesis.screen.surge': ('暴走の兆し！投入を止めろ', 'Surge! Stop the feed'),
+    'gui.singulo.genesis.screen.surge_held': ('暴走を抑えている', 'Holding the surge'),
+    'gui.singulo.genesis.screen.feed_on': ('投入中', 'Feeding'),
+    'gui.singulo.genesis.screen.feed_off': ('投入停止中', 'Feed stopped'),
+    'gui.singulo.genesis.screen.feed_redstone': ('赤石信号で停止中', 'Stopped by redstone'),
+    'gui.singulo.genesis.screen.feed_tip': ('クリックで投入を止める／再開する', 'Click to stop or resume the feed'),
+    'gui.singulo.genesis.screen.feed_tip_stabilizing': ('止めている間も蓄えから維持の電力を使い、異変は起きる。電力が足りないまま投入を続けると不安定になる',
+                                                        'While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability'),
+    'gui.singulo.genesis.screen.no_template': ('作る物が未登録', 'Nothing chosen yet'),
+    'gui.singulo.genesis.screen.cost': ('1個あたり %s', '%s each'),
+    'gui.singulo.genesis.screen.synth': ('生成中 %s', 'Making %s'),
+    'gui.singulo.genesis.screen.output': ('完成品', 'Output'),
+    'gui.singulo.genesis.screen.template_tip_1': ('作りたい物を持ってクリックすると登録される（手持ちの物は減らない）', 'Click with an item to choose it (it is not used up)'),
+    'gui.singulo.genesis.screen.template_tip_2': ('何も持たずにクリックすると登録を解除。インベントリの物をシフトクリックしても登録できる', 'Click empty-handed to clear; shift-click items to choose'),
+    'tooltip.singulo.genesis_core.memory': ('生まれた宇宙の記憶を宿している。置き直しても質量生成を続けられる（溜めた電力と作りかけの進み具合は引き継がない）',
+                                            'Holds the memory of the universe it bore. Place it again to resume mass synthesis (stored power and partial progress are not kept)'),
+    'ending.singulo.line.1': ('かつて、ある文明は、すべての質量をエネルギーに変えようとした。',
+                              'Once, a civilization tried to turn all mass into energy.'),
+    'ending.singulo.line.2': ('炉はその願いを叶えた。都市も、山も、海も。残ったのは重力の異常と、記録だけだった。',
+                              'The reactor granted that wish: the cities, the mountains, the sea. Only the anomaly and the records remained.'),
+    'ending.singulo.line.3': ('あなたはその記録を読み、同じ炉に火を入れた。そして、投入を止める手を離さなかった。',
+                              'You read those records and lit the same fire. And you never let go of the hand that stops the feed.'),
+    'ending.singulo.line.4': ('そして今、エネルギーは質量に戻り、星になり、銀河になった。',
+                              'And now the energy has become mass again, then stars, then a galaxy.'),
+    'ending.singulo.line.5': ('夜空を見上げてほしい。あの光は、あなたが生んだ宇宙だ。',
+                              'Look up at the night sky. That light is the universe you made.'),
+    'ending.singulo.archivist': ('――記録者の声がする。「最後の頁の、その先を。読ませてくれて、ありがとう」',
+                                 '— The Archivist\'s voice: "Beyond the last page. Thank you for letting me read it."'),
+    'ending.singulo.thanks': ('Thank you for playing', 'Thank you for playing'),
+    'ending.singulo.credit': ('Singulo', 'Singulo'),
+    'ending.singulo.skip': ('Esc で閉じる', 'Press Esc to close'),
 }
 
 
@@ -759,8 +895,8 @@ def lang_files():
     gen_docs.descriptions(ctx, ja, en)
     gen_docs.guide(ctx, ja, en)
     gen_docs.advancements(ctx, ja, en)
-    from records import RECORDS, HIDDEN_RECORDS
-    for rid, _, jt, jb, et, eb in RECORDS + HIDDEN_RECORDS:
+    from records import RECORDS, HIDDEN_RECORDS, FINAL_RECORDS, GENESIS_RECORDS
+    for rid, _, jt, jb, et, eb in RECORDS + HIDDEN_RECORDS + FINAL_RECORDS + GENESIS_RECORDS:
         ja[f'record.{MODID}.{rid}.title'], ja[f'record.{MODID}.{rid}.body'] = jt, jb
         en[f'record.{MODID}.{rid}.title'], en[f'record.{MODID}.{rid}.body'] = et, eb
     write_json(ASSETS / 'lang' / 'ja_jp.json', dict(sorted(ja.items())))
@@ -793,7 +929,7 @@ def models():
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
-        if kind in ('gravity', 'nature', 'boss_block'):
+        if kind in ('gravity', 'nature', 'boss_block', 'genesis'):
             continue                                           # 重力パネル・受電器・自然物・ボス部屋の仕掛けは blocks_extra・blocks_extra4・blocks_extra5 が作る
         if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'deco', 'deco_glass'):
             model = {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}}
@@ -884,6 +1020,8 @@ def models():
     blocks_extra4.models(write_json, ASSETS)
     import blocks_extra5
     blocks_extra5.models(write_json, ASSETS)
+    import genesis_assets
+    genesis_assets.models(write_json, ASSETS)
 
 
 def boost_overlay_model():
@@ -1104,7 +1242,7 @@ def textures():
             save(im, tb / 'ruin_cache_sealed.png')
 
     warden_textures(te, save)
-    for egg in ('horizon_warden', 'echo_sentinel', 'gravity_remnant'):
+    for egg in ('horizon_warden', 'echo_sentinel', 'gravity_remnant', 'ergosphere_leviathan', 'last_archivist'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # マルチブロックの部品
@@ -1311,6 +1449,8 @@ def art_textures():
     blocks_extra4.textures(tb, art16.save)
     import blocks_extra5
     blocks_extra5.textures(tb, art16.save)
+    import genesis_assets
+    genesis_assets.textures(tb, ti, art16.save)
     # 遺構の建材など、まだのっぺりしている絵にも汚し（使用感）を入れる
     from PIL import Image
     for name, (iid, _, kind) in MOD.items():
@@ -1869,9 +2009,99 @@ SOUNDS = {
     'deep_sea_collector.collect': ('machine/deep_sea_collector_collect', '高圧結晶ができる', 'Pressure crystal forms', 12),
     'void_collector.collect': ('machine/void_collector_collect', '虚空の塵が集まる', 'Void dust gathers', 12),
     'fulgurite.form': ('nature/fulgurite_form', '砂が雷ガラスになる', 'Sand fuses into fulgurite', 20),
+    'ergosphere_leviathan.emerge': ('boss/ergosphere_leviathan_emerge', '炉心に渦が開く', 'A vortex opens in the core', 48),
+    'ergosphere_leviathan.ambient': ('boss/ergosphere_leviathan_ambient', 'エルゴ球の大蛇が歌う', 'Ergosphere Leviathan sings', 32),
+    'ergosphere_leviathan.hurt': ('boss/ergosphere_leviathan_hurt', '鱗がきしむ', 'Scales grind', 20),
+    'ergosphere_leviathan.roar': ('boss/ergosphere_leviathan_roar', 'エルゴ球の大蛇が吠える', 'Ergosphere Leviathan roars', 48),
+    'ergosphere_leviathan.dive': ('boss/ergosphere_leviathan_dive', 'エルゴ球の大蛇が突進する', 'Ergosphere Leviathan dives', 32),
+    'ergosphere_leviathan.breath_charge': ('boss/ergosphere_leviathan_breath_charge', '口の渦が吸い込む', 'The maw draws in', 32),
+    'ergosphere_leviathan.breath_fire': ('boss/ergosphere_leviathan_breath_fire', '渦の光線が放たれる', 'Vortex breath fires', 48),
+    'ergosphere_leviathan.shed': ('boss/ergosphere_leviathan_shed', '鱗が剥がれる', 'Scales shed', 24),
+    'ergosphere_leviathan.death': ('boss/ergosphere_leviathan_death', 'エルゴ球の大蛇が沈んでいく', 'Ergosphere Leviathan sinks', 48),
+    'ergosphere_leviathan.implode': ('boss/ergosphere_leviathan_implode', '渦がつぶれる', 'The vortex collapses', 48),
+    'ergosphere_leviathan.hatchling': ('boss/ergosphere_leviathan_hatchling', '小さな何かが鳴く', 'Something small chirps', 16),
+    'ergosphere_leviathan.rumble': ('boss/ergosphere_leviathan_rumble', '床の下で何かがうごめく', 'Something stirs beneath the floor', 48),
+    'ergosphere_leviathan.swallow': ('boss/ergosphere_leviathan_swallow', '顎が閉じる', 'Jaws snap shut', 32),
+    'ergosphere_leviathan.whip': ('boss/ergosphere_leviathan_whip', '尾が薙ぎ払う', 'The tail lashes', 24),
+    'ergosphere_leviathan.molt': ('boss/ergosphere_leviathan_molt', '鱗が弾け飛ぶ', 'Scales burst away', 48),
+    'ergosphere_leviathan.coil': ('boss/ergosphere_leviathan_coil', '大蛇がとぐろを巻く', 'The Leviathan coils', 32),
+    'ergosphere_leviathan.ascend': ('boss/ergosphere_leviathan_ascend', '龍が噴き上がる', 'The wyrm erupts', 64),
+    'ergosphere_leviathan.jet_charge': ('boss/ergosphere_leviathan_jet_charge', '角に光が集まる', 'Light gathers in the horns', 32),
+    'ergosphere_leviathan.jet': ('boss/ergosphere_leviathan_jet', '相対論的ジェットが薙ぐ', 'Relativistic jets sweep', 48),
+    'ergosphere_leviathan.storm': ('boss/ergosphere_leviathan_storm', '特異点が降る', 'Singularities rain', 32),
+    'last_archivist.emerge': ('boss/last_archivist_emerge', '記録が集まる', 'Records gather', 48),
+    'last_archivist.ambient': ('boss/last_archivist_ambient', '最後の記録者がささやく', 'The Last Archivist whispers', 24),
+    'last_archivist.hurt': ('boss/last_archivist_hurt', '光輪が揺らぐ', 'The halo wavers', 20),
+    'last_archivist.phase': ('boss/last_archivist_phase', '記録者が姿を変える', 'The Archivist transforms', 48),
+    'last_archivist.judgment_aim': ('boss/last_archivist_judgment_aim', '光輪が狙いを定める', 'The halo takes aim', 32),
+    'last_archivist.judgment_fire': ('boss/last_archivist_judgment_fire', '裁きの光が降る', 'Judgment falls', 48),
+    'last_archivist.verdict': ('boss/last_archivist_verdict', '光の陣が描かれる', 'Circles are drawn', 32),
+    'last_archivist.collapse': ('boss/last_archivist_collapse', '小さな特異点が落ちる', 'Singularities fall', 32),
+    'last_archivist.recall': ('boss/last_archivist_recall', '記録者が記録を読み上げる', 'The Archivist recites', 32),
+    'last_archivist.nova_charge': ('boss/last_archivist_nova_charge', '光が内へ集まる', 'Light gathers inward', 48),
+    'last_archivist.nova': ('boss/last_archivist_nova', '新星が弾ける', 'Nova bursts', 64),
+    'last_archivist.death': ('boss/last_archivist_death', '光輪が砕ける', 'The halo shatters', 48),
+    'last_archivist.death_flash': ('boss/last_archivist_death_flash', '最後の光', 'The last light', 64),
+    'genesis.form': ('genesis/form', '創世炉が組み上がる', 'Genesis Engine assembles', 24),
+    'genesis.ambient': ('genesis/ambient', '創世炉が脈打つ', 'Genesis Engine pulses', 32),
+    'genesis.seed': ('genesis/seed', '原初の種が沈む', 'Primordial Seed sinks in', 32),
+    'genesis.ignite': ('genesis/ignite', '種火がともる', 'The seed ignites', 64),
+    'genesis.surge': ('genesis/surge', '宇宙がうねる', 'Proto-universe surges', 48),
+    'genesis.alarm': ('genesis/alarm', '暴走の兆し', 'Surge warning', 64),
+    'genesis.collapse': ('genesis/collapse', '宇宙が崩れかける', 'Proto-universe collapses', 64),
+    'genesis.lever': ('genesis/lever', '投入が切り替わる', 'Feed toggles', 16),
+    'genesis.birth_collapse': ('genesis/birth_collapse', '光が一点に落ちる', 'Light falls into a point', 96),
+    'genesis.big_bang': ('genesis/big_bang', '宇宙が生まれる', 'A universe is born', 128),
+    'genesis.sky': ('genesis/sky', '銀河が空へ昇る', 'A galaxy rises into the sky', 128),
+    'genesis.synth': ('genesis/synth', '質量が生まれる', 'Mass is synthesized', 24),
 }
 # 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
 SOUND_FALLBACKS = {
+    'ergosphere_leviathan.emerge': 'minecraft:entity.warden.emerge',
+    'ergosphere_leviathan.ambient': 'minecraft:entity.elder_guardian.ambient',
+    'ergosphere_leviathan.hurt': 'minecraft:entity.elder_guardian.hurt',
+    'ergosphere_leviathan.roar': 'minecraft:entity.ender_dragon.growl',
+    'ergosphere_leviathan.dive': 'minecraft:entity.phantom.swoop',
+    'ergosphere_leviathan.breath_charge': 'minecraft:entity.warden.sonic_charge',
+    'ergosphere_leviathan.breath_fire': 'minecraft:entity.warden.sonic_boom',
+    'ergosphere_leviathan.shed': 'minecraft:entity.shulker.shoot',
+    'ergosphere_leviathan.death': 'minecraft:entity.ender_dragon.death',
+    'ergosphere_leviathan.implode': 'minecraft:entity.generic.explode',
+    'ergosphere_leviathan.hatchling': 'minecraft:entity.silverfish.ambient',
+    'ergosphere_leviathan.rumble': 'minecraft:entity.warden.dig',
+    'ergosphere_leviathan.swallow': 'minecraft:entity.ravager.attack',
+    'ergosphere_leviathan.whip': 'minecraft:entity.player.attack.sweep',
+    'ergosphere_leviathan.molt': 'minecraft:entity.zombie.break_wooden_door',
+    'ergosphere_leviathan.coil': 'minecraft:entity.ender_dragon.flap',
+    'ergosphere_leviathan.ascend': 'minecraft:entity.wither.spawn',
+    'ergosphere_leviathan.jet_charge': 'minecraft:block.beacon.power_select',
+    'ergosphere_leviathan.jet': 'minecraft:entity.warden.sonic_boom',
+    'ergosphere_leviathan.storm': 'minecraft:block.respawn_anchor.deplete',
+    'last_archivist.emerge': 'minecraft:block.end_portal.spawn',
+    'last_archivist.ambient': 'minecraft:block.conduit.ambient',
+    'last_archivist.hurt': 'minecraft:block.amethyst_block.hit',
+    'last_archivist.phase': 'minecraft:item.totem.use',
+    'last_archivist.judgment_aim': 'minecraft:block.beacon.activate',
+    'last_archivist.judgment_fire': 'minecraft:entity.evoker.cast_spell',
+    'last_archivist.verdict': 'minecraft:block.respawn_anchor.charge',
+    'last_archivist.collapse': 'minecraft:block.respawn_anchor.deplete',
+    'last_archivist.recall': 'minecraft:entity.illusioner.cast_spell',
+    'last_archivist.nova_charge': 'minecraft:block.beacon.power_select',
+    'last_archivist.nova': 'minecraft:entity.warden.sonic_boom',
+    'last_archivist.death': 'minecraft:block.beacon.deactivate',
+    'last_archivist.death_flash': 'minecraft:block.end_portal.spawn',
+    'genesis.form': 'minecraft:block.beacon.activate',
+    'genesis.ambient': 'minecraft:block.beacon.ambient',
+    'genesis.seed': 'minecraft:block.respawn_anchor.charge',
+    'genesis.ignite': 'minecraft:block.end_portal_frame.fill',
+    'genesis.surge': 'minecraft:block.respawn_anchor.deplete',
+    'genesis.alarm': 'minecraft:block.bell.resonate',
+    'genesis.collapse': 'minecraft:entity.generic.explode',
+    'genesis.lever': 'minecraft:block.lever.click',
+    'genesis.birth_collapse': 'minecraft:block.portal.trigger',
+    'genesis.big_bang': 'minecraft:entity.wither.spawn',
+    'genesis.sky': 'minecraft:ui.toast.challenge_complete',
+    'genesis.synth': 'minecraft:block.amethyst_block.resonate',
     'horizon_warden.ambient': 'minecraft:block.beacon.ambient',
     'sealed_container.denied': 'minecraft:block.dispenser.fail',
     'sealed_container.insert': 'minecraft:block.vault.insert_item',
@@ -1919,6 +2149,14 @@ def sounds_json():
                     if str(p.relative_to(base)).replace('\\', '/')[:-4] not in used)
     if missing:
         raise SystemExit(f'効果音のファイルがない: {missing}')
+    # Java 側（SinguloSounds.NAMES）に登録がないと、鳴らした瞬間にゲームが落ちる
+    java = (Path(__file__).resolve().parent.parent / 'src' / 'main' / 'java' / 'io' / 'github' / 'genichimaruo' / 'singulo'
+            / 'registry' / 'SinguloSounds.java').read_text(encoding='utf-8')
+    names_block = java[java.index('NAMES = {'):java.index('};', java.index('NAMES = {'))]
+    registered = set(re.findall(r'"([a-z0-9_.]+)"', names_block))
+    if set(SOUNDS) != registered:
+        raise SystemExit(f'SinguloSounds.NAMES と SOUNDS が合わない: Java に足りない {sorted(set(SOUNDS) - registered)}、'
+                         f'余分 {sorted(registered - set(SOUNDS))}')
     if unused:
         print(f'  使っていない効果音のファイル: {unused}')
     if pending:
@@ -2020,12 +2258,14 @@ RUIN_PLACEMENT = {
     'research_building': (56, 20, 19370502, ['#minecraft:is_overworld']),
     'culture_facility': (64, 24, 19370503, ['#minecraft:is_overworld']),
     'final_lab': (96, 40, 19370504, ['#minecraft:is_overworld']),
+    'sunken_reactor': (112, 48, 19370505, ['#minecraft:is_overworld']),
 }
 # 地下の遺構を埋める高さ（構造物の床の Y の範囲）。深い遺構ほど後の段階
 RUIN_DEPTH = {
     'research_building': (-20, 4),
     'culture_facility': (-46, -30),
     'final_lab': (-56, -46),
+    'sunken_reactor': (-60, -54),
 }
 
 
@@ -2066,10 +2306,14 @@ def craters_data():
     })
 
 
+# 沈んだ炉心区画の保管庫の中身（1回の遠征ぶん）: (アイテム, 最小, 最大)。ほかにクリスタルメモリと、ときどきオーバークロック・チップ
+SUNKEN_REACTOR_LOOT = [('エキゾチック物質', 3, 5), ('ジェット凝縮体', 2, 3), ('H凝縮体', 1, 2)]
+
 # 番人の落とす物: 番人 → [(アイテム, 最小, 最大)]
 BOSS_LOOT = {
     'echo_sentinel': [('番人の投影核', 2, 2), ('クリスタルメモリ', 1, 2)],
     'gravity_remnant': [('縮退核', 2, 2), ('高圧結晶', 2, 4)],
+    'ergosphere_leviathan': [('渦の断章', 1, 1), ('エキゾチック物質', 4, 6), ('H凝縮体', 2, 3)],
 }
 
 
@@ -2123,7 +2367,8 @@ def ruins_data():
         })
     write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'ruins.json',
                {'values': [f'{MODID}:{rid}' for rid in ruins.RUINS]})
-    write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'gravity_anomalies.json', {'values': [f'{MODID}:final_lab']})
+    write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'gravity_anomalies.json',
+               {'values': [f'{MODID}:final_lab', f'{MODID}:sunken_reactor']})
 
     # 中身: 遺構ごとに1つの保管庫へ、1回の遠征ぶんを入れる。一回限りのもの（特異点の種）は別表で初回だけ
     pools, first = {}, {}
@@ -2135,7 +2380,14 @@ def ruins_data():
              {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]}
         (first if info['kind'] == 'once' else pools).setdefault(rid, []).append(pool)
     # クリスタルメモリ（旧文明の記録）。深い遺構ほど多い
-    fragments = {'observation_post': (1, 2), 'research_building': (1, 2), 'culture_facility': (2, 3), 'final_lab': (2, 3)}
+    fragments = {'observation_post': (1, 2), 'research_building': (1, 2), 'culture_facility': (2, 3), 'final_lab': (2, 3),
+                 'sunken_reactor': (2, 3)}
+    # 沈んだ炉心区画（段階5）: 探索でしか手に入らない物はなく、点火後の素材をまとめて持ち帰れる
+    for name, lo, hi in SUNKEN_REACTOR_LOOT:
+        pools.setdefault('sunken_reactor', []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid(name), 'functions': [
+            {'function': 'minecraft:set_count', 'count': lo if lo == hi else {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
+    pools['sunken_reactor'].append({'rolls': 1, 'entries': [
+        {'type': 'minecraft:item', 'name': mid('オーバークロック・チップ'), 'weight': 35}, {'type': 'minecraft:empty', 'weight': 65}]})
     for rid, (lo, hi) in fragments.items():
         pools.setdefault(rid, []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid('クリスタルメモリ'), 'functions': [
             {'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
@@ -2210,6 +2462,95 @@ def mass_values():
     write_json(DATA / 'mass_values' / 'default.json', {'entries': out})
 
 
+def mass_synthesis():
+    """創世炉の質量生成の表: (アイテムかタグ, 質量, 希少度 0〜4)。1個の電力 = 質量 × genesisBaseCost × 10^希少度。
+    質量は mass_values と同じ尺度（石1ブロック = 1）。Singulo の物（圧縮ブロック・質量ペレットなど）は載せない。
+    生成した物を炉に戻して得をしないよう、質量は mass_values の値以上にする（作物は #c:crops で一括、品目ごとに下げない）。
+    加工すると質量値が増える物（原木→板材4枚、かぼちゃ→種4粒）は、加工したあとの質量にする。
+    GameTest synthesizedItemsNeverFeedAProfit が、登録されたすべてのレシピをたどって確かめる。
+    c:ingots・c:plates には Singulo の鋼が入るので、金属は種類ごとのタグで指定する。"""
+    entries = [
+        # 0: ありふれた物（石・土・木・植物・食べ物・色）
+        ('#c:stones', 1, 0), ('#c:cobblestones', 1, 0), ('#minecraft:stone_bricks', 1, 0), ('#c:sandstone/blocks', 1, 0),
+        ('#minecraft:dirt', 0.5, 0), ('#c:sands', 0.5, 0), ('#c:gravels', 0.5, 0), ('#c:netherracks', 1, 0),
+        ('#c:obsidians', 1.2, 0), ('#minecraft:terracotta', 1, 0), ('#c:concretes', 1, 0), ('#c:concrete_powders', 0.5, 0),
+        ('#c:glass_blocks', 0.5, 0), ('#c:glass_panes', 0.2, 0),
+        ('minecraft:end_stone', 1, 0), ('minecraft:deepslate', 1.2, 0), ('minecraft:cobbled_deepslate', 1.2, 0),
+        ('minecraft:tuff', 1, 0), ('minecraft:calcite', 1, 0), ('minecraft:andesite', 1, 0), ('minecraft:diorite', 1, 0),
+        ('minecraft:granite', 1, 0), ('minecraft:basalt', 1.2, 0), ('minecraft:smooth_basalt', 1.2, 0),
+        ('minecraft:blackstone', 1.2, 0), ('minecraft:dripstone_block', 1, 0), ('minecraft:pointed_dripstone', 0.25, 0),
+        ('minecraft:magma_block', 1, 0), ('minecraft:soul_sand', 0.5, 0), ('minecraft:soul_soil', 0.5, 0),
+        ('minecraft:clay', 0.5, 0), ('minecraft:clay_ball', 0.1, 0), ('minecraft:mud', 0.5, 0), ('minecraft:brick', 0.1, 0),
+        ('minecraft:snow_block', 0.5, 0), ('minecraft:snowball', 0.1, 0), ('minecraft:ice', 0.5, 0), ('minecraft:packed_ice', 1, 0),
+        ('minecraft:moss_block', 0.5, 0), ('minecraft:flint', 0.1, 0),
+        ('#minecraft:logs', 1, 0), ('#minecraft:planks', 0.25, 0), ('minecraft:pumpkin', 1, 0), ('#minecraft:leaves', 0.25, 0),
+        ('#minecraft:saplings', 0.25, 0), ('#minecraft:flowers', 0.25, 0), ('#c:mushrooms', 0.25, 0),
+        ('#c:crops', 0.25, 0), ('#c:seeds', 0.25, 0), ('#minecraft:wool', 0.25, 0), ('#minecraft:wool_carpets', 0.1, 0),
+        ('#c:dyes', 0.1, 0), ('minecraft:stick', 0.1, 0), ('minecraft:bamboo', 0.25, 0), ('minecraft:kelp', 0.25, 0),
+        ('minecraft:vine', 0.1, 0), ('minecraft:lily_pad', 0.1, 0), ('minecraft:glow_lichen', 0.1, 0),
+        ('minecraft:paper', 0.1, 0), ('minecraft:sugar', 0.1, 0), ('minecraft:apple', 0.25, 0),
+        ('minecraft:sweet_berries', 0.25, 0), ('minecraft:glow_berries', 0.25, 0),
+        ('minecraft:beef', 0.25, 0), ('minecraft:porkchop', 0.25, 0), ('minecraft:chicken', 0.25, 0),
+        ('minecraft:mutton', 0.25, 0), ('minecraft:rabbit', 0.25, 0), ('minecraft:cod', 0.25, 0), ('minecraft:salmon', 0.25, 0),
+        ('minecraft:egg', 0.1, 0), ('minecraft:feather', 0.1, 0), ('minecraft:ink_sac', 0.1, 0),
+        ('minecraft:rotten_flesh', 0.1, 0),
+        # 1: 普通の資源（金属・鉱石・燃料・魔法の粉・モブの落とし物）
+        ('#c:ingots/iron', 3 / 9, 1), ('#c:ingots/copper', 3 / 9, 1), ('#c:ingots/gold', 7 / 9, 1),
+        ('#c:storage_blocks/iron', 3, 1), ('#c:storage_blocks/copper', 3, 1), ('#c:storage_blocks/gold', 7, 1),
+        ('minecraft:iron_nugget', 3 / 81, 1), ('minecraft:gold_nugget', 7 / 81, 1),
+        ('minecraft:raw_iron', 3 / 9, 1), ('minecraft:raw_copper', 3 / 9, 1), ('minecraft:raw_gold', 7 / 9, 1),
+        ('minecraft:raw_iron_block', 3, 1), ('minecraft:raw_copper_block', 3, 1), ('minecraft:raw_gold_block', 7, 1),
+        ('minecraft:coal_ore', 1, 1), ('minecraft:deepslate_coal_ore', 1.2, 1), ('minecraft:iron_ore', 1, 1),
+        ('minecraft:deepslate_iron_ore', 1.2, 1), ('minecraft:copper_ore', 1, 1), ('minecraft:deepslate_copper_ore', 1.2, 1),
+        ('minecraft:gold_ore', 1, 1), ('minecraft:deepslate_gold_ore', 1.2, 1), ('minecraft:redstone_ore', 1, 1),
+        ('minecraft:deepslate_redstone_ore', 1.2, 1), ('minecraft:lapis_ore', 1, 1), ('minecraft:deepslate_lapis_ore', 1.2, 1),
+        ('minecraft:nether_quartz_ore', 1, 1), ('minecraft:nether_gold_ore', 1, 1),
+        ('minecraft:coal', 0.2, 1), ('minecraft:charcoal', 0.2, 1), ('minecraft:coal_block', 1.8, 1),
+        ('minecraft:redstone', 0.1, 1), ('minecraft:redstone_block', 0.9, 1),
+        ('minecraft:lapis_lazuli', 0.1, 1), ('minecraft:lapis_block', 0.9, 1),
+        ('minecraft:quartz', 0.2, 1), ('minecraft:quartz_block', 0.8, 1),
+        ('minecraft:glowstone_dust', 0.1, 1), ('minecraft:glowstone', 0.4, 1),
+        ('minecraft:amethyst_shard', 0.2, 1), ('minecraft:amethyst_block', 0.8, 1),
+        ('minecraft:slime_ball', 0.1, 1), ('minecraft:slime_block', 0.9, 1), ('minecraft:honeycomb', 0.1, 1),
+        ('minecraft:magma_cream', 0.1, 1), ('minecraft:glow_ink_sac', 0.1, 1), ('minecraft:blue_ice', 2, 1),
+        ('minecraft:gunpowder', 0.1, 1), ('minecraft:string', 0.05, 1), ('minecraft:bone', 0.1, 1),
+        ('minecraft:bone_meal', 0.05, 1), ('minecraft:bone_block', 0.9, 1), ('minecraft:leather', 0.1, 1),
+        ('minecraft:rabbit_hide', 0.05, 1), ('minecraft:spider_eye', 0.1, 1), ('minecraft:armadillo_scute', 0.1, 1),
+        ('minecraft:chorus_fruit', 0.1, 1), ('minecraft:sculk', 0.5, 1),
+        # 2: 貴重な物（宝石・エンダー・ネザーの素材・宝の品）
+        ('minecraft:diamond', 1, 2), ('minecraft:diamond_block', 9, 2), ('minecraft:diamond_ore', 1, 2),
+        ('minecraft:deepslate_diamond_ore', 1.2, 2), ('minecraft:emerald', 1, 2), ('minecraft:emerald_block', 9, 2),
+        ('minecraft:emerald_ore', 1, 2), ('minecraft:deepslate_emerald_ore', 1.2, 2),
+        ('minecraft:ender_pearl', 0.5, 2), ('minecraft:ender_eye', 0.6, 2), ('minecraft:blaze_rod', 0.3, 2),
+        ('minecraft:blaze_powder', 0.15, 2), ('minecraft:breeze_rod', 0.3, 2), ('minecraft:ghast_tear', 0.2, 2),
+        ('minecraft:phantom_membrane', 0.2, 2), ('minecraft:prismarine_shard', 0.2, 2),
+        ('minecraft:prismarine_crystals', 0.2, 2), ('minecraft:sponge', 0.5, 2), ('minecraft:nautilus_shell', 0.3, 2),
+        ('minecraft:turtle_scute', 0.2, 2), ('minecraft:rabbit_foot', 0.1, 2), ('minecraft:goat_horn', 0.2, 2),
+        ('minecraft:golden_apple', 0.8, 2), ('minecraft:experience_bottle', 0.2, 2), ('minecraft:name_tag', 0.2, 2),
+        ('minecraft:saddle', 0.5, 2), ('minecraft:trial_key', 0.2, 2), ('minecraft:sculk_catalyst', 1, 2),
+        ('minecraft:sculk_sensor', 0.5, 2), ('minecraft:sculk_shrieker', 1, 2),
+        ('minecraft:zombie_head', 0.5, 2), ('minecraft:skeleton_skull', 0.5, 2), ('minecraft:creeper_head', 0.5, 2),
+        ('minecraft:piglin_head', 0.5, 2), ('#c:music_discs', 0.2, 2), ('#minecraft:trim_templates', 0.5, 2),
+        # 3: 稀少な物（ネザライト・深層・海の秘宝）
+        ('minecraft:netherite_scrap', 0.6, 3), ('minecraft:netherite_ingot', 20 / 9, 3), ('minecraft:netherite_block', 20, 3),
+        ('minecraft:ancient_debris', 2, 3), ('minecraft:netherite_upgrade_smithing_template', 0.5, 3),
+        ('minecraft:echo_shard', 0.3, 3), ('minecraft:shulker_shell', 0.5, 3), ('minecraft:heart_of_the_sea', 1, 3),
+        ('minecraft:conduit', 1, 3), ('minecraft:trident', 3, 3), ('minecraft:totem_of_undying', 1, 3),
+        ('minecraft:wither_skeleton_skull', 0.5, 3), ('minecraft:sniffer_egg', 1, 3), ('minecraft:ominous_trial_key', 0.3, 3),
+        ('minecraft:dragon_breath', 0.5, 3), ('minecraft:enchanted_golden_apple', 3, 3),
+        # 4: 伝説の物
+        ('minecraft:nether_star', 5, 4), ('minecraft:beacon', 6, 4), ('minecraft:heavy_core', 4, 4),
+        ('minecraft:dragon_head', 2, 4), ('minecraft:elytra', 3, 4), ('minecraft:dragon_egg', 10, 4),
+    ]
+    out = []
+    for k, m, tier in entries:
+        e = {'tag': k[1:]} if k.startswith('#') else {'item': k}
+        e['mass'] = round(m, 4)
+        e['tier'] = tier
+        out.append(e)
+    write_json(DATA / 'mass_synthesis' / 'default.json', {'entries': out})
+
+
 def thermal():
     """設計書「段階1の発電: 熱電発電機」の表。"""
     write_json(DATA / 'thermal' / 'default.json', {
@@ -2259,7 +2600,8 @@ TAB_GROUPS = [
                    'shield_tower_crown',
                    'tipler_core', 'tipler_frame', 'tipler_housing', 'tipler_bearing', 'tipler_window', 'tipler_holder',
                    'wormhole_generator_core', 'wormhole_generator_shell', 'wormhole_generator_coil', 'wormhole_generator_focuser',
-                   'wormhole_generator_window', 'wormhole_generator_port']),
+                   'wormhole_generator_window', 'wormhole_generator_port',
+                   'genesis_core', 'genesis_frame', 'genesis_pylon', 'primordial_seed']),
     ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel', 'keraunos_tower', 'deep_sea_collector', 'void_collector',
                      'low_gravity_panel',
                      'high_gravity_panel', 'gravitational_wave_detector', 'neutrino_observatory',
@@ -2283,7 +2625,8 @@ TAB_GROUPS = [
             'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock',
             'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
-                     'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg']),
+                     'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
+                     'last_archivist_spawn_egg']),
 ]
 
 
@@ -2559,7 +2902,7 @@ def validate():
 
 
 # わざと透ける（ガラス・重ね絵）以外のブロックのテクスチャ
-SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay')
+SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram')
 
 
 GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind in ('part_glass', 'ruin_glass', 'deco_glass')}
@@ -2657,6 +3000,7 @@ def main():
     sealed_container_assets()
     tags()
     mass_values()
+    mass_synthesis()
     thermal()
     ruins_data()
     craters_data()
