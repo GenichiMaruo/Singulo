@@ -2,9 +2,9 @@
 
 **From a thermocouple to a rotating black hole.**
 
-Singulo is a technology mod for Minecraft 1.20.1 (Forge or NeoForge) and 1.21.1 (NeoForge).
+Singulo is a technology mod for Minecraft 1.21.1 (NeoForge), with older builds for 1.20.1 (Forge or NeoForge).
 Build a factory, recover lost technology from guarded ruins and work your way up through cryogenics, quantum physics and time crystals.
-At the end you ignite a black hole and draw power from its spin.
+You ignite a black hole and draw power from its spin, and in the end you use that power to give birth to a universe.
 
 The themes come from real physics: superconductivity, particle accelerators, the Casimir effect, Hawking radiation and the Penrose process.
 The mechanics and numbers are tuned for gameplay, not for simulation.
@@ -82,7 +82,19 @@ After the endgame, every boss can be refought in an awakened form with more heal
 use an Awakening Record Core on the Final Lab's seal console, or an awakened core on the guardian core of the other ruins.
 Awakened guardians drop chapters of records... and someone is still waiting to be read.
 
+Bosses grow stronger with the number of challengers, and everyone's attacks land, so bigger parties win faster. Rewards are counted for the players present when the fight begins.
+
 Decoded records add the story of the lost civilization to your handbook.
+
+### The final goal: the Genesis Engine
+
+The old civilization tried to turn all mass into energy and perished. The Genesis Engine does the reverse.
+
+1. Build a **Genesis Core** ringed by eight frames and twelve pylons, and plant a **Primordial Seed** made from a chapter of the Vortex.
+2. Pour in **1.5 TFE** to kindle it, then hold **100 MFE/t** while a proto-universe stabilizes. Stop the feed when the surge alarm sounds, or the universe collapses and you lose progress.
+3. Watch it be born: light falls into a point, a flash, and a galaxy unfurls and **rises into the overworld night sky** for every player.
+
+Afterwards the engine performs **mass synthesis**: it turns power into items, from stone to nether stars. Rarer items cost orders of magnitude more power.
 
 ---
 
@@ -107,9 +119,10 @@ Choose the file for your Minecraft version. The suffix **F** means Forge and **N
 | --- | --- | --- | --- |
 | **1.20.1** | **Forge 47.4.26** or later for 1.20.1 | **17** | [1.20.1F release](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1F) · [1.20.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) |
 | **1.20.1** | **NeoForge 47.1.106** | **17** | [1.20.1N release](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1N) · [1.20.1 NeoForge source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) |
-| **1.21.1** | **NeoForge 21.1.256** or later for 1.21.1 | **21** | [1.21.1N file](https://www.curseforge.com/minecraft/mc-mods/singulo/files/9118572) · [1.21.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/main) |
+| **1.21.1** | **NeoForge 21.1.256** or later for 1.21.1 | **21** | [1.21.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) · [1.21.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/main) |
 
 You can also filter the CurseForge Files tab by Minecraft version and mod loader.
+The latest content (the Genesis Engine, the Sunken Reactor Sector and the new bosses) is only in the 1.21.1 build; the 1.20.1 builds stay at 0.3.0.
 JEI is optional and supported on both versions.
 
 Multiplayer servers and clients both need the mod.
