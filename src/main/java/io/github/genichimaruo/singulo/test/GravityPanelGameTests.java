@@ -95,6 +95,89 @@ public final class GravityPanelGameTests {
         });
     }
 
+    /** 受電器 A（x=0）・パネル6枚（x=1..6）・受電器 B（x=7）の一列を置く。 */
+    private static GravityReceiverBlockEntity[] twoReceivers(GameTestHelper helper) {
+        helper.setBlock(new BlockPos(0, 1, 1), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
+        helper.setBlock(new BlockPos(7, 1, 1), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
+        for (int x = 1; x <= 6; x++) {
+            helper.setBlock(new BlockPos(x, 1, 1), SinguloBlocks.LOW_GRAVITY_PANEL.get());
+        }
+        return new GravityReceiverBlockEntity[] {helper.getBlockEntity(new BlockPos(0, 1, 1)), helper.getBlockEntity(new BlockPos(7, 1, 1))};
+    }
+
+    /** 受電器が複数あっても、どれか1台だけで集まり全体を働かせられる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 60)
+    public static void oneOfSeveralReceiversPowersAllPanels(GameTestHelper helper) {
+        GravityReceiverBlockEntity[] r = twoReceivers(helper);
+        int per = GravityReceiverBlockEntity.perPanel();
+        helper.onEachTick(() -> r[1].energy().receiveLong(6L * per, false));
+        helper.runAtTickTime(30, () -> {
+            for (int x = 1; x <= 6; x++) {
+                helper.assertTrue(powered(helper, new BlockPos(x, 1, 1)), "片方の受電器だけでは働かない: x=" + x);
+            }
+            helper.assertTrue(r[1].supplyingPanels() == 6 && r[0].supplyingPanels() == 0,
+                    "払った枚数が違う: A=" + r[0].supplyingPanels() + " B=" + r[1].supplyingPanels());
+            helper.assertTrue(r[0].panels() == 6 && r[0].activePanels() == 6, "A の表示が違う: " + r[0].activePanels() + "/" + r[0].panels());
+            helper.succeed();
+        });
+    }
+
+    /** どちらにも十分な電力があれば、パネルごとに近いほうの受電器が払う。 */
+    @GameTest(template = EMPTY, timeoutTicks = 60)
+    public static void nearestReceiverPaysForEachPanel(GameTestHelper helper) {
+        GravityReceiverBlockEntity[] r = twoReceivers(helper);
+        int per = GravityReceiverBlockEntity.perPanel();
+        helper.onEachTick(() -> {
+            r[0].energy().receiveLong(6L * per, false);
+            r[1].energy().receiveLong(6L * per, false);
+        });
+        helper.runAtTickTime(30, () -> {
+            helper.assertTrue(r[0].supplyingPanels() == 3 && r[1].supplyingPanels() == 3,
+                    "近いほうが払っていない: A=" + r[0].supplyingPanels() + " B=" + r[1].supplyingPanels());
+            helper.succeed();
+        });
+    }
+
+    /** 近い受電器の電力が弱いときは、払えない分を遠い受電器が払う。 */
+    @GameTest(template = EMPTY, timeoutTicks = 60)
+    public static void fartherReceiverCoversWeakSupply(GameTestHelper helper) {
+        GravityReceiverBlockEntity[] r = twoReceivers(helper);
+        int per = GravityReceiverBlockEntity.perPanel();
+        helper.onEachTick(() -> {
+            r[0].energy().receiveLong(per, false);
+            r[1].energy().receiveLong(6L * per, false);
+        });
+        helper.runAtTickTime(30, () -> {
+            for (int x = 1; x <= 6; x++) {
+                helper.assertTrue(powered(helper, new BlockPos(x, 1, 1)), "遠い受電器が補わない: x=" + x);
+            }
+            helper.assertTrue(r[0].supplyingPanels() == 1 && r[1].supplyingPanels() == 5,
+                    "払った枚数が違う: A=" + r[0].supplyingPanels() + " B=" + r[1].supplyingPanels());
+            helper.succeed();
+        });
+    }
+
+    /** 衝撃発電パネルは、ためた電力をケーブルへ送り出す（ケーブルから受け取りはしない）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void impactGeneratorFeedsCables(GameTestHelper helper) {
+        BlockPos gen = new BlockPos(1, 1, 3);
+        helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
+        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = helper.getBlockEntity(gen);
+        be.absorb(5);
+        for (int z = 2; z >= 1; z--) {
+            helper.setBlock(new BlockPos(1, 1, z), SinguloBlocks.SUPERCONDUCTING_CABLE.get());
+        }
+        BlockPos kilnPos = new BlockPos(1, 1, 0);
+        helper.setBlock(kilnPos, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.KILN).get());
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity kiln = helper.getBlockEntity(kilnPos);
+        var cap = helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                helper.absolutePos(gen), Direction.NORTH);
+        helper.assertTrue(cap != null && cap.canExtract() && !cap.canReceive(), "ケーブル用の口が取り出し専用でない");
+        helper.assertTrue(cap.receiveEnergy(1_000, false) == 0, "ケーブルから受け取ってしまう");
+        helper.succeedWhen(() -> helper.assertTrue(kiln.energy().getEnergyStored() > 0 && be.stored() < 5_000,
+                "ケーブルの先へ送られない: kiln=" + kiln.energy().getEnergyStored() + " gen=" + be.stored()));
+    }
+
     /** 同じ種類のパネルどうしは見た目がつながり、ちがう種類とはつながらない。 */
     @GameTest(template = EMPTY)
     public static void panelsJoinOnlyTheSameKind(GameTestHelper helper) {
