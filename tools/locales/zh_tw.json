@@ -1265,7 +1265,7 @@
   },
   "desc.singulo.coolant_cartridge": {
     "source": "A steel canister holding 100 mB of liquid nitrogen. Lets the Precision Assembler build cryogenic parts such as quantum computing modules.",
-    "translation": "裝有 100 mB 液氮的鋼罐。讓無法放入液體的精密組裝台也能組裝量子運算模組等低溫零件。"
+    "translation": "裝有 100 mB 液態氮的鋼罐。讓無法放入液體的精密組裝台也能組裝量子運算模組等低溫零件。"
   },
   "desc.singulo.cooling_tower_base": {
     "source": "The 5×5 foundation of the tower.",
@@ -1324,8 +1324,8 @@
     "translation": "僅限創造模式。無限的電力，持續輸送給所有相鄰的方塊。"
   },
   "desc.singulo.cryogenic_cooling_tower": {
-    "source": "Liquefies nitrogen (and helium at height 10+).",
-    "translation": "液化氮氣（塔高 10 以上時也能液化氦氣）。"
+    "source": "A multiblock that liquefies nitrogen from the air, and helium too once it is 10 or more blocks tall.",
+    "translation": "從空氣製造液態氮的多方塊結構；塔高 10 以上時還能將氦液化為液態氦。"
   },
   "desc.singulo.cryogenic_turbine": {
     "source": "Generates power from evaporating cryogens.",
@@ -1341,7 +1341,7 @@
   },
   "desc.singulo.data_card_observation_log": {
     "source": "A copy of an observation log, usable in recipes.",
-    "translation": "觀察日誌的副本，可用於配方。"
+    "translation": "觀測日誌的副本，可用於配方。"
   },
   "desc.singulo.data_card_quantum_fragment": {
     "source": "A copy of a quantum data fragment.",
@@ -1360,8 +1360,8 @@
     "translation": "將物質壓碎，製成簡併物質殼與反應爐零件。"
   },
   "desc.singulo.degenerate_compactor_anvil": {
-    "source": "Bottom centre; takes the blows.",
-    "translation": "位於底部中心；承受錘擊。"
+    "source": "The anvil at the centre of the Degenerate Compactor floor. It takes the blows of the ram from above.",
+    "translation": "放在簡併壓縮爐底面中心的砧座，承受上方撞錘的撞擊。"
   },
   "desc.singulo.degenerate_compactor_controller": {
     "source": "Middle of the front, second layer, of the 5×5×5 press.",
@@ -1444,8 +1444,8 @@
     "translation": "劣化的零件。在檔案終端中修復它。"
   },
   "desc.singulo.degraded_time_crystal_seed": {
-    "source": "Restore it to grow time crystals.",
-    "translation": "修復後可培育時間晶體。"
+    "source": "A seed found in the Culture Facility. Restore it to grow time crystals.",
+    "translation": "在封閉培養設施拾得的種子。修復後可培育時間晶體。"
   },
   "desc.singulo.dimensional_pocket": {
     "source": "Right-click to open your own 27-slot storage from anywhere. The contents survive death.",
@@ -1576,8 +1576,8 @@
     "translation": "爐心質量較小時（催化劑模式；開啟回收運轉即可保持），每5分鐘收集1個霍金凝聚體。"
   },
   "desc.singulo.hawking_condensate": {
-    "source": "Condensed Hawking radiation.",
-    "translation": "凝聚的霍金輻射。"
+    "source": "Condensed Hawking radiation. An ingredient of the Singularity Core.",
+    "translation": "收集霍金輻射凝聚而成。奇點核心的材料。"
   },
   "desc.singulo.heat_exchange_core": {
     "source": "Heat exchangers stacked up the middle of the tower.",
@@ -1633,15 +1633,15 @@
   },
   "desc.singulo.laser_cooler": {
     "source": "Laser-cools atoms into cold atoms, lattices and condensates.",
-    "translation": "以雷射冷卻原子，製成冷原子、光學晶格基板與凝聚態催化劑。"
+    "translation": "以雷射冷原子，製成冷原子、光學晶格基板與凝聚態催化劑。"
   },
   "desc.singulo.low_gravity_panel": {
     "source": "When powered, standing on it cuts your gravity to a fifth until you next land (less fall damage too). Joins visually with its neighbours.",
     "translation": "通電時，站在上面會使你的重力降為五分之一，直到下次著地（摔落傷害也會減少）。外觀會與相鄰的面板相連。"
   },
   "desc.singulo.magnetic_bottle": {
-    "source": "Captures strangelets and contains leaking strange matter.",
-    "translation": "捕獲奇異子，並收容洩漏的奇異夸克物質方塊。"
+    "source": "A bottle that traps strangelets in a magnetic field. Use it on leaking strange matter to contain and collect it.",
+    "translation": "以磁場捕捉奇異子的瓶子。對洩漏的奇異夸克物質方塊使用，即可將其封存並回收。"
   },
   "desc.singulo.magnetic_key": {
     "source": "Opens or seals a magnetic-lock container. Used up each time.",
@@ -1704,8 +1704,8 @@
     "translation": "持續掃描大範圍區域，向附近玩家顯示礦石與廢墟。使用以切換顯示。"
   },
   "desc.singulo.neutrino_scanner": {
-    "source": "Reveals ruins and ores through terrain for 10 seconds.",
-    "translation": "透過地形顯露出廢墟和礦石，持續 10 秒。"
+    "source": "Shows the outlines of nearby ruin blocks and ores through terrain for 10 seconds. Uses power. Sensitivity modules reveal deeper ores.",
+    "translation": "使用後，在 10 秒內透過地形顯示周圍的廢墟方塊與礦石輪廓。消耗電力。更深層的礦石需要靈敏度模組才能顯示。"
   },
   "desc.singulo.observation_log": {
     "source": "A record from observation posts. Copy it onto data cards.",
@@ -1729,7 +1729,7 @@
   },
   "desc.singulo.phase_sync_plate": {
     "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
-    "translation": "把冷卻原子的振動印在光晶格上的板。能讓時間晶體的振動相位一致，使培育時間為 12 分鐘。"
+    "translation": "把冷原子的振動印在光晶格上的板。能讓時間晶體的振動相位一致，使培育時間為 12 分鐘。"
   },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
@@ -1772,8 +1772,8 @@
     "translation": "來自研究棟的記錄。"
   },
   "desc.singulo.quantum_heat_engine": {
-    "source": "A catalyst-driven generator.",
-    "translation": "催化劑驅動的發電機。"
+    "source": "Generates power from the quantum effects of a catalyst. Higher-tier catalysts give more output.",
+    "translation": "利用催化劑的量子效應發電。催化劑等級越高，輸出越大。"
   },
   "desc.singulo.quantum_key": {
     "source": "Opens or seals a quantum-lock container. Used up each time.",
@@ -1848,8 +1848,8 @@
     "translation": "被煙灰燻黑的古建築板材。"
   },
   "desc.singulo.seal_console": {
-    "source": "Touch it to wake the Horizon Warden.",
-    "translation": "觸碰它即可喚醒視界守衛。"
+    "source": "The seal of the Final Lab. Touch it to wake the Horizon Warden.",
+    "translation": "最終實驗室的封印。觸碰它即可喚醒視界守衛。"
   },
   "desc.singulo.sealed_container_1": {
     "source": "Opens with a Magnetic Key; sneak-use a key to seal it again. Breaking it by force destroys the contents.",
@@ -1892,8 +1892,8 @@
     "translation": "底座上層的內側 3×3。"
   },
   "desc.singulo.shield_tower_core": {
-    "source": "Front middle of the upper plinth layer.",
-    "translation": "底座上層正面的中央。"
+    "source": "The brain of the Event Horizon Shield Tower. Goes in the front middle of the second plinth layer.",
+    "translation": "事件視界護盾塔的核心。放在基座第二層正面的中央。"
   },
   "desc.singulo.shield_tower_crown": {
     "source": "The top of the tower; the dome is cast from here.",
@@ -1924,32 +1924,32 @@
     "translation": "被點燃後成為黑洞核心。"
   },
   "desc.singulo.smes_cell": {
-    "source": "Superconducting energy storage.",
-    "translation": "超導儲能。"
+    "source": "Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its screen.",
+    "translation": "超導磁儲能裝置，可儲存大量電力。右鍵開啟介面。"
   },
   "desc.singulo.smes_module": {
     "source": "High-capacity energy storage.",
     "translation": "高容量儲能。"
   },
   "desc.singulo.spent_bose_condensate_catalyst": {
-    "source": "Recycle it into lower-tier catalysts.",
-    "translation": "可回收為較低等級的催化劑。"
+    "source": "A used-up BE Condensate Catalyst. About 25% can be recovered as a lower-tier catalyst.",
+    "translation": "用盡的玻色凝聚態催化劑。約 25% 可回收為低一級的催化劑。"
   },
   "desc.singulo.spent_muon_catalyst": {
     "source": "A used-up catalyst. Partly recyclable.",
     "translation": "用過的催化劑。部分可回收。"
   },
   "desc.singulo.spent_singularity_core": {
-    "source": "Recycle it into lower-tier catalysts.",
-    "translation": "可回收為較低等級的催化劑。"
+    "source": "A used-up Singularity Core. About 25% can be recovered as a lower-tier catalyst.",
+    "translation": "用盡的奇點核心。約 25% 可回收為低一級的催化劑。"
   },
   "desc.singulo.spent_time_crystal_catalyst": {
-    "source": "Recycle it into lower-tier catalysts.",
-    "translation": "可回收為較低等級的催化劑。"
+    "source": "A used-up Time Crystal Catalyst. About 25% can be recovered as a lower-tier catalyst.",
+    "translation": "用盡的時間晶體催化劑。約 25% 可回收為低一級的催化劑。"
   },
   "desc.singulo.stardust": {
     "source": "Cosmic grains carrying rare isotopes. The raw material for cold atoms.",
-    "translation": "從宇宙帶來的微粒，含有地球上沒有的稀有同位素。是冷卻原子的原料。"
+    "translation": "從宇宙帶來的微粒，含有地球上沒有的稀有同位素。是冷原子的原料。"
   },
   "desc.singulo.stardust_cluster": {
     "source": "Crystals of cosmic grains that grow on meteorite crust. Break them for stardust.",
@@ -2132,8 +2132,8 @@
     "translation": "代替產生器外殼放置。把電力送入核心，並把完成的入口推送出去。"
   },
   "desc.singulo.wormhole_generator_shell": {
-    "source": "Sphere shell; any can be swapped for an I/O port.",
-    "translation": "球殼；任何一塊都可替換為輸入輸出埠。"
+    "source": "The outer shell of the Wormhole Generator sphere. Any shell block can be replaced with a multiblock I/O port.",
+    "translation": "蟲洞產生器球體的外殼。任何一塊外殼都可替換為多方塊輸入輸出埠。"
   },
   "desc.singulo.wormhole_generator_window": {
     "source": "Middle of each face at the equator; shows the vortex.",
@@ -2152,8 +2152,8 @@
     "translation": "在入口 8 格內時，把機器連接到另一端入口附近編號相同（0-127）的埠。每個入口依喉部大小可讓 8、32 或 128 個埠運作，依距離由近到遠。運作時會發光。"
   },
   "desc.singulo.wormhole_stabilizer": {
-    "source": "Stabilizes wormhole mouths.",
-    "translation": "穩定蟲洞口。"
+    "source": "Stabilizes an unstable wormhole mouth with exotic matter so that it can be placed.",
+    "translation": "以奇異物質穩定不穩定蟲洞入口，使其成為可以放置的入口。"
   },
   "direction.singulo.east": {
     "source": "east",
@@ -3033,19 +3033,19 @@
   },
   "gui.singulo.guardian.defeated.echo_sentinel": {
     "source": "The Echo Sentinel unravels. The vault field dissipates",
-    "translation": "回聲守衛消散了。寶庫的力場消失了"
+    "translation": "回聲守衛消散了。保管庫的力場消失了"
   },
   "gui.singulo.guardian.defeated.ergosphere_leviathan": {
     "source": "The Ergosphere Leviathan sinks into the vortex. The vault field dissipates",
-    "translation": "能層巨蛇沉入了漩渦之底。寶庫的力場消失了"
+    "translation": "能層巨蛇沉入了漩渦之底。保管庫的力場消失了"
   },
   "gui.singulo.guardian.defeated.gravity_remnant": {
     "source": "The Gravity Remnant collapses. The vault field dissipates",
-    "translation": "重力殘渣的核心坍縮了。寶庫的力場消失了"
+    "translation": "重力殘渣的核心坍縮了。保管庫的力場消失了"
   },
   "gui.singulo.guardian.no_vault": {
     "source": "No guarded vault nearby",
-    "translation": "附近沒有受守衛保護的寶庫"
+    "translation": "附近沒有受守衛保護的保管庫"
   },
   "gui.singulo.guardian.reset.echo_sentinel": {
     "source": "No challenger remains. The Echo Sentinel returns to the records",
@@ -3620,24 +3620,24 @@
     "translation": "催化劑"
   },
   "guide.singulo.catalysts.slots.body": {
-    "source": "Catalyst machines have a dedicated slot that accepts only catalysts. Spent catalysts can be recycled into about 25% of a lower-tier catalyst.",
-    "translation": "使用催化劑的裝置有一個只接受催化劑的專用槽。用盡的催化劑可在催化反應器中回收，得到約 25% 的低一級催化劑材料。"
+    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). Nothing else fits.\nA used-up catalyst becomes a spent catalyst. In the Catalytic Reactor, about 25% of it can be recovered as material for the catalyst one tier lower.",
+    "translation": "使用催化劑的裝置有只能放入催化劑的專用槽（介面中帶有催化劑標記的格子），其他物品放不進去。\n用盡的催化劑會變成失活催化劑。在催化反應器中，約 25% 可回收為低一級催化劑的材料。"
   },
   "guide.singulo.catalysts.slots.title": {
     "source": "Catalyst slots and recycling",
     "translation": "催化劑槽及回收"
   },
   "guide.singulo.catalysts.tiers.body": {
-    "source": "Muon (2), BE (3), Time crystal (4), Singularity core (5). Higher tier = faster and less wear; one lower = half speed and double wear (generators give 25% output); two lower = unusable. Underpowering wears catalysts faster.\nThese rules apply to devices that run on a catalyst slot. When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or amount of life and the speed does not change.",
-    "translation": "緲子（2）、玻色凝聚態（3）、時間晶體（4）、奇點核心（5）。等級較高＝速度較快、消耗較少；低一級＝速度減半、消耗加倍（發電機輸出降為 25%）；低兩級＝無法使用。電力不足會使催化劑消耗更快。\n這些規則適用於靠催化劑槽運轉的裝置。加工配方將催化劑列為材料時，只消耗固定數量或壽命，速度不變。"
+    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE condensate catalyst takes one muon catalyst and 40 seconds).",
+    "translation": "緲子（2）、玻色凝聚態（3）、時間晶體（4）、奇點核心（5）。\n- 與裝置同級：標準\n- 高一級：速度 +25%，消耗 −20%（最多疊加到高兩級）\n- 低一級：速度 ×0.5，消耗 ×2（發電機輸出為額定的 25%）\n- 低兩級：無法使用\n剩餘越少，所需電力越多（最多 ×1.6）；電力低於 80% 時會因反應不完全而使消耗 ×1.5。\n這些規則適用於靠催化劑槽運轉的裝置（錨、穩定器、發電機、護盾等）。加工配方中作為材料列出的催化劑，只消耗固定數量或壽命，速度不變（例如：玻色凝聚態催化劑的加工需要 1 個緲子催化劑，耗時 40 秒）。"
   },
   "guide.singulo.catalysts.tiers.title": {
     "source": "Tiers and effects",
     "translation": "等級和效果"
   },
   "guide.singulo.catalysts.time.body": {
-    "source": "Near a running reactor catalysts wear at ×0.5; inside a T-Cylinder field ×2. The two cancel out.",
-    "translation": "在運轉中的反應爐附近，催化劑消耗 ×0.5；在蒂普勒圓柱的場內則為 ×2。兩者重疊時會互相抵消。"
+    "source": "In a P-Reactor's pull zone time slows down: catalysts wear at ×0.5 (machines run at ×0.8). Inside a T-Cylinder field it is the reverse, ×2. The two cancel out where they overlap. Keeping catalyst storage near the reactor makes them last longer.",
+    "translation": "彭羅斯反應爐的引力區內時間變慢：催化劑消耗為 ×0.5（裝置為 ×0.8）。蒂普勒圓柱的範圍內則相反，為 ×2。兩者重疊時會互相抵消。把催化劑倉庫放在爐旁能用得更久。"
   },
   "guide.singulo.catalysts.time.title": {
     "source": "Time fields",
@@ -3664,8 +3664,8 @@
     "translation": "建造創世爐"
   },
   "guide.singulo.genesis.synth.body": {
-    "source": "A born universe turns power into items. Use the core empty-handed to open its screen and put the item you want in the left frame (or use the item on the core). Collect results from the slot on the right (or pull from below with a hopper).\nCost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). A broken core keeps the memory of its universe and works again wherever you place it, but stored power and partial progress are lost, so avoid moving it in the middle of an expensive item. The table is a datapack (mass_synthesis).",
-    "translation": "誕生了宇宙的創世爐能將電力轉化為物品。空手使用核心開啟介面，把想製造的物品登記到左側框中（手持物品對核心使用也可登記）。完成的物品可從介面右側的欄位取出（也可用漏斗等從下方抽出）。\n每個物品的電力 = 質量 × 1 GFE × 10^稀有度，稀有度從 0（石頭、泥土等）到 4（地獄之星、鞘翅、龍蛋等）。拆下的核心會保留宇宙的記憶，放到別處後仍可直接使用（但儲存的電力與未完成的進度不會保留，製造昂貴物品途中請勿拆除）。可製造的物品由資料包（mass_synthesis）定義。"
+    "source": "A Genesis Engine that has given birth can make items from power. Use the core empty-handed to open its screen and put the item you want in the left frame (or use the item on the core). Collect results from the slot on the right (or pull them from below with a hopper).\nCost per item = mass × 1 GFE × 10^rarity. Rarity runs from 0 (stone, dirt) to 4 (nether star, elytra, dragon egg), so rarer items cost orders of magnitude more power. A broken core keeps the memory of its universe and works again wherever you place it, but stored power and partial progress are lost, so do not break it in the middle of an expensive item. The list of items is a datapack (mass_synthesis).",
+    "translation": "誕生了宇宙的創世爐能將電力轉化為物品。空手使用核心開啟介面，把想製造的物品登記到左側框中（手持物品對核心使用也可登記）。完成的物品可從介面右側的欄位取出（也可用漏斗等從下方抽出）。\n每個物品的電力 = 質量 × 1 GFE × 10^稀有度。稀有度從 0（石頭、泥土等）到 4（地獄之星、鞘翅、龍蛋等），越稀有的物品耗電量高出好幾個數量級。拆下的核心會保留宇宙的記憶，放到別處後仍可直接使用（但儲存的電力與未完成的進度不會保留，製造昂貴物品途中請勿拆除）。可製造的物品由資料包（mass_synthesis）定義。"
   },
   "guide.singulo.genesis.synth.title": {
     "source": "Mass synthesis",
@@ -3676,8 +3676,8 @@
     "translation": "危險"
   },
   "guide.singulo.hazards.list.body": {
-    "source": "- Tidal zone ignores armour.\n- Leaking hydrogen near fire explodes.\n- Large accelerators may leak strangelets that convert blocks into strange matter; contain them with a Magnetic Bottle.",
-    "translation": "- 反應爐的潮汐區會無視護甲造成傷害。\n- 外洩的氫氣靠近火源會爆炸。\n- 大型粒子加速器可能洩漏奇異子，將周圍方塊轉化為奇異夸克物質方塊；可用磁瓶將其封存。"
+    "source": "- The reactor's tidal zone (radius 4) deals damage that ignores armour.\n- A broken hydrogen container causes a small explosion near fire.\n- A large particle accelerator may occasionally leak a strangelet, which turns one nearby block per second into strange matter (it stops at radius 8 or 512 blocks and does not spread inside a shield). Contain and collect it with a Magnetic Bottle.",
+    "translation": "- 反應爐的潮汐區（半徑 4）造成的傷害會無視護甲。\n- 氫氣容器損壞時，若靠近火源會發生小型爆炸。\n- 大規模運轉的粒子加速器偶爾會洩漏奇異子，每秒把附近 1 個方塊轉化為奇異夸克物質方塊（到半徑 8 或 512 個方塊為止，不會擴散進護盾內）。可用磁瓶將其封存並回收。"
   },
   "guide.singulo.hazards.list.title": {
     "source": "Hazards",
@@ -3696,16 +3696,16 @@
     "translation": "電力、催化劑與廢墟"
   },
   "guide.singulo.intro.howto.body": {
-    "source": "- Pick a chapter on the left; flip pages with the arrows.\n- The Progress chapter shows finished and next goals (same as the Singulo advancement tab).\n- Hover items for a description; hold Shift for recipes and uses.\n- Use the Holo Projector on a multiblock controller to see its shape.",
-    "translation": "- 選擇左側的章節，用箭頭翻頁。\n- 「進度」章節會顯示已達成與下一個目標（與進度畫面的 Singulo 分頁相同）。\n- 將滑鼠移到物品上可查看說明；按住 Shift 可查看製作方式與用途。\n- 對多方塊結構的控制器使用全像投影器，即可看到其形狀。"
+    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter shows the goals you have reached and the next ones (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
+    "translation": "- 選擇左側的章節，右側會顯示頁面。用下方的箭頭翻頁。\n- 「進度」章節會顯示已達成與下一個目標（與進度畫面〔L 鍵〕的 Singulo 分頁相同）。\n- 將滑鼠移到物品上可查看說明；按住 Shift 可查看製作方式與用途。\n- 對多方塊結構的控制器使用全像投影器，正確的形狀會以半透明方式浮現。"
   },
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",
     "translation": "本手冊的使用方式"
   },
   "guide.singulo.intro.welcome.body": {
-    "source": "Singulo is a tech mod about extracting energy from mass. Start with thermoelectric power, climb through cryogenic, quantum and temporal tech, and finally run a spinning black hole.\nThere are five stages. Read the stage chapters in order to know what to build next.",
-    "translation": "Singulo 是一個「從質量中提取能量」的科技模組。從熱電發電起步，逐步發展低溫、量子與時間技術，最後以旋轉的黑洞發電。\n共有五個階段。依序閱讀各階段章節，就能知道接下來該建造什麼。"
+    "source": "Singulo is a tech mod about extracting energy from mass. Start with thermoelectric power, build up cryogenic, quantum and temporal technology stage by stage, and finally generate power from a spinning black hole (the P-Reactor).\nThere are five stages. Each has a goal machine and a key material that opens the next stage. Read from \"Stage 1\" on the left to know what to build next.",
+    "translation": "Singulo 是一個「從質量中提取能量」的科技模組。從熱電發電起步，逐步累積低溫、量子與時間技術，最後以旋轉的黑洞（彭羅斯反應爐）發電。\n共有五個階段。每個階段都有目標裝置，以及通往下一階段的關鍵材料。從左側的「第 1 階段」開始依序閱讀，就能知道接下來該建造什麼。"
   },
   "guide.singulo.intro.welcome.title": {
     "source": "Welcome to Singulo",
@@ -3716,16 +3716,16 @@
     "translation": "多方塊結構"
   },
   "guide.singulo.multiblocks.list.body": {
-    "source": "cooling_tower, particle_accelerator, degenerate_compactor, casimir_cavity, degenerate_furnace, penrose_reactor, event_horizon_shield, tipler_cylinder, wormhole_generator.",
-    "translation": "低溫冷卻塔：cooling_tower、粒子加速器：particle_accelerator、簡併壓縮爐：degenerate_compactor、卡西米爾腔：casimir_cavity、簡併熱爐：degenerate_furnace、彭羅斯反應爐：penrose_reactor、事件視界護盾塔：event_horizon_shield、蒂普勒圓柱：tipler_cylinder、蟲洞產生器：wormhole_generator。"
+    "source": "- Cryogenic Cooling Tower (5×5, 7–15 high): cooling_tower\n- Particle Accelerator (ring 8–32 wide): particle_accelerator\n- Degenerate Compactor (5×5×5): degenerate_compactor\n- C-Cavity (5×5×5): casimir_cavity\n- Degenerate Furnace (5×5×7): degenerate_furnace\n- P-Reactor (13×13×13): penrose_reactor\n- Event Horizon Shield Tower (5×5, 9 high): event_horizon_shield\n- T-Cylinder (5×5×9): tipler_cylinder\n- Wormhole Generator (5×5×5 sphere): wormhole_generator",
+    "translation": "- 低溫冷卻塔（5×5，高 7–15）：cooling_tower\n- 粒子加速器（環邊長 8–32）：particle_accelerator\n- 簡併壓縮爐（5×5×5）：degenerate_compactor\n- 卡西米爾腔（5×5×5）：casimir_cavity\n- 簡併熱爐（5×5×7）：degenerate_furnace\n- 彭羅斯反應爐（13×13×13）：penrose_reactor\n- 事件視界護盾塔（5×5，高 9）：event_horizon_shield\n- 蒂普勒圓柱（5×5×9）：tipler_cylinder\n- 蟲洞產生器（5×5×5 球體）：wormhole_generator"
   },
   "guide.singulo.multiblocks.list.title": {
     "source": "Multiblock list",
     "translation": "多方塊結構列表"
   },
   "guide.singulo.multiblocks.projector.body": {
-    "source": "1. Place the controller; the structure extends behind it.\n2. Use the projector on it to see the shape and a material list.\n3. Fill the cyan boxes, clear the red ones. It lights up when complete.\n4. Sneak-use to change size.\nIn creative: /singulo build <name> [size].",
-    "translation": "1. 放置控制器，結構會往其後方延伸。\n2. 對控制器使用全像投影器，即可看到結構形狀與材料清單。\n3. 在青色框中放入方塊，清除紅色框中的方塊。完成後結構會亮起。\n4. 潛行使用可切換尺寸。\n創造模式：/singulo build <名稱> [尺寸]。"
+    "source": "1. Place the controller (its front faces you and the structure extends behind it).\n2. Right-click the controller with the Holo Projector. The correct shape is projected, and the required and missing counts appear in chat.\n3. Place the shown blocks in the cyan boxes and remove the blocks in the red ones. When everything is in place the projection disappears, light runs along the seams and the machine starts.\n4. For machines with a choice of size (the cooling tower and the accelerator), sneak-use the projector to switch sizes.\nIn creative mode, /singulo build <name> [size] builds it in one go.",
+    "translation": "1. 放置控制器（正面朝向自己，結構往其後方延伸）。\n2. 用全像投影器右鍵控制器，正確的形狀會投影出來，所需數量與缺少的數量會顯示在聊天欄。\n3. 在青色框中放入所示方塊，移除紅色框中的方塊。全部就位後投影消失，接縫處閃過光芒，裝置啟動。\n4. 可選尺寸的裝置（冷卻塔、加速器）潛行使用投影器即可切換尺寸。\n創造模式下可用 /singulo build <名稱> [尺寸] 一次建成。"
   },
   "guide.singulo.multiblocks.projector.title": {
     "source": "Using the Holo Projector",
@@ -3736,8 +3736,8 @@
     "translation": "電力與物流"
   },
   "guide.singulo.power.cables.body": {
-    "source": "Copper wire → superconducting cable → topological wire → horizon bus. A network carries what its weakest cable can.",
-    "translation": "銅導線 → 超導電纜 → 拓撲導線 → 視界匯流排。網路的傳輸量取決於其中最細的電纜。"
+    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). A connected network carries only what its thinnest cable can.",
+    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。相連網路的傳輸量取決於其中最細的電纜。"
   },
   "guide.singulo.power.cables.title": {
     "source": "Cables",
@@ -3764,32 +3764,32 @@
     "translation": "奇點科技"
   },
   "guide.singulo.romance.darkmatter.body": {
-    "source": "Collect near a core, store in containment tanks, feed the core directly.",
-    "translation": "在爐心附近收集，存放於重力約束槽中，直接投料至爐心。"
+    "source": "A Halo Collector placed within 16 blocks of a core collects it. It leaks from ordinary containers, so keep it in a Gravitational Containment Tank. Fed directly into the core, it becomes mass without the Eddington limit.",
+    "translation": "把暈收集器放在爐心 16 格以內即可收集。它會從一般容器中洩漏，因此要存放在重力約束槽中。直接投入爐心時，不受愛丁頓極限限制即可成為質量。"
   },
   "guide.singulo.romance.darkmatter.title": {
     "source": "Dark matter",
     "translation": "暗物質"
   },
   "guide.singulo.romance.gear.body": {
-    "source": "Metric Drive, Graviton Manipulator, Advanced Worldline Anchor.",
-    "translation": "度規驅動器、重力子操控器、世界線錨（進階）。"
+    "source": "- Metric Drive: keep it in your inventory and switch between low gravity, zero gravity (flight) and high gravity.\n- Graviton Manipulator: levitate, pull, repel and crush. The G key switches to a cone area.\n- Advanced Worldline Anchor: with a core embedded, it keeps a radius of 5 loaded with no upkeep.",
+    "translation": "- 度規驅動器：放在物品欄中，在低重力、無重力（飛行）與高重力之間切換。\n- 重力子操控器：懸浮、牽引、斥力、壓潰。按 G 鍵切換為錐形範圍。\n- 世界線錨（進階）：嵌入核心後無需消耗即可維持半徑 5 的區塊載入。"
   },
   "guide.singulo.romance.gear.title": {
     "source": "Gravity gear",
     "translation": "重力裝備"
   },
   "guide.singulo.romance.shield.body": {
-    "source": "Protects a 32-block radius. With a Singularity Core it also blocks hostile spawns.",
-    "translation": "保護半徑 32 格的範圍。使用奇點核心時，還能阻止敵對生物生成。"
+    "source": "A tower (5×5, 9 high) that protects a radius of 32. A time crystal catalyst stops explosions and griefing; a Singularity Core also stops hostile spawns and intruders. Uses 16,384 FE/t.",
+    "translation": "保護半徑 32 範圍的塔（5×5，高 9）。使用時間晶體催化劑可防止爆炸與破壞；使用奇點核心還能阻止敵對生物生成與入侵。耗電 16,384 FE/t。"
   },
   "guide.singulo.romance.shield.title": {
     "source": "Event Horizon Shield",
     "translation": "事件視界護盾"
   },
   "guide.singulo.romance.tipler.body": {
-    "source": "Doubles supported machine processing within 16 blocks.",
-    "translation": "使半徑 16 格內支援的機器加工速度加倍。"
+    "source": "Speeds up time within a radius of 16 (×2; 5×5×9). Fuel and catalyst go in through the core's screen: a time crystal catalyst, exotic matter (one per minute) and 100 kFE/t.",
+    "translation": "使半徑 16 內的時間加速（×2；5×5×9）。燃料與催化劑從核心的介面放入：時間晶體催化劑、奇異物質（每分鐘 1 個）以及 100 kFE/t。"
   },
   "guide.singulo.romance.tipler.title": {
     "source": "T-Cylinder",
@@ -3801,7 +3801,7 @@
   },
   "guide.singulo.ruins.bosses.body": {
     "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "研究棟、封鎖培養設施和最終實驗設施的寶庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n人數越多，守衛就越強：每多一名玩家，體力增加原本的一半，招式間隔也會稍微縮短（最多計算 6 人）。中途加入時體力比例保持不變，有人離開也不會變弱。相對地，掉落物會按戰鬥開始時的挑戰者人數掉落（之後加入的人不會增加掉落）。多人攻擊時，每個人的攻擊都不會被他人擋住（同一個人連續攻擊，仍需像以往一樣稍作間隔）。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封鎖培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗設施）：觸碰中央的封印控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也能造成全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞的落點也會留下奇點。掉落漩渦斷章。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
+    "translation": "研究棟、封閉培養設施和最終實驗室的保管庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n人數越多，守衛就越強：每多一名玩家，體力增加原本的一半，招式間隔也會稍微縮短（最多計算 6 人）。中途加入時體力比例保持不變，有人離開也不會變弱。相對地，掉落物會按戰鬥開始時的挑戰者人數掉落（之後加入的人不會增加掉落）。多人攻擊時，每個人的攻擊都不會被他人擋住（同一個人連續攻擊，仍需像以往一樣稍作間隔）。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封閉培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗室）：觸碰中央的封印控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也能造成全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞的落點也會留下奇點。掉落漩渦斷章。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3824,8 +3824,8 @@
     "translation": "只能在特定地點獲得的素材"
   },
   "guide.singulo.ruins.list.body": {
-    "source": "Observation Post, Research Building, Culture Facility, Final Lab and the Sunken Reactor Sector — each deeper and better guarded than the last. The Sunken Reactor Sector (around Y −60 to −54) is found by tuning the explorer compass after the Final Lab.",
-    "translation": "地表觀測站、研究棟、封閉培養設施、最終實驗室，以及沉沒的爐心區——一處比一處更深、守衛更強。沉沒的爐心區（約 Y −60〜−54）需要在攻略最終實驗室後調整探索指南針才能找到。"
+    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
+    "translation": "- 地表觀測站：平原、沙漠等地表上唯一建在地面的遺蹟。白色警衛無人機。觀測日誌、控制單元（7 天再生）。\n- 研究棟：淺層地下（約 Y −20〜4）。警衛機，以及深處檔案室的回聲守衛。冷原子陷阱、量子資料片段（7 天）。\n- 封閉培養設施：深層地下（約 Y −46〜−30）。低溫核心、更強的警衛機，以及深處隔離槽室的重力殘渣。時間晶種、培養資料（14 天）。\n- 最終實驗室：最深處地下（約 Y −56〜−46）的重力異常點。由視界守衛看守。奇點種子、異常樣本（14 天）。\n- 沉沒的爐心區：比最終實驗室更深的地下（約 Y −60〜−54），停止運轉的第二座反應爐。攻略最終實驗室後調整探索羅盤即可尋找。能層巨蛇。奇異物質、噴流凝聚體、霍金凝聚體（14 天）。"
   },
   "guide.singulo.ruins.list.title": {
     "source": "The five ruins",
@@ -3840,8 +3840,8 @@
     "translation": "規劃探索"
   },
   "guide.singulo.ruins.records.body": {
-    "source": "Ruin caches sometimes hold crystal memories. Decode them in the Archive Terminal to unlock the Ancient Records chapter.",
-    "translation": "廢墟保管庫中有時會出現水晶記憶體。在檔案終端解讀後，即可解鎖「舊文明的記錄」章節。"
+    "source": "Ruin caches sometimes hold crystal memories. Decode them with power in the Archive Terminal to read the records of the old civilization (they are added to the Ancient Records chapter of this handbook). Collect them all to learn why the civilization fell.",
+    "translation": "廢墟保管庫中有時會出現水晶記憶體。在檔案終端消耗電力解讀後，即可閱讀舊文明的記錄（會加入手冊的「舊文明的記錄」章節）。全部集齊，就能知道文明滅亡的原因。"
   },
   "guide.singulo.ruins.records.title": {
     "source": "Crystal memories",
@@ -3860,24 +3860,24 @@
     "translation": "第一階段：啟動"
   },
   "guide.singulo.stage1.goal.body": {
-    "source": "The key is the Superconducting Coil, made in the Cryogenic Cooling Tower. It needs a Control Unit from an Observation Post. Find one, restore the unit in the Archive Terminal, then build the tower.",
-    "translation": "關鍵是超導線圈，在低溫冷卻塔中製作。製作時需要地表觀測站的控制單元。找到地表觀測站，在檔案終端修復控制單元，然後建造冷卻塔。"
+    "source": "The key to stage 2 is the Superconducting Coil. It is made in the Cryogenic Cooling Tower and needs a Control Unit found at an Observation Post.\n- Find an Observation Post (on plains, deserts and other surfaces) and bring back the degraded control unit and observation log from its cache.\n- Restore the control unit in the Archive Terminal.\n- Gather the cooling tower parts and build it with the Holo Projector.",
+    "translation": "通往第 2 階段的關鍵是超導線圈。它在低溫冷卻塔中製作，需要在地表觀測站拾得的控制單元作為材料。\n- 尋找地表觀測站（平原、沙漠等地表），從保管庫帶回退化的控制單元與觀測日誌。\n- 在檔案終端修復控制單元。\n- 備齊冷卻塔的零件，用全像投影器建造。"
   },
   "guide.singulo.stage1.goal.title": {
     "source": "Reaching stage 2",
     "translation": "進入第 2 階段"
   },
   "guide.singulo.stage1.machines.body": {
-    "source": "- Kiln: fires ceramic boards and steel.\n- Compressor: plates, and mass mode for compressed blocks.\n- Electrolyzer: water to hydrogen and oxygen.\n- Archive Terminal: copies records, restores parts, decodes fragments.",
-    "translation": "- 燒製爐：燒製陶瓷基板與鋼材。\n- 壓縮機：製作板材；質量模式可製作壓縮塊。\n- 電解槽：將水分解為氫氣與氧氣。\n- 檔案終端：複製記錄、修復零件、解碼片段。"
+    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
+    "translation": "- 燒製爐：燒製陶瓷基板等，也能更快地煉鋼。\n- 壓縮機：製作鋼板。質量模式下會把有質量值的材料變成「質量」，壓成壓縮塊或質量顆粒。\n- 電解槽：將水分解為氫氣與氧氣。\n- 檔案終端：把遺蹟的記錄抄寫到資料卡上，修復退化的零件，也能解讀水晶記憶體。"
   },
   "guide.singulo.stage1.machines.title": {
     "source": "Stage 1 machines",
     "translation": "第一階段機器"
   },
   "guide.singulo.stage1.materials.body": {
-    "source": "1. Iron + coal = steel blend; smelt it in a blast furnace.\n2. Clay, quartz, bone meal and sand make unfired ceramic; fire it into white ceramic. Before the Nether, two flint replace the quartz.\n3. Make basic circuits and basic frames. Most machines need these.",
-    "translation": "1. 鐵＋煤炭＝鋼混合物；放入高爐熔煉。\n2. 黏土、石英、骨粉和沙子製成未燒製陶瓷，燒製後成為白色陶瓷複合材料。前往地獄之前，可用兩個燧石代替石英。\n3. 製作基本電路與基本框架，大多數機器都需要它們。"
+    "source": "1. Mix iron and coal into steel blend and smelt it into steel ingots in a blast furnace.\n2. Make unfired ceramic from clay, nether quartz, bone meal and sand, and fire it in a furnace into white ceramic composite. Before you reach the Nether, two flint can replace the nether quartz.\n3. Make basic circuits from ceramic, redstone and copper, and basic frames from steel and ceramic.\nThese three (steel, ceramic and circuits) go into almost every machine.",
+    "translation": "1. 用鐵和煤炭製作鋼混合物，在高爐中煉成鋼錠。\n2. 用黏土、地獄石英、骨粉和沙子製作未燒製陶瓷，在熔爐中燒成白色陶瓷複合材料。前往地獄之前，可用 2 個燧石代替地獄石英。\n3. 用陶瓷、紅石和銅製作基本電路，用鋼和陶瓷製作基本框架。\n這三樣（鋼、陶瓷、電路）是幾乎所有裝置的材料。"
   },
   "guide.singulo.stage1.materials.title": {
     "source": "First materials",
@@ -3893,7 +3893,7 @@
   },
   "guide.singulo.stage1.thermal_pairs.body": {
     "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nTo run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.",
-    "translation": "冷方塊可以一直使用而不融化的組合（每台發電機的輸出）：\n- 岩漿塊＋藍冰：約 76 FE/t（最推薦）\n- 運轉中的燒製爐＋藍冰：約 66 FE/t\n- 營火＋藍冰：約 56 FE/t\n- 營火＋浮冰：約 55 FE/t\n熔岩太熱：即使是藍冰也會在約 40 秒內變成浮冰並繼續融化。營火搭配水、雪或冰，不到 1 分鐘就會融化。\n要運轉第 2 階段的低溫冷卻塔（液氮 240 FE/t），岩漿塊＋藍冰大約需要 4 台以上，營火＋浮冰則需要 5 台以上（不含銅導線損耗）。先用 2–4 台，一次運轉一台機器，再逐步增加。"
+    "translation": "冷方塊可以一直使用而不融化的組合（每台發電機的輸出）：\n- 岩漿塊＋藍冰：約 76 FE/t（最推薦）\n- 運轉中的燒製爐＋藍冰：約 66 FE/t\n- 營火＋藍冰：約 56 FE/t\n- 營火＋浮冰：約 55 FE/t\n熔岩太熱：即使是藍冰也會在約 40 秒內變成浮冰並繼續融化。營火搭配水、雪或冰，不到 1 分鐘就會融化。\n要運轉第 2 階段的低溫冷卻塔（液態氮 240 FE/t），岩漿塊＋藍冰大約需要 4 台以上，營火＋浮冰則需要 5 台以上（不含銅導線損耗）。先用 2–4 台，一次運轉一台機器，再逐步增加。"
   },
   "guide.singulo.stage1.thermal_pairs.title": {
     "source": "Pairs that last",
@@ -3904,32 +3904,32 @@
     "translation": "第二階段：低溫"
   },
   "guide.singulo.stage2.accelerator.body": {
-    "source": "Build a square ring of tubes and magnets (8–32 wide), magnets on the corners and on at least a quarter of the ring. It turns hydrogen into muon bundles (and rare monopoles). The Catalytic Reactor turns them into muon catalysts.",
-    "translation": "用加速管與聚焦磁鐵組成方形環（邊長 8–32），四個角落必須是聚焦磁鐵，且磁鐵至少佔環的四分之一。它能將氫轉化為緲子束（極少數情況下會產生磁單極子）。催化反應器可將緲子束製成緲子催化劑。"
+    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.",
+    "translation": "用加速管與聚焦磁鐵組成方形環（邊長 8–32），並讓控制器緊貼著環放置。四個角落必須是聚焦磁鐵，且磁鐵至少佔環的四分之一。它以氫製造緲子束，極少數情況下會產生磁單極子。\n催化反應器以緲子束製作緲子催化劑（2 級）。把宇宙射線緲子收集器放在高處，無需電力也能慢慢收集緲子束。"
   },
   "guide.singulo.stage2.accelerator.title": {
     "source": "Particle Accelerator and muon catalyst",
     "translation": "粒子加速器與緲子催化劑"
   },
   "guide.singulo.stage2.goal.body": {
-    "source": "You need liquid helium (tower 10+ high, helium from crushed deepslate) and quantum data from Research Buildings.",
-    "translation": "需要液態氦（冷卻塔高 10 以上；氦來自壓碎的深板岩）以及研究棟的量子資料。"
+    "source": "The keys to stage 3 are the Quantum Computing Module and liquid helium. Build the cooling tower 10 or more blocks high and liquefy helium released by crushing deepslate in the compressor. Also collect quantum data fragments from Research Buildings (surface to shallow underground).",
+    "translation": "通往第 3 階段的關鍵是量子運算模組與液態氦。把冷卻塔建到 10 格以上，並將壓縮機粉碎深板岩時產生的氦液化。也要在研究棟（地表到淺層地下）收集量子資料片段。"
   },
   "guide.singulo.stage2.goal.title": {
     "source": "Reaching stage 3",
     "translation": "進入第 3 階段"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "- Precision Assembler: makes almost everything from stage 3 on.\n- Cryogenic Turbine: power from evaporating nitrogen.\n- SMES Cell: stores energy.\n- Small Worldline Anchor: chunk loader fed by catalysts.\n- Monopole Upgrade: ×2 speed, +50% efficiency in a machine's monopole slot.",
-    "translation": "- 精密組裝台：第 3 階段以後幾乎所有東西都在這裡製作。\n- 低溫渦輪機：利用液態氮蒸發發電。\n- 超導磁儲能電池：儲存電力。\n- 世界線錨（小型）：以催化劑運作的區塊載入器。\n- 單極子升級模組：插入機器的單極子槽，速度 ×2、效率 +50%。"
+    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Cryogenic Turbine: generates power from evaporating liquid nitrogen (5 kFE/t).\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
+    "translation": "- 精密組裝台：第 3 階段以後幾乎所有零件與裝置都在這裡製作。\n- 低溫渦輪機：利用液態氮氣化發電（5 kFE/t）。\n- SMES 電池：儲存大量電力。\n- 世界線錨（小型）：放入催化劑後持續載入周圍的區塊。\n- 單極子升級模組：以磁單極子製作，插入裝置的單極子槽後速度 ×2、電力效率 +50%。"
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",
     "translation": "其他第 2 階段設備"
   },
   "guide.singulo.stage2.tower.body": {
-    "source": "A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. It makes liquid nitrogen from air and superconducting coils.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 cryogenic turbines and a 10-high tower 5 (less when it also processes coils; recipes with inputs run before nitrogen).",
-    "translation": "收腰的 5×5 塔，高 7–15，中央一列為熱交換核心。它能從空氣製造液態氮，也能製造超導線圈。\n熱交換核心和冷卻帶可用 3 個浮冰代替藍冰。只製造液態氮時，高 7 的塔約可供 3.5 台低溫渦輪機，高 10 的塔可供 5 台（同時加工線圈時會減少；有材料的配方優先於液態氮）。"
+    "source": "Build a waisted hyperboloid tower 7–15 high on a 5×5 base. The middle column is heat exchange cores and the top is closed with a vent grate. The controller goes in the middle of the front face, second layer from the bottom. Taller towers are faster, and at 10 or more they also make liquid helium.\nIt makes liquid nitrogen from the air with no inputs. Superconducting coils are made from copper, redstone, steel plates, substrates, a control unit and liquid nitrogen.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 cryogenic turbines and a 10-high tower 5 (fewer when it also processes coils; recipes with inputs run before nitrogen).",
+    "translation": "在 5×5 的基座上建造高 7–15 的收腰雙曲面塔。中央一列為熱交換核心，頂部用通風格柵封住。控制器放在正面從下往上第二層的中央。越高越快，10 格以上還能製造液態氦。\n無需任何材料即可從空氣製造液態氮。超導線圈由銅、紅石、鋼板、基板、控制單元與液態氮製成。\n熱交換核心和冷卻帶可用 3 個浮冰代替藍冰。只製造液態氮時，高 7 的塔約可供 3.5 台低溫渦輪機，高 10 的塔可供 5 台（同時加工線圈等時會減少；有材料的配方優先於液態氮）。"
   },
   "guide.singulo.stage2.tower.title": {
     "source": "Cryogenic Cooling Tower",
@@ -3940,8 +3940,8 @@
     "translation": "第三階段：量子"
   },
   "guide.singulo.stage3.goal.body": {
-    "source": "The key is exotic matter from the C-Cavity, which needs time crystal catalysts. Search the deep Culture Facility.",
-    "translation": "關鍵是卡西米爾腔製造的奇異物質，需要時間晶體催化劑。前往地底深處的封閉培養設施探索吧。"
+    "source": "The key to stage 4 is exotic matter. It is made in the C-Cavity and needs time crystal catalysts. Search the Culture Facility (deepslate layer) for time crystal seeds and culture data. Watch out for the cryogenic section and the stronger security machines.",
+    "translation": "通往第 4 階段的關鍵是奇異物質。它在卡西米爾腔中製造，需要時間晶體催化劑。前往封閉培養設施（深板岩層）尋找時間晶種與培養資料吧。注意低溫區與更強的警衛機。"
   },
   "guide.singulo.stage3.goal.title": {
     "source": "Reaching stage 4",
@@ -3956,8 +3956,8 @@
     "translation": "量子機器"
   },
   "guide.singulo.stage3.tools.body": {
-    "source": "- Inertial Control Gauntlet: levitate or pull small mobs.\n- Inertial Stabilizer: explosion-proofs a 16-block radius.\n- Gravitational Wave Detector: points to anomalies.\n- Neutrino Scanner: shows ruins and ores through terrain.",
-    "translation": "- 慣性控制手套：讓小型生物懸浮或將其拉近。\n- 慣性穩定器：使半徑 16 格內的爆炸不會破壞方塊。\n- 重力波探測器：指出重力異常的方向。\n- 微中子掃描器：透過地形顯示廢墟與礦石。"
+    "source": "- Inertial Control Gauntlet: hold right-click to levitate or pull small mobs. It runs on power; sneak-right-click a block that holds power to charge it.\n- Inertial Stabilizer: stops explosions from breaking blocks within a radius of 16.\n- Gravitational Wave Detector: shows the rough direction and distance band of the Final Lab (gravity anomaly).\n- Neutrino Scanner: shows the outlines of ruins and ores through terrain for 10 seconds. At first it shows up to iron and redstone; sensitivity modules (Mk2: gold, diamond, emerald; Mk3: ancient debris) reveal deeper ores. It also works on the observatory.",
+    "translation": "- 慣性控制手套：長按右鍵讓小型生物懸浮或將其拉近。消耗電力；潛行右鍵帶電的方塊即可充電。\n- 慣性穩定器：半徑 16 內的爆炸不會破壞方塊。\n- 重力波探測器：顯示最終實驗室（重力異常點）的大致方向與距離範圍。\n- 微中子掃描器：在 10 秒內透過地形顯示遺蹟與礦石的輪廓。起初只能顯示到鐵與紅石；使用靈敏度模組（Mk2：金、鑽石、綠寶石；Mk3：遠古遺骸）後，更深層的礦石也會顯示。也可用於觀測站。"
   },
   "guide.singulo.stage3.tools.title": {
     "source": "Tools and exploration",
@@ -3968,24 +3968,24 @@
     "translation": "第四階段：時間"
   },
   "guide.singulo.stage4.compression.body": {
-    "source": "Mass mode turns materials with mass values into compressed blocks, Lv1 to Lv3. Lv1 made from 3+ kinds of blocks is \"mixed\" and only 8 are needed for Lv2. The Degenerate Compactor (closed 5×5×5 press) makes degenerate shells.",
-    "translation": "質量模式可將具有質量值的材料轉換為壓縮塊，從 Lv1 到 Lv3。由 3 種以上方塊製成的 Lv1 為「混合」型，只需 8 個即可製成 Lv2。簡併壓縮爐（封閉式 5×5×5 壓力機）可製造簡併物質殼。"
+    "source": "In mass mode the compressor turns materials with a mass value into \"mass\" and presses it into compressed blocks, Lv1 → Lv2 → Lv3. Lv1 made from three or more kinds of source blocks is \"mixed\", and only 8 are needed for Lv2. There are also compressed metal blocks made of metals only.\nThe Degenerate Compactor (a closed 5×5×5 press) makes degenerate matter shells and reactor shell blocks.",
+    "translation": "壓縮機的質量模式會把有質量值的材料變成「質量」，依序壓成壓縮塊 Lv1 → Lv2 → Lv3。由 3 種以上原始方塊製成的 Lv1 為「混合」，只需 8 個即可製成 Lv2。另有只以金屬壓成的金屬壓縮塊。\n簡併壓縮爐（封閉式 5×5×5 壓力機）用於製造簡併物質殼與反應爐外殼。"
   },
   "guide.singulo.stage4.compression.title": {
     "source": "Compression chain",
     "translation": "壓縮鏈"
   },
   "guide.singulo.stage4.goal.body": {
-    "source": "Wake and defeat the Horizon Warden at the Final Lab to get a dormant singularity seed, awaken it in the encapsulator and ignite it in the P-Reactor.",
-    "translation": "在最終實驗室喚醒並擊敗視界守衛，取得休眠奇點種子；在奇點封裝器中將其喚醒，再放入彭羅斯反應爐點火。"
+    "source": "At the Final Lab (gravity anomaly), touch the seal console to wake the Horizon Warden. Defeat it and the cache opens, giving you a dormant singularity seed. Awaken it in the Singularity Encapsulator, then load it into the P-Reactor and ignite it.",
+    "translation": "在最終實驗室（重力異常點）觸碰封印控制台，視界守衛就會甦醒。擊敗它後保管庫開啟，即可取得休眠奇點種子。在奇點封裝器中將其喚醒，再放入彭羅斯反應爐點火。"
   },
   "guide.singulo.stage4.goal.title": {
     "source": "Reaching stage 5",
     "translation": "進入第 5 階段"
   },
   "guide.singulo.stage4.power.body": {
-    "source": "- Degenerate Furnace (5×5×7): 5 MFE/t from Lv2 blocks on time crystals (1.25 MFE/t on BE catalysts); power leaves through I/O ports and it waits without burning fuel or catalyst while full.\n- Shells: one degenerate shell makes 24 reactor shell blocks; ignition needs 6 shells for plating plus 1 for the seed.\n- Probe Station: automates trips to discovered ruins.\n- Topological wire and SMES modules for large power.",
-    "translation": "- 簡併熱爐（5×5×7）：使用時間晶體催化劑，以 Lv2 壓縮塊產生 5 MFE/t（玻色凝聚態催化劑為 1.25 MFE/t）；電力經由輸入輸出埠輸出，儲能已滿時待機，不消耗燃料與催化劑。\n- 殼：一個簡併物質殼可製作 24 塊反應爐外殼；點火需要 6 個殼用於外殼，另加 1 個用於種子。\n- 自動探測站：自動前往已發現的廢墟。\n- 拓撲導線與超導磁儲能模組：用於大電力的傳輸與儲存。"
+    "source": "- Degenerate Furnace (5×5×7): crushes compressed blocks Lv2 for 5 MFE/t. It uses a time crystal catalyst (a BE condensate catalyst runs it at 25%, 1.25 MFE/t, as a stopgap). Power leaves through its I/O ports automatically; while its storage is full it waits without using fuel or catalyst.\n- Shells: one degenerate matter shell makes 24 reactor shell blocks. Ignition needs 6 shells for the plating plus 1 for the singularity seed. Gathering rock and metal in bulk helps.\n- Probe Station: sends probes to discovered Observation Posts and brings back half the loot.\n- Topological wire and SMES modules carry and store large amounts of power.",
+    "translation": "- 簡併熱爐（5×5×7）：壓碎壓縮塊 Lv2 產生 5 MFE/t。使用時間晶體催化劑（玻色凝聚態催化劑也能以 25%、1.25 MFE/t 暫時運轉）。電力會自動從輸入輸出埠送出；儲能已滿時待機，不消耗燃料與催化劑。\n- 簡併物質殼與反應爐外殼：1 個簡併物質殼可製作 24 塊反應爐外殼。點火前需要 6 個用於外殼，另加 1 個用於奇點種子。最好成批收集岩石與金屬。\n- 自動探測站：向已發現的地表觀測站派出探測器，帶回一半數量的回收物。\n- 拓撲導線與 SMES 模組用於傳輸與儲存大量電力。"
   },
   "guide.singulo.stage4.power.title": {
     "source": "Big power and automation",
@@ -4004,8 +4004,8 @@
     "translation": "第五階段：奇點"
   },
   "guide.singulo.stage5.byproducts.body": {
-    "source": "Collectors produce jet condensate, H-Condensate and exotic matter. The Singularity Core is the tier 5 catalyst.",
-    "translation": "收集器會產生噴流凝聚體、霍金凝聚體與奇異物質。奇點核心是第 5 級催化劑。"
+    "source": "With a Jet Collector, a Hawking Collector or an Ergosphere Ring installed, the reactor produces jet condensate, H-Condensate or exotic matter depending on how it is running. H-Condensate and other materials make the Singularity Core (the tier 5 catalyst).",
+    "translation": "裝入噴流收集器、霍金收集器或能層環後，反應爐會依運轉模式產出噴流凝聚體、霍金凝聚體或奇異物質。霍金凝聚體等可用來製作奇點核心（5 級催化劑）。"
   },
   "guide.singulo.stage5.byproducts.title": {
     "source": "By-products and the Singularity Core",
@@ -4020,16 +4020,16 @@
     "translation": "更遠的前方"
   },
   "guide.singulo.stage5.ignite.body": {
-    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s (250 MFE/t on average). While igniting the screen shows the intake and what will arrive; a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below so H condensate forms every 5 minutes with a Hawking Collector. The first core needs six, so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nBurn mass pellets; efficiency depends on spin. Mind the 24-block pull zone (time runs slower there) and the 4-block tidal zone.",
-    "translation": "插入種子，按下「點火」，在 10 秒內輸送 50 GFE（平均 250 MFE/t）。點火時介面會顯示受電速度和預計送達量；網路上限由最細的線纜決定，因此只用拓撲導線的網路 10 秒內只能送達 20 GFE。\n新爐心以回收運轉開始：爐心質量保持在 480 以下，配合霍金收集器每 5 分鐘產生一個霍金凝聚體。第一個奇點核心需要 6 個，因此先運轉約 30 分鐘，再關閉回收運轉轉為發電。回收運轉還會讓質量過大的爐心每秒釋放 2 質量。\n燃料為質量顆粒；效率取決於自旋。注意 24 格的引力區（那裡時間會變慢）和 4 格的潮汐區。"
+    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a horizon bus is required). The screen shows the intake needed (250 MFE/t on average by default). While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nThe fuel is mass pellets. Accretion efficiency depends on spin (5.7–42.3%); a core of mass 5000 at full spin gives about 2.1 GFE/t.\nOutside the ring (out to radius 24) a weak pull acts, inside the ring a pull you cannot escape, and anything that touches the black sphere is destroyed no matter how tough. Radius 4 is a tidal zone that ignores armour. Time runs slower in the pull zone: machines at ×0.8, catalyst wear at ×0.5.",
+    "translation": "插入種子，按下「點火」，在 10 秒內經由埠或控制器輸送 50 GFE（需要視界匯流排）。介面會顯示點火所需的受電（預設平均 250 MFE/t）。點火時會顯示受電速度與預計送達量，不足時請重新檢查線路；網路上限由最細的線纜決定，因此只用拓撲導線的網路 10 秒內只能送達 20 GFE。\n新爐心以回收運轉開始：爐心質量保持在 480 以下，配合霍金收集器每 5 分鐘產生 1 個霍金凝聚體。第一個奇點核心需要 6 個（直接 4 個、修復異常樣本 2 個），因此先運轉約 30 分鐘，再關閉回收運轉轉為發電。回收運轉還會讓質量過大的爐心每秒釋放 2 質量。\n燃料是質量顆粒。吸積效率取決於自旋（5.7–42.3%）；爐心質量 5000、自旋最大時約 2.1 GFE/t。\n環外（到半徑 24）是弱引力區，環內是無法逃脫的強引力區，碰到黑色球體的東西無論多堅固都會消失。半徑 4 是無視護甲的潮汐區。引力區內時間變慢：裝置 ×0.8，催化劑消耗 ×0.5。"
   },
   "guide.singulo.stage5.ignite.title": {
     "source": "Ignition and operation",
     "translation": "點火與運轉"
   },
   "guide.singulo.stage5.reactor.body": {
-    "source": "Three continuous orthogonal rings of radius 6 (48 blocks each): gyro drives where they cross, twelve stabilizer coils at the 45° points, reactor shell elsewhere (replace shell blocks with extraction ports or mass alarms), an empty 3×3×3 core. The core controller sits 5 below the centre.",
-    "translation": "三個半徑 6 的連續正交環（每個 48 格）：交叉處放陀螺驅動裝置，45° 位置放 12 個爐心穩定線圈，其餘為反應爐外殼（外殼方塊可替換為提取埠或爐心質量警報器），中心為空的 3×3×3 爐心。爐心控制器位於中心下方 5 格。"
+    "source": "Build three continuous rings of radius 6 (48 blocks each) on the three orthogonal planes through the core centre. The six points where they cross are gyro drives, the 45° points of each ring (twelve in all) are reactor stabilizer coils, and the rest is reactor shell (which can be swapped for extraction ports and mass alarms). The central 3×3×3 is air. The core controller sits 5 blocks below the centre. Use the Holo Projector on the core controller to show the whole structure.",
+    "translation": "在通過爐心中心的三個正交平面上，各建一個半徑 6、連續不斷的圓環（每環 48 個方塊）。三環交叉的 6 處放陀螺驅動裝置，各環 45° 的位置（共 12 處）放爐心穩定線圈，其餘為反應爐外殼（可換成提取埠與爐心質量警報器）。中心的 3×3×3 留空。爐心控制器位於中心下方 5 格處。對爐心控制器使用全像投影器，就能看到整個結構。"
   },
   "guide.singulo.stage5.reactor.title": {
     "source": "Building the reactor",
@@ -5005,7 +5005,7 @@
   },
   "item.singulo.data_card_observation_log": {
     "source": "Data Card (Observation Log)",
-    "translation": "資料卡（觀察日誌）"
+    "translation": "資料卡（觀測日誌）"
   },
   "item.singulo.data_card_quantum_fragment": {
     "source": "Data Card (Quantum Data Fragment)",
@@ -5097,7 +5097,7 @@
   },
   "item.singulo.gravity_chapter": {
     "source": "Chapter of Weight",
-    "translation": "重量斷章"
+    "translation": "重力斷章"
   },
   "item.singulo.gravity_field_stabilizer": {
     "source": "Gravity Field Stabilizer",
@@ -5193,7 +5193,7 @@
   },
   "item.singulo.observation_log": {
     "source": "Observation Log",
-    "translation": "觀察日誌"
+    "translation": "觀測日誌"
   },
   "item.singulo.optical_lattice_substrate": {
     "source": "Optical Lattice Substrate",
@@ -6765,7 +6765,7 @@
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
-    "translation": "用於：資料卡（觀察日誌）、資料卡（量子資料片段）、資料卡（培養資料）"
+    "translation": "用於：資料卡（觀測日誌）、資料卡（量子資料片段）、資料卡（培養資料）"
   },
   "uses.singulo.bose_condensate_catalyst": {
     "source": "Used in: Time Crystal Catalyst",
@@ -7069,7 +7069,7 @@
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
-    "translation": "用於：資料卡（觀察日誌）"
+    "translation": "用於：資料卡（觀測日誌）"
   },
   "uses.singulo.optical_lattice_substrate": {
     "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",
