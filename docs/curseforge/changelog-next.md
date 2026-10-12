@@ -25,6 +25,7 @@
   - Each extra player shortens the boss's attack gaps a little, down to 0.6× (`bossPacePerPlayer`).
   - Up to six players count (`bossMaxScaledPlayers`).
   - When someone joins mid-fight the health fraction is kept, and the boss never weakens when players leave.
+  - Bosses track the post-hit invulnerability per player, so every challenger's attacks land. Each player still gets the usual half-second window. Before, the whole party shared one window, and big groups dealt barely more damage than a solo player.
   - Drops and awakened rewards come once per challenger (`bossLootPerPlayer`), so everyone can collect their own chapters. The reward count is fixed when the fight begins (when the boss finishes emerging). Players who join later make the boss tougher but do not add rewards.
   - The Last Archivist only counts players inside its force field. Players waiting outside do not scale the boss, and if everyone inside falls the fight resets.
   - The boss bar shows the challenger count.

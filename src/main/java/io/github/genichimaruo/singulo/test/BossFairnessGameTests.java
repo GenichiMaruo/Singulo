@@ -371,4 +371,86 @@ public final class BossFairnessGameTests {
         }
         helper.succeed();
     }
+
+    /**
+     * 無敵時間はプレイヤーごと。6人がそれぞれ毎秒1回殴ると36回すべて通り、人数で増えた体力（3.5倍）より
+     * 攻撃の数（6倍）が多いので、ソロより速く削れる。共有の無敵時間だと12回しか通らず、ソロより遅かった。
+     */
+    @GameTest(template = EMPTY, batch = "boss_fair_hurt_party")
+    public static void partyHitsAreAcceptedPerPlayer(GameTestHelper helper) {
+        Vec3 c = LastArchivist.shieldCenter(helper.absolutePos(new BlockPos(3, 4, 3)));
+        java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
+        LastArchivist solo = archivist(helper);
+        LastArchivist party = archivist(helper);
+        try {
+            for (int i = 0; i < 6; i++) {
+                players.add(survivor(helper, c.add(i, 0, 0)));
+            }
+            solo.setNoAi(true);
+            party.setNoAi(true);
+            party.setParticipants(6);
+            float startSolo = solo.getHealth();
+            float startParty = party.getHealth();
+            int soloAccepted = 0;
+            int partyAccepted = 0;
+            int partyAttempted = 0;
+            for (int tick = 0; tick < 120; tick++) {
+                solo.tick();
+                party.tick();
+                if (tick % 20 == 0 && solo.hurt(helper.getLevel().damageSources().playerAttack(players.getFirst()), 20)) {
+                    soloAccepted++;
+                }
+                for (int i = 0; i < 6; i++) {
+                    if (tick % 20 == i * 20 / 6) {                     // 1秒の中に散らして殴る（0・3・6・10・13・16 tick）
+                        partyAttempted++;
+                        if (party.hurt(helper.getLevel().damageSources().playerAttack(players.get(i)), 20)) {
+                            partyAccepted++;
+                        }
+                    }
+                }
+            }
+            double soloLost = (startSolo - solo.getHealth()) / solo.getMaxHealth();
+            double partyLost = (startParty - party.getHealth()) / party.getMaxHealth();
+            helper.assertTrue(soloAccepted == 6, "ソロの攻撃が通らない: " + soloAccepted);
+            helper.assertTrue(partyAccepted == partyAttempted, "6人の攻撃が全部は通らない: " + partyAccepted + "/" + partyAttempted);
+            helper.assertTrue(partyLost > soloLost, "6人のほうがソロより遅く削れる: " + partyLost + " <= " + soloLost);
+        } finally {
+            solo.discard();
+            party.discard();
+            leave(helper, players.toArray(ServerPlayer[]::new));
+        }
+        helper.succeed();
+    }
+
+    /** ひとりひとりにはバニラと同じ無敵時間がかかる（同じ人が0.5秒以内に同じ強さで殴っても通らない。強い攻撃は差の分だけ通る）。 */
+    @GameTest(template = EMPTY, batch = "boss_fair_hurt_single")
+    public static void eachPlayerKeepsTheirOwnHurtWindow(GameTestHelper helper) {
+        Vec3 c = LastArchivist.shieldCenter(helper.absolutePos(new BlockPos(3, 4, 3)));
+        LastArchivist b = archivist(helper);
+        ServerPlayer one = survivor(helper, c.add(1, 0, 0));
+        ServerPlayer two = survivor(helper, c.add(-1, 0, 0));
+        try {
+            b.setNoAi(true);
+            var sources = helper.getLevel().damageSources();
+            helper.assertTrue(b.hurt(sources.playerAttack(one), 10), "最初の一撃が通らない");
+            for (int i = 0; i < 5; i++) {
+                b.tick();
+            }
+            helper.assertFalse(b.hurt(sources.playerAttack(one), 10), "同じ人の同じ強さの連打が0.5秒以内に通った");
+            helper.assertTrue(b.hurt(sources.playerAttack(two), 10), "別の人の攻撃が、他の人の無敵時間に止められた");
+            float before = b.getHealth();
+            helper.assertTrue(b.hurt(sources.playerAttack(one), 30), "強い攻撃が通らない");
+            helper.assertTrue(b.getHealth() < before, "強い攻撃で体力が減らない");
+            for (int i = 0; i < 10; i++) {
+                b.tick();
+            }
+            helper.assertTrue(b.hurt(sources.playerAttack(one), 10), "無敵時間が終わっても通らない");
+            // プレイヤー以外の攻撃は今までどおり（共有の無敵時間）
+            helper.assertFalse(b.hurt(sources.generic(), 5), "プレイヤー以外の攻撃が無敵時間を無視した");
+        } finally {
+            b.discard();
+            leave(helper, one, two);
+        }
+        helper.succeed();
+    }
 }

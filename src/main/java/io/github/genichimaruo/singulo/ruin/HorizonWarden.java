@@ -169,6 +169,8 @@ public class HorizonWarden extends Monster {
     private int emptyChecks;
     /** 強さに数えている挑戦者の数（増えるだけで、減らない。{@link BossScaling}）。 */
     private int participants = 1;
+    /** 無敵時間をプレイヤーごとに分ける（大勢で殴れば、人数ぶんの攻撃が通る）。 */
+    private final HurtWindows hurtWindows = new HurtWindows();
     /** 報酬に数える挑戦者の数。目覚めたときの人数で決まり、途中で合流しても増えない。0 ならまだ決まっていない。 */
     private int rewardParticipants;
     /** ボスバーのもとの名前（人数を添える前）。null なら実体の名前。 */
@@ -278,6 +280,7 @@ public class HorizonWarden extends Monster {
     @Override
     public void tick() {
         super.tick();
+        hurtWindows.tick();
         if (!level().isClientSide && emergeTicks() > 0) {
             tickEmerge((ServerLevel) level());
         }
@@ -1005,7 +1008,7 @@ public class HorizonWarden extends Monster {
         if (!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             amount *= damageScale;
         }
-        return super.hurt(source, amount);
+        return hurtWindows.hurt(this, source, amount, super::hurt, () -> lastHurt, v -> lastHurt = v);
     }
 
     /** 跳ね返さない飛び道具（自分やドローンの光弾、すでに自分が跳ね返したもの）。 */

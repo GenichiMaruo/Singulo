@@ -390,7 +390,7 @@ public class GravityRemnant extends RuinBoss {
             return super.hurt(source, amount);
         }
         boolean bypass = source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
-        if (shell() > 0 && !bypass && amount > 0 && invulnerableTime <= 10) {
+        if (shell() > 0 && !bypass && amount > 0 && !inHurtWindow(source)) {
             int piece = shell() - 1;
             setShell(piece);
             if (level() instanceof ServerLevel level) {

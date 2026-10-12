@@ -62,6 +62,8 @@ public abstract class RuinBoss extends Monster {
     protected float damageScale = 1;
     /** 強さに数えている挑戦者の数（増えるだけで、減らない）。 */
     private int participants = 1;
+    /** 無敵時間をプレイヤーごとに分ける（大勢で殴れば、人数ぶんの攻撃が通る）。 */
+    private final HurtWindows hurtWindows = new HurtWindows();
     /** 報酬に数える挑戦者の数。戦いが始まったとき（出現の演出が終わったとき）の人数で決まり、途中で合流しても増えない。0 ならまだ決まっていない。 */
     private int rewardParticipants;
     /** ボスバーのもとの名前（人数を添える前）。null なら実体の名前。 */
@@ -274,6 +276,7 @@ public abstract class RuinBoss extends Monster {
     @Override
     public void tick() {
         super.tick();
+        hurtWindows.tick();
         if (!level().isClientSide && emergeTicks() > 0) {
             ServerLevel level = (ServerLevel) level();
             int left = emergeTicks() - 1;
@@ -382,7 +385,12 @@ public abstract class RuinBoss extends Monster {
         if (!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             amount *= damageScale;
         }
-        return super.hurt(source, amount);
+        return hurtWindows.hurt(this, source, amount, super::hurt, () -> lastHurt, v -> lastHurt = v);
+    }
+
+    /** source の攻撃が、いまその攻撃者の無敵時間（同じ強さ以下は通らない間）の中か。プレイヤーごとに分けて数える。 */
+    protected boolean inHurtWindow(DamageSource source) {
+        return hurtWindows.within(this, source);
     }
 
     @Override
