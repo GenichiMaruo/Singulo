@@ -793,7 +793,7 @@
   },
   "block.singulo.rogue_black_hole": {
     "source": "Rogue Black Hole",
-    "translation": "제어 불능 블랙홀"
+    "translation": "떠돌이 블랙홀"
   },
   "block.singulo.ruin_cache": {
     "source": "Ruin Cache",
@@ -837,7 +837,7 @@
   },
   "block.singulo.seal_console": {
     "source": "Seal Console",
-    "translation": "씰 콘솔"
+    "translation": "봉인 콘솔"
   },
   "block.singulo.sealed_container_1": {
     "source": "Sealed Container (Magnetic Lock)",
@@ -1021,7 +1021,7 @@
   },
   "command.singulo.blackhole.done": {
     "source": "Rogue black hole at %s, %s, %s · mass %s",
-    "translation": "%s, %s, %s에 제어 불능 블랙홀을 생성했습니다 · 질량 %s"
+    "translation": "%s, %s, %s에 떠돌이 블랙홀을 생성했습니다 · 질량 %s"
   },
   "command.singulo.build.done": {
     "source": "Built %s with %s blocks",
@@ -1137,7 +1137,7 @@
   },
   "desc.singulo.awakening_record_core": {
     "source": "A record of the defeated warden, reforged with singularity power. Use it on the Seal Console in the final lab to wake the Awakened Horizon Warden: 2.5× health, 1.5× damage, faster moves. Victory yields overclock chips and more.",
-    "translation": "쓰러뜨린 감시자의 기록을 특이점의 힘으로 다시 구운 핵입니다. 최종 실험 시설의 씰 콘솔에 사용하면 각성한 지평선 감시자가 깨어납니다. 체력 2.5배, 피해 1.5배, 기술이 더 빠릅니다. 이기면 오버클럭 칩 등을 얻습니다."
+    "translation": "쓰러뜨린 감시자의 기록을 특이점의 힘으로 다시 구운 핵입니다. 최종 실험 시설의 봉인 콘솔에 사용하면 각성한 지평선 감시자가 깨어납니다. 체력 2.5배, 피해 1.5배, 기술이 더 빠릅니다. 이기면 오버클럭 칩 등을 얻습니다."
   },
   "desc.singulo.basic_circuit": {
     "source": "The brain of every early machine.",
@@ -1221,7 +1221,7 @@
   },
   "desc.singulo.cold_atom_trap": {
     "source": "A restored cold atom trap.",
-    "translation": "복원된 저온 원자 트랩."
+    "translation": "복원된 냉각 원자 트랩."
   },
   "desc.singulo.cold_atoms": {
     "source": "Atoms cooled close to absolute zero.",
@@ -1341,7 +1341,7 @@
   },
   "desc.singulo.data_card_observation_log": {
     "source": "A copy of an observation log, usable in recipes.",
-    "translation": "레시피에 사용할 수 있는 관찰 기록의 사본입니다."
+    "translation": "레시피에 사용할 수 있는 관측 로그의 사본입니다."
   },
   "desc.singulo.data_card_quantum_fragment": {
     "source": "A copy of a quantum data fragment.",
@@ -1573,7 +1573,7 @@
   },
   "desc.singulo.hawking_collector": {
     "source": "Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
-    "translation": "노심 질량이 작을 때(촉매 모드, 회수 운전으로 유지 가능) 5분마다 H 응축체를 1개 모읍니다."
+    "translation": "노심 질량이 작을 때(촉매 모드, 회수 운전으로 유지 가능) 5분마다 호킹 응축물를 1개 모읍니다."
   },
   "desc.singulo.hawking_condensate": {
     "source": "Condensed Hawking radiation.",
@@ -1997,7 +1997,7 @@
   },
   "desc.singulo.terminus_record": {
     "source": "The four chapters bound back together with singularity power: the last page. Use it on the Seal Console of the Final Lab to wake what slept in the time field. Leave and the record is returned.",
-    "translation": "네 개의 단장을 특이점의 힘으로 다시 묶은 마지막 페이지입니다. 최종 실험 시설의 씰 콘솔에 사용하면 시간의 장 속에서 잠들어 있던 무언가가 깨어납니다. 방을 떠나면 기록은 돌려받습니다."
+    "translation": "네 개의 단장을 특이점의 힘으로 다시 묶은 마지막 페이지입니다. 최종 실험 시설의 봉인 콘솔에 사용하면 시간의 장 속에서 잠들어 있던 무언가가 깨어납니다. 방을 떠나면 기록은 돌려받습니다."
   },
   "desc.singulo.thermocouple_module": {
     "source": "Turns a temperature difference into electricity.",
@@ -2305,7 +2305,7 @@
   },
   "fluid_type.singulo.liquid_nitrogen": {
     "source": "Liquid Nitrogen",
-    "translation": "액체질소"
+    "translation": "액체 질소"
   },
   "fluid_type.singulo.oxygen": {
     "source": "Oxygen",
@@ -3289,7 +3289,7 @@
   },
   "gui.singulo.reactor.recaptured": {
     "source": "The rogue black hole is now the core",
-    "translation": "제어 불능 블랙홀을 노심으로 끌어들였다"
+    "translation": "떠돌이 블랙홀을 노심으로 끌어들였다"
   },
   "gui.singulo.reactor.slot.0": {
     "source": "Singularity seed",
@@ -3557,7 +3557,7 @@
   },
   "gui.singulo.thermo.coolant": {
     "source": "Liquid nitrogen %s mB",
-    "translation": "액체질소 %1$s mB"
+    "translation": "액체 질소 %1$s mB"
   },
   "gui.singulo.thermo.delta": {
     "source": "Delta T %s K",
@@ -3801,7 +3801,7 @@
   },
   "guide.singulo.ruins.bosses.body": {
     "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관고는 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나면 수호자는 원래대로 돌아갑니다.\n여럿이 도전하면 수호자는 인원에 맞춰 강해집니다. 한 명 늘 때마다 체력이 원래의 절반만큼 늘고 기술 간격도 조금 짧아집니다(최대 6명까지). 도중에 합류해도 체력 비율은 유지되며, 누가 빠져도 약해지지 않습니다. 대신 전리품은 전투가 시작될 때의 도전자 수만큼 떨어집니다(나중에 합류한 사람의 몫은 늘지 않습니다). 여럿이 공격해도 서로의 공격에 막히지 않고 모두의 공격이 들어갑니다(같은 사람의 연타는 지금처럼 조금 간격을 두어야 들어갑니다).\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 씰 콘솔을 만지면 깨어납니다. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 감시자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다.\n- 에르고구의 거대 뱀(가라앉은 노심 구획): 구형 격납실 바닥의 멈춘 노심에 다가가면 나타납니다. 체력 2/3과 1/3에서 모습을 바꿉니다(바뀌는 동안은 피해를 받지 않습니다). 헤엄친 자리의 띠 안에서는 헤엄친 방향으로 떠밀리니, 흐름을 타고 쫓아가세요. 꼬리의 금빛으로 빛나는 핵은 언제나 약점입니다.\n  장갑: 반응로 외피 비늘을 두르고 몸통이 단단합니다. 머리가 하늘색으로 빛나면 돌진(노려진 곳에서 벗어나세요), 아가리의 소용돌이가 열리면 정면에 서지 마세요(빨아들인 뒤 광선). 꼬리 근처에 있으면 휩쓸립니다.\n  골격: 비늘을 모두 튕겨 내고(가까이 있으면 아픕니다) 빛의 골격이 됩니다. 몸통도 제대로 피해를 받습니다. 방 중앙에서 똬리를 틀고 돌며 주변을 떠밀고 빛의 파편을 쏩니다. 다가가면 물고, 돌진이 연달아 옵니다.\n  용: 노심의 소용돌이로 잠수했다가 검은 용이 되어 솟구칩니다. 두 뿔에서 도는 두 줄기 광선(상대론적 제트), 하늘을 돌며 발밑에 작은 블랙홀을 떨어뜨리는 폭풍(빛의 기둥이 전조), 돌진의 착지점에도 특이점이 남습니다. 소용돌이의 단장을 떨어뜨립니다.\n- 각성한 수호자: 메아리 파수꾼이나 중력 잔재를 쓰러뜨린 뒤 방 바닥의 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하면 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠른 기술, 체력 65%에서 분노). 메아리 파수꾼은 분신과 광탄이 하나씩 늘고, 분노하면 부서진 투영기를 두 개까지 다시 투영합니다. 중력 잔재는 잔해를 더 많이 쏘고, 중력 우물이 넓어지며, 연속으로 내려찍습니다. 방을 떠나면 각성핵은 돌려받습니다."
+    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관고는 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나면 수호자는 원래대로 돌아갑니다.\n여럿이 도전하면 수호자는 인원에 맞춰 강해집니다. 한 명 늘 때마다 체력이 원래의 절반만큼 늘고 기술 간격도 조금 짧아집니다(최대 6명까지). 도중에 합류해도 체력 비율은 유지되며, 누가 빠져도 약해지지 않습니다. 대신 전리품은 전투가 시작될 때의 도전자 수만큼 떨어집니다(나중에 합류한 사람의 몫은 늘지 않습니다). 여럿이 공격해도 서로의 공격에 막히지 않고 모두의 공격이 들어갑니다(같은 사람의 연타는 지금처럼 조금 간격을 두어야 들어갑니다).\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 봉인 콘솔을 만지면 깨어납니다. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 감시자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다.\n- 에르고구의 거대 뱀(가라앉은 노심 구획): 구형 격납실 바닥의 멈춘 노심에 다가가면 나타납니다. 체력 2/3과 1/3에서 모습을 바꿉니다(바뀌는 동안은 피해를 받지 않습니다). 헤엄친 자리의 띠 안에서는 헤엄친 방향으로 떠밀리니, 흐름을 타고 쫓아가세요. 꼬리의 금빛으로 빛나는 핵은 언제나 약점입니다.\n  장갑: 반응로 외피 비늘을 두르고 몸통이 단단합니다. 머리가 하늘색으로 빛나면 돌진(노려진 곳에서 벗어나세요), 아가리의 소용돌이가 열리면 정면에 서지 마세요(빨아들인 뒤 광선). 꼬리 근처에 있으면 휩쓸립니다.\n  골격: 비늘을 모두 튕겨 내고(가까이 있으면 아픕니다) 빛의 골격이 됩니다. 몸통도 제대로 피해를 받습니다. 방 중앙에서 똬리를 틀고 돌며 주변을 떠밀고 빛의 파편을 쏩니다. 다가가면 물고, 돌진이 연달아 옵니다.\n  용: 노심의 소용돌이로 잠수했다가 검은 용이 되어 솟구칩니다. 두 뿔에서 도는 두 줄기 광선(상대론적 제트), 하늘을 돌며 발밑에 작은 블랙홀을 떨어뜨리는 폭풍(빛의 기둥이 전조), 돌진의 착지점에도 특이점이 남습니다. 소용돌이의 단장을 떨어뜨립니다.\n- 각성한 수호자: 메아리 파수꾼이나 중력 잔재를 쓰러뜨린 뒤 방 바닥의 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하면 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠른 기술, 체력 65%에서 분노). 메아리 파수꾼은 분신과 광탄이 하나씩 늘고, 분노하면 부서진 투영기를 두 개까지 다시 투영합니다. 중력 잔재는 잔해를 더 많이 쏘고, 중력 우물이 넓어지며, 연속으로 내려찍습니다. 방을 떠나면 각성핵은 돌려받습니다."
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3841,7 +3841,7 @@
   },
   "guide.singulo.ruins.records.body": {
     "source": "Ruin caches sometimes hold crystal memories. Decode them in the Archive Terminal to unlock the Ancient Records chapter.",
-    "translation": "폐허 보관함에서 가끔 크리스털 메모리가 나옵니다. 기록 보관 단말기에서 읽어 내면 '고대 문명의 기록' 장이 열립니다."
+    "translation": "폐허 보관고에서 가끔 크리스털 메모리가 나옵니다. 기록 보관 단말기에서 읽어 내면 '고대 문명의 기록' 장이 열립니다."
   },
   "guide.singulo.ruins.records.title": {
     "source": "Crystal memories",
@@ -3929,7 +3929,7 @@
   },
   "guide.singulo.stage2.tower.body": {
     "source": "A waisted 5×5 tower, 7–15 high, with heat exchange cores up the middle. It makes liquid nitrogen from air and superconducting coils.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 cryogenic turbines and a 10-high tower 5 (less when it also processes coils; recipes with inputs run before nitrogen).",
-    "translation": "가운데가 잘록한 5×5 탑으로, 높이는 7~15이고 중앙에 열교환 코어가 들어갑니다. 공기로 액체질소를 만들고, 초전도 코일도 만듭니다.\n열교환 코어와 냉각 밴드는 푸른 얼음 대신 꽁꽁 언 얼음 3개로도 만들 수 있습니다. 질소만 만들면 높이 7 탑은 극저온 터빈 약 3.5대, 높이 10 탑은 5대를 돌립니다(코일 등과 함께 가공하면 줄어듭니다. 재료가 있는 레시피가 질소보다 먼저 돌아갑니다)."
+    "translation": "가운데가 잘록한 5×5 탑으로, 높이는 7~15이고 중앙에 열교환 코어가 들어갑니다. 공기로 액체 질소를 만들고, 초전도 코일도 만듭니다.\n열교환 코어와 냉각 밴드는 푸른 얼음 대신 꽁꽁 언 얼음 3개로도 만들 수 있습니다. 질소만 만들면 높이 7 탑은 극저온 터빈 약 3.5대, 높이 10 탑은 5대를 돌립니다(코일 등과 함께 가공하면 줄어듭니다. 재료가 있는 레시피가 질소보다 먼저 돌아갑니다)."
   },
   "guide.singulo.stage2.tower.title": {
     "source": "Cryogenic Cooling Tower",
@@ -4013,7 +4013,7 @@
   },
   "guide.singulo.stage5.endgame.body": {
     "source": "With cores and power you can run the late-game devices: shields, T-Cylinders and wormholes. Artificial star cores end the hunt for nether stars.\nFor a real fight, make an Awakening Record Core in the singularity encapsulator and use it on the Final Lab's seal console: the Awakened Horizon Warden has 2.5× health and 1.5× damage. Beat it for overclock chips and more, as often as you like.\nThe Research Building and Culture Facility guardians can be refought too: use an Awakened Echo Core or Awakened Gravity Core on their guardian core.\nOnce the Final Lab is cleared, tune your explorer compass to find a Sunken Reactor Sector: the Ergosphere Leviathan lives in its dead second reactor.\nThey say awakened guardians drop chapters of records as they fall. What might you read once you have them all?",
-    "translation": "코어와 전력이 있으면 보호막, 티플러 원통, 웜홀 같은 후반 장치를 가동할 수 있습니다. 인공 항성 코어가 있으면 더 이상 네더의 별을 찾지 않아도 됩니다.\n진짜 싸움을 원한다면 특이점 캡슐화기에서 각성의 기록핵을 만들어 최종 실험 시설의 씰 콘솔에 사용하세요. 각성한 지평선 감시자는 체력 2.5배, 피해 1.5배입니다. 이기면 오버클럭 칩 등을 얻고, 몇 번이든 도전할 수 있습니다.\n연구동과 봉쇄 배양 시설의 수호자와도 재대결할 수 있습니다. 각 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하세요.\n최종 실험 시설을 공략했다면 탐험가의 나침반을 조정해 가라앉은 노심 구획을 찾아보세요. 멈춘 두 번째 반응로에 에르고구의 거대 뱀이 살고 있습니다.\n각성한 수호자들은 쓰러질 때 기록의 단장을 떨어뜨린다고 합니다. 단장을 모두 모으면 무엇을 읽을 수 있을까요?"
+    "translation": "코어와 전력이 있으면 보호막, 티플러 원통, 웜홀 같은 후반 장치를 가동할 수 있습니다. 인공 항성 코어가 있으면 더 이상 네더의 별을 찾지 않아도 됩니다.\n진짜 싸움을 원한다면 특이점 캡슐화기에서 각성의 기록핵을 만들어 최종 실험 시설의 봉인 콘솔에 사용하세요. 각성한 지평선 감시자는 체력 2.5배, 피해 1.5배입니다. 이기면 오버클럭 칩 등을 얻고, 몇 번이든 도전할 수 있습니다.\n연구동과 봉쇄 배양 시설의 수호자와도 재대결할 수 있습니다. 각 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하세요.\n최종 실험 시설을 공략했다면 탐험가의 나침반을 조정해 가라앉은 노심 구획을 찾아보세요. 멈춘 두 번째 반응로에 에르고구의 거대 뱀이 살고 있습니다.\n각성한 수호자들은 쓰러질 때 기록의 단장을 떨어뜨린다고 합니다. 단장을 모두 모으면 무엇을 읽을 수 있을까요?"
   },
   "guide.singulo.stage5.endgame.title": {
     "source": "Beyond",
@@ -5005,7 +5005,7 @@
   },
   "item.singulo.data_card_observation_log": {
     "source": "Data Card (Observation Log)",
-    "translation": "데이터 카드(관찰 기록)"
+    "translation": "데이터 카드(관측 로그)"
   },
   "item.singulo.data_card_quantum_fragment": {
     "source": "Data Card (Quantum Data Fragment)",
@@ -5097,7 +5097,7 @@
   },
   "item.singulo.gravity_chapter": {
     "source": "Chapter of Weight",
-    "translation": "무게의 단장"
+    "translation": "중력의 단장"
   },
   "item.singulo.gravity_field_stabilizer": {
     "source": "Gravity Field Stabilizer",
@@ -5193,7 +5193,7 @@
   },
   "item.singulo.observation_log": {
     "source": "Observation Log",
-    "translation": "관찰 기록"
+    "translation": "관측 로그"
   },
   "item.singulo.optical_lattice_substrate": {
     "source": "Optical Lattice Substrate",
@@ -6585,7 +6585,7 @@
   },
   "subtitles.singulo.vault.unseal": {
     "source": "Vault field dissipates",
-    "translation": "보관함의 역장이 사라진다"
+    "translation": "보관고의 역장이 사라진다"
   },
   "subtitles.singulo.void_collector.collect": {
     "source": "Void dust gathers",
@@ -6765,7 +6765,7 @@
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
-    "translation": "사용 대상: 데이터 카드(관찰 기록), 데이터 카드(양자 데이터 조각), 데이터 카드(배양 데이터)"
+    "translation": "사용 대상: 데이터 카드(관측 로그), 데이터 카드(양자 데이터 조각), 데이터 카드(배양 데이터)"
   },
   "uses.singulo.bose_condensate_catalyst": {
     "source": "Used in: Time Crystal Catalyst",
@@ -7069,7 +7069,7 @@
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
-    "translation": "사용 제품: 데이터 카드(관찰 기록)"
+    "translation": "사용 제품: 데이터 카드(관측 로그)"
   },
   "uses.singulo.optical_lattice_substrate": {
     "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",

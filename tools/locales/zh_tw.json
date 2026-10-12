@@ -1265,7 +1265,7 @@
   },
   "desc.singulo.coolant_cartridge": {
     "source": "A steel canister holding 100 mB of liquid nitrogen. Lets the Precision Assembler build cryogenic parts such as quantum computing modules.",
-    "translation": "裝有 100 mB 液氮的鋼罐。讓無法放入液體的精密組裝台也能組裝量子運算模組等低溫零件。"
+    "translation": "裝有 100 mB 液態氮的鋼罐。讓無法放入液體的精密組裝台也能組裝量子運算模組等低溫零件。"
   },
   "desc.singulo.cooling_tower_base": {
     "source": "The 5×5 foundation of the tower.",
@@ -1341,7 +1341,7 @@
   },
   "desc.singulo.data_card_observation_log": {
     "source": "A copy of an observation log, usable in recipes.",
-    "translation": "觀察日誌的副本，可用於配方。"
+    "translation": "觀測日誌的副本，可用於配方。"
   },
   "desc.singulo.data_card_quantum_fragment": {
     "source": "A copy of a quantum data fragment.",
@@ -1633,7 +1633,7 @@
   },
   "desc.singulo.laser_cooler": {
     "source": "Laser-cools atoms into cold atoms, lattices and condensates.",
-    "translation": "以雷射冷卻原子，製成冷原子、光學晶格基板與凝聚態催化劑。"
+    "translation": "以雷射冷原子，製成冷原子、光學晶格基板與凝聚態催化劑。"
   },
   "desc.singulo.low_gravity_panel": {
     "source": "When powered, standing on it cuts your gravity to a fifth until you next land (less fall damage too). Joins visually with its neighbours.",
@@ -1729,7 +1729,7 @@
   },
   "desc.singulo.phase_sync_plate": {
     "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
-    "translation": "把冷卻原子的振動印在光晶格上的板。能讓時間晶體的振動相位一致，使培育時間為 12 分鐘。"
+    "translation": "把冷原子的振動印在光晶格上的板。能讓時間晶體的振動相位一致，使培育時間為 12 分鐘。"
   },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
@@ -1949,7 +1949,7 @@
   },
   "desc.singulo.stardust": {
     "source": "Cosmic grains carrying rare isotopes. The raw material for cold atoms.",
-    "translation": "從宇宙帶來的微粒，含有地球上沒有的稀有同位素。是冷卻原子的原料。"
+    "translation": "從宇宙帶來的微粒，含有地球上沒有的稀有同位素。是冷原子的原料。"
   },
   "desc.singulo.stardust_cluster": {
     "source": "Crystals of cosmic grains that grow on meteorite crust. Break them for stardust.",
@@ -3033,19 +3033,19 @@
   },
   "gui.singulo.guardian.defeated.echo_sentinel": {
     "source": "The Echo Sentinel unravels. The vault field dissipates",
-    "translation": "回聲守衛消散了。寶庫的力場消失了"
+    "translation": "回聲守衛消散了。保管庫的力場消失了"
   },
   "gui.singulo.guardian.defeated.ergosphere_leviathan": {
     "source": "The Ergosphere Leviathan sinks into the vortex. The vault field dissipates",
-    "translation": "能層巨蛇沉入了漩渦之底。寶庫的力場消失了"
+    "translation": "能層巨蛇沉入了漩渦之底。保管庫的力場消失了"
   },
   "gui.singulo.guardian.defeated.gravity_remnant": {
     "source": "The Gravity Remnant collapses. The vault field dissipates",
-    "translation": "重力殘渣的核心坍縮了。寶庫的力場消失了"
+    "translation": "重力殘渣的核心坍縮了。保管庫的力場消失了"
   },
   "gui.singulo.guardian.no_vault": {
     "source": "No guarded vault nearby",
-    "translation": "附近沒有受守衛保護的寶庫"
+    "translation": "附近沒有受守衛保護的保管庫"
   },
   "gui.singulo.guardian.reset.echo_sentinel": {
     "source": "No challenger remains. The Echo Sentinel returns to the records",
@@ -3801,7 +3801,7 @@
   },
   "guide.singulo.ruins.bosses.body": {
     "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "研究棟、封鎖培養設施和最終實驗設施的寶庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n人數越多，守衛就越強：每多一名玩家，體力增加原本的一半，招式間隔也會稍微縮短（最多計算 6 人）。中途加入時體力比例保持不變，有人離開也不會變弱。相對地，掉落物會按戰鬥開始時的挑戰者人數掉落（之後加入的人不會增加掉落）。多人攻擊時，每個人的攻擊都不會被他人擋住（同一個人連續攻擊，仍需像以往一樣稍作間隔）。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封鎖培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗設施）：觸碰中央的封印控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也能造成全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞的落點也會留下奇點。掉落漩渦斷章。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
+    "translation": "研究棟、封閉培養設施和最終實驗室的保管庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間時，守衛也會復原。\n人數越多，守衛就越強：每多一名玩家，體力增加原本的一半，招式間隔也會稍微縮短（最多計算 6 人）。中途加入時體力比例保持不變，有人離開也不會變弱。相對地，掉落物會按戰鬥開始時的挑戰者人數掉落（之後加入的人不會增加掉落）。多人攻擊時，每個人的攻擊都不會被他人擋住（同一個人連續攻擊，仍需像以往一樣稍作間隔）。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封閉培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。掉落簡併核。\n- 視界守衛（最終實驗室）：觸碰中央的封印控制台即可喚醒。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也能造成全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞的落點也會留下奇點。掉落漩渦斷章。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3893,7 +3893,7 @@
   },
   "guide.singulo.stage1.thermal_pairs.body": {
     "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nTo run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.",
-    "translation": "冷方塊可以一直使用而不融化的組合（每台發電機的輸出）：\n- 岩漿塊＋藍冰：約 76 FE/t（最推薦）\n- 運轉中的燒製爐＋藍冰：約 66 FE/t\n- 營火＋藍冰：約 56 FE/t\n- 營火＋浮冰：約 55 FE/t\n熔岩太熱：即使是藍冰也會在約 40 秒內變成浮冰並繼續融化。營火搭配水、雪或冰，不到 1 分鐘就會融化。\n要運轉第 2 階段的低溫冷卻塔（液氮 240 FE/t），岩漿塊＋藍冰大約需要 4 台以上，營火＋浮冰則需要 5 台以上（不含銅導線損耗）。先用 2–4 台，一次運轉一台機器，再逐步增加。"
+    "translation": "冷方塊可以一直使用而不融化的組合（每台發電機的輸出）：\n- 岩漿塊＋藍冰：約 76 FE/t（最推薦）\n- 運轉中的燒製爐＋藍冰：約 66 FE/t\n- 營火＋藍冰：約 56 FE/t\n- 營火＋浮冰：約 55 FE/t\n熔岩太熱：即使是藍冰也會在約 40 秒內變成浮冰並繼續融化。營火搭配水、雪或冰，不到 1 分鐘就會融化。\n要運轉第 2 階段的低溫冷卻塔（液態氮 240 FE/t），岩漿塊＋藍冰大約需要 4 台以上，營火＋浮冰則需要 5 台以上（不含銅導線損耗）。先用 2–4 台，一次運轉一台機器，再逐步增加。"
   },
   "guide.singulo.stage1.thermal_pairs.title": {
     "source": "Pairs that last",
@@ -3921,7 +3921,7 @@
   },
   "guide.singulo.stage2.others.body": {
     "source": "- Precision Assembler: makes almost everything from stage 3 on.\n- Cryogenic Turbine: power from evaporating nitrogen.\n- SMES Cell: stores energy.\n- Small Worldline Anchor: chunk loader fed by catalysts.\n- Monopole Upgrade: ×2 speed, +50% efficiency in a machine's monopole slot.",
-    "translation": "- 精密組裝台：第 3 階段以後幾乎所有東西都在這裡製作。\n- 低溫渦輪機：利用液態氮蒸發發電。\n- 超導磁儲能電池：儲存電力。\n- 世界線錨（小型）：以催化劑運作的區塊載入器。\n- 單極子升級模組：插入機器的單極子槽，速度 ×2、效率 +50%。"
+    "translation": "- 精密組裝台：第 3 階段以後幾乎所有東西都在這裡製作。\n- 低溫渦輪機：利用液態氮蒸發發電。\n- SMES 電池：儲存電力。\n- 世界線錨（小型）：以催化劑運作的區塊載入器。\n- 單極子升級模組：插入機器的單極子槽，速度 ×2、效率 +50%。"
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",
@@ -5005,7 +5005,7 @@
   },
   "item.singulo.data_card_observation_log": {
     "source": "Data Card (Observation Log)",
-    "translation": "資料卡（觀察日誌）"
+    "translation": "資料卡（觀測日誌）"
   },
   "item.singulo.data_card_quantum_fragment": {
     "source": "Data Card (Quantum Data Fragment)",
@@ -5097,7 +5097,7 @@
   },
   "item.singulo.gravity_chapter": {
     "source": "Chapter of Weight",
-    "translation": "重量斷章"
+    "translation": "重力斷章"
   },
   "item.singulo.gravity_field_stabilizer": {
     "source": "Gravity Field Stabilizer",
@@ -5193,7 +5193,7 @@
   },
   "item.singulo.observation_log": {
     "source": "Observation Log",
-    "translation": "觀察日誌"
+    "translation": "觀測日誌"
   },
   "item.singulo.optical_lattice_substrate": {
     "source": "Optical Lattice Substrate",
@@ -6765,7 +6765,7 @@
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
-    "translation": "用於：資料卡（觀察日誌）、資料卡（量子資料片段）、資料卡（培養資料）"
+    "translation": "用於：資料卡（觀測日誌）、資料卡（量子資料片段）、資料卡（培養資料）"
   },
   "uses.singulo.bose_condensate_catalyst": {
     "source": "Used in: Time Crystal Catalyst",
@@ -7069,7 +7069,7 @@
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
-    "translation": "用於：資料卡（觀察日誌）"
+    "translation": "用於：資料卡（觀測日誌）"
   },
   "uses.singulo.optical_lattice_substrate": {
     "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",

@@ -313,7 +313,7 @@
   },
   "advancement.singulo.ruin_culture.description": {
     "source": "Open a culture facility cache",
-    "translation": "打开封锁培养设施的宝库"
+    "translation": "打开封闭培养设施的保管库"
   },
   "advancement.singulo.ruin_culture.title": {
     "source": "Sealed Section",
@@ -329,7 +329,7 @@
   },
   "advancement.singulo.ruin_observation.description": {
     "source": "Open an observation post cache",
-    "translation": "打开地表观测站的宝库"
+    "translation": "打开地表观测站的保管库"
   },
   "advancement.singulo.ruin_observation.title": {
     "source": "Traces of the Ancients",
@@ -337,7 +337,7 @@
   },
   "advancement.singulo.ruin_research.description": {
     "source": "Open a research building cache",
-    "translation": "打开研究楼的宝库"
+    "translation": "打开研究楼的保管库"
   },
   "advancement.singulo.ruin_research.title": {
     "source": "Research Building",
@@ -345,7 +345,7 @@
   },
   "advancement.singulo.ruin_sunken.description": {
     "source": "Open the cache of a Sunken Reactor Sector",
-    "translation": "打开沉没的炉心区的宝库"
+    "translation": "打开沉没的炉心区的保管库"
   },
   "advancement.singulo.ruin_sunken.title": {
     "source": "The Sunken Reactor",
@@ -1049,7 +1049,7 @@
   },
   "compass.singulo.hint": {
     "source": "Sneak-use on the cache of a cleared %s to tune it for the next ruin",
-    "translation": "潜行右键已攻略的%s的宝库，即可调校以搜寻下一处废墟"
+    "translation": "潜行右键已攻略的%s的保管库，即可调校以搜寻下一处废墟"
   },
   "compass.singulo.level": {
     "source": "Tuning %s / %s",
@@ -1061,7 +1061,7 @@
   },
   "compass.singulo.not_cleared": {
     "source": "Clear %s first by opening its cache",
-    "translation": "请先打开%s的宝库完成攻略"
+    "translation": "请先打开%s的保管库完成攻略"
   },
   "compass.singulo.not_found": {
     "source": "No %s nearby",
@@ -1077,7 +1077,7 @@
   },
   "compass.singulo.wrong_cache": {
     "source": "Tuning needs the cache of %s",
-    "translation": "调校需要%s的宝库"
+    "translation": "调校需要%s的保管库"
   },
   "container.singulo.dimensional_pocket": {
     "source": "Dimensional Pocket",
@@ -1133,7 +1133,7 @@
   },
   "desc.singulo.awakening_gravity_core": {
     "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
-    "translation": "注入了奇点之力的简并核。在封锁培养设施的守卫封印核心上使用，会召唤觉醒的重力残渣：生命 2.5 倍、伤害 1.5 倍、瓦砾更多、重力井更大更强，并会连续砸地。获胜后除了平常的掉落，还能获得超频芯片等奖励。"
+    "translation": "注入了奇点之力的简并核。在封闭培养设施的守卫封印核心上使用，会召唤觉醒的重力残渣：生命 2.5 倍、伤害 1.5 倍、瓦砾更多、重力井更大更强，并会连续砸地。获胜后除了平常的掉落，还能获得超频芯片等奖励。"
   },
   "desc.singulo.awakening_record_core": {
     "source": "A record of the defeated warden, reforged with singularity power. Use it on the Seal Console in the final lab to wake the Awakened Horizon Warden: 2.5× health, 1.5× damage, faster moves. Victory yields overclock chips and more.",
@@ -1333,7 +1333,7 @@
   },
   "desc.singulo.culture_data": {
     "source": "A record from the culture facility.",
-    "translation": "来自封锁培养设施的记录。"
+    "translation": "来自封闭培养设施的记录。"
   },
   "desc.singulo.data_card_culture_data": {
     "source": "A copy of culture data.",
@@ -1341,7 +1341,7 @@
   },
   "desc.singulo.data_card_observation_log": {
     "source": "A copy of an observation log, usable in recipes.",
-    "translation": "观察日志的副本，可用于配方。"
+    "translation": "观测日志的副本，可用于配方。"
   },
   "desc.singulo.data_card_quantum_fragment": {
     "source": "A copy of a quantum data fragment.",
@@ -1389,7 +1389,7 @@
   },
   "desc.singulo.degenerate_furnace": {
     "source": "A large generator burning Lv2 blocks: 5 MFE/t on time crystals with default settings (25% on BE catalysts).",
-    "translation": "燃烧 Lv2 块的大型发电机。默认设置下使用时间晶体催化剂为 5 MFE/t（低一级的 BE 凝聚催化剂为 25%）。"
+    "translation": "燃烧 Lv2 块的大型发电机。默认设置下使用时间晶体催化剂为 5 MFE/t（低一级的 玻色凝聚态催化剂为 25%）。"
   },
   "desc.singulo.degenerate_furnace_controller": {
     "source": "Goes in the middle of a side, second layer from the bottom.",
@@ -1641,7 +1641,7 @@
   },
   "desc.singulo.magnetic_bottle": {
     "source": "Captures strangelets and contains leaking strange matter.",
-    "translation": "捕获奇异子，并封存泄漏的奇异物质。"
+    "translation": "捕获奇异子，并封存泄漏的奇异夸克物质块。"
   },
   "desc.singulo.magnetic_key": {
     "source": "Opens or seals a magnetic-lock container. Used up each time.",
@@ -1729,7 +1729,7 @@
   },
   "desc.singulo.phase_sync_plate": {
     "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
-    "translation": "把冷却原子的振动印在光晶格上的板。能让时间晶体的振动相位一致，使培育时间为 12 分钟。"
+    "translation": "把冷原子的振动印在光晶格上的板。能让时间晶体的振动相位一致，使培育时间为 12 分钟。"
   },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
@@ -1949,7 +1949,7 @@
   },
   "desc.singulo.stardust": {
     "source": "Cosmic grains carrying rare isotopes. The raw material for cold atoms.",
-    "translation": "从宇宙带来的微粒，含有地球上没有的稀有同位素。是冷却原子的原料。"
+    "translation": "从宇宙带来的微粒，含有地球上没有的稀有同位素。是冷原子的原料。"
   },
   "desc.singulo.stardust_cluster": {
     "source": "Crystals of cosmic grains that grow on meteorite crust. Break them for stardust.",
@@ -1973,7 +1973,7 @@
   },
   "desc.singulo.strangelet": {
     "source": "Converts nearby blocks into strange matter. Contain it with a Magnetic Bottle.",
-    "translation": "将附近的方块转化为奇异物质。用磁瓶收容它。"
+    "translation": "将附近的方块转化为奇异夸克物质块。用磁瓶收容它。"
   },
   "desc.singulo.striped_ruin_panel": {
     "source": "Ancient panel with a long-dead light band.",
@@ -3921,7 +3921,7 @@
   },
   "guide.singulo.stage2.others.body": {
     "source": "- Precision Assembler: makes almost everything from stage 3 on.\n- Cryogenic Turbine: power from evaporating nitrogen.\n- SMES Cell: stores energy.\n- Small Worldline Anchor: chunk loader fed by catalysts.\n- Monopole Upgrade: ×2 speed, +50% efficiency in a machine's monopole slot.",
-    "translation": "- 精密组装台：第 3 阶段以后的几乎所有东西都在这里制作。\n- 低温涡轮机：利用液氮气化发电。\n- 超导磁储能电池：储存电能。\n- 小型世界线锚：放入催化剂即可持续加载区块。\n- 单极子升级模块：装入机器的单极子槽后，速度 ×2，电力效率 +50%。"
+    "translation": "- 精密组装台：第 3 阶段以后的几乎所有东西都在这里制作。\n- 低温涡轮机：利用液氮气化发电。\n- SMES 电池：储存电能。\n- 小型世界线锚：放入催化剂即可持续加载区块。\n- 单极子升级模块：装入机器的单极子槽后，速度 ×2，电力效率 +50%。"
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",
@@ -3949,7 +3949,7 @@
   },
   "guide.singulo.stage3.quantum.body": {
     "source": "- Entanglement Synthesizer: entangled elements, two at a time.\n- Laser Cooler: cold atoms, lattices, BE condensate catalyst.\n- Quantum Heat Engine: catalyst-driven generator, 200 kFE/t on BE catalysts; a muon catalyst runs it at 25% (50 kFE/t) as a stopgap. It waits without wearing the catalyst while its storage is full.",
-    "translation": "- 量子纠缠合成器：制造量子纠缠元件，一次两个。\n- 激光冷却器：制造冷原子、光学晶格基板和 BE 凝聚催化剂。\n- 量子热机：催化剂驱动发电机，使用 BE 凝聚催化剂时 200 kFE/t；缪子催化剂可以 25%（50 kFE/t）临时运行。储能满时待机，不消耗催化剂。"
+    "translation": "- 量子纠缠合成器：制造量子纠缠元件，一次两个。\n- 激光冷却器：制造冷原子、光学晶格基板和 玻色凝聚态催化剂。\n- 量子热机：催化剂驱动发电机，使用 玻色凝聚态催化剂时 200 kFE/t；缪子催化剂可以 25%（50 kFE/t）临时运行。储能满时待机，不消耗催化剂。"
   },
   "guide.singulo.stage3.quantum.title": {
     "source": "Quantum machines",
@@ -5005,7 +5005,7 @@
   },
   "item.singulo.data_card_observation_log": {
     "source": "Data Card (Observation Log)",
-    "translation": "数据卡（观察日志）"
+    "translation": "数据卡（观测日志）"
   },
   "item.singulo.data_card_quantum_fragment": {
     "source": "Data Card (Quantum Data Fragment)",
@@ -5193,7 +5193,7 @@
   },
   "item.singulo.observation_log": {
     "source": "Observation Log",
-    "translation": "观察日志"
+    "translation": "观测日志"
   },
   "item.singulo.optical_lattice_substrate": {
     "source": "Optical Lattice Substrate",
@@ -5449,7 +5449,7 @@
   },
   "jei.singulo.mb.degenerate_furnace": {
     "source": "■ Shape: closed 5×5×7 furnace\n■ Start: time crystal catalyst and fuel\n■ Fuel: compressed block Lv2\n■ Output: 5 MFE/t by default (25% on BE catalysts)",
-    "translation": "■ 形状：封闭式5×5×7炉\n■ 启动：时间晶体催化剂和燃料\n■ 燃料：压缩块Lv2\n■ 输出：默认 5 MFE/t（BE 凝聚催化剂为 25%）"
+    "translation": "■ 形状：封闭式5×5×7炉\n■ 启动：时间晶体催化剂和燃料\n■ 燃料：压缩块 Lv2\n■ 输出：默认 5 MFE/t（玻色凝聚态催化剂为 25%）"
   },
   "jei.singulo.mb.event_horizon_shield": {
     "source": "■ Shape: tapering tower, 9 high\n■ Start: time crystal or singularity core, and power\n■ Effect: guards a radius of 32",
@@ -5721,7 +5721,7 @@
   },
   "record.singulo.r01.title": {
     "source": "Observation Log 1",
-    "translation": "观察日志 1"
+    "translation": "观测日志 1"
   },
   "record.singulo.r02.body": {
     "source": "Thermoelectric efficiency is below 0.0001%. Burning fuel for a gradient is like moving a mountain to pick up a grain of sand. Still, this is where we must begin.",
@@ -5729,7 +5729,7 @@
   },
   "record.singulo.r02.title": {
     "source": "Observation Log 7",
-    "translation": "观察日志 7"
+    "translation": "观测日志 7"
   },
   "record.singulo.r03.body": {
     "source": "All casings shall be white, so that every stain shows. Anomalies must be found while they are still visible.",
@@ -6585,7 +6585,7 @@
   },
   "subtitles.singulo.vault.unseal": {
     "source": "Vault field dissipates",
-    "translation": "宝库的力场消失"
+    "translation": "保管库的力场消失"
   },
   "subtitles.singulo.void_collector.collect": {
     "source": "Void dust gathers",
@@ -6765,7 +6765,7 @@
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
-    "translation": "用于：数据卡（观察日志）、数据卡（量子数据片段）、数据卡（培养数据）"
+    "translation": "用于：数据卡（观测日志）、数据卡（量子数据片段）、数据卡（培养数据）"
   },
   "uses.singulo.bose_condensate_catalyst": {
     "source": "Used in: Time Crystal Catalyst",
@@ -7069,7 +7069,7 @@
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
-    "translation": "用于：数据卡（观察日志）"
+    "translation": "用于：数据卡（观测日志）"
   },
   "uses.singulo.optical_lattice_substrate": {
     "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",
