@@ -1572,8 +1572,8 @@
     "translation": "右键打开。介绍目标、机器、多方块结构，并显示你的进度。"
   },
   "desc.singulo.hawking_collector": {
-    "source": "Collects H-Condensate in catalyst mode.",
-    "translation": "在催化剂模式下收集霍金凝聚体。"
+    "source": "Collects one H-Condensate every 5 minutes while the core is light (catalyst mode; harvest mode keeps it there).",
+    "translation": "炉心质量较小时（催化剂模式；开启回收运转即可保持），每5分钟收集1个霍金凝聚体。"
   },
   "desc.singulo.hawking_condensate": {
     "source": "Condensed Hawking radiation.",
@@ -2208,8 +2208,8 @@
     "translation": "你读了那些记录，点燃了同样的炉火。而你始终没有放开那只停止投料的手。"
   },
   "ending.singulo.line.4": {
-    "source": "So now the energy returns: to mass, to stars, to a galaxy.",
-    "translation": "所以此刻，能量归还了。归于质量。归于星辰。归于银河。"
+    "source": "And now the energy has become mass again, then stars, then a galaxy.",
+    "translation": "而此刻，能量重新化为质量，化为星辰，化为银河。"
   },
   "ending.singulo.line.5": {
     "source": "Look up at the night sky. That light is the universe you made.",
@@ -2420,12 +2420,12 @@
     "translation": "那么，就让你读到最后一页吧。"
   },
   "gui.singulo.archivist.phase_2": {
-    "source": "Remember. Every record is here.",
-    "translation": "回想起来吧。所有的记录都在这里。"
+    "source": "Do you remember? Every record is here.",
+    "translation": "你还记得吗。所有的记录，都在这里。"
   },
   "gui.singulo.archivist.phase_3": {
-    "source": "Light and record alike return to this dark.",
-    "translation": "光也好，记录也好，终将回归这片黑暗。"
+    "source": "Light and records alike sink into this dark in the end.",
+    "translation": "光也好，记录也好，终会沉入这片黑暗。"
   },
   "gui.singulo.archivist.reset": {
     "source": "No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console",
@@ -2440,12 +2440,12 @@
     "translation": "力场封闭了房间。在结束之前，谁也出不去。"
   },
   "gui.singulo.archivist.tide": {
-    "source": "I turn the page of gravity.",
-    "translation": "翻开重力的一页。"
+    "source": "Let me read you the record of weight.",
+    "translation": "让我为你读出重量的记录。"
   },
   "gui.singulo.archivist.tide_final": {
-    "source": "Do not fall. Float. All of it lies within my gravity.",
-    "translation": "不要坠落。漂浮吧。一切都在我的重力之中。"
+    "source": "There is nowhere left to fall.",
+    "translation": "已经无处可坠了。"
   },
   "gui.singulo.boss.party": {
     "source": "%s [%s challengers]",
@@ -2868,8 +2868,8 @@
     "translation": "把想制造的物品放入左侧框中，即可用电力制造"
   },
   "gui.singulo.genesis.kindled": {
-    "source": "The seed ignites. A universe begins to swell. Keep the upkeep flowing and hold back the surges",
-    "translation": "火种点燃了。宇宙开始膨胀。保持维持电力不断，并压制失控"
+    "source": "The seed ignites and a universe begins to swell. Keep the upkeep flowing and watch for surges",
+    "translation": "火种点燃，宇宙开始膨胀。保持维持电力不断，留意失控的征兆"
   },
   "gui.singulo.genesis.not_synthesizable": {
     "source": "The Genesis Engine cannot make that",
@@ -3116,8 +3116,8 @@
     "translation": "Singulo 手册"
   },
   "gui.singulo.leviathan.ascend": {
-    "source": "The vortex tears open. A light-eating black wyrm ascends on wings of accretion",
-    "translation": "漩涡被撕裂了。吞噬光的黑龙展开吸积之翼升了上来"
+    "source": "The vortex tears open and a black wyrm rises, its wings a spread of accretion-disk light",
+    "translation": "漩涡被撕开，一条黑龙升了上来。像翅膀一样展开的，是吸积盘的光"
   },
   "gui.singulo.leviathan.molt": {
     "source": "The Leviathan shudders. Its reactor-plate scales burst away, baring a skeleton of light",
@@ -3544,8 +3544,8 @@
     "translation": "高度 %1$s"
   },
   "gui.singulo.structure.degenerate_compactor": {
-    "source": "3×3×3",
-    "translation": "3×3×3"
+    "source": "5×5×5",
+    "translation": "5×5×5"
   },
   "gui.singulo.structure.particle_accelerator": {
     "source": "Side %s",
@@ -3664,8 +3664,8 @@
     "translation": "建造创世炉"
   },
   "guide.singulo.genesis.synth.body": {
-    "source": "A born universe turns power into items. Use the core empty-handed to open its screen and put the item you want in the left frame (or use the item on the core). Collect results from the slot on the right (or pull from below with a hopper).\nCost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). A broken core keeps the memory of its universe and works again wherever you place it. The table is a datapack (mass_synthesis).",
-    "translation": "诞生了宇宙的创世炉能将电力转化为物品。空手使用核心打开界面，把想制造的物品登记到左侧框中（手持物品对核心使用也可登记）。成品可从界面右侧的槽位取出（也可在下方用漏斗抽取）。\n每个物品的耗电 = 质量 × 1 GFE × 10^稀有度，稀有度从 0（石头、泥土）到 4（下界之星、鞘翅、龙蛋）。拆下的核心会保留宇宙的记忆，放到别处后仍可直接使用。配方表由数据包（mass_synthesis）定义。"
+    "source": "A born universe turns power into items. Use the core empty-handed to open its screen and put the item you want in the left frame (or use the item on the core). Collect results from the slot on the right (or pull from below with a hopper).\nCost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). A broken core keeps the memory of its universe and works again wherever you place it, but stored power and partial progress are lost, so avoid moving it in the middle of an expensive item. The table is a datapack (mass_synthesis).",
+    "translation": "诞生了宇宙的创世炉能将电力转化为物品。空手使用核心打开界面，把想制造的物品登记到左侧框中（手持物品对核心使用也可登记）。成品可从界面右侧的槽位取出（也可在下方用漏斗抽取）。\n每个物品的耗电 = 质量 × 1 GFE × 10^稀有度，稀有度从 0（石头、泥土）到 4（下界之星、鞘翅、龙蛋）。拆下的核心会保留宇宙的记忆，放到别处后仍可直接使用（但储存的电力与未完成的进度不会保留，制造昂贵物品途中请勿拆除）。配方表由数据包（mass_synthesis）定义。"
   },
   "guide.singulo.genesis.synth.title": {
     "source": "Mass synthesis",
@@ -3800,8 +3800,8 @@
     "translation": "废墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "研究楼、封闭培养设施和最终实验室的保管库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间时，守卫也会复原。\n人数越多，守卫就越强：每多一名玩家，体力增加原本的一半，招式间隔也会稍微缩短（最多计算 6 人）。中途加入时体力比例保持不变，有人离开也不会变弱。相对地，掉落物会按挑战者人数掉落。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封闭培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。掉落简并核。\n- 视界守卫（最终实验室）：触碰中央的封印控制台即可唤醒。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。\n- 能层巨蛇（沉没的炉心区）：靠近球形收容室地板上停止运转的炉心，它就会现身。体力降到 2/3 和 1/3 时会改变形态（变化期间不会受伤）。它游过的轨迹会把你朝它游动的方向冲走：顺着水流追上去吧。尾部发金光的核心始终是弱点。\n  装甲：披着炉壳的鳞片，躯干坚硬。头部发出青光是冲撞的信号（离开被锁定的地方）；巨口张开时不要站在正前方（先吸过去，再吐出光束）。靠近尾巴会被横扫。\n  骨骼：把鳞片全部弹飞（靠近会受伤），化为光之骨骼，躯干也能造成全额伤害。它会在房间中央盘成一圈旋转，把你卷着冲走并发射光之碎片；靠近会被咬，冲撞会连续而来。\n  龙：潜入炉心的漩涡，化为黑龙喷涌而出。双角射出旋转的两道光束（相对论性喷流），在高空盘旋时向你脚下降下小型黑洞（光柱是预兆），冲撞的落点也会留下奇点。掉落漩涡断章。\n- 觉醒的守卫：击败回响守卫或重力残渣后，在房间地板上的守卫封印核心上使用觉醒回响核或觉醒重力核，即可再战（生命 2.5 倍、伤害 1.5 倍、招式更快、体力 65% 时狂暴）。回响守卫会多一个分身和一发光弹，狂暴时最多重新投影两个被破坏的投影器；重力残渣会射出更多瓦砾，重力井更大，并会连续砸地。离开房间时觉醒核会返还。"
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "研究楼、封闭培养设施和最终实验室的保管库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间时，守卫也会复原。\n人数越多，守卫就越强：每多一名玩家，体力增加原本的一半，招式间隔也会稍微缩短（最多计算 6 人）。中途加入时体力比例保持不变，有人离开也不会变弱。相对地，掉落物会按战斗开始时的挑战者人数掉落（之后加入的人不会增加掉落）。多人攻击时，每个人的攻击都不会被他人挡住（同一个人连续攻击，仍需像以往一样稍作间隔）。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封闭培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。掉落简并核。\n- 视界守卫（最终实验室）：触碰中央的封印控制台即可唤醒。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。\n- 能层巨蛇（沉没的炉心区）：靠近球形收容室地板上停止运转的炉心，它就会现身。体力降到 2/3 和 1/3 时会改变形态（变化期间不会受伤）。它游过的轨迹会把你朝它游动的方向冲走：顺着水流追上去吧。尾部发金光的核心始终是弱点。\n  装甲：披着炉壳的鳞片，躯干坚硬。头部发出青光是冲撞的信号（离开被锁定的地方）；巨口张开时不要站在正前方（先吸过去，再吐出光束）。靠近尾巴会被横扫。\n  骨骼：把鳞片全部弹飞（靠近会受伤），化为光之骨骼，躯干也能造成全额伤害。它会在房间中央盘成一圈旋转，把你卷着冲走并发射光之碎片；靠近会被咬，冲撞会连续而来。\n  龙：潜入炉心的漩涡，化为黑龙喷涌而出。双角射出旋转的两道光束（相对论性喷流），在高空盘旋时向你脚下降下小型黑洞（光柱是预兆），冲撞的落点也会留下奇点。掉落漩涡断章。\n- 觉醒的守卫：击败回响守卫或重力残渣后，在房间地板上的守卫封印核心上使用觉醒回响核或觉醒重力核，即可再战（生命 2.5 倍、伤害 1.5 倍、招式更快、体力 65% 时狂暴）。回响守卫会多一个分身和一发光弹，狂暴时最多重新投影两个被破坏的投影器；重力残渣会射出更多瓦砾，重力井更大，并会连续砸地。离开房间时觉醒核会返还。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -3824,12 +3824,12 @@
     "translation": "只能在特定地点获得的素材"
   },
   "guide.singulo.ruins.list.body": {
-    "source": "Observation Post, Research Building, Culture Facility, Final Lab — each guards loot for one catalyst tier.",
-    "translation": "地表观测站、研究楼、封闭培养设施、最终实验室——每处都守护着对应一个催化剂等级的战利品。"
+    "source": "Observation Post, Research Building, Culture Facility, Final Lab and the Sunken Reactor Sector — each deeper and better guarded than the last. The Sunken Reactor Sector (around Y −60 to −54) is found by tuning the explorer compass after the Final Lab.",
+    "translation": "地表观测站、研究楼、封闭培养设施、最终实验室，以及沉没的炉心区——一处比一处更深、守卫更强。沉没的炉心区（约 Y −60〜−54）需要在攻略最终实验室后调整探索指南针才能找到。"
   },
   "guide.singulo.ruins.list.title": {
-    "source": "The four ruins",
-    "translation": "四大废墟"
+    "source": "The five ruins",
+    "translation": "五处废墟"
   },
   "guide.singulo.ruins.plan.body": {
     "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
@@ -6660,8 +6660,8 @@
     "translation": "模式：%1$s"
   },
   "tooltip.singulo.genesis_core.memory": {
-    "source": "Holds the memory of the universe it bore. Place it again to resume mass synthesis",
-    "translation": "寄宿着诞生之宇宙的记忆。重新放置后可直接继续质量生成"
+    "source": "Holds the memory of the universe it bore. Place it again to resume mass synthesis (stored power and partial progress are not kept)",
+    "translation": "寄宿着诞生之宇宙的记忆。重新放置后可继续质量生成（储存的电力与未完成的进度不会保留）"
   },
   "tooltip.singulo.holo_projector.hint": {
     "source": "Right-click a controller to project; again to hide. Sneak to change size",

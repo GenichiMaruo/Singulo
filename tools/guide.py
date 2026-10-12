@@ -316,18 +316,22 @@ CHAPTERS = [
          ' Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.'),
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
-        ('list', '4つの遺構',
+        ('list', '5つの遺構',
          '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
          '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。冷却原子トラップ・量子データ片（7日）。\n'
          '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。時間結晶の種・培養データ（14日）。\n'
-         '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。',
-         'The four ruins',
-         'Observation Post, Research Building, Culture Facility, Final Lab — each guards loot for one catalyst tier.'),
+         '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。\n'
+         '・沈んだ炉心区画: 最終実験施設よりさらに深い地下（Y−60〜−54あたり）の、止まった二基目の炉。'
+         '最終実験施設を攻略したあと、探索コンパスを調整すると探せる。エルゴ球の大蛇。エキゾチック物質・ジェット凝縮体・H凝縮体（14日）。',
+         'The five ruins',
+         'Observation Post, Research Building, Culture Facility, Final Lab and the Sunken Reactor Sector — each deeper and better guarded '
+         'than the last. The Sunken Reactor Sector (around Y −60 to −54) is found by tuning the explorer compass after the Final Lab.'),
         ('bosses', '遺構の番人',
          '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。'
          '番人は部屋から挑戦者がいなくなると元に戻ります。\n'
          '大勢で挑むと、番人は人数に合わせて強くなります（1人増えるごとに体力が5割増え、技の間も少し縮む。6人まで）。'
-         '途中で加わっても体力の割合は保たれ、人が抜けても弱くはなりません。そのかわり、落とす物は挑戦者の人数ぶん出ます。\n'
+         '途中で加わっても体力の割合は保たれ、人が抜けても弱くはなりません。そのかわり、落とす物は戦いが始まったときの挑戦者の人数ぶん出ます（あとから加わった人のぶんは増えません）。'
+         '大勢で攻撃しても、ほかの人の攻撃に邪魔されず全員の攻撃が通ります（同じ人の連打は、これまでどおり少し間を置かないと通りません）。\n'
          '・残響の番人（研究棟の記録保管室）: 部屋に入ると現れる警備ホログラム。宙を回りながら追いかける光弾を撃ち、'
          'しばらく見ていないと背後へ跳んで斬りつけてきます（跳ぶ前に光が集まる）。残響投影器は番人を守るだけでなく、一斉に光の槍も撃ちます'
          '（金色の狙いの線が出たら動くこと）。足元に光の陣が映ったら、柱が立つ前に陣の外へ。投影器が残っているほど攻撃が通りにくいので、先に壊すこと。'
@@ -354,7 +358,8 @@ CHAPTERS = [
          'When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\n'
          'Guardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their '
          'attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. '
-         'In return they drop their loot once per challenger.\n'
+         'In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). '
+         'Everyone\'s attacks land without blocking each other, though each player still needs the usual short pause between hits.\n'
          '- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you '
          'to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys '
          '(move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it '
@@ -475,13 +480,14 @@ CHAPTERS = [
          '宇宙を生んだ創世炉は、電力から物を作り出せます。核を素手で使って画面を開き、作りたい物を左の枠に登録してください'
          '（物を持って核を使っても登録できます）。完成品は画面右のスロットから受け取れます（下からホッパーなどで取り出すこともできます）。\n'
          '1個に必要な電力 = 質量 × 1 GFE × 10^希少度。希少度は 0（石・土など）から 4（ネザースター・エリトラ・ドラゴンの卵など）まであり、'
-         '希少な物ほど桁違いに電力を食います。宇宙を生んだ核は壊しても記憶を宿したままで、別の場所に置き直せばそのまま使えます。'
+         '希少な物ほど桁違いに電力を食います。宇宙を生んだ核は壊しても記憶を宿したままで、別の場所に置き直せばそのまま使えます（ただし、溜めた電力と作りかけの進み具合は引き継がれません。高価な物を作っている途中では壊さないこと）。'
          '作れる物はデータパック（mass_synthesis）で変えられます。',
          'Mass synthesis',
          'A born universe turns power into items. Use the core empty-handed to open its screen and put the item you want in the left frame '
          '(or use the item on the core). Collect results from the slot on the right (or pull from below with a hopper).\n'
          'Cost per item = mass × 1 GFE × 10^rarity, from rarity 0 (stone, dirt) to 4 (nether star, elytra, dragon egg). '
-         'A broken core keeps the memory of its universe and works again wherever you place it. '
+         'A broken core keeps the memory of its universe and works again wherever you place it, but stored power and partial progress are lost, '
+         'so avoid moving it in the middle of an expensive item. '
          'The table is a datapack (mass_synthesis).'),
     ]),
     ('hazards', 'minecraft:tnt', '危険', 'Hazards', [
