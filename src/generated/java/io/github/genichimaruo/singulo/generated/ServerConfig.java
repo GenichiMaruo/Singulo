@@ -284,7 +284,7 @@ public final class ServerConfig {
         PROBE_YIELD_MULTIPLIER_ = b.defineInRange("probeYieldMultiplier", 0.5, 0.0, 1.0);
         b.comment("ホライズン・ウォーデンのHP", "範囲: 1〜100,000");
         WARDEN_HEALTH_ = b.defineInRange("wardenHealth", 1200, 1, 100000);
-        b.comment("挑戦者が離れたら全回復するか", "範囲: true / false");
+        b.comment("挑戦者が全員離れたら番人が戻って全回復するか（最後の記録者以外は3分の猶予がある）", "範囲: true / false");
         WARDEN_RESET_ON_LEAVE_ = b.define("wardenResetOnLeave", true);
         b.comment("覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）", "範囲: 1.0〜20.0");
         AWAKENED_WARDEN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedWardenHealthMultiplier", 2.5, 1.0, 20.0);

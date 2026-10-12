@@ -222,11 +222,13 @@ public final class ReactorGameTests {
     }
 
     /** リングの外にいるものは少し引き寄せられるだけで、吸い込まれたり死んだりはしない。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    // 同じ組のほかの炉心（蒸発の爆発など）に巻き込まれないよう、1つだけの組で動かす
+    @GameTest(template = HUGE, batch = BATCH + "_outside", timeoutTicks = 200)
     public static void outsideTheRingsOnlyWeakPull(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(0, 1, 0));
+        // 日の光で燃えないハスク（テストの時刻によって死なないように）
+        net.minecraft.world.entity.monster.Husk zombie = helper.spawn(EntityType.HUSK, new BlockPos(0, 1, 0));
         Vec3 c = Vec3.atCenterOf(helper.absolutePos(CENTER));
         helper.runAtTickTime(80, () -> {
             helper.assertTrue(zombie.isAlive(), "リングの外で死んだ");

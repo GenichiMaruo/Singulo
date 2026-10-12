@@ -80,7 +80,7 @@ SERVER = [
     ('ruins', 'probeAutomationOffset', '2', '1〜4（整数）', '何ティア下の回収物を自動探査機で回収できるか（N−2ルール）'),
     ('ruins', 'probeYieldMultiplier', '0.5', '0.0〜1.0', '自動探査機の回収量（手動遠征比）'),
     ('ruins', 'wardenHealth', '1200', '1〜100,000', 'ホライズン・ウォーデンのHP'),
-    ('ruins', 'wardenResetOnLeave', 'true', 'true / false', '挑戦者が離れたら全回復するか'),
+    ('ruins', 'wardenResetOnLeave', 'true', 'true / false', '挑戦者が全員離れたら番人が戻って全回復するか（最後の記録者以外は3分の猶予がある）'),
     ('ruins', 'awakenedWardenHealthMultiplier', '2.5', '1.0〜20.0', '覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）'),
     ('ruins', 'awakenedWardenDamageMultiplier', '1.5', '1.0〜10.0', '覚醒したホライズン・ウォーデンが与えるダメージの倍率'),
     ('ruins', 'leviathanHealth', '1600', '1〜100,000', 'エルゴ球の大蛇（沈んだ炉心区画のボス）のHP'),

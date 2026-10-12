@@ -148,6 +148,30 @@ public final class BossRoomGameTests {
         });
     }
 
+    /** 記録保管室から出ない: 押し出されると核の上へ戻り、部屋の外の相手の背後へは跳ばない。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_28", timeoutTicks = 60)
+    public static void sentinelStaysInItsRoom(GameTestHelper helper) {
+        GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
+        EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
+        s.skipEmerging();
+        BlockPos home = helper.absolutePos(CORE);
+        s.teleportTo(home.getX() + 14.5, home.getY() + 2, home.getZ() + 0.5);
+        helper.runAtTickTime(5, () -> {
+            double dx = Math.abs(s.getX() - (home.getX() + 0.5));
+            double dz = Math.abs(s.getZ() - (home.getZ() + 0.5));
+            helper.assertTrue(dx <= EchoSentinel.ROOM_HALF + EchoSentinel.ROOM_SLACK && dz <= EchoSentinel.ROOM_HALF + EchoSentinel.ROOM_SLACK,
+                    "部屋の外に出たまま: dx=" + dx + " dz=" + dz);
+            var outside = helper.spawn(EntityType.ARMOR_STAND, new BlockPos(4, 1, 4).offset(12, 0, 0));
+            if (s.blinkBehind(helper.getLevel(), outside)) {
+                double bx = Math.abs(s.getX() - (home.getX() + 0.5));
+                helper.assertTrue(bx <= EchoSentinel.ROOM_HALF + 0.01, "部屋の外の相手の背後へ跳んだ: dx=" + bx);
+            }
+            outside.discard();
+            s.discard();
+            helper.succeed();
+        });
+    }
+
     /** 体力が半分を切ると、1撃で消える分身を2体呼ぶ。分身はボスバーもドロップも持たない。 */
     @GameTest(template = EMPTY, batch = BATCH + "_5", timeoutTicks = 40)
     public static void sentinelSummonsOneHitEchoes(GameTestHelper helper) {
@@ -440,7 +464,13 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
         boss.skipEmerging();
+        // 挑戦者がいなくなっても、しばらく（3分）は残る。猶予を飛ばすと戻る
+        helper.runAtTickTime(100, () -> {
+            helper.assertFalse(boss.isRemoved(), "猶予の間に消えた");
+            boss.skipResetGrace();
+        });
         helper.succeedWhen(() -> {
+            helper.assertTrue(helper.getTick() > 100, "猶予を確かめる前");
             helper.assertTrue(boss.isRemoved(), "挑戦者がいないのに覚醒した番人が残っている");
             helper.assertTrue(core.activeBoss(helper.getLevel()) == null, "封印核が戦闘中のまま");
             helper.assertTrue(dropped(helper, item("awakening_gravity_core")) == 1, "覚醒核が返ってこない");
