@@ -2455,6 +2455,10 @@
     "source": "Then let me show you the last page.",
     "translation": "그렇다면 마지막 페이지를 읽게 해 주마."
   },
+  "gui.singulo.archivist.halo": {
+    "source": "The halo unravels into spreading rings... Jump the low ones, crouch under the high ones!",
+    "translation": "광륜이 풀려 고리가 되어 퍼져 나갑니다…… 낮은 고리는 뛰어넘고, 높은 고리는 웅크려 지나가세요!"
+  },
   "gui.singulo.archivist.phase_2": {
     "source": "Do you remember? Every record is here.",
     "translation": "기억하는가. 모든 기록은 여기에 있다."
@@ -2482,6 +2486,14 @@
   "gui.singulo.archivist.tide_final": {
     "source": "There is nowhere left to fall.",
     "translation": "이제 더는 떨어질 곳이 없다."
+  },
+  "gui.singulo.archivist.wings": {
+    "source": "The Last Archivist spreads its six wings...",
+    "translation": "최후의 기록자가 여섯 장의 날개를 펼쳤습니다……"
+  },
+  "gui.singulo.archivist.wings_hint": {
+    "source": "Stand in the shadow of a wing!",
+    "translation": "날개의 그림자 안으로 들어가세요!"
   },
   "gui.singulo.boss.party": {
     "source": "%s [%s challengers]",

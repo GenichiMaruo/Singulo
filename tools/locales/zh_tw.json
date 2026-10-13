@@ -2455,6 +2455,10 @@
     "source": "Then let me show you the last page.",
     "translation": "那麼，就讓你讀到最後一頁吧。"
   },
+  "gui.singulo.archivist.halo": {
+    "source": "The halo unravels into spreading rings... Jump the low ones, crouch under the high ones!",
+    "translation": "光環解開，化作圓環向外擴散……低的環跳過去，高的環蹲下穿過！"
+  },
   "gui.singulo.archivist.phase_2": {
     "source": "Do you remember? Every record is here.",
     "translation": "你還記得嗎。所有的記錄，都在這裡。"
@@ -2482,6 +2486,14 @@
   "gui.singulo.archivist.tide_final": {
     "source": "There is nowhere left to fall.",
     "translation": "已經無處可墜了。"
+  },
+  "gui.singulo.archivist.wings": {
+    "source": "The Last Archivist spreads its six wings...",
+    "translation": "最後的記錄者展開了六片羽翼……"
+  },
+  "gui.singulo.archivist.wings_hint": {
+    "source": "Stand in the shadow of a wing!",
+    "translation": "躲進羽翼的陰影裡！"
   },
   "gui.singulo.boss.party": {
     "source": "%s [%s challengers]",
