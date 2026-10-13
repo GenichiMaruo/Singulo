@@ -38,6 +38,6 @@ python3 tools/check_port_1201.py --jar build/libs/Singulo-0.6.0-1.20.1F.jar
 ./gradlew runClient
 ```
 
-生成画像には Pillow が必要です。GameTest の実行前には `build/gametest/world` のみを削除して、前回の試験のブロック・流体・エンティティが次回に干渉するのを防ぎます。開発用や通常プレイのワールドは対象外です。
+生成画像には Pillow が必要です。GameTest の実行前には `build/gametest/world` と前回の `build/gametest/logs/latest.log` を削除して、前回の試験のブロック・流体・エンティティが次回に干渉するのを防ぎます。開発用や通常プレイのワールドは対象外です。
 
 1.20.1 固有の回帰テストとして、充電器のエネルギー Capability と NBT 保存、防具板のエンチャント、翼の滑空、新規パケットの Unicode／シード値の往復を追加しました。ボスとアンドロイドの実効段差高さ（1ブロック）も確認します。詳細な実測結果は [0.6.0 検証記録](port-0.6.0-1.20.1/verification.md) を参照してください。
