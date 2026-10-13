@@ -28,7 +28,32 @@ public final class BossCombatLog {
     private static final String HEADER = "time\tevent\tboss\tboss_hp\tboss_state\tattack\traw\tdealt\tblocked\tplayer\tplayer_hp\tarmor\ttoughness"
             + "\tblocking\tdistance\tweapon\tparticipants";
 
+    /** 叩きつけられた相手と、叩きつけたボス・技・その時刻（落下のダメージは攻撃した者を持たないので、ここで結びつける）。 */
+    private record Slam(Mob boss, String attack, long until) {}
+
+    private static final java.util.Map<java.util.UUID, Slam> SLAMS = new java.util.concurrent.ConcurrentHashMap<>();
+
     private BossCombatLog() {}
+
+    /** ボスが相手を叩きつけた（このあと数秒の落下ダメージを、その技で受けたものとして記録する）。 */
+    public static void slammed(LivingEntity target, Mob boss, String attack) {
+        if (target instanceof Player && enabled()) {
+            SLAMS.put(target.getUUID(), new Slam(boss, attack, target.level().getGameTime() + 100));
+        }
+    }
+
+    /** 落下のダメージなら、直前に叩きつけたボス。 */
+    private static Slam slamFor(LivingEntity victim, DamageSource source) {
+        Slam s = SLAMS.get(victim.getUUID());
+        if (s == null || !source.is(net.minecraft.tags.DamageTypeTags.IS_FALL)) {
+            return null;
+        }
+        if (victim.level().getGameTime() > s.until() || s.boss().isRemoved()) {
+            SLAMS.remove(victim.getUUID());
+            return null;
+        }
+        return s;
+    }
 
     static boolean enabled() {
         return !ServerConfig.SPEC.isLoaded() || ServerConfig.BOSS_COMBAT_LOG.get();
@@ -46,7 +71,11 @@ public final class BossCombatLog {
         LivingEntity victim = event.getEntity();
         DamageSource source = event.getSource();
         Mob attacker = boss(source.getEntity());
-        if (victim instanceof Player player && attacker != null) {
+        Slam slam = attacker == null ? slamFor(victim, source) : null;
+        if (victim instanceof Player player && slam != null) {
+            SLAMS.remove(player.getUUID());
+            write("hit_player", slam.boss(), slam.attack(), event.getOriginalDamage(), event.getNewDamage(), event.getBlockedDamage(), player);
+        } else if (victim instanceof Player player && attacker != null) {
             write("hit_player", attacker, attackName(attacker, source), event.getOriginalDamage(), event.getNewDamage(),
                     event.getBlockedDamage(), player);
         } else if (boss(victim) != null && source.getEntity() instanceof Player player) {
@@ -60,7 +89,10 @@ public final class BossCombatLog {
         }
         LivingEntity dead = event.getEntity();
         Mob attacker = boss(event.getSource().getEntity());
-        if (dead instanceof Player player && attacker != null) {
+        Slam slam = attacker == null ? slamFor(dead, event.getSource()) : null;
+        if (dead instanceof Player player && slam != null) {
+            write("player_died", slam.boss(), slam.attack(), 0, 0, 0, player);
+        } else if (dead instanceof Player player && attacker != null) {
             write("player_died", attacker, attackName(attacker, event.getSource()), 0, 0, 0, player);
         } else if (boss(dead) != null) {
             Player killer = event.getSource().getEntity() instanceof Player p ? p : null;

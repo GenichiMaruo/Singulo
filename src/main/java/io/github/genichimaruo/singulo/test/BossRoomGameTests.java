@@ -246,9 +246,9 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         r.skipEmerging();
-        helper.assertTrue(r.getMaxHealth() == GravityRemnant.HEALTH && r.shell() == GravityRemnant.SHELL_PIECES, "体力か殻が設計値でない");
+        helper.assertTrue(r.getMaxHealth() == GravityRemnant.health() && r.shell() == GravityRemnant.SHELL_PIECES, "体力か殻が設計値でない");
         r.hurt(helper.getLevel().damageSources().magic(), 20);
-        float lost = GravityRemnant.HEALTH - r.getHealth();
+        float lost = GravityRemnant.health() - r.getHealth();
         helper.assertTrue(r.shell() == GravityRemnant.SHELL_PIECES - 1, "当てても殻が剥がれない: " + r.shell());
         helper.assertTrue(Math.abs(lost - 20 * GravityRemnant.SHELL_FACTOR) < 0.01F, "殻があるのにダメージが減らない: " + lost);
         r.setShell(0);
@@ -433,7 +433,7 @@ public final class BossRoomGameTests {
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
         helper.assertTrue(boss instanceof GravityRemnant && boss.awakened(), "覚醒の重力核で覚醒した重力の澱が現れない: " + boss);
         boss.skipEmerging();
-        double expected = GravityRemnant.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        double expected = GravityRemnant.health() * RuinBoss.awakenedHealthMultiplier();
         helper.assertTrue(boss.getMaxHealth() <= 1024 && Math.abs(boss.effectiveMaxHealth() - expected) < 1.0,
                 "体力が " + expected + " 相当でない: " + boss.getMaxHealth() + " / " + boss.effectiveMaxHealth());
         GravityRemnant r = (GravityRemnant) boss;
