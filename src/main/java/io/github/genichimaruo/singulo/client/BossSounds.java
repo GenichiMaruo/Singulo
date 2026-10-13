@@ -72,6 +72,12 @@ final class BossSounds {
         if (e instanceof HorizonWarden) {
             return "horizon_warden.ambient";
         }
+        if (e instanceof io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan) {
+            return "ergosphere_leviathan.ambient";
+        }
+        if (e instanceof io.github.genichimaruo.singulo.ruin.LastArchivist) {
+            return "last_archivist.ambient";
+        }
         return null;
     }
 

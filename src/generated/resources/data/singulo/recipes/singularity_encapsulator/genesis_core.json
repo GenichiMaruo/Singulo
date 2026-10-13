@@ -1,0 +1,43 @@
+{
+  "type": "singulo:machine",
+  "station": "singularity_encapsulator",
+  "stage": 5,
+  "time": 2400,
+  "energy": 500000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:artificial_star_core"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:hawking_condensate"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 8
+    },
+    {
+      "ingredient": {
+        "item": "singulo:quantum_computing_module"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_module"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:genesis_core",
+    "count": 1
+  }
+}

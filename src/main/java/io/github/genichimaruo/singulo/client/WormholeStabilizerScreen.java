@@ -40,6 +40,7 @@ public class WormholeStabilizerScreen extends AbstractContainerScreen<WormholeSt
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (Panel.inside(mouseX, mouseY, leftPos + BAR_X - 1, topPos + BAR_Y - 1, 8, BAR_H + 2)) {

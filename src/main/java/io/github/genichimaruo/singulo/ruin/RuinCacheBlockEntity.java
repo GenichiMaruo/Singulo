@@ -100,7 +100,8 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
     }
 
     /** 番人に守られた遺構（研究棟・封鎖培養施設はボス部屋の番人、最終実験施設は守護機）。 */
-    public static final java.util.Set<String> GUARDED = java.util.Set.of("research_building", "culture_facility", "final_lab");
+    public static final java.util.Set<String> GUARDED = java.util.Set.of("research_building", "culture_facility", "final_lab",
+            "sunken_reactor");
 
     /** 番人に守られた保管庫か。倒すまで封鎖され、再生したら封鎖し直す。 */
     public boolean guarded() {
@@ -114,7 +115,8 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
 
     /** その遺構の中身が再生するまでの tick 数。0 以下なら再生しない。 */
     public static long regenTicks(String ruin) {
-        double mult = ServerConfig.SPEC.isLoaded() ? ServerConfig.REGEN_DAYS_MULTIPLIER.get() : 1.0;
+        double mult = (ServerConfig.SPEC.isLoaded() ? ServerConfig.REGEN_DAYS_MULTIPLIER.get() : 1.0)
+                * io.github.genichimaruo.singulo.data.Difficulty.regenDays();
         int days = GeneratedContent.RUIN_REGEN_DAYS.getOrDefault(ruin, 7);
         return mult <= 0 ? -1 : Math.round(days * TICKS_PER_DAY * mult);
     }

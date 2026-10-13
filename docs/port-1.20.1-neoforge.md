@@ -1,36 +1,47 @@
-# Minecraft 1.20.1 / NeoForge 版
+# Minecraft 1.20.1 / NeoForge 版（Singulo 0.6.0）
 
-`port/1.20.1-forge` の Singulo 0.3.0 を基に、`port/1.20.1-neoforge` で NeoForge 47.1.106 専用版を管理します。Minecraft 1.21.1 / NeoForge 版は `main`、1.20.1 / Forge 版は元のブランチを使用します。
+既存の `port/1.20.1-neoforge` の 0.3.0 を、`main` の 0.6.0（`aee3da0`）まで更新したバックポートです。`main` は Minecraft 1.21.1 専用として維持します。
 
 ## 実行環境
 
-- Minecraft 1.20.1、NeoForge 47.1.106、Java 17。
-- JEI は任意。開発環境では JEI 15.20.0.129 を使用します。
-- 配布ファイル: `build/libs/Singulo-0.3.0-1.20.1N.jar`。
+- Minecraft **1.20.1**、NeoForge **47.1.106**、Java **17**。
+- JEI は任意。開発・検証環境では **15.20.0.129** を使用します。
+- 配布用 JAR: `build/libs/Singulo-0.6.0-1.20.1N.jar`（`-dev.jar` は配布しません）。
+- 公開用タグ: `v0.6.0-1.20.1N`。この変更自体は公開処理を実行しません。
 
-## ビルド設定
+## 更新内容
 
-ModDevGradle の Legacy プラグインで `enable { neoForgeVersion = "1.20.1-47.1.106" }` を指定し、公式の `net.neoforged:forge` に対してコンパイル・再難読化します。このバージョンの NeoForge は `net.minecraftforge` の Java パッケージ、`META-INF/mods.toml`、依存 mod ID `forge` を使用するため、それらは維持します。依存バージョンを 47.1.106 に設定し、配布名の末尾と公開ローダーをそれぞれ `N`、`neoforge` に変更します。
+0.4〜0.6 の変更を取り込み、ボス戦・報酬・重力装備・隕石探索・ジェネシスの進行、アンドロイドの敵・組立・護衛・充電・修理・装備・命名に対応しました。サポーター名は攻略本とエンディングの通常／虹色の額に表示できます。実際の名簿は空のままです。
 
-1.20.1 のデータ形式・通信・描画などのバックポート内容は [Forge 版の移植記録](port-1.20.1.md) を参照してください。1.21.1 のワールドを変換する機能は含みません。
+1.21.1 からの主な API 変更は以下のとおりです。
 
-## 検証手順
+- 登録・イベント・Capability・GUI・通信を 1.20.1 の API に移植。新しい通信にはチャネルバージョン 2 を使用し、0.3.0 クライアントとの接続を拒否します。クライアントとサーバーの両方を更新してください。
+- Data Components は既存の 1.20.1 用 NBT 保存に合わせ、装備・充電器・探索記録・ジェネシス記憶を保存します。
+- アンドロイドの防具効果・防具エンチャント、翼の滑空・重力・落下ダメージを 1.20.1 のフックで実装します。
+- 描画の頂点形式、印刷中のクリッピング、GUI、ビームの描画範囲を旧 API に対応させます。
+- レシピ・戦利品・進捗・構造物・タグは 1.20.1 の複数形ディレクトリと形式で生成し、共通素材には Forge タグを使います。
 
-Gradle は JDK 25、Minecraft のコンパイルと実行は Java 17 を使用します。
+1.21.1 のワールドを 1.20.1 に変換する機能はありません。既存の 1.20.1 ワールドを更新する前にはバックアップしてください。新しい遺構設備は新規生成チャンクに出現します。
 
-```powershell
-./gradlew.bat build runGameTestServer
-./gradlew.bat runClient -PclientSmokeTest=true
-uv run --no-project --python 3.12 tools/localization.py --check
+## ビルド・検証
+
+Gradle 9.8 を動かせる完全な JDK 17 以上と、Minecraft のコンパイル／実行用の JDK 17 を使用します。検証では Gradle に JDK 21、ゲームに JDK 17 を使用しました。特定 PC の Java パスは固定しません。必要なら `-Porg.gradle.java.installations.paths=/path/to/jdk17` を指定してください。
+
+```sh
+python3 tools/gen_data.py
+python3 tools/check_models.py
+python3 tools/localization.py --check
+python3 tools/check_supporters.py
+python3 tools/check_port_1201.py
+./gradlew build runGameTestServer
+python3 tools/check_port_1201.py --jar build/libs/Singulo-0.6.0-1.20.1N.jar
+./gradlew runClient
 ```
 
-公開タグは `v0.3.0-1.20.1N`。GitHub Actions でもビルドと GameTest に成功した同じ JAR を CurseForge と GitHub Release にアップロードします。
+生成画像には Pillow が必要です。GameTest の実行前には `build/gametest/world` と前回の `build/gametest/logs/latest.log` を削除して、前回の試験のブロック・流体・エンティティが次回に干渉するのを防ぎます。開発用や通常プレイのワールドは対象外です。
 
-## 検証結果
+1.20.1 固有の回帰テストとして、充電器のエネルギー Capability と NBT 保存、防具板のエンチャント、翼の滑空、新規パケットの Unicode／シード値の往復を追加しました。ボスとアンドロイドの実効段差高さ（1ブロック）も確認します。詳細な実測結果は [0.6.0 検証記録](port-0.6.0-1.20.1/verification.md) を参照してください。
 
-2026-10-11、NeoForge 47.1.106 / Java 17 で確認しました。
+## NeoForge 1.20.1 のメタデータ
 
-- ビルドと再難読化が成功。配布 JAR の 425 クラスが Java 17 形式で、依存バージョン・Minecraft バージョン・Access Transformer を確認。
-- GameTest 180 件すべて成功。機械、搬入出、遺構、戦利品、ボス、ワームホール、時間結晶、飛行・爆発ノックバック耐性・Capability を検証。
-- JEI 15.20.0.129 を含むクライアントでリソース読み込みとタイトル画面到達を確認。
-- 中国語簡体字・繁体字・韓国語の各 1,563 項目の翻訳と書式チェックが成功。
+ModDevGradle の `enable { neoForgeVersion = "1.20.1-47.1.106" }` で公式の `net.neoforged:forge` を使用します。この世代は Java パッケージ `net.minecraftforge`、`META-INF/mods.toml`、依存 mod ID `forge` が正しい形式です。配布名の末尾は `N`、公開先ローダー指定は `neoforge` です。

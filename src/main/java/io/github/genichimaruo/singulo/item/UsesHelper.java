@@ -129,7 +129,7 @@ public final class UsesHelper {
     }
 
     public static int maxRepairs() {
-        return configLoaded() ? ServerConfig.MAX_REPAIRS.get() : 3;
+        return io.github.genichimaruo.singulo.data.Difficulty.maxRepairs(configLoaded() ? ServerConfig.MAX_REPAIRS.get() : 3);
     }
 
     static double repairWear() {
@@ -141,7 +141,7 @@ public final class UsesHelper {
     }
 
     static double catalystLifetimeMultiplier() {
-        return configLoaded() ? ServerConfig.LIFETIME_MULTIPLIER.get() : 1.0;
+        return (configLoaded() ? ServerConfig.LIFETIME_MULTIPLIER.get() : 1.0) * io.github.genichimaruo.singulo.data.Difficulty.catalystLifetime();
     }
 
     static double catalystMinutes(UsesItem item) {

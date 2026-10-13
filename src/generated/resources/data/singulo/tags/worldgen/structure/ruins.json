@@ -3,6 +3,7 @@
     "singulo:observation_post",
     "singulo:research_building",
     "singulo:culture_facility",
-    "singulo:final_lab"
+    "singulo:final_lab",
+    "singulo:sunken_reactor"
   ]
 }

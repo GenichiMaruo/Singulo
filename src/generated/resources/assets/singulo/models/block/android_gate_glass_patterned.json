@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "singulo:block/android_gate_glass_patterned"
+  },
+  "render_type": "minecraft:translucent"
+}

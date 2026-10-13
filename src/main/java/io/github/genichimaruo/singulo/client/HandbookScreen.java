@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.supporter.SupporterCredits;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +40,11 @@ public class HandbookScreen extends Screen {
     /** 作者への支援（Ko-fi）。題名の行の右端の小さなボタンから、確認の画面を出してブラウザで開く。 */
     static final String SUPPORT_URL = "https://ko-fi.com/graycat9";
 
-    private record Page(Component title, List<Line> lines) {}
+    private record Page(Component title, List<Line> lines, List<SupporterCredits.Entry> supporters) {
+        Page(Component title, List<Line> lines) {
+            this(title, lines, List.of());
+        }
+    }
 
     /** 本文の1行（色つき）。 */
     private record Line(Component text, int color) {}
@@ -72,6 +77,7 @@ public class HandbookScreen extends Screen {
         loadChapters();
         chapters.add(1, progressChapter());
         chapters.add(recordsChapter());
+        chapters.add(supportersChapter());
         chapter = Math.min(lastChapter, chapters.size() - 1);
         page = Math.min(lastPage, chapters.get(chapter).pages.size() - 1);
     }
@@ -199,10 +205,28 @@ public class HandbookScreen extends Screen {
         return new Chapter(Component.translatable("gui.singulo.handbook.records"), icon("singulo:record_fragment"), pages);
     }
 
+    /** Four individually framed supporters per page; both tiers share the same roster. */
+    private Chapter supportersChapter() {
+        SupporterCredits.Catalog roster = SupporterRoster.load();
+        List<Page> pages = new ArrayList<>();
+        List<Line> intro = new ArrayList<>();
+        intro.add(new Line(Component.translatable("gui.singulo.supporters.intro"), Panel.TEXT));
+        intro.add(new Line(Component.translatable("gui.singulo.supporters.count", roster.entries().size()), Panel.WELL_EDGE));
+        if (roster.entries().isEmpty()) {
+            intro.add(new Line(Component.translatable("gui.singulo.supporters.empty"), Panel.TEXT));
+        }
+        pages.add(new Page(Component.translatable("gui.singulo.supporters.title"), intro));
+        for (int i = 0; i < roster.pageCount(4); i++) {
+            pages.add(new Page(Component.translatable("gui.singulo.handbook.supporters"), List.of(), roster.page(i, 4)));
+        }
+        return new Chapter(Component.translatable("gui.singulo.handbook.supporters"), new ItemStack(Items.NAME_TAG), pages);
+    }
+
     // ------------------------------------------------------------------ 描画
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         Panel.background(g, left, top, W, H);
         g.drawString(font, title, left + 8, top + 7, Panel.TEXT, false);
@@ -241,12 +265,22 @@ public class HandbookScreen extends Screen {
         int bodyH = H - 38 - 22;
         g.enableScissor(px, bodyTop, px + pw, bodyTop + bodyH);
         int y = bodyTop - scroll;
+        SupporterCredits.Entry hoveredSupporter = null;
         for (Line line : p.lines) {
             for (FormattedCharSequence seq : font.split(line.text, pw)) {
                 g.drawString(font, seq, px, y, line.color, false);
                 y += 10;
             }
             y += 3;
+        }
+        float animation = (net.minecraft.Util.getMillis() % 800_000L) / 50F;
+        for (SupporterCredits.Entry supporter : p.supporters) {
+            SupporterPlaque.draw(g, font, supporter, px, y, pw - 2, SupporterPlaque.HEIGHT, animation);
+            if (Panel.inside(mouseX, mouseY, px, y, pw - 2, SupporterPlaque.HEIGHT)
+                    && mouseY >= bodyTop && mouseY < bodyTop + bodyH) {
+                hoveredSupporter = supporter;
+            }
+            y += SupporterPlaque.HEIGHT + SupporterPlaque.GAP;
         }
         g.disableScissor();
         // ページ送り
@@ -255,6 +289,9 @@ public class HandbookScreen extends Screen {
         g.drawCenteredString(font, count, px + pw / 2, navY + 2, Panel.TEXT);
         drawArrow(g, px + pw / 2 - 40, navY, "<", page > 0, mouseX, mouseY);
         drawArrow(g, px + pw / 2 + 28, navY, ">", page < c.pages.size() - 1, mouseX, mouseY);
+        if (hoveredSupporter != null) {
+            g.renderTooltip(font, font.split(SupporterPlaque.tooltip(hoveredSupporter), 220), mouseX, mouseY);
+        }
     }
 
     /** 支援ボタンの位置と大きさ（題名の行の右端）。 */
@@ -331,7 +368,7 @@ public class HandbookScreen extends Screen {
         if (mx < left + LIST_W + 8) {
             int max = Math.max(0, chapters.size() * ROW - (H - 28));
             listScroll = Math.max(0, Math.min(max, listScroll - (int) (dy * ROW)));
-        } else {
+        } else if (chapters.get(chapter).pages.get(page).supporters.isEmpty()) {
             scroll = Math.max(0, scroll - (int) (dy * 12));
         }
         return true;

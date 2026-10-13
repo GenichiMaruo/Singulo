@@ -19,6 +19,10 @@ import net.minecraft.world.phys.AABB;
 /**
  * 封印コンソール。触れると守護機ホライズン・ウォーデンを起こす（近くに封鎖された保管庫があるときだけ）。
  * 守護機が倒されると保管庫の力場を消し、挑戦者がいなくなって守護機が封印に戻ると、また触れられる状態に戻る。
+ * <p>
+ * 攻略後の再戦: 覚醒の記録核を手に持って使うと、保管庫が開いていても覚醒した守護機を呼び出す（記録核を1個使う）。
+ * <p>
+ * 隠しボス: 終焉の記録を手に持って使うと、最後の記録者が目覚める（{@link #activateArchivist}）。
  */
 public class SealConsoleBlockEntity extends BlockEntity {
     public static final int VAULT_SEARCH_RADIUS = 12;
@@ -26,6 +30,15 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     @Nullable
     private UUID warden;
+    @Nullable
+    private UUID archivist;
+    /** 重力異常点が縮み始めた・戻り始めたゲーム時刻（描画用。0 ならずっと今の状態）。 */
+    private long anomalyChangedAt;
+
+    /** ボスが現れてから、重力異常点が縮んで消えるまでの tick。 */
+    public static final int ANOMALY_SHRINK_TICKS = 40;
+    /** ボスが倒されて（封印に戻って）から、重力異常点が元の大きさに戻るまでの tick。 */
+    public static final int ANOMALY_RETURN_TICKS = 60;
 
     public SealConsoleBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.SEAL_CONSOLE.get(), pos, state);
@@ -63,7 +76,7 @@ public class SealConsoleBlockEntity extends BlockEntity {
      */
     @Nullable
     public HorizonWarden activate(ServerLevel level, @Nullable ServerPlayer player) {
-        if (activeWarden(level) != null) {
+        if (activeWarden(level) != null || activeArchivist(level) != null) {
             tell(player, "gui.singulo.console.active");
             return null;
         }
@@ -88,14 +101,107 @@ public class SealConsoleBlockEntity extends BlockEntity {
         w.startEmerging();
         level.addFreshEntity(w);
         warden = w.getUUID();
-        setChanged();
+        anomalyChanged();
         broadcast(level, "gui.singulo.console.awakened");
         return w;
     }
 
+    /** 覚醒の記録核（覚醒した守護機を呼び出す）。 */
+    public static net.minecraft.world.item.Item awakeningCore() {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("awakening_record_core"));
+    }
+
+    /**
+     * 覚醒の記録核を使ったとき。覚醒した守護機を起こせたらそれを返す（呼んだ側が記録核を1個減らす）。
+     * 保管庫が封鎖されていてもいなくても呼べる（勝てば封鎖も解ける）。
+     */
+    @Nullable
+    public HorizonWarden activateAwakened(ServerLevel level, @Nullable ServerPlayer player) {
+        if (activeWarden(level) != null || activeArchivist(level) != null) {
+            tell(player, "gui.singulo.console.active");
+            return null;
+        }
+        RuinCacheBlockEntity vault = vault(level);
+        if (vault == null) {
+            tell(player, "gui.singulo.console.no_vault");
+            return null;
+        }
+        // 通常戦と同じく、中身の再生期限が過ぎていればここで入れ直して封鎖を確定させる（勝てばその封鎖が解ける）。
+        // これをしないと、勝ったあとに保管庫を開こうとした時点で入れ直しが起きて、また封鎖されてしまう
+        vault.refillIfDue(level, level.getGameTime());
+        HorizonWarden w = SinguloEntities.HORIZON_WARDEN.get().create(level);
+        if (w == null) {
+            return null;
+        }
+        BlockPos spawn = worldPosition.above();
+        w.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, 0, 0);
+        w.awaken(worldPosition, worldPosition, true);
+        w.startEmerging();
+        level.addFreshEntity(w);
+        warden = w.getUUID();
+        anomalyChanged();
+        broadcast(level, "gui.singulo.console.awakened_rematch");
+        return w;
+    }
+
+    // ------------------------------------------------------------------ 隠しボス: 最後の記録者
+
+    /** 終焉の記録（4つの断章から作る。最後の記録者を呼び出す）。 */
+    public static net.minecraft.world.item.Item terminusRecord() {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("terminus_record"));
+    }
+
+    @Nullable
+    public LastArchivist activeArchivist(ServerLevel level) {
+        if (archivist == null) {
+            return null;
+        }
+        Entity e = level.getEntity(archivist);
+        return e instanceof LastArchivist a && a.isAlive() ? a : null;
+    }
+
+    /**
+     * 終焉の記録を使ったとき。最後の記録者を起こせたらそれを返す（呼んだ側が記録を1個減らす）。
+     * 守護機と同時には呼べない。保管庫が開いていても呼べる（保管庫の封鎖には関わらない）。
+     */
+    @Nullable
+    public LastArchivist activateArchivist(ServerLevel level, @Nullable ServerPlayer player) {
+        if (activeWarden(level) != null || activeArchivist(level) != null) {
+            tell(player, "gui.singulo.console.active");
+            return null;
+        }
+        if (vault(level) == null) {
+            tell(player, "gui.singulo.console.no_vault");
+            return null;
+        }
+        LastArchivist a = SinguloEntities.LAST_ARCHIVIST.get().create(level);
+        if (a == null) {
+            return null;
+        }
+        net.minecraft.world.phys.Vec3 at = LastArchivist.spawnAt(worldPosition);
+        a.moveTo(at.x, at.y, at.z, 180, 0);
+        a.awaken(worldPosition);
+        a.startEmerging();
+        level.addFreshEntity(a);
+        archivist = a.getUUID();
+        anomalyChanged();
+        return a;
+    }
+
+    void onArchivistDefeated(ServerLevel level) {
+        archivist = null;
+        anomalyChanged();
+    }
+
+    void onArchivistReset(ServerLevel level) {
+        archivist = null;
+        anomalyChanged();
+        broadcast(level, "gui.singulo.archivist.reset");
+    }
+
     void onWardenDefeated(ServerLevel level) {
         warden = null;
-        setChanged();
+        anomalyChanged();
         RuinCacheBlockEntity vault = vault(level);
         if (vault != null) {
             vault.setSealed(false);
@@ -106,8 +212,46 @@ public class SealConsoleBlockEntity extends BlockEntity {
 
     void onWardenReset(ServerLevel level) {
         warden = null;
-        setChanged();
+        anomalyChanged();
         broadcast(level, "gui.singulo.console.reset");
+    }
+
+    /** ボスが起きているか（守護機か最後の記録者）。クライアントでも分かる。 */
+    public boolean bossAwake() {
+        return warden != null || archivist != null;
+    }
+
+    /**
+     * 重力異常点の大きさ（0〜1）。ボスが現れると縮んで消え（ボスはこの異常点から生まれる）、
+     * 倒される・封印に戻ると、ゆっくり元の大きさへ戻る。time はゲーム時刻（部分 tick を含む）。
+     */
+    public float anomalyScale(float time) {
+        float since = anomalyChangedAt <= 0 ? Float.MAX_VALUE : time - anomalyChangedAt;
+        if (bossAwake()) {
+            float k = Math.min(1, Math.max(0, since / ANOMALY_SHRINK_TICKS));
+            return (1 - k) * (1 - k);                          // 速く縮み始め、最後はすっと消える
+        }
+        float k = Math.min(1, Math.max(0, since / ANOMALY_RETURN_TICKS));
+        // ゆっくり戻り、少しふくらみすぎてから落ち着く
+        return k >= 1 ? 1 : k * k * (3 - 2 * k) * (1 + 0.25F * (float) Math.sin(k * Math.PI));
+    }
+
+    private void anomalyChanged() {
+        anomalyChangedAt = level != null ? level.getGameTime() : 0;
+        setChanged();
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
+    }
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
     }
 
     private void broadcast(ServerLevel level, String key) {
@@ -128,11 +272,17 @@ public class SealConsoleBlockEntity extends BlockEntity {
         if (warden != null) {
             tag.putUUID("warden", warden);
         }
+        if (archivist != null) {
+            tag.putUUID("archivist", archivist);
+        }
+        tag.putLong("anomaly_changed", anomalyChangedAt);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         warden = tag.hasUUID("warden") ? tag.getUUID("warden") : null;
+        archivist = tag.hasUUID("archivist") ? tag.getUUID("archivist") : null;
+        anomalyChangedAt = tag.getLong("anomaly_changed");
     }
 }

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "CAC",
+    "PAP"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:packed_ice"
+    },
+    "C": {
+      "tag": "forge:ingots/copper"
+    },
+    "P": {
+      "tag": "forge:plates/steel"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:heat_exchange_core"
+  }
+}

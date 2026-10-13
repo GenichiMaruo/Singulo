@@ -184,6 +184,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     // changing recipe equality or the constructor used throughout the game tests.
     private static final java.util.Map<MachineRecipe, net.minecraft.resources.ResourceLocation> IDS =
             java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+    public MachineRecipe withId(net.minecraft.resources.ResourceLocation id) { IDS.put(this, id); return this; }
     public MachineRecipe value() { return this; }
     public net.minecraft.resources.ResourceLocation id() { return IDS.getOrDefault(this, io.github.genichimaruo.singulo.Singulo.id(station)); }
 

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""GameTest 用の空の構造物（src/main/resources/data/singulo/structure/*.nbt）を書き出す。"""
+"""GameTest 用の空の構造物（src/main/resources/data/singulo/structures/*.nbt）を書き出す。"""
 import gzip
 import struct
 from pathlib import Path
 
-OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "main" / "resources" / "data" / "singulo" / "structure"
+OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "main" / "resources" / "data" / "singulo" / "structures"
 # 名前 → (幅, 高さ, 奥行き)
-TEMPLATES = {"empty": (8, 8, 8), "tall": (5, 13, 5), "large": (9, 11, 9), "huge": (15, 15, 15)}
-DATA_VERSION = 3955  # 1.21.1
+TEMPLATES = {"empty": (8, 8, 8), "tall": (5, 13, 5), "large": (9, 11, 9), "huge": (15, 15, 15), "crater": (64, 24, 64)}
+DATA_VERSION = 3465  # 1.20.1
 
 
 def name(s):

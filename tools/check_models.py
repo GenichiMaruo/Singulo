@@ -1,6 +1,7 @@
 """生成したモデルを確かめる。
 
-1. 装置・ケーブルのブロックモデルの要素が1マス（0〜16）に収まっているか（恩恵の模様の重ね絵は除く）
+1. 装置・ケーブルのブロックモデルの要素が1マス（0〜16）に収まっているか（恩恵の模様の重ね絵は除く。アンドロイド用ガラスの縁は、
+   厚さのない面を外へ EDGE_OFFSET までずらしてよい）
 2. 同じ向きの面が同じ平面で重なっていないか（重なるとちらつく）。回転のある要素どうしは、回転が同じものだけ比べる
 
 使い方: uv run --no-project --python 3.12 tools/check_models.py
@@ -11,6 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent / 'src' / 'generated' / 'resources' / 'assets' / 'singulo' / 'models'
 EPS = 1e-6
+# アンドロイド用ガラスの縁（厚さのない面）を、ちらつかないように1マスの外へずらしてよい幅
+EDGE_OFFSET = 0.02
 CABLES = ('copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus')
 
 # 面 → (固定する軸, 値は from/to のどちら, 面の2つの軸)
@@ -29,6 +32,20 @@ def faces_of(e):
         yield name, plane, rect, json.dumps(e.get('rotation'), sort_keys=True)
 
 
+def edge_overlay_ok(e):
+    """ガラスの縁: 厚さのない面で、はみ出しはその面の軸だけ、EDGE_OFFSET 以内か。"""
+    f, t = e['from'], e['to']
+    flat = [k for k in range(3) if abs(t[k] - f[k]) < EPS]
+    if len(flat) != 1:
+        return False
+    for k in range(3):
+        lo, hi = min(f[k], t[k]), max(f[k], t[k])
+        margin = EDGE_OFFSET if k == flat[0] else 0
+        if lo < -margin - EPS or hi > 16 + margin + EPS:
+            return False
+    return True
+
+
 def overlap(r1, r2):
     return min(r1[2], r2[2]) - max(r1[0], r2[0]) > EPS and min(r1[3], r2[3]) - max(r1[1], r2[1]) > EPS
 
@@ -43,6 +60,8 @@ def main():
         rel = path.relative_to(ROOT).as_posix()
         if rel.startswith('block/') and 'boost_overlay' not in rel:
             for e in els:
+                if '_glass_edge_' in rel and edge_overlay_ok(e):
+                    continue
                 if min(e['from'] + e['to']) < -EPS or max(e['from'] + e['to']) > 16 + EPS:
                     problems.append(f'{rel}: 1マスからはみ出している {e["from"]} → {e["to"]}')
         if any(rel.startswith(f'block/{c}') or rel == f'item/{c}.json' for c in CABLES):
