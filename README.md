@@ -3,20 +3,20 @@
 [日本語](docs/manual-ja.md) · [English](docs/manual-en.md) · [简体中文](docs/manual-zh-cn.md) · [繁體中文](docs/manual-zh-tw.md) · [한국어](docs/manual-ko-kr.md) · [レシピ一覧](docs/recipes/README.md)
 
 **熱電発電から始めて、回転ブラックホールを運用し、最後は宇宙をひとつ生み出す工業modです。**
-Minecraft 1.21.1 / NeoForge 向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
+Minecraft 1.21.1（NeoForge）と 1.20.1（Forge / NeoForge）向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
 
 ## 対応バージョン / Minecraft versions
 
-Minecraft と mod ローダーに合うファイルを選んでください。最新の内容（創世炉・沈んだ炉心区画・新しいボスなど）は 1.21.1 版だけにあり、1.20.1 版は 0.3.0 のままです。
-Choose the download that matches your Minecraft version and mod loader. The latest content (the Genesis Engine, the Sunken Reactor Sector and the new bosses) is only in the 1.21.1 build; the 1.20.1 builds stay at 0.3.0.
+Minecraft と mod ローダーに合うファイルを選んでください。各版の最新ファイルは、下の「ダウンロード」から開けます。
+Choose the download that matches your Minecraft version and mod loader. Each "Download" link lists the newest files for that version.
 
 | Minecraft | ローダー / Loader | Java | ソース / Source | ダウンロード / Download |
 | --- | --- | --- | --- | --- |
-| **1.21.1** | **NeoForge** | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [0.4.0 · 1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) |
-| **1.20.1** | **Forge** | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [0.3.0 · 1.20.1F](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1F) |
-| **1.20.1** | **NeoForge** | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [0.3.0 · 1.20.1N](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1N) |
+| **1.21.1** | **NeoForge** 21.1.256+ | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) |
+| **1.20.1** | **Forge** 47.4.26+ | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
+| **1.20.1** | **NeoForge** 47.1.106+ | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
 
-ファイル名の末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) でも Minecraft バージョンとローダーで絞り込めます。
+ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) や [GitHub Releases](https://github.com/GenichiMaruo/Singulo/releases) からも選べます。
 
 ## 何ができる？
 
@@ -26,13 +26,14 @@ Choose the download that matches your Minecraft version and mod loader. The late
 - **ブラックホールを運用する** — Pリアクターの点火、燃料供給、質量・スピンの管理で発電し、副産物を回収。
 - **重力と時空を使う** — 重力操作の道具、拠点を守るシールド、対応装置の時間加速、チャンクローダー、遠隔拠点間で電力・アイテム・液体をつなぐワームホール。
 - **宇宙を生む** — 最終目標の「創世炉」で、ブラックホールの電力から宇宙をひとつ生み出します。生まれた銀河は夜空に昇り、炉はその後、電力から物を作り出す質量生成ができるようになります。
+- **アンドロイドと戦い、仲間にする** — 遺構の印刷台から出撃する3種類のアンドロイドを倒して設計メモリを集め、組立ステーションで自分の護衛を印刷。迎撃・徘徊・追従を選び、装備や名前も付けられます。
 - **みんなで挑む** — ボスは挑戦者の人数に合わせて強くなり、全員の攻撃がそれぞれ通ります。報酬は戦いが始まったときの人数ぶん。
 
-**Singulo** is a technology mod for Minecraft 1.21.1 / NeoForge. Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/manual-en.md).
+**Singulo** is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge / NeoForge). Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/manual-en.md).
 
 ## 遊び始めるには
 
-Minecraft **1.21.1** と NeoForge **21.1.256以上の1.21.1対応版**が必要です。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
+上の表の Minecraft とローダーが必要です（1.21.1 版なら NeoForge **21.1.256以上の1.21.1対応版**）。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
 
 初めてワールドに入ると **Singulo ハンドブック**を受け取ります。右クリックで開き、鋼鉄・セラミック・基礎回路から始めましょう。アイテムの説明はカーソルを合わせると表示され、Shiftで作り方と使い道を確認できます。
 

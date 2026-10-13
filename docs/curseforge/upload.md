@@ -7,9 +7,11 @@
 
 | Minecraft | ブランチ | 配布ファイル |
 | --- | --- | --- |
-| 1.21.1 / NeoForge | `main` | `build/libs/Singulo-0.4.0-1.21.1N.jar` |
-| 1.20.1 / Forge | `port/1.20.1-forge` | `build/libs/Singulo-0.3.0-1.20.1F.jar` |
-| 1.20.1 / NeoForge | `port/1.20.1-neoforge` | `build/libs/Singulo-0.3.0-1.20.1N.jar` |
+| 1.21.1 / NeoForge | `main` | `build/libs/Singulo-<版>-1.21.1N.jar` |
+| 1.20.1 / Forge | `port/1.20.1-forge` | `build/libs/Singulo-<版>-1.20.1F.jar` |
+| 1.20.1 / NeoForge | `port/1.20.1-neoforge` | `build/libs/Singulo-<版>-1.20.1N.jar` |
+
+`<版>` は各ブランチの `gradle.properties` の `mod_version` です。
 
 ## Display name
 Singulo-<版>-1.21.1N、Singulo-<版>-1.20.1F、または Singulo-<版>-1.20.1N（例: Singulo-0.4.0-1.21.1N）

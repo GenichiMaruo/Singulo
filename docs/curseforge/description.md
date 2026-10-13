@@ -2,7 +2,7 @@
 
 **From a thermocouple to a rotating black hole.**
 
-Singulo is a technology mod for Minecraft 1.21.1 (NeoForge), with older builds for 1.20.1 (Forge or NeoForge).
+Singulo is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge or NeoForge).
 Build a factory, recover lost technology from guarded ruins and work your way up through cryogenics, quantum physics and time crystals.
 You ignite a black hole and draw power from its spin, and in the end you use that power to give birth to a universe.
 
@@ -127,12 +127,11 @@ Choose the file for your Minecraft version. The suffix **F** means Forge and **N
 
 | Minecraft | Mod loader | Java | Files and source |
 | --- | --- | --- | --- |
-| **1.20.1** | **Forge 47.4.26** or later for 1.20.1 | **17** | [1.20.1F release](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1F) · [1.20.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) |
-| **1.20.1** | **NeoForge 47.1.106** | **17** | [1.20.1N release](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.3.0-1.20.1N) · [1.20.1 NeoForge source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) |
-| **1.21.1** | **NeoForge 21.1.256** or later for 1.21.1 | **21** | [1.21.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) · [1.21.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/main) |
+| **1.20.1** | **Forge 47.4.26** or later for 1.20.1 | **17** | [1.20.1F files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) · [1.20.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) |
+| **1.20.1** | **NeoForge 47.1.106** or later for 1.20.1 | **17** | [1.20.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) · [1.20.1 NeoForge source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) |
+| **1.21.1** | **NeoForge 21.1.256** or later for 1.21.1 | **21** | [1.21.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) · [1.21.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/main) |
 
 You can also filter the CurseForge Files tab by Minecraft version and mod loader.
-The latest content (the Genesis Engine, the Sunken Reactor Sector and the new bosses) is only in the 1.21.1 build; the 1.20.1 builds stay at 0.3.0.
 JEI is optional and supported on both versions.
 
 Multiplayer servers and clients both need the mod.
