@@ -277,6 +277,7 @@ MOD = {
     '遺構の照明': ('ruin_lamp', 'Ruin Lamp', 'ruin_block'),
     '遺構保管庫': ('ruin_cache', 'Ruin Cache', 'ruin_block'),
     '警備機ドック': ('ruin_guard_dock', 'Guard Dock', 'ruin_block'),
+    '遺構の印刷台': ('ruin_android_fabricator', 'Ruin Android Fabricator', 'ruin_block'),
     '封印コンソール': ('seal_console', 'Seal Console', 'ruin_block'),
     '番人の封印核': ('guardian_core', 'Guardian Seal Core', 'boss_block'),
     '残響投影器': ('echo_projector', 'Echo Projector', 'boss_block'),

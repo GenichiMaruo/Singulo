@@ -337,6 +337,9 @@ public final class SinguloBlocks {
             () -> new RuinCacheBlock(unbreakable().noOcclusion().lightLevel(s -> 6)));
     public static final DeferredBlock<GuardDockBlock> RUIN_GUARD_DOCK = BLOCKS.register("ruin_guard_dock",
             () -> new GuardDockBlock(unbreakable()));
+    /** 遺構の印刷台（アンドロイドを印刷して出す）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidFabricatorBlock> RUIN_ANDROID_FABRICATOR = BLOCKS.register(
+            "ruin_android_fabricator", () -> new io.github.genichimaruo.singulo.android.AndroidFabricatorBlock(unbreakable().lightLevel(s -> 7)));
     public static final DeferredBlock<SealConsoleBlock> SEAL_CONSOLE = BLOCKS.register("seal_console",
             () -> new SealConsoleBlock(unbreakable().lightLevel(s -> 10)));
     /**

@@ -69,7 +69,18 @@ public final class SinguloEntities {
             "last_archivist", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.LastArchivist::new, MobCategory.MONSTER)
                     .sized(1.2F, 3.4F).clientTrackingRange(12).fireImmune().build(Singulo.id("last_archivist").toString()));
 
+    /** 光刃型アンドロイド「ルミナ」（プレイヤーより少し小さい）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.BladeAndroid>> BLADE_ANDROID = REGISTER.register(
+            "blade_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.BladeAndroid::new, MobCategory.MONSTER)
+                    .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(Singulo.id("blade_android").toString()));
+    /** アンドロイドが床から立てる光の柱。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.AndroidLaser>> ANDROID_LASER = REGISTER.register(
+            "android_laser", () -> EntityType.Builder.<io.github.genichimaruo.singulo.android.AndroidLaser>of(
+                    io.github.genichimaruo.singulo.android.AndroidLaser::new, MobCategory.MISC)
+                    .sized(1.8F, 4.0F).clientTrackingRange(8).updateInterval(10).build(Singulo.id("android_laser").toString()));
+
     public static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(BLADE_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
         event.put(ECHO_SENTINEL.get(), io.github.genichimaruo.singulo.ruin.EchoSentinel.createAttributes().build());

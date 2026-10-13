@@ -27,6 +27,7 @@ from recipes import (RECIPES, ORDER, EXPLORE, REPAIR, RESTORED, CARDS, STAGE_NAM
                      REPAIR_WEAR, MAX_REPAIRS, ASSEMBLER_MAX_KINDS, WORKBENCH_MAX_ITEMS)
 import config_spec  # noqa: E402
 import ruins  # noqa: E402
+import androids  # noqa: E402
 from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
                  STATIONS, STAGE_COLORS, SPENT, ACCEPTS_SPENT, MIN_SIZE)
 
@@ -681,6 +682,8 @@ UI_LANG = {
     'gui.singulo.wormhole_port.no_partner': ('口の向こう側がつながっていない', 'The mouth is not connected'),
     'gui.singulo.wormhole_port.status': ('向こう側の入れ物 %s 個とつながっている', 'Connected to %s handlers on the other side'),
     'entity.singulo.security_drone': ('警備ドローン', 'Security Drone'),
+    'entity.singulo.blade_android': ('光刃型アンドロイド「ルミナ」', 'Blade Android "Lumina"'),
+    'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
     'entity.singulo.horizon_warden.awakened': ('覚醒したホライズン・ウォーデン', 'Awakened Horizon Warden'),
     'entity.singulo.warden_singularity': ('ウォーデンの特異点', 'Warden Singularity'),
@@ -782,6 +785,7 @@ UI_LANG = {
     'gui.singulo.cache.sealed': ('力場で封鎖されている。この遺構を守る番人を倒さなければ開かない',
                                  "Sealed by a force field. Defeat this ruin's guardian"),
     'item.singulo.security_drone_spawn_egg': ('警備ドローンのスポーンエッグ', 'Security Drone Spawn Egg'),
+    'item.singulo.blade_android_spawn_egg': ('光刃型アンドロイドのスポーンエッグ', 'Blade Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -952,6 +956,10 @@ def models():
             elif kind in ('ruin_glass', 'deco_glass'):
                 model['render_type'] = 'minecraft:translucent'      # うっすら色のついたガラス（割れた穴は抜ける）
             write_json(ASSETS / 'models' / 'block' / f'{iid}.json', model)
+            if iid == 'ruin_android_fabricator':
+                # 上は印刷床（光の走査線が動く）、横は格納口のあるパネル
+                write_json(ASSETS / 'models' / 'block' / f'{iid}.json', {'parent': 'minecraft:block/cube_bottom_top', 'textures': {
+                    'top': f'{MODID}:block/{iid}_top', 'side': f'{MODID}:block/{iid}_side', 'bottom': f'{MODID}:block/{iid}'}})
             if iid == 'ruin_cache':
                 # 封鎖中（sealed=true）は別の見た目
                 write_json(ASSETS / 'models' / 'block' / 'ruin_cache_sealed.json',
@@ -1207,6 +1215,10 @@ def textures():
     drone_textures(te, save)
     write_json(ASSETS / 'models' / 'item' / 'security_drone_spawn_egg.json',
                {'parent': 'minecraft:item/template_spawn_egg'})
+    # 遺構のアンドロイド（128×64。tools/androids.py）
+    androids.textures(te, save)
+    write_json(ASSETS / 'models' / 'item' / 'blade_android_spawn_egg.json',
+               {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
     aged, aged_seam = (226, 218, 190, 255), (180, 170, 140, 255)
@@ -1244,6 +1256,10 @@ def textures():
         elif iid == 'ruin_guard_dock':
             d.ellipse([3, 3, 12, 12], fill=(57, 66, 74, 255), outline=aged_seam)
             d.ellipse([6, 6, 9, 9], fill=(255, 120, 100, 255))
+        elif iid == 'ruin_android_fabricator':
+            # 底面（上面と側面は blocks_extra3 が作る）
+            d.rectangle([1, 1, 14, 14], fill=(52, 58, 68, 255), outline=aged_seam)
+            d.rectangle([5, 5, 10, 10], outline=(120, 225, 255, 255))
         elif iid == 'seal_console':
             d.rectangle([2, 2, 13, 13], fill=(30, 34, 40, 255), outline=(150, 230, 255, 255))
             d.ellipse([5, 5, 10, 10], outline=(150, 230, 255, 255))
@@ -2628,8 +2644,8 @@ TAB_GROUPS = [
     ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',
             'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel', 'pristine_ruin_tiles', 'pristine_ruin_pillar',
             'pristine_ruin_light', 'intact_ruin_glass', 'reinforced_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
-            'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock',
-            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
+            'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
+            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg', 'blade_android_spawn_egg']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
                      'last_archivist_spawn_egg']),

@@ -803,6 +803,10 @@
     "source": "Rogue Black Hole",
     "translation": "流浪黑洞"
   },
+  "block.singulo.ruin_android_fabricator": {
+    "source": "Ruin Android Fabricator",
+    "translation": "遗迹仿生人打印台"
+  },
   "block.singulo.ruin_cache": {
     "source": "Ruin Cache",
     "translation": "废墟保管库"
@@ -1835,6 +1839,10 @@
     "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
     "translation": "嵌在沉没的炉心区封锁柱上的窗，用来承受反应炉的冲击。非常坚硬，爆炸也无法破坏。"
   },
+  "desc.singulo.ruin_android_fabricator": {
+    "source": "Prints androids onto its bed and sends them out.",
+    "translation": "在台面上打印仿生人并让其出动。"
+  },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
     "translation": "存放废墟回收物的保管库。清空数天后内容会恢复（被移动过的不会）。漏斗和管道无法从中取出物品。"
@@ -2258,6 +2266,14 @@
   "ending.singulo.thanks": {
     "source": "Thank you for playing",
     "translation": "Thank you for playing"
+  },
+  "entity.singulo.android_laser": {
+    "source": "Light Pillar",
+    "translation": "光柱"
+  },
+  "entity.singulo.blade_android": {
+    "source": "Blade Android \"Lumina\"",
+    "translation": "光刃型仿生人“露米娜”"
   },
   "entity.singulo.echo_sentinel": {
     "source": "Echo Sentinel",
@@ -5026,6 +5042,10 @@
   "item.singulo.black_hole_bomb": {
     "source": "Black Hole Bomb",
     "translation": "黑洞炸弹"
+  },
+  "item.singulo.blade_android_spawn_egg": {
+    "source": "Blade Android Spawn Egg",
+    "translation": "光刃型仿生人刷怪蛋"
   },
   "item.singulo.blank_data_card": {
     "source": "Blank Data Card",

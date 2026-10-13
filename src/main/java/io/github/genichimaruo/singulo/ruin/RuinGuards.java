@@ -3,12 +3,13 @@ package io.github.genichimaruo.singulo.ruin;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 
-/** 遺構の守り手（ホライズン・ウォーデン・ボス部屋の番人・警備ドローン）。互いに狙わず、互いの攻撃で傷つかない。 */
+/** 遺構の守り手（ホライズン・ウォーデン・ボス部屋の番人・警備ドローン・遺構のアンドロイド）。互いに狙わず、互いの攻撃で傷つかない。 */
 public final class RuinGuards {
     private RuinGuards() {}
 
     public static boolean isGuard(Entity e) {
-        return e instanceof HorizonWarden || e instanceof SecurityDrone || e instanceof RuinBoss;
+        return e instanceof HorizonWarden || e instanceof SecurityDrone || e instanceof RuinBoss
+                || e instanceof io.github.genichimaruo.singulo.android.RuinAndroid;
     }
 
     /** 守り手どうしの攻撃（光弾・技・跳ね返した飛び道具も含む）か。 */

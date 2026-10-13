@@ -803,6 +803,10 @@
     "source": "Rogue Black Hole",
     "translation": "떠돌이 블랙홀"
   },
+  "block.singulo.ruin_android_fabricator": {
+    "source": "Ruin Android Fabricator",
+    "translation": "유적 안드로이드 프린터"
+  },
   "block.singulo.ruin_cache": {
     "source": "Ruin Cache",
     "translation": "폐허 보관고"
@@ -1835,6 +1839,10 @@
     "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
     "translation": "가라앉은 노심 구획의 봉쇄 기둥에 끼워진, 반응로의 충격을 견디기 위한 창입니다. 매우 단단하며 폭발로도 부서지지 않습니다."
   },
+  "desc.singulo.ruin_android_fabricator": {
+    "source": "Prints androids onto its bed and sends them out.",
+    "translation": "받침대 위에 안드로이드를 출력해 출격시킵니다."
+  },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
     "translation": "폐허 회수품이 든 보관함입니다. 비운 뒤 며칠이 지나면 내용물이 돌아옵니다(옮긴 것은 제외). 호퍼나 파이프로는 꺼낼 수 없습니다."
@@ -2258,6 +2266,14 @@
   "ending.singulo.thanks": {
     "source": "Thank you for playing",
     "translation": "Thank you for playing"
+  },
+  "entity.singulo.android_laser": {
+    "source": "Light Pillar",
+    "translation": "빛기둥"
+  },
+  "entity.singulo.blade_android": {
+    "source": "Blade Android \"Lumina\"",
+    "translation": "광검날형 안드로이드 \"루미나\""
   },
   "entity.singulo.echo_sentinel": {
     "source": "Echo Sentinel",
@@ -5026,6 +5042,10 @@
   "item.singulo.black_hole_bomb": {
     "source": "Black Hole Bomb",
     "translation": "블랙홀 폭탄"
+  },
+  "item.singulo.blade_android_spawn_egg": {
+    "source": "Blade Android Spawn Egg",
+    "translation": "광검날형 안드로이드 생성 알"
   },
   "item.singulo.blank_data_card": {
     "source": "Blank Data Card",

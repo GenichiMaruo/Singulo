@@ -395,6 +395,7 @@ DESC = {
     '原初の種': ('渦の断章に刻まれた最初の運転記録をもとに、点火の手順を逆にたどって作り出した種。創世炉の核に使うと、宇宙の誕生が始まる。',
              'A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.'),
     '警備機ドック': ('警備ドローンを出撃させるドック。', 'Launches security drones.'),
+    '遺構の印刷台': ('アンドロイドを台の上に印刷して出撃させる。', 'Prints androids onto its bed and sends them out.'),
     '封印コンソール': ('最終実験施設の封印。触れるとホライズン・ウォーデンが起動する。', 'The seal of the Final Lab. Touch it to wake the Horizon Warden.'),
     '番人の封印核': ('研究棟と封鎖培養施設のボス部屋の床に埋まった封印。挑戦者が部屋に入ると、その遺構の番人を起こす。壊せない。',
                'The seal in the floor of a ruin boss room. It wakes the ruin\'s guardian when a challenger enters. Unbreakable.'),
