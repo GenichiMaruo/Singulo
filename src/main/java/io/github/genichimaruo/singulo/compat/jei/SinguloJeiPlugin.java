@@ -79,7 +79,16 @@ public class SinguloJeiPlugin implements IModPlugin {
             }
         }
         byType.forEach((t, list) -> registration.addRecipes(TYPES.get(t), list));
-        // レシピのないアイテムには説明（遺構の回収物・粒子加速器の副産物・クリエイティブ専用など）
+        // JEI のレシピで作れないアイテムには説明と入手方法（遺構の回収物・粒子加速器の副産物・Pリアクターの運転で生まれる物・
+        // 専用の処理で作る物・クリエイティブ専用など）
+        var registries = Minecraft.getInstance().level.registryAccess();
+        java.util.Set<Item> made = new java.util.HashSet<>();
+        for (RecipeHolder<?> h : Minecraft.getInstance().level.getRecipeManager().getRecipes()) {
+            ItemStack result = h.value().getResultItem(registries);
+            if (!result.isEmpty()) {
+                made.add(result.getItem());
+            }
+        }
         for (Item item : BuiltInRegistries.ITEM) {
             ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
             if (!Singulo.MODID.equals(id.getNamespace())) {
@@ -87,7 +96,8 @@ public class SinguloJeiPlugin implements IModPlugin {
             }
             String howto = "howto.singulo." + id.getPath();
             String desc = "desc.singulo." + id.getPath();
-            if (I18n.exists(desc) && (!I18n.exists(howto) || I18n.get(howto).startsWith(I18n.get("jei.singulo.found_prefix")))) {
+            if (I18n.exists(desc) && (!I18n.exists(howto) || !made.contains(item)
+                    || I18n.get(howto).startsWith(I18n.get("jei.singulo.found_prefix")))) {
                 List<Component> lines = new ArrayList<>();
                 lines.add(Component.translatable(desc));
                 if (I18n.exists(howto)) {

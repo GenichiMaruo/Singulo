@@ -731,6 +731,10 @@
     "source": "Meteoric Iron Chunk",
     "translation": "陨铁块"
   },
+  "block.singulo.meteorite_core": {
+    "source": "Meteorite Core",
+    "translation": "陨石核心"
+  },
   "block.singulo.meteorite_crust": {
     "source": "Meteorite Fusion Crust",
     "translation": "陨石熔壳"
@@ -1058,6 +1062,22 @@
   "compass.singulo.max": {
     "source": "Fully tuned",
     "translation": "已调校到最高"
+  },
+  "compass.singulo.meteor.found": {
+    "source": "Meteorite core is %s blocks away",
+    "translation": "陨石核心位于 %s 格外"
+  },
+  "compass.singulo.meteor.idle": {
+    "source": "Right-click to search for a meteorite core",
+    "translation": "右键寻找陨石核心"
+  },
+  "compass.singulo.meteor.mined": {
+    "source": "The meteorite core it pointed to has been mined",
+    "translation": "所指的陨石核心已被开采"
+  },
+  "compass.singulo.meteor.not_found": {
+    "source": "No unmined meteorite core nearby",
+    "translation": "附近没有尚未开采的陨石核心"
   },
   "compass.singulo.not_cleared": {
     "source": "Clear %s first by opening its cache",
@@ -1655,6 +1675,10 @@
     "source": "Packed mass fuel for the P-Reactor.",
     "translation": "压实的质量燃料，供彭罗斯反应堆使用。"
   },
+  "desc.singulo.meteor_compass": {
+    "source": "Right-click to point at the nearest meteorite core not yet mined. Once that core is mined, the needle spins again.",
+    "translation": "右键指向最近的尚未开采的陨石核心。所指的核心被开采后，指针会重新旋转。"
+  },
   "desc.singulo.meteoric_iron_chunk": {
     "source": "Natural iron-nickel alloy inside a meteorite. Mine it (iron pickaxe or better) for raw meteoric iron. Found only in meteor craters.",
     "translation": "陨石中的铁镍天然合金。用铁镐或更好的镐开采可得到粗陨铁。只在陨石坑中出现。"
@@ -1662,6 +1686,10 @@
   "desc.singulo.meteoric_iron_ingot": {
     "source": "A strongly magnetic natural iron-nickel alloy, used for magnet pole pieces, magnetic keys and confinement rings.",
     "translation": "具有强磁性的铁镍天然合金。用于磁铁的磁极片、磁锁钥匙和磁约束环。"
+  },
+  "desc.singulo.meteorite_core": {
+    "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
+    "translation": "陨铁与星尘熔合而成的块体，每块陨石的中心各有一个。用铁镐或更好的镐开采，可同时得到粗陨铁和星尘。陨石罗盘指向它。"
   },
   "desc.singulo.meteorite_crust": {
     "source": "The burnt, melted shell of a crater meteorite. Only shells still in their crater slowly grow stardust clusters.",
@@ -2931,6 +2959,10 @@
     "source": "Click to stop or resume the feed",
     "translation": "点击停止或恢复投料"
   },
+  "gui.singulo.genesis.screen.feed_tip_stabilizing": {
+    "source": "While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability",
+    "translation": "停止期间仍会从储能中消耗维持电力，事件也照样发生。电力不足时继续投料，不稳定度会上升"
+  },
   "gui.singulo.genesis.screen.instability": {
     "source": "Instability",
     "translation": "不稳定度"
@@ -3816,8 +3848,8 @@
     "translation": "调校探索罗盘"
   },
   "guide.singulo.ruins.gathering.body": {
-    "source": "- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. Clusters slowly regrow, but only on crust still in its crater.\n- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.",
-    "translation": "- 陨石坑（平原、沙漠、森林等地表生物群系）：直径约 10 格的浅碗状坑，中心有半埋的陨石。用铁镐或更好的镐开采陨铁块得到粗陨铁，从黑色熔壳上长出的星尘晶簇得到星尘。星尘晶簇会慢慢重新长出，但只限于原本就在陨石坑里的熔壳。\n- 闪电熔岩：闪电击中沙子会把沙子变成闪电熔岩块。把避雷针立在沙子上，每逢雷雨就会在避雷针下方形成。有了第 3 阶段的克劳诺斯放电塔，可以随时用电力向避雷针发射人工闪电。\n- 高压晶体（第 3 阶段）：把深海压力收集器放在上方有 16 格以上海水的海底，会被水压慢慢压成（越深越快）。\n- 虚空之尘（第 4~5 阶段）：把虚空收集器放在末地正下方直到虚空都空无一物的地方即可收集。"
+    "source": "- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. Clusters slowly regrow, but only on crust still in its crater. Each meteorite has one meteorite core at its heart; mine it for raw meteoric iron and stardust together. The Meteor Compass points to the nearest core not yet mined.\n- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.",
+    "translation": "- 陨石坑（平原、沙漠、森林等地表生物群系）：直径约 10 格的浅碗状坑，中心有半埋的陨石。用铁镐或更好的镐开采陨铁块得到粗陨铁，从黑色熔壳上长出的星尘晶簇得到星尘。星尘晶簇会慢慢重新长出，但只限于原本就在陨石坑里的熔壳。每块陨石的中心埋着一个陨石核心，开采后可同时得到粗陨铁和星尘。陨石罗盘会指向最近的尚未开采的核心。\n- 闪电熔岩：闪电击中沙子会把沙子变成闪电熔岩块。把避雷针立在沙子上，每逢雷雨就会在避雷针下方形成。有了第 3 阶段的克劳诺斯放电塔，可以随时用电力向避雷针发射人工闪电。\n- 高压晶体（第 3 阶段）：把深海压力收集器放在上方有 16 格以上海水的海底，会被水压慢慢压成（越深越快）。\n- 虚空之尘（第 4~5 阶段）：把虚空收集器放在末地正下方直到虚空都空无一物的地方即可收集。"
   },
   "guide.singulo.ruins.gathering.title": {
     "source": "Materials found in one place",
@@ -4535,6 +4567,10 @@
     "source": "Made in: Compressor (stage 1)",
     "translation": "制造地：压缩机（第 1 阶段）"
   },
+  "howto.singulo.meteor_compass": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
   "howto.singulo.meteoric_iron_ingot": {
     "source": "Made in: Blast Furnace (stage 2)",
     "translation": "制造地：高炉（第 2 阶段）"
@@ -5163,6 +5199,10 @@
     "source": "Mass Pellet",
     "translation": "质量颗粒"
   },
+  "item.singulo.meteor_compass": {
+    "source": "Meteor Compass",
+    "translation": "陨石罗盘"
+  },
   "item.singulo.meteoric_iron_ingot": {
     "source": "Meteoric Iron Ingot",
     "translation": "陨铁锭"
@@ -5524,8 +5564,8 @@
     "translation": "泄漏的氢气被点燃！"
   },
   "message.singulo.impact_generator.status": {
-    "source": "Stored %s / %s FE, gravity panels active: %s / %s",
-    "translation": "已储存 %s / %s FE，正在工作的重力面板：%s / %s"
+    "source": "Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)",
+    "translation": "已储存 %s / %s FE，正在工作的重力面板：%s / %s（本面板支付其中 %s 块，可向线缆输出 %s FE）"
   },
   "message.singulo.keraunos.busy": {
     "source": "Charging or cooling down",
@@ -7270,9 +7310,5 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "用于：虫洞入口"
-  },
-  "gui.singulo.genesis.screen.feed_tip_stabilizing": {
-    "source": "While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability",
-    "translation": "停止期间仍会从储能中消耗维持电力，事件也照样发生。电力不足时继续投料，不稳定度会上升"
   }
 }

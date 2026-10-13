@@ -187,6 +187,10 @@ public final class SinguloClient {
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.METEOR_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
+                new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
+                        io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
     }
 
     /** 説明（折り返し）と、Shift を押している間は作り方・使い道。 */

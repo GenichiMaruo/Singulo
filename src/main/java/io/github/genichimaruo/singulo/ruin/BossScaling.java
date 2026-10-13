@@ -37,6 +37,16 @@ public final class BossScaling {
         return !ServerConfig.SPEC.isLoaded() || ServerConfig.BOSS_LOOT_PER_PLAYER.get();
     }
 
+    /** ボスの経験値の倍率（設定 bossXpMultiplier）。 */
+    public static double xpMultiplier() {
+        return ServerConfig.SPEC.isLoaded() ? ServerConfig.BOSS_XP_MULTIPLIER.get() : 1.0;
+    }
+
+    /** 倒したときに出る経験値の合計: 1人分 × 報酬に数える人数 × 倍率（オーブは皆で拾う）。 */
+    public static int xp(int perPlayer, int players) {
+        return (int) Math.min(Integer.MAX_VALUE, Math.round((double) perPlayer * lootRolls(players) * xpMultiplier()));
+    }
+
     /** 強さに数える人数（1〜bossMaxScaledPlayers）。 */
     public static int clamp(int players) {
         return Mth.clamp(players, 1, Math.max(1, maxPlayers()));

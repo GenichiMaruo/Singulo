@@ -97,6 +97,14 @@ public class EchoSentinel extends RuinBoss {
     /** 相手の周りを回る距離と高さ。 */
     static final double ORBIT = 6;
     static final double HOVER = 2.0;
+    /**
+     * 記録保管室の中で動ける広さ: 核から水平に ROOM_HALF ブロック（四角）、高さは核の上 1〜ROOM_TOP ブロック（足の位置）。
+     * 部屋の内側は核から東西8・南北9ブロック、高さ11ブロック。体の幅と高さの分を引いてある。
+     */
+    public static final double ROOM_HALF = 6.5;
+    static final double ROOM_TOP = 8.5;
+    /** 部屋からこれ以上はみ出したら（押し出された・壁を壊されたなど）、核の上へ戻る。 */
+    public static final double ROOM_SLACK = 1.5;
     /** 覚醒した個体が本気になったとき映し直す投影器の数。 */
     public static final int AWAKENED_REPROJECT = 2;
 
@@ -115,7 +123,7 @@ public class EchoSentinel extends RuinBoss {
 
     public EchoSentinel(EntityType<? extends EchoSentinel> type, Level level) {
         super(type, level, BossEvent.BossBarColor.BLUE);
-        this.xpReward = 80;
+        this.xpReward = 500;
         setNoGravity(true);
         orbitAngle = random.nextDouble() * Math.PI * 2;
     }
@@ -311,6 +319,7 @@ public class EchoSentinel extends RuinBoss {
         if (awakened() && !isMinion()) {
             tickAwakened(level);
         }
+        keepInRoom(level);
         LivingEntity target = getTarget();
         drift(target);
         tickLance(level);
@@ -389,19 +398,36 @@ public class EchoSentinel extends RuinBoss {
         } else {
             return;
         }
-        if (home != null) {
-            Vec3 h = Vec3.atBottomCenterOf(home);
-            Vec3 off = goal.subtract(h);
-            double max = ARENA_RADIUS - 4;
-            if (off.horizontalDistance() > max) {
-                goal = h.add(off.x * max / off.horizontalDistance(), off.y, off.z * max / off.horizontalDistance());
-            }
-        }
+        goal = insideRoom(goal);
         Vec3 v = goal.subtract(position()).scale(0.06);
         if (v.length() > 0.32) {
             v = v.normalize().scale(0.32);
         }
         setDeltaMovement(getDeltaMovement().scale(0.6).add(v.scale(0.4)));
+    }
+
+    /** 部屋の中に収めた位置（守る核がなければそのまま）。 */
+    public Vec3 insideRoom(Vec3 p) {
+        if (home == null) {
+            return p;
+        }
+        double cx = home.getX() + 0.5;
+        double cz = home.getZ() + 0.5;
+        return new Vec3(Mth.clamp(p.x, cx - ROOM_HALF, cx + ROOM_HALF), Mth.clamp(p.y, home.getY() + 1.0, home.getY() + ROOM_TOP),
+                Mth.clamp(p.z, cz - ROOM_HALF, cz + ROOM_HALF));
+    }
+
+    /** 部屋から大きくはみ出していたら、核の上へ跳んで戻る（部屋の外へは出ない）。 */
+    private void keepInRoom(ServerLevel level) {
+        if (home == null || insideRoom(position()).distanceTo(position()) <= ROOM_SLACK) {
+            return;
+        }
+        Vec3 before = position();
+        Vec3 back = Vec3.atBottomCenterOf(home).add(0, 1.0 + HOVER, 0);
+        teleportTo(back.x, back.y, back.z);
+        setDeltaMovement(Vec3.ZERO);
+        level.sendParticles(ParticleTypes.END_ROD, before.x, before.y + 1.2, before.z, 20, 0.3, 0.8, 0.3, 0.1);
+        level.sendParticles(ParticleTypes.END_ROD, back.x, back.y + 1.2, back.z, 20, 0.3, 0.8, 0.3, 0.1);
     }
 
     /** 相手がこちらを見ているか（視線の先、約40度以内で、間に壁がない）。 */
@@ -440,9 +466,10 @@ public class EchoSentinel extends RuinBoss {
         // 続けて跳ぶときは、背後ではなく左右に回り込む
         double turn = chain == 0 ? 0 : (chain % 2 == 1 ? 1 : -1) * Math.PI / 2;
         Vec3 dir = look.normalize().yRot((float) turn);
-        Vec3 behind = target.position().subtract(dir.scale(2.5));
+        // 相手が部屋の外にいても、跳ぶ先は部屋の中
+        Vec3 behind = insideRoom(target.position().subtract(dir.scale(2.5)).add(0, 0.5, 0));
         Vec3 before = position();
-        if (!randomTeleport(behind.x, target.getY() + 0.5, behind.z, false)) {
+        if (!randomTeleport(behind.x, behind.y, behind.z, false)) {
             return false;
         }
         unseenTicks = 0;
@@ -577,17 +604,20 @@ public class EchoSentinel extends RuinBoss {
             }
             echo.makeMinion();
             double a = orbitAngle + Math.PI * 2 * (i + 1) / (count + 1);
-            echo.moveTo(target.getX() + Math.cos(a) * ORBIT, target.getY() + HOVER, target.getZ() + Math.sin(a) * ORBIT, getYRot(), 0);
+            Vec3 at = insideRoom(target.position().add(Math.cos(a) * ORBIT, HOVER, Math.sin(a) * ORBIT));
+            echo.moveTo(at.x, at.y, at.z, getYRot(), 0);
             echo.orbitAngle = a;
             echo.setTarget(target);
             if (home != null) {
+                // 分身も部屋から出ない
+                echo.home = home;
                 echo.restrictTo(home, ARENA_RADIUS);
             }
             level.addFreshEntity(echo);
             level.sendParticles(ParticleTypes.FLASH, echo.getX(), echo.getY() + 1.2, echo.getZ(), 1, 0, 0, 0, 0);
         }
         orbitAngle += Math.PI * 2 / (count + 1) * (1 + random.nextInt(count));
-        Vec3 swap = target.position().add(Math.cos(orbitAngle) * ORBIT, HOVER, Math.sin(orbitAngle) * ORBIT);
+        Vec3 swap = insideRoom(target.position().add(Math.cos(orbitAngle) * ORBIT, HOVER, Math.sin(orbitAngle) * ORBIT));
         randomTeleport(swap.x, swap.y, swap.z, false);
         level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
         playSound(SinguloSounds.get("echo_sentinel.summon"), 2.0F, 1.0F);

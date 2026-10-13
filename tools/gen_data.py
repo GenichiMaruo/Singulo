@@ -77,7 +77,7 @@ def stage_of(name):
     # レシピのないもの（封印コンテナからしか出ないものは、そのコンテナの鍵の段階）
     return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
-            '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
+            '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '隕石の核': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5}.get(name, 1)
 
@@ -467,7 +467,8 @@ UI_LANG = {
     'message.singulo.stabilizer.already': ('この触媒はすでに安定化してある', 'This catalyst is already stabilized'),
     'message.singulo.stabilizer.done': ('触媒を安定化した（残りの寿命が2倍になった）', 'Catalyst stabilized: remaining life doubled'),
     'message.singulo.gravity_receiver.status': ('重力パネル %s / %s 枚が稼働中（1枚あたり %s FE/t）', 'Gravity panels active: %s / %s (%s FE/t each)'),
-    'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中', 'Stored %s / %s FE, gravity panels active: %s / %s'),
+    'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中（このパネルが %s 枚分を払い、ケーブルへ出せるのは %s FE）',
+                                                'Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)'),
     'message.singulo.deep_sea_collector.idle': ('水深が足りない（真上に16ブロック以上の水が必要）', 'Not deep enough: needs 16+ blocks of water above'),
     'message.singulo.deep_sea_collector.rate': ('水圧 %s%%: 約%s秒ごとに高圧結晶が1個できる', 'Pressure %s%%: one Pressure Crystal every %ss'),
     'message.singulo.void_collector.idle': ('ジ・エンドの、真下が奈落まで吹き抜けている場所でしか動かない', 'Works only in the End, over open void'),
@@ -574,6 +575,10 @@ UI_LANG = {
     'compass.singulo.target': ('探す遺構: %s', 'Target: %s'),
     'compass.singulo.found': ('%s は %s ブロック先', '%s is %s blocks away'),
     'compass.singulo.not_found': ('近くに %s が見つからない', 'No %s nearby'),
+    'compass.singulo.meteor.found': ('隕石の核は %s ブロック先', 'Meteorite core is %s blocks away'),
+    'compass.singulo.meteor.not_found': ('近くに、まだ掘り出されていない隕石の核がない', 'No unmined meteorite core nearby'),
+    'compass.singulo.meteor.mined': ('指していた隕石の核は、もう掘り出された', 'The meteorite core it pointed to has been mined'),
+    'compass.singulo.meteor.idle': ('右クリックで隕石の核を探す', 'Right-click to search for a meteorite core'),
     'tooltip.singulo.creative_only': ('クリエイティブ専用', 'Creative only'),
     'tooltip.singulo.creative_catalyst.tier': ('ティア %s の触媒として働く', 'Acts as a tier %s catalyst'),
     'tooltip.singulo.builder_wand.hint': ('コントローラに使って一瞬で組み立てる。スニークで大きさ切替', 'Use on a controller to build instantly. Sneak to change size'),
@@ -1009,7 +1014,7 @@ def models():
             else:
                 write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
         else:
-            if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'graviton_manipulator'):
+            if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'meteor_compass', 'graviton_manipulator'):
                 continue                                       # 立体のモデル・針のモデルは別に作る
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json',
                        {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
@@ -1435,9 +1440,10 @@ def art_textures():
     for iid, core in CABLES.items():
         art16.save(art16.cable_texture(iid, core), tb / f'{iid}.png')
         art16.save(art16.cable_end(iid, core), tb / f'{iid}_end.png')
-    # 探索コンパスの針（16コマ）
+    # 探索コンパス・隕石コンパスの針（16コマ）
     for k in range(16):
         art16.save(art16.compass_frame(k / 16), ti / f'explorer_compass_{k:02d}.png')
+        art16.save(art16.compass_frame(k / 16, art16.METEOR_COMPASS), ti / f'meteor_compass_{k:02d}.png')
     black_hole_textures(art16, tb)
     manipulator_staff_texture(art16)
     # あとから足したブロック（遺構の変わり種・建材・重力パネル）
@@ -2165,17 +2171,18 @@ def sounds_json():
 
 
 def compass_item_model():
-    """探索コンパス: 針の向き（minecraft:angle）で16コマを切り替える。"""
-    overrides = []
-    n = 16
-    for k in range(n):
-        overrides.append({'predicate': {'angle': max(0.0, k / n - 1 / (2 * n))},
-                          'model': f'{MODID}:item/explorer_compass_{k:02d}'})
-        write_json(ASSETS / 'models' / 'item' / f'explorer_compass_{k:02d}.json',
-                   {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/explorer_compass_{k:02d}'}})
-    overrides.append({'predicate': {'angle': 1 - 1 / (2 * n)}, 'model': f'{MODID}:item/explorer_compass_00'})
-    write_json(ASSETS / 'models' / 'item' / 'explorer_compass.json', {
-        'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/explorer_compass_00'}, 'overrides': overrides})
+    """探索コンパス・隕石コンパス: 針の向き（minecraft:angle）で16コマを切り替える。"""
+    for iid in ('explorer_compass', 'meteor_compass'):
+        overrides = []
+        n = 16
+        for k in range(n):
+            overrides.append({'predicate': {'angle': max(0.0, k / n - 1 / (2 * n))},
+                              'model': f'{MODID}:item/{iid}_{k:02d}'})
+            write_json(ASSETS / 'models' / 'item' / f'{iid}_{k:02d}.json',
+                       {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}_{k:02d}'}})
+        overrides.append({'predicate': {'angle': 1 - 1 / (2 * n)}, 'model': f'{MODID}:item/{iid}_00'})
+        write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
+            'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}_00'}, 'overrides': overrides})
 
 def mid_entity(eid):
     return f'{MODID}:{eid}'
@@ -2226,7 +2233,7 @@ def tags():
     blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust')
+               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
                           or v[0].startswith('pristine_')]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
@@ -2276,29 +2283,19 @@ CRATER_BIOMES = ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:de
 
 
 def craters_data():
-    """隕石クレーター（地表の小さな構造物）。3通りの形から1つを選んで置く。地面の高さに合わせ、すり鉢を地面に掘り込む。"""
-    import craters
-    craters.write_all(DATA / 'structure' / 'craters')
+    """
+    隕石クレーター（地表の小さな構造物）。型紙は使わず、Java（MeteorCraterPiece）がその場の地面の高さに合わせて
+    すり鉢・縁・飛び散った土を描き込む（地形を四角く削らないよう、地形の調整はしない）。
+    0.4.0 までの型紙（craters/meteor_crater_{a,b,c}.nbt）は、保存済みのワールドの構造が参照するので、
+    src/main/resources に残してある（ここでは作らない）。
+    """
     write_json(DATA / 'tags' / 'worldgen' / 'biome' / 'has_structure' / 'meteor_crater.json', {'values': CRATER_BIOMES})
-    write_json(DATA / 'worldgen' / 'template_pool' / 'craters' / 'meteor_crater.json', {
-        'fallback': 'minecraft:empty',
-        'elements': [{'weight': 1, 'element': {
-            'element_type': 'minecraft:single_pool_element', 'location': f'{MODID}:craters/{name}',
-            'projection': 'rigid', 'processors': 'minecraft:empty'}} for name in craters.VARIANTS],
-    })
     write_json(DATA / 'worldgen' / 'structure' / 'meteor_crater.json', {
-        'type': 'minecraft:jigsaw',
+        'type': f'{MODID}:meteor_crater',
         'biomes': f'#{MODID}:has_structure/meteor_crater',
         'step': 'surface_structures',
         'spawn_overrides': {},
-        'terrain_adaptation': 'beard_thin',
-        'start_pool': f'{MODID}:craters/meteor_crater',
-        'size': 1,
-        'max_distance_from_center': 32,
-        'use_expansion_hack': False,
-        # テンプレートの y=SURFACE が、元の地面のすぐ上になるように
-        'start_height': {'absolute': -craters.SURFACE},
-        'project_start_to_heightmap': 'WORLD_SURFACE_WG',
+        'terrain_adaptation': 'none',
     })
     write_json(DATA / 'worldgen' / 'structure_set' / 'meteor_crater.json', {
         'structures': [{'structure': f'{MODID}:meteor_crater', 'weight': 1}],
@@ -2577,7 +2574,7 @@ def thermal():
 # ---------------------------------------------------------------- クリエイティブタブ（と JEI）の並び
 # 用途ごとにまとめ、まとまりの中は段階順・レシピ順。並べ忘れたアイテムは「素材」の最後に入る。
 TAB_GROUPS = [
-    ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'settings_card', 'decoded_record']),
+    ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'decoded_record']),
     ('発電・蓄電・送電', ['thermoelectric_generator', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
@@ -2613,7 +2610,7 @@ TAB_GROUPS = [
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core']),
-    ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'raw_meteoric_iron', 'meteoric_iron_ingot', 'stardust',
+    ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core', 'raw_meteoric_iron', 'meteoric_iron_ingot', 'stardust',
             'fulgurite_block', 'fulgurite', 'pressure_crystal', 'void_dust']),
     ('素材', None),
     ('回収物と記録', None),

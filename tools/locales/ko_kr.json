@@ -731,6 +731,10 @@
     "source": "Meteoric Iron Chunk",
     "translation": "운철 덩어리"
   },
+  "block.singulo.meteorite_core": {
+    "source": "Meteorite Core",
+    "translation": "운석 핵"
+  },
   "block.singulo.meteorite_crust": {
     "source": "Meteorite Fusion Crust",
     "translation": "운석 용융각"
@@ -1058,6 +1062,22 @@
   "compass.singulo.max": {
     "source": "Fully tuned",
     "translation": "더 이상 조정할 수 없음"
+  },
+  "compass.singulo.meteor.found": {
+    "source": "Meteorite core is %s blocks away",
+    "translation": "운석 핵은 %s 블록 떨어져 있습니다"
+  },
+  "compass.singulo.meteor.idle": {
+    "source": "Right-click to search for a meteorite core",
+    "translation": "우클릭하면 운석 핵을 찾습니다"
+  },
+  "compass.singulo.meteor.mined": {
+    "source": "The meteorite core it pointed to has been mined",
+    "translation": "가리키던 운석 핵은 이미 캐냈습니다"
+  },
+  "compass.singulo.meteor.not_found": {
+    "source": "No unmined meteorite core nearby",
+    "translation": "근처에 아직 캐지 않은 운석 핵이 없습니다"
   },
   "compass.singulo.not_cleared": {
     "source": "Clear %s first by opening its cache",
@@ -1655,6 +1675,10 @@
     "source": "Packed mass fuel for the P-Reactor.",
     "translation": "질량을 굳힌 연료. 펜로즈 반응로에 투입해 발전합니다."
   },
+  "desc.singulo.meteor_compass": {
+    "source": "Right-click to point at the nearest meteorite core not yet mined. Once that core is mined, the needle spins again.",
+    "translation": "우클릭하면 아직 캐지 않은 운석 핵 중 가장 가까운 것을 가리킵니다. 그 핵을 캐내면 바늘이 다시 돕니다."
+  },
   "desc.singulo.meteoric_iron_chunk": {
     "source": "Natural iron-nickel alloy inside a meteorite. Mine it (iron pickaxe or better) for raw meteoric iron. Found only in meteor craters.",
     "translation": "운석 속의 철과 니켈의 천연 합금입니다. 철 곡괭이 이상으로 캐면 운철 원석이 나옵니다. 운석 구덩이에만 있습니다."
@@ -1662,6 +1686,10 @@
   "desc.singulo.meteoric_iron_ingot": {
     "source": "A strongly magnetic natural iron-nickel alloy, used for magnet pole pieces, magnetic keys and confinement rings.",
     "translation": "강한 자성을 지닌 철과 니켈의 천연 합금입니다. 자석의 자극편, 자기 잠금 열쇠, 자기 가둠 고리에 씁니다."
+  },
+  "desc.singulo.meteorite_core": {
+    "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
+    "translation": "운철과 별가루가 녹아 엉긴 덩어리로, 운석마다 한가운데에 하나씩 있습니다. 철 곡괭이 이상으로 캐면 운철 원석과 별가루를 함께 얻습니다. 운석 나침반이 이것을 가리킵니다."
   },
   "desc.singulo.meteorite_crust": {
     "source": "The burnt, melted shell of a crater meteorite. Only shells still in their crater slowly grow stardust clusters.",
@@ -2931,6 +2959,10 @@
     "source": "Click to stop or resume the feed",
     "translation": "클릭하여 투입을 멈추거나 재개"
   },
+  "gui.singulo.genesis.screen.feed_tip_stabilizing": {
+    "source": "While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability",
+    "translation": "멈춘 동안에도 저장된 전력에서 유지 전력이 빠져나가고, 이변도 일어난다. 전력이 부족한 채로 투입을 계속하면 불안정해진다"
+  },
   "gui.singulo.genesis.screen.instability": {
     "source": "Instability",
     "translation": "불안정도"
@@ -3816,8 +3848,8 @@
     "translation": "탐험가의 나침반 조정"
   },
   "guide.singulo.ruins.gathering.body": {
-    "source": "- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. Clusters slowly regrow, but only on crust still in its crater.\n- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.",
-    "translation": "- 운석 구덩이(평원, 사막, 숲 등 지표 생물 군계): 지름 10블록쯤 되는 얕은 사발 모양의 구덩이 한가운데에 반쯤 묻힌 운석이 있습니다. 철 곡괭이 이상으로 운철 덩어리를 캐면 운철 원석, 검은 용융각에 자란 별가루 결정에서 별가루를 얻습니다. 별가루 결정은 처음부터 구덩이에 있던 껍질에서만 조금씩 다시 자랍니다.\n- 섬전암: 번개가 모래에 떨어지면 모래가 섬전암 블록이 됩니다. 피뢰침을 모래 위에 세워 두면 뇌우가 올 때마다 피뢰침 아래에 생깁니다. 3단계의 케라우노스 방전탑이 있으면 전력으로 인공 번개를 피뢰침에 쏘아 언제든 만들 수 있습니다.\n- 고압 결정(3단계): 심해 압력 수집기를 위에 물이 16블록 이상 있는 해저에 두면 수압으로 조금씩 생깁니다(깊을수록 빠름).\n- 공허의 먼지(4~5단계): 공허 수집기를 엔드에서 바로 아래가 공허까지 텅 빈 곳에 두면 모입니다."
+    "source": "- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. Clusters slowly regrow, but only on crust still in its crater. Each meteorite has one meteorite core at its heart; mine it for raw meteoric iron and stardust together. The Meteor Compass points to the nearest core not yet mined.\n- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.",
+    "translation": "- 운석 구덩이(평원, 사막, 숲 등 지표 생물 군계): 지름 10블록쯤 되는 얕은 사발 모양의 구덩이 한가운데에 반쯤 묻힌 운석이 있습니다. 철 곡괭이 이상으로 운철 덩어리를 캐면 운철 원석, 검은 용융각에 자란 별가루 결정에서 별가루를 얻습니다. 별가루 결정은 처음부터 구덩이에 있던 껍질에서만 조금씩 다시 자랍니다. 운석 한가운데에는 운석 핵이 하나 묻혀 있어, 캐면 운철 원석과 별가루를 함께 얻습니다. 운석 나침반은 아직 캐지 않은 핵 중 가장 가까운 것을 가리킵니다.\n- 섬전암: 번개가 모래에 떨어지면 모래가 섬전암 블록이 됩니다. 피뢰침을 모래 위에 세워 두면 뇌우가 올 때마다 피뢰침 아래에 생깁니다. 3단계의 케라우노스 방전탑이 있으면 전력으로 인공 번개를 피뢰침에 쏘아 언제든 만들 수 있습니다.\n- 고압 결정(3단계): 심해 압력 수집기를 위에 물이 16블록 이상 있는 해저에 두면 수압으로 조금씩 생깁니다(깊을수록 빠름).\n- 공허의 먼지(4~5단계): 공허 수집기를 엔드에서 바로 아래가 공허까지 텅 빈 곳에 두면 모입니다."
   },
   "guide.singulo.ruins.gathering.title": {
     "source": "Materials found in one place",
@@ -4535,6 +4567,10 @@
     "source": "Made in: Compressor (stage 1)",
     "translation": "제작: 압축기(1단계)"
   },
+  "howto.singulo.meteor_compass": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
   "howto.singulo.meteoric_iron_ingot": {
     "source": "Made in: Blast Furnace (stage 2)",
     "translation": "제작: 용광로(2단계)"
@@ -5163,6 +5199,10 @@
     "source": "Mass Pellet",
     "translation": "질량 펠릿"
   },
+  "item.singulo.meteor_compass": {
+    "source": "Meteor Compass",
+    "translation": "운석 나침반"
+  },
   "item.singulo.meteoric_iron_ingot": {
     "source": "Meteoric Iron Ingot",
     "translation": "운철 주괴"
@@ -5524,8 +5564,8 @@
     "translation": "누출된 수소에 불이 붙었습니다!"
   },
   "message.singulo.impact_generator.status": {
-    "source": "Stored %s / %s FE, gravity panels active: %s / %s",
-    "translation": "저장 %s / %s FE, 작동 중인 중력 패널: %s / %s"
+    "source": "Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)",
+    "translation": "저장 %s / %s FE, 작동 중인 중력 패널: %s / %s (이 패널이 %s개분 부담, 케이블로 보낼 수 있는 양 %s FE)"
   },
   "message.singulo.keraunos.busy": {
     "source": "Charging or cooling down",
@@ -7270,9 +7310,5 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "사용 대상: 웜홀 입구"
-  },
-  "gui.singulo.genesis.screen.feed_tip_stabilizing": {
-    "source": "While stopped, upkeep still drains the buffer and events still happen. Feeding without enough power raises instability",
-    "translation": "멈춘 동안에도 저장된 전력에서 유지 전력이 빠져나가고, 이변도 일어난다. 전력이 부족한 채로 투입을 계속하면 불안정해진다"
   }
 }

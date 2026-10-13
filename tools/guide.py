@@ -489,7 +489,8 @@ CHAPTERS = [
          'handbook). Collect them all to learn why the civilization fell.'),
         ('gathering', 'その場所でしか採れない素材',
          '・隕石クレーター（平原・砂漠・森などの地表）: 差し渡し10ブロックほどの浅いすり鉢の中心に、半分埋まった隕石があります。'
-         '隕鉄塊（鉄以上のツルハシ）から隕鉄の原石、黒い溶融殻に育つ星屑の結晶から星屑が採れます。星屑の結晶は、クレーターに最初からある殻にだけ、少しずつ育ち直します。\n'
+         '隕鉄塊（鉄以上のツルハシ）から隕鉄の原石、黒い溶融殻に育つ星屑の結晶から星屑が採れます。星屑の結晶は、クレーターに最初からある殻にだけ、少しずつ育ち直します。'
+         '隕石の芯には隕石の核が1つ埋まっていて、掘ると隕鉄の原石と星屑がまとめて出ます。隕石コンパスは、まだ掘り出されていない核のうち、いちばん近いものを指します。\n'
          '・雷ガラス: 雷が砂に落ちると、砂が雷ガラス塊になります。避雷針を砂の上に立てておくと、雷雨のたびに避雷針の下にできます。'
          '段階3のケラウノス放電塔があれば、電力で人工の雷を避雷針へ撃って、いつでも作れます。\n'
          '・高圧結晶（段階3）: 深海圧力収集器を、真上に水が16ブロック以上ある海底に置くと、水圧で少しずつできます（深いほど速い）。\n'
@@ -497,7 +498,9 @@ CHAPTERS = [
          'Materials found in one place',
          '- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. '
          'Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. '
-         'Clusters slowly regrow, but only on crust still in its crater.\n'
+         'Clusters slowly regrow, but only on crust still in its crater. '
+         'Each meteorite has one meteorite core at its heart; mine it for raw meteoric iron and stardust together. '
+         'The Meteor Compass points to the nearest core not yet mined.\n'
          '- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. '
          'The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n'
          '- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n'

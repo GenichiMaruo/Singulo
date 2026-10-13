@@ -95,8 +95,8 @@ public class HorizonWarden extends Monster {
 
     public static final double ARMOR_PHASE_1 = 10;
     public static final int ARENA_RADIUS = 24;
-    /** 挑戦者がいない判定（20 tick ごと）がこの回数続くと封印に戻る。 */
-    static final int RESET_CHECKS = 5;
+    /** 挑戦者がいない判定（20 tick ごと）がこの回数続くと封印に戻る（3分。倒れて戻ってくるまでの猶予）。 */
+    static final int RESET_CHECKS = 180;
     static final int BOLT_INTERVAL = 40;
     /** 扇状に撃つ光弾の数と、隣どうしの角度。 */
     public static final int VOLLEY = 3;
@@ -191,7 +191,7 @@ public class HorizonWarden extends Monster {
 
     public HorizonWarden(EntityType<? extends HorizonWarden> type, Level level) {
         super(type, level);
-        this.xpReward = 200;
+        this.xpReward = 1500;
         setPersistenceRequired();
     }
 
@@ -335,10 +335,21 @@ public class HorizonWarden extends Monster {
         }
     }
 
+    /** 挑戦者がいなくなってからの猶予を、次の確かめで終わるところまで進める（テスト用）。 */
+    public void skipResetGrace() {
+        emptyChecks = Math.max(emptyChecks, RESET_CHECKS - 1);
+    }
+
     /** 報酬に数える挑戦者の数（まだ決まっていなければ、今の人数で決める）。 */
     public int rewardParticipants() {
         lockRewardParticipants();
         return rewardParticipants;
+    }
+
+    /** 倒したときの経験値。ドロップと同じく、挑戦者の人数分（設定で1人分にもできる）。 */
+    @Override
+    protected int getBaseExperienceReward() {
+        return BossScaling.xp(xpReward, rewardParticipants());
     }
 
     /** 報酬に数える人数を、今の人数で決める（一度決めたら変わらない）。 */
@@ -433,7 +444,7 @@ public class HorizonWarden extends Monster {
             getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue() * AWAKENED_SPEED);
             setBarName(Component.translatable("entity.singulo.horizon_warden.awakened"));
             bossBar.setColor(BossEvent.BossBarColor.PURPLE);
-            xpReward = 500;
+            xpReward = 4500;
         }
         // 最大体力はゲームの決まりで 1024 までなので、それを超える分は受けるダメージを減らして同じ硬さにする
         double max = Math.min(health, MAX_HEALTH_CAP);
@@ -1352,7 +1363,7 @@ public class HorizonWarden extends Monster {
         entityData.set(EMERGE, tag.getInt("emerge"));
         entityData.set(AWAKENED, tag.getBoolean("awakened"));
         if (awakened()) {
-            xpReward = 500;
+            xpReward = 4500;
         }
         home = NbtUtils.readBlockPos(tag, "home").orElse(null);
         console = NbtUtils.readBlockPos(tag, "console").orElse(null);

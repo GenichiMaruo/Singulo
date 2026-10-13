@@ -82,7 +82,7 @@ public class GravityRemnant extends RuinBoss {
 
     public GravityRemnant(EntityType<? extends GravityRemnant> type, Level level) {
         super(type, level, BossEvent.BossBarColor.PURPLE);
-        this.xpReward = 120;
+        this.xpReward = 800;
         setNoGravity(true);
     }
 

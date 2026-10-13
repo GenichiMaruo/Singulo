@@ -44,8 +44,8 @@ public abstract class RuinBoss extends Monster {
     private static final EntityDataAccessor<Boolean> AWAKENED = SynchedEntityData.defineId(RuinBoss.class, EntityDataSerializers.BOOLEAN);
     /** 部屋を守る広さ（核からのブロック数）。 */
     public static final int ARENA_RADIUS = 20;
-    /** 挑戦者がいないのを何回（1秒ごと）続けて確かめたら戻るか。 */
-    static final int RESET_CHECKS = 5;
+    /** 挑戦者がいないのを何回（1秒ごと）続けて確かめたら戻るか（3分。倒れて戻ってくるまでの猶予）。 */
+    static final int RESET_CHECKS = 180;
     /** 覚醒した個体の技の間（通常の何倍か）。 */
     public static final float AWAKENED_PACE = 0.75F;
     /** 本気になる（技が増える）体力の割合。覚醒した個体は早い。 */
@@ -155,6 +155,11 @@ public abstract class RuinBoss extends Monster {
         setBarName(barName != null ? barName : getDisplayName());
     }
 
+    /** 挑戦者がいなくなってからの猶予を、次の確かめで終わるところまで進める（テスト用）。 */
+    public void skipResetGrace() {
+        emptyChecks = Math.max(emptyChecks, resetChecks() - 1);
+    }
+
     /** 報酬に数える挑戦者の数（まだ決まっていなければ、今の人数で決める）。 */
     public int rewardParticipants() {
         if (rewardParticipants <= 0) {
@@ -190,9 +195,28 @@ public abstract class RuinBoss extends Monster {
         return BossEvent.BossBarColor.PURPLE;
     }
 
-    /** 覚醒した個体の経験値。 */
+    /** 覚醒する前の経験値（初めて使うときに、作ったときの値を覚える）。 */
+    private int normalXp = -1;
+
+    private int normalXp() {
+        if (normalXp < 0) {
+            normalXp = xpReward;
+        }
+        return normalXp;
+    }
+
+    /**
+     * 覚醒した個体の経験値。いまの値ではなく覚醒する前の値から決めるので、すでに覚醒した個体へ
+     * データを当て直しても（/data merge など）増えない。
+     */
     protected int awakenedXp() {
-        return xpReward * 3;
+        return normalXp() * 3;
+    }
+
+    /** 倒したときの経験値。ドロップと同じく、挑戦者の人数分（設定で1人分にもできる）。設定 bossXpMultiplier を掛ける。 */
+    @Override
+    protected int getBaseExperienceReward() {
+        return BossScaling.xp(xpReward, rewardParticipants());
     }
 
     /** 覚醒した個体を倒したときの追加の報酬（アイテムID と個数）。通常のドロップに加えて出る。 */
@@ -329,10 +353,15 @@ public abstract class RuinBoss extends Monster {
         }
         emptyChecks = present ? 0 : emptyChecks + 1;
         boolean reset = !ServerConfig.SPEC.isLoaded() || ServerConfig.WARDEN_RESET_ON_LEAVE.get();
-        if (emptyChecks >= RESET_CHECKS && reset) {
+        if (emptyChecks >= resetChecks() && reset) {
             onAbandoned(level);
             discard();
         }
+    }
+
+    /** 挑戦者がいないのを何回（1秒ごと）続けて確かめたら核へ戻るか。 */
+    protected int resetChecks() {
+        return RESET_CHECKS;
     }
 
     /** 部屋にいる挑戦者の数（強さと、戦いを続けるかに使う）。部屋の形が違うボスは数え方を変える。 */

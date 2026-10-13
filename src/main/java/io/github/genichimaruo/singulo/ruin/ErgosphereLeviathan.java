@@ -148,7 +148,7 @@ public class ErgosphereLeviathan extends RuinBoss {
         }
         // 部位の番号は本体の番号の続きにする（エンダードラゴンと同じ。クライアントとサーバーで番号がそろう）
         setId(ENTITY_COUNTER.getAndAdd(parts.length + 1) + 1);
-        this.xpReward = 250;
+        this.xpReward = 2000;
         this.noPhysics = true;
         this.noCulling = true;
         setNoGravity(true);

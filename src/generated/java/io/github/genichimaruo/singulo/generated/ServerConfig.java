@@ -65,6 +65,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.DoubleValue BOSS_PACE_PER_PLAYER;
     public static final ModConfigSpec.IntValue BOSS_MAX_SCALED_PLAYERS;
     public static final ModConfigSpec.BooleanValue BOSS_LOOT_PER_PLAYER;
+    public static final ModConfigSpec.DoubleValue BOSS_XP_MULTIPLIER;
     public static final ModConfigSpec.IntValue TEMPLATE_USES;
     public static final ModConfigSpec.IntValue SCULK_PER_SHARD;
     public static final ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS;
@@ -152,6 +153,7 @@ public final class ServerConfig {
         ModConfigSpec.DoubleValue BOSS_PACE_PER_PLAYER_;
         ModConfigSpec.IntValue BOSS_MAX_SCALED_PLAYERS_;
         ModConfigSpec.BooleanValue BOSS_LOOT_PER_PLAYER_;
+        ModConfigSpec.DoubleValue BOSS_XP_MULTIPLIER_;
         ModConfigSpec.IntValue TEMPLATE_USES_;
         ModConfigSpec.IntValue SCULK_PER_SHARD_;
         ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS_;
@@ -284,7 +286,7 @@ public final class ServerConfig {
         PROBE_YIELD_MULTIPLIER_ = b.defineInRange("probeYieldMultiplier", 0.5, 0.0, 1.0);
         b.comment("ホライズン・ウォーデンのHP", "範囲: 1〜100,000");
         WARDEN_HEALTH_ = b.defineInRange("wardenHealth", 1200, 1, 100000);
-        b.comment("挑戦者が離れたら全回復するか", "範囲: true / false");
+        b.comment("挑戦者が全員離れたら番人が戻って全回復するか（最後の記録者以外は3分の猶予がある）", "範囲: true / false");
         WARDEN_RESET_ON_LEAVE_ = b.define("wardenResetOnLeave", true);
         b.comment("覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）", "範囲: 1.0〜20.0");
         AWAKENED_WARDEN_HEALTH_MULTIPLIER_ = b.defineInRange("awakenedWardenHealthMultiplier", 2.5, 1.0, 20.0);
@@ -304,8 +306,10 @@ public final class ServerConfig {
         BOSS_PACE_PER_PLAYER_ = b.defineInRange("bossPacePerPlayer", 0.08, 0.0, 0.5);
         b.comment("ボスの強さに数える挑戦者の上限", "範囲: 1〜32（整数）");
         BOSS_MAX_SCALED_PLAYERS_ = b.defineInRange("bossMaxScaledPlayers", 6, 1, 32);
-        b.comment("ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか", "範囲: true / false");
+        b.comment("ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）", "範囲: true / false");
         BOSS_LOOT_PER_PLAYER_ = b.define("bossLootPerPlayer", true);
+        b.comment("ボスを倒したときの経験値の倍率", "範囲: 0.0〜10.0");
+        BOSS_XP_MULTIPLIER_ = b.defineInRange("bossXpMultiplier", 1.0, 0.0, 10.0);
         b.pop();
         b.push("echo");
         b.comment("型の残響の欠片が割れるまでの回数", "範囲: 1〜1000（整数）");
@@ -427,6 +431,7 @@ public final class ServerConfig {
         BOSS_PACE_PER_PLAYER = BOSS_PACE_PER_PLAYER_;
         BOSS_MAX_SCALED_PLAYERS = BOSS_MAX_SCALED_PLAYERS_;
         BOSS_LOOT_PER_PLAYER = BOSS_LOOT_PER_PLAYER_;
+        BOSS_XP_MULTIPLIER = BOSS_XP_MULTIPLIER_;
         TEMPLATE_USES = TEMPLATE_USES_;
         SCULK_PER_SHARD = SCULK_PER_SHARD_;
         BLACK_HOLE_PULL_RADIUS = BLACK_HOLE_PULL_RADIUS_;

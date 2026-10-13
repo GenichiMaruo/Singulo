@@ -139,7 +139,13 @@ public final class BossGameTests {
         vault(helper).setSealed(false);
         HorizonWarden warden = console.activateAwakened(helper.getLevel(), null);
         warden.skipEmerging();
+        // 挑戦者がいなくなっても、しばらく（3分）は残る。猶予を飛ばすと戻る
+        helper.runAtTickTime(100, () -> {
+            helper.assertFalse(warden.isRemoved(), "猶予の間に消えた");
+            warden.skipResetGrace();
+        });
         helper.succeedWhen(() -> {
+            helper.assertTrue(helper.getTick() > 100, "猶予を確かめる前");
             helper.assertTrue(warden.isRemoved(), "挑戦者がいないのに覚醒した守護機が残っている");
             helper.assertTrue(!helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new net.minecraft.world.phys.AABB(helper.absolutePos(CONSOLE)).inflate(3),
@@ -153,7 +159,13 @@ public final class BossGameTests {
         HorizonWarden warden = console.activate(helper.getLevel(), null);
         warden.skipEmerging();
         warden.setHealth(300);
+        // 挑戦者がいなくなっても、しばらく（3分）は残る。猶予を飛ばすと戻る
+        helper.runAtTickTime(100, () -> {
+            helper.assertFalse(warden.isRemoved(), "猶予の間に消えた");
+            warden.skipResetGrace();
+        });
         helper.succeedWhen(() -> {
+            helper.assertTrue(helper.getTick() > 100, "猶予を確かめる前");
             helper.assertTrue(warden.isRemoved(), "挑戦者がいないのに守護機が残っている");
             helper.assertTrue(console.activeWarden(helper.getLevel()) == null, "コンソールが起動中のまま");
             helper.assertTrue(vault(helper).isSealed(), "削り逃げで保管庫が開いた");

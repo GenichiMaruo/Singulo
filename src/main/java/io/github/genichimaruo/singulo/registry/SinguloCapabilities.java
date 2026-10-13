@@ -87,6 +87,9 @@ public final class SinguloCapabilities {
                 (be, side) -> be.fluids());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.GRAVITY_RECEIVER.get(),
                 (be, side) -> be.energy());
+        // 衝撃発電パネルは取り出すだけ（ケーブルへ送り出す）
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.IMPACT_GENERATOR.get(),
+                (be, side) -> be.output());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DEEP_SEA_COLLECTOR.get(),
                 (be, side) -> be.automationItems());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.VOID_COLLECTOR.get(),

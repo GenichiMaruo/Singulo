@@ -80,7 +80,7 @@ SERVER = [
     ('ruins', 'probeAutomationOffset', '2', '1〜4（整数）', '何ティア下の回収物を自動探査機で回収できるか（N−2ルール）'),
     ('ruins', 'probeYieldMultiplier', '0.5', '0.0〜1.0', '自動探査機の回収量（手動遠征比）'),
     ('ruins', 'wardenHealth', '1200', '1〜100,000', 'ホライズン・ウォーデンのHP'),
-    ('ruins', 'wardenResetOnLeave', 'true', 'true / false', '挑戦者が離れたら全回復するか'),
+    ('ruins', 'wardenResetOnLeave', 'true', 'true / false', '挑戦者が全員離れたら番人が戻って全回復するか（最後の記録者以外は3分の猶予がある）'),
     ('ruins', 'awakenedWardenHealthMultiplier', '2.5', '1.0〜20.0', '覚醒したホライズン・ウォーデン（攻略後の再戦）の体力の倍率（wardenHealth に掛ける）'),
     ('ruins', 'awakenedWardenDamageMultiplier', '1.5', '1.0〜10.0', '覚醒したホライズン・ウォーデンが与えるダメージの倍率'),
     ('ruins', 'leviathanHealth', '1600', '1〜100,000', 'エルゴ球の大蛇（沈んだ炉心区画のボス）のHP'),
@@ -90,7 +90,8 @@ SERVER = [
     ('ruins', 'bossHealthPerPlayer', '0.5', '0.0〜4.0', '挑戦者が1人増えるごとに増えるボスの体力（もとの体力に対する割合）'),
     ('ruins', 'bossPacePerPlayer', '0.08', '0.0〜0.5', '挑戦者が1人増えるごとに、ボスの技の間が縮む割合（0.6倍まで）'),
     ('ruins', 'bossMaxScaledPlayers', '6', '1〜32（整数）', 'ボスの強さに数える挑戦者の上限'),
-    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか'),
+    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）'),
+    ('ruins', 'bossXpMultiplier', '1.0', '0.0〜10.0', 'ボスを倒したときの経験値の倍率'),
 
     # 残響の欠片
     ('echo', 'templateUses', '16', '1〜1000（整数）', '型の残響の欠片が割れるまでの回数'),

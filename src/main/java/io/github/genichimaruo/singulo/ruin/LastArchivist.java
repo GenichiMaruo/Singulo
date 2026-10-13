@@ -87,7 +87,7 @@ public class LastArchivist extends RuinBoss {
     public static final int EMERGE_TICKS = 200, DEATH_TICKS = 200;
     public static final int ARENA = 18;
     /** 漂う高さ（コンソールの上面から）と、相手との間合い。 */
-    public static final double HOVER = 2.5, KEEP_DISTANCE = 7;
+    public static final double HOVER = 1.9, KEEP_DISTANCE = 7;
     public static final float HOVER_F = (float) HOVER;
     /** 体の各部の高さ（足元から）。 */
     public static final double HEAD_Y = 2.78, HALO_Y = 2.85, CHEST_Y = 2.2;
@@ -156,7 +156,7 @@ public class LastArchivist extends RuinBoss {
 
     public LastArchivist(EntityType<? extends LastArchivist> type, Level level) {
         super(type, level, BossEvent.BossBarColor.YELLOW);
-        this.xpReward = 1000;
+        this.xpReward = 5000;
         this.noPhysics = true;
         setNoGravity(true);
         setEffectiveHealth(ServerConfig.SPEC.isLoaded() ? ServerConfig.ARCHIVIST_HEALTH.get() : HEALTH);
@@ -1092,6 +1092,12 @@ public class LastArchivist extends RuinBoss {
         return level.getEntitiesOfClass(Player.class, new AABB(c, c).inflate(r),
                 p -> !ArenaShield.exempt(p) && p.isAlive() && p.position().distanceToSqr(c) <= r * r
                         && (!shieldUp || insiders.contains(p.getUUID())));
+    }
+
+    /** 最後の記録者は、力場の中の全員が倒れたら、すぐ（5秒で）戦いを終える（ほかの番人のような猶予はない）。 */
+    @Override
+    protected int resetChecks() {
+        return 5;
     }
 
     /**
