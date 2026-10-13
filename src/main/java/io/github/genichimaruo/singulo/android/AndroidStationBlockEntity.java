@@ -400,7 +400,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
         a.startPrinting();
-        a.makeGuard(owner != null ? owner : new UUID(0, 0), worldPosition, mode, retreat);
+        a.makeGuard(owner, worldPosition, mode, retreat);
         if (!name.isEmpty()) {
             a.setCustomName(Component.literal(name));
         }

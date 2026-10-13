@@ -110,6 +110,8 @@ public abstract class RuinAndroid extends Monster {
     private int retreatPercent = 30;
     private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(2);
     private int repairCooldown;
+    /** ステーションが遠すぎて戻れなかったとき、しばらく戻ろうとしない（tick）。 */
+    private int retreatCooldown;
     /** 解体中（印刷を逆にたどって消えていく）。 */
     private boolean dismantling;
     /** 今の動きを始めてからの tick（サーバー）。 */
@@ -179,7 +181,7 @@ public abstract class RuinAndroid extends Monster {
      * 次に印刷するアンドロイドに持たせる。なければその場に落とす。
      */
     private void releaseInventory(ServerLevel level) {
-        AndroidStationBlockEntity station = home != null && level.isLoaded(home)
+        AndroidStationBlockEntity station = home != null
                 && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
         boolean sent = false;
         for (int i = 0; i < inventory.getContainerSize(); i++) {
@@ -276,7 +278,7 @@ public abstract class RuinAndroid extends Monster {
     // ------------------------------------------------------------------ 護衛（プレイヤーのアンドロイド）
 
     /** 組立ステーションで印刷した護衛にする。 */
-    public void makeGuard(java.util.UUID owner, BlockPos station, int mode, int retreatPercent) {
+    public void makeGuard(@Nullable java.util.UUID owner, BlockPos station, int mode, int retreatPercent) {
         this.guard = true;
         entityData.set(GUARD, true);
         this.owner = owner;
@@ -354,6 +356,18 @@ public abstract class RuinAndroid extends Monster {
         }
         Vec3 anchor = guardAnchor();
         return anchor == null || e.position().distanceToSqr(anchor) < GUARD_RANGE * GUARD_RANGE;
+    }
+
+    /**
+     * 村のゴーレムや、飼われた動物が護衛のアンドロイドを狙おうとしたら止める（アンドロイドは敵対モブの扱いなので、
+     * ゴーレムが狙ってしまうため）。
+     */
+    public static void onChangeTarget(net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent event) {
+        if (event.getNewAboutToBeSetTarget() instanceof RuinAndroid a && a.isGuard()
+                && (event.getEntity() instanceof net.minecraft.world.entity.animal.AbstractGolem
+                || event.getEntity() instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame())) {
+            event.setCanceled(true);
+        }
     }
 
     /** この作品のボス（番人・ウォーデンなど）。護衛のアンドロイドとは互いに敵対しない。 */
@@ -542,6 +556,9 @@ public abstract class RuinAndroid extends Monster {
         if (repairCooldown > 0) {
             repairCooldown--;
         }
+        if (retreatCooldown > 0) {
+            retreatCooldown--;
+        }
         entityData.set(ALERT, getTarget() != null && active());
         if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
             if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
@@ -556,7 +573,7 @@ public abstract class RuinAndroid extends Monster {
             }
         }
         if (guard && printed() && active() && getHealth() < getMaxHealth() * retreatPercent / 100F
-                && !useRepairKit((ServerLevel) level()) && home != null && repairCooldown <= 0) {
+                && !useRepairKit((ServerLevel) level()) && home != null && repairCooldown <= 0 && retreatCooldown <= 0) {
             // 体力が減ったら（自己修理キットがなければ）、戦いをやめてステーションへ戻る
             setTarget(null);
             setState(STATE_RETREAT);
@@ -592,18 +609,24 @@ public abstract class RuinAndroid extends Monster {
     public boolean isAlliedTo(Entity other) {
         if (guard) {
             // 護衛はプレイヤーとほかの護衛の味方
-            return other instanceof Player || other instanceof RuinAndroid a && a.isGuard() || super.isAlliedTo(other);
+            return other instanceof Player || other instanceof RuinAndroid a && a.isGuard()
+                    || other instanceof net.minecraft.world.entity.animal.AbstractGolem
+                    || other instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame() || super.isAlliedTo(other);
         }
         return RuinGuards.isGuard(other) || super.isAlliedTo(other);
     }
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!printed()) {
+        if (source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            return super.hurt(source, amount);
+        }
+        if (!printed() || dismantling) {
             return false;
         }
         Entity by = source.getEntity();
-        if (guard ? by instanceof Player || by instanceof RuinAndroid a && a.isGuard() || isBoss(by) : RuinGuards.isGuard(by)) {
+        if (guard ? by instanceof Player || by instanceof RuinAndroid a && a.isGuard() || isBoss(by)
+                || by instanceof net.minecraft.world.entity.animal.AbstractGolem : RuinGuards.isGuard(by)) {
             return false;
         }
         // ボスの叩きつけ・投げ飛ばしの落下も受けない（落下のダメージには、誰の技かが付かないので、近くにボスがいるかで見る）
@@ -713,6 +736,7 @@ public abstract class RuinAndroid extends Monster {
         tag.put("inventory", inventory.createTag(registryAccess()));
         if (guard) {
             tag.putBoolean("guard", true);
+            tag.putBoolean("dismantling", dismantling);
             if (owner != null) {
                 tag.putUUID("owner", owner);
             }
@@ -732,6 +756,7 @@ public abstract class RuinAndroid extends Monster {
         }
         NbtUtils.readBlockPos(tag, "home").ifPresent(this::setHome);
         guard = tag.getBoolean("guard");
+        dismantling = tag.getBoolean("dismantling");
         entityData.set(GUARD, guard);
         inventory.fromTag(tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND), registryAccess());
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
@@ -837,7 +862,8 @@ public abstract class RuinAndroid extends Monster {
                 BlockPos h = home;
                 Vec3 dock = h == null ? null : Vec3.atBottomCenterOf(h.above());
                 if (state() == STATE_RETREAT && dock != null && dock.distanceToSqr(position()) > 96 * 96) {
-                    // 遠すぎる（別の場所にいる）ときは、その場で直るのを待つ
+                    // 遠すぎる（別の場所にいる）ときは戻らず、しばらく（30秒）戻ろうとしない
+                    retreatCooldown = 600;
                     setState(STATE_IDLE);
                     return;
                 }
