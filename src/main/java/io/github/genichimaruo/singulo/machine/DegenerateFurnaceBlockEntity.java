@@ -21,8 +21,9 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
 /**
  * 縮退熱炉のコントローラ（ティア4の発電機、5×5×7 のマルチブロック）。上下のピストンで圧縮ブロックLv2 を押しつぶし、
- * 縮退圧の熱で degenerateFurnaceOutput（既定 20 MFE/t）を出す。燃料は Lv2 1個で BURN_TICKS 燃え、時間結晶触媒を消費する。
- * 出力は触媒の速度倍率に比例する。電力はマルチブロック搬入出ポート（とコントローラ自身）から押し出す。
+ * 縮退圧の熱で degenerateFurnaceOutput（既定 5 MFE/t）を出す。燃料は Lv2 1個で BURN_TICKS 燃え、時間結晶触媒を消費する。
+ * 出力は触媒の速度倍率に比例し、1段下のBE凝縮触媒では generatorLowerTierOutput（既定25%）の仮運転になる。
+ * 蓄電がいっぱいの間は待機し、燃料も触媒も減らさない。電力はマルチブロック搬入出ポート（とコントローラ自身）から押し出す。
  * ピストンは STROKE_TICKS ごとに1回打ち込む（描画と音はゲーム時刻で合わせる）。
  */
 public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
@@ -80,6 +81,11 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     }
 
     @Override
+    protected boolean isGenerator() {
+        return true;
+    }
+
+    @Override
     protected int baseUsage(ItemStack catalyst) {
         return 0;
     }
@@ -120,7 +126,8 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
             }
             burn--;
             output = (int) Math.min(Integer.MAX_VALUE, Math.round(ServerConfig.DEGENERATE_FURNACE_OUTPUT.get()
-                    * effect.speed() * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get()));
+                    * CatalystHelper.generatorOutput(MACHINE_TIER, catalystSlot().getStackInSlot(0), effect)
+                    * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get()));
             energy.generate(output);
         }
         pushEnergy(level, PUSH_PER_TICK);

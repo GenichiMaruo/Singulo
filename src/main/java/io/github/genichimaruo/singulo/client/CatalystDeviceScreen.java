@@ -20,6 +20,7 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (menu.kind().extraSlot() != null && !menu.getSlot(1).hasItem() && menu.getCarried().isEmpty()
@@ -135,6 +136,12 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
             case NO_FUEL -> out.add(Component.translatable("gui.singulo.device.no_fuel"));
             case NO_TARGET -> out.add(Component.translatable("gui.singulo.probe.no_target"));
             case OFF -> out.add(Component.translatable("gui.singulo.status.off"));
+            case STANDBY -> {
+                out.add(Component.translatable("gui.singulo.device.standby"));
+                out.add(Component.translatable("gui.singulo.device.standby.hint"));
+            }
+            case LIMITED -> out.add(Component.translatable("gui.singulo.anchor.limited",
+                    io.github.genichimaruo.singulo.machine.WorldlineAnchorBlockEntity.anchorLimit()));
             default -> {
                 int value = menu.value(CatalystDeviceBlockEntity.D_VALUE);
                 switch (menu.kind()) {

@@ -27,12 +27,18 @@ import net.minecraft.world.phys.Vec3;
  *   <li>倒されたとき: 激しくちらつき、横にずれながら足元からほどけていく。最後に宙に残った記録結晶が膨らみ、閃光とともに砕ける</li>
  * </ul>
  * 分身は見た目がほぼ同じで、胸の記録結晶だけが少し暗い。
+ * <p>
+ * 覚醒した個体: 兜に紅い光の冠、頭の後ろに放射のついた大きな二重の光輪、肩から伸びる4枚の光の翼。
+ * 目の帯と光の刃が紅く燃え、胸の記録結晶は金色に光る。
  */
 public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
     static final int RGB = 0x8FEAFF;
     static final int DEEP = 0x2C8FB8;
     static final int CORE = 0xE8FFFF;
     static final int CIRCLE = 0xBFF4FF;
+    /** 覚醒した個体の光（紅と金）。 */
+    static final int AWAKE = 0xFF3C78;
+    static final int AWAKE_GOLD = 0xFFD27A;
 
     public EchoSentinelRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -86,6 +92,9 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
         if (alpha > 4 && floor < 2.4F) {
             body(pose, vc, full, alpha, built, floor, t, e.strikeTicks(), e.isMinion(), death);
+            if (e.awakened() && !e.isMinion() && built > 2.0F && floor < 1.6F) {
+                awakenedParts(pose, vc, alpha, t, e.strikeTicks() > 0);
+            }
         }
         if (death > 0) {
             crystalDeath(pose, vc, death, t);
@@ -129,6 +138,61 @@ public class EchoSentinelRenderer extends EntityRenderer<EchoSentinel> {
         }
         renderCircle(e, partialTick, t, pose, vc);
         super.render(e, yaw, partialTick, pose, buffers, light);
+    }
+
+    /**
+     * 覚醒した個体の追加の部位（足元が原点、+Z が前）: 兜の紅い光の冠、頭の後ろの大きな二重の光輪と放射、
+     * 肩から伸びる4枚の光の翼、紅く燃える目の帯と刃、金色の胸の記録結晶。
+     */
+    private static void awakenedParts(PoseStack pose, VertexConsumer vc, int alpha, float t, boolean striking) {
+        int a = Math.min(255, alpha + 60);
+        // 冠: 兜の上に5本の光の棘
+        for (int k = -2; k <= 2; k++) {
+            float x = k * 0.07F;
+            float h = 0.16F + (2 - Math.abs(k)) * 0.07F;
+            FxDraw.box(pose, vc, x - 0.018F, 2.14F, 0.06F - Math.abs(k) * 0.02F, x + 0.018F, 2.14F + h, 0.1F - Math.abs(k) * 0.02F,
+                    FxDraw.FULL_BRIGHT, AWAKE, a);
+        }
+        // 紅く燃える目の帯と、胸の金の記録結晶
+        FxDraw.box(pose, vc, -0.14F, 1.995F, 0.16F, 0.14F, 2.045F, 0.18F, FxDraw.FULL_BRIGHT, AWAKE, 255);
+        pose.pushPose();
+        pose.translate(0, 1.57, 0.24);
+        pose.mulPose(Axis.YP.rotationDegrees(t * 6));
+        FxDraw.octahedron(pose.last(), vc, 0.11F, 0.17F, AWAKE_GOLD, 255);
+        pose.popPose();
+        // 光の刃の芯（紅）
+        for (int s = -1; s <= 1; s += 2) {
+            float ax0 = s < 0 ? -0.46F : 0.34F;
+            float blade = striking ? 0.95F : 0.55F;
+            FxDraw.box(pose, vc, ax0 + 0.05F, 0.86F - blade, -0.008F, ax0 + 0.07F, 0.86F, 0.008F, FxDraw.FULL_BRIGHT, AWAKE, 255);
+        }
+        // 大きな二重の光輪と放射
+        pose.pushPose();
+        pose.translate(0, 2.0, -0.3);
+        pose.mulPose(Axis.XP.rotationDegrees(90));
+        pose.mulPose(Axis.YP.rotationDegrees(-t * 1.5F));
+        FxDraw.ring(pose.last(), vc, 0.55F, 0.6F, AWAKE, a, a);
+        FxDraw.ring(pose.last(), vc, 0.62F, 0.75F, AWAKE_GOLD, a / 2, 0);
+        for (int k = 0; k < 8; k++) {
+            pose.pushPose();
+            pose.mulPose(Axis.YP.rotationDegrees(k * 45));
+            pose.mulPose(Axis.XP.rotationDegrees(90));
+            pose.translate(0.6F, 0, 0);
+            LastArchivistRenderer.blade(pose, vc, 1, 0.45F, 0.05F, AWAKE_GOLD, a, AWAKE, 0);
+            pose.popPose();
+        }
+        pose.popPose();
+        // 肩から伸びる4枚の光の翼
+        for (int s = -1; s <= 1; s += 2) {
+            for (int f = 0; f < 2; f++) {
+                pose.pushPose();
+                pose.translate(s * 0.3F, 1.75F, -0.18F);
+                pose.mulPose(Axis.YP.rotationDegrees(s * 25));
+                pose.mulPose(Axis.ZP.rotationDegrees(s * (25 + f * 22 + Mth.sin(t * 0.1F) * 5)));
+                LastArchivistRenderer.blade(pose, vc, s, 1.1F - f * 0.25F, 0.2F, AWAKE, (int) (a * 0.85F), AWAKE_GOLD, 0);
+                pose.popPose();
+            }
+        }
     }
 
     /** 倒されたとき: 宙に残った記録結晶が速く回りながら膨らみ、最後に閃光とともに砕ける。 */

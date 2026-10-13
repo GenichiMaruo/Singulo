@@ -169,6 +169,9 @@ public final class SinguloBlocks {
     public static final RegistryObject<SimpleMachineBlock<DegenerateFurnaceBlockEntity>> DEGENERATE_FURNACE_CONTROLLER =
             BLOCKS.register("degenerate_furnace_controller", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.DEGENERATE_FURNACE, DegenerateFurnaceBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
+    /** アンドロイド組立ステーション（護衛のアンドロイドを印刷する）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidStationBlock> ANDROID_STATION = BLOCKS.register(
+            "android_station", () -> new io.github.genichimaruo.singulo.android.AndroidStationBlock(machineProperties()));
     public static final RegistryObject<SimpleMachineBlock<ProbeStationBlockEntity>> PROBE_STATION = BLOCKS.register(
             "probe_station", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.PROBE_STATION, ProbeStationBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
@@ -236,6 +239,9 @@ public final class SinguloBlocks {
     public static final RegistryObject<GlassBlock> RUIN_GLASS = glass("ruin_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.STONE);
     public static final RegistryObject<GlassBlock> INTACT_RUIN_GLASS = glass("intact_ruin_glass", MapColor.NONE, 4.0F, 9.0F,
             SoundType.STONE);
+    /** 強化遺構ガラス（沈んだ炉心区画の封じ込め柱の窓。とても硬く、爆発では壊れない）。 */
+    public static final RegistryObject<GlassBlock> REINFORCED_RUIN_GLASS = glass("reinforced_ruin_glass", MapColor.NONE, 25.0F,
+            1200.0F, SoundType.GLASS);
     public static final RegistryObject<Block> RUIN_LAMP = simpleBlock("ruin_lamp",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.GLASS).lightLevel(s -> 12));
     public static final RegistryObject<Block> RUIN_LAMP_AMBER = ruinLamp("ruin_lamp_amber");
@@ -278,6 +284,16 @@ public final class SinguloBlocks {
     public static final RegistryObject<GlassBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
 
+    /** アンドロイド用のガラス（遮断: アンドロイドだけ通れない、透過: アンドロイドだけ通れる。無地は隣とつながる）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS = BLOCKS.register(
+            "android_barrier_glass", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), false, true));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS_PATTERNED = BLOCKS.register(
+            "android_barrier_glass_patterned", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), false, false));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_GATE_GLASS = BLOCKS.register(
+            "android_gate_glass", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), true, true));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_GATE_GLASS_PATTERNED = BLOCKS.register(
+            "android_gate_glass_patterned", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), true, false));
+
     // ---- 隕石クレーター（地表の小さな構造物）と、雷ガラス
     /** 隕石の溶融殻（クレーターに最初からあるものだけ、星屑の結晶を育てる）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.nature.MeteoriteCrustBlock> METEORITE_CRUST = BLOCKS.register(
@@ -293,6 +309,11 @@ public final class SinguloBlocks {
             "stardust_cluster", () -> new net.minecraft.world.level.block.AmethystClusterBlock(7, 3, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1.5F).sound(SoundType.AMETHYST_CLUSTER).noOcclusion()
                     .lightLevel(s -> 6).forceSolidOn().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
+    /** 隕石の核（隕石の芯に1つだけ。隕石コンパスが指す。掘ると隕鉄の原石と星屑。鉄以上のツルハシ）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.nature.MeteoriteCoreBlock> METEORITE_CORE = BLOCKS.register(
+            "meteorite_core", () -> new io.github.genichimaruo.singulo.nature.MeteoriteCoreBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(8.0F, 12.0F).requiresCorrectToolForDrops().sound(SoundType.ANCIENT_DEBRIS)
+                    .lightLevel(s -> 7)));
     /** 雷ガラス塊（雷が落ちた砂が溶けて固まったもの。壊すと雷ガラス）。 */
     public static final RegistryObject<Block> FULGURITE_BLOCK = simpleBlock("fulgurite_block",
             BlockBehaviour.Properties.of().mapColor(MapColor.SAND).strength(0.8F).sound(SoundType.GLASS));
@@ -333,8 +354,24 @@ public final class SinguloBlocks {
             () -> new RuinCacheBlock(unbreakable().noOcclusion().lightLevel(s -> 6)));
     public static final RegistryObject<GuardDockBlock> RUIN_GUARD_DOCK = BLOCKS.register("ruin_guard_dock",
             () -> new GuardDockBlock(unbreakable()));
+    /** 遺構の印刷台（アンドロイドを印刷して出す）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidFabricatorBlock> RUIN_ANDROID_FABRICATOR = BLOCKS.register(
+            "ruin_android_fabricator", () -> new io.github.genichimaruo.singulo.android.AndroidFabricatorBlock(unbreakable().lightLevel(s -> 7)));
     public static final RegistryObject<SealConsoleBlock> SEAL_CONSOLE = BLOCKS.register("seal_console",
             () -> new SealConsoleBlock(unbreakable().lightLevel(s -> 10)));
+    /**
+     * ホログラムの床。最後の記録者が現れたとき、ボス部屋の床の欠けた所を埋める仮の床（赤い半透明の投影）。
+     * 壊せず、何も落とさず、アイテムもない。戦いが終わると消える。
+     */
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.ArenaHologramBlock> ARENA_HOLOGRAM = BLOCKS.register("arena_hologram",
+            () -> new io.github.genichimaruo.singulo.ruin.ArenaHologramBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
+                    .strength(-1.0F, 3_600_000.0F).noLootTable().sound(SoundType.AMETHYST).lightLevel(s -> 6).noOcclusion()
+                    .isValidSpawn((s, l, p, e) -> false).isRedstoneConductor((s, l, p) -> false).isSuffocating((s, l, p) -> false)
+                    .isViewBlocking((s, l, p) -> false).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** 創世炉の核（GenesisCoreBlock）。動き出したらサバイバルでは壊せない。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.genesis.GenesisCoreBlock> GENESIS_CORE = BLOCKS.register("genesis_core",
+            () -> new io.github.genichimaruo.singulo.genesis.GenesisCoreBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                    .strength(8.0F, 1200.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 12)));
     /** 番人の封印核（研究棟・封鎖培養施設のボス部屋の床。壊せない）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.GuardianCoreBlock> GUARDIAN_CORE = BLOCKS.register("guardian_core",
             () -> new io.github.genichimaruo.singulo.ruin.GuardianCoreBlock(unbreakable().lightLevel(s -> 9)));
@@ -384,6 +421,12 @@ public final class SinguloBlocks {
                 .strength(hardness, resistance).requiresCorrectToolForDrops().sound(sound).noOcclusion()
                 .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
                 .isValidSpawn((s, l, p, e) -> false)));
+    }
+
+    private static BlockBehaviour.Properties androidGlassProperties() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(1.5F, 6.0F).sound(SoundType.GLASS).noOcclusion()
+                .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
+                .isValidSpawn((s, l, p, e) -> false);
     }
 
     private static BlockBehaviour.Properties gravityProperties(MapColor color) {

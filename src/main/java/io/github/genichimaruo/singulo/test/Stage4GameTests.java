@@ -101,7 +101,7 @@ public final class Stage4GameTests {
         keepPowered(helper, m);
         m.items().setStackInSlot(0, new ItemStack(item("compressed_block_3"), 4));
         m.items().setStackInSlot(1, new ItemStack(item("degenerate_precursor"), 4));
-        m.items().setStackInSlot(2, new ItemStack(item("compressed_metal_block_2"), 2));
+        m.items().setStackInSlot(2, new ItemStack(item("compressed_metal_block_2"), 1));
         m.automationFluids().fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 6000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
             helper.assertTrue(m.structureSize() == 5, "5×5×5 として形成されない");
@@ -190,7 +190,7 @@ public final class Stage4GameTests {
     }
 
     @GameTest(template = LARGE, timeoutTicks = 100)
-    public static void degenerateFurnaceBurnsLv2With20MFE(GameTestHelper helper) {
+    public static void degenerateFurnaceBurnsLv2With5MFE(GameTestHelper helper) {
         // コントローラは (3,2,1)、炉は南（+Z）へ。手前の面の最上段（高さ y=1+5）の外装板をポートにし、その前に蓄電池を置く
         BlockPos controllerPos = buildFurnace(helper, new BlockPos(3, 2, 1), new BlockPos(3, 6, 1));
         helper.setBlock(new BlockPos(3, 6, 0), SinguloBlocks.SMES_MODULE.get());
@@ -202,7 +202,7 @@ public final class Stage4GameTests {
             helper.assertTrue(f.fuel().getStackInSlot(0).getCount() == 1, "燃料を1個ずつ燃やしていない");
             SmesCellBlockEntity sink = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, new BlockPos(3, 6, 0));
             long total = (long) f.energy().getEnergyStored() + sink.energy().getEnergyStored();
-            helper.assertTrue(total >= 20_000_000L * 5, "20 MFE/t で発電していない: " + total);
+            helper.assertTrue(total >= 5_000_000L * 5 && total <= 5_000_000L * 9, "5 MFE/t で発電していない: " + total);
             helper.assertTrue(sink.energy().getEnergyStored() > 0, "搬入出ポートから電力が押し出されない");
             helper.succeed();
         });

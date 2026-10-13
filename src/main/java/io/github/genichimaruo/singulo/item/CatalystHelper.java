@@ -58,6 +58,21 @@ public final class CatalystHelper {
         return Effect.NONE;
     }
 
+    /**
+     * 発電機の出力倍率。上位・同じティアの触媒は速度倍率どおり（最大+50%）、1段下の触媒は generatorLowerTierOutput
+     * （既定は定格の25%）。下位の触媒は「次の触媒を作るまでのつなぎ」の出力にとどめ、上位の触媒を作る意味を残す。
+     * 加工装置やアンカーの lowerTierSpeed とは別の値。
+     */
+    public static double generatorOutput(int machineTier, ItemStack catalyst, Effect effect) {
+        if (!effect.usable()) {
+            return 0;
+        }
+        if (tierOf(catalyst) < machineTier) {
+            return ServerConfig.SPEC.isLoaded() ? ServerConfig.GENERATOR_LOWER_TIER_OUTPUT.get() : 0.25;
+        }
+        return effect.speed();
+    }
+
     /** 残量による必要電力の倍率。100〜51%で×1.0〜1.25、50〜11%で×1.25〜1.6、10%以下で×1.6。 */
     public static double powerMultiplier(ItemStack catalyst) {
         UsesData data = UsesHelper.get(catalyst);

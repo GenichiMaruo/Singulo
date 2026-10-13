@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "singulo:sunken_reactor",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 112,
+    "separation": 48,
+    "salt": 19370505
+  }
+}

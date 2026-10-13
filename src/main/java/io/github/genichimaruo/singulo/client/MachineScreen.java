@@ -74,6 +74,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         if (sidesOpen) {
             renderSides(g, mouseX, mouseY);

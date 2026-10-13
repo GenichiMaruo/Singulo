@@ -1477,6 +1477,36 @@ def degenerate_nucleus():
     return outlined(f)
 
 
+def afterglow_wings():
+    """残光の翼: 左右へ広げた一対の天使の翼（中央に寄せて描く）。前縁は中央の付け根から外上へ反り上がり、
+    そこから白い風切羽が一枚ずつ下へ垂れる（羽根の先のあいだが透けて、扇のように見える）。羽根の先は淡い水色に光る。"""
+    im, d = new()
+    white = (255, 255, 255, 255)
+    shade = (206, 222, 244, 255)
+    glow = (130, 222, 255, 255)
+    for side in (-1, 1):
+        def X(x):
+            return 7.5 + side * (x + 0.5)
+        # 前縁: 付け根 (0, 9) から外上の (6, 3) へ
+        edge = [(0, 9), (1, 8), (2, 7), (3, 6), (4, 5), (5, 4), (6, 3)]
+        # 風切羽: 前縁の各点から下（少し外）へ。外ほど長い
+        for i, (ex, ey) in enumerate(edge[1:], start=1):
+            length = 3 + (i + 1) // 2
+            for k in range(1, length + 1):
+                x = ex + (k * i) // 12
+                y = ey + k
+                if y > 14:
+                    break
+                c = glow if k == length else (shade if (k + i) % 3 == 0 else white)
+                d.point((X(x), y), fill=c)
+                if k < length and x > 0:
+                    d.point((X(x - 1), y), fill=shade)         # 羽根の内側の重なり（ふっくら見せる）
+        for ex, ey in edge:
+            d.point((X(ex), ey), fill=white)
+        d.point((X(6), 3), fill=glow)
+    return im
+
+
 def confinement_ring():
     """磁気閉じ込め環: 銀の隕鉄の芯に、赤紫のトポロジカル導線を巻いた輪。"""
     def f(d):
@@ -1551,14 +1581,27 @@ def shell_sphere():
                                d.line([(8, 3), (8, 12)], fill=(80, 80, 96, 255))))
 
 
-def compass_frame(angle):
-    """探索コンパスの1コマ（angle は 0〜1、北が上）。"""
+# コンパスの色: (外枠, 縁, 文字盤, 目盛り, 針の先, 針の尾)
+EXPLORER_COMPASS = ((236, 238, 240), (190, 118, 66), (30, 40, 52), (110, 205, 238), (255, 110, 80), (210, 214, 222))
+# 隕石コンパス: 焼けた隕鉄の枠に、星屑の光る目盛りと針
+METEOR_COMPASS = ((92, 88, 94), (52, 46, 50), (20, 18, 30), (190, 160, 255), (150, 225, 255), (170, 150, 200))
+
+
+def compass_frame(angle, palette=EXPLORER_COMPASS):
+    """コンパスの1コマ（angle は 0〜1、北が上）。"""
+    body, rim, face, mark, tip, tail = palette
+    tip = tip + (255,)
     im, d = new()
-    d.ellipse([1, 1, 14, 14], fill=(236, 238, 240, 255), outline=(190, 118, 66, 255))
-    d.ellipse([3, 3, 12, 12], fill=(30, 40, 52, 255))
+    d.ellipse([1, 1, 14, 14], fill=body + (255,), outline=rim + (255,))
+    d.ellipse([3, 3, 12, 12], fill=face + (255,))
+    if palette is METEOR_COMPASS:
+        # 枠の焼けた筋と、文字盤の星屑の粒
+        d.arc([1, 1, 14, 14], 200, 260, fill=(130, 110, 100, 255))
+        d.point((5, 9), fill=(120, 110, 170, 255))
+        d.point((10, 5), fill=(120, 110, 170, 255))
     for k in range(4):
         a = k * math.pi / 2
-        d.point((7.5 + 4.5 * math.cos(a), 7.5 + 4.5 * math.sin(a)), fill=(110, 205, 238, 255))
+        d.point((7.5 + 4.5 * math.cos(a), 7.5 + 4.5 * math.sin(a)), fill=mark + (255,))
     # 針: ドットを数点打つだけだと、斜めの向きで途切れる。画素ごとに、針（中心から先へ細くなる線分）に
     # どれだけ覆われるかを 4×4 の点で数え、半分近く覆われていれば塗る（どの向きでも途切れない）
     a = angle * 2 * math.pi - math.pi / 2
@@ -1588,12 +1631,12 @@ def compass_frame(angle):
                 side = -qx * dy + qy * dx
                 if cardinal and along > 4.6 - 2.2 and side > 0:
                     continue
-                px[x, y] = (255, 110, 80, 255)            # 北を指す赤い先
+                px[x, y] = tip                            # 指す先
     dx, dy = -dx, -dy
     for y in range(3, 13):
         for x in range(3, 13):
-            if px[x, y] != (255, 110, 80, 255) and coverage(x, y, 3.0, 0.6) >= 0.3:
-                px[x, y] = (210, 214, 222, 255)           # 反対側の白い尾
+            if px[x, y] != tip and coverage(x, y, 3.0, 0.6) >= 0.3:
+                px[x, y] = tail + (255,)                  # 反対側の尾
     return im
 
 
@@ -1610,6 +1653,7 @@ ITEM_ART = {
     'handbook': lambda: book((40, 90, 130), T1),
     'holo_projector': lambda: device((220, 224, 230), (40, 70, 90), T1),
     'explorer_compass': lambda: compass_frame(0.0),
+    'meteor_compass': lambda: compass_frame(0.0, METEOR_COMPASS),
     'thermocouple_module': lambda: module((220, 224, 230), (255, 130, 90)),
     'basic_frame': lambda: frame(STEEL, (236, 238, 240)),
     'wormhole_mouth_casing': lambda: frame((58, 48, 82), (214, 144, 255)),
@@ -1624,6 +1668,7 @@ ITEM_ART = {
     'degenerate_precursor': degenerate_precursor,
     'confinement_ring': confinement_ring,
     'sentinel_core': sentinel_core,
+    'afterglow_wings': afterglow_wings,
     'degenerate_nucleus': degenerate_nucleus,
     'steel_plate': lambda: plate(STEEL),
     'ceramic_substrate': lambda: plate((236, 238, 240), 3, COPPER),
@@ -1638,6 +1683,17 @@ ITEM_ART = {
     'muon_catalyst': lambda: crystal_cluster((96, 140, 236), mark=(200, 230, 255)),
     'bose_condensate_catalyst': lambda: crystal_cluster((110, 220, 236), mark=(255, 255, 255)),
     'time_crystal_catalyst': lambda: crystal_cluster((250, 182, 84), mark=(255, 250, 220)),
+    'time_crystal_module': lambda: module((236, 238, 244), (250, 182, 84)),
+    'awakening_record_core': lambda: crystal_cluster((176, 120, 255), mark=(255, 230, 255)),
+    'awakening_echo_core': lambda: crystal_cluster((112, 214, 255), mark=(230, 250, 255)),
+    'awakening_gravity_core': lambda: crystal_cluster((236, 96, 132), mark=(255, 225, 235)),
+    'awakening_ergosphere_core': lambda: crystal_cluster((140, 104, 250), mark=(240, 228, 255)),
+    'echo_chapter': lambda: scroll((232, 246, 255), (80, 196, 240)),
+    'gravity_chapter': lambda: scroll((236, 226, 250), (140, 90, 230)),
+    'horizon_chapter': lambda: scroll((242, 242, 255), (150, 190, 255)),
+    'ergosphere_chapter': lambda: scroll((226, 216, 246), (110, 70, 210)),
+    'terminus_record': lambda: book((34, 26, 54), (255, 210, 120)),
+    'archivist_halo': lambda: torus((255, 210, 120), (255, 246, 214)),
     'spent_muon_catalyst': lambda: crystal_cluster((96, 140, 236), spent=True),
     'spent_bose_condensate_catalyst': lambda: crystal_cluster((110, 220, 236), spent=True),
     'spent_time_crystal_catalyst': lambda: crystal_cluster((250, 182, 84), spent=True),

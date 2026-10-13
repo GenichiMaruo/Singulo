@@ -120,9 +120,9 @@ public final class Stage3GameTests {
         muon.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
         helper.runAtTickTime(10, () -> {
             int full = bose.energy().getEnergyStored();
-            int half = muon.energy().getEnergyStored();
+            int quarter = muon.energy().getEnergyStored();
             helper.assertTrue(full >= 200_000 * 9 && full <= 200_000 * 11, "ボース凝縮触媒で 200 kFE/t にならない: " + full);
-            helper.assertTrue(Math.abs(half * 2 - full) <= 200_000, "1段下のミュオン触媒で出力が半分にならない: " + half);
+            helper.assertTrue(Math.abs(quarter * 4 - full) <= 400_000, "1段下のミュオン触媒で出力が定格の25%にならない: " + quarter);
             helper.succeed();
         });
     }

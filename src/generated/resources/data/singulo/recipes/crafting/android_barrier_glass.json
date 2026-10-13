@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GRG",
+    "GBG",
+    "GRG"
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "singulo:android_barrier_glass"
+  }
+}

@@ -119,3 +119,23 @@ idea {
 
 
 tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '1000'] }
+
+// Failed fixtures must not contaminate the next test run. Development worlds are separate.
+var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
+    delete layout.buildDirectory.dir('gametest/world')
+    delete layout.buildDirectory.file('gametest/logs/latest.log')
+}
+tasks.named('runGameTestServer') { dependsOn cleanGameTestWorld }
+
+// Minecraft's bootstrap can exit with status 0 before running any tests. Require the completion report.
+var gameTestResultLog = layout.buildDirectory.file('gametest/logs/latest.log')
+var verifyGameTestResults = tasks.register('verifyGameTestResults') {
+    group = 'verification'
+    doLast {
+        def log = gameTestResultLog.get().asFile
+        if (!log.isFile() || !(log.getText('UTF-8') =~ /All [1-9][0-9]* required tests passed/).find()) {
+            throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/gametest/logs/latest.log')
+        }
+    }
+}
+tasks.named('runGameTestServer') { finalizedBy verifyGameTestResults }

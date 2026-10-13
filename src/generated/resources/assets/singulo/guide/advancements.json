@@ -171,8 +171,13 @@
       "stage": 5
     },
     {
-      "id": "core",
+      "id": "hawking",
       "parent": "ignite",
+      "stage": 5
+    },
+    {
+      "id": "core",
+      "parent": "hawking",
       "stage": 5
     },
     {
@@ -206,8 +211,63 @@
       "stage": 5
     },
     {
+      "id": "star_core",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "awakened",
+      "parent": "core",
+      "stage": 5
+    },
+    {
+      "id": "awakened_echo",
+      "parent": "hawking",
+      "stage": 5
+    },
+    {
+      "id": "awakened_gravity",
+      "parent": "hawking",
+      "stage": 5
+    },
+    {
+      "id": "ruin_sunken",
+      "parent": "warden",
+      "stage": 5
+    },
+    {
+      "id": "leviathan",
+      "parent": "ruin_sunken",
+      "stage": 5
+    },
+    {
+      "id": "awakened_leviathan",
+      "parent": "leviathan",
+      "stage": 5
+    },
+    {
+      "id": "archivist",
+      "parent": "awakened",
+      "stage": 5
+    },
+    {
       "id": "records",
       "parent": "archive",
+      "stage": 5
+    },
+    {
+      "id": "genesis_formed",
+      "parent": "leviathan",
+      "stage": 5
+    },
+    {
+      "id": "genesis_birth",
+      "parent": "genesis_formed",
+      "stage": 5
+    },
+    {
+      "id": "synth_legendary",
+      "parent": "genesis_birth",
       "stage": 5
     }
   ]
