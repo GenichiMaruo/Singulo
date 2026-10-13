@@ -310,7 +310,7 @@ public final class ServerConfig {
         BOSS_PACE_PER_PLAYER_ = b.defineInRange("bossPacePerPlayer", 0.08, 0.0, 0.5);
         b.comment("ボスの強さに数える挑戦者の上限", "範囲: 1〜32（整数）");
         BOSS_MAX_SCALED_PLAYERS_ = b.defineInRange("bossMaxScaledPlayers", 6, 1, 32);
-        b.comment("ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）", "範囲: true / false");
+        b.comment("ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値の合計も。経験値は部屋の挑戦者で等しく分ける）", "範囲: true / false");
         BOSS_LOOT_PER_PLAYER_ = b.define("bossLootPerPlayer", true);
         b.comment("ボスを倒したときの経験値の倍率", "範囲: 0.0〜10.0");
         BOSS_XP_MULTIPLIER_ = b.defineInRange("bossXpMultiplier", 1.0, 0.0, 10.0);

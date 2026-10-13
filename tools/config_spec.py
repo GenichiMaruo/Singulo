@@ -90,7 +90,7 @@ SERVER = [
     ('ruins', 'bossHealthPerPlayer', '0.5', '0.0〜4.0', '挑戦者が1人増えるごとに増えるボスの体力（もとの体力に対する割合）'),
     ('ruins', 'bossPacePerPlayer', '0.08', '0.0〜0.5', '挑戦者が1人増えるごとに、ボスの技の間が縮む割合（0.6倍まで）'),
     ('ruins', 'bossMaxScaledPlayers', '6', '1〜32（整数）', 'ボスの強さに数える挑戦者の上限'),
-    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）'),
+    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値の合計も。経験値は部屋の挑戦者で等しく分ける）'),
     ('ruins', 'bossXpMultiplier', '1.0', '0.0〜10.0', 'ボスを倒したときの経験値の倍率'),
     ('ruins', 'bossHardMode', 'false', 'true / false', 'ボスのハードモード（0.4.1 までの体力とダメージを基準にした高難度。新しい技はそのまま使い、大蛇の光線などは通常より強い）'),
     ('ruins', 'bossCombatLog', 'false', 'true / false', 'ボス戦で受けた・与えたダメージを logs/singulo-combat.log に記録するか（調整用）'),

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 public final class EventHorizonTargets {
     private EventHorizonTargets() {}
 
-    /** ボスの落とし物の印。ブラックホールに引き寄せられず、飲み込まれない（倒した報酬が失われないように）。 */
+    /** ボスの落とし物（アイテム・経験値オーブ）の印。ブラックホールに引き寄せられず、飲み込まれない（倒した報酬が失われないように）。 */
     public static final String PROTECTED = "singulo_boss_loot";
 
     /** 地平線の向こうから戻ってきたクリスタルメモリの印（戻った時刻）。しばらくは引き寄せない。 */
@@ -27,7 +27,8 @@ public final class EventHorizonTargets {
         if (e instanceof Player p && (p.isCreative() || p.isSpectator())) {
             return false;
         }
-        if (e instanceof net.minecraft.world.entity.item.ItemEntity item && item.getPersistentData().getBoolean(PROTECTED)) {
+        if ((e instanceof net.minecraft.world.entity.item.ItemEntity || e instanceof net.minecraft.world.entity.ExperienceOrb)
+                && e.getPersistentData().getBoolean(PROTECTED)) {
             return false;
         }
         if (e instanceof net.minecraft.world.entity.item.ItemEntity item && isReturnedRecord(item)

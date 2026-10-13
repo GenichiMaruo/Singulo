@@ -115,6 +115,122 @@ public final class BossRewardGameTests {
         helper.succeed();
     }
 
+    /**
+     * 経験値の合計は戦いの始めに決めた額のまま、部屋の挑戦者で等しく分ける（あとから増えた人がいても増えない。
+     * 割り切れない分も消えない。クリエイティブは受け取らない）。
+     */
+    @GameTest(template = EMPTY, batch = "boss_reward_xp_split", timeoutTicks = 40)
+    public static void bossExperienceTotalIsSplitNotMultiplied(GameTestHelper helper) {
+        double oldMultiplier = ServerConfig.BOSS_XP_MULTIPLIER.get();
+        ServerConfig.BOSS_XP_MULTIPLIER.set(1.002);
+        EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
+        boss.lockRewardParticipants();
+        ServerPlayer a = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 3))));
+        ServerPlayer b = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 1, 3))));
+        ServerPlayer creative = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 5))));
+        creative.setGameMode(GameType.CREATIVE);
+        try {
+            int beforeA = a.totalExperience;
+            int beforeB = b.totalExperience;
+            int beforeC = creative.totalExperience;
+            boss.setHealth(1);
+            boss.hurt(helper.getLevel().damageSources().playerAttack(a), 1000);
+            int gotA = a.totalExperience - beforeA;
+            int gotB = b.totalExperience - beforeB;
+            int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
+            helper.assertTrue(want % 2 == 1, "割り切れない額になっていない: " + want);
+            helper.assertTrue(gotA + gotB == want, "合計が決めた額と違う（人数で増えた・余りが消えた）: " + gotA + " + " + gotB + " / " + want);
+            helper.assertTrue(Math.abs(gotA - gotB) <= 1, "等しく分けていない: " + gotA + " / " + gotB);
+            helper.assertTrue(creative.totalExperience == beforeC, "クリエイティブが受け取った");
+        } finally {
+            ServerConfig.BOSS_XP_MULTIPLIER.set(oldMultiplier);
+            boss.discard();
+            leave(helper, a);
+            leave(helper, b);
+            leave(helper, creative);
+        }
+        helper.succeed();
+    }
+
+    /** 人数ぶんの報酬を切ると（bossLootPerPlayer=false）、3人で挑んでも経験値の合計は1人分（皆で分ける）。 */
+    @GameTest(template = EMPTY, batch = "boss_reward_xp_shared", timeoutTicks = 40)
+    public static void bossExperienceIsSharedWithoutPerPlayerLoot(GameTestHelper helper) {
+        boolean oldPerPlayer = ServerConfig.BOSS_LOOT_PER_PLAYER.get();
+        ServerConfig.BOSS_LOOT_PER_PLAYER.set(false);
+        EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
+        boss.setParticipants(3);
+        boss.lockRewardParticipants();
+        java.util.List<ServerPlayer> party = new java.util.ArrayList<>();
+        try {
+            for (int i = 0; i < 3; i++) {
+                party.add(survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + 2 * i, 1, 5)))));
+            }
+            int before = party.stream().mapToInt(p -> p.totalExperience).sum();
+            boss.setHealth(1);
+            boss.hurt(helper.getLevel().damageSources().playerAttack(party.get(0)), 1000);
+            int got = party.stream().mapToInt(p -> p.totalExperience).sum() - before;
+            int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
+            helper.assertTrue(got == want, "人数ぶんの報酬を切ったのに合計が増えた: " + got + " / " + want);
+        } finally {
+            ServerConfig.BOSS_LOOT_PER_PLAYER.set(oldPerPlayer);
+            boss.discard();
+            party.forEach(p -> leave(helper, p));
+        }
+        helper.succeed();
+    }
+
+    /** 直接入る経験値でも、修繕の付いた傷んだ装備が直る（オーブを拾ったときと同じ）。 */
+    @GameTest(template = EMPTY, batch = "boss_reward_xp_mending", timeoutTicks = 40)
+    public static void bossExperienceRepairsMendingGear(GameTestHelper helper) {
+        EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
+        ServerPlayer p = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 3))));
+        try {
+            ItemStack chest = new ItemStack(Items.DIAMOND_CHESTPLATE);
+            chest.enchant(helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                    .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.MENDING), 1);
+            chest.setDamageValue(200);
+            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, chest);
+            int before = p.totalExperience;
+            boss.setHealth(1);
+            boss.hurt(helper.getLevel().damageSources().playerAttack(p), 1000);
+            ItemStack worn = p.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
+            helper.assertTrue(worn.getDamageValue() < 200, "修繕で直らない: " + worn.getDamageValue());
+            int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
+            helper.assertTrue(p.totalExperience - before < want, "直した分の経験値が減っていない");
+        } finally {
+            boss.discard();
+            leave(helper, p);
+        }
+        helper.succeed();
+    }
+
+    /** 部屋に誰もいなければ、経験値は核の上にオーブで出る。ブラックホールよけの印が付き、ふつうより長く残る。 */
+    @GameTest(template = EMPTY, batch = "boss_reward_xp_empty", timeoutTicks = 40)
+    public static void bossExperienceInAnEmptyRoomIsProtected(GameTestHelper helper) {
+        EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
+        ServerPlayer far = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))).add(60, 0, 0));
+        try {
+            boss.setHealth(1);
+            boss.hurt(helper.getLevel().damageSources().playerAttack(far), 1000);
+            AABB around = new AABB(helper.absolutePos(new BlockPos(3, 1, 3))).inflate(12);
+            var orbs = helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around);
+            helper.assertTrue(!orbs.isEmpty(), "誰もいないのにオーブが出ない");
+            int total = 0;
+            for (ExperienceOrb orb : orbs) {
+                helper.assertTrue(orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED), "オーブにブラックホールよけの印がない");
+                helper.assertTrue(orb.saveWithoutId(new CompoundTag()).getShort("Age") < 0, "オーブがふつうの寿命のまま");
+                total += orb.getValue();
+                orb.discard();
+            }
+            int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
+            helper.assertTrue(total == want, "オーブの合計が違う: " + total + " / " + want);
+        } finally {
+            boss.discard();
+            leave(helper, far);
+        }
+        helper.succeed();
+    }
+
     /** 重力の裂け目は、予告の線の上（3本、長さ ±RIFT_REACH、床から4ブロックまで）にしか当たらない。向きを変えても同じ。 */
     @GameTest(template = EMPTY)
     public static void riftOnlyHitsTheWarnedLines(GameTestHelper helper) {

@@ -1,7 +1,7 @@
 ## Singulo-0.5.0-1.21.1N
 
 ### Boss rework
-Every boss was retuned from logged playtests so that a player with the gear you would normally have at that point can just about win. For a harder fight, turn on the new server setting `bossHardMode`: bosses keep their 0.4.1 health and damage, and also use the new attacks (some of them, such as the Leviathan's breath and jets, hit harder than in normal mode).
+Every boss was retuned from logged playtests so that a player with the gear you would normally have at that point can just about win. For a harder fight, turn on the new server setting `bossHardMode`: a harder mode based on the 0.4.1 health and damage. Bosses still use the new attacks, and some of them, such as the Leviathan's breath and jets, hit harder than in normal mode.
 
 - **Echo Sentinel** (unenchanted diamond gear): its bolts, projector lances and projection circles are now ordinary damage that armor reduces (they used to pierce armor). Damage: bolt 5, strike 8, lance 6, circle 8. Health 320 → 240. Before it enrages it fires bolts more often; after, it chains a second blink-strike 60% of the time (was 70%). It no longer casts its circle or lances at a player standing outside its boss room.
 - **Gravity Remnant** (netherite chestplate, leggings and sword): its slam drops you from a lower height (fall damage ignores armor and caused most deaths). Slams come a little less often. Health 450 → 400. Its gravity well now runs in a cycle: it pulls for 4 s, charges for 1 s (glow and sound), bursts nearby players outward, then rests for 3 s while the Remnant drifts to another spot in the room.
@@ -22,11 +22,11 @@ Every boss was retuned from logged playtests so that a player with the gear you 
 
 ### New
 - **Reinforced Ruin Glass**: a blast-proof window with a symmetric pattern. It forms the second block of the Sunken Reactor Sector's containment pillars (in newly generated sectors).
-- New server settings: `bossHardMode` (0.4.1 health and damage, plus the new attacks) and `bossCombatLog` (writes boss fight damage, by attack, to `logs/singulo-combat.log`; off by default).
+- New server settings: `bossHardMode` (a harder mode based on the 0.4.1 health and damage) and `bossCombatLog` (writes boss fight damage, by attack, to `logs/singulo-combat.log`; off by default).
 
 ### Fixes
 - Boss drops and awakened rewards now appear on the guardian core (on the seal console for the Horizon Warden) instead of where the boss died. They never despawn and do not merge with other items, and black holes do not swallow them, so loot is no longer lost through gaps in the floor.
-- Boss experience now goes straight to each challenger in the room instead of dropping as orbs, so it can no longer despawn or be swallowed. If nobody is in the room, it drops as orbs on the guardian core.
+- Boss experience now goes straight to the challengers in the room instead of dropping as orbs, so it can no longer despawn or be swallowed. The total is split evenly among them (it no longer grows with players beyond the count fixed when the fight began), and Mending still repairs gear with it. If nobody is in the room, it drops on the guardian core as orbs that black holes do not swallow and that last about 30 minutes.
 - Boss bolts still in flight when the world is saved keep their damage and armor behavior after it reloads.
 - The Leviathan's Gravity Rift only hits along the warned lines (not in the corridors beyond them).
 - Warden singularities no longer keep hurting players after the Warden dies.
