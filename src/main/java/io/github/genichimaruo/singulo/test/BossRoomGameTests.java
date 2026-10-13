@@ -131,7 +131,7 @@ public final class BossRoomGameTests {
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
         float max = s.getMaxHealth();
-        helper.assertTrue(max == EchoSentinel.HEALTH, "体力が設計値でない: " + max);
+        helper.assertTrue(max == EchoSentinel.health(), "体力が設計値でない: " + max);
         s.hurt(helper.getLevel().damageSources().magic(), 20);
         float shielded = max - s.getHealth();
         helper.assertTrue(Math.abs(shielded - 20 * EchoSentinel.PROJECTION_FACTOR[4]) < 0.01F, "投影器4つで1割にならない: " + shielded);
@@ -203,7 +203,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
-        s.setHealth(EchoSentinel.HEALTH / 2 - 1);
+        s.setHealth(EchoSentinel.health() / 2 - 1);
         var target = helper.spawn(EntityType.ARMOR_STAND, new BlockPos(4, 1, 1));
         s.summonEchoes(helper.getLevel(), target);
         List<EchoSentinel> echoes = helper.getLevel().getEntitiesOfClass(EchoSentinel.class, s.getBoundingBox().inflate(32), EchoSentinel::isMinion);
@@ -418,7 +418,7 @@ public final class BossRoomGameTests {
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
         helper.assertTrue(boss instanceof EchoSentinel && boss.awakened(), "覚醒の残響核で覚醒した残響の番人が現れない: " + boss);
         boss.skipEmerging();
-        double expected = EchoSentinel.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        double expected = EchoSentinel.health() * RuinBoss.awakenedHealthMultiplier();
         helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
         helper.assertTrue(((EchoSentinel) boss).minionCount() == EchoSentinel.MINIONS + 1, "覚醒した番人の分身が増えない");
         helper.assertTrue(core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core")) == null, "覚醒戦の最中に2体目が現れた");

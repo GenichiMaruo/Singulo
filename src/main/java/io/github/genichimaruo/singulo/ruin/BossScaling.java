@@ -37,6 +37,11 @@ public final class BossScaling {
         return !ServerConfig.SPEC.isLoaded() || ServerConfig.BOSS_LOOT_PER_PLAYER.get();
     }
 
+    /** ボスのハードモード（設定 bossHardMode）。0.4.1 までの強さ（残響の番人の魔法が防具を貫く）。 */
+    public static boolean hardMode() {
+        return ServerConfig.SPEC.isLoaded() && ServerConfig.BOSS_HARD_MODE.get();
+    }
+
     /** ボスの経験値の倍率（設定 bossXpMultiplier）。 */
     public static double xpMultiplier() {
         return ServerConfig.SPEC.isLoaded() ? ServerConfig.BOSS_XP_MULTIPLIER.get() : 1.0;

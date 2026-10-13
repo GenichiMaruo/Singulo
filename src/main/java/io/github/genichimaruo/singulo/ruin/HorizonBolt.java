@@ -37,6 +37,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
     private float damage = DAMAGE;
     /** 防具と盾を無視する光弾か（ウォーデンのフェーズ2から）。 */
     private boolean piercing;
+    private boolean armored;
 
     public HorizonBolt(EntityType<? extends HorizonBolt> type, Level level) {
         super(type, level);
@@ -53,6 +54,12 @@ public class HorizonBolt extends ThrowableItemProjectile {
     }
 
     /** 防具と盾を無視する光弾にする。 */
+    /** 防具で減る弾にする（普通の飛び道具のダメージ）。既定は魔法（防具を貫く）。 */
+    public HorizonBolt armored(boolean on) {
+        this.armored = on;
+        return this;
+    }
+
     public HorizonBolt piercing(boolean on) {
         this.piercing = on;
         return this;
@@ -115,6 +122,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
         Entity hit = result.getEntity();
         if (hit != getOwner() && !RuinGuards.isGuard(hit)) {
             hit.hurt(piercing ? io.github.genichimaruo.singulo.registry.SinguloDamageTypes.tidal(level(), getOwner())
+                    : armored ? damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null)
                     : damageSources().indirectMagic(this, getOwner()), damage);
         }
     }

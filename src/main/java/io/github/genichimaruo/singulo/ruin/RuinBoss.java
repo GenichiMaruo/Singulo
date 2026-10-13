@@ -85,6 +85,28 @@ public abstract class RuinBoss extends Monster {
     }
 
     /** 分身か（ボスバー・核への知らせ・ドロップがない）。 */
+    /** 戦いの記録（BossCombatLog）に書く、いま当てている技の名前（技を当てる間だけ）。 */
+    private String combatAttack;
+
+    public String combatAttack() {
+        return combatAttack;
+    }
+
+    /** 技の名前をつけてダメージを与える（戦いの記録に、どの技で受けたかを残す）。 */
+    protected boolean hurtWith(String attack, net.minecraft.world.entity.LivingEntity target, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        combatAttack = attack;
+        try {
+            return target.hurt(source, amount);
+        } finally {
+            combatAttack = null;
+        }
+    }
+
+    /** 戦いの記録に書く、ボスの今の様子（激昂・残っている仕掛けなど）。 */
+    public String combatState() {
+        return (awakened() ? "awakened " : "") + (getHealth() <= getMaxHealth() * 0.5F ? "half" : "");
+    }
+
     public boolean isMinion() {
         return false;
     }
