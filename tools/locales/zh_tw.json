@@ -2255,6 +2255,18 @@
     "source": "Press Esc to close",
     "translation": "按 Esc 關閉"
   },
+  "ending.singulo.supporter_controls": {
+    "source": "← / → to browse supporters · Esc to close",
+    "translation": "← / → 瀏覽支持者 · Esc 關閉"
+  },
+  "ending.singulo.supporter_range": {
+    "source": "%s–%s / %s",
+    "translation": "%s–%s / %s"
+  },
+  "ending.singulo.supporters": {
+    "source": "With thanks to our supporters",
+    "translation": "致謝所有支持者"
+  },
   "ending.singulo.thanks": {
     "source": "Thank you for playing",
     "translation": "Thank you for playing"
@@ -3163,6 +3175,10 @@
     "source": "Support the author on Ko-fi (opens in your browser)",
     "translation": "在 Ko-fi 上支持作者（在瀏覽器中開啟）"
   },
+  "gui.singulo.handbook.supporters": {
+    "source": "Supporters",
+    "translation": "支持者"
+  },
   "gui.singulo.handbook.title": {
     "source": "Singulo Handbook",
     "translation": "Singulo 手冊"
@@ -3622,6 +3638,30 @@
   "gui.singulo.structure.particle_accelerator": {
     "source": "Side %s",
     "translation": "邊長 %s"
+  },
+  "gui.singulo.supporters.count": {
+    "source": "Supporters: %s / 100",
+    "translation": "支持者：%s / 100"
+  },
+  "gui.singulo.supporters.empty": {
+    "source": "Supporter names will be added in future updates.",
+    "translation": "支持者的名字將在今後的更新中加入。"
+  },
+  "gui.singulo.supporters.intro": {
+    "source": "Thank you to everyone supporting the development of Singulo. The names listed here also appear in the ending.",
+    "translation": "感謝所有支持 Singulo 開發的朋友。這裡列出的名字也會出現在結局中。"
+  },
+  "gui.singulo.supporters.rainbow": {
+    "source": "Rainbow Supporter",
+    "translation": "彩虹支持者"
+  },
+  "gui.singulo.supporters.standard": {
+    "source": "Supporter",
+    "translation": "支持者"
+  },
+  "gui.singulo.supporters.title": {
+    "source": "Thank you for your support",
+    "translation": "感謝您的支持"
   },
   "gui.singulo.thermo.cold": {
     "source": "Cold side %s K",
