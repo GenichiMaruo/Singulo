@@ -315,7 +315,9 @@ public final class BossRoomGameTests {
         helper.runAtTickTime(GravityRemnant.EMERGE_TICKS / 2, () ->
                 helper.assertBlockPresent(SinguloBlocks.RUIN_GLASS.get(), CORE.offset(2, 3, 0)));
         helper.runAtTickTime(GravityRemnant.EMERGE_TICKS + 10, () -> {
-            helper.assertBlockPresent(Blocks.AIR, CORE.offset(2, 3, 0));
+            var broken = helper.getBlockState(CORE.offset(2, 3, 0));
+            // Water can flow into the shattered tank before this check runs.
+            helper.assertTrue(broken.isAir() || broken.is(Blocks.WATER), "槽のガラスが砕けない: " + broken);
             helper.assertTrue(r.emergeTicks() == 0 && !r.isNoAi(), "演出が終わっても動き出さない");
             core.restoreProps(helper.getLevel());
             helper.assertBlockPresent(Blocks.PURPLE_STAINED_GLASS, CORE.offset(2, 3, 0));
