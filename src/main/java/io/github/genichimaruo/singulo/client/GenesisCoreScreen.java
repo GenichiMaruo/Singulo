@@ -60,6 +60,7 @@ public class GenesisCoreScreen extends AbstractContainerScreen<GenesisCoreMenu> 
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         GenesisCoreBlockEntity core = core();
         if (core != null && core.canToggleFeed() && Panel.inside(mouseX, mouseY, leftPos + FEED_X - 1, topPos + FEED_Y - 1, 12, 12)) {

@@ -63,7 +63,7 @@ public final class BossRoomGameTests {
 
     private static int dropped(GameTestHelper helper, Item item) {
         int n = 0;
-        for (ItemEntity e : helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(16))) {
+        for (ItemEntity e : helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(helper.absolutePos(BlockPos.ZERO), helper.absolutePos(new BlockPos(8, 8, 8))))) {
             if (e.getItem().is(item)) {
                 n += e.getItem().getCount();
             }
@@ -240,7 +240,7 @@ public final class BossRoomGameTests {
         s.kill();
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, VAULT)).isSealed(), "倒しても保管庫が開かない");
-            helper.assertTrue(dropped(helper, item("sentinel_core")) == 2, "番人の投影核を2つ落とさない: " + dropped(helper, item("sentinel_core")));
+            helper.assertTrue(dropped(helper, item("sentinel_core")) == 2, "番人の投影核を2つ落とさない: " + dropped(helper, item("sentinel_core")) + ", participants=" + s.rewardParticipants());
             helper.assertTrue(core.activeBoss(helper.getLevel()) == null, "倒したのに番人が残っている");
             helper.succeed();
         });

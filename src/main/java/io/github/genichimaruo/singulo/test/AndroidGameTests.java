@@ -53,7 +53,9 @@ public final class AndroidGameTests {
     }
 
     private static List<RuinAndroid> androids(GameTestHelper helper) {
-        return helper.getLevel().getEntitiesOfClass(RuinAndroid.class, new AABB(helper.absolutePos(STATION)).inflate(8));
+        // Adjacent 1.20.1 test fixtures can be within eight blocks; only count this station's guards.
+        return helper.getLevel().getEntitiesOfClass(RuinAndroid.class, new AABB(helper.absolutePos(STATION)).inflate(8),
+                a -> helper.absolutePos(STATION).equals(a.home()));
     }
 
     /** ステーションは、メモリとキットと電力で護衛を1体だけ印刷し、キットと電力を使う。印刷中は傷つかない。 */
@@ -79,7 +81,7 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 160)
     public static void guardIgnoresPlayersAndReportsHealth(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
             RuinAndroid a = androids(helper).get(0);
             float before = a.getHealth();
@@ -103,6 +105,8 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void transferUpgradePassesInventory(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 2);
+        // A placed station belongs to its player; unrelated orphan fixtures must not block this reprint.
+        s.setOwner(java.util.UUID.randomUUID());
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_UPGRADE, new ItemStack(item("android_transfer_upgrade")));
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
             RuinAndroid first = androids(helper).get(0);
@@ -114,7 +118,7 @@ public final class AndroidGameTests {
         });
         helper.succeedWhen(() -> {
             List<RuinAndroid> list = androids(helper).stream().filter(RuinAndroid::isAlive).toList();
-            helper.assertTrue(list.size() == 1, "印刷し直されない");
+            helper.assertTrue(list.size() == 1, "印刷し直されない: count=" + list.size() + ", station=" + s.saveWithoutMetadata());
             ItemStack kits = list.get(0).inventory().getItem(RuinAndroid.SLOT_REPAIR);
             helper.assertTrue(kits.getCount() == 5, "持ち物が次の護衛に渡らない: " + kits);
             list.get(0).discard();
@@ -189,7 +193,7 @@ public final class AndroidGameTests {
         BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
         guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
         BladeAndroid ruin = SinguloEntities.BLADE_ANDROID.get().create(level);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         List<LivingEntity> spared = List.of(SinguloEntities.GRAVITY_REMNANT.get().create(level), EntityType.COW.create(level),
                 EntityType.VILLAGER.create(level), player);
@@ -263,9 +267,9 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void permitAndFollowSettings(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
-        var stranger = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var friend = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var stranger = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -309,8 +313,8 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void removedMemberLosesAndroidScreen(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var friend = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);

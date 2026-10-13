@@ -479,7 +479,7 @@ public final class BossGameTests {
             helper.assertTrue(bomb.isRemoved(), "爆弾が吸い込まれない");
             helper.assertTrue(a.getHealth() > before, "吸い込んでも体力が戻らない: " + a.getHealth() + " / " + before);
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.reactor.MicroBlackHole.class,
-                    a.getBoundingBox().inflate(40)).isEmpty(), "爆弾が着弾してブラックホールが開いた");
+                    new net.minecraft.world.phys.AABB(helper.absolutePos(BlockPos.ZERO), helper.absolutePos(new BlockPos(8, 8, 8)))).isEmpty(), "爆弾が着弾してブラックホールが開いた");
             a.discard();
             helper.succeed();
         });

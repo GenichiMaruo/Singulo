@@ -64,17 +64,20 @@ public final class BossCombatLog {
         return e instanceof RuinBoss || e instanceof HorizonWarden ? (Mob) e : null;
     }
 
-    private static final java.util.Map<LivingEntity, Float> RAW = new java.util.WeakHashMap<>();
-    private static final java.util.Map<LivingEntity, Float> BLOCKED = new java.util.WeakHashMap<>();
+    private record Hit(DamageSource source, float amount) {}
+    private static final java.util.Map<LivingEntity, Hit> RAW = new java.util.WeakHashMap<>();
+    private static final java.util.Map<LivingEntity, Hit> BLOCKED = new java.util.WeakHashMap<>();
     public static void onHurt(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
-        if (!event.getEntity().level().isClientSide && enabled()) RAW.put(event.getEntity(), event.getAmount());
+        if (!event.getEntity().level().isClientSide && enabled()) RAW.put(event.getEntity(), new Hit(event.getSource(), event.getAmount()));
     }
     public static void onShield(net.minecraftforge.event.entity.living.ShieldBlockEvent event) {
-        if (!event.getEntity().level().isClientSide && enabled()) BLOCKED.put(event.getEntity(), event.getBlockedDamage());
+        if (!event.getEntity().level().isClientSide && enabled()) BLOCKED.put(event.getEntity(), new Hit(event.getDamageSource(), event.getBlockedDamage()));
     }
     public static void onDamage(LivingDamageEvent event) {
-        float rawDamage = RAW.getOrDefault(event.getEntity(), event.getAmount()); RAW.remove(event.getEntity());
-        float blockedDamage = BLOCKED.getOrDefault(event.getEntity(), 0F); BLOCKED.remove(event.getEntity());
+        Hit raw = RAW.remove(event.getEntity());
+        Hit blocked = BLOCKED.remove(event.getEntity());
+        float rawDamage = raw != null && raw.source() == event.getSource() ? raw.amount() : event.getAmount();
+        float blockedDamage = blocked != null && blocked.source() == event.getSource() ? blocked.amount() : 0F;
         if (event.getEntity().level().isClientSide() || !enabled()) {
             return;
         }
@@ -83,16 +86,16 @@ public final class BossCombatLog {
         Mob attacker = boss(source.getEntity());
         Slam slam = attacker == null ? slamFor(victim, source) : null;
         if (victim instanceof Player player && slam != null) {
-            if (player.getHealth() > 0) {
+            if (player.getHealth() > event.getAmount()) {
                 // 倒れなかった: この叩きつけの記録はここまで（倒れたときは、死亡の記録で使ってから消す）
                 SLAMS.remove(player.getUUID());
             }
-            write("hit_player", slam.boss(), slam.attack(), rawDamage, event.getAmount(), blockedDamage, player);
+            write("hit_player", slam.boss(), slam.attack(), rawDamage, event.getAmount(), blockedDamage, player, victim);
         } else if (victim instanceof Player player && attacker != null) {
             write("hit_player", attacker, attackName(attacker, source), rawDamage, event.getAmount(),
-                    blockedDamage, player);
+                    blockedDamage, player, victim);
         } else if (boss(victim) != null && source.getEntity() instanceof Player player) {
-            write("hit_boss", (Mob) victim, source.getMsgId(), rawDamage, event.getAmount(), blockedDamage, player);
+            write("hit_boss", (Mob) victim, source.getMsgId(), rawDamage, event.getAmount(), blockedDamage, player, victim);
         }
     }
 
@@ -130,20 +133,27 @@ public final class BossCombatLog {
     }
 
     private static void write(String event, Mob boss, String attack, float raw, float dealt, float blocked, Player player) {
+        write(event, boss, attack, raw, dealt, blocked, player, null);
+    }
+
+    private static void write(String event, Mob boss, String attack, float raw, float dealt, float blocked, Player player,
+                              LivingEntity pendingVictim) {
+        float bossHealth = Math.max(0, boss.getHealth() - (pendingVictim == boss ? dealt : 0));
+        float playerHealth = player == null ? 0 : Math.max(0, player.getHealth() - (pendingVictim == player ? dealt : 0));
         String state = boss instanceof RuinBoss r ? r.combatState() : boss instanceof HorizonWarden w ? w.combatState() : "";
         int participants = boss instanceof RuinBoss r ? r.participants() : boss instanceof HorizonWarden w ? w.participants() : 1;
         String line = String.join("\t",
                 String.format(Locale.ROOT, "%.2f", boss.tickCount / 20.0),
                 event,
                 BuiltInRegistries.ENTITY_TYPE.getKey(boss.getType()).getPath() + (boss instanceof RuinBoss r && r.isMinion() ? "(echo)" : ""),
-                String.format(Locale.ROOT, "%.1f/%.1f", boss.getHealth(), boss.getMaxHealth()),
+                String.format(Locale.ROOT, "%.1f/%.1f", bossHealth, boss.getMaxHealth()),
                 state,
                 attack,
                 String.format(Locale.ROOT, "%.2f", raw),
                 String.format(Locale.ROOT, "%.2f", dealt),
                 String.format(Locale.ROOT, "%.2f", blocked),
                 player == null ? "-" : player.getGameProfile().getName(),
-                player == null ? "-" : String.format(Locale.ROOT, "%.1f/%.1f", player.getHealth(), player.getMaxHealth()),
+                player == null ? "-" : String.format(Locale.ROOT, "%.1f/%.1f", playerHealth, player.getMaxHealth()),
                 player == null ? "-" : String.format(Locale.ROOT, "%.0f", player.getAttributeValue(Attributes.ARMOR)),
                 player == null ? "-" : String.format(Locale.ROOT, "%.0f", player.getAttributeValue(Attributes.ARMOR_TOUGHNESS)),
                 player == null ? "-" : String.valueOf(player.isBlocking()),

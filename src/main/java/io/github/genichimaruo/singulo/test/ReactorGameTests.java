@@ -268,7 +268,7 @@ public final class ReactorGameTests {
         helper.runAtTickTime(3, () -> r.forceCore(PenroseReactorBlockEntity.START_MASS, 0));
         helper.succeedWhen(() -> helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "点火直後の炉心でホーキング凝縮体ができない"));
+                "点火直後の炉心でホーキング凝縮体ができない: formed=" + r.isFormed() + ", state=" + r.state() + ", mass=" + r.mass() + ", nbt=" + r.saveWithoutMetadata()));
     }
 
     @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 1400)

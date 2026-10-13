@@ -226,6 +226,7 @@ public class HandbookScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         Panel.background(g, left, top, W, H);
         g.drawString(font, title, left + 8, top + 7, Panel.TEXT, false);

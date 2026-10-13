@@ -70,6 +70,7 @@ public class PenroseReactorScreen extends AbstractContainerScreen<PenroseReactor
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         if (menu.getCarried().isEmpty()) {
             for (int i = 0; i < PenroseReactorMenu.SLOT_POS.length; i++) {

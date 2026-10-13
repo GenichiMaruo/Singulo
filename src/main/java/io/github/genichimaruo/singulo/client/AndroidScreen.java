@@ -146,6 +146,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (named() && Panel.inside(mouseX, mouseY, leftPos + RESET_X, topPos + RESET_Y, 10, 10)) {

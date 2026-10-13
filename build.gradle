@@ -119,3 +119,9 @@ idea {
 
 
 tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '1000'] }
+
+// Failed fixtures must not contaminate the next test run. Development worlds are separate.
+var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
+    delete layout.buildDirectory.dir('gametest/world')
+}
+tasks.named('runGameTestServer') { dependsOn cleanGameTestWorld }

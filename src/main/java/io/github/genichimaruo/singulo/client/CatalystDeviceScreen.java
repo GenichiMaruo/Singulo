@@ -20,6 +20,7 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (menu.kind().extraSlot() != null && !menu.getSlot(1).hasItem() && menu.getCarried().isEmpty()

@@ -186,17 +186,22 @@ public final class NatureGameTests {
      * 隕石クレーター: 地面の高さを読んで描き込む。すり鉢は地面より低く、中心の隕石には核が1つ。描き込む範囲の外の地面は
      * 元のまま（四角く削らない）。核を掘り出すと、コンパスはもう指さない。
      */
-    // テストの場所から遠く離れた所に描く（ほかのテストの場所を荒らさないように）
-    @GameTest(template = EMPTY, batch = "meteor_crater", timeoutTicks = 100)
+    // 広い専用の試験構造に描く。1.20.1では試験外チャンクを同期読み込みすると初期化中に待機する。
+    @GameTest(template = "crater", batch = "meteor_crater", timeoutTicks = 100)
     public static void craterIsCarvedIntoTheGround(GameTestHelper helper) {
         net.minecraft.server.level.ServerLevel level = helper.getLevel();
-        BlockPos base = helper.absolutePos(BlockPos.ZERO).offset(0, 0, 4000);
+        BlockPos base = helper.absolutePos(new BlockPos(32, 0, 32));
         var heightmap = net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE;
         // テストの世界は薄い平地なので、厚さ10ブロックの地面（石の上に土と草）を作る
         int ground = base.getY() + 12;
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         for (int x = -18; x <= 18; x++) {
             for (int z = -18; z <= 18; z++) {
+                // Earlier batches may leave tall structures above this fixture. Clear the test columns first.
+                int oldTop = level.getHeight(heightmap, base.getX() + x, base.getZ() + z);
+                for (int y = oldTop; y > ground; y--) {
+                    level.setBlock(p.set(base.getX() + x, y, base.getZ() + z), Blocks.AIR.defaultBlockState(), 18);
+                }
                 for (int y = base.getY(); y <= ground; y++) {
                     level.setBlock(p.set(base.getX() + x, y, base.getZ() + z),
                             (y == ground ? Blocks.GRASS_BLOCK : y >= ground - 2 ? Blocks.DIRT : Blocks.STONE).defaultBlockState(), 2);

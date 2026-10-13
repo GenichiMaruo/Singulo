@@ -348,6 +348,7 @@ public final class BossRewardGameTests {
     @GameTest(template = EMPTY, batch = "boss_reward_log", timeoutTicks = 40)
     public static void fatalSlamIsLoggedAsDeath(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
+        boss.setNoAi(true);
         ServerPlayer p = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 3))));
         vulnerable(p);
         helper.runAtTickTime(2, () -> {
@@ -358,10 +359,15 @@ public final class BossRewardGameTests {
                 long hitsBefore = count(log, "hit_player", "test_slam");
                 long deathsBefore = count(log, "player_died", "test_slam");
                 p.setHealth(1);
+                helper.assertTrue(ServerConfig.SPEC.isLoaded() && ServerConfig.BOSS_COMBAT_LOG.get(), "戦闘ログの設定が有効でない");
+                helper.assertFalse(boss.isRemoved(), "記録する前にボスが試験領域から消えた");
                 BossCombatLog.slammed(p, boss, "test_slam");
                 p.hurt(helper.getLevel().damageSources().fall(), 4);
                 helper.assertTrue(p.isDeadOrDying(), "落下で倒れない");
                 helper.assertTrue(count(log, "hit_player", "test_slam") - hitsBefore == 1, "叩きつけの落下ダメージが記録されない");
+                String lastHit = Files.readAllLines(log).stream().filter(line -> line.contains("\thit_player\t")
+                        && line.contains("\ttest_slam\t")).reduce((a, b) -> b).orElseThrow();
+                helper.assertTrue(lastHit.split("\t")[10].equals("0.0/20.0"), "戦闘ログの HP が被ダメージ前の値: " + lastHit);
                 helper.assertTrue(count(log, "player_died", "test_slam") - deathsBefore == 1, "叩きつけの落下で倒れたのに死亡が記録されない");
             } catch (java.io.IOException e) {
                 throw new RuntimeException(e);

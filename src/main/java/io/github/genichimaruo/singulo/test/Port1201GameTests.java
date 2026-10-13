@@ -25,6 +25,15 @@ public final class Port1201GameTests {
     private Port1201GameTests() {}
 
     @GameTest(template = "empty")
+    public static void stepHeightMatchesModernOneBlockHeight(GameTestHelper helper) {
+        var warden = io.github.genichimaruo.singulo.registry.SinguloEntities.HORIZON_WARDEN.get().create(helper.getLevel());
+        var android = io.github.genichimaruo.singulo.registry.SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        helper.assertTrue(Math.abs(warden.getStepHeight() - 1.0F) < 0.001F, "Warden step height changed: " + warden.getStepHeight());
+        helper.assertTrue(Math.abs(android.getStepHeight() - 1.0F) < 0.001F, "Android step height changed: " + android.getStepHeight());
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void chargerEnergyPersistsAndExposesCapability(GameTestHelper helper) {
         ItemStack charger = new ItemStack(SinguloItems.ANDROID_CHARGER.get());
         var energy = charger.getCapability(ForgeCapabilities.ENERGY).orElse(null);

@@ -221,16 +221,16 @@ public final class Stage5RomanceGameTests {
         ShieldTowerBlockEntity shield = buildShield(helper, "singularity_core");
         BlockPos zombiePos = new BlockPos(10, 1, 4);
         Zombie[] zombie = new Zombie[1];
-        helper.runAtTickTime(3, () -> {
-            helper.assertTrue(shield.protectionLevel() == 5, "コアで完全版にならない: " + shield.status());
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(shield.protectionLevel() == 5, "コアで完全版にならない: " + shield.status()))
+                .thenExecute(() -> {
             zombie[0] = helper.spawn(EntityType.ZOMBIE, zombiePos);
-        });
-        helper.runAtTickTime(20, () -> {
+        })
+                .thenExecuteAfter(17, () -> {
             double d = zombie[0].position().distanceTo(Vec3.atCenterOf(helper.absolutePos(new BlockPos(7, 1, 4))));
             helper.assertTrue(d > 5, "敵対モブが押し返されない（距離 " + d + "）");
             zombie[0].discard();
-            helper.succeed();
-        });
+        }).thenSucceed();
     }
 
     // ------------------------------------------------------------------ ワールドライン・アンカー（上位）

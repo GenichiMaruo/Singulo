@@ -216,7 +216,7 @@ public final class SinguloClient {
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
-                io.github.genichimaruo.singulo.registry.SinguloItems.METEOR_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
+                io.github.genichimaruo.singulo.registry.SinguloItems.METEOR_COMPASS.get(), new ResourceLocation("minecraft", "angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
     }

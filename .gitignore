@@ -23,4 +23,3 @@ __pycache__/
 
 # generator cache
 src/generated/**/.cache
-
