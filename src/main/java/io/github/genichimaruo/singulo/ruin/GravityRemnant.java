@@ -50,6 +50,8 @@ public class GravityRemnant extends RuinBoss {
     public static final int EMERGE_TICKS = 110;
     public static final int DEATH_TICKS = 80;
     public static final float HEALTH = 450;
+    /** 通常の体力（ハードモードは HEALTH）。 */
+    public static final float HEALTH_NORMAL = 400;
     public static final int SHELL_PIECES = 8;
     /** 殻がある間に受けるダメージの倍率。 */
     public static final float SHELL_FACTOR = 0.3F;
@@ -58,17 +60,41 @@ public class GravityRemnant extends RuinBoss {
     static final int REGROW_DELAY = 160;
     public static final int GATHER_TICKS = 40;
     static final int FLIP_INTERVAL = 140;
+    /** 通常の強さでの、叩きつけの間（ハードモードは FLIP_INTERVAL）。 */
+    static final int FLIP_INTERVAL_NORMAL = 170;
     /** 浮かせてから叩きつけるまでの tick。 */
     public static final int FLIP_HOLD = 22;
     public static final double FLIP_RADIUS = 14;
     public static final double LIFT_SPEED = 1.25;
     public static final double SLAM_SPEED = 3.0;
     public static final float SLAM_FALL = 8;
+    /**
+     * 通常の強さでの、叩きつけの落下の高さ。落下のダメージは防具で減らないので、ハードモード（1回で7〜10）より低くする
+     * （1回でおよそ4〜6）。
+     */
+    public static final float SLAM_FALL_NORMAL = 4;
+
+    /** いまの設定での体力。 */
+    public static float health() {
+        return BossScaling.hardMode() ? HEALTH : HEALTH_NORMAL;
+    }
     /** 重力井戸（体力半分から）。 */
     public static final double WELL_RADIUS = 9;
     public static final double AWAKENED_WELL_RADIUS = 12;
     static final double WELL_PULL = 0.07;
     public static final double CORE_RADIUS = 2.2;
+    /**
+     * 重力井戸の周期: 引き寄せる → 溜める（引き寄せが止まり、予告の光と音）→ 吹き飛ばす → 休む（そのあいだに部屋の別の場所へ漂う）。
+     * ずっと引き寄せられて同じ場所から殴るだけにならないように。
+     */
+    public static final int WELL_PULL_TICKS = 80;
+    public static final int WELL_CHARGE_TICKS = 20;
+    public static final int WELL_REST_TICKS = 60;
+    public static final double BURST_RADIUS = 4.0;
+    public static final float BURST_DAMAGE = 6;
+    public static final float BURST_DAMAGE_NORMAL = 4;
+    /** 休むあいだに移る先の、核からの距離。 */
+    static final double WELL_SHIFT = 5.0;
     public static final float CORE_DAMAGE = 3;
     static final double HOVER = 2.5;
     /** 殻・瓦礫の見た目に使う建材。 */
@@ -77,6 +103,11 @@ public class GravityRemnant extends RuinBoss {
     private int debrisCooldown = DEBRIS_INTERVAL;
     private int flipCooldown = FLIP_INTERVAL / 2;
     private int bareTicks;
+    /** 重力井戸の周期の、いまの位置（tick）。 */
+    private int wellTick;
+    /** 休むあいだに漂っていく先（なければ核の上）。 */
+    @Nullable
+    private Vec3 wellAnchor;
     /** 覚醒した個体が、いま続けての叩きつけをしているか（続けるのは1度まで）。 */
     private boolean chainedFlip;
 
@@ -84,6 +115,10 @@ public class GravityRemnant extends RuinBoss {
         super(type, level, BossEvent.BossBarColor.PURPLE);
         this.xpReward = 800;
         setNoGravity(true);
+        if (!level.isClientSide && !BossScaling.hardMode()) {
+            // 読み込むときは、このあと保存した体力で上書きされる
+            setEffectiveHealth(HEALTH_NORMAL);
+        }
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -232,7 +267,7 @@ public class GravityRemnant extends RuinBoss {
             level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, getX(), getY() + 0.6, getZ(), 2, 0.8, 0.8, 0.8, 0.01);
         }
         if (wellOpen()) {
-            tickWell(level);
+            tickWellCycle(level);
         }
         if (target == null || !target.isAlive()) {
             return;
@@ -252,7 +287,10 @@ public class GravityRemnant extends RuinBoss {
         }
         Vec3 h = Vec3.atBottomCenterOf(home).add(0, 1 + HOVER, 0);
         Vec3 goal = h;
-        if (target != null && target.isAlive()) {
+        if (wellOpen() && wellAnchor != null) {
+            // 重力井戸の周期では、休むたびに決めた場所へ漂っていく（相手は追いかけて殴る）
+            goal = wellAnchor.add(0, Math.sin(tickCount * 0.05) * 0.6, 0);
+        } else if (target != null && target.isAlive()) {
             Vec3 toward = target.position().subtract(h).multiply(1, 0, 1);
             double reach = Math.min(toward.length() - 5, ARENA_RADIUS / 2.0);
             if (reach > 0) {
@@ -314,7 +352,7 @@ public class GravityRemnant extends RuinBoss {
 
     /** 周りの相手を浮かせる。少しあとで床へ叩きつける。 */
     public void startFlip(ServerLevel level) {
-        flipCooldown = pace(FLIP_INTERVAL + random.nextInt(40));
+        flipCooldown = pace((BossScaling.hardMode() ? FLIP_INTERVAL : FLIP_INTERVAL_NORMAL) + random.nextInt(40));
         entityData.set(FLIP, flipHold());
         for (LivingEntity e : flipTargets(level)) {
             e.setDeltaMovement(e.getDeltaMovement().x * 0.3, LIFT_SPEED, e.getDeltaMovement().z * 0.3);
@@ -338,7 +376,13 @@ public class GravityRemnant extends RuinBoss {
                 continue;
             }
             e.setDeltaMovement(e.getDeltaMovement().x, -SLAM_SPEED, e.getDeltaMovement().z);
-            e.fallDistance = Math.max(e.fallDistance, SLAM_FALL);
+            if (BossScaling.hardMode()) {
+                e.fallDistance = Math.max(e.fallDistance, SLAM_FALL);
+            } else {
+                // 浮かされた高さの分も含めて、落下の高さをこれだけにそろえる
+                e.fallDistance = SLAM_FALL_NORMAL;
+            }
+            BossCombatLog.slammed(e, this, "slam_fall");
             e.hurtMarked = true;
             level.sendParticles(ParticleTypes.SQUID_INK, e.getX(), e.getY() + 1, e.getZ(), 10, 0.3, 0.5, 0.3, 0.02);
         }
@@ -358,6 +402,49 @@ public class GravityRemnant extends RuinBoss {
                         && !(e instanceof Player p && (p.isCreative() || p.isSpectator())));
     }
 
+    /** 重力井戸の周期を1 tick 進める。 */
+    private void tickWellCycle(ServerLevel level) {
+        int cycle = WELL_PULL_TICKS + WELL_CHARGE_TICKS + WELL_REST_TICKS;
+        int t = wellTick++ % cycle;
+        Vec3 c = position().add(0, getBbHeight() / 2, 0);
+        if (t < WELL_PULL_TICKS) {
+            tickWell(level);
+        } else if (t < WELL_PULL_TICKS + WELL_CHARGE_TICKS) {
+            // 溜め: 引き寄せは止まり、核に光が集まる
+            if (t == WELL_PULL_TICKS) {
+                level.playSound(null, blockPosition(), SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.HOSTILE, 2.0F, 0.6F);
+            }
+            level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 12, BURST_RADIUS * 0.5, 1.0, BURST_RADIUS * 0.5, 0.6);
+            if (t == WELL_PULL_TICKS + WELL_CHARGE_TICKS - 1) {
+                burst(level, c);
+            }
+        } else if (t == WELL_PULL_TICKS + WELL_CHARGE_TICKS) {
+            // 休む: 部屋の別の場所へ漂っていく
+            double a = random.nextDouble() * Math.PI * 2;
+            Vec3 h = home == null ? position() : Vec3.atBottomCenterOf(home).add(0, 1 + HOVER, 0);
+            wellAnchor = h.add(Math.cos(a) * WELL_SHIFT, 0, Math.sin(a) * WELL_SHIFT);
+        }
+    }
+
+    /** 溜めた重力を吹き出し、近くの相手を外へ飛ばす（防具で減るダメージ）。 */
+    private void burst(ServerLevel level, Vec3 c) {
+        level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.5F, 0.7F);
+        level.sendParticles(ParticleTypes.EXPLOSION, c.x, c.y, c.z, 3, 0.8, 0.5, 0.8, 0);
+        level.sendParticles(ParticleTypes.PORTAL, c.x, c.y, c.z, 80, BURST_RADIUS * 0.6, 1.0, BURST_RADIUS * 0.6, 1.2);
+        float damage = BossScaling.hardMode() ? BURST_DAMAGE : BURST_DAMAGE_NORMAL;
+        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(BURST_RADIUS),
+                e -> e != this && !RuinGuards.isGuard(e) && !(e instanceof Player p && (p.isCreative() || p.isSpectator())))) {
+            Vec3 away = e.position().subtract(c).multiply(1, 0, 1);
+            if (away.length() > BURST_RADIUS) {
+                continue;
+            }
+            hurtWith("well_burst", e, damageSources().mobAttack(this), damage);
+            Vec3 dir = away.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : away.normalize();
+            e.setDeltaMovement(dir.x * 1.4, 0.55, dir.z * 1.4);
+            e.hurtMarked = true;
+        }
+    }
+
     /** 重力井戸: 近くの相手を核へ引き寄せ、核に触れた相手を潮汐で傷つける。 */
     private void tickWell(ServerLevel level) {
         Vec3 c = position().add(0, getBbHeight() / 2, 0);
@@ -373,7 +460,7 @@ public class GravityRemnant extends RuinBoss {
             e.setDeltaMovement(e.getDeltaMovement().add(to.normalize().scale(pull * (1 - d / radius))));
             e.hurtMarked = true;
             if (d <= CORE_RADIUS && tickCount % 10 == 0) {
-                e.hurt(SinguloDamageTypes.tidal(level, this), CORE_DAMAGE);
+                hurtWith("core", e, SinguloDamageTypes.tidal(level, this), CORE_DAMAGE);
             }
         }
         if (tickCount % 4 == 0) {
@@ -384,6 +471,11 @@ public class GravityRemnant extends RuinBoss {
     }
 
     /** 殻がある間は受けるダメージが小さく、1撃ごとに殻が1つ剥がれる。 */
+    @Override
+    public String combatState() {
+        return super.combatState() + " shell=" + shell() + (wellOpen() ? " well" : "");
+    }
+
     @Override
     public boolean hurt(DamageSource source, float amount) {
         if (emergeTicks() > 0 || RuinGuards.friendlyFire(source) || isInvulnerableTo(source)) {

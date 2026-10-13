@@ -795,6 +795,10 @@
     "source": "Reactor Stabilizer Coil",
     "translation": "炉心稳定线圈"
   },
+  "block.singulo.reinforced_ruin_glass": {
+    "source": "Reinforced Ruin Glass",
+    "translation": "强化废墟玻璃"
+  },
   "block.singulo.rogue_black_hole": {
     "source": "Rogue Black Hole",
     "translation": "流浪黑洞"
@@ -1827,6 +1831,10 @@
     "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
     "translation": "古代的存储介质：用光把记录刻在玻璃之中。在档案终端读取后会加入手册。"
   },
+  "desc.singulo.reinforced_ruin_glass": {
+    "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
+    "translation": "嵌在沉没的炉心区封锁柱上的窗，用来承受反应炉的冲击。非常坚硬，爆炸也无法破坏。"
+  },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
     "translation": "存放废墟回收物的保管库。清空数天后内容会恢复（被移动过的不会）。漏斗和管道无法从中取出物品。"
@@ -2447,6 +2455,10 @@
     "source": "Then let me show you the last page.",
     "translation": "那么，就让你读到最后一页吧。"
   },
+  "gui.singulo.archivist.halo": {
+    "source": "The halo unravels into spreading rings... Jump the low ones, crouch under the high ones!",
+    "translation": "光环解开，化作圆环向外扩散……低的环跳过去，高的环蹲下穿过！"
+  },
   "gui.singulo.archivist.phase_2": {
     "source": "Do you remember? Every record is here.",
     "translation": "你还记得吗。所有的记录，都在这里。"
@@ -2474,6 +2486,14 @@
   "gui.singulo.archivist.tide_final": {
     "source": "There is nowhere left to fall.",
     "translation": "已经无处可坠了。"
+  },
+  "gui.singulo.archivist.wings": {
+    "source": "The Last Archivist spreads its six wings...",
+    "translation": "最后的记录者展开了六片羽翼……"
+  },
+  "gui.singulo.archivist.wings_hint": {
+    "source": "Stand in the shadow of a wing!",
+    "translation": "躲进羽翼的阴影里！"
   },
   "gui.singulo.boss.party": {
     "source": "%s [%s challengers]",
@@ -3155,6 +3175,22 @@
     "source": "The Leviathan shudders. Its reactor-plate scales burst away, baring a skeleton of light",
     "translation": "巨蛇浑身颤抖。炉壳的鳞片四散弹飞，露出了光之骨骼"
   },
+  "gui.singulo.leviathan.quake": {
+    "source": "The Leviathan rises and curls up... Jump over the shockwaves!",
+    "translation": "巨蛇高高升起，蜷起身体……冲击波到来时跳起来！"
+  },
+  "gui.singulo.leviathan.reignite": {
+    "source": "The dead core is waking...",
+    "translation": "停止的炉心之涡正在苏醒……"
+  },
+  "gui.singulo.leviathan.reignite_hint": {
+    "source": "Hide behind a containment pillar!",
+    "translation": "躲到封锁柱后面！"
+  },
+  "gui.singulo.leviathan.rift": {
+    "source": "Lines of light cross the floor... Get off them!",
+    "translation": "光线划过地面……快离开线上！"
+  },
   "gui.singulo.leviathan.submerge": {
     "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
     "translation": "巨蛇潜入了炉心的漩涡。漩涡扩张，光被吸了进去……"
@@ -3162,6 +3198,10 @@
   "gui.singulo.leviathan.swallow": {
     "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
     "translation": "——地板裂开，巨大的颚将它一口吞下。能层巨蛇现身了"
+  },
+  "gui.singulo.leviathan.tide": {
+    "source": "The core vortex opens and drags everything in... Run against the pull!",
+    "translation": "炉心之涡张开，吞噬一切……逆着引力向外跑！"
   },
   "gui.singulo.make_free.off": {
     "source": "Skips recipes without ingredients",
@@ -3832,8 +3872,8 @@
     "translation": "废墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns; guardians also reset if every challenger leaves.\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you), and its dives leave singularities behind. Drops Chapters of the Vortex.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "研究楼、封闭培养设施和最终实验室的保管库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间时，守卫也会复原。\n人数越多，守卫就越强：每多一名玩家，体力增加原本的一半，招式间隔也会稍微缩短（最多计算 6 人）。中途加入时体力比例保持不变，有人离开也不会变弱。相对地，掉落物会按战斗开始时的挑战者人数掉落（之后加入的人不会增加掉落）。多人攻击时，每个人的攻击都不会被他人挡住（同一个人连续攻击，仍需像以往一样稍作间隔）。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封闭培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。掉落简并核。\n- 视界守卫（最终实验室）：触碰中央的封印控制台即可唤醒。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。\n- 能层巨蛇（沉没的炉心区）：靠近球形收容室地板上停止运转的炉心，它就会现身。体力降到 2/3 和 1/3 时会改变形态（变化期间不会受伤）。它游过的轨迹会把你朝它游动的方向冲走：顺着水流追上去吧。尾部发金光的核心始终是弱点。\n  装甲：披着炉壳的鳞片，躯干坚硬。头部发出青光是冲撞的信号（离开被锁定的地方）；巨口张开时不要站在正前方（先吸过去，再吐出光束）。靠近尾巴会被横扫。\n  骨骼：把鳞片全部弹飞（靠近会受伤），化为光之骨骼，躯干也能造成全额伤害。它会在房间中央盘成一圈旋转，把你卷着冲走并发射光之碎片；靠近会被咬，冲撞会连续而来。\n  龙：潜入炉心的漩涡，化为黑龙喷涌而出。双角射出旋转的两道光束（相对论性喷流），在高空盘旋时向你脚下降下小型黑洞（光柱是预兆），冲撞的落点也会留下奇点。掉落漩涡断章。\n- 觉醒的守卫：击败回响守卫或重力残渣后，在房间地板上的守卫封印核心上使用觉醒回响核或觉醒重力核，即可再战（生命 2.5 倍、伤害 1.5 倍、招式更快、体力 65% 时狂暴）。回响守卫会多一个分身和一发光弹，狂暴时最多重新投影两个被破坏的投影器；重力残渣会射出更多瓦砾，重力井更大，并会连续砸地。离开房间时觉醒核会返还。"
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against the pull).\n  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "研究楼、封闭培养设施和最终实验室的保管库，在击败各自的守卫之前都被力场封锁。内容物再生后会重新封锁，守卫也会回来；所有挑战者离开房间后，守卫仍会停留 3 分钟（让倒下的人回来取装备），之后若无人返回才会复原。开启服务器设置 bossHardMode 后，守卫会变得更强。击败后的掉落物会出现在地板上的守卫封印核心（视界守卫为封印控制台）上方，经验则由房间内的挑战者平分并直接获得（经验修补依然有效）。\n人数越多，守卫就越强：每多一名玩家，体力增加原本的一半，招式间隔也会稍微缩短（最多计算 6 人）。中途加入时体力比例保持不变，有人离开也不会变弱。相对地，掉落物会按战斗开始时的挑战者人数掉落（之后加入的人不会增加掉落）。多人攻击时，每个人的攻击都不会被他人挡住（同一个人连续攻击，仍需像以往一样稍作间隔）。\n- 回响守卫（研究楼的档案室）：一进入房间就会出现的警卫全息影像。它在空中绕着你飞行并发射追踪光弹，一旦你不再看着它，就会瞬移到你背后斩击（瞬移前会聚集光芒）。回响投影器不仅保护守卫，还会一齐射出光之枪（出现金色瞄准线时要移动）；脚下映出光阵时，要在光柱升起前走出阵外。投影器剩得越多，攻击越难奏效，所以先把它们打掉。体力低于一半时会召唤一击即消的分身；投影器的光只会连向本体。掉落守卫投影核心。\n- 重力残渣（封闭培养设施的隔离槽室）：冲破收容槽而出的黑色核心。瓦砾外壳还在时受到的伤害较小，每受一击剥落一块；它会把瓦砾射向你。它会把周围的对手抬起再砸向地面，因此重力靴或冲击发电面板会很有帮助。体力低于一半时会形成重力井，把你拉向核心（碰到核心会受伤）。重力井在拉扯之后会蓄力（有光和声音预兆），把附近的对手弹飞，然后漂移到房间的其他位置。掉落简并核。\n- 视界守卫（最终实验室）：触碰中央的封印控制台即可唤醒。最后形态在你脚下展开的奇点会先预警 1 秒再开始牵引，请立刻离开。击败后，在控制台上使用觉醒记录核，即可与觉醒的守卫再战（生命 2.5 倍、伤害 1.5 倍、更快且更早进入后续阶段）。离开房间时记录核会返还。\n- 能层巨蛇（沉没的炉心区）：靠近球形收容室地板上停止运转的炉心，它就会现身。体力降到 2/3 和 1/3 时会改变形态（变化期间不会受伤）。它游过的轨迹会把你朝它游动的方向冲走：顺着水流追上去吧。尾部发金光的核心始终是弱点。\n  装甲：披着炉壳的鳞片，躯干坚硬。头部发出青光是冲撞的信号（离开被锁定的地方）；巨口张开时不要站在正前方（先吸过去，再吐出光束）。靠近尾巴会被横扫。冲撞掠过地面后，它会在地面附近停留片刻，正是反击的好机会。\n  骨骼：把鳞片全部弹飞（靠近会受伤），化为光之骨骼，躯干也能造成全额伤害。它会在房间中央盘成一圈旋转，把你卷着冲走并发射光之碎片；靠近会被咬，冲撞会连续而来。\n  龙：潜入炉心的漩涡，化为黑龙喷涌而出。双角射出旋转的两道光束（相对论性喷流），在高空盘旋时向你脚下降下小型黑洞（光柱是预兆），冲撞后停下的地方，会在它飞离时留下奇点。掉落漩涡断章。\n  任何形态：它高高升起并蜷起身体时，会砸向中心，两道冲击波沿地面扩散（波到来时跳起）。地面出现光线时，要在空间裂开前离开线上（共三次，每次改变方向）。骨骼与龙形态还会打开炉心之涡，把整个房间往里拉（靠近炉心会受伤，要逆着引力向外跑）。\n  炉心再点火：骨骼与龙形态会缠绕炉心蓄力，向整个房间释放冲击。出现预兆时，躲到封锁柱后面（柱上的强化废墟玻璃也能挡住冲击）。\n- 觉醒的守卫：击败回响守卫或重力残渣后，在房间地板上的守卫封印核心上使用觉醒回响核或觉醒重力核，即可再战（生命 2.5 倍、伤害 1.5 倍、招式更快、体力 65% 时狂暴）。回响守卫会多一个分身和一发光弹，狂暴时最多重新投影两个被破坏的投影器；重力残渣会射出更多瓦砾，重力井更大，并会连续砸地。离开房间时觉醒核会返还。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",

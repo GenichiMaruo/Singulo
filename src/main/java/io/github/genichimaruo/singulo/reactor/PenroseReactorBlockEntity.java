@@ -720,6 +720,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public static void returnRecord(ServerLevel level, Entity swallowed, Vec3 c, double horizon) {
         double chance = swallowed instanceof LivingEntity ? RECORD_FROM_MOB
                 : swallowed instanceof net.minecraft.world.entity.item.ItemEntity item && !EventHorizonTargets.isReturnedRecord(item)
+                        && !item.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
                 ? RECORD_FROM_ITEM : 0;
         if (chance <= 0 || level.random.nextDouble() >= chance) {
             return;

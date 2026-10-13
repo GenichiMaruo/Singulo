@@ -37,12 +37,17 @@ public final class BossScaling {
         return !ServerConfig.SPEC.isLoaded() || ServerConfig.BOSS_LOOT_PER_PLAYER.get();
     }
 
+    /** ボスのハードモード（設定 bossHardMode）。0.4.1 までの強さ（残響の番人の魔法が防具を貫く）。 */
+    public static boolean hardMode() {
+        return ServerConfig.SPEC.isLoaded() && ServerConfig.BOSS_HARD_MODE.get();
+    }
+
     /** ボスの経験値の倍率（設定 bossXpMultiplier）。 */
     public static double xpMultiplier() {
         return ServerConfig.SPEC.isLoaded() ? ServerConfig.BOSS_XP_MULTIPLIER.get() : 1.0;
     }
 
-    /** 倒したときに出る経験値の合計: 1人分 × 報酬に数える人数 × 倍率（オーブは皆で拾う）。 */
+    /** 倒したときに出る経験値の合計: 1人分 × 報酬に数える人数 × 倍率（部屋の挑戦者で等しく分ける）。 */
     public static int xp(int perPlayer, int players) {
         return (int) Math.min(Integer.MAX_VALUE, Math.round((double) perPlayer * lootRolls(players) * xpMultiplier()));
     }

@@ -357,6 +357,7 @@ public final class GeneratedContent {
             "pristine_ruin_pillar",
             "pristine_ruin_light",
             "intact_ruin_glass",
+            "reinforced_ruin_glass",
             "ruin_lamp",
             "ruin_lamp_amber",
             "ruin_lamp_verdant",

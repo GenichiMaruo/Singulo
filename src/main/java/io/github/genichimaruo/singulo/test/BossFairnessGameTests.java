@@ -218,7 +218,9 @@ public final class BossFairnessGameTests {
             LastArchivist reloaded = archivist(helper);
             reloaded.load(b.saveWithoutId(new CompoundTag()));
             double after = reloaded.effectiveMaxHealth();
-            helper.assertTrue(before > 12_000_000 && Math.abs(after - before) / before < 1e-3, "読み込み直すと硬さが変わる: " + before + " → " + after);
+            // 体力 100,000 × 通常の強さの倍率 × 32人ぶん（1 + 4 × 31）
+            helper.assertTrue(before > 100_000 * LastArchivist.NORMAL_HEALTH_FACTOR * 120 && Math.abs(after - before) / before < 1e-3,
+                    "読み込み直すと硬さが変わる: " + before + " → " + after);
             b.discard();
             reloaded.discard();
             var warden = SinguloEntities.HORIZON_WARDEN.get().create(helper.getLevel());

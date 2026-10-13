@@ -66,6 +66,8 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue BOSS_MAX_SCALED_PLAYERS;
     public static final ModConfigSpec.BooleanValue BOSS_LOOT_PER_PLAYER;
     public static final ModConfigSpec.DoubleValue BOSS_XP_MULTIPLIER;
+    public static final ModConfigSpec.BooleanValue BOSS_HARD_MODE;
+    public static final ModConfigSpec.BooleanValue BOSS_COMBAT_LOG;
     public static final ModConfigSpec.IntValue TEMPLATE_USES;
     public static final ModConfigSpec.IntValue SCULK_PER_SHARD;
     public static final ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS;
@@ -154,6 +156,8 @@ public final class ServerConfig {
         ModConfigSpec.IntValue BOSS_MAX_SCALED_PLAYERS_;
         ModConfigSpec.BooleanValue BOSS_LOOT_PER_PLAYER_;
         ModConfigSpec.DoubleValue BOSS_XP_MULTIPLIER_;
+        ModConfigSpec.BooleanValue BOSS_HARD_MODE_;
+        ModConfigSpec.BooleanValue BOSS_COMBAT_LOG_;
         ModConfigSpec.IntValue TEMPLATE_USES_;
         ModConfigSpec.IntValue SCULK_PER_SHARD_;
         ModConfigSpec.IntValue BLACK_HOLE_PULL_RADIUS_;
@@ -306,10 +310,14 @@ public final class ServerConfig {
         BOSS_PACE_PER_PLAYER_ = b.defineInRange("bossPacePerPlayer", 0.08, 0.0, 0.5);
         b.comment("ボスの強さに数える挑戦者の上限", "範囲: 1〜32（整数）");
         BOSS_MAX_SCALED_PLAYERS_ = b.defineInRange("bossMaxScaledPlayers", 6, 1, 32);
-        b.comment("ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）", "範囲: true / false");
+        b.comment("ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値の合計も。経験値は部屋の挑戦者で等しく分ける）", "範囲: true / false");
         BOSS_LOOT_PER_PLAYER_ = b.define("bossLootPerPlayer", true);
         b.comment("ボスを倒したときの経験値の倍率", "範囲: 0.0〜10.0");
         BOSS_XP_MULTIPLIER_ = b.defineInRange("bossXpMultiplier", 1.0, 0.0, 10.0);
+        b.comment("ボスのハードモード（0.4.1 までの体力とダメージを基準にした高難度。新しい技はそのまま使い、大蛇の光線などは通常より強い）", "範囲: true / false");
+        BOSS_HARD_MODE_ = b.define("bossHardMode", false);
+        b.comment("ボス戦で受けた・与えたダメージを logs/singulo-combat.log に記録するか（調整用）", "範囲: true / false");
+        BOSS_COMBAT_LOG_ = b.define("bossCombatLog", false);
         b.pop();
         b.push("echo");
         b.comment("型の残響の欠片が割れるまでの回数", "範囲: 1〜1000（整数）");
@@ -432,6 +440,8 @@ public final class ServerConfig {
         BOSS_MAX_SCALED_PLAYERS = BOSS_MAX_SCALED_PLAYERS_;
         BOSS_LOOT_PER_PLAYER = BOSS_LOOT_PER_PLAYER_;
         BOSS_XP_MULTIPLIER = BOSS_XP_MULTIPLIER_;
+        BOSS_HARD_MODE = BOSS_HARD_MODE_;
+        BOSS_COMBAT_LOG = BOSS_COMBAT_LOG_;
         TEMPLATE_USES = TEMPLATE_USES_;
         SCULK_PER_SHARD = SCULK_PER_SHARD_;
         BLACK_HOLE_PULL_RADIUS = BLACK_HOLE_PULL_RADIUS_;

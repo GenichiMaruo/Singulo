@@ -47,6 +47,8 @@ neoForge {
             gameDirectory = project.file('build/gametest')
             // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
             systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse(project.mod_id)
+            // テストは tick で数えるので、時計を速めても結果は変わらない（-PtestTickRate=20 で普通の速さ）
+            systemProperty 'singulo.gameTestTickRate', providers.gradleProperty('testTickRate').getOrElse('200')
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

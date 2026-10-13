@@ -85,6 +85,28 @@ public abstract class RuinBoss extends Monster {
     }
 
     /** 分身か（ボスバー・核への知らせ・ドロップがない）。 */
+    /** 戦いの記録（BossCombatLog）に書く、いま当てている技の名前（技を当てる間だけ）。 */
+    private String combatAttack;
+
+    public String combatAttack() {
+        return combatAttack;
+    }
+
+    /** 技の名前をつけてダメージを与える（戦いの記録に、どの技で受けたかを残す）。 */
+    protected boolean hurtWith(String attack, net.minecraft.world.entity.LivingEntity target, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        combatAttack = attack;
+        try {
+            return target.hurt(source, amount);
+        } finally {
+            combatAttack = null;
+        }
+    }
+
+    /** 戦いの記録に書く、ボスの今の様子（激昂・残っている仕掛けなど）。 */
+    public String combatState() {
+        return (awakened() ? "awakened " : "") + (getHealth() <= getMaxHealth() * 0.5F ? "half" : "");
+    }
+
     public boolean isMinion() {
         return false;
     }
@@ -153,6 +175,38 @@ public abstract class RuinBoss extends Monster {
         rescaleHealth(BossScaling.healthFactor(n) / BossScaling.healthFactor(participants));
         participants = n;
         setBarName(barName != null ? barName : getDisplayName());
+    }
+
+    // ------------------------------------------------------------------ 落とし物
+
+    /** 倒れたときの落とし物と経験値を出す場所（守る核の上。なければ倒れた場所）。宙で倒れても、床の穴へ落ちて失われないように。 */
+    protected net.minecraft.world.phys.Vec3 lootPos() {
+        return home != null ? net.minecraft.world.phys.Vec3.atBottomCenterOf(home.above()).add(0, 0.2, 0) : position();
+    }
+
+    @Override
+    public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(net.minecraft.world.item.ItemStack stack, float offsetY) {
+        if (isDeadOrDying() || isRemoved()) {
+            return BossLoot.drop(this, lootPos(), stack);
+        }
+        return super.spawnAtLocation(stack, offsetY);
+    }
+
+    @Override
+    protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
+        if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
+                || lastHurtByPlayerTime > 0 && shouldDropExperience()
+                && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
+            int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
+            BossLoot.experience(server, lootPos(), reward, rewardPlayers(server));
+        }
+    }
+
+    /** 経験値を受け取る、部屋にいる挑戦者（生きていて、クリエイティブ・観戦者でない）。 */
+    protected java.util.List<Player> rewardPlayers(ServerLevel level) {
+        net.minecraft.world.phys.AABB box = home != null ? new net.minecraft.world.phys.AABB(home).inflate(arenaRadius() + 4)
+                : getBoundingBox().inflate(32);
+        return level.getEntitiesOfClass(Player.class, box, BossLoot::recipient);
     }
 
     /** 挑戦者がいなくなってからの猶予を、次の確かめで終わるところまで進める（テスト用）。 */

@@ -64,10 +64,11 @@ public class LastArchivist extends RuinBoss {
     private static final EntityDataAccessor<Integer> MOVE = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MOVE_TICKS = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FLASH = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> JUDGE_COUNT = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> JUDGE_1 = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> JUDGE_2 = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> JUDGE_3 = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.VECTOR3);
+    /** 裁きの光の狙い（挑戦者ひとりにつき1本。x, y, z を並べた float のビット列）。 */
+    private static final EntityDataAccessor<net.minecraft.nbt.CompoundTag> JUDGE_POINTS = SynchedEntityData.defineId(LastArchivist.class,
+            EntityDataSerializers.COMPOUND_TAG);
+    /** 裁きの光の狙いの数の上限（大人数でも重くなりすぎないように）。 */
+    public static final int JUDGE_MAX = 16;
     /** 部屋の中心（封印コンソール）。部屋全体の演出をクライアントで描くのに使う。 */
     private static final EntityDataAccessor<java.util.Optional<BlockPos>> HOME = SynchedEntityData.defineId(LastArchivist.class,
             EntityDataSerializers.OPTIONAL_BLOCK_POS);
@@ -79,15 +80,45 @@ public class LastArchivist extends RuinBoss {
     private static final EntityDataAccessor<Integer> TIDE = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
     /** ブラックホール爆弾を吸い込んで回復している残り tick（演出用）。 */
     private static final EntityDataAccessor<Integer> ABSORB = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
+    /** 光輪の断罪: それぞれの輪が高いか（ビット）。翼の審判: 翼の向きの始まり（ラジアン）。どちらも見た目にも使う。 */
+    private static final EntityDataAccessor<Integer> HALO_PATTERN = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> WING_ANGLE = SynchedEntityData.defineId(LastArchivist.class, EntityDataSerializers.FLOAT);
 
-    public static final int NONE = 0, JUDGMENT = 1, VERDICT = 2, RECALL_ECHO = 3, RECALL_GRAVITY = 4, RECALL_HORIZON = 5, NOVA = 6, GRAVITY_TIDE = 7;
+    public static final int NONE = 0, JUDGMENT = 1, VERDICT = 2, RECALL_ECHO = 3, RECALL_GRAVITY = 4, RECALL_HORIZON = 5, NOVA = 6, GRAVITY_TIDE = 7, HALO_SWEEP = 8, WINGS = 9;
+    /**
+     * 光輪の断罪（追憶・終焉）: 光輪が水平の輪になって部屋の縁まで広がる。HALO_RINGS 個が HALO_GAP おきに続き、
+     * 低い輪（床から HALO_LOW）は跳んで越え、高い輪（床から HALO_HIGH）はしゃがんでくぐる。
+     */
+    public static final int HALO_WINDUP = 24, HALO_GAP = 18, HALO_RINGS = 3;
+    public static final double HALO_SPEED = 0.5, HALO_LOW = 0.45, HALO_HIGH = 1.62;
+    public static final float HALO_DAMAGE = 12, HALO_DAMAGE_NORMAL = 9;
+    /**
+     * 必殺技「翼の審判」（終焉）: 部屋の中央へ昇り、光の翼6枚を広げてゆっくり回す。床は光に満ち、翼の真下だけが影になる。
+     * WINGS_CHARGE tick 後、影（翼の向きから ±WINGS_SHADOW 度）の外にいる相手へ光が降り注ぐ。
+     */
+    public static final int WINGS_CHARGE = 140, WINGS_TICKS = 170, WINGS_INTERVAL = 800;
+    public static final float WINGS_TURN_DEG = 0.55F, WINGS_SHADOW = 11F;
+    public static final float WINGS_DAMAGE = 40, WINGS_DAMAGE_NORMAL = 30;
+    /** 裁きの光は、撃つこの tick 前まで相手を追い、そこで狙いを決める（音で分かる）。 */
+    public static final int JUDGE_LOCK = 8;
 
     /** 体力の既定値（設定 archivistHealth）。 */
     public static final double HEALTH = 2400;
+    /** 通常の強さの体力の倍率（archivistHealth に掛ける。ハードモードは1倍）。 */
+    public static final double NORMAL_HEALTH_FACTOR = 0.85;
+
+    /** いまの設定での体力の倍率（ハードモードは1倍）。 */
+    public static double healthFactor() {
+        return BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR;
+    }
     public static final int EMERGE_TICKS = 200, DEATH_TICKS = 200;
     public static final int ARENA = 18;
     /** 漂う高さ（コンソールの上面から）と、相手との間合い。 */
-    public static final double HOVER = 1.9, KEEP_DISTANCE = 7;
+    /**
+     * 漂う高さ（相手の足元か床から。足元の目の中へ入れて、剣が届く高さ）と、相手との間合い。
+     * 重力潮汐のあいだは KEEP_DISTANCE_TIDE まで近づく（浮いていても殴れるように）。
+     */
+    public static final double HOVER = 1.4, KEEP_DISTANCE = 7, KEEP_DISTANCE_TIDE = 2.5;
     public static final float HOVER_F = (float) HOVER;
     /** 体の各部の高さ（足元から）。 */
     public static final double HEAD_Y = 2.78, HALO_Y = 2.85, CHEST_Y = 2.2;
@@ -149,6 +180,12 @@ public class LastArchivist extends RuinBoss {
     public static final int LOGIN_GRACE = 100;
     private int bumpSoundCooldown;
     private int tideGrace;
+    /** 翼の審判までの残り（終焉のときだけ減る）。 */
+    private int wingsTimer = 200;
+    /** 裁きの光を続けて撃ったか。 */
+    private boolean judgeRepeated;
+    /** 光輪の断罪: それぞれの輪に当たった相手。 */
+    private final List<Set<UUID>> haloHit = List.of(new HashSet<>(), new HashSet<>(), new HashSet<>());
     /** 重力潮汐で重力を変えたプレイヤー（どこへ行っても、潮汐が終われば必ず元に戻す）。 */
     private final Set<UUID> tideAffected = new HashSet<>();
     /** 床の欠けた所に置いたホログラムの床と、そこにもとあったもの（水・草など。消すときに戻す）。 */
@@ -159,7 +196,8 @@ public class LastArchivist extends RuinBoss {
         this.xpReward = 5000;
         this.noPhysics = true;
         setNoGravity(true);
-        setEffectiveHealth(ServerConfig.SPEC.isLoaded() ? ServerConfig.ARCHIVIST_HEALTH.get() : HEALTH);
+        setEffectiveHealth((ServerConfig.SPEC.isLoaded() ? ServerConfig.ARCHIVIST_HEALTH.get() : HEALTH)
+                * (BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -179,15 +217,14 @@ public class LastArchivist extends RuinBoss {
         builder.define(MOVE, NONE);
         builder.define(MOVE_TICKS, 0);
         builder.define(FLASH, 0);
-        builder.define(JUDGE_COUNT, 0);
-        builder.define(JUDGE_1, new Vector3f());
-        builder.define(JUDGE_2, new Vector3f());
-        builder.define(JUDGE_3, new Vector3f());
+        builder.define(JUDGE_POINTS, new net.minecraft.nbt.CompoundTag());
         builder.define(HOME, java.util.Optional.empty());
         builder.define(SHIELD, 0);
         builder.define(SHIELD_HIT, 0);
         builder.define(TIDE, 0);
         builder.define(ABSORB, 0);
+        builder.define(HALO_PATTERN, 0);
+        builder.define(WING_ANGLE, 0F);
     }
 
     @Override
@@ -205,6 +242,11 @@ public class LastArchivist extends RuinBoss {
         return ARENA;
     }
 
+    @Override
+    public String combatState() {
+        return super.combatState() + " phase=" + phase();
+    }
+
     public int phase() {
         return entityData.get(PHASE);
     }
@@ -217,20 +259,32 @@ public class LastArchivist extends RuinBoss {
         return entityData.get(MOVE_TICKS);
     }
 
+    /** 光輪の断罪: i 番目の輪が高い輪か。 */
+    public boolean haloHigh(int i) {
+        return (entityData.get(HALO_PATTERN) >> i & 1) != 0;
+    }
+
+    /** 翼の審判: いまの翼の向き（ラジアン。elapsed は始まってからの tick）。 */
+    public double wingAngle(float elapsed) {
+        return entityData.get(WING_ANGLE) + Math.toRadians(WINGS_TURN_DEG * elapsed);
+    }
+
+    /** 床の上面の高さ（部屋の演出の基準）。 */
+    public static double arenaFloor(BlockPos console) {
+        return floorY(console) + 1;
+    }
+
     /** 裁きの光を放った光が残る tick。 */
     public int flash() {
         return entityData.get(FLASH);
     }
 
-    /** 裁きの光の狙い（0〜3個）。 */
+    /** 裁きの光の狙い（挑戦者ひとりにつき1つ。1人のときは、その人と左右）。 */
     public List<Vec3> judgePoints() {
         List<Vec3> out = new ArrayList<>();
-        int n = entityData.get(JUDGE_COUNT);
-        EntityDataAccessor<?>[] keys = {JUDGE_1, JUDGE_2, JUDGE_3};
-        for (int i = 0; i < n && i < 3; i++) {
-            @SuppressWarnings("unchecked")
-            Vector3f v = entityData.get((EntityDataAccessor<Vector3f>) keys[i]);
-            out.add(new Vec3(v.x, v.y, v.z));
+        int[] v = entityData.get(JUDGE_POINTS).getIntArray("p");
+        for (int i = 0; i + 2 < v.length; i += 3) {
+            out.add(new Vec3(Float.intBitsToFloat(v[i]), Float.intBitsToFloat(v[i + 1]), Float.intBitsToFloat(v[i + 2])));
         }
         return out;
     }
@@ -388,6 +442,9 @@ public class LastArchivist extends RuinBoss {
         }
         ServerLevel level = (ServerLevel) level();
         updatePhase(level);
+        if (phase() == 3 && move() != WINGS && wingsTimer > 0) {
+            wingsTimer--;
+        }
         LivingEntity target = getTarget();
         if (target != null && (!target.isAlive() || !challenger(target))) {
             target = null;
@@ -427,20 +484,28 @@ public class LastArchivist extends RuinBoss {
         moveCooldown = 30;
     }
 
-    /** コンソールの上を漂い、相手と間合いを取って回り込む。 */
+    /**
+     * 相手と間合いを取って回り込む。高さは相手の足元（床より下へは行かない）から HOVER 上で、下の壇やコンソールには
+     * めり込まない。重力潮汐のあいだは近づく。
+     */
     private void drift(LivingEntity target) {
         Vec3 h = Vec3.atBottomCenterOf(home).add(0, 1 + HOVER, 0);
         Vec3 goal = h;
-        if (target != null) {
+        if (move() == WINGS) {
+            goal = shieldCenter(home).add(0, 6, 0);
+        } else if (target != null) {
             Vec3 off = position().subtract(target.position()).multiply(1, 0, 1);
             off = off.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : off.normalize();
             off = off.yRot(0.01F * (phase() + 1));
-            goal = target.position().add(off.scale(KEEP_DISTANCE)).add(0, HOVER, 0);
+            boolean tide = tideTicks() > 0 || tideGrace > 0;
+            goal = target.position().add(off.scale(tide ? KEEP_DISTANCE_TIDE : KEEP_DISTANCE));
             Vec3 fromHome = goal.subtract(h).multiply(1, 0, 1);
             if (fromHome.length() > ARENA - 5) {
                 goal = h.add(fromHome.normalize().scale(ARENA - 5)).add(0, goal.y - h.y, 0);
             }
-            goal = new Vec3(goal.x, h.y + Math.sin(tickCount * 0.05) * 0.5, goal.z);
+            double base = Math.max(target.getY(), floorY(home) + 1);
+            double y = Math.max(base, groundBelow(goal.x, goal.z, base + 3)) + HOVER + Math.sin(tickCount * 0.05) * 0.3;
+            goal = new Vec3(goal.x, y, goal.z);
             getLookControl().setLookAt(target, 30, 30);
             float yaw = (float) (Mth.atan2(target.getZ() - getZ(), target.getX() - getX()) * Mth.RAD_TO_DEG) - 90;
             setYRot(yaw);
@@ -462,18 +527,22 @@ public class LastArchivist extends RuinBoss {
         if (phase() == 1) {
             kind = step % 2 == 0 ? JUDGMENT : VERDICT;
         } else if (phase() == 2) {
-            kind = switch (step % 5) {
+            kind = switch (step % 6) {
                 case 0 -> JUDGMENT;
+                case 1 -> HALO_SWEEP;
                 case 2 -> GRAVITY_TIDE;
                 case 3 -> VERDICT;
                 default -> nextRecall();
             };
+        } else if (wingsTimer <= 0) {
+            kind = WINGS;
         } else {
-            kind = switch (step % 5) {
+            kind = switch (step % 6) {
                 case 0 -> NOVA;
                 case 1 -> JUDGMENT;
                 case 2 -> GRAVITY_TIDE;
                 case 3 -> nextRecall();
+                case 4 -> HALO_SWEEP;
                 default -> VERDICT;
             };
         }
@@ -500,7 +569,145 @@ public class LastArchivist extends RuinBoss {
                 startTide(level);
                 moveCooldown = pace(30);
             }
+            case HALO_SWEEP -> startHaloSweep(level);
+            case WINGS -> startWings(level);
             default -> { }
+        }
+    }
+
+    // ---- 光輪の断罪
+
+    private void startHaloSweep(ServerLevel level) {
+        int pattern = 0;
+        for (int i = 0; i < HALO_RINGS; i++) {
+            if (random.nextBoolean()) {
+                pattern |= 1 << i;
+            }
+        }
+        // 3つとも同じ高さにはしない
+        if (pattern == 0 || pattern == (1 << HALO_RINGS) - 1) {
+            pattern ^= 1 << random.nextInt(HALO_RINGS);
+        }
+        entityData.set(HALO_PATTERN, pattern);
+        for (int i = 0; i < HALO_RINGS; i++) {
+            haloHit.get(i).clear();
+        }
+        setMove(HALO_SWEEP, haloTicks());
+        actionBar(level, "gui.singulo.archivist.halo");
+        playSound(SinguloSounds.get("last_archivist.recall"), 4.0F, 1.4F);
+    }
+
+    /** 光輪の断罪の長さ（最後の輪が部屋の縁に届くまで）。 */
+    public static int haloTicks() {
+        return HALO_WINDUP + (HALO_RINGS - 1) * HALO_GAP + (int) Math.ceil((SHIELD_RADIUS + 1) / HALO_SPEED);
+    }
+
+    /** i 番目の輪の半径（まだ出ていなければ負）。elapsed は始まってからの tick。 */
+    public static double haloRadius(int i, float elapsed) {
+        return (elapsed - HALO_WINDUP - i * HALO_GAP) * HALO_SPEED;
+    }
+
+    private void tickHaloSweep(ServerLevel level, int left) {
+        if (home == null) {
+            return;
+        }
+        float elapsed = haloTicks() - left;
+        Vec3 c = shieldCenter(home);
+        double floor = arenaFloor(home);
+        float damage = BossScaling.hardMode() ? HALO_DAMAGE : HALO_DAMAGE_NORMAL;
+        for (int i = 0; i < HALO_RINGS; i++) {
+            double r = haloRadius(i, elapsed);
+            if (r < 0 || r > SHIELD_RADIUS + 1) {
+                continue;
+            }
+            if (Math.abs(r - Math.round(r)) < HALO_SPEED / 2 && (int) Math.round(r) % 4 == 0) {
+                playSound(SinguloSounds.get("last_archivist.judgment_fire"), 1.5F, 1.6F + i * 0.1F);
+            }
+            double y = floor + (haloHigh(i) ? HALO_HIGH : HALO_LOW);
+            for (Player p : challengers(level)) {
+                double d = Math.hypot(p.getX() - c.x, p.getZ() - c.z);
+                net.minecraft.world.phys.AABB box = p.getBoundingBox();
+                if (Math.abs(d - r) > 0.7 || y < box.minY || y > box.maxY || !haloHit.get(i).add(p.getUUID())) {
+                    continue;
+                }
+                hurtWith("halo_sweep", p, SinguloDamageTypes.tidal(level, this), damage);
+                Vec3 k = p.position().subtract(c).multiply(1, 0, 1);
+                if (k.lengthSqr() > 1e-4) {
+                    k = k.normalize();
+                    p.push(k.x * 0.8, 0.3, k.z * 0.8);
+                    p.hurtMarked = true;
+                }
+            }
+        }
+    }
+
+    // ---- 翼の審判
+
+    private void startWings(ServerLevel level) {
+        wingsTimer = pace(WINGS_INTERVAL);
+        entityData.set(WING_ANGLE, (float) (random.nextDouble() * Math.PI * 2));
+        setMove(WINGS, WINGS_TICKS);
+        showTitle(level, "gui.singulo.archivist.wings", "gui.singulo.archivist.wings_hint");
+        playSound(SinguloSounds.get("last_archivist.phase"), 5.0F, 0.6F);
+    }
+
+    /** 相手が翼の影（翼の向きから ±WINGS_SHADOW 度）の中にいるか。 */
+    private boolean inWingShadow(Player p, Vec3 c, float elapsed) {
+        double a = Math.atan2(p.getZ() - c.z, p.getX() - c.x);
+        double base = wingAngle(elapsed);
+        for (int w = 0; w < 6; w++) {
+            double diff = Mth.wrapDegrees(Math.toDegrees(a - base) - w * 60.0);
+            if (Math.abs(diff) <= WINGS_SHADOW) {
+                return true;
+            }
+        }
+        return Math.hypot(p.getX() - c.x, p.getZ() - c.z) < 1.5;     // 真下も影
+    }
+
+    private void tickWings(ServerLevel level, int left) {
+        if (home == null) {
+            return;
+        }
+        float elapsed = WINGS_TICKS - left;
+        Vec3 c = shieldCenter(home);
+        if (elapsed % 20 == 0 && elapsed < WINGS_CHARGE) {
+            playSound(SinguloSounds.get("last_archivist.judgment_aim"), 4.0F, 0.5F + elapsed / WINGS_CHARGE);
+        }
+        if (elapsed == WINGS_CHARGE - 30) {
+            playSound(SinguloSounds.get("last_archivist.nova_charge"), 5.0F, 0.8F);
+        }
+        if (elapsed == WINGS_CHARGE) {
+            playSound(SinguloSounds.get("last_archivist.nova"), 6.0F, 0.7F);
+            level.playSound(null, c.x, c.y, c.z, net.minecraft.sounds.SoundEvents.WARDEN_SONIC_BOOM,
+                    net.minecraft.sounds.SoundSource.HOSTILE, 5.0F, 0.6F);
+            float damage = BossScaling.hardMode() ? WINGS_DAMAGE : WINGS_DAMAGE_NORMAL;
+            for (Player p : challengers(level)) {
+                if (inWingShadow(p, c, elapsed)) {
+                    continue;
+                }
+                hurtWith("wings", p, SinguloDamageTypes.tidal(level, this), damage);
+                p.push(0, 0.6, 0);
+                p.hurtMarked = true;
+            }
+        }
+    }
+
+    /** 挑戦者の画面に大きな文字（題と、よけ方の手がかり）を出す。 */
+    private void showTitle(ServerLevel level, String title, String hint) {
+        for (Player p : challengers(level)) {
+            if (p instanceof ServerPlayer sp) {
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket(5, 80, 15));
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket(Component.translatable(hint)));
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket(Component.translatable(title)));
+            }
+        }
+    }
+
+    /** 挑戦者のホットバーの上に文字を出す。 */
+    private void actionBar(ServerLevel level, String key) {
+        Component msg = Component.translatable(key);
+        for (Player p : challengers(level)) {
+            p.displayClientMessage(msg, true);
         }
     }
 
@@ -529,10 +736,26 @@ public class LastArchivist extends RuinBoss {
             }
             case RECALL_HORIZON -> tickHorizonRing(level, left);
             case NOVA -> tickNova(level, left);
+            case HALO_SWEEP -> tickHaloSweep(level, left);
+            case WINGS -> tickWings(level, left);
             default -> { }
         }
+        if (move() == JUDGMENT && left > JUDGE_LOCK) {
+            // 撃つ直前まで相手を追う
+            aimJudgment(level, target);
+        } else if (move() == JUDGMENT && left == JUDGE_LOCK) {
+            playSound(SinguloSounds.get("last_archivist.judgment_aim"), 3.0F, 1.8F);
+        }
         if (left <= 0) {
-            setMove(NONE, 0);
+            if (move() == JUDGMENT && phase() >= 2 && !judgeRepeated) {
+                // 追憶からは2度続けて撃つ
+                judgeRepeated = true;
+                setMove(JUDGMENT, pace(JUDGE_WINDUP * 2 / 3));
+                playSound(SinguloSounds.get("last_archivist.judgment_aim"), 3.0F, 1.2F);
+            } else {
+                judgeRepeated = false;
+                setMove(NONE, 0);
+            }
         }
     }
 
@@ -540,10 +763,17 @@ public class LastArchivist extends RuinBoss {
 
     /** 光輪の放射が相手を狙う（相手が1人なら、今の位置と、動いた先の左右）。狙いは始めたときに決まる。 */
     public void startJudgment(ServerLevel level, LivingEntity target) {
+        aimJudgment(level, target);
+        setMove(JUDGMENT, pace(JUDGE_WINDUP));
+        playSound(SinguloSounds.get("last_archivist.judgment_aim"), 3.0F, 1.0F);
+    }
+
+    /** 裁きの光の狙いを、いまの挑戦者の位置に合わせる（全員に1本ずつ。相手が1人なら、その左右も）。 */
+    private void aimJudgment(ServerLevel level, @javax.annotation.Nullable LivingEntity target) {
         List<Vec3> points = new ArrayList<>();
         List<Player> players = challengers(level);
         for (Player p : players) {
-            if (points.size() < 3) {
+            if (points.size() < JUDGE_MAX) {
                 points.add(p.getBoundingBox().getCenter());
             }
         }
@@ -555,18 +785,21 @@ public class LastArchivist extends RuinBoss {
             points.add(at.add(side.scale(-2.6)));
         }
         if (points.isEmpty()) {
+            if (target == null) {
+                return;
+            }
             points.add(target.getBoundingBox().getCenter());
         }
-        EntityDataAccessor<?>[] keys = {JUDGE_1, JUDGE_2, JUDGE_3};
+        int[] v = new int[points.size() * 3];
         for (int i = 0; i < points.size(); i++) {
             Vec3 p = points.get(i);
-            @SuppressWarnings("unchecked")
-            EntityDataAccessor<Vector3f> key = (EntityDataAccessor<Vector3f>) keys[i];
-            entityData.set(key, new Vector3f((float) p.x, (float) p.y, (float) p.z));
+            v[i * 3] = Float.floatToIntBits((float) p.x);
+            v[i * 3 + 1] = Float.floatToIntBits((float) p.y);
+            v[i * 3 + 2] = Float.floatToIntBits((float) p.z);
         }
-        entityData.set(JUDGE_COUNT, points.size());
-        setMove(JUDGMENT, pace(JUDGE_WINDUP));
-        playSound(SinguloSounds.get("last_archivist.judgment_aim"), 3.0F, 1.0F);
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        tag.putIntArray("p", v);
+        entityData.set(JUDGE_POINTS, tag);
     }
 
     private void fireJudgment(ServerLevel level) {
@@ -579,7 +812,7 @@ public class LastArchivist extends RuinBoss {
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(from, end).inflate(1.2),
                     e -> e.isAlive() && e != this && !RuinGuards.isGuard(e))) {
                 if (!e.getBoundingBox().inflate(0.5).clip(from, end).isEmpty()) {
-                    e.hurt(damageSources().indirectMagic(this, this), JUDGE_DAMAGE);
+                    hurtWith("judgment", e, damageSources().indirectMagic(this, this), JUDGE_DAMAGE);
                 }
             }
             for (int i = 0; i <= 20; i++) {
@@ -590,7 +823,7 @@ public class LastArchivist extends RuinBoss {
             // 着いた所: 光が弾けて、まわりも焼く
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(end, end).inflate(JUDGE_SPLASH),
                     e -> e.isAlive() && e != this && !RuinGuards.isGuard(e) && e.distanceToSqr(end) <= JUDGE_SPLASH * JUDGE_SPLASH)) {
-                e.hurt(damageSources().indirectMagic(this, this), JUDGE_DAMAGE * 0.6F);
+                hurtWith("judgment_splash", e, damageSources().indirectMagic(this, this), JUDGE_DAMAGE * 0.6F);
             }
             level.sendParticles(ParticleTypes.EXPLOSION, end.x, end.y, end.z, 2, 0.4, 0.2, 0.4, 0);
             level.sendParticles(ParticleTypes.END_ROD, end.x, end.y + 0.2, end.z, 40, 0.2, 0.1, 0.2, 0.35);
@@ -674,7 +907,7 @@ public class LastArchivist extends RuinBoss {
                     0, Math.cos(a), 0.05, Math.sin(a), 0.4);
         }
         for (Player p : challengers(level)) {
-            if (p.distanceTo(this) <= 4.5 && p.hurt(damageSources().mobAttack(this), ECHO_DAMAGE)) {
+            if (p.distanceTo(this) <= 4.5 && hurtWith("echo_strike", p, damageSources().mobAttack(this), ECHO_DAMAGE)) {
                 Vec3 k = p.position().subtract(position()).multiply(1, 0, 1);
                 if (k.lengthSqr() > 1e-4) {
                     p.knockback(0.8, -k.normalize().x, -k.normalize().z);
@@ -702,6 +935,7 @@ public class LastArchivist extends RuinBoss {
             if (p.distanceTo(this) <= 20 && !p.onGround()) {
                 p.setDeltaMovement(p.getDeltaMovement().x, -3.0, p.getDeltaMovement().z);
                 p.fallDistance = Math.max(p.fallDistance, 8);
+                BossCombatLog.slammed(p, this, "gravity_slam_fall");
                 p.hurtMarked = true;
             }
         }
@@ -733,7 +967,7 @@ public class LastArchivist extends RuinBoss {
         for (Player p : challengers(level)) {
             double d = Math.hypot(p.getX() - c.x, p.getZ() - c.z);
             if (Math.abs(d - r) < 1.2 && p.onGround() && ringHit.add(p.getUUID())) {
-                p.hurt(damageSources().mobAttack(this), HORIZON_DAMAGE);
+                hurtWith("horizon_ring", p, damageSources().mobAttack(this), HORIZON_DAMAGE);
                 p.push(0, 0.4, 0);
                 p.hurtMarked = true;
             }
@@ -759,7 +993,7 @@ public class LastArchivist extends RuinBoss {
             p.setDeltaMovement(p.getDeltaMovement().add(to.normalize().scale(0.02 * (1 - d / PULL_RADIUS))));
             p.hurtMarked = true;
             if (d <= CORE_RADIUS && tickCount % 10 == 0) {
-                p.hurt(SinguloDamageTypes.tidal(level, this), CORE_DAMAGE);
+                hurtWith("event_horizon", p, SinguloDamageTypes.tidal(level, this), CORE_DAMAGE);
             }
         }
     }
@@ -787,7 +1021,7 @@ public class LastArchivist extends RuinBoss {
         for (Player p : challengers(level)) {
             double d = p.position().add(0, 1, 0).distanceTo(c);
             if (Math.abs(d - r) < 1.5 && ringHit.add(p.getUUID())) {
-                p.hurt(damageSources().indirectMagic(this, this), NOVA_DAMAGE);
+                hurtWith("nova", p, damageSources().indirectMagic(this, this), NOVA_DAMAGE);
                 Vec3 k = p.position().subtract(c).normalize();
                 p.push(k.x, 0.5, k.z);
                 p.hurtMarked = true;
@@ -988,6 +1222,19 @@ public class LastArchivist extends RuinBoss {
         level.playSound(null, blockPosition(), net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, SoundSource.HOSTILE, 2.5F, 0.7F);
     }
 
+    /** (x, z) の真下の、足場の上面の高さ（from から床までを調べる。なければ床）。 */
+    private double groundBelow(double x, double z, double from) {
+        int floor = floorY(home) + 1;
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int y = (int) Math.floor(from); y >= floor; y--) {
+            p.set(Mth.floor(x), y, Mth.floor(z));
+            if (!level().getBlockState(p).getCollisionShape(level(), p).isEmpty()) {
+                return y + 1;
+            }
+        }
+        return floor;
+    }
+
     // ---- 重力潮汐（部屋全体の重力のゆがみ）
 
     /** 部屋じゅうの相手を宙へ浮かせ、そのあとしばらく低重力にする（終焉では高く、長く浮かせる）。 */
@@ -1009,7 +1256,8 @@ public class LastArchivist extends RuinBoss {
             for (Player p : arenaPlayers(level)) {
                 if (lifting) {
                     Vec3 v = p.getDeltaMovement();
-                    p.setDeltaMovement(v.x * 0.92, Mth.lerp(0.25, v.y, rise), v.z * 0.92);
+                    // 浮かせるのは上向きだけ（横には動ける）
+                    p.setDeltaMovement(v.x, Mth.lerp(0.25, v.y, rise), v.z);
                     p.hurtMarked = true;
                 }
                 p.fallDistance = 0;

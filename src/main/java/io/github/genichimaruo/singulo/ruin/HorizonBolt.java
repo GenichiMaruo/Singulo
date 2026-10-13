@@ -37,6 +37,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
     private float damage = DAMAGE;
     /** 防具と盾を無視する光弾か（ウォーデンのフェーズ2から）。 */
     private boolean piercing;
+    private boolean armored;
 
     public HorizonBolt(EntityType<? extends HorizonBolt> type, Level level) {
         super(type, level);
@@ -53,12 +54,24 @@ public class HorizonBolt extends ThrowableItemProjectile {
     }
 
     /** 防具と盾を無視する光弾にする。 */
+    /** 防具で減る弾にする（普通の飛び道具のダメージ）。既定は魔法（防具を貫く）。 */
+    public HorizonBolt armored(boolean on) {
+        this.armored = on;
+        return this;
+    }
+
     public HorizonBolt piercing(boolean on) {
         this.piercing = on;
         return this;
     }
 
     /** 色（0xRRGGBB）・大きさ（1 が標準）・ダメージを決める。 */
+    /** 当たったときのダメージだけを変える。 */
+    public HorizonBolt power(float damage) {
+        this.damage = damage;
+        return this;
+    }
+
     public HorizonBolt style(int rgb, float size, float damage) {
         entityData.set(COLOR, rgb);
         entityData.set(SIZE, size);
@@ -109,12 +122,41 @@ public class HorizonBolt extends ThrowableItemProjectile {
         }
     }
 
+    /** ダメージと当たり方（防具を貫くか・防具で減るか）を保存する。読み込み直しても同じ強さで当たる。 */
+    @Override
+    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putFloat("damage", damage);
+        tag.putBoolean("armored", armored);
+        tag.putBoolean("piercing", piercing);
+    }
+
+    @Override
+    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        // 0.5.0 より前に保存された光弾は、ダメージを持たない（既定の値のまま）
+        if (tag.contains("damage")) {
+            damage = tag.getFloat("damage");
+        }
+        armored = tag.getBoolean("armored");
+        piercing = tag.getBoolean("piercing");
+    }
+
+    public float damage() {
+        return damage;
+    }
+
+    public boolean armored() {
+        return armored;
+    }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         Entity hit = result.getEntity();
         if (hit != getOwner() && !RuinGuards.isGuard(hit)) {
             hit.hurt(piercing ? io.github.genichimaruo.singulo.registry.SinguloDamageTypes.tidal(level(), getOwner())
+                    : armored ? damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null)
                     : damageSources().indirectMagic(this, getOwner()), damage);
         }
     }

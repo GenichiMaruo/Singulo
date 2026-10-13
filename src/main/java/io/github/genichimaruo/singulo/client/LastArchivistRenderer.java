@@ -41,8 +41,8 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
     static final int HORIZON = 0xBFD8FF;
     /** 衣の高さ: 裾・肩・襟。 */
     static final float HEM_Y = 0.35F, SHOULDER_Y = 2.0F, COLLAR_Y = 2.45F;
-    /** 足元から見た床（コンソールの上面）の高さ。 */
-    static final float FLOOR = -(1 + LastArchivist.HOVER_F) + 0.08F;
+    /** 足元から見た地面の高さ（相手の足元か床から HOVER 上に浮いている）。 */
+    static final float FLOOR = -LastArchivist.HOVER_F + 0.08F;
 
     public LastArchivistRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -646,12 +646,101 @@ public class LastArchivistRenderer extends EntityRenderer<LastArchivist> {
 
     // ------------------------------------------------------------------ 技
 
+    /**
+     * 光輪の断罪: 部屋の中央から広がる水平の光の輪（高い輪と低い輪）。出る前は、中央に小さな輪を高さごとに重ねて予告する。
+     */
+    private static void haloSweep(LastArchivist e, net.minecraft.core.BlockPos home, float left, float t, Vec3 origin, PoseStack pose,
+                                  VertexConsumer glow) {
+        float elapsed = LastArchivist.haloTicks() - left;
+        Vec3 c = LastArchivist.shieldCenter(home);
+        double floor = LastArchivist.arenaFloor(home);
+        for (int i = 0; i < LastArchivist.HALO_RINGS; i++) {
+            double r = LastArchivist.haloRadius(i, elapsed);
+            double y = floor + (e.haloHigh(i) ? LastArchivist.HALO_HIGH : LastArchivist.HALO_LOW);
+            if (r > LastArchivist.SHIELD_RADIUS + 1) {
+                continue;
+            }
+            pose.pushPose();
+            pose.translate(c.x - origin.x, y - origin.y, c.z - origin.z);
+            if (r < 0) {
+                // 予告: 中央に、その高さの小さな輪が光る（近い順に明るい）
+                float pulse = 0.6F + 0.4F * Mth.sin(t * 0.6F + i);
+                float rr = 1.2F + i * 0.5F;
+                FxDraw.ring(pose.last(), glow, rr - 0.25F, rr + 0.25F, e.haloHigh(i) ? CRYSTAL : GOLD, (int) (200 * pulse), 0);
+            } else {
+                float rr = (float) r;
+                int rgb = e.haloHigh(i) ? CRYSTAL : GOLD;
+                FxDraw.ring(pose.last(), glow, Math.max(0, rr - 0.9F), rr, rgb, 0, 230);
+                FxDraw.ring(pose.last(), glow, rr, rr + 0.35F, 0xFFFFFF, 255, 0);
+                pose.translate(0, 0.12, 0);
+                FxDraw.ring(pose.last(), glow, Math.max(0, rr - 0.3F), rr + 0.2F, rgb, 120, 0);
+                pose.translate(0, -0.24, 0);
+                FxDraw.ring(pose.last(), glow, Math.max(0, rr - 0.3F), rr + 0.2F, rgb, 120, 0);
+            }
+            pose.popPose();
+        }
+    }
+
+    /**
+     * 翼の審判: 部屋いっぱいに広がる6枚の光の翼。床は光に満ち、翼の真下だけが紫の影になる（翼と一緒に回る）。
+     * 光が降り注ぐと、影の外に光の柱が立ち並んで消えていく。
+     */
+    private static void wingsOfJudgment(LastArchivist e, net.minecraft.core.BlockPos home, float left, float t, Vec3 origin,
+                                        PoseStack pose, VertexConsumer glow) {
+        float elapsed = LastArchivist.WINGS_TICKS - left;
+        Vec3 c = LastArchivist.shieldCenter(home);
+        double floor = LastArchivist.arenaFloor(home) + 0.06;
+        double base = e.wingAngle(elapsed);
+        boolean fired = elapsed >= LastArchivist.WINGS_CHARGE;
+        float charge = Mth.clamp(elapsed / LastArchivist.WINGS_CHARGE, 0, 1);
+        float fade = fired ? Mth.clamp(1 - (elapsed - LastArchivist.WINGS_CHARGE) / (LastArchivist.WINGS_TICKS - LastArchivist.WINGS_CHARGE), 0, 1)
+                : Mth.clamp(elapsed / 15F, 0, 1);
+        double reach = LastArchivist.SHIELD_RADIUS - 0.5;
+        Vec3 chest = e.chest().subtract(origin);
+        // 6枚の光の翼
+        for (int w = 0; w < 6; w++) {
+            double a = base + w * Math.PI / 3;
+            Vec3 tip = chest.add(Math.cos(a) * reach, 1.2 + 0.4 * Math.sin(t * 0.2 + w), Math.sin(a) * reach);
+            FxDraw.beam(pose.last(), glow, chest, tip, 1.4F, GOLD, (int) (170 * fade));
+            FxDraw.beam(pose.last(), glow, chest, tip, 0.4F, 0xFFFFFF, (int) (230 * fade));
+        }
+        // 床: 光の筋（影の向きは紫）
+        for (int k = 0; k < 90; k++) {
+            double a = base + Math.toRadians(k * 4);
+            double rel = (k * 4) % 60;
+            boolean shadow = Math.min(rel, 60 - rel) <= LastArchivist.WINGS_SHADOW;
+            Vec3 dir = new Vec3(Math.cos(a), 0, Math.sin(a));
+            Vec3 from = new Vec3(c.x, floor, c.z).add(dir.scale(1.5)).subtract(origin);
+            Vec3 to = new Vec3(c.x, floor, c.z).add(dir.scale(reach)).subtract(origin);
+            if (shadow) {
+                FxDraw.beam(pose.last(), glow, from, to, 0.5F, VIOLET, (int) (90 * fade));
+            } else if (!fired) {
+                FxDraw.beam(pose.last(), glow, from, to, 0.35F, GOLD, (int) ((30 + 170 * charge) * fade
+                        * (0.75F + 0.25F * Mth.sin(t * 0.8F + k))));
+            } else {
+                FxDraw.beam(pose.last(), glow, from, to, 0.6F, 0xFFFFFF, (int) (255 * fade));
+                // 降り注ぐ光の柱
+                for (double r = 3; r < reach; r += 3.5) {
+                    Vec3 p0 = new Vec3(c.x, floor, c.z).add(dir.scale(r)).subtract(origin);
+                    FxDraw.beam(pose.last(), glow, p0, p0.add(0, 12, 0), 0.5F, PALE, (int) (200 * fade));
+                }
+            }
+        }
+    }
+
     private static void renderMoves(LastArchivist e, int phase, float t, float partialTick, Vec3 origin, Quaternionf camera, PoseStack pose,
                                     MultiBufferSource buffers) {
         VertexConsumer glow = glow(buffers);
         int move = e.move();
         float left = Math.max(0, e.moveTicks() - partialTick);
         Vec3 halo = e.haloCenter().subtract(e.position());
+        java.util.Optional<net.minecraft.core.BlockPos> arena = e.arenaHome();
+        if (move == LastArchivist.HALO_SWEEP && arena.isPresent()) {
+            haloSweep(e, arena.get(), left, t, origin, pose, glow);
+        }
+        if (move == LastArchivist.WINGS && arena.isPresent()) {
+            wingsOfJudgment(e, arena.get(), left, t, origin, pose, glow);
+        }
         // 裁きの光: 狙いの細い線、放つと太い光の柱
         if (move == LastArchivist.JUDGMENT || e.flash() > 0) {
             List<Vec3> points = e.judgePoints();

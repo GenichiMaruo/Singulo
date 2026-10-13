@@ -70,8 +70,28 @@ public class EchoSentinel extends RuinBoss {
     public static final float HEALTH = 320;
     /** 残っている投影器の数（0〜4）ごとの、受けるダメージの倍率。 */
     public static final float[] PROJECTION_FACTOR = {1.0F, 0.65F, 0.4F, 0.22F, 0.1F};
+    /**
+     * 技のダメージ（ハードモード）。光弾・槍・陣は魔法で、防具を貫く。通常は防具で減るダメージにして、元の値を少し上げる
+     * （ダイヤの防具・エンチャントなしで、ぎりぎり勝てるくらい。受けるダメージはハードモードのおよそ3分の1）。
+     */
     public static final float BOLT_DAMAGE = 5;
+    public static final float BOLT_DAMAGE_NORMAL = 5;
+    public static final float STRIKE_DAMAGE_NORMAL = 8;
+    public static final float LANCE_DAMAGE_NORMAL = 6;
+    public static final float CIRCLE_DAMAGE_NORMAL = 8;
+    /** 通常の体力（ハードモードは HEALTH）。 */
+    public static final float HEALTH_NORMAL = 240;
+
+    /** いまの設定での体力。 */
+    public static float health() {
+        return BossScaling.hardMode() ? HEALTH : HEALTH_NORMAL;
+    }
     static final int BOLT_INTERVAL = 36;
+    /** 通常の強さで、激昂する前の光弾の間（前半も手を緩めない）。 */
+    static final int BOLT_INTERVAL_CALM_NORMAL = 26;
+    /** 激昂してから、斬ったあとに続けて回り込む割合（ハードモード / 通常）。 */
+    static final float CHAIN_CHANCE = 0.7F;
+    static final float CHAIN_CHANCE_NORMAL = 0.6F;
     public static final int BLINK_UNSEEN_TICKS = 24;
     static final int BLINK_COOLDOWN = 90;
     /** 体力半分からの、続けて跳ぶ回数（最初の1回のほかに）。 */
@@ -126,6 +146,10 @@ public class EchoSentinel extends RuinBoss {
         this.xpReward = 500;
         setNoGravity(true);
         orbitAngle = random.nextDouble() * Math.PI * 2;
+        if (!level.isClientSide && !BossScaling.hardMode()) {
+            // 読み込むときは、このあと保存した体力で上書きされる
+            setEffectiveHealth(HEALTH_NORMAL);
+        }
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -339,7 +363,7 @@ public class EchoSentinel extends RuinBoss {
         if (--boltCooldown <= 0) {
             shootBolts(target);
         }
-        if (!isMinion() && --skillCooldown <= 0 && lanceTicks() == 0 && circleTicks() == 0) {
+        if (!isMinion() && --skillCooldown <= 0 && lanceTicks() == 0 && circleTicks() == 0 && targetInRoom(target)) {
             skillCooldown = pace(enraged() ? SKILL_INTERVAL_ENRAGED : SKILL_INTERVAL);
             if (lanceNext && projectorCount() > 0) {
                 startLance(target);
@@ -417,6 +441,30 @@ public class EchoSentinel extends RuinBoss {
                 Mth.clamp(p.z, cz - ROOM_HALF, cz + ROOM_HALF));
     }
 
+    /**
+     * 相手が記録保管室の中にいるか（守る核がなければ、いつも中とみなす）。部屋の外の相手には、床からの技（投影陣）と
+     * 投影器の槍を使わない（部屋の内側は核から東西8・南北9ブロック、高さ11ブロック）。
+     */
+    public boolean targetInRoom(LivingEntity target) {
+        if (home == null) {
+            return true;
+        }
+        double dx = Math.abs(target.getX() - (home.getX() + 0.5));
+        double dz = Math.abs(target.getZ() - (home.getZ() + 0.5));
+        double dy = target.getY() - home.getY();
+        return dx <= ROOM_HALF + 3 && dz <= ROOM_HALF + 3 && dy >= -1 && dy <= 12;
+    }
+
+    /** 槍と陣のダメージの種類: ハードモードは防具を貫く魔法、通常は防具で減る。 */
+    private net.minecraft.world.damagesource.DamageSource magic() {
+        return BossScaling.hardMode() ? damageSources().indirectMagic(this, this) : damageSources().mobAttack(this);
+    }
+
+    @Override
+    public String combatState() {
+        return super.combatState() + (enraged() ? " enraged" : "") + " projectors=" + projectorCount();
+    }
+
     /** 部屋から大きくはみ出していたら、核の上へ跳んで戻る（部屋の外へは出ない）。 */
     private void keepInRoom(ServerLevel level) {
         if (home == null || insideRoom(position()).distanceTo(position()) <= ROOM_SLACK) {
@@ -437,17 +485,20 @@ public class EchoSentinel extends RuinBoss {
     }
 
     public void shootBolts(LivingEntity target) {
-        boltCooldown = pace(BOLT_INTERVAL + random.nextInt(16));
+        int interval = BossScaling.hardMode() || enraged() ? BOLT_INTERVAL : BOLT_INTERVAL_CALM_NORMAL;
+        boltCooldown = pace(interval + random.nextInt(16));
         if (!hasLineOfSight(target)) {
             return;
         }
         Vec3 from = position().add(0, getBbHeight() * 0.6, 0);
-        float damage = isMinion() ? BOLT_DAMAGE / 2 : BOLT_DAMAGE;
+        boolean hard = BossScaling.hardMode();
+        float base = hard ? BOLT_DAMAGE : BOLT_DAMAGE_NORMAL;
+        float damage = isMinion() ? base / 2 : base;
         int n = (!isMinion() && enraged() ? 5 : 3) + (awakened() ? 1 : 0);
         for (int i = 0; i < n; i++) {
             double a = (i - (n - 1) / 2.0) * 0.5;
             Vec3 side = Vec3.directionFromRotation(0, getYRot() + 90).scale(Math.sin(a) * 0.8);
-            HorizonBolt bolt = new HorizonBolt(level(), this).homing(target).style(0x7FE8FF, 0.7F, damage);
+            HorizonBolt bolt = new HorizonBolt(level(), this).homing(target).style(0x7FE8FF, 0.7F, damage).armored(!hard);
             bolt.setPos(from.add(side));
             Vec3 d = target.getEyePosition().subtract(from).normalize().add(0, 0.25, 0).add(side.scale(0.5));
             bolt.shoot(d.x, d.y, d.z, 0.85F, 0);
@@ -488,14 +539,16 @@ public class EchoSentinel extends RuinBoss {
         level.sendParticles(ParticleTypes.SWEEP_ATTACK, getX() + dir.x * 0.5, getY() + 1.2, getZ() + dir.z * 0.5, 1, 0, 0, 0, 0);
         playSound(SinguloSounds.get("echo_sentinel.strike"), 1.5F, 1.0F);
         if (distanceTo(target) <= STRIKE_RANGE) {
-            float damage = isMinion() ? STRIKE_DAMAGE / 2 : STRIKE_DAMAGE;
-            if (target.hurt(damageSources().mobAttack(this), damage) && dir.lengthSqr() > 1e-4) {
+            float base = BossScaling.hardMode() ? STRIKE_DAMAGE : STRIKE_DAMAGE_NORMAL;
+            float damage = isMinion() ? base / 2 : base;
+            if (hurtWith(chain == 0 ? "strike" : "strike_chain", target, damageSources().mobAttack(this), damage) && dir.lengthSqr() > 1e-4) {
                 Vec3 k = dir.normalize();
                 target.knockback(0.6, -k.x, -k.z);
             }
         }
         // 体力半分からは、続けて回り込んで斬る
-        if (!isMinion() && enraged() && chain < BLINK_CHAIN && random.nextFloat() < 0.7F) {
+        float chainChance = BossScaling.hardMode() ? CHAIN_CHANCE : CHAIN_CHANCE_NORMAL;
+        if (!isMinion() && enraged() && chain < BLINK_CHAIN && random.nextFloat() < chainChance) {
             chain++;
             blinkBehind(level, target);
         }
@@ -537,7 +590,7 @@ public class EchoSentinel extends RuinBoss {
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(from, end).inflate(0.8),
                     e -> e.isAlive() && !RuinGuards.isGuard(e))) {
                 if (!e.getBoundingBox().inflate(0.3).clip(from, end).isEmpty()) {
-                    e.hurt(damageSources().indirectMagic(this, this), LANCE_DAMAGE);
+                    hurtWith("lance", e, magic(), BossScaling.hardMode() ? LANCE_DAMAGE : LANCE_DAMAGE_NORMAL);
                 }
             }
             for (int i = 0; i <= 16; i++) {
@@ -575,11 +628,14 @@ public class EchoSentinel extends RuinBoss {
         if (c - 1 > 0) {
             return;
         }
+        if (home != null && !insideRoom(at).closerThan(at, ROOM_SLACK + 2)) {
+            return;
+        }
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(r, 1, r).expandTowards(0, 3, 0),
                 e -> e.isAlive() && !RuinGuards.isGuard(e))) {
             double dx = e.getX() - at.x;
             double dz = e.getZ() - at.z;
-            if (dx * dx + dz * dz <= r * r && e.hurt(damageSources().indirectMagic(this, this), CIRCLE_DAMAGE)) {
+            if (dx * dx + dz * dz <= r * r && hurtWith("circle", e, magic(), BossScaling.hardMode() ? CIRCLE_DAMAGE : CIRCLE_DAMAGE_NORMAL)) {
                 e.setDeltaMovement(e.getDeltaMovement().add(0, 0.6, 0));
                 e.hurtMarked = true;
             }

@@ -1,7 +1,0 @@
-allprojects {
-    afterEvaluate {
-        def reviewRoot = rootProject.file('docs/pr7-review-0df8684/repro')
-        sourceSets.main.java.srcDir(new File(reviewRoot, 'java'))
-        sourceSets.main.resources.srcDir(new File(reviewRoot, 'resources'))
-    }
-}

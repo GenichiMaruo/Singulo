@@ -131,7 +131,7 @@ public final class BossRoomGameTests {
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
         float max = s.getMaxHealth();
-        helper.assertTrue(max == EchoSentinel.HEALTH, "体力が設計値でない: " + max);
+        helper.assertTrue(max == EchoSentinel.health(), "体力が設計値でない: " + max);
         s.hurt(helper.getLevel().damageSources().magic(), 20);
         float shielded = max - s.getHealth();
         helper.assertTrue(Math.abs(shielded - 20 * EchoSentinel.PROJECTION_FACTOR[4]) < 0.01F, "投影器4つで1割にならない: " + shielded);
@@ -174,18 +174,24 @@ public final class BossRoomGameTests {
     }
 
     /** 記録保管室から出ない:押し出されると核の上へ戻り、部屋の外の相手の背後へは跳ばない。 */
-    @GameTest(template = EMPTY, batch = BATCH + "_28", timeoutTicks = 60)
+    // 押し出した先はテストの区画の外のチャンクなので、強制読み込みして動けるようにする
+    // （読み込みは実時間で進むので、tick を速めたテストでは戻るまで待つ）
+    @GameTest(template = EMPTY, batch = BATCH + "_28", timeoutTicks = 200)
     public static void sentinelStaysInItsRoom(GameTestHelper helper) {
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
         BlockPos home = helper.absolutePos(CORE);
+        net.minecraft.world.level.ChunkPos pushed = new net.minecraft.world.level.ChunkPos(home.offset(14, 0, 0));
+        boolean wasForced = helper.getLevel().getForcedChunks().contains(pushed.toLong());
+        helper.getLevel().setChunkForced(pushed.x, pushed.z, true);
         s.teleportTo(home.getX() + 14.5, home.getY() + 2, home.getZ() + 0.5);
-        helper.runAtTickTime(5, () -> {
+        helper.startSequence().thenWaitUntil(() -> {
             double dx = Math.abs(s.getX() - (home.getX() + 0.5));
             double dz = Math.abs(s.getZ() - (home.getZ() + 0.5));
             helper.assertTrue(dx <= EchoSentinel.ROOM_HALF + EchoSentinel.ROOM_SLACK && dz <= EchoSentinel.ROOM_HALF + EchoSentinel.ROOM_SLACK,
                     "部屋の外に出たまま: dx=" + dx + " dz=" + dz);
+        }).thenExecute(() -> {
             var outside = helper.spawn(EntityType.ARMOR_STAND, new BlockPos(4, 1, 4).offset(12, 0, 0));
             if (s.blinkBehind(helper.getLevel(), outside)) {
                 double bx = Math.abs(s.getX() - (home.getX() + 0.5));
@@ -193,8 +199,8 @@ public final class BossRoomGameTests {
             }
             outside.discard();
             s.discard();
-            helper.succeed();
-        });
+            helper.getLevel().setChunkForced(pushed.x, pushed.z, wasForced);
+        }).thenSucceed();
     }
 
     /** 体力が半分を切ると、1撃で消える分身を2体呼ぶ。分身はボスバーもドロップも持たない。 */
@@ -203,7 +209,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);
         EchoSentinel s = (EchoSentinel) core.awaken(helper.getLevel());
         s.skipEmerging();
-        s.setHealth(EchoSentinel.HEALTH / 2 - 1);
+        s.setHealth(EchoSentinel.health() / 2 - 1);
         var target = helper.spawn(EntityType.ARMOR_STAND, new BlockPos(4, 1, 1));
         s.summonEchoes(helper.getLevel(), target);
         List<EchoSentinel> echoes = helper.getLevel().getEntitiesOfClass(EchoSentinel.class, s.getBoundingBox().inflate(32), EchoSentinel::isMinion);
@@ -246,9 +252,9 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = room(helper, "culture_facility", VAULT, CORE);
         GravityRemnant r = (GravityRemnant) core.awaken(helper.getLevel());
         r.skipEmerging();
-        helper.assertTrue(r.getMaxHealth() == GravityRemnant.HEALTH && r.shell() == GravityRemnant.SHELL_PIECES, "体力か殻が設計値でない");
+        helper.assertTrue(r.getMaxHealth() == GravityRemnant.health() && r.shell() == GravityRemnant.SHELL_PIECES, "体力か殻が設計値でない");
         r.hurt(helper.getLevel().damageSources().magic(), 20);
-        float lost = GravityRemnant.HEALTH - r.getHealth();
+        float lost = GravityRemnant.health() - r.getHealth();
         helper.assertTrue(r.shell() == GravityRemnant.SHELL_PIECES - 1, "当てても殻が剥がれない: " + r.shell());
         helper.assertTrue(Math.abs(lost - 20 * GravityRemnant.SHELL_FACTOR) < 0.01F, "殻があるのにダメージが減らない: " + lost);
         r.setShell(0);
@@ -418,7 +424,7 @@ public final class BossRoomGameTests {
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core"));
         helper.assertTrue(boss instanceof EchoSentinel && boss.awakened(), "覚醒の残響核で覚醒した残響の番人が現れない: " + boss);
         boss.skipEmerging();
-        double expected = EchoSentinel.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        double expected = EchoSentinel.health() * RuinBoss.awakenedHealthMultiplier();
         helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
         helper.assertTrue(((EchoSentinel) boss).minionCount() == EchoSentinel.MINIONS + 1, "覚醒した番人の分身が増えない");
         helper.assertTrue(core.awakenAwakened(helper.getLevel(), null, stack("awakening_echo_core")) == null, "覚醒戦の最中に2体目が現れた");
@@ -433,7 +439,7 @@ public final class BossRoomGameTests {
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
         helper.assertTrue(boss instanceof GravityRemnant && boss.awakened(), "覚醒の重力核で覚醒した重力の澱が現れない: " + boss);
         boss.skipEmerging();
-        double expected = GravityRemnant.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        double expected = GravityRemnant.health() * RuinBoss.awakenedHealthMultiplier();
         helper.assertTrue(boss.getMaxHealth() <= 1024 && Math.abs(boss.effectiveMaxHealth() - expected) < 1.0,
                 "体力が " + expected + " 相当でない: " + boss.getMaxHealth() + " / " + boss.effectiveMaxHealth());
         GravityRemnant r = (GravityRemnant) boss;
@@ -514,7 +520,8 @@ public final class BossRoomGameTests {
         helper.assertTrue(l.emergeTicks() == ErgosphereLeviathan.EMERGE_TICKS, "出現の演出が始まらない");
         helper.assertTrue(l.getParts().length == ErgosphereLeviathan.SEGMENTS, "体の節の数がおかしい: " + l.getParts().length);
         helper.assertFalse(l.segments()[3].hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で体が傷ついた");
-        helper.assertTrue(Math.abs(l.effectiveMaxHealth() - ErgosphereLeviathan.HEALTH) < 1.0, "体力が1600相当でない: " + l.effectiveMaxHealth());
+        double health = ErgosphereLeviathan.HEALTH * ErgosphereLeviathan.healthFactor();
+        helper.assertTrue(Math.abs(l.effectiveMaxHealth() - health) < 1.0, "体力が" + health + "相当でない: " + l.effectiveMaxHealth());
         l.discard();
         helper.succeed();
     }
@@ -582,7 +589,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = clearedRoom(helper, "sunken_reactor");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_ergosphere_core"));
         helper.assertTrue(boss instanceof ErgosphereLeviathan && boss.awakened(), "覚醒の渦核で覚醒した大蛇が現れない: " + boss);
-        double expected = ErgosphereLeviathan.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        double expected = ErgosphereLeviathan.HEALTH * ErgosphereLeviathan.healthFactor() * RuinBoss.awakenedHealthMultiplier();
         helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
         boss.discard();
         helper.succeed();

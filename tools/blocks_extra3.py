@@ -83,6 +83,50 @@ def intact_ruin_glass():
     return im
 
 
+def reinforced_ruin_glass():
+    """
+    強化遺構ガラス（上下左右に対称）: 朽ちていない白い枠と、内側の暗い鋼の枠。四隅に鋲。
+    透けたガラスに、四隅から中心へ向かう細い補強線と、中心の菱形の紋（光る芯）。各辺の中ほどに小さな三角の留め具。
+    """
+    from PIL import Image as _Image
+    q = {}                                      # 左上の 8×8 だけ描き、上下左右に写す
+    clear = rgba(mix(GLASS_TINT, (170, 230, 255), 0.35), 70)
+    white, steel, bolt = (236, 238, 240, 255), (70, 78, 90, 255), (190, 196, 206, 255)
+    lattice, rune, core = (150, 220, 255, 150), (110, 200, 255, 220), (235, 250, 255, 255)
+    for y in range(8):
+        for x in range(8):
+            c = clear
+            if x == 0 or y == 0:
+                c = white
+            elif x == 1 or y == 1:
+                c = steel
+            elif x == y and x >= 3:
+                c = lattice                     # 四隅から中心への補強線
+            # 中心の菱形の紋（|dx|+|dy| が一定の所）
+            dx, dy = 7.5 - x, 7.5 - y
+            if abs(abs(dx) + abs(dy) - 4) < 0.6:
+                c = rune
+            if abs(dx) + abs(dy) <= 1.1:
+                c = core
+            q[(x, y)] = c
+    q[(2, 2)] = bolt                            # 四隅の鋲
+    q[(3, 2)] = steel
+    q[(2, 3)] = steel
+    q[(7, 2)] = rune                            # 辺の中ほどの留め具（三角）
+    q[(6, 2)] = (110, 200, 255, 140)
+    q[(7, 3)] = (110, 200, 255, 140)
+    q[(2, 7)] = rune
+    q[(2, 6)] = (110, 200, 255, 140)
+    q[(3, 7)] = (110, 200, 255, 140)
+    im = _Image.new('RGBA', (S, S))
+    px = im.load()
+    for (x, y), c in q.items():
+        for xx in (x, S - 1 - x):
+            for yy in (y, S - 1 - y):
+                px[xx, yy] = c
+    return im
+
+
 def broken_ruin_glass():
     """割れた遺構ガラス: 当たった点から放射状に走るひびと輪のひび、抜け落ちた穴、角度の違う破片の濃淡。"""
     rnd = random.Random(41)
@@ -300,7 +344,7 @@ def _sheet(frames):
 
 
 # 汚しを入れない（または、ここで自前で入れる）建材
-NO_WEATHER = {'ruin_cache', 'ruin_guard_dock', 'seal_console', 'cracked_ruin_panel'}
+NO_WEATHER = {'ruin_cache', 'ruin_guard_dock', 'seal_console', 'cracked_ruin_panel', 'reinforced_ruin_glass'}
 
 
 def skip_weathering(iid):
@@ -311,6 +355,7 @@ def textures(tb, save, weather, write_json):
     """weather(im, seed) は汚しを足す関数（art16.weather_existing）。"""
     save(weather(cracked_ruin_panel(), 13), tb / 'cracked_ruin_panel.png')
     save(intact_ruin_glass(), tb / 'intact_ruin_glass.png')
+    save(reinforced_ruin_glass(), tb / 'reinforced_ruin_glass.png')
     save(broken_ruin_glass(), tb / 'ruin_glass.png')
     save(white_glass_panel(), tb / 'white_glass_panel.png')
     save(white_glass_panel(star=True), tb / 'white_star_glass_panel.png')

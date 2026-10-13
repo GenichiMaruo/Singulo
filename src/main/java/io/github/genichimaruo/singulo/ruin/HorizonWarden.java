@@ -81,6 +81,21 @@ public class HorizonWarden extends Monster {
     public static final int DEATH_TICKS = 100;
     /** 体力の既定値（設定 wardenHealth）。 */
     public static final double HEALTH = 1200;
+    /**
+     * 通常の強さ（ハードモードでないとき）の倍率: 体力（wardenHealth に掛ける）、すべての技のダメージ、技と技の間。
+     * ネザライトの防具（ダメージ軽減III）と剣（ダメージ増加IV）で、ぎりぎり勝てるくらい。
+     */
+    public static final double NORMAL_HEALTH_FACTOR = 0.7;
+    public static final float NORMAL_DAMAGE_FACTOR = 0.7F;
+    /** 防具を貫く技（ビーム・特異点）は、通常の強さではさらに下げる。 */
+    public static final float NORMAL_PIERCING_FACTOR = 0.4F;
+    public static final float NORMAL_PACE_FACTOR = 1.25F;
+    public static final float GRIP_SLAM_FALL_NORMAL = 6;
+
+    /** いまの設定での体力の倍率（ハードモードは1倍）。 */
+    public static double healthFactor() {
+        return BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR;
+    }
     /** ゲームの決まりの最大体力の上限。 */
     static final double MAX_HEALTH_CAP = 1024;
     /** フェーズごとの、技のあいだの間の倍率（フェーズが進むほど短い）。 */
@@ -246,6 +261,30 @@ public class HorizonWarden extends Monster {
         }
     }
 
+    /** 戦いの記録（BossCombatLog）に書く、いま当てている技の名前（技を当てる間だけ）。 */
+    private String combatAttack;
+
+    public String combatAttack() {
+        return combatAttack;
+    }
+
+    /** 技の名前をつけてダメージを与える（通常の強さでは、技ごとの倍率を掛ける）。 */
+    boolean hurtWith(String attack, LivingEntity target, DamageSource source, float amount) {
+        combatAttack = attack;
+        float factor = BossScaling.hardMode() ? 1F
+                : attack.equals("beam") || attack.equals("singularity") ? NORMAL_PIERCING_FACTOR : NORMAL_DAMAGE_FACTOR;
+        try {
+            return target.hurt(source, amount * factor);
+        } finally {
+            combatAttack = null;
+        }
+    }
+
+    /** 戦いの記録に書く、いまの様子（形態・覚醒）。 */
+    public String combatState() {
+        return (awakened() ? "awakened " : "") + "phase=" + phase();
+    }
+
     public int phase() {
         return entityData.get(PHASE);
     }
@@ -333,6 +372,38 @@ public class HorizonWarden extends Monster {
             }
             lockRewardParticipants();
         }
+    }
+
+    // ------------------------------------------------------------------ 落とし物
+
+    /** 倒れたときの落とし物と経験値を出す場所（封印コンソールの上。なければ倒れた場所）。宙で倒れても、床の穴へ落ちて失われないように。 */
+    protected net.minecraft.world.phys.Vec3 lootPos() {
+        return console != null ? net.minecraft.world.phys.Vec3.atBottomCenterOf(console.above()).add(0, 0.2, 0) : position();
+    }
+
+    @Override
+    public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(net.minecraft.world.item.ItemStack stack, float offsetY) {
+        if (isDeadOrDying() || isRemoved()) {
+            return BossLoot.drop(this, lootPos(), stack);
+        }
+        return super.spawnAtLocation(stack, offsetY);
+    }
+
+    @Override
+    protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
+        if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
+                || lastHurtByPlayerTime > 0 && shouldDropExperience()
+                && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
+            int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
+            BossLoot.experience(server, lootPos(), reward, rewardPlayers(server));
+        }
+    }
+
+    /** 経験値を受け取る、部屋にいる挑戦者（生きていて、クリエイティブ・観戦者でない）。 */
+    protected java.util.List<Player> rewardPlayers(ServerLevel level) {
+        net.minecraft.world.phys.AABB box = home != null ? new net.minecraft.world.phys.AABB(home).inflate(ARENA_RADIUS)
+                : getBoundingBox().inflate(32);
+        return level.getEntitiesOfClass(Player.class, box, BossLoot::recipient);
     }
 
     /** 挑戦者がいなくなってからの猶予を、次の確かめで終わるところまで進める（テスト用）。 */
@@ -439,7 +510,11 @@ public class HorizonWarden extends Monster {
         this.console = console;
         entityData.set(AWAKENED, awakened);
         double health = (ServerConfig.SPEC.isLoaded() ? ServerConfig.WARDEN_HEALTH.get() : HEALTH)
-                * io.github.genichimaruo.singulo.data.Difficulty.wardenHealth() * (awakened ? awakenedHealthMultiplier() : 1.0);
+                * io.github.genichimaruo.singulo.data.Difficulty.wardenHealth() * (awakened ? awakenedHealthMultiplier() : 1.0)
+                * (BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR);
+        if (!BossScaling.hardMode()) {
+            getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(16 * NORMAL_DAMAGE_FACTOR);
+        }
         if (awakened) {
             getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue() * AWAKENED_SPEED);
             setBarName(Component.translatable("entity.singulo.horizon_warden.awakened"));
@@ -595,7 +670,7 @@ public class HorizonWarden extends Monster {
             case BEAM -> startBeam(target);
         }
         // 技のあいだの間（フェーズが進むほど短い。覚醒した個体はさらに短い）
-        int gap = MIN_GAP[Mth.clamp(phase(), 1, 3) - 1];
+        int gap = Math.round(MIN_GAP[Mth.clamp(phase(), 1, 3) - 1] * (BossScaling.hardMode() ? 1F : NORMAL_PACE_FACTOR));
         float k = (awakened() ? AWAKENED_PACE : 1F) * BossScaling.paceFactor(participants);
         specialCooldown = Math.max(specialCooldown, Math.max(4, Math.round(gap * k)));
     }
@@ -603,7 +678,12 @@ public class HorizonWarden extends Monster {
     /** 技のあいだの間を、今のフェーズに合わせて縮める。 */
     int pace(int ticks) {
         return Math.max(4, Math.round(ticks * PACE[Mth.clamp(phase(), 1, 3) - 1] * (awakened() ? AWAKENED_PACE : 1F)
-                * BossScaling.paceFactor(participants)));
+                * BossScaling.paceFactor(participants) * (BossScaling.hardMode() ? 1F : NORMAL_PACE_FACTOR)));
+    }
+
+    /** 技のダメージの倍率（通常の強さでは下げる）。 */
+    public float damageFactor() {
+        return BossScaling.hardMode() ? 1F : NORMAL_DAMAGE_FACTOR;
     }
 
     /** フェーズ2から: ビームとレーザーが壁を抜け、防具と盾を無視する（手加減なし）。 */
@@ -655,7 +735,7 @@ public class HorizonWarden extends Monster {
         for (int i = 0; i < VOLLEY; i++) {
             float yaw = (i - (VOLLEY - 1) / 2.0F) * VOLLEY_SPREAD * Mth.DEG_TO_RAD;
             Vec3 d = dir.yRot(yaw);
-            HorizonBolt bolt = new HorizonBolt(level(), this);
+            HorizonBolt bolt = new HorizonBolt(level(), this).power(HorizonBolt.DAMAGE * damageFactor());
             bolt.setPos(from);
             bolt.shoot(d.x, d.y, d.z, 1.4F, 0.5F);
             level().addFreshEntity(bolt);
@@ -673,7 +753,7 @@ public class HorizonWarden extends Monster {
         for (int i = 0; i < SHARDS; i++) {
             double a = base + i * Math.PI * 2 / SHARDS;
             Vec3 from = position().add(Math.cos(a) * 1.8, getBbHeight() * 0.55, Math.sin(a) * 1.8);
-            HorizonBolt bolt = new HorizonBolt(level(), this).homing(target).style(rgb, 0.8F, HorizonBolt.DAMAGE * 0.8F).piercing(piercing());
+            HorizonBolt bolt = new HorizonBolt(level(), this).homing(target).style(rgb, 0.8F, HorizonBolt.DAMAGE * 0.8F * damageFactor()).piercing(piercing());
             bolt.setPos(from);
             Vec3 d = from.subtract(position().add(0, getBbHeight() * 0.55, 0)).normalize().add(0, 0.4, 0);
             bolt.shoot(d.x, d.y, d.z, 0.7F, 0);
@@ -755,7 +835,7 @@ public class HorizonWarden extends Monster {
             if (d > SWEEP_RANGE + e.getBbWidth() / 2 || (d > 0.5 && to.normalize().dot(forward) < cos)) {
                 continue;
             }
-            e.hurt(damageSources().mobAttack(this), SWEEP_DAMAGE);
+            hurtWith("sweep", e, damageSources().mobAttack(this), SWEEP_DAMAGE);
             Vec3 side = new Vec3(-forward.z, 0, forward.x);
             e.setDeltaMovement(to.normalize().scale(0.8).add(side.scale(-0.6)).add(0, 0.45, 0));
             e.hurtMarked = true;
@@ -807,7 +887,7 @@ public class HorizonWarden extends Monster {
             AABB box = new AABB(from, end).inflate(0.6);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive() && !RuinGuards.isGuard(e))) {
                 if (!e.getBoundingBox().inflate(0.2).clip(from, end).isEmpty()) {
-                    e.hurt(piercing() ? SinguloDamageTypes.tidal(level, this) : damageSources().indirectMagic(this, this), LASER_DAMAGE);
+                    hurtWith("laser", e, piercing() ? SinguloDamageTypes.tidal(level, this) : damageSources().indirectMagic(this, this), LASER_DAMAGE);
                 }
             }
         }
@@ -861,7 +941,7 @@ public class HorizonWarden extends Monster {
             t.fallDistance = 0;
             getLookControl().setLookAt(t);
             if (g % GRIP_HIT_INTERVAL == 0) {
-                t.hurt(SinguloDamageTypes.tidal(level, this), GRIP_DAMAGE);
+                hurtWith("grip", t, SinguloDamageTypes.tidal(level, this), GRIP_DAMAGE);
             }
             if (g % 3 == 0) {
                 level.sendParticles(ParticleTypes.REVERSE_PORTAL, t.getX(), t.getY() + t.getBbHeight() / 2, t.getZ(), 4, 0.3, 0.4, 0.3, 0.02);
@@ -871,7 +951,8 @@ public class HorizonWarden extends Monster {
         if (g - 1 == 0) {
             // 最後に強く叩き落とす。落ちた高さに GRIP_SLAM_FALL を足して、着地で大きな落下ダメージになる
             t.setDeltaMovement(t.getDeltaMovement().x * 0.3, -GRIP_SLAM_SPEED, t.getDeltaMovement().z * 0.3);
-            t.fallDistance = GRIP_SLAM_FALL;
+            t.fallDistance = BossScaling.hardMode() ? GRIP_SLAM_FALL : GRIP_SLAM_FALL_NORMAL;
+            BossCombatLog.slammed(t, this, "grip_slam_fall");
             t.hurtMarked = true;
             level.sendParticles(ParticleTypes.SONIC_BOOM, t.getX(), t.getY() + 1, t.getZ(), 1, 0, 0, 0, 0);
             playSound(SoundEvents.WARDEN_ATTACK_IMPACT, 1.5F, 0.5F);
@@ -923,7 +1004,7 @@ public class HorizonWarden extends Monster {
                 continue;
             }
             shockHit.add(e.getId());
-            e.hurt(damageSources().mobAttack(this), SHOCK_DAMAGE);
+            hurtWith("shockwave", e, damageSources().mobAttack(this), SHOCK_DAMAGE);
             Vec3 out = new Vec3(e.getX() - c.x, 0, e.getZ() - c.z).normalize().scale(1.1).add(0, 0.55, 0);
             e.setDeltaMovement(out);
             e.hurtMarked = true;
@@ -990,7 +1071,7 @@ public class HorizonWarden extends Monster {
             if (e.getBoundingBox().inflate(0.4).clip(from, end).isEmpty()) {
                 continue;
             }
-            e.hurt(SinguloDamageTypes.tidal(level, this), BEAM_DAMAGE);
+            hurtWith("beam", e, SinguloDamageTypes.tidal(level, this), BEAM_DAMAGE);
             e.setDeltaMovement(dir.scale(1.4).add(0, 0.4, 0));
             e.hurtMarked = true;
         }
@@ -1192,7 +1273,13 @@ public class HorizonWarden extends Monster {
         if (busy()) {
             return false;
         }
-        boolean hit = super.doHurtTarget(target);
+        combatAttack = "melee";
+        boolean hit;
+        try {
+            hit = super.doHurtTarget(target);
+        } finally {
+            combatAttack = null;
+        }
         if (hit && level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getY() + 1, target.getZ(), 1, 0, 0, 0, 0);
         }

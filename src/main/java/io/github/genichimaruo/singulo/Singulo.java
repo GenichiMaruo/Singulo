@@ -61,6 +61,7 @@ public final class Singulo {
         modBus.addListener(SinguloEntities::registerAttributes);
         modBus.addListener((RegisterTicketControllersEvent e) -> e.register(WorldlineAnchorBlockEntity.TICKETS));
         NeoForge.EVENT_BUS.addListener(SinguloReloadListeners::register);
+        NeoForge.EVENT_BUS.addListener(Singulo::speedUpGameTests);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onTeleport);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onBreak);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onExplosion);
@@ -85,6 +86,8 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.FormationEffect::onServerTick);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDeath);
         if (RuinSelfCheck.enabled()) {
             NeoForge.EVENT_BUS.addListener(RuinSelfCheck::onServerStarted);
         }
@@ -94,6 +97,26 @@ public final class Singulo {
         modBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) -> io.github.genichimaruo.singulo.data.ConfigMigration.onConfig(e));
         container.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+    }
+
+    /**
+     * 自動テストのサーバーだけ、時計を速める（システムプロパティ singulo.gameTestTickRate。tick で数えるテストの結果は変わらない）。
+     * 普通の遊びのサーバーには何もしない。
+     */
+    private static void speedUpGameTests(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
+        String rate = System.getProperty("singulo.gameTestTickRate");
+        if (rate == null || !(event.getServer() instanceof net.minecraft.gametest.framework.GameTestServer)) {
+            return;
+        }
+        try {
+            float tps = Float.parseFloat(rate);
+            if (tps > 20) {
+                event.getServer().tickRateManager().setTickRate(tps);
+                LOGGER.info("GameTest server tick rate: {}", tps);
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.warn("Bad singulo.gameTestTickRate: {}", rate);
+        }
     }
 
     public static ResourceLocation id(String path) {
