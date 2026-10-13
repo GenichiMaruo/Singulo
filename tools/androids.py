@@ -35,9 +35,11 @@ ANDROID_PARTS = {
     'blade': (98, 32, 1, 13, 2),
     'blade_tip': (104, 32, 1, 2, 1),
     'thruster': (0, 48, 2, 3, 2),
+    'whip_handle': (110, 32, 1, 4, 1),
 }
 
-# 型ごとの色。hair: 髪（明・影・深い影）、streak: ひと房の色、accent: 光の色、iris: 瞳（深・明）
+# 型ごとの色。hair: 髪（明・影・深い影）、streak: ひと房（またはインナー）の色、accent: 光の色、iris: 瞳（深・明）
+# mirror: 長い房・サイドテール・前髪のひと房が体の右側（鞭型）。inner: 髪の内側（後ろ髪の裏・房の内側）を streak の色に。
 VARIANTS = {
     'blade_android': {
         'hair': ((238, 241, 247), (208, 215, 229), (178, 188, 208)),
@@ -45,6 +47,15 @@ VARIANTS = {
         'accent': (120, 225, 255),
         'iris': ((40, 128, 182), (110, 214, 250)),
         'seed': 31,
+    },
+    'whip_android': {
+        'hair': ((44, 42, 56), (32, 30, 42), (20, 19, 28)),
+        'streak': ((236, 92, 178), (184, 58, 140)),
+        'accent': (255, 106, 196),
+        'iris': ((150, 40, 120), (250, 122, 210)),
+        'seed': 37,
+        'mirror': True,
+        'inner': True,
     },
 }
 
@@ -85,6 +96,8 @@ def paint(pal, Image):
     glow = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
     hair, hair_sh, hair_deep = pal['hair']
     streak, streak_sh = pal['streak']
+    mirror = pal.get('mirror', False)
+    inner = pal.get('inner', False)
     accent = pal['accent']
     iris_deep, iris = pal['iris']
 
@@ -168,10 +181,11 @@ def paint(pal, Image):
             put(hx + x, hy + y, hair if (x + y) % 3 else hair_sh)
     for x in (0, 3, 4):
         put(hx + x, hy + 4, hair_sh)
-    # ひと房（体の左側の前髪）
+    # ひと房（光刃型は体の左側、鞭型は右側の前髪）
+    sc, tc = (1, 0) if mirror else (6, 7)
     for y in range(4):
-        put(hx + 6, hy + y, streak)
-    put(hx + 7, hy + 4, streak_sh)
+        put(hx + sc, hy + y, streak)
+    put(hx + tc, hy + 4, streak_sh)
     # 顔の両脇に垂れる毛
     for y in range(5, 7):
         put(hx, hy + y, hair_sh)
@@ -190,8 +204,8 @@ def paint(pal, Image):
     hair_face(f['up'], strands=False)
     for i in range(7):
         put(x0 + min(7, 2 + i // 2), y0 + i, hair_sh)  # 分け目
-    put(x0 + 6, y0 + 0, streak)
-    put(x0 + 6, y0 + 1, streak)
+    put(x0 + (1 if mirror else 6), y0 + 0, streak)
+    put(x0 + (1 if mirror else 6), y0 + 1, streak)
     # 上の角を1ドットずつ抜いて、頭の丸みを出す
     clear = (0, 0, 0)
     x0, y0, x1, y1 = f['up']
@@ -206,8 +220,14 @@ def paint(pal, Image):
     f = part('back_hair')
     for k in ('back', 'side_a', 'side_b', 'up'):
         hair_face(f[k])
-    fill(f['front'], hair_deep, 2)
-    fill(f['down'], hair_sh, 2)
+    # 後ろ髪の裏（頭側）。インナーカラーの型は、ここが差し色になる
+    fill(f['front'], streak_sh if inner else hair_deep, 2)
+    fill(f['down'], streak if inner else hair_sh, 2)
+    if inner:
+        for k in ('side_a', 'side_b'):
+            x0, y0, x1, y1 = f[k]
+            for y in range(y0 + 2, y1):
+                put(x0 if k == 'side_b' else x1 - 1, y, streak)
     x0, y0, x1, y1 = f['back']
     for x in range(x0, x1):
         if (x - x0) % 2 == 1:
@@ -221,6 +241,10 @@ def paint(pal, Image):
         f = part(name)
         for k in f:
             hair_face(f[k], strands=False)
+        if inner:
+            # 房の内側（顔の側）を差し色に。長い房は左にあれば -X 面、右にあれば +X 面が顔の側
+            on_left = (name == 'side_lock_l') != mirror
+            fill(f['side_a' if on_left else 'side_b'], streak, 2)
         if tip:
             for k in ('front', 'side_a', 'side_b', 'back'):
                 x0, y0, x1, y1 = f[k]
@@ -451,5 +475,16 @@ def paint(pal, Image):
     x0, y0, x1, y1 = f['back']
     for y in range(y0, y1):
         put(x0, y, CERAMIC)
+    line(f['down'], accent)
+    # ---------------------------------------------------------------- 鞭の柄（黒い握りに、光る輪）
+    f = part('whip_handle')
+    for k in f:
+        fill(f[k], SUIT_HI, 3)
+    for k in ('front', 'side_a', 'side_b', 'back'):
+        x0, y0, x1, y1 = f[k]
+        for x in range(x0, x1):
+            put(x, y0, CERAMIC)
+            put(x, y0 + 2, accent, lit=True)
+            put(x, y1 - 1, accent, lit=True)
     line(f['down'], accent)
     return base, glow

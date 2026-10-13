@@ -2335,6 +2335,10 @@
     "source": "Warden Singularity",
     "translation": "守衛奇點"
   },
+  "entity.singulo.whip_android": {
+    "source": "Whip Android \"Verna\"",
+    "translation": "鞭型仿生人「薇爾娜」"
+  },
   "fluid_type.singulo.axion_condensate": {
     "source": "Axion Condensate",
     "translation": "軸子凝聚體"
@@ -5514,6 +5518,10 @@
   "item.singulo.void_dust": {
     "source": "Void Dust",
     "translation": "虛空之塵"
+  },
+  "item.singulo.whip_android_spawn_egg": {
+    "source": "Whip Android Spawn Egg",
+    "translation": "鞭型仿生人生怪蛋"
   },
   "item.singulo.white_ceramic_composite": {
     "source": "White Ceramic Composite",

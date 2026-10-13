@@ -26,6 +26,7 @@ import net.minecraft.util.Mth;
  */
 public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     public static final ModelLayerLocation BLADE_LAYER = new ModelLayerLocation(Singulo.id("blade_android"), "main");
+    public static final ModelLayerLocation WHIP_LAYER = new ModelLayerLocation(Singulo.id("whip_android"), "main");
 
     final ModelPart root;
     final ModelPart hips;
@@ -51,6 +52,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     final ModelPart shinR;
     /** 光刃型の刃（なければ null）。半透明で光るので、本体とは別に描く。 */
     final ModelPart blade;
+    /** 鞭型の柄（なければ null）。鞭そのものは描画で伸ばす。 */
+    final ModelPart whipHandle;
+    /** サイドテールと長い房のある側（+1 は体の左、-1 は右）。髪の揺れの向きに使う。 */
+    final float hairSide;
 
     public AndroidModel(ModelPart root) {
         this.root = root;
@@ -76,6 +81,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         this.legR = root.getChild("leg_r");
         this.shinR = legR.getChild("shin_r");
         this.blade = forearmR.hasChild("blade") ? forearmR.getChild("blade") : null;
+        this.whipHandle = forearmR.hasChild("whip_handle") ? forearmR.getChild("whip_handle") : null;
+        this.hairSide = ponytail.getInitialPose().x > 0 ? 1 : -1;
     }
 
     private static CubeListBuilder cube(int u, int v, float x, float y, float z, int w, int h, int d, CubeDeformation def) {
@@ -128,12 +135,14 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         head.addOrReplaceChild("hair", cube(30, 0, -4, -8, -3.5F, 8, 8, 7, def(0.45F)), PartPose.ZERO);
         head.addOrReplaceChild("back_hair", cube(60, 0, -4.5F, 0, -1, 9, 9, 2, def(0, 0, -0.3F)),
                 PartPose.offsetAndRotation(0, -6.5F, 3.4F, 0.12F, 0, 0));
+        // 長い房とサイドテールの側（光刃型は左、鞭型は右。side_lock_l は長い房、side_lock_r は短い房）
+        float m = variant == AndroidRenderer.Variant.WHIP ? -1 : 1;
         head.addOrReplaceChild("side_lock_l", cube(82, 0, -0.5F, 0, -1, 1, 8, 2, def(-0.1F)),
-                PartPose.offsetAndRotation(4.4F, -5, -2, 0, 0, -0.05F));
+                PartPose.offsetAndRotation(4.4F * m, -5, -2, 0, 0, -0.05F * m));
         head.addOrReplaceChild("side_lock_r", cube(88, 0, -0.5F, 0, -1, 1, 4, 2, def(-0.1F)),
-                PartPose.offsetAndRotation(-4.4F, -5, -2, 0, 0, 0.05F));
+                PartPose.offsetAndRotation(-4.4F * m, -5, -2, 0, 0, 0.05F * m));
         head.addOrReplaceChild("ponytail", cube(94, 0, -1, 0, -1, 2, 7, 2, def(-0.1F)),
-                PartPose.offsetAndRotation(4.1F, -7, 2, 0.25F, 0, -0.45F));
+                PartPose.offsetAndRotation(4.1F * m, -7, 2, 0.25F, 0, -0.45F * m));
         // アホ毛（横から見てコの字。薄い板だが厚みを持たせ、表裏が重ならないように）
         head.addOrReplaceChild("ahoge", cube(10, 48, -0.5F, -3, -1, 1, 3, 2, def(-0.35F, 0, 0)),
                 PartPose.offsetAndRotation(0.5F, -8.2F, -0.5F, 0, 0.5F, 0.15F));
@@ -155,6 +164,11 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             // 先端は刃の中へ少し食い込ませ、細くする（刃の面と同じ所に面が重なると、ちらつくので）
             blade.addOrReplaceChild("blade_tip", cube(104, 32, -0.5F, 12.5F, -0.5F, 1, 2, 1, def(-0.32F, 0, -0.1F)), PartPose.ZERO);
         }
+        if (variant == AndroidRenderer.Variant.WHIP) {
+            // 鞭の柄（握った手から下へ）
+            forearmR.addOrReplaceChild("whip_handle", cube(110, 32, -0.5F, 0, -0.5F, 1, 4, 1, def(-0.05F)),
+                    PartPose.offsetAndRotation(0, 4.2F, -0.6F, -0.35F, 0, 0));
+        }
 
         // 脚（太ももは左右で違う絵。左は黒いニーハイ、右は素肌にガーター）
         PartDefinition legL = root.addOrReplaceChild("leg_l", cube(0, 32, -1.5F, 0, -1.5F, 3, 6, 3, def(-0.1F, 0, -0.1F)),
@@ -169,6 +183,13 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     @Override
     public ModelPart root() {
         return root;
+    }
+
+    /** 柄の先（鞭の付け根）までの変形を pose に積む。 */
+    void toWhip(PoseStack pose) {
+        toBlade(pose);
+        whipHandle.translateAndRotate(pose);
+        pose.translate(0, 4 / 16F, 0);
     }
 
     /** 刃までの親の変形を pose に積む（刃を別に描くため）。 */
@@ -222,7 +243,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtLeft.zRot += -0.08F * walk;
         skirtRight.zRot += 0.08F * walk;
         skirtTail.xRot += 0.35F * walk + 0.04F * breeze;
-        ponytail.zRot += Mth.sin(age * 0.09F) * 0.07F - 0.1F * walk;
+        ponytail.zRot += (Mth.sin(age * 0.09F) * 0.07F - 0.1F * walk) * hairSide;
         ponytail.xRot += 0.4F * walk + Mth.sin(age * 0.07F) * 0.05F;
         backHair.xRot += 0.25F * walk;
         sideLockL.xRot += -0.1F * walk;
@@ -245,9 +266,130 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             case BladeAndroid.STATE_SPIN_WINDUP -> spinWindup(t);
             case BladeAndroid.STATE_SPIN -> spin(t);
             case BladeAndroid.STATE_CAST -> cast(t);
+            case io.github.genichimaruo.singulo.android.WhipAndroid.STATE_LASH_WINDUP -> lashWindup(t);
+            case io.github.genichimaruo.singulo.android.WhipAndroid.STATE_LASH -> lash(t, 1F);
+            case io.github.genichimaruo.singulo.android.WhipAndroid.STATE_CRACK -> crack(t);
+            case io.github.genichimaruo.singulo.android.WhipAndroid.STATE_BIND -> bind(t);
+            case io.github.genichimaruo.singulo.android.WhipAndroid.STATE_SLAM_WINDUP -> slamWindup(t, age);
+            case io.github.genichimaruo.singulo.android.WhipAndroid.STATE_SLAM -> slam(t);
             default -> {
+                if (whipHandle != null) {
+                    // 鞭を持つ右手は少し前に出して構える
+                    armR.xRot -= 0.35F;
+                    forearmR.xRot = -0.45F;
+                }
             }
         }
+    }
+
+    // ------------------------------------------------------------------ 鞭型の動き
+
+    /** 鞭打ちの前触れ: 右腕を頭の上・後ろへ高く上げ、体を少し反らす。左腕は前へ。 */
+    private void lashWindup(float t) {
+        float k = ease(t / 6);
+        armR.xRot = Mth.lerp(k, armR.xRot, -2.75F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.35F);
+        forearmR.xRot = -0.5F * k;
+        torso.xRot -= 0.18F * k;
+        torso.yRot += 0.35F * k;
+        armL.xRot = -0.8F * k;
+        armL.zRot = -0.08F - 0.3F * k;
+        legL.xRot = -0.35F * k;
+        legR.xRot = 0.3F * k;
+        ponytail.xRot -= 0.2F * k;
+        head.xRot -= 0.1F * k;
+    }
+
+    /** 打ち込み: 腕を一気に前へ振り下ろす（2 tick）。体を前へ倒し、髪とスカートが遅れてついてくる。 */
+    private void lash(float t, float amount) {
+        float u = easeOut(t / 2);
+        float k = (1 - ease((t - 3) / 5)) * amount;
+        armR.xRot = Mth.lerp(k, armR.xRot, Mth.lerp(u, -2.75F, -1.15F));
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.15F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.1F);
+        torso.xRot += 0.3F * u * k;
+        torso.yRot += Mth.lerp(u, 0.35F, -0.25F) * k;
+        hips.y += 0.8F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.55F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 0.5F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.45F);
+        armL.xRot = Mth.lerp(k, armL.xRot, 0.3F);
+        armL.zRot = Mth.lerp(k, armL.zRot, -0.5F);
+        backHair.xRot += 0.35F * u * k;
+        ponytail.xRot += 0.5F * u * k;
+        skirtBack.xRot += 0.3F * u * k;
+    }
+
+    /** 近くへの横払い: 手首を返して横に鋭く払う。 */
+    private void crack(float t) {
+        float u = easeOut(t / 2);
+        float k = 1 - ease((t - 3) / 4);
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.35F);
+        armR.yRot = Mth.lerp(u, 0.9F, -0.8F) * k;
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.2F);
+        torso.yRot += Mth.lerp(u, 0.35F, -0.4F) * k;
+        hips.y += 0.5F * k;
+    }
+
+    /** 絡め取り: 投げてから、腕を後ろへ引き、体を反らして引き寄せる。 */
+    private void bind(float t) {
+        if (t < io.github.genichimaruo.singulo.android.WhipAndroid.BIND_THROW) {
+            lash(t * 0.6F, 1F);
+            return;
+        }
+        float k = ease((t - io.github.genichimaruo.singulo.android.WhipAndroid.BIND_THROW) / 4) * (1 - ease((t - io.github.genichimaruo.singulo.android.WhipAndroid.BIND + 4) / 4));
+        float tug = Mth.sin(t * 0.9F) * 0.08F;
+        armR.xRot = Mth.lerp(k, -1.15F, 0.45F + tug);
+        armR.zRot = 0.2F;
+        forearmR.xRot = -0.9F * k;
+        armL.xRot = Mth.lerp(k, 0.2F, -0.7F);
+        forearmL.xRot = -0.8F * k;
+        armL.zRot = -0.3F;
+        torso.xRot -= 0.25F * k;
+        hips.y += 1.4F * k;
+        legL.xRot = -0.6F * k;
+        shinL.xRot = 0.5F * k;
+        legR.xRot = 0.5F * k;
+        shinR.xRot = 0.6F * k;
+        ponytail.xRot -= 0.2F * k;
+        skirtFront.xRot -= 0.2F * k;
+    }
+
+    /** 叩きつけの前触れ: 右腕を頭上に掲げて鞭を回す（腕が小さく円を描く）。体は伸び上がる。 */
+    private void slamWindup(float t, float age) {
+        float k = ease(t / 5);
+        float spin = age * 1.4F;
+        armR.xRot = Mth.lerp(k, armR.xRot, -2.9F + Mth.sin(spin) * 0.15F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.25F + Mth.cos(spin) * 0.15F);
+        forearmR.xRot = -0.2F * k;
+        torso.xRot -= 0.12F * k;
+        hips.y -= 0.6F * k;
+        armL.zRot = -0.08F - 0.5F * k;
+        armL.xRot = -0.3F * k;
+        head.xRot -= 0.25F * k;
+        skirtLeft.zRot -= 0.15F * k;
+        skirtRight.zRot += 0.15F * k;
+    }
+
+    /** 叩きつけ: 深くかがみ込みながら、腕を床まで振り下ろす。 */
+    private void slam(float t) {
+        float u = easeOut(t / 2);
+        float k = 1 - ease((t - 8) / 5);
+        armR.xRot = Mth.lerp(k, armR.xRot, Mth.lerp(u, -2.9F, -0.55F));
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.1F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.2F);
+        torso.xRot += 0.6F * u * k;
+        hips.y += 2.6F * u * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.9F * u);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 1.2F * u);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.4F * u);
+        shinR.xRot = Mth.lerp(k, shinR.xRot, 1.1F * u);
+        armL.xRot = Mth.lerp(k, armL.xRot, 0.4F);
+        armL.zRot = Mth.lerp(k, armL.zRot, -0.7F);
+        backHair.xRot -= 0.3F * u * k;
+        ponytail.xRot -= 0.6F * u * k;
+        skirtBack.xRot += 0.4F * u * k;
+        skirtFront.xRot -= 0.3F * u * k;
     }
 
     private void lowPower() {
@@ -350,7 +492,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         shinR.xRot = Mth.lerp(k, shinR.xRot, 0.3F);
         armL.xRot = Mth.lerp(k, armL.xRot, -0.3F);
         armL.zRot = Mth.lerp(k, armL.zRot, -0.6F);
-        ponytail.zRot -= 0.5F * u * k;
+        ponytail.zRot -= 0.5F * u * k * hairSide;
         backHair.xRot += 0.3F * k;
         skirtTail.zRot += 0.4F * u * k;
         skirtLeft.zRot -= 0.25F * u * k;
@@ -384,10 +526,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtLeft.zRot -= 0.7F * fling;
         skirtRight.zRot += 0.7F * fling;
         skirtTail.zRot += 0.9F * fling;
-        ponytail.zRot -= 1.1F * fling;
+        ponytail.zRot -= 1.1F * fling * hairSide;
         backHair.xRot += 0.6F * fling;
-        sideLockL.zRot -= 0.5F * fling;
-        sideLockR.zRot += 0.5F * fling;
+        sideLockL.zRot -= 0.5F * fling * hairSide;
+        sideLockR.zRot += 0.5F * fling * hairSide;
     }
 
     /** 光柱: 片膝をついて左手を床に当てる。撃つ瞬間に顔を上げる。 */

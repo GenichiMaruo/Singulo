@@ -61,6 +61,8 @@ public final class SinguloItems {
             () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.BLADE_ANDROID, 0xF0F2F6, 0x78E1FF, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> WHIP_ANDROID_SPAWN_EGG = ITEMS.register("whip_android_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.WHIP_ANDROID, 0x2A2A36, 0xFF6AC4, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
@@ -254,6 +256,7 @@ public final class SinguloItems {
         block(SinguloBlocks.ECHO_PROJECTOR, 1);
         TAB_ORDER.add(SECURITY_DRONE_SPAWN_EGG);
         TAB_ORDER.add(BLADE_ANDROID_SPAWN_EGG);
+        TAB_ORDER.add(WHIP_ANDROID_SPAWN_EGG);
         for (var lamp : java.util.List.of(SinguloBlocks.RUIN_LAMP_AMBER, SinguloBlocks.RUIN_LAMP_VERDANT, SinguloBlocks.RUIN_LAMP_VIOLET,
                 SinguloBlocks.RUIN_LAMP_CRIMSON)) {
             block(lamp, 1);

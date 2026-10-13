@@ -2335,6 +2335,10 @@
     "source": "Warden Singularity",
     "translation": "감시자의 특이점"
   },
+  "entity.singulo.whip_android": {
+    "source": "Whip Android \"Verna\"",
+    "translation": "채찍형 안드로이드 \"베르나\""
+  },
   "fluid_type.singulo.axion_condensate": {
     "source": "Axion Condensate",
     "translation": "액시온 응축물"
@@ -5514,6 +5518,10 @@
   "item.singulo.void_dust": {
     "source": "Void Dust",
     "translation": "공허의 먼지"
+  },
+  "item.singulo.whip_android_spawn_egg": {
+    "source": "Whip Android Spawn Egg",
+    "translation": "채찍형 안드로이드 생성 알"
   },
   "item.singulo.white_ceramic_composite": {
     "source": "White Ceramic Composite",

@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
+import io.github.genichimaruo.singulo.android.WhipAndroid;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -16,6 +17,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
@@ -29,7 +31,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     static final float SCALE = 0.85F;
 
     public enum Variant {
-        BLADE("blade_android", BladeAndroid.ACCENT, AndroidModel.BLADE_LAYER);
+        BLADE("blade_android", BladeAndroid.ACCENT, AndroidModel.BLADE_LAYER),
+        WHIP("whip_android", WhipAndroid.ACCENT, AndroidModel.WHIP_LAYER);
 
         final ResourceLocation texture;
         final ResourceLocation glow;
@@ -51,6 +54,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         this.variant = variant;
         addLayer(new Glow(this));
         addLayer(new Blade(this));
+        addLayer(new Whip(this));
     }
 
     @Override
@@ -285,6 +289,138 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     /** 透きとおって光る刃。前触れのあいだは強く光る。 */
+    /**
+     * 光の鞭。柄の先から、動きに合わせた曲線で描く（待機: 床へ垂れる、振りかぶり: 頭の後ろ、打ち込み: 前へ伸びて波打つ、
+     * 絡め取り: 相手まで張る、叩きつけ: 頭上で回してから床へ）。叩きつけの衝撃波も描く。
+     */
+    final class Whip extends RenderLayer<RuinAndroid, AndroidModel> {
+        Whip(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            AndroidModel m = getParentModel();
+            if (m.whipHandle == null || !(android instanceof WhipAndroid whip)) {
+                return;
+            }
+            Vec3 camera = entityRenderDispatcher.camera.getPosition();
+            pose.pushPose();
+            m.toWhip(pose);
+            org.joml.Vector3f h = pose.last().pose().transformPosition(new org.joml.Vector3f());
+            pose.popPose();
+            Vec3 hand = new Vec3(h.x, h.y, h.z);
+            Vec3 origin = android.getPosition(partialTick).subtract(camera);
+            float bodyYaw = Mth.rotLerp(partialTick, android.yBodyRotO, android.yBodyRot);
+            Vec3 fwd = Vec3.directionFromRotation(0, bodyYaw);
+            Vec3 side = new Vec3(-fwd.z, 0, fwd.x);
+            Vec3 up = new Vec3(0, 1, 0);
+            int state = android.state();
+            float t = android.stateTime(partialTick);
+            Vec3 end;
+            Vec3 ctrl;
+            float wave = 0;
+            float tension = 0;
+            switch (state) {
+                case WhipAndroid.STATE_LASH_WINDUP -> {
+                    float k = Mth.clamp(t / 6, 0, 1);
+                    end = origin.add(up.scale(2.2 + 0.4 * k)).subtract(fwd.scale(1.2 + 0.6 * k));
+                    ctrl = hand.add(up.scale(0.7)).subtract(fwd.scale(0.4));
+                    wave = 0.12F;
+                }
+                case WhipAndroid.STATE_LASH, WhipAndroid.STATE_BIND -> {
+                    Entity linked = whip.linked();
+                    if (state == WhipAndroid.STATE_BIND && linked != null && t >= WhipAndroid.BIND_THROW) {
+                        end = linked.getPosition(partialTick).add(0, linked.getBbHeight() * 0.55, 0).subtract(camera);
+                        ctrl = hand.lerp(end, 0.5).add(0, -0.15, 0);
+                        tension = 1;
+                        wave = 0.05F;
+                    } else {
+                        float reach = t < 2 ? Mth.lerp(t / 2, 0.6F, (float) WhipAndroid.REACH)
+                                : t < 4 ? (float) WhipAndroid.REACH : Mth.lerp(Mth.clamp((t - 4) / 5, 0, 1), (float) WhipAndroid.REACH, 1.2F);
+                        end = origin.add(fwd.scale(reach)).add(up.scale(1.0));
+                        ctrl = hand.lerp(end, 0.4).add(up.scale(0.6 * (1 - Mth.clamp(t / 3, 0, 1))));
+                        wave = 0.35F * (1 - Mth.clamp(t / 8, 0, 1));
+                    }
+                }
+                case WhipAndroid.STATE_CRACK -> {
+                    float u = 1 - (1 - Mth.clamp(t / 2, 0, 1)) * (1 - Mth.clamp(t / 2, 0, 1));
+                    double a = Math.toRadians(Mth.lerp(u, 70, -70));
+                    Vec3 dir = fwd.scale(Math.cos(a)).add(side.scale(Math.sin(a)));
+                    end = origin.add(dir.scale(2.8)).add(up.scale(0.9));
+                    ctrl = hand.lerp(end, 0.5).add(side.scale(0.4 * (1 - u)));
+                    wave = 0.15F;
+                }
+                case WhipAndroid.STATE_SLAM_WINDUP -> {
+                    double a = age * 1.4;
+                    end = origin.add(up.scale(2.9)).add(fwd.scale(Math.cos(a) * 1.5)).add(side.scale(Math.sin(a) * 1.5));
+                    ctrl = hand.add(up.scale(0.8));
+                    wave = 0.08F;
+                }
+                case WhipAndroid.STATE_SLAM -> {
+                    float u = 1 - (1 - Mth.clamp(t / 2, 0, 1)) * (1 - Mth.clamp(t / 2, 0, 1));
+                    float back = Mth.clamp((t - 9) / 5, 0, 1);
+                    end = origin.add(fwd.scale(Mth.lerp(u, -0.5F, 3.3F) * (1 - back) + 0.4 * back))
+                            .add(up.scale(Mth.lerp(u, 2.9F, 0.05F)));
+                    ctrl = hand.lerp(end, 0.5).add(up.scale(0.5 * (1 - u)));
+                    wave = 0.1F;
+                    shockwave(origin, fwd, side, t, age, buffers);
+                }
+                default -> {
+                    // 床へ垂れて、少し後ろへ引きずる
+                    Vec3 ground = new Vec3(hand.x, origin.y + 0.03, hand.z).subtract(fwd.scale(0.25));
+                    float sway = Mth.sin(age * 0.08F) * 0.06F;
+                    end = ground.subtract(fwd.scale(0.9)).add(side.scale(0.25 + sway));
+                    ctrl = new Vec3(hand.x, origin.y + 0.15, hand.z).add(side.scale(sway));
+                    wave = 0.03F;
+                }
+            }
+            // 光は足し合わせで描く（深度を書かないので、交差した板どうしが隠し合ってちらつかない）
+            drawWhip(hand, ctrl, end, side, wave, tension, age, buffers.getBuffer(RenderType.lightning()),
+                    android.active() || state == RuinAndroid.STATE_CHARGING ? 1F : 0.4F);
+        }
+
+        /** 柄の先 from から end まで、二次曲線に波を足した鞭。 */
+        private void drawWhip(Vec3 from, Vec3 ctrl, Vec3 end, Vec3 side, float wave, float tension, float age, VertexConsumer vc,
+                              float brightness) {
+            PoseStack.Pose id = new PoseStack().last();
+            int n = 20;
+            Vec3 prev = from;
+            for (int i = 1; i <= n; i++) {
+                float s = (float) i / n;
+                Vec3 p = from.scale((1 - s) * (1 - s)).add(ctrl.scale(2 * (1 - s) * s)).add(end.scale(s * s));
+                double w = wave * Math.sin(s * Math.PI * 3 - age * 0.9) * 4 * s * (1 - s) * (1 - tension * 0.7);
+                p = p.add(side.scale(w)).add(0, w * 0.5, 0);
+                float width = Mth.lerp(s, 0.075F, 0.035F);
+                FxDraw.beam(id, vc, prev, p, width * 1.8F, variant.accent, (int) (150 * brightness));
+                FxDraw.beam(id, vc, prev, p, width * 0.55F, 0xFFFFFF, (int) (235 * brightness));
+                prev = p;
+            }
+        }
+
+        /** 叩きつけの衝撃波: 床を前へ走る光の帯と、先端の光。 */
+        private void shockwave(Vec3 origin, Vec3 fwd, Vec3 side, float t, float age, MultiBufferSource buffers) {
+            if (t < 1) {
+                return;
+            }
+            float front = (float) Math.min(WhipAndroid.WAVE_RANGE, 1.2 + (t - 1) * WhipAndroid.WAVE_SPEED);
+            float fade = 1 - Mth.clamp((t - 10) / 4, 0, 1);
+            VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+            PoseStack.Pose id = new PoseStack().last();
+            Vec3 a = origin.add(fwd.scale(1.0)).add(0, 0.05, 0);
+            Vec3 b = origin.add(fwd.scale(front)).add(0, 0.05, 0);
+            FxDraw.beam(id, vc, a, b, 0.55F, variant.accent, (int) (90 * fade));
+            FxDraw.beam(id, vc, a, b, 0.14F, 0xFFFFFF, (int) (200 * fade));
+            // 波の先: 立ち上がる光の板
+            for (int k = -2; k <= 2; k++) {
+                Vec3 base = b.add(side.scale(k * 0.25));
+                double h = 0.5 + 0.35 * Math.abs(Math.sin(age * 1.7 + k));
+                FxDraw.beam(id, vc, base, base.add(0, h * (1 - Math.abs(k) * 0.2), 0), 0.12F, variant.accent, (int) (200 * fade));
+            }
+        }
+    }
+
     final class Blade extends RenderLayer<RuinAndroid, AndroidModel> {
         Blade(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);

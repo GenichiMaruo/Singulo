@@ -683,6 +683,7 @@ UI_LANG = {
     'gui.singulo.wormhole_port.status': ('向こう側の入れ物 %s 個とつながっている', 'Connected to %s handlers on the other side'),
     'entity.singulo.security_drone': ('警備ドローン', 'Security Drone'),
     'entity.singulo.blade_android': ('光刃型アンドロイド「ルミナ」', 'Blade Android "Lumina"'),
+    'entity.singulo.whip_android': ('鞭型アンドロイド「ヴェルナ」', 'Whip Android "Verna"'),
     'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
     'entity.singulo.horizon_warden.awakened': ('覚醒したホライズン・ウォーデン', 'Awakened Horizon Warden'),
@@ -786,6 +787,7 @@ UI_LANG = {
                                  "Sealed by a force field. Defeat this ruin's guardian"),
     'item.singulo.security_drone_spawn_egg': ('警備ドローンのスポーンエッグ', 'Security Drone Spawn Egg'),
     'item.singulo.blade_android_spawn_egg': ('光刃型アンドロイドのスポーンエッグ', 'Blade Android Spawn Egg'),
+    'item.singulo.whip_android_spawn_egg': ('鞭型アンドロイドのスポーンエッグ', 'Whip Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -1217,8 +1219,8 @@ def textures():
                {'parent': 'minecraft:item/template_spawn_egg'})
     # 遺構のアンドロイド（128×64。tools/androids.py）
     androids.textures(te, save)
-    write_json(ASSETS / 'models' / 'item' / 'blade_android_spawn_egg.json',
-               {'parent': 'minecraft:item/template_spawn_egg'})
+    for egg in ('blade_android', 'whip_android'):
+        write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
     aged, aged_seam = (226, 218, 190, 255), (180, 170, 140, 255)
@@ -2645,7 +2647,8 @@ TAB_GROUPS = [
             'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel', 'pristine_ruin_tiles', 'pristine_ruin_pillar',
             'pristine_ruin_light', 'intact_ruin_glass', 'reinforced_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
             'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
-            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg', 'blade_android_spawn_egg']),
+            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg', 'blade_android_spawn_egg',
+            'whip_android_spawn_egg']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
                      'last_archivist_spawn_egg']),
