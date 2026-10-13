@@ -78,11 +78,13 @@ It sweeps the ground with crescents, fires a chest laser, grabs you with gravity
 In its later phases it sends your projectiles back at you.
 Deepest of all, the **Ergosphere Leviathan** swims around the dead core of the Sunken Reactor Sector:
 a long serpent of reactor plates that dives through the chamber, drags you along its wake and breathes a vortex beam.
+When it coils around the core to reignite it, only the shadow of a containment pillar will save you.
 After the endgame, every boss can be refought in an awakened form with more health, harder hits and faster moves:
 use an Awakening Record Core on the Final Lab's seal console, or an awakened core on the guardian core of the other ruins.
 Awakened guardians drop chapters of records... and someone is still waiting to be read.
 
 Bosses grow stronger with the number of challengers, and everyone's attacks land, so bigger parties win faster. Rewards are counted for the players present when the fight begins.
+Each boss is tuned so that the gear you would normally have at that point can just about win. For a tougher fight, turn on the server setting `bossHardMode`.
 
 Decoded records add the story of the lost civilization to your handbook.
 

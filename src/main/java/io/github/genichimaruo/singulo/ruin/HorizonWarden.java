@@ -91,6 +91,11 @@ public class HorizonWarden extends Monster {
     public static final float NORMAL_PIERCING_FACTOR = 0.4F;
     public static final float NORMAL_PACE_FACTOR = 1.25F;
     public static final float GRIP_SLAM_FALL_NORMAL = 6;
+
+    /** いまの設定での体力の倍率（ハードモードは1倍）。 */
+    public static double healthFactor() {
+        return BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR;
+    }
     /** ゲームの決まりの最大体力の上限。 */
     static final double MAX_HEALTH_CAP = 1024;
     /** フェーズごとの、技のあいだの間の倍率（フェーズが進むほど短い）。 */

@@ -93,7 +93,7 @@ SERVER = [
     ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）'),
     ('ruins', 'bossXpMultiplier', '1.0', '0.0〜10.0', 'ボスを倒したときの経験値の倍率'),
     ('ruins', 'bossHardMode', 'false', 'true / false', 'ボスのハードモード（0.4.1 までの強さ。残響の番人の魔法が防具を貫き、ダメージも元の値）'),
-    ('ruins', 'bossCombatLog', 'true', 'true / false', 'ボス戦で受けた・与えたダメージを logs/singulo-combat.log に記録するか（調整用）'),
+    ('ruins', 'bossCombatLog', 'false', 'true / false', 'ボス戦で受けた・与えたダメージを logs/singulo-combat.log に記録するか（調整用）'),
 
     # 残響の欠片
     ('echo', 'templateUses', '16', '1〜1000（整数）', '型の残響の欠片が割れるまでの回数'),

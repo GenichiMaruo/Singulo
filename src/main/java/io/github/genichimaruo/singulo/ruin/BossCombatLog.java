@@ -56,7 +56,7 @@ public final class BossCombatLog {
     }
 
     static boolean enabled() {
-        return !ServerConfig.SPEC.isLoaded() || ServerConfig.BOSS_COMBAT_LOG.get();
+        return ServerConfig.SPEC.isLoaded() && ServerConfig.BOSS_COMBAT_LOG.get();
     }
 
     /** 攻撃した側（飛び道具なら撃った者）がボスなら、そのボス。 */

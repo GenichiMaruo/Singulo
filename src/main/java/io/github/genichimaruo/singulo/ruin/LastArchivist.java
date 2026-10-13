@@ -106,6 +106,11 @@ public class LastArchivist extends RuinBoss {
     public static final double HEALTH = 2400;
     /** 通常の強さの体力の倍率（archivistHealth に掛ける。ハードモードは1倍）。 */
     public static final double NORMAL_HEALTH_FACTOR = 0.85;
+
+    /** いまの設定での体力の倍率（ハードモードは1倍）。 */
+    public static double healthFactor() {
+        return BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR;
+    }
     public static final int EMERGE_TICKS = 200, DEATH_TICKS = 200;
     public static final int ARENA = 18;
     /** 漂う高さ（コンソールの上面から）と、相手との間合い。 */

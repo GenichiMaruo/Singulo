@@ -514,7 +514,8 @@ public final class BossRoomGameTests {
         helper.assertTrue(l.emergeTicks() == ErgosphereLeviathan.EMERGE_TICKS, "出現の演出が始まらない");
         helper.assertTrue(l.getParts().length == ErgosphereLeviathan.SEGMENTS, "体の節の数がおかしい: " + l.getParts().length);
         helper.assertFalse(l.segments()[3].hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で体が傷ついた");
-        helper.assertTrue(Math.abs(l.effectiveMaxHealth() - ErgosphereLeviathan.HEALTH) < 1.0, "体力が1600相当でない: " + l.effectiveMaxHealth());
+        double health = ErgosphereLeviathan.HEALTH * ErgosphereLeviathan.healthFactor();
+        helper.assertTrue(Math.abs(l.effectiveMaxHealth() - health) < 1.0, "体力が" + health + "相当でない: " + l.effectiveMaxHealth());
         l.discard();
         helper.succeed();
     }
@@ -582,7 +583,7 @@ public final class BossRoomGameTests {
         GuardianCoreBlockEntity core = clearedRoom(helper, "sunken_reactor");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_ergosphere_core"));
         helper.assertTrue(boss instanceof ErgosphereLeviathan && boss.awakened(), "覚醒の渦核で覚醒した大蛇が現れない: " + boss);
-        double expected = ErgosphereLeviathan.HEALTH * RuinBoss.awakenedHealthMultiplier();
+        double expected = ErgosphereLeviathan.HEALTH * ErgosphereLeviathan.healthFactor() * RuinBoss.awakenedHealthMultiplier();
         helper.assertTrue(Math.abs(boss.effectiveMaxHealth() - expected) < 1.0, "体力が " + expected + " 相当でない: " + boss.effectiveMaxHealth());
         boss.discard();
         helper.succeed();

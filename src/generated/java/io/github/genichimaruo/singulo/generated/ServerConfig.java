@@ -317,7 +317,7 @@ public final class ServerConfig {
         b.comment("ボスのハードモード（0.4.1 までの強さ。残響の番人の魔法が防具を貫き、ダメージも元の値）", "範囲: true / false");
         BOSS_HARD_MODE_ = b.define("bossHardMode", false);
         b.comment("ボス戦で受けた・与えたダメージを logs/singulo-combat.log に記録するか（調整用）", "範囲: true / false");
-        BOSS_COMBAT_LOG_ = b.define("bossCombatLog", true);
+        BOSS_COMBAT_LOG_ = b.define("bossCombatLog", false);
         b.pop();
         b.push("echo");
         b.comment("型の残響の欠片が割れるまでの回数", "範囲: 1〜1000（整数）");

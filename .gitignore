@@ -24,5 +24,3 @@ __pycache__/
 # generator cache
 src/generated/**/.cache
 
-# balance analysis output
-tools/balance/analysis.json

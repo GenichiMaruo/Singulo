@@ -126,6 +126,11 @@ public class ErgosphereLeviathan extends RuinBoss {
     /** 通常の強さの体力の倍率（leviathanHealth に掛ける。ハードモードは1倍）。 */
     public static final double NORMAL_HEALTH_FACTOR = 0.625;
 
+    /** いまの設定での体力の倍率（ハードモードは1倍）。 */
+    public static double healthFactor() {
+        return BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR;
+    }
+
     // ---- 出現: 渦が開く → 小さな蛇が這い出して泳ぐ → 真下から顎が噴き上がって丸呑み → 螺旋を描いて昇る
     public static final int EMERGE_TICKS = 220;
     public static final int EMERGE_VORTEX = 30;

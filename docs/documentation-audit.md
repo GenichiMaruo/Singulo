@@ -40,7 +40,7 @@ This audit compares the repository's current implementation and default data wit
 
 ## 0.3.1 の調整で同期した記述（2026-10-11）
 
-[バランス評価](balance-review-0.3.0/README.md) と [課題一覧](balance-review-0.3.0/issue.md) の指摘に合わせて実装を変え、説明もそろえました。対応の一覧は [対応記録](balance-review-0.3.0/RESOLUTION.md) にあります。
+0.3.0 のバランス評価の指摘に合わせて実装を変え、説明もそろえました。変更の内容は [0.3.1 の変更履歴](curseforge/changelog-0.3.1.md) にあります。
 
 | 記述 | 現行 |
 | --- | --- |

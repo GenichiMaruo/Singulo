@@ -73,8 +73,9 @@ public final class BossGameTests {
         HorizonWarden warden = console.activate(helper.getLevel(), null);
         warden.skipEmerging();
         helper.assertTrue(warden != null, "守護機が起動しない");
-        helper.assertTrue(Math.abs(warden.effectiveMaxHealth() - (float) HorizonWarden.HEALTH) < 0.5F && warden.getHealth() == warden.getMaxHealth(),
-                "HP1200 相当で起動しない: " + warden.getHealth() + " / " + warden.effectiveMaxHealth());
+        float health = (float) (HorizonWarden.HEALTH * HorizonWarden.healthFactor());
+        helper.assertTrue(Math.abs(warden.effectiveMaxHealth() - health) < 0.5F && warden.getHealth() == warden.getMaxHealth(),
+                "HP" + health + " 相当で起動しない: " + warden.getHealth() + " / " + warden.effectiveMaxHealth());
         helper.assertTrue(warden.phase() == 1 && warden.getAttributeValue(Attributes.ARMOR) == HorizonWarden.ARMOR_PHASE_1,
                 "フェーズ1の外装がない");
         helper.assertTrue(vault(helper).isSealed(), "戦っている間に保管庫が開いている");
@@ -125,7 +126,7 @@ public final class BossGameTests {
         HorizonWarden warden = console.activateAwakened(helper.getLevel(), null);
         helper.assertTrue(warden != null && warden.awakened(), "覚醒の記録核で覚醒した守護機が起きない");
         warden.skipEmerging();
-        double expected = HorizonWarden.HEALTH * HorizonWarden.awakenedHealthMultiplier();
+        double expected = HorizonWarden.HEALTH * HorizonWarden.healthFactor() * HorizonWarden.awakenedHealthMultiplier();
         helper.assertTrue(Math.abs(warden.effectiveMaxHealth() - expected) < 1.0,
                 "覚醒した守護機の体力が " + expected + " 相当でない: " + warden.effectiveMaxHealth());
         helper.assertTrue(console.activateAwakened(helper.getLevel(), null) == null, "覚醒戦の最中に2体目が起きた");
@@ -204,10 +205,13 @@ public final class BossGameTests {
         warden.skipEmerging();
         Zombie zombie = armoredZombie(helper, new BlockPos(6, 1, 1));
         warden.deploySingularity(zombie.position());
-        helper.runAtTickTime(22, () -> {
+        boolean hard = io.github.genichimaruo.singulo.ruin.BossScaling.hardMode();
+        int armed = hard ? 0 : io.github.genichimaruo.singulo.ruin.WardenSingularity.ARM_TICKS_NORMAL;
+        helper.runAtTickTime(armed + 22, () -> {
             helper.assertTrue(zombie.getArmorValue() >= 20, "防具が着られていない: " + zombie.getArmorValue());
-            // 10 tick ごとに WardenSingularity.DAMAGE。防具（防御20）があっても減らない → 2回で 20 → 10
-            float twoHits = 20 - 2 * io.github.genichimaruo.singulo.ruin.WardenSingularity.DAMAGE;
+            // 前触れのあと 10 tick ごとに WardenSingularity.DAMAGE（通常の強さでは倍率を掛ける）。防具（防御20）があっても減らない
+            float hit = io.github.genichimaruo.singulo.ruin.WardenSingularity.DAMAGE * (hard ? 1F : HorizonWarden.NORMAL_PIERCING_FACTOR);
+            float twoHits = 20 - 2 * hit;
             helper.assertTrue(zombie.getHealth() <= twoHits + 0.01F && zombie.getHealth() >= twoHits - 4.01F,
                     "潮汐ダメージが防具で軽減されている: HP " + zombie.getHealth());
             helper.succeed();
@@ -287,10 +291,13 @@ public final class BossGameTests {
         warden.skipEmerging();
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(7, 1, 9));
         warden.startGrip(zombie);
-        float held = 2 * HorizonWarden.GRIP_DAMAGE;
+        boolean hard = io.github.genichimaruo.singulo.ruin.BossScaling.hardMode();
+        float held = 2 * HorizonWarden.GRIP_DAMAGE * (hard ? 1F : HorizonWarden.NORMAL_DAMAGE_FACTOR);
+        // 落下の高さ（ハードモード 10、通常 6）から3を引いたぶん以上
+        float fall = (hard ? HorizonWarden.GRIP_SLAM_FALL : HorizonWarden.GRIP_SLAM_FALL_NORMAL) - 3;
         helper.runAtTickTime(HorizonWarden.GRIP_WARN + HorizonWarden.GRIP_HOLD + 30, () -> {
             float lost = 20 - (zombie.isAlive() ? zombie.getHealth() : 0);
-            helper.assertTrue(lost >= held + 8, "叩き落としの落下ダメージが小さい: 減った体力 " + lost);
+            helper.assertTrue(lost >= held + fall, "叩き落としの落下ダメージが小さい: 減った体力 " + lost);
             zombie.discard();
             helper.succeed();
         });
@@ -332,7 +339,8 @@ public final class BossGameTests {
         LastArchivist a = console.activateArchivist(helper.getLevel(), null);
         helper.assertTrue(a != null && a.emergeTicks() == LastArchivist.EMERGE_TICKS, "最後の記録者が目覚めない");
         helper.assertFalse(a.hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
-        helper.assertTrue(Math.abs(a.effectiveMaxHealth() - LastArchivist.HEALTH) < 1.0, "体力が2400相当でない: " + a.effectiveMaxHealth());
+        double archivist = LastArchivist.HEALTH * LastArchivist.healthFactor();
+        helper.assertTrue(Math.abs(a.effectiveMaxHealth() - archivist) < 1.0, "体力が" + archivist + "相当でない: " + a.effectiveMaxHealth());
         helper.assertTrue(console.activate(helper.getLevel(), null) == null, "記録者がいるのに守護機が起きた");
         helper.assertTrue(console.activateArchivist(helper.getLevel(), null) == null, "2体目が目覚めた");
         a.discard();
