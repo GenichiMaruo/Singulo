@@ -316,6 +316,59 @@ def dock_frame(k):
     return im
 
 
+def fabricator_top(k):
+    """遺構の印刷台の上面: 暗い印刷床に水色の格子、明るい枠と四隅の吐出口。光の走査線が床を往復する。"""
+    t = k / ANIM_FRAMES
+    im, d = new((34, 38, 48, 255))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(AGED))
+    d.rectangle([1, 1, S - 2, S - 2], outline=(80, 150, 175, 255))
+    for g in (4, 8, 11):
+        d.line([(2, g), (S - 3, g)], fill=(46, 70, 84, 255))
+        d.line([(g, 2), (g, S - 3)], fill=(46, 70, 84, 255))
+    sweep = 2 + round((S - 5) * (0.5 - 0.5 * math.cos(2 * math.pi * t)))
+    d.line([(2, sweep), (S - 3, sweep)], fill=(170, 240, 255, 255))
+    for y in (sweep - 1, sweep + 1):
+        if 2 <= y <= S - 3:
+            d.line([(2, y), (S - 3, y)], fill=(70, 140, 170, 255))
+    for x, y in ((1, 1), (S - 2, 1), (1, S - 2), (S - 2, S - 2)):
+        d.point((x, y), fill=(200, 250, 255, 255))
+    return im
+
+
+def station_top(k):
+    """アンドロイド組立ステーションの上面: 白い外装の枠の中の、濃い印刷床に水色の格子。光の走査線が往復し、四隅の吐出口が順に光る。"""
+    t = k / ANIM_FRAMES
+    im, d = new((228, 232, 236, 255))
+    d.rectangle([0, 0, S - 1, S - 1], outline=(196, 202, 210, 255))
+    d.rectangle([2, 2, S - 3, S - 3], fill=(30, 36, 46, 255), outline=(120, 225, 255, 255))
+    for g in (5, 8, 10):
+        d.line([(3, g), (S - 4, g)], fill=(44, 72, 88, 255))
+        d.line([(g, 3), (g, S - 4)], fill=(44, 72, 88, 255))
+    sweep = 3 + round((S - 7) * (0.5 - 0.5 * math.cos(2 * math.pi * t)))
+    d.line([(3, sweep), (S - 4, sweep)], fill=(190, 245, 255, 255))
+    for y in (sweep - 1, sweep + 1):
+        if 3 <= y <= S - 4:
+            d.line([(3, y), (S - 4, y)], fill=(80, 160, 190, 255))
+    for i, (x, y) in enumerate(((1, 1), (S - 2, 1), (S - 2, S - 2), (1, S - 2))):
+        on = (i + k // 2) % 4 == 0
+        d.point((x, y), fill=(120, 225, 255, 255) if on else (150, 156, 164, 255))
+    return im
+
+
+def fabricator_side():
+    """遺構の印刷台の側面: 古びた白いパネルに、縦長の暗い格納口と水色の目盛り。下は暗い帯。"""
+    im, d = new(rgba(AGED))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(AGED_SEAM))
+    d.line([(1, 1), (14, 1)], fill=rgba(mix(AGED, (255, 255, 255), 0.4)))
+    d.rectangle([5, 3, 10, 12], fill=(40, 44, 52, 255), outline=(150, 156, 164, 255))
+    for y in (5, 7, 9):
+        d.line([(7, y), (8, y)], fill=(120, 225, 255, 255))
+    d.rectangle([1, 13, 14, 14], fill=(70, 74, 84, 255))
+    d.point((2, 3), fill=(120, 225, 255, 255))
+    d.point((13, 3), fill=(120, 225, 255, 255))
+    return im
+
+
 def console_frame(k):
     """封印コンソール: 黒い操作盤に、回る封印の目盛りと輪、中央の四芒星が脈打つ。"""
     t = k / ANIM_FRAMES
@@ -344,7 +397,7 @@ def _sheet(frames):
 
 
 # 汚しを入れない（または、ここで自前で入れる）建材
-NO_WEATHER = {'ruin_cache', 'ruin_guard_dock', 'seal_console', 'cracked_ruin_panel', 'reinforced_ruin_glass'}
+NO_WEATHER = {'ruin_cache', 'ruin_guard_dock', 'seal_console', 'cracked_ruin_panel', 'reinforced_ruin_glass', 'ruin_android_fabricator'}
 
 
 def skip_weathering(iid):
@@ -376,6 +429,13 @@ def textures(tb, save, weather, write_json):
     for iid, fn, seed, ticks in (('ruin_guard_dock', dock_frame, 61, 3), ('seal_console', console_frame, 67, 4)):
         save(_sheet([weather(fn(k), seed) for k in range(ANIM_FRAMES)]), tb / f'{iid}.png')
         write_json(tb / f'{iid}.png.mcmeta', {'animation': {'frametime': ticks, 'interpolate': True}})
+    # 遺構の印刷台（上面は走査線が往復する）
+    save(_sheet([fabricator_top(k) for k in range(ANIM_FRAMES)]), tb / 'ruin_android_fabricator_top.png')
+    write_json(tb / 'ruin_android_fabricator_top.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
+    save(weather(fabricator_side(), 71), tb / 'ruin_android_fabricator_side.png')
+    # アンドロイド組立ステーションの上面（自作の装置なので汚しは入れない）
+    save(_sheet([station_top(k) for k in range(ANIM_FRAMES)]), tb / 'android_station_top.png')
+    write_json(tb / 'android_station_top.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
 
 
 def _cache_model(sealed):

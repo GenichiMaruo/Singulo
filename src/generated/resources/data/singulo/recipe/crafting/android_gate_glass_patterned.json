@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LL",
+    "LL"
+  ],
+  "key": {
+    "L": {
+      "item": "singulo:android_gate_glass"
+    }
+  },
+  "result": {
+    "id": "singulo:android_gate_glass_patterned",
+    "count": 4
+  }
+}

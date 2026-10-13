@@ -1,0 +1,105 @@
+{
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "edge": "singulo:block/android_barrier_glass_edge",
+    "particle": "singulo:block/android_barrier_glass"
+  },
+  "elements": [
+    {
+      "from": [
+        15,
+        0,
+        -0.012
+      ],
+      "to": [
+        16,
+        16,
+        -0.012
+      ],
+      "faces": {
+        "north": {
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            1,
+            16
+          ],
+          "cullface": "north"
+        }
+      }
+    },
+    {
+      "from": [
+        15,
+        0,
+        16.012
+      ],
+      "to": [
+        16,
+        16,
+        16.012
+      ],
+      "faces": {
+        "south": {
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            1,
+            16
+          ],
+          "cullface": "south"
+        }
+      }
+    },
+    {
+      "from": [
+        15,
+        -0.012,
+        0
+      ],
+      "to": [
+        16,
+        -0.012,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            1,
+            16
+          ],
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        15,
+        16.012,
+        0
+      ],
+      "to": [
+        16,
+        16.012,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            1,
+            16
+          ],
+          "cullface": "up"
+        }
+      }
+    }
+  ]
+}

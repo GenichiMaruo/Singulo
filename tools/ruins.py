@@ -28,6 +28,7 @@ BROKEN_GLASS = f'{MODID}:ruin_glass'
 LAMP = f'{MODID}:ruin_lamp'
 CACHE = f'{MODID}:ruin_cache'
 DOCK = f'{MODID}:ruin_guard_dock'
+FABRICATOR = f'{MODID}:ruin_android_fabricator'
 CONSOLE = f'{MODID}:seal_console'
 CORE = f'{MODID}:guardian_core'
 PROJECTOR = f'{MODID}:echo_projector'
@@ -127,6 +128,28 @@ class Builder:
 
     def dock(self, x, y, z, tier):
         self.set(x, y, z, DOCK, None, {'tier': tier})
+
+    def fabricator(self, x, y, z, radius=6):
+        """
+        遺構の印刷台を (x, y, z) の近くの壁際に置く。床があり、そのマスと上の3マスが空いていて（アンドロイドが立てる）、
+        すぐ横の同じ高さと1つ上が壁の所を探す。
+        """
+        def solid(name):
+            return name not in (None, AIR) and not any(w in name for w in ('slab', 'stairs', 'carpet', 'cobweb', 'end_rod'))
+
+        spots = sorted(((dx, dz) for dx in range(-radius, radius + 1) for dz in range(-radius, radius + 1)),
+                       key=lambda d: d[0] * d[0] + d[1] * d[1])
+        for dx, dz in spots:
+            px, pz = x + dx, z + dz
+            if not solid(self.get(px, y - 1, pz)):
+                continue
+            if not all(self.get(px, y + k, pz) == AIR for k in range(4)):
+                continue
+            if any(solid(self.get(px + ox, y, pz + oz)) and solid(self.get(px + ox, y + 1, pz + oz))
+                   for ox, oz in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                self.set(px, y, pz, FABRICATOR)
+                return px, y, pz
+        raise ValueError(f'遺構の印刷台を置ける壁際がない: {(x, y, z)}')
 
     def sealed(self, x, y, z, tier):
         """封印コンテナ（次の段階の鍵で開く。中身は初めて開いたときに loot table singulo:sealed/tier_N から入る）。"""
@@ -243,6 +266,7 @@ def observation_post():
     b.set(c + 5, 1, c + 2, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
     b.dock(c - 4, 1, c + 4, 1)
     b.sealed(c - 5, 1, c - 1, 1)
+    b.fabricator(c + 3, 1, c - 4)
     # 朽ちた跡
     b.decay(cracked=0.2, mossy=0.15)
     for (x, y, z), blk in list(b.blocks.items()):         # 屋根の穴
@@ -336,6 +360,8 @@ def research_building():
     b.dock(13, 1, 4, 2)
     b.sealed(4, 8, 16, 2)
     b.dock(22, 8, 14, 2)
+    b.fabricator(5, 1, 6)
+    b.fabricator(12, 8, 6)
     archive_hall(b, X)
     b.decay(cracked=0.2, mossy=0.08)
     b.break_glass(0.2)
@@ -494,6 +520,7 @@ def culture_facility():
                 b.set(x, 10, z, 'minecraft:spore_blossom')
     b.dock(c - 9, 1, c - 5, 3)
     b.dock(c + 9, 1, c + 5, 3)
+    b.fabricator(c, 1, c + 9)
     containment_chamber(b, c)
     b.decay(cracked=0.15, mossy=0.1)
     b.break_glass(0.1)
@@ -656,6 +683,7 @@ def final_lab():
     b.fill(c - 2, 1, c + R, c - 2, 5, 34, PANEL)
     b.fill(c + 2, 1, c + R, c + 2, 5, 34, PANEL)
     b.fill(c - 2, 5, c + R, c + 2, 5, 34, PANEL)
+    b.fabricator(c + 1, 1, 33, radius=1)                      # 入口の通路（ドームの外）
     b.decay(cracked=0.22, mossy=0.12, only_above=1)
     b.scatter('minecraft:moss_carpet', 30, 1, (2, 2, 32, 32), floor=(PANEL, LAMP))
     return b
@@ -746,6 +774,7 @@ def sunken_reactor():
         b.fill(cx - 1, FLOOR + 1, z, cx + 1, FLOOR + 4, z, AIR)
         if z % 4 == 0:
             b.set(cx, FLOOR + 5, z, LAMP)
+    b.fabricator(cx + 1, FLOOR + 1, 52, radius=1)             # 入口の通路（封じ込め室の外）
     # 剥がれた炉殻の破片が宙に止まっている（重力の乱れ）
     for _ in range(60):
         x, y, z = cx + b.rng.randint(-17, 17), b.rng.randint(FLOOR + 3, 32), cz + b.rng.randint(-17, 17)
