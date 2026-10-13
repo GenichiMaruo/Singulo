@@ -19,10 +19,25 @@ import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** Regression checks for APIs that differ from the 1.21.1 implementation. */
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = Singulo.MODID)
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class Port1201GameTests {
     private Port1201GameTests() {}
+
+    /** ConfigValue.set() auto-saves; a delayed file watcher reload can undo another test's temporary setting. */
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public static void stabilizeGameTestConfig(net.minecraftforge.event.server.ServerStartedEvent event) throws java.io.IOException {
+        if (!net.minecraftforge.gametest.ForgeGameTestHooks.isGametestServer()) return;
+        for (var config : net.minecraftforge.fml.config.ConfigTracker.INSTANCE.configSets()
+                .get(net.minecraftforge.fml.config.ModConfig.Type.SERVER)) {
+            if (config.getModId().equals(Singulo.MODID)) {
+                com.electronwill.nightconfig.core.file.FileWatcher.defaultInstance().removeWatch(config.getFullPath());
+                Singulo.LOGGER.info("GameTests: disabled asynchronous config watching for {}", config.getFileName());
+            }
+        }
+    }
+
 
     @GameTest(template = "empty")
     public static void stepHeightMatchesModernOneBlockHeight(GameTestHelper helper) {

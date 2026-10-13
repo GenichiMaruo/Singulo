@@ -42,6 +42,11 @@ public final class ReactorGameTests {
             level.removeBlock(pos, false);
         }
     }
+    /** Timing checks run alone: other reactors in the long batch keep emitting hazards after success. */
+    @net.minecraft.gametest.framework.AfterBatch(batch = BATCH + "_ignition")
+    public static void stopIgnitionReactor(net.minecraft.server.level.ServerLevel level) {
+        stopReactors(level);
+    }
     private static final BlockPos CENTER = new BlockPos(7, 7, 7);
     private static final BlockPos CONTROLLER = CENTER.below(Structures.CONTROLLER_BELOW_CENTER);
     /** テストで抽出ポートにする炉殻の位置（リングの最初の炉殻）。 */
@@ -91,7 +96,7 @@ public final class ReactorGameTests {
         });
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 420)
+    @GameTest(template = HUGE, batch = BATCH + "_ignition", timeoutTicks = 420)
     public static void ignitionNeeds50GFEWithinTenSeconds(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
@@ -100,7 +105,7 @@ public final class ReactorGameTests {
         helper.onEachTick(() -> r.energy().receiveEnergy(300_000_000, false));
         // 電力は数秒で満ちるが、炉心ができるのは点火の演出（16秒）の終わり
         helper.runAtTickTime(3 + PenroseReactorBlockEntity.IGNITION_SEQUENCE_TICKS - 40, () -> helper.assertTrue(
-                r.state() == PenroseReactorBlockEntity.State.IGNITING, "点火の演出の途中で炉心ができた"));
+                r.state() == PenroseReactorBlockEntity.State.IGNITING, "点火演出の状態が変わった: state=" + r.state() + ", formed=" + r.isFormed() + ", data=" + r.saveWithoutMetadata()));
         helper.succeedWhen(() -> {
             helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.RUNNING, "点火して稼働しない");
             helper.assertTrue(Math.abs(r.mass() - PenroseReactorBlockEntity.START_MASS) < 1, "最初の炉心質量が500でない");
