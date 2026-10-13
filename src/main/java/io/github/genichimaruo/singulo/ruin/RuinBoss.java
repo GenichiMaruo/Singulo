@@ -177,6 +177,31 @@ public abstract class RuinBoss extends Monster {
         setBarName(barName != null ? barName : getDisplayName());
     }
 
+    // ------------------------------------------------------------------ 落とし物
+
+    /** 倒れたときの落とし物と経験値を出す場所（守る核の上。なければ倒れた場所）。宙で倒れても、床の穴へ落ちて失われないように。 */
+    protected net.minecraft.world.phys.Vec3 lootPos() {
+        return home != null ? net.minecraft.world.phys.Vec3.atBottomCenterOf(home.above()).add(0, 0.2, 0) : position();
+    }
+
+    @Override
+    public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(net.minecraft.world.item.ItemStack stack, float offsetY) {
+        if (isDeadOrDying() || isRemoved()) {
+            return BossLoot.drop(this, lootPos(), stack);
+        }
+        return super.spawnAtLocation(stack, offsetY);
+    }
+
+    @Override
+    protected void dropExperience(@Nullable net.minecraft.world.entity.Entity killer) {
+        if (level() instanceof ServerLevel server && !wasExperienceConsumed() && (isAlwaysExperienceDropper()
+                || lastHurtByPlayerTime > 0 && shouldDropExperience()
+                && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
+            int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
+            BossLoot.experience(server, lootPos(), reward);
+        }
+    }
+
     /** 挑戦者がいなくなってからの猶予を、次の確かめで終わるところまで進める（テスト用）。 */
     public void skipResetGrace() {
         emptyChecks = Math.max(emptyChecks, resetChecks() - 1);

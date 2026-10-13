@@ -66,6 +66,12 @@ public class HorizonBolt extends ThrowableItemProjectile {
     }
 
     /** 色（0xRRGGBB）・大きさ（1 が標準）・ダメージを決める。 */
+    /** 当たったときのダメージだけを変える。 */
+    public HorizonBolt power(float damage) {
+        this.damage = damage;
+        return this;
+    }
+
     public HorizonBolt style(int rgb, float size, float damage) {
         entityData.set(COLOR, rgb);
         entityData.set(SIZE, size);

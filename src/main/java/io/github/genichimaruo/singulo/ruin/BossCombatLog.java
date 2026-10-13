@@ -109,11 +109,14 @@ public final class BossCombatLog {
         if (boss instanceof RuinBoss r && r.combatAttack() != null) {
             return r.combatAttack();
         }
+        if (boss instanceof HorizonWarden w && w.combatAttack() != null) {
+            return w.combatAttack();
+        }
         return source.getMsgId();
     }
 
     private static void write(String event, Mob boss, String attack, float raw, float dealt, float blocked, Player player) {
-        String state = boss instanceof RuinBoss r ? r.combatState() : "";
+        String state = boss instanceof RuinBoss r ? r.combatState() : boss instanceof HorizonWarden w ? w.combatState() : "";
         int participants = boss instanceof RuinBoss r ? r.participants() : boss instanceof HorizonWarden w ? w.participants() : 1;
         String line = String.join("\t",
                 String.format(Locale.ROOT, "%.2f", boss.tickCount / 20.0),

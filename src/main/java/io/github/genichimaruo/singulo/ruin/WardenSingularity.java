@@ -24,6 +24,13 @@ public class WardenSingularity extends Entity {
     public static final float DAMAGE = 5.0F;
     /** 育つ・しぼむのにかける tick。 */
     public static final int GROW = 10;
+    /**
+     * 通常の強さでは、出てからこの tick のあいだは育つだけで、引き寄せもダメージもない（足元に出たのを見てから離れられる）。
+     * 引き寄せも、歩いて逃げられる強さにする。ハードモードは出た瞬間から 0.08 で引き寄せる。
+     */
+    public static final int ARM_TICKS_NORMAL = 20;
+    static final double PULL = 0.08;
+    static final double PULL_NORMAL = 0.04;
 
     @Nullable
     private Entity owner;
@@ -51,7 +58,8 @@ public class WardenSingularity extends Entity {
         if (!(level() instanceof ServerLevel level)) {
             return;
         }
-        if (tickCount >= LIFETIME) {
+        // ウォーデンが倒れたら（いなくなったら）、残っている特異点も消える
+        if (tickCount >= LIFETIME || owner instanceof LivingEntity o && (o.isRemoved() || o.isDeadOrDying())) {
             discard();
             return;
         }
@@ -59,16 +67,29 @@ public class WardenSingularity extends Entity {
         if (tickCount % 4 == 0) {
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 6, RADIUS / 2, 0.6, RADIUS / 2, 0.02);
         }
+        boolean hard = BossScaling.hardMode();
+        if (!hard && tickCount < ARM_TICKS_NORMAL) {
+            // 予告: 範囲の縁に光を出すだけ
+            if (tickCount % 2 == 0) {
+                double a = random.nextDouble() * Math.PI * 2;
+                level.sendParticles(ParticleTypes.END_ROD, c.x + Math.cos(a) * RADIUS, c.y - 0.8, c.z + Math.sin(a) * RADIUS, 1, 0, 0.02, 0, 0);
+            }
+            return;
+        }
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(RADIUS),
                 e -> e != owner && e.isAlive() && !RuinGuards.isGuard(e))) {
             Vec3 toCenter = c.subtract(e.position());
             if (toCenter.lengthSqr() > RADIUS * RADIUS) {
                 continue;
             }
-            e.setDeltaMovement(e.getDeltaMovement().add(toCenter.normalize().scale(0.08)));
+            e.setDeltaMovement(e.getDeltaMovement().add(toCenter.normalize().scale(hard ? PULL : PULL_NORMAL)));
             e.hurtMarked = true;
             if (tickCount % 10 == 0) {
-                e.hurt(SinguloDamageTypes.tidal(level, owner), DAMAGE);
+                if (owner instanceof HorizonWarden w) {
+                    w.hurtWith("singularity", e, SinguloDamageTypes.tidal(level, owner), DAMAGE);
+                } else {
+                    e.hurt(SinguloDamageTypes.tidal(level, owner), DAMAGE);
+                }
             }
         }
     }
