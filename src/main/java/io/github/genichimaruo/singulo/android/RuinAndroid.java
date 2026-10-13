@@ -36,8 +36,9 @@ import org.joml.Vector3f;
 /**
  * 遺構のアンドロイド（光刃型・鞭型・光剣型の共通部分）。印刷台の上で、下から積み上がるように印刷されて現れる。
  *
- * <p>充電（{@link #CHARGE_MAX}）を持ち、技を使うたびに減る。0 になると攻撃をやめ（目の光が消える）、印刷台へ戻って
- * 充電する（{@link #CHARGE_MAX} tick、約15秒で満タン）。印刷台がなければ、その場で座って充電する。死ぬことはない。
+ * <p>充電（{@link #CHARGE_MAX}）を持ち、技を使うたびに減る（大技10回ほどで切れる）。0 になると攻撃をやめ（目の光が消える）、
+ * 近くの印刷台へ戻って充電する（5秒で満タン）。近くに印刷台がなければ、昼の空の下では左手からソーラーパネルを広げて
+ * 充電し（10秒）、夜や屋内では地面に座ってゆっくり充電する（14秒）。死ぬことはない。
  */
 public abstract class RuinAndroid extends Monster {
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
@@ -49,9 +50,19 @@ public abstract class RuinAndroid extends Monster {
     public static final int STATE_IDLE = 0;
     public static final int STATE_LOW_POWER = 1;
     public static final int STATE_CHARGING = 2;
+    /** 昼の空の下で、左手のソーラーパネルで充電している。 */
+    public static final int STATE_SOLAR = 3;
+    /** 夜や屋内で、地面に座って充電している。 */
+    public static final int STATE_RESTING = 4;
 
-    /** 充電の満タン（0 から満タンまで、印刷台の上でこの tick）。 */
-    public static final int CHARGE_MAX = 300;
+    /** 充電の満タン。 */
+    public static final int CHARGE_MAX = 2800;
+    /** 1 tick に充電する量（印刷台: 5秒、ソーラー: 10秒、座って: 14秒で満タン）。 */
+    public static final int RATE_DOCK = CHARGE_MAX / 100;
+    public static final int RATE_SOLAR = CHARGE_MAX / 200;
+    public static final int RATE_REST = CHARGE_MAX / 280;
+    /** これより遠い印刷台へは戻らない（その場で充電する）。 */
+    public static final double DOCK_RANGE = 32;
     /** 印刷にかかる tick。 */
     public static final int PRINT_TICKS = 60;
     /** 印刷台から離れていい距離（遺構のもの）。 */
@@ -118,9 +129,15 @@ public abstract class RuinAndroid extends Monster {
         entityData.set(CHARGE, Mth.clamp(charge, 0, CHARGE_MAX));
     }
 
-    /** 充電を cost 使う。足りなければ使わずに false。0 になったら充電切れ（戻る）。 */
+    /**
+     * 充電を cost 使う。0 になったら充電切れ（戻る）。足りなければ使わずに false を返し、充電切れとして充電しに行く
+     * （大技に足りない残りのまま、技を出せずに立ち尽くさないように）。
+     */
     protected boolean spend(int cost) {
         if (charge() < cost) {
+            if (active()) {
+                powerDown();
+            }
             return false;
         }
         setCharge(charge() - cost);
@@ -140,8 +157,12 @@ public abstract class RuinAndroid extends Monster {
 
     /** 攻撃できるか（充電があり、印刷が終わり、戻り・充電中でない）。 */
     public boolean active() {
-        int s = state();
-        return printed() && s != STATE_LOW_POWER && s != STATE_CHARGING;
+        return printed() && state() != STATE_LOW_POWER && !charging(state());
+    }
+
+    /** 充電中の状態か（印刷台・ソーラー・座って）。 */
+    public static boolean charging(int state) {
+        return state == STATE_CHARGING || state == STATE_SOLAR || state == STATE_RESTING;
     }
 
     public boolean printed() {
@@ -358,7 +379,7 @@ public abstract class RuinAndroid extends Monster {
 
         @Override
         public boolean canUse() {
-            return !printed() || state() == STATE_LOW_POWER || state() == STATE_CHARGING;
+            return !printed() || state() == STATE_LOW_POWER || charging(state());
         }
 
         @Override
@@ -374,8 +395,10 @@ public abstract class RuinAndroid extends Monster {
             if (state() == STATE_LOW_POWER) {
                 BlockPos h = home;
                 Vec3 dock = h == null ? null : Vec3.atBottomCenterOf(h.above());
-                if (dock == null || dock.distanceToSqr(position()) > 48 * 48 || stateTicks > 400) {
-                    setState(STATE_CHARGING);
+                if (dock == null || dock.distanceToSqr(position()) > DOCK_RANGE * DOCK_RANGE || stateTicks > 400) {
+                    getNavigation().stop();
+                    setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
+                    playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
                     return;
                 }
                 if (dock.distanceToSqr(position()) < 1.6 * 1.6) {
@@ -387,17 +410,34 @@ public abstract class RuinAndroid extends Monster {
                 if (stateTicks % 10 == 1) {
                     getNavigation().moveTo(dock.x, dock.y, dock.z, 0.75);
                 }
-            } else if (state() == STATE_CHARGING) {
+            } else if (charging(state())) {
                 getNavigation().stop();
-                setCharge(charge() + 1);
+                int s = state();
+                // 外で充電中に日が沈んだり屋根の下に入ったら座る。座っていて日が出たらパネルを広げる
+                if (s != STATE_CHARGING && stateTicks % 40 == 0) {
+                    boolean sun = sunlit(level);
+                    if (s == STATE_SOLAR && !sun) {
+                        setState(STATE_RESTING);
+                        s = STATE_RESTING;
+                    } else if (s == STATE_RESTING && sun) {
+                        setState(STATE_SOLAR);
+                        s = STATE_SOLAR;
+                    }
+                }
+                setCharge(charge() + (s == STATE_CHARGING ? RATE_DOCK : s == STATE_SOLAR ? RATE_SOLAR : RATE_REST));
                 if (stateTicks % 8 == 0) {
-                    sparks(level, position().add(0, 0.2, 0), 3, 0.35);
+                    sparks(level, position().add(0, s == STATE_SOLAR ? 2.2 : 0.2, 0), 2, 0.3);
                 }
                 if (charge() >= CHARGE_MAX) {
                     setState(STATE_IDLE);
                     playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
                 }
             }
+        }
+
+        /** 昼で、空が見えていて、雨でないか（ソーラーで充電できるか）。 */
+        private boolean sunlit(ServerLevel level) {
+            return level.isDay() && !level.isRaining() && level.canSeeSky(blockPosition().above());
         }
     }
 }

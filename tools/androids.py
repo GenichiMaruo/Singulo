@@ -36,6 +36,8 @@ ANDROID_PARTS = {
     'blade_tip': (104, 32, 1, 2, 1),
     'thruster': (0, 48, 2, 3, 2),
     'whip_handle': (110, 32, 1, 4, 1),
+    'hilt': (114, 32, 1, 4, 1),
+    'guard': (118, 32, 3, 1, 1),
 }
 
 # 型ごとの色。hair: 髪（明・影・深い影）、streak: ひと房（またはインナー）の色、accent: 光の色、iris: 瞳（深・明）
@@ -56,6 +58,13 @@ VARIANTS = {
         'seed': 37,
         'mirror': True,
         'inner': True,
+    },
+    'saber_android': {
+        'hair': ((226, 230, 238), (192, 198, 212), (160, 166, 182)),
+        'streak': ((242, 202, 98), (204, 160, 58)),
+        'accent': (255, 196, 90),
+        'iris': ((168, 108, 28), (255, 212, 112)),
+        'seed': 41,
     },
 }
 
@@ -487,4 +496,18 @@ def paint(pal, Image):
             put(x, y0 + 2, accent, lit=True)
             put(x, y1 - 1, accent, lit=True)
     line(f['down'], accent)
+
+    # ---------------------------------------------------------------- 光剣の柄（白い握りに金の帯）と鍔
+    f = part('hilt')
+    for k in f:
+        fill(f[k], CERAMIC, 2)
+    for k in ('front', 'side_a', 'side_b', 'back'):
+        x0, y0, x1, y1 = f[k]
+        for x in range(x0, x1):
+            put(x, y0 + 1, SUIT)
+            put(x, y0 + 2, accent, lit=True)
+    f = part('guard')
+    for k in f:
+        fill(f[k], CERAMIC_SH, 2)
+    line(f['up'], accent)
     return base, glow

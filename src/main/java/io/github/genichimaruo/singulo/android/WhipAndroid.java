@@ -61,10 +61,10 @@ public class WhipAndroid extends RuinAndroid {
     static final float WAVE_DAMAGE = 6;
     static final float CRACK_DAMAGE = 4;
 
-    static final int COST_LASH = 55;
-    static final int COST_BIND = 70;
-    static final int COST_SLAM = 75;
-    static final int COST_CRACK = 15;
+    static final int COST_LASH = 235;
+    static final int COST_BIND = 295;
+    static final int COST_SLAM = 310;
+    static final int COST_CRACK = 60;
 
     public WhipAndroid(EntityType<? extends WhipAndroid> type, Level level) {
         super(type, level);

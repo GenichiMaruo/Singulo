@@ -8,7 +8,8 @@ import net.minecraft.world.entity.EntityType;
 /** アンドロイドの型（印刷台や設計メモリが、どの型を印刷するか）。 */
 public enum AndroidKind {
     BLADE("blade", SinguloEntities.BLADE_ANDROID),
-    WHIP("whip", SinguloEntities.WHIP_ANDROID);
+    WHIP("whip", SinguloEntities.WHIP_ANDROID),
+    SABER("saber", SinguloEntities.SABER_ANDROID);
 
     public final String id;
     private final Supplier<? extends EntityType<? extends RuinAndroid>> type;

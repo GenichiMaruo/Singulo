@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
+import io.github.genichimaruo.singulo.android.SaberAndroid;
 import io.github.genichimaruo.singulo.android.WhipAndroid;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -32,7 +33,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
 
     public enum Variant {
         BLADE("blade_android", BladeAndroid.ACCENT, AndroidModel.BLADE_LAYER),
-        WHIP("whip_android", WhipAndroid.ACCENT, AndroidModel.WHIP_LAYER);
+        WHIP("whip_android", WhipAndroid.ACCENT, AndroidModel.WHIP_LAYER),
+        SABER("saber_android", SaberAndroid.ACCENT, AndroidModel.SABER_LAYER);
 
         final ResourceLocation texture;
         final ResourceLocation glow;
@@ -55,6 +57,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Glow(this));
         addLayer(new Blade(this));
         addLayer(new Whip(this));
+        addLayer(new Saber(this));
+        addLayer(new Solar(this));
     }
 
     @Override
@@ -167,6 +171,52 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 slashTrail(android, partialTick, pose, glow, t, 4, 1.45F, 1F);
             }
             case BladeAndroid.STATE_SWING -> slashTrail(android, partialTick, pose, glow, t, 3, 1.25F, 0.6F);
+            case SaberAndroid.STATE_SWEEP -> slashTrail(android, partialTick, pose, glow, t, 2, (float) SaberAndroid.SWEEP_REACH, 1.1F);
+            case SaberAndroid.STATE_RIPOSTE -> slashTrail(android, partialTick, pose, glow, t, 1.5F, 1.7F, 1F);
+            case SaberAndroid.STATE_CUT -> slashTrail(android, partialTick, pose, glow, t, 3, 1.4F, 0.6F);
+            case SaberAndroid.STATE_THRUST_WINDUP -> {
+                // 腰だめの剣に光が集まる
+                pose.pushPose();
+                bodySpace(android, partialTick, pose);
+                pose.translate(0.35, 0.75, -0.3);
+                float k = Mth.clamp(t / SaberAndroid.THRUST_WINDUP, 0, 1);
+                float pulse = 0.85F + 0.15F * Mth.sin(age * 2.2F);
+                FxDraw.billboard(pose, glow, camera, (0.4F + 0.9F * k) * pulse, accent, 130);
+                FxDraw.billboard(pose, glow, camera, (0.15F + 0.35F * k) * pulse, 0xFFFFFF, 230);
+                pose.popPose();
+            }
+            case SaberAndroid.STATE_GUARD -> {
+                // 正面の光の盾（六角の縁と、薄い面）
+                pose.pushPose();
+                bodySpace(android, partialTick, pose);
+                pose.translate(0, 1.0, -0.75);
+                pose.mulPose(Axis.XP.rotationDegrees(90));
+                float k = Mth.clamp(t / 4, 0, 1) * (1 - Mth.clamp((t - SaberAndroid.GUARD + 4) / 4, 0, 1));
+                float shimmer = 0.9F + 0.1F * Mth.sin(age * 0.2F);
+                FxDraw.ring(pose.last(), glow, 0, 0.75F * k, accent, (int) (45 * shimmer), (int) (70 * shimmer));
+                FxDraw.ring(pose.last(), glow, 0.7F * k, 0.8F * k, 0xFFFFFF, (int) (200 * k), (int) (120 * k));
+                pose.mulPose(Axis.YP.rotationDegrees(age * 3));
+                for (int i = 0; i < 6; i++) {
+                    float a0 = Mth.TWO_PI * i / 6;
+                    float a1 = Mth.TWO_PI * (i + 1) / 6;
+                    FxDraw.beam(pose.last(), glow, new Vec3(Mth.cos(a0) * 0.55 * k, 0, Mth.sin(a0) * 0.55 * k),
+                            new Vec3(Mth.cos(a1) * 0.55 * k, 0, Mth.sin(a1) * 0.55 * k), 0.04F, accent, (int) (200 * k));
+                }
+                pose.popPose();
+            }
+            case SaberAndroid.STATE_WAVE -> {
+                if (t >= 6) {
+                    pose.pushPose();
+                    bodySpace(android, partialTick, pose);
+                    pose.translate(0, 1.2, 0);
+                    pose.mulPose(Axis.ZP.rotationDegrees(-60));
+                    float u = Mth.clamp((t - 6) / 2, 0, 1);
+                    float fade = 1 - Mth.clamp((t - 8) / 4, 0, 1);
+                    FxDraw.crescent(pose.last(), glow, Mth.lerp(u, 90, -80), 90, 1.5F, 0.55F, accent, (int) (180 * fade));
+                    FxDraw.crescent(pose.last(), glow, Mth.lerp(u, 90, -80), 90, 1.5F, 0.16F, 0xFFFFFF, (int) (235 * fade));
+                    pose.popPose();
+                }
+            }
             case BladeAndroid.STATE_SPIN -> {
                 pose.pushPose();
                 bodySpace(android, partialTick, pose);
@@ -204,6 +254,14 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.popPose();
                 }
             }
+            case RuinAndroid.STATE_SOLAR, RuinAndroid.STATE_RESTING -> {
+                // 足元の充電の目盛り（満ちるほど白い弧がのびる）
+                pose.pushPose();
+                pose.translate(0, 0.02, 0);
+                FxDraw.ring(pose.last(), glow, 0.6F, 0.75F, accent, 70, 15);
+                LastArchivistRenderer.arc(pose, glow, 0.62F, 0.73F, -90, -90 + 360 * android.chargeFraction(), 0xFFFFFF, 190);
+                pose.popPose();
+            }
             case RuinAndroid.STATE_CHARGING -> {
                 // 体を下から上へなぞる充電の輪（満ちるほど明るい）
                 float charge = android.chargeFraction();
@@ -227,8 +285,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     /** 刃の軌跡（右後ろから左前への三日月。少し斜め）。 */
-    private static void slashTrail(RuinAndroid android, float partialTick, PoseStack pose, VertexConsumer glow, float t, float fast,
-                                   float radius, float amount) {
+    private void slashTrail(RuinAndroid android, float partialTick, PoseStack pose, VertexConsumer glow, float t, float fast,
+                            float radius, float amount) {
         float u = 1 - (1 - Mth.clamp(t / fast, 0, 1)) * (1 - Mth.clamp(t / fast, 0, 1));
         float fade = 1 - Mth.clamp((t - fast) / 4, 0, 1);
         if (fade <= 0) {
@@ -240,7 +298,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         bodySpace(android, partialTick, pose);
         pose.translate(0, 1.0, 0);
         pose.mulPose(Axis.ZP.rotationDegrees(-14));
-        FxDraw.crescent(pose.last(), glow, tail, head, radius, 0.6F * amount, ((AndroidRenderer.Variant.BLADE.accent)), (int) (180 * fade));
+        FxDraw.crescent(pose.last(), glow, tail, head, radius, 0.6F * amount, variant.accent, (int) (180 * fade));
         FxDraw.crescent(pose.last(), glow, tail, head, radius, 0.18F * amount, 0xFFFFFF, (int) (235 * fade));
         pose.popPose();
     }
@@ -257,6 +315,33 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             int alpha = (int) (strength * (110 - 30 * i));
             model.renderToBuffer(pose, vc, FxDraw.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, argb(alpha, mix(variant.accent, 0xFFFFFF, 0.25F)));
             pose.popPose();
+        }
+    }
+
+    /**
+     * 足し合わせの光の箱（RenderType.lightning 用）。各面を表裏の両方の向きで描くので、どの向きから見ても、
+     * 面の向き（裏向きの面を描かない設定）で消えることがない。
+     */
+    static void glowBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1, int rgb, int alpha) {
+        PoseStack.Pose p = pose.last();
+        float[][][] faces = {
+                {{x0, y0, z0}, {x1, y0, z0}, {x1, y0, z1}, {x0, y0, z1}},
+                {{x0, y1, z0}, {x1, y1, z0}, {x1, y1, z1}, {x0, y1, z1}},
+                {{x0, y0, z0}, {x1, y0, z0}, {x1, y1, z0}, {x0, y1, z0}},
+                {{x0, y0, z1}, {x1, y0, z1}, {x1, y1, z1}, {x0, y1, z1}},
+                {{x0, y0, z0}, {x0, y0, z1}, {x0, y1, z1}, {x0, y1, z0}},
+                {{x1, y0, z0}, {x1, y0, z1}, {x1, y1, z1}, {x1, y1, z0}},
+        };
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+        for (float[][] f : faces) {
+            for (int i = 0; i < 4; i++) {
+                vc.addVertex(p, f[i][0], f[i][1], f[i][2]).setColor(r, g, b, alpha);
+            }
+            for (int i = 3; i >= 0; i--) {
+                vc.addVertex(p, f[i][0], f[i][1], f[i][2]).setColor(r, g, b, alpha);
+            }
         }
     }
 
@@ -280,11 +365,73 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 return;
             }
             int alpha = 255;
-            if (state == RuinAndroid.STATE_CHARGING) {
+            if (state == RuinAndroid.STATE_CHARGING || state == RuinAndroid.STATE_RESTING) {
                 alpha = (int) (70 + 60 * Mth.sin(ageInTicks * 0.15F));
             }
             VertexConsumer vc = buffers.getBuffer(RenderType.eyes(variant.glow));
             getParentModel().renderToBuffer(pose, vc, 0xF00000, OverlayTexture.NO_OVERLAY, argb(alpha, 0xFFFFFF));
+        }
+    }
+
+    /**
+     * ソーラー充電: 空へ掲げた左手の上に、3枚の羽根のソーラーパネルが広がる（両脇の2枚が、たたまれた状態から開く）。
+     * 濃い紺のセルに銀の枠と格子。パネルから腕へ、光が流れ落ちる。
+     */
+    final class Solar extends RenderLayer<RuinAndroid, AndroidModel> {
+        Solar(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (android.state() != RuinAndroid.STATE_SOLAR) {
+                return;
+            }
+            AndroidModel m = getParentModel();
+            float t = android.stateTime(partialTick);
+            float open = Mth.clamp((t - 6) / 14, 0, 1);
+            open = open * open * (3 - 2 * open);
+            float rise = Mth.clamp(t / 8, 0, 1);
+            pose.pushPose();
+            m.toLeftHand(pose);
+            // 手の先（体の大きさで縮んでいるので、長さは SCALE で割る）
+            pose.translate(0, (0.12F + 0.1F * rise) / SCALE, 0);
+            float s = (0.35F + 0.65F * rise) / SCALE;
+            pose.scale(s, s, s);
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            leaf(pose, body, light);
+            for (int side = -1; side <= 1; side += 2) {
+                pose.pushPose();
+                pose.translate(side * 0.25F, 0, 0);
+                // たたまれた羽根（下に180度折り返し）から、水平に開く
+                pose.mulPose(Axis.ZP.rotationDegrees(side * 180 * (1 - open)));
+                pose.translate(side * 0.25F, 0, 0);
+                leaf(pose, body, light);
+                pose.popPose();
+            }
+            // 支柱
+            FxDraw.box(pose, body, -0.03F, -0.2F, -0.03F, 0.03F, 0, 0.03F, light, 0xB8BEC8, 255);
+            // パネルから腕へ流れ落ちる光
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            float flow = (age * 0.05F) % 1F;
+            glowBox(pose, fx, -0.02F, -0.2F - flow * 0.6F, -0.02F, 0.02F, -0.1F - flow * 0.6F, 0.02F, variant.accent, (int) (180 * open));
+            glowBox(pose, fx, -0.76F * open, 0.026F, -0.19F, 0.76F * open, 0.032F, 0.19F, variant.accent,
+                    (int) (35 + 25 * Mth.sin(age * 0.1F)));
+            pose.popPose();
+        }
+
+        /** 羽根1枚（中心が原点、幅 0.5・奥行き 0.36、上が空を向く）。 */
+        private void leaf(PoseStack pose, VertexConsumer vc, int light) {
+            float w = 0.25F;
+            float d = 0.18F;
+            FxDraw.box(pose, vc, -w, 0, -d, w, 0.025F, d, light, 0x9AA2B0, 255);
+            FxDraw.box(pose, vc, -w + 0.02F, 0.024F, -d + 0.02F, w - 0.02F, 0.03F, d - 0.02F, light, 0x1E2C55, 255);
+            for (int i = 1; i < 4; i++) {
+                float x = -w + 2 * w * i / 4;
+                FxDraw.box(pose, vc, x - 0.004F, 0.03F, -d + 0.02F, x + 0.004F, 0.033F, d - 0.02F, light, 0x6C86B8, 255);
+            }
+            FxDraw.box(pose, vc, -w + 0.02F, 0.03F, -0.004F, w - 0.02F, 0.033F, 0.004F, light, 0x6C86B8, 255);
         }
     }
 
@@ -378,7 +525,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
             // 光は足し合わせで描く（深度を書かないので、交差した板どうしが隠し合ってちらつかない）
             drawWhip(hand, ctrl, end, side, wave, tension, age, buffers.getBuffer(RenderType.lightning()),
-                    android.active() || state == RuinAndroid.STATE_CHARGING ? 1F : 0.4F);
+                    android.active() || RuinAndroid.charging(state) ? 1F : 0.4F);
         }
 
         /** 柄の先 from から end まで、二次曲線に波を足した鞭。 */
@@ -418,6 +565,56 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 double h = 0.5 + 0.35 * Math.abs(Math.sin(age * 1.7 + k));
                 FxDraw.beam(id, vc, base, base.add(0, h * (1 - Math.abs(k) * 0.2), 0), 0.12F, variant.accent, (int) (200 * fade));
             }
+        }
+    }
+
+    /** 光の刀身。柄の先から伸びる（横薙ぎで伸び、溜め突きと構えで強く光る）。足し合わせで描く。 */
+    final class Saber extends RenderLayer<RuinAndroid, AndroidModel> {
+        Saber(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            AndroidModel m = getParentModel();
+            if (m.hilt == null) {
+                return;
+            }
+            int state = android.state();
+            float t = android.stateTime(partialTick);
+            float len = 1.15F;
+            float glow = 1F;
+            if (state == SaberAndroid.STATE_SWEEP) {
+                float out = t < 2 ? t / 2 : t < 5 ? 1 : 1 - Mth.clamp((t - 5) / 3, 0, 1);
+                len = Mth.lerp(out, 1.15F, (float) SaberAndroid.SWEEP_REACH);
+            } else if (state == SaberAndroid.STATE_THRUST_WINDUP || state == SaberAndroid.STATE_GUARD) {
+                glow = 1.25F + 0.1F * Mth.sin(age * 0.25F);
+            } else if (state == SaberAndroid.STATE_THRUST && t < 5) {
+                len = 1.5F;
+                glow = 1.3F;
+            } else if (state == RuinAndroid.STATE_LOW_POWER) {
+                len = 0.35F;
+                glow = 0.35F;
+            } else if (RuinAndroid.charging(state)) {
+                len = 0.6F;
+                glow = 0.5F;
+            }
+            // 柄の座標（+Y が刀身の向き。体の大きさ SCALE で縮んでいるので、ブロックの長さは SCALE で割る）で、
+            // 四角い光の棒を2重（色の外側と白い芯）に描く。細い板と違って、どの向きから見ても途切れない
+            pose.pushPose();
+            m.toBlade(pose);
+            m.hilt.translateAndRotate(pose);
+            pose.translate(0, 3.5F / 16, 0);
+            float l = len / SCALE;
+            float outer = 0.045F * glow / SCALE;
+            float core = 0.017F / SCALE;
+            VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+            int a = (int) Math.min(255, 140 * glow);
+            int c = (int) (230 * Math.min(1, glow));
+            glowBox(pose, vc, -outer, 0, -outer, outer, l, outer, variant.accent, a);
+            glowBox(pose, vc, -core, 0, -core, core, l + 0.08F / SCALE, core, 0xFFFFFF, c);
+            pose.popPose();
         }
     }
 

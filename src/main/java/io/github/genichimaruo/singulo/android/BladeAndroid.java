@@ -46,10 +46,10 @@ public class BladeAndroid extends RuinAndroid {
     static final double DASH_SPEED = 1.15;
 
     /** 技ごとの充電の消費（満タンは {@link #CHARGE_MAX}）。 */
-    static final int COST_DASH = 60;
-    static final int COST_SPIN = 60;
-    static final int COST_CAST = 75;
-    static final int COST_SWING = 15;
+    static final int COST_DASH = 250;
+    static final int COST_SPIN = 250;
+    static final int COST_CAST = 310;
+    static final int COST_SWING = 60;
 
     public BladeAndroid(EntityType<? extends BladeAndroid> type, Level level) {
         super(type, level);

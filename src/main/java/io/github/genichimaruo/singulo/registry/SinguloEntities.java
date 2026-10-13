@@ -77,6 +77,15 @@ public final class SinguloEntities {
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.WhipAndroid>> WHIP_ANDROID = REGISTER.register(
             "whip_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.WhipAndroid::new, MobCategory.MONSTER)
                     .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(Singulo.id("whip_android").toString()));
+    /** 光剣型アンドロイド「ソレイユ」。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.SaberAndroid>> SABER_ANDROID = REGISTER.register(
+            "saber_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.SaberAndroid::new, MobCategory.MONSTER)
+                    .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(Singulo.id("saber_android").toString()));
+    /** 光剣型の斬撃波。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.AndroidCrescent>> ANDROID_CRESCENT = REGISTER.register(
+            "android_crescent", () -> EntityType.Builder.<io.github.genichimaruo.singulo.android.AndroidCrescent>of(
+                    io.github.genichimaruo.singulo.android.AndroidCrescent::new, MobCategory.MISC)
+                    .sized(0.8F, 0.4F).clientTrackingRange(8).updateInterval(1).build(Singulo.id("android_crescent").toString()));
     /** アンドロイドが床から立てる光の柱。 */
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.AndroidLaser>> ANDROID_LASER = REGISTER.register(
             "android_laser", () -> EntityType.Builder.<io.github.genichimaruo.singulo.android.AndroidLaser>of(
@@ -86,6 +95,7 @@ public final class SinguloEntities {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(BLADE_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
         event.put(WHIP_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
+        event.put(SABER_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
         event.put(ECHO_SENTINEL.get(), io.github.genichimaruo.singulo.ruin.EchoSentinel.createAttributes().build());

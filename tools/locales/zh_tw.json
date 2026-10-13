@@ -2267,6 +2267,10 @@
     "source": "Thank you for playing",
     "translation": "Thank you for playing"
   },
+  "entity.singulo.android_crescent": {
+    "source": "Crescent Slash",
+    "translation": "斬擊波"
+  },
   "entity.singulo.android_laser": {
     "source": "Light Pillar",
     "translation": "光柱"
@@ -2326,6 +2330,10 @@
   "entity.singulo.last_archivist": {
     "source": "The Last Archivist",
     "translation": "最後的記錄者"
+  },
+  "entity.singulo.saber_android": {
+    "source": "Saber Android \"Soleil\"",
+    "translation": "光劍型仿生人「索蕾伊」"
   },
   "entity.singulo.security_drone": {
     "source": "Security Drone",
@@ -5338,6 +5346,10 @@
   "item.singulo.record_fragment": {
     "source": "Crystal Memory",
     "translation": "水晶記憶體"
+  },
+  "item.singulo.saber_android_spawn_egg": {
+    "source": "Saber Android Spawn Egg",
+    "translation": "光劍型仿生人生怪蛋"
   },
   "item.singulo.scanner_module_2": {
     "source": "Neutrino Sensitivity Module Mk2",

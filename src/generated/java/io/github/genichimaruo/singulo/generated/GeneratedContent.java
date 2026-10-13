@@ -373,6 +373,7 @@ public final class GeneratedContent {
             "security_drone_spawn_egg",
             "blade_android_spawn_egg",
             "whip_android_spawn_egg",
+            "saber_android_spawn_egg",
             "creative_energy_source",
             "creative_catalyst",
             "builder_wand",
