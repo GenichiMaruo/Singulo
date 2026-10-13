@@ -15,7 +15,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,6 +31,10 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
     public static final long COOLDOWN = 24_000;
     /** 1体の印刷が終わってから、次の印刷を始めるまで（台の上が空いていれば、すぐ）。 */
     static final int NEXT_PRINT_DELAY = 40;
+    /** 残りのアンドロイドが全員見つからない（読み込まれていない所・別の次元にいる）まま、これだけ経ったら出撃を打ち切る（設計メモリは出ない）。 */
+    static final int LOST_TIMEOUT = 6000;
+    /** 打ち切ったあと、次に出撃できるまで。 */
+    static final int LOST_COOLDOWN = 1200;
 
     @Nullable
     private AndroidKind kind;
@@ -41,6 +44,10 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
     private int printed;
     private long lastPrint;
     private long nextWave;
+    /** 倒されずにいなくなったアンドロイドがいる（このときは全滅しても設計メモリを出さない）。 */
+    private boolean lost;
+    /** 残りが全員見つからなくなってからの時間（tick）。 */
+    private int missing;
 
     public AndroidFabricatorBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.ANDROID_FABRICATOR.get(), pos, state);
@@ -56,7 +63,7 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    /** 今の出撃で出ているアンドロイド（生きているもの）の数。 */
+    /** 今の出撃で出ているアンドロイド（生きているもの。読み込まれていない所にいるものも含む）の数。 */
     public int alive() {
         return androids.size();
     }
@@ -73,10 +80,18 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
             AndroidKind[] all = AndroidKind.values();
             setKind(all[level.random.nextInt(all.length)]);
         }
-        androids.removeIf(id -> {
-            Entity e = level.getEntity(id);
-            return e == null || !e.isAlive();
-        });
+        // 見つからない（読み込まれていない）だけのものは、倒されたとは限らないので残す。消えたものは forget で外れる
+        androids.removeIf(id -> level.getEntity(id) instanceof RuinAndroid a && !a.isAlive());
+        if (!androids.isEmpty() && androids.stream().noneMatch(id -> level.getEntity(id) != null)) {
+            missing += 5;
+            if (missing >= LOST_TIMEOUT) {
+                androids.clear();
+                lost = true;
+                setChanged();
+            }
+        } else {
+            missing = 0;
+        }
         long now = level.getGameTime();
         if (waveActive) {
             if (printed < waveSize) {
@@ -85,8 +100,15 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
                 }
             } else if (androids.isEmpty()) {
                 waveActive = false;
-                nextWave = now + COOLDOWN;
-                cleared(level);
+                if (lost) {
+                    // 倒されずにいなくなったものがいる: 設計メモリは出さず、少しして出撃し直せる
+                    nextWave = now + LOST_COOLDOWN;
+                    level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 1.0F, 1.2F);
+                } else {
+                    nextWave = now + COOLDOWN;
+                    cleared(level);
+                }
+                lost = false;
                 setChanged();
             }
             return;
@@ -100,8 +122,23 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
             waveActive = true;
             waveSize = 2 + level.random.nextInt(2);
             printed = 0;
+            lost = false;
+            missing = 0;
             lastPrint = now - RuinAndroid.PRINT_TICKS - NEXT_PRINT_DELAY;
             level.playSound(null, worldPosition, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0F, 1.5F);
+            setChanged();
+        }
+    }
+
+    /**
+     * 出撃したアンドロイドがいなくなった（RuinAndroid.remove から）。killed は倒されたとき。
+     * 倒されずに消えた（平和な難易度など）ものがいれば、全滅しても設計メモリを出さない。
+     */
+    public void forget(UUID id, boolean killed) {
+        if (androids.remove(id)) {
+            if (!killed) {
+                lost = true;
+            }
             setChanged();
         }
     }
@@ -161,7 +198,9 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
         tag.putBoolean("wave", waveActive);
         tag.putInt("wave_size", waveSize);
         tag.putInt("printed", printed);
+        tag.putLong("last_print", lastPrint);
         tag.putLong("next_wave", nextWave);
+        tag.putBoolean("lost", lost);
     }
 
     @Override
@@ -175,6 +214,8 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
         waveActive = tag.getBoolean("wave");
         waveSize = tag.getInt("wave_size");
         printed = tag.getInt("printed");
+        lastPrint = tag.getLong("last_print");
         nextWave = tag.getLong("next_wave");
+        lost = tag.getBoolean("lost");
     }
 }

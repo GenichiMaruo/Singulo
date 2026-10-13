@@ -1,7 +1,9 @@
 package io.github.genichimaruo.singulo.test;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity;
 import io.github.genichimaruo.singulo.android.AndroidKind;
+import io.github.genichimaruo.singulo.android.AndroidLaser;
 import io.github.genichimaruo.singulo.android.AndroidStationBlockEntity;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
@@ -12,7 +14,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -109,6 +118,141 @@ public final class AndroidGameTests {
             ItemStack kits = list.get(0).inventory().getItem(RuinAndroid.SLOT_REPAIR);
             helper.assertTrue(kits.getCount() == 5, "持ち物が次の護衛に渡らない: " + kits);
             list.get(0).discard();
+        });
+    }
+
+    /** 遺構のアンドロイドが1体出撃中の印刷台を置く（出撃数2・印刷済み2）。 */
+    private static AndroidFabricatorBlockEntity fabricatorWith(GameTestHelper helper, BlockPos at, RuinAndroid a) {
+        helper.setBlock(at, SinguloBlocks.RUIN_ANDROID_FABRICATOR.get());
+        AndroidFabricatorBlockEntity f = helper.getBlockEntity(at);
+        CompoundTag tag = f.saveWithFullMetadata(helper.getLevel().registryAccess());
+        tag.putString("kind", AndroidKind.BLADE.id);
+        tag.putBoolean("wave", true);
+        tag.putInt("wave_size", 2);
+        tag.putInt("printed", 2);
+        ListTag ids = new ListTag();
+        ids.add(NbtUtils.createUUID(a.getUUID()));
+        tag.put("androids", ids);
+        f.loadWithComponents(tag, helper.getLevel().registryAccess());
+        return f;
+    }
+
+    private static BladeAndroid ruinAndroid(GameTestHelper helper, BlockPos fabricator) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.setNoAi(true);
+        a.setHome(helper.absolutePos(fabricator));
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 5))));
+        helper.getLevel().addFreshEntity(a);
+        return a;
+    }
+
+    private static int memories(GameTestHelper helper, BlockPos at) {
+        return helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(helper.absolutePos(at)).inflate(4),
+                e -> e.getItem().is(item(AndroidKind.BLADE.memoryId()))).stream().mapToInt(e -> e.getItem().getCount()).sum();
+    }
+
+    /** 読み込みが外れただけ（見つからないだけ）の生きているアンドロイドは、倒した扱いにならない（設計メモリは出ない）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void fabricatorKeepsUnloadedAndroid(GameTestHelper helper) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        BladeAndroid a = ruinAndroid(helper, at);
+        AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
+        a.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
+        helper.runAfterDelay(30, () -> {
+            helper.assertTrue(memories(helper, at) == 0, "読み込まれていないだけのアンドロイドで設計メモリが出た");
+            helper.assertTrue(f.alive() == 1, "読み込まれていないアンドロイドを出撃から外した");
+            helper.succeed();
+        });
+    }
+
+    /** 出撃したアンドロイドが全部倒されたら、設計メモリが1つだけ出る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 160)
+    public static void fabricatorDropsMemoryWhenAllDefeated(GameTestHelper helper) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        BladeAndroid a = ruinAndroid(helper, at);
+        AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
+        a.kill();
+        helper.runAfterDelay(60, () -> {
+            helper.assertTrue(f.alive() == 0, "倒したアンドロイドが出撃に残っている");
+            helper.assertTrue(memories(helper, at) == 1, "設計メモリが1つ出ない: " + memories(helper, at));
+            for (ItemEntity e : helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(helper.absolutePos(at)).inflate(4))) {
+                e.discard();
+            }
+            helper.succeed();
+        });
+    }
+
+    /** 護衛の技はボス・中立の動物・村人・プレイヤーに当たらず、敵対モブには当たる。遺構の技は仲間以外に当たる。 */
+    @GameTest(template = EMPTY)
+    public static void guardAttacksSpareBossesAndNeutrals(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
+        guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        BladeAndroid ruin = SinguloEntities.BLADE_ANDROID.get().create(level);
+        var player = helper.makeMockServerPlayerInLevel();
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        List<LivingEntity> spared = List.of(SinguloEntities.GRAVITY_REMNANT.get().create(level), EntityType.COW.create(level),
+                EntityType.VILLAGER.create(level), player);
+        for (LivingEntity e : spared) {
+            helper.assertFalse(RuinAndroid.canHit(true, guard, e), "護衛の技が当たる: " + e.getType());
+            helper.assertFalse(RuinAndroid.canHit(true, null, e), "出した護衛がいない技が当たる: " + e.getType());
+        }
+        var zombie = EntityType.ZOMBIE.create(level);
+        helper.assertTrue(RuinAndroid.canHit(true, guard, zombie), "護衛の技が敵対モブに当たらない");
+        helper.assertTrue(RuinAndroid.canHit(false, ruin, EntityType.VILLAGER.create(level)), "遺構の技が村人に当たらない");
+        helper.assertFalse(RuinAndroid.canHit(false, ruin, SinguloEntities.WHIP_ANDROID.get().create(level)), "遺構の技が遺構の仲間に当たる");
+        helper.succeed();
+    }
+
+    /** 出した護衛がいなくなっても、光柱は村人を傷つけず、敵対モブだけを傷つける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 60)
+    public static void orphanGuardLaserSparesVillagers(GameTestHelper helper) {
+        var level = helper.getLevel();
+        helper.setBlock(new BlockPos(3, 1, 3), net.minecraft.world.level.block.Blocks.STONE);
+        Vec3 at = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 2, 3)));
+        BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
+        guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        guard.setNoAi(true);
+        guard.moveTo(at.add(3, 0, 0));
+        level.addFreshEntity(guard);
+        var villager = EntityType.VILLAGER.create(level);
+        var zombie = EntityType.ZOMBIE.create(level);
+        for (var e : List.<net.minecraft.world.entity.Mob>of(villager, zombie)) {
+            e.setNoAi(true);
+            e.moveTo(at);
+            level.addFreshEntity(e);
+        }
+        AndroidLaser.spawn(level, guard, at);
+        AndroidLaser laser = level.getEntitiesOfClass(AndroidLaser.class, new AABB(at, at).inflate(3)).getFirst();
+        guard.remove(Entity.RemovalReason.KILLED);
+        laser.tickCount = AndroidLaser.WARN;
+        laser.tick();
+        helper.assertTrue(villager.getHealth() == villager.getMaxHealth(), "出した護衛がいない光柱が村人を傷つけた");
+        helper.assertTrue(zombie.getHealth() < zombie.getMaxHealth(), "出した護衛がいない光柱が敵対モブを傷つけない");
+        laser.discard();
+        villager.discard();
+        zombie.discard();
+        helper.succeed();
+    }
+
+    /** 同じ場所にステーションを置き直しても、前の護衛は身寄りのないアンドロイドになり、新しいステーションでリンクできる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void replacedStationRelinksOldGuard(GameTestHelper helper) {
+        station(helper, 1);
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
+            RuinAndroid old = androids(helper).get(0);
+            old.moveTo(old.position().add(3, 0, 0));
+            helper.setBlock(STATION, net.minecraft.world.level.block.Blocks.AIR);
+            AndroidStationBlockEntity s = station(helper, 0);
+            helper.runAfterDelay(45, () -> {
+                helper.assertTrue(old.orphan(), "置き直したステーションの前の護衛が身寄りのないアンドロイドにならない");
+                s.press(AndroidStationBlockEntity.BUTTON_LINK);
+                s.press(AndroidStationBlockEntity.BUTTON_MODE_FOLLOW);
+                helper.assertTrue(!old.orphan() && helper.absolutePos(STATION).equals(old.home()), "新しいステーションにリンクできない");
+                helper.assertTrue(old.mode() == RuinAndroid.MODE_FOLLOW && s.manages(old.getUUID()), "新しいステーションで操作できない");
+                old.discard();
+                helper.succeed();
+            });
         });
     }
 

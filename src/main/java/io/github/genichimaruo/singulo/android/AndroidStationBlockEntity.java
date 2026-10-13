@@ -269,6 +269,11 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         }
     }
 
+    /** このステーションが受け持つアンドロイドか。 */
+    public boolean manages(UUID id) {
+        return id.equals(android);
+    }
+
     /** アンドロイドが体力を知らせる（毎秒）。 */
     public void reportHealth(UUID id, float fraction) {
         if (id.equals(android)) {
@@ -475,6 +480,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 壊されたら、中身を落とし、アンドロイドはステーションを失う（その場に残る）。 */
     @Override
     public void onBroken(Level level) {
+        // 読み込まれているアンドロイドには、すぐ知らせる（同じ場所に置き直しても、新しいステーションでリンクできるように）
+        if (android != null && level instanceof ServerLevel server && server.getEntity(android) instanceof RuinAndroid a) {
+            a.loseStation();
+        }
         for (int i = 0; i < items.getSlots(); i++) {
             Block.popResource(level, worldPosition, items.getStackInSlot(i));
         }

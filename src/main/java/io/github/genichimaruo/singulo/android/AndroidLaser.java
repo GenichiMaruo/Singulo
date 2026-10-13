@@ -16,7 +16,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -35,6 +34,8 @@ public class AndroidLaser extends Entity {
 
     @Nullable
     private UUID ownerId;
+    /** 護衛の技か（出したアンドロイドがいなくなっても、当たる相手をこれで決める）。 */
+    private boolean guardSide;
     private final Set<UUID> hit = new HashSet<>();
 
     public AndroidLaser(EntityType<? extends AndroidLaser> type, Level level) {
@@ -46,6 +47,7 @@ public class AndroidLaser extends Entity {
     public static void spawn(ServerLevel level, RuinAndroid owner, Vec3 at) {
         AndroidLaser laser = new AndroidLaser(SinguloEntities.ANDROID_LASER.get(), level);
         laser.ownerId = owner.getUUID();
+        laser.guardSide = owner.isGuard();
         laser.entityData.set(COLOR, owner.accent());
         BlockPos p = BlockPos.containing(at.x, at.y + 1, at.z);
         for (int i = 0; i < 6 && level.getBlockState(p.below()).getCollisionShape(level, p.below()).isEmpty(); i++) {
@@ -77,8 +79,8 @@ public class AndroidLaser extends Entity {
         if (tickCount >= WARN && tickCount < WARN + BEAM) {
             Entity owner = ownerId == null ? null : level.getEntity(ownerId);
             AABB box = new AABB(getX() - RADIUS, getY(), getZ() - RADIUS, getX() + RADIUS, getY() + HEIGHT, getZ() + RADIUS);
-            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e.isAlive() && !hit.contains(e.getUUID()))) {
-                if (owner != null && (e == owner || owner.isAlliedTo(e)) || e instanceof Player p && (p.isCreative() || p.isSpectator())) {
+            for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> !hit.contains(e.getUUID()))) {
+                if (!RuinAndroid.canHit(guardSide, owner, e)) {
                     continue;
                 }
                 if (e.position().multiply(1, 0, 1).distanceTo(position().multiply(1, 0, 1)) > RADIUS + e.getBbWidth() / 2) {

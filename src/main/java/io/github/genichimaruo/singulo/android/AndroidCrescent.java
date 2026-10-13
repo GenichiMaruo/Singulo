@@ -13,7 +13,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -31,6 +30,8 @@ public class AndroidCrescent extends Entity {
 
     @Nullable
     private UUID ownerId;
+    /** 護衛の技か（出したアンドロイドがいなくなっても、当たる相手をこれで決める）。 */
+    private boolean guardSide;
     private final Set<UUID> hit = new HashSet<>();
 
     public AndroidCrescent(EntityType<? extends AndroidCrescent> type, Level level) {
@@ -41,6 +42,7 @@ public class AndroidCrescent extends Entity {
     public static void shoot(ServerLevel level, RuinAndroid owner, Vec3 dir) {
         AndroidCrescent c = new AndroidCrescent(SinguloEntities.ANDROID_CRESCENT.get(), level);
         c.ownerId = owner.getUUID();
+        c.guardSide = owner.isGuard();
         c.entityData.set(COLOR, owner.accent());
         Vec3 from = owner.position().add(0, 1.0, 0).add(dir.multiply(1, 0, 1).normalize().scale(0.6));
         c.setPos(from);
@@ -72,8 +74,8 @@ public class AndroidCrescent extends Entity {
             }
             Entity owner = ownerId == null ? null : level.getEntity(ownerId);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().expandTowards(getDeltaMovement())
-                    .inflate(HALF_WIDTH, 0.4, HALF_WIDTH), e -> e.isAlive() && !hit.contains(e.getUUID()))) {
-                if (owner != null && (e == owner || owner.isAlliedTo(e)) || e instanceof Player p && (p.isCreative() || p.isSpectator())) {
+                    .inflate(HALF_WIDTH, 0.4, HALF_WIDTH), e -> !hit.contains(e.getUUID()))) {
+                if (!RuinAndroid.canHit(guardSide, owner, e)) {
                     continue;
                 }
                 hit.add(e.getUUID());

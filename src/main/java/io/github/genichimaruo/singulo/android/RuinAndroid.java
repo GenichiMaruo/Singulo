@@ -259,6 +259,14 @@ public abstract class RuinAndroid extends Monster {
         playSound(SoundEvents.BEACON_DEACTIVATE, 0.9F, 1.4F);
     }
 
+    /** ステーションを失う（身寄りのないアンドロイドになり、新しいステーションでリンクし直せる）。 */
+    void loseStation() {
+        if (guard) {
+            setHome(null);
+            clearRestriction();
+        }
+    }
+
     /** ステーションを失った護衛か（新しいステーションでリンクし直せる）。 */
     public boolean orphan() {
         return guard && home == null;
@@ -346,12 +354,35 @@ public abstract class RuinAndroid extends Monster {
         return home == null ? null : Vec3.atBottomCenterOf(home.above());
     }
 
-    /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
-    boolean guardTargets(LivingEntity e) {
-        if (!(e instanceof net.minecraft.world.entity.monster.Enemy) || e instanceof RuinAndroid a && a.isGuard() || isBoss(e)) {
+    /** 護衛が戦う相手か（敵対モブ。ボス・護衛のアンドロイド・飼われた動物は除く。範囲は見ない）。 */
+    static boolean hostileToGuards(LivingEntity e) {
+        return e instanceof net.minecraft.world.entity.monster.Enemy && !(e instanceof RuinAndroid a && a.isGuard()) && !isBoss(e)
+                && !(e instanceof net.minecraft.world.entity.TamableAnimal);
+    }
+
+    /**
+     * 技（斬撃・光柱・斬撃波・衝撃波）を当ててよい相手か。護衛の技は {@link #hostileToGuards} の相手だけに当たり、
+     * 遺構のアンドロイドの技は守り手（遺構のアンドロイド・ドローン・ボス）とその味方以外に当たる。
+     * owner は技を出したアンドロイド（もういなければ null。そのときも guardSide で決める）。
+     */
+    public static boolean canHit(boolean guardSide, @Nullable Entity owner, LivingEntity e) {
+        if (!e.isAlive() || e == owner || e instanceof Player p && (p.isCreative() || p.isSpectator())) {
             return false;
         }
-        if (e instanceof net.minecraft.world.entity.TamableAnimal) {
+        if (guardSide) {
+            return hostileToGuards(e);
+        }
+        return !RuinGuards.isGuard(e) && !(owner != null && owner.isAlliedTo(e));
+    }
+
+    /** このアンドロイドの技を当ててよい相手か。 */
+    boolean canHit(LivingEntity e) {
+        return canHit(guard, this, e);
+    }
+
+    /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
+    boolean guardTargets(LivingEntity e) {
+        if (!hostileToGuards(e)) {
             return false;
         }
         Vec3 anchor = guardAnchor();
@@ -561,15 +592,14 @@ public abstract class RuinAndroid extends Monster {
         }
         entityData.set(ALERT, getTarget() != null && active());
         if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
-            if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
+            if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
                 // 体力をステーションへ知らせる（コンパレーターの出力。どこにいても最後の値が残る）
                 station.reportHealth(getUUID(), getHealth() / getMaxHealth());
                 // 自己修理キットが1つでも減っていたら、ステーションのストックから補充する
                 station.refill(this);
             } else {
-                // ステーションが壊された: 身寄りのないアンドロイドになる（新しいステーションでリンクし直せる）
-                setHome(null);
-                clearRestriction();
+                // ステーションが壊された（同じ場所に置き直されたものは、このアンドロイドを知らない）: 身寄りのないアンドロイドになる
+                loseStation();
             }
         }
         if (guard && printed() && active() && getHealth() < getMaxHealth() * retreatPercent / 100F
@@ -653,6 +683,16 @@ public abstract class RuinAndroid extends Monster {
         }
     }
 
+    /** 遺構のアンドロイドがいなくなったら、印刷台に知らせる（倒されたか、ただ消えたか）。読み込みが外れただけなら知らせない。 */
+    @Override
+    public void remove(RemovalReason reason) {
+        super.remove(reason);
+        if (!guard && home != null && reason.shouldDestroy() && level() instanceof ServerLevel level && level.isLoaded(home)
+                && level.getBlockEntity(home) instanceof AndroidFabricatorBlockEntity fabricator) {
+            fabricator.forget(getUUID(), reason == RemovalReason.KILLED);
+        }
+    }
+
     @Override
     public boolean shouldDropExperience() {
         return !guard && super.shouldDropExperience();
@@ -665,8 +705,7 @@ public abstract class RuinAndroid extends Monster {
         }
         Vec3 look = Vec3.directionFromRotation(0, yBodyRot);
         int hits = 0;
-        for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(reach),
-                e -> e != this && e.isAlive() && !isAlliedTo(e) && !(e instanceof Player p && (p.isCreative() || p.isSpectator())))) {
+        for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(reach), this::canHit)) {
             Vec3 to = e.position().subtract(position()).multiply(1, 0, 1);
             double dist = to.length();
             if (dist > reach + e.getBbWidth() / 2) {

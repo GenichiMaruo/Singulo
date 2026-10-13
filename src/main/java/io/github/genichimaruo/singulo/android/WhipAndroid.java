@@ -116,8 +116,7 @@ public class WhipAndroid extends RuinAndroid {
         Vec3 look = Vec3.directionFromRotation(0, yBodyRot);
         LivingEntity best = null;
         double bestDist = Double.MAX_VALUE;
-        for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(reach),
-                e -> e != this && e.isAlive() && !isAlliedTo(e) && !(e instanceof Player p && (p.isCreative() || p.isSpectator())))) {
+        for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(reach), this::canHit)) {
             Vec3 to = e.position().subtract(position()).multiply(1, 0, 1);
             double d = to.length();
             if (d > reach + e.getBbWidth() / 2 || !hasLineOfSight(e)) {
@@ -277,8 +276,7 @@ public class WhipAndroid extends RuinAndroid {
             sparks(level, at.add(0, 0.15, 0), 4, 0.25);
             level.sendParticles(ParticleTypes.CRIT, at.x, at.y + 0.1, at.z, 4, 0.3, 0.05, 0.3, 0.1);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new net.minecraft.world.phys.AABB(at, at).inflate(1.0, 0.6, 1.0),
-                    e -> e != WhipAndroid.this && e.isAlive() && !isAlliedTo(e) && !waveHit.contains(e.getUUID())
-                            && !(e instanceof Player p && (p.isCreative() || p.isSpectator())))) {
+                    e -> canHit(e) && !waveHit.contains(e.getUUID()))) {
                 if (!e.onGround()) {
                     continue;
                 }
