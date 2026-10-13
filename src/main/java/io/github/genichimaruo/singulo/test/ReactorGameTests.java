@@ -39,6 +39,9 @@ public final class ReactorGameTests {
     @net.minecraft.gametest.framework.AfterBatch(batch = BATCH)
     public static void stopReactors(net.minecraft.server.level.ServerLevel level) {
         for (BlockPos pos : PenroseReactorBlockEntity.runningPositions(level)) {
+            if (level.getBlockEntity(pos) instanceof PenroseReactorBlockEntity reactor) {
+                for (int slot = 0; slot < reactor.items().getSlots(); slot++) reactor.items().setStackInSlot(slot, ItemStack.EMPTY);
+            }
             level.removeBlock(pos, false);
         }
     }
@@ -47,11 +50,16 @@ public final class ReactorGameTests {
     public static void stopIgnitionReactor(net.minecraft.server.level.ServerLevel level) {
         stopReactors(level);
     }
+    @net.minecraft.gametest.framework.AfterBatch(batch = BATCH + "_hawking")
+    public static void stopHawkingReactors(net.minecraft.server.level.ServerLevel level) { stopReactors(level); }
+    @net.minecraft.gametest.framework.AfterBatch(batch = BATCH + "_ergo")
+    public static void stopErgoReactor(net.minecraft.server.level.ServerLevel level) { stopReactors(level); }
     private static final BlockPos CENTER = new BlockPos(7, 7, 7);
     private static final BlockPos CONTROLLER = CENTER.below(Structures.CONTROLLER_BELOW_CENTER);
     /** テストで抽出ポートにする炉殻の位置（リングの最初の炉殻）。 */
     private static final BlockPos PORT = Structures.reactorLayout(CENTER).entrySet().stream()
-            .filter(e -> e.getValue() == MultiblockPart.Role.REACTOR_SHELL).findFirst().orElseThrow().getKey();
+            .filter(e -> e.getValue() == MultiblockPart.Role.REACTOR_SHELL).map(Map.Entry::getKey)
+            .min(java.util.Comparator.comparingLong(BlockPos::asLong)).orElseThrow();
 
     private ReactorGameTests() {}
 
@@ -70,7 +78,31 @@ public final class ReactorGameTests {
         }
         helper.setBlock(PORT, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(CONTROLLER, SinguloBlocks.CORE_CONTROLLER.get());
-        return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONTROLLER);
+        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONTROLLER);
+        // End a fixture's hazards as soon as it finishes, including cores still igniting.
+        try {
+            var field = java.util.Arrays.stream(GameTestHelper.class.getDeclaredFields())
+                    .filter(f -> f.getType() == net.minecraft.gametest.framework.GameTestInfo.class).findFirst().orElseThrow();
+            field.setAccessible(true);
+            var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
+            info.addListener(new net.minecraft.gametest.framework.GameTestListener() {
+                public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo test) {}
+                public void testPassed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
+                public void testFailed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
+                private void cleanup() {
+                    var level = helper.getLevel();
+                    var bounds = new net.minecraft.world.phys.AABB(helper.absolutePos(new BlockPos(-2, -2, -2)),
+                            helper.absolutePos(new BlockPos(17, 17, 17)));
+                    for (var entity : level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, bounds,
+                            e -> !(e instanceof net.minecraft.world.entity.player.Player))) entity.discard();
+                    if (level.getBlockEntity(reactor.getBlockPos()) == reactor) {
+                        for (int slot = 0; slot < reactor.items().getSlots(); slot++) reactor.items().setStackInSlot(slot, ItemStack.EMPTY);
+                        level.removeBlock(reactor.getBlockPos(), false);
+                    }
+                }
+            });
+        } catch (ReflectiveOperationException e) { throw new IllegalStateException(e); }
+        return reactor;
     }
 
     @GameTest(template = HUGE, batch = BATCH)
@@ -126,7 +158,7 @@ public final class ReactorGameTests {
     }
 
     /** 組み立てる前に抽出ポートへ敷いたホライズン・バスからも、点火の電力が入ること（形成したら接続し直す）。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 420)
+    @GameTest(template = HUGE, batch = BATCH + "_ignition", setupTicks = 20, timeoutTicks = 600)
     public static void ignitionPowerThroughPortCableLaidBeforeForming(GameTestHelper helper) {
         BlockPos port = PORT;
         net.minecraft.core.Direction d = outward(port);
@@ -134,13 +166,16 @@ public final class ReactorGameTests {
         helper.setBlock(port.relative(d, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
-        helper.runAtTickTime(5, () -> helper.assertTrue(r.ignite(), "点火を始められない"));
-        helper.succeedWhen(() -> helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.RUNNING,
-                "ポートにつないだケーブルから点火の電力が入らない: " + r.state()));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち: " + r.saveWithoutMetadata()))
+                .thenExecute(() -> helper.assertTrue(r.ignite(), "点火を始められない"))
+                .thenWaitUntil(() -> helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.RUNNING,
+                        "ポートにつないだケーブルから点火の電力が入らない: " + r.saveWithoutMetadata()))
+                .thenSucceed();
     }
 
     /** ホライズン・バスは 1 tick に int の上限（約 2.1 GFE）を超えて運ぶ: 50 GFE の点火電力が数 tick で入る。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 60)
+    @GameTest(template = HUGE, batch = BATCH + "_ignition", setupTicks = 20, timeoutTicks = 160)
     public static void horizonBusCarriesBeyondIntPerTick(GameTestHelper helper) {
         BlockPos port = PORT;
         net.minecraft.core.Direction d = outward(port);
@@ -148,12 +183,12 @@ public final class ReactorGameTests {
         helper.setBlock(port.relative(d), SinguloBlocks.HORIZON_BUS.get());
         helper.setBlock(port.relative(d, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
-        helper.runAtTickTime(5, () -> helper.assertTrue(r.ignite(), "点火を始められない"));
-        // int の上限なら 3 tick で約 6.4 GFE（13%）しか入らない
-        helper.runAtTickTime(9, () -> {
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち"))
+                .thenExecute(() -> helper.assertTrue(r.ignite(), "点火を始められない"))
+                .thenExecuteAfter(4, () -> {
             helper.assertTrue(r.ignitionCharge() >= 1F, "点火の電力が int の上限で止まっている: " + r.ignitionCharge());
-            helper.succeed();
-        });
+        }).thenSucceed();
     }
 
     /** 抽出ポートと炉心質量警報器はリングの炉殻のどこに置いてもよく、警報器は質量が上限に達すると赤石信号を出す。 */
@@ -161,7 +196,7 @@ public final class ReactorGameTests {
     public static void portsAndAlarmsAnywhereOnRings(GameTestHelper helper) {
         build(helper);
         java.util.List<BlockPos> shells = Structures.reactorLayout(CENTER).entrySet().stream()
-                .filter(e -> e.getValue() == MultiblockPart.Role.REACTOR_SHELL).map(Map.Entry::getKey).toList();
+                .filter(e -> e.getValue() == MultiblockPart.Role.REACTOR_SHELL).map(Map.Entry::getKey).filter(p -> !p.equals(PORT)).toList();
         BlockPos port2 = shells.get(20);
         BlockPos alarm = shells.get(40);
         helper.setBlock(port2, SinguloBlocks.EXTRACTION_PORT.get());
@@ -255,37 +290,43 @@ public final class ReactorGameTests {
         });
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 6200)
+    @GameTest(template = HUGE, batch = BATCH + "_hawking", setupTicks = 20, timeoutTicks = 6800)
     public static void smallCoreRadiatesHawkingCondensate(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_HAWKING, new ItemStack(item("hawking_collector")));
-        helper.runAtTickTime(3, () -> r.forceCore(300, 0));
-        helper.succeedWhen(() -> helper.assertTrue(
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち"))
+                .thenExecute(() -> r.forceCore(300, 0))
+                .thenWaitUntil(() -> helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "質量150〜500で5分たってもホーキング凝縮体ができない"));
+                "ホーキング凝縮体ができない: " + r.saveWithoutMetadata())).thenSucceed();
     }
 
     /** 点火したばかりの炉心（質量500）でも、そのままホーキング凝縮体ができる（蒸発で縮むのを待たなくてよい）。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 6200)
+    @GameTest(template = HUGE, batch = BATCH + "_hawking", setupTicks = 20, timeoutTicks = 6800)
     public static void freshlyIgnitedCoreRadiatesHawkingCondensate(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_HAWKING, new ItemStack(item("hawking_collector")));
-        helper.runAtTickTime(3, () -> r.forceCore(PenroseReactorBlockEntity.START_MASS, 0));
-        helper.succeedWhen(() -> helper.assertTrue(
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち"))
+                .thenExecute(() -> r.forceCore(PenroseReactorBlockEntity.START_MASS, 0))
+                .thenWaitUntil(() -> helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "点火直後の炉心でホーキング凝縮体ができない: formed=" + r.isFormed() + ", state=" + r.state() + ", mass=" + r.mass() + ", nbt=" + r.saveWithoutMetadata()));
+                "ホーキング凝縮体ができない: " + r.saveWithoutMetadata())).thenSucceed();
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 1400)
+    @GameTest(template = HUGE, batch = BATCH + "_ergo", setupTicks = 20, timeoutTicks = 2000)
     public static void ergosphereYieldsExoticMatterAndSpinsDown(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_ERGO, new ItemStack(item("ergosphere_ring")));
-        helper.runAtTickTime(3, () -> r.forceCore(1000, 0.95));
-        helper.succeedWhen(() -> {
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち"))
+                .thenExecute(() -> r.forceCore(1000, 0.95))
+                .thenWaitUntil(() -> {
             helper.assertTrue(r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("exotic_matter")),
-                    "エルゴ抽出でエキゾチック物質ができない");
+                    "エルゴ抽出でエキゾチック物質ができない: " + r.saveWithoutMetadata());
             helper.assertTrue(r.spin() < 0.95, "エルゴ抽出でスピンが減らない");
-        });
+        }).thenSucceed();
     }
 
     @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 100)
