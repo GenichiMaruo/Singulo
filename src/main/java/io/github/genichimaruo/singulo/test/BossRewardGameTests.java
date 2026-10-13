@@ -5,6 +5,7 @@ import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.reactor.EventHorizonTargets;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.ruin.BossCombatLog;
+import io.github.genichimaruo.singulo.ruin.BossLoot;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
 import io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan;
 import io.github.genichimaruo.singulo.ruin.HorizonBolt;
@@ -229,6 +230,73 @@ public final class BossRewardGameTests {
             leave(helper, far);
         }
         helper.succeed();
+    }
+
+    /** 誰もいないときのオーブの値は、ふつうのオーブの値と重ならない（同じ値どうししか結合しないので、取り込まれない）。 */
+    @GameTest(template = EMPTY)
+    public static void protectedOrbValuesNeverMatchVanilla(GameTestHelper helper) {
+        for (int t = 1; t <= 100_000; t++) {
+            helper.assertTrue(BossLoot.VANILLA_ORB_VALUES.contains(ExperienceOrb.getExperienceValue(t)),
+                    "ふつうのオーブの値の一覧に抜けがある: " + ExperienceOrb.getExperienceValue(t));
+        }
+        for (int total = 1; total <= 20_000; total++) {
+            int sum = 0;
+            for (int value : BossLoot.protectedOrbValues(total)) {
+                sum += value;
+                helper.assertTrue(value > 0, "値が0以下: " + total);
+                if (total != 1 && total != 3) {
+                    helper.assertFalse(BossLoot.VANILLA_ORB_VALUES.contains(value), "ふつうのオーブと同じ値: " + total + " -> " + value);
+                }
+            }
+            helper.assertTrue(sum == total, "合計が変わる: " + total + " -> " + sum);
+        }
+        helper.succeed();
+    }
+
+    /** 誰もいないときのオーブは、近くにふつうの経験値が出ても取り込まれず、保存し直しても印と長い寿命を保つ。 */
+    @GameTest(template = EMPTY, batch = "boss_reward_xp_merge", timeoutTicks = 120)
+    public static void protectedOrbsSurviveVanillaOrbsNearby(GameTestHelper helper) {
+        EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
+        ServerPlayer far = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))).add(60, 0, 0));
+        boss.setHealth(1);
+        boss.hurt(helper.getLevel().damageSources().playerAttack(far), 1000);
+        leave(helper, far);
+        boss.discard();
+        int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
+        AABB around = new AABB(helper.absolutePos(new BlockPos(3, 1, 3))).inflate(16);
+        ExperienceOrb sample = helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around).get(0);
+        Vec3 at = sample.position();
+        int vanilla = 0;
+        // 保護されたオーブと近い値も含めて、ふつうの経験値を何度も出す
+        for (int amount : new int[] {1, 2, 3, 5, 6, 7, 16, 17, 36, 37, 72, 73, 148, 149, 306, 307, 500}) {
+            for (int i = 0; i < 3; i++) {
+                ExperienceOrb.award(helper.getLevel(), at, amount);
+                vanilla += amount;
+            }
+        }
+        int vanillaTotal = vanilla;
+        helper.runAtTickTime(80, () -> {
+            int protectedXp = 0;
+            int ordinaryXp = 0;
+            for (ExperienceOrb orb : helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around)) {
+                CompoundTag tag = orb.saveWithoutId(new CompoundTag());
+                int xp = orb.getValue() * Math.max(1, tag.getInt("Count"));
+                if (orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)) {
+                    protectedXp += xp;
+                    helper.assertTrue(tag.getShort("Age") < 0, "保護されたオーブの寿命がふつうに戻った");
+                    ExperienceOrb restored = new ExperienceOrb(net.minecraft.world.entity.EntityType.EXPERIENCE_ORB, helper.getLevel());
+                    restored.load(tag);
+                    helper.assertTrue(restored.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
+                            && restored.saveWithoutId(new CompoundTag()).getShort("Age") < 0, "保存し直すと印か寿命を失う");
+                } else {
+                    ordinaryXp += xp;
+                }
+                orb.discard();
+            }
+            helper.assertTrue(protectedXp == want, "保護されたオーブの合計が変わった（取り込まれた）: " + protectedXp + " / " + want);
+            helper.assertTrue(ordinaryXp == vanillaTotal, "ふつうの経験値の合計が変わった: " + ordinaryXp + " / " + vanillaTotal);
+            helper.succeed();
+        });
     }
 
     /** 重力の裂け目は、予告の線の上（3本、長さ ±RIFT_REACH、床から4ブロックまで）にしか当たらない。向きを変えても同じ。 */

@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
  * （無期限。ほかのアイテムとは結合しないので、印も失われない）、ブラックホール（マイクロブラックホール・Pリアクター）にも
  * 飲み込まれない。
  */
-final class BossLoot {
+public final class BossLoot {
     private BossLoot() {}
 
     /** 落とし物を1つ、安全な場所に出す（死んだときの取りまとめ中なら、そこへ加える）。 */
@@ -90,9 +90,7 @@ final class BossLoot {
 
     /** 誰もいないときのオーブ。ブラックホールに吸われず、約30分残る（ふつうは5分）。 */
     private static void orbs(ServerLevel level, Vec3 at, int total) {
-        while (total > 0) {
-            int value = ExperienceOrb.getExperienceValue(total);
-            total -= value;
+        for (int value : protectedOrbValues(total)) {
             ExperienceOrb orb = new ExperienceOrb(level, at.x, at.y, at.z, value);
             net.minecraft.nbt.CompoundTag tag = orb.saveWithoutId(new net.minecraft.nbt.CompoundTag());
             tag.putShort("Age", Short.MIN_VALUE);
@@ -100,5 +98,27 @@ final class BossLoot {
             orb.getPersistentData().putBoolean(io.github.genichimaruo.singulo.reactor.EventHorizonTargets.PROTECTED, true);
             level.addFreshEntity(orb);
         }
+    }
+
+    /** ふつうの経験値オーブの値（ExperienceOrb.getExperienceValue が返すもの。すべて奇数）。 */
+    public static final java.util.Set<Integer> VANILLA_ORB_VALUES = java.util.Set.of(1, 3, 7, 17, 37, 73, 149, 307, 617, 1237, 2477);
+
+    /**
+     * 誰もいないときのオーブの値の分け方（合計は total）。オーブは同じ値どうしでしか結合しないので、ふつうのオーブの値
+     * （VANILLA_ORB_VALUES）を避けて、ふつうのオーブに取り込まれて印を失うことがないようにする。奇数の合計は 5 を1つ
+     * 出してから偶数で分ける（合計が 1 か 3 のときだけ、値 1 のオーブが1つ残る）。
+     */
+    public static java.util.List<Integer> protectedOrbValues(int total) {
+        java.util.List<Integer> values = new java.util.ArrayList<>();
+        if (total % 2 == 1 && total >= 5) {
+            values.add(5);
+            total -= 5;
+        }
+        while (total > 0) {
+            int value = total >= 2 ? Math.max(2, ExperienceOrb.getExperienceValue(total) & ~1) : total;
+            values.add(value);
+            total -= value;
+        }
+        return values;
     }
 }
