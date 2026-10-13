@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:artificial_star_core"
+    },
+    "title": {
+      "translate": "advancement.singulo.star_core.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.star_core.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "singulo:artificial_star_core"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:core"
+}

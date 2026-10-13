@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 200,
+  "energy": 2000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_catalyst"
+      },
+      "uses": 36000
+    },
+    {
+      "ingredient": {
+        "item": "singulo:optical_lattice_substrate"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:time_crystal_module",
+    "count": 1
+  }
+}

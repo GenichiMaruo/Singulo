@@ -1,42 +1,43 @@
-# Minecraft 1.20.1 / Forge 版
+# Minecraft 1.20.1 / Forge 版（Singulo 0.6.0）
 
-Singulo 0.3.0 を Minecraft 1.20.1 / Forge 47.4.26 にバックポートしたブランチです。元の 1.21.1 版は `main` に残し、1.20.1 版は `port/1.20.1-forge` で管理します。
+既存の `port/1.20.1-forge` の 0.3.0 を、`main` の 0.6.0（`aee3da0`）まで更新したバックポートです。`main` は Minecraft 1.21.1 専用として維持します。
 
 ## 実行環境
 
-- Minecraft 1.20.1、Forge 47.4.26 以上の 1.20.1 対応版、Java 17。
-- JEI は任意。開発環境では JEI 15.20.0.129 を使用します。
-- 配布ファイル: `build/libs/Singulo-0.3.0-1.20.1F.jar`。
+- Minecraft **1.20.1**、Forge **47.4.26**、Java **17**。
+- JEI は任意。開発・検証環境では **15.20.0.129** を使用します。
+- 配布用 JAR: `build/libs/Singulo-0.6.0-1.20.1F.jar`（`-dev.jar` は配布しません）。
+- 公開用タグ: `v0.6.0-1.20.1F`。この変更自体は公開処理を実行しません。
 
-## 対応内容
+## 更新内容
 
-登録・イベント・通信・チャンクロード・流体とアイテムの搬入出を Forge 1.20.1 の API に移植しました。アイテムの状態は NBT、プレイヤーの記録・発見履歴・次元ポケットは死亡時にも引き継ぐ Forge の保存データを使用します。
+0.4〜0.6 の変更を取り込み、ボス戦・報酬・重力装備・隕石探索・ジェネシスの進行、アンドロイドの敵・組立・護衛・充電・修理・装備・命名に対応しました。サポーター名は攻略本とエンディングの通常／虹色の額に表示できます。実際の名簿は空のままです。
 
-レシピ・戦利品・進捗・タグ・構造物は 1.20.1 のディレクトリと形式で生成します。共通素材タグは Forge のタグに対応させ、戦利品はスタックできないアイテムも指定個数を生成します。描画・GUI・シェーダー・JEI の連携も 1.20.1 の API に合わせています。
+1.21.1 からの主な API 変更は以下のとおりです。
 
-重力は Forge の重力属性を使用します。落下ダメージ倍率・飛行・爆発ノックバック耐性は独自属性と Forge イベントで補います。飛行を解除するときは、この mod が許可した飛行だけを解除します。
+- 登録・イベント・Capability・GUI・通信を 1.20.1 の API に移植。新しい通信にはチャネルバージョン 2 を使用し、0.3.0 クライアントとの接続を拒否します。クライアントとサーバーの両方を更新してください。
+- Data Components は既存の 1.20.1 用 NBT 保存に合わせ、装備・充電器・探索記録・ジェネシス記憶を保存します。
+- アンドロイドの防具効果・防具エンチャント、翼の滑空・重力・落下ダメージを 1.20.1 のフックで実装します。
+- 描画の頂点形式、印刷中のクリッピング、GUI、ビームの描画範囲を旧 API に対応させます。
+- レシピ・戦利品・進捗・構造物・タグは 1.20.1 の複数形ディレクトリと形式で生成し、共通素材には Forge タグを使います。
 
-1.21.1 のワールドを 1.20.1 に移すための変換機能は含みません。1.20.1 用のワールドで使用してください。
+1.21.1 のワールドを 1.20.1 に変換する機能はありません。既存の 1.20.1 ワールドを更新する前にはバックアップしてください。新しい遺構設備は新規生成チャンクに出現します。
 
-## 開発・確認
+## ビルド・検証
 
-Gradle は JDK 25、Minecraft のコンパイルと実行は JDK 17 のツールチェーンを使用します。`gradle.properties` の `org.gradle.java.home` は開発環境の JDK に合わせて変更してください。
+Gradle 9.8 を動かせる完全な JDK 17 以上と、Minecraft のコンパイル／実行用の JDK 17 を使用します。検証では Gradle に JDK 21、ゲームに JDK 17 を使用しました。特定 PC の Java パスは固定しません。必要なら `-Porg.gradle.java.installations.paths=/path/to/jdk17` を指定してください。
 
-```powershell
-uv run --no-project --python 3.12 --with pillow tools/gen_data.py
-uv run --no-project --python 3.12 --with pillow tools/check_models.py
-uv run --no-project --python 3.12 tools/localization.py --check
-./gradlew.bat build runGameTestServer
-./gradlew.bat runClient -PclientSmokeTest=true
+```sh
+python3 tools/gen_data.py
+python3 tools/check_models.py
+python3 tools/localization.py --check
+python3 tools/check_supporters.py
+python3 tools/check_port_1201.py
+./gradlew build runGameTestServer
+python3 tools/check_port_1201.py --jar build/libs/Singulo-0.6.0-1.20.1F.jar
+./gradlew runClient
 ```
 
-クライアント確認はタイトル画面とリソースの読み込み完了をログに出し、自動終了します。通常の起動は `./gradlew.bat runClient` です。
+生成画像には Pillow が必要です。GameTest の実行前には `build/gametest/world` のみを削除して、前回の試験のブロック・流体・エンティティが次回に干渉するのを防ぎます。開発用や通常プレイのワールドは対象外です。
 
-## 検証結果
-
-2026-10-11、Forge 47.4.26 / Java 17 で以下を確認しました。
-
-- 配布 JAR のビルドと再難読化が成功。クラスのバージョンは Java 17、Forge のメタデータと 1.20.1 のリソース配置を確認。
-- GameTest 180 件すべて成功。機械、搬入出、遺構、戦利品、ボス、ワームホール、時間結晶の育成などを検証。飛行・爆発ノックバック耐性・Capability の再接続も含む。
-- JEI を含むクライアントがリソースを読み込み、タイトル画面に到達。
-- 生成モデルの問題 0 件。中国語簡体字・繁体字・韓国語は各 1,563 項目の翻訳と書式を検証。
+1.20.1 固有の回帰テストとして、充電器のエネルギー Capability と NBT 保存、防具板のエンチャント、翼の滑空、新規パケットの Unicode／シード値の往復を追加しました。ボスとアンドロイドの実効段差高さ（1ブロック）も確認します。詳細な実測結果は [0.6.0 検証記録](port-0.6.0-1.20.1/verification.md) を参照してください。

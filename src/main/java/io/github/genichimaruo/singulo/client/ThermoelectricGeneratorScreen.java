@@ -16,6 +16,7 @@ public class ThermoelectricGeneratorScreen extends AbstractContainerScreen<Therm
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + 17, 8, 62)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.energy",

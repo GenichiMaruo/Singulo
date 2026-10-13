@@ -1,0 +1,954 @@
+{
+  "entries": [
+    {
+      "tag": "forge:stone",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "forge:cobblestone",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:stone_bricks",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "forge:sandtone",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:dirt",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "forge:sand",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "forge:gravel",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "forge:netherrack",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "forge:obsidian",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:terracotta",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "forge:concretes",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "forge:concrete_powders",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "forge:glass_blocks",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "tag": "forge:glass_panes",
+      "mass": 0.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:end_stone",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:deepslate",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:cobbled_deepslate",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:tuff",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:calcite",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:andesite",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:diorite",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:granite",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:basalt",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:smooth_basalt",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:blackstone",
+      "mass": 1.2,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:dripstone_block",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:pointed_dripstone",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:magma_block",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:soul_sand",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:soul_soil",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:clay",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:clay_ball",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:mud",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:brick",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:snow_block",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:snowball",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:ice",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:packed_ice",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:moss_block",
+      "mass": 0.5,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:flint",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:logs",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:planks",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:pumpkin",
+      "mass": 1,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:leaves",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:saplings",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:flowers",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "forge:mushrooms",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "forge:crops",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "forge:seeds",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:wool",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "tag": "minecraft:wool_carpets",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "tag": "forge:dyes",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:stick",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:bamboo",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:kelp",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:vine",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:lily_pad",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:glow_lichen",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:paper",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:sugar",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:apple",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:sweet_berries",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:glow_berries",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:beef",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:porkchop",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:chicken",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:mutton",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:rabbit",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:cod",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:salmon",
+      "mass": 0.25,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:egg",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:feather",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:ink_sac",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "item": "minecraft:rotten_flesh",
+      "mass": 0.1,
+      "tier": 0
+    },
+    {
+      "tag": "forge:ingots/iron",
+      "mass": 0.3333,
+      "tier": 1
+    },
+    {
+      "tag": "forge:ingots/copper",
+      "mass": 0.3333,
+      "tier": 1
+    },
+    {
+      "tag": "forge:ingots/gold",
+      "mass": 0.7778,
+      "tier": 1
+    },
+    {
+      "tag": "forge:storage_blocks/iron",
+      "mass": 3,
+      "tier": 1
+    },
+    {
+      "tag": "forge:storage_blocks/copper",
+      "mass": 3,
+      "tier": 1
+    },
+    {
+      "tag": "forge:storage_blocks/gold",
+      "mass": 7,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:iron_nugget",
+      "mass": 0.037,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:gold_nugget",
+      "mass": 0.0864,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "mass": 0.3333,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:raw_copper",
+      "mass": 0.3333,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:raw_gold",
+      "mass": 0.7778,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:raw_iron_block",
+      "mass": 3,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:raw_copper_block",
+      "mass": 3,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:raw_gold_block",
+      "mass": 7,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:coal_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:deepslate_coal_ore",
+      "mass": 1.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:iron_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:deepslate_iron_ore",
+      "mass": 1.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:copper_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:deepslate_copper_ore",
+      "mass": 1.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:gold_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:deepslate_gold_ore",
+      "mass": 1.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:redstone_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:deepslate_redstone_ore",
+      "mass": 1.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:lapis_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:deepslate_lapis_ore",
+      "mass": 1.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:nether_quartz_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:nether_gold_ore",
+      "mass": 1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:coal",
+      "mass": 0.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:charcoal",
+      "mass": 0.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:coal_block",
+      "mass": 1.8,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:redstone",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:redstone_block",
+      "mass": 0.9,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:lapis_lazuli",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:lapis_block",
+      "mass": 0.9,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:quartz",
+      "mass": 0.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:quartz_block",
+      "mass": 0.8,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:glowstone_dust",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:glowstone",
+      "mass": 0.4,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:amethyst_shard",
+      "mass": 0.2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:amethyst_block",
+      "mass": 0.8,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:slime_ball",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:slime_block",
+      "mass": 0.9,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:honeycomb",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:magma_cream",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:glow_ink_sac",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:blue_ice",
+      "mass": 2,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:gunpowder",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:string",
+      "mass": 0.05,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:bone",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:bone_meal",
+      "mass": 0.05,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:bone_block",
+      "mass": 0.9,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:leather",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:rabbit_hide",
+      "mass": 0.05,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:spider_eye",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:armadillo_scute",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:chorus_fruit",
+      "mass": 0.1,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:sculk",
+      "mass": 0.5,
+      "tier": 1
+    },
+    {
+      "item": "minecraft:diamond",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:diamond_block",
+      "mass": 9,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:diamond_ore",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:deepslate_diamond_ore",
+      "mass": 1.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:emerald",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:emerald_block",
+      "mass": 9,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:emerald_ore",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:deepslate_emerald_ore",
+      "mass": 1.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:ender_pearl",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:ender_eye",
+      "mass": 0.6,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:blaze_rod",
+      "mass": 0.3,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:blaze_powder",
+      "mass": 0.15,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:breeze_rod",
+      "mass": 0.3,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:ghast_tear",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:phantom_membrane",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:prismarine_shard",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:prismarine_crystals",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:sponge",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:nautilus_shell",
+      "mass": 0.3,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:turtle_scute",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:rabbit_foot",
+      "mass": 0.1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:goat_horn",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:golden_apple",
+      "mass": 0.8,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:experience_bottle",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:name_tag",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:saddle",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:trial_key",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:sculk_catalyst",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:sculk_sensor",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:sculk_shrieker",
+      "mass": 1,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:zombie_head",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:skeleton_skull",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:creeper_head",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:piglin_head",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "tag": "forge:music_discs",
+      "mass": 0.2,
+      "tier": 2
+    },
+    {
+      "tag": "minecraft:trim_templates",
+      "mass": 0.5,
+      "tier": 2
+    },
+    {
+      "item": "minecraft:netherite_scrap",
+      "mass": 0.6,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:netherite_ingot",
+      "mass": 2.2222,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:netherite_block",
+      "mass": 20,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:ancient_debris",
+      "mass": 2,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:netherite_upgrade_smithing_template",
+      "mass": 0.5,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:echo_shard",
+      "mass": 0.3,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:shulker_shell",
+      "mass": 0.5,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:heart_of_the_sea",
+      "mass": 1,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:conduit",
+      "mass": 1,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:trident",
+      "mass": 3,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:totem_of_undying",
+      "mass": 1,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:wither_skeleton_skull",
+      "mass": 0.5,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:sniffer_egg",
+      "mass": 1,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:ominous_trial_key",
+      "mass": 0.3,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:dragon_breath",
+      "mass": 0.5,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:enchanted_golden_apple",
+      "mass": 3,
+      "tier": 3
+    },
+    {
+      "item": "minecraft:nether_star",
+      "mass": 5,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:beacon",
+      "mass": 6,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:heavy_core",
+      "mass": 4,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:dragon_head",
+      "mass": 2,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:elytra",
+      "mass": 3,
+      "tier": 4
+    },
+    {
+      "item": "minecraft:dragon_egg",
+      "mass": 10,
+      "tier": 4
+    }
+  ]
+}

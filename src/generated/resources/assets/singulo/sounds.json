@@ -852,8 +852,16 @@
     "subtitle": "subtitles.singulo.horizon_warden.ambient",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.ambient",
-        "type": "event"
+        "name": "singulo:boss/horizon_warden_ambient_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/horizon_warden_ambient_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/horizon_warden_ambient_3",
+        "attenuation_distance": 20
       }
     ]
   },
@@ -935,6 +943,443 @@
       {
         "name": "singulo:nature/fulgurite_form",
         "attenuation_distance": 20
+      }
+    ]
+  },
+  "ergosphere_leviathan.emerge": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.emerge",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_emerge",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.ambient": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.ambient",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_ambient_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:boss/ergosphere_leviathan_ambient_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:boss/ergosphere_leviathan_ambient_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ergosphere_leviathan.hurt": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.hurt",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_hurt",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "ergosphere_leviathan.roar": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.roar",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_roar",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.dive": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.dive",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_dive",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ergosphere_leviathan.breath_charge": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.breath_charge",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_breath_charge",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ergosphere_leviathan.breath_fire": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.breath_fire",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_breath_fire",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.shed": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.shed",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_shed",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "ergosphere_leviathan.death": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.death",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_death",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.implode": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.implode",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_implode",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.hatchling": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.hatchling",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_hatchling",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "ergosphere_leviathan.rumble": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.rumble",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_rumble",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.swallow": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.swallow",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_swallow",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ergosphere_leviathan.whip": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.whip",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_whip",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "ergosphere_leviathan.molt": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.molt",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_molt",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.coil": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.coil",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_coil",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ergosphere_leviathan.ascend": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.ascend",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_ascend",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ergosphere_leviathan.jet_charge": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.jet_charge",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_jet_charge",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ergosphere_leviathan.jet": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.jet",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_jet",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.storm": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.storm",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_storm",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "last_archivist.emerge": {
+    "subtitle": "subtitles.singulo.last_archivist.emerge",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_emerge",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "last_archivist.ambient": {
+    "subtitle": "subtitles.singulo.last_archivist.ambient",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_ambient_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:boss/last_archivist_ambient_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:boss/last_archivist_ambient_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "last_archivist.hurt": {
+    "subtitle": "subtitles.singulo.last_archivist.hurt",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_hurt",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "last_archivist.phase": {
+    "subtitle": "subtitles.singulo.last_archivist.phase",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_phase",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "last_archivist.judgment_aim": {
+    "subtitle": "subtitles.singulo.last_archivist.judgment_aim",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_judgment_aim",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "last_archivist.judgment_fire": {
+    "subtitle": "subtitles.singulo.last_archivist.judgment_fire",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_judgment_fire",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "last_archivist.verdict": {
+    "subtitle": "subtitles.singulo.last_archivist.verdict",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_verdict",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "last_archivist.collapse": {
+    "subtitle": "subtitles.singulo.last_archivist.collapse",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_collapse",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "last_archivist.recall": {
+    "subtitle": "subtitles.singulo.last_archivist.recall",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_recall",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "last_archivist.nova_charge": {
+    "subtitle": "subtitles.singulo.last_archivist.nova_charge",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_nova_charge",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "last_archivist.nova": {
+    "subtitle": "subtitles.singulo.last_archivist.nova",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_nova",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "last_archivist.death": {
+    "subtitle": "subtitles.singulo.last_archivist.death",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_death",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "last_archivist.death_flash": {
+    "subtitle": "subtitles.singulo.last_archivist.death_flash",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_death_flash",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "genesis.form": {
+    "subtitle": "subtitles.singulo.genesis.form",
+    "sounds": [
+      {
+        "name": "singulo:genesis/form",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "genesis.ambient": {
+    "subtitle": "subtitles.singulo.genesis.ambient",
+    "sounds": [
+      {
+        "name": "singulo:genesis/ambient_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:genesis/ambient_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "singulo:genesis/ambient_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "genesis.seed": {
+    "subtitle": "subtitles.singulo.genesis.seed",
+    "sounds": [
+      {
+        "name": "singulo:genesis/seed",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "genesis.ignite": {
+    "subtitle": "subtitles.singulo.genesis.ignite",
+    "sounds": [
+      {
+        "name": "singulo:genesis/ignite",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "genesis.surge": {
+    "subtitle": "subtitles.singulo.genesis.surge",
+    "sounds": [
+      {
+        "name": "singulo:genesis/surge",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "genesis.alarm": {
+    "subtitle": "subtitles.singulo.genesis.alarm",
+    "sounds": [
+      {
+        "name": "singulo:genesis/alarm",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "genesis.collapse": {
+    "subtitle": "subtitles.singulo.genesis.collapse",
+    "sounds": [
+      {
+        "name": "singulo:genesis/collapse",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "genesis.lever": {
+    "subtitle": "subtitles.singulo.genesis.lever",
+    "sounds": [
+      {
+        "name": "singulo:genesis/lever",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "genesis.birth_collapse": {
+    "subtitle": "subtitles.singulo.genesis.birth_collapse",
+    "sounds": [
+      {
+        "name": "singulo:genesis/birth_collapse",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "genesis.big_bang": {
+    "subtitle": "subtitles.singulo.genesis.big_bang",
+    "sounds": [
+      {
+        "name": "singulo:genesis/big_bang",
+        "attenuation_distance": 128
+      }
+    ]
+  },
+  "genesis.sky": {
+    "subtitle": "subtitles.singulo.genesis.sky",
+    "sounds": [
+      {
+        "name": "singulo:genesis/sky",
+        "attenuation_distance": 128
+      }
+    ]
+  },
+  "genesis.synth": {
+    "subtitle": "subtitles.singulo.genesis.synth",
+    "sounds": [
+      {
+        "name": "singulo:genesis/synth_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:genesis/synth_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:genesis/synth_3",
+        "attenuation_distance": 24
       }
     ]
   }

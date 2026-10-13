@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:ergosphere_chapter"
+    },
+    "title": {
+      "translate": "advancement.singulo.leviathan.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.leviathan.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "singulo:ergosphere_leviathan"
+        }
+      }
+    }
+  },
+  "parent": "singulo:ruin_sunken"
+}

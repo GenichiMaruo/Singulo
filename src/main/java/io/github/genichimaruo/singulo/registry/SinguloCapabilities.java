@@ -50,9 +50,17 @@ public final class SinguloCapabilities {
         catalystDevice(event, SinguloBlockEntities.QUANTUM_HEAT_ENGINE.get());
         catalystDevice(event, SinguloBlockEntities.DEGENERATE_FURNACE.get());
         catalystDevice(event, SinguloBlockEntities.PROBE_STATION.get());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),
+                (be, side) -> be.automationItems());
         catalystDevice(event, SinguloBlockEntities.WORLDLINE_ANCHOR_ADVANCED.get());
         catalystDevice(event, SinguloBlockEntities.SHIELD_TOWER.get());
         catalystDevice(event, SinguloBlockEntities.TIPLER_CYLINDER.get());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.GENESIS_CORE.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.GENESIS_CORE.get(),
+                (be, side) -> be.items());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.CREATIVE_ENERGY.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.PENROSE_REACTOR.get(),
@@ -83,6 +91,9 @@ public final class SinguloCapabilities {
                 (be, side) -> be.fluids());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.GRAVITY_RECEIVER.get(),
                 (be, side) -> be.energy());
+        // 衝撃発電パネルは取り出すだけ（ケーブルへ送り出す）
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.IMPACT_GENERATOR.get(),
+                (be, side) -> be.output());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.DEEP_SEA_COLLECTOR.get(),
                 (be, side) -> be.automationItems());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.VOID_COLLECTOR.get(),
@@ -96,6 +107,8 @@ public final class SinguloCapabilities {
                 (be, side) -> net.minecraftforge.items.wrapper.EmptyHandler.INSTANCE);
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_MODULE.get(),
                 (be, side) -> be.energyFor(side));
+        event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> io.github.genichimaruo.singulo.android.AndroidChargerItem.energy(stack),
+                SinguloItems.ANDROID_CHARGER.get());
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> GravityGauntletItem.energy(stack),
                 SinguloItems.INERTIAL_CONTROL_GAUNTLET.get(), SinguloItems.GRAVITON_MANIPULATOR.get());
         event.registerItem(Capabilities.EnergyStorage.ITEM,

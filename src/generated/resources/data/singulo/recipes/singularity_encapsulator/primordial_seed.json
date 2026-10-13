@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "singularity_encapsulator",
+  "stage": 5,
+  "time": 2400,
+  "energy": 500000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:ergosphere_chapter"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:hawking_condensate"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:artificial_star_core"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "singulo:primordial_seed",
+    "count": 1
+  }
+}

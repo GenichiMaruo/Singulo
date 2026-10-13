@@ -59,6 +59,7 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (kind == Kind.WORMHOLE_PORT && Panel.inside(mouseX, mouseY, leftPos + BIT_X, topPos + BIT_Y,
