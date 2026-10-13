@@ -93,21 +93,24 @@ public class AndroidMenu extends AbstractContainerMenu {
         return data.getInt(index);
     }
 
-    /** 名前を付け直す（サーバー。RenameAndroidPayload から）。 */
-    public void rename(String name) {
-        if (android != null) {
+    /** 名前を付け直す（サーバー。RenameAndroidPayload から）。操作できる人だけ。 */
+    public void rename(Player player, String name) {
+        if (android != null && android.mayOperate(player)) {
             android.rename(name);
         }
     }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_DISMANTLE && android != null) {
+        if (android == null || !android.mayOperate(player)) {
+            return false;
+        }
+        if (id == BUTTON_DISMANTLE) {
             android.dismantle();
             player.closeContainer();
             return true;
         }
-        if (id == BUTTON_ESCORT && android != null && android.mode() == RuinAndroid.MODE_FOLLOW && android.mayOperate(player)) {
+        if (id == BUTTON_ESCORT && android.mode() == RuinAndroid.MODE_FOLLOW) {
             android.chooseEscort(!android.escort());
             return true;
         }
@@ -139,6 +142,7 @@ public class AndroidMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return android == null || android.isAlive() && android.distanceToSqr(player) < 8 * 8;
+        // 許可証から外された人の画面は、開いたままでも閉じる（持ち物を動かしたり、名前を変えたりできないように）
+        return android == null || android.isAlive() && android.distanceToSqr(player) < 8 * 8 && android.mayOperate(player);
     }
 }

@@ -91,7 +91,7 @@ public class AndroidStationMenu extends AbstractContainerMenu {
 
     /** 名前を付け直す（サーバー。RenameAndroidPayload から）。 */
     public void rename(Player player, String name) {
-        if (player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity station) {
+        if (player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.mayOperate(player)) {
             station.rename(name);
         }
     }

@@ -283,19 +283,61 @@ public final class AndroidGameTests {
             s.press(AndroidStationBlockEntity.BUTTON_LEADER);
             helper.assertTrue(a.ownerPlayer() == owner, "切り替えが持ち主に戻らない");
             helper.assertTrue(a.mayOperate(friend) && !a.mayOperate(stranger), "アンドロイドの画面を開ける人が許可証と合わない");
+            // 索敵の AI のタイミングによらないよう、狙いを直接付けて、毎 tick の見直しで外されるかを見る
+            a.setNoAi(true);
+            owner.moveTo(a.position());
             var zombie = EntityType.ZOMBIE.create(helper.getLevel());
             zombie.setNoAi(true);
             zombie.moveTo(a.position().add(3, 0, 0));
             helper.getLevel().addFreshEntity(zombie);
-            helper.runAfterDelay(40, () -> {
+            a.setTarget(zombie);
+            helper.runAfterDelay(3, () -> {
                 helper.assertTrue(a.getTarget() == null, "ついていくだけなのに敵を狙う");
                 s.press(AndroidStationBlockEntity.BUTTON_ESCORT);
-                helper.succeedWhen(() -> {
-                    helper.assertTrue(a.getTarget() == zombie || !zombie.isAlive(), "護衛するのに敵を狙わない");
+                a.setTarget(zombie);
+                helper.runAfterDelay(3, () -> {
+                    helper.assertTrue(a.getTarget() == zombie, "護衛するのに敵を狙わない");
                     zombie.discard();
                     a.discard();
+                    helper.succeed();
                 });
             });
+        });
+    }
+
+    /** 許可証から外された人は、開いていたアンドロイドの画面でも、名前の変更・解体・持ち物の出し入れができない。持ち主はできる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void removedMemberLosesAndroidScreen(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        var owner = helper.makeMockServerPlayerInLevel();
+        var friend = helper.makeMockServerPlayerInLevel();
+        s.setOwner(owner.getUUID());
+        ItemStack permit = new ItemStack(item("shield_permit"));
+        io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
+        io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, friend);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PERMIT, permit);
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
+            RuinAndroid a = androids(helper).get(0);
+            owner.moveTo(a.position());
+            friend.moveTo(a.position());
+            var friendMenu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, friend.getInventory(), a);
+            var ownerMenu = new io.github.genichimaruo.singulo.android.AndroidMenu(2, owner.getInventory(), a);
+            helper.assertTrue(friendMenu.stillValid(friend), "登録した人が画面を使えない");
+            // 許可証を持ち主だけのものに替えて、アンドロイドへ伝える
+            ItemStack ownerOnly = new ItemStack(item("shield_permit"));
+            io.github.genichimaruo.singulo.item.ShieldPermitItem.add(ownerOnly, owner);
+            s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PERMIT, ownerOnly);
+            s.press(AndroidStationBlockEntity.BUTTON_MODE_GUARD);
+            helper.assertFalse(friendMenu.stillValid(friend), "外された人の画面が開いたまま使える");
+            friendMenu.rename(friend, "Intruder");
+            helper.assertFalse(a.hasCustomName(), "外された人が名前を変えられる");
+            helper.assertFalse(friendMenu.clickMenuButton(friend, io.github.genichimaruo.singulo.android.AndroidMenu.BUTTON_DISMANTLE),
+                    "外された人が解体できる");
+            helper.assertTrue(ownerMenu.stillValid(owner), "持ち主の画面が使えなくなった");
+            ownerMenu.rename(owner, "Mine");
+            helper.assertTrue(a.hasCustomName(), "持ち主が名前を変えられない");
+            a.discard();
+            helper.succeed();
         });
     }
 

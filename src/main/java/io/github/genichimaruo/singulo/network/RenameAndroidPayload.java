@@ -34,7 +34,7 @@ public record RenameAndroidPayload(int containerId, String name) implements Cust
                 return;
             }
             if (player.containerMenu instanceof AndroidMenu menu && menu.stillValid(player)) {
-                menu.rename(payload.name());
+                menu.rename(player, payload.name());
             } else if (player.containerMenu instanceof AndroidStationMenu menu && menu.stillValid(player)) {
                 menu.rename(player, payload.name());
             }
