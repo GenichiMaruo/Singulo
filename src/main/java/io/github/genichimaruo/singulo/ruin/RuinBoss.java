@@ -198,8 +198,16 @@ public abstract class RuinBoss extends Monster {
                 || lastHurtByPlayerTime > 0 && shouldDropExperience()
                 && server.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT))) {
             int reward = net.neoforged.neoforge.event.EventHooks.getExperienceDrop(this, lastHurtByPlayer, getExperienceReward(server, killer));
-            BossLoot.experience(server, lootPos(), reward);
+            int perPlayer = reward / Math.max(1, BossScaling.lootRolls(rewardParticipants()));
+            BossLoot.experience(server, lootPos(), reward, perPlayer, rewardPlayers(server));
         }
+    }
+
+    /** 経験値を受け取る、部屋にいる挑戦者（生きていて、観戦者でない）。 */
+    protected java.util.List<Player> rewardPlayers(ServerLevel level) {
+        net.minecraft.world.phys.AABB box = home != null ? new net.minecraft.world.phys.AABB(home).inflate(arenaRadius() + 4)
+                : getBoundingBox().inflate(32);
+        return level.getEntitiesOfClass(Player.class, box, p -> p.isAlive() && !p.isSpectator());
     }
 
     /** 挑戦者がいなくなってからの猶予を、次の確かめで終わるところまで進める（テスト用）。 */

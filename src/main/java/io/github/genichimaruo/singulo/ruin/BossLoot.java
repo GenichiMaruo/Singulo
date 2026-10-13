@@ -8,9 +8,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * ボスの落とす物と経験値を、倒れた場所ではなく決まった安全な場所（核やコンソールの上）に出す。
- * 宙に浮いたまま倒れたボスの落とし物が、床の穴や隙間へ落ちて失われないように。落とし物は時間で消えず、
- * ブラックホール（マイクロブラックホール・Pリアクター）にも飲み込まれない。
+ * ボスの落とす物を、倒れた場所ではなく決まった安全な場所（核やコンソールの上）に出し、経験値は挑戦者へ直接与える。
+ * 宙に浮いたまま倒れたボスの落とし物が、床の穴や隙間へ落ちて失われないように。落とし物は時間で消えず
+ * （無期限。ほかのアイテムとは結合しないので、印も失われない）、ブラックホール（マイクロブラックホール・Pリアクター）にも
+ * 飲み込まれない。
  */
 final class BossLoot {
     private BossLoot() {}
@@ -22,7 +23,7 @@ final class BossLoot {
         }
         ItemEntity item = new ItemEntity(boss.level(), at.x, at.y, at.z, stack, 0, 0.15, 0);
         item.setDefaultPickUpDelay();
-        item.setExtendedLifetime();
+        item.setUnlimitedLifetime();
         item.getPersistentData().putBoolean(io.github.genichimaruo.singulo.reactor.EventHorizonTargets.PROTECTED, true);
         if (boss.captureDrops() != null) {
             boss.captureDrops().add(item);
@@ -32,10 +33,22 @@ final class BossLoot {
         return item;
     }
 
-    /** 経験値を安全な場所に出す。 */
-    static void experience(ServerLevel level, Vec3 at, int amount) {
-        if (amount > 0) {
-            ExperienceOrb.award(level, at, amount);
+    /**
+     * 経験値を、部屋にいる挑戦者それぞれへ直接 perPlayer ずつ与える（オーブではないので、時間で消えず、ブラックホールにも
+     * 吸われない）。部屋に誰もいなければ、合計 total を安全な場所へオーブで出す。
+     */
+    static void experience(ServerLevel level, Vec3 at, int total, int perPlayer, java.util.List<? extends net.minecraft.world.entity.player.Player> players) {
+        if (total <= 0) {
+            return;
         }
+        if (players.isEmpty()) {
+            ExperienceOrb.award(level, at, total);
+            return;
+        }
+        for (net.minecraft.world.entity.player.Player p : players) {
+            p.giveExperiencePoints(perPlayer);
+        }
+        level.playSound(null, at.x, at.y, at.z, net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP,
+                net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 }

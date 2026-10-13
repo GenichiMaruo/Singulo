@@ -1048,7 +1048,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             if (on) {
                 for (int k = -1; k <= 1; k++) {
                     Vec3 mid = c.add(across.scale(k * RIFT_SPACING));
-                    for (double s = -ARENA + 4; s <= ARENA - 4; s += 1.2) {
+                    for (double s = -RIFT_REACH; s <= RIFT_REACH; s += 1.2) {
                         for (int edge = -1; edge <= 1; edge += 2) {
                             Vec3 q = mid.add(along.scale(s)).add(across.scale(edge * RIFT_WIDTH * 0.8));
                             level.sendParticles(inVolley > RIFT_WARN - 8 ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.END_ROD,
@@ -1068,24 +1068,21 @@ public class ErgosphereLeviathan extends RuinBoss {
             // 線に沿って黒い光の壁が立ち上がる
             for (int k = -1; k <= 1; k++) {
                 Vec3 mid = c.add(across.scale(k * RIFT_SPACING));
-                for (double s = -ARENA + 4; s <= ARENA - 4; s += 1.5) {
+                for (double s = -RIFT_REACH; s <= RIFT_REACH; s += 1.5) {
                     Vec3 q = mid.add(along.scale(s));
                     level.sendParticles(ParticleTypes.REVERSE_PORTAL, q.x, c.y + 2.5, q.z, 10, 0.25, 2.2, 0.25, 0.4);
                     level.sendParticles(ParticleTypes.SQUID_INK, q.x, c.y + 1.5, q.z, 2, 0.15, 1.2, 0.15, 0.02);
                     level.sendParticles(ParticleTypes.END_ROD, q.x, c.y + 0.2, q.z, 1, 0.2, 0.05, 0.2, 0.08);
                 }
-                Vec3 end1 = mid.add(along.scale(ARENA - 4));
-                Vec3 end2 = mid.add(along.scale(-ARENA + 4));
+                Vec3 end1 = mid.add(along.scale(RIFT_REACH));
+                Vec3 end2 = mid.add(along.scale(-RIFT_REACH));
                 level.sendParticles(ParticleTypes.SONIC_BOOM, end1.x, c.y + 1.5, end1.z, 1, 0, 0, 0, 0);
                 level.sendParticles(ParticleTypes.SONIC_BOOM, end2.x, c.y + 1.5, end2.z, 1, 0, 0, 0, 0);
             }
             level.playSound(null, c.x, c.y, c.z, net.minecraft.sounds.SoundEvents.ENDER_DRAGON_GROWL,
                     net.minecraft.sounds.SoundSource.HOSTILE, 3.0F, 1.5F);
             for (Player p : challengers(level, ARENA + 4)) {
-                Vec3 off = p.position().subtract(c);
-                double side = off.x * across.x + off.z * across.z;
-                double nearest = Math.round(side / RIFT_SPACING);
-                if (Math.abs(nearest) <= 1 && Math.abs(side - nearest * RIFT_SPACING) <= RIFT_WIDTH && p.getY() < c.y + 4) {
+                if (riftHits(c, riftAngle, p.position())) {
                     hurtWith("rift", p, damageSources().indirectMagic(this, this), damage);
                 }
             }
@@ -1097,6 +1094,24 @@ public class ErgosphereLeviathan extends RuinBoss {
         if (ticks <= 1) {
             backToSwim();
         }
+    }
+
+    /** 重力の裂け目の、予告の線の長さ（中心から片側）。描画と当たりで同じ長さを使う。 */
+    public static final double RIFT_REACH = ARENA - 4;
+
+    /**
+     * pos が、向き angle の裂け目（中心 c、平行な3本）に当たるか。予告の線の上（幅 RIFT_WIDTH、長さ ±RIFT_REACH）で、
+     * 床から高さ4ブロックまで。
+     */
+    public static boolean riftHits(Vec3 c, double angle, Vec3 pos) {
+        Vec3 along = new Vec3(Math.cos(angle), 0, Math.sin(angle));
+        Vec3 across = new Vec3(-along.z, 0, along.x);
+        Vec3 off = pos.subtract(c);
+        double side = off.x * across.x + off.z * across.z;
+        double length = off.x * along.x + off.z * along.z;
+        double nearest = Math.round(side / RIFT_SPACING);
+        return Math.abs(nearest) <= 1 && Math.abs(side - nearest * RIFT_SPACING) <= RIFT_WIDTH && Math.abs(length) <= RIFT_REACH
+                && pos.y >= c.y - 1 && pos.y < c.y + 4;
     }
 
     // ---- 引き潮

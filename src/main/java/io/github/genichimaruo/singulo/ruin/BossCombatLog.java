@@ -73,7 +73,10 @@ public final class BossCombatLog {
         Mob attacker = boss(source.getEntity());
         Slam slam = attacker == null ? slamFor(victim, source) : null;
         if (victim instanceof Player player && slam != null) {
-            SLAMS.remove(player.getUUID());
+            if (player.getHealth() > 0) {
+                // 倒れなかった: この叩きつけの記録はここまで（倒れたときは、死亡の記録で使ってから消す）
+                SLAMS.remove(player.getUUID());
+            }
             write("hit_player", slam.boss(), slam.attack(), event.getOriginalDamage(), event.getNewDamage(), event.getBlockedDamage(), player);
         } else if (victim instanceof Player player && attacker != null) {
             write("hit_player", attacker, attackName(attacker, source), event.getOriginalDamage(), event.getNewDamage(),
@@ -91,6 +94,7 @@ public final class BossCombatLog {
         Mob attacker = boss(event.getSource().getEntity());
         Slam slam = attacker == null ? slamFor(dead, event.getSource()) : null;
         if (dead instanceof Player player && slam != null) {
+            SLAMS.remove(player.getUUID());
             write("player_died", slam.boss(), slam.attack(), 0, 0, 0, player);
         } else if (dead instanceof Player player && attacker != null) {
             write("player_died", attacker, attackName(attacker, event.getSource()), 0, 0, 0, player);

@@ -122,6 +122,34 @@ public class HorizonBolt extends ThrowableItemProjectile {
         }
     }
 
+    /** ダメージと当たり方（防具を貫くか・防具で減るか）を保存する。読み込み直しても同じ強さで当たる。 */
+    @Override
+    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putFloat("damage", damage);
+        tag.putBoolean("armored", armored);
+        tag.putBoolean("piercing", piercing);
+    }
+
+    @Override
+    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        // 0.5.0 より前に保存された光弾は、ダメージを持たない（既定の値のまま）
+        if (tag.contains("damage")) {
+            damage = tag.getFloat("damage");
+        }
+        armored = tag.getBoolean("armored");
+        piercing = tag.getBoolean("piercing");
+    }
+
+    public float damage() {
+        return damage;
+    }
+
+    public boolean armored() {
+        return armored;
+    }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);

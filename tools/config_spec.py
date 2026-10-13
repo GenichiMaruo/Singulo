@@ -92,7 +92,7 @@ SERVER = [
     ('ruins', 'bossMaxScaledPlayers', '6', '1〜32（整数）', 'ボスの強さに数える挑戦者の上限'),
     ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）'),
     ('ruins', 'bossXpMultiplier', '1.0', '0.0〜10.0', 'ボスを倒したときの経験値の倍率'),
-    ('ruins', 'bossHardMode', 'false', 'true / false', 'ボスのハードモード（0.4.1 までの強さ。残響の番人の魔法が防具を貫き、ダメージも元の値）'),
+    ('ruins', 'bossHardMode', 'false', 'true / false', 'ボスのハードモード（0.4.1 までの体力とダメージを基準にした高難度。新しい技はそのまま使い、大蛇の光線などは通常より強い）'),
     ('ruins', 'bossCombatLog', 'false', 'true / false', 'ボス戦で受けた・与えたダメージを logs/singulo-combat.log に記録するか（調整用）'),
 
     # 残響の欠片

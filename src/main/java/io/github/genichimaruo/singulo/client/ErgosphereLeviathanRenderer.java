@@ -470,7 +470,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         double a = e.riftAngle();
         Vec3 along = new Vec3(Math.cos(a), 0, Math.sin(a));
         Vec3 across = new Vec3(-along.z, 0, along.x);
-        double reach = ErgosphereLeviathan.ARENA - 4;
+        double reach = ErgosphereLeviathan.RIFT_REACH;
         for (int k = -1; k <= 1; k++) {
             Vec3 mid = c.add(across.scale(k * ErgosphereLeviathan.RIFT_SPACING));
             Vec3 p0 = mid.add(along.scale(-reach)).subtract(origin);

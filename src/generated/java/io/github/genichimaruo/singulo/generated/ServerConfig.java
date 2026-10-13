@@ -314,7 +314,7 @@ public final class ServerConfig {
         BOSS_LOOT_PER_PLAYER_ = b.define("bossLootPerPlayer", true);
         b.comment("ボスを倒したときの経験値の倍率", "範囲: 0.0〜10.0");
         BOSS_XP_MULTIPLIER_ = b.defineInRange("bossXpMultiplier", 1.0, 0.0, 10.0);
-        b.comment("ボスのハードモード（0.4.1 までの強さ。残響の番人の魔法が防具を貫き、ダメージも元の値）", "範囲: true / false");
+        b.comment("ボスのハードモード（0.4.1 までの体力とダメージを基準にした高難度。新しい技はそのまま使い、大蛇の光線などは通常より強い）", "範囲: true / false");
         BOSS_HARD_MODE_ = b.define("bossHardMode", false);
         b.comment("ボス戦で受けた・与えたダメージを logs/singulo-combat.log に記録するか（調整用）", "範囲: true / false");
         BOSS_COMBAT_LOG_ = b.define("bossCombatLog", false);
