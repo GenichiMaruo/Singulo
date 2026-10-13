@@ -94,6 +94,11 @@ public final class SinguloClient {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEALED_CONTAINER.get(),
                 SealedContainerRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
+        event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));
+        event.registerEntityRenderer(SinguloEntities.SABER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SABER));
+        event.registerEntityRenderer(SinguloEntities.ANDROID_CRESCENT.get(), AndroidCrescentRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.ANDROID_LASER.get(), AndroidLaserRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ECHO_SENTINEL.get(), EchoSentinelRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_REMNANT.get(), GravityRemnantRenderer::new);
@@ -160,6 +165,9 @@ public final class SinguloClient {
 
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SecurityDroneRenderer.LAYER, SecurityDroneRenderer::createLayer);
+        event.registerLayerDefinition(AndroidModel.BLADE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BLADE));
+        event.registerLayerDefinition(AndroidModel.WHIP_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.WHIP));
+        event.registerLayerDefinition(AndroidModel.SABER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.SABER));
         event.registerLayerDefinition(HorizonWardenRenderer.LAYER, HorizonWardenRenderer::createLayer);
     }
 
@@ -172,6 +180,8 @@ public final class SinguloClient {
         event.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
         event.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
         event.register(SinguloMenus.GENESIS_CORE.get(), GenesisCoreScreen::new);
+        event.register(SinguloMenus.ANDROID_STATION.get(), AndroidStationScreen::new);
+        event.register(SinguloMenus.ANDROID.get(), AndroidScreen::new);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */

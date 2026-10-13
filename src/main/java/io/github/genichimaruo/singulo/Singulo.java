@@ -66,6 +66,7 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onBreak);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onExplosion);
         NeoForge.EVENT_BUS.addListener(InertialStabilizerBlockEntity::onExplosion);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.RuinAndroid::onChangeTarget);
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onExplosionStart);
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onExplosionDetonate);
         NeoForge.EVENT_BUS.addListener(ShieldTowerBlockEntity::onMobGriefing);

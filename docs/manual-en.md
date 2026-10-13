@@ -93,6 +93,31 @@ Every ruin hides a **sealed container** that opens only with the key of the next
 
 A Probe Station only visits ruins a player has discovered by opening their caches. With default settings, the stage 4 station automates Observation Posts. Culture Facilities, Final Labs and Sunken Reactor Sectors always require manual exploration. Decode Record Fragments in the Archive Terminal and read the decoded items to add ancient stories to your handbook.
 
+## Androids
+
+Every ruin has **Ruin Android Fabricators** against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind onto its bed, built up from the feet, and sends them out. Defeat them all and a **compact crystal memory** of that design appears on the fabricator (which then rests for a day).
+
+| Kind | Main moves |
+| --- | --- |
+| Blade Android "Lumina" | Dash slash with afterimages, pillars of light from the floor (leave the warning rings), spin slash |
+| Whip Android "Verna" | A lash reaching about 6 blocks, a bind that pulls you in, a shockwave along the floor (jump it) |
+| Saber Android "Soleil" | Lunging thrust, a sweep whose blade stretches, a flying crescent slash. Raises a light shield when hit and counters if you keep striking |
+
+Androids run on charge and run out after about ten big moves. They return to a nearby fabricator, unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging.
+
+**Your own androids:** make an **Android Assembly Station** and android kits in the stage 2 Precision Assembler. Put a compact crystal memory (never used up) and kits (one per print) in the station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last.
+
+- Guards attack hostile mobs only and never fight players or bosses. Player and boss attacks do not hurt them.
+- Modes: Guard (by the station), Wander (within 16 blocks) and Follow (goes with its owner). Below its return health it goes back to the station and repairs and recharges in 5 s.
+- While following, if you carry an **Android Wireless Charger** (30 refills when full), it recharges as it walks beside you.
+- While following, choose "Just follow" (never fights) or "Escort" (fights nearby enemies), in the station or by clicking the mode tag in the android screen.
+- Put a **Shield Permit** in the station's permit slot and only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.
+- Right-click an android to open its inventory: **Self-Repair Kits** (one restores half its health when it gets hurt) and an **Android Armor Plate** that takes armor enchantments.
+- The station has a refill slot (tops up repair kits automatically) and an upgrade slot (a **Transfer Upgrade** passes a fallen android's inventory to the next one), and hoppers can insert into it.
+- Name your android in the station or android screen, and read its health with a comparator. If the station is broken, Link the android to a new one.
+
+**Android glass:** Barrier Glass (only androids cannot pass) and Gate Glass (only androids can pass), each in a plain kind that joins with its neighbours and a patterned kind.
+
 ## Black holes and late-game technology
 
 Insert your first Singularity Seed into the Core Controller, start ignition, and supply **50 GFE within ten seconds** under default settings. The formation sequence then creates the core. Prepare a high-capacity power network before attempting ignition: 50 GFE in ten seconds averages 250 MFE/t, and a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE. While igniting the screen shows the intake and what will arrive, and a failure reports what was missing.

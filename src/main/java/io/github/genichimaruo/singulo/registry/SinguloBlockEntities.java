@@ -171,6 +171,14 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<GuardDockBlockEntity>> GUARD_DOCK = REGISTER.register("guard_dock",
             () -> build(GuardDockBlockEntity::new, SinguloBlocks.RUIN_GUARD_DOCK.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidStationBlockEntity>> ANDROID_STATION =
+            REGISTER.register("android_station", () -> build(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity::new,
+                    SinguloBlocks.ANDROID_STATION.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity>> ANDROID_FABRICATOR =
+            REGISTER.register("android_fabricator", () -> build(io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity::new,
+                    SinguloBlocks.RUIN_ANDROID_FABRICATOR.get()));
+
     public static final Supplier<BlockEntityType<SealConsoleBlockEntity>> SEAL_CONSOLE = REGISTER.register("seal_console",
             () -> build(SealConsoleBlockEntity::new, SinguloBlocks.SEAL_CONSOLE.get()));
 

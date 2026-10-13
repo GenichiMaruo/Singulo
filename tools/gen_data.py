@@ -27,6 +27,7 @@ from recipes import (RECIPES, ORDER, EXPLORE, REPAIR, RESTORED, CARDS, STAGE_NAM
                      REPAIR_WEAR, MAX_REPAIRS, ASSEMBLER_MAX_KINDS, WORKBENCH_MAX_ITEMS)
 import config_spec  # noqa: E402
 import ruins  # noqa: E402
+import androids  # noqa: E402
 from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
                  STATIONS, STAGE_COLORS, SPENT, ACCEPTS_SPENT, MIN_SIZE)
 
@@ -79,7 +80,8 @@ def stage_of(name):
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '隕石の核': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
-            '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5}.get(name, 1)
+            '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
+            '小型クリスタルメモリ（光剣型）': 2}.get(name, 1)
 
 
 def max_uses(name):
@@ -529,6 +531,16 @@ UI_LANG = {
     'gui.singulo.slot.upgrade': ('アップグレード枠（単極子・オーバークロック）', 'Upgrade slot (monopole or overclock)'),
     'gui.singulo.sides.button': ('面の設定', 'Sides'),
     'gui.singulo.sides.items': ('アイテム', 'Items'),
+    'gui.singulo.handbook.supporters': ('サポーター', 'Supporters'),
+    'gui.singulo.supporters.title': ('ご支援ありがとうございます', 'Thank you for your support'),
+    'gui.singulo.supporters.intro': ('Singulo の開発を支えてくださる皆さま、ありがとうございます。ここに掲載されたお名前はエンディングにも登場します。', 'Thank you to everyone supporting the development of Singulo. The names listed here also appear in the ending.'),
+    'gui.singulo.supporters.count': ('掲載人数: %s / 100', 'Supporters: %s / 100'),
+    'gui.singulo.supporters.empty': ('支援者のお名前は今後の更新で追加されます。', 'Supporter names will be added in future updates.'),
+    'gui.singulo.supporters.standard': ('支援者', 'Supporter'),
+    'gui.singulo.supporters.rainbow': ('虹色サポーター', 'Rainbow Supporter'),
+    'ending.singulo.supporters': ('ご支援くださった皆さまへ', 'With thanks to our supporters'),
+    'ending.singulo.supporter_range': ('%s–%s / %s', '%s–%s / %s'),
+    'ending.singulo.supporter_controls': ('← / → で支援者名\u3000Esc で閉じる', '← / → to browse supporters · Esc to close'),
     'gui.singulo.handbook.support': ('作者を支援', 'Support'),
     'gui.singulo.handbook.support_hint': ('Ko-fi で作者を支援する（ブラウザで開く）', 'Support the author on Ko-fi (opens in your browser)'),
     'gui.singulo.sides.tank_in': ('入力%s', 'In %s'),
@@ -681,6 +693,103 @@ UI_LANG = {
     'gui.singulo.wormhole_port.no_partner': ('口の向こう側がつながっていない', 'The mouth is not connected'),
     'gui.singulo.wormhole_port.status': ('向こう側の入れ物 %s 個とつながっている', 'Connected to %s handlers on the other side'),
     'entity.singulo.security_drone': ('警備ドローン', 'Security Drone'),
+    'gui.singulo.android.nickname.blade': ('ルミナ', 'Lumina'),
+    'gui.singulo.android.nickname.whip': ('ヴェルナ', 'Verna'),
+    'gui.singulo.android.nickname.saber': ('ソレイユ', 'Soleil'),
+    'gui.singulo.android.rename': ('クリックで名前を変える', 'Click to rename'),
+    'gui.singulo.android.dismantle': ('解体する（2回押す）', 'Dismantle (press twice)'),
+    'gui.singulo.android.rename.reset': ('名前を元に戻す', 'Reset name'),
+    'gui.singulo.android_station.upgrade': ('強化', 'Upgrade'),
+    'gui.singulo.android_station.stock': ('補充', 'Refill'),
+    'gui.singulo.android.dismantle.confirm': ('もう一度押すと解体します', 'Press again to dismantle'),
+    'gui.singulo.android_station.link': ('リンク', 'Link'),
+    'gui.singulo.android_station.status.11': ('近くに身寄りのないアンドロイドがいます', 'An android without a station is nearby'),
+    'gui.singulo.android.say.alert.0': ('敵発見！', 'Enemy spotted!'),
+    'gui.singulo.android.say.alert.1': ('見つけた！', 'Found one!'),
+    'gui.singulo.android.say.alert.2': ('そこっ！', 'There!'),
+    'gui.singulo.android.say.alert.3': ('行くよ！', 'Here I go!'),
+    'gui.singulo.android.say.alert.4': ('下がってて！', 'Stay back!'),
+    'gui.singulo.android.say.alert.5': ('排除します！', 'Eliminating!'),
+    'gui.singulo.android.say.idle.0': ('まかせて！', 'Leave it to me!'),
+    'gui.singulo.android.say.idle.1': ('ひまだなぁ…', 'So bored...'),
+    'gui.singulo.android.say.idle.2': ('いい天気だね', 'Nice weather, huh'),
+    'gui.singulo.android.say.idle.3': ('見張り中です', 'On lookout'),
+    'gui.singulo.android.say.idle.4': ('ねえ、何して遊ぶ？', 'Hey, what shall we play?'),
+    'gui.singulo.android.say.idle.5': ('ふぁ…（あくび）', '*yawn*'),
+    'gui.singulo.android.say.idle.6': ('今日もがんばる！', "I'll do my best today too!"),
+    'gui.singulo.android.say.idle.7': ('異常なし！', 'All clear!'),
+    'gui.singulo.android.say.idle.8': ('次はどこ行く？', 'Where to next?'),
+    'gui.singulo.android.say.idle.9': ('えへへ', 'Ehehe'),
+    'gui.singulo.android.say.hurt.0': ('いたた…まだいける！', 'Ouch... still going!'),
+    'gui.singulo.android.say.hurt.1': ('修理キット、ある？', 'Got a repair kit?'),
+    'gui.singulo.android.say.hurt.2': ('ちょっとピンチかも', 'This is getting tight'),
+    'gui.singulo.android.say.low_power.0': ('充電がほしいな…', 'Need a charge...'),
+    'gui.singulo.android.say.low_power.1': ('電池が…へろへろ…', 'Battery... so weak...'),
+    'gui.singulo.android.say.low_power.2': ('おなかすいた…（電気）', 'Hungry... (for power)'),
+    'gui.singulo.android.say.charging.0': ('充電中…♪', 'Charging... ♪'),
+    'gui.singulo.android.say.charging.1': ('ぽかぽかする〜', 'So warm~'),
+    'gui.singulo.android.say.charging.2': ('満タンまでもうちょっと', 'Almost full'),
+    'gui.singulo.android.say.retreat.0': ('ちょっと休むね', 'Taking a break'),
+    'gui.singulo.android.say.retreat.1': ('修理してくるね', 'Off to get repaired'),
+    'gui.singulo.android.say.charging_follow.0': ('ありがと、充電中♪', 'Thanks! Charging ♪'),
+    'gui.singulo.android.say.charging_follow.1': ('そばにいると安心する', 'I feel safe near you'),
+    'tooltip.singulo.android_armor_plate': ('護衛のアンドロイドの胸当て（防御 +8、防具強度 +2）', 'Chestplate for a guard android (+8 armor, +2 toughness)'),
+    'gui.singulo.android.hp': ('体力 %s / %s', 'HP %s / %s'),
+    'gui.singulo.android.charge': ('%s%%', '%s%%'),
+    'gui.singulo.android.mode': ('モード：%s', 'Mode: %s'),
+    'gui.singulo.android.follow.only': ('追従のみ', 'Follow only'),
+    'gui.singulo.android.follow.escort': ('追従・護衛', 'Follow & escort'),
+    'gui.singulo.android.follow.hint': ('クリックで「追従のみ」（戦わない）と「追従・護衛」（そばの敵と戦う）を切り替える。ステーションの設定も変わる。',
+                                        'Click to switch between "Follow only" (never fights) and "Follow & escort" (fights nearby enemies). Also changes the station setting.'),
+    'gui.singulo.android.armor': ('防御', 'Armor'),
+    'gui.singulo.android.repair': ('修理', 'Repair'),
+    'gui.singulo.android.plate': ('装甲', 'Plate'),
+    'message.singulo.android_charger.charged': ('無線充電器に %1$s FE 充電した（%2$s / %3$s FE）', 'Charged %1$s FE into the wireless charger (%2$s / %3$s FE)'),
+    'tooltip.singulo.android_charger.charges': ('アンドロイドの満充電 %s 回分', 'Full android charges: %s'),
+    'gui.singulo.android_station.no_design': ('設計メモリなし', 'No design memory'),
+    'gui.singulo.android_station.status.0': ('小型クリスタルメモリを入れてください', 'Insert a compact crystal memory'),
+    'gui.singulo.android_station.status.1': ('アンドロイドキットがありません', 'No android kit'),
+    'gui.singulo.android_station.status.2': ('電力が足りません（印刷に 40000 FE）', 'Not enough power (40000 FE to print)'),
+    'gui.singulo.android_station.status.3': ('印刷中', 'Printing'),
+    'gui.singulo.android_station.status.4': ('稼働中', 'Active'),
+    'gui.singulo.android_station.status.5': ('ステーションへ戻っています', 'Returning to the station'),
+    'gui.singulo.android_station.status.6': ('充電中', 'Charging'),
+    'gui.singulo.android_station.status.8': ('ステーションの上がふさがっています', 'Something is blocking the top'),
+    'gui.singulo.android_station.status.9': ('遠くにいます', 'Far away'),
+    'gui.singulo.android_station.status.10': ('充電切れ', 'Out of charge'),
+    'gui.singulo.android_station.status.waiting': ('%s 秒後に印刷し直す', 'Reprinting in %s s'),
+    'gui.singulo.android_station.hp': ('体力', 'HP'),
+    'gui.singulo.android_station.charge': ('充電', 'Charge'),
+    'gui.singulo.android_station.memory': ('設計', 'Design'),
+    'gui.singulo.android_station.kit': ('キット', 'Kit'),
+    'gui.singulo.android_station.mode.0': ('迎撃', 'Guard'),
+    'gui.singulo.android_station.mode.1': ('徘徊', 'Wander'),
+    'gui.singulo.android_station.mode.2': ('追従', 'Follow'),
+    'gui.singulo.android_station.mode.0.hint': ('ステーションのそばで待ち、近づいた敵だけを迎え撃つ。', 'Waits by the station and fights enemies that come close.'),
+    'gui.singulo.android_station.mode.1.hint': ('ステーションのまわり（16ブロック）を歩き回り、見つけた敵を倒す。', 'Roams within 16 blocks of the station and fights the enemies it finds.'),
+    'gui.singulo.android_station.mode.2.hint': ('持ち主についていく（下のボタンで、そばの敵と戦うか選ぶ）。無線充電器を持っていれば、ついて歩きながら充電する。', 'Follows its owner (the buttons below choose whether it fights nearby enemies). Recharges while walking with you if you carry a wireless charger.'),
+    'gui.singulo.android_station.retreat': ('戻る体力 %s%%', 'Return at %s%%'),
+    'gui.singulo.android_station.retreat.hint': ('体力がこの割合を下回ると、ステーションへ戻って修理と充電をする。', 'Below this share of health it returns to the station to repair and recharge.'),
+    'gui.singulo.android_station.recall': ('呼び戻す', 'Recall'),
+    'gui.singulo.android_station.follow_only': ('ついていくだけ', 'Just follow'),
+    'gui.singulo.android_station.follow_only.hint': ('追従中は、ついていくだけで戦わない（打たれても仕返ししない）。', 'While following, it only tags along and never fights (not even when hit).'),
+    'gui.singulo.android_station.escort': ('護衛する', 'Escort'),
+    'gui.singulo.android_station.escort.hint': ('追従中も、そばの敵を倒す。', 'While following, it also fights enemies near you.'),
+    'gui.singulo.android_station.permit': ('許可証', 'Permit'),
+    'gui.singulo.android_station.permit.none': ('許可証なし：だれでも操作できる', 'No permit: anyone can use it'),
+    'gui.singulo.android_station.permit.members': ('持ち主と登録した %s人だけが操作できる', 'Only the owner and %s registered can use it'),
+    'gui.singulo.android_station.permit.hint': ('シールド許可証を入れると、持ち主と登録した人だけがステーションとアンドロイドの画面を開ける。追従する人も、登録した人から選べる。',
+                                                'With a shield permit inside, only the owner and registered players can open the station and android screens, and you can choose which of them it follows.'),
+    'gui.singulo.android_station.leader': ('追従する人：%s', 'Follows: %s'),
+    'gui.singulo.android_station.leader.owner': ('持ち主', 'Owner'),
+    'gui.singulo.android_station.leader.hint': ('クリックで、追従する人を切り替える（その人がいないときは持ち主に、持ち主もいなければ近くの登録した人に追従する）。',
+                                                'Click to change whom it follows (when that player is away it follows the owner, or else the nearest registered player).'),
+    'gui.singulo.android_station.locked': ('このステーションの許可証に登録されていない', 'You are not on this station\'s permit'),
+    'entity.singulo.blade_android': ('光刃型アンドロイド「ルミナ」', 'Blade Android "Lumina"'),
+    'entity.singulo.whip_android': ('鞭型アンドロイド「ヴェルナ」', 'Whip Android "Verna"'),
+    'entity.singulo.saber_android': ('光剣型アンドロイド「ソレイユ」', 'Saber Android "Soleil"'),
+    'entity.singulo.android_crescent': ('斬撃波', 'Crescent Slash'),
+    'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
     'entity.singulo.horizon_warden.awakened': ('覚醒したホライズン・ウォーデン', 'Awakened Horizon Warden'),
     'entity.singulo.warden_singularity': ('ウォーデンの特異点', 'Warden Singularity'),
@@ -782,6 +891,9 @@ UI_LANG = {
     'gui.singulo.cache.sealed': ('力場で封鎖されている。この遺構を守る番人を倒さなければ開かない',
                                  "Sealed by a force field. Defeat this ruin's guardian"),
     'item.singulo.security_drone_spawn_egg': ('警備ドローンのスポーンエッグ', 'Security Drone Spawn Egg'),
+    'item.singulo.blade_android_spawn_egg': ('光刃型アンドロイドのスポーンエッグ', 'Blade Android Spawn Egg'),
+    'item.singulo.whip_android_spawn_egg': ('鞭型アンドロイドのスポーンエッグ', 'Whip Android Spawn Egg'),
+    'item.singulo.saber_android_spawn_egg': ('光剣型アンドロイドのスポーンエッグ', 'Saber Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -952,6 +1064,14 @@ def models():
             elif kind in ('ruin_glass', 'deco_glass'):
                 model['render_type'] = 'minecraft:translucent'      # うっすら色のついたガラス（割れた穴は抜ける）
             write_json(ASSETS / 'models' / 'block' / f'{iid}.json', model)
+            if iid == 'ruin_android_fabricator':
+                # 上は印刷床（光の走査線が動く）、横は格納口のあるパネル
+                write_json(ASSETS / 'models' / 'block' / f'{iid}.json', {'parent': 'minecraft:block/cube_bottom_top', 'textures': {
+                    'top': f'{MODID}:block/{iid}_top', 'side': f'{MODID}:block/{iid}_side', 'bottom': f'{MODID}:block/{iid}'}})
+            if iid in ('android_barrier_glass', 'android_gate_glass'):
+                # 無地: 隣とつながるガラス（つながっていない向きの縁だけ描く。tools/androids.py）
+                androids.glass_models(iid, write_json, ASSETS)
+                continue
             if iid == 'ruin_cache':
                 # 封鎖中（sealed=true）は別の見た目
                 write_json(ASSETS / 'models' / 'block' / 'ruin_cache_sealed.json',
@@ -988,6 +1108,9 @@ def models():
                                  'front': f'{MODID}:block/{iid}_front{state}', 'particle': f'{MODID}:block/machine_side_t{st}'},
                     'elements': els,
                 }
+                if iid == 'android_station':
+                    # 上面は印刷床（光の走査線が往復する。blocks_extra3.station_top）
+                    model['textures']['top'] = f'{MODID}:block/android_station_top'
                 if skin:
                     # マルチブロックのコントローラは、部品と同じ外装で包む（見た目をそろえる）
                     for key in ('top', 'side', 'bottom', 'particle'):
@@ -1207,6 +1330,10 @@ def textures():
     drone_textures(te, save)
     write_json(ASSETS / 'models' / 'item' / 'security_drone_spawn_egg.json',
                {'parent': 'minecraft:item/template_spawn_egg'})
+    # 遺構のアンドロイド（128×64。tools/androids.py）
+    androids.textures(te, save)
+    for egg in ('blade_android', 'whip_android', 'saber_android'):
+        write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
     aged, aged_seam = (226, 218, 190, 255), (180, 170, 140, 255)
@@ -1244,6 +1371,10 @@ def textures():
         elif iid == 'ruin_guard_dock':
             d.ellipse([3, 3, 12, 12], fill=(57, 66, 74, 255), outline=aged_seam)
             d.ellipse([6, 6, 9, 9], fill=(255, 120, 100, 255))
+        elif iid == 'ruin_android_fabricator':
+            # 底面（上面と側面は blocks_extra3 が作る）
+            d.rectangle([1, 1, 14, 14], fill=(52, 58, 68, 255), outline=aged_seam)
+            d.rectangle([5, 5, 10, 10], outline=(120, 225, 255, 255))
         elif iid == 'seal_console':
             d.rectangle([2, 2, 13, 13], fill=(30, 34, 40, 255), outline=(150, 230, 255, 255))
             d.ellipse([5, 5, 10, 10], outline=(150, 230, 255, 255))
@@ -1449,6 +1580,9 @@ def art_textures():
     for iid, core in CABLES.items():
         art16.save(art16.cable_texture(iid, core), tb / f'{iid}.png')
         art16.save(art16.cable_end(iid, core), tb / f'{iid}_end.png')
+    # アンドロイドの設計メモリ・キット・無線充電器（tools/androids.py）
+    androids.item_textures(ti, art16.save)
+    androids.glass_textures(tb, art16.save)
     # 探索コンパス・隕石コンパスの針（16コマ）
     for k in range(16):
         art16.save(art16.compass_frame(k / 16), ti / f'explorer_compass_{k:02d}.png')
@@ -2615,7 +2749,8 @@ TAB_GROUPS = [
                      'unstable_wormhole_mouth', 'wormhole_stabilizer', 'wormhole_mouth_casing', 'wormhole_mouth', 'wormhole_port']),
     ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
                'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
-               'dimensional_pocket']),
+               'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
+               'android_armor_plate']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core']),
@@ -2624,12 +2759,15 @@ TAB_GROUPS = [
     ('素材', None),
     ('回収物と記録', None),
     ('建材', ['white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
-            'black_reinforced_glass', 'black_star_glass']),
+            'black_reinforced_glass', 'black_star_glass', 'android_barrier_glass', 'android_barrier_glass_patterned',
+            'android_gate_glass', 'android_gate_glass_patterned']),
     ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',
             'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel', 'pristine_ruin_tiles', 'pristine_ruin_pillar',
             'pristine_ruin_light', 'intact_ruin_glass', 'reinforced_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
-            'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock',
-            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
+            'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
+            'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
+            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg', 'blade_android_spawn_egg',
+            'whip_android_spawn_egg', 'saber_android_spawn_egg']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
                      'last_archivist_spawn_egg']),
@@ -2908,7 +3046,9 @@ def validate():
 
 
 # わざと透ける（ガラス・重ね絵）以外のブロックのテクスチャ
-SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram')
+SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram',
+                              'android_barrier_glass_item', 'android_barrier_glass_edge', 'android_gate_glass_item',
+                              'android_gate_glass_edge')
 
 
 GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind in ('part_glass', 'ruin_glass', 'deco_glass')}
