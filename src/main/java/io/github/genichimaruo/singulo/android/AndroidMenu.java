@@ -25,7 +25,7 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int HOTBAR_Y = 192;
 
     public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, COUNT = 7;
-    public static final int BUTTON_DISMANTLE = 0;
+    public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1;
 
     @Nullable
     private final RuinAndroid android;
@@ -36,7 +36,8 @@ public class AndroidMenu extends AbstractContainerMenu {
             case D_HP -> Math.round(android.getHealth() * 10);
             case D_MAX_HP -> Math.round(android.getMaxHealth() * 10);
             case D_CHARGE -> Math.round(100 * android.chargeFraction());
-            case D_MODE -> android.mode();
+            case D_MODE -> android.mode() == RuinAndroid.MODE_FOLLOW && !android.escort() ? AndroidStationBlockEntity.MODE_FOLLOW_ONLY
+                    : android.mode();
             case D_STATE -> android.state();
             case D_ARMOR -> android.getArmorValue();
             case D_ALERT -> android.alert() ? 1 : 0;
@@ -104,6 +105,10 @@ public class AndroidMenu extends AbstractContainerMenu {
         if (id == BUTTON_DISMANTLE && android != null) {
             android.dismantle();
             player.closeContainer();
+            return true;
+        }
+        if (id == BUTTON_ESCORT && android != null && android.mode() == RuinAndroid.MODE_FOLLOW && android.mayOperate(player)) {
+            android.chooseEscort(!android.escort());
             return true;
         }
         return false;

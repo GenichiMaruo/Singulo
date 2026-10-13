@@ -13,18 +13,19 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
-/** アンドロイド組立ステーションの画面。設計メモリとキットのスロット、アンドロイドの様子、動き方の設定。 */
+/** アンドロイド組立ステーションの画面。設計メモリ・キットなどと許可証のスロット、アンドロイドの様子、動き方の設定。 */
 public class AndroidStationMenu extends AbstractContainerMenu {
     public static final int WIDTH = 248;
-    public static final int HEIGHT = 226;
+    public static final int HEIGHT = 254;
     public static final int MEMORY_X = 14, MEMORY_Y = 30;
     public static final int KIT_X = 14, KIT_Y = 58;
     public static final int UPGRADE_X = 14, UPGRADE_Y = 86;
     public static final int STOCK_X = 14, STOCK_Y = 114;
+    public static final int PERMIT_X = 14, PERMIT_Y = 142;
     /** 持ち物は横幅の中央に。 */
     public static final int INV_X = (WIDTH - 162) / 2 + 1;
-    public static final int INV_Y = 144;
-    public static final int HOTBAR_Y = 202;
+    public static final int INV_Y = 172;
+    public static final int HOTBAR_Y = 230;
 
     private final BlockPos pos;
     private final SyncedInts data;
@@ -55,6 +56,12 @@ public class AndroidStationMenu extends AbstractContainerMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return RuinAndroid.isRepairKit(stack);
+            }
+        });
+        addSlot(new SlotItemHandler(items, AndroidStationBlockEntity.SLOT_PERMIT, PERMIT_X, PERMIT_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return AndroidStationBlockEntity.isPermit(stack);
             }
         });
         for (int row = 0; row < 3; row++) {
@@ -91,7 +98,7 @@ public class AndroidStationMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity station) {
+        if (player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.mayOperate(player)) {
             station.press(id);
             return true;
         }
@@ -125,6 +132,6 @@ public class AndroidStationMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player, pos)
-                && player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity;
+                && player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.mayOperate(player);
     }
 }

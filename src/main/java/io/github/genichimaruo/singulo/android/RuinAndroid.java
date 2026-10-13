@@ -108,6 +108,15 @@ public abstract class RuinAndroid extends Monster {
     private int mode = MODE_GUARD;
     /** 体力がこの割合（%）を下回ったら、ステーションへ戻る。 */
     private int retreatPercent = 30;
+    /** 追従中に戦うか（false なら、ついていくだけ）。 */
+    private boolean escort = true;
+    /** アンドロイドの画面で切り替えたが、まだステーションに伝えていない（ステーションが読み込まれていない）。 */
+    private boolean escortPending;
+    /** ステーションの許可証に登録された人（持ち主のほかに画面を開け、持ち主がいないときはこの人たちに追従する）。 */
+    private final java.util.List<java.util.UUID> members = new java.util.ArrayList<>();
+    /** 追従する人（許可証に登録された人から選ぶ。null は持ち主）。 */
+    @Nullable
+    private java.util.UUID leader;
     private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(2);
     private int repairCooldown;
     /** ステーションが遠すぎて戻れなかったとき、しばらく戻ろうとしない（tick）。 */
@@ -156,13 +165,13 @@ public abstract class RuinAndroid extends Monster {
         return true;
     }
 
-    /** 持ち主が右クリックすると、持ち物と様子の GUI を開く。 */
+    /** 持ち主（か、ステーションの許可証に登録された人）が右クリックすると、持ち物と様子の GUI を開く。 */
     @Override
     protected net.minecraft.world.InteractionResult mobInteract(Player player, net.minecraft.world.InteractionHand hand) {
         if (!entityData.get(GUARD) || player.isShiftKeyDown()) {
             return super.mobInteract(player, hand);
         }
-        if (player instanceof net.minecraft.server.level.ServerPlayer sp && (owner == null || owner.equals(player.getUUID()))) {
+        if (player instanceof net.minecraft.server.level.ServerPlayer sp && mayOperate(player)) {
             sp.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new AndroidMenu(id, inv, this), getDisplayName()),
                     buf -> buf.writeVarInt(getId()));
         }
@@ -323,9 +332,77 @@ public abstract class RuinAndroid extends Monster {
         return mode;
     }
 
+    /** 追従中に戦うか（ステーションの設定）。 */
+    public void setEscort(boolean escort) {
+        this.escort = escort;
+        if (!escort && mode == MODE_FOLLOW) {
+            setTarget(null);
+        }
+    }
+
+    public boolean escort() {
+        return escort;
+    }
+
+    /** アンドロイドの画面で切り替えたのを、まだステーションに伝えていないか（その間はステーションの設定で上書きしない）。 */
+    public boolean escortPending() {
+        return escortPending;
+    }
+
+    /** アンドロイドの画面から、追従中に戦うかを切り替える。ステーションの設定も同じにする（読み込まれていなければ、あとで）。 */
+    public void chooseEscort(boolean escort) {
+        setEscort(escort);
+        escortPending = true;
+        pushEscort();
+    }
+
+    /** 切り替えた設定を、ステーションに伝える（読み込まれていれば）。 */
+    private void pushEscort() {
+        if (escortPending && home != null && level().isLoaded(home)
+                && level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
+            station.setEscort(escort);
+            escortPending = false;
+        }
+    }
+
+    /** ステーションの許可証に登録された人を受け取る。 */
+    public void setMembers(java.util.List<java.util.UUID> ids) {
+        members.clear();
+        members.addAll(ids);
+    }
+
+    /** 追従する人を受け取る（null は持ち主）。 */
+    public void setLeader(@Nullable java.util.UUID leader) {
+        this.leader = leader;
+    }
+
+    /** この人が画面を開けるか（持ち主か、許可証に登録された人。持ち主がいなければだれでも）。 */
+    public boolean mayOperate(Player player) {
+        return owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID());
+    }
+
+    /**
+     * ついていく相手: ステーションで選んだ人（許可証に登録された人。同じ世界にいれば）、次に持ち主。
+     * どちらもいなければ、許可証に登録された人のうち一番近い人。
+     */
     @Nullable
     public Player ownerPlayer() {
-        return owner == null ? null : level().getPlayerByUUID(owner);
+        Player chosen = leader != null && members.contains(leader) ? level().getPlayerByUUID(leader) : null;
+        if (chosen != null && !chosen.isSpectator()) {
+            return chosen;
+        }
+        Player p = owner == null ? null : level().getPlayerByUUID(owner);
+        if (p != null) {
+            return p;
+        }
+        Player best = null;
+        for (java.util.UUID id : members) {
+            Player m = level().getPlayerByUUID(id);
+            if (m != null && !m.isSpectator() && (best == null || m.distanceToSqr(this) < best.distanceToSqr(this))) {
+                best = m;
+            }
+        }
+        return best;
     }
 
     /** 新しいステーションにつなぎ直す（身寄りのないアンドロイドのリンク）。持ち物はそのまま。 */
@@ -382,7 +459,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
     boolean guardTargets(LivingEntity e) {
-        if (!hostileToGuards(e)) {
+        if (!hostileToGuards(e) || mode == MODE_FOLLOW && !escort) {
             return false;
         }
         Vec3 anchor = guardAnchor();
@@ -593,6 +670,7 @@ public abstract class RuinAndroid extends Monster {
         entityData.set(ALERT, getTarget() != null && active());
         if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
             if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
+                pushEscort();
                 // 体力をステーションへ知らせる（コンパレーターの出力。どこにいても最後の値が残る）
                 station.reportHealth(getUUID(), getHealth() / getMaxHealth());
                 // 自己修理キットが1つでも減っていたら、ステーションのストックから補充する
@@ -781,6 +859,16 @@ public abstract class RuinAndroid extends Monster {
             }
             tag.putInt("mode", mode);
             tag.putInt("retreat", retreatPercent);
+            tag.putBoolean("escort", escort);
+            tag.putBoolean("escort_pending", escortPending);
+            net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+            for (java.util.UUID id : members) {
+                list.add(NbtUtils.createUUID(id));
+            }
+            tag.put("members", list);
+            if (leader != null) {
+                tag.putUUID("leader", leader);
+            }
         }
     }
 
@@ -801,6 +889,13 @@ public abstract class RuinAndroid extends Monster {
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         if (guard) {
             configure(tag.getInt("mode"), tag.contains("retreat") ? tag.getInt("retreat") : 30);
+            escort = !tag.contains("escort") || tag.getBoolean("escort");
+            escortPending = tag.getBoolean("escort_pending");
+            members.clear();
+            for (net.minecraft.nbt.Tag t : tag.getList("members", net.minecraft.nbt.Tag.TAG_INT_ARRAY)) {
+                members.add(NbtUtils.loadUUID(t));
+            }
+            leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
         }
         if (charge() <= 0) {
             setState(STATE_LOW_POWER);

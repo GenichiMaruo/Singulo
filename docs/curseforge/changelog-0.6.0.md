@@ -9,9 +9,11 @@ A new kind of enemy, and a companion you can build.
   - **Saber Android "Soleil":** a lunging thrust, a sweep whose blade stretches as she swings, a flying crescent slash, and a light shield she raises the moment she is hit (strike again and she counters).
   - Androids run on charge. After about ten big moves they power down and return to their fabricator, unfold a solar panel under the open daytime sky, or sit down to recharge (5, 10 or 14 s). They do not attack while charging.
   - Defeat all of a fabricator's androids to get a **compact crystal memory** of their design.
+  - Fabricators are placed when ruins generate, so look for them in newly generated chunks.
 - **Your own android:** build an **Android Assembly Station** and android kits in the Precision Assembler (stage 2). With a memory, a kit and power (40,000 FE), it prints one guard android and reprints it if it falls.
   - Guards attack hostile mobs (ruin androids and drones too) and never fight players or bosses; player and boss attacks do not hurt them.
-  - Modes: Guard, Wander and Follow. Set the health at which it comes back to repair and recharge, or recall it.
+  - Modes: Guard, Wander and Follow. While following, choose whether it only tags along or escorts you and fights. Set the health at which it comes back to repair and recharge, or recall it.
+  - Put a **Shield Permit** in the station to let registered friends use the station and the android; only they and the owner can open its screens, and choose which of them it follows.
   - Right-click your android for its inventory: **Self-Repair Kits** and an **Android Armor Plate** (+8 armor, +2 toughness, takes armor enchantments; it shows as subtle plating).
   - **Android Wireless Charger** (300,000 FE, about 30 refills): a following android recharges beside you as it walks.
   - The station has a refill slot for repair kits, an upgrade slot for the **Transfer Upgrade** (a fallen android's inventory passes to the next one), accepts items from hoppers, and outputs the android's health to a comparator.

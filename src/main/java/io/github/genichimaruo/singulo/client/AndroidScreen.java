@@ -15,8 +15,8 @@ import net.minecraft.world.inventory.Slot;
 /**
  * 護衛のアンドロイドの画面。落ち着いた灰青の地に、型の色を少しだけ差す。上の帯に名前（クリックで変えられる）、
  * 左にアンドロイドの姿（マウスの方を向く）と吹き出しのひとこと（敵を見つけた・ひま・けが・充電などで変わる）、
- * 右にハートの体力、電池の充電、動き方、装甲の値、自己修理キットと装甲板のスロット。右下に小さな解体のボタン
- * （2回押すと解体）。
+ * 右にハートの体力、電池の充電、動き方（追従中はクリックで「追従のみ」と「追従・護衛」を切り替える）、装甲の値、
+ * 自己修理キットと装甲板のスロット。右下に小さな解体のボタン（2回押すと解体）。
  */
 public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private static final int PORTRAIT_X = 8, PORTRAIT_Y = 24, PORTRAIT_W = 72, PORTRAIT_H = 96;
@@ -24,6 +24,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private static final int NAME_Y = 4, NAME_H = 14;
     private static final int DISMANTLE_X = AndroidMenu.DISMANTLE_X, DISMANTLE_Y = AndroidMenu.DISMANTLE_Y;
     private static final int RESET_X = 190, RESET_Y = NAME_Y + 2;
+    private static final int MODE_X = RIGHT_X, MODE_Y = 65, MODE_W = 78, MODE_H = 13;
 
     private static final int PAPER = 0xFFE9ECF1;
     private static final int BORDER = 0xFF5C6475;
@@ -63,6 +64,21 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         return a != null && a.hasCustomName() && !names.editing();
     }
 
+    /** 追従中か（動き方の札で、戦うかを切り替えられる）。 */
+    private boolean following() {
+        int mode = menu.value(AndroidMenu.D_MODE);
+        return mode == RuinAndroid.MODE_FOLLOW || mode == io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.MODE_FOLLOW_ONLY;
+    }
+
+    /** 動き方の札の文字。 */
+    private Component modeName() {
+        int mode = menu.value(AndroidMenu.D_MODE);
+        if (following()) {
+            return Component.translatable(mode == RuinAndroid.MODE_FOLLOW ? "gui.singulo.android.follow.escort" : "gui.singulo.android.follow.only");
+        }
+        return Component.translatable("gui.singulo.android.mode", Component.translatable("gui.singulo.android_station.mode." + mode));
+    }
+
     private boolean armed() {
         return Util.getMillis() - dismantleArmed < 3000;
     }
@@ -89,6 +105,11 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             EditBox box = names.open(font, leftPos + 30, topPos + NAME_Y, imageWidth - 60, current);
             addRenderableWidget(box);
             setFocused(box);
+            return true;
+        }
+        if (following() && Panel.inside(mouseX, mouseY, leftPos + MODE_X, topPos + MODE_Y, MODE_W, MODE_H) && minecraft != null
+                && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_ESCORT);
             return true;
         }
         if (Panel.inside(mouseX, mouseY, leftPos + DISMANTLE_X, topPos + DISMANTLE_Y, 12, 12) && minecraft != null
@@ -135,6 +156,9 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         if (Panel.inside(mouseX, mouseY, leftPos + DISMANTLE_X, topPos + DISMANTLE_Y, 12, 12)) {
             g.renderTooltip(font, font.split(Component.translatable(armed() ? "gui.singulo.android.dismantle.confirm"
                     : "gui.singulo.android.dismantle"), 180), mouseX, mouseY);
+        }
+        if (following() && Panel.inside(mouseX, mouseY, leftPos + MODE_X, topPos + MODE_Y, MODE_W, MODE_H)) {
+            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.follow.hint"), 180), mouseX, mouseY);
         }
         if (Panel.inside(mouseX, mouseY, leftPos + RIGHT_X + 82, topPos + 64, 28, 14)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.android.armor"), mouseX, mouseY);
@@ -191,7 +215,18 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         g.fill(bx + 2, by + 2, bx + 2 + cw, by + 10, mix(accent, 0x404858, 0.15F));
         g.fill(bx + 2, by + 2, bx + 2 + cw, by + 4, mix(accent, 0xFFFFFF, 0.45F));
         // 動き方の札と、装甲（盾）
-        roundRect(g, x + RIGHT_X, y + 65, 78, 13, mix(accent, PAPER, 0.75F));
+        boolean modeHover = following() && Panel.inside(mouseX, mouseY, x + MODE_X, y + MODE_Y, MODE_W, MODE_H);
+        roundRect(g, x + MODE_X, y + MODE_Y, MODE_W, MODE_H, mix(accent, PAPER, modeHover ? 0.55F : 0.75F));
+        if (following()) {
+            // 切り替えられる印（右端の小さな両向きの矢印）
+            int ax = x + MODE_X + MODE_W - 8;
+            int ay = y + MODE_Y + 3;
+            int ac = mix(accent, 0x2A3040, 0.5F);
+            g.fill(ax, ay + 1, ax + 5, ay + 2, ac);
+            g.fill(ax + 3, ay, ax + 4, ay + 3, ac);
+            g.fill(ax, ay + 5, ax + 5, ay + 6, ac);
+            g.fill(ax + 1, ay + 4, ax + 2, ay + 7, ac);
+        }
         shield(g, x + RIGHT_X + 84, y + 66, BORDER);
         // スロット（ふつうの持ち物と同じ落ち着いた灰色。個数の白い数字が読めるように）
         for (Slot s : menu.slots) {
@@ -232,8 +267,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.android.hp", hp / 10, max / 10), RIGHT_X, 24, 110, INK);
         AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.android.charge", menu.value(AndroidMenu.D_CHARGE)),
                 RIGHT_X + 67, 51, 46, INK);
-        AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.mode",
-                Component.translatable("gui.singulo.android_station.mode." + menu.value(AndroidMenu.D_MODE))), RIGHT_X + 2, 68, 74, INK);
+        AndroidStationScreen.fitCentered(g, font, modeName(), MODE_X + 2, MODE_Y + 3, following() ? MODE_W - 12 : MODE_W - 4, INK);
         g.drawString(font, String.valueOf(menu.value(AndroidMenu.D_ARMOR)), RIGHT_X + 97, 68, INK, false);
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.repair"), AndroidMenu.REPAIR_X - 10,
                 AndroidMenu.REPAIR_Y - 12, 36, INK);

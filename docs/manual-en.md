@@ -110,6 +110,8 @@ Androids run on charge and run out after about ten big moves. They return to a n
 - Guards attack hostile mobs only and never fight players or bosses. Player and boss attacks do not hurt them.
 - Modes: Guard (by the station), Wander (within 16 blocks) and Follow (goes with its owner). Below its return health it goes back to the station and repairs and recharges in 5 s.
 - While following, if you carry an **Android Wireless Charger** (30 refills when full), it recharges as it walks beside you.
+- While following, choose "Just follow" (never fights) or "Escort" (fights nearby enemies), in the station or by clicking the mode tag in the android screen.
+- Put a **Shield Permit** in the station's permit slot and only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.
 - Right-click an android to open its inventory: **Self-Repair Kits** (one restores half its health when it gets hurt) and an **Android Armor Plate** that takes armor enchantments.
 - The station has a refill slot (tops up repair kits automatically) and an upgrade slot (a **Transfer Upgrade** passes a fallen android's inventory to the next one), and hoppers can insert into it.
 - Name your android in the station or android screen, and read its health with a comparator. If the station is broken, Link the android to a new one.

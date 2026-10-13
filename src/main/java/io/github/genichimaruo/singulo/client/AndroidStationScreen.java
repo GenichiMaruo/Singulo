@@ -12,7 +12,8 @@ import net.minecraft.world.inventory.Slot;
 
 /**
  * アンドロイド組立ステーションの画面（横長）。左に設計メモリとキットのスロット、中ほどにアンドロイドの様子（型・状態・体力・充電）、
- * その下に動き方（迎撃・徘徊・追従）と、戻ってくる体力の割合、呼び戻すボタン。右端は蓄電量。長い文字は枠に収まるよう縮める。
+ * その下に動き方（迎撃・徘徊・追従）と、戻ってくる体力の割合、呼び戻すボタン、追従中に戦うか（ついていくだけ・護衛する）、
+ * 許可証の登録の様子。右端は蓄電量。長い文字は枠に収まるよう縮める。
  */
 public class AndroidStationScreen extends AbstractContainerScreen<AndroidStationMenu> {
     private static final int INFO_X = 46;
@@ -26,6 +27,9 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
     private static final int RECALL_X = INFO_X + 110;
     private static final int RECALL_W = 52;
     private static final int BAR_X = 222;
+    private static final int ESCORT_Y = 126;
+    private static final int ESCORT_W = (INFO_W - 3) / 2;
+    private static final int LEADER_Y = 142;
     private static final int NAME_Y = 20;
 
     private final NameEditor names = new NameEditor();
@@ -61,10 +65,54 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         if (Panel.inside(mouseX, mouseY, leftPos + MINUS_X + 16, topPos + RETREAT_Y, PLUS_X - MINUS_X - 18, 16)) {
             g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.retreat.hint"), 180), mouseX, mouseY);
         }
+        for (int i = 0; i < 2; i++) {
+            if (Panel.inside(mouseX, mouseY, escortX(i), topPos + ESCORT_Y, ESCORT_W, 16)) {
+                g.renderTooltip(font, font.split(Component.translatable(ESCORT_KEYS[i] + ".hint"), 180), mouseX, mouseY);
+            }
+        }
+        if (Panel.inside(mouseX, mouseY, leftPos + INFO_X, topPos + LEADER_Y, INFO_W, 16)) {
+            int members = permitMembers();
+            if (members > 0) {
+                java.util.List<net.minecraft.util.FormattedCharSequence> lines = new java.util.ArrayList<>();
+                lines.addAll(font.split(Component.translatable("gui.singulo.android_station.permit.members", members), 180));
+                lines.addAll(font.split(Component.translatable("gui.singulo.android_station.leader.hint"), 180));
+                g.renderTooltip(font, lines, mouseX, mouseY);
+            } else {
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.permit.hint"), 180), mouseX, mouseY);
+            }
+        }
     }
 
     private int modeX(int i) {
         return leftPos + INFO_X + i * (MODE_W + 3);
+    }
+
+    /** 追従中に戦うかのボタン（0: ついていくだけ、1: 護衛する）。 */
+    private static final String[] ESCORT_KEYS = {"gui.singulo.android_station.follow_only", "gui.singulo.android_station.escort"};
+    private static final int[] ESCORT_BUTTONS = {AndroidStationBlockEntity.BUTTON_FOLLOW_ONLY, AndroidStationBlockEntity.BUTTON_ESCORT};
+
+    private int escortX(int i) {
+        return leftPos + INFO_X + i * (ESCORT_W + 3);
+    }
+
+    /** 許可証に登録された人数。 */
+    private int permitMembers() {
+        return io.github.genichimaruo.singulo.item.ShieldPermitItem.members(menu.getSlot(AndroidStationBlockEntity.SLOT_PERMIT).getItem()).size();
+    }
+
+    /** 追従する人の名前（0 は持ち主）。 */
+    private Component leaderName() {
+        int i = menu.value(AndroidStationBlockEntity.D_LEADER);
+        java.util.UUID owner = minecraft != null && minecraft.level != null
+                && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station ? station.owner() : null;
+        var list = AndroidStationBlockEntity.leaders(menu.getSlot(AndroidStationBlockEntity.SLOT_PERMIT).getItem(), owner);
+        return i > 0 && i <= list.size() ? Component.literal(list.get(i - 1).name())
+                : Component.translatable("gui.singulo.android_station.leader.owner");
+    }
+
+    /** 追従モードか（追従中に戦うかのボタンが効く）。 */
+    private boolean following() {
+        return menu.value(AndroidStationBlockEntity.D_MODE) == io.github.genichimaruo.singulo.android.RuinAndroid.MODE_FOLLOW;
     }
 
     /** 付けた名前（なければ型の愛称、設計メモリがなければ「設計メモリなし」）。 */
@@ -145,6 +193,14 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
             } else if (Panel.inside(mouseX, mouseY, leftPos + RECALL_X, topPos + RETREAT_Y, RECALL_W, 16)) {
                 id = orphanWaiting() ? AndroidStationBlockEntity.BUTTON_LINK : AndroidStationBlockEntity.BUTTON_RECALL;
             }
+            for (int i = 0; i < 2; i++) {
+                if (Panel.inside(mouseX, mouseY, escortX(i), topPos + ESCORT_Y, ESCORT_W, 16)) {
+                    id = ESCORT_BUTTONS[i];
+                }
+            }
+            if (permitMembers() > 0 && Panel.inside(mouseX, mouseY, leftPos + INFO_X, topPos + LEADER_Y, INFO_W, 16)) {
+                id = AndroidStationBlockEntity.BUTTON_LEADER;
+            }
             if (id >= 0) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
                 return true;
@@ -180,6 +236,21 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         button(g, x + PLUS_X, y + RETREAT_Y, 16, 16, false, Panel.inside(mouseX, mouseY, x + PLUS_X, y + RETREAT_Y, 16, 16));
         button(g, x + RECALL_X, y + RETREAT_Y, RECALL_W, 16, orphanWaiting(),
                 Panel.inside(mouseX, mouseY, x + RECALL_X, y + RETREAT_Y, RECALL_W, 16));
+        // 追従中に戦うか（追従でないときは薄く出す。設定は覚えておく）
+        int escort = menu.value(AndroidStationBlockEntity.D_ESCORT);
+        for (int i = 0; i < 2; i++) {
+            boolean on = i == escort;
+            boolean hover = Panel.inside(mouseX, mouseY, escortX(i), y + ESCORT_Y, ESCORT_W, 16);
+            if (following()) {
+                button(g, escortX(i), y + ESCORT_Y, ESCORT_W, 16, on, hover);
+            } else {
+                g.fill(escortX(i) - 1, y + ESCORT_Y - 1, escortX(i) + ESCORT_W + 1, y + ESCORT_Y + 17, 0xFFC4CBD2);
+                g.fill(escortX(i), y + ESCORT_Y, escortX(i) + ESCORT_W, y + ESCORT_Y + 16, on ? 0xFFAFC9D6 : hover ? 0xFFE6EDF1 : 0xFFF4F6F8);
+            }
+        }
+        if (permitMembers() > 0) {
+            button(g, x + INFO_X, y + LEADER_Y, INFO_W, 16, false, Panel.inside(mouseX, mouseY, x + INFO_X, y + LEADER_Y, INFO_W, 16));
+        }
     }
 
     private static void bar(GuiGraphics g, int x, int y, int percent, int color) {
@@ -235,6 +306,19 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
                 0xFF8A949E);
         fitCentered(g, font, Component.translatable("gui.singulo.android_station.stock"), 6, AndroidStationMenu.STOCK_Y - 11, 32,
                 0xFF8A949E);
+        fitCentered(g, font, Component.translatable("gui.singulo.android_station.permit"), 6, AndroidStationMenu.PERMIT_Y - 11, 32,
+                0xFF8A949E);
+        int escort = menu.value(AndroidStationBlockEntity.D_ESCORT);
+        for (int i = 0; i < 2; i++) {
+            int color = !following() ? 0xFF9AA3AC : i == escort ? 0xFFFFFFFF : Panel.TEXT;
+            fitCentered(g, font, Component.translatable(ESCORT_KEYS[i]), INFO_X + i * (ESCORT_W + 3) + 2, ESCORT_Y + 4, ESCORT_W - 4, color);
+        }
+        if (permitMembers() > 0) {
+            fitCentered(g, font, Component.translatable("gui.singulo.android_station.leader", leaderName()), INFO_X + 2, LEADER_Y + 4,
+                    INFO_W - 4, Panel.TEXT);
+        } else {
+            fit(g, font, Component.translatable("gui.singulo.android_station.permit.none"), INFO_X, LEADER_Y + 4, INFO_W, 0xFF8A949E);
+        }
         int mode = menu.value(AndroidStationBlockEntity.D_MODE);
         for (int i = 0; i < 3; i++) {
             fitCentered(g, font, Component.translatable("gui.singulo.android_station.mode." + i), INFO_X + i * (MODE_W + 3) + 2,

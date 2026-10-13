@@ -291,9 +291,10 @@ DESC = {
     '設定カード': ('装置の設定を写して、ほかの装置に貼る。', 'Copies a machine\'s settings to another.'),
     'ニュートリノ観測所': ('電力で広い範囲を調べ続け、鉱石と遺構を近くの人に見せ続ける。右クリックで表示を切り替える。',
                    'Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.'),
-    'シールド許可証': ('シールド発生塔に入れると、登録した人だけが守りの中で作業できる。'
+    'シールド許可証': ('シールド発生塔に入れると、登録した人だけが守りの中で作業できる。アンドロイド組立ステーションに入れると、登録した人もアンドロイドを操作できる。'
                 '右クリックで自分を、ほかのプレイヤーに右クリックでその人と自分を登録する。放射冠だけはだれでも壊せる。',
-                'Put it in a shield tower: only registered players may build, break or take items inside. Use to register yourself; '
+                'Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, '
+                'registered players may also control the android. Use to register yourself; '
                 'use on a player to register them and you. Anyone can break the emitter crown.'),
     'シールド発生塔コア': ('イベントホライズン・シールド発生塔の頭脳。基壇の2段目の手前の中央に置く。', 'The brain of the Event Horizon Shield Tower. Goes in the front middle of the second plinth layer.'),
     'イベントホライズン・シールド発生塔': ('半径32の中を爆発・荒らし・敵の湧きから守る塔。', 'Protects a 32-block radius from explosions, griefing and hostile spawns.'),

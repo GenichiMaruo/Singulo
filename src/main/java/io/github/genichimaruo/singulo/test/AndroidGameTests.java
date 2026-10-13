@@ -256,6 +256,68 @@ public final class AndroidGameTests {
         });
     }
 
+    /**
+     * 許可証: 持ち主と登録した人だけが操作でき、追従する人を登録した人から選べる。
+     * 追従中「ついていくだけ」なら敵を狙わず、「護衛する」なら狙う。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 400)
+    public static void permitAndFollowSettings(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        var owner = helper.makeMockServerPlayerInLevel();
+        var friend = helper.makeMockServerPlayerInLevel();
+        var stranger = helper.makeMockServerPlayerInLevel();
+        s.setOwner(owner.getUUID());
+        ItemStack permit = new ItemStack(item("shield_permit"));
+        io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
+        io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, friend);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PERMIT, permit);
+        helper.assertTrue(s.mayOperate(owner) && s.mayOperate(friend), "持ち主か登録した人がステーションを使えない");
+        helper.assertFalse(s.mayOperate(stranger), "登録していない人がステーションを使える");
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
+            RuinAndroid a = androids(helper).get(0);
+            s.press(AndroidStationBlockEntity.BUTTON_MODE_FOLLOW);
+            s.press(AndroidStationBlockEntity.BUTTON_FOLLOW_ONLY);
+            helper.assertTrue(a.ownerPlayer() == owner, "はじめは持ち主に追従しない");
+            s.press(AndroidStationBlockEntity.BUTTON_LEADER);
+            helper.assertTrue(a.ownerPlayer() == friend, "選んだ登録者に追従しない");
+            s.press(AndroidStationBlockEntity.BUTTON_LEADER);
+            helper.assertTrue(a.ownerPlayer() == owner, "切り替えが持ち主に戻らない");
+            helper.assertTrue(a.mayOperate(friend) && !a.mayOperate(stranger), "アンドロイドの画面を開ける人が許可証と合わない");
+            var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+            zombie.setNoAi(true);
+            zombie.moveTo(a.position().add(3, 0, 0));
+            helper.getLevel().addFreshEntity(zombie);
+            helper.runAfterDelay(40, () -> {
+                helper.assertTrue(a.getTarget() == null, "ついていくだけなのに敵を狙う");
+                s.press(AndroidStationBlockEntity.BUTTON_ESCORT);
+                helper.succeedWhen(() -> {
+                    helper.assertTrue(a.getTarget() == zombie || !zombie.isAlive(), "護衛するのに敵を狙わない");
+                    zombie.discard();
+                    a.discard();
+                });
+            });
+        });
+    }
+
+    /** アンドロイドの画面で「追従のみ／追従・護衛」を切り替えると、ステーションの設定も変わり、上書きで戻らない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void androidScreenSwitchesEscort(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
+            RuinAndroid a = androids(helper).get(0);
+            s.press(AndroidStationBlockEntity.BUTTON_MODE_FOLLOW);
+            a.chooseEscort(false);
+            helper.assertFalse(s.escort(), "アンドロイドの画面の切り替えがステーションに伝わらない");
+            helper.runAfterDelay(45, () -> {
+                helper.assertFalse(a.escort(), "ステーションの設定で切り替えが戻った");
+                a.chooseEscort(true);
+                helper.assertTrue(s.escort() && a.escort(), "護衛に戻せない");
+                a.discard();
+                helper.succeed();
+            });
+        });
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

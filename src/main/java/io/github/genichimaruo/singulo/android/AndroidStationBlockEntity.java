@@ -46,13 +46,15 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 倒されてから印刷し直すまで。 */
     public static final int REPRINT_DELAY = 100;
 
-    /** スロット: 設計メモリ・キット・強化（転送アップグレード）。 */
-    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_UPGRADE = 2, SLOT_REPAIR_STOCK = 3;
-    public static final int SLOTS = 4;
+    /** スロット: 設計メモリ・キット・強化（転送アップグレード）・自己修理キットの補充・シールド許可証。 */
+    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_UPGRADE = 2, SLOT_REPAIR_STOCK = 3, SLOT_PERMIT = 4;
+    public static final int SLOTS = 5;
 
     /** GUI に送る値。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_MODE = 2, D_RETREAT = 3, D_STATUS = 4, D_HP = 5, D_CHARGE = 6,
-            D_KIND = 7, D_DELAY = 8, COUNT = 9;
+            D_KIND = 7, D_DELAY = 8, D_ESCORT = 9, D_LEADER = 10, COUNT = 11;
+    /** 画面に出すモードの番号: 追従（ついていくだけ）。 */
+    public static final int MODE_FOLLOW_ONLY = 3;
     /** 状態（GUI の表示）。 */
     public static final int S_NO_MEMORY = 0, S_NO_KIT = 1, S_NO_ENERGY = 2, S_PRINTING = 3, S_ACTIVE = 4, S_RETURNING = 5,
             S_CHARGING = 6, S_WAITING = 7, S_BLOCKED = 8, S_AWAY = 9, S_LOW_POWER = 10, S_ORPHAN = 11;
@@ -60,7 +62,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public static final double ORPHAN_RANGE = 24;
 
     public static final int BUTTON_MODE_GUARD = 0, BUTTON_MODE_WANDER = 1, BUTTON_MODE_FOLLOW = 2, BUTTON_RETREAT_DOWN = 3,
-            BUTTON_RETREAT_UP = 4, BUTTON_RECALL = 5, BUTTON_LINK = 6;
+            BUTTON_RETREAT_UP = 4, BUTTON_RECALL = 5, BUTTON_LINK = 6, BUTTON_FOLLOW_ONLY = 7, BUTTON_ESCORT = 8,
+            BUTTON_LEADER = 9;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
     /** 転送アップグレードで預かった持ち物（自己修理キット・装甲板。次に印刷するアンドロイドに持たせる）。 */
@@ -77,6 +80,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 case SLOT_MEMORY -> memoryKind(stack) != null;
                 case SLOT_KIT -> isKit(stack);
                 case SLOT_UPGRADE -> isTransferUpgrade(stack);
+                case SLOT_PERMIT -> isPermit(stack);
                 default -> RuinAndroid.isRepairKit(stack);
             };
         }
@@ -93,6 +97,11 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     private UUID android;
     private int mode = RuinAndroid.MODE_GUARD;
     private int retreat = 30;
+    /** 追従中に戦うか（false なら、ついていくだけ）。 */
+    private boolean escort = true;
+    /** 追従する人（許可証に登録された人。null は持ち主）。 */
+    @Nullable
+    private UUID leader;
     private int delay;
     private int status;
     private int hp;
@@ -119,6 +128,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             yield k == null ? -1 : k.ordinal();
         }
         case D_DELAY -> delay;
+        case D_ESCORT -> escort ? 1 : 0;
+        case D_LEADER -> leaderIndex();
         default -> 0;
     });
 
@@ -172,6 +183,70 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 預かっている持ち物（GUI の表示用）。 */
     public net.minecraft.world.SimpleContainer kept() {
         return kept;
+    }
+
+    public static boolean isPermit(ItemStack stack) {
+        return stack.getItem() instanceof io.github.genichimaruo.singulo.item.ShieldPermitItem;
+    }
+
+    /** 許可証に登録された人（許可証がなければ空）。 */
+    public java.util.List<UUID> members() {
+        return io.github.genichimaruo.singulo.item.ShieldPermitItem.members(items.getStackInSlot(SLOT_PERMIT)).stream()
+                .map(io.github.genichimaruo.singulo.item.ShieldPermitItem.Member::id).toList();
+    }
+
+    /**
+     * この人がステーションを使えるか。許可証にだれかが登録されていれば、持ち主と登録された人だけ。なければだれでも。
+     */
+    public boolean mayOperate(Player player) {
+        java.util.List<UUID> members = members();
+        return members.isEmpty() || owner == null || owner.equals(player.getUUID()) || members.contains(player.getUUID());
+    }
+
+    /** 追従する人に選べる、持ち主のほかの登録者（許可証の順）。 */
+    public static java.util.List<io.github.genichimaruo.singulo.item.ShieldPermitItem.Member> leaders(ItemStack permit, @Nullable UUID owner) {
+        return io.github.genichimaruo.singulo.item.ShieldPermitItem.members(permit).stream().filter(m -> !m.id().equals(owner)).toList();
+    }
+
+    /** 追従する人の番号（0 は持ち主、1〜 は leaders の順）。選んだ人が許可証から外れていれば持ち主。 */
+    private int leaderIndex() {
+        if (leader == null) {
+            return 0;
+        }
+        var list = leaders(items.getStackInSlot(SLOT_PERMIT), owner);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).id().equals(leader)) {
+                return i + 1;
+            }
+        }
+        return 0;
+    }
+
+    @Nullable
+    public UUID owner() {
+        return owner;
+    }
+
+    public boolean escort() {
+        return escort;
+    }
+
+    /** 追従中に戦うか（アンドロイドの画面で切り替えたとき）。 */
+    public void setEscort(boolean escort) {
+        if (this.escort != escort) {
+            this.escort = escort;
+            setChanged();
+        }
+    }
+
+    /** アンドロイドに今の設定（動き方・戻る体力・追従中に戦うか・許可証・追従する人）を渡す。 */
+    private void sync(RuinAndroid a) {
+        a.configure(mode, retreat);
+        if (!a.escortPending()) {
+            a.setEscort(escort);
+        }
+        a.setMembers(members());
+        a.setLeader(leaderIndex() > 0 ? leader : null);
     }
 
     public static boolean isKit(ItemStack stack) {
@@ -240,6 +315,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public void setOwner(UUID owner) {
         this.owner = owner;
         setChanged();
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);   // 持ち主はクライアントにも送る
+        }
     }
 
     /** 上で充電するアンドロイドに電力を渡す。足りれば使って true。 */
@@ -332,7 +410,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 status = !a.printed() ? S_PRINTING : s == RuinAndroid.STATE_RETREAT ? S_RETURNING
                         : s == RuinAndroid.STATE_LOW_POWER ? S_LOW_POWER : RuinAndroid.charging(s) ? S_CHARGING : S_ACTIVE;
                 if (level.getGameTime() % 20 == 0) {
-                    a.configure(mode, retreat);
+                    sync(a);
                 }
             } else if (e == null) {
                 status = S_AWAY;                         // 読み込まれていない所にいる（追従で遠くへ行った）
@@ -406,6 +484,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
         a.startPrinting();
         a.makeGuard(owner, worldPosition, mode, retreat);
+        sync(a);
         if (!name.isEmpty()) {
             a.setCustomName(Component.literal(name));
         }
@@ -433,6 +512,14 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             case BUTTON_MODE_GUARD, BUTTON_MODE_WANDER, BUTTON_MODE_FOLLOW -> mode = id;
             case BUTTON_RETREAT_DOWN -> retreat = Mth.clamp(retreat - 10, 0, 90);
             case BUTTON_RETREAT_UP -> retreat = Mth.clamp(retreat + 10, 0, 90);
+            case BUTTON_FOLLOW_ONLY -> escort = false;
+            case BUTTON_ESCORT -> escort = true;
+            case BUTTON_LEADER -> {
+                // 持ち主 → 登録した人（順に）→ 持ち主 …
+                var list = leaders(items.getStackInSlot(SLOT_PERMIT), owner);
+                int next = (leaderIndex() + 1) % (list.size() + 1);
+                leader = next == 0 ? null : list.get(next - 1).id();
+            }
             case BUTTON_RECALL -> {
                 if (android != null && level instanceof ServerLevel server && server.getEntity(android) instanceof RuinAndroid a) {
                     a.recall();
@@ -442,6 +529,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 if (android == null && orphan != null && level instanceof ServerLevel server
                         && server.getEntity(orphan) instanceof RuinAndroid a && a.orphan()) {
                     a.link(worldPosition, mode, retreat);
+                    sync(a);
                     android = a.getUUID();
                     orphan = null;
                     setSignal(Math.max(1, (int) Math.ceil(15 * a.getHealth() / a.getMaxHealth())));
@@ -454,7 +542,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             }
         }
         if (android != null && level instanceof ServerLevel server && server.getEntity(android) instanceof RuinAndroid a) {
-            a.configure(mode, retreat);
+            sync(a);
         }
         setChanged();
     }
@@ -463,6 +551,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public void openMenu(ServerPlayer player) {
         if (owner == null) {
             setOwner(player.getUUID());
+        }
+        if (!mayOperate(player)) {
+            player.displayClientMessage(Component.translatable("gui.singulo.android_station.locked"), true);
+            return;
         }
         player.openMenu(this, buf -> buf.writeBlockPos(worldPosition));
     }
@@ -507,17 +599,24 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         }
         tag.putInt("mode", mode);
         tag.putInt("retreat", retreat);
+        tag.putBoolean("escort", escort);
+        if (leader != null) {
+            tag.putUUID("leader", leader);
+        }
         tag.putInt("delay", delay);
         tag.putString("name", name);
         tag.putInt("signal", signal);
         tag.put("kept", kept.createTag(registries));
     }
 
-    // 名前はクライアントにも送る（ステーションの GUI に出すため）
+    // 名前と持ち主はクライアントにも送る（ステーションの GUI に出すため。追従する人の候補から持ち主を除く）
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putString("name", name);
+        if (owner != null) {
+            tag.putUUID("owner", owner);
+        }
         return tag;
     }
 
@@ -537,6 +636,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         android = tag.hasUUID("android") ? tag.getUUID("android") : null;
         mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_FOLLOW);
         retreat = tag.contains("retreat") ? Mth.clamp(tag.getInt("retreat"), 0, 90) : 30;
+        escort = !tag.contains("escort") || tag.getBoolean("escort");
+        leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
         delay = tag.getInt("delay");
         name = tag.getString("name");
         signal = tag.getInt("signal");

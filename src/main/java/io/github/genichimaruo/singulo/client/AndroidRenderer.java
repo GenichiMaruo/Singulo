@@ -224,8 +224,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.translate(0, 0.95, 0);
                 float u = Mth.clamp(t / 7, 0, 1);
                 float fade = 1 - Mth.clamp((t - 6) / 4, 0, 1);
-                float head = 360 * (1 - (1 - u) * (1 - u));
-                float from = Math.max(0, head - 200);
+                // 体の回転（AndroidModel.spin）と同じ向きに、刃先の軌跡が伸びる（角度は負の向きへ進む）
+                float head = -360 * (1 - (1 - u) * (1 - u));
+                float from = Math.min(0, head + 200);
                 FxDraw.crescent(pose.last(), glow, from, head, 1.55F, 0.55F, accent, (int) (170 * fade));
                 FxDraw.crescent(pose.last(), glow, from, head, 1.55F, 0.16F, 0xFFFFFF, (int) (230 * fade));
                 pose.popPose();
