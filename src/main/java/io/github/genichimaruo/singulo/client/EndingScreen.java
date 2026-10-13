@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.client;
 
+import io.github.genichimaruo.singulo.supporter.SupporterCredits;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -19,11 +20,17 @@ public class EndingScreen extends Screen {
     private static final int FIRST_LINE = 70;
     private static final int LINE_GAP = 95;
     private static final int LINE_FADE = 35;
+    private static final int SUPPORTER_PAGE_TICKS = 180;
 
     private final List<Component> lines = new ArrayList<>();
+    private final List<SupporterCredits.Entry> supporters;
     private final long seed;
     private final float[][] field;
     private int ticks;
+    private int supporterStart;
+    private int supporterTicks;
+    private int supporterColumns = 2;
+    private int supporterRows = 3;
 
     public static void open(boolean archivist) {
         Minecraft.getInstance().setScreen(new EndingScreen(archivist));
@@ -31,6 +38,7 @@ public class EndingScreen extends Screen {
 
     EndingScreen(boolean archivist) {
         super(Component.translatable("ending.singulo.thanks"));
+        supporters = SupporterRoster.load().entries();
         for (int i = 1; i <= 5; i++) {
             lines.add(Component.translatable("ending.singulo.line." + i));
         }
@@ -47,14 +55,43 @@ public class EndingScreen extends Screen {
         }
     }
 
+    @Override
+    protected void init() {
+        super.init();
+        supporterColumns = Math.max(1, Math.min(3, (width - 32) / 180));
+        supporterRows = Math.max(1, Math.min(4, (height - 110) / (SupporterPlaque.HEIGHT + 8)));
+        // Keep the first visible supporter on resize, and give the new layout time to be read.
+        supporterTicks = 0;
+    }
+
     private int thanksAt() {
         return FIRST_LINE + lines.size() * LINE_GAP + 40;
+    }
+
+    private int supportersAt() {
+        return thanksAt() + 100;
+    }
+
+    private int supporterCapacity() {
+        return supporterColumns * supporterRows;
+    }
+
+    private boolean showingSupporters() {
+        return !supporters.isEmpty() && ticks >= supportersAt();
     }
 
     @Override
     public void tick() {
         ticks++;
-        if (ticks > thanksAt() + 900) {
+        if (showingSupporters()) {
+            supporterTicks++;
+            if (supporterTicks >= SUPPORTER_PAGE_TICKS && supporterStart + supporterCapacity() < supporters.size()) {
+                supporterStart += supporterCapacity();
+                supporterTicks = 0;
+            } else if (supporterTicks > SUPPORTER_PAGE_TICKS + 60) {
+                onClose();
+            }
+        } else if (supporters.isEmpty() && ticks > thanksAt() + 900) {
             onClose();
         }
     }
@@ -86,6 +123,20 @@ public class EndingScreen extends Screen {
         }
         // 生まれた銀河（斜めから見た渦）
         galaxy(g, t, dawn);
+        if (showingSupporters()) {
+            renderSupporters(g, mouseX, mouseY, t);
+        } else {
+            renderStory(g, t);
+        }
+        if (ticks > 100) {
+            int alpha = (int) (120 * Mth.clamp((t - 100) / 40F, 0, 1));
+            Component hint = Component.translatable(showingSupporters() ? "ending.singulo.supporter_controls" : "ending.singulo.skip");
+            g.drawString(font, hint, width - font.width(hint) - 8, height - 14, (Math.max(4, alpha) << 24) | 0xA0A0A8);
+        }
+        // 部品はないので Screen#render は呼ばない（呼ぶと背景がもう一度、上から塗られる）
+    }
+
+    private void renderStory(GuiGraphics g, float t) {
         // 言葉
         int maxWidth = Math.min(width - 40, 360);
         int y = height / 2 + 34;
@@ -117,12 +168,68 @@ public class EndingScreen extends Screen {
             g.drawCenteredString(font, Component.translatable("ending.singulo.credit"), width / 2, height / 2 - 44,
                     (Math.max(4, (int) (180 * thanks)) << 24) | 0xC8C8D8);
         }
-        if (ticks > 100) {
-            int alpha = (int) (120 * Mth.clamp((t - 100) / 40F, 0, 1));
-            Component hint = Component.translatable("ending.singulo.skip");
-            g.drawString(font, hint, width - font.width(hint) - 8, height - 14, (Math.max(4, alpha) << 24) | 0xA0A0A8);
+    }
+
+    private void renderSupporters(GuiGraphics g, int mx, int my, float time) {
+        g.pose().pushPose();
+        g.pose().translate(width / 2F, 16, 0);
+        g.pose().scale(1.5F, 1.5F, 1);
+        g.drawCenteredString(font, Component.translatable("ending.singulo.thanks"), 0, 0, 0xFFFFE6B8);
+        g.pose().popPose();
+        g.drawCenteredString(font, Component.translatable("ending.singulo.credit"), width / 2, 36, 0xFFCACAE0);
+        g.drawCenteredString(font, Component.translatable("ending.singulo.supporters"), width / 2, 55, 0xFFE3D8C3);
+
+        int to = Math.min(supporters.size(), supporterStart + supporterCapacity());
+        int rows = (to - supporterStart + supporterColumns - 1) / supporterColumns;
+        int gridWidth = Math.min(620, width - 40);
+        int cardWidth = (gridWidth - (supporterColumns - 1) * 10) / supporterColumns;
+        int gridHeight = rows * SupporterPlaque.HEIGHT + (rows - 1) * 8;
+        int top = 72 + Math.max(0, (height - 110 - gridHeight) / 2);
+        SupporterCredits.Entry hover = null;
+        for (int i = supporterStart; i < to; i++) {
+            int row = (i - supporterStart) / supporterColumns;
+            int column = (i - supporterStart) % supporterColumns;
+            int inRow = Math.min(supporterColumns, to - supporterStart - row * supporterColumns);
+            int rowWidth = inRow * cardWidth + (inRow - 1) * 10;
+            int x = (width - rowWidth) / 2 + column * (cardWidth + 10);
+            int y = top + row * (SupporterPlaque.HEIGHT + 8);
+            SupporterCredits.Entry entry = supporters.get(i);
+            SupporterPlaque.draw(g, font, entry, x, y, cardWidth, SupporterPlaque.HEIGHT, time);
+            if (Panel.inside(mx, my, x, y, cardWidth, SupporterPlaque.HEIGHT)) {
+                hover = entry;
+            }
         }
-        // 部品はないので Screen#render は呼ばない（呼ぶと背景がもう一度、上から塗られる）
+        g.drawCenteredString(font, Component.translatable("ending.singulo.supporter_range", supporterStart + 1, to, supporters.size()),
+                width / 2, height - 34, 0xFFC7C8D4);
+        if (hover != null) {
+            g.renderTooltip(font, font.split(SupporterPlaque.tooltip(hover), 220), mx, my);
+        }
+    }
+
+    private boolean turnSupporters(int direction) {
+        if (!showingSupporters()) {
+            return false;
+        }
+        int next = supporterStart + direction * supporterCapacity();
+        if ((direction > 0 && next >= supporters.size()) || (direction < 0 && supporterStart == 0)) {
+            return false;
+        }
+        supporterStart = Math.max(0, next);
+        supporterTicks = 0;
+        return true;
+    }
+
+    @Override
+    public boolean keyPressed(int key, int scan, int mods) {
+        if ((key == 262 && turnSupporters(1)) || (key == 263 && turnSupporters(-1))) {
+            return true;
+        }
+        return super.keyPressed(key, scan, mods);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mx, double my, double dx, double dy) {
+        return (dy != 0 && turnSupporters(dy < 0 ? 1 : -1)) || super.mouseScrolled(mx, my, dx, dy);
     }
 
     /** いま見えている行の数。 */

@@ -19,4 +19,9 @@ A new kind of enemy, and a companion you can build.
 - **Android glass:** Barrier Glass (only androids cannot pass) and Gate Glass (only androids can pass), in plain kinds that join seamlessly and patterned kinds.
 - New handbook chapter: Androids.
 
+### Supporter credits
+
+- Added a Supporters chapter to the handbook and supporter pages after the ending's story. Each name has its own frame: a classic frame for standard supporters, or an animated rainbow frame and sparkling rainbow name for rainbow supporters.
+- Both tiers share an ordered roster of up to 100 people. The roster is empty until display names are confirmed; future updates will add names.
+
 This file is published with the **Beta** release type. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).
