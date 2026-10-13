@@ -36,5 +36,14 @@ public final class SinguloMenus {
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.machine.DeviceMenu>> DEVICE = REGISTER.register("device",
             () -> IForgeMenuType.create(io.github.genichimaruo.singulo.machine.DeviceMenu::client));
 
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.AndroidMenu>> ANDROID = REGISTER.register(
+            "android", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.android.AndroidMenu::client));
+
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.AndroidStationMenu>> ANDROID_STATION = REGISTER.register(
+            "android_station", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.android.AndroidStationMenu::client));
+
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.genesis.GenesisCoreMenu>> GENESIS_CORE = REGISTER.register(
+            "genesis_core", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.genesis.GenesisCoreMenu::client));
+
     private SinguloMenus() {}
 }

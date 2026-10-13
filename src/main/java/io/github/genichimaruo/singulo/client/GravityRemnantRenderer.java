@@ -23,6 +23,8 @@ import org.joml.Quaternionf;
  *   <li>浮かせて叩きつける前は、核が脈打ち、床へ向かう光の輪が広がる</li>
  *   <li>殻を作り直すときは、遠くから瓦礫が渦を巻いて集まる</li>
  *   <li>出現: 槽の中に核が生まれて膨らみ、槽が砕けると瓦礫が飛んできて殻になる</li>
+ *   <li>覚醒した個体: 殻の瓦礫の継ぎ目が紅く灼け、核のまわりに紅い降着の輪がもう1本。
+ *       縦に回る泣く黒曜石の環（6つ）と、核から突き出す4本の光の棘が加わる</li>
  * </ul>
  */
 public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
@@ -76,6 +78,9 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
             FxDraw.ring(pose.last(), glow, r * 2.0F, r * 2.6F, RIM, (int) (110 * grow), 0);
             pose.popPose();
             FxDraw.gyroRings(pose, glow, r * 1.9F, 0.03F, t * 2, RIM, (int) (90 * grow));
+            if (e.awakened() && death == 0) {
+                awakenedCore(pose, glow, r, t, grow);
+            }
         }
         if (death > 0) {
             deathFx(pose, glow, camera, death, t, cy);
@@ -85,7 +90,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
             pose.pushPose();
             pose.mulPose(Axis.YP.rotationDegrees(-t * 3));
             for (int k = 0; k < 3; k++) {
-                float rr = (float) GravityRemnant.WELL_RADIUS * (0.35F + 0.22F * k);
+                float rr = (float) e.wellRadius() * (0.35F + 0.22F * k);
                 FxDraw.ring(pose.last(), glow, rr - 0.08F, rr, RIM, 70 - k * 15, 0);
             }
             pose.popPose();
@@ -93,7 +98,7 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
         // 叩きつけの前触れ: 床へ向かって広がる輪
         int flip = e.flipTicks();
         if (flip > 0) {
-            float k = 1 - (flip - partialTick) / GravityRemnant.FLIP_HOLD;
+            float k = 1 - (flip - partialTick) / e.flipHold();
             pose.pushPose();
             pose.translate(0, -cy - 1.4 + 0.05, 0);
             float rr = 1 + k * (float) GravityRemnant.FLIP_RADIUS;
@@ -132,8 +137,55 @@ public class GravityRemnantRenderer extends EntityRenderer<GravityRemnant> {
             pose.translate(-0.5, -0.5, -0.5);
             blocks.renderSingleBlock(GravityRemnant.rubble(i), pose, buffers, light, OverlayTexture.NO_OVERLAY);
             pose.popPose();
+            if (e.awakened() && death == 0) {
+                // 灼けた継ぎ目: 瓦礫が内側から紅く光る
+                pose.pushPose();
+                pose.translate(Math.cos(a) * orbit, y, Math.sin(a) * orbit);
+                FxDraw.billboard(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE)), camera, 1.1F * s / 0.42F * 0.5F,
+                        AWAKE, 150);
+                pose.popPose();
+            }
+        }
+        if (e.awakened() && death == 0 && emerge >= 1) {
+            // 縦に回る泣く黒曜石の環
+            for (int i = 0; i < 6; i++) {
+                double a = t * 0.05 + i * Math.PI / 3;
+                pose.pushPose();
+                pose.translate(0, cy + Math.sin(a) * 2.8, Math.cos(a) * 2.8);
+                pose.mulPose(Axis.XP.rotationDegrees(t * 3 + i * 60));
+                pose.scale(0.38F, 0.38F, 0.38F);
+                pose.translate(-0.5, -0.5, -0.5);
+                blocks.renderSingleBlock(net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN.defaultBlockState(), pose, buffers,
+                        net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                pose.popPose();
+            }
+            VertexConsumer g = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            pose.pushPose();
+            pose.translate(0, cy, 0);
+            pose.mulPose(Axis.ZP.rotationDegrees(90));
+            pose.mulPose(Axis.YP.rotationDegrees(t * 2.9F));
+            FxDraw.ring(pose.last(), g, 2.7F, 2.9F, AWAKE, 160, 160);
+            pose.popPose();
         }
         super.render(e, yaw, partialTick, pose, buffers, light);
+    }
+
+    static final int AWAKE = 0xFF3C50;
+
+    /** 覚醒した個体の核: 紅い降着の輪がもう1本と、核から突き出す4本の光の棘。 */
+    private static void awakenedCore(PoseStack pose, VertexConsumer glow, float r, float t, float grow) {
+        pose.pushPose();
+        pose.mulPose(Axis.XP.rotationDegrees(-30));
+        pose.mulPose(Axis.YP.rotationDegrees(-t * 7));
+        FxDraw.ring(pose.last(), glow, r * 2.3F, r * 2.9F, AWAKE, (int) (210 * grow), 0);
+        pose.popPose();
+        for (int k = 0; k < 4; k++) {
+            pose.pushPose();
+            pose.mulPose(Axis.YP.rotationDegrees(k * 90 + t * 1.5F));
+            pose.mulPose(Axis.ZP.rotationDegrees(35));
+            LastArchivistRenderer.blade(pose, glow, 1, r * 3.2F * grow, 0.25F, AWAKE, 230, 0xFFD27A, 0);
+            pose.popPose();
+        }
     }
 
     /** 倒されたときの核の大きさの倍率: 脈打ちながら膨らみ、COLLAPSE_AT からつぶれ、FLASH_AT で消える。 */

@@ -498,6 +498,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 out.add(holder);
             }
         }
+        // サーバー設定（プリセット・殻の材料・育成時間など）を当てはめる
+        out = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(out);
         out.sort(Comparator.comparingInt((MachineRecipe h) -> -h.value().priority())
                 .thenComparingInt(h -> -(h.value().ingredients().size() + h.value().fluidIngredients().size()
                         + (h.value().restore().isPresent() ? 1 : 0))).thenComparing(h -> h.id().toString()));
@@ -512,6 +514,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 out.add(holder);
             }
         }
+        out = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(out);
         out.sort(Comparator.comparing(h -> h.id().toString()));
         return out;
     }

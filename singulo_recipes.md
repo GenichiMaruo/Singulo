@@ -1,6 +1,8 @@
 # Singulo 装置・素材・レシピ詳細設計
 
-対象: Minecraft 1.21.1 / NeoForge。この文書は `tools/recipes.py`（レシピの唯一の正）から `tools/balance/gen_md.py` で自動生成し、難易度の計算は `tools/balance/analyze.py`、整合性の検証は `tools/gen_data.py` で行っている。数値はプレイテスト前の初期値で、サーバー設定とデータパックで変更できる前提。
+> 開発時の設計資料です（0.3.0 以前の数値を含む）。現行の値は [レシピ一覧](docs/recipes/README.md) と [説明書](docs/manual-ja.md)、0.3.1 以降の調整は [変更履歴](docs/curseforge/) を参照してください。
+
+対象: Minecraft 1.21.1 / NeoForge。この文書は `tools/recipes.py`（レシピの唯一の正）から当時の生成ツールで作った（ツールはその後削除した）。整合性の検証は `tools/gen_data.py` で行っている。数値はプレイテスト前の初期値で、サーバー設定とデータパックで変更できる前提。
 
 ## 読み方
 
@@ -917,6 +919,4 @@ Pリアクター、点火用のSMESモジュール25個、ホライズン・バ�
 
 - `tools/recipes.py`: レシピ・遺構回収物・到達セット・発電能力の定義。ここを直して再生成すれば、この文書の表とグラフ、modのレシピがすべて更新される。
 - `tools/gen_data.py`: modのデータを生成する。生成の前に、段階の逆転（後の段階の素材や装置を前の段階で使っていないか）、未定義の製作場所、レシピと修復の循環、設定の既定値とレシピの一致、作業台（9個以内）と精密組立台（6種類以内）の枠を検証する。現状はすべて通過。
-- `tools/balance/analyze.py`: 原料展開と難易度の計算。結果は `tools/balance/analysis.json`。
 - `tools/config_spec.py`: 設定項目・プリセット・データパックの仕様。modの設定クラスもここから生成する。
-- `tools/balance/gen_md.py`: この文書を生成する。

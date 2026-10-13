@@ -24,4 +24,8 @@ public class SinguloBlockItem extends BlockItem {
                     .withStyle(net.minecraft.ChatFormatting.GREEN));
         }
     }
+    @Override
+    public boolean isFoil(net.minecraft.world.item.ItemStack stack) {
+        return super.isFoil(stack) || io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.remembersUniverse(stack);
+    }
 }

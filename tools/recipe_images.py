@@ -33,7 +33,7 @@ SLOT_FILL = (139, 139, 139)
 TEXT = (55, 55, 55)
 
 FONT_PATHS = ['C:/Windows/Fonts/BIZ-UDGothicR.ttc', 'C:/Windows/Fonts/meiryo.ttc', 'C:/Windows/Fonts/YuGothM.ttc',
-              '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc']
+              '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', '/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf']
 FONT_BOLD_PATHS = ['C:/Windows/Fonts/BIZ-UDGothicB.ttc', 'C:/Windows/Fonts/meiryob.ttc'] + FONT_PATHS
 
 # タグ・バニラの代表の絵（textures の中の名前）

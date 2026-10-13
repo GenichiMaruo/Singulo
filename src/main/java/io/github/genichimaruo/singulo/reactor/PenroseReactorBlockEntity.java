@@ -62,7 +62,8 @@ import net.minecraftforge.items.ItemStackHandler;
 public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener {
     public enum State { UNFORMED, DORMANT, IGNITING, RUNNING }
 
-    public enum Mode { POWER, CATALYST, ERGO, STANDBY, DANGER }
+    /** SHEDDING: 回収運転で、育ちすぎた炉心からジェットで質量を放出している（番号で同期するので後ろに足す）。 */
+    public enum Mode { POWER, CATALYST, ERGO, STANDBY, DANGER, SHEDDING }
 
     public static final double START_MASS = 500;
     /** ホーキング凝縮体ができる質量の上限。点火直後（START_MASS）から作れるように、初期質量と同じにする。 */
@@ -74,6 +75,13 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public static final double GROWTH_FRACTION = 0.25;
     public static final double EVAPORATION_PER_SECOND = 0.006;
     public static final double MIN_INJECTION = 0.03;
+    /**
+     * 回収運転（H凝縮体を作り続ける運転）で保つ炉心質量の上限。H凝縮体は質量 150〜{@link #HAWKING_MAX_MASS} でしかできないので、
+     * ペレットはこの値を超えない分だけ入れる（発電は小さくなる）。
+     */
+    public static final double HARVEST_CEILING = 480;
+    /** 回収運転で、上限を超えた炉心からジェットで放出する質量（毎秒）。質量5,000からでも約38分で戻る。 */
+    public static final double SHED_PER_SECOND = 2.0;
     public static final long BUFFER_CAPACITY = 40_000_000_000L;
     public static final long SPIN_POWER = 200_000_000L;
     /** スピンを 1 上げるのに要る電力 = SPIN_ENERGY × 炉心質量（FE）。質量5000・100 MFE/t で約5分。 */
@@ -229,6 +237,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (mass < 150) {
             return Mode.DANGER;
         }
+        if (harvestMode && mass > HARVEST_CEILING + 1e-6 && mass > HAWKING_MAX_MASS) {
+            return Mode.SHEDDING;
+        }
         if (mass <= HAWKING_MAX_MASS) {
             return Mode.CATALYST;
         }
@@ -349,6 +360,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         state = State.IGNITING;
         ignitionStored = 0;
         ignitionElapsed = 0;
+        receivedThisTick = 0;
+        ignitionBandwidth = 0;
+        ignitionReachable = 0;
+        ignitionPeak = 0;
         ignitionCharged = false;
         int window = ServerConfig.SPEC.isLoaded() ? ServerConfig.IGNITION_WINDOW_SECONDS.get() : 10;
         ignitionTicks = window * 20;
@@ -375,11 +390,26 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     static long ignitionEnergy() {
-        return ServerConfig.SPEC.isLoaded() ? ServerConfig.IGNITION_ENERGY.get() : 50_000_000_000L;
+        long base = ServerConfig.SPEC.isLoaded() ? ServerConfig.IGNITION_ENERGY.get() : 50_000_000_000L;
+        return Math.round(base * io.github.genichimaruo.singulo.data.Difficulty.ignitionEnergy());
     }
+
+    /**
+     * 点火の診断。受電帯域（直前の tick に受け取れた電力）と、その速さが続いたときに制限時間内に届く総量。
+     * 蓄電が足りていても、網のいちばん細いケーブルが上限になって間に合わないことがあるので、理由を画面と失敗の知らせで示す。
+     */
+    private long receivedThisTick;
+    private long ignitionBandwidth;
+    private long ignitionReachable;
+    private long ignitionPeak;
 
     private void tickIgnition(ServerLevel level) {
         ignitionElapsed++;
+        // 前の tick に受け取った量（ケーブルは装置の tick の合間に押し込んでくる）
+        ignitionBandwidth = receivedThisTick;
+        ignitionPeak = Math.max(ignitionPeak, receivedThisTick);
+        receivedThisTick = 0;
+        ignitionReachable = ignitionStored + ignitionBandwidth * Math.max(0, ignitionTicks);
         if (ignitionElapsed == IGNITION_SEQUENCE_TICKS - IGNITION_SOUND_TICKS) {
             // 点火の音（鳴り終わる瞬間に炉心ができる）
             Vec3 core = coreCenter();
@@ -412,9 +442,15 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (!ignitionCharged && --ignitionTicks <= 0) {
             // 時間切れ。注いだ電力は失われるが、種は残る（重いが詰まない）。鳴り始めた点火の音も止める
             state = State.DORMANT;
+            int window = ServerConfig.SPEC.isLoaded() ? ServerConfig.IGNITION_WINDOW_SECONDS.get() : 10;
+            long needPerTick = ignitionEnergy() / Math.max(1, window * 20L);
+            // 何が足りなかったか（届いた量・いちばん速かった受電・必要な受電）を知らせる
+            broadcast(level, "gui.singulo.reactor.ignition_failed");
+            broadcast(level, "gui.singulo.reactor.ignition_failed.detail",
+                    String.format("%.1f", ignitionStored / 1e9), String.format("%.1f", ignitionEnergy() / 1e9),
+                    String.format("%,d", ignitionPeak / 1_000_000L), String.format("%,d", needPerTick / 1_000_000L));
             ignitionStored = 0;
             stopIgnitionSound(level);
-            broadcast(level, "gui.singulo.reactor.ignition_failed");
             setChanged();
         }
     }
@@ -426,6 +462,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         double wanted = perPellet <= 0 ? 0 : (double) (BUFFER_CAPACITY - buffer) / perPellet;
         // 投入間隔を決めていればその間隔で（エディントン限界まで）、自動なら蓄電の減った分だけ
         double rate = feedInterval > 0 ? Math.min(max, 1.0 / feedInterval) : Math.max(MIN_INJECTION * max, Math.min(max, wanted));
+        // 回収運転: ペレットで質量が上限を超えるなら入れない（H凝縮体のできる質量に保つ）
+        if (harvestMode && mass + PELLET_MASS * GROWTH_FRACTION > HARVEST_CEILING) {
+            rate = 0;
+        }
         pelletCarry += rate;
         int whole = (int) pelletCarry;
         int taken = whole <= 0 ? 0 : items.extractItem(SLOT_FUEL, whole, false).getCount();
@@ -439,6 +479,10 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         evaporate(level);
         if (state != State.RUNNING) {
             return;
+        }
+        // 回収運転: 育ちすぎた炉心は、ジェットで質量を少しずつ捨てて上限まで戻す（降着していないので発電はしない）
+        if (harvestMode && mass > HARVEST_CEILING) {
+            mass = Math.max(HARVEST_CEILING, mass - SHED_PER_SECOND / 20.0);
         }
         // 角運動量インジェクター
         double target = SPIN_TARGETS[spinTarget];
@@ -628,6 +672,21 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         setChanged();
     }
 
+    /**
+     * 回収運転（H凝縮体を作り続ける）。新しく建てたリアクターは回収運転で始まり、最初のコアに要る H凝縮体を
+     * 取り逃がさない。切ると、蓄電の減った分だけペレットを入れる発電運転になる。
+     */
+    private boolean harvestMode = true;
+
+    public boolean harvestMode() {
+        return harvestMode;
+    }
+
+    public void toggleHarvestMode() {
+        harvestMode = !harvestMode;
+        setChanged();
+    }
+
     public void setFeedInterval(int ticks) {
         feedInterval = Math.max(0, Math.min(MAX_FEED_INTERVAL, ticks));
         setChanged();
@@ -661,6 +720,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public static void returnRecord(ServerLevel level, Entity swallowed, Vec3 c, double horizon) {
         double chance = swallowed instanceof LivingEntity ? RECORD_FROM_MOB
                 : swallowed instanceof net.minecraft.world.entity.item.ItemEntity item && !EventHorizonTargets.isReturnedRecord(item)
+                        && !item.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)
                 ? RECORD_FROM_ITEM : 0;
         if (chance <= 0 || level.random.nextDouble() >= chance) {
             return;
@@ -964,9 +1024,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         }
     }
 
-    private void broadcast(ServerLevel level, String key) {
+    private void broadcast(ServerLevel level, String key, Object... args) {
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, new AABB(worldPosition).inflate(32))) {
-            p.displayClientMessage(Component.translatable(key), false);
+            p.displayClientMessage(Component.translatable(key, args), false);
         }
     }
 
@@ -1066,10 +1126,12 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     }
 
     /** テスト用: 炉心の状態を直接決める。 */
+    /** 試験用: 指定の質量・スピンの炉心を置く（発電運転。回収運転にするなら toggleHarvestMode で切り替える）。 */
     public void forceCore(double mass, double spin) {
         this.mass = mass;
         this.spin = spin;
         this.state = mass > 0 ? State.RUNNING : State.DORMANT;
+        this.harvestMode = false;
     }
 
     /** 点火中は点火エネルギーを受け取り、稼働中は蓄電から取り出せる。 */
@@ -1082,6 +1144,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             long take = Math.min(amount, Math.max(0, ignitionEnergy() - ignitionStored));
             if (!simulate) {
                 ignitionStored += take;
+                receivedThisTick += take;
             }
             return take;
         }
@@ -1162,7 +1225,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     // ------------------------------------------------------------------ GUI・同期・保存
 
     public static final int D_STATE = 0, D_MASS_X10 = 1, D_SPIN_X1000 = 2, D_ETA_X10000 = 3, D_OUT_LO = 4, D_OUT_HI = 5,
-            D_BUFFER_MFE = 6, D_IGNITION_PCT = 7, D_IGNITION_SECS = 8, D_TARGET = 9, D_MODE = 10, D_INTERVAL = 11, COUNT = 12;
+            D_BUFFER_MFE = 6, D_IGNITION_PCT = 7, D_IGNITION_SECS = 8, D_TARGET = 9, D_MODE = 10, D_INTERVAL = 11, D_HARVEST = 12,
+            D_IGNITION_BAND_MFE = 13, D_IGNITION_STORED_GFE10 = 14, COUNT = 15;
 
     public SyncedInts syncData() {
         return SyncedInts.server(COUNT, i -> switch (i) {
@@ -1178,6 +1242,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             case D_TARGET -> spinTarget;
             case D_MODE -> mode().ordinal();
             case D_INTERVAL -> feedInterval;
+            case D_HARVEST -> harvestMode ? 1 : 0;
+            case D_IGNITION_BAND_MFE -> (int) Math.min(Integer.MAX_VALUE, ignitionBandwidth / 1_000_000L);
+            case D_IGNITION_STORED_GFE10 -> (int) Math.min(Integer.MAX_VALUE, ignitionReachable / 100_000_000L);
             default -> 0;
         });
     }
@@ -1240,6 +1307,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         tag.putInt("ergo", ergoTimer);
         tag.putBoolean("ignited_before", ignitedBefore);
         tag.putInt("feed_interval", feedInterval);
+        tag.putBoolean("harvest_mode", harvestMode);
         if (collapseStart >= 0) {
             writeCollapse(tag);
         }
@@ -1298,6 +1366,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (tag.contains("feed_interval")) {
             feedInterval = tag.getInt("feed_interval");
         }
+        // この版より前に点火していたリアクターは、これまでどおり発電運転のまま
+        harvestMode = tag.contains("harvest_mode") ? tag.getBoolean("harvest_mode") : !ignitedBefore;
         readCollapse(tag);
     }
 

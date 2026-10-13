@@ -32,6 +32,7 @@ public final class SinguloClient {
 
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
+        modBus.addListener(SinguloClient::addWingLayers);
         modBus.addListener(GravitationalLensing::registerShaders);
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(SinguloClient::addPacks);
@@ -41,6 +42,9 @@ public final class SinguloClient {
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         MinecraftForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) ->
+                ClientGalaxies.set(java.util.List.of(), false));
         MinecraftForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
@@ -81,6 +85,20 @@ public final class SinguloClient {
         }
     }
 
+    /** 残光の翼を、プレイヤー（両方の体型）と防具立てに描く。 */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void addWingLayers(EntityRenderersEvent.AddLayers event) {
+        for (String skin : event.getSkins()) {
+            if (event.getSkin(skin) instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer r) {
+                r.addLayer(new AfterglowWingsLayer<>(r));
+            }
+        }
+        if (event.getRenderer(net.minecraft.world.entity.EntityType.ARMOR_STAND)
+                instanceof net.minecraft.client.renderer.entity.ArmorStandRenderer stand) {
+            stand.addLayer(new AfterglowWingsLayer(stand));
+        }
+    }
+
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ACCELERATOR_CONTROLLER.get(),
                 AcceleratorRenderer::new);
@@ -91,23 +109,36 @@ public final class SinguloClient {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEALED_CONTAINER.get(),
                 SealedContainerRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
+        event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));
+        event.registerEntityRenderer(SinguloEntities.SABER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SABER));
+        event.registerEntityRenderer(SinguloEntities.ANDROID_CRESCENT.get(), AndroidCrescentRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.ANDROID_LASER.get(), AndroidLaserRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ECHO_SENTINEL.get(), EchoSentinelRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_REMNANT.get(), GravityRemnantRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_DEBRIS.get(), GravityDebrisRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.ERGOSPHERE_LEVIATHAN.get(), ErgosphereLeviathanRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.LAST_ARCHIVIST.get(), LastArchivistRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ECHO_PROJECTOR.get(),
                 EchoProjectorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),
                 PenroseReactorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEAL_CONSOLE.get(),
                 ctx -> new net.minecraft.client.renderer.blockentity.BlockEntityRenderer<>() {
-                    // 重力異常点: 封印コンソールの上の空間がゆがんで見える
+                    // 重力異常点: 封印コンソールの上の空間がゆがんで見える。ボスが現れると縮んで消え、倒されると戻る
                     @Override
                     public void render(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be, float pt,
                                        com.mojang.blaze3d.vertex.PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buf,
                                        int light, int overlay) {
-                        net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos()).add(0, 3.5, 0);
-                        GravitationalLensing.add(c, 1.2F, 0.5F);
+                        if (be.getLevel() == null) {
+                            return;
+                        }
+                        float scale = be.anomalyScale(be.getLevel().getGameTime() + pt);
+                        if (scale > 0.01F) {
+                            net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atCenterOf(be.getBlockPos()).add(0, 3.5, 0);
+                            GravitationalLensing.add(c, 1.2F * scale, 0.5F * Math.min(1, scale));
+                        }
                     }
 
                     @Override
@@ -123,6 +154,8 @@ public final class SinguloClient {
                 WormholeMouthRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.TIPLER_CYLINDER.get(),
                 TiplerCylinderRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.GENESIS_CORE.get(),
+                GenesisCoreRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_FURNACE.get(),
                 DegenerateFurnaceRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.DEGENERATE_COMPACTOR_CONTROLLER.get(),
@@ -143,6 +176,9 @@ public final class SinguloClient {
 
     private static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SecurityDroneRenderer.LAYER, SecurityDroneRenderer::createLayer);
+        event.registerLayerDefinition(AndroidModel.BLADE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BLADE));
+        event.registerLayerDefinition(AndroidModel.WHIP_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.WHIP));
+        event.registerLayerDefinition(AndroidModel.SABER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.SABER));
         event.registerLayerDefinition(HorizonWardenRenderer.LAYER, HorizonWardenRenderer::createLayer);
     }
 
@@ -154,6 +190,9 @@ public final class SinguloClient {
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.SMES.get(), SmesScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.GENESIS_CORE.get(), GenesisCoreScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_STATION.get(), AndroidStationScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID.get(), AndroidScreen::new);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
@@ -176,6 +215,10 @@ public final class SinguloClient {
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), new ResourceLocation("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.METEOR_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
+                new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
+                        io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
     }
 
     /** 説明（折り返し）と、Shift を押している間は作り方・使い道。 */
@@ -184,6 +227,10 @@ public final class SinguloClient {
                 .getKey(event.getItemStack().getItem());
         if (!Singulo.MODID.equals(id.getNamespace())) {
             return;
+        }
+        if (io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.remembersUniverse(event.getItemStack())) {
+            event.getToolTip().add(1, Component.translatable("tooltip.singulo.genesis_core.memory")
+                    .withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
         }
         String key = "desc.singulo." + id.getPath();
         if (!net.minecraft.client.resources.language.I18n.exists(key)) {

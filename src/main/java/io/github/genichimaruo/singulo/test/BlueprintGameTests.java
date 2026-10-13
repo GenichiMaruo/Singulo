@@ -73,6 +73,22 @@ public final class BlueprintGameTests {
         check(helper, Blueprints.Kind.WORMHOLE_GENERATOR, 5, new BlockPos(7, 1, 7), Direction.NORTH, 5);
     }
 
+    @GameTest(template = HUGE)
+    public static void blueprintGenesisEngine(GameTestHelper helper) {
+        check(helper, Blueprints.Kind.GENESIS_ENGINE, 7, new BlockPos(7, 1, 7), Direction.NORTH, 7);
+    }
+
+    /** 創世炉には画面がないので、枠や柱は「コントローラーの画面を開く部品」にはならない（右クリックをふさがない）。 */
+    @GameTest(template = HUGE)
+    public static void genesisPartsKeepTheirClicks(GameTestHelper helper) {
+        BlockPos c = helper.absolutePos(new BlockPos(7, 1, 7));
+        SinguloCommands.place(helper.getLevel(), Blueprints.Kind.GENESIS_ENGINE, c, Direction.NORTH, 7);
+        helper.assertTrue(Blueprints.formedSize(helper.getLevel(), c, Blueprints.Kind.GENESIS_ENGINE) == 7, "形成されない");
+        BlockPos pylon = c.offset(io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.PYLONS[0]);
+        helper.assertTrue(Blueprints.controllerOf(helper.getLevel(), pylon) == null, "柱が核の部品として扱われる");
+        helper.succeed();
+    }
+
     /** 形成済みなら部品からコントローラーが見つかり、1つ欠けると見つからない（コントローラーの画面を開くのに使う）。 */
     @GameTest(template = HUGE)
     public static void partsFindTheirFormedController(GameTestHelper helper) {

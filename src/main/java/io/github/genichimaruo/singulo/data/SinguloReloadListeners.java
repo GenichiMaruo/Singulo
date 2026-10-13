@@ -8,5 +8,6 @@ public final class SinguloReloadListeners {
     public static void register(AddReloadListenerEvent event) {
         event.addListener(MassValues.INSTANCE);
         event.addListener(ThermalData.INSTANCE);
+        event.addListener(io.github.genichimaruo.singulo.genesis.MassSynthesis.INSTANCE);
     }
 }

@@ -91,10 +91,21 @@
       "pages": [
         "ruins.list",
         "ruins.bosses",
+        "ruins.plan",
         "ruins.compass",
         "ruins.sealed",
         "ruins.records",
         "ruins.gathering"
+      ]
+    },
+    {
+      "id": "androids",
+      "icon": "singulo:android_station",
+      "pages": [
+        "androids.ruin",
+        "androids.build",
+        "androids.care",
+        "androids.glass"
       ]
     },
     {
@@ -105,6 +116,15 @@
         "romance.tipler",
         "romance.gear",
         "romance.darkmatter"
+      ]
+    },
+    {
+      "id": "genesis",
+      "icon": "singulo:genesis_core",
+      "pages": [
+        "genesis.build",
+        "genesis.birth",
+        "genesis.synth"
       ]
     },
     {

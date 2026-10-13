@@ -222,11 +222,13 @@ public final class ReactorGameTests {
     }
 
     /** リングの外にいるものは少し引き寄せられるだけで、吸い込まれたり死んだりはしない。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    // 同じ組のほかの炉心（蒸発の爆発など）に巻き込まれないよう、1つだけの組で動かす
+    @GameTest(template = HUGE, batch = BATCH + "_outside", timeoutTicks = 200)
     public static void outsideTheRingsOnlyWeakPull(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(0, 1, 0));
+        // 日の光で燃えないハスク（テストの時刻によって死なないように）
+        net.minecraft.world.entity.monster.Husk zombie = helper.spawn(EntityType.HUSK, new BlockPos(0, 1, 0));
         Vec3 c = Vec3.atCenterOf(helper.absolutePos(CENTER));
         helper.runAtTickTime(80, () -> {
             helper.assertTrue(zombie.isAlive(), "リングの外で死んだ");
@@ -299,6 +301,38 @@ public final class ReactorGameTests {
             double before = far.distanceTo(Vec3.atCenterOf(helper.absolutePos(CENTER)));
             double after = drop.position().distanceTo(Vec3.atCenterOf(helper.absolutePos(CENTER)));
             helper.assertTrue(drop.isRemoved() || after < before - 0.5, "引力帯でアイテムが引き寄せられない: " + before + " -> " + after + " v=" + drop.getDeltaMovement());
+            helper.succeed();
+        });
+    }
+
+    /** 回収運転: 質量が上限（480）を超えるならペレットを入れず、H凝縮体のできる質量に保つ。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    public static void harvestModeKeepsMassBelowCeiling(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
+        helper.runAtTickTime(3, () -> {
+            r.forceCore(470, 0);
+            r.toggleHarvestMode();
+        });
+        helper.runAtTickTime(150, () -> {
+            helper.assertTrue(r.harvestMode(), "回収運転になっていない");
+            helper.assertTrue(r.mass() <= PenroseReactorBlockEntity.HARVEST_CEILING + 1e-6 && r.mass() > 460,
+                    "回収運転で質量が上限の下に保たれない: " + r.mass());
+            helper.succeed();
+        });
+    }
+
+    /** 回収運転: 育ちすぎた炉心は毎秒2ずつ質量を放出して戻る。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    public static void harvestModeShedsOvergrownCore(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        helper.runAtTickTime(3, () -> {
+            r.forceCore(1000, 0);
+            r.toggleHarvestMode();
+        });
+        helper.runAtTickTime(103, () -> {
+            helper.assertTrue(r.mode() == PenroseReactorBlockEntity.Mode.SHEDDING, "放出中の表示にならない: " + r.mode());
+            helper.assertTrue(r.mass() < 991 && r.mass() > 985, "5秒で質量が約10減らない: " + r.mass());
             helper.succeed();
         });
     }

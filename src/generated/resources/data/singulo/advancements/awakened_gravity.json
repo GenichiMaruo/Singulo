@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:awakening_gravity_core"
+    },
+    "title": {
+      "translate": "advancement.singulo.awakened_gravity.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.awakened_gravity.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "awakened_gravity_remnant"
+      }
+    }
+  },
+  "parent": "singulo:hawking"
+}

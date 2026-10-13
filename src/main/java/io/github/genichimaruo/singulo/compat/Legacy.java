@@ -14,7 +14,7 @@ public final class Legacy {
     }
     @SuppressWarnings("unchecked")
     public static <T extends net.minecraft.world.level.block.entity.BlockEntity> T blockEntity(net.minecraft.gametest.framework.GameTestHelper helper, BlockPos pos) {
-        return (T)helper.getBlockEntity(pos);
+        return (T)io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
     }
     public static java.util.UUID uuid(net.minecraft.resources.ResourceLocation id) {
         return java.util.UUID.nameUUIDFromBytes(id.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));

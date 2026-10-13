@@ -50,18 +50,36 @@ public final class SinguloItems {
             "neutrino_scanner", () -> new io.github.genichimaruo.singulo.item.NeutrinoScannerItem(new Item.Properties().rarity(Rarity.RARE), 3));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.ExplorerCompassItem> EXPLORER_COMPASS = ITEMS.register(
             "explorer_compass", () -> new io.github.genichimaruo.singulo.item.ExplorerCompassItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.MeteorCompassItem> METEOR_COMPASS = ITEMS.register(
+            "meteor_compass", () -> new io.github.genichimaruo.singulo.item.MeteorCompassItem(new Item.Properties(), 2));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.CreativeCatalystItem> CREATIVE_CATALYST = ITEMS.register(
             "creative_catalyst", () -> new io.github.genichimaruo.singulo.item.CreativeCatalystItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
             "builder_wand", () -> new io.github.genichimaruo.singulo.item.BuilderWandItem(new Item.Properties()));
+    /** アンドロイド用の無線充電器。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
+            "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
+    /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
+            "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
             () -> new ForgeSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.BLADE_ANDROID, 0xF0F2F6, 0x78E1FF, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> WHIP_ANDROID_SPAWN_EGG = ITEMS.register("whip_android_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.WHIP_ANDROID, 0x2A2A36, 0xFF6AC4, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> SABER_ANDROID_SPAWN_EGG = ITEMS.register("saber_android_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.SABER_ANDROID, 0xDCE0E8, 0xFFC45A, new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new ForgeSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
             () -> new ForgeSpawnEggItem(SinguloEntities.ECHO_SENTINEL, 0xBFEFFF, 0x3A8FB0, new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> GRAVITY_REMNANT_SPAWN_EGG = ITEMS.register("gravity_remnant_spawn_egg",
             () -> new ForgeSpawnEggItem(SinguloEntities.GRAVITY_REMNANT, 0x16121E, 0x9A6CFF, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> ERGOSPHERE_LEVIATHAN_SPAWN_EGG = ITEMS.register("ergosphere_leviathan_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.ERGOSPHERE_LEVIATHAN, 0x1A1424, 0x8A5CFF, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> LAST_ARCHIVIST_SPAWN_EGG = ITEMS.register("last_archivist_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.LAST_ARCHIVIST, 0xECE4D2, 0xFFD27A, new Item.Properties()));
     /** 封印コンテナからしか出ない道具。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
             "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));
@@ -69,6 +87,9 @@ public final class SinguloItems {
             "catalyst_stabilizer", () -> new io.github.genichimaruo.singulo.item.CatalystStabilizerItem(new Item.Properties().rarity(Rarity.RARE), 4));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.DimensionalPocketItem> DIMENSIONAL_POCKET = ITEMS.register(
             "dimensional_pocket", () -> new io.github.genichimaruo.singulo.item.DimensionalPocketItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    /** 残光の翼（最後の記録者が落とす。クリエイティブのタブにも JEI にも出さない）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.AfterglowWingsItem> AFTERGLOW_WINGS = ITEMS.register(
+            "afterglow_wings", () -> new io.github.genichimaruo.singulo.item.AfterglowWingsItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.SealedRecordItem> SEALED_RECORD = ITEMS.register(
             "sealed_record", () -> new io.github.genichimaruo.singulo.item.SealedRecordItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     /** ニュートリノ感度モジュール（スキャナーと観測所の感度を上げる）。 */
@@ -95,6 +116,8 @@ public final class SinguloItems {
             Map.entry("decoded_record", 1),
             Map.entry("magnetic_bottle", 4),
             Map.entry("neutrino_scanner", 3),
+            Map.entry("android_charger", 2),
+            Map.entry("android_armor_plate", 2),
             Map.entry("explorer_compass", 1),
             Map.entry("creative_catalyst", 6),
             Map.entry("builder_wand", 6),
@@ -115,6 +138,7 @@ public final class SinguloItems {
         TAB_ORDER.add(SETTINGS_CARD);
         TAB_ORDER.add(HOLO_PROJECTOR);
         TAB_ORDER.add(EXPLORER_COMPASS);
+        TAB_ORDER.add(METEOR_COMPASS);
         TAB_ORDER.add(DECODED_RECORD);
         block(SinguloBlocks.THERMOELECTRIC_GENERATOR, 1);
         block(SinguloBlocks.COPPER_WIRE, 1);
@@ -163,6 +187,9 @@ public final class SinguloItems {
         block(SinguloBlocks.FOCUSING_MAGNET, 2);
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
         block(SinguloBlocks.PROBE_STATION, 4);
+        block(SinguloBlocks.ANDROID_STATION, 2);
+        TAB_ORDER.add(ANDROID_CHARGER);
+        TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         block(SinguloBlocks.SMES_MODULE, 4);
         block(SinguloBlocks.TOPOLOGICAL_WIRE, 4);
         block(SinguloBlocks.REACTOR_SHELL, 5);
@@ -187,6 +214,7 @@ public final class SinguloItems {
         TAB_ORDER.add(ITEMS.register("wormhole_mouth", () -> new SinguloBlockItem(SinguloBlocks.WORMHOLE_MOUTH.get(),
                 new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 5)));
         block(SinguloBlocks.WORMHOLE_PORT, 5);
+        block(SinguloBlocks.GENESIS_CORE, 5);
         block(SinguloBlocks.CRYOGENIC_TURBINE, 2);
         block(SinguloBlocks.SMES_CELL, 2);
         block(SinguloBlocks.COSMIC_MUON_COLLECTOR, 2);
@@ -204,6 +232,7 @@ public final class SinguloItems {
         block(SinguloBlocks.METEORITE_CRUST, 2);
         block(SinguloBlocks.METEORIC_IRON_CHUNK, 2);
         block(SinguloBlocks.STARDUST_CLUSTER, 2);
+        block(SinguloBlocks.METEORITE_CORE, 2);
         block(SinguloBlocks.FULGURITE_BLOCK, 2);
         TAB_ORDER.add(INERTIAL_CONTROL_GAUNTLET);
         TAB_ORDER.add(NEUTRINO_SCANNER);
@@ -228,14 +257,23 @@ public final class SinguloItems {
         block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_GLASS, 1);
         block(SinguloBlocks.BLACK_STAR_GLASS, 1);
+        block(SinguloBlocks.ANDROID_BARRIER_GLASS, 2);
+        block(SinguloBlocks.ANDROID_BARRIER_GLASS_PATTERNED, 2);
+        block(SinguloBlocks.ANDROID_GATE_GLASS, 2);
+        block(SinguloBlocks.ANDROID_GATE_GLASS_PATTERNED, 2);
         block(SinguloBlocks.RUIN_GLASS, 1);
         block(SinguloBlocks.INTACT_RUIN_GLASS, 1);
+        block(SinguloBlocks.REINFORCED_RUIN_GLASS, 5);
         block(SinguloBlocks.RUIN_CACHE, 1);
         block(SinguloBlocks.RUIN_GUARD_DOCK, 1);
+        block(SinguloBlocks.RUIN_ANDROID_FABRICATOR, 1);
         block(SinguloBlocks.SEAL_CONSOLE, 1);
         block(SinguloBlocks.GUARDIAN_CORE, 1);
         block(SinguloBlocks.ECHO_PROJECTOR, 1);
         TAB_ORDER.add(SECURITY_DRONE_SPAWN_EGG);
+        TAB_ORDER.add(BLADE_ANDROID_SPAWN_EGG);
+        TAB_ORDER.add(WHIP_ANDROID_SPAWN_EGG);
+        TAB_ORDER.add(SABER_ANDROID_SPAWN_EGG);
         for (var lamp : java.util.List.of(SinguloBlocks.RUIN_LAMP_AMBER, SinguloBlocks.RUIN_LAMP_VERDANT, SinguloBlocks.RUIN_LAMP_VIOLET,
                 SinguloBlocks.RUIN_LAMP_CRIMSON)) {
             block(lamp, 1);

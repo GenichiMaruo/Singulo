@@ -47,6 +47,8 @@ public final class Singulo {
                 () -> io.github.genichimaruo.singulo.client.SinguloClient::init);
         SinguloFluids.FLUIDS.register(modBus);
         SinguloBlocks.BLOCKS.register(modBus);
+        io.github.genichimaruo.singulo.registry.SinguloWorldgen.STRUCTURE_TYPES.register(modBus);
+        io.github.genichimaruo.singulo.registry.SinguloWorldgen.PIECES.register(modBus);
         SinguloItems.ITEMS.register(modBus);
         SinguloBlockEntities.REGISTER.register(modBus);
         SinguloEntities.REGISTER.register(modBus);
@@ -87,10 +89,24 @@ public final class Singulo {
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.AncientRecords::onLogin);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.command.SinguloCommands::register);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.FormationEffect::onServerTick);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onTeleport);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onBreak);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onExplosion);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.RuinAndroid::onChangeTarget);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.AfterglowWingsItem::onFall);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.genesis.GenesisGalaxies::onLogin);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
+        MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST, io.github.genichimaruo.singulo.ruin.BossCombatLog::onHurt);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onShield);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDeath);
         if (RuinSelfCheck.enabled()) {
             MinecraftForge.EVENT_BUS.addListener(RuinSelfCheck::onServerStarted);
         }
 
+        modBus.addListener((net.minecraftforge.fml.event.config.ModConfigEvent.Loading e) -> io.github.genichimaruo.singulo.data.ConfigMigration.onConfig(e));
+        modBus.addListener((net.minecraftforge.fml.event.config.ModConfigEvent.Reloading e) -> io.github.genichimaruo.singulo.data.ConfigMigration.onConfig(e));
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
     }
