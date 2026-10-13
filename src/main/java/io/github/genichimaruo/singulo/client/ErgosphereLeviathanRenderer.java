@@ -456,10 +456,148 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
 
     // ------------------------------------------------------------------ 技の光
 
+    static final int VOID = 0x7A3CFF;
+
+    /**
+     * 重力の裂け目: 予告のあいだは床に3本の光の帯（点滅しながら太くなる）。裂けると、線に沿って黒紫の光の壁が立ち上がり、
+     * 中心に白い裂け目が走って、ゆっくり消えていく。
+     */
+    private static void riftWalls(ErgosphereLeviathan e, Vec3 origin, float t, float left, PoseStack pose, VertexConsumer glow) {
+        int length = ErgosphereLeviathan.RIFT_WARN + ErgosphereLeviathan.RIFT_GAP;
+        float elapsed = ErgosphereLeviathan.RIFT_VOLLEYS * length - left;
+        float inVolley = elapsed % length;
+        Vec3 c = Vec3.atBottomCenterOf(e.homePos()).add(0, 1.05, 0);
+        double a = e.riftAngle();
+        Vec3 along = new Vec3(Math.cos(a), 0, Math.sin(a));
+        Vec3 across = new Vec3(-along.z, 0, along.x);
+        double reach = ErgosphereLeviathan.ARENA - 4;
+        for (int k = -1; k <= 1; k++) {
+            Vec3 mid = c.add(across.scale(k * ErgosphereLeviathan.RIFT_SPACING));
+            Vec3 p0 = mid.add(along.scale(-reach)).subtract(origin);
+            Vec3 p1 = mid.add(along.scale(reach)).subtract(origin);
+            if (inVolley < ErgosphereLeviathan.RIFT_WARN) {
+                float k2 = inVolley / ErgosphereLeviathan.RIFT_WARN;
+                boolean blink = (int) (inVolley / 2) % 2 == 0 || k2 > 0.7F;
+                FxDraw.beam(pose.last(), glow, p0, p1, (float) ErgosphereLeviathan.RIFT_WIDTH * 2 * (0.3F + 0.7F * k2),
+                        k2 > 0.7F ? 0xFF5AD8 : VOID, blink ? (int) (60 + 150 * k2) : 30);
+                FxDraw.beam(pose.last(), glow, p0, p1, 0.08F, 0xFFFFFF, (int) (120 * k2));
+            } else {
+                // 裂けた: 線に沿って立ち上がる光の壁
+                float fade = 1 - (inVolley - ErgosphereLeviathan.RIFT_WARN) / ErgosphereLeviathan.RIFT_GAP;
+                float h = 6.5F * (0.4F + 0.6F * fade);
+                for (double s = -reach; s <= reach; s += 1.0) {
+                    Vec3 b = mid.add(along.scale(s)).subtract(origin);
+                    float wob = 0.6F + 0.4F * Mth.sin(t * 1.3F + (float) s);
+                    FxDraw.beam(pose.last(), glow, b, b.add(0, h * wob, 0), 0.9F * fade, VOID, (int) (200 * fade));
+                }
+                FxDraw.beam(pose.last(), glow, p0, p1, 0.6F * fade, 0xFFFFFF, (int) (255 * fade));
+                FxDraw.beam(pose.last(), glow, p0.add(0, 0.05, 0), p1.add(0, 0.05, 0), 2.4F * fade, 0x1A0030, (int) (180 * fade));
+            }
+        }
+    }
+
+    /**
+     * 引き潮: 床一面に、回りながら中心へ流れ込む4本の渦の腕と、外から内へ縮んでいく光の輪。
+     * 炉心の上には黒い球と、天井へ伸びる紫の渦の柱。
+     */
+    private static void tideVortex(ErgosphereLeviathan e, Vec3 origin, float t, float left, PoseStack pose, VertexConsumer glow) {
+        Vec3 c = Vec3.atBottomCenterOf(e.homePos()).add(0, 1.08, 0);
+        float elapsed = ErgosphereLeviathan.TIDE_TICKS - left;
+        float in = Mth.clamp(elapsed / 15F, 0, 1) * Mth.clamp(left / 15F, 0, 1);
+        double spin = t * 0.12;
+        double arena = ErgosphereLeviathan.ARENA - 2;
+        for (int arm = 0; arm < 4; arm++) {
+            Vec3 prev = null;
+            for (double r = arena; r >= 0.8; r -= 0.9) {
+                double ang = spin + arm * Math.PI / 2 + r * 0.22;
+                Vec3 q = c.add(Math.cos(ang) * r, 0, Math.sin(ang) * r).subtract(origin);
+                if (prev != null) {
+                    boolean inner = r < ErgosphereLeviathan.TIDE_CORE_RADIUS;
+                    FxDraw.beam(pose.last(), glow, prev, q, (float) (0.25 + r * 0.04), inner ? 0xFF5AD8 : VOID, (int) (170 * in));
+                }
+                prev = q;
+            }
+        }
+        pose.pushPose();
+        Vec3 cc = c.subtract(origin);
+        pose.translate(cc.x, cc.y, cc.z);
+        for (int i = 0; i < 5; i++) {
+            float r = (float) (arena * (1 - ((elapsed * 0.012F + i / 5F) % 1F)));
+            FxDraw.ring(pose.last(), glow, Math.max(0, r - 0.6F), r, VOID, 0, (int) (150 * in));
+        }
+        FxDraw.ring(pose.last(), glow, 0, (float) ErgosphereLeviathan.TIDE_CORE_RADIUS, 0xFF5AD8, (int) (90 * in), (int) (200 * in));
+        pose.translate(0, 1.6, 0);
+        FxDraw.sphere(pose.last(), glow, 1.2F + 0.2F * Mth.sin(t * 0.4F), 0x1A0030, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT);
+        pose.popPose();
+        // 天井へ伸びる渦の柱（ねじれながら細くなる）
+        for (int i = 0; i < 6; i++) {
+            double ang = spin * 2 + i * Math.PI / 3;
+            Vec3 bottom = c.add(Math.cos(ang) * 2.2, 0.2, Math.sin(ang) * 2.2).subtract(origin);
+            Vec3 top = c.add(Math.cos(ang + 1.2) * 0.6, 14, Math.sin(ang + 1.2) * 0.6).subtract(origin);
+            FxDraw.beam(pose.last(), glow, bottom, top, 0.35F, VOID, (int) (160 * in));
+        }
+    }
+
+    /** 炉心の再点火で、炉心から放つ光の筋の数。 */
+    static final int REIGNITE_RAYS = 144;
+
+    /**
+     * 炉心の再点火: 炉心から部屋じゅうへ放射状の光の筋。筋はブロック（封じ込め柱など）で止まるので、柱の後ろに影ができる。
+     * 溜めているあいだは細く薄い筋がゆっくり回り（どこが陰になるか見える）、放つ瞬間に太く白い光の束が部屋を満たして消えていく。
+     * 炉心には光の球、床には広がる光の輪。
+     */
+    private static void reigniteRays(ErgosphereLeviathan e, Vec3 origin, float t, float left, PoseStack pose, VertexConsumer glow) {
+        Vec3 core = Vec3.atBottomCenterOf(e.homePos()).add(0, 2.0, 0);
+        float elapsed = ErgosphereLeviathan.REIGNITE_TICKS - left;
+        boolean charging = elapsed < ErgosphereLeviathan.REIGNITE_CHARGE;
+        float k = charging ? elapsed / ErgosphereLeviathan.REIGNITE_CHARGE
+                : Math.max(0, 1 - (elapsed - ErgosphereLeviathan.REIGNITE_CHARGE)
+                        / (ErgosphereLeviathan.REIGNITE_TICKS - ErgosphereLeviathan.REIGNITE_CHARGE));
+        double spin = charging ? t * 0.004 : 0;
+        for (int i = 0; i < REIGNITE_RAYS; i++) {
+            double a = Math.PI * 2 * i / REIGNITE_RAYS + spin;
+            for (double y : charging ? new double[] {0} : new double[] {-0.8, 0, 1.2}) {
+                Vec3 from = core.add(0, y, 0);
+                Vec3 to = from.add(Math.cos(a) * ErgosphereLeviathan.ARENA, 0, Math.sin(a) * ErgosphereLeviathan.ARENA);
+                net.minecraft.world.phys.HitResult hit = e.level().clip(new net.minecraft.world.level.ClipContext(from, to,
+                        net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, e));
+                Vec3 end = hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS ? to : hit.getLocation();
+                if (charging) {
+                    FxDraw.beam(pose.last(), glow, from.subtract(origin), end.subtract(origin), 0.04F + 0.1F * k, GOLD,
+                            (int) (30 + 110 * k * (0.7F + 0.3F * Mth.sin(t * 0.5F + i))));
+                } else {
+                    FxDraw.beam(pose.last(), glow, from.subtract(origin), end.subtract(origin), 0.25F + 0.9F * k, GOLD, (int) (200 * k));
+                    FxDraw.beam(pose.last(), glow, from.subtract(origin), end.subtract(origin), 0.1F + 0.35F * k, 0xFFFFFF, (int) (255 * k));
+                }
+            }
+        }
+        // 炉心の光の球と、床に広がる光の輪
+        pose.pushPose();
+        Vec3 c = core.subtract(origin);
+        pose.translate(c.x, c.y, c.z);
+        float sphere = charging ? 0.4F + 2.2F * k : 1.5F + 2.5F * (1 - k);
+        FxDraw.sphere(pose.last(), glow, sphere, charging ? GOLD : 0xFFFFFF, 0xF000F0);
+        if (!charging) {
+            float r = 2 + (ErgosphereLeviathan.ARENA - 2) * (1 - k);
+            pose.translate(0, -0.95, 0);
+            FxDraw.ring(pose.last(), glow, Math.max(0, r - 2.5F), r, GOLD, (int) (40 * k), (int) (220 * k));
+        }
+        pose.popPose();
+    }
+
     private static void renderMoves(ErgosphereLeviathan e, int state, int form, Vec3[] centers, Vec3 origin, float t, float partialTick,
                                     Quaternionf camera, PoseStack pose, MultiBufferSource buffers) {
         VertexConsumer glow = glow(buffers);
         float left = Math.max(0, e.stateTicks() - partialTick);
+        if (state == ErgosphereLeviathan.REIGNITE && !e.homePos().equals(net.minecraft.core.BlockPos.ZERO)) {
+            reigniteRays(e, origin, t, left, pose, glow);
+        }
+        if (state == ErgosphereLeviathan.RIFT && !e.homePos().equals(net.minecraft.core.BlockPos.ZERO)) {
+            riftWalls(e, origin, t, left, pose, glow);
+        }
+        if (state == ErgosphereLeviathan.TIDE && !e.homePos().equals(net.minecraft.core.BlockPos.ZERO)) {
+            tideVortex(e, origin, t, left, pose, glow);
+        }
         if (state == ErgosphereLeviathan.BREATH_FIRE) {
             Vec3 from = e.mouth().subtract(e.position());
             Vec3 to = e.aim().subtract(origin);
@@ -498,8 +636,8 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         if (state == ErgosphereLeviathan.JET) {
             Vec3 head = centers[0].subtract(origin);
             boolean firing = left <= ErgosphereLeviathan.JET_TICKS - ErgosphereLeviathan.JET_WINDUP;
-            for (Vec3 dir : ErgosphereLeviathan.jetDirections(e.jetYaw())) {
-                Vec3 end = head.add(dir.scale(ErgosphereLeviathan.JET_RANGE));
+            for (Vec3 dir : ErgosphereLeviathan.jetDirections(e.jetYaw(), e.jetPitch())) {
+                Vec3 end = head.add(dir.scale(ErgosphereLeviathan.JET_RANGE + 12));
                 if (firing) {
                     FxDraw.beam(pose.last(), glow, head, end, 1.6F + 0.2F * Mth.sin(t * 3), GOLD, 130);
                     FxDraw.beam(pose.last(), glow, head, end, 0.4F, 0xFFFFFF, 255);

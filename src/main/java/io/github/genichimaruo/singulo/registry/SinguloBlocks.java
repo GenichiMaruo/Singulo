@@ -232,6 +232,9 @@ public final class SinguloBlocks {
     public static final DeferredBlock<TransparentBlock> RUIN_GLASS = glass("ruin_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.STONE);
     public static final DeferredBlock<TransparentBlock> INTACT_RUIN_GLASS = glass("intact_ruin_glass", MapColor.NONE, 4.0F, 9.0F,
             SoundType.STONE);
+    /** 強化遺構ガラス（沈んだ炉心区画の封じ込め柱の窓。とても硬く、爆発では壊れない）。 */
+    public static final DeferredBlock<TransparentBlock> REINFORCED_RUIN_GLASS = glass("reinforced_ruin_glass", MapColor.NONE, 25.0F,
+            1200.0F, SoundType.GLASS);
     public static final DeferredBlock<Block> RUIN_LAMP = BLOCKS.registerSimpleBlock("ruin_lamp",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.GLASS).lightLevel(s -> 12));
     public static final DeferredBlock<Block> RUIN_LAMP_AMBER = ruinLamp("ruin_lamp_amber");

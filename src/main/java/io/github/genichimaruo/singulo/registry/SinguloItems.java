@@ -243,6 +243,7 @@ public final class SinguloItems {
         block(SinguloBlocks.BLACK_STAR_GLASS, 1);
         block(SinguloBlocks.RUIN_GLASS, 1);
         block(SinguloBlocks.INTACT_RUIN_GLASS, 1);
+        block(SinguloBlocks.REINFORCED_RUIN_GLASS, 5);
         block(SinguloBlocks.RUIN_CACHE, 1);
         block(SinguloBlocks.RUIN_GUARD_DOCK, 1);
         block(SinguloBlocks.SEAL_CONSOLE, 1);

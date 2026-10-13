@@ -795,6 +795,10 @@
     "source": "Reactor Stabilizer Coil",
     "translation": "炉心稳定线圈"
   },
+  "block.singulo.reinforced_ruin_glass": {
+    "source": "Reinforced Ruin Glass",
+    "translation": "强化废墟玻璃"
+  },
   "block.singulo.rogue_black_hole": {
     "source": "Rogue Black Hole",
     "translation": "流浪黑洞"
@@ -1826,6 +1830,10 @@
   "desc.singulo.record_fragment": {
     "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
     "translation": "古代的存储介质：用光把记录刻在玻璃之中。在档案终端读取后会加入手册。"
+  },
+  "desc.singulo.reinforced_ruin_glass": {
+    "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
+    "translation": "嵌在沉没的炉心区封锁柱上的窗，用来承受反应炉的冲击。非常坚硬，爆炸也无法破坏。"
   },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
@@ -3155,6 +3163,22 @@
     "source": "The Leviathan shudders. Its reactor-plate scales burst away, baring a skeleton of light",
     "translation": "巨蛇浑身颤抖。炉壳的鳞片四散弹飞，露出了光之骨骼"
   },
+  "gui.singulo.leviathan.quake": {
+    "source": "The Leviathan rises and curls up... Jump over the shockwaves!",
+    "translation": "巨蛇高高升起，蜷起身体……冲击波到来时跳起来！"
+  },
+  "gui.singulo.leviathan.reignite": {
+    "source": "The dead core is waking...",
+    "translation": "停止的炉心之涡正在苏醒……"
+  },
+  "gui.singulo.leviathan.reignite_hint": {
+    "source": "Hide behind a containment pillar!",
+    "translation": "躲到封锁柱后面！"
+  },
+  "gui.singulo.leviathan.rift": {
+    "source": "Lines of light cross the floor... Get off them!",
+    "translation": "光线划过地面……快离开线上！"
+  },
   "gui.singulo.leviathan.submerge": {
     "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
     "translation": "巨蛇潜入了炉心的漩涡。漩涡扩张，光被吸了进去……"
@@ -3162,6 +3186,10 @@
   "gui.singulo.leviathan.swallow": {
     "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
     "translation": "——地板裂开，巨大的颚将它一口吞下。能层巨蛇现身了"
+  },
+  "gui.singulo.leviathan.tide": {
+    "source": "The core vortex opens and drags everything in... Run against the pull!",
+    "translation": "炉心之涡张开，吞噬一切……逆着引力向外跑！"
   },
   "gui.singulo.make_free.off": {
     "source": "Skips recipes without ingredients",

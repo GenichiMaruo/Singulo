@@ -795,6 +795,10 @@
     "source": "Reactor Stabilizer Coil",
     "translation": "노심 안정화 코일"
   },
+  "block.singulo.reinforced_ruin_glass": {
+    "source": "Reinforced Ruin Glass",
+    "translation": "강화 폐허 유리"
+  },
   "block.singulo.rogue_black_hole": {
     "source": "Rogue Black Hole",
     "translation": "떠돌이 블랙홀"
@@ -1826,6 +1830,10 @@
   "desc.singulo.record_fragment": {
     "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
     "translation": "빛으로 유리 속에 기록을 새긴 고대 문명의 기록 매체입니다. 기록 보관 단말기에서 읽어 내면 안내서에 추가됩니다."
+  },
+  "desc.singulo.reinforced_ruin_glass": {
+    "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
+    "translation": "가라앉은 노심 구획의 봉쇄 기둥에 끼워진, 반응로의 충격을 견디기 위한 창입니다. 매우 단단하며 폭발로도 부서지지 않습니다."
   },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
@@ -3155,6 +3163,22 @@
     "source": "The Leviathan shudders. Its reactor-plate scales burst away, baring a skeleton of light",
     "translation": "거대 뱀이 몸을 떱니다. 반응로 외피 비늘이 튕겨 나가고 빛의 골격이 드러났습니다"
   },
+  "gui.singulo.leviathan.quake": {
+    "source": "The Leviathan rises and curls up... Jump over the shockwaves!",
+    "translation": "거대 뱀이 높이 솟아 몸을 웅크렸습니다…… 충격파가 오면 뛰어오르세요!"
+  },
+  "gui.singulo.leviathan.reignite": {
+    "source": "The dead core is waking...",
+    "translation": "멈춘 노심의 소용돌이가 깨어나고 있습니다……"
+  },
+  "gui.singulo.leviathan.reignite_hint": {
+    "source": "Hide behind a containment pillar!",
+    "translation": "봉쇄 기둥 뒤에 숨으세요!"
+  },
+  "gui.singulo.leviathan.rift": {
+    "source": "Lines of light cross the floor... Get off them!",
+    "translation": "바닥에 빛의 선이 그어집니다…… 선 위에서 벗어나세요!"
+  },
   "gui.singulo.leviathan.submerge": {
     "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
     "translation": "거대 뱀이 노심의 소용돌이로 잠수합니다. 소용돌이가 넓어지며 빛을 빨아들입니다……"
@@ -3162,6 +3186,10 @@
   "gui.singulo.leviathan.swallow": {
     "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
     "translation": "――바닥이 갈라지고 거대한 턱이 그것을 통째로 삼켰습니다. 에르고구의 거대 뱀이 모습을 드러냈습니다"
+  },
+  "gui.singulo.leviathan.tide": {
+    "source": "The core vortex opens and drags everything in... Run against the pull!",
+    "translation": "노심의 소용돌이가 열려 모든 것을 끌어들입니다…… 흐름을 거슬러 바깥으로 달리세요!"
   },
   "gui.singulo.make_free.off": {
     "source": "Skips recipes without ingredients",

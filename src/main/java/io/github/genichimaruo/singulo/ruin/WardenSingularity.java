@@ -22,6 +22,8 @@ public class WardenSingularity extends Entity {
     public static final int LIFETIME = 100;
     public static final double RADIUS = 3.5;
     public static final float DAMAGE = 5.0F;
+    /** 通常の強さでのダメージの倍率（防具を貫くので低め。ハードモードは1倍）。 */
+    public static final float NORMAL_DAMAGE_FACTOR = 0.4F;
     /** 育つ・しぼむのにかける tick。 */
     public static final int GROW = 10;
     /**
@@ -87,6 +89,9 @@ public class WardenSingularity extends Entity {
             if (tickCount % 10 == 0) {
                 if (owner instanceof HorizonWarden w) {
                     w.hurtWith("singularity", e, SinguloDamageTypes.tidal(level, owner), DAMAGE);
+                } else if (owner instanceof RuinBoss b) {
+                    // エルゴ球の大蛇（龍の姿）の特異点
+                    b.hurtWith("singularity", e, SinguloDamageTypes.tidal(level, owner), DAMAGE * (hard ? 1F : NORMAL_DAMAGE_FACTOR));
                 } else {
                     e.hurt(SinguloDamageTypes.tidal(level, owner), DAMAGE);
                 }

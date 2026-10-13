@@ -341,6 +341,8 @@ DESC = {
     '無垢の遺構導光板': ('淡く光る筋の入った白いパネル。とても硬く、鉄以上のツルハシで掘る。', 'A white panel with a softly glowing strip. Very hard; needs an iron pickaxe or better.'),
     '割れた遺構ガラス': ('割れたまま残った旧文明の窓。遺構パネルと同じくらい硬く、爆発にも強い。', 'A cracked ancient window, as tough and blast-resistant as a ruin panel.'),
     '遺構ガラス': ('割れずに残った旧文明の窓。遺構パネルと同じくらい硬く、爆発にも強い。', 'An intact ancient window, as tough and blast-resistant as a ruin panel.'),
+    '強化遺構ガラス': ('沈んだ炉心区画の封じ込め柱にはめ込まれた、炉の衝撃に耐えるための窓。とても硬く、爆発でも壊れない。',
+                'A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor\'s blasts. Very hard and blast-proof.'),
     '遺構の照明': ('今も光る旧文明の照明。', 'An ancient lamp that still glows.'),
     '遺構保管庫': ('遺構の回収物が入った保管庫。空になってから数日で中身が戻る（置き直したものは戻らない）。ホッパーやパイプでは取り出せない。',
               'Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.'),

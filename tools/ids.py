@@ -273,6 +273,7 @@ MOD = {
     '無垢の遺構導光板': ('pristine_ruin_light', 'Pristine Ruin Light Strip', 'ruin_block'),
     '割れた遺構ガラス': ('ruin_glass', 'Broken Ruin Glass', 'ruin_glass'),
     '遺構ガラス': ('intact_ruin_glass', 'Ruin Glass', 'ruin_glass'),
+    '強化遺構ガラス': ('reinforced_ruin_glass', 'Reinforced Ruin Glass', 'ruin_glass'),
     '遺構の照明': ('ruin_lamp', 'Ruin Lamp', 'ruin_block'),
     '遺構保管庫': ('ruin_cache', 'Ruin Cache', 'ruin_block'),
     '警備機ドック': ('ruin_guard_dock', 'Guard Dock', 'ruin_block'),

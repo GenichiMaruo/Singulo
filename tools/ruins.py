@@ -23,6 +23,7 @@ PRISTINE_VARIANTS = tuple(f'{MODID}:{v}' for v in ('pristine_ruin_panel', 'prist
 PRISTINE_PILLAR = f'{MODID}:pristine_ruin_pillar'
 PRISTINE_LIGHT = f'{MODID}:pristine_ruin_light'
 GLASS = f'{MODID}:intact_ruin_glass'
+REINFORCED_GLASS = f'{MODID}:reinforced_ruin_glass'
 BROKEN_GLASS = f'{MODID}:ruin_glass'
 LAMP = f'{MODID}:ruin_lamp'
 CACHE = f'{MODID}:ruin_cache'
@@ -709,6 +710,7 @@ def sunken_reactor():
         a = math.pi * 2 * k / 6
         x, z = round(cx + math.cos(a) * 13), round(cz + math.sin(a) * 13)
         b.fill(x, FLOOR + 1, z, x, FLOOR + 11, z, PRISTINE_PILLAR)
+        b.set(x, FLOOR + 2, z, REINFORCED_GLASS)            # 床から2段目は強化ガラス（陰に隠れても、炉心の光が透けて見える）
         b.set(x, FLOOR + 6, z, PRISTINE_LIGHT)
         b.set(x, FLOOR + 12, z, LAMP)
         top = next((y for y in range(FLOOR + 13, 36) if b.get(x, y, z) not in (None, AIR)), 35)
