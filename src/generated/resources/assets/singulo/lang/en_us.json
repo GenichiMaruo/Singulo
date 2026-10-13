@@ -1390,7 +1390,7 @@
   "message.singulo.gravity_receiver.status": "Gravity panels active: %s / %s (%s FE/t each)",
   "message.singulo.hidden_records_complete": "You have read every sealed record",
   "message.singulo.hydrogen_leak": "Leaking hydrogen ignited!",
-  "message.singulo.impact_generator.status": "Stored %s / %s FE, gravity panels active: %s / %s",
+  "message.singulo.impact_generator.status": "Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)",
   "message.singulo.keraunos.busy": "Charging or cooling down",
   "message.singulo.keraunos.fire": "Discharge! (%s / %s FE stored)",
   "message.singulo.keraunos.mode.auto": "Auto: fires whenever it is charged",

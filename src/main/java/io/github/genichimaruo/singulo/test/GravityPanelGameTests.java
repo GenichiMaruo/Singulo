@@ -178,6 +178,35 @@ public final class GravityPanelGameTests {
                 "ケーブルの先へ送られない: kiln=" + kiln.energy().getEnergyStored() + " gen=" + be.stored()));
     }
 
+    /** 衝撃発電パネルが外へ出せるのは、何面につないでも、取り出される分と合わせて1 tick に PUSH_PER_TICK まで。 */
+    @GameTest(template = EMPTY, timeoutTicks = 40)
+    public static void impactGeneratorOutputIsSharedAcrossFaces(GameTestHelper helper) {
+        BlockPos gen = new BlockPos(3, 3, 3);
+        helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
+        io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity be = helper.getBlockEntity(gen);
+        be.absorb(10);
+        java.util.List<io.github.genichimaruo.singulo.machine.MachineBlockEntity> sinks = new java.util.ArrayList<>();
+        for (Direction d : Direction.values()) {
+            helper.setBlock(gen.relative(d), SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.KILN).get());
+            sinks.add(helper.getBlockEntity(gen.relative(d)));
+        }
+        long before = be.stored();
+        GravityReceiverBlockEntity.serverTick(helper.getLevel(), helper.absolutePos(gen), helper.getBlockState(gen), be);
+        long sent = sinks.stream().mapToLong(s -> s.energy().getEnergyStored()).sum();
+        helper.assertTrue(sent == io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity.PUSH_PER_TICK,
+                "6面で1 tick に出した量が上限と違う: " + sent);
+        helper.assertTrue(before - be.stored() == sent, "出した量と減った量が合わない");
+        helper.assertTrue(be.output().extractEnergy(1_000, false) == 0, "同じ tick に、上限を超えて取り出せる");
+        // そのあとも自分の tick で送り続けるが、1 tick あたりは上限まで（3 tick で上限の3倍まで）
+        long afterFirst = be.stored();
+        helper.runAfterDelay(3, () -> {
+            long next = afterFirst - be.stored();
+            helper.assertTrue(next > 0 && next <= 3L * io.github.genichimaruo.singulo.gravity.ImpactGeneratorBlockEntity.PUSH_PER_TICK,
+                    "続く3 tick に出した量が上限と違う: " + next);
+            helper.succeed();
+        });
+    }
+
     /** 同じ種類のパネルどうしは見た目がつながり、ちがう種類とはつながらない。 */
     @GameTest(template = EMPTY)
     public static void panelsJoinOnlyTheSameKind(GameTestHelper helper) {

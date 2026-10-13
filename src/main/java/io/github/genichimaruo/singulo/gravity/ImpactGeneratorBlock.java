@@ -65,7 +65,7 @@ public class ImpactGeneratorBlock extends GravityReceiverBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ImpactGeneratorBlockEntity be) {
             player.displayClientMessage(Component.translatable("message.singulo.impact_generator.status",
-                    be.stored(), ImpactGeneratorBlockEntity.CAPACITY, be.activePanels(), be.panels()), true);
+                    be.stored(), ImpactGeneratorBlockEntity.CAPACITY, be.activePanels(), be.panels(), be.supplyingPanels(), be.surplus()), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

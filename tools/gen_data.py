@@ -467,7 +467,8 @@ UI_LANG = {
     'message.singulo.stabilizer.already': ('この触媒はすでに安定化してある', 'This catalyst is already stabilized'),
     'message.singulo.stabilizer.done': ('触媒を安定化した（残りの寿命が2倍になった）', 'Catalyst stabilized: remaining life doubled'),
     'message.singulo.gravity_receiver.status': ('重力パネル %s / %s 枚が稼働中（1枚あたり %s FE/t）', 'Gravity panels active: %s / %s (%s FE/t each)'),
-    'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中', 'Stored %s / %s FE, gravity panels active: %s / %s'),
+    'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中（このパネルが %s 枚分を払い、ケーブルへ出せるのは %s FE）',
+                                                'Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)'),
     'message.singulo.deep_sea_collector.idle': ('水深が足りない（真上に16ブロック以上の水が必要）', 'Not deep enough: needs 16+ blocks of water above'),
     'message.singulo.deep_sea_collector.rate': ('水圧 %s%%: 約%s秒ごとに高圧結晶が1個できる', 'Pressure %s%%: one Pressure Crystal every %ss'),
     'message.singulo.void_collector.idle': ('ジ・エンドの、真下が奈落まで吹き抜けている場所でしか動かない', 'Works only in the End, over open void'),
@@ -2285,6 +2286,8 @@ def craters_data():
     """
     隕石クレーター（地表の小さな構造物）。型紙は使わず、Java（MeteorCraterPiece）がその場の地面の高さに合わせて
     すり鉢・縁・飛び散った土を描き込む（地形を四角く削らないよう、地形の調整はしない）。
+    0.4.0 までの型紙（craters/meteor_crater_{a,b,c}.nbt）は、保存済みのワールドの構造が参照するので、
+    src/main/resources に残してある（ここでは作らない）。
     """
     write_json(DATA / 'tags' / 'worldgen' / 'biome' / 'has_structure' / 'meteor_crater.json', {'values': CRATER_BIOMES})
     write_json(DATA / 'worldgen' / 'structure' / 'meteor_crater.json', {

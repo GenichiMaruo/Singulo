@@ -107,12 +107,19 @@ public class MeteorCraterPiece extends StructurePiece {
             BoundingBox chunkBox, ChunkPos chunkPos, BlockPos pivot) {
         int cx = center.getX();
         int cz = center.getZ();
+        // 描いたすり鉢の底の高さ（列ごと）。掘ったあとに高さの地図を読み直すと、出来上がったチャンクでは
+        // 生成用の高さ（WG）が掘る前のまま残っていて、底の上に浮いたものを置いてしまうので、自分で覚えておく。
+        // 部品は同時に別のチャンクで描かれることがあるので、この呼び出しの中だけで持つ
+        java.util.Map<Long, Integer> floors = new java.util.HashMap<>();
         for (int x = Math.max(chunkBox.minX(), cx - REACH); x <= Math.min(chunkBox.maxX(), cx + REACH); x++) {
             for (int z = Math.max(chunkBox.minZ(), cz - REACH); z <= Math.min(chunkBox.maxZ(), cz + REACH); z++) {
-                column(level, x, z);
+                int floor = column(level, x, z);
+                if (floor != Integer.MIN_VALUE) {
+                    floors.put(BlockPos.asLong(x, 0, z), floor);
+                }
             }
         }
-        meteor(level, chunkBox);
+        meteor(level, chunkBox, floors);
     }
 
     // ------------------------------------------------------------------ 地面
@@ -148,7 +155,8 @@ public class MeteorCraterPiece extends StructurePiece {
 
     /** その列の、地面のいちばん上のブロックの高さ（草花や木は飛ばす）。上が水なら Integer.MIN_VALUE。 */
     private static int ground(WorldGenLevel level, int x, int z) {
-        // 生成中は WG の高さ。出来上がったチャンク（/place など）では WG の高さが古いことがあるので、今の高さと大きいほう
+        // 生成中は WG の高さ、出来上がったチャンク（/place など）では今の高さが正しい。どちらかが古くなっていても、
+        // 大きいほうから下へ、地面の上に乗っているだけのもの（空気を含む）を飛ばして探すので、本当の地面に行き着く
         int y = Math.max(level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z), level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z)) - 1;
         int bottom = level.getMinBuildHeight();
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(x, y, z);
@@ -165,7 +173,8 @@ public class MeteorCraterPiece extends StructurePiece {
         return Integer.MIN_VALUE;
     }
 
-    private void column(WorldGenLevel level, int x, int z) {
+    /** 1列を描く。すり鉢の中なら底の高さ、それ以外は Integer.MIN_VALUE。 */
+    private int column(WorldGenLevel level, int x, int z) {
         double dx = x + 0.5 - (center.getX() + 0.5);
         double dz = z + 0.5 - (center.getZ() + 0.5);
         double d = Math.sqrt(dx * dx + dz * dz);
@@ -174,27 +183,28 @@ public class MeteorCraterPiece extends StructurePiece {
         double ray = rays(theta);
         double reach = r + RIM + 2.5 + 3.0 * ray;
         if (d >= reach) {
-            return;
+            return Integer.MIN_VALUE;
         }
         int g = ground(level, x, z);
         if (g == Integer.MIN_VALUE) {
-            return;
+            return Integer.MIN_VALUE;
         }
         RandomSource rnd = random(x, 0, z, 1);
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(x, g, z);
         BlockState top = level.getBlockState(p);
         Soil soil = soil(top);
         if (d < r) {
-            bowl(level, x, z, g, d / r, rnd);
+            return bowl(level, x, z, g, d / r, rnd);
         } else if (d < r + RIM) {
             rim(level, x, z, g, (d - r) / RIM, theta, top, soil, rnd);
         } else {
             ejecta(level, x, z, g, (d - r - RIM) / (reach - r - RIM), ray, top, soil, rnd);
         }
+        return Integer.MIN_VALUE;
     }
 
-    /** すり鉢の底（k は縁までの割合 0〜1）。 */
-    private void bowl(WorldGenLevel level, int x, int z, int g, double k, RandomSource rnd) {
+    /** すり鉢の底（k は縁までの割合 0〜1）。底の高さを返す。 */
+    private int bowl(WorldGenLevel level, int x, int z, int g, double k, RandomSource rnd) {
         double depth = 3.0 * (1 - k * k) + 0.4 + (rnd.nextDouble() - 0.5) * 0.5;
         // 縁に近いほど、その列の地面の高さへ寄せる（斜面でも切り立った壁にしない）
         double w = Mth.clamp((k - 0.5) / 0.5, 0, 1);
@@ -215,6 +225,7 @@ public class MeteorCraterPiece extends StructurePiece {
                 level.setBlock(p, rnd.nextInt(3) == 0 ? Blocks.TUFF.defaultBlockState() : Blocks.STONE.defaultBlockState(), SET);
             }
         }
+        return fy;
     }
 
     /** 底の材料: 中心ほど焼けて溶けた岩、外側は砂利と凝灰岩（土ではないので、木は生えない）。 */
@@ -349,6 +360,11 @@ public class MeteorCraterPiece extends StructurePiece {
 
     // ------------------------------------------------------------------ 隕石
 
+    /** その場所が隕石の形の中か（1 以下なら中）。 */
+    public double insideMeteor(BlockPos p) {
+        return inside(p.getX(), p.getY(), p.getZ());
+    }
+
     /** 隕石の形の中か（1 以下なら中。0.45 より内側は芯）。 */
     private double inside(int x, int y, int z) {
         double rx = meteorSize * 1.1;
@@ -363,7 +379,7 @@ public class MeteorCraterPiece extends StructurePiece {
         return (qx / rx) * (qx / rx) + (qy / ry) * (qy / ry) + (pz / rz) * (pz / rz) - bump;
     }
 
-    private void meteor(WorldGenLevel level, BoundingBox chunkBox) {
+    private void meteor(WorldGenLevel level, BoundingBox chunkBox, java.util.Map<Long, Integer> floors) {
         int span = (int) Math.ceil(meteorSize * 1.1) + 3;
         BlockPos core = corePos();
         BlockState crust = SinguloBlocks.METEORITE_CRUST.get().defaultBlockState().setValue(MeteoriteCrustBlock.NATURAL, true);
@@ -401,11 +417,11 @@ public class MeteorCraterPiece extends StructurePiece {
                     continue;
                 }
                 double dd = Math.hypot(x + 0.5 - mx, z + 0.5 - mz);
-                if (dd < 1.5 || dd > 3.6) {
+                Integer floorY = floors.get(BlockPos.asLong(x, 0, z));
+                if (dd < 1.5 || dd > 3.6 || floorY == null) {
                     continue;
                 }
-                int top = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z) - 1;
-                p.set(x, top, z);
+                p.set(x, floorY, z);
                 BlockState floor = level.getBlockState(p);
                 if (floor.is(SinguloBlocks.METEORITE_CRUST.get()) || floor.is(SinguloBlocks.METEORIC_IRON_CHUNK.get())
                         || floor.is(SinguloBlocks.STARDUST_CLUSTER.get()) || floor.is(SinguloBlocks.METEORITE_CORE.get())) {

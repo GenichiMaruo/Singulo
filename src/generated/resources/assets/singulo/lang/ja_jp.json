@@ -1390,7 +1390,7 @@
   "message.singulo.gravity_receiver.status": "重力パネル %s / %s 枚が稼働中（1枚あたり %s FE/t）",
   "message.singulo.hidden_records_complete": "封印された記録をすべて読み終えた",
   "message.singulo.hydrogen_leak": "水素が漏れて引火した！",
-  "message.singulo.impact_generator.status": "蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中",
+  "message.singulo.impact_generator.status": "蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中（このパネルが %s 枚分を払い、ケーブルへ出せるのは %s FE）",
   "message.singulo.keraunos.busy": "放電の準備をしている",
   "message.singulo.keraunos.fire": "放電！（蓄電 %s / %s FE）",
   "message.singulo.keraunos.mode.auto": "自動: 電力がたまると自動で発射する",

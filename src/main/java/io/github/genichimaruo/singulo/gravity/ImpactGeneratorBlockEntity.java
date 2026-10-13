@@ -15,14 +15,17 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * 既定（パネル1枚 40 FE/t）では、8ブロックほどの落下1回で、2枚の重力パネルを5秒ほど働かせられる。
  * <p>
  * ケーブルなど（受電器以外）の電力を受け取る装置が隣にあれば、自分が働かせているパネルの RESERVE_TICKS tick 分を残して、
- * 余りを毎tick PUSH_PER_TICK まで送り出す。ケーブルから電力を受け取ることはない。
+ * 余りを送り出す。外へ出せるのは、何面につないでも、隣から取り出される分と合わせて1 tick に PUSH_PER_TICK まで。
+ * ケーブルから電力を受け取ることはない。
+ * <p>
+ * 6枚以上を働かせていると、残す分（パネル1枚あたり 4,000 FE）が容量を超えるので、外へは出さない。
  */
 public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
     public static final long ENERGY_PER_BLOCK = 1_000;
     public static final long CAPACITY = 20_000;
     /** これより短い落下では発電しない（歩いて段差を降りたくらい）。 */
     public static final float MIN_FALL = 1.0F;
-    /** 1 tick に外へ送り出せる量。 */
+    /** 1 tick に外へ出せる量（すべての面と、隣から取り出される分の合計）。 */
     public static final int PUSH_PER_TICK = 1_000;
     /** 働かせているパネルのために残しておく時間（tick）。 */
     public static final int RESERVE_TICKS = 100;
@@ -36,10 +39,9 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
 
         @Override
         public int extractEnergy(int amount, boolean simulate) {
-            int take = (int) Math.max(0, Math.min(amount, surplus()));
+            int take = (int) Math.max(0, Math.min(amount, outputLeft()));
             if (!simulate && take > 0) {
-                stored -= take;
-                setChanged();
+                spend(take);
             }
             return take;
         }
@@ -65,6 +67,10 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
         }
     };
 
+    /** 外へ出した量を数えている tick と、その tick に出した量。 */
+    private long outputTick = Long.MIN_VALUE;
+    private long outputUsed;
+
     public ImpactGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.IMPACT_GENERATOR.get(), pos, state);
     }
@@ -84,10 +90,27 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
         return Math.max(0, stored - reserve);
     }
 
+    /** この tick にまだ外へ出せる量（パネルのために残す分と、1 tick の上限の小さいほう）。 */
+    public long outputLeft() {
+        long now = level == null ? 0 : level.getGameTime();
+        if (now != outputTick) {
+            outputTick = now;
+            outputUsed = 0;
+        }
+        return Math.max(0, Math.min(surplus(), PUSH_PER_TICK - outputUsed));
+    }
+
+    private void spend(long amount) {
+        outputLeft();
+        stored -= amount;
+        outputUsed += amount;
+        setChanged();
+    }
+
     @Override
     protected void afterDistribute(Level level) {
         for (Direction dir : Direction.values()) {
-            long room = Math.min(surplus(), PUSH_PER_TICK);
+            long room = outputLeft();
             if (room <= 0) {
                 return;
             }
@@ -97,10 +120,9 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
             }
             IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, n, dir.getOpposite());
             if (target != null && target.canReceive()) {
-                long sent = LongEnergyStorage.receive(target, room, false);
+                long sent = Math.min(room, LongEnergyStorage.receive(target, room, false));
                 if (sent > 0) {
-                    stored -= sent;
-                    setChanged();
+                    spend(sent);
                 }
             }
         }

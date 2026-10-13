@@ -5564,8 +5564,8 @@
     "translation": "洩漏的氫氣被點燃！"
   },
   "message.singulo.impact_generator.status": {
-    "source": "Stored %s / %s FE, gravity panels active: %s / %s",
-    "translation": "已儲存 %s / %s FE，正在運作的重力面板：%s / %s"
+    "source": "Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)",
+    "translation": "已儲存 %s / %s FE，正在運作的重力面板：%s / %s（本面板支付其中 %s 塊，可向纜線輸出 %s FE）"
   },
   "message.singulo.keraunos.busy": {
     "source": "Charging or cooling down",

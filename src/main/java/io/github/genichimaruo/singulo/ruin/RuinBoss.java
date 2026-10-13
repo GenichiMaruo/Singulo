@@ -195,15 +195,28 @@ public abstract class RuinBoss extends Monster {
         return BossEvent.BossBarColor.PURPLE;
     }
 
-    /** 覚醒した個体の経験値。 */
-    protected int awakenedXp() {
-        return xpReward * 3;
+    /** 覚醒する前の経験値（初めて使うときに、作ったときの値を覚える）。 */
+    private int normalXp = -1;
+
+    private int normalXp() {
+        if (normalXp < 0) {
+            normalXp = xpReward;
+        }
+        return normalXp;
     }
 
-    /** 倒したときの経験値。ドロップと同じく、挑戦者の人数分（設定で1人分にもできる）。 */
+    /**
+     * 覚醒した個体の経験値。いまの値ではなく覚醒する前の値から決めるので、すでに覚醒した個体へ
+     * データを当て直しても（/data merge など）増えない。
+     */
+    protected int awakenedXp() {
+        return normalXp() * 3;
+    }
+
+    /** 倒したときの経験値。ドロップと同じく、挑戦者の人数分（設定で1人分にもできる）。設定 bossXpMultiplier を掛ける。 */
     @Override
     protected int getBaseExperienceReward() {
-        return xpReward * BossScaling.lootRolls(rewardParticipants());
+        return BossScaling.xp(xpReward, rewardParticipants());
     }
 
     /** 覚醒した個体を倒したときの追加の報酬（アイテムID と個数）。通常のドロップに加えて出る。 */

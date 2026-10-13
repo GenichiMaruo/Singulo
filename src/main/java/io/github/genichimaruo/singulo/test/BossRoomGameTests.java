@@ -148,7 +148,32 @@ public final class BossRoomGameTests {
         });
     }
 
-    /** 記録保管室から出ない: 押し出されると核の上へ戻り、部屋の外の相手の背後へは跳ばない。 */
+    /** 覚醒した番人の経験値は、データを当て直しても（/data merge など）増えない。読み込み直した個体とも同じ。 */
+    @GameTest(template = EMPTY, batch = BATCH + "_29")
+    public static void awakenedXpSurvivesDataMerge(GameTestHelper helper) {
+        EchoSentinel s = io.github.genichimaruo.singulo.registry.SinguloEntities.ECHO_SENTINEL.get().create(helper.getLevel());
+        s.makeAwakened();
+        int before = s.getExperienceReward(helper.getLevel(), null);
+        net.minecraft.nbt.CompoundTag tag = s.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        tag.putBoolean("Glowing", true);
+        try {
+            new net.minecraft.server.commands.data.EntityDataAccessor(s).setData(tag);
+            new net.minecraft.server.commands.data.EntityDataAccessor(s).setData(tag);
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        int after = s.getExperienceReward(helper.getLevel(), null);
+        EchoSentinel cold = io.github.genichimaruo.singulo.registry.SinguloEntities.ECHO_SENTINEL.get().create(helper.getLevel());
+        cold.load(tag);
+        int reloaded = cold.getExperienceReward(helper.getLevel(), null);
+        helper.assertTrue(before == after && after == reloaded, "当て直すと経験値が変わる: " + before + " → " + after + "（読み込み直し " + reloaded + "）");
+        helper.assertTrue(before == 500 * 3, "覚醒した残響の番人の経験値が設計と違う: " + before);
+        s.discard();
+        cold.discard();
+        helper.succeed();
+    }
+
+    /** 記録保管室から出ない:押し出されると核の上へ戻り、部屋の外の相手の背後へは跳ばない。 */
     @GameTest(template = EMPTY, batch = BATCH + "_28", timeoutTicks = 60)
     public static void sentinelStaysInItsRoom(GameTestHelper helper) {
         GuardianCoreBlockEntity core = room(helper, "research_building", VAULT, CORE);

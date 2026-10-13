@@ -95,39 +95,67 @@ public class MeteorCompassItem extends SinguloItem {
         }
         Structure crater = holder.get().value();
         var state = level.getChunkSource().getGeneratorState();
+        BlockPos best = null;
         for (StructurePlacement placement : state.getPlacementsForStructure(holder.get())) {
             if (!(placement instanceof RandomSpreadStructurePlacement spread)) {
                 continue;
             }
-            int spacing = spread.spacing();
-            int cellX = Math.floorDiv(from.getX() >> 4, spacing);
-            int cellZ = Math.floorDiv(from.getZ() >> 4, spacing);
-            BlockPos best = null;
-            double bestDist = Double.MAX_VALUE;
-            for (int ring = 0; ring <= SEARCH_CELLS; ring++) {
-                for (int i = -ring; i <= ring; i++) {
-                    for (int j = -ring; j <= ring; j++) {
-                        if (Math.max(Math.abs(i), Math.abs(j)) != ring) {
-                            continue;
-                        }
-                        ChunkPos cp = spread.getPotentialStructureChunk(state.getLevelSeed(), (cellX + i) * spacing, (cellZ + j) * spacing);
-                        BlockPos core = core(level, cp, crater, spread);
-                        if (core == null || MeteorCores.mined(level, core)) {
-                            continue;
-                        }
-                        double dist = core.distSqr(new BlockPos(from.getX(), core.getY(), from.getZ()));
-                        if (dist < bestDist) {
-                            bestDist = dist;
-                            best = core;
-                        }
+            BlockPos found = nearestInCells(from, spread.spacing(), SEARCH_CELLS, (cx, cz) -> {
+                ChunkPos cp = spread.getPotentialStructureChunk(state.getLevelSeed(), cx * spread.spacing(), cz * spread.spacing());
+                BlockPos core = core(level, cp, crater, spread);
+                return core == null || MeteorCores.mined(level, core) ? null : core;
+            });
+            if (found != null && (best == null || horizontal(from, found) < horizontal(from, best))) {
+                best = found;
+            }
+        }
+        return best;
+    }
+
+    /** 区画 (cx, cz) にある候補（なければ null）。 */
+    @FunctionalInterface
+    public interface CellLookup {
+        BlockPos at(int cx, int cz);
+    }
+
+    /**
+     * 配置の区画（一辺 spacing チャンク）を近い輪から調べ、水平距離がいちばん近い候補を返す。区画の輪の順は距離の順と同じではない
+     * （区画の端にいると、隣の区画の候補のほうが近いことがある）ので、見つかったあとも、その距離より近い所を含みうる輪は調べる。
+     * 輪 r の区画は、どこも今いる区画から (r - 1) 区画ぶん以上離れている。
+     */
+    public static BlockPos nearestInCells(BlockPos from, int spacing, int maxRing, CellLookup lookup) {
+        int cellX = Math.floorDiv(from.getX() >> 4, spacing);
+        int cellZ = Math.floorDiv(from.getZ() >> 4, spacing);
+        double cell = spacing * 16.0;
+        BlockPos best = null;
+        double bestDist = Double.MAX_VALUE;
+        for (int ring = 0; ring <= maxRing; ring++) {
+            // 核は区画の中のチャンクから1ブロックほどはみ出しうるので、少し余裕を見る
+            if (best != null && (ring - 1) * cell - 2 >= bestDist) {
+                break;
+            }
+            for (int i = -ring; i <= ring; i++) {
+                for (int j = -ring; j <= ring; j++) {
+                    if (Math.max(Math.abs(i), Math.abs(j)) != ring) {
+                        continue;
                     }
-                }
-                if (best != null) {
-                    return best;
+                    BlockPos found = lookup.at(cellX + i, cellZ + j);
+                    if (found == null) {
+                        continue;
+                    }
+                    double dist = horizontal(from, found);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        best = found;
+                    }
                 }
             }
         }
-        return null;
+        return best;
+    }
+
+    private static double horizontal(BlockPos a, BlockPos b) {
+        return Math.hypot(a.getX() - b.getX(), a.getZ() - b.getZ());
     }
 
     /** そのチャンクから始まるクレーターの核の場所（なければ null）。 */

@@ -90,7 +90,8 @@ SERVER = [
     ('ruins', 'bossHealthPerPlayer', '0.5', '0.0〜4.0', '挑戦者が1人増えるごとに増えるボスの体力（もとの体力に対する割合）'),
     ('ruins', 'bossPacePerPlayer', '0.08', '0.0〜0.5', '挑戦者が1人増えるごとに、ボスの技の間が縮む割合（0.6倍まで）'),
     ('ruins', 'bossMaxScaledPlayers', '6', '1〜32（整数）', 'ボスの強さに数える挑戦者の上限'),
-    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか'),
+    ('ruins', 'bossLootPerPlayer', 'true', 'true / false', 'ボスの落とす物と覚醒の報酬を、挑戦者の人数ぶん出すか（経験値も。オーブは皆で拾う）'),
+    ('ruins', 'bossXpMultiplier', '1.0', '0.0〜10.0', 'ボスを倒したときの経験値の倍率'),
 
     # 残響の欠片
     ('echo', 'templateUses', '16', '1〜1000（整数）', '型の残響の欠片が割れるまでの回数'),

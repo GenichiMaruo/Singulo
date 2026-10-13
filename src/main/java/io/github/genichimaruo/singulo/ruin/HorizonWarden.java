@@ -349,7 +349,7 @@ public class HorizonWarden extends Monster {
     /** 倒したときの経験値。ドロップと同じく、挑戦者の人数分（設定で1人分にもできる）。 */
     @Override
     protected int getBaseExperienceReward() {
-        return xpReward * BossScaling.lootRolls(rewardParticipants());
+        return BossScaling.xp(xpReward, rewardParticipants());
     }
 
     /** 報酬に数える人数を、今の人数で決める（一度決めたら変わらない）。 */

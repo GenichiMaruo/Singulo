@@ -1390,7 +1390,7 @@
   "message.singulo.gravity_receiver.status": "正在運作的重力面板：%s / %s（每塊 %s FE/t）",
   "message.singulo.hidden_records_complete": "你已讀完所有封印記錄",
   "message.singulo.hydrogen_leak": "洩漏的氫氣被點燃！",
-  "message.singulo.impact_generator.status": "已儲存 %s / %s FE，正在運作的重力面板：%s / %s",
+  "message.singulo.impact_generator.status": "已儲存 %s / %s FE，正在運作的重力面板：%s / %s（本面板支付其中 %s 塊，可向纜線輸出 %s FE）",
   "message.singulo.keraunos.busy": "正在準備放電",
   "message.singulo.keraunos.fire": "放電！（儲電 %s / %s FE）",
   "message.singulo.keraunos.mode.auto": "自動：充滿電後自動發射",

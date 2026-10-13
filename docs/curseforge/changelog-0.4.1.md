@@ -3,11 +3,11 @@
 ### New
 - **Meteor Compass** (stage 2, crafting table: compass, 4 amethyst shards, 4 iron ingots). Right-click to point at the nearest meteorite core that has not been mined yet; the action bar shows the distance. When that core is mined the needle spins again, and right-clicking finds the next one.
 - **Meteorite Core.** Every meteorite now has one core at its heart. Mine it (iron pickaxe or better) for 4–6 raw meteoric iron and 3–5 stardust (Fortune applies).
-- **Impact Generator Panels feed cables.** Cables now connect to the panel and receive its stored power. The panel keeps five seconds of power for the gravity panels it is running and sends the rest out, up to 1,000 FE/t. It does not take power from cables.
+- **Impact Generator Panels feed cables.** Cables now connect to the panel and receive its stored power. The panel keeps five seconds of power for the gravity panels it is running and sends the rest out, up to 1,000 FE/t in total however many sides are connected. It does not take power from cables. Right-clicking it now also shows how many panels it is paying for and how much is spare for cables. While it runs six or more panels, the reserve is larger than its 20,000 FE capacity, so nothing goes to cables.
 
 ### Changes
 - **Meteor craters blend into the terrain.** Craters are now carved column by column to match the ground they land on, instead of being stamped from a template that cut a square pit into the land. The bowl eases into slopes, the raised rim uses the local ground (grass, sand, red sand, terracotta or stone), and debris is thrown out in uneven rays with the odd boulder and meteorite fragment. Craters are no longer placed on water or on steep slopes.
-- **Boss experience is much higher**, and is now given once per challenger, like the drops (`bossLootPerPlayer`):
+- **Boss experience is much higher**, and is now given once per challenger, like the drops (`bossLootPerPlayer`). The orbs drop together for the whole party to pick up. The new setting `bossXpMultiplier` (default 1.0) scales it:
   - Echo Sentinel 80 → 500, Gravity Remnant 120 → 800, Ergosphere Leviathan 250 → 2,000.
   - Horizon Warden 200 → 1,500 (awakened 500 → 4,500), Last Archivist 1,000 → 5,000.
   - Awakened guardians still give three times their normal experience.
@@ -21,9 +21,11 @@
   - Any one receiver can store enough to power the whole group on its own (before, only one receiver could hold more than one panel's worth, so the others added almost nothing).
   - When several receivers have power, each panel is paid for by the receiver closest to it along the panels. If that receiver runs short, the next closest one pays.
   - The receiver's light shows whether it is powering panels right now.
+- Awakened guardians no longer gain more experience each time data is re-applied to them (for example with `/data merge`).
 - The Echo Sentinel no longer leaves its boss room. Its movement, blinks and echoes stay inside the archive hall, and if it is pushed out it flashes back above the core.
 
 ### Updating from 0.4.0
 - Craters that already exist keep their old shape and have no core, so the Meteor Compass does not point to them. New craters appear in newly explored chunks.
+- The old crater templates are kept, so craters saved by 0.4.0 (including ones in chunks that were only partly generated) still load and finish placing.
 
 This file is published with the **Beta** release type. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).

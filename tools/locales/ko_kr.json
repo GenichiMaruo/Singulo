@@ -5564,8 +5564,8 @@
     "translation": "누출된 수소에 불이 붙었습니다!"
   },
   "message.singulo.impact_generator.status": {
-    "source": "Stored %s / %s FE, gravity panels active: %s / %s",
-    "translation": "저장 %s / %s FE, 작동 중인 중력 패널: %s / %s"
+    "source": "Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)",
+    "translation": "저장 %s / %s FE, 작동 중인 중력 패널: %s / %s (이 패널이 %s개분 부담, 케이블로 보낼 수 있는 양 %s FE)"
   },
   "message.singulo.keraunos.busy": {
     "source": "Charging or cooling down",

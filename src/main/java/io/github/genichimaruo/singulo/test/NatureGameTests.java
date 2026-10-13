@@ -126,6 +126,63 @@ public final class NatureGameTests {
         helper.succeed();
     }
 
+    /** 隕石コンパスの探し方: 区画の輪の順ではなく、実際の距離でいちばん近い核を選ぶ（区画の端・負の座標・掘り出し済み・候補なし）。 */
+    @GameTest(template = EMPTY)
+    public static void meteorCompassPicksTheTrulyNearestCore(GameTestHelper helper) {
+        int spacing = 28;
+        BlockPos sameCell = new BlockPos(89, 17, 7);
+        BlockPos nextCell = new BlockPos(713, 17, 103);
+        BlockPos from = new BlockPos(447, 20, 103);
+        java.util.Map<Long, BlockPos> cores = new java.util.HashMap<>();
+        cores.put(net.minecraft.world.level.ChunkPos.asLong(0, 0), sameCell);
+        cores.put(net.minecraft.world.level.ChunkPos.asLong(1, 0), nextCell);
+        var nearest = (java.util.function.Function<java.util.Map<Long, BlockPos>, BlockPos>) m ->
+                io.github.genichimaruo.singulo.item.MeteorCompassItem.nearestInCells(from, spacing, 4,
+                        (cx, cz) -> m.get(net.minecraft.world.level.ChunkPos.asLong(cx, cz)));
+        helper.assertTrue(nextCell.equals(nearest.apply(cores)), "区画の端で、隣の区画の近い核を選ばない: " + nearest.apply(cores));
+        // 近いほうが掘り出されていれば、同じ区画の核
+        java.util.Map<Long, BlockPos> mined = new java.util.HashMap<>(cores);
+        mined.remove(net.minecraft.world.level.ChunkPos.asLong(1, 0));
+        helper.assertTrue(sameCell.equals(nearest.apply(mined)), "残っている核を選ばない");
+        helper.assertTrue(nearest.apply(java.util.Map.of()) == null, "候補がないのに何かを選んだ");
+        // 負の座標の境目: 区画 -1 の端にいて、区画 0 の核が近い
+        BlockPos west = new BlockPos(-1, 64, 0);
+        BlockPos far = new BlockPos(-440, 64, 0);
+        BlockPos near = new BlockPos(5, 64, 0);
+        BlockPos got = io.github.genichimaruo.singulo.item.MeteorCompassItem.nearestInCells(west, spacing, 4,
+                (cx, cz) -> cx == -1 && cz == 0 ? far : cx == 0 && cz == 0 ? near : null);
+        helper.assertTrue(near.equals(got), "負の座標の境目で近い核を選ばない: " + got);
+        helper.succeed();
+    }
+
+    /** 0.4.0 までのクレーターの型紙（保存された構造が参照する）が元の名前で残り、読み戻した構造の大きさが変わらない。 */
+    @GameTest(template = EMPTY)
+    public static void legacyCraterTemplatesStillLoad(GameTestHelper helper) {
+        net.minecraft.server.level.ServerLevel level = helper.getLevel();
+        var manager = level.getServer().getStructureManager();
+        var context = net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext.fromLevel(level);
+        var crater = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).get(Singulo.id("meteor_crater"));
+        for (String v : new String[] {"a", "b", "c"}) {
+            var id = Singulo.id("craters/meteor_crater_" + v);
+            var template = manager.get(id);
+            helper.assertTrue(template.isPresent() && template.get().getSize().equals(new net.minecraft.core.Vec3i(23, 10, 23)),
+                    "古い型紙がない: " + id);
+            var element = net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement.single(id.toString())
+                    .apply(net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool.Projection.RIGID);
+            BlockPos pos = helper.absolutePos(BlockPos.ZERO);
+            var piece = new net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece(manager, element, pos, 0,
+                    net.minecraft.world.level.block.Rotation.NONE, element.getBoundingBox(manager, pos, net.minecraft.world.level.block.Rotation.NONE),
+                    net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings.APPLY_WATERLOGGING);
+            var cp = new net.minecraft.world.level.ChunkPos(pos);
+            var start = new net.minecraft.world.level.levelgen.structure.StructureStart(crater, cp, 0,
+                    new net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer(java.util.List.of(piece)));
+            var restored = net.minecraft.world.level.levelgen.structure.StructureStart.loadStaticStart(context, start.createTag(context, cp), 0);
+            helper.assertTrue(restored != null && restored.isValid() && restored.getPieces().get(0).getBoundingBox().getXSpan() == 23,
+                    "保存した古いクレーターを読み戻すと形が変わる: " + id);
+        }
+        helper.succeed();
+    }
+
     /**
      * 隕石クレーター: 地面の高さを読んで描き込む。すり鉢は地面より低く、中心の隕石には核が1つ。描き込む範囲の外の地面は
      * 元のまま（四角く削らない）。核を掘り出すと、コンパスはもう指さない。
@@ -183,6 +240,22 @@ public final class NatureGameTests {
         }
         helper.assertTrue(counted >= 8 && lower == counted, "すり鉢が地面より低くない: " + lower + " / " + counted);
         helper.assertTrue(level.getHeight(heightmap, center.getX() + 14, center.getZ() + 14) - 1 == corner, "描き込む範囲の外の地面が変わった");
+        // 掘ったあとも生成用の高さ（WG）が古いまま残る、出来上がったチャンク。底の上に浮いたマグマやかけらを置かない
+        int floating = 0;
+        for (int x = -10; x <= 10; x++) {
+            for (int z = -10; z <= 10; z++) {
+                for (int y = ground - 6; y <= ground + 3; y++) {
+                    BlockPos q = center.offset(x, y - ground, z);
+                    var s = level.getBlockState(q);
+                    boolean loose = s.is(Blocks.MAGMA_BLOCK) || s.is(SinguloBlocks.METEORIC_IRON_CHUNK.get())
+                            || s.is(SinguloBlocks.METEORITE_CRUST.get()) && !s.getValue(MeteoriteCrustBlock.NATURAL);
+                    if (loose && level.getBlockState(q.below()).isAir() && piece.insideMeteor(q.below()) > 1.0) {
+                        floating++;
+                    }
+                }
+            }
+        }
+        helper.assertTrue(floating == 0, "宙に浮いたマグマ・かけらがある: " + floating);
         helper.assertFalse(io.github.genichimaruo.singulo.nature.MeteorCores.mined(level, core), "掘る前から掘り出し済みになっている");
         level.destroyBlock(core, false);
         helper.assertTrue(io.github.genichimaruo.singulo.nature.MeteorCores.mined(level, core), "核を掘り出しても覚えていない");
