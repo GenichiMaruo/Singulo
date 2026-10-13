@@ -59,6 +59,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Whip(this));
         addLayer(new Saber(this));
         addLayer(new Solar(this));
+        addLayer(new ArmorGlint(this));
     }
 
     @Override
@@ -254,6 +255,31 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.popPose();
                 }
             }
+            case RuinAndroid.STATE_CHARGING_FOLLOW -> {
+                // 持ち主の無線充電器から胸へ流れる光の線（ゆるく揺れる）と、足元の充電の目盛り
+                Entity link = android.chargerLink();
+                if (link != null) {
+                    Vec3 camera3 = entityRenderDispatcher.camera.getPosition();
+                    Vec3 from = link.getPosition(partialTick).add(0, link.getBbHeight() * 0.45, 0).subtract(camera3);
+                    Vec3 to = android.getPosition(partialTick).add(0, android.getBbHeight() * 0.6, 0).subtract(camera3);
+                    if (from.distanceToSqr(to) < 6 * 6) {
+                        VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+                        PoseStack.Pose id = new PoseStack().last();
+                        Vec3 prev = from;
+                        for (int i = 1; i <= 10; i++) {
+                            float s = i / 10F;
+                            Vec3 p = from.lerp(to, s).add(0, Mth.sin(s * Mth.PI) * 0.25 + Mth.sin(age * 0.4F + s * 9) * 0.03, 0);
+                            FxDraw.beam(id, fx, prev, p, 0.05F, accent, 150);
+                            prev = p;
+                        }
+                    }
+                    glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                }
+                pose.pushPose();
+                pose.translate(0, 0.02, 0);
+                LastArchivistRenderer.arc(pose, glow, 0.62F, 0.73F, -90, -90 + 360 * android.chargeFraction(), 0xFFFFFF, 190);
+                pose.popPose();
+            }
             case RuinAndroid.STATE_SOLAR, RuinAndroid.STATE_RESTING -> {
                 // 足元の充電の目盛り（満ちるほど白い弧がのびる）
                 pose.pushPose();
@@ -385,14 +411,26 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         @Override
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float age, float netHeadYaw, float headPitch) {
-            if (android.state() != RuinAndroid.STATE_SOLAR) {
+            int state = android.state();
+            if (state != RuinAndroid.STATE_SOLAR && state != RuinAndroid.STATE_SOLAR_FOLD) {
                 return;
             }
             AndroidModel m = getParentModel();
             float t = android.stateTime(partialTick);
-            float open = Mth.clamp((t - 6) / 14, 0, 1);
+            float open;
+            float rise;
+            if (state == RuinAndroid.STATE_SOLAR) {
+                open = Mth.clamp((t - 6) / 14, 0, 1);
+                rise = Mth.clamp(t / 8, 0, 1);
+            } else {
+                // たたむ: 羽根を閉じてから、手の中へ縮めて消す
+                open = 1 - Mth.clamp(t / 8, 0, 1);
+                rise = 1 - Mth.clamp((t - 7) / 6, 0, 1);
+                if (rise <= 0) {
+                    return;
+                }
+            }
             open = open * open * (3 - 2 * open);
-            float rise = Mth.clamp(t / 8, 0, 1);
             pose.pushPose();
             m.toLeftHand(pose);
             // 手の先（体の大きさで縮んでいるので、長さは SCALE で割る）
@@ -432,6 +470,21 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 FxDraw.box(pose, vc, x - 0.004F, 0.03F, -d + 0.02F, x + 0.004F, 0.033F, d - 0.02F, light, 0x6C86B8, 255);
             }
             FxDraw.box(pose, vc, -w + 0.02F, 0.03F, -0.004F, w - 0.02F, 0.033F, 0.004F, light, 0x6C86B8, 255);
+        }
+    }
+
+    /** エンチャントした装甲板の光沢（防具と同じ光沢を、装甲の部品だけに重ねる）。 */
+    final class ArmorGlint extends RenderLayer<RuinAndroid, AndroidModel> {
+        ArmorGlint(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (android.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).hasFoil()) {
+                getParentModel().renderArmor(pose, buffers.getBuffer(RenderType.armorEntityGlint()), light, OverlayTexture.NO_OVERLAY);
+            }
         }
     }
 

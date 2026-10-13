@@ -16,5 +16,6 @@ public final class SinguloNetwork {
         r.playToClient(ScanPayload.TYPE, ScanPayload.STREAM_CODEC, ScanPayload::handle);
         r.playToServer(SideConfigPayload.TYPE, SideConfigPayload.STREAM_CODEC, SideConfigPayload::handle);
         r.playToServer(ManipulatorInputPayload.TYPE, ManipulatorInputPayload.STREAM_CODEC, ManipulatorInputPayload::handle);
+        r.playToServer(RenameAndroidPayload.TYPE, RenameAndroidPayload.STREAM_CODEC, RenameAndroidPayload::handle);
     }
 }

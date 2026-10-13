@@ -526,6 +526,77 @@ CHAPTERS = [
          '- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n'
          '- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.'),
     ]),
+    ('androids', 'singulo:android_station', 'アンドロイド', 'Androids', [
+        ('ruin', '遺構のアンドロイド',
+         'どの遺構にも、壁際に遺構の印刷台があります。サバイバルのプレイヤーが近づくと、台の型（光刃型・鞭型・光剣型のどれか）の'
+         'アンドロイドを2〜3体、台の上へ下から積み上げるように印刷して出撃させます。全部倒すと、その型の小型クリスタルメモリが台の上に出て、台は1日休みます。\n'
+         '・光刃型「ルミナ」: 身をかがめて刃が光ったら、残像を残して詰め寄る瞬歩斬り。片膝をついて床に手を当てたら、足元に予告の輪が出て光の柱が立つ（輪から出る）。'
+         '近くでは刃を広げて回転斬り。\n'
+         '・鞭型「ヴェルナ」: 約6ブロック先まで届く鞭打ちと、巻きつけて引き寄せる絡め取り。鞭を頭上で回したら、床に打ち付けて一直線の衝撃波（跳べば当たらない）。\n'
+         '・光剣型「ソレイユ」: 腰だめから踏み込む突きと、振る瞬間に刃が伸びる横薙ぎ、飛ぶ三日月の斬撃波。打たれると正面に光の盾を張り（正面からはあまり通らない）、'
+         '構えの最中に打つと斬り返してきます。背後か横から攻めること。\n'
+         'アンドロイドには充電があり、大技を10回ほど使うと切れて、目の光が消えます。近くの印刷台へ戻るか、昼の空の下ではソーラーパネルを広げ、夜や屋内では座り込んで充電します'
+         '（印刷台5秒・太陽光10秒・座り込み14秒）。充電中は攻撃してこないので、攻めどきです。',
+         'Ruin androids',
+         'Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids '
+         'of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of '
+         'that design appears on the fabricator, which then rests for a day.\n'
+         '- Blade Android "Lumina": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches '
+         'the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n'
+         '- Whip Android "Verna": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams '
+         'the floor and sends a straight shockwave (jump it).\n'
+         '- Saber Android "Soleil": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light '
+         'shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\n'
+         'Androids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar '
+         'panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack '
+         'while charging: your chance to strike.'),
+        ('build', '自分のアンドロイド',
+         'アンドロイド組立ステーションに小型クリスタルメモリ（型を決める。減らない）とアンドロイドキット（印刷ごとに1つ）を入れ、電力を送ると、'
+         '上に護衛のアンドロイドを1体印刷します（1回 40,000 FE）。倒されたら、キットがあれば印刷し直します。置いた人が持ち主です。\n'
+         '・護衛は敵対モブ（遺構のアンドロイドやドローンも）だけを狙い、プレイヤーやボスとは戦いません。プレイヤーとボスの攻撃では傷つきません。\n'
+         '・動き方: 迎撃（ステーションのそばで待つ）・徘徊（16ブロック以内を歩き回る）・追従（持ち主についていく）。\n'
+         '・戻る体力: これを下回ると、ステーションへ戻って修理と充電をします。「呼び戻す」で戻すこともできます。\n'
+         '・名前: ステーションやアンドロイドの画面で名前をクリックすると付けられます（↺で愛称に戻す）。\n'
+         '・コンパレーター: ステーションから、アンドロイドの体力に応じた信号（0〜15）が出ます。\n'
+         '・ステーションを壊すと、アンドロイドはその場に残ります。新しいステーションに同じ型のメモリを入れると、「リンク」でつなぎ直せます。',
+         'Your own androids',
+         'Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, '
+         'and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n'
+         '- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n'
+         '- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner).\n'
+         '- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n'
+         '- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n'
+         '- Comparator: the station outputs a signal (0-15) from the android\'s health.\n'
+         '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.'),
+        ('care', '充電と修理と装備',
+         '・充電: 護衛はステーションへ戻って5秒で満タン（電力を使い、体力も直る）。追従中は、無線充電器を持っていれば持ち主のそばで、ついて歩きながら5秒で満タン'
+         '（充電器は満タンで30回分。電力を出すブロックを右クリックして充電する）。ステーションが遠く充電器もなければ、太陽光か座り込みで充電します。\n'
+         '・持ち物: 自分のアンドロイドを右クリックすると画面が開きます。自己修理キット（1スタック）は、体力が戻る割合を下回ったときに1つ使って半分直します。'
+         'アンドロイド用装甲板（1枚）は胸当てになり（防御 +8、防具強度 +2）、防具のエンチャントが付けられます。積むと胸と左肩に装甲が付きます。\n'
+         '・ステーションの補充スロットに自己修理キットを入れておくと、1つでも減れば補充します。強化スロットに転送アップグレードを積むと、倒れたときの持ち物を'
+         '次のアンドロイドへ引き継ぎます（ないとその場に落とす）。ステーションへはホッパーなどで搬入できます（外からは取り出せない）。\n'
+         '・解体: アンドロイドの画面のスパナを2回押すと、上から消えていき、ステーションがすぐ新しく印刷します。',
+         'Charging, repair and gear',
+         '- Charging: a guard refills in 5 s back at its station (using power, and it heals too). While following, if you carry an Android Wireless Charger '
+         'it comes to you and refills in 5 s as it walks with you (a full charger holds 30 refills; right-click a block that supplies power to charge it). '
+         'With the station far away and no charger, it uses solar power or sits down.\n'
+         '- Inventory: right-click your android to open its screen. A stack of Self-Repair Kits: one is used to restore half its health when it drops below '
+         'the return health. One Android Armor Plate works as its chestplate (+8 armor, +2 toughness) and takes armor enchantments; it shows as plating on '
+         'the chest and left shoulder.\n'
+         '- Kits in the station\'s refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android\'s '
+         'inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n'
+         '- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.'),
+        ('glass', 'アンドロイド用のガラス',
+         '・アンドロイド遮断ガラス（琥珀色）: アンドロイドだけが通れない。プレイヤーやほかの生き物はすり抜けられる。拠点の出入り口に。\n'
+         '・アンドロイド透過ガラス（水色）: アンドロイドだけが通れる。ほかにとってはふつうのガラス。護衛の通り道に。\n'
+         'アンドロイドは道を探すときも、遮断ガラスはふさがった所、透過ガラスは空いた所として扱います。無地のものは同じガラスが隣り合うとつながって1枚に見え、'
+         '模様入りは無地4枚から作れます。',
+         'Android glass',
+         '- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n'
+         '- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard\'s own path.\n'
+         'Androids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass '
+         'next to them, and four plain panes make the patterned kind.'),
+    ]),
     ('romance', 'singulo:tipler_core', '特異点技術', 'Singularity Tech', [
         ('shield', 'イベントホライズン・シールド',
          '半径32の中を守る塔（5×5、高さ9）。時間結晶触媒で爆発と荒らしを防ぎ、シンギュラリティ・コアなら敵の湧きと侵入も止める。電力16,384 FE/t。',

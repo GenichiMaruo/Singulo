@@ -48,6 +48,10 @@ public class SaberAndroid extends RuinAndroid {
     /** 横薙ぎのときに伸びる刃の長さ（ブロック）。 */
     public static final double SWEEP_REACH = 3.4;
     public static final double THRUST_REACH = 4.0;
+    /** 打たれた瞬間の盾は、この tick に1回まで（5秒）。 */
+    static final int REACTIVE_GUARD_COOLDOWN = 100;
+    private long nextReactiveGuard;
+
     /** 構えで正面から受けるダメージの倍率。 */
     static final float GUARD_FACTOR = 0.3F;
 
@@ -67,6 +71,11 @@ public class SaberAndroid extends RuinAndroid {
     }
 
     @Override
+    public AndroidKind kind() {
+        return AndroidKind.SABER;
+    }
+
+    @Override
     public int accent() {
         return ACCENT;
     }
@@ -79,8 +88,25 @@ public class SaberAndroid extends RuinAndroid {
     /** 構えのあいだ、正面からの攻撃を光の盾で受ける。受けたら斬り返す。 */
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (state() == STATE_GUARD && !level().isClientSide && source.getEntity() != null && !source.is(
-                net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)) {
+        if (level().isClientSide || source.getEntity() == null || source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)
+                || isInvulnerableTo(source)) {
+            return super.hurt(source, amount);
+        }
+        boolean reactive = false;
+        if (state() != STATE_GUARD && active() && level().getGameTime() >= nextReactiveGuard && charge() >= COST_GUARD
+                && !(isGuard() && source.getEntity() instanceof net.minecraft.world.entity.player.Player)) {
+            // 打たれた瞬間に盾を張る（この一撃から受ける。続けて打たれたら斬り返す）
+            spend(COST_GUARD);
+            setState(STATE_GUARD);
+            nextReactiveGuard = level().getGameTime() + REACTIVE_GUARD_COOLDOWN;
+            Vec3 to = source.getEntity().position().subtract(position());
+            float yaw = (float) (Math.atan2(to.z, to.x) * 180 / Math.PI) - 90;
+            setYRot(yaw);
+            yBodyRot = yaw;
+            yHeadRot = yaw;
+            reactive = true;
+        }
+        if (state() == STATE_GUARD) {
             Vec3 from = source.getEntity().position().subtract(position()).multiply(1, 0, 1);
             Vec3 look = Vec3.directionFromRotation(0, yBodyRot);
             if (from.lengthSqr() > 1e-4 && from.normalize().dot(look) > 0.35) {
@@ -89,7 +115,9 @@ public class SaberAndroid extends RuinAndroid {
                 if (level() instanceof ServerLevel level) {
                     sparks(level, position().add(look.scale(0.7)).add(0, 1.0, 0), 10, 0.35);
                 }
-                setState(STATE_RIPOSTE);
+                if (!reactive) {
+                    setState(STATE_RIPOSTE);
+                }
             }
         }
         return super.hurt(source, amount);

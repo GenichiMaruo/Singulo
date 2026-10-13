@@ -132,9 +132,19 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    /** 全部倒されたとき（報酬は設計メモリ。のちの段階で入る）。 */
+    /** 全部倒されたとき: この型の設計メモリ（小型クリスタルメモリ）が台の上に出る。 */
     private void cleared(ServerLevel level) {
         level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 1.0F, 1.2F);
+        if (kind == null) {
+            return;
+        }
+        var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(kind.memoryId()));
+        Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
+        net.minecraft.world.entity.item.ItemEntity drop = new net.minecraft.world.entity.item.ItemEntity(level, top.x, top.y + 0.2, top.z,
+                new net.minecraft.world.item.ItemStack(item), 0, 0.2, 0);
+        drop.setDefaultPickUpDelay();
+        level.addFreshEntity(drop);
+        level.playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.0F, 1.4F);
     }
 
     @Override

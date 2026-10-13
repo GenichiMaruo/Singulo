@@ -180,6 +180,8 @@ public final class SinguloClient {
         event.register(SinguloMenus.WORMHOLE_STABILIZER.get(), WormholeStabilizerScreen::new);
         event.register(SinguloMenus.DEVICE.get(), DeviceScreen::new);
         event.register(SinguloMenus.GENESIS_CORE.get(), GenesisCoreScreen::new);
+        event.register(SinguloMenus.ANDROID_STATION.get(), AndroidStationScreen::new);
+        event.register(SinguloMenus.ANDROID.get(), AndroidScreen::new);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */

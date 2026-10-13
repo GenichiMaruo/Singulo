@@ -23,6 +23,16 @@ public enum AndroidKind {
         return type.get();
     }
 
+    /** 愛称（ルミナ・ヴェルナ・ソレイユ）の翻訳キー。 */
+    public String nicknameKey() {
+        return "gui.singulo.android.nickname." + id;
+    }
+
+    /** この型の設計メモリのアイテムID（singulo:android_memory_blade など）。 */
+    public String memoryId() {
+        return "android_memory_" + id;
+    }
+
     @Nullable
     public static AndroidKind byId(String id) {
         for (AndroidKind k : values()) {

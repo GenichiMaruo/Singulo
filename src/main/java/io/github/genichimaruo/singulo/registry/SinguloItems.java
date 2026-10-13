@@ -57,6 +57,12 @@ public final class SinguloItems {
             "creative_catalyst", () -> new io.github.genichimaruo.singulo.item.CreativeCatalystItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BuilderWandItem> BUILDER_WAND = ITEMS.register(
             "builder_wand", () -> new io.github.genichimaruo.singulo.item.BuilderWandItem(new Item.Properties()));
+    /** アンドロイド用の無線充電器。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
+            "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
+    /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
+            "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
@@ -111,6 +117,8 @@ public final class SinguloItems {
             Map.entry("decoded_record", 1),
             Map.entry("magnetic_bottle", 4),
             Map.entry("neutrino_scanner", 3),
+            Map.entry("android_charger", 2),
+            Map.entry("android_armor_plate", 2),
             Map.entry("explorer_compass", 1),
             Map.entry("creative_catalyst", 6),
             Map.entry("builder_wand", 6),
@@ -180,6 +188,9 @@ public final class SinguloItems {
         block(SinguloBlocks.FOCUSING_MAGNET, 2);
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
         block(SinguloBlocks.PROBE_STATION, 4);
+        block(SinguloBlocks.ANDROID_STATION, 2);
+        TAB_ORDER.add(ANDROID_CHARGER);
+        TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         block(SinguloBlocks.SMES_MODULE, 4);
         block(SinguloBlocks.TOPOLOGICAL_WIRE, 4);
         block(SinguloBlocks.REACTOR_SHELL, 5);
@@ -247,6 +258,10 @@ public final class SinguloItems {
         block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_GLASS, 1);
         block(SinguloBlocks.BLACK_STAR_GLASS, 1);
+        block(SinguloBlocks.ANDROID_BARRIER_GLASS, 2);
+        block(SinguloBlocks.ANDROID_BARRIER_GLASS_PATTERNED, 2);
+        block(SinguloBlocks.ANDROID_GATE_GLASS, 2);
+        block(SinguloBlocks.ANDROID_GATE_GLASS_PATTERNED, 2);
         block(SinguloBlocks.RUIN_GLASS, 1);
         block(SinguloBlocks.INTACT_RUIN_GLASS, 1);
         block(SinguloBlocks.REINFORCED_RUIN_GLASS, 5);

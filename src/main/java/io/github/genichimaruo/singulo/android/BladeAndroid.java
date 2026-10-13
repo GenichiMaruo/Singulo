@@ -56,6 +56,11 @@ public class BladeAndroid extends RuinAndroid {
     }
 
     @Override
+    public AndroidKind kind() {
+        return AndroidKind.BLADE;
+    }
+
+    @Override
     public int accent() {
         return ACCENT;
     }

@@ -59,6 +59,9 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     final ModelPart hilt;
     /** サイドテールと長い房のある側（+1 は体の左、-1 は右）。髪の揺れの向きに使う。 */
     final float hairSide;
+    /** 装甲板を積んだときだけ見える、胸の銀の板と左肩の小さな肩当て（さりげなく）。 */
+    final ModelPart armorChest;
+    final ModelPart armorPad;
 
     public AndroidModel(ModelPart root) {
         this.root = root;
@@ -87,6 +90,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         this.whipHandle = forearmR.hasChild("whip_handle") ? forearmR.getChild("whip_handle") : null;
         this.hilt = forearmR.hasChild("hilt") ? forearmR.getChild("hilt") : null;
         this.hairSide = ponytail.getInitialPose().x > 0 ? 1 : -1;
+        this.armorChest = torso.getChild("armor_chest");
+        this.armorPad = armL.getChild("armor_pad");
     }
 
     private static CubeListBuilder cube(int u, int v, float x, float y, float z, int w, int h, int d, CubeDeformation def) {
@@ -123,6 +128,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
 
         PartDefinition torso = hips.addOrReplaceChild("torso", cube(0, 16, -3, -8, -1.5F, 6, 8, 3), PartPose.offset(0, -3, 0));
         torso.addOrReplaceChild("chest", cube(18, 16, -3, -7, -2.3F, 6, 3, 1, def(-0.3F, 0, -0.15F)), PartPose.ZERO);
+        // 装甲板: 胸の板にかぶせる薄い銀の板（胸の板より少しだけ大きい）
+        torso.addOrReplaceChild("armor_chest", cube(110, 40, -3, -7, -2.3F, 6, 3, 1, def(-0.12F, 0.12F, 0.06F)), PartPose.ZERO);
         torso.addOrReplaceChild("neck", cube(114, 0, -1, -1, -1, 2, 2, 2, def(-0.15F)), PartPose.offset(0, -8, 0));
         for (int side = 0; side < 2; side++) {
             float x = side == 0 ? 1.6F : -1.6F;
@@ -157,6 +164,9 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         PartDefinition armL = torso.addOrReplaceChild("arm_l", cube(48, 32, -1, -0.5F, -1, 2, 5, 2, def(-0.05F)),
                 PartPose.offsetAndRotation(4, -7.5F, 0, 0, 0, -0.08F));
         armL.addOrReplaceChild("forearm_l", cube(64, 32, -1, 0, -1, 2, 5, 2, def(-0.05F)), PartPose.offset(0, 4.5F, 0));
+        // 装甲板: 左肩の小さな肩当て（右の肩当てより薄い）
+        armL.addOrReplaceChild("armor_pad", cube(110, 46, -1, -1.2F, -2, 3, 1, 4, def(0.02F, -0.1F, -0.1F)),
+                PartPose.rotation(0, 0, -0.15F));
         PartDefinition armR = torso.addOrReplaceChild("arm_r", cube(56, 32, -1, -0.5F, -1, 2, 5, 2, def(-0.05F)),
                 PartPose.offsetAndRotation(-4, -7.5F, 0, 0, 0, 0.12F));
         armR.addOrReplaceChild("pad_r", cube(84, 32, -2, -1.5F, -2, 3, 2, 4, def(0.05F)), PartPose.rotation(0, 0, 0.15F));
@@ -193,6 +203,18 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     @Override
     public ModelPart root() {
         return root;
+    }
+
+    /** 装甲の部品を、親の変形をたどって描く（エンチャントの光沢を重ねるため）。 */
+    void renderArmor(PoseStack pose, com.mojang.blaze3d.vertex.VertexConsumer vc, int light, int overlay) {
+        pose.pushPose();
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        torso.translateAndRotate(pose);
+        armorChest.render(pose, vc, light, overlay);
+        armL.translateAndRotate(pose);
+        armorPad.render(pose, vc, light, overlay);
+        pose.popPose();
     }
 
     /** 左手の先までの変形を pose に積む（ソーラーパネルを出すため）。 */
@@ -236,6 +258,9 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     @Override
     public void setupAnim(RuinAndroid android, float limbSwing, float limbSwingAmount, float age, float netHeadYaw, float headPitch) {
         root.getAllParts().forEach(ModelPart::resetPose);
+        boolean armored = !android.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).isEmpty();
+        armorChest.visible = armored;
+        armorPad.visible = armored;
         float pt = age - android.tickCount;
         int state = android.state();
         float t = android.stateTime(pt);
@@ -280,6 +305,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             case RuinAndroid.STATE_LOW_POWER -> lowPower();
             case RuinAndroid.STATE_CHARGING -> charging(t, age);
             case RuinAndroid.STATE_SOLAR -> solar(t, age);
+            case RuinAndroid.STATE_SOLAR_FOLD -> solarFold(t, age);
             case RuinAndroid.STATE_RESTING -> resting(t, age);
             case BladeAndroid.STATE_DASH_WINDUP -> dashWindup(t, age);
             case BladeAndroid.STATE_DASH -> dash();
@@ -554,16 +580,28 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     }
 
     /** 正座して、うつむいて充電する。 */
-    /** ソーラー充電: 左手をまっすぐ空へ掲げ、少し見上げる。 */
+    /**
+     * ソーラー充電: 左手を体の左外へ開きながら空へ掲げる（少し後ろへ反らして、手とパネルが顔にかからないように）。
+     * 顔はパネルの方を見上げる。
+     */
     private void solar(float t, float age) {
         float k = ease(t / 8);
-        armL.xRot = Mth.lerp(k, armL.xRot, -3.05F);
-        armL.zRot = Mth.lerp(k, armL.zRot, -0.12F);
-        forearmL.xRot = Mth.lerp(k, forearmL.xRot, 0);
-        head.xRot -= 0.35F * k;
-        head.zRot += 0.05F * k;
+        armL.xRot = Mth.lerp(k, armL.xRot, -3.3F);
+        // 頭上に掲げた腕は、z の回転の向きが下ろしたときと逆になる（正で体の左外へ開く）
+        armL.zRot = Mth.lerp(k, armL.zRot, 0.48F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, 0.1F);
+        head.xRot -= 0.3F * k;
+        head.yRot += 0.25F * k;
+        head.zRot -= 0.06F * k;
         torso.xRot -= 0.06F * k + Mth.sin(age * 0.06F) * 0.01F;
         armR.zRot = Mth.lerp(k, armR.zRot, 0.18F);
+    }
+
+    /** ソーラーをたたむ: パネルがたたまれるあいだは腕を掲げたまま、そのあと腕を下ろす。 */
+    private void solarFold(float t, float age) {
+        float down = ease((t - 9) / 10);
+        float keep = 1 - down;
+        solar(8 * keep, age);
     }
 
     /**

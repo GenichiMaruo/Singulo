@@ -165,6 +165,9 @@ public final class SinguloBlocks {
     public static final DeferredBlock<SimpleMachineBlock<DegenerateFurnaceBlockEntity>> DEGENERATE_FURNACE_CONTROLLER =
             BLOCKS.register("degenerate_furnace_controller", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.DEGENERATE_FURNACE, DegenerateFurnaceBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
+    /** アンドロイド組立ステーション（護衛のアンドロイドを印刷する）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidStationBlock> ANDROID_STATION = BLOCKS.register(
+            "android_station", () -> new io.github.genichimaruo.singulo.android.AndroidStationBlock(machineProperties()));
     public static final DeferredBlock<SimpleMachineBlock<ProbeStationBlockEntity>> PROBE_STATION = BLOCKS.register(
             "probe_station", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.PROBE_STATION, ProbeStationBlockEntity::new, CatalystDeviceBlockEntity::serverTick));
@@ -276,6 +279,16 @@ public final class SinguloBlocks {
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
     public static final DeferredBlock<TransparentBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
+
+    /** アンドロイド用のガラス（遮断: アンドロイドだけ通れない、透過: アンドロイドだけ通れる。無地は隣とつながる）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS = BLOCKS.register(
+            "android_barrier_glass", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), false, true));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS_PATTERNED = BLOCKS.register(
+            "android_barrier_glass_patterned", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), false, false));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_GATE_GLASS = BLOCKS.register(
+            "android_gate_glass", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), true, true));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_GATE_GLASS_PATTERNED = BLOCKS.register(
+            "android_gate_glass_patterned", () -> new io.github.genichimaruo.singulo.android.AndroidGlassBlock(androidGlassProperties(), true, false));
 
     // ---- 隕石クレーター（地表の小さな構造物）と、雷ガラス
     /** 隕石の溶融殻（クレーターに最初からあるものだけ、星屑の結晶を育てる）。 */
@@ -404,6 +417,12 @@ public final class SinguloBlocks {
                 .strength(hardness, resistance).requiresCorrectToolForDrops().sound(sound).noOcclusion()
                 .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
                 .isValidSpawn((s, l, p, e) -> false)));
+    }
+
+    private static BlockBehaviour.Properties androidGlassProperties() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.NONE).strength(1.5F, 6.0F).sound(SoundType.GLASS).noOcclusion()
+                .isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
+                .isValidSpawn((s, l, p, e) -> false);
     }
 
     private static BlockBehaviour.Properties gravityProperties(MapColor color) {

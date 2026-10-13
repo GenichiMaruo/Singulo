@@ -88,6 +88,14 @@ Each boss is tuned so that the gear you would normally have at that point can ju
 
 Decoded records add the story of the lost civilization to your handbook.
 
+### Androids
+
+Ruin fabricators print androids that fight with an arm blade, a light whip or a saber, each with its own moves, warnings and openings.
+They run on charge: when it runs out they head back to their fabricator, unfold a solar panel or sit down to recharge.
+Defeat a fabricator's androids to recover a compact crystal memory of their design, then print your own guard android in an Android Assembly Station.
+Choose how it guards (stay, wander or follow you), give it a name, self-repair kits and an enchantable armor plate, recharge it on the go with a wireless charger,
+and keep it out of (or let it through) places with android barrier and gate glass.
+
 ### The final goal: the Genesis Engine
 
 The old civilization tried to turn all mass into energy and perished. The Genesis Engine does the reverse.

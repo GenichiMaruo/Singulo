@@ -439,6 +439,26 @@
     "source": "Accelerator Tube",
     "translation": "加速管"
   },
+  "block.singulo.android_barrier_glass": {
+    "source": "Android Barrier Glass",
+    "translation": "仿生人阻隔玻璃"
+  },
+  "block.singulo.android_barrier_glass_patterned": {
+    "source": "Patterned Android Barrier Glass",
+    "translation": "花纹仿生人阻隔玻璃"
+  },
+  "block.singulo.android_gate_glass": {
+    "source": "Android Gate Glass",
+    "translation": "仿生人透过玻璃"
+  },
+  "block.singulo.android_gate_glass_patterned": {
+    "source": "Patterned Android Gate Glass",
+    "translation": "花纹仿生人透过玻璃"
+  },
+  "block.singulo.android_station": {
+    "source": "Android Assembly Station",
+    "translation": "仿生人组装站"
+  },
   "block.singulo.archive_terminal": {
     "source": "Archive Terminal",
     "translation": "档案终端"
@@ -805,7 +825,7 @@
   },
   "block.singulo.ruin_android_fabricator": {
     "source": "Ruin Android Fabricator",
-    "translation": "遗迹仿生人打印台"
+    "translation": "废墟仿生人打印台"
   },
   "block.singulo.ruin_cache": {
     "source": "Ruin Cache",
@@ -1134,6 +1154,58 @@
   "desc.singulo.afterglow_wings": {
     "source": "Wings of crystal feathers born from the Last Archivist's light. Wear them on your chest to glide; sneak while gliding to beat them and surge ahead. No fall damage.",
     "translation": "由最后的记录者之光诞生的结晶羽翼。穿在胸甲栏即可滑翔，滑翔时潜行会振翅加速。不会受到摔落伤害。"
+  },
+  "desc.singulo.android_armor_plate": {
+    "source": "One fitted to a guard android works as its chestplate (+8 armor, +2 toughness). Takes armor enchantments.",
+    "translation": "装在护卫仿生人身上时作为胸甲生效（护甲 +8，盔甲韧性 +2）。可附上护甲类附魔。"
+  },
+  "desc.singulo.android_barrier_glass": {
+    "source": "Glass that only androids cannot pass. Players and other creatures go straight through. Joins seamlessly with the same glass next to it.",
+    "translation": "只有仿生人无法通过的玻璃。玩家和其他生物可以直接穿过。与相同的玻璃相邻时会无缝相连。"
+  },
+  "desc.singulo.android_barrier_glass_patterned": {
+    "source": "Patterned glass that only androids cannot pass.",
+    "translation": "只有仿生人无法通过的花纹玻璃。"
+  },
+  "desc.singulo.android_charger": {
+    "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
+    "translation": "随身携带时，跟随中的仿生人会靠近你，边跟着走边充电（充满时可充满仿生人 30 次）。右键点击能输出电力的方块为其充电。"
+  },
+  "desc.singulo.android_gate_glass": {
+    "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
+    "translation": "只有仿生人可以通过的玻璃，对其他一切都是实心的。与相同的玻璃相邻时会无缝相连。"
+  },
+  "desc.singulo.android_gate_glass_patterned": {
+    "source": "Patterned glass that only androids can pass.",
+    "translation": "只有仿生人可以通过的花纹玻璃。"
+  },
+  "desc.singulo.android_kit": {
+    "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
+    "translation": "一套零件与外壳。仿生人组装站每打印一个仿生人就消耗一个。"
+  },
+  "desc.singulo.android_memory_blade": {
+    "source": "A compact crystal memory with a reader, holding the design of the Blade Android. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "记录了光刃型仿生人设计、带读取端子的小型水晶存储器。放入仿生人组装站即可打印该型号（不会消耗）。"
+  },
+  "desc.singulo.android_memory_saber": {
+    "source": "A compact crystal memory with a reader, holding the design of the Saber Android. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "记录了光剑型仿生人设计、带读取端子的小型水晶存储器。放入仿生人组装站即可打印该型号（不会消耗）。"
+  },
+  "desc.singulo.android_memory_whip": {
+    "source": "A compact crystal memory with a reader, holding the design of the Whip Android. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "记录了鞭型仿生人设计、带读取端子的小型水晶存储器。放入仿生人组装站即可打印该型号（不会消耗）。"
+  },
+  "desc.singulo.android_repair_kit": {
+    "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
+    "translation": "放在护卫仿生人的物品栏里，受伤时会用掉一个，恢复一半生命（用完后返回组装站）。"
+  },
+  "desc.singulo.android_station": {
+    "source": "Prints one guard android from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
+    "translation": "用小型水晶存储器、仿生人套件和电力打印一个护卫仿生人，被击倒后用新的套件重新打印。可设置其行动方式，以及在何种生命值时返回维修与充电。"
+  },
+  "desc.singulo.android_transfer_upgrade": {
+    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits and armor plate) to the station instead of dropping it, and the next android it prints carries it.",
+    "translation": "装在仿生人组装站的强化栏位后，仿生人倒下或被拆解时，其物品（修理套件和装甲板）不会掉落，而是传送到组装站，并交给下一个打印出的仿生人。"
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -1840,8 +1912,8 @@
     "translation": "嵌在沉没的炉心区封锁柱上的窗，用来承受反应炉的冲击。非常坚硬，爆炸也无法破坏。"
   },
   "desc.singulo.ruin_android_fabricator": {
-    "source": "Prints androids onto its bed and sends them out.",
-    "translation": "在台面上打印仿生人并让其出动。"
+    "source": "Prints androids onto its bed and sends them out. Defeat them all to get a compact crystal memory of their design.",
+    "translation": "在台面上打印仿生人并让其出动。全部击败后会得到对应型号的小型水晶存储器。"
   },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
@@ -2462,6 +2534,290 @@
   "gui.singulo.anchor.status": {
     "source": "Radius %s chunks · %s · %s FE/t · stored %s FE",
     "translation": "半径 %s 区块 · %s · %s FE/t · 储能 %s FE"
+  },
+  "gui.singulo.android.armor": {
+    "source": "Armor",
+    "translation": "护甲"
+  },
+  "gui.singulo.android.charge": {
+    "source": "%s%%",
+    "translation": "%s%%"
+  },
+  "gui.singulo.android.dismantle": {
+    "source": "Dismantle (press twice)",
+    "translation": "拆解（按两次）"
+  },
+  "gui.singulo.android.dismantle.confirm": {
+    "source": "Press again to dismantle",
+    "translation": "再按一次即拆解"
+  },
+  "gui.singulo.android.hp": {
+    "source": "HP %s / %s",
+    "translation": "生命 %s / %s"
+  },
+  "gui.singulo.android.mode": {
+    "source": "Mode: %s",
+    "translation": "模式：%s"
+  },
+  "gui.singulo.android.nickname.blade": {
+    "source": "Lumina",
+    "translation": "露米娜"
+  },
+  "gui.singulo.android.nickname.saber": {
+    "source": "Soleil",
+    "translation": "索蕾伊"
+  },
+  "gui.singulo.android.nickname.whip": {
+    "source": "Verna",
+    "translation": "薇尔娜"
+  },
+  "gui.singulo.android.plate": {
+    "source": "Plate",
+    "translation": "装甲"
+  },
+  "gui.singulo.android.rename": {
+    "source": "Click to rename",
+    "translation": "点击以更改名字"
+  },
+  "gui.singulo.android.rename.reset": {
+    "source": "Reset name",
+    "translation": "恢复原名"
+  },
+  "gui.singulo.android.repair": {
+    "source": "Repair",
+    "translation": "修理"
+  },
+  "gui.singulo.android.say.alert.0": {
+    "source": "Enemy spotted!",
+    "translation": "发现敌人！"
+  },
+  "gui.singulo.android.say.alert.1": {
+    "source": "Found one!",
+    "translation": "找到了！"
+  },
+  "gui.singulo.android.say.alert.2": {
+    "source": "There!",
+    "translation": "那边！"
+  },
+  "gui.singulo.android.say.alert.3": {
+    "source": "Here I go!",
+    "translation": "上了！"
+  },
+  "gui.singulo.android.say.alert.4": {
+    "source": "Stay back!",
+    "translation": "退后！"
+  },
+  "gui.singulo.android.say.alert.5": {
+    "source": "Eliminating!",
+    "translation": "排除目标！"
+  },
+  "gui.singulo.android.say.charging.0": {
+    "source": "Charging... ♪",
+    "translation": "充电中…♪"
+  },
+  "gui.singulo.android.say.charging.1": {
+    "source": "So warm~",
+    "translation": "暖洋洋的〜"
+  },
+  "gui.singulo.android.say.charging.2": {
+    "source": "Almost full",
+    "translation": "快充满了"
+  },
+  "gui.singulo.android.say.charging_follow.0": {
+    "source": "Thanks! Charging ♪",
+    "translation": "谢谢，充电中♪"
+  },
+  "gui.singulo.android.say.charging_follow.1": {
+    "source": "I feel safe near you",
+    "translation": "在你身边好安心"
+  },
+  "gui.singulo.android.say.hurt.0": {
+    "source": "Ouch... still going!",
+    "translation": "好痛…还能行！"
+  },
+  "gui.singulo.android.say.hurt.1": {
+    "source": "Got a repair kit?",
+    "translation": "有修理套件吗？"
+  },
+  "gui.singulo.android.say.hurt.2": {
+    "source": "This is getting tight",
+    "translation": "有点危险了"
+  },
+  "gui.singulo.android.say.idle.0": {
+    "source": "Leave it to me!",
+    "translation": "交给我吧！"
+  },
+  "gui.singulo.android.say.idle.1": {
+    "source": "So bored...",
+    "translation": "好无聊啊…"
+  },
+  "gui.singulo.android.say.idle.2": {
+    "source": "Nice weather, huh",
+    "translation": "天气真好呢"
+  },
+  "gui.singulo.android.say.idle.3": {
+    "source": "On lookout",
+    "translation": "正在警戒"
+  },
+  "gui.singulo.android.say.idle.4": {
+    "source": "Hey, what shall we play?",
+    "translation": "呐，要玩什么？"
+  },
+  "gui.singulo.android.say.idle.5": {
+    "source": "*yawn*",
+    "translation": "哈啊…（打哈欠）"
+  },
+  "gui.singulo.android.say.idle.6": {
+    "source": "I'll do my best today too!",
+    "translation": "今天也要加油！"
+  },
+  "gui.singulo.android.say.idle.7": {
+    "source": "All clear!",
+    "translation": "一切正常！"
+  },
+  "gui.singulo.android.say.idle.8": {
+    "source": "Where to next?",
+    "translation": "接下来去哪里？"
+  },
+  "gui.singulo.android.say.idle.9": {
+    "source": "Ehehe",
+    "translation": "嘿嘿"
+  },
+  "gui.singulo.android.say.low_power.0": {
+    "source": "Need a charge...",
+    "translation": "想要充电…"
+  },
+  "gui.singulo.android.say.low_power.1": {
+    "source": "Battery... so weak...",
+    "translation": "电池…没力气了…"
+  },
+  "gui.singulo.android.say.low_power.2": {
+    "source": "Hungry... (for power)",
+    "translation": "肚子饿了…（电）"
+  },
+  "gui.singulo.android.say.retreat.0": {
+    "source": "Taking a break",
+    "translation": "稍微休息一下"
+  },
+  "gui.singulo.android.say.retreat.1": {
+    "source": "Off to get repaired",
+    "translation": "我去修理一下"
+  },
+  "gui.singulo.android_station.charge": {
+    "source": "Charge",
+    "translation": "电量"
+  },
+  "gui.singulo.android_station.hp": {
+    "source": "HP",
+    "translation": "生命"
+  },
+  "gui.singulo.android_station.kit": {
+    "source": "Kit",
+    "translation": "套件"
+  },
+  "gui.singulo.android_station.link": {
+    "source": "Link",
+    "translation": "链接"
+  },
+  "gui.singulo.android_station.memory": {
+    "source": "Design",
+    "translation": "设计"
+  },
+  "gui.singulo.android_station.mode.0": {
+    "source": "Guard",
+    "translation": "迎击"
+  },
+  "gui.singulo.android_station.mode.0.hint": {
+    "source": "Waits by the station and fights enemies that come close.",
+    "translation": "在组装站旁等待，只迎击靠近的敌人。"
+  },
+  "gui.singulo.android_station.mode.1": {
+    "source": "Wander",
+    "translation": "徘徊"
+  },
+  "gui.singulo.android_station.mode.1.hint": {
+    "source": "Roams within 16 blocks of the station and fights the enemies it finds.",
+    "translation": "在组装站周围（16 格）四处走动，击败发现的敌人。"
+  },
+  "gui.singulo.android_station.mode.2": {
+    "source": "Follow",
+    "translation": "跟随"
+  },
+  "gui.singulo.android_station.mode.2.hint": {
+    "source": "Follows its owner and fights nearby enemies. Recharges while walking with you if you carry a wireless charger.",
+    "translation": "跟随主人并击败附近的敌人。如果你带着无线充电器，它会边跟着走边充电。"
+  },
+  "gui.singulo.android_station.no_design": {
+    "source": "No design memory",
+    "translation": "没有设计存储器"
+  },
+  "gui.singulo.android_station.recall": {
+    "source": "Recall",
+    "translation": "召回"
+  },
+  "gui.singulo.android_station.retreat": {
+    "source": "Return at %s%%",
+    "translation": "返回生命 %s%%"
+  },
+  "gui.singulo.android_station.retreat.hint": {
+    "source": "Below this share of health it returns to the station to repair and recharge.",
+    "translation": "生命值低于此比例时，返回组装站维修并充电。"
+  },
+  "gui.singulo.android_station.status.0": {
+    "source": "Insert a compact crystal memory",
+    "translation": "请放入小型水晶存储器"
+  },
+  "gui.singulo.android_station.status.1": {
+    "source": "No android kit",
+    "translation": "没有仿生人套件"
+  },
+  "gui.singulo.android_station.status.10": {
+    "source": "Out of charge",
+    "translation": "电量耗尽"
+  },
+  "gui.singulo.android_station.status.11": {
+    "source": "An android without a station is nearby",
+    "translation": "附近有失去组装站的仿生人"
+  },
+  "gui.singulo.android_station.status.2": {
+    "source": "Not enough power (40000 FE to print)",
+    "translation": "电力不足（打印需要 40000 FE）"
+  },
+  "gui.singulo.android_station.status.3": {
+    "source": "Printing",
+    "translation": "打印中"
+  },
+  "gui.singulo.android_station.status.4": {
+    "source": "Active",
+    "translation": "运行中"
+  },
+  "gui.singulo.android_station.status.5": {
+    "source": "Returning to the station",
+    "translation": "正在返回组装站"
+  },
+  "gui.singulo.android_station.status.6": {
+    "source": "Charging",
+    "translation": "充电中"
+  },
+  "gui.singulo.android_station.status.8": {
+    "source": "Something is blocking the top",
+    "translation": "组装站上方被挡住了"
+  },
+  "gui.singulo.android_station.status.9": {
+    "source": "Far away",
+    "translation": "在远处"
+  },
+  "gui.singulo.android_station.status.waiting": {
+    "source": "Reprinting in %s s",
+    "translation": "%s 秒后重新打印"
+  },
+  "gui.singulo.android_station.stock": {
+    "source": "Refill",
+    "translation": "补充"
+  },
+  "gui.singulo.android_station.upgrade": {
+    "source": "Upgrade",
+    "translation": "强化"
   },
   "gui.singulo.archivist.death_1": {
     "source": "...I have been dreaming a long dream.",
@@ -3715,6 +4071,42 @@
     "source": "Connected to %s handlers on the other side",
     "translation": "已连接另一端的 %s 个容器"
   },
+  "guide.singulo.androids": {
+    "source": "Androids",
+    "translation": "仿生人"
+  },
+  "guide.singulo.androids.build.body": {
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner).\n- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.",
+    "translation": "在仿生人组装站放入小型水晶存储器（决定型号，不会消耗）和仿生人套件（每次打印一个）并供电，它就会在上方打印一个护卫仿生人（每次 40,000 FE）。被击倒后，只要还有套件就会重新打印。放置组装站的人就是主人。\n- 护卫只攻击敌对生物（包括遗迹的仿生人和无人机），从不与玩家或首领战斗。玩家和首领的攻击不会伤到它。\n- 行动方式：迎击（在组装站旁等待）、徘徊（在 16 格内四处走动）、跟随（跟着主人）。\n- 返回生命：低于此值时，仿生人会回去维修并充电。按“召回”可立即让它回去。\n- 名字：在组装站或仿生人界面中点击名字即可改名（↺ 按钮恢复昵称）。\n- 比较器：组装站会根据仿生人的生命输出信号（0〜15）。\n- 组装站被破坏后，仿生人会留在原地。在新的组装站放入相同型号的存储器并按“链接”即可重新连接。"
+  },
+  "guide.singulo.androids.build.title": {
+    "source": "Your own androids",
+    "translation": "自己的仿生人"
+  },
+  "guide.singulo.androids.care.body": {
+    "source": "- Charging: a guard refills in 5 s back at its station (using power, and it heals too). While following, if you carry an Android Wireless Charger it comes to you and refills in 5 s as it walks with you (a full charger holds 30 refills; right-click a block that supplies power to charge it). With the station far away and no charger, it uses solar power or sits down.\n- Inventory: right-click your android to open its screen. A stack of Self-Repair Kits: one is used to restore half its health when it drops below the return health. One Android Armor Plate works as its chestplate (+8 armor, +2 toughness) and takes armor enchantments; it shows as plating on the chest and left shoulder.\n- Kits in the station's refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android's inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.",
+    "translation": "- 充电：护卫回到组装站后 5 秒充满（消耗电力，同时恢复生命）。跟随时，如果你带着仿生人无线充电器，它会来到你身边，边跟着走边在 5 秒内充满（充电器充满时可用 30 次；右键点击能输出电力的方块为其充电）。组装站很远又没有充电器时，它会用太阳能或坐下充电。\n- 物品：右键点击自己的仿生人即可打开其界面。一组自我修理套件：生命低于返回生命时用掉一个，恢复一半生命。一块仿生人用装甲板作为胸甲生效（护甲 +8，盔甲韧性 +2），可附上护甲类附魔，装上后胸口和左肩会出现装甲。\n- 组装站补充栏位中的修理套件，会在仿生人用掉一个时自动补充。强化栏位中的传送升级会把倒下仿生人的物品交给下一个（没有则掉落）。漏斗和管道可以向组装站输入，但无法取出。\n- 拆解：在仿生人界面中按两次扳手，它会从上方逐渐消失，组装站随即打印新的仿生人。"
+  },
+  "guide.singulo.androids.care.title": {
+    "source": "Charging, repair and gear",
+    "translation": "充电、修理与装备"
+  },
+  "guide.singulo.androids.glass.body": {
+    "source": "- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard's own path.\nAndroids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass next to them, and four plain panes make the patterned kind.",
+    "translation": "- 仿生人阻隔玻璃（琥珀色）：只有仿生人无法通过，玩家和其他生物可以直接穿过。适合放在基地出入口。\n- 仿生人透过玻璃（水色）：只有仿生人可以通过，对其他一切都是实心玻璃。适合作为护卫的专用通道。\n仿生人在规划路线时也会考虑这些玻璃：阻隔玻璃视为阻挡，透过玻璃视为通路。素面款与相同的玻璃相邻时会无缝相连，四块素面款可以做成花纹款。"
+  },
+  "guide.singulo.androids.glass.title": {
+    "source": "Android glass",
+    "translation": "仿生人用玻璃"
+  },
+  "guide.singulo.androids.ruin.body": {
+    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
+    "translation": "每座遗迹的墙边都有废墟仿生人打印台。生存模式的玩家靠近时，它会在台面上从脚开始逐层打印出 2〜3 个对应型号（光刃型、鞭型或光剑型）的仿生人并让其出动。全部击败后，台面上会出现该型号的小型水晶存储器，打印台随后休息一天。\n- 光刃型“露米娜”：蹲下、刀刃发亮后，会留下残影冲来斩击。单膝跪地手按地面时，脚下会出现预告圈并升起光柱（离开圈）。近身时会张开刀刃回旋斩。\n- 鞭型“薇尔娜”：可达约 6 格的鞭击，以及缠住并把你拉近的缠绕。在头顶甩鞭后，会抽打地面放出一道直线冲击波（跳起即可躲开）。\n- 光剑型“索蕾伊”：踏步突刺、挥动时剑刃伸长的横斩，以及飞行的新月斩击波。受击时会在正面展开光盾（正面几乎打不进去），继续攻击会被反击。请从侧面或背后进攻。\n仿生人依靠电量行动，大招用 10 次左右就会耗尽，眼睛的光会熄灭。它们会回到附近的打印台，或在白天露天处展开太阳能板，夜晚或室内则坐下充电（打印台 5 秒、太阳能 10 秒、坐下 14 秒）。充电时不会攻击，正是进攻的时机。"
+  },
+  "guide.singulo.androids.ruin.title": {
+    "source": "Ruin androids",
+    "translation": "遗迹的仿生人"
+  },
   "guide.singulo.catalysts": {
     "source": "Catalysts",
     "translation": "催化剂"
@@ -4162,6 +4554,46 @@
   "howto.singulo.accelerator_tube": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_armor_plate": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.android_barrier_glass": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_barrier_glass_patterned": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_charger": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.android_gate_glass": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_gate_glass_patterned": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.android_repair_kit": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_station": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.android_transfer_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
   },
   "howto.singulo.anomaly_sample": {
     "source": "Restore a Degraded Anomaly Sample",
@@ -5011,6 +5443,38 @@
     "source": "No fall damage while worn. Protects like a diamond chestplate",
     "translation": "穿戴时不受摔落伤害。防护与钻石胸甲相同"
   },
+  "item.singulo.android_armor_plate": {
+    "source": "Android Armor Plate",
+    "translation": "仿生人用装甲板"
+  },
+  "item.singulo.android_charger": {
+    "source": "Android Wireless Charger",
+    "translation": "仿生人无线充电器"
+  },
+  "item.singulo.android_kit": {
+    "source": "Android Kit",
+    "translation": "仿生人套件"
+  },
+  "item.singulo.android_memory_blade": {
+    "source": "Compact Crystal Memory (Blade)",
+    "translation": "小型水晶存储器（光刃型）"
+  },
+  "item.singulo.android_memory_saber": {
+    "source": "Compact Crystal Memory (Saber)",
+    "translation": "小型水晶存储器（光剑型）"
+  },
+  "item.singulo.android_memory_whip": {
+    "source": "Compact Crystal Memory (Whip)",
+    "translation": "小型水晶存储器（鞭型）"
+  },
+  "item.singulo.android_repair_kit": {
+    "source": "Self-Repair Kit",
+    "translation": "自我修理套件"
+  },
+  "item.singulo.android_transfer_upgrade": {
+    "source": "Transfer Upgrade",
+    "translation": "传送升级"
+  },
   "item.singulo.anomaly_sample": {
     "source": "Anomaly Sample",
     "translation": "异常样本"
@@ -5622,6 +6086,10 @@
   "key.singulo.toggle_area": {
     "source": "Toggle gravity tool area",
     "translation": "切换重力操控范围"
+  },
+  "message.singulo.android_charger.charged": {
+    "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
+    "translation": "已为无线充电器充入 %1$s FE（%2$s / %3$s FE）"
   },
   "message.singulo.deep_sea_collector.idle": {
     "source": "Not deep enough: needs 16+ blocks of water above",
@@ -6731,6 +7199,14 @@
     "source": "Wormhole stabilizer runs",
     "translation": "虫洞稳定器运行"
   },
+  "tooltip.singulo.android_armor_plate": {
+    "source": "Chestplate for a guard android (+8 armor, +2 toughness)",
+    "translation": "护卫仿生人的胸甲（护甲 +8，盔甲韧性 +2）"
+  },
+  "tooltip.singulo.android_charger.charges": {
+    "source": "Full android charges: %s",
+    "translation": "可充满仿生人 %s 次"
+  },
   "tooltip.singulo.beyond_repair": {
     "source": "Beyond repair",
     "translation": "无法修复"
@@ -6855,6 +7331,14 @@
     "source": "Used in: Particle Accelerator",
     "translation": "用于：粒子加速器"
   },
+  "uses.singulo.android_barrier_glass": {
+    "source": "Used in: Patterned Android Barrier Glass",
+    "translation": "用于：花纹仿生人阻隔玻璃"
+  },
+  "uses.singulo.android_gate_glass": {
+    "source": "Used in: Patterned Android Gate Glass",
+    "translation": "用于：花纹仿生人透过玻璃"
+  },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
     "translation": "用于：奇点核心"
@@ -6864,12 +7348,12 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 15 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 15 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 22 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 22 个"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 34 more",
-    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 34 个"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 35 more",
+    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 35 个"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -6916,8 +7400,8 @@
     "translation": "用于：卡西米尔腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 4 more",
-    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 4 个"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 7 more",
+    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 7 个"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -7284,12 +7768,12 @@
     "translation": "用于：基本框架、钢板、压缩机"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 62 more",
-    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 62 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 66 more",
+    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 66 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 41 more",
-    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 41 个"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 46 more",
+    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 46 个"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",
@@ -7356,8 +7840,8 @@
     "translation": "用于：重力场稳定器、虫洞生成器聚焦器、虫洞入口外壳"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 10 more",
-    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 10 个"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 12 more",
+    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 12 个"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",

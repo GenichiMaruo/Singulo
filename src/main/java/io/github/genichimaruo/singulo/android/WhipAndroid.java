@@ -71,6 +71,11 @@ public class WhipAndroid extends RuinAndroid {
     }
 
     @Override
+    public AndroidKind kind() {
+        return AndroidKind.WHIP;
+    }
+
+    @Override
     public int accent() {
         return ACCENT;
     }

@@ -68,8 +68,50 @@ public abstract class RuinAndroid extends Monster {
     /** 印刷台から離れていい距離（遺構のもの）。 */
     public static final int HOME_RADIUS = 18;
 
+    /** 体力が減ってステーションへ戻っているところ（護衛）。 */
+    public static final int STATE_RETREAT = 5;
+    /** 追従中に、持ち主の無線充電器で充電しながらついて歩いている（護衛）。 */
+    public static final int STATE_CHARGING_FOLLOW = 6;
+    /** ソーラー充電が終わって、パネルをたたんでいる（{@link #FOLD_TICKS}）。 */
+    public static final int STATE_SOLAR_FOLD = 7;
+    public static final int FOLD_TICKS = 20;
+    /** 無線充電器から1 tick にもらう電力（満充電 PER_ANDROID を 100 tick、5秒で）。 */
+    static final int CHARGER_FE_PER_TICK = AndroidChargerItem.PER_ANDROID / 100;
+
+    /** 護衛の動き方（組立ステーションの設定）。 */
+    public static final int MODE_GUARD = 0;
+    public static final int MODE_WANDER = 1;
+    public static final int MODE_FOLLOW = 2;
+    /** 護衛が敵を探す範囲（ステーションか持ち主から）。 */
+    public static final double GUARD_RANGE = 14;
+    public static final int WANDER_RADIUS = 16;
+
+    /** 充電器から電力をもらって、ついて歩いている持ち主（見た目のため。いなければ -1）。 */
+    private static final EntityDataAccessor<Integer> CHARGER_LINK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 護衛か（見た目と、右クリックで GUI を開けるかのため）。 */
+    private static final EntityDataAccessor<Boolean> GUARD = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+    /** 敵を見つけているか（GUI のひとこと）。 */
+    private static final EntityDataAccessor<Boolean> ALERT = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+
+    /** 護衛の持ち物: 0 は自己修理キット（1スタック）、1 は装甲板（胸当てとして働く）。 */
+    public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1;
+    /** 自己修理キット1つで直す体力の割合と、続けて使えるまでの tick。 */
+    static final float REPAIR_FRACTION = 0.5F;
+    static final int REPAIR_COOLDOWN = 60;
+
     @Nullable
     private BlockPos home;
+    /** 護衛（プレイヤーの組立ステーションで印刷された）か。護衛は敵対モブだけを狙い、プレイヤーには傷つけられない。 */
+    private boolean guard;
+    @Nullable
+    private java.util.UUID owner;
+    private int mode = MODE_GUARD;
+    /** 体力がこの割合（%）を下回ったら、ステーションへ戻る。 */
+    private int retreatPercent = 30;
+    private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(2);
+    private int repairCooldown;
+    /** 解体中（印刷を逆にたどって消えていく）。 */
+    private boolean dismantling;
     /** 今の動きを始めてからの tick（サーバー）。 */
     protected int stateTicks;
     /** クライアント: 今の動きが始まった時刻（見た目のため）。 */
@@ -80,6 +122,83 @@ public abstract class RuinAndroid extends Monster {
         super(type, level);
         this.xpReward = 8;
         setPersistenceRequired();
+        setDropChance(net.minecraft.world.entity.EquipmentSlot.CHEST, 0);
+        // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）
+        inventory.addListener(c -> setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy()));
+    }
+
+    /** 護衛の持ち物（GUI のスロット）。 */
+    public net.minecraft.world.SimpleContainer inventory() {
+        return inventory;
+    }
+
+    public static boolean isRepairKit(net.minecraft.world.item.ItemStack stack) {
+        return !stack.isEmpty() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_repair_kit");
+    }
+
+    public static boolean isArmorPlate(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidArmorPlateItem;
+    }
+
+    /** 自己修理キットを1つ使って、体力を半分直す。使えたら true。 */
+    private boolean useRepairKit(ServerLevel level) {
+        if (repairCooldown > 0 || !isRepairKit(inventory.getItem(SLOT_REPAIR))) {
+            return false;
+        }
+        inventory.removeItem(SLOT_REPAIR, 1);
+        heal(getMaxHealth() * REPAIR_FRACTION);
+        repairCooldown = REPAIR_COOLDOWN;
+        sparks(level, position().add(0, 1.0, 0), 14, 0.4);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, getX(), getY() + 1.2, getZ(), 6, 0.3, 0.4, 0.3, 0);
+        playSound(SoundEvents.SMITHING_TABLE_USE, 0.8F, 1.5F);
+        return true;
+    }
+
+    /** 持ち主が右クリックすると、持ち物と様子の GUI を開く。 */
+    @Override
+    protected net.minecraft.world.InteractionResult mobInteract(Player player, net.minecraft.world.InteractionHand hand) {
+        if (!entityData.get(GUARD) || player.isShiftKeyDown()) {
+            return super.mobInteract(player, hand);
+        }
+        if (player instanceof net.minecraft.server.level.ServerPlayer sp && (owner == null || owner.equals(player.getUUID()))) {
+            sp.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new AndroidMenu(id, inv, this), getDisplayName()),
+                    buf -> buf.writeVarInt(getId()));
+        }
+        return net.minecraft.world.InteractionResult.sidedSuccess(level().isClientSide);
+    }
+
+    /** 倒れたら、自己修理キットと装甲板をその場に落とす。 */
+    @Override
+    protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
+        super.dropCustomDeathLoot(level, source, recentlyHit);
+        releaseInventory(level);
+    }
+
+    /**
+     * 持ち物（自己修理キット・装甲板）を手放す。ステーションに転送アップグレードがあれば、ステーションへ転送して
+     * 次に印刷するアンドロイドに持たせる。なければその場に落とす。
+     */
+    private void releaseInventory(ServerLevel level) {
+        AndroidStationBlockEntity station = home != null && level.isLoaded(home)
+                && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
+        boolean sent = false;
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            net.minecraft.world.item.ItemStack stack = inventory.removeItemNoUpdate(i);
+            if (stack.isEmpty()) {
+                continue;
+            }
+            if (station != null) {
+                stack = station.keep(i, stack);
+                sent = true;
+            }
+            if (!stack.isEmpty()) {
+                spawnAtLocation(stack);
+            }
+        }
+        if (sent) {
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL, getX(), getY() + 0.8, getZ(), 20, 0.3, 0.5, 0.3, 0.2);
+            playSound(SoundEvents.ENDERMAN_TELEPORT, 0.5F, 1.6F);
+        }
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -96,12 +215,157 @@ public abstract class RuinAndroid extends Monster {
     /** 光の色（目・刃・印刷の光）。型ごとに違う。 */
     public abstract int accent();
 
+    public abstract AndroidKind kind();
+
+    /** 呼び名: 付けた名前があればそれ、なければ型の愛称（ルミナなど）。 */
+    public net.minecraft.network.chat.Component nickname() {
+        return hasCustomName() ? getCustomName() : net.minecraft.network.chat.Component.translatable(kind().nicknameKey());
+    }
+
+    /** 名前を付け直す（空なら愛称に戻す）。ステーションにも覚えさせる（印刷し直しても同じ名前）。 */
+    public void rename(String name) {
+        String n = name == null ? "" : name.strip();
+        if (n.length() > 32) {
+            n = n.substring(0, 32);
+        }
+        setCustomName(n.isEmpty() ? null : net.minecraft.network.chat.Component.literal(n));
+        if (home != null && level() instanceof ServerLevel level && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
+            station.rememberName(n);
+        }
+    }
+
+    /** 敵を見つけているか（GUI のひとことのため）。 */
+    public boolean alert() {
+        return entityData.get(ALERT);
+    }
+
+    /**
+     * 解体する（護衛の GUI のボタン）。持ち物をその場に落とし、印刷を逆にたどるように上から消えていく。
+     * 消えたらステーションに知らせ、ステーションはすぐに新しく印刷する（キットがあれば）。
+     */
+    public void dismantle() {
+        if (dismantling || !guard || !printed()) {
+            return;
+        }
+        dismantling = true;
+        if (level() instanceof ServerLevel level) {
+            releaseInventory(level);
+        }
+        setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.item.ItemStack.EMPTY);
+        setTarget(null);
+        getNavigation().stop();
+        playSound(SoundEvents.BEACON_DEACTIVATE, 0.9F, 1.4F);
+    }
+
+    /** ステーションを失った護衛か（新しいステーションでリンクし直せる）。 */
+    public boolean orphan() {
+        return guard && home == null;
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(STATE, STATE_IDLE);
         builder.define(CHARGE, CHARGE_MAX);
         builder.define(PRINT, PRINT_TICKS);
+        builder.define(CHARGER_LINK, -1);
+        builder.define(GUARD, false);
+        builder.define(ALERT, false);
+    }
+
+    // ------------------------------------------------------------------ 護衛（プレイヤーのアンドロイド）
+
+    /** 組立ステーションで印刷した護衛にする。 */
+    public void makeGuard(java.util.UUID owner, BlockPos station, int mode, int retreatPercent) {
+        this.guard = true;
+        entityData.set(GUARD, true);
+        this.owner = owner;
+        setHome(station);
+        configure(mode, retreatPercent);
+        setTarget(null);
+    }
+
+    /** ステーションの設定を受け取る。 */
+    public void configure(int mode, int retreatPercent) {
+        this.mode = Mth.clamp(mode, MODE_GUARD, MODE_FOLLOW);
+        this.retreatPercent = Mth.clamp(retreatPercent, 0, 90);
+        if (home != null) {
+            if (this.mode == MODE_WANDER) {
+                restrictTo(home, WANDER_RADIUS);
+            } else if (this.mode == MODE_FOLLOW) {
+                clearRestriction();
+            } else {
+                restrictTo(home, 4);
+            }
+        }
+    }
+
+    public boolean isGuard() {
+        return level().isClientSide ? entityData.get(GUARD) : guard;
+    }
+
+    @Nullable
+    public java.util.UUID owner() {
+        return owner;
+    }
+
+    public int mode() {
+        return mode;
+    }
+
+    @Nullable
+    public Player ownerPlayer() {
+        return owner == null ? null : level().getPlayerByUUID(owner);
+    }
+
+    /** 新しいステーションにつなぎ直す（身寄りのないアンドロイドのリンク）。持ち物はそのまま。 */
+    public void link(BlockPos station, int mode, int retreatPercent) {
+        setHome(station);
+        configure(mode, retreatPercent);
+    }
+
+    /** ステーションへ呼び戻す（GUI のボタン）。 */
+    public void recall() {
+        if (printed() && state() != STATE_RETREAT && !charging(state())) {
+            setTarget(null);
+            setState(STATE_RETREAT);
+        }
+    }
+
+    /** 敵を探す中心（迎撃・徘徊はステーション、追従は持ち主）。 */
+    @Nullable
+    Vec3 guardAnchor() {
+        if (mode == MODE_FOLLOW) {
+            Player p = ownerPlayer();
+            if (p != null) {
+                return p.position();
+            }
+        }
+        return home == null ? null : Vec3.atBottomCenterOf(home.above());
+    }
+
+    /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
+    boolean guardTargets(LivingEntity e) {
+        if (!(e instanceof net.minecraft.world.entity.monster.Enemy) || e instanceof RuinAndroid a && a.isGuard() || isBoss(e)) {
+            return false;
+        }
+        if (e instanceof net.minecraft.world.entity.TamableAnimal) {
+            return false;
+        }
+        Vec3 anchor = guardAnchor();
+        return anchor == null || e.position().distanceToSqr(anchor) < GUARD_RANGE * GUARD_RANGE;
+    }
+
+    /** この作品のボス（番人・ウォーデンなど）。護衛のアンドロイドとは互いに敵対しない。 */
+    static boolean isBoss(@Nullable Entity e) {
+        return e instanceof io.github.genichimaruo.singulo.ruin.RuinBoss || e instanceof io.github.genichimaruo.singulo.ruin.HorizonWarden;
+    }
+
+    /** 充電器でつながっている持ち主（クライアントでも見える）。 */
+    @Nullable
+    public Entity chargerLink() {
+        int id = entityData.get(CHARGER_LINK);
+        return id < 0 ? null : level().getEntity(id);
     }
 
     // ------------------------------------------------------------------ 状態
@@ -157,12 +421,13 @@ public abstract class RuinAndroid extends Monster {
 
     /** 攻撃できるか（充電があり、印刷が終わり、戻り・充電中でない）。 */
     public boolean active() {
-        return printed() && state() != STATE_LOW_POWER && !charging(state());
+        int s = state();
+        return printed() && s != STATE_LOW_POWER && s != STATE_RETREAT && s != STATE_SOLAR_FOLD && !charging(s);
     }
 
-    /** 充電中の状態か（印刷台・ソーラー・座って）。 */
+    /** 充電中の状態か（印刷台・ソーラー・座って・充電器）。 */
     public static boolean charging(int state) {
-        return state == STATE_CHARGING || state == STATE_SOLAR || state == STATE_RESTING;
+        return state == STATE_CHARGING || state == STATE_SOLAR || state == STATE_RESTING || state == STATE_CHARGING_FOLLOW;
     }
 
     public boolean printed() {
@@ -226,11 +491,26 @@ public abstract class RuinAndroid extends Monster {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new PowerGoal());
         registerCombat();
-        goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7));
+        goalSelector.addGoal(5, new GuardGoal());
+        goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
+            @Override
+            public boolean canUse() {
+                return (!guard || mode == MODE_WANDER) && super.canUse();
+            }
+        });
         goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 10));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
-        targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        // 遺構のものはプレイヤーを、護衛は敵対モブを狙う。護衛はプレイヤーに打たれても仕返ししない
+        targetSelector.addGoal(1, new HurtByTargetGoal(this) {
+            @Override
+            public boolean canUse() {
+                return super.canUse() && !(guard && (getLastHurtByMob() instanceof Player
+                        || getLastHurtByMob() instanceof RuinAndroid a && a.isGuard()));
+            }
+        });
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, p -> !guard));
+        targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.Mob.class, 5, true, false,
+                e -> guard && guardTargets(e)));
     }
 
     /** 型ごとの戦い方（優先度 2〜5）。 */
@@ -243,6 +523,51 @@ public abstract class RuinAndroid extends Monster {
             return;
         }
         stateTicks++;
+        if (dismantling) {
+            // 印刷を逆にたどって、上から消えていく
+            int p = entityData.get(PRINT);
+            if (p > 0) {
+                entityData.set(PRINT, p - 1);
+                if (p % 6 == 0) {
+                    playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.4F, 2.0F - p / (float) PRINT_TICKS);
+                }
+            } else {
+                if (home != null && level().getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
+                    station.onAndroidDismantled(getUUID());
+                }
+                discard();
+            }
+            return;
+        }
+        if (repairCooldown > 0) {
+            repairCooldown--;
+        }
+        entityData.set(ALERT, getTarget() != null && active());
+        if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
+            if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
+                // 体力をステーションへ知らせる（コンパレーターの出力。どこにいても最後の値が残る）
+                station.reportHealth(getUUID(), getHealth() / getMaxHealth());
+                // 自己修理キットが1つでも減っていたら、ステーションのストックから補充する
+                station.refill(this);
+            } else {
+                // ステーションが壊された: 身寄りのないアンドロイドになる（新しいステーションでリンクし直せる）
+                setHome(null);
+                clearRestriction();
+            }
+        }
+        if (guard && printed() && active() && getHealth() < getMaxHealth() * retreatPercent / 100F
+                && !useRepairKit((ServerLevel) level()) && home != null && repairCooldown <= 0) {
+            // 体力が減ったら（自己修理キットがなければ）、戦いをやめてステーションへ戻る
+            setTarget(null);
+            setState(STATE_RETREAT);
+            playSound(SoundEvents.BEACON_DEACTIVATE, 0.7F, 1.3F);
+        }
+        if (guard && getTarget() != null && !guardTargets(getTarget())) {
+            setTarget(null);
+        }
+        if (state() != STATE_CHARGING_FOLLOW && entityData.get(CHARGER_LINK) >= 0) {
+            entityData.set(CHARGER_LINK, -1);
+        }
         int p = entityData.get(PRINT);
         if (p < PRINT_TICKS) {
             entityData.set(PRINT, p + 1);
@@ -265,15 +590,49 @@ public abstract class RuinAndroid extends Monster {
 
     @Override
     public boolean isAlliedTo(Entity other) {
+        if (guard) {
+            // 護衛はプレイヤーとほかの護衛の味方
+            return other instanceof Player || other instanceof RuinAndroid a && a.isGuard() || super.isAlliedTo(other);
+        }
         return RuinGuards.isGuard(other) || super.isAlliedTo(other);
     }
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!printed() || RuinGuards.isGuard(source.getEntity())) {
+        if (!printed()) {
+            return false;
+        }
+        Entity by = source.getEntity();
+        if (guard ? by instanceof Player || by instanceof RuinAndroid a && a.isGuard() || isBoss(by) : RuinGuards.isGuard(by)) {
+            return false;
+        }
+        // ボスの叩きつけ・投げ飛ばしの落下も受けない（落下のダメージには、誰の技かが付かないので、近くにボスがいるかで見る）
+        if (guard && source.is(net.minecraft.tags.DamageTypeTags.IS_FALL)
+                && !level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(48), RuinAndroid::isBoss).isEmpty()) {
             return false;
         }
         return super.hurt(source, amount);
+    }
+
+    /** 護衛は平和な難易度でも消えない。 */
+    @Override
+    protected boolean shouldDespawnInPeaceful() {
+        return !guard;
+    }
+
+    /** 護衛が倒れたら、ステーションに知らせる（キットがあれば印刷し直す）。護衛は経験値を落とさない。 */
+    @Override
+    public void die(DamageSource source) {
+        super.die(source);
+        if (guard && home != null && level() instanceof ServerLevel level
+                && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
+            station.onAndroidDied(getUUID());
+        }
+    }
+
+    @Override
+    public boolean shouldDropExperience() {
+        return !guard && super.shouldDropExperience();
     }
 
     /** 前方 arcDeg 度・距離 reach の扇の中の相手に当てる（技の当たり判定）。当たった数を返す。 */
@@ -351,6 +710,15 @@ public abstract class RuinAndroid extends Monster {
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
+        tag.put("inventory", inventory.createTag(registryAccess()));
+        if (guard) {
+            tag.putBoolean("guard", true);
+            if (owner != null) {
+                tag.putUUID("owner", owner);
+            }
+            tag.putInt("mode", mode);
+            tag.putInt("retreat", retreatPercent);
+        }
     }
 
     @Override
@@ -363,8 +731,60 @@ public abstract class RuinAndroid extends Monster {
             entityData.set(PRINT, Mth.clamp(tag.getInt("print"), 0, PRINT_TICKS));
         }
         NbtUtils.readBlockPos(tag, "home").ifPresent(this::setHome);
+        guard = tag.getBoolean("guard");
+        entityData.set(GUARD, guard);
+        inventory.fromTag(tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND), registryAccess());
+        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        if (guard) {
+            configure(tag.getInt("mode"), tag.contains("retreat") ? tag.getInt("retreat") : 30);
+        }
         if (charge() <= 0) {
             setState(STATE_LOW_POWER);
+        }
+    }
+
+    /** 護衛の立ち位置: 迎撃はステーションのそばへ戻って待ち、追従は持ち主についていく（離れすぎたらそばへ跳ぶ）。 */
+    private final class GuardGoal extends Goal {
+        GuardGoal() {
+            setFlags(EnumSet.of(Flag.MOVE));
+        }
+
+        @Override
+        public boolean canUse() {
+            return guard && active() && getTarget() == null && mode != MODE_WANDER;
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void tick() {
+            if (mode == MODE_FOLLOW) {
+                Player p = ownerPlayer();
+                if (p == null) {
+                    return;
+                }
+                double d = distanceTo(p);
+                if (d > 24 && p.onGround()) {
+                    // 離れすぎたら、持ち主のそばへ跳ぶ（ペットと同じ）
+                    Vec3 back = p.position().subtract(p.getLookAngle().multiply(1, 0, 1).normalize().scale(2));
+                    teleportTo(back.x, p.getY(), back.z);
+                    getNavigation().stop();
+                } else if (d > 4) {
+                    if (getNavigation().isDone() || tickCount % 10 == 0) {
+                        getNavigation().moveTo(p, d > 10 ? 1.2 : 1.0);
+                    }
+                } else {
+                    getNavigation().stop();
+                }
+            } else if (home != null) {
+                Vec3 spot = Vec3.atBottomCenterOf(home.above());
+                if (spot.distanceToSqr(position()) > 3 * 3 && (getNavigation().isDone() || tickCount % 20 == 0)) {
+                    getNavigation().moveTo(spot.x, spot.y, spot.z, 0.9);
+                }
+            }
         }
     }
 
@@ -379,7 +799,8 @@ public abstract class RuinAndroid extends Monster {
 
         @Override
         public boolean canUse() {
-            return !printed() || state() == STATE_LOW_POWER || charging(state());
+            return !printed() || state() == STATE_LOW_POWER || state() == STATE_RETREAT || state() == STATE_SOLAR_FOLD
+                    || charging(state());
         }
 
         @Override
@@ -392,10 +813,37 @@ public abstract class RuinAndroid extends Monster {
             if (!printed() || !(level() instanceof ServerLevel level)) {
                 return;
             }
-            if (state() == STATE_LOW_POWER) {
+            if (state() == STATE_LOW_POWER && guard && mode == MODE_FOLLOW) {
+                // 追従中: 充電器を持った持ち主のほうがステーションより近いか、ステーションが遠すぎれば、持ち主のそばで充電する
+                Player p = chargerOwner();
+                double dock = home == null ? Double.MAX_VALUE : Math.sqrt(Vec3.atBottomCenterOf(home.above()).distanceToSqr(position()));
+                if (p != null && (dock > DOCK_RANGE || distanceTo(p) < dock)) {
+                    setState(STATE_CHARGING_FOLLOW);
+                    return;
+                }
+            }
+            if (state() == STATE_CHARGING_FOLLOW) {
+                followCharge(level);
+                return;
+            }
+            if (state() == STATE_SOLAR_FOLD) {
+                getNavigation().stop();
+                if (stateTicks >= FOLD_TICKS) {
+                    setState(STATE_IDLE);
+                }
+                return;
+            }
+            if (state() == STATE_LOW_POWER || state() == STATE_RETREAT) {
                 BlockPos h = home;
                 Vec3 dock = h == null ? null : Vec3.atBottomCenterOf(h.above());
-                if (dock == null || dock.distanceToSqr(position()) > DOCK_RANGE * DOCK_RANGE || stateTicks > 400) {
+                if (state() == STATE_RETREAT && dock != null && dock.distanceToSqr(position()) > 96 * 96) {
+                    // 遠すぎる（別の場所にいる）ときは、その場で直るのを待つ
+                    setState(STATE_IDLE);
+                    return;
+                }
+                // 充電切れで、ステーション（印刷台）が遠すぎれば戻らずにその場で充電する。体力で戻るときは遠くからでも戻る
+                double range = state() == STATE_RETREAT ? 96 : DOCK_RANGE;
+                if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400)) {
                     getNavigation().stop();
                     setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
                     playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
@@ -413,6 +861,16 @@ public abstract class RuinAndroid extends Monster {
             } else if (charging(state())) {
                 getNavigation().stop();
                 int s = state();
+                if (s == STATE_CHARGING && home != null) {
+                    // ステーション（印刷台）の真上の中心へ寄る
+                    Vec3 c = Vec3.atBottomCenterOf(home.above());
+                    Vec3 dv = c.subtract(position()).multiply(1, 0, 1);
+                    if (dv.length() > 0.04) {
+                        setDeltaMovement(dv.x * 0.3, getDeltaMovement().y, dv.z * 0.3);
+                    } else {
+                        setPos(c.x, getY(), c.z);
+                    }
+                }
                 // 外で充電中に日が沈んだり屋根の下に入ったら座る。座っていて日が出たらパネルを広げる
                 if (s != STATE_CHARGING && stateTicks % 40 == 0) {
                     boolean sun = sunlit(level);
@@ -424,14 +882,70 @@ public abstract class RuinAndroid extends Monster {
                         s = STATE_SOLAR;
                     }
                 }
-                setCharge(charge() + (s == STATE_CHARGING ? RATE_DOCK : s == STATE_SOLAR ? RATE_SOLAR : RATE_REST));
+                int rate = s == STATE_CHARGING ? RATE_DOCK : s == STATE_SOLAR ? RATE_SOLAR : RATE_REST;
+                if (s == STATE_CHARGING && guard && stateTicks % 10 == 0 && home != null
+                        && level.getBlockEntity(home) instanceof AndroidStationBlockEntity dock) {
+                    dock.refill(RuinAndroid.this);
+                }
+                if (s == STATE_CHARGING && guard) {
+                    // 護衛はステーションの電力で充電し、体力も直す（電力が足りなければ待つ）
+                    if (!(home != null && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station
+                            && station.drawCharge(AndroidStationBlockEntity.FE_PER_CHARGE_TICK))) {
+                        rate = 0;
+                    } else if (stateTicks % 4 == 0 && getHealth() < getMaxHealth()) {
+                        heal(1);
+                    }
+                }
+                setCharge(charge() + rate);
                 if (stateTicks % 8 == 0) {
                     sparks(level, position().add(0, s == STATE_SOLAR ? 2.2 : 0.2, 0), 2, 0.3);
                 }
-                if (charge() >= CHARGE_MAX) {
-                    setState(STATE_IDLE);
+                boolean healed = !(guard && s == STATE_CHARGING) || getHealth() >= getMaxHealth();
+                if (charge() >= CHARGE_MAX && healed) {
+                    // ソーラーのときは、パネルをたたんでから戦いに戻る
+                    setState(s == STATE_SOLAR ? STATE_SOLAR_FOLD : STATE_IDLE);
                     playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
                 }
+            }
+        }
+
+        /** 電力の残っている無線充電器を持っている持ち主（近くにいなければ null）。 */
+        @Nullable
+        private Player chargerOwner() {
+            Player p = ownerPlayer();
+            return p != null && p.isAlive() && p.distanceToSqr(RuinAndroid.this) < 64 * 64 && !AndroidChargerItem.find(p).isEmpty()
+                    ? p : null;
+        }
+
+        /** 持ち主のそばへ寄って、ついて歩きながら充電器から充電する（5秒で満タン）。 */
+        private void followCharge(ServerLevel level) {
+            Player p = chargerOwner();
+            if (p == null) {
+                // 充電器が切れた・持ち主がいない: ふつうの充電切れに戻る
+                setState(STATE_LOW_POWER);
+                return;
+            }
+            entityData.set(CHARGER_LINK, p.getId());
+            double d = distanceTo(p);
+            if (d > 2.5) {
+                if (stateTicks % 5 == 0) {
+                    getNavigation().moveTo(p, 1.15);
+                }
+            } else {
+                getNavigation().stop();
+                getLookControl().setLookAt(p, 30, 30);
+            }
+            if (d < 4) {
+                net.minecraft.world.item.ItemStack charger = AndroidChargerItem.find(p);
+                int got = AndroidChargerItem.energy(charger).extractEnergy(CHARGER_FE_PER_TICK, false);
+                setCharge(charge() + RATE_DOCK * got / CHARGER_FE_PER_TICK);
+                if (stateTicks % 8 == 0) {
+                    sparks(level, position().add(0, 1.0, 0), 2, 0.25);
+                }
+            }
+            if (charge() >= CHARGE_MAX) {
+                setState(STATE_IDLE);
+                playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
             }
         }
 

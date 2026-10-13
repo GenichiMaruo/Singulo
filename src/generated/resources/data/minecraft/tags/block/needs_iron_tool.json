@@ -25,6 +25,10 @@
     "singulo:white_glass_panel",
     "singulo:white_star_glass_panel",
     "singulo:black_reinforced_glass",
-    "singulo:black_star_glass"
+    "singulo:black_star_glass",
+    "singulo:android_barrier_glass",
+    "singulo:android_barrier_glass_patterned",
+    "singulo:android_gate_glass",
+    "singulo:android_gate_glass_patterned"
   ]
 }

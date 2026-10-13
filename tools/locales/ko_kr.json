@@ -439,6 +439,26 @@
     "source": "Accelerator Tube",
     "translation": "가속관"
   },
+  "block.singulo.android_barrier_glass": {
+    "source": "Android Barrier Glass",
+    "translation": "안드로이드 차단 유리"
+  },
+  "block.singulo.android_barrier_glass_patterned": {
+    "source": "Patterned Android Barrier Glass",
+    "translation": "무늬 안드로이드 차단 유리"
+  },
+  "block.singulo.android_gate_glass": {
+    "source": "Android Gate Glass",
+    "translation": "안드로이드 투과 유리"
+  },
+  "block.singulo.android_gate_glass_patterned": {
+    "source": "Patterned Android Gate Glass",
+    "translation": "무늬 안드로이드 투과 유리"
+  },
+  "block.singulo.android_station": {
+    "source": "Android Assembly Station",
+    "translation": "안드로이드 조립 스테이션"
+  },
   "block.singulo.archive_terminal": {
     "source": "Archive Terminal",
     "translation": "기록 보관 단말기"
@@ -805,7 +825,7 @@
   },
   "block.singulo.ruin_android_fabricator": {
     "source": "Ruin Android Fabricator",
-    "translation": "유적 안드로이드 프린터"
+    "translation": "폐허 안드로이드 출력대"
   },
   "block.singulo.ruin_cache": {
     "source": "Ruin Cache",
@@ -1134,6 +1154,58 @@
   "desc.singulo.afterglow_wings": {
     "source": "Wings of crystal feathers born from the Last Archivist's light. Wear them on your chest to glide; sneak while gliding to beat them and surge ahead. No fall damage.",
     "translation": "최후의 기록자의 빛에서 태어난 결정 깃털의 날개입니다. 몸통에 착용하면 활공할 수 있고, 활공 중에 웅크리면 날갯짓으로 가속합니다. 낙하 피해를 받지 않습니다."
+  },
+  "desc.singulo.android_armor_plate": {
+    "source": "One fitted to a guard android works as its chestplate (+8 armor, +2 toughness). Takes armor enchantments.",
+    "translation": "호위 안드로이드에 하나 장착하면 흉갑으로 작동합니다(방어 +8, 방어 강도 +2). 방어구 마법 부여를 할 수 있습니다."
+  },
+  "desc.singulo.android_barrier_glass": {
+    "source": "Glass that only androids cannot pass. Players and other creatures go straight through. Joins seamlessly with the same glass next to it.",
+    "translation": "안드로이드만 지나갈 수 없는 유리. 플레이어와 다른 생물은 그대로 통과합니다. 같은 유리와 붙으면 이음새 없이 이어집니다."
+  },
+  "desc.singulo.android_barrier_glass_patterned": {
+    "source": "Patterned glass that only androids cannot pass.",
+    "translation": "안드로이드만 지나갈 수 없는 무늬 유리."
+  },
+  "desc.singulo.android_charger": {
+    "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
+    "translation": "들고 다니면 따라오는 안드로이드가 가까이 와서 함께 걸으며 충전합니다(가득 차 있으면 안드로이드를 30번 가득 충전). 전력을 내보내는 블록을 우클릭해 충전합니다."
+  },
+  "desc.singulo.android_gate_glass": {
+    "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
+    "translation": "안드로이드만 지나갈 수 있는 유리. 그 밖의 모든 것에는 단단한 유리입니다. 같은 유리와 붙으면 이음새 없이 이어집니다."
+  },
+  "desc.singulo.android_gate_glass_patterned": {
+    "source": "Patterned glass that only androids can pass.",
+    "translation": "안드로이드만 지나갈 수 있는 무늬 유리."
+  },
+  "desc.singulo.android_kit": {
+    "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
+    "translation": "부품과 외장 한 벌. 안드로이드 조립 스테이션이 안드로이드를 하나 출력할 때마다 하나씩 사용합니다."
+  },
+  "desc.singulo.android_memory_blade": {
+    "source": "A compact crystal memory with a reader, holding the design of the Blade Android. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "광날형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
+  },
+  "desc.singulo.android_memory_saber": {
+    "source": "A compact crystal memory with a reader, holding the design of the Saber Android. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "광검형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
+  },
+  "desc.singulo.android_memory_whip": {
+    "source": "A compact crystal memory with a reader, holding the design of the Whip Android. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "채찍형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
+  },
+  "desc.singulo.android_repair_kit": {
+    "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
+    "translation": "호위 안드로이드의 소지품에 넣어 두면 다쳤을 때 하나를 써서 체력을 절반 회복합니다(다 쓰면 스테이션으로 돌아갑니다)."
+  },
+  "desc.singulo.android_station": {
+    "source": "Prints one guard android from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
+    "translation": "소형 크리스털 메모리와 안드로이드 키트와 전력으로 호위 안드로이드를 하나 출력하고, 쓰러지면 새 키트로 다시 출력합니다. 움직이는 방식과, 돌아와서 수리·충전할 체력을 정합니다."
+  },
+  "desc.singulo.android_transfer_upgrade": {
+    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits and armor plate) to the station instead of dropping it, and the next android it prints carries it.",
+    "translation": "안드로이드 조립 스테이션의 강화 슬롯에 넣으면, 안드로이드가 쓰러지거나 해체될 때 소지품(수리 키트와 장갑판)을 떨어뜨리지 않고 스테이션으로 전송해 다음에 출력하는 안드로이드에게 넘깁니다."
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -1840,8 +1912,8 @@
     "translation": "가라앉은 노심 구획의 봉쇄 기둥에 끼워진, 반응로의 충격을 견디기 위한 창입니다. 매우 단단하며 폭발로도 부서지지 않습니다."
   },
   "desc.singulo.ruin_android_fabricator": {
-    "source": "Prints androids onto its bed and sends them out.",
-    "translation": "받침대 위에 안드로이드를 출력해 출격시킵니다."
+    "source": "Prints androids onto its bed and sends them out. Defeat them all to get a compact crystal memory of their design.",
+    "translation": "받침대 위에 안드로이드를 출력해 출격시킵니다. 모두 쓰러뜨리면 그 형의 소형 크리스털 메모리를 얻습니다."
   },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
@@ -2277,7 +2349,7 @@
   },
   "entity.singulo.blade_android": {
     "source": "Blade Android \"Lumina\"",
-    "translation": "광검날형 안드로이드 \"루미나\""
+    "translation": "광날형 안드로이드 \"루미나\""
   },
   "entity.singulo.echo_sentinel": {
     "source": "Echo Sentinel",
@@ -2462,6 +2534,290 @@
   "gui.singulo.anchor.status": {
     "source": "Radius %s chunks · %s · %s FE/t · stored %s FE",
     "translation": "반경 %1$s 청크 · %2$s · %3$s FE/t · 저장됨 %4$s FE"
+  },
+  "gui.singulo.android.armor": {
+    "source": "Armor",
+    "translation": "방어"
+  },
+  "gui.singulo.android.charge": {
+    "source": "%s%%",
+    "translation": "%s%%"
+  },
+  "gui.singulo.android.dismantle": {
+    "source": "Dismantle (press twice)",
+    "translation": "해체(두 번 누르기)"
+  },
+  "gui.singulo.android.dismantle.confirm": {
+    "source": "Press again to dismantle",
+    "translation": "한 번 더 누르면 해체합니다"
+  },
+  "gui.singulo.android.hp": {
+    "source": "HP %s / %s",
+    "translation": "체력 %s / %s"
+  },
+  "gui.singulo.android.mode": {
+    "source": "Mode: %s",
+    "translation": "모드: %s"
+  },
+  "gui.singulo.android.nickname.blade": {
+    "source": "Lumina",
+    "translation": "루미나"
+  },
+  "gui.singulo.android.nickname.saber": {
+    "source": "Soleil",
+    "translation": "솔레이유"
+  },
+  "gui.singulo.android.nickname.whip": {
+    "source": "Verna",
+    "translation": "베르나"
+  },
+  "gui.singulo.android.plate": {
+    "source": "Plate",
+    "translation": "장갑"
+  },
+  "gui.singulo.android.rename": {
+    "source": "Click to rename",
+    "translation": "클릭해서 이름 바꾸기"
+  },
+  "gui.singulo.android.rename.reset": {
+    "source": "Reset name",
+    "translation": "이름 되돌리기"
+  },
+  "gui.singulo.android.repair": {
+    "source": "Repair",
+    "translation": "수리"
+  },
+  "gui.singulo.android.say.alert.0": {
+    "source": "Enemy spotted!",
+    "translation": "적 발견!"
+  },
+  "gui.singulo.android.say.alert.1": {
+    "source": "Found one!",
+    "translation": "찾았다!"
+  },
+  "gui.singulo.android.say.alert.2": {
+    "source": "There!",
+    "translation": "거기!"
+  },
+  "gui.singulo.android.say.alert.3": {
+    "source": "Here I go!",
+    "translation": "간다!"
+  },
+  "gui.singulo.android.say.alert.4": {
+    "source": "Stay back!",
+    "translation": "물러나 있어!"
+  },
+  "gui.singulo.android.say.alert.5": {
+    "source": "Eliminating!",
+    "translation": "제거합니다!"
+  },
+  "gui.singulo.android.say.charging.0": {
+    "source": "Charging... ♪",
+    "translation": "충전 중…♪"
+  },
+  "gui.singulo.android.say.charging.1": {
+    "source": "So warm~",
+    "translation": "따끈따끈해~"
+  },
+  "gui.singulo.android.say.charging.2": {
+    "source": "Almost full",
+    "translation": "가득 찰 때까지 조금만"
+  },
+  "gui.singulo.android.say.charging_follow.0": {
+    "source": "Thanks! Charging ♪",
+    "translation": "고마워, 충전 중♪"
+  },
+  "gui.singulo.android.say.charging_follow.1": {
+    "source": "I feel safe near you",
+    "translation": "곁에 있으면 안심돼"
+  },
+  "gui.singulo.android.say.hurt.0": {
+    "source": "Ouch... still going!",
+    "translation": "아야… 아직 괜찮아!"
+  },
+  "gui.singulo.android.say.hurt.1": {
+    "source": "Got a repair kit?",
+    "translation": "수리 키트 있어?"
+  },
+  "gui.singulo.android.say.hurt.2": {
+    "source": "This is getting tight",
+    "translation": "좀 위험할지도"
+  },
+  "gui.singulo.android.say.idle.0": {
+    "source": "Leave it to me!",
+    "translation": "맡겨 줘!"
+  },
+  "gui.singulo.android.say.idle.1": {
+    "source": "So bored...",
+    "translation": "심심해…"
+  },
+  "gui.singulo.android.say.idle.2": {
+    "source": "Nice weather, huh",
+    "translation": "날씨 좋다"
+  },
+  "gui.singulo.android.say.idle.3": {
+    "source": "On lookout",
+    "translation": "경계 중입니다"
+  },
+  "gui.singulo.android.say.idle.4": {
+    "source": "Hey, what shall we play?",
+    "translation": "있잖아, 뭐 하고 놀까?"
+  },
+  "gui.singulo.android.say.idle.5": {
+    "source": "*yawn*",
+    "translation": "하암…(하품)"
+  },
+  "gui.singulo.android.say.idle.6": {
+    "source": "I'll do my best today too!",
+    "translation": "오늘도 힘낼게!"
+  },
+  "gui.singulo.android.say.idle.7": {
+    "source": "All clear!",
+    "translation": "이상 없음!"
+  },
+  "gui.singulo.android.say.idle.8": {
+    "source": "Where to next?",
+    "translation": "다음엔 어디 갈까?"
+  },
+  "gui.singulo.android.say.idle.9": {
+    "source": "Ehehe",
+    "translation": "헤헤"
+  },
+  "gui.singulo.android.say.low_power.0": {
+    "source": "Need a charge...",
+    "translation": "충전하고 싶어…"
+  },
+  "gui.singulo.android.say.low_power.1": {
+    "source": "Battery... so weak...",
+    "translation": "배터리가… 흐물흐물…"
+  },
+  "gui.singulo.android.say.low_power.2": {
+    "source": "Hungry... (for power)",
+    "translation": "배고파…(전기)"
+  },
+  "gui.singulo.android.say.retreat.0": {
+    "source": "Taking a break",
+    "translation": "잠깐 쉴게"
+  },
+  "gui.singulo.android.say.retreat.1": {
+    "source": "Off to get repaired",
+    "translation": "수리하고 올게"
+  },
+  "gui.singulo.android_station.charge": {
+    "source": "Charge",
+    "translation": "충전"
+  },
+  "gui.singulo.android_station.hp": {
+    "source": "HP",
+    "translation": "체력"
+  },
+  "gui.singulo.android_station.kit": {
+    "source": "Kit",
+    "translation": "키트"
+  },
+  "gui.singulo.android_station.link": {
+    "source": "Link",
+    "translation": "연결"
+  },
+  "gui.singulo.android_station.memory": {
+    "source": "Design",
+    "translation": "설계"
+  },
+  "gui.singulo.android_station.mode.0": {
+    "source": "Guard",
+    "translation": "요격"
+  },
+  "gui.singulo.android_station.mode.0.hint": {
+    "source": "Waits by the station and fights enemies that come close.",
+    "translation": "스테이션 곁에서 기다리다가 가까이 온 적만 요격합니다."
+  },
+  "gui.singulo.android_station.mode.1": {
+    "source": "Wander",
+    "translation": "배회"
+  },
+  "gui.singulo.android_station.mode.1.hint": {
+    "source": "Roams within 16 blocks of the station and fights the enemies it finds.",
+    "translation": "스테이션 주변(16블록)을 돌아다니며 발견한 적을 쓰러뜨립니다."
+  },
+  "gui.singulo.android_station.mode.2": {
+    "source": "Follow",
+    "translation": "따라가기"
+  },
+  "gui.singulo.android_station.mode.2.hint": {
+    "source": "Follows its owner and fights nearby enemies. Recharges while walking with you if you carry a wireless charger.",
+    "translation": "주인을 따라다니며 근처의 적을 쓰러뜨립니다. 무선 충전기를 들고 있으면 함께 걸으며 충전합니다."
+  },
+  "gui.singulo.android_station.no_design": {
+    "source": "No design memory",
+    "translation": "설계 메모리 없음"
+  },
+  "gui.singulo.android_station.recall": {
+    "source": "Recall",
+    "translation": "불러오기"
+  },
+  "gui.singulo.android_station.retreat": {
+    "source": "Return at %s%%",
+    "translation": "복귀 체력 %s%%"
+  },
+  "gui.singulo.android_station.retreat.hint": {
+    "source": "Below this share of health it returns to the station to repair and recharge.",
+    "translation": "체력이 이 비율보다 낮아지면 스테이션으로 돌아가 수리와 충전을 합니다."
+  },
+  "gui.singulo.android_station.status.0": {
+    "source": "Insert a compact crystal memory",
+    "translation": "소형 크리스털 메모리를 넣으세요"
+  },
+  "gui.singulo.android_station.status.1": {
+    "source": "No android kit",
+    "translation": "안드로이드 키트가 없습니다"
+  },
+  "gui.singulo.android_station.status.10": {
+    "source": "Out of charge",
+    "translation": "전력 소진"
+  },
+  "gui.singulo.android_station.status.11": {
+    "source": "An android without a station is nearby",
+    "translation": "근처에 스테이션을 잃은 안드로이드가 있습니다"
+  },
+  "gui.singulo.android_station.status.2": {
+    "source": "Not enough power (40000 FE to print)",
+    "translation": "전력이 부족합니다(출력에 40000 FE)"
+  },
+  "gui.singulo.android_station.status.3": {
+    "source": "Printing",
+    "translation": "출력 중"
+  },
+  "gui.singulo.android_station.status.4": {
+    "source": "Active",
+    "translation": "가동 중"
+  },
+  "gui.singulo.android_station.status.5": {
+    "source": "Returning to the station",
+    "translation": "스테이션으로 돌아가는 중"
+  },
+  "gui.singulo.android_station.status.6": {
+    "source": "Charging",
+    "translation": "충전 중"
+  },
+  "gui.singulo.android_station.status.8": {
+    "source": "Something is blocking the top",
+    "translation": "스테이션 위가 막혀 있습니다"
+  },
+  "gui.singulo.android_station.status.9": {
+    "source": "Far away",
+    "translation": "멀리 있음"
+  },
+  "gui.singulo.android_station.status.waiting": {
+    "source": "Reprinting in %s s",
+    "translation": "%s초 후 다시 출력"
+  },
+  "gui.singulo.android_station.stock": {
+    "source": "Refill",
+    "translation": "보충"
+  },
+  "gui.singulo.android_station.upgrade": {
+    "source": "Upgrade",
+    "translation": "강화"
   },
   "gui.singulo.archivist.death_1": {
     "source": "...I have been dreaming a long dream.",
@@ -3715,6 +4071,42 @@
     "source": "Connected to %s handlers on the other side",
     "translation": "반대편의 저장소 %s개와 연결됨"
   },
+  "guide.singulo.androids": {
+    "source": "Androids",
+    "translation": "안드로이드"
+  },
+  "guide.singulo.androids.build.body": {
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner).\n- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.",
+    "translation": "안드로이드 조립 스테이션에 소형 크리스털 메모리(형을 정함, 소모되지 않음)와 안드로이드 키트(출력마다 하나)를 넣고 전력을 보내면, 위에 호위 안드로이드를 하나 출력합니다(1회 40,000 FE). 쓰러지면 키트가 남아 있는 한 다시 출력합니다. 스테이션을 놓은 사람이 주인입니다.\n- 호위는 적대적 몹(유적의 안드로이드와 드론 포함)만 노리고, 플레이어나 보스와는 절대 싸우지 않습니다. 플레이어와 보스의 공격으로는 다치지 않습니다.\n- 움직임: 요격(스테이션 곁에서 대기)·배회(16블록 안을 돌아다님)·따라가기(주인을 따라감).\n- 복귀 체력: 이보다 낮아지면 안드로이드가 돌아가 수리와 충전을 합니다. \"불러오기\"로 바로 돌려보낼 수도 있습니다.\n- 이름: 스테이션이나 안드로이드 화면에서 이름을 클릭하면 바꿀 수 있습니다(↺ 버튼으로 애칭으로 되돌림).\n- 비교기: 스테이션이 안드로이드의 체력에 따라 신호(0~15)를 냅니다.\n- 스테이션이 부서지면 안드로이드는 그 자리에 남습니다. 새 스테이션에 같은 형의 메모리를 넣고 \"연결\"을 누르면 다시 이어집니다."
+  },
+  "guide.singulo.androids.build.title": {
+    "source": "Your own androids",
+    "translation": "나만의 안드로이드"
+  },
+  "guide.singulo.androids.care.body": {
+    "source": "- Charging: a guard refills in 5 s back at its station (using power, and it heals too). While following, if you carry an Android Wireless Charger it comes to you and refills in 5 s as it walks with you (a full charger holds 30 refills; right-click a block that supplies power to charge it). With the station far away and no charger, it uses solar power or sits down.\n- Inventory: right-click your android to open its screen. A stack of Self-Repair Kits: one is used to restore half its health when it drops below the return health. One Android Armor Plate works as its chestplate (+8 armor, +2 toughness) and takes armor enchantments; it shows as plating on the chest and left shoulder.\n- Kits in the station's refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android's inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.",
+    "translation": "- 충전: 호위는 스테이션으로 돌아가 5초 만에 가득 찹니다(전력을 쓰고, 체력도 회복). 따라가는 중에 안드로이드 무선 충전기를 들고 있으면, 곁으로 와서 함께 걸으며 5초 만에 가득 찹니다(충전기는 가득 차 있으면 30회분. 전력을 내보내는 블록을 우클릭해 충전). 스테이션이 멀고 충전기도 없으면 태양광이나 앉아서 충전합니다.\n- 소지품: 내 안드로이드를 우클릭하면 화면이 열립니다. 자가 수리 키트 한 묶음: 체력이 복귀 체력보다 낮아지면 하나를 써서 체력을 절반 회복. 안드로이드용 장갑판 하나는 흉갑으로 작동하며(방어 +8, 방어 강도 +2), 방어구 마법 부여를 할 수 있고, 장착하면 가슴과 왼쪽 어깨에 장갑이 붙습니다.\n- 스테이션의 보충 슬롯에 넣은 자가 수리 키트는, 안드로이드가 하나라도 쓰면 자동으로 보충됩니다. 강화 슬롯의 전송 업그레이드는 쓰러진 안드로이드의 소지품을 다음 안드로이드에게 넘깁니다(없으면 그 자리에 떨어짐). 호퍼와 파이프로 스테이션에 넣을 수 있지만, 꺼낼 수는 없습니다.\n- 해체: 안드로이드 화면의 스패너를 두 번 누르면 위에서부터 사라지고, 스테이션이 곧바로 새로 출력합니다."
+  },
+  "guide.singulo.androids.care.title": {
+    "source": "Charging, repair and gear",
+    "translation": "충전·수리·장비"
+  },
+  "guide.singulo.androids.glass.body": {
+    "source": "- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard's own path.\nAndroids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass next to them, and four plain panes make the patterned kind.",
+    "translation": "- 안드로이드 차단 유리(호박색): 안드로이드만 지나갈 수 없고, 플레이어와 다른 생물은 그대로 통과합니다. 기지 출입구에 알맞습니다.\n- 안드로이드 투과 유리(하늘색): 안드로이드만 지나갈 수 있고, 그 밖의 모든 것에는 단단한 유리입니다. 호위 전용 통로에 알맞습니다.\n안드로이드는 길을 찾을 때도 이 유리를 고려합니다. 차단 유리는 막힌 곳, 투과 유리는 열린 곳으로 봅니다. 민무늬는 같은 유리와 붙으면 이음새 없이 이어지고, 민무늬 4장으로 무늬 있는 것을 만들 수 있습니다."
+  },
+  "guide.singulo.androids.glass.title": {
+    "source": "Android glass",
+    "translation": "안드로이드용 유리"
+  },
+  "guide.singulo.androids.ruin.body": {
+    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
+    "translation": "모든 유적에는 벽 쪽에 폐허 안드로이드 출력대가 있습니다. 서바이벌 플레이어가 다가오면, 받침대 위에 그 형(광날형·채찍형·광검형)의 안드로이드 2~3체를 아래부터 쌓아 올리듯 출력해 출격시킵니다. 모두 쓰러뜨리면 그 형의 소형 크리스털 메모리가 출력대 위에 나타나고, 출력대는 하루 동안 쉽니다.\n- 광날형 \"루미나\": 몸을 숙이고 칼날이 빛나면 잔상을 남기며 파고들어 벱니다. 한쪽 무릎을 꿇고 바닥에 손을 대면 발밑에 예고 고리가 생기고 빛기둥이 솟습니다(고리 밖으로). 가까이서는 칼날을 펼쳐 회전 베기.\n- 채찍형 \"베르나\": 약 6블록까지 닿는 채찍질과, 휘감아 끌어당기는 감기. 머리 위로 채찍을 돌리면 바닥을 내리쳐 일직선 충격파를 보냅니다(점프로 피함).\n- 광검형 \"솔레이유\": 파고드는 찌르기, 휘두르는 순간 칼날이 늘어나는 가로 베기, 날아가는 초승달 참격파. 맞으면 정면에 빛의 방패를 펼치고(정면으로는 거의 안 통함), 계속 치면 반격합니다. 옆이나 뒤에서 공격하세요.\n안드로이드는 충전량으로 움직이며, 큰 기술을 10번쯤 쓰면 바닥나 눈의 빛이 꺼집니다. 가까운 출력대로 돌아가거나, 낮의 하늘 아래에서는 태양광 패널을 펼치고, 밤이나 실내에서는 앉아서 충전합니다(출력대 5초·태양광 10초·앉아서 14초). 충전 중에는 공격하지 않으니 공격할 기회입니다."
+  },
+  "guide.singulo.androids.ruin.title": {
+    "source": "Ruin androids",
+    "translation": "유적의 안드로이드"
+  },
   "guide.singulo.catalysts": {
     "source": "Catalysts",
     "translation": "촉매"
@@ -4162,6 +4554,46 @@
   "howto.singulo.accelerator_tube": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_armor_plate": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_barrier_glass": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_barrier_glass_patterned": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_charger": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_gate_glass": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_gate_glass_patterned": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_repair_kit": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_station": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_transfer_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
   },
   "howto.singulo.anomaly_sample": {
     "source": "Restore a Degraded Anomaly Sample",
@@ -5011,6 +5443,38 @@
     "source": "No fall damage while worn. Protects like a diamond chestplate",
     "translation": "착용 중에는 낙하 피해를 받지 않는다. 방어력은 다이아몬드 흉갑과 같다"
   },
+  "item.singulo.android_armor_plate": {
+    "source": "Android Armor Plate",
+    "translation": "안드로이드용 장갑판"
+  },
+  "item.singulo.android_charger": {
+    "source": "Android Wireless Charger",
+    "translation": "안드로이드 무선 충전기"
+  },
+  "item.singulo.android_kit": {
+    "source": "Android Kit",
+    "translation": "안드로이드 키트"
+  },
+  "item.singulo.android_memory_blade": {
+    "source": "Compact Crystal Memory (Blade)",
+    "translation": "소형 크리스털 메모리(광날형)"
+  },
+  "item.singulo.android_memory_saber": {
+    "source": "Compact Crystal Memory (Saber)",
+    "translation": "소형 크리스털 메모리(광검형)"
+  },
+  "item.singulo.android_memory_whip": {
+    "source": "Compact Crystal Memory (Whip)",
+    "translation": "소형 크리스털 메모리(채찍형)"
+  },
+  "item.singulo.android_repair_kit": {
+    "source": "Self-Repair Kit",
+    "translation": "자가 수리 키트"
+  },
+  "item.singulo.android_transfer_upgrade": {
+    "source": "Transfer Upgrade",
+    "translation": "전송 업그레이드"
+  },
   "item.singulo.anomaly_sample": {
     "source": "Anomaly Sample",
     "translation": "이상 샘플"
@@ -5057,7 +5521,7 @@
   },
   "item.singulo.blade_android_spawn_egg": {
     "source": "Blade Android Spawn Egg",
-    "translation": "광검날형 안드로이드 생성 알"
+    "translation": "광날형 안드로이드 생성 알"
   },
   "item.singulo.blank_data_card": {
     "source": "Blank Data Card",
@@ -5622,6 +6086,10 @@
   "key.singulo.toggle_area": {
     "source": "Toggle gravity tool area",
     "translation": "중력 도구 영역 전환"
+  },
+  "message.singulo.android_charger.charged": {
+    "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
+    "translation": "무선 충전기에 %1$s FE를 충전했습니다(%2$s / %3$s FE)"
   },
   "message.singulo.deep_sea_collector.idle": {
     "source": "Not deep enough: needs 16+ blocks of water above",
@@ -6731,6 +7199,14 @@
     "source": "Wormhole stabilizer runs",
     "translation": "웜홀 안정기가 작동한다"
   },
+  "tooltip.singulo.android_armor_plate": {
+    "source": "Chestplate for a guard android (+8 armor, +2 toughness)",
+    "translation": "호위 안드로이드의 흉갑(방어 +8, 방어 강도 +2)"
+  },
+  "tooltip.singulo.android_charger.charges": {
+    "source": "Full android charges: %s",
+    "translation": "안드로이드 가득 충전 %s회분"
+  },
   "tooltip.singulo.beyond_repair": {
     "source": "Beyond repair",
     "translation": "더 이상 수리할 수 없음"
@@ -6855,6 +7331,14 @@
     "source": "Used in: Particle Accelerator",
     "translation": "사용 제품: 입자 가속기"
   },
+  "uses.singulo.android_barrier_glass": {
+    "source": "Used in: Patterned Android Barrier Glass",
+    "translation": "사용 대상: 무늬 안드로이드 차단 유리"
+  },
+  "uses.singulo.android_gate_glass": {
+    "source": "Used in: Patterned Android Gate Glass",
+    "translation": "사용 대상: 무늬 안드로이드 투과 유리"
+  },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
     "translation": "사용 제품: 특이점 코어"
@@ -6864,12 +7348,12 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 15 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 15개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 22 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 22개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 34 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 34개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 35 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 35개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -6916,8 +7400,8 @@
     "translation": "사용 제품: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 4 more",
-    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 4개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 7 more",
+    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 7개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -7284,12 +7768,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 62 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 62개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 66 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 66개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 41 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 41개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 46 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 46개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",
@@ -7356,8 +7840,8 @@
     "translation": "사용 대상: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 10 more",
-    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 10개"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 12 more",
+    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 12개"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",

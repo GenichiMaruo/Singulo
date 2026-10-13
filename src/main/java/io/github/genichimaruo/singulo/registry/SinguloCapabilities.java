@@ -50,6 +50,10 @@ public final class SinguloCapabilities {
         catalystDevice(event, SinguloBlockEntities.QUANTUM_HEAT_ENGINE.get());
         catalystDevice(event, SinguloBlockEntities.DEGENERATE_FURNACE.get());
         catalystDevice(event, SinguloBlockEntities.PROBE_STATION.get());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_STATION.get(),
+                (be, side) -> be.automationItems());
         catalystDevice(event, SinguloBlockEntities.WORLDLINE_ANCHOR_ADVANCED.get());
         catalystDevice(event, SinguloBlockEntities.SHIELD_TOWER.get());
         catalystDevice(event, SinguloBlockEntities.TIPLER_CYLINDER.get());
@@ -103,6 +107,8 @@ public final class SinguloCapabilities {
                 (be, side) -> net.neoforged.neoforge.items.wrapper.EmptyItemHandler.INSTANCE);
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_MODULE.get(),
                 (be, side) -> be.energyFor(side));
+        event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> io.github.genichimaruo.singulo.android.AndroidChargerItem.energy(stack),
+                SinguloItems.ANDROID_CHARGER.get());
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> GravityGauntletItem.energy(stack),
                 SinguloItems.INERTIAL_CONTROL_GAUNTLET.get(), SinguloItems.GRAVITON_MANIPULATOR.get());
         event.registerItem(Capabilities.EnergyStorage.ITEM,

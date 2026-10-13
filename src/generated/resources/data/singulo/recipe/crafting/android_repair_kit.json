@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "CBC",
+    " R "
+  ],
+  "key": {
+    "P": {
+      "tag": "c:plates/steel"
+    },
+    "C": {
+      "tag": "c:ingots/copper"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    }
+  },
+  "result": {
+    "id": "singulo:android_repair_kit",
+    "count": 4
+  }
+}

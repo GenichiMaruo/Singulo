@@ -335,6 +335,26 @@ def fabricator_top(k):
     return im
 
 
+def station_top(k):
+    """アンドロイド組立ステーションの上面: 白い外装の枠の中の、濃い印刷床に水色の格子。光の走査線が往復し、四隅の吐出口が順に光る。"""
+    t = k / ANIM_FRAMES
+    im, d = new((228, 232, 236, 255))
+    d.rectangle([0, 0, S - 1, S - 1], outline=(196, 202, 210, 255))
+    d.rectangle([2, 2, S - 3, S - 3], fill=(30, 36, 46, 255), outline=(120, 225, 255, 255))
+    for g in (5, 8, 10):
+        d.line([(3, g), (S - 4, g)], fill=(44, 72, 88, 255))
+        d.line([(g, 3), (g, S - 4)], fill=(44, 72, 88, 255))
+    sweep = 3 + round((S - 7) * (0.5 - 0.5 * math.cos(2 * math.pi * t)))
+    d.line([(3, sweep), (S - 4, sweep)], fill=(190, 245, 255, 255))
+    for y in (sweep - 1, sweep + 1):
+        if 3 <= y <= S - 4:
+            d.line([(3, y), (S - 4, y)], fill=(80, 160, 190, 255))
+    for i, (x, y) in enumerate(((1, 1), (S - 2, 1), (S - 2, S - 2), (1, S - 2))):
+        on = (i + k // 2) % 4 == 0
+        d.point((x, y), fill=(120, 225, 255, 255) if on else (150, 156, 164, 255))
+    return im
+
+
 def fabricator_side():
     """遺構の印刷台の側面: 古びた白いパネルに、縦長の暗い格納口と水色の目盛り。下は暗い帯。"""
     im, d = new(rgba(AGED))
@@ -413,6 +433,9 @@ def textures(tb, save, weather, write_json):
     save(_sheet([fabricator_top(k) for k in range(ANIM_FRAMES)]), tb / 'ruin_android_fabricator_top.png')
     write_json(tb / 'ruin_android_fabricator_top.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
     save(weather(fabricator_side(), 71), tb / 'ruin_android_fabricator_side.png')
+    # アンドロイド組立ステーションの上面（自作の装置なので汚しは入れない）
+    save(_sheet([station_top(k) for k in range(ANIM_FRAMES)]), tb / 'android_station_top.png')
+    write_json(tb / 'android_station_top.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
 
 
 def _cache_model(sealed):

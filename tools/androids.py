@@ -36,6 +36,8 @@ ANDROID_PARTS = {
     'blade_tip': (104, 32, 1, 2, 1),
     'thruster': (0, 48, 2, 3, 2),
     'whip_handle': (110, 32, 1, 4, 1),
+    'armor_chest': (110, 40, 6, 3, 1),
+    'armor_pad': (110, 46, 3, 1, 4),
     'hilt': (114, 32, 1, 4, 1),
     'guard': (118, 32, 3, 1, 1),
 }
@@ -485,6 +487,24 @@ def paint(pal, Image):
     for y in range(y0, y1):
         put(x0, y, CERAMIC)
     line(f['down'], accent)
+    # ---------------------------------------------------------------- 装甲板（積んだときだけ見える。銀の板に型の色の縁）
+    silver, silver_sh = (214, 220, 230), (168, 176, 190)
+    f = part('armor_chest')
+    for k in f:
+        fill(f[k], silver_sh, 2)
+    x0, y0, x1, y1 = f['front']
+    fill(f['front'], silver, 2)
+    for x in range(x0, x1):
+        put(x, y1 - 1, accent, lit=True)
+    put(x0 + 2, y0 + 1, WHITE)
+    put(x0 + 3, y0 + 1, mix(accent, 40), lit=True)
+    f = part('armor_pad')
+    for k in f:
+        fill(f[k], silver_sh if k != 'up' else silver, 2)
+    x0, y0, x1, y1 = f['side_b']
+    for x in range(x0, x1):
+        put(x, y0, accent, lit=True)
+
     # ---------------------------------------------------------------- 鞭の柄（黒い握りに、光る輪）
     f = part('whip_handle')
     for k in f:
@@ -511,3 +531,307 @@ def paint(pal, Image):
         fill(f[k], CERAMIC_SH, 2)
     line(f['up'], accent)
     return base, glow
+
+
+# ---------------------------------------------------------------- アイテムの絵（16×16）
+
+def item_textures(ti, save):
+    """小型クリスタルメモリ（3つの型の色）、アンドロイドキット、無線充電器。"""
+    from PIL import Image
+    for name, pal in VARIANTS.items():
+        kind = name.replace('_android', '')
+        save(memory_icon(pal['accent'], Image), ti / f'android_memory_{kind}.png')
+    save(kit_icon(Image), ti / 'android_kit.png')
+    save(charger_icon(Image), ti / 'android_charger.png')
+    save(repair_icon(Image), ti / 'android_repair_kit.png')
+    save(plate_icon(Image), ti / 'android_armor_plate.png')
+    save(upgrade_icon(Image), ti / 'android_transfer_upgrade.png')
+
+
+def memory_icon(accent, Image):
+    """読み取り端子つきの小型クリスタルメモリ: 銀の枠に型の色の結晶、下に金の端子、横に小さな表示灯。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    frame, frame_sh, frame_hi = (196, 202, 212), (140, 146, 160), (236, 240, 246)
+    gold = (226, 186, 92)
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                px[x, y] = tuple(c) + (255,) if len(c) == 3 else c
+
+    rect(3, 1, 12, 12, frame_sh)
+    rect(4, 1, 12, 11, frame)
+    rect(4, 1, 11, 1, frame_hi)
+    # 使い込んだ枠の汚し（細かな擦れ・角の摩耗・斜めの小傷。汚れではなく使用感）
+    rng = random.Random(sum(accent))
+    for y in range(1, 13):
+        for x in range(3, 13):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            k = rng.choice((0, 0, 0, -6, -10, 6))
+            if (x, y) in ((3, 1), (12, 1), (3, 12), (12, 12), (4, 1), (12, 2)):
+                k -= 18
+            px[x, y] = (max(0, min(255, r + k)), max(0, min(255, g + k)), max(0, min(255, b + k)), a)
+    for (x, y) in ((10, 11), (11, 10), (4, 7), (4, 8)):
+        r, g, b, a = px[x, y]
+        px[x, y] = (min(255, r + 26), min(255, g + 26), min(255, b + 26), a)
+    # 結晶（上ほど明るい、斜めの光。奥の枠が少し透けて見える）
+    for y in range(2, 10):
+        for x in range(5, 11):
+            k = (y - 2) / 7
+            c = tuple(int(a * (1 - 0.45 * k) + 255 * 0.25 * (1 - k)) for a in accent)
+            alpha = 150
+            if (x + y) % 5 == 0:
+                c = tuple(min(255, v + 50) for v in c)
+                alpha = 190
+            px[x, y] = tuple(min(255, v) for v in c) + (alpha,)
+    px[6, 3] = (255, 255, 255, 235)
+    px[7, 3] = (240, 250, 255, 210)
+    px[6, 4] = (240, 250, 255, 210)
+    # 読み取り端子
+    rect(4, 12, 11, 12, frame_sh)
+    for x in range(4, 12, 2):
+        rect(x, 13, x, 14, gold)
+    # 表示灯
+    px[11, 11] = tuple(accent) + (255,)
+    return im
+
+
+def kit_icon(Image):
+    """アンドロイドキット: 白い陶磁のケースに、黒い留め具と水色の線。ふたに人型の印。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    white, shade, edge = (238, 240, 244), (200, 206, 216), (120, 126, 140)
+    dark = (52, 56, 70)
+    glow = (120, 225, 255)
+    for y in range(3, 14):
+        for x in range(1, 15):
+            c = shade if y >= 11 else white
+            if x in (1, 14) or y in (3, 13):
+                c = edge
+            px[x, y] = c + (255,)
+    for x in range(2, 14):
+        px[x, 10] = glow + (255,)
+    for x in (6, 7, 8, 9):
+        px[x, 2] = dark + (255,)
+    px[6, 3] = dark + (255,)
+    px[9, 3] = dark + (255,)
+    # 人型の印（頭と体）
+    for (x, y) in ((7, 5), (8, 5), (7, 6), (8, 6), (6, 7), (7, 7), (8, 7), (9, 7), (7, 8), (8, 8)):
+        px[x, y] = (90, 150, 190, 255)
+    px[3, 5] = glow + (255,)
+    px[12, 5] = glow + (255,)
+    return im
+
+
+def charger_icon(Image):
+    """無線充電器: 黒い本体に白い外装の輪、水色に光る送電の輪と稲妻の印。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    import math
+    for y in range(16):
+        for x in range(16):
+            d = math.hypot(x - 7.5, y - 7.5)
+            if d <= 7.0:
+                c = (236, 238, 242) if d > 5.6 else (120, 225, 255) if d > 4.6 else (44, 48, 60)
+                if 5.6 < d <= 7.0 and y > 9:
+                    c = (200, 206, 216)
+                px[x, y] = c + (255,)
+    for (x, y) in ((8, 4), (7, 5), (7, 6), (6, 7), (7, 7), (8, 7), (9, 7), (8, 8), (8, 9), (7, 10)):
+        px[x, y] = (255, 236, 140, 255)
+    return im
+
+
+def repair_icon(Image):
+    """自己修理キット: 白い小箱に、ピンクの十字と小さなハート。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(4, 14):
+        for x in range(2, 14):
+            c = (238, 240, 244) if y < 11 else (206, 212, 222)
+            if x in (2, 13) or y in (4, 13):
+                c = (130, 136, 150)
+            px[x, y] = c + (255,)
+    for x in range(5, 11):
+        px[x, 3] = (130, 136, 150, 255)
+    px[5, 2] = px[10, 2] = (130, 136, 150, 255)
+    for x in range(6, 10):
+        px[x, 2] = (130, 136, 150, 255)
+    for (x, y) in ((7, 6), (8, 6), (7, 7), (8, 7), (5, 8), (6, 8), (7, 8), (8, 8), (9, 8), (10, 8), (7, 9), (8, 9), (7, 10), (8, 10)):
+        px[x, y] = (240, 90, 130, 255)
+    px[11, 5] = (255, 160, 190, 255)
+    return im
+
+
+def plate_icon(Image):
+    """アンドロイド用装甲板: 白い陶磁の胸当て。縁は銀、中央に水色の発光ライン。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    rows = [(4, 11), (2, 13), (2, 13), (2, 13), (3, 12), (3, 12), (3, 12), (4, 11), (4, 11), (5, 10), (6, 9)]
+    for i, (a, b) in enumerate(rows):
+        y = 3 + i
+        for x in range(a, b + 1):
+            edge = x in (a, b) or i in (0, len(rows) - 1)
+            c = (150, 156, 170) if edge else (236, 238, 242) if x < 8 else (210, 214, 224)
+            px[x, y] = c + (255,)
+    for x in (6, 9):
+        px[x, 3] = (0, 0, 0, 0)
+    for y in range(6, 12):
+        px[7, y] = (120, 225, 255, 255)
+        px[8, y] = (90, 190, 230, 255)
+    return im
+
+
+def upgrade_icon(Image):
+    """転送アップグレード: 白い基板に、紫の転送の渦と、矢印。端に金の端子。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(2, 14):
+        for x in range(2, 14):
+            c = (236, 238, 242) if (x, y) not in ((2, 2), (13, 2), (2, 13), (13, 13)) else (0, 0, 0)
+            if (x, y) in ((2, 2), (13, 2), (2, 13), (13, 13)):
+                continue
+            if x in (2, 13) or y in (2, 13):
+                c = (150, 156, 170)
+            px[x, y] = c + (255,)
+    import math
+    for y in range(4, 12):
+        for x in range(4, 12):
+            d = math.hypot(x - 7.5, y - 7.5)
+            if 1.5 < d < 3.6:
+                ang = math.atan2(y - 7.5, x - 7.5)
+                v = 0.5 + 0.5 * math.sin(ang * 2 + d)
+                px[x, y] = (int(120 + 80 * v), int(60 + 40 * v), int(200 + 50 * v), 255)
+    px[7, 7] = px[8, 8] = (240, 220, 255, 255)
+    px[7, 8] = px[8, 7] = (200, 160, 255, 255)
+    for x in (5, 7, 9):
+        px[x, 14] = (226, 186, 92, 255)
+    return im
+
+
+# ---------------------------------------------------------------- アンドロイド用のガラス
+
+# id: (縁の色, 光の色, ガラスの色。RGBA)
+GLASSES = {
+    'android_barrier_glass': ((190, 140, 80, 170), (255, 190, 100, 220), (255, 206, 150, 46)),
+    'android_gate_glass': ((90, 156, 194, 170), (130, 228, 255, 220), (160, 222, 255, 46)),
+}
+
+
+def edge_color(frame, glow, i):
+    """縁の1ドット（i は縁に沿った位置）: 明るい所と暗い所の細かな濃淡と、ところどころ光る点。"""
+    if i % 6 == 3:
+        return glow
+    k = (8, -10, 0, 12, -6, 4)[i % 6]
+    r, g, b, a = frame
+    return (max(0, min(255, r + k)), max(0, min(255, g + k)), max(0, min(255, b + k)), a)
+DIRS = {'north': ('z', -1), 'south': ('z', 1), 'west': ('x', -1), 'east': ('x', 1), 'down': ('y', -1), 'up': ('y', 1)}
+
+
+def glass_textures(tb, save):
+    """無地（中身・縁・持ったときの絵）と、模様入り（シンメトリー）のガラス。"""
+    from PIL import Image
+    for iid, (frame, glow, fill) in GLASSES.items():
+        save(glass_fill(fill, Image), tb / f'{iid}.png')
+        save(glass_edge(frame, glow, Image), tb / f'{iid}_edge.png')
+        item = glass_fill(fill, Image)
+        border(item, frame, glow)
+        save(item, tb / f'{iid}_item.png')
+        save(glass_pattern(iid, frame, glow, fill, Image), tb / f'{iid}_patterned.png')
+
+
+def glass_fill(fill, Image):
+    """ガラスの中身（縁なし）: うすい色と、斜めの光の筋2本。"""
+    im = Image.new('RGBA', (16, 16), fill)
+    px = im.load()
+    for i in range(16):
+        for x, y in ((i, 15 - i), (i + 3, 15 - i)):
+            if 0 <= x < 16 and 2 <= i <= 12:
+                px[x, y] = (255, 255, 255, 70)
+    return im
+
+
+def border(im, frame, glow):
+    """外周1ドットの控えめな縁（細かな濃淡と光る点）。"""
+    px = im.load()
+    for i in range(16):
+        c = edge_color(frame, glow, i)
+        for a, b in ((i, 0), (i, 15), (0, i), (15, i)):
+            px[a, b] = c
+
+
+def glass_edge(frame, glow, Image):
+    """つながっていない向きに描く縁: 上の1行（横の縁）と左の1列（縦の縁）。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for i in range(16):
+        c = edge_color(frame, glow, i)
+        px[i, 0] = c
+        px[0, i] = c
+    return im
+
+
+def glass_pattern(iid, frame, glow, fill, Image):
+    """模様入り: 縁と、上下左右対称の模様（遮断はひし形と横の帯、透過はひし形と中央の輪と内向きの山形）。"""
+    im = glass_fill(fill, Image)
+    border(im, frame, glow)
+    px = im.load()
+    for i in range(8):
+        # ひし形（中心 7.5、半径 6）
+        for x, y in ((7 - i, 2 + i), (8 + i, 2 + i), (7 - i, 13 - i), (8 + i, 13 - i)):
+            if 2 <= x <= 13 and 2 <= y <= 13 and abs(x - 7.5) + abs(y - 7.5) >= 5:
+                px[x, y] = glow
+    if 'barrier' in iid:
+        for x in range(4, 12):
+            px[x, 7] = frame
+            px[x, 8] = frame
+        for x in (5, 10):
+            px[x, 7] = px[x, 8] = glow
+    else:
+        for x, y in ((6, 6), (7, 6), (8, 6), (9, 6), (6, 9), (7, 9), (8, 9), (9, 9), (6, 7), (6, 8), (9, 7), (9, 8)):
+            px[x, y] = glow
+        px[7, 7] = px[8, 8] = px[7, 8] = px[8, 7] = (255, 255, 255, 120)
+        for x, y in ((3, 4), (4, 3), (12, 4), (11, 3), (3, 11), (4, 12), (12, 11), (11, 12)):
+            px[x, y] = frame
+    return im
+
+
+def glass_models(iid, write_json, assets):
+    """無地のガラス: 中身の箱と、つながっていない向き（6方向）ごとの縁のモデル。blockstate は multipart。"""
+    modid = 'singulo'
+    tex = f'{modid}:block/{iid}'
+    edge = f'{modid}:block/{iid}_edge'
+    faces = ('north', 'south', 'east', 'west', 'up', 'down')
+    write_json(assets / 'models' / 'block' / f'{iid}.json', {
+        'render_type': 'minecraft:translucent',
+        'textures': {'all': tex, 'particle': tex},
+        'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16],
+                      'faces': {f: {'texture': '#all', 'cullface': f} for f in faces}}],
+    })
+    vaxis = {'north': 'y', 'south': 'y', 'east': 'y', 'west': 'y', 'up': 'z', 'down': 'z'}
+    parts = [{'apply': {'model': f'{modid}:block/{iid}'}}]
+    for d, (dax, dsg) in DIRS.items():
+        els = []
+        for f, (fax, fsg) in DIRS.items():
+            if fax == dax:
+                continue
+            lo, hi = [0, 0, 0], [16, 16, 16]
+            i = 'xyz'.index(fax)
+            # 横の縁と縦の縁は四隅で重なるので、縦の縁を少しだけ外へずらして、同じ面に重ならないようにする（ちらつき防止）
+            horizontal = vaxis[f] == dax
+            off = 0.005 if horizontal else 0.012
+            plane = -off if fsg < 0 else 16 + off
+            lo[i] = hi[i] = plane
+            j = 'xyz'.index(dax)
+            lo[j], hi[j] = (15, 16) if dsg > 0 else (0, 1)
+            uv = [0, 0, 16, 1] if horizontal else [0, 0, 1, 16]
+            els.append({'from': lo, 'to': hi, 'faces': {f: {'texture': '#edge', 'uv': uv, 'cullface': f}}})
+        write_json(assets / 'models' / 'block' / f'{iid}_edge_{d}.json', {
+            'render_type': 'minecraft:translucent', 'textures': {'edge': edge, 'particle': tex}, 'elements': els})
+        parts.append({'when': {d: 'false'}, 'apply': {'model': f'{modid}:block/{iid}_edge_{d}'}})
+    write_json(assets / 'blockstates' / f'{iid}.json', {'multipart': parts})
+    write_json(assets / 'models' / 'item' / f'{iid}.json', {
+        'parent': 'minecraft:block/cube_all', 'render_type': 'minecraft:translucent',
+        'textures': {'all': f'{modid}:block/{iid}_item'}})

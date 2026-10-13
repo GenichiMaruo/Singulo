@@ -99,6 +99,16 @@
       ]
     },
     {
+      "id": "androids",
+      "icon": "singulo:android_station",
+      "pages": [
+        "androids.ruin",
+        "androids.build",
+        "androids.care",
+        "androids.glass"
+      ]
+    },
+    {
       "id": "romance",
       "icon": "singulo:tipler_core",
       "pages": [
