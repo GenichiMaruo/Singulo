@@ -46,6 +46,10 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
         if (player.level().isClientSide || console == null) {
             return true;
         }
+        if (level != null && level.isLoaded(console) && !(level.getBlockEntity(console) instanceof WorkConsoleBlockEntity)) {
+            setConsole(null);                   // 指令台が壊された場合は、永続的な締め出しにしない
+            return true;
+        }
         WorkConsoleBlockEntity linked = consoleEntity();
         return linked != null && linked.mayOperate(player);
     }

@@ -107,7 +107,7 @@ public final class GuiReviewHarness {
             case 12 -> {
                 require(mc, DeliveryPortScreen.class);
                 capture(mc, "delivery-port");
-                System.out.println("SINGULO_GUI_COMPLETE 11");
+                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 11");
                 phase++;
                 mc.stop();
             }
@@ -127,7 +127,7 @@ public final class GuiReviewHarness {
         try (var screenshot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
             screenshot.writeToFile(dir.resolve(name + ".png"));
         }
-        System.out.println("SINGULO_GUI_CAPTURE " + name);
+        Singulo.LOGGER.info("SINGULO_GUI_CAPTURE {}", name);
     }
 
     private static void openAndroid(Minecraft mc) {

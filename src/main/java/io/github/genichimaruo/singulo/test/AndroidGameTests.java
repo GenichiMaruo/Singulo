@@ -1105,6 +1105,10 @@ public final class AndroidGameTests {
         helper.assertFalse(portMenu.stillValid(friend), "権限を外された後も納品口が使える");
         portMenu.rename(friend, "not allowed");
         helper.assertTrue(port.name().isEmpty(), "権限を外された後も納品口の名前を変えられる");
+        CompoundTag linkedSave = rack.saveWithFullMetadata(level.registryAccess());
+        helper.setBlock(CONSOLE, net.minecraft.world.level.block.Blocks.AIR);
+        rack.loadWithComponents(linkedSave, level.registryAccess()); // 棚が未読込の間に指令台が壊された場合
+        helper.assertTrue(rack.mayOperate(stranger) && rack.console() == null, "壊れた指令台へのリンクで締め出された");
         helper.succeed();
     }
 

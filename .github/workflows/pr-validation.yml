@@ -50,6 +50,7 @@ jobs:
           test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 11
           grep -q 'SINGULO_GUI_COMPLETE 11' build/gui-review/logs/latest.log
       - name: Encode GUI captures for remote review
+        if: always()
         run: |
           python3 - <<'PY'
           import base64
