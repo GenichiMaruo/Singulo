@@ -31,11 +31,14 @@ public record WorkJob(Type type, int orderId, int jobId, long amount, List<ItemC
         public final WorkJob job;
         public UUID worker;
         public long lastBeat;
+        /** 分割して納品するときの未納品数。 */
+        public long remainingDelivery;
 
         Lease(WorkJob job, UUID worker, long now) {
             this.job = job;
             this.worker = worker;
             this.lastBeat = now;
+            this.remainingDelivery = job.amount();
         }
     }
 }

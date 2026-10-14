@@ -202,8 +202,8 @@ public final class WorkConsoleView {
         List<ItemCount> made = new ArrayList<>();
         List<ItemCount> needed = new ArrayList<>();
         for (WorkPlanner.Step s : plan.steps) {
-            ItemStack out = s.entry().recipe().output();
-            ItemCount.add(made, out, (long) out.getCount() * s.crafts());
+            ItemStack out = s.entry().recipe().outputKey();
+            ItemCount.add(made, out, (long) s.entry().recipe().outputCount() * s.crafts());
             ItemCount.add(needed, out, s.needed());
         }
         ListTag cs = new ListTag();

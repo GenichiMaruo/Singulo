@@ -864,6 +864,116 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+
+    /** 満杯の納品箱へ少しずつ届けても、製作の余りを注文数に足さない。 */
+    @GameTest(template = EMPTY)
+    public static void partialDeliveryKeepsSurplus(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var planks = net.minecraft.world.item.Items.OAK_PLANKS;
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(0, new ItemStack(planks, 3));
+        BladeAndroid a = worker(helper, false);
+        a.setNoAi(true);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(planks), 3, List.of(a.getUUID()), null);
+        helper.assertTrue(error == null, "在庫の納品を注文できない");
+        var job = console.requestJob(a);
+        var pickups = console.planPickup(job, a.blockPosition());
+        helper.assertTrue(pickups != null, "受け取りを計画できない");
+        for (var pickup : pickups) {
+            helper.assertTrue(console.fetchAt(a, job, pickup), "予約した板材を取れない");
+        }
+        a.addToCarry(new ItemStack(planks)); // 同じ種類の製作の余り
+        for (int i = 0; i < console.outbox().getContainerSize(); i++) {
+            console.outbox().setItem(i, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 64));
+        }
+        console.outbox().setItem(0, new ItemStack(planks, 63));
+        helper.assertFalse(console.deliver(a, job), "1個だけで納品完了になった");
+        console.outbox().setItem(0, new ItemStack(planks, 63));
+        helper.assertFalse(console.deliver(a, job), "2個だけで納品完了になった");
+        console.outbox().setItem(0, ItemStack.EMPTY);
+        helper.assertTrue(console.deliver(a, job), "残り1個の納品が終わらない");
+        helper.assertTrue(console.outbox().getItem(0).getCount() == 1, "最後に残数を超えて納品した");
+        helper.assertTrue(console.orders().getFirst().delivered == 3, "納品数が注文と違う");
+        int surplus = 0;
+        for (int slot : a.carrySlots()) {
+            if (a.inventory().getItem(slot).is(planks)) {
+                surplus += a.inventory().getItem(slot).getCount();
+            }
+        }
+        helper.assertTrue(surplus == 1, "製作の余りが持ち物に残らない");
+        console.complete(job);
+        helper.assertTrue(console.orders().isEmpty(), "納品後に注文が終わらない");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** 流体の計算結果は、見本の個数ではなくmBで製作数と余りを表示する。 */
+    @GameTest(template = EMPTY)
+    public static void fluidPlanUsesMillibuckets(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        ItemStack water = io.github.genichimaruo.singulo.android.work.FluidSamples.of(
+                new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.EXTRACT, helper.absolutePos(TABLE), null, water);
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), water).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
+        var plan = console.plan(io.github.genichimaruo.singulo.android.work.FluidSamples.key(water), 1500);
+        helper.assertTrue(plan.ok(), "流体の計画を作れない");
+        var view = io.github.genichimaruo.singulo.android.work.WorkConsoleView.plan(console, plan, level.registryAccess());
+        var made = view.getList("crafted", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(0);
+        helper.assertTrue(made.getLong("count") == 2000 && made.getLong("surplus") == 500, "mBで表示していない");
+        helper.succeed();
+    }
+
+    /** 加工のバッチ投入では、充電10で原鉄を1個だけ投入し、その場で止まる。 */
+    @GameTest(template = EMPTY)
+    public static void processingStopsWhenChargeRunsOut(GameTestHelper helper) throws Exception {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        BladeAndroid a = worker(helper, false);
+        a.setNoAi(true);
+        CompoundTag saved = a.saveWithoutId(new CompoundTag());
+        saved.putInt("charge", 10);
+        a.load(saved);
+        a.addToCarry(new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 3));
+        java.util.List<ItemStack> grid = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        var recipe = new io.github.genichimaruo.singulo.android.work.RecipeData(
+                io.github.genichimaruo.singulo.android.work.RecipeData.MODE_PROCESSING, grid,
+                new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of());
+        var batch = new io.github.genichimaruo.singulo.android.work.WorkJob.Batch(0, 3, helper.absolutePos(furnacePos), recipe);
+        var job = new io.github.genichimaruo.singulo.android.work.WorkJob(
+                io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, 0, 1, 0, List.of(), List.of(batch), true);
+        Class<?> goalType = Class.forName("io.github.genichimaruo.singulo.android.AndroidWorkGoal");
+        var constructor = goalType.getDeclaredConstructor(RuinAndroid.class);
+        constructor.setAccessible(true);
+        Object goal = constructor.newInstance(a);
+        var process = goalType.getDeclaredMethod("process", net.minecraft.server.level.ServerLevel.class,
+                io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.class,
+                io.github.genichimaruo.singulo.android.work.WorkJob.class, io.github.genichimaruo.singulo.android.work.WorkJob.Batch.class);
+        process.setAccessible(true);
+        for (int i = 0; i < 10; i++) {
+            process.invoke(goal, level, console, job, batch);
+        }
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace = helper.getBlockEntity(furnacePos);
+        helper.assertTrue(furnace.getItem(0).getCount() == 1, "充電切れのあとも投入を続けた");
+        helper.assertTrue(a.charge() == 0 && !a.active(), "充電切れで止まらない");
+        int raw = 0;
+        for (int slot : a.carrySlots()) {
+            if (a.inventory().getItem(slot).is(net.minecraft.world.item.Items.RAW_IRON)) {
+                raw += a.inventory().getItem(slot).getCount();
+            }
+        }
+        helper.assertTrue(raw == 2, "未投入の原鉄が残らない");
+        a.discard();
+        helper.succeed();
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

@@ -357,6 +357,10 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         craftTimer = 0;
+        if (android.charge() < CRAFT_COST) {
+            android.spend(CRAFT_COST);
+            return;
+        }
         if (!craftOnce(level, step.recipe())) {
             android.setState(RuinAndroid.STATE_IDLE);
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
@@ -365,9 +369,7 @@ final class AndroidWorkGoal extends Goal {
         android.playSound(SoundEvents.VILLAGER_WORK_TOOLSMITH, 0.6F, 1.4F);
         android.sparks(level, Vec3.atCenterOf(at).add(0, 0.6, 0), 4, 0.25);
         crafted++;
-        if (!android.spend(CRAFT_COST)) {
-            return;                            // 充電切れ: 充電してから続きを作る
-        }
+        android.spend(CRAFT_COST);              // 製作済みの回数は、充電切れでも下で確定する
         if (crafted >= step.crafts()) {
             // この工程を作り終えた: 次の工程（次の作業場所）へ。全部終われば、納品か片付けへ
             // （作る姿勢は、歩き出すまで続ける。ここで立ち姿に戻すと、続けて作るときに頭が一瞬ガクッと動くので）
@@ -402,10 +404,20 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         boolean progress = false;
-        while (inserted < step.crafts() && insertOnce(in, fin, r)) {
+        while (inserted < step.crafts()) {
+            if (android.charge() < CRAFT_COST) {
+                android.spend(CRAFT_COST);
+                break;
+            }
+            if (!insertOnce(in, fin, r)) {
+                break;
+            }
             inserted++;
             progress = true;
             android.spend(CRAFT_COST);
+            if (!android.active()) {
+                break;
+            }
         }
         long want = step.crafts() * r.outputCount();
         // 流体の出てくる物: 装置の流体の出口から、タンクへ（主な物は要る分だけ、ほかの物は全部）
@@ -581,8 +593,8 @@ final class AndroidWorkGoal extends Goal {
             // 搾乳: 牛乳入りバケツを集める（数は物の欄、空ならできる物の数）
             want = Math.max(1, ps.item().isEmpty() ? r.outputCount() : ps.item().getCount()) * step.crafts();
             what = new ItemStack(net.minecraft.world.item.Items.MILK_BUCKET);
-        } else if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED || ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE) {
-            want = 1;                          // 1回通りやったら終わり（終わったら progress を 1 にする）
+        } else if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE) {
+            want = step.crafts();              // 1回の製作につき1回操作する
         }
         if (progress >= want) {
             procIndex++;
@@ -610,7 +622,7 @@ final class AndroidWorkGoal extends Goal {
                 return;
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED -> {
-                breed(level, c, job, ps);
+                breed(level, c, job, ps, want);
                 return;
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK, io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> {
@@ -1275,7 +1287,8 @@ final class AndroidWorkGoal extends Goal {
         java.util.List<ItemStack> drops = new java.util.ArrayList<>();
         net.minecraft.world.entity.player.Player as = actor(level, c, null);
         for (BlockPos p : tree(level, base)) {
-            if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, p, as)) {
+            if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, p, as)
+                    || !p.equals(base) && !mayBreak(level, c, p)) {
                 continue;
             }
             BlockState s = level.getBlockState(p);
@@ -1433,10 +1446,11 @@ final class AndroidWorkGoal extends Goal {
     /**
      * 繁殖: 持ってきたえさを、ペアになれる大人に与える（同じ種類の数が上限に届くまで）。与えられる相手がいなくなるか、えさがなくなったら終わり。
      */
-    private void breed(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps) {
+    private void breed(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps,
+                       long want) {
         ItemStack feed = ps.item();
         if (feed.isEmpty() || carriedCount(feed.getItem()) <= 0) {
-            progress = 1;
+            progress = want;
             return;
         }
         net.minecraft.world.phys.AABB area = pen(ps);
@@ -1457,7 +1471,7 @@ final class AndroidWorkGoal extends Goal {
                 }
             }
             if (target == null) {
-                progress = 1;                  // もう与える相手がいない: 終わり
+                progress = want;               // もう与える相手がいない: 終わり
                 return;
             }
             ranchTarget = target.getUUID();
@@ -1480,6 +1494,7 @@ final class AndroidWorkGoal extends Goal {
         craftTimer = 0;
         ranchTarget = null;
         if (android.takeFromCarry(feed, 1)) {
+            progress++;
             target.setInLove(actor(level, c, null));          // ハートが出る
             android.spend(CRAFT_COST);
         }
@@ -1519,6 +1534,16 @@ final class AndroidWorkGoal extends Goal {
         BlockPos p = ps.pos();
         BlockState s = level.getBlockState(p);
         net.minecraft.world.entity.player.Player as = actor(level, c, null);
+        as.moveTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
+        var hit = new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(p), Direction.UP, p, false);
+        var event = new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(
+                as, net.minecraft.world.InteractionHand.MAIN_HAND, p, hit);
+        if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, p, as)
+                || net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event).isCanceled()
+                || event.getUseBlock() == net.neoforged.neoforge.common.util.TriState.FALSE) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+            return;
+        }
         android.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
         if (s.getBlock() instanceof net.minecraft.world.level.block.LeverBlock lever) {
             boolean on = s.getValue(net.minecraft.world.level.block.LeverBlock.POWERED);
@@ -1536,7 +1561,7 @@ final class AndroidWorkGoal extends Goal {
             as.moveTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
             s.useWithoutItem(level, as, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(p), Direction.UP, p, false));
         }
-        progress = 1;
+        progress++;
     }
 
     private void stopMining() {

@@ -189,7 +189,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         trigger = -1;
         countBox = new EditBox(font, leftPos + 26, topPos + 36, 46, 14, Component.empty());
         countBox.setMaxLength(4);
-        countBox.setFilter(s -> s.isEmpty() || s.chars().allMatch(Character::isDigit));
+        countBox.setFilter(s -> s.isEmpty() || s.chars().allMatch(c -> c >= '0' && c <= '9'));
         countBox.setValue("1");
         countBox.setResponder(s -> {
             count = s.isEmpty() ? 1 : Math.max(1, Math.min(WorkConsoleBlockEntity.MAX_COUNT, Long.parseLong(s)));
@@ -401,7 +401,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 if (Panel.inside(mouseX, mouseY, x + 8, y + DETAIL_BACK_Y, 50, 12)) {
                     detail = -1;
                 }
-                return true;
+                if (Panel.inside(mouseX, mouseY, x + 8, y + TOP, 240, DETAIL_BACK_Y + 12 - TOP)) {
+                    return true;
+                }
+                return super.mouseClicked(mouseX, mouseY, button);
             }
             List<CompoundTag> orders = list("orders");
             for (int i = 0; i < ORDER_ROWS; i++) {
@@ -441,7 +444,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         if (trigger >= 0) {
             return picking != null;                // 登録は、今そろっていなくてもできる（そろったら始める）
         }
-        return plan != null && plan.getBoolean("ok") && !startAndroids().isEmpty() && planDelay == 0;
+        return plan != null && plan.getBoolean("ok") && plan.getLong("count") == count
+                && picking != null && ItemStack.isSameItemSameComponents(stack(plan, "target"), picking)
+                && !startAndroids().isEmpty() && planDelay == 0;
     }
 
     /** 選べるアンドロイドか（作業中でなく、採掘の工程があれば採掘アップグレードを積んでいる）。 */

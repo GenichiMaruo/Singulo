@@ -1379,16 +1379,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 完成品を納品先（指令台の納品箱か、納品口）へ届ける。全部入れば true。 */
     public boolean deliver(RuinAndroid a, WorkJob job) {
+        WorkJob.Lease active = lease(job.jobId());
+        if (active == null) {
+            return false;
+        }
         BlockPos at = destination(job);
         DeliveryPortBlockEntity port = deliveryPort(at);
         WorkOrder o = order(job.orderId());
         if (FluidSamples.is(job.fetch().get(0).item)) {
-            return deliverFluid(a, job, at, o);
+            return deliverFluid(a, job, at, o, active);
         }
         IItemHandler box = o != null && o.toStock ? stockHandler(at) : port != null ? port.handler() : outboxHandler;
         boolean all = true;
         long moved = 0;
-        long limit = job.amount();
+        long limit = active.remainingDelivery;
         for (int slot : a.carrySlots()) {
             ItemStack s = a.inventory().getItem(slot);
             if (s.isEmpty() || limit <= moved || !ItemStack.isSameItemSameComponents(s, job.fetch().get(0).item)) {
@@ -1400,18 +1404,21 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             a.inventory().setItem(slot, s.copyWithCount(s.getCount() - give + notIn));
             all &= notIn == 0;
         }
+        active.remainingDelivery = Math.max(0, active.remainingDelivery - moved);
+        all = active.remainingDelivery == 0;
         if (o != null) {
             o.delivered += moved;
             o.deliverInProgress = Math.max(0, o.deliverInProgress - moved);
             o.status = all ? WorkOrder.RUNNING : WorkOrder.WAIT_SPACE;
         }
+        setChanged();
         return all;
     }
 
     /** 流体の完成品を、届け先の隣の入れ物へ入れる。全部入れば true。 */
-    private boolean deliverFluid(RuinAndroid a, WorkJob job, BlockPos at, @Nullable WorkOrder o) {
+    private boolean deliverFluid(RuinAndroid a, WorkJob job, BlockPos at, @Nullable WorkOrder o, WorkJob.Lease active) {
         var like = FluidSamples.fluid(job.fetch().get(0).item);
-        int want = (int) Math.min(job.amount(), a.tankAmount(like));
+        int want = (int) Math.min(active.remainingDelivery, a.tankAmount(like));
         int moved = 0;
         for (var h : fluidStoresAt(at, new HashSet<>())) {
             if (moved >= want) {
@@ -1420,12 +1427,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             moved += h.fill(like.copyWithAmount(want - moved), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
         }
         a.drainTanks(like, moved, false);
-        boolean all = moved >= want;
+        active.remainingDelivery = Math.max(0, active.remainingDelivery - moved);
+        boolean all = active.remainingDelivery == 0;
         if (o != null) {
             o.delivered += moved;
             o.deliverInProgress = Math.max(0, o.deliverInProgress - moved);
             o.status = all ? WorkOrder.RUNNING : WorkOrder.WAIT_SPACE;
         }
+        setChanged();
         return all;
     }
 
@@ -1502,7 +1511,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         WorkJob.Lease l = lease(job.jobId());
         if (l != null) {
             leases.remove(l);
-            release(l.job);
+            release(l.job, l.remainingDelivery);
         }
         WorkOrder o = order(job.orderId());
         if (o == null) {
@@ -1523,7 +1532,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     public enum Failure { MISSING, UNREACHABLE, BAD_RECIPE, STALLED }
 
     /** 取り上げた作業の分を、まだやっていないことにする。 */
-    private void release(WorkJob job) {
+    private void release(WorkJob job, long remainingDelivery) {
         WorkOrder o = order(job.orderId());
         if (o == null) {
             return;
@@ -1536,7 +1545,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
         } else if (job.type() == WorkJob.Type.DELIVER) {
-            o.deliverInProgress = Math.max(0, o.deliverInProgress - job.amount());
+            o.deliverInProgress = Math.max(0, o.deliverInProgress - remainingDelivery);
         }
     }
 
@@ -1913,7 +1922,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             WorkJob.Lease l = it.next();
             if (now - l.lastBeat > LEASE_TIMEOUT || order(l.job.orderId()) == null) {
                 it.remove();
-                release(l.job);
+                release(l.job, l.remainingDelivery);
             }
         }
         for (WorkOrder o : new ArrayList<>(orders)) {
