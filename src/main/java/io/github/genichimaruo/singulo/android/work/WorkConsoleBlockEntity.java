@@ -129,6 +129,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private int nextOrderId = 1;
     /** 渡している作業（保存しない。読み込み直したら、アンドロイドが作業を取り直す）。 */
     private final List<WorkJob.Lease> leases = new ArrayList<>();
+    /** 登録した注文。 */
+    private final List<StandingOrder> standing = new ArrayList<>();
+    private int nextStandingId = 1;
+    public static final int MAX_STANDING = 16;
+    /** レッドストーン信号が入っているか。進行中の注文があるか（コンパレーターの出力）。 */
+    private boolean powered;
+    private boolean outputOn;
     private int nextJobId = 1;
     /** 最後の知らせ（画面に出す。取り消しの理由など）。 */
     @Nullable
@@ -272,6 +279,15 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), available());
     }
 
+    /**
+     * 作って増やす計算（在庫を保つ注文）: 完成品そのものの在庫は使わない（使うと、作らずに在庫を予約するだけで終わり、在庫が増えない）。
+     */
+    private WorkPlanner.Plan planToStock(ItemStack target, long count) {
+        List<ItemCount> stock = available();
+        stock.removeIf(c -> c.matches(target));
+        return WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), stock);
+    }
+
     // ------------------------------------------------------------------ アンドロイド
 
     /** 注文に使えるアンドロイド（範囲内・作業オン・この人が操作できる・印刷が済んでいる護衛）。 */
@@ -311,16 +327,29 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 注文する。できなければ理由を返す（できたら null）。 */
     @Nullable
     public Component start(ServerPlayer player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination) {
+        return start(player, target, count, androids, destination, false);
+    }
+
+    /**
+     * 注文する（toStock なら、できた物を素材置き場へ入れる）。androids が空なら、選べる全員。できなければ理由を返す（できたら null）。
+     */
+    @Nullable
+    private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
+                            boolean toStock) {
         if (!mayOperate(player)) {
             return Component.translatable("gui.singulo.work_console.locked");
         }
-        WorkPlanner.Plan plan = plan(target, count);
+        WorkPlanner.Plan plan = toStock ? planToStock(target, count) : plan(target, count);
         if (!plan.ok()) {
             return Component.translatable(plan.loop ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
         }
+        if (toStock && plan.steps.isEmpty()) {
+            return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
+        }
+        boolean mining = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsMining());
         List<RuinAndroid> chosen = new ArrayList<>();
         for (RuinAndroid a : candidates(player)) {
-            if (androids.contains(a.getUUID()) && !busy(a)) {
+            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a) && (!androids.isEmpty() || !mining || a.canMine())) {
                 chosen.add(a);
             }
         }
@@ -328,6 +357,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return Component.translatable("gui.singulo.work_console.error.no_android");
         }
         WorkOrder order = WorkOrder.create(nextOrderId++, plan, player.getUUID());
+        order.toStock = toStock;
         order.destination = destination != null && !destination.equals(worldPosition) && deliveryPort(destination) != null ? destination : null;
         // どの工程も、選んだアンドロイドのだれかが一度に運べるか
         for (WorkOrder.StepState s : order.steps) {
@@ -357,6 +387,96 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         message = null;
         setChanged();
         return null;
+    }
+
+    // ------------------------------------------------------------------ 登録した注文
+
+    public List<StandingOrder> standing() {
+        return standing;
+    }
+
+    public boolean powered() {
+        return powered;
+    }
+
+    /** 注文を登録する。できなければ理由を返す。 */
+    @Nullable
+    public Component register(ServerPlayer player, ItemStack target, long count, int trigger, @Nullable BlockPos destination,
+                              List<UUID> androids) {
+        if (!mayOperate(player)) {
+            return Component.translatable("gui.singulo.work_console.locked");
+        }
+        if (standing.size() >= MAX_STANDING) {
+            return Component.translatable("gui.singulo.work_console.standing.full", MAX_STANDING);
+        }
+        BlockPos dest = destination != null && !destination.equals(worldPosition) && deliveryPort(destination) != null ? destination : null;
+        standing.add(new StandingOrder(nextStandingId++, target, Math.max(1, Math.min(MAX_COUNT, count)), trigger, dest, androids,
+                player.getUUID()));
+        message = Component.translatable("gui.singulo.work_console.standing.added", target.getHoverName());
+        setChanged();
+        return null;
+    }
+
+    public void unregister(int id) {
+        standing.removeIf(s -> s.id == id);
+        setChanged();
+    }
+
+    /** 隣の信号が変わった。立ち上がりで「信号で1回」の登録に知らせる。 */
+    public void onSignal(boolean now) {
+        if (now && !powered) {
+            for (StandingOrder s : standing) {
+                if (s.trigger == StandingOrder.PULSE && s.activeOrder < 0) {
+                    s.pending = true;               // 進行中に来た信号は数えない
+                }
+            }
+        }
+        if (powered != now) {
+            powered = now;
+            setChanged();
+        }
+    }
+
+    /** 登録した注文のきっかけを調べて、要れば注文する（毎秒）。 */
+    private void runStanding(ServerLevel level) {
+        for (StandingOrder s : standing) {
+            if (s.activeOrder >= 0) {
+                if (order(s.activeOrder) != null) {
+                    s.state = StandingOrder.RUNNING;
+                    continue;
+                }
+                s.activeOrder = -1;
+            }
+            long want;
+            if (s.trigger == StandingOrder.PULSE) {
+                want = s.pending ? s.count : 0;
+            } else if (s.trigger == StandingOrder.KEEP_POWERED && !powered) {
+                s.state = StandingOrder.NO_SIGNAL;
+                s.reason = null;
+                continue;
+            } else {
+                want = Math.max(0, s.count - ItemCount.get(stock(), s.target));
+            }
+            if (want <= 0) {
+                s.state = StandingOrder.IDLE;
+                s.reason = null;
+                continue;
+            }
+            Player actor = net.neoforged.neoforge.common.util.FakePlayerFactory.get(level, new com.mojang.authlib.GameProfile(
+                    s.registrant != null ? s.registrant : owner != null ? owner : UUID.nameUUIDFromBytes(new byte[0]), "[Singulo]"));
+            int id = nextOrderId;
+            Component why = start(actor, s.target, want, s.androids, s.destination, s.toStock());
+            if (why == null) {
+                s.activeOrder = id;
+                s.pending = false;
+                s.state = StandingOrder.RUNNING;
+                s.reason = null;
+                setChanged();
+            } else {
+                s.state = StandingOrder.WAITING;   // 素材・アンドロイドがそろうのを待つ（そろえば次の確認で始める）
+                s.reason = why;
+            }
+        }
     }
 
     /** 注文を取り消す。作業中のアンドロイドは、持っている物を資材口へ戻してから、作業をやめる。 */
@@ -482,6 +602,16 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         if (o.stepsFinished()) {
             long left = o.count - o.delivered - o.deliverInProgress;
+            if (o.toStock && left > 0) {
+                // 素材置き場へ入れる注文: もう素材置き場にある完成品は、運ばずに届けたことにする
+                long have = Math.min(left, o.held(null, o.target));
+                o.delivered += have;
+                left -= have;
+                if (left <= 0) {
+                    finishIfDone(o);
+                    return WorkJob.simple(WorkJob.Type.WAIT, o.id);
+                }
+            }
             if (left > 0) {
                 long amount = Math.min(left, (long) slots * o.target.getMaxStackSize());
                 o.deliverInProgress += amount;
@@ -891,6 +1021,15 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 注文の納品先（納品口がなくなっていれば、指令台）。 */
     public BlockPos destination(WorkJob job) {
         WorkOrder o = order(job.orderId());
+        if (o != null && o.toStock) {
+            // 素材置き場へ入れる: ストレージのある受け渡し場所（指令台を先に）
+            for (BlockPos p : supplyPoints()) {
+                if (!storagesAt(p, new HashSet<>()).isEmpty()) {
+                    return p;
+                }
+            }
+            return worldPosition;
+        }
         return o != null && o.destination != null && deliveryPort(o.destination) != null ? o.destination : worldPosition;
     }
 
@@ -909,8 +1048,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     public boolean deliver(RuinAndroid a, WorkJob job) {
         BlockPos at = destination(job);
         DeliveryPortBlockEntity port = deliveryPort(at);
-        IItemHandler box = port != null ? port.handler() : outboxHandler;
         WorkOrder o = order(job.orderId());
+        IItemHandler box = o != null && o.toStock ? stockHandler(at) : port != null ? port.handler() : outboxHandler;
         boolean all = true;
         long moved = 0;
         long limit = job.amount();
@@ -931,6 +1070,49 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             o.status = all ? WorkOrder.RUNNING : WorkOrder.WAIT_SPACE;
         }
         return all;
+    }
+
+    /** 受け渡し場所の隣のストレージ全部を、1つの入れ口として扱う（素材置き場へ入れる注文の納品。入れるだけ）。 */
+    private IItemHandler stockHandler(BlockPos point) {
+        List<IItemHandler> stores = storagesAt(point, new HashSet<>());
+        return new IItemHandler() {
+            @Override
+            public int getSlots() {
+                return 1;
+            }
+
+            @Override
+            public ItemStack getStackInSlot(int slot) {
+                return ItemStack.EMPTY;
+            }
+
+            @Override
+            public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+                ItemStack rest = stack;
+                for (IItemHandler h : stores) {
+                    rest = ItemHandlerHelper.insertItemStacked(h, rest, simulate);
+                    if (rest.isEmpty()) {
+                        break;
+                    }
+                }
+                return rest;
+            }
+
+            @Override
+            public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                return ItemStack.EMPTY;
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return Integer.MAX_VALUE;
+            }
+
+            @Override
+            public boolean isItemValid(int slot, ItemStack stack) {
+                return true;
+            }
+        };
     }
 
     /** 作業が終わった。 */
@@ -1314,6 +1496,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (WorkOrder o : new ArrayList<>(orders)) {
             finishIfDone(o);
         }
+        runStanding(level);
+        // コンパレーター: 進行中の注文があれば 15
+        boolean on = !orders.isEmpty();
+        if (on != outputOn) {
+            outputOn = on;
+            level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
+        }
         // 画面を開いている人に、様子を送る
         for (ServerPlayer p : level.players()) {
             if (p.containerMenu instanceof WorkConsoleMenu menu && worldPosition.equals(menu.pos())) {
@@ -1389,6 +1578,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         tag.put("orders", os);
         tag.putInt("next_order", nextOrderId);
+        ListTag ss = new ListTag();
+        for (StandingOrder s : standing) {
+            ss.add(s.save(registries));
+        }
+        tag.put("standing", ss);
+        tag.putInt("next_standing", nextStandingId);
+        tag.putBoolean("powered", powered);
         net.minecraft.core.NonNullList<ItemStack> enc = net.minecraft.core.NonNullList.withSize(ENCODER_SLOTS, ItemStack.EMPTY);
         for (int i = 0; i < ENCODER_SLOTS; i++) {
             enc.set(i, encoder.getItem(i));
@@ -1427,6 +1623,15 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         nextOrderId = Math.max(1, tag.getInt("next_order"));
+        standing.clear();
+        for (Tag t : tag.getList("standing", Tag.TAG_COMPOUND)) {
+            StandingOrder s = StandingOrder.load((CompoundTag) t, registries);
+            if (s != null) {
+                standing.add(s);
+            }
+        }
+        nextStandingId = Math.max(1, tag.getInt("next_standing"));
+        powered = tag.getBoolean("powered");
         net.minecraft.core.NonNullList<ItemStack> enc = net.minecraft.core.NonNullList.withSize(ENCODER_SLOTS, ItemStack.EMPTY);
         net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("encoder"), enc, registries);
         mode = Math.floorMod(tag.getInt("encoder_mode"), MODES);

@@ -4367,6 +4367,46 @@
     "source": "No heat source or heat sink adjacent",
     "translation": "인접한 열원이나 저온원이 없음"
   },
+  "gui.singulo.work_console.activity.charge": {
+    "source": "Recharging",
+    "translation": "충전 중"
+  },
+  "gui.singulo.work_console.activity.craft": {
+    "source": "Crafting",
+    "translation": "만드는 중"
+  },
+  "gui.singulo.work_console.activity.deliver": {
+    "source": "Delivering",
+    "translation": "납품하러 감"
+  },
+  "gui.singulo.work_console.activity.fetch": {
+    "source": "Fetching materials",
+    "translation": "재료를 가지러 감"
+  },
+  "gui.singulo.work_console.activity.fight": {
+    "source": "Fighting",
+    "translation": "싸우는 중"
+  },
+  "gui.singulo.work_console.activity.mine": {
+    "source": "Mining",
+    "translation": "채굴 중"
+  },
+  "gui.singulo.work_console.activity.none": {
+    "source": "Idle",
+    "translation": "대기"
+  },
+  "gui.singulo.work_console.activity.process": {
+    "source": "Processing",
+    "translation": "장치로 가공"
+  },
+  "gui.singulo.work_console.activity.return": {
+    "source": "Putting away",
+    "translation": "정리"
+  },
+  "gui.singulo.work_console.activity.wait": {
+    "source": "Waiting for materials",
+    "translation": "재료를 기다리는 중"
+  },
   "gui.singulo.work_console.androids": {
     "source": "Androids (slots)",
     "translation": "안드로이드(나를 수 있는 칸)"
@@ -4446,6 +4486,22 @@
   "gui.singulo.work_console.delivery.port": {
     "source": "Delivery port (%s, %s, %s)",
     "translation": "납품구(%s, %s, %s)"
+  },
+  "gui.singulo.work_console.detail.delivered": {
+    "source": "Delivered %s / %s",
+    "translation": "납품 %s / %s"
+  },
+  "gui.singulo.work_console.detail.doing": {
+    "source": " (%s in progress)",
+    "translation": " (%s 작업 중)"
+  },
+  "gui.singulo.work_console.detail.hint": {
+    "source": "Click to see the steps and what each android is doing",
+    "translation": "클릭해서 공정과 안드로이드의 상태를 봅니다"
+  },
+  "gui.singulo.work_console.detail.to_stock": {
+    "source": "To stockpile %s / %s",
+    "translation": "재료 보관소로 %s / %s"
   },
   "gui.singulo.work_console.done": {
     "source": "Delivered %s ×%s",
@@ -4551,6 +4607,54 @@
     "source": "Lay out what goes in and what comes out. Scroll to change counts (Shift: 10 at a time)",
     "translation": "넣는 것과 나오는 것을 놓습니다. 휠로 개수 변경(Shift: 10개씩)"
   },
+  "gui.singulo.work_console.register": {
+    "source": "Save",
+    "translation": "등록"
+  },
+  "gui.singulo.work_console.signal.off": {
+    "source": "Redstone signal: off",
+    "translation": "레드스톤 신호: 꺼짐"
+  },
+  "gui.singulo.work_console.signal.on": {
+    "source": "Redstone signal: on",
+    "translation": "레드스톤 신호: 켜짐"
+  },
+  "gui.singulo.work_console.standing.added": {
+    "source": "Saved the order for %s",
+    "translation": "%s 주문을 등록했습니다"
+  },
+  "gui.singulo.work_console.standing.full": {
+    "source": "Up to %s orders can be saved",
+    "translation": "%s건까지 등록할 수 있습니다"
+  },
+  "gui.singulo.work_console.standing.none": {
+    "source": "No saved orders (choose a trigger when confirming an order)",
+    "translation": "등록한 주문이 없습니다(주문 확인에서 계기를 골라 등록)"
+  },
+  "gui.singulo.work_console.standing.state.0": {
+    "source": "Idle",
+    "translation": "대기 중"
+  },
+  "gui.singulo.work_console.standing.state.1": {
+    "source": "Running",
+    "translation": "진행 중"
+  },
+  "gui.singulo.work_console.standing.state.2": {
+    "source": "Waiting",
+    "translation": "기다리는 중"
+  },
+  "gui.singulo.work_console.standing.state.3": {
+    "source": "Waiting for a signal",
+    "translation": "신호를 기다리는 중"
+  },
+  "gui.singulo.work_console.standing.stock": {
+    "source": " (in stock: %s)",
+    "translation": " (재고 %s)"
+  },
+  "gui.singulo.work_console.standing.waiting": {
+    "source": "Waiting: %s",
+    "translation": "대기 중: %s"
+  },
   "gui.singulo.work_console.start": {
     "source": "Start",
     "translation": "작업 시작"
@@ -4595,9 +4699,49 @@
     "source": "Running",
     "translation": "진행 중"
   },
+  "gui.singulo.work_console.tab.standing": {
+    "source": "Saved",
+    "translation": "등록"
+  },
+  "gui.singulo.work_console.trigger.keep": {
+    "source": "Keep in stock",
+    "translation": "재고 유지"
+  },
+  "gui.singulo.work_console.trigger.keep.hint": {
+    "source": "Whenever the stockpile holds fewer than this many, order enough to get back to it. The products go into the stockpile",
+    "translation": "재료 보관소의 재고가 이 수보다 적어지면, 이 수까지 자동으로 주문합니다. 완성품은 재료 보관소에 넣습니다"
+  },
+  "gui.singulo.work_console.trigger.keep_powered": {
+    "source": "Keep stock while powered",
+    "translation": "신호 중 재고 유지"
+  },
+  "gui.singulo.work_console.trigger.keep_powered.hint": {
+    "source": "Keep in stock, but only while the console is powered by redstone",
+    "translation": "지령대에 레드스톤 신호가 들어와 있는 동안만 \"재고 유지\""
+  },
+  "gui.singulo.work_console.trigger.now": {
+    "source": "Order now",
+    "translation": "지금 주문"
+  },
+  "gui.singulo.work_console.trigger.now.hint": {
+    "source": "Click to save the order with a trigger instead (right-click to go back). Order now: order just this once",
+    "translation": "클릭해서 주문을 등록할 계기를 고릅니다(우클릭으로 역순). 지금 주문: 한 번만 주문합니다"
+  },
+  "gui.singulo.work_console.trigger.pulse": {
+    "source": "Once per signal",
+    "translation": "신호마다 1회"
+  },
+  "gui.singulo.work_console.trigger.pulse.hint": {
+    "source": "Order this many each time the console receives a redstone pulse. If materials are short, it waits until they are in stock",
+    "translation": "지령대에 레드스톤 신호가 들어올 때마다 이 수를 한 번 주문합니다. 재료가 부족하면 갖춰질 때까지 기다립니다"
+  },
   "gui.singulo.work_console.unlink": {
     "source": "Unlink",
     "translation": "끊기"
+  },
+  "gui.singulo.work_console.worker.away": {
+    "source": "(not found)",
+    "translation": "(보이지 않음)"
   },
   "gui.singulo.wormhole.generated": {
     "source": "A pair of mouths formed. Stabilize within %s s",

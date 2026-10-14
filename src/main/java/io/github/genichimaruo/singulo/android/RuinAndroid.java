@@ -108,6 +108,11 @@ public abstract class RuinAndroid extends Monster {
     private static final EntityDataAccessor<Integer> BATTERIES = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     /** 作業（自動化）を割り当てられているか（持ち物を取り出せなくするため、クライアントでも見る）。 */
     private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+    /** 作業中に今していること（{@link #ACT_FETCH} など。クライアントでも見える）。 */
+    private static final EntityDataAccessor<Integer> ACTIVITY = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    public static final int ACT_NONE = 0, ACT_FETCH = 1, ACT_CRAFT = 2, ACT_PROCESS = 3, ACT_MINE = 4, ACT_DELIVER = 5, ACT_RETURN = 6,
+            ACT_WAIT = 7, ACT_CHARGE = 8, ACT_FIGHT = 9;
+    public static final String[] ACTIVITY_KEYS = {"none", "fetch", "craft", "process", "mine", "deliver", "return", "wait", "charge", "fight"};
     /** バックパックアップグレードを積んでいるか（見た目のため）。 */
     private static final EntityDataAccessor<Boolean> BACKPACK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
 
@@ -257,6 +262,7 @@ public abstract class RuinAndroid extends Monster {
         this.workJob = null;
         this.personal = 0;
         entityData.set(WORKING, false);
+        entityData.set(ACTIVITY, ACT_NONE);
         if (state() == STATE_CRAFTING || state() == STATE_MINING) {
             setState(STATE_IDLE);
         }
@@ -274,6 +280,27 @@ public abstract class RuinAndroid extends Monster {
     /** 作業中か（クライアントでも見える）。 */
     public boolean isWorking() {
         return entityData.get(WORKING);
+    }
+
+    void setActivity(int activity) {
+        if (entityData.get(ACTIVITY) != activity) {
+            entityData.set(ACTIVITY, activity);
+        }
+    }
+
+    /** 作業中に今していること（充電に戻っている間は充電、戦っている間は戦い）。作業中でなければ {@link #ACT_NONE}。 */
+    public int activity() {
+        if (!isWorking()) {
+            return ACT_NONE;
+        }
+        int s = state();
+        if (s == STATE_LOW_POWER || s == STATE_RETREAT || charging(s)) {
+            return ACT_CHARGE;
+        }
+        if (getTarget() != null) {
+            return ACT_FIGHT;
+        }
+        return entityData.get(ACTIVITY);
     }
 
     /** 持ち物の5つと、バックパックがあればその24（全部）。 */
@@ -551,6 +578,7 @@ public abstract class RuinAndroid extends Monster {
         builder.define(BATTERIES, 0);
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
+        builder.define(ACTIVITY, ACT_NONE);
     }
 
     // ------------------------------------------------------------------ 護衛（プレイヤーのアンドロイド）

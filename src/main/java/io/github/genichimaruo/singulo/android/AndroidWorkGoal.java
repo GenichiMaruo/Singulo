@@ -180,6 +180,7 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         if (returning) {
+            android.setActivity(RuinAndroid.ACT_RETURN);
             returnItems(c);
             return;
         }
@@ -188,6 +189,7 @@ final class AndroidWorkGoal extends Goal {
             begin(c.requestJob(android));
             job = android.workJob;
         }
+        android.setActivity(activityFor(job));
         switch (job.type()) {
             case WAIT -> {
                 if (android.state() == RuinAndroid.STATE_CRAFTING) {
@@ -201,6 +203,30 @@ final class AndroidWorkGoal extends Goal {
             case CRAFT -> craft(level, c, job);
             case DELIVER -> deliver(c, job);
         }
+    }
+
+    /** 作業の今の段階を、画面と頭の上のアイコンに出す形にする。 */
+    private int activityFor(WorkJob job) {
+        return switch (job.type()) {
+            case WAIT -> RuinAndroid.ACT_WAIT;
+            case DEPOSIT, EXIT -> RuinAndroid.ACT_RETURN;
+            case DELIVER -> phase == 0 ? RuinAndroid.ACT_FETCH : RuinAndroid.ACT_DELIVER;
+            case CRAFT -> {
+                if (phase == 0) {
+                    yield RuinAndroid.ACT_FETCH;
+                }
+                if (batchIndex >= job.batch().size() || job.batch().get(batchIndex).recipe() == null) {
+                    yield RuinAndroid.ACT_CRAFT;
+                }
+                RecipeData r = job.batch().get(batchIndex).recipe();
+                if (r.procedure()) {
+                    boolean mine = procIndex < r.steps().size()
+                            && r.steps().get(procIndex).kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE;
+                    yield mine ? RuinAndroid.ACT_MINE : RuinAndroid.ACT_PROCESS;
+                }
+                yield r.processing() ? RuinAndroid.ACT_PROCESS : RuinAndroid.ACT_CRAFT;
+            }
+        };
     }
 
     /** 持ち物を資材の受け渡し場所へ戻す。EXIT なら、そのあと作業をやめる。 */

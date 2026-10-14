@@ -603,6 +603,55 @@ public final class AndroidGameTests {
         });
     }
 
+    /**
+     * 登録した注文（在庫を保つ）: 素材置き場の板材（1枚）が4枚を下回っているので、指令台が自分で注文し、原木から作って素材置き場へ入れる
+     * （今ある板材を予約するだけで終わらせない）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void standingOrderKeepsStock(GameTestHelper helper) {
+        var console = workshop(helper, 2);
+        net.minecraft.world.level.block.entity.ChestBlockEntity seed = helper.getBlockEntity(CHEST);
+        seed.setItem(5, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+        BladeAndroid a = worker(helper, false);
+        var player = helper.makeMockServerPlayerInLevel();
+        var error = console.register(player, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 4,
+                io.github.genichimaruo.singulo.android.work.StandingOrder.KEEP, null, List.of());
+        helper.assertTrue(error == null, "登録できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+            int planks = 0;
+            for (int i = 0; i < chest.getContainerSize(); i++) {
+                if (chest.getItem(i).is(net.minecraft.world.item.Items.OAK_PLANKS)) {
+                    planks += chest.getItem(i).getCount();
+                }
+            }
+            helper.assertTrue(planks >= 4, "板材が素材置き場に4枚そろわない: " + planks);
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            helper.assertFalse(a.isWorking(), "注文が終わっても作業中のまま");
+            a.discard();
+        });
+    }
+
+    /** 登録した注文（信号で1回）: 信号が入るまでは注文せず、入ったら1回だけ注文して、納品口へ届ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void standingOrderOnPulse(GameTestHelper helper) {
+        var console = workshop(helper, 2);
+        BladeAndroid a = worker(helper, false);
+        var player = helper.makeMockServerPlayerInLevel();
+        console.register(player, new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+                io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE, helper.absolutePos(DELIVERY), List.of());
+        helper.runAfterDelay(60, () -> {
+            helper.assertTrue(console.orders().isEmpty(), "信号がないのに注文した");
+            console.onSignal(true);
+            console.onSignal(false);
+            helper.succeedWhen(() -> {
+                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+                helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+                a.discard();
+            });
+        });
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

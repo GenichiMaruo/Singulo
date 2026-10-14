@@ -46,6 +46,8 @@ public final class WorkOrder {
     /** 納品先（作業指令台か、納品口）。 */
     @Nullable
     public BlockPos destination;
+    /** できた物を、納品先ではなく素材置き場へ入れる（登録した注文の「在庫を保つ」）。 */
+    public boolean toStock;
 
     public WorkOrder(int id, ItemStack target, long count, @Nullable UUID orderer) {
         this.id = id;
@@ -218,6 +220,7 @@ public final class WorkOrder {
         if (destination != null) {
             t.put("destination", NbtUtils.writeBlockPos(destination));
         }
+        t.putBoolean("to_stock", toStock);
         ListTag hs = new ListTag();
         for (Holding h : held) {
             CompoundTag ht = new CompoundTag();
@@ -256,6 +259,7 @@ public final class WorkOrder {
         }
         o.delivered = t.getLong("delivered");
         o.destination = NbtUtils.readBlockPos(t, "destination").orElse(null);
+        o.toStock = t.getBoolean("to_stock");
         for (Tag tag : t.getList("held", Tag.TAG_COMPOUND)) {
             CompoundTag ht = (CompoundTag) tag;
             ItemStack item = ItemStack.parseOptional(registries, ht.getCompound("item"));

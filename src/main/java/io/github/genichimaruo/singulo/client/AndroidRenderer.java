@@ -88,6 +88,39 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
         super.render(android, yaw, partialTick, pose, buffers, light);
         renderMoves(android, partialTick, pose, buffers);
+        renderWorkIcon(android, partialTick, pose, buffers, light);
+    }
+
+    /** 作業中の今していることの印（頭の上に、小さく回る物の絵）。設定 androidWorkIcons で消せる。 */
+    private void renderWorkIcon(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
+        int act = android.activity();
+        if (act == RuinAndroid.ACT_NONE || io.github.genichimaruo.singulo.generated.ClientConfig.SPEC.isLoaded()
+                && !io.github.genichimaruo.singulo.generated.ClientConfig.ANDROID_WORK_ICONS.get()) {
+            return;
+        }
+        net.minecraft.world.item.ItemStack icon = new net.minecraft.world.item.ItemStack(switch (act) {
+            case RuinAndroid.ACT_FETCH -> net.minecraft.world.item.Items.CHEST;
+            case RuinAndroid.ACT_CRAFT -> net.minecraft.world.item.Items.CRAFTING_TABLE;
+            case RuinAndroid.ACT_PROCESS -> net.minecraft.world.item.Items.FURNACE;
+            case RuinAndroid.ACT_MINE -> net.minecraft.world.item.Items.DIAMOND_PICKAXE;
+            case RuinAndroid.ACT_DELIVER -> net.minecraft.world.item.Items.CHEST_MINECART;
+            case RuinAndroid.ACT_RETURN -> net.minecraft.world.item.Items.BARREL;
+            case RuinAndroid.ACT_WAIT -> net.minecraft.world.item.Items.CLOCK;
+            case RuinAndroid.ACT_CHARGE -> net.minecraft.world.item.Items.REDSTONE;
+            case RuinAndroid.ACT_FIGHT -> net.minecraft.world.item.Items.IRON_SWORD;
+            default -> net.minecraft.world.item.Items.AIR;
+        });
+        if (icon.isEmpty()) {
+            return;
+        }
+        float age = android.tickCount + partialTick;
+        pose.pushPose();
+        pose.translate(0, android.getBbHeight() + 0.45F + 0.04F * Mth.sin(age * 0.1F), 0);
+        pose.mulPose(Axis.YP.rotationDegrees(age * 3));
+        pose.scale(0.35F, 0.35F, 0.35F);
+        net.minecraft.client.Minecraft.getInstance().getItemRenderer().renderStatic(icon, net.minecraft.world.item.ItemDisplayContext.FIXED,
+                light, OverlayTexture.NO_OVERLAY, pose, buffers, android.level(), android.getId());
+        pose.popPose();
     }
 
     /** 体を描くときと同じ変形（向き・裏返し・大きさ）を pose に積む。 */

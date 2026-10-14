@@ -69,6 +69,33 @@ public final class WorkConsoleView {
             ot.putInt("progress", o.progress());
             ot.putInt("status", o.status);
             ot.putInt("workers", o.workers.size());
+            // 進み具合の詳しい様子: 工程ごとの回数と、受け持っているアンドロイドの今していること
+            ListTag st = new ListTag();
+            for (WorkOrder.StepState s : o.steps) {
+                CompoundTag x = new CompoundTag();
+                x.put("item", s.recipe.output().save(reg));
+                x.putLong("done", s.done);
+                x.putLong("total", s.total);
+                x.putLong("doing", s.inProgress);
+                st.add(x);
+            }
+            ot.put("steps", st);
+            ot.putLong("delivered", o.delivered);
+            ot.putBoolean("to_stock", o.toStock);
+            ListTag wt = new ListTag();
+            for (java.util.UUID id : o.workers) {
+                CompoundTag w = new CompoundTag();
+                if (c.getLevel() instanceof net.minecraft.server.level.ServerLevel sl && sl.getEntity(id) instanceof RuinAndroid a && a.isAlive()) {
+                    w.putString("name", Component.Serializer.toJson(a.nickname(), reg));
+                    w.putInt("activity", a.workOrder() == o.id ? a.activity() : RuinAndroid.ACT_NONE);
+                    w.putInt("accent", a.accent());
+                } else {
+                    w.putString("name", Component.Serializer.toJson(Component.translatable("gui.singulo.work_console.worker.away"), reg));
+                    w.putInt("activity", -1);
+                }
+                wt.add(w);
+            }
+            ot.put("worker_list", wt);
             os.add(ot);
         }
         t.put("orders", os);
@@ -112,6 +139,24 @@ public final class WorkConsoleView {
             as.add(at);
         }
         t.put("androids", as);
+        // 登録した注文
+        ListTag ss = new ListTag();
+        List<ItemCount> inStock = c.standing().isEmpty() ? List.of() : c.stock();
+        for (StandingOrder s : c.standing()) {
+            CompoundTag st = new CompoundTag();
+            st.putInt("id", s.id);
+            st.put("item", s.target.save(reg));
+            st.putLong("count", s.count);
+            st.putInt("trigger", s.trigger);
+            st.putInt("state", s.state);
+            st.putLong("stock", ItemCount.get(inStock, s.target));
+            if (s.reason != null) {
+                st.putString("reason", Component.Serializer.toJson(s.reason, reg));
+            }
+            ss.add(st);
+        }
+        t.put("standing", ss);
+        t.putBoolean("powered", c.powered());
         if (c.message() != null) {
             t.putString("message", Component.Serializer.toJson(c.message(), reg));
         }

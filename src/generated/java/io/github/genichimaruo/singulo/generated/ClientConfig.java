@@ -12,6 +12,7 @@ public final class ClientConfig {
     public static final ModConfigSpec.BooleanValue DOPPLER_BEAMING;
     public static final ModConfigSpec.ConfigValue<String> LENSING_QUALITY;
     public static final ModConfigSpec.BooleanValue FORMATION_EFFECTS;
+    public static final ModConfigSpec.BooleanValue ANDROID_WORK_ICONS;
     public static final ModConfigSpec SPEC;
 
     static {
@@ -20,6 +21,7 @@ public final class ClientConfig {
         ModConfigSpec.BooleanValue DOPPLER_BEAMING_;
         ModConfigSpec.ConfigValue<String> LENSING_QUALITY_;
         ModConfigSpec.BooleanValue FORMATION_EFFECTS_;
+        ModConfigSpec.BooleanValue ANDROID_WORK_ICONS_;
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
         b.push("render");
         b.comment("重力レンズの歪み表示", "範囲: true / false");
@@ -32,12 +34,15 @@ public final class ClientConfig {
         LENSING_QUALITY_ = b.defineInList("lensingQuality", "high", java.util.Arrays.asList("low", "medium", "high"));
         b.comment("マルチブロック形成時の光の演出", "範囲: true / false");
         FORMATION_EFFECTS_ = b.define("formationEffects", true);
+        b.comment("作業中のアンドロイドの頭の上に、今していること（取りに行く・作る・採掘 など）のアイコンを出す", "範囲: true / false");
+        ANDROID_WORK_ICONS_ = b.define("androidWorkIcons", true);
         b.pop();
         GRAVITATIONAL_LENSING = GRAVITATIONAL_LENSING_;
         LENSING_WITH_SHADER_PACKS = LENSING_WITH_SHADER_PACKS_;
         DOPPLER_BEAMING = DOPPLER_BEAMING_;
         LENSING_QUALITY = LENSING_QUALITY_;
         FORMATION_EFFECTS = FORMATION_EFFECTS_;
+        ANDROID_WORK_ICONS = ANDROID_WORK_ICONS_;
         SPEC = b.build();
     }
 }

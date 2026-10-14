@@ -28,7 +28,8 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
             ByteBufCodecs.COMPOUND_TAG, WorkConsoleActionPayload::action,
             WorkConsoleActionPayload::new);
 
-    public static final String PLAN = "plan", START = "start", CANCEL = "cancel", UNLINK = "unlink", GRID = "grid", PROCESS = "process";
+    public static final String PLAN = "plan", START = "start", CANCEL = "cancel", UNLINK = "unlink", GRID = "grid", PROCESS = "process",
+            REGISTER = "register", UNREGISTER = "unregister";
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
@@ -53,6 +54,22 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
             list.add(NbtUtils.createUUID(id));
         }
         t.put("androids", list);
+        return t;
+    }
+
+    /** 注文を登録する（trigger は {@link StandingOrder#KEEP} など）。 */
+    public static CompoundTag register(ItemStack item, long count, int trigger, List<UUID> androids, BlockPos destination,
+                                       net.minecraft.core.HolderLookup.Provider reg) {
+        CompoundTag t = start(item, count, androids, destination, reg);
+        t.putString("type", REGISTER);
+        t.putInt("trigger", trigger);
+        return t;
+    }
+
+    public static CompoundTag unregister(int id) {
+        CompoundTag t = new CompoundTag();
+        t.putString("type", UNREGISTER);
+        t.putInt("id", id);
         return t;
     }
 
@@ -141,6 +158,25 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     plan.putBoolean("started", error == null);
                     if (error != null) {
                         plan.putString("error", Component.Serializer.toJson(error, reg));
+                    }
+                }
+                case REGISTER -> {
+                    List<UUID> ids = new ArrayList<>();
+                    for (Tag t : a.getList("androids", Tag.TAG_INT_ARRAY)) {
+                        ids.add(NbtUtils.loadUUID(t));
+                    }
+                    BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLong("destination")) : null;
+                    Component error = item.isEmpty() ? Component.literal("?")
+                            : console.register(player, item, count, a.getInt("trigger"), destination, ids);
+                    plan = new CompoundTag();
+                    plan.putBoolean("started", error == null);
+                    if (error != null) {
+                        plan.putString("error", Component.Serializer.toJson(error, reg));
+                    }
+                }
+                case UNREGISTER -> {
+                    if (console.mayOperate(player)) {
+                        console.unregister(a.getInt("id"));
                     }
                 }
                 case CANCEL -> console.cancel(a.getInt("id"), null);

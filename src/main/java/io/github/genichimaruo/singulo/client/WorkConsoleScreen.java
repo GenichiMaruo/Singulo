@@ -37,7 +37,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * 数は5桁まで小さな字で出し、10000 からは 10K・10M・10G… と縮めて出す。
  */
 public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> {
-    private static final int TAB_Y = 16, TAB_W = 46, TAB_H = 13, TABS = 5, TAB_RECORD = 3, TAB_OUTBOX = 4;
+    private static final int TAB_Y = 16, TAB_W = 38, TAB_H = 13, TABS = 6, TAB_RECORD = 3, TAB_OUTBOX = 4, TAB_STANDING = 5;
+    /** タブの並び（左から）: 注文・登録・進行中・つながり・記録・納品箱。 */
+    private static final int[] TAB_ORDER = {0, TAB_STANDING, 1, 2, 3, 4};
+    private static final String[] TAB_KEYS = {"order", "running", "links", "record", "outbox", "standing"};
+    /** 注文の確認: きっかけのボタン（-1 は今すぐ注文、0〜 は登録。{@link StandingOrder}）。 */
+    private static final int TRIGGER_X = 8, TRIGGER_W = 116;
     /** 注文の確認: 納品先を選ぶボタン。 */
     private static final int DEST_X = 132, DEST_Y = 36, DEST_W = 116, DEST_H = 14;
     private static final int TOP = 33;
@@ -64,6 +69,13 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     private CompoundTag plan;
     @Nullable
     private Component error;
+    /** 進行中のページで、詳しく見ている注文（なければ -1）。 */
+    private int detail = -1;
+    private static final int DETAIL_ROWS = 5, DETAIL_H = 16, DETAIL_BACK_Y = TOP + DETAIL_ROWS * DETAIL_H + 4;
+    /** 注文の確認で選んだきっかけ（-1: 今すぐ注文）。 */
+    private int trigger = -1;
+    /** 登録を送ったところ（返事で登録のページへ移る）。 */
+    private boolean registering;
     private final Set<UUID> chosen = new HashSet<>();
     /** 選んだ納品先（様子の deliveries の番号）。 */
     private int destination;
@@ -118,7 +130,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 if (p.contains("started")) {
                     if (p.getBoolean("started")) {
                         closePicking();
-                        tab = 1;
+                        tab = registering ? TAB_STANDING : 1;
                     } else {
                         error = text(p, "error");
                     }
@@ -174,6 +186,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         androidScroll = 0;
         chosen.clear();
         destination = 0;
+        trigger = -1;
         countBox = new EditBox(font, leftPos + 26, topPos + 36, 46, 14, Component.empty());
         countBox.setMaxLength(4);
         countBox.setFilter(s -> s.isEmpty() || s.chars().allMatch(Character::isDigit));
@@ -275,11 +288,24 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 destination = (destination + (button == 1 ? deliveries.size() - 1 : 1)) % deliveries.size();
                 return true;
             }
+            if (Panel.inside(mouseX, mouseY, x + TRIGGER_X, y + BUTTON_Y, TRIGGER_W, BUTTON_H)) {
+                // 今すぐ → 在庫を保つ → 信号で1回 → 信号の間だけ在庫を保つ（右クリックで逆順）
+                int n = io.github.genichimaruo.singulo.android.work.StandingOrder.TRIGGERS + 1;
+                trigger = Math.floorMod(trigger + 1 + (button == 1 ? -1 : 1), n) - 1;
+                error = null;
+                return true;
+            }
             if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && canStart()) {
                 error = null;
                 BlockPos dest = deliveries.isEmpty() ? menu.pos()
                         : BlockPos.of(deliveries.get(Math.min(destination, deliveries.size() - 1)).getLong("pos"));
-                send(WorkConsoleActionPayload.start(picking, count, startAndroids(), dest, reg()));
+                registering = trigger >= 0;
+                if (registering) {
+                    List<UUID> picked = new ArrayList<>(chosen);
+                    send(WorkConsoleActionPayload.register(picking, count, trigger, picked, dest, reg()));
+                } else {
+                    send(WorkConsoleActionPayload.start(picking, count, startAndroids(), dest, reg()));
+                }
                 return true;
             }
             if (Panel.inside(mouseX, mouseY, x + BACK_X, y + BUTTON_Y, BACK_W, BUTTON_H)) {
@@ -290,8 +316,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         }
         for (int i = 0; i < TABS; i++) {
             if (Panel.inside(mouseX, mouseY, x + 8 + i * (TAB_W + 2), y + TAB_Y, TAB_W, TAB_H)) {
-                tab = i;
+                tab = TAB_ORDER[i];
                 scroll = 0;
+                detail = -1;
                 return true;
             }
         }
@@ -348,11 +375,30 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 }
             }
         } else if (tab == 1) {
+            if (detailOrder() != null) {
+                if (Panel.inside(mouseX, mouseY, x + 8, y + DETAIL_BACK_Y, 50, 12)) {
+                    detail = -1;
+                }
+                return true;
+            }
             List<CompoundTag> orders = list("orders");
             for (int i = 0; i < ORDER_ROWS; i++) {
                 int idx = i + scroll;
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 232, y + TOP + i * ROW_H + 3, 12, 12)) {
                     send(WorkConsoleActionPayload.cancel(orders.get(idx).getInt("id")));
+                    return true;
+                }
+                if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, 222, ROW_H - 1)) {
+                    detail = orders.get(idx).getInt("id");     // 行をクリック: 詳しい様子を見る
+                    return true;
+                }
+            }
+        } else if (tab == TAB_STANDING) {
+            List<CompoundTag> rows = list("standing");
+            for (int i = 0; i < ORDER_ROWS; i++) {
+                int idx = i + scroll;
+                if (idx < rows.size() && Panel.inside(mouseX, mouseY, x + 232, y + TOP + i * ROW_H + 3, 12, 12)) {
+                    send(WorkConsoleActionPayload.unregister(rows.get(idx).getInt("id")));
                     return true;
                 }
             }
@@ -370,6 +416,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     }
 
     private boolean canStart() {
+        if (trigger >= 0) {
+            return picking != null;                // 登録は、今そろっていなくてもできる（そろったら始める）
+        }
         return plan != null && plan.getBoolean("ok") && !startAndroids().isEmpty() && planDelay == 0;
     }
 
@@ -419,12 +468,14 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                     g.renderComponentTooltip(font, lines, mouseX, mouseY);
                 }
             }
-        } else if (tab == 1) {
+        } else if (tab == 1 && detailOrder() == null) {
             List<CompoundTag> orders = list("orders");
             for (int i = 0; i < ORDER_ROWS; i++) {
                 int idx = i + scroll;
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 232, y + TOP + i * ROW_H + 3, 12, 12)) {
                     g.renderTooltip(font, Component.translatable("gui.singulo.work_console.cancel"), mouseX, mouseY);
+                } else if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, 222, ROW_H - 1)) {
+                    g.renderTooltip(font, Component.translatable("gui.singulo.work_console.detail.hint"), mouseX, mouseY);
                 }
             }
         } else if (tab == TAB_RECORD) {
@@ -487,6 +538,11 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
 
     private void renderPickingTooltips(GuiGraphics g, int mouseX, int mouseY) {
         int x = leftPos, y = topPos;
+        if (Panel.inside(mouseX, mouseY, x + TRIGGER_X, y + BUTTON_Y, TRIGGER_W, BUTTON_H)) {
+            String key = trigger < 0 ? "now" : io.github.genichimaruo.singulo.android.work.StandingOrder.TRIGGER_KEYS[trigger];
+            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.trigger." + key + ".hint"), 180), mouseX, mouseY);
+            return;
+        }
         List<CompoundTag> androids = list("androids");
         for (int i = 0; i < LIST_ROWS; i++) {
             int idx = i + androidScroll;
@@ -555,7 +611,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         }
         for (int i = 0; i < TABS; i++) {
             int tx = x + 8 + i * (TAB_W + 2);
-            boolean on = i == tab;
+            boolean on = TAB_ORDER[i] == tab;
             g.fill(tx - 1, y + TAB_Y - 1, tx + TAB_W + 1, y + TAB_Y + TAB_H + 1, Panel.WELL_EDGE);
             g.fill(tx, y + TAB_Y, tx + TAB_W, y + TAB_Y + TAB_H,
                     on ? 0xFF3A8FB0 : Panel.inside(mouseX, mouseY, tx, y + TAB_Y, TAB_W, TAB_H) ? 0xFFD6E6EE : 0xFFF4F6F8);
@@ -568,11 +624,17 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         if (tab == 0) {
             renderEntries(g, x, y, mouseX, mouseY);
         } else if (tab == 1) {
-            renderOrders(g, x, y);
+            if (detailOrder() != null) {
+                renderDetail(g, x, y, mouseX, mouseY);
+            } else {
+                renderOrders(g, x, y);
+            }
         } else if (tab == 2) {
             renderLinks(g, x, y, mouseX, mouseY);
         } else if (tab == TAB_RECORD) {
             renderRecord(g, x, y, mouseX, mouseY);
+        } else if (tab == TAB_STANDING) {
+            renderStanding(g, x, y);
         }
     }
 
@@ -714,6 +776,67 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         }
     }
 
+    /** 詳しく見ている注文（終わった・ほかのページへ移ったら null）。 */
+    @Nullable
+    private CompoundTag detailOrder() {
+        if (detail < 0) {
+            return null;
+        }
+        for (CompoundTag o : list("orders")) {
+            if (o.getInt("id") == detail) {
+                return o;
+            }
+        }
+        detail = -1;
+        return null;
+    }
+
+    /** 注文の詳しい様子: 左に工程ごとの回数（最後に納品）、右に受け持っているアンドロイドと、今していること。 */
+    private void renderDetail(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+        CompoundTag o = detailOrder();
+        Panel.well(g, x + 8, y + TOP, 116, DETAIL_ROWS * DETAIL_H);
+        Panel.well(g, x + 132, y + TOP, 116, DETAIL_ROWS * DETAIL_H);
+        List<CompoundTag> steps = tags(o, "steps");
+        for (int i = 0; i < steps.size() && i < DETAIL_ROWS - 1; i++) {
+            g.renderItem(stack(steps.get(i), "item"), x + 9, y + TOP + i * DETAIL_H);
+        }
+        int last = Math.min(steps.size(), DETAIL_ROWS - 1);
+        g.renderItem(stack(o, "target"), x + 9, y + TOP + last * DETAIL_H);
+        List<CompoundTag> workers = tags(o, "worker_list");
+        for (int i = 0; i < workers.size() && i < DETAIL_ROWS; i++) {
+            int ry = y + TOP + i * DETAIL_H;
+            g.fill(x + 135, ry + 4, x + 143, ry + 12, workers.get(i).getInt("activity") < 0 ? 0xFF8A949E
+                    : 0xFF000000 | workers.get(i).getInt("accent"));
+        }
+        boolean hover = Panel.inside(mouseX, mouseY, x + 8, y + DETAIL_BACK_Y, 50, 12);
+        g.fill(x + 7, y + DETAIL_BACK_Y - 1, x + 59, y + DETAIL_BACK_Y + 13, Panel.WELL_EDGE);
+        g.fill(x + 8, y + DETAIL_BACK_Y, x + 58, y + DETAIL_BACK_Y + 12, hover ? 0xFFD6E6EE : 0xFFF4F6F8);
+    }
+
+    private static List<CompoundTag> tags(CompoundTag t, String key) {
+        List<CompoundTag> out = new ArrayList<>();
+        for (Tag e : t.getList(key, Tag.TAG_COMPOUND)) {
+            out.add((CompoundTag) e);
+        }
+        return out;
+    }
+
+    /** 登録のページ: 登録した注文の行（物・きっかけ・様子、右端の × で消す）。 */
+    private void renderStanding(GuiGraphics g, int x, int y) {
+        List<CompoundTag> rows = list("standing");
+        scroll = Math.min(scroll, Math.max(0, rows.size() - ORDER_ROWS));
+        for (int i = 0; i < ORDER_ROWS; i++) {
+            int idx = i + scroll;
+            if (idx >= rows.size()) {
+                break;
+            }
+            int ry = y + TOP + i * ROW_H;
+            g.fill(x + 8, ry, x + 248, ry + ROW_H - 1, 0xFFF4F6F8);
+            g.renderItem(stack(rows.get(idx), "item"), x + 9, ry + 1);
+            g.fill(x + 232, ry + 3, x + 244, ry + 15, 0xFFE8B0B0);
+        }
+    }
+
     private void renderLinks(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
         List<CompoundTag> links = list("links");
         scroll = Math.min(scroll, Math.max(0, links.size() - LINK_ROWS));
@@ -740,6 +863,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         g.fill(x + DEST_X - 1, y + DEST_Y - 1, x + DEST_X + DEST_W + 1, y + DEST_Y + DEST_H + 1, Panel.WELL_EDGE);
         g.fill(x + DEST_X, y + DEST_Y, x + DEST_X + DEST_W, y + DEST_Y + DEST_H,
                 Panel.inside(mouseX, mouseY, x + DEST_X, y + DEST_Y, DEST_W, DEST_H) ? 0xFFD6E6EE : 0xFFF4F6F8);
+        g.fill(x + TRIGGER_X - 1, y + BUTTON_Y - 1, x + TRIGGER_X + TRIGGER_W + 1, y + BUTTON_Y + BUTTON_H + 1, Panel.WELL_EDGE);
+        g.fill(x + TRIGGER_X, y + BUTTON_Y, x + TRIGGER_X + TRIGGER_W, y + BUTTON_Y + BUTTON_H,
+                Panel.inside(mouseX, mouseY, x + TRIGGER_X, y + BUTTON_Y, TRIGGER_W, BUTTON_H) ? 0xFFD6E6EE
+                        : trigger >= 0 ? 0xFFDCEAF2 : 0xFFF4F6F8);
         List<CompoundTag> mats = planRows();
         listScroll = Math.min(listScroll, Math.max(0, mats.size() - LIST_ROWS));
         for (int i = 0; i < LIST_ROWS; i++) {
@@ -780,11 +907,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         }
         AndroidStationScreen.fit(g, font, title, 8, 5, imageWidth - 16, Panel.TEXT);
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
-        String[] tabs = {"gui.singulo.work_console.tab.order", "gui.singulo.work_console.tab.running", "gui.singulo.work_console.tab.links",
-                "gui.singulo.work_console.tab.record", "gui.singulo.work_console.tab.outbox"};
         for (int i = 0; i < TABS; i++) {
-            AndroidStationScreen.fitCentered(g, font, Component.translatable(tabs[i]), 8 + i * (TAB_W + 2) + 2, TAB_Y + 3, TAB_W - 4,
-                    i == tab ? 0xFFFFFFFF : Panel.TEXT);
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.tab." + TAB_KEYS[TAB_ORDER[i]]),
+                    8 + i * (TAB_W + 2) + 2, TAB_Y + 3, TAB_W - 4, TAB_ORDER[i] == tab ? 0xFFFFFFFF : Panel.TEXT);
         }
         CompoundTag v = menu.view();
         Component message = v != null && v.contains("message") ? text(v, "message") : null;
@@ -796,6 +921,38 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             if (message != null) {
                 AndroidStationScreen.fit(g, font, message, 8, TOP + ROWS * CELL + 4, 240, MUTED);
             }
+        } else if (tab == 1 && detailOrder() != null) {
+            CompoundTag o = detailOrder();
+            List<CompoundTag> steps = tags(o, "steps");
+            int light = 0xFFE9EDF0;
+            for (int i = 0; i < steps.size() && i < DETAIL_ROWS - 1; i++) {
+                CompoundTag st = steps.get(i);
+                long done = st.getLong("done"), total = st.getLong("total"), doing = st.getLong("doing");
+                Component line = Component.literal(compact(done) + " / " + compact(total));
+                if (doing > 0) {
+                    line = line.copy().append(Component.translatable("gui.singulo.work_console.detail.doing", compact(doing)));
+                }
+                AndroidStationScreen.fit(g, font, line, 27, TOP + i * DETAIL_H + 4, 95, done >= total ? 0xFF78D2F0 : light);
+            }
+            int last = Math.min(steps.size(), DETAIL_ROWS - 1);
+            Component deliver = o.getBoolean("to_stock")
+                    ? Component.translatable("gui.singulo.work_console.detail.to_stock", compact(o.getLong("delivered")), compact(o.getLong("count")))
+                    : Component.translatable("gui.singulo.work_console.detail.delivered", compact(o.getLong("delivered")), compact(o.getLong("count")));
+            AndroidStationScreen.fit(g, font, deliver, 27, TOP + last * DETAIL_H + 4, 95, light);
+            List<CompoundTag> workers = tags(o, "worker_list");
+            for (int i = 0; i < workers.size() && i < DETAIL_ROWS; i++) {
+                CompoundTag w = workers.get(i);
+                int act = w.getInt("activity");
+                Component line = text(w, "name").copy();
+                if (act >= 0) {
+                    line = line.copy().append(": ").append(Component.translatable("gui.singulo.work_console.activity."
+                            + io.github.genichimaruo.singulo.android.RuinAndroid.ACTIVITY_KEYS[Math.min(act, io.github.genichimaruo.singulo.android.RuinAndroid.ACTIVITY_KEYS.length - 1)]));
+                }
+                AndroidStationScreen.fit(g, font, line, 147, TOP + i * DETAIL_H + 4, 99, act < 0 ? MUTED : light);
+            }
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.back"), 10, DETAIL_BACK_Y + 2, 46, Panel.TEXT);
+            AndroidStationScreen.fit(g, font, stack(o, "target").getHoverName().copy().append(" ×" + compact(o.getLong("count"))), 64,
+                    DETAIL_BACK_Y + 2, 184, Panel.TEXT);
         } else if (tab == 1) {
             List<CompoundTag> orders = list("orders");
             if (orders.isEmpty()) {
@@ -818,6 +975,38 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             if (message != null) {
                 AndroidStationScreen.fit(g, font, message, 8, TOP + ORDER_ROWS * ROW_H + 2, 240, MUTED);
             }
+        } else if (tab == TAB_STANDING) {
+            List<CompoundTag> rows = list("standing");
+            if (rows.isEmpty()) {
+                AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.work_console.standing.none"), 10, TOP + 4, 236, MUTED);
+            }
+            for (int i = 0; i < ORDER_ROWS; i++) {
+                int idx = i + scroll;
+                if (idx >= rows.size()) {
+                    break;
+                }
+                CompoundTag s = rows.get(idx);
+                int ry = TOP + i * ROW_H;
+                int trig = s.getInt("trigger");
+                Component head = stack(s, "item").getHoverName().copy().append(" ×" + compact(s.getLong("count")));
+                AndroidStationScreen.fit(g, font, head, 28, ry + 1, 120, Panel.TEXT);
+                AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.work_console.trigger." + io.github.genichimaruo.singulo.android.work.StandingOrder.TRIGGER_KEYS[trig]), 150,
+                        ry + 1, 78, 0xFF3A8FB0);
+                int state = s.getInt("state");
+                Component line = state == io.github.genichimaruo.singulo.android.work.StandingOrder.WAITING && s.contains("reason")
+                        ? Component.translatable("gui.singulo.work_console.standing.waiting", text(s, "reason"))
+                        : Component.translatable("gui.singulo.work_console.standing.state." + state);
+                if (trig != io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE) {
+                    line = line.copy().append(Component.translatable("gui.singulo.work_console.standing.stock", compact(s.getLong("stock"))));
+                }
+                AndroidStationScreen.fit(g, font, line, 28, ry + 10, 200, state == io.github.genichimaruo.singulo.android.work.StandingOrder.RUNNING ? GREEN
+                        : state == io.github.genichimaruo.singulo.android.work.StandingOrder.WAITING ? 0xFFC08020 : MUTED);
+                g.drawString(font, "×", 235, ry + 5, 0xFF803030, false);
+            }
+            CompoundTag view = menu.view();
+            boolean on = view != null && view.getBoolean("powered");
+            AndroidStationScreen.fit(g, font, Component.translatable(on ? "gui.singulo.work_console.signal.on" : "gui.singulo.work_console.signal.off"),
+                    8, TOP + ORDER_ROWS * ROW_H + 2, 240, on ? 0xFFD04848 : MUTED);
         } else if (tab == TAB_OUTBOX) {
             AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.work_console.outbox.hint"), 8, TOP + 1, 240, MUTED);
         } else if (tab == TAB_RECORD) {
@@ -932,8 +1121,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             color = GREEN;
         }
         AndroidStationScreen.fit(g, font, status, 8, LIST_Y + LIST_ROWS * LIST_H + 6, 240, color);
-        AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.start"), START_X + 2, BUTTON_Y + 4,
-                START_W - 4, canStart() ? 0xFFFFFFFF : 0xFF8A949E);
+        AndroidStationScreen.fitCentered(g, font, Component.translatable(trigger >= 0 ? "gui.singulo.work_console.register"
+                : "gui.singulo.work_console.start"), START_X + 2, BUTTON_Y + 4, START_W - 4, canStart() ? 0xFFFFFFFF : 0xFF8A949E);
+        AndroidStationScreen.fitCentered(g, font, Component.translatable(trigger < 0 ? "gui.singulo.work_console.trigger.now"
+                : "gui.singulo.work_console.trigger." + io.github.genichimaruo.singulo.android.work.StandingOrder.TRIGGER_KEYS[trigger]), TRIGGER_X + 2, BUTTON_Y + 4, TRIGGER_W - 4, Panel.TEXT);
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.back"), BACK_X + 2, BUTTON_Y + 4, BACK_W - 4,
                 Panel.TEXT);
         if (picking.is(Items.AIR)) {

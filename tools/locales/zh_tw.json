@@ -4367,6 +4367,46 @@
     "source": "No heat source or heat sink adjacent",
     "translation": "相鄰沒有熱源或低溫源"
   },
+  "gui.singulo.work_console.activity.charge": {
+    "source": "Recharging",
+    "translation": "充電中"
+  },
+  "gui.singulo.work_console.activity.craft": {
+    "source": "Crafting",
+    "translation": "製作中"
+  },
+  "gui.singulo.work_console.activity.deliver": {
+    "source": "Delivering",
+    "translation": "去交付"
+  },
+  "gui.singulo.work_console.activity.fetch": {
+    "source": "Fetching materials",
+    "translation": "去取材料"
+  },
+  "gui.singulo.work_console.activity.fight": {
+    "source": "Fighting",
+    "translation": "戰鬥中"
+  },
+  "gui.singulo.work_console.activity.mine": {
+    "source": "Mining",
+    "translation": "採掘中"
+  },
+  "gui.singulo.work_console.activity.none": {
+    "source": "Idle",
+    "translation": "待機"
+  },
+  "gui.singulo.work_console.activity.process": {
+    "source": "Processing",
+    "translation": "用裝置加工"
+  },
+  "gui.singulo.work_console.activity.return": {
+    "source": "Putting away",
+    "translation": "收拾"
+  },
+  "gui.singulo.work_console.activity.wait": {
+    "source": "Waiting for materials",
+    "translation": "等待材料"
+  },
   "gui.singulo.work_console.androids": {
     "source": "Androids (slots)",
     "translation": "仿生人（可攜帶格數）"
@@ -4446,6 +4486,22 @@
   "gui.singulo.work_console.delivery.port": {
     "source": "Delivery port (%s, %s, %s)",
     "translation": "交付口（%s, %s, %s）"
+  },
+  "gui.singulo.work_console.detail.delivered": {
+    "source": "Delivered %s / %s",
+    "translation": "交付 %s / %s"
+  },
+  "gui.singulo.work_console.detail.doing": {
+    "source": " (%s in progress)",
+    "translation": "（%s 作業中）"
+  },
+  "gui.singulo.work_console.detail.hint": {
+    "source": "Click to see the steps and what each android is doing",
+    "translation": "點擊查看工序和仿生人的狀態"
+  },
+  "gui.singulo.work_console.detail.to_stock": {
+    "source": "To stockpile %s / %s",
+    "translation": "放入資材存放處 %s / %s"
   },
   "gui.singulo.work_console.done": {
     "source": "Delivered %s ×%s",
@@ -4551,6 +4607,54 @@
     "source": "Lay out what goes in and what comes out. Scroll to change counts (Shift: 10 at a time)",
     "translation": "放置放入的物品和產出的物品。滾動滾輪變更數量（Shift：每次10個）"
   },
+  "gui.singulo.work_console.register": {
+    "source": "Save",
+    "translation": "登記"
+  },
+  "gui.singulo.work_console.signal.off": {
+    "source": "Redstone signal: off",
+    "translation": "紅石訊號：無"
+  },
+  "gui.singulo.work_console.signal.on": {
+    "source": "Redstone signal: on",
+    "translation": "紅石訊號：有"
+  },
+  "gui.singulo.work_console.standing.added": {
+    "source": "Saved the order for %s",
+    "translation": "已登記 %s 的訂單"
+  },
+  "gui.singulo.work_console.standing.full": {
+    "source": "Up to %s orders can be saved",
+    "translation": "最多可登記 %s 個"
+  },
+  "gui.singulo.work_console.standing.none": {
+    "source": "No saved orders (choose a trigger when confirming an order)",
+    "translation": "沒有登記的訂單（在確認訂單時選擇觸發條件來登記）"
+  },
+  "gui.singulo.work_console.standing.state.0": {
+    "source": "Idle",
+    "translation": "待機中"
+  },
+  "gui.singulo.work_console.standing.state.1": {
+    "source": "Running",
+    "translation": "進行中"
+  },
+  "gui.singulo.work_console.standing.state.2": {
+    "source": "Waiting",
+    "translation": "等待中"
+  },
+  "gui.singulo.work_console.standing.state.3": {
+    "source": "Waiting for a signal",
+    "translation": "等待訊號"
+  },
+  "gui.singulo.work_console.standing.stock": {
+    "source": " (in stock: %s)",
+    "translation": "（庫存 %s）"
+  },
+  "gui.singulo.work_console.standing.waiting": {
+    "source": "Waiting: %s",
+    "translation": "等待中：%s"
+  },
   "gui.singulo.work_console.start": {
     "source": "Start",
     "translation": "開始作業"
@@ -4595,9 +4699,49 @@
     "source": "Running",
     "translation": "進行中"
   },
+  "gui.singulo.work_console.tab.standing": {
+    "source": "Saved",
+    "translation": "登記"
+  },
+  "gui.singulo.work_console.trigger.keep": {
+    "source": "Keep in stock",
+    "translation": "保持庫存"
+  },
+  "gui.singulo.work_console.trigger.keep.hint": {
+    "source": "Whenever the stockpile holds fewer than this many, order enough to get back to it. The products go into the stockpile",
+    "translation": "資材存放處的庫存低於此數量時，自動下單補到此數量。成品放入資材存放處"
+  },
+  "gui.singulo.work_console.trigger.keep_powered": {
+    "source": "Keep stock while powered",
+    "translation": "有訊號時保持庫存"
+  },
+  "gui.singulo.work_console.trigger.keep_powered.hint": {
+    "source": "Keep in stock, but only while the console is powered by redstone",
+    "translation": "僅在指令台收到紅石訊號期間「保持庫存」"
+  },
+  "gui.singulo.work_console.trigger.now": {
+    "source": "Order now",
+    "translation": "立即下單"
+  },
+  "gui.singulo.work_console.trigger.now.hint": {
+    "source": "Click to save the order with a trigger instead (right-click to go back). Order now: order just this once",
+    "translation": "點擊選擇登記訂單的觸發條件（右鍵反向）。立即下單：只下單一次"
+  },
+  "gui.singulo.work_console.trigger.pulse": {
+    "source": "Once per signal",
+    "translation": "每次訊號一次"
+  },
+  "gui.singulo.work_console.trigger.pulse.hint": {
+    "source": "Order this many each time the console receives a redstone pulse. If materials are short, it waits until they are in stock",
+    "translation": "指令台每收到一次紅石訊號，就下單一次此數量。材料不足時會等到備齊"
+  },
   "gui.singulo.work_console.unlink": {
     "source": "Unlink",
     "translation": "斷開"
+  },
+  "gui.singulo.work_console.worker.away": {
+    "source": "(not found)",
+    "translation": "（找不到）"
   },
   "gui.singulo.wormhole.generated": {
     "source": "A pair of mouths formed. Stabilize within %s s",
