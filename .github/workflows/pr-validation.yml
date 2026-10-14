@@ -38,6 +38,27 @@ jobs:
           if not log.is_file() or not re.search(r"All [1-9][0-9]* required tests passed", log.read_text(encoding="utf-8")):
               raise SystemExit("GameTestServer did not report successful nonempty completion")
           PY
+      - name: Prepare disposable GUI review world
+        run: python3 tools/review/prepare_gui.py
+      - name: Run real client GUI smoke
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
+      - name: Require GUI captures
+        run: |
+          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 11
+          grep -q 'SINGULO_GUI_COMPLETE 11' build/gui-review/logs/latest.log
+      - name: Encode GUI captures for remote review
+        run: |
+          python3 - <<'PY'
+          import base64
+          import pathlib
+          print("::group::GUI captures for remote inspection")
+          for path in sorted(pathlib.Path("build/gui-review/screenshots").glob("*.png")):
+              print("SINGULO_GUI_IMAGE " + path.stem + " " + base64.b64encode(path.read_bytes()).decode("ascii"))
+          print("::endgroup::")
+          PY
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -48,3 +69,5 @@ jobs:
             build/libs/*.jar
             build/gametest/logs/
             build/reports/
+            build/gui-review/screenshots/
+            build/gui-review/logs/

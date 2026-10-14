@@ -84,8 +84,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
 
     @Override
     protected boolean openScreen(ServerPlayer player) {
-        WorkConsoleBlockEntity c = consoleEntity();
-        if (c != null && !c.mayOperate(player)) {
+        if (!mayOperate(player)) {
             player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
             return true;
         }

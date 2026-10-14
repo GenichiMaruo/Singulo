@@ -1068,6 +1068,46 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+
+    /** 許可証から外された人の棚・納品口を閉じ、他人の指令台への付け替えも拒否する。 */
+    @GameTest(template = EMPTY)
+    public static void workLinksEnforcePermissionChanges(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        var owner = helper.makeMockServerPlayerInLevel();
+        var friend = helper.makeMockServerPlayerInLevel();
+        var stranger = helper.makeMockServerPlayerInLevel();
+        friend.moveTo(Vec3.atCenterOf(helper.absolutePos(SUPPLY)));
+        console.setOwner(owner.getUUID());
+        ItemStack permit = new ItemStack(item("shield_permit"));
+        io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
+        io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, friend);
+        console.permit().setStackInSlot(0, permit);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity port = helper.getBlockEntity(DELIVERY);
+        var rackMenu = new io.github.genichimaruo.singulo.android.work.RecipeRackMenu(1, friend.getInventory(), helper.absolutePos(RACK), rack.items());
+        var portMenu = new io.github.genichimaruo.singulo.android.work.DeliveryPortMenu(2, friend.getInventory(), helper.absolutePos(DELIVERY),
+                new net.minecraft.world.SimpleContainer(io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity.SLOTS));
+        helper.assertTrue(rackMenu.stillValid(friend) && portMenu.stillValid(friend), "登録者が棚・納品口を使えない");
+        BlockPos other = new BlockPos(5, 1, 5);
+        helper.setBlock(other, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity otherConsole = helper.getBlockEntity(other);
+        otherConsole.setOwner(stranger.getUUID());
+        ItemStack link = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(other),
+                SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        rack.useItem(stranger, link, net.minecraft.world.InteractionHand.MAIN_HAND);
+        helper.assertTrue(helper.absolutePos(CONSOLE).equals(rack.console()), "他人の棚を自分の指令台につなぎ替えた");
+        ItemStack ownerOnly = new ItemStack(item("shield_permit"));
+        io.github.genichimaruo.singulo.item.ShieldPermitItem.add(ownerOnly, owner);
+        console.permit().setStackInSlot(0, ownerOnly);
+        helper.assertFalse(rackMenu.stillValid(friend), "権限を外された後も棚が使える");
+        helper.assertFalse(portMenu.stillValid(friend), "権限を外された後も納品口が使える");
+        portMenu.rename(friend, "not allowed");
+        helper.assertTrue(port.name().isEmpty(), "権限を外された後も納品口の名前を変えられる");
+        helper.succeed();
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

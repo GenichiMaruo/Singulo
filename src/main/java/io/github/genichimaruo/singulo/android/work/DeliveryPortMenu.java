@@ -46,7 +46,7 @@ public class DeliveryPortMenu extends AbstractContainerMenu {
 
     /** 名前を付け直す（サーバー。RenameAndroidPayload から）。 */
     public void rename(Player player, String name) {
-        if (player.level().getBlockEntity(pos) instanceof DeliveryPortBlockEntity port) {
+        if (player.level().getBlockEntity(pos) instanceof DeliveryPortBlockEntity port && port.mayOperate(player)) {
             port.setName(name);
         }
     }
@@ -78,6 +78,6 @@ public class DeliveryPortMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player, pos)
-                && player.level().getBlockEntity(pos) instanceof DeliveryPortBlockEntity;
+                && player.level().getBlockEntity(pos) instanceof DeliveryPortBlockEntity port && port.mayOperate(player);
     }
 }

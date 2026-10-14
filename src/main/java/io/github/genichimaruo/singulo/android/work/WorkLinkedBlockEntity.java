@@ -41,6 +41,15 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
                 && level.getBlockEntity(console) instanceof WorkConsoleBlockEntity c ? c : null;
     }
 
+    /** 開いた後の許可証変更と、指令台未読込の間も権限を維持する。 */
+    public boolean mayOperate(net.minecraft.world.entity.player.Player player) {
+        if (player.level().isClientSide || console == null) {
+            return true;
+        }
+        WorkConsoleBlockEntity linked = consoleEntity();
+        return linked != null && linked.mayOperate(player);
+    }
+
     void setConsole(@Nullable BlockPos console) {
         this.console = console;
         setChanged();
@@ -53,6 +62,10 @@ public abstract class WorkLinkedBlockEntity extends BlockEntity implements Abstr
     public boolean useItem(ServerPlayer player, ItemStack stack, InteractionHand hand) {
         if (!WorkLocationCardItem.isCard(stack)) {
             return false;
+        }
+        if (!mayOperate(player)) {
+            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            return true;
         }
         BlockPos target = WorkLocationCardItem.pos(stack);
         if (target == null || !WorkLocationCardItem.sameDimension(stack, player.level())

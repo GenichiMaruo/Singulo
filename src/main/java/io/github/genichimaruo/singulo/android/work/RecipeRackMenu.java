@@ -81,6 +81,6 @@ public class RecipeRackMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return io.github.genichimaruo.singulo.multiblock.Blueprints.withinMenuReach(player, pos)
-                && player.level().getBlockEntity(pos) instanceof RecipeRackBlockEntity;
+                && player.level().getBlockEntity(pos) instanceof RecipeRackBlockEntity rack && rack.mayOperate(player);
     }
 }
