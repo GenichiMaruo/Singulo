@@ -20,4 +20,14 @@ Let your androids craft, smelt and mine for you.
 - JEI's + button fills the Record tab for any recipe. Scroll over a slot to change counts.
 - New handbook pages: Upgrades, Work automation, and Processing, procedures and mining.
 
+### Saved orders, farming and fluids
+- Save up to 16 orders: keep stock, run once when a redstone signal arrives, or keep stock while powered. Orders wait for missing materials; the progress view shows each step and the android's current work.
+- Procedure cards also support harvesting and replanting, tree felling and replanting (requires a **Felling Upgrade**), breeding, shearing, milking, slaughtering and block interaction (levers, buttons and doors).
+- Record fuel and the item input/output faces for processing. Androids defend themselves while working and greet their owner and nearby androids.
+- **Tank Upgrade:** adds two tanks of 32,000 mB each for moving liquids and gases between stockpile tanks and machines. Record fluids with a container or JEI's + button.
+
+### Decorations and recipe variants
+- The android screen's third page equips head decorations (ribbon, hair ornament, beret, headdress), back/waist decorations (cape, scarf, waist ribbon) and hand decorations (paperback, bouquet, teacup, umbrella). Craft them at a crafting table and dye them.
+- Added shaped crafting recipes for the recipe rack, supply and delivery ports, workbench and work cards, alongside the work console's Precision Assembler recipe.
+
 This file is published with the **Beta** release type. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).

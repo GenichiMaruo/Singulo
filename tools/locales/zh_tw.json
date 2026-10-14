@@ -7045,23 +7045,23 @@
   },
   "item.singulo.shield_permit.added": {
     "source": "Registered %s · %s",
-    "translation": "已註冊 %1$s · 共 %2$s 人"
+    "translation": "已登記 %1$s · 共 %2$s 人"
   },
   "item.singulo.shield_permit.already": {
     "source": "%s already registered · %s",
-    "translation": "%1$s 已註冊 · 共 %2$s 人"
+    "translation": "%1$s 已登記 · 共 %2$s 人"
   },
   "item.singulo.shield_permit.empty": {
     "source": "Nobody registered yet",
-    "translation": "還沒有人註冊"
+    "translation": "還沒有人登記"
   },
   "item.singulo.shield_permit.hint": {
     "source": "Use to register yourself; use on a player to add them",
-    "translation": "右鍵註冊自己；對玩家右鍵可將對方也註冊"
+    "translation": "右鍵登記自己；對玩家右鍵可將對方也登記"
   },
   "item.singulo.shield_permit.members": {
     "source": "Registered: %s",
-    "translation": "已註冊：%1$s 人"
+    "translation": "已登記：%1$s 人"
   },
   "item.singulo.shield_permit.more": {
     "source": "%s more",
@@ -7069,7 +7069,7 @@
   },
   "item.singulo.shield_permit.reset": {
     "source": "Only %s is registered now",
-    "translation": "已將註冊名單重設為僅 %1$s"
+    "translation": "已將登記名單重設為僅 %1$s"
   },
   "item.singulo.singularity_core": {
     "source": "Singularity Core",
