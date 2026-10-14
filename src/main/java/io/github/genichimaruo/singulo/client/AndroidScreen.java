@@ -243,6 +243,14 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             NameEditor.drawReset(g, x + RESET_X, y + RESET_Y, Panel.inside(mouseX, mouseY, x + RESET_X, y + RESET_Y, 10, 10),
                     mix(accent, 0x2A3040, 0.3F), mix(accent, 0xFFFFFF, 0.6F));
         }
+        // 全ページ共通の持ち物欄。ページ別の早期returnより前に描き、背景の描画を先に確定する。
+        g.flush();
+        for (int i = RuinAndroid.INVENTORY_SIZE; i < menu.slots.size(); i++) {
+            Slot slot = menu.slots.get(i);
+            g.fill(x + slot.x - 1, y + slot.y - 1, x + slot.x + 17, y + slot.y + 17, SLOT_EDGE);
+            g.fill(x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, SLOT_FILL);
+        }
+        g.flush();
         if (gearPage()) {
             renderGear(g, x, y, mouseX, mouseY, accent);
             return;

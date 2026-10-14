@@ -126,6 +126,23 @@ public final class GuiReviewHarness {
         Files.createDirectories(dir);
         try (var screenshot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
             screenshot.writeToFile(dir.resolve(name + ".png"));
+            if (name.startsWith("android-")) {
+                var slot = mc.player.containerMenu.getSlot(RuinAndroid.INVENTORY_SIZE);
+                double scale = mc.getWindow().getGuiScale();
+                int left = (mc.getWindow().getGuiScaledWidth() - AndroidMenu.WIDTH) / 2;
+                int top = (mc.getWindow().getGuiScaledHeight() - AndroidMenu.HEIGHT) / 2;
+                int pixel = screenshot.getPixelRGBA((int) ((left + slot.x + 8) * scale), (int) ((top + slot.y + 8) * scale));
+                for (int i = RuinAndroid.INVENTORY_SIZE; i < mc.player.containerMenu.slots.size(); i++) {
+                    if (!mc.player.containerMenu.getSlot(i).isActive()) {
+                        throw new IllegalStateException("Inactive player inventory slot in " + name);
+                    }
+                }
+                long active = mc.player.containerMenu.slots.stream().filter(net.minecraft.world.inventory.Slot::isActive).count();
+                Singulo.LOGGER.info("SINGULO_GUI_INVENTORY {} active={} pixel={}", name, active, Integer.toHexString(pixel));
+                if (pixel != 0xFF988F8B) {
+                    throw new IllegalStateException("Player inventory background missing in " + name);
+                }
+            }
         }
         Singulo.LOGGER.info("SINGULO_GUI_CAPTURE {}", name);
     }
