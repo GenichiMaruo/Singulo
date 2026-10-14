@@ -17,5 +17,9 @@ public final class SinguloNetwork {
         r.playToServer(SideConfigPayload.TYPE, SideConfigPayload.STREAM_CODEC, SideConfigPayload::handle);
         r.playToServer(ManipulatorInputPayload.TYPE, ManipulatorInputPayload.STREAM_CODEC, ManipulatorInputPayload::handle);
         r.playToServer(RenameAndroidPayload.TYPE, RenameAndroidPayload.STREAM_CODEC, RenameAndroidPayload::handle);
+        r.playToServer(io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload.TYPE, io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload.STREAM_CODEC,
+                io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload::handle);
+        r.playToClient(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.TYPE, io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.STREAM_CODEC,
+                io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload::handle);
     }
 }

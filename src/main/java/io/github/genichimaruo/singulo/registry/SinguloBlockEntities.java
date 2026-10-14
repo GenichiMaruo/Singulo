@@ -175,6 +175,17 @@ public final class SinguloBlockEntities {
             REGISTER.register("android_station", () -> build(io.github.genichimaruo.singulo.android.AndroidStationBlockEntity::new,
                     SinguloBlocks.ANDROID_STATION.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity>> ANDROID_WORK_CONSOLE =
+            REGISTER.register("android_work_console", () -> build(io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity::new, SinguloBlocks.ANDROID_WORK_CONSOLE.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity>> ANDROID_SUPPLY_PORT =
+            REGISTER.register("android_supply_port", () -> build(io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity::new, SinguloBlocks.ANDROID_SUPPLY_PORT.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT =
+            REGISTER.register("android_delivery_port", () -> build(io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new, SinguloBlocks.ANDROID_DELIVERY_PORT.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ANDROID_WORKBENCH =
+            REGISTER.register("android_workbench", () -> build(io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, SinguloBlocks.ANDROID_WORKBENCH.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity>> ANDROID_RECIPE_RACK =
+            REGISTER.register("android_recipe_rack", () -> build(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity::new, SinguloBlocks.ANDROID_RECIPE_RACK.get()));
+
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity>> ANDROID_FABRICATOR =
             REGISTER.register("android_fabricator", () -> build(io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity::new,
                     SinguloBlocks.RUIN_ANDROID_FABRICATOR.get()));

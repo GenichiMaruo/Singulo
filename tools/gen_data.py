@@ -736,6 +736,116 @@ UI_LANG = {
     'tooltip.singulo.android_armor_plate': ('護衛のアンドロイドの胸当て（防御 +8、防具強度 +2）', 'Chestplate for a guard android (+8 armor, +2 toughness)'),
     'tooltip.singulo.android_mining_upgrade': ('ダイヤのツルハシ相当で掘る。効率強化・幸運・シルクタッチを付けられる', 'Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch'),
     'gui.singulo.android.page.gear': ('装備と持ち物', 'Gear and inventory'),
+    'message.singulo.work_location.recorded': ('%s の位置を記録した（%s, %s, %s）', 'Recorded %s at %s, %s, %s'),
+    'tooltip.singulo.work_location.empty': ('記録なし（ブロックをシフト右クリックで記録）', 'Empty: sneak-use on a block to record it'),
+    'tooltip.singulo.work_location.block': ('%s（%s, %s, %s）', '%s at %s, %s, %s'),
+    'tooltip.singulo.work_location.hint': ('作業指令台を記録したカードで資材口などを右クリックすると、つながる', 'Use a card holding a work console on a port or rack to link it'),
+    'tooltip.singulo.recipe_card.empty': ('まだ記録していない（作業指令台の「記録」で記録する）', 'Blank: record a recipe in a work console\'s Record tab'),
+    'message.singulo.work_location.cleared': ('記録を消した', 'Cleared the record'),
+    'message.singulo.recipe_card.cleared': ('レシピを消した', 'Cleared the recipe'),
+    'gui.singulo.work_console.tab.record': ('記録', 'Record'),
+    'gui.singulo.work_console.tab.outbox': ('納品箱', 'Outbox'),
+    'gui.singulo.work_console.outbox.hint': ('指令台に届いた完成品。隣の箱へ自動で出す', 'Orders delivered to the console. Moved into adjacent chests automatically'),
+    'gui.singulo.work_console.delivery': ('納品先: %s', 'Deliver to: %s'),
+    'gui.singulo.work_console.delivery.hint': ('クリックで納品先を切り替える（右クリックで逆順）。納品口の名前は、納品口の画面で付けられる', 'Click to change where it is delivered (right-click to go back). Name delivery ports in their own screen'),
+    'gui.singulo.work_console.delivery.console': ('作業指令台', 'Work console'),
+    'gui.singulo.work_console.delivery.port': ('納品口（%s, %s, %s）', 'Delivery port (%s, %s, %s)'),
+    'gui.singulo.work_console.record.hint': ('見本を置いて、レシピカードに記録する（JEI の「+」でも置ける）', 'Lay out a pattern and record it onto a recipe card (JEI\'s + button works too)'),
+    'gui.singulo.work_console.record.hint.processing': ('入れる物と出てくる物を置く。ホイールで数を変える（シフトで10ずつ）', 'Lay out what goes in and what comes out. Scroll to change counts (Shift: 10 at a time)'),
+    'gui.singulo.recipe_encoder.mode.crafting': ('作業台', 'Crafting'),
+    'tooltip.singulo.recipe_card.processing': ('加工（かまど・装置に入れて取り出す）', 'Processing (put into a furnace or machine and taken out)'),
+    'tooltip.singulo.recipe_card.extra': ('ほかに: %s ×%s', 'Also: %s ×%s'),
+    'gui.singulo.recipe_encoder.mode.processing': ('加工', 'Processing'),
+    'gui.singulo.recipe_encoder.mode.procedure': ('手順', 'Procedure'),
+    'gui.singulo.recipe_encoder.kind.insert': ('投入', 'Insert'),
+    'gui.singulo.recipe_encoder.kind.extract': ('取り出し', 'Extract'),
+    'gui.singulo.recipe_encoder.kind.mine': ('採掘', 'Mine'),
+    'gui.singulo.recipe_encoder.kind.hint': ('足す手順の種類を切り替える。投入: 装置に上から入れる。取り出し: 装置の下から取り出す。採掘: ブロックを掘る（採掘アップグレードが要る）', 'Switch the kind of step to add. Insert: put into a machine from above. Extract: take out from below. Mine: dig blocks (needs a Mining Upgrade)'),
+    'gui.singulo.recipe_encoder.step.add': ('足す', 'Add'),
+    'gui.singulo.recipe_encoder.step.add.hint': ('作業位置カードの場所と、物の欄の物で、手順を1つ足す（最大8つ）', 'Add a step at the place on the Work Location Card, with the item in the item slot (up to eight)'),
+    'gui.singulo.recipe_encoder.step.remove': ('クリックで消す', 'Click to remove'),
+    'gui.singulo.recipe_encoder.step.loc_a.hint': ('手順の場所を記録した作業位置カード', 'A Work Location Card holding the place for the step'),
+    'gui.singulo.recipe_encoder.step.loc_b.hint': ('採掘の範囲のもう1点（なくてもよい。あれば2点で囲った範囲を掘る）', 'The other corner of the mining area (optional; with it, the box between the two cards is mined)'),
+    'gui.singulo.recipe_encoder.step.item.hint': ('入れる・取り出す・集める物（ホイールで数を変える）。採掘で空なら、できる物を集める', 'What to insert, extract or gather (scroll to change the count). Leave it empty for mining to gather the product'),
+    'gui.singulo.recipe_encoder.product.hint': ('この手順でできる物（1回分の数）。指令台ではこの物として注文できる', 'What these steps produce, per run. It can be ordered as this item at the console'),
+    'gui.singulo.recipe_encoder.step.full': ('手順は8つまで', 'Up to eight steps'),
+    'gui.singulo.recipe_encoder.step.no_place': ('作業位置カード（この次元の場所を記録したもの）を置いてください', 'Place a Work Location Card holding a place in this dimension'),
+    'gui.singulo.recipe_encoder.step.no_item': ('物の欄に、入れる・取り出す物を置いてください', 'Place the item to insert or extract in the item slot'),
+    'gui.singulo.recipe_encoder.step.too_big': ('採掘の範囲は1辺 %s ブロックまで', 'The mining area can be at most %s blocks on a side'),
+    'tooltip.singulo.procedure_card.empty': ('まだ記録していない（作業指令台の「記録」の手順モードで記録する）', 'Blank: record steps in the procedure mode of a work console\'s Record tab'),
+    'tooltip.singulo.procedure_card.product': ('できる物', 'the product'),
+    'tooltip.singulo.procedure_card.insert': ('投入: %s（%s）', 'Insert %s (%s)'),
+    'tooltip.singulo.procedure_card.extract': ('取り出し: %s（%s）', 'Extract %s (%s)'),
+    'tooltip.singulo.procedure_card.mine': ('採掘: %s がそろうまで（%s）', 'Mine until %s (%s)'),
+    'gui.singulo.recipe_encoder.mode.hint': ('記録する種類を切り替える。作業台: 作業台で作る。加工: かまどや装置に上から入れ、下から取り出す。手順: 手順カードに投入・取り出し・採掘の手順を記録する', 'Switch what is recorded. Crafting: made at a crafting table. Processing: put into a furnace or machine from above and taken out from below. Procedure: insert, extract and mine steps on a Procedure Card'),
+    'gui.singulo.recipe_encoder.output.hint': ('出てくる物（主な物）を置く', 'Place what comes out (the main product)'),
+    'gui.singulo.recipe_encoder.extra.hint': ('ほかに出てくる物（副産物）。取り出して素材置き場へ戻す', 'Anything else that comes out (byproducts). It is taken out and returned to the stockpile'),
+    'tooltip.singulo.recipe_card.output': ('作る物: %s ×%s', 'Makes: %s ×%s'),
+    'message.singulo.work_link.not_console': ('このカードは作業指令台を記録していない', 'This card does not hold a work console'),
+    'message.singulo.work_link.removed': ('作業指令台から外した', 'Unlinked from the work console'),
+    'message.singulo.work_link.too_far': ('作業指令台から遠すぎる（%sブロックまで）', 'Too far from the work console (up to %s blocks)'),
+    'message.singulo.work_link.added': ('作業指令台（%s, %s, %s）につないだ', 'Linked to the work console at %s, %s, %s'),
+    'message.singulo.work_link.none': ('どの作業指令台にもつながっていない', 'Not linked to a work console'),
+    'message.singulo.work_link.info': ('つながっている作業指令台：%s, %s, %s', 'Linked to the work console at %s, %s, %s'),
+    'message.singulo.supply_port.storages': ('（ストレージ %s 個）', ' (%s storages)'),
+    'gui.singulo.work_console.locked': ('この作業指令台の許可証に登録されていない', 'You are not on this work console\'s permit'),
+    'gui.singulo.work_console.error.loop': ('レシピがループしている', 'The recipes loop'),
+    'gui.singulo.work_console.error.missing': ('素材が足りない', 'Not enough materials'),
+    'gui.singulo.work_console.error.no_android': ('手の空いたアンドロイドを選んでいない', 'No free android is chosen'),
+    'gui.singulo.work_console.error.capacity': ('%s の素材を一度に運べるアンドロイドがいない（バックパックが必要）', 'No chosen android can carry the materials for %s at once (a backpack is needed)'),
+    'gui.singulo.work_console.error.not_workbench': ('%s のレシピの作業場所が作業台ではない', 'The work location for %s is not a crafting table'),
+    'message.singulo.android_workbench.hint': ('アンドロイドが作業台のレシピを作る台。レシピ棚の作業位置カードにこの台を記録する', 'Androids craft here. Record this block on the Work Location Card in a recipe rack'),
+    'gui.singulo.work_console.cancelled': ('%s の注文を取り消した', 'Cancelled the order for %s'),
+    'gui.singulo.work_console.cancelled.unreachable': ('%s の注文を取り消した（たどり着けない場所があった）', 'Cancelled the order for %s (a place could not be reached)'),
+    'gui.singulo.work_console.cancelled.recipe': ('%s の注文を取り消した（レシピが合わない）', 'Cancelled the order for %s (the recipe does not match)'),
+    'gui.singulo.work_console.cancelled.stalled': ('%s の注文を取り消した（装置の加工が進まない）', 'Cancelled the order for %s (the machine stopped processing)'),
+    'gui.singulo.work_console.error.no_miner': ('%s の手順に採掘があるが、採掘アップグレードを積んだアンドロイドを選んでいない', '%s needs mining, but no chosen android has a Mining Upgrade'),
+    'gui.singulo.work_console.error.not_machine': ('%s のレシピの作業場所に、入れたり取り出したりできない', 'Items cannot be put into or taken from the work location for %s'),
+    'gui.singulo.work_console.done': ('%s ×%s を納品した', 'Delivered %s ×%s'),
+    'gui.singulo.work_console.stock': ('在庫: %s', 'In stock: %s'),
+    'gui.singulo.work_console.craftable': ('作れる', 'Craftable'),
+    'gui.singulo.work_console.cancel': ('取り消す', 'Cancel'),
+    'gui.singulo.work_console.count.hint': ('シフトで10ずつ、コントロールで64ずつ', 'Shift: 10 at a time, Ctrl: 64'),
+    'gui.singulo.work_console.choose_android': ('アンドロイドを選んでください', 'Choose at least one android'),
+    'gui.singulo.work_console.cannot_start': ('この注文はできない', 'This order cannot be started'),
+    'gui.singulo.work_console.tab.order': ('注文', 'Order'),
+    'gui.singulo.work_console.tab.running': ('進行中', 'Running'),
+    'gui.singulo.work_console.tab.links': ('つながり', 'Links'),
+    'gui.singulo.work_console.empty': ('注文できる物がない（資材口とレシピ棚をつなぐ）', 'Nothing to order (link supply ports and recipe racks)'),
+    'gui.singulo.work_console.no_orders': ('進行中の注文はない', 'No running orders'),
+    'gui.singulo.work_console.status.0': ('作業中（%s体）', 'Working (%s androids)'),
+    'gui.singulo.work_console.status.1': ('素材を待っている', 'Waiting for materials'),
+    'gui.singulo.work_console.status.2': ('運べるアンドロイドを待っている', 'Waiting for an android that can carry it'),
+    'gui.singulo.work_console.status.3': ('置き場の空きを待っている', 'Waiting for storage space'),
+    'gui.singulo.work_console.no_links': ('つながっているブロックはない', 'Nothing is linked'),
+    'gui.singulo.work_console.link.0': ('資材口', 'Supply port'),
+    'gui.singulo.work_console.link.1': ('納品口', 'Delivery port'),
+    'gui.singulo.work_console.link.2': ('レシピ棚', 'Recipe rack'),
+    'gui.singulo.work_console.link.lost': ('（見つからない）', '(missing)'),
+    'gui.singulo.work_console.unlink': ('外す', 'Unlink'),
+    'gui.singulo.work_console.link.hint': ('作業位置カードでこの台を記録し、そのカードで右クリックしてつなぐ', 'Record this console on a Work Location Card, then use the card on blocks to link them'),
+    'gui.singulo.work_console.materials': ('作る物と素材（必要 / 在庫）', 'To craft, and materials (need / have)'),
+    'gui.singulo.work_console.crafted': ('作る ×%s', 'Craft ×%s'),
+    'gui.singulo.work_console.crafted.surplus': ('作る ×%s（余り %s）', 'Craft ×%s (%s left over)'),
+    'gui.singulo.work_console.crafted.hint': ('アンドロイドが作る物。余りは素材置き場へ戻る', 'Crafted by the androids. Leftovers go back to the stockpile'),
+    'gui.singulo.work_console.material.hint': ('素材置き場から使う物（必要 / 在庫）', 'Taken from the stockpile (need / have)'),
+    'gui.singulo.work_console.androids': ('アンドロイド（運べる数）', 'Androids (slots)'),
+    'gui.singulo.work_console.no_androids': ('近くに使えるアンドロイドがいない', 'No android available nearby'),
+    'gui.singulo.work_console.busy': ('%s（作業中）', '%s (busy)'),
+    'gui.singulo.work_console.planning': ('計算中…', 'Calculating...'),
+    'gui.singulo.work_console.plan': ('工程 %s ・ 作る回数 %s', '%s steps, %s crafts'),
+    'gui.singulo.work_console.start': ('作業開始', 'Start'),
+    'gui.singulo.work_console.back': ('戻る', 'Back'),
+    'gui.singulo.recipe_encoder.encode': ('記録', 'Save'),
+    'gui.singulo.recipe_encoder.encode.hint': ('記録したカードの欄のカードに、この並びを記録する（空ならストックから1枚取る）', 'Record this recipe onto the card in the recorded slot (takes one from the stock if it is empty)'),
+    'gui.singulo.recipe_encoder.clear': ('見本を消す', 'Clear the pattern'),
+    'gui.singulo.recipe_encoder.clear.short': ('見本消去', 'Clear grid'),
+    'gui.singulo.recipe_encoder.clear_card': ('レシピ消去', 'Erase'),
+    'gui.singulo.recipe_encoder.clear_card.hint': ('記録したカードのレシピを消す', 'Erase the recipe on the recorded card'),
+    'gui.singulo.recipe_encoder.stock': ('ストック', 'Stock'),
+    'gui.singulo.recipe_encoder.stock.hint': ('未記録のレシピカードを1スタック入れておくと、記録したカードの欄が空のとき、ここから1枚取って記録する', 'Keep a stack of blank recipe cards here. When the recorded-card slot is empty, Save takes one from here'),
+    'gui.singulo.recipe_encoder.grid.hint': ('持っている物でクリックすると、その見本を置く（物は減らない）', 'Click with an item to place a copy as a pattern (it is not used up)'),
+    'gui.singulo.recipe_encoder.card': ('記録済み', 'Recorded'),
     'gui.singulo.android.page.status': ('様子', 'Status'),
     'gui.singulo.android.battery': ('バッテリー', 'Battery'),
     'gui.singulo.android.backpack': ('バックパック', 'Backpack'),
@@ -1064,6 +1174,7 @@ def models():
     black_hole_item_models()
     manipulator_staff_model()
     compass_item_model()
+    work_card_item_model()
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
@@ -1123,6 +1234,9 @@ def models():
                 if iid == 'android_station':
                     # 上面は印刷床（光の走査線が往復する。blocks_extra3.station_top）
                     model['textures']['top'] = f'{MODID}:block/android_station_top'
+                if iid == 'android_workbench':
+                    # 上面は 3×3 のマスの作業面（blocks_extra3.workbench_top）
+                    model['textures']['top'] = f'{MODID}:block/android_workbench_top'
                 if skin:
                     # マルチブロックのコントローラは、部品と同じ外装で包む（見た目をそろえる）
                     for key in ('top', 'side', 'bottom', 'particle'):
@@ -2325,6 +2439,16 @@ def sounds_json():
     write_json(ASSETS / 'sounds.json', out)
 
 
+def work_card_item_model():
+    """作業位置カード: 記録済み（singulo:recorded）なら、緑の帯とピンの絵にする。"""
+    iid = 'work_location_card'
+    write_json(ASSETS / 'models' / 'item' / f'{iid}_recorded.json',
+               {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}_recorded'}})
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
+        'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'},
+        'overrides': [{'predicate': {f'{MODID}:recorded': 1}, 'model': f'{MODID}:item/{iid}_recorded'}]})
+
+
 def compass_item_model():
     """探索コンパス・隕石コンパス: 針の向き（minecraft:angle）で16コマを切り替える。"""
     for iid in ('explorer_compass', 'meteor_compass'):
@@ -2763,7 +2887,8 @@ TAB_GROUPS = [
                'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
                'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
                'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade',
-               'android_mining_upgrade']),
+               'android_mining_upgrade', 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
+               'work_location_card', 'recipe_card', 'procedure_card']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core']),

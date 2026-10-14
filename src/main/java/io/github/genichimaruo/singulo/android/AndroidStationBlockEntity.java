@@ -217,6 +217,20 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return stack;
     }
 
+    /** 転送アップグレードで預かった作業（枠ごと。次に印刷するアンドロイドが同じ注文の作業を続ける）。 */
+    private final BlockPos[] keptConsole = new BlockPos[MAX_UNITS];
+    private final int[] keptOrder = new int[MAX_UNITS];
+
+    /** 倒れたアンドロイドの作業を預かる。 */
+    public void keepWork(UUID id, @Nullable BlockPos console, int order) {
+        int unit = unitOf(id);
+        if (unit >= 0) {
+            keptConsole[unit] = console;
+            keptOrder[unit] = order;
+            setChanged();
+        }
+    }
+
     /** 預かっている持ち物（枠ごと）。 */
     public net.minecraft.world.SimpleContainer kept(int unit) {
         return kept[unit];
@@ -532,6 +546,16 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return null;
     }
 
+    /** 印刷したいのに、上にだれかいて待っている（上で待機しているアンドロイドは、どく）。 */
+    public boolean wantsTop() {
+        for (int i = 0; i < units(); i++) {
+            if (androids[i] == null && statuses[i] == S_BLOCKED) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean topClear(ServerLevel level) {
         AABB box = new AABB(worldPosition.above()).expandTowards(0, 1, 0).deflate(0.05);
         return level.noCollision(box) && level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator()).isEmpty();
@@ -552,6 +576,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         }
         refill(a);
         a.setCharge(a.maxCharge());
+        if (keptConsole[unit] != null) {
+            a.assignWork(keptConsole[unit], keptOrder[unit]);
+            keptConsole[unit] = null;
+        }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
         a.startPrinting();
@@ -708,6 +736,12 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             tag.put("kept" + i, net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), list, registries));
         }
         tag.putInt("selected", selected);
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (keptConsole[i] != null) {
+                tag.put("kept_console" + i, net.minecraft.nbt.NbtUtils.writeBlockPos(keptConsole[i]));
+                tag.putInt("kept_order" + i, keptOrder[i]);
+            }
+        }
         tag.putInt("mode", mode);
         tag.putInt("retreat", retreat);
         tag.putBoolean("escort", escort);
@@ -772,6 +806,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                     : RuinAndroid.SLOT_REPAIR, stack));
         }
         selected = Mth.clamp(tag.getInt("selected"), 0, MAX_UNITS - 1);
+        for (int i = 0; i < MAX_UNITS; i++) {
+            keptConsole[i] = net.minecraft.nbt.NbtUtils.readBlockPos(tag, "kept_console" + i).orElse(null);
+            keptOrder[i] = tag.getInt("kept_order" + i);
+        }
         mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_FOLLOW);
         retreat = tag.contains("retreat") ? Mth.clamp(tag.getInt("retreat"), 0, 90) : 30;
         escort = !tag.contains("escort") || tag.getBoolean("escort");

@@ -338,6 +338,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         }
         switch (state) {
             case RuinAndroid.STATE_LOW_POWER -> lowPower();
+            case RuinAndroid.STATE_CRAFTING -> crafting(age);
+            case RuinAndroid.STATE_MINING -> mining(age);
             case RuinAndroid.STATE_CHARGING -> charging(t, age);
             case RuinAndroid.STATE_SOLAR -> solar(t, age);
             case RuinAndroid.STATE_SOLAR_FOLD -> solarFold(t, age);
@@ -604,6 +606,35 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtFront.xRot -= 0.3F * u * k;
     }
 
+    /** 作業台で作る: 少し前かがみで、両手を前に出し、交互にとんとんと手を動かす。 */
+    private void crafting(float age) {
+        float beat = age * 0.45F;
+        // 上体を少し前へ。頭は軽くうつむく程度（作業台を見下ろして首が折れないように、見る向きは使わない）
+        torso.xRot += 0.12F;
+        head.xRot = 0.2F;
+        armL.xRot = -0.9F + Mth.sin(beat) * 0.25F;
+        armR.xRot = -0.9F - Mth.sin(beat) * 0.25F;
+        armL.zRot = -0.18F;
+        armR.zRot = 0.18F;
+        forearmL.xRot = -0.6F - Math.max(0, Mth.sin(beat)) * 0.4F;
+        forearmR.xRot = -0.6F - Math.max(0, -Mth.sin(beat)) * 0.4F;
+    }
+
+    /** 採掘: 左手のツルハシを振りかぶって、振り下ろす。 */
+    private void mining(float age) {
+        float beat = age * 0.32F;
+        float s = Mth.sin(beat);
+        float down = s > 0 ? s * s : s * 0.6F;          // 振り下ろしは速く、振りかぶりはゆっくり
+        torso.xRot += 0.1F;
+        head.xRot = 0.25F;
+        armL.xRot = -1.5F + down * 1.0F;
+        armL.zRot = -0.12F;
+        forearmL.xRot = -0.45F;
+        armR.xRot = -0.25F;
+        armR.zRot = 0.18F;
+        forearmR.xRot = -0.3F;
+    }
+
     private void lowPower() {
         torso.xRot += 0.3F;
         head.xRot += 0.55F;
@@ -678,7 +709,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
 
     private void charging(float t, float age) {
         float k = ease(t / 10);
+        // 脚は腰とは別の部品なので、腰と一緒に下げる（下げないと、立ったときの高さから脚が前へ突き出る）
         hips.y += 8.5F * k;
+        legL.y += 8.5F * k;
+        legR.y += 8.5F * k;
         legL.xRot = -1.5F * k;
         legR.xRot = -1.5F * k;
         shinL.xRot = 2.95F * k;
@@ -686,7 +720,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         legL.zRot = -0.08F * k;
         legR.zRot = 0.08F * k;
         torso.xRot += 0.1F * k;
-        head.xRot = 0.4F * k + Mth.sin(age * 0.06F) * 0.03F;
+        head.xRot = 0.15F * k + Mth.sin(age * 0.06F) * 0.03F;
         armL.xRot = -0.55F * k;
         forearmL.xRot = -0.65F * k;
         armL.zRot = 0.15F * k;

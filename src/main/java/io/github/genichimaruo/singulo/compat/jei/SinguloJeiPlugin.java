@@ -49,6 +49,12 @@ public class SinguloJeiPlugin implements IModPlugin {
         return t.isMultiblock() ? SinguloBlocks.CONTROLLERS.get(t).get() : SinguloBlocks.MACHINES.get(t).get();
     }
 
+    /** 作業指令台の記録のページへ、作業台のレシピを「+」で置く。 */
+    @Override
+    public void registerRecipeTransferHandlers(mezz.jei.api.registration.IRecipeTransferRegistration registration) {
+        registration.addUniversalRecipeTransferHandler(new WorkConsoleTransferHandler(registration.getTransferHelper()));
+    }
+
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         for (MachineType t : MachineType.values()) {

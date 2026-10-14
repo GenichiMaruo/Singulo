@@ -1,0 +1,23 @@
+## Singulo-0.7.0-1.21.1N
+
+### Android upgrades
+- **Production Upgrade** (station): prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it.
+- **Battery Upgrade** (android, up to two): each adds 50% to the full charge. A battery pack shows on the waist.
+- **Backpack Upgrade** (android): adds 24 slots to the android's new 5-slot inventory. A backpack shows on its back.
+- **Mining Upgrade** (android): lets it mine in work orders, like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch.
+- The android screen has a "Gear and inventory" page for upgrades, and a switch for whether the android may be given work.
+
+### Work automation
+Let your androids craft, smelt and mine for you.
+
+- **Android Work Console:** the chests next to it are the stockpile. Link **Supply Ports** (more stockpile), **Delivery Ports** (named destinations) and **Recipe Racks** to it with a **Work Location Card**.
+- Order an item and amount at the console. Orders need every material in stock; intermediate materials are made too, and androids only use the materials that were reserved when the order started.
+- Androids gather everything for a batch in one trip, craft step after step without going back to the stockpile, and deliver to the console's outbox (moved into adjacent chests) or a named Delivery Port.
+- **Recipe Cards** are recorded in the console's Record tab, in three modes:
+  - **Crafting:** a 3×3 pattern, made at a crafting table or the new **Android Workbench** (four times as fast).
+  - **Processing:** furnace and machine recipes with counts and up to two byproducts. Androids put items in from above, wait, and take the results out from below.
+  - **Procedure:** up to eight insert, extract and mine steps on a **Procedure Card**, which keeps the places on the card. Androids with a Mining Upgrade dig an area until they have enough (works with a cobblestone generator), skipping unbreakable, container and shield-protected blocks. While mining they swing a glowing pickaxe.
+- JEI's + button fills the Record tab for any recipe. Scroll over a slot to change counts.
+- New handbook pages: Upgrades, Work automation, and Processing, procedures and mining.
+
+This file is published with the **Beta** release type. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).

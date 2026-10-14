@@ -85,25 +85,25 @@ public class AndroidMenu extends AbstractContainerMenu {
         addSlot(new PageSlot(items, RuinAndroid.SLOT_BATTERY, UPGRADE_X, BATTERY_Y, PAGE_GEAR, RuinAndroid.MAX_BATTERIES) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return RuinAndroid.isBatteryUpgrade(stack);
+                return !working() && RuinAndroid.isBatteryUpgrade(stack);
             }
         });
         addSlot(new PageSlot(items, RuinAndroid.SLOT_BACKPACK, UPGRADE_X, BACKPACK_Y, PAGE_GEAR, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return RuinAndroid.isBackpackUpgrade(stack);
+                return !working() && RuinAndroid.isBackpackUpgrade(stack);
             }
 
             /** 中に物が入っている間は、バックパックを外せない。 */
             @Override
             public boolean mayPickup(Player player) {
-                return packEmpty();
+                return !working() && packEmpty();
             }
         });
         addSlot(new PageSlot(items, RuinAndroid.SLOT_MINING, UPGRADE_X, MINING_Y, PAGE_GEAR, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return RuinAndroid.isMiningUpgrade(stack);
+                return !working() && RuinAndroid.isMiningUpgrade(stack);
             }
         });
         for (int i = 0; i < RuinAndroid.CARRY_SLOTS; i++) {
@@ -113,7 +113,7 @@ public class AndroidMenu extends AbstractContainerMenu {
             addSlot(new PageSlot(items, RuinAndroid.PACK_START + i, PACK_X + (i % 6) * 18, PACK_Y + (i / 6) * 18, PAGE_GEAR, 64) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
-                    return hasBackpack();
+                    return !working() && hasBackpack();
                 }
             });
         }
@@ -148,6 +148,21 @@ public class AndroidMenu extends AbstractContainerMenu {
         public int getMaxStackSize() {
             return limit;
         }
+
+        /** 作業中は、アップグレード・持ち物・バックパックの中を出し入れできない（修理キットと装甲板はできる）。 */
+        private boolean locked() {
+            return slotPage == PAGE_GEAR && android != null && android.isWorking();
+        }
+
+        @Override
+        public boolean mayPickup(Player player) {
+            return !locked() && super.mayPickup(player);
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return !locked() && super.mayPlace(stack);
+        }
     }
 
     public static AndroidMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
@@ -178,6 +193,11 @@ public class AndroidMenu extends AbstractContainerMenu {
     /** バックパックアップグレードを積んでいるか（スロットの中身で見るので、クライアントでも分かる）。 */
     public boolean hasBackpack() {
         return RuinAndroid.isBackpackUpgrade(items.getItem(RuinAndroid.SLOT_BACKPACK));
+    }
+
+    /** 作業中か（持ち物を出し入れできない）。 */
+    public boolean working() {
+        return android != null && android.isWorking();
     }
 
     /** バックパックの中が空か。 */

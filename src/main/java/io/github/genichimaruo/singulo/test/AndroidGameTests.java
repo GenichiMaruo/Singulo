@@ -421,6 +421,188 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+    /** 作業の場所: 指令台・資材口（隣にチェスト）・納品口・レシピ棚・作業台。 */
+    private static final BlockPos CONSOLE = new BlockPos(0, 1, 0), SUPPLY = new BlockPos(1, 1, 0), CHEST = new BlockPos(1, 1, 1),
+            DELIVERY = new BlockPos(3, 1, 0), RACK = new BlockPos(4, 1, 0), TABLE = new BlockPos(4, 1, 3);
+
+    private static ItemStack recipeCard(GameTestHelper helper, java.util.List<ItemStack> grid, ItemStack output) {
+        ItemStack card = new ItemStack(item("recipe_card"));
+        new io.github.genichimaruo.singulo.android.work.RecipeData(grid, output).write(card, helper.getLevel().registryAccess());
+        return card;
+    }
+
+    /**
+     * 作業の工場を組む: 指令台に資材口・納品口・レシピ棚を作業位置カードでつなぎ、棚に「原木→板材」「板材→棒」のレシピを並べる。
+     * チェストには原木 logs 本。
+     */
+    private static io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity workshop(GameTestHelper helper, int logs) {
+        var level = helper.getLevel();
+        helper.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        helper.setBlock(SUPPLY, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
+        helper.setBlock(CHEST, net.minecraft.world.level.block.Blocks.CHEST);
+        helper.setBlock(DELIVERY, SinguloBlocks.ANDROID_DELIVERY_PORT.get());
+        helper.setBlock(RACK, SinguloBlocks.ANDROID_RECIPE_RACK.get());
+        helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
+        var player = helper.makeMockServerPlayerInLevel();
+        ItemStack link = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
+                SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        for (BlockPos p : List.of(SUPPLY, DELIVERY, RACK)) {
+            io.github.genichimaruo.singulo.android.work.WorkLinkedBlockEntity b = helper.getBlockEntity(p);
+            b.useItem(player, link, net.minecraft.world.InteractionHand.MAIN_HAND);
+        }
+        ItemStack table = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(table, level, helper.absolutePos(TABLE),
+                net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        java.util.List<ItemStack> planks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        planks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
+        java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        sticks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+        sticks.set(3, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+        rack.items().setStackInSlot(0, table);
+        rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
+        rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
+        return helper.getBlockEntity(CONSOLE);
+    }
+
+    /** 素材が足りない注文は、計算で止まる（原木1本では棒16本は作れない）。在庫で足りれば作れる。 */
+    @GameTest(template = EMPTY)
+    public static void workPlanNeedsMaterials(GameTestHelper helper) {
+        var console = workshop(helper, 1);
+        ItemStack stick = new ItemStack(net.minecraft.world.item.Items.STICK);
+        var short_ = console.plan(stick, 16);
+        helper.assertFalse(short_.ok(), "素材が足りないのに作れることになった");
+        var ok = console.plan(stick, 8);
+        helper.assertTrue(ok.ok() && ok.steps.size() == 2, "原木1本から棒8本の工程が2つにならない: " + ok.steps.size());
+        helper.succeed();
+    }
+
+    /** アンドロイドが資材口から原木を取り、作業台で板材と棒を作って、納品口へ棒を届ける。作業中は持ち物を取り出せない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidCraftsAndDelivers(GameTestHelper helper) {
+        var console = workshop(helper, 2);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        var player = helper.makeMockServerPlayerInLevel();
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.assertTrue(a.isWorking(), "アンドロイドが作業中にならない");
+        io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity port = helper.getBlockEntity(DELIVERY);
+        helper.succeedWhen(() -> {
+            int sticks = 0;
+            for (int i = 0; i < port.handler().getSlots(); i++) {
+                if (port.handler().getStackInSlot(i).is(net.minecraft.world.item.Items.STICK)) {
+                    sticks += port.handler().getStackInSlot(i).getCount();
+                }
+            }
+            helper.assertTrue(sticks == 8, "棒が8本届かない: " + sticks);
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            helper.assertFalse(a.isWorking(), "注文が終わっても作業中のまま");
+            // 作った板材は、資材置き場へ戻さずに、そのまま棒に使う
+            net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+            for (int i = 0; i < chest.getContainerSize(); i++) {
+                helper.assertFalse(chest.getItem(i).is(net.minecraft.world.item.Items.OAK_PLANKS), "作った板材を資材置き場へ戻した");
+            }
+            a.discard();
+        });
+    }
+
+    /** 納品口に届いた item の数。 */
+    private static int delivered(GameTestHelper helper, net.minecraft.world.item.Item item) {
+        io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity port = helper.getBlockEntity(DELIVERY);
+        int n = 0;
+        for (int i = 0; i < port.handler().getSlots(); i++) {
+            if (port.handler().getStackInSlot(i).is(item)) {
+                n += port.handler().getStackInSlot(i).getCount();
+            }
+        }
+        return n;
+    }
+
+    /** 作業を始めたアンドロイド（採掘アップグレードつきにもできる）。 */
+    private static BladeAndroid worker(GameTestHelper helper, boolean miner) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        if (miner) {
+            a.inventory().setItem(RuinAndroid.SLOT_MINING, new ItemStack(item("android_mining_upgrade")));
+        }
+        helper.getLevel().addFreshEntity(a);
+        return a;
+    }
+
+    /** 加工モード: かまどに原鉄を上から入れ、焼けた鉄インゴットを下から取り出して、納品口へ届ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidSmeltsInFurnace(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace = helper.getBlockEntity(furnacePos);
+        furnace.setItem(1, new ItemStack(net.minecraft.world.item.Items.COAL, 4));
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        new io.github.genichimaruo.singulo.android.work.RecipeData(io.github.genichimaruo.singulo.android.work.RecipeData.MODE_PROCESSING, in,
+                new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of()).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var player = helper.makeMockServerPlayerInLevel();
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2, List.of(a.getUUID()),
+                helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /** 手順カードの採掘: 採掘アップグレードを積んだアンドロイドが、範囲の石を掘って丸石を集め、納品口へ届ける。積んでいなければ注文できない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidMinesWithProcedure(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos from = new BlockPos(0, 1, 5), to = new BlockPos(1, 1, 5);
+        helper.setBlock(from, net.minecraft.world.level.block.Blocks.STONE);
+        helper.setBlock(to, net.minecraft.world.level.block.Blocks.STONE);
+        var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
+                helper.absolutePos(from), helper.absolutePos(to), ItemStack.EMPTY);
+        ItemStack card = new ItemStack(item("procedure_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
+                .write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);   // 場所のカードがない行
+        BladeAndroid plain = worker(helper, false);
+        var player = helper.makeMockServerPlayerInLevel();
+        ItemStack cobble = new ItemStack(net.minecraft.world.item.Items.COBBLESTONE);
+        helper.assertTrue(console.start(player, cobble, 2, List.of(plain.getUUID()), helper.absolutePos(DELIVERY)) != null,
+                "採掘アップグレードなしで採掘の注文ができた");
+        plain.discard();
+        BladeAndroid a = worker(helper, true);
+        var error = console.start(player, cobble, 2, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");
+            helper.assertTrue(level.getBlockState(helper.absolutePos(from)).isAir() && level.getBlockState(helper.absolutePos(to)).isAir(),
+                    "範囲の石が掘られていない");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

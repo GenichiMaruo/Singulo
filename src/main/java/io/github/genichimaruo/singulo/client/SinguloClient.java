@@ -27,6 +27,7 @@ public final class SinguloClient {
 
     public SinguloClient(IEventBus modBus) {
         modBus.addListener(SinguloClient::registerScreens);
+        modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerExtensions);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
@@ -182,6 +183,16 @@ public final class SinguloClient {
         event.register(SinguloMenus.GENESIS_CORE.get(), GenesisCoreScreen::new);
         event.register(SinguloMenus.ANDROID_STATION.get(), AndroidStationScreen::new);
         event.register(SinguloMenus.ANDROID.get(), AndroidScreen::new);
+        event.register(SinguloMenus.ANDROID_WORK_CONSOLE.get(), WorkConsoleScreen::new);
+        event.register(SinguloMenus.ANDROID_RECIPE_RACK.get(), RecipeRackScreen::new);
+        event.register(SinguloMenus.ANDROID_DELIVERY_PORT.get(), DeliveryPortScreen::new);
+    }
+
+    /** 作業位置カードとレシピカードは、シフトを押している間、中身の絵を重ねて見せる。 */
+    private static void registerDecorations(net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent event) {
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), WorkCardDecorator.LOCATION);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.PROCEDURE_CARD.get(), WorkCardDecorator.RECIPE);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
@@ -193,6 +204,10 @@ public final class SinguloClient {
 
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+        // 作業位置カード: 記録済みなら絵を切り替える
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
+                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.pos(stack) != null ? 1 : 0));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->

@@ -608,6 +608,52 @@ CHAPTERS = [
          '- Backpack Upgrade: adds the backpack\'s 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n'
          '- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n'
          '- Work on/off: choose for each android whether it may be given work (automation).'),
+        ('work', '作業の自動化',
+         '自分のアンドロイドに、作業台のクラフトを任せられます。\n'
+         '1. アンドロイド作業指令台を置き、作業位置カードでシフト右クリックして記録する。そのカードでレシピ棚（増やすなら資材口・納品口も）を右クリックすると、指令台につながる（64ブロック以内）。\n'
+         '2. 指令台（と資材口）の隣にチェストを置く（素材置き場）。アンドロイドは、素材が実際に入っている所を回って取る。'
+         '完成品は、注文で選んだ納品先（指令台の納品箱か、名前を付けた納品口）に届く。\n'
+         '3. 指令台の「記録」で、3×3 に見本を置き（物は減らない。JEI の「+」でも置ける）、レシピカードに記録する。\n'
+         '4. レシピ棚の行の左に、作業台を記録した作業位置カードを置き、右にレシピカードを並べる。\n'
+         '5. 指令台の「注文」で作る物と個数を選び、素材が足りるのを確かめて、アンドロイドを選んで作業開始。'
+         '途中の素材も、レシピがあれば自分で作ります。\n'
+         'アンドロイドは5スロット（バックパックで+24）ずつ運びます。作業中は持ち物を取り出せず、終わると元の動き方に戻ります。'
+         'たどり着けない場所があると、その注文は取り消されます。',
+         'Work automation',
+         'Your androids can take over crafting table work.\n'
+         '1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra '
+         'supply ports and delivery ports) to link them to the console (within 64 blocks).\n'
+         '2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the '
+         'materials. Finished orders go to the destination chosen in the order: the console\'s outbox or a named delivery port.\n'
+         '3. In the console\'s Record tab, lay out a 3×3 pattern (nothing is used up; JEI\'s + button works too) and record it onto a recipe card.\n'
+         '4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n'
+         '5. In the console\'s Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. '
+         'Intermediate materials are crafted too when there is a recipe for them.\n'
+         'Androids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes '
+         'back to its usual mode. If a place cannot be reached, the order is cancelled.'),
+        ('process', '加工・手順・採掘',
+         '指令台の「記録」のモードボタンで、記録する種類を切り替えます。\n'
+         '・加工: かまどや装置のレシピ。左に入れる物、右に出てくる物（ほかに出てくる副産物も2つまで）を置き、ホイールで数を変える'
+         '（JEI の「+」でも置ける）。アンドロイドは装置に上から入れ、できるまでそばで待って、下から取り出す。副産物は素材置き場へ戻す。'
+         '燃料や電力は自分で用意する。2分たっても進まなければ、注文は取り消される。\n'
+         '・手順: 手順カードに、投入・取り出し・採掘の手順を8つまで記録する。作業位置カードを置いて場所を写し、物の欄に物を置いて「足す」。'
+         '右にできる物を置いて記録する。手順カードは場所を自分で持つので、レシピ棚のどの行にも並べられる。\n'
+         '・採掘: 採掘アップグレードを積んだアンドロイドだけが行う。作業位置カード2枚で範囲を決めると、上の段から掘り、目当ての物がそろうまで続ける'
+         '（丸石製造機にも使える）。壊せないブロック・液体・入れ物・シールドで守られた所は掘らない。掘る物がない状態が30秒続くと取り消される。\n'
+         '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。',
+         'Processing, procedures and mining',
+         'The mode button in the console\'s Record tab switches what you record.\n'
+         '- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), '
+         'and scroll to change counts (JEI\'s + button works too). Androids put the items in from above, wait beside the machine and take '
+         'the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, '
+         'the order is cancelled.\n'
+         '- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put '
+         'the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they '
+         'work in any recipe rack row.\n'
+         '- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until '
+         'enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and '
+         'shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n'
+         '- Android Workbench: crafts four times as fast as a vanilla crafting table.'),
         ('glass', 'アンドロイド用のガラス',
          '・アンドロイド遮断ガラス（琥珀色）: アンドロイドだけが通れない。プレイヤーやほかの生き物はすり抜けられる。拠点の出入り口に。\n'
          '・アンドロイド透過ガラス（水色）: アンドロイドだけが通れる。ほかにとってはふつうのガラス。護衛の通り道に。\n'

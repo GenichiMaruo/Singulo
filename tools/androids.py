@@ -591,11 +591,15 @@ def item_textures(ti, save):
     save(charger_icon(Image), ti / 'android_charger.png')
     save(repair_icon(Image), ti / 'android_repair_kit.png')
     save(plate_icon(Image), ti / 'android_armor_plate.png')
-    save(upgrade_icon(Image), ti / 'android_transfer_upgrade.png')
-    save(production_icon(Image), ti / 'android_production_upgrade.png')
-    save(battery_icon(Image), ti / 'android_battery_upgrade.png')
-    save(backpack_icon(Image), ti / 'android_backpack_upgrade.png')
-    save(mining_icon(Image), ti / 'android_mining_upgrade.png')
+    save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
+    save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
+    save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
+    save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
+    save(wear(mining_icon(Image), 23), ti / 'android_mining_upgrade.png')
+    save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
+    save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
+    save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
+    save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
 
 
 def memory_icon(accent, Image):
@@ -773,6 +777,71 @@ def upgrade_board(Image):
     for x in (5, 7, 9):
         px[x, 14] = (226, 186, 92, 255)
     return im, px
+
+
+def wear(im, seed):
+    """使い込んだ汚し（汚れではなく使用感）: 面の細かな擦れ、縁の摩耗（角ほど強く）、小さな光る傷。"""
+    px = im.load()
+    w, h = im.size
+    rng = random.Random(seed)
+
+    def opaque(x, y):
+        return 0 <= x < w and 0 <= y < h and px[x, y][3] > 0
+
+    for y in range(h):
+        for x in range(w):
+            if not opaque(x, y):
+                continue
+            r, g, b, a = px[x, y]
+            k = rng.choice((0, 0, 0, 0, -5, -8, 5))
+            open_sides = sum(not opaque(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            if open_sides >= 2:
+                k -= 16                                   # 角の摩耗
+            elif open_sides == 1 and rng.random() < 0.3:
+                k -= 10                                   # 縁の擦れ
+            px[x, y] = (max(0, min(255, r + k)), max(0, min(255, g + k)), max(0, min(255, b + k)), a)
+    inner = [(x, y) for y in range(1, h - 1) for x in range(1, w - 1)
+             if all(opaque(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1))]
+    for _ in range(3):
+        if not inner:
+            break
+        x, y = rng.choice(inner)
+        for (sx, sy, d) in ((x, y, 26), (x + 1, y - 1, 14)):     # 斜めの小傷
+            if opaque(sx, sy):
+                r, g, b, a = px[sx, sy]
+                px[sx, sy] = (min(255, r + d), min(255, g + d), min(255, b + d), a)
+    return im
+
+
+def card_icon(Image, stripe, recorded=None):
+    """作業のカード: 白いカードに色の帯と、金の端子、小さな光る点（作業位置は緑、レシピは水色）。
+    作業位置カードは、未記録（recorded=False）なら帯が灰色で点が消え、記録済みなら帯が緑で、右上に位置の印（ピン）が付く。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(3, 13):
+        for x in range(2, 14):
+            if (x, y) in ((2, 3), (13, 3), (2, 12), (13, 12)):
+                continue
+            px[x, y] = ((150, 156, 170) if x in (2, 13) or y in (3, 12) else (238, 240, 244)) + (255,)
+    for y in range(4, 7):
+        for x in range(3, 13):
+            px[x, y] = stripe + (255,)
+    for x in (4, 6, 8):
+        px[x, 10] = (226, 186, 92, 255)
+        px[x, 11] = (200, 160, 70, 255)
+    if recorded is not False:
+        px[11, 9] = tuple(min(255, c + 70) for c in stripe) + (255,)
+        px[10, 9] = stripe + (255,)
+    else:
+        px[11, 9] = (196, 200, 210, 255)
+        px[10, 9] = (196, 200, 210, 255)
+    if recorded:
+        # 位置の印（ピン）: 帯の右上に、濃い緑の頭と白い光
+        for (x, y) in ((11, 1), (12, 1), (11, 2), (12, 2)):
+            px[x, y] = (40, 120, 70, 255)
+        px[11, 1] = (200, 255, 210, 255)
+        px[12, 3] = (40, 120, 70, 255)
+    return im
 
 
 def production_icon(Image):

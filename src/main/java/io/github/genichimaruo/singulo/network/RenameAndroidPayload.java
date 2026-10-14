@@ -37,6 +37,9 @@ public record RenameAndroidPayload(int containerId, String name) implements Cust
                 menu.rename(player, payload.name());
             } else if (player.containerMenu instanceof AndroidStationMenu menu && menu.stillValid(player)) {
                 menu.rename(player, payload.name());
+            } else if (player.containerMenu instanceof io.github.genichimaruo.singulo.android.work.DeliveryPortMenu menu
+                    && menu.stillValid(player)) {
+                menu.rename(player, payload.name());
             }
         });
     }

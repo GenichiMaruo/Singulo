@@ -447,6 +447,10 @@
     "source": "Patterned Android Barrier Glass",
     "translation": "花紋仿生人阻隔玻璃"
   },
+  "block.singulo.android_delivery_port": {
+    "source": "Android Delivery Port",
+    "translation": "仿生人交付口"
+  },
   "block.singulo.android_gate_glass": {
     "source": "Android Gate Glass",
     "translation": "仿生人透過玻璃"
@@ -455,9 +459,25 @@
     "source": "Patterned Android Gate Glass",
     "translation": "花紋仿生人透過玻璃"
   },
+  "block.singulo.android_recipe_rack": {
+    "source": "Android Recipe Rack",
+    "translation": "仿生人配方架"
+  },
   "block.singulo.android_station": {
     "source": "Android Assembly Station",
     "translation": "仿生人組裝站"
+  },
+  "block.singulo.android_supply_port": {
+    "source": "Android Supply Port",
+    "translation": "仿生人資材口"
+  },
+  "block.singulo.android_work_console": {
+    "source": "Android Work Console",
+    "translation": "仿生人作業指令台"
+  },
+  "block.singulo.android_workbench": {
+    "source": "Android Workbench",
+    "translation": "仿生人工作台"
   },
   "block.singulo.archive_terminal": {
     "source": "Archive Terminal",
@@ -1179,6 +1199,10 @@
     "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
     "translation": "隨身攜帶時，跟隨中的仿生人會靠近你，邊跟著走邊充電（充滿時可充滿仿生人 30 次）。右鍵點擊能輸出電力的方塊為其充電。"
   },
+  "desc.singulo.android_delivery_port": {
+    "source": "Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.",
+    "translation": "仿生人把訂單的成品送到這裡（下單時選為交付目標）。27 格的箱子，可在介面中命名，裡面的物品會自動移到相鄰的箱子。"
+  },
   "desc.singulo.android_gate_glass": {
     "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
     "translation": "只有仿生人可以通過的玻璃，對其他一切都是實心的。與相同的玻璃相鄰時會無縫相連。"
@@ -1211,6 +1235,10 @@
     "source": "Fitted in an Android Assembly Station, it prints and looks after up to two androids. Only one can charge on top at a time; the other waits beside it and takes its turn.",
     "translation": "裝在仿生人組裝站後，最多可列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流充電。"
   },
+  "desc.singulo.android_recipe_rack": {
+    "source": "A six-row rack. Put a Work Location Card on the left of a row and up to eight recipe cards on the right, and they can be ordered as recipes made at that location.",
+    "translation": "6 行的架子。在每行左邊放作業位置卡、右邊放最多 8 張配方卡，就能作為在那個位置製作的配方下單。"
+  },
   "desc.singulo.android_repair_kit": {
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
     "translation": "放在護衛仿生人的物品欄裡，受傷時會用掉一個，恢復一半生命（用完後返回組裝站）。"
@@ -1219,9 +1247,21 @@
     "source": "Prints one guard android (two with a Production Upgrade) from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
     "translation": "用小型水晶記憶體、仿生人套件和電力列印一個護衛仿生人（有生產升級時最多兩個），被擊倒後用新的套件重新列印。可設定其行動方式，以及在何種生命值時返回維修與充電。"
   },
+  "desc.singulo.android_supply_port": {
+    "source": "Connects the storage next to it (chests and the like) as the work stockpile. Androids take materials here and put what they make back.",
+    "translation": "把相鄰的儲存（箱子等）連接為作業的資材存放處。仿生人在這裡取材料，並把做好的物品放回。"
+  },
   "desc.singulo.android_transfer_upgrade": {
     "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
     "translation": "裝在仿生人組裝站的強化欄位後，仿生人倒下或被拆解時，其物品（修理套件、裝甲板、升級和攜帶的物品）不會掉落，而是傳送到組裝站，並交給下一個列印出的仿生人。"
+  },
+  "desc.singulo.android_work_console": {
+    "source": "Brings together the supply ports, delivery ports and recipe racks linked to it with a Work Location Card, takes orders and hands the work to nearby androids. It works as a supply port and a delivery port itself, and its Record tab writes recipes onto recipe cards. Orders need every material in stock.",
+    "translation": "彙總用作業位置卡連接的資材口、交付口和配方架，接受訂單並把作業分配給附近的仿生人。指令台本身也兼作資材口和交付口，並可在介面的「記錄」中把配方記錄到配方卡上。材料不足的訂單無法下單。"
+  },
+  "desc.singulo.android_workbench": {
+    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.",
+    "translation": "仿生人製作工作台配方的地方，速度是原版工作台的4倍。將它記錄到配方架的作業位置卡上使用。"
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -1887,6 +1927,10 @@
     "source": "Sends probes to discovered ruins to fetch loot.",
     "translation": "派遣探測器前往已發現的廢墟取回戰利品。"
   },
+  "desc.singulo.procedure_card": {
+    "source": "Records up to eight insert, extract and mine steps and what they produce, in the procedure mode of a work console's Record tab. The places are stored on the card, so it works in a recipe rack row without a Work Location Card. Only androids with a Mining Upgrade do mining steps.",
+    "translation": "在作業指令台「記錄」的步驟模式中，記錄最多8個放入、取出、採掘的步驟及其產物。位置記錄在卡中，因此可放在配方架中沒有作業位置卡的行。採掘步驟只有裝有採掘升級的仿生人才會執行。"
+  },
   "desc.singulo.quantum_computing_module": {
     "source": "The brain of advanced machines.",
     "translation": "先進機器的大腦。"
@@ -1918,6 +1962,10 @@
   "desc.singulo.reactor_stabilizer": {
     "source": "Coils at the 45° points of the reactor rings.",
     "translation": "位於反應爐環 45° 位置的線圈。"
+  },
+  "desc.singulo.recipe_card": {
+    "source": "Record a recipe on it in a work console's Record tab and place it in a recipe rack. Sneak-use on nothing to clear it. Hold Shift to see what it makes.",
+    "translation": "在作業指令台的「記錄」中記錄配方，然後放進配方架。對著空處潛行右鍵會清除配方。按住 Shift 會顯示製作的物品。"
   },
   "desc.singulo.record_fragment": {
     "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
@@ -2234,6 +2282,10 @@
   "desc.singulo.white_star_glass_panel": {
     "source": "A see-through white panel with a four-pointed star.",
     "translation": "帶有四芒星圖案的可透視白色面板。"
+  },
+  "desc.singulo.work_location_card": {
+    "source": "Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.",
+    "translation": "潛行右鍵方塊來記錄其位置（疊在一起時只分出一張來記錄）。對著空處潛行右鍵會清除記錄。用記錄了作業指令台的卡右鍵資材口、交付口或配方架即可連接。按住 Shift 會顯示記錄的方塊。"
   },
   "desc.singulo.worldline_anchor_advanced": {
     "source": "Advanced chunk loader. Embedding a Singularity Core makes it free and maximal.",
@@ -3943,6 +3995,130 @@
     "source": "Not formed",
     "translation": "未形成"
   },
+  "gui.singulo.recipe_encoder.card": {
+    "source": "Recorded",
+    "translation": "已記錄"
+  },
+  "gui.singulo.recipe_encoder.clear": {
+    "source": "Clear the pattern",
+    "translation": "清除樣本"
+  },
+  "gui.singulo.recipe_encoder.clear.short": {
+    "source": "Clear grid",
+    "translation": "清除樣本"
+  },
+  "gui.singulo.recipe_encoder.clear_card": {
+    "source": "Erase",
+    "translation": "清除配方"
+  },
+  "gui.singulo.recipe_encoder.clear_card.hint": {
+    "source": "Erase the recipe on the recorded card",
+    "translation": "清除已記錄卡上的配方"
+  },
+  "gui.singulo.recipe_encoder.encode": {
+    "source": "Save",
+    "translation": "記錄"
+  },
+  "gui.singulo.recipe_encoder.encode.hint": {
+    "source": "Record this recipe onto the card in the recorded slot (takes one from the stock if it is empty)",
+    "translation": "把這個排列記錄到「已記錄」欄的卡上（為空時從庫存取一張）"
+  },
+  "gui.singulo.recipe_encoder.extra.hint": {
+    "source": "Anything else that comes out (byproducts). It is taken out and returned to the stockpile",
+    "translation": "其他產出的物品（副產物）。取出後放回資材存放處"
+  },
+  "gui.singulo.recipe_encoder.grid.hint": {
+    "source": "Click with an item to place a copy as a pattern (it is not used up)",
+    "translation": "拿著物品點擊即可放置樣本（物品不會減少）"
+  },
+  "gui.singulo.recipe_encoder.kind.extract": {
+    "source": "Extract",
+    "translation": "取出"
+  },
+  "gui.singulo.recipe_encoder.kind.hint": {
+    "source": "Switch the kind of step to add. Insert: put into a machine from above. Extract: take out from below. Mine: dig blocks (needs a Mining Upgrade)",
+    "translation": "切換要新增的步驟種類。放入：從上方放入裝置。取出：從裝置下方取出。採掘：挖掘方塊（需要採掘升級）"
+  },
+  "gui.singulo.recipe_encoder.kind.insert": {
+    "source": "Insert",
+    "translation": "放入"
+  },
+  "gui.singulo.recipe_encoder.kind.mine": {
+    "source": "Mine",
+    "translation": "採掘"
+  },
+  "gui.singulo.recipe_encoder.mode.crafting": {
+    "source": "Crafting",
+    "translation": "工作台"
+  },
+  "gui.singulo.recipe_encoder.mode.hint": {
+    "source": "Switch what is recorded. Crafting: made at a crafting table. Processing: put into a furnace or machine from above and taken out from below. Procedure: insert, extract and mine steps on a Procedure Card",
+    "translation": "切換要記錄的種類。工作台：在工作台製作。加工：從上方放入熔爐或裝置，從下方取出。步驟：在步驟卡上記錄放入、取出、採掘的步驟"
+  },
+  "gui.singulo.recipe_encoder.mode.procedure": {
+    "source": "Procedure",
+    "translation": "步驟"
+  },
+  "gui.singulo.recipe_encoder.mode.processing": {
+    "source": "Processing",
+    "translation": "加工"
+  },
+  "gui.singulo.recipe_encoder.output.hint": {
+    "source": "Place what comes out (the main product)",
+    "translation": "放置產出的物品（主產物）"
+  },
+  "gui.singulo.recipe_encoder.product.hint": {
+    "source": "What these steps produce, per run. It can be ordered as this item at the console",
+    "translation": "這些步驟的產物（每次的數量）。在指令台上可作為該物品下單"
+  },
+  "gui.singulo.recipe_encoder.step.add": {
+    "source": "Add",
+    "translation": "新增"
+  },
+  "gui.singulo.recipe_encoder.step.add.hint": {
+    "source": "Add a step at the place on the Work Location Card, with the item in the item slot (up to eight)",
+    "translation": "用作業位置卡的位置和物品欄中的物品新增一個步驟（最多8個）"
+  },
+  "gui.singulo.recipe_encoder.step.full": {
+    "source": "Up to eight steps",
+    "translation": "最多8個步驟"
+  },
+  "gui.singulo.recipe_encoder.step.item.hint": {
+    "source": "What to insert, extract or gather (scroll to change the count). Leave it empty for mining to gather the product",
+    "translation": "要放入、取出或收集的物品（滾動滾輪變更數量）。採掘時留空則收集產物"
+  },
+  "gui.singulo.recipe_encoder.step.loc_a.hint": {
+    "source": "A Work Location Card holding the place for the step",
+    "translation": "記錄了步驟位置的作業位置卡"
+  },
+  "gui.singulo.recipe_encoder.step.loc_b.hint": {
+    "source": "The other corner of the mining area (optional; with it, the box between the two cards is mined)",
+    "translation": "採掘範圍的另一角（可省略。放置後挖掘兩張卡之間的範圍）"
+  },
+  "gui.singulo.recipe_encoder.step.no_item": {
+    "source": "Place the item to insert or extract in the item slot",
+    "translation": "請在物品欄中放入要放入或取出的物品"
+  },
+  "gui.singulo.recipe_encoder.step.no_place": {
+    "source": "Place a Work Location Card holding a place in this dimension",
+    "translation": "請放入記錄了本維度位置的作業位置卡"
+  },
+  "gui.singulo.recipe_encoder.step.remove": {
+    "source": "Click to remove",
+    "translation": "點擊刪除"
+  },
+  "gui.singulo.recipe_encoder.step.too_big": {
+    "source": "The mining area can be at most %s blocks on a side",
+    "translation": "採掘範圍每邊最多 %s 格"
+  },
+  "gui.singulo.recipe_encoder.stock": {
+    "source": "Stock",
+    "translation": "庫存"
+  },
+  "gui.singulo.recipe_encoder.stock.hint": {
+    "source": "Keep a stack of blank recipe cards here. When the recorded-card slot is empty, Save takes one from here",
+    "translation": "在這裡放一組未記錄的配方卡，「已記錄」欄為空時，記錄會從這裡取一張"
+  },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",
     "translation": "防護：爆炸、生物破壞"
@@ -4191,6 +4367,230 @@
     "source": "No heat source or heat sink adjacent",
     "translation": "相鄰沒有熱源或低溫源"
   },
+  "gui.singulo.work_console.androids": {
+    "source": "Androids (slots)",
+    "translation": "仿生人（可攜帶格數）"
+  },
+  "gui.singulo.work_console.back": {
+    "source": "Back",
+    "translation": "返回"
+  },
+  "gui.singulo.work_console.busy": {
+    "source": "%s (busy)",
+    "translation": "%s（作業中）"
+  },
+  "gui.singulo.work_console.cancel": {
+    "source": "Cancel",
+    "translation": "取消"
+  },
+  "gui.singulo.work_console.cancelled": {
+    "source": "Cancelled the order for %s",
+    "translation": "已取消 %s 的訂單"
+  },
+  "gui.singulo.work_console.cancelled.recipe": {
+    "source": "Cancelled the order for %s (the recipe does not match)",
+    "translation": "已取消 %s 的訂單（配方不符）"
+  },
+  "gui.singulo.work_console.cancelled.stalled": {
+    "source": "Cancelled the order for %s (the machine stopped processing)",
+    "translation": "已取消 %s 的訂單（裝置的加工沒有進展）"
+  },
+  "gui.singulo.work_console.cancelled.unreachable": {
+    "source": "Cancelled the order for %s (a place could not be reached)",
+    "translation": "已取消 %s 的訂單（有無法到達的地方）"
+  },
+  "gui.singulo.work_console.cannot_start": {
+    "source": "This order cannot be started",
+    "translation": "無法下這個訂單"
+  },
+  "gui.singulo.work_console.choose_android": {
+    "source": "Choose at least one android",
+    "translation": "請選擇仿生人"
+  },
+  "gui.singulo.work_console.count.hint": {
+    "source": "Shift: 10 at a time, Ctrl: 64",
+    "translation": "Shift 每次 10，Ctrl 每次 64"
+  },
+  "gui.singulo.work_console.craftable": {
+    "source": "Craftable",
+    "translation": "可製作"
+  },
+  "gui.singulo.work_console.crafted": {
+    "source": "Craft ×%s",
+    "translation": "製作 ×%s"
+  },
+  "gui.singulo.work_console.crafted.hint": {
+    "source": "Crafted by the androids. Leftovers go back to the stockpile",
+    "translation": "由仿生人製作的物品。剩餘的會放回資材存放處"
+  },
+  "gui.singulo.work_console.crafted.surplus": {
+    "source": "Craft ×%s (%s left over)",
+    "translation": "製作 ×%s（剩餘 %s）"
+  },
+  "gui.singulo.work_console.delivery": {
+    "source": "Deliver to: %s",
+    "translation": "交付目標：%s"
+  },
+  "gui.singulo.work_console.delivery.console": {
+    "source": "Work console",
+    "translation": "作業指令台"
+  },
+  "gui.singulo.work_console.delivery.hint": {
+    "source": "Click to change where it is delivered (right-click to go back). Name delivery ports in their own screen",
+    "translation": "點擊切換交付目標（右鍵反向）。交付口的名字可在交付口的介面中設定"
+  },
+  "gui.singulo.work_console.delivery.port": {
+    "source": "Delivery port (%s, %s, %s)",
+    "translation": "交付口（%s, %s, %s）"
+  },
+  "gui.singulo.work_console.done": {
+    "source": "Delivered %s ×%s",
+    "translation": "已交付 %s ×%s"
+  },
+  "gui.singulo.work_console.empty": {
+    "source": "Nothing to order (link supply ports and recipe racks)",
+    "translation": "沒有可訂購的物品（連接資材口和配方架）"
+  },
+  "gui.singulo.work_console.error.capacity": {
+    "source": "No chosen android can carry the materials for %s at once (a backpack is needed)",
+    "translation": "沒有能一次搬運 %s 所需材料的仿生人（需要背包）"
+  },
+  "gui.singulo.work_console.error.loop": {
+    "source": "The recipes loop",
+    "translation": "配方形成了循環"
+  },
+  "gui.singulo.work_console.error.missing": {
+    "source": "Not enough materials",
+    "translation": "材料不足"
+  },
+  "gui.singulo.work_console.error.no_android": {
+    "source": "No free android is chosen",
+    "translation": "沒有選擇空閒的仿生人"
+  },
+  "gui.singulo.work_console.error.no_miner": {
+    "source": "%s needs mining, but no chosen android has a Mining Upgrade",
+    "translation": "%s 需要採掘，但所選仿生人都沒有採掘升級"
+  },
+  "gui.singulo.work_console.error.not_machine": {
+    "source": "Items cannot be put into or taken from the work location for %s",
+    "translation": "無法向 %s 的工作位置放入或取出物品"
+  },
+  "gui.singulo.work_console.error.not_workbench": {
+    "source": "The work location for %s is not a crafting table",
+    "translation": "%s 的配方的作業位置不是工作台"
+  },
+  "gui.singulo.work_console.link.0": {
+    "source": "Supply port",
+    "translation": "資材口"
+  },
+  "gui.singulo.work_console.link.1": {
+    "source": "Delivery port",
+    "translation": "交付口"
+  },
+  "gui.singulo.work_console.link.2": {
+    "source": "Recipe rack",
+    "translation": "配方架"
+  },
+  "gui.singulo.work_console.link.hint": {
+    "source": "Record this console on a Work Location Card, then use the card on blocks to link them",
+    "translation": "用作業位置卡記錄此台，再用該卡右鍵方塊來連接"
+  },
+  "gui.singulo.work_console.link.lost": {
+    "source": "(missing)",
+    "translation": "（找不到）"
+  },
+  "gui.singulo.work_console.locked": {
+    "source": "You are not on this work console's permit",
+    "translation": "你未登記在此作業指令台的許可證上"
+  },
+  "gui.singulo.work_console.material.hint": {
+    "source": "Taken from the stockpile (need / have)",
+    "translation": "從資材存放處取用的物品（需要 / 庫存）"
+  },
+  "gui.singulo.work_console.materials": {
+    "source": "To craft, and materials (need / have)",
+    "translation": "製作的物品與材料（需要 / 庫存）"
+  },
+  "gui.singulo.work_console.no_androids": {
+    "source": "No android available nearby",
+    "translation": "附近沒有可用的仿生人"
+  },
+  "gui.singulo.work_console.no_links": {
+    "source": "Nothing is linked",
+    "translation": "沒有連接的方塊"
+  },
+  "gui.singulo.work_console.no_orders": {
+    "source": "No running orders",
+    "translation": "沒有進行中的訂單"
+  },
+  "gui.singulo.work_console.outbox.hint": {
+    "source": "Orders delivered to the console. Moved into adjacent chests automatically",
+    "translation": "送到指令台的成品。會自動移到相鄰的箱子"
+  },
+  "gui.singulo.work_console.plan": {
+    "source": "%s steps, %s crafts",
+    "translation": "工序 %s ・ 製作次數 %s"
+  },
+  "gui.singulo.work_console.planning": {
+    "source": "Calculating...",
+    "translation": "計算中…"
+  },
+  "gui.singulo.work_console.record.hint": {
+    "source": "Lay out a pattern and record it onto a recipe card (JEI's + button works too)",
+    "translation": "擺放樣本並記錄到配方卡上（也可用 JEI 的「+」）"
+  },
+  "gui.singulo.work_console.record.hint.processing": {
+    "source": "Lay out what goes in and what comes out. Scroll to change counts (Shift: 10 at a time)",
+    "translation": "放置放入的物品和產出的物品。滾動滾輪變更數量（Shift：每次10個）"
+  },
+  "gui.singulo.work_console.start": {
+    "source": "Start",
+    "translation": "開始作業"
+  },
+  "gui.singulo.work_console.status.0": {
+    "source": "Working (%s androids)",
+    "translation": "作業中（%s 個）"
+  },
+  "gui.singulo.work_console.status.1": {
+    "source": "Waiting for materials",
+    "translation": "等待材料"
+  },
+  "gui.singulo.work_console.status.2": {
+    "source": "Waiting for an android that can carry it",
+    "translation": "等待能搬運的仿生人"
+  },
+  "gui.singulo.work_console.status.3": {
+    "source": "Waiting for storage space",
+    "translation": "等待存放空間"
+  },
+  "gui.singulo.work_console.stock": {
+    "source": "In stock: %s",
+    "translation": "庫存：%s"
+  },
+  "gui.singulo.work_console.tab.links": {
+    "source": "Links",
+    "translation": "連接"
+  },
+  "gui.singulo.work_console.tab.order": {
+    "source": "Order",
+    "translation": "訂單"
+  },
+  "gui.singulo.work_console.tab.outbox": {
+    "source": "Outbox",
+    "translation": "交付箱"
+  },
+  "gui.singulo.work_console.tab.record": {
+    "source": "Record",
+    "translation": "記錄"
+  },
+  "gui.singulo.work_console.tab.running": {
+    "source": "Running",
+    "translation": "進行中"
+  },
+  "gui.singulo.work_console.unlink": {
+    "source": "Unlink",
+    "translation": "斷開"
+  },
   "gui.singulo.wormhole.generated": {
     "source": "A pair of mouths formed. Stabilize within %s s",
     "translation": "已生成一對入口。請在 %s 秒內完成穩定化"
@@ -4259,6 +4659,14 @@
     "source": "Android glass",
     "translation": "仿生人用玻璃"
   },
+  "guide.singulo.androids.process.body": {
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
+    "translation": "用指令台「記錄」的模式按鈕切換要記錄的種類。\n・加工：熔爐和裝置的配方。左邊放放入的物品，右邊放產出的物品（另可放最多 2 個副產物），用滾輪變更數量（也可用 JEI 的「+」）。仿生人從上方放入裝置，在旁邊等待完成後從下方取出。副產物放回資材存放處。燃料和電力需自己準備。2 分鐘沒有進展時，訂單會被取消。\n・步驟：在步驟卡上記錄最多 8 個放入、取出、採掘的步驟。放入作業位置卡來複製位置，在物品欄放入物品後按「新增」。在右邊放產物後記錄。步驟卡自帶位置，所以可以放在配方架的任意一行。\n・採掘：只有裝有採掘升級的仿生人會執行。用 2 張作業位置卡決定範圍後，從上層開始挖，直到收集到所需物品（也可用於刷石機）。無法破壞的方塊、液體、容器、受護盾保護的地方不會挖。沒有可挖的東西持續 30 秒時會取消。\n・仿生人工作台：製作速度是原版工作台的 4 倍。"
+  },
+  "guide.singulo.androids.process.title": {
+    "source": "Processing, procedures and mining",
+    "translation": "加工、步驟與採掘"
+  },
   "guide.singulo.androids.ruin.body": {
     "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
     "translation": "每座遺蹟的牆邊都有廢墟仿生人列印台。生存模式的玩家靠近時，它會在台面上從腳開始逐層列印出 2〜3 個對應型號（光刃型、鞭型或光劍型）的仿生人並讓其出動。全部擊敗後，台面上會出現該型號的小型水晶記憶體，列印台隨後休息一天。\n- 光刃型「露米娜」：蹲下、刀刃發亮後，會留下殘影衝來斬擊。單膝跪地手按地面時，腳下會出現預告圈並升起光柱（離開圈）。近身時會張開刀刃迴旋斬。\n- 鞭型「薇爾娜」：可達約 6 格的鞭擊，以及纏住並把你拉近的纏繞。在頭頂甩鞭後，會抽打地面放出一道直線衝擊波（跳起即可躲開）。\n- 光劍型「索蕾伊」：踏步突刺、揮動時劍刃伸長的橫斬，以及飛行的新月斬擊波。受擊時會在正面展開光盾（正面幾乎打不進去），繼續攻擊會被反擊。請從側面或背後進攻。\n仿生人依靠電量行動，大招用 10 次左右就會耗盡，眼睛的光會熄滅。它們會回到附近的列印台，或在白天露天處展開太陽能板，夜晚或室內則坐下充電（列印台 5 秒、太陽能 10 秒、坐下 14 秒）。充電時不會攻擊，正是進攻的時機。"
@@ -4274,6 +4682,14 @@
   "guide.singulo.androids.upgrades.title": {
     "source": "Upgrades",
     "translation": "升級"
+  },
+  "guide.singulo.androids.work.body": {
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. If a place cannot be reached, the order is cancelled.",
+    "translation": "可以把工作台的合成交給自己的仿生人。\n1. 放置仿生人作業指令台，用作業位置卡潛行右鍵來記錄它。用這張卡右鍵配方架（要增加的話還有資材口和交付口），就會連接到指令台（64 格以內）。\n2. 在指令台（和資材口）旁邊放箱子（資材存放處）。仿生人會到實際放有材料的地方去取。成品會送到下單時選擇的交付目標（指令台的交付箱或命名過的交付口）。\n3. 在指令台的「記錄」的 3×3 中擺放樣本（物品不會減少，也可用 JEI 的「+」），記錄到配方卡上。\n4. 在配方架某一行的左邊放記錄了工作台的作業位置卡，右邊排列配方卡。\n5. 在指令台的「訂單」中選擇物品和數量，確認材料足夠，選擇仿生人後開始作業。有配方的中間材料也會自己製作。\n仿生人每次搬運 5 格（有背包時 +24）。作業中無法取出它的物品，訂單完成後會回到原來的行動方式。有無法到達的地方時，該訂單會被取消。"
+  },
+  "guide.singulo.androids.work.title": {
+    "source": "Work automation",
+    "translation": "作業自動化"
   },
   "guide.singulo.catalysts": {
     "source": "Catalysts",
@@ -4747,6 +5163,10 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
+  "howto.singulo.android_delivery_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.android_gate_glass": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
@@ -4767,6 +5187,10 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
+  "howto.singulo.android_recipe_rack": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.android_repair_kit": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
@@ -4775,9 +5199,21 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
+  "howto.singulo.android_supply_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
+  },
+  "howto.singulo.android_work_console": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
+  },
+  "howto.singulo.android_workbench": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
   },
   "howto.singulo.anomaly_sample": {
     "source": "Restore a Degraded Anomaly Sample",
@@ -5327,6 +5763,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "製造地：精密組裝台（第 4 階段）"
   },
+  "howto.singulo.procedure_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.quantum_computing_module": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "製造地：精密組裝台（第 3 階段）"
@@ -5354,6 +5794,10 @@
   "howto.singulo.reactor_stabilizer": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.recipe_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
   },
   "howto.singulo.scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -5558,6 +6002,10 @@
   "howto.singulo.white_star_glass_panel": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
+  },
+  "howto.singulo.work_location_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
   },
   "howto.singulo.worldline_anchor_advanced": {
     "source": "Made in: Precision Assembler (stage 5)",
@@ -5991,6 +6439,10 @@
     "source": "Primordial Seed",
     "translation": "原初之種"
   },
+  "item.singulo.procedure_card": {
+    "source": "Procedure Card",
+    "translation": "步驟卡"
+  },
   "item.singulo.quantum_computing_module": {
     "source": "Quantum Computing Module",
     "translation": "量子運算模組"
@@ -6006,6 +6458,10 @@
   "item.singulo.raw_meteoric_iron": {
     "source": "Raw Meteoric Iron",
     "translation": "粗隕鐵"
+  },
+  "item.singulo.recipe_card": {
+    "source": "Recipe Card",
+    "translation": "配方卡"
   },
   "item.singulo.record_fragment": {
     "source": "Crystal Memory",
@@ -6203,6 +6659,10 @@
     "source": "White Ceramic Composite",
     "translation": "白色陶瓷複合材料"
   },
+  "item.singulo.work_location_card": {
+    "source": "Work Location Card",
+    "translation": "作業位置卡"
+  },
   "item.singulo.wormhole_mouth_casing": {
     "source": "Wormhole Mouth Casing",
     "translation": "蟲洞入口外殼"
@@ -6291,6 +6751,10 @@
     "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
     "translation": "已為無線充電器充入 %1$s FE（%2$s / %3$s FE）"
   },
+  "message.singulo.android_workbench.hint": {
+    "source": "Androids craft here. Record this block on the Work Location Card in a recipe rack",
+    "translation": "仿生人在此製作。將此方塊記錄到配方架的作業位置卡上"
+  },
   "message.singulo.deep_sea_collector.idle": {
     "source": "Not deep enough: needs 16+ blocks of water above",
     "translation": "水深不夠（上方需要 16 格以上的水）"
@@ -6355,6 +6819,10 @@
     "source": "Found %s ores and %s ruin blocks",
     "translation": "發現 %1$s 個礦石與 %2$s 個廢墟方塊"
   },
+  "message.singulo.recipe_card.cleared": {
+    "source": "Cleared the recipe",
+    "translation": "已清除配方"
+  },
   "message.singulo.record_read": {
     "source": "You read the ancient record \"%s\". Find it in the handbook",
     "translation": "你讀了古代記錄「%1$s」。可在手冊中查閱"
@@ -6403,6 +6871,10 @@
     "source": "Strangelet contained",
     "translation": "已將奇異子封入磁瓶"
   },
+  "message.singulo.supply_port.storages": {
+    "source": " (%s storages)",
+    "translation": "（%s 個儲存）"
+  },
   "message.singulo.void_collector.idle": {
     "source": "Works only in the End, over open void",
     "translation": "只能在終界、正下方直到虛空都空無一物的地方運轉"
@@ -6414,6 +6886,38 @@
   "message.singulo.welcome": {
     "source": "You received the Singulo Handbook. Right-click to open it",
     "translation": "你收到了 Singulo 手冊。按右鍵即可開啟"
+  },
+  "message.singulo.work_link.added": {
+    "source": "Linked to the work console at %s, %s, %s",
+    "translation": "已連接到作業指令台（%s, %s, %s）"
+  },
+  "message.singulo.work_link.info": {
+    "source": "Linked to the work console at %s, %s, %s",
+    "translation": "已連接的作業指令台：%s, %s, %s"
+  },
+  "message.singulo.work_link.none": {
+    "source": "Not linked to a work console",
+    "translation": "沒有連接到任何作業指令台"
+  },
+  "message.singulo.work_link.not_console": {
+    "source": "This card does not hold a work console",
+    "translation": "這張卡沒有記錄作業指令台"
+  },
+  "message.singulo.work_link.removed": {
+    "source": "Unlinked from the work console",
+    "translation": "已從作業指令台斷開"
+  },
+  "message.singulo.work_link.too_far": {
+    "source": "Too far from the work console (up to %s blocks)",
+    "translation": "離作業指令台太遠（最多 %s 格）"
+  },
+  "message.singulo.work_location.cleared": {
+    "source": "Cleared the record",
+    "translation": "已清除記錄"
+  },
+  "message.singulo.work_location.recorded": {
+    "source": "Recorded %s at %s, %s, %s",
+    "translation": "已記錄 %s 的位置（%s, %s, %s）"
   },
   "metric_drive.singulo.mode.high_gravity": {
     "source": "High gravity",
@@ -7499,6 +8003,42 @@
     "source": "Not functional yet; usable as a material",
     "translation": "功能尚未實裝，可作為材料使用"
   },
+  "tooltip.singulo.procedure_card.empty": {
+    "source": "Blank: record steps in the procedure mode of a work console's Record tab",
+    "translation": "尚未記錄（在作業指令台「記錄」的步驟模式中記錄）"
+  },
+  "tooltip.singulo.procedure_card.extract": {
+    "source": "Extract %s (%s)",
+    "translation": "取出：%s（%s）"
+  },
+  "tooltip.singulo.procedure_card.insert": {
+    "source": "Insert %s (%s)",
+    "translation": "放入：%s（%s）"
+  },
+  "tooltip.singulo.procedure_card.mine": {
+    "source": "Mine until %s (%s)",
+    "translation": "採掘：直到收集到 %s（%s）"
+  },
+  "tooltip.singulo.procedure_card.product": {
+    "source": "the product",
+    "translation": "產物"
+  },
+  "tooltip.singulo.recipe_card.empty": {
+    "source": "Blank: record a recipe in a work console's Record tab",
+    "translation": "尚未記錄（在作業指令台的「記錄」中記錄）"
+  },
+  "tooltip.singulo.recipe_card.extra": {
+    "source": "Also: %s ×%s",
+    "translation": "另有：%s ×%s"
+  },
+  "tooltip.singulo.recipe_card.output": {
+    "source": "Makes: %s ×%s",
+    "translation": "製作：%s ×%s"
+  },
+  "tooltip.singulo.recipe_card.processing": {
+    "source": "Processing (put into a furnace or machine and taken out)",
+    "translation": "加工（放入熔爐或裝置後取出）"
+  },
   "tooltip.singulo.repairs": {
     "source": "Repaired %s / %s times",
     "translation": "已修復 %1$s / %2$s 次"
@@ -7518,6 +8058,18 @@
   "tooltip.singulo.uses": {
     "source": "Uses %s / %s",
     "translation": "使用次數 %1$s / %2$s"
+  },
+  "tooltip.singulo.work_location.block": {
+    "source": "%s at %s, %s, %s",
+    "translation": "%s（%s, %s, %s）"
+  },
+  "tooltip.singulo.work_location.empty": {
+    "source": "Empty: sneak-use on a block to record it",
+    "translation": "未記錄（潛行右鍵方塊來記錄）"
+  },
+  "tooltip.singulo.work_location.hint": {
+    "source": "Use a card holding a work console on a port or rack to link it",
+    "translation": "用記錄了作業指令台的卡右鍵資材口等即可連接"
   },
   "tooltip.singulo.wormhole.unstable": {
     "source": "Unstable: collapses in %s s",
@@ -7556,12 +8108,12 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 26 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 26 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 33 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 33 個"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 35 more",
-    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 35 個"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
+    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 36 個"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -7608,8 +8160,8 @@
     "translation": "用於：卡西米爾腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 9 more",
-    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 9 個"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 13 more",
+    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 13 個"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -7976,12 +8528,12 @@
     "translation": "用於：基本框架、鋼板、壓縮機"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 68 more",
-    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 68 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 72 more",
+    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 72 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 49 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 49 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 50 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 50 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

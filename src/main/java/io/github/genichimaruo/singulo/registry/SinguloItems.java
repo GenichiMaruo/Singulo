@@ -66,6 +66,13 @@ public final class SinguloItems {
     /** 採掘アップグレード（ツルハシのエンチャントを付けられる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem> ANDROID_MINING_UPGRADE = ITEMS.register(
             "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
+    /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
+            "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
+            "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ProcedureCardItem> PROCEDURE_CARD = ITEMS.register(
+            "procedure_card", () -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
@@ -123,6 +130,9 @@ public final class SinguloItems {
             Map.entry("android_charger", 2),
             Map.entry("android_armor_plate", 2),
             Map.entry("android_mining_upgrade", 2),
+            Map.entry("work_location_card", 2),
+            Map.entry("recipe_card", 2),
+            Map.entry("procedure_card", 2),
             Map.entry("explorer_compass", 1),
             Map.entry("creative_catalyst", 6),
             Map.entry("builder_wand", 6),
@@ -193,9 +203,17 @@ public final class SinguloItems {
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
         block(SinguloBlocks.PROBE_STATION, 4);
         block(SinguloBlocks.ANDROID_STATION, 2);
+        block(SinguloBlocks.ANDROID_WORK_CONSOLE, 2);
+        block(SinguloBlocks.ANDROID_SUPPLY_PORT, 2);
+        block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);
+        block(SinguloBlocks.ANDROID_RECIPE_RACK, 2);
+        block(SinguloBlocks.ANDROID_WORKBENCH, 2);
         TAB_ORDER.add(ANDROID_CHARGER);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
+        TAB_ORDER.add(WORK_LOCATION_CARD);
+        TAB_ORDER.add(RECIPE_CARD);
+        TAB_ORDER.add(PROCEDURE_CARD);
         block(SinguloBlocks.SMES_MODULE, 4);
         block(SinguloBlocks.TOPOLOGICAL_WIRE, 4);
         block(SinguloBlocks.REACTOR_SHELL, 5);

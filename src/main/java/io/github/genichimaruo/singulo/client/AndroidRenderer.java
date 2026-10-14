@@ -59,6 +59,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Whip(this));
         addLayer(new Saber(this));
         addLayer(new Solar(this));
+        addLayer(new Pickaxe(this));
         addLayer(new ArmorGlint(this));
     }
 
@@ -471,6 +472,44 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 FxDraw.box(pose, vc, x - 0.004F, 0.03F, -d + 0.02F, x + 0.004F, 0.033F, d - 0.02F, light, 0x6C86B8, 255);
             }
             FxDraw.box(pose, vc, -w + 0.02F, 0.03F, -0.004F, w - 0.02F, 0.033F, 0.004F, light, 0x6C86B8, 255);
+        }
+    }
+
+    /**
+     * 採掘: 左手に持つツルハシ。プレイヤーと同じく、柄は前腕に直角（手から前へ）、頭は柄の先で腕と同じ向きに張り出す。
+     * 柄は実体（濃い金属色）、頭はアンドロイドの色で光る（先が持ち手の方へ曲がった弧）。
+     */
+    final class Pickaxe extends RenderLayer<RuinAndroid, AndroidModel> {
+        Pickaxe(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (android.state() != RuinAndroid.STATE_MINING) {
+                return;
+            }
+            pose.pushPose();
+            getParentModel().toLeftHand(pose);
+            float k = 1 / SCALE;
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            // 柄: 手の中（少し後ろに出る）から前へ
+            FxDraw.box(pose, body, -0.022F * k, -0.022F * k, -0.42F * k, 0.022F * k, 0.022F * k, 0.08F * k, light, 0x4A505C, 255);
+            // 頭の付け根
+            FxDraw.box(pose, body, -0.032F * k, -0.04F * k, -0.45F * k, 0.032F * k, 0.04F * k, -0.39F * k, light, 0x8C94A2, 255);
+            // 光る頭: 腕の向き（上下）に張り出し、先が持ち手の方（後ろ）へ曲がる
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            float pulse = 0.8F + 0.2F * Mth.sin(age * 0.3F);
+            for (int i = -4; i <= 4; i++) {
+                float y = i * 0.045F;
+                float z = -0.42F + i * i * 0.006F;
+                float t = 1 - Math.abs(i) / 5F;
+                float h = 0.022F + 0.01F * t;
+                glowBox(pose, fx, -0.02F * k, (y - 0.026F) * k, (z - h) * k, 0.02F * k, (y + 0.026F) * k, (z + h) * k, variant.accent,
+                        (int) (120 * pulse));
+            }
+            pose.popPose();
         }
     }
 
