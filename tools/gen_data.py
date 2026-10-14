@@ -755,6 +755,10 @@ UI_LANG = {
     'gui.singulo.work_console.record.hint.processing': ('入れる物と出てくる物を置く。ホイールで数を変える（シフトで10ずつ）', 'Lay out what goes in and what comes out. Scroll to change counts (Shift: 10 at a time)'),
     'gui.singulo.recipe_encoder.mode.crafting': ('作業台', 'Crafting'),
     'gui.singulo.recipe_encoder.fuel': ('燃料', 'Fuel'),
+    'gui.singulo.recipe_encoder.variants.on': ('同じ種類も使う', 'Any variant'),
+    'gui.singulo.recipe_encoder.variants.off': ('同じ物だけ', 'Same item only'),
+    'gui.singulo.recipe_encoder.variants.hint': ('同じ種類も使う: 見本と同じ物でなくても、レシピに合う同じ種類の物（いろいろな木の板材など）を使う。同じ物だけ: 見本と同じ物だけを使う', 'Any variant: use anything the recipe accepts in that slot, not just the pattern item (any wood planks, for example). Same item only: use exactly the pattern items'),
+    'tooltip.singulo.recipe_card.variants': ('同じ種類の別の物も使う', 'Accepts variants of the same kind'),
     'gui.singulo.recipe_encoder.face.up': ('上', 'Top'),
     'gui.singulo.recipe_encoder.face.down': ('下', 'Bottom'),
     'gui.singulo.recipe_encoder.face.north': ('北', 'North'),
@@ -830,7 +834,8 @@ UI_LANG = {
     'gui.singulo.work_console.error.loop': ('レシピがループしている', 'The recipes loop'),
     'gui.singulo.work_console.error.missing': ('素材が足りない', 'Not enough materials'),
     'gui.singulo.work_console.error.no_android': ('手の空いたアンドロイドを選んでいない', 'No free android is chosen'),
-    'gui.singulo.work_console.error.capacity': ('%s の素材を一度に運べるアンドロイドがいない（バックパックが必要）', 'No chosen android can carry the materials for %s at once (a backpack is needed)'),
+    'gui.singulo.work_console.error.capacity': ('%s の素材を一度に運べるアンドロイドがいない（バックパックか、流体ならタンクアップグレードが必要）', 'No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)'),
+    'gui.singulo.work_console.needs_tank': ('この注文には液体・ガスを運ぶ工程があるので、タンクアップグレードを積んだアンドロイドだけ選べる', 'This order moves liquids or gases, so only androids with a Tank Upgrade can be chosen'),
     'gui.singulo.work_console.error.not_workbench': ('%s のレシピの作業場所が作業台ではない', 'The work location for %s is not a crafting table'),
     'message.singulo.android_workbench.hint': ('アンドロイドが作業台のレシピを作る台。レシピ棚の作業位置カードにこの台を記録する', 'Androids craft here. Record this block on the Work Location Card in a recipe rack'),
     'gui.singulo.work_console.cancelled': ('%s の注文を取り消した', 'Cancelled the order for %s'),
@@ -930,7 +935,10 @@ UI_LANG = {
     'gui.singulo.recipe_encoder.card': ('記録済み', 'Recorded'),
     'gui.singulo.android.page.status': ('様子', 'Status'),
     'gui.singulo.android.battery': ('バッテリー', 'Battery'),
-    'gui.singulo.android.backpack': ('バックパック', 'Backpack'),
+    'gui.singulo.android.storage': ('収納', 'Storage'),
+    'gui.singulo.android.tank': ('タンク%s: %s 約 %s / %s mB', 'Tank %s: %s, about %s / %s mB'),
+    'gui.singulo.android.tank.empty': ('タンク%s: 空', 'Tank %s: empty'),
+    'tooltip.singulo.fluid_sample': ('%s mB', '%s mB'),
     'gui.singulo.android.tools': ('道具', 'Tools'),
     'gui.singulo.android.pack': ('バックパックの中', 'Backpack'),
     'gui.singulo.android.carry': ('持ち物', 'Carry'),
@@ -1257,6 +1265,7 @@ def models():
     manipulator_staff_model()
     compass_item_model()
     work_card_item_model()
+    fluid_sample_item_model()
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
@@ -2521,6 +2530,12 @@ def sounds_json():
     write_json(ASSETS / 'sounds.json', out)
 
 
+def fluid_sample_item_model():
+    """流体の見本: しずくの絵（流体の色に染める）。"""
+    write_json(ASSETS / 'models' / 'item' / 'fluid_sample.json',
+               {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/fluid_sample'}})
+
+
 def work_card_item_model():
     """作業位置カード: 記録済み（singulo:recorded）なら、緑の帯とピンの絵にする。"""
     iid = 'work_location_card'
@@ -2968,7 +2983,7 @@ TAB_GROUPS = [
     ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
                'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
                'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
-               'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade',
+               'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade',
                'android_mining_upgrade', 'android_felling_upgrade', 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
                'work_location_card', 'recipe_card', 'procedure_card']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',

@@ -119,6 +119,7 @@ MOD = {
     '生産アップグレード': ('android_production_upgrade', 'Production Upgrade', 'item'),
     'バッテリーアップグレード': ('android_battery_upgrade', 'Battery Upgrade', 'item'),
     'バックパックアップグレード': ('android_backpack_upgrade', 'Backpack Upgrade', 'item'),
+    'タンクアップグレード': ('android_tank_upgrade', 'Tank Upgrade', 'item'),
     '採掘アップグレード': ('android_mining_upgrade', 'Mining Upgrade', 'tool'),
     '伐採アップグレード': ('android_felling_upgrade', 'Felling Upgrade', 'tool'),
     'アンドロイド作業指令台': ('android_work_console', 'Android Work Console', 'machine'),

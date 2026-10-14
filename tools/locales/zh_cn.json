@@ -1252,8 +1252,12 @@
     "translation": "用小型水晶存储器、仿生人套件和电力打印一个护卫仿生人（有生产升级时最多两个），被击倒后用新的套件重新打印。可设置其行动方式，以及在何种生命值时返回维修与充电。"
   },
   "desc.singulo.android_supply_port": {
-    "source": "Connects the storage next to it (chests and the like) as the work stockpile. Androids take materials here and put what they make back.",
-    "translation": "把相邻的存储（箱子等）连接为作业的资材存放处。仿生人在这里取材料，并把做好的物品放回。"
+    "source": "Connects the storage next to it (chests and the like) and fluid tanks as the work stockpile. Androids take materials here and put what they make back.",
+    "translation": "把相邻的存储（箱子等）和流体储罐连接为作业的资材存放处。仿生人在这里取材料，并把做好的物品放回。"
+  },
+  "desc.singulo.android_tank_upgrade": {
+    "source": "Gives a guard android two tanks for liquids and gases (32,000 mB each, one fluid per tank), so work can carry fluids from the stockpile to machines. The tanks show at its waist. It cannot be removed while they hold anything.",
+    "translation": "装在护卫仿生人上后，会有 2 个可装液体或气体的储罐（各 32,000 mB，每个储罐一种）。作业时可把流体从资材存放处运到装置。腰部会出现储罐。储罐里还有东西时无法取下。"
   },
   "desc.singulo.android_transfer_upgrade": {
     "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
@@ -2623,10 +2627,6 @@
     "source": "Armor",
     "translation": "护甲"
   },
-  "gui.singulo.android.backpack": {
-    "source": "Backpack",
-    "translation": "背包"
-  },
   "gui.singulo.android.battery": {
     "source": "Battery",
     "translation": "电池"
@@ -2826,6 +2826,18 @@
   "gui.singulo.android.say.retreat.1": {
     "source": "Off to get repaired",
     "translation": "我去修理一下"
+  },
+  "gui.singulo.android.storage": {
+    "source": "Storage",
+    "translation": "收纳"
+  },
+  "gui.singulo.android.tank": {
+    "source": "Tank %s: %s, about %s / %s mB",
+    "translation": "储罐%s：%s 约 %s / %s mB"
+  },
+  "gui.singulo.android.tank.empty": {
+    "source": "Tank %s: empty",
+    "translation": "储罐%s：空"
   },
   "gui.singulo.android.tools": {
     "source": "Tools",
@@ -4235,6 +4247,18 @@
     "source": "What to do with a lever (click to change). Buttons, doors, trapdoors and the like are always used like a right-click",
     "translation": "如何操作拉杆（点击更改）。按钮、门、活板门等总是与右键相同"
   },
+  "gui.singulo.recipe_encoder.variants.hint": {
+    "source": "Any variant: use anything the recipe accepts in that slot, not just the pattern item (any wood planks, for example). Same item only: use exactly the pattern items",
+    "translation": "同类也可：即使不是样本中的物品，也会使用配方认可的同类物品（各种木板等）。仅相同物品：只使用与样本相同的物品"
+  },
+  "gui.singulo.recipe_encoder.variants.off": {
+    "source": "Same item only",
+    "translation": "仅相同物品"
+  },
+  "gui.singulo.recipe_encoder.variants.on": {
+    "source": "Any variant",
+    "translation": "同类也可"
+  },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",
     "translation": "防护：爆炸、生物破坏"
@@ -4644,8 +4668,8 @@
     "translation": "没有可订购的物品（连接资材口和配方架）"
   },
   "gui.singulo.work_console.error.capacity": {
-    "source": "No chosen android can carry the materials for %s at once (a backpack is needed)",
-    "translation": "没有能一次搬运 %s 所需材料的仿生人（需要背包）"
+    "source": "No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)",
+    "translation": "没有能一次搬运 %s 所需材料的仿生人（需要背包，流体则需要储罐升级）"
   },
   "gui.singulo.work_console.error.loop": {
     "source": "The recipes loop",
@@ -4714,6 +4738,10 @@
   "gui.singulo.work_console.needs_miner": {
     "source": "This order includes mining, so only androids with a Mining Upgrade can be chosen",
     "translation": "此订单包含采掘工序，只能选择装有采掘升级的仿生人"
+  },
+  "gui.singulo.work_console.needs_tank": {
+    "source": "This order moves liquids or gases, so only androids with a Tank Upgrade can be chosen",
+    "translation": "此订单包含搬运液体或气体的工序，只能选择装有储罐升级的仿生人"
   },
   "gui.singulo.work_console.no_androids": {
     "source": "No android available nearby",
@@ -4952,8 +4980,8 @@
     "translation": "仿生人用玻璃"
   },
   "guide.singulo.androids.process.body": {
-    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "用指令台“记录”的模式按钮切换要记录的种类。\n・加工：熔炉和装置的配方。左边放放入的物品，右边放产出的物品（另可放最多 2 个副产物），用滚轮更改数量（也可用 JEI 的“+”）。仿生人从上方放入装置，在旁边等待完成后从下方取出。副产物放回资材存放处。燃料和电力需自己准备。2 分钟没有进展时，订单会被取消。\n・步骤：在步骤卡上记录最多 8 个放入、取出、采掘的步骤。放入作业位置卡来复制位置，在物品栏放入物品后按“添加”。在右边放产物后记录。步骤卡自带位置，所以可以放在配方架的任意一行。\n・采掘：只有装有采掘升级的仿生人会执行。用 2 张作业位置卡决定范围后，从上层开始挖，直到收集到所需物品（也可用于刷石机）。无法破坏的方块、液体、容器、受护盾保护的地方不会挖。没有可挖的东西持续 30 秒时会取消。\n・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次放入设定的数量。留空则不去取）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。"
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
+    "translation": "用指令台“记录”的模式按钮切换要记录的种类。\n・加工：熔炉和装置的配方。左边放放入的物品，右边放产出的物品（另可放最多 2 个副产物），用滚轮更改数量（也可用 JEI 的“+”）。仿生人从上方放入装置，在旁边等待完成后从下方取出。副产物放回资材存放处。燃料和电力需自己准备。2 分钟没有进展时，订单会被取消。\n・步骤：在步骤卡上记录最多 8 个放入、取出、采掘的步骤。放入作业位置卡来复制位置，在物品栏放入物品后按“添加”。在右边放产物后记录。步骤卡自带位置，所以可以放在配方架的任意一行。\n・采掘：只有装有采掘升级的仿生人会执行。用 2 张作业位置卡决定范围后，从上层开始挖，直到收集到所需物品（也可用于刷石机）。无法破坏的方块、液体、容器、受护盾保护的地方不会挖。没有可挖的东西持续 30 秒时会取消。\n・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次放入设定的数量。留空则不去取）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。"
   },
   "guide.singulo.androids.process.title": {
     "source": "Processing, procedures and mining",
@@ -4968,8 +4996,8 @@
     "translation": "遗迹的仿生人"
   },
   "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 生产升级：装在组装站后，最多打印并管理两个仿生人。一次只能有一个在上方充电，另一个在旁边等待并轮流。用名字左边的“1”“2”选择界面显示哪一个（行动方式等设置两个共用）。\n- 在仿生人界面中点击名字左边的按钮，切换到“装备与物品”页，就能放入升级。\n- 电池升级：每个使充满电量增加 50%（最多两个），充满所需时间也相应变长。腰部会出现电池包。\n- 背包升级：在 5 格物品之外，再加上背包的 24 格。背包里有物品时无法取下。\n- 采掘升级：使仿生人能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。\n- 伐木升级：使仿生人能进行伐木作业（相当于钻石斧）。可附上效率、时运和精准采集。\n- 作业开/关：为每个仿生人决定是否可以分配作业（自动化）。"
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 生产升级：装在组装站后，最多打印并管理两个仿生人。一次只能有一个在上方充电，另一个在旁边等待并轮流。用名字左边的“1”“2”选择界面显示哪一个（行动方式等设置两个共用）。\n- 在仿生人界面中点击名字左边的按钮，切换到“装备与物品”页，就能放入升级。\n- 电池升级：每个使充满电量增加 50%（最多两个），充满所需时间也相应变长。腰部会出现电池包。\n- 背包升级：在 5 格物品之外，再加上背包的 24 格。背包里有物品时无法取下。\n- 采掘升级：使仿生人能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。\n- 伐木升级：使仿生人能进行伐木作业（相当于钻石斧）。可附上效率、时运和精准采集。\n- 储罐升级：2 个可装液体或气体的储罐（各 32,000 mB，每个储罐一种）。腰部会出现储罐。储罐里还有东西时无法取下。\n- 作业开/关：为每个仿生人决定是否可以分配作业（自动化）。"
   },
   "guide.singulo.androids.upgrades.title": {
     "source": "Upgrades",
@@ -5498,6 +5526,10 @@
   "howto.singulo.android_supply_port": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_tank_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
   },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -6418,6 +6450,10 @@
   "item.singulo.android_repair_kit": {
     "source": "Self-Repair Kit",
     "translation": "自我修理套件"
+  },
+  "item.singulo.android_tank_upgrade": {
+    "source": "Tank Upgrade",
+    "translation": "储罐升级"
   },
   "item.singulo.android_transfer_upgrade": {
     "source": "Transfer Upgrade",
@@ -8259,6 +8295,10 @@
     "source": "Exotic charge: %s s",
     "translation": "奇异物质剩余：%s 秒"
   },
+  "tooltip.singulo.fluid_sample": {
+    "source": "%s mB",
+    "translation": "%s mB"
+  },
   "tooltip.singulo.gauntlet.hint": {
     "source": "Hold use to manipulate · Sneak-use to switch mode",
     "translation": "按住使用键操控 · 潜行使用以切换模式"
@@ -8379,6 +8419,10 @@
     "source": "Processing (put into a furnace or machine and taken out)",
     "translation": "加工（放入熔炉或装置后取出）"
   },
+  "tooltip.singulo.recipe_card.variants": {
+    "source": "Accepts variants of the same kind",
+    "translation": "也使用同类的其他物品"
+  },
   "tooltip.singulo.repairs": {
     "source": "Repaired %s / %s times",
     "translation": "已修复 %1$s / %2$s 次"
@@ -8448,8 +8492,8 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 34 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 34 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 35 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 35 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
@@ -8868,8 +8912,8 @@
     "translation": "用于：基本框架、钢板、压缩机"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 73 more",
-    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 73 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 74 more",
+    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 74 个"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 51 more",

@@ -37,7 +37,7 @@ public final class WorkConsoleView {
         List<ItemCount> entries = new ArrayList<>();
         List<ItemStack> craftable = new ArrayList<>();
         for (RecipeRackBlockEntity.Entry e : c.recipes()) {
-            ItemStack out = e.recipe().output();
+            ItemStack out = e.recipe().outputKey();
             if (craftable.stream().noneMatch(s -> ItemStack.isSameItemSameComponents(s, out))) {
                 craftable.add(out.copyWithCount(1));
                 entries.add(new ItemCount(out, ItemCount.get(stock, out)));
@@ -137,6 +137,7 @@ public final class WorkConsoleView {
             at.putInt("accent", a.accent());
             at.putBoolean("miner", a.canMine());
             at.putBoolean("feller", a.canFell());
+            at.putBoolean("tank", a.hasTank());
             as.add(at);
         }
         t.put("androids", as);
@@ -175,12 +176,15 @@ public final class WorkConsoleView {
         t.putBoolean("ok", plan.ok());
         t.putBoolean("loop", plan.loop);
         long crafts = 0;
-        boolean mining = false, felling = false;
+        boolean mining = false, felling = false, fluids = FluidSamples.is(plan.target);
         for (WorkPlanner.Step s : plan.steps) {
             crafts += s.crafts();
             mining |= s.entry().recipe().needsMining();
             felling |= s.entry().recipe().needsFelling();
+            fluids |= s.entry().recipe().outputs().stream().anyMatch(FluidSamples::is)
+                    || s.entry().recipe().inputs().stream().anyMatch(i -> FluidSamples.is(i.item));
         }
+        t.putBoolean("fluids", fluids);              // 流体を運ぶ工程がある: タンクアップグレードを積んだアンドロイドだけ選べる
         t.putBoolean("mining", mining);
         t.putBoolean("felling", felling);              // 採掘の工程がある: 採掘アップグレードを積んだアンドロイドだけ選べる
         t.putInt("steps", plan.steps.size());

@@ -90,12 +90,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private int stepOption;
     /** 加工モードで記録する、入れる面・取り出す面・燃料の面（{@link RecipeData#faces}）。 */
     private int faces = RecipeData.DEFAULT_FACES;
+    /** 作業台モードで、同じ種類の別の物も使うレシピとして記録するか。 */
+    private boolean variants;
     /** 手順モードで並べた手順。 */
     private final List<ProcedureStep> procSteps = new ArrayList<>();
     private final net.minecraft.world.inventory.ContainerData modeData = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
-            return index == 0 ? mode : index == 1 ? stepKind : index == 2 ? stepOption : faces;
+            return index == 0 ? mode : index == 1 ? stepKind : index == 2 ? stepOption : index == 3 ? faces : variants ? 1 : 0;
         }
 
         @Override
@@ -106,14 +108,16 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 stepKind = value;
             } else if (index == 2) {
                 stepOption = value;
-            } else {
+            } else if (index == 3) {
                 faces = value;
+            } else {
+                variants = value != 0;
             }
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return 5;
         }
     };
     private final net.minecraft.world.SimpleContainer encoder = new net.minecraft.world.SimpleContainer(ENCODER_SLOTS) {
@@ -261,6 +265,17 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 ItemCount.add(out, s, s.getCount());
             }
         }
+        Set<BlockPos> seen = new HashSet<>();
+        for (BlockPos p : supplyPoints()) {
+            for (var h : fluidStoresAt(p, seen)) {
+                for (int t = 0; t < h.getTanks(); t++) {
+                    var f = h.getFluidInTank(t);
+                    if (!f.isEmpty()) {
+                        ItemCount.add(out, FluidSamples.of(f.copyWithAmount(1)), f.getAmount());
+                    }
+                }
+            }
+        }
         return out;
     }
 
@@ -368,13 +383,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return Component.translatable("gui.singulo.work_console.error.no_android");
         }
         WorkOrder order = WorkOrder.create(nextOrderId++, plan, player.getUUID());
-        order.toStock = toStock;
+        order.toStock = toStock || FluidSamples.is(target);
         order.destination = destination != null && !destination.equals(worldPosition) && deliveryPort(destination) != null ? destination : null;
         // どの工程も、選んだアンドロイドのだれかが一度に運べるか
         for (WorkOrder.StepState s : order.steps) {
             boolean fits = false;
             for (RuinAndroid a : chosen) {
-                fits |= maxCrafts(s.recipe, a.freeCarry(), 1) >= 1;
+                fits |= maxCrafts(s.recipe, a.freeCarry(), 1) >= 1 && tankLimit(a, s.recipe) >= 1;
             }
             if (!fits) {
                 return Component.translatable("gui.singulo.work_console.error.capacity", s.recipe.output().getHoverName());
@@ -511,9 +526,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     /** 加工モードのレシピを作れる場所（上から入れて、下から取り出せる）。 */
     private boolean isMachine(BlockPos pos, RecipeData recipe) {
-        return level != null
-                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, recipe.inputFace()) != null
-                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, recipe.outputFace()) != null;
+        return level != null && handles(pos, recipe.inputFace()) && handles(pos, recipe.outputFace());
+    }
+
+    /** その面から、物か流体を出し入れできるか。 */
+    private boolean handles(BlockPos pos, net.minecraft.core.Direction face) {
+        return level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, face) != null
+                || level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, pos, face) != null;
     }
 
     /** 作業台のレシピを作れるブロック（バニラの作業台か、アンドロイド作業台）。 */
@@ -547,7 +566,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                     stacks += stacks(in.item.getCraftingRemainingItem(), in.count * done);   // バケツなど、作ると残る物
                 }
             }
-            stacks += stacks(recipe.output(), (long) recipe.output().getCount() * done);
+            stacks += stacks(recipe.output(), (long) recipe.outputCount() * done);
             peak = Math.max(peak, stacks);
         }
         // ほかに出てくる物（副産物、採掘で出るほかの物）の分も空けておく
@@ -556,6 +575,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     private static int stacks(ItemStack item, long count) {
+        if (FluidSamples.is(item)) {
+            return 0;                                  // 流体は持ち物ではなく、タンクに入る
+        }
         int max = Math.max(1, item.getMaxStackSize());
         return (int) ((count + max - 1) / max);
     }
@@ -569,9 +591,35 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return o != null && o.orderer != null ? o.orderer : owner;
     }
 
+    /** 1回分の流体（入れる物・出てくる物）を、アンドロイドのタンクで何回分運べるか（流体がなければ上限なし）。 */
+    static long tankLimit(RuinAndroid a, RecipeData recipe) {
+        List<ItemCount> fluids = new ArrayList<>();
+        for (ItemCount in : recipe.inputs()) {
+            if (FluidSamples.is(in.item)) {
+                ItemCount.add(fluids, in.item, in.count);
+            }
+        }
+        for (ItemStack out : recipe.outputs()) {
+            if (FluidSamples.is(out)) {
+                ItemCount.add(fluids, FluidSamples.key(out), FluidSamples.amount(out));
+            }
+        }
+        if (fluids.isEmpty()) {
+            return Long.MAX_VALUE;
+        }
+        if (!a.hasTank() || fluids.size() > RuinAndroid.TANKS) {
+            return 0;
+        }
+        long k = Long.MAX_VALUE;
+        for (ItemCount f : fluids) {
+            k = Math.min(k, RuinAndroid.TANK_CAPACITY / Math.max(1, f.count));
+        }
+        return k;
+    }
+
     /** このアンドロイドにできる工程か（採掘の手順は、採掘アップグレードが要る）。 */
     private static boolean canDo(RuinAndroid a, RecipeData recipe) {
-        return (!recipe.needsMining() || a.canMine()) && (!recipe.needsFelling() || a.canFell());
+        return (!recipe.needsMining() || a.canMine()) && (!recipe.needsFelling() || a.canFell()) && tankLimit(a, recipe) > 0;
     }
 
     /** 次の作業をもらう。 */
@@ -601,14 +649,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.remaining() <= 0 || !o.ready(s) || locationBusy(s.location) || !canDo(a, s.recipe)) {
                 continue;
             }
-            long k = maxCrafts(s.recipe, slots, s.remaining());
+            long k = Math.min(maxCrafts(s.recipe, slots, s.remaining()), tankLimit(a, s.recipe));
             if (k <= 0) {
                 tooSmall = true;
                 continue;
             }
             List<ItemCount> fetch = new ArrayList<>();
             for (ItemCount in : s.recipe.inputs()) {
-                ItemCount.add(fetch, in.item, in.count * k);
+                if (in.alt != null) {
+                    ItemCount.addAlt(fetch, in.item, in.count * k, in.alt);
+                } else {
+                    ItemCount.add(fetch, in.item, in.count * k);
+                }
             }
             s.inProgress += k;
             return lease(new WorkJob(WorkJob.Type.CRAFT, o.id, nextJobId++, 0, fetch,
@@ -627,7 +679,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
             if (left > 0) {
-                long amount = Math.min(left, (long) slots * o.target.getMaxStackSize());
+                long amount = FluidSamples.is(o.target) ? Math.min(left, a.tankSpace(FluidSamples.fluid(o.target)))
+                        : Math.min(left, (long) slots * o.target.getMaxStackSize());
+                if (amount <= 0) {
+                    return WorkJob.simple(WorkJob.Type.WAIT, o.id);          // タンクがない・いっぱい
+                }
                 o.deliverInProgress += amount;
                 List<ItemCount> fetch = new ArrayList<>();
                 ItemCount.add(fetch, o.target, amount);
@@ -658,7 +714,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             // 持ち物の素材で何回作れるか（素材の要らない手順（採掘だけなど）は、空いている場所に収まるだけ）
             long k = s.remaining();
             for (ItemCount in : s.recipe.inputs()) {
-                k = Math.min(k, carried(a, in.item) / in.count);
+                k = Math.min(k, carried(a, in) / in.count);
             }
             if (s.recipe.inputs().isEmpty()) {
                 k = maxCrafts(s.recipe, a.freeCarry(), k);
@@ -668,7 +724,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             List<ItemCount> use = new ArrayList<>();
             for (ItemCount in : s.recipe.inputs()) {
-                ItemCount.add(use, in.item, in.count * k);
+                if (in.alt != null) {
+                    ItemCount.addAlt(use, in.item, in.count * k, in.alt);
+                } else {
+                    ItemCount.add(use, in.item, in.count * k);
+                }
             }
             s.inProgress += k;
             return lease(new WorkJob(WorkJob.Type.CRAFT, o.id, nextJobId++, 0, use, List.of(new WorkJob.Batch(i, k, s.location, s.recipe)), true), a);
@@ -700,7 +760,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.remaining() <= 0) {
                 continue;
             }
-            if (s.inProgress > 0 || locationBusy(s.location) || !canDo(a, s.recipe)) {
+            if (s.inProgress > 0 || locationBusy(s.location) || !canDo(a, s.recipe) || tankLimit(a, s.recipe) != Long.MAX_VALUE
+                    || s.recipe.variants()) {
                 return null;                          // ほかのアンドロイドが作業中の工程、このアンドロイドにできない工程がある: 1工程ずつに分ける
             }
             for (int j : s.after) {
@@ -762,7 +823,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 ItemCount.add(inv, in.item, -use);
                 ItemCount.add(fetch, in.item, need - use);
             }
-            ItemCount.add(inv, b.recipe().output(), (long) b.recipe().output().getCount() * b.crafts());
+            ItemCount.add(inv, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
         }
         for (ItemCount c : fetch) {
             if (c.count > 0 && o.held(null, c.item) < c.count) {
@@ -781,7 +842,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             for (ItemCount c : carry) {
                 ItemCount.add(during, c.item, c.count);
             }
-            ItemCount.add(during, b.recipe().output(), (long) b.recipe().output().getCount() * b.crafts());
+            ItemCount.add(during, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
             for (ItemCount in : b.recipe().inputs()) {
                 if (in.item.hasCraftingRemainingItem()) {
                     ItemCount.add(during, in.item.getCraftingRemainingItem(), in.count * b.crafts());
@@ -791,7 +852,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             for (ItemCount in : b.recipe().inputs()) {
                 ItemCount.add(carry, in.item, -in.count * b.crafts());
             }
-            ItemCount.add(carry, b.recipe().output(), (long) b.recipe().output().getCount() * b.crafts());
+            ItemCount.add(carry, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
         }
         return peak <= slots ? fetch : null;
     }
@@ -807,7 +868,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     /** 持ち物の中の、見本と同じ物の数。 */
+    /** 持っている、need に合う物の数（同じ種類の別の物も数える）。 */
+    private static long carried(RuinAndroid a, ItemCount need) {
+        if (need.alt == null) {
+            return carried(a, need.item);
+        }
+        long n = 0;
+        for (int slot : a.carrySlots()) {
+            if (need.matches(a.inventory().getItem(slot))) {
+                n += a.inventory().getItem(slot).getCount();
+            }
+        }
+        return n;
+    }
+
     private static long carried(RuinAndroid a, ItemStack like) {
+        if (FluidSamples.is(like)) {
+            return a.tankAmount(FluidSamples.fluid(like));
+        }
         long n = 0;
         for (int slot : a.carrySlots()) {
             if (ItemStack.isSameItemSameComponents(a.inventory().getItem(slot), like)) {
@@ -879,6 +957,42 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
+    /** 受け渡し場所 point の隣の、流体の入れ物（タンクなど）。 */
+    public List<net.neoforged.neoforge.fluids.capability.IFluidHandler> fluidStoresAt(BlockPos point, Set<BlockPos> seen) {
+        List<net.neoforged.neoforge.fluids.capability.IFluidHandler> out = new ArrayList<>();
+        SupplyPortBlockEntity.collectFluids(level, point, seen, out);
+        return out;
+    }
+
+    /** 流体の入れ物にある、この流体の量（mB）。 */
+    private static long fluidIn(List<net.neoforged.neoforge.fluids.capability.IFluidHandler> stores, net.neoforged.neoforge.fluids.FluidStack like) {
+        long n = 0;
+        for (var h : stores) {
+            for (int t = 0; t < h.getTanks(); t++) {
+                if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(h.getFluidInTank(t), like)) {
+                    n += h.getFluidInTank(t).getAmount();
+                }
+            }
+        }
+        return n;
+    }
+
+    /** 受け渡し場所 point にある、この物（流体の見本なら流体）の数。 */
+    private long countAt(BlockPos point, ItemStack item, List<IItemHandler> stores) {
+        if (FluidSamples.is(item)) {
+            return fluidIn(fluidStoresAt(point, new HashSet<>()), FluidSamples.fluid(item));
+        }
+        long here = 0;
+        for (IItemHandler h : stores) {
+            for (int s = 0; s < h.getSlots(); s++) {
+                if (ItemStack.isSameItemSameComponents(h.getStackInSlot(s), item)) {
+                    here += h.getStackInSlot(s).getCount();
+                }
+            }
+        }
+        return here;
+    }
+
     /** 1つの受け渡し場所で取る物。 */
     public record Pickup(BlockPos point, List<ItemCount> items) {}
 
@@ -901,12 +1015,32 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         points.sort(java.util.Comparator.comparingDouble(p -> p.distSqr(from)));
         List<ItemCount> left = new ArrayList<>();
         for (ItemCount c : job.fetch()) {
-            ItemCount.add(left, c.item, c.count);
+            if (c.alt != null) {
+                ItemCount.addAlt(left, c.item, c.count, c.alt);
+            } else {
+                ItemCount.add(left, c.item, c.count);
+            }
         }
         List<Pickup> out = new ArrayList<>();
         for (BlockPos p : points) {
             List<ItemCount> here = new ArrayList<>();
             for (ItemCount need : left) {
+                if (need.alt != null) {
+                    // 同じ種類の別の物: ここに予約した、合う物それぞれから
+                    for (WorkOrder.Holding h : o.held) {
+                        if (need.count <= 0) {
+                            break;
+                        }
+                        if (h.point.equals(p) && need.matches(h.item)) {
+                            long take = Math.min(need.count, h.count - ItemCount.get(here, h.item));
+                            if (take > 0) {
+                                need.count -= take;
+                                ItemCount.add(here, h.item, take);
+                            }
+                        }
+                    }
+                    continue;
+                }
                 long take = Math.min(need.count, o.held(p, need.item));
                 if (take > 0) {
                     need.count -= take;
@@ -944,15 +1078,29 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         for (ItemCount c : need) {
             long left = c.count;
-            for (int i = 0; i < points.size() && left > 0; i++) {
-                long here = 0;
-                for (IItemHandler h : stores.get(i)) {
-                    for (int s = 0; s < h.getSlots(); s++) {
-                        if (c.matches(h.getStackInSlot(s))) {
-                            here += h.getStackInSlot(s).getCount();
+            if (c.alt != null) {
+                // 同じ種類の別の物も使う: 受け渡し場所ごとに、合う物そのものを予約する
+                for (int i = 0; i < points.size() && left > 0; i++) {
+                    for (ItemCount have : itemsAt(stores.get(i), c)) {
+                        long here = have.count;
+                        for (WorkOrder other : orders) {
+                            here -= other.held(points.get(i), have.item);
+                        }
+                        long take = Math.min(left, Math.max(0, here));
+                        order.hold(points.get(i), have.item, take);
+                        left -= take;
+                        if (left <= 0) {
+                            break;
                         }
                     }
                 }
+                if (left > 0) {
+                    short_.add(new ItemCount(c.item, left, c.alt));
+                }
+                continue;
+            }
+            for (int i = 0; i < points.size() && left > 0; i++) {
+                long here = countAt(points.get(i), c.item, stores.get(i));
                 for (WorkOrder other : orders) {
                     here -= other.held(points.get(i), c.item);
                 }
@@ -965,6 +1113,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         return short_;
+    }
+
+    /** ストレージにある、need に合う物（物ごとの数）。 */
+    private static List<ItemCount> itemsAt(List<IItemHandler> stores, ItemCount need) {
+        List<ItemCount> out = new ArrayList<>();
+        for (IItemHandler h : stores) {
+            for (int s = 0; s < h.getSlots(); s++) {
+                ItemStack st = h.getStackInSlot(s);
+                if (!st.isEmpty() && need.matches(st)) {
+                    ItemCount.add(out, st, st.getCount());
+                }
+            }
+        }
+        return out;
     }
 
     /** 燃料 fuel の、ほかの注文が予約していない在庫がある受け渡し場所のうち、from に一番近い所（なければ null）。 */
@@ -1032,12 +1194,16 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return;
         }
         WorkOrder.StepState s = o.steps.get(b.step());
-        int per = Math.max(1, s.recipe.output().getCount());
+        int per = s.recipe.outputCount();
         long extra = (missingOutputs + per - 1) / per;
         s.total += extra;
         List<ItemCount> need = new ArrayList<>(o.pendingReserve);
         for (ItemCount in : s.recipe.inputs()) {
-            ItemCount.add(need, in.item, in.count * extra);
+            if (in.alt != null) {
+                ItemCount.addAlt(need, in.item, in.count * extra, in.alt);
+            } else {
+                ItemCount.add(need, in.item, in.count * extra);
+            }
         }
         o.pendingReserve.clear();
         o.pendingReserve.addAll(reserveItems(o, need));
@@ -1078,21 +1244,38 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 受け渡し場所で、そこにある物を持ち物へ取り出す（全部そろわなければ取らない）。 */
     public boolean fetchAt(RuinAndroid a, WorkJob job, Pickup pickup) {
         List<IItemHandler> stores = storagesAt(pickup.point(), new HashSet<>());
+        var fluids = fluidStoresAt(pickup.point(), new HashSet<>());
         for (ItemCount need : pickup.items()) {
-            long have = 0;
-            for (IItemHandler h : stores) {
-                for (int i = 0; i < h.getSlots(); i++) {
-                    if (need.matches(h.getStackInSlot(i))) {
-                        have += h.getStackInSlot(i).getCount();
-                    }
-                }
-            }
-            if (have < need.count) {
+            if (countAt(pickup.point(), need.item, stores) < need.count) {
                 return false;
+            }
+            if (FluidSamples.is(need.item) && a.tankSpace(FluidSamples.fluid(need.item)) < need.count) {
+                return false;                          // タンクに入りきらない
             }
         }
         WorkOrder o = order(job.orderId());
         for (ItemCount need : pickup.items()) {
+            if (FluidSamples.is(need.item)) {
+                // 流体: 入れ物から抜いて、タンクへ
+                var like = FluidSamples.fluid(need.item);
+                long left = need.count;
+                for (var h : fluids) {
+                    if (left <= 0) {
+                        break;
+                    }
+                    var got = h.drain(like.copyWithAmount((int) Math.min(left, Integer.MAX_VALUE)),
+                            net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                    int in = a.fillTanks(got, false);
+                    if (in < got.getAmount()) {
+                        h.fill(got.copyWithAmount(got.getAmount() - in), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                    }
+                    left -= in;
+                }
+                if (o != null) {
+                    o.release(pickup.point(), need.item, need.count - left);
+                }
+                continue;
+            }
             long left = need.count;
             for (IItemHandler h : stores) {
                 for (int i = 0; i < h.getSlots() && left > 0; i++) {
@@ -1141,6 +1324,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             a.inventory().setItem(slot, rest);
             all &= rest.isEmpty();
         }
+        // タンクの流体も、隣の入れ物へ戻す
+        for (var f : a.tankFluids()) {
+            int moved = 0;
+            for (var h : fluidStoresAt(point, new HashSet<>())) {
+                int in = h.fill(f.copyWithAmount(f.getAmount() - moved), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                moved += in;
+                if (moved >= f.getAmount()) {
+                    break;
+                }
+            }
+            if (moved > 0) {
+                a.drainTanks(f, moved, false);
+                if (o != null) {
+                    o.hold(point, FluidSamples.of(f.copyWithAmount(1)), moved);
+                }
+            }
+            all &= moved >= f.getAmount();
+        }
         if (!all && o != null) {
             o.status = WorkOrder.WAIT_SPACE;
         } else if (o != null && o.status == WorkOrder.WAIT_SPACE) {
@@ -1181,6 +1382,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         BlockPos at = destination(job);
         DeliveryPortBlockEntity port = deliveryPort(at);
         WorkOrder o = order(job.orderId());
+        if (FluidSamples.is(job.fetch().get(0).item)) {
+            return deliverFluid(a, job, at, o);
+        }
         IItemHandler box = o != null && o.toStock ? stockHandler(at) : port != null ? port.handler() : outboxHandler;
         boolean all = true;
         long moved = 0;
@@ -1196,6 +1400,27 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             a.inventory().setItem(slot, s.copyWithCount(s.getCount() - give + notIn));
             all &= notIn == 0;
         }
+        if (o != null) {
+            o.delivered += moved;
+            o.deliverInProgress = Math.max(0, o.deliverInProgress - moved);
+            o.status = all ? WorkOrder.RUNNING : WorkOrder.WAIT_SPACE;
+        }
+        return all;
+    }
+
+    /** 流体の完成品を、届け先の隣の入れ物へ入れる。全部入れば true。 */
+    private boolean deliverFluid(RuinAndroid a, WorkJob job, BlockPos at, @Nullable WorkOrder o) {
+        var like = FluidSamples.fluid(job.fetch().get(0).item);
+        int want = (int) Math.min(job.amount(), a.tankAmount(like));
+        int moved = 0;
+        for (var h : fluidStoresAt(at, new HashSet<>())) {
+            if (moved >= want) {
+                break;
+            }
+            moved += h.fill(like.copyWithAmount(want - moved), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+        }
+        a.drainTanks(like, moved, false);
+        boolean all = moved >= want;
         if (o != null) {
             o.delivered += moved;
             o.deliverInProgress = Math.max(0, o.deliverInProgress - moved);
@@ -1409,15 +1634,16 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 continue;
             }
             boolean found = false;
-            for (ItemStack m : merged) {
-                if (ItemStack.isSameItemSameComponents(m, s)) {
-                    m.setCount(Math.min(64, m.getCount() + s.getCount()));
+            for (int i = 0; i < merged.size(); i++) {
+                ItemStack m = merged.get(i);
+                if (ItemStack.isSameItemSameComponents(FluidSamples.key(m), FluidSamples.key(s))) {
+                    merged.set(i, FluidSamples.withAmount(m, (int) (FluidSamples.amount(m) + FluidSamples.amount(s))));
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                merged.add(s.copyWithCount(Math.min(64, s.getCount())));
+                merged.add(FluidSamples.is(s) ? s.copy() : s.copyWithCount(Math.min(64, s.getCount())));
             }
         }
         for (int i = 0; i < GRID; i++) {
@@ -1438,7 +1664,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return;
         }
         ItemStack s = encoder.getItem(index);
-        if (!s.isEmpty()) {
+        if (FluidSamples.is(s)) {
+            int amount = (int) FluidSamples.amount(s);
+            encoder.setItem(index, FluidSamples.withAmount(s, Math.max(1, Math.min(1_000_000, amount + delta * 100))));
+        } else if (!s.isEmpty()) {
             encoder.setItem(index, s.copyWithCount(Math.max(1, Math.min(64, s.getCount() + delta))));
         }
     }
@@ -1513,6 +1742,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
             RecipeData.processing(grid, result.copy(), extras, encoder.getItem(FUEL), faces).write(card, level.registryAccess());
+        } else if (variants) {
+            RecipeData.crafting(grid, result.copy(), alternatives(grid)).write(card, level.registryAccess());
         } else {
             new RecipeData(grid, result.copy()).write(card, level.registryAccess());
         }
@@ -1556,6 +1787,43 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 足せなければ、その理由。
      */
     @Nullable
+    /** 同じ種類の別の物も使うかを切り替える（作業台モード）。 */
+    public void toggleVariants() {
+        variants = !variants;
+        setChanged();
+    }
+
+    /**
+     * 見本の欄ごとの、使ってよい物（作業台のレシピの材料のうち、その欄の物が合い、ほかの物も合うもの）。合う材料がなければ空。
+     * 棒のレシピなら、板材の欄はどの木の板材でもよい、となる。
+     */
+    private List<String> alternatives(List<ItemStack> grid) {
+        List<String> out = new ArrayList<>();
+        List<net.minecraft.world.item.crafting.Ingredient> ings = List.of();
+        if (level instanceof ServerLevel server) {
+            net.minecraft.core.NonNullList<ItemStack> g = net.minecraft.core.NonNullList.withSize(GRID, ItemStack.EMPTY);
+            for (int i = 0; i < GRID; i++) {
+                g.set(i, grid.get(i).copyWithCount(1));
+            }
+            var input = net.minecraft.world.item.crafting.CraftingInput.of(3, 3, g);
+            ings = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
+                    .map(h -> (List<net.minecraft.world.item.crafting.Ingredient>) h.value().getIngredients()).orElse(List.of());
+        }
+        for (ItemStack s : grid) {
+            String alt = "";
+            if (!s.isEmpty()) {
+                for (var ing : ings) {
+                    if (!ing.isEmpty() && ing.test(s) && ing.getItems().length > 1) {
+                        alt = ItemCount.key(ing);
+                        break;
+                    }
+                }
+            }
+            out.add(alt);
+        }
+        return out;
+    }
+
     /** 加工モードの面を切り替える（which: 0 入れる面、1 取り出す面、2 燃料の面。燃料だけ「自動」もある）。 */
     public void cycleFace(int which, boolean back) {
         int shift = which * 3;
@@ -1755,6 +2023,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         tag.putInt("step_kind", stepKind);
         tag.putInt("step_option", stepOption);
         tag.putInt("faces", faces);
+        tag.putBoolean("variants", variants);
         ListTag ps = new ListTag();
         for (ProcedureStep s : procSteps) {
             ps.add(s.save(registries));
@@ -1801,6 +2070,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         stepKind = Math.floorMod(tag.getInt("step_kind"), ProcedureStep.KINDS);
         stepOption = tag.contains("step_option") ? tag.getInt("step_option") : ProcedureStep.defaultOption(stepKind);
         faces = tag.contains("faces") ? tag.getInt("faces") : RecipeData.DEFAULT_FACES;
+        variants = tag.getBoolean("variants");
         procSteps.clear();
         for (Tag t : tag.getList("proc_steps", Tag.TAG_COMPOUND)) {
             if (procSteps.size() < RecipeData.MAX_STEPS) {

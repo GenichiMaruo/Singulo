@@ -52,7 +52,10 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     public static final int SLOT_PERMIT = 0, SLOT_GRID = 1, SLOT_RESULT = 10, SLOT_CARD = 11, SLOT_STOCK = 12, SLOT_EXTRA = 13,
             SLOT_LOC_A = 15, SLOT_LOC_B = 16, SLOT_PITEM = 17, SLOT_FUEL = 18, SLOT_OUTBOX = 19, OWN = SLOT_OUTBOX + WorkConsoleBlockEntity.OUTBOX_SLOTS;
     public static final int BUTTON_ENCODE = 0, BUTTON_CLEAR = 1, BUTTON_CLEAR_CARD = 2, BUTTON_MODE = 3, BUTTON_KIND = 4, BUTTON_ADD = 5,
-            BUTTON_KIND_BACK = 6, BUTTON_REMOVE_STEP = 10, BUTTON_OPTION = 20, BUTTON_FACE = 30, BUTTON_FACE_BACK = 33, BUTTON_ADJUST = 100;
+            BUTTON_KIND_BACK = 6, BUTTON_REMOVE_STEP = 10, BUTTON_OPTION = 20, BUTTON_FACE = 30, BUTTON_FACE_BACK = 33, BUTTON_VARIANTS = 36,
+            BUTTON_ADJUST = 100;
+    /** 作業台モードの「同じ種類の別の物も使う」の切り替え（見本の下）。 */
+    public static final int VARIANTS_X = 30, VARIANTS_Y = 99, VARIANTS_W = 76, VARIANTS_H = 11;
     /** 加工モードの面のボタン（見本の下に3つ: 入れる面・取り出す面・燃料の面）。 */
     public static final int FACE_X = 30, FACE_Y = 99, FACE_W = 22, FACE_H = 11, FACE_GAP = 2;
     /** 手順の数の上限・レバーの扱いのボタン（種類のボタンの下）。BUTTON_OPTION から +1、-1、+10、-10。 */
@@ -207,7 +210,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     public static WorkConsoleMenu client(int id, Inventory inventory, RegistryFriendlyByteBuf buf) {
         return new WorkConsoleMenu(id, inventory, buf.readBlockPos(), new ItemStackHandler(1),
                 new SimpleContainer(WorkConsoleBlockEntity.ENCODER_SLOTS), new SimpleContainer(WorkConsoleBlockEntity.OUTBOX_SLOTS),
-                new net.minecraft.world.inventory.SimpleContainerData(4));
+                new net.minecraft.world.inventory.SimpleContainerData(5));
     }
 
     /** 記録のモード（{@link WorkConsoleBlockEntity#MODE_CRAFTING} など）。 */
@@ -223,6 +226,11 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     /** 手順モードで、次に足す手順の種類。 */
     public int stepKind() {
         return mode.get(1);
+    }
+
+    /** 作業台モードで、同じ種類の別の物も使うレシピとして記録するか。 */
+    public boolean variants() {
+        return mode.get(4) != 0;
     }
 
     /** 加工モードで記録する面（{@link RecipeData#faces}）。 */
@@ -284,7 +292,9 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             if ((grid || counted) && (type == ClickType.PICKUP || type == ClickType.QUICK_MOVE)) {
                 ItemStack carried = getCarried();
                 int count = counted && button == 0 ? carried.getCount() : 1;
-                encoder.setItem(encoderIndex(slotId), carried.isEmpty() ? ItemStack.EMPTY : carried.copyWithCount(count));
+                ItemStack fluid = counted ? FluidSamples.fromContainer(carried) : ItemStack.EMPTY;
+                encoder.setItem(encoderIndex(slotId), carried.isEmpty() ? ItemStack.EMPTY
+                        : FluidSamples.is(fluid) ? fluid : carried.copyWithCount(count));
                 if (!player.level().isClientSide && player.level().getBlockEntity(pos) instanceof WorkConsoleBlockEntity c) {
                     c.updateResult();
                 }
@@ -318,6 +328,10 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         }
         if (id == BUTTON_KIND || id == BUTTON_KIND_BACK) {
             c.cycleStepKind(id == BUTTON_KIND_BACK);
+            return true;
+        }
+        if (id == BUTTON_VARIANTS) {
+            c.toggleVariants();
             return true;
         }
         if (id >= BUTTON_FACE && id < BUTTON_FACE + 6) {

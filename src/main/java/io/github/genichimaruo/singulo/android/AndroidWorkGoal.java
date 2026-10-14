@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.android;
 
+import io.github.genichimaruo.singulo.android.work.FluidSamples;
 import io.github.genichimaruo.singulo.android.work.ItemCount;
 import io.github.genichimaruo.singulo.android.work.RecipeData;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity;
@@ -390,7 +391,9 @@ final class AndroidWorkGoal extends Goal {
                 r.inputFace());
         net.neoforged.neoforge.items.IItemHandler out = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at,
                 r.outputFace());
-        if (in == null || out == null) {
+        net.neoforged.neoforge.fluids.capability.IFluidHandler fin = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, at, r.inputFace());
+        net.neoforged.neoforge.fluids.capability.IFluidHandler fout = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, at, r.outputFace());
+        if (in == null && fin == null || out == null && fout == null) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
             return;
         }
@@ -399,13 +402,35 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         boolean progress = false;
-        while (inserted < step.crafts() && insertOnce(in, r)) {
+        while (inserted < step.crafts() && insertOnce(in, fin, r)) {
             inserted++;
             progress = true;
             android.spend(CRAFT_COST);
         }
-        long want = step.crafts() * Math.max(1, r.output().getCount());
-        for (int i = 0; i < out.getSlots(); i++) {
+        long want = step.crafts() * r.outputCount();
+        // 流体の出てくる物: 装置の流体の出口から、タンクへ（主な物は要る分だけ、ほかの物は全部）
+        if (fout != null) {
+            for (ItemStack o : r.outputs()) {
+                if (!FluidSamples.is(o)) {
+                    continue;
+                }
+                boolean main = o == r.output();
+                var like = FluidSamples.fluid(o);
+                int limit = (int) Math.min(main ? want - collected : Integer.MAX_VALUE, android.tankSpace(like));
+                if (limit <= 0) {
+                    continue;
+                }
+                var got = fout.drain(like.copyWithAmount(limit), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                if (!got.isEmpty()) {
+                    android.fillTanks(got, false);
+                    if (main) {
+                        collected += got.getAmount();
+                    }
+                    progress = true;
+                }
+            }
+        }
+        for (int i = 0; out != null && i < out.getSlots(); i++) {
             ItemStack s = out.getStackInSlot(i);
             if (s.isEmpty()) {
                 continue;
@@ -437,7 +462,7 @@ final class AndroidWorkGoal extends Goal {
             stalled = 0;
             android.playSound(SoundEvents.ITEM_PICKUP, 0.4F, 1.2F);
         } else if ((stalled += PROCESS_INTERVAL) >= SHORT_TICKS && inserted >= step.crafts() && collected < want
-                && !holdsAny(in, r.inputs())) {
+                && (in == null || !holdsAny(in, r.inputs())) && (fin == null || !holdsFluid(fin, r.inputs()))) {
             // 入れた素材を使い切ったのに、できた物が足りない（確率で出る物）: 足りない分の回数を足して、集まるまで作り直す
             endShort(c, job, want - collected);
             return;
@@ -551,10 +576,10 @@ final class AndroidWorkGoal extends Goal {
         }
         io.github.genichimaruo.singulo.android.work.ProcedureStep ps = r.steps().get(procIndex);
         ItemStack what = ps.item().isEmpty() ? r.output() : ps.item();
-        long want = Math.max(1, what.getCount()) * step.crafts();
+        long want = Math.max(1, FluidSamples.amount(what)) * step.crafts();
         if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK) {
             // 搾乳: 牛乳入りバケツを集める（数は物の欄、空ならできる物の数）
-            want = Math.max(1, ps.item().isEmpty() ? r.output().getCount() : ps.item().getCount()) * step.crafts();
+            want = Math.max(1, ps.item().isEmpty() ? r.outputCount() : ps.item().getCount()) * step.crafts();
             what = new ItemStack(net.minecraft.world.item.Items.MILK_BUCKET);
         } else if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED || ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE) {
             want = 1;                          // 1回通りやったら終わり（終わったら progress を 1 にする）
@@ -615,13 +640,34 @@ final class AndroidWorkGoal extends Goal {
         }
         craftTimer = 0;
         boolean insert = ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.INSERT;
-        net.neoforged.neoforge.items.IItemHandler h = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
-                ps.pos(), insert ? Direction.UP : Direction.DOWN);
-        if (h == null) {
-            fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
-            return;
+        long moved;
+        if (FluidSamples.is(what)) {
+            net.neoforged.neoforge.fluids.capability.IFluidHandler fh = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, ps.pos(), insert ? Direction.UP : Direction.DOWN);
+            if (fh == null) {
+                fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+                return;
+            }
+            var like = FluidSamples.fluid(what);
+            int limit = (int) Math.min(want - progress, Integer.MAX_VALUE);
+            if (insert) {
+                var f = android.drainTanks(like, limit, true);
+                int put = fh.fill(f, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                android.drainTanks(like, put, false);
+                moved = put;
+            } else {
+                var got = fh.drain(like.copyWithAmount(Math.min(limit, android.tankSpace(like))), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                android.fillTanks(got, false);
+                moved = got.getAmount();
+            }
+        } else {
+            net.neoforged.neoforge.items.IItemHandler h = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    ps.pos(), insert ? Direction.UP : Direction.DOWN);
+            if (h == null) {
+                fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+                return;
+            }
+            moved = insert ? insertFromCarry(h, what, want - progress) : extractToCarry(h, what, want - progress);
         }
-        long moved = insert ? insertFromCarry(h, what, want - progress) : extractToCarry(h, what, want - progress);
         progress += moved;
         if (moved > 0) {
             stalled = 0;
@@ -630,7 +676,7 @@ final class AndroidWorkGoal extends Goal {
             // 投入した素材はもう使われたのに、取り出す物が足りない（確率で出る物）: 足りない分の回数を足して、集まるまで繰り返す
             long per = Math.max(1, what.getCount());
             long missingRuns = (want - progress + per - 1) / per;
-            endShort(c, job, missingRuns * Math.max(1, r.output().getCount()));
+            endShort(c, job, missingRuns * r.outputCount());
         } else if (stalled >= STALL_TICKS) {
             fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
         }
@@ -1579,9 +1625,20 @@ final class AndroidWorkGoal extends Goal {
     }
 
     /** 1回分の素材を、全部入るときだけ入れる。 */
-    private boolean insertOnce(net.neoforged.neoforge.items.IItemHandler in, RecipeData r) {
+    private boolean insertOnce(@Nullable net.neoforged.neoforge.items.IItemHandler in, @Nullable net.neoforged.neoforge.fluids.capability.IFluidHandler fin, RecipeData r) {
         java.util.List<ItemCount> inputs = r.inputs();
         for (ItemCount need : inputs) {
+            if (FluidSamples.is(need.item)) {
+                // 流体: タンクにあって、装置の流体の入口に全部入るか
+                var f = FluidSamples.fluid(need.item).copyWithAmount((int) need.count);
+                if (fin == null || android.tankAmount(f) < need.count || fin.fill(f, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE) < need.count) {
+                    return false;
+                }
+                continue;
+            }
+            if (in == null) {
+                return false;
+            }
             int have = 0;
             for (int slot : android.carrySlots()) {
                 if (need.matches(android.inventory().getItem(slot))) {
@@ -1597,11 +1654,35 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         for (ItemCount need : inputs) {
+            if (FluidSamples.is(need.item)) {
+                var f = android.drainTanks(FluidSamples.fluid(need.item), (int) need.count, false);
+                int put = fin.fill(f, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                if (put < f.getAmount()) {
+                    android.fillTanks(f.copyWithAmount(f.getAmount() - put), false);     // 入りきらなかった分は戻す
+                }
+                continue;
+            }
             android.takeFromCarry(need.item, (int) need.count);
             ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(in, need.item.copyWithCount((int) need.count), false);
             drop(android.addToCarry(rest));
         }
         return true;
+    }
+
+    /** 装置（流体の入口）に、まだ入れた流体が残っているか（まだ加工している）。 */
+    private static boolean holdsFluid(net.neoforged.neoforge.fluids.capability.IFluidHandler h, java.util.List<ItemCount> inputs) {
+        for (ItemCount in : inputs) {
+            if (!FluidSamples.is(in.item)) {
+                continue;
+            }
+            var like = FluidSamples.fluid(in.item);
+            for (int t = 0; t < h.getTanks(); t++) {
+                if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(h.getFluidInTank(t), like)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void deliver(WorkConsoleBlockEntity c, WorkJob job) {
@@ -1795,6 +1876,9 @@ final class AndroidWorkGoal extends Goal {
         if (recipe == null) {
             return false;
         }
+        if (recipe.variants()) {
+            return craftVariants(level, recipe);
+        }
         NonNullList<ItemStack> grid = recipe.gridList();
         CraftingInput input = CraftingInput.of(3, 3, grid);
         java.util.Optional<RecipeHolder<CraftingRecipe>> match = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
@@ -1816,6 +1900,58 @@ final class AndroidWorkGoal extends Goal {
         NonNullList<ItemStack> remaining = match.get().value().getRemainingItems(input);
         for (ItemCount in : recipe.inputs()) {
             android.takeFromCarry(in.item, (int) in.count);
+        }
+        drop(android.addToCarry(result));
+        for (ItemStack r : remaining) {
+            if (!r.isEmpty()) {
+                drop(android.addToCarry(r));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 同じ種類の別の物も使うレシピを1回作る: 見本の欄ごとに、持ち物から合う物を1つずつ選んで並べ、作業台のレシピで作る。
+     * 選んだ物を減らし、できた物と残る物を持ち物に入れる。並べられない・レシピが合わないときは false（何も減らさない）。
+     */
+    private boolean craftVariants(ServerLevel level, RecipeData recipe) {
+        int[] carry = android.carrySlots();
+        int[] used = new int[carry.length];
+        int[] from = new int[9];
+        NonNullList<ItemStack> grid = NonNullList.withSize(9, ItemStack.EMPTY);
+        for (int i = 0; i < 9; i++) {
+            from[i] = -1;
+            ItemStack want = recipe.grid().get(i);
+            if (want.isEmpty()) {
+                continue;
+            }
+            net.minecraft.world.item.crafting.Ingredient alt = recipe.alt(i);
+            for (int j = 0; j < carry.length; j++) {
+                ItemStack s = android.inventory().getItem(carry[j]);
+                boolean ok = alt != null ? !s.isEmpty() && alt.test(s) : ItemStack.isSameItemSameComponents(s, want);
+                if (ok && s.getCount() - used[j] > 0) {
+                    used[j]++;
+                    from[i] = j;
+                    grid.set(i, s.copyWithCount(1));
+                    break;
+                }
+            }
+            if (from[i] < 0) {
+                return false;
+            }
+        }
+        CraftingInput input = CraftingInput.of(3, 3, grid);
+        java.util.Optional<RecipeHolder<CraftingRecipe>> match = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
+        if (match.isEmpty()) {
+            return false;
+        }
+        ItemStack result = match.get().value().assemble(input, level.registryAccess());
+        NonNullList<ItemStack> remaining = match.get().value().getRemainingItems(input);
+        for (int j = 0; j < carry.length; j++) {
+            if (used[j] > 0) {
+                ItemStack s = android.inventory().getItem(carry[j]);
+                android.inventory().setItem(carry[j], s.copyWithCount(s.getCount() - used[j]));
+            }
         }
         drop(android.addToCarry(result));
         for (ItemStack r : remaining) {

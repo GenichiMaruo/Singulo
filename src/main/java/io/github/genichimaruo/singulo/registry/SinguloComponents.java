@@ -44,6 +44,11 @@ public final class SinguloComponents {
     public static final Supplier<DataComponentType<Boolean>> CONE = REGISTER.registerComponentType("cone",
             b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
+    /** 流体の見本（作業の自動化で、液体・ガスを物のように扱う目印）の、流体の種類と量。 */
+    public static final Supplier<DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> FLUID_SAMPLE =
+            REGISTER.registerComponentType("fluid_sample", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
+                    .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
+
     /** ホロ投影機で選んでいる大きさ（選択肢の番号）。 */
     public static final Supplier<DataComponentType<Integer>> HOLO_SIZE = REGISTER.registerComponentType("holo_size",
             b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));

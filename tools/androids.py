@@ -595,6 +595,8 @@ def item_textures(ti, save):
     save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
+    save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
+    save(droplet_icon(Image), ti / 'fluid_sample.png')
     save(wear(mining_icon(Image), 23), ti / 'android_mining_upgrade.png')
     save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
     save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
@@ -911,6 +913,42 @@ def mining_icon(Image):
         px[x, y] = (150, 236, 255, 255)
     for (x, y) in ((6, 4), (7, 4), (8, 4), (9, 5), (10, 6)):
         px[x, y] = (210, 248, 255, 255)
+    return im
+
+
+def droplet_icon(Image):
+    """流体の見本: 白いしずく（流体の色に染めて使う）。左上に光、右下に影。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    # しずくの形（行ごとの左右の端）
+    rows = {2: (7, 8), 3: (7, 8), 4: (6, 9), 5: (6, 9), 6: (5, 10), 7: (4, 11), 8: (4, 11), 9: (3, 12), 10: (3, 12),
+            11: (3, 12), 12: (4, 11), 13: (5, 10), 14: (6, 9)}
+    for y, (x0, x1) in rows.items():
+        for x in range(x0, x1 + 1):
+            edge = x in (x0, x1) or y in (2, 14)
+            shade = 150 if edge else 255 - max(0, (x - 7) + (y - 9)) * 10
+            px[x, y] = (shade, shade, shade, 255)
+    for (x, y) in ((5, 9), (5, 10), (6, 8)):
+        px[x, y] = (255, 255, 255, 255)
+    return im
+
+
+def tank_icon(Image):
+    """タンクアップグレード: 基板の上に、ガラスの筒が2本（左は水色、右は黄緑の流体が入っている）。"""
+    im, px = upgrade_board(Image)
+    for x0, fluid in ((4, (90, 170, 240, 255)), (9, (170, 230, 110, 255))):
+        for y in range(3, 13):
+            for x in range(x0, x0 + 4):
+                edge = x in (x0, x0 + 3) or y in (3, 12)
+                if edge:
+                    px[x, y] = (200, 210, 222, 255)          # ガラスの縁
+                elif y >= 6:
+                    px[x, y] = fluid                          # 流体
+                else:
+                    px[x, y] = (226, 238, 246, 255)          # 空いている所
+        px[x0 + 1, 7] = (255, 255, 255, 255)                  # 光の反射
+        for x in range(x0 + 1, x0 + 3):
+            px[x, 2] = (120, 126, 136, 255)                   # ふた
     return im
 
 

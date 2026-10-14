@@ -243,6 +243,13 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         pose.popPose();
     }
 
+    /** 腰の横（スカートの左右の面）までの変形を pose に積む（タンクを描くため）。 */
+    void toHipSide(PoseStack pose, boolean left) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        hips.getChild(left ? "skirt_left" : "skirt_right").translateAndRotate(pose);
+    }
+
     /** 左手の先までの変形を pose に積む（ソーラーパネルを出すため）。 */
     void toLeftHand(PoseStack pose) {
         root.translateAndRotate(pose);

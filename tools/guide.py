@@ -600,6 +600,7 @@ CHAPTERS = [
          '・バックパックアップグレード: 持ち物（5スロット）に、バックパックの24スロットが加わる。中に物があるうちは外せない。\n'
          '・採掘アップグレード: 採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。\n'
          '・伐採アップグレード: 伐採の作業ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。\n'
+         '・タンクアップグレード: 液体・ガスを運べるタンクが2つ（各32,000 mB、1つに1種類）。腰にタンクが見える。中身が残っている間は外せない。\n'
          '・作業のオン／オフ: 作業（自動化）に割り当ててよいかを、アンドロイドごとに決める。',
          'Upgrades',
          '- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits '
@@ -609,6 +610,7 @@ CHAPTERS = [
          '- Backpack Upgrade: adds the backpack\'s 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n'
          '- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n'
          '- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n'
+         '- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything.\n'
          '- Work on/off: choose for each android whether it may be given work (automation).'),
         ('work', '作業の自動化',
          '自分のアンドロイドに、作業台のクラフトを任せられます。\n'
@@ -646,6 +648,9 @@ CHAPTERS = [
          '伐採アップグレードが要る）、繁殖（えさを与えて、決めた数まで増やす）、毛刈り・搾乳（空のバケツを持っていく）、'
          '処理（決めた数を超えた分）。名前付き・つながれた・飼われている動物と子どもには手を出さない。\n'
          '・操作: レバー（オン・オフ・切り替え）、ボタン、ドアなどを使う。仕掛けを動かす合図に。\n'
+         '・液体・ガス: 資材口や指令台の隣のタンクも素材置き場になる。加工モードや手順の見本の欄を、バケツなどの入れ物でクリックするか JEI の「+」で、'
+         '流体を置ける（ホイールで 100 mB ずつ、シフトで 1000 mB ずつ）。タンクアップグレードを積んだアンドロイドが、流体を装置へ運ぶ。'
+         '流体を作る注文は、素材置き場のタンクへ入れる。\n'
          '・燃料: 加工モードの燃料の欄に燃料を置いて記録すると、装置の燃料が切れたとき、その燃料を素材置き場から取ってきて入れる'
          '（置いた数ずつ。空なら取りに行かない）。\n'
          '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。'
@@ -667,6 +672,9 @@ CHAPTERS = [
          'saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull '
          '(anything above a set number). Named, leashed and tamed animals and babies are left alone.\n'
          '- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n'
+         '- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure '
+         'mode with a bucket or other fluid container, or use JEI\'s + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). '
+         'Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n'
          '- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the '
          'stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n'
          '- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until '

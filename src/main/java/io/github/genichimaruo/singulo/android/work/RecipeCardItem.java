@@ -44,10 +44,13 @@ public class RecipeCardItem extends Item {
             tooltip.add(Component.translatable("tooltip.singulo.recipe_card.empty").withStyle(ChatFormatting.GRAY));
             return;
         }
-        tooltip.add(Component.translatable("tooltip.singulo.recipe_card.output", data.output().getHoverName(), data.output().getCount())
+        tooltip.add(Component.translatable("tooltip.singulo.recipe_card.output", data.output().getHoverName(), data.outputCount())
                 .withStyle(ChatFormatting.AQUA));
         for (ItemStack e : data.extras()) {
             tooltip.add(Component.translatable("tooltip.singulo.recipe_card.extra", e.getHoverName(), e.getCount()).withStyle(ChatFormatting.DARK_AQUA));
+        }
+        if (data.variants()) {
+            tooltip.add(Component.translatable("tooltip.singulo.recipe_card.variants").withStyle(ChatFormatting.DARK_AQUA));
         }
         if (data.processing()) {
             tooltip.add(Component.translatable("tooltip.singulo.recipe_card.processing").withStyle(ChatFormatting.DARK_AQUA));

@@ -53,7 +53,7 @@ public final class WorkOrder {
 
     public WorkOrder(int id, ItemStack target, long count, @Nullable UUID orderer) {
         this.id = id;
-        this.target = target.copyWithCount(1);
+        this.target = FluidSamples.key(target);
         this.count = count;
         this.orderer = orderer;
     }

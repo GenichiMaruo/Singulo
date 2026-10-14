@@ -36,6 +36,21 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
         collect(level, worldPosition, seen, out);
     }
 
+    /** from の隣の、流体を入れておけるブロック（タンクなど。作業のブロックは除く）。 */
+    static void collectFluids(Level level, BlockPos from, Set<BlockPos> seen,
+                              List<net.neoforged.neoforge.fluids.capability.IFluidHandler> out) {
+        for (Direction d : Direction.values()) {
+            BlockPos p = from.relative(d);
+            if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
+                continue;
+            }
+            var h = level.getCapability(Capabilities.FluidHandler.BLOCK, p, d.getOpposite());
+            if (h != null && h.getTanks() > 0 && seen.add(p)) {
+                out.add(h);
+            }
+        }
+    }
+
     /** box の中身を、pos の隣のストレージへ移す（作業のブロックは除く）。1回で1スタックずつ。 */
     static void pushOut(Level level, BlockPos pos, net.minecraft.world.Container box) {
         List<IItemHandler> targets = new java.util.ArrayList<>();

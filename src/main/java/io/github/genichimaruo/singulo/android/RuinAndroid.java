@@ -180,6 +180,9 @@ public abstract class RuinAndroid extends Monster {
 
     /** 持っているバッテリーアップグレードの数（見た目と、充電の満タンのため）。 */
     private static final EntityDataAccessor<Integer> BATTERIES = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** タンクの見た目: 流体の番号（+1。0 は空）と入っている割合（0〜100）を、タンクごとに1つの数にまとめる。-1 はタンクなし。 */
+    private static final EntityDataAccessor<Integer> TANK_A = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> TANK_B = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     /** 作業（自動化）を割り当てられているか（持ち物を取り出せなくするため、クライアントでも見る）。 */
     private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
     /** 仕草（挨拶。{@link #GESTURE_WAVE} など。クライアントでも見える）。 */
@@ -206,9 +209,11 @@ public abstract class RuinAndroid extends Monster {
      */
     public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1, SLOT_BATTERY = 2, SLOT_BACKPACK = 3, SLOT_MINING = 4;
     public static final int CARRY_START = 5, CARRY_SLOTS = 5, PACK_START = 10, PACK_SLOTS = 24;
-    /** 伐採アップグレードの枠（あとから足したので、持ち物のうしろ）。 */
-    public static final int SLOT_FELLING = PACK_START + PACK_SLOTS;
-    public static final int INVENTORY_SIZE = SLOT_FELLING + 1;
+    /** 伐採アップグレード・タンクアップグレードの枠（あとから足したので、持ち物のうしろ）。 */
+    public static final int SLOT_FELLING = PACK_START + PACK_SLOTS, SLOT_TANK = SLOT_FELLING + 1;
+    public static final int INVENTORY_SIZE = SLOT_TANK + 1;
+    /** タンクアップグレードのタンクの数と、1つの容量（mB）。1つのタンクには1種類の流体。 */
+    public static final int TANKS = 2, TANK_CAPACITY = 32000;
     /** バッテリーアップグレードは2個まで。1個につき充電の満タンが半分（CHARGE_MAX / 2）ずつ増える。 */
     public static final int MAX_BATTERIES = 2;
     /** 自己修理キット1つで直す体力の割合と、続けて使えるまでの tick。 */
@@ -271,6 +276,7 @@ public abstract class RuinAndroid extends Monster {
                 net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
                 entityData.set(BATTERIES, isBatteryUpgrade(battery) ? Math.min(MAX_BATTERIES, battery.getCount()) : 0);
                 entityData.set(BACKPACK, isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)));
+                syncTanks();
                 if (charge() > maxCharge()) {
                     setCharge(maxCharge());
                 }
@@ -296,6 +302,154 @@ public abstract class RuinAndroid extends Monster {
 
     public static boolean isFellingUpgrade(net.minecraft.world.item.ItemStack stack) {
         return stack.getItem() instanceof AndroidFellingUpgradeItem;
+    }
+
+    public static boolean isTankUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return isItem(stack, "android_tank_upgrade");
+    }
+
+    // ------------------------------------------------------------------ タンク（流体）
+
+    /** タンクアップグレードのタンク（積んでいなければ使えない）。 */
+    private final net.neoforged.neoforge.fluids.capability.templates.FluidTank[] tanks = {
+            new net.neoforged.neoforge.fluids.capability.templates.FluidTank(TANK_CAPACITY),
+            new net.neoforged.neoforge.fluids.capability.templates.FluidTank(TANK_CAPACITY)};
+
+    /** タンクアップグレードを積んでいるか。 */
+    public boolean hasTank() {
+        return isTankUpgrade(inventory.getItem(SLOT_TANK));
+    }
+
+    /** タンクが空か（タンクアップグレードを外せるか）。 */
+    public boolean tanksEmpty() {
+        for (var t : tanks) {
+            if (!t.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** タンクの中身。 */
+    public java.util.List<net.neoforged.neoforge.fluids.FluidStack> tankFluids() {
+        java.util.List<net.neoforged.neoforge.fluids.FluidStack> out = new java.util.ArrayList<>();
+        for (var t : tanks) {
+            if (!t.isEmpty()) {
+                out.add(t.getFluid().copy());
+            }
+        }
+        return out;
+    }
+
+    /** この流体が、タンクにいくつあるか（mB）。 */
+    public int tankAmount(net.neoforged.neoforge.fluids.FluidStack like) {
+        int n = 0;
+        for (var t : tanks) {
+            if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(t.getFluid(), like)) {
+                n += t.getFluidAmount();
+            }
+        }
+        return n;
+    }
+
+    /** あと、この流体をどれだけ入れられるか（同じ流体のタンクの空きと、空のタンク）。 */
+    public int tankSpace(net.neoforged.neoforge.fluids.FluidStack like) {
+        if (!hasTank()) {
+            return 0;
+        }
+        int n = 0;
+        for (var t : tanks) {
+            if (t.isEmpty() || net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(t.getFluid(), like)) {
+                n += t.getSpace();
+            }
+        }
+        return n;
+    }
+
+    /** タンクに入れる（同じ流体のタンクから、そのあと空のタンク）。入った量。 */
+    public int fillTanks(net.neoforged.neoforge.fluids.FluidStack fluid, boolean simulate) {
+        if (!hasTank() || fluid.isEmpty()) {
+            return 0;
+        }
+        var action = simulate ? net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
+                : net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        int left = fluid.getAmount();
+        int[] planned = new int[TANKS];
+        for (int pass = 0; pass < 2 && left > 0; pass++) {
+            for (int i = 0; i < TANKS && left > 0; i++) {
+                var t = tanks[i];
+                boolean same = net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(t.getFluid(), fluid);
+                boolean empty = t.isEmpty() && planned[i] == 0;
+                if (pass == 0 ? !same : !empty) {
+                    continue;
+                }
+                int room = t.getCapacity() - t.getFluidAmount() - planned[i];
+                int put = Math.min(room, left);
+                if (put <= 0) {
+                    continue;
+                }
+                if (simulate) {
+                    planned[i] += put;
+                } else {
+                    t.fill(fluid.copyWithAmount(put), action);
+                }
+                left -= put;
+            }
+        }
+        if (!simulate) {
+            syncTanks();
+        }
+        return fluid.getAmount() - left;
+    }
+
+    /** タンクから出す（この流体を最大 amount）。出した流体。 */
+    public net.neoforged.neoforge.fluids.FluidStack drainTanks(net.neoforged.neoforge.fluids.FluidStack like, int amount, boolean simulate) {
+        var action = simulate ? net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
+                : net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        int got = 0;
+        for (var t : tanks) {
+            if (got >= amount || !net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(t.getFluid(), like)) {
+                continue;
+            }
+            got += t.drain(amount - got, action).getAmount();
+        }
+        if (!simulate && got > 0) {
+            syncTanks();
+        }
+        return got <= 0 ? net.neoforged.neoforge.fluids.FluidStack.EMPTY : like.copyWithAmount(got);
+    }
+
+    /** タンクの見た目を、クライアントへ知らせる。 */
+    private void syncTanks() {
+        if (level().isClientSide) {
+            return;
+        }
+        boolean on = hasTank();
+        for (int i = 0; i < TANKS; i++) {
+            int v = -1;
+            if (on) {
+                var f = tanks[i].getFluid();
+                v = f.isEmpty() ? 0 : (net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(f.getFluid()) + 1) << 8
+                        | Math.max(1, f.getAmount() * 100 / TANK_CAPACITY);
+            }
+            entityData.set(i == 0 ? TANK_A : TANK_B, v);
+        }
+    }
+
+    /** タンク i の入っている割合（クライアント。0〜1、タンクアップグレードがなければ -1）。 */
+    public float tankFill(int i) {
+        int v = entityData.get(i == 0 ? TANK_A : TANK_B);
+        return v < 0 ? -1 : (v & 0xFF) / 100F;
+    }
+
+    /** タンク i の流体（クライアント。空なら null）。 */
+    @Nullable
+    public net.minecraft.world.level.material.Fluid tankFluid(int i) {
+        int v = entityData.get(i == 0 ? TANK_A : TANK_B);
+        if (v <= 0 || (v >> 8) == 0) {
+            return null;
+        }
+        return net.minecraft.core.registries.BuiltInRegistries.FLUID.byId((v >> 8) - 1);
     }
 
     /** 伐採アップグレードを積んでいるか。 */
@@ -447,7 +601,7 @@ public abstract class RuinAndroid extends Monster {
                 return false;
             }
         }
-        return true;
+        return tanksEmpty();
     }
 
     /** 持ち物に入れる（同じ物に重ねてから、空きへ）。入りきらなかった分を返す。 */
@@ -670,6 +824,8 @@ public abstract class RuinAndroid extends Monster {
         builder.define(GUARD, false);
         builder.define(ALERT, false);
         builder.define(BATTERIES, 0);
+        builder.define(TANK_A, -1);
+        builder.define(TANK_B, -1);
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
@@ -1272,6 +1428,11 @@ public abstract class RuinAndroid extends Monster {
             items.set(i, inventory.getItem(i));
         }
         tag.put("items", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), items, registryAccess()));
+        net.minecraft.nbt.ListTag tl = new net.minecraft.nbt.ListTag();
+        for (var t : tanks) {
+            tl.add(t.writeToNBT(registryAccess(), new CompoundTag()));
+        }
+        tag.put("tanks", tl);
         tag.putBoolean("work", workEnabled);
         if (workConsole != null) {
             tag.put("work_console", NbtUtils.writeBlockPos(workConsole));
@@ -1313,6 +1474,14 @@ public abstract class RuinAndroid extends Monster {
         dismantling = tag.getBoolean("dismantling");
         entityData.set(GUARD, guard);
         loadInventory(tag);
+        net.minecraft.nbt.ListTag tl = tag.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        for (int i = 0; i < TANKS; i++) {
+            tanks[i].setFluid(net.neoforged.neoforge.fluids.FluidStack.EMPTY);
+            if (i < tl.size()) {
+                tanks[i].readFromNBT(registryAccess(), tl.getCompound(i));
+            }
+        }
+        syncTanks();
         workEnabled = !tag.contains("work") || tag.getBoolean("work");
         NbtUtils.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
             assignWork(p, tag.getInt("work_order"));

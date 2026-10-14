@@ -25,19 +25,50 @@ import net.minecraft.world.item.component.CustomData;
  * 手順カードも同じ記録を使う（{@link ProcedureCardItem}）。
  */
 public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras, List<ProcedureStep> steps, ItemStack fuel,
-                         int faces) {
+                         int faces, List<String> alts) {
     public static final String MODE_CRAFTING = "crafting", MODE_PROCESSING = "processing", MODE_PROCEDURE = "procedure";
     public static final int MAX_STEPS = 8;
     private static final String KEY = "android_recipe";
 
     /** 作業台モードのレシピ。 */
     public RecipeData(List<ItemStack> grid, ItemStack output) {
-        this(MODE_CRAFTING, grid, output, List.of(), List.of(), ItemStack.EMPTY, DEFAULT_FACES);
+        this(MODE_CRAFTING, grid, output, List.of(), List.of(), ItemStack.EMPTY, DEFAULT_FACES, List.of());
     }
 
     public RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras) {
-        this(mode, grid, output, extras, List.of(), ItemStack.EMPTY, DEFAULT_FACES);
+        this(mode, grid, output, extras, List.of(), ItemStack.EMPTY, DEFAULT_FACES, List.of());
     }
+
+    /**
+     * 作業台モードのレシピで、同じ種類の別の物も使うもの（alts: 見本の欄ごとの、使ってよい物の材料。空なら、その欄は見本と同じ物だけ）。
+     * いろいろな木の板材から棒を作る、など。
+     */
+    public static RecipeData crafting(List<ItemStack> grid, ItemStack output, List<String> alts) {
+        return new RecipeData(MODE_CRAFTING, grid, output, List.of(), List.of(), ItemStack.EMPTY, DEFAULT_FACES, List.copyOf(alts));
+    }
+
+    /** 同じ種類の別の物も使うか。 */
+    public boolean variants() {
+        for (String a : alts) {
+            if (!a.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 見本の欄 i で使ってよい物（同じ種類の別の物も使わないなら null）。 */
+    @Nullable
+    public net.minecraft.world.item.crafting.Ingredient alt(int i) {
+        if (i >= alts.size() || alts.get(i).isEmpty()) {
+            return null;
+        }
+        return ALT_CACHE.computeIfAbsent(alts.get(i), k -> java.util.Optional.ofNullable(ItemCount.parse(k))).orElse(null);
+    }
+
+    /** 材料の文字を読んだもの（何度も読まないように）。 */
+    private static final java.util.Map<String, java.util.Optional<net.minecraft.world.item.crafting.Ingredient>> ALT_CACHE =
+            new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * 加工モードで、装置のどの面から入れ・取り出し・燃料を入れるか（Direction の番号を3ビットずつ: 入れる面、取り出す面、燃料の面）。
@@ -76,7 +107,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
     }
 
     public static RecipeData processing(List<ItemStack> grid, ItemStack output, List<ItemStack> extras, ItemStack fuel, int faces) {
-        return new RecipeData(MODE_PROCESSING, grid, output, extras, List.of(), fuel.copy(), faces);
+        return new RecipeData(MODE_PROCESSING, grid, output, extras, List.of(), fuel.copy(), faces, List.of());
     }
 
     /** 手順カードの記録。 */
@@ -85,7 +116,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         for (int i = 0; i < 9; i++) {
             grid.add(ItemStack.EMPTY);
         }
-        return new RecipeData(MODE_PROCEDURE, grid, output, List.of(), List.copyOf(steps), ItemStack.EMPTY, DEFAULT_FACES);
+        return new RecipeData(MODE_PROCEDURE, grid, output, List.of(), List.copyOf(steps), ItemStack.EMPTY, DEFAULT_FACES, List.of());
     }
 
     public boolean processing() {
@@ -113,6 +144,16 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             }
         }
         return false;
+    }
+
+    /** 1回でできる数（流体の見本なら mB）。 */
+    public int outputCount() {
+        return (int) Math.max(1, Math.min(Integer.MAX_VALUE, FluidSamples.amount(output)));
+    }
+
+    /** できる物の目印（数え方。流体の見本は量 1）。 */
+    public ItemStack outputKey() {
+        return FluidSamples.key(output);
     }
 
     /** 出てくる物（主な物と、ほかの物）。 */
@@ -173,6 +214,13 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             r.put("fuel", fuel.save(registries));
         }
         r.putInt("faces", faces);
+        if (variants()) {
+            ListTag al = new ListTag();
+            for (String a : alts) {
+                al.add(net.minecraft.nbt.StringTag.valueOf(a));
+            }
+            r.put("alts", al);
+        }
         return r;
     }
 
@@ -201,7 +249,11 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         String mode = r.contains("mode") ? r.getString("mode") : MODE_CRAFTING;
         ItemStack fuel = r.contains("fuel") ? ItemStack.parseOptional(registries, r.getCompound("fuel")) : ItemStack.EMPTY;
         int faces = r.contains("faces") ? r.getInt("faces") : DEFAULT_FACES;
-        return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps, fuel, faces);
+        List<String> alts = new ArrayList<>();
+        for (Tag t : r.getList("alts", Tag.TAG_STRING)) {
+            alts.add(t.getAsString());
+        }
+        return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps, fuel, faces, alts);
     }
 
     /** 記録を消す（新しいカードと同じに戻すので、未記録のカードとまた重なる）。 */
@@ -221,18 +273,25 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             // 手順カード: 投入する物
             for (ProcedureStep s : steps) {
                 if ((s.kind() == ProcedureStep.INSERT || s.kind() == ProcedureStep.BREED) && !s.item().isEmpty()) {
-                    ItemCount.add(out, s.item(), s.item().getCount());          // 入れる物、繁殖のえさ
+                    ItemCount.add(out, FluidSamples.key(s.item()), FluidSamples.amount(s.item()));     // 入れる物（流体も）、繁殖のえさ
                 } else if (s.kind() == ProcedureStep.MILK) {
                     // 搾乳: 取る牛乳の数だけ、空のバケツを持っていく
-                    int n = s.item().isEmpty() ? Math.max(1, output.getCount()) : s.item().getCount();
+                    int n = s.item().isEmpty() ? outputCount() : s.item().getCount();
                     ItemCount.add(out, new ItemStack(net.minecraft.world.item.Items.BUCKET), n);
                 }
             }
             return out;
         }
-        for (ItemStack s : grid) {
-            if (!s.isEmpty()) {
-                ItemCount.add(out, s, processing() ? s.getCount() : 1);
+        for (int i = 0; i < grid.size(); i++) {
+            ItemStack s = grid.get(i);
+            if (s.isEmpty()) {
+                continue;
+            }
+            net.minecraft.world.item.crafting.Ingredient alt = processing() ? null : alt(i);
+            if (alt != null) {
+                ItemCount.addAlt(out, s, 1, alt);          // 同じ種類の別の物も使う
+            } else {
+                ItemCount.add(out, FluidSamples.key(s), processing() ? FluidSamples.amount(s) : 1);
             }
         }
         return out;

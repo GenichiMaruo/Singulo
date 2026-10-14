@@ -28,6 +28,7 @@ public final class SinguloClient {
     public SinguloClient(IEventBus modBus) {
         modBus.addListener(SinguloClient::registerScreens);
         modBus.addListener(SinguloClient::registerDecorations);
+        modBus.addListener(SinguloClient::registerItemColors);
         modBus.addListener(SinguloClient::registerExtensions);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
@@ -189,10 +190,22 @@ public final class SinguloClient {
     }
 
     /** 作業位置カードとレシピカードは、シフトを押している間、中身の絵を重ねて見せる。 */
+    /** 流体の見本は、流体の色に染める。 */
+    private static void registerItemColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Item event) {
+        event.register((stack, layer) -> {
+            var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(stack);
+            if (f.isEmpty()) {
+                return 0xFFFFFFFF;
+            }
+            return 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get());
+    }
+
     private static void registerDecorations(net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent event) {
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), WorkCardDecorator.LOCATION);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.PROCEDURE_CARD.get(), WorkCardDecorator.RECIPE);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get(), FluidSampleDecorator.INSTANCE);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */

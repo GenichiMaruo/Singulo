@@ -114,11 +114,12 @@ public class SinguloJeiPlugin implements IModPlugin {
         }
     }
 
-    /** 隠しボスの報酬（残光の翼）は、JEI の一覧に出さない。 */
+    /** 隠しボスの報酬（残光の翼）と、作業の内部の目印（流体の見本）は、JEI の一覧に出さない。 */
     @Override
     public void onRuntimeAvailable(mezz.jei.api.runtime.IJeiRuntime runtime) {
         runtime.getIngredientManager().removeIngredientsAtRuntime(mezz.jei.api.constants.VanillaTypes.ITEM_STACK,
-                java.util.List.of(new net.minecraft.world.item.ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.AFTERGLOW_WINGS.get())));
+                java.util.List.of(new net.minecraft.world.item.ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.AFTERGLOW_WINGS.get()),
+                        new net.minecraft.world.item.ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get())));
     }
 
     @Override

@@ -73,6 +73,9 @@ public final class SinguloItems {
             "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
             "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
+    /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
+            "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ProcedureCardItem> PROCEDURE_CARD = ITEMS.register(
             "procedure_card", () -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",

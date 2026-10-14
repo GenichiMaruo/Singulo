@@ -30,6 +30,8 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private static final int PAGE_X = 6, PAGE_Y = NAME_Y + 1, PAGE_S = 12;
     /** バックパックの欄の左端（スロットの1マス手前）。 */
     private static final int PACK_X_FRAME = AndroidMenu.PACK_X - 4;
+    /** タンクの目盛り（装備のページ、バックパックの下に2本）。 */
+    private static final int TANK_Y = 111, TANK_W = 56, TANK_H = 8, TANK_GAP = 4;
 
     private static final int PAPER = 0xFFE9ECF1;
     private static final int BORDER = 0xFF5C6475;
@@ -180,6 +182,17 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             if (Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W, AndroidMenu.WORK_H)) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.work.hint"), 180), mouseX, mouseY);
             }
+            RuinAndroid android = menu.android();
+            for (int i = 0; android != null && android.tankFill(0) >= 0 && i < RuinAndroid.TANKS; i++) {
+                if (Panel.inside(mouseX, mouseY, leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP), topPos + TANK_Y, TANK_W, TANK_H)) {
+                    net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                    int amount = Math.round(android.tankFill(i) * RuinAndroid.TANK_CAPACITY);
+                    g.renderTooltip(font, fluid == null ? Component.translatable("gui.singulo.android.tank.empty", i + 1)
+                            : Component.translatable("gui.singulo.android.tank", i + 1,
+                                    new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName(), amount, RuinAndroid.TANK_CAPACITY),
+                            mouseX, mouseY);
+                }
+            }
             return;
         }
         if (Panel.inside(mouseX, mouseY, leftPos + DISMANTLE_X, topPos + DISMANTLE_Y, 12, 12)) {
@@ -303,11 +316,30 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         roundRect(g, x + PACK_X_FRAME, y + 22, 116, 86, mix(accent, PAPER, 0.92F));
         roundRect(g, x + AndroidMenu.CARRY_X - 4, y + 22, 24, 104, mix(accent, PAPER, 0.88F));
         slots(g, x, y, accent, 2, 3);
-        slots(g, x, y, accent, RuinAndroid.SLOT_FELLING, 1);
+        slots(g, x, y, accent, RuinAndroid.SLOT_FELLING, 2);
         if (!menu.hasBackpack()) {
             // バックパックがないときは、中のスロットを覆う
             g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
                     y + AndroidMenu.PACK_Y + 4 * 18 - 1, 0xC8E9ECF1);
+        }
+        // タンクアップグレード: タンクの中身（流体の色で、入っている割合まで）
+        RuinAndroid android = menu.android();
+        if (android != null && android.tankFill(0) >= 0) {
+            for (int i = 0; i < RuinAndroid.TANKS; i++) {
+                int tx = x + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                g.fill(tx - 1, y + TANK_Y - 1, tx + TANK_W + 1, y + TANK_Y + TANK_H + 1, BORDER);
+                g.fill(tx, y + TANK_Y, tx + TANK_W, y + TANK_Y + TANK_H, 0xFF2A3040);
+                net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                float fill = android.tankFill(i);
+                if (fluid != null && fill > 0) {
+                    int color = 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid)
+                            .getTintColor(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000));
+                    g.fill(tx, y + TANK_Y, tx + Math.max(1, Math.round(TANK_W * Math.min(1, fill))), y + TANK_Y + TANK_H, color);
+                }
+                for (int m = 1; m < 4; m++) {
+                    g.fill(tx + TANK_W * m / 4, y + TANK_Y, tx + TANK_W * m / 4 + 1, y + TANK_Y + 2, 0x80FFFFFF);      // 目盛り
+                }
+            }
         }
         // 作業のオン／オフ
         boolean on = menu.value(AndroidMenu.D_WORK) != 0;
@@ -340,7 +372,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, INK, false);
         if (gearPage()) {
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.battery"), 6, AndroidMenu.BATTERY_Y - 9, 48, INK);
-            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.backpack"), 6, AndroidMenu.BACKPACK_Y - 9, 48,
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.storage"), 6, AndroidMenu.BACKPACK_Y - 9, 48,
                     INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.tools"), 6, AndroidMenu.MINING_Y - 9, 48, INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack"), PACK_X_FRAME, 24, 116, INK);

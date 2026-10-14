@@ -42,6 +42,16 @@ final class WorkConsoleTransferHandler implements IUniversalRecipeTransferHandle
         return Optional.of(SinguloMenus.ANDROID_WORK_CONSOLE.get());
     }
 
+    /** 欄の物（流体なら、流体の見本）。 */
+    private static Optional<ItemStack> sample(IRecipeSlotView view) {
+        Optional<ItemStack> item = view.getDisplayedItemStack();
+        if (item.isPresent()) {
+            return item;
+        }
+        return view.getDisplayedIngredient(mezz.jei.api.neoforge.NeoForgeTypes.FLUID_STACK)
+                .map(io.github.genichimaruo.singulo.android.work.FluidSamples::of).filter(s -> !s.isEmpty());
+    }
+
     @Nullable
     @Override
     public IRecipeTransferError transferRecipe(WorkConsoleMenu menu, Object recipe, IRecipeSlotsView slots, Player player,
@@ -50,10 +60,10 @@ final class WorkConsoleTransferHandler implements IUniversalRecipeTransferHandle
         if (!crafting) {
             List<ItemStack> inputs = new ArrayList<>(), outputs = new ArrayList<>();
             for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.INPUT)) {
-                view.getDisplayedItemStack().ifPresent(inputs::add);
+                sample(view).ifPresent(inputs::add);
             }
             for (IRecipeSlotView view : slots.getSlotViews(RecipeIngredientRole.OUTPUT)) {
-                view.getDisplayedItemStack().ifPresent(outputs::add);
+                sample(view).ifPresent(outputs::add);
             }
             if (inputs.isEmpty() || outputs.isEmpty()) {
                 return helper.createInternalError();   // 物のないレシピ（液体だけなど）は扱えない: ボタンを出さない

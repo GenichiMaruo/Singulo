@@ -570,6 +570,37 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 同じ種類の別の物も使うレシピ: 見本は樫の板材でも、素材置き場の白樺の板材から棒を作る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidCraftsWithVariants(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.BIRCH_PLANKS, 2));
+        // 棒のレシピを、同じ種類も使うものに置き換える（板材の欄は、どの木の板材でもよい）
+        java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        sticks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+        sticks.set(3, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+        String planks = io.github.genichimaruo.singulo.android.work.ItemCount.key(
+                net.minecraft.world.item.crafting.Ingredient.of(net.minecraft.tags.ItemTags.PLANKS));
+        java.util.List<String> alts = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ""));
+        alts.set(0, planks);
+        alts.set(3, planks);
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.crafting(sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4), alts)
+                .write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(2, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "白樺の板材で棒を注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+            a.discard();
+        });
+    }
+
     /** 加工モードの燃料: かまどの燃料が切れていれば、素材置き場から記録した燃料（石炭）を取ってきて入れる。 */
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void androidFetchesFuel(GameTestHelper helper) {

@@ -28,7 +28,7 @@ public class ProcedureCardItem extends RecipeCardItem {
             tooltip.add(Component.translatable("tooltip.singulo.procedure_card.empty").withStyle(ChatFormatting.GRAY));
             return;
         }
-        tooltip.add(Component.translatable("tooltip.singulo.recipe_card.output", data.output().getHoverName(), data.output().getCount())
+        tooltip.add(Component.translatable("tooltip.singulo.recipe_card.output", data.output().getHoverName(), data.outputCount())
                 .withStyle(ChatFormatting.AQUA));
         int n = 1;
         for (ProcedureStep s : data.steps()) {

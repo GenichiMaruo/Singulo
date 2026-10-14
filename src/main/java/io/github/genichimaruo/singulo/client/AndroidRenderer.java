@@ -60,6 +60,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Saber(this));
         addLayer(new Solar(this));
         addLayer(new Pickaxe(this));
+        addLayer(new Tanks(this));
         addLayer(new ArmorGlint(this));
     }
 
@@ -580,6 +581,46 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                         (int) (120 * pulse));
             }
             pose.popPose();
+        }
+    }
+
+    /**
+     * タンクアップグレード: 腰の左右に、ガラスの筒を1本ずつ。中の流体の色で、入っている高さまで満たす。上下に金属のふた。
+     */
+    final class Tanks extends RenderLayer<RuinAndroid, AndroidModel> {
+        Tanks(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (android.tankFill(0) < 0 || !android.printed()) {
+                return;
+            }
+            for (int i = 0; i < RuinAndroid.TANKS; i++) {
+                boolean left = i == 0;
+                pose.pushPose();
+                getParentModel().toHipSide(pose, left);
+                float s = left ? 1 : -1;
+                // 筒の大きさ（ピクセル）: 外側へ出して、太さ 1.8、高さ 3.6
+                float x0 = s * 0.55F / 16, x1 = s * 2.35F / 16, y0 = 0.6F / 16, y1 = 4.2F / 16, z0 = -0.9F / 16, z1 = 0.9F / 16;
+                float lo = Math.min(x0, x1), hi = Math.max(x0, x1);
+                VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                FxDraw.box(pose, metal, lo, y0 - 0.35F / 16, z0, hi, y0, z1, light, 0x8C94A2, 255);
+                FxDraw.box(pose, metal, lo, y1, z0, hi, y1 + 0.35F / 16, z1, light, 0x8C94A2, 255);
+                VertexConsumer glass = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
+                float fill = android.tankFill(i);
+                net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                if (fluid != null && fill > 0) {
+                    int color = net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid)
+                            .getTintColor(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000)) & 0xFFFFFF;
+                    float top = y0 + (y1 - y0) * Math.min(1, fill);
+                    FxDraw.box(pose, glass, lo + 0.15F / 16, y0, z0 + 0.15F / 16, hi - 0.15F / 16, top, z1 - 0.15F / 16, light, color, 220);
+                }
+                FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
+                pose.popPose();
+            }
         }
     }
 

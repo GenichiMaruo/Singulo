@@ -32,7 +32,7 @@ public final class WorkPlanner {
         public boolean loop;
 
         Plan(ItemStack target, long count) {
-            this.target = target.copyWithCount(1);
+            this.target = FluidSamples.key(target);
             this.count = count;
         }
 
@@ -58,20 +58,30 @@ public final class WorkPlanner {
      */
     public static Plan plan(ItemStack target, long count, List<RecipeRackBlockEntity.Entry> recipes, List<ItemCount> stock) {
         Plan plan = new Plan(target, count);
-        need(plan, target, count, recipes, stock, new ArrayList<>());
+        need(plan, target, count, null, recipes, stock, new ArrayList<>());
         return plan;
     }
 
-    private static void need(Plan plan, ItemStack item, long amount, List<RecipeRackBlockEntity.Entry> recipes, List<ItemCount> stock,
-                             List<ItemStack> path) {
-        // 在庫から使う
-        for (ItemCount c : stock) {
-            if (c.matches(item) && c.count > 0) {
+    /** item を amount 個そろえる。alt があれば、在庫の同じ種類の別の物も使う（使った物そのものを予約する）。 */
+    private static void need(Plan plan, ItemStack item, long amount, @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt,
+                             List<RecipeRackBlockEntity.Entry> recipes, List<ItemCount> stock, List<ItemStack> path) {
+        // 在庫から使う（同じ物を先に。同じ種類の別の物も使うなら、そのあと別の物も）
+        for (int pass = 0; pass < (alt == null ? 1 : 2) && amount > 0; pass++) {
+            for (ItemCount c : stock) {
+                if (c.count <= 0 || c.alt != null) {
+                    continue;
+                }
+                boolean ok = pass == 0 ? c.matches(item) : alt.test(c.item) && !c.matches(item);
+                if (!ok) {
+                    continue;
+                }
                 long take = Math.min(c.count, amount);
                 c.count -= take;
                 amount -= take;
-                ItemCount.add(plan.fromStock, item, take);
-                break;
+                ItemCount.add(plan.fromStock, c.item, take);
+                if (amount <= 0) {
+                    break;
+                }
             }
         }
         if (amount <= 0) {
@@ -79,7 +89,7 @@ public final class WorkPlanner {
         }
         RecipeRackBlockEntity.Entry recipe = null;
         for (RecipeRackBlockEntity.Entry e : recipes) {
-            if (ItemStack.isSameItemSameComponents(e.recipe().output(), item)) {
+            if (ItemStack.isSameItemSameComponents(e.recipe().outputKey(), FluidSamples.key(item))) {
                 recipe = e;
                 break;
             }
@@ -93,11 +103,11 @@ public final class WorkPlanner {
             ItemCount.add(plan.missing, item, amount);
             return;
         }
-        int per = Math.max(1, recipe.recipe().output().getCount());
+        int per = recipe.recipe().outputCount();
         long crafts = (amount + per - 1) / per;
         path.add(item);
         for (ItemCount in : recipe.recipe().inputs()) {
-            need(plan, in.item, in.count * crafts, recipes, stock, path);
+            need(plan, in.item, in.count * crafts, in.alt, recipes, stock, path);
         }
         path.remove(path.size() - 1);
         plan.steps.add(new Step(recipe, crafts, amount));

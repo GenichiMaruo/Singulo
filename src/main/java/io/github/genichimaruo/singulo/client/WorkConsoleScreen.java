@@ -336,6 +336,11 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkConsoleMenu.BUTTON_MODE);
                 return true;
             }
+            if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_CRAFTING && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.VARIANTS_X,
+                    y + WorkConsoleMenu.VARIANTS_Y, WorkConsoleMenu.VARIANTS_W, WorkConsoleMenu.VARIANTS_H)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkConsoleMenu.BUTTON_VARIANTS);
+                return true;
+            }
             int face = hoveredFace(mouseX, mouseY);
             if (face >= 0) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
@@ -442,7 +447,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     /** 選べるアンドロイドか（作業中でなく、採掘の工程があれば採掘アップグレードを積んでいる）。 */
     private boolean selectable(CompoundTag a) {
         return !a.getBoolean("busy") && (plan == null || !plan.getBoolean("mining") || a.getBoolean("miner"))
-                && (plan == null || !plan.getBoolean("felling") || a.getBoolean("feller"));
+                && (plan == null || !plan.getBoolean("felling") || a.getBoolean("feller"))
+                && (plan == null || !plan.getBoolean("fluids") || a.getBoolean("tank"));
     }
 
     /** 作業を始めるアンドロイド: 選んだうちの選べるもの。だれも選んでいなければ、選べるもの全部。 */
@@ -537,6 +543,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.extra.hint"), 160), mouseX, mouseY);
             } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_RESULT && !hoveredSlot.hasItem() && menu.processing()) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.output.hint"), 160), mouseX, mouseY);
+            } else if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_CRAFTING && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.VARIANTS_X,
+                    y + WorkConsoleMenu.VARIANTS_Y, WorkConsoleMenu.VARIANTS_W, WorkConsoleMenu.VARIANTS_H)) {
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.variants.hint"), 180), mouseX, mouseY);
             } else if (hoveredFace(mouseX, mouseY) >= 0) {
                 String[] keys = {"in", "out", "fuel"};
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[hoveredFace(mouseX, mouseY)]
@@ -609,8 +618,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 CompoundTag a = androids.get(idx);
                 if (!a.getBoolean("busy") && !selectable(a)) {
                     boolean axe = plan != null && plan.getBoolean("felling") && !a.getBoolean("feller");
-                    g.renderTooltip(font, font.split(Component.translatable(axe ? "gui.singulo.work_console.needs_feller"
-                            : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
+                    boolean tank = plan != null && plan.getBoolean("fluids") && !a.getBoolean("tank");
+                    g.renderTooltip(font, font.split(Component.translatable(tank ? "gui.singulo.work_console.needs_tank"
+                            : axe ? "gui.singulo.work_console.needs_feller" : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
                     return;
                 }
             }
@@ -730,6 +740,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 button(g, x + WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP), y + WorkConsoleMenu.FACE_Y,
                         WorkConsoleMenu.FACE_W, WorkConsoleMenu.FACE_H, false, mouseX, mouseY);
             }
+        }
+        if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_CRAFTING) {
+            button(g, x + WorkConsoleMenu.VARIANTS_X, y + WorkConsoleMenu.VARIANTS_Y, WorkConsoleMenu.VARIANTS_W, WorkConsoleMenu.VARIANTS_H,
+                    menu.variants(), mouseX, mouseY);
         }
         if (procedure) {
             button(g, x + WorkConsoleMenu.KIND_X, y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.KIND_W, WorkConsoleMenu.SMALL_H, false, mouseX, mouseY);
@@ -1119,7 +1133,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                                 WorkConsoleMenu.FACE_Y + 3, WorkConsoleMenu.FACE_W - 2, Panel.TEXT);
                     }
                 } else {
-                    small(g, Component.translatable("gui.singulo.work_console.record.hint"), 66, 108, 132, MUTED);
+                    small(g, Component.translatable(menu.variants() ? "gui.singulo.recipe_encoder.variants.on" : "gui.singulo.recipe_encoder.variants.off"),
+                            WorkConsoleMenu.VARIANTS_X + WorkConsoleMenu.VARIANTS_W / 2, WorkConsoleMenu.VARIANTS_Y + 3, WorkConsoleMenu.VARIANTS_W - 4,
+                            menu.variants() ? 0xFFFFFFFF : Panel.TEXT);
                 }
             }
         } else {
