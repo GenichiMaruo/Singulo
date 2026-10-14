@@ -721,27 +721,32 @@ public final class AndroidGameTests {
         BladeAndroid a = worker(helper, false);
         var player = helper.makeMockServerPlayerInLevel();
         console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
-        helper.runAfterDelay(20, () -> {
-            var zombie = EntityType.ZOMBIE.create(helper.getLevel());
-            zombie.moveTo(a.position().add(1.5, 0, 0));
-            zombie.setNoAi(true);
-            zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
-            zombie.setHealth(200);              // 観測前に倒れて標的が消えるのを防ぐ
-            helper.getLevel().addFreshEntity(zombie);
-            a.invulnerableTime = 0;
-            helper.assertTrue(a.hurt(helper.getLevel().damageSources().mobAttack(zombie), 1), "応戦確認用の攻撃が入らなかった");
-            boolean[] fought = {false};
-            helper.succeedWhen(() -> {
-                if (!fought[0]) {
-                    helper.assertTrue(a.getTarget() == zombie, "作業中に襲ってきた相手を狙わない");
+        net.minecraft.world.entity.monster.Zombie[] attacker = {null};
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(a.tickCount >= 5 && a.active(), "個体のAIが動き始めるのを待つ"))
+                .thenExecute(() -> {
+                    var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+                    zombie.moveTo(a.position().add(1.5, 0, 0));
+                    zombie.setNoAi(true);
+                    zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
+                    zombie.setHealth(200);
+                    helper.getLevel().addFreshEntity(zombie);
+                    attacker[0] = zombie;
+                    a.invulnerableTime = 0;
+                    helper.assertTrue(a.hurt(helper.getLevel().damageSources().mobAttack(zombie), 1), "応戦確認用の攻撃が入らなかった");
+                    Singulo.LOGGER.info("Android defense fixture: entityTick={}, hurtTick={}, lastAttackerMatches={}, active={}, working={}",
+                            a.tickCount, a.getLastHurtByMobTimestamp(), a.getLastHurtByMob() == zombie, a.active(), a.isWorking());
+                })
+                .thenWaitUntil(() -> {
+                    helper.assertTrue(a.getTarget() == attacker[0], "作業中に襲ってきた相手を狙わない: tick=" + a.tickCount
+                            + " active=" + a.active() + " lastAttacker=" + (a.getLastHurtByMob() == attacker[0]));
                     helper.assertTrue(a.isWorking(), "戦っている間に作業を取り上げられた");
-                    fought[0] = true;
-                    zombie.discard();
-                }
-                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8, "片付けたあと作業に戻らない");
-                a.discard();
-            });
-        });
+                })
+                .thenExecute(() -> attacker[0].discard())
+                .thenWaitUntil(() -> helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8,
+                        "片付けたあと作業に戻らない"))
+                .thenExecute(a::discard)
+                .thenSucceed();
     }
 
     /** 手順カード1枚（steps、できる物 output）を、場所のカードのない行に並べる。 */
