@@ -62,6 +62,15 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     /** 装甲板を積んだときだけ見える、胸の銀の板と左肩の小さな肩当て（さりげなく）。 */
     final ModelPart armorChest;
     final ModelPart armorPad;
+    /** バックパックアップグレードを積んだときの、背中のバックパックと肩ひも（背中のスラスターの代わりに付く）。 */
+    final ModelPart backpack;
+    final ModelPart strapL;
+    final ModelPart strapR;
+    final ModelPart thrusterL;
+    final ModelPart thrusterR;
+    /** バッテリーアップグレードの数だけ、腰の後ろ（スカートの上）に付くバッテリーパック。 */
+    final ModelPart batteryL;
+    final ModelPart batteryR;
 
     public AndroidModel(ModelPart root) {
         this.root = root;
@@ -92,6 +101,13 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         this.hairSide = ponytail.getInitialPose().x > 0 ? 1 : -1;
         this.armorChest = torso.getChild("armor_chest");
         this.armorPad = armL.getChild("armor_pad");
+        this.backpack = torso.getChild("backpack");
+        this.strapL = torso.getChild("strap_l");
+        this.strapR = torso.getChild("strap_r");
+        this.thrusterL = torso.getChild("thruster_l");
+        this.thrusterR = torso.getChild("thruster_r");
+        this.batteryL = skirtBack.getChild("battery_l");
+        this.batteryR = skirtBack.getChild("battery_r");
     }
 
     private static CubeListBuilder cube(int u, int v, float x, float y, float z, int w, int h, int d, CubeDeformation def) {
@@ -117,8 +133,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         // スカート（前・後ろ・左右と、右だけ長い垂れ）
         hips.addOrReplaceChild("skirt_front", cube(54, 16, -4, 0, -0.5F, 8, 5, 1, def(0, 0, -0.2F)),
                 PartPose.offsetAndRotation(0, -2, -2.0F, -0.22F, 0, 0));
-        hips.addOrReplaceChild("skirt_back", cube(72, 16, -4, 0, -0.5F, 8, 6, 1, def(0, 0, -0.2F)),
+        PartDefinition skirtBack = hips.addOrReplaceChild("skirt_back", cube(72, 16, -4, 0, -0.5F, 8, 6, 1, def(0, 0, -0.2F)),
                 PartPose.offsetAndRotation(0, -2, 2.0F, 0.28F, 0, 0));
+        // バッテリーパック（スカートの後ろの面に、左右1つずつ。スカートと一緒に揺れる）
+        skirtBack.addOrReplaceChild("battery_l", cube(16, 54, -1, -0.2F, 0.35F, 2, 3, 2, def(-0.05F)), PartPose.offset(2.3F, 0, 0));
+        skirtBack.addOrReplaceChild("battery_r", CubeListBuilder.create().texOffs(16, 54).mirror()
+                .addBox(-1, -0.2F, 0.35F, 2, 3, 2, def(-0.05F)), PartPose.offset(-2.3F, 0, 0));
         hips.addOrReplaceChild("skirt_left", cube(90, 16, -0.5F, 0, -2.5F, 1, 5, 5, def(-0.2F, 0, 0)),
                 PartPose.offsetAndRotation(3.5F, -2, 0, 0, 0, -0.28F));
         hips.addOrReplaceChild("skirt_right", CubeListBuilder.create().texOffs(90, 16).mirror().addBox(-0.5F, 0, -2.5F, 1, 5, 5, def(-0.2F, 0, 0)),
@@ -131,6 +151,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         // 装甲板: 胸の板にかぶせる薄い銀の板（胸の板より少しだけ大きい）
         torso.addOrReplaceChild("armor_chest", cube(110, 40, -3, -7, -2.3F, 6, 3, 1, def(-0.12F, 0.12F, 0.06F)), PartPose.ZERO);
         torso.addOrReplaceChild("neck", cube(114, 0, -1, -1, -1, 2, 2, 2, def(-0.15F)), PartPose.offset(0, -8, 0));
+        // バックパック（背中から少し離して背負う）と、背中の小物入れ、肩ひも
+        PartDefinition backpack = torso.addOrReplaceChild("backpack", cube(16, 44, -3, -7, 0, 6, 6, 3), PartPose.offset(0, 0, 1.6F));
+        backpack.addOrReplaceChild("pocket", cube(36, 44, -2, -4, 2.9F, 4, 3, 1, def(-0.05F)), PartPose.ZERO);
+        torso.addOrReplaceChild("strap_l", cube(48, 44, -0.5F, -8.5F, -2, 1, 1, 4, def(-0.1F)), PartPose.offset(2.1F, 0, 0));
+        torso.addOrReplaceChild("strap_r", CubeListBuilder.create().texOffs(48, 44).mirror()
+                .addBox(-0.5F, -8.5F, -2, 1, 1, 4, def(-0.1F)), PartPose.offset(-2.1F, 0, 0));
         for (int side = 0; side < 2; side++) {
             float x = side == 0 ? 1.6F : -1.6F;
             CubeListBuilder b = CubeListBuilder.create().texOffs(0, 48);
@@ -261,6 +287,15 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         boolean armored = !android.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).isEmpty();
         armorChest.visible = armored;
         armorPad.visible = armored;
+        boolean pack = android.hasBackpack();
+        backpack.visible = pack;
+        strapL.visible = pack;
+        strapR.visible = pack;
+        thrusterL.visible = !pack;
+        thrusterR.visible = !pack;
+        int batteries = android.batteries();
+        batteryL.visible = batteries >= 1;
+        batteryR.visible = batteries >= 2;
         float pt = age - android.tickCount;
         int state = android.state();
         float t = android.stateTime(pt);

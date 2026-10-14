@@ -1159,6 +1159,10 @@
     "source": "One fitted to a guard android works as its chestplate (+8 armor, +2 toughness). Takes armor enchantments.",
     "translation": "호위 안드로이드에 하나 장착하면 흉갑으로 작동합니다(방어 +8, 방어 강도 +2). 방어구 마법 부여를 할 수 있습니다."
   },
+  "desc.singulo.android_backpack_upgrade": {
+    "source": "Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.",
+    "translation": "호위 안드로이드에 넣으면 소지품이 24칸(4줄×6칸) 늘어납니다. 등에 백팩을 멥니다."
+  },
   "desc.singulo.android_barrier_glass": {
     "source": "Glass that only androids cannot pass. Players and other creatures go straight through. Joins seamlessly with the same glass next to it.",
     "translation": "안드로이드만 지나갈 수 없는 유리. 플레이어와 다른 생물은 그대로 통과합니다. 같은 유리와 붙으면 이음새 없이 이어집니다."
@@ -1166,6 +1170,10 @@
   "desc.singulo.android_barrier_glass_patterned": {
     "source": "Patterned glass that only androids cannot pass.",
     "translation": "안드로이드만 지나갈 수 없는 무늬 유리."
+  },
+  "desc.singulo.android_battery_upgrade": {
+    "source": "Fitted to a guard android, each one raises its full charge by 50% (up to two). A battery pack appears on its waist for each.",
+    "translation": "호위 안드로이드에 넣으면 하나당 완충량이 50% 늘어납니다(둘까지). 넣은 수만큼 허리에 배터리 팩이 붙습니다."
   },
   "desc.singulo.android_charger": {
     "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
@@ -1195,17 +1203,25 @@
     "source": "A compact crystal memory with a reader, holding the design of the Whip Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "채찍형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
   },
+  "desc.singulo.android_mining_upgrade": {
+    "source": "Fitted to a guard android, it lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.",
+    "translation": "호위 안드로이드에 넣으면 채굴 작업을 할 수 있습니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다."
+  },
+  "desc.singulo.android_production_upgrade": {
+    "source": "Fitted in an Android Assembly Station, it prints and looks after up to two androids. Only one can charge on top at a time; the other waits beside it and takes its turn.",
+    "translation": "안드로이드 조립 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다."
+  },
   "desc.singulo.android_repair_kit": {
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
     "translation": "호위 안드로이드의 소지품에 넣어 두면 다쳤을 때 하나를 써서 체력을 절반 회복합니다(다 쓰면 스테이션으로 돌아갑니다)."
   },
   "desc.singulo.android_station": {
-    "source": "Prints one guard android from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
-    "translation": "소형 크리스털 메모리와 안드로이드 키트와 전력으로 호위 안드로이드를 하나 출력하고, 쓰러지면 새 키트로 다시 출력합니다. 움직이는 방식과, 돌아와서 수리·충전할 체력을 정합니다."
+    "source": "Prints one guard android (two with a Production Upgrade) from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
+    "translation": "소형 크리스털 메모리와 안드로이드 키트와 전력으로 호위 안드로이드를 하나(생산 업그레이드가 있으면 둘까지) 출력하고, 쓰러지면 새 키트로 다시 출력합니다. 움직이는 방식과, 돌아와서 수리·충전할 체력을 정합니다."
   },
   "desc.singulo.android_transfer_upgrade": {
-    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits and armor plate) to the station instead of dropping it, and the next android it prints carries it.",
-    "translation": "안드로이드 조립 스테이션의 강화 슬롯에 넣으면, 안드로이드가 쓰러지거나 해체될 때 소지품(수리 키트와 장갑판)을 떨어뜨리지 않고 스테이션으로 전송해 다음에 출력하는 안드로이드에게 넘깁니다."
+    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
+    "translation": "안드로이드 조립 스테이션의 강화 슬롯에 넣으면, 안드로이드가 쓰러지거나 해체될 때 소지품(수리 키트·장갑판·업그레이드·운반 중인 물건)을 떨어뜨리지 않고 스테이션으로 전송해 다음에 출력하는 안드로이드에게 넘깁니다."
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -2551,6 +2567,18 @@
     "source": "Armor",
     "translation": "방어"
   },
+  "gui.singulo.android.backpack": {
+    "source": "Backpack",
+    "translation": "백팩"
+  },
+  "gui.singulo.android.battery": {
+    "source": "Battery",
+    "translation": "배터리"
+  },
+  "gui.singulo.android.carry": {
+    "source": "Carry",
+    "translation": "소지품"
+  },
   "gui.singulo.android.charge": {
     "source": "%s%%",
     "translation": "%s%%"
@@ -2579,6 +2607,10 @@
     "source": "HP %s / %s",
     "translation": "체력 %s / %s"
   },
+  "gui.singulo.android.mining": {
+    "source": "Mining",
+    "translation": "채굴"
+  },
   "gui.singulo.android.mode": {
     "source": "Mode: %s",
     "translation": "모드: %s"
@@ -2594,6 +2626,22 @@
   "gui.singulo.android.nickname.whip": {
     "source": "Verna",
     "translation": "베르나"
+  },
+  "gui.singulo.android.pack": {
+    "source": "Backpack",
+    "translation": "백팩 안"
+  },
+  "gui.singulo.android.pack.none": {
+    "source": "No backpack",
+    "translation": "백팩 없음"
+  },
+  "gui.singulo.android.page.gear": {
+    "source": "Gear and inventory",
+    "translation": "장비와 소지품"
+  },
+  "gui.singulo.android.page.status": {
+    "source": "Status",
+    "translation": "상태"
   },
   "gui.singulo.android.plate": {
     "source": "Plate",
@@ -2726,6 +2774,18 @@
   "gui.singulo.android.say.retreat.1": {
     "source": "Off to get repaired",
     "translation": "수리하고 올게"
+  },
+  "gui.singulo.android.work.hint": {
+    "source": "Whether this android may be given work (automation). When off, it is never offered for work.",
+    "translation": "이 안드로이드에게 작업(자동화)을 맡겨도 되는지 정합니다. 끄면 작업 후보에 나오지 않습니다."
+  },
+  "gui.singulo.android.work.off": {
+    "source": "Work: off",
+    "translation": "작업: 끔"
+  },
+  "gui.singulo.android.work.on": {
+    "source": "Work: on",
+    "translation": "작업: 켬"
   },
   "gui.singulo.android_station.charge": {
     "source": "Charge",
@@ -4207,6 +4267,14 @@
     "source": "Ruin androids",
     "translation": "유적의 안드로이드"
   },
+  "guide.singulo.androids.upgrades.body": {
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩의 24칸이 더해집니다. 안에 물건이 있으면 뺄 수 없습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
+  },
+  "guide.singulo.androids.upgrades.title": {
+    "source": "Upgrades",
+    "translation": "업그레이드"
+  },
   "guide.singulo.catalysts": {
     "source": "Catalysts",
     "translation": "촉매"
@@ -4659,6 +4727,10 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
+  "howto.singulo.android_backpack_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
   "howto.singulo.android_barrier_glass": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
@@ -4666,6 +4738,10 @@
   "howto.singulo.android_barrier_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_battery_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
   },
   "howto.singulo.android_charger": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -4680,6 +4756,14 @@
     "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.android_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_mining_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_production_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
@@ -5547,6 +5631,14 @@
     "source": "Android Armor Plate",
     "translation": "안드로이드용 장갑판"
   },
+  "item.singulo.android_backpack_upgrade": {
+    "source": "Backpack Upgrade",
+    "translation": "백팩 업그레이드"
+  },
+  "item.singulo.android_battery_upgrade": {
+    "source": "Battery Upgrade",
+    "translation": "배터리 업그레이드"
+  },
   "item.singulo.android_charger": {
     "source": "Android Wireless Charger",
     "translation": "안드로이드 무선 충전기"
@@ -5566,6 +5658,14 @@
   "item.singulo.android_memory_whip": {
     "source": "Compact Crystal Memory (Whip)",
     "translation": "소형 크리스털 메모리(채찍형)"
+  },
+  "item.singulo.android_mining_upgrade": {
+    "source": "Mining Upgrade",
+    "translation": "채굴 업그레이드"
+  },
+  "item.singulo.android_production_upgrade": {
+    "source": "Production Upgrade",
+    "translation": "생산 업그레이드"
   },
   "item.singulo.android_repair_kit": {
     "source": "Self-Repair Kit",
@@ -7307,6 +7407,10 @@
     "source": "Full android charges: %s",
     "translation": "안드로이드 가득 충전 %s회분"
   },
+  "tooltip.singulo.android_mining_upgrade": {
+    "source": "Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch",
+    "translation": "다이아몬드 곡괭이처럼 캡니다. 효율·행운·섬세한 손길을 부여할 수 있습니다"
+  },
   "tooltip.singulo.beyond_repair": {
     "source": "Beyond repair",
     "translation": "더 이상 수리할 수 없음"
@@ -7439,6 +7543,10 @@
     "source": "Used in: Patterned Android Gate Glass",
     "translation": "사용 대상: 무늬 안드로이드 투과 유리"
   },
+  "uses.singulo.android_kit": {
+    "source": "Used in: Production Upgrade",
+    "translation": "사용 대상: 생산 업그레이드"
+  },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
     "translation": "사용 제품: 특이점 코어"
@@ -7448,8 +7556,8 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 22 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 22개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 26 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 26개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 35 more",
@@ -7500,8 +7608,8 @@
     "translation": "사용 제품: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 7 more",
-    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 7개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 9 more",
+    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 9개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -7868,12 +7976,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 66 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 66개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 68 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 68개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 46 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 46개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 49 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 49개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

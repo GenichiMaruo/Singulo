@@ -113,6 +113,7 @@ Androids run on charge and run out after about ten big moves. They return to a n
 - While following, choose "Just follow" (never fights) or "Escort" (fights nearby enemies), in the station or by clicking the mode tag in the android screen.
 - Put a **Shield Permit** in the station's permit slot and only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.
 - Right-click an android to open its inventory: **Self-Repair Kits** (one restores half its health when it gets hurt) and an **Android Armor Plate** that takes armor enchantments.
+- **Upgrades:** a **Production Upgrade** in the station lets it print up to two androids (only one charges on top at a time; the other waits beside it). On the android's "Gear and inventory" page (the button left of its name) you can fit **Battery Upgrades** (+50% charge each, up to two), a **Backpack Upgrade** (+24 inventory slots) and a **Mining Upgrade** (for mining work; takes pickaxe enchantments). Androids carry 5 slots of items, more with a backpack.
 - The station has a refill slot (tops up repair kits automatically) and an upgrade slot (a **Transfer Upgrade** passes a fallen android's inventory to the next one), and hoppers can insert into it.
 - Name your android in the station or android screen, and read its health with a comparator. If the station is broken, Link the android to a new one.
 

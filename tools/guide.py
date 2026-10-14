@@ -592,6 +592,22 @@ CHAPTERS = [
          '- Kits in the station\'s refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android\'s '
          'inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n'
          '- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.'),
+        ('upgrades', 'アップグレード',
+         '・生産アップグレード: ステーションに積むと、アンドロイドを2体まで印刷して受け持つ。上で充電できるのは1体ずつで、もう1体はそばで待って交代する。'
+         '画面の名前の左の「1」「2」で、見るアンドロイドを選ぶ（動き方などの設定は2体共通）。\n'
+         '・アンドロイドの画面の名前の左のボタンで「装備と持ち物」のページに切り替えると、アップグレードを積める。\n'
+         '・バッテリーアップグレード: 1個につき充電の満タンが50%増える（2個まで）。満タンまでの充電の時間もそのぶん延びる。腰にバッテリーパックが付く。\n'
+         '・バックパックアップグレード: 持ち物（5スロット）に、バックパックの24スロットが加わる。中に物があるうちは外せない。\n'
+         '・採掘アップグレード: 採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。\n'
+         '・作業のオン／オフ: 作業（自動化）に割り当ててよいかを、アンドロイドごとに決める。',
+         'Upgrades',
+         '- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits '
+         'beside it and takes its turn. Use "1" and "2" left of the name to choose which android the screen shows (settings are shared).\n'
+         '- The button left of the name in the android screen opens the "Gear and inventory" page, where upgrades go.\n'
+         '- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n'
+         '- Backpack Upgrade: adds the backpack\'s 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n'
+         '- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n'
+         '- Work on/off: choose for each android whether it may be given work (automation).'),
         ('glass', 'アンドロイド用のガラス',
          '・アンドロイド遮断ガラス（琥珀色）: アンドロイドだけが通れない。プレイヤーやほかの生き物はすり抜けられる。拠点の出入り口に。\n'
          '・アンドロイド透過ガラス（水色）: アンドロイドだけが通れる。ほかにとってはふつうのガラス。護衛の通り道に。\n'

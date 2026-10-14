@@ -30,6 +30,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -85,6 +86,10 @@ public abstract class RuinAndroid extends Monster {
     /** 護衛が敵を探す範囲（ステーションか持ち主から）。 */
     public static final double GUARD_RANGE = 14;
     public static final int WANDER_RADIUS = 16;
+    /** ステーションの上が空くのを待つときの、ステーションからの距離。 */
+    static final double WAIT_RADIUS = 2.6;
+    /** 迎撃・待機のときに立つ場所（ステーションの上を空けておくため、横へずらす。アンドロイドごとに向きを変える）。 */
+    private static final Vec3[] STAND_OFFSETS = {new Vec3(2, 0, 0), new Vec3(-2, 0, 0), new Vec3(0, 0, 2), new Vec3(0, 0, -2)};
 
     /** 充電器から電力をもらって、ついて歩いている持ち主（見た目のため。いなければ -1）。 */
     private static final EntityDataAccessor<Integer> CHARGER_LINK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
@@ -93,8 +98,21 @@ public abstract class RuinAndroid extends Monster {
     /** 敵を見つけているか（GUI のひとこと）。 */
     private static final EntityDataAccessor<Boolean> ALERT = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
 
-    /** 護衛の持ち物: 0 は自己修理キット（1スタック）、1 は装甲板（胸当てとして働く）。 */
-    public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1;
+    /** 持っているバッテリーアップグレードの数（見た目と、充電の満タンのため）。 */
+    private static final EntityDataAccessor<Integer> BATTERIES = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** バックパックアップグレードを積んでいるか（見た目のため）。 */
+    private static final EntityDataAccessor<Boolean> BACKPACK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+
+    /**
+     * 護衛の持ち物: 0 は自己修理キット（1スタック）、1 は装甲板（胸当てとして働く）、2 はバッテリーアップグレード（2個まで）、
+     * 3 はバックパックアップグレード、4 は採掘アップグレード。5〜9 は運ぶ物を入れる持ち物（ホッパーと同じ5スロット）、
+     * 10〜33 はバックパックの中（24スロット。バックパックを積んでいるときだけ使える）。
+     */
+    public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1, SLOT_BATTERY = 2, SLOT_BACKPACK = 3, SLOT_MINING = 4;
+    public static final int CARRY_START = 5, CARRY_SLOTS = 5, PACK_START = 10, PACK_SLOTS = 24;
+    public static final int INVENTORY_SIZE = PACK_START + PACK_SLOTS;
+    /** バッテリーアップグレードは2個まで。1個につき充電の満タンが半分（CHARGE_MAX / 2）ずつ増える。 */
+    public static final int MAX_BATTERIES = 2;
     /** 自己修理キット1つで直す体力の割合と、続けて使えるまでの tick。 */
     static final float REPAIR_FRACTION = 0.5F;
     static final int REPAIR_COOLDOWN = 60;
@@ -117,7 +135,9 @@ public abstract class RuinAndroid extends Monster {
     /** 追従する人（許可証に登録された人から選ぶ。null は持ち主）。 */
     @Nullable
     private java.util.UUID leader;
-    private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(2);
+    private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(INVENTORY_SIZE);
+    /** 作業（自動化）に割り当ててよいか（アンドロイドの画面で切り替える）。 */
+    private boolean workEnabled = true;
     private int repairCooldown;
     /** ステーションが遠すぎて戻れなかったとき、しばらく戻ろうとしない（tick）。 */
     private int retreatCooldown;
@@ -134,8 +154,63 @@ public abstract class RuinAndroid extends Monster {
         this.xpReward = 8;
         setPersistenceRequired();
         setDropChance(net.minecraft.world.entity.EquipmentSlot.CHEST, 0);
-        // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）
-        inventory.addListener(c -> setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy()));
+        // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）。アップグレードは見た目と充電の満タンに出す
+        inventory.addListener(c -> {
+            setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy());
+            if (!level().isClientSide) {
+                net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
+                entityData.set(BATTERIES, isBatteryUpgrade(battery) ? Math.min(MAX_BATTERIES, battery.getCount()) : 0);
+                entityData.set(BACKPACK, isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)));
+                if (charge() > maxCharge()) {
+                    setCharge(maxCharge());
+                }
+            }
+        });
+    }
+
+    private static boolean isItem(net.minecraft.world.item.ItemStack stack, String id) {
+        return !stack.isEmpty() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals(id);
+    }
+
+    public static boolean isBatteryUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return isItem(stack, "android_battery_upgrade");
+    }
+
+    public static boolean isBackpackUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return isItem(stack, "android_backpack_upgrade");
+    }
+
+    public static boolean isMiningUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidMiningUpgradeItem;
+    }
+
+    /** 積んでいるバッテリーアップグレードの数（クライアントでも見える）。 */
+    public int batteries() {
+        return entityData.get(BATTERIES);
+    }
+
+    /** バックパックアップグレードを積んでいるか（クライアントでも見える）。 */
+    public boolean hasBackpack() {
+        return entityData.get(BACKPACK);
+    }
+
+    /** 採掘アップグレードを積んでいるか。 */
+    public boolean canMine() {
+        return isMiningUpgrade(inventory.getItem(SLOT_MINING));
+    }
+
+    /** 充電の満タン（バッテリーアップグレード1個につき +50%）。 */
+    public int maxCharge() {
+        return CHARGE_MAX * (2 + batteries()) / 2;
+    }
+
+    /** 作業（自動化）に割り当ててよいか。 */
+    public boolean workEnabled() {
+        return workEnabled;
+    }
+
+    public void setWorkEnabled(boolean enabled) {
+        this.workEnabled = enabled;
     }
 
     /** 護衛の持ち物（GUI のスロット）。 */
@@ -144,7 +219,7 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public static boolean isRepairKit(net.minecraft.world.item.ItemStack stack) {
-        return !stack.isEmpty() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_repair_kit");
+        return isItem(stack, "android_repair_kit");
     }
 
     public static boolean isArmorPlate(net.minecraft.world.item.ItemStack stack) {
@@ -178,7 +253,7 @@ public abstract class RuinAndroid extends Monster {
         return net.minecraft.world.InteractionResult.sidedSuccess(level().isClientSide);
     }
 
-    /** 倒れたら、自己修理キットと装甲板をその場に落とす。 */
+    /** 倒れたら、持ち物（自己修理キット・装甲板・アップグレード・運んでいる物）をその場に落とす。 */
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, source, recentlyHit);
@@ -186,7 +261,7 @@ public abstract class RuinAndroid extends Monster {
     }
 
     /**
-     * 持ち物（自己修理キット・装甲板）を手放す。ステーションに転送アップグレードがあれば、ステーションへ転送して
+     * 持ち物（自己修理キット・装甲板・アップグレード・運んでいる物）を手放す。ステーションに転送アップグレードがあれば、ステーションへ転送して
      * 次に印刷するアンドロイドに持たせる。なければその場に落とす。
      */
     private void releaseInventory(ServerLevel level) {
@@ -199,7 +274,7 @@ public abstract class RuinAndroid extends Monster {
                 continue;
             }
             if (station != null) {
-                stack = station.keep(i, stack);
+                stack = station.keep(getUUID(), i, stack);
                 sent = true;
             }
             if (!stack.isEmpty()) {
@@ -209,6 +284,24 @@ public abstract class RuinAndroid extends Monster {
         if (sent) {
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL, getX(), getY() + 0.8, getZ(), 20, 0.3, 0.5, 0.3, 0.2);
             playSound(SoundEvents.ENDERMAN_TELEPORT, 0.5F, 1.6F);
+        }
+    }
+
+    /** 持ち物を読み込む。0.6.0 までの保存（位置なしの並び）は、自己修理キットと装甲板をそれぞれの場所へ戻す。 */
+    private void loadInventory(CompoundTag tag) {
+        inventory.clearContent();
+        if (tag.contains("items")) {
+            net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items = net.minecraft.core.NonNullList.withSize(INVENTORY_SIZE,
+                    net.minecraft.world.item.ItemStack.EMPTY);
+            net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("items"), items, registryAccess());
+            for (int i = 0; i < INVENTORY_SIZE; i++) {
+                inventory.setItem(i, items.get(i));
+            }
+            return;
+        }
+        for (net.minecraft.nbt.Tag t : tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            net.minecraft.world.item.ItemStack.parse(registryAccess(), t).ifPresent(stack ->
+                    inventory.setItem(isArmorPlate(stack) ? SLOT_PLATE : SLOT_REPAIR, stack));
         }
     }
 
@@ -241,7 +334,7 @@ public abstract class RuinAndroid extends Monster {
         }
         setCustomName(n.isEmpty() ? null : net.minecraft.network.chat.Component.literal(n));
         if (home != null && level() instanceof ServerLevel level && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
-            station.rememberName(n);
+            station.rememberName(getUUID(), n);
         }
     }
 
@@ -290,6 +383,8 @@ public abstract class RuinAndroid extends Monster {
         builder.define(CHARGER_LINK, -1);
         builder.define(GUARD, false);
         builder.define(ALERT, false);
+        builder.define(BATTERIES, 0);
+        builder.define(BACKPACK, false);
     }
 
     // ------------------------------------------------------------------ 護衛（プレイヤーのアンドロイド）
@@ -508,11 +603,11 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public float chargeFraction() {
-        return charge() / (float) CHARGE_MAX;
+        return charge() / (float) maxCharge();
     }
 
     protected void setCharge(int charge) {
-        entityData.set(CHARGE, Mth.clamp(charge, 0, CHARGE_MAX));
+        entityData.set(CHARGE, Mth.clamp(charge, 0, maxCharge()));
     }
 
     /**
@@ -850,7 +945,13 @@ public abstract class RuinAndroid extends Monster {
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
-        tag.put("inventory", inventory.createTag(registryAccess()));
+        net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items = net.minecraft.core.NonNullList.withSize(INVENTORY_SIZE,
+                net.minecraft.world.item.ItemStack.EMPTY);
+        for (int i = 0; i < INVENTORY_SIZE; i++) {
+            items.set(i, inventory.getItem(i));
+        }
+        tag.put("items", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), items, registryAccess()));
+        tag.putBoolean("work", workEnabled);
         if (guard) {
             tag.putBoolean("guard", true);
             tag.putBoolean("dismantling", dismantling);
@@ -885,7 +986,11 @@ public abstract class RuinAndroid extends Monster {
         guard = tag.getBoolean("guard");
         dismantling = tag.getBoolean("dismantling");
         entityData.set(GUARD, guard);
-        inventory.fromTag(tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND), registryAccess());
+        loadInventory(tag);
+        workEnabled = !tag.contains("work") || tag.getBoolean("work");
+        if (tag.contains("charge")) {
+            setCharge(tag.getInt("charge"));                // バッテリーの数が分かってから、満タンに合わせて戻す
+        }
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         if (guard) {
             configure(tag.getInt("mode"), tag.contains("retreat") ? tag.getInt("retreat") : 30);
@@ -939,8 +1044,11 @@ public abstract class RuinAndroid extends Monster {
                     getNavigation().stop();
                 }
             } else if (home != null) {
-                Vec3 spot = Vec3.atBottomCenterOf(home.above());
-                if (spot.distanceToSqr(position()) > 3 * 3 && (getNavigation().isDone() || tickCount % 20 == 0)) {
+                // ステーションのすぐ横で待つ。上に乗ったままにならないよう、上にいたら横へどく（ほかのアンドロイドの充電・印刷のため）
+                Vec3 dock = Vec3.atBottomCenterOf(home.above());
+                Vec3 spot = dock.add(STAND_OFFSETS[Math.floorMod(getUUID().hashCode(), STAND_OFFSETS.length)]);
+                boolean onDock = position().subtract(dock).horizontalDistanceSqr() < 0.8 * 0.8 && Math.abs(getY() - dock.y) < 1;
+                if ((spot.distanceToSqr(position()) > 3 * 3 || onDock) && (getNavigation().isDone() || tickCount % 20 == 0)) {
                     getNavigation().moveTo(spot.x, spot.y, spot.z, 0.9);
                 }
             }
@@ -1003,13 +1111,20 @@ public abstract class RuinAndroid extends Monster {
                 }
                 // 充電切れで、ステーション（印刷台）が遠すぎれば戻らずにその場で充電する。体力で戻るときは遠くからでも戻る
                 double range = state() == STATE_RETREAT ? 96 : DOCK_RANGE;
-                if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400)) {
+                // ステーションの上でほかのアンドロイドが充電中なら、そばで待って、どいたら交代で乗る（待つ間は座り込まない）
+                boolean taken = guard && h != null && dockTaken(level, h);
+                if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400) && !taken) {
                     getNavigation().stop();
                     setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
                     playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
                     return;
                 }
-                if (dock.distanceToSqr(position()) < 1.6 * 1.6) {
+                if (taken && dock.distanceToSqr(position()) < WAIT_RADIUS * WAIT_RADIUS) {
+                    getNavigation().stop();
+                    getLookControl().setLookAt(dock.x, dock.y + 1, dock.z);
+                    return;
+                }
+                if (!taken && dock.distanceToSqr(position()) < 1.6 * 1.6) {
                     getNavigation().stop();
                     setState(STATE_CHARGING);
                     playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.4F);
@@ -1061,12 +1176,19 @@ public abstract class RuinAndroid extends Monster {
                     sparks(level, position().add(0, s == STATE_SOLAR ? 2.2 : 0.2, 0), 2, 0.3);
                 }
                 boolean healed = !(guard && s == STATE_CHARGING) || getHealth() >= getMaxHealth();
-                if (charge() >= CHARGE_MAX && healed) {
+                if (charge() >= maxCharge() && healed) {
                     // ソーラーのときは、パネルをたたんでから戦いに戻る
                     setState(s == STATE_SOLAR ? STATE_SOLAR_FOLD : STATE_IDLE);
                     playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
                 }
             }
+        }
+
+        /** ステーションの上で、ほかのアンドロイドが充電・印刷されているか。 */
+        private boolean dockTaken(ServerLevel level, BlockPos station) {
+            Vec3 dock = Vec3.atBottomCenterOf(station.above());
+            return !level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(0.9, 1, 0.9),
+                    a -> a != RuinAndroid.this && a.isAlive() && (charging(a.state()) || !a.printed())).isEmpty();
         }
 
         /** 電力の残っている無線充電器を持っている持ち主（近くにいなければ null）。 */
@@ -1103,7 +1225,7 @@ public abstract class RuinAndroid extends Monster {
                     sparks(level, position().add(0, 1.0, 0), 2, 0.25);
                 }
             }
-            if (charge() >= CHARGE_MAX) {
+            if (charge() >= maxCharge()) {
                 setState(STATE_IDLE);
                 playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
             }

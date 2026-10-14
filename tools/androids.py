@@ -40,6 +40,10 @@ ANDROID_PARTS = {
     'armor_pad': (110, 46, 3, 1, 4),
     'hilt': (114, 32, 1, 4, 1),
     'guard': (118, 32, 3, 1, 1),
+    'backpack': (16, 44, 6, 6, 3),
+    'pocket': (36, 44, 4, 3, 1),
+    'strap': (48, 44, 1, 1, 4),
+    'battery': (16, 54, 2, 3, 2),
 }
 
 # 型ごとの色。hair: 髪（明・影・深い影）、streak: ひと房（またはインナー）の色、accent: 光の色、iris: 瞳（深・明）
@@ -505,6 +509,48 @@ def paint(pal, Image):
     for x in range(x0, x1):
         put(x, y0, accent, lit=True)
 
+    # ---------------------------------------------------------------- バックパック（積んだときだけ見える）
+    # 白い陶磁の箱に黒い縁取り。下の面に型の色の光るライン（背中のスラスターの代わり）
+    f = part('backpack')
+    for k in f:
+        fill(f[k], CERAMIC if k in ('back', 'up') else CERAMIC_SH, 2)
+    for k in ('back', 'side_a', 'side_b'):
+        x0, y0, x1, y1 = f[k]
+        for x in range(x0, x1):
+            put(x, y0, SUIT_HI)
+            put(x, y1 - 1, SUIT)
+        for y in range(y0, y1):
+            put(x0, y, SUIT_HI)
+            put(x1 - 1, y, SUIT_HI)
+    x0, y0, x1, y1 = f['back']
+    for x in range(x0 + 1, x1 - 1):
+        put(x, y1 - 2, accent, lit=True)
+    line(f['down'], accent)
+    f = part('pocket')
+    for k in f:
+        fill(f[k], SUIT, 3)
+    x0, y0, x1, y1 = f['back']
+    for x in range(x0, x1):
+        put(x, y0, SUIT_HI)
+    put(x0 + 1, y0 + 1, accent, lit=True)
+    put(x0 + 2, y0 + 1, accent, lit=True)
+    f = part('strap')
+    for k in f:
+        fill(f[k], SUIT, 3)
+    # ---------------------------------------------------------------- バッテリーパック（積んだ数だけ）
+    # 銀の筒に黒い端子のふた。後ろの面に、型の色の充電ランプ（2つ）
+    f = part('battery')
+    for k in f:
+        fill(f[k], CERAMIC_SH if k != 'up' else SUIT_HI, 2)
+    for k in ('back', 'front', 'side_a', 'side_b'):
+        x0, y0, x1, y1 = f[k]
+        for x in range(x0, x1):
+            put(x, y0, SUIT_HI)
+    x0, y0, x1, y1 = f['back']
+    put(x0, y0 + 1, accent, lit=True)
+    put(x0 + 1, y0 + 1, accent, lit=True)
+    put(x0, y0 + 2, mix(accent, -40), lit=True)
+
     # ---------------------------------------------------------------- 鞭の柄（黒い握りに、光る輪）
     f = part('whip_handle')
     for k in f:
@@ -546,6 +592,10 @@ def item_textures(ti, save):
     save(repair_icon(Image), ti / 'android_repair_kit.png')
     save(plate_icon(Image), ti / 'android_armor_plate.png')
     save(upgrade_icon(Image), ti / 'android_transfer_upgrade.png')
+    save(production_icon(Image), ti / 'android_production_upgrade.png')
+    save(battery_icon(Image), ti / 'android_battery_upgrade.png')
+    save(backpack_icon(Image), ti / 'android_backpack_upgrade.png')
+    save(mining_icon(Image), ti / 'android_mining_upgrade.png')
 
 
 def memory_icon(accent, Image):
@@ -708,6 +758,89 @@ def upgrade_icon(Image):
     px[7, 8] = px[8, 7] = (200, 160, 255, 255)
     for x in (5, 7, 9):
         px[x, 14] = (226, 186, 92, 255)
+    return im
+
+
+def upgrade_board(Image):
+    """アップグレードの共通の台: 白い基板と灰色の縁、下に金の端子。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(2, 14):
+        for x in range(2, 14):
+            if (x, y) in ((2, 2), (13, 2), (2, 13), (13, 13)):
+                continue
+            px[x, y] = ((150, 156, 170) if x in (2, 13) or y in (2, 13) else (236, 238, 242)) + (255,)
+    for x in (5, 7, 9):
+        px[x, 14] = (226, 186, 92, 255)
+    return im, px
+
+
+def production_icon(Image):
+    """生産アップグレード: 基板の上に、重なった2体の人影（水色と白）。"""
+    im, px = upgrade_board(Image)
+    back, front = (120, 200, 236), (60, 120, 170)
+    for (cx, c) in ((9, back), (6, front)):
+        for y in range(4, 7):
+            for x in range(cx - 1, cx + 1):
+                px[x, y] = c + (255,)
+        for y in range(7, 12):
+            for x in range(cx - 2, cx + 2):
+                px[x, y] = c + (255,)
+    px[11, 4] = (255, 255, 255, 255)
+    return im
+
+
+def battery_icon(Image):
+    """バッテリーアップグレード: 縦長の電池に、緑の残量の目盛りと稲妻。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(3, 15):
+        for x in range(4, 12):
+            px[x, y] = ((90, 96, 110) if x in (4, 11) or y in (3, 14) else (214, 220, 230)) + (255,)
+    for x in range(6, 10):
+        px[x, 2] = (60, 64, 76, 255)
+    for y in range(5, 13):
+        for x in range(5, 11):
+            if y >= 7:
+                px[x, y] = ((90, 214, 140) if y % 2 else (70, 190, 120)) + (255,)
+    for (x, y) in ((8, 6), (7, 7), (6, 8), (7, 8), (8, 8), (9, 8), (8, 9), (7, 10)):
+        px[x, y] = (255, 236, 120, 255)
+    return im
+
+
+def backpack_icon(Image):
+    """バックパックアップグレード: 白い箱のバックパックに、黒いふたと肩ひも、光るライン。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(4, 14):
+        for x in range(3, 13):
+            if (x, y) in ((3, 4), (12, 4), (3, 13), (12, 13)):
+                continue
+            px[x, y] = ((150, 156, 170) if x in (3, 12) or y in (4, 13) else (236, 238, 242)) + (255,)
+    for y in range(4, 8):
+        for x in range(4, 12):
+            px[x, y] = (54, 58, 74, 255)
+    for x in range(5, 11):
+        px[x, 2] = (54, 58, 74, 255)
+    px[5, 3] = px[10, 3] = (54, 58, 74, 255)
+    for y in range(9, 12):
+        for x in range(6, 10):
+            px[x, y] = (200, 206, 216, 255)
+    for x in range(4, 12):
+        px[x, 12] = (120, 225, 255, 255)
+    return im
+
+
+def mining_icon(Image):
+    """採掘アップグレード: 基板の上に、光るツルハシ（持ち手だけ実体の色、頭は水色に光る）。"""
+    im, px = upgrade_board(Image)
+    for i in range(7):
+        px[5 + i, 11 - i] = (120, 88, 60, 255)        # 持ち手（左下から右上へ）
+    head = [(4, 5), (5, 4), (6, 3), (7, 3), (8, 3), (9, 4), (10, 5), (11, 6), (12, 7)]
+    for (x, y) in head:
+        px[x, y] = (150, 236, 255, 255)
+    for (x, y) in ((6, 4), (7, 4), (8, 4), (9, 5), (10, 6)):
+        px[x, y] = (210, 248, 255, 255)
     return im
 
 

@@ -1159,6 +1159,10 @@
     "source": "One fitted to a guard android works as its chestplate (+8 armor, +2 toughness). Takes armor enchantments.",
     "translation": "装在护卫仿生人身上时作为胸甲生效（护甲 +8，盔甲韧性 +2）。可附上护甲类附魔。"
   },
+  "desc.singulo.android_backpack_upgrade": {
+    "source": "Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.",
+    "translation": "装在护卫仿生人上后，物品栏增加 24 格（4 行 6 列）。仿生人会把它背在背上。"
+  },
   "desc.singulo.android_barrier_glass": {
     "source": "Glass that only androids cannot pass. Players and other creatures go straight through. Joins seamlessly with the same glass next to it.",
     "translation": "只有仿生人无法通过的玻璃。玩家和其他生物可以直接穿过。与相同的玻璃相邻时会无缝相连。"
@@ -1166,6 +1170,10 @@
   "desc.singulo.android_barrier_glass_patterned": {
     "source": "Patterned glass that only androids cannot pass.",
     "translation": "只有仿生人无法通过的花纹玻璃。"
+  },
+  "desc.singulo.android_battery_upgrade": {
+    "source": "Fitted to a guard android, each one raises its full charge by 50% (up to two). A battery pack appears on its waist for each.",
+    "translation": "装在护卫仿生人上后，每个可使充满电量增加 50%（最多两个）。装了几个，腰部就会出现几个电池包。"
   },
   "desc.singulo.android_charger": {
     "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
@@ -1195,17 +1203,25 @@
     "source": "A compact crystal memory with a reader, holding the design of the Whip Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "记录了鞭型仿生人设计、带读取端子的小型水晶存储器。放入仿生人组装站即可打印该型号（不会消耗）。"
   },
+  "desc.singulo.android_mining_upgrade": {
+    "source": "Fitted to a guard android, it lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.",
+    "translation": "装在护卫仿生人上后，它就能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。"
+  },
+  "desc.singulo.android_production_upgrade": {
+    "source": "Fitted in an Android Assembly Station, it prints and looks after up to two androids. Only one can charge on top at a time; the other waits beside it and takes its turn.",
+    "translation": "装在仿生人组装站后，最多可打印并管理两个仿生人。一次只能有一个在上方充电，另一个在旁边等待并轮流充电。"
+  },
   "desc.singulo.android_repair_kit": {
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
     "translation": "放在护卫仿生人的物品栏里，受伤时会用掉一个，恢复一半生命（用完后返回组装站）。"
   },
   "desc.singulo.android_station": {
-    "source": "Prints one guard android from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
-    "translation": "用小型水晶存储器、仿生人套件和电力打印一个护卫仿生人，被击倒后用新的套件重新打印。可设置其行动方式，以及在何种生命值时返回维修与充电。"
+    "source": "Prints one guard android (two with a Production Upgrade) from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
+    "translation": "用小型水晶存储器、仿生人套件和电力打印一个护卫仿生人（有生产升级时最多两个），被击倒后用新的套件重新打印。可设置其行动方式，以及在何种生命值时返回维修与充电。"
   },
   "desc.singulo.android_transfer_upgrade": {
-    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits and armor plate) to the station instead of dropping it, and the next android it prints carries it.",
-    "translation": "装在仿生人组装站的强化栏位后，仿生人倒下或被拆解时，其物品（修理套件和装甲板）不会掉落，而是传送到组装站，并交给下一个打印出的仿生人。"
+    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
+    "translation": "装在仿生人组装站的强化栏位后，仿生人倒下或被拆解时，其物品（修理套件、装甲板、升级和携带的物品）不会掉落，而是传送到组装站，并交给下一个打印出的仿生人。"
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -2551,6 +2567,18 @@
     "source": "Armor",
     "translation": "护甲"
   },
+  "gui.singulo.android.backpack": {
+    "source": "Backpack",
+    "translation": "背包"
+  },
+  "gui.singulo.android.battery": {
+    "source": "Battery",
+    "translation": "电池"
+  },
+  "gui.singulo.android.carry": {
+    "source": "Carry",
+    "translation": "携带"
+  },
   "gui.singulo.android.charge": {
     "source": "%s%%",
     "translation": "%s%%"
@@ -2579,6 +2607,10 @@
     "source": "HP %s / %s",
     "translation": "生命 %s / %s"
   },
+  "gui.singulo.android.mining": {
+    "source": "Mining",
+    "translation": "采掘"
+  },
   "gui.singulo.android.mode": {
     "source": "Mode: %s",
     "translation": "模式：%s"
@@ -2594,6 +2626,22 @@
   "gui.singulo.android.nickname.whip": {
     "source": "Verna",
     "translation": "薇尔娜"
+  },
+  "gui.singulo.android.pack": {
+    "source": "Backpack",
+    "translation": "背包内"
+  },
+  "gui.singulo.android.pack.none": {
+    "source": "No backpack",
+    "translation": "没有背包"
+  },
+  "gui.singulo.android.page.gear": {
+    "source": "Gear and inventory",
+    "translation": "装备与物品"
+  },
+  "gui.singulo.android.page.status": {
+    "source": "Status",
+    "translation": "状态"
   },
   "gui.singulo.android.plate": {
     "source": "Plate",
@@ -2726,6 +2774,18 @@
   "gui.singulo.android.say.retreat.1": {
     "source": "Off to get repaired",
     "translation": "我去修理一下"
+  },
+  "gui.singulo.android.work.hint": {
+    "source": "Whether this android may be given work (automation). When off, it is never offered for work.",
+    "translation": "是否可以给这个仿生人分配作业（自动化）。关闭后，它不会出现在作业的候选中。"
+  },
+  "gui.singulo.android.work.off": {
+    "source": "Work: off",
+    "translation": "作业：关"
+  },
+  "gui.singulo.android.work.on": {
+    "source": "Work: on",
+    "translation": "作业：开"
   },
   "gui.singulo.android_station.charge": {
     "source": "Charge",
@@ -4207,6 +4267,14 @@
     "source": "Ruin androids",
     "translation": "遗迹的仿生人"
   },
+  "guide.singulo.androids.upgrades.body": {
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 生产升级：装在组装站后，最多打印并管理两个仿生人。一次只能有一个在上方充电，另一个在旁边等待并轮流。用名字左边的“1”“2”选择界面显示哪一个（行动方式等设置两个共用）。\n- 在仿生人界面中点击名字左边的按钮，切换到“装备与物品”页，就能放入升级。\n- 电池升级：每个使充满电量增加 50%（最多两个），充满所需时间也相应变长。腰部会出现电池包。\n- 背包升级：在 5 格物品之外，再加上背包的 24 格。背包里有物品时无法取下。\n- 采掘升级：使仿生人能进行采掘作业（相当于钻石镐）。可附上效率、时运和精准采集。\n- 作业开/关：为每个仿生人决定是否可以分配作业（自动化）。"
+  },
+  "guide.singulo.androids.upgrades.title": {
+    "source": "Upgrades",
+    "translation": "升级"
+  },
   "guide.singulo.catalysts": {
     "source": "Catalysts",
     "translation": "催化剂"
@@ -4659,6 +4727,10 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "制造地：精密组装台（第 2 阶段）"
   },
+  "howto.singulo.android_backpack_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
   "howto.singulo.android_barrier_glass": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
@@ -4666,6 +4738,10 @@
   "howto.singulo.android_barrier_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_battery_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
   },
   "howto.singulo.android_charger": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -4680,6 +4756,14 @@
     "translation": "制造地：工作台（第 2 阶段）"
   },
   "howto.singulo.android_kit": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.android_mining_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.android_production_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "制造地：精密组装台（第 2 阶段）"
   },
@@ -5547,6 +5631,14 @@
     "source": "Android Armor Plate",
     "translation": "仿生人用装甲板"
   },
+  "item.singulo.android_backpack_upgrade": {
+    "source": "Backpack Upgrade",
+    "translation": "背包升级"
+  },
+  "item.singulo.android_battery_upgrade": {
+    "source": "Battery Upgrade",
+    "translation": "电池升级"
+  },
   "item.singulo.android_charger": {
     "source": "Android Wireless Charger",
     "translation": "仿生人无线充电器"
@@ -5566,6 +5658,14 @@
   "item.singulo.android_memory_whip": {
     "source": "Compact Crystal Memory (Whip)",
     "translation": "小型水晶存储器（鞭型）"
+  },
+  "item.singulo.android_mining_upgrade": {
+    "source": "Mining Upgrade",
+    "translation": "采掘升级"
+  },
+  "item.singulo.android_production_upgrade": {
+    "source": "Production Upgrade",
+    "translation": "生产升级"
   },
   "item.singulo.android_repair_kit": {
     "source": "Self-Repair Kit",
@@ -7307,6 +7407,10 @@
     "source": "Full android charges: %s",
     "translation": "可充满仿生人 %s 次"
   },
+  "tooltip.singulo.android_mining_upgrade": {
+    "source": "Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch",
+    "translation": "像钻石镐一样采掘。可附上效率、时运和精准采集"
+  },
   "tooltip.singulo.beyond_repair": {
     "source": "Beyond repair",
     "translation": "无法修复"
@@ -7439,6 +7543,10 @@
     "source": "Used in: Patterned Android Gate Glass",
     "translation": "用于：花纹仿生人透过玻璃"
   },
+  "uses.singulo.android_kit": {
+    "source": "Used in: Production Upgrade",
+    "translation": "用于：生产升级"
+  },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
     "translation": "用于：奇点核心"
@@ -7448,8 +7556,8 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 22 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 22 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 26 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 26 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 35 more",
@@ -7500,8 +7608,8 @@
     "translation": "用于：卡西米尔腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 7 more",
-    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 7 个"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 9 more",
+    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 9 个"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -7868,12 +7976,12 @@
     "translation": "用于：基本框架、钢板、压缩机"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 66 more",
-    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 66 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 68 more",
+    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 68 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 46 more",
-    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 46 个"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 49 more",
+    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 49 个"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

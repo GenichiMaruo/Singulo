@@ -360,6 +360,67 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 生産アップグレードがあれば2体まで印刷する（1体目がステーションの上からどいてから、2体目を印刷する）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 600)
+    public static void productionUpgradePrintsTwo(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 3);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRODUCTION, new ItemStack(item("android_production_upgrade")));
+        helper.succeedWhen(() -> {
+            List<RuinAndroid> list = androids(helper).stream().filter(RuinAndroid::isAlive).toList();
+            helper.assertTrue(list.size() == 2, "2体印刷されない: " + list.size());
+            helper.assertTrue(list.stream().allMatch(a -> s.manages(a.getUUID())), "ステーションが2体とも受け持っていない");
+            helper.assertTrue(s.items().getStackInSlot(AndroidStationBlockEntity.SLOT_KIT).getCount() == 1, "キットを2つ使っていない");
+            list.forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** バッテリーアップグレード1個につき充電の満タンが50%増え、外すと満タンに合わせて減る。 */
+    @GameTest(template = EMPTY)
+    public static void batteryUpgradeRaisesCharge(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        helper.assertTrue(a.maxCharge() == RuinAndroid.CHARGE_MAX, "アップグレードなしの満タンが違う");
+        a.inventory().setItem(RuinAndroid.SLOT_BATTERY, new ItemStack(item("android_battery_upgrade"), 2));
+        helper.assertTrue(a.batteries() == 2 && a.maxCharge() == RuinAndroid.CHARGE_MAX * 2, "2個で満タンが2倍にならない");
+        CompoundTag tag = a.saveWithoutId(new CompoundTag());
+        tag.putInt("charge", RuinAndroid.CHARGE_MAX * 2);
+        a.load(tag);
+        helper.assertTrue(a.charge() == RuinAndroid.CHARGE_MAX * 2, "読み込みで充電が満タンを超えた分を失った: " + a.charge());
+        a.inventory().setItem(RuinAndroid.SLOT_BATTERY, new ItemStack(item("android_battery_upgrade"), 1));
+        helper.assertTrue(a.maxCharge() == RuinAndroid.CHARGE_MAX * 3 / 2 && a.charge() == a.maxCharge(), "外したときに充電が満タンに合わない");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** 持ち物は位置ごと保存する（空きスロットがあってもずれない）。0.6.0 の保存も、装甲板を装甲板の場所へ戻す。 */
+    @GameTest(template = EMPTY)
+    public static void androidInventoryKeepsSlots(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.inventory().setItem(RuinAndroid.SLOT_PLATE, new ItemStack(item("android_armor_plate")));
+        a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
+        a.inventory().setItem(RuinAndroid.PACK_START + 7, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 12));
+        CompoundTag tag = a.saveWithoutId(new CompoundTag());
+        BladeAndroid b = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        b.load(tag);
+        helper.assertTrue(RuinAndroid.isArmorPlate(b.inventory().getItem(RuinAndroid.SLOT_PLATE)), "装甲板の場所がずれた");
+        helper.assertTrue(b.inventory().getItem(RuinAndroid.SLOT_REPAIR).isEmpty(), "修理キットの場所に物が入った");
+        helper.assertTrue(b.inventory().getItem(RuinAndroid.PACK_START + 7).getCount() == 12 && b.hasBackpack(), "バックパックの中身の場所がずれた");
+        // 0.6.0 までの保存（位置なしの並び）
+        CompoundTag legacy = a.saveWithoutId(new CompoundTag());
+        legacy.remove("items");
+        ListTag list = new ListTag();
+        list.add(new ItemStack(item("android_armor_plate")).save(helper.getLevel().registryAccess()));
+        legacy.put("inventory", list);
+        BladeAndroid c = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        c.load(legacy);
+        helper.assertTrue(RuinAndroid.isArmorPlate(c.inventory().getItem(RuinAndroid.SLOT_PLATE)), "古い保存の装甲板が装甲板の場所に戻らない");
+        a.discard();
+        b.discard();
+        c.discard();
+        helper.succeed();
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

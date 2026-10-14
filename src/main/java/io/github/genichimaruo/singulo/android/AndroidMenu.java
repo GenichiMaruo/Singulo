@@ -12,7 +12,15 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-/** 護衛のアンドロイドの画面。自己修理キット（1スタック）と装甲板（1枚）のスロット、体力・充電・動き方の表示。 */
+/**
+ * 護衛のアンドロイドの画面。2ページある。
+ * <ul>
+ * <li>様子: 体力・充電・動き方の表示と、自己修理キット（1スタック）・装甲板（1枚）のスロット。</li>
+ * <li>装備と持ち物: アップグレード（バッテリー2個まで・バックパック・採掘）、作業のオン／オフ、
+ * 持ち物（5スロット）とバックパックの中（縦4×横6。バックパックを積んでいるときだけ）。</li>
+ * </ul>
+ * ページは画面（クライアント）だけが切り替え、見えないページのスロットは隠す。
+ */
 public class AndroidMenu extends AbstractContainerMenu {
     public static final int WIDTH = 210;
     public static final int HEIGHT = 216;
@@ -20,16 +28,27 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int REPAIR_X = 96, REPAIR_Y = 102;
     public static final int PLATE_X = 134, PLATE_Y = 102;
     public static final int DISMANTLE_X = 172, DISMANTLE_Y = 104;
+    /** 装備と持ち物のページ: 左にアップグレードの列、中ほどにバックパック（6×4）、右に持ち物の列（5）。 */
+    public static final int UPGRADE_X = 22, BATTERY_Y = 32, BACKPACK_Y = 60, MINING_Y = 88;
+    public static final int PACK_X = 58, PACK_Y = 32;
+    public static final int CARRY_X = 184, CARRY_Y = 32;
+    public static final int WORK_X = 8, WORK_Y = 108, WORK_W = 44, WORK_H = 14;
     public static final int INV_X = (WIDTH - 162) / 2 + 1;
     public static final int INV_Y = 134;
     public static final int HOTBAR_Y = 192;
 
-    public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, COUNT = 7;
-    public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1;
+    public static final int PAGE_STATUS = 0, PAGE_GEAR = 1;
+
+    public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, D_WORK = 7,
+            COUNT = 8;
+    public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1, BUTTON_WORK = 2;
 
     @Nullable
     private final RuinAndroid android;
+    private final Container items;
     private final SyncedInts data;
+    /** 見ているページ（クライアント）。 */
+    private int page = PAGE_STATUS;
 
     public AndroidMenu(int containerId, Inventory inventory, RuinAndroid android) {
         this(containerId, inventory, android, android.inventory(), SyncedInts.server(COUNT, i -> switch (i) {
@@ -41,6 +60,7 @@ public class AndroidMenu extends AbstractContainerMenu {
             case D_STATE -> android.state();
             case D_ARMOR -> android.getArmorValue();
             case D_ALERT -> android.alert() ? 1 : 0;
+            case D_WORK -> android.workEnabled() ? 1 : 0;
             default -> 0;
         }));
     }
@@ -48,24 +68,55 @@ public class AndroidMenu extends AbstractContainerMenu {
     private AndroidMenu(int containerId, Inventory inventory, @Nullable RuinAndroid android, Container items, SyncedInts data) {
         super(SinguloMenus.ANDROID.get(), containerId);
         this.android = android;
+        this.items = items;
         this.data = data;
-        addSlot(new Slot(items, RuinAndroid.SLOT_REPAIR, REPAIR_X, REPAIR_Y) {
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_REPAIR, REPAIR_X, REPAIR_Y, PAGE_STATUS, 64) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return RuinAndroid.isRepairKit(stack);
             }
         });
-        addSlot(new Slot(items, RuinAndroid.SLOT_PLATE, PLATE_X, PLATE_Y) {
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_PLATE, PLATE_X, PLATE_Y, PAGE_STATUS, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return RuinAndroid.isArmorPlate(stack);
             }
-
+        });
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_BATTERY, UPGRADE_X, BATTERY_Y, PAGE_GEAR, RuinAndroid.MAX_BATTERIES) {
             @Override
-            public int getMaxStackSize() {
-                return 1;
+            public boolean mayPlace(ItemStack stack) {
+                return RuinAndroid.isBatteryUpgrade(stack);
             }
         });
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_BACKPACK, UPGRADE_X, BACKPACK_Y, PAGE_GEAR, 1) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return RuinAndroid.isBackpackUpgrade(stack);
+            }
+
+            /** 中に物が入っている間は、バックパックを外せない。 */
+            @Override
+            public boolean mayPickup(Player player) {
+                return packEmpty();
+            }
+        });
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_MINING, UPGRADE_X, MINING_Y, PAGE_GEAR, 1) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return RuinAndroid.isMiningUpgrade(stack);
+            }
+        });
+        for (int i = 0; i < RuinAndroid.CARRY_SLOTS; i++) {
+            addSlot(new PageSlot(items, RuinAndroid.CARRY_START + i, CARRY_X, CARRY_Y + i * 18, PAGE_GEAR, 64));
+        }
+        for (int i = 0; i < RuinAndroid.PACK_SLOTS; i++) {
+            addSlot(new PageSlot(items, RuinAndroid.PACK_START + i, PACK_X + (i % 6) * 18, PACK_Y + (i / 6) * 18, PAGE_GEAR, 64) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return hasBackpack();
+                }
+            });
+        }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
@@ -77,10 +128,32 @@ public class AndroidMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
+    /** ページごとに出し入れするスロット（見えないページのものは隠す）。 */
+    private class PageSlot extends Slot {
+        private final int slotPage;
+        private final int limit;
+
+        PageSlot(Container container, int index, int x, int y, int page, int limit) {
+            super(container, index, x, y);
+            this.slotPage = page;
+            this.limit = limit;
+        }
+
+        @Override
+        public boolean isActive() {
+            return page == slotPage;
+        }
+
+        @Override
+        public int getMaxStackSize() {
+            return limit;
+        }
+    }
+
     public static AndroidMenu client(int containerId, Inventory inventory, RegistryFriendlyByteBuf buf) {
         int id = buf.readVarInt();
         RuinAndroid android = inventory.player.level().getEntity(id) instanceof RuinAndroid a ? a : null;
-        return new AndroidMenu(containerId, inventory, android, new SimpleContainer(2), SyncedInts.client(COUNT));
+        return new AndroidMenu(containerId, inventory, android, new SimpleContainer(RuinAndroid.INVENTORY_SIZE), SyncedInts.client(COUNT));
     }
 
     /** 画面に描くアンドロイド（クライアント。見つからなければ null）。 */
@@ -91,6 +164,30 @@ public class AndroidMenu extends AbstractContainerMenu {
 
     public int value(int index) {
         return data.getInt(index);
+    }
+
+    public int page() {
+        return page;
+    }
+
+    /** 見るページを変える（クライアント）。 */
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    /** バックパックアップグレードを積んでいるか（スロットの中身で見るので、クライアントでも分かる）。 */
+    public boolean hasBackpack() {
+        return RuinAndroid.isBackpackUpgrade(items.getItem(RuinAndroid.SLOT_BACKPACK));
+    }
+
+    /** バックパックの中が空か。 */
+    public boolean packEmpty() {
+        for (int i = 0; i < RuinAndroid.PACK_SLOTS; i++) {
+            if (!items.getItem(RuinAndroid.PACK_START + i).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** 名前を付け直す（サーバー。RenameAndroidPayload から）。操作できる人だけ。 */
@@ -114,6 +211,10 @@ public class AndroidMenu extends AbstractContainerMenu {
             android.chooseEscort(!android.escort());
             return true;
         }
+        if (id == BUTTON_WORK) {
+            android.setWorkEnabled(!android.workEnabled());
+            return true;
+        }
         return false;
     }
 
@@ -125,11 +226,13 @@ public class AndroidMenu extends AbstractContainerMenu {
         }
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
-        if (index < 2) {
-            if (!moveItemStackTo(stack, 2, slots.size(), true)) {
+        int own = RuinAndroid.INVENTORY_SIZE;
+        if (index < own) {
+            if (!moveItemStackTo(stack, own, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, 0, 2, false)) {
+        } else if (!moveItemStackTo(stack, 0, RuinAndroid.CARRY_START, false)          // 修理キット・装甲板・アップグレードの枠
+                && !moveItemStackTo(stack, RuinAndroid.CARRY_START, own, false)) {     // 持ち物、バックパックの中
             return ItemStack.EMPTY;
         }
         if (stack.isEmpty()) {
