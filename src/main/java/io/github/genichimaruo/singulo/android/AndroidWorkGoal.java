@@ -105,7 +105,8 @@ final class AndroidWorkGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return android.isGuard() && android.workConsole() != null && android.active() && android.printed();
+        // 襲われて戦っている間は止める（作業の進みは残る。片付けたら、止めた所から続ける）
+        return android.isGuard() && android.workConsole() != null && android.active() && android.printed() && android.getTarget() == null;
     }
 
     @Override
@@ -749,6 +750,7 @@ final class AndroidWorkGoal extends Goal {
             fail(c, job, WorkConsoleBlockEntity.Failure.UNREACHABLE);
         } else if (at) {
             if (c.deliver(android, job)) {
+                android.gesture(RuinAndroid.GESTURE_NOD, null);            // 届けた: 小さくうなずく
                 c.complete(job);
                 afterJob(c, job);
             } else {

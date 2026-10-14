@@ -652,6 +652,31 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 作業中に襲われたら、襲ってきた相手を迎え撃ち、片付けたら作業に戻って注文を終える。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void workingAndroidFightsBack(GameTestHelper helper) {
+        var console = workshop(helper, 2);
+        BladeAndroid a = worker(helper, false);
+        var player = helper.makeMockServerPlayerInLevel();
+        console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.runAfterDelay(20, () -> {
+            var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+            zombie.moveTo(a.position().add(1.5, 0, 0));
+            zombie.setNoAi(true);
+            helper.getLevel().addFreshEntity(zombie);
+            a.hurt(helper.getLevel().damageSources().mobAttack(zombie), 1);
+            helper.runAfterDelay(10, () -> {
+                helper.assertTrue(a.getTarget() == zombie, "作業中に襲ってきた相手を狙わない");
+                helper.assertTrue(a.isWorking(), "戦っている間に作業を取り上げられた");
+                zombie.discard();
+                helper.succeedWhen(() -> {
+                    helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8, "片付けたあと作業に戻らない");
+                    a.discard();
+                });
+            });
+        });
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

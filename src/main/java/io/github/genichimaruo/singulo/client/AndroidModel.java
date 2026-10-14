@@ -378,6 +378,28 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
                 }
             }
         }
+        gestureOverlay(android, pt);
+    }
+
+    /** 挨拶の仕草: 手を振る（左手を上げて左右に）・会釈（頭と上体を軽く下げる）。始めと終わりはなめらかに。 */
+    private void gestureOverlay(RuinAndroid android, float pt) {
+        int g = android.gesture();
+        if (g == RuinAndroid.GESTURE_NONE) {
+            return;
+        }
+        float t = android.gestureTime(pt);
+        float k = Mth.clamp(Math.min(t / 5, (RuinAndroid.GESTURE_TICKS - t) / 5), 0, 1);
+        k = k * k * (3 - 2 * k);
+        if (g == RuinAndroid.GESTURE_WAVE) {
+            armL.xRot = Mth.lerp(k, armL.xRot, -0.3F);
+            armL.zRot = Mth.lerp(k, armL.zRot, -2.5F + Mth.sin(t * 0.7F) * 0.35F);
+            forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.35F);
+            head.zRot += 0.08F * k;
+        } else if (g == RuinAndroid.GESTURE_NOD) {
+            float bow = Math.max(0, Mth.sin(t / RuinAndroid.GESTURE_TICKS * Mth.PI));
+            head.xRot += 0.45F * bow;
+            torso.xRot += 0.12F * bow;
+        }
     }
 
     // ------------------------------------------------------------------ 光剣型の動き

@@ -93,6 +93,70 @@ public abstract class RuinAndroid extends Monster {
     /** ステーションの上が空くのを待つときの、ステーションからの距離。 */
     static final double WAIT_RADIUS = 2.6;
     /** 迎撃・待機のときに立つ場所（ステーションの上を空けておくため、横へずらす。アンドロイドごとに向きを変える）。 */
+    // ------------------------------------------------------------------ 挨拶
+
+    /** 仕草の残り（サーバー）と、そのあいだ向く相手。仕草が始まった時（クライアント）。 */
+    private int gestureTicks;
+    @Nullable
+    private Entity gestureLook;
+    private int clientGestureStart;
+    /** 持ち主・許可証の人が最後にそばにいた時刻、仲間と最後に挨拶した時刻（保存しない）。 */
+    private final java.util.Map<java.util.UUID, Long> lastClose = new java.util.HashMap<>();
+    private final java.util.Map<java.util.UUID, Long> lastPeerGreet = new java.util.HashMap<>();
+    /** これだけ離れていた人がそばに来たら挨拶する（5分）。仲間とは1分に1回まで。 */
+    static final int AWAY_TICKS = 20 * 60 * 5, PEER_GREET_TICKS = 20 * 60;
+
+    public int gesture() {
+        return entityData.get(GESTURE);
+    }
+
+    /** 仕草が始まってからの時間（クライアント、tick）。 */
+    public float gestureTime(float partialTick) {
+        return tickCount - clientGestureStart + partialTick;
+    }
+
+    /** 仕草をする（look があれば、そのあいだそちらを向く）。 */
+    public void gesture(int kind, @Nullable Entity look) {
+        entityData.set(GESTURE, GESTURE_NONE);
+        entityData.set(GESTURE, kind);
+        gestureTicks = GESTURE_TICKS;
+        gestureLook = look;
+    }
+
+    /** 毎秒: 久しぶりにそばに来た持ち主へ手を振り、そばを通る仲間と会釈する。 */
+    private void greetings(ServerLevel level) {
+        if (!guard || !printed() || !active() || getTarget() != null || gestureTicks > 0) {
+            return;
+        }
+        long now = level.getGameTime();
+        for (Player p : level.players()) {
+            if (p.isSpectator() || !mayOperate(p) || p.distanceToSqr(this) > 8 * 8) {
+                continue;
+            }
+            Long seen = lastClose.put(p.getUUID(), now);
+            if (seen == null || now - seen > AWAY_TICKS) {
+                gesture(GESTURE_WAVE, p);
+                chirp(level, null, 1.5F);
+                return;
+            }
+        }
+        for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, getBoundingBox().inflate(2.5),
+                a -> a != this && a.isAlive() && a.guard && a.printed() && a.active() && a.getTarget() == null && a.gestureTicks <= 0
+                        && java.util.Objects.equals(a.owner, owner))) {
+            Long last = lastPeerGreet.get(a.getUUID());
+            if (last == null || now - last > PEER_GREET_TICKS) {
+                lastPeerGreet.put(a.getUUID(), now);
+                a.lastPeerGreet.put(getUUID(), now);
+                gesture(GESTURE_NOD, a);
+                a.gesture(GESTURE_NOD, this);
+                chirp(level, a, 1.2F);
+                return;
+            }
+        }
+    }
+
+    /** 作業中に襲ってきた相手を追う距離。 */
+    static final double WORK_DEFEND_RANGE = 16;
     /** ステーションの上の番が、仲間に上を譲っているところ。 */
     private boolean yielding;
     private static final Vec3[] STAND_OFFSETS = {new Vec3(2, 0, 0), new Vec3(-2, 0, 0), new Vec3(0, 0, 2), new Vec3(0, 0, -2)};
@@ -108,6 +172,11 @@ public abstract class RuinAndroid extends Monster {
     private static final EntityDataAccessor<Integer> BATTERIES = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     /** 作業（自動化）を割り当てられているか（持ち物を取り出せなくするため、クライアントでも見る）。 */
     private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+    /** 仕草（挨拶。{@link #GESTURE_WAVE} など。クライアントでも見える）。 */
+    private static final EntityDataAccessor<Integer> GESTURE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    public static final int GESTURE_NONE = 0, GESTURE_WAVE = 1, GESTURE_NOD = 2;
+    /** 仕草の長さ（tick）。 */
+    public static final int GESTURE_TICKS = 30;
     /** 作業中に今していること（{@link #ACT_FETCH} など。クライアントでも見える）。 */
     private static final EntityDataAccessor<Integer> ACTIVITY = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     public static final int ACT_NONE = 0, ACT_FETCH = 1, ACT_CRAFT = 2, ACT_PROCESS = 3, ACT_MINE = 4, ACT_DELIVER = 5, ACT_RETURN = 6,
@@ -297,7 +366,7 @@ public abstract class RuinAndroid extends Monster {
         if (s == STATE_LOW_POWER || s == STATE_RETREAT || charging(s)) {
             return ACT_CHARGE;
         }
-        if (getTarget() != null) {
+        if (getTarget() != null || entityData.get(ALERT)) {
             return ACT_FIGHT;
         }
         return entityData.get(ACTIVITY);
@@ -579,6 +648,7 @@ public abstract class RuinAndroid extends Monster {
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
+        builder.define(GESTURE, GESTURE_NONE);
     }
 
     // ------------------------------------------------------------------ 護衛（プレイヤーのアンドロイド）
@@ -748,7 +818,11 @@ public abstract class RuinAndroid extends Monster {
 
     /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
     boolean guardTargets(LivingEntity e) {
-        if (!hostileToGuards(e) || mode == MODE_FOLLOW && !escort || workConsole != null) {
+        if (workConsole != null) {
+            // 作業中は、自分を襲ってきた相手だけ迎え撃つ（近くにいる間）。片付けたら作業に戻る
+            return hostileToGuards(e) && e == getLastHurtByMob() && e.isAlive() && e.distanceToSqr(this) < WORK_DEFEND_RANGE * WORK_DEFEND_RANGE;
+        }
+        if (!hostileToGuards(e) || mode == MODE_FOLLOW && !escort) {
             return false;
         }
         Vec3 anchor = guardAnchor();
@@ -886,6 +960,9 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
+        if (GESTURE.equals(key) && level().isClientSide) {
+            clientGestureStart = tickCount;
+        }
         if (STATE.equals(key) && level().isClientSide) {
             int s = state();
             if (s != clientPrevState) {
@@ -985,6 +1062,17 @@ public abstract class RuinAndroid extends Monster {
         }
         if (guard && getTarget() != null && !guardTargets(getTarget())) {
             setTarget(null);
+        }
+        if (gestureTicks > 0) {
+            if (gestureLook != null && gestureLook.isAlive()) {
+                getLookControl().setLookAt(gestureLook, 60, 60);
+            }
+            if (--gestureTicks == 0) {
+                entityData.set(GESTURE, GESTURE_NONE);
+                gestureLook = null;
+            }
+        } else if (tickCount % 20 == 11) {
+            greetings((ServerLevel) level());
         }
         // 作業中は、作業指令台に毎秒知らせる（充電で作業の手を止めている間も、作業を取り上げられないように）
         if (workJob != null && workJob.jobId() >= 0 && tickCount % 20 == 0 && workConsole != null && level().isLoaded(workConsole)

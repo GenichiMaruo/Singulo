@@ -123,6 +123,28 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         pose.popPose();
     }
 
+    /**
+     * 透きとおって光る刃の描き方: entityTranslucentEmissive と同じだが、奥行きも書く。書かないと、あとから描かれるブロックの
+     * 絵（チェストなど）が、手前にある刃の上に描かれてしまう。
+     */
+    private static final class DepthGlow extends RenderType {
+        static final java.util.function.Function<ResourceLocation, RenderType> TYPE = net.minecraft.Util.memoize(texture -> create(
+                "singulo_translucent_emissive_depth", com.mojang.blaze3d.vertex.DefaultVertexFormat.NEW_ENTITY,
+                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, true, true, CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
+                        .setTextureState(new TextureStateShard(texture, false, false))
+                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(NO_CULL)
+                        .setWriteMaskState(COLOR_DEPTH_WRITE)
+                        .setOverlayState(OVERLAY)
+                        .createCompositeState(false)));
+
+        private DepthGlow(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
+                          boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
+            super(name, format, mode, size, crumbling, sort, setup, clear);
+        }
+    }
+
     /** 体を描くときと同じ変形（向き・裏返し・大きさ）を pose に積む。 */
     private void modelSpace(RuinAndroid android, float partialTick, PoseStack pose) {
         float bodyYaw = Mth.rotLerp(partialTick, android.yBodyRotO, android.yBodyRot);
@@ -762,7 +784,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.pushPose();
             m.toBlade(pose);
             m.blade.visible = true;
-            m.blade.render(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(variant.texture)), FxDraw.FULL_BRIGHT,
+            m.blade.render(pose, buffers.getBuffer(DepthGlow.TYPE.apply(variant.texture)), FxDraw.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, argb((int) (255 * k), 0xFFFFFF));
             m.blade.visible = false;
             pose.popPose();
