@@ -888,6 +888,9 @@ public final class AndroidGameTests {
         }
         console.outbox().setItem(0, new ItemStack(planks, 63));
         helper.assertFalse(console.deliver(a, job), "1個だけで納品完了になった");
+        CompoundTag controller = console.saveWithFullMetadata(helper.getLevel().registryAccess());
+        console.loadWithComponents(controller, helper.getLevel().registryAccess());
+        helper.assertTrue(console.orders().getFirst().deliverInProgress == 2, "再読込で未納品数を失った");
         console.outbox().setItem(0, new ItemStack(planks, 63));
         helper.assertFalse(console.deliver(a, job), "2個だけで納品完了になった");
         console.outbox().setItem(0, ItemStack.EMPTY);
@@ -971,6 +974,61 @@ public final class AndroidGameTests {
         }
         helper.assertTrue(raw == 2, "未投入の原鉄が残らない");
         a.discard();
+        helper.succeed();
+    }
+
+
+    /** 一部製作済みで指令台と個体を再読込しても、最初の素材を二重に要求しない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidResumesCraftAfterReload(GameTestHelper helper) {
+        var console = workshop(helper, 1);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない");
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(a.saveWorkState().getLong("crafted") > 0, "一部製作済みになるのを待つ"))
+                .thenExecute(() -> {
+                    CompoundTag saved = a.saveWithoutId(new CompoundTag());
+                    CompoundTag controller = console.saveWithFullMetadata(helper.getLevel().registryAccess());
+                    console.loadWithComponents(controller, helper.getLevel().registryAccess());
+                    a.load(saved);
+                })
+                .thenWaitUntil(() -> {
+                    helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8, "再読込後に棒8本が届かない");
+                    helper.assertTrue(console.orders().isEmpty(), "再読込後に注文が終わらない");
+                })
+                .thenExecute(a::discard)
+                .thenSucceed();
+    }
+
+    /** 転送後も、持ち主の物を資材として戻さず、作業用の物とタンクを引き継ぐ。 */
+    @GameTest(template = EMPTY)
+    public static void transferredWorkKeepsPersonalSlotsAndFluids(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.EMERALD));
+        a.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
+        a.assignWork(helper.absolutePos(CONSOLE), 1);
+        a.addToCarry(new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4));
+        var water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000);
+        a.fillTanks(water, false);
+        CompoundTag work = a.saveWorkState();
+        BladeAndroid b = SinguloEntities.BLADE_ANDROID.get().create(level);
+        for (int i = 0; i < RuinAndroid.INVENTORY_SIZE; i++) {
+            b.inventory().setItem(i, a.inventory().getItem(i).copy());
+        }
+        b.assignWork(helper.absolutePos(CONSOLE), 1);
+        b.restoreWorkState(work);
+        boolean personalExcluded = true, cargoIncluded = false;
+        for (int slot : b.carrySlots()) {
+            personalExcluded &= slot != RuinAndroid.CARRY_START;
+            cargoIncluded |= b.inventory().getItem(slot).is(net.minecraft.world.item.Items.OAK_PLANKS);
+        }
+        helper.assertTrue(personalExcluded && cargoIncluded, "転送後に持ち主の物と作業用の物が混ざった");
+        helper.assertTrue(b.tankAmount(water) == 1000, "転送後に流体を失った");
+        a.discard();
+        b.discard();
         helper.succeed();
     }
 

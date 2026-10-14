@@ -26,6 +26,54 @@ public record WorkJob(Type type, int orderId, int jobId, long amount, List<ItemC
         return new WorkJob(type, orderId, -1, 0, List.of(), List.of(), false);
     }
 
+    /** 消費済み素材をもう一度要求しないよう、作業そのものも保存する。 */
+    public net.minecraft.nbt.CompoundTag save(net.minecraft.core.HolderLookup.Provider registries) {
+        var tag = new net.minecraft.nbt.CompoundTag();
+        tag.putString("type", type.name());
+        tag.putInt("order", orderId);
+        tag.putInt("job", jobId);
+        tag.putLong("amount", amount);
+        tag.putBoolean("carried", carried);
+        tag.put("fetch", WorkOrder.saveCounts(fetch, registries));
+        var batches = new net.minecraft.nbt.ListTag();
+        for (Batch b : batch) {
+            var t = new net.minecraft.nbt.CompoundTag();
+            t.putInt("step", b.step());
+            t.putLong("crafts", b.crafts());
+            t.putLong("location", b.location().asLong());
+            t.put("recipe", b.recipe().save(registries));
+            batches.add(t);
+        }
+        tag.put("batch", batches);
+        return tag;
+    }
+
+    @javax.annotation.Nullable
+    public static WorkJob load(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        if (!tag.contains("type")) {
+            return null;
+        }
+        Type type;
+        try {
+            type = Type.valueOf(tag.getString("type"));
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+        var fetch = new java.util.ArrayList<ItemCount>();
+        WorkOrder.loadCounts(tag.getList("fetch", net.minecraft.nbt.Tag.TAG_COMPOUND), fetch, registries);
+        var batch = new java.util.ArrayList<Batch>();
+        for (var element : tag.getList("batch", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            var t = (net.minecraft.nbt.CompoundTag) element;
+            var recipe = RecipeData.load(t.getCompound("recipe"), registries);
+            if (recipe == null || t.getInt("step") < 0 || t.getLong("crafts") <= 0) {
+                return null;
+            }
+            batch.add(new Batch(t.getInt("step"), t.getLong("crafts"), BlockPos.of(t.getLong("location")), recipe));
+        }
+        return new WorkJob(type, tag.getInt("order"), tag.getInt("job"), Math.max(0, tag.getLong("amount")),
+                fetch, batch, tag.getBoolean("carried"));
+    }
+
     /** 作業指令台が覚えておく、渡した作業（だれが、いつまで）。 */
     public static final class Lease {
         public final WorkJob job;

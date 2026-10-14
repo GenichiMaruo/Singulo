@@ -253,7 +253,9 @@ public abstract class RuinAndroid extends Monster {
     @Nullable
     private BlockPos workConsole;
     private int workOrder = -1;
-    /** 今進めている作業（保存しない。作業指令台に毎秒知らせる）。 */
+    /** 作業の途中も保存し、再読込・転送後に同じ所から続ける。 */
+    private AndroidWorkGoal workGoal;
+    /** 今進めている作業（作業指令台に毎秒知らせる）。 */
     @Nullable
     io.github.genichimaruo.singulo.android.work.WorkJob workJob;
     /**
@@ -516,6 +518,7 @@ public abstract class RuinAndroid extends Monster {
         this.workConsole = console.immutable();
         this.workOrder = order;
         this.workJob = null;
+        workGoal.loadWork(new CompoundTag());
         int mask = 0;
         int[] all = allCarrySlots();
         for (int i = 0; i < all.length; i++) {
@@ -528,8 +531,34 @@ public abstract class RuinAndroid extends Monster {
         setTarget(null);
     }
 
+    /** 死亡後の転送・再印刷でも、持ち主の物と作業用の物を区別して復元する。 */
+    public CompoundTag saveWorkState() {
+        CompoundTag t = workGoal.saveWork();
+        t.putInt("personal", personal);
+        var fluids = new net.minecraft.nbt.ListTag();
+        for (var tank : tanks) {
+            fluids.add(tank.writeToNBT(registryAccess(), new CompoundTag()));
+        }
+        t.put("tanks", fluids);
+        return t;
+    }
+
+    public void restoreWorkState(CompoundTag t) {
+        personal = t.getInt("personal");
+        workGoal.loadWork(t);
+        var fluids = t.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        for (int i = 0; i < TANKS; i++) {
+            tanks[i].setFluid(net.neoforged.neoforge.fluids.FluidStack.EMPTY);
+            if (i < fluids.size()) {
+                tanks[i].readFromNBT(registryAccess(), fluids.getCompound(i));
+            }
+        }
+        syncTanks();
+    }
+
     /** 作業をやめる（元の動き方に戻る）。 */
     public void clearWork() {
+        workGoal.loadWork(new CompoundTag());
         this.workConsole = null;
         this.workOrder = -1;
         this.workJob = null;
@@ -731,7 +760,11 @@ public abstract class RuinAndroid extends Monster {
                 && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
         boolean sent = false;
         if (station != null && workConsole != null) {
-            station.keepWork(getUUID(), workConsole, workOrder);    // 印刷し直したアンドロイドが、同じ注文の作業を続ける
+            station.keepWork(getUUID(), workConsole, workOrder, saveWorkState());    // 印刷し直したアンドロイドが、同じ注文の作業を続ける
+        }
+        if (station == null && workConsole != null && level.isLoaded(workConsole)
+                && level.getBlockEntity(workConsole) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity c) {
+            c.cancel(workOrder, null);           // 消費済みの作業を別の個体に最初からやり直させない
         }
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             net.minecraft.world.item.ItemStack stack = inventory.removeItemNoUpdate(i);
@@ -1188,7 +1221,8 @@ public abstract class RuinAndroid extends Monster {
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new PowerGoal());
-        goalSelector.addGoal(2, new AndroidWorkGoal(this));
+        workGoal = new AndroidWorkGoal(this);
+        goalSelector.addGoal(2, workGoal);
         registerCombat();
         goalSelector.addGoal(5, new GuardGoal());
         goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
@@ -1466,6 +1500,7 @@ public abstract class RuinAndroid extends Monster {
             tag.put("work_console", NbtUtils.writeBlockPos(workConsole));
             tag.putInt("work_order", workOrder);
             tag.putInt("work_personal", personal);
+            tag.put("work_state", saveWorkState());
         }
         if (guard) {
             tag.putBoolean("guard", true);
@@ -1514,6 +1549,9 @@ public abstract class RuinAndroid extends Monster {
         NbtUtils.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
             assignWork(p, tag.getInt("work_order"));
             personal = tag.getInt("work_personal");          // 作業を始めたときの持ち主の物の場所（読み込み直しても変えない）
+            if (tag.contains("work_state")) {
+                restoreWorkState(tag.getCompound("work_state"));
+            }
         }, this::clearWork);
         if (tag.contains("charge")) {
             setCharge(tag.getInt("charge"));                // バッテリーの数が分かってから、満タンに合わせて戻す

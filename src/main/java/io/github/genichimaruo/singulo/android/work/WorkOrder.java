@@ -297,7 +297,7 @@ public final class WorkOrder {
     static void loadCounts(ListTag tags, List<ItemCount> out, HolderLookup.Provider registries) {
         for (Tag t : tags) {
             ItemCount c = ItemCount.load((CompoundTag) t, registries);
-            if (!c.item.isEmpty()) {
+            if (c != null && !c.item.isEmpty()) {
                 out.add(c);
             }
         }

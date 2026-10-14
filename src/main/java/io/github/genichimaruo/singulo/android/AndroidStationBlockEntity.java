@@ -220,13 +220,15 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 転送アップグレードで預かった作業（枠ごと。次に印刷するアンドロイドが同じ注文の作業を続ける）。 */
     private final BlockPos[] keptConsole = new BlockPos[MAX_UNITS];
     private final int[] keptOrder = new int[MAX_UNITS];
+    private final CompoundTag[] keptWork = new CompoundTag[MAX_UNITS];
 
     /** 倒れたアンドロイドの作業を預かる。 */
-    public void keepWork(UUID id, @Nullable BlockPos console, int order) {
+    public void keepWork(UUID id, @Nullable BlockPos console, int order, CompoundTag state) {
         int unit = unitOf(id);
         if (unit >= 0) {
             keptConsole[unit] = console;
             keptOrder[unit] = order;
+            keptWork[unit] = state.copy();
             setChanged();
         }
     }
@@ -578,7 +580,11 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         a.setCharge(a.maxCharge());
         if (keptConsole[unit] != null) {
             a.assignWork(keptConsole[unit], keptOrder[unit]);
+            if (keptWork[unit] != null) {
+                a.restoreWorkState(keptWork[unit]);
+            }
             keptConsole[unit] = null;
+            keptWork[unit] = null;
         }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
@@ -740,6 +746,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             if (keptConsole[i] != null) {
                 tag.put("kept_console" + i, net.minecraft.nbt.NbtUtils.writeBlockPos(keptConsole[i]));
                 tag.putInt("kept_order" + i, keptOrder[i]);
+                if (keptWork[i] != null) {
+                    tag.put("kept_work" + i, keptWork[i]);
+                }
             }
         }
         tag.putInt("mode", mode);
@@ -809,6 +818,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         for (int i = 0; i < MAX_UNITS; i++) {
             keptConsole[i] = net.minecraft.nbt.NbtUtils.readBlockPos(tag, "kept_console" + i).orElse(null);
             keptOrder[i] = tag.getInt("kept_order" + i);
+            keptWork[i] = tag.contains("kept_work" + i) ? tag.getCompound("kept_work" + i).copy() : null;
         }
         mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_FOLLOW);
         retreat = tag.contains("retreat") ? Mth.clamp(tag.getInt("retreat"), 0, 90) : 30;

@@ -104,6 +104,75 @@ final class AndroidWorkGoal extends Goal {
         setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
+    /** 製作・投入・手順・素材受取の途中を、アンドロイドと一緒に保存する。 */
+    net.minecraft.nbt.CompoundTag saveWork() {
+        var t = new net.minecraft.nbt.CompoundTag();
+        var registries = android.registryAccess();
+        if (android.workJob != null) {
+            t.put("job", android.workJob.save(registries));
+        }
+        t.putInt("phase", phase);
+        t.putBoolean("returning", returning);
+        t.putLong("crafted", crafted);
+        t.putLong("inserted", inserted);
+        t.putLong("collected", collected);
+        t.putInt("batch", batchIndex);
+        t.putInt("procedure", procIndex);
+        t.putLong("progress", progress);
+        if (pickups != null) {
+            var remaining = new net.minecraft.nbt.ListTag();
+            for (int i = pickupIndex; i < pickups.size(); i++) {
+                var pickup = pickups.get(i);
+                var pt = new net.minecraft.nbt.CompoundTag();
+                pt.putLong("point", pickup.point().asLong());
+                var items = new net.minecraft.nbt.ListTag();
+                for (ItemCount count : pickup.items()) {
+                    items.add(count.save(registries));
+                }
+                pt.put("items", items);
+                remaining.add(pt);
+            }
+            t.put("pickups", remaining);
+        }
+        return t;
+    }
+
+    /** 移動経路は探し直すが、消費・製作・受取済みの数は巻き戻さない。 */
+    void loadWork(net.minecraft.nbt.CompoundTag t) {
+        android.workJob = WorkJob.load(t.getCompound("job"), android.registryAccess());
+        phase = t.getInt("phase");
+        returning = t.getBoolean("returning");
+        crafted = t.getLong("crafted");
+        inserted = t.getLong("inserted");
+        collected = t.getLong("collected");
+        batchIndex = t.getInt("batch");
+        procIndex = t.getInt("procedure");
+        progress = t.getLong("progress");
+        pickups = null;
+        pickupIndex = 0;
+        if (t.contains("pickups")) {
+            pickups = new java.util.ArrayList<>();
+            for (var element : t.getList("pickups", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+                var pt = (net.minecraft.nbt.CompoundTag) element;
+                var items = new java.util.ArrayList<ItemCount>();
+                for (var item : pt.getList("items", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+                    var count = ItemCount.load((net.minecraft.nbt.CompoundTag) item, android.registryAccess());
+                    if (count != null) {
+                        items.add(count);
+                    }
+                }
+                pickups.add(new WorkConsoleBlockEntity.Pickup(BlockPos.of(pt.getLong("point")), items));
+            }
+        }
+        travel = wait = craftTimer = stalled = mineIdle = 0;
+        stopMining();
+        mineSkip.clear();
+        ranchSkip.clear();
+        ranchTarget = null;
+        goalBlock = standAt = fuelTrip = null;
+        dropPoints = null;
+    }
+
     @Override
     public boolean canUse() {
         // 襲われて戦っている間は止める（作業の進みは残る。片付けたら、止めた所から続ける）
@@ -179,6 +248,11 @@ final class AndroidWorkGoal extends Goal {
         WorkConsoleBlockEntity c = console(level);
         if (c == null) {
             return;
+        }
+        // 取消・再割当てを毎tick確認し、残った古い作業で素材を消費しない。
+        if (android.workJob != null && android.workJob.jobId() >= 0 && !c.heartbeat(android, android.workJob)) {
+            android.workJob = null;
+            returning = false;
         }
         if (wait > 0) {
             wait--;

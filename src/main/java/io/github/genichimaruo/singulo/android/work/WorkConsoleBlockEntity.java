@@ -140,7 +140,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private final Set<BlockPos> links = new LinkedHashSet<>();
     private final List<WorkOrder> orders = new ArrayList<>();
     private int nextOrderId = 1;
-    /** 渡している作業（保存しない。読み込み直したら、アンドロイドが作業を取り直す）。 */
+    /** 渡している作業。途中の消費と再割当てが重ならないよう保存する。 */
     private final List<WorkJob.Lease> leases = new ArrayList<>();
     /** 登録した注文。 */
     private final List<StandingOrder> standing = new ArrayList<>();
@@ -150,6 +150,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private boolean powered;
     private boolean outputOn;
     private int nextJobId = 1;
+    private boolean restoredLeases;
     /** 最後の知らせ（画面に出す。取り消しの理由など）。 */
     @Nullable
     private Component message;
@@ -897,6 +898,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     private WorkJob lease(WorkJob job, RuinAndroid a) {
         leases.add(new WorkJob.Lease(job, a.getUUID(), level.getGameTime()));
+        setChanged();
         WorkOrder o = order(job.orderId());
         if (o != null && o.status == WorkOrder.WAIT_CAPACITY) {
             o.status = WorkOrder.RUNNING;
@@ -933,7 +935,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (l == null || order(job.orderId()) == null) {
             return false;
         }
-        l.worker = a.getUUID();
+        if (!l.worker.equals(a.getUUID())) {
+            l.worker = a.getUUID();
+            setChanged();
+        }
         l.lastBeat = level.getGameTime();
         return true;
     }
@@ -1917,13 +1922,27 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     private void tick(ServerLevel level) {
         long now = level.getGameTime();
-        // 知らせが途切れた作業（倒れた・読み込まれていない）を取り上げる
+        if (restoredLeases) {
+            for (WorkJob.Lease lease : leases) {
+                lease.lastBeat = now;           // 指令台と個体のチャンクの読み込み順に猶予を設ける
+            }
+            restoredLeases = false;
+        }
+        // 消費済みの作業は、未読込の個体から取り上げて再実行しない。
+        List<Integer> abandoned = new ArrayList<>();
         for (Iterator<WorkJob.Lease> it = leases.iterator(); it.hasNext(); ) {
             WorkJob.Lease l = it.next();
-            if (now - l.lastBeat > LEASE_TIMEOUT || order(l.job.orderId()) == null) {
+            // 未読込の個体は途中で再割当てしない。復帰・転送後の引継ぎか、画面からの取消を待つ。
+            boolean workerLoaded = level.getEntity(l.worker) != null;
+            if (order(l.job.orderId()) == null) {
                 it.remove();
-                release(l.job, l.remainingDelivery);
+            } else if (workerLoaded && now - l.lastBeat > LEASE_TIMEOUT) {
+                it.remove();
+                abandoned.add(l.job.orderId());
             }
+        }
+        for (int id : abandoned) {
+            cancel(id, null);
         }
         for (WorkOrder o : new ArrayList<>(orders)) {
             if (!o.pendingReserve.isEmpty()) {
@@ -2016,6 +2035,17 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         tag.put("orders", os);
         tag.putInt("next_order", nextOrderId);
+        tag.putInt("next_job", nextJobId);
+        ListTag jobs = new ListTag();
+        for (WorkJob.Lease lease : leases) {
+            CompoundTag job = new CompoundTag();
+            job.put("job", lease.job.save(registries));
+            job.putUUID("worker", lease.worker);
+            job.putLong("last_beat", lease.lastBeat);
+            job.putLong("remaining_delivery", lease.remainingDelivery);
+            jobs.add(job);
+        }
+        tag.put("leases", jobs);
         ListTag ss = new ListTag();
         for (StandingOrder s : standing) {
             ss.add(s.save(registries));
@@ -2064,6 +2094,30 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         nextOrderId = Math.max(1, tag.getInt("next_order"));
+        nextJobId = Math.max(1, tag.getInt("next_job"));
+        leases.clear();
+        restoredLeases = true;
+        for (Tag element : tag.getList("leases", Tag.TAG_COMPOUND)) {
+            CompoundTag t = (CompoundTag) element;
+            WorkJob job = WorkJob.load(t.getCompound("job"), registries);
+            WorkOrder order = job == null ? null : order(job.orderId());
+            if (job == null || order == null || !t.hasUUID("worker")) {
+                continue;
+            }
+            var lease = new WorkJob.Lease(job, t.getUUID("worker"), t.getLong("last_beat"));
+            lease.remainingDelivery = Math.max(0, Math.min(job.amount(), t.getLong("remaining_delivery")));
+            leases.add(lease);
+            nextJobId = Math.max(nextJobId, job.jobId() + 1);
+            if (job.type() == WorkJob.Type.CRAFT) {
+                for (WorkJob.Batch b : job.batch()) {
+                    if (b.step() < order.steps.size()) {
+                        order.steps.get(b.step()).inProgress += b.crafts();
+                    }
+                }
+            } else if (job.type() == WorkJob.Type.DELIVER) {
+                order.deliverInProgress += lease.remainingDelivery;
+            }
+        }
         standing.clear();
         for (Tag t : tag.getList("standing", Tag.TAG_COMPOUND)) {
             StandingOrder s = StandingOrder.load((CompoundTag) t, registries);
