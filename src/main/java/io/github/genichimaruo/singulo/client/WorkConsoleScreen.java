@@ -264,7 +264,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 if (idx < androids.size() && Panel.inside(mouseX, mouseY, x + 132, y + LIST_Y + i * LIST_H, 116, LIST_H)) {
                     CompoundTag a = androids.get(idx);
                     UUID id = a.getUUID("id");
-                    if (!a.getBoolean("busy") && !chosen.remove(id)) {
+                    if (selectable(a) && !chosen.remove(id)) {
                         chosen.add(id);
                     }
                     return true;
@@ -279,7 +279,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 error = null;
                 BlockPos dest = deliveries.isEmpty() ? menu.pos()
                         : BlockPos.of(deliveries.get(Math.min(destination, deliveries.size() - 1)).getLong("pos"));
-                send(WorkConsoleActionPayload.start(picking, count, new ArrayList<>(chosen), dest, reg()));
+                send(WorkConsoleActionPayload.start(picking, count, startAndroids(), dest, reg()));
                 return true;
             }
             if (Panel.inside(mouseX, mouseY, x + BACK_X, y + BUTTON_Y, BACK_W, BUTTON_H)) {
@@ -370,7 +370,26 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     }
 
     private boolean canStart() {
-        return plan != null && plan.getBoolean("ok") && !chosen.isEmpty() && planDelay == 0;
+        return plan != null && plan.getBoolean("ok") && !startAndroids().isEmpty() && planDelay == 0;
+    }
+
+    /** 選べるアンドロイドか（作業中でなく、採掘の工程があれば採掘アップグレードを積んでいる）。 */
+    private boolean selectable(CompoundTag a) {
+        return !a.getBoolean("busy") && (plan == null || !plan.getBoolean("mining") || a.getBoolean("miner"));
+    }
+
+    /** 作業を始めるアンドロイド: 選んだうちの選べるもの。だれも選んでいなければ、選べるもの全部。 */
+    private List<UUID> startAndroids() {
+        List<UUID> picked = new ArrayList<>(), all = new ArrayList<>();
+        for (CompoundTag a : list("androids")) {
+            if (selectable(a)) {
+                all.add(a.getUUID("id"));
+                if (chosen.contains(a.getUUID("id"))) {
+                    picked.add(a.getUUID("id"));
+                }
+            }
+        }
+        return picked.isEmpty() ? all : picked;
     }
 
     // ------------------------------------------------------------------ 描画
@@ -468,6 +487,23 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
 
     private void renderPickingTooltips(GuiGraphics g, int mouseX, int mouseY) {
         int x = leftPos, y = topPos;
+        List<CompoundTag> androids = list("androids");
+        for (int i = 0; i < LIST_ROWS; i++) {
+            int idx = i + androidScroll;
+            if (idx < androids.size() && Panel.inside(mouseX, mouseY, x + 132, y + LIST_Y + i * LIST_H, 116, LIST_H)) {
+                CompoundTag a = androids.get(idx);
+                if (!a.getBoolean("busy") && !selectable(a)) {
+                    g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
+                    return;
+                }
+            }
+        }
+        if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && canStart() && chosen.stream().noneMatch(
+                id -> androids.stream().anyMatch(a -> a.getUUID("id").equals(id) && selectable(a)))) {
+            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.auto_android", startAndroids().size()), 160),
+                    mouseX, mouseY);
+            return;
+        }
         if (Panel.inside(mouseX, mouseY, x + 8, y + 36, 14, 14) || Panel.inside(mouseX, mouseY, x + 76, y + 36, 14, 14)) {
             g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.count.hint"), 160), mouseX, mouseY);
         }
@@ -487,7 +523,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             }
         }
         if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && !canStart()) {
-            g.renderTooltip(font, font.split(Component.translatable(chosen.isEmpty() ? "gui.singulo.work_console.choose_android"
+            g.renderTooltip(font, font.split(Component.translatable(startAndroids().isEmpty() ? "gui.singulo.work_console.choose_android"
                     : "gui.singulo.work_console.cannot_start"), 160), mouseX, mouseY);
         }
     }
@@ -722,10 +758,11 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             }
             CompoundTag a = androids.get(idx);
             int ry = y + LIST_Y + i * LIST_H;
-            boolean on = chosen.contains(a.getUUID("id"));
+            boolean can = selectable(a);
+            boolean on = can && chosen.contains(a.getUUID("id"));
             int accent = 0xFF000000 | a.getInt("accent");
             g.fill(x + 134, ry + 3, x + 144, ry + 13, Panel.WELL_EDGE);
-            g.fill(x + 135, ry + 4, x + 143, ry + 12, on ? accent : 0xFFF4F6F8);
+            g.fill(x + 135, ry + 4, x + 143, ry + 12, on ? accent : can ? 0xFFF4F6F8 : 0xFF8A949E);
         }
         boolean start = canStart();
         g.fill(x + START_X - 1, y + BUTTON_Y - 1, x + START_X + START_W + 1, y + BUTTON_Y + BUTTON_H + 1, Panel.WELL_EDGE);
@@ -878,7 +915,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             if (a.getBoolean("busy")) {
                 name = Component.translatable("gui.singulo.work_console.busy", name);
             }
-            AndroidStationScreen.fit(g, font, name, 148, LIST_Y + i * LIST_H + 4, 98, a.getBoolean("busy") ? MUTED : 0xFFE9EDF0);
+            AndroidStationScreen.fit(g, font, name, 148, LIST_Y + i * LIST_H + 4, 98, selectable(a) ? 0xFFE9EDF0 : MUTED);
         }
         Component status;
         int color = Panel.TEXT;

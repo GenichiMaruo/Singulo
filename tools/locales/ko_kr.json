@@ -4371,6 +4371,10 @@
     "source": "Androids (slots)",
     "translation": "안드로이드(나를 수 있는 칸)"
   },
+  "gui.singulo.work_console.auto_android": {
+    "source": "None chosen: all %s available androids will start",
+    "translation": "고르지 않았으므로, 고를 수 있는 안드로이드 전원(%s대)으로 시작합니다"
+  },
   "gui.singulo.work_console.back": {
     "source": "Back",
     "translation": "돌아가기"
@@ -4404,8 +4408,8 @@
     "translation": "이 주문은 할 수 없습니다"
   },
   "gui.singulo.work_console.choose_android": {
-    "source": "Choose at least one android",
-    "translation": "안드로이드를 골라 주세요"
+    "source": "No android can take this order",
+    "translation": "고를 수 있는 안드로이드가 없습니다"
   },
   "gui.singulo.work_console.count.hint": {
     "source": "Shift: 10 at a time, Ctrl: 64",
@@ -4510,6 +4514,10 @@
   "gui.singulo.work_console.materials": {
     "source": "To craft, and materials (need / have)",
     "translation": "만드는 것과 재료(필요 / 재고)"
+  },
+  "gui.singulo.work_console.needs_miner": {
+    "source": "This order includes mining, so only androids with a Mining Upgrade can be chosen",
+    "translation": "이 주문에는 채굴 공정이 있어서, 채굴 업그레이드를 단 안드로이드만 고를 수 있습니다"
   },
   "gui.singulo.work_console.no_androids": {
     "source": "No android available nearby",

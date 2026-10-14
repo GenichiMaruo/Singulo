@@ -4371,6 +4371,10 @@
     "source": "Androids (slots)",
     "translation": "仿生人（可携带格数）"
   },
+  "gui.singulo.work_console.auto_android": {
+    "source": "None chosen: all %s available androids will start",
+    "translation": "未选择，将由全部可用的仿生人（%s 个）开始"
+  },
   "gui.singulo.work_console.back": {
     "source": "Back",
     "translation": "返回"
@@ -4404,8 +4408,8 @@
     "translation": "无法下这个订单"
   },
   "gui.singulo.work_console.choose_android": {
-    "source": "Choose at least one android",
-    "translation": "请选择仿生人"
+    "source": "No android can take this order",
+    "translation": "没有可选择的仿生人"
   },
   "gui.singulo.work_console.count.hint": {
     "source": "Shift: 10 at a time, Ctrl: 64",
@@ -4510,6 +4514,10 @@
   "gui.singulo.work_console.materials": {
     "source": "To craft, and materials (need / have)",
     "translation": "制作的物品与材料（需要 / 库存）"
+  },
+  "gui.singulo.work_console.needs_miner": {
+    "source": "This order includes mining, so only androids with a Mining Upgrade can be chosen",
+    "translation": "此订单包含采掘工序，只能选择装有采掘升级的仿生人"
   },
   "gui.singulo.work_console.no_androids": {
     "source": "No android available nearby",
