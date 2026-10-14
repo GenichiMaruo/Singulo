@@ -66,6 +66,8 @@ jobs:
         run: |
           test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 15
           grep -q 'SINGULO_GUI_COMPLETE 15' build/gui-review/logs/latest.log
+      - name: Verify inventory pixels in exported PNGs
+        run: python3 tools/review/check_gui_png.py
       - name: Encode GUI captures for remote review
         if: always()
         run: |
@@ -89,3 +91,4 @@ jobs:
             build/reports/
             build/gui-review/screenshots/
             build/gui-review/logs/
+            build/gui-review/inventory-pixels.json

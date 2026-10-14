@@ -213,6 +213,7 @@ public final class GuiReviewHarness {
     private static void capture(Minecraft mc, String name) throws Exception {
         Path dir = Path.of(System.getProperty("singulo.guiReviewOutput"));
         Files.createDirectories(dir);
+        org.lwjgl.opengl.GL11.glFinish();
         try (var screenshot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
             screenshot.writeToFile(dir.resolve(name + ".png"));
             if (name.startsWith("android-")) {
@@ -220,7 +221,11 @@ public final class GuiReviewHarness {
                 double scale = mc.getWindow().getGuiScale();
                 int left = (mc.getWindow().getGuiScaledWidth() - AndroidMenu.WIDTH) / 2;
                 int top = (mc.getWindow().getGuiScaledHeight() - AndroidMenu.HEIGHT) / 2;
-                int pixel = screenshot.getPixelRGBA((int) ((left + slot.x + 8) * scale), (int) ((top + slot.y + 8) * scale));
+                if (slot.x != AndroidMenu.INV_X || slot.y != AndroidMenu.INV_Y) {
+                    throw new IllegalStateException("Unexpected first inventory slot: " + slot.x + "," + slot.y);
+                }
+                int pixel = screenshot.getPixelRGBA((int) ((left + AndroidMenu.INV_X + 8) * scale),
+                        (int) ((top + AndroidMenu.INV_Y + 8) * scale));
                 for (int i = RuinAndroid.INVENTORY_SIZE; i < mc.player.containerMenu.slots.size(); i++) {
                     if (!mc.player.containerMenu.getSlot(i).isActive()) {
                         throw new IllegalStateException("Inactive player inventory slot in " + name);

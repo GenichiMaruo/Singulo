@@ -715,7 +715,7 @@ public final class AndroidGameTests {
     }
 
     /** 作業中に襲われたら、襲ってきた相手を迎え撃ち、片付けたら作業に戻って注文を終える。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(template = EMPTY, batch = "android_defense", timeoutTicks = 2400)
     public static void workingAndroidFightsBack(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
@@ -725,16 +725,21 @@ public final class AndroidGameTests {
             var zombie = EntityType.ZOMBIE.create(helper.getLevel());
             zombie.moveTo(a.position().add(1.5, 0, 0));
             zombie.setNoAi(true);
+            zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
+            zombie.setHealth(200);              // 観測前に倒れて標的が消えるのを防ぐ
             helper.getLevel().addFreshEntity(zombie);
-            a.hurt(helper.getLevel().damageSources().mobAttack(zombie), 1);
-            helper.runAfterDelay(10, () -> {
-                helper.assertTrue(a.getTarget() == zombie, "作業中に襲ってきた相手を狙わない");
-                helper.assertTrue(a.isWorking(), "戦っている間に作業を取り上げられた");
-                zombie.discard();
-                helper.succeedWhen(() -> {
-                    helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8, "片付けたあと作業に戻らない");
-                    a.discard();
-                });
+            a.invulnerableTime = 0;
+            helper.assertTrue(a.hurt(helper.getLevel().damageSources().mobAttack(zombie), 1), "応戦確認用の攻撃が入らなかった");
+            boolean[] fought = {false};
+            helper.succeedWhen(() -> {
+                if (!fought[0]) {
+                    helper.assertTrue(a.getTarget() == zombie, "作業中に襲ってきた相手を狙わない");
+                    helper.assertTrue(a.isWorking(), "戦っている間に作業を取り上げられた");
+                    fought[0] = true;
+                    zombie.discard();
+                }
+                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8, "片付けたあと作業に戻らない");
+                a.discard();
             });
         });
     }
