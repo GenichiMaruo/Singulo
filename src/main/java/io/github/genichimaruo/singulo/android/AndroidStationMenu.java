@@ -16,18 +16,18 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 /** アンドロイド組立ステーションの画面。設計メモリ・キットなどと許可証のスロット、アンドロイドの様子、動き方の設定。 */
 public class AndroidStationMenu extends AbstractContainerMenu {
     public static final int WIDTH = 254;
-    public static final int HEIGHT = 254;
+    public static final int HEIGHT = 240;
     /** 左の列（中心 x=26）。強化の段だけは、転送と生産のアップグレードを横に2つ並べる。 */
     public static final int MEMORY_X = 18, MEMORY_Y = 30;
-    public static final int KIT_X = 18, KIT_Y = 58;
-    public static final int UPGRADE_X = 8, UPGRADE_Y = 86;
-    public static final int PRODUCTION_X = 28, PRODUCTION_Y = 86;
-    public static final int STOCK_X = 18, STOCK_Y = 114;
-    public static final int PERMIT_X = 18, PERMIT_Y = 142;
+    public static final int KIT_X = 18, KIT_Y = 56;
+    public static final int UPGRADE_X = 8, UPGRADE_Y = 82;
+    public static final int PRODUCTION_X = 28, PRODUCTION_Y = 82;
+    public static final int STOCK_X = 18, STOCK_Y = 108;
+    public static final int PERMIT_X = 18, PERMIT_Y = 134;
     /** 持ち物は横幅の中央に。 */
     public static final int INV_X = (WIDTH - 162) / 2 + 1;
-    public static final int INV_Y = 172;
-    public static final int HOTBAR_Y = 230;
+    public static final int INV_Y = 160;
+    public static final int HOTBAR_Y = 218;
 
     private final BlockPos pos;
     private final SyncedInts data;

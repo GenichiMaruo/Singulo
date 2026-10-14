@@ -19,9 +19,9 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
     private static final int INFO_X = 52;
     private static final int INFO_W = 162;
     private static final int BAR_LABEL_W = 30;
-    private static final int MODE_Y = 82;
+    private static final int MODE_Y = 70;
     private static final int MODE_W = 52;
-    private static final int RETREAT_Y = 104;
+    private static final int RETREAT_Y = 90;
     private static final int MINUS_X = INFO_X;
     private static final int PLUS_X = INFO_X + 92;
     private static final int RECALL_X = INFO_X + 110;
@@ -29,9 +29,9 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
     private static final int BAR_X = 228;
     /** 2体を受け持つときの、見るアンドロイドを選ぶ札（名前の左）。 */
     private static final int UNIT_W = 12, UNIT_GAP = 2;
-    private static final int ESCORT_Y = 126;
+    private static final int ESCORT_Y = 110;
     private static final int ESCORT_W = (INFO_W - 3) / 2;
-    private static final int LEADER_Y = 142;
+    private static final int LEADER_Y = 130;
     private static final int NAME_Y = 20;
 
     private final NameEditor names = new NameEditor();
@@ -260,8 +260,8 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         int status = menu.value(AndroidStationBlockEntity.D_STATUS);
         boolean present = status >= AndroidStationBlockEntity.S_PRINTING && status != AndroidStationBlockEntity.S_WAITING
                 && status != AndroidStationBlockEntity.S_BLOCKED;
-        bar(g, x + INFO_X + BAR_LABEL_W, y + 52, present ? menu.value(AndroidStationBlockEntity.D_HP) : 0, 0xFF60C080);
-        bar(g, x + INFO_X + BAR_LABEL_W, y + 66, present ? menu.value(AndroidStationBlockEntity.D_CHARGE) : 0, Panel.GLOW);
+        bar(g, x + INFO_X + BAR_LABEL_W, y + 46, present ? menu.value(AndroidStationBlockEntity.D_HP) : 0, 0xFF60C080);
+        bar(g, x + INFO_X + BAR_LABEL_W, y + 58, present ? menu.value(AndroidStationBlockEntity.D_CHARGE) : 0, Panel.GLOW);
         int mode = menu.value(AndroidStationBlockEntity.D_MODE);
         for (int i = 0; i < 3; i++) {
             button(g, modeX(i), y + MODE_Y, MODE_W, 16, i == mode, Panel.inside(mouseX, mouseY, modeX(i), y + MODE_Y, MODE_W, 16));
@@ -331,9 +331,9 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         Component state = status == AndroidStationBlockEntity.S_WAITING
                 ? Component.translatable("gui.singulo.android_station.status.waiting", (menu.value(AndroidStationBlockEntity.D_DELAY) + 19) / 20)
                 : Component.translatable("gui.singulo.android_station.status." + status);
-        fit(g, font, state, INFO_X, 35, INFO_W, statusColor(status));
-        fit(g, font, Component.translatable("gui.singulo.android_station.hp"), INFO_X, 51, BAR_LABEL_W - 3, Panel.TEXT);
-        fit(g, font, Component.translatable("gui.singulo.android_station.charge"), INFO_X, 65, BAR_LABEL_W - 3, Panel.TEXT);
+        fit(g, font, state, INFO_X, 32, INFO_W, statusColor(status));
+        fit(g, font, Component.translatable("gui.singulo.android_station.hp"), INFO_X, 45, BAR_LABEL_W - 3, Panel.TEXT);
+        fit(g, font, Component.translatable("gui.singulo.android_station.charge"), INFO_X, 57, BAR_LABEL_W - 3, Panel.TEXT);
         if (twoUnits()) {
             for (int i = 0; i < AndroidStationBlockEntity.MAX_UNITS; i++) {
                 fitCentered(g, font, Component.literal(String.valueOf(i + 1)), INFO_X + i * (UNIT_W + UNIT_GAP), NAME_Y + 1, UNIT_W,

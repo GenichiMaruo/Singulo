@@ -51,7 +51,7 @@ public final class GuiReviewHarness {
             mc.getSingleplayerServer().execute(() -> prepare(mc));
             return;
         }
-        if (!prepared || ++ready % 30 != 0) {
+        if (!prepared || mc.getOverlay() != null || ++ready % 30 != 0) {
             return;
         }
         switch (phase) {
@@ -211,6 +211,14 @@ public final class GuiReviewHarness {
     }
 
     private static void capture(Minecraft mc, String name) throws Exception {
+        if (mc.getOverlay() != null) {
+            throw new IllegalStateException("Capture obscured by loading overlay: " + name);
+        }
+        if (mc.screen instanceof AndroidStationScreen
+                && (AndroidStationMenu.WIDTH > mc.getWindow().getGuiScaledWidth()
+                || AndroidStationMenu.HEIGHT > mc.getWindow().getGuiScaledHeight())) {
+            throw new IllegalStateException("Station exceeds GUI viewport: " + name);
+        }
         Path dir = Path.of(System.getProperty("singulo.guiReviewOutput"));
         Files.createDirectories(dir);
         org.lwjgl.opengl.GL11.glFinish();
