@@ -243,6 +243,39 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         pose.popPose();
     }
 
+    /** 頭までの変形を pose に積む（頭の装飾）。 */
+    void toHead(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        torso.translateAndRotate(pose);
+        head.translateAndRotate(pose);
+    }
+
+    /** 後ろ髪までの変形（リボンの垂れを、髪の角度に合わせて髪の外側に沿わせる）。 */
+    void toBackHair(PoseStack pose) {
+        toHead(pose);
+        backHair.translateAndRotate(pose);
+    }
+
+    /** スカートの後ろの面までの変形（腰リボンの垂れを、スカートの角度に合わせて沿わせる）。 */
+    void toSkirtBack(PoseStack pose) {
+        toHips(pose);
+        skirtBack.translateAndRotate(pose);
+    }
+
+    /** 胴までの変形（背中の装飾）。 */
+    void toTorso(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        torso.translateAndRotate(pose);
+    }
+
+    /** 腰までの変形（腰の装飾）。 */
+    void toHips(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+    }
+
     /** 腰の横（スカートの左右の面）までの変形を pose に積む（タンクを描くため）。 */
     void toHipSide(PoseStack pose, boolean left) {
         root.translateAndRotate(pose);
@@ -300,6 +333,9 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         strapR.visible = pack;
         thrusterL.visible = !pack;
         thrusterR.visible = !pack;
+        // ベレー帽をかぶっている間は、アホ毛を帽子の中にしまう（突き抜けないように）
+        ahoge.visible = !(android.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD).getItem()
+                instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc && acc.style().equals("beret"));
         int batteries = android.batteries();
         batteryL.visible = batteries >= 1;
         batteryR.visible = batteries >= 2;
@@ -386,6 +422,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             }
         }
         gestureOverlay(android, pt);
+        if (android.showsHeldDecor()) {
+            // 手に持つ装飾: 左の前腕を前へ水平に出して持つ
+            armL.xRot = Mth.lerp(0.8F, armL.xRot, -0.35F);
+            armL.zRot = -0.1F;
+            forearmL.xRot = -1.2F;
+        }
     }
 
     /** 挨拶の仕草: 手を振る（左手を上げて左右に）・会釈（頭と上体を軽く下げる）。始めと終わりはなめらかに。 */

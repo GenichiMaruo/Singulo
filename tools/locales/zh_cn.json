@@ -1195,6 +1195,22 @@
     "source": "Fitted to a guard android, each one raises its full charge by 50% (up to two). A battery pack appears on its waist for each.",
     "translation": "装在护卫仿生人上后，每个可使充满电量增加 50%（最多两个）。装了几个，腰部就会出现几个电池包。"
   },
+  "desc.singulo.android_beret": {
+    "source": "A beret for an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "戴在仿生人头上的贝雷帽。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
+  "desc.singulo.android_book": {
+    "source": "A book an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "待机中的仿生人拿在手上的书。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
+  "desc.singulo.android_bouquet": {
+    "source": "A bouquet an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "待机中的仿生人拿在手上的花束。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
+  "desc.singulo.android_cape": {
+    "source": "A cape hanging from an android's shoulders that flutters as it walks. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "从仿生人肩部垂到背后的披风，行走时会飘动。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
   "desc.singulo.android_charger": {
     "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
     "translation": "随身携带时，跟随中的仿生人会靠近你，边跟着走边充电（充满时可充满仿生人 30 次）。右键点击能输出电力的方块为其充电。"
@@ -1214,6 +1230,14 @@
   "desc.singulo.android_gate_glass_patterned": {
     "source": "Patterned glass that only androids can pass.",
     "translation": "只有仿生人可以通过的花纹玻璃。"
+  },
+  "desc.singulo.android_hair_flower": {
+    "source": "A flower hair ornament worn on the right side of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "戴在仿生人头部右侧的花朵发饰。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
+  "desc.singulo.android_headdress": {
+    "source": "A frilled headdress for an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "戴在仿生人头上的褶边头饰。放入装饰页的栏位。可与染料一起在工作台染色。"
   },
   "desc.singulo.android_kit": {
     "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
@@ -1247,6 +1271,14 @@
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
     "translation": "放在护卫仿生人的物品栏里，受伤时会用掉一个，恢复一半生命（用完后返回组装站）。"
   },
+  "desc.singulo.android_ribbon": {
+    "source": "A ribbon tied at the back of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "系在仿生人后脑的缎带。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
+  "desc.singulo.android_scarf": {
+    "source": "A scarf wrapped around an android's neck. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "围在仿生人脖子上的围巾。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
   "desc.singulo.android_station": {
     "source": "Prints one guard android (two with a Production Upgrade) from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
     "translation": "用小型水晶存储器、仿生人套件和电力打印一个护卫仿生人（有生产升级时最多两个），被击倒后用新的套件重新打印。可设置其行动方式，以及在何种生命值时返回维修与充电。"
@@ -1259,9 +1291,21 @@
     "source": "Gives a guard android two tanks for liquids and gases (32,000 mB each, one fluid per tank), so work can carry fluids from the stockpile to machines. The tanks show at its waist. It cannot be removed while they hold anything.",
     "translation": "装在护卫仿生人上后，会有 2 个可装液体或气体的储罐（各 32,000 mB，每个储罐一种）。作业时可把流体从资材存放处运到装置。腰部会出现储罐。储罐里还有东西时无法取下。"
   },
+  "desc.singulo.android_teacup": {
+    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "待机中的仿生人拿在手上的茶杯。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
   "desc.singulo.android_transfer_upgrade": {
     "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
     "translation": "装在仿生人组装站的强化栏位后，仿生人倒下或被拆解时，其物品（修理套件、装甲板、升级和携带的物品）不会掉落，而是传送到组装站，并交给下一个打印出的仿生人。"
+  },
+  "desc.singulo.android_umbrella": {
+    "source": "An umbrella an android holds up while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "待机中的仿生人撑着的伞。放入装饰页的栏位。可与染料一起在工作台染色。"
+  },
+  "desc.singulo.android_waist_ribbon": {
+    "source": "A large bow tied at the back of an android's waist. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "系在仿生人腰后的大蝴蝶结。放入装饰页的栏位。可与染料一起在工作台染色。"
   },
   "desc.singulo.android_work_console": {
     "source": "Brings together the supply ports, delivery ports and recipe racks linked to it with a Work Location Card, takes orders and hands the work to nearby androids. It works as a supply port and a delivery port itself, and its Record tab writes recipes onto recipe cards. Orders need every material in stock.",
@@ -2639,6 +2683,38 @@
     "source": "%s%%",
     "translation": "%s%%"
   },
+  "gui.singulo.android.decor.0": {
+    "source": "Head",
+    "translation": "头部"
+  },
+  "gui.singulo.android.decor.0.hint": {
+    "source": "Ribbon, hair flower, beret or headdress",
+    "translation": "缎带、发饰、贝雷帽、头饰"
+  },
+  "gui.singulo.android.decor.1": {
+    "source": "Back / waist",
+    "translation": "背部・腰部"
+  },
+  "gui.singulo.android.decor.1.hint": {
+    "source": "Cape, scarf or waist ribbon",
+    "translation": "披风、围巾、腰部缎带"
+  },
+  "gui.singulo.android.decor.2": {
+    "source": "Hand",
+    "translation": "手部"
+  },
+  "gui.singulo.android.decor.2.hint": {
+    "source": "Paperback, bouquet, teacup or umbrella (held only while idle)",
+    "translation": "文库本、花束、茶杯、伞（仅在待机时拿着）"
+  },
+  "gui.singulo.android.decor.dye": {
+    "source": "Dye them with dyes on a crafting table",
+    "translation": "可与染料一起在工作台染色"
+  },
+  "gui.singulo.android.decor.speech": {
+    "source": "Does it suit me?",
+    "translation": "合适吗？"
+  },
   "gui.singulo.android.dismantle": {
     "source": "Dismantle (press twice)",
     "translation": "拆解（按两次）"
@@ -2686,6 +2762,10 @@
   "gui.singulo.android.pack.none": {
     "source": "No backpack",
     "translation": "没有背包"
+  },
+  "gui.singulo.android.page.decor": {
+    "source": "Decorations",
+    "translation": "装饰"
   },
   "gui.singulo.android.page.gear": {
     "source": "Gear and inventory",
@@ -4971,6 +5051,14 @@
     "source": "Charging, repair and gear",
     "translation": "充电、修理与装备"
   },
+  "guide.singulo.androids.decor.body": {
+    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret or headdress\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
+    "translation": "在仿生人界面中用名字左边的按钮切换页面，第 3 页是“装饰”页。可在头部、背部/腰部、手部的栏位装上装饰。不影响战斗和作业。全部在工作台制作，可与染料一起在工作台染色（与皮革盔甲相同）。\n・头部：缎带、发饰、贝雷帽、头饰\n・背部/腰部：披风、围巾、腰部缎带（披风和围巾的末端行走时会飘动）\n・手部：文库本、花束、茶杯、伞（仅在待机时拿着。战斗、作业、充电时会收起）"
+  },
+  "guide.singulo.androids.decor.title": {
+    "source": "Android decorations",
+    "translation": "仿生人的装饰"
+  },
   "guide.singulo.androids.glass.body": {
     "source": "- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard's own path.\nAndroids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass next to them, and four plain panes make the patterned kind.",
     "translation": "- 仿生人阻隔玻璃（琥珀色）：只有仿生人无法通过，玩家和其他生物可以直接穿过。适合放在基地出入口。\n- 仿生人透过玻璃（水色）：只有仿生人可以通过，对其他一切都是实心玻璃。适合作为护卫的专用通道。\n仿生人在规划路线时也会考虑这些玻璃：阻隔玻璃视为阻挡，透过玻璃视为通路。素面款与相同的玻璃相邻时会无缝相连，四块素面款可以做成花纹款。"
@@ -5479,6 +5567,22 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "制造地：精密组装台（第 2 阶段）"
   },
+  "howto.singulo.android_beret": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.android_book": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.android_bouquet": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.android_cape": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
   "howto.singulo.android_charger": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "制造地：精密组装台（第 2 阶段）"
@@ -5498,6 +5602,14 @@
   "howto.singulo.android_gate_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_hair_flower": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.android_headdress": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
   },
   "howto.singulo.android_kit": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -5519,6 +5631,14 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
   },
+  "howto.singulo.android_ribbon": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.android_scarf": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
   "howto.singulo.android_station": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "制造地：精密组装台（第 2 阶段）"
@@ -5531,9 +5651,21 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "制造地：精密组装台（第 2 阶段）"
   },
+  "howto.singulo.android_teacup": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "制造地：精密组装台（第 2 阶段）"
+  },
+  "howto.singulo.android_umbrella": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.android_waist_ribbon": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
   },
   "howto.singulo.android_work_console": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -6415,6 +6547,22 @@
     "source": "Battery Upgrade",
     "translation": "电池升级"
   },
+  "item.singulo.android_beret": {
+    "source": "Beret",
+    "translation": "贝雷帽"
+  },
+  "item.singulo.android_book": {
+    "source": "Paperback",
+    "translation": "文库本"
+  },
+  "item.singulo.android_bouquet": {
+    "source": "Bouquet",
+    "translation": "花束"
+  },
+  "item.singulo.android_cape": {
+    "source": "Cape",
+    "translation": "披风"
+  },
   "item.singulo.android_charger": {
     "source": "Android Wireless Charger",
     "translation": "仿生人无线充电器"
@@ -6422,6 +6570,14 @@
   "item.singulo.android_felling_upgrade": {
     "source": "Felling Upgrade",
     "translation": "伐木升级"
+  },
+  "item.singulo.android_hair_flower": {
+    "source": "Hair Flower",
+    "translation": "发饰"
+  },
+  "item.singulo.android_headdress": {
+    "source": "Headdress",
+    "translation": "头饰"
   },
   "item.singulo.android_kit": {
     "source": "Android Kit",
@@ -6451,13 +6607,33 @@
     "source": "Self-Repair Kit",
     "translation": "自我修理套件"
   },
+  "item.singulo.android_ribbon": {
+    "source": "Ribbon",
+    "translation": "缎带"
+  },
+  "item.singulo.android_scarf": {
+    "source": "Scarf",
+    "translation": "围巾"
+  },
   "item.singulo.android_tank_upgrade": {
     "source": "Tank Upgrade",
     "translation": "储罐升级"
   },
+  "item.singulo.android_teacup": {
+    "source": "Teacup",
+    "translation": "茶杯"
+  },
   "item.singulo.android_transfer_upgrade": {
     "source": "Transfer Upgrade",
     "translation": "传送升级"
+  },
+  "item.singulo.android_umbrella": {
+    "source": "Umbrella",
+    "translation": "伞"
+  },
+  "item.singulo.android_waist_ribbon": {
+    "source": "Waist Ribbon",
+    "translation": "腰部缎带"
   },
   "item.singulo.anomaly_sample": {
     "source": "Anomaly Sample",
@@ -8238,6 +8414,18 @@
   "subtitles.singulo.wormhole_stabilizer_running": {
     "source": "Wormhole stabilizer runs",
     "translation": "虫洞稳定器运行"
+  },
+  "tooltip.singulo.android_accessory.0": {
+    "source": "Worn on an android's head (decoration page)",
+    "translation": "戴在仿生人头上（装饰页）"
+  },
+  "tooltip.singulo.android_accessory.1": {
+    "source": "Worn on an android's back or waist (decoration page)",
+    "translation": "戴在仿生人背部或腰部（装饰页）"
+  },
+  "tooltip.singulo.android_accessory.2": {
+    "source": "Held by an idle android (decoration page)",
+    "translation": "待机中的仿生人拿在手上（装饰页）"
   },
   "tooltip.singulo.android_armor_plate": {
     "source": "Chestplate for a guard android (+8 armor, +2 toughness)",

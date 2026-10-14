@@ -61,6 +61,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Solar(this));
         addLayer(new Pickaxe(this));
         addLayer(new Tanks(this));
+        addLayer(new Accessories(this));
         addLayer(new ArmorGlint(this));
     }
 
@@ -620,6 +621,176 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
                 pose.popPose();
+            }
+        }
+    }
+
+    /**
+     * 装飾: 頭（リボン・髪飾り・ベレー帽・ヘッドドレス）、背中/腰（マント・マフラー・腰リボン）、手（本・花束・ティーカップ・傘）。
+     * 染めた色で描く。手に持つ物は、待機している間だけ。大きさは体のピクセル（1/16）で決める。
+     */
+    final class Accessories extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final float P = 1 / 16F;
+
+        Accessories(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (!android.printed()) {
+                return;
+            }
+            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            AndroidModel m = getParentModel();
+            for (int part = 0; part < 3; part++) {
+                net.minecraft.world.item.ItemStack stack = android.decor(part);
+                if (!(stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc)) {
+                    continue;
+                }
+                if (part == io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND && !android.showsHeldDecor()) {
+                    continue;
+                }
+                int c = acc.color(stack);
+                pose.pushPose();
+                switch (part) {
+                    case 0 -> m.toHead(pose);
+                    case 1 -> {
+                        if (acc.style().equals("waist_ribbon")) {
+                            m.toHips(pose);
+                        } else {
+                            m.toTorso(pose);
+                        }
+                    }
+                    default -> m.toLeftHand(pose);
+                }
+                draw(acc.style(), pose, vc, light, c, Math.min(1, limbSwingAmount), age);
+                pose.popPose();
+            }
+        }
+
+        /** 箱（ピクセル単位）。 */
+        private void b(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float z0, float x1, float y1, float z1, int rgb) {
+            FxDraw.box(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255);
+        }
+
+        private void draw(String style, PoseStack pose, VertexConsumer vc, int light, int c, float walk, float age) {
+            int dark = mix(c, 0x000000, 0.25F);
+            switch (style) {
+                // ---- 頭（頭の箱: x -4〜4、y -8〜0、z -3.5〜3.5。前は -z）
+                case "ribbon" -> {
+                    // 後頭部の上に、左右の輪と結び目、短い垂れ
+                    b(pose, vc, light, -0.7F, -7.9F, 4.1F, 0.7F, -6.7F, 4.9F, dark);
+                    b(pose, vc, light, -3.0F, -8.8F, 4.2F, -0.7F, -6.2F, 4.8F, c);
+                    b(pose, vc, light, 0.7F, -8.8F, 4.2F, 3.0F, -6.2F, 4.8F, c);
+                    // 垂れ: 後ろ髪の外側に沿わせる（髪の角度・揺れに合わせる）
+                    pose.popPose();
+                    pose.pushPose();
+                    getParentModel().toBackHair(pose);
+                    b(pose, vc, light, -1.4F, -0.2F, 0.75F, -0.5F, 3.6F, 1.1F, c);
+                    b(pose, vc, light, 0.5F, -0.2F, 0.75F, 1.4F, 3.2F, 1.1F, c);
+                }
+                case "hair_flower" -> {
+                    // 右の側頭部に、花びら4枚と黄色い芯
+                    float x = -4.25F;
+                    b(pose, vc, light, x - 0.5F, -7.4F, -1.9F, x, -6.4F, -0.9F, 0xF7E07A);
+                    b(pose, vc, light, x - 0.4F, -8.6F, -1.9F, x + 0.1F, -7.4F, -0.9F, c);
+                    b(pose, vc, light, x - 0.4F, -6.4F, -1.9F, x + 0.1F, -5.2F, -0.9F, c);
+                    b(pose, vc, light, x - 0.4F, -7.4F, -3.1F, x + 0.1F, -6.4F, -1.9F, c);
+                    b(pose, vc, light, x - 0.4F, -7.4F, -0.9F, x + 0.1F, -6.4F, 0.3F, c);
+                }
+                case "beret" -> {
+                    // 頭の上に少し傾けた円盤と、てっぺんの小さな柄
+                    pose.pushPose();
+                    pose.translate(0, -8 * P, 0);
+                    pose.mulPose(Axis.ZP.rotationDegrees(-10));
+                    b(pose, vc, light, -4.8F, -1.1F, -4.2F, 4.8F, 0.1F, 4.2F, c);
+                    b(pose, vc, light, -4.2F, -1.6F, -3.6F, 4.2F, -1.1F, 3.6F, c);
+                    b(pose, vc, light, -0.3F, -2.3F, -0.3F, 0.3F, -1.6F, 0.3F, dark);
+                    pose.popPose();
+                }
+                case "headdress" -> {
+                    // 頭の上の前寄りに帯、前の縁にひだ（交互に）、両わきに小さなリボン
+                    b(pose, vc, light, -4.3F, -8.7F, -2.2F, 4.3F, -8.0F, -0.8F, c);
+                    for (int i = 0; i < 8; i++) {
+                        float x0 = -4.3F + i * 1.075F;
+                        b(pose, vc, light, x0, -9.3F - (i % 2) * 0.4F, -2.3F, x0 + 1.0F, -8.7F, -1.7F, c);
+                    }
+                    b(pose, vc, light, -4.6F, -8.4F, -1.8F, -4.2F, -6.8F, -1.0F, dark);
+                    b(pose, vc, light, 4.2F, -8.4F, -1.8F, 4.6F, -6.8F, -1.0F, dark);
+                }
+                // ---- 背中（胴の箱: x -3〜3、y -8〜0、z -1.5〜1.5。後ろは +z）
+                case "cape" -> {
+                    // 肩から背中へ垂れるマント。歩くと後ろへなびく
+                    b(pose, vc, light, -3.4F, -8.3F, -1.8F, 3.4F, -7.5F, 1.9F, dark);           // 襟
+                    pose.pushPose();
+                    pose.translate(0, -7.8F * P, 1.7F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(6 + 22 * walk + 3 * Mth.sin(age * 0.08F)));
+                    b(pose, vc, light, -3.8F, 0, 0, 3.8F, 15.5F, 0.4F, c);
+                    pose.popPose();
+                }
+                case "scarf" -> {
+                    // 首に巻いて、前の左に垂れ
+                    b(pose, vc, light, -3.4F, -8.2F, -1.9F, 3.4F, -6.8F, -1.5F, c);
+                    b(pose, vc, light, -3.4F, -8.2F, 1.5F, 3.4F, -6.8F, 1.9F, c);
+                    b(pose, vc, light, -3.4F, -8.2F, -1.9F, -3.0F, -6.8F, 1.9F, c);
+                    b(pose, vc, light, 3.0F, -8.2F, -1.9F, 3.4F, -6.8F, 1.9F, c);
+                    pose.pushPose();
+                    pose.translate(1.6F * P, -6.8F * P, -1.9F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(-8 - 15 * walk));
+                    b(pose, vc, light, 0, 0, -0.4F, 1.6F, 5.0F, 0, c);
+                    b(pose, vc, light, 0, 4.4F, -0.45F, 1.6F, 5.0F, 0.05F, dark);
+                    pose.popPose();
+                }
+                case "waist_ribbon" -> {
+                    // 腰の後ろに大きな蝶結び（腰の箱: x -3.5〜3.5、y -3〜0、z -2〜2）
+                    b(pose, vc, light, -0.9F, -2.4F, 2.0F, 0.9F, -0.8F, 2.9F, dark);
+                    b(pose, vc, light, -4.0F, -3.4F, 2.1F, -0.9F, -0.2F, 2.8F, c);
+                    b(pose, vc, light, 0.9F, -3.4F, 2.1F, 4.0F, -0.2F, 2.8F, c);
+                    // 垂れ: スカートの後ろの面の外側に沿わせる（スカートの角度・揺れに合わせる。バッテリーの内側）
+                    pose.popPose();
+                    pose.pushPose();
+                    getParentModel().toSkirtBack(pose);
+                    b(pose, vc, light, -1.25F, 0.2F, 0.35F, -0.3F, 5.6F, 0.7F, c);
+                    b(pose, vc, light, 0.3F, 0.2F, 0.35F, 1.25F, 5.0F, 0.7F, c);
+                }
+                // ---- 手（左手の先。前腕を前へ水平に出すので、上は -z、前は +y）
+                case "book" -> {
+                    // 立てて開いた本（表紙は染めた色、中は白いページ）
+                    b(pose, vc, light, -1.5F, 0.6F, -3.6F, 1.5F, 1.1F, -0.2F, c);
+                    b(pose, vc, light, -1.3F, 0.3F, -3.4F, 1.3F, 0.6F, -0.4F, 0xF4F1E6);
+                    b(pose, vc, light, -0.1F, 0.2F, -3.6F, 0.1F, 1.1F, -0.2F, dark);
+                }
+                case "bouquet" -> {
+                    // 茎と包み紙、上に花（赤・黄・白・桃）
+                    b(pose, vc, light, -0.3F, 0.2F, -2.2F, 0.3F, 0.8F, 0.4F, 0x4E8A3A);
+                    b(pose, vc, light, -1.0F, -0.2F, -2.8F, 1.0F, 1.2F, -1.0F, c);
+                    int[] petals = {0xE04848, 0xF2D24A, 0xF4F4F4, 0xEE8FB0};
+                    for (int i = 0; i < 4; i++) {
+                        float x = (i % 2 == 0 ? -0.8F : 0.2F), y = (i < 2 ? -0.4F : 0.6F);
+                        b(pose, vc, light, x, y, -3.9F, x + 0.9F, y + 0.9F, -2.8F, petals[i]);
+                    }
+                }
+                case "teacup" -> {
+                    // 手のひらの上に、受け皿とカップ（金の縁）、横に取っ手
+                    b(pose, vc, light, -1.5F, -0.1F, -0.4F, 1.5F, 2.7F, -0.15F, c);
+                    b(pose, vc, light, -0.9F, 0.4F, -2.0F, 0.9F, 2.2F, -0.4F, c);
+                    b(pose, vc, light, -0.95F, 0.35F, -2.2F, 0.95F, 2.25F, -2.0F, 0xE0B850);
+                    b(pose, vc, light, 0.9F, 1.0F, -1.6F, 1.5F, 1.6F, -0.8F, c);
+                    b(pose, vc, light, -0.7F, 0.6F, -2.05F, 0.7F, 2.0F, -1.95F, 0x8A5A3A);    // 紅茶
+                }
+                case "umbrella" -> {
+                    // 柄を上へ。頭の上に、染めた色の傘（2段の円盤）と、てっぺんの石突き
+                    b(pose, vc, light, -0.25F, 0.2F, -22F, 0.25F, 0.7F, 0.6F, 0x5A4A3A);
+                    b(pose, vc, light, -0.6F, 0.0F, 0.6F, 0.6F, 1.6F, 1.2F, 0x5A4A3A);
+                    b(pose, vc, light, -8.5F, -8.0F, -21.6F, 8.5F, 8.9F, -21.0F, c);
+                    b(pose, vc, light, -6.0F, -5.5F, -22.4F, 6.0F, 6.4F, -21.6F, c);
+                    b(pose, vc, light, -3.0F, -2.5F, -23.0F, 3.0F, 3.4F, -22.4F, dark);
+                    b(pose, vc, light, -0.3F, 0.15F, -24.0F, 0.3F, 0.75F, -23.0F, 0xC8C8C8);
+                }
+                default -> {
+                }
             }
         }
     }

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    " R ",
+    " R "
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "R": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "result": {
+    "id": "singulo:android_umbrella",
+    "count": 1
+  }
+}

@@ -737,6 +737,18 @@ UI_LANG = {
     'tooltip.singulo.android_felling_upgrade': ('ダイヤの斧相当で木を切る。効率強化・幸運・シルクタッチを付けられる', 'Fells trees like a diamond axe. Takes Efficiency, Fortune and Silk Touch'),
     'tooltip.singulo.android_mining_upgrade': ('ダイヤのツルハシ相当で掘る。効率強化・幸運・シルクタッチを付けられる', 'Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch'),
     'gui.singulo.android.page.gear': ('装備と持ち物', 'Gear and inventory'),
+    'gui.singulo.android.page.decor': ('装飾', 'Decorations'),
+    'gui.singulo.android.decor.0': ('頭', 'Head'),
+    'gui.singulo.android.decor.1': ('背中・腰', 'Back / waist'),
+    'gui.singulo.android.decor.2': ('手', 'Hand'),
+    'gui.singulo.android.decor.0.hint': ('リボン・髪飾り・ベレー帽・ヘッドドレス', 'Ribbon, hair flower, beret or headdress'),
+    'gui.singulo.android.decor.1.hint': ('マント・マフラー・腰リボン', 'Cape, scarf or waist ribbon'),
+    'gui.singulo.android.decor.2.hint': ('文庫本・花束・ティーカップ・傘（待機している間だけ持つ）', 'Paperback, bouquet, teacup or umbrella (held only while idle)'),
+    'gui.singulo.android.decor.dye': ('染料と一緒に作業台で染められる', 'Dye them with dyes on a crafting table'),
+    'gui.singulo.android.decor.speech': ('似合う？', 'Does it suit me?'),
+    'tooltip.singulo.android_accessory.0': ('アンドロイドの頭に着ける（装飾のページ）', 'Worn on an android\'s head (decoration page)'),
+    'tooltip.singulo.android_accessory.1': ('アンドロイドの背中・腰に着ける（装飾のページ）', 'Worn on an android\'s back or waist (decoration page)'),
+    'tooltip.singulo.android_accessory.2': ('待機しているアンドロイドが手に持つ（装飾のページ）', 'Held by an idle android (decoration page)'),
     'message.singulo.work_location.recorded': ('%s の位置を記録した（%s, %s, %s）', 'Recorded %s at %s, %s, %s'),
     'tooltip.singulo.work_location.empty': ('記録なし（ブロックをシフト右クリックで記録）', 'Empty: sneak-use on a block to record it'),
     'tooltip.singulo.work_location.block': ('%s（%s, %s, %s）', '%s at %s, %s, %s'),
@@ -2530,6 +2542,14 @@ def sounds_json():
     write_json(ASSETS / 'sounds.json', out)
 
 
+def accessory_item_models():
+    """アンドロイドの装飾: 染める絵（layer0）と、染めない絵（layer1）。"""
+    from androids import ACCESSORY_IDS
+    for iid in ACCESSORY_IDS:
+        write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': 'minecraft:item/generated', 'textures': {
+            'layer0': f'{MODID}:item/{iid}', 'layer1': f'{MODID}:item/{iid}_detail'}})
+
+
 def fluid_sample_item_model():
     """流体の見本: しずくの絵（流体の色に染める）。"""
     write_json(ASSETS / 'models' / 'item' / 'fluid_sample.json',
@@ -2983,7 +3003,7 @@ TAB_GROUPS = [
     ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
                'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
                'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
-               'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade',
+               'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade', 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
                'android_mining_upgrade', 'android_felling_upgrade', 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
                'work_location_card', 'recipe_card', 'procedure_card']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
@@ -3374,6 +3394,7 @@ def main():
     lang_files()
     models()
     textures()
+    accessory_item_models()          # 生成の一般の物のモデルのあとに、2枚重ねで書き直す
     opaque_block_textures()
     ghost_textures()
     rogue_black_hole_assets()

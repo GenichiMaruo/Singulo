@@ -597,6 +597,11 @@ def item_textures(ti, save):
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
     save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
     save(droplet_icon(Image), ti / 'fluid_sample.png')
+    for n, (iid, (base, detail)) in enumerate(accessory_icons(Image).items()):
+        if iid in FABRIC_ACCESSORIES:
+            fabric(base, 41 + n)                       # 布の織り目
+        save(wear(base, 41 + n), ti / f'{iid}.png')     # 使い込んだ汚し（染める所も、染めない所も）
+        save(wear(detail, 59 + n), ti / f'{iid}_detail.png')
     save(wear(mining_icon(Image), 23), ti / 'android_mining_upgrade.png')
     save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
     save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
@@ -963,6 +968,146 @@ def felling_icon(Image):
     for (x, y) in ((12, 4), (12, 5), (12, 6)):
         px[x, y] = (210, 248, 255, 255)
     return im
+
+
+# ---------------------------------------------------------------- アンドロイドの装飾
+
+ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
+                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella')
+
+
+FABRIC_ACCESSORIES = ('android_ribbon', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon')
+
+
+def fabric(im, seed):
+    """布の織り目: 縦横の糸が交互に浮き沈みする細かな濃淡と、ところどころの毛羽立ち。"""
+    px = im.load()
+    w, h = im.size
+    rng = random.Random(seed)
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            k = -9 if (x + y) % 2 == 0 else 0           # 織り目
+            if (x // 2 + y) % 4 == 0:
+                k -= 4                                   # 斜めの綾
+            if rng.random() < 0.06:
+                k += 10                                  # 毛羽
+            px[x, y] = (max(0, min(255, r + k)), max(0, min(255, g + k)), max(0, min(255, b + k)), a)
+
+
+def accessory_icons(Image):
+    """装飾の絵: 染める所（白い濃淡。layer0、染めた色に染める）と、染めない所（layer1）の2枚ずつ。"""
+    W, S, E = (255, 255, 255, 255), (214, 214, 214, 255), (150, 150, 150, 255)   # 白・影・縁
+
+    def new():
+        return Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+
+    def rect(im, x0, y0, x1, y1, c):
+        px = im.load()
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                px[x, y] = c
+
+    def shaded(im, x0, y0, x1, y1):
+        rect(im, x0, y0, x1, y1, E)
+        if x1 - x0 >= 2 and y1 - y0 >= 2:
+            rect(im, x0 + 1, y0 + 1, x1 - 1, y1 - 1, W)
+            rect(im, x0 + 1, y1 - 1, x1 - 1, y1 - 1, S)
+
+    out = {}
+    # リボン: 左右の輪と結び目、垂れ
+    b, d = new(), new()
+    shaded(b, 1, 3, 6, 9)
+    shaded(b, 9, 3, 14, 9)
+    shaded(b, 5, 9, 7, 14)
+    shaded(b, 8, 9, 10, 13)
+    shaded(b, 6, 5, 9, 8)
+    out['android_ribbon'] = (b, d)
+    # 髪飾り: 花びら（染める）と黄色い芯、緑の葉
+    b, d = new(), new()
+    for (x, y) in ((6, 1), (10, 5), (6, 9), (2, 5)):
+        shaded(b, x, y, x + 4, y + 4)
+    rect(d, 7, 6, 9, 8, (247, 224, 122, 255))
+    rect(d, 11, 11, 14, 12, (78, 138, 58, 255))
+    out['android_hair_flower'] = (b, d)
+    # ベレー帽: 平たい楕円と柄
+    b, d = new(), new()
+    shaded(b, 1, 6, 14, 11)
+    shaded(b, 3, 4, 12, 6)
+    rect(d, 7, 2, 8, 3, (60, 60, 70, 255))
+    out['android_beret'] = (b, d)
+    # ヘッドドレス: 帯とひだ
+    b, d = new(), new()
+    shaded(b, 1, 7, 14, 10)
+    for i in range(7):
+        rect(b, 1 + i * 2, 4 + (i % 2), 2 + i * 2, 6, W)
+        rect(b, 1 + i * 2, 6, 2 + i * 2, 6, S)
+    rect(d, 0, 8, 1, 12, (90, 90, 100, 255))
+    rect(d, 14, 8, 15, 12, (90, 90, 100, 255))
+    out['android_headdress'] = (b, d)
+    # マント: 肩の留め具（金）から広がる布
+    b, d = new(), new()
+    for y in range(3, 15):
+        w = 3 + (y - 3) // 2
+        shaded(b, 8 - w, y, 7 + w, y)
+    rect(b, 4, 3, 11, 4, S)
+    rect(d, 4, 2, 5, 3, (224, 184, 80, 255))
+    rect(d, 10, 2, 11, 3, (224, 184, 80, 255))
+    out['android_cape'] = (b, d)
+    # マフラー: 輪と垂れ、縞
+    b, d = new(), new()
+    shaded(b, 2, 3, 13, 7)
+    shaded(b, 3, 7, 6, 14)
+    for x in range(3, 13, 3):
+        rect(d, x, 4, x, 6, (255, 255, 255, 120))
+    rect(d, 3, 12, 6, 12, (255, 255, 255, 120))
+    out['android_scarf'] = (b, d)
+    # 腰リボン: 大きな蝶結びと長い垂れ
+    b, d = new(), new()
+    shaded(b, 0, 2, 6, 8)
+    shaded(b, 9, 2, 15, 8)
+    shaded(b, 5, 3, 10, 7)
+    shaded(b, 4, 8, 6, 15)
+    shaded(b, 9, 8, 11, 14)
+    out['android_waist_ribbon'] = (b, d)
+    # 文庫本: 表紙（染める）と白いページ
+    b, d = new(), new()
+    shaded(b, 3, 2, 12, 14)
+    rect(d, 5, 4, 11, 12, (244, 241, 230, 255))
+    for y in (6, 8, 10):
+        rect(d, 6, y, 10, y, (180, 176, 166, 255))
+    rect(d, 3, 2, 4, 14, (90, 70, 60, 255))
+    out['android_book'] = (b, d)
+    # 花束: 包み紙（染める）と、上の色とりどりの花、茎
+    b, d = new(), new()
+    for y in range(8, 15):
+        w = (15 - y) // 2 + 1
+        shaded(b, 8 - w, y, 7 + w, y)
+    for (x, y, c) in ((3, 3, (224, 72, 72, 255)), (7, 2, (242, 210, 74, 255)), (10, 4, (238, 143, 176, 255)), (6, 5, (244, 244, 244, 255))):
+        rect(d, x, y, x + 2, y + 2, c)
+    rect(d, 7, 7, 8, 8, (78, 138, 58, 255))
+    out['android_bouquet'] = (b, d)
+    # ティーカップ: カップと受け皿（染める）、金の縁、紅茶、取っ手
+    b, d = new(), new()
+    shaded(b, 1, 12, 14, 13)
+    shaded(b, 3, 5, 11, 11)
+    shaded(b, 11, 6, 13, 9)
+    rect(d, 3, 5, 11, 5, (224, 184, 80, 255))
+    rect(d, 4, 6, 10, 6, (138, 90, 58, 255))
+    out['android_teacup'] = (b, d)
+    # 傘: 半円の傘（染める）と柄
+    b, d = new(), new()
+    for y in range(2, 8):
+        w = min(7, 2 + (y - 2) * 2)
+        shaded(b, 8 - w, y, 7 + w, y)
+    rect(b, 1, 7, 14, 7, S)
+    rect(d, 7, 8, 8, 14, (90, 74, 58, 255))
+    rect(d, 5, 13, 7, 14, (90, 74, 58, 255))
+    rect(d, 7, 1, 8, 1, (200, 200, 200, 255))
+    out['android_umbrella'] = (b, d)
+    return out
 
 
 # ---------------------------------------------------------------- アンドロイド用のガラス

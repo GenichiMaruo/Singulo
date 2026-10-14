@@ -86,6 +86,14 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         return Component.translatable("gui.singulo.android.mode", Component.translatable("gui.singulo.android_station.mode." + mode));
     }
 
+    private boolean statusPage() {
+        return menu.page() == AndroidMenu.PAGE_STATUS;
+    }
+
+    private boolean decorPage() {
+        return menu.page() == AndroidMenu.PAGE_DECOR;
+    }
+
     private boolean gearPage() {
         return menu.page() == AndroidMenu.PAGE_GEAR;
     }
@@ -111,7 +119,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             return true;
         }
         if (Panel.inside(mouseX, mouseY, leftPos + PAGE_X, topPos + PAGE_Y, PAGE_S, PAGE_S)) {
-            menu.setPage(gearPage() ? AndroidMenu.PAGE_STATUS : AndroidMenu.PAGE_GEAR);
+            menu.setPage((menu.page() + 1) % AndroidMenu.PAGES);           // 様子 → 装備 → 装飾 → 様子
             dismantleArmed = 0;
             return true;
         }
@@ -128,12 +136,12 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             setFocused(box);
             return true;
         }
-        if (!gearPage() && following() && Panel.inside(mouseX, mouseY, leftPos + MODE_X, topPos + MODE_Y, MODE_W, MODE_H)
+        if (statusPage() && following() && Panel.inside(mouseX, mouseY, leftPos + MODE_X, topPos + MODE_Y, MODE_W, MODE_H)
                 && minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_ESCORT);
             return true;
         }
-        if (!gearPage() && Panel.inside(mouseX, mouseY, leftPos + DISMANTLE_X, topPos + DISMANTLE_Y, 12, 12) && minecraft != null
+        if (statusPage() && Panel.inside(mouseX, mouseY, leftPos + DISMANTLE_X, topPos + DISMANTLE_Y, 12, 12) && minecraft != null
                 && minecraft.gameMode != null) {
             if (armed()) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_DISMANTLE);
@@ -175,8 +183,18 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
         }
         if (Panel.inside(mouseX, mouseY, leftPos + PAGE_X, topPos + PAGE_Y, PAGE_S, PAGE_S)) {
-            g.renderTooltip(font, Component.translatable(gearPage() ? "gui.singulo.android.page.status" : "gui.singulo.android.page.gear"),
-                    mouseX, mouseY);
+            String[] next = {"gui.singulo.android.page.gear", "gui.singulo.android.page.decor", "gui.singulo.android.page.status"};
+            g.renderTooltip(font, Component.translatable(next[menu.page()]), mouseX, mouseY);
+        }
+        if (decorPage()) {
+            // 空いている装飾の枠: どこに着ける物か
+            for (int i = 0; i < RuinAndroid.DECOR_SLOTS; i++) {
+                var slot = menu.getSlot(RuinAndroid.SLOT_DECOR + i);
+                if (!slot.hasItem() && Panel.inside(mouseX, mouseY, leftPos + slot.x, topPos + slot.y, 16, 16)) {
+                    g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.decor." + i + ".hint"), 160), mouseX, mouseY);
+                }
+            }
+            return;
         }
         if (gearPage()) {
             if (Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W, AndroidMenu.WORK_H)) {
@@ -229,21 +247,13 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             renderGear(g, x, y, mouseX, mouseY, accent);
             return;
         }
-        // 姿の枠
-        int px = x + PORTRAIT_X;
-        int py = y + PORTRAIT_Y;
-        roundRect(g, px - 1, py - 1, PORTRAIT_W + 2, PORTRAIT_H + 2, BORDER);
-        g.fillGradient(px, py, px + PORTRAIT_W, py + PORTRAIT_H, mix(accent, PAPER, 0.88F), mix(accent, PAPER, 0.7F));
-        for (int i = 0; i < 5; i++) {
-            star(g, px + 6 + (i * 23) % (PORTRAIT_W - 10), py + 8 + (i * 37) % (PORTRAIT_H - 34), mix(accent, PAPER, 0.5F));
+        if (decorPage()) {
+            portrait(g, x, y, mouseX, mouseY, accent);
+            roundRect(g, x + AndroidMenu.DECOR_X - 6, y + 22, 112, 98, mix(accent, PAPER, 0.88F));
+            slots(g, x, y, accent, RuinAndroid.SLOT_DECOR, RuinAndroid.DECOR_SLOTS);
+            return;
         }
-        RuinAndroid android = menu.android();
-        if (android != null) {
-            InventoryScreen.renderEntityInInventoryFollowsMouse(g, px + 2, py + 2, px + PORTRAIT_W - 2, py + PORTRAIT_H - 18, 32, 0.0625F,
-                    mouseX, mouseY, android);
-        }
-        // 吹き出し（姿の下）
-        roundRect(g, px + 2, py + PORTRAIT_H - 16, PORTRAIT_W - 4, 14, 0xFFFFFFFF);
+        portrait(g, x, y, mouseX, mouseY, accent);
         // 体力（ハート10個）
         int hp = menu.value(AndroidMenu.D_HP);
         int max = Math.max(1, menu.value(AndroidMenu.D_MAX_HP));
@@ -349,12 +359,40 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 on ? mix(accent, 0x2A3040, hover ? 0.2F : 0.35F) : hover ? 0xFFF4F6F8 : 0xFFD4D8DF);
     }
 
-    /** ページ切り替えのボタン: 様子のページではバックパックの絵、装備のページではハートの絵。 */
+    /** 姿の枠: アンドロイドの姿（マウスの方を向く）と、下の吹き出し。 */
+    private void portrait(GuiGraphics g, int x, int y, int mouseX, int mouseY, int accent) {
+        int px = x + PORTRAIT_X;
+        int py = y + PORTRAIT_Y;
+        roundRect(g, px - 1, py - 1, PORTRAIT_W + 2, PORTRAIT_H + 2, BORDER);
+        g.fillGradient(px, py, px + PORTRAIT_W, py + PORTRAIT_H, mix(accent, PAPER, 0.88F), mix(accent, PAPER, 0.7F));
+        for (int i = 0; i < 5; i++) {
+            star(g, px + 6 + (i * 23) % (PORTRAIT_W - 10), py + 8 + (i * 37) % (PORTRAIT_H - 34), mix(accent, PAPER, 0.5F));
+        }
+        RuinAndroid android = menu.android();
+        if (android != null) {
+            InventoryScreen.renderEntityInInventoryFollowsMouse(g, px + 2, py + 2, px + PORTRAIT_W - 2, py + PORTRAIT_H - 18, 32, 0.0625F,
+                    mouseX, mouseY, android);
+        }
+        // 吹き出し（姿の下）
+        roundRect(g, px + 2, py + PORTRAIT_H - 16, PORTRAIT_W - 4, 14, 0xFFFFFFFF);
+    }
+
+    /** ページ切り替えのボタン: 次のページの絵（様子 → 装備: バックパック、装備 → 装飾: リボン、装飾 → 様子: ハート）。 */
     private void pageButton(GuiGraphics g, int x, int y, boolean hover, int accent) {
         roundRect(g, x, y, PAGE_S, PAGE_S, hover ? mix(accent, 0xFFFFFF, 0.55F) : mix(accent, 0xFFFFFF, 0.35F));
         int c = 0xFF3C4350;
-        if (gearPage()) {
+        if (decorPage()) {
             heart(g, x + 2, y + 2, 1);
+            return;
+        }
+        if (gearPage()) {
+            // リボン: 左右の輪と、真ん中の結び目、垂れ
+            int r = mix(accent, 0xFF3C4350, 0.4F);
+            g.fill(x + 2, y + 3, x + 5, y + 7, r);
+            g.fill(x + 7, y + 3, x + 10, y + 7, r);
+            g.fill(x + 5, y + 4, x + 7, y + 6, c);
+            g.fill(x + 4, y + 7, x + 5, y + 10, r);
+            g.fill(x + 7, y + 7, x + 8, y + 10, r);
             return;
         }
         // バックパック: 角の丸い袋と、ふた、留め具
@@ -370,6 +408,16 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             AndroidStationScreen.fitCentered(g, font, name(), 24, NAME_Y + 3, imageWidth - 48, 0xFFFFFFFF);
         }
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, INK, false);
+        if (decorPage()) {
+            for (int i = 0; i < RuinAndroid.DECOR_SLOTS; i++) {
+                AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.android.decor." + i), AndroidMenu.DECOR_X + 22,
+                        AndroidMenu.DECOR_Y + i * AndroidMenu.DECOR_STEP + 4, 84, INK);
+            }
+            AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.android.decor.dye"), AndroidMenu.DECOR_X - 2, 110, 108, 0xFF8A949E);
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.decor.speech"), PORTRAIT_X + 4,
+                    PORTRAIT_Y + PORTRAIT_H - 13, PORTRAIT_W - 8, INK);
+            return;
+        }
         if (gearPage()) {
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.battery"), 6, AndroidMenu.BATTERY_Y - 9, 48, INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.storage"), 6, AndroidMenu.BACKPACK_Y - 9, 48,

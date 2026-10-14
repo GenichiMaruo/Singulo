@@ -681,6 +681,19 @@ CHAPTERS = [
          'enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing '
          '(up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n'
          '- Android Workbench: crafts four times as fast as a vanilla crafting table.'),
+        ('decor', 'アンドロイドの装飾',
+         'アンドロイドの画面の、名前の左のボタンでページを切り替えると、3枚目が「装飾」のページ。頭・背中/腰・手の枠に装飾を着けられる。'
+         '戦い・作業には影響しない。どれも作業台で作り、染料と一緒に作業台で染められる（革の防具と同じ）。\n'
+         '・頭: リボン・髪飾り・ベレー帽・ヘッドドレス\n'
+         '・背中/腰: マント・マフラー・腰リボン（マントとマフラーの垂れは、歩くとなびく）\n'
+         '・手: 文庫本・花束・ティーカップ・傘（待機している間だけ持つ。戦い・作業・充電の間はしまう）',
+         'Android decorations',
+         'Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand '
+         'slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like '
+         'leather armor.\n'
+         '- Head: ribbon, hair flower, beret or headdress\n'
+         '- Back/waist: cape, scarf or waist ribbon (the cape and the scarf\'s tail flutter as it walks)\n'
+         '- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)'),
         ('glass', 'アンドロイド用のガラス',
          '・アンドロイド遮断ガラス（琥珀色）: アンドロイドだけが通れない。プレイヤーやほかの生き物はすり抜けられる。拠点の出入り口に。\n'
          '・アンドロイド透過ガラス（水色）: アンドロイドだけが通れる。ほかにとってはふつうのガラス。護衛の通り道に。\n'

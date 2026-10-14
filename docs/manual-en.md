@@ -120,6 +120,7 @@ Androids run on charge and run out after about ten big moves. They return to a n
 - **Fighting back and greetings:** an android attacked while working fights back against that attacker only, then resumes where it stopped. It waves when you come back after a while, nods to fellow androids it passes, and gives a little nod when it delivers.
 - **Farming and using blocks:** procedure cards can also harvest (pick crops and replant), fell (cut whole trees and replant; needs a **Felling Upgrade**), breed, shear, milk, cull, and use blocks (levers on/off, buttons, doors).
 - **Liquids and gases:** androids with a **Tank Upgrade** (two tanks of 32,000 mB) take liquids and gases from tanks next to supply ports and carry them to machines. Click a pattern slot with a bucket or other container, or use JEI's + button, to place a fluid in processing or procedure mode.
+- **Decorations:** the third page of the android screen holds a head slot (ribbon, hair flower, beret, headdress), a back/waist slot (cape, scarf, waist ribbon) and a hand slot (paperback, bouquet, teacup, umbrella). They are crafted on a crafting table and can be dyed.
 - The station has a refill slot (tops up repair kits automatically) and an upgrade slot (a **Transfer Upgrade** passes a fallen android's inventory to the next one), and hoppers can insert into it.
 - Name your android in the station or android screen, and read its health with a comparator. If the station is broken, Link the android to a new one.
 

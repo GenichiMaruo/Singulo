@@ -199,6 +199,11 @@ public final class SinguloClient {
             }
             return 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
         }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get());
+        // アンドロイドの装飾: 染める絵（layer0）だけを、染めた色に
+        for (var acc : io.github.genichimaruo.singulo.registry.SinguloItems.ACCESSORIES) {
+            event.register((stack, layer) -> layer == 0 && stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem a
+                    ? 0xFF000000 | a.color(stack) : 0xFFFFFFFF, acc.get());
+        }
     }
 
     private static void registerDecorations(net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent event) {

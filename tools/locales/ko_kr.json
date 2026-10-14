@@ -1195,6 +1195,22 @@
     "source": "Fitted to a guard android, each one raises its full charge by 50% (up to two). A battery pack appears on its waist for each.",
     "translation": "호위 안드로이드에 넣으면 하나당 완충량이 50% 늘어납니다(둘까지). 넣은 수만큼 허리에 배터리 팩이 붙습니다."
   },
+  "desc.singulo.android_beret": {
+    "source": "A beret for an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리에 씌우는 베레모.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_book": {
+    "source": "A book an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 손에 드는 책.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_bouquet": {
+    "source": "A bouquet an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 손에 드는 꽃다발.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_cape": {
+    "source": "A cape hanging from an android's shoulders that flutters as it walks. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드의 어깨에서 등으로 늘어지는 망토. 걸으면 나부낍니다.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
   "desc.singulo.android_charger": {
     "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
     "translation": "들고 다니면 따라오는 안드로이드가 가까이 와서 함께 걸으며 충전합니다(가득 차 있으면 안드로이드를 30번 가득 충전). 전력을 내보내는 블록을 우클릭해 충전합니다."
@@ -1214,6 +1230,14 @@
   "desc.singulo.android_gate_glass_patterned": {
     "source": "Patterned glass that only androids can pass.",
     "translation": "안드로이드만 지나갈 수 있는 무늬 유리."
+  },
+  "desc.singulo.android_hair_flower": {
+    "source": "A flower hair ornament worn on the right side of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리 오른쪽에 다는 꽃 머리 장식.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_headdress": {
+    "source": "A frilled headdress for an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리에 다는 주름 장식 헤드드레스.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
   },
   "desc.singulo.android_kit": {
     "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
@@ -1247,6 +1271,14 @@
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
     "translation": "호위 안드로이드의 소지품에 넣어 두면 다쳤을 때 하나를 써서 체력을 절반 회복합니다(다 쓰면 스테이션으로 돌아갑니다)."
   },
+  "desc.singulo.android_ribbon": {
+    "source": "A ribbon tied at the back of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드의 뒤통수에 묶는 리본.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_scarf": {
+    "source": "A scarf wrapped around an android's neck. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드의 목에 두르는 목도리.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
   "desc.singulo.android_station": {
     "source": "Prints one guard android (two with a Production Upgrade) from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
     "translation": "소형 크리스털 메모리와 안드로이드 키트와 전력으로 호위 안드로이드를 하나(생산 업그레이드가 있으면 둘까지) 출력하고, 쓰러지면 새 키트로 다시 출력합니다. 움직이는 방식과, 돌아와서 수리·충전할 체력을 정합니다."
@@ -1259,9 +1291,21 @@
     "source": "Gives a guard android two tanks for liquids and gases (32,000 mB each, one fluid per tank), so work can carry fluids from the stockpile to machines. The tanks show at its waist. It cannot be removed while they hold anything.",
     "translation": "호위 안드로이드에 달면 액체나 기체를 담는 탱크가 2개(각 32,000 mB, 탱크 하나에 한 종류) 생깁니다. 작업에서 유체를 재료 보관소에서 장치로 나릅니다. 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다."
   },
+  "desc.singulo.android_teacup": {
+    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 손에 드는 찻잔.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
   "desc.singulo.android_transfer_upgrade": {
     "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
     "translation": "안드로이드 조립 스테이션의 강화 슬롯에 넣으면, 안드로이드가 쓰러지거나 해체될 때 소지품(수리 키트·장갑판·업그레이드·운반 중인 물건)을 떨어뜨리지 않고 스테이션으로 전송해 다음에 출력하는 안드로이드에게 넘깁니다."
+  },
+  "desc.singulo.android_umbrella": {
+    "source": "An umbrella an android holds up while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 쓰는 우산.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_waist_ribbon": {
+    "source": "A large bow tied at the back of an android's waist. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 허리 뒤에 묶는 커다란 나비 리본.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
   },
   "desc.singulo.android_work_console": {
     "source": "Brings together the supply ports, delivery ports and recipe racks linked to it with a Work Location Card, takes orders and hands the work to nearby androids. It works as a supply port and a delivery port itself, and its Record tab writes recipes onto recipe cards. Orders need every material in stock.",
@@ -2639,6 +2683,38 @@
     "source": "%s%%",
     "translation": "%s%%"
   },
+  "gui.singulo.android.decor.0": {
+    "source": "Head",
+    "translation": "머리"
+  },
+  "gui.singulo.android.decor.0.hint": {
+    "source": "Ribbon, hair flower, beret or headdress",
+    "translation": "리본·머리 장식·베레모·헤드드레스"
+  },
+  "gui.singulo.android.decor.1": {
+    "source": "Back / waist",
+    "translation": "등・허리"
+  },
+  "gui.singulo.android.decor.1.hint": {
+    "source": "Cape, scarf or waist ribbon",
+    "translation": "망토·목도리·허리 리본"
+  },
+  "gui.singulo.android.decor.2": {
+    "source": "Hand",
+    "translation": "손"
+  },
+  "gui.singulo.android.decor.2.hint": {
+    "source": "Paperback, bouquet, teacup or umbrella (held only while idle)",
+    "translation": "문고본·꽃다발·찻잔·우산(대기 중에만 듭니다)"
+  },
+  "gui.singulo.android.decor.dye": {
+    "source": "Dye them with dyes on a crafting table",
+    "translation": "염료와 함께 제작대에서 물들일 수 있습니다"
+  },
+  "gui.singulo.android.decor.speech": {
+    "source": "Does it suit me?",
+    "translation": "어울려?"
+  },
   "gui.singulo.android.dismantle": {
     "source": "Dismantle (press twice)",
     "translation": "해체(두 번 누르기)"
@@ -2686,6 +2762,10 @@
   "gui.singulo.android.pack.none": {
     "source": "No backpack",
     "translation": "백팩 없음"
+  },
+  "gui.singulo.android.page.decor": {
+    "source": "Decorations",
+    "translation": "장식"
   },
   "gui.singulo.android.page.gear": {
     "source": "Gear and inventory",
@@ -4971,6 +5051,14 @@
     "source": "Charging, repair and gear",
     "translation": "충전·수리·장비"
   },
+  "guide.singulo.androids.decor.body": {
+    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret or headdress\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
+    "translation": "안드로이드 화면에서 이름 왼쪽의 버튼으로 페이지를 바꾸면, 3번째가 \"장식\" 페이지입니다. 머리·등/허리·손 칸에 장식을 달 수 있습니다. 전투·작업에는 영향이 없습니다. 모두 제작대에서 만들고, 염료와 함께 제작대에서 물들일 수 있습니다(가죽 방어구와 같음).\n・머리: 리본·머리 장식·베레모·헤드드레스\n・등/허리: 망토·목도리·허리 리본(망토와 목도리 끝은 걸으면 나부낍니다)\n・손: 문고본·꽃다발·찻잔·우산(대기 중에만 듭니다. 전투·작업·충전 중에는 넣어 둡니다)"
+  },
+  "guide.singulo.androids.decor.title": {
+    "source": "Android decorations",
+    "translation": "안드로이드의 장식"
+  },
   "guide.singulo.androids.glass.body": {
     "source": "- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard's own path.\nAndroids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass next to them, and four plain panes make the patterned kind.",
     "translation": "- 안드로이드 차단 유리(호박색): 안드로이드만 지나갈 수 없고, 플레이어와 다른 생물은 그대로 통과합니다. 기지 출입구에 알맞습니다.\n- 안드로이드 투과 유리(하늘색): 안드로이드만 지나갈 수 있고, 그 밖의 모든 것에는 단단한 유리입니다. 호위 전용 통로에 알맞습니다.\n안드로이드는 길을 찾을 때도 이 유리를 고려합니다. 차단 유리는 막힌 곳, 투과 유리는 열린 곳으로 봅니다. 민무늬는 같은 유리와 붙으면 이음새 없이 이어지고, 민무늬 4장으로 무늬 있는 것을 만들 수 있습니다."
@@ -5479,6 +5567,22 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
+  "howto.singulo.android_beret": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_book": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_bouquet": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_cape": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.android_charger": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
@@ -5498,6 +5602,14 @@
   "howto.singulo.android_gate_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_hair_flower": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_headdress": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.android_kit": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -5519,6 +5631,14 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.android_ribbon": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_scarf": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.android_station": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
@@ -5531,9 +5651,21 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
+  "howto.singulo.android_teacup": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_umbrella": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_waist_ribbon": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.android_work_console": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -6415,6 +6547,22 @@
     "source": "Battery Upgrade",
     "translation": "배터리 업그레이드"
   },
+  "item.singulo.android_beret": {
+    "source": "Beret",
+    "translation": "베레모"
+  },
+  "item.singulo.android_book": {
+    "source": "Paperback",
+    "translation": "문고본"
+  },
+  "item.singulo.android_bouquet": {
+    "source": "Bouquet",
+    "translation": "꽃다발"
+  },
+  "item.singulo.android_cape": {
+    "source": "Cape",
+    "translation": "망토"
+  },
   "item.singulo.android_charger": {
     "source": "Android Wireless Charger",
     "translation": "안드로이드 무선 충전기"
@@ -6422,6 +6570,14 @@
   "item.singulo.android_felling_upgrade": {
     "source": "Felling Upgrade",
     "translation": "벌목 업그레이드"
+  },
+  "item.singulo.android_hair_flower": {
+    "source": "Hair Flower",
+    "translation": "머리 장식"
+  },
+  "item.singulo.android_headdress": {
+    "source": "Headdress",
+    "translation": "헤드드레스"
   },
   "item.singulo.android_kit": {
     "source": "Android Kit",
@@ -6451,13 +6607,33 @@
     "source": "Self-Repair Kit",
     "translation": "자가 수리 키트"
   },
+  "item.singulo.android_ribbon": {
+    "source": "Ribbon",
+    "translation": "리본"
+  },
+  "item.singulo.android_scarf": {
+    "source": "Scarf",
+    "translation": "목도리"
+  },
   "item.singulo.android_tank_upgrade": {
     "source": "Tank Upgrade",
     "translation": "탱크 업그레이드"
   },
+  "item.singulo.android_teacup": {
+    "source": "Teacup",
+    "translation": "찻잔"
+  },
   "item.singulo.android_transfer_upgrade": {
     "source": "Transfer Upgrade",
     "translation": "전송 업그레이드"
+  },
+  "item.singulo.android_umbrella": {
+    "source": "Umbrella",
+    "translation": "우산"
+  },
+  "item.singulo.android_waist_ribbon": {
+    "source": "Waist Ribbon",
+    "translation": "허리 리본"
   },
   "item.singulo.anomaly_sample": {
     "source": "Anomaly Sample",
@@ -8238,6 +8414,18 @@
   "subtitles.singulo.wormhole_stabilizer_running": {
     "source": "Wormhole stabilizer runs",
     "translation": "웜홀 안정기가 작동한다"
+  },
+  "tooltip.singulo.android_accessory.0": {
+    "source": "Worn on an android's head (decoration page)",
+    "translation": "안드로이드 머리에 답니다(장식 페이지)"
+  },
+  "tooltip.singulo.android_accessory.1": {
+    "source": "Worn on an android's back or waist (decoration page)",
+    "translation": "안드로이드 등이나 허리에 답니다(장식 페이지)"
+  },
+  "tooltip.singulo.android_accessory.2": {
+    "source": "Held by an idle android (decoration page)",
+    "translation": "대기 중인 안드로이드가 손에 듭니다(장식 페이지)"
   },
   "tooltip.singulo.android_armor_plate": {
     "source": "Chestplate for a guard android (+8 armor, +2 toughness)",

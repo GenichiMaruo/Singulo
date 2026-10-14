@@ -843,6 +843,27 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 装飾: 着けた装飾はクライアントにも伝わり（描くため）、染めた色が使われる。枠に合わない物は入らない。 */
+    @GameTest(template = EMPTY)
+    public static void androidWearsAccessories(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        ItemStack ribbon = new ItemStack(item("android_ribbon"));
+        ribbon.set(net.minecraft.core.component.DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x123456, true));
+        a.inventory().setItem(RuinAndroid.SLOT_DECOR, ribbon);
+        ItemStack worn = a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD);
+        helper.assertTrue(worn.is(item("android_ribbon")), "頭の装飾が伝わらない");
+        helper.assertTrue(((io.github.genichimaruo.singulo.android.AndroidAccessoryItem) worn.getItem()).color(worn) == 0x123456, "染めた色が使われない");
+        var player = helper.makeMockServerPlayerInLevel();
+        var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
+        helper.assertFalse(menu.getSlot(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND)
+                .mayPlace(new ItemStack(item("android_cape"))), "手の枠にマントが入る");
+        helper.assertTrue(menu.getSlot(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK)
+                .mayPlace(new ItemStack(item("android_cape"))), "背中の枠にマントが入らない");
+        a.discard();
+        helper.succeed();
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

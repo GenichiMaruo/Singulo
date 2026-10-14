@@ -39,7 +39,9 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int INV_Y = 134;
     public static final int HOTBAR_Y = 192;
 
-    public static final int PAGE_STATUS = 0, PAGE_GEAR = 1;
+    public static final int PAGE_STATUS = 0, PAGE_GEAR = 1, PAGE_DECOR = 2, PAGES = 3;
+    /** 装飾のページ: 姿の右に、頭・背中/腰・手の枠を縦に並べる。 */
+    public static final int DECOR_X = 96, DECOR_Y = 34, DECOR_STEP = 28;
 
     public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, D_WORK = 7,
             COUNT = 8;
@@ -137,6 +139,15 @@ public class AndroidMenu extends AbstractContainerMenu {
                 return !working() && (android == null || android.tanksEmpty());
             }
         });
+        for (int i = 0; i < RuinAndroid.DECOR_SLOTS; i++) {
+            int part = i;
+            addSlot(new PageSlot(items, RuinAndroid.SLOT_DECOR + i, DECOR_X, DECOR_Y + i * DECOR_STEP, PAGE_DECOR, 1) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return AndroidAccessoryItem.isAccessory(stack, part);
+                }
+            });
+        }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
@@ -273,6 +284,8 @@ public class AndroidMenu extends AbstractContainerMenu {
             }
         } else if (!(RuinAndroid.isFellingUpgrade(stack) && moveItemStackTo(stack, RuinAndroid.SLOT_FELLING, RuinAndroid.SLOT_FELLING + 1, false))
                 && !(RuinAndroid.isTankUpgrade(stack) && moveItemStackTo(stack, RuinAndroid.SLOT_TANK, RuinAndroid.SLOT_TANK + 1, false))
+                && !(stack.getItem() instanceof AndroidAccessoryItem acc
+                        && moveItemStackTo(stack, RuinAndroid.SLOT_DECOR + acc.part(), RuinAndroid.SLOT_DECOR + acc.part() + 1, false))
                 && !moveItemStackTo(stack, 0, RuinAndroid.CARRY_START, false)          // 修理キット・装甲板・アップグレードの枠
                 && !moveItemStackTo(stack, RuinAndroid.CARRY_START, RuinAndroid.SLOT_FELLING, false)) {     // 持ち物、バックパックの中
             return ItemStack.EMPTY;

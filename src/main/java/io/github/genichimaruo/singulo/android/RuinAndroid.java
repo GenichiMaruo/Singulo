@@ -182,6 +182,12 @@ public abstract class RuinAndroid extends Monster {
     private static final EntityDataAccessor<Integer> BATTERIES = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     /** タンクの見た目: 流体の番号（+1。0 は空）と入っている割合（0〜100）を、タンクごとに1つの数にまとめる。-1 はタンクなし。 */
     private static final EntityDataAccessor<Integer> TANK_A = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 装飾（頭・背中/腰・手。クライアントで描くため）。 */
+    @SuppressWarnings("unchecked")
+    private static final EntityDataAccessor<net.minecraft.world.item.ItemStack>[] DECOR = new EntityDataAccessor[] {
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK)};
     private static final EntityDataAccessor<Integer> TANK_B = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     /** 作業（自動化）を割り当てられているか（持ち物を取り出せなくするため、クライアントでも見る）。 */
     private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
@@ -211,7 +217,9 @@ public abstract class RuinAndroid extends Monster {
     public static final int CARRY_START = 5, CARRY_SLOTS = 5, PACK_START = 10, PACK_SLOTS = 24;
     /** 伐採アップグレード・タンクアップグレードの枠（あとから足したので、持ち物のうしろ）。 */
     public static final int SLOT_FELLING = PACK_START + PACK_SLOTS, SLOT_TANK = SLOT_FELLING + 1;
-    public static final int INVENTORY_SIZE = SLOT_TANK + 1;
+    /** 装飾の枠（頭・背中/腰・手）。 */
+    public static final int SLOT_DECOR = SLOT_TANK + 1, DECOR_SLOTS = 3;
+    public static final int INVENTORY_SIZE = SLOT_DECOR + DECOR_SLOTS;
     /** タンクアップグレードのタンクの数と、1つの容量（mB）。1つのタンクには1種類の流体。 */
     public static final int TANKS = 2, TANK_CAPACITY = 32000;
     /** バッテリーアップグレードは2個まで。1個につき充電の満タンが半分（CHARGE_MAX / 2）ずつ増える。 */
@@ -277,6 +285,12 @@ public abstract class RuinAndroid extends Monster {
                 entityData.set(BATTERIES, isBatteryUpgrade(battery) ? Math.min(MAX_BATTERIES, battery.getCount()) : 0);
                 entityData.set(BACKPACK, isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)));
                 syncTanks();
+                for (int i = 0; i < DECOR_SLOTS; i++) {
+                    net.minecraft.world.item.ItemStack d = inventory.getItem(SLOT_DECOR + i);
+                    if (!net.minecraft.world.item.ItemStack.matches(d, entityData.get(DECOR[i]))) {
+                        entityData.set(DECOR[i], d.copy());
+                    }
+                }
                 if (charge() > maxCharge()) {
                     setCharge(maxCharge());
                 }
@@ -302,6 +316,17 @@ public abstract class RuinAndroid extends Monster {
 
     public static boolean isFellingUpgrade(net.minecraft.world.item.ItemStack stack) {
         return stack.getItem() instanceof AndroidFellingUpgradeItem;
+    }
+
+    /** 手に持つ装飾を見せるか: 待機していて（戦い・作業・充電をしていない）、挨拶の仕草もしていない。 */
+    public boolean showsHeldDecor() {
+        return printed() && state() == STATE_IDLE && !isWorking() && !entityData.get(ALERT) && gesture() == GESTURE_NONE
+                && !decor(AndroidAccessoryItem.HAND).isEmpty();
+    }
+
+    /** 着けている装飾（part: {@link AndroidAccessoryItem#HEAD} など。クライアントでも見える）。 */
+    public net.minecraft.world.item.ItemStack decor(int part) {
+        return entityData.get(DECOR[part]);
     }
 
     public static boolean isTankUpgrade(net.minecraft.world.item.ItemStack stack) {
@@ -825,6 +850,9 @@ public abstract class RuinAndroid extends Monster {
         builder.define(ALERT, false);
         builder.define(BATTERIES, 0);
         builder.define(TANK_A, -1);
+        for (EntityDataAccessor<net.minecraft.world.item.ItemStack> d : DECOR) {
+            builder.define(d, net.minecraft.world.item.ItemStack.EMPTY);
+        }
         builder.define(TANK_B, -1);
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
