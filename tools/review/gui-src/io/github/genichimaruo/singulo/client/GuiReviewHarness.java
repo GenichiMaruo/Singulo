@@ -55,7 +55,11 @@ public final class GuiReviewHarness {
             return;
         }
         switch (phase) {
-            case 1 -> { openAndroid(mc); phase++; }
+            case 1 -> {
+                org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
+                openAndroid(mc);
+                phase++;
+            }
             case 2 -> {
                 require(mc, AndroidScreen.class);
                 capture(mc, "android-status");

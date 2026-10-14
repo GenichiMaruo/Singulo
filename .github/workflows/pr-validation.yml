@@ -24,6 +24,10 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: gradle
+      - name: Validate translations and models
+        run: |
+          python3 tools/localization.py --check
+          python3 tools/check_models.py
       - name: Build and run required GameTests
         shell: bash
         run: |
@@ -37,6 +41,19 @@ jobs:
           log = pathlib.Path("build/gametest/logs/latest.log")
           if not log.is_file() or not re.search(r"All [1-9][0-9]* required tests passed", log.read_text(encoding="utf-8")):
               raise SystemExit("GameTestServer did not report successful nonempty completion")
+          PY
+      - name: Check production JAR excludes GUI harness
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import zipfile
+          jars = list(pathlib.Path("build/libs").glob("*.jar"))
+          if not jars:
+              raise SystemExit("No production JAR found")
+          for path in jars:
+              with zipfile.ZipFile(path) as jar:
+                  if any("GuiReviewHarness" in name for name in jar.namelist()):
+                      raise SystemExit("Development GUI harness leaked into " + str(path))
           PY
       - name: Prepare disposable GUI review world
         run: python3 tools/review/prepare_gui.py

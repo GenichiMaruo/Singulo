@@ -616,6 +616,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 if (fluid != null && fill > 0) {
                     int color = net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid)
                             .getTintColor(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000)) & 0xFFFFFF;
+                    if (fluid.isSame(net.minecraft.world.level.material.Fluids.LAVA)) {
+                        color = 0xFF6A00;
+                    }
                     float top = y0 + (y1 - y0) * Math.min(1, fill);
                     FxDraw.box(pose, glass, lo + 0.15F / 16, y0, z0 + 0.15F / 16, hi - 0.15F / 16, top, z1 - 0.15F / 16, light, color, 220);
                 }

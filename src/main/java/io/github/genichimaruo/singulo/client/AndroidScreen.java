@@ -352,6 +352,9 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 if (fluid != null && fill > 0) {
                     int color = 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid)
                             .getTintColor(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000));
+                    if (fluid.isSame(net.minecraft.world.level.material.Fluids.LAVA)) {
+                        color = 0xFFFF6A00;     // 溶岩はテクスチャ自体が着色され、tintだけだと白になる
+                    }
                     g.fill(tx, y + TANK_Y, tx + Math.max(1, Math.round(TANK_W * Math.min(1, fill))), y + TANK_Y + TANK_H, color);
                 }
                 for (int m = 1; m < 4; m++) {
