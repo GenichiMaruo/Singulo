@@ -40,7 +40,20 @@ public class ProcedureCardItem extends RecipeCardItem {
     public static Component describe(ProcedureStep s) {
         Component what = s.item().isEmpty() ? Component.translatable("tooltip.singulo.procedure_card.product")
                 : Component.empty().append(s.item().getHoverName()).append(" ×" + s.item().getCount());
-        return Component.translatable("tooltip.singulo.procedure_card." + ProcedureStep.KEYS[s.kind()], what, where(s));
+        String key = "tooltip.singulo.procedure_card." + ProcedureStep.KEYS[s.kind()];
+        return switch (s.kind()) {
+            case ProcedureStep.BREED, ProcedureStep.CULL -> Component.translatable(key, what, s.option(), where(s));
+            case ProcedureStep.USE -> Component.translatable(key, option(s.kind(), s.option()), where(s));
+            default -> Component.translatable(key, what, where(s));
+        };
+    }
+
+    /** 手順の数の上限（「8頭まで」）、レバーの扱い（「切り替え」など）。上限も扱いもない手順は空。 */
+    public static Component option(int kind, int option) {
+        if (kind == ProcedureStep.USE) {
+            return Component.translatable("gui.singulo.recipe_encoder.use." + Math.floorMod(option, ProcedureStep.USE_MODES));
+        }
+        return ProcedureStep.hasOption(kind) ? Component.translatable("gui.singulo.recipe_encoder.limit", option) : Component.empty();
     }
 
     public static String where(ProcedureStep s) {

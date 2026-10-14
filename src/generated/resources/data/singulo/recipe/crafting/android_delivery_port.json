@@ -1,29 +1,25 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "PRP",
+    "PHP",
+    " B "
+  ],
+  "key": {
+    "P": {
       "tag": "c:plates/steel"
     },
-    {
-      "tag": "c:plates/steel"
+    "R": {
+      "tag": "c:dusts/redstone"
     },
-    {
-      "tag": "c:plates/steel"
-    },
-    {
-      "tag": "c:plates/steel"
-    },
-    {
+    "H": {
       "item": "minecraft:hopper"
     },
-    {
+    "B": {
       "item": "singulo:basic_circuit"
-    },
-    {
-      "tag": "c:dusts/redstone"
     }
-  ],
+  },
   "result": {
     "id": "singulo:android_delivery_port",
     "count": 1

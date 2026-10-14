@@ -156,6 +156,7 @@ final class AndroidWorkGoal extends Goal {
         inserted = 0;
         collected = 0;
         stalled = 0;
+        fuelTrip = null;
         resetProcedure();
     }
 
@@ -165,6 +166,8 @@ final class AndroidWorkGoal extends Goal {
         stopMining();
         mineIdle = 0;
         mineSkip.clear();
+        ranchTarget = null;
+        ranchSkip.clear();
     }
 
     @Override
@@ -221,9 +224,15 @@ final class AndroidWorkGoal extends Goal {
                 }
                 RecipeData r = job.batch().get(batchIndex).recipe();
                 if (r.procedure()) {
-                    boolean mine = procIndex < r.steps().size()
-                            && r.steps().get(procIndex).kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE;
-                    yield mine ? RuinAndroid.ACT_MINE : RuinAndroid.ACT_PROCESS;
+                    int kind = procIndex < r.steps().size() ? r.steps().get(procIndex).kind() : -1;
+                    yield switch (kind) {
+                        case io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE -> RuinAndroid.ACT_MINE;
+                        case io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST -> RuinAndroid.ACT_FARM;
+                        case io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL -> RuinAndroid.ACT_FELL;
+                        case io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED, io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK, io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> RuinAndroid.ACT_RANCH;
+                        case io.github.genichimaruo.singulo.android.work.ProcedureStep.USE -> RuinAndroid.ACT_USE;
+                        default -> RuinAndroid.ACT_PROCESS;
+                    };
                 }
                 yield r.processing() ? RuinAndroid.ACT_PROCESS : RuinAndroid.ACT_CRAFT;
             }
@@ -316,6 +325,10 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         WorkJob.Batch step = job.batch().get(batchIndex);
+        if (fuelTrip != null && step.recipe() != null) {
+            fuelRun(c, step.recipe().fuel());              // 燃料を取りに行っている
+            return;
+        }
         if (step.recipe() != null && step.recipe().procedure()) {
             procedure(level, c, job, step);
             return;
@@ -373,10 +386,16 @@ final class AndroidWorkGoal extends Goal {
         craftTimer = 0;
         RecipeData r = step.recipe();
         BlockPos at = step.location();
-        net.neoforged.neoforge.items.IItemHandler in = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, Direction.UP);
-        net.neoforged.neoforge.items.IItemHandler out = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, Direction.DOWN);
+        net.neoforged.neoforge.items.IItemHandler in = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at,
+                r.inputFace());
+        net.neoforged.neoforge.items.IItemHandler out = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at,
+                r.outputFace());
         if (in == null || out == null) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+            return;
+        }
+        // 燃料が切れていれば、燃料を足す（持っていなければ、取りに行く）。記録した燃料がなければ、取りに行かない
+        if (!r.fuel().isEmpty() && needsFuel(level, at, r) && refuel(level, c, at, r)) {
             return;
         }
         boolean progress = false;
@@ -417,7 +436,12 @@ final class AndroidWorkGoal extends Goal {
         if (progress) {
             stalled = 0;
             android.playSound(SoundEvents.ITEM_PICKUP, 0.4F, 1.2F);
-        } else if ((stalled += PROCESS_INTERVAL) >= STALL_TICKS) {
+        } else if ((stalled += PROCESS_INTERVAL) >= SHORT_TICKS && inserted >= step.crafts() && collected < want
+                && !holdsAny(in, r.inputs())) {
+            // 入れた素材を使い切ったのに、できた物が足りない（確率で出る物）: 足りない分の回数を足して、集まるまで作り直す
+            endShort(c, job, want - collected);
+            return;
+        } else if (stalled >= STALL_TICKS) {
             fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
             return;
         }
@@ -427,6 +451,92 @@ final class AndroidWorkGoal extends Goal {
             stalled = 0;
             batchIndex++;
         }
+    }
+
+    /** 燃料を取りに行く受け渡し場所（行っていなければ null）。 */
+    @Nullable
+    private BlockPos fuelTrip;
+
+    /** 燃料を入れる面: 記録した面か、自動なら、装置から見てアンドロイドのいる横の面（かまどなら燃料の欄）。 */
+    private Direction fuelSide(BlockPos machine, RecipeData r) {
+        if (r.fuelFace() != null) {
+            return r.fuelFace();
+        }
+        Vec3 d = android.position().subtract(Vec3.atCenterOf(machine));
+        Direction dir = Direction.getNearest(d.x, 0, d.z);
+        return dir.getAxis().isHorizontal() ? dir : Direction.NORTH;
+    }
+
+    /** 装置の燃料が切れて、止まっているか（かまどは火が消えて燃料の欄が空で、焼く物が残っている）。 */
+    private boolean needsFuel(ServerLevel level, BlockPos machine, RecipeData r) {
+        if (level.getBlockEntity(machine) instanceof net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity f) {
+            BlockState s = level.getBlockState(machine);
+            boolean lit = s.hasProperty(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT)
+                    && s.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT);
+            return !lit && f.getItem(1).isEmpty() && !f.getItem(0).isEmpty();
+        }
+        // ほかの装置: 5秒進まず、横の面に燃料が入っていない
+        net.neoforged.neoforge.items.IItemHandler side = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                machine, fuelSide(machine, r));
+        return stalled >= 100 && side != null && side.getSlots() > 0;
+    }
+
+    /** 燃料を足す。持っていなければ取りに行き始めて true（このあと取りに行く）。足した・足せないときは false。 */
+    private boolean refuel(ServerLevel level, WorkConsoleBlockEntity c, BlockPos machine, RecipeData r) {
+        ItemStack fuel = r.fuel();
+        if (carriedCount(fuel.getItem()) > 0) {
+            net.neoforged.neoforge.items.IItemHandler side = level.getCapability(
+                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, machine, fuelSide(machine, r));
+            if (side != null && insertFromCarry(side, fuel, carriedCount(fuel.getItem())) > 0) {
+                stalled = 0;
+                android.playSound(SoundEvents.ITEM_PICKUP, 0.4F, 0.8F);
+            }
+            return false;
+        }
+        fuelTrip = c.fuelPoint(fuel, android.blockPosition());
+        travel = 0;
+        return fuelTrip != null;                // 在庫にない: そのまま待つ（加工が止まったままなら、やがて取り消す）
+    }
+
+    /** 燃料を取りに行って、受け渡し場所から（予約されていない物を）取る。取ったら装置へ戻る。 */
+    private void fuelRun(WorkConsoleBlockEntity c, ItemStack fuel) {
+        android.setActivity(RuinAndroid.ACT_FETCH);
+        Boolean at = go(fuelTrip, HANDOVER_TICKS);
+        if (at == null) {
+            fuelTrip = null;
+        } else if (at) {
+            c.takeFuel(android, fuelTrip, fuel, Math.max(1, fuel.getCount()));
+            fuelTrip = null;
+            stalled = 0;
+            travel = 0;
+        }
+    }
+
+    /** 素材を使い切ったあと、できた物を待つ時間。過ぎても足りなければ、確率で出なかったとみなす。 */
+    private static final int SHORT_TICKS = 20 * 30;
+
+    /** 装置（入れる面）に、まだこれらの素材が残っているか（まだ加工している）。 */
+    private static boolean holdsAny(net.neoforged.neoforge.items.IItemHandler h, java.util.List<ItemCount> inputs) {
+        for (int i = 0; i < h.getSlots(); i++) {
+            ItemStack s = h.getStackInSlot(i);
+            for (ItemCount in : inputs) {
+                if (!s.isEmpty() && in.matches(s)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** 今の工程が、目当ての数に missing だけ足りずに終わった: 指令台に知らせて（回数を足してもらい）、ここまでで作業を区切る。 */
+    private void endShort(WorkConsoleBlockEntity c, WorkJob job, long missing) {
+        c.reportShort(job, batchIndex, missing);
+        c.completeUpTo(job, batchIndex);
+        inserted = 0;
+        collected = 0;
+        stalled = 0;
+        resetProcedure();
+        afterJob(c, job);
     }
 
     // ------------------------------------------------------------------ 手順カード
@@ -442,6 +552,13 @@ final class AndroidWorkGoal extends Goal {
         io.github.genichimaruo.singulo.android.work.ProcedureStep ps = r.steps().get(procIndex);
         ItemStack what = ps.item().isEmpty() ? r.output() : ps.item();
         long want = Math.max(1, what.getCount()) * step.crafts();
+        if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK) {
+            // 搾乳: 牛乳入りバケツを集める（数は物の欄、空ならできる物の数）
+            want = Math.max(1, ps.item().isEmpty() ? r.output().getCount() : ps.item().getCount()) * step.crafts();
+            what = new ItemStack(net.minecraft.world.item.Items.MILK_BUCKET);
+        } else if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED || ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE) {
+            want = 1;                          // 1回通りやったら終わり（終わったら progress を 1 にする）
+        }
         if (progress >= want) {
             procIndex++;
             progress = 0;
@@ -449,11 +566,38 @@ final class AndroidWorkGoal extends Goal {
             stopMining();
             mineIdle = 0;
             mineSkip.clear();
+            ranchTarget = null;
+            ranchSkip.clear();
+            craftTimer = 0;
             return;
         }
-        if (ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE) {
-            mine(level, c, job, ps, what);
-            return;
+        switch (ps.kind()) {
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE -> {
+                mine(level, c, job, ps, what);
+                return;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST -> {
+                harvest(level, c, job, ps, what);
+                return;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL -> {
+                fell(level, c, job, ps, what);
+                return;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.BREED -> {
+                breed(level, c, job, ps);
+                return;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK, io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> {
+                ranch(level, c, job, ps, what);
+                return;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.USE -> {
+                use(level, c, job, ps);
+                return;
+            }
+            default -> {
+            }
         }
         Boolean arrived = go(ps.pos(), 0);
         if (arrived == null) {
@@ -482,9 +626,29 @@ final class AndroidWorkGoal extends Goal {
         if (moved > 0) {
             stalled = 0;
             android.playSound(SoundEvents.ITEM_PICKUP, 0.4F, insert ? 0.9F : 1.2F);
-        } else if ((stalled += PROCESS_INTERVAL) >= STALL_TICKS) {
+        } else if ((stalled += PROCESS_INTERVAL) >= SHORT_TICKS && !insert && insertsUsedUp(level, r)) {
+            // 投入した素材はもう使われたのに、取り出す物が足りない（確率で出る物）: 足りない分の回数を足して、集まるまで繰り返す
+            long per = Math.max(1, what.getCount());
+            long missingRuns = (want - progress + per - 1) / per;
+            endShort(c, job, missingRuns * Math.max(1, r.output().getCount()));
+        } else if (stalled >= STALL_TICKS) {
             fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
         }
+    }
+
+    /** 手順カードで投入した物が、投入先の装置にもう残っていないか。 */
+    private static boolean insertsUsedUp(ServerLevel level, RecipeData r) {
+        for (io.github.genichimaruo.singulo.android.work.ProcedureStep s : r.steps()) {
+            if (s.kind() != io.github.genichimaruo.singulo.android.work.ProcedureStep.INSERT || s.item().isEmpty()) {
+                continue;
+            }
+            net.neoforged.neoforge.items.IItemHandler h = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    s.pos(), Direction.UP);
+            if (h != null && holdsAny(h, java.util.List.of(new ItemCount(s.item(), 1)))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** 持ち物から what を最大 limit 個、装置へ入れる。入れた数。 */
@@ -595,6 +759,7 @@ final class AndroidWorkGoal extends Goal {
         android.getLookControl().setLookAt(center.x, center.y, center.z, 90, 90);
         android.setYRot(yawTo(target));
         android.setYBodyRot(android.getYRot());
+        android.setTool(RuinAndroid.TOOL_PICKAXE);
         if (android.state() != RuinAndroid.STATE_MINING) {
             android.setState(RuinAndroid.STATE_MINING);
         }
@@ -628,6 +793,704 @@ final class AndroidWorkGoal extends Goal {
         }
         stopMining();
         android.spend(MINE_COST);
+    }
+
+    // ------------------------------------------------------------------ 農作業・操作
+
+    /** 収穫・伐採・牧場で、することがない状態が続いたらあきらめるまで（牧場は毛が生えるのを待つので長め）。 */
+    private static final int FARM_IDLE_TICKS = 20 * 30, RANCH_IDLE_TICKS = 20 * 120;
+    /** 1つ収穫する・動物の世話をする時間。 */
+    private static final int HARVEST_TICKS = 8, RANCH_TICKS = 12;
+    /** 牧場で世話をしている動物と、たどり着けなかった動物。 */
+    @Nullable
+    private java.util.UUID ranchTarget;
+    private final java.util.Set<java.util.UUID> ranchSkip = new java.util.HashSet<>();
+
+    /** 範囲の中で、条件に合う一番近いブロック（なければ null）。 */
+    @Nullable
+    private BlockPos nearestInArea(net.minecraft.world.level.levelgen.structure.BoundingBox box, java.util.function.Predicate<BlockPos> ok) {
+        BlockPos best = null;
+        double bestDist = 0;
+        for (BlockPos p : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
+            if (!android.level().isLoaded(p) || mineSkip.contains(p) || !ok.test(p)) {
+                continue;
+            }
+            double d = p.distSqr(android.blockPosition());
+            if (best == null || d < bestDist) {
+                best = p.immutable();
+                bestDist = d;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * ブロックのそば（手が届く所）まで近づく。着いたら true、歩いているあいだ false、たどり着けなければ null。
+     * できるだけ隣まで寄り、これ以上近づけなければ、手が届く所から作業する。
+     */
+    @Nullable
+    private Boolean reachBlock(BlockPos target) {
+        Vec3 center = Vec3.atCenterOf(target);
+        double d2 = android.getEyePosition().distanceToSqr(center);
+        if (mineSettled || d2 <= MINE_NEAR * MINE_NEAR) {
+            mineSettled = true;
+            travel = 0;
+            android.getNavigation().stop();
+            return true;
+        }
+        boolean reach = d2 <= MINE_REACH * MINE_REACH;
+        if (travel > 0 && android.getNavigation().isDone() && reach) {
+            mineSettled = true;
+            return true;
+        }
+        idlePose();
+        if (++travel > GIVE_UP_TICKS) {
+            travel = 0;
+            if (reach) {
+                mineSettled = true;
+                return true;
+            }
+            return null;
+        }
+        if (travel % 20 == 1 || android.getNavigation().isDone()) {
+            net.minecraft.world.level.pathfinder.Path path = android.getNavigation().createPath(target, 1);
+            if (path != null && android.getNavigation().moveTo(path, 1.0)) {
+                return false;
+            }
+            if (reach) {
+                mineSettled = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 動物のそばまで寄る。着いたら true、歩いているあいだ false、たどり着けなければ null。 */
+    @Nullable
+    private Boolean reachEntity(net.minecraft.world.entity.Entity target) {
+        if (android.distanceToSqr(target) <= 2.3 * 2.3) {
+            travel = 0;
+            android.getNavigation().stop();
+            android.getLookControl().setLookAt(target, 60, 60);
+            return true;
+        }
+        idlePose();
+        if (++travel > GIVE_UP_TICKS) {
+            travel = 0;
+            return null;
+        }
+        if (travel % 10 == 1 || android.getNavigation().isDone()) {
+            android.getNavigation().moveTo(target, 1.0);
+        }
+        return false;
+    }
+
+    /** 歩き出すときは、作業の姿勢をやめる。 */
+    private void idlePose() {
+        if (android.state() == RuinAndroid.STATE_MINING || android.state() == RuinAndroid.STATE_CRAFTING) {
+            android.setState(RuinAndroid.STATE_IDLE);
+        }
+    }
+
+    /** することがない: 範囲のそばで待つ。limit 続いたら、注文を取り消す。 */
+    private void idleNear(WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps, int limit) {
+        idlePose();
+        if (android.position().distanceToSqr(Vec3.atCenterOf(ps.pos())) > (MINE_REACH + 2) * (MINE_REACH + 2)) {
+            moveNear(ps.pos());
+        }
+        // まだ育つ物（若い作物・苗木・毛を刈った羊・子ども・アメジストの芽）があれば、育つのを待つ（長く待つ）
+        if (mineIdle % 100 == 0) {
+            growing = android.level() instanceof ServerLevel level && growing(level, ps);
+        }
+        if (growing) {
+            android.setActivity(RuinAndroid.ACT_WAIT);
+        }
+        if (++mineIdle >= (growing ? GROW_WAIT_TICKS : limit)) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
+        }
+    }
+
+    /** 育つのを待つ限度（20分）と、今、育つのを待っているか。 */
+    private static final int GROW_WAIT_TICKS = 20 * 60 * 20;
+    private boolean growing;
+
+    /** 範囲に、まだ育つ物があるか。 */
+    private static boolean growing(ServerLevel level, io.github.genichimaruo.singulo.android.work.ProcedureStep ps) {
+        net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
+        switch (ps.kind()) {
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL -> {
+                for (BlockPos p : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
+                    if (level.isLoaded(p) && grows(level, p, ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> {
+                return !level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, pen(ps),
+                        a -> a.isAlive() && (a.isBaby() || ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR && a instanceof net.minecraft.world.entity.animal.Sheep s
+                                && s.isSheared())).isEmpty();
+            }
+            default -> {
+                return false;
+            }
+        }
+    }
+
+    /** そのうち収穫できる（伐採なら、苗木）。 */
+    private static boolean grows(ServerLevel level, BlockPos p, boolean trees) {
+        BlockState s = level.getBlockState(p);
+        net.minecraft.world.level.block.Block b = s.getBlock();
+        if (trees) {
+            return s.is(net.minecraft.tags.BlockTags.SAPLINGS);
+        }
+        if (b instanceof net.minecraft.world.level.block.CropBlock crop) {
+            return !crop.isMaxAge(s);
+        }
+        if (b instanceof net.minecraft.world.level.block.NetherWartBlock) {
+            return s.getValue(net.minecraft.world.level.block.NetherWartBlock.AGE) < 3;
+        }
+        if (b instanceof net.minecraft.world.level.block.CocoaBlock) {
+            return s.getValue(net.minecraft.world.level.block.CocoaBlock.AGE) < 2;
+        }
+        if (b instanceof net.minecraft.world.level.block.SweetBerryBushBlock) {
+            return s.getValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE) < 2;
+        }
+        if (b instanceof net.minecraft.world.level.block.SugarCaneBlock || b instanceof net.minecraft.world.level.block.CactusBlock
+                || b instanceof net.minecraft.world.level.block.BambooStalkBlock) {
+            return !level.getBlockState(p.below()).is(b);              // 根元: 伸びる
+        }
+        return b instanceof net.minecraft.world.level.block.StemBlock || s.is(net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST);
+    }
+
+    /** 手に入れた物を持ち物に入れ、目当ての物の数を数える。 */
+    private void collect(java.util.List<ItemStack> drops, ItemStack what) {
+        for (ItemStack d : drops) {
+            if (d.isEmpty()) {
+                continue;
+            }
+            if (ItemStack.isSameItemSameComponents(d, what)) {
+                progress += d.getCount();
+            }
+            drop(android.addToCarry(d));
+        }
+    }
+
+    /** ほかの mod の守りも効くよう、注文した人として、そのブロックを壊してよいか確かめる。 */
+    private boolean mayBreak(ServerLevel level, WorkConsoleBlockEntity c, BlockPos p) {
+        if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.isActiveCrown(level, p)) {
+            return false;
+        }
+        net.minecraft.world.entity.player.Player as = actor(level, c, null);
+        return !net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level, p,
+                level.getBlockState(p), as)).isCanceled();
+    }
+
+    // ---------------- 収穫
+
+    /** 収穫できるブロックか（育ちきった作物・ネザーウォート・カカオ・スイートベリー、サトウキビなどの一番上、カボチャ・スイカ）。 */
+    private static boolean harvestable(ServerLevel level, BlockPos p) {
+        BlockState s = level.getBlockState(p);
+        net.minecraft.world.level.block.Block b = s.getBlock();
+        if (b instanceof net.minecraft.world.level.block.CropBlock crop) {
+            return crop.isMaxAge(s);
+        }
+        if (b instanceof net.minecraft.world.level.block.NetherWartBlock) {
+            return s.getValue(net.minecraft.world.level.block.NetherWartBlock.AGE) >= 3;
+        }
+        if (b instanceof net.minecraft.world.level.block.CocoaBlock) {
+            return s.getValue(net.minecraft.world.level.block.CocoaBlock.AGE) >= 2;
+        }
+        if (b instanceof net.minecraft.world.level.block.SweetBerryBushBlock) {
+            return s.getValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE) >= 2;
+        }
+        if (b instanceof net.minecraft.world.level.block.SugarCaneBlock || b instanceof net.minecraft.world.level.block.CactusBlock
+                || b instanceof net.minecraft.world.level.block.BambooStalkBlock) {
+            // 根元は残す: 下が同じで、上が違う（一番上）のものから切る
+            return level.getBlockState(p.below()).is(b) && !level.getBlockState(p.above()).is(b);
+        }
+        return s.is(net.minecraft.world.level.block.Blocks.PUMPKIN) || s.is(net.minecraft.world.level.block.Blocks.MELON)
+                || s.is(net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER);
+    }
+
+    private void harvest(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps,
+                         ItemStack what) {
+        if (mineTarget != null && !harvestable(level, mineTarget)) {
+            stopMining();
+        }
+        if (mineTarget == null) {
+            mineTarget = nearestInArea(ps.area(), p -> harvestable(level, p));
+            travel = 0;
+            if (mineTarget == null) {
+                idleNear(c, job, ps, FARM_IDLE_TICKS);
+                return;
+            }
+        }
+        mineIdle = 0;
+        BlockPos target = mineTarget;
+        Boolean at = reachBlock(target);
+        if (at == null) {
+            mineSkip.add(target);
+            stopMining();
+            return;
+        }
+        if (!at) {
+            return;
+        }
+        Vec3 look = Vec3.atCenterOf(target);
+        android.getLookControl().setLookAt(look.x, look.y, look.z, 90, 90);
+        if (android.state() != RuinAndroid.STATE_CRAFTING) {
+            android.setState(RuinAndroid.STATE_CRAFTING);
+        }
+        if (++mineTimer < HARVEST_TICKS) {
+            return;
+        }
+        stopMining();
+        if (!mayBreak(level, c, target)) {
+            mineSkip.add(target);
+            return;
+        }
+        collect(harvestBlock(level, target), what);
+        android.spend(CRAFT_COST);
+    }
+
+    /** 収穫する: 作物は種を1つ使って植え直し、スイートベリーは実だけ摘み、ほかは壊して取る。手に入った物を返す。 */
+    private java.util.List<ItemStack> harvestBlock(ServerLevel level, BlockPos p) {
+        BlockState s = level.getBlockState(p);
+        net.minecraft.world.level.block.Block b = s.getBlock();
+        if (b instanceof net.minecraft.world.level.block.SweetBerryBushBlock) {
+            int age = s.getValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE);
+            int n = (age >= 3 ? 2 : 1) + level.random.nextInt(2);
+            level.setBlock(p, s.setValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE, 1), 2);
+            level.playSound(null, p, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
+            return new java.util.ArrayList<>(java.util.List.of(new ItemStack(net.minecraft.world.item.Items.SWEET_BERRIES, n)));
+        }
+        // アメジストの塊はツルハシで取る（欠片が多く出る。採掘アップグレードがあれば、そのエンチャントも効く）
+        ItemStack tool = s.is(net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER)
+                ? android.canMine() ? miningTool() : new ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE) : ItemStack.EMPTY;
+        java.util.List<ItemStack> drops = new java.util.ArrayList<>(
+                net.minecraft.world.level.block.Block.getDrops(s, level, p, level.getBlockEntity(p), android, tool));
+        BlockState replant = null;
+        if (b instanceof net.minecraft.world.level.block.CropBlock crop) {
+            replant = crop.getStateForAge(0);
+        } else if (b instanceof net.minecraft.world.level.block.NetherWartBlock) {
+            replant = s.setValue(net.minecraft.world.level.block.NetherWartBlock.AGE, 0);
+        } else if (b instanceof net.minecraft.world.level.block.CocoaBlock) {
+            replant = s.setValue(net.minecraft.world.level.block.CocoaBlock.AGE, 0);
+        }
+        if (replant != null && takeSeed(drops, b.asItem())) {
+            level.levelEvent(2001, p, net.minecraft.world.level.block.Block.getId(s));     // 壊れる粒と音
+            level.setBlock(p, replant, 2);
+            return drops;
+        }
+        level.destroyBlock(p, false, android);
+        return drops;
+    }
+
+    /** 手に入った物から、植え直す種を1つ取る。取れたら true。 */
+    private static boolean takeSeed(java.util.List<ItemStack> drops, net.minecraft.world.item.Item seed) {
+        for (ItemStack d : drops) {
+            if (d.is(seed) && !d.isEmpty()) {
+                d.shrink(1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ---------------- 伐採
+
+    /** 伐採の道具: ダイヤの斧に、伐採アップグレードのエンチャントを付けたもの。 */
+    private ItemStack fellingTool() {
+        ItemStack tool = new ItemStack(net.minecraft.world.item.Items.DIAMOND_AXE);
+        ItemStack upgrade = android.inventory().getItem(RuinAndroid.SLOT_FELLING);
+        tool.set(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
+                upgrade.getOrDefault(net.minecraft.core.component.DataComponents.ENCHANTMENTS,
+                        net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY));
+        return tool;
+    }
+
+    /** 木: base からつながった原木（斜めも）と、そのまわりの自然の葉。 */
+    private static java.util.List<BlockPos> tree(ServerLevel level, BlockPos base) {
+        java.util.List<BlockPos> logs = new java.util.ArrayList<>();
+        java.util.Set<BlockPos> seen = new java.util.HashSet<>();
+        java.util.ArrayDeque<BlockPos> queue = new java.util.ArrayDeque<>();
+        queue.add(base);
+        seen.add(base);
+        while (!queue.isEmpty() && logs.size() < 256) {
+            BlockPos p = queue.poll();
+            logs.add(p);
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = 0; dy <= 1; dy++) {
+                    for (int dz = -1; dz <= 1; dz++) {
+                        BlockPos n = p.offset(dx, dy, dz);
+                        if (Math.abs(n.getX() - base.getX()) <= 8 && Math.abs(n.getZ() - base.getZ()) <= 8 && n.getY() - base.getY() <= 32
+                                && seen.add(n) && level.getBlockState(n).is(net.minecraft.tags.BlockTags.LOGS)) {
+                            queue.add(n);
+                        }
+                    }
+                }
+            }
+        }
+        // 葉: 原木から（面でつながって）5つまで
+        java.util.List<BlockPos> out = new java.util.ArrayList<>(logs);
+        java.util.Map<BlockPos, Integer> depth = new java.util.HashMap<>();
+        java.util.ArrayDeque<BlockPos> leaves = new java.util.ArrayDeque<>();
+        for (BlockPos p : logs) {
+            depth.put(p, 0);
+            leaves.add(p);
+        }
+        while (!leaves.isEmpty() && out.size() < 768) {
+            BlockPos p = leaves.poll();
+            int d = depth.get(p);
+            if (d >= 5) {
+                continue;
+            }
+            for (Direction dir : Direction.values()) {
+                BlockPos n = p.relative(dir);
+                if (depth.containsKey(n)) {
+                    continue;
+                }
+                BlockState s = level.getBlockState(n);
+                if (s.getBlock() instanceof net.minecraft.world.level.block.LeavesBlock
+                        && !s.getValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT)) {
+                    depth.put(n, d + 1);
+                    leaves.add(n);
+                    out.add(n);
+                }
+            }
+        }
+        return out;
+    }
+
+    private void fell(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps,
+                      ItemStack what) {
+        if (!android.canFell()) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+            return;
+        }
+        ItemStack tool = fellingTool();
+        if (mineTarget != null && !level.getBlockState(mineTarget).is(net.minecraft.tags.BlockTags.LOGS)) {
+            stopMining();
+        }
+        if (mineTarget == null) {
+            // 一番下の段の原木（同じ段では近い順）を根元にする
+            net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
+            for (int y = box.minY(); y <= box.maxY() && mineTarget == null; y++) {
+                mineTarget = nearestInArea(new net.minecraft.world.level.levelgen.structure.BoundingBox(box.minX(), y, box.minZ(), box.maxX(), y,
+                        box.maxZ()), p -> level.getBlockState(p).is(net.minecraft.tags.BlockTags.LOGS)
+                        && !level.getBlockState(p.below()).is(net.minecraft.tags.BlockTags.LOGS));
+            }
+            travel = 0;
+            if (mineTarget == null) {
+                idleNear(c, job, ps, FARM_IDLE_TICKS);
+                return;
+            }
+            int total = 0;
+            for (BlockPos p : tree(level, mineTarget)) {
+                BlockState s = level.getBlockState(p);
+                total += s.is(net.minecraft.tags.BlockTags.LOGS) ? breakTicks(level, p, s, tool) : 0;
+            }
+            mineNeed = Math.max(20, Math.min(200, total / 2));
+        }
+        mineIdle = 0;
+        BlockPos base = mineTarget;
+        Boolean at = reachBlock(base);
+        if (at == null) {
+            mineSkip.add(base);
+            stopMining();
+            return;
+        }
+        if (!at) {
+            return;
+        }
+        Vec3 look = Vec3.atCenterOf(base);
+        android.getLookControl().setLookAt(look.x, look.y, look.z, 90, 90);
+        android.setYRot(yawTo(base));
+        android.setYBodyRot(android.getYRot());
+        android.setTool(RuinAndroid.TOOL_AXE);
+        if (android.state() != RuinAndroid.STATE_MINING) {
+            android.setState(RuinAndroid.STATE_MINING);
+        }
+        mineTimer++;
+        level.destroyBlockProgress(android.getId(), base, Math.min(9, mineTimer * 10 / Math.max(1, mineNeed)));
+        if (mineTimer % 6 == 0) {
+            level.playSound(null, base, SoundEvents.WOOD_HIT, net.minecraft.sounds.SoundSource.BLOCKS, 0.7F, 0.9F);
+        }
+        if (mineTimer < mineNeed) {
+            return;
+        }
+        stopMining();
+        if (!mayBreak(level, c, base)) {
+            mineSkip.add(base);
+            return;
+        }
+        // 木を丸ごと切る（守られたブロックは残す）
+        java.util.List<ItemStack> drops = new java.util.ArrayList<>();
+        net.minecraft.world.entity.player.Player as = actor(level, c, null);
+        for (BlockPos p : tree(level, base)) {
+            if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, p, as)) {
+                continue;
+            }
+            BlockState s = level.getBlockState(p);
+            drops.addAll(net.minecraft.world.level.block.Block.getDrops(s, level, p, level.getBlockEntity(p), android, tool));
+            level.removeBlock(p, false);
+        }
+        level.levelEvent(2001, base, net.minecraft.world.level.block.Block.getId(net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState()));
+        level.playSound(null, base, SoundEvents.WOOD_BREAK, net.minecraft.sounds.SoundSource.BLOCKS, 1, 0.8F);
+        // 苗木を植え直す
+        for (ItemStack d : drops) {
+            if (!d.isEmpty() && d.getItem() instanceof net.minecraft.world.item.BlockItem bi
+                    && bi.getBlock().defaultBlockState().is(net.minecraft.tags.BlockTags.SAPLINGS)
+                    && level.getBlockState(base).isAir() && bi.getBlock().defaultBlockState().canSurvive(level, base)) {
+                level.setBlock(base, bi.getBlock().defaultBlockState(), 3);
+                d.shrink(1);
+                break;
+            }
+        }
+        collect(drops, what);
+        android.spend(MINE_COST * 4);
+    }
+
+    // ---------------- 牧場
+
+    /** 範囲の空間（動物を探す。上に少し広げる）。 */
+    private static net.minecraft.world.phys.AABB pen(io.github.genichimaruo.singulo.android.work.ProcedureStep ps) {
+        net.minecraft.world.level.levelgen.structure.BoundingBox b = ps.area();
+        return new net.minecraft.world.phys.AABB(b.minX(), b.minY(), b.minZ(), b.maxX() + 1, b.maxY() + 3, b.maxZ() + 1);
+    }
+
+    /** 世話をしてよい大人の動物か（名前付き・つながれている・飼われている動物は扱わない）。 */
+    private static boolean tendable(net.minecraft.world.entity.animal.Animal a) {
+        return a.isAlive() && !a.isBaby() && !a.hasCustomName() && !a.isLeashed()
+                && !(a instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame());
+    }
+
+    /** 範囲の、落ちている物を拾う（近い物から。目当ての物は数える）。 */
+    private void pickUp(ServerLevel level, net.minecraft.world.phys.AABB area, ItemStack what) {
+        for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                area.inflate(2), e -> e.isAlive() && e.distanceToSqr(android) < 4 * 4)) {
+            ItemStack s = e.getItem().copy();
+            ItemStack rest = android.addToCarry(s);
+            int took = s.getCount() - rest.getCount();
+            if (took <= 0) {
+                continue;
+            }
+            if (ItemStack.isSameItemSameComponents(s, what)) {
+                progress += took;
+            }
+            if (rest.isEmpty()) {
+                e.discard();
+            } else {
+                e.setItem(rest);
+            }
+            android.playSound(SoundEvents.ITEM_PICKUP, 0.3F, 1.4F);
+        }
+    }
+
+    /** 毛刈り・搾乳・処理: 範囲の動物を1頭ずつ世話して、目当ての物がそろうまで続ける。 */
+    private void ranch(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps,
+                       ItemStack what) {
+        net.minecraft.world.phys.AABB area = pen(ps);
+        pickUp(level, area, what);
+        net.minecraft.world.entity.animal.Animal target = ranchTarget != null
+                && level.getEntity(ranchTarget) instanceof net.minecraft.world.entity.animal.Animal a && a.isAlive() ? a : null;
+        if (target != null && !wants(level, ps, target, area)) {
+            target = null;
+        }
+        if (target == null) {
+            ranchTarget = null;
+            craftTimer = 0;
+            travel = 0;
+            double best = 0;
+            for (net.minecraft.world.entity.animal.Animal a : level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, area,
+                    a -> !ranchSkip.contains(a.getUUID()) && wants(level, ps, a, area))) {
+                double d = a.distanceToSqr(android);
+                if (target == null || d < best) {
+                    target = a;
+                    best = d;
+                }
+            }
+            if (target == null) {
+                idleNear(c, job, ps, RANCH_IDLE_TICKS);
+                return;
+            }
+            ranchTarget = target.getUUID();
+        }
+        mineIdle = 0;
+        Boolean at = reachEntity(target);
+        if (at == null) {
+            ranchSkip.add(target.getUUID());
+            ranchTarget = null;
+            return;
+        }
+        if (!at) {
+            return;
+        }
+        if (android.state() != RuinAndroid.STATE_CRAFTING) {
+            android.setState(RuinAndroid.STATE_CRAFTING);
+        }
+        if (++craftTimer < RANCH_TICKS) {
+            return;
+        }
+        craftTimer = 0;
+        ranchTarget = null;
+        switch (ps.kind()) {
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR -> {
+                if (target instanceof net.minecraft.world.entity.animal.Sheep sheep) {
+                    sheep.shear(net.minecraft.sounds.SoundSource.PLAYERS);        // 毛は足元に落ちる（拾う）
+                }
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK -> {
+                if (android.takeFromCarry(new ItemStack(net.minecraft.world.item.Items.BUCKET), 1)) {
+                    level.playSound(null, target, SoundEvents.COW_MILK, net.minecraft.sounds.SoundSource.NEUTRAL, 1, 1);
+                    collect(new java.util.ArrayList<>(java.util.List.of(new ItemStack(net.minecraft.world.item.Items.MILK_BUCKET))), what);
+                }
+            }
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> {
+                android.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+                target.hurt(level.damageSources().mobAttack(android), Float.MAX_VALUE);     // 落ちた物は拾う
+            }
+            default -> {
+            }
+        }
+        android.spend(CRAFT_COST);
+    }
+
+    /** この動物に、この手順ですることがあるか。 */
+    private boolean wants(ServerLevel level, io.github.genichimaruo.singulo.android.work.ProcedureStep ps, net.minecraft.world.entity.animal.Animal a,
+                          net.minecraft.world.phys.AABB area) {
+        if (!tendable(a)) {
+            return false;
+        }
+        return switch (ps.kind()) {
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR -> a instanceof net.minecraft.world.entity.animal.Sheep sheep && sheep.readyForShearing();
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.MILK -> a instanceof net.minecraft.world.entity.animal.Cow
+                    && carriedCount(net.minecraft.world.item.Items.BUCKET) > 0;
+            case io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, area,
+                    o -> o.getType() == a.getType() && tendable(o)).size() > ps.option();
+            default -> false;
+        };
+    }
+
+    private int carriedCount(net.minecraft.world.item.Item item) {
+        int n = 0;
+        for (int slot : android.carrySlots()) {
+            ItemStack s = android.inventory().getItem(slot);
+            if (s.is(item)) {
+                n += s.getCount();
+            }
+        }
+        return n;
+    }
+
+    /**
+     * 繁殖: 持ってきたえさを、ペアになれる大人に与える（同じ種類の数が上限に届くまで）。与えられる相手がいなくなるか、えさがなくなったら終わり。
+     */
+    private void breed(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps) {
+        ItemStack feed = ps.item();
+        if (feed.isEmpty() || carriedCount(feed.getItem()) <= 0) {
+            progress = 1;
+            return;
+        }
+        net.minecraft.world.phys.AABB area = pen(ps);
+        net.minecraft.world.entity.animal.Animal target = ranchTarget != null
+                && level.getEntity(ranchTarget) instanceof net.minecraft.world.entity.animal.Animal a && a.isAlive() ? a : null;
+        if (target == null || !breedable(level, target, feed, area, ps.option())) {
+            ranchTarget = null;
+            craftTimer = 0;
+            travel = 0;
+            target = null;
+            double best = 0;
+            for (net.minecraft.world.entity.animal.Animal a : level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, area,
+                    a -> !ranchSkip.contains(a.getUUID()) && breedable(level, a, feed, area, ps.option()))) {
+                double d = a.distanceToSqr(android);
+                if (target == null || d < best) {
+                    target = a;
+                    best = d;
+                }
+            }
+            if (target == null) {
+                progress = 1;                  // もう与える相手がいない: 終わり
+                return;
+            }
+            ranchTarget = target.getUUID();
+        }
+        Boolean at = reachEntity(target);
+        if (at == null) {
+            ranchSkip.add(target.getUUID());
+            ranchTarget = null;
+            return;
+        }
+        if (!at) {
+            return;
+        }
+        if (android.state() != RuinAndroid.STATE_CRAFTING) {
+            android.setState(RuinAndroid.STATE_CRAFTING);
+        }
+        if (++craftTimer < RANCH_TICKS) {
+            return;
+        }
+        craftTimer = 0;
+        ranchTarget = null;
+        if (android.takeFromCarry(feed, 1)) {
+            target.setInLove(actor(level, c, null));          // ハートが出る
+            android.spend(CRAFT_COST);
+        }
+    }
+
+    /** えさを与えてよいか: 大人で恋をしていない、えさを食べる、同じ種類の数が上限より少なく、相手（ほかに与えられる大人か、恋をしている大人）がいる。 */
+    private static boolean breedable(ServerLevel level, net.minecraft.world.entity.animal.Animal a, ItemStack feed, net.minecraft.world.phys.AABB area,
+                                     int limit) {
+        if (!tendable(a) || a.getAge() != 0 || a.isInLove() || !a.canFallInLove() || !a.isFood(feed)) {
+            return false;
+        }
+        java.util.List<net.minecraft.world.entity.animal.Animal> same = level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class,
+                area, o -> o.getType() == a.getType() && o.isAlive());
+        if (same.size() >= limit) {
+            return false;                      // 子どもも数える（生まれる分で上限を超えないように）
+        }
+        for (net.minecraft.world.entity.animal.Animal o : same) {
+            if (o != a && !o.isBaby() && (o.isInLove() || o.getAge() == 0 && o.canFallInLove())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ---------------- 操作
+
+    /** 操作: ブロックの前へ行って使う（レバーは、オン・オフ・切り替えを選べる）。 */
+    private void use(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps) {
+        Boolean arrived = go(ps.pos(), FACE_TICKS);
+        if (arrived == null) {
+            fail(c, job, WorkConsoleBlockEntity.Failure.UNREACHABLE);
+            return;
+        }
+        if (!arrived) {
+            return;
+        }
+        BlockPos p = ps.pos();
+        BlockState s = level.getBlockState(p);
+        net.minecraft.world.entity.player.Player as = actor(level, c, null);
+        android.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+        if (s.getBlock() instanceof net.minecraft.world.level.block.LeverBlock lever) {
+            boolean on = s.getValue(net.minecraft.world.level.block.LeverBlock.POWERED);
+            boolean flip = ps.option() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE_TOGGLE || ps.option() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE_ON && !on
+                    || ps.option() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE_OFF && on;
+            if (flip) {
+                lever.pull(s, level, p, as);
+            }
+        } else if (s.getBlock() instanceof net.minecraft.world.level.block.ButtonBlock button) {
+            if (!s.getValue(net.minecraft.world.level.block.ButtonBlock.POWERED)) {
+                button.press(s, level, p, as);
+                level.playSound(null, p, SoundEvents.STONE_BUTTON_CLICK_ON, net.minecraft.sounds.SoundSource.BLOCKS, 0.6F, 1);
+            }
+        } else {
+            as.moveTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
+            s.useWithoutItem(level, as, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(p), Direction.UP, p, false));
+        }
+        progress = 1;
     }
 
     private void stopMining() {
@@ -671,8 +1534,9 @@ final class AndroidWorkGoal extends Goal {
             return false;
         }
         BlockState state = level.getBlockState(pos);
-        if (state.isAir() || !state.getFluidState().isEmpty() || state.getDestroySpeed(level, pos) < 0 || level.getBlockEntity(pos) != null) {
-            return false;
+        if (state.isAir() || !state.getFluidState().isEmpty() || state.getDestroySpeed(level, pos) < 0 || level.getBlockEntity(pos) != null
+                || state.is(net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST)) {
+            return false;                      // 芽生えたアメジストは壊さない（壊すと何も出ず、二度と育たない）
         }
         if (state.requiresCorrectToolForDrops() && !tool.isCorrectToolForDrops(state)) {
             return false;                      // ダイヤのツルハシで掘れない（ネザライトより硬い物など）

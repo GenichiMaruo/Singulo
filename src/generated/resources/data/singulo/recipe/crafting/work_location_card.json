@@ -1,17 +1,22 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "R",
+    "K",
+    "B"
+  ],
+  "key": {
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "K": {
       "item": "singulo:ceramic_substrate"
     },
-    {
+    "B": {
       "item": "singulo:basic_circuit"
-    },
-    {
-      "tag": "c:dusts/redstone"
     }
-  ],
+  },
   "result": {
     "id": "singulo:work_location_card",
     "count": 4

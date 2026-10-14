@@ -1203,6 +1203,10 @@
     "source": "Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.",
     "translation": "仿生人把訂單的成品送到這裡（下單時選為交付目標）。27 格的箱子，可在介面中命名，裡面的物品會自動移到相鄰的箱子。"
   },
+  "desc.singulo.android_felling_upgrade": {
+    "source": "Lets a guard android do felling steps on procedure cards (cutting whole trees and replanting saplings), like a diamond axe. Takes Efficiency, Fortune and Silk Touch.",
+    "translation": "裝在護衛仿生人上後，可執行步驟卡的伐木（整棵砍樹並補種樹苗），相當於鑽石斧。可附上效率、幸運和絲綢之觸。"
+  },
   "desc.singulo.android_gate_glass": {
     "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
     "translation": "只有仿生人可以通過的玻璃，對其他一切都是實心的。與相同的玻璃相鄰時會無縫相連。"
@@ -1928,8 +1932,8 @@
     "translation": "派遣探測器前往已發現的廢墟取回戰利品。"
   },
   "desc.singulo.procedure_card": {
-    "source": "Records up to eight insert, extract and mine steps and what they produce, in the procedure mode of a work console's Record tab. The places are stored on the card, so it works in a recipe rack row without a Work Location Card. Only androids with a Mining Upgrade do mining steps.",
-    "translation": "在作業指令台「記錄」的步驟模式中，記錄最多8個放入、取出、採掘的步驟及其產物。位置記錄在卡中，因此可放在配方架中沒有作業位置卡的行。採掘步驟只有裝有採掘升級的仿生人才會執行。"
+    "source": "Records up to eight steps and what they produce, in the procedure mode of a work console's Record tab. Steps can insert, extract, mine, harvest, fell, breed, shear, milk, cull or use a block (levers and buttons). The places are stored on the card, so it works in a recipe rack row without a Work Location Card. Mining needs a Mining Upgrade and felling a Felling Upgrade.",
+    "translation": "在作業指令台「記錄」的步驟模式中，記錄最多8個步驟及其產物。步驟有放入、取出、採掘、收穫、伐木、繁殖、剪毛、擠奶、處理、操作（拉桿或按鈕）。位置記錄在卡中，因此可放在配方架中沒有作業位置卡的行。採掘需要採掘升級，伐木需要伐木升級。"
   },
   "desc.singulo.quantum_computing_module": {
     "source": "The brain of advanced machines.",
@@ -2659,10 +2663,6 @@
     "source": "HP %s / %s",
     "translation": "生命 %s / %s"
   },
-  "gui.singulo.android.mining": {
-    "source": "Mining",
-    "translation": "採掘"
-  },
   "gui.singulo.android.mode": {
     "source": "Mode: %s",
     "translation": "模式：%s"
@@ -2826,6 +2826,10 @@
   "gui.singulo.android.say.retreat.1": {
     "source": "Off to get repaired",
     "translation": "我去修理一下"
+  },
+  "gui.singulo.android.tools": {
+    "source": "Tools",
+    "translation": "工具"
   },
   "gui.singulo.android.work.hint": {
     "source": "Whether this android may be given work (automation). When off, it is never offered for work.",
@@ -4027,25 +4031,121 @@
     "source": "Anything else that comes out (byproducts). It is taken out and returned to the stockpile",
     "translation": "其他產出的物品（副產物）。取出後放回資材存放處"
   },
+  "gui.singulo.recipe_encoder.face.auto": {
+    "source": "Auto",
+    "translation": "自動"
+  },
+  "gui.singulo.recipe_encoder.face.down": {
+    "source": "Bottom",
+    "translation": "下"
+  },
+  "gui.singulo.recipe_encoder.face.east": {
+    "source": "East",
+    "translation": "東"
+  },
+  "gui.singulo.recipe_encoder.face.north": {
+    "source": "North",
+    "translation": "北"
+  },
+  "gui.singulo.recipe_encoder.face.south": {
+    "source": "South",
+    "translation": "南"
+  },
+  "gui.singulo.recipe_encoder.face.up": {
+    "source": "Top",
+    "translation": "上"
+  },
+  "gui.singulo.recipe_encoder.face.west": {
+    "source": "West",
+    "translation": "西"
+  },
+  "gui.singulo.recipe_encoder.face_button.fuel": {
+    "source": "Fuel: %s",
+    "translation": "燃 %s"
+  },
+  "gui.singulo.recipe_encoder.face_button.fuel.hint": {
+    "source": "Which face of the machine fuel goes in through. Auto: the side the android stands at (a furnace's fuel slot)",
+    "translation": "從裝置的哪個面放入燃料。自動：仿生人所站的側面（熔爐為燃料欄）"
+  },
+  "gui.singulo.recipe_encoder.face_button.in": {
+    "source": "In: %s",
+    "translation": "入 %s"
+  },
+  "gui.singulo.recipe_encoder.face_button.in.hint": {
+    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Directions are world directions",
+    "translation": "從裝置的哪個面放入材料（點擊切換，右鍵反向）。東南西北為世界方向"
+  },
+  "gui.singulo.recipe_encoder.face_button.out": {
+    "source": "Out: %s",
+    "translation": "出 %s"
+  },
+  "gui.singulo.recipe_encoder.face_button.out.hint": {
+    "source": "Which face of the machine products are taken out from (click to change, right-click to go back)",
+    "translation": "從裝置的哪個面取出產物（點擊切換，右鍵反向）"
+  },
+  "gui.singulo.recipe_encoder.fuel": {
+    "source": "Fuel",
+    "translation": "燃料"
+  },
+  "gui.singulo.recipe_encoder.fuel.hint": {
+    "source": "The fuel to fetch when the machine runs out, and how many to bring each time (scroll to change). Leave it empty to never fetch fuel",
+    "translation": "裝置燃料耗盡時要去取的燃料，以及每次帶來的數量（滾動滾輪變更數量）。留空則不去取"
+  },
   "gui.singulo.recipe_encoder.grid.hint": {
     "source": "Click with an item to place a copy as a pattern (it is not used up)",
     "translation": "拿著物品點擊即可放置樣本（物品不會減少）"
+  },
+  "gui.singulo.recipe_encoder.kind.breed": {
+    "source": "Breed",
+    "translation": "繁殖"
+  },
+  "gui.singulo.recipe_encoder.kind.cull": {
+    "source": "Cull",
+    "translation": "處理"
   },
   "gui.singulo.recipe_encoder.kind.extract": {
     "source": "Extract",
     "translation": "取出"
   },
+  "gui.singulo.recipe_encoder.kind.fell": {
+    "source": "Fell",
+    "translation": "伐木"
+  },
+  "gui.singulo.recipe_encoder.kind.harvest": {
+    "source": "Harvest",
+    "translation": "收穫"
+  },
   "gui.singulo.recipe_encoder.kind.hint": {
-    "source": "Switch the kind of step to add. Insert: put into a machine from above. Extract: take out from below. Mine: dig blocks (needs a Mining Upgrade)",
-    "translation": "切換要新增的步驟種類。放入：從上方放入裝置。取出：從裝置下方取出。採掘：挖掘方塊（需要採掘升級）"
+    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Use: flip levers, press buttons and the like",
+    "translation": "切換要新增的步驟種類（右鍵反向）。放入/取出：放入或取出裝置。採掘/伐木：挖掘範圍或砍樹（需要升級）。收穫：收取作物並補種。繁殖/剪毛/擠奶/處理：照料範圍內的動物。操作：使用拉桿、按鈕等"
   },
   "gui.singulo.recipe_encoder.kind.insert": {
     "source": "Insert",
     "translation": "放入"
   },
+  "gui.singulo.recipe_encoder.kind.milk": {
+    "source": "Milk",
+    "translation": "擠奶"
+  },
   "gui.singulo.recipe_encoder.kind.mine": {
     "source": "Mine",
     "translation": "採掘"
+  },
+  "gui.singulo.recipe_encoder.kind.shear": {
+    "source": "Shear",
+    "translation": "剪毛"
+  },
+  "gui.singulo.recipe_encoder.kind.use": {
+    "source": "Use",
+    "translation": "操作"
+  },
+  "gui.singulo.recipe_encoder.limit": {
+    "source": "up to %s",
+    "translation": "最多 %s 隻"
+  },
+  "gui.singulo.recipe_encoder.limit.hint": {
+    "source": "Number of animals. Breed: increase each kind up to this many. Cull: cull any above this many. Click or scroll to change (Shift: 10 at a time, right-click to lower)",
+    "translation": "動物的數量。繁殖：同種增加到此數量。處理：處理超過此數量的部分。點擊或滾動滾輪變更（Shift：每次10，右鍵減少）"
   },
   "gui.singulo.recipe_encoder.mode.crafting": {
     "source": "Crafting",
@@ -4084,8 +4184,8 @@
     "translation": "最多8個步驟"
   },
   "gui.singulo.recipe_encoder.step.item.hint": {
-    "source": "What to insert, extract or gather (scroll to change the count). Leave it empty for mining to gather the product",
-    "translation": "要放入、取出或收集的物品（滾動滾輪變更數量）。採掘時留空則收集產物"
+    "source": "What to insert, extract or gather (scroll to change the count). For breeding, the feed; for milking, how many buckets of milk (empty buckets are taken along). Leave it empty for mining and the like to gather the product",
+    "translation": "要放入、取出或收集的物品（滾動滾輪變更數量）。繁殖時為飼料，擠奶時為要取的牛奶數量（會帶上空桶）。採掘等留空則收集產物"
   },
   "gui.singulo.recipe_encoder.step.loc_a.hint": {
     "source": "A Work Location Card holding the place for the step",
@@ -4118,6 +4218,22 @@
   "gui.singulo.recipe_encoder.stock.hint": {
     "source": "Keep a stack of blank recipe cards here. When the recorded-card slot is empty, Save takes one from here",
     "translation": "在這裡放一組未記錄的配方卡，「已記錄」欄為空時，記錄會從這裡取一張"
+  },
+  "gui.singulo.recipe_encoder.use.0": {
+    "source": "Toggle",
+    "translation": "切換"
+  },
+  "gui.singulo.recipe_encoder.use.1": {
+    "source": "Turn on",
+    "translation": "開啟"
+  },
+  "gui.singulo.recipe_encoder.use.2": {
+    "source": "Turn off",
+    "translation": "關閉"
+  },
+  "gui.singulo.recipe_encoder.use.hint": {
+    "source": "What to do with a lever (click to change). Buttons, doors, trapdoors and the like are always used like a right-click",
+    "translation": "如何操作拉桿（點擊變更）。按鈕、門、活板門等總是與右鍵相同"
   },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",
@@ -4379,6 +4495,14 @@
     "source": "Delivering",
     "translation": "去交付"
   },
+  "gui.singulo.work_console.activity.farm": {
+    "source": "Harvesting",
+    "translation": "收穫中"
+  },
+  "gui.singulo.work_console.activity.fell": {
+    "source": "Felling",
+    "translation": "伐木中"
+  },
   "gui.singulo.work_console.activity.fetch": {
     "source": "Fetching materials",
     "translation": "去取材料"
@@ -4399,9 +4523,17 @@
     "source": "Processing",
     "translation": "用裝置加工"
   },
+  "gui.singulo.work_console.activity.ranch": {
+    "source": "Tending animals",
+    "translation": "照料動物"
+  },
   "gui.singulo.work_console.activity.return": {
     "source": "Putting away",
     "translation": "收拾"
+  },
+  "gui.singulo.work_console.activity.use": {
+    "source": "Using a block",
+    "translation": "操作"
   },
   "gui.singulo.work_console.activity.wait": {
     "source": "Waiting for materials",
@@ -4527,6 +4659,10 @@
     "source": "No free android is chosen",
     "translation": "沒有選擇空閒的仿生人"
   },
+  "gui.singulo.work_console.error.no_feller": {
+    "source": "%s needs felling, but no chosen android has a Felling Upgrade",
+    "translation": "%s 的步驟包含伐木，但所選仿生人都沒有伐木升級"
+  },
   "gui.singulo.work_console.error.no_miner": {
     "source": "%s needs mining, but no chosen android has a Mining Upgrade",
     "translation": "%s 需要採掘，但所選仿生人都沒有採掘升級"
@@ -4570,6 +4706,10 @@
   "gui.singulo.work_console.materials": {
     "source": "To craft, and materials (need / have)",
     "translation": "製作的物品與材料（需要 / 庫存）"
+  },
+  "gui.singulo.work_console.needs_feller": {
+    "source": "This order includes felling, so only androids with a Felling Upgrade can be chosen",
+    "translation": "此訂單包含伐木工序，只能選擇裝有伐木升級的仿生人"
   },
   "gui.singulo.work_console.needs_miner": {
     "source": "This order includes mining, so only androids with a Mining Upgrade can be chosen",
@@ -4812,8 +4952,8 @@
     "translation": "仿生人用玻璃"
   },
   "guide.singulo.androids.process.body": {
-    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "用指令台「記錄」的模式按鈕切換要記錄的種類。\n・加工：熔爐和裝置的配方。左邊放放入的物品，右邊放產出的物品（另可放最多 2 個副產物），用滾輪變更數量（也可用 JEI 的「+」）。仿生人從上方放入裝置，在旁邊等待完成後從下方取出。副產物放回資材存放處。燃料和電力需自己準備。2 分鐘沒有進展時，訂單會被取消。\n・步驟：在步驟卡上記錄最多 8 個放入、取出、採掘的步驟。放入作業位置卡來複製位置，在物品欄放入物品後按「新增」。在右邊放產物後記錄。步驟卡自帶位置，所以可以放在配方架的任意一行。\n・採掘：只有裝有採掘升級的仿生人會執行。用 2 張作業位置卡決定範圍後，從上層開始挖，直到收集到所需物品（也可用於刷石機）。無法破壞的方塊、液體、容器、受護盾保護的地方不會挖。沒有可挖的東西持續 30 秒時會取消。\n・仿生人工作台：製作速度是原版工作台的 4 倍。"
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
+    "translation": "用指令台「記錄」的模式按鈕切換要記錄的種類。\n・加工：熔爐和裝置的配方。左邊放放入的物品，右邊放產出的物品（另可放最多 2 個副產物），用滾輪變更數量（也可用 JEI 的「+」）。仿生人從上方放入裝置，在旁邊等待完成後從下方取出。副產物放回資材存放處。燃料和電力需自己準備。2 分鐘沒有進展時，訂單會被取消。\n・步驟：在步驟卡上記錄最多 8 個放入、取出、採掘的步驟。放入作業位置卡來複製位置，在物品欄放入物品後按「新增」。在右邊放產物後記錄。步驟卡自帶位置，所以可以放在配方架的任意一行。\n・採掘：只有裝有採掘升級的仿生人會執行。用 2 張作業位置卡決定範圍後，從上層開始挖，直到收集到所需物品（也可用於刷石機）。無法破壞的方塊、液體、容器、受護盾保護的地方不會挖。沒有可挖的東西持續 30 秒時會取消。\n・農活：收穫（收取成熟的作物並補種。甘蔗和仙人掌保留根部）、伐木（整棵砍樹並補種樹苗。需要伐木升級）、繁殖（餵食增加到設定數量）、剪毛・擠奶（會帶上空桶）、處理（超過設定數量的部分）。不會碰有名字、拴著、被馴服的動物和幼崽。\n・操作：使用拉桿（開・關・切換）、按鈕、門等。用來驅動機關。\n・燃料：在加工模式的燃料欄放入燃料後記錄，裝置燃料耗盡時會從資材存放處取來該燃料放入（每次放入設定的數量。留空則不去取）。\n・機率產出：產出數量不足時，從資材存放處取用不足部分的材料，重複製作直到收集齊（材料不足時會等到備齊）。收穫、伐木、牧場中若還有會生長的東西，會等待其生長（最多 20 分鐘）。紫水晶只收取完全長成的晶簇，不會破壞紫水晶母岩。\n・仿生人工作台：製作速度是原版工作台的 4 倍。"
   },
   "guide.singulo.androids.process.title": {
     "source": "Processing, procedures and mining",
@@ -4828,8 +4968,8 @@
     "translation": "遺蹟的仿生人"
   },
   "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 生產升級：裝在組裝站後，最多列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流。用名字左邊的「1」「2」選擇介面顯示哪一個（行動方式等設定兩個共用）。\n- 在仿生人介面中點擊名字左邊的按鈕，切換到「裝備與物品」頁，就能放入升級。\n- 電池升級：每個使充滿電量增加 50%（最多兩個），充滿所需時間也相應變長。腰部會出現電池包。\n- 背包升級：在 5 格物品之外，再加上背包的 24 格。背包裡有物品時無法取下。\n- 採掘升級：使仿生人能進行採掘作業（相當於鑽石鎬）。可附上效率、幸運和絲綢之觸。\n- 作業開/關：為每個仿生人決定是否可以分配作業（自動化）。"
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 生產升級：裝在組裝站後，最多列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流。用名字左邊的「1」「2」選擇介面顯示哪一個（行動方式等設定兩個共用）。\n- 在仿生人介面中點擊名字左邊的按鈕，切換到「裝備與物品」頁，就能放入升級。\n- 電池升級：每個使充滿電量增加 50%（最多兩個），充滿所需時間也相應變長。腰部會出現電池包。\n- 背包升級：在 5 格物品之外，再加上背包的 24 格。背包裡有物品時無法取下。\n- 採掘升級：使仿生人能進行採掘作業（相當於鑽石鎬）。可附上效率、幸運和絲綢之觸。\n- 伐木升級：使仿生人能進行伐木作業（相當於鑽石斧）。可附上效率、幸運和絲綢之觸。\n- 作業開/關：為每個仿生人決定是否可以分配作業（自動化）。"
   },
   "guide.singulo.androids.upgrades.title": {
     "source": "Upgrades",
@@ -5318,6 +5458,10 @@
   "howto.singulo.android_delivery_port": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.android_felling_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
   },
   "howto.singulo.android_gate_glass": {
     "source": "Made in: Crafting Table (stage 2)",
@@ -6242,6 +6386,10 @@
   "item.singulo.android_charger": {
     "source": "Android Wireless Charger",
     "translation": "仿生人無線充電器"
+  },
+  "item.singulo.android_felling_upgrade": {
+    "source": "Felling Upgrade",
+    "translation": "伐木升級"
   },
   "item.singulo.android_kit": {
     "source": "Android Kit",
@@ -8063,6 +8211,10 @@
     "source": "Full android charges: %s",
     "translation": "可充滿仿生人 %s 次"
   },
+  "tooltip.singulo.android_felling_upgrade": {
+    "source": "Fells trees like a diamond axe. Takes Efficiency, Fortune and Silk Touch",
+    "translation": "像鑽石斧一樣砍樹。可附上效率、幸運和絲綢之觸"
+  },
   "tooltip.singulo.android_mining_upgrade": {
     "source": "Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch",
     "translation": "像鑽石鎬一樣採掘。可附上效率、幸運和絲綢之觸"
@@ -8155,6 +8307,14 @@
     "source": "Not functional yet; usable as a material",
     "translation": "功能尚未實裝，可作為材料使用"
   },
+  "tooltip.singulo.procedure_card.breed": {
+    "source": "Breed with %s, up to %s (%s)",
+    "translation": "繁殖：餵 %s，最多 %s 隻（%s）"
+  },
+  "tooltip.singulo.procedure_card.cull": {
+    "source": "Cull until %s, keeping %s (%s)",
+    "translation": "處理：直到收集到 %s，超過 %s 隻的部分（%s）"
+  },
   "tooltip.singulo.procedure_card.empty": {
     "source": "Blank: record steps in the procedure mode of a work console's Record tab",
     "translation": "尚未記錄（在作業指令台「記錄」的步驟模式中記錄）"
@@ -8163,9 +8323,21 @@
     "source": "Extract %s (%s)",
     "translation": "取出：%s（%s）"
   },
+  "tooltip.singulo.procedure_card.fell": {
+    "source": "Fell trees until %s (%s)",
+    "translation": "伐木：直到收集到 %s（%s）"
+  },
+  "tooltip.singulo.procedure_card.harvest": {
+    "source": "Harvest until %s (%s)",
+    "translation": "收穫：直到收集到 %s（%s）"
+  },
   "tooltip.singulo.procedure_card.insert": {
     "source": "Insert %s (%s)",
     "translation": "放入：%s（%s）"
+  },
+  "tooltip.singulo.procedure_card.milk": {
+    "source": "Milk: %s (%s)",
+    "translation": "擠奶：%s（%s）"
   },
   "tooltip.singulo.procedure_card.mine": {
     "source": "Mine until %s (%s)",
@@ -8175,6 +8347,14 @@
     "source": "the product",
     "translation": "產物"
   },
+  "tooltip.singulo.procedure_card.shear": {
+    "source": "Shear until %s (%s)",
+    "translation": "剪毛：直到收集到 %s（%s）"
+  },
+  "tooltip.singulo.procedure_card.use": {
+    "source": "Use: %s (%s)",
+    "translation": "操作：%s（%s）"
+  },
   "tooltip.singulo.recipe_card.empty": {
     "source": "Blank: record a recipe in a work console's Record tab",
     "translation": "尚未記錄（在作業指令台的「記錄」中記錄）"
@@ -8182,6 +8362,14 @@
   "tooltip.singulo.recipe_card.extra": {
     "source": "Also: %s ×%s",
     "translation": "另有：%s ×%s"
+  },
+  "tooltip.singulo.recipe_card.faces": {
+    "source": "Faces: in %s, out %s, fuel %s",
+    "translation": "面：放入 %s・取出 %s・燃料 %s"
+  },
+  "tooltip.singulo.recipe_card.fuel": {
+    "source": "Fuel: %s ×%s (fetched when it runs out)",
+    "translation": "燃料：%s ×%s（耗盡時去取）"
   },
   "tooltip.singulo.recipe_card.output": {
     "source": "Makes: %s ×%s",
@@ -8260,8 +8448,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 33 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 33 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 34 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 34 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
@@ -8680,12 +8868,12 @@
     "translation": "用於：基本框架、鋼板、壓縮機"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 72 more",
-    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 72 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 73 more",
+    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 73 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 50 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 50 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 51 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 51 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

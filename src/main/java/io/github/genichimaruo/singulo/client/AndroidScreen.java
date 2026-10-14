@@ -303,6 +303,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         roundRect(g, x + PACK_X_FRAME, y + 22, 116, 86, mix(accent, PAPER, 0.92F));
         roundRect(g, x + AndroidMenu.CARRY_X - 4, y + 22, 24, 104, mix(accent, PAPER, 0.88F));
         slots(g, x, y, accent, 2, 3);
+        slots(g, x, y, accent, RuinAndroid.SLOT_FELLING, 1);
         if (!menu.hasBackpack()) {
             // バックパックがないときは、中のスロットを覆う
             g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
@@ -341,7 +342,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.battery"), 6, AndroidMenu.BATTERY_Y - 9, 48, INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.backpack"), 6, AndroidMenu.BACKPACK_Y - 9, 48,
                     INK);
-            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.mining"), 6, AndroidMenu.MINING_Y - 9, 48, INK);
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.tools"), 6, AndroidMenu.MINING_Y - 9, 48, INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack"), PACK_X_FRAME, 24, 116, INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.carry"), AndroidMenu.CARRY_X - 4, 24, 24, INK);
             if (!menu.hasBackpack()) {

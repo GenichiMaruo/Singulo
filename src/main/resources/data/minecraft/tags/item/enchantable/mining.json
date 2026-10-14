@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "singulo:android_mining_upgrade"
+    "singulo:android_mining_upgrade",
+    "singulo:android_felling_upgrade"
   ]
 }

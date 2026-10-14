@@ -570,6 +570,37 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 加工モードの燃料: かまどの燃料が切れていれば、素材置き場から記録した燃料（石炭）を取ってきて入れる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidFetchesFuel(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        chest.setItem(2, new ItemStack(net.minecraft.world.item.Items.COAL, 2));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(),
+                new ItemStack(net.minecraft.world.item.Items.COAL)).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "燃料を取ってきて鉄インゴットを2つ届けない");
+            a.discard();
+        });
+    }
+
     /** 手順カードの採掘: 採掘アップグレードを積んだアンドロイドが、範囲の石を掘って丸石を集め、納品口へ届ける。積んでいなければ注文できない。 */
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void androidMinesWithProcedure(GameTestHelper helper) {
@@ -674,6 +705,110 @@ public final class AndroidGameTests {
                     a.discard();
                 });
             });
+        });
+    }
+
+    /** 手順カード1枚（steps、できる物 output）を、場所のカードのない行に並べる。 */
+    private static void procedureCard(GameTestHelper helper, List<io.github.genichimaruo.singulo.android.work.ProcedureStep> steps, ItemStack output) {
+        ItemStack card = new ItemStack(item("procedure_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(steps, output).write(card, helper.getLevel().registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 3 + 1, card);
+    }
+
+    /** 収穫: 育ちきった小麦を取って植え直し、小麦を納品口へ届ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidHarvestsAndReplants(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        for (int x = 0; x < 2; x++) {
+            helper.setBlock(new BlockPos(x, 1, 5), net.minecraft.world.level.block.Blocks.FARMLAND);
+            helper.setBlock(new BlockPos(x, 2, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
+                    .getStateForAge(7));
+        }
+        procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 2, 5)),
+                helper.absolutePos(new BlockPos(1, 2, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
+                helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない");
+            helper.assertTrue(helper.getBlockState(new BlockPos(0, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
+                    && helper.getBlockState(new BlockPos(1, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
+            a.discard();
+        });
+    }
+
+    /** 収穫: 芽生えたアメジストの上の、育ちきった塊だけを取る（芽生えたアメジストは壊さない）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidHarvestsAmethyst(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        helper.setBlock(new BlockPos(1, 1, 6), net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST);
+        helper.setBlock(new BlockPos(1, 2, 6), net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER);
+        procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 1, 5)),
+                helper.absolutePos(new BlockPos(2, 3, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD, 4));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD), 4,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.AMETHYST_SHARD) == 4, "アメジストの欠片が4つ届かない");
+            helper.assertTrue(helper.getBlockState(new BlockPos(1, 1, 6)).is(net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST),
+                    "芽生えたアメジストを壊した");
+            a.discard();
+        });
+    }
+
+    /** 伐採: 伐採アップグレードを積んだアンドロイドが、木を丸ごと切って原木を届ける。積んでいなければ注文できない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidFellsTree(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        helper.setBlock(new BlockPos(1, 0, 6), net.minecraft.world.level.block.Blocks.DIRT);
+        for (int y = 1; y <= 3; y++) {
+            helper.setBlock(new BlockPos(1, y, 6), net.minecraft.world.level.block.Blocks.OAK_LOG);
+        }
+        helper.setBlock(new BlockPos(1, 4, 6), net.minecraft.world.level.block.Blocks.OAK_LEAVES);
+        procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL, helper.absolutePos(new BlockPos(0, 1, 5)),
+                helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 3));
+        var player = helper.makeMockServerPlayerInLevel();
+        BladeAndroid plain = worker(helper, false);
+        helper.assertTrue(console.start(player, new ItemStack(net.minecraft.world.item.Items.OAK_LOG), 3, List.of(plain.getUUID()),
+                helper.absolutePos(DELIVERY)) != null, "伐採アップグレードなしで伐採の注文ができた");
+        plain.discard();
+        BladeAndroid a = worker(helper, false);
+        a.inventory().setItem(RuinAndroid.SLOT_FELLING, new ItemStack(item("android_felling_upgrade")));
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.OAK_LOG), 3, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.OAK_LOG) == 3, "原木が3つ届かない");
+            helper.assertFalse(helper.getBlockState(new BlockPos(1, 3, 6)).is(net.minecraft.world.level.block.Blocks.OAK_LOG), "木の上が残った");
+            a.discard();
+        });
+    }
+
+    /** 毛刈り: 範囲の羊の毛を刈り、落ちた羊毛を拾って届ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidShearsSheep(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var sheep = EntityType.SHEEP.create(helper.getLevel());
+        sheep.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 1, 6))));
+        sheep.setNoAi(true);
+        helper.getLevel().addFreshEntity(sheep);
+        procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, helper.absolutePos(new BlockPos(0, 1, 5)),
+                helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL), 1,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHITE_WOOL) >= 1, "羊毛が届かない");
+            helper.assertTrue(sheep.isSheared(), "毛を刈っていない");
+            sheep.discard();
+            a.discard();
         });
     }
 

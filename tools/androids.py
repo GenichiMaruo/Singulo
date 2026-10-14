@@ -596,6 +596,7 @@ def item_textures(ti, save):
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
     save(wear(mining_icon(Image), 23), ti / 'android_mining_upgrade.png')
+    save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
     save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
     save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
     save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
@@ -909,6 +910,19 @@ def mining_icon(Image):
     for (x, y) in head:
         px[x, y] = (150, 236, 255, 255)
     for (x, y) in ((6, 4), (7, 4), (8, 4), (9, 5), (10, 6)):
+        px[x, y] = (210, 248, 255, 255)
+    return im
+
+
+def felling_icon(Image):
+    """伐採アップグレード: 基板の上に、光る斧（持ち手だけ実体の色、刃は水色に光る）。"""
+    im, px = upgrade_board(Image)
+    for i in range(7):
+        px[5 + i, 11 - i] = (120, 88, 60, 255)        # 持ち手（左下から右上へ）
+    blade = [(9, 3), (10, 3), (11, 3), (8, 4), (9, 4), (10, 4), (11, 4), (12, 4), (9, 5), (10, 5), (11, 5), (12, 5), (12, 6), (11, 6)]
+    for (x, y) in blade:
+        px[x, y] = (150, 236, 255, 255)
+    for (x, y) in ((12, 4), (12, 5), (12, 6)):
         px[x, y] = (210, 248, 255, 255)
     return im
 

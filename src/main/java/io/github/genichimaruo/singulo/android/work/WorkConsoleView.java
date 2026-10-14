@@ -136,6 +136,7 @@ public final class WorkConsoleView {
             at.putInt("slots", a.isWorking() ? a.carryCapacity() : a.freeCarry());
             at.putInt("accent", a.accent());
             at.putBoolean("miner", a.canMine());
+            at.putBoolean("feller", a.canFell());
             as.add(at);
         }
         t.put("androids", as);
@@ -174,12 +175,14 @@ public final class WorkConsoleView {
         t.putBoolean("ok", plan.ok());
         t.putBoolean("loop", plan.loop);
         long crafts = 0;
-        boolean mining = false;
+        boolean mining = false, felling = false;
         for (WorkPlanner.Step s : plan.steps) {
             crafts += s.crafts();
             mining |= s.entry().recipe().needsMining();
+            felling |= s.entry().recipe().needsFelling();
         }
-        t.putBoolean("mining", mining);              // 採掘の工程がある: 採掘アップグレードを積んだアンドロイドだけ選べる
+        t.putBoolean("mining", mining);
+        t.putBoolean("felling", felling);              // 採掘の工程がある: 採掘アップグレードを積んだアンドロイドだけ選べる
         t.putInt("steps", plan.steps.size());
         t.putLong("crafts", crafts);
         List<ItemCount> stock = c.available();

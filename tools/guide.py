@@ -599,6 +599,7 @@ CHAPTERS = [
          '・バッテリーアップグレード: 1個につき充電の満タンが50%増える（2個まで）。満タンまでの充電の時間もそのぶん延びる。腰にバッテリーパックが付く。\n'
          '・バックパックアップグレード: 持ち物（5スロット）に、バックパックの24スロットが加わる。中に物があるうちは外せない。\n'
          '・採掘アップグレード: 採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。\n'
+         '・伐採アップグレード: 伐採の作業ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。\n'
          '・作業のオン／オフ: 作業（自動化）に割り当ててよいかを、アンドロイドごとに決める。',
          'Upgrades',
          '- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits '
@@ -607,6 +608,7 @@ CHAPTERS = [
          '- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n'
          '- Backpack Upgrade: adds the backpack\'s 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n'
          '- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n'
+         '- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n'
          '- Work on/off: choose for each android whether it may be given work (automation).'),
         ('work', '作業の自動化',
          '自分のアンドロイドに、作業台のクラフトを任せられます。\n'
@@ -640,6 +642,14 @@ CHAPTERS = [
          '右にできる物を置いて記録する。手順カードは場所を自分で持つので、レシピ棚のどの行にも並べられる。\n'
          '・採掘: 採掘アップグレードを積んだアンドロイドだけが行う。作業位置カード2枚で範囲を決めると、上の段から掘り、目当ての物がそろうまで続ける'
          '（丸石製造機にも使える）。壊せないブロック・液体・入れ物・シールドで守られた所は掘らない。掘る物がない状態が30秒続くと取り消される。\n'
+         '・農作業: 収穫（育ちきった作物を取って植え直す。サトウキビ・サボテンは根元を残す）、伐採（木を丸ごと切って苗木を植え直す。'
+         '伐採アップグレードが要る）、繁殖（えさを与えて、決めた数まで増やす）、毛刈り・搾乳（空のバケツを持っていく）、'
+         '処理（決めた数を超えた分）。名前付き・つながれた・飼われている動物と子どもには手を出さない。\n'
+         '・操作: レバー（オン・オフ・切り替え）、ボタン、ドアなどを使う。仕掛けを動かす合図に。\n'
+         '・燃料: 加工モードの燃料の欄に燃料を置いて記録すると、装置の燃料が切れたとき、その燃料を素材置き場から取ってきて入れる'
+         '（置いた数ずつ。空なら取りに行かない）。\n'
+         '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。'
+         '収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ちきった塊だけ取り、芽生えたアメジストは壊さない。\n'
          '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。',
          'Processing, procedures and mining',
          'The mode button in the console\'s Record tab switches what you record.\n'
@@ -653,6 +663,15 @@ CHAPTERS = [
          '- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until '
          'enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and '
          'shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n'
+         '- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants '
+         'saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull '
+         '(anything above a set number). Named, leashed and tamed animals and babies are left alone.\n'
+         '- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n'
+         '- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the '
+         'stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n'
+         '- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until '
+         'enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing '
+         '(up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n'
          '- Android Workbench: crafts four times as fast as a vanilla crafting table.'),
         ('glass', 'アンドロイド用のガラス',
          '・アンドロイド遮断ガラス（琥珀色）: アンドロイドだけが通れない。プレイヤーやほかの生き物はすり抜けられる。拠点の出入り口に。\n'

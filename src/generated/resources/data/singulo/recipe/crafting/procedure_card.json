@@ -1,20 +1,22 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "R ",
+    "KB",
+    "R "
+  ],
+  "key": {
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "K": {
       "item": "singulo:ceramic_substrate"
     },
-    {
-      "tag": "c:dusts/redstone"
-    },
-    {
-      "tag": "c:dusts/redstone"
-    },
-    {
+    "B": {
       "item": "singulo:basic_circuit"
     }
-  ],
+  },
   "result": {
     "id": "singulo:procedure_card",
     "count": 4

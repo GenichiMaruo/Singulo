@@ -256,6 +256,7 @@ public final class GeneratedContent {
             "android_battery_upgrade",
             "android_backpack_upgrade",
             "android_mining_upgrade",
+            "android_felling_upgrade",
             "android_work_console",
             "android_supply_port",
             "android_delivery_port",

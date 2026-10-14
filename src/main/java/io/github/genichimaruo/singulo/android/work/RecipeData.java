@@ -24,18 +24,59 @@ import net.minecraft.world.item.component.CustomData;
  * 素材は置いたとおりの物（同じアイテム・同じ付加情報）で数える。
  * 手順カードも同じ記録を使う（{@link ProcedureCardItem}）。
  */
-public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras, List<ProcedureStep> steps) {
+public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras, List<ProcedureStep> steps, ItemStack fuel,
+                         int faces) {
     public static final String MODE_CRAFTING = "crafting", MODE_PROCESSING = "processing", MODE_PROCEDURE = "procedure";
     public static final int MAX_STEPS = 8;
     private static final String KEY = "android_recipe";
 
     /** 作業台モードのレシピ。 */
     public RecipeData(List<ItemStack> grid, ItemStack output) {
-        this(MODE_CRAFTING, grid, output, List.of(), List.of());
+        this(MODE_CRAFTING, grid, output, List.of(), List.of(), ItemStack.EMPTY, DEFAULT_FACES);
     }
 
     public RecipeData(String mode, List<ItemStack> grid, ItemStack output, List<ItemStack> extras) {
-        this(mode, grid, output, extras, List.of());
+        this(mode, grid, output, extras, List.of(), ItemStack.EMPTY, DEFAULT_FACES);
+    }
+
+    /**
+     * 加工モードで、装置のどの面から入れ・取り出し・燃料を入れるか（Direction の番号を3ビットずつ: 入れる面、取り出す面、燃料の面）。
+     * 燃料の面が {@link #FACE_AUTO} なら、アンドロイドの立っている横の面。既定は 上・下・自動。
+     */
+    public static final int FACE_AUTO = 7;
+    public static final int DEFAULT_FACES = faces(net.minecraft.core.Direction.UP.get3DDataValue(),
+            net.minecraft.core.Direction.DOWN.get3DDataValue(), FACE_AUTO);
+
+    public static int faces(int in, int out, int fuel) {
+        return (in & 7) | (out & 7) << 3 | (fuel & 7) << 6;
+    }
+
+    public net.minecraft.core.Direction inputFace() {
+        return face(faces & 7, net.minecraft.core.Direction.UP);
+    }
+
+    public net.minecraft.core.Direction outputFace() {
+        return face(faces >> 3 & 7, net.minecraft.core.Direction.DOWN);
+    }
+
+    /** 燃料を入れる面（自動なら null）。 */
+    @Nullable
+    public net.minecraft.core.Direction fuelFace() {
+        int f = faces >> 6 & 7;
+        return f == FACE_AUTO ? null : face(f, net.minecraft.core.Direction.NORTH);
+    }
+
+    private static net.minecraft.core.Direction face(int i, net.minecraft.core.Direction fallback) {
+        return i < 6 ? net.minecraft.core.Direction.from3DDataValue(i) : fallback;
+    }
+
+    /** 加工モードのレシピ（fuel: 燃料が切れたら取りに行く燃料と、1回に持ってくる数。空なら取りに行かない）。 */
+    public static RecipeData processing(List<ItemStack> grid, ItemStack output, List<ItemStack> extras, ItemStack fuel) {
+        return processing(grid, output, extras, fuel, DEFAULT_FACES);
+    }
+
+    public static RecipeData processing(List<ItemStack> grid, ItemStack output, List<ItemStack> extras, ItemStack fuel, int faces) {
+        return new RecipeData(MODE_PROCESSING, grid, output, extras, List.of(), fuel.copy(), faces);
     }
 
     /** 手順カードの記録。 */
@@ -44,7 +85,7 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         for (int i = 0; i < 9; i++) {
             grid.add(ItemStack.EMPTY);
         }
-        return new RecipeData(MODE_PROCEDURE, grid, output, List.of(), List.copyOf(steps));
+        return new RecipeData(MODE_PROCEDURE, grid, output, List.of(), List.copyOf(steps), ItemStack.EMPTY, DEFAULT_FACES);
     }
 
     public boolean processing() {
@@ -57,8 +98,17 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
 
     /** 採掘の手順があるか（採掘アップグレードを積んだアンドロイドだけができる）。 */
     public boolean needsMining() {
+        return has(ProcedureStep.MINE);
+    }
+
+    /** 伐採の手順があるか（伐採アップグレードを積んだアンドロイドだけができる）。 */
+    public boolean needsFelling() {
+        return has(ProcedureStep.FELL);
+    }
+
+    private boolean has(int kind) {
         for (ProcedureStep s : steps) {
-            if (s.kind() == ProcedureStep.MINE) {
+            if (s.kind() == kind) {
                 return true;
             }
         }
@@ -119,6 +169,10 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             }
             r.put("steps", st);
         }
+        if (!fuel.isEmpty()) {
+            r.put("fuel", fuel.save(registries));
+        }
+        r.putInt("faces", faces);
         return r;
     }
 
@@ -145,7 +199,9 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             }
         }
         String mode = r.contains("mode") ? r.getString("mode") : MODE_CRAFTING;
-        return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps);
+        ItemStack fuel = r.contains("fuel") ? ItemStack.parseOptional(registries, r.getCompound("fuel")) : ItemStack.EMPTY;
+        int faces = r.contains("faces") ? r.getInt("faces") : DEFAULT_FACES;
+        return output.isEmpty() ? null : new RecipeData(mode, grid, output, extras, steps, fuel, faces);
     }
 
     /** 記録を消す（新しいカードと同じに戻すので、未記録のカードとまた重なる）。 */
@@ -164,8 +220,12 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
         if (procedure()) {
             // 手順カード: 投入する物
             for (ProcedureStep s : steps) {
-                if (s.kind() == ProcedureStep.INSERT && !s.item().isEmpty()) {
-                    ItemCount.add(out, s.item(), s.item().getCount());
+                if ((s.kind() == ProcedureStep.INSERT || s.kind() == ProcedureStep.BREED) && !s.item().isEmpty()) {
+                    ItemCount.add(out, s.item(), s.item().getCount());          // 入れる物、繁殖のえさ
+                } else if (s.kind() == ProcedureStep.MILK) {
+                    // 搾乳: 取る牛乳の数だけ、空のバケツを持っていく
+                    int n = s.item().isEmpty() ? Math.max(1, output.getCount()) : s.item().getCount();
+                    ItemCount.add(out, new ItemStack(net.minecraft.world.item.Items.BUCKET), n);
                 }
             }
             return out;

@@ -110,6 +110,16 @@ public abstract class RuinAndroid extends Monster {
         return entityData.get(GESTURE);
     }
 
+    public int tool() {
+        return entityData.get(TOOL);
+    }
+
+    void setTool(int tool) {
+        if (entityData.get(TOOL) != tool) {
+            entityData.set(TOOL, tool);
+        }
+    }
+
     /** 仕草が始まってからの時間（クライアント、tick）。 */
     public float gestureTime(float partialTick) {
         return tickCount - clientGestureStart + partialTick;
@@ -175,13 +185,17 @@ public abstract class RuinAndroid extends Monster {
     /** 仕草（挨拶。{@link #GESTURE_WAVE} など。クライアントでも見える）。 */
     private static final EntityDataAccessor<Integer> GESTURE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     public static final int GESTURE_NONE = 0, GESTURE_WAVE = 1, GESTURE_NOD = 2;
+    /** 採掘の姿勢で持つ道具（0: ツルハシ、1: 斧）。 */
+    private static final EntityDataAccessor<Integer> TOOL = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    public static final int TOOL_PICKAXE = 0, TOOL_AXE = 1;
     /** 仕草の長さ（tick）。 */
     public static final int GESTURE_TICKS = 30;
     /** 作業中に今していること（{@link #ACT_FETCH} など。クライアントでも見える）。 */
     private static final EntityDataAccessor<Integer> ACTIVITY = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     public static final int ACT_NONE = 0, ACT_FETCH = 1, ACT_CRAFT = 2, ACT_PROCESS = 3, ACT_MINE = 4, ACT_DELIVER = 5, ACT_RETURN = 6,
-            ACT_WAIT = 7, ACT_CHARGE = 8, ACT_FIGHT = 9;
-    public static final String[] ACTIVITY_KEYS = {"none", "fetch", "craft", "process", "mine", "deliver", "return", "wait", "charge", "fight"};
+            ACT_WAIT = 7, ACT_CHARGE = 8, ACT_FIGHT = 9, ACT_FARM = 10, ACT_RANCH = 11, ACT_FELL = 12, ACT_USE = 13;
+    public static final String[] ACTIVITY_KEYS = {"none", "fetch", "craft", "process", "mine", "deliver", "return", "wait", "charge", "fight",
+            "farm", "ranch", "fell", "use"};
     /** バックパックアップグレードを積んでいるか（見た目のため）。 */
     private static final EntityDataAccessor<Boolean> BACKPACK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
 
@@ -192,7 +206,9 @@ public abstract class RuinAndroid extends Monster {
      */
     public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1, SLOT_BATTERY = 2, SLOT_BACKPACK = 3, SLOT_MINING = 4;
     public static final int CARRY_START = 5, CARRY_SLOTS = 5, PACK_START = 10, PACK_SLOTS = 24;
-    public static final int INVENTORY_SIZE = PACK_START + PACK_SLOTS;
+    /** 伐採アップグレードの枠（あとから足したので、持ち物のうしろ）。 */
+    public static final int SLOT_FELLING = PACK_START + PACK_SLOTS;
+    public static final int INVENTORY_SIZE = SLOT_FELLING + 1;
     /** バッテリーアップグレードは2個まで。1個につき充電の満タンが半分（CHARGE_MAX / 2）ずつ増える。 */
     public static final int MAX_BATTERIES = 2;
     /** 自己修理キット1つで直す体力の割合と、続けて使えるまでの tick。 */
@@ -276,6 +292,15 @@ public abstract class RuinAndroid extends Monster {
 
     public static boolean isMiningUpgrade(net.minecraft.world.item.ItemStack stack) {
         return stack.getItem() instanceof AndroidMiningUpgradeItem;
+    }
+
+    public static boolean isFellingUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidFellingUpgradeItem;
+    }
+
+    /** 伐採アップグレードを積んでいるか。 */
+    public boolean canFell() {
+        return isFellingUpgrade(inventory.getItem(SLOT_FELLING));
     }
 
     /** 積んでいるバッテリーアップグレードの数（クライアントでも見える）。 */
@@ -649,6 +674,7 @@ public abstract class RuinAndroid extends Monster {
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
         builder.define(GESTURE, GESTURE_NONE);
+        builder.define(TOOL, TOOL_PICKAXE);
     }
 
     // ------------------------------------------------------------------ 護衛（プレイヤーのアンドロイド）

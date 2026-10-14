@@ -237,6 +237,11 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double dx, double dy) {
         if (tab == TAB_RECORD && picking == null) {
+            if (optionShown() && Panel.inside(mouseX, mouseY, leftPos + WorkConsoleMenu.OPTION_X, topPos + WorkConsoleMenu.OPTION_Y,
+                    WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H)) {
+                adjustOption(dy > 0, hasShiftDown());
+                return true;
+            }
             // 加工モードの見本: ホイールで数を変える（シフトで10ずつ）
             adjustHovered(dy > 0, hasShiftDown());
             return true;
@@ -331,10 +336,22 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkConsoleMenu.BUTTON_MODE);
                 return true;
             }
+            int face = hoveredFace(mouseX, mouseY);
+            if (face >= 0) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
+                        (button == 1 ? WorkConsoleMenu.BUTTON_FACE_BACK : WorkConsoleMenu.BUTTON_FACE) + face);
+                return true;
+            }
             if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_PROCEDURE) {
                 if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.KIND_X, y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.KIND_W,
                         WorkConsoleMenu.SMALL_H)) {
-                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkConsoleMenu.BUTTON_KIND);
+                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
+                            button == 1 ? WorkConsoleMenu.BUTTON_KIND_BACK : WorkConsoleMenu.BUTTON_KIND);
+                    return true;
+                }
+                if (optionShown() && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.OPTION_X, y + WorkConsoleMenu.OPTION_Y,
+                        WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H)) {
+                    adjustOption(button != 1, hasShiftDown());
                     return true;
                 }
                 if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.ADD_X, y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.ADD_W,
@@ -424,7 +441,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
 
     /** 選べるアンドロイドか（作業中でなく、採掘の工程があれば採掘アップグレードを積んでいる）。 */
     private boolean selectable(CompoundTag a) {
-        return !a.getBoolean("busy") && (plan == null || !plan.getBoolean("mining") || a.getBoolean("miner"));
+        return !a.getBoolean("busy") && (plan == null || !plan.getBoolean("mining") || a.getBoolean("miner"))
+                && (plan == null || !plan.getBoolean("felling") || a.getBoolean("feller"));
     }
 
     /** 作業を始めるアンドロイド: 選んだうちの選べるもの。だれも選んでいなければ、選べるもの全部。 */
@@ -497,6 +515,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 g.renderTooltip(font, java.util.List.of(io.github.genichimaruo.singulo.android.work.ProcedureCardItem.describe(s).getVisualOrderText(),
                         Component.translatable("gui.singulo.recipe_encoder.step.remove").withStyle(net.minecraft.ChatFormatting.GRAY)
                                 .getVisualOrderText()), mouseX, mouseY);
+            } else if (optionShown() && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.OPTION_X, y + WorkConsoleMenu.OPTION_Y, WorkConsoleMenu.OPTION_W,
+                    WorkConsoleMenu.OPTION_H)) {
+                g.renderTooltip(font, font.split(Component.translatable(menu.stepKind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.USE
+                        ? "gui.singulo.recipe_encoder.use.hint" : "gui.singulo.recipe_encoder.limit.hint"), 180), mouseX, mouseY);
             } else if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_PROCEDURE && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.KIND_X,
                     y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.KIND_W, WorkConsoleMenu.SMALL_H)) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.kind.hint"), 180), mouseX, mouseY);
@@ -515,12 +537,49 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.extra.hint"), 160), mouseX, mouseY);
             } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_RESULT && !hoveredSlot.hasItem() && menu.processing()) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.output.hint"), 160), mouseX, mouseY);
+            } else if (hoveredFace(mouseX, mouseY) >= 0) {
+                String[] keys = {"in", "out", "fuel"};
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[hoveredFace(mouseX, mouseY)]
+                        + ".hint"), 180), mouseX, mouseY);
+            } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_FUEL && !hoveredSlot.hasItem()) {
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel.hint"), 180), mouseX, mouseY);
             } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_STOCK && !hoveredSlot.hasItem()) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.stock.hint"), 160), mouseX, mouseY);
             } else if (hoveredSlot != null && hoveredSlot.index >= WorkConsoleMenu.SLOT_GRID && hoveredSlot.index < WorkConsoleMenu.SLOT_RESULT
                     && !hoveredSlot.hasItem()) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.grid.hint"), 160), mouseX, mouseY);
             }
+        }
+    }
+
+    /** 加工モードの面のボタンのうち、指しているもの（0 入れる、1 取り出す、2 燃料。なければ -1）。 */
+    private int hoveredFace(double mouseX, double mouseY) {
+        if (!menu.processing() || tab != TAB_RECORD) {
+            return -1;
+        }
+        for (int i = 0; i < 3; i++) {
+            if (Panel.inside(mouseX, mouseY, leftPos + WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP),
+                    topPos + WorkConsoleMenu.FACE_Y, WorkConsoleMenu.FACE_W, WorkConsoleMenu.FACE_H)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /** 面の名前（上・下・北・南・西・東、燃料は自動も）。 */
+    private static Component faceName(int value) {
+        return Component.translatable("gui.singulo.recipe_encoder.face." + (value == io.github.genichimaruo.singulo.android.work.RecipeData.FACE_AUTO
+                ? "auto" : net.minecraft.core.Direction.from3DDataValue(value).getName()));
+    }
+
+    /** 手順モードで、次に足す手順が数の上限・レバーの扱いを持つか（ボタンを出す）。 */
+    private boolean optionShown() {
+        return menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_PROCEDURE && io.github.genichimaruo.singulo.android.work.ProcedureStep.hasOption(menu.stepKind());
+    }
+
+    private void adjustOption(boolean up, boolean ten) {
+        if (minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkConsoleMenu.BUTTON_OPTION + (up ? 0 : 1) + (ten ? 2 : 0));
         }
     }
 
@@ -549,7 +608,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             if (idx < androids.size() && Panel.inside(mouseX, mouseY, x + 132, y + LIST_Y + i * LIST_H, 116, LIST_H)) {
                 CompoundTag a = androids.get(idx);
                 if (!a.getBoolean("busy") && !selectable(a)) {
-                    g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
+                    boolean axe = plan != null && plan.getBoolean("felling") && !a.getBoolean("feller");
+                    g.renderTooltip(font, font.split(Component.translatable(axe ? "gui.singulo.work_console.needs_feller"
+                            : "gui.singulo.work_console.needs_miner"), 160), mouseX, mouseY);
                     return;
                 }
             }
@@ -653,11 +714,22 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             g.renderOutline(x + WorkConsoleMenu.RESULT_X - 3, y + WorkConsoleMenu.RESULT_Y - 3, 22, 22, Panel.GLOW);
             g.renderOutline(x + WorkConsoleMenu.EXTRA_X - 3, y + WorkConsoleMenu.EXTRA_Y - 3,
                     18 * io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.EXTRAS + 4, 22, Panel.GLOW);
+            g.renderOutline(x + WorkConsoleMenu.FUEL_X - 3, y + WorkConsoleMenu.FUEL_Y - 3, 22, 22, 0xFFE0A050);   // 燃料（橙）
         }
         int[][] buttons = {{WorkConsoleMenu.ENCODE_X, WorkConsoleMenu.ENCODE_Y, 1}, {WorkConsoleMenu.CLEAR_X, WorkConsoleMenu.CLEAR_Y, 0},
                 {WorkConsoleMenu.CLEAR_CARD_X, WorkConsoleMenu.CLEAR_CARD_Y, 0}, {WorkConsoleMenu.MODE_X, WorkConsoleMenu.MODE_Y, 0}};
         for (int[] b : buttons) {
             button(g, x + b[0], y + b[1], WorkConsoleMenu.BUTTON_W, WorkConsoleMenu.BUTTON_H, b[2] == 1, mouseX, mouseY);
+        }
+        if (optionShown()) {
+            button(g, x + WorkConsoleMenu.OPTION_X, y + WorkConsoleMenu.OPTION_Y, WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H, false, mouseX,
+                    mouseY);
+        }
+        if (menu.processing()) {
+            for (int i = 0; i < 3; i++) {
+                button(g, x + WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP), y + WorkConsoleMenu.FACE_Y,
+                        WorkConsoleMenu.FACE_W, WorkConsoleMenu.FACE_H, false, mouseX, mouseY);
+            }
         }
         if (procedure) {
             button(g, x + WorkConsoleMenu.KIND_X, y + WorkConsoleMenu.SMALL_Y, WorkConsoleMenu.KIND_W, WorkConsoleMenu.SMALL_H, false, mouseX, mouseY);
@@ -691,8 +763,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 g.pose().popPose();
             }
             String count = s.item().isEmpty() ? "" : " ×" + s.item().getCount();
+            Component opt = io.github.genichimaruo.singulo.android.work.ProcedureCardItem.option(s.kind(), s.option());
             AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.recipe_encoder.kind." + io.github.genichimaruo.singulo.android.work.ProcedureStep.KEYS[s.kind()])
-                    .append(count), lx + 19, ry + 1, WorkConsoleMenu.STEPS_W - 28, 0xFFE8EEF2);
+                    .append(count).append(opt.getString().isEmpty() ? Component.empty() : Component.literal(" ").append(opt)), lx + 19, ry + 1,
+                    WorkConsoleMenu.STEPS_W - 28, 0xFFE8EEF2);
             g.drawString(font, "×", lx + WorkConsoleMenu.STEPS_W - 7, ry + 1, 0xFFE07070, false);
         }
         g.renderOutline(x + WorkConsoleMenu.PITEM_X - 3, y + WorkConsoleMenu.PITEM_Y - 3, 22, 22, Panel.GLOW);
@@ -1020,16 +1094,33 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.recipe_encoder.mode." + modes[Math.floorMod(menu.mode(), 3)]),
                     WorkConsoleMenu.MODE_X + 2, WorkConsoleMenu.MODE_Y + 3, WorkConsoleMenu.BUTTON_W - 4, Panel.TEXT);
             small(g, Component.translatable("gui.singulo.recipe_encoder.card"), WorkConsoleMenu.CARD_X + 8, WorkConsoleMenu.CARD_Y - 8, 26, MUTED);
+            if (menu.processing()) {
+                small(g, Component.translatable("gui.singulo.recipe_encoder.fuel"), WorkConsoleMenu.FUEL_X + 8, WorkConsoleMenu.FUEL_Y - 9, 22, MUTED);
+            }
             small(g, Component.translatable("gui.singulo.recipe_encoder.stock"), WorkConsoleMenu.STOCK_X + 8, WorkConsoleMenu.STOCK_Y - 8, 26, MUTED);
             if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_PROCEDURE) {
                 AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.recipe_encoder.kind."
-                        + io.github.genichimaruo.singulo.android.work.ProcedureStep.KEYS[Math.floorMod(menu.stepKind(), 3)]), WorkConsoleMenu.KIND_X + 1, WorkConsoleMenu.SMALL_Y + 2,
+                        + io.github.genichimaruo.singulo.android.work.ProcedureStep.KEYS[Math.floorMod(menu.stepKind(), io.github.genichimaruo.singulo.android.work.ProcedureStep.KINDS)]), WorkConsoleMenu.KIND_X + 1, WorkConsoleMenu.SMALL_Y + 2,
                         WorkConsoleMenu.KIND_W - 2, Panel.TEXT);
                 AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.recipe_encoder.step.add"), WorkConsoleMenu.ADD_X + 1,
                         WorkConsoleMenu.SMALL_Y + 2, WorkConsoleMenu.ADD_W - 2, 0xFFFFFFFF);
+                if (optionShown()) {
+                    AndroidStationScreen.fitCentered(g, font, io.github.genichimaruo.singulo.android.work.ProcedureCardItem.option(menu.stepKind(), menu.stepOption()),
+                            WorkConsoleMenu.OPTION_X + 1, WorkConsoleMenu.OPTION_Y + 2, WorkConsoleMenu.OPTION_W - 2, Panel.TEXT);
+                }
             } else {
-                small(g, Component.translatable(menu.processing() ? "gui.singulo.work_console.record.hint.processing"
-                        : "gui.singulo.work_console.record.hint"), 66, 108, 132, MUTED);
+                if (menu.processing()) {
+                    // 面のボタン: 「入 上」「出 下」「燃 自動」
+                    String[] keys = {"in", "out", "fuel"};
+                    for (int i = 0; i < 3; i++) {
+                        int fv = menu.faces() >> (i * 3) & 7;
+                        small(g, Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[i], faceName(fv)),
+                                WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP) + WorkConsoleMenu.FACE_W / 2,
+                                WorkConsoleMenu.FACE_Y + 3, WorkConsoleMenu.FACE_W - 2, Panel.TEXT);
+                    }
+                } else {
+                    small(g, Component.translatable("gui.singulo.work_console.record.hint"), 66, 108, 132, MUTED);
+                }
             }
         } else {
             List<CompoundTag> links = list("links");

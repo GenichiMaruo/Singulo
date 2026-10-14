@@ -66,6 +66,8 @@ public final class SinguloItems {
     /** 採掘アップグレード（ツルハシのエンチャントを付けられる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem> ANDROID_MINING_UPGRADE = ITEMS.register(
             "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem> ANDROID_FELLING_UPGRADE = ITEMS.register(
+            "android_felling_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem(new Item.Properties()));
     /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
             "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
@@ -130,6 +132,7 @@ public final class SinguloItems {
             Map.entry("android_charger", 2),
             Map.entry("android_armor_plate", 2),
             Map.entry("android_mining_upgrade", 2),
+            Map.entry("android_felling_upgrade", 2),
             Map.entry("work_location_card", 2),
             Map.entry("recipe_card", 2),
             Map.entry("procedure_card", 2),
@@ -211,6 +214,7 @@ public final class SinguloItems {
         TAB_ORDER.add(ANDROID_CHARGER);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
+        TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
         TAB_ORDER.add(WORK_LOCATION_CARD);
         TAB_ORDER.add(RECIPE_CARD);
         TAB_ORDER.add(PROCEDURE_CARD);

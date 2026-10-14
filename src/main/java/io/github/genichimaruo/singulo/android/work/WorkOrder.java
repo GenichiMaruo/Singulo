@@ -43,6 +43,8 @@ public final class WorkOrder {
     public int status = RUNNING;
     /** 素材が足りず待っているとき、次に試す時刻。 */
     public long retryAt;
+    /** あとから足した回数の素材で、まだ予約できていない物（在庫がそろうのを待つ）。 */
+    public final List<ItemCount> pendingReserve = new ArrayList<>();
     /** 納品先（作業指令台か、納品口）。 */
     @Nullable
     public BlockPos destination;
@@ -109,7 +111,8 @@ public final class WorkOrder {
         public final RecipeData recipe;
         public final BlockPos location;
         public final Block block;
-        public final long total;
+        /** 作る回数（確率で出る物が足りなかったときは、あとから増える）。 */
+        public long total;
         public long done;
         public long inProgress;
         /** この工程の素材を作る、前の工程の番号。 */
@@ -221,6 +224,11 @@ public final class WorkOrder {
             t.put("destination", NbtUtils.writeBlockPos(destination));
         }
         t.putBoolean("to_stock", toStock);
+        ListTag pr = new ListTag();
+        for (ItemCount c : pendingReserve) {
+            pr.add(c.save(registries));
+        }
+        t.put("pending_reserve", pr);
         ListTag hs = new ListTag();
         for (Holding h : held) {
             CompoundTag ht = new CompoundTag();
@@ -260,6 +268,12 @@ public final class WorkOrder {
         o.delivered = t.getLong("delivered");
         o.destination = NbtUtils.readBlockPos(t, "destination").orElse(null);
         o.toStock = t.getBoolean("to_stock");
+        for (Tag p : t.getList("pending_reserve", Tag.TAG_COMPOUND)) {
+            ItemCount c = ItemCount.load((CompoundTag) p, registries);
+            if (c != null) {
+                o.pendingReserve.add(c);
+            }
+        }
         for (Tag tag : t.getList("held", Tag.TAG_COMPOUND)) {
             CompoundTag ht = (CompoundTag) tag;
             ItemStack item = ItemStack.parseOptional(registries, ht.getCompound("item"));

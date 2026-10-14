@@ -51,6 +51,17 @@ public class RecipeCardItem extends Item {
         }
         if (data.processing()) {
             tooltip.add(Component.translatable("tooltip.singulo.recipe_card.processing").withStyle(ChatFormatting.DARK_AQUA));
+            if (data.faces() != RecipeData.DEFAULT_FACES) {
+                tooltip.add(Component.translatable("tooltip.singulo.recipe_card.faces",
+                        Component.translatable("gui.singulo.recipe_encoder.face." + data.inputFace().getName()),
+                        Component.translatable("gui.singulo.recipe_encoder.face." + data.outputFace().getName()),
+                        Component.translatable("gui.singulo.recipe_encoder.face." + (data.fuelFace() == null ? "auto" : data.fuelFace().getName())))
+                        .withStyle(ChatFormatting.DARK_AQUA));
+            }
+            if (!data.fuel().isEmpty()) {
+                tooltip.add(Component.translatable("tooltip.singulo.recipe_card.fuel", data.fuel().getHoverName(), data.fuel().getCount())
+                        .withStyle(ChatFormatting.GOLD));
+            }
         }
         for (ItemCount c : data.inputs()) {
             tooltip.add(Component.literal(" ・").append(c.item.getHoverName()).append(" ×" + c.count).withStyle(ChatFormatting.GRAY));

@@ -30,6 +30,8 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int DISMANTLE_X = 172, DISMANTLE_Y = 104;
     /** 装備と持ち物のページ: 左にアップグレードの列、中ほどにバックパック（6×4）、右に持ち物の列（5）。 */
     public static final int UPGRADE_X = 22, BATTERY_Y = 32, BACKPACK_Y = 60, MINING_Y = 88;
+    /** 道具の枠（採掘・伐採）は、左右に並べる。 */
+    public static final int MINING_X = 12, FELLING_X = 32;
     public static final int PACK_X = 58, PACK_Y = 32;
     public static final int CARRY_X = 184, CARRY_Y = 32;
     public static final int WORK_X = 8, WORK_Y = 108, WORK_W = 44, WORK_H = 14;
@@ -100,7 +102,7 @@ public class AndroidMenu extends AbstractContainerMenu {
                 return !working() && packEmpty();
             }
         });
-        addSlot(new PageSlot(items, RuinAndroid.SLOT_MINING, UPGRADE_X, MINING_Y, PAGE_GEAR, 1) {
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_MINING, MINING_X, MINING_Y, PAGE_GEAR, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return !working() && RuinAndroid.isMiningUpgrade(stack);
@@ -117,6 +119,12 @@ public class AndroidMenu extends AbstractContainerMenu {
                 }
             });
         }
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_FELLING, FELLING_X, MINING_Y, PAGE_GEAR, 1) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return !working() && RuinAndroid.isFellingUpgrade(stack);
+            }
+        });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
@@ -251,8 +259,9 @@ public class AndroidMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, own, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!moveItemStackTo(stack, 0, RuinAndroid.CARRY_START, false)          // 修理キット・装甲板・アップグレードの枠
-                && !moveItemStackTo(stack, RuinAndroid.CARRY_START, own, false)) {     // 持ち物、バックパックの中
+        } else if (!(RuinAndroid.isFellingUpgrade(stack) && moveItemStackTo(stack, RuinAndroid.SLOT_FELLING, RuinAndroid.SLOT_FELLING + 1, false))
+                && !moveItemStackTo(stack, 0, RuinAndroid.CARRY_START, false)          // 修理キット・装甲板・アップグレードの枠
+                && !moveItemStackTo(stack, RuinAndroid.CARRY_START, RuinAndroid.SLOT_FELLING, false)) {     // 持ち物、バックパックの中
             return ItemStack.EMPTY;
         }
         if (stack.isEmpty()) {

@@ -108,6 +108,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             case RuinAndroid.ACT_WAIT -> net.minecraft.world.item.Items.CLOCK;
             case RuinAndroid.ACT_CHARGE -> net.minecraft.world.item.Items.REDSTONE;
             case RuinAndroid.ACT_FIGHT -> net.minecraft.world.item.Items.IRON_SWORD;
+            case RuinAndroid.ACT_FARM -> net.minecraft.world.item.Items.WHEAT;
+            case RuinAndroid.ACT_RANCH -> net.minecraft.world.item.Items.SHEARS;
+            case RuinAndroid.ACT_FELL -> net.minecraft.world.item.Items.DIAMOND_AXE;
+            case RuinAndroid.ACT_USE -> net.minecraft.world.item.Items.LEVER;
             default -> net.minecraft.world.item.Items.AIR;
         });
         if (icon.isEmpty()) {
@@ -553,9 +557,20 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, body, -0.022F * k, -0.022F * k, -0.42F * k, 0.022F * k, 0.022F * k, 0.08F * k, light, 0x4A505C, 255);
             // 頭の付け根
             FxDraw.box(pose, body, -0.032F * k, -0.04F * k, -0.45F * k, 0.032F * k, 0.04F * k, -0.39F * k, light, 0x8C94A2, 255);
-            // 光る頭: 腕の向き（上下）に張り出し、先が持ち手の方（後ろ）へ曲がる
             VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
             float pulse = 0.8F + 0.2F * Mth.sin(age * 0.3F);
+            if (android.tool() == RuinAndroid.TOOL_AXE) {
+                // 光る斧の刃: 柄の先から片側（上）へ、先ほど幅の広い刃
+                for (int j = 0; j < 6; j++) {
+                    float yy = 0.02F + j * 0.04F;
+                    float half = 0.035F + j * 0.014F;
+                    glowBox(pose, fx, -0.02F * k, yy * k, (-0.42F - half) * k, 0.02F * k, (yy + 0.04F) * k, (-0.42F + half) * k, variant.accent,
+                            (int) (130 * pulse));
+                }
+                pose.popPose();
+                return;
+            }
+            // 光る頭: 腕の向き（上下）に張り出し、先が持ち手の方（後ろ）へ曲がる
             for (int i = -4; i <= 4; i++) {
                 float y = i * 0.045F;
                 float z = -0.42F + i * i * 0.006F;

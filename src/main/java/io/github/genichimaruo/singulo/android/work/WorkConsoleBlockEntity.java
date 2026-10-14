@@ -77,34 +77,43 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /**
      * レシピの記録: 0〜8 は見本の欄（物は減らない）、9 は作る物（作業台モードは表示だけ）、10 は記録したカード、
      * 11 は未記録のカードのストック（1スタック）、12〜13 は加工モードの、ほかに出てくる物（副産物）、
-     * 14〜15 は手順モードの作業位置カード（場所と、採掘の範囲のもう1点）、16 は手順モードの物（見本）。
+     * 14〜15 は手順モードの作業位置カード（場所と、採掘の範囲のもう1点）、16 は手順モードの物（見本）、
+     * 17 は加工モードの燃料（見本。切れたら取りに行く燃料と、1回に持ってくる数）。
      */
     public static final int GRID = 9, RESULT = 9, CARD = 10, STOCK = 11, EXTRA = 12, EXTRAS = 2, LOC_A = 14, LOC_B = 15, PITEM = 16,
-            ENCODER_SLOTS = 17;
+            FUEL = 17, ENCODER_SLOTS = 18;
     public static final int MODE_CRAFTING = 0, MODE_PROCESSING = 1, MODE_PROCEDURE = 2, MODES = 3;
     /** 記録のモードと、手順モードで次に足す手順の種類。 */
     private int mode;
     private int stepKind;
+    /** 次に足す手順の数の上限（繁殖・処理）か、レバーの扱い（操作）。 */
+    private int stepOption;
+    /** 加工モードで記録する、入れる面・取り出す面・燃料の面（{@link RecipeData#faces}）。 */
+    private int faces = RecipeData.DEFAULT_FACES;
     /** 手順モードで並べた手順。 */
     private final List<ProcedureStep> procSteps = new ArrayList<>();
     private final net.minecraft.world.inventory.ContainerData modeData = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
-            return index == 0 ? mode : stepKind;
+            return index == 0 ? mode : index == 1 ? stepKind : index == 2 ? stepOption : faces;
         }
 
         @Override
         public void set(int index, int value) {
             if (index == 0) {
                 mode = value;
-            } else {
+            } else if (index == 1) {
                 stepKind = value;
+            } else if (index == 2) {
+                stepOption = value;
+            } else {
+                faces = value;
             }
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return 4;
         }
     };
     private final net.minecraft.world.SimpleContainer encoder = new net.minecraft.world.SimpleContainer(ENCODER_SLOTS) {
@@ -347,9 +356,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
         }
         boolean mining = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsMining());
+        boolean felling = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsFelling());
         List<RuinAndroid> chosen = new ArrayList<>();
         for (RuinAndroid a : candidates(player)) {
-            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a) && (!androids.isEmpty() || !mining || a.canMine())) {
+            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a)
+                    && (!androids.isEmpty() || (!mining || a.canMine()) && (!felling || a.canFell()))) {
                 chosen.add(a);
             }
         }
@@ -371,11 +382,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (!s.recipe.processing() && !s.recipe.procedure() && !isWorkbench(s.block)) {
                 return Component.translatable("gui.singulo.work_console.error.not_workbench", s.recipe.output().getHoverName());
             }
-            if (s.recipe.processing() && !isMachine(s.location)) {
+            if (s.recipe.processing() && !isMachine(s.location, s.recipe)) {
                 return Component.translatable("gui.singulo.work_console.error.not_machine", s.recipe.output().getHoverName());
             }
             if (s.recipe.needsMining() && chosen.stream().noneMatch(RuinAndroid::canMine)) {
                 return Component.translatable("gui.singulo.work_console.error.no_miner", s.recipe.output().getHoverName());
+            }
+            if (s.recipe.needsFelling() && chosen.stream().noneMatch(RuinAndroid::canFell)) {
+                return Component.translatable("gui.singulo.work_console.error.no_feller", s.recipe.output().getHoverName());
             }
         }
         reserve(order, plan);
@@ -496,10 +510,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 作るたびに素材は減り、できた物が増えるので、作っている途中で一番場所を取るときで数える。
      */
     /** 加工モードのレシピを作れる場所（上から入れて、下から取り出せる）。 */
-    private boolean isMachine(BlockPos pos) {
+    private boolean isMachine(BlockPos pos, RecipeData recipe) {
         return level != null
-                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, net.minecraft.core.Direction.UP) != null
-                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, net.minecraft.core.Direction.DOWN) != null;
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, recipe.inputFace()) != null
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, recipe.outputFace()) != null;
     }
 
     /** 作業台のレシピを作れるブロック（バニラの作業台か、アンドロイド作業台）。 */
@@ -557,7 +571,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** このアンドロイドにできる工程か（採掘の手順は、採掘アップグレードが要る）。 */
     private static boolean canDo(RuinAndroid a, RecipeData recipe) {
-        return !recipe.needsMining() || a.canMine();
+        return (!recipe.needsMining() || a.canMine()) && (!recipe.needsFelling() || a.canFell());
     }
 
     /** 次の作業をもらう。 */
@@ -916,13 +930,19 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 同じストレージ（2つの場所に挟まれた箱など）は、先に数えた場所の物として扱う。
      */
     private void reserve(WorkOrder order, WorkPlanner.Plan plan) {
+        reserveItems(order, plan.fromStock);
+    }
+
+    /** need を、受け渡し場所の在庫（ほかの注文の予約を除く）から予約する。予約しきれなかった物を返す。 */
+    private List<ItemCount> reserveItems(WorkOrder order, List<ItemCount> need) {
+        List<ItemCount> short_ = new ArrayList<>();
         Set<BlockPos> seen = new HashSet<>();
         List<BlockPos> points = supplyPoints();
         List<List<IItemHandler>> stores = new ArrayList<>();
         for (BlockPos p : points) {
             stores.add(storagesAt(p, seen));
         }
-        for (ItemCount c : plan.fromStock) {
+        for (ItemCount c : need) {
             long left = c.count;
             for (int i = 0; i < points.size() && left > 0; i++) {
                 long here = 0;
@@ -940,7 +960,119 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 order.hold(points.get(i), c.item, take);
                 left -= take;
             }
+            if (left > 0) {
+                ItemCount.add(short_, c.item, left);
+            }
         }
+        return short_;
+    }
+
+    /** 燃料 fuel の、ほかの注文が予約していない在庫がある受け渡し場所のうち、from に一番近い所（なければ null）。 */
+    @Nullable
+    public BlockPos fuelPoint(ItemStack fuel, BlockPos from) {
+        BlockPos best = null;
+        Set<BlockPos> seen = new HashSet<>();
+        for (BlockPos p : supplyPoints()) {
+            if (loose(p, fuel, storagesAt(p, seen)) > 0 && (best == null || p.distSqr(from) < best.distSqr(from))) {
+                best = p;
+            }
+        }
+        return best;
+    }
+
+    /** 受け渡し場所 point にある、どの注文も予約していない item の数。 */
+    private long loose(BlockPos point, ItemStack item, List<IItemHandler> stores) {
+        long here = 0;
+        for (IItemHandler h : stores) {
+            for (int s = 0; s < h.getSlots(); s++) {
+                if (ItemStack.isSameItemSameComponents(h.getStackInSlot(s), item)) {
+                    here += h.getStackInSlot(s).getCount();
+                }
+            }
+        }
+        for (WorkOrder o : orders) {
+            here -= o.held(point, item);
+        }
+        return Math.max(0, here);
+    }
+
+    /** 受け渡し場所 point から、予約されていない燃料を最大 count 個、持ち物へ取る。取った数。 */
+    public int takeFuel(RuinAndroid a, BlockPos point, ItemStack fuel, int count) {
+        List<IItemHandler> stores = storagesAt(point, new HashSet<>());
+        int want = (int) Math.min(count, loose(point, fuel, stores));
+        int took = 0;
+        for (IItemHandler h : stores) {
+            for (int s = 0; s < h.getSlots() && took < want; s++) {
+                if (!ItemStack.isSameItemSameComponents(h.getStackInSlot(s), fuel)) {
+                    continue;
+                }
+                ItemStack got = h.extractItem(s, want - took, false);
+                ItemStack rest = a.addToCarry(got);
+                took += got.getCount() - rest.getCount();
+                if (!rest.isEmpty()) {
+                    ItemHandlerHelper.insertItemStacked(h, rest, false);        // 持ち物がいっぱい: 戻す
+                    return took;
+                }
+            }
+        }
+        return took;
+    }
+
+    /**
+     * 作った数が足りなかった（確率で出る物）: 足りない数を作る回数を工程に足し、その素材を在庫から予約する（なければ、そろうまで待つ）。
+     * 目当ての数が集まるまで、作業を続ける。
+     */
+    public void reportShort(WorkJob job, int batchIndex, long missingOutputs) {
+        WorkOrder o = order(job.orderId());
+        if (o == null || batchIndex < 0 || batchIndex >= job.batch().size() || missingOutputs <= 0) {
+            return;
+        }
+        WorkJob.Batch b = job.batch().get(batchIndex);
+        if (b.step() >= o.steps.size()) {
+            return;
+        }
+        WorkOrder.StepState s = o.steps.get(b.step());
+        int per = Math.max(1, s.recipe.output().getCount());
+        long extra = (missingOutputs + per - 1) / per;
+        s.total += extra;
+        List<ItemCount> need = new ArrayList<>(o.pendingReserve);
+        for (ItemCount in : s.recipe.inputs()) {
+            ItemCount.add(need, in.item, in.count * extra);
+        }
+        o.pendingReserve.clear();
+        o.pendingReserve.addAll(reserveItems(o, need));
+        if (!o.pendingReserve.isEmpty()) {
+            o.status = WorkOrder.WAIT_ITEMS;
+        }
+        setChanged();
+    }
+
+    /** 作業の途中まで（upTo の工程まで）を終えたことにし、そのあとの工程は、まだやっていないことにする。 */
+    public void completeUpTo(WorkJob job, int upTo) {
+        WorkJob.Lease l = lease(job.jobId());
+        if (l == null) {
+            return;
+        }
+        leases.remove(l);
+        WorkOrder o = order(job.orderId());
+        if (o == null) {
+            return;
+        }
+        for (int i = 0; i < job.batch().size(); i++) {
+            WorkJob.Batch b = job.batch().get(i);
+            if (b.step() < o.steps.size()) {
+                WorkOrder.StepState s = o.steps.get(b.step());
+                s.inProgress = Math.max(0, s.inProgress - b.crafts());
+                if (i <= upTo) {
+                    s.done += b.crafts();
+                }
+            }
+        }
+        if (o.pendingReserve.isEmpty()) {
+            o.status = WorkOrder.RUNNING;
+        }
+        finishIfDone(o);
+        setChanged();
     }
 
     /** 受け渡し場所で、そこにある物を持ち物へ取り出す（全部そろわなければ取らない）。 */
@@ -1380,7 +1512,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                     extras.add(encoder.getItem(EXTRA + i).copy());
                 }
             }
-            new RecipeData(RecipeData.MODE_PROCESSING, grid, result.copy(), extras).write(card, level.registryAccess());
+            RecipeData.processing(grid, result.copy(), extras, encoder.getItem(FUEL), faces).write(card, level.registryAccess());
         } else {
             new RecipeData(grid, result.copy()).write(card, level.registryAccess());
         }
@@ -1414,8 +1546,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     /** 次に足す手順の種類を切り替える（投入 → 取り出し → 採掘）。 */
-    public void cycleStepKind() {
-        stepKind = (stepKind + 1) % ProcedureStep.KINDS;
+    public void cycleStepKind(boolean back) {
+        stepKind = Math.floorMod(stepKind + (back ? -1 : 1), ProcedureStep.KINDS);
+        stepOption = ProcedureStep.defaultOption(stepKind);
     }
 
     /**
@@ -1423,6 +1556,27 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 足せなければ、その理由。
      */
     @Nullable
+    /** 加工モードの面を切り替える（which: 0 入れる面、1 取り出す面、2 燃料の面。燃料だけ「自動」もある）。 */
+    public void cycleFace(int which, boolean back) {
+        int shift = which * 3;
+        int cur = faces >> shift & 7;
+        int n = which == 2 ? 7 : 6;                          // 燃料は 0〜5 と 自動（7）
+        int idx = cur == RecipeData.FACE_AUTO ? 6 : cur;
+        idx = Math.floorMod(idx + (back ? -1 : 1), n);
+        int value = idx == 6 ? RecipeData.FACE_AUTO : idx;
+        faces = faces & ~(7 << shift) | value << shift;
+        setChanged();
+    }
+
+    /** 次に足す手順の数の上限（1〜64）・レバーの扱い（切り替え・オン・オフ）を変える。 */
+    public void adjustStepOption(int delta) {
+        if (stepKind == ProcedureStep.USE) {
+            stepOption = Math.floorMod(stepOption + Integer.signum(delta), ProcedureStep.USE_MODES);
+        } else if (ProcedureStep.hasOption(stepKind)) {
+            stepOption = Math.max(1, Math.min(64, stepOption + delta));
+        }
+    }
+
     public Component addStep() {
         if (procSteps.size() >= RecipeData.MAX_STEPS) {
             return Component.translatable("gui.singulo.recipe_encoder.step.full");
@@ -1433,11 +1587,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return Component.translatable("gui.singulo.recipe_encoder.step.no_place");
         }
         ItemStack item = encoder.getItem(PITEM).copy();
-        if (stepKind != ProcedureStep.MINE && item.isEmpty()) {
+        if (ProcedureStep.needsItem(stepKind) && item.isEmpty()) {
             return Component.translatable("gui.singulo.recipe_encoder.step.no_item");
         }
         BlockPos corner = null;
-        if (stepKind == ProcedureStep.MINE) {
+        if (ProcedureStep.usesArea(stepKind)) {
             ItemStack b = encoder.getItem(LOC_B);
             BlockPos pb = WorkLocationCardItem.pos(b);
             if (pb != null && WorkLocationCardItem.sameDimension(b, level)) {
@@ -1448,7 +1602,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 corner = pb;
             }
         }
-        procSteps.add(new ProcedureStep(stepKind, pos, corner, item));
+        int option = ProcedureStep.hasOption(stepKind) ? stepOption : ProcedureStep.defaultOption(stepKind);
+        procSteps.add(new ProcedureStep(stepKind, pos, corner, stepKind == ProcedureStep.USE ? ItemStack.EMPTY : item, option));
         setChanged();
         return null;
     }
@@ -1494,6 +1649,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         for (WorkOrder o : new ArrayList<>(orders)) {
+            if (!o.pendingReserve.isEmpty()) {
+                List<ItemCount> need = new ArrayList<>(o.pendingReserve);
+                o.pendingReserve.clear();
+                o.pendingReserve.addAll(reserveItems(o, need));
+                o.status = o.pendingReserve.isEmpty() ? WorkOrder.RUNNING : WorkOrder.WAIT_ITEMS;
+            }
             finishIfDone(o);
         }
         runStanding(level);
@@ -1592,6 +1753,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         tag.put("encoder", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), enc, registries));
         tag.putInt("encoder_mode", mode);
         tag.putInt("step_kind", stepKind);
+        tag.putInt("step_option", stepOption);
+        tag.putInt("faces", faces);
         ListTag ps = new ListTag();
         for (ProcedureStep s : procSteps) {
             ps.add(s.save(registries));
@@ -1636,6 +1799,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("encoder"), enc, registries);
         mode = Math.floorMod(tag.getInt("encoder_mode"), MODES);
         stepKind = Math.floorMod(tag.getInt("step_kind"), ProcedureStep.KINDS);
+        stepOption = tag.contains("step_option") ? tag.getInt("step_option") : ProcedureStep.defaultOption(stepKind);
+        faces = tag.contains("faces") ? tag.getInt("faces") : RecipeData.DEFAULT_FACES;
         procSteps.clear();
         for (Tag t : tag.getList("proc_steps", Tag.TAG_COMPOUND)) {
             if (procSteps.size() < RecipeData.MAX_STEPS) {
