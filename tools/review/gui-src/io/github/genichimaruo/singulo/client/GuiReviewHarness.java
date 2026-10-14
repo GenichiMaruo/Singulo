@@ -111,12 +111,97 @@ public final class GuiReviewHarness {
             case 12 -> {
                 require(mc, DeliveryPortScreen.class);
                 capture(mc, "delivery-port");
-                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 11");
+                mc.getSingleplayerServer().execute(() -> detailFixture(mc));
+                openBlock(mc, CONSOLE);
+                phase++;
+            }
+            case 13 -> {
+                require(mc, WorkConsoleScreen.class);
+                setField(mc.screen, "tab", 1);
+                setField(mc.screen, "detail", 999);
+                phase++;
+            }
+            case 14 -> {
+                capture(mc, "console-detail");
+                int left = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
+                int top = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
+                mc.screen.mouseScrolled(left + 20, top + 50, 0, -1);
+                mc.screen.mouseScrolled(left + 200, top + 50, 0, -1);
+                phase++;
+            }
+            case 15 -> {
+                capture(mc, "console-detail-scrolled");
+                if ((Integer) field(mc.screen, "detailScroll") != 1 || (Integer) field(mc.screen, "workerScroll") != 1) {
+                    throw new IllegalStateException("Detail columns did not scroll independently");
+                }
+                openBlock(mc, STATION);
+                phase++;
+            }
+            case 16 -> {
+                require(mc, AndroidStationScreen.class);
+                mc.getWindow().setWindowed(854, 480);
+                phase++;
+            }
+            case 17 -> {
+                capture(mc, "station-ja-854x480");
+                phase = 99;
+                mc.getLanguageManager().setSelected("en_us");
+                mc.reloadResourcePacks().thenRun(() -> mc.execute(() -> {
+                    ready = 0;
+                    phase = 18;
+                }));
+            }
+            case 18 -> {
+                require(mc, AndroidStationScreen.class);
+                capture(mc, "station-en-854x480");
+                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 15");
                 phase++;
                 mc.stop();
             }
             default -> {}
         }
+    }
+
+    private static Object field(Object target, String name) throws Exception {
+        var field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        return field.get(target);
+    }
+
+    private static void setField(Object target, String name, Object value) throws Exception {
+        var field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    /** Controlled UI fixture: six steps and six worker rows, including unloaded workers. */
+    private static void detailFixture(Minecraft mc) {
+        var player = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
+        var level = player.serverLevel();
+        var t = new net.minecraft.nbt.CompoundTag();
+        t.putInt("id", 999);
+        t.put("target", new ItemStack(Items.OAK_PLANKS).save(level.registryAccess()));
+        t.putLong("count", 24);
+        var steps = new net.minecraft.nbt.ListTag();
+        var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(Items.OAK_LOG));
+        var recipe = new RecipeData(grid, new ItemStack(Items.OAK_PLANKS, 4));
+        for (int i = 0; i < 6; i++) {
+            var step = new net.minecraft.nbt.CompoundTag();
+            step.put("recipe", recipe.save(level.registryAccess()));
+            step.put("location", net.minecraft.nbt.NbtUtils.writeBlockPos(CONSOLE));
+            step.putString("block", "minecraft:crafting_table");
+            step.putLong("total", i + 1);
+            step.putLong("done", i);
+            steps.add(step);
+        }
+        t.put("steps", steps);
+        var order = WorkOrder.load(t, level.registryAccess());
+        order.workers.add(androidId);
+        for (int i = 0; i < 5; i++) {
+            order.workers.add(new UUID(0, i + 1));
+        }
+        ((WorkConsoleBlockEntity) level.getBlockEntity(CONSOLE)).orders().add(order);
     }
 
     private static void require(Minecraft mc, Class<?> type) {

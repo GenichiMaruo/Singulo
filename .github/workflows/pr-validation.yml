@@ -64,8 +64,8 @@ jobs:
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
       - name: Require GUI captures
         run: |
-          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 11
-          grep -q 'SINGULO_GUI_COMPLETE 11' build/gui-review/logs/latest.log
+          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 15
+          grep -q 'SINGULO_GUI_COMPLETE 15' build/gui-review/logs/latest.log
       - name: Encode GUI captures for remote review
         if: always()
         run: |
