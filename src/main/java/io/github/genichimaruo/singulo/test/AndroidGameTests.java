@@ -1032,6 +1032,42 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+
+    /** 1枠に2種類を投入できたと誤認せず、途中の再読込後は未投入の材料だけを入れる。 */
+    @GameTest(template = EMPTY)
+    public static void processingRemembersPartialInputs(GameTestHelper helper) throws Exception {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
+        a.inventory().setItem(RuinAndroid.CARRY_START + 1, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE));
+        java.util.List<ItemStack> grid = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
+        grid.set(1, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE));
+        var recipe = new io.github.genichimaruo.singulo.android.work.RecipeData(
+                io.github.genichimaruo.singulo.android.work.RecipeData.MODE_PROCESSING, grid,
+                new ItemStack(net.minecraft.world.item.Items.STICK), List.of());
+        var handler = new net.neoforged.neoforge.items.ItemStackHandler(1);
+        var goalField = RuinAndroid.class.getDeclaredField("workGoal");
+        goalField.setAccessible(true);
+        Object goal = goalField.get(a);
+        var insert = goal.getClass().getDeclaredMethod("insertOnce", net.neoforged.neoforge.items.IItemHandler.class,
+                net.neoforged.neoforge.fluids.capability.IFluidHandler.class,
+                io.github.genichimaruo.singulo.android.work.RecipeData.class);
+        insert.setAccessible(true);
+        int initialCharge = a.charge();
+        helper.assertFalse((Boolean) insert.invoke(goal, handler, null, recipe), "2種類とも入ったことになった");
+        helper.assertTrue(handler.getStackInSlot(0).is(net.minecraft.world.item.Items.OAK_LOG), "最初の材料が入らない");
+        helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START + 1).getCount() == 1, "未投入の材料を失った");
+        handler.extractItem(0, 64, false);       // 装置が最初の材料を消費した
+        CompoundTag checkpoint = a.saveWorkState();
+        a.restoreWorkState(checkpoint);
+        helper.assertTrue((Boolean) insert.invoke(goal, handler, null, recipe), "未投入の材料から再開できない");
+        helper.assertTrue(handler.getStackInSlot(0).is(net.minecraft.world.item.Items.COBBLESTONE), "最初の材料を再投入した");
+        helper.assertTrue(a.carryEmpty(), "材料が持ち物に残った");
+        helper.assertTrue(a.charge() == initialCharge - 10, "1回分の加工で充電を二重に使った");
+        a.discard();
+        helper.succeed();
+    }
+
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
     @GameTest(template = EMPTY)
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {

@@ -69,6 +69,9 @@ final class AndroidWorkGoal extends Goal {
     private long crafted;
     /** 加工モード: 装置に入れた回数、取り出した主な物の数、何も進まなかった時間。 */
     private long inserted, collected;
+    @Nullable
+    private java.util.List<ItemCount> processingPending;
+    private boolean processingPaid, processingMoved;
     private int stalled;
     /** 手順カード: 今の手順の番号と、その手順で入れた・取り出した・集めた数。 */
     private int procIndex;
@@ -116,6 +119,14 @@ final class AndroidWorkGoal extends Goal {
         t.putLong("crafted", crafted);
         t.putLong("inserted", inserted);
         t.putLong("collected", collected);
+        if (processingPending != null) {
+            var inputs = new net.minecraft.nbt.ListTag();
+            for (ItemCount input : processingPending) {
+                inputs.add(input.save(registries));
+            }
+            t.put("processing_pending", inputs);
+            t.putBoolean("processing_paid", processingPaid);
+        }
         t.putInt("batch", batchIndex);
         t.putInt("procedure", procIndex);
         t.putLong("progress", progress);
@@ -145,6 +156,15 @@ final class AndroidWorkGoal extends Goal {
         crafted = t.getLong("crafted");
         inserted = t.getLong("inserted");
         collected = t.getLong("collected");
+        processingPending = null;
+        processingPaid = t.getBoolean("processing_paid");
+        processingMoved = false;
+        if (t.contains("processing_pending")) {
+            processingPending = new java.util.ArrayList<>();
+            for (var input : t.getList("processing_pending", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+                processingPending.add(ItemCount.load((net.minecraft.nbt.CompoundTag) input, android.registryAccess()));
+            }
+        }
         batchIndex = t.getInt("batch");
         procIndex = t.getInt("procedure");
         progress = t.getLong("progress");
@@ -225,6 +245,8 @@ final class AndroidWorkGoal extends Goal {
         batchIndex = 0;
         inserted = 0;
         collected = 0;
+        processingPending = null;
+        processingPaid = processingMoved = false;
         stalled = 0;
         fuelTrip = null;
         resetProcedure();
@@ -479,16 +501,17 @@ final class AndroidWorkGoal extends Goal {
         }
         boolean progress = false;
         while (inserted < step.crafts()) {
-            if (android.charge() < CRAFT_COST) {
+            if (!processingPaid && android.charge() < CRAFT_COST) {
                 android.spend(CRAFT_COST);
                 break;
             }
-            if (!insertOnce(in, fin, r)) {
+            boolean complete = insertOnce(in, fin, r);
+            progress |= processingMoved;
+            if (!complete) {
                 break;
             }
             inserted++;
             progress = true;
-            android.spend(CRAFT_COST);
             if (!android.active()) {
                 break;
             }
@@ -556,7 +579,7 @@ final class AndroidWorkGoal extends Goal {
             fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
             return;
         }
-        if (collected >= want) {
+        if (collected >= want && inserted >= step.crafts()) {
             inserted = 0;
             collected = 0;
             stalled = 0;
@@ -824,6 +847,9 @@ final class AndroidWorkGoal extends Goal {
                       ItemStack what) {
         if (!android.canMine()) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
+            return;
+        }
+        if (!canPay(MINE_COST)) {
             return;
         }
         ItemStack tool = miningTool();
@@ -1108,6 +1134,14 @@ final class AndroidWorkGoal extends Goal {
         }
     }
 
+    private boolean canPay(int cost) {
+        if (android.charge() >= cost) {
+            return true;
+        }
+        android.spend(cost);                    // 作業前に充電へ戻り、最後の1回を無料にしない
+        return false;
+    }
+
     /** ほかの mod の守りも効くよう、注文した人として、そのブロックを壊してよいか確かめる。 */
     private boolean mayBreak(ServerLevel level, WorkConsoleBlockEntity c, BlockPos p) {
         if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.isActiveCrown(level, p)) {
@@ -1147,6 +1181,9 @@ final class AndroidWorkGoal extends Goal {
 
     private void harvest(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps,
                          ItemStack what) {
+        if (!canPay(CRAFT_COST)) {
+            return;
+        }
         if (mineTarget != null && !harvestable(level, mineTarget)) {
             stopMining();
         }
@@ -1301,6 +1338,9 @@ final class AndroidWorkGoal extends Goal {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
             return;
         }
+        if (!canPay(MINE_COST * 4)) {
+            return;
+        }
         ItemStack tool = fellingTool();
         if (mineTarget != null && !level.getBlockState(mineTarget).is(net.minecraft.tags.BlockTags.LOGS)) {
             stopMining();
@@ -1424,6 +1464,9 @@ final class AndroidWorkGoal extends Goal {
     /** 毛刈り・搾乳・処理: 範囲の動物を1頭ずつ世話して、目当ての物がそろうまで続ける。 */
     private void ranch(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, io.github.genichimaruo.singulo.android.work.ProcedureStep ps,
                        ItemStack what) {
+        if (!canPay(CRAFT_COST)) {
+            return;
+        }
         net.minecraft.world.phys.AABB area = pen(ps);
         pickUp(level, area, what);
         net.minecraft.world.entity.animal.Animal target = ranchTarget != null
@@ -1468,6 +1511,10 @@ final class AndroidWorkGoal extends Goal {
         }
         craftTimer = 0;
         ranchTarget = null;
+        if (!mayTend(level, c, target, ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL)) {
+            ranchSkip.add(target.getUUID());
+            return;
+        }
         switch (ps.kind()) {
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR -> {
                 if (target instanceof net.minecraft.world.entity.animal.Sheep sheep) {
@@ -1567,11 +1614,34 @@ final class AndroidWorkGoal extends Goal {
         }
         craftTimer = 0;
         ranchTarget = null;
+        if (!mayTend(level, c, target, false)) {
+            ranchSkip.add(target.getUUID());
+            return;
+        }
+        if (!canPay(CRAFT_COST)) {
+            return;
+        }
         if (android.takeFromCarry(feed, 1)) {
             progress++;
             target.setInLove(actor(level, c, null));          // ハートが出る
             android.spend(CRAFT_COST);
         }
+    }
+
+    /** 牧場の操作も、注文者としての保護判定を通す。 */
+    private boolean mayTend(ServerLevel level, WorkConsoleBlockEntity c, net.minecraft.world.entity.animal.Animal target, boolean attack) {
+        var as = actor(level, c, null);
+        as.moveTo(android.getX(), android.getY(), android.getZ(), android.getYRot(), android.getXRot());
+        if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, target.blockPosition(), as)) {
+            return false;
+        }
+        if (attack) {
+            return !net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(
+                    new net.neoforged.neoforge.event.entity.player.AttackEntityEvent(as, target)).isCanceled();
+        }
+        return !net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(
+                new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract(
+                        as, net.minecraft.world.InteractionHand.MAIN_HAND, target)).isCanceled();
     }
 
     /** えさを与えてよいか: 大人で恋をしていない、えさを食べる、同じ種類の数が上限より少なく、相手（ほかに与えられる大人か、恋をしている大人）がいる。 */
@@ -1723,48 +1793,73 @@ final class AndroidWorkGoal extends Goal {
                 "[Singulo Android]"));
     }
 
-    /** 1回分の素材を、全部入るときだけ入れる。 */
-    private boolean insertOnce(@Nullable net.neoforged.neoforge.items.IItemHandler in, @Nullable net.neoforged.neoforge.fluids.capability.IFluidHandler fin, RecipeData r) {
-        java.util.List<ItemCount> inputs = r.inputs();
-        for (ItemCount need : inputs) {
-            if (FluidSamples.is(need.item)) {
-                // 流体: タンクにあって、装置の流体の入口に全部入るか
-                var f = FluidSamples.fluid(need.item).copyWithAmount((int) need.count);
-                if (fin == null || android.tankAmount(f) < need.count || fin.fill(f, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE) < need.count) {
-                    return false;
+    /**
+     * 1回分を順に投入する。異なる材料のSIMULATEを同じ空き枠に対して行っても、
+     * 全種類が同時に入る保証にはならない。実際に入った分を覚え、残りだけを次回投入する。
+     */
+    private boolean insertOnce(@Nullable net.neoforged.neoforge.items.IItemHandler in,
+                               @Nullable net.neoforged.neoforge.fluids.capability.IFluidHandler fin, RecipeData r) {
+        processingMoved = false;
+        if (processingPending == null) {
+            java.util.List<ItemCount> inputs = r.inputs();
+            for (ItemCount need : inputs) {
+                if (FluidSamples.is(need.item)) {
+                    if (fin == null || android.tankAmount(FluidSamples.fluid(need.item)) < need.count) {
+                        return false;
+                    }
+                } else {
+                    long have = 0;
+                    for (int slot : android.carrySlots()) {
+                        if (need.matches(android.inventory().getItem(slot))) {
+                            have += android.inventory().getItem(slot).getCount();
+                        }
+                    }
+                    if (in == null || have < need.count) {
+                        return false;
+                    }
                 }
+            }
+            processingPending = new java.util.ArrayList<>();
+            for (ItemCount input : inputs) {
+                processingPending.add(new ItemCount(input.item, input.count));
+            }
+            processingPaid = false;
+        }
+        for (ItemCount need : processingPending) {
+            if (need.count <= 0) {
                 continue;
             }
-            if (in == null) {
-                return false;
-            }
-            int have = 0;
-            for (int slot : android.carrySlots()) {
-                if (need.matches(android.inventory().getItem(slot))) {
-                    have += android.inventory().getItem(slot).getCount();
+            long moved = 0;
+            if (FluidSamples.is(need.item) && fin != null) {
+                var like = FluidSamples.fluid(need.item);
+                var available = android.drainTanks(like, (int) Math.min(need.count, Integer.MAX_VALUE), true);
+                if (!available.isEmpty()) {
+                    int put = fin.fill(available, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                    android.drainTanks(like, put, false);
+                    moved = put;
                 }
+            } else if (in != null && !FluidSamples.is(need.item)) {
+                moved = insertFromCarry(in, need.item, need.count);
             }
-            if (have < need.count) {
-                return false;
+            if (moved > 0) {
+                if (!processingPaid) {
+                    android.spend(CRAFT_COST);
+                    processingPaid = true;
+                }
+                need.count -= moved;
+                processingMoved = true;
             }
-            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(in, need.item.copyWithCount((int) need.count), true);
-            if (!rest.isEmpty()) {
+        }
+        for (ItemCount need : processingPending) {
+            if (need.count > 0) {
                 return false;
             }
         }
-        for (ItemCount need : inputs) {
-            if (FluidSamples.is(need.item)) {
-                var f = android.drainTanks(FluidSamples.fluid(need.item), (int) need.count, false);
-                int put = fin.fill(f, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                if (put < f.getAmount()) {
-                    android.fillTanks(f.copyWithAmount(f.getAmount() - put), false);     // 入りきらなかった分は戻す
-                }
-                continue;
-            }
-            android.takeFromCarry(need.item, (int) need.count);
-            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(in, need.item.copyWithCount((int) need.count), false);
-            drop(android.addToCarry(rest));
+        if (!processingPaid) {
+            android.spend(CRAFT_COST);          // 素材のない加工でも1回分は使う
         }
+        processingPending = null;
+        processingPaid = false;
         return true;
     }
 

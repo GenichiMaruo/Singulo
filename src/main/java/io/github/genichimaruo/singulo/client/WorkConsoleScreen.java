@@ -71,6 +71,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     private Component error;
     /** 進行中のページで、詳しく見ている注文（なければ -1）。 */
     private int detail = -1;
+    private int detailScroll, workerScroll;
     private static final int DETAIL_ROWS = 5, DETAIL_H = 16, DETAIL_BACK_Y = TOP + DETAIL_ROWS * DETAIL_H + 4;
     /** 注文の確認で選んだきっかけ（-1: 今すぐ注文）。 */
     private int trigger = -1;
@@ -247,6 +248,15 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             return true;
         }
         int step = dy > 0 ? -1 : 1;
+        CompoundTag detailed = tab == 1 ? detailOrder() : null;
+        if (picking == null && detailed != null) {
+            if (mouseX < leftPos + 128) {
+                detailScroll = Math.max(0, Math.min(detailScroll + step, Math.max(0, tags(detailed, "steps").size() - (DETAIL_ROWS - 1))));
+            } else {
+                workerScroll = Math.max(0, Math.min(workerScroll + step, Math.max(0, tags(detailed, "worker_list").size() - DETAIL_ROWS)));
+            }
+            return true;
+        }
         if (picking != null) {
             if (mouseX < leftPos + 128) {
                 listScroll = Math.max(0, listScroll + step);
@@ -415,6 +425,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 }
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, 222, ROW_H - 1)) {
                     detail = orders.get(idx).getInt("id");     // 行をクリック: 詳しい様子を見る
+                    detailScroll = workerScroll = 0;
                     return true;
                 }
             }
@@ -890,20 +901,36 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         Panel.well(g, x + 8, y + TOP, 116, DETAIL_ROWS * DETAIL_H);
         Panel.well(g, x + 132, y + TOP, 116, DETAIL_ROWS * DETAIL_H);
         List<CompoundTag> steps = tags(o, "steps");
-        for (int i = 0; i < steps.size() && i < DETAIL_ROWS - 1; i++) {
-            g.renderItem(stack(steps.get(i), "item"), x + 9, y + TOP + i * DETAIL_H);
+        detailScroll = Math.min(detailScroll, Math.max(0, steps.size() - (DETAIL_ROWS - 1)));
+        for (int i = 0; i + detailScroll < steps.size() && i < DETAIL_ROWS - 1; i++) {
+            g.renderItem(stack(steps.get(i + detailScroll), "item"), x + 9, y + TOP + i * DETAIL_H);
         }
         int last = Math.min(steps.size(), DETAIL_ROWS - 1);
         g.renderItem(stack(o, "target"), x + 9, y + TOP + last * DETAIL_H);
         List<CompoundTag> workers = tags(o, "worker_list");
-        for (int i = 0; i < workers.size() && i < DETAIL_ROWS; i++) {
+        workerScroll = Math.min(workerScroll, Math.max(0, workers.size() - DETAIL_ROWS));
+        for (int i = 0; i + workerScroll < workers.size() && i < DETAIL_ROWS; i++) {
             int ry = y + TOP + i * DETAIL_H;
-            g.fill(x + 135, ry + 4, x + 143, ry + 12, workers.get(i).getInt("activity") < 0 ? 0xFF8A949E
-                    : 0xFF000000 | workers.get(i).getInt("accent"));
+            CompoundTag worker = workers.get(i + workerScroll);
+            g.fill(x + 135, ry + 4, x + 143, ry + 12, worker.getInt("activity") < 0 ? 0xFF8A949E
+                    : 0xFF000000 | worker.getInt("accent"));
         }
+        detailScrollbar(g, x + 122, y + TOP, DETAIL_ROWS - 1, steps.size(), detailScroll);
+        detailScrollbar(g, x + 246, y + TOP, DETAIL_ROWS, workers.size(), workerScroll);
         boolean hover = Panel.inside(mouseX, mouseY, x + 8, y + DETAIL_BACK_Y, 50, 12);
         g.fill(x + 7, y + DETAIL_BACK_Y - 1, x + 59, y + DETAIL_BACK_Y + 13, Panel.WELL_EDGE);
         g.fill(x + 8, y + DETAIL_BACK_Y, x + 58, y + DETAIL_BACK_Y + 12, hover ? 0xFFD6E6EE : 0xFFF4F6F8);
+    }
+
+    private static void detailScrollbar(GuiGraphics g, int x, int y, int rows, int total, int offset) {
+        if (total <= rows) {
+            return;
+        }
+        int height = rows * DETAIL_H;
+        int thumb = Math.max(6, height * rows / total);
+        int top = y + (height - thumb) * offset / (total - rows);
+        g.fill(x, y, x + 1, y + height, 0xFF46515B);
+        g.fill(x, top, x + 1, top + thumb, 0xFF78D2F0);
     }
 
     private static List<CompoundTag> tags(CompoundTag t, String key) {
@@ -1018,8 +1045,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             CompoundTag o = detailOrder();
             List<CompoundTag> steps = tags(o, "steps");
             int light = 0xFFE9EDF0;
-            for (int i = 0; i < steps.size() && i < DETAIL_ROWS - 1; i++) {
-                CompoundTag st = steps.get(i);
+            for (int i = 0; i + detailScroll < steps.size() && i < DETAIL_ROWS - 1; i++) {
+                CompoundTag st = steps.get(i + detailScroll);
                 long done = st.getLong("done"), total = st.getLong("total"), doing = st.getLong("doing");
                 Component line = Component.literal(compact(done) + " / " + compact(total));
                 if (doing > 0) {
@@ -1033,8 +1060,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                     : Component.translatable("gui.singulo.work_console.detail.delivered", compact(o.getLong("delivered")), compact(o.getLong("count")));
             AndroidStationScreen.fit(g, font, deliver, 27, TOP + last * DETAIL_H + 4, 95, light);
             List<CompoundTag> workers = tags(o, "worker_list");
-            for (int i = 0; i < workers.size() && i < DETAIL_ROWS; i++) {
-                CompoundTag w = workers.get(i);
+            for (int i = 0; i + workerScroll < workers.size() && i < DETAIL_ROWS; i++) {
+                CompoundTag w = workers.get(i + workerScroll);
                 int act = w.getInt("activity");
                 Component line = text(w, "name").copy();
                 if (act >= 0) {
