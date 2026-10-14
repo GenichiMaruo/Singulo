@@ -554,6 +554,8 @@ final class AndroidWorkGoal extends Goal {
                     }
                 }
             }
+            boolean main = ItemStack.isSameItemSameComponents(s, r.output());
+            take = Math.min(take, outputCapacity(s.copyWithCount(Math.max(1, take)), main));
             if (take <= 0) {
                 continue;
             }
@@ -561,10 +563,10 @@ final class AndroidWorkGoal extends Goal {
             if (got.isEmpty()) {
                 continue;
             }
-            if (ItemStack.isSameItemSameComponents(got, r.output())) {
-                collected += got.getCount();
+            int kept = keepOutput(got, main);
+            if (main) {
+                collected += kept;
             }
-            drop(android.addToCarry(got));
             progress = true;
         }
         if (progress) {
@@ -831,9 +833,13 @@ final class AndroidWorkGoal extends Goal {
             if (s.isEmpty() || !ItemStack.isSameItemSameComponents(s, what)) {
                 continue;
             }
-            ItemStack got = h.extractItem(i, (int) Math.min(s.getCount(), limit - moved), false);
-            moved += got.getCount();
-            drop(android.addToCarry(got));
+            int take = (int) Math.min(s.getCount(), limit - moved);
+            take = Math.min(take, outputCapacity(s.copyWithCount(take), true));
+            if (take <= 0) {
+                continue;
+            }
+            ItemStack got = h.extractItem(i, take, false);
+            moved += keepOutput(got, true);
         }
         return moved;
     }
@@ -943,12 +949,7 @@ final class AndroidWorkGoal extends Goal {
         java.util.List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(state, level, target, level.getBlockEntity(target),
                 android, tool);
         level.destroyBlock(target, false, android);
-        for (ItemStack d : drops) {
-            if (ItemStack.isSameItemSameComponents(d, what)) {
-                progress += d.getCount();
-            }
-            drop(android.addToCarry(d));
-        }
+        collect(drops, what);
         stopMining();
         android.spend(MINE_COST);
     }
@@ -1121,16 +1122,83 @@ final class AndroidWorkGoal extends Goal {
         return b instanceof net.minecraft.world.level.block.StemBlock || s.is(net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST);
     }
 
-    /** 手に入れた物を持ち物に入れ、目当ての物の数を数える。 */
+    /** 注文の完成品を副産物より優先する。持ち主の私物や工程で使う材料は捨てない。 */
+    private int outputCapacity(ItemStack what, boolean priority) {
+        int room = carryRoom(what);
+        if (priority && room < what.getCount()) {
+            for (int slot : android.carrySlots()) {
+                ItemStack held = android.inventory().getItem(slot);
+                if (held.isEmpty() || ItemStack.isSameItemSameComponents(held, what) || neededForWork(held)) {
+                    continue;
+                }
+                android.inventory().setItem(slot, ItemStack.EMPTY);
+                drop(held);
+                room = carryRoom(what);
+                if (room >= what.getCount()) {
+                    break;
+                }
+            }
+        }
+        return room;
+    }
+
+    private int carryRoom(ItemStack what) {
+        int room = 0;
+        for (int slot : android.carrySlots()) {
+            ItemStack held = android.inventory().getItem(slot);
+            if (held.isEmpty()) {
+                room += what.getMaxStackSize();
+            } else if (ItemStack.isSameItemSameComponents(held, what)) {
+                room += Math.max(0, held.getMaxStackSize() - held.getCount());
+            }
+        }
+        return room;
+    }
+
+    private boolean neededForWork(ItemStack held) {
+        WorkJob job = android.workJob;
+        if (job == null) {
+            return true; // 作業の内容が分からないときは持ち物を守る
+        }
+        for (ItemCount in : job.fetch()) {
+            if (ItemStack.isSameItemSameComponents(held, in.item)) {
+                return true;
+            }
+        }
+        for (WorkJob.Batch batch : job.batch()) {
+            RecipeData recipe = batch.recipe();
+            if (ItemStack.isSameItemSameComponents(held, recipe.output())
+                    || ItemStack.isSameItemSameComponents(held, recipe.fuel())) {
+                return true;
+            }
+            for (ItemCount in : recipe.inputs()) {
+                if (ItemStack.isSameItemSameComponents(held, in.item)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private int keepOutput(ItemStack stack, boolean priority) {
+        outputCapacity(stack, priority);
+        ItemStack rest = android.addToCarry(stack);
+        int kept = stack.getCount() - rest.getCount();
+        drop(rest);
+        return kept;
+    }
+
+    /** 手に入れて実際に持てた物だけを数える。 */
     private void collect(java.util.List<ItemStack> drops, ItemStack what) {
         for (ItemStack d : drops) {
             if (d.isEmpty()) {
                 continue;
             }
-            if (ItemStack.isSameItemSameComponents(d, what)) {
-                progress += d.getCount();
+            boolean main = ItemStack.isSameItemSameComponents(d, what);
+            int kept = keepOutput(d, main);
+            if (main) {
+                progress += kept;
             }
-            drop(android.addToCarry(d));
         }
     }
 

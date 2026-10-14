@@ -1139,4 +1139,54 @@ public final class AndroidGameTests {
         pig.discard();
         helper.succeed();
     }
+
+    /** 副産物で満杯でも目的の品を持ち、私物・後続材料は守る。満杯の装置出力は抜き捨てない。 */
+    @GameTest(template = EMPTY)
+    public static void workOutputSurvivesFullCargo(GameTestHelper helper) throws Exception {
+        var level = helper.getLevel();
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.EMERALD));
+        a.assignWork(helper.absolutePos(CONSOLE), 1);
+        var target = new ItemStack(net.minecraft.world.item.Items.DIAMOND);
+        var input = new ItemStack(net.minecraft.world.item.Items.OAK_LOG);
+        var job = new io.github.genichimaruo.singulo.android.work.WorkJob(
+                io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, 1, 1, 0,
+                List.of(new io.github.genichimaruo.singulo.android.work.ItemCount(input, 1)), List.of(), true);
+        var jobField = RuinAndroid.class.getDeclaredField("workJob");
+        jobField.setAccessible(true);
+        jobField.set(a, job);
+        int[] slots = a.carrySlots();
+        a.inventory().setItem(slots[0], input.copy());
+        for (int i = 1; i < slots.length; i++) {
+            a.inventory().setItem(slots[i], new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 64));
+        }
+        var goalField = RuinAndroid.class.getDeclaredField("workGoal");
+        goalField.setAccessible(true);
+        Object goal = goalField.get(a);
+        var collect = goal.getClass().getDeclaredMethod("collect", List.class, ItemStack.class);
+        collect.setAccessible(true);
+        collect.invoke(goal, List.of(target.copy()), target);
+        helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START).is(net.minecraft.world.item.Items.EMERALD), "私物を捨てた");
+        helper.assertTrue(a.inventory().getItem(slots[0]).is(net.minecraft.world.item.Items.OAK_LOG), "後続材料を捨てた");
+        boolean kept = false;
+        for (int slot : slots) {
+            kept |= a.inventory().getItem(slot).is(net.minecraft.world.item.Items.DIAMOND);
+        }
+        helper.assertTrue(kept && a.saveWorkState().getLong("progress") == 1, "目的の品を持たずに進捗を数えた");
+        // 全枠が必要な材料で埋まるときは、装置に残して待つ。
+        for (int slot : slots) {
+            a.inventory().setItem(slot, input.copyWithCount(64));
+        }
+        var handler = new net.neoforged.neoforge.items.ItemStackHandler(1);
+        handler.setStackInSlot(0, target.copy());
+        var extract = goal.getClass().getDeclaredMethod("extractToCarry",
+                net.neoforged.neoforge.items.IItemHandler.class, ItemStack.class, long.class);
+        extract.setAccessible(true);
+        long moved = (Long) extract.invoke(goal, handler, target, 1L);
+        helper.assertTrue(moved == 0 && handler.getStackInSlot(0).getCount() == 1, "持てない完成品を装置から抜き捨てた");
+        collect.invoke(goal, List.of(target.copy()), target);
+        helper.assertTrue(a.saveWorkState().getLong("progress") == 1, "足元に落ちた品を取得済みと数えた");
+        a.discard();
+        helper.succeed();
+    }
 }
