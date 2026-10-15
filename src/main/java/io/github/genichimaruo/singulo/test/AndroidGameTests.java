@@ -455,6 +455,11 @@ public final class AndroidGameTests {
      */
     private static io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity workshop(GameTestHelper helper, int logs) {
         var level = helper.getLevel();
+        // The empty structure contains air, including y=0. Give the factory a real
+        // floor so irrigation and farmland do not form a floating, two-block ledge.
+        for (int x = 0; x < 8; x++) for (int z = 0; z < 8; z++) {
+            helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
+        }
         helper.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         helper.setBlock(SUPPLY, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
         helper.setBlock(CHEST, net.minecraft.world.level.block.Blocks.CHEST);
