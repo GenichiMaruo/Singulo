@@ -20,6 +20,49 @@ public final class Legacy {
         return java.util.UUID.nameUUIDFromBytes(id.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
     public static boolean sameFluid(net.minecraftforge.fluids.FluidStack a, net.minecraftforge.fluids.FluidStack b) { return a.isFluidEqual(b); }
+    private static final java.util.List<FixtureScope> FIXTURES = new java.util.ArrayList<>();
+    private static boolean fixtureTracking;
+    private static final class FixtureScope {
+        final net.minecraft.server.level.ServerLevel level;
+        final net.minecraft.world.phys.AABB bounds;
+        final java.util.Set<net.minecraft.world.entity.Entity> entities =
+                java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        FixtureScope(net.minecraft.server.level.ServerLevel level, net.minecraft.world.phys.AABB bounds) {
+            this.level = level; this.bounds = bounds;
+        }
+    }
+    private static void trackFixtureEntity(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
+        var entity = event.getEntity();
+        if (entity instanceof net.minecraft.world.entity.player.Player) return;
+        for (var fixture : FIXTURES) {
+            if (event.getLevel() == fixture.level && (fixture.bounds.contains(entity.position())
+                    || entity instanceof net.minecraft.world.entity.projectile.Projectile projectile
+                    && fixture.entities.contains(projectile.getOwner()))) {
+                fixture.entities.add(entity);
+                return;
+            }
+        }
+        // Single-test batches can deliberately spawn helpers outside the structure.
+        // There is no other live fixture in this disposable GameTest level to own them.
+        FixtureScope sole = null;
+        for (var fixture : FIXTURES) if (event.getLevel() == fixture.level) {
+            if (sole != null) return;
+            sole = fixture;
+        }
+        if (sole != null) sole.entities.add(entity);
+    }
+    /** The batch runner's listener starts the next batch synchronously: cleanup must run first. */
+    @SuppressWarnings("unchecked")
+    private static void addCleanupListener(net.minecraft.gametest.framework.GameTestInfo info,
+                                           net.minecraft.gametest.framework.GameTestListener listener)
+            throws ReflectiveOperationException {
+        var field = java.util.Arrays.stream(net.minecraft.gametest.framework.GameTestInfo.class.getDeclaredFields())
+                .filter(f -> f.getGenericType() instanceof java.lang.reflect.ParameterizedType type
+                        && java.util.Arrays.asList(type.getActualTypeArguments()).contains(net.minecraft.gametest.framework.GameTestListener.class))
+                .findFirst().orElseThrow();
+        field.setAccessible(true);
+        ((java.util.List<net.minecraft.gametest.framework.GameTestListener>) field.get(info)).add(0, listener);
+    }
     /** Completed machines and hostiles must not affect later fixtures in their search radius. */
     public static void isolateFixture(net.minecraft.gametest.framework.GameTestHelper helper) {
         try {
@@ -28,12 +71,39 @@ public final class Legacy {
             field.setAccessible(true);
             var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
             var bounds = info.getStructureBounds();
-            info.addListener(new net.minecraft.gametest.framework.GameTestListener() {
+            // GameTestServer advances ticks without a real-time delay. A fixed setupTicks
+            // does not guarantee that asynchronously promoted chunks can tick entities yet.
+            // Pump chunk tasks before the fixture starts, without advancing its game clock.
+            var level = helper.getLevel();
+            int minX = net.minecraft.util.Mth.floor(bounds.minX) >> 4;
+            int maxX = net.minecraft.util.Mth.floor(bounds.maxX) >> 4;
+            int minZ = net.minecraft.util.Mth.floor(bounds.minZ) >> 4;
+            int maxZ = net.minecraft.util.Mth.floor(bounds.maxZ) >> 4;
+            java.util.List<BlockPos> chunks = new java.util.ArrayList<>();
+            for (int x = minX; x <= maxX; x++) for (int z = minZ; z <= maxZ; z++) {
+                level.setChunkForced(x, z, true);
+                level.getChunk(x, z);
+                chunks.add(new BlockPos(x << 4, 0, z << 4));
+            }
+            java.util.function.BooleanSupplier ready = () -> chunks.stream().allMatch(level::isPositionEntityTicking);
+            long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
+            level.getServer().managedBlock(() -> ready.getAsBoolean() || System.nanoTime() >= deadline);
+            helper.assertTrue(ready.getAsBoolean(), "Fixture chunks did not become entity-ticking before setup");
+            if (!fixtureTracking) {
+                net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(Legacy::trackFixtureEntity);
+                fixtureTracking = true;
+            }
+            var scope = new FixtureScope(level, bounds);
+            FIXTURES.add(scope);
+            addCleanupListener(info, new net.minecraft.gametest.framework.GameTestListener() {
                 public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo test) {}
                 public void testPassed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
                 public void testFailed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
                 private void cleanup() {
                     var level = helper.getLevel();
+                    FIXTURES.remove(scope);
+                    // Discard owned entities even after they left their original structure.
+                    for (var entity : scope.entities) entity.discard();
                     // Keep forced chunks intact: another simultaneously running fixture may share one.
                     int minX = net.minecraft.util.Mth.floor(bounds.minX) >> 4;
                     int maxX = net.minecraft.util.Mth.floor(bounds.maxX) >> 4;
@@ -79,7 +149,7 @@ public final class Legacy {
                     .filter(f -> f.getType() == net.minecraft.gametest.framework.GameTestInfo.class).findFirst().orElseThrow();
             field.setAccessible(true);
             var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
-            info.addListener(new net.minecraft.gametest.framework.GameTestListener() {
+            addCleanupListener(info, new net.minecraft.gametest.framework.GameTestListener() {
                 public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo test) {}
                 public void testPassed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
                 public void testFailed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
