@@ -10,9 +10,10 @@ from fractions import Fraction as F
 RECIPES = {}
 ORDER = []
 
-def R(name, stage, station, inputs, out=1, t=0, fe=0, cat='material', note=''):
+def R(name, stage, station, inputs, out=1, t=0, fe=0, cat='material', note='', mod=None):
+    """mod: そのMODが入っているときだけ読まれるレシピ（neoforge:mod_loaded の条件。任意の連携の材料を使うとき）。"""
     RECIPES[name] = dict(stage=stage, station=station, inputs=inputs, out=out,
-                         t=t, fe=fe, cat=cat, note=note)
+                         t=t, fe=fe, cat=cat, note=note, mod=mod)
     ORDER.append(name)
 
 # 遺構回収物（探索でしか手に入らない）。そのままではレシピに使えない。
@@ -178,6 +179,10 @@ R('バックパックアップグレード', 2, '精密組立台', {'ホッパ�
   cat='part', note='アンドロイドの持ち物 +24スロット')
 R('タンクアップグレード', 2, '精密組立台', {'バケツ': 2, 'ガラス': 2, '鋼板': 2, '基礎回路': 1}, t=6, fe=100,
   cat='part', note='アンドロイドが液体・ガスを運べる（2種類まで、各32,000 mB）')
+R('ガスタンクアップグレード', 2, '精密組立台', {'基本ケミカルタンク': 1, 'オスミウムインゴット': 2, '鋼板': 2, '基礎回路': 1}, t=6, fe=100,
+  cat='part', note='アンドロイドが Mekanism のガス・化学物質を運べる（2種類まで、各32,000 mB）。Mekanism が必要', mod='mekanism')
+R('ガス・液体アップグレード', 2, '精密組立台', {'タンクアップグレード': 1, 'ガスタンクアップグレード': 1, '注入合金': 2, '基本制御回路': 1},
+  t=8, fe=200, cat='part', note='液体と化学物質を2種類ずつ運べる（各16,000 mB）。Mekanism が必要', mod='mekanism')
 R('採掘アップグレード', 2, '精密組立台', {'ダイヤモンドのツルハシ': 1, '鋼板': 2, '超伝導コイル': 1, '基礎回路': 1}, t=8, fe=100,
   cat='tool', note='アンドロイドが採掘できる。ツルハシのエンチャントを付けられる')
 R('伐採アップグレード', 2, '精密組立台', {'ダイヤモンドの斧': 1, '鋼板': 2, '超伝導コイル': 1, '基礎回路': 1}, t=8, fe=100,

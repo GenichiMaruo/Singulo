@@ -1219,9 +1219,17 @@
     "source": "Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.",
     "translation": "안드로이드가 주문한 완성품을 여기로 가져옵니다(주문할 때 납품처로 고름). 27칸 상자이며 화면에서 이름을 붙일 수 있고, 안의 물건은 옆 상자로 자동으로 옮깁니다."
   },
+  "desc.singulo.android_dual_tank_upgrade": {
+    "source": "Only works when Mekanism is installed. In the tank slot it gives two liquid tanks and two chemical tanks (16,000 mB each; the same total as a Tank Upgrade), for work that uses both. Glass tubes and gas cylinders show at its waist. It cannot be removed while they hold anything.",
+    "translation": "Mekanism이 설치되어 있을 때만 쓸 수 있습니다. 탱크 칸에 달면 액체 탱크 2개와 화학 물질 탱크 2개가 붙습니다(각 16,000 mB. 전체 양은 탱크 업그레이드와 같음). 액체와 화학 물질을 둘 다 쓰는 작업에 알맞습니다. 허리에 유리관과 가스통이 보입니다. 내용물이 남아 있는 동안에는 뗄 수 없습니다."
+  },
   "desc.singulo.android_felling_upgrade": {
     "source": "Lets a guard android do felling steps on procedure cards (cutting whole trees and replanting saplings), like a diamond axe. Takes Efficiency, Fortune and Silk Touch.",
     "translation": "호위 안드로이드에 달면 절차 카드의 벌목(나무를 통째로 베고 묘목을 다시 심기)을 할 수 있습니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다."
+  },
+  "desc.singulo.android_gas_tank_upgrade": {
+    "source": "Only works when Mekanism is installed. In the tank slot it gives two tanks for Mekanism chemicals (gases, infuse types, pigments, slurries; 32,000 mB each, one chemical per tank), so work can carry chemicals from the stockpile to machines. Gas cylinders show at its waist. Click a tank in the screen with a chemical tank to fill or draw. It cannot be removed while they hold anything.",
+    "translation": "Mekanism이 설치되어 있을 때만 쓸 수 있습니다. 탱크 칸에 달면 Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나를 수 있는 탱크가 2개 (각 32,000 mB, 하나에 1종류) 붙습니다. 작업에서 화학 물질을 재료 보관소에서 장치로 나릅니다. 허리에 가스통이 보입니다. 케미컬 탱크 등으로 화면의 탱크를 클릭하면 넣고 뺄 수 있습니다. 내용물이 남아 있는 동안에는 뗄 수 없습니다."
   },
   "desc.singulo.android_gate_glass": {
     "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
@@ -2691,6 +2699,18 @@
     "source": "%s%%",
     "translation": "%s%%"
   },
+  "gui.singulo.android.chem": {
+    "source": "Gas tank %s: %s %s / %s mB",
+    "translation": "가스 탱크%s: %s %s / %s mB"
+  },
+  "gui.singulo.android.chem.empty": {
+    "source": "Gas tank %s: empty",
+    "translation": "가스 탱크%s: 비어 있음"
+  },
+  "gui.singulo.android.chem.hint": {
+    "source": "Click with a chemical tank (Mekanism) or similar to fill or draw",
+    "translation": "케미컬 탱크(Mekanism) 등으로 클릭하면 넣거나 퍼냅니다"
+  },
   "gui.singulo.android.decor.0": {
     "source": "Head",
     "translation": "머리"
@@ -2955,9 +2975,21 @@
     "source": "Tank %s: %s, about %s / %s mB",
     "translation": "탱크%s: %s 약 %s / %s mB"
   },
+  "gui.singulo.android.tank.clear": {
+    "source": "Shift-click to dump the contents",
+    "translation": "Shift+클릭으로 내용물을 버립니다"
+  },
   "gui.singulo.android.tank.empty": {
     "source": "Tank %s: empty",
     "translation": "탱크%s: 비어 있음"
+  },
+  "gui.singulo.android.tank.hint": {
+    "source": "Click with a bucket or other container to fill or draw",
+    "translation": "양동이 등의 용기로 클릭하면 넣거나 퍼냅니다"
+  },
+  "gui.singulo.android.tank.locked": {
+    "source": "Cannot be used while working",
+    "translation": "작업 중에는 넣고 뺄 수 없습니다"
   },
   "gui.singulo.android.tools": {
     "source": "Tools",
@@ -4971,6 +5003,10 @@
     "source": "To craft, and materials (need / have)",
     "translation": "만드는 것과 재료(필요 / 재고)"
   },
+  "gui.singulo.work_console.needs_chem_tank": {
+    "source": "This order moves chemicals (Mekanism gases and the like), so only androids with a Gas Tank Upgrade or a Gas & Liquid Upgrade can be chosen",
+    "translation": "이 주문에는 화학 물질(Mekanism의 가스 등)을 나르는 공정이 있어서, 가스 탱크 업그레이드나 가스·액체 업그레이드를 단 안드로이드만 고를 수 있습니다"
+  },
   "gui.singulo.work_console.needs_feller": {
     "source": "This order includes felling, so only androids with a Felling Upgrade can be chosen",
     "translation": "이 주문에는 벌목 공정이 있어서, 벌목 업그레이드를 단 안드로이드만 고를 수 있습니다"
@@ -5268,8 +5304,8 @@
     "translation": "유적의 안드로이드"
   },
   "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩의 24칸이 더해집니다. 안에 물건이 있으면 뺄 수 없습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩의 24칸이 더해집니다. 안에 물건이 있으면 뺄 수 없습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
   },
   "guide.singulo.androids.upgrades.title": {
     "source": "Upgrades",
@@ -5775,7 +5811,15 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.android_dual_tank_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
   "howto.singulo.android_felling_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_gas_tank_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
@@ -6759,9 +6803,17 @@
     "source": "Android Wireless Charger",
     "translation": "안드로이드 무선 충전기"
   },
+  "item.singulo.android_dual_tank_upgrade": {
+    "source": "Gas & Liquid Upgrade",
+    "translation": "가스·액체 업그레이드"
+  },
   "item.singulo.android_felling_upgrade": {
     "source": "Felling Upgrade",
     "translation": "벌목 업그레이드"
+  },
+  "item.singulo.android_gas_tank_upgrade": {
+    "source": "Gas Tank Upgrade",
+    "translation": "가스 탱크 업그레이드"
   },
   "item.singulo.android_hair_flower": {
     "source": "Hair Flower",
@@ -8715,6 +8767,10 @@
     "source": "Stabilized",
     "translation": "안정화됨"
   },
+  "tooltip.singulo.chemical_sample": {
+    "source": "%s mB",
+    "translation": "%s mB"
+  },
   "tooltip.singulo.creative_catalyst.tier": {
     "source": "Acts as a tier %s catalyst",
     "translation": "티어 %s 촉매로 작동합니다"
@@ -8786,6 +8842,10 @@
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "혼합: 8개로 Lv2가 됨"
+  },
+  "tooltip.singulo.needs_mekanism": {
+    "source": "Only works when Mekanism is installed",
+    "translation": "Mekanism이 설치되어 있을 때만 쓸 수 있습니다"
   },
   "tooltip.singulo.planned": {
     "source": "Not functional yet; usable as a material",
@@ -8927,6 +8987,10 @@
     "source": "Used in: Patterned Android Barrier Glass",
     "translation": "사용 대상: 무늬 안드로이드 차단 유리"
   },
+  "uses.singulo.android_gas_tank_upgrade": {
+    "source": "Used in: Gas & Liquid Upgrade",
+    "translation": "사용 제품: 가스·액체 업그레이드"
+  },
   "uses.singulo.android_gate_glass": {
     "source": "Used in: Patterned Android Gate Glass",
     "translation": "사용 대상: 무늬 안드로이드 투과 유리"
@@ -8934,6 +8998,10 @@
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade",
     "translation": "사용 대상: 생산 업그레이드"
+  },
+  "uses.singulo.android_tank_upgrade": {
+    "source": "Used in: Gas & Liquid Upgrade",
+    "translation": "사용 제품: 가스·액체 업그레이드"
   },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
@@ -8944,8 +9012,8 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 37 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 37개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 38 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 38개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
@@ -9364,8 +9432,8 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 74 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 74개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 75 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 75개"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 51 more",

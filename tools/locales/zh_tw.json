@@ -1219,9 +1219,17 @@
     "source": "Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.",
     "translation": "仿生人把訂單的成品送到這裡（下單時選為交付目標）。27 格的箱子，可在介面中命名，裡面的物品會自動移到相鄰的箱子。"
   },
+  "desc.singulo.android_dual_tank_upgrade": {
+    "source": "Only works when Mekanism is installed. In the tank slot it gives two liquid tanks and two chemical tanks (16,000 mB each; the same total as a Tank Upgrade), for work that uses both. Glass tubes and gas cylinders show at its waist. It cannot be removed while they hold anything.",
+    "translation": "僅在安裝了 Mekanism 時可用。放入儲罐欄後，會裝上 2 個液體儲罐和 2 個化學品儲罐（各 16,000 mB。總量與儲罐升級相同）。適合同時使用液體和化學品的作業。腰部會出現玻璃筒和氣瓶。儲罐內還有內容物時無法取下。"
+  },
   "desc.singulo.android_felling_upgrade": {
     "source": "Lets a guard android do felling steps on procedure cards (cutting whole trees and replanting saplings), like a diamond axe. Takes Efficiency, Fortune and Silk Touch.",
     "translation": "裝在護衛仿生人上後，可執行步驟卡的伐木（整棵砍樹並補種樹苗），相當於鑽石斧。可附上效率、幸運和絲綢之觸。"
+  },
+  "desc.singulo.android_gas_tank_upgrade": {
+    "source": "Only works when Mekanism is installed. In the tank slot it gives two tanks for Mekanism chemicals (gases, infuse types, pigments, slurries; 32,000 mB each, one chemical per tank), so work can carry chemicals from the stockpile to machines. Gas cylinders show at its waist. Click a tank in the screen with a chemical tank to fill or draw. It cannot be removed while they hold anything.",
+    "translation": "僅在安裝了 Mekanism 時可用。放入儲罐欄後，會裝上 2 個能搬運 Mekanism 化學品（氣體、灌注物、顏料、漿液）的儲罐（各 32,000 mB，每個 1 種）。作業時會把化學品從資材存放處運到裝置。腰部會出現氣瓶。用化學品儲罐等點擊介面中的儲罐可以取放。儲罐內還有內容物時無法取下。"
   },
   "desc.singulo.android_gate_glass": {
     "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
@@ -2691,6 +2699,18 @@
     "source": "%s%%",
     "translation": "%s%%"
   },
+  "gui.singulo.android.chem": {
+    "source": "Gas tank %s: %s %s / %s mB",
+    "translation": "氣體儲罐%s：%s %s / %s mB"
+  },
+  "gui.singulo.android.chem.empty": {
+    "source": "Gas tank %s: empty",
+    "translation": "氣體儲罐%s：空"
+  },
+  "gui.singulo.android.chem.hint": {
+    "source": "Click with a chemical tank (Mekanism) or similar to fill or draw",
+    "translation": "用化學品儲罐（Mekanism）等點擊，可放入或取出"
+  },
   "gui.singulo.android.decor.0": {
     "source": "Head",
     "translation": "頭部"
@@ -2955,9 +2975,21 @@
     "source": "Tank %s: %s, about %s / %s mB",
     "translation": "儲罐%s：%s 約 %s / %s mB"
   },
+  "gui.singulo.android.tank.clear": {
+    "source": "Shift-click to dump the contents",
+    "translation": "Shift＋點擊，倒掉內容物"
+  },
   "gui.singulo.android.tank.empty": {
     "source": "Tank %s: empty",
     "translation": "儲罐%s：空"
+  },
+  "gui.singulo.android.tank.hint": {
+    "source": "Click with a bucket or other container to fill or draw",
+    "translation": "用桶等容器點擊，可放入或取出"
+  },
+  "gui.singulo.android.tank.locked": {
+    "source": "Cannot be used while working",
+    "translation": "作業中無法取放"
   },
   "gui.singulo.android.tools": {
     "source": "Tools",
@@ -4971,6 +5003,10 @@
     "source": "To craft, and materials (need / have)",
     "translation": "製作的物品與材料（需要 / 庫存）"
   },
+  "gui.singulo.work_console.needs_chem_tank": {
+    "source": "This order moves chemicals (Mekanism gases and the like), so only androids with a Gas Tank Upgrade or a Gas & Liquid Upgrade can be chosen",
+    "translation": "此訂單包含搬運化學品（Mekanism 的氣體等）的工序，只能選擇裝有氣體儲罐升級或氣體與液體升級的仿生人"
+  },
   "gui.singulo.work_console.needs_feller": {
     "source": "This order includes felling, so only androids with a Felling Upgrade can be chosen",
     "translation": "此訂單包含伐木工序，只能選擇裝有伐木升級的仿生人"
@@ -5268,8 +5304,8 @@
     "translation": "遺蹟的仿生人"
   },
   "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 生產升級：裝在組裝站後，最多列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流。用名字左邊的「1」「2」選擇介面顯示哪一個（行動方式等設定兩個共用）。\n- 在仿生人介面中點擊名字左邊的按鈕，切換到「裝備與物品」頁，就能放入升級。\n- 電池升級：每個使充滿電量增加 50%（最多兩個），充滿所需時間也相應變長。腰部會出現電池包。\n- 背包升級：在 5 格物品之外，再加上背包的 24 格。背包裡有物品時無法取下。\n- 採掘升級：使仿生人能進行採掘作業（相當於鑽石鎬）。可附上效率、幸運和絲綢之觸。\n- 伐木升級：使仿生人能進行伐木作業（相當於鑽石斧）。可附上效率、幸運和絲綢之觸。\n- 儲罐升級：2 個可裝液體或氣體的儲罐（各 32,000 mB，每個儲罐一種）。腰部會出現儲罐。儲罐裡還有東西時無法取下。\n- 作業開/關：為每個仿生人決定是否可以分配作業（自動化）。"
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 生產升級：裝在組裝站後，最多列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流。用名字左邊的「1」「2」選擇介面顯示哪一個（行動方式等設定兩個共用）。\n- 在仿生人介面中點擊名字左邊的按鈕，切換到「裝備與物品」頁，就能放入升級。\n- 電池升級：每個使充滿電量增加 50%（最多兩個），充滿所需時間也相應變長。腰部會出現電池包。\n- 背包升級：在 5 格物品之外，再加上背包的 24 格。背包裡有物品時無法取下。\n- 採掘升級：使仿生人能進行採掘作業（相當於鑽石鎬）。可附上效率、幸運和絲綢之觸。\n- 伐木升級：使仿生人能進行伐木作業（相當於鑽石斧）。可附上效率、幸運和絲綢之觸。\n- 儲罐升級：2 個可裝液體或氣體的儲罐（各 32,000 mB，每個儲罐一種）。腰部會出現儲罐。儲罐裡還有東西時無法取下。用桶等點擊介面中的儲罐可以取放，按住 Shift 點擊旁邊的 × 會倒掉內容物。\n- 氣體儲罐升級・氣體與液體升級（僅在安裝了 Mekanism 時）：可搬運 Mekanism 化學品（氣體、灌注物、顏料、漿液）的儲罐。氣體儲罐可裝 2 種化學品（各 32,000 mB），氣體與液體可裝液體和化學品各 2 種（各 16,000 mB）。腰部會出現氣瓶。用化學品儲罐等點擊介面中的儲罐可以取放。作業時，資材口旁的化學品儲罐會成為資材存放處，仿生人會把化學品運到裝置。\n- 作業開/關：為每個仿生人決定是否可以分配作業（自動化）。"
   },
   "guide.singulo.androids.upgrades.title": {
     "source": "Upgrades",
@@ -5775,7 +5811,15 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
   },
+  "howto.singulo.android_dual_tank_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
+  },
   "howto.singulo.android_felling_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
+  },
+  "howto.singulo.android_gas_tank_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
@@ -6759,9 +6803,17 @@
     "source": "Android Wireless Charger",
     "translation": "仿生人無線充電器"
   },
+  "item.singulo.android_dual_tank_upgrade": {
+    "source": "Gas & Liquid Upgrade",
+    "translation": "氣體與液體升級"
+  },
   "item.singulo.android_felling_upgrade": {
     "source": "Felling Upgrade",
     "translation": "伐木升級"
+  },
+  "item.singulo.android_gas_tank_upgrade": {
+    "source": "Gas Tank Upgrade",
+    "translation": "氣體儲罐升級"
   },
   "item.singulo.android_hair_flower": {
     "source": "Hair Flower",
@@ -8715,6 +8767,10 @@
     "source": "Stabilized",
     "translation": "已穩定化"
   },
+  "tooltip.singulo.chemical_sample": {
+    "source": "%s mB",
+    "translation": "%s mB"
+  },
   "tooltip.singulo.creative_catalyst.tier": {
     "source": "Acts as a tier %s catalyst",
     "translation": "視為第 %1$s 階催化劑"
@@ -8786,6 +8842,10 @@
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "混合：8個組成Lv2"
+  },
+  "tooltip.singulo.needs_mekanism": {
+    "source": "Only works when Mekanism is installed",
+    "translation": "僅在安裝了 Mekanism 時可用"
   },
   "tooltip.singulo.planned": {
     "source": "Not functional yet; usable as a material",
@@ -8927,6 +8987,10 @@
     "source": "Used in: Patterned Android Barrier Glass",
     "translation": "用於：花紋仿生人阻隔玻璃"
   },
+  "uses.singulo.android_gas_tank_upgrade": {
+    "source": "Used in: Gas & Liquid Upgrade",
+    "translation": "用於：氣體與液體升級"
+  },
   "uses.singulo.android_gate_glass": {
     "source": "Used in: Patterned Android Gate Glass",
     "translation": "用於：花紋仿生人透過玻璃"
@@ -8934,6 +8998,10 @@
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade",
     "translation": "用於：生產升級"
+  },
+  "uses.singulo.android_tank_upgrade": {
+    "source": "Used in: Gas & Liquid Upgrade",
+    "translation": "用於：氣體與液體升級"
   },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
@@ -8944,8 +9012,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 37 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 37 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 38 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 38 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
@@ -9364,8 +9432,8 @@
     "translation": "用於：基本框架、鋼板、壓縮機"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 74 more",
-    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 74 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 75 more",
+    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 75 個"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 51 more",

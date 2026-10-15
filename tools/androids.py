@@ -597,6 +597,9 @@ def item_textures(ti, save):
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
     save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
     save(droplet_icon(Image), ti / 'fluid_sample.png')
+    save(bubble_icon(Image), ti / 'chemical_sample.png')
+    save(wear(gas_tank_icon(Image), 33), ti / 'android_gas_tank_upgrade.png')
+    save(wear(dual_tank_icon(Image), 35), ti / 'android_dual_tank_upgrade.png')
     for n, (iid, (base, detail)) in enumerate(accessory_icons(Image).items()):
         if iid in FABRIC_ACCESSORIES:
             fabric(base, 41 + n)                       # 布の織り目
@@ -979,6 +982,61 @@ def droplet_icon(Image):
             px[x, y] = (shade, shade, shade, 255)
     for (x, y) in ((5, 9), (5, 10), (6, 8)):
         px[x, y] = (255, 255, 255, 255)
+    return im
+
+
+def bubble_icon(Image):
+    """化学物質の見本: 白い泡の集まり（化学物質の色に染めて使う）。大きな泡と小さな泡2つ、左上に光。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for cx, cy, r in ((7, 9, 4.6), (11.5, 4.5, 2.4), (3.5, 3.5, 1.6)):
+        for y in range(16):
+            for x in range(16):
+                d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+                if d <= r:
+                    shade = 150 if d > r - 1 else 255 - int(max(0, (x - cx) + (y - cy)) * 12)
+                    px[x, y] = (shade, shade, shade, 255)
+    for (x, y) in ((5, 7), (5, 8), (6, 6), (11, 3)):
+        px[x, y] = (255, 255, 255, 255)
+    return im
+
+
+def gas_cylinder(px, x0, band):
+    """ガスボンベ（4×10）: 鋼の胴、丸い肩、上にバルブ、真ん中に中身の色の帯。"""
+    steel, dark, light = (176, 184, 196, 255), (110, 118, 132, 255), (222, 228, 236, 255)
+    for y in range(4, 13):
+        for x in range(x0, x0 + 4):
+            px[x, y] = dark if x in (x0, x0 + 3) or y == 12 else steel
+    for x in range(x0 + 1, x0 + 3):
+        px[x, 3] = dark                                  # 肩
+        px[x, 2] = (90, 96, 108, 255)                   # バルブ
+    px[x0 + 1, 1] = (226, 186, 92, 255)                 # バルブのつまみ（金）
+    for x in range(x0 + 1, x0 + 3):
+        for y in (7, 8):
+            px[x, y] = band + (255,)                     # 中身の色の帯
+    px[x0 + 1, 5] = light                                # 光の反射
+
+
+def gas_tank_icon(Image):
+    """ガスタンクアップグレード: 基板の上に、ガスボンベが2本（帯は黄色と水色）。"""
+    im, px = upgrade_board(Image)
+    gas_cylinder(px, 4, (236, 214, 90))
+    gas_cylinder(px, 9, (110, 200, 240))
+    return im
+
+
+def dual_tank_icon(Image):
+    """ガス・液体アップグレード: 基板の上に、左はガラスの筒（水色の液体）、右はガスボンベ（黄色の帯）。"""
+    im, px = upgrade_board(Image)
+    x0, fluid = 4, (90, 170, 240, 255)
+    for y in range(3, 13):
+        for x in range(x0, x0 + 4):
+            edge = x in (x0, x0 + 3) or y in (3, 12)
+            px[x, y] = (200, 210, 222, 255) if edge else fluid if y >= 6 else (226, 238, 246, 255)
+    px[x0 + 1, 7] = (255, 255, 255, 255)
+    for x in range(x0 + 1, x0 + 3):
+        px[x, 2] = (120, 126, 136, 255)
+    gas_cylinder(px, 9, (236, 214, 90))
     return im
 
 

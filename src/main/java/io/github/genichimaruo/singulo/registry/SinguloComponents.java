@@ -49,6 +49,11 @@ public final class SinguloComponents {
             REGISTER.registerComponentType("fluid_sample", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
                     .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
 
+    /** 化学物質の見本（Mekanism の化学物質を、作業の自動化で物のように扱う目印）の、化学物質の ID と量。 */
+    public static final Supplier<DataComponentType<io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content>> CHEMICAL_SAMPLE =
+            REGISTER.registerComponentType("chemical_sample", b -> b.persistent(io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content.CODEC)
+                    .networkSynchronized(io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content.STREAM_CODEC));
+
     /** ホロ投影機で選んでいる大きさ（選択肢の番号）。 */
     public static final Supplier<DataComponentType<Integer>> HOLO_SIZE = REGISTER.registerComponentType("holo_size",
             b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));

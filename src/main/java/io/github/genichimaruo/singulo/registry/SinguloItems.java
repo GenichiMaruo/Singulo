@@ -118,6 +118,9 @@ public final class SinguloItems {
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
+    /** 化学物質の見本（Mekanism の化学物質。作業の自動化の内部の目印。手に入れる物ではない）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ChemicalSampleItem> CHEMICAL_SAMPLE = ITEMS.register(
+            "chemical_sample", () -> new io.github.genichimaruo.singulo.android.work.ChemicalSampleItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ProcedureCardItem> PROCEDURE_CARD = ITEMS.register(
             "procedure_card", () -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",

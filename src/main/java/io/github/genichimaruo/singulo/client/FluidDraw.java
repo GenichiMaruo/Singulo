@@ -44,11 +44,26 @@ public final class FluidDraw {
 
     /** 画面の (x, y) から w×h を、流体の絵を 16×16 ずつ並べて埋める（はみ出す所は絵を切る）。 */
     public static void fill(GuiGraphics g, Fluid fluid, int x, int y, int w, int h) {
+        fill(g, sprite(fluid), tint(fluid), x, y, w, h);
+    }
+
+    /** 化学物質（Mekanism）の絵と色で埋める（絵が分からなければ、白い絵を色で塗る）。 */
+    public static void fillChemical(GuiGraphics g, String id, int x, int y, int w, int h) {
+        fill(g, chemicalSprite(id), 0xFF000000 | io.github.genichimaruo.singulo.android.work.Chemicals.tint(id), x, y, w, h);
+    }
+
+    /** 化学物質の絵（ブロックの絵の束の中。なければ白い絵）。 */
+    public static TextureAtlasSprite chemicalSprite(String id) {
+        net.minecraft.resources.ResourceLocation icon = io.github.genichimaruo.singulo.android.work.Chemicals.icon(id);
+        var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+        return atlas.apply(icon == null ? net.minecraft.resources.ResourceLocation.withDefaultNamespace("block/white_concrete") : icon);
+    }
+
+    /** 画面の (x, y) から w×h を、絵 sprite を 16×16 ずつ並べ、色 argb で染めて埋める。 */
+    public static void fill(GuiGraphics g, TextureAtlasSprite sprite, int argb, int x, int y, int w, int h) {
         if (w <= 0 || h <= 0) {
             return;
         }
-        TextureAtlasSprite sprite = sprite(fluid);
-        int argb = tint(fluid);
         g.flush();
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
@@ -77,8 +92,18 @@ public final class FluidDraw {
      */
     public static void box(PoseStack pose, VertexConsumer vc, Fluid fluid, float x0, float y0, float z0, float x1, float y1, float z1,
                            int light, int alpha) {
-        TextureAtlasSprite s = sprite(fluid);
-        int argb = tint(fluid);
+        box(pose, vc, sprite(fluid), tint(fluid), x0, y0, z0, x1, y1, z1, light, alpha);
+    }
+
+    /** 化学物質（Mekanism）の絵と色で包んだ箱。 */
+    public static void chemicalBox(PoseStack pose, VertexConsumer vc, String id, float x0, float y0, float z0, float x1, float y1, float z1,
+                                   int light, int alpha) {
+        box(pose, vc, chemicalSprite(id), io.github.genichimaruo.singulo.android.work.Chemicals.tint(id), x0, y0, z0, x1, y1, z1, light, alpha);
+    }
+
+    /** 箱を、絵 s を色 argb で染めて包む。 */
+    public static void box(PoseStack pose, VertexConsumer vc, TextureAtlasSprite s, int argb, float x0, float y0, float z0, float x1, float y1,
+                           float z1, int light, int alpha) {
         int r = argb >> 16 & 0xFF, gr = argb >> 8 & 0xFF, bl = argb & 0xFF;
         PoseStack.Pose p = pose.last();
         float w = Math.abs(x1 - x0), h = Math.abs(y1 - y0), d = Math.abs(z1 - z0);

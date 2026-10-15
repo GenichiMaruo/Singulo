@@ -458,6 +458,29 @@ public final class AndroidGameTests {
         });
     }
 
+    /** タンクの画面: 水入りバケツでクリックするとタンクに入り（空のバケツが残る）、空のバケツで汲み、捨てるボタンで空になる。 */
+    @GameTest(template = EMPTY)
+    public static void tankTakesBuckets(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        a.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
+        var player = helper.makeMockServerPlayerInLevel();
+        player.containerMenu.setCarried(new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET));
+        helper.assertTrue(a.useTankContainer(player, 0), "水入りバケツでタンクに入れられない");
+        var water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1);
+        helper.assertTrue(a.tankAmount(water) == 1000 && player.containerMenu.getCarried().is(net.minecraft.world.item.Items.BUCKET),
+                "タンクに 1000 mB 入って、空のバケツが残らない: " + a.tankAmount(water));
+        helper.assertTrue(a.useTankContainer(player, 0) && player.containerMenu.getCarried().is(net.minecraft.world.item.Items.WATER_BUCKET)
+                && a.tankAmount(water) == 0, "空のバケツでタンクから汲めない");
+        player.containerMenu.setCarried(new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET));
+        a.useTankContainer(player, 1);
+        helper.assertTrue(a.clearTank(1) && a.tanksEmpty(), "捨てるボタンでタンクが空にならない");
+        a.discard();
+        helper.succeed();
+    }
+
     /** 範囲カード: 2つの角を記録すると、その範囲になる。 */
     @GameTest(template = EMPTY)
     public static void areaCardRecordsTwoCorners(GameTestHelper helper) {

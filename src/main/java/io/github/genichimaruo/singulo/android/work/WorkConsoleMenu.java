@@ -316,7 +316,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
                 int count = counted && button == 0 ? carried.getCount() : 1;
                 ItemStack fluid = counted ? FluidSamples.fromContainer(carried) : ItemStack.EMPTY;
                 encoder.setItem(encoderIndex(slotId), carried.isEmpty() ? ItemStack.EMPTY
-                        : FluidSamples.is(fluid) ? fluid : carried.copyWithCount(count));
+                        : FluidSamples.liquid(fluid) ? fluid : carried.copyWithCount(count));
                 if (!player.level().isClientSide && player.level().getBlockEntity(pos) instanceof WorkConsoleBlockEntity c) {
                     c.updateResult();
                 }

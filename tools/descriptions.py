@@ -416,6 +416,16 @@ DESC = {
         'Fitted to a guard android, each one raises its full charge by 50% (up to two). A battery pack appears on its waist for each.'),
     'タンクアップグレード': ('護衛のアンドロイドに積むと、液体やガスを運べるタンクが2つ（各32,000 mB、1つに1種類）付く。作業で流体を素材置き場から装置へ運ぶ。腰にタンクが見える。中身が残っている間は外せない。',
         'Gives a guard android two tanks for liquids and gases (32,000 mB each, one fluid per tank), so work can carry fluids from the stockpile to machines. The tanks show at its waist. It cannot be removed while they hold anything.'),
+    'ガスタンクアップグレード': ('Mekanism が入っているときだけ使える。タンクの欄に積むと、Mekanism の化学物質（ガス・注入材・顔料・スラリー）を運べるタンクが2つ'
+                         '（各32,000 mB、1つに1種類）付く。作業で化学物質を素材置き場から装置へ運ぶ。腰にガスボンベが見える。'
+                         'ケミカルタンクなどで画面のタンクをクリックすると出し入れできる。中身が残っている間は外せない。',
+        'Only works when Mekanism is installed. In the tank slot it gives two tanks for Mekanism chemicals (gases, infuse types, pigments, '
+        'slurries; 32,000 mB each, one chemical per tank), so work can carry chemicals from the stockpile to machines. Gas cylinders show at its '
+        'waist. Click a tank in the screen with a chemical tank to fill or draw. It cannot be removed while they hold anything.'),
+    'ガス・液体アップグレード': ('Mekanism が入っているときだけ使える。タンクの欄に積むと、液体のタンク2つと化学物質のタンク2つが付く（各16,000 mB。'
+                          '全体の量はタンクアップグレードと同じ）。液体と化学物質を両方使う作業に。腰にガラスの筒とガスボンベが見える。中身が残っている間は外せない。',
+        'Only works when Mekanism is installed. In the tank slot it gives two liquid tanks and two chemical tanks (16,000 mB each; the same total '
+        'as a Tank Upgrade), for work that uses both. Glass tubes and gas cylinders show at its waist. It cannot be removed while they hold anything.'),
     'バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が24スロット（縦4×横6）増える。背中にバックパックを背負う。',
         'Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.'),
     '伐採アップグレード': ('護衛のアンドロイドに積むと、手順カードの伐採（木を丸ごと切って苗木を植え直す）ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。',

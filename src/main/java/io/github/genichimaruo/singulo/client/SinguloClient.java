@@ -66,6 +66,12 @@ public final class SinguloClient {
         if (dark != null) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.dark_matter", dark).withStyle(ChatFormatting.GRAY));
         }
+        // Mekanism の化学物質のためのアップグレードは、Mekanism がなければ使えないことを知らせる
+        var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem());
+        if (Singulo.MODID.equals(id.getNamespace()) && (id.getPath().equals("android_gas_tank_upgrade") || id.getPath().equals("android_dual_tank_upgrade"))
+                && !io.github.genichimaruo.singulo.android.work.Chemicals.present()) {
+            event.getToolTip().add(Component.translatable("tooltip.singulo.needs_mekanism").withStyle(ChatFormatting.RED));
+        }
         UsesData data = event.getItemStack().get(SinguloComponents.USES.get());
         if (data != null && event.getItemStack().is(Items.ECHO_SHARD)) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.uses", data.remaining(), data.max())
@@ -200,6 +206,11 @@ public final class SinguloClient {
             }
             return 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
         }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get());
+        // 化学物質の見本は、化学物質の色に
+        event.register((stack, layer) -> {
+            String id = io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(stack);
+            return id.isEmpty() ? 0xFFFFFFFF : 0xFF000000 | io.github.genichimaruo.singulo.android.work.Chemicals.tint(id);
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.CHEMICAL_SAMPLE.get());
         // アンドロイドの装飾: 染める絵（layer0）だけを、染めた色に
         for (var acc : io.github.genichimaruo.singulo.registry.SinguloItems.ACCESSORIES) {
             event.register((stack, layer) -> layer == 0 && stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem a
@@ -212,6 +223,7 @@ public final class SinguloClient {
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.PROCEDURE_CARD.get(), WorkCardDecorator.RECIPE);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get(), FluidSampleDecorator.INSTANCE);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.CHEMICAL_SAMPLE.get(), FluidSampleDecorator.INSTANCE);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */

@@ -155,13 +155,19 @@ def recipe_files():
     out = {}  # 相対パス → json
     skipped = []
 
+    cond = {}
+
     def add(path, obj):
         if path in out:
             warn(f'レシピのパスが重複: {path}')
+        if cond.get('mod'):
+            # 任意の連携の材料を使うレシピ: そのMODが入っているときだけ読む
+            obj = {'neoforge:conditions': [{'type': 'neoforge:mod_loaded', 'modid': cond['mod']}], **obj}
         out[path] = obj
 
     for name in ORDER:
         r = RECIPES[name]
+        cond['mod'] = r.get('mod')
         station = r['station']
         if (name in STRUCTURES and name != '圧縮ブロックLv2（混成）') or station == 'マルチブロック組み立て':
             skipped.append(f'{name}（{station}）')
@@ -983,7 +989,16 @@ UI_LANG = {
     'gui.singulo.android.storage': ('収納', 'Storage'),
     'gui.singulo.android.tank': ('タンク%s: %s 約 %s / %s mB', 'Tank %s: %s, about %s / %s mB'),
     'gui.singulo.android.tank.empty': ('タンク%s: 空', 'Tank %s: empty'),
+    'gui.singulo.android.tank.hint': ('バケツなどの入れ物でクリックすると、入れる・汲む', 'Click with a bucket or other container to fill or draw'),
+    'gui.singulo.android.tank.locked': ('作業中は出し入れできない', 'Cannot be used while working'),
+    'gui.singulo.android.tank.clear': ('シフト＋クリックで、中身を捨てる', 'Shift-click to dump the contents'),
     'tooltip.singulo.fluid_sample': ('%s mB', '%s mB'),
+    'tooltip.singulo.chemical_sample': ('%s mB', '%s mB'),
+    'gui.singulo.work_console.needs_chem_tank': ('この注文には化学物質（Mekanism のガスなど）を運ぶ工程があるので、ガスタンクアップグレードかガス・液体アップグレードを積んだアンドロイドだけ選べる', 'This order moves chemicals (Mekanism gases and the like), so only androids with a Gas Tank Upgrade or a Gas & Liquid Upgrade can be chosen'),
+    'gui.singulo.android.chem': ('ガスタンク%s: %s %s / %s mB', 'Gas tank %s: %s %s / %s mB'),
+    'gui.singulo.android.chem.empty': ('ガスタンク%s: 空', 'Gas tank %s: empty'),
+    'gui.singulo.android.chem.hint': ('ケミカルタンク（Mekanism）などでクリックすると、入れる・汲む', 'Click with a chemical tank (Mekanism) or similar to fill or draw'),
+    'tooltip.singulo.needs_mekanism': ('Mekanism が入っているときだけ使える', 'Only works when Mekanism is installed'),
     'gui.singulo.android.tools': ('道具', 'Tools'),
     'gui.singulo.android.pack': ('バックパックの中', 'Backpack'),
     'gui.singulo.android.carry': ('持ち物', 'Carry'),
@@ -2609,6 +2624,9 @@ def fluid_sample_item_model():
     """流体の見本: しずくの絵（流体の色に染める）。"""
     write_json(ASSETS / 'models' / 'item' / 'fluid_sample.json',
                {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/fluid_sample'}})
+    # 化学物質の見本（Mekanism）: 泡の絵（化学物質の色に染める）
+    write_json(ASSETS / 'models' / 'item' / 'chemical_sample.json',
+               {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/chemical_sample'}})
 
 
 def work_card_item_model():
@@ -3070,7 +3088,7 @@ TAB_GROUPS = [
     ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
                'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
                'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
-               'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade', 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
+               'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade', 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
                'android_mining_upgrade', 'android_felling_upgrade', 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
                'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',

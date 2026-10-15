@@ -47,12 +47,12 @@ public final class MachineWatch {
         RecipeData r = s.recipe;
         net.minecraft.core.Direction outFace = outputFace(level, at, r);
         IItemHandler out = outFace == null ? null : level.getCapability(Capabilities.ItemHandler.BLOCK, at, outFace);
-        IFluidHandler fout = outFace == null ? null : level.getCapability(Capabilities.FluidHandler.BLOCK, at, outFace);
         if (!handlesInput(level, at, r) || !handlesOutput(level, at, r)) {
             s.collectReady = true;                 // 装置が壊された: 見に行く（作れないので、注文を取り消すことになる）
             return;
         }
-        long have = output(out, fout, r.output());
+        long have = outFace == null ? 0 : FluidSamples.liquid(r.output()) ? LiquidStores.machine(level, at, outFace).amount(r.output())
+                : output(out, r.output());
         long held = held(level, at, r);
         long sig = have * 1_000_003L + held;
         if (sig != s.watchSig) {
@@ -118,8 +118,7 @@ public final class MachineWatch {
     /** 取り出す面のどれかから、物か流体を出し入れできるか。 */
     public static boolean handlesOutput(Level level, BlockPos at, RecipeData r) {
         for (net.minecraft.core.Direction d : r.outputAuto() ? OUT_ORDER : new net.minecraft.core.Direction[] {r.outputFace()}) {
-            if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null
-                    || level.getCapability(Capabilities.FluidHandler.BLOCK, at, d) != null) {
+            if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
             }
         }
@@ -146,9 +145,9 @@ public final class MachineWatch {
                     return d;
                 }
             }
-            IFluidHandler f = level.getCapability(Capabilities.FluidHandler.BLOCK, at, d);
+            LiquidStores liquids = LiquidStores.machine(level, at, d);
             for (ItemStack o : r.outputs()) {
-                if (f != null && FluidSamples.is(o) && !f.drain(FluidSamples.fluid(o).copyWithAmount(1), IFluidHandler.FluidAction.SIMULATE).isEmpty()) {
+                if (FluidSamples.liquid(o) && liquids.drain(o, 1, true) > 0) {
                     return d;
                 }
             }
@@ -174,8 +173,7 @@ public final class MachineWatch {
     /** 素材を入れる面のどれかから、物か流体を出し入れできるか（装置として使えるか）。 */
     public static boolean handlesInput(Level level, BlockPos at, RecipeData r) {
         for (net.minecraft.core.Direction d : inputFaces(r)) {
-            if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null
-                    || level.getCapability(Capabilities.FluidHandler.BLOCK, at, d) != null) {
+            if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
             }
         }
@@ -201,9 +199,8 @@ public final class MachineWatch {
 
     /** 面 d から、今 item を入れられるか。 */
     private static boolean accepts(Level level, BlockPos at, net.minecraft.core.Direction d, ItemStack item) {
-        if (FluidSamples.is(item)) {
-            IFluidHandler h = level.getCapability(Capabilities.FluidHandler.BLOCK, at, d);
-            return h != null && h.fill(FluidSamples.fluid(item).copyWithAmount(1), IFluidHandler.FluidAction.SIMULATE) > 0;
+        if (FluidSamples.liquid(item)) {
+            return LiquidStores.machine(level, at, d).fill(item, 1, true) > 0;
         }
         if (level.getBlockEntity(at) instanceof net.minecraft.world.WorldlyContainer wc && !placeable(wc, d, item)) {
             return false;                          // かまどの横（燃料の欄）に焼く物を入れない
@@ -236,7 +233,7 @@ public final class MachineWatch {
      */
     public static ItemStack refusedInput(Level level, BlockPos at, RecipeData r) {
         for (ItemCount need : r.inputs()) {
-            if (FluidSamples.is(need.item)) {
+            if (FluidSamples.liquid(need.item)) {
                 continue;
             }
             boolean ok = false;
@@ -264,11 +261,8 @@ public final class MachineWatch {
         for (ItemCount need : r.inputs()) {
             for (net.minecraft.core.Direction d : inputFaces(r)) {
                 long here = 0;
-                if (FluidSamples.is(need.item)) {
-                    IFluidHandler h = level.getCapability(Capabilities.FluidHandler.BLOCK, at, d);
-                    if (h != null) {
-                        here = heldFluid(h, List.of(need));
-                    }
+                if (FluidSamples.liquid(need.item)) {
+                    here = LiquidStores.machine(level, at, d).amount(need.item);
                 } else {
                     IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, at, d);
                     if (h != null) {
@@ -284,21 +278,8 @@ public final class MachineWatch {
         return n;
     }
 
-    /** 出口にある、主な物の数（流体なら mB）。 */
-    private static long output(IItemHandler out, IFluidHandler fout, ItemStack main) {
-        if (FluidSamples.is(main)) {
-            if (fout == null) {
-                return 0;
-            }
-            FluidStack like = FluidSamples.fluid(main);
-            long n = 0;
-            for (int t = 0; t < fout.getTanks(); t++) {
-                if (FluidStack.isSameFluidSameComponents(fout.getFluidInTank(t), like)) {
-                    n += fout.getFluidInTank(t).getAmount();
-                }
-            }
-            return n;
-        }
+    /** 出口にある、主な物の数（物だけ。液体・化学物質は {@link LiquidStores#machine}）。 */
+    private static long output(IItemHandler out, ItemStack main) {
         long n = 0;
         for (int i = 0; out != null && i < out.getSlots(); i++) {
             if (ItemStack.isSameItemSameComponents(out.getStackInSlot(i), main)) {
@@ -325,7 +306,7 @@ public final class MachineWatch {
         for (int i = 0; i < h.getSlots(); i++) {
             ItemStack s = h.getStackInSlot(i);
             for (ItemCount in : inputs) {
-                if (!s.isEmpty() && !FluidSamples.is(in.item) && in.matches(s)) {
+                if (!s.isEmpty() && !FluidSamples.liquid(in.item) && in.matches(s)) {
                     n += s.getCount();
                     break;
                 }
@@ -334,20 +315,4 @@ public final class MachineWatch {
         return n;
     }
 
-    /** 装置（流体の入口）に残っている、入れた流体の量。 */
-    private static long heldFluid(IFluidHandler h, List<ItemCount> inputs) {
-        long n = 0;
-        for (ItemCount in : inputs) {
-            if (!FluidSamples.is(in.item)) {
-                continue;
-            }
-            FluidStack like = FluidSamples.fluid(in.item);
-            for (int t = 0; t < h.getTanks(); t++) {
-                if (FluidStack.isSameFluidSameComponents(h.getFluidInTank(t), like)) {
-                    n += h.getFluidInTank(t).getAmount();
-                }
-            }
-        }
-        return n;
-    }
 }

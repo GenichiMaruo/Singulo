@@ -33,6 +33,29 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private static final int PACK_X_FRAME = AndroidMenu.PACK_X - 4;
     /** タンクの目盛り（装備のページ、バックパックの下に2本）。 */
     private static final int TANK_Y = 111, TANK_W = 56, TANK_H = 8, TANK_GAP = 4;
+    /** タンクの目盛りの幅と、その右の「捨てる」ボタン（シフト＋クリック）。 */
+    private static final int BAR_W = 47, CLEAR_W = 8;
+
+    /** 装備のページのタンクの段（chem: 化学物質のタンク。液体と化学物質の両方なら、2段に細く並べる）。 */
+    private record TankRow(boolean chem, int y, int h) {}
+
+    private java.util.List<TankRow> tankRows() {
+        RuinAndroid a = menu.android();
+        if (a == null) {
+            return java.util.List.of();
+        }
+        boolean fluid = a.tankFill(0) >= 0, chem = a.chemFill(0) >= 0;
+        if (fluid && chem) {
+            return java.util.List.of(new TankRow(false, TANK_Y - 3, 6), new TankRow(true, TANK_Y + 5, 6));
+        }
+        return fluid ? java.util.List.of(new TankRow(false, TANK_Y, TANK_H)) : chem ? java.util.List.of(new TankRow(true, TANK_Y, TANK_H))
+                : java.util.List.of();
+    }
+
+    /** 積んでいるタンクのアップグレード（画面の欄の中身。タンクの大きさを決める）。 */
+    private net.minecraft.world.item.ItemStack tankUpgrade() {
+        return menu.getSlot(RuinAndroid.SLOT_TANK).getItem();
+    }
 
     private static final int PAPER = 0xFFE9ECF1;
     private static final int BORDER = 0xFF5C6475;
@@ -148,6 +171,26 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             dismantleArmed = 0;
             return true;
         }
+        if (gearPage() && minecraft != null && minecraft.gameMode != null) {
+            for (TankRow row : tankRows()) {
+                for (int i = 0; i < RuinAndroid.TANKS; i++) {
+                    int tx = leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                    if (Panel.inside(mouseX, mouseY, tx, topPos + row.y(), BAR_W, row.h()) && !menu.getCarried().isEmpty()) {
+                        // バケツ・ケミカルタンクなどで、タンクに入れる・タンクから汲む
+                        minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
+                                (row.chem() ? AndroidMenu.BUTTON_CHEM_USE : AndroidMenu.BUTTON_TANK_USE) + i);
+                        return true;
+                    }
+                    if (Panel.inside(mouseX, mouseY, tx + BAR_W + 1, topPos + row.y(), CLEAR_W, row.h())) {
+                        if (hasShiftDown()) {
+                            minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
+                                    (row.chem() ? AndroidMenu.BUTTON_CHEM_CLEAR : AndroidMenu.BUTTON_TANK_CLEAR) + i);
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
         if (gearPage() && Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W,
                 AndroidMenu.WORK_H) && minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_WORK);
@@ -230,14 +273,30 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.work.hint"), 180), mouseX, mouseY);
             }
             RuinAndroid android = menu.android();
-            for (int i = 0; android != null && android.tankFill(0) >= 0 && i < RuinAndroid.TANKS; i++) {
-                if (Panel.inside(mouseX, mouseY, leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP), topPos + TANK_Y, TANK_W, TANK_H)) {
-                    net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
-                    int amount = Math.round(android.tankFill(i) * RuinAndroid.TANK_CAPACITY);
-                    g.renderTooltip(font, fluid == null ? Component.translatable("gui.singulo.android.tank.empty", i + 1)
-                            : Component.translatable("gui.singulo.android.tank", i + 1,
-                                    new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName(), amount, RuinAndroid.TANK_CAPACITY),
-                            mouseX, mouseY);
+            for (TankRow row : android == null ? java.util.List.<TankRow>of() : tankRows()) {
+                for (int i = 0; i < RuinAndroid.TANKS; i++) {
+                    int tx = leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                    if (Panel.inside(mouseX, mouseY, tx, topPos + row.y(), BAR_W, row.h())) {
+                        java.util.List<Component> lines = new java.util.ArrayList<>();
+                        if (row.chem()) {
+                            String id = android.chemId(i);
+                            int cap = RuinAndroid.chemCapacity(tankUpgrade());
+                            lines.add(id.isEmpty() ? Component.translatable("gui.singulo.android.chem.empty", i + 1)
+                                    : Component.translatable("gui.singulo.android.chem", i + 1, io.github.genichimaruo.singulo.android.work.Chemicals.name(id),
+                                            Math.round(android.chemFill(i) * cap), cap));
+                        } else {
+                            net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                            int cap = RuinAndroid.fluidCapacity(tankUpgrade());
+                            lines.add(fluid == null ? Component.translatable("gui.singulo.android.tank.empty", i + 1)
+                                    : Component.translatable("gui.singulo.android.tank", i + 1,
+                                            new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName(), Math.round(android.tankFill(i) * cap), cap));
+                        }
+                        lines.add(Component.translatable(menu.working() ? "gui.singulo.android.tank.locked"
+                                : row.chem() ? "gui.singulo.android.chem.hint" : "gui.singulo.android.tank.hint").withStyle(net.minecraft.ChatFormatting.GRAY));
+                        g.renderComponentTooltip(font, lines, mouseX, mouseY);
+                    } else if (Panel.inside(mouseX, mouseY, tx + BAR_W + 1, topPos + row.y(), CLEAR_W, row.h())) {
+                        g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.tank.clear"), 160), mouseX, mouseY);
+                    }
                 }
             }
             return;
@@ -378,20 +437,40 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
                     y + AndroidMenu.PACK_Y + 4 * 18 - 1, 0xC8E9ECF1);
         }
-        // タンクアップグレード: タンクの中身（流体そのものの絵で、入っている割合まで。流れるアニメーションも動く）
+        // タンク: 中身そのものの絵で、入っている割合まで（流れるアニメーションも動く）。液体と化学物質（Mekanism）の段
         RuinAndroid android = menu.android();
-        if (android != null && android.tankFill(0) >= 0) {
+        for (TankRow row : android == null ? java.util.List.<TankRow>of() : tankRows()) {
+            int ty = y + row.y(), th = row.h();
             for (int i = 0; i < RuinAndroid.TANKS; i++) {
                 int tx = x + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
-                g.fill(tx - 1, y + TANK_Y - 1, tx + TANK_W + 1, y + TANK_Y + TANK_H + 1, BORDER);
-                g.fill(tx, y + TANK_Y, tx + TANK_W, y + TANK_Y + TANK_H, 0xFF2A3040);
-                net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
-                float fill = android.tankFill(i);
-                if (fluid != null && fill > 0) {
-                    FluidDraw.fill(g, fluid, tx, y + TANK_Y, Math.max(1, Math.round(TANK_W * Math.min(1, fill))), TANK_H);
+                // 捨てるボタン（小さな ×。シフト＋クリック）
+                int cx = tx + BAR_W + 1;
+                boolean ch = Panel.inside(mouseX, mouseY, cx, ty, CLEAR_W, th);
+                g.fill(cx, ty - 1, cx + CLEAR_W, ty + th + 1, BORDER);
+                g.fill(cx + 1, ty, cx + CLEAR_W - 1, ty + th, ch && hasShiftDown() ? 0xFFD05050 : ch ? 0xFF9AA0AC : 0xFFC4C9D2);
+                int arm = Math.min(4, th - 2);
+                for (int k = 0; k < arm; k++) {
+                    int ox = (4 - arm) / 2;
+                    g.fill(cx + 2 + ox + k, ty + 1 + k, cx + 3 + ox + k, ty + 2 + k, BORDER);
+                    g.fill(cx + 1 + ox + arm - k, ty + 1 + k, cx + 2 + ox + arm - k, ty + 2 + k, BORDER);
+                }
+                g.fill(tx - 1, ty - 1, tx + BAR_W + 1, ty + th + 1, BORDER);
+                g.fill(tx, ty, tx + BAR_W, ty + th, row.chem() ? 0xFF303A34 : 0xFF2A3040);
+                if (row.chem()) {
+                    String id = android.chemId(i);
+                    float fill = android.chemFill(i);
+                    if (!id.isEmpty() && fill > 0) {
+                        FluidDraw.fillChemical(g, id, tx, ty, Math.max(1, Math.round(BAR_W * Math.min(1, fill))), th);
+                    }
+                } else {
+                    net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                    float fill = android.tankFill(i);
+                    if (fluid != null && fill > 0) {
+                        FluidDraw.fill(g, fluid, tx, ty, Math.max(1, Math.round(BAR_W * Math.min(1, fill))), th);
+                    }
                 }
                 for (int m = 1; m < 4; m++) {
-                    g.fill(tx + TANK_W * m / 4, y + TANK_Y, tx + TANK_W * m / 4 + 1, y + TANK_Y + 2, 0x80FFFFFF);      // 目盛り
+                    g.fill(tx + BAR_W * m / 4, ty, tx + BAR_W * m / 4 + 1, ty + 2, 0x80FFFFFF);      // 目盛り
                 }
             }
         }

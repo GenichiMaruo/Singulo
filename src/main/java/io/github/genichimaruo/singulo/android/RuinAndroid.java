@@ -197,6 +197,11 @@ public abstract class RuinAndroid extends Monster {
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK)};
     private static final EntityDataAccessor<Integer> TANK_B = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 化学物質のタンクの見た目: 「ID;割合（0〜100）」。空なら「;0」、化学物質のタンクがなければ「-」。 */
+    @SuppressWarnings("unchecked")
+    private static final EntityDataAccessor<String>[] CHEM = new EntityDataAccessor[] {
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.STRING),
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.STRING)};
     /** 巡回の記録（アンドロイドの画面の「記録」のページに出すため）。 */
     private static final EntityDataAccessor<CompoundTag> PATROL_LOG = SynchedEntityData.defineId(RuinAndroid.class,
             EntityDataSerializers.COMPOUND_TAG);
@@ -342,8 +347,32 @@ public abstract class RuinAndroid extends Monster {
         return entityData.get(DECOR[part]);
     }
 
+    /** タンクの欄に積める物か（タンク・ガスタンク・ガス・液体のアップグレード）。 */
     public static boolean isTankUpgrade(net.minecraft.world.item.ItemStack stack) {
-        return isItem(stack, "android_tank_upgrade");
+        return isItem(stack, "android_tank_upgrade") || isItem(stack, "android_gas_tank_upgrade") || isItem(stack, "android_dual_tank_upgrade");
+    }
+
+    /**
+     * 積んだアップグレードの、液体のタンク1つの大きさ: タンク 32,000、ガス・液体 16,000（化学物質と分けるので半分）、ほかは 0。
+     */
+    public static int fluidCapacity(net.minecraft.world.item.ItemStack upgrade) {
+        return isItem(upgrade, "android_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+    }
+
+    /** 化学物質（Mekanism）のタンク1つの大きさ: ガスタンク 32,000、ガス・液体 16,000。Mekanism がなければ 0（使えない）。 */
+    public static int chemCapacity(net.minecraft.world.item.ItemStack upgrade) {
+        if (!io.github.genichimaruo.singulo.android.work.Chemicals.present()) {
+            return 0;
+        }
+        return isItem(upgrade, "android_gas_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+    }
+
+    public int fluidCapacity() {
+        return fluidCapacity(inventory.getItem(SLOT_TANK));
+    }
+
+    public int chemCapacity() {
+        return chemCapacity(inventory.getItem(SLOT_TANK));
     }
 
     // ------------------------------------------------------------------ タンク（流体）
@@ -353,15 +382,175 @@ public abstract class RuinAndroid extends Monster {
             new net.neoforged.neoforge.fluids.capability.templates.FluidTank(TANK_CAPACITY),
             new net.neoforged.neoforge.fluids.capability.templates.FluidTank(TANK_CAPACITY)};
 
-    /** タンクアップグレードを積んでいるか。 */
+    /** 液体のタンクを積んでいるか（タンクの大きさも、積んだアップグレードに合わせる）。 */
     public boolean hasTank() {
-        return isTankUpgrade(inventory.getItem(SLOT_TANK));
+        int cap = fluidCapacity();
+        for (var t : tanks) {
+            if (t.getCapacity() != cap && cap > 0) {
+                t.setCapacity(cap);
+            }
+        }
+        return cap > 0;
     }
 
-    /** タンクが空か（タンクアップグレードを外せるか）。 */
+    /** 化学物質のタンクを積んでいるか。 */
+    public boolean hasChemTank() {
+        return chemCapacity() > 0;
+    }
+
+    // ------------------------------------------------------------------ タンク（化学物質。Mekanism）
+
+    /** 化学物質のタンク: 中身の ID（空なら ""）と量。Mekanism の型は使わない（{@link io.github.genichimaruo.singulo.android.work.Chemicals}）。 */
+    private final String[] chemIds = {"", ""};
+    private final long[] chemAmounts = new long[TANKS];
+
+    /** この化学物質が、タンクにいくつあるか。 */
+    public long chemAmount(String id) {
+        long n = 0;
+        for (int i = 0; i < TANKS; i++) {
+            if (chemIds[i].equals(id)) {
+                n += chemAmounts[i];
+            }
+        }
+        return n;
+    }
+
+    /** あと、この化学物質をどれだけ入れられるか。 */
+    public long chemSpace(String id) {
+        int cap = chemCapacity();
+        long n = 0;
+        for (int i = 0; cap > 0 && i < TANKS; i++) {
+            if (chemIds[i].isEmpty() || chemIds[i].equals(id)) {
+                n += cap - chemAmounts[i];
+            }
+        }
+        return n;
+    }
+
+    /** 化学物質をタンクに入れる（同じ物のタンクから、そのあと空のタンク）。入った量。 */
+    public long fillChem(String id, long amount, boolean simulate) {
+        int cap = chemCapacity();
+        if (cap <= 0 || id.isEmpty() || amount <= 0) {
+            return 0;
+        }
+        long left = amount;
+        boolean[] used = new boolean[TANKS];
+        for (int pass = 0; pass < 2 && left > 0; pass++) {
+            for (int i = 0; i < TANKS && left > 0; i++) {
+                boolean same = chemIds[i].equals(id);
+                boolean empty = chemIds[i].isEmpty() && !used[i];
+                if (pass == 0 ? !same : !empty) {
+                    continue;
+                }
+                long put = Math.min(cap - chemAmounts[i], left);
+                if (put <= 0) {
+                    continue;
+                }
+                used[i] = true;
+                if (!simulate) {
+                    chemIds[i] = id;
+                    chemAmounts[i] += put;
+                }
+                left -= put;
+            }
+        }
+        if (!simulate) {
+            syncTanks();
+        }
+        return amount - left;
+    }
+
+    /** 化学物質をタンクから出す（最大 amount）。出た量。 */
+    public long drainChem(String id, long amount, boolean simulate) {
+        long got = 0;
+        for (int i = 0; i < TANKS && got < amount; i++) {
+            if (!chemIds[i].equals(id) || chemIds[i].isEmpty()) {
+                continue;
+            }
+            long take = Math.min(chemAmounts[i], amount - got);
+            got += take;
+            if (!simulate) {
+                chemAmounts[i] -= take;
+                if (chemAmounts[i] <= 0) {
+                    chemAmounts[i] = 0;
+                    chemIds[i] = "";
+                }
+            }
+        }
+        if (!simulate && got > 0) {
+            syncTanks();
+        }
+        return got;
+    }
+
+    /** 化学物質のタンクの中身（ID → 量）。 */
+    public java.util.Map<String, Long> chemicals() {
+        java.util.Map<String, Long> out = new java.util.LinkedHashMap<>();
+        for (int i = 0; i < TANKS; i++) {
+            if (!chemIds[i].isEmpty() && chemAmounts[i] > 0) {
+                out.merge(chemIds[i], chemAmounts[i], Long::sum);
+            }
+        }
+        return out;
+    }
+
+    // ------------------------------------------------------------------ 液体・化学物質を、見本（流体の見本・化学物質の見本）で扱う
+
+    /** 見本の流体・化学物質が、タンクにいくつあるか。 */
+    public long liquidAmount(net.minecraft.world.item.ItemStack sample) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return chemAmount(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
+        }
+        return tankAmount(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+    }
+
+    /** 見本の流体・化学物質を、あとどれだけ入れられるか。 */
+    public long liquidSpace(net.minecraft.world.item.ItemStack sample) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return chemSpace(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
+        }
+        return tankSpace(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+    }
+
+    /** 見本の流体・化学物質を amount 入れる。入った量。 */
+    public long fillLiquid(net.minecraft.world.item.ItemStack sample, long amount, boolean simulate) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return fillChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
+        }
+        var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
+        return f.isEmpty() ? 0 : fillTanks(f.copyWithAmount((int) Math.min(Integer.MAX_VALUE, amount)), simulate);
+    }
+
+    /** 見本の流体・化学物質を最大 amount 出す。出た量。 */
+    public long drainLiquid(net.minecraft.world.item.ItemStack sample, long amount, boolean simulate) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return drainChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
+        }
+        var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
+        return f.isEmpty() ? 0 : drainTanks(f, (int) Math.min(Integer.MAX_VALUE, amount), simulate).getAmount();
+    }
+
+    /** タンクの中身すべて（流体と化学物質の、量1の見本 → 量）。 */
+    public java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> liquids() {
+        java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> out = new java.util.ArrayList<>();
+        for (var f : tankFluids()) {
+            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.FluidSamples.of(f.copyWithAmount(1)), (long) f.getAmount()));
+        }
+        for (var e : chemicals().entrySet()) {
+            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.ChemicalSamples.of(e.getKey(), 1), e.getValue()));
+        }
+        return out;
+    }
+
+    /** タンクが空か（タンクアップグレードを外せるか）。化学物質のタンクも見る。 */
     public boolean tanksEmpty() {
         for (var t : tanks) {
             if (!t.isEmpty()) {
+                return false;
+            }
+        }
+        for (String id : chemIds) {
+            if (!id.isEmpty()) {
                 return false;
             }
         }
@@ -457,21 +646,175 @@ public abstract class RuinAndroid extends Monster {
         return got <= 0 ? net.neoforged.neoforge.fluids.FluidStack.EMPTY : like.copyWithAmount(got);
     }
 
+    /**
+     * 画面から: カーソルで持っている入れ物（バケツなど）を、タンク i に使う。中身があればタンクへ入れ（空か、同じ流体のタンクだけ）、
+     * 空の入れ物ならタンクから汲む。作業中は使えない（作業の素材なので）。使えたら true。
+     */
+    public boolean useTankContainer(Player player, int i) {
+        if (!hasTank() || i < 0 || i >= TANKS || isWorking()) {
+            return false;
+        }
+        net.minecraft.world.item.ItemStack carried = player.containerMenu.getCarried();
+        if (carried.isEmpty()) {
+            return false;
+        }
+        var handler = net.neoforged.neoforge.fluids.FluidUtil.getFluidHandler(carried.copyWithCount(1)).orElse(null);
+        if (handler == null) {
+            return false;
+        }
+        var tank = tanks[i];
+        var exec = net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        var contained = handler.drain(Integer.MAX_VALUE, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
+        boolean filled = false, emptied = false;
+        if (!contained.isEmpty() && (tank.isEmpty() || net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(tank.getFluid(), contained))) {
+            var got = handler.drain(Math.min(tank.getSpace(), contained.getAmount()), exec);     // バケツは1杯分入るときだけ
+            if (!got.isEmpty()) {
+                tank.fill(got, exec);
+                emptied = true;
+            }
+        } else if (contained.isEmpty() && !tank.isEmpty()) {
+            int put = handler.fill(tank.getFluid().copy(), exec);
+            if (put > 0) {
+                tank.drain(put, exec);
+                filled = true;
+            }
+        }
+        if (!filled && !emptied) {
+            return false;
+        }
+        net.minecraft.world.item.ItemStack result = handler.getContainer();
+        if (carried.getCount() == 1) {
+            player.containerMenu.setCarried(result);
+        } else {
+            carried.shrink(1);
+            if (!player.getInventory().add(result)) {
+                player.drop(result, false);
+            }
+        }
+        playSound(emptied ? SoundEvents.BUCKET_EMPTY : SoundEvents.BUCKET_FILL, 0.6F, 1.0F);
+        syncTanks();
+        return true;
+    }
+
+    /**
+     * 画面から: カーソルで持っている化学物質の入れ物（Mekanism のケミカルタンクなど）を、化学物質のタンク i に使う。
+     * 中身があればタンクへ入れ（空か、同じ物のタンクだけ）、空ならタンクから汲む。作業中は使えない。
+     */
+    public boolean useChemContainer(Player player, int i) {
+        int cap = chemCapacity();
+        if (cap <= 0 || i < 0 || i >= TANKS || isWorking()) {
+            return false;
+        }
+        net.minecraft.world.item.ItemStack carried = player.containerMenu.getCarried();
+        net.minecraft.world.item.ItemStack one = carried.copyWithCount(1);
+        var store = io.github.genichimaruo.singulo.android.work.Chemicals.itemStore(one);
+        if (store == null) {
+            return false;
+        }
+        var inside = io.github.genichimaruo.singulo.android.work.Chemicals.contained(one);
+        boolean moved = false;
+        if (inside != null && (chemIds[i].isEmpty() || chemIds[i].equals(inside.getKey()))) {
+            long got = store.extract(inside.getKey(), Math.min(cap - chemAmounts[i], inside.getValue()), false);
+            if (got > 0) {
+                chemIds[i] = inside.getKey();
+                chemAmounts[i] += got;
+                moved = true;
+            }
+        } else if (!chemIds[i].isEmpty()) {
+            long put = store.insert(chemIds[i], chemAmounts[i], false);
+            if (put > 0) {
+                chemAmounts[i] -= put;
+                if (chemAmounts[i] <= 0) {
+                    chemAmounts[i] = 0;
+                    chemIds[i] = "";
+                }
+                moved = true;
+            }
+        }
+        if (!moved) {
+            return false;
+        }
+        if (carried.getCount() == 1) {
+            player.containerMenu.setCarried(one);
+        } else {
+            carried.shrink(1);
+            if (!player.getInventory().add(one)) {
+                player.drop(one, false);
+            }
+        }
+        playSound(SoundEvents.BUCKET_FILL_POWDER_SNOW, 0.5F, 1.4F);
+        syncTanks();
+        return true;
+    }
+
+    /** 画面から: 化学物質のタンク i の中身を捨てる。作業中はできない。 */
+    public boolean clearChem(int i) {
+        if (chemCapacity() <= 0 || i < 0 || i >= TANKS || isWorking() || chemIds[i].isEmpty()) {
+            return false;
+        }
+        chemIds[i] = "";
+        chemAmounts[i] = 0;
+        playSound(SoundEvents.FIRE_EXTINGUISH, 0.3F, 1.6F);
+        syncTanks();
+        return true;
+    }
+
+    /** 画面から: タンク i の中身を捨てる。作業中はできない。 */
+    public boolean clearTank(int i) {
+        if (!hasTank() || i < 0 || i >= TANKS || isWorking() || tanks[i].isEmpty()) {
+            return false;
+        }
+        tanks[i].setFluid(net.neoforged.neoforge.fluids.FluidStack.EMPTY);
+        playSound(SoundEvents.BUCKET_EMPTY, 0.5F, 0.8F);
+        syncTanks();
+        return true;
+    }
+
     /** タンクの見た目を、クライアントへ知らせる。 */
     private void syncTanks() {
         if (level().isClientSide) {
             return;
         }
         boolean on = hasTank();
+        int cap = Math.max(1, fluidCapacity());
+        int chemCap = chemCapacity();
         for (int i = 0; i < TANKS; i++) {
             int v = -1;
             if (on) {
                 var f = tanks[i].getFluid();
                 v = f.isEmpty() ? 0 : (net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(f.getFluid()) + 1) << 8
-                        | Math.max(1, f.getAmount() * 100 / TANK_CAPACITY);
+                        | Math.max(1, f.getAmount() * 100 / cap);
             }
             entityData.set(i == 0 ? TANK_A : TANK_B, v);
+            entityData.set(CHEM[i], chemCap <= 0 ? "-"
+                    : chemIds[i] + ";" + (chemIds[i].isEmpty() ? 0 : Math.max(1, chemAmounts[i] * 100 / chemCap)));
         }
+    }
+
+    /** 化学物質のタンク i の入っている割合（クライアント。0〜1、化学物質のタンクがなければ -1）。 */
+    public float chemFill(int i) {
+        String v = entityData.get(CHEM[i]);
+        int sep = v.indexOf(';');
+        if (sep < 0) {
+            return -1;
+        }
+        try {
+            return Integer.parseInt(v.substring(sep + 1)) / 100F;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /** 化学物質のタンク i の中身の ID（クライアント。空なら ""）。 */
+    public String chemId(int i) {
+        String v = entityData.get(CHEM[i]);
+        int sep = v.indexOf(';');
+        return sep < 0 ? "" : v.substring(0, sep);
+    }
+
+    /** 液体のタンク1つの大きさ（クライアント。画面の数字のため）。 */
+    public int clientFluidCapacity() {
+        return fluidCapacity();
     }
 
     /** タンク i の入っている割合（クライアント。0〜1、タンクアップグレードがなければ -1）。 */
@@ -556,7 +899,28 @@ public abstract class RuinAndroid extends Monster {
             fluids.add(tank.writeToNBT(registryAccess(), new CompoundTag()));
         }
         t.put("tanks", fluids);
+        t.put("chem_tanks", saveChems());
         return t;
+    }
+
+    /** 化学物質のタンクを保存する形に。 */
+    private net.minecraft.nbt.ListTag saveChems() {
+        net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+        for (int i = 0; i < TANKS; i++) {
+            CompoundTag c = new CompoundTag();
+            c.putString("id", chemIds[i]);
+            c.putLong("amount", chemAmounts[i]);
+            list.add(c);
+        }
+        return list;
+    }
+
+    private void loadChems(net.minecraft.nbt.ListTag list) {
+        for (int i = 0; i < TANKS; i++) {
+            CompoundTag c = i < list.size() ? list.getCompound(i) : new CompoundTag();
+            chemIds[i] = c.getString("id");
+            chemAmounts[i] = chemIds[i].isEmpty() ? 0 : Math.max(0, c.getLong("amount"));
+        }
     }
 
     public void restoreWorkState(CompoundTag t) {
@@ -569,6 +933,7 @@ public abstract class RuinAndroid extends Monster {
                 tanks[i].readFromNBT(registryAccess(), fluids.getCompound(i));
             }
         }
+        loadChems(t.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
         syncTanks();
     }
 
@@ -903,6 +1268,9 @@ public abstract class RuinAndroid extends Monster {
             builder.define(d, net.minecraft.world.item.ItemStack.EMPTY);
         }
         builder.define(TANK_B, -1);
+        for (EntityDataAccessor<String> c : CHEM) {
+            builder.define(c, "-");
+        }
         builder.define(PATROL_LOG, new CompoundTag());
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
@@ -1690,6 +2058,7 @@ public abstract class RuinAndroid extends Monster {
             tl.add(t.writeToNBT(registryAccess(), new CompoundTag()));
         }
         tag.put("tanks", tl);
+        tag.put("chem_tanks", saveChems());
         tag.putBoolean("work", workEnabled);
         if (workConsole != null) {
             tag.put("work_console", NbtUtils.writeBlockPos(workConsole));
@@ -1740,6 +2109,7 @@ public abstract class RuinAndroid extends Monster {
                 tanks[i].readFromNBT(registryAccess(), tl.getCompound(i));
             }
         }
+        loadChems(tag.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
         syncTanks();
         workEnabled = !tag.contains("work") || tag.getBoolean("work");
         NbtUtils.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {

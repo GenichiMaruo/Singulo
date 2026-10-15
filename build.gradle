@@ -86,6 +86,14 @@ repositories {
             includeGroup 'net.mezzdev.config'
         }
     }
+    // Mekanism（化学物質のタンクアップグレード。任意の連携）
+    maven {
+        name = 'ModMaven'
+        url = 'https://modmaven.dev/'
+        content {
+            includeGroup 'mekanism'
+        }
+    }
 }
 
 dependencies {
@@ -93,6 +101,12 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    // Mekanism も任意の連携（入っていなくても遊べる。依存関係には書かない）。API だけでコンパイルし、
+    // -PwithMekanism を付けたときだけ、開発中の起動（クライアント・GameTest）に本体を入れる
+    compileOnly "mekanism:Mekanism:${mekanism_version}:api"
+    if (providers.gradleProperty('withMekanism').isPresent()) {
+        localRuntime "mekanism:Mekanism:${mekanism_version}"
+    }
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

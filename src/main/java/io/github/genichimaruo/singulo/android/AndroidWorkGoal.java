@@ -525,8 +525,6 @@ final class AndroidWorkGoal extends Goal {
         Direction outFace = io.github.genichimaruo.singulo.android.work.MachineWatch.outputFace(level, at, r);
         net.neoforged.neoforge.items.IItemHandler out = outFace == null ? null
                 : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, outFace);
-        net.neoforged.neoforge.fluids.capability.IFluidHandler fout = outFace == null ? null
-                : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, at, outFace);
         if (!io.github.genichimaruo.singulo.android.work.MachineWatch.handlesInput(level, at, r)
                 || !io.github.genichimaruo.singulo.android.work.MachineWatch.handlesOutput(level, at, r)) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
@@ -570,23 +568,26 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         long want = job.type() == WorkJob.Type.COLLECT ? job.amount() : step.crafts() * r.outputCount();
-        // 流体の出てくる物: 装置の流体の出口から、タンクへ（主な物は要る分だけ、ほかの物は全部）
-        if (fout != null) {
+        // 液体・化学物質の出てくる物: 装置の出口から、タンクへ（主な物は要る分だけ、ほかの物は全部）
+        if (outFace != null) {
+            io.github.genichimaruo.singulo.android.work.LiquidStores liquids = io.github.genichimaruo.singulo.android.work.LiquidStores.machine(level, at, outFace);
             for (ItemStack o : r.outputs()) {
-                if (!FluidSamples.is(o)) {
+                if (!FluidSamples.liquid(o)) {
                     continue;
                 }
                 boolean main = o == r.output();
-                var like = FluidSamples.fluid(o);
-                int limit = (int) Math.min(main ? want - collected : Integer.MAX_VALUE, android.tankSpace(like));
+                long limit = Math.min(main ? want - collected : Long.MAX_VALUE, android.liquidSpace(o));
                 if (limit <= 0) {
                     continue;
                 }
-                var got = fout.drain(like.copyWithAmount(limit), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                if (!got.isEmpty()) {
-                    android.fillTanks(got, false);
+                long got = liquids.drain(o, limit, false);
+                if (got > 0) {
+                    long in = android.fillLiquid(o, got, false);
+                    if (in < got) {
+                        liquids.fill(o, got - in, false);     // 入りきらなかった分は戻す
+                    }
                     if (main) {
-                        collected += got.getAmount();
+                        collected += in;
                     }
                     progress = true;
                 }
@@ -877,23 +878,26 @@ final class AndroidWorkGoal extends Goal {
         craftTimer = 0;
         boolean insert = ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.INSERT;
         long moved;
-        if (FluidSamples.is(what)) {
-            net.neoforged.neoforge.fluids.capability.IFluidHandler fh = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, ps.pos(), insert ? Direction.UP : Direction.DOWN);
-            if (fh == null) {
+        if (FluidSamples.liquid(what)) {
+            Direction face = insert ? Direction.UP : Direction.DOWN;
+            if (!io.github.genichimaruo.singulo.android.work.LiquidStores.handles(level, ps.pos(), face)) {
                 fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
                 return;
             }
-            var like = FluidSamples.fluid(what);
-            int limit = (int) Math.min(want - progress, Integer.MAX_VALUE);
+            io.github.genichimaruo.singulo.android.work.LiquidStores liquids = io.github.genichimaruo.singulo.android.work.LiquidStores.machine(level, ps.pos(), face);
+            long limit = want - progress;
             if (insert) {
-                var f = android.drainTanks(like, limit, true);
-                int put = fh.fill(f, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                android.drainTanks(like, put, false);
+                long can = android.drainLiquid(what, limit, true);
+                long put = liquids.fill(what, can, false);
+                android.drainLiquid(what, put, false);
                 moved = put;
             } else {
-                var got = fh.drain(like.copyWithAmount(Math.min(limit, android.tankSpace(like))), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                android.fillTanks(got, false);
-                moved = got.getAmount();
+                long got = liquids.drain(what, Math.min(limit, android.liquidSpace(what)), false);
+                long in = android.fillLiquid(what, got, false);
+                if (in < got) {
+                    liquids.fill(what, got - in, false);
+                }
+                moved = in;
             }
         } else {
             net.neoforged.neoforge.items.IItemHandler h = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
@@ -1997,20 +2001,20 @@ final class AndroidWorkGoal extends Goal {
             return face == null ? null : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, face);
         }, item -> {
             Direction face = io.github.genichimaruo.singulo.android.work.MachineWatch.inputFace(level, at, r, item);
-            return face == null ? null : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, at, face);
+            return face == null ? null : io.github.genichimaruo.singulo.android.work.LiquidStores.machine(level, at, face);
         }, r);
     }
 
-    /** 素材ごとに入れる先（items: 物の入れ口、fluids: 流体の入れ口。なければ null）を決めて、1回分を順に投入する。 */
+    /** 素材ごとに入れる先（items: 物の入れ口、liquids: 液体・化学物質の入れ口。なければ null）を決めて、1回分を順に投入する。 */
     private boolean insertOnce(java.util.function.Function<ItemStack, net.neoforged.neoforge.items.IItemHandler> items,
-                               java.util.function.Function<ItemStack, net.neoforged.neoforge.fluids.capability.IFluidHandler> fluids,
+                               java.util.function.Function<ItemStack, io.github.genichimaruo.singulo.android.work.LiquidStores> liquids,
                                RecipeData r) {
         processingMoved = false;
         if (processingPending == null) {
             java.util.List<ItemCount> inputs = r.inputs();
             for (ItemCount need : inputs) {
-                if (FluidSamples.is(need.item)) {
-                    if (android.tankAmount(FluidSamples.fluid(need.item)) < need.count) {
+                if (FluidSamples.liquid(need.item)) {
+                    if (android.liquidAmount(need.item) < need.count) {
                         return false;
                     }
                 } else {
@@ -2036,18 +2040,17 @@ final class AndroidWorkGoal extends Goal {
                 continue;
             }
             long moved = 0;
-            boolean fluid = FluidSamples.is(need.item);
-            net.neoforged.neoforge.fluids.capability.IFluidHandler fin = fluid ? fluids.apply(need.item) : null;
-            net.neoforged.neoforge.items.IItemHandler in = fluid ? null : items.apply(need.item);
-            if (FluidSamples.is(need.item) && fin != null) {
-                var like = FluidSamples.fluid(need.item);
-                var available = android.drainTanks(like, (int) Math.min(need.count, Integer.MAX_VALUE), true);
-                if (!available.isEmpty()) {
-                    int put = fin.fill(available, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                    android.drainTanks(like, put, false);
+            boolean liquid = FluidSamples.liquid(need.item);
+            io.github.genichimaruo.singulo.android.work.LiquidStores fin = liquid ? liquids.apply(need.item) : null;
+            net.neoforged.neoforge.items.IItemHandler in = liquid ? null : items.apply(need.item);
+            if (liquid && fin != null) {
+                long available = android.drainLiquid(need.item, need.count, true);
+                if (available > 0) {
+                    long put = fin.fill(need.item, available, false);
+                    android.drainLiquid(need.item, put, false);
                     moved = put;
                 }
-            } else if (in != null && !FluidSamples.is(need.item)) {
+            } else if (in != null && !liquid) {
                 moved = insertFromCarry(in, need.item, need.count);
             }
             if (moved > 0) {
@@ -2070,22 +2073,6 @@ final class AndroidWorkGoal extends Goal {
         processingPending = null;
         processingPaid = false;
         return true;
-    }
-
-    /** 装置（流体の入口）に、まだ入れた流体が残っているか（まだ加工している）。 */
-    private static boolean holdsFluid(net.neoforged.neoforge.fluids.capability.IFluidHandler h, java.util.List<ItemCount> inputs) {
-        for (ItemCount in : inputs) {
-            if (!FluidSamples.is(in.item)) {
-                continue;
-            }
-            var like = FluidSamples.fluid(in.item);
-            for (int t = 0; t < h.getTanks(); t++) {
-                if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(h.getFluidInTank(t), like)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private void deliver(WorkConsoleBlockEntity c, WorkJob job) {

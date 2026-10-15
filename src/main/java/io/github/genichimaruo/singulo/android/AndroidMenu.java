@@ -46,6 +46,10 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, D_WORK = 7,
             COUNT = 8;
     public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1, BUTTON_WORK = 2;
+    /** タンク i に、カーソルの入れ物を使う（BUTTON_TANK_USE + i）・中身を捨てる（BUTTON_TANK_CLEAR + i）。 */
+    public static final int BUTTON_TANK_USE = 10, BUTTON_TANK_CLEAR = 20;
+    /** 化学物質のタンク i に、カーソルの入れ物を使う・中身を捨てる。 */
+    public static final int BUTTON_CHEM_USE = 30, BUTTON_CHEM_CLEAR = 40;
 
     @Nullable
     private final RuinAndroid android;
@@ -130,7 +134,9 @@ public class AndroidMenu extends AbstractContainerMenu {
         addSlot(new PageSlot(items, RuinAndroid.SLOT_TANK, TANK_X, BACKPACK_Y, PAGE_GEAR, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return !working() && RuinAndroid.isTankUpgrade(stack);
+                // Mekanism がなければ、化学物質だけのタンク（ガスタンク）は何もできないので積まない
+                return !working() && RuinAndroid.isTankUpgrade(stack)
+                        && (RuinAndroid.fluidCapacity(stack) > 0 || RuinAndroid.chemCapacity(stack) > 0);
             }
 
             /** 中に流体が残っている間は、タンクを外せない。 */
@@ -265,6 +271,18 @@ public class AndroidMenu extends AbstractContainerMenu {
         if (id == BUTTON_WORK) {
             android.setWorkEnabled(!android.workEnabled());
             return true;
+        }
+        if (id >= BUTTON_TANK_USE && id < BUTTON_TANK_USE + RuinAndroid.TANKS) {
+            return android.useTankContainer(player, id - BUTTON_TANK_USE);
+        }
+        if (id >= BUTTON_TANK_CLEAR && id < BUTTON_TANK_CLEAR + RuinAndroid.TANKS) {
+            return android.clearTank(id - BUTTON_TANK_CLEAR);
+        }
+        if (id >= BUTTON_CHEM_USE && id < BUTTON_CHEM_USE + RuinAndroid.TANKS) {
+            return android.useChemContainer(player, id - BUTTON_CHEM_USE);
+        }
+        if (id >= BUTTON_CHEM_CLEAR && id < BUTTON_CHEM_CLEAR + RuinAndroid.TANKS) {
+            return android.clearChem(id - BUTTON_CHEM_CLEAR);
         }
         return false;
     }

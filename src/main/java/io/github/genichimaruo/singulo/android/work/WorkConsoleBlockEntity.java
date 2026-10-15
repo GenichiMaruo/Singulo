@@ -294,14 +294,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         Set<BlockPos> seen = new HashSet<>();
         for (BlockPos p : supplyPoints()) {
-            for (var h : fluidStoresAt(p, seen)) {
-                for (int t = 0; t < h.getTanks(); t++) {
-                    var f = h.getFluidInTank(t);
-                    if (!f.isEmpty()) {
-                        ItemCount.add(out, FluidSamples.of(f.copyWithAmount(1)), f.getAmount());
-                    }
-                }
-            }
+            LiquidStores.at(level, p, seen).addTo(out);       // 液体・化学物質（Mekanism）も、量で数える
         }
         return out;
     }
@@ -409,7 +402,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return Component.translatable("gui.singulo.work_console.error.no_android");
         }
         WorkOrder order = WorkOrder.create(nextOrderId++, plan, player.getUUID());
-        order.toStock = toStock || FluidSamples.is(target);
+        order.toStock = toStock || FluidSamples.liquid(target);
         order.destination = destination != null && !destination.equals(worldPosition) && deliveryPort(destination) != null ? destination : null;
         // どの工程も、選んだアンドロイドのだれかが一度に運べるか
         for (WorkOrder.StepState s : order.steps) {
@@ -566,7 +559,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** その面から、物か流体を出し入れできるか。 */
     private boolean handles(BlockPos pos, net.minecraft.core.Direction face) {
         return level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, face) != null
-                || level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, pos, face) != null;
+                || LiquidStores.handles(level, pos, face);
     }
 
     /** 作業台のレシピを作れるブロック（バニラの作業台か、アンドロイド作業台）。 */
@@ -609,8 +602,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     private static int stacks(ItemStack item, long count) {
-        if (FluidSamples.is(item)) {
-            return 0;                                  // 流体は持ち物ではなく、タンクに入る
+        if (FluidSamples.liquid(item)) {
+            return 0;                                  // 液体・化学物質は持ち物ではなく、タンクに入る
         }
         int max = Math.max(1, item.getMaxStackSize());
         return (int) ((count + max - 1) / max);
@@ -625,28 +618,36 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return o != null && o.orderer != null ? o.orderer : owner;
     }
 
-    /** 1回分の流体（入れる物・出てくる物）を、アンドロイドのタンクで何回分運べるか（流体がなければ上限なし）。 */
+    /**
+     * 1回分の液体・化学物質（入れる物・出てくる物）を、アンドロイドのタンクで何回分運べるか（どちらもなければ上限なし）。
+     * 液体は液体のタンク、化学物質は化学物質のタンク（Mekanism）に、それぞれ2種類まで。
+     */
     static long tankLimit(RuinAndroid a, RecipeData recipe) {
-        List<ItemCount> fluids = new ArrayList<>();
+        List<ItemCount> fluids = new ArrayList<>(), chems = new ArrayList<>();
         for (ItemCount in : recipe.inputs()) {
-            if (FluidSamples.is(in.item)) {
-                ItemCount.add(fluids, in.item, in.count);
+            if (FluidSamples.liquid(in.item)) {
+                ItemCount.add(ChemicalSamples.is(in.item) ? chems : fluids, in.item, in.count);
             }
         }
         for (ItemStack out : recipe.outputs()) {
-            if (FluidSamples.is(out)) {
-                ItemCount.add(fluids, FluidSamples.key(out), FluidSamples.amount(out));
+            if (FluidSamples.liquid(out)) {
+                ItemCount.add(ChemicalSamples.is(out) ? chems : fluids, FluidSamples.key(out), FluidSamples.amount(out));
             }
         }
-        if (fluids.isEmpty()) {
+        if (fluids.isEmpty() && chems.isEmpty()) {
             return Long.MAX_VALUE;
         }
-        if (!a.hasTank() || fluids.size() > RuinAndroid.TANKS) {
+        int fluidCap = a.fluidCapacity(), chemCap = a.chemCapacity();
+        if (!fluids.isEmpty() && (fluidCap <= 0 || fluids.size() > RuinAndroid.TANKS)
+                || !chems.isEmpty() && (chemCap <= 0 || chems.size() > RuinAndroid.TANKS)) {
             return 0;
         }
         long k = Long.MAX_VALUE;
         for (ItemCount f : fluids) {
-            k = Math.min(k, RuinAndroid.TANK_CAPACITY / Math.max(1, f.count));
+            k = Math.min(k, fluidCap / Math.max(1, f.count));
+        }
+        for (ItemCount c : chems) {
+            k = Math.min(k, chemCap / Math.max(1, c.count));
         }
         return k;
     }
@@ -793,7 +794,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
             if (left > 0) {
-                long amount = FluidSamples.is(o.target) ? Math.min(left, a.tankSpace(FluidSamples.fluid(o.target)))
+                long amount = FluidSamples.liquid(o.target) ? Math.min(left, a.liquidSpace(o.target))
                         : Math.min(left, (long) slots * o.target.getMaxStackSize());
                 if (amount <= 0) {
                     return WorkJob.simple(WorkJob.Type.WAIT, o.id);          // タンクがない・いっぱい
@@ -997,8 +998,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     private static long carried(RuinAndroid a, ItemStack like) {
-        if (FluidSamples.is(like)) {
-            return a.tankAmount(FluidSamples.fluid(like));
+        if (FluidSamples.liquid(like)) {
+            return a.liquidAmount(like);
         }
         long n = 0;
         for (int slot : a.carrySlots()) {
@@ -1108,8 +1109,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 受け渡し場所 point にある、この物（流体の見本なら流体）の数。 */
     private long countAt(BlockPos point, ItemStack item, List<IItemHandler> stores) {
-        if (FluidSamples.is(item)) {
-            return fluidIn(fluidStoresAt(point, new HashSet<>()), FluidSamples.fluid(item));
+        if (FluidSamples.liquid(item)) {
+            return LiquidStores.at(level, point).amount(item);
         }
         long here = 0;
         for (IItemHandler h : stores) {
@@ -1535,35 +1536,27 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 受け渡し場所で、そこにある物を持ち物へ取り出す（全部そろわなければ取らない）。 */
     public boolean fetchAt(RuinAndroid a, WorkJob job, Pickup pickup) {
         List<IItemHandler> stores = storagesAt(pickup.point(), new HashSet<>());
-        var fluids = fluidStoresAt(pickup.point(), new HashSet<>());
+        LiquidStores liquids = LiquidStores.at(level, pickup.point());
         for (ItemCount need : pickup.items()) {
             if (countAt(pickup.point(), need.item, stores) < need.count) {
                 return false;
             }
-            if (FluidSamples.is(need.item) && a.tankSpace(FluidSamples.fluid(need.item)) < need.count) {
+            if (FluidSamples.liquid(need.item) && a.liquidSpace(need.item) < need.count) {
                 return false;                          // タンクに入りきらない
             }
         }
         WorkOrder o = order(job.orderId());
         for (ItemCount need : pickup.items()) {
-            if (FluidSamples.is(need.item)) {
-                // 流体: 入れ物から抜いて、タンクへ
-                var like = FluidSamples.fluid(need.item);
-                long left = need.count;
-                for (var h : fluids) {
-                    if (left <= 0) {
-                        break;
-                    }
-                    var got = h.drain(like.copyWithAmount((int) Math.min(left, Integer.MAX_VALUE)),
-                            net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                    int in = a.fillTanks(got, false);
-                    if (in < got.getAmount()) {
-                        h.fill(got.copyWithAmount(got.getAmount() - in), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                    }
-                    left -= in;
+            if (FluidSamples.liquid(need.item)) {
+                // 液体・化学物質: 入れ物から抜いて、タンクへ（入りきる分だけ抜く）
+                long room = Math.min(need.count, a.fillLiquid(need.item, need.count, true));
+                long got = liquids.drain(need.item, room, false);
+                long in = a.fillLiquid(need.item, got, false);
+                if (in < got) {
+                    liquids.fill(need.item, got - in, false);         // 入りきらなかった分は戻す（ふつうは起きない）
                 }
                 if (o != null) {
-                    o.release(pickup.point(), need.item, need.count - left);
+                    o.release(pickup.point(), need.item, in);
                 }
                 continue;
             }
@@ -1615,23 +1608,17 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             a.inventory().setItem(slot, rest);
             all &= rest.isEmpty();
         }
-        // タンクの流体も、隣の入れ物へ戻す
-        for (var f : a.tankFluids()) {
-            int moved = 0;
-            for (var h : fluidStoresAt(point, new HashSet<>())) {
-                int in = h.fill(f.copyWithAmount(f.getAmount() - moved), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                moved += in;
-                if (moved >= f.getAmount()) {
-                    break;
-                }
-            }
+        // タンクの液体・化学物質も、隣の入れ物へ戻す
+        LiquidStores liquids = LiquidStores.at(level, point);
+        for (var e : a.liquids()) {
+            long moved = liquids.fill(e.getKey(), e.getValue(), false);
             if (moved > 0) {
-                a.drainTanks(f, moved, false);
+                a.drainLiquid(e.getKey(), moved, false);
                 if (o != null) {
-                    o.hold(point, FluidSamples.of(f.copyWithAmount(1)), moved);
+                    o.hold(point, e.getKey(), moved);
                 }
             }
-            all &= moved >= f.getAmount();
+            all &= moved >= e.getValue();
         }
         if (!all && o != null) {
             o.status = WorkOrder.WAIT_SPACE;
@@ -1677,7 +1664,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         BlockPos at = destination(job);
         DeliveryPortBlockEntity port = deliveryPort(at);
         WorkOrder o = order(job.orderId());
-        if (FluidSamples.is(job.fetch().get(0).item)) {
+        if (FluidSamples.liquid(job.fetch().get(0).item)) {
             return deliverFluid(a, job, at, o, active);
         }
         IItemHandler box = o != null && o.toStock ? stockHandler(at) : port != null ? port.handler() : outboxHandler;
@@ -1706,18 +1693,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return all;
     }
 
-    /** 流体の完成品を、届け先の隣の入れ物へ入れる。全部入れば true。 */
+    /** 液体・化学物質の完成品を、届け先の隣の入れ物へ入れる。全部入れば true。 */
     private boolean deliverFluid(RuinAndroid a, WorkJob job, BlockPos at, @Nullable WorkOrder o, WorkJob.Lease active) {
-        var like = FluidSamples.fluid(job.fetch().get(0).item);
-        int want = (int) Math.min(active.remainingDelivery, a.tankAmount(like));
-        int moved = 0;
-        for (var h : fluidStoresAt(at, new HashSet<>())) {
-            if (moved >= want) {
-                break;
-            }
-            moved += h.fill(like.copyWithAmount(want - moved), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-        }
-        a.drainTanks(like, moved, false);
+        ItemStack like = job.fetch().get(0).item;
+        long want = Math.min(active.remainingDelivery, a.liquidAmount(like));
+        long moved = LiquidStores.at(level, at).fill(like, want, false);
+        a.drainLiquid(like, moved, false);
         active.remainingDelivery = Math.max(0, active.remainingDelivery - moved);
         boolean all = active.remainingDelivery == 0;
         if (o != null) {
@@ -1969,7 +1950,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
             if (!found) {
-                merged.add(FluidSamples.is(s) ? s.copy() : s.copyWithCount(Math.min(64, s.getCount())));
+                merged.add(FluidSamples.liquid(s) ? s.copy() : s.copyWithCount(Math.min(64, s.getCount())));
             }
         }
         for (int i = 0; i < GRID; i++) {
@@ -1990,7 +1971,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return;
         }
         ItemStack s = encoder.getItem(index);
-        if (FluidSamples.is(s)) {
+        if (FluidSamples.liquid(s)) {
             int amount = (int) FluidSamples.amount(s);
             encoder.setItem(index, FluidSamples.withAmount(s, Math.max(1, Math.min(1_000_000, amount + delta * 100))));
         } else if (!s.isEmpty()) {

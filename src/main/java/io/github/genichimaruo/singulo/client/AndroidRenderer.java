@@ -599,7 +599,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         @Override
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float age, float netHeadYaw, float headPitch) {
-            if (android.tankFill(0) < 0 || !android.printed()) {
+            boolean fluids = android.tankFill(0) >= 0, chems = android.chemFill(0) >= 0;
+            if (!fluids && !chems || !android.printed()) {
                 return;
             }
             for (int i = 0; i < RuinAndroid.TANKS; i++) {
@@ -607,9 +608,17 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.pushPose();
                 getParentModel().toHipSide(pose, left);
                 float s = left ? 1 : -1;
-                // 筒の大きさ（ピクセル）: 外側へ出して、太さ 1.8、高さ 3.6
-                float x0 = s * 0.55F / 16, x1 = s * 2.35F / 16, y0 = 0.6F / 16, y1 = 4.2F / 16, z0 = -0.9F / 16, z1 = 0.9F / 16;
+                // 筒の大きさ（ピクセル）: 外側へ出して、太さ 1.8、高さ 3.6。液体と化学物質の両方なら、前に筒、後ろにボンベを細く並べる
+                float x0 = s * 0.55F / 16, x1 = s * 2.35F / 16, y0 = 0.6F / 16, y1 = 4.2F / 16;
+                float z0 = -0.9F / 16, z1 = fluids && chems ? -0.05F / 16 : 0.9F / 16;
                 float lo = Math.min(x0, x1), hi = Math.max(x0, x1);
+                if (chems) {
+                    cylinder(pose, buffers, light, android, i, lo, hi, y0, y1, fluids ? 0.05F / 16 : -0.9F / 16, 0.9F / 16);
+                }
+                if (!fluids) {
+                    pose.popPose();
+                    continue;
+                }
                 VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
                 FxDraw.box(pose, metal, lo, y0 - 0.35F / 16, z0, hi, y0, z1, light, 0x8C94A2, 255);
                 FxDraw.box(pose, metal, lo, y1, z0, hi, y1 + 0.35F / 16, z1, light, 0x8C94A2, 255);
@@ -626,6 +635,34 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 VertexConsumer glass = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
                 FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
                 pose.popPose();
+            }
+        }
+
+        /**
+         * ガスボンベ（化学物質のタンク）: 鋼の胴と丸い肩、上にバルブと金のつまみ、肩の下に中身の色の帯、前に中身の見える細い窓
+         * （化学物質そのものの絵で、入っている高さまで）。
+         */
+        private void cylinder(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, int i, float lo, float hi, float y0, float y1,
+                              float z0, float z1) {
+            float p = 1 / 16F;
+            VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            int steel = 0xB4BCC8, dark = 0x6E7684;
+            FxDraw.box(pose, metal, lo, y0 - 0.3F * p, z0, hi, y1 - 0.4F * p, z1, light, steel, 255);                            // 胴
+            float inset = 0.25F * p;
+            FxDraw.box(pose, metal, lo + inset, y1 - 0.4F * p, z0 + inset, hi - inset, y1 + 0.2F * p, z1 - inset, light, dark, 255);   // 肩
+            float mx = (lo + hi) / 2, mz = (z0 + z1) / 2, v = 0.3F * p;
+            FxDraw.box(pose, metal, mx - v, y1 + 0.2F * p, mz - v, mx + v, y1 + 0.8F * p, mz + v, light, 0x5A606C, 255);          // バルブ
+            FxDraw.box(pose, metal, mx - 0.5F * p, y1 + 0.8F * p, mz - 0.15F * p, mx + 0.5F * p, y1 + 1.0F * p, mz + 0.15F * p, light, 0xE2BA5C, 255);
+            String id = android.chemId(i);
+            float fill = android.chemFill(i);
+            int band = id.isEmpty() ? 0x9AA2AE : io.github.genichimaruo.singulo.android.work.Chemicals.tint(id);
+            FxDraw.box(pose, metal, lo - 0.02F * p, y1 - 1.2F * p, z0 - 0.02F * p, hi + 0.02F * p, y1 - 0.8F * p, z1 + 0.02F * p, light, band, 255);  // 帯
+            // 前の窓（暗いガラスの奥に、入っている高さまで中身）
+            float wx0 = lo + 0.45F * (hi - lo), wx1 = hi - 0.2F * (hi - lo), wy0 = y0 + 0.2F * p, wy1 = y1 - 1.5F * p, wz = z0 - 0.01F * p;
+            FxDraw.box(pose, metal, wx0, wy0, wz - 0.02F * p, wx1, wy1, wz, light, 0x2A3040, 255);
+            if (!id.isEmpty() && fill > 0) {
+                VertexConsumer chem = buffers.getBuffer(RenderType.entityTranslucent(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
+                FluidDraw.chemicalBox(pose, chem, id, wx0, wy0, wz - 0.04F * p, wx1, wy0 + (wy1 - wy0) * Math.min(1, fill), wz - 0.02F * p, light, 235);
             }
         }
     }
