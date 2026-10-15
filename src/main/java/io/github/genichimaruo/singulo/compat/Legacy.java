@@ -19,6 +19,7 @@ public final class Legacy {
     public static java.util.UUID uuid(net.minecraft.resources.ResourceLocation id) {
         return java.util.UUID.nameUUIDFromBytes(id.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
+    public static boolean sameFluid(net.minecraftforge.fluids.FluidStack a, net.minecraftforge.fluids.FluidStack b) { return a.isFluidEqual(b); }
     private Legacy() {}
     /** Forge 1.20.1's vanilla GameTest mock lacks a channel before player login hooks run. */
     public static net.minecraft.server.level.ServerPlayer mockServerPlayer(net.minecraft.gametest.framework.GameTestHelper helper) {

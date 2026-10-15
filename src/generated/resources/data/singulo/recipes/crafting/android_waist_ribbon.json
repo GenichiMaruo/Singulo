@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "W W",
+    " S ",
+    "W W"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "S": {
+      "tag": "forge:strings"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_waist_ribbon"
+  }
+}

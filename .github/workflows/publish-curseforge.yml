@@ -2,7 +2,9 @@ name: Publish CurseForge and GitHub Beta
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v*-1.20.1F']
+    branches: [port/1.20.1-forge]
+    paths: ['gradle.properties']
   workflow_dispatch:
 
 permissions:
@@ -15,6 +17,9 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     environment: curseforge
     outputs:
       name: ${{ steps.version.outputs.name }}
@@ -23,7 +28,9 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '25'
+          java-version: |
+            17
+            21
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -44,12 +51,17 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "name=$mod_name-$version-$minecraft$suffix" >> "$GITHUB_OUTPUT"
           echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
-      - name: Validate translations
-        run: python tools/localization.py --check
+      - name: Validate source and resources
+        run: |
+          python tools/localization.py --check
+          python tools/check_models.py
+          python tools/check_supporters.py
+          python tools/check_port_1201.py
       - name: Build and run GameTests
         run: |
           chmod +x gradlew
-          ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" build runGameTestServer
+          ./gradlew --no-daemon --max-workers=2 -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64 build runGameTestServer
+          python3 tools/check_port_1201.py --jar "build/libs/${{ steps.version.outputs.name }}.jar"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.version.outputs.name }}
@@ -73,7 +85,6 @@ jobs:
 
   github-release:
     needs: publish
-    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -87,9 +98,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_NAME: ${{ needs.publish.outputs.name }}
+          GH_TARGET: ${{ github.sha }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "dist/$RELEASE_NAME.jar" \
-            --repo "$GITHUB_REPOSITORY" --verify-tag \
+          gh release create "v$(sed -n 's/^mod_version=//p' gradle.properties)-1.20.1F" "dist/$RELEASE_NAME.jar" \
+            --repo "$GITHUB_REPOSITORY" --target "$GH_TARGET" \
             --title "$RELEASE_NAME (Beta)" \
             --notes-file "docs/curseforge/changelog-$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r').md" \
             --prerelease --latest=false

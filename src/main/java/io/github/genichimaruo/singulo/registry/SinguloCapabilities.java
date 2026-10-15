@@ -43,6 +43,8 @@ public final class SinguloCapabilities {
                 (be, side) -> be.tank());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_CELL.get(),
                 (be, side) -> be.energyFor(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_DELIVERY_PORT.get(), (be, side) -> be.handler());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_WORK_CONSOLE.get(), (be, side) -> be.outboxHandler());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.COSMIC_MUON_COLLECTOR.get(),
                 (be, side) -> be.automationItems());
         catalystDevice(event, SinguloBlockEntities.WORLDLINE_ANCHOR.get());

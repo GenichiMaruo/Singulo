@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 2,
+  "time": 160,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:android_kit"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:basic_circuit"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:ceramic_substrate"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:android_production_upgrade",
+    "count": 1
+  }
+}

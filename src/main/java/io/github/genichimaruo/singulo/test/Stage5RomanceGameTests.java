@@ -159,7 +159,7 @@ public final class Stage5RomanceGameTests {
      * 許可証: 登録された人がいると、守りの中で登録されていない人は止められ、登録した人は止められない。
      * 放射冠はだれでも壊せる扱いで、壊れるとシールドが止まる。
      */
-    @GameTest(template = HUGE, batch = "shield_permit", setupTicks = 20, timeoutTicks = 160)
+    @GameTest(template = HUGE, batch = "shield_permit", timeoutTicks = 80)
     public static void shieldPermitLocksOutsiders(GameTestHelper helper) {
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
         var player = TestBuild.mockPlayer(helper);
@@ -167,9 +167,8 @@ public final class Stage5RomanceGameTests {
         shield.permit().setStackInSlot(0, permit);
         BlockPos inside = helper.absolutePos(new BlockPos(2, 1, 2));
         BlockPos crown = helper.absolutePos(new BlockPos(7, 9, 4));   // コントローラ (7,2,2) から上へ7・奥へ2
-        helper.startSequence()
-                .thenWaitUntil(() -> helper.assertTrue(shield.protectionLevel() == 4, "守りが始まらない: " + shield.status()))
-                .thenExecute(() -> {
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(shield.protectionLevel() == 4, "守りが始まらない: " + shield.status());
             helper.assertTrue(!ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "だれも登録されていないのに止められた");
             // ほかの人だけを登録する
             ItemStack card = shield.permit().getStackInSlot(0);
@@ -187,21 +186,21 @@ public final class Stage5RomanceGameTests {
             helper.assertTrue(ShieldTowerBlockEntity.isActiveCrown(helper.getLevel(), crown), "放射冠の位置がわからない");
             helper.getLevel().destroyBlock(crown, false);
             ShieldTowerBlockEntity.onCrownBroken(helper.getLevel(), crown);
-        })
-                .thenExecuteAfter(5, () -> {
+        });
+        helper.runAtTickTime(10, () -> {
             helper.assertTrue(shield.protectionLevel() == 0, "放射冠を壊してもシールドが止まらない");
             player.discard();
-        }).thenSucceed();
+            helper.succeed();
+        });
     }
 
-    @GameTest(template = HUGE, batch = "shield", setupTicks = 20, timeoutTicks = 160)
+    @GameTest(template = HUGE, batch = "shield", timeoutTicks = 40)
     public static void shieldTowerStopsExplosionsAndGriefing(GameTestHelper helper) {
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
         BlockPos dirt = new BlockPos(2, 1, 2);
         helper.setBlock(dirt, Blocks.DIRT);
-        helper.startSequence()
-                .thenWaitUntil(() -> helper.assertTrue(shield.protectionLevel() == 4, "時間結晶触媒で守りが始まらない: " + shield.status()))
-                .thenExecute(() -> {
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(shield.protectionLevel() == 4, "時間結晶触媒で守りが始まらない: " + shield.status());
             BlockPos at = helper.absolutePos(dirt.above());
             helper.getLevel().explode(null, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 3.0F,
                     Level.ExplosionInteraction.TNT);
@@ -210,13 +209,14 @@ public final class Stage5RomanceGameTests {
             helper.assertTrue(!ShieldTowerBlockEntity.shielded(helper.getLevel(), zombie.position(), 5),
                     "時間結晶触媒なのに湧き止めまで効いている");
             zombie.discard();
-        })
-                .thenExecuteAfter(5, () -> {
+        });
+        helper.runAtTickTime(10, () -> {
             helper.assertBlockPresent(Blocks.DIRT, dirt);
-        }).thenSucceed();
+            helper.succeed();
+        });
     }
 
-    @GameTest(template = HUGE, batch = "shield_core", setupTicks = 20, timeoutTicks = 160)
+    @GameTest(template = HUGE, batch = "shield_core", timeoutTicks = 60)
     public static void shieldTowerWithCoreRepelsHostiles(GameTestHelper helper) {
         ShieldTowerBlockEntity shield = buildShield(helper, "singularity_core");
         BlockPos zombiePos = new BlockPos(10, 1, 4);

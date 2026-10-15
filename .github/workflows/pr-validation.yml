@@ -1,0 +1,89 @@
+name: PR validation
+
+on:
+  pull_request:
+    branches: [port/1.20.1-neoforge, port/1.20.1-forge]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-gametest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+          cache: gradle
+      - name: Validate translations and models
+        run: |
+          python3 tools/localization.py --check
+          python3 tools/check_models.py
+          python3 tools/check_supporters.py
+          python3 tools/check_port_1201.py
+      - name: Build and run required GameTests
+        shell: bash
+        run: |
+          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
+      - name: Require a completed nonempty successful GameTest run
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import re
+          log = pathlib.Path("build/gametest/logs/latest.log")
+          if not log.is_file() or not re.search(r"All [1-9][0-9]* required tests passed", log.read_text(encoding="utf-8")):
+              raise SystemExit("GameTestServer did not report successful nonempty completion")
+          PY
+      - name: Validate Java 17 distribution archive
+        run: python3 tools/check_port_1201.py --jar "build/libs/Singulo-$(sed -n 's/^mod_version=//p' gradle.properties)-1.20.1$(sed -n 's/^mod_loader_suffix=//p' gradle.properties).jar"
+      - name: Check production JAR excludes GUI harness
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import zipfile
+          jars = list(pathlib.Path("build/libs").glob("*.jar"))
+          if not jars:
+              raise SystemExit("No production JAR found")
+          for path in jars:
+              with zipfile.ZipFile(path) as jar:
+                  if any("GuiReviewHarness" in name for name in jar.namelist()):
+                      raise SystemExit("Development GUI harness leaked into " + str(path))
+          PY
+      - name: Prepare disposable GUI review world
+        run: python3 tools/review/prepare_gui.py
+      - name: Run real client GUI smoke
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
+      - name: Require GUI captures
+        run: |
+          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 15
+          grep -q 'SINGULO_GUI_COMPLETE 15' build/gui-review/logs/latest.log
+      - name: Verify inventory pixels in exported PNGs
+        run: python3 tools/review/check_gui_png.py
+      - name: Save build outputs and validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-validation-${{ github.sha }}
+          if-no-files-found: warn
+          path: |
+            build/libs/*.jar
+            build/gametest/logs/
+            build/reports/
+            build/gui-review/screenshots/
+            build/gui-review/logs/
+            build/gui-review/inventory-pixels.json

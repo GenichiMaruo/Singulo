@@ -40,6 +40,10 @@ ANDROID_PARTS = {
     'armor_pad': (110, 46, 3, 1, 4),
     'hilt': (114, 32, 1, 4, 1),
     'guard': (118, 32, 3, 1, 1),
+    'backpack': (16, 44, 6, 6, 3),
+    'pocket': (36, 44, 4, 3, 1),
+    'strap': (48, 44, 1, 1, 4),
+    'battery': (16, 54, 2, 3, 2),
 }
 
 # 型ごとの色。hair: 髪（明・影・深い影）、streak: ひと房（またはインナー）の色、accent: 光の色、iris: 瞳（深・明）
@@ -505,6 +509,48 @@ def paint(pal, Image):
     for x in range(x0, x1):
         put(x, y0, accent, lit=True)
 
+    # ---------------------------------------------------------------- バックパック（積んだときだけ見える）
+    # 白い陶磁の箱に黒い縁取り。下の面に型の色の光るライン（背中のスラスターの代わり）
+    f = part('backpack')
+    for k in f:
+        fill(f[k], CERAMIC if k in ('back', 'up') else CERAMIC_SH, 2)
+    for k in ('back', 'side_a', 'side_b'):
+        x0, y0, x1, y1 = f[k]
+        for x in range(x0, x1):
+            put(x, y0, SUIT_HI)
+            put(x, y1 - 1, SUIT)
+        for y in range(y0, y1):
+            put(x0, y, SUIT_HI)
+            put(x1 - 1, y, SUIT_HI)
+    x0, y0, x1, y1 = f['back']
+    for x in range(x0 + 1, x1 - 1):
+        put(x, y1 - 2, accent, lit=True)
+    line(f['down'], accent)
+    f = part('pocket')
+    for k in f:
+        fill(f[k], SUIT, 3)
+    x0, y0, x1, y1 = f['back']
+    for x in range(x0, x1):
+        put(x, y0, SUIT_HI)
+    put(x0 + 1, y0 + 1, accent, lit=True)
+    put(x0 + 2, y0 + 1, accent, lit=True)
+    f = part('strap')
+    for k in f:
+        fill(f[k], SUIT, 3)
+    # ---------------------------------------------------------------- バッテリーパック（積んだ数だけ）
+    # 銀の筒に黒い端子のふた。後ろの面に、型の色の充電ランプ（2つ）
+    f = part('battery')
+    for k in f:
+        fill(f[k], CERAMIC_SH if k != 'up' else SUIT_HI, 2)
+    for k in ('back', 'front', 'side_a', 'side_b'):
+        x0, y0, x1, y1 = f[k]
+        for x in range(x0, x1):
+            put(x, y0, SUIT_HI)
+    x0, y0, x1, y1 = f['back']
+    put(x0, y0 + 1, accent, lit=True)
+    put(x0 + 1, y0 + 1, accent, lit=True)
+    put(x0, y0 + 2, mix(accent, -40), lit=True)
+
     # ---------------------------------------------------------------- 鞭の柄（黒い握りに、光る輪）
     f = part('whip_handle')
     for k in f:
@@ -545,7 +591,23 @@ def item_textures(ti, save):
     save(charger_icon(Image), ti / 'android_charger.png')
     save(repair_icon(Image), ti / 'android_repair_kit.png')
     save(plate_icon(Image), ti / 'android_armor_plate.png')
-    save(upgrade_icon(Image), ti / 'android_transfer_upgrade.png')
+    save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
+    save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
+    save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
+    save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
+    save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
+    save(droplet_icon(Image), ti / 'fluid_sample.png')
+    for n, (iid, (base, detail)) in enumerate(accessory_icons(Image).items()):
+        if iid in FABRIC_ACCESSORIES:
+            fabric(base, 41 + n)                       # 布の織り目
+        save(wear(base, 41 + n), ti / f'{iid}.png')     # 使い込んだ汚し（染める所も、染めない所も）
+        save(wear(detail, 59 + n), ti / f'{iid}_detail.png')
+    save(wear(mining_icon(Image), 23), ti / 'android_mining_upgrade.png')
+    save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
+    save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
+    save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
+    save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
+    save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
 
 
 def memory_icon(accent, Image):
@@ -709,6 +771,343 @@ def upgrade_icon(Image):
     for x in (5, 7, 9):
         px[x, 14] = (226, 186, 92, 255)
     return im
+
+
+def upgrade_board(Image):
+    """アップグレードの共通の台: 白い基板と灰色の縁、下に金の端子。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(2, 14):
+        for x in range(2, 14):
+            if (x, y) in ((2, 2), (13, 2), (2, 13), (13, 13)):
+                continue
+            px[x, y] = ((150, 156, 170) if x in (2, 13) or y in (2, 13) else (236, 238, 242)) + (255,)
+    for x in (5, 7, 9):
+        px[x, 14] = (226, 186, 92, 255)
+    return im, px
+
+
+def wear(im, seed):
+    """使い込んだ汚し（汚れではなく使用感）: 面の細かな擦れ、縁の摩耗（角ほど強く）、小さな光る傷。"""
+    px = im.load()
+    w, h = im.size
+    rng = random.Random(seed)
+
+    def opaque(x, y):
+        return 0 <= x < w and 0 <= y < h and px[x, y][3] > 0
+
+    for y in range(h):
+        for x in range(w):
+            if not opaque(x, y):
+                continue
+            r, g, b, a = px[x, y]
+            k = rng.choice((0, 0, 0, 0, -5, -8, 5))
+            open_sides = sum(not opaque(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            if open_sides >= 2:
+                k -= 16                                   # 角の摩耗
+            elif open_sides == 1 and rng.random() < 0.3:
+                k -= 10                                   # 縁の擦れ
+            px[x, y] = (max(0, min(255, r + k)), max(0, min(255, g + k)), max(0, min(255, b + k)), a)
+    inner = [(x, y) for y in range(1, h - 1) for x in range(1, w - 1)
+             if all(opaque(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1))]
+    for _ in range(3):
+        if not inner:
+            break
+        x, y = rng.choice(inner)
+        for (sx, sy, d) in ((x, y, 26), (x + 1, y - 1, 14)):     # 斜めの小傷
+            if opaque(sx, sy):
+                r, g, b, a = px[sx, sy]
+                px[sx, sy] = (min(255, r + d), min(255, g + d), min(255, b + d), a)
+    return im
+
+
+def card_icon(Image, stripe, recorded=None):
+    """作業のカード: 白いカードに色の帯と、金の端子、小さな光る点（作業位置は緑、レシピは水色）。
+    作業位置カードは、未記録（recorded=False）なら帯が灰色で点が消え、記録済みなら帯が緑で、右上に位置の印（ピン）が付く。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(3, 13):
+        for x in range(2, 14):
+            if (x, y) in ((2, 3), (13, 3), (2, 12), (13, 12)):
+                continue
+            px[x, y] = ((150, 156, 170) if x in (2, 13) or y in (3, 12) else (238, 240, 244)) + (255,)
+    for y in range(4, 7):
+        for x in range(3, 13):
+            px[x, y] = stripe + (255,)
+    for x in (4, 6, 8):
+        px[x, 10] = (226, 186, 92, 255)
+        px[x, 11] = (200, 160, 70, 255)
+    if recorded is not False:
+        px[11, 9] = tuple(min(255, c + 70) for c in stripe) + (255,)
+        px[10, 9] = stripe + (255,)
+    else:
+        px[11, 9] = (196, 200, 210, 255)
+        px[10, 9] = (196, 200, 210, 255)
+    if recorded:
+        # 位置の印（ピン）: 帯の右上に、濃い緑の頭と白い光
+        for (x, y) in ((11, 1), (12, 1), (11, 2), (12, 2)):
+            px[x, y] = (40, 120, 70, 255)
+        px[11, 1] = (200, 255, 210, 255)
+        px[12, 3] = (40, 120, 70, 255)
+    return im
+
+
+def production_icon(Image):
+    """生産アップグレード: 基板の上に、重なった2体の人影（水色と白）。"""
+    im, px = upgrade_board(Image)
+    back, front = (120, 200, 236), (60, 120, 170)
+    for (cx, c) in ((9, back), (6, front)):
+        for y in range(4, 7):
+            for x in range(cx - 1, cx + 1):
+                px[x, y] = c + (255,)
+        for y in range(7, 12):
+            for x in range(cx - 2, cx + 2):
+                px[x, y] = c + (255,)
+    px[11, 4] = (255, 255, 255, 255)
+    return im
+
+
+def battery_icon(Image):
+    """バッテリーアップグレード: 縦長の電池に、緑の残量の目盛りと稲妻。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(3, 15):
+        for x in range(4, 12):
+            px[x, y] = ((90, 96, 110) if x in (4, 11) or y in (3, 14) else (214, 220, 230)) + (255,)
+    for x in range(6, 10):
+        px[x, 2] = (60, 64, 76, 255)
+    for y in range(5, 13):
+        for x in range(5, 11):
+            if y >= 7:
+                px[x, y] = ((90, 214, 140) if y % 2 else (70, 190, 120)) + (255,)
+    for (x, y) in ((8, 6), (7, 7), (6, 8), (7, 8), (8, 8), (9, 8), (8, 9), (7, 10)):
+        px[x, y] = (255, 236, 120, 255)
+    return im
+
+
+def backpack_icon(Image):
+    """バックパックアップグレード: 白い箱のバックパックに、黒いふたと肩ひも、光るライン。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(4, 14):
+        for x in range(3, 13):
+            if (x, y) in ((3, 4), (12, 4), (3, 13), (12, 13)):
+                continue
+            px[x, y] = ((150, 156, 170) if x in (3, 12) or y in (4, 13) else (236, 238, 242)) + (255,)
+    for y in range(4, 8):
+        for x in range(4, 12):
+            px[x, y] = (54, 58, 74, 255)
+    for x in range(5, 11):
+        px[x, 2] = (54, 58, 74, 255)
+    px[5, 3] = px[10, 3] = (54, 58, 74, 255)
+    for y in range(9, 12):
+        for x in range(6, 10):
+            px[x, y] = (200, 206, 216, 255)
+    for x in range(4, 12):
+        px[x, 12] = (120, 225, 255, 255)
+    return im
+
+
+def mining_icon(Image):
+    """採掘アップグレード: 基板の上に、光るツルハシ（持ち手だけ実体の色、頭は水色に光る）。"""
+    im, px = upgrade_board(Image)
+    for i in range(7):
+        px[5 + i, 11 - i] = (120, 88, 60, 255)        # 持ち手（左下から右上へ）
+    head = [(4, 5), (5, 4), (6, 3), (7, 3), (8, 3), (9, 4), (10, 5), (11, 6), (12, 7)]
+    for (x, y) in head:
+        px[x, y] = (150, 236, 255, 255)
+    for (x, y) in ((6, 4), (7, 4), (8, 4), (9, 5), (10, 6)):
+        px[x, y] = (210, 248, 255, 255)
+    return im
+
+
+def droplet_icon(Image):
+    """流体の見本: 白いしずく（流体の色に染めて使う）。左上に光、右下に影。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    # しずくの形（行ごとの左右の端）
+    rows = {2: (7, 8), 3: (7, 8), 4: (6, 9), 5: (6, 9), 6: (5, 10), 7: (4, 11), 8: (4, 11), 9: (3, 12), 10: (3, 12),
+            11: (3, 12), 12: (4, 11), 13: (5, 10), 14: (6, 9)}
+    for y, (x0, x1) in rows.items():
+        for x in range(x0, x1 + 1):
+            edge = x in (x0, x1) or y in (2, 14)
+            shade = 150 if edge else 255 - max(0, (x - 7) + (y - 9)) * 10
+            px[x, y] = (shade, shade, shade, 255)
+    for (x, y) in ((5, 9), (5, 10), (6, 8)):
+        px[x, y] = (255, 255, 255, 255)
+    return im
+
+
+def tank_icon(Image):
+    """タンクアップグレード: 基板の上に、ガラスの筒が2本（左は水色、右は黄緑の流体が入っている）。"""
+    im, px = upgrade_board(Image)
+    for x0, fluid in ((4, (90, 170, 240, 255)), (9, (170, 230, 110, 255))):
+        for y in range(3, 13):
+            for x in range(x0, x0 + 4):
+                edge = x in (x0, x0 + 3) or y in (3, 12)
+                if edge:
+                    px[x, y] = (200, 210, 222, 255)          # ガラスの縁
+                elif y >= 6:
+                    px[x, y] = fluid                          # 流体
+                else:
+                    px[x, y] = (226, 238, 246, 255)          # 空いている所
+        px[x0 + 1, 7] = (255, 255, 255, 255)                  # 光の反射
+        for x in range(x0 + 1, x0 + 3):
+            px[x, 2] = (120, 126, 136, 255)                   # ふた
+    return im
+
+
+def felling_icon(Image):
+    """伐採アップグレード: 基板の上に、光る斧（持ち手だけ実体の色、刃は水色に光る）。"""
+    im, px = upgrade_board(Image)
+    for i in range(7):
+        px[5 + i, 11 - i] = (120, 88, 60, 255)        # 持ち手（左下から右上へ）
+    blade = [(9, 3), (10, 3), (11, 3), (8, 4), (9, 4), (10, 4), (11, 4), (12, 4), (9, 5), (10, 5), (11, 5), (12, 5), (12, 6), (11, 6)]
+    for (x, y) in blade:
+        px[x, y] = (150, 236, 255, 255)
+    for (x, y) in ((12, 4), (12, 5), (12, 6)):
+        px[x, y] = (210, 248, 255, 255)
+    return im
+
+
+# ---------------------------------------------------------------- アンドロイドの装飾
+
+ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
+                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella')
+
+
+FABRIC_ACCESSORIES = ('android_ribbon', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon')
+
+
+def fabric(im, seed):
+    """布の織り目: 縦横の糸が交互に浮き沈みする細かな濃淡と、ところどころの毛羽立ち。"""
+    px = im.load()
+    w, h = im.size
+    rng = random.Random(seed)
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            k = -9 if (x + y) % 2 == 0 else 0           # 織り目
+            if (x // 2 + y) % 4 == 0:
+                k -= 4                                   # 斜めの綾
+            if rng.random() < 0.06:
+                k += 10                                  # 毛羽
+            px[x, y] = (max(0, min(255, r + k)), max(0, min(255, g + k)), max(0, min(255, b + k)), a)
+
+
+def accessory_icons(Image):
+    """装飾の絵: 染める所（白い濃淡。layer0、染めた色に染める）と、染めない所（layer1）の2枚ずつ。"""
+    W, S, E = (255, 255, 255, 255), (214, 214, 214, 255), (150, 150, 150, 255)   # 白・影・縁
+
+    def new():
+        return Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+
+    def rect(im, x0, y0, x1, y1, c):
+        px = im.load()
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                px[x, y] = c
+
+    def shaded(im, x0, y0, x1, y1):
+        rect(im, x0, y0, x1, y1, E)
+        if x1 - x0 >= 2 and y1 - y0 >= 2:
+            rect(im, x0 + 1, y0 + 1, x1 - 1, y1 - 1, W)
+            rect(im, x0 + 1, y1 - 1, x1 - 1, y1 - 1, S)
+
+    out = {}
+    # リボン: 左右の輪と結び目、垂れ
+    b, d = new(), new()
+    shaded(b, 1, 3, 6, 9)
+    shaded(b, 9, 3, 14, 9)
+    shaded(b, 5, 9, 7, 14)
+    shaded(b, 8, 9, 10, 13)
+    shaded(b, 6, 5, 9, 8)
+    out['android_ribbon'] = (b, d)
+    # 髪飾り: 花びら（染める）と黄色い芯、緑の葉
+    b, d = new(), new()
+    for (x, y) in ((6, 1), (10, 5), (6, 9), (2, 5)):
+        shaded(b, x, y, x + 4, y + 4)
+    rect(d, 7, 6, 9, 8, (247, 224, 122, 255))
+    rect(d, 11, 11, 14, 12, (78, 138, 58, 255))
+    out['android_hair_flower'] = (b, d)
+    # ベレー帽: 平たい楕円と柄
+    b, d = new(), new()
+    shaded(b, 1, 6, 14, 11)
+    shaded(b, 3, 4, 12, 6)
+    rect(d, 7, 2, 8, 3, (60, 60, 70, 255))
+    out['android_beret'] = (b, d)
+    # ヘッドドレス: 帯とひだ
+    b, d = new(), new()
+    shaded(b, 1, 7, 14, 10)
+    for i in range(7):
+        rect(b, 1 + i * 2, 4 + (i % 2), 2 + i * 2, 6, W)
+        rect(b, 1 + i * 2, 6, 2 + i * 2, 6, S)
+    rect(d, 0, 8, 1, 12, (90, 90, 100, 255))
+    rect(d, 14, 8, 15, 12, (90, 90, 100, 255))
+    out['android_headdress'] = (b, d)
+    # マント: 肩の留め具（金）から広がる布
+    b, d = new(), new()
+    for y in range(3, 15):
+        w = 3 + (y - 3) // 2
+        shaded(b, 8 - w, y, 7 + w, y)
+    rect(b, 4, 3, 11, 4, S)
+    rect(d, 4, 2, 5, 3, (224, 184, 80, 255))
+    rect(d, 10, 2, 11, 3, (224, 184, 80, 255))
+    out['android_cape'] = (b, d)
+    # マフラー: 輪と垂れ、縞
+    b, d = new(), new()
+    shaded(b, 2, 3, 13, 7)
+    shaded(b, 3, 7, 6, 14)
+    for x in range(3, 13, 3):
+        rect(d, x, 4, x, 6, (255, 255, 255, 120))
+    rect(d, 3, 12, 6, 12, (255, 255, 255, 120))
+    out['android_scarf'] = (b, d)
+    # 腰リボン: 大きな蝶結びと長い垂れ
+    b, d = new(), new()
+    shaded(b, 0, 2, 6, 8)
+    shaded(b, 9, 2, 15, 8)
+    shaded(b, 5, 3, 10, 7)
+    shaded(b, 4, 8, 6, 15)
+    shaded(b, 9, 8, 11, 14)
+    out['android_waist_ribbon'] = (b, d)
+    # 文庫本: 表紙（染める）と白いページ
+    b, d = new(), new()
+    shaded(b, 3, 2, 12, 14)
+    rect(d, 5, 4, 11, 12, (244, 241, 230, 255))
+    for y in (6, 8, 10):
+        rect(d, 6, y, 10, y, (180, 176, 166, 255))
+    rect(d, 3, 2, 4, 14, (90, 70, 60, 255))
+    out['android_book'] = (b, d)
+    # 花束: 包み紙（染める）と、上の色とりどりの花、茎
+    b, d = new(), new()
+    for y in range(8, 15):
+        w = (15 - y) // 2 + 1
+        shaded(b, 8 - w, y, 7 + w, y)
+    for (x, y, c) in ((3, 3, (224, 72, 72, 255)), (7, 2, (242, 210, 74, 255)), (10, 4, (238, 143, 176, 255)), (6, 5, (244, 244, 244, 255))):
+        rect(d, x, y, x + 2, y + 2, c)
+    rect(d, 7, 7, 8, 8, (78, 138, 58, 255))
+    out['android_bouquet'] = (b, d)
+    # ティーカップ: カップと受け皿（染める）、金の縁、紅茶、取っ手
+    b, d = new(), new()
+    shaded(b, 1, 12, 14, 13)
+    shaded(b, 3, 5, 11, 11)
+    shaded(b, 11, 6, 13, 9)
+    rect(d, 3, 5, 11, 5, (224, 184, 80, 255))
+    rect(d, 4, 6, 10, 6, (138, 90, 58, 255))
+    out['android_teacup'] = (b, d)
+    # 傘: 半円の傘（染める）と柄
+    b, d = new(), new()
+    for y in range(2, 8):
+        w = min(7, 2 + (y - 2) * 2)
+        shaded(b, 8 - w, y, 7 + w, y)
+    rect(b, 1, 7, 14, 7, S)
+    rect(d, 7, 8, 8, 14, (90, 74, 58, 255))
+    rect(d, 5, 13, 7, 14, (90, 74, 58, 255))
+    rect(d, 7, 1, 8, 1, (200, 200, 200, 255))
+    out['android_umbrella'] = (b, d)
+    return out
 
 
 # ---------------------------------------------------------------- アンドロイド用のガラス

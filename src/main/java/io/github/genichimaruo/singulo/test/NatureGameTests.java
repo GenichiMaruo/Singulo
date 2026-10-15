@@ -26,7 +26,7 @@ public final class NatureGameTests {
     private NatureGameTests() {}
 
     /** ケラウノス放電塔: 電力をためて撃つと、砂の上の避雷針へ雷が飛び、砂が雷ガラス塊になる。 */
-    @GameTest(template = EMPTY, setupTicks = 20, timeoutTicks = 240)
+    @GameTest(template = EMPTY, timeoutTicks = 120)
     public static void keraunosTowerTurnsSandIntoFulgurite(GameTestHelper helper) {
         BlockPos tower = new BlockPos(1, 1, 1);
         BlockPos sand = new BlockPos(5, 1, 5);
@@ -38,10 +38,11 @@ public final class NatureGameTests {
         be.energy().setEnergy(be.energy().getMaxEnergyStored());
         helper.assertTrue(be.fire(null), "撃てない");
         helper.assertFalse(be.fire(null), "ためている間にもう一度撃てる");
-        helper.succeedWhen(() -> {
+        helper.runAtTickTime(KeraunosTowerBlockEntity.CHARGE_TICKS + 10, () -> {
             helper.assertBlockPresent(SinguloBlocks.FULGURITE_BLOCK.get(), sand);
             helper.assertTrue(be.energy().getEnergyStored() == be.energy().getMaxEnergyStored() - KeraunosTowerBlockEntity.COST,
                     "電力の使い方が違う");
+            helper.succeed();
         });
     }
 

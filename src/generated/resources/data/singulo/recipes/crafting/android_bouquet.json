@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FFF",
+    " P "
+  ],
+  "key": {
+    "F": {
+      "tag": "minecraft:small_flowers"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_bouquet"
+  }
+}

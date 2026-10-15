@@ -28,8 +28,8 @@ public final class SinguloClient {
     public static void init() { new SinguloClient(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()); }
 
     public SinguloClient(IEventBus modBus) {
-
-
+        modBus.addListener(SinguloClient::registerDecorations);
+        modBus.addListener(SinguloClient::registerItemColors);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(SinguloClient::addWingLayers);
@@ -193,6 +193,33 @@ public final class SinguloClient {
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.GENESIS_CORE.get(), GenesisCoreScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_STATION.get(), AndroidStationScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID.get(), AndroidScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_WORK_CONSOLE.get(), WorkConsoleScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_RECIPE_RACK.get(), RecipeRackScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(SinguloMenus.ANDROID_DELIVERY_PORT.get(), DeliveryPortScreen::new);
+    }
+
+    /** 作業位置カードとレシピカードは、シフトを押している間、中身の絵を重ねて見せる。 */
+    /** 流体の見本は、流体の色に染める。 */
+    private static void registerItemColors(net.minecraftforge.client.event.RegisterColorHandlersEvent.Item event) {
+        event.register((stack, layer) -> {
+            var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(stack);
+            if (f.isEmpty()) {
+                return 0xFFFFFFFF;
+            }
+            return 0xFF000000 | net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get());
+        // アンドロイドの装飾: 染める絵（layer0）だけを、染めた色に
+        for (var acc : io.github.genichimaruo.singulo.registry.SinguloItems.ACCESSORIES) {
+            event.register((stack, layer) -> layer == 0 && stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem a
+                    ? 0xFF000000 | a.color(stack) : 0xFFFFFFFF, acc.get());
+        }
+    }
+
+    private static void registerDecorations(net.minecraftforge.client.event.RegisterItemDecorationsEvent event) {
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), WorkCardDecorator.LOCATION);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.PROCEDURE_CARD.get(), WorkCardDecorator.RECIPE);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get(), FluidSampleDecorator.INSTANCE);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
@@ -211,6 +238,10 @@ public final class SinguloClient {
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
         event.enqueueWork(SinguloClient::registerScreens);
+        // 作業位置カード: 記録済みなら絵を切り替える
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
+                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.pos(stack) != null ? 1 : 0));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), new ResourceLocation("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->

@@ -62,6 +62,58 @@ public final class SinguloItems {
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
             "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
+    /** 採掘アップグレード（ツルハシのエンチャントを付けられる）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem> ANDROID_MINING_UPGRADE = ITEMS.register(
+            "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem> ANDROID_FELLING_UPGRADE = ITEMS.register(
+            "android_felling_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidFellingUpgradeItem(new Item.Properties()));
+    /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
+            "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
+            "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
+    /** アンドロイドの装飾（頭・背中/腰・手）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_RIBBON = ITEMS.register(
+            "android_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "ribbon", 0xE0607E));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_HAIR_FLOWER = ITEMS.register(
+            "android_hair_flower", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "hair_flower", 0xF2C94C));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BERET = ITEMS.register(
+            "android_beret", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "beret", 0x34406E));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_HEADDRESS = ITEMS.register(
+            "android_headdress", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "headdress", 0xF5F5F5));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAPE = ITEMS.register(
+            "android_cape", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "cape", 0x8E2F3F));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_SCARF = ITEMS.register(
+            "android_scarf", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "scarf", 0xC84E4E));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_WAIST_RIBBON = ITEMS.register(
+            "android_waist_ribbon", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "waist_ribbon", 0x5A8ED6));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BOOK = ITEMS.register(
+            "android_book", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "book", 0x6B4A3A));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_BOUQUET = ITEMS.register(
+            "android_bouquet", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "bouquet", 0xF0E2C0));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_TEACUP = ITEMS.register(
+            "android_teacup", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "teacup", 0xFFFFFF));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_UMBRELLA = ITEMS.register(
+            "android_umbrella", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "umbrella", 0x4A78C8));
+    /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
+    public static final java.util.List<RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
+            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA);
+    /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
+            "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.work.ProcedureCardItem> PROCEDURE_CARD = ITEMS.register(
+            "procedure_card", () -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
             () -> new ForgeSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
@@ -118,6 +170,22 @@ public final class SinguloItems {
             Map.entry("neutrino_scanner", 3),
             Map.entry("android_charger", 2),
             Map.entry("android_armor_plate", 2),
+            Map.entry("android_mining_upgrade", 2),
+            Map.entry("android_felling_upgrade", 2),
+            Map.entry("android_ribbon", 1),
+            Map.entry("android_hair_flower", 1),
+            Map.entry("android_beret", 1),
+            Map.entry("android_headdress", 1),
+            Map.entry("android_cape", 1),
+            Map.entry("android_scarf", 1),
+            Map.entry("android_waist_ribbon", 1),
+            Map.entry("android_book", 1),
+            Map.entry("android_bouquet", 1),
+            Map.entry("android_teacup", 1),
+            Map.entry("android_umbrella", 1),
+            Map.entry("work_location_card", 2),
+            Map.entry("recipe_card", 2),
+            Map.entry("procedure_card", 2),
             Map.entry("explorer_compass", 1),
             Map.entry("creative_catalyst", 6),
             Map.entry("builder_wand", 6),
@@ -188,8 +256,19 @@ public final class SinguloItems {
         block(SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER, 4);
         block(SinguloBlocks.PROBE_STATION, 4);
         block(SinguloBlocks.ANDROID_STATION, 2);
+        block(SinguloBlocks.ANDROID_WORK_CONSOLE, 2);
+        block(SinguloBlocks.ANDROID_SUPPLY_PORT, 2);
+        block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);
+        block(SinguloBlocks.ANDROID_RECIPE_RACK, 2);
+        block(SinguloBlocks.ANDROID_WORKBENCH, 2);
         TAB_ORDER.add(ANDROID_CHARGER);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
+        TAB_ORDER.add(ANDROID_MINING_UPGRADE);
+        TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
+        TAB_ORDER.add(WORK_LOCATION_CARD);
+        TAB_ORDER.add(RECIPE_CARD);
+        TAB_ORDER.add(PROCEDURE_CARD);
+        TAB_ORDER.addAll(ACCESSORIES);
         block(SinguloBlocks.SMES_MODULE, 4);
         block(SinguloBlocks.TOPOLOGICAL_WIRE, 4);
         block(SinguloBlocks.REACTOR_SHELL, 5);
