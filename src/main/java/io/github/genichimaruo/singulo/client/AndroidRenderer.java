@@ -1301,23 +1301,46 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, body, -0.045F, 0.78F, -0.07F, 0.045F, 1.06F, 0.07F, light, 0x6E7684, 255);   // 斧頭の芯
             FxDraw.box(pose, body, -0.035F, 1.06F, -0.035F, 0.035F, 1.14F, 0.035F, light, 0x8C94A2, 255); // 先の飾り
             VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
-            int n = 9;
-            for (int j = 0; j < n; j++) {
-                float y0 = 0.68F + j * 0.055F;
-                float s = Mth.sin(Mth.PI * (j + 0.5F) / n);
-                float reach = 0.1F + 0.26F * s;
-                int a = (int) Math.min(255, 150 * glow);
-                for (int side = -1; side <= 1; side += 2) {
-                    float z0 = side * 0.06F, z1 = side * (0.06F + reach);
-                    glowBox(pose, fx, -0.018F, y0, Math.min(z0, z1), 0.018F, y0 + 0.055F, Math.max(z0, z1), variant.accent, a);
-                    // 刃先の白い縁
-                    float e0 = side * (0.04F + reach), e1 = side * (0.06F + reach);
-                    glowBox(pose, fx, -0.012F, y0, Math.min(e0, e1), 0.012F, y0 + 0.055F, Math.max(e0, e1), 0xFFFFFF,
-                            (int) Math.min(255, 200 * glow));
+            // 刃: 三日月の輪郭を細かく区切り、両面の板と刃先の白い帯・縁を、互いに重ならない面だけで描く
+            // （光は奥行きも書くので、同じ平面に面が重なるとちらつく）
+            PoseStack.Pose p = pose.last();
+            int a = (int) Math.min(255, 150 * glow);
+            int edge = (int) Math.min(255, 210 * glow);
+            int n = 12;
+            float h = 0.5F, y0 = 0.68F, inner = 0.05F, w = 0.018F, band = 0.025F;
+            for (int side = -1; side <= 1; side += 2) {
+                for (int j = 0; j < n; j++) {
+                    float ya = y0 + h * j / n, yb = y0 + h * (j + 1) / n;
+                    float ra = side * (inner + bladeReach(j / (float) n)), rb = side * (inner + bladeReach((j + 1) / (float) n));
+                    float ea = ra + side * band, eb = rb + side * band;
+                    for (float x = -w; x <= w; x += 2 * w) {
+                        glowQuad(p, fx, x, ya, side * inner, x, yb, side * inner, x, yb, rb, x, ya, ra, variant.accent, a);
+                        glowQuad(p, fx, x, ya, ra, x, yb, rb, x, yb, eb, x, ya, ea, 0xFFFFFF, edge);
+                    }
+                    glowQuad(p, fx, -w, ya, ea, w, ya, ea, w, yb, eb, -w, yb, eb, 0xFFFFFF, edge);   // 刃先の縁
                 }
             }
             pose.popPose();
         }
+    }
+
+    /** 斧の刃の張り出し（柄の向きの位置 0〜1。真ん中が広く、上下の端が少し後ろへ反る三日月）。 */
+    private static float bladeReach(float s) {
+        return 0.06F + 0.27F * Mth.sin(Mth.PI * s);
+    }
+
+    /** 足し合わせの光の四角形（表裏の両方の向きで描く）。 */
+    private static void glowQuad(PoseStack.Pose p, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                                 float x2, float y2, float z2, float x3, float y3, float z3, int rgb, int alpha) {
+        int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        vc.addVertex(p, x0, y0, z0).setColor(r, g, b, alpha);
+        vc.addVertex(p, x1, y1, z1).setColor(r, g, b, alpha);
+        vc.addVertex(p, x2, y2, z2).setColor(r, g, b, alpha);
+        vc.addVertex(p, x3, y3, z3).setColor(r, g, b, alpha);
+        vc.addVertex(p, x3, y3, z3).setColor(r, g, b, alpha);
+        vc.addVertex(p, x2, y2, z2).setColor(r, g, b, alpha);
+        vc.addVertex(p, x1, y1, z1).setColor(r, g, b, alpha);
+        vc.addVertex(p, x0, y0, z0).setColor(r, g, b, alpha);
     }
 
     /** ビット型の短剣: 短い柄と鍔、光の刃（白い芯と菫の外側）。 */
@@ -1347,9 +1370,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, body, -0.07F, 0.06F, -0.018F, 0.07F, 0.09F, 0.018F, light, 0x8C94B8, 255);
             VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
             float outer = 0.03F * glow;
+            // 白い芯を先に描く（外側の光が先に奥行きを書くと、中の芯が隠れて見えなくなる）
+            glowBox(pose, fx, -0.01F, 0.095F, -0.005F, 0.01F, 0.11F + len, 0.005F, 0xFFFFFF, (int) (230 * Math.min(1, glow)));
             glowBox(pose, fx, -outer, 0.09F, -0.008F - outer * 0.4F, outer, 0.09F + len, 0.008F + outer * 0.4F, variant.accent,
                     (int) Math.min(255, 150 * glow));
-            glowBox(pose, fx, -0.01F, 0.09F, -0.005F, 0.01F, 0.11F + len, 0.005F, 0xFFFFFF, (int) (230 * Math.min(1, glow)));
             pose.popPose();
         }
     }
@@ -1376,24 +1400,33 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.pushPose();
             getParentModel().toTorso(pose);
             float k = 1 / SCALE;
+            // 別の描画先を取り出すと前の描画先は閉じられるので、本体を全部描いてから光を描く
             VertexConsumer solid = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
-            float p = 1 / 16F;
             for (int i = out; i < BitAndroid.BITS; i++) {
-                // 左右3基ずつ、背中の上から外へ斜めに開く（先が上）
-                int side = i % 2 == 0 ? 1 : -1;
-                int row = i / 2;
-                pose.pushPose();
-                pose.translate(side * (1.2F + row * 0.9F) * p, (-6.6F + row * 1.1F) * p, 2.1F * p);
-                pose.mulPose(Axis.ZP.rotationDegrees(side * (25 + row * 18)));
-                pose.mulPose(Axis.XP.rotationDegrees(90));
-                pose.scale(k * 0.8F, k * 0.8F, k * 0.8F);
+                stowed(pose, i, k);
                 bitBody(pose, solid, light);
+                pose.popPose();
+            }
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            for (int i = out; i < BitAndroid.BITS; i++) {
+                stowed(pose, i, k);
                 glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent,
                         (int) (110 + 50 * Mth.sin(age * 0.15F + i)));
                 pose.popPose();
             }
             pose.popPose();
+        }
+
+        /** しまったビット i の位置へ（pushPose する）。左右3基ずつ、背中の上から外へ斜めに開く（先が上）。 */
+        private void stowed(PoseStack pose, int i, float k) {
+            float p = 1 / 16F;
+            int side = i % 2 == 0 ? 1 : -1;
+            int row = i / 2;
+            pose.pushPose();
+            pose.translate(side * (1.2F + row * 0.9F) * p, (-6.6F + row * 1.1F) * p, 2.1F * p);
+            pose.mulPose(Axis.ZP.rotationDegrees(side * (25 + row * 18)));
+            pose.mulPose(Axis.XP.rotationDegrees(90));
+            pose.scale(k * 0.8F, k * 0.8F, k * 0.8F);
         }
     }
 

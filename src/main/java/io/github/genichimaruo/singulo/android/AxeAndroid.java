@@ -198,8 +198,8 @@ public class AxeAndroid extends RuinAndroid {
                 case STATE_SLAM -> {
                     getNavigation().stop();
                     if (stateTicks == 3) {
-                        playSound(SoundEvents.ANVIL_LAND, 1.0F, 0.6F);
-                        playSound(SoundEvents.GENERIC_EXPLODE.value(), 0.6F, 1.4F);
+                        playSound(SoundEvents.MACE_SMASH_GROUND, 1.0F, 1.2F);
+                        playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 0.8F, 1.4F);
                         shockwave(level);
                     }
                     if (stateTicks >= SLAM) {
@@ -216,14 +216,14 @@ public class AxeAndroid extends RuinAndroid {
                         setDeltaMovement(leap.x * speed, 0.62, leap.z * speed);
                         hasImpulse = true;
                         setState(STATE_LEAP);
-                        playSound(SoundEvents.RAVAGER_ROAR, 0.5F, 1.8F);
+                        playSound(SoundEvents.TRIDENT_RIPTIDE_1.value(), 0.9F, 1.6F);
                     }
                 }
                 case STATE_LEAP -> {
                     getNavigation().stop();
                     if (stateTicks > 3 && (onGround() || stateTicks >= LEAP_MAX)) {
                         sweep(LEAP_RADIUS, 360, LEAP_DAMAGE, 0.7);
-                        playSound(SoundEvents.ANVIL_LAND, 0.9F, 0.8F);
+                        playSound(SoundEvents.MACE_SMASH_GROUND, 0.9F, 1.3F);
                         level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 0.2, getZ(), 1, 0, 0, 0, 0);
                         sparks(level, position().add(0, 0.2, 0), 20, 1.0);
                         finish(45 + random.nextInt(25));

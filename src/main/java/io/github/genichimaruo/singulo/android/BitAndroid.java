@@ -259,7 +259,7 @@ public class BitAndroid extends RuinAndroid {
                         setDeltaMovement(back.x * 0.9, 0.38, back.z * 0.9);
                         hasImpulse = true;
                         setState(STATE_BACKSTEP);
-                        playSound(SoundEvents.BREEZE_JUMP, 0.6F, 1.6F);
+                        playSound(SoundEvents.TRIDENT_RIPTIDE_2.value(), 0.6F, 1.9F);
                     }
                 }
                 case STATE_BACKSTEP -> {
