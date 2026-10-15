@@ -272,7 +272,7 @@ public final class ReactorGameTests {
                 .thenExecute(() -> r.forceCore(300, 0))
                 .thenWaitUntil(() -> helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "ホーキング凝縮体ができない: formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " data=" + r.saveWithoutMetadata())).thenSucceed();
+                "ホーキング凝縮体ができない: formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " missing=" + Structures.reactorLayout(CENTER).keySet().stream().filter(pos -> helper.getBlockState(pos).isAir()).limit(12).toList() + " data=" + r.saveWithoutMetadata())).thenSucceed();
     }
 
     /** 点火したばかりの炉心（質量500）でも、そのままホーキング凝縮体ができる（蒸発で縮むのを待たなくてよい）。 */
@@ -286,7 +286,7 @@ public final class ReactorGameTests {
                 .thenExecute(() -> r.forceCore(PenroseReactorBlockEntity.START_MASS, 0))
                 .thenWaitUntil(() -> helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "ホーキング凝縮体ができない: formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " data=" + r.saveWithoutMetadata())).thenSucceed();
+                "ホーキング凝縮体ができない: formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " missing=" + Structures.reactorLayout(CENTER).keySet().stream().filter(pos -> helper.getBlockState(pos).isAir()).limit(12).toList() + " data=" + r.saveWithoutMetadata())).thenSucceed();
     }
 
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 2000, batch = "reactor_isolated_ergosphereYieldsExoticMatterAndSpinsDown")
@@ -425,7 +425,7 @@ public final class ReactorGameTests {
         });
         helper.runAtTickTime(100, () -> {
             helper.assertTrue(r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL).getCount() < 64, "投入間隔どおりに投入されない");
-            helper.assertTrue(r.mass() <= PenroseReactorBlockEntity.MAX_MASS, "ペレットで上限を超えた: " + r.mass() + " nearby=" + helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new net.minecraft.world.phys.AABB(helper.absolutePos(CENTER)).inflate(24)).stream().map(e -> e.getType() + "@" + e.position()).toList());
+            helper.assertTrue(r.mass() <= PenroseReactorBlockEntity.MAX_MASS, "ペレットで上限を超えた: " + r.mass() + " nearby=" + helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, new net.minecraft.world.phys.AABB(helper.absolutePos(CENTER)).inflate(24)).stream().map(e -> e.getType() + "@" + e.position() + (e instanceof ItemEntity drop ? "=" + drop.getItem() : "")).toList());
             helper.assertTrue(!r.collapsing(), "ペレットだけで崩壊した");
             helper.succeed();
         });
