@@ -595,7 +595,7 @@ public final class AndroidGameTests {
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない" + " pos=" + a.position() + " ticks=" + a.tickCount + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " guard=" + a.isGuard() + " printed=" + a.printed() + " target=" + a.getTarget() + " work=" + a.saveWorkState() + " console=" + console.saveWithoutMetadata() + " furnace=" + furnace.saveWithoutMetadata());
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
             a.discard();
         });
@@ -691,7 +691,7 @@ public final class AndroidGameTests {
         var error = console.start(player, cobble, 2, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない" + " pos=" + a.position() + " ticks=" + a.tickCount + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " guard=" + a.isGuard() + " printed=" + a.printed() + " target=" + a.getTarget() + " work=" + a.saveWorkState() + " console=" + console.saveWithoutMetadata());
             helper.assertTrue(level.getBlockState(helper.absolutePos(from)).isAir() && level.getBlockState(helper.absolutePos(to)).isAir(),
                     "範囲の石が掘られていない");
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
