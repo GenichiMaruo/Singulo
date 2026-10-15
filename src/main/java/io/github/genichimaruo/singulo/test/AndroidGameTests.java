@@ -802,7 +802,12 @@ public final class AndroidGameTests {
             helper.setBlock(new BlockPos(x, 1, 5), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState()
                     .setValue(net.minecraft.world.level.block.FarmBlock.MOISTURE, 7));
         }
-        helper.runAtTickTime(5, () -> {
+        helper.startSequence().thenWaitUntil(() -> {
+            for (int x = 0; x < 2; x++) {
+                helper.assertTrue(helper.getLevel().getRawBrightness(helper.absolutePos(new BlockPos(x, 2, 5)), 0) >= 9,
+                        "畑の照明更新が終わっていない");
+            }
+        }).thenExecute(() -> {
             for (int x = 0; x < 2; x++) {
                 helper.setBlock(new BlockPos(x, 2, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
                         .getStateForAge(7));
@@ -815,7 +820,7 @@ public final class AndroidGameTests {
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(new BlockPos(0, 2, 5)) + " crop1=" + helper.getBlockState(new BlockPos(1, 2, 5)) + " message=" + console.message());
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(new BlockPos(0, 2, 5)) + " crop1=" + helper.getBlockState(new BlockPos(1, 2, 5)) + " soil0=" + helper.getBlockState(new BlockPos(0, 1, 5)) + " light=" + helper.getLevel().getRawBrightness(helper.absolutePos(new BlockPos(0, 2, 5)), 0) + " message=" + console.message());
             helper.assertTrue(helper.getBlockState(new BlockPos(0, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
                     && helper.getBlockState(new BlockPos(1, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
             a.discard();
