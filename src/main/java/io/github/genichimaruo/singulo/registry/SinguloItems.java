@@ -71,6 +71,11 @@ public final class SinguloItems {
     /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
             "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
+    /** 範囲カード（2つの角で囲った範囲）と、記録した場所を見せる測量メガネ。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.AreaCardItem> AREA_CARD = ITEMS.register(
+            "area_card", () -> new io.github.genichimaruo.singulo.android.work.AreaCardItem(new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.SurveyGlassesItem> SURVEY_GLASSES = ITEMS.register(
+            "survey_glasses", () -> new io.github.genichimaruo.singulo.android.work.SurveyGlassesItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
             "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
     /** アンドロイドの装飾（頭・背中/腰・手）。 */
@@ -185,6 +190,8 @@ public final class SinguloItems {
             Map.entry("android_teacup", 1),
             Map.entry("android_umbrella", 1),
             Map.entry("work_location_card", 2),
+            Map.entry("area_card", 2),
+            Map.entry("survey_glasses", 2),
             Map.entry("recipe_card", 2),
             Map.entry("procedure_card", 2),
             Map.entry("explorer_compass", 1),
@@ -267,6 +274,8 @@ public final class SinguloItems {
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
         TAB_ORDER.add(WORK_LOCATION_CARD);
+        TAB_ORDER.add(AREA_CARD);
+        TAB_ORDER.add(SURVEY_GLASSES);
         TAB_ORDER.add(RECIPE_CARD);
         TAB_ORDER.add(PROCEDURE_CARD);
         TAB_ORDER.addAll(ACCESSORIES);

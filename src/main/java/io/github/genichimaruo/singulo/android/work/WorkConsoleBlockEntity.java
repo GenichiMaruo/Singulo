@@ -63,6 +63,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     @Nullable
     private UUID owner;
+    /** 経路の決まり（{@link PathRule}）: 4行 × 経由地点・対象範囲・進入禁止ゾーン2つ。 */
+    private final ItemStackHandler routes = new ItemStackHandler(PathRule.SLOTS) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return PathRule.fits(slot % PathRule.COLS, stack);
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+    };
     private final ItemStackHandler permit = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -173,6 +190,15 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     public ItemStackHandler permit() {
         return permit;
+    }
+
+    public ItemStackHandler routes() {
+        return routes;
+    }
+
+    /** 経路の決まり（作業のアンドロイドが従う）。 */
+    public List<PathRule> pathRules() {
+        return level == null ? List.of() : PathRule.read(routes, 0, level);
     }
 
     public net.minecraft.world.SimpleContainer outbox() {
@@ -2293,12 +2319,15 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new WorkConsoleMenu(id, inventory, worldPosition, permit, encoder, outbox, modeData);
+        return new WorkConsoleMenu(id, inventory, worldPosition, permit, encoder, outbox, routes, modeData);
     }
 
     @Override
     public void onBroken(Level level) {
         Block.popResource(level, worldPosition, permit.getStackInSlot(0));
+        for (int i = 0; i < routes.getSlots(); i++) {
+            Block.popResource(level, worldPosition, routes.getStackInSlot(i));
+        }
         Block.popResource(level, worldPosition, encoder.getItem(CARD));
         Block.popResource(level, worldPosition, encoder.getItem(STOCK));
         Block.popResource(level, worldPosition, encoder.getItem(LOC_A));
@@ -2322,6 +2351,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             tag.putUUID("owner", owner);
         }
         tag.put("permit", permit.serializeNBT(registries));
+        tag.put("routes", routes.serializeNBT(registries));
         ListTag ls = new ListTag();
         for (BlockPos p : links) {
             ls.add(NbtUtils.writeBlockPos(p));
@@ -2380,6 +2410,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (tag.contains("permit")) {
             permit.deserializeNBT(registries, tag.getCompound("permit"));
         }
+        CompoundTag rt = tag.getCompound("routes");
+        rt.putInt("Size", PathRule.SLOTS);
+        routes.deserializeNBT(registries, rt);
         links.clear();
         for (Tag t : tag.getList("links", Tag.TAG_INT_ARRAY)) {
             NbtUtils.readBlockPos(wrap(t), "p").ifPresent(links::add);

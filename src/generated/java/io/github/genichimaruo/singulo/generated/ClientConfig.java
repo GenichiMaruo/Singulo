@@ -34,7 +34,7 @@ public final class ClientConfig {
         LENSING_QUALITY_ = b.defineInList("lensingQuality", "high", java.util.Arrays.asList("low", "medium", "high"));
         b.comment("マルチブロック形成時の光の演出", "範囲: true / false");
         FORMATION_EFFECTS_ = b.define("formationEffects", true);
-        b.comment("作業中のアンドロイドの頭の上に、今していること（取りに行く・作る・採掘 など）のアイコンを出す", "範囲: true / false");
+        b.comment("作業中のアンドロイドの頭の上に、今していること（取りに行く・作る・採掘 など）のアイコンを出す（測量メガネを掛けているときだけ見える）", "範囲: true / false");
         ANDROID_WORK_ICONS_ = b.define("androidWorkIcons", true);
         b.pop();
         GRAVITATIONAL_LENSING = GRAVITATIONAL_LENSING_;

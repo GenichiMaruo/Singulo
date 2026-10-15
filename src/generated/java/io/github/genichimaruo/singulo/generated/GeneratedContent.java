@@ -276,6 +276,8 @@ public final class GeneratedContent {
             "android_recipe_rack",
             "android_workbench",
             "work_location_card",
+            "area_card",
+            "survey_glasses",
             "recipe_card",
             "procedure_card",
             "sealed_container_1",

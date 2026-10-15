@@ -606,6 +606,10 @@ def item_textures(ti, save):
     save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
     save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
     save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
+    save(area_card_icon(Image, 0), ti / 'area_card.png')
+    save(area_card_icon(Image, 1), ti / 'area_card_first.png')
+    save(area_card_icon(Image, 2), ti / 'area_card_recorded.png')
+    save(wear(glasses_icon(Image), 37), ti / 'survey_glasses.png')
     save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
     save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
 
@@ -849,6 +853,46 @@ def card_icon(Image, stripe, recorded=None):
             px[x, y] = (40, 120, 70, 255)
         px[11, 1] = (200, 255, 210, 255)
         px[12, 3] = (40, 120, 70, 255)
+    return im
+
+
+def area_card_icon(Image, corners):
+    """範囲カード: 作業のカードに、範囲の角の印（かぎ形）。corners: 0 未記録（灰色の帯、印なし）、1 1つ目の角だけ（左上）、2 範囲ができた（左上と右下）。"""
+    stripe = (176, 182, 194) if corners == 0 else (120, 150, 236)
+    im = card_icon(Image, stripe, recorded=False if corners == 0 else None)
+    px = im.load()
+    mark = (60, 80, 170, 255)
+    if corners >= 1:
+        for (x, y) in ((0, 0), (1, 0), (2, 0), (0, 1), (0, 2)):
+            px[x, y] = mark
+        px[1, 1] = (200, 215, 255, 255)
+    if corners >= 2:
+        for (x, y) in ((15, 15), (14, 15), (13, 15), (15, 14), (15, 13)):
+            px[x, y] = mark
+        px[14, 14] = (200, 215, 255, 255)
+    return im
+
+
+def glasses_icon(Image):
+    """測量メガネ: 濃い枠の丸いレンズ2つ（淡い水色、左上に光）、真ん中のブリッジに小さな金の回路、両端につる。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    frame, lens, shine, gold = (54, 58, 72, 255), (150, 214, 240, 255), (232, 250, 255, 255), (226, 186, 92, 255)
+    for cx in (4, 11):
+        for y in range(5, 12):
+            for x in range(cx - 3, cx + 4):
+                d = (x - cx) ** 2 + (y - 8) ** 2
+                if d <= 10:
+                    px[x, y] = frame if d >= 6 else lens
+        px[cx - 1, 7] = shine
+        px[cx - 2, 8] = shine
+    for x in (7, 8):
+        px[x, 7] = frame
+    px[7, 6] = gold
+    px[8, 6] = gold
+    for x in (0, 15):
+        px[x, 7] = frame
+        px[x, 6] = frame
     return im
 
 

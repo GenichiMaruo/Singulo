@@ -290,6 +290,9 @@ final class AndroidWorkGoal extends Goal {
         if (c == null) {
             return;
         }
+        if (android.tickCount % 20 == 5) {
+            android.setWorkRules(c.pathRules());       // 作業指令台の「経路」
+        }
         // 取消・再割当てを毎tick確認し、残った古い作業で素材を消費しない。
         if (android.workJob != null && android.workJob.jobId() >= 0 && !c.heartbeat(android, android.workJob)) {
             android.workJob = null;
@@ -2219,8 +2222,9 @@ final class AndroidWorkGoal extends Goal {
         if (++travel > GIVE_UP_TICKS) {
             return giveUp();
         }
-        if (travel % 20 == 1 || android.getNavigation().isDone()) {
-            android.getNavigation().moveTo(goal.x, goal.y, goal.z, 1.0);
+        // 経路の決まり（作業指令台の「経路」）に従って向かう。経由地点を通ったら、あきらめるまでの時間を数え直す
+        if (android.moveVia(goal, 1.0, android.workRules(), travel % 20 == 1)) {
+            travel = 0;
         }
         return false;
     }

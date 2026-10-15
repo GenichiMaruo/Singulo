@@ -1327,6 +1327,10 @@
     "source": "The halo the Last Archivist wore. It is still quietly warm and faintly whispers in an old tongue.",
     "translation": "최후의 기록자가 쓰고 있던 광륜입니다. 지금도 조용히 따뜻하며, 희미하게 옛말을 속삭입니다."
   },
+  "desc.singulo.area_card": {
+    "source": "Sneak-use two blocks to record the area between them as corners (up to 128 blocks per side; one card is split off a stack). Sneak-use again to record anew; sneak-use on nothing to clear it. Used on the Routes page of the work console and assembly station for the area a waypoint covers and for no-entry zones.",
+    "translation": "블록 두 개를 웅크리고 우클릭하면 그 둘을 모서리로 하는 범위를 기록합니다(한 변 128블록까지. 겹쳐 있으면 한 장만 나누어 기록). 다시 웅크리고 우클릭하면 새로 기록합니다. 빈 곳에 웅크리고 우클릭하면 기록을 지웁니다. 작업 지령대·조립 스테이션 \"경로\"의 대상 범위와 진입 금지 구역에 씁니다."
+  },
   "desc.singulo.artificial_star_core": {
     "source": "A star core that replaces nether stars.",
     "translation": "네더의 별을 대신하는 항성 핵."
@@ -2223,6 +2227,10 @@
     "source": "Wire for coils and cables.",
     "translation": "코일 및 케이블용 와이어."
   },
+  "desc.singulo.survey_glasses": {
+    "source": "Worn on the head (use it, or put it in the helmet slot). While worn, the places recorded on the area card or work location card in your hand are outlined (with only the first corner of an area recorded, the area up to the block you look at is previewed). The icons over working androids, showing what they are doing, are only visible while wearing them.",
+    "translation": "머리에 씁니다(우클릭하거나 투구 칸에). 쓰고 있는 동안 손에 든 범위 카드·작업 위치 카드가 기록한 장소가 테두리로 보입니다(범위 카드에 첫 번째 모서리만 기록했다면 보고 있는 블록까지의 범위 미리보기도). 작업 중인 안드로이드 머리 위의 표시도 쓰고 있을 때만 보입니다."
+  },
   "desc.singulo.temporal_key": {
     "source": "Opens or seals a temporal-lock container. Used up each time.",
     "translation": "시간 잠금 컨테이너를 열거나 봉인합니다. 쓸 때마다 소모됩니다."
@@ -2739,6 +2747,34 @@
     "source": "HP %s / %s",
     "translation": "체력 %s / %s"
   },
+  "gui.singulo.android.log.alarm": {
+    "source": "Spotted a group of %2$s (%1$s and others) and raised the alarm",
+    "translation": "%1$s 등 %2$s마리의 무리를 발견하고 경보를 울림"
+  },
+  "gui.singulo.android.log.boss": {
+    "source": "Spotted %s and raised the alarm",
+    "translation": "%s을(를) 발견하고 경보를 울림"
+  },
+  "gui.singulo.android.log.empty.0": {
+    "source": "Nothing recorded yet",
+    "translation": "아직 기록이 없음"
+  },
+  "gui.singulo.android.log.empty.1": {
+    "source": "Defeated enemies and alarms show up here",
+    "translation": "쓰러뜨린 적과 경보가 여기에 남습니다"
+  },
+  "gui.singulo.android.log.kill": {
+    "source": "Defeated %s ×%s",
+    "translation": "%s을(를) %s마리 쓰러뜨림"
+  },
+  "gui.singulo.android.log.speech": {
+    "source": "Patrol log",
+    "translation": "순찰 일지"
+  },
+  "gui.singulo.android.log.when": {
+    "source": "Day %s %s",
+    "translation": "%s일째 %s"
+  },
   "gui.singulo.android.mode": {
     "source": "Mode: %s",
     "translation": "모드: %s"
@@ -2770,6 +2806,10 @@
   "gui.singulo.android.page.gear": {
     "source": "Gear and inventory",
     "translation": "장비와 소지품"
+  },
+  "gui.singulo.android.page.log": {
+    "source": "Log",
+    "translation": "기록"
   },
   "gui.singulo.android.page.status": {
     "source": "Status",
@@ -3011,9 +3051,49 @@
     "source": "Follows its owner (the buttons below choose whether it fights nearby enemies). Recharges while walking with you if you carry a wireless charger.",
     "translation": "주인을 따라다닙니다(아래 버튼으로 근처의 적과 싸울지 고릅니다). 무선 충전기를 들고 있으면 함께 걸으며 충전합니다."
   },
+  "gui.singulo.android_station.mode.3": {
+    "source": "Patrol",
+    "translation": "순찰"
+  },
+  "gui.singulo.android_station.mode.3.hint": {
+    "source": "Walks the route below (Work Location Cards) in order and fights enemies nearby. Calls idle allies when a fight starts, and when it spots a group of enemies or a boss, the station gives a redstone signal and the owner is told.",
+    "translation": "아래 순찰 경로(작업 위치 카드)의 장소를 차례로 돌며 근처의 적과 싸웁니다. 싸움이 시작되면 손이 빈 동료를 부르고, 적의 무리나 보스를 발견하면 스테이션에서 레드스톤 신호를 내고 주인에게 알립니다."
+  },
   "gui.singulo.android_station.no_design": {
     "source": "No design memory",
     "translation": "설계 메모리 없음"
+  },
+  "gui.singulo.android_station.patrol.dwell": {
+    "source": "Pause %ss",
+    "translation": "대기 %s초"
+  },
+  "gui.singulo.android_station.patrol.dwell.hint": {
+    "source": "How long to stop and look around at each point. Click to change",
+    "translation": "각 지점에서 멈춰 서서 둘러보는 시간(클릭으로 전환)"
+  },
+  "gui.singulo.android_station.patrol.night.hint": {
+    "source": "Patrol only at night (waiting by the station in the day) or all the time. Click to switch",
+    "translation": "밤에만 순찰할지(낮에는 스테이션 곁에서 대기), 늘 순찰할지(클릭으로 전환)"
+  },
+  "gui.singulo.android_station.patrol.night.off": {
+    "source": "Day & night",
+    "translation": "밤낮 모두"
+  },
+  "gui.singulo.android_station.patrol.night.on": {
+    "source": "Nights only",
+    "translation": "밤에만"
+  },
+  "gui.singulo.android_station.patrol.order.back_and_forth": {
+    "source": "Back & forth",
+    "translation": "왕복"
+  },
+  "gui.singulo.android_station.patrol.order.hint": {
+    "source": "After the last point, go back to the first one (Loop) or come back the same way (Back & forth). Click to switch",
+    "translation": "마지막 지점까지 가면 첫 지점으로 돌아갈지(순환), 온 길을 되돌아갈지(왕복)(클릭으로 전환)"
+  },
+  "gui.singulo.android_station.patrol.order.loop": {
+    "source": "Loop",
+    "translation": "순환"
   },
   "gui.singulo.android_station.permit": {
     "source": "Permit",
@@ -3042,6 +3122,22 @@
   "gui.singulo.android_station.retreat.hint": {
     "source": "Below this share of health it returns to the station to repair and recharge.",
     "translation": "체력이 이 비율보다 낮아지면 스테이션으로 돌아가 수리와 충전을 합니다."
+  },
+  "gui.singulo.android_station.route.hint": {
+    "source": "Patrol route: place Work Location Cards and the androids visit those places from left to right (up to 8), standing on top of each one to look around.",
+    "translation": "순찰 경로: 작업 위치 카드를 놓으면 그 장소를 왼쪽부터 차례로 돕니다(8개까지). 카드 장소 위에 서서 둘러봅니다."
+  },
+  "gui.singulo.android_station.rules": {
+    "source": "Routes",
+    "translation": "경로"
+  },
+  "gui.singulo.android_station.rules.back": {
+    "source": "Status",
+    "translation": "상태"
+  },
+  "gui.singulo.android_station.rules.hint": {
+    "source": "Switch to the page of route rules for patrols (required waypoints and no-entry zones)",
+    "translation": "순찰 이동의 규칙(필수 경유 지점·진입 금지 구역) 페이지로 전환"
   },
   "gui.singulo.android_station.status.0": {
     "source": "Insert a compact crystal memory",
@@ -4183,6 +4279,18 @@
     "source": "The fuel to fetch when the machine runs out, and how many to bring each time (scroll to change). Leave it empty to never fetch fuel",
     "translation": "장치의 연료가 떨어지면 가지러 갈 연료와, 한 번에 가져올 수(휠로 개수 변경). 비워 두면 가지러 가지 않습니다"
   },
+  "gui.singulo.recipe_encoder.fuel_mode.count": {
+    "source": "×%s",
+    "translation": "%s개"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.fill": {
+    "source": "Fill",
+    "translation": "가득"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.hint": {
+    "source": "How much fuel is brought each time (click to switch). ×N: the count in the fuel slot (never more than the machine can take). Fill: as much as the machine can take",
+    "translation": "한 번에 가져오는 연료의 양(클릭으로 전환). N개: 연료 칸의 수만큼(장치에 다 들어가지 않는 만큼은 가져오지 않음). 가득: 장치에 들어가는 만큼"
+  },
   "gui.singulo.recipe_encoder.grid.hint": {
     "source": "Click with an item to place a copy as a pattern (it is not used up)",
     "translation": "물건을 들고 클릭하면 그 견본을 둡니다(줄지 않습니다)"
@@ -4338,6 +4446,38 @@
   "gui.singulo.recipe_encoder.variants.on": {
     "source": "Any variant",
     "translation": "같은 종류도 사용"
+  },
+  "gui.singulo.route.hint.0": {
+    "source": "Moving into or out of the area, androids pass the waypoint",
+    "translation": "대상 범위의 안팎을 오갈 때 경유 지점을 지나고,"
+  },
+  "gui.singulo.route.hint.1": {
+    "source": "and stay out of its no-entry zones on the way (up to 4 rows)",
+    "translation": "그동안 진입 금지 구역을 피합니다(4행까지)"
+  },
+  "gui.singulo.route.scope": {
+    "source": "Area",
+    "translation": "대상 범위"
+  },
+  "gui.singulo.route.scope.hint": {
+    "source": "Area (Area Card): only moves into or out of this area go through the waypoint",
+    "translation": "대상 범위(범위 카드): 이 범위의 안팎을 오가는 이동만 경유 지점을 지납니다"
+  },
+  "gui.singulo.route.via": {
+    "source": "Waypoint",
+    "translation": "경유 지점"
+  },
+  "gui.singulo.route.via.hint": {
+    "source": "Waypoint (Work Location Card): androids moving into or out of the area pass over this place",
+    "translation": "경유 지점(작업 위치 카드): 대상 범위의 안팎을 오갈 때 이 장소 위를 지나갑니다"
+  },
+  "gui.singulo.route.zone": {
+    "source": "No-entry zones",
+    "translation": "진입 금지 구역"
+  },
+  "gui.singulo.route.zone.hint": {
+    "source": "No-entry zone (Area Card, up to 2): androids stay out of it while moving through the waypoint (unless they start or end inside it)",
+    "translation": "진입 금지 구역(범위 카드, 2개까지): 경유 지점을 지나는 이동 동안 여기에 들어가지 않습니다(출발한 곳·목적지를 포함하는 구역은 제외)"
   },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",
@@ -4679,6 +4819,10 @@
     "source": "Cancelled the order for %s (a place could not be reached)",
     "translation": "%s 주문을 취소했습니다(도착할 수 없는 곳이 있었습니다)"
   },
+  "gui.singulo.work_console.cancelled.wrong_face": {
+    "source": "Cancelled the order for %s (the machine does not take materials through its %s face)",
+    "translation": "%s 주문을 취소했습니다(장치가 넣는 면(%s)으로 재료를 받지 않음)"
+  },
   "gui.singulo.work_console.cannot_start": {
     "source": "This order cannot be started",
     "translation": "이 주문은 할 수 없습니다"
@@ -4735,6 +4879,14 @@
     "source": "Click to see the steps and what each android is doing",
     "translation": "클릭해서 공정과 안드로이드의 상태를 봅니다"
   },
+  "gui.singulo.work_console.detail.machine": {
+    "source": " (%s in a machine)",
+    "translation": " (%s 장치에서 가공 중)"
+  },
+  "gui.singulo.work_console.detail.machine_eta": {
+    "source": " (%s in a machine, about %ss left)",
+    "translation": " (%s 장치에서 가공 중, 약 %s초 남음)"
+  },
   "gui.singulo.work_console.detail.to_stock": {
     "source": "To stockpile %s / %s",
     "translation": "재료 보관소로 %s / %s"
@@ -4778,6 +4930,14 @@
   "gui.singulo.work_console.error.not_workbench": {
     "source": "The work location for %s is not a crafting table",
     "translation": "%s 레시피의 작업 위치가 제작대가 아닙니다"
+  },
+  "gui.singulo.work_console.error.wrong_face": {
+    "source": "The machine for %s does not take %s through its %s face (check the \"In\" face on the recipe card)",
+    "translation": "%s 레시피의 장치가 넣는 면(%3$s)으로 %2$s을(를) 받지 않습니다(레시피 카드의 \"입\" 면을 확인하세요)"
+  },
+  "gui.singulo.work_console.fuel_ordered": {
+    "source": "Out of fuel (%s), so an order to make %s was placed",
+    "translation": "재료 보관소에 연료(%s)가 없어서 %s개를 만드는 주문을 냈습니다"
   },
   "gui.singulo.work_console.link.0": {
     "source": "Supply port",
@@ -4943,6 +5103,10 @@
     "source": "Record",
     "translation": "기록"
   },
+  "gui.singulo.work_console.tab.routes": {
+    "source": "Routes",
+    "translation": "경로"
+  },
   "gui.singulo.work_console.tab.running": {
     "source": "Running",
     "translation": "진행 중"
@@ -4991,6 +5155,10 @@
     "source": "(not found)",
     "translation": "(보이지 않음)"
   },
+  "gui.singulo.work_console.worker.elsewhere": {
+    "source": "On another order",
+    "translation": "다른 주문 작업 중"
+  },
   "gui.singulo.wormhole.generated": {
     "source": "A pair of mouths formed. Stabilize within %s s",
     "translation": "입구 한 쌍이 생겼습니다. %s초 이내에 안정화하세요"
@@ -5036,8 +5204,8 @@
     "translation": "안드로이드"
   },
   "guide.singulo.androids.build.body": {
-    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.",
-    "translation": "안드로이드 조립 스테이션에 소형 크리스털 메모리(형을 정함, 소모되지 않음)와 안드로이드 키트(출력마다 하나)를 넣고 전력을 보내면, 위에 호위 안드로이드를 하나 출력합니다(1회 40,000 FE). 쓰러지면 키트가 남아 있는 한 다시 출력합니다. 스테이션을 놓은 사람이 주인입니다.\n- 호위는 적대적 몹(유적의 안드로이드와 드론 포함)만 노리고, 플레이어나 보스와는 절대 싸우지 않습니다. 플레이어와 보스의 공격으로는 다치지 않습니다.\n- 움직임: 요격(스테이션 곁에서 대기)·배회(16블록 안을 돌아다님)·따라가기(주인을 따라감). 따라가는 중에는 \"따라가기만\"과 \"호위하기\"(근처의 적과 싸움) 중에서 고릅니다.\n- 허가증: 스테이션에 보호막 허가증을 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있습니다. 주인과 등록한 사람 중 누구를 따라갈지도 고를 수 있습니다.\n- 복귀 체력: 이보다 낮아지면 안드로이드가 돌아가 수리와 충전을 합니다. \"불러오기\"로 바로 돌려보낼 수도 있습니다.\n- 이름: 스테이션이나 안드로이드 화면에서 이름을 클릭하면 바꿀 수 있습니다(↺ 버튼으로 애칭으로 되돌림).\n- 비교기: 스테이션이 안드로이드의 체력에 따라 신호(0~15)를 냅니다.\n- 스테이션이 부서지면 안드로이드는 그 자리에 남습니다. 새 스테이션에 같은 형의 메모리를 넣고 \"연결\"을 누르면 다시 이어집니다."
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.",
+    "translation": "안드로이드 조립 스테이션에 소형 크리스털 메모리(형을 정함, 소모되지 않음)와 안드로이드 키트(출력마다 하나)를 넣고 전력을 보내면, 위에 호위 안드로이드를 하나 출력합니다(1회 40,000 FE). 쓰러지면 키트가 남아 있는 한 다시 출력합니다. 스테이션을 놓은 사람이 주인입니다.\n- 호위는 적대적 몹(유적의 안드로이드와 드론 포함)만 노리고, 플레이어나 보스와는 절대 싸우지 않습니다. 플레이어와 보스의 공격으로는 다치지 않습니다.\n- 움직임: 요격(스테이션 곁에서 대기)·배회(16블록 안을 돌아다님)·따라가기(주인을 따라감)·순찰(정한 장소를 돎). 따라가는 중에는 \"따라가기만\"과 \"호위하기\"(근처의 적과 싸움) 중에서 고릅니다.\n- 허가증: 스테이션에 보호막 허가증을 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있습니다. 주인과 등록한 사람 중 누구를 따라갈지도 고를 수 있습니다.\n- 복귀 체력: 이보다 낮아지면 안드로이드가 돌아가 수리와 충전을 합니다. \"불러오기\"로 바로 돌려보낼 수도 있습니다.\n- 이름: 스테이션이나 안드로이드 화면에서 이름을 클릭하면 바꿀 수 있습니다(↺ 버튼으로 애칭으로 되돌림).\n- 비교기: 스테이션이 안드로이드의 체력에 따라 신호(0~15)를 냅니다.\n- 스테이션이 부서지면 안드로이드는 그 자리에 남습니다. 새 스테이션에 같은 형의 메모리를 넣고 \"연결\"을 누르면 다시 이어집니다."
   },
   "guide.singulo.androids.build.title": {
     "source": "Your own androids",
@@ -5067,6 +5235,14 @@
     "source": "Android glass",
     "translation": "안드로이드용 유리"
   },
+  "guide.singulo.androids.patrol.body": {
+    "source": "Set the station's mode to Patrol and the androids walk a set route and keep watch.\n- Route: choosing Patrol shows eight slots. Put Work Location Cards in them and the androids visit those places from left to right, standing on top of each to look around. Choose whether they go back to the first point (Loop) or return the same way (Back & forth), whether they patrol only at night, and how long they stop at each point. Two androids start from opposite sides.\n- Fights: they fight enemies nearby and carry on from where they left off. When a fight starts, idle androids of the same station come to help (and go back afterwards).\n- Alarm: when they spot a group of enemies (5 or more) or a boss, the station gives a redstone signal for 5 seconds and the owner is told (at most once a minute).\n- Log: defeated enemies and alarms are kept on the Log page of the android screen, newest first (16 entries). Come back after a while and the android tells you what happened while you were away.",
+    "translation": "스테이션의 움직임을 \"순찰\"로 하면 안드로이드가 정한 장소를 차례로 돌며 경계합니다.\n・순찰 경로: \"순찰\"을 고르면 나오는 8개의 칸에 작업 위치 카드를 놓으면, 그 장소를 왼쪽부터 차례로 돌고 카드 장소 위에 서서 둘러봅니다. 마지막까지 가면 처음으로 돌아갈지(순환), 온 길을 되돌아갈지(왕복), 밤에만 돌지, 각 지점에서 멈추는 시간을 고를 수 있습니다. 2체라면 반대쪽부터 돕니다.\n・싸움: 근처의 적과 싸우고, 정리되면 빠져나온 곳부터 이어갑니다. 싸움이 시작되면 같은 스테이션의 손이 빈 동료를 부릅니다(정리되면 제자리로 돌아감).\n・경보: 적의 무리(5마리 이상)나 보스를 발견하면 스테이션이 5초 동안 레드스톤 신호를 내고 주인에게 알립니다(1분에 1번까지).\n・기록: 쓰러뜨린 적과 경보는 안드로이드 화면의 \"기록\" 페이지에 최신순으로 16건 남습니다. 오랜만에 곁에 가면 자리를 비운 사이의 일을 한마디 알려 줍니다."
+  },
+  "guide.singulo.androids.patrol.title": {
+    "source": "Patrol",
+    "translation": "순찰 경비"
+  },
   "guide.singulo.androids.process.body": {
     "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in and take the results out (the faces are chosen automatically, or set them with the In and Out buttons when recording). While a slow machine works, they do other jobs (including their other orders) and come back when it is done. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
     "translation": "지령대 \"기록\"의 모드 버튼으로 기록할 종류를 전환합니다.\n・가공: 화로와 장치의 레시피. 왼쪽에 넣는 것, 오른쪽에 나오는 것(부산물도 2개까지)을 놓고, 휠로 개수를 바꿉니다(JEI의 \"+\"로도 가능). 안드로이드는 장치에 재료를 넣고 완성품을 꺼냅니다(면은 자동. 기록할 때 \"입\" \"출\" 버튼으로 정할 수도 있음). 오래 걸리는 가공은 기다리는 동안 다른 작업(맡은 다른 주문도)을 하고, 완성되면 가지러 돌아옵니다. 부산물은 재료 보관소로 돌려놓습니다. 연료와 전력은 직접 준비하세요. 2분 동안 진행이 없으면 주문이 취소됩니다.\n・절차: 절차 카드에 투입·꺼내기·채굴 절차를 8개까지 기록합니다. 작업 위치 카드를 놓아 위치를 옮기고, 아이템 칸에 아이템을 놓은 뒤 \"추가\"를 누릅니다. 오른쪽에 만들어지는 것을 놓고 기록합니다. 절차 카드는 위치를 스스로 가지므로 레시피 선반의 어느 줄에나 놓을 수 있습니다.\n・채굴: 채굴 업그레이드를 단 안드로이드만 합니다. 작업 위치 카드 2장으로 범위를 정하면 위층부터 캐며, 목표 아이템이 모일 때까지 계속합니다(조약돌 생성기에도 쓸 수 있음). 부술 수 없는 블록·액체·보관함·실드로 보호된 곳은 캐지 않습니다. 캘 것이 없는 상태가 30초 계속되면 취소됩니다.\n・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다."
@@ -5074,6 +5250,14 @@
   "guide.singulo.androids.process.title": {
     "source": "Processing, procedures and mining",
     "translation": "가공·절차·채굴"
+  },
+  "guide.singulo.androids.routes.body": {
+    "source": "On the Routes page of the work console, and the Routes page of the assembly station (the button right of the title), you can set up to four movement rules (the console's apply to work trips, the station's to patrols).\n- Each row takes a waypoint (Work Location Card), an area (Area Card) and up to two no-entry zones (Area Cards).\n- Moving into or out of the area, androids first pass over the waypoint, like a door to the base, and stay out of the no-entry zones on the way (unless they start or end inside one).\n- Area Card: sneak-use two blocks to record the area between them as corners (up to 128 blocks per side). Areas reach from the recorded height up two blocks, so recording floor blocks works for androids walking on them.\n- Survey Glasses: worn on the head, they outline the places recorded on the area or work location card in your hand (with only the first corner recorded, the area up to the block you look at is previewed). The icons over working androids only show while you wear them.",
+    "translation": "작업 지령대의 \"경로\" 페이지와 조립 스테이션의 \"경로\"(제목 오른쪽 버튼)에서 안드로이드의 이동 규칙을 4개까지 만들 수 있습니다(작업 지령대는 작업 이동에, 스테이션은 순찰 이동에 적용).\n・한 행에 경유 지점(작업 위치 카드), 대상 범위(범위 카드), 진입 금지 구역(범위 카드, 2개까지)을 놓습니다.\n・대상 범위의 안팎을 오가는 이동에서는 경유 지점 위를 지난 뒤 목적지로 향합니다(거점의 문처럼). 그동안 진입 금지 구역에 들어가지 않습니다(출발한 곳·목적지가 구역 안이면 그 구역은 피하지 않음).\n・범위 카드: 블록 두 개를 웅크리고 우클릭하면 그 둘을 모서리로 하는 범위를 기록합니다(한 변 128블록까지). 범위는 기록한 블록의 높이부터 그 위 2칸까지 적용되므로, 바닥 블록을 기록하면 그 위를 걷는 안드로이드에게 적용됩니다.\n・측량 안경: 머리에 쓰면 손에 든 범위 카드·작업 위치 카드가 기록한 장소가 테두리로 보입니다(범위 카드에 첫 번째 모서리만 기록했다면 보고 있는 블록까지의 범위 미리보기도). 작업 중인 안드로이드 머리 위의 표시도 쓰고 있을 때만 보입니다."
+  },
+  "guide.singulo.androids.routes.title": {
+    "source": "Routes and Survey Glasses",
+    "translation": "경로와 측량 안경"
   },
   "guide.singulo.androids.ruin.body": {
     "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
@@ -5682,6 +5866,10 @@
   "howto.singulo.archive_terminal": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.area_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.artificial_star_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
@@ -6363,6 +6551,10 @@
     "source": "Made in: Cryogenic Cooling Tower (stage 2)",
     "translation": "제작: 극저온 냉각탑(2단계)"
   },
+  "howto.singulo.survey_glasses": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
   "howto.singulo.temporal_key": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "제작: 정밀 조립기(4단계)"
@@ -6642,6 +6834,10 @@
   "item.singulo.archivist_halo": {
     "source": "Archivist's Halo",
     "translation": "기록자의 광륜"
+  },
+  "item.singulo.area_card": {
+    "source": "Area Card",
+    "translation": "범위 카드"
   },
   "item.singulo.artificial_star_core": {
     "source": "Artificial Star Core",
@@ -7123,6 +7319,10 @@
     "source": "Superconducting Wire",
     "translation": "초전도 선재"
   },
+  "item.singulo.survey_glasses": {
+    "source": "Survey Glasses",
+    "translation": "측량 안경"
+  },
   "item.singulo.temporal_key": {
     "source": "Temporal Key",
     "translation": "시간 잠금 열쇠"
@@ -7259,6 +7459,22 @@
     "source": "Toggle gravity tool area",
     "translation": "중력 도구 영역 전환"
   },
+  "message.singulo.android.alarm": {
+    "source": "%s: spotted a group of %3$s (%2$s and others) at %4$s, %5$s, %6$s",
+    "translation": "%1$s: %2$s 등 %3$s마리의 무리를 발견했습니다(%4$s, %5$s, %6$s)"
+  },
+  "message.singulo.android.alarm.boss": {
+    "source": "%s: spotted %s at %s, %s, %s",
+    "translation": "%s: %s을(를) 발견했습니다(%s, %s, %s)"
+  },
+  "message.singulo.android.patrol_report": {
+    "source": "%s: while you were away, I defeated %s enemies",
+    "translation": "%s: 자리를 비운 사이에 적을 %s마리 쓰러뜨렸어요"
+  },
+  "message.singulo.android.patrol_report.alarm": {
+    "source": "%s: while you were away, I defeated %s enemies and raised %s alarms",
+    "translation": "%s: 자리를 비운 사이에 적을 %s마리 쓰러뜨리고 경보를 %s번 울렸어요"
+  },
   "message.singulo.android_charger.charged": {
     "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
     "translation": "무선 충전기에 %1$s FE를 충전했습니다(%2$s / %3$s FE)"
@@ -7266,6 +7482,22 @@
   "message.singulo.android_workbench.hint": {
     "source": "Androids craft here. Record this block on the Work Location Card in a recipe rack",
     "translation": "안드로이드가 여기서 만듭니다. 레시피 선반의 작업 위치 카드에 이 블록을 기록하세요"
+  },
+  "message.singulo.area_card.cleared": {
+    "source": "Cleared the area",
+    "translation": "범위 기록을 지웠습니다"
+  },
+  "message.singulo.area_card.first": {
+    "source": "Recorded the first corner (%s, %s, %s). Sneak-use the other corner",
+    "translation": "첫 번째 모서리를 기록했습니다(%s, %s, %s). 다른 모서리를 웅크리고 우클릭하세요"
+  },
+  "message.singulo.area_card.recorded": {
+    "source": "Recorded the area (%s×%s×%s)",
+    "translation": "범위를 기록했습니다(%s×%s×%s)"
+  },
+  "message.singulo.area_card.too_large": {
+    "source": "The area is too large (up to %s blocks per side)",
+    "translation": "범위가 너무 큽니다(한 변 %s블록까지)"
   },
   "message.singulo.deep_sea_collector.idle": {
     "source": "Not deep enough: needs 16+ blocks of water above",
@@ -8443,6 +8675,30 @@
     "source": "Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch",
     "translation": "다이아몬드 곡괭이처럼 캡니다. 효율·행운·섬세한 손길을 부여할 수 있습니다"
   },
+  "tooltip.singulo.area_card.area": {
+    "source": "Area: %s, %s, %s to %s, %s, %s",
+    "translation": "범위: %s, %s, %s ~ %s, %s, %s"
+  },
+  "tooltip.singulo.area_card.empty": {
+    "source": "Sneak-use a block to record the first corner of an area",
+    "translation": "블록을 웅크리고 우클릭해 범위의 첫 번째 모서리를 기록"
+  },
+  "tooltip.singulo.area_card.first": {
+    "source": "First corner: %s, %s, %s",
+    "translation": "첫 번째 모서리: %s, %s, %s"
+  },
+  "tooltip.singulo.area_card.hint": {
+    "source": "Sneak-use to record again; sneak-use on nothing to clear. Wear Survey Glasses to see the area",
+    "translation": "웅크리고 우클릭하면 다시 기록. 빈 곳에 웅크리고 우클릭하면 지움. 측량 안경을 쓰면 범위가 보임"
+  },
+  "tooltip.singulo.area_card.next": {
+    "source": "Sneak-use the other corner",
+    "translation": "다른 모서리를 웅크리고 우클릭"
+  },
+  "tooltip.singulo.area_card.size": {
+    "source": "Size: %s×%s×%s",
+    "translation": "크기: %s×%s×%s"
+  },
   "tooltip.singulo.beyond_repair": {
     "source": "Beyond repair",
     "translation": "더 이상 수리할 수 없음"
@@ -8599,6 +8855,10 @@
     "source": "Fuel: %s ×%s (fetched when it runs out)",
     "translation": "연료: %s ×%s (떨어지면 가지러 감)"
   },
+  "tooltip.singulo.recipe_card.fuel_fill": {
+    "source": "Fuel: %s, filled up (when it runs out, as much as fits is fetched)",
+    "translation": "연료: %s 가득 (떨어지면 들어가는 만큼 가지러 감)"
+  },
   "tooltip.singulo.recipe_card.output": {
     "source": "Makes: %s ×%s",
     "translation": "만드는 것: %s ×%s"
@@ -8626,6 +8886,10 @@
   "tooltip.singulo.stage": {
     "source": "Stage %s: %s",
     "translation": "%s단계: %s"
+  },
+  "tooltip.singulo.survey_glasses": {
+    "source": "Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing",
+    "translation": "머리에 쓰면 손에 든 범위 카드·작업 위치 카드가 기록한 장소와 안드로이드의 작업 표시가 보입니다"
   },
   "tooltip.singulo.uses": {
     "source": "Uses %s / %s",
@@ -8680,8 +8944,8 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 35 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 35개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 37 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 37개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
@@ -8732,8 +8996,8 @@
     "translation": "사용 제품: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 13 more",
-    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 13개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 14 more",
+    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 14개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -9206,45 +9470,5 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "사용 대상: 웜홀 입구"
-  },
-  "gui.singulo.work_console.detail.machine": {
-    "source": " (%s in a machine)",
-    "translation": " (%s 장치에서 가공 중)"
-  },
-  "gui.singulo.work_console.detail.machine_eta": {
-    "source": " (%s in a machine, about %ss left)",
-    "translation": " (%s 장치에서 가공 중, 약 %s초 남음)"
-  },
-  "gui.singulo.work_console.worker.elsewhere": {
-    "source": "On another order",
-    "translation": "다른 주문 작업 중"
-  },
-  "gui.singulo.work_console.error.wrong_face": {
-    "source": "The machine for %s does not take %s through its %s face (check the \"In\" face on the recipe card)",
-    "translation": "%s 레시피의 장치가 넣는 면(%3$s)으로 %2$s을(를) 받지 않습니다(레시피 카드의 \"입\" 면을 확인하세요)"
-  },
-  "gui.singulo.work_console.cancelled.wrong_face": {
-    "source": "Cancelled the order for %s (the machine does not take materials through its %s face)",
-    "translation": "%s 주문을 취소했습니다(장치가 넣는 면(%s)으로 재료를 받지 않음)"
-  },
-  "tooltip.singulo.recipe_card.fuel_fill": {
-    "source": "Fuel: %s, filled up (when it runs out, as much as fits is fetched)",
-    "translation": "연료: %s 가득 (떨어지면 들어가는 만큼 가지러 감)"
-  },
-  "gui.singulo.recipe_encoder.fuel_mode.count": {
-    "source": "×%s",
-    "translation": "%s개"
-  },
-  "gui.singulo.recipe_encoder.fuel_mode.fill": {
-    "source": "Fill",
-    "translation": "가득"
-  },
-  "gui.singulo.recipe_encoder.fuel_mode.hint": {
-    "source": "How much fuel is brought each time (click to switch). ×N: the count in the fuel slot (never more than the machine can take). Fill: as much as the machine can take",
-    "translation": "한 번에 가져오는 연료의 양(클릭으로 전환). N개: 연료 칸의 수만큼(장치에 다 들어가지 않는 만큼은 가져오지 않음). 가득: 장치에 들어가는 만큼"
-  },
-  "gui.singulo.work_console.fuel_ordered": {
-    "source": "Out of fuel (%s), so an order to make %s was placed",
-    "translation": "재료 보관소에 연료(%s)가 없어서 %s개를 만드는 주문을 냈습니다"
   }
 }

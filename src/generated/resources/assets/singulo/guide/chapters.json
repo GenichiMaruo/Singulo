@@ -104,6 +104,8 @@
       "pages": [
         "androids.ruin",
         "androids.build",
+        "androids.patrol",
+        "androids.routes",
         "androids.care",
         "androids.upgrades",
         "androids.work",

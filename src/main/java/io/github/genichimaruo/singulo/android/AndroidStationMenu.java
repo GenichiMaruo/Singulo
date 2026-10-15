@@ -24,6 +24,11 @@ public class AndroidStationMenu extends AbstractContainerMenu {
     public static final int PRODUCTION_X = 28, PRODUCTION_Y = 82;
     public static final int STOCK_X = 18, STOCK_Y = 108;
     public static final int PERMIT_X = 18, PERMIT_Y = 134;
+    /** 巡回路の欄（動き方が巡回のとき、追従の設定の段に8つ並べる）。 */
+    public static final int ROUTE_X = 61, ROUTE_Y = 111;
+    /** 経路のページ（題の右の「経路」で切り替える）: 4行（経由地点・対象範囲・進入禁止ゾーン2つ）。 */
+    public static final int RULE_Y = 40, RULE_ROW = 19;
+    public static final int[] RULE_COL_X = {66, 106, 146, 164};
     /** 持ち物は横幅の中央に。 */
     public static final int INV_X = (WIDTH - 162) / 2 + 1;
     public static final int INV_Y = 160;
@@ -31,6 +36,8 @@ public class AndroidStationMenu extends AbstractContainerMenu {
 
     private final BlockPos pos;
     private final SyncedInts data;
+    /** 経路のページを見ているか（クライアント）。 */
+    private boolean ruleView;
 
     public AndroidStationMenu(int containerId, Inventory inventory, BlockPos pos, IItemHandler items, SyncedInts data) {
         super(SinguloMenus.ANDROID_STATION.get(), containerId);
@@ -72,6 +79,34 @@ public class AndroidStationMenu extends AbstractContainerMenu {
                 return AndroidStationBlockEntity.isProductionUpgrade(stack);
             }
         });
+        for (int i = 0; i < AndroidStationBlockEntity.ROUTE_SLOTS; i++) {
+            addSlot(new SlotItemHandler(items, AndroidStationBlockEntity.SLOT_ROUTE + i, ROUTE_X + i * 18, ROUTE_Y) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.isCard(stack);
+                }
+
+                @Override
+                public boolean isActive() {
+                    return patrolling() && !ruleView;
+                }
+            });
+        }
+        for (int i = 0; i < io.github.genichimaruo.singulo.android.work.PathRule.SLOTS; i++) {
+            int col = i % io.github.genichimaruo.singulo.android.work.PathRule.COLS;
+            addSlot(new SlotItemHandler(items, AndroidStationBlockEntity.SLOT_RULES + i, RULE_COL_X[col],
+                    RULE_Y + (i / io.github.genichimaruo.singulo.android.work.PathRule.COLS) * RULE_ROW) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return io.github.genichimaruo.singulo.android.work.PathRule.fits(col, stack);
+                }
+
+                @Override
+                public boolean isActive() {
+                    return ruleView;
+                }
+            });
+        }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
@@ -90,6 +125,20 @@ public class AndroidStationMenu extends AbstractContainerMenu {
 
     public int value(int index) {
         return data.getInt(index);
+    }
+
+    /** 経路のページを見ているか。 */
+    public boolean ruleView() {
+        return ruleView;
+    }
+
+    public void setRuleView(boolean ruleView) {
+        this.ruleView = ruleView;
+    }
+
+    /** 動き方が巡回か（巡回路の欄を出す）。 */
+    public boolean patrolling() {
+        return data.getInt(AndroidStationBlockEntity.D_MODE) == RuinAndroid.MODE_PATROL;
     }
 
     /** ステーションの場所（クライアントで、名前を読むため）。 */

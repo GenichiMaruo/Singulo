@@ -378,6 +378,135 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 巡回路の欄に作業位置カード（床のブロック）を置く。 */
+    private static void routeCard(GameTestHelper helper, AndroidStationBlockEntity s, int index, BlockPos floor) {
+        ItemStack card = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(card, helper.getLevel(), helper.absolutePos(floor),
+                helper.getLevel().getBlockState(helper.absolutePos(floor)).getBlock());
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_ROUTE + index, card);
+    }
+
+    /** 巡回: 巡回路の2つの地点を、順に回る（どちらの上にも立つ）。 */
+    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    public static void patrolWalksRoute(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        BlockPos[] points = {new BlockPos(1, 0, 6), new BlockPos(6, 0, 6)};
+        for (int i = 0; i < points.length; i++) {
+            routeCard(helper, s, i, points[i]);
+        }
+        s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
+        for (int i = 0; i < 3; i++) {
+            s.press(AndroidStationBlockEntity.BUTTON_DWELL);     // 立ち止まる時間: 5秒 → 10 → 20 → 0秒
+        }
+        boolean[] visited = new boolean[points.length];
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : androids(helper)) {
+                for (int i = 0; i < points.length; i++) {
+                    Vec3 stand = Vec3.atBottomCenterOf(helper.absolutePos(points[i].above()));
+                    visited[i] |= a.printed() && a.position().subtract(stand).horizontalDistance() < 1.7;
+                }
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(androids(helper).stream().allMatch(a -> a.mode() == RuinAndroid.MODE_PATROL), "動き方が巡回にならない");
+            helper.assertTrue(visited[0] && visited[1], "巡回路の地点を回らない: " + visited[0] + ", " + visited[1]);
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /**
+     * 経路の決まり: 巡回の地点（東の帯の中）へ向かうとき、帯（対象範囲）に入るので経由地点（帯の南の端）を通り、
+     * そのあいだ進入禁止ゾーン（ステーションと帯のあいだの列。南の端だけ空いている）に入らない。
+     */
+    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    public static void patrolFollowsRouteRules(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        var level = helper.getLevel();
+        BlockPos point = new BlockPos(6, 0, 1), via = new BlockPos(6, 0, 7);
+        routeCard(helper, s, 0, point);
+        // 1行目: 経由地点・対象範囲（x 5〜7 の帯）・進入禁止ゾーン（x 4 の列、z 0〜6）
+        ItemStack viaCard = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(viaCard, level, helper.absolutePos(via),
+                level.getBlockState(helper.absolutePos(via)).getBlock());
+        ItemStack scope = new ItemStack(item("area_card"));
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.record(scope, level, helper.absolutePos(new BlockPos(5, 0, 0)),
+                helper.absolutePos(new BlockPos(7, 0, 7)));
+        ItemStack zone = new ItemStack(item("area_card"));
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.record(zone, level, helper.absolutePos(new BlockPos(4, 0, 0)),
+                helper.absolutePos(new BlockPos(4, 0, 6)));
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_RULES, viaCard);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_RULES + 1, scope);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_RULES + 2, zone);
+        s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
+        boolean[] passedVia = {false}, reached = {false}, trespassed = {false};
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : androids(helper)) {
+                if (!a.printed()) {
+                    continue;
+                }
+                Vec3 rel = a.position().subtract(Vec3.atLowerCornerOf(helper.absolutePos(BlockPos.ZERO)));
+                passedVia[0] |= rel.subtract(6.5, 1, 7.5).horizontalDistance() < 1.6;
+                reached[0] |= passedVia[0] && rel.subtract(6.5, 1, 1.5).horizontalDistance() < 1.6;
+                trespassed[0] |= !passedVia[0] && rel.x >= 4 && rel.x < 5 && rel.z >= 0 && rel.z < 7;
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertFalse(trespassed[0], "経由地点へ向かうあいだに、進入禁止ゾーンに入った");
+            helper.assertTrue(passedVia[0], "対象範囲に入るのに、経由地点を通らない");
+            helper.assertTrue(reached[0], "経由地点を通ったあと、巡回の地点へ行かない");
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** 範囲カード: 2つの角を記録すると、その範囲になる。 */
+    @GameTest(template = EMPTY)
+    public static void areaCardRecordsTwoCorners(GameTestHelper helper) {
+        ItemStack card = new ItemStack(item("area_card"));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.AreaCardItem.box(card) == null, "未記録なのに範囲がある");
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.recordFirst(card, helper.getLevel(), new BlockPos(3, 1, 9));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.AreaCardItem.box(card) == null, "1つ目の角だけで範囲になった");
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.recordSecond(card, new BlockPos(1, 4, 5));
+        var box = io.github.genichimaruo.singulo.android.work.AreaCardItem.box(card);
+        helper.assertTrue(box != null && box.getXSpan() == 3 && box.getYSpan() == 4 && box.getZSpan() == 5, "範囲の大きさが違う: " + box);
+        helper.assertTrue(card.getMaxStackSize() == 1, "記録したカードが重なる");
+        helper.succeed();
+    }
+
+    /** 巡回中に敵の群れ（5体）を見つけたら、ステーションがレッドストーン信号を出し、記録に残す。倒した相手も記録に残る。 */
+    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    public static void patrolRaisesAlarm(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        routeCard(helper, s, 0, new BlockPos(2, 0, 5));
+        s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
+        boolean[] alarmed = {false};
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 40, () -> {
+            for (int i = 0; i < 5; i++) {
+                var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+                zombie.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + i, 1, 6))));
+                zombie.setNoAi(true);
+                zombie.setPersistenceRequired();
+                helper.getLevel().addFreshEntity(zombie);
+            }
+        });
+        boolean[] powered = {false};
+        helper.onEachTick(() -> {
+            alarmed[0] |= s.alarming();
+            BlockPos at = helper.absolutePos(STATION);
+            powered[0] |= helper.getLevel().getBlockState(at).getSignal(helper.getLevel(), at, net.minecraft.core.Direction.EAST) == 15;
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(alarmed[0], "敵の群れを見つけても、警報を出さない");
+            helper.assertTrue(powered[0], "警報なのに、ステーションがレッドストーン信号を出さない");
+            RuinAndroid a = androids(helper).get(0);
+            var log = a.patrolLog();
+            helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_ALARM),
+                    "警報が記録に残らない");
+            helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_KILL),
+                    "倒した相手が記録に残らない");
+            a.discard();
+        });
+    }
+
     /** バッテリーアップグレード1個につき充電の満タンが50%増え、外すと満タンに合わせて減る。 */
     @GameTest(template = EMPTY)
     public static void batteryUpgradeRaisesCharge(GameTestHelper helper) {

@@ -39,7 +39,7 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int INV_Y = 134;
     public static final int HOTBAR_Y = 192;
 
-    public static final int PAGE_STATUS = 0, PAGE_GEAR = 1, PAGE_DECOR = 2, PAGES = 3;
+    public static final int PAGE_STATUS = 0, PAGE_GEAR = 1, PAGE_DECOR = 2, PAGE_LOG = 3, PAGES = 4;
     /** 装飾のページ: 姿の右に、頭・背中/腰・手の枠を縦に並べる。 */
     public static final int DECOR_X = 96, DECOR_Y = 34, DECOR_STEP = 28;
 

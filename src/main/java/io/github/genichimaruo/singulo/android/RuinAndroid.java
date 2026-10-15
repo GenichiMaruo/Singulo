@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -87,6 +88,8 @@ public abstract class RuinAndroid extends Monster {
     public static final int MODE_GUARD = 0;
     public static final int MODE_WANDER = 1;
     public static final int MODE_FOLLOW = 2;
+    /** 巡回: ステーションで決めた巡回路を回る（{@link AndroidPatrol}）。 */
+    public static final int MODE_PATROL = 3;
     /** 護衛が敵を探す範囲（ステーションか持ち主から）。 */
     public static final double GUARD_RANGE = 14;
     public static final int WANDER_RADIUS = 16;
@@ -147,6 +150,11 @@ public abstract class RuinAndroid extends Monster {
             if (seen == null || now - seen > AWAY_TICKS) {
                 gesture(GESTURE_WAVE, p);
                 chirp(level, null, 1.5F);
+                // 留守のあいだに巡回で変わったことがあれば、一言知らせる
+                Component report = seen == null ? null : patrol.report();
+                if (report != null) {
+                    p.displayClientMessage(report, true);
+                }
                 return;
             }
         }
@@ -189,6 +197,9 @@ public abstract class RuinAndroid extends Monster {
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK)};
     private static final EntityDataAccessor<Integer> TANK_B = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 巡回の記録（アンドロイドの画面の「記録」のページに出すため）。 */
+    private static final EntityDataAccessor<CompoundTag> PATROL_LOG = SynchedEntityData.defineId(RuinAndroid.class,
+            EntityDataSerializers.COMPOUND_TAG);
     /** 作業（自動化）を割り当てられているか（持ち物を取り出せなくするため、クライアントでも見る）。 */
     private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
     /** 仕草（挨拶。{@link #GESTURE_WAVE} など。クライアントでも見える）。 */
@@ -892,6 +903,7 @@ public abstract class RuinAndroid extends Monster {
             builder.define(d, net.minecraft.world.item.ItemStack.EMPTY);
         }
         builder.define(TANK_B, -1);
+        builder.define(PATROL_LOG, new CompoundTag());
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
@@ -911,14 +923,166 @@ public abstract class RuinAndroid extends Monster {
         setTarget(null);
     }
 
+    /** 巡回（巡回路・記録）。 */
+    final AndroidPatrol patrol = new AndroidPatrol(this);
+    /** 仲間に呼ばれて迎え撃つ相手（片付いたら、元の持ち場へ戻る）。 */
+    @Nullable
+    private LivingEntity assistTarget;
+    /** 巡回中に戦い始めた相手（仲間を呼ぶのは、相手が変わったときだけ）。 */
+    @Nullable
+    private LivingEntity engaged;
+
+    // ------------------------------------------------------------------ 経路（必須経由地点・進入禁止ゾーン）
+
+    /** 経路の決まり: 作業は作業指令台から、巡回はステーションから受け取る。 */
+    private java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> workRules = java.util.List.of(),
+            patrolRules = java.util.List.of();
+    /** 今の移動の行き先と、通る経由地点の決まり（なければ null）、もう通ったか、最後に {@link #moveVia} した時刻。 */
+    @Nullable
+    private Vec3 viaGoal;
+    @Nullable
+    private io.github.genichimaruo.singulo.android.work.PathRule viaRule;
+    private boolean viaPassed;
+    private int viaTick;
+    /** 今の移動で避ける進入禁止ゾーン（出発した所・行き先を含むゾーンは除いたもの）。 */
+    private java.util.List<net.minecraft.world.level.levelgen.structure.BoundingBox> avoidZones = java.util.List.of();
+
+    public void setWorkRules(java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> rules) {
+        workRules = rules;
+    }
+
+    public void setPatrolRules(java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> rules) {
+        patrolRules = rules;
+    }
+
+    public java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> workRules() {
+        return workRules;
+    }
+
+    public java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> patrolRules() {
+        return patrolRules;
+    }
+
+    /**
+     * 経路の決まりに従って goal へ向かう（毎 tick 呼ぶ）。対象範囲の中と外を行き来する移動なら、まず経由地点へ寄り、
+     * そのあいだ進入禁止ゾーンを避ける。repath なら経路を探し直す（経由地点を通ったときも探し直す）。経由地点を今通ったら true。
+     */
+    public boolean moveVia(Vec3 goal, double speed, java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> rules, boolean repath) {
+        viaTick = tickCount;
+        if (viaGoal == null || viaGoal.distanceToSqr(goal) > 1) {
+            // 新しい移動: 対象範囲をまたぐ決まりのうち、経由地点が一番近いもの
+            viaGoal = goal;
+            viaPassed = false;
+            viaRule = null;
+            for (var r : rules) {
+                if (r.crosses(position(), goal) && (viaRule == null || r.stand().distanceToSqr(position()) < viaRule.stand().distanceToSqr(position()))) {
+                    viaRule = r;
+                }
+            }
+            java.util.List<net.minecraft.world.level.levelgen.structure.BoundingBox> zones = new java.util.ArrayList<>();
+            if (viaRule != null) {
+                for (var z : viaRule.zones()) {
+                    boolean exempt = io.github.genichimaruo.singulo.android.work.PathRule.inside(z, getX(), getY(), getZ())
+                            || io.github.genichimaruo.singulo.android.work.PathRule.inside(z, goal.x, goal.y, goal.z);
+                    if (!exempt) {
+                        zones.add(z);
+                    }
+                }
+            }
+            avoidZones = java.util.List.copyOf(zones);
+            repath = true;
+        }
+        boolean passed = false;
+        Vec3 dest = goal;
+        if (viaRule != null && !viaPassed) {
+            Vec3 w = viaRule.stand();
+            Vec3 d = w.subtract(position());
+            if (d.horizontalDistance() < 1.5 && Math.abs(d.y) < 2) {
+                viaPassed = true;                  // 経由地点を通った: 行き先へ
+                passed = true;
+                repath = true;
+            } else {
+                dest = w;
+            }
+        }
+        if (repath || getNavigation().isDone()) {
+            getNavigation().moveTo(dest.x, dest.y, dest.z, speed);
+        }
+        return passed;
+    }
+
+    /** 経路探しで、このブロックに入ってはいけないか（今の移動で避ける進入禁止ゾーンの中）。 */
+    boolean forbidden(int x, int y, int z) {
+        java.util.List<net.minecraft.world.level.levelgen.structure.BoundingBox> zones = avoidZones;
+        if (zones == null) {
+            return false;
+        }
+        for (var box : zones) {
+            if (io.github.genichimaruo.singulo.android.work.PathRule.inside(box, x + 0.5, y, z + 0.5)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 経路探しで、進入禁止ゾーンを通れないところとして扱う。 */
+    @Override
+    protected net.minecraft.world.entity.ai.navigation.PathNavigation createNavigation(Level level) {
+        return new net.minecraft.world.entity.ai.navigation.GroundPathNavigation(this, level) {
+            @Override
+            protected net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int maxVisitedNodes) {
+                this.nodeEvaluator = new net.minecraft.world.level.pathfinder.WalkNodeEvaluator() {
+                    @Override
+                    public net.minecraft.world.level.pathfinder.PathType getPathTypeOfMob(
+                            net.minecraft.world.level.pathfinder.PathfindingContext context, int x, int y, int z, net.minecraft.world.entity.Mob mob) {
+                        return mob instanceof RuinAndroid a && a.forbidden(x, y, z) ? net.minecraft.world.level.pathfinder.PathType.BLOCKED
+                                : super.getPathTypeOfMob(context, x, y, z, mob);
+                    }
+                };
+                this.nodeEvaluator.setCanPassDoors(true);
+                return new net.minecraft.world.level.pathfinder.PathFinder(this.nodeEvaluator, maxVisitedNodes);
+            }
+        };
+    }
+
+    /** ステーションの巡回の設定を受け取る。 */
+    public void setPatrol(java.util.List<BlockPos> route, boolean backAndForth, boolean nightOnly, int dwellTicks) {
+        patrol.configure(route, backAndForth, nightOnly, dwellTicks);
+    }
+
+    /** 仲間に呼ばれた: その相手を迎え撃つ（持ち場から離れていても）。 */
+    public void assist(LivingEntity target) {
+        assistTarget = target;
+        setTarget(target);
+    }
+
+    /** 巡回の記録が変わった: クライアントへ送る。 */
+    void syncPatrolLog() {
+        entityData.set(PATROL_LOG, patrol.logTag());
+    }
+
+    /** 巡回の記録（新しい順。クライアントでも読める）。 */
+    public java.util.List<AndroidPatrol.Entry> patrolLog() {
+        return AndroidPatrol.readLog(entityData.get(PATROL_LOG));
+    }
+
+    /** 倒した相手を、記録に残す（追従中は除く）。 */
+    @Override
+    public boolean killedEntity(ServerLevel level, LivingEntity killed) {
+        if (guard && mode != MODE_FOLLOW && killed != this) {
+            patrol.onKill(level, killed);
+        }
+        return super.killedEntity(level, killed);
+    }
+
     /** ステーションの設定を受け取る。 */
     public void configure(int mode, int retreatPercent) {
-        this.mode = Mth.clamp(mode, MODE_GUARD, MODE_FOLLOW);
+        this.mode = Mth.clamp(mode, MODE_GUARD, MODE_PATROL);
         this.retreatPercent = Mth.clamp(retreatPercent, 0, 90);
         if (home != null) {
             if (this.mode == MODE_WANDER) {
                 restrictTo(home, WANDER_RADIUS);
-            } else if (this.mode == MODE_FOLLOW) {
+            } else if (this.mode == MODE_FOLLOW || this.mode == MODE_PATROL) {
                 clearRestriction();
             } else {
                 restrictTo(home, 4);
@@ -1029,6 +1193,9 @@ public abstract class RuinAndroid extends Monster {
     /** 敵を探す中心（迎撃・徘徊はステーション、追従は持ち主）。 */
     @Nullable
     Vec3 guardAnchor() {
+        if (mode == MODE_PATROL) {
+            return position();                     // 巡回中は、今いる所のまわり
+        }
         if (mode == MODE_FOLLOW) {
             Player p = ownerPlayer();
             if (p != null) {
@@ -1066,6 +1233,9 @@ public abstract class RuinAndroid extends Monster {
 
     /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
     boolean guardTargets(LivingEntity e) {
+        if (e == assistTarget && e.isAlive() && e.distanceToSqr(this) < AndroidPatrol.CALL_RANGE * AndroidPatrol.CALL_RANGE) {
+            return true;                           // 仲間に呼ばれた相手
+        }
         if (workConsole != null) {
             // 作業中は、自分を襲ってきた相手だけ迎え撃つ（近くにいる間）。片付けたら作業に戻る
             return hostileToGuards(e) && e == getLastHurtByMob() && e.isAlive() && e.distanceToSqr(this) < WORK_DEFEND_RANGE * WORK_DEFEND_RANGE;
@@ -1312,6 +1482,26 @@ public abstract class RuinAndroid extends Monster {
         if (guard && getTarget() != null && !guardTargets(getTarget())) {
             setTarget(null);
         }
+        if (getTarget() == null) {
+            assistTarget = null;
+        }
+        if (viaGoal != null && tickCount - viaTick > 40) {
+            // 経路に従った移動が終わった（着いた・ほかの動きになった）: 進入禁止ゾーンを避けるのをやめる
+            viaGoal = null;
+            viaRule = null;
+            avoidZones = java.util.List.of();
+        }
+        if (guard && mode == MODE_PATROL && printed() && active() && level() instanceof ServerLevel pl) {
+            // 巡回中: 戦い始めたら仲間を呼び、毎秒、敵の群れ・ボスを探して警報を出す
+            LivingEntity t = getTarget();
+            if (t != null && t != engaged) {
+                patrol.engage(pl, t);
+            }
+            engaged = t;
+            if (tickCount % 20 == 3 && patrol.active(pl)) {
+                patrol.scan(pl);
+            }
+        }
         if (gestureTicks > 0) {
             if (gestureLook != null && gestureLook.isAlive()) {
                 getLookControl().setLookAt(gestureLook, 60, 60);
@@ -1515,6 +1705,7 @@ public abstract class RuinAndroid extends Monster {
             }
             tag.putInt("mode", mode);
             tag.putInt("retreat", retreatPercent);
+            tag.put("patrol", patrol.save());
             tag.putBoolean("escort", escort);
             tag.putBoolean("escort_pending", escortPending);
             net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
@@ -1571,6 +1762,8 @@ public abstract class RuinAndroid extends Monster {
                 members.add(NbtUtils.loadUUID(t));
             }
             leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
+            patrol.load(tag.getCompound("patrol"));
+            syncPatrolLog();
         }
         if (charge() <= 0) {
             setState(STATE_LOW_POWER);
@@ -1595,6 +1788,9 @@ public abstract class RuinAndroid extends Monster {
 
         @Override
         public void tick() {
+            if (mode == MODE_PATROL && level() instanceof ServerLevel pl && patrol.tick(pl)) {
+                return;                            // 巡回路を回っている（巡回しないとき（夜だけ・巡回路なし）は、ステーションのそばで待つ）
+            }
             if (mode == MODE_FOLLOW) {
                 Player p = ownerPlayer();
                 if (p == null) {

@@ -554,7 +554,7 @@ CHAPTERS = [
          'アンドロイド組立ステーションに小型クリスタルメモリ（型を決める。減らない）とアンドロイドキット（印刷ごとに1つ）を入れ、電力を送ると、'
          '上に護衛のアンドロイドを1体印刷します（1回 40,000 FE）。倒されたら、キットがあれば印刷し直します。置いた人が持ち主です。\n'
          '・護衛は敵対モブ（遺構のアンドロイドやドローンも）だけを狙い、プレイヤーやボスとは戦いません。プレイヤーとボスの攻撃では傷つきません。\n'
-         '・動き方: 迎撃（ステーションのそばで待つ）・徘徊（16ブロック以内を歩き回る）・追従（持ち主についていく）。'
+         '・動き方: 迎撃（ステーションのそばで待つ）・徘徊（16ブロック以内を歩き回る）・追従（持ち主についていく）・巡回（決めた場所を回る）。'
          '追従中に戦うかは「ついていくだけ」と「護衛する」で選べます。\n'
          '・許可証: ステーションにシールド許可証を入れると、持ち主と登録した人だけがステーションとアンドロイドの画面を開けます。'
          '追従する人も、持ち主か登録した人から選べます。\n'
@@ -566,7 +566,7 @@ CHAPTERS = [
          'Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, '
          'and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n'
          '- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n'
-         '- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner). '
+         '- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). '
          'While following, choose "Just follow" or "Escort" (fights nearby enemies).\n'
          '- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. '
          'You can also choose whether it follows the owner or one of the registered players.\n'
@@ -574,6 +574,45 @@ CHAPTERS = [
          '- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n'
          '- Comparator: the station outputs a signal (0-15) from the android\'s health.\n'
          '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.'),
+        ('patrol', '巡回警備',
+         'ステーションの動き方を「巡回」にすると、決めた場所を順に回って見張ります。\n'
+         '・巡回路: 「巡回」を選ぶと出る8つの欄に作業位置カードを置くと、その場所を左から順に回り、カードの場所の上に立って見回します。'
+         '最後まで行ったら最初へ戻る（周回）か、来た道を戻る（往復）か、夜だけ回るか、各地点で立ち止まる時間を選べます。2体なら、反対側から回ります。\n'
+         '・戦い: 近くの敵と戦い、片付けたら抜けた所から続けます。戦いになると、同じステーションの手の空いた仲間を呼びます（片付いたら持ち場へ戻る）。\n'
+         '・警報: 敵の群れ（5体以上）かボスを見つけると、ステーションが5秒間レッドストーン信号を出し、持ち主に知らせます（1分に1回まで）。\n'
+         '・記録: 倒した相手と警報は、アンドロイドの画面の「記録」のページに、新しい順に16件残ります。'
+         '久しぶりにそばへ行くと、留守のあいだのことを一言知らせてくれます。',
+         'Patrol',
+         'Set the station\'s mode to Patrol and the androids walk a set route and keep watch.\n'
+         '- Route: choosing Patrol shows eight slots. Put Work Location Cards in them and the androids visit those places from left to right, '
+         'standing on top of each to look around. Choose whether they go back to the first point (Loop) or return the same way (Back & forth), '
+         'whether they patrol only at night, and how long they stop at each point. Two androids start from opposite sides.\n'
+         '- Fights: they fight enemies nearby and carry on from where they left off. When a fight starts, idle androids of the same station come to '
+         'help (and go back afterwards).\n'
+         '- Alarm: when they spot a group of enemies (5 or more) or a boss, the station gives a redstone signal for 5 seconds and the owner is told '
+         '(at most once a minute).\n'
+         '- Log: defeated enemies and alarms are kept on the Log page of the android screen, newest first (16 entries). '
+         'Come back after a while and the android tells you what happened while you were away.'),
+        ('routes', '経路と測量メガネ',
+         '作業指令台の「経路」のページと、組立ステーションの「経路」（題の右のボタン）で、アンドロイドの移動の決まりを4つまで作れます'
+         '（作業指令台は作業の移動に、ステーションは巡回の移動に効く）。\n'
+         '・1行に、経由地点（作業位置カード）、対象範囲（範囲カード）、進入禁止ゾーン（範囲カード、2つまで）を置きます。\n'
+         '・対象範囲の中と外を行き来する移動では、経由地点の上を通ってから行き先へ向かいます（拠点の扉のように）。'
+         'そのあいだは、進入禁止ゾーンに入りません（出発した所・行き先がゾーンの中なら、そのゾーンは避けない）。\n'
+         '・範囲カード: ブロックを2つシフト右クリックすると、その2つを角とする範囲を記録します（1辺128ブロックまで）。'
+         '範囲は、記録したブロックの高さからその上2マスまでに効くので、床のブロックを記録すれば、その上を歩くアンドロイドに効きます。\n'
+         '・測量メガネ: 頭に掛けると、手に持った範囲カード・作業位置カードの記録した場所が枠で見えます'
+         '（範囲カードの1つ目の角だけなら、見ているブロックまでの範囲の見込みも）。作業中のアンドロイドの頭の上の印も、掛けているときだけ見えます。',
+         'Routes and Survey Glasses',
+         'On the Routes page of the work console, and the Routes page of the assembly station (the button right of the title), you can set up to '
+         'four movement rules (the console\'s apply to work trips, the station\'s to patrols).\n'
+         '- Each row takes a waypoint (Work Location Card), an area (Area Card) and up to two no-entry zones (Area Cards).\n'
+         '- Moving into or out of the area, androids first pass over the waypoint, like a door to the base, and stay out of the no-entry '
+         'zones on the way (unless they start or end inside one).\n'
+         '- Area Card: sneak-use two blocks to record the area between them as corners (up to 128 blocks per side). Areas reach from the '
+         'recorded height up two blocks, so recording floor blocks works for androids walking on them.\n'
+         '- Survey Glasses: worn on the head, they outline the places recorded on the area or work location card in your hand (with only the '
+         'first corner recorded, the area up to the block you look at is previewed). The icons over working androids only show while you wear them.'),
         ('care', '充電と修理と装備',
          '・充電: 護衛はステーションへ戻って5秒で満タン（電力を使い、体力も直る）。追従中は、無線充電器を持っていれば持ち主のそばで、ついて歩きながら5秒で満タン'
          '（充電器は満タンで30回分。電力を出すブロックを右クリックして充電する）。ステーションが遠く充電器もなければ、太陽光か座り込みで充電します。\n'

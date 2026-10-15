@@ -738,6 +738,18 @@ UI_LANG = {
     'tooltip.singulo.android_mining_upgrade': ('ダイヤのツルハシ相当で掘る。効率強化・幸運・シルクタッチを付けられる', 'Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch'),
     'gui.singulo.android.page.gear': ('装備と持ち物', 'Gear and inventory'),
     'gui.singulo.android.page.decor': ('装飾', 'Decorations'),
+    'gui.singulo.android.page.log': ('記録', 'Log'),
+    'gui.singulo.android.log.when': ('%s日目 %s', 'Day %s %s'),
+    'gui.singulo.android.log.kill': ('%sを%s体倒した', 'Defeated %s ×%s'),
+    'gui.singulo.android.log.alarm': ('%sなど%s体の群れを見つけて、警報を出した', 'Spotted a group of %2$s (%1$s and others) and raised the alarm'),
+    'gui.singulo.android.log.boss': ('%sを見つけて、警報を出した', 'Spotted %s and raised the alarm'),
+    'gui.singulo.android.log.empty.0': ('まだ記録はない', 'Nothing recorded yet'),
+    'gui.singulo.android.log.empty.1': ('倒した相手や警報が、ここに残る', 'Defeated enemies and alarms show up here'),
+    'gui.singulo.android.log.speech': ('見回り日誌', 'Patrol log'),
+    'message.singulo.android.alarm': ('%s: %sなど%s体の群れを見つけた（%s, %s, %s）', '%s: spotted a group of %3$s (%2$s and others) at %4$s, %5$s, %6$s'),
+    'message.singulo.android.alarm.boss': ('%s: %sを見つけた（%s, %s, %s）', '%s: spotted %s at %s, %s, %s'),
+    'message.singulo.android.patrol_report': ('%s: 留守のあいだに、敵を%s体倒しました', '%s: while you were away, I defeated %s enemies'),
+    'message.singulo.android.patrol_report.alarm': ('%s: 留守のあいだに、敵を%s体倒して、警報を%s回出しました', '%s: while you were away, I defeated %s enemies and raised %s alarms'),
     'gui.singulo.android.decor.0': ('頭', 'Head'),
     'gui.singulo.android.decor.1': ('背中・腰', 'Back / waist'),
     'gui.singulo.android.decor.2': ('手', 'Hand'),
@@ -753,6 +765,17 @@ UI_LANG = {
     'tooltip.singulo.work_location.empty': ('記録なし（ブロックをシフト右クリックで記録）', 'Empty: sneak-use on a block to record it'),
     'tooltip.singulo.work_location.block': ('%s（%s, %s, %s）', '%s at %s, %s, %s'),
     'tooltip.singulo.work_location.hint': ('作業指令台を記録したカードで資材口などを右クリックすると、つながる', 'Use a card holding a work console on a port or rack to link it'),
+    'message.singulo.area_card.first': ('1つ目の角を記録した（%s, %s, %s）。もう1つの角をシフト右クリック', 'Recorded the first corner (%s, %s, %s). Sneak-use the other corner'),
+    'message.singulo.area_card.recorded': ('範囲を記録した（%s×%s×%s）', 'Recorded the area (%s×%s×%s)'),
+    'message.singulo.area_card.too_large': ('範囲が大きすぎる（1辺 %sブロックまで）', 'The area is too large (up to %s blocks per side)'),
+    'message.singulo.area_card.cleared': ('範囲の記録を消した', 'Cleared the area'),
+    'tooltip.singulo.area_card.empty': ('ブロックをシフト右クリックで、範囲の1つ目の角を記録', 'Sneak-use a block to record the first corner of an area'),
+    'tooltip.singulo.area_card.first': ('1つ目の角: %s, %s, %s', 'First corner: %s, %s, %s'),
+    'tooltip.singulo.area_card.next': ('もう1つの角をシフト右クリック', 'Sneak-use the other corner'),
+    'tooltip.singulo.area_card.area': ('範囲: %s, %s, %s 〜 %s, %s, %s', 'Area: %s, %s, %s to %s, %s, %s'),
+    'tooltip.singulo.area_card.size': ('大きさ: %s×%s×%s', 'Size: %s×%s×%s'),
+    'tooltip.singulo.area_card.hint': ('シフト右クリックで記録し直す。何もない所でシフト右クリックで消す。測量メガネを掛けると範囲が見える', 'Sneak-use to record again; sneak-use on nothing to clear. Wear Survey Glasses to see the area'),
+    'tooltip.singulo.survey_glasses': ('頭に掛けると、手に持った範囲カード・作業位置カードの場所と、アンドロイドの作業の印が見える', 'Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing'),
     'tooltip.singulo.recipe_card.empty': ('まだ記録していない（作業指令台の「記録」で記録する）', 'Blank: record a recipe in a work console\'s Record tab'),
     'message.singulo.work_location.cleared': ('記録を消した', 'Cleared the record'),
     'message.singulo.recipe_card.cleared': ('レシピを消した', 'Cleared the recipe'),
@@ -999,6 +1022,29 @@ UI_LANG = {
     'gui.singulo.android_station.mode.0': ('迎撃', 'Guard'),
     'gui.singulo.android_station.mode.1': ('徘徊', 'Wander'),
     'gui.singulo.android_station.mode.2': ('追従', 'Follow'),
+    'gui.singulo.android_station.mode.3': ('巡回', 'Patrol'),
+    'gui.singulo.android_station.mode.3.hint': ('下の巡回路（作業位置カード）の場所を順に回り、近くの敵と戦う。戦いになったら手の空いた仲間を呼び、敵の群れやボスを見つけたら、ステーションからレッドストーン信号を出して持ち主に知らせる。', 'Walks the route below (Work Location Cards) in order and fights enemies nearby. Calls idle allies when a fight starts, and when it spots a group of enemies or a boss, the station gives a redstone signal and the owner is told.'),
+    'gui.singulo.android_station.route.hint': ('巡回路: 作業位置カードを置くと、その場所を左から順に回る（8つまで）。カードの場所の上に立って見回す。', 'Patrol route: place Work Location Cards and the androids visit those places from left to right (up to 8), standing on top of each one to look around.'),
+    'gui.singulo.android_station.rules': ('経路', 'Routes'),
+    'gui.singulo.android_station.rules.back': ('様子', 'Status'),
+    'gui.singulo.android_station.rules.hint': ('巡回の移動の決まり（必須経由地点・進入禁止ゾーン）のページに切り替える', 'Switch to the page of route rules for patrols (required waypoints and no-entry zones)'),
+    'gui.singulo.work_console.tab.routes': ('経路', 'Routes'),
+    'gui.singulo.route.via': ('経由地点', 'Waypoint'),
+    'gui.singulo.route.scope': ('対象範囲', 'Area'),
+    'gui.singulo.route.zone': ('進入禁止ゾーン', 'No-entry zones'),
+    'gui.singulo.route.via.hint': ('経由地点（作業位置カード）: 対象範囲の中と外を行き来するとき、この場所の上を通る', 'Waypoint (Work Location Card): androids moving into or out of the area pass over this place'),
+    'gui.singulo.route.scope.hint': ('対象範囲（範囲カード）: この範囲の中と外を行き来する移動だけ、経由地点を通る', 'Area (Area Card): only moves into or out of this area go through the waypoint'),
+    'gui.singulo.route.zone.hint': ('進入禁止ゾーン（範囲カード、2つまで）: 経由地点を通る移動のあいだ、ここに入らない（出発した所・行き先を含むゾーンは除く）', 'No-entry zone (Area Card, up to 2): androids stay out of it while moving through the waypoint (unless they start or end inside it)'),
+    'gui.singulo.route.hint.0': ('対象範囲の中と外を行き来するとき、経由地点を通り、', 'Moving into or out of the area, androids pass the waypoint'),
+    'gui.singulo.route.hint.1': ('そのあいだ進入禁止ゾーンを避ける（4行まで）', 'and stay out of its no-entry zones on the way (up to 4 rows)'),
+    'gui.singulo.android_station.patrol.order.loop': ('周回', 'Loop'),
+    'gui.singulo.android_station.patrol.order.back_and_forth': ('往復', 'Back & forth'),
+    'gui.singulo.android_station.patrol.order.hint': ('最後の地点まで行ったら、最初の地点へ戻る（周回）か、来た道を戻る（往復）か（クリックで切り替え）', 'After the last point, go back to the first one (Loop) or come back the same way (Back & forth). Click to switch'),
+    'gui.singulo.android_station.patrol.night.on': ('夜だけ', 'Nights only'),
+    'gui.singulo.android_station.patrol.night.off': ('昼も夜も', 'Day & night'),
+    'gui.singulo.android_station.patrol.night.hint': ('夜だけ巡回する（昼はステーションのそばで待つ）か、いつも巡回するか（クリックで切り替え）', 'Patrol only at night (waiting by the station in the day) or all the time. Click to switch'),
+    'gui.singulo.android_station.patrol.dwell': ('待つ %s秒', 'Pause %ss'),
+    'gui.singulo.android_station.patrol.dwell.hint': ('各地点で立ち止まって見回す時間（クリックで切り替え）', 'How long to stop and look around at each point. Click to change'),
     'gui.singulo.android_station.mode.0.hint': ('ステーションのそばで待ち、近づいた敵だけを迎え撃つ。', 'Waits by the station and fights enemies that come close.'),
     'gui.singulo.android_station.mode.1.hint': ('ステーションのまわり（16ブロック）を歩き回り、見つけた敵を倒す。', 'Roams within 16 blocks of the station and fights the enemies it finds.'),
     'gui.singulo.android_station.mode.2.hint': ('持ち主についていく（下のボタンで、そばの敵と戦うか選ぶ）。無線充電器を持っていれば、ついて歩きながら充電する。', 'Follows its owner (the buttons below choose whether it fights nearby enemies). Recharges while walking with you if you carry a wireless charger.'),
@@ -1286,7 +1332,6 @@ def models():
     black_hole_item_models()
     manipulator_staff_model()
     compass_item_model()
-    work_card_item_model()
     fluid_sample_item_model()
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
@@ -2576,6 +2621,18 @@ def work_card_item_model():
         'overrides': [{'predicate': {f'{MODID}:recorded': 1}, 'model': f'{MODID}:item/{iid}_recorded'}]})
 
 
+def area_card_item_model():
+    """範囲カード: 1つ目の角だけ（singulo:recorded 0.5）なら角が1つ、範囲ができていれば（1）角が2つの絵にする。"""
+    iid = 'area_card'
+    for suffix in ('first', 'recorded'):
+        write_json(ASSETS / 'models' / 'item' / f'{iid}_{suffix}.json',
+                   {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}_{suffix}'}})
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
+        'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'},
+        'overrides': [{'predicate': {f'{MODID}:recorded': 0.5}, 'model': f'{MODID}:item/{iid}_first'},
+                      {'predicate': {f'{MODID}:recorded': 1}, 'model': f'{MODID}:item/{iid}_recorded'}]})
+
+
 def compass_item_model():
     """探索コンパス・隕石コンパス: 針の向き（minecraft:angle）で16コマを切り替える。"""
     for iid in ('explorer_compass', 'meteor_compass'):
@@ -3015,7 +3072,7 @@ TAB_GROUPS = [
                'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
                'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade', 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
                'android_mining_upgrade', 'android_felling_upgrade', 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
-               'work_location_card', 'recipe_card', 'procedure_card']),
+               'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core']),
@@ -3405,6 +3462,8 @@ def main():
     models()
     textures()
     accessory_item_models()          # 生成の一般の物のモデルのあとに、2枚重ねで書き直す
+    work_card_item_model()           # 生成の一般の物のモデルのあとに、記録済みの絵へ切り替えるモデルを書き直す
+    area_card_item_model()
     opaque_block_textures()
     ghost_textures()
     rogue_black_hole_assets()

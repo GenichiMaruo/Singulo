@@ -438,6 +438,17 @@ DESC = {
         'Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.'),
     '作業位置カード': ('ブロックをシフト右クリックして位置を記録する（重なっていれば1枚だけ分けて記録する）。何もない所でシフト右クリックすると記録を消す。作業指令台を記録したカードで資材口・納品口・レシピ棚を右クリックすると、つながる。シフトを押すと記録したブロックの絵になる。',
         'Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.'),
+    '範囲カード': ('ブロックを2つシフト右クリックして、その2つを角とする範囲を記録する（1辺128ブロックまで。重なっていれば1枚だけ分けて記録する）。'
+              'もう一度シフト右クリックすると記録し直す。何もない所でシフト右クリックすると記録を消す。作業指令台・組立ステーションの「経路」で、'
+              '経由の対象範囲と進入禁止ゾーンに使う。',
+        'Sneak-use two blocks to record the area between them as corners (up to 128 blocks per side; one card is split off a stack). '
+        'Sneak-use again to record anew; sneak-use on nothing to clear it. Used on the Routes page of the work console and assembly station '
+        'for the area a waypoint covers and for no-entry zones.'),
+    '測量メガネ': ('頭に掛ける（右クリックか、防具の頭の欄へ）。掛けているあいだ、手に持った範囲カード・作業位置カードの記録した場所が枠で見える'
+              '（範囲カードの1つ目の角だけなら、見ているブロックまでの範囲の見込みも）。作業中のアンドロイドの頭の上の、今していることの印も、掛けているときだけ見える。',
+        'Worn on the head (use it, or put it in the helmet slot). While worn, the places recorded on the area card or work location card in your '
+        'hand are outlined (with only the first corner of an area recorded, the area up to the block you look at is previewed). The icons over '
+        'working androids, showing what they are doing, are only visible while wearing them.'),
     'レシピカード': ('作業指令台の「記録」でレシピを記録し、レシピ棚に並べる。何もない所でシフト右クリックするとレシピを消す。シフトを押すと作る物の絵になる。',
         'Record a recipe on it in a work console\'s Record tab and place it in a recipe rack. Sneak-use on nothing to clear it. Hold Shift to see what it makes.'),
     'リボン': ('アンドロイドの頭に着けるリボン（後頭部に結ぶ）。装飾のページの枠に着ける。染料と一緒に作業台で染められる。',

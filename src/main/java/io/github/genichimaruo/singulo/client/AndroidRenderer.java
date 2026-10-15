@@ -94,10 +94,12 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         renderWorkIcon(android, partialTick, pose, buffers, light);
     }
 
-    /** 作業中の今していることの印（頭の上に、小さく回る物の絵）。設定 androidWorkIcons で消せる。 */
+    /** 作業中の今していることの印（頭の上に、小さく回る物の絵）。測量メガネを掛けているときだけ見える。設定 androidWorkIcons で消せる。 */
     private void renderWorkIcon(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         int act = android.activity();
-        if (act == RuinAndroid.ACT_NONE || io.github.genichimaruo.singulo.generated.ClientConfig.SPEC.isLoaded()
+        var viewer = net.minecraft.client.Minecraft.getInstance().player;
+        if (act == RuinAndroid.ACT_NONE || viewer == null || !io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.wearing(viewer)
+                || io.github.genichimaruo.singulo.generated.ClientConfig.SPEC.isLoaded()
                 && !io.github.genichimaruo.singulo.generated.ClientConfig.ANDROID_WORK_ICONS.get()) {
             return;
         }
@@ -611,18 +613,17 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
                 FxDraw.box(pose, metal, lo, y0 - 0.35F / 16, z0, hi, y0, z1, light, 0x8C94A2, 255);
                 FxDraw.box(pose, metal, lo, y1, z0, hi, y1 + 0.35F / 16, z1, light, 0x8C94A2, 255);
-                VertexConsumer glass = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
                 float fill = android.tankFill(i);
                 net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
                 if (fluid != null && fill > 0) {
-                    int color = net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid)
-                            .getTintColor(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000)) & 0xFFFFFF;
-                    if (fluid.isSame(net.minecraft.world.level.material.Fluids.LAVA)) {
-                        color = 0xFF6A00;
-                    }
-                    float top = y0 + (y1 - y0) * Math.min(1, fill);
-                    FxDraw.box(pose, glass, lo + 0.15F / 16, y0, z0 + 0.15F / 16, hi - 0.15F / 16, top, z1 - 0.15F / 16, light, color, 220);
+                    // 中身: 流体そのものの絵（流れるアニメーションも動く）。ガスは上から溜まる
+                    VertexConsumer liquid = buffers.getBuffer(RenderType.entityTranslucent(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
+                    float level = (y1 - y0) * Math.min(1, fill);
+                    float bottom = FluidDraw.gaseous(fluid) ? y1 - level : y0, top = FluidDraw.gaseous(fluid) ? y1 : y0 + level;
+                    FluidDraw.box(pose, liquid, fluid, lo + 0.15F / 16, bottom, z0 + 0.15F / 16, hi - 0.15F / 16, top, z1 - 0.15F / 16, light,
+                            FluidDraw.gaseous(fluid) ? 170 : 235);
                 }
+                VertexConsumer glass = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
                 FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
                 pose.popPose();
             }
