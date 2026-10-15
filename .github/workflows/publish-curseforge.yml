@@ -63,7 +63,11 @@ jobs:
       - name: Build and run GameTests
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon --max-workers=2 -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64 build runGameTestServer
+          mkdir -p build/reports/gametest
+          for namespace in singulo singulo_automation singulo_reactor; do
+            ./gradlew --no-daemon --max-workers=2 -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64 -PtestNamespace="$namespace" build runGameTestServer
+            cp build/gametest/logs/latest.log "build/reports/gametest/$namespace.log"
+          done
           python3 tools/check_port_1201.py --jar "build/libs/${{ steps.version.outputs.name }}.jar"
       - uses: actions/upload-artifact@v4
         with:
