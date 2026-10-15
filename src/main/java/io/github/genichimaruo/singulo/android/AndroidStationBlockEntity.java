@@ -51,7 +51,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             SLOT_ROUTE = 6, ROUTE_SLOTS = 8;
     /** 経路の決まり（{@link io.github.genichimaruo.singulo.android.work.PathRule}）の欄（巡回の移動に効く）。 */
     public static final int SLOT_RULES = SLOT_ROUTE + ROUTE_SLOTS;
-    public static final int SLOTS = SLOT_RULES + io.github.genichimaruo.singulo.android.work.PathRule.SLOTS;
+    /** 工場式印刷ユニット（印刷の時間と電力が半分、修理が2倍速）。古い保存と番号がずれないよう、最後に置く。 */
+    public static final int SLOT_PRINT_UNIT = SLOT_RULES + io.github.genichimaruo.singulo.android.work.PathRule.SLOTS;
+    public static final int SLOTS = SLOT_PRINT_UNIT + 1;
     /** 巡回の各地点で立ち止まる時間の選び方（秒）。 */
     public static final int[] DWELL_SECONDS = {0, 3, 5, 10, 20};
     /** 警報のレッドストーン信号を出す時間。 */
@@ -93,6 +95,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
+            if (slot == SLOT_PRINT_UNIT) {
+                return isPrintUnit(stack);
+            }
             return switch (slot) {
                 case SLOT_MEMORY -> memoryKind(stack) != null;
                 case SLOT_KIT -> isKit(stack);
@@ -194,6 +199,25 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     public static boolean isProductionUpgrade(ItemStack stack) {
         return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_production_upgrade");
+    }
+
+    public static boolean isPrintUnit(ItemStack stack) {
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_factory_print_unit");
+    }
+
+    /** 工場式印刷ユニットを積んでいるか。 */
+    public boolean hasPrintUnit() {
+        return isPrintUnit(items.getStackInSlot(SLOT_PRINT_UNIT));
+    }
+
+    /** 1体の印刷にかかる電力（工場式印刷ユニットで半分）。 */
+    public int printFe() {
+        return hasPrintUnit() ? PRINT_FE / 2 : PRINT_FE;
+    }
+
+    /** 倒されてから印刷し直すまで（工場式印刷ユニットで半分）。 */
+    public int reprintDelay() {
+        return hasPrintUnit() ? REPRINT_DELAY / 2 : REPRINT_DELAY;
     }
 
     /** 受け持てるアンドロイドの数（生産アップグレードを積んでいれば2）。 */
@@ -512,7 +536,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     /** アンドロイドが倒れたとき（RuinAndroid.die から）。 */
     public void onAndroidDied(UUID id) {
-        release(id, REPRINT_DELAY);
+        release(id, reprintDelay());
     }
 
     /** アンドロイドの枠を空ける（delay tick ののち、キットがあれば印刷し直す）。 */
@@ -567,7 +591,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 } else if (e == null) {
                     statuses[i] = S_AWAY;                // 読み込まれていない所にいる（追従で遠くへ行った）
                 } else {
-                    release(androids[i], REPRINT_DELAY);
+                    release(androids[i], reprintDelay());
                 }
                 continue;
             }
@@ -586,7 +610,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 statuses[i] = S_NO_MEMORY;
             } else if (!isKit(items.getStackInSlot(SLOT_KIT))) {
                 statuses[i] = S_NO_KIT;
-            } else if (energy.getEnergyStored() < PRINT_FE) {
+            } else if (energy.getEnergyStored() < printFe()) {
                 statuses[i] = S_NO_ENERGY;
             } else if (printing || !topClear(level)) {
                 statuses[i] = S_BLOCKED;                 // 上で印刷中・充電中のアンドロイドがどくのを待つ
@@ -624,7 +648,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     private void print(ServerLevel level, AndroidKind kind, int unit) {
         RuinAndroid a = kind.type().create(level);
-        if (a == null || !energy.consume(PRINT_FE)) {
+        if (a == null || !energy.consume(printFe())) {
             return;
         }
         items.extractItem(SLOT_KIT, 1, false);
@@ -648,6 +672,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
         a.startPrinting();
+        if (hasPrintUnit()) {
+            a.skipPrinting(RuinAndroid.PRINT_TICKS / 2);           // 工場式印刷ユニット: 半分の時間で印刷し終える
+        }
         a.makeGuard(owner, worldPosition, mode, retreat);
         sync(a);
         if (!names[unit].isEmpty()) {

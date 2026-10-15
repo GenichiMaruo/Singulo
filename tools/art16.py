@@ -1477,6 +1477,26 @@ def degenerate_nucleus():
     return outlined(f)
 
 
+def precision_actuator():
+    """精密アクチュエーター: 鋼の歯車と、そこから斜め上へ伸びるピストンの腕。継ぎ目に橙の警告色、軸は光る。"""
+    def f(d):
+        steel, dark, hi = (150, 158, 172, 255), (70, 76, 90, 255), (214, 220, 230, 255)
+        orange = (240, 140, 60, 255)
+        # 歯車（左下）
+        d.ellipse([1, 6, 10, 15], fill=steel)
+        for x, y in ((5, 5), (5, 15), (0, 10), (10, 10), (2, 7), (8, 7), (2, 13), (8, 13)):
+            d.point((x, y), fill=steel)
+        d.ellipse([3, 8, 8, 13], fill=dark)
+        d.ellipse([4, 9, 7, 12], fill=(255, 200, 120, 255))
+        # ピストンの腕（右上へ）
+        d.line([(6, 9), (13, 2)], fill=dark, width=3)
+        d.line([(7, 8), (12, 3)], fill=hi)
+        d.rectangle([9, 4, 11, 6], fill=orange)
+        d.rectangle([12, 1, 14, 3], fill=steel)
+        d.point((13, 2), fill=(255, 255, 255, 255))
+    return outlined(f)
+
+
 def afterglow_wings():
     """残光の翼: 左右へ広げた一対の天使の翼（中央に寄せて描く）。前縁は中央の付け根から外上へ反り上がり、
     そこから白い風切羽が一枚ずつ下へ垂れる（羽根の先のあいだが透けて、扇のように見える）。羽根の先は淡い水色に光る。"""
@@ -1688,6 +1708,8 @@ ITEM_ART = {
     'awakening_echo_core': lambda: crystal_cluster((112, 214, 255), mark=(230, 250, 255)),
     'awakening_gravity_core': lambda: crystal_cluster((236, 96, 132), mark=(255, 225, 235)),
     'awakening_ergosphere_core': lambda: crystal_cluster((140, 104, 250), mark=(240, 228, 255)),
+    'awakening_foundry_core': lambda: crystal_cluster((246, 136, 64), mark=(255, 236, 214)),
+    'precision_actuator': precision_actuator,
     'echo_chapter': lambda: scroll((232, 246, 255), (80, 196, 240)),
     'gravity_chapter': lambda: scroll((236, 226, 250), (140, 90, 230)),
     'horizon_chapter': lambda: scroll((242, 242, 255), (150, 190, 255)),

@@ -375,6 +375,11 @@ public abstract class RuinAndroid extends Monster {
         }
     }
 
+    /** 拠点の暮らしの様子（テストの説明用）。 */
+    public String lifeState() {
+        return life == null ? "-" : life.describe();
+    }
+
     /** 着けている装飾（part: {@link AndroidAccessoryItem#HEAD} など。クライアントでも見える）。 */
     public net.minecraft.world.item.ItemStack decor(int part) {
         return entityData.get(DECOR[part]);
@@ -1496,6 +1501,37 @@ public abstract class RuinAndroid extends Monster {
         return level().isClientSide ? entityData.get(GUARD) : guard;
     }
 
+    /** 廃アンドロイド工場の製造ラインが印刷した個体（何も落とさず、経験値もない）と、そのうちの試作機（体力はそのまま）。 */
+    private boolean factoryMade, prototype;
+
+    /** 工場で印刷された個体にする。量産型（prototype でない）は体力が半分。 */
+    public void makeFactoryMade(boolean prototype) {
+        this.factoryMade = true;
+        this.prototype = prototype;
+        xpReward = 0;
+        if (!prototype) {
+            var max = getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+            max.setBaseValue(max.getBaseValue() * 0.5);
+            setHealth(getMaxHealth());
+        }
+    }
+
+    public boolean factoryMade() {
+        return factoryMade;
+    }
+
+    public boolean prototype() {
+        return prototype;
+    }
+
+    /** 工場で印刷された個体は何も落とさない。 */
+    @Override
+    protected void dropFromLootTable(DamageSource source, boolean recentlyHit) {
+        if (!factoryMade) {
+            super.dropFromLootTable(source, recentlyHit);
+        }
+    }
+
     @Nullable
     public java.util.UUID owner() {
         return owner;
@@ -1748,6 +1784,11 @@ public abstract class RuinAndroid extends Monster {
     /** 印刷を始める（印刷台から出すとき）。 */
     public void startPrinting() {
         entityData.set(PRINT, 0);
+    }
+
+    /** 印刷を ticks だけ進めておく（工場式印刷ユニット）。 */
+    public void skipPrinting(int ticks) {
+        entityData.set(PRINT, Mth.clamp(entityData.get(PRINT) + ticks, 0, PRINT_TICKS - 1));
     }
 
     /** スポーンエッグやコマンドで出したときも、印刷されて現れる。 */
@@ -2083,6 +2124,10 @@ public abstract class RuinAndroid extends Monster {
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
+        if (factoryMade) {
+            tag.putBoolean("factory_made", true);
+            tag.putBoolean("prototype", prototype);
+        }
         net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items = net.minecraft.core.NonNullList.withSize(INVENTORY_SIZE,
                 net.minecraft.world.item.ItemStack.EMPTY);
         for (int i = 0; i < INVENTORY_SIZE; i++) {
@@ -2139,6 +2184,11 @@ public abstract class RuinAndroid extends Monster {
         NbtUtils.readBlockPos(tag, "home").ifPresent(this::setHome);
         guard = tag.getBoolean("guard");
         dismantling = tag.getBoolean("dismantling");
+        factoryMade = tag.getBoolean("factory_made");
+        prototype = tag.getBoolean("prototype");
+        if (factoryMade) {
+            xpReward = 0;
+        }
         entityData.set(GUARD, guard);
         loadInventory(tag);
         net.minecraft.nbt.ListTag tl = tag.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
@@ -2427,8 +2477,8 @@ public abstract class RuinAndroid extends Monster {
                     if (!(home != null && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station
                             && station.drawCharge(AndroidStationBlockEntity.FE_PER_CHARGE_TICK))) {
                         rate = 0;
-                    } else if (stateTicks % 4 == 0 && getHealth() < getMaxHealth()) {
-                        heal(1);
+                    } else if (stateTicks % (station.hasPrintUnit() ? 2 : 4) == 0 && getHealth() < getMaxHealth()) {
+                        heal(1);                     // 工場式印刷ユニットがあれば2倍速く直す
                     }
                 }
                 setCharge(charge() + rate);

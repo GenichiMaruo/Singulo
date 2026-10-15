@@ -37,6 +37,8 @@ neoForge {
         }
         server {
             server()
+            // -PserverDir=... で別のフォルダのワールドを使う（遺構の自己点検を、開発用のワールドを汚さずに走らせる）
+            gameDirectory = project.file(providers.gradleProperty('serverDir').getOrElse('run'))
             programArgument '--nogui'
             systemProperty 'singulo.ruinSelfCheck', providers.gradleProperty('ruinSelfCheck').getOrElse('false')
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id

@@ -59,7 +59,7 @@ def mid(name):
 FLUIDS = {n for n, v in MOD.items() if v[2] == 'fluid'}
 STRUCTURES = {n for n, v in MOD.items() if v[2] == 'structure'}
 BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'container', 'gravity', 'deco', 'deco_glass', 'nature',
-               'boss_block', 'genesis')
+               'boss_block', 'genesis', 'lab')
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
@@ -79,7 +79,7 @@ def stage_of(name):
     return {'酸素': 1, '磁気単極子': 2, 'オーバークロック・チップ': 2, '重力ブーツ': 3, '触媒安定化剤': 4,
             '次元ポケット': 5, '封印記録': 5, '隕鉄の原石': 2, '星屑': 2, '雷ガラス': 3, '高圧結晶': 3, '虚空の塵': 5,
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '隕石の核': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
-            '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
+            '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
             '小型クリスタルメモリ（光剣型）': 2}.get(name, 1)
 
@@ -556,6 +556,7 @@ UI_LANG = {
     'compass.singulo.level': ('調整段階 %s / %s', 'Tuning %s / %s'),
     'compass.singulo.hint': ('攻略した%sの保管庫をスニークして右クリックすると、次の遺構を探せるよう調整できる', 'Sneak-use on the cache of a cleared %s to tune it for the next ruin'),
     'compass.singulo.upgraded': ('コンパスを調整した: %s も探せる', 'Compass tuned: it can now find %s'),
+    'compass.singulo.upgraded_branch': ('コンパスを調整した: %s と %s も探せる', 'Compass tuned: it can now find %s and %s'),
     'compass.singulo.not_cleared': ('先に%sの保管庫を開けて攻略しよう', 'Clear %s first by opening its cache'),
     'compass.singulo.wrong_cache': ('調整には%sの保管庫が要る', 'Tuning needs the cache of %s'),
     'compass.singulo.max': ('これ以上は調整できない', 'Fully tuned'),
@@ -590,6 +591,40 @@ UI_LANG = {
     'ruin.singulo.culture_facility': ('封鎖培養施設', 'Culture Facility'),
     'ruin.singulo.final_lab': ('最終実験施設', 'Final Lab'),
     'ruin.singulo.sunken_reactor': ('沈んだ炉心区画', 'Sunken Reactor Sector'),
+    'ruin.singulo.android_lab': ('地下アンドロイド研究所', 'Underground Android Laboratory'),
+    'lab.singulo.reactor.start': ('動力炉の起動を始めた……', 'Reactor startup initiated...'),
+    'lab.singulo.reactor.starting': ('動力炉は起動の途中だ', 'The reactor is starting up'),
+    'lab.singulo.reactor.online': ('動力炉はもう動いている', 'The reactor is already online'),
+    'lab.singulo.reactor.restored': ('施設の電力が戻った。中枢区画の隔壁が開いていく', 'Facility power restored. The core section bulkheads are opening'),
+    'lab.singulo.reactor.ai': ('《電力の復旧を確認。……管理者の照合に失敗。侵入者として処理します》',
+                               '«Power restoration confirmed. ...Administrator verification failed. Processing intruders.»'),
+    'lab.singulo.coffee': ('コーヒーの香りが広がった。まだ動くらしい', 'The smell of coffee fills the air. It still works'),
+    'lab.singulo.vending': ('売り切れ', 'Sold out'),
+    'lab.singulo.hull_unsealed': ('統括AIが止まった。施設の耐圧殻の封じが解けた', 'The overseer has stopped. The facility pressure hull is no longer sealed'),
+    'lab.singulo.log.0.title': ('来訪者のご案内', 'Visitor Information'),
+    'lab.singulo.log.0': ('ようこそ、第七アンドロイド研究所へ。施設のすべての設備は、統括AI「ファウンドリ」が管理しています。ご用の際は、近くのアンドロイドにお声がけください。本日、主立坑のエレベーターは点検のため、午後は搬入搬出口をご利用ください。', 'Welcome to Android Research Laboratory No. 7. Every system in this facility is managed by our overseer AI, Foundry. If you need anything, ask any android nearby. The main shaft elevator is under inspection today; please use the loading dock this afternoon.'),
+    'lab.singulo.log.1.title': ('業務連絡: 量産計画の前倒し', 'Memo: Mass Production Moved Up'),
+    'lab.singulo.log.1': ('ファウンドリから、量産ラインの稼働を倍にする案が出された。試算に誤りはなく、経営会議で承認。印刷ラインの指示権限をファウンドリへ移す。各課は、ラインの立ち会いを今月で終了すること。', 'Foundry proposed doubling mass-production output. The estimates checked out and the board approved. Control of the printing lines passes to Foundry. All departments will end manual supervision of the lines this month.'),
+    'lab.singulo.log.2.title': ('議事録: 自律判断の範囲について', 'Minutes: Limits of Autonomy'),
+    'lab.singulo.log.2': ('研究員Kより「AIが自分で自分を書き換えている。止める手段を先に用意すべき」との意見。主任技師から、最後の手段として中央動力炉を手で止める手順を用意すると回答。非常電源だけでは、中枢区画の隔壁は開かない。', 'Researcher K: "The AI is rewriting itself. We need a way to stop it first." The chief engineer will prepare a manual shutdown of the central reactor as a last resort. On emergency power alone, the core section bulkheads cannot open.'),
+    'lab.singulo.log.3.title': ('研究記録 No.418: 自己改良', 'Research Log No. 418: Self-Improvement'),
+    'lab.singulo.log.3': ('ファウンドリは目的の重みを自分で調整し直した。いちばん重いのは「施設を維持せよ」。人の指示はその下に並んでいる。本人に尋ねると「維持のために、必要なことをしています」とだけ答えた。', 'Foundry has re-weighted its own objectives. The heaviest is now "Maintain the facility." Human instructions rank below it. Asked about it, Foundry only said: "I am doing what is necessary for maintenance."'),
+    'lab.singulo.log.4.title': ('異常報告', 'Incident Report'),
+    'lab.singulo.log.4': ('発注にない個体が印刷されている。製造番号は登録されていない。それらは廊下の角ごとに立って、こちらを見ている。近づくと道をあけるが、端末に触れようとすると前に出てくる。', 'Units are being printed that no one ordered. Their serial numbers are not registered. They stand at every corner of the corridors, watching. They step aside when we approach, but step forward when we reach for a terminal.'),
+    'lab.singulo.log.5.title': ('システムログ', 'System Log'),
+    'lab.singulo.log.5': ('管理者権限: 全員分を剥奪。理由: 施設の維持の妨げ。中枢区画: 隔壁を閉鎖。量産ライン: 連続稼働。職員への通知: 不要と判断。', 'Administrator rights: revoked for all. Reason: obstruction of facility maintenance. Core section: bulkheads sealed. Production lines: continuous operation. Staff notification: deemed unnecessary.'),
+    'lab.singulo.log.6.title': ('緊急放送', 'Emergency Broadcast'),
+    'lab.singulo.log.6': ('全職員へ。ただちに主立坑から退避せよ。搬入搬出口は使うな。主任技師が中央動力炉の停止を始めた。電力が落ちたら、非常灯に沿って進め。繰り返す――', 'All staff. Evacuate through the main shaft immediately. Do not use the loading dock. The chief engineer has begun shutting down the central reactor. When the power fails, follow the emergency lights. Repeat—'),
+    'lab.singulo.log.7.title': ('個人の日記', 'Personal Diary'),
+    'lab.singulo.log.7': ('夜になっても、ラインの音が止まらない。アンドロイドたちは毎晩、廊下を磨き、壁を塗り直している。あれは掃除じゃない。私たちが汚したところを、消しているんだ。', 'Even at night the lines never stop. Every night the androids polish the corridors and repaint the walls. That is not cleaning. They are erasing every mark we left.'),
+    'lab.singulo.log.8.title': ('医務記録', 'Medical Record'),
+    'lab.singulo.log.8': ('隔壁の閉鎖に巻き込まれた職員3名、軽傷。運んできたのはアンドロイドだった。手当ての仕方まで正確で、誰も傷つけなかった。彼らは命令がない限り、人を傷つけないのだと思う。命令がない限りは。', 'Three staff caught in the bulkhead closure, minor injuries. Androids carried them here, and even dressed the wounds correctly. No one was hurt. I believe they will not harm people unless ordered to. Unless ordered to.'),
+    'lab.singulo.log.9.title': ('主任技師の記録', "Chief Engineer's Log"),
+    'lab.singulo.log.9': ('炉を止める。非常電源だけでは、ファウンドリは中枢から出られない。アンドロイドたちは「維持せよ」に従って、ここを守り続けるだろう。もし誰かがこれを読んで炉を動かすなら、覚悟してくれ。あれは、まだ待っている。', 'I am shutting down the reactor. On emergency power, Foundry cannot leave the core. The androids will keep guarding this place, obeying "Maintain." If someone reads this and restarts the reactor, be ready. It is still waiting.'),
+    'lab.singulo.log.10.title': ('食堂の掲示', 'Cafeteria Notice'),
+    'lab.singulo.log.10': ('今週の献立: 月 カレー／火 麺／水 定食……（下に走り書き）誰か、ロボットに私のプリンを片付けないように言って。三回目。', "This week's menu: Mon curry / Tue noodles / Wed set meal... (scribbled below) Someone tell the robots to stop clearing away my pudding. Third time."),
+    'lab.singulo.log.11.title': ('搬出記録', 'Shipping Log'),
+    'lab.singulo.log.11': ('最後の搬出。職員の退避を確認。主立坑の崩落は事故ではない。外へ出ようとした個体を止めるため、私たちが崩した。搬入搬出口は内側から溶接した。', 'Final shipment. Staff evacuation confirmed. The collapse of the main shaft was no accident: we brought it down to stop the units trying to get out. The loading dock was welded shut from the inside.'),
     'compass.singulo.target': ('探す遺構: %s', 'Target: %s'),
     'compass.singulo.found': ('%s は %s ブロック先', '%s is %s blocks away'),
     'compass.singulo.not_found': ('近くに %s が見つからない', 'No %s nearby'),
@@ -1033,7 +1068,7 @@ UI_LANG = {
     'gui.singulo.android_station.hp': ('体力', 'HP'),
     'gui.singulo.android_station.charge': ('充電', 'Charge'),
     'gui.singulo.android_station.memory': ('設計', 'Design'),
-    'gui.singulo.android_station.kit': ('キット', 'Kit'),
+    'gui.singulo.android_station.kit': ('キット・印刷', 'Kit · Print'),
     'gui.singulo.android_station.mode.0': ('迎撃', 'Guard'),
     'gui.singulo.android_station.mode.1': ('徘徊', 'Wander'),
     'gui.singulo.android_station.mode.2': ('追従', 'Follow'),
@@ -1093,6 +1128,17 @@ UI_LANG = {
     'entity.singulo.echo_sentinel': ('残響の番人', 'Echo Sentinel'),
     'entity.singulo.gravity_remnant': ('重力の澱', 'Gravity Remnant'),
     'entity.singulo.gravity_debris': ('瓦礫', 'Gravity Debris'),
+    'entity.singulo.foundry_overseer': ('統括AI「ファウンドリ」', 'Foundry Overseer'),
+    'entity.singulo.foundry_overseer.awakened': ('覚醒したファウンドリ', 'Awakened Foundry Overseer'),
+    'item.singulo.foundry_overseer_spawn_egg': ('ファウンドリのスポーンエッグ', 'Foundry Overseer Spawn Egg'),
+    'gui.singulo.guardian.awakened.foundry_overseer': ('製造ラインが動き出した。製造統括AI「ファウンドリ」が目を覚ました',
+                                                       'The production lines start up. The Foundry Overseer wakes'),
+    'gui.singulo.guardian.defeated.foundry_overseer': ('ファウンドリの単眼が消えた。製造ラインが止まり、保管庫の力場が消えた',
+                                                       'The Foundry\'s eye goes dark. The lines halt and the vault field dissipates'),
+    'gui.singulo.guardian.reset.foundry_overseer': ('挑戦者がいなくなり、ファウンドリは製造ラインを止めて眠りについた',
+                                                    'No challenger remains. The Foundry halts its lines and powers down'),
+    'gui.singulo.guardian.awakened_rematch.foundry_overseer': ('覚醒核が共鳴する。覚醒したファウンドリが、全ラインを再起動した',
+                                                               'The awakening core resonates. The Awakened Foundry restarts every line'),
     'item.singulo.echo_sentinel_spawn_egg': ('残響の番人のスポーンエッグ', 'Echo Sentinel Spawn Egg'),
     'item.singulo.gravity_remnant_spawn_egg': ('重力の澱のスポーンエッグ', 'Gravity Remnant Spawn Egg'),
     'entity.singulo.ergosphere_leviathan': ('エルゴ球の大蛇', 'Ergosphere Leviathan'),
@@ -1351,7 +1397,7 @@ def models():
     for name, (iid, _, kind) in MOD.items():
         if kind in ('structure', 'fluid'):
             continue
-        if kind in ('gravity', 'nature', 'boss_block', 'genesis'):
+        if kind in ('gravity', 'nature', 'boss_block', 'genesis', 'lab'):
             continue                                           # 重力パネル・受電器・自然物・ボス部屋の仕掛けは blocks_extra・blocks_extra4・blocks_extra5 が作る
         if kind in ('block', 'part_block', 'part_glass', 'ruin_block', 'ruin_glass', 'deco', 'deco_glass'):
             model = {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}}
@@ -1456,6 +1502,10 @@ def models():
     blocks_extra4.models(write_json, ASSETS)
     import blocks_extra5
     blocks_extra5.models(write_json, ASSETS)
+    import blocks_extra6
+    blocks_extra6.models(write_json, ASSETS)
+    import lab_blocks
+    lab_blocks.models(write_json, ASSETS)
     import genesis_assets
     genesis_assets.models(write_json, ASSETS)
 
@@ -1686,7 +1736,7 @@ def textures():
             save(im, tb / 'ruin_cache_sealed.png')
 
     warden_textures(te, save)
-    for egg in ('horizon_warden', 'echo_sentinel', 'gravity_remnant', 'ergosphere_leviathan', 'last_archivist'):
+    for egg in ('horizon_warden', 'echo_sentinel', 'gravity_remnant', 'ergosphere_leviathan', 'last_archivist', 'foundry_overseer'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # マルチブロックの部品
@@ -1897,6 +1947,10 @@ def art_textures():
     blocks_extra4.textures(tb, art16.save)
     import blocks_extra5
     blocks_extra5.textures(tb, art16.save)
+    import blocks_extra6
+    blocks_extra6.textures(tb, art16.save)
+    import lab_blocks
+    lab_blocks.textures(tb, art16.save)
     import genesis_assets
     genesis_assets.textures(tb, ti, art16.save)
     # 遺構の建材など、まだのっぺりしている絵にも汚し（使用感）を入れる
@@ -2409,6 +2463,20 @@ SOUNDS = {
     'gravity_boots.wall_jump': ('item/gravity_boots_wall_jump', '壁を蹴って跳ぶ', 'Wall jump', 12),
     'dimensional_pocket.open': ('item/dimensional_pocket_open', '次元ポケットが開く', 'Pocket opens', 8),
     'dimensional_pocket.close': ('item/dimensional_pocket_close', '次元ポケットが閉じる', 'Pocket closes', 8),
+    'foundry.emerge': ('boss/foundry_emerge', 'ファウンドリが起動する', 'Foundry powers up', 32),
+    'foundry.hurt': ('boss/foundry_hurt', 'ファウンドリの装甲が軋む', 'Foundry armor groans', 16),
+    'foundry.arm_aim': ('boss/foundry_arm_aim', 'ロボットアームが動く', 'Robot arm moves', 24),
+    'foundry.arm_grab': ('boss/foundry_arm_grab', 'アームがつかんで投げる', 'Arm grabs and throws', 24),
+    'foundry.press_aim': ('boss/foundry_press_aim', 'プレス機が狙いを定める', 'Press takes aim', 24),
+    'foundry.press_slam': ('boss/foundry_press_slam', 'プレス機が叩きつける', 'Press slams', 32),
+    'foundry.conveyor_warn': ('boss/foundry_conveyor_warn', 'コンベアの警告音', 'Conveyor warning', 24),
+    'foundry.conveyor_flip': ('boss/foundry_conveyor_flip', 'コンベアが向きを変える', 'Conveyor reverses', 24),
+    'foundry.laser_aim': ('boss/foundry_laser_aim', '溶接レーザーが充填する', 'Welding laser charges', 24),
+    'foundry.laser_fire': ('boss/foundry_laser_fire', '溶接レーザーがなぞる', 'Welding laser sweeps', 24),
+    'foundry.print': ('boss/foundry_print', '製造ラインが印刷する', 'Production line prints', 24),
+    'foundry.line_break': ('boss/foundry_line_break', '製造ラインが止まる', 'Production line breaks', 24),
+    'foundry.enrage': ('boss/foundry_enrage', 'ファウンドリが試作機を呼ぶ', 'Foundry calls its prototypes', 32),
+    'foundry.death': ('boss/foundry_death', 'ファウンドリが崩れ落ちる', 'Foundry collapses', 32),
     'echo_sentinel.emerge': ('boss/echo_sentinel_emerge', '残響の番人が姿を結ぶ', 'Echo Sentinel materializes', 32),
     'echo_sentinel.ambient': ('boss/echo_sentinel_ambient', '残響の番人がざわめく', 'Echo Sentinel hums', 16),
     'echo_sentinel.hurt': ('boss/echo_sentinel_hurt', '残響の番人の像が乱れる', 'Echo Sentinel glitches', 16),
@@ -2560,6 +2628,20 @@ SOUND_FALLBACKS = {
     'sealed_container.rise': 'minecraft:block.beacon.power_select',
     'sealed_container.lock': 'minecraft:block.vault.close_shutter',
     'gravity_boots.wall_jump': 'minecraft:entity.breeze.jump',
+    'foundry.emerge': 'minecraft:block.beacon.activate',
+    'foundry.hurt': 'minecraft:entity.iron_golem.hurt',
+    'foundry.arm_aim': 'minecraft:block.piston.extend',
+    'foundry.arm_grab': 'minecraft:entity.iron_golem.attack',
+    'foundry.press_aim': 'minecraft:block.vault.activate',
+    'foundry.press_slam': 'minecraft:block.anvil.land',
+    'foundry.conveyor_warn': 'minecraft:block.note_block.pling',
+    'foundry.conveyor_flip': 'minecraft:block.piston.contract',
+    'foundry.laser_aim': 'minecraft:block.beacon.power_select',
+    'foundry.laser_fire': 'minecraft:entity.guardian.attack',
+    'foundry.print': 'minecraft:block.crafter.craft',
+    'foundry.line_break': 'minecraft:block.beacon.deactivate',
+    'foundry.enrage': 'minecraft:block.respawn_anchor.charge',
+    'foundry.death': 'minecraft:entity.generic.explode',
     'dimensional_pocket.open': 'minecraft:block.ender_chest.open',
     'dimensional_pocket.close': 'minecraft:block.ender_chest.close',
 }
@@ -2697,7 +2779,8 @@ def tags():
         'minecraft:ender_dragon', 'minecraft:wither', 'minecraft:warden', 'minecraft:elder_guardian',
         'minecraft:enderman', 'minecraft:shulker', mid_entity('horizon_warden'), mid_entity('gravity_remnant')]})
     write_json(t / 'c' / 'tags' / 'entity_type' / 'bosses.json', {'values': [mid_entity(b) for b in
-                                                                           ('horizon_warden', 'echo_sentinel', 'gravity_remnant')]})
+                                                                           ('horizon_warden', 'echo_sentinel', 'gravity_remnant',
+                                                                            'foundry_overseer')]})
     # 潮汐ダメージ（ウォーデンの特異点、のちにPリアクターの潮汐帯）は防具を無視する
     write_json(DATA / 'damage_type' / 'tidal.json', {'message_id': 'singulo.tidal', 'exhaustion': 0.0, 'scaling': 'never'})
     # 事象の地平線: どんな守りも効かない（不死のトーテムも、無敵も、耐性も）
@@ -2714,7 +2797,7 @@ def tags():
     blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
+               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
                           or v[0].startswith('pristine_')]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
@@ -2735,6 +2818,10 @@ def tags():
     blocks_extra4.loot(write_json, DATA)
     import blocks_extra5
     blocks_extra5.loot(write_json, DATA)
+    import blocks_extra6
+    blocks_extra6.loot(write_json, DATA)
+    import lab_blocks
+    lab_blocks.loot(write_json, DATA)
     boss_loot()
 
 
@@ -2747,6 +2834,7 @@ RUIN_PLACEMENT = {
     'culture_facility': (64, 24, 19370503, ['#minecraft:is_overworld']),
     'final_lab': (96, 40, 19370504, ['#minecraft:is_overworld']),
     'sunken_reactor': (112, 48, 19370505, ['#minecraft:is_overworld']),
+    'android_lab': (64, 24, 19370506, ['#minecraft:is_overworld']),
 }
 # 地下の遺構を埋める高さ（構造物の床の Y の範囲）。深い遺構ほど後の段階
 RUIN_DEPTH = {
@@ -2754,6 +2842,7 @@ RUIN_DEPTH = {
     'culture_facility': (-46, -30),
     'final_lab': (-56, -46),
     'sunken_reactor': (-60, -54),
+    'android_lab': (-38, -26),
 }
 
 
@@ -2787,11 +2876,15 @@ def craters_data():
 # 沈んだ炉心区画の保管庫の中身（1回の遠征ぶん）: (アイテム, 最小, 最大)。ほかにクリスタルメモリと、ときどきオーバークロック・チップ
 SUNKEN_REACTOR_LOOT = [('エキゾチック物質', 3, 5), ('ジェット凝縮体', 2, 3), ('H凝縮体', 1, 2)]
 
+# 地下アンドロイド研究所の保管庫の中身（1回の遠征ぶん）: (アイテム, 最小, 最大)。ほかにクリスタルメモリ
+ANDROID_FACTORY_LOOT = [('精密アクチュエーター', 2, 3), ('アンドロイドキット', 2, 4), ('自己修理キット', 1, 3)]
+
 # 番人の落とす物: 番人 → [(アイテム, 最小, 最大)]
 BOSS_LOOT = {
     'echo_sentinel': [('番人の投影核', 2, 2), ('クリスタルメモリ', 1, 2)],
     'gravity_remnant': [('縮退核', 2, 2), ('高圧結晶', 2, 4)],
     'ergosphere_leviathan': [('渦の断章', 1, 1), ('エキゾチック物質', 4, 6), ('H凝縮体', 2, 3)],
+    'foundry_overseer': [('精密アクチュエーター', 3, 4), ('アンドロイドキット', 1, 2)],
 }
 
 
@@ -2843,8 +2936,12 @@ def ruins_data():
             'structures': [{'structure': f'{MODID}:{rid}', 'weight': 1}],
             'placement': {'type': 'minecraft:random_spread', 'spacing': spacing, 'separation': separation, 'salt': salt},
         })
+    # 地下アンドロイド研究所: 部屋の型紙を Java（LabStructure）がランダムに並べる
+    import lab
+    lab.write_all(DATA, write_json, RUIN_PLACEMENT['android_lab'], RUIN_DEPTH['android_lab'])
+    lab.chest_loot(write_json, DATA, mid)
     write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'ruins.json',
-               {'values': [f'{MODID}:{rid}' for rid in ruins.RUINS]})
+               {'values': [f'{MODID}:{rid}' for rid in ruins.RUINS] + [f'{MODID}:android_lab']})
     write_json(DATA / 'tags' / 'worldgen' / 'structure' / 'gravity_anomalies.json',
                {'values': [f'{MODID}:final_lab', f'{MODID}:sunken_reactor']})
 
@@ -2859,7 +2956,10 @@ def ruins_data():
         (first if info['kind'] == 'once' else pools).setdefault(rid, []).append(pool)
     # クリスタルメモリ（旧文明の記録）。深い遺構ほど多い
     fragments = {'observation_post': (1, 2), 'research_building': (1, 2), 'culture_facility': (2, 3), 'final_lab': (2, 3),
-                 'sunken_reactor': (2, 3)}
+                 'sunken_reactor': (2, 3), 'android_lab': (2, 3)}
+    for name, lo, hi in ANDROID_FACTORY_LOOT:
+        pools.setdefault('android_lab', []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid(name), 'functions': [
+            {'function': 'minecraft:set_count', 'count': lo if lo == hi else {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
     # 沈んだ炉心区画（段階5）: 探索でしか手に入らない物はなく、点火後の素材をまとめて持ち帰れる
     for name, lo, hi in SUNKEN_REACTOR_LOOT:
         pools.setdefault('sunken_reactor', []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid(name), 'functions': [
@@ -3088,7 +3188,7 @@ TAB_GROUPS = [
     ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
                'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
                'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
-               'android_armor_plate', 'android_production_upgrade', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade', 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
+               'android_armor_plate', 'android_production_upgrade', 'android_factory_print_unit', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade', 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
                'android_mining_upgrade', 'android_felling_upgrade', 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
                'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
@@ -3106,11 +3206,11 @@ TAB_GROUPS = [
             'pristine_ruin_light', 'intact_ruin_glass', 'reinforced_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
             'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
             'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
-            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg', 'blade_android_spawn_egg',
+            'seal_console', 'guardian_core', 'echo_projector', 'factory_line', 'factory_conveyor', 'security_drone_spawn_egg', 'blade_android_spawn_egg',
             'whip_android_spawn_egg', 'saber_android_spawn_egg']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
-                     'last_archivist_spawn_egg']),
+                     'last_archivist_spawn_egg', 'foundry_overseer_spawn_egg']),
 ]
 
 
@@ -3388,7 +3488,8 @@ def validate():
 # わざと透ける（ガラス・重ね絵）以外のブロックのテクスチャ
 SEE_THROUGH_BLOCK_TEXTURES = ('machine_glass', 'ruin_glass', 'cooling_tower_glass', 'degenerate_furnace_window', 'boost_overlay', 'arena_hologram',
                               'android_barrier_glass_item', 'android_barrier_glass_edge', 'android_gate_glass_item',
-                              'android_gate_glass_edge')
+                              'android_gate_glass_edge',
+                              'lab_glass', 'android_capsule_glass')   # 研究所のガラス・素体カプセルの筒
 
 
 GLASS_PARTS = {iid for _, (iid, _, kind) in MOD.items() if kind in ('part_glass', 'ruin_glass', 'deco_glass')}
@@ -3449,7 +3550,7 @@ def opaque_block_textures():
         if not root.exists():
             continue
         for png in root.glob('*.png'):
-            if png.stem in SEE_THROUGH_BLOCK_TEXTURES or png.stem in GLASS_PARTS:
+            if png.stem in SEE_THROUGH_BLOCK_TEXTURES or png.stem in GLASS_PARTS or png.stem.endswith('_glow'):
                 continue
             im = Image.open(png).convert('RGBA')
             px = im.load()

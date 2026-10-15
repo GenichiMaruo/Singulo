@@ -114,6 +114,9 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.GRAVITY_DEBRIS.get(), GravityDebrisRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ERGOSPHERE_LEVIATHAN.get(), ErgosphereLeviathanRenderer::new);
         event.registerEntityRenderer(SinguloEntities.LAST_ARCHIVIST.get(), LastArchivistRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.FOUNDRY_OVERSEER.get(), FoundryOverseerRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FACTORY_LINE.get(),
+                FactoryLineRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ECHO_PROJECTOR.get(),
                 EchoProjectorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),

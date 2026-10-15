@@ -88,6 +88,11 @@ final class AndroidLife extends Goal {
         return kind != null;
     }
 
+    /** 今の暮らしの様子（テストの説明用）。 */
+    String describe() {
+        return kind + " left=" + left + " travel=" + travel + " next=" + (nextTick - android.tickCount) + " free=" + free();
+    }
+
     /** 手が空いているか（暮らしを始めてよい・続けてよい）。 */
     private boolean free() {
         if (!android.isGuard() || !android.printed() || !android.active() || android.getTarget() != null || android.isWorking()
@@ -434,7 +439,7 @@ final class AndroidLife extends Goal {
             BlockState s = level.getBlockState(spot);
             boolean chair = !s.isAir() && !s.canBeReplaced();
             BlockPos stand = chair ? spot : spot;
-            if (!near(stand, chair ? 1.4 : 1.3)) {
+            if (!near(stand, chair ? 2.0 : 1.6)) {
                 return;
             }
             if (chair) {
@@ -532,7 +537,7 @@ final class AndroidLife extends Goal {
                 left = 0;
                 return;
             }
-            if (!near(item.blockPosition(), 1.3)) {
+            if (!near(item.blockPosition(), 2.0)) {             // 道のりの終わりは、ぴったり上でなく少し手前で止まる
                 return;
             }
             held = item.getItem().copy();

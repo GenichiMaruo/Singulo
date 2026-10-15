@@ -378,20 +378,25 @@ CHAPTERS = [
          ' Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.'),
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
-        ('list', '5つの遺構',
+        ('list', '6つの遺構',
          '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
          '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。冷却原子トラップ・量子データ片（7日）。\n'
          '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。時間結晶の種・培養データ（14日）。\n'
+         '・地下アンドロイド研究所: 中くらいの深さの地下（床は Y−38〜−26あたり）。封鎖培養施設と並ぶ分かれ道で、研究棟でコンパスを調整すると一緒に探せる'
+         '（コンパスは地表まで突き抜けた主立坑を指す）。部屋の並びは毎回変わる。奥のAI中枢に統括AI「ファウンドリ」。精密アクチュエーター・アンドロイドキット（14日）。\n'
          '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。\n'
          '・沈んだ炉心区画: 最終実験施設よりさらに深い地下（Y−60〜−54あたり）の、止まった二基目の炉。'
          '最終実験施設を攻略したあと、探索コンパスを調整すると探せる。エルゴ球の大蛇。エキゾチック物質・ジェット凝縮体・H凝縮体（14日）。',
-         'The five ruins',
+         'The six ruins',
          '- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White '
          'security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow '
          'underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the '
          'back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground '
          '(around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the '
-         'containment room at the back. Time crystal seeds and culture data (14 days).\n- Final Lab: a gravity '
+         'containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: '
+         'mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building '
+         'lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. '
+         'The overseer AI Foundry waits in the AI core. Precision actuators and android kits (14 days).\n- Final Lab: a gravity '
          'anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds '
          'and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the '
          'Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. '
@@ -415,6 +420,11 @@ CHAPTERS = [
          '最後の姿で足元に出す特異点は、1秒の前触れのあとに引き寄せ始めるので、すぐ離れること。'
          '倒したあとは、覚醒の記録核をコンソールに使うと「覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。'
          'やめて部屋を離れると記録核は戻ります。\n'
+         '・統括AI「ファウンドリ」（地下アンドロイド研究所のAI中枢）: 中枢の中心に浮かぶ機械の頭脳で、自分では動かず施設の設備で戦います。'
+         '壁の4つの製造ラインが動いている間は攻撃が通りにくい（1つにつき2割）ので、先に殴って壊すこと。ラインはときどき量産型のアンドロイドを送り出します。'
+         '床に赤い印が出たらロボットアーム（印は少しの間追ってきて、止まってから降りてくる。つかまれると投げられる）、影の丸はプレス（すぐ外へ）、'
+         '床の扇形の印は溶接レーザー（床すれすれの光線が回ってくるので、跳んで越える）。床のコンベアは相手を流し、枠の灯が赤く光ったあと向きを変えます。'
+         '体力が半分を切ると試作機を2体呼び、アームが2本になります。精密アクチュエーターを落とします。覚醒の製造核で再戦すると、本気になったとき壊したラインを印刷し直します。\n'
          '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます'
          '（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増え、本気になると壊した投影器を2つまで映し直します。'
          '重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。\n'
@@ -468,9 +478,35 @@ CHAPTERS = [
          'vortex to drag everything in (the core hurts; run against the pull).\n'
          '  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, '
          'hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n'
+         '- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never moves and fights with the facility itself. '
+         'While the four production lines on the walls run, it takes less damage (20% per line): break them first. The lines also send out mass-produced androids. '
+         'A red mark on the floor is a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the press '
+         '(step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). '
+         'The floor conveyors carry you along and reverse after their frames glow red. Below half health it calls two prototypes and uses two arms. '
+         'Drops precision actuators. Awakened with an Awakened Foundry Core, it reprints its broken lines when enraged.\n'
          '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core '
          'in the room\'s floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two '
          'broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
+        ('lab', '地下アンドロイド研究所',
+         '旧文明のアンドロイドの研究所。統括AI「ファウンドリ」が暴走し、職員は中央動力炉を止めて主立坑から逃げ出しました。'
+         '人がいなくなった今も、アンドロイドたちは「施設を維持せよ」という最後の命令に従って施設を直し続けています。\n'
+         '・入口は、地表まで突き抜けた崩れた主立坑（はしごと足場で降りる）。施設は耐圧殻で包まれていて、統括AIを倒すまでは壊せません'
+         '（倒したあとも黒曜石より硬い）。\n'
+         '・主電源は落ちていて、非常灯だけが赤く灯る薄暗い施設です。中央動力炉の制御盤を右クリックすると動力炉が起動し、'
+         '施設の明かりがついて、AI中枢の隔壁が開きます。そして、眠っていた統括AIも目を覚まします。\n'
+         '・部屋の並びは毎回変わります。研究室・資料室・サーバールーム・社員寮・医務室・食堂などが並び、警備機や印刷台が守っています。'
+         '物資の棚には研究所の部品や資料が残っています。\n'
+         '・記録端末を右クリックすると、残された記録を読めます。集めると、暴走のいきさつが分かります。',
+         'Underground Android Laboratory',
+         'An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through '
+         'the main shaft. Even now the androids keep repairing the facility, obeying their last order: "Maintain the facility."\n'
+         '- The way in is the collapsed main shaft that breaks through to the surface (climb down the ladders and scaffolding). The facility is wrapped in a '
+         'pressure hull that cannot be broken until the overseer falls (and is harder than obsidian even then).\n'
+         '- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, '
+         'the AI core bulkheads open, and the dormant overseer wakes.\n'
+         '- The room layout changes every time: research labs, archives, server rooms, dormitories, a medical bay, a cafeteria and more, guarded by security '
+         'machines and fabricators. Supply chests still hold laboratory parts and records.\n'
+         '- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.'),
         ('plan', '探索の段取り',
          '段階が進むと探索先が一度に増えます。先に集めておくと、あとで工場が止まりません。\n'
          '・段階2のうち: 隕石クレーター（隕鉄・星屑）、氷山か氷樹（氷塊・青氷）。\n'
@@ -636,6 +672,8 @@ CHAPTERS = [
         ('upgrades', 'アップグレード',
          '・生産アップグレード: ステーションに積むと、アンドロイドを2体まで印刷して受け持つ。上で充電できるのは1体ずつで、もう1体はそばで待って交代する。'
          '画面の名前の左の「1」「2」で、見るアンドロイドを選ぶ（動き方などの設定は2体共通）。\n'
+         '・工場式印刷ユニット: ステーションのキットの横のスロットに積むと、印刷にかかる時間と電力が半分になり、上での修理が2倍速くなる。'
+         '地下アンドロイド研究所で手に入る精密アクチュエーターで作る。\n'
          '・アンドロイドの画面の名前の左のボタンで「装備と持ち物」のページに切り替えると、アップグレードを積める。\n'
          '・バッテリーアップグレード: 1個につき充電の満タンが50%増える（2個まで）。満タンまでの充電の時間もそのぶん延びる。腰にバッテリーパックが付く。\n'
          '・バックパックアップグレード: 持ち物（5スロット）に、バックパックの24スロットが加わる。中に物があるうちは外せない。\n'
@@ -650,6 +688,8 @@ CHAPTERS = [
          'Upgrades',
          '- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits '
          'beside it and takes its turn. Use "1" and "2" left of the name to choose which android the screen shows (settings are shared).\n'
+         '- Factory Print Unit: in the slot beside the station\'s kit slot, it halves printing time and power and doubles repair speed on the station. '
+         'Made from precision actuators found in the Underground Android Laboratory.\n'
          '- The button left of the name in the android screen opens the "Gear and inventory" page, where upgrades go.\n'
          '- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n'
          '- Backpack Upgrade: adds the backpack\'s 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n'

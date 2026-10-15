@@ -201,6 +201,14 @@ public final class SinguloBlockEntities {
             REGISTER.register("echo_projector", () -> build(io.github.genichimaruo.singulo.ruin.EchoProjectorBlockEntity::new,
                     SinguloBlocks.ECHO_PROJECTOR.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.FactoryLineBlockEntity>> FACTORY_LINE =
+            REGISTER.register("factory_line", () -> build(io.github.genichimaruo.singulo.ruin.FactoryLineBlockEntity::new,
+                    SinguloBlocks.FACTORY_LINE.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlockEntity>> REACTOR_CONSOLE =
+            REGISTER.register("reactor_console", () -> build(io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlockEntity::new,
+                    SinguloBlocks.REACTOR_CONSOLE.get()));
+
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =
             REGISTER.register("neutrino_observatory", () -> build(io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity::new,
                     SinguloBlocks.NEUTRINO_OBSERVATORY.get()));

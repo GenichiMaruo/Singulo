@@ -19,7 +19,9 @@ public class AndroidStationMenu extends AbstractContainerMenu {
     public static final int HEIGHT = 240;
     /** 左の列（中心 x=26）。強化の段だけは、転送と生産のアップグレードを横に2つ並べる。 */
     public static final int MEMORY_X = 18, MEMORY_Y = 30;
-    public static final int KIT_X = 18, KIT_Y = 56;
+    /** キットの段は、キットと工場式印刷ユニットを横に2つ並べる。 */
+    public static final int KIT_X = 8, KIT_Y = 56;
+    public static final int PRINT_UNIT_X = 28, PRINT_UNIT_Y = 56;
     public static final int UPGRADE_X = 8, UPGRADE_Y = 82;
     public static final int PRODUCTION_X = 28, PRODUCTION_Y = 82;
     public static final int STOCK_X = 18, STOCK_Y = 108;
@@ -107,6 +109,12 @@ public class AndroidStationMenu extends AbstractContainerMenu {
                 }
             });
         }
+        addSlot(new SlotItemHandler(items, AndroidStationBlockEntity.SLOT_PRINT_UNIT, PRINT_UNIT_X, PRINT_UNIT_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return AndroidStationBlockEntity.isPrintUnit(stack);
+            }
+        });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));

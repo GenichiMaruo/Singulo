@@ -78,8 +78,37 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 工場式印刷ユニットを積むと、印刷の電力が半分になり、半分の時間で印刷し終える。 */
+    @GameTest(template = EMPTY, batch = "android_print_unit", timeoutTicks = 120)
+    public static void printUnitHalvesPrinting(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRINT_UNIT, new ItemStack(item("android_factory_print_unit")));
+        helper.assertTrue(s.hasPrintUnit(), "工場式印刷ユニットを積めない");
+        long[] seen = {-1, -1};
+        int[] energy = {-1};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (!list.isEmpty() && seen[0] < 0) {
+                seen[0] = helper.getTick();
+                energy[0] = s.energy().getEnergyStored();
+            }
+            if (!list.isEmpty() && list.get(0).printed() && seen[1] < 0) {
+                seen[1] = helper.getTick();
+            }
+        });
+        helper.succeedWhen(() -> {
+            List<RuinAndroid> now = androids(helper);
+            helper.assertTrue(seen[1] >= 0, "印刷し終わらない: " + now.size() + " " + (now.isEmpty() ? "" : now.get(0).printProgress(0)
+                    + " state=" + now.get(0).state() + " alive=" + now.get(0).isAlive()) + " seen=" + seen[0]);
+            helper.assertTrue(energy[0] == AndroidStationBlockEntity.CAPACITY - AndroidStationBlockEntity.PRINT_FE / 2,
+                    "印刷の電力が半分にならない: " + (AndroidStationBlockEntity.CAPACITY - energy[0]));
+            helper.assertTrue(seen[1] - seen[0] <= RuinAndroid.PRINT_TICKS / 2 + 2, "印刷が半分の時間で終わらない: " + (seen[1] - seen[0]));
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
     /** 護衛はプレイヤーの攻撃で傷つかず、ふつうのダメージでは傷つく。体力はコンパレーターに出る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 160)
+    @GameTest(template = EMPTY, batch = "android_guard_hp", timeoutTicks = 160)
     public static void guardIgnoresPlayersAndReportsHealth(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
         var player = helper.makeMockServerPlayerInLevel();
@@ -90,7 +119,8 @@ public final class AndroidGameTests {
             helper.assertTrue(a.getHealth() == before, "プレイヤーの攻撃で傷ついた");
             a.invulnerableTime = 0;
             a.hurt(helper.getLevel().damageSources().magic(), 15);
-            helper.assertTrue(a.getHealth() < before, "ふつうのダメージで傷つかない");
+            helper.assertTrue(a.getHealth() < before, "ふつうのダメージで傷つかない: printed=" + a.printed() + " state=" + a.state()
+                    + " hp=" + a.getHealth() + "/" + before);
             // 体力を知らせる（毎秒）のを待って、コンパレーターの値を見る
             helper.runAfterDelay(25, () -> {
                 int signal = s.signal();
@@ -512,7 +542,7 @@ public final class AndroidGameTests {
     }
 
     /** 拠点の暮らし: しばらく落ちたままの物を拾って、そばのチェストへしまう。 */
-    @GameTest(template = EMPTY, batch = "android_life", timeoutTicks = 1200)
+    @GameTest(template = EMPTY, batch = "android_life_tidy", timeoutTicks = 1200)
     public static void idleGuardTidiesIntoChest(GameTestHelper helper) {
         helper.getLevel().setDayTime(1000);
         station(helper, 1);
@@ -521,6 +551,10 @@ public final class AndroidGameTests {
         net.minecraft.world.entity.item.ItemEntity drop = helper.spawnItem(Items.APPLE, 2.5F, 1, 6.5F);
         drop.setPickUpDelay(0);
         helper.onEachTick(() -> {
+            // 落ちた物が「しばらく落ちたまま」（10秒）になってから急かす（先に別の暮らしを始めて、時間切れにならないように）
+            if (drop.isAlive() && drop.getAge() < 20 * 11) {
+                return;
+            }
             for (RuinAndroid a : androids(helper)) {
                 if (a.printed() && a.tickCount % 40 == 0 && a.state() == RuinAndroid.STATE_IDLE) {
                     a.lifeNow();
@@ -529,7 +563,11 @@ public final class AndroidGameTests {
         });
         helper.succeedWhen(() -> {
             var be = (net.minecraft.world.level.block.entity.ChestBlockEntity) helper.getBlockEntity(chest);
-            helper.assertTrue(!be.isEmpty() && be.getItem(0).is(Items.APPLE), "落ちていた物を、そばのチェストへしまわない");
+            String why = " (落ちた物: " + (drop.isAlive() ? "残っている age=" + drop.getAge() + " at=" + drop.position() : "消えた")
+                    + androids(helper).stream().map(a -> " / " + a.state() + " hand=" + a.getMainHandItem() + " pos=" + a.blockPosition()
+                    + " exact=" + a.position() + " home=" + a.home() + " life=" + a.lifeState() + " guard=" + a.isGuard() + " active=" + a.active()
+                    + " target=" + a.getTarget()).reduce("", String::concat) + ")";
+            helper.assertTrue(!be.isEmpty() && be.getItem(0).is(Items.APPLE), "落ちていた物を、そばのチェストへしまわない" + why);
             androids(helper).forEach(RuinAndroid::discard);
         });
     }

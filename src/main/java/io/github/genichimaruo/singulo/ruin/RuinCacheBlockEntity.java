@@ -99,9 +99,9 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
         }
     }
 
-    /** 番人に守られた遺構（研究棟・封鎖培養施設はボス部屋の番人、最終実験施設は守護機）。 */
+    /** 番人に守られた遺構（研究棟・封鎖培養施設・沈んだ炉心区画・廃アンドロイド工場はボス部屋の番人、最終実験施設は守護機）。 */
     public static final java.util.Set<String> GUARDED = java.util.Set.of("research_building", "culture_facility", "final_lab",
-            "sunken_reactor");
+            "sunken_reactor", "android_lab");
 
     /** 番人に守られた保管庫か。倒すまで封鎖され、再生したら封鎖し直す。 */
     public boolean guarded() {

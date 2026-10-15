@@ -15,6 +15,7 @@ MOD: 日本語名 → (id, 英語名, 種類)
     gravity    重力パネルと受電器（Java側の専用クラス。パネルは隣とつながる見た目）
     deco       自分で作れる建材（ただ置けるだけ。Java側で登録）
     deco_glass 自分で作れる透ける建材（半透明で描く。Java側で登録）
+    lab        地下アンドロイド研究所のブロック（lab_blocks.py が絵とモデルを作り、Java で登録）
     nature     自然にできるブロック（隕石クレーターの殻・隕鉄・星屑の結晶、雷ガラス塊。Java側で登録、落とす物は専用）
 VANILLA: 日本語名 → アイテムID（'#' で始まるものはタグ）
 """
@@ -117,6 +118,7 @@ MOD = {
     '転送アップグレード': ('android_transfer_upgrade', 'Transfer Upgrade', 'item'),
     'アンドロイド用装甲板': ('android_armor_plate', 'Android Armor Plate', 'tool'),
     '生産アップグレード': ('android_production_upgrade', 'Production Upgrade', 'item'),
+    '工場式印刷ユニット': ('android_factory_print_unit', 'Factory Print Unit', 'item'),
     'バッテリーアップグレード': ('android_battery_upgrade', 'Battery Upgrade', 'item'),
     'バックパックアップグレード': ('android_backpack_upgrade', 'Backpack Upgrade', 'item'),
     'タンクアップグレード': ('android_tank_upgrade', 'Tank Upgrade', 'item'),
@@ -194,6 +196,8 @@ MOD = {
     '覚醒の残響核': ('awakening_echo_core', 'Awakened Echo Core', 'item'),
     '覚醒の重力核': ('awakening_gravity_core', 'Awakened Gravity Core', 'item'),
     '覚醒の渦核': ('awakening_ergosphere_core', 'Awakened Ergosphere Core', 'item'),
+    '精密アクチュエーター': ('precision_actuator', 'Precision Actuator', 'item'),
+    '覚醒の製造核': ('awakening_foundry_core', 'Awakened Foundry Core', 'item'),
     '残響の断章': ('echo_chapter', 'Chapter of Echoes', 'item'),
     '重力の断章': ('gravity_chapter', 'Chapter of Weight', 'item'),
     '地平線の断章': ('horizon_chapter', 'Chapter of the Horizon', 'item'),
@@ -319,6 +323,29 @@ MOD = {
     '封印コンソール': ('seal_console', 'Seal Console', 'ruin_block'),
     '番人の封印核': ('guardian_core', 'Guardian Seal Core', 'boss_block'),
     '残響投影器': ('echo_projector', 'Echo Projector', 'boss_block'),
+    '製造ライン': ('factory_line', 'Production Line', 'boss_block'),
+    '工場のコンベア': ('factory_conveyor', 'Factory Conveyor', 'boss_block'),
+    # ---- 地下アンドロイド研究所（作れない。絵とモデルは lab_blocks.py、登録は Java の SinguloBlocks）
+    '研究所の白いパネル': ('lab_panel', 'Lab Panel', 'lab'),
+    '研究所の帯入りパネル': ('lab_panel_lined', 'Lined Lab Panel', 'lab'),
+    '研究所の床タイル': ('lab_tiles', 'Lab Floor Tiles', 'lab'),
+    '研究所の構造材': ('lab_frame', 'Lab Frame', 'lab'),
+    '研究所のガラス': ('lab_glass', 'Lab Glass', 'lab'),
+    '施設灯': ('facility_light', 'Facility Light', 'lab'),
+    '非常灯': ('emergency_light', 'Emergency Light', 'lab'),
+    '耐圧殻': ('pressure_hull', 'Pressure Hull', 'lab'),
+    '隔壁': ('bulkhead', 'Bulkhead', 'lab'),
+    '動力炉の制御盤': ('reactor_console', 'Reactor Control Panel', 'lab'),
+    '炉心': ('reactor_core', 'Reactor Core', 'lab'),
+    '動力導管': ('power_conduit', 'Power Conduit', 'lab'),
+    'サーバーラック': ('server_rack', 'Server Rack', 'lab'),
+    '記録端末': ('lab_terminal', 'Record Terminal', 'lab'),
+    '素体カプセル': ('android_capsule', 'Body Capsule', 'lab'),
+    '机のモニター': ('desk_monitor', 'Desk Monitor', 'lab'),
+    'コーヒーメーカー': ('coffee_maker', 'Coffee Maker', 'lab'),
+    '自動販売機': ('vending_machine', 'Vending Machine', 'lab'),
+    '書類の山': ('paper_stack', 'Stack of Papers', 'lab'),
+    'ごみ箱': ('trash_bin', 'Trash Bin', 'lab'),
     '遺構の照明（琥珀）': ('ruin_lamp_amber', 'Ruin Lamp (Amber)', 'ruin_block'),
     '遺構の照明（翠）': ('ruin_lamp_verdant', 'Ruin Lamp (Verdant)', 'ruin_block'),
     '遺構の照明（菫）': ('ruin_lamp_violet', 'Ruin Lamp (Violet)', 'ruin_block'),

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=true": {
+      "model": "singulo:block/power_conduit_on"
+    },
+    "powered=false": {
+      "model": "singulo:block/power_conduit_off"
+    }
+  }
+}

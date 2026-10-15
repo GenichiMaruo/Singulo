@@ -594,6 +594,7 @@ def item_textures(ti, save):
     save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
     save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
+    save(wear(print_unit_icon(Image), 37), ti / 'android_factory_print_unit.png')
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
     save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
     save(droplet_icon(Image), ti / 'fluid_sample.png')
@@ -911,6 +912,25 @@ def production_icon(Image):
             for x in range(cx - 2, cx + 2):
                 px[x, y] = c + (255,)
     px[11, 4] = (255, 255, 255, 255)
+    return im
+
+
+def print_unit_icon(Image):
+    """工場式印刷ユニット: 基板の上に、レールを走る印刷ヘッドと、下へ伸びる光の線（橙の警告の縞つき）。"""
+    im, px = upgrade_board(Image)
+    rail, head, glow, warn = (70, 76, 90), (150, 158, 172), (255, 170, 90), (240, 140, 60)
+    for x in range(3, 13):
+        px[x, 4] = rail + (255,)
+    for y in range(3, 7):
+        for x in range(6, 10):
+            px[x, y] = (head if y < 6 else (100, 106, 120)) + (255,)
+    for x in (6, 8):
+        px[x, 3] = warn + (255,)
+    for y in range(7, 11):
+        px[7, y] = glow + (255,)
+        px[8, y] = (255, 230, 200, 255)
+    for x in range(4, 12):
+        px[x, 11] = ((255, 200, 140) if 6 <= x <= 9 else (200, 206, 216)) + (255,)
     return im
 
 

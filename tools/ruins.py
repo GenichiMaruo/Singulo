@@ -32,6 +32,8 @@ FABRICATOR = f'{MODID}:ruin_android_fabricator'
 CONSOLE = f'{MODID}:seal_console'
 CORE = f'{MODID}:guardian_core'
 PROJECTOR = f'{MODID}:echo_projector'
+LINE = f'{MODID}:factory_line'
+CONVEYOR = f'{MODID}:factory_conveyor'
 STRIPED = f'{MODID}:striped_ruin_panel'
 AIR = 'minecraft:air'
 # 骨組み・装置の暗い部分
@@ -788,6 +790,11 @@ def sunken_reactor():
     b.decay(cracked=0.18, mossy=0.04, only_above=FLOOR + 1)
     b.scatter('minecraft:cobweb', 14, 30, (6, 6, 40, 40), floor=(AIR,))
     return b
+
+
+def conveyor(b, x, y, z, facing):
+    """止まっている工場のコンベア（facing の向きへ流れる）。"""
+    b.set(x, y, z, CONVEYOR, {'facing': facing, 'running': 'false', 'warn': 'false'})
 
 
 # 遺構ID → (作る関数, 置き方)。surface は地上、それ以外は地下に埋める（gen_data.RUIN_PLACEMENT の高さ）

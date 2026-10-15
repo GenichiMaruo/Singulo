@@ -1,0 +1,19 @@
+{
+  "structures": [
+    {
+      "structure": "singulo:android_lab",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 64,
+    "separation": 24,
+    "salt": 19370506,
+    "locate_offset": [
+      8,
+      0,
+      8
+    ]
+  }
+}

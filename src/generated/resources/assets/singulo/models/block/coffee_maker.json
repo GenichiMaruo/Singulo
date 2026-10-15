@@ -1,0 +1,136 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "body": "singulo:block/lab_plastic",
+    "front": "singulo:block/coffee_maker_front",
+    "pot": "singulo:block/coffee_maker_pot",
+    "particle": "singulo:block/lab_plastic"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        1,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#body"
+        },
+        "south": {
+          "texture": "#body"
+        },
+        "east": {
+          "texture": "#body"
+        },
+        "west": {
+          "texture": "#body"
+        },
+        "up": {
+          "texture": "#body"
+        },
+        "down": {
+          "texture": "#body"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        1,
+        9
+      ],
+      "to": [
+        12,
+        11,
+        13
+      ],
+      "faces": {
+        "south": {
+          "texture": "#body"
+        },
+        "east": {
+          "texture": "#body"
+        },
+        "west": {
+          "texture": "#body"
+        },
+        "up": {
+          "texture": "#body"
+        },
+        "down": {
+          "texture": "#body"
+        },
+        "north": {
+          "texture": "#front"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        11,
+        4
+      ],
+      "to": [
+        12,
+        13,
+        13
+      ],
+      "faces": {
+        "south": {
+          "texture": "#body"
+        },
+        "east": {
+          "texture": "#body"
+        },
+        "west": {
+          "texture": "#body"
+        },
+        "up": {
+          "texture": "#body"
+        },
+        "down": {
+          "texture": "#body"
+        },
+        "north": {
+          "texture": "#front"
+        }
+      }
+    },
+    {
+      "from": [
+        5.5,
+        1,
+        5
+      ],
+      "to": [
+        10.5,
+        7,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pot"
+        },
+        "south": {
+          "texture": "#pot"
+        },
+        "east": {
+          "texture": "#pot"
+        },
+        "west": {
+          "texture": "#pot"
+        },
+        "down": {
+          "texture": "#pot"
+        }
+      }
+    }
+  ]
+}

@@ -16,10 +16,11 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 /**
  * 開発用の自己点検。-Dsingulo.ruinSelfCheck=true（./gradlew runServer -PruinSelfCheck=true）で起動すると、
- * 5種類の遺構をそれぞれ探し、その周りのチャンクを生成して保管庫が置かれたかを確かめ、結果をログに出して止まる。
+ * 6種類の遺構をそれぞれ探し、その周りのチャンクを生成して保管庫が置かれたかを確かめ、結果をログに出して止まる。
  */
 public final class RuinSelfCheck {
-    static final String[] RUINS = {"observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor"};
+    static final String[] RUINS = {"observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor",
+            "android_lab"};
     static final int SEARCH_RADIUS_CHUNKS = 160;
 
     private RuinSelfCheck() {}
@@ -49,6 +50,8 @@ public final class RuinSelfCheck {
                 Singulo.LOGGER.error("[ruin-check] {}: cache at {} is not sealed or has no seal console nearby", ruin, cachePos);
             } else if (GuardianCoreBlockEntity.bossFor(ruin) != null && !bossRoomReady(level, cachePos)) {
                 Singulo.LOGGER.error("[ruin-check] {}: cache at {} is not sealed or has no guardian core nearby", ruin, cachePos);
+            } else if ("android_lab".equals(ruin) && !labReady(level, pos)) {
+                Singulo.LOGGER.error("[ruin-check] {}: reactor console or guardian core has no facility box", ruin);
             } else {
                 ok++;
                 Singulo.LOGGER.info("[ruin-check] {}: OK, located at {}, cache at {} ({} blocks from origin){}",
@@ -59,6 +62,21 @@ public final class RuinSelfCheck {
         }
         Singulo.LOGGER.info("[ruin-check] {}/{} ruins generated with a cache", ok, RUINS.length);
         server.halt(false);
+    }
+
+    /** 研究所: 動力炉の制御盤と封印核に、施設の範囲が書き込まれているか（主立坑から ±5 チャンク）。 */
+    private static boolean labReady(ServerLevel level, BlockPos shaft) {
+        boolean console = false, core = false;
+        for (int dx = -5; dx <= 5; dx++) {
+            for (int dz = -5; dz <= 5; dz++) {
+                for (BlockEntity be : level.getChunk((shaft.getX() >> 4) + dx, (shaft.getZ() >> 4) + dz).getBlockEntities().values()) {
+                    console |= be instanceof io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlockEntity c && c.facility() != null;
+                    core |= be instanceof GuardianCoreBlockEntity g && g.facility() != null;
+                }
+            }
+        }
+        Singulo.LOGGER.info("[ruin-check] android_lab: reactor console with facility={}, guardian core with facility={}", console, core);
+        return console && core;
     }
 
     /** 最終実験施設: 保管庫が封鎖された状態で生成され、近くに封印コンソールがあるか。 */
@@ -92,8 +110,9 @@ public final class RuinSelfCheck {
     private static BlockPos findCache(ServerLevel level, BlockPos center, String ruin) {
         int cx = center.getX() >> 4;
         int cz = center.getZ() >> 4;
-        for (int dx = -3; dx <= 3; dx++) {
-            for (int dz = -3; dz <= 3; dz++) {
+        int r = "android_lab".equals(ruin) ? 5 : 3;      // 研究所は主立坑から最大4チャンクほど離れて広がる
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dz = -r; dz <= r; dz++) {
                 LevelChunk chunk = level.getChunk(cx + dx, cz + dz);
                 for (BlockEntity be : chunk.getBlockEntities().values()) {
                     if (be instanceof RuinCacheBlockEntity cache && ruin.equals(cache.ruin())) {
