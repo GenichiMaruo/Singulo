@@ -100,7 +100,11 @@ public final class ReactorGameTests {
         helper.onEachTick(() -> r.energy().receiveEnergy(300_000_000, false));
         // 電力は数秒で満ちるが、炉心ができるのは点火の演出（16秒）の終わり
         helper.runAtTickTime(3 + PenroseReactorBlockEntity.IGNITION_SEQUENCE_TICKS - 40, () -> helper.assertTrue(
-                r.state() == PenroseReactorBlockEntity.State.IGNITING, "点火演出の状態が変わった: state=" + r.state() + ", formed=" + r.isFormed() + ", data=" + r.saveWithoutMetadata()));
+                r.state() == PenroseReactorBlockEntity.State.IGNITING, "点火演出の状態が変わった: state=" + r.state() + ", formed=" + r.isFormed()
+                        + ", missing=" + Structures.reactorLayout(CENTER).keySet().stream().filter(pos -> helper.getBlockState(pos).isAir()).limit(16).toList()
+                        + ", core=" + java.util.stream.StreamSupport.stream(BlockPos.betweenClosed(CENTER.offset(-1, -1, -1), CENTER.offset(1, 1, 1)).spliterator(), false)
+                                .filter(pos -> !helper.getBlockState(pos).isAir()).map(pos -> pos.toShortString() + "=" + helper.getBlockState(pos)).toList()
+                        + ", data=" + r.saveWithoutMetadata()));
         helper.succeedWhen(() -> {
             helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.RUNNING, "点火して稼働しない");
             helper.assertTrue(Math.abs(r.mass() - PenroseReactorBlockEntity.START_MASS) < 1, "最初の炉心質量が500でない");

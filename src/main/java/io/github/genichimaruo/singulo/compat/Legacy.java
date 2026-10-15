@@ -42,6 +42,14 @@ public final class Legacy {
                 return;
             }
         }
+        // Single-test batches can deliberately spawn helpers outside the structure.
+        // There is no other live fixture in this disposable GameTest level to own them.
+        FixtureScope sole = null;
+        for (var fixture : FIXTURES) if (event.getLevel() == fixture.level) {
+            if (sole != null) return;
+            sole = fixture;
+        }
+        if (sole != null) sole.entities.add(entity);
     }
     /** The batch runner's listener starts the next batch synchronously: cleanup must run first. */
     @SuppressWarnings("unchecked")
