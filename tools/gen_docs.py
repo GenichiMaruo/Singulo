@@ -107,6 +107,9 @@ def advancements(ctx, ja, en):
         if parent is not None:
             adv['parent'] = f'{MODID}:{parent}'
         ctx['write_json'](ctx['DATA'] / 'advancement' / f'{aid}.json', adv)
-        out.append({'id': aid, 'parent': parent, 'stage': stage})
+        entry = {'id': aid, 'parent': parent, 'stage': stage}
+        if aid in HIDDEN_ADVANCEMENTS:
+            entry['hidden'] = True
+        out.append(entry)
     # ハンドブックが段階ごとに並べるための一覧
     ctx['write_json'](ctx['ASSETS'] / 'guide' / 'advancements.json', {'advancements': out})

@@ -84,7 +84,35 @@ public final class Stage6ReviewHarness {
                 phase++;
             } else if (phase == 5) {
                 capture(mc, "advancements-end-ja");
-                Singulo.LOGGER.info("SINGULO_STAGE6_VISUAL_COMPLETE combatFrames={} advancements=3", captured.size());
+                mc.setScreen(null);
+                mc.getSingleplayerServer().execute(() -> {
+                    var server = mc.getSingleplayerServer();
+                    var player = server.getPlayerList().getPlayer(mc.player.getUUID());
+                    player.getAdvancements().revoke(server.getAdvancements().get(Singulo.id("archivist")), "done");
+                });
+                phase++;
+            } else if (phase == 6) {
+                openProgress(mc);
+                if (progressText(mc).contains(net.minecraft.network.chat.Component.translatable("advancement.singulo.archivist.title").getString()))
+                    throw new IllegalStateException("Hidden advancement leaked before completion");
+                phase++;
+            } else if (phase == 7) {
+                capture(mc, "handbook-hidden-before-ja");
+                mc.setScreen(null);
+                mc.getSingleplayerServer().execute(() -> {
+                    var server = mc.getSingleplayerServer();
+                    var player = server.getPlayerList().getPlayer(mc.player.getUUID());
+                    player.getAdvancements().award(server.getAdvancements().get(Singulo.id("archivist")), "done");
+                });
+                phase++;
+            } else if (phase == 8) {
+                openProgress(mc);
+                if (!progressText(mc).contains(net.minecraft.network.chat.Component.translatable("advancement.singulo.archivist.title").getString()))
+                    throw new IllegalStateException("Hidden advancement missing after completion");
+                phase++;
+            } else if (phase == 9) {
+                capture(mc, "handbook-hidden-after-ja");
+                Singulo.LOGGER.info("SINGULO_STAGE6_VISUAL_COMPLETE combatFrames={} advancements=3 handbook=2 hiddenBefore=false hiddenAfter=true", captured.size());
                 mc.stop();
                 phase++;
             }
@@ -130,6 +158,32 @@ public final class Stage6ReviewHarness {
         target.setHealth(200);
         level.addFreshEntity(target);
         prepared = true;
+    }
+
+    private static Object field(Object owner, String name) throws Exception {
+        var field = owner.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        return field.get(owner);
+    }
+
+    private static void openProgress(Minecraft mc) throws Exception {
+        mc.setScreen(new HandbookScreen());
+        for (var setting : new String[]{"chapter", "page", "scroll"}) {
+            var field = HandbookScreen.class.getDeclaredField(setting);
+            field.setAccessible(true);
+            field.setInt(mc.screen, setting.equals("chapter") ? 1 : setting.equals("page") ? 4 : 0);
+        }
+    }
+
+    private static String progressText(Minecraft mc) throws Exception {
+        var chapters = (java.util.List<?>) field(mc.screen, "chapters");
+        var text = new StringBuilder();
+        for (Object page : (java.util.List<?>) field(chapters.get(1), "pages")) {
+            for (Object line : (java.util.List<?>) field(page, "lines")) {
+                text.append(((net.minecraft.network.chat.Component) field(line, "text")).getString()).append('\n');
+            }
+        }
+        return text.toString();
     }
 
     private static void capture(Minecraft mc, String name) throws Exception {

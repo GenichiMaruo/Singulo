@@ -248,7 +248,8 @@
     {
       "id": "archivist",
       "parent": "awakened",
-      "stage": 5
+      "stage": 5,
+      "hidden": true
     },
     {
       "id": "records",
