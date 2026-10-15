@@ -13,6 +13,10 @@ concurrency:
 
 jobs:
   build-and-gametest:
+    strategy:
+      fail-fast: false
+      matrix:
+        namespace: [singulo, singulo_automation, singulo_reactor]
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
@@ -35,7 +39,7 @@ jobs:
       - name: Build and run required GameTests
         shell: bash
         run: |
-          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
+          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestNamespace=${{ matrix.namespace }} -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
       - name: Require a completed nonempty successful GameTest run
         shell: bash
         run: |
@@ -62,23 +66,27 @@ jobs:
                       raise SystemExit("Development GUI harness leaked into " + str(path))
           PY
       - name: Prepare disposable GUI review world
+        if: matrix.namespace == 'singulo'
         run: python3 tools/review/prepare_gui.py
       - name: Run real client GUI smoke
+        if: matrix.namespace == 'singulo'
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
           ALSOFT_DRIVERS: 'null'
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
       - name: Require GUI captures
+        if: matrix.namespace == 'singulo'
         run: |
           test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 15
           grep -q 'SINGULO_GUI_COMPLETE 15' build/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
+        if: matrix.namespace == 'singulo'
         run: python3 tools/review/check_gui_png.py
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pr-validation-${{ github.sha }}
+          name: pr-validation-${{ github.sha }}-${{ matrix.namespace }}
           if-no-files-found: warn
           path: |
             build/libs/*.jar

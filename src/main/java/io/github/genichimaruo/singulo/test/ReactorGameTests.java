@@ -29,7 +29,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 /**
  * ペンローズ・リアクターの確認。引力帯が周りのテストに届かないよう、別の組（batch）にして順番に流す。
  */
-@GameTestHolder(Singulo.MODID)
+@GameTestHolder("singulo_reactor")
 @PrefixGameTestTemplate(false)
 public final class ReactorGameTests {
     private static final String HUGE = "reactor_isolated";

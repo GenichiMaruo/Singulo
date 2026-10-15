@@ -27,7 +27,7 @@ def tag_list(key, elem_type, payloads):
     return b'\x09' + name(key) + bytes([elem_type]) + struct.pack('>i', len(payloads)) + b''.join(payloads)
 
 
-def write(template, sx, sy, sz):
+def write(template, sx, sy, sz, namespace="singulo"):
     air = tag_string('Name', 'minecraft:air') + b'\x00'
     blocks = []
     for y in range(sy):
@@ -41,7 +41,7 @@ def write(template, sx, sy, sz):
             + tag_list('blocks', 10, blocks)
             + tag_list('entities', 10, []))
     root = b'\x0a' + name('') + body + b'\x00'
-    out = OUT_DIR / f"{template}.nbt"
+    out = OUT_DIR.parent.parent / namespace / "structures" / f"{template}.nbt"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(gzip.compress(root))
     print(out)
@@ -50,6 +50,8 @@ def write(template, sx, sy, sz):
 def main():
     for template, size in TEMPLATES.items():
         write(template, *size)
+    write("empty", *TEMPLATES["empty"], namespace="singulo_automation")
+    write("reactor_isolated", *TEMPLATES["reactor_isolated"], namespace="singulo_reactor")
 
 
 if __name__ == '__main__':

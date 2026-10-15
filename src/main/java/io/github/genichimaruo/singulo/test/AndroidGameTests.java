@@ -30,7 +30,7 @@ import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** アンドロイド（充電・護衛・組立ステーション・転送アップグレード・アンドロイド用のガラス）の確認。 */
-@GameTestHolder(Singulo.MODID)
+@GameTestHolder("singulo_automation")
 @PrefixGameTestTemplate(false)
 public final class AndroidGameTests {
     private static final String EMPTY = "empty";
