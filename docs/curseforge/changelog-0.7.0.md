@@ -1,4 +1,6 @@
-## Singulo-0.7.0-1.21.1N
+## Singulo-0.7.0-1.20.1N
+
+Minecraft **1.20.1**, **NeoForge 47.1.106**, Java **17**. This backport includes the 0.7.0 automation, decorations and review fixes from the 1.21.1 edition.
 
 ### Android upgrades
 - **Production Upgrade** (station): prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it.
@@ -29,5 +31,11 @@ Let your androids craft, smelt and mine for you.
 ### Decorations and recipe variants
 - The android screen's third page equips head decorations (ribbon, hair ornament, beret, headdress), back/waist decorations (cape, scarf, waist ribbon) and hand decorations (paperback, bouquet, teacup, umbrella). Craft them at a crafting table and dye them.
 - Added shaped crafting recipes for the recipe rack, supply and delivery ports, workbench and work cards, alongside the work console's Precision Assembler recipe.
+
+### Reliability fixes
+- Work and reservations survive saving and reloading, including partial processing and deliveries. Transfer preserves work cargo and fluids.
+- Workers stop unpaid processing when charge runs out and respect protected blocks and interactions.
+- Linked menus recheck permission changes; long order details scroll independently.
+- Required regression tests and real-client GUI validation run before publication.
 
 This file is published with the **Beta** release type. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).

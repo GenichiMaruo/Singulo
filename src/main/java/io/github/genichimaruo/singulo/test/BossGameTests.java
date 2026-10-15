@@ -55,7 +55,7 @@ public final class BossGameTests {
     }
 
     /** 起動すると出現の演出が始まり、そのあいだは動かず傷つかない。演出が終わると戦い始める。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = HorizonWarden.EMERGE_TICKS + 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = HorizonWarden.EMERGE_TICKS + 40, batch = "warden_emerge")
     public static void wardenEmergesBeforeFighting(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
