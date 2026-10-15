@@ -32,7 +32,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * アンドロイド組立ステーション。設計メモリ（型を決める。減らない）とアンドロイドキット（印刷するたびに1つ使う）を入れ、
- * 電力を送ると、上に護衛のアンドロイドを1体印刷する。倒されたら、キットが残っていれば少しして印刷し直す。
+ * 電力を送ると、上に護衛のアンドロイドを1体（生産アップグレードを積めば2体まで）印刷する。上で充電できるのは1体ずつ。倒されたら、キットが残っていれば少しして印刷し直す。
  * 戻ってきたアンドロイドは、ここで電力を使って修理・充電する。GUI で動き方と、戻ってくる体力の割合を決める。
  */
 public class AndroidStationBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener,
@@ -47,12 +47,15 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public static final int REPRINT_DELAY = 100;
 
     /** スロット: 設計メモリ・キット・強化（転送アップグレード）・自己修理キットの補充・シールド許可証。 */
-    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_UPGRADE = 2, SLOT_REPAIR_STOCK = 3, SLOT_PERMIT = 4;
-    public static final int SLOTS = 5;
+    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_UPGRADE = 2, SLOT_REPAIR_STOCK = 3, SLOT_PERMIT = 4, SLOT_PRODUCTION = 5;
+    public static final int SLOTS = 6;
+    /** 受け持てるアンドロイドの数（生産アップグレードで2）。 */
+    public static final int MAX_UNITS = 2;
 
     /** GUI に送る値。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_MODE = 2, D_RETREAT = 3, D_STATUS = 4, D_HP = 5, D_CHARGE = 6,
-            D_KIND = 7, D_DELAY = 8, D_ESCORT = 9, D_LEADER = 10, COUNT = 11;
+            D_KIND = 7, D_DELAY = 8, D_ESCORT = 9, D_LEADER = 10,
+            D_SELECTED = 11, D_UNITS = 12, COUNT = 13;
     /** 画面に出すモードの番号: 追従（ついていくだけ）。 */
     public static final int MODE_FOLLOW_ONLY = 3;
     /** 状態（GUI の表示）。 */
@@ -64,10 +67,13 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public static final int BUTTON_MODE_GUARD = 0, BUTTON_MODE_WANDER = 1, BUTTON_MODE_FOLLOW = 2, BUTTON_RETREAT_DOWN = 3,
             BUTTON_RETREAT_UP = 4, BUTTON_RECALL = 5, BUTTON_LINK = 6, BUTTON_FOLLOW_ONLY = 7, BUTTON_ESCORT = 8,
             BUTTON_LEADER = 9;
+    /** 画面で見るアンドロイドを選ぶ（BUTTON_SELECT + 番号）。 */
+    public static final int BUTTON_SELECT = 10;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
-    /** 転送アップグレードで預かった持ち物（自己修理キット・装甲板。次に印刷するアンドロイドに持たせる）。 */
-    private final net.minecraft.world.SimpleContainer kept = new net.minecraft.world.SimpleContainer(2);
+    /** 転送アップグレードで預かった持ち物（アンドロイドごと。次にその枠で印刷するアンドロイドに持たせる）。 */
+    private final net.minecraft.world.SimpleContainer[] kept = {new net.minecraft.world.SimpleContainer(RuinAndroid.INVENTORY_SIZE),
+            new net.minecraft.world.SimpleContainer(RuinAndroid.INVENTORY_SIZE)};
     private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -81,6 +87,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 case SLOT_KIT -> isKit(stack);
                 case SLOT_UPGRADE -> isTransferUpgrade(stack);
                 case SLOT_PERMIT -> isPermit(stack);
+                case SLOT_PRODUCTION -> isProductionUpgrade(stack);
                 default -> RuinAndroid.isRepairKit(stack);
             };
         }
@@ -93,8 +100,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     @Nullable
     private UUID owner;
-    @Nullable
-    private UUID android;
+    /** 受け持つアンドロイド（枠ごと。いなければ null）。 */
+    private final UUID[] androids = new UUID[MAX_UNITS];
     private int mode = RuinAndroid.MODE_GUARD;
     private int retreat = 30;
     /** 追従中に戦うか（false なら、ついていくだけ）。 */
@@ -102,13 +109,17 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 追従する人（許可証に登録された人。null は持ち主）。 */
     @Nullable
     private UUID leader;
-    private int delay;
-    private int status;
-    private int hp;
-    private int charge;
-    /** アンドロイドに付けた名前（空なら型の愛称）。印刷し直しても同じ名前にする。 */
-    private String name = "";
-    /** コンパレーターの出力（アンドロイドの体力。0 はいない）。 */
+    private final int[] delays = new int[MAX_UNITS];
+    private final int[] statuses = new int[MAX_UNITS];
+    private final int[] hps = new int[MAX_UNITS];
+    private final int[] charges = new int[MAX_UNITS];
+    /** 枠ごとの体力の信号（1〜15。いなければ 0）。 */
+    private final int[] signals = new int[MAX_UNITS];
+    /** アンドロイドに付けた名前（枠ごと。空なら型の愛称）。印刷し直しても同じ名前にする。 */
+    private final String[] names = {"", ""};
+    /** 画面で見ているアンドロイドの枠。 */
+    private int selected;
+    /** コンパレーターの出力（アンドロイドの体力の低いほう。0 はいない）。 */
     private int signal;
 
     /** リンクできる、身寄りのないアンドロイド。 */
@@ -120,14 +131,16 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         case D_CAPACITY -> energy.getMaxEnergyStored();
         case D_MODE -> mode;
         case D_RETREAT -> retreat;
-        case D_STATUS -> status;
-        case D_HP -> hp;
-        case D_CHARGE -> charge;
+        case D_STATUS -> statuses[selected];
+        case D_HP -> hps[selected];
+        case D_CHARGE -> charges[selected];
         case D_KIND -> {
             AndroidKind k = memoryKind(items.getStackInSlot(SLOT_MEMORY));
             yield k == null ? -1 : k.ordinal();
         }
-        case D_DELAY -> delay;
+        case D_DELAY -> delays[selected];
+        case D_SELECTED -> selected;
+        case D_UNITS -> units();
         case D_ESCORT -> escort ? 1 : 0;
         case D_LEADER -> leaderIndex();
         default -> 0;
@@ -158,16 +171,40 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_transfer_upgrade");
     }
 
+    public static boolean isProductionUpgrade(ItemStack stack) {
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_production_upgrade");
+    }
+
+    /** 受け持てるアンドロイドの数（生産アップグレードを積んでいれば2）。 */
+    public int units() {
+        return isProductionUpgrade(items.getStackInSlot(SLOT_PRODUCTION)) ? MAX_UNITS : 1;
+    }
+
+    /** このアンドロイドの枠（受け持っていなければ -1）。 */
+    private int unitOf(UUID id) {
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (id.equals(androids[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     /** 転送アップグレードを積んでいるか。 */
     public boolean hasTransfer() {
         return isTransferUpgrade(items.getStackInSlot(SLOT_UPGRADE));
     }
 
     /** アンドロイドから転送された持ち物を預かる（slot は持ち物の位置）。預かれなかった分を返す。 */
-    public ItemStack keep(int slot, ItemStack stack) {
-        ItemStack held = kept.getItem(slot);
+    public ItemStack keep(UUID id, int slot, ItemStack stack) {
+        int unit = unitOf(id);
+        if (unit < 0 || slot >= RuinAndroid.INVENTORY_SIZE) {
+            return stack;
+        }
+        net.minecraft.world.SimpleContainer box = kept[unit];
+        ItemStack held = box.getItem(slot);
         if (held.isEmpty()) {
-            kept.setItem(slot, stack);
+            box.setItem(slot, stack);
             setChanged();
             return ItemStack.EMPTY;
         }
@@ -180,9 +217,25 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return stack;
     }
 
-    /** 預かっている持ち物（GUI の表示用）。 */
-    public net.minecraft.world.SimpleContainer kept() {
-        return kept;
+    /** 転送アップグレードで預かった作業（枠ごと。次に印刷するアンドロイドが同じ注文の作業を続ける）。 */
+    private final BlockPos[] keptConsole = new BlockPos[MAX_UNITS];
+    private final int[] keptOrder = new int[MAX_UNITS];
+    private final CompoundTag[] keptWork = new CompoundTag[MAX_UNITS];
+
+    /** 倒れたアンドロイドの作業を預かる。 */
+    public void keepWork(UUID id, @Nullable BlockPos console, int order, CompoundTag state) {
+        int unit = unitOf(id);
+        if (unit >= 0) {
+            keptConsole[unit] = console;
+            keptOrder[unit] = order;
+            keptWork[unit] = state.copy();
+            setChanged();
+        }
+    }
+
+    /** 預かっている持ち物（枠ごと）。 */
+    public net.minecraft.world.SimpleContainer kept(int unit) {
+        return kept[unit];
     }
 
     public static boolean isPermit(ItemStack stack) {
@@ -325,38 +378,61 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return energy.consume(fe);
     }
 
-    public String name() {
-        return name;
+    /** 枠の名前（空なら型の愛称）。 */
+    public String name(int unit) {
+        return names[unit];
     }
 
     /** 名前を覚える（アンドロイドの GUI から変えたとき）。 */
-    public void rememberName(String name) {
-        this.name = name;
+    public void rememberName(UUID id, String name) {
+        int unit = unitOf(id);
+        if (unit < 0) {
+            return;
+        }
+        names[unit] = name;
         setChanged();
         if (level != null) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
     }
 
-    /** 名前を変える（ステーションの GUI から）。今いるアンドロイドにも付ける。 */
+    /** 名前を変える（ステーションの GUI から。見ている枠）。今いるアンドロイドにも付ける。 */
     public void rename(String name) {
-        if (android != null && level instanceof ServerLevel server && server.getEntity(android) instanceof RuinAndroid a) {
+        UUID id = androids[selected];
+        if (id != null && level instanceof ServerLevel server && server.getEntity(id) instanceof RuinAndroid a) {
             a.rename(name);
         } else {
-            rememberName(name.strip());
+            names[selected] = name.strip();
+            setChanged();
+            if (level != null) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            }
         }
     }
 
     /** このステーションが受け持つアンドロイドか。 */
     public boolean manages(UUID id) {
-        return id.equals(android);
+        return unitOf(id) >= 0;
     }
 
     /** アンドロイドが体力を知らせる（毎秒）。 */
     public void reportHealth(UUID id, float fraction) {
-        if (id.equals(android)) {
-            setSignal(Math.max(1, (int) Math.ceil(15 * Math.min(1, fraction))));
+        int unit = unitOf(id);
+        if (unit >= 0) {
+            signals[unit] = Math.max(1, (int) Math.ceil(15 * Math.min(1, fraction)));
+            updateSignal();
         }
+    }
+
+    /** コンパレーターの出力を、受け持つアンドロイドの体力の低いほうにする（いなければ 0）。 */
+    private void updateSignal() {
+        int value = 0;
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (androids[i] != null) {
+                value = value == 0 ? signals[i] : Math.min(value, signals[i]);
+            }
+        }
+        setSignal(value);
     }
 
     /** コンパレーターの出力（0〜15）。 */
@@ -376,20 +452,22 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     /** 解体されたとき: すぐに印刷し直す（キットと電力があれば）。 */
     public void onAndroidDismantled(UUID id) {
-        if (id.equals(android)) {
-            android = null;
-            setSignal(0);
-            delay = 10;
-            setChanged();
-        }
+        release(id, 10);
     }
 
     /** アンドロイドが倒れたとき（RuinAndroid.die から）。 */
     public void onAndroidDied(UUID id) {
-        if (id.equals(android)) {
-            android = null;
-            setSignal(0);
-            delay = REPRINT_DELAY;
+        release(id, REPRINT_DELAY);
+    }
+
+    /** アンドロイドの枠を空ける（delay tick ののち、キットがあれば印刷し直す）。 */
+    private void release(UUID id, int delay) {
+        int unit = unitOf(id);
+        if (unit >= 0) {
+            androids[unit] = null;
+            signals[unit] = 0;
+            delays[unit] = delay;
+            updateSignal();
             setChanged();
         }
     }
@@ -401,54 +479,62 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     }
 
     private void tick(ServerLevel level) {
-        if (android != null) {
-            Entity e = level.getEntity(android);
-            if (e instanceof RuinAndroid a && a.isAlive()) {
-                hp = Math.round(100 * a.getHealth() / a.getMaxHealth());
-                charge = Math.round(100 * a.chargeFraction());
-                int s = a.state();
-                status = !a.printed() ? S_PRINTING : s == RuinAndroid.STATE_RETREAT ? S_RETURNING
-                        : s == RuinAndroid.STATE_LOW_POWER ? S_LOW_POWER : RuinAndroid.charging(s) ? S_CHARGING : S_ACTIVE;
-                if (level.getGameTime() % 20 == 0) {
-                    sync(a);
-                }
-            } else if (e == null) {
-                status = S_AWAY;                         // 読み込まれていない所にいる（追従で遠くへ行った）
-            } else {
-                android = null;
-                delay = REPRINT_DELAY;
-                setSignal(0);
-                setChanged();
-            }
-            return;
+        if (selected >= units() && androids[selected] == null) {
+            selected = 0;
         }
-        setSignal(0);
-        hp = 0;
-        charge = 0;
         AndroidKind kind = memoryKind(items.getStackInSlot(SLOT_MEMORY));
-        if (kind != null && level.getGameTime() % 20 == 0) {
+        boolean empty = false;
+        for (int i = 0; i < units(); i++) {
+            empty |= androids[i] == null;
+        }
+        if (!empty) {
+            orphan = null;
+        } else if (kind != null && level.getGameTime() % 20 == 0) {
             orphan = findOrphan(level, kind);
         }
-        if (orphan != null) {
-            // 身寄りのないアンドロイドがいる: リンクを待つ（新しく印刷しない）
-            status = S_ORPHAN;
-            return;
-        }
-        if (delay > 0) {
-            delay--;
-            status = S_WAITING;
-            return;
-        }
-        if (kind == null) {
-            status = S_NO_MEMORY;
-        } else if (!isKit(items.getStackInSlot(SLOT_KIT))) {
-            status = S_NO_KIT;
-        } else if (energy.getEnergyStored() < PRINT_FE) {
-            status = S_NO_ENERGY;
-        } else if (!topClear(level)) {
-            status = S_BLOCKED;
-        } else if (level.getGameTime() % 10 == 0) {
-            print(level, kind);
+        boolean printing = false;
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (androids[i] != null) {
+                Entity e = level.getEntity(androids[i]);
+                if (e instanceof RuinAndroid a && a.isAlive()) {
+                    hps[i] = Math.round(100 * a.getHealth() / a.getMaxHealth());
+                    charges[i] = Math.round(100 * a.chargeFraction());
+                    int s = a.state();
+                    statuses[i] = !a.printed() ? S_PRINTING : s == RuinAndroid.STATE_RETREAT ? S_RETURNING
+                            : s == RuinAndroid.STATE_LOW_POWER ? S_LOW_POWER : RuinAndroid.charging(s) ? S_CHARGING : S_ACTIVE;
+                    if (level.getGameTime() % 20 == 0) {
+                        sync(a);
+                    }
+                } else if (e == null) {
+                    statuses[i] = S_AWAY;                // 読み込まれていない所にいる（追従で遠くへ行った）
+                } else {
+                    release(androids[i], REPRINT_DELAY);
+                }
+                continue;
+            }
+            hps[i] = 0;
+            charges[i] = 0;
+            if (i >= units()) {
+                continue;                                // 生産アップグレードがないと、2体目は印刷しない
+            }
+            if (orphan != null) {
+                // 身寄りのないアンドロイドがいる: リンクを待つ（新しく印刷しない）
+                statuses[i] = S_ORPHAN;
+            } else if (delays[i] > 0) {
+                delays[i]--;
+                statuses[i] = S_WAITING;
+            } else if (kind == null) {
+                statuses[i] = S_NO_MEMORY;
+            } else if (!isKit(items.getStackInSlot(SLOT_KIT))) {
+                statuses[i] = S_NO_KIT;
+            } else if (energy.getEnergyStored() < PRINT_FE) {
+                statuses[i] = S_NO_ENERGY;
+            } else if (printing || !topClear(level)) {
+                statuses[i] = S_BLOCKED;                 // 上で印刷中・充電中のアンドロイドがどくのを待つ
+            } else if (level.getGameTime() % 10 == 0) {
+                print(level, kind, i);
+                printing = true;
+            }
         }
     }
 
@@ -462,36 +548,57 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return null;
     }
 
+    /** 印刷したいのに、上にだれかいて待っている（上で待機しているアンドロイドは、どく）。 */
+    public boolean wantsTop() {
+        for (int i = 0; i < units(); i++) {
+            if (androids[i] == null && statuses[i] == S_BLOCKED) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean topClear(ServerLevel level) {
         AABB box = new AABB(worldPosition.above()).expandTowards(0, 1, 0).deflate(0.05);
         return level.noCollision(box) && level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator()).isEmpty();
     }
 
-    private void print(ServerLevel level, AndroidKind kind) {
+    private void print(ServerLevel level, AndroidKind kind, int unit) {
         RuinAndroid a = kind.type().create(level);
         if (a == null || !energy.consume(PRINT_FE)) {
             return;
         }
         items.extractItem(SLOT_KIT, 1, false);
         // 預かっていた持ち物を持たせ、自己修理キットをストックから補充する
-        for (int i = 0; i < kept.getContainerSize(); i++) {
-            if (!kept.getItem(i).isEmpty()) {
-                a.inventory().setItem(i, kept.removeItemNoUpdate(i));
+        net.minecraft.world.SimpleContainer box = kept[unit];
+        for (int i = 0; i < box.getContainerSize(); i++) {
+            if (!box.getItem(i).isEmpty()) {
+                a.inventory().setItem(i, box.removeItemNoUpdate(i));
             }
         }
         refill(a);
+        a.setCharge(a.maxCharge());
+        if (keptConsole[unit] != null) {
+            a.assignWork(keptConsole[unit], keptOrder[unit]);
+            if (keptWork[unit] != null) {
+                a.restoreWorkState(keptWork[unit]);
+            }
+            keptConsole[unit] = null;
+            keptWork[unit] = null;
+        }
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
         a.startPrinting();
         a.makeGuard(owner, worldPosition, mode, retreat);
         sync(a);
-        if (!name.isEmpty()) {
-            a.setCustomName(Component.literal(name));
+        if (!names[unit].isEmpty()) {
+            a.setCustomName(Component.literal(names[unit]));
         }
         level.addFreshEntity(a);
-        android = a.getUUID();
-        status = S_PRINTING;
-        setSignal(15);
+        androids[unit] = a.getUUID();
+        statuses[unit] = S_PRINTING;
+        signals[unit] = 15;
+        updateSignal();
         level.playSound(null, worldPosition, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.8F, 1.6F);
         setChanged();
     }
@@ -521,28 +628,49 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 leader = next == 0 ? null : list.get(next - 1).id();
             }
             case BUTTON_RECALL -> {
-                if (android != null && level instanceof ServerLevel server && server.getEntity(android) instanceof RuinAndroid a) {
+                if (androids[selected] != null && level instanceof ServerLevel server
+                        && server.getEntity(androids[selected]) instanceof RuinAndroid a) {
                     a.recall();
                 }
             }
             case BUTTON_LINK -> {
-                if (android == null && orphan != null && level instanceof ServerLevel server
+                // 見ている枠が空いていればそこへ、埋まっていれば空いている枠へつなぐ
+                int unit = selected < units() && androids[selected] == null ? selected : -1;
+                for (int i = 0; unit < 0 && i < units(); i++) {
+                    if (androids[i] == null) {
+                        unit = i;
+                    }
+                }
+                if (unit >= 0 && orphan != null && level instanceof ServerLevel server
                         && server.getEntity(orphan) instanceof RuinAndroid a && a.orphan()) {
                     a.link(worldPosition, mode, retreat);
                     sync(a);
-                    android = a.getUUID();
+                    androids[unit] = a.getUUID();
                     orphan = null;
-                    setSignal(Math.max(1, (int) Math.ceil(15 * a.getHealth() / a.getMaxHealth())));
-                    rememberName(a.hasCustomName() ? a.getCustomName().getString() : "");
+                    signals[unit] = Math.max(1, (int) Math.ceil(15 * a.getHealth() / a.getMaxHealth()));
+                    updateSignal();
+                    rememberName(a.getUUID(), a.hasCustomName() ? a.getCustomName().getString() : "");
+                    selected = unit;
                     server.playSound(null, worldPosition, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8F, 1.6F);
                 }
+            }
+            case BUTTON_SELECT, BUTTON_SELECT + 1 -> {
+                int unit = id - BUTTON_SELECT;
+                if (unit < units() || androids[unit] != null) {
+                    selected = unit;
+                }
+                return;
             }
             default -> {
                 return;
             }
         }
-        if (android != null && level instanceof ServerLevel server && server.getEntity(android) instanceof RuinAndroid a) {
-            sync(a);
+        if (level instanceof ServerLevel server) {
+            for (UUID unit : androids) {
+                if (unit != null && server.getEntity(unit) instanceof RuinAndroid a) {
+                    sync(a);
+                }
+            }
         }
         setChanged();
     }
@@ -573,14 +701,20 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     @Override
     public void onBroken(Level level) {
         // 読み込まれているアンドロイドには、すぐ知らせる（同じ場所に置き直しても、新しいステーションでリンクできるように）
-        if (android != null && level instanceof ServerLevel server && server.getEntity(android) instanceof RuinAndroid a) {
-            a.loseStation();
+        if (level instanceof ServerLevel server) {
+            for (UUID unit : androids) {
+                if (unit != null && server.getEntity(unit) instanceof RuinAndroid a) {
+                    a.loseStation();
+                }
+            }
         }
         for (int i = 0; i < items.getSlots(); i++) {
             Block.popResource(level, worldPosition, items.getStackInSlot(i));
         }
-        for (int i = 0; i < kept.getContainerSize(); i++) {
-            Block.popResource(level, worldPosition, kept.getItem(i));
+        for (net.minecraft.world.SimpleContainer box : kept) {
+            for (int i = 0; i < box.getContainerSize(); i++) {
+                Block.popResource(level, worldPosition, box.getItem(i));
+            }
         }
     }
 
@@ -594,8 +728,28 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         if (owner != null) {
             tag.putUUID("owner", owner);
         }
-        if (android != null) {
-            tag.putUUID("android", android);
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (androids[i] != null) {
+                tag.putUUID("android" + i, androids[i]);
+            }
+            tag.putInt("delay" + i, delays[i]);
+            tag.putString("name" + i, names[i]);
+            tag.putInt("signal" + i, signals[i]);
+            net.minecraft.core.NonNullList<ItemStack> list = net.minecraft.core.NonNullList.withSize(RuinAndroid.INVENTORY_SIZE, ItemStack.EMPTY);
+            for (int s = 0; s < RuinAndroid.INVENTORY_SIZE; s++) {
+                list.set(s, kept[i].getItem(s));
+            }
+            tag.put("kept" + i, net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), list, registries));
+        }
+        tag.putInt("selected", selected);
+        for (int i = 0; i < MAX_UNITS; i++) {
+            if (keptConsole[i] != null) {
+                tag.put("kept_console" + i, net.minecraft.nbt.NbtUtils.writeBlockPos(keptConsole[i]));
+                tag.putInt("kept_order" + i, keptOrder[i]);
+                if (keptWork[i] != null) {
+                    tag.put("kept_work" + i, keptWork[i]);
+                }
+            }
         }
         tag.putInt("mode", mode);
         tag.putInt("retreat", retreat);
@@ -603,17 +757,16 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         if (leader != null) {
             tag.putUUID("leader", leader);
         }
-        tag.putInt("delay", delay);
-        tag.putString("name", name);
         tag.putInt("signal", signal);
-        tag.put("kept", kept.createTag(registries));
     }
 
     // 名前と持ち主はクライアントにも送る（ステーションの GUI に出すため。追従する人の候補から持ち主を除く）
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        tag.putString("name", name);
+        for (int i = 0; i < MAX_UNITS; i++) {
+            tag.putString("name" + i, names[i]);
+        }
         if (owner != null) {
             tag.putUUID("owner", owner);
         }
@@ -633,14 +786,44 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         inv.putInt("Size", SLOTS);
         items.deserializeNBT(registries, inv);
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
-        android = tag.hasUUID("android") ? tag.getUUID("android") : null;
+        for (int i = 0; i < MAX_UNITS; i++) {
+            androids[i] = tag.hasUUID("android" + i) ? tag.getUUID("android" + i) : null;
+            delays[i] = tag.getInt("delay" + i);
+            names[i] = tag.getString("name" + i);
+            signals[i] = tag.getInt("signal" + i);
+            kept[i].clearContent();
+            if (tag.contains("kept" + i)) {
+                net.minecraft.core.NonNullList<ItemStack> list = net.minecraft.core.NonNullList.withSize(RuinAndroid.INVENTORY_SIZE, ItemStack.EMPTY);
+                net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("kept" + i), list, registries);
+                for (int s = 0; s < RuinAndroid.INVENTORY_SIZE; s++) {
+                    kept[i].setItem(s, list.get(s));
+                }
+            }
+        }
+        // 0.6.0 までの保存（1体だけ）は、1つ目の枠に入れる
+        if (tag.hasUUID("android")) {
+            androids[0] = tag.getUUID("android");
+        }
+        if (tag.contains("name")) {
+            names[0] = tag.getString("name");
+        }
+        if (tag.contains("delay")) {
+            delays[0] = tag.getInt("delay");
+        }
+        for (net.minecraft.nbt.Tag t : tag.getList("kept", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            ItemStack.parse(registries, t).ifPresent(stack -> kept[0].setItem(RuinAndroid.isArmorPlate(stack) ? RuinAndroid.SLOT_PLATE
+                    : RuinAndroid.SLOT_REPAIR, stack));
+        }
+        selected = Mth.clamp(tag.getInt("selected"), 0, MAX_UNITS - 1);
+        for (int i = 0; i < MAX_UNITS; i++) {
+            keptConsole[i] = net.minecraft.nbt.NbtUtils.readBlockPos(tag, "kept_console" + i).orElse(null);
+            keptOrder[i] = tag.getInt("kept_order" + i);
+            keptWork[i] = tag.contains("kept_work" + i) ? tag.getCompound("kept_work" + i).copy() : null;
+        }
         mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_FOLLOW);
         retreat = tag.contains("retreat") ? Mth.clamp(tag.getInt("retreat"), 0, 90) : 30;
         escort = !tag.contains("escort") || tag.getBoolean("escort");
         leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
-        delay = tag.getInt("delay");
-        name = tag.getString("name");
         signal = tag.getInt("signal");
-        kept.fromTag(tag.getList("kept", net.minecraft.nbt.Tag.TAG_COMPOUND), registries);
     }
 }

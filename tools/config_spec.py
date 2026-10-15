@@ -138,6 +138,7 @@ CLIENT = [
     ('render', 'dopplerBeaming', 'true', 'true / false', '降着円盤のドップラー・ビーミング'),
     ('render', 'lensingQuality', '"high"', '"low" / "medium" / "high"', '歪み処理の解像度'),
     ('render', 'formationEffects', 'true', 'true / false', 'マルチブロック形成時の光の演出'),
+    ('render', 'androidWorkIcons', 'true', 'true / false', '作業中のアンドロイドの頭の上に、今していること（取りに行く・作る・採掘 など）のアイコンを出す'),
 ]
 
 DATAPACK = [

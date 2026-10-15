@@ -39,6 +39,13 @@ public final class SinguloMenus {
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.AndroidMenu>> ANDROID = REGISTER.register(
             "android", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.AndroidMenu::client));
 
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.WorkConsoleMenu>> ANDROID_WORK_CONSOLE = REGISTER.register(
+            "android_work_console", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.work.WorkConsoleMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.DeliveryPortMenu>> ANDROID_DELIVERY_PORT = REGISTER.register(
+            "android_delivery_port", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.work.DeliveryPortMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.RecipeRackMenu>> ANDROID_RECIPE_RACK = REGISTER.register(
+            "android_recipe_rack", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.work.RecipeRackMenu::client));
+
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.AndroidStationMenu>> ANDROID_STATION = REGISTER.register(
             "android_station", () -> IMenuTypeExtension.create(io.github.genichimaruo.singulo.android.AndroidStationMenu::client));
 

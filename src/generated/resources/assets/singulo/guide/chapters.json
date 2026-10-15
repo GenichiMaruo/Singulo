@@ -105,6 +105,10 @@
         "androids.ruin",
         "androids.build",
         "androids.care",
+        "androids.upgrades",
+        "androids.work",
+        "androids.process",
+        "androids.decor",
         "androids.glass"
       ]
     },

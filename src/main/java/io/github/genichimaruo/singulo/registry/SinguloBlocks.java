@@ -168,6 +168,22 @@ public final class SinguloBlocks {
     /** アンドロイド組立ステーション（護衛のアンドロイドを印刷する）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidStationBlock> ANDROID_STATION = BLOCKS.register(
             "android_station", () -> new io.github.genichimaruo.singulo.android.AndroidStationBlock(machineProperties()));
+    /** アンドロイドの作業（自動化）: 作業指令台（資材口とレシピの記録を兼ねる）・資材口・納品口・レシピ棚。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.work.WorkConsoleBlock> ANDROID_WORK_CONSOLE = BLOCKS.register(
+            "android_work_console", () -> new io.github.genichimaruo.singulo.android.work.WorkConsoleBlock(machineProperties()));
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity>> ANDROID_SUPPLY_PORT = BLOCKS.register(
+            "android_supply_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_SUPPLY_PORT,
+                    io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity::new, (l, p, s, be) -> {}));
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT = BLOCKS.register(
+            "android_delivery_port", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_DELIVERY_PORT,
+                    io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new,
+                    io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::serverTick));
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ANDROID_WORKBENCH = BLOCKS.register(
+            "android_workbench", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_WORKBENCH,
+                    io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, (l, p, s, be) -> {}));
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity>> ANDROID_RECIPE_RACK = BLOCKS.register(
+            "android_recipe_rack", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_RECIPE_RACK,
+                    io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity::new, (l, p, s, be) -> {}));
     public static final DeferredBlock<SimpleMachineBlock<ProbeStationBlockEntity>> PROBE_STATION = BLOCKS.register(
             "probe_station", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.PROBE_STATION, ProbeStationBlockEntity::new, CatalystDeviceBlockEntity::serverTick));

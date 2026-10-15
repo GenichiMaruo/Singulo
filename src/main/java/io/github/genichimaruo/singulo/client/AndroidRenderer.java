@@ -59,6 +59,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Whip(this));
         addLayer(new Saber(this));
         addLayer(new Solar(this));
+        addLayer(new Pickaxe(this));
+        addLayer(new Tanks(this));
+        addLayer(new Accessories(this));
+        addLayer(new Blink(this));
         addLayer(new ArmorGlint(this));
     }
 
@@ -87,6 +91,65 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
         super.render(android, yaw, partialTick, pose, buffers, light);
         renderMoves(android, partialTick, pose, buffers);
+        renderWorkIcon(android, partialTick, pose, buffers, light);
+    }
+
+    /** 作業中の今していることの印（頭の上に、小さく回る物の絵）。設定 androidWorkIcons で消せる。 */
+    private void renderWorkIcon(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
+        int act = android.activity();
+        if (act == RuinAndroid.ACT_NONE || io.github.genichimaruo.singulo.generated.ClientConfig.SPEC.isLoaded()
+                && !io.github.genichimaruo.singulo.generated.ClientConfig.ANDROID_WORK_ICONS.get()) {
+            return;
+        }
+        net.minecraft.world.item.ItemStack icon = new net.minecraft.world.item.ItemStack(switch (act) {
+            case RuinAndroid.ACT_FETCH -> net.minecraft.world.item.Items.CHEST;
+            case RuinAndroid.ACT_CRAFT -> net.minecraft.world.item.Items.CRAFTING_TABLE;
+            case RuinAndroid.ACT_PROCESS -> net.minecraft.world.item.Items.FURNACE;
+            case RuinAndroid.ACT_MINE -> net.minecraft.world.item.Items.DIAMOND_PICKAXE;
+            case RuinAndroid.ACT_DELIVER -> net.minecraft.world.item.Items.CHEST_MINECART;
+            case RuinAndroid.ACT_RETURN -> net.minecraft.world.item.Items.BARREL;
+            case RuinAndroid.ACT_WAIT -> net.minecraft.world.item.Items.CLOCK;
+            case RuinAndroid.ACT_CHARGE -> net.minecraft.world.item.Items.REDSTONE;
+            case RuinAndroid.ACT_FIGHT -> net.minecraft.world.item.Items.IRON_SWORD;
+            case RuinAndroid.ACT_FARM -> net.minecraft.world.item.Items.WHEAT;
+            case RuinAndroid.ACT_RANCH -> net.minecraft.world.item.Items.SHEARS;
+            case RuinAndroid.ACT_FELL -> net.minecraft.world.item.Items.DIAMOND_AXE;
+            case RuinAndroid.ACT_USE -> net.minecraft.world.item.Items.LEVER;
+            default -> net.minecraft.world.item.Items.AIR;
+        });
+        if (icon.isEmpty()) {
+            return;
+        }
+        float age = android.tickCount + partialTick;
+        pose.pushPose();
+        pose.translate(0, android.getBbHeight() + 0.45F + 0.04F * Mth.sin(age * 0.1F), 0);
+        pose.mulPose(Axis.YP.rotationDegrees(age * 3));
+        pose.scale(0.35F, 0.35F, 0.35F);
+        net.minecraft.client.Minecraft.getInstance().getItemRenderer().renderStatic(icon, net.minecraft.world.item.ItemDisplayContext.FIXED,
+                light, OverlayTexture.NO_OVERLAY, pose, buffers, android.level(), android.getId());
+        pose.popPose();
+    }
+
+    /**
+     * 透きとおって光る刃の描き方: entityTranslucentEmissive と同じだが、奥行きも書く。書かないと、あとから描かれるブロックの
+     * 絵（チェストなど）が、手前にある刃の上に描かれてしまう。
+     */
+    private static final class DepthGlow extends RenderType {
+        static final java.util.function.Function<ResourceLocation, RenderType> TYPE = net.minecraft.Util.memoize(texture -> create(
+                "singulo_translucent_emissive_depth", com.mojang.blaze3d.vertex.DefaultVertexFormat.NEW_ENTITY,
+                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, true, true, CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
+                        .setTextureState(new TextureStateShard(texture, false, false))
+                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(NO_CULL)
+                        .setWriteMaskState(COLOR_DEPTH_WRITE)
+                        .setOverlayState(OVERLAY)
+                        .createCompositeState(false)));
+
+        private DepthGlow(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
+                          boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
+            super(name, format, mode, size, crumbling, sort, setup, clear);
+        }
     }
 
     /** 体を描くときと同じ変形（向き・裏返し・大きさ）を pose に積む。 */
@@ -474,6 +537,306 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
     }
 
+    /**
+     * 採掘: 左手に持つツルハシ。プレイヤーと同じく、柄は前腕に直角（手から前へ）、頭は柄の先で腕と同じ向きに張り出す。
+     * 柄は実体（濃い金属色）、頭はアンドロイドの色で光る（先が持ち手の方へ曲がった弧）。
+     */
+    final class Pickaxe extends RenderLayer<RuinAndroid, AndroidModel> {
+        Pickaxe(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (android.state() != RuinAndroid.STATE_MINING) {
+                return;
+            }
+            pose.pushPose();
+            getParentModel().toLeftHand(pose);
+            float k = 1 / SCALE;
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            // 柄: 手の中（少し後ろに出る）から前へ
+            FxDraw.box(pose, body, -0.022F * k, -0.022F * k, -0.42F * k, 0.022F * k, 0.022F * k, 0.08F * k, light, 0x4A505C, 255);
+            // 頭の付け根
+            FxDraw.box(pose, body, -0.032F * k, -0.04F * k, -0.45F * k, 0.032F * k, 0.04F * k, -0.39F * k, light, 0x8C94A2, 255);
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            float pulse = 0.8F + 0.2F * Mth.sin(age * 0.3F);
+            if (android.tool() == RuinAndroid.TOOL_AXE) {
+                // 光る斧の刃: 柄の先から片側（上）へ、先ほど幅の広い刃
+                for (int j = 0; j < 6; j++) {
+                    float yy = 0.02F + j * 0.04F;
+                    float half = 0.035F + j * 0.014F;
+                    glowBox(pose, fx, -0.02F * k, yy * k, (-0.42F - half) * k, 0.02F * k, (yy + 0.04F) * k, (-0.42F + half) * k, variant.accent,
+                            (int) (130 * pulse));
+                }
+                pose.popPose();
+                return;
+            }
+            // 光る頭: 腕の向き（上下）に張り出し、先が持ち手の方（後ろ）へ曲がる
+            for (int i = -4; i <= 4; i++) {
+                float y = i * 0.045F;
+                float z = -0.42F + i * i * 0.006F;
+                float t = 1 - Math.abs(i) / 5F;
+                float h = 0.022F + 0.01F * t;
+                glowBox(pose, fx, -0.02F * k, (y - 0.026F) * k, (z - h) * k, 0.02F * k, (y + 0.026F) * k, (z + h) * k, variant.accent,
+                        (int) (120 * pulse));
+            }
+            pose.popPose();
+        }
+    }
+
+    /**
+     * タンクアップグレード: 腰の左右に、ガラスの筒を1本ずつ。中の流体の色で、入っている高さまで満たす。上下に金属のふた。
+     */
+    final class Tanks extends RenderLayer<RuinAndroid, AndroidModel> {
+        Tanks(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (android.tankFill(0) < 0 || !android.printed()) {
+                return;
+            }
+            for (int i = 0; i < RuinAndroid.TANKS; i++) {
+                boolean left = i == 0;
+                pose.pushPose();
+                getParentModel().toHipSide(pose, left);
+                float s = left ? 1 : -1;
+                // 筒の大きさ（ピクセル）: 外側へ出して、太さ 1.8、高さ 3.6
+                float x0 = s * 0.55F / 16, x1 = s * 2.35F / 16, y0 = 0.6F / 16, y1 = 4.2F / 16, z0 = -0.9F / 16, z1 = 0.9F / 16;
+                float lo = Math.min(x0, x1), hi = Math.max(x0, x1);
+                VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                FxDraw.box(pose, metal, lo, y0 - 0.35F / 16, z0, hi, y0, z1, light, 0x8C94A2, 255);
+                FxDraw.box(pose, metal, lo, y1, z0, hi, y1 + 0.35F / 16, z1, light, 0x8C94A2, 255);
+                VertexConsumer glass = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
+                float fill = android.tankFill(i);
+                net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                if (fluid != null && fill > 0) {
+                    int color = net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid)
+                            .getTintColor(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000)) & 0xFFFFFF;
+                    if (fluid.isSame(net.minecraft.world.level.material.Fluids.LAVA)) {
+                        color = 0xFF6A00;
+                    }
+                    float top = y0 + (y1 - y0) * Math.min(1, fill);
+                    FxDraw.box(pose, glass, lo + 0.15F / 16, y0, z0 + 0.15F / 16, hi - 0.15F / 16, top, z1 - 0.15F / 16, light, color, 220);
+                }
+                FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
+                pose.popPose();
+            }
+        }
+    }
+
+    /**
+     * 瞬き: 数秒ごと（アンドロイドごとに間合いを変える）に、目の上にまぶた（肌の色と、下の縁のまつげの線）を重ねる。
+     * 半分閉じる → 閉じる（2 tick）→ 半分閉じる。目は顔（頭の前の面、z -3.5）の 5〜6 段目、左右 1〜2 列・5〜6 列。
+     */
+    final class Blink extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final int SKIN = 0xFFECE4, CREASE = 0xE6CFC8, LASH = 0x4A3A44;
+
+        Blink(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (!android.printed()) {
+                return;
+            }
+            int period = 70 + Math.floorMod(android.getId() * 37, 50);          // 3.5〜6秒ごと
+            int phase = Math.floorMod(android.tickCount + android.getId() * 13, period);
+            if (phase > 3) {
+                return;
+            }
+            boolean half = phase == 0 || phase == 3;                              // 閉じかけ・開きかけ
+            float p = 1 / 16F;
+            pose.pushPose();
+            getParentModel().toHead(pose);
+            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            float z0 = -3.52F * p, z1 = -3.5F * p;
+            for (float x0 : new float[] {-3, 1}) {
+                float x1 = x0 + 2;
+                float bottom = half ? -2 : -1;                                     // 半分なら上の段だけ
+                FxDraw.box(pose, vc, x0 * p, -3 * p, z0, x1 * p, (bottom - 0.25F) * p, z1, light, half ? CREASE : SKIN, 255);
+                FxDraw.box(pose, vc, x0 * p, (bottom - 0.25F) * p, z0 - 0.002F, x1 * p, bottom * p, z1, light, LASH, 255);
+            }
+            pose.popPose();
+        }
+    }
+
+    /**
+     * 装飾: 頭（リボン・髪飾り・ベレー帽・ヘッドドレス）、背中/腰（マント・マフラー・腰リボン）、手（本・花束・ティーカップ・傘）。
+     * 染めた色で描く。手に持つ物は、待機している間だけ。大きさは体のピクセル（1/16）で決める。
+     */
+    final class Accessories extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final float P = 1 / 16F;
+
+        Accessories(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (!android.printed()) {
+                return;
+            }
+            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            AndroidModel m = getParentModel();
+            for (int part = 0; part < 3; part++) {
+                net.minecraft.world.item.ItemStack stack = android.decor(part);
+                if (!(stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc)) {
+                    continue;
+                }
+                if (part == io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND && !android.showsHeldDecor()) {
+                    continue;
+                }
+                int c = acc.color(stack);
+                pose.pushPose();
+                switch (part) {
+                    case 0 -> m.toHead(pose);
+                    case 1 -> {
+                        if (acc.style().equals("waist_ribbon")) {
+                            m.toHips(pose);
+                        } else {
+                            m.toTorso(pose);
+                        }
+                    }
+                    default -> m.toLeftHand(pose);
+                }
+                draw(acc.style(), pose, vc, light, c, Math.min(1, limbSwingAmount), age);
+                pose.popPose();
+            }
+        }
+
+        /** 箱（ピクセル単位）。 */
+        private void b(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float z0, float x1, float y1, float z1, int rgb) {
+            FxDraw.box(pose, vc, x0 * P, y0 * P, z0 * P, x1 * P, y1 * P, z1 * P, light, rgb, 255);
+        }
+
+        private void draw(String style, PoseStack pose, VertexConsumer vc, int light, int c, float walk, float age) {
+            int dark = mix(c, 0x000000, 0.25F);
+            switch (style) {
+                // ---- 頭（頭の箱: x -4〜4、y -8〜0、z -3.5〜3.5。前は -z）
+                case "ribbon" -> {
+                    // 後頭部の上に、左右の輪と結び目、短い垂れ
+                    b(pose, vc, light, -0.7F, -7.9F, 4.1F, 0.7F, -6.7F, 4.9F, dark);
+                    b(pose, vc, light, -3.0F, -8.8F, 4.2F, -0.7F, -6.2F, 4.8F, c);
+                    b(pose, vc, light, 0.7F, -8.8F, 4.2F, 3.0F, -6.2F, 4.8F, c);
+                    // 垂れ: 後ろ髪の外側に沿わせる（髪の角度・揺れに合わせる）
+                    pose.popPose();
+                    pose.pushPose();
+                    getParentModel().toBackHair(pose);
+                    b(pose, vc, light, -1.4F, -0.2F, 0.75F, -0.5F, 3.6F, 1.1F, c);
+                    b(pose, vc, light, 0.5F, -0.2F, 0.75F, 1.4F, 3.2F, 1.1F, c);
+                }
+                case "hair_flower" -> {
+                    // 右の側頭部に、花びら4枚と黄色い芯
+                    float x = -4.25F;
+                    b(pose, vc, light, x - 0.5F, -7.4F, -1.9F, x, -6.4F, -0.9F, 0xF7E07A);
+                    b(pose, vc, light, x - 0.4F, -8.6F, -1.9F, x + 0.1F, -7.4F, -0.9F, c);
+                    b(pose, vc, light, x - 0.4F, -6.4F, -1.9F, x + 0.1F, -5.2F, -0.9F, c);
+                    b(pose, vc, light, x - 0.4F, -7.4F, -3.1F, x + 0.1F, -6.4F, -1.9F, c);
+                    b(pose, vc, light, x - 0.4F, -7.4F, -0.9F, x + 0.1F, -6.4F, 0.3F, c);
+                }
+                case "beret" -> {
+                    // 頭の上に少し傾けた円盤と、てっぺんの小さな柄
+                    pose.pushPose();
+                    pose.translate(0, -8 * P, 0);
+                    pose.mulPose(Axis.ZP.rotationDegrees(-10));
+                    b(pose, vc, light, -4.8F, -1.1F, -4.2F, 4.8F, 0.1F, 4.2F, c);
+                    b(pose, vc, light, -4.2F, -1.6F, -3.6F, 4.2F, -1.1F, 3.6F, c);
+                    b(pose, vc, light, -0.3F, -2.3F, -0.3F, 0.3F, -1.6F, 0.3F, dark);
+                    pose.popPose();
+                }
+                case "headdress" -> {
+                    // 頭の上の前寄りに帯、前の縁にひだ（交互に）、両わきに小さなリボン
+                    b(pose, vc, light, -4.3F, -8.7F, -2.2F, 4.3F, -8.0F, -0.8F, c);
+                    for (int i = 0; i < 8; i++) {
+                        float x0 = -4.3F + i * 1.075F;
+                        b(pose, vc, light, x0, -9.3F - (i % 2) * 0.4F, -2.3F, x0 + 1.0F, -8.7F, -1.7F, c);
+                    }
+                    b(pose, vc, light, -4.6F, -8.4F, -1.8F, -4.2F, -6.8F, -1.0F, dark);
+                    b(pose, vc, light, 4.2F, -8.4F, -1.8F, 4.6F, -6.8F, -1.0F, dark);
+                }
+                // ---- 背中（胴の箱: x -3〜3、y -8〜0、z -1.5〜1.5。後ろは +z）
+                case "cape" -> {
+                    // 肩から背中へ垂れるマント。歩くと後ろへなびく
+                    b(pose, vc, light, -3.4F, -8.3F, -1.8F, 3.4F, -7.5F, 1.9F, dark);           // 襟
+                    pose.pushPose();
+                    pose.translate(0, -7.8F * P, 1.7F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(6 + 22 * walk + 3 * Mth.sin(age * 0.08F)));
+                    b(pose, vc, light, -3.8F, 0, 0, 3.8F, 15.5F, 0.4F, c);
+                    pose.popPose();
+                }
+                case "scarf" -> {
+                    // 首に巻いて、前の左に垂れ
+                    b(pose, vc, light, -3.4F, -8.2F, -1.9F, 3.4F, -6.8F, -1.5F, c);
+                    b(pose, vc, light, -3.4F, -8.2F, 1.5F, 3.4F, -6.8F, 1.9F, c);
+                    b(pose, vc, light, -3.4F, -8.2F, -1.9F, -3.0F, -6.8F, 1.9F, c);
+                    b(pose, vc, light, 3.0F, -8.2F, -1.9F, 3.4F, -6.8F, 1.9F, c);
+                    pose.pushPose();
+                    pose.translate(1.6F * P, -6.8F * P, -1.9F * P);
+                    pose.mulPose(Axis.XP.rotationDegrees(-8 - 15 * walk));
+                    b(pose, vc, light, 0, 0, -0.4F, 1.6F, 5.0F, 0, c);
+                    b(pose, vc, light, 0, 4.4F, -0.45F, 1.6F, 5.0F, 0.05F, dark);
+                    pose.popPose();
+                }
+                case "waist_ribbon" -> {
+                    // 腰の後ろに大きな蝶結び（腰の箱: x -3.5〜3.5、y -3〜0、z -2〜2）
+                    b(pose, vc, light, -0.9F, -2.4F, 2.0F, 0.9F, -0.8F, 2.9F, dark);
+                    b(pose, vc, light, -4.0F, -3.4F, 2.1F, -0.9F, -0.2F, 2.8F, c);
+                    b(pose, vc, light, 0.9F, -3.4F, 2.1F, 4.0F, -0.2F, 2.8F, c);
+                    // 垂れ: スカートの後ろの面の外側に沿わせる（スカートの角度・揺れに合わせる。バッテリーの内側）
+                    pose.popPose();
+                    pose.pushPose();
+                    getParentModel().toSkirtBack(pose);
+                    b(pose, vc, light, -1.25F, 0.2F, 0.35F, -0.3F, 5.6F, 0.7F, c);
+                    b(pose, vc, light, 0.3F, 0.2F, 0.35F, 1.25F, 5.0F, 0.7F, c);
+                }
+                // ---- 手（左手の先。前腕を前へ水平に出すので、上は -z、前は +y）
+                case "book" -> {
+                    // 立てて開いた本（表紙は染めた色、中は白いページ）
+                    b(pose, vc, light, -1.5F, 0.6F, -3.6F, 1.5F, 1.1F, -0.2F, c);
+                    b(pose, vc, light, -1.3F, 0.3F, -3.4F, 1.3F, 0.6F, -0.4F, 0xF4F1E6);
+                    b(pose, vc, light, -0.1F, 0.2F, -3.6F, 0.1F, 1.1F, -0.2F, dark);
+                }
+                case "bouquet" -> {
+                    // 茎と包み紙、上に花（赤・黄・白・桃）
+                    b(pose, vc, light, -0.3F, 0.2F, -2.2F, 0.3F, 0.8F, 0.4F, 0x4E8A3A);
+                    b(pose, vc, light, -1.0F, -0.2F, -2.8F, 1.0F, 1.2F, -1.0F, c);
+                    int[] petals = {0xE04848, 0xF2D24A, 0xF4F4F4, 0xEE8FB0};
+                    for (int i = 0; i < 4; i++) {
+                        float x = (i % 2 == 0 ? -0.8F : 0.2F), y = (i < 2 ? -0.4F : 0.6F);
+                        b(pose, vc, light, x, y, -3.9F, x + 0.9F, y + 0.9F, -2.8F, petals[i]);
+                    }
+                }
+                case "teacup" -> {
+                    // 手のひらの上に、受け皿とカップ（金の縁）、横に取っ手
+                    b(pose, vc, light, -1.5F, -0.1F, -0.4F, 1.5F, 2.7F, -0.15F, c);
+                    b(pose, vc, light, -0.9F, 0.4F, -2.0F, 0.9F, 2.2F, -0.4F, c);
+                    b(pose, vc, light, -0.95F, 0.35F, -2.2F, 0.95F, 2.25F, -2.0F, 0xE0B850);
+                    b(pose, vc, light, 0.9F, 1.0F, -1.6F, 1.5F, 1.6F, -0.8F, c);
+                    b(pose, vc, light, -0.7F, 0.6F, -2.05F, 0.7F, 2.0F, -1.95F, 0x8A5A3A);    // 紅茶
+                }
+                case "umbrella" -> {
+                    // 柄を上へ。頭の上に、染めた色の傘（2段の円盤）と、てっぺんの石突き
+                    b(pose, vc, light, -0.25F, 0.2F, -22F, 0.25F, 0.7F, 0.6F, 0x5A4A3A);
+                    b(pose, vc, light, -0.6F, 0.0F, 0.6F, 0.6F, 1.6F, 1.2F, 0x5A4A3A);
+                    b(pose, vc, light, -8.5F, -8.0F, -21.6F, 8.5F, 8.9F, -21.0F, c);
+                    b(pose, vc, light, -6.0F, -5.5F, -22.4F, 6.0F, 6.4F, -21.6F, c);
+                    b(pose, vc, light, -3.0F, -2.5F, -23.0F, 3.0F, 3.4F, -22.4F, dark);
+                    b(pose, vc, light, -0.3F, 0.15F, -24.0F, 0.3F, 0.75F, -23.0F, 0xC8C8C8);
+                }
+                default -> {
+                }
+            }
+        }
+    }
+
     /** エンチャントした装甲板の光沢（防具と同じ光沢を、装甲の部品だけに重ねる）。 */
     final class ArmorGlint extends RenderLayer<RuinAndroid, AndroidModel> {
         ArmorGlint(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
@@ -690,7 +1053,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             pose.pushPose();
             m.toBlade(pose);
             m.blade.visible = true;
-            m.blade.render(pose, buffers.getBuffer(RenderType.entityTranslucentEmissive(variant.texture)), FxDraw.FULL_BRIGHT,
+            m.blade.render(pose, buffers.getBuffer(DepthGlow.TYPE.apply(variant.texture)), FxDraw.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, argb((int) (255 * k), 0xFFFFFF));
             m.blade.visible = false;
             pose.popPose();

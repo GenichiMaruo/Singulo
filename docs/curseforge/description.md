@@ -96,6 +96,10 @@ Defeat a fabricator's androids to recover a compact crystal memory of their desi
 Choose how it guards (stay, wander or follow you), give it a name, self-repair kits and an enchantable armor plate, recharge it on the go with a wireless charger,
 and keep it out of (or let it through) places with android barrier and gate glass.
 
+On the 1.21.1 branch, androids can also take crafting, processing and mining orders from an **Android Work Console**.
+Record recipes and procedures, keep items in stock or trigger orders with redstone, and let them farm, tend animals and operate blocks.
+Upgrades add battery capacity, inventory space and fluid tanks; head, back/waist and hand decorations can be dyed.
+
 ### The final goal: the Genesis Engine
 
 The old civilization tried to turn all mass into energy and perished. The Genesis Engine does the reverse.
