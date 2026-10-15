@@ -4164,16 +4164,16 @@
     "translation": "入 %s"
   },
   "gui.singulo.recipe_encoder.face_button.in.hint": {
-    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Directions are world directions",
-    "translation": "从装置的哪个面放入材料（点击切换，右键反向）。东南西北为世界方向"
+    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Directions are world directions",
+    "translation": "从装置的哪个面放入材料（点击切换，右键反向）。自动：按上、侧面、下的顺序，从接受该材料的面放入（通常这样就行）。东南西北为世界方向"
   },
   "gui.singulo.recipe_encoder.face_button.out": {
     "source": "Out: %s",
     "translation": "出 %s"
   },
   "gui.singulo.recipe_encoder.face_button.out.hint": {
-    "source": "Which face of the machine products are taken out from (click to change, right-click to go back)",
-    "translation": "从装置的哪个面取出产物（点击切换，右键反向）"
+    "source": "Which face of the machine products are taken out from (click to change, right-click to go back). Auto: tries bottom, sides, then top, and uses the first face the products come out of (furnaces use the bottom)",
+    "translation": "从装置的哪个面取出产物（点击切换，右键反向）。自动：按下、侧面、上的顺序，从能取出产物的面取出（熔炉类为下）"
   },
   "gui.singulo.recipe_encoder.fuel": {
     "source": "Fuel",
@@ -4656,8 +4656,8 @@
     "translation": "返回"
   },
   "gui.singulo.work_console.busy": {
-    "source": "%s (busy)",
-    "translation": "%s（作业中）"
+    "source": "%s (busy at another console)",
+    "translation": "%s（在其他指令台作业中）"
   },
   "gui.singulo.work_console.cancel": {
     "source": "Cancel",
@@ -5068,8 +5068,8 @@
     "translation": "仿生人用玻璃"
   },
   "guide.singulo.androids.process.body": {
-    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "用指令台“记录”的模式按钮切换要记录的种类。\n・加工：熔炉和装置的配方。左边放放入的物品，右边放产出的物品（另可放最多 2 个副产物），用滚轮更改数量（也可用 JEI 的“+”）。仿生人从上方放入装置，在旁边等待完成后从下方取出。副产物放回资材存放处。燃料和电力需自己准备。2 分钟没有进展时，订单会被取消。\n・步骤：在步骤卡上记录最多 8 个放入、取出、采掘的步骤。放入作业位置卡来复制位置，在物品栏放入物品后按“添加”。在右边放产物后记录。步骤卡自带位置，所以可以放在配方架的任意一行。\n・采掘：只有装有采掘升级的仿生人会执行。用 2 张作业位置卡决定范围后，从上层开始挖，直到收集到所需物品（也可用于刷石机）。无法破坏的方块、液体、容器、受护盾保护的地方不会挖。没有可挖的东西持续 30 秒时会取消。\n・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次放入设定的数量。留空则不去取）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。"
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in and take the results out (the faces are chosen automatically, or set them with the In and Out buttons when recording). While a slow machine works, they do other jobs (including their other orders) and come back when it is done. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
+    "translation": "用指令台“记录”的模式按钮切换要记录的种类。\n・加工：熔炉和装置的配方。左边放放入的物品，右边放产出的物品（另可放最多 2 个副产物），用滚轮更改数量（也可用 JEI 的“+”）。仿生人把材料放入装置，取出产物（面会自动决定，也可以在记录时用“入”“出”按钮指定）。耗时较长的加工，会在等待期间去做其他作业（包括承担的其他订单），完成后再回来取。副产物放回资材存放处。燃料和电力需自己准备。2 分钟没有进展时，订单会被取消。\n・步骤：在步骤卡上记录最多 8 个放入、取出、采掘的步骤。放入作业位置卡来复制位置，在物品栏放入物品后按“添加”。在右边放产物后记录。步骤卡自带位置，所以可以放在配方架的任意一行。\n・采掘：只有装有采掘升级的仿生人会执行。用 2 张作业位置卡决定范围后，从上层开始挖，直到收集到所需物品（也可用于刷石机）。无法破坏的方块、液体、容器、受护盾保护的地方不会挖。没有可挖的东西持续 30 秒时会取消。\n・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次按设定的数量，或用栏下方的按钮设为“加满”则带来装置能放入的量。两种都不会带来放不下的部分。留空则不去取）。资材存放处没有且有配方可以制作时，会自动下单制作燃料（制作期间仿生人会做其他作业）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。"
   },
   "guide.singulo.androids.process.title": {
     "source": "Processing, procedures and mining",
@@ -5092,8 +5092,8 @@
     "translation": "升级"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. If a place cannot be reached, the order is cancelled.",
-    "translation": "可以把工作台的合成交给自己的仿生人。\n1. 放置仿生人作业指令台，用作业位置卡潜行右键来记录它。用这张卡右键配方架（要增加的话还有资材口和交付口），就会连接到指令台（64 格以内）。\n2. 在指令台（和资材口）旁边放箱子（资材存放处）。仿生人会到实际放有材料的地方去取。成品会送到下单时选择的交付目标（指令台的交付箱或命名过的交付口）。\n3. 在指令台的“记录”的 3×3 中摆放样本（物品不会减少，也可用 JEI 的“+”），记录到配方卡上。\n4. 在配方架某一行的左边放记录了工作台的作业位置卡，右边排列配方卡。\n5. 在指令台的“订单”中选择物品和数量，确认材料足够，选择仿生人后开始作业。有配方的中间材料也会自己制作。\n仿生人每次搬运 5 格（有背包时 +24）。作业中无法取出它的物品，订单完成后会回到原来的行动方式。有无法到达的地方时，该订单会被取消。"
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "可以把工作台的合成交给自己的仿生人。\n1. 放置仿生人作业指令台，用作业位置卡潜行右键来记录它。用这张卡右键配方架（要增加的话还有资材口和交付口），就会连接到指令台（64 格以内）。\n2. 在指令台（和资材口）旁边放箱子（资材存放处）。仿生人会到实际放有材料的地方去取。成品会送到下单时选择的交付目标（指令台的交付箱或命名过的交付口）。\n3. 在指令台的“记录”的 3×3 中摆放样本（物品不会减少，也可用 JEI 的“+”），记录到配方卡上。\n4. 在配方架某一行的左边放记录了工作台的作业位置卡，右边排列配方卡。\n5. 在指令台的“订单”中选择物品和数量，确认材料足够，选择仿生人后开始作业。有配方的中间材料也会自己制作。\n仿生人每次搬运 5 格（有背包时 +24）。作业中无法取出它的物品，订单完成后会回到原来的行动方式。作业中的仿生人也可以承担同一指令台的其他订单（空闲时也会去做）。有无法到达的地方时，该订单会被取消。"
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
@@ -9206,5 +9206,45 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "用于：虫洞入口"
+  },
+  "gui.singulo.work_console.detail.machine": {
+    "source": " (%s in a machine)",
+    "translation": "（%s 在装置中加工）"
+  },
+  "gui.singulo.work_console.detail.machine_eta": {
+    "source": " (%s in a machine, about %ss left)",
+    "translation": "（%s 在装置中加工，约剩 %s 秒）"
+  },
+  "gui.singulo.work_console.worker.elsewhere": {
+    "source": "On another order",
+    "translation": "在做其他订单的作业"
+  },
+  "gui.singulo.work_console.error.wrong_face": {
+    "source": "The machine for %s does not take %s through its %s face (check the \"In\" face on the recipe card)",
+    "translation": "%s 的配方的装置不接受从放入面（%3$s）放入的 %2$s（请确认配方卡的“入”面）"
+  },
+  "gui.singulo.work_console.cancelled.wrong_face": {
+    "source": "Cancelled the order for %s (the machine does not take materials through its %s face)",
+    "translation": "已取消 %s 的订单（装置不接受从放入面（%s）放入的材料）"
+  },
+  "tooltip.singulo.recipe_card.fuel_fill": {
+    "source": "Fuel: %s, filled up (when it runs out, as much as fits is fetched)",
+    "translation": "燃料：%s 加满（耗尽时取来能放入的量）"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.count": {
+    "source": "×%s",
+    "translation": "%s 个"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.fill": {
+    "source": "Fill",
+    "translation": "加满"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.hint": {
+    "source": "How much fuel is brought each time (click to switch). ×N: the count in the fuel slot (never more than the machine can take). Fill: as much as the machine can take",
+    "translation": "每次带来的燃料数量（点击切换）。N 个：按燃料栏的数量（装置放不下的部分不带）。加满：装置能放入多少就带多少"
+  },
+  "gui.singulo.work_console.fuel_ordered": {
+    "source": "Out of fuel (%s), so an order to make %s was placed",
+    "translation": "资材存放处没有燃料（%s），已下单制作 %s 个"
   }
 }

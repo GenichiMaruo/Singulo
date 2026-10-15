@@ -77,6 +77,8 @@ public final class WorkConsoleView {
                 x.putLong("done", s.done);
                 x.putLong("total", s.total);
                 x.putLong("doing", s.inProgress);
+                x.putLong("parked", s.parked);
+                x.putInt("eta", s.eta);
                 st.add(x);
             }
             ot.put("steps", st);
@@ -87,7 +89,8 @@ public final class WorkConsoleView {
                 CompoundTag w = new CompoundTag();
                 if (c.getLevel() instanceof net.minecraft.server.level.ServerLevel sl && sl.getEntity(id) instanceof RuinAndroid a && a.isAlive()) {
                     w.putString("name", Component.Serializer.toJson(a.nickname(), reg));
-                    w.putInt("activity", a.workOrder() == o.id ? a.activity() : RuinAndroid.ACT_NONE);
+                    // ほかの注文の作業をしている（装置を待つあいだなど）なら、-2
+                    w.putInt("activity", a.workOrder() == o.id ? a.activity() : c.order(a.workOrder()) != null ? -2 : RuinAndroid.ACT_NONE);
                     w.putInt("accent", a.accent());
                 } else {
                     w.putString("name", Component.Serializer.toJson(Component.translatable("gui.singulo.work_console.worker.away"), reg));

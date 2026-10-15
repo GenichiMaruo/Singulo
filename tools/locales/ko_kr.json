@@ -4164,16 +4164,16 @@
     "translation": "입 %s"
   },
   "gui.singulo.recipe_encoder.face_button.in.hint": {
-    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Directions are world directions",
-    "translation": "장치의 어느 면으로 재료를 넣을지(클릭으로 전환, 우클릭으로 역순). 동서남북은 세계 방향"
+    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Directions are world directions",
+    "translation": "장치의 어느 면으로 재료를 넣을지(클릭으로 전환, 우클릭으로 역순). 자동: 위·옆·아래 순으로, 그 재료를 받는 면으로 넣습니다(보통은 이것으로 충분). 동서남북은 세계 방향"
   },
   "gui.singulo.recipe_encoder.face_button.out": {
     "source": "Out: %s",
     "translation": "출 %s"
   },
   "gui.singulo.recipe_encoder.face_button.out.hint": {
-    "source": "Which face of the machine products are taken out from (click to change, right-click to go back)",
-    "translation": "장치의 어느 면에서 완성품을 꺼낼지(클릭으로 전환, 우클릭으로 역순)"
+    "source": "Which face of the machine products are taken out from (click to change, right-click to go back). Auto: tries bottom, sides, then top, and uses the first face the products come out of (furnaces use the bottom)",
+    "translation": "장치의 어느 면에서 완성품을 꺼낼지(클릭으로 전환, 우클릭으로 역순). 자동: 아래·옆·위 순으로, 완성품을 꺼낼 수 있는 면에서(화로류는 아래)"
   },
   "gui.singulo.recipe_encoder.fuel": {
     "source": "Fuel",
@@ -4656,8 +4656,8 @@
     "translation": "돌아가기"
   },
   "gui.singulo.work_console.busy": {
-    "source": "%s (busy)",
-    "translation": "%s(작업 중)"
+    "source": "%s (busy at another console)",
+    "translation": "%s(다른 지령대에서 작업 중)"
   },
   "gui.singulo.work_console.cancel": {
     "source": "Cancel",
@@ -5068,8 +5068,8 @@
     "translation": "안드로이드용 유리"
   },
   "guide.singulo.androids.process.body": {
-    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "지령대 \"기록\"의 모드 버튼으로 기록할 종류를 전환합니다.\n・가공: 화로와 장치의 레시피. 왼쪽에 넣는 것, 오른쪽에 나오는 것(부산물도 2개까지)을 놓고, 휠로 개수를 바꿉니다(JEI의 \"+\"로도 가능). 안드로이드는 장치에 위로 넣고, 완성될 때까지 옆에서 기다렸다가 아래로 꺼냅니다. 부산물은 재료 보관소로 돌려놓습니다. 연료와 전력은 직접 준비하세요. 2분 동안 진행이 없으면 주문이 취소됩니다.\n・절차: 절차 카드에 투입·꺼내기·채굴 절차를 8개까지 기록합니다. 작업 위치 카드를 놓아 위치를 옮기고, 아이템 칸에 아이템을 놓은 뒤 \"추가\"를 누릅니다. 오른쪽에 만들어지는 것을 놓고 기록합니다. 절차 카드는 위치를 스스로 가지므로 레시피 선반의 어느 줄에나 놓을 수 있습니다.\n・채굴: 채굴 업그레이드를 단 안드로이드만 합니다. 작업 위치 카드 2장으로 범위를 정하면 위층부터 캐며, 목표 아이템이 모일 때까지 계속합니다(조약돌 생성기에도 쓸 수 있음). 부술 수 없는 블록·액체·보관함·실드로 보호된 곳은 캐지 않습니다. 캘 것이 없는 상태가 30초 계속되면 취소됩니다.\n・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩. 비워 두면 가지러 가지 않음).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다."
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in and take the results out (the faces are chosen automatically, or set them with the In and Out buttons when recording). While a slow machine works, they do other jobs (including their other orders) and come back when it is done. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
+    "translation": "지령대 \"기록\"의 모드 버튼으로 기록할 종류를 전환합니다.\n・가공: 화로와 장치의 레시피. 왼쪽에 넣는 것, 오른쪽에 나오는 것(부산물도 2개까지)을 놓고, 휠로 개수를 바꿉니다(JEI의 \"+\"로도 가능). 안드로이드는 장치에 재료를 넣고 완성품을 꺼냅니다(면은 자동. 기록할 때 \"입\" \"출\" 버튼으로 정할 수도 있음). 오래 걸리는 가공은 기다리는 동안 다른 작업(맡은 다른 주문도)을 하고, 완성되면 가지러 돌아옵니다. 부산물은 재료 보관소로 돌려놓습니다. 연료와 전력은 직접 준비하세요. 2분 동안 진행이 없으면 주문이 취소됩니다.\n・절차: 절차 카드에 투입·꺼내기·채굴 절차를 8개까지 기록합니다. 작업 위치 카드를 놓아 위치를 옮기고, 아이템 칸에 아이템을 놓은 뒤 \"추가\"를 누릅니다. 오른쪽에 만들어지는 것을 놓고 기록합니다. 절차 카드는 위치를 스스로 가지므로 레시피 선반의 어느 줄에나 놓을 수 있습니다.\n・채굴: 채굴 업그레이드를 단 안드로이드만 합니다. 작업 위치 카드 2장으로 범위를 정하면 위층부터 캐며, 목표 아이템이 모일 때까지 계속합니다(조약돌 생성기에도 쓸 수 있음). 부술 수 없는 블록·액체·보관함·실드로 보호된 곳은 캐지 않습니다. 캘 것이 없는 상태가 30초 계속되면 취소됩니다.\n・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다."
   },
   "guide.singulo.androids.process.title": {
     "source": "Processing, procedures and mining",
@@ -5092,8 +5092,8 @@
     "translation": "업그레이드"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. If a place cannot be reached, the order is cancelled.",
-    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
@@ -9206,5 +9206,45 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "사용 대상: 웜홀 입구"
+  },
+  "gui.singulo.work_console.detail.machine": {
+    "source": " (%s in a machine)",
+    "translation": " (%s 장치에서 가공 중)"
+  },
+  "gui.singulo.work_console.detail.machine_eta": {
+    "source": " (%s in a machine, about %ss left)",
+    "translation": " (%s 장치에서 가공 중, 약 %s초 남음)"
+  },
+  "gui.singulo.work_console.worker.elsewhere": {
+    "source": "On another order",
+    "translation": "다른 주문 작업 중"
+  },
+  "gui.singulo.work_console.error.wrong_face": {
+    "source": "The machine for %s does not take %s through its %s face (check the \"In\" face on the recipe card)",
+    "translation": "%s 레시피의 장치가 넣는 면(%3$s)으로 %2$s을(를) 받지 않습니다(레시피 카드의 \"입\" 면을 확인하세요)"
+  },
+  "gui.singulo.work_console.cancelled.wrong_face": {
+    "source": "Cancelled the order for %s (the machine does not take materials through its %s face)",
+    "translation": "%s 주문을 취소했습니다(장치가 넣는 면(%s)으로 재료를 받지 않음)"
+  },
+  "tooltip.singulo.recipe_card.fuel_fill": {
+    "source": "Fuel: %s, filled up (when it runs out, as much as fits is fetched)",
+    "translation": "연료: %s 가득 (떨어지면 들어가는 만큼 가지러 감)"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.count": {
+    "source": "×%s",
+    "translation": "%s개"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.fill": {
+    "source": "Fill",
+    "translation": "가득"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.hint": {
+    "source": "How much fuel is brought each time (click to switch). ×N: the count in the fuel slot (never more than the machine can take). Fill: as much as the machine can take",
+    "translation": "한 번에 가져오는 연료의 양(클릭으로 전환). N개: 연료 칸의 수만큼(장치에 다 들어가지 않는 만큼은 가져오지 않음). 가득: 장치에 들어가는 만큼"
+  },
+  "gui.singulo.work_console.fuel_ordered": {
+    "source": "Out of fuel (%s), so an order to make %s was placed",
+    "translation": "재료 보관소에 연료(%s)가 없어서 %s개를 만드는 주문을 냈습니다"
   }
 }

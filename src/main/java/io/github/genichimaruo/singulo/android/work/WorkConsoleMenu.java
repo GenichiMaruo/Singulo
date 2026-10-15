@@ -53,7 +53,9 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             SLOT_LOC_A = 15, SLOT_LOC_B = 16, SLOT_PITEM = 17, SLOT_FUEL = 18, SLOT_OUTBOX = 19, OWN = SLOT_OUTBOX + WorkConsoleBlockEntity.OUTBOX_SLOTS;
     public static final int BUTTON_ENCODE = 0, BUTTON_CLEAR = 1, BUTTON_CLEAR_CARD = 2, BUTTON_MODE = 3, BUTTON_KIND = 4, BUTTON_ADD = 5,
             BUTTON_KIND_BACK = 6, BUTTON_REMOVE_STEP = 10, BUTTON_OPTION = 20, BUTTON_FACE = 30, BUTTON_FACE_BACK = 33, BUTTON_VARIANTS = 36,
-            BUTTON_ADJUST = 100;
+            BUTTON_FUEL_FILL = 37, BUTTON_ADJUST = 100;
+    /** 加工モードの、燃料を持ってくる量のボタン（燃料の欄の下）。 */
+    public static final int FUEL_MODE_X = 5, FUEL_MODE_Y = 80, FUEL_MODE_W = 22, FUEL_MODE_H = 11;
     /** 作業台モードの「同じ種類の別の物も使う」の切り替え（見本の下）。 */
     public static final int VARIANTS_X = 30, VARIANTS_Y = 99, VARIANTS_W = 76, VARIANTS_H = 11;
     /** 加工モードの面のボタン（見本の下に3つ: 入れる面・取り出す面・燃料の面）。 */
@@ -332,6 +334,10 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         }
         if (id == BUTTON_VARIANTS) {
             c.toggleVariants();
+            return true;
+        }
+        if (id == BUTTON_FUEL_FILL) {
+            c.toggleFuelFill();
             return true;
         }
         if (id >= BUTTON_FACE && id < BUTTON_FACE + 6) {

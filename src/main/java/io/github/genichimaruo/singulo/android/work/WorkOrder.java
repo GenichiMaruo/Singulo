@@ -115,6 +115,17 @@ public final class WorkOrder {
         public long total;
         public long done;
         public long inProgress;
+        /**
+         * 装置に素材を入れ終えて、加工を待っている回数（アンドロイドはほかの作業へ行った）と、まだ取り出していない主な物の数。
+         * できたら、指令台が取り出しの作業を出す。
+         */
+        public long parked, parkedOut;
+        /** 取り出しに行ってよい（できた・素材を使い切った・出口がいっぱい・燃料切れ・長く変化がない）。毎秒調べる。保存しない。 */
+        public boolean collectReady;
+        /** 加工の残り時間の見込み（tick。分からなければ -1）と、装置の様子が最後に変わった時刻・その様子。保存しない。 */
+        public int eta = -1;
+        long watchChanged;
+        long watchSig = Long.MIN_VALUE;
         /** この工程の素材を作る、前の工程の番号。 */
         public final List<Integer> after = new ArrayList<>();
 
@@ -126,7 +137,7 @@ public final class WorkOrder {
         }
 
         public long remaining() {
-            return total - done - inProgress;
+            return total - done - inProgress - parked;
         }
 
         public boolean finished() {
@@ -216,6 +227,10 @@ public final class WorkOrder {
             st.putString("block", BuiltInRegistries.BLOCK.getKey(s.block).toString());
             st.putLong("total", s.total);
             st.putLong("done", s.done);
+            if (s.parked > 0) {
+                st.putLong("parked", s.parked);
+                st.putLong("parked_out", s.parkedOut);
+            }
             list.add(st);
         }
         t.put("steps", list);
@@ -263,6 +278,8 @@ public final class WorkOrder {
             StepState s = new StepState(r, NbtUtils.readBlockPos(st, "location").orElse(BlockPos.ZERO),
                     bid == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(bid), st.getLong("total"));
             s.done = st.getLong("done");
+            s.parked = Math.max(0, st.getLong("parked"));
+            s.parkedOut = Math.max(0, st.getLong("parked_out"));
             o.steps.add(s);
         }
         o.delivered = t.getLong("delivered");

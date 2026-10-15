@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
  * <li>CRAFT: 素材をまとめて取り（fetch）、batch の工程を順に、それぞれの作業場所で作る。素材を作る工程と使う工程を
  * 一度に受け持つので、途中で素材置き場へ戻らない。作り終えたら、完成品はそのまま納品先へ届ける。</li>
  * <li>DELIVER: 完成品を amount 個取り、納品先へ届ける。</li>
+ * <li>COLLECT: 加工を待っている装置（batch の1工程。素材はもう入れてある）から、できた物を amount 個取り出す。</li>
  * <li>DEPOSIT: 持っている物をすべて素材置き場へ戻す（前の作業の残りや、取り消したときの物）。</li>
  * <li>WAIT: 今できる作業がない（ほかの工程の終わりを待つ）。</li>
  * <li>EXIT: 注文が終わった・取り消された（持ち物を戻してから、作業をやめる）。</li>
@@ -17,7 +18,7 @@ import net.minecraft.core.BlockPos;
  * carried が true の作業は、素材（届ける物）をもう持っているので、取りに行かない（作った物で続けて作る・届ける）。
  */
 public record WorkJob(Type type, int orderId, int jobId, long amount, List<ItemCount> fetch, List<Batch> batch, boolean carried) {
-    public enum Type { CRAFT, DELIVER, DEPOSIT, WAIT, EXIT }
+    public enum Type { CRAFT, DELIVER, DEPOSIT, WAIT, EXIT, COLLECT }
 
     /** 1つの工程を crafts 回（作業場所 location で）。 */
     public record Batch(int step, long crafts, BlockPos location, RecipeData recipe) {}

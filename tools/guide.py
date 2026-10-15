@@ -622,6 +622,7 @@ CHAPTERS = [
          '5. 指令台の「注文」で作る物と個数を選び、素材が足りるのを確かめて、アンドロイドを選んで作業開始。'
          '途中の素材も、レシピがあれば自分で作ります。\n'
          'アンドロイドは5スロット（バックパックで+24）ずつ運びます。作業中は持ち物を取り出せず、終わると元の動き方に戻ります。'
+         '作業中のアンドロイドにも、同じ指令台の次の注文を受け持たせられます（手が空いたら、そちらもする）。'
          'たどり着けない場所があると、その注文は取り消されます。',
          'Work automation',
          'Your androids can take over crafting table work.\n'
@@ -634,11 +635,13 @@ CHAPTERS = [
          '5. In the console\'s Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. '
          'Intermediate materials are crafted too when there is a recipe for them.\n'
          'Androids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes '
-         'back to its usual mode. If a place cannot be reached, the order is cancelled.'),
+         'back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. '
+         'If a place cannot be reached, the order is cancelled.'),
         ('process', '加工・手順・採掘',
          '指令台の「記録」のモードボタンで、記録する種類を切り替えます。\n'
          '・加工: かまどや装置のレシピ。左に入れる物、右に出てくる物（ほかに出てくる副産物も2つまで）を置き、ホイールで数を変える'
-         '（JEI の「+」でも置ける）。アンドロイドは装置に上から入れ、できるまでそばで待って、下から取り出す。副産物は素材置き場へ戻す。'
+         '（JEI の「+」でも置ける）。アンドロイドは装置に素材を入れ、できた物を取り出す（面は自動。記録の「入」「出」のボタンで決めることもできる）。長くかかる加工は、待つあいだにほかの作業'
+         '（受け持つほかの注文も）をして、できたら取りに戻る。副産物は素材置き場へ戻す。'
          '燃料や電力は自分で用意する。2分たっても進まなければ、注文は取り消される。\n'
          '・手順: 手順カードに、投入・取り出し・採掘の手順を8つまで記録する。作業位置カードを置いて場所を写し、物の欄に物を置いて「足す」。'
          '右にできる物を置いて記録する。手順カードは場所を自分で持つので、レシピ棚のどの行にも並べられる。\n'
@@ -652,15 +655,18 @@ CHAPTERS = [
          '流体を置ける（ホイールで 100 mB ずつ、シフトで 1000 mB ずつ）。タンクアップグレードを積んだアンドロイドが、流体を装置へ運ぶ。'
          '流体を作る注文は、素材置き場のタンクへ入れる。\n'
          '・燃料: 加工モードの燃料の欄に燃料を置いて記録すると、装置の燃料が切れたとき、その燃料を素材置き場から取ってきて入れる'
-         '（置いた数ずつ。空なら取りに行かない）。\n'
+         '（置いた数ずつか、欄の下のボタンで「満タン」にすると装置に入るだけ。どちらも入りきらない分は持ってこない。空なら取りに行かない）。'
+         '素材置き場になく、レシピで作れるなら、燃料を作る注文を自動で出す（作るあいだ、アンドロイドはほかの作業をする）。\n'
          '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。'
          '収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ちきった塊だけ取り、芽生えたアメジストは壊さない。\n'
          '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。',
          'Processing, procedures and mining',
          'The mode button in the console\'s Record tab switches what you record.\n'
          '- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), '
-         'and scroll to change counts (JEI\'s + button works too). Androids put the items in from above, wait beside the machine and take '
-         'the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, '
+         'and scroll to change counts (JEI\'s + button works too). Androids put the items in and take the results out (the faces are chosen '
+         'automatically, or set them with the In and Out buttons when recording). '
+         'While a slow machine works, they do other jobs (including their other orders) and come back when it is done. '
+         'Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, '
          'the order is cancelled.\n'
          '- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put '
          'the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they '
@@ -676,7 +682,9 @@ CHAPTERS = [
          'mode with a bucket or other fluid container, or use JEI\'s + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). '
          'Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n'
          '- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the '
-         'stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n'
+         'stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than '
+         'the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make '
+         'the fuel is placed automatically (the androids do other work meanwhile).\n'
          '- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until '
          'enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing '
          '(up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n'

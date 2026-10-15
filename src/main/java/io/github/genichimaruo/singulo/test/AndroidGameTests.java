@@ -52,8 +52,10 @@ public final class AndroidGameTests {
         return s;
     }
 
+    /** このテストのステーションが印刷したアンドロイド（並んで動くほかのテストのものは数えない。少し離れていても数える）。 */
     private static List<RuinAndroid> androids(GameTestHelper helper) {
-        return helper.getLevel().getEntitiesOfClass(RuinAndroid.class, new AABB(helper.absolutePos(STATION)).inflate(8));
+        BlockPos station = helper.absolutePos(STATION);
+        return helper.getLevel().getEntitiesOfClass(RuinAndroid.class, new AABB(station).inflate(32), a -> station.equals(a.home()));
     }
 
     /** ステーションは、メモリとキットと電力で護衛を1体だけ印刷し、キットと電力を使う。印刷中は傷つかない。 */
@@ -113,8 +115,10 @@ public final class AndroidGameTests {
                     "転送アップグレードがあるのに持ち物が落ちた");
         });
         helper.succeedWhen(() -> {
-            List<RuinAndroid> list = androids(helper).stream().filter(RuinAndroid::isAlive).toList();
-            helper.assertTrue(list.size() == 1, "印刷し直されない");
+            // 同じ組で並んで動くほかのテストのアンドロイドは数えない（このステーションのものだけ）
+            List<RuinAndroid> list = androids(helper).stream()
+                    .filter(a -> a.isAlive() && helper.absolutePos(STATION).equals(a.home())).toList();
+            helper.assertTrue(list.size() == 1, "印刷し直されない: " + list.size());
             ItemStack kits = list.get(0).inventory().getItem(RuinAndroid.SLOT_REPAIR);
             helper.assertTrue(kits.getCount() == 5, "持ち物が次の護衛に渡らない: " + kits);
             list.get(0).discard();
@@ -570,6 +574,161 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 燃料の「満タン」: 燃料が切れたら、1個ずつではなく、装置に入るだけ（在庫の石炭5個を全部）持ってくる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidFillsFuel(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        chest.setItem(2, new ItemStack(net.minecraft.world.item.Items.COAL, 5));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(),
+                new ItemStack(net.minecraft.world.item.Items.COAL), io.github.genichimaruo.singulo.android.work.RecipeData.DEFAULT_FACES
+                        | io.github.genichimaruo.singulo.android.work.RecipeData.FUEL_FILL).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない");
+            int coal = 0;
+            for (int i = 0; i < chest.getContainerSize(); i++) {
+                coal += chest.getItem(i).is(net.minecraft.world.item.Items.COAL) ? chest.getItem(i).getCount() : 0;
+            }
+            helper.assertTrue(coal == 0, "満タンなのに石炭を全部持ってこない（残り " + coal + "）");
+            a.discard();
+        });
+    }
+
+    /**
+     * 燃料が素材置き場になく、作れるとき: 燃料（樫の板材）を作る注文を自動で出し、原木から板材を作って、かまどに足して焼き上げる。
+     */
+    @GameTest(template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
+    public static void androidOrdersMissingFuel(GameTestHelper helper) {
+        var console = workshop(helper, 2);                  // 原木2本と、板材・棒のレシピ
+        var level = helper.getLevel();
+        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(),
+                new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 2)).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        boolean[] fuelOrdered = {false};
+        helper.onEachTick(() -> fuelOrdered[0] |= console.orders().stream().anyMatch(o -> o.target.is(net.minecraft.world.item.Items.OAK_PLANKS)));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(fuelOrdered[0], "燃料（板材）を作る注文を出さない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "燃料を作って、鉄インゴットを2つ届けない");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /** 入れる面を間違えたレシピ（かまどの下の面から原鉄）: 立ち尽くさず、注文の時点で理由を出して断る。 */
+    @GameTest(template = EMPTY)
+    public static void wrongInputFaceIsRefused(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace = helper.getBlockEntity(furnacePos);
+        furnace.setItem(1, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 4));   // 下の面にも見える燃料の欄が埋まっていても見分ける
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        int down = net.minecraft.core.Direction.DOWN.get3DDataValue();
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(),
+                ItemStack.EMPTY, io.github.genichimaruo.singulo.android.work.RecipeData.faces(down, down,
+                        io.github.genichimaruo.singulo.android.work.RecipeData.FACE_AUTO)).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error != null && error.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
+                && t.getKey().equals("gui.singulo.work_console.error.wrong_face"), "入れる面の間違いを断らない: " + error);
+        a.discard();
+        helper.succeed();
+    }
+
+    /**
+     * 装置の加工を待つあいだに、ほかの作業をする: かまどに原鉄を入れたら、焼けるのを待たずに、もう1つの注文（棒）を作って届け、
+     * 焼けたら取りに戻って、鉄インゴットも届ける。
+     */
+    @GameTest(template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
+    public static void androidWorksWhileFurnaceSmelts(GameTestHelper helper) {
+        var console = workshop(helper, 2);
+        var level = helper.getLevel();
+        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace = helper.getBlockEntity(furnacePos);
+        furnace.setItem(1, new ItemStack(net.minecraft.world.item.Items.COAL, 4));
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 4));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        new io.github.genichimaruo.singulo.android.work.RecipeData(io.github.genichimaruo.singulo.android.work.RecipeData.MODE_PROCESSING, in,
+                new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of()).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var player = helper.makeMockServerPlayerInLevel();
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 4, List.of(a.getUUID()),
+                helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "鉄インゴットを注文できない: " + (error == null ? "" : error.getString()));
+        error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "作業中のアンドロイドに、2つ目の注文を受け持たせられない: " + (error == null ? "" : error.getString()));
+        int[] ingotsWhenSticksDone = {-1};
+        helper.onEachTick(() -> {
+            if (ingotsWhenSticksDone[0] < 0 && delivered(helper, net.minecraft.world.item.Items.STICK) >= 8) {
+                ingotsWhenSticksDone[0] = delivered(helper, net.minecraft.world.item.Items.IRON_INGOT);
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 4, "鉄インゴットが4つ届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8, "棒が8本届かない");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            helper.assertTrue(ingotsWhenSticksDone[0] >= 0 && ingotsWhenSticksDone[0] < 4,
+                    "かまどを待っているあいだに棒を作らなかった（棒が届いたときの鉄インゴット: " + ingotsWhenSticksDone[0] + "）");
+            helper.assertFalse(a.isWorking(), "注文が終わっても作業中のまま");
+            a.discard();
+        });
+    }
+
     /** 同じ種類の別の物も使うレシピ: 見本は樫の板材でも、素材置き場の白樺の板材から棒を作る。 */
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void androidCraftsWithVariants(GameTestHelper helper) {
@@ -677,7 +836,7 @@ public final class AndroidGameTests {
         BladeAndroid a = worker(helper, false);
         var player = helper.makeMockServerPlayerInLevel();
         var error = console.register(player, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 4,
-                io.github.genichimaruo.singulo.android.work.StandingOrder.KEEP, null, List.of());
+                io.github.genichimaruo.singulo.android.work.StandingOrder.KEEP, null, List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.assertTrue(error == null, "登録できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
             net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
@@ -701,7 +860,7 @@ public final class AndroidGameTests {
         BladeAndroid a = worker(helper, false);
         var player = helper.makeMockServerPlayerInLevel();
         console.register(player, new ItemStack(net.minecraft.world.item.Items.STICK), 4,
-                io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE, helper.absolutePos(DELIVERY), List.of());
+                io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE, helper.absolutePos(DELIVERY), List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(console.orders().isEmpty(), "信号がないのに注文した");
             console.onSignal(true);
@@ -728,6 +887,7 @@ public final class AndroidGameTests {
                     var zombie = EntityType.ZOMBIE.create(helper.getLevel());
                     zombie.moveTo(a.position().add(1.5, 0, 0));
                     zombie.setNoAi(true);
+                    zombie.setPersistenceRequired();       // プレイヤーから遠いと消える（遠くで動くほかのテストのプレイヤーが一番近いとき）
                     zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
                     zombie.setHealth(200);
                     helper.getLevel().addFreshEntity(zombie);
@@ -1059,18 +1219,18 @@ public final class AndroidGameTests {
         var goalField = RuinAndroid.class.getDeclaredField("workGoal");
         goalField.setAccessible(true);
         Object goal = goalField.get(a);
-        var insert = goal.getClass().getDeclaredMethod("insertOnce", net.neoforged.neoforge.items.IItemHandler.class,
-                net.neoforged.neoforge.fluids.capability.IFluidHandler.class,
+        var insert = goal.getClass().getDeclaredMethod("insertOnce", java.util.function.Function.class, java.util.function.Function.class,
                 io.github.genichimaruo.singulo.android.work.RecipeData.class);
+        java.util.function.Function<ItemStack, Object> toHandler = item -> handler, noFluid = item -> null;
         insert.setAccessible(true);
         int initialCharge = a.charge();
-        helper.assertFalse((Boolean) insert.invoke(goal, handler, null, recipe), "2種類とも入ったことになった");
+        helper.assertFalse((Boolean) insert.invoke(goal, toHandler, noFluid, recipe), "2種類とも入ったことになった");
         helper.assertTrue(handler.getStackInSlot(0).is(net.minecraft.world.item.Items.OAK_LOG), "最初の材料が入らない");
         helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START + 1).getCount() == 1, "未投入の材料を失った");
         handler.extractItem(0, 64, false);       // 装置が最初の材料を消費した
         CompoundTag checkpoint = a.saveWorkState();
         a.restoreWorkState(checkpoint);
-        helper.assertTrue((Boolean) insert.invoke(goal, handler, null, recipe), "未投入の材料から再開できない");
+        helper.assertTrue((Boolean) insert.invoke(goal, toHandler, noFluid, recipe), "未投入の材料から再開できない");
         helper.assertTrue(handler.getStackInSlot(0).is(net.minecraft.world.item.Items.COBBLESTONE), "最初の材料を再投入した");
         helper.assertTrue(a.carryEmpty(), "材料が持ち物に残った");
         helper.assertTrue(a.charge() == initialCharge - 10, "1回分の加工で充電を二重に使った");

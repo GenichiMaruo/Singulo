@@ -351,6 +351,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkConsoleMenu.BUTTON_VARIANTS);
                 return true;
             }
+            if (fuelModeHovered(mouseX, mouseY)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkConsoleMenu.BUTTON_FUEL_FILL);
+                return true;
+            }
             int face = hoveredFace(mouseX, mouseY);
             if (face >= 0) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
@@ -562,6 +566,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             } else if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_CRAFTING && Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.VARIANTS_X,
                     y + WorkConsoleMenu.VARIANTS_Y, WorkConsoleMenu.VARIANTS_W, WorkConsoleMenu.VARIANTS_H)) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.variants.hint"), 180), mouseX, mouseY);
+            } else if (fuelModeHovered(mouseX, mouseY)) {
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel_mode.hint"), 180), mouseX, mouseY);
             } else if (hoveredFace(mouseX, mouseY) >= 0) {
                 String[] keys = {"in", "out", "fuel"};
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[hoveredFace(mouseX, mouseY)]
@@ -575,6 +581,12 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.grid.hint"), 160), mouseX, mouseY);
             }
         }
+    }
+
+    /** 加工モードの、燃料を持ってくる量のボタンを指しているか。 */
+    private boolean fuelModeHovered(double mouseX, double mouseY) {
+        return menu.processing() && tab == TAB_RECORD && Panel.inside(mouseX, mouseY, leftPos + WorkConsoleMenu.FUEL_MODE_X,
+                topPos + WorkConsoleMenu.FUEL_MODE_Y, WorkConsoleMenu.FUEL_MODE_W, WorkConsoleMenu.FUEL_MODE_H);
     }
 
     /** 加工モードの面のボタンのうち、指しているもの（0 入れる、1 取り出す、2 燃料。なければ -1）。 */
@@ -591,7 +603,12 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         return -1;
     }
 
-    /** 面の名前（上・下・北・南・西・東、燃料は自動も）。 */
+    /** 燃料を、装置に入るだけ持ってくる設定か。 */
+    private boolean fuelFill() {
+        return (menu.faces() & io.github.genichimaruo.singulo.android.work.RecipeData.FUEL_FILL) != 0;
+    }
+
+    /** 面の名前（上・下・北・南・西・東・自動）。 */
     private static Component faceName(int value) {
         return Component.translatable("gui.singulo.recipe_encoder.face." + (value == io.github.genichimaruo.singulo.android.work.RecipeData.FACE_AUTO
                 ? "auto" : net.minecraft.core.Direction.from3DDataValue(value).getName()));
@@ -756,6 +773,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 button(g, x + WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP), y + WorkConsoleMenu.FACE_Y,
                         WorkConsoleMenu.FACE_W, WorkConsoleMenu.FACE_H, false, mouseX, mouseY);
             }
+            button(g, x + WorkConsoleMenu.FUEL_MODE_X, y + WorkConsoleMenu.FUEL_MODE_Y, WorkConsoleMenu.FUEL_MODE_W, WorkConsoleMenu.FUEL_MODE_H,
+                    fuelFill(), mouseX, mouseY);
         }
         if (menu.mode() == io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.MODE_CRAFTING) {
             button(g, x + WorkConsoleMenu.VARIANTS_X, y + WorkConsoleMenu.VARIANTS_Y, WorkConsoleMenu.VARIANTS_W, WorkConsoleMenu.VARIANTS_H,
@@ -1052,6 +1071,13 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 if (doing > 0) {
                     line = line.copy().append(Component.translatable("gui.singulo.work_console.detail.doing", compact(doing)));
                 }
+                long parked = st.getLong("parked");
+                if (parked > 0) {
+                    int eta = st.getInt("eta");
+                    line = line.copy().append(eta >= 0
+                            ? Component.translatable("gui.singulo.work_console.detail.machine_eta", compact(parked), (eta + 19) / 20)
+                            : Component.translatable("gui.singulo.work_console.detail.machine", compact(parked)));
+                }
                 AndroidStationScreen.fit(g, font, line, 27, TOP + i * DETAIL_H + 4, 95, done >= total ? 0xFF78D2F0 : light);
             }
             int last = Math.min(steps.size(), DETAIL_ROWS - 1);
@@ -1064,11 +1090,13 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 CompoundTag w = workers.get(i + workerScroll);
                 int act = w.getInt("activity");
                 Component line = text(w, "name").copy();
-                if (act >= 0) {
+                if (act == -2) {
+                    line = line.copy().append(": ").append(Component.translatable("gui.singulo.work_console.worker.elsewhere"));
+                } else if (act >= 0) {
                     line = line.copy().append(": ").append(Component.translatable("gui.singulo.work_console.activity."
                             + io.github.genichimaruo.singulo.android.RuinAndroid.ACTIVITY_KEYS[Math.min(act, io.github.genichimaruo.singulo.android.RuinAndroid.ACTIVITY_KEYS.length - 1)]));
                 }
-                AndroidStationScreen.fit(g, font, line, 147, TOP + i * DETAIL_H + 4, 99, act < 0 ? MUTED : light);
+                AndroidStationScreen.fit(g, font, line, 147, TOP + i * DETAIL_H + 4, 99, act == -1 ? MUTED : light);
             }
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.back"), 10, DETAIL_BACK_Y + 2, 46, Panel.TEXT);
             AndroidStationScreen.fit(g, font, stack(o, "target").getHoverName().copy().append(" ×" + compact(o.getLong("count"))), 64,
@@ -1164,6 +1192,12 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                                 WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP) + WorkConsoleMenu.FACE_W / 2,
                                 WorkConsoleMenu.FACE_Y + 3, WorkConsoleMenu.FACE_W - 2, Panel.TEXT);
                     }
+                    // 燃料を持ってくる量: 「N個」（燃料の欄の数ずつ）か「満タン」（装置に入るだけ）
+                    int fuelCount = Math.max(1, menu.getSlot(WorkConsoleMenu.SLOT_FUEL).getItem().getCount());
+                    small(g, fuelFill() ? Component.translatable("gui.singulo.recipe_encoder.fuel_mode.fill")
+                                    : Component.translatable("gui.singulo.recipe_encoder.fuel_mode.count", fuelCount),
+                            WorkConsoleMenu.FUEL_MODE_X + WorkConsoleMenu.FUEL_MODE_W / 2, WorkConsoleMenu.FUEL_MODE_Y + 3, WorkConsoleMenu.FUEL_MODE_W - 2,
+                            fuelFill() ? 0xFFFFFFFF : Panel.TEXT);
                 } else {
                     small(g, Component.translatable(menu.variants() ? "gui.singulo.recipe_encoder.variants.on" : "gui.singulo.recipe_encoder.variants.off"),
                             WorkConsoleMenu.VARIANTS_X + WorkConsoleMenu.VARIANTS_W / 2, WorkConsoleMenu.VARIANTS_Y + 3, WorkConsoleMenu.VARIANTS_W - 4,

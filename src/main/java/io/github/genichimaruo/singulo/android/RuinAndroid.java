@@ -531,6 +531,11 @@ public abstract class RuinAndroid extends Monster {
         setTarget(null);
     }
 
+    /** 同じ作業指令台の、受け持つほかの注文へ移る（手が空いているとき。持ち主の物の区別はそのまま）。 */
+    public void switchOrder(int order) {
+        this.workOrder = order;
+    }
+
     /** 死亡後の転送・再印刷でも、持ち主の物と作業用の物を区別して復元する。 */
     public CompoundTag saveWorkState() {
         CompoundTag t = workGoal.saveWork();
