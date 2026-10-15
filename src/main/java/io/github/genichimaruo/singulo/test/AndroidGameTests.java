@@ -1145,6 +1145,7 @@ public final class AndroidGameTests {
     public static void workOutputSurvivesFullCargo(GameTestHelper helper) throws Exception {
         var level = helper.getLevel();
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);
+        a.moveTo(Vec3.atCenterOf(helper.absolutePos(STATION)));
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.EMERALD));
         a.assignWork(helper.absolutePos(CONSOLE), 1);
         var target = new ItemStack(net.minecraft.world.item.Items.DIAMOND);

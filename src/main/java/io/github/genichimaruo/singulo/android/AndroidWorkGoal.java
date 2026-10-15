@@ -554,8 +554,11 @@ final class AndroidWorkGoal extends Goal {
                     }
                 }
             }
+            if (take <= 0) {
+                continue;
+            }
             boolean main = ItemStack.isSameItemSameComponents(s, r.output());
-            take = Math.min(take, outputCapacity(s.copyWithCount(Math.max(1, take)), main));
+            take = Math.min(take, outputCapacity(s.copyWithCount(take), main));
             if (take <= 0) {
                 continue;
             }

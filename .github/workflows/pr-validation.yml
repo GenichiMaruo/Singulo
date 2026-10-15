@@ -68,17 +68,6 @@ jobs:
           grep -q 'SINGULO_GUI_COMPLETE 15' build/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py
-      - name: Encode GUI captures for remote review
-        if: always()
-        run: |
-          python3 - <<'PY'
-          import base64
-          import pathlib
-          print("::group::GUI captures for remote inspection")
-          for path in sorted(pathlib.Path("build/gui-review/screenshots").glob("*.png")):
-              print("SINGULO_GUI_IMAGE " + path.stem + " " + base64.b64encode(path.read_bytes()).decode("ascii"))
-          print("::endgroup::")
-          PY
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
