@@ -4,25 +4,46 @@ on:
   push:
     tags: ['v*-1.20.1F', 'v*-1.20.1F-r*']
   workflow_dispatch:
+    inputs:
+      verified_run_id:
+        description: 'Successful PR validation run to promote without rebuilding'
+        required: false
+        type: string
+      release_tag:
+        description: 'Existing immutable tag matching the verified CI tree'
+        required: false
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: curseforge-${{ github.ref }}
+  group: curseforge-${{ inputs.release_tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: write
+      actions: read
     env:
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
+      VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      SOURCE_DIR: ${{ inputs.verified_run_id != '' && 'release-source' || '.' }}
+      GH_TOKEN: ${{ github.token }}
     environment: curseforge
     outputs:
       name: ${{ steps.version.outputs.name }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        if: inputs.verified_run_id != ''
+        with:
+          ref: ${{ inputs.release_tag }}
+          path: release-source
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -36,16 +57,21 @@ jobs:
       - name: Validate version and changelog
         id: version
         shell: bash
+        working-directory: ${{ env.SOURCE_DIR }}
         run: |
+          if [[ -n "$VERIFIED_RUN_ID" && -z "$RELEASE_TAG" || -z "$VERIFIED_RUN_ID" && -n "$RELEASE_TAG" ]]; then
+            echo 'verified_run_id and release_tag must be supplied together'; exit 1
+          fi
           version=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')
           mod_name=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d '\r')
           minecraft=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')
           suffix=$(sed -n 's/^mod_loader_suffix=//p' gradle.properties | tr -d '\r')
           [[ "$suffix" == F ]] || { echo 'This workflow publishes Forge builds (F)'; exit 1; }
-          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+          if [[ "$GITHUB_REF_TYPE" == tag || -n "$RELEASE_TAG" ]]; then
+            tag_name="${RELEASE_TAG:-$GITHUB_REF_NAME}"
             tag_prefix="v$version-$minecraft$suffix"
-            retry_suffix="${GITHUB_REF_NAME#"$tag_prefix"}"
-            if [[ "$GITHUB_REF_NAME" != "$tag_prefix" && ( "$retry_suffix" == "$GITHUB_REF_NAME" || ! "$retry_suffix" =~ ^-r[1-9][0-9]*$ ) ]]; then
+            retry_suffix="${tag_name#"$tag_prefix"}"
+            if [[ "$tag_name" != "$tag_prefix" && ( "$retry_suffix" == "$tag_name" || ! "$retry_suffix" =~ ^-r[1-9][0-9]*$ ) ]]; then
               echo 'Tag must match the version, Minecraft and loader, optionally followed by -r<number>'
               exit 1
             fi
@@ -55,12 +81,14 @@ jobs:
           echo "name=$mod_name-$version-$minecraft$suffix" >> "$GITHUB_OUTPUT"
           echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
       - name: Validate source and resources
+        working-directory: ${{ env.SOURCE_DIR }}
         run: |
           python tools/localization.py --check
           python tools/check_models.py
           python tools/check_supporters.py
           python tools/check_port_1201.py
       - name: Build and run GameTests
+        if: inputs.verified_run_id == ''
         run: |
           chmod +x gradlew
           mkdir -p build/reports/gametest
@@ -69,6 +97,33 @@ jobs:
             cp build/gametest/logs/latest.log "build/reports/gametest/$namespace.log"
           done
           python3 tools/check_port_1201.py --jar "build/libs/${{ steps.version.outputs.name }}.jar"
+      - name: Verify CI provenance and immutable tag
+        id: verified
+        if: inputs.verified_run_id != ''
+        run: python3 tools/verified_release.py check --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
+      - uses: actions/download-artifact@v4
+        if: inputs.verified_run_id != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.verified_run_id }}
+          pattern: ${{ steps.verified.outputs.pattern }}
+          path: verified-artifacts
+      - name: Promote the validated production JAR
+        if: inputs.verified_run_id != ''
+        env:
+          JAR_NAME: ${{ steps.version.outputs.name }}.jar
+        run: |
+          python3 tools/verified_release.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source --output "build/libs/$JAR_NAME"
+          python3 release-source/tools/check_port_1201.py --jar "build/libs/$JAR_NAME"
+      - name: Stage release to prevent duplicate promotion uploads
+        if: inputs.verified_run_id != ''
+        env:
+          RELEASE_NAME: ${{ steps.version.outputs.name }}
+          MOD_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "$RELEASE_TAG" "build/libs/$RELEASE_NAME.jar" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --draft --prerelease --latest=false \
+            --title "$RELEASE_NAME (Beta)" --notes-file "release-source/docs/curseforge/changelog-$MOD_VERSION.md"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.version.outputs.name }}
@@ -83,7 +138,7 @@ jobs:
           name: ${{ steps.version.outputs.name }}
           version: ${{ steps.version.outputs.version }}
           version-type: beta
-          changelog-file: docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
+          changelog-file: ${{ env.SOURCE_DIR }}/docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
           loaders: forge
           game-versions: ${{ steps.version.outputs.minecraft }}
           java: '17'
@@ -92,12 +147,14 @@ jobs:
 
   github-release:
     needs: publish
-    if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag' || inputs.release_tag != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
       - uses: actions/download-artifact@v4
         with:
           name: ${{ needs.publish.outputs.name }}
@@ -106,8 +163,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_NAME: ${{ needs.publish.outputs.name }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "dist/$RELEASE_NAME.jar" \
+          if [[ -n "$VERIFIED_RUN_ID" ]]; then
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest=false
+            exit 0
+          fi
+          gh release create "$RELEASE_TAG" "dist/$RELEASE_NAME.jar" \
             --repo "$GITHUB_REPOSITORY" --verify-tag \
             --title "$RELEASE_NAME (Beta)" \
             --notes-file "docs/curseforge/changelog-$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r').md" \
