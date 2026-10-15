@@ -128,6 +128,7 @@ var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
 tasks.named('runGameTestServer') { dependsOn cleanGameTestWorld }
 
 // Minecraft's bootstrap can exit with status 0 before running any tests. Require the completion report.
+var selectedGameTestNamespace = providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor')
 var gameTestResultLog = layout.buildDirectory.file('gametest/logs/latest.log')
 var verifyGameTestResults = tasks.register('verifyGameTestResults') {
     group = 'verification'
@@ -137,7 +138,7 @@ var verifyGameTestResults = tasks.register('verifyGameTestResults') {
         if (result == null || !result.find()) {
             throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/gametest/logs/latest.log')
         }
-        def namespace = providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor')
+        def namespace = selectedGameTestNamespace
         def expected = ['singulo': 254, 'singulo_automation': 37, 'singulo_reactor': 21,
                         'singulo,singulo_automation,singulo_reactor': 312][namespace]
         if (expected != null && result.group(1).toInteger() != expected) {
