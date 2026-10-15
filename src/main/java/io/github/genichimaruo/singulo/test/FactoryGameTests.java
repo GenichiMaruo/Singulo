@@ -148,6 +148,9 @@ public final class FactoryGameTests {
             helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
             int n = dropped(helper, item("precision_actuator"));
             helper.assertTrue(n >= 3 && n <= 4, "精密アクチュエーターを3〜4個落とさない: " + n);
+            // 部屋に挑戦者がいないときは、試作機の設計メモリをどちらか1つ
+            int memories = dropped(helper, item("android_memory_axe")) + dropped(helper, item("android_memory_bit"));
+            helper.assertTrue(memories == 1, "試作機の設計メモリを1つ落とさない: " + memories);
             helper.assertFalse(helper.getBlockState(new BlockPos(5, CONVEYOR_Y, CONVEYOR_Z)).getValue(FactoryConveyorBlock.RUNNING), "倒してもコンベアが止まらない");
             helper.assertFalse(helper.getBlockState(hull).getValue(io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock.SEALED),
                     "倒しても耐圧殻の封じが解けない");
@@ -260,6 +263,12 @@ public final class FactoryGameTests {
         helper.runAtTickTime(10, () -> {
             long prototypes = f.factoryMade(helper.getLevel()).stream().filter(RuinAndroid::prototype).count();
             helper.assertTrue(prototypes == 2, "本気になっても試作機を2体呼ばない: " + prototypes);
+            helper.assertTrue(f.factoryMade(helper.getLevel()).stream().filter(RuinAndroid::prototype)
+                    .allMatch(a -> a instanceof io.github.genichimaruo.singulo.android.AxeAndroid
+                            || a instanceof io.github.genichimaruo.singulo.android.BitAndroid), "試作機が斧型・ビット型でない");
+            helper.assertTrue(f.factoryMade(helper.getLevel()).stream().filter(a -> !a.prototype())
+                    .noneMatch(a -> a instanceof io.github.genichimaruo.singulo.android.AxeAndroid
+                            || a instanceof io.github.genichimaruo.singulo.android.BitAndroid), "量産型に試作機の型が混じった");
             f.factoryMade(helper.getLevel()).forEach(a -> a.discard());
             z.discard();
             f.discard();

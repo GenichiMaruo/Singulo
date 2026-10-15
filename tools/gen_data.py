@@ -81,7 +81,7 @@ def stage_of(name):
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '隕石の核': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
-            '小型クリスタルメモリ（光剣型）': 2}.get(name, 1)
+            '小型クリスタルメモリ（光剣型）': 2, '小型クリスタルメモリ（斧型）': 4, '小型クリスタルメモリ（ビット型）': 4}.get(name, 1)
 
 
 def max_uses(name):
@@ -737,6 +737,8 @@ UI_LANG = {
     'gui.singulo.android.nickname.blade': ('ルミナ', 'Lumina'),
     'gui.singulo.android.nickname.whip': ('ヴェルナ', 'Verna'),
     'gui.singulo.android.nickname.saber': ('ソレイユ', 'Soleil'),
+    'gui.singulo.android.nickname.axe': ('アルマ', 'Alma'),
+    'gui.singulo.android.nickname.bit': ('ノクス', 'Nox'),
     'gui.singulo.android.rename': ('クリックで名前を変える', 'Click to rename'),
     'gui.singulo.android.dismantle': ('解体する（2回押す）', 'Dismantle (press twice)'),
     'gui.singulo.android.rename.reset': ('名前を元に戻す', 'Reset name'),
@@ -1118,6 +1120,8 @@ UI_LANG = {
     'entity.singulo.blade_android': ('光刃型アンドロイド「ルミナ」', 'Blade Android "Lumina"'),
     'entity.singulo.whip_android': ('鞭型アンドロイド「ヴェルナ」', 'Whip Android "Verna"'),
     'entity.singulo.saber_android': ('光剣型アンドロイド「ソレイユ」', 'Saber Android "Soleil"'),
+    'entity.singulo.axe_android': ('斧型アンドロイド「アルマ」', 'Axe Android "Alma"'),
+    'entity.singulo.bit_android': ('ビット型アンドロイド「ノクス」', 'Bit Android "Nox"'),
     'entity.singulo.android_crescent': ('斬撃波', 'Crescent Slash'),
     'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
@@ -1235,6 +1239,8 @@ UI_LANG = {
     'item.singulo.blade_android_spawn_egg': ('光刃型アンドロイドのスポーンエッグ', 'Blade Android Spawn Egg'),
     'item.singulo.whip_android_spawn_egg': ('鞭型アンドロイドのスポーンエッグ', 'Whip Android Spawn Egg'),
     'item.singulo.saber_android_spawn_egg': ('光剣型アンドロイドのスポーンエッグ', 'Saber Android Spawn Egg'),
+    'item.singulo.axe_android_spawn_egg': ('斧型アンドロイドのスポーンエッグ', 'Axe Android Spawn Egg'),
+    'item.singulo.bit_android_spawn_egg': ('ビット型アンドロイドのスポーンエッグ', 'Bit Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -1681,7 +1687,7 @@ def textures():
                {'parent': 'minecraft:item/template_spawn_egg'})
     # 遺構のアンドロイド（128×64。tools/androids.py）
     androids.textures(te, save)
-    for egg in ('blade_android', 'whip_android', 'saber_android'):
+    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
@@ -3205,9 +3211,9 @@ TAB_GROUPS = [
             'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel', 'pristine_ruin_tiles', 'pristine_ruin_pillar',
             'pristine_ruin_light', 'intact_ruin_glass', 'reinforced_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
             'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
-            'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
+            'android_memory_blade', 'android_memory_whip', 'android_memory_saber', 'android_memory_axe', 'android_memory_bit',
             'seal_console', 'guardian_core', 'echo_projector', 'factory_line', 'factory_conveyor', 'security_drone_spawn_egg', 'blade_android_spawn_egg',
-            'whip_android_spawn_egg', 'saber_android_spawn_egg']),
+            'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg', 'bit_android_spawn_egg']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
                      'last_archivist_spawn_egg', 'foundry_overseer_spawn_egg']),

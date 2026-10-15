@@ -320,6 +320,8 @@ MOD = {
     '小型クリスタルメモリ（光刃型）': ('android_memory_blade', 'Compact Crystal Memory (Blade)', 'item'),
     '小型クリスタルメモリ（鞭型）': ('android_memory_whip', 'Compact Crystal Memory (Whip)', 'item'),
     '小型クリスタルメモリ（光剣型）': ('android_memory_saber', 'Compact Crystal Memory (Saber)', 'item'),
+    '小型クリスタルメモリ（斧型）': ('android_memory_axe', 'Compact Crystal Memory (Axe)', 'item'),
+    '小型クリスタルメモリ（ビット型）': ('android_memory_bit', 'Compact Crystal Memory (Bit)', 'item'),
     '封印コンソール': ('seal_console', 'Seal Console', 'ruin_block'),
     '番人の封印核': ('guardian_core', 'Guardian Seal Core', 'boss_block'),
     '残響投影器': ('echo_projector', 'Echo Projector', 'boss_block'),

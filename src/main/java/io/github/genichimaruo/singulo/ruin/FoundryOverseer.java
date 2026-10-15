@@ -621,7 +621,7 @@ public class FoundryOverseer extends RuinBoss {
             return false;
         }
         BlockPos line = live.get(random.nextInt(live.size()));
-        AndroidKind[] kinds = AndroidKind.values();
+        AndroidKind[] kinds = AndroidKind.ruinKinds();             // 量産型は旧型（試作機の型は量産しない）
         return spawnAt(level, line, kinds[random.nextInt(kinds.length)], false, target) != null;
     }
 
@@ -640,8 +640,7 @@ public class FoundryOverseer extends RuinBoss {
         }
         playSound(SinguloSounds.get("foundry.enrage"), 2.5F, 0.8F);
         List<BlockPos> live = intactLines();
-        // TODO 段階5: 斧型・ビット型の試作機に替える（今は光剣型・光刃型の試作機で代える）
-        AndroidKind[] prototypes = {AndroidKind.SABER, AndroidKind.BLADE};
+        AndroidKind[] prototypes = AndroidKind.prototypes();          // 斧型「アルマ」とビット型「ノクス」の試作機
         for (int i = 0; i < prototypes.length; i++) {
             BlockPos from = live.isEmpty() ? null : live.get(i % live.size());
             spawnAt(level, from, prototypes[i], true, getTarget());
@@ -732,6 +731,26 @@ public class FoundryOverseer extends RuinBoss {
                 a.kill();
             }
             playSound(SinguloSounds.get("foundry.line_break"), 2.5F, 0.6F);
+        }
+    }
+
+    /** ふつうの落とし物に加え、部屋にいる挑戦者それぞれへ試作機の設計メモリを1つ（まだ持っていない型を先に）。 */
+    @Override
+    protected void dropFromLootTable(DamageSource source, boolean recentlyHit) {
+        super.dropFromLootTable(source, recentlyHit);
+        if (isMinion() || !(level() instanceof ServerLevel level)) {
+            return;
+        }
+        List<Player> players = rewardPlayers(level);
+        if (players.isEmpty()) {
+            AndroidKind[] all = AndroidKind.prototypes();
+            spawnAtLocation(PrototypeMemories.stack(all[random.nextInt(all.length)]));
+            return;
+        }
+        for (Player p : players) {
+            if (p instanceof net.minecraft.server.level.ServerPlayer sp) {
+                spawnAtLocation(PrototypeMemories.stack(PrototypeMemories.next(sp, random)));
+            }
         }
     }
 

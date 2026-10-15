@@ -57,6 +57,7 @@ public final class Singulo {
 
         modBus.addListener(SinguloCapabilities::register);
         modBus.addListener(io.github.genichimaruo.singulo.network.SinguloNetwork::register);
+        java.util.Objects.requireNonNull(io.github.genichimaruo.singulo.ruin.PrototypeMemories.RECEIVED);  // 記録の登録先へ加える
         io.github.genichimaruo.singulo.ruin.AncientRecords.REGISTER.register(modBus);
         modBus.addListener(SinguloEntities::registerAttributes);
         modBus.addListener((RegisterTicketControllersEvent e) -> e.register(WorldlineAnchorBlockEntity.TICKETS));

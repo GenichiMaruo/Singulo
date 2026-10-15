@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.android.AxeAndroid;
+import io.github.genichimaruo.singulo.android.BitAndroid;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 import io.github.genichimaruo.singulo.android.SaberAndroid;
@@ -32,20 +34,25 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     static final float SCALE = 0.85F;
 
     public enum Variant {
-        BLADE("blade_android", BladeAndroid.ACCENT, AndroidModel.BLADE_LAYER),
-        WHIP("whip_android", WhipAndroid.ACCENT, AndroidModel.WHIP_LAYER),
-        SABER("saber_android", SaberAndroid.ACCENT, AndroidModel.SABER_LAYER);
+        BLADE("blade_android", BladeAndroid.ACCENT, AndroidModel.BLADE_LAYER, false),
+        WHIP("whip_android", WhipAndroid.ACCENT, AndroidModel.WHIP_LAYER, true),
+        SABER("saber_android", SaberAndroid.ACCENT, AndroidModel.SABER_LAYER, false),
+        AXE("axe_android", AxeAndroid.ACCENT, AndroidModel.AXE_LAYER, false),
+        BIT("bit_android", BitAndroid.ACCENT, AndroidModel.BIT_LAYER, true);
 
         final ResourceLocation texture;
         final ResourceLocation glow;
         final int accent;
         final ModelLayerLocation layer;
+        /** 長い房とサイドテールが体の右（tools/androids.py の mirror と同じ）。 */
+        final boolean mirror;
 
-        Variant(String name, int accent, ModelLayerLocation layer) {
+        Variant(String name, int accent, ModelLayerLocation layer, boolean mirror) {
             this.texture = Singulo.id("textures/entity/" + name + ".png");
             this.glow = Singulo.id("textures/entity/" + name + "_glow.png");
             this.accent = accent;
             this.layer = layer;
+            this.mirror = mirror;
         }
     }
 
@@ -58,6 +65,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Blade(this));
         addLayer(new Whip(this));
         addLayer(new Saber(this));
+        addLayer(new Axe(this));
+        addLayer(new Dagger(this));
+        addLayer(new StowedBits(this));
         addLayer(new Solar(this));
         addLayer(new Pickaxe(this));
         addLayer(new Tanks(this));
@@ -91,6 +101,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
         super.render(android, yaw, partialTick, pose, buffers, light);
         renderMoves(android, partialTick, pose, buffers);
+        if (android instanceof BitAndroid bit) {
+            renderBits(bit, partialTick, pose, buffers, light);
+        }
         renderWorkIcon(android, partialTick, pose, buffers, light);
         if (android.napping() && android.printed()) {
             renderSleep(android, partialTick, pose, buffers, light);
@@ -336,6 +349,49 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 pose.popPose();
             }
+            case AxeAndroid.STATE_CLEAVE_WINDUP -> {
+                // 右後ろへ引いた斧頭に光が集まる
+                pose.pushPose();
+                bodySpace(android, partialTick, pose);
+                pose.translate(-0.9, 1.15, 0.45);
+                float k = Mth.clamp(t / AxeAndroid.CLEAVE_WINDUP, 0, 1);
+                float pulse = 0.85F + 0.15F * Mth.sin(age * 1.8F);
+                FxDraw.billboard(pose, glow, camera, (0.5F + 1.0F * k) * pulse, accent, 140);
+                FxDraw.billboard(pose, glow, camera, (0.2F + 0.4F * k) * pulse, 0xFFFFFF, 230);
+                pose.popPose();
+            }
+            case AxeAndroid.STATE_CLEAVE -> slashTrail(android, partialTick, pose, glow, t, 2.5F, (float) AxeAndroid.CLEAVE_REACH, 1.25F);
+            case AxeAndroid.STATE_CHOP -> slashTrail(android, partialTick, pose, glow, t, 3, 1.5F, 0.7F);
+            case AxeAndroid.STATE_SLAM_WINDUP, AxeAndroid.STATE_LEAP -> {
+                // 頭上へ掲げた斧頭に光が集まる
+                pose.pushPose();
+                bodySpace(android, partialTick, pose);
+                pose.translate(0, 2.35, 0.15);
+                float k = state == AxeAndroid.STATE_LEAP ? 1 : Mth.clamp(t / AxeAndroid.SLAM_WINDUP, 0, 1);
+                float pulse = 0.85F + 0.15F * Mth.sin(age * 2.0F);
+                FxDraw.billboard(pose, glow, camera, (0.5F + 1.1F * k) * pulse, accent, 150);
+                FxDraw.billboard(pose, glow, camera, (0.2F + 0.45F * k) * pulse, 0xFFFFFF, 235);
+                pose.popPose();
+                if (state == AxeAndroid.STATE_LEAP) {
+                    renderAfterimages(android, partialTick, pose, buffers, 0.8F);
+                }
+            }
+            case AxeAndroid.STATE_SLAM -> axeShockwave(android, partialTick, pose, buffers, t, age);
+            case AxeAndroid.STATE_LEAP_WINDUP -> {
+                // 足元に、踏み込む前の光の輪
+                pose.pushPose();
+                pose.translate(0, 0.03, 0);
+                float k = Mth.clamp(t / AxeAndroid.LEAP_WINDUP, 0, 1);
+                FxDraw.ring(pose.last(), glow, 0.5F * k, 0.8F * k, accent, (int) (170 * k), (int) (60 * k));
+                pose.popPose();
+            }
+            case BitAndroid.STATE_STAB -> {
+                if (t < 6) {
+                    slashTrail(android, partialTick, pose, glow, t, 2, 1.1F, 0.45F);
+                } else {
+                    slashTrail(android, partialTick, pose, glow, t - 6, 2, 1.2F, 0.55F);
+                }
+            }
             case RuinAndroid.STATE_LOW_POWER -> {
                 // 頭の上で、橙の小さな光が点滅する（充電切れ）
                 if ((int) (age / 6) % 2 == 0) {
@@ -417,6 +473,121 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         FxDraw.crescent(pose.last(), glow, tail, head, radius, 0.6F * amount, variant.accent, (int) (180 * fade));
         FxDraw.crescent(pose.last(), glow, tail, head, radius, 0.18F * amount, 0xFFFFFF, (int) (235 * fade));
         pose.popPose();
+    }
+
+    /** 斧の叩きつけの衝撃波: 体の前へまっすぐ、床を走る光の帯と、先で立ち上がる光の板、走った跡の割れ目の光。 */
+    private void axeShockwave(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, float t, float age) {
+        if (t < 3) {
+            return;
+        }
+        float front = (float) Math.min(AxeAndroid.SHOCKWAVE_LENGTH, 0.8 + (t - 3) * 2.2);
+        float fade = 1 - Mth.clamp((t - 7) / 5, 0, 1);
+        pose.pushPose();
+        bodySpace(android, partialTick, pose);
+        VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+        PoseStack.Pose p = pose.last();
+        Vec3 a = new Vec3(0, 0.05, -0.8);
+        Vec3 b = new Vec3(0, 0.05, -front);
+        FxDraw.beam(p, vc, a, b, 1.1F, variant.accent, (int) (90 * fade));
+        FxDraw.beam(p, vc, a, b, 0.25F, 0xFFFFFF, (int) (200 * fade));
+        // 割れ目: 帯にそってジグザグの細い光
+        Vec3 prev = a;
+        for (int i = 1; i <= 10; i++) {
+            float s = i / 10F;
+            Vec3 q = new Vec3(Mth.sin(i * 2.3F) * 0.25, 0.06, Mth.lerp(s, -0.8F, -front));
+            FxDraw.beam(p, vc, prev, q, 0.08F, 0xFFE0C8, (int) (220 * fade));
+            prev = q;
+        }
+        // 波の先: 立ち上がる光の板
+        for (int k = -3; k <= 3; k++) {
+            Vec3 base = new Vec3(k * 0.22, 0.05, -front);
+            double h = 0.6 + 0.4 * Math.abs(Math.sin(age * 1.7 + k));
+            FxDraw.beam(p, vc, base, base.add(0, h * (1 - Math.abs(k) * 0.18), 0), 0.14F, variant.accent, (int) (210 * fade));
+        }
+        pose.popPose();
+    }
+
+    // ------------------------------------------------------------------ ビット
+
+    /** 背中のビットをしまう位置（体の向きの座標。背中の上、肩甲骨のあたり）。 */
+    private static Vec3 stowedOffset(int i, float bodyYaw) {
+        double side = (i - (BitAndroid.BITS - 1) / 2.0) * 0.12;
+        double a = Math.toRadians(bodyYaw);
+        Vec3 back = new Vec3(Math.sin(a), 0, -Math.cos(a));
+        Vec3 right = new Vec3(Math.cos(a), 0, Math.sin(a));
+        return back.scale(0.28).add(right.scale(side)).add(0, 1.2 + 0.12 * Math.abs(side), 0);
+    }
+
+    /**
+     * 浮かんだビット（体の後ろ上に扇のように並ぶ）。紺の細長い菱形の本体に、菫の光の芯と、後ろの噴射の光。
+     * 展開の途中は背中から飛び出していく。撃ったビットからは、相手へ光線（白い芯と水色の外側）が走る。
+     */
+    private void renderBits(BitAndroid bit, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
+        int n = bit.deployed();
+        if (n <= 0 || !bit.printed()) {
+            return;
+        }
+        float age = bit.tickCount + partialTick;
+        float bodyYaw = Mth.rotLerp(partialTick, bit.yBodyRotO, bit.yBodyRot);
+        float out = 1;
+        if (bit.state() == BitAndroid.STATE_DEPLOY) {
+            out = ease(Mth.clamp((bit.stateTime(partialTick) - BitAndroid.DEPLOY / 2F) / 5, 0, 1));
+        }
+        Vec3[] at = new Vec3[n];
+        for (int i = 0; i < n; i++) {
+            at[i] = stowedOffset(i % BitAndroid.BITS, bodyYaw).lerp(BitAndroid.bitOffset(i, n, bodyYaw, age), out);
+        }
+        VertexConsumer solid = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+        for (int i = 0; i < n; i++) {
+            pose.pushPose();
+            pose.translate(at[i].x, at[i].y, at[i].z);
+            pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
+            pose.mulPose(Axis.XP.rotationDegrees(-25 + 8 * Mth.sin(age * 0.1F + i)));
+            bitBody(pose, solid, light);
+            pose.popPose();
+        }
+        VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+        for (int i = 0; i < n; i++) {
+            pose.pushPose();
+            pose.translate(at[i].x, at[i].y, at[i].z);
+            pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
+            pose.mulPose(Axis.XP.rotationDegrees(-25 + 8 * Mth.sin(age * 0.1F + i)));
+            float pulse = 0.75F + 0.25F * Mth.sin(age * 0.4F + i * 1.3F);
+            glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent, (int) (200 * pulse));
+            glowBox(pose, fx, -0.03F, -0.03F, 0.13F, 0.03F, 0.03F, 0.2F + 0.05F * pulse, variant.accent, (int) (120 * pulse));
+            pose.popPose();
+        }
+        // 光線（撃った直後だけ、だんだん細く薄く）
+        int flash = bit.shotFlash();
+        int shot = bit.shotBit();
+        if (flash > 0 && shot < n) {
+            float k = Mth.clamp((flash - partialTick) / BitAndroid.FLASH, 0, 1);
+            Vec3 to = bit.shotAt().subtract(bit.getPosition(partialTick));
+            PoseStack.Pose p = pose.last();
+            FxDraw.beam(p, fx, at[shot], to, 0.16F * k + 0.04F, BitAndroid.BEAM, (int) (150 * k));
+            FxDraw.beam(p, fx, at[shot], to, 0.05F * k + 0.015F, 0xFFFFFF, (int) (240 * k));
+            pose.pushPose();
+            pose.translate(at[shot].x, at[shot].y, at[shot].z);
+            Quaternionf camera = entityRenderDispatcher.cameraOrientation();
+            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            FxDraw.billboard(pose, glow, camera, 0.35F * k + 0.1F, BitAndroid.BEAM, (int) (200 * k));
+            pose.popPose();
+        }
+    }
+
+    /** ビットの本体（向きの座標。前は -Z）: 細長い菱形を、太さの違う箱を重ねて作る。 */
+    private static void bitBody(PoseStack pose, VertexConsumer vc, int light) {
+        int navy = 0x2C345C, edge = 0x8C94B8;
+        FxDraw.box(pose, vc, -0.035F, -0.035F, -0.12F, 0.035F, 0.035F, 0.12F, light, navy, 255);
+        FxDraw.box(pose, vc, -0.022F, -0.022F, -0.2F, 0.022F, 0.022F, -0.12F, light, navy, 255);
+        FxDraw.box(pose, vc, -0.01F, -0.01F, -0.26F, 0.01F, 0.01F, -0.2F, light, edge, 255);
+        FxDraw.box(pose, vc, -0.07F, -0.006F, 0.02F, 0.07F, 0.006F, 0.12F, light, edge, 255);      // 横の小さな翼
+        FxDraw.box(pose, vc, -0.028F, -0.028F, 0.12F, 0.028F, 0.028F, 0.15F, light, 0x1A1E34, 255);
+    }
+
+    private static float ease(float x) {
+        x = Mth.clamp(x, 0, 1);
+        return x * x * (3 - 2 * x);
     }
 
     /** 突進の残像（後ろへ3つ、だんだん薄く）。 */
@@ -1093,6 +1264,135 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             int c = (int) (230 * Math.min(1, glow));
             glowBox(pose, vc, -outer, 0, -outer, outer, l, outer, variant.accent, a);
             glowBox(pose, vc, -core, 0, -core, core, l + 0.08F / SCALE, core, 0xFFFFFF, c);
+            pose.popPose();
+        }
+    }
+
+    /**
+     * 斧型の両手斧: 長い柄（濃い金属、握りに革巻き、端に石突き）の先に、両刃の斧頭。斧頭の芯は金属で、刃は光る
+     * （真ん中が広い三日月の形を、薄い光の箱を重ねて作る）。前触れのあいだは強く光る。
+     */
+    final class Axe extends RenderLayer<RuinAndroid, AndroidModel> {
+        Axe(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            AndroidModel m = getParentModel();
+            if (m.axeGrip == null || !android.printed()) {
+                return;
+            }
+            int state = android.state();
+            float glow = state == RuinAndroid.STATE_LOW_POWER ? 0.3F : RuinAndroid.charging(state) ? 0.5F
+                    : state == AxeAndroid.STATE_CLEAVE_WINDUP || state == AxeAndroid.STATE_SLAM_WINDUP || state == AxeAndroid.STATE_LEAP
+                    ? 1.3F + 0.1F * Mth.sin(age * 0.4F) : 0.85F + 0.08F * Mth.sin(age * 0.2F);
+            pose.pushPose();
+            m.toBlade(pose);
+            m.axeGrip.translateAndRotate(pose);
+            float k = 1 / SCALE;
+            pose.scale(k, k, k);                       // ここからはブロックの長さで描く
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            float r = 0.028F;
+            FxDraw.box(pose, body, -r, -0.42F, -r, r, 1.02F, r, light, 0x3C424E, 255);                       // 柄
+            FxDraw.box(pose, body, -r - 0.006F, -0.12F, -r - 0.006F, r + 0.006F, 0.16F, r + 0.006F, light, 0x5A3E30, 255);  // 革巻き
+            FxDraw.box(pose, body, -0.04F, -0.5F, -0.04F, 0.04F, -0.42F, 0.04F, light, 0x8C94A2, 255);    // 石突き
+            FxDraw.box(pose, body, -0.045F, 0.78F, -0.07F, 0.045F, 1.06F, 0.07F, light, 0x6E7684, 255);   // 斧頭の芯
+            FxDraw.box(pose, body, -0.035F, 1.06F, -0.035F, 0.035F, 1.14F, 0.035F, light, 0x8C94A2, 255); // 先の飾り
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            int n = 9;
+            for (int j = 0; j < n; j++) {
+                float y0 = 0.68F + j * 0.055F;
+                float s = Mth.sin(Mth.PI * (j + 0.5F) / n);
+                float reach = 0.1F + 0.26F * s;
+                int a = (int) Math.min(255, 150 * glow);
+                for (int side = -1; side <= 1; side += 2) {
+                    float z0 = side * 0.06F, z1 = side * (0.06F + reach);
+                    glowBox(pose, fx, -0.018F, y0, Math.min(z0, z1), 0.018F, y0 + 0.055F, Math.max(z0, z1), variant.accent, a);
+                    // 刃先の白い縁
+                    float e0 = side * (0.04F + reach), e1 = side * (0.06F + reach);
+                    glowBox(pose, fx, -0.012F, y0, Math.min(e0, e1), 0.012F, y0 + 0.055F, Math.max(e0, e1), 0xFFFFFF,
+                            (int) Math.min(255, 200 * glow));
+                }
+            }
+            pose.popPose();
+        }
+    }
+
+    /** ビット型の短剣: 短い柄と鍔、光の刃（白い芯と菫の外側）。 */
+    final class Dagger extends RenderLayer<RuinAndroid, AndroidModel> {
+        Dagger(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            AndroidModel m = getParentModel();
+            if (m.daggerGrip == null || !android.printed()) {
+                return;
+            }
+            int state = android.state();
+            float glow = state == RuinAndroid.STATE_LOW_POWER ? 0.3F : RuinAndroid.charging(state) ? 0.5F
+                    : state == BitAndroid.STATE_STAB ? 1.3F : 0.9F;
+            float len = state == RuinAndroid.STATE_LOW_POWER ? 0.12F : 0.42F;
+            pose.pushPose();
+            m.toBlade(pose);
+            m.daggerGrip.translateAndRotate(pose);
+            float k = 1 / SCALE;
+            pose.scale(k, k, k);
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            FxDraw.box(pose, body, -0.022F, -0.12F, -0.022F, 0.022F, 0.06F, 0.022F, light, 0x2C345C, 255);
+            FxDraw.box(pose, body, -0.07F, 0.06F, -0.018F, 0.07F, 0.09F, 0.018F, light, 0x8C94B8, 255);
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            float outer = 0.03F * glow;
+            glowBox(pose, fx, -outer, 0.09F, -0.008F - outer * 0.4F, outer, 0.09F + len, 0.008F + outer * 0.4F, variant.accent,
+                    (int) Math.min(255, 150 * glow));
+            glowBox(pose, fx, -0.01F, 0.09F, -0.005F, 0.01F, 0.11F + len, 0.005F, 0xFFFFFF, (int) (230 * Math.min(1, glow)));
+            pose.popPose();
+        }
+    }
+
+    /** ビット型の、背中にしまったビット（浮かべていない間）。背中の上に、翼のように並ぶ。 */
+    final class StowedBits extends RenderLayer<RuinAndroid, AndroidModel> {
+        StowedBits(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (!(android instanceof BitAndroid bit) || !android.printed()) {
+                return;
+            }
+            int out = bit.deployed();
+            if (bit.state() == BitAndroid.STATE_DEPLOY && bit.stateTime(partialTick) < BitAndroid.DEPLOY / 2F) {
+                out = 0;                                  // 送り出す前は、まだ背中にある
+            }
+            if (out >= BitAndroid.BITS) {
+                return;
+            }
+            pose.pushPose();
+            getParentModel().toTorso(pose);
+            float k = 1 / SCALE;
+            VertexConsumer solid = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            float p = 1 / 16F;
+            for (int i = out; i < BitAndroid.BITS; i++) {
+                // 左右3基ずつ、背中の上から外へ斜めに開く（先が上）
+                int side = i % 2 == 0 ? 1 : -1;
+                int row = i / 2;
+                pose.pushPose();
+                pose.translate(side * (1.2F + row * 0.9F) * p, (-6.6F + row * 1.1F) * p, 2.1F * p);
+                pose.mulPose(Axis.ZP.rotationDegrees(side * (25 + row * 18)));
+                pose.mulPose(Axis.XP.rotationDegrees(90));
+                pose.scale(k * 0.8F, k * 0.8F, k * 0.8F);
+                bitBody(pose, solid, light);
+                glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent,
+                        (int) (110 + 50 * Mth.sin(age * 0.15F + i)));
+                pose.popPose();
+            }
             pose.popPose();
         }
     }
