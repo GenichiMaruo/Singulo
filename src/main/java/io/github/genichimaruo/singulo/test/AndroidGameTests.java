@@ -525,7 +525,7 @@ public final class AndroidGameTests {
                     sticks += port.handler().getStackInSlot(i).getCount();
                 }
             }
-            helper.assertTrue(sticks == 8, "棒が8本届かない: " + sticks);
+            helper.assertTrue(sticks == 8, "棒が8本届かない: " + sticks + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " work=" + a.saveWorkState() + " message=" + console.message());
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
             helper.assertFalse(a.isWorking(), "注文が終わっても作業中のまま");
             // 作った板材は、資材置き場へ戻さずに、そのまま棒に使う
@@ -623,7 +623,7 @@ public final class AndroidGameTests {
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "白樺の板材で棒を注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない: health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " work=" + a.saveWorkState() + " message=" + console.message());
             a.discard();
         });
     }
@@ -738,7 +738,7 @@ public final class AndroidGameTests {
             console.onSignal(true);
             console.onSignal(false);
             helper.succeedWhen(() -> {
-                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない: health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " work=" + a.saveWorkState() + " message=" + console.message());
                 helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
                 a.discard();
             });
