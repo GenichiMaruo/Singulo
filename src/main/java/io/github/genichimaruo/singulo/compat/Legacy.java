@@ -28,6 +28,24 @@ public final class Legacy {
             field.setAccessible(true);
             var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
             var bounds = info.getStructureBounds();
+            // GameTestServer advances ticks without a real-time delay. A fixed setupTicks
+            // does not guarantee that asynchronously promoted chunks can tick entities yet.
+            // Pump chunk tasks before the fixture starts, without advancing its game clock.
+            var level = helper.getLevel();
+            int minX = net.minecraft.util.Mth.floor(bounds.minX) >> 4;
+            int maxX = net.minecraft.util.Mth.floor(bounds.maxX) >> 4;
+            int minZ = net.minecraft.util.Mth.floor(bounds.minZ) >> 4;
+            int maxZ = net.minecraft.util.Mth.floor(bounds.maxZ) >> 4;
+            java.util.List<BlockPos> chunks = new java.util.ArrayList<>();
+            for (int x = minX; x <= maxX; x++) for (int z = minZ; z <= maxZ; z++) {
+                level.setChunkForced(x, z, true);
+                level.getChunk(x, z);
+                chunks.add(new BlockPos(x << 4, 0, z << 4));
+            }
+            java.util.function.BooleanSupplier ready = () -> chunks.stream().allMatch(level::isPositionEntityTicking);
+            long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
+            level.getServer().managedBlock(() -> ready.getAsBoolean() || System.nanoTime() >= deadline);
+            helper.assertTrue(ready.getAsBoolean(), "Fixture chunks did not become entity-ticking before setup");
             info.addListener(new net.minecraft.gametest.framework.GameTestListener() {
                 public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo test) {}
                 public void testPassed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
