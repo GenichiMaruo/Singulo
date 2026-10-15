@@ -21,7 +21,7 @@ public final class GuideGameTests {
 
     private GuideGameTests() {}
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void decodedRecordsUnlockInOrder(GameTestHelper helper) {
         ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
@@ -39,7 +39,7 @@ public final class GuideGameTests {
         }
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void advancementsAreLoaded(GameTestHelper helper) {
         var advancements = helper.getLevel().getServer().getAdvancements();
         for (String id : new String[]{"root", "tower", "ignite", "records"}) {

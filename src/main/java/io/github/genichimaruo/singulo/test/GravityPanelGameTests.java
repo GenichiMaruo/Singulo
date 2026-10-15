@@ -29,7 +29,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 電力が足りないと、受電器に近い順に払える枚数だけ働く。種類のちがうパネルも伝う。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void receiverPowersNearestPanelsFirst(GameTestHelper helper) {
         BlockPos receiver = new BlockPos(1, 1, 1);
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
@@ -51,7 +51,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 受電器が壊されると、パネルは止まる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void panelsStopWhenReceiverIsRemoved(GameTestHelper helper) {
         BlockPos receiver = new BlockPos(1, 1, 1);
         BlockPos panel = new BlockPos(2, 1, 1);
@@ -75,7 +75,7 @@ public final class GravityPanelGameTests {
 
     /** 衝撃発電パネル: 上に落ちてもダメージを受けず、落ちた高さに応じてためた電力で、つながった重力パネルを働かせる。 */
     // 引き寄せる物（マイクロブラックホールなど）のテストと同時に動くと落下距離が消えるので、別の組で動かす
-    @GameTest(template = "tall", batch = "impact_generator", timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = "tall", batch = "impact_generator", timeoutTicks = 100)
     public static void impactGeneratorAbsorbsFallAndPowersPanels(GameTestHelper helper) {
         BlockPos gen = new BlockPos(2, 1, 2);
         helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
@@ -106,7 +106,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 受電器が複数あっても、どれか1台だけで集まり全体を働かせられる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void oneOfSeveralReceiversPowersAllPanels(GameTestHelper helper) {
         GravityReceiverBlockEntity[] r = twoReceivers(helper);
         int per = GravityReceiverBlockEntity.perPanel();
@@ -123,7 +123,7 @@ public final class GravityPanelGameTests {
     }
 
     /** どちらにも十分な電力があれば、パネルごとに近いほうの受電器が払う。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void nearestReceiverPaysForEachPanel(GameTestHelper helper) {
         GravityReceiverBlockEntity[] r = twoReceivers(helper);
         int per = GravityReceiverBlockEntity.perPanel();
@@ -139,7 +139,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 近い受電器の電力が弱いときは、払えない分を遠い受電器が払う。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void fartherReceiverCoversWeakSupply(GameTestHelper helper) {
         GravityReceiverBlockEntity[] r = twoReceivers(helper);
         int per = GravityReceiverBlockEntity.perPanel();
@@ -158,7 +158,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 衝撃発電パネルは、ためた電力をケーブルへ送り出す（ケーブルから受け取りはしない）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void impactGeneratorFeedsCables(GameTestHelper helper) {
         BlockPos gen = new BlockPos(1, 1, 3);
         helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
@@ -179,7 +179,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 衝撃発電パネルが外へ出せるのは、何面につないでも、取り出される分と合わせて1 tick に PUSH_PER_TICK まで。 */
-    @GameTest(template = EMPTY, timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void impactGeneratorOutputIsSharedAcrossFaces(GameTestHelper helper) {
         BlockPos gen = new BlockPos(3, 3, 3);
         helper.setBlock(gen, SinguloBlocks.IMPACT_GENERATOR.get());
@@ -208,7 +208,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 同じ種類のパネルどうしは見た目がつながり、ちがう種類とはつながらない。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void panelsJoinOnlyTheSameKind(GameTestHelper helper) {
         helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.LOW_GRAVITY_PANEL.get());
@@ -221,7 +221,7 @@ public final class GravityPanelGameTests {
     }
 
     /** 働いている低重力パネルに乗ると重力が変わり、パネル以外の地面に降りると元に戻る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 80)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 80)
     public static void standingOnPoweredPanelChangesGravityUntilLanding(GameTestHelper helper) {
         BlockPos receiver = new BlockPos(1, 1, 2);
         BlockPos panel = new BlockPos(2, 1, 2);

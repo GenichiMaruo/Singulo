@@ -43,7 +43,7 @@ public final class SinguloGameTests {
         return be;
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void kilnMakesSteel(GameTestHelper helper) {
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         kiln.items().setStackInSlot(0, new ItemStack(item("steel_blend")));
@@ -51,7 +51,7 @@ public final class SinguloGameTests {
                 kiln.items().getStackInSlot(kiln.type().outputSlot()).is(item("steel_ingot")), "鋼鉄インゴットが出ない"));
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void kilnWithoutPowerWaits(GameTestHelper helper) {
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         kiln.energy().setEnergy(0);
@@ -62,7 +62,7 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void compressorMassModeMakesPellet(GameTestHelper helper) {
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         var recipes = MachineBlockEntity.massRecipes(helper.getLevel(), MachineType.COMPRESSOR);
@@ -84,7 +84,7 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void compressorMakesSteelPlate(GameTestHelper helper) {
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         compressor.items().setStackInSlot(0, new ItemStack(item("steel_ingot")));
@@ -92,7 +92,7 @@ public final class SinguloGameTests {
                 compressor.items().getStackInSlot(compressor.type().outputSlot()).is(item("steel_plate")), "鋼板が出ない"));
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void assemblerMakesQuantumModule(GameTestHelper helper) {
         MachineBlockEntity assembler = machine(helper, MachineType.PRECISION_ASSEMBLER);
         assembler.items().setStackInSlot(0, new ItemStack(item("entangled_element"), 5));
@@ -105,7 +105,7 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void electrolyzerSplitsWater(GameTestHelper helper) {
         MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
         electrolyzer.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
@@ -119,7 +119,7 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 500)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void archiveCopiesObservationLog(GameTestHelper helper) {
         MachineBlockEntity archive = machine(helper, MachineType.ARCHIVE_TERMINAL);
         archive.items().setStackInSlot(0, new ItemStack(item("observation_log")));
@@ -133,7 +133,7 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 500)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void archiveRestoresControlUnit(GameTestHelper helper) {
         MachineBlockEntity archive = machine(helper, MachineType.ARCHIVE_TERMINAL);
         archive.items().setStackInSlot(0, new ItemStack(item("degraded_control_unit")));
@@ -148,7 +148,7 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void usesWearAndRepairLimit(GameTestHelper helper) {
         ItemStack unit = new ItemStack(item("control_unit"));
         ItemStack worn = UsesHelper.consume(unit, 16);
@@ -170,7 +170,7 @@ public final class SinguloGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void thermoelectricCampfireBlueIce(GameTestHelper helper) {
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.CAMPFIRE);
@@ -185,7 +185,7 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void thermoelectricLavaMeltsIce(GameTestHelper helper) {
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.MAGMA_BLOCK);
@@ -194,7 +194,7 @@ public final class SinguloGameTests {
         helper.succeedWhenBlockPresent(Blocks.WATER, MACHINE.east());
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void copperWireCarriesPower(GameTestHelper helper) {
         BlockPos gen = new BlockPos(1, 1, 1);
         helper.setBlock(gen, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());

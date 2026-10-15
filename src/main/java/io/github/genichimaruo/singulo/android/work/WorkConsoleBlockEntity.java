@@ -2085,7 +2085,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             permit.deserializeNBT(tag.getCompound("permit"));
         }
         links.clear();
-        for (Tag t : tag.getList("links", Tag.TAG_INT_ARRAY)) {
+        for (Tag t : tag.getList("links", Tag.TAG_COMPOUND)) {
             io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(wrap(t), "p").ifPresent(links::add);
         }
         orders.clear();

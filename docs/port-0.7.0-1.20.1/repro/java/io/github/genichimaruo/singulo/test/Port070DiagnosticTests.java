@@ -12,7 +12,7 @@ import net.minecraftforge.gametest.*;
 @GameTestHolder("singulo_port_checks")
 @PrefixGameTestTemplate(false)
 public final class Port070DiagnosticTests {
-    private static void observe(GameTestHelper h) {
+    public static void observe(GameTestHelper h) {
         h.onEachTick(() -> {
             if (h.getTick() % 100 != 0 && h.getTick() != 1) return;
             var box = new AABB(h.absolutePos(new BlockPos(-1, -1, -1)), h.absolutePos(new BlockPos(17, 17, 17)));
@@ -23,6 +23,7 @@ public final class Port070DiagnosticTests {
                 if (entity instanceof RuinAndroid a) {
                     Singulo.LOGGER.info("PORT070_ANDROID active={} charge={} state={} work={} checkpoint={}",
                             a.active(), a.charge(), a.state(), a.isWorking(), a.saveWorkState());
+                    Singulo.LOGGER.info("PORT070_DAMAGE source={} attacker={}", a.getLastDamageSource(), a.getLastHurtByMob());
                 }
             }
         });

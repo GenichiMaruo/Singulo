@@ -39,7 +39,7 @@ public final class Port1201GameTests {
     }
 
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void stepHeightMatchesModernOneBlockHeight(GameTestHelper helper) {
         var warden = io.github.genichimaruo.singulo.registry.SinguloEntities.HORIZON_WARDEN.get().create(helper.getLevel());
         var android = io.github.genichimaruo.singulo.registry.SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
@@ -48,7 +48,7 @@ public final class Port1201GameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void chargerEnergyPersistsAndExposesCapability(GameTestHelper helper) {
         ItemStack charger = new ItemStack(SinguloItems.ANDROID_CHARGER.get());
         var energy = charger.getCapability(ForgeCapabilities.ENERGY).orElse(null);
@@ -62,7 +62,7 @@ public final class Port1201GameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void armorPlateAcceptsArmorEnchantments(GameTestHelper helper) {
         ItemStack plate = new ItemStack(SinguloItems.ANDROID_ARMOR_PLATE.get());
         var item = plate.getItem();
@@ -77,7 +77,7 @@ public final class Port1201GameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void afterglowWingsUseLegacyFlightHooks(GameTestHelper helper) {
         var wings = SinguloItems.AFTERGLOW_WINGS.get();
         ItemStack stack = new ItemStack(wings);
@@ -88,7 +88,7 @@ public final class Port1201GameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void automationLegacyItemsRoundTrip(GameTestHelper helper) {
         for (var upgrade : List.of(SinguloItems.ANDROID_MINING_UPGRADE.get(), SinguloItems.ANDROID_FELLING_UPGRADE.get())) {
             ItemStack stack = new ItemStack(upgrade);
@@ -114,7 +114,7 @@ public final class Port1201GameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void newPacketsRoundTripOnLegacyChannel(GameTestHelper helper) {
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
@@ -140,6 +140,18 @@ public final class Port1201GameTests {
         } finally {
             buffer.release();
         }
+        helper.succeed();
+    }
+    @GameTest(setupTicks = 20, template = "empty")
+    public static void workConsoleLinksSurviveLegacyNbt(GameTestHelper helper) {
+        var pos = new net.minecraft.core.BlockPos(2, 1, 2);
+        helper.setBlock(pos, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        var link = helper.absolutePos(new net.minecraft.core.BlockPos(3, 1, 2));
+        console.links().add(link);
+        var saved = console.saveWithFullMetadata();
+        console.load(saved);
+        helper.assertTrue(console.links().equals(List.of(link)), "Work console lost links across 1.20.1 compound-tag round-trip");
         helper.succeed();
     }
 }

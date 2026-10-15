@@ -59,7 +59,7 @@ public final class AndroidGameTests {
     }
 
     /** ステーションは、メモリとキットと電力で護衛を1体だけ印刷し、キットと電力を使う。印刷中は傷つかない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void stationPrintsOneGuard(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 3);
         helper.runAtTickTime(40, () -> {
@@ -78,7 +78,7 @@ public final class AndroidGameTests {
     }
 
     /** 護衛はプレイヤーの攻撃で傷つかず、ふつうのダメージでは傷つく。体力はコンパレーターに出る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 160)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 160)
     public static void guardIgnoresPlayersAndReportsHealth(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
         var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
@@ -102,7 +102,7 @@ public final class AndroidGameTests {
     }
 
     /** 転送アップグレードがあれば、倒れた護衛の持ち物はステーションへ送られ、次に印刷した護衛が持つ。 */
-    @GameTest(template = EMPTY, timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void transferUpgradePassesInventory(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 2);
         // A placed station belongs to its player; unrelated orphan fixtures must not block this reprint.
@@ -156,7 +156,7 @@ public final class AndroidGameTests {
     }
 
     /** 読み込みが外れただけ（見つからないだけ）の生きているアンドロイドは、倒した扱いにならない（設計メモリは出ない）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void fabricatorKeepsUnloadedAndroid(GameTestHelper helper) {
         BlockPos at = new BlockPos(2, 1, 2);
         BladeAndroid a = ruinAndroid(helper, at);
@@ -170,7 +170,7 @@ public final class AndroidGameTests {
     }
 
     /** 出撃したアンドロイドが全部倒されたら、設計メモリが1つだけ出る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 160)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 160)
     public static void fabricatorDropsMemoryWhenAllDefeated(GameTestHelper helper) {
         BlockPos at = new BlockPos(2, 1, 2);
         BladeAndroid a = ruinAndroid(helper, at);
@@ -187,7 +187,7 @@ public final class AndroidGameTests {
     }
 
     /** 護衛の技はボス・中立の動物・村人・プレイヤーに当たらず、敵対モブには当たる。遺構の技は仲間以外に当たる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void guardAttacksSpareBossesAndNeutrals(GameTestHelper helper) {
         var level = helper.getLevel();
         BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
@@ -209,7 +209,7 @@ public final class AndroidGameTests {
     }
 
     /** 出した護衛がいなくなっても、光柱は村人を傷つけず、敵対モブだけを傷つける。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void orphanGuardLaserSparesVillagers(GameTestHelper helper) {
         var level = helper.getLevel();
         helper.setBlock(new BlockPos(3, 1, 3), net.minecraft.world.level.block.Blocks.STONE);
@@ -240,7 +240,7 @@ public final class AndroidGameTests {
     }
 
     /** 同じ場所にステーションを置き直しても、前の護衛は身寄りのないアンドロイドになり、新しいステーションでリンクできる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void replacedStationRelinksOldGuard(GameTestHelper helper) {
         station(helper, 1);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
@@ -264,7 +264,7 @@ public final class AndroidGameTests {
      * 許可証: 持ち主と登録した人だけが操作でき、追従する人を登録した人から選べる。
      * 追従中「ついていくだけ」なら敵を狙わず、「護衛する」なら狙う。
      */
-    @GameTest(template = EMPTY, timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void permitAndFollowSettings(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
         var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
@@ -310,7 +310,7 @@ public final class AndroidGameTests {
     }
 
     /** 許可証から外された人は、開いていたアンドロイドの画面でも、名前の変更・解体・持ち物の出し入れができない。持ち主はできる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void removedMemberLosesAndroidScreen(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
         var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
@@ -346,7 +346,7 @@ public final class AndroidGameTests {
     }
 
     /** アンドロイドの画面で「追従のみ／追従・護衛」を切り替えると、ステーションの設定も変わり、上書きで戻らない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void androidScreenSwitchesEscort(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
@@ -365,7 +365,7 @@ public final class AndroidGameTests {
     }
 
     /** 生産アップグレードがあれば2体まで印刷する（1体目がステーションの上からどいてから、2体目を印刷する）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 600)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 600)
     public static void productionUpgradePrintsTwo(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 3);
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRODUCTION, new ItemStack(item("android_production_upgrade")));
@@ -379,7 +379,7 @@ public final class AndroidGameTests {
     }
 
     /** バッテリーアップグレード1個につき充電の満タンが50%増え、外すと満タンに合わせて減る。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void batteryUpgradeRaisesCharge(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
@@ -397,7 +397,7 @@ public final class AndroidGameTests {
     }
 
     /** 持ち物は位置ごと保存する（空きスロットがあってもずれない）。0.6.0 の保存も、装甲板を装甲板の場所へ戻す。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void androidInventoryKeepsSlots(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
@@ -473,7 +473,7 @@ public final class AndroidGameTests {
     }
 
     /** 素材が足りない注文は、計算で止まる（原木1本では棒16本は作れない）。在庫で足りれば作れる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void workPlanNeedsMaterials(GameTestHelper helper) {
         var console = workshop(helper, 1);
         ItemStack stick = new ItemStack(net.minecraft.world.item.Items.STICK);
@@ -485,7 +485,7 @@ public final class AndroidGameTests {
     }
 
     /** アンドロイドが資材口から原木を取り、作業台で板材と棒を作って、納品口へ棒を届ける。作業中は持ち物を取り出せない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidCraftsAndDelivers")
     public static void androidCraftsAndDelivers(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
@@ -541,7 +541,7 @@ public final class AndroidGameTests {
     }
 
     /** 加工モード: かまどに原鉄を上から入れ、焼けた鉄インゴットを下から取り出して、納品口へ届ける。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidSmeltsInFurnace")
     public static void androidSmeltsInFurnace(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
@@ -575,7 +575,7 @@ public final class AndroidGameTests {
     }
 
     /** 同じ種類の別の物も使うレシピ: 見本は樫の板材でも、素材置き場の白樺の板材から棒を作る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidCraftsWithVariants")
     public static void androidCraftsWithVariants(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
@@ -606,7 +606,7 @@ public final class AndroidGameTests {
     }
 
     /** 加工モードの燃料: かまどの燃料が切れていれば、素材置き場から記録した燃料（石炭）を取ってきて入れる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidFetchesFuel")
     public static void androidFetchesFuel(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
@@ -637,7 +637,7 @@ public final class AndroidGameTests {
     }
 
     /** 手順カードの採掘: 採掘アップグレードを積んだアンドロイドが、範囲の石を掘って丸石を集め、納品口へ届ける。積んでいなければ注文できない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidMinesWithProcedure")
     public static void androidMinesWithProcedure(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
@@ -663,7 +663,7 @@ public final class AndroidGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");
             helper.assertTrue(level.getBlockState(helper.absolutePos(from)).isAir() && level.getBlockState(helper.absolutePos(to)).isAir(),
-                    "範囲の石が掘られていない");
+                    "範囲の石が掘られていない: " + level.getBlockState(helper.absolutePos(from)) + " / " + level.getBlockState(helper.absolutePos(to)));
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
             a.discard();
         });
@@ -673,7 +673,7 @@ public final class AndroidGameTests {
      * 登録した注文（在庫を保つ）: 素材置き場の板材（1枚）が4枚を下回っているので、指令台が自分で注文し、原木から作って素材置き場へ入れる
      * （今ある板材を予約するだけで終わらせない）。
      */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_standingOrderKeepsStock")
     public static void standingOrderKeepsStock(GameTestHelper helper) {
         var console = workshop(helper, 2);
         net.minecraft.world.level.block.entity.ChestBlockEntity seed = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
@@ -699,7 +699,7 @@ public final class AndroidGameTests {
     }
 
     /** 登録した注文（信号で1回）: 信号が入るまでは注文せず、入ったら1回だけ注文して、納品口へ届ける。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_standingOrderOnPulse")
     public static void standingOrderOnPulse(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
@@ -719,7 +719,7 @@ public final class AndroidGameTests {
     }
 
     /** 作業中に襲われたら、襲ってきた相手を迎え撃ち、片付けたら作業に戻って注文を終える。 */
-    @GameTest(template = EMPTY, batch = "android_defense", timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_defense", timeoutTicks = 2400)
     public static void workingAndroidFightsBack(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
@@ -762,7 +762,7 @@ public final class AndroidGameTests {
     }
 
     /** 収穫: 育ちきった小麦を取って植え直し、小麦を納品口へ届ける。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidHarvestsAndReplants")
     public static void androidHarvestsAndReplants(GameTestHelper helper) {
         var console = workshop(helper, 0);
         for (int x = 0; x < 2; x++) {
@@ -786,7 +786,7 @@ public final class AndroidGameTests {
     }
 
     /** 収穫: 芽生えたアメジストの上の、育ちきった塊だけを取る（芽生えたアメジストは壊さない）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidHarvestsAmethyst")
     public static void androidHarvestsAmethyst(GameTestHelper helper) {
         var console = workshop(helper, 0);
         helper.setBlock(new BlockPos(1, 1, 6), net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST);
@@ -807,7 +807,7 @@ public final class AndroidGameTests {
     }
 
     /** 伐採: 伐採アップグレードを積んだアンドロイドが、木を丸ごと切って原木を届ける。積んでいなければ注文できない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidFellsTree")
     public static void androidFellsTree(GameTestHelper helper) {
         var console = workshop(helper, 0);
         helper.setBlock(new BlockPos(1, 0, 6), net.minecraft.world.level.block.Blocks.DIRT);
@@ -835,7 +835,7 @@ public final class AndroidGameTests {
     }
 
     /** 毛刈り: 範囲の羊の毛を刈り、落ちた羊毛を拾って届ける。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidShearsSheep")
     public static void androidShearsSheep(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var sheep = EntityType.SHEEP.create(helper.getLevel());
@@ -858,7 +858,7 @@ public final class AndroidGameTests {
     }
 
     /** 装飾: 着けた装飾はクライアントにも伝わり（描くため）、染めた色が使われる。枠に合わない物は入らない。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_androidWearsAccessories")
     public static void androidWearsAccessories(GameTestHelper helper) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
@@ -880,7 +880,7 @@ public final class AndroidGameTests {
 
 
     /** 満杯の納品箱へ少しずつ届けても、製作の余りを注文数に足さない。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_partialDeliveryKeepsSurplus")
     public static void partialDeliveryKeepsSurplus(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var planks = net.minecraft.world.item.Items.OAK_PLANKS;
@@ -925,7 +925,7 @@ public final class AndroidGameTests {
     }
 
     /** 流体の計算結果は、見本の個数ではなくmBで製作数と余りを表示する。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_fluidPlanUsesMillibuckets")
     public static void fluidPlanUsesMillibuckets(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
@@ -946,7 +946,7 @@ public final class AndroidGameTests {
     }
 
     /** 加工のバッチ投入では、充電10で原鉄を1個だけ投入し、その場で止まる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_processingStopsWhenChargeRunsOut")
     public static void processingStopsWhenChargeRunsOut(GameTestHelper helper) throws Exception {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
@@ -993,7 +993,7 @@ public final class AndroidGameTests {
 
 
     /** 一部製作済みで指令台と個体を再読込しても、最初の素材を二重に要求しない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidResumesCraftAfterReload")
     public static void androidResumesCraftAfterReload(GameTestHelper helper) {
         var console = workshop(helper, 1);
         BladeAndroid a = worker(helper, false);
@@ -1017,7 +1017,7 @@ public final class AndroidGameTests {
     }
 
     /** 転送後も、持ち主の物を資材として戻さず、作業用の物とタンクを引き継ぐ。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_transferredWorkKeepsPersonalSlotsAndFluids")
     public static void transferredWorkKeepsPersonalSlotsAndFluids(GameTestHelper helper) {
         var level = helper.getLevel();
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);
@@ -1048,7 +1048,7 @@ public final class AndroidGameTests {
 
 
     /** 1枠に2種類を投入できたと誤認せず、途中の再読込後は未投入の材料だけを入れる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_processingRemembersPartialInputs")
     public static void processingRemembersPartialInputs(GameTestHelper helper) throws Exception {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
@@ -1084,7 +1084,7 @@ public final class AndroidGameTests {
 
 
     /** 許可証から外された人の棚・納品口を閉じ、他人の指令台への付け替えも拒否する。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_workLinksEnforcePermissionChanges")
     public static void workLinksEnforcePermissionChanges(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
@@ -1127,7 +1127,7 @@ public final class AndroidGameTests {
     }
 
     /** 遮断ガラスはアンドロイドだけを止め、透過ガラスはアンドロイドだけを通す。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_androidGlassFiltersAndroids")
     public static void androidGlassFiltersAndroids(GameTestHelper helper) {
         BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         var pig = EntityType.PIG.create(helper.getLevel());
@@ -1145,7 +1145,7 @@ public final class AndroidGameTests {
     }
 
     /** 副産物で満杯でも目的の品を持ち、私物・後続材料は守る。満杯の装置出力は抜き捨てない。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_workOutputSurvivesFullCargo")
     public static void workOutputSurvivesFullCargo(GameTestHelper helper) throws Exception {
         var level = helper.getLevel();
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(level);

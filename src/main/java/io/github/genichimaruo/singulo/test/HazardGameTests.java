@@ -33,7 +33,7 @@ public final class HazardGameTests {
 
     private HazardGameTests() {}
 
-    @GameTest(template = EMPTY, timeoutTicks = 120)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 120)
     public static void strangeletConvertsBlocksAndBottleContainsIt(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 2, 3);
         for (BlockPos p : BlockPos.betweenClosed(new BlockPos(1, 1, 1), new BlockPos(5, 3, 5))) {
@@ -65,7 +65,7 @@ public final class HazardGameTests {
     }
 
     /** スキャナーは感度の段階に応じて鉱石を映す: 段階1は鉄まで、段階2でダイヤモンド、段階3で古代の残骸。遺構はいつでも映る。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void neutrinoScannerFindsOresAndRuins(GameTestHelper helper) {
         BlockPos iron = new BlockPos(1, 1, 1).offset(20000, 200, 20000);
         BlockPos diamond = new BlockPos(1, 1, 5).offset(20000, 200, 20000);
@@ -89,7 +89,7 @@ public final class HazardGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void hydrogenLeakNearFireExplodes(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());

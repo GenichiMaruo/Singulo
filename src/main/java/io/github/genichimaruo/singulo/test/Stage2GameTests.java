@@ -66,7 +66,7 @@ public final class Stage2GameTests {
         return controller;
     }
 
-    @GameTest(template = TALL, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 200)
     public static void coolingTowerMakesLiquidNitrogen(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
         BlockPos port = towerPort;
@@ -82,7 +82,7 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = TALL, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 300)
     public static void tallCoolingTowerLiquefiesHelium(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 10);
         tower.automationFluids().fill(new FluidStack(fluid("helium"), 1000), IFluidHandler.FluidAction.EXECUTE);
@@ -92,7 +92,7 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = TALL, timeoutTicks = 700)
+    @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 700)
     public static void coolingTowerMakesSuperconductingCoil(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
         // 30秒×400 FE/t は内部の蓄電を超えるので、電源の代わりに毎tick満たす
@@ -110,7 +110,7 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = TALL, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = TALL, timeoutTicks = 200)
     public static void coolingTowerBreaksWhenCasingRemoved(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
         helper.runAtTickTime(25, () -> {
@@ -125,7 +125,7 @@ public final class Stage2GameTests {
 
     // ------------------------------------------------------------------ 粒子加速器
 
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void acceleratorMakesMuonBundles(GameTestHelper helper) {
         int side = 8;
         for (int x = 0; x < side; x++) {
@@ -154,7 +154,7 @@ public final class Stage2GameTests {
 
     // ------------------------------------------------------------------ 触媒反応器と触媒
 
-    @GameTest(template = EMPTY, timeoutTicks = 500)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void catalyticReactorMakesMuonCatalyst(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.CATALYTIC_REACTOR).get());
@@ -171,7 +171,7 @@ public final class Stage2GameTests {
                 reactor.items().getStackInSlot(reactor.type().outputSlot()).is(item("muon_catalyst")), "ミュオン触媒が出ない"));
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void catalystTierRules(GameTestHelper helper) {
         ItemStack muon = new ItemStack(item("muon_catalyst"));
         ItemStack bose = new ItemStack(item("bose_condensate_catalyst"));
@@ -195,7 +195,7 @@ public final class Stage2GameTests {
 
     // ------------------------------------------------------------------ 発電・蓄電・送電
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void cryogenicTurbineRunsOnLavaAndNitrogen(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.CRYOGENIC_TURBINE.get());
@@ -212,7 +212,7 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void smesFeedsKilnThroughSuperconductingCable(GameTestHelper helper) {
         BlockPos smesPos = new BlockPos(1, 1, 4);
         helper.setBlock(smesPos, SinguloBlocks.SMES_CELL.get());
@@ -231,7 +231,7 @@ public final class Stage2GameTests {
 
     // ------------------------------------------------------------------ 特異点技術・収集
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void worldlineAnchorLoadsChunksWithCatalyst(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
@@ -249,7 +249,7 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void worldlineAnchorStopsWithoutPower(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
@@ -262,7 +262,7 @@ public final class Stage2GameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void cosmicMuonCollectorNeedsAltitude(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.COSMIC_MUON_COLLECTOR.get());

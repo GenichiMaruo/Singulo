@@ -53,7 +53,7 @@ public final class Stage5WormholeGameTests {
     /** ワームホール生成器（5×5×5 の球）を建てる。コントローラは (3,2,1)（下から2段目の手前の中央）、球は南（+Z）へ。 */
     private static final BlockPos GENERATOR = new BlockPos(3, 2, 1);
 
-    @GameTest(template = EMPTY, timeoutTicks = 260)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 260)
     public static void wormholeGeneratorMakesPairWithOneGigawattForTenSeconds(GameTestHelper helper) {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR, GENERATOR,
                 net.minecraft.core.Direction.SOUTH, 5);
@@ -72,7 +72,7 @@ public final class Stage5WormholeGameTests {
     }
 
     /** 外殻の代わりにマルチブロック搬入出ポートを置いても形成でき、ポートから電力を入れ、できた口を取り出せる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void wormholeGeneratorIoPortAnywhere(GameTestHelper helper) {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR, GENERATOR,
                 net.minecraft.core.Direction.SOUTH, 5);
@@ -88,7 +88,7 @@ public final class Stage5WormholeGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void stabilizerSealsMouthsAndRejectsExpiredOnes(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.WORMHOLE_STABILIZER.get());
@@ -117,7 +117,7 @@ public final class Stage5WormholeGameTests {
 
     // ------------------------------------------------------------------ 口とポート
 
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void wormholePortsLinkEnergyItemsAndFluids(GameTestHelper helper) {
         long pair = helper.getLevel().random.nextLong();
         BlockPos mouthA = new BlockPos(1, 1, 1);
@@ -166,7 +166,7 @@ public final class Stage5WormholeGameTests {
     }
 
     /** ポート番号がちがうとつながらず、そろえるとつながる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void wormholePortsLinkOnlyMatchingChannels(GameTestHelper helper) {
         long pair = helper.getLevel().random.nextLong();
         BlockPos mouthA = new BlockPos(1, 1, 1);
@@ -202,7 +202,7 @@ public final class Stage5WormholeGameTests {
     }
 
     /** 3×3 の喉で働けるポートは口に近い順に8個まで。9個目は止まり、光らない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void wormholeMouthRunsOnlyNearestPorts(GameTestHelper helper) {
         long pair = helper.getLevel().random.nextLong();
         BlockPos mouthA = new BlockPos(1, 1, 1);
@@ -241,7 +241,7 @@ public final class Stage5WormholeGameTests {
     }
 
     /** 燃料が切れても口は消えずに閉じて休み、エキゾチック物質を入れるとまた開く。 */
-    @GameTest(template = EMPTY, timeoutTicks = 800)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 800)
     public static void wormholeMouthClosesInsteadOfVanishing(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.WORMHOLE_MOUTH.get());
@@ -259,7 +259,7 @@ public final class Stage5WormholeGameTests {
     }
 
     /** 初めて置いた口は、燃料なしでも5分開いている。置き直した口は閉じた状態から。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void wormholeMouthFirstPlacementGrace(GameTestHelper helper) {
         ItemStack fresh = new ItemStack(SinguloBlocks.WORMHOLE_MOUTH.get());
         SinguloComponents.set(fresh, SinguloComponents.WORMHOLE.get(), new WormholeData(5, 0));
@@ -279,7 +279,7 @@ public final class Stage5WormholeGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void wormholeMouthUpkeepScalesWithThroatArea(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.WORMHOLE_MOUTH.get());
@@ -291,7 +291,7 @@ public final class Stage5WormholeGameTests {
 
     // ------------------------------------------------------------------ 重力閉じ込めタンク
 
-    @GameTest(template = EMPTY, timeoutTicks = 80)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 80)
     public static void containmentTankLeaksWithoutPowerAndKeepsContentsAsItem(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.CONTAINMENT_TANK.get());
@@ -322,7 +322,7 @@ public final class Stage5WormholeGameTests {
 
     // ------------------------------------------------------------------ マニピュレーター
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void manipulatorConeAndDarkMatterFuel(GameTestHelper helper) {
         ServerPlayer player = TestBuild.mockPlayer(helper);
         try {

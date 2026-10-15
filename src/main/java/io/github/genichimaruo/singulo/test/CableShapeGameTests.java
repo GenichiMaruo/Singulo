@@ -19,7 +19,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class CableShapeGameTests {
     private CableShapeGameTests() {}
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void straightCableKeepsProfile(GameTestHelper helper) {
         for (int z = 1; z <= 3; z++) {
             helper.setBlock(new BlockPos(3, 1, z), SinguloBlocks.TOPOLOGICAL_WIRE.get());

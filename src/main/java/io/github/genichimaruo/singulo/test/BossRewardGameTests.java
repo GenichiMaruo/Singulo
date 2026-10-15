@@ -74,7 +74,7 @@ public final class BossRewardGameTests {
     }
 
     /** ボスの落とし物は時間で消えず（無期限）、ほかのアイテムと結合しないので、ブラックホールよけの印も失わない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 80)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 80)
     public static void bossLootNeverDespawnsOrMerges(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         boss.setHealth(0);
@@ -95,7 +95,7 @@ public final class BossRewardGameTests {
     }
 
     /** ボスの経験値は、部屋にいる挑戦者へ直接入る（オーブにならないので、時間で消えず、ブラックホールにも吸われない）。 */
-    @GameTest(template = EMPTY, batch = "boss_reward_xp", timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_xp", timeoutTicks = 40)
     public static void bossExperienceGoesStraightToChallengers(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         ServerPlayer p = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 3))));
@@ -119,7 +119,7 @@ public final class BossRewardGameTests {
      * 経験値の合計は戦いの始めに決めた額のまま、部屋の挑戦者で等しく分ける（あとから増えた人がいても増えない。
      * 割り切れない分も消えない。クリエイティブは受け取らない）。
      */
-    @GameTest(template = EMPTY, batch = "boss_reward_xp_split", timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_xp_split", timeoutTicks = 40)
     public static void bossExperienceTotalIsSplitNotMultiplied(GameTestHelper helper) {
         double oldMultiplier = ServerConfig.BOSS_XP_MULTIPLIER.get();
         ServerConfig.BOSS_XP_MULTIPLIER.set(1.002);
@@ -153,7 +153,7 @@ public final class BossRewardGameTests {
     }
 
     /** 人数ぶんの報酬を切ると（bossLootPerPlayer=false）、3人で挑んでも経験値の合計は1人分（皆で分ける）。 */
-    @GameTest(template = EMPTY, batch = "boss_reward_xp_shared", timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_xp_shared", timeoutTicks = 40)
     public static void bossExperienceIsSharedWithoutPerPlayerLoot(GameTestHelper helper) {
         boolean oldPerPlayer = ServerConfig.BOSS_LOOT_PER_PLAYER.get();
         ServerConfig.BOSS_LOOT_PER_PLAYER.set(false);
@@ -180,7 +180,7 @@ public final class BossRewardGameTests {
     }
 
     /** 直接入る経験値でも、修繕の付いた傷んだ装備が直る（オーブを拾ったときと同じ）。 */
-    @GameTest(template = EMPTY, batch = "boss_reward_xp_mending", timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_xp_mending", timeoutTicks = 40)
     public static void bossExperienceRepairsMendingGear(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         ServerPlayer p = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 3))));
@@ -204,7 +204,7 @@ public final class BossRewardGameTests {
     }
 
     /** 部屋に誰もいなければ、経験値は核の上にオーブで出る。ブラックホールよけの印が付き、ふつうより長く残る。 */
-    @GameTest(template = EMPTY, batch = "boss_reward_xp_empty", timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_xp_empty", timeoutTicks = 40)
     public static void bossExperienceInAnEmptyRoomIsProtected(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         ServerPlayer far = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))).add(60, 0, 0));
@@ -231,7 +231,7 @@ public final class BossRewardGameTests {
     }
 
     /** 誰もいないときのオーブの値は、ふつうのオーブの値と重ならない（同じ値どうししか結合しないので、取り込まれない）。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void protectedOrbValuesNeverMatchVanilla(GameTestHelper helper) {
         for (int t = 1; t <= 100_000; t++) {
             helper.assertTrue(BossLoot.VANILLA_ORB_VALUES.contains(ExperienceOrb.getExperienceValue(t)),
@@ -252,7 +252,7 @@ public final class BossRewardGameTests {
     }
 
     /** 誰もいないときのオーブは、近くにふつうの経験値が出ても取り込まれず、保存し直しても印と長い寿命を保つ。 */
-    @GameTest(template = EMPTY, batch = "boss_reward_xp_merge", timeoutTicks = 120)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_xp_merge", timeoutTicks = 120)
     public static void protectedOrbsSurviveVanillaOrbsNearby(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         ServerPlayer far = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))).add(60, 0, 0));
@@ -298,7 +298,7 @@ public final class BossRewardGameTests {
     }
 
     /** 重力の裂け目は、予告の線の上（3本、長さ ±RIFT_REACH、床から4ブロックまで）にしか当たらない。向きを変えても同じ。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void riftOnlyHitsTheWarnedLines(GameTestHelper helper) {
         Vec3 c = new Vec3(0, 64, 0);
         for (double angle : new double[] {0, Math.PI / 3, 2 * Math.PI / 3}) {
@@ -323,7 +323,7 @@ public final class BossRewardGameTests {
     }
 
     /** 光弾は、ダメージと当たり方（防具で減るか）を保存し、読み込み直しても同じ強さで当たる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void boltKeepsItsDamageAcrossSaves(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         HorizonBolt bolt = new HorizonBolt(helper.getLevel(), boss).style(0x7FE8FF, 0.7F, 7).armored(true);
@@ -345,7 +345,7 @@ public final class BossRewardGameTests {
     }
 
     /** 叩きつけの落下で倒れたとき、受けたダメージと死亡の両方が戦闘の記録に残る（それぞれ1行）。 */
-    @GameTest(template = EMPTY, batch = "boss_reward_log", timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_log", timeoutTicks = 40)
     public static void fatalSlamIsLoggedAsDeath(GameTestHelper helper) {
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         boss.setNoAi(true);

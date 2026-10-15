@@ -24,7 +24,7 @@ public final class ManipulatorGameTests {
     private ManipulatorGameTests() {}
 
     /** ためるほど強く、ためきったら頭打ち。少し上向きに投げる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void manipulatorFlingScalesWithCharge(GameTestHelper helper) {
         Vec3 look = new Vec3(1, 0, 0);
         double weak = GravitonManipulatorItem.flingVelocity(look, 0).x;
@@ -37,7 +37,7 @@ public final class ManipulatorGameTests {
     }
 
     /** どのマルチブロックも部品表にコントローラー（1個）と部品があること。大きさもログに出す。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void multiblockPartLists(GameTestHelper helper) {
         for (Blueprints.Kind kind : Blueprints.Kind.values()) {
             Map<Block, Integer> parts = Blueprints.partCounts(kind);
@@ -59,7 +59,7 @@ public final class ManipulatorGameTests {
     }
 
     /** 右クリックでためて離すと、持ち上げたモブが前へ飛んでいき、1秒は持ち上げられない。 */
-    @GameTest(template = "huge", timeoutTicks = 140)
+    @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 140)
     public static void manipulatorChargeAndThrow(GameTestHelper helper) {
         var player = TestBuild.mockPlayer(helper);
         try {
@@ -102,7 +102,7 @@ public final class ManipulatorGameTests {
     }
 
     /** 円錐（G キー）で持ち上げていても、ためて離すと投げられる。 */
-    @GameTest(template = "huge", timeoutTicks = 140)
+    @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 140)
     public static void manipulatorThrowInConeMode(GameTestHelper helper) {
         var player = TestBuild.mockPlayer(helper);
         try {
