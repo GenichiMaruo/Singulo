@@ -144,7 +144,9 @@ public final class BossRoomGameTests {
             helper.assertBlockPresent(Blocks.AIR, p);
         }
         helper.runAtTickTime(30, () -> {
-            for (BlockPos p : PROJECTORS) helper.assertBlockPresent(Blocks.AIR, p);
+            // Physics may fill the hole (for example with falling gravel). The contract
+            // is that the projector stays destroyed and its damage reduction disappears.
+            for (BlockPos p : PROJECTORS) helper.assertBlockNotPresent(SinguloBlocks.ECHO_PROJECTOR.get(), p);
             helper.assertTrue(s.projectorCount() == 0, "壊した投影器を数え直さない: " + s.projectorCount() + ", entity ticks=" + s.tickCount + ", removed=" + s.isRemoved());
             float before = s.getHealth();
             s.hurt(helper.getLevel().damageSources().magic(), 20);

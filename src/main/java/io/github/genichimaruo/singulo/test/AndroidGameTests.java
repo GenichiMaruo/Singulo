@@ -44,6 +44,10 @@ public final class AndroidGameTests {
 
     /** 電力・設計メモリ・キットのあるステーションを置く。 */
     private static AndroidStationBlockEntity station(GameTestHelper helper, int kits) {
+        // A printed guard needs walkable ground beside the station to clear its top.
+        for (int x = 0; x < 8; x++) for (int z = 0; z < 8; z++) {
+            helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
+        }
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
         AndroidStationBlockEntity s = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, STATION);
         s.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);
@@ -376,14 +380,15 @@ public final class AndroidGameTests {
     }
 
     /** 生産アップグレードがあれば2体まで印刷する（1体目がステーションの上からどいてから、2体目を印刷する）。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 600)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 600, batch = "android_station_production")
     public static void productionUpgradePrintsTwo(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 3);
+        s.setOwner(java.util.UUID.randomUUID());
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRODUCTION, new ItemStack(item("android_production_upgrade")));
         helper.succeedWhen(() -> {
             List<RuinAndroid> list = androids(helper).stream().filter(RuinAndroid::isAlive).toList();
-            helper.assertTrue(list.size() == 2, "2体印刷されない: " + list.size());
+            helper.assertTrue(list.size() == 2, "2体印刷されない: " + list.size() + " station=" + s.saveWithoutMetadata());
             helper.assertTrue(list.stream().allMatch(a -> s.manages(a.getUUID())), "ステーションが2体とも受け持っていない");
             helper.assertTrue(s.items().getStackInSlot(AndroidStationBlockEntity.SLOT_KIT).getCount() == 1, "キットを2つ使っていない");
             list.forEach(RuinAndroid::discard);
@@ -525,7 +530,7 @@ public final class AndroidGameTests {
                     sticks += port.handler().getStackInSlot(i).getCount();
                 }
             }
-            helper.assertTrue(sticks == 8, "棒が8本届かない: " + sticks);
+            helper.assertTrue(sticks == 8, "棒が8本届かない: " + sticks + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " work=" + a.saveWorkState() + " message=" + console.message());
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
             helper.assertFalse(a.isWorking(), "注文が終わっても作業中のまま");
             // 作った板材は、資材置き場へ戻さずに、そのまま棒に使う
@@ -623,7 +628,7 @@ public final class AndroidGameTests {
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "白樺の板材で棒を注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない: health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " work=" + a.saveWorkState() + " message=" + console.message());
             a.discard();
         });
     }
@@ -738,7 +743,7 @@ public final class AndroidGameTests {
             console.onSignal(true);
             console.onSignal(false);
             helper.succeedWhen(() -> {
-                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない: health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " work=" + a.saveWorkState() + " message=" + console.message());
                 helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
                 a.discard();
             });
