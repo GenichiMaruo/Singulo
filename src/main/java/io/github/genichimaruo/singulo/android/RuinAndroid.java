@@ -1972,6 +1972,9 @@ public abstract class RuinAndroid extends Monster {
             entityData.set(PRINT, p + 1);
             setDeltaMovement(0, Math.min(0, getDeltaMovement().y), 0);
             if (p + 1 == PRINT_TICKS) {
+                if (guard && owner != null && level() instanceof ServerLevel server) {
+                    io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), owner, "android_printed");
+                }
                 playSound(SoundEvents.BEACON_ACTIVATE, 0.8F, 1.8F);
             } else if (p % 6 == 0) {
                 playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.4F, 1.4F + p / (float) PRINT_TICKS);

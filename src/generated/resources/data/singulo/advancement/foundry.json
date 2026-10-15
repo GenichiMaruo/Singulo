@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:factory_line"
+    },
+    "title": {
+      "translate": "advancement.singulo.foundry.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.foundry.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "defeat/foundry_overseer"
+      }
+    }
+  },
+  "parent": "singulo:lab_power"
+}

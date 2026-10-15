@@ -77,6 +77,24 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     @Override
+    public boolean shouldRender(RuinAndroid android, net.minecraft.client.renderer.culling.Frustum frustum,
+                                double x, double y, double z) {
+        if (super.shouldRender(android, frustum, x, y, z)) {
+            return true;
+        }
+        if (android instanceof BitAndroid bit && bit.deployed() > 0 && android.shouldRender(x, y, z)) {
+            // 本体が画面外でも、突進中のビットが見えるなら描く。当たり判定は変えない。
+            var bounds = android.getBoundingBox();
+            for (int i = 0; i < bit.deployed(); i++) {
+                Vec3 at = bit.bitPosition(i, 1);
+                bounds = bounds.minmax(new net.minecraft.world.phys.AABB(at, at).inflate(1));
+            }
+            return frustum.isVisible(bounds);
+        }
+        return false;
+    }
+
+    @Override
     public ResourceLocation getTextureLocation(RuinAndroid android) {
         return variant.texture;
     }
@@ -535,14 +553,13 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
         Vec3[] at = new Vec3[n];
         for (int i = 0; i < n; i++) {
-            at[i] = stowedOffset(i % BitAndroid.BITS, bodyYaw).lerp(BitAndroid.bitOffset(i, n, bodyYaw, age), out);
+            at[i] = stowedOffset(i % BitAndroid.BITS, bodyYaw).lerp(bit.bitPosition(i, partialTick).subtract(bit.getPosition(partialTick)), out);
         }
         VertexConsumer solid = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
         for (int i = 0; i < n; i++) {
             pose.pushPose();
             pose.translate(at[i].x, at[i].y, at[i].z);
-            pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
-            pose.mulPose(Axis.XP.rotationDegrees(-25 + 8 * Mth.sin(age * 0.1F + i)));
+            orientBit(pose, bit.bitDirection(i, partialTick));
             bitBody(pose, solid, light);
             pose.popPose();
         }
@@ -550,11 +567,18 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         for (int i = 0; i < n; i++) {
             pose.pushPose();
             pose.translate(at[i].x, at[i].y, at[i].z);
-            pose.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
-            pose.mulPose(Axis.XP.rotationDegrees(-25 + 8 * Mth.sin(age * 0.1F + i)));
+            orientBit(pose, bit.bitDirection(i, partialTick));
             float pulse = 0.75F + 0.25F * Mth.sin(age * 0.4F + i * 1.3F);
             glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent, (int) (200 * pulse));
             glowBox(pose, fx, -0.03F, -0.03F, 0.13F, 0.03F, 0.03F, 0.2F + 0.05F * pulse, variant.accent, (int) (120 * pulse));
+            if (bit.bladeOut(i, partialTick)) {
+                // 先端(-Z)に現れる光の刃。予備動作で伸び、飛び出す前に攻撃を知らせる。
+                float blade = Mth.clamp(bit.slashTime(partialTick) / BitAndroid.SLASH_WINDUP, 0, 1);
+                glowBox(pose, fx, -0.11F * blade, -0.022F, -0.26F - 0.65F * blade,
+                        0.11F * blade, 0.022F, -0.23F, BitAndroid.ACCENT, 170);
+                glowBox(pose, fx, -0.025F * blade, -0.01F, -0.26F - 0.62F * blade,
+                        0.025F * blade, 0.01F, -0.23F, 0xFFFFFF, 240);
+            }
             pose.popPose();
         }
         // 光線（撃った直後だけ、だんだん細く薄く）
@@ -564,8 +588,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             float k = Mth.clamp((flash - partialTick) / BitAndroid.FLASH, 0, 1);
             Vec3 to = bit.shotAt().subtract(bit.getPosition(partialTick));
             PoseStack.Pose p = pose.last();
-            FxDraw.beam(p, fx, at[shot], to, 0.16F * k + 0.04F, BitAndroid.BEAM, (int) (150 * k));
-            FxDraw.beam(p, fx, at[shot], to, 0.05F * k + 0.015F, 0xFFFFFF, (int) (240 * k));
+            FxDraw.beam(p, fx, bit.shotFrom().subtract(bit.getPosition(partialTick)), to, 0.16F * k + 0.04F, BitAndroid.BEAM, (int) (150 * k));
+            FxDraw.beam(p, fx, bit.shotFrom().subtract(bit.getPosition(partialTick)), to, 0.05F * k + 0.015F, 0xFFFFFF, (int) (240 * k));
             pose.pushPose();
             pose.translate(at[shot].x, at[shot].y, at[shot].z);
             Quaternionf camera = entityRenderDispatcher.cameraOrientation();
@@ -573,6 +597,17 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.billboard(pose, glow, camera, 0.35F * k + 0.1F, BitAndroid.BEAM, (int) (200 * k));
             pose.popPose();
         }
+    }
+
+    private static void orientBit(PoseStack pose, Vec3 direction) {
+        if (direction.lengthSqr() < 1e-6) {
+            return;
+        }
+        // モデルの前は-Z。ワールド方向へ合わせる（本体の向きから独立）。
+        float yaw = (float) Math.atan2(-direction.x, -direction.z);
+        float pitch = (float) Math.asin(Mth.clamp(direction.y, -1, 1));
+        pose.mulPose(Axis.YP.rotation(yaw));
+        pose.mulPose(Axis.XP.rotation(pitch));
     }
 
     /** ビットの本体（向きの座標。前は -Z）: 細長い菱形を、太さの違う箱を重ねて作る。 */

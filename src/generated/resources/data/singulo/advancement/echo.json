@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:echo_resonator"
+    },
+    "title": {
+      "translate": "advancement.singulo.echo.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.echo.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "defeat/echo_sentinel"
+      }
+    }
+  },
+  "parent": "singulo:ruin_research"
+}

@@ -17,7 +17,7 @@
     },
     {
       "id": "circuit",
-      "parent": "ceramic",
+      "parent": "steel",
       "stage": 1
     },
     {
@@ -32,12 +32,12 @@
     },
     {
       "id": "projector",
-      "parent": "circuit",
+      "parent": "compressor",
       "stage": 1
     },
     {
       "id": "archive",
-      "parent": "compressor",
+      "parent": "circuit",
       "stage": 1
     },
     {
@@ -47,7 +47,7 @@
     },
     {
       "id": "tower",
-      "parent": "ruin_observation",
+      "parent": "compressor",
       "stage": 2
     },
     {
@@ -82,7 +82,7 @@
     },
     {
       "id": "quantum",
-      "parent": "assembler",
+      "parent": "muon",
       "stage": 3
     },
     {
@@ -92,7 +92,7 @@
     },
     {
       "id": "ruin_research",
-      "parent": "quantum",
+      "parent": "ruin_observation",
       "stage": 3
     },
     {
@@ -117,12 +117,12 @@
     },
     {
       "id": "ruin_culture",
-      "parent": "bose",
+      "parent": "echo",
       "stage": 4
     },
     {
       "id": "crystal",
-      "parent": "ruin_culture",
+      "parent": "gravity",
       "stage": 4
     },
     {
@@ -142,12 +142,12 @@
     },
     {
       "id": "probe",
-      "parent": "crystal",
+      "parent": "ruin_research",
       "stage": 4
     },
     {
       "id": "ruin_final",
-      "parent": "exotic",
+      "parent": "gravity",
       "stage": 5
     },
     {
@@ -217,17 +217,17 @@
     },
     {
       "id": "awakened",
-      "parent": "core",
+      "parent": "warden",
       "stage": 5
     },
     {
       "id": "awakened_echo",
-      "parent": "hawking",
+      "parent": "echo",
       "stage": 5
     },
     {
       "id": "awakened_gravity",
-      "parent": "hawking",
+      "parent": "gravity",
       "stage": 5
     },
     {
@@ -269,6 +269,101 @@
       "id": "synth_legendary",
       "parent": "genesis_birth",
       "stage": 5
+    },
+    {
+      "id": "compass",
+      "parent": "archive",
+      "stage": 1
+    },
+    {
+      "id": "echo",
+      "parent": "ruin_research",
+      "stage": 3
+    },
+    {
+      "id": "gravity",
+      "parent": "ruin_culture",
+      "stage": 4
+    },
+    {
+      "id": "lab_power",
+      "parent": "echo",
+      "stage": 4
+    },
+    {
+      "id": "foundry",
+      "parent": "lab_power",
+      "stage": 4
+    },
+    {
+      "id": "ruin_android_lab",
+      "parent": "foundry",
+      "stage": 4
+    },
+    {
+      "id": "awakened_foundry",
+      "parent": "foundry",
+      "stage": 5
+    },
+    {
+      "id": "android_station",
+      "parent": "assembler",
+      "stage": 2
+    },
+    {
+      "id": "android_memory",
+      "parent": "android_station",
+      "stage": 2
+    },
+    {
+      "id": "android_printed",
+      "parent": "android_memory",
+      "stage": 2
+    },
+    {
+      "id": "android_charger",
+      "parent": "android_printed",
+      "stage": 2
+    },
+    {
+      "id": "android_work",
+      "parent": "android_printed",
+      "stage": 2
+    },
+    {
+      "id": "android_recipe",
+      "parent": "android_work",
+      "stage": 2
+    },
+    {
+      "id": "android_delivery",
+      "parent": "android_recipe",
+      "stage": 2
+    },
+    {
+      "id": "android_rack",
+      "parent": "android_recipe",
+      "stage": 2
+    },
+    {
+      "id": "android_routes",
+      "parent": "android_work",
+      "stage": 2
+    },
+    {
+      "id": "android_survey",
+      "parent": "android_routes",
+      "stage": 2
+    },
+    {
+      "id": "android_prototypes",
+      "parent": "foundry",
+      "stage": 4
+    },
+    {
+      "id": "android_factory_print",
+      "parent": "ruin_android_lab",
+      "stage": 4
     }
   ]
 }

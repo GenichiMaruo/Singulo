@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:android_kit"
+    },
+    "title": {
+      "translate": "advancement.singulo.android_printed.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.android_printed.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "android_printed"
+      }
+    }
+  },
+  "parent": "singulo:android_memory"
+}

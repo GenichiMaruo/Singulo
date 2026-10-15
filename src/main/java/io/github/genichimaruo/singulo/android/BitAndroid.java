@@ -1,6 +1,9 @@
 package io.github.genichimaruo.singulo.android;
 
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,12 +18,13 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 /**
  * ビット型アンドロイド「ノクス」。紺の髪に菫と水色の差し色。物静かで観察好き。
- * 背中と腰に小さなビット（ファンネルのような子機）を6基しまっていて、戦いになると体から分離して後ろに浮かび、レーザーを撃つ。
+ * 背中と腰に小さなビット（ファンネルのような子機）を6基しまっていて、戦いになると体から離れて追従して見え、レーザーと突進斬撃で戦う（別エンティティではない）。
  *
  * <ul>
  * <li>展開: 戦い始めに、ビットが4基（体力が半分を切ると6基）体から離れ、体の後ろに扇のように浮かぶ。戦いが終わると戻る。</li>
@@ -50,6 +54,28 @@ public class BitAndroid extends RuinAndroid {
     public static final float STAB_DAMAGE = 4;
     /** レーザーの光が残る tick。 */
     public static final int FLASH = 5;
+    /** 予備動作4tick、往路8tick、復路12tick。光線の3回に1回を置き換える（追加発射ではない）。 */
+    public static final int SLASH_WINDUP = 4, SLASH_OUT = 8, SLASH_RETURN = 12;
+    public static final int SLASH_DURATION = SLASH_WINDUP + SLASH_OUT + SLASH_RETURN;
+    public static final double SLASH_RANGE = 12;
+    public static final float SLASH_DAMAGE = 4.5F;
+    private static final int COST_SLASH = 36;
+
+    private static final EntityDataAccessor<BlockPos> SLASH_ORIGIN = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.BLOCK_POS);
+    private static final EntityDataAccessor<BlockPos> SHOT_ORIGIN = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.BLOCK_POS);
+    private static final EntityDataAccessor<Integer> SLASH_BIT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Long> SLASH_START = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Vector3f> SLASH_FROM = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3f> SLASH_AT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3f> SHOT_FROM = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
+
+    // 本体の一部。別エンティティ・当たり判定・独立した保存データは作らない。
+    // ワールド座標を保持するので、本体の旋回や歩行に即座に貼り付かない。
+    private final Vec3[] followers = new Vec3[BITS];
+    private final Vec3[] oldFollowers = new Vec3[BITS];
+    private float formationYaw;
+    private boolean formationReady;
+    private final Set<Integer> slashHits = new HashSet<>();
 
     static final int COST_DEPLOY = 120;
     static final int COST_SHOT = 18;
@@ -78,6 +104,13 @@ public class BitAndroid extends RuinAndroid {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DEPLOYED, 0);
+        builder.define(SLASH_ORIGIN, BlockPos.ZERO);
+        builder.define(SHOT_ORIGIN, BlockPos.ZERO);
+        builder.define(SLASH_BIT, -1);
+        builder.define(SLASH_START, 0L);
+        builder.define(SLASH_FROM, new Vector3f());
+        builder.define(SLASH_AT, new Vector3f());
+        builder.define(SHOT_FROM, new Vector3f());
         builder.define(SHOT_BIT, 0);
         builder.define(SHOT_FLASH, 0);
         builder.define(SHOT_AT, new Vector3f());
@@ -117,7 +150,7 @@ public class BitAndroid extends RuinAndroid {
 
     public Vec3 shotAt() {
         Vector3f v = entityData.get(SHOT_AT);
-        return new Vec3(v.x, v.y, v.z);
+        return Vec3.atLowerCornerOf(entityData.get(SHOT_ORIGIN)).add(new Vec3(v));
     }
 
     /**
@@ -140,17 +173,161 @@ public class BitAndroid extends RuinAndroid {
         }
     }
 
+    public Vec3 shotFrom() {
+        return Vec3.atLowerCornerOf(entityData.get(SHOT_ORIGIN)).add(new Vec3(entityData.get(SHOT_FROM)));
+    }
+
+    public int slashBit() {
+        return entityData.get(SLASH_BIT);
+    }
+
+    private Vec3 slashFrom() {
+        return Vec3.atLowerCornerOf(entityData.get(SLASH_ORIGIN)).add(new Vec3(entityData.get(SLASH_FROM)));
+    }
+
+    public Vec3 slashAim() {
+        return Vec3.atLowerCornerOf(entityData.get(SLASH_ORIGIN)).add(new Vec3(entityData.get(SLASH_AT)));
+    }
+
+    public float slashTime(float partialTick) {
+        return level().getGameTime() - entityData.get(SLASH_START) + partialTick;
+    }
+
+    public boolean bladeOut(int i, float partialTick) {
+        return i == slashBit() && slashTime(partialTick) < SLASH_WINDUP + SLASH_OUT;
+    }
+
+    /** 展開位置へ追いつくまで少し遅れる。瞬間移動時は長い残像を残さない。 */
+    private void tickFormation() {
+        if (!formationReady) {
+            formationYaw = yBodyRot;
+            formationReady = true;
+        }
+        formationYaw = Mth.rotLerp(0.14F, formationYaw, yBodyRot);
+        for (int i = 0; i < BITS; i++) {
+            Vec3 goal = position().add(bitOffset(i, Math.max(BITS_OUT, deployed()), formationYaw, tickCount));
+            if (followers[i] == null || followers[i].distanceToSqr(position()) > 64) {
+                followers[i] = goal;
+            }
+            oldFollowers[i] = followers[i];
+            followers[i] = followers[i].lerp(goal, 0.24);
+        }
+    }
+
+    /** 本体の相対座標に戻すのは描画の直前だけ。突進は同期した発射位置と狙いへ向かう。 */
+    public Vec3 bitPosition(int i, float partialTick) {
+        Vec3 follow = followers[i] == null ? position().add(bitOffset(i, Math.max(BITS_OUT, deployed()), yBodyRot, tickCount))
+                : oldFollowers[i].lerp(followers[i], partialTick);
+        if (i != slashBit()) {
+            return follow;
+        }
+        Vec3 from = slashFrom();
+        Vec3 to = slashAim();
+        float t = slashTime(partialTick);
+        if (t < SLASH_WINDUP) {
+            return from;
+        }
+        if (t < SLASH_WINDUP + SLASH_OUT) {
+            return from.lerp(to, Mth.clamp((t - SLASH_WINDUP) / SLASH_OUT, 0, 1));
+        }
+        float back = Mth.clamp((t - SLASH_WINDUP - SLASH_OUT) / SLASH_RETURN, 0, 1);
+        return to.lerp(follow, back * back * (3 - 2 * back));
+    }
+
+    /** 描画上の先端方向。突進中だけ狙った場所を向き、帰りは編隊へ戻る。 */
+    public Vec3 bitDirection(int i, float partialTick) {
+        if (i == slashBit()) {
+            Vec3 from = slashFrom();
+            Vec3 to = slashAim();
+            if (slashTime(partialTick) < SLASH_WINDUP + SLASH_OUT) {
+                return to.subtract(from).normalize();
+            }
+            return (followers[i] == null ? position() : followers[i]).subtract(bitPosition(i, partialTick)).normalize();
+        }
+        return Vec3.directionFromRotation(-25, formationYaw);
+    }
+
+    /** 狙いは発射時に固定。移動で避けられ、壁の向こうへ突き抜けない。 */
+    public boolean slash(ServerLevel level, int i, LivingEntity target) {
+        if (!active() || !canHit(target) || i < 0 || i >= deployed() || slashBit() >= 0) {
+            return false;
+        }
+        Vec3 from = bitPosition(i, 1);
+        Vec3 to = target.getBoundingBox().getCenter();
+        if (from.distanceTo(to) > SLASH_RANGE || blocked(level, from, to)) {
+            return false;
+        }
+        // 大きいワールド座標をfloatに詰めると小数が失われる。整数の基準点と近距離の差分を同期する。
+        entityData.set(SLASH_ORIGIN, blockPosition());
+        Vec3 origin = Vec3.atLowerCornerOf(blockPosition());
+        entityData.set(SLASH_FROM, from.subtract(origin).toVector3f());
+        entityData.set(SLASH_AT, to.subtract(origin).toVector3f());
+        entityData.set(SLASH_START, level.getGameTime());
+        entityData.set(SLASH_BIT, i);
+        slashHits.clear();
+        playSound(SoundEvents.BEACON_POWER_SELECT, 0.55F, 1.6F);
+        return true;
+    }
+
+    private boolean blocked(ServerLevel level, Vec3 from, Vec3 to) {
+        return level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() != HitResult.Type.MISS;
+    }
+
+    private void tickSlash(ServerLevel level) {
+        if (slashBit() < 0) {
+            return;
+        }
+        float t = slashTime(0);
+        if (!active() || !isAlive() || deployed() <= slashBit() || t >= SLASH_DURATION) {
+            entityData.set(SLASH_BIT, -1);
+            slashHits.clear();
+            return;
+        }
+        if (t <= SLASH_WINDUP || t > SLASH_WINDUP + SLASH_OUT) {
+            return;
+        }
+        Vec3 from = slashFrom();
+        Vec3 aim = slashAim();
+        Vec3 a = from.lerp(aim, (t - SLASH_WINDUP - 1) / SLASH_OUT);
+        Vec3 b = from.lerp(aim, (t - SLASH_WINDUP) / SLASH_OUT);
+        // 毎tick全経路を確認。突進中に置かれた壁も通り抜けない。
+        HitResult wall = level.clip(new ClipContext(from, b, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        if (wall.getType() != HitResult.Type.MISS) {
+            entityData.set(SLASH_AT, wall.getLocation().subtract(Vec3.atLowerCornerOf(entityData.get(SLASH_ORIGIN))).toVector3f());
+            entityData.set(SLASH_START, level.getGameTime() - SLASH_WINDUP - SLASH_OUT);
+            return;
+        }
+        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(a, b).inflate(0.35), this::canHit)) {
+            AABB box = e.getBoundingBox().inflate(0.25);
+            if (!slashHits.contains(e.getId()) && (box.contains(a) || box.clip(a, b).isPresent())
+                    && !blocked(level, a, e.getBoundingBox().getCenter())) {
+                slashHits.add(e.getId());
+                if (e.hurt(damageSources().mobAttack(this), SLASH_DAMAGE)) {
+                    playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 0.7F, 1.8F);
+                    sparks(level, e.getBoundingBox().getCenter(), 5, 0.15);
+                }
+            }
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide && shotFlash() > 0) {
-            entityData.set(SHOT_FLASH, shotFlash() - 1);
+        tickFormation();
+        if (level() instanceof ServerLevel level) {
+            if (shotFlash() > 0) {
+                entityData.set(SHOT_FLASH, shotFlash() - 1);
+            }
+            tickSlash(level);
         }
     }
 
     /** ビット i から相手へレーザーを撃つ（壁があれば撃たない）。撃てたか。 */
     public boolean fire(ServerLevel level, int i, LivingEntity target) {
-        Vec3 from = position().add(bitOffset(i, deployed(), yBodyRot, tickCount));
+        if (!active() || i < 0 || i >= deployed() || i == slashBit() || !canHit(target)) {
+            return false;
+        }
+        Vec3 from = bitPosition(i, 1);
         Vec3 to = target.getBoundingBox().getCenter();
         if (from.distanceTo(to) > FIRE_RANGE) {
             return false;
@@ -162,8 +339,11 @@ public class BitAndroid extends RuinAndroid {
         if (canHit(target)) {
             target.hurt(damageSources().mobAttack(this), BIT_DAMAGE);
         }
+        entityData.set(SHOT_ORIGIN, blockPosition());
+        Vec3 origin = Vec3.atLowerCornerOf(blockPosition());
+        entityData.set(SHOT_FROM, from.subtract(origin).toVector3f());
         entityData.set(SHOT_BIT, i);
-        entityData.set(SHOT_AT, new Vector3f((float) to.x, (float) to.y, (float) to.z));
+        entityData.set(SHOT_AT, to.subtract(origin).toVector3f());
         entityData.set(SHOT_FLASH, FLASH);
         playSound(SoundEvents.AMETHYST_BLOCK_CHIME, 0.7F, 1.9F);
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK, to.x, to.y, to.z, 4, 0.1, 0.1, 0.1, 0.1);
@@ -231,8 +411,16 @@ public class BitAndroid extends RuinAndroid {
             // 浮かんだビットの射撃（ほかの動きの最中も撃つ）
             if (deployed() > 0 && --fireCooldown <= 0) {
                 fireCooldown = deployed() >= BITS_OUT_ENRAGED ? FIRE_INTERVAL_ENRAGED : FIRE_INTERVAL;
-                if (hasLineOfSight(target) && spend(COST_SHOT)) {
-                    fire(level, shots++ % deployed(), target);
+                if (hasLineOfSight(target)) {
+                    int i = shots++ % deployed();
+                    if (shots % 3 == 0 && slashBit() < 0 && bitPosition(i, 1).distanceTo(target.getBoundingBox().getCenter()) <= SLASH_RANGE) {
+                        if (spend(COST_SLASH) && slash(level, i, target)) {
+                            // 命中後の通常の無敵時間が明けてから次の光線を撃つ。
+                            fireCooldown = Math.max(fireCooldown + 8, SLASH_WINDUP + SLASH_OUT + 10);
+                        }
+                    } else if (i != slashBit() && spend(COST_SHOT)) {
+                        fire(level, i, target);
+                    }
                 }
             }
             switch (s) {

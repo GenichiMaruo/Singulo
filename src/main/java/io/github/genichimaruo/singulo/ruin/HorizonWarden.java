@@ -1296,6 +1296,11 @@ public class HorizonWarden extends Monster {
         entityData.set(LASER, 0);
         entityData.set(SWEEP, 0);
         if (level() instanceof ServerLevel level) {
+            for (Player participant : rewardPlayers(level)) {
+                if (participant instanceof ServerPlayer player) {
+                    io.github.genichimaruo.singulo.registry.SinguloTriggers.milestone(player, "defeat/horizon_warden");
+                }
+            }
             playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.death"), 3.5F, 1.0F);
             if (console != null && level.getBlockEntity(console) instanceof SealConsoleBlockEntity c) {
                 c.onWardenDefeated(level);

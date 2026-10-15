@@ -19,12 +19,12 @@ CHAPTERS = [
          'material that opens the next stage. Read from "Stage 1" on the left to know what to build next.'),
         ('howto', 'このハンドブックの使い方',
          '・左の章を選ぶと、右にページが出ます。下の矢印でページをめくります。\n'
-         '・「進み具合」の章で、達成した目標と次の目標が分かります（進捗画面［L キー］の Singulo タブとも同じです）。\n'
+         '・「進み具合」の章は工業・探索・アンドロイドの枝に沿って、達成した目標と次の目標を示します（進捗画面［L キー］の Singulo タブとも同じです）。\n'
          '・アイテムにカーソルを合わせると説明が出ます。Shift を押すと作り方と使い道も出ます。\n'
          '・マルチブロックは「ホロ投影機」をコントローラに使うと、正しい形が半透明で浮かび上がります。',
          'Using this book',
          '- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the '
-         'bottom.\n- The Progress chapter shows the goals you have reached and the next ones (the same as the '
+         'bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the '
          'Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift '
          'to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller '
          'to show the correct shape as a translucent outline.'),
@@ -576,7 +576,7 @@ CHAPTERS = [
          '・斧型「アルマ」: 硬くて重い。斧を右へ引いたら広い薙ぎ払い、頭上へ振り上げたら床へ叩きつけて前へ一直線の衝撃波（跳べば当たらない）、'
          '低くかがんだら跳びかかって着地でまわりを叩きます。\n'
          '・ビット型「ノクス」: 背中の浮遊ビットを浮かべ、離れた所から光線で撃ってきます（体力が半分を切ると6基）。間合いを取ろうとし、'
-         '近づくと短剣で二連撃してから後ろへ跳びます。壁の陰に入れば光線は届きません。\n'
+         '近づくと短剣で二連撃してから後ろへ跳びます。ビットの先端に刃が光ったら、狙った場所へビット自体が突進して斬ります。予告を見て横へ避けましょう。壁は光線も突進も止めます。\n'
          'アンドロイドには充電があり、大技を10回ほど使うと切れて、目の光が消えます。近くの印刷台へ戻るか、昼の空の下ではソーラーパネルを広げ、夜や屋内では座り込んで充電します'
          '（印刷台5秒・太陽光10秒・座り込み14秒）。充電中は攻撃してこないので、攻めどきです。',
          'Ruin androids',
@@ -593,7 +593,7 @@ CHAPTERS = [
          '- Axe Android "Alma": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and '
          'sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n'
          '- Bit Android "Nox": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her '
-         'distance; get close and she stabs twice with a dagger, then hops back. Beams cannot reach you behind a wall.\n'
+         'distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\n'
          'Androids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar '
          'panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack '
          'while charging: your chance to strike.'),

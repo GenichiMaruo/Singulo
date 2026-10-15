@@ -108,6 +108,11 @@ public class ReactorConsoleBlockEntity extends BlockEntity {
         powered = true;
         setChanged();
         int n = LabPower.restore(level, area());
+        for (ServerPlayer player : players(level)) {
+            if (player.isAlive() && !player.isCreative() && !player.isSpectator()) {
+                io.github.genichimaruo.singulo.registry.SinguloTriggers.milestone(player, "lab_power");
+            }
+        }
         BlockState s = level.getBlockState(worldPosition);
         if (s.getBlock() instanceof ReactorConsoleBlock && !s.getValue(ReactorConsoleBlock.POWERED)) {
             level.setBlock(worldPosition, s.setValue(ReactorConsoleBlock.POWERED, true), Block.UPDATE_CLIENTS);
@@ -119,11 +124,15 @@ public class ReactorConsoleBlockEntity extends BlockEntity {
         io.github.genichimaruo.singulo.Singulo.LOGGER.debug("Lab power restored at {}: {} blocks", worldPosition, n);
     }
 
-    /** 施設の中のプレイヤーへ知らせる（施設内放送）。 */
-    private void broadcast(ServerLevel level, Component msg) {
+    private java.util.List<ServerPlayer> players(ServerLevel level) {
         BoundingBox b = area();
         AABB box = new AABB(b.minX(), b.minY(), b.minZ(), b.maxX() + 1, b.maxY() + 1, b.maxZ() + 1).inflate(8);
-        for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, box)) {
+        return level.getEntitiesOfClass(ServerPlayer.class, box);
+    }
+
+    /** 施設の中のプレイヤーへ知らせる（施設内放送）。 */
+    private void broadcast(ServerLevel level, Component msg) {
+        for (ServerPlayer p : players(level)) {
             p.sendSystemMessage(msg);
         }
     }

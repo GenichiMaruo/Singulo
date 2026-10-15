@@ -480,6 +480,12 @@ public abstract class RuinBoss extends Monster {
     public void die(DamageSource source) {
         super.die(source);
         if (level() instanceof ServerLevel level && !isMinion()) {
+            String bossId = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
+            for (Player participant : rewardPlayers(level)) {
+                if (participant instanceof ServerPlayer player) {
+                    io.github.genichimaruo.singulo.registry.SinguloTriggers.milestone(player, "defeat/" + bossId);
+                }
+            }
             GuardianCoreBlockEntity core = core(level);
             if (core != null) {
                 core.onBossDefeated(level);

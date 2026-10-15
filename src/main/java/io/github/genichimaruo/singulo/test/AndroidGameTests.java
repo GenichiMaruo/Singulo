@@ -133,12 +133,21 @@ public final class AndroidGameTests {
     }
 
     /** 転送アップグレードがあれば、倒れた護衛の持ち物はステーションへ送られ、次に印刷した護衛が持つ。 */
-    @GameTest(template = EMPTY, timeoutTicks = 400)
+    @GameTest(template = EMPTY, batch = "android_transfer_inventory", timeoutTicks = 400)
     public static void transferUpgradePassesInventory(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 2);
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_UPGRADE, new ItemStack(item("android_transfer_upgrade")));
-        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
-            RuinAndroid first = androids(helper).get(0);
+        boolean[] transferred = {false};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> current = androids(helper);
+            // 持ち物の引継ぎだけを調べる。足場のない空テンプレートから歩いて落ちるのを避ける。
+            current.forEach(a -> { a.setNoAi(true); a.setNoGravity(true); });
+            if (transferred[0] || helper.getTick() < RuinAndroid.PRINT_TICKS + 30
+                    || current.isEmpty() || !current.get(0).printed()) {
+                return;
+            }
+            RuinAndroid first = current.get(0);
+            transferred[0] = true;
             first.inventory().setItem(RuinAndroid.SLOT_REPAIR, new ItemStack(item("android_repair_kit"), 5));
             first.kill();
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
@@ -146,6 +155,7 @@ public final class AndroidGameTests {
                     "転送アップグレードがあるのに持ち物が落ちた");
         });
         helper.succeedWhen(() -> {
+            helper.assertTrue(transferred[0], "最初の護衛が印刷されない");
             // 同じ組で並んで動くほかのテストのアンドロイドは数えない（このステーションのものだけ）
             List<RuinAndroid> list = androids(helper).stream()
                     .filter(a -> a.isAlive() && helper.absolutePos(STATION).equals(a.home())).toList();

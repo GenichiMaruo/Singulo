@@ -2,7 +2,7 @@ name: PR validation
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feature/0.8.0]
 
 permissions:
   contents: read
@@ -28,10 +28,11 @@ jobs:
         run: |
           python3 tools/localization.py --check
           python3 tools/check_models.py
+          python3 tools/check_advancements.py
       - name: Build and run required GameTests
         shell: bash
         run: |
-          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestTickRate=20
+          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestTickRate=200
       - name: Require a completed nonempty successful GameTest run
         shell: bash
         run: |
@@ -52,7 +53,7 @@ jobs:
               raise SystemExit("No production JAR found")
           for path in jars:
               with zipfile.ZipFile(path) as jar:
-                  if any("GuiReviewHarness" in name for name in jar.namelist()):
+                  if any("GuiReviewHarness" in name or "Stage6ReviewHarness" in name for name in jar.namelist()):
                       raise SystemExit("Development GUI harness leaked into " + str(path))
           PY
       - name: Prepare disposable GUI review world
