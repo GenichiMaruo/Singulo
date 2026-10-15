@@ -81,7 +81,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 重力潮汐を受けたあと部屋の外へ出れば、低重力・落下無効はすぐ外れる。ボスが消えたときも、離れた所にいる人から外れる。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_tide")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_tide")
     public static void tideEffectsEndWhenLeavingOrWhenBossGoes(GameTestHelper helper) {
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
@@ -111,7 +111,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 力場が張られている間は、外にいる人に潮汐はかからない。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_tide_out")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_tide_out")
     public static void tideSparesPlayersOutsideTheShield(GameTestHelper helper) {
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
@@ -131,7 +131,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 読み込み直しても、力場の内側（壁の近く）にいた参加者は外へ追い出されない。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_reload")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_reload")
     public static void reloadKeepsParticipantsInside(GameTestHelper helper) {
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
@@ -156,7 +156,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 力場の外で待っている人は、強さにも数えず、戦いを続ける理由にもならない（中に誰もいなければ戦いは終わる）。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_outside")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_outside")
     public static void outsidersNeitherScaleNorHoldTheFight(GameTestHelper helper) {
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
@@ -176,7 +176,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 報酬の人数は戦いが始まったときの人数で決まる。終盤に合流しても、体力は増えるが報酬は増えない。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_rewards")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_rewards")
     public static void lateJoinersAddHealthButNotRewards(GameTestHelper helper) {
         var solo = SinguloEntities.ECHO_SENTINEL.get().create(helper.getLevel());
         solo.makeAwakened();
@@ -202,7 +202,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 設定で許される高い体力と大人数でも、保存・読み込みのあとで硬さが変わらない（最後の記録者とホライズン・ウォーデン）。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_health")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_health")
     public static void highHealthSettingsSurviveReload(GameTestHelper helper) {
         int oldHealth = ServerConfig.ARCHIVIST_HEALTH.get();
         int oldMax = ServerConfig.BOSS_MAX_SCALED_PLAYERS.get();
@@ -240,7 +240,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 床の欠けた所をホログラムで埋めても、戦いが終われば元の水に戻る。読み込み直したあとでも戻る。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_floor")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_floor")
     public static void temporaryFloorRestoresWater(GameTestHelper helper) {
         LastArchivist b = archivist(helper);
         BlockPos pos = b.home().offset(0, -3, 0);
@@ -263,7 +263,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 最後の記録者の報酬（光輪・翼など）も、戦いが始まったときの人数で決まる。中へ戻ってきた人で強さは増えても、報酬は増えない。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_hidden_rewards")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_hidden_rewards")
     public static void archivistRewardsUseTheLockedCount(GameTestHelper helper) {
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
@@ -290,7 +290,7 @@ public final class BossFairnessGameTests {
     }
 
     /** 潮汐が終わったあとの猶予の間に中へ来た人も、猶予が終われば落下無効が外れる。外へ出てボスが消えても残らない。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_tide_grace")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_tide_grace")
     public static void graceEntrantsAreReleasedToo(GameTestHelper helper) {
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
@@ -331,7 +331,7 @@ public final class BossFairnessGameTests {
      * 中にいた人を保存していない以前の版のデータでは、誰もいないうちに力場の処理が動いても、
      * あとから中でログインしてきた人は中の人のまま（別々に戻ってきても）。歩いて外から来た人は入れない。
      */
-    @GameTest(template = EMPTY, batch = "boss_fair_legacy")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_legacy")
     public static void legacySaveAdoptsPlayersWhoLogInInside(GameTestHelper helper) {
         LastArchivist original = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(original.home());
@@ -377,7 +377,7 @@ public final class BossFairnessGameTests {
      * 無敵時間はプレイヤーごと。6人がそれぞれ毎秒1回殴ると36回すべて通り、人数で増えた体力（3.5倍）より
      * 攻撃の数（6倍）が多いので、ソロより速く削れる。共有の無敵時間だと12回しか通らず、ソロより遅かった。
      */
-    @GameTest(template = EMPTY, batch = "boss_fair_hurt_party")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_hurt_party")
     public static void partyHitsAreAcceptedPerPlayer(GameTestHelper helper) {
         Vec3 c = LastArchivist.shieldCenter(helper.absolutePos(new BlockPos(3, 4, 3)));
         java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
@@ -424,7 +424,7 @@ public final class BossFairnessGameTests {
     }
 
     /** ひとりひとりにはバニラと同じ無敵時間がかかる（同じ人が0.5秒以内に同じ強さで殴っても通らない。強い攻撃は差の分だけ通る）。 */
-    @GameTest(template = EMPTY, batch = "boss_fair_hurt_single")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_hurt_single")
     public static void eachPlayerKeepsTheirOwnHurtWindow(GameTestHelper helper) {
         Vec3 c = LastArchivist.shieldCenter(helper.absolutePos(new BlockPos(3, 4, 3)));
         LastArchivist b = archivist(helper);
@@ -479,7 +479,7 @@ public final class BossFairnessGameTests {
      * 殻の軽減は、無敵時間の中でも外でも同じ。同じ人の同じ強さの連打は通らず、殻も減らない。
      * 強い連撃は軽減したあとの差だけ通り、殻は剥がれない。別の人の一撃は、それぞれ殻を1枚剥がす。
      */
-    @GameTest(template = EMPTY, batch = "boss_fair_shell")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_shell")
     public static void shellMitigationCannotBeSkippedByRepeating(GameTestHelper helper) {
         Vec3 c = Vec3.atCenterOf(helper.absolutePos(new BlockPos(3, 4, 3)));
         ServerPlayer a = survivor(helper, c.add(2, 0, 0));
@@ -512,7 +512,7 @@ public final class BossFairnessGameTests {
      * A: 環境の30のあとにプレイヤーの20が通っても、同じ環境の30はまだ通らない。
      * B: プレイヤーたちの攻撃が続いても、環境の無敵時間は環境の一撃からの時間だけで減っていく。
      */
-    @GameTest(template = EMPTY, batch = "boss_fair_shared_window")
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_shared_window")
     public static void playerHitsLeaveTheSharedWindowAlone(GameTestHelper helper) {
         Vec3 c = Vec3.atCenterOf(helper.absolutePos(new BlockPos(3, 4, 3)));
         ServerPlayer a = survivor(helper, c.add(2, 0, 0));

@@ -49,7 +49,7 @@ public final class Stage4GameTests {
 
     // ------------------------------------------------------------------ 混成ボーナス
 
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void mixedSourcesMakeMixedLv1AndEightMakeLv2(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
@@ -78,7 +78,7 @@ public final class Stage4GameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void plainLv1NeedsNine(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
@@ -93,7 +93,7 @@ public final class Stage4GameTests {
 
     // ------------------------------------------------------------------ 縮退圧縮炉・カシミール空洞
 
-    @GameTest(template = EMPTY, timeoutTicks = 1400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 1400)
     public static void compactorMakesDegenerateShell(GameTestHelper helper) {
         BlockPos controllerPos = new BlockPos(3, 2, 1);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.DEGENERATE_COMPACTOR, controllerPos, Direction.SOUTH, 5);
@@ -121,7 +121,7 @@ public final class Stage4GameTests {
         return m;
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 3000)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 3000)
     public static void casimirCavityMakesAxionThenExoticMatter(GameTestHelper helper) {
         MachineBlockEntity m = buildCavity(helper);
         m.items().setStackInSlot(0, new ItemStack(Items.NETHER_STAR));
@@ -140,7 +140,7 @@ public final class Stage4GameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void cavityNeedsVacuumBetweenMirrors(GameTestHelper helper) {
         MachineBlockEntity m = buildCavity(helper);
         helper.setBlock(new BlockPos(3, 3, 3), Blocks.STONE);   // 鏡面の間に物を置くと真空でなくなる
@@ -152,7 +152,7 @@ public final class Stage4GameTests {
 
     // ------------------------------------------------------------------ 時間結晶
 
-    @GameTest(template = EMPTY, timeoutTicks = 25_000)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 25_000)
     public static void incubatorPurityHalvesLifeWhenHalfUnderpowered(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.TIME_CRYSTAL_INCUBATOR).get());
@@ -189,7 +189,7 @@ public final class Stage4GameTests {
         return controllerRel;
     }
 
-    @GameTest(template = LARGE, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = LARGE, timeoutTicks = 100)
     public static void degenerateFurnaceBurnsLv2With5MFE(GameTestHelper helper) {
         // コントローラは (3,2,1)、炉は南（+Z）へ。手前の面の最上段（高さ y=1+5）の外装板をポートにし、その前に蓄電池を置く
         BlockPos controllerPos = buildFurnace(helper, new BlockPos(3, 2, 1), new BlockPos(3, 6, 1));
@@ -209,7 +209,7 @@ public final class Stage4GameTests {
     }
 
     /** 縮退熱炉: 枠の位置にポートを置くと形成されない。中に入れない（中の空気の部屋は囲まれている）。 */
-    @GameTest(template = LARGE, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = LARGE, timeoutTicks = 60)
     public static void degenerateFurnaceRejectsPortOnFrame(GameTestHelper helper) {
         BlockPos controllerPos = buildFurnace(helper, new BlockPos(3, 2, 1), new BlockPos(1, 4, 1));
         DegenerateFurnaceBlockEntity f = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controllerPos);
@@ -221,7 +221,7 @@ public final class Stage4GameTests {
 
     // ------------------------------------------------------------------ 送電・蓄電
 
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void cableNetworkIsLimitedByThinnestCable(GameTestHelper helper) {
         // SMESモジュール → トポロジカル導線 → 銅導線 → トポロジカル導線 → SMESモジュール。銅導線（2 kFE/t）で頭打ちになる
         BlockPos from = new BlockPos(1, 1, 5);
@@ -241,7 +241,7 @@ public final class Stage4GameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void topologicalWireCarries100MFE(GameTestHelper helper) {
         BlockPos from = new BlockPos(1, 1, 4);
         BlockPos to = new BlockPos(1, 1, 1);
@@ -261,7 +261,7 @@ public final class Stage4GameTests {
 
     // ------------------------------------------------------------------ 自動探査機
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void probeStationFetchesFromDiscoveredObservationPost(GameTestHelper helper) {
         ServerPlayer player = TestBuild.mockPlayer(helper);
         try {

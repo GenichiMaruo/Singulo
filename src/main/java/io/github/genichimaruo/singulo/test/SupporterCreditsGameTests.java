@@ -22,7 +22,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class SupporterCreditsGameTests {
     private SupporterCreditsGameTests() {}
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void bundledRosterIsValid(GameTestHelper helper) throws Exception {
         try (var stream = SupporterCredits.class.getResourceAsStream("/assets/singulo/supporters.json")) {
             helper.assertTrue(stream != null, "Bundled supporter roster is missing");
@@ -34,7 +34,7 @@ public final class SupporterCreditsGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void allHundredNamesSurvivePaging(GameTestHelper helper) {
         List<Entry> entries = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
@@ -55,7 +55,7 @@ public final class SupporterCreditsGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void unicodeNamesAndBothTiersLoad(GameTestHelper helper) {
         Catalog roster = SupporterCredits.read(new StringReader("""
                 {"supporters":[
@@ -70,7 +70,7 @@ public final class SupporterCreditsGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void invalidRostersAreRejected(GameTestHelper helper) {
         for (String invalid : List.of("{}", "null", "[]", "{\"supporters\":[null]}",
                 "{\"supporters\":[{\"id\":1,\"name\":\"name\",\"tier\":\"standard\"}]}",

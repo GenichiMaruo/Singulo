@@ -43,6 +43,20 @@ public final class Legacy {
                 public void testPassed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
                 public void testFailed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
                 private void cleanup() {
+                    // Automatic orders search nearby workers. Stop this completed fixture before
+                    // the next batch places another workshop inside that search radius.
+                    var level = helper.getLevel();
+                    var origin = helper.absolutePos(net.minecraft.core.BlockPos.ZERO);
+                    var bounds = new net.minecraft.world.phys.AABB(origin, helper.absolutePos(new net.minecraft.core.BlockPos(8, 8, 8)));
+                    for (var android : level.getEntitiesOfClass(io.github.genichimaruo.singulo.android.RuinAndroid.class, bounds)) {
+                        android.discard();
+                    }
+                    for (var pos : net.minecraft.core.BlockPos.betweenClosed(origin, helper.absolutePos(new net.minecraft.core.BlockPos(7, 7, 7)))) {
+                        if (level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console) {
+                            console.orders().clear();
+                            console.standing().clear();
+                        }
+                    }
                     server.getPlayerList().remove(player);
                     if (connection.channel() instanceof io.netty.channel.embedded.EmbeddedChannel channel) channel.finishAndReleaseAll();
                 }

@@ -32,7 +32,7 @@ public final class ExtrasGameTests {
     private ExtrasGameTests() {}
 
     /** ブラックホール爆弾の小さなブラックホールは、近くのモブを飲み込み、時間がたつと消える。 */
-    @GameTest(template = EMPTY, timeoutTicks = MicroBlackHole.LIFE + 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = MicroBlackHole.LIFE + 40)
     public static void microBlackHoleSwallowsAndVanishes(GameTestHelper helper) {
         Vec3 at = helper.absoluteVec(new Vec3(4, 3, 4));
         MicroBlackHole hole = new MicroBlackHole(SinguloEntities.MICRO_BLACK_HOLE.get(), helper.getLevel());
@@ -47,7 +47,7 @@ public final class ExtrasGameTests {
     }
 
     /** 野良ブラックホールは、質量が小さくなると蒸発しきって消える。 */
-    @GameTest(template = EMPTY, timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void rogueBlackHoleEvaporates(GameTestHelper helper) {
         BlockPos pos = new BlockPos(4, 4, 4);
         helper.setBlock(pos, SinguloBlocks.ROGUE_BLACK_HOLE.get());
@@ -57,7 +57,7 @@ public final class ExtrasGameTests {
     }
 
     /** 野良ブラックホールの寿命は、質量5000でおよそ6時間。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void rogueBlackHoleLifetimeIsAboutSixHours(GameTestHelper helper) {
         double m = 5000;
         double seconds = m * m * m / (3 * RogueBlackHoleBlockEntity.EVAPORATION_K);
@@ -66,7 +66,7 @@ public final class ExtrasGameTests {
     }
 
     /** 設定カード: スニークして写し、ほかの装置に貼ると、面の設定が同じになる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void settingsCardCopiesSides(GameTestHelper helper) {
         BlockPos a = new BlockPos(2, 1, 2);
         BlockPos b = new BlockPos(5, 1, 2);

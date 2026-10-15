@@ -17,7 +17,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class ForgeCompatibilityGameTests {
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void capabilitySurvivesInvalidationAndRevival(GameTestHelper helper) {
         var pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, io.github.genichimaruo.singulo.registry.SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
@@ -32,7 +32,7 @@ public final class ForgeCompatibilityGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void flightIsGrantedAndRevokedWithoutRemovingOtherFlight(GameTestHelper helper) {
         var player = TestBuild.mockPlayer(helper);
         try {
@@ -55,7 +55,7 @@ public final class ForgeCompatibilityGameTests {
         }
     }
 
-    @GameTest(template = "empty", timeoutTicks = 20)
+    @GameTest(setupTicks = 20, template = "empty", timeoutTicks = 20)
     public static void explosionResistanceSuppressesImpulse(GameTestHelper helper) {
         var zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 3, 3));
         zombie.setNoAi(true);

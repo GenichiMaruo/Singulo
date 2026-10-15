@@ -105,7 +105,7 @@ public final class ReactorGameTests {
         return reactor;
     }
 
-    @GameTest(template = HUGE, batch = BATCH)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH)
     public static void accretionEfficiencyFollowsSpin(GameTestHelper helper) {
         double still = PenroseReactorBlockEntity.efficiency(0);
         double extremal = PenroseReactorBlockEntity.efficiency(1);
@@ -116,7 +116,7 @@ public final class ReactorGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 100)
     public static void reactorFormsAndPortsForwardEnergy(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         helper.succeedWhen(() -> {
@@ -128,7 +128,7 @@ public final class ReactorGameTests {
         });
     }
 
-    @GameTest(template = HUGE, batch = BATCH + "_ignition", timeoutTicks = 420)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_ignition", timeoutTicks = 420)
     public static void ignitionNeeds50GFEWithinTenSeconds(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
@@ -192,7 +192,7 @@ public final class ReactorGameTests {
     }
 
     /** 抽出ポートと炉心質量警報器はリングの炉殻のどこに置いてもよく、警報器は質量が上限に達すると赤石信号を出す。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 100)
     public static void portsAndAlarmsAnywhereOnRings(GameTestHelper helper) {
         build(helper);
         java.util.List<BlockPos> shells = Structures.reactorLayout(CENTER).entrySet().stream()
@@ -215,7 +215,7 @@ public final class ReactorGameTests {
         });
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 400)
     public static void ignitionFailsWithoutEnoughPowerButKeepsSeed(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
@@ -229,7 +229,7 @@ public final class ReactorGameTests {
         });
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 200)
     public static void eddingtonLimitCapsFuel(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
@@ -246,7 +246,7 @@ public final class ReactorGameTests {
     }
 
     /** リングの内側に入ったものは中心へ吸い込まれ、どんなに頑丈でも（無敵・耐性・体力・不死のトーテム）必ず死ぬ。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 200)
     public static void eventHorizonKillsEvenTheToughest(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
@@ -263,7 +263,7 @@ public final class ReactorGameTests {
 
     /** リングの外にいるものは少し引き寄せられるだけで、吸い込まれたり死んだりはしない。 */
     // 同じ組のほかの炉心（蒸発の爆発など）に巻き込まれないよう、1つだけの組で動かす
-    @GameTest(template = HUGE, batch = BATCH + "_outside", timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH + "_outside", timeoutTicks = 200)
     public static void outsideTheRingsOnlyWeakPull(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
@@ -279,7 +279,7 @@ public final class ReactorGameTests {
         });
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 400)
     public static void smallCoreEvaporatesAndBursts(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(104, 0));
@@ -329,7 +329,7 @@ public final class ReactorGameTests {
         }).thenSucceed();
     }
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 100)
     public static void tidalZoneAndPull(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, CENTER.offset(2, 0, 0));
@@ -352,7 +352,7 @@ public final class ReactorGameTests {
     }
 
     /** 回収運転: 質量が上限（480）を超えるならペレットを入れず、H凝縮体のできる質量に保つ。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 200)
     public static void harvestModeKeepsMassBelowCeiling(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
@@ -369,7 +369,7 @@ public final class ReactorGameTests {
     }
 
     /** 回収運転: 育ちすぎた炉心は毎秒2ずつ質量を放出して戻る。 */
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 200)
     public static void harvestModeShedsOvergrownCore(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> {
@@ -383,7 +383,7 @@ public final class ReactorGameTests {
         });
     }
 
-    @GameTest(template = "empty", timeoutTicks = 6200)
+    @GameTest(setupTicks = 20, template = "empty", timeoutTicks = 6200)
     public static void encapsulatorMakesSingularityCore(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.SINGULARITY_ENCAPSULATOR).get());
@@ -401,7 +401,7 @@ public final class ReactorGameTests {
 
     // ------------------------------------------------------------------ ダークマター
 
-    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 120)
+    @GameTest(setupTicks = 20, template = HUGE, batch = BATCH, timeoutTicks = 120)
     public static void haloCollectorGathersDarkMatterAndCoreAcceptsIt(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         BlockPos collectorPos = new BlockPos(1, 1, 1);
@@ -434,7 +434,7 @@ public final class ReactorGameTests {
     }
 
     /** ペレットでは炉心質量が上限を超えない（投入間隔を最短にしても、崩壊は起きない）。 */
-    @GameTest(template = HUGE, batch = "reactor_feed", timeoutTicks = 120)
+    @GameTest(setupTicks = 20, template = HUGE, batch = "reactor_feed", timeoutTicks = 120)
     public static void pelletsNeverOverfillCore(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
@@ -454,7 +454,7 @@ public final class ReactorGameTests {
      * 物を投げ込んで質量が上限を大きく超えると、炉が崩壊して中心に野良ブラックホールが残り、コントローラも消える。
      * 同じ場所にリアクターを組み直すと、野良ブラックホールを炉心として取り込む。
      */
-    @GameTest(template = HUGE, batch = "reactor_collapse", timeoutTicks = 320)
+    @GameTest(setupTicks = 20, template = HUGE, batch = "reactor_collapse", timeoutTicks = 320)
     public static void overfilledReactorCollapsesAndCanBeRecaptured(GameTestHelper helper) {
         PenroseReactorBlockEntity r = build(helper);
         double start = PenroseReactorBlockEntity.MAX_MASS + PenroseReactorBlockEntity.COLLAPSE_MARGIN - 0.5;

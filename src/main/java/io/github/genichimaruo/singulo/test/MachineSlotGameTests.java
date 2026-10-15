@@ -33,7 +33,7 @@ public final class MachineSlotGameTests {
         return BuiltInRegistries.ITEM.get(Singulo.id(id));
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void catalystsOnlyGoIntoCatalystSlot(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
@@ -55,7 +55,7 @@ public final class MachineSlotGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void monopoleUpgradeDoublesSpeed(GameTestHelper helper) {
         BlockPos a = new BlockPos(1, 1, 3);
         BlockPos b = new BlockPos(5, 1, 3);
@@ -78,7 +78,7 @@ public final class MachineSlotGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void sideConfigAndAutoEject(GameTestHelper helper) {
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get()

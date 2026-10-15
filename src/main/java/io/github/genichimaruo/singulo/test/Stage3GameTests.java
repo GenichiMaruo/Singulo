@@ -51,7 +51,7 @@ public final class Stage3GameTests {
         be.automationFluids().fill(new FluidStack(SinguloFluids.get(fluid), amount), IFluidHandler.FluidAction.EXECUTE);
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 700)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 700)
     public static void synthesizerMakesEntangledPairs(GameTestHelper helper) {
         MachineBlockEntity m = poweredMachine(helper, MachineType.ENTANGLEMENT_SYNTHESIZER);
         m.items().setStackInSlot(0, new ItemStack(Items.QUARTZ, 2));
@@ -66,7 +66,7 @@ public final class Stage3GameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void laserCoolerMakesColdAtoms(GameTestHelper helper) {
         MachineBlockEntity m = poweredMachine(helper, MachineType.LASER_COOLER);
         m.items().setStackInSlot(0, new ItemStack(item("stardust")));
@@ -80,7 +80,7 @@ public final class Stage3GameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 900)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 900)
     public static void laserCoolerMakesBoseCatalystFromSpentMuon(GameTestHelper helper) {
         MachineBlockEntity m = poweredMachine(helper, MachineType.LASER_COOLER);
         m.items().setStackInSlot(0, new ItemStack(item("cold_atoms"), 4));
@@ -93,7 +93,7 @@ public final class Stage3GameTests {
                 "失活したミュオン触媒からボース凝縮触媒ができない"));
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 2500)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2500)
     public static void echoResonatorCopiesShardKeepingTemplate(GameTestHelper helper) {
         MachineBlockEntity m = poweredMachine(helper, MachineType.ECHO_RESONATOR);
         m.items().setStackInSlot(0, new ItemStack(Items.ECHO_SHARD));
@@ -108,7 +108,7 @@ public final class Stage3GameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void quantumHeatEngineOutputDependsOnCatalystTier(GameTestHelper helper) {
         BlockPos a = new BlockPos(1, 1, 1);
         BlockPos b = new BlockPos(5, 1, 5);
@@ -153,18 +153,18 @@ public final class Stage3GameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void inertialStabilizerStopsExplosionDamage(GameTestHelper helper) {
         blastDirt(helper, true);
     }
 
     /** 対照: 電力のないスタビライザーは守らない（同じ爆発で土が壊れることの確認）。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void unpoweredStabilizerDoesNotProtect(GameTestHelper helper) {
         blastDirt(helper, false);
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void gauntletTargetsAndCharging(GameTestHelper helper) {
         helper.assertTrue(GravityGauntletItem.canAffect(helper.spawn(EntityType.ZOMBIE, POS)), "ゾンビ（HP20）を操れない");
         helper.assertTrue(!GravityGauntletItem.canAffect(helper.spawn(EntityType.IRON_GOLEM, POS.east(2))),

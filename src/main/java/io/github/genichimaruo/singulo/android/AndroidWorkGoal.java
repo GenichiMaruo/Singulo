@@ -625,7 +625,7 @@ final class AndroidWorkGoal extends Goal {
     private boolean refuel(ServerLevel level, WorkConsoleBlockEntity c, BlockPos machine, RecipeData r) {
         ItemStack fuel = r.fuel();
         if (carriedCount(fuel.getItem()) > 0) {
-            net.minecraftforge.items.IItemHandler side = io.github.genichimaruo.singulo.compat.Capabilities.get(level, 
+            net.minecraftforge.items.IItemHandler side = io.github.genichimaruo.singulo.compat.Capabilities.get(level,
                     io.github.genichimaruo.singulo.compat.Capabilities.ItemHandler.BLOCK, machine, fuelSide(machine, r));
             if (side != null && insertFromCarry(side, fuel, carriedCount(fuel.getItem())) > 0) {
                 stalled = 0;

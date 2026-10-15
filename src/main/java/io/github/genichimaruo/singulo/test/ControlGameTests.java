@@ -35,7 +35,7 @@ public final class ControlGameTests {
     private ControlGameTests() {}
 
     /** 電力が通った道のケーブルだけが、入ってきた面と出ていった面を記録する（行き止まりの枝は光らない）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void cableRecordsOnlyTheActualPath(GameTestHelper helper) {
         BlockPos gen = new BlockPos(1, 1, 1);
         helper.setBlock(gen, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
@@ -62,7 +62,7 @@ public final class ControlGameTests {
     }
 
     /** 電源を切った装置は動かず、入れ直すと動く。 */
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void powerSwitchStopsMachine(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
@@ -82,7 +82,7 @@ public final class ControlGameTests {
     }
 
     /** 材料なしのレシピ（電力だけで作るもの）を見分けられる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void freeRecipesAreRecognized(GameTestHelper helper) {
         var recipes = helper.getLevel().getRecipeManager().getAllRecipesFor(
                 io.github.genichimaruo.singulo.registry.SinguloRecipes.MACHINE.get());
@@ -95,7 +95,7 @@ public final class ControlGameTests {
     }
 
     /** 電解槽は、タンクごとに面を決められる: 水を入れる面、水素と酸素を出す面を別々に。 */
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void electrolyzerOutputsEachGasOnItsOwnFace(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
@@ -132,7 +132,7 @@ public final class ControlGameTests {
     }
 
     /** ウォーデンと警備ドローンは互いの攻撃で傷つかず、互いを味方とみなす。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void guardsDoNotHurtEachOther(GameTestHelper helper) {
         HorizonWarden warden = helper.spawn(SinguloEntities.HORIZON_WARDEN.get(), new BlockPos(2, 1, 2));
         SecurityDrone drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(6, 2, 6));
@@ -148,7 +148,7 @@ public final class ControlGameTests {
     }
 
     /** ウォーデンは、飛んでくるブラックホール爆弾を届く前に打ち返し、近くでは開かせない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 120)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 120)
     public static void wardenDeflectsBlackHoleBomb(GameTestHelper helper) {
         HorizonWarden warden = helper.spawn(SinguloEntities.HORIZON_WARDEN.get(), new BlockPos(4, 1, 4));
         Zombie thrower = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 1, 0));
