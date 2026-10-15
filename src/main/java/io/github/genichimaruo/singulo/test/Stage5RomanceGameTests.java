@@ -61,6 +61,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void timeFieldsDilateAccelerateAndCancel(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Level level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(10004, 1, 10004));
         BlockPos reactor = helper.absolutePos(new BlockPos(10000, 1, 10000));
@@ -92,6 +93,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, batch = "tipler", timeoutTicks = 160)
     public static void tiplerCylinderDoublesFurnaceSpeed(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
                 net.minecraft.core.Direction.SOUTH, 9);
         TiplerCylinderBlockEntity tipler = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TIPLER);
@@ -125,6 +127,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, batch = "tipler")
     public static void tiplerCylinderNeedsFullShape(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
                 net.minecraft.core.Direction.SOUTH, 9);
         // 観察窓を1枚外す（中に入れてしまう）
@@ -161,6 +164,7 @@ public final class Stage5RomanceGameTests {
      */
     @GameTest(setupTicks = 20, template = HUGE, batch = "shield_permit", timeoutTicks = 80)
     public static void shieldPermitLocksOutsiders(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
         var player = TestBuild.mockPlayer(helper);
         ItemStack permit = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.SHIELD_PERMIT.get());
@@ -196,6 +200,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, batch = "shield", timeoutTicks = 40)
     public static void shieldTowerStopsExplosionsAndGriefing(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
         BlockPos dirt = new BlockPos(2, 1, 2);
         helper.setBlock(dirt, Blocks.DIRT);
@@ -218,6 +223,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, batch = "shield_core", timeoutTicks = 60)
     public static void shieldTowerWithCoreRepelsHostiles(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ShieldTowerBlockEntity shield = buildShield(helper, "singularity_core");
         BlockPos zombiePos = new BlockPos(10, 1, 4);
         Zombie[] zombie = new Zombie[1];
@@ -237,6 +243,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void advancedAnchorScalesAndEmbedsCore(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED.get());
         AdvancedWorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -260,6 +267,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void gravitonManipulatorTargetsAndCrush(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         GravitonManipulatorItem manipulator = SinguloItems.GRAVITON_MANIPULATOR.get();
         var golem = helper.spawn(EntityType.IRON_GOLEM, new BlockPos(1, 1, 1));
         helper.assertTrue(manipulator.affects(golem, GravityGauntletItem.Mode.LEVITATE), "HP100のゴーレムを持ち上げられない");
@@ -292,6 +300,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void gravitonManipulatorRepelsMobsAndProjectiles(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos center = new BlockPos(4, 1, 4);
         ArmorStand owner = helper.spawn(EntityType.ARMOR_STAND, center);
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, center.east(2));
@@ -312,6 +321,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void metricDriveChangesGravityAndUsesExoticMatter(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
             player.getAbilities().instabuild = false;

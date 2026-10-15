@@ -35,6 +35,7 @@ public final class MachineSlotGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void catalystsOnlyGoIntoCatalystSlot(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
         MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -57,6 +58,7 @@ public final class MachineSlotGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void monopoleUpgradeDoublesSpeed(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos a = new BlockPos(1, 1, 3);
         BlockPos b = new BlockPos(5, 1, 3);
         helper.setBlock(a, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get());
@@ -80,6 +82,7 @@ public final class MachineSlotGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void sideConfigAndAutoEject(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.COMPRESSOR).get()
                 .defaultBlockState().setValue(AbstractMachineBlock.FACING, Direction.NORTH));

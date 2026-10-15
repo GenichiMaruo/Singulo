@@ -83,6 +83,7 @@ public final class BossFairnessGameTests {
     /** 重力潮汐を受けたあと部屋の外へ出れば、低重力・落下無効はすぐ外れる。ボスが消えたときも、離れた所にいる人から外れる。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_tide")
     public static void tideEffectsEndWhenLeavingOrWhenBossGoes(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
         ServerPlayer p = survivor(helper, c.add(5, 0, 0));
@@ -113,6 +114,7 @@ public final class BossFairnessGameTests {
     /** 力場が張られている間は、外にいる人に潮汐はかからない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_tide_out")
     public static void tideSparesPlayersOutsideTheShield(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
         ServerPlayer p = survivor(helper, c.add(16, -0.9, 0));
@@ -133,6 +135,7 @@ public final class BossFairnessGameTests {
     /** 読み込み直しても、力場の内側（壁の近く）にいた参加者は外へ追い出されない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_reload")
     public static void reloadKeepsParticipantsInside(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
         ServerPlayer p = survivor(helper, c.add(14, -0.9, 0));
@@ -158,6 +161,7 @@ public final class BossFairnessGameTests {
     /** 力場の外で待っている人は、強さにも数えず、戦いを続ける理由にもならない（中に誰もいなければ戦いは終わる）。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_outside")
     public static void outsidersNeitherScaleNorHoldTheFight(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
         ServerPlayer one = survivor(helper, c.add(18, 0, 0));
@@ -178,6 +182,7 @@ public final class BossFairnessGameTests {
     /** 報酬の人数は戦いが始まったときの人数で決まる。終盤に合流しても、体力は増えるが報酬は増えない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_rewards")
     public static void lateJoinersAddHealthButNotRewards(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var solo = SinguloEntities.ECHO_SENTINEL.get().create(helper.getLevel());
         solo.makeAwakened();
         solo.lockRewardParticipants();                       // ひとりで戦いを始めた
@@ -204,6 +209,7 @@ public final class BossFairnessGameTests {
     /** 設定で許される高い体力と大人数でも、保存・読み込みのあとで硬さが変わらない（最後の記録者とホライズン・ウォーデン）。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_health")
     public static void highHealthSettingsSurviveReload(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         int oldHealth = ServerConfig.ARCHIVIST_HEALTH.get();
         int oldMax = ServerConfig.BOSS_MAX_SCALED_PLAYERS.get();
         double oldPer = ServerConfig.BOSS_HEALTH_PER_PLAYER.get();
@@ -242,6 +248,7 @@ public final class BossFairnessGameTests {
     /** 床の欠けた所をホログラムで埋めても、戦いが終われば元の水に戻る。読み込み直したあとでも戻る。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_floor")
     public static void temporaryFloorRestoresWater(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist b = archivist(helper);
         BlockPos pos = b.home().offset(0, -3, 0);
         helper.getLevel().setBlock(pos, Blocks.WATER.defaultBlockState(), 3);
@@ -265,6 +272,7 @@ public final class BossFairnessGameTests {
     /** 最後の記録者の報酬（光輪・翼など）も、戦いが始まったときの人数で決まる。中へ戻ってきた人で強さは増えても、報酬は増えない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_hidden_rewards")
     public static void archivistRewardsUseTheLockedCount(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
         java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
@@ -292,6 +300,7 @@ public final class BossFairnessGameTests {
     /** 潮汐が終わったあとの猶予の間に中へ来た人も、猶予が終われば落下無効が外れる。外へ出てボスが消えても残らない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_tide_grace")
     public static void graceEntrantsAreReleasedToo(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist b = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(b.home());
         java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
@@ -333,6 +342,7 @@ public final class BossFairnessGameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_legacy")
     public static void legacySaveAdoptsPlayersWhoLogInInside(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist original = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(original.home());
         call(original, LastArchivist.class, "raiseShield", helper);
@@ -379,6 +389,7 @@ public final class BossFairnessGameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_hurt_party")
     public static void partyHitsAreAcceptedPerPlayer(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Vec3 c = LastArchivist.shieldCenter(helper.absolutePos(new BlockPos(3, 4, 3)));
         java.util.List<ServerPlayer> players = new java.util.ArrayList<>();
         LastArchivist solo = archivist(helper);
@@ -426,6 +437,7 @@ public final class BossFairnessGameTests {
     /** ひとりひとりにはバニラと同じ無敵時間がかかる（同じ人が0.5秒以内に同じ強さで殴っても通らない。強い攻撃は差の分だけ通る）。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_hurt_single")
     public static void eachPlayerKeepsTheirOwnHurtWindow(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Vec3 c = LastArchivist.shieldCenter(helper.absolutePos(new BlockPos(3, 4, 3)));
         LastArchivist b = archivist(helper);
         ServerPlayer one = survivor(helper, c.add(1, 0, 0));
@@ -481,6 +493,7 @@ public final class BossFairnessGameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_shell")
     public static void shellMitigationCannotBeSkippedByRepeating(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Vec3 c = Vec3.atCenterOf(helper.absolutePos(new BlockPos(3, 4, 3)));
         ServerPlayer a = survivor(helper, c.add(2, 0, 0));
         ServerPlayer b = survivor(helper, c.add(-2, 0, 0));
@@ -514,6 +527,7 @@ public final class BossFairnessGameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_shared_window")
     public static void playerHitsLeaveTheSharedWindowAlone(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Vec3 c = Vec3.atCenterOf(helper.absolutePos(new BlockPos(3, 4, 3)));
         ServerPlayer a = survivor(helper, c.add(2, 0, 0));
         ServerPlayer b = survivor(helper, c.add(-2, 0, 0));

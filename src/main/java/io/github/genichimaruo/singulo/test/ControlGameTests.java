@@ -37,6 +37,7 @@ public final class ControlGameTests {
     /** 電力が通った道のケーブルだけが、入ってきた面と出ていった面を記録する（行き止まりの枝は光らない）。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void cableRecordsOnlyTheActualPath(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos gen = new BlockPos(1, 1, 1);
         helper.setBlock(gen, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(gen.west(), Blocks.CAMPFIRE);
@@ -64,6 +65,7 @@ public final class ControlGameTests {
     /** 電源を切った装置は動かず、入れ直すと動く。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void powerSwitchStopsMachine(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
         MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -84,6 +86,7 @@ public final class ControlGameTests {
     /** 材料なしのレシピ（電力だけで作るもの）を見分けられる。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void freeRecipesAreRecognized(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var recipes = helper.getLevel().getRecipeManager().getAllRecipesFor(
                 io.github.genichimaruo.singulo.registry.SinguloRecipes.MACHINE.get());
         boolean any = recipes.stream().anyMatch(h -> MachineBlockEntity.isFree(h.value())
@@ -97,6 +100,7 @@ public final class ControlGameTests {
     /** 電解槽は、タンクごとに面を決められる: 水を入れる面、水素と酸素を出す面を別々に。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void electrolyzerOutputsEachGasOnItsOwnFace(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.ELECTROLYZER).get());
         MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -134,6 +138,7 @@ public final class ControlGameTests {
     /** ウォーデンと警備ドローンは互いの攻撃で傷つかず、互いを味方とみなす。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void guardsDoNotHurtEachOther(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = helper.spawn(SinguloEntities.HORIZON_WARDEN.get(), new BlockPos(2, 1, 2));
         SecurityDrone drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(6, 2, 6));
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(6, 1, 2));
@@ -150,6 +155,7 @@ public final class ControlGameTests {
     /** ウォーデンは、飛んでくるブラックホール爆弾を届く前に打ち返し、近くでは開かせない。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 120)
     public static void wardenDeflectsBlackHoleBomb(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = helper.spawn(SinguloEntities.HORIZON_WARDEN.get(), new BlockPos(4, 1, 4));
         Zombie thrower = helper.spawn(EntityType.ZOMBIE, new BlockPos(4, 1, 0));
         BlackHoleBomb bomb = new BlackHoleBomb(helper.getLevel(), thrower);
