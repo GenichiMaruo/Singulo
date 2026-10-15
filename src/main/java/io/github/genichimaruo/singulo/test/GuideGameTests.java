@@ -21,8 +21,9 @@ public final class GuideGameTests {
 
     private GuideGameTests() {}
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void decodedRecordsUnlockInOrder(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
             player.getAbilities().instabuild = false;
@@ -39,8 +40,9 @@ public final class GuideGameTests {
         }
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void advancementsAreLoaded(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var advancements = helper.getLevel().getServer().getAdvancements();
         for (String id : new String[]{"root", "tower", "ignite", "records"}) {
             Advancement h = advancements.getAdvancement(Singulo.id(id));

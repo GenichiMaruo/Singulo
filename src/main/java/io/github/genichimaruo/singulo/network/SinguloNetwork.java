@@ -10,7 +10,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 /** Versioned Forge 1.20.1 channel; handlers execute on the game thread. */
 public final class SinguloNetwork {
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(Singulo.id("main"),
-            () -> "2", "2"::equals, "2"::equals);
+            () -> "3", "3"::equals, "3"::equals);
     public static void register() {
         CHANNEL.messageBuilder(ToggleAreaPayload.class, 0, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(ToggleAreaPayload::encode).decoder(ToggleAreaPayload::decode)
@@ -36,6 +36,12 @@ public final class SinguloNetwork {
         CHANNEL.messageBuilder(RenameAndroidPayload.class, 7, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(RenameAndroidPayload::encode).decoder(RenameAndroidPayload::decode)
                 .consumerMainThread((p, c) -> RenameAndroidPayload.handle(p, c.get())).add();
+        CHANNEL.messageBuilder(io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload.class, 8, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload::encode).decoder(io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload::decode)
+                .consumerMainThread((p, c) -> io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload.handle(p, c.get())).add();
+        CHANNEL.messageBuilder(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.class, 9, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload::encode).decoder(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload::decode)
+                .consumerMainThread((p, c) -> io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.handle(p, c.get())).add();
     }
     public static void sendToServer(Object packet) { CHANNEL.sendToServer(packet); }
     public static void sendToPlayer(ServerPlayer player, Object packet) {

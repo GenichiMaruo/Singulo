@@ -355,6 +355,23 @@ def station_top(k):
     return im
 
 
+def workbench_top():
+    """アンドロイド作業台の上面: 白い外装の枠の中の濃い作業面に、バニラの作業台と同じ大きさの 3×3 の格子
+    （線は 1 ピクセル、マスの中は 2×2）。格子の線は水色、四隅に固定具。"""
+    im, d = new((228, 232, 236, 255))
+    d.rectangle([0, 0, S - 1, S - 1], outline=(196, 202, 210, 255))
+    d.rectangle([1, 1, S - 2, S - 2], fill=(38, 44, 54, 255), outline=(150, 156, 164, 255))
+    for g in (3, 6, 9, 12):
+        d.line([(3, g), (12, g)], fill=(96, 190, 222, 255))
+        d.line([(g, 3), (g, 12)], fill=(96, 190, 222, 255))
+    for cx in (4, 7, 10):
+        for cy in (4, 7, 10):
+            d.rectangle([cx, cy, cx + 1, cy + 1], fill=(58, 68, 82, 255))
+    for x, y in ((1, 1), (S - 2, 1), (S - 2, S - 2), (1, S - 2)):
+        d.point((x, y), fill=(196, 202, 210, 255))
+    return im
+
+
 def fabricator_side():
     """遺構の印刷台の側面: 古びた白いパネルに、縦長の暗い格納口と水色の目盛り。下は暗い帯。"""
     im, d = new(rgba(AGED))
@@ -435,6 +452,7 @@ def textures(tb, save, weather, write_json):
     save(weather(fabricator_side(), 71), tb / 'ruin_android_fabricator_side.png')
     # アンドロイド組立ステーションの上面（自作の装置なので汚しは入れない）
     save(_sheet([station_top(k) for k in range(ANIM_FRAMES)]), tb / 'android_station_top.png')
+    save(workbench_top(), tb / 'android_workbench_top.png')
     write_json(tb / 'android_station_top.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
 
 

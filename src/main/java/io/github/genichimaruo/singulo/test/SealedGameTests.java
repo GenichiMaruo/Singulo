@@ -41,8 +41,9 @@ public final class SealedGameTests {
     }
 
     /** 遺構のコンテナは鍵がないと開かず、段階の鍵で解錠の演出のあとに開いて、中身が入っている。 */
-    @GameTest(template = EMPTY, timeoutTicks = SealedContainerBlockEntity.UNSEAL_TICKS + 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = SealedContainerBlockEntity.UNSEAL_TICKS + 40)
     public static void sealedContainerOpensWithKey(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
         SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -62,8 +63,9 @@ public final class SealedGameTests {
     }
 
     /** 封印中に壊すと、中身ごと失われる（何も落ちない）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 20)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 20)
     public static void breakingSealedContainerLosesContents(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(1).get());
         SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -78,8 +80,9 @@ public final class SealedGameTests {
     }
 
     /** 自分で置いたコンテナは開いていて、鍵で封印でき、また鍵で開けると中身が残っている。 */
-    @GameTest(template = EMPTY, timeoutTicks = SealedContainerBlockEntity.SEAL_TICKS + SealedContainerBlockEntity.UNSEAL_TICKS + 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = SealedContainerBlockEntity.SEAL_TICKS + SealedContainerBlockEntity.UNSEAL_TICKS + 40)
     public static void craftedContainerCanBeSealedAndReopened(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
         SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -106,8 +109,9 @@ public final class SealedGameTests {
      * 実際の右クリックの流れ（ServerPlayerGameMode.useItemOn）でも、鍵を持ってスニークして使うと封印できる。
      * 標準ではスニーク中に物を持っているとブロックの操作が呼ばれないので、それを通しているかを確かめる。
      */
-    @GameTest(template = EMPTY, timeoutTicks = 20)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 20)
     public static void sneakUseWithKeySealsThroughInteraction(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
         SealedContainerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -130,8 +134,9 @@ public final class SealedGameTests {
     }
 
     /** 遺構保管庫と封印コンテナの中身は、ホッパーやパイプからは取り出せない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void hoppersCannotTakeFromCacheOrContainer(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos box = new BlockPos(2, 2, 2);
         helper.setBlock(box, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
         SealedContainerBlockEntity container = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, box);
@@ -147,8 +152,9 @@ public final class SealedGameTests {
     }
 
     /** プレイヤーが置いた遺構保管庫は、遺構の印があっても中身が入らない（壊して置き直しても補充されない）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 20)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 20)
     public static void playerPlacedCacheDoesNotRefill(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
         io.github.genichimaruo.singulo.ruin.RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -166,8 +172,9 @@ public final class SealedGameTests {
     }
 
     /** オーバークロック・チップを挿した電解槽は、同じ時間でより多く水素を作る（電力は十分にある）。 */
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void overclockChipSpeedsUpMachine(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos a = new BlockPos(1, 1, 1);
         BlockPos b = new BlockPos(3, 1, 1);
         helper.setBlock(new BlockPos(2, 1, 1), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
@@ -194,8 +201,9 @@ public final class SealedGameTests {
     }
 
     /** 触媒安定化剤は、触媒の残りの寿命を2倍にし、印をつける。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void stabilizerDoublesCatalystLife(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ItemStack catalyst = item("muon_catalyst");
         SinguloComponents.set(catalyst, SinguloComponents.USES.get(), new UsesData(100, 1000, 0));
         CatalystStabilizerItem.stabilize(catalyst);
@@ -206,8 +214,9 @@ public final class SealedGameTests {
     }
 
     /** 次元ポケットの中身はプレイヤーに付いていて、開き直しても残る。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void dimensionalPocketKeepsContents(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ServerPlayer player = TestBuild.mockPlayer(helper);
         DimensionalPocketItem.Pocket first = new DimensionalPocketItem.Pocket(player);
         first.setItem(5, new ItemStack(Items.GOLD_INGOT, 7));
@@ -218,8 +227,9 @@ public final class SealedGameTests {
     }
 
     /** 重力ブーツを履いていると落下ダメージを受けない。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void gravityBootsPreventFallDamage(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ServerPlayer player = TestBuild.mockPlayer(helper);
         player.setItemSlot(EquipmentSlot.FEET, new ItemStack(SinguloItems.GRAVITY_BOOTS.get()));
         float before = player.getHealth();

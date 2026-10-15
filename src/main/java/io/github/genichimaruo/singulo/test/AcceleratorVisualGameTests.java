@@ -17,8 +17,9 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 public final class AcceleratorVisualGameTests {
     private AcceleratorVisualGameTests() {}
 
-    @GameTest(template = "empty")
+    @GameTest(setupTicks = 20, template = "empty")
     public static void acceleratorPulseFollowsClosedTrack(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (int side : new int[]{8, 16, 32}) {
             var ring = new io.github.genichimaruo.singulo.multiblock.AcceleratorRing(BlockPos.ZERO, side);
             double length = ring.perimeter();
@@ -84,8 +85,9 @@ public final class AcceleratorVisualGameTests {
         }
     }
 
-    @GameTest(template = "huge", timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 60)
     public static void acceleratorConnectsBreaksAndReconnects(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (int x = 0; x < 8; x++) {
             for (int z = 0; z < 8; z++) {
                 if (x == 0 || x == 7 || z == 0 || z == 7) {

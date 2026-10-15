@@ -42,7 +42,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.network.PacketDistributor;
+import io.github.genichimaruo.singulo.network.SinguloNetwork;
 
 /**
  * 創世炉の核。まわりに創世炉の枠（8）と創世炉の柱（4本×3段）を組むと形ができる（{@link #FRAMES}・{@link #PYLONS}）。

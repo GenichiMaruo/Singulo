@@ -1,13 +1,13 @@
-# Minecraft 1.20.1 / NeoForge 版（Singulo 0.6.0）
+# Minecraft 1.20.1 / NeoForge 版（Singulo 0.7.0）
 
-既存の `port/1.20.1-neoforge` の 0.3.0 を、`main` の 0.6.0（`aee3da0`）まで更新したバックポートです。`main` は Minecraft 1.21.1 専用として維持します。
+既存の `port/1.20.1-neoforge` の 0.6.0 を、`main` の 0.7.0（`933373a`）まで更新したバックポートです。`main` は Minecraft 1.21.1 専用として維持します。
 
 ## 実行環境
 
 - Minecraft **1.20.1**、NeoForge **47.1.106**、Java **17**。
 - JEI は任意。開発・検証環境では **15.20.0.129** を使用します。
-- 配布用 JAR: `build/libs/Singulo-0.6.0-1.20.1N.jar`（`-dev.jar` は配布しません）。
-- 公開用タグ: `v0.6.0-1.20.1N`。この変更自体は公開処理を実行しません。
+- 配布用 JAR: `build/libs/Singulo-0.7.0-1.20.1N.jar`（`-dev.jar` は配布しません）。
+- 公開用タグ: `v0.7.0-1.20.1N`。この変更自体は公開処理を実行しません。
 
 ## 更新内容
 
@@ -34,7 +34,7 @@ python3 tools/localization.py --check
 python3 tools/check_supporters.py
 python3 tools/check_port_1201.py
 ./gradlew build runGameTestServer
-python3 tools/check_port_1201.py --jar build/libs/Singulo-0.6.0-1.20.1N.jar
+python3 tools/check_port_1201.py --jar build/libs/Singulo-0.7.0-1.20.1N.jar
 ./gradlew runClient
 ```
 
@@ -45,3 +45,5 @@ python3 tools/check_port_1201.py --jar build/libs/Singulo-0.6.0-1.20.1N.jar
 ## NeoForge 1.20.1 のメタデータ
 
 ModDevGradle の `enable { neoForgeVersion = "1.20.1-47.1.106" }` で公式の `net.neoforged:forge` を使用します。この世代は Java パッケージ `net.minecraftforge`、`META-INF/mods.toml`、依存 mod ID `forge` が正しい形式です。配布名の末尾は `N`、公開先ローダー指定は `neoforge` です。
+
+0.7.0の検証・画像・公開結果は[0.7.0移植記録](port-0.7.0-1.20.1/verification.md)を参照してください。
