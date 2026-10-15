@@ -27,15 +27,15 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 - **重力と時空を使う** — 重力操作の道具、拠点を守るシールド、対応装置の時間加速、チャンクローダー、遠隔拠点間で電力・アイテム・液体をつなぐワームホール。
 - **宇宙を生む** — 最終目標の「創世炉」で、ブラックホールの電力から宇宙をひとつ生み出します。生まれた銀河は夜空に昇り、炉はその後、電力から物を作り出す質量生成ができるようになります。
 - **アンドロイドと戦い、仲間にする** — 遺構の印刷台から出撃する3種類のアンドロイドを倒して設計メモリを集め、組立ステーションで自分の護衛を印刷。迎撃・徘徊・追従を選び、装備や名前も付けられます。
-- **アンドロイドに作業を頼む** — 1.21.1版の作業指令台で製作・加工・採掘を注文し、手順カードで農作業や装置の操作も任せられます。在庫やレッドストーンで注文を自動化でき、流体搬送用のタンクや装飾も付けられます。
+- **アンドロイドに作業を頼む** — 0.7.0の作業指令台で製作・加工・採掘を注文し、手順カードで農作業や装置の操作も任せられます。在庫やレッドストーンで注文を自動化でき、流体搬送用のタンクや装飾も付けられます。
 - **みんなで挑む** — ボスは挑戦者の人数に合わせて強くなり、全員の攻撃がそれぞれ通ります。報酬は戦いが始まったときの人数ぶん。
 
 **Singulo** is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge / NeoForge). Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/manual-en.md).
 
 ## 遊び始めるには
 
-1.21.1版では、アンドロイドの作業自動化・追加アップグレード・装飾を開発しています。1.20.1版への対応状況は、各配布ファイルの変更履歴で確認してください。
-Android work automation, additional upgrades and decorations are being developed on the 1.21.1 branch. Check each download's changelog for availability on 1.20.1.
+0.7.0では、アンドロイドの作業自動化・追加アップグレード・装飾を1.20.1のForge / NeoForgeにも対応させました。[NeoForge版](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.7.0-1.20.1N-r1)・[Forge版](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.7.0-1.20.1F-r2)から選んでください。両版のCurseForge配布・検証記録は[移植検証の記録](docs/reviews/port-0.7.0-1.20.1-findings.md)を参照してください。
+Version 0.7.0 brings Android work automation, additional upgrades and decorations to Minecraft 1.20.1 on both Forge and NeoForge. Choose the matching loader above. The `main` branch remains dedicated to Minecraft 1.21.1.
 
 上の表の Minecraft とローダーが必要です（1.21.1 版なら NeoForge **21.1.256以上の1.21.1対応版**）。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
 
