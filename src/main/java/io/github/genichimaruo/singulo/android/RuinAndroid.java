@@ -80,6 +80,13 @@ public abstract class RuinAndroid extends Monster {
     public static final int STATE_CRAFTING = 8;
     /** 採掘の手順でブロックを掘っている（左手に光るツルハシ）。 */
     public static final int STATE_MINING = 9;
+    /** 拠点の暮らし（{@link AndroidLife}）: 椅子・階段に座る、地面に座る、植木鉢・作物に手をかざす、床を掃く。 */
+    public static final int STATE_SIT = 90, STATE_SIT_GROUND = 91, STATE_TEND = 92, STATE_SWEEP = 93;
+
+    /** 拠点の暮らしの動きか。 */
+    public static boolean lifeState(int state) {
+        return state >= STATE_SIT && state <= STATE_SWEEP;
+    }
     public static final int FOLD_TICKS = 20;
     /** 無線充電器から1 tick にもらう電力（満充電 PER_ANDROID を 100 tick、5秒で）。 */
     static final int CHARGER_FE_PER_TICK = AndroidChargerItem.PER_ANDROID / 100;
@@ -209,7 +216,9 @@ public abstract class RuinAndroid extends Monster {
     private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
     /** 仕草（挨拶。{@link #GESTURE_WAVE} など。クライアントでも見える）。 */
     private static final EntityDataAccessor<Integer> GESTURE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
-    public static final int GESTURE_NONE = 0, GESTURE_WAVE = 1, GESTURE_NOD = 2;
+    /** 昼寝している（目を閉じて、頭の上に Z）。 */
+    private static final EntityDataAccessor<Boolean> NAPPING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+    public static final int GESTURE_NONE = 0, GESTURE_WAVE = 1, GESTURE_NOD = 2, GESTURE_TALK = 3;
     /** 採掘の姿勢で持つ道具（0: ツルハシ、1: 斧）。 */
     private static final EntityDataAccessor<Integer> TOOL = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     public static final int TOOL_PICKAXE = 0, TOOL_AXE = 1;
@@ -338,8 +347,32 @@ public abstract class RuinAndroid extends Monster {
 
     /** 手に持つ装飾を見せるか: 待機していて（戦い・作業・充電をしていない）、挨拶の仕草もしていない。 */
     public boolean showsHeldDecor() {
-        return printed() && state() == STATE_IDLE && !isWorking() && !entityData.get(ALERT) && gesture() == GESTURE_NONE
+        int s = state();
+        boolean calm = s == STATE_IDLE || (s == STATE_SIT || s == STATE_SIT_GROUND) && !napping();     // 座って本を読む、など
+        return printed() && calm && !isWorking() && !entityData.get(ALERT) && gesture() == GESTURE_NONE
                 && !decor(AndroidAccessoryItem.HAND).isEmpty();
+    }
+
+    /** 昼寝しているか（クライアントでも見える）。 */
+    public boolean napping() {
+        return entityData.get(NAPPING);
+    }
+
+    void setNapping(boolean napping) {
+        if (napping() != napping) {
+            entityData.set(NAPPING, napping);
+        }
+    }
+
+    /** 拠点の暮らし（サーバー）。 */
+    @Nullable
+    AndroidLife life;
+
+    /** すぐに次の暮らしを始めてよいことにする（テスト用。ふだんは 15〜45 秒おき）。 */
+    public void lifeNow() {
+        if (life != null) {
+            life.hurry();
+        }
     }
 
     /** 着けている装飾（part: {@link AndroidAccessoryItem#HEAD} など。クライアントでも見える）。 */
@@ -1276,6 +1309,7 @@ public abstract class RuinAndroid extends Monster {
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
         builder.define(GESTURE, GESTURE_NONE);
+        builder.define(NAPPING, false);
         builder.define(TOOL, TOOL_PICKAXE);
     }
 
@@ -1767,6 +1801,8 @@ public abstract class RuinAndroid extends Monster {
         workGoal = new AndroidWorkGoal(this);
         goalSelector.addGoal(2, workGoal);
         registerCombat();
+        life = new AndroidLife(this);
+        goalSelector.addGoal(4, life);
         goalSelector.addGoal(5, new GuardGoal());
         goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
             @Override
@@ -2075,6 +2111,9 @@ public abstract class RuinAndroid extends Monster {
             tag.putInt("mode", mode);
             tag.putInt("retreat", retreatPercent);
             tag.put("patrol", patrol.save());
+            if (life != null) {
+                tag.put("life", life.save());
+            }
             tag.putBoolean("escort", escort);
             tag.putBoolean("escort_pending", escortPending);
             net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
@@ -2133,6 +2172,9 @@ public abstract class RuinAndroid extends Monster {
             }
             leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
             patrol.load(tag.getCompound("patrol"));
+            if (life != null) {
+                life.load(tag.getCompound("life"));
+            }
             syncPatrolLog();
         }
         if (charge() <= 0) {

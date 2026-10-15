@@ -386,7 +386,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             case RuinAndroid.STATE_CHARGING -> charging(t, age);
             case RuinAndroid.STATE_SOLAR -> solar(t, age);
             case RuinAndroid.STATE_SOLAR_FOLD -> solarFold(t, age);
-            case RuinAndroid.STATE_RESTING -> resting(t, age);
+            case RuinAndroid.STATE_RESTING, RuinAndroid.STATE_SIT_GROUND -> resting(t, age);
+            case RuinAndroid.STATE_SIT -> sittingOnChair(t, age);
+            case RuinAndroid.STATE_TEND -> tending(t, age);
+            case RuinAndroid.STATE_SWEEP -> sweeping(age);
             case BladeAndroid.STATE_DASH_WINDUP -> dashWindup(t, age);
             case BladeAndroid.STATE_DASH -> dash();
             case BladeAndroid.STATE_SLASH -> slash(t, 4, 1F);
@@ -422,6 +425,14 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             }
         }
         gestureOverlay(android, pt);
+        if (android.napping()) {
+            // 昼寝: 頭を前へ垂らして、ゆっくり息をする
+            float breath = Mth.sin(age * 0.06F);
+            head.xRot = 0.6F + breath * 0.04F;
+            head.zRot = 0.25F;
+            head.yRot = 0;
+            torso.xRot += 0.08F + breath * 0.02F;
+        }
         if (android.showsHeldDecor()) {
             // 手に持つ装飾: 左の前腕を前へ水平に出して持つ
             armL.xRot = Mth.lerp(0.8F, armL.xRot, -0.35F);
@@ -448,6 +459,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             float bow = Math.max(0, Mth.sin(t / RuinAndroid.GESTURE_TICKS * Mth.PI));
             head.xRot += 0.45F * bow;
             torso.xRot += 0.12F * bow;
+        } else if (g == RuinAndroid.GESTURE_TALK) {
+            // 話す身ぶり: 右手を胸の前へ出して、手のひらを返しながら小さく動かす。頭も少し傾ける
+            armR.xRot = Mth.lerp(k, armR.xRot, -0.7F + Mth.sin(t * 0.5F) * 0.15F);
+            armR.zRot = Mth.lerp(k, armR.zRot, 0.35F);
+            forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.9F + Mth.sin(t * 0.8F) * 0.2F);
+            head.zRot += 0.1F * k * Mth.sin(t * 0.3F);
         }
     }
 
@@ -776,6 +793,60 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtBack.xRot += 0.35F * k;
         skirtTail.xRot += 0.4F * k;
         skirtTail.zRot += 0.3F * k;
+    }
+
+    /** 椅子・階段に座る: 腰を座面まで下げ、太ももを前へ水平に、すねは下へ垂らす。両手はひざの上。 */
+    private void sittingOnChair(float t, float age) {
+        float k = ease(t / 10);
+        hips.y += 11.5F * k;
+        legL.y += 11.5F * k;
+        legR.y += 11.5F * k;
+        legL.xRot = -1.5F * k;
+        legR.xRot = -1.5F * k;
+        legL.yRot = 0.08F * k;
+        legR.yRot = -0.08F * k;
+        shinL.xRot = 1.45F * k + Mth.sin(age * 0.05F) * 0.05F * k;      // 足をすこしぶらぶら
+        shinR.xRot = 1.45F * k - Mth.sin(age * 0.05F) * 0.05F * k;
+        torso.xRot -= 0.05F * k;
+        armL.xRot = Mth.lerp(k, armL.xRot, -0.55F);
+        armL.zRot = Mth.lerp(k, armL.zRot, 0.12F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.35F);
+        armR.xRot = Mth.lerp(k, armR.xRot, -0.55F);
+        armR.zRot = Mth.lerp(k, armR.zRot, -0.12F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.35F);
+        skirtFront.xRot -= 1.2F * k;
+        skirtLeft.zRot -= 0.3F * k;
+        skirtRight.zRot += 0.3F * k;
+        skirtBack.xRot += 0.2F * k;
+    }
+
+    /** 植木鉢・作物に手をかざす: 少しかがんで、右手を前へ下向きに出し、ゆっくり左右に動かす。 */
+    private void tending(float t, float age) {
+        float k = ease(t / 8);
+        torso.xRot += 0.35F * k;
+        hips.y += 1.2F * k;
+        legL.xRot = -0.35F * k;
+        legR.xRot = -0.35F * k;
+        shinL.xRot = 0.6F * k;
+        shinR.xRot = 0.6F * k;
+        head.xRot = Mth.lerp(k, head.xRot, 0.5F);
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.1F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.1F + Mth.sin(age * 0.12F) * 0.15F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.2F);
+    }
+
+    /** 床を掃く: ほうきを持つように両手を体の前で下げ、左右に掃く。 */
+    private void sweeping(float age) {
+        float s = Mth.sin(age * 0.35F);
+        torso.xRot += 0.2F;
+        torso.yRot += s * 0.25F;
+        head.xRot = 0.35F;
+        armL.xRot = -0.6F;
+        armL.zRot = -0.25F + s * 0.25F;
+        forearmL.xRot = -0.3F;
+        armR.xRot = -0.45F;
+        armR.zRot = 0.35F + s * 0.25F;
+        forearmR.xRot = -0.25F;
     }
 
     private void charging(float t, float age) {

@@ -92,9 +92,33 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         super.render(android, yaw, partialTick, pose, buffers, light);
         renderMoves(android, partialTick, pose, buffers);
         renderWorkIcon(android, partialTick, pose, buffers, light);
+        if (android.napping() && android.printed()) {
+            renderSleep(android, partialTick, pose, buffers, light);
+        }
     }
 
     /** 作業中の今していることの印（頭の上に、小さく回る物の絵）。測量メガネを掛けているときだけ見える。設定 androidWorkIcons で消せる。 */
+    /** 昼寝: 頭の上に、小さな Z が3つ、ずれて浮かび上がっては消える（いつもこちらを向く）。 */
+    private void renderSleep(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        float age = android.tickCount + partialTick;
+        for (int i = 0; i < 3; i++) {
+            float phase = ((age / 50F) + i / 3F) % 1F;             // 0〜1 で上へ
+            int alpha = (int) (255 * Math.min(1, Math.min(phase * 4, (1 - phase) * 3)));
+            if (alpha < 8) {
+                continue;
+            }
+            pose.pushPose();
+            pose.translate(0.15F + phase * 0.35F, android.getBbHeight() + 0.05F + phase * 0.7F, 0);
+            pose.mulPose(entityRenderDispatcher.cameraOrientation());
+            float scale = 0.012F + phase * 0.012F;
+            pose.scale(scale, -scale, scale);
+            mc.font.drawInBatch("Z", -2.5F, 0, (alpha << 24) | 0xE8F0FF, false, pose.last().pose(), buffers,
+                    net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, light);
+            pose.popPose();
+        }
+    }
+
     private void renderWorkIcon(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         int act = android.activity();
         var viewer = net.minecraft.client.Minecraft.getInstance().player;
@@ -685,7 +709,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 return;
             }
             int period = 70 + Math.floorMod(android.getId() * 37, 50);          // 3.5〜6秒ごと
-            int phase = Math.floorMod(android.tickCount + android.getId() * 13, period);
+            int phase = android.napping() ? 1 : Math.floorMod(android.tickCount + android.getId() * 13, period);   // 昼寝中は閉じたまま
             if (phase > 3) {
                 return;
             }
@@ -811,16 +835,16 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.popPose();
                 }
                 case "scarf" -> {
-                    // 首に巻いて、前の左に垂れ
+                    // 首に巻いて、前の左に垂れ（箱どうしを重ねない: 同じ面が重なるとちらつく）
                     b(pose, vc, light, -3.4F, -8.2F, -1.9F, 3.4F, -6.8F, -1.5F, c);
                     b(pose, vc, light, -3.4F, -8.2F, 1.5F, 3.4F, -6.8F, 1.9F, c);
-                    b(pose, vc, light, -3.4F, -8.2F, -1.9F, -3.0F, -6.8F, 1.9F, c);
-                    b(pose, vc, light, 3.0F, -8.2F, -1.9F, 3.4F, -6.8F, 1.9F, c);
+                    b(pose, vc, light, -3.4F, -8.2F, -1.5F, -3.0F, -6.8F, 1.5F, c);
+                    b(pose, vc, light, 3.0F, -8.2F, -1.5F, 3.4F, -6.8F, 1.5F, c);
                     pose.pushPose();
                     pose.translate(1.6F * P, -6.8F * P, -1.9F * P);
                     pose.mulPose(Axis.XP.rotationDegrees(-8 - 15 * walk));
-                    b(pose, vc, light, 0, 0, -0.4F, 1.6F, 5.0F, 0, c);
-                    b(pose, vc, light, 0, 4.4F, -0.45F, 1.6F, 5.0F, 0.05F, dark);
+                    b(pose, vc, light, 0.05F, 0, -0.35F, 1.55F, 4.4F, -0.05F, c);
+                    b(pose, vc, light, 0, 4.4F, -0.4F, 1.6F, 5.0F, 0, dark);
                     pose.popPose();
                 }
                 case "waist_ribbon" -> {

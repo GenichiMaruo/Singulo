@@ -561,7 +561,8 @@ CHAPTERS = [
          '・戻る体力: これを下回ると、ステーションへ戻って修理と充電をします。「呼び戻す」で戻すこともできます。\n'
          '・名前: ステーションやアンドロイドの画面で名前をクリックすると付けられます（↺で愛称に戻す）。\n'
          '・コンパレーター: ステーションから、アンドロイドの体力に応じた信号（0〜15）が出ます。\n'
-         '・ステーションを壊すと、アンドロイドはその場に残ります。新しいステーションに同じ型のメモリを入れると、「リンク」でつなぎ直せます。',
+         '・ステーションを壊すと、アンドロイドはその場に残ります。新しいステーションに同じ型のメモリを入れると、「リンク」でつなぎ直せます。\n'
+         '・暮らし: 手が空いた護衛は、ステーションのそばで、階段・ハーフブロック・椅子に座る（夜は昼寝）、植木鉢や作物に手をかざす、床を掃く、しばらく落ちたままの物をそばのチェストへしまう、仲間とおしゃべりする、雨なら屋根の下へ（傘を持っていればそのまま）、夕焼けや夜空を眺める、など。',
          'Your own androids',
          'Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, '
          'and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n'
@@ -573,7 +574,8 @@ CHAPTERS = [
          '- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n'
          '- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n'
          '- Comparator: the station outputs a signal (0-15) from the android\'s health.\n'
-         '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.'),
+         '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n'
+         '- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..'),
         ('patrol', '巡回警備',
          'ステーションの動き方を「巡回」にすると、決めた場所を順に回って見張ります。\n'
          '・巡回路: 「巡回」を選ぶと出る8つの欄に作業位置カードを置くと、その場所を左から順に回り、カードの場所の上に立って見回します。'

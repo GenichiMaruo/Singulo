@@ -24,6 +24,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -479,6 +480,58 @@ public final class AndroidGameTests {
         helper.assertTrue(a.clearTank(1) && a.tanksEmpty(), "捨てるボタンでタンクが空にならない");
         a.discard();
         helper.succeed();
+    }
+
+    /** 拠点の暮らし: 昼、手の空いた護衛は、ステーションのそばの階段に座る（座れる物がなければ地面に。ほかに掃く仕草などもする）。 */
+    @GameTest(template = EMPTY, batch = "android_life", timeoutTicks = 2400)
+    public static void idleGuardSitsOnStairs(GameTestHelper helper) {
+        helper.getLevel().setDayTime(1000);
+        station(helper, 1);
+        BlockPos stair = new BlockPos(5, 1, 2);
+        helper.setBlock(stair, net.minecraft.world.level.block.Blocks.OAK_STAIRS);
+        // 作業台（名前に "bench" が入る）は椅子ではない。階段より近くに置く
+        BlockPos bench = new BlockPos(3, 1, 3);
+        helper.setBlock(bench, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORKBENCH.get());
+        boolean[] sat = {false}, onBench = {false};
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : androids(helper)) {
+                if (a.printed() && a.tickCount % 60 == 0 && a.state() == RuinAndroid.STATE_IDLE) {
+                    a.lifeNow();
+                }
+                sat[0] |= a.state() == RuinAndroid.STATE_SIT
+                        && a.position().subtract(Vec3.atBottomCenterOf(helper.absolutePos(stair))).horizontalDistance() < 0.45;
+                onBench[0] |= a.state() == RuinAndroid.STATE_SIT
+                        && a.position().subtract(Vec3.atBottomCenterOf(helper.absolutePos(bench))).horizontalDistance() < 0.6;
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(!onBench[0], "作業台に座った（作業台の中に埋まる）");
+            helper.assertTrue(sat[0], "手の空いた護衛が、そばの階段に座らない");
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** 拠点の暮らし: しばらく落ちたままの物を拾って、そばのチェストへしまう。 */
+    @GameTest(template = EMPTY, batch = "android_life", timeoutTicks = 1200)
+    public static void idleGuardTidiesIntoChest(GameTestHelper helper) {
+        helper.getLevel().setDayTime(1000);
+        station(helper, 1);
+        BlockPos chest = new BlockPos(6, 1, 6);
+        helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
+        net.minecraft.world.entity.item.ItemEntity drop = helper.spawnItem(Items.APPLE, 2.5F, 1, 6.5F);
+        drop.setPickUpDelay(0);
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : androids(helper)) {
+                if (a.printed() && a.tickCount % 40 == 0 && a.state() == RuinAndroid.STATE_IDLE) {
+                    a.lifeNow();
+                }
+            }
+        });
+        helper.succeedWhen(() -> {
+            var be = (net.minecraft.world.level.block.entity.ChestBlockEntity) helper.getBlockEntity(chest);
+            helper.assertTrue(!be.isEmpty() && be.getItem(0).is(Items.APPLE), "落ちていた物を、そばのチェストへしまわない");
+            androids(helper).forEach(RuinAndroid::discard);
+        });
     }
 
     /** 範囲カード: 2つの角を記録すると、その範囲になる。 */
