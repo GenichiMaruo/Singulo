@@ -30,6 +30,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -74,6 +75,10 @@ public abstract class RuinAndroid extends Monster {
     public static final int STATE_CHARGING_FOLLOW = 6;
     /** ソーラー充電が終わって、パネルをたたんでいる（{@link #FOLD_TICKS}）。 */
     public static final int STATE_SOLAR_FOLD = 7;
+    /** 作業場所で物を作っている（作業の自動化）。 */
+    public static final int STATE_CRAFTING = 8;
+    /** 採掘の手順でブロックを掘っている（左手に光るツルハシ）。 */
+    public static final int STATE_MINING = 9;
     public static final int FOLD_TICKS = 20;
     /** 無線充電器から1 tick にもらう電力（満充電 PER_ANDROID を 100 tick、5秒で）。 */
     static final int CHARGER_FE_PER_TICK = AndroidChargerItem.PER_ANDROID / 100;
@@ -85,6 +90,86 @@ public abstract class RuinAndroid extends Monster {
     /** 護衛が敵を探す範囲（ステーションか持ち主から）。 */
     public static final double GUARD_RANGE = 14;
     public static final int WANDER_RADIUS = 16;
+    /** ステーションの上が空くのを待つときの、ステーションからの距離。 */
+    static final double WAIT_RADIUS = 2.6;
+    /** 迎撃・待機のときに立つ場所（ステーションの上を空けておくため、横へずらす。アンドロイドごとに向きを変える）。 */
+    // ------------------------------------------------------------------ 挨拶
+
+    /** 仕草の残り（サーバー）と、そのあいだ向く相手。仕草が始まった時（クライアント）。 */
+    private int gestureTicks;
+    @Nullable
+    private Entity gestureLook;
+    private int clientGestureStart;
+    /** 持ち主・許可証の人が最後にそばにいた時刻、仲間と最後に挨拶した時刻（保存しない）。 */
+    private final java.util.Map<java.util.UUID, Long> lastClose = new java.util.HashMap<>();
+    private final java.util.Map<java.util.UUID, Long> lastPeerGreet = new java.util.HashMap<>();
+    /** これだけ離れていた人がそばに来たら挨拶する（5分）。仲間とは1分に1回まで。 */
+    static final int AWAY_TICKS = 20 * 60 * 5, PEER_GREET_TICKS = 20 * 60;
+
+    public int gesture() {
+        return entityData.get(GESTURE);
+    }
+
+    public int tool() {
+        return entityData.get(TOOL);
+    }
+
+    void setTool(int tool) {
+        if (entityData.get(TOOL) != tool) {
+            entityData.set(TOOL, tool);
+        }
+    }
+
+    /** 仕草が始まってからの時間（クライアント、tick）。 */
+    public float gestureTime(float partialTick) {
+        return tickCount - clientGestureStart + partialTick;
+    }
+
+    /** 仕草をする（look があれば、そのあいだそちらを向く）。 */
+    public void gesture(int kind, @Nullable Entity look) {
+        entityData.set(GESTURE, GESTURE_NONE);
+        entityData.set(GESTURE, kind);
+        gestureTicks = GESTURE_TICKS;
+        gestureLook = look;
+    }
+
+    /** 毎秒: 久しぶりにそばに来た持ち主へ手を振り、そばを通る仲間と会釈する。 */
+    private void greetings(ServerLevel level) {
+        if (!guard || !printed() || !active() || getTarget() != null || gestureTicks > 0) {
+            return;
+        }
+        long now = level.getGameTime();
+        for (Player p : level.players()) {
+            if (p.isSpectator() || !mayOperate(p) || p.distanceToSqr(this) > 8 * 8) {
+                continue;
+            }
+            Long seen = lastClose.put(p.getUUID(), now);
+            if (seen == null || now - seen > AWAY_TICKS) {
+                gesture(GESTURE_WAVE, p);
+                chirp(level, null, 1.5F);
+                return;
+            }
+        }
+        for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, getBoundingBox().inflate(2.5),
+                a -> a != this && a.isAlive() && a.guard && a.printed() && a.active() && a.getTarget() == null && a.gestureTicks <= 0
+                        && java.util.Objects.equals(a.owner, owner))) {
+            Long last = lastPeerGreet.get(a.getUUID());
+            if (last == null || now - last > PEER_GREET_TICKS) {
+                lastPeerGreet.put(a.getUUID(), now);
+                a.lastPeerGreet.put(getUUID(), now);
+                gesture(GESTURE_NOD, a);
+                a.gesture(GESTURE_NOD, this);
+                chirp(level, a, 1.2F);
+                return;
+            }
+        }
+    }
+
+    /** 作業中に襲ってきた相手を追う距離。 */
+    static final double WORK_DEFEND_RANGE = 16;
+    /** ステーションの上の番が、仲間に上を譲っているところ。 */
+    private boolean yielding;
+    private static final Vec3[] STAND_OFFSETS = {new Vec3(2, 0, 0), new Vec3(-2, 0, 0), new Vec3(0, 0, 2), new Vec3(0, 0, -2)};
 
     /** 充電器から電力をもらって、ついて歩いている持ち主（見た目のため。いなければ -1）。 */
     private static final EntityDataAccessor<Integer> CHARGER_LINK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
@@ -93,8 +178,52 @@ public abstract class RuinAndroid extends Monster {
     /** 敵を見つけているか（GUI のひとこと）。 */
     private static final EntityDataAccessor<Boolean> ALERT = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
 
-    /** 護衛の持ち物: 0 は自己修理キット（1スタック）、1 は装甲板（胸当てとして働く）。 */
-    public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1;
+    /** 持っているバッテリーアップグレードの数（見た目と、充電の満タンのため）。 */
+    private static final EntityDataAccessor<Integer> BATTERIES = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** タンクの見た目: 流体の番号（+1。0 は空）と入っている割合（0〜100）を、タンクごとに1つの数にまとめる。-1 はタンクなし。 */
+    private static final EntityDataAccessor<Integer> TANK_A = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 装飾（頭・背中/腰・手。クライアントで描くため）。 */
+    @SuppressWarnings("unchecked")
+    private static final EntityDataAccessor<net.minecraft.world.item.ItemStack>[] DECOR = new EntityDataAccessor[] {
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK)};
+    private static final EntityDataAccessor<Integer> TANK_B = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 作業（自動化）を割り当てられているか（持ち物を取り出せなくするため、クライアントでも見る）。 */
+    private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+    /** 仕草（挨拶。{@link #GESTURE_WAVE} など。クライアントでも見える）。 */
+    private static final EntityDataAccessor<Integer> GESTURE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    public static final int GESTURE_NONE = 0, GESTURE_WAVE = 1, GESTURE_NOD = 2;
+    /** 採掘の姿勢で持つ道具（0: ツルハシ、1: 斧）。 */
+    private static final EntityDataAccessor<Integer> TOOL = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    public static final int TOOL_PICKAXE = 0, TOOL_AXE = 1;
+    /** 仕草の長さ（tick）。 */
+    public static final int GESTURE_TICKS = 30;
+    /** 作業中に今していること（{@link #ACT_FETCH} など。クライアントでも見える）。 */
+    private static final EntityDataAccessor<Integer> ACTIVITY = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    public static final int ACT_NONE = 0, ACT_FETCH = 1, ACT_CRAFT = 2, ACT_PROCESS = 3, ACT_MINE = 4, ACT_DELIVER = 5, ACT_RETURN = 6,
+            ACT_WAIT = 7, ACT_CHARGE = 8, ACT_FIGHT = 9, ACT_FARM = 10, ACT_RANCH = 11, ACT_FELL = 12, ACT_USE = 13;
+    public static final String[] ACTIVITY_KEYS = {"none", "fetch", "craft", "process", "mine", "deliver", "return", "wait", "charge", "fight",
+            "farm", "ranch", "fell", "use"};
+    /** バックパックアップグレードを積んでいるか（見た目のため）。 */
+    private static final EntityDataAccessor<Boolean> BACKPACK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+
+    /**
+     * 護衛の持ち物: 0 は自己修理キット（1スタック）、1 は装甲板（胸当てとして働く）、2 はバッテリーアップグレード（2個まで）、
+     * 3 はバックパックアップグレード、4 は採掘アップグレード。5〜9 は運ぶ物を入れる持ち物（ホッパーと同じ5スロット）、
+     * 10〜33 はバックパックの中（24スロット。バックパックを積んでいるときだけ使える）。
+     */
+    public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1, SLOT_BATTERY = 2, SLOT_BACKPACK = 3, SLOT_MINING = 4;
+    public static final int CARRY_START = 5, CARRY_SLOTS = 5, PACK_START = 10, PACK_SLOTS = 24;
+    /** 伐採アップグレード・タンクアップグレードの枠（あとから足したので、持ち物のうしろ）。 */
+    public static final int SLOT_FELLING = PACK_START + PACK_SLOTS, SLOT_TANK = SLOT_FELLING + 1;
+    /** 装飾の枠（頭・背中/腰・手）。 */
+    public static final int SLOT_DECOR = SLOT_TANK + 1, DECOR_SLOTS = 3;
+    public static final int INVENTORY_SIZE = SLOT_DECOR + DECOR_SLOTS;
+    /** タンクアップグレードのタンクの数と、1つの容量（mB）。1つのタンクには1種類の流体。 */
+    public static final int TANKS = 2, TANK_CAPACITY = 32000;
+    /** バッテリーアップグレードは2個まで。1個につき充電の満タンが半分（CHARGE_MAX / 2）ずつ増える。 */
+    public static final int MAX_BATTERIES = 2;
     /** 自己修理キット1つで直す体力の割合と、続けて使えるまでの tick。 */
     static final float REPAIR_FRACTION = 0.5F;
     static final int REPAIR_COOLDOWN = 60;
@@ -117,7 +246,23 @@ public abstract class RuinAndroid extends Monster {
     /** 追従する人（許可証に登録された人から選ぶ。null は持ち主）。 */
     @Nullable
     private java.util.UUID leader;
-    private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(2);
+    private final net.minecraft.world.SimpleContainer inventory = new net.minecraft.world.SimpleContainer(INVENTORY_SIZE);
+    /** 作業（自動化）に割り当ててよいか（アンドロイドの画面で切り替える）。 */
+    private boolean workEnabled = true;
+    /** 割り当てられた作業の、作業指令台と注文（なければ null と -1）。 */
+    @Nullable
+    private BlockPos workConsole;
+    private int workOrder = -1;
+    /** 作業の途中も保存し、再読込・転送後に同じ所から続ける。 */
+    private AndroidWorkGoal workGoal;
+    /** 今進めている作業（作業指令台に毎秒知らせる）。 */
+    @Nullable
+    io.github.genichimaruo.singulo.android.work.WorkJob workJob;
+    /**
+     * 作業を始めたときに、持ち物・バックパックの中に入っていた物の場所（ビット。持ち物 0〜4、バックパック 5〜28）。
+     * 持ち主が入れておいた物なので、作業では使わず（空いている場所だけ使う）、資材置き場へも戻さない。
+     */
+    private int personal;
     private int repairCooldown;
     /** ステーションが遠すぎて戻れなかったとき、しばらく戻ろうとしない（tick）。 */
     private int retreatCooldown;
@@ -134,8 +279,429 @@ public abstract class RuinAndroid extends Monster {
         this.xpReward = 8;
         setPersistenceRequired();
         setDropChance(net.minecraft.world.entity.EquipmentSlot.CHEST, 0);
-        // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）
-        inventory.addListener(c -> setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy()));
+        // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）。アップグレードは見た目と充電の満タンに出す
+        inventory.addListener(c -> {
+            setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy());
+            if (!level().isClientSide) {
+                net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
+                entityData.set(BATTERIES, isBatteryUpgrade(battery) ? Math.min(MAX_BATTERIES, battery.getCount()) : 0);
+                entityData.set(BACKPACK, isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)));
+                syncTanks();
+                for (int i = 0; i < DECOR_SLOTS; i++) {
+                    net.minecraft.world.item.ItemStack d = inventory.getItem(SLOT_DECOR + i);
+                    if (!net.minecraft.world.item.ItemStack.matches(d, entityData.get(DECOR[i]))) {
+                        entityData.set(DECOR[i], d.copy());
+                    }
+                }
+                if (charge() > maxCharge()) {
+                    setCharge(maxCharge());
+                }
+            }
+        });
+    }
+
+    private static boolean isItem(net.minecraft.world.item.ItemStack stack, String id) {
+        return !stack.isEmpty() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals(id);
+    }
+
+    public static boolean isBatteryUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return isItem(stack, "android_battery_upgrade");
+    }
+
+    public static boolean isBackpackUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return isItem(stack, "android_backpack_upgrade");
+    }
+
+    public static boolean isMiningUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidMiningUpgradeItem;
+    }
+
+    public static boolean isFellingUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidFellingUpgradeItem;
+    }
+
+    /** 手に持つ装飾を見せるか: 待機していて（戦い・作業・充電をしていない）、挨拶の仕草もしていない。 */
+    public boolean showsHeldDecor() {
+        return printed() && state() == STATE_IDLE && !isWorking() && !entityData.get(ALERT) && gesture() == GESTURE_NONE
+                && !decor(AndroidAccessoryItem.HAND).isEmpty();
+    }
+
+    /** 着けている装飾（part: {@link AndroidAccessoryItem#HEAD} など。クライアントでも見える）。 */
+    public net.minecraft.world.item.ItemStack decor(int part) {
+        return entityData.get(DECOR[part]);
+    }
+
+    public static boolean isTankUpgrade(net.minecraft.world.item.ItemStack stack) {
+        return isItem(stack, "android_tank_upgrade");
+    }
+
+    // ------------------------------------------------------------------ タンク（流体）
+
+    /** タンクアップグレードのタンク（積んでいなければ使えない）。 */
+    private final net.minecraftforge.fluids.capability.templates.FluidTank[] tanks = {
+            new net.minecraftforge.fluids.capability.templates.FluidTank(TANK_CAPACITY),
+            new net.minecraftforge.fluids.capability.templates.FluidTank(TANK_CAPACITY)};
+
+    /** タンクアップグレードを積んでいるか。 */
+    public boolean hasTank() {
+        return isTankUpgrade(inventory.getItem(SLOT_TANK));
+    }
+
+    /** タンクが空か（タンクアップグレードを外せるか）。 */
+    public boolean tanksEmpty() {
+        for (var t : tanks) {
+            if (!t.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** タンクの中身。 */
+    public java.util.List<net.minecraftforge.fluids.FluidStack> tankFluids() {
+        java.util.List<net.minecraftforge.fluids.FluidStack> out = new java.util.ArrayList<>();
+        for (var t : tanks) {
+            if (!t.isEmpty()) {
+                out.add(t.getFluid().copy());
+            }
+        }
+        return out;
+    }
+
+    /** この流体が、タンクにいくつあるか（mB）。 */
+    public int tankAmount(net.minecraftforge.fluids.FluidStack like) {
+        int n = 0;
+        for (var t : tanks) {
+            if (io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
+                n += t.getFluidAmount();
+            }
+        }
+        return n;
+    }
+
+    /** あと、この流体をどれだけ入れられるか（同じ流体のタンクの空きと、空のタンク）。 */
+    public int tankSpace(net.minecraftforge.fluids.FluidStack like) {
+        if (!hasTank()) {
+            return 0;
+        }
+        int n = 0;
+        for (var t : tanks) {
+            if (t.isEmpty() || io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
+                n += t.getSpace();
+            }
+        }
+        return n;
+    }
+
+    /** タンクに入れる（同じ流体のタンクから、そのあと空のタンク）。入った量。 */
+    public int fillTanks(net.minecraftforge.fluids.FluidStack fluid, boolean simulate) {
+        if (!hasTank() || fluid.isEmpty()) {
+            return 0;
+        }
+        var action = simulate ? net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
+                : net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        int left = fluid.getAmount();
+        int[] planned = new int[TANKS];
+        for (int pass = 0; pass < 2 && left > 0; pass++) {
+            for (int i = 0; i < TANKS && left > 0; i++) {
+                var t = tanks[i];
+                boolean same = io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), fluid);
+                boolean empty = t.isEmpty() && planned[i] == 0;
+                if (pass == 0 ? !same : !empty) {
+                    continue;
+                }
+                int room = t.getCapacity() - t.getFluidAmount() - planned[i];
+                int put = Math.min(room, left);
+                if (put <= 0) {
+                    continue;
+                }
+                if (simulate) {
+                    planned[i] += put;
+                } else {
+                    t.fill(io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(fluid, put), action);
+                }
+                left -= put;
+            }
+        }
+        if (!simulate) {
+            syncTanks();
+        }
+        return fluid.getAmount() - left;
+    }
+
+    /** タンクから出す（この流体を最大 amount）。出した流体。 */
+    public net.minecraftforge.fluids.FluidStack drainTanks(net.minecraftforge.fluids.FluidStack like, int amount, boolean simulate) {
+        var action = simulate ? net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
+                : net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        int got = 0;
+        for (var t : tanks) {
+            if (got >= amount || !io.github.genichimaruo.singulo.compat.Legacy.sameFluid(t.getFluid(), like)) {
+                continue;
+            }
+            got += t.drain(amount - got, action).getAmount();
+        }
+        if (!simulate && got > 0) {
+            syncTanks();
+        }
+        return got <= 0 ? net.minecraftforge.fluids.FluidStack.EMPTY : io.github.genichimaruo.singulo.compat.Legacy.copyWithAmount(like, got);
+    }
+
+    /** タンクの見た目を、クライアントへ知らせる。 */
+    private void syncTanks() {
+        if (level().isClientSide) {
+            return;
+        }
+        boolean on = hasTank();
+        for (int i = 0; i < TANKS; i++) {
+            int v = -1;
+            if (on) {
+                var f = tanks[i].getFluid();
+                v = f.isEmpty() ? 0 : (net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(f.getFluid()) + 1) << 8
+                        | Math.max(1, f.getAmount() * 100 / TANK_CAPACITY);
+            }
+            entityData.set(i == 0 ? TANK_A : TANK_B, v);
+        }
+    }
+
+    /** タンク i の入っている割合（クライアント。0〜1、タンクアップグレードがなければ -1）。 */
+    public float tankFill(int i) {
+        int v = entityData.get(i == 0 ? TANK_A : TANK_B);
+        return v < 0 ? -1 : (v & 0xFF) / 100F;
+    }
+
+    /** タンク i の流体（クライアント。空なら null）。 */
+    @Nullable
+    public net.minecraft.world.level.material.Fluid tankFluid(int i) {
+        int v = entityData.get(i == 0 ? TANK_A : TANK_B);
+        if (v <= 0 || (v >> 8) == 0) {
+            return null;
+        }
+        return net.minecraft.core.registries.BuiltInRegistries.FLUID.byId((v >> 8) - 1);
+    }
+
+    /** 伐採アップグレードを積んでいるか。 */
+    public boolean canFell() {
+        return isFellingUpgrade(inventory.getItem(SLOT_FELLING));
+    }
+
+    /** 積んでいるバッテリーアップグレードの数（クライアントでも見える）。 */
+    public int batteries() {
+        return entityData.get(BATTERIES);
+    }
+
+    /** バックパックアップグレードを積んでいるか（クライアントでも見える）。 */
+    public boolean hasBackpack() {
+        return entityData.get(BACKPACK);
+    }
+
+    /** 採掘アップグレードを積んでいるか。 */
+    public boolean canMine() {
+        return isMiningUpgrade(inventory.getItem(SLOT_MINING));
+    }
+
+    /** 充電の満タン（バッテリーアップグレード1個につき +50%）。 */
+    public int maxCharge() {
+        return CHARGE_MAX * (2 + batteries()) / 2;
+    }
+
+    /** 作業（自動化）に割り当ててよいか。 */
+    public boolean workEnabled() {
+        return workEnabled;
+    }
+
+    public void setWorkEnabled(boolean enabled) {
+        this.workEnabled = enabled;
+    }
+
+    /** 作業指令台の注文を割り当てる（作業中は戦わず、持ち物を取り出せない）。 */
+    public void assignWork(BlockPos console, int order) {
+        this.workConsole = console.immutable();
+        this.workOrder = order;
+        this.workJob = null;
+        workGoal.loadWork(new CompoundTag());
+        int mask = 0;
+        int[] all = allCarrySlots();
+        for (int i = 0; i < all.length; i++) {
+            if (!inventory.getItem(all[i]).isEmpty()) {
+                mask |= 1 << i;
+            }
+        }
+        this.personal = mask;
+        entityData.set(WORKING, true);
+        setTarget(null);
+    }
+
+    /** 死亡後の転送・再印刷でも、持ち主の物と作業用の物を区別して復元する。 */
+    public CompoundTag saveWorkState() {
+        CompoundTag t = workGoal.saveWork();
+        t.putInt("personal", personal);
+        var fluids = new net.minecraft.nbt.ListTag();
+        for (var tank : tanks) {
+            fluids.add(tank.writeToNBT(new CompoundTag()));
+        }
+        t.put("tanks", fluids);
+        return t;
+    }
+
+    public void restoreWorkState(CompoundTag t) {
+        personal = t.getInt("personal");
+        workGoal.loadWork(t);
+        var fluids = t.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        for (int i = 0; i < TANKS; i++) {
+            tanks[i].setFluid(net.minecraftforge.fluids.FluidStack.EMPTY);
+            if (i < fluids.size()) {
+                tanks[i].readFromNBT(fluids.getCompound(i));
+            }
+        }
+        syncTanks();
+    }
+
+    /** 作業をやめる（元の動き方に戻る）。 */
+    public void clearWork() {
+        workGoal.loadWork(new CompoundTag());
+        this.workConsole = null;
+        this.workOrder = -1;
+        this.workJob = null;
+        this.personal = 0;
+        entityData.set(WORKING, false);
+        entityData.set(ACTIVITY, ACT_NONE);
+        if (state() == STATE_CRAFTING || state() == STATE_MINING) {
+            setState(STATE_IDLE);
+        }
+    }
+
+    @Nullable
+    public BlockPos workConsole() {
+        return workConsole;
+    }
+
+    public int workOrder() {
+        return workOrder;
+    }
+
+    /** 作業中か（クライアントでも見える）。 */
+    public boolean isWorking() {
+        return entityData.get(WORKING);
+    }
+
+    void setActivity(int activity) {
+        if (entityData.get(ACTIVITY) != activity) {
+            entityData.set(ACTIVITY, activity);
+        }
+    }
+
+    /** 作業中に今していること（充電に戻っている間は充電、戦っている間は戦い）。作業中でなければ {@link #ACT_NONE}。 */
+    public int activity() {
+        if (!isWorking()) {
+            return ACT_NONE;
+        }
+        int s = state();
+        if (s == STATE_LOW_POWER || s == STATE_RETREAT || charging(s)) {
+            return ACT_CHARGE;
+        }
+        if (getTarget() != null || entityData.get(ALERT)) {
+            return ACT_FIGHT;
+        }
+        return entityData.get(ACTIVITY);
+    }
+
+    /** 持ち物の5つと、バックパックがあればその24（全部）。 */
+    private int[] allCarrySlots() {
+        int n = RuinAndroid.CARRY_SLOTS + (isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)) ? PACK_SLOTS : 0);
+        int[] out = new int[n];
+        for (int i = 0; i < n; i++) {
+            out[i] = i < CARRY_SLOTS ? CARRY_START + i : PACK_START + (i - CARRY_SLOTS);
+        }
+        return out;
+    }
+
+    /** 作業で運ぶ物を入れるスロット: 持ち物とバックパックのうち、作業を始めたときに空いていた所。 */
+    public int[] carrySlots() {
+        int[] all = allCarrySlots();
+        int n = 0;
+        for (int i = 0; i < all.length; i++) {
+            if ((personal & (1 << i)) == 0) {
+                n++;
+            }
+        }
+        int[] out = new int[n];
+        n = 0;
+        for (int i = 0; i < all.length; i++) {
+            if ((personal & (1 << i)) == 0) {
+                out[n++] = all[i];
+            }
+        }
+        return out;
+    }
+
+    /** 持ち物とバックパックの空いているスロットの数（作業に使える場所。作業を始める前の見積もり）。 */
+    public int freeCarry() {
+        int n = 0;
+        for (int slot : allCarrySlots()) {
+            if (inventory.getItem(slot).isEmpty()) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    public int carryCapacity() {
+        return carrySlots().length;
+    }
+
+    public boolean carryEmpty() {
+        for (int slot : carrySlots()) {
+            if (!inventory.getItem(slot).isEmpty()) {
+                return false;
+            }
+        }
+        return tanksEmpty();
+    }
+
+    /** 持ち物に入れる（同じ物に重ねてから、空きへ）。入りきらなかった分を返す。 */
+    public net.minecraft.world.item.ItemStack addToCarry(net.minecraft.world.item.ItemStack stack) {
+        net.minecraft.world.item.ItemStack rest = stack.copy();
+        for (int pass = 0; pass < 2 && !rest.isEmpty(); pass++) {
+            for (int slot : carrySlots()) {
+                net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+                if (pass == 0 && !s.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameTags(s, rest)) {
+                    int move = Math.min(rest.getCount(), s.getMaxStackSize() - s.getCount());
+                    s.grow(move);
+                    rest.shrink(move);
+                } else if (pass == 1 && s.isEmpty()) {
+                    inventory.setItem(slot, rest);
+                    rest = net.minecraft.world.item.ItemStack.EMPTY;
+                }
+                if (rest.isEmpty()) {
+                    break;
+                }
+            }
+        }
+        inventory.setChanged();
+        return rest;
+    }
+
+    /** 持ち物から、見本と同じ物を count 個取り出す（足りなければ取らずに false）。 */
+    public boolean takeFromCarry(net.minecraft.world.item.ItemStack like, int count) {
+        int have = 0;
+        for (int slot : carrySlots()) {
+            if (net.minecraft.world.item.ItemStack.isSameItemSameTags(inventory.getItem(slot), like)) {
+                have += inventory.getItem(slot).getCount();
+            }
+        }
+        if (have < count) {
+            return false;
+        }
+        for (int slot : carrySlots()) {
+            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+            if (count > 0 && net.minecraft.world.item.ItemStack.isSameItemSameTags(s, like)) {
+                int take = Math.min(count, s.getCount());
+                s.shrink(take);
+                count -= take;
+            }
+        }
+        inventory.setChanged();
+        return true;
     }
 
     /** 護衛の持ち物（GUI のスロット）。 */
@@ -144,7 +710,7 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public static boolean isRepairKit(net.minecraft.world.item.ItemStack stack) {
-        return !stack.isEmpty() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_repair_kit");
+        return isItem(stack, "android_repair_kit");
     }
 
     public static boolean isArmorPlate(net.minecraft.world.item.ItemStack stack) {
@@ -178,7 +744,7 @@ public abstract class RuinAndroid extends Monster {
         return net.minecraft.world.InteractionResult.sidedSuccess(level().isClientSide);
     }
 
-    /** 倒れたら、自己修理キットと装甲板をその場に落とす。 */
+    /** 倒れたら、持ち物（自己修理キット・装甲板・アップグレード・運んでいる物）をその場に落とす。 */
     @Override
     protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
@@ -186,20 +752,27 @@ public abstract class RuinAndroid extends Monster {
     }
 
     /**
-     * 持ち物（自己修理キット・装甲板）を手放す。ステーションに転送アップグレードがあれば、ステーションへ転送して
+     * 持ち物（自己修理キット・装甲板・アップグレード・運んでいる物）を手放す。ステーションに転送アップグレードがあれば、ステーションへ転送して
      * 次に印刷するアンドロイドに持たせる。なければその場に落とす。
      */
     private void releaseInventory(ServerLevel level) {
         AndroidStationBlockEntity station = home != null
                 && level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.hasTransfer() ? s : null;
         boolean sent = false;
+        if (station != null && workConsole != null) {
+            station.keepWork(getUUID(), workConsole, workOrder, saveWorkState());    // 印刷し直したアンドロイドが、同じ注文の作業を続ける
+        }
+        if (station == null && workConsole != null && level.isLoaded(workConsole)
+                && level.getBlockEntity(workConsole) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity c) {
+            c.cancel(workOrder, null);           // 消費済みの作業を別の個体に最初からやり直させない
+        }
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             net.minecraft.world.item.ItemStack stack = inventory.removeItemNoUpdate(i);
             if (stack.isEmpty()) {
                 continue;
             }
             if (station != null) {
-                stack = station.keep(i, stack);
+                stack = station.keep(getUUID(), i, stack);
                 sent = true;
             }
             if (!stack.isEmpty()) {
@@ -209,6 +782,24 @@ public abstract class RuinAndroid extends Monster {
         if (sent) {
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL, getX(), getY() + 0.8, getZ(), 20, 0.3, 0.5, 0.3, 0.2);
             playSound(SoundEvents.ENDERMAN_TELEPORT, 0.5F, 1.6F);
+        }
+    }
+
+    /** 持ち物を読み込む。0.6.0 までの保存（位置なしの並び）は、自己修理キットと装甲板をそれぞれの場所へ戻す。 */
+    private void loadInventory(CompoundTag tag) {
+        inventory.clearContent();
+        if (tag.contains("items")) {
+            net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items = net.minecraft.core.NonNullList.withSize(INVENTORY_SIZE,
+                    net.minecraft.world.item.ItemStack.EMPTY);
+            net.minecraft.world.ContainerHelper.loadAllItems(tag.getCompound("items"), items);
+            for (int i = 0; i < INVENTORY_SIZE; i++) {
+                inventory.setItem(i, items.get(i));
+            }
+            return;
+        }
+        for (net.minecraft.nbt.Tag t : tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            java.util.Optional.of(net.minecraft.world.item.ItemStack.of((CompoundTag) t)).filter(stack -> !stack.isEmpty()).ifPresent(stack ->
+                    inventory.setItem(isArmorPlate(stack) ? SLOT_PLATE : SLOT_REPAIR, stack));
         }
     }
 
@@ -241,7 +832,7 @@ public abstract class RuinAndroid extends Monster {
         }
         setCustomName(n.isEmpty() ? null : net.minecraft.network.chat.Component.literal(n));
         if (home != null && level() instanceof ServerLevel level && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station) {
-            station.rememberName(n);
+            station.rememberName(getUUID(), n);
         }
     }
 
@@ -290,6 +881,17 @@ public abstract class RuinAndroid extends Monster {
         entityData.define(CHARGER_LINK, -1);
         entityData.define(GUARD, false);
         entityData.define(ALERT, false);
+        entityData.define(BATTERIES, 0);
+        entityData.define(TANK_A, -1);
+        for (EntityDataAccessor<net.minecraft.world.item.ItemStack> d : DECOR) {
+            entityData.define(d, net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        entityData.define(TANK_B, -1);
+        entityData.define(BACKPACK, false);
+        entityData.define(WORKING, false);
+        entityData.define(ACTIVITY, ACT_NONE);
+        entityData.define(GESTURE, GESTURE_NONE);
+        entityData.define(TOOL, TOOL_PICKAXE);
     }
 
     // ------------------------------------------------------------------ 護衛（プレイヤーのアンドロイド）
@@ -459,6 +1061,10 @@ public abstract class RuinAndroid extends Monster {
 
     /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
     boolean guardTargets(LivingEntity e) {
+        if (workConsole != null) {
+            // 作業中は、自分を襲ってきた相手だけ迎え撃つ（近くにいる間）。片付けたら作業に戻る
+            return hostileToGuards(e) && e == getLastHurtByMob() && e.isAlive() && e.distanceToSqr(this) < WORK_DEFEND_RANGE * WORK_DEFEND_RANGE;
+        }
         if (!hostileToGuards(e) || mode == MODE_FOLLOW && !escort) {
             return false;
         }
@@ -508,11 +1114,11 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public float chargeFraction() {
-        return charge() / (float) CHARGE_MAX;
+        return charge() / (float) maxCharge();
     }
 
     protected void setCharge(int charge) {
-        entityData.set(CHARGE, Mth.clamp(charge, 0, CHARGE_MAX));
+        entityData.set(CHARGE, Mth.clamp(charge, 0, maxCharge()));
     }
 
     /**
@@ -597,6 +1203,9 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
+        if (GESTURE.equals(key) && level().isClientSide) {
+            clientGestureStart = tickCount;
+        }
         if (STATE.equals(key) && level().isClientSide) {
             int s = state();
             if (s != clientPrevState) {
@@ -612,6 +1221,8 @@ public abstract class RuinAndroid extends Monster {
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new PowerGoal());
+        workGoal = new AndroidWorkGoal(this);
+        goalSelector.addGoal(2, workGoal);
         registerCombat();
         goalSelector.addGoal(5, new GuardGoal());
         goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
@@ -687,8 +1298,31 @@ public abstract class RuinAndroid extends Monster {
             setState(STATE_RETREAT);
             playSound(SoundEvents.BEACON_DEACTIVATE, 0.7F, 1.3F);
         }
+        if (guard && printed() && active() && mode != MODE_FOLLOW && getTarget() == null && !isWorking() && home != null
+                && retreatCooldown <= 0 && tickCount % 20 == 7 && getHealth() < getMaxHealth()
+                && tickCount - getLastHurtByMobTimestamp() > 100 && level().getBlockEntity(home) instanceof AndroidStationBlockEntity) {
+            // 傷ついていて、手が空いている（戦っていない・作業していない）: ステーションへ戻って直す
+            setState(STATE_RETREAT);
+        }
         if (guard && getTarget() != null && !guardTargets(getTarget())) {
             setTarget(null);
+        }
+        if (gestureTicks > 0) {
+            if (gestureLook != null && gestureLook.isAlive()) {
+                getLookControl().setLookAt(gestureLook, 60, 60);
+            }
+            if (--gestureTicks == 0) {
+                entityData.set(GESTURE, GESTURE_NONE);
+                gestureLook = null;
+            }
+        } else if (tickCount % 20 == 11) {
+            greetings((ServerLevel) level());
+        }
+        // 作業中は、作業指令台に毎秒知らせる（充電で作業の手を止めている間も、作業を取り上げられないように）
+        if (workJob != null && workJob.jobId() >= 0 && tickCount % 20 == 0 && workConsole != null && level().isLoaded(workConsole)
+                && level().getBlockEntity(workConsole) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity c
+                && !c.heartbeat(this, workJob)) {
+            workJob = null;
         }
         if (state() != STATE_CHARGING_FOLLOW && entityData.get(CHARGER_LINK) >= 0) {
             entityData.set(CHARGER_LINK, -1);
@@ -850,7 +1484,24 @@ public abstract class RuinAndroid extends Monster {
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
-        tag.put("inventory", inventory.createTag());
+        net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items = net.minecraft.core.NonNullList.withSize(INVENTORY_SIZE,
+                net.minecraft.world.item.ItemStack.EMPTY);
+        for (int i = 0; i < INVENTORY_SIZE; i++) {
+            items.set(i, inventory.getItem(i));
+        }
+        tag.put("items", net.minecraft.world.ContainerHelper.saveAllItems(new CompoundTag(), items));
+        net.minecraft.nbt.ListTag tl = new net.minecraft.nbt.ListTag();
+        for (var t : tanks) {
+            tl.add(t.writeToNBT(new CompoundTag()));
+        }
+        tag.put("tanks", tl);
+        tag.putBoolean("work", workEnabled);
+        if (workConsole != null) {
+            tag.put("work_console", NbtUtils.writeBlockPos(workConsole));
+            tag.putInt("work_order", workOrder);
+            tag.putInt("work_personal", personal);
+            tag.put("work_state", saveWorkState());
+        }
         if (guard) {
             tag.putBoolean("guard", true);
             tag.putBoolean("dismantling", dismantling);
@@ -885,7 +1536,26 @@ public abstract class RuinAndroid extends Monster {
         guard = tag.getBoolean("guard");
         dismantling = tag.getBoolean("dismantling");
         entityData.set(GUARD, guard);
-        inventory.fromTag(tag.getList("inventory", net.minecraft.nbt.Tag.TAG_COMPOUND));
+        loadInventory(tag);
+        net.minecraft.nbt.ListTag tl = tag.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        for (int i = 0; i < TANKS; i++) {
+            tanks[i].setFluid(net.minecraftforge.fluids.FluidStack.EMPTY);
+            if (i < tl.size()) {
+                tanks[i].readFromNBT(tl.getCompound(i));
+            }
+        }
+        syncTanks();
+        workEnabled = !tag.contains("work") || tag.getBoolean("work");
+        io.github.genichimaruo.singulo.compat.Legacy.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
+            assignWork(p, tag.getInt("work_order"));
+            personal = tag.getInt("work_personal");          // 作業を始めたときの持ち主の物の場所（読み込み直しても変えない）
+            if (tag.contains("work_state")) {
+                restoreWorkState(tag.getCompound("work_state"));
+            }
+        }, this::clearWork);
+        if (tag.contains("charge")) {
+            setCharge(tag.getInt("charge"));                // バッテリーの数が分かってから、満タンに合わせて戻す
+        }
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         if (guard) {
             configure(tag.getInt("mode"), tag.contains("retreat") ? tag.getInt("retreat") : 30);
@@ -938,12 +1608,89 @@ public abstract class RuinAndroid extends Monster {
                 } else {
                     getNavigation().stop();
                 }
-            } else if (home != null) {
-                Vec3 spot = Vec3.atBottomCenterOf(home.above());
-                if (spot.distanceToSqr(position()) > 3 * 3 && (getNavigation().isDone() || tickCount % 20 == 0)) {
+            } else if (home != null && level() instanceof ServerLevel level) {
+                // ステーションのそばで待つ。待っている仲間のうち1体（番）はステーションの上に立つ。
+                // ほかの仲間が充電・修理に戻ってくるとき、ステーションが印刷したいときは、番が横へどいて譲る
+                Vec3 dock = Vec3.atBottomCenterOf(home.above());
+                boolean onDock = position().subtract(dock).horizontalDistanceSqr() < 0.8 * 0.8 && Math.abs(getY() - dock.y) < 1;
+                RuinAndroid needer = dockNeeder(level);
+                boolean keeper = mode == MODE_GUARD && dockKeeper(level) == RuinAndroid.this;
+                boolean yield = keeper && (needer != null || level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.wantsTop());
+                if (keeper && yield && !yielding) {
+                    // 「どうぞ」: 戻ってくる仲間の方を向いて知らせる
+                    chirp(level, needer, 1.7F);
+                }
+                yielding = keeper && yield;
+                if (keeper && !yield) {
+                    Vec3 dv = dock.subtract(position()).multiply(1, 0, 1);
+                    if (dv.length() > 0.6 || Math.abs(getY() - dock.y) > 1) {
+                        if (getNavigation().isDone() || tickCount % 20 == 0) {
+                            getNavigation().moveTo(dock.x, dock.y, dock.z, 0.9);
+                        }
+                    } else {
+                        // 上に着いた: 中央に寄って止まる
+                        getNavigation().stop();
+                        if (dv.length() > 0.05) {
+                            setDeltaMovement(dv.x * 0.3, getDeltaMovement().y, dv.z * 0.3);
+                        }
+                    }
+                    return;
+                }
+                Vec3 spot = dock.add(STAND_OFFSETS[Math.floorMod(getUUID().hashCode(), STAND_OFFSETS.length)]);
+                if ((spot.distanceToSqr(position()) > 3 * 3 || onDock) && (getNavigation().isDone() || tickCount % 20 == 0)) {
                     getNavigation().moveTo(spot.x, spot.y, spot.z, 0.9);
                 }
             }
+        }
+    }
+
+    /** 同じステーションの護衛で、迎撃モードで手が空いて待っている仲間（自分も含む）。 */
+    private java.util.List<RuinAndroid> idlePeers(ServerLevel level) {
+        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        return level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(16),
+                a -> a.isAlive() && a.guard && home.equals(a.home) && a.mode == MODE_GUARD && a.printed() && a.active()
+                        && a.getTarget() == null && !a.isWorking() && a.state() == STATE_IDLE);
+    }
+
+    /** ステーションの上で待つ番: 今上にいる仲間がいればその仲間（入れ替わらないように）、いなければ UUID の一番小さい仲間。 */
+    @Nullable
+    private RuinAndroid dockKeeper(ServerLevel level) {
+        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        RuinAndroid best = null;
+        for (RuinAndroid a : idlePeers(level)) {
+            boolean on = a.position().subtract(dock).horizontalDistanceSqr() < 0.8 * 0.8 && Math.abs(a.getY() - dock.y) < 1;
+            if (on) {
+                return a;
+            }
+            if (best == null || a.getUUID().compareTo(best.getUUID()) < 0) {
+                best = a;
+            }
+        }
+        return best;
+    }
+
+    /** ステーションの上を使いたい仲間（充電・修理に戻ってくる、上で充電・印刷中）。いなければ null。 */
+    @Nullable
+    private RuinAndroid dockNeeder(ServerLevel level) {
+        Vec3 dock = Vec3.atBottomCenterOf(home.above());
+        for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(32),
+                a -> a != this && a.isAlive() && a.guard && home.equals(a.home))) {
+            int s = a.state();
+            if (!a.printed() || s == STATE_LOW_POWER || s == STATE_RETREAT || s == STATE_CHARGING) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    /** 仲間に知らせる（短い電子音と音符。相手がいれば、互いに向き合う）。 */
+    void chirp(ServerLevel level, @Nullable RuinAndroid other, float pitch) {
+        playSound(SoundEvents.AMETHYST_BLOCK_CHIME, 0.7F, pitch);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.NOTE, getX(), getY() + getBbHeight() + 0.4, getZ(), 1, 0, 0, 0,
+                pitch / 2);
+        if (other != null) {
+            getLookControl().setLookAt(other, 60, 60);
+            other.getLookControl().setLookAt(this, 60, 60);
         }
     }
 
@@ -1003,16 +1750,31 @@ public abstract class RuinAndroid extends Monster {
                 }
                 // 充電切れで、ステーション（印刷台）が遠すぎれば戻らずにその場で充電する。体力で戻るときは遠くからでも戻る
                 double range = state() == STATE_RETREAT ? 96 : DOCK_RANGE;
-                if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400)) {
+                // ステーションの上でほかのアンドロイドが充電中なら、そばで待って、どいたら交代で乗る（待つ間は座り込まない）
+                boolean taken = guard && h != null && dockTaken(level, h);
+                if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400) && !taken) {
                     getNavigation().stop();
                     setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
                     playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
                     return;
                 }
-                if (dock.distanceToSqr(position()) < 1.6 * 1.6) {
+                if (taken && dock.distanceToSqr(position()) < WAIT_RADIUS * WAIT_RADIUS) {
+                    getNavigation().stop();
+                    getLookControl().setLookAt(dock.x, dock.y + 1, dock.z);
+                    return;
+                }
+                if (!taken && dock.distanceToSqr(position()) < 1.6 * 1.6) {
                     getNavigation().stop();
                     setState(STATE_CHARGING);
                     playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.4F);
+                    // 「ありがとう」: 譲ってくれた仲間がそばにいれば、そちらを向いて返す
+                    if (guard) {
+                        for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, getBoundingBox().inflate(4),
+                                a -> a != RuinAndroid.this && a.isAlive() && a.guard && h.equals(a.home) && a.yielding)) {
+                            chirp(level, a, 1.3F);
+                            break;
+                        }
+                    }
                     return;
                 }
                 if (stateTicks % 10 == 1) {
@@ -1061,12 +1823,19 @@ public abstract class RuinAndroid extends Monster {
                     sparks(level, position().add(0, s == STATE_SOLAR ? 2.2 : 0.2, 0), 2, 0.3);
                 }
                 boolean healed = !(guard && s == STATE_CHARGING) || getHealth() >= getMaxHealth();
-                if (charge() >= CHARGE_MAX && healed) {
+                if (charge() >= maxCharge() && healed) {
                     // ソーラーのときは、パネルをたたんでから戦いに戻る
                     setState(s == STATE_SOLAR ? STATE_SOLAR_FOLD : STATE_IDLE);
                     playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
                 }
             }
+        }
+
+        /** ステーションの上で、ほかのアンドロイドが充電・印刷されているか。 */
+        private boolean dockTaken(ServerLevel level, BlockPos station) {
+            Vec3 dock = Vec3.atBottomCenterOf(station.above());
+            return !level.getEntitiesOfClass(RuinAndroid.class, new AABB(dock, dock).inflate(0.9, 1, 0.9),
+                    a -> a != RuinAndroid.this && a.isAlive() && (charging(a.state()) || !a.printed())).isEmpty();
         }
 
         /** 電力の残っている無線充電器を持っている持ち主（近くにいなければ null）。 */
@@ -1103,7 +1872,7 @@ public abstract class RuinAndroid extends Monster {
                     sparks(level, position().add(0, 1.0, 0), 2, 0.25);
                 }
             }
-            if (charge() >= CHARGE_MAX) {
+            if (charge() >= maxCharge()) {
                 setState(STATE_IDLE);
                 playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
             }

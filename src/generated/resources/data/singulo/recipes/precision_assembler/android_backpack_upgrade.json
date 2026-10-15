@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 2,
+  "time": 120,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:hopper"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:ceramic_substrate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:basic_circuit"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:android_backpack_upgrade",
+    "count": 1
+  }
+}

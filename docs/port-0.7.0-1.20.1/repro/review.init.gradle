@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    def r = rootProject.file('docs/port-0.7.0-1.20.1/repro')
+    sourceSets.main.java.srcDir(new File(r, 'java'))
+    sourceSets.main.resources.srcDir(new File(r, 'resources'))
+} }

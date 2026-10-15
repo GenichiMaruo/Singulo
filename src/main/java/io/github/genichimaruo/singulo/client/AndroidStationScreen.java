@@ -16,20 +16,22 @@ import net.minecraft.world.inventory.Slot;
  * 許可証の登録の様子。右端は蓄電量。長い文字は枠に収まるよう縮める。
  */
 public class AndroidStationScreen extends AbstractContainerScreen<AndroidStationMenu> {
-    private static final int INFO_X = 46;
+    private static final int INFO_X = 52;
     private static final int INFO_W = 162;
     private static final int BAR_LABEL_W = 30;
-    private static final int MODE_Y = 82;
+    private static final int MODE_Y = 70;
     private static final int MODE_W = 52;
-    private static final int RETREAT_Y = 104;
+    private static final int RETREAT_Y = 90;
     private static final int MINUS_X = INFO_X;
     private static final int PLUS_X = INFO_X + 92;
     private static final int RECALL_X = INFO_X + 110;
     private static final int RECALL_W = 52;
-    private static final int BAR_X = 222;
-    private static final int ESCORT_Y = 126;
+    private static final int BAR_X = 228;
+    /** 2体を受け持つときの、見るアンドロイドを選ぶ札（名前の左）。 */
+    private static final int UNIT_W = 12, UNIT_GAP = 2;
+    private static final int ESCORT_Y = 110;
     private static final int ESCORT_W = (INFO_W - 3) / 2;
-    private static final int LEADER_Y = 142;
+    private static final int LEADER_Y = 130;
     private static final int NAME_Y = 20;
 
     private final NameEditor names = new NameEditor();
@@ -59,7 +61,7 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         }
         if (named() && Panel.inside(mouseX, mouseY, leftPos + INFO_X + INFO_W - 10, topPos + NAME_Y, 10, 10)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.android.rename.reset"), mouseX, mouseY);
-        } else if (!names.editing() && Panel.inside(mouseX, mouseY, leftPos + INFO_X, topPos + NAME_Y, INFO_W - 12, 11)
+        } else if (!names.editing() && Panel.inside(mouseX, mouseY, leftPos + nameX(), topPos + NAME_Y, nameW() - 12, 11)
                 && menu.value(AndroidStationBlockEntity.D_KIND) >= 0) {
             g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
         }
@@ -116,12 +118,30 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         return menu.value(AndroidStationBlockEntity.D_MODE) == io.github.genichimaruo.singulo.android.RuinAndroid.MODE_FOLLOW;
     }
 
+    private int selected() {
+        return menu.value(AndroidStationBlockEntity.D_SELECTED);
+    }
+
+    /** 2体を受け持つか（見るアンドロイドを選ぶ札を出す）。 */
+    private boolean twoUnits() {
+        return menu.value(AndroidStationBlockEntity.D_UNITS) > 1;
+    }
+
+    /** 名前の欄の左端（2体のときは、選ぶ札の右）。 */
+    private int nameX() {
+        return INFO_X + (twoUnits() ? 2 * (UNIT_W + UNIT_GAP) : 0);
+    }
+
+    private int nameW() {
+        return INFO_W - (nameX() - INFO_X);
+    }
+
     /** 付けた名前（なければ型の愛称、設計メモリがなければ「設計メモリなし」）。 */
     private Component androidName() {
         int kind = menu.value(AndroidStationBlockEntity.D_KIND);
-        if (minecraft != null && minecraft.level != null
-                && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station && !station.name().isEmpty()) {
-            return Component.literal(station.name());
+        if (minecraft != null && minecraft.level != null && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station
+                && !station.name(selected()).isEmpty()) {
+            return Component.literal(station.name(selected()));
         }
         return kind >= 0 && kind < AndroidKind.values().length ? Component.translatable(AndroidKind.values()[kind].nicknameKey())
                 : Component.translatable("gui.singulo.android_station.no_design");
@@ -130,7 +150,7 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
     /** 名前を付けているか（元に戻すボタンを出す）。 */
     private boolean named() {
         return !names.editing() && minecraft != null && minecraft.level != null
-                && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station && !station.name().isEmpty();
+                && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station && !station.name(selected()).isEmpty();
     }
 
     private boolean orphanWaiting() {
@@ -171,11 +191,19 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
             NameEditor.reset(menu.containerId);
             return true;
         }
-        if (Panel.inside(mouseX, mouseY, leftPos + INFO_X, topPos + NAME_Y, INFO_W - 12, 11)
+        if (twoUnits() && minecraft != null && minecraft.gameMode != null) {
+            for (int i = 0; i < AndroidStationBlockEntity.MAX_UNITS; i++) {
+                if (Panel.inside(mouseX, mouseY, leftPos + INFO_X + i * (UNIT_W + UNIT_GAP), topPos + NAME_Y - 1, UNIT_W, 11)) {
+                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidStationBlockEntity.BUTTON_SELECT + i);
+                    return true;
+                }
+            }
+        }
+        if (Panel.inside(mouseX, mouseY, leftPos + nameX(), topPos + NAME_Y, nameW() - 12, 11)
                 && menu.value(AndroidStationBlockEntity.D_KIND) >= 0) {
             String current = minecraft != null && minecraft.level != null
-                    && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station ? station.name() : "";
-            var box = names.open(font, leftPos + INFO_X - 2, topPos + NAME_Y - 3, INFO_W, current);
+                    && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station ? station.name(selected()) : "";
+            var box = names.open(font, leftPos + nameX() - 2, topPos + NAME_Y - 3, nameW(), current);
             addRenderableWidget(box);
             setFocused(box);
             return true;
@@ -223,12 +251,18 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
             NameEditor.drawReset(g, x + INFO_X + INFO_W - 10, y + NAME_Y, Panel.inside(mouseX, mouseY, x + INFO_X + INFO_W - 10, y + NAME_Y, 10, 10),
                     0xFFD6DBE0, Panel.TEXT);
         }
+        if (twoUnits()) {
+            for (int i = 0; i < AndroidStationBlockEntity.MAX_UNITS; i++) {
+                int ux = x + INFO_X + i * (UNIT_W + UNIT_GAP);
+                button(g, ux, y + NAME_Y - 1, UNIT_W, 11, i == selected(), Panel.inside(mouseX, mouseY, ux, y + NAME_Y - 1, UNIT_W, 11));
+            }
+        }
         Panel.verticalBar(g, x + BAR_X, y + 18, 10, 104, (double) menu.value(AndroidStationBlockEntity.D_ENERGY) / cap, Panel.GLOW);
         int status = menu.value(AndroidStationBlockEntity.D_STATUS);
         boolean present = status >= AndroidStationBlockEntity.S_PRINTING && status != AndroidStationBlockEntity.S_WAITING
                 && status != AndroidStationBlockEntity.S_BLOCKED;
-        bar(g, x + INFO_X + BAR_LABEL_W, y + 52, present ? menu.value(AndroidStationBlockEntity.D_HP) : 0, 0xFF60C080);
-        bar(g, x + INFO_X + BAR_LABEL_W, y + 66, present ? menu.value(AndroidStationBlockEntity.D_CHARGE) : 0, Panel.GLOW);
+        bar(g, x + INFO_X + BAR_LABEL_W, y + 46, present ? menu.value(AndroidStationBlockEntity.D_HP) : 0, 0xFF60C080);
+        bar(g, x + INFO_X + BAR_LABEL_W, y + 58, present ? menu.value(AndroidStationBlockEntity.D_CHARGE) : 0, Panel.GLOW);
         int mode = menu.value(AndroidStationBlockEntity.D_MODE);
         for (int i = 0; i < 3; i++) {
             button(g, modeX(i), y + MODE_Y, MODE_W, 16, i == mode, Panel.inside(mouseX, mouseY, modeX(i), y + MODE_Y, MODE_W, 16));
@@ -292,22 +326,28 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
         int kind = menu.value(AndroidStationBlockEntity.D_KIND);
         if (!names.editing()) {
-            fit(g, font, androidName(), INFO_X, NAME_Y + 2, INFO_W - 13, kind >= 0 ? Panel.TEXT : 0xFF8A949E);
+            fit(g, font, androidName(), nameX(), NAME_Y + 2, nameW() - 13, kind >= 0 ? Panel.TEXT : 0xFF8A949E);
         }
         int status = menu.value(AndroidStationBlockEntity.D_STATUS);
         Component state = status == AndroidStationBlockEntity.S_WAITING
                 ? Component.translatable("gui.singulo.android_station.status.waiting", (menu.value(AndroidStationBlockEntity.D_DELAY) + 19) / 20)
                 : Component.translatable("gui.singulo.android_station.status." + status);
-        fit(g, font, state, INFO_X, 35, INFO_W, statusColor(status));
-        fit(g, font, Component.translatable("gui.singulo.android_station.hp"), INFO_X, 51, BAR_LABEL_W - 3, Panel.TEXT);
-        fit(g, font, Component.translatable("gui.singulo.android_station.charge"), INFO_X, 65, BAR_LABEL_W - 3, Panel.TEXT);
-        fitCentered(g, font, Component.translatable("gui.singulo.android_station.memory"), 6, AndroidStationMenu.MEMORY_Y - 11, 32, 0xFF8A949E);
-        fitCentered(g, font, Component.translatable("gui.singulo.android_station.kit"), 6, AndroidStationMenu.KIT_Y - 11, 32, 0xFF8A949E);
-        fitCentered(g, font, Component.translatable("gui.singulo.android_station.upgrade"), 6, AndroidStationMenu.UPGRADE_Y - 11, 32,
+        fit(g, font, state, INFO_X, 32, INFO_W, statusColor(status));
+        fit(g, font, Component.translatable("gui.singulo.android_station.hp"), INFO_X, 45, BAR_LABEL_W - 3, Panel.TEXT);
+        fit(g, font, Component.translatable("gui.singulo.android_station.charge"), INFO_X, 57, BAR_LABEL_W - 3, Panel.TEXT);
+        if (twoUnits()) {
+            for (int i = 0; i < AndroidStationBlockEntity.MAX_UNITS; i++) {
+                fitCentered(g, font, Component.literal(String.valueOf(i + 1)), INFO_X + i * (UNIT_W + UNIT_GAP), NAME_Y + 1, UNIT_W,
+                        i == selected() ? 0xFFFFFFFF : Panel.TEXT);
+            }
+        }
+        fitCentered(g, font, Component.translatable("gui.singulo.android_station.memory"), 6, AndroidStationMenu.MEMORY_Y - 11, 40, 0xFF8A949E);
+        fitCentered(g, font, Component.translatable("gui.singulo.android_station.kit"), 6, AndroidStationMenu.KIT_Y - 11, 40, 0xFF8A949E);
+        fitCentered(g, font, Component.translatable("gui.singulo.android_station.upgrade"), 6, AndroidStationMenu.UPGRADE_Y - 11, 40,
                 0xFF8A949E);
-        fitCentered(g, font, Component.translatable("gui.singulo.android_station.stock"), 6, AndroidStationMenu.STOCK_Y - 11, 32,
+        fitCentered(g, font, Component.translatable("gui.singulo.android_station.stock"), 6, AndroidStationMenu.STOCK_Y - 11, 40,
                 0xFF8A949E);
-        fitCentered(g, font, Component.translatable("gui.singulo.android_station.permit"), 6, AndroidStationMenu.PERMIT_Y - 11, 32,
+        fitCentered(g, font, Component.translatable("gui.singulo.android_station.permit"), 6, AndroidStationMenu.PERMIT_Y - 11, 40,
                 0xFF8A949E);
         int escort = menu.value(AndroidStationBlockEntity.D_ESCORT);
         for (int i = 0; i < 2; i++) {

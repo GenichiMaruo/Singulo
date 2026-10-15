@@ -62,6 +62,15 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     /** 装甲板を積んだときだけ見える、胸の銀の板と左肩の小さな肩当て（さりげなく）。 */
     final ModelPart armorChest;
     final ModelPart armorPad;
+    /** バックパックアップグレードを積んだときの、背中のバックパックと肩ひも（背中のスラスターの代わりに付く）。 */
+    final ModelPart backpack;
+    final ModelPart strapL;
+    final ModelPart strapR;
+    final ModelPart thrusterL;
+    final ModelPart thrusterR;
+    /** バッテリーアップグレードの数だけ、腰の後ろ（スカートの上）に付くバッテリーパック。 */
+    final ModelPart batteryL;
+    final ModelPart batteryR;
 
     public AndroidModel(ModelPart root) {
         this.root = root;
@@ -92,6 +101,13 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         this.hairSide = ponytail.getInitialPose().x > 0 ? 1 : -1;
         this.armorChest = torso.getChild("armor_chest");
         this.armorPad = armL.getChild("armor_pad");
+        this.backpack = torso.getChild("backpack");
+        this.strapL = torso.getChild("strap_l");
+        this.strapR = torso.getChild("strap_r");
+        this.thrusterL = torso.getChild("thruster_l");
+        this.thrusterR = torso.getChild("thruster_r");
+        this.batteryL = skirtBack.getChild("battery_l");
+        this.batteryR = skirtBack.getChild("battery_r");
     }
 
     private static CubeListBuilder cube(int u, int v, float x, float y, float z, int w, int h, int d, CubeDeformation def) {
@@ -117,8 +133,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         // スカート（前・後ろ・左右と、右だけ長い垂れ）
         hips.addOrReplaceChild("skirt_front", cube(54, 16, -4, 0, -0.5F, 8, 5, 1, def(0, 0, -0.2F)),
                 PartPose.offsetAndRotation(0, -2, -2.0F, -0.22F, 0, 0));
-        hips.addOrReplaceChild("skirt_back", cube(72, 16, -4, 0, -0.5F, 8, 6, 1, def(0, 0, -0.2F)),
+        PartDefinition skirtBack = hips.addOrReplaceChild("skirt_back", cube(72, 16, -4, 0, -0.5F, 8, 6, 1, def(0, 0, -0.2F)),
                 PartPose.offsetAndRotation(0, -2, 2.0F, 0.28F, 0, 0));
+        // バッテリーパック（スカートの後ろの面に、左右1つずつ。スカートと一緒に揺れる）
+        skirtBack.addOrReplaceChild("battery_l", cube(16, 54, -1, -0.2F, 0.35F, 2, 3, 2, def(-0.05F)), PartPose.offset(2.3F, 0, 0));
+        skirtBack.addOrReplaceChild("battery_r", CubeListBuilder.create().texOffs(16, 54).mirror()
+                .addBox(-1, -0.2F, 0.35F, 2, 3, 2, def(-0.05F)), PartPose.offset(-2.3F, 0, 0));
         hips.addOrReplaceChild("skirt_left", cube(90, 16, -0.5F, 0, -2.5F, 1, 5, 5, def(-0.2F, 0, 0)),
                 PartPose.offsetAndRotation(3.5F, -2, 0, 0, 0, -0.28F));
         hips.addOrReplaceChild("skirt_right", CubeListBuilder.create().texOffs(90, 16).mirror().addBox(-0.5F, 0, -2.5F, 1, 5, 5, def(-0.2F, 0, 0)),
@@ -131,6 +151,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         // 装甲板: 胸の板にかぶせる薄い銀の板（胸の板より少しだけ大きい）
         torso.addOrReplaceChild("armor_chest", cube(110, 40, -3, -7, -2.3F, 6, 3, 1, def(-0.12F, 0.12F, 0.06F)), PartPose.ZERO);
         torso.addOrReplaceChild("neck", cube(114, 0, -1, -1, -1, 2, 2, 2, def(-0.15F)), PartPose.offset(0, -8, 0));
+        // バックパック（背中から少し離して背負う）と、背中の小物入れ、肩ひも
+        PartDefinition backpack = torso.addOrReplaceChild("backpack", cube(16, 44, -3, -7, 0, 6, 6, 3), PartPose.offset(0, 0, 1.6F));
+        backpack.addOrReplaceChild("pocket", cube(36, 44, -2, -4, 2.9F, 4, 3, 1, def(-0.05F)), PartPose.ZERO);
+        torso.addOrReplaceChild("strap_l", cube(48, 44, -0.5F, -8.5F, -2, 1, 1, 4, def(-0.1F)), PartPose.offset(2.1F, 0, 0));
+        torso.addOrReplaceChild("strap_r", CubeListBuilder.create().texOffs(48, 44).mirror()
+                .addBox(-0.5F, -8.5F, -2, 1, 1, 4, def(-0.1F)), PartPose.offset(-2.1F, 0, 0));
         for (int side = 0; side < 2; side++) {
             float x = side == 0 ? 1.6F : -1.6F;
             CubeListBuilder b = CubeListBuilder.create().texOffs(0, 48);
@@ -217,6 +243,46 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         pose.popPose();
     }
 
+    /** 頭までの変形を pose に積む（頭の装飾）。 */
+    void toHead(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        torso.translateAndRotate(pose);
+        head.translateAndRotate(pose);
+    }
+
+    /** 後ろ髪までの変形（リボンの垂れを、髪の角度に合わせて髪の外側に沿わせる）。 */
+    void toBackHair(PoseStack pose) {
+        toHead(pose);
+        backHair.translateAndRotate(pose);
+    }
+
+    /** スカートの後ろの面までの変形（腰リボンの垂れを、スカートの角度に合わせて沿わせる）。 */
+    void toSkirtBack(PoseStack pose) {
+        toHips(pose);
+        skirtBack.translateAndRotate(pose);
+    }
+
+    /** 胴までの変形（背中の装飾）。 */
+    void toTorso(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        torso.translateAndRotate(pose);
+    }
+
+    /** 腰までの変形（腰の装飾）。 */
+    void toHips(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+    }
+
+    /** 腰の横（スカートの左右の面）までの変形を pose に積む（タンクを描くため）。 */
+    void toHipSide(PoseStack pose, boolean left) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        hips.getChild(left ? "skirt_left" : "skirt_right").translateAndRotate(pose);
+    }
+
     /** 左手の先までの変形を pose に積む（ソーラーパネルを出すため）。 */
     void toLeftHand(PoseStack pose) {
         root.translateAndRotate(pose);
@@ -261,6 +327,18 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         boolean armored = !android.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).isEmpty();
         armorChest.visible = armored;
         armorPad.visible = armored;
+        boolean pack = android.hasBackpack();
+        backpack.visible = pack;
+        strapL.visible = pack;
+        strapR.visible = pack;
+        thrusterL.visible = !pack;
+        thrusterR.visible = !pack;
+        // ベレー帽をかぶっている間は、アホ毛を帽子の中にしまう（突き抜けないように）
+        ahoge.visible = !(android.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD).getItem()
+                instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc && acc.style().equals("beret"));
+        int batteries = android.batteries();
+        batteryL.visible = batteries >= 1;
+        batteryR.visible = batteries >= 2;
         float pt = age - android.tickCount;
         int state = android.state();
         float t = android.stateTime(pt);
@@ -303,6 +381,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         }
         switch (state) {
             case RuinAndroid.STATE_LOW_POWER -> lowPower();
+            case RuinAndroid.STATE_CRAFTING -> crafting(age);
+            case RuinAndroid.STATE_MINING -> mining(age);
             case RuinAndroid.STATE_CHARGING -> charging(t, age);
             case RuinAndroid.STATE_SOLAR -> solar(t, age);
             case RuinAndroid.STATE_SOLAR_FOLD -> solarFold(t, age);
@@ -340,6 +420,34 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
                     forearmR.xRot = -0.45F;
                 }
             }
+        }
+        gestureOverlay(android, pt);
+        if (android.showsHeldDecor()) {
+            // 手に持つ装飾: 左の前腕を前へ水平に出して持つ
+            armL.xRot = Mth.lerp(0.8F, armL.xRot, -0.35F);
+            armL.zRot = -0.1F;
+            forearmL.xRot = -1.2F;
+        }
+    }
+
+    /** 挨拶の仕草: 手を振る（左手を上げて左右に）・会釈（頭と上体を軽く下げる）。始めと終わりはなめらかに。 */
+    private void gestureOverlay(RuinAndroid android, float pt) {
+        int g = android.gesture();
+        if (g == RuinAndroid.GESTURE_NONE) {
+            return;
+        }
+        float t = android.gestureTime(pt);
+        float k = Mth.clamp(Math.min(t / 5, (RuinAndroid.GESTURE_TICKS - t) / 5), 0, 1);
+        k = k * k * (3 - 2 * k);
+        if (g == RuinAndroid.GESTURE_WAVE) {
+            armL.xRot = Mth.lerp(k, armL.xRot, -0.3F);
+            armL.zRot = Mth.lerp(k, armL.zRot, -2.5F + Mth.sin(t * 0.7F) * 0.35F);
+            forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.35F);
+            head.zRot += 0.08F * k;
+        } else if (g == RuinAndroid.GESTURE_NOD) {
+            float bow = Math.max(0, Mth.sin(t / RuinAndroid.GESTURE_TICKS * Mth.PI));
+            head.xRot += 0.45F * bow;
+            torso.xRot += 0.12F * bow;
         }
     }
 
@@ -569,6 +677,35 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtFront.xRot -= 0.3F * u * k;
     }
 
+    /** 作業台で作る: 少し前かがみで、両手を前に出し、交互にとんとんと手を動かす。 */
+    private void crafting(float age) {
+        float beat = age * 0.45F;
+        // 上体を少し前へ。頭は軽くうつむく程度（作業台を見下ろして首が折れないように、見る向きは使わない）
+        torso.xRot += 0.12F;
+        head.xRot = 0.2F;
+        armL.xRot = -0.9F + Mth.sin(beat) * 0.25F;
+        armR.xRot = -0.9F - Mth.sin(beat) * 0.25F;
+        armL.zRot = -0.18F;
+        armR.zRot = 0.18F;
+        forearmL.xRot = -0.6F - Math.max(0, Mth.sin(beat)) * 0.4F;
+        forearmR.xRot = -0.6F - Math.max(0, -Mth.sin(beat)) * 0.4F;
+    }
+
+    /** 採掘: 左手のツルハシを振りかぶって、振り下ろす。 */
+    private void mining(float age) {
+        float beat = age * 0.32F;
+        float s = Mth.sin(beat);
+        float down = s > 0 ? s * s : s * 0.6F;          // 振り下ろしは速く、振りかぶりはゆっくり
+        torso.xRot += 0.1F;
+        head.xRot = 0.25F;
+        armL.xRot = -1.5F + down * 1.0F;
+        armL.zRot = -0.12F;
+        forearmL.xRot = -0.45F;
+        armR.xRot = -0.25F;
+        armR.zRot = 0.18F;
+        forearmR.xRot = -0.3F;
+    }
+
     private void lowPower() {
         torso.xRot += 0.3F;
         head.xRot += 0.55F;
@@ -643,7 +780,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
 
     private void charging(float t, float age) {
         float k = ease(t / 10);
+        // 脚は腰とは別の部品なので、腰と一緒に下げる（下げないと、立ったときの高さから脚が前へ突き出る）
         hips.y += 8.5F * k;
+        legL.y += 8.5F * k;
+        legR.y += 8.5F * k;
         legL.xRot = -1.5F * k;
         legR.xRot = -1.5F * k;
         shinL.xRot = 2.95F * k;
@@ -651,7 +791,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         legL.zRot = -0.08F * k;
         legR.zRot = 0.08F * k;
         torso.xRot += 0.1F * k;
-        head.xRot = 0.4F * k + Mth.sin(age * 0.06F) * 0.03F;
+        head.xRot = 0.15F * k + Mth.sin(age * 0.06F) * 0.03F;
         armL.xRot = -0.55F * k;
         forearmL.xRot = -0.65F * k;
         armL.zRot = 0.15F * k;
