@@ -62,6 +62,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Pickaxe(this));
         addLayer(new Tanks(this));
         addLayer(new Accessories(this));
+        addLayer(new Blink(this));
         addLayer(new ArmorGlint(this));
     }
 
@@ -625,6 +626,44 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
                 pose.popPose();
             }
+        }
+    }
+
+    /**
+     * 瞬き: 数秒ごと（アンドロイドごとに間合いを変える）に、目の上にまぶた（肌の色と、下の縁のまつげの線）を重ねる。
+     * 半分閉じる → 閉じる（2 tick）→ 半分閉じる。目は顔（頭の前の面、z -3.5）の 5〜6 段目、左右 1〜2 列・5〜6 列。
+     */
+    final class Blink extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final int SKIN = 0xFFECE4, CREASE = 0xE6CFC8, LASH = 0x4A3A44;
+
+        Blink(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (!android.printed()) {
+                return;
+            }
+            int period = 70 + Math.floorMod(android.getId() * 37, 50);          // 3.5〜6秒ごと
+            int phase = Math.floorMod(android.tickCount + android.getId() * 13, period);
+            if (phase > 3) {
+                return;
+            }
+            boolean half = phase == 0 || phase == 3;                              // 閉じかけ・開きかけ
+            float p = 1 / 16F;
+            pose.pushPose();
+            getParentModel().toHead(pose);
+            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            float z0 = -3.52F * p, z1 = -3.5F * p;
+            for (float x0 : new float[] {-3, 1}) {
+                float x1 = x0 + 2;
+                float bottom = half ? -2 : -1;                                     // 半分なら上の段だけ
+                FxDraw.box(pose, vc, x0 * p, -3 * p, z0, x1 * p, (bottom - 0.25F) * p, z1, light, half ? CREASE : SKIN, 255);
+                FxDraw.box(pose, vc, x0 * p, (bottom - 0.25F) * p, z0 - 0.002F, x1 * p, bottom * p, z1, light, LASH, 255);
+            }
+            pose.popPose();
         }
     }
 
