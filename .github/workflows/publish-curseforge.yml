@@ -2,7 +2,7 @@ name: Publish CurseForge and GitHub Beta
 
 on:
   push:
-    tags: ['v*-1.20.1F']
+    tags: ['v*-1.20.1F', 'v*-1.20.1F-r*']
   workflow_dispatch:
 
 permissions:
@@ -42,8 +42,13 @@ jobs:
           minecraft=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')
           suffix=$(sed -n 's/^mod_loader_suffix=//p' gradle.properties | tr -d '\r')
           [[ "$suffix" == F ]] || { echo 'This workflow publishes Forge builds (F)'; exit 1; }
-          if [[ "$GITHUB_REF_TYPE" == tag && "$GITHUB_REF_NAME" != "v$version" && "$GITHUB_REF_NAME" != "v$version-$minecraft$suffix" ]]; then
-            echo 'Tag must match mod_version, optionally followed by the Minecraft version and loader suffix'; exit 1
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            tag_prefix="v$version-$minecraft$suffix"
+            retry_suffix="${GITHUB_REF_NAME#"$tag_prefix"}"
+            if [[ "$GITHUB_REF_NAME" != "$tag_prefix" && ( "$retry_suffix" == "$GITHUB_REF_NAME" || ! "$retry_suffix" =~ ^-r[1-9][0-9]*$ ) ]]; then
+              echo 'Tag must match the version, Minecraft and loader, optionally followed by -r<number>'
+              exit 1
+            fi
           fi
           test -f "docs/curseforge/changelog-$version.md"
           echo "version=$version" >> "$GITHUB_OUTPUT"
