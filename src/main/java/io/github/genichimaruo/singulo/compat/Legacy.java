@@ -44,6 +44,9 @@ public final class Legacy {
                         if (chunk == null) continue;
                         for (var blockEntity : new java.util.ArrayList<>(chunk.getBlockEntities().values())) {
                             if (bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(blockEntity.getBlockPos()))) {
+                                // Remove the inventory before the block's onRemove hook can
+                                // drop test cargo into a later reactor's gravity field.
+                                level.removeBlockEntity(blockEntity.getBlockPos());
                                 level.removeBlock(blockEntity.getBlockPos(), false);
                             }
                         }

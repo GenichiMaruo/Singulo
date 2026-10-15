@@ -56,7 +56,7 @@ GitHub Actions では自動で決まります（下の「GitHub Actions で公�
 
 版番号・変更履歴・翻訳を検証し、ビルドと GameTest が成功した JAR を成果物として保存したあと、同じ JAR をアップロードします。
 
-公開の種類（Release type）は、既定（`auto`）では版番号から決まります。
+mainの公開の種類（Release type）は、既定（`auto`）では版番号から決まります。1.20.1の0.7.0用ワークフローはBeta固定です。
 
 | `mod_version` | 公開の種類 |
 | --- | --- |
@@ -64,7 +64,7 @@ GitHub Actions では自動で決まります（下の「GitHub Actions で公�
 | `1.0.0` 以降で、`-beta` などの付かない版（例: 1.0.0、1.2.3） | **Release** |
 | 後ろに `-alpha`・`-beta.1`・`-rc1` などが付く版（例: 1.0.0-beta.1） | Beta |
 
-手動実行（Actions タブの「Run workflow」）では、`release_type` に `beta`・`release`・`alpha` を選んで上書きできます。タグと `gradle.properties` の版番号が一致しない場合は公開しません。再実行すると重複アップロードになる可能性があるため、成功済みの公開ジョブは再実行しないでください。
+mainの手動実行（Actions タブの「Run workflow」）では、`release_type` に `beta`・`release`・`alpha` を選んで上書きできます。1.20.1版にはこの上書き入力はありません。タグと `gradle.properties` の版番号が一致しない場合は公開しません。再実行すると重複アップロードになる可能性があるため、成功済みの公開ジョブは再実行しないでください。
 
 公開後の CurseForge の審査・承認はアップロードとは別の手続きです。
 
