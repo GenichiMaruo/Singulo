@@ -1,13 +1,13 @@
-# Minecraft 1.20.1 / Forge 版（Singulo 0.6.0）
+# Minecraft 1.20.1 / Forge 版（Singulo 0.7.0）
 
-既存の `port/1.20.1-forge` の 0.3.0 を、`main` の 0.6.0（`aee3da0`）まで更新したバックポートです。`main` は Minecraft 1.21.1 専用として維持します。
+既存の `port/1.20.1-forge` の 0.6.0 を、`main` の 0.7.0（`933373a`）まで更新したバックポートです。`main` は Minecraft 1.21.1 専用として維持します。
 
 ## 実行環境
 
 - Minecraft **1.20.1**、Forge **47.4.26**、Java **17**。
 - JEI は任意。開発・検証環境では **15.20.0.129** を使用します。
-- 配布用 JAR: `build/libs/Singulo-0.6.0-1.20.1F.jar`（`-dev.jar` は配布しません）。
-- 公開用タグ: `v0.6.0-1.20.1F`。この変更自体は公開処理を実行しません。
+- 配布用 JAR: `build/libs/Singulo-0.7.0-1.20.1F.jar`（`-dev.jar` は配布しません）。
+- 公開用タグ: `v0.7.0-1.20.1F`。この変更自体は公開処理を実行しません。
 
 ## 更新内容
 
@@ -34,10 +34,12 @@ python3 tools/localization.py --check
 python3 tools/check_supporters.py
 python3 tools/check_port_1201.py
 ./gradlew build runGameTestServer
-python3 tools/check_port_1201.py --jar build/libs/Singulo-0.6.0-1.20.1F.jar
+python3 tools/check_port_1201.py --jar build/libs/Singulo-0.7.0-1.20.1F.jar
 ./gradlew runClient
 ```
 
 生成画像には Pillow が必要です。GameTest の実行前には `build/gametest/world` と前回の `build/gametest/logs/latest.log` を削除して、前回の試験のブロック・流体・エンティティが次回に干渉するのを防ぎます。開発用や通常プレイのワールドは対象外です。
 
 1.20.1 固有の回帰テストとして、充電器のエネルギー Capability と NBT 保存、防具板のエンチャント、翼の滑空、新規パケットの Unicode／シード値の往復を追加しました。ボスとアンドロイドの実効段差高さ（1ブロック）も確認します。詳細な実測結果は [0.6.0 検証記録](port-0.6.0-1.20.1/verification.md) を参照してください。
+
+0.7.0の検証・画像・公開結果は[0.7.0移植記録](port-0.7.0-1.20.1/verification.md)を参照してください。

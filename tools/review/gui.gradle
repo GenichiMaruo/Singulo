@@ -1,0 +1,16 @@
+// Development-only: ordinary build/jar tasks never include the GUI harness.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/gui-src'))
+        legacyForge.runs.client {
+            gameDirectory = file('build/gui-review')
+            systemProperty 'singulo.guiReviewOutput', file('build/gui-review/screenshots').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

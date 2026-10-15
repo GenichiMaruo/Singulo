@@ -447,6 +447,10 @@
     "source": "Patterned Android Barrier Glass",
     "translation": "무늬 안드로이드 차단 유리"
   },
+  "block.singulo.android_delivery_port": {
+    "source": "Android Delivery Port",
+    "translation": "안드로이드 납품구"
+  },
   "block.singulo.android_gate_glass": {
     "source": "Android Gate Glass",
     "translation": "안드로이드 투과 유리"
@@ -455,9 +459,25 @@
     "source": "Patterned Android Gate Glass",
     "translation": "무늬 안드로이드 투과 유리"
   },
+  "block.singulo.android_recipe_rack": {
+    "source": "Android Recipe Rack",
+    "translation": "안드로이드 레시피 선반"
+  },
   "block.singulo.android_station": {
     "source": "Android Assembly Station",
     "translation": "안드로이드 조립 스테이션"
+  },
+  "block.singulo.android_supply_port": {
+    "source": "Android Supply Port",
+    "translation": "안드로이드 자재구"
+  },
+  "block.singulo.android_work_console": {
+    "source": "Android Work Console",
+    "translation": "안드로이드 작업 지령대"
+  },
+  "block.singulo.android_workbench": {
+    "source": "Android Workbench",
+    "translation": "안드로이드 작업대"
   },
   "block.singulo.archive_terminal": {
     "source": "Archive Terminal",
@@ -1159,6 +1179,10 @@
     "source": "One fitted to a guard android works as its chestplate (+8 armor, +2 toughness). Takes armor enchantments.",
     "translation": "호위 안드로이드에 하나 장착하면 흉갑으로 작동합니다(방어 +8, 방어 강도 +2). 방어구 마법 부여를 할 수 있습니다."
   },
+  "desc.singulo.android_backpack_upgrade": {
+    "source": "Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.",
+    "translation": "호위 안드로이드에 넣으면 소지품이 24칸(4줄×6칸) 늘어납니다. 등에 백팩을 멥니다."
+  },
   "desc.singulo.android_barrier_glass": {
     "source": "Glass that only androids cannot pass. Players and other creatures go straight through. Joins seamlessly with the same glass next to it.",
     "translation": "안드로이드만 지나갈 수 없는 유리. 플레이어와 다른 생물은 그대로 통과합니다. 같은 유리와 붙으면 이음새 없이 이어집니다."
@@ -1167,9 +1191,37 @@
     "source": "Patterned glass that only androids cannot pass.",
     "translation": "안드로이드만 지나갈 수 없는 무늬 유리."
   },
+  "desc.singulo.android_battery_upgrade": {
+    "source": "Fitted to a guard android, each one raises its full charge by 50% (up to two). A battery pack appears on its waist for each.",
+    "translation": "호위 안드로이드에 넣으면 하나당 완충량이 50% 늘어납니다(둘까지). 넣은 수만큼 허리에 배터리 팩이 붙습니다."
+  },
+  "desc.singulo.android_beret": {
+    "source": "A beret for an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리에 씌우는 베레모.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_book": {
+    "source": "A book an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 손에 드는 책.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_bouquet": {
+    "source": "A bouquet an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 손에 드는 꽃다발.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_cape": {
+    "source": "A cape hanging from an android's shoulders that flutters as it walks. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드의 어깨에서 등으로 늘어지는 망토. 걸으면 나부낍니다.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
   "desc.singulo.android_charger": {
     "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
     "translation": "들고 다니면 따라오는 안드로이드가 가까이 와서 함께 걸으며 충전합니다(가득 차 있으면 안드로이드를 30번 가득 충전). 전력을 내보내는 블록을 우클릭해 충전합니다."
+  },
+  "desc.singulo.android_delivery_port": {
+    "source": "Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.",
+    "translation": "안드로이드가 주문한 완성품을 여기로 가져옵니다(주문할 때 납품처로 고름). 27칸 상자이며 화면에서 이름을 붙일 수 있고, 안의 물건은 옆 상자로 자동으로 옮깁니다."
+  },
+  "desc.singulo.android_felling_upgrade": {
+    "source": "Lets a guard android do felling steps on procedure cards (cutting whole trees and replanting saplings), like a diamond axe. Takes Efficiency, Fortune and Silk Touch.",
+    "translation": "호위 안드로이드에 달면 절차 카드의 벌목(나무를 통째로 베고 묘목을 다시 심기)을 할 수 있습니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다."
   },
   "desc.singulo.android_gate_glass": {
     "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
@@ -1178,6 +1230,14 @@
   "desc.singulo.android_gate_glass_patterned": {
     "source": "Patterned glass that only androids can pass.",
     "translation": "안드로이드만 지나갈 수 있는 무늬 유리."
+  },
+  "desc.singulo.android_hair_flower": {
+    "source": "A flower hair ornament worn on the right side of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리 오른쪽에 다는 꽃 머리 장식.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_headdress": {
+    "source": "A frilled headdress for an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 머리에 다는 주름 장식 헤드드레스.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
   },
   "desc.singulo.android_kit": {
     "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
@@ -1195,17 +1255,65 @@
     "source": "A compact crystal memory with a reader, holding the design of the Whip Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "채찍형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
   },
+  "desc.singulo.android_mining_upgrade": {
+    "source": "Fitted to a guard android, it lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.",
+    "translation": "호위 안드로이드에 넣으면 채굴 작업을 할 수 있습니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다."
+  },
+  "desc.singulo.android_production_upgrade": {
+    "source": "Fitted in an Android Assembly Station, it prints and looks after up to two androids. Only one can charge on top at a time; the other waits beside it and takes its turn.",
+    "translation": "안드로이드 조립 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다."
+  },
+  "desc.singulo.android_recipe_rack": {
+    "source": "A six-row rack. Put a Work Location Card on the left of a row and up to eight recipe cards on the right, and they can be ordered as recipes made at that location.",
+    "translation": "6줄짜리 선반. 각 줄 왼쪽에 작업 위치 카드, 오른쪽에 레시피 카드를 8장까지 놓으면 그 위치에서 만드는 레시피로 주문할 수 있습니다."
+  },
   "desc.singulo.android_repair_kit": {
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
     "translation": "호위 안드로이드의 소지품에 넣어 두면 다쳤을 때 하나를 써서 체력을 절반 회복합니다(다 쓰면 스테이션으로 돌아갑니다)."
   },
+  "desc.singulo.android_ribbon": {
+    "source": "A ribbon tied at the back of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드의 뒤통수에 묶는 리본.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_scarf": {
+    "source": "A scarf wrapped around an android's neck. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드의 목에 두르는 목도리.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
   "desc.singulo.android_station": {
-    "source": "Prints one guard android from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
-    "translation": "소형 크리스털 메모리와 안드로이드 키트와 전력으로 호위 안드로이드를 하나 출력하고, 쓰러지면 새 키트로 다시 출력합니다. 움직이는 방식과, 돌아와서 수리·충전할 체력을 정합니다."
+    "source": "Prints one guard android (two with a Production Upgrade) from a compact crystal memory, an android kit and power, and reprints it with a new kit if it falls. Set how it moves and at what health it comes back to repair and recharge.",
+    "translation": "소형 크리스털 메모리와 안드로이드 키트와 전력으로 호위 안드로이드를 하나(생산 업그레이드가 있으면 둘까지) 출력하고, 쓰러지면 새 키트로 다시 출력합니다. 움직이는 방식과, 돌아와서 수리·충전할 체력을 정합니다."
+  },
+  "desc.singulo.android_supply_port": {
+    "source": "Connects the storage next to it (chests and the like) and fluid tanks as the work stockpile. Androids take materials here and put what they make back.",
+    "translation": "옆의 저장소(상자 등)와 유체 탱크를 작업의 재료 보관소로 연결합니다. 안드로이드는 여기서 재료를 꺼내고, 만든 것을 돌려놓습니다."
+  },
+  "desc.singulo.android_tank_upgrade": {
+    "source": "Gives a guard android two tanks for liquids and gases (32,000 mB each, one fluid per tank), so work can carry fluids from the stockpile to machines. The tanks show at its waist. It cannot be removed while they hold anything.",
+    "translation": "호위 안드로이드에 달면 액체나 기체를 담는 탱크가 2개(각 32,000 mB, 탱크 하나에 한 종류) 생깁니다. 작업에서 유체를 재료 보관소에서 장치로 나릅니다. 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다."
+  },
+  "desc.singulo.android_teacup": {
+    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 손에 드는 찻잔.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
   },
   "desc.singulo.android_transfer_upgrade": {
-    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits and armor plate) to the station instead of dropping it, and the next android it prints carries it.",
-    "translation": "안드로이드 조립 스테이션의 강화 슬롯에 넣으면, 안드로이드가 쓰러지거나 해체될 때 소지품(수리 키트와 장갑판)을 떨어뜨리지 않고 스테이션으로 전송해 다음에 출력하는 안드로이드에게 넘깁니다."
+    "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
+    "translation": "안드로이드 조립 스테이션의 강화 슬롯에 넣으면, 안드로이드가 쓰러지거나 해체될 때 소지품(수리 키트·장갑판·업그레이드·운반 중인 물건)을 떨어뜨리지 않고 스테이션으로 전송해 다음에 출력하는 안드로이드에게 넘깁니다."
+  },
+  "desc.singulo.android_umbrella": {
+    "source": "An umbrella an android holds up while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "대기 중인 안드로이드가 쓰는 우산.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_waist_ribbon": {
+    "source": "A large bow tied at the back of an android's waist. Goes in the decoration page. Dye it with dyes on a crafting table.",
+    "translation": "안드로이드 허리 뒤에 묶는 커다란 나비 리본.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+  },
+  "desc.singulo.android_work_console": {
+    "source": "Brings together the supply ports, delivery ports and recipe racks linked to it with a Work Location Card, takes orders and hands the work to nearby androids. It works as a supply port and a delivery port itself, and its Record tab writes recipes onto recipe cards. Orders need every material in stock.",
+    "translation": "작업 위치 카드로 연결한 자재구·납품구·레시피 선반을 모아 주문을 받고, 근처의 안드로이드에게 작업을 맡깁니다. 지령대 자체도 자재구와 납품구를 겸하며, 화면의 \"기록\"에서 레시피 카드에 레시피를 기록할 수 있습니다. 재료가 부족한 주문은 할 수 없습니다."
+  },
+  "desc.singulo.android_workbench": {
+    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.",
+    "translation": "안드로이드가 제작대 레시피를 만드는 곳. 바닐라 제작대보다 4배 빠르게 만듭니다. 레시피 선반의 작업 위치 카드에 기록해서 사용합니다."
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -1871,6 +1979,10 @@
     "source": "Sends probes to discovered ruins to fetch loot.",
     "translation": "전리품을 가져오기 위해 탐사선을 발견된 폐허로 보냅니다."
   },
+  "desc.singulo.procedure_card": {
+    "source": "Records up to eight steps and what they produce, in the procedure mode of a work console's Record tab. Steps can insert, extract, mine, harvest, fell, breed, shear, milk, cull or use a block (levers and buttons). The places are stored on the card, so it works in a recipe rack row without a Work Location Card. Mining needs a Mining Upgrade and felling a Felling Upgrade.",
+    "translation": "작업 지령대 「기록」의 절차 모드에서 절차(최대 8개)와 만들어지는 것을 기록합니다. 절차는 투입·꺼내기·채굴·수확·벌목·번식·털 깎기·우유 짜기·처리·조작(레버나 버튼). 위치는 카드 안에 기록되므로 레시피 선반에서 작업 위치 카드가 없는 줄에도 놓을 수 있습니다. 채굴에는 채굴 업그레이드, 벌목에는 벌목 업그레이드가 필요합니다."
+  },
   "desc.singulo.quantum_computing_module": {
     "source": "The brain of advanced machines.",
     "translation": "첨단 기계의 두뇌."
@@ -1902,6 +2014,10 @@
   "desc.singulo.reactor_stabilizer": {
     "source": "Coils at the 45° points of the reactor rings.",
     "translation": "반응로 링의 45° 지점에 설치하는, 지평선을 안정시키는 코일."
+  },
+  "desc.singulo.recipe_card": {
+    "source": "Record a recipe on it in a work console's Record tab and place it in a recipe rack. Sneak-use on nothing to clear it. Hold Shift to see what it makes.",
+    "translation": "작업 지령대의 \"기록\"에서 레시피를 기록하고 레시피 선반에 놓습니다. 아무것도 없는 곳에서 웅크리고 우클릭하면 레시피를 지웁니다. Shift를 누르면 만드는 것의 그림이 됩니다."
   },
   "desc.singulo.record_fragment": {
     "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
@@ -2218,6 +2334,10 @@
   "desc.singulo.white_star_glass_panel": {
     "source": "A see-through white panel with a four-pointed star.",
     "translation": "사방별 무늬가 들어간, 속이 비치는 흰색 패널."
+  },
+  "desc.singulo.work_location_card": {
+    "source": "Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.",
+    "translation": "블록을 웅크리고 우클릭하면 위치를 기록합니다(겹쳐 있으면 한 장만 나눠서 기록). 아무것도 없는 곳에서 웅크리고 우클릭하면 기록을 지웁니다. 작업 지령대를 기록한 카드로 자재구·납품구·레시피 선반을 우클릭하면 연결됩니다. Shift를 누르면 기록한 블록의 그림이 됩니다."
   },
   "desc.singulo.worldline_anchor_advanced": {
     "source": "Advanced chunk loader. Embedding a Singularity Core makes it free and maximal.",
@@ -2551,9 +2671,49 @@
     "source": "Armor",
     "translation": "방어"
   },
+  "gui.singulo.android.battery": {
+    "source": "Battery",
+    "translation": "배터리"
+  },
+  "gui.singulo.android.carry": {
+    "source": "Carry",
+    "translation": "소지품"
+  },
   "gui.singulo.android.charge": {
     "source": "%s%%",
     "translation": "%s%%"
+  },
+  "gui.singulo.android.decor.0": {
+    "source": "Head",
+    "translation": "머리"
+  },
+  "gui.singulo.android.decor.0.hint": {
+    "source": "Ribbon, hair flower, beret or headdress",
+    "translation": "리본·머리 장식·베레모·헤드드레스"
+  },
+  "gui.singulo.android.decor.1": {
+    "source": "Back / waist",
+    "translation": "등・허리"
+  },
+  "gui.singulo.android.decor.1.hint": {
+    "source": "Cape, scarf or waist ribbon",
+    "translation": "망토·목도리·허리 리본"
+  },
+  "gui.singulo.android.decor.2": {
+    "source": "Hand",
+    "translation": "손"
+  },
+  "gui.singulo.android.decor.2.hint": {
+    "source": "Paperback, bouquet, teacup or umbrella (held only while idle)",
+    "translation": "문고본·꽃다발·찻잔·우산(대기 중에만 듭니다)"
+  },
+  "gui.singulo.android.decor.dye": {
+    "source": "Dye them with dyes on a crafting table",
+    "translation": "염료와 함께 제작대에서 물들일 수 있습니다"
+  },
+  "gui.singulo.android.decor.speech": {
+    "source": "Does it suit me?",
+    "translation": "어울려?"
   },
   "gui.singulo.android.dismantle": {
     "source": "Dismantle (press twice)",
@@ -2594,6 +2754,26 @@
   "gui.singulo.android.nickname.whip": {
     "source": "Verna",
     "translation": "베르나"
+  },
+  "gui.singulo.android.pack": {
+    "source": "Backpack",
+    "translation": "백팩 안"
+  },
+  "gui.singulo.android.pack.none": {
+    "source": "No backpack",
+    "translation": "백팩 없음"
+  },
+  "gui.singulo.android.page.decor": {
+    "source": "Decorations",
+    "translation": "장식"
+  },
+  "gui.singulo.android.page.gear": {
+    "source": "Gear and inventory",
+    "translation": "장비와 소지품"
+  },
+  "gui.singulo.android.page.status": {
+    "source": "Status",
+    "translation": "상태"
   },
   "gui.singulo.android.plate": {
     "source": "Plate",
@@ -2726,6 +2906,34 @@
   "gui.singulo.android.say.retreat.1": {
     "source": "Off to get repaired",
     "translation": "수리하고 올게"
+  },
+  "gui.singulo.android.storage": {
+    "source": "Storage",
+    "translation": "수납"
+  },
+  "gui.singulo.android.tank": {
+    "source": "Tank %s: %s, about %s / %s mB",
+    "translation": "탱크%s: %s 약 %s / %s mB"
+  },
+  "gui.singulo.android.tank.empty": {
+    "source": "Tank %s: empty",
+    "translation": "탱크%s: 비어 있음"
+  },
+  "gui.singulo.android.tools": {
+    "source": "Tools",
+    "translation": "도구"
+  },
+  "gui.singulo.android.work.hint": {
+    "source": "Whether this android may be given work (automation). When off, it is never offered for work.",
+    "translation": "이 안드로이드에게 작업(자동화)을 맡겨도 되는지 정합니다. 끄면 작업 후보에 나오지 않습니다."
+  },
+  "gui.singulo.android.work.off": {
+    "source": "Work: off",
+    "translation": "작업: 끔"
+  },
+  "gui.singulo.android.work.on": {
+    "source": "Work: on",
+    "translation": "작업: 켬"
   },
   "gui.singulo.android_station.charge": {
     "source": "Charge",
@@ -3883,6 +4091,254 @@
     "source": "Not formed",
     "translation": "형성되지 않음"
   },
+  "gui.singulo.recipe_encoder.card": {
+    "source": "Recorded",
+    "translation": "기록됨"
+  },
+  "gui.singulo.recipe_encoder.clear": {
+    "source": "Clear the pattern",
+    "translation": "견본 지우기"
+  },
+  "gui.singulo.recipe_encoder.clear.short": {
+    "source": "Clear grid",
+    "translation": "견본 지우기"
+  },
+  "gui.singulo.recipe_encoder.clear_card": {
+    "source": "Erase",
+    "translation": "레시피 지우기"
+  },
+  "gui.singulo.recipe_encoder.clear_card.hint": {
+    "source": "Erase the recipe on the recorded card",
+    "translation": "기록된 카드의 레시피를 지웁니다"
+  },
+  "gui.singulo.recipe_encoder.encode": {
+    "source": "Save",
+    "translation": "기록"
+  },
+  "gui.singulo.recipe_encoder.encode.hint": {
+    "source": "Record this recipe onto the card in the recorded slot (takes one from the stock if it is empty)",
+    "translation": "\"기록됨\" 칸의 카드에 이 배치를 기록합니다(비어 있으면 재고에서 한 장 꺼냄)"
+  },
+  "gui.singulo.recipe_encoder.extra.hint": {
+    "source": "Anything else that comes out (byproducts). It is taken out and returned to the stockpile",
+    "translation": "그 외에 나오는 것(부산물). 꺼내서 재료 보관소로 돌려놓습니다"
+  },
+  "gui.singulo.recipe_encoder.face.auto": {
+    "source": "Auto",
+    "translation": "자동"
+  },
+  "gui.singulo.recipe_encoder.face.down": {
+    "source": "Bottom",
+    "translation": "아래"
+  },
+  "gui.singulo.recipe_encoder.face.east": {
+    "source": "East",
+    "translation": "동"
+  },
+  "gui.singulo.recipe_encoder.face.north": {
+    "source": "North",
+    "translation": "북"
+  },
+  "gui.singulo.recipe_encoder.face.south": {
+    "source": "South",
+    "translation": "남"
+  },
+  "gui.singulo.recipe_encoder.face.up": {
+    "source": "Top",
+    "translation": "위"
+  },
+  "gui.singulo.recipe_encoder.face.west": {
+    "source": "West",
+    "translation": "서"
+  },
+  "gui.singulo.recipe_encoder.face_button.fuel": {
+    "source": "Fuel: %s",
+    "translation": "연 %s"
+  },
+  "gui.singulo.recipe_encoder.face_button.fuel.hint": {
+    "source": "Which face of the machine fuel goes in through. Auto: the side the android stands at (a furnace's fuel slot)",
+    "translation": "장치의 어느 면으로 연료를 넣을지. 자동: 안드로이드가 서 있는 옆면(화로라면 연료 칸)"
+  },
+  "gui.singulo.recipe_encoder.face_button.in": {
+    "source": "In: %s",
+    "translation": "입 %s"
+  },
+  "gui.singulo.recipe_encoder.face_button.in.hint": {
+    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Directions are world directions",
+    "translation": "장치의 어느 면으로 재료를 넣을지(클릭으로 전환, 우클릭으로 역순). 동서남북은 세계 방향"
+  },
+  "gui.singulo.recipe_encoder.face_button.out": {
+    "source": "Out: %s",
+    "translation": "출 %s"
+  },
+  "gui.singulo.recipe_encoder.face_button.out.hint": {
+    "source": "Which face of the machine products are taken out from (click to change, right-click to go back)",
+    "translation": "장치의 어느 면에서 완성품을 꺼낼지(클릭으로 전환, 우클릭으로 역순)"
+  },
+  "gui.singulo.recipe_encoder.fuel": {
+    "source": "Fuel",
+    "translation": "연료"
+  },
+  "gui.singulo.recipe_encoder.fuel.hint": {
+    "source": "The fuel to fetch when the machine runs out, and how many to bring each time (scroll to change). Leave it empty to never fetch fuel",
+    "translation": "장치의 연료가 떨어지면 가지러 갈 연료와, 한 번에 가져올 수(휠로 개수 변경). 비워 두면 가지러 가지 않습니다"
+  },
+  "gui.singulo.recipe_encoder.grid.hint": {
+    "source": "Click with an item to place a copy as a pattern (it is not used up)",
+    "translation": "물건을 들고 클릭하면 그 견본을 둡니다(줄지 않습니다)"
+  },
+  "gui.singulo.recipe_encoder.kind.breed": {
+    "source": "Breed",
+    "translation": "번식"
+  },
+  "gui.singulo.recipe_encoder.kind.cull": {
+    "source": "Cull",
+    "translation": "처리"
+  },
+  "gui.singulo.recipe_encoder.kind.extract": {
+    "source": "Extract",
+    "translation": "꺼내기"
+  },
+  "gui.singulo.recipe_encoder.kind.fell": {
+    "source": "Fell",
+    "translation": "벌목"
+  },
+  "gui.singulo.recipe_encoder.kind.harvest": {
+    "source": "Harvest",
+    "translation": "수확"
+  },
+  "gui.singulo.recipe_encoder.kind.hint": {
+    "source": "Switch the kind of step to add (right-click to go back). Insert/Extract: into or out of a machine. Mine/Fell: dig an area or cut trees (needs an upgrade). Harvest: pick crops and replant. Breed/Shear/Milk/Cull: tend the animals in an area. Use: flip levers, press buttons and the like",
+    "translation": "추가할 절차의 종류를 전환합니다(우클릭으로 역순). 투입/꺼내기: 장치에 넣거나 꺼내기. 채굴/벌목: 범위를 캐거나 나무를 베기(업그레이드 필요). 수확: 작물을 거두고 다시 심기. 번식/털 깎기/우유 짜기/처리: 범위의 동물 돌보기. 조작: 레버·버튼 등 사용"
+  },
+  "gui.singulo.recipe_encoder.kind.insert": {
+    "source": "Insert",
+    "translation": "투입"
+  },
+  "gui.singulo.recipe_encoder.kind.milk": {
+    "source": "Milk",
+    "translation": "우유 짜기"
+  },
+  "gui.singulo.recipe_encoder.kind.mine": {
+    "source": "Mine",
+    "translation": "채굴"
+  },
+  "gui.singulo.recipe_encoder.kind.shear": {
+    "source": "Shear",
+    "translation": "털 깎기"
+  },
+  "gui.singulo.recipe_encoder.kind.use": {
+    "source": "Use",
+    "translation": "조작"
+  },
+  "gui.singulo.recipe_encoder.limit": {
+    "source": "up to %s",
+    "translation": "%s마리까지"
+  },
+  "gui.singulo.recipe_encoder.limit.hint": {
+    "source": "Number of animals. Breed: increase each kind up to this many. Cull: cull any above this many. Click or scroll to change (Shift: 10 at a time, right-click to lower)",
+    "translation": "동물의 수. 번식: 같은 종류를 이 수까지 늘립니다. 처리: 이 수를 넘는 만큼 처리합니다. 클릭·휠로 변경(Shift: 10씩, 우클릭으로 줄이기)"
+  },
+  "gui.singulo.recipe_encoder.mode.crafting": {
+    "source": "Crafting",
+    "translation": "작업대"
+  },
+  "gui.singulo.recipe_encoder.mode.hint": {
+    "source": "Switch what is recorded. Crafting: made at a crafting table. Processing: put into a furnace or machine from above and taken out from below. Procedure: insert, extract and mine steps on a Procedure Card",
+    "translation": "기록할 종류를 전환합니다. 제작대: 제작대에서 만들기. 가공: 화로나 장치에 위로 넣고 아래로 꺼내기. 절차: 절차 카드에 투입·꺼내기·채굴 절차를 기록"
+  },
+  "gui.singulo.recipe_encoder.mode.procedure": {
+    "source": "Procedure",
+    "translation": "절차"
+  },
+  "gui.singulo.recipe_encoder.mode.processing": {
+    "source": "Processing",
+    "translation": "가공"
+  },
+  "gui.singulo.recipe_encoder.output.hint": {
+    "source": "Place what comes out (the main product)",
+    "translation": "나오는 것(주산물)을 놓습니다"
+  },
+  "gui.singulo.recipe_encoder.product.hint": {
+    "source": "What these steps produce, per run. It can be ordered as this item at the console",
+    "translation": "이 절차로 만들어지는 것(1회분 개수). 지령대에서 이 아이템으로 주문할 수 있습니다"
+  },
+  "gui.singulo.recipe_encoder.step.add": {
+    "source": "Add",
+    "translation": "추가"
+  },
+  "gui.singulo.recipe_encoder.step.add.hint": {
+    "source": "Add a step at the place on the Work Location Card, with the item in the item slot (up to eight)",
+    "translation": "작업 위치 카드의 위치와 아이템 칸의 아이템으로 절차를 하나 추가합니다(최대 8개)"
+  },
+  "gui.singulo.recipe_encoder.step.full": {
+    "source": "Up to eight steps",
+    "translation": "절차는 8개까지"
+  },
+  "gui.singulo.recipe_encoder.step.item.hint": {
+    "source": "What to insert, extract or gather (scroll to change the count). For breeding, the feed; for milking, how many buckets of milk (empty buckets are taken along). Leave it empty for mining and the like to gather the product",
+    "translation": "넣거나 꺼내거나 모을 아이템(휠로 개수 변경). 번식에서는 먹이, 우유 짜기에서는 짤 우유의 수(빈 양동이를 가져감). 채굴 등에서 비워 두면 만들어지는 것을 모읍니다"
+  },
+  "gui.singulo.recipe_encoder.step.loc_a.hint": {
+    "source": "A Work Location Card holding the place for the step",
+    "translation": "절차의 위치를 기록한 작업 위치 카드"
+  },
+  "gui.singulo.recipe_encoder.step.loc_b.hint": {
+    "source": "The other corner of the mining area (optional; with it, the box between the two cards is mined)",
+    "translation": "채굴 범위의 다른 한쪽 모서리(없어도 됨. 있으면 두 카드 사이의 범위를 캡니다)"
+  },
+  "gui.singulo.recipe_encoder.step.no_item": {
+    "source": "Place the item to insert or extract in the item slot",
+    "translation": "아이템 칸에 넣거나 꺼낼 아이템을 놓아 주세요"
+  },
+  "gui.singulo.recipe_encoder.step.no_place": {
+    "source": "Place a Work Location Card holding a place in this dimension",
+    "translation": "이 차원의 위치를 기록한 작업 위치 카드를 놓아 주세요"
+  },
+  "gui.singulo.recipe_encoder.step.remove": {
+    "source": "Click to remove",
+    "translation": "클릭하여 삭제"
+  },
+  "gui.singulo.recipe_encoder.step.too_big": {
+    "source": "The mining area can be at most %s blocks on a side",
+    "translation": "채굴 범위는 한 변 %s블록까지"
+  },
+  "gui.singulo.recipe_encoder.stock": {
+    "source": "Stock",
+    "translation": "재고"
+  },
+  "gui.singulo.recipe_encoder.stock.hint": {
+    "source": "Keep a stack of blank recipe cards here. When the recorded-card slot is empty, Save takes one from here",
+    "translation": "기록하지 않은 레시피 카드를 한 묶음 넣어 두면, \"기록됨\" 칸이 비어 있을 때 기록이 여기서 한 장 꺼냅니다"
+  },
+  "gui.singulo.recipe_encoder.use.0": {
+    "source": "Toggle",
+    "translation": "전환"
+  },
+  "gui.singulo.recipe_encoder.use.1": {
+    "source": "Turn on",
+    "translation": "켜기"
+  },
+  "gui.singulo.recipe_encoder.use.2": {
+    "source": "Turn off",
+    "translation": "끄기"
+  },
+  "gui.singulo.recipe_encoder.use.hint": {
+    "source": "What to do with a lever (click to change). Buttons, doors, trapdoors and the like are always used like a right-click",
+    "translation": "레버를 어떻게 할지(클릭으로 변경). 버튼·문·다락문 등은 항상 우클릭과 같습니다"
+  },
+  "gui.singulo.recipe_encoder.variants.hint": {
+    "source": "Any variant: use anything the recipe accepts in that slot, not just the pattern item (any wood planks, for example). Same item only: use exactly the pattern items",
+    "translation": "같은 종류도 사용: 견본과 같은 것이 아니어도, 레시피에 맞는 같은 종류(여러 나무 판자 등)를 씁니다. 같은 것만: 견본과 같은 것만 씁니다"
+  },
+  "gui.singulo.recipe_encoder.variants.off": {
+    "source": "Same item only",
+    "translation": "같은 것만"
+  },
+  "gui.singulo.recipe_encoder.variants.on": {
+    "source": "Any variant",
+    "translation": "같은 종류도 사용"
+  },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",
     "translation": "보호: 폭발, 몹의 블록 파괴"
@@ -4131,6 +4587,410 @@
     "source": "No heat source or heat sink adjacent",
     "translation": "인접한 열원이나 저온원이 없음"
   },
+  "gui.singulo.work_console.activity.charge": {
+    "source": "Recharging",
+    "translation": "충전 중"
+  },
+  "gui.singulo.work_console.activity.craft": {
+    "source": "Crafting",
+    "translation": "만드는 중"
+  },
+  "gui.singulo.work_console.activity.deliver": {
+    "source": "Delivering",
+    "translation": "납품하러 감"
+  },
+  "gui.singulo.work_console.activity.farm": {
+    "source": "Harvesting",
+    "translation": "수확 중"
+  },
+  "gui.singulo.work_console.activity.fell": {
+    "source": "Felling",
+    "translation": "벌목 중"
+  },
+  "gui.singulo.work_console.activity.fetch": {
+    "source": "Fetching materials",
+    "translation": "재료를 가지러 감"
+  },
+  "gui.singulo.work_console.activity.fight": {
+    "source": "Fighting",
+    "translation": "싸우는 중"
+  },
+  "gui.singulo.work_console.activity.mine": {
+    "source": "Mining",
+    "translation": "채굴 중"
+  },
+  "gui.singulo.work_console.activity.none": {
+    "source": "Idle",
+    "translation": "대기"
+  },
+  "gui.singulo.work_console.activity.process": {
+    "source": "Processing",
+    "translation": "장치로 가공"
+  },
+  "gui.singulo.work_console.activity.ranch": {
+    "source": "Tending animals",
+    "translation": "동물 돌보기"
+  },
+  "gui.singulo.work_console.activity.return": {
+    "source": "Putting away",
+    "translation": "정리"
+  },
+  "gui.singulo.work_console.activity.use": {
+    "source": "Using a block",
+    "translation": "조작"
+  },
+  "gui.singulo.work_console.activity.wait": {
+    "source": "Waiting for materials",
+    "translation": "재료를 기다리는 중"
+  },
+  "gui.singulo.work_console.androids": {
+    "source": "Androids (slots)",
+    "translation": "안드로이드(나를 수 있는 칸)"
+  },
+  "gui.singulo.work_console.auto_android": {
+    "source": "None chosen: all %s available androids will start",
+    "translation": "고르지 않았으므로, 고를 수 있는 안드로이드 전원(%s대)으로 시작합니다"
+  },
+  "gui.singulo.work_console.back": {
+    "source": "Back",
+    "translation": "돌아가기"
+  },
+  "gui.singulo.work_console.busy": {
+    "source": "%s (busy)",
+    "translation": "%s(작업 중)"
+  },
+  "gui.singulo.work_console.cancel": {
+    "source": "Cancel",
+    "translation": "취소"
+  },
+  "gui.singulo.work_console.cancelled": {
+    "source": "Cancelled the order for %s",
+    "translation": "%s 주문을 취소했습니다"
+  },
+  "gui.singulo.work_console.cancelled.recipe": {
+    "source": "Cancelled the order for %s (the recipe does not match)",
+    "translation": "%s 주문을 취소했습니다(레시피가 맞지 않음)"
+  },
+  "gui.singulo.work_console.cancelled.stalled": {
+    "source": "Cancelled the order for %s (the machine stopped processing)",
+    "translation": "%s 주문을 취소했습니다(장치의 가공이 진행되지 않음)"
+  },
+  "gui.singulo.work_console.cancelled.unreachable": {
+    "source": "Cancelled the order for %s (a place could not be reached)",
+    "translation": "%s 주문을 취소했습니다(도착할 수 없는 곳이 있었습니다)"
+  },
+  "gui.singulo.work_console.cannot_start": {
+    "source": "This order cannot be started",
+    "translation": "이 주문은 할 수 없습니다"
+  },
+  "gui.singulo.work_console.choose_android": {
+    "source": "No android can take this order",
+    "translation": "고를 수 있는 안드로이드가 없습니다"
+  },
+  "gui.singulo.work_console.count.hint": {
+    "source": "Shift: 10 at a time, Ctrl: 64",
+    "translation": "Shift로 10씩, Ctrl로 64씩"
+  },
+  "gui.singulo.work_console.craftable": {
+    "source": "Craftable",
+    "translation": "만들 수 있음"
+  },
+  "gui.singulo.work_console.crafted": {
+    "source": "Craft ×%s",
+    "translation": "만들기 ×%s"
+  },
+  "gui.singulo.work_console.crafted.hint": {
+    "source": "Crafted by the androids. Leftovers go back to the stockpile",
+    "translation": "안드로이드가 만드는 것. 남은 것은 재료 보관소로 돌아갑니다"
+  },
+  "gui.singulo.work_console.crafted.surplus": {
+    "source": "Craft ×%s (%s left over)",
+    "translation": "만들기 ×%s(남음 %s)"
+  },
+  "gui.singulo.work_console.delivery": {
+    "source": "Deliver to: %s",
+    "translation": "납품처: %s"
+  },
+  "gui.singulo.work_console.delivery.console": {
+    "source": "Work console",
+    "translation": "작업 지령대"
+  },
+  "gui.singulo.work_console.delivery.hint": {
+    "source": "Click to change where it is delivered (right-click to go back). Name delivery ports in their own screen",
+    "translation": "클릭하면 납품처를 바꿉니다(우클릭은 반대로). 납품구의 이름은 납품구 화면에서 붙일 수 있습니다"
+  },
+  "gui.singulo.work_console.delivery.port": {
+    "source": "Delivery port (%s, %s, %s)",
+    "translation": "납품구(%s, %s, %s)"
+  },
+  "gui.singulo.work_console.detail.delivered": {
+    "source": "Delivered %s / %s",
+    "translation": "납품 %s / %s"
+  },
+  "gui.singulo.work_console.detail.doing": {
+    "source": " (%s in progress)",
+    "translation": " (%s 작업 중)"
+  },
+  "gui.singulo.work_console.detail.hint": {
+    "source": "Click to see the steps and what each android is doing",
+    "translation": "클릭해서 공정과 안드로이드의 상태를 봅니다"
+  },
+  "gui.singulo.work_console.detail.to_stock": {
+    "source": "To stockpile %s / %s",
+    "translation": "재료 보관소로 %s / %s"
+  },
+  "gui.singulo.work_console.done": {
+    "source": "Delivered %s ×%s",
+    "translation": "%s ×%s 납품했습니다"
+  },
+  "gui.singulo.work_console.empty": {
+    "source": "Nothing to order (link supply ports and recipe racks)",
+    "translation": "주문할 수 있는 것이 없습니다(자재구와 레시피 선반을 연결)"
+  },
+  "gui.singulo.work_console.error.capacity": {
+    "source": "No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)",
+    "translation": "%s 의 재료를 한 번에 나를 수 있는 안드로이드가 없습니다(백팩이, 유체라면 탱크 업그레이드가 필요)"
+  },
+  "gui.singulo.work_console.error.loop": {
+    "source": "The recipes loop",
+    "translation": "레시피가 순환합니다"
+  },
+  "gui.singulo.work_console.error.missing": {
+    "source": "Not enough materials",
+    "translation": "재료가 부족합니다"
+  },
+  "gui.singulo.work_console.error.no_android": {
+    "source": "No free android is chosen",
+    "translation": "한가한 안드로이드를 고르지 않았습니다"
+  },
+  "gui.singulo.work_console.error.no_feller": {
+    "source": "%s needs felling, but no chosen android has a Felling Upgrade",
+    "translation": "%s 에는 벌목이 필요하지만, 선택한 안드로이드 중 벌목 업그레이드를 단 것이 없습니다"
+  },
+  "gui.singulo.work_console.error.no_miner": {
+    "source": "%s needs mining, but no chosen android has a Mining Upgrade",
+    "translation": "%s 에는 채굴이 필요하지만, 선택한 안드로이드 중 채굴 업그레이드를 단 것이 없습니다"
+  },
+  "gui.singulo.work_console.error.not_machine": {
+    "source": "Items cannot be put into or taken from the work location for %s",
+    "translation": "%s 의 작업 위치에 넣거나 꺼낼 수 없습니다"
+  },
+  "gui.singulo.work_console.error.not_workbench": {
+    "source": "The work location for %s is not a crafting table",
+    "translation": "%s 레시피의 작업 위치가 제작대가 아닙니다"
+  },
+  "gui.singulo.work_console.link.0": {
+    "source": "Supply port",
+    "translation": "자재구"
+  },
+  "gui.singulo.work_console.link.1": {
+    "source": "Delivery port",
+    "translation": "납품구"
+  },
+  "gui.singulo.work_console.link.2": {
+    "source": "Recipe rack",
+    "translation": "레시피 선반"
+  },
+  "gui.singulo.work_console.link.hint": {
+    "source": "Record this console on a Work Location Card, then use the card on blocks to link them",
+    "translation": "작업 위치 카드로 이 대를 기록하고, 그 카드로 블록을 우클릭해 연결합니다"
+  },
+  "gui.singulo.work_console.link.lost": {
+    "source": "(missing)",
+    "translation": "(찾을 수 없음)"
+  },
+  "gui.singulo.work_console.locked": {
+    "source": "You are not on this work console's permit",
+    "translation": "이 작업 지령대의 허가증에 등록되어 있지 않습니다"
+  },
+  "gui.singulo.work_console.material.hint": {
+    "source": "Taken from the stockpile (need / have)",
+    "translation": "재료 보관소에서 쓰는 것(필요 / 재고)"
+  },
+  "gui.singulo.work_console.materials": {
+    "source": "To craft, and materials (need / have)",
+    "translation": "만드는 것과 재료(필요 / 재고)"
+  },
+  "gui.singulo.work_console.needs_feller": {
+    "source": "This order includes felling, so only androids with a Felling Upgrade can be chosen",
+    "translation": "이 주문에는 벌목 공정이 있어서, 벌목 업그레이드를 단 안드로이드만 고를 수 있습니다"
+  },
+  "gui.singulo.work_console.needs_miner": {
+    "source": "This order includes mining, so only androids with a Mining Upgrade can be chosen",
+    "translation": "이 주문에는 채굴 공정이 있어서, 채굴 업그레이드를 단 안드로이드만 고를 수 있습니다"
+  },
+  "gui.singulo.work_console.needs_tank": {
+    "source": "This order moves liquids or gases, so only androids with a Tank Upgrade can be chosen",
+    "translation": "이 주문에는 액체·기체를 나르는 공정이 있어서, 탱크 업그레이드를 단 안드로이드만 고를 수 있습니다"
+  },
+  "gui.singulo.work_console.no_androids": {
+    "source": "No android available nearby",
+    "translation": "근처에 쓸 수 있는 안드로이드가 없습니다"
+  },
+  "gui.singulo.work_console.no_links": {
+    "source": "Nothing is linked",
+    "translation": "연결된 블록이 없습니다"
+  },
+  "gui.singulo.work_console.no_orders": {
+    "source": "No running orders",
+    "translation": "진행 중인 주문이 없습니다"
+  },
+  "gui.singulo.work_console.outbox.hint": {
+    "source": "Orders delivered to the console. Moved into adjacent chests automatically",
+    "translation": "지령대에 도착한 완성품. 옆 상자로 자동으로 옮깁니다"
+  },
+  "gui.singulo.work_console.plan": {
+    "source": "%s steps, %s crafts",
+    "translation": "공정 %s · 만드는 횟수 %s"
+  },
+  "gui.singulo.work_console.planning": {
+    "source": "Calculating...",
+    "translation": "계산 중…"
+  },
+  "gui.singulo.work_console.record.hint": {
+    "source": "Lay out a pattern and record it onto a recipe card (JEI's + button works too)",
+    "translation": "견본을 놓고 레시피 카드에 기록합니다(JEI의 \"+\"로도 놓을 수 있음)"
+  },
+  "gui.singulo.work_console.record.hint.processing": {
+    "source": "Lay out what goes in and what comes out. Scroll to change counts (Shift: 10 at a time)",
+    "translation": "넣는 것과 나오는 것을 놓습니다. 휠로 개수 변경(Shift: 10개씩)"
+  },
+  "gui.singulo.work_console.register": {
+    "source": "Save",
+    "translation": "등록"
+  },
+  "gui.singulo.work_console.signal.off": {
+    "source": "Redstone signal: off",
+    "translation": "레드스톤 신호: 꺼짐"
+  },
+  "gui.singulo.work_console.signal.on": {
+    "source": "Redstone signal: on",
+    "translation": "레드스톤 신호: 켜짐"
+  },
+  "gui.singulo.work_console.standing.added": {
+    "source": "Saved the order for %s",
+    "translation": "%s 주문을 등록했습니다"
+  },
+  "gui.singulo.work_console.standing.full": {
+    "source": "Up to %s orders can be saved",
+    "translation": "%s건까지 등록할 수 있습니다"
+  },
+  "gui.singulo.work_console.standing.none": {
+    "source": "No saved orders (choose a trigger when confirming an order)",
+    "translation": "등록한 주문이 없습니다(주문 확인에서 계기를 골라 등록)"
+  },
+  "gui.singulo.work_console.standing.state.0": {
+    "source": "Idle",
+    "translation": "대기 중"
+  },
+  "gui.singulo.work_console.standing.state.1": {
+    "source": "Running",
+    "translation": "진행 중"
+  },
+  "gui.singulo.work_console.standing.state.2": {
+    "source": "Waiting",
+    "translation": "기다리는 중"
+  },
+  "gui.singulo.work_console.standing.state.3": {
+    "source": "Waiting for a signal",
+    "translation": "신호를 기다리는 중"
+  },
+  "gui.singulo.work_console.standing.stock": {
+    "source": " (in stock: %s)",
+    "translation": " (재고 %s)"
+  },
+  "gui.singulo.work_console.standing.waiting": {
+    "source": "Waiting: %s",
+    "translation": "대기 중: %s"
+  },
+  "gui.singulo.work_console.start": {
+    "source": "Start",
+    "translation": "작업 시작"
+  },
+  "gui.singulo.work_console.status.0": {
+    "source": "Working (%s androids)",
+    "translation": "작업 중(%s대)"
+  },
+  "gui.singulo.work_console.status.1": {
+    "source": "Waiting for materials",
+    "translation": "재료를 기다리는 중"
+  },
+  "gui.singulo.work_console.status.2": {
+    "source": "Waiting for an android that can carry it",
+    "translation": "나를 수 있는 안드로이드를 기다리는 중"
+  },
+  "gui.singulo.work_console.status.3": {
+    "source": "Waiting for storage space",
+    "translation": "보관 공간을 기다리는 중"
+  },
+  "gui.singulo.work_console.stock": {
+    "source": "In stock: %s",
+    "translation": "재고: %s"
+  },
+  "gui.singulo.work_console.tab.links": {
+    "source": "Links",
+    "translation": "연결"
+  },
+  "gui.singulo.work_console.tab.order": {
+    "source": "Order",
+    "translation": "주문"
+  },
+  "gui.singulo.work_console.tab.outbox": {
+    "source": "Outbox",
+    "translation": "납품함"
+  },
+  "gui.singulo.work_console.tab.record": {
+    "source": "Record",
+    "translation": "기록"
+  },
+  "gui.singulo.work_console.tab.running": {
+    "source": "Running",
+    "translation": "진행 중"
+  },
+  "gui.singulo.work_console.tab.standing": {
+    "source": "Saved",
+    "translation": "등록"
+  },
+  "gui.singulo.work_console.trigger.keep": {
+    "source": "Keep in stock",
+    "translation": "재고 유지"
+  },
+  "gui.singulo.work_console.trigger.keep.hint": {
+    "source": "Whenever the stockpile holds fewer than this many, order enough to get back to it. The products go into the stockpile",
+    "translation": "재료 보관소의 재고가 이 수보다 적어지면, 이 수까지 자동으로 주문합니다. 완성품은 재료 보관소에 넣습니다"
+  },
+  "gui.singulo.work_console.trigger.keep_powered": {
+    "source": "Keep stock while powered",
+    "translation": "신호 중 재고 유지"
+  },
+  "gui.singulo.work_console.trigger.keep_powered.hint": {
+    "source": "Keep in stock, but only while the console is powered by redstone",
+    "translation": "지령대에 레드스톤 신호가 들어와 있는 동안만 \"재고 유지\""
+  },
+  "gui.singulo.work_console.trigger.now": {
+    "source": "Order now",
+    "translation": "지금 주문"
+  },
+  "gui.singulo.work_console.trigger.now.hint": {
+    "source": "Click to save the order with a trigger instead (right-click to go back). Order now: order just this once",
+    "translation": "클릭해서 주문을 등록할 계기를 고릅니다(우클릭으로 역순). 지금 주문: 한 번만 주문합니다"
+  },
+  "gui.singulo.work_console.trigger.pulse": {
+    "source": "Once per signal",
+    "translation": "신호마다 1회"
+  },
+  "gui.singulo.work_console.trigger.pulse.hint": {
+    "source": "Order this many each time the console receives a redstone pulse. If materials are short, it waits until they are in stock",
+    "translation": "지령대에 레드스톤 신호가 들어올 때마다 이 수를 한 번 주문합니다. 재료가 부족하면 갖춰질 때까지 기다립니다"
+  },
+  "gui.singulo.work_console.unlink": {
+    "source": "Unlink",
+    "translation": "끊기"
+  },
+  "gui.singulo.work_console.worker.away": {
+    "source": "(not found)",
+    "translation": "(보이지 않음)"
+  },
   "gui.singulo.wormhole.generated": {
     "source": "A pair of mouths formed. Stabilize within %s s",
     "translation": "입구 한 쌍이 생겼습니다. %s초 이내에 안정화하세요"
@@ -4191,6 +5051,14 @@
     "source": "Charging, repair and gear",
     "translation": "충전·수리·장비"
   },
+  "guide.singulo.androids.decor.body": {
+    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret or headdress\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
+    "translation": "안드로이드 화면에서 이름 왼쪽의 버튼으로 페이지를 바꾸면, 3번째가 \"장식\" 페이지입니다. 머리·등/허리·손 칸에 장식을 달 수 있습니다. 전투·작업에는 영향이 없습니다. 모두 제작대에서 만들고, 염료와 함께 제작대에서 물들일 수 있습니다(가죽 방어구와 같음).\n・머리: 리본·머리 장식·베레모·헤드드레스\n・등/허리: 망토·목도리·허리 리본(망토와 목도리 끝은 걸으면 나부낍니다)\n・손: 문고본·꽃다발·찻잔·우산(대기 중에만 듭니다. 전투·작업·충전 중에는 넣어 둡니다)"
+  },
+  "guide.singulo.androids.decor.title": {
+    "source": "Android decorations",
+    "translation": "안드로이드의 장식"
+  },
   "guide.singulo.androids.glass.body": {
     "source": "- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard's own path.\nAndroids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass next to them, and four plain panes make the patterned kind.",
     "translation": "- 안드로이드 차단 유리(호박색): 안드로이드만 지나갈 수 없고, 플레이어와 다른 생물은 그대로 통과합니다. 기지 출입구에 알맞습니다.\n- 안드로이드 투과 유리(하늘색): 안드로이드만 지나갈 수 있고, 그 밖의 모든 것에는 단단한 유리입니다. 호위 전용 통로에 알맞습니다.\n안드로이드는 길을 찾을 때도 이 유리를 고려합니다. 차단 유리는 막힌 곳, 투과 유리는 열린 곳으로 봅니다. 민무늬는 같은 유리와 붙으면 이음새 없이 이어지고, 민무늬 4장으로 무늬 있는 것을 만들 수 있습니다."
@@ -4199,6 +5067,14 @@
     "source": "Android glass",
     "translation": "안드로이드용 유리"
   },
+  "guide.singulo.androids.process.body": {
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
+    "translation": "지령대 \"기록\"의 모드 버튼으로 기록할 종류를 전환합니다.\n・가공: 화로와 장치의 레시피. 왼쪽에 넣는 것, 오른쪽에 나오는 것(부산물도 2개까지)을 놓고, 휠로 개수를 바꿉니다(JEI의 \"+\"로도 가능). 안드로이드는 장치에 위로 넣고, 완성될 때까지 옆에서 기다렸다가 아래로 꺼냅니다. 부산물은 재료 보관소로 돌려놓습니다. 연료와 전력은 직접 준비하세요. 2분 동안 진행이 없으면 주문이 취소됩니다.\n・절차: 절차 카드에 투입·꺼내기·채굴 절차를 8개까지 기록합니다. 작업 위치 카드를 놓아 위치를 옮기고, 아이템 칸에 아이템을 놓은 뒤 \"추가\"를 누릅니다. 오른쪽에 만들어지는 것을 놓고 기록합니다. 절차 카드는 위치를 스스로 가지므로 레시피 선반의 어느 줄에나 놓을 수 있습니다.\n・채굴: 채굴 업그레이드를 단 안드로이드만 합니다. 작업 위치 카드 2장으로 범위를 정하면 위층부터 캐며, 목표 아이템이 모일 때까지 계속합니다(조약돌 생성기에도 쓸 수 있음). 부술 수 없는 블록·액체·보관함·실드로 보호된 곳은 캐지 않습니다. 캘 것이 없는 상태가 30초 계속되면 취소됩니다.\n・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩. 비워 두면 가지러 가지 않음).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다."
+  },
+  "guide.singulo.androids.process.title": {
+    "source": "Processing, procedures and mining",
+    "translation": "가공·절차·채굴"
+  },
   "guide.singulo.androids.ruin.body": {
     "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
     "translation": "모든 유적에는 벽 쪽에 폐허 안드로이드 출력대가 있습니다. 서바이벌 플레이어가 다가오면, 받침대 위에 그 형(광날형·채찍형·광검형)의 안드로이드 2~3체를 아래부터 쌓아 올리듯 출력해 출격시킵니다. 모두 쓰러뜨리면 그 형의 소형 크리스털 메모리가 출력대 위에 나타나고, 출력대는 하루 동안 쉽니다.\n- 광날형 \"루미나\": 몸을 숙이고 칼날이 빛나면 잔상을 남기며 파고들어 벱니다. 한쪽 무릎을 꿇고 바닥에 손을 대면 발밑에 예고 고리가 생기고 빛기둥이 솟습니다(고리 밖으로). 가까이서는 칼날을 펼쳐 회전 베기.\n- 채찍형 \"베르나\": 약 6블록까지 닿는 채찍질과, 휘감아 끌어당기는 감기. 머리 위로 채찍을 돌리면 바닥을 내리쳐 일직선 충격파를 보냅니다(점프로 피함).\n- 광검형 \"솔레이유\": 파고드는 찌르기, 휘두르는 순간 칼날이 늘어나는 가로 베기, 날아가는 초승달 참격파. 맞으면 정면에 빛의 방패를 펼치고(정면으로는 거의 안 통함), 계속 치면 반격합니다. 옆이나 뒤에서 공격하세요.\n안드로이드는 충전량으로 움직이며, 큰 기술을 10번쯤 쓰면 바닥나 눈의 빛이 꺼집니다. 가까운 출력대로 돌아가거나, 낮의 하늘 아래에서는 태양광 패널을 펼치고, 밤이나 실내에서는 앉아서 충전합니다(출력대 5초·태양광 10초·앉아서 14초). 충전 중에는 공격하지 않으니 공격할 기회입니다."
@@ -4206,6 +5082,22 @@
   "guide.singulo.androids.ruin.title": {
     "source": "Ruin androids",
     "translation": "유적의 안드로이드"
+  },
+  "guide.singulo.androids.upgrades.body": {
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩의 24칸이 더해집니다. 안에 물건이 있으면 뺄 수 없습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
+  },
+  "guide.singulo.androids.upgrades.title": {
+    "source": "Upgrades",
+    "translation": "업그레이드"
+  },
+  "guide.singulo.androids.work.body": {
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. If a place cannot be reached, the order is cancelled.",
+    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
+  },
+  "guide.singulo.androids.work.title": {
+    "source": "Work automation",
+    "translation": "작업 자동화"
   },
   "guide.singulo.catalysts": {
     "source": "Catalysts",
@@ -4659,6 +5551,10 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
+  "howto.singulo.android_backpack_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
   "howto.singulo.android_barrier_glass": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
@@ -4667,7 +5563,35 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.android_battery_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_beret": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_book": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_bouquet": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_cape": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.android_charger": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_delivery_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_felling_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
@@ -4679,21 +5603,77 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.android_hair_flower": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_headdress": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.android_kit": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_mining_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_production_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_recipe_rack": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.android_repair_kit": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.android_ribbon": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_scarf": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.android_station": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
+  "howto.singulo.android_supply_port": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_tank_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_teacup": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_umbrella": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_waist_ribbon": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
+  "howto.singulo.android_work_console": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "제작: 정밀 조립기(2단계)"
+  },
+  "howto.singulo.android_workbench": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.anomaly_sample": {
     "source": "Restore a Degraded Anomaly Sample",
@@ -5243,6 +6223,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "제작: 정밀 조립기(4단계)"
   },
+  "howto.singulo.procedure_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
   "howto.singulo.quantum_computing_module": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "제작: 정밀 조립기(3단계)"
@@ -5270,6 +6254,10 @@
   "howto.singulo.reactor_stabilizer": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "howto.singulo.recipe_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
   },
   "howto.singulo.scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -5475,6 +6463,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
+  "howto.singulo.work_location_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
   "howto.singulo.worldline_anchor_advanced": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
@@ -5547,9 +6539,45 @@
     "source": "Android Armor Plate",
     "translation": "안드로이드용 장갑판"
   },
+  "item.singulo.android_backpack_upgrade": {
+    "source": "Backpack Upgrade",
+    "translation": "백팩 업그레이드"
+  },
+  "item.singulo.android_battery_upgrade": {
+    "source": "Battery Upgrade",
+    "translation": "배터리 업그레이드"
+  },
+  "item.singulo.android_beret": {
+    "source": "Beret",
+    "translation": "베레모"
+  },
+  "item.singulo.android_book": {
+    "source": "Paperback",
+    "translation": "문고본"
+  },
+  "item.singulo.android_bouquet": {
+    "source": "Bouquet",
+    "translation": "꽃다발"
+  },
+  "item.singulo.android_cape": {
+    "source": "Cape",
+    "translation": "망토"
+  },
   "item.singulo.android_charger": {
     "source": "Android Wireless Charger",
     "translation": "안드로이드 무선 충전기"
+  },
+  "item.singulo.android_felling_upgrade": {
+    "source": "Felling Upgrade",
+    "translation": "벌목 업그레이드"
+  },
+  "item.singulo.android_hair_flower": {
+    "source": "Hair Flower",
+    "translation": "머리 장식"
+  },
+  "item.singulo.android_headdress": {
+    "source": "Headdress",
+    "translation": "헤드드레스"
   },
   "item.singulo.android_kit": {
     "source": "Android Kit",
@@ -5567,13 +6595,45 @@
     "source": "Compact Crystal Memory (Whip)",
     "translation": "소형 크리스털 메모리(채찍형)"
   },
+  "item.singulo.android_mining_upgrade": {
+    "source": "Mining Upgrade",
+    "translation": "채굴 업그레이드"
+  },
+  "item.singulo.android_production_upgrade": {
+    "source": "Production Upgrade",
+    "translation": "생산 업그레이드"
+  },
   "item.singulo.android_repair_kit": {
     "source": "Self-Repair Kit",
     "translation": "자가 수리 키트"
   },
+  "item.singulo.android_ribbon": {
+    "source": "Ribbon",
+    "translation": "리본"
+  },
+  "item.singulo.android_scarf": {
+    "source": "Scarf",
+    "translation": "목도리"
+  },
+  "item.singulo.android_tank_upgrade": {
+    "source": "Tank Upgrade",
+    "translation": "탱크 업그레이드"
+  },
+  "item.singulo.android_teacup": {
+    "source": "Teacup",
+    "translation": "찻잔"
+  },
   "item.singulo.android_transfer_upgrade": {
     "source": "Transfer Upgrade",
     "translation": "전송 업그레이드"
+  },
+  "item.singulo.android_umbrella": {
+    "source": "Umbrella",
+    "translation": "우산"
+  },
+  "item.singulo.android_waist_ribbon": {
+    "source": "Waist Ribbon",
+    "translation": "허리 리본"
   },
   "item.singulo.anomaly_sample": {
     "source": "Anomaly Sample",
@@ -5891,6 +6951,10 @@
     "source": "Primordial Seed",
     "translation": "원초의 씨앗"
   },
+  "item.singulo.procedure_card": {
+    "source": "Procedure Card",
+    "translation": "절차 카드"
+  },
   "item.singulo.quantum_computing_module": {
     "source": "Quantum Computing Module",
     "translation": "양자 연산 모듈"
@@ -5906,6 +6970,10 @@
   "item.singulo.raw_meteoric_iron": {
     "source": "Raw Meteoric Iron",
     "translation": "운철 원석"
+  },
+  "item.singulo.recipe_card": {
+    "source": "Recipe Card",
+    "translation": "레시피 카드"
   },
   "item.singulo.record_fragment": {
     "source": "Crystal Memory",
@@ -6103,6 +7171,10 @@
     "source": "White Ceramic Composite",
     "translation": "화이트 세라믹 복합재"
   },
+  "item.singulo.work_location_card": {
+    "source": "Work Location Card",
+    "translation": "작업 위치 카드"
+  },
   "item.singulo.wormhole_mouth_casing": {
     "source": "Wormhole Mouth Casing",
     "translation": "웜홀 입구 케이싱"
@@ -6191,6 +7263,10 @@
     "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
     "translation": "무선 충전기에 %1$s FE를 충전했습니다(%2$s / %3$s FE)"
   },
+  "message.singulo.android_workbench.hint": {
+    "source": "Androids craft here. Record this block on the Work Location Card in a recipe rack",
+    "translation": "안드로이드가 여기서 만듭니다. 레시피 선반의 작업 위치 카드에 이 블록을 기록하세요"
+  },
   "message.singulo.deep_sea_collector.idle": {
     "source": "Not deep enough: needs 16+ blocks of water above",
     "translation": "수심이 부족합니다(위에 물이 16블록 이상 필요)"
@@ -6255,6 +7331,10 @@
     "source": "Found %s ores and %s ruin blocks",
     "translation": "광석 %s개, 폐허 블록 %s개를 발견했습니다"
   },
+  "message.singulo.recipe_card.cleared": {
+    "source": "Cleared the recipe",
+    "translation": "레시피를 지웠습니다"
+  },
   "message.singulo.record_read": {
     "source": "You read the ancient record \"%s\". Find it in the handbook",
     "translation": "고대 기록 \"%s\"을(를) 읽었습니다. 핸드북의 \"고대 기록\"에서 볼 수 있습니다"
@@ -6303,6 +7383,10 @@
     "source": "Strangelet contained",
     "translation": "스트레인지렛을 자기 병에 가두었습니다"
   },
+  "message.singulo.supply_port.storages": {
+    "source": " (%s storages)",
+    "translation": " (저장소 %s개)"
+  },
   "message.singulo.void_collector.idle": {
     "source": "Works only in the End, over open void",
     "translation": "엔드에서 바로 아래가 공허까지 빈 곳에서만 작동합니다"
@@ -6314,6 +7398,38 @@
   "message.singulo.welcome": {
     "source": "You received the Singulo Handbook. Right-click to open it",
     "translation": "Singulo 핸드북을 받았습니다. 마우스 오른쪽 버튼을 클릭하여 엽니다."
+  },
+  "message.singulo.work_link.added": {
+    "source": "Linked to the work console at %s, %s, %s",
+    "translation": "작업 지령대(%s, %s, %s)에 연결했습니다"
+  },
+  "message.singulo.work_link.info": {
+    "source": "Linked to the work console at %s, %s, %s",
+    "translation": "연결된 작업 지령대: %s, %s, %s"
+  },
+  "message.singulo.work_link.none": {
+    "source": "Not linked to a work console",
+    "translation": "어느 작업 지령대에도 연결되어 있지 않습니다"
+  },
+  "message.singulo.work_link.not_console": {
+    "source": "This card does not hold a work console",
+    "translation": "이 카드는 작업 지령대를 기록하지 않았습니다"
+  },
+  "message.singulo.work_link.removed": {
+    "source": "Unlinked from the work console",
+    "translation": "작업 지령대에서 연결을 끊었습니다"
+  },
+  "message.singulo.work_link.too_far": {
+    "source": "Too far from the work console (up to %s blocks)",
+    "translation": "작업 지령대에서 너무 멉니다(%s블록까지)"
+  },
+  "message.singulo.work_location.cleared": {
+    "source": "Cleared the record",
+    "translation": "기록을 지웠습니다"
+  },
+  "message.singulo.work_location.recorded": {
+    "source": "Recorded %s at %s, %s, %s",
+    "translation": "%s의 위치를 기록했습니다(%s, %s, %s)"
   },
   "metric_drive.singulo.mode.high_gravity": {
     "source": "High gravity",
@@ -7299,6 +8415,18 @@
     "source": "Wormhole stabilizer runs",
     "translation": "웜홀 안정기가 작동한다"
   },
+  "tooltip.singulo.android_accessory.0": {
+    "source": "Worn on an android's head (decoration page)",
+    "translation": "안드로이드 머리에 답니다(장식 페이지)"
+  },
+  "tooltip.singulo.android_accessory.1": {
+    "source": "Worn on an android's back or waist (decoration page)",
+    "translation": "안드로이드 등이나 허리에 답니다(장식 페이지)"
+  },
+  "tooltip.singulo.android_accessory.2": {
+    "source": "Held by an idle android (decoration page)",
+    "translation": "대기 중인 안드로이드가 손에 듭니다(장식 페이지)"
+  },
   "tooltip.singulo.android_armor_plate": {
     "source": "Chestplate for a guard android (+8 armor, +2 toughness)",
     "translation": "호위 안드로이드의 흉갑(방어 +8, 방어 강도 +2)"
@@ -7306,6 +8434,14 @@
   "tooltip.singulo.android_charger.charges": {
     "source": "Full android charges: %s",
     "translation": "안드로이드 가득 충전 %s회분"
+  },
+  "tooltip.singulo.android_felling_upgrade": {
+    "source": "Fells trees like a diamond axe. Takes Efficiency, Fortune and Silk Touch",
+    "translation": "다이아몬드 도끼처럼 나무를 벱니다. 효율·행운·섬세한 손길을 부여할 수 있습니다"
+  },
+  "tooltip.singulo.android_mining_upgrade": {
+    "source": "Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch",
+    "translation": "다이아몬드 곡괭이처럼 캡니다. 효율·행운·섬세한 손길을 부여할 수 있습니다"
   },
   "tooltip.singulo.beyond_repair": {
     "source": "Beyond repair",
@@ -7346,6 +8482,10 @@
   "tooltip.singulo.exotic_charge": {
     "source": "Exotic charge: %s s",
     "translation": "특이 물질 잔량: %s초"
+  },
+  "tooltip.singulo.fluid_sample": {
+    "source": "%s mB",
+    "translation": "%s mB"
   },
   "tooltip.singulo.gauntlet.hint": {
     "source": "Hold use to manipulate · Sneak-use to switch mode",
@@ -7395,6 +8535,82 @@
     "source": "Not functional yet; usable as a material",
     "translation": "아직 기능 미구현. 재료로 사용 가능"
   },
+  "tooltip.singulo.procedure_card.breed": {
+    "source": "Breed with %s, up to %s (%s)",
+    "translation": "번식: %s 먹이기, %s마리까지 (%s)"
+  },
+  "tooltip.singulo.procedure_card.cull": {
+    "source": "Cull until %s, keeping %s (%s)",
+    "translation": "처리: %s 모일 때까지, %s마리를 넘는 만큼 (%s)"
+  },
+  "tooltip.singulo.procedure_card.empty": {
+    "source": "Blank: record steps in the procedure mode of a work console's Record tab",
+    "translation": "아직 기록하지 않음(작업 지령대 「기록」의 절차 모드에서 기록)"
+  },
+  "tooltip.singulo.procedure_card.extract": {
+    "source": "Extract %s (%s)",
+    "translation": "꺼내기: %s (%s)"
+  },
+  "tooltip.singulo.procedure_card.fell": {
+    "source": "Fell trees until %s (%s)",
+    "translation": "벌목: %s 모일 때까지 (%s)"
+  },
+  "tooltip.singulo.procedure_card.harvest": {
+    "source": "Harvest until %s (%s)",
+    "translation": "수확: %s 모일 때까지 (%s)"
+  },
+  "tooltip.singulo.procedure_card.insert": {
+    "source": "Insert %s (%s)",
+    "translation": "투입: %s (%s)"
+  },
+  "tooltip.singulo.procedure_card.milk": {
+    "source": "Milk: %s (%s)",
+    "translation": "우유 짜기: %s (%s)"
+  },
+  "tooltip.singulo.procedure_card.mine": {
+    "source": "Mine until %s (%s)",
+    "translation": "채굴: %s 모일 때까지 (%s)"
+  },
+  "tooltip.singulo.procedure_card.product": {
+    "source": "the product",
+    "translation": "만들어지는 것"
+  },
+  "tooltip.singulo.procedure_card.shear": {
+    "source": "Shear until %s (%s)",
+    "translation": "털 깎기: %s 모일 때까지 (%s)"
+  },
+  "tooltip.singulo.procedure_card.use": {
+    "source": "Use: %s (%s)",
+    "translation": "조작: %s (%s)"
+  },
+  "tooltip.singulo.recipe_card.empty": {
+    "source": "Blank: record a recipe in a work console's Record tab",
+    "translation": "아직 기록하지 않음(작업 지령대의 \"기록\"에서 기록)"
+  },
+  "tooltip.singulo.recipe_card.extra": {
+    "source": "Also: %s ×%s",
+    "translation": "그 외: %s ×%s"
+  },
+  "tooltip.singulo.recipe_card.faces": {
+    "source": "Faces: in %s, out %s, fuel %s",
+    "translation": "면: 넣기 %s・꺼내기 %s・연료 %s"
+  },
+  "tooltip.singulo.recipe_card.fuel": {
+    "source": "Fuel: %s ×%s (fetched when it runs out)",
+    "translation": "연료: %s ×%s (떨어지면 가지러 감)"
+  },
+  "tooltip.singulo.recipe_card.output": {
+    "source": "Makes: %s ×%s",
+    "translation": "만드는 것: %s ×%s"
+  },
+  "tooltip.singulo.recipe_card.processing": {
+    "source": "Processing (put into a furnace or machine and taken out)",
+    "translation": "가공(화로나 장치에 넣고 꺼냄)"
+  },
+  "tooltip.singulo.recipe_card.variants": {
+    "source": "Accepts variants of the same kind",
+    "translation": "같은 종류의 다른 것도 사용"
+  },
   "tooltip.singulo.repairs": {
     "source": "Repaired %s / %s times",
     "translation": "수리 %s / %s회"
@@ -7414,6 +8630,18 @@
   "tooltip.singulo.uses": {
     "source": "Uses %s / %s",
     "translation": "사용 횟수 %s / %s"
+  },
+  "tooltip.singulo.work_location.block": {
+    "source": "%s at %s, %s, %s",
+    "translation": "%s(%s, %s, %s)"
+  },
+  "tooltip.singulo.work_location.empty": {
+    "source": "Empty: sneak-use on a block to record it",
+    "translation": "기록 없음(블록을 웅크리고 우클릭해 기록)"
+  },
+  "tooltip.singulo.work_location.hint": {
+    "source": "Use a card holding a work console on a port or rack to link it",
+    "translation": "작업 지령대를 기록한 카드로 자재구 등을 우클릭하면 연결됩니다"
   },
   "tooltip.singulo.wormhole.unstable": {
     "source": "Unstable: collapses in %s s",
@@ -7439,6 +8667,10 @@
     "source": "Used in: Patterned Android Gate Glass",
     "translation": "사용 대상: 무늬 안드로이드 투과 유리"
   },
+  "uses.singulo.android_kit": {
+    "source": "Used in: Production Upgrade",
+    "translation": "사용 대상: 생산 업그레이드"
+  },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
     "translation": "사용 제품: 특이점 코어"
@@ -7448,12 +8680,12 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 22 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 22개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 35 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 35개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 35 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 35개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 36개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -7500,8 +8732,8 @@
     "translation": "사용 제품: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 7 more",
-    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 7개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 13 more",
+    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 13개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -7868,12 +9100,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 66 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 66개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 74 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 74개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 46 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 46개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 51 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 51개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

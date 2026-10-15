@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.network.PacketDistributor;
+import io.github.genichimaruo.singulo.network.SinguloNetwork;
 import org.lwjgl.glfw.GLFW;
 
 /**

@@ -39,6 +39,13 @@ public final class SinguloMenus {
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.AndroidMenu>> ANDROID = REGISTER.register(
             "android", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.android.AndroidMenu::client));
 
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.WorkConsoleMenu>> ANDROID_WORK_CONSOLE = REGISTER.register(
+            "android_work_console", () -> net.minecraftforge.common.extensions.IForgeMenuType.create(io.github.genichimaruo.singulo.android.work.WorkConsoleMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.DeliveryPortMenu>> ANDROID_DELIVERY_PORT = REGISTER.register(
+            "android_delivery_port", () -> net.minecraftforge.common.extensions.IForgeMenuType.create(io.github.genichimaruo.singulo.android.work.DeliveryPortMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.work.RecipeRackMenu>> ANDROID_RECIPE_RACK = REGISTER.register(
+            "android_recipe_rack", () -> net.minecraftforge.common.extensions.IForgeMenuType.create(io.github.genichimaruo.singulo.android.work.RecipeRackMenu::client));
+
     public static final Supplier<MenuType<io.github.genichimaruo.singulo.android.AndroidStationMenu>> ANDROID_STATION = REGISTER.register(
             "android_station", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.android.AndroidStationMenu::client));
 

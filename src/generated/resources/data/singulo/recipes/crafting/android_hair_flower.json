@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "F",
+    "S"
+  ],
+  "key": {
+    "F": {
+      "tag": "minecraft:small_flowers"
+    },
+    "S": {
+      "tag": "forge:strings"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_hair_flower"
+  }
+}

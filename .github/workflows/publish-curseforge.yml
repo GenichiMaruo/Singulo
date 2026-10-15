@@ -2,7 +2,7 @@ name: Publish CurseForge and GitHub Beta
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v*-1.20.1F']
   workflow_dispatch:
 
 permissions:
@@ -15,6 +15,9 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     environment: curseforge
     outputs:
       name: ${{ steps.version.outputs.name }}
@@ -23,7 +26,9 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '25'
+          java-version: |
+            17
+            21
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -44,12 +49,17 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "name=$mod_name-$version-$minecraft$suffix" >> "$GITHUB_OUTPUT"
           echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
-      - name: Validate translations
-        run: python tools/localization.py --check
+      - name: Validate source and resources
+        run: |
+          python tools/localization.py --check
+          python tools/check_models.py
+          python tools/check_supporters.py
+          python tools/check_port_1201.py
       - name: Build and run GameTests
         run: |
           chmod +x gradlew
-          ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" build runGameTestServer
+          ./gradlew --no-daemon --max-workers=2 -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64 build runGameTestServer
+          python3 tools/check_port_1201.py --jar "build/libs/${{ steps.version.outputs.name }}.jar"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.version.outputs.name }}

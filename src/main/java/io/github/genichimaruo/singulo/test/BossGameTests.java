@@ -55,8 +55,9 @@ public final class BossGameTests {
     }
 
     /** 起動すると出現の演出が始まり、そのあいだは動かず傷つかない。演出が終わると戦い始める。 */
-    @GameTest(template = EMPTY, timeoutTicks = HorizonWarden.EMERGE_TICKS + 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = HorizonWarden.EMERGE_TICKS + 40, batch = "warden_emerge")
     public static void wardenEmergesBeforeFighting(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         helper.assertTrue(warden != null && warden.emergeTicks() == HorizonWarden.EMERGE_TICKS && warden.isNoAi(), "出現の演出が始まらない");
         helper.assertFalse(warden.hurt(helper.getLevel().damageSources().generic(), 50), "出現の途中で傷ついた");
@@ -67,8 +68,9 @@ public final class BossGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void consoleWakesWardenWhileVaultSealed(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         HorizonWarden warden = console.activate(helper.getLevel(), null);
         warden.skipEmerging();
@@ -83,8 +85,9 @@ public final class BossGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void wardenPhasesFollowHealth(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         warden.setHealth(500);
@@ -99,8 +102,9 @@ public final class BossGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void defeatOpensVaultWithSeed(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         warden.kill();
@@ -118,8 +122,9 @@ public final class BossGameTests {
     }
 
     /** 攻略後の再戦: 覚醒の記録核で、保管庫が開いていても覚醒した守護機（体力×2.5）が起きる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void awakeningCoreSummonsStrongerWarden(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         vault(helper).setSealed(false);
         helper.assertTrue(console.activate(helper.getLevel(), null) == null, "保管庫が開いているのに普通の守護機が起きた");
@@ -134,8 +139,9 @@ public final class BossGameTests {
     }
 
     /** 覚醒戦をやめて離れると、守護機は封印に戻り、記録核がコンソールの上に返る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void abandonedAwakenedFightReturnsCore(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         vault(helper).setSealed(false);
         HorizonWarden warden = console.activateAwakened(helper.getLevel(), null);
@@ -154,8 +160,9 @@ public final class BossGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void wardenReturnsToSealWithoutChallengers(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         HorizonWarden warden = console.activate(helper.getLevel(), null);
         warden.skipEmerging();
@@ -173,8 +180,9 @@ public final class BossGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void regeneratedVaultIsSealedAgain(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         arena(helper);
         RuinCacheBlockEntity vault = vault(helper);
         vault.setSealed(false);
@@ -199,8 +207,9 @@ public final class BossGameTests {
         return zombie;
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void singularityZoneDealsFullDamageThroughArmor(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         Zombie zombie = armoredZombie(helper, new BlockPos(6, 1, 1));
@@ -218,8 +227,9 @@ public final class BossGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void gravityAttackPullsThenLifts(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         Zombie zombie = armoredZombie(helper, new BlockPos(7, 1, 7));
@@ -232,8 +242,9 @@ public final class BossGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void wardenShootsBoltsAtDistance(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         Zombie near = armoredZombie(helper, CONSOLE.east());
@@ -245,8 +256,9 @@ public final class BossGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void tidalDamageIgnoresArmorAndWardenIsBoss(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         helper.assertTrue(SinguloDamageTypes.tidal(helper.getLevel(), null).is(DamageTypeTags.BYPASSES_ARMOR),
                 "潮汐ダメージが防具を無視しない");
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
@@ -257,8 +269,9 @@ public final class BossGameTests {
     }
 
     /** フェーズ2以降: 撃った矢を跳ね返し、撃った相手に当てる（ウォーデンは無傷）。 */
-    @GameTest(template = "huge", timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 200)
     public static void phaseTwoReflectsProjectilesAtShooter(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         warden.setNoAi(false);
@@ -285,8 +298,9 @@ public final class BossGameTests {
     }
 
     /** 重力の手: 持ち上げたあと強く叩き落とし、着地で大きな落下ダメージ（つかんでいる間のダメージとは別に8以上）。 */
-    @GameTest(template = "huge", timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 200)
     public static void gravityGripSlamsWithFallDamage(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(7, 1, 9));
@@ -304,8 +318,9 @@ public final class BossGameTests {
     }
 
     /** 倒されると、演出のあいだは膝をついて残り、終わると消える。 */
-    @GameTest(template = EMPTY, timeoutTicks = HorizonWarden.DEATH_TICKS + 30)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = HorizonWarden.DEATH_TICKS + 30)
     public static void wardenDeathPlaysOut(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         warden.kill();
@@ -317,8 +332,9 @@ public final class BossGameTests {
     }
 
     /** フェーズ2からは、ビームが壁を抜ける（手加減なし）。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void wardenPiercesFromPhaseTwo(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         helper.assertFalse(warden.piercing(), "フェーズ1から貫通している");
@@ -333,8 +349,9 @@ public final class BossGameTests {
     // ------------------------------------------------------------------ 隠しボス: 最後の記録者
 
     /** 終焉の記録で、最後の記録者が出現の演出つきで目覚める。そのあいだ守護機は呼べず、2体目も出ない。 */
-    @GameTest(template = EMPTY, timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void terminusRecordWakesArchivist(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         LastArchivist a = console.activateArchivist(helper.getLevel(), null);
         helper.assertTrue(a != null && a.emergeTicks() == LastArchivist.EMERGE_TICKS, "最後の記録者が目覚めない");
@@ -348,8 +365,9 @@ public final class BossGameTests {
     }
 
     /** 体力 2/3・1/3 で、回想・終焉の姿へ移る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void archivistPhasesFollowHealth(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
         a.skipEmerging();
         a.setHealth(a.getMaxHealth() * 0.5F);
@@ -365,8 +383,9 @@ public final class BossGameTests {
     }
 
     /** 倒すと演出のあと消え、記録者の光輪が残る。 */
-    @GameTest(template = EMPTY, timeoutTicks = LastArchivist.DEATH_TICKS + 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = LastArchivist.DEATH_TICKS + 40)
     public static void archivistDeathLeavesHalo(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
         a.skipEmerging();
         a.kill();
@@ -381,8 +400,9 @@ public final class BossGameTests {
     }
 
     /** 挑戦をやめて離れると、記録者は戻り、終焉の記録がコンソールの上に返る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void abandonedArchivistReturnsRecord(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         LastArchivist a = console.activateArchivist(helper.getLevel(), null);
         a.skipEmerging();
@@ -396,8 +416,9 @@ public final class BossGameTests {
     }
 
     /** 封印コンソールの上の重力異常点は、守護機が現れると縮んで消え、倒されると元の大きさへ戻る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void anomalyShrinksWhileWardenAwake(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         long now = helper.getLevel().getGameTime();
         helper.assertTrue(console.anomalyScale(now) == 1, "眠っているのに重力異常点が小さい: " + console.anomalyScale(now));
@@ -417,8 +438,9 @@ public final class BossGameTests {
     }
 
     /** 最後の記録者が現れると部屋が力場で閉ざされ、力場を越える移動（エンダーパールなど）は止まる。倒すと力場は消える。 */
-    @GameTest(template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void archivistSealsTheChamber(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         LastArchivist a = console.activateArchivist(helper.getLevel(), null);
         helper.runAtTickTime(3, () -> {
@@ -438,8 +460,9 @@ public final class BossGameTests {
     }
 
     /** 最後の記録者が現れると、部屋の床の欠けた所がホログラムの床で埋まり、床は壊せなくなる。いなくなると元に戻る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void archivistPatchesTheFloor(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SealConsoleBlockEntity console = arena(helper);
         BlockPos hole = helper.absolutePos(CONSOLE).offset(0, -3, 0);
         BlockPos solid = hole.east();
@@ -464,8 +487,9 @@ public final class BossGameTests {
     }
 
     /** 戦いの最中に投げたブラックホール爆弾は着弾せず、記録者の頭の特異点に吸い込まれて体力が戻る。 */
-    @GameTest(template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void archivistSwallowsBlackHoleBombs(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
         a.skipEmerging();
         a.setHealth(a.getMaxHealth() * 0.5F);
@@ -486,8 +510,9 @@ public final class BossGameTests {
     }
 
     /** 最後の記録者を倒すと、残光の翼が落ちる。翼は胴に着けて滑空でき、壊れない。 */
-    @GameTest(template = EMPTY, timeoutTicks = LastArchivist.DEATH_TICKS + 40)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = LastArchivist.DEATH_TICKS + 40)
     public static void archivistDropsAfterglowWings(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);
         a.skipEmerging();
         a.kill();
@@ -504,8 +529,9 @@ public final class BossGameTests {
     }
 
     /** ホライズン・ウォーデンも、挑戦者が増えると体力の割合を保ったまま強くなる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void wardenScalesWithChallengers(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         HorizonWarden warden = arena(helper).activate(helper.getLevel(), null);
         warden.skipEmerging();
         float base = warden.effectiveMaxHealth();

@@ -43,16 +43,18 @@ public final class SinguloGameTests {
         return be;
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void kilnMakesSteel(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         kiln.items().setStackInSlot(0, new ItemStack(item("steel_blend")));
         helper.succeedWhen(() -> helper.assertTrue(
                 kiln.items().getStackInSlot(kiln.type().outputSlot()).is(item("steel_ingot")), "鋼鉄インゴットが出ない"));
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void kilnWithoutPowerWaits(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         kiln.energy().setEnergy(0);
         kiln.items().setStackInSlot(0, new ItemStack(item("steel_blend")));
@@ -62,8 +64,9 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void compressorMassModeMakesPellet(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         var recipes = MachineBlockEntity.massRecipes(helper.getLevel(), MachineType.COMPRESSOR);
         int index = -1;
@@ -84,16 +87,18 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void compressorMakesSteelPlate(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         compressor.items().setStackInSlot(0, new ItemStack(item("steel_ingot")));
         helper.succeedWhen(() -> helper.assertTrue(
                 compressor.items().getStackInSlot(compressor.type().outputSlot()).is(item("steel_plate")), "鋼板が出ない"));
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void assemblerMakesQuantumModule(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity assembler = machine(helper, MachineType.PRECISION_ASSEMBLER);
         assembler.items().setStackInSlot(0, new ItemStack(item("entangled_element"), 5));
         assembler.items().setStackInSlot(5, new ItemStack(item("basic_circuit")));
@@ -105,8 +110,9 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void electrolyzerSplitsWater(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
         electrolyzer.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
@@ -119,8 +125,9 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 500)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void archiveCopiesObservationLog(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity archive = machine(helper, MachineType.ARCHIVE_TERMINAL);
         archive.items().setStackInSlot(0, new ItemStack(item("observation_log")));
         archive.items().setStackInSlot(1, new ItemStack(item("blank_data_card"), 4));
@@ -133,8 +140,9 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 500)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void archiveRestoresControlUnit(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity archive = machine(helper, MachineType.ARCHIVE_TERMINAL);
         archive.items().setStackInSlot(0, new ItemStack(item("degraded_control_unit")));
         archive.items().setStackInSlot(1, new ItemStack(item("basic_circuit")));
@@ -148,8 +156,9 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void usesWearAndRepairLimit(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ItemStack unit = new ItemStack(item("control_unit"));
         ItemStack worn = UsesHelper.consume(unit, 16);
         helper.assertTrue(worn.is(item("degraded_control_unit")), "使い切ったら劣化品に戻る");
@@ -170,8 +179,9 @@ public final class SinguloGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void thermoelectricCampfireBlueIce(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.CAMPFIRE);
         helper.setBlock(MACHINE.east(), Blocks.BLUE_ICE);
@@ -185,8 +195,9 @@ public final class SinguloGameTests {
         });
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void thermoelectricLavaMeltsIce(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.MAGMA_BLOCK);
         helper.setBlock(MACHINE.east(), Blocks.SNOW_BLOCK);
@@ -194,8 +205,9 @@ public final class SinguloGameTests {
         helper.succeedWhenBlockPresent(Blocks.WATER, MACHINE.east());
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void copperWireCarriesPower(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos gen = new BlockPos(1, 1, 1);
         helper.setBlock(gen, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(gen.west(), Blocks.CAMPFIRE);

@@ -38,10 +38,10 @@ FONT_BOLD_PATHS = ['C:/Windows/Fonts/BIZ-UDGothicB.ttc', 'C:/Windows/Fonts/meiry
 
 # タグ・バニラの代表の絵（textures の中の名前）
 TAG_ICONS = {
-    'c:glass_blocks/colorless': 'block/glass', 'c:dusts/glowstone': 'item/glowstone_dust', 'c:ender_pearls': 'item/ender_pearl',
-    'c:slime_balls': 'item/slime_ball', 'c:gems/diamond': 'item/diamond', 'singulo:star_core': 'item/nether_star',
-    'c:gems/quartz': 'item/quartz', 'c:dusts/redstone': 'item/redstone', 'singulo:helium_bearing_stone': 'block/deepslate',
-    'c:sands': 'block/sand', 'c:ingots/iron': 'item/iron_ingot', 'c:ingots/copper': 'item/copper_ingot', 'c:obsidians': 'block/obsidian',
+    'forge:glass_blocks/colorless': 'block/glass', 'forge:dusts/glowstone': 'item/glowstone_dust', 'forge:ender_pearls': 'item/ender_pearl',
+    'forge:slime_balls': 'item/slime_ball', 'forge:gems/diamond': 'item/diamond', 'singulo:star_core': 'item/nether_star',
+    'forge:gems/quartz': 'item/quartz', 'forge:dusts/redstone': 'item/redstone', 'singulo:helium_bearing_stone': 'block/deepslate',
+    'forge:sand': 'block/sand', 'forge:ingots/iron': 'item/iron_ingot', 'forge:ingots/copper': 'item/copper_ingot', 'forge:obsidians': 'block/obsidian',
 }
 VANILLA_TEXTURE_OVERRIDES = {
     'minecraft:piston': 'block/piston_side', 'minecraft:blast_furnace': 'block/blast_furnace_front',

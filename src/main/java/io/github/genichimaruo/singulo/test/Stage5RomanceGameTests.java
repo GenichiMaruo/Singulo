@@ -59,8 +59,9 @@ public final class Stage5RomanceGameTests {
 
     // ------------------------------------------------------------------ 時間の場
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void timeFieldsDilateAccelerateAndCancel(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Level level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(10004, 1, 10004));
         BlockPos reactor = helper.absolutePos(new BlockPos(10000, 1, 10000));
@@ -90,8 +91,9 @@ public final class Stage5RomanceGameTests {
     /** Tシリンダー（5×5×9）を建てる。コントローラは (7,2,2)、格納筒は南（+Z）へ。円柱の中心は (7,5,4)。 */
     private static final BlockPos TIPLER = new BlockPos(7, 2, 2);
 
-    @GameTest(template = HUGE, batch = "tipler", timeoutTicks = 160)
+    @GameTest(setupTicks = 20, template = HUGE, batch = "tipler", timeoutTicks = 160)
     public static void tiplerCylinderDoublesFurnaceSpeed(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
                 net.minecraft.core.Direction.SOUTH, 9);
         TiplerCylinderBlockEntity tipler = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TIPLER);
@@ -123,8 +125,9 @@ public final class Stage5RomanceGameTests {
         });
     }
 
-    @GameTest(template = HUGE, batch = "tipler")
+    @GameTest(setupTicks = 20, template = HUGE, batch = "tipler")
     public static void tiplerCylinderNeedsFullShape(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.TIPLER_CYLINDER, TIPLER,
                 net.minecraft.core.Direction.SOUTH, 9);
         // 観察窓を1枚外す（中に入れてしまう）
@@ -159,17 +162,17 @@ public final class Stage5RomanceGameTests {
      * 許可証: 登録された人がいると、守りの中で登録されていない人は止められ、登録した人は止められない。
      * 放射冠はだれでも壊せる扱いで、壊れるとシールドが止まる。
      */
-    @GameTest(template = HUGE, batch = "shield_permit", setupTicks = 20, timeoutTicks = 160)
+    @GameTest(setupTicks = 20, template = HUGE, batch = "shield_permit", timeoutTicks = 80)
     public static void shieldPermitLocksOutsiders(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
         var player = TestBuild.mockPlayer(helper);
         ItemStack permit = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.SHIELD_PERMIT.get());
         shield.permit().setStackInSlot(0, permit);
         BlockPos inside = helper.absolutePos(new BlockPos(2, 1, 2));
         BlockPos crown = helper.absolutePos(new BlockPos(7, 9, 4));   // コントローラ (7,2,2) から上へ7・奥へ2
-        helper.startSequence()
-                .thenWaitUntil(() -> helper.assertTrue(shield.protectionLevel() == 4, "守りが始まらない: " + shield.status()))
-                .thenExecute(() -> {
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(shield.protectionLevel() == 4, "守りが始まらない: " + shield.status());
             helper.assertTrue(!ShieldTowerBlockEntity.locked(helper.getLevel(), inside, player), "だれも登録されていないのに止められた");
             // ほかの人だけを登録する
             ItemStack card = shield.permit().getStackInSlot(0);
@@ -187,21 +190,22 @@ public final class Stage5RomanceGameTests {
             helper.assertTrue(ShieldTowerBlockEntity.isActiveCrown(helper.getLevel(), crown), "放射冠の位置がわからない");
             helper.getLevel().destroyBlock(crown, false);
             ShieldTowerBlockEntity.onCrownBroken(helper.getLevel(), crown);
-        })
-                .thenExecuteAfter(5, () -> {
+        });
+        helper.runAtTickTime(10, () -> {
             helper.assertTrue(shield.protectionLevel() == 0, "放射冠を壊してもシールドが止まらない");
             player.discard();
-        }).thenSucceed();
+            helper.succeed();
+        });
     }
 
-    @GameTest(template = HUGE, batch = "shield", setupTicks = 20, timeoutTicks = 160)
+    @GameTest(setupTicks = 20, template = HUGE, batch = "shield", timeoutTicks = 40)
     public static void shieldTowerStopsExplosionsAndGriefing(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
         BlockPos dirt = new BlockPos(2, 1, 2);
         helper.setBlock(dirt, Blocks.DIRT);
-        helper.startSequence()
-                .thenWaitUntil(() -> helper.assertTrue(shield.protectionLevel() == 4, "時間結晶触媒で守りが始まらない: " + shield.status()))
-                .thenExecute(() -> {
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(shield.protectionLevel() == 4, "時間結晶触媒で守りが始まらない: " + shield.status());
             BlockPos at = helper.absolutePos(dirt.above());
             helper.getLevel().explode(null, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 3.0F,
                     Level.ExplosionInteraction.TNT);
@@ -210,14 +214,16 @@ public final class Stage5RomanceGameTests {
             helper.assertTrue(!ShieldTowerBlockEntity.shielded(helper.getLevel(), zombie.position(), 5),
                     "時間結晶触媒なのに湧き止めまで効いている");
             zombie.discard();
-        })
-                .thenExecuteAfter(5, () -> {
+        });
+        helper.runAtTickTime(10, () -> {
             helper.assertBlockPresent(Blocks.DIRT, dirt);
-        }).thenSucceed();
+            helper.succeed();
+        });
     }
 
-    @GameTest(template = HUGE, batch = "shield_core", setupTicks = 20, timeoutTicks = 160)
+    @GameTest(setupTicks = 20, template = HUGE, batch = "shield_core", timeoutTicks = 60)
     public static void shieldTowerWithCoreRepelsHostiles(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ShieldTowerBlockEntity shield = buildShield(helper, "singularity_core");
         BlockPos zombiePos = new BlockPos(10, 1, 4);
         Zombie[] zombie = new Zombie[1];
@@ -235,8 +241,9 @@ public final class Stage5RomanceGameTests {
 
     // ------------------------------------------------------------------ ワールドライン・アンカー（上位）
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void advancedAnchorScalesAndEmbedsCore(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_ADVANCED.get());
         AdvancedWorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -258,8 +265,9 @@ public final class Stage5RomanceGameTests {
 
     // ------------------------------------------------------------------ グラビトン・マニピュレーター
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void gravitonManipulatorTargetsAndCrush(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         GravitonManipulatorItem manipulator = SinguloItems.GRAVITON_MANIPULATOR.get();
         var golem = helper.spawn(EntityType.IRON_GOLEM, new BlockPos(1, 1, 1));
         helper.assertTrue(manipulator.affects(golem, GravityGauntletItem.Mode.LEVITATE), "HP100のゴーレムを持ち上げられない");
@@ -290,8 +298,9 @@ public final class Stage5RomanceGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void gravitonManipulatorRepelsMobsAndProjectiles(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos center = new BlockPos(4, 1, 4);
         ArmorStand owner = helper.spawn(EntityType.ARMOR_STAND, center);
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, center.east(2));
@@ -310,8 +319,9 @@ public final class Stage5RomanceGameTests {
 
     // ------------------------------------------------------------------ メトリック・ドライブ
 
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY)
     public static void metricDriveChangesGravityAndUsesExoticMatter(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ServerPlayer player = TestBuild.mockPlayer(helper);
         try {
             player.getAbilities().instabuild = false;
