@@ -13,7 +13,8 @@ public record WorkConsoleViewPayload(int containerId, CompoundTag view) {
 
     public static void handle(WorkConsoleViewPayload payload, net.minecraftforge.network.NetworkEvent.Context context) {
         context.enqueueWork(() -> {
-            if (net.minecraft.client.Minecraft.getInstance().player.containerMenu instanceof WorkConsoleMenu menu && menu.containerId == payload.containerId()) {
+            var player = net.minecraft.client.Minecraft.getInstance().player;
+            if (player != null && player.containerMenu instanceof WorkConsoleMenu menu && menu.containerId == payload.containerId()) {
                 menu.receive(payload.view());
             }
         });

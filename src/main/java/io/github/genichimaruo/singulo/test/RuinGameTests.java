@@ -55,6 +55,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void observationPostCacheHoldsOneExpedition(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         RuinCacheBlockEntity cache = cache(helper, "observation_post");
         cache.refillIfDue(helper.getLevel(), 1000);
         int logs = count(cache, item("observation_log"));
@@ -66,6 +67,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void cacheRegeneratesAfterSevenDays(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         RuinCacheBlockEntity cache = cache(helper, "observation_post");
         long t = 1000;
         cache.refillIfDue(helper.getLevel(), t);
@@ -80,6 +82,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void dormantSeedOnlyOnFirstFill(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         RuinCacheBlockEntity cache = cache(helper, "final_lab");
         cache.refillIfDue(helper.getLevel(), 0);
         helper.assertTrue(count(cache, item("dormant_singularity_seed")) == 1, "初回に休眠した特異点の種が1個入らない");
@@ -94,6 +97,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void guardDockLaunchesTieredDrones(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         helper.setBlock(POS, SinguloBlocks.RUIN_GUARD_DOCK.get());
         GuardDockBlockEntity dock = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
         dock.setTier(2);
@@ -110,6 +114,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void droneDropsNothing(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         SecurityDrone drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above());
         drone.setTier(3);
         helper.assertTrue(drone.getMaxHealth() == 40, "段階3のドローンはHP40");
@@ -123,6 +128,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void detectorDescribesDirectionAndBand(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos origin = new BlockPos(0, 64, 0);
         String northeast = GravitationalWaveDetectorBlockEntity.describe(origin, new BlockPos(400, 64, -400)).getString();
         helper.assertTrue(northeast.contains("北東") || northeast.contains("northeast"), "北東にならない: " + northeast);
@@ -134,6 +140,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void ruinTemplatesHaveCacheAndGuards(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (String ruin : List.of("observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor")) {
             Optional<StructureTemplate> template = helper.getLevel().getStructureManager().get(Singulo.id("ruins/" + ruin));
             helper.assertTrue(template.isPresent(), "構造物ファイルがない: " + ruin);
@@ -167,6 +174,7 @@ public final class RuinGameTests {
     /** /singulo ruin と同じ置き方で、遺構を丸ごと建てられる（保管庫に遺構IDが入る）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void ruinCommandPlacesRuin(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos center = helper.absolutePos(new BlockPos(4, 1, 4));
         net.minecraft.core.Vec3i size = io.github.genichimaruo.singulo.command.SinguloCommands.placeRuin(
                 helper.getLevel(), "observation_post", center);
@@ -185,6 +193,7 @@ public final class RuinGameTests {
     /** 探索コンパスは、攻略した遺構の保管庫で調整するまで、次の遺構を探せない。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void compassUnlocksNextRuinOnlyAfterClearing(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
         RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);

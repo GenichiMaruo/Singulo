@@ -3,8 +3,6 @@ name: Publish CurseForge and GitHub Beta
 on:
   push:
     tags: ['v*-1.20.1F']
-    branches: [port/1.20.1-forge]
-    paths: ['gradle.properties']
   workflow_dispatch:
 
 permissions:
@@ -85,6 +83,7 @@ jobs:
 
   github-release:
     needs: publish
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -98,10 +97,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_NAME: ${{ needs.publish.outputs.name }}
-          GH_TARGET: ${{ github.sha }}
         run: |
-          gh release create "v$(sed -n 's/^mod_version=//p' gradle.properties)-1.20.1F" "dist/$RELEASE_NAME.jar" \
-            --repo "$GITHUB_REPOSITORY" --target "$GH_TARGET" \
+          gh release create "$GITHUB_REF_NAME" "dist/$RELEASE_NAME.jar" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag \
             --title "$RELEASE_NAME (Beta)" \
             --notes-file "docs/curseforge/changelog-$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r').md" \
             --prerelease --latest=false

@@ -20,6 +20,44 @@ public final class Legacy {
         return java.util.UUID.nameUUIDFromBytes(id.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
     public static boolean sameFluid(net.minecraftforge.fluids.FluidStack a, net.minecraftforge.fluids.FluidStack b) { return a.isFluidEqual(b); }
+    /** Completed machines and hostiles must not affect later fixtures in their search radius. */
+    public static void isolateFixture(net.minecraft.gametest.framework.GameTestHelper helper) {
+        try {
+            var field = java.util.Arrays.stream(net.minecraft.gametest.framework.GameTestHelper.class.getDeclaredFields())
+                    .filter(f -> f.getType() == net.minecraft.gametest.framework.GameTestInfo.class).findFirst().orElseThrow();
+            field.setAccessible(true);
+            var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
+            var bounds = info.getStructureBounds();
+            info.addListener(new net.minecraft.gametest.framework.GameTestListener() {
+                public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo test) {}
+                public void testPassed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
+                public void testFailed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
+                private void cleanup() {
+                    var level = helper.getLevel();
+                    // Keep forced chunks intact: another simultaneously running fixture may share one.
+                    int minX = net.minecraft.util.Mth.floor(bounds.minX) >> 4;
+                    int maxX = net.minecraft.util.Mth.floor(bounds.maxX) >> 4;
+                    int minZ = net.minecraft.util.Mth.floor(bounds.minZ) >> 4;
+                    int maxZ = net.minecraft.util.Mth.floor(bounds.maxZ) >> 4;
+                    for (int x = minX; x <= maxX; x++) for (int z = minZ; z <= maxZ; z++) {
+                        var chunk = level.getChunkSource().getChunkNow(x, z);
+                        if (chunk == null) continue;
+                        for (var blockEntity : new java.util.ArrayList<>(chunk.getBlockEntities().values())) {
+                            if (bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(blockEntity.getBlockPos()))) {
+                                level.removeBlock(blockEntity.getBlockPos(), false);
+                            }
+                        }
+                    }
+                    for (var entity : level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, bounds)) {
+                        if (!(entity instanceof net.minecraft.world.entity.player.Player)) entity.discard();
+                    }
+                }
+            });
+        } catch (ReflectiveOperationException ex) {
+            throw new IllegalStateException("Cannot isolate GameTest fixture", ex);
+        }
+    }
+
     private Legacy() {}
     /** Forge 1.20.1's vanilla GameTest mock lacks a channel before player login hooks run. */
     public static net.minecraft.server.level.ServerPlayer mockServerPlayer(net.minecraft.gametest.framework.GameTestHelper helper) {

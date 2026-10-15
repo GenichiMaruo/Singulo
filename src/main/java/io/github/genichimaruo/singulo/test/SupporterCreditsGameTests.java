@@ -24,6 +24,7 @@ public final class SupporterCreditsGameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void bundledRosterIsValid(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         try (var stream = SupporterCredits.class.getResourceAsStream("/assets/singulo/supporters.json")) {
             helper.assertTrue(stream != null, "Bundled supporter roster is missing");
             try (var reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
@@ -36,6 +37,7 @@ public final class SupporterCreditsGameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void allHundredNamesSurvivePaging(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         List<Entry> entries = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             entries.add(new Entry("supporter-" + i, "名前 " + i, i % 2 == 0 ? Tier.STANDARD : Tier.RAINBOW));
@@ -57,6 +59,7 @@ public final class SupporterCreditsGameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void unicodeNamesAndBothTiersLoad(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Catalog roster = SupporterCredits.read(new StringReader("""
                 {"supporters":[
                   {"id":"one","name":"  日本語 e\\u0301  ","tier":"standard"},
@@ -72,6 +75,7 @@ public final class SupporterCreditsGameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void invalidRostersAreRejected(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (String invalid : List.of("{}", "null", "[]", "{\"supporters\":[null]}",
                 "{\"supporters\":[{\"id\":1,\"name\":\"name\",\"tier\":\"standard\"}]}",
                 "{\"supporters\":[{\"id\":\"one\",\"name\":\"name\",\"tier\":\"gold\"}]}",

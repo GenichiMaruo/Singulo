@@ -26,6 +26,7 @@ public final class ManipulatorGameTests {
     /** ためるほど強く、ためきったら頭打ち。少し上向きに投げる。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void manipulatorFlingScalesWithCharge(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         Vec3 look = new Vec3(1, 0, 0);
         double weak = GravitonManipulatorItem.flingVelocity(look, 0).x;
         double strong = GravitonManipulatorItem.flingVelocity(look, GravitonManipulatorItem.MAX_CHARGE).x;
@@ -39,6 +40,7 @@ public final class ManipulatorGameTests {
     /** どのマルチブロックも部品表にコントローラー（1個）と部品があること。大きさもログに出す。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void multiblockPartLists(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (Blueprints.Kind kind : Blueprints.Kind.values()) {
             Map<Block, Integer> parts = Blueprints.partCounts(kind);
             helper.assertTrue(parts.get(Blueprints.controllerBlock(kind)) == 1, kind.id() + " のコントローラーが1個でない");
@@ -61,6 +63,7 @@ public final class ManipulatorGameTests {
     /** 右クリックでためて離すと、持ち上げたモブが前へ飛んでいき、1秒は持ち上げられない。 */
     @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 140)
     public static void manipulatorChargeAndThrow(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var player = TestBuild.mockPlayer(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
@@ -104,6 +107,7 @@ public final class ManipulatorGameTests {
     /** 円錐（G キー）で持ち上げていても、ためて離すと投げられる。 */
     @GameTest(setupTicks = 20, template = "huge", timeoutTicks = 140)
     public static void manipulatorThrowInConeMode(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var player = TestBuild.mockPlayer(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);

@@ -41,6 +41,7 @@ public final class Port1201GameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void stepHeightMatchesModernOneBlockHeight(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var warden = io.github.genichimaruo.singulo.registry.SinguloEntities.HORIZON_WARDEN.get().create(helper.getLevel());
         var android = io.github.genichimaruo.singulo.registry.SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         helper.assertTrue(Math.abs(warden.getStepHeight() - 1.0F) < 0.001F, "Warden step height changed: " + warden.getStepHeight());
@@ -50,6 +51,7 @@ public final class Port1201GameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void chargerEnergyPersistsAndExposesCapability(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ItemStack charger = new ItemStack(SinguloItems.ANDROID_CHARGER.get());
         var energy = charger.getCapability(ForgeCapabilities.ENERGY).orElse(null);
         helper.assertTrue(energy != null, "Wireless charger has no Forge energy capability");
@@ -64,6 +66,7 @@ public final class Port1201GameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void armorPlateAcceptsArmorEnchantments(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ItemStack plate = new ItemStack(SinguloItems.ANDROID_ARMOR_PLATE.get());
         var item = plate.getItem();
         helper.assertTrue(item.canApplyAtEnchantingTable(plate, Enchantments.ALL_DAMAGE_PROTECTION),
@@ -79,6 +82,7 @@ public final class Port1201GameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void afterglowWingsUseLegacyFlightHooks(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var wings = SinguloItems.AFTERGLOW_WINGS.get();
         ItemStack stack = new ItemStack(wings);
         var wearer = helper.makeMockPlayer();
@@ -90,6 +94,7 @@ public final class Port1201GameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void automationLegacyItemsRoundTrip(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (var upgrade : List.of(SinguloItems.ANDROID_MINING_UPGRADE.get(), SinguloItems.ANDROID_FELLING_UPGRADE.get())) {
             ItemStack stack = new ItemStack(upgrade);
             helper.assertTrue(upgrade.canApplyAtEnchantingTable(stack, Enchantments.BLOCK_EFFICIENCY), "Upgrade rejects efficiency");
@@ -116,6 +121,7 @@ public final class Port1201GameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void newPacketsRoundTripOnLegacyChannel(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
             GalaxyPayload galaxies = new GalaxyPayload(List.of(0L, Long.MIN_VALUE, Long.MAX_VALUE), true);
@@ -144,11 +150,20 @@ public final class Port1201GameTests {
     }
     @GameTest(setupTicks = 20, template = "empty")
     public static void workConsoleLinksSurviveLegacyNbt(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var pos = new net.minecraft.core.BlockPos(2, 1, 2);
         helper.setBlock(pos, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
         var link = helper.absolutePos(new net.minecraft.core.BlockPos(3, 1, 2));
-        console.links().add(link);
+        var relativeLink = new net.minecraft.core.BlockPos(3, 1, 2);
+        helper.setBlock(relativeLink, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_DELIVERY_PORT.get());
+        io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity port = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, relativeLink);
+        var card = new ItemStack(SinguloItems.WORK_LOCATION_CARD.get());
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(card, helper.getLevel(), helper.absolutePos(pos),
+                io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        helper.assertTrue(port.useItem(player, card, net.minecraft.world.InteractionHand.MAIN_HAND), "Cannot link port fixture");
+        helper.assertTrue(console.links().equals(List.of(link)), "Port fixture did not register its link");
         var saved = console.saveWithFullMetadata();
         console.load(saved);
         helper.assertTrue(console.links().equals(List.of(link)), "Work console lost links across 1.20.1 compound-tag round-trip");

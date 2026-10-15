@@ -63,6 +63,7 @@ public final class BalanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void coreControllerFromModulesByNormalInsertion(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity m = assembler(helper, new BlockPos(2, 1, 2));
         IItemHandler auto = m.automationItems();
         insert(helper, auto, new ItemStack(item("basic_frame")));
@@ -75,6 +76,7 @@ public final class BalanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void timeCrystalModuleNeedsThirtyMinutesOfLife(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity fresh = assembler(helper, new BlockPos(1, 1, 1));
         MachineBlockEntity weak = assembler(helper, new BlockPos(5, 1, 5));
         ItemStack good = new ItemStack(item("time_crystal_catalyst"));
@@ -103,6 +105,7 @@ public final class BalanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void fullGeneratorWaitsWithoutWearingCatalyst(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.QUANTUM_HEAT_ENGINE.get());
         QuantumHeatEngineBlockEntity engine = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -124,6 +127,7 @@ public final class BalanceGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void anchorsPerPlayerAreLimited(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         int limit = WorldlineAnchorBlockEntity.anchorLimit();
         if (limit <= 0 || limit > 8) {
             helper.succeed();                                 // 既定（8）以外の設定では確かめない
@@ -153,6 +157,7 @@ public final class BalanceGameTests {
     /** 設定が既定値のままなら、データパックのレシピをそのまま使う（JSONと同じもの）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void defaultSettingsKeepDatapackRecipes(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (MachineRecipe h : helper.getLevel().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
             String path = h.id().getPath();
             if (path.equals("degenerate_compactor/reactor_shell") || path.equals("degenerate_compactor/degenerate_matter_shell")
@@ -185,6 +190,7 @@ public final class BalanceGameTests {
     /** SNG-021: expert でも通常の殻の冷却材がタンク1つ（8,000 mB）に収まる。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "balance_expert")
     public static void expertShellFitsTank(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         String old = ServerConfig.PRESET.get();
         try {
             ServerConfig.PRESET.set("expert");
@@ -203,6 +209,7 @@ public final class BalanceGameTests {
     /** SNG-022: 寿命を短くする設定でも、新品の時間結晶からモジュールを作れる（低純度品は作れないまま）。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "balance_lifetime")
     public static void supportedLifetimeCanProduceModule(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         int old = ServerConfig.TIME_CRYSTAL_LIFETIME_MINUTES.get();
         try {
             ServerConfig.TIME_CRYSTAL_LIFETIME_MINUTES.set(20);
@@ -225,6 +232,7 @@ public final class BalanceGameTests {
     /** SNG-025: shellCoolantMb はストレンジ物質版にも（半分として）効く。0 なら窒素は要らない。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "balance_strange")
     public static void zeroShellCoolantAppliesToAlternative(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         int old = ServerConfig.SHELL_COOLANT_MB.get();
         try {
             ServerConfig.SHELL_COOLANT_MB.set(0);
@@ -243,6 +251,7 @@ public final class BalanceGameTests {
     /** SNG-023: 再生期限が過ぎた保管庫でも、覚醒戦に勝てば開けられる。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "balance_vault")
     public static void awakenedVictoryOpensDueVault(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos vaultPos = new BlockPos(1, 1, 1);
         BlockPos consolePos = new BlockPos(4, 1, 4);
         helper.setBlock(vaultPos, SinguloBlocks.RUIN_CACHE.get());
@@ -275,6 +284,7 @@ public final class BalanceGameTests {
     /** SNG-024: 上限を下げると、動いているアンカーも後から動き出した順に止まる。 */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "balance_anchor", timeoutTicks = 40)
     public static void loweredAnchorLimitIsEnforced(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         int old = ServerConfig.MAX_ANCHORS_PER_PLAYER.get();
         ServerConfig.MAX_ANCHORS_PER_PLAYER.set(3);
         UUID owner = UUID.randomUUID();
