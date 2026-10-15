@@ -157,12 +157,13 @@ public final class Legacy {
                     // Automatic orders search nearby workers. Stop this completed fixture before
                     // the next batch places another workshop inside that search radius.
                     var level = helper.getLevel();
-                    var origin = helper.absolutePos(net.minecraft.core.BlockPos.ZERO);
-                    var bounds = new net.minecraft.world.phys.AABB(origin, helper.absolutePos(new net.minecraft.core.BlockPos(8, 8, 8)));
+                    var bounds = info.getStructureBounds();
+                    var origin = BlockPos.containing(bounds.minX, bounds.minY, bounds.minZ);
+                    var end = BlockPos.containing(bounds.maxX - 1, bounds.maxY - 1, bounds.maxZ - 1);
                     for (var android : level.getEntitiesOfClass(io.github.genichimaruo.singulo.android.RuinAndroid.class, bounds)) {
                         android.discard();
                     }
-                    for (var pos : net.minecraft.core.BlockPos.betweenClosed(origin, helper.absolutePos(new net.minecraft.core.BlockPos(7, 7, 7)))) {
+                    for (var pos : net.minecraft.core.BlockPos.betweenClosed(origin, end)) {
                         if (level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console) {
                             console.orders().clear();
                             console.standing().clear();

@@ -50,7 +50,7 @@ def write(template, sx, sy, sz, namespace="singulo"):
 def main():
     for template, size in TEMPLATES.items():
         write(template, *size)
-    write("empty", *TEMPLATES["empty"], namespace="singulo_automation")
+    write("empty", 16, 8, 16, namespace="singulo_automation")
     write("empty", *TEMPLATES["empty"], namespace="singulo_reactor")
     write("reactor_isolated", *TEMPLATES["reactor_isolated"], namespace="singulo_reactor")
 
