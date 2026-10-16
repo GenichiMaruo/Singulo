@@ -131,3 +131,100 @@ ADVANCEMENTS = [
     ('synth_legendary', 'genesis_birth', 'genesis_pylon', 'challenge', ('milestone', 'synth_legendary'), 5,
      '無から有へ', '創世炉で伝説の物（希少度4）を作る', 'Something from Nothing', 'Synthesize a legendary item (rarity 4) in the Genesis Engine'),
 ]
+
+
+# 0.8.0 第6段階: 既存IDと done 条件名は維持して達成履歴を引き継ぐ。
+# parent は表示上の導線であり、製品のティア解禁や実績の発火を制限しない。
+# 探索を工業の枝へ埋め込まず、通常ボスから分岐を見渡せるようにする。
+PARENTS = {
+    'circuit': 'steel', 'ceramic': 'steel', 'archive': 'circuit',
+    'compressor': 'thermo', 'projector': 'compressor', 'tower': 'compressor',
+    'quantum': 'muon', 'ruin_research': 'ruin_observation', 'bose': 'entangled',
+    'ruin_culture': 'echo', 'crystal': 'gravity', 'probe': 'ruin_research',
+    'ruin_final': 'gravity', 'ruin_sunken': 'warden',
+    'awakened_echo': 'echo', 'awakened_gravity': 'gravity', 'awakened': 'warden',
+    'records': 'archive', 'archivist': 'awakened',
+}
+# ラストヒットに依存させない。同じ部屋にいる生存中の挑戦者へ報酬と同じ範囲で発火する。
+CONDITIONS = {
+    'warden': ('milestone', 'defeat/horizon_warden'),
+    'leviathan': ('milestone', 'defeat/ergosphere_leviathan'),
+}
+DESCRIPTIONS = {
+    'tower': ('極低温冷却塔を組み上げる。観測拠点の回収物で超伝導コイルへ進もう',
+              'Form a cryogenic cooling tower. Recover observation-post materials to make superconducting coils'),
+    'ruin_final': ('重力の澱を越え、最終実験施設の入口にたどり着く',
+                   'After the Gravity Remnant, reach the entrance to the final lab'),
+    'warden': ('ホライズン・ウォーデン討伐時、挑戦者として部屋にいる',
+               'Be a surviving challenger in the arena when the Horizon Warden falls'),
+    'leviathan': ('エルゴ球の大蛇討伐時、挑戦者として部屋にいる',
+                  'Be a surviving challenger in the arena when the Ergosphere Leviathan falls'),
+}
+ADVANCEMENTS = [
+    (aid, PARENTS.get(aid, parent), icon, frame, CONDITIONS.get(aid, cond), stage,
+     jt, DESCRIPTIONS.get(aid, (jd, ed))[0], et, DESCRIPTIONS.get(aid, (jd, ed))[1])
+    for aid, parent, icon, frame, cond, stage, jt, jd, et, ed in ADVANCEMENTS
+]
+ADVANCEMENTS += [
+    ('compass', 'archive', 'meteor_compass', 'task', ('item', 'meteor_compass'), 1,
+     '次の痕跡へ', '探索コンパスを手に入れ、探索先を選ぶ', 'The Next Trace', 'Obtain an exploration compass to choose your next expedition'),
+    ('echo', 'ruin_research', 'echo_resonator', 'challenge', ('milestone', 'defeat/echo_sentinel'), 3,
+     '残響を越えて', '残響の番人討伐時、挑戦者として部屋にいる', 'Beyond the Echo', 'Be a surviving challenger in the arena when the Echo Sentinel falls'),
+    ('gravity', 'ruin_culture', 'culture_data', 'challenge', ('milestone', 'defeat/gravity_remnant'), 4,
+     '重さをほどく', '重力の澱討伐時、挑戦者として部屋にいる', 'Unravelling Gravity', 'Be a surviving challenger in the arena when the Gravity Remnant falls'),
+    ('lab_power', 'echo', 'reactor_console', 'goal', ('milestone', 'lab_power'), 4,
+     '眠る工場に灯を', '地下アンドロイド研究所の動力復旧に立ち会う', 'Lights in the Sleeping Factory', 'Be present when power returns to the underground android laboratory'),
+    ('foundry', 'lab_power', 'factory_line', 'challenge', ('milestone', 'defeat/foundry_overseer'), 4,
+     '最後の命令', '統括AIファウンドリ討伐時、挑戦者として部屋にいる', 'The Last Directive', 'Be a surviving challenger in the arena when the Foundry Overseer falls'),
+    ('ruin_android_lab', 'foundry', 'precision_actuator', 'goal', ('milestone', 'discover/android_lab'), 4,
+     '保たれた研究所', '地下アンドロイド研究所の保管庫を開ける', 'The Preserved Laboratory', 'Open the cache of the underground android laboratory'),
+    ('awakened_foundry', 'foundry', 'awakening_foundry_core', 'challenge', ('milestone', 'awakened_foundry_overseer'), 5,
+     '再起動する意思', '覚醒した統括AIファウンドリを倒す', 'A Will Rebooted', 'Defeat the Awakened Foundry Overseer'),
+    ('android_station', 'assembler', 'android_station', 'goal', ('item', 'android_station'), 2,
+     '迎える準備', 'アンドロイド組立ステーションを手に入れる。メモリ・キット・電力を用意しよう',
+     'Ready to Welcome', 'Obtain an Android Assembly Station; prepare a memory, a kit and power'),
+    ('android_memory', 'android_station', 'android_memory_blade', 'task', ('any_item', 'android_memory_blade', 'android_memory_whip', 'android_memory_saber'), 2,
+     '小さな設計図', '遺構の印刷台から旧型の設計メモリを1種類手に入れる', 'A Little Blueprint', 'Obtain any ordinary android design memory from a ruin fabricator'),
+    ('android_printed', 'android_memory', 'android_kit', 'goal', ('milestone', 'android_printed'), 2,
+     'はじめまして', '自分の組立ステーションで護衛の印刷を完了する', 'Hello There', 'Finish printing a guard at your own assembly station'),
+    ('android_charger', 'android_printed', 'android_charger', 'task', ('item', 'android_charger'), 2,
+     'そばで充電', 'アンドロイド用無線充電器を手に入れる', 'Charge Nearby', 'Obtain an Android Wireless Charger'),
+    ('android_work', 'android_printed', 'android_work_console', 'goal', ('item', 'android_work_console'), 2,
+     '仕事を頼もう', '作業指令台を手に入れる。素材置き場とレシピをつなごう', 'A Job to Do', 'Obtain a Work Console; connect supplies and recipes'),
+    ('android_recipe', 'android_work', 'recipe_card', 'task', ('item', 'recipe_card'), 2,
+     '作り方を渡す', 'レシピカードを手に入れ、作業指令台で作り方を記録しよう', 'Pass on a Recipe', 'Obtain a Recipe Card and record a recipe at the Work Console'),
+    ('android_delivery', 'android_recipe', 'android_delivery_port', 'goal', ('milestone', 'android_order_complete'), 2,
+     'できました', '自分が頼んだ注文を必要数まで納品してもらう', 'Order Ready', 'Receive the full requested quantity of an order you placed'),
+    ('android_rack', 'android_recipe', 'android_recipe_rack', 'task', ('item', 'android_recipe_rack'), 2,
+     '工場の手引き', 'アンドロイドレシピ棚を手に入れる', 'Factory Handbook', 'Obtain an Android Recipe Rack'),
+    ('android_routes', 'android_work', 'area_card', 'task', ('item', 'area_card'), 2,
+     '通り道を考える', '範囲カードを手に入れる。地点カードと合わせて経路を決めよう', 'Plan the Way', 'Obtain an Area Card; combine it with location cards to plan routes'),
+    ('android_survey', 'android_routes', 'survey_glasses', 'task', ('item', 'survey_glasses'), 2,
+     '見える道しるべ', '測量メガネを手に入れる', 'Visible Waypoints', 'Obtain Survey Glasses'),
+    ('android_prototypes', 'foundry', 'android_memory_bit', 'challenge', ('all_items', 'android_memory_axe', 'android_memory_bit'), 4,
+     '二つの可能性', 'アルマとノクスの設計メモリを両方そろえて持つ（統括AIを2回倒せばそろう）',
+     'Two Possibilities', 'Hold both Alma and Nox design memories together (two Overseer victories guarantee both)'),
+    ('android_factory_print', 'ruin_android_lab', 'android_factory_print_unit', 'task', ('item', 'android_factory_print_unit'), 4,
+     '工場の技術を拠点へ', '工場式印刷ユニットを手に入れる', 'Factory Technology at Home', 'Obtain a Factory Print Unit'),
+]
+
+
+def validate_advancements():
+    """木の循環・孤立・未定義親・段階逆転を、生成より前に止める。"""
+    by_id = {a[0]: a for a in ADVANCEMENTS}
+    if len(by_id) != len(ADVANCEMENTS):
+        raise ValueError('duplicate advancement ID')
+    if [a[0] for a in ADVANCEMENTS if a[1] is None] != ['root']:
+        raise ValueError('expected exactly one root')
+    for aid, parent, icon, frame, cond, stage, *_ in ADVANCEMENTS:
+        seen = {aid}
+        node = parent
+        while node is not None:
+            if node not in by_id or node in seen:
+                raise ValueError(f'{aid}: missing parent or cycle at {node}')
+            seen.add(node)
+            if by_id[node][5] > stage:
+                raise ValueError(f'{aid}: parent has a later tier: {node}')
+            node = by_id[node][1]
+        if frame not in ('task', 'goal', 'challenge') or cond[0] not in ('tick', 'item', 'any_item', 'all_items', 'milestone', 'kill'):
+            raise ValueError(f'{aid}: invalid frame or criterion')

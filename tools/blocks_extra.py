@@ -8,6 +8,7 @@
   地の絵は縁のない（並べると模様が続く）絵、つながっていない辺にだけ縁取りの絵を重ねる（切り抜きで描く）
 """
 import random
+import zlib
 
 from PIL import Image, ImageDraw
 
@@ -45,6 +46,51 @@ def rgba(c, a=255):
 
 def mix(a, b, t):
     return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+
+def grime(im, seed, strength=1.0):
+    """
+    手入れされた施設の使用感の汚し（朽ちた汚れではない）。半透明の所（ガラス）は触らない。
+    - 面のわずかな濃淡のむら
+    - 目地・継ぎ目（まわりより暗い線）にたまった、うっすらしたくすみ
+    - 縁の摩耗（角ほど強く）
+    - 薄い擦り傷（斜めの短い線）と、小さな光る傷
+    """
+    rnd = random.Random(seed)
+    px = im.load()
+    w, h = im.size
+    src = im.copy().load()
+
+    def lum(c):
+        return (c[0] * 3 + c[1] * 6 + c[2]) / 10
+
+    def shift(c, k):
+        return tuple(max(0, min(255, int(v + k))) for v in c[:3]) + (c[3],)
+
+    for y in range(h):
+        for x in range(w):
+            c = src[x, y]
+            if c[3] < 200:
+                continue
+            k = (rnd.random() - 0.5) * 7 * strength
+            near = [src[x + dx, y + dy] for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if 0 <= x + dx < w and 0 <= y + dy < h]
+            if near and lum(c) < sum(lum(n) for n in near) / len(near) - 18:
+                k -= 6 * strength                                   # 目地のくすみ
+            e = min(x, y, w - 1 - x, h - 1 - y)
+            if e == 0:
+                k -= (9 if (x in (0, w - 1) and y in (0, h - 1)) else 4) * strength   # 縁と角の摩耗
+            px[x, y] = shift(c, k)
+    for _ in range(2):
+        x, y = rnd.randrange(2, w - 4), rnd.randrange(2, h - 4)
+        for t in range(rnd.randint(2, 3)):
+            c = px[x + t, y + t]
+            if c[3] >= 200:
+                px[x + t, y + t] = shift(c, -10 * strength)          # 擦り傷
+    x, y = rnd.randrange(2, w - 2), rnd.randrange(2, h - 2)
+    c = px[x, y]
+    if c[3] >= 200:
+        px[x, y] = shift(c, 14 * strength)                          # 小さな光る傷
+    return im
 
 
 def new(fill=(0, 0, 0, 0)):

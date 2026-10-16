@@ -77,6 +77,8 @@ public final class WorkConsoleView {
                 x.putLong("done", s.done);
                 x.putLong("total", s.total);
                 x.putLong("doing", s.inProgress);
+                x.putLong("parked", s.parked);
+                x.putInt("eta", s.eta);
                 st.add(x);
             }
             ot.put("steps", st);
@@ -87,7 +89,8 @@ public final class WorkConsoleView {
                 CompoundTag w = new CompoundTag();
                 if (c.getLevel() instanceof net.minecraft.server.level.ServerLevel sl && sl.getEntity(id) instanceof RuinAndroid a && a.isAlive()) {
                     w.putString("name", Component.Serializer.toJson(a.nickname()));
-                    w.putInt("activity", a.workOrder() == o.id ? a.activity() : RuinAndroid.ACT_NONE);
+                    // ほかの注文の作業をしている（装置を待つあいだなど）なら、-2
+                    w.putInt("activity", a.workOrder() == o.id ? a.activity() : c.order(a.workOrder()) != null ? -2 : RuinAndroid.ACT_NONE);
                     w.putInt("accent", a.accent());
                 } else {
                     w.putString("name", Component.Serializer.toJson(Component.translatable("gui.singulo.work_console.worker.away")));
@@ -138,6 +141,7 @@ public final class WorkConsoleView {
             at.putBoolean("miner", a.canMine());
             at.putBoolean("feller", a.canFell());
             at.putBoolean("tank", a.hasTank());
+            at.putBoolean("chem_tank", a.hasChemTank());
             as.add(at);
         }
         t.put("androids", as);
@@ -176,15 +180,18 @@ public final class WorkConsoleView {
         t.putBoolean("ok", plan.ok());
         t.putBoolean("loop", plan.loop);
         long crafts = 0;
-        boolean mining = false, felling = false, fluids = FluidSamples.is(plan.target);
+        boolean mining = false, felling = false, fluids = FluidSamples.is(plan.target), chems = ChemicalSamples.is(plan.target);
         for (WorkPlanner.Step s : plan.steps) {
             crafts += s.crafts();
             mining |= s.entry().recipe().needsMining();
             felling |= s.entry().recipe().needsFelling();
             fluids |= s.entry().recipe().outputs().stream().anyMatch(FluidSamples::is)
                     || s.entry().recipe().inputs().stream().anyMatch(i -> FluidSamples.is(i.item));
+            chems |= s.entry().recipe().outputs().stream().anyMatch(ChemicalSamples::is)
+                    || s.entry().recipe().inputs().stream().anyMatch(i -> ChemicalSamples.is(i.item));
         }
-        t.putBoolean("fluids", fluids);              // 流体を運ぶ工程がある: タンクアップグレードを積んだアンドロイドだけ選べる
+        t.putBoolean("fluids", fluids);              // 液体を運ぶ工程がある: 液体のタンクを積んだアンドロイドだけ選べる
+        t.putBoolean("chemicals", chems);            // 化学物質（Mekanism）を運ぶ工程がある: 化学物質のタンクを積んだアンドロイドだけ
         t.putBoolean("mining", mining);
         t.putBoolean("felling", felling);              // 採掘の工程がある: 採掘アップグレードを積んだアンドロイドだけ選べる
         t.putInt("steps", plan.steps.size());

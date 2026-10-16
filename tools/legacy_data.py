@@ -23,6 +23,8 @@ def convert(path: Path, obj):
             return value
         if not isinstance(value, dict): return value
         value = {k: visit(v) for k, v in value.items()}
+        if value.get('type') == 'neoforge:mod_loaded':
+            value['type'] = 'forge:mod_loaded'
         if value.get('type') == 'neoforge:components':
             return {'type': 'forge:partial_nbt', 'item': value['items'], 'nbt': value['components']}
         if value.get('function') == 'minecraft:copy_components':
@@ -31,6 +33,7 @@ def convert(path: Path, obj):
         if 'functions' in value: value['functions'] = [f for f in value['functions'] if f is not None]
         if 'pack_format' in value: value['pack_format'] = 15
         if 'neoforge_data' in value: value['forge_data'] = value.pop('neoforge_data')
+        if 'neoforge:conditions' in value: value['conditions'] = value.pop('neoforge:conditions')
         return value
     obj = visit(obj)
     if 'loot_tables' in parts:

@@ -64,6 +64,10 @@ public final class SinguloEntities {
             "ergosphere_leviathan", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan::new, MobCategory.MONSTER)
                     .sized(2.2F, 2.2F).clientTrackingRange(12).updateInterval(1).fireImmune()
                     .build(Singulo.id("ergosphere_leviathan").toString()));
+    /** 廃アンドロイド工場のボス部屋の番人。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.FoundryOverseer>> FOUNDRY_OVERSEER = REGISTER.register(
+            "foundry_overseer", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.FoundryOverseer::new, MobCategory.MONSTER)
+                    .sized(2.4F, 2.4F).clientTrackingRange(12).fireImmune().build(Singulo.id("foundry_overseer").toString()));
     /** 隠しボス（最終実験施設の封印コンソールで、終焉の記録を使うと目覚める）。 */
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.ruin.LastArchivist>> LAST_ARCHIVIST = REGISTER.register(
             "last_archivist", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.ruin.LastArchivist::new, MobCategory.MONSTER)
@@ -78,6 +82,13 @@ public final class SinguloEntities {
             "whip_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.WhipAndroid::new, MobCategory.MONSTER)
                     .sized(0.55F, 1.65F).clientTrackingRange(10).build(Singulo.id("whip_android").toString()));
     /** 光剣型アンドロイド「ソレイユ」。 */
+    /** 斧型アンドロイド「アルマ」とビット型アンドロイド「ノクス」（地下アンドロイド研究所の試作機）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.AxeAndroid>> AXE_ANDROID = REGISTER.register(
+            "axe_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.AxeAndroid::new, MobCategory.MONSTER)
+                    .sized(0.55F, 1.65F).clientTrackingRange(10).build(Singulo.id("axe_android").toString()));
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.BitAndroid>> BIT_ANDROID = REGISTER.register(
+            "bit_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.BitAndroid::new, MobCategory.MONSTER)
+                    .sized(0.55F, 1.65F).clientTrackingRange(10).build(Singulo.id("bit_android").toString()));
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.SaberAndroid>> SABER_ANDROID = REGISTER.register(
             "saber_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.SaberAndroid::new, MobCategory.MONSTER)
                     .sized(0.55F, 1.65F).clientTrackingRange(10).build(Singulo.id("saber_android").toString()));
@@ -96,12 +107,15 @@ public final class SinguloEntities {
         event.put(BLADE_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
         event.put(WHIP_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
         event.put(SABER_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
+        event.put(AXE_ANDROID.get(), io.github.genichimaruo.singulo.android.AxeAndroid.createAttributes().build());
+        event.put(BIT_ANDROID.get(), io.github.genichimaruo.singulo.android.BitAndroid.createAttributes().build());
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());
         event.put(ECHO_SENTINEL.get(), io.github.genichimaruo.singulo.ruin.EchoSentinel.createAttributes().build());
         event.put(GRAVITY_REMNANT.get(), io.github.genichimaruo.singulo.ruin.GravityRemnant.createAttributes().build());
         event.put(ERGOSPHERE_LEVIATHAN.get(), io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan.createAttributes().build());
         event.put(LAST_ARCHIVIST.get(), io.github.genichimaruo.singulo.ruin.LastArchivist.createAttributes().build());
+        event.put(FOUNDRY_OVERSEER.get(), io.github.genichimaruo.singulo.ruin.FoundryOverseer.createAttributes().build());
     }
 
     private SinguloEntities() {}

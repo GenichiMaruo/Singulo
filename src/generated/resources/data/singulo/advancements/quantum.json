@@ -28,5 +28,5 @@
       }
     }
   },
-  "parent": "singulo:assembler"
+  "parent": "singulo:muon"
 }

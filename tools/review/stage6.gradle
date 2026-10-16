@@ -1,0 +1,16 @@
+// Development-only visual harness; never part of ordinary build or release JARs.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/stage6-src'))
+        legacyForge.runs.client {
+            gameDirectory = file('build/stage6-review')
+            systemProperty 'singulo.stage6Output', file('build/stage6-review/screenshots').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

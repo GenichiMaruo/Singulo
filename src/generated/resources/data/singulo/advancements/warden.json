@@ -16,11 +16,9 @@
   },
   "criteria": {
     "done": {
-      "trigger": "minecraft:player_killed_entity",
+      "trigger": "singulo:milestone",
       "conditions": {
-        "entity": {
-          "type": "singulo:horizon_warden"
-        }
+        "id": "defeat/horizon_warden"
       }
     }
   },

@@ -35,18 +35,26 @@ public final class FluidSamples {
         return stack.getTag() == null ? FluidStack.EMPTY : FluidStack.loadFluidStackFromNBT(stack.getTag().getCompound("singulo:fluid_sample"));
     }
 
-    /** 数: 見本なら流体の量（mB）、物なら個数。 */
+    /** 液体・化学物質の見本か（物ではなく、量で数える）。 */
+    public static boolean liquid(ItemStack stack) {
+        return is(stack) || ChemicalSamples.is(stack);
+    }
+
+    /** 数: 見本なら流体・化学物質の量（mB）、物なら個数。 */
     public static long amount(ItemStack stack) {
-        return is(stack) ? fluid(stack).getAmount() : stack.getCount();
+        return is(stack) ? fluid(stack).getAmount() : ChemicalSamples.is(stack) ? ChemicalSamples.amount(stack) : stack.getCount();
     }
 
     /** 数え方の目印（見本は量 1、物は1個）。 */
     public static ItemStack key(ItemStack stack) {
-        return is(stack) ? withAmount(stack, 1) : stack.copyWithCount(1);
+        return liquid(stack) ? withAmount(stack, 1) : stack.copyWithCount(1);
     }
 
     /** 量を変えた見本（物なら個数を変える。1〜64）。 */
     public static ItemStack withAmount(ItemStack stack, int amount) {
+        if (ChemicalSamples.is(stack)) {
+            return ChemicalSamples.of(ChemicalSamples.id(stack), Math.max(1, amount));
+        }
         if (!is(stack)) {
             return stack.copyWithCount(Math.max(1, Math.min(64, amount)));
         }
@@ -55,12 +63,16 @@ public final class FluidSamples {
         return of(f);
     }
 
-    /** 物を見本の欄に置くとき: バケツなど流体の入れ物なら、中の流体の見本に変える。 */
+    /** 物を見本の欄に置くとき: バケツなど流体の入れ物なら中の流体の見本に、ケミカルタンク（Mekanism）なら中の化学物質の見本に変える。 */
     public static ItemStack fromContainer(ItemStack stack) {
-        if (stack.isEmpty() || is(stack)) {
+        if (stack.isEmpty() || liquid(stack)) {
             return stack.copy();
         }
         FluidStack f = net.minecraftforge.fluids.FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
-        return f.isEmpty() ? stack.copy() : of(f);
+        if (!f.isEmpty()) {
+            return of(f);
+        }
+        var chem = Chemicals.contained(stack);
+        return chem == null ? stack.copy() : ChemicalSamples.of(chem.getKey(), Math.min(1000, chem.getValue()));
     }
 }

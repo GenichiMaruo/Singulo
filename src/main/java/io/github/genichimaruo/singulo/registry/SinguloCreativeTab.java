@@ -16,7 +16,14 @@ public final class SinguloCreativeTab {
     public static final Supplier<CreativeModeTab> MAIN = REGISTER.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.singulo"))
             .icon(() -> new ItemStack(SinguloBlocks.MACHINES.get(MachineType.KILN).get()))
-            .displayItems((params, output) -> SinguloItems.TAB_ORDER.forEach(item -> output.accept(item.get())))
+            .displayItems((params, output) -> SinguloItems.TAB_ORDER.forEach(item -> {
+                // Mekanism がないときは、Mekanism の化学物質のためのアップグレードを出さない（使えないので）
+                String path = item.getId().getPath();
+                if (io.github.genichimaruo.singulo.android.work.Chemicals.present()
+                        || !path.equals("android_gas_tank_upgrade") && !path.equals("android_dual_tank_upgrade")) {
+                    output.accept(item.get());
+                }
+            }))
             .build());
 
     private SinguloCreativeTab() {}

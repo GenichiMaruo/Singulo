@@ -36,7 +36,7 @@ def validate_jar(path):
         check_layout(names)
         metadata = tomllib.loads(archive.read('META-INF/mods.toml').decode())
         mod = next(m for m in metadata['mods'] if m['modId'] == 'singulo')
-        assert mod['version'] == '0.7.0', 'Incorrect mod version'
+        assert mod['version'] == '0.8.0', 'Incorrect mod version'
         dependencies = {d['modId']: d for d in metadata['dependencies']['singulo']}
         assert dependencies['minecraft']['versionRange'] == '[1.20.1]', 'Incorrect Minecraft dependency'
         assert 'forge' in dependencies, 'Missing 1.20.1 loader dependency'
@@ -49,14 +49,17 @@ def validate_jar(path):
         for feature in ('android/AndroidStationBlockEntity', 'genesis/GenesisCoreBlockEntity',
                         'client/SupporterPlaque', 'network/RenameAndroidPayload',
                         'android/AndroidWorkGoal', 'android/work/WorkConsoleBlockEntity',
-                        'android/work/RecipeData', 'android/AndroidAccessoryItem'):
+                        'android/work/RecipeData', 'android/AndroidAccessoryItem',
+                        'android/AxeAndroid', 'android/BitAndroid', 'android/AndroidPatrol', 'android/AndroidLife',
+                        'ruin/FoundryOverseer', 'ruin/lab/LabStructure', 'android/work/AreaCardItem',
+                        'registry/PendingMilestones', 'compat/mekanism/MekanismChemicals'):
             assert f'io/github/genichimaruo/singulo/{feature}.class' in names, f'Missing feature: {feature}'
         count = 0
         for name in names:
             if name.endswith('.class'):
                 header = archive.read(name)[:8]
                 assert header[:4] == b'\xca\xfe\xba\xbe' and struct.unpack('>H', header[6:8])[0] <= 61, f'Not Java 17: {name}'
-                assert 'GuiReviewHarness' not in name and 'PreviewHarness' not in name and 'ReviewTests' not in name and 'PortDiagnosticTests' not in name and 'DiagnosticTests' not in name, f'Preview code shipped: {name}'
+                assert 'GuiReviewHarness' not in name and 'Stage6ReviewHarness' not in name and 'PreviewHarness' not in name and 'ReviewTests' not in name and 'PortDiagnosticTests' not in name and 'DiagnosticTests' not in name, f'Preview code shipped: {name}'
                 count += 1
             if name.endswith('pack.mcmeta'):
                 assert json.loads(archive.read(name))['pack']['pack_format'] == 15, f'Wrong pack format: {name}'

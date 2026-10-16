@@ -211,7 +211,8 @@ public final class Stage5RomanceGameTests {
                     Level.ExplosionInteraction.TNT);
             Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(3, 1, 4));
             helper.assertTrue(!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(helper.getLevel(), zombie), "範囲内のモブがブロックを荒らせる");
-            helper.assertTrue(!ShieldTowerBlockEntity.shielded(helper.getLevel(), zombie.position(), 5),
+            // このテストの塔だけを見る（ほかのテストの塔が近くにあっても巻き込まない）
+            helper.assertTrue(!shield.covers(zombie.position(), 5),
                     "時間結晶触媒なのに湧き止めまで効いている");
             zombie.discard();
         });

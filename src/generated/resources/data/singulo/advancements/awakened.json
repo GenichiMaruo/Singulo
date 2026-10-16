@@ -22,5 +22,5 @@
       }
     }
   },
-  "parent": "singulo:core"
+  "parent": "singulo:warden"
 }

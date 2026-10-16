@@ -72,6 +72,23 @@ VARIANTS = {
         'iris': ((168, 108, 28), (255, 212, 112)),
         'seed': 41,
     },
+    # 斧型「アルマ」: 赤銅の髪に朱色のひと房
+    'axe_android': {
+        'hair': ((186, 102, 70), (150, 76, 50), (112, 54, 36)),
+        'streak': ((255, 112, 70), (214, 74, 44)),
+        'accent': (255, 110, 64),
+        'iris': ((150, 52, 30), (255, 144, 96)),
+        'seed': 43,
+    },
+    # ビット型「ノクス」: 紺の髪に菫のひと房
+    'bit_android': {
+        'hair': ((50, 58, 98), (36, 42, 76), (24, 28, 54)),
+        'streak': ((176, 128, 255), (136, 92, 220)),
+        'accent': (176, 128, 255),
+        'iris': ((84, 62, 176), (204, 176, 255)),
+        'seed': 47,
+        'mirror': True,
+    },
 }
 
 SKIN = (255, 236, 228)
@@ -594,9 +611,13 @@ def item_textures(ti, save):
     save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
     save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
+    save(wear(print_unit_icon(Image), 37), ti / 'android_factory_print_unit.png')
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
     save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
     save(droplet_icon(Image), ti / 'fluid_sample.png')
+    save(bubble_icon(Image), ti / 'chemical_sample.png')
+    save(wear(gas_tank_icon(Image), 33), ti / 'android_gas_tank_upgrade.png')
+    save(wear(dual_tank_icon(Image), 35), ti / 'android_dual_tank_upgrade.png')
     for n, (iid, (base, detail)) in enumerate(accessory_icons(Image).items()):
         if iid in FABRIC_ACCESSORIES:
             fabric(base, 41 + n)                       # 布の織り目
@@ -606,6 +627,10 @@ def item_textures(ti, save):
     save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
     save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
     save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
+    save(area_card_icon(Image, 0), ti / 'area_card.png')
+    save(area_card_icon(Image, 1), ti / 'area_card_first.png')
+    save(area_card_icon(Image, 2), ti / 'area_card_recorded.png')
+    save(wear(glasses_icon(Image), 37), ti / 'survey_glasses.png')
     save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
     save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
 
@@ -852,6 +877,46 @@ def card_icon(Image, stripe, recorded=None):
     return im
 
 
+def area_card_icon(Image, corners):
+    """範囲カード: 作業のカードに、範囲の角の印（かぎ形）。corners: 0 未記録（灰色の帯、印なし）、1 1つ目の角だけ（左上）、2 範囲ができた（左上と右下）。"""
+    stripe = (176, 182, 194) if corners == 0 else (120, 150, 236)
+    im = card_icon(Image, stripe, recorded=False if corners == 0 else None)
+    px = im.load()
+    mark = (60, 80, 170, 255)
+    if corners >= 1:
+        for (x, y) in ((0, 0), (1, 0), (2, 0), (0, 1), (0, 2)):
+            px[x, y] = mark
+        px[1, 1] = (200, 215, 255, 255)
+    if corners >= 2:
+        for (x, y) in ((15, 15), (14, 15), (13, 15), (15, 14), (15, 13)):
+            px[x, y] = mark
+        px[14, 14] = (200, 215, 255, 255)
+    return im
+
+
+def glasses_icon(Image):
+    """測量メガネ: 濃い枠の丸いレンズ2つ（淡い水色、左上に光）、真ん中のブリッジに小さな金の回路、両端につる。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    frame, lens, shine, gold = (54, 58, 72, 255), (150, 214, 240, 255), (232, 250, 255, 255), (226, 186, 92, 255)
+    for cx in (4, 11):
+        for y in range(5, 12):
+            for x in range(cx - 3, cx + 4):
+                d = (x - cx) ** 2 + (y - 8) ** 2
+                if d <= 10:
+                    px[x, y] = frame if d >= 6 else lens
+        px[cx - 1, 7] = shine
+        px[cx - 2, 8] = shine
+    for x in (7, 8):
+        px[x, 7] = frame
+    px[7, 6] = gold
+    px[8, 6] = gold
+    for x in (0, 15):
+        px[x, 7] = frame
+        px[x, 6] = frame
+    return im
+
+
 def production_icon(Image):
     """生産アップグレード: 基板の上に、重なった2体の人影（水色と白）。"""
     im, px = upgrade_board(Image)
@@ -864,6 +929,25 @@ def production_icon(Image):
             for x in range(cx - 2, cx + 2):
                 px[x, y] = c + (255,)
     px[11, 4] = (255, 255, 255, 255)
+    return im
+
+
+def print_unit_icon(Image):
+    """工場式印刷ユニット: 基板の上に、レールを走る印刷ヘッドと、下へ伸びる光の線（橙の警告の縞つき）。"""
+    im, px = upgrade_board(Image)
+    rail, head, glow, warn = (70, 76, 90), (150, 158, 172), (255, 170, 90), (240, 140, 60)
+    for x in range(3, 13):
+        px[x, 4] = rail + (255,)
+    for y in range(3, 7):
+        for x in range(6, 10):
+            px[x, y] = (head if y < 6 else (100, 106, 120)) + (255,)
+    for x in (6, 8):
+        px[x, 3] = warn + (255,)
+    for y in range(7, 11):
+        px[7, y] = glow + (255,)
+        px[8, y] = (255, 230, 200, 255)
+    for x in range(4, 12):
+        px[x, 11] = ((255, 200, 140) if 6 <= x <= 9 else (200, 206, 216)) + (255,)
     return im
 
 
@@ -935,6 +1019,61 @@ def droplet_icon(Image):
             px[x, y] = (shade, shade, shade, 255)
     for (x, y) in ((5, 9), (5, 10), (6, 8)):
         px[x, y] = (255, 255, 255, 255)
+    return im
+
+
+def bubble_icon(Image):
+    """化学物質の見本: 白い泡の集まり（化学物質の色に染めて使う）。大きな泡と小さな泡2つ、左上に光。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for cx, cy, r in ((7, 9, 4.6), (11.5, 4.5, 2.4), (3.5, 3.5, 1.6)):
+        for y in range(16):
+            for x in range(16):
+                d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+                if d <= r:
+                    shade = 150 if d > r - 1 else 255 - int(max(0, (x - cx) + (y - cy)) * 12)
+                    px[x, y] = (shade, shade, shade, 255)
+    for (x, y) in ((5, 7), (5, 8), (6, 6), (11, 3)):
+        px[x, y] = (255, 255, 255, 255)
+    return im
+
+
+def gas_cylinder(px, x0, band):
+    """ガスボンベ（4×10）: 鋼の胴、丸い肩、上にバルブ、真ん中に中身の色の帯。"""
+    steel, dark, light = (176, 184, 196, 255), (110, 118, 132, 255), (222, 228, 236, 255)
+    for y in range(4, 13):
+        for x in range(x0, x0 + 4):
+            px[x, y] = dark if x in (x0, x0 + 3) or y == 12 else steel
+    for x in range(x0 + 1, x0 + 3):
+        px[x, 3] = dark                                  # 肩
+        px[x, 2] = (90, 96, 108, 255)                   # バルブ
+    px[x0 + 1, 1] = (226, 186, 92, 255)                 # バルブのつまみ（金）
+    for x in range(x0 + 1, x0 + 3):
+        for y in (7, 8):
+            px[x, y] = band + (255,)                     # 中身の色の帯
+    px[x0 + 1, 5] = light                                # 光の反射
+
+
+def gas_tank_icon(Image):
+    """ガスタンクアップグレード: 基板の上に、ガスボンベが2本（帯は黄色と水色）。"""
+    im, px = upgrade_board(Image)
+    gas_cylinder(px, 4, (236, 214, 90))
+    gas_cylinder(px, 9, (110, 200, 240))
+    return im
+
+
+def dual_tank_icon(Image):
+    """ガス・液体アップグレード: 基板の上に、左はガラスの筒（水色の液体）、右はガスボンベ（黄色の帯）。"""
+    im, px = upgrade_board(Image)
+    x0, fluid = 4, (90, 170, 240, 255)
+    for y in range(3, 13):
+        for x in range(x0, x0 + 4):
+            edge = x in (x0, x0 + 3) or y in (3, 12)
+            px[x, y] = (200, 210, 222, 255) if edge else fluid if y >= 6 else (226, 238, 246, 255)
+    px[x0 + 1, 7] = (255, 255, 255, 255)
+    for x in range(x0 + 1, x0 + 3):
+        px[x, 2] = (120, 126, 136, 255)
+    gas_cylinder(px, 9, (236, 214, 90))
     return im
 
 

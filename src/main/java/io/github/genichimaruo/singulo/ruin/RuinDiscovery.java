@@ -29,9 +29,11 @@ public final class RuinDiscovery {
      * （設計書の N−2 ルール。最終実験施設と封鎖培養施設は常に手動）。
      */
     static final Map<String, Integer> RUIN_TIER = Map.of(
-            "observation_post", 2, "research_building", 3, "culture_facility", 4, "final_lab", 5, "sunken_reactor", 5);
+            "observation_post", 2, "research_building", 3, "culture_facility", 4, "final_lab", 5, "sunken_reactor", 5,
+            "android_lab", 4);
     /** 自動化できない遺構。 */
-    static final java.util.Set<String> ALWAYS_MANUAL = java.util.Set.of("culture_facility", "final_lab", "sunken_reactor");
+    static final java.util.Set<String> ALWAYS_MANUAL = java.util.Set.of("culture_facility", "final_lab", "sunken_reactor",
+            "android_lab");
 
     private RuinDiscovery() {}
 
