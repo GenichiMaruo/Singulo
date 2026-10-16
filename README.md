@@ -13,8 +13,8 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 | Minecraft | ローダー / Loader | Java | ソース / Source | ダウンロード / Download |
 | --- | --- | --- | --- | --- |
 | **1.21.1** | **NeoForge** 21.1.256+ | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) |
-| **1.20.1** | **Forge** 47.4.26+ | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
-| **1.20.1** | **NeoForge** 47.1.106+ | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
+| **1.20.1** | **Forge** 47.4.26+ | **17** | [1.20.1](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
+| **1.20.1** | **NeoForge** 47.1.106+ | **17** | [1.20.1](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
 
 ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) からも選べます。配布用JARはCurseForgeからダウンロードしてください。GitHub Releasesには変更履歴と配布先へのリンクのみを掲載します。
 Download mod JARs from CurseForge. GitHub Releases contain release notes and a link to CurseForge only.
@@ -55,15 +55,23 @@ Singulo を気に入ってもらえたら、[Ko-fi](https://ko-fi.com/graycat9) 
 
 ## 開発するには
 
-GradleはJDK 25、Minecraftのコンパイルと実行はJDK 21を使用します。`gradle.properties` の `org.gradle.java.home` は開発者環境のパスなので、自分のJDK 25の場所に合わせてください。JDK 21はGradleのツールチェーンが取得します。
+この `1.20.1` ブランチは Forge / NeoForge の共通ソースです。Gradleの実行にはJDK 21、Minecraftのコンパイル・実行にはJDK 17を使用します。JDK 17はGradleのツールチェーンでも取得できます。
 
 ```sh
-./gradlew build
-./gradlew runClient
-./gradlew runGameTestServer
+# Forge
+./gradlew -Ploader=forge build
+./gradlew -Ploader=forge runClient
+./gradlew -Ploader=forge runGameTestServer
+
+# NeoForge（-Ploaderを省略した場合の既定値）
+./gradlew -Ploader=neoforge build
+./gradlew -Ploader=neoforge runClient
+./gradlew -Ploader=neoforge runGameTestServer
 ```
 
-WindowsのPowerShellでは `./gradlew.bat` を使います。ビルドしたJARは `build/libs/` に出力されます。
+WindowsのPowerShellでは `./gradlew.bat` を使います。JARは `build/forge/libs/*F.jar` と `build/neoforge/libs/*N.jar`、テスト結果は各 `build/<loader>/gametest/` に出力します。開発用ワールドは `run/<loader>/` に分離しています。
+
+両ローダーの依存バージョンは `gradle.properties` の `forge_version` / `neoforge_version` で管理します。共通ソース・レシピ・翻訳への変更は、両ローダーでCIを通してから統合してください。[統合構成・検証・公開手順](docs/development-1.20.1.md)も参照してください。
 
 | 場所 | 内容 |
 | --- | --- |

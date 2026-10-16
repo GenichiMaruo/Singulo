@@ -1,4 +1,4 @@
-## Singulo-0.7.0-1.20.1N
+## Singulo 0.7.0 — Minecraft 1.20.1 (Forge / NeoForge)
 
 Minecraft **1.20.1**, **NeoForge 47.1.106**, Java **17**. This backport includes the 0.7.0 automation, decorations and review fixes from the 1.21.1 edition.
 

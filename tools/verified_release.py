@@ -20,16 +20,16 @@ def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 
 
-def inspect(repo, run_id, tag, source):
+def inspect(repo, run_id, tag, source, loader):
     run = api(repo, f"actions/runs/{run_id}")
     if not (run["conclusion"] == "success" and run["status"] == "completed"
-            and run["event"] == "pull_request"
+            and (run["event"] == "pull_request" or (run["event"] in ("push", "workflow_dispatch") and run["head_branch"] == "1.20.1"))
             and run["path"] == ".github/workflows/pr-validation.yml"
             and run["head_repository"]["full_name"] == repo):
-        raise RuntimeError("Source must be a successful PR validation in this repository")
+        raise RuntimeError("Source must be a successful PR or 1.20.1 branch validation in this repository")
     jobs = api(repo, f"actions/runs/{run_id}/jobs?per_page=100")["jobs"]
-    expected_jobs = {f"build-and-gametest ({ns})" for ns in GROUPS} | {"optional-mekanism"}
-    if {j["name"] for j in jobs} != expected_jobs or any(j["conclusion"] != "success" for j in jobs):
+    expected_jobs = {f"build-and-gametest ({variant}, {ns})" for variant in ("forge", "neoforge") for ns in GROUPS} | {f"optional-mekanism ({variant})" for variant in ("forge", "neoforge")}
+    if len(jobs) != len(expected_jobs) or {j["name"] for j in jobs} != expected_jobs or any(j["conclusion"] != "success" for j in jobs):
         raise RuntimeError("All required validation jobs must have succeeded")
     ref = api(repo, f"git/ref/tags/{tag}")["object"]
     while ref["type"] == "tag":
@@ -43,7 +43,7 @@ def inspect(repo, run_id, tag, source):
     selected = {}
     tested_commits = set()
     for artifact in artifacts:
-        match = re.fullmatch(r"pr-validation-([0-9a-f]{40})-(singulo(?:_[a-z]+)?)", artifact["name"])
+        match = re.fullmatch(rf"pr-validation-([0-9a-f]{{40}})-{loader}-(singulo(?:_[a-z]+)?)", artifact["name"])
         if match:
             ns = match[2]
             if artifact["expired"] or ns in selected:
@@ -55,7 +55,7 @@ def inspect(repo, run_id, tag, source):
     tested_commit = tested_commits.pop()
     if api(repo, f"git/commits/{tested_commit}")["tree"]["sha"] != tree:
         raise RuntimeError("The actual CI merge tree differs from the release tag")
-    return {"repository": repo, "run_id": run_id, "run_attempt": run["run_attempt"],
+    return {"loader": loader, "repository": repo, "run_id": run_id, "run_attempt": run["run_attempt"],
             "tag": tag, "commit": ref["sha"], "tree": tree, "tested_commit": tested_commit,
             "artifacts": selected}
 
@@ -116,10 +116,16 @@ def main():
     if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+-1\.20\.1[FN](?:-r[1-9][0-9]*)?", args.tag) or args.run <= 0:
         raise RuntimeError("Invalid 1.20.1 release tag or validation run")
     properties = dict(line.split("=", 1) for line in (args.source / "gradle.properties").read_text().splitlines() if "=" in line and not line.startswith("#"))
-    expected_tag = f"v{properties['mod_version']}-1.20.1{properties['mod_loader_suffix']}"
+    suffix = re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+-1\.20\.1([FN])(?:-r[1-9][0-9]*)?", args.tag)[1]
+    loader = "forge" if suffix == "F" else "neoforge"
+    expected_tag = f"v{properties['mod_version']}-{properties['minecraft_version']}{suffix}"
     if args.tag != expected_tag and not re.fullmatch(re.escape(expected_tag) + r"-r[1-9][0-9]*", args.tag):
         raise RuntimeError("Tag does not match the checked-out version and loader")
-    metadata = inspect(args.repo, args.run, args.tag, args.source)
+    if properties['minecraft_version'] != '1.20.1':
+        raise RuntimeError("Expected Minecraft 1.20.1 sources")
+    if args.mode == "promote" and (args.output is None or args.output.name != f"{properties['mod_name']}-{properties['mod_version']}-1.20.1{suffix}.jar"):
+        raise RuntimeError("Output filename must match the tagged loader and version")
+    metadata = inspect(args.repo, args.run, args.tag, args.source, loader)
     if args.mode == "promote":
         if metadata != json.loads(args.metadata.read_text()):
             raise RuntimeError("Validation provenance changed during download")
@@ -129,7 +135,7 @@ def main():
     else:
         if os.environ.get("GITHUB_OUTPUT"):
             with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-                output.write(f"pattern=pr-validation-{metadata['tested_commit']}-*\n")
+                output.write(f"pattern=pr-validation-{metadata['tested_commit']}-{loader}-*\n")
         print(f"Verified {sum(GROUPS.values())} tests + Mekanism + GUI at tree {metadata['tree']}")
     args.metadata.write_text(json.dumps(metadata, indent=2) + "\n")
 

@@ -3,8 +3,8 @@ allprojects {
     afterEvaluate {
         sourceSets.main.java.srcDir(file('tools/review/stage6-src'))
         legacyForge.runs.client {
-            gameDirectory = file('build/stage6-review')
-            systemProperty 'singulo.stage6Output', file('build/stage6-review/screenshots').absolutePath
+            gameDirectory = layout.buildDirectory.dir('stage6-review').get().asFile
+            systemProperty 'singulo.stage6Output', layout.buildDirectory.dir('stage6-review/screenshots').get().asFile.absolutePath
             programArgument '--quickPlaySingleplayer'
             programArgument 'Review'
             programArgument '--width'

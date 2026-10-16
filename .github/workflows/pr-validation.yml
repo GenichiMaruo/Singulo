@@ -2,7 +2,11 @@ name: PR validation
 
 on:
   pull_request:
-    branches: [port/1.20.1-neoforge, port/1.20.1-forge]
+    branches: ['1.20.1']
+
+  push:
+    branches: ['1.20.1']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,10 +20,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        loader: [forge, neoforge]
         namespace: [singulo, singulo_automation, singulo_reactor, singulo_prototype, singulo_progression, singulo_lab]
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
+      LOADER: ${{ matrix.loader }}
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     steps:
       - uses: actions/checkout@v4
@@ -38,28 +44,33 @@ jobs:
           python3 tools/check_advancements.py
           python3 tools/check_recipe_parity.py
           python3 tools/check_port_1201.py
+          python3 tools/test_verified_release.py
       - name: Build and run required GameTests
         shell: bash
         run: |
-          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestNamespace=${{ matrix.namespace }} -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
+          bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 build runGameTestServer -PtestNamespace=${{ matrix.namespace }} -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
       - name: Require a completed nonempty successful GameTest run
         shell: bash
         run: |
           python3 - <<'PY'
           import pathlib
+          import os
           import re
-          log = pathlib.Path("build/gametest/logs/latest.log")
+          log = pathlib.Path("build") / os.environ["LOADER"] / "gametest/logs/latest.log"
           if not log.is_file() or not re.search(r"All [1-9][0-9]* required tests passed", log.read_text(encoding="utf-8")):
               raise SystemExit("GameTestServer did not report successful nonempty completion")
           PY
       - name: Validate Java 17 distribution archive
-        run: python3 tools/check_port_1201.py --jar "build/libs/Singulo-$(sed -n 's/^mod_version=//p' gradle.properties)-1.20.1$(sed -n 's/^mod_loader_suffix=//p' gradle.properties).jar"
+        run: |
+          suffix=N; if [[ "$LOADER" == forge ]]; then suffix=F; fi
+          python3 tools/check_port_1201.py --jar "build/$LOADER/libs/Singulo-$(sed -n 's/^mod_version=//p' gradle.properties)-1.20.1$suffix.jar"
       - name: Check production JAR excludes GUI harness
         run: |
           python3 - <<'PY'
           import pathlib
+          import os
           import zipfile
-          jars = list(pathlib.Path("build/libs").glob("*.jar"))
+          jars = list((pathlib.Path("build") / os.environ["LOADER"] / "libs").glob("*.jar"))
           if not jars:
               raise SystemExit("No production JAR found")
           for path in jars:
@@ -69,39 +80,44 @@ jobs:
           PY
       - name: Prepare disposable GUI review world
         if: matrix.namespace == 'singulo'
-        run: python3 tools/review/prepare_gui.py
+        run: python3 tools/review/prepare_gui.py --loader "$LOADER"
       - name: Run real client GUI smoke
         if: matrix.namespace == 'singulo'
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
           ALSOFT_DRIVERS: 'null'
-        run: xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
+        run: xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
       - name: Require GUI captures
         if: matrix.namespace == 'singulo'
         run: |
-          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 20
-          grep -q 'SINGULO_GUI_COMPLETE 20' build/gui-review/logs/latest.log
+          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 20
+          grep -q 'SINGULO_GUI_COMPLETE 20' build/${{ matrix.loader }}/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         if: matrix.namespace == 'singulo'
-        run: python3 tools/review/check_gui_png.py
+        run: python3 tools/review/check_gui_png.py --loader "$LOADER"
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pr-validation-${{ github.sha }}-${{ matrix.namespace }}
+          name: pr-validation-${{ github.sha }}-${{ matrix.loader }}-${{ matrix.namespace }}
           if-no-files-found: warn
           path: |
-            build/libs/*.jar
-            build/gametest/logs/
-            build/reports/
-            build/gui-review/screenshots/
-            build/gui-review/logs/
-            build/gui-review/inventory-pixels.json
+            build/${{ matrix.loader }}/libs/*.jar
+            build/${{ matrix.loader }}/gametest/logs/
+            build/${{ matrix.loader }}/reports/
+            build/${{ matrix.loader }}/gui-review/screenshots/
+            build/${{ matrix.loader }}/gui-review/logs/
+            build/${{ matrix.loader }}/gui-review/inventory-pixels.json
 
   optional-mekanism:
+    strategy:
+      fail-fast: false
+      matrix:
+        loader: [forge, neoforge]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      LOADER: ${{ matrix.loader }}
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     steps:
       - uses: actions/checkout@v4
@@ -113,9 +129,9 @@ jobs:
             21
           cache: gradle
       - name: Verify all four legacy chemical families with real Mekanism
-        run: bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
+        run: bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mekanism-validation-${{ github.sha }}
-          path: build/gametest/logs/
+          name: mekanism-validation-${{ github.sha }}-${{ matrix.loader }}
+          path: build/${{ matrix.loader }}/gametest/logs/
