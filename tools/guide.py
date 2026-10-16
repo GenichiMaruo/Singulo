@@ -19,12 +19,12 @@ CHAPTERS = [
          'material that opens the next stage. Read from "Stage 1" on the left to know what to build next.'),
         ('howto', 'このハンドブックの使い方',
          '・左の章を選ぶと、右にページが出ます。下の矢印でページをめくります。\n'
-         '・「進み具合」の章で、達成した目標と次の目標が分かります（進捗画面［L キー］の Singulo タブとも同じです）。\n'
+         '・「進み具合」の章は工業・探索・アンドロイドの枝に沿って、達成した目標と次の目標を示します（進捗画面［L キー］の Singulo タブとも同じです）。\n'
          '・アイテムにカーソルを合わせると説明が出ます。Shift を押すと作り方と使い道も出ます。\n'
          '・マルチブロックは「ホロ投影機」をコントローラに使うと、正しい形が半透明で浮かび上がります。',
          'Using this book',
          '- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the '
-         'bottom.\n- The Progress chapter shows the goals you have reached and the next ones (the same as the '
+         'bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the '
          'Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift '
          'to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller '
          'to show the correct shape as a translucent outline.'),
@@ -378,20 +378,25 @@ CHAPTERS = [
          ' Mouths run on exotic matter and close when it runs out; a newly placed mouth stays open for 5 minutes without fuel.'),
     ]),
     ('ruins', 'singulo:ruin_cache', '遺構と探索', 'Ruins', [
-        ('list', '5つの遺構',
+        ('list', '6つの遺構',
          '・地表観測拠点: 平原・砂漠などの地上に建つ、ただ1つの地上の遺構。白い警備ドローン。観測ログ・制御ユニット（7日で再生）。\n'
          '・研究棟: 浅い地下（Y−20〜4あたり）。警備機と、奥の記録保管室の残響の番人。冷却原子トラップ・量子データ片（7日）。\n'
          '・封鎖培養施設: 深い地下（Y−46〜−30あたり）。極低温コアと強い警備機、奥の隔離槽室の重力の澱。時間結晶の種・培養データ（14日）。\n'
+         '・地下アンドロイド研究所: 中くらいの深さの地下（床は Y−38〜−26あたり）。封鎖培養施設と並ぶ分かれ道で、研究棟でコンパスを調整すると一緒に探せる'
+         '（コンパスは地表まで突き抜けた主立坑を指す）。部屋の並びは毎回変わる。奥のAI中枢に統括AI「ファウンドリ」。精密アクチュエーター・アンドロイドキット（14日）。\n'
          '・最終実験施設: いちばん深い地下（Y−56〜−46あたり）の重力異常点。守護機ホライズン・ウォーデン。特異点の種・アノマリー・サンプル（14日）。\n'
          '・沈んだ炉心区画: 最終実験施設よりさらに深い地下（Y−60〜−54あたり）の、止まった二基目の炉。'
          '最終実験施設を攻略したあと、探索コンパスを調整すると探せる。エルゴ球の大蛇。エキゾチック物質・ジェット凝縮体・H凝縮体（14日）。',
-         'The five ruins',
+         'The six ruins',
          '- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White '
          'security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow '
          'underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the '
          'back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground '
          '(around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the '
-         'containment room at the back. Time crystal seeds and culture data (14 days).\n- Final Lab: a gravity '
+         'containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: '
+         'mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building '
+         'lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. '
+         'The overseer AI Foundry waits in the AI core. Precision actuators and android kits (14 days).\n- Final Lab: a gravity '
          'anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds '
          'and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the '
          'Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. '
@@ -415,6 +420,12 @@ CHAPTERS = [
          '最後の姿で足元に出す特異点は、1秒の前触れのあとに引き寄せ始めるので、すぐ離れること。'
          '倒したあとは、覚醒の記録核をコンソールに使うと「覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。'
          'やめて部屋を離れると記録核は戻ります。\n'
+         '・統括AI「ファウンドリ」（地下アンドロイド研究所のAI中枢）: 中枢の中心に浮かぶ機械の頭脳で、自分では動かず施設の設備で戦います。'
+         '壁の4つの製造ラインが動いている間は攻撃が通りにくい（1つにつき2割）ので、先に殴って壊すこと。ラインはときどき量産型のアンドロイドを送り出します。'
+         '床に赤い印が出たらロボットアーム（印は少しの間追ってきて、止まってから降りてくる。つかまれると投げられる）、影の丸はプレス（すぐ外へ）、'
+         '床の扇形の印は溶接レーザー（床すれすれの光線が回ってくるので、跳んで越える）。床のコンベアは相手を流し、枠の灯が赤く光ったあと向きを変えます。'
+         '体力が半分を切ると試作機（斧型・ビット型）を2体呼び、アームが2本になります。精密アクチュエーターと、挑戦した人それぞれに'
+         '試作機の小型クリスタルメモリ（まだ持っていない型が先）を落とします。覚醒の製造核で再戦すると、本気になったとき壊したラインを印刷し直します。\n'
          '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます'
          '（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増え、本気になると壊した投影器を2つまで映し直します。'
          '重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。\n'
@@ -468,9 +479,35 @@ CHAPTERS = [
          'vortex to drag everything in (the core hurts; run against the pull).\n'
          '  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, '
          'hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n'
+         '- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never moves and fights with the facility itself. '
+         'While the four production lines on the walls run, it takes less damage (20% per line): break them first. The lines also send out mass-produced androids. '
+         'A red mark on the floor is a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the press '
+         '(step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). '
+         'The floor conveyors carry you along and reverse after their frames glow red. Below half health it calls two prototypes (Axe and Bit) and uses two arms. '
+         'Drops precision actuators, and for each challenger a compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundry Core, it reprints its broken lines when enraged.\n'
          '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core '
          'in the room\'s floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two '
          'broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
+        ('lab', '地下アンドロイド研究所',
+         '旧文明のアンドロイドの研究所。統括AI「ファウンドリ」が暴走し、職員は中央動力炉を止めて主立坑から逃げ出しました。'
+         '人がいなくなった今も、アンドロイドたちは「施設を維持せよ」という最後の命令に従って施設を直し続けています。\n'
+         '・入口は、地表まで突き抜けた崩れた主立坑（はしごと足場で降りる）。施設は耐圧殻で包まれていて、統括AIを倒すまでは壊せません'
+         '（倒したあとも黒曜石より硬い）。\n'
+         '・主電源は落ちていて、非常灯だけが赤く灯る薄暗い施設です。中央動力炉の制御盤を右クリックすると動力炉が起動し、'
+         '施設の明かりがついて、AI中枢の隔壁が開きます。そして、眠っていた統括AIも目を覚まします。\n'
+         '・部屋の並びは毎回変わります。研究室・資料室・サーバールーム・社員寮・医務室・食堂などが並び、警備機や印刷台が守っています。'
+         '物資の棚には研究所の部品や資料が残っています。\n'
+         '・記録端末を右クリックすると、残された記録を読めます。集めると、暴走のいきさつが分かります。',
+         'Underground Android Laboratory',
+         'An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through '
+         'the main shaft. Even now the androids keep repairing the facility, obeying their last order: "Maintain the facility."\n'
+         '- The way in is the collapsed main shaft that breaks through to the surface (climb down the ladders and scaffolding). The facility is wrapped in a '
+         'pressure hull that cannot be broken until the overseer falls (and is harder than obsidian even then).\n'
+         '- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, '
+         'the AI core bulkheads open, and the dormant overseer wakes.\n'
+         '- The room layout changes every time: research labs, archives, server rooms, dormitories, a medical bay, a cafeteria and more, guarded by security '
+         'machines and fabricators. Supply chests still hold laboratory parts and records.\n'
+         '- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.'),
         ('plan', '探索の段取り',
          '段階が進むと探索先が一度に増えます。先に集めておくと、あとで工場が止まりません。\n'
          '・段階2のうち: 隕石クレーター（隕鉄・星屑）、氷山か氷樹（氷塊・青氷）。\n'
@@ -535,6 +572,11 @@ CHAPTERS = [
          '・鞭型「ヴェルナ」: 約6ブロック先まで届く鞭打ちと、巻きつけて引き寄せる絡め取り。鞭を頭上で回したら、床に打ち付けて一直線の衝撃波（跳べば当たらない）。\n'
          '・光剣型「ソレイユ」: 腰だめから踏み込む突きと、振る瞬間に刃が伸びる横薙ぎ、飛ぶ三日月の斬撃波。打たれると正面に光の盾を張り（正面からはあまり通らない）、'
          '構えの最中に打つと斬り返してきます。背後か横から攻めること。\n'
+         '地下アンドロイド研究所には、印刷台には出てこない試作機がいます（統括AIが呼び出す）。\n'
+         '・斧型「アルマ」: 硬くて重い。斧を右へ引いたら広い薙ぎ払い、頭上へ振り上げたら床へ叩きつけて前へ一直線の衝撃波（跳べば当たらない）、'
+         '低くかがんだら跳びかかって着地でまわりを叩きます。\n'
+         '・ビット型「ノクス」: 背中の浮遊ビットを浮かべ、離れた所から光線で撃ってきます（体力が半分を切ると6基）。間合いを取ろうとし、'
+         '近づくと短剣で二連撃してから後ろへ跳びます。ビットの先端に刃が光ったら、狙った場所へビット自体が突進して斬ります。予告を見て横へ避けましょう。壁は光線も突進も止めます。\n'
          'アンドロイドには充電があり、大技を10回ほど使うと切れて、目の光が消えます。近くの印刷台へ戻るか、昼の空の下ではソーラーパネルを広げ、夜や屋内では座り込んで充電します'
          '（印刷台5秒・太陽光10秒・座り込み14秒）。充電中は攻撃してこないので、攻めどきです。',
          'Ruin androids',
@@ -547,6 +589,11 @@ CHAPTERS = [
          'the floor and sends a straight shockwave (jump it).\n'
          '- Saber Android "Soleil": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light '
          'shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\n'
+         'The Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n'
+         '- Axe Android "Alma": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and '
+         'sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n'
+         '- Bit Android "Nox": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her '
+         'distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\n'
          'Androids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar '
          'panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack '
          'while charging: your chance to strike.'),
@@ -554,26 +601,67 @@ CHAPTERS = [
          'アンドロイド組立ステーションに小型クリスタルメモリ（型を決める。減らない）とアンドロイドキット（印刷ごとに1つ）を入れ、電力を送ると、'
          '上に護衛のアンドロイドを1体印刷します（1回 40,000 FE）。倒されたら、キットがあれば印刷し直します。置いた人が持ち主です。\n'
          '・護衛は敵対モブ（遺構のアンドロイドやドローンも）だけを狙い、プレイヤーやボスとは戦いません。プレイヤーとボスの攻撃では傷つきません。\n'
-         '・動き方: 迎撃（ステーションのそばで待つ）・徘徊（16ブロック以内を歩き回る）・追従（持ち主についていく）。'
+         '・動き方: 迎撃（ステーションのそばで待つ）・徘徊（16ブロック以内を歩き回る）・追従（持ち主についていく）・巡回（決めた場所を回る）。'
          '追従中に戦うかは「ついていくだけ」と「護衛する」で選べます。\n'
          '・許可証: ステーションにシールド許可証を入れると、持ち主と登録した人だけがステーションとアンドロイドの画面を開けます。'
          '追従する人も、持ち主か登録した人から選べます。\n'
          '・戻る体力: これを下回ると、ステーションへ戻って修理と充電をします。「呼び戻す」で戻すこともできます。\n'
          '・名前: ステーションやアンドロイドの画面で名前をクリックすると付けられます（↺で愛称に戻す）。\n'
          '・コンパレーター: ステーションから、アンドロイドの体力に応じた信号（0〜15）が出ます。\n'
-         '・ステーションを壊すと、アンドロイドはその場に残ります。新しいステーションに同じ型のメモリを入れると、「リンク」でつなぎ直せます。',
+         '・ステーションを壊すと、アンドロイドはその場に残ります。新しいステーションに同じ型のメモリを入れると、「リンク」でつなぎ直せます。\n'
+         '・暮らし: 手が空いた護衛は、ステーションのそばで、階段・ハーフブロック・椅子に座る（夜は昼寝）、植木鉢や作物に手をかざす、床を掃く、しばらく落ちたままの物をそばのチェストへしまう、仲間とおしゃべりする、雨なら屋根の下へ（傘を持っていればそのまま）、夕焼けや夜空を眺める、など。',
          'Your own androids',
          'Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, '
          'and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n'
          '- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n'
-         '- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner). '
+         '- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). '
          'While following, choose "Just follow" or "Escort" (fights nearby enemies).\n'
          '- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. '
          'You can also choose whether it follows the owner or one of the registered players.\n'
          '- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n'
          '- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n'
          '- Comparator: the station outputs a signal (0-15) from the android\'s health.\n'
-         '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.'),
+         '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n'
+         '- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..'),
+        ('patrol', '巡回警備',
+         'ステーションの動き方を「巡回」にすると、決めた場所を順に回って見張ります。\n'
+         '・巡回路: 「巡回」を選ぶと出る8つの欄に作業位置カードを置くと、その場所を左から順に回り、カードの場所の上に立って見回します。'
+         '最後まで行ったら最初へ戻る（周回）か、来た道を戻る（往復）か、夜だけ回るか、各地点で立ち止まる時間を選べます。2体なら、反対側から回ります。\n'
+         '・戦い: 近くの敵と戦い、片付けたら抜けた所から続けます。戦いになると、同じステーションの手の空いた仲間を呼びます（片付いたら持ち場へ戻る）。\n'
+         '・警報: 敵の群れ（5体以上）かボスを見つけると、ステーションが5秒間レッドストーン信号を出し、持ち主に知らせます（1分に1回まで）。\n'
+         '・記録: 倒した相手と警報は、アンドロイドの画面の「記録」のページに、新しい順に16件残ります。'
+         '久しぶりにそばへ行くと、留守のあいだのことを一言知らせてくれます。',
+         'Patrol',
+         'Set the station\'s mode to Patrol and the androids walk a set route and keep watch.\n'
+         '- Route: choosing Patrol shows eight slots. Put Work Location Cards in them and the androids visit those places from left to right, '
+         'standing on top of each to look around. Choose whether they go back to the first point (Loop) or return the same way (Back & forth), '
+         'whether they patrol only at night, and how long they stop at each point. Two androids start from opposite sides.\n'
+         '- Fights: they fight enemies nearby and carry on from where they left off. When a fight starts, idle androids of the same station come to '
+         'help (and go back afterwards).\n'
+         '- Alarm: when they spot a group of enemies (5 or more) or a boss, the station gives a redstone signal for 5 seconds and the owner is told '
+         '(at most once a minute).\n'
+         '- Log: defeated enemies and alarms are kept on the Log page of the android screen, newest first (16 entries). '
+         'Come back after a while and the android tells you what happened while you were away.'),
+        ('routes', '経路と測量メガネ',
+         '作業指令台の「経路」のページと、組立ステーションの「経路」（題の右のボタン）で、アンドロイドの移動の決まりを4つまで作れます'
+         '（作業指令台は作業の移動に、ステーションは巡回の移動に効く）。\n'
+         '・1行に、経由地点（作業位置カード）、対象範囲（範囲カード）、進入禁止ゾーン（範囲カード、2つまで）を置きます。\n'
+         '・対象範囲の中と外を行き来する移動では、経由地点の上を通ってから行き先へ向かいます（拠点の扉のように）。'
+         'そのあいだは、進入禁止ゾーンに入りません（出発した所・行き先がゾーンの中なら、そのゾーンは避けない）。\n'
+         '・範囲カード: ブロックを2つシフト右クリックすると、その2つを角とする範囲を記録します（1辺128ブロックまで）。'
+         '範囲は、記録したブロックの高さからその上2マスまでに効くので、床のブロックを記録すれば、その上を歩くアンドロイドに効きます。\n'
+         '・測量メガネ: 頭に掛けると、手に持った範囲カード・作業位置カードの記録した場所が枠で見えます'
+         '（範囲カードの1つ目の角だけなら、見ているブロックまでの範囲の見込みも）。作業中のアンドロイドの頭の上の印も、掛けているときだけ見えます。',
+         'Routes and Survey Glasses',
+         'On the Routes page of the work console, and the Routes page of the assembly station (the button right of the title), you can set up to '
+         'four movement rules (the console\'s apply to work trips, the station\'s to patrols).\n'
+         '- Each row takes a waypoint (Work Location Card), an area (Area Card) and up to two no-entry zones (Area Cards).\n'
+         '- Moving into or out of the area, androids first pass over the waypoint, like a door to the base, and stay out of the no-entry '
+         'zones on the way (unless they start or end inside one).\n'
+         '- Area Card: sneak-use two blocks to record the area between them as corners (up to 128 blocks per side). Areas reach from the '
+         'recorded height up two blocks, so recording floor blocks works for androids walking on them.\n'
+         '- Survey Glasses: worn on the head, they outline the places recorded on the area or work location card in your hand (with only the '
+         'first corner recorded, the area up to the block you look at is previewed). The icons over working androids only show while you wear them.'),
         ('care', '充電と修理と装備',
          '・充電: 護衛はステーションへ戻って5秒で満タン（電力を使い、体力も直る）。追従中は、無線充電器を持っていれば持ち主のそばで、ついて歩きながら5秒で満タン'
          '（充電器は満タンで30回分。電力を出すブロックを右クリックして充電する）。ステーションが遠く充電器もなければ、太陽光か座り込みで充電します。\n'
@@ -595,22 +683,35 @@ CHAPTERS = [
         ('upgrades', 'アップグレード',
          '・生産アップグレード: ステーションに積むと、アンドロイドを2体まで印刷して受け持つ。上で充電できるのは1体ずつで、もう1体はそばで待って交代する。'
          '画面の名前の左の「1」「2」で、見るアンドロイドを選ぶ（動き方などの設定は2体共通）。\n'
+         '・工場式印刷ユニット: ステーションのキットの横のスロットに積むと、印刷にかかる時間と電力が半分になり、上での修理が2倍速くなる。'
+         '地下アンドロイド研究所で手に入る精密アクチュエーターで作る。\n'
          '・アンドロイドの画面の名前の左のボタンで「装備と持ち物」のページに切り替えると、アップグレードを積める。\n'
          '・バッテリーアップグレード: 1個につき充電の満タンが50%増える（2個まで）。満タンまでの充電の時間もそのぶん延びる。腰にバッテリーパックが付く。\n'
          '・バックパックアップグレード: 持ち物（5スロット）に、バックパックの24スロットが加わる。中に物があるうちは外せない。\n'
          '・採掘アップグレード: 採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。\n'
          '・伐採アップグレード: 伐採の作業ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。\n'
-         '・タンクアップグレード: 液体・ガスを運べるタンクが2つ（各32,000 mB、1つに1種類）。腰にタンクが見える。中身が残っている間は外せない。\n'
+         '・タンクアップグレード: 液体・ガスを運べるタンクが2つ（各32,000 mB、1つに1種類）。腰にタンクが見える。中身が残っている間は外せない。'
+         '画面のタンクをバケツなどでクリックすると出し入れでき、横の × をシフト＋クリックすると中身を捨てる。\n'
+         '・ガスタンクアップグレード・ガス・液体アップグレード（Mekanism が入っているときだけ）: Mekanism の化学物質（ガス・注入材・顔料・スラリー）を'
+         '運べるタンク。ガスタンクは化学物質を2種類（各32,000 mB）、ガス・液体は液体と化学物質を2種類ずつ（各16,000 mB）。腰にガスボンベが見える。'
+         '画面のタンクはケミカルタンクなどでクリックして出し入れできる。作業では、資材口の隣のケミカルタンクを素材置き場として、化学物質を装置へ運ぶ。\n'
          '・作業のオン／オフ: 作業（自動化）に割り当ててよいかを、アンドロイドごとに決める。',
          'Upgrades',
          '- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits '
          'beside it and takes its turn. Use "1" and "2" left of the name to choose which android the screen shows (settings are shared).\n'
+         '- Factory Print Unit: in the slot beside the station\'s kit slot, it halves printing time and power and doubles repair speed on the station. '
+         'Made from precision actuators found in the Underground Android Laboratory.\n'
          '- The button left of the name in the android screen opens the "Gear and inventory" page, where upgrades go.\n'
          '- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n'
          '- Backpack Upgrade: adds the backpack\'s 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n'
          '- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n'
          '- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n'
-         '- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything.\n'
+         '- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. '
+         'Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n'
+         '- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, '
+         'slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). '
+         'Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a '
+         'supply port join the stockpile and androids carry chemicals to machines.\n'
          '- Work on/off: choose for each android whether it may be given work (automation).'),
         ('work', '作業の自動化',
          '自分のアンドロイドに、作業台のクラフトを任せられます。\n'
@@ -622,6 +723,7 @@ CHAPTERS = [
          '5. 指令台の「注文」で作る物と個数を選び、素材が足りるのを確かめて、アンドロイドを選んで作業開始。'
          '途中の素材も、レシピがあれば自分で作ります。\n'
          'アンドロイドは5スロット（バックパックで+24）ずつ運びます。作業中は持ち物を取り出せず、終わると元の動き方に戻ります。'
+         '作業中のアンドロイドにも、同じ指令台の次の注文を受け持たせられます（手が空いたら、そちらもする）。'
          'たどり着けない場所があると、その注文は取り消されます。',
          'Work automation',
          'Your androids can take over crafting table work.\n'
@@ -634,11 +736,13 @@ CHAPTERS = [
          '5. In the console\'s Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. '
          'Intermediate materials are crafted too when there is a recipe for them.\n'
          'Androids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes '
-         'back to its usual mode. If a place cannot be reached, the order is cancelled.'),
+         'back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. '
+         'If a place cannot be reached, the order is cancelled.'),
         ('process', '加工・手順・採掘',
          '指令台の「記録」のモードボタンで、記録する種類を切り替えます。\n'
          '・加工: かまどや装置のレシピ。左に入れる物、右に出てくる物（ほかに出てくる副産物も2つまで）を置き、ホイールで数を変える'
-         '（JEI の「+」でも置ける）。アンドロイドは装置に上から入れ、できるまでそばで待って、下から取り出す。副産物は素材置き場へ戻す。'
+         '（JEI の「+」でも置ける）。アンドロイドは装置に素材を入れ、できた物を取り出す（面は自動。記録の「入」「出」のボタンで決めることもできる）。長くかかる加工は、待つあいだにほかの作業'
+         '（受け持つほかの注文も）をして、できたら取りに戻る。副産物は素材置き場へ戻す。'
          '燃料や電力は自分で用意する。2分たっても進まなければ、注文は取り消される。\n'
          '・手順: 手順カードに、投入・取り出し・採掘の手順を8つまで記録する。作業位置カードを置いて場所を写し、物の欄に物を置いて「足す」。'
          '右にできる物を置いて記録する。手順カードは場所を自分で持つので、レシピ棚のどの行にも並べられる。\n'
@@ -652,15 +756,18 @@ CHAPTERS = [
          '流体を置ける（ホイールで 100 mB ずつ、シフトで 1000 mB ずつ）。タンクアップグレードを積んだアンドロイドが、流体を装置へ運ぶ。'
          '流体を作る注文は、素材置き場のタンクへ入れる。\n'
          '・燃料: 加工モードの燃料の欄に燃料を置いて記録すると、装置の燃料が切れたとき、その燃料を素材置き場から取ってきて入れる'
-         '（置いた数ずつ。空なら取りに行かない）。\n'
+         '（置いた数ずつか、欄の下のボタンで「満タン」にすると装置に入るだけ。どちらも入りきらない分は持ってこない。空なら取りに行かない）。'
+         '素材置き場になく、レシピで作れるなら、燃料を作る注文を自動で出す（作るあいだ、アンドロイドはほかの作業をする）。\n'
          '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。'
          '収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ちきった塊だけ取り、芽生えたアメジストは壊さない。\n'
          '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。',
          'Processing, procedures and mining',
          'The mode button in the console\'s Record tab switches what you record.\n'
          '- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), '
-         'and scroll to change counts (JEI\'s + button works too). Androids put the items in from above, wait beside the machine and take '
-         'the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, '
+         'and scroll to change counts (JEI\'s + button works too). Androids put the items in and take the results out (the faces are chosen '
+         'automatically, or set them with the In and Out buttons when recording). '
+         'While a slow machine works, they do other jobs (including their other orders) and come back when it is done. '
+         'Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, '
          'the order is cancelled.\n'
          '- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put '
          'the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they '
@@ -676,7 +783,9 @@ CHAPTERS = [
          'mode with a bucket or other fluid container, or use JEI\'s + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). '
          'Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n'
          '- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the '
-         'stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n'
+         'stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than '
+         'the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make '
+         'the fuel is placed automatically (the androids do other work meanwhile).\n'
          '- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until '
          'enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing '
          '(up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n'

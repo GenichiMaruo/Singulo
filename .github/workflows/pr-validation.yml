@@ -2,7 +2,7 @@ name: PR validation
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feature/0.8.0]
 
 permissions:
   contents: read
@@ -28,10 +28,11 @@ jobs:
         run: |
           python3 tools/localization.py --check
           python3 tools/check_models.py
+          python3 tools/check_advancements.py
       - name: Build and run required GameTests
         shell: bash
         run: |
-          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestTickRate=20
+          bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestTickRate=200
       - name: Require a completed nonempty successful GameTest run
         shell: bash
         run: |
@@ -52,7 +53,7 @@ jobs:
               raise SystemExit("No production JAR found")
           for path in jars:
               with zipfile.ZipFile(path) as jar:
-                  if any("GuiReviewHarness" in name for name in jar.namelist()):
+                  if any("GuiReviewHarness" in name or "Stage6ReviewHarness" in name for name in jar.namelist()):
                       raise SystemExit("Development GUI harness leaked into " + str(path))
           PY
       - name: Prepare disposable GUI review world
@@ -64,8 +65,8 @@ jobs:
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
       - name: Require GUI captures
         run: |
-          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 15
-          grep -q 'SINGULO_GUI_COMPLETE 15' build/gui-review/logs/latest.log
+          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 20
+          grep -q 'SINGULO_GUI_COMPLETE 20' build/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py
       - name: Save build outputs and validation logs
@@ -81,3 +82,26 @@ jobs:
             build/gui-review/screenshots/
             build/gui-review/logs/
             build/gui-review/inventory-pixels.json
+
+  optional-mekanism:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - name: Run optional chemical integration tests against real Mekanism
+        run: bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism
+      - name: Require completed nonempty integration tests
+        run: grep -E 'All [1-9][0-9]* required tests passed' build/gametest/logs/latest.log
+      - name: Save integration logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mekanism-validation-${{ github.sha }}
+          path: build/gametest/logs/

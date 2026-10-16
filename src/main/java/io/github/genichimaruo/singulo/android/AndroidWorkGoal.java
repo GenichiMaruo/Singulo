@@ -42,6 +42,11 @@ final class AndroidWorkGoal extends Goal {
     static final int CRAFT_TICKS = 40;
     /** 加工モード: 装置に入れる・取り出すのを試す間隔（tick）と、何も進まないときにあきらめるまで。 */
     private static final int PROCESS_INTERVAL = 10, STALL_TICKS = 20 * 120;
+    /**
+     * 装置の加工を待たずに離れる: 入れ終えて {@link #LEAVE_TICKS} 待ち、残りが {@link #LEAVE_ETA_TICKS} 以上かかりそうなとき
+     * （残り時間が分からない装置は、{@link #LEAVE_UNKNOWN_TICKS} 待ってもできなければ）。
+     */
+    private static final int LEAVE_TICKS = 20, LEAVE_ETA_TICKS = 20 * 15, LEAVE_UNKNOWN_TICKS = 20 * 10;
     /** 採掘: 掘れる物がないまま待つ限度、手の届く距離、1つ掘るごとに使う充電。 */
     private static final int MINE_IDLE_TICKS = 20 * 30, MINE_COST = 6;
     private static final double MINE_REACH = 4.0, MINE_NEAR = 2.0;
@@ -73,6 +78,11 @@ final class AndroidWorkGoal extends Goal {
     private java.util.List<ItemCount> processingPending;
     private boolean processingPaid, processingMoved;
     private int stalled;
+    /** 加工モード: 素材を入れ終えてから、できるのを待っている時間（長くかかりそうなら、ほかの作業へ行く）。 */
+    private int machineWait;
+    /** 次の作業の最初の受け渡し場所で、前の作業の残り（注文 leftoverOrder の物）を戻してから取る。 */
+    private boolean depositFirst;
+    private int leftoverOrder = -1;
     /** 手順カード: 今の手順の番号と、その手順で入れた・取り出した・集めた数。 */
     private int procIndex;
     private long progress;
@@ -130,6 +140,8 @@ final class AndroidWorkGoal extends Goal {
         t.putInt("batch", batchIndex);
         t.putInt("procedure", procIndex);
         t.putLong("progress", progress);
+        t.putBoolean("deposit_first", depositFirst);
+        t.putInt("leftover_order", leftoverOrder);
         if (pickups != null) {
             var remaining = new net.minecraft.nbt.ListTag();
             for (int i = pickupIndex; i < pickups.size(); i++) {
@@ -168,6 +180,8 @@ final class AndroidWorkGoal extends Goal {
         batchIndex = t.getInt("batch");
         procIndex = t.getInt("procedure");
         progress = t.getLong("progress");
+        depositFirst = t.getBoolean("deposit_first");
+        leftoverOrder = t.contains("leftover_order") ? t.getInt("leftover_order") : android.workOrder();
         pickups = null;
         pickupIndex = 0;
         if (t.contains("pickups")) {
@@ -184,7 +198,7 @@ final class AndroidWorkGoal extends Goal {
                 pickups.add(new WorkConsoleBlockEntity.Pickup(BlockPos.of(pt.getLong("point")), items));
             }
         }
-        travel = wait = craftTimer = stalled = mineIdle = 0;
+        travel = wait = craftTimer = stalled = mineIdle = machineWait = 0;
         stopMining();
         mineSkip.clear();
         ranchSkip.clear();
@@ -248,8 +262,13 @@ final class AndroidWorkGoal extends Goal {
         processingPending = null;
         processingPaid = processingMoved = false;
         stalled = 0;
+        machineWait = 0;
+        depositFirst = false;
         fuelTrip = null;
         resetProcedure();
+        if (job.type() == WorkJob.Type.COLLECT && !job.batch().isEmpty()) {
+            inserted = job.batch().get(0).crafts();          // 素材はもう入れてある: 取り出すだけ
+        }
     }
 
     private void resetProcedure() {
@@ -270,6 +289,9 @@ final class AndroidWorkGoal extends Goal {
         WorkConsoleBlockEntity c = console(level);
         if (c == null) {
             return;
+        }
+        if (android.tickCount % 20 == 5) {
+            android.setWorkRules(c.pathRules());       // 作業指令台の「経路」
         }
         // 取消・再割当てを毎tick確認し、残った古い作業で素材を消費しない。
         if (android.workJob != null && android.workJob.jobId() >= 0 && !c.heartbeat(android, android.workJob)) {
@@ -301,7 +323,7 @@ final class AndroidWorkGoal extends Goal {
                 wait = WAIT_TICKS;
             }
             case DEPOSIT, EXIT -> deposit(c, job);
-            case CRAFT -> craft(level, c, job);
+            case CRAFT, COLLECT -> craft(level, c, job);
             case DELIVER -> deliver(c, job);
         }
     }
@@ -312,7 +334,7 @@ final class AndroidWorkGoal extends Goal {
             case WAIT -> RuinAndroid.ACT_WAIT;
             case DEPOSIT, EXIT -> RuinAndroid.ACT_RETURN;
             case DELIVER -> phase == 0 ? RuinAndroid.ACT_FETCH : RuinAndroid.ACT_DELIVER;
-            case CRAFT -> {
+            case CRAFT, COLLECT -> {
                 if (phase == 0) {
                     yield RuinAndroid.ACT_FETCH;
                 }
@@ -391,7 +413,10 @@ final class AndroidWorkGoal extends Goal {
         }
     }
 
-    /** 作業のあと: 持っている物で続けられればそのまま続け、なければ持ち物を資材口へ戻しに行く。 */
+    /**
+     * 作業のあと: 持っている物で続けられればそのまま続ける。なければ次の作業を決めて、素材を取りに行く最初の受け渡し場所で
+     * 持ち物を戻してから取る（戻しに行くだけの道を省く）。取りに行く作業がなければ、持ち物を資材口へ戻しに行く。
+     */
     private void afterJob(WorkConsoleBlockEntity c, WorkJob done) {
         WorkJob next = c.chainJob(android, done.orderId());
         if (next != null) {
@@ -399,13 +424,28 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         android.workJob = null;
-        returning = !android.carryEmpty();
         travel = 0;
+        leftoverOrder = done.orderId();
+        returning = false;
+        if (android.carryEmpty()) {
+            return;
+        }
+        next = c.requestJob(android, true);
+        if ((next.type() == WorkJob.Type.CRAFT || next.type() == WorkJob.Type.DELIVER) && !next.carried() && !next.fetch().isEmpty()) {
+            begin(next);
+            depositFirst = true;
+            return;
+        }
+        // requestJob は見積もりではなく貸出。今回は着手しないので、予約を必ず返す。
+        if (next.jobId() >= 0) {
+            c.fail(next, WorkConsoleBlockEntity.Failure.DEFERRED);
+        }
+        returning = true;
     }
 
     /** 作業のあと、持ち物を資材の受け渡し場所へ戻す。 */
     private void returnItems(WorkConsoleBlockEntity c) {
-        Boolean done = dropAll(c, WorkJob.simple(WorkJob.Type.DEPOSIT, android.workOrder()));
+        Boolean done = dropAll(c, WorkJob.simple(WorkJob.Type.DEPOSIT, leftoverOrder));
         if (done == null || done) {
             returning = false;                 // 戻せない所しかなければ、次に作業をもらうときにもう一度戻しに行く
         }
@@ -485,19 +525,28 @@ final class AndroidWorkGoal extends Goal {
         craftTimer = 0;
         RecipeData r = step.recipe();
         BlockPos at = step.location();
-        net.neoforged.neoforge.items.IItemHandler in = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at,
-                r.inputFace());
-        net.neoforged.neoforge.items.IItemHandler out = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at,
-                r.outputFace());
-        net.neoforged.neoforge.fluids.capability.IFluidHandler fin = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, at, r.inputFace());
-        net.neoforged.neoforge.fluids.capability.IFluidHandler fout = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, at, r.outputFace());
-        if (in == null && fin == null || out == null && fout == null) {
+        // 取り出す面: 記録した面か、自動なら、今できた物を取り出せる面（まだなければ null: 取り出さない）
+        Direction outFace = io.github.genichimaruo.singulo.android.work.MachineWatch.outputFace(level, at, r);
+        net.neoforged.neoforge.items.IItemHandler out = outFace == null ? null
+                : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, outFace);
+        if (!io.github.genichimaruo.singulo.android.work.MachineWatch.handlesInput(level, at, r)
+                || !io.github.genichimaruo.singulo.android.work.MachineWatch.handlesOutput(level, at, r)) {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
             return;
         }
         // 燃料が切れていれば、燃料を足す（持っていなければ、取りに行く）。記録した燃料がなければ、取りに行かない
+        fuelMissing = false;
         if (!r.fuel().isEmpty() && needsFuel(level, at, r) && refuel(level, c, at, r)) {
             return;
+        }
+        // 燃料が素材置き場になく、作れるなら、作る注文を出して（作っていれば）待つ。待つあいだは取り消さない。
+        // ほかにできる作業（燃料を作る作業も）があれば、入れた分は装置に任せてそちらへ
+        if (fuelMissing && processingPending == null && c.orderFuel(job, r.fuel(), fuelWant)) {
+            stalled = 0;
+            if (c.hasOtherWork(android, job, batchIndex)) {
+                leaveForFuel(c, job, step, r);
+                return;
+            }
         }
         boolean progress = false;
         while (inserted < step.crafts()) {
@@ -505,9 +554,15 @@ final class AndroidWorkGoal extends Goal {
                 android.spend(CRAFT_COST);
                 break;
             }
-            boolean complete = insertOnce(in, fin, r);
+            boolean complete = insertOnce(level, at, r);
             progress |= processingMoved;
             if (!complete) {
+                if (!processingMoved && !io.github.genichimaruo.singulo.android.work.MachineWatch.refusedInput(level, at, r).isEmpty()) {
+                    // 記録した入れる面から入らない（かまどの下の面など）: いつまで待っても入らないので、理由を出して取り消す
+                    android.setState(RuinAndroid.STATE_IDLE);
+                    fail(c, job, WorkConsoleBlockEntity.Failure.WRONG_FACE);
+                    return;
+                }
                 break;
             }
             inserted++;
@@ -516,24 +571,27 @@ final class AndroidWorkGoal extends Goal {
                 break;
             }
         }
-        long want = step.crafts() * r.outputCount();
-        // 流体の出てくる物: 装置の流体の出口から、タンクへ（主な物は要る分だけ、ほかの物は全部）
-        if (fout != null) {
+        long want = job.type() == WorkJob.Type.COLLECT ? job.amount() : step.crafts() * r.outputCount();
+        // 液体・化学物質の出てくる物: 装置の出口から、タンクへ（主な物は要る分だけ、ほかの物は全部）
+        if (outFace != null) {
+            io.github.genichimaruo.singulo.android.work.LiquidStores liquids = io.github.genichimaruo.singulo.android.work.LiquidStores.machine(level, at, outFace);
             for (ItemStack o : r.outputs()) {
-                if (!FluidSamples.is(o)) {
+                if (!FluidSamples.liquid(o)) {
                     continue;
                 }
                 boolean main = o == r.output();
-                var like = FluidSamples.fluid(o);
-                int limit = (int) Math.min(main ? want - collected : Integer.MAX_VALUE, android.tankSpace(like));
+                long limit = Math.min(main ? want - collected : Long.MAX_VALUE, android.liquidSpace(o));
                 if (limit <= 0) {
                     continue;
                 }
-                var got = fout.drain(like.copyWithAmount(limit), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                if (!got.isEmpty()) {
-                    android.fillTanks(got, false);
+                long got = liquids.drain(o, limit, false);
+                if (got > 0) {
+                    long in = android.fillLiquid(o, got, false);
+                    if (in < got) {
+                        liquids.fill(o, got - in, false);     // 入りきらなかった分は戻す
+                    }
                     if (main) {
-                        collected += got.getAmount();
+                        collected += in;
                     }
                     progress = true;
                 }
@@ -572,11 +630,26 @@ final class AndroidWorkGoal extends Goal {
             }
             progress = true;
         }
+        if (inserted >= step.crafts() && collected < want) {
+            // 入れ終えて、できるのを待っている: 長くかかりそうで、ほかにできる作業があれば、待たずにそちらへ
+            // （できたら、指令台が取り出しの作業を出す）
+            machineWait += PROCESS_INTERVAL;
+            if (mayLeave(level, at) && c.hasOtherWork(android, job, batchIndex)) {
+                c.park(job, batchIndex, want - collected);
+                android.gesture(RuinAndroid.GESTURE_NOD, null);
+                inserted = 0;
+                collected = 0;
+                stalled = 0;
+                machineWait = 0;
+                afterJob(c, job);
+                return;
+            }
+        }
         if (progress) {
             stalled = 0;
             android.playSound(SoundEvents.ITEM_PICKUP, 0.4F, 1.2F);
         } else if ((stalled += PROCESS_INTERVAL) >= SHORT_TICKS && inserted >= step.crafts() && collected < want
-                && (in == null || !holdsAny(in, r.inputs())) && (fin == null || !holdsFluid(fin, r.inputs()))) {
+                && io.github.genichimaruo.singulo.android.work.MachineWatch.held(level, at, r) == 0) {
             // 入れた素材を使い切ったのに、できた物が足りない（確率で出る物）: 足りない分の回数を足して、集まるまで作り直す
             endShort(c, job, want - collected);
             return;
@@ -588,13 +661,38 @@ final class AndroidWorkGoal extends Goal {
             inserted = 0;
             collected = 0;
             stalled = 0;
+            machineWait = 0;
             batchIndex++;
         }
     }
 
-    /** 燃料を取りに行く受け渡し場所（行っていなければ null）。 */
+    /** 装置の加工を待たずに離れてよいか: 残り時間の見込みが長い（分からない装置は、しばらく待ってもできなければ）。 */
+    private boolean mayLeave(ServerLevel level, BlockPos machine) {
+        int eta = io.github.genichimaruo.singulo.android.work.MachineWatch.eta(level, machine);
+        return eta < 0 ? machineWait >= LEAVE_UNKNOWN_TICKS : machineWait >= LEAVE_TICKS && eta >= LEAVE_ETA_TICKS;
+    }
+
+    /** 燃料を取りに行く受け渡し場所（行っていなければ null）と、持ってくる数。 */
     @Nullable
     private BlockPos fuelTrip;
+    private int fuelWant;
+    /** 燃料を足そうとしたが、素材置き場になかった（この tick の加工で）。 */
+    private boolean fuelMissing;
+
+    /** 装置の燃料の面に、あと何個燃料が入るか。 */
+    private int fuelRoom(ServerLevel level, BlockPos machine, RecipeData r) {
+        net.neoforged.neoforge.items.IItemHandler side = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                machine, fuelSide(machine, r));
+        if (side == null) {
+            return 0;
+        }
+        ItemStack full = r.fuel().copyWithCount(r.fuel().getMaxStackSize());
+        int room = 0;
+        for (int i = 0; i < side.getSlots(); i++) {
+            room += full.getCount() - side.insertItem(i, full, true).getCount();
+        }
+        return room;
+    }
 
     /** 燃料を入れる面: 記録した面か、自動なら、装置から見てアンドロイドのいる横の面（かまどなら燃料の欄）。 */
     private Direction fuelSide(BlockPos machine, RecipeData r) {
@@ -632,9 +730,38 @@ final class AndroidWorkGoal extends Goal {
             }
             return false;
         }
+        // 持ってくる数: 装置に入るだけ（満タン）か、燃料の欄の数ずつ。どちらも、入りきらない分は持ってこない
+        int room = fuelRoom(level, machine, r);
+        fuelWant = r.fuelFill() ? room : Math.min(Math.max(1, fuel.getCount()), room);
+        if (fuelWant <= 0) {
+            return false;                       // 燃料の欄がいっぱい（ほかの理由で止まっている）
+        }
         fuelTrip = c.fuelPoint(fuel, android.blockPosition());
         travel = 0;
-        return fuelTrip != null;                // 在庫にない: そのまま待つ（加工が止まったままなら、やがて取り消す）
+        fuelMissing = fuelTrip == null;         // 在庫にない: 作れるなら作る注文を出す（作れなければ、止まったままなら、やがて取り消す）
+        return fuelTrip != null;
+    }
+
+    /**
+     * 燃料を作るあいだ、装置を離れる: 入れた回数分は「加工を待っている」にして（燃料ができたら、指令台が取り出し・燃料足しの作業を出す）、
+     * 残りの素材は資材口へ戻す。何も入れていなければ、作業をあとに回す。
+     */
+    private void leaveForFuel(WorkConsoleBlockEntity c, WorkJob job, WorkJob.Batch step, RecipeData r) {
+        if (job.type() == WorkJob.Type.COLLECT) {
+            c.park(job, batchIndex, job.amount() - collected);
+        } else if (inserted > 0) {
+            c.park(job, batchIndex, inserted, Math.max(0, inserted * r.outputCount() - collected));
+        } else {
+            android.setState(RuinAndroid.STATE_IDLE);
+            fail(c, job, WorkConsoleBlockEntity.Failure.DEFERRED);
+            return;
+        }
+        android.gesture(RuinAndroid.GESTURE_NOD, null);
+        inserted = 0;
+        collected = 0;
+        stalled = 0;
+        machineWait = 0;
+        afterJob(c, job);
     }
 
     /** 燃料を取りに行って、受け渡し場所から（予約されていない物を）取る。取ったら装置へ戻る。 */
@@ -644,7 +771,7 @@ final class AndroidWorkGoal extends Goal {
         if (at == null) {
             fuelTrip = null;
         } else if (at) {
-            c.takeFuel(android, fuelTrip, fuel, Math.max(1, fuel.getCount()));
+            c.takeFuel(android, fuelTrip, fuel, Math.max(1, fuelWant));
             fuelTrip = null;
             stalled = 0;
             travel = 0;
@@ -755,23 +882,26 @@ final class AndroidWorkGoal extends Goal {
         craftTimer = 0;
         boolean insert = ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.INSERT;
         long moved;
-        if (FluidSamples.is(what)) {
-            net.neoforged.neoforge.fluids.capability.IFluidHandler fh = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, ps.pos(), insert ? Direction.UP : Direction.DOWN);
-            if (fh == null) {
+        if (FluidSamples.liquid(what)) {
+            Direction face = insert ? Direction.UP : Direction.DOWN;
+            if (!io.github.genichimaruo.singulo.android.work.LiquidStores.handles(level, ps.pos(), face)) {
                 fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
                 return;
             }
-            var like = FluidSamples.fluid(what);
-            int limit = (int) Math.min(want - progress, Integer.MAX_VALUE);
+            io.github.genichimaruo.singulo.android.work.LiquidStores liquids = io.github.genichimaruo.singulo.android.work.LiquidStores.machine(level, ps.pos(), face);
+            long limit = want - progress;
             if (insert) {
-                var f = android.drainTanks(like, limit, true);
-                int put = fh.fill(f, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                android.drainTanks(like, put, false);
+                long can = android.drainLiquid(what, limit, true);
+                long put = liquids.fill(what, can, false);
+                android.drainLiquid(what, put, false);
                 moved = put;
             } else {
-                var got = fh.drain(like.copyWithAmount(Math.min(limit, android.tankSpace(like))), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                android.fillTanks(got, false);
-                moved = got.getAmount();
+                long got = liquids.drain(what, Math.min(limit, android.liquidSpace(what)), false);
+                long in = android.fillLiquid(what, got, false);
+                if (in < got) {
+                    liquids.fill(what, got - in, false);
+                }
+                moved = in;
             }
         } else {
             net.neoforged.neoforge.items.IItemHandler h = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
@@ -1868,14 +1998,27 @@ final class AndroidWorkGoal extends Goal {
      * 1回分を順に投入する。異なる材料のSIMULATEを同じ空き枠に対して行っても、
      * 全種類が同時に入る保証にはならない。実際に入った分を覚え、残りだけを次回投入する。
      */
-    private boolean insertOnce(@Nullable net.neoforged.neoforge.items.IItemHandler in,
-                               @Nullable net.neoforged.neoforge.fluids.capability.IFluidHandler fin, RecipeData r) {
+    private boolean insertOnce(ServerLevel level, BlockPos at, RecipeData r) {
+        // 入れる面: 記録した面か、自動なら、今この素材を受け付ける面（上・横・下の順）
+        return insertOnce(item -> {
+            Direction face = io.github.genichimaruo.singulo.android.work.MachineWatch.inputFace(level, at, r, item);
+            return face == null ? null : level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, face);
+        }, item -> {
+            Direction face = io.github.genichimaruo.singulo.android.work.MachineWatch.inputFace(level, at, r, item);
+            return face == null ? null : io.github.genichimaruo.singulo.android.work.LiquidStores.machine(level, at, face);
+        }, r);
+    }
+
+    /** 素材ごとに入れる先（items: 物の入れ口、liquids: 液体・化学物質の入れ口。なければ null）を決めて、1回分を順に投入する。 */
+    private boolean insertOnce(java.util.function.Function<ItemStack, net.neoforged.neoforge.items.IItemHandler> items,
+                               java.util.function.Function<ItemStack, io.github.genichimaruo.singulo.android.work.LiquidStores> liquids,
+                               RecipeData r) {
         processingMoved = false;
         if (processingPending == null) {
             java.util.List<ItemCount> inputs = r.inputs();
             for (ItemCount need : inputs) {
-                if (FluidSamples.is(need.item)) {
-                    if (fin == null || android.tankAmount(FluidSamples.fluid(need.item)) < need.count) {
+                if (FluidSamples.liquid(need.item)) {
+                    if (android.liquidAmount(need.item) < need.count) {
                         return false;
                     }
                 } else {
@@ -1885,7 +2028,7 @@ final class AndroidWorkGoal extends Goal {
                             have += android.inventory().getItem(slot).getCount();
                         }
                     }
-                    if (in == null || have < need.count) {
+                    if (have < need.count) {
                         return false;
                     }
                 }
@@ -1901,15 +2044,17 @@ final class AndroidWorkGoal extends Goal {
                 continue;
             }
             long moved = 0;
-            if (FluidSamples.is(need.item) && fin != null) {
-                var like = FluidSamples.fluid(need.item);
-                var available = android.drainTanks(like, (int) Math.min(need.count, Integer.MAX_VALUE), true);
-                if (!available.isEmpty()) {
-                    int put = fin.fill(available, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
-                    android.drainTanks(like, put, false);
+            boolean liquid = FluidSamples.liquid(need.item);
+            io.github.genichimaruo.singulo.android.work.LiquidStores fin = liquid ? liquids.apply(need.item) : null;
+            net.neoforged.neoforge.items.IItemHandler in = liquid ? null : items.apply(need.item);
+            if (liquid && fin != null) {
+                long available = android.drainLiquid(need.item, need.count, true);
+                if (available > 0) {
+                    long put = fin.fill(need.item, available, false);
+                    android.drainLiquid(need.item, put, false);
                     moved = put;
                 }
-            } else if (in != null && !FluidSamples.is(need.item)) {
+            } else if (in != null && !liquid) {
                 moved = insertFromCarry(in, need.item, need.count);
             }
             if (moved > 0) {
@@ -1932,22 +2077,6 @@ final class AndroidWorkGoal extends Goal {
         processingPending = null;
         processingPaid = false;
         return true;
-    }
-
-    /** 装置（流体の入口）に、まだ入れた流体が残っているか（まだ加工している）。 */
-    private static boolean holdsFluid(net.neoforged.neoforge.fluids.capability.IFluidHandler h, java.util.List<ItemCount> inputs) {
-        for (ItemCount in : inputs) {
-            if (!FluidSamples.is(in.item)) {
-                continue;
-            }
-            var like = FluidSamples.fluid(in.item);
-            for (int t = 0; t < h.getTanks(); t++) {
-                if (net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(h.getFluidInTank(t), like)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private void deliver(WorkConsoleBlockEntity c, WorkJob job) {
@@ -1992,6 +2121,15 @@ final class AndroidWorkGoal extends Goal {
         if (at == null) {
             fail(c, job, WorkConsoleBlockEntity.Failure.UNREACHABLE);
         } else if (at) {
+            if (depositFirst) {
+                // 前の作業の残りを、ここで戻してから取る。戻しきれなければ、この作業はあとにして、ほかの場所へ戻しに行く
+                depositFirst = false;
+                if (!c.depositAt(android, WorkJob.simple(WorkJob.Type.DEPOSIT, leftoverOrder), p.point())) {
+                    fail(c, job, WorkConsoleBlockEntity.Failure.DEFERRED);
+                    returning = true;
+                    return;
+                }
+            }
             if (c.fetchAt(android, job, p)) {
                 pickupIndex++;
             } else {
@@ -2075,8 +2213,9 @@ final class AndroidWorkGoal extends Goal {
         if (++travel > GIVE_UP_TICKS) {
             return giveUp();
         }
-        if (travel % 20 == 1 || android.getNavigation().isDone()) {
-            android.getNavigation().moveTo(goal.x, goal.y, goal.z, 1.0);
+        // 経路の決まり（作業指令台の「経路」）に従って向かう。経由地点を通ったら、あきらめるまでの時間を数え直す
+        if (android.moveVia(goal, 1.0, android.workRules(), travel % 20 == 1)) {
+            travel = 0;
         }
         return false;
     }

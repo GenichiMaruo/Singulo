@@ -50,10 +50,16 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     /** 納品箱のページ: 9×3。 */
     public static final int OUTBOX_X = INV_X, OUTBOX_Y = 44;
     public static final int SLOT_PERMIT = 0, SLOT_GRID = 1, SLOT_RESULT = 10, SLOT_CARD = 11, SLOT_STOCK = 12, SLOT_EXTRA = 13,
-            SLOT_LOC_A = 15, SLOT_LOC_B = 16, SLOT_PITEM = 17, SLOT_FUEL = 18, SLOT_OUTBOX = 19, OWN = SLOT_OUTBOX + WorkConsoleBlockEntity.OUTBOX_SLOTS;
+            SLOT_LOC_A = 15, SLOT_LOC_B = 16, SLOT_PITEM = 17, SLOT_FUEL = 18, SLOT_OUTBOX = 19,
+            SLOT_ROUTE = SLOT_OUTBOX + WorkConsoleBlockEntity.OUTBOX_SLOTS, OWN = SLOT_ROUTE + PathRule.SLOTS;
+    /** 経路のページ: 4行（経由地点・対象範囲・進入禁止ゾーン2つ）。 */
+    public static final int ROUTE_X = 66, ROUTE_Y = 46, ROUTE_ROW = 19;
+    public static final int[] ROUTE_COL_X = {ROUTE_X, ROUTE_X + 40, ROUTE_X + 80, ROUTE_X + 98};
     public static final int BUTTON_ENCODE = 0, BUTTON_CLEAR = 1, BUTTON_CLEAR_CARD = 2, BUTTON_MODE = 3, BUTTON_KIND = 4, BUTTON_ADD = 5,
             BUTTON_KIND_BACK = 6, BUTTON_REMOVE_STEP = 10, BUTTON_OPTION = 20, BUTTON_FACE = 30, BUTTON_FACE_BACK = 33, BUTTON_VARIANTS = 36,
-            BUTTON_ADJUST = 100;
+            BUTTON_FUEL_FILL = 37, BUTTON_ADJUST = 100;
+    /** 加工モードの、燃料を持ってくる量のボタン（燃料の欄の下）。 */
+    public static final int FUEL_MODE_X = 5, FUEL_MODE_Y = 80, FUEL_MODE_W = 22, FUEL_MODE_H = 11;
     /** 作業台モードの「同じ種類の別の物も使う」の切り替え（見本の下）。 */
     public static final int VARIANTS_X = 30, VARIANTS_Y = 99, VARIANTS_W = 76, VARIANTS_H = 11;
     /** 加工モードの面のボタン（見本の下に3つ: 入れる面・取り出す面・燃料の面）。 */
@@ -71,13 +77,14 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     private boolean showPermit;
     private boolean showEncoder;
     private boolean showOutbox;
+    private boolean showRoutes;
     /** サーバーから届いた様子（クライアント）。 */
     @Nullable
     private CompoundTag view;
     private int viewVersion;
 
     public WorkConsoleMenu(int id, Inventory inventory, BlockPos pos, IItemHandler permit, Container encoder, Container outbox,
-                           net.minecraft.world.inventory.ContainerData mode) {
+                           IItemHandler routes, net.minecraft.world.inventory.ContainerData mode) {
         super(SinguloMenus.ANDROID_WORK_CONSOLE.get(), id);
         this.pos = pos;
         this.encoder = encoder;
@@ -153,6 +160,20 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
                 }
             });
         }
+        for (int i = 0; i < PathRule.SLOTS; i++) {
+            int col = i % PathRule.COLS;
+            addSlot(new SlotItemHandler(routes, i, ROUTE_COL_X[col], ROUTE_Y + (i / PathRule.COLS) * ROUTE_ROW) {
+                @Override
+                public boolean isActive() {
+                    return showRoutes && showInventory;
+                }
+
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return PathRule.fits(col, stack);
+                }
+            });
+        }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
@@ -210,7 +231,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     public static WorkConsoleMenu client(int id, Inventory inventory, RegistryFriendlyByteBuf buf) {
         return new WorkConsoleMenu(id, inventory, buf.readBlockPos(), new ItemStackHandler(1),
                 new SimpleContainer(WorkConsoleBlockEntity.ENCODER_SLOTS), new SimpleContainer(WorkConsoleBlockEntity.OUTBOX_SLOTS),
-                new net.minecraft.world.inventory.SimpleContainerData(5));
+                new ItemStackHandler(PathRule.SLOTS), new net.minecraft.world.inventory.SimpleContainerData(5));
     }
 
     /** 記録のモード（{@link WorkConsoleBlockEntity#MODE_CRAFTING} など）。 */
@@ -257,11 +278,12 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         return pos;
     }
 
-    public void setVisibility(boolean inventory, boolean permit, boolean encoder, boolean outbox) {
+    public void setVisibility(boolean inventory, boolean permit, boolean encoder, boolean outbox, boolean routes) {
         this.showInventory = inventory;
         this.showPermit = permit;
         this.showEncoder = encoder;
         this.showOutbox = outbox;
+        this.showRoutes = routes;
     }
 
     /** 様子を受け取る（クライアント）。 */
@@ -294,7 +316,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
                 int count = counted && button == 0 ? carried.getCount() : 1;
                 ItemStack fluid = counted ? FluidSamples.fromContainer(carried) : ItemStack.EMPTY;
                 encoder.setItem(encoderIndex(slotId), carried.isEmpty() ? ItemStack.EMPTY
-                        : FluidSamples.is(fluid) ? fluid : carried.copyWithCount(count));
+                        : FluidSamples.liquid(fluid) ? fluid : carried.copyWithCount(count));
                 if (!player.level().isClientSide && player.level().getBlockEntity(pos) instanceof WorkConsoleBlockEntity c) {
                     c.updateResult();
                 }
@@ -332,6 +354,10 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         }
         if (id == BUTTON_VARIANTS) {
             c.toggleVariants();
+            return true;
+        }
+        if (id == BUTTON_FUEL_FILL) {
+            c.toggleFuelFill();
             return true;
         }
         if (id >= BUTTON_FACE && id < BUTTON_FACE + 6) {
@@ -392,7 +418,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
         if (index == SLOT_PERMIT || index == SLOT_CARD || index == SLOT_STOCK || index == SLOT_LOC_A || index == SLOT_LOC_B
-                || index >= SLOT_OUTBOX && index < OWN) {
+                || index >= SLOT_OUTBOX && index < OWN) {     // 納品箱・経路の欄から持ち物へ
             if (!moveItemStackTo(stack, OWN, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
@@ -401,6 +427,10 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
                 // 未記録のカードはストックへ、記録したカードは記録したカードの欄へ
                 boolean blank = RecipeData.read(stack, player.level().registryAccess()) == null;
                 if (!moveItemStackTo(stack, blank ? SLOT_STOCK : SLOT_CARD, blank ? SLOT_STOCK + 1 : SLOT_CARD + 1, false)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (showRoutes && (WorkLocationCardItem.isCard(stack) || AreaCardItem.isCard(stack))) {
+                if (!moveItemStackTo(stack, SLOT_ROUTE, OWN, false)) {        // 経路のページ: 空いている合う欄へ
                     return ItemStack.EMPTY;
                 }
             } else if (WorkLocationCardItem.isCard(stack) && mode() == WorkConsoleBlockEntity.MODE_PROCEDURE) {

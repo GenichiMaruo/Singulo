@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -79,6 +80,13 @@ public abstract class RuinAndroid extends Monster {
     public static final int STATE_CRAFTING = 8;
     /** 採掘の手順でブロックを掘っている（左手に光るツルハシ）。 */
     public static final int STATE_MINING = 9;
+    /** 拠点の暮らし（{@link AndroidLife}）: 椅子・階段に座る、地面に座る、植木鉢・作物に手をかざす、床を掃く。 */
+    public static final int STATE_SIT = 90, STATE_SIT_GROUND = 91, STATE_TEND = 92, STATE_SWEEP = 93;
+
+    /** 拠点の暮らしの動きか。 */
+    public static boolean lifeState(int state) {
+        return state >= STATE_SIT && state <= STATE_SWEEP;
+    }
     public static final int FOLD_TICKS = 20;
     /** 無線充電器から1 tick にもらう電力（満充電 PER_ANDROID を 100 tick、5秒で）。 */
     static final int CHARGER_FE_PER_TICK = AndroidChargerItem.PER_ANDROID / 100;
@@ -87,6 +95,8 @@ public abstract class RuinAndroid extends Monster {
     public static final int MODE_GUARD = 0;
     public static final int MODE_WANDER = 1;
     public static final int MODE_FOLLOW = 2;
+    /** 巡回: ステーションで決めた巡回路を回る（{@link AndroidPatrol}）。 */
+    public static final int MODE_PATROL = 3;
     /** 護衛が敵を探す範囲（ステーションか持ち主から）。 */
     public static final double GUARD_RANGE = 14;
     public static final int WANDER_RADIUS = 16;
@@ -147,6 +157,11 @@ public abstract class RuinAndroid extends Monster {
             if (seen == null || now - seen > AWAY_TICKS) {
                 gesture(GESTURE_WAVE, p);
                 chirp(level, null, 1.5F);
+                // 留守のあいだに巡回で変わったことがあれば、一言知らせる
+                Component report = seen == null ? null : patrol.report();
+                if (report != null) {
+                    p.displayClientMessage(report, true);
+                }
                 return;
             }
         }
@@ -189,11 +204,21 @@ public abstract class RuinAndroid extends Monster {
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK),
             SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.ITEM_STACK)};
     private static final EntityDataAccessor<Integer> TANK_B = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 化学物質のタンクの見た目: 「ID;割合（0〜100）」。空なら「;0」、化学物質のタンクがなければ「-」。 */
+    @SuppressWarnings("unchecked")
+    private static final EntityDataAccessor<String>[] CHEM = new EntityDataAccessor[] {
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.STRING),
+            SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.STRING)};
+    /** 巡回の記録（アンドロイドの画面の「記録」のページに出すため）。 */
+    private static final EntityDataAccessor<CompoundTag> PATROL_LOG = SynchedEntityData.defineId(RuinAndroid.class,
+            EntityDataSerializers.COMPOUND_TAG);
     /** 作業（自動化）を割り当てられているか（持ち物を取り出せなくするため、クライアントでも見る）。 */
     private static final EntityDataAccessor<Boolean> WORKING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
     /** 仕草（挨拶。{@link #GESTURE_WAVE} など。クライアントでも見える）。 */
     private static final EntityDataAccessor<Integer> GESTURE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
-    public static final int GESTURE_NONE = 0, GESTURE_WAVE = 1, GESTURE_NOD = 2;
+    /** 昼寝している（目を閉じて、頭の上に Z）。 */
+    private static final EntityDataAccessor<Boolean> NAPPING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
+    public static final int GESTURE_NONE = 0, GESTURE_WAVE = 1, GESTURE_NOD = 2, GESTURE_TALK = 3;
     /** 採掘の姿勢で持つ道具（0: ツルハシ、1: 斧）。 */
     private static final EntityDataAccessor<Integer> TOOL = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     public static final int TOOL_PICKAXE = 0, TOOL_AXE = 1;
@@ -322,8 +347,37 @@ public abstract class RuinAndroid extends Monster {
 
     /** 手に持つ装飾を見せるか: 待機していて（戦い・作業・充電をしていない）、挨拶の仕草もしていない。 */
     public boolean showsHeldDecor() {
-        return printed() && state() == STATE_IDLE && !isWorking() && !entityData.get(ALERT) && gesture() == GESTURE_NONE
+        int s = state();
+        boolean calm = s == STATE_IDLE || (s == STATE_SIT || s == STATE_SIT_GROUND) && !napping();     // 座って本を読む、など
+        return printed() && calm && !isWorking() && !entityData.get(ALERT) && gesture() == GESTURE_NONE
                 && !decor(AndroidAccessoryItem.HAND).isEmpty();
+    }
+
+    /** 昼寝しているか（クライアントでも見える）。 */
+    public boolean napping() {
+        return entityData.get(NAPPING);
+    }
+
+    void setNapping(boolean napping) {
+        if (napping() != napping) {
+            entityData.set(NAPPING, napping);
+        }
+    }
+
+    /** 拠点の暮らし（サーバー）。 */
+    @Nullable
+    AndroidLife life;
+
+    /** すぐに次の暮らしを始めてよいことにする（テスト用。ふだんは 15〜45 秒おき）。 */
+    public void lifeNow() {
+        if (life != null) {
+            life.hurry();
+        }
+    }
+
+    /** 拠点の暮らしの様子（テストの説明用）。 */
+    public String lifeState() {
+        return life == null ? "-" : life.describe();
     }
 
     /** 着けている装飾（part: {@link AndroidAccessoryItem#HEAD} など。クライアントでも見える）。 */
@@ -331,8 +385,32 @@ public abstract class RuinAndroid extends Monster {
         return entityData.get(DECOR[part]);
     }
 
+    /** タンクの欄に積める物か（タンク・ガスタンク・ガス・液体のアップグレード）。 */
     public static boolean isTankUpgrade(net.minecraft.world.item.ItemStack stack) {
-        return isItem(stack, "android_tank_upgrade");
+        return isItem(stack, "android_tank_upgrade") || isItem(stack, "android_gas_tank_upgrade") || isItem(stack, "android_dual_tank_upgrade");
+    }
+
+    /**
+     * 積んだアップグレードの、液体のタンク1つの大きさ: タンク 32,000、ガス・液体 16,000（化学物質と分けるので半分）、ほかは 0。
+     */
+    public static int fluidCapacity(net.minecraft.world.item.ItemStack upgrade) {
+        return isItem(upgrade, "android_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+    }
+
+    /** 化学物質（Mekanism）のタンク1つの大きさ: ガスタンク 32,000、ガス・液体 16,000。Mekanism がなければ 0（使えない）。 */
+    public static int chemCapacity(net.minecraft.world.item.ItemStack upgrade) {
+        if (!io.github.genichimaruo.singulo.android.work.Chemicals.present()) {
+            return 0;
+        }
+        return isItem(upgrade, "android_gas_tank_upgrade") ? TANK_CAPACITY : isItem(upgrade, "android_dual_tank_upgrade") ? TANK_CAPACITY / 2 : 0;
+    }
+
+    public int fluidCapacity() {
+        return fluidCapacity(inventory.getItem(SLOT_TANK));
+    }
+
+    public int chemCapacity() {
+        return chemCapacity(inventory.getItem(SLOT_TANK));
     }
 
     // ------------------------------------------------------------------ タンク（流体）
@@ -342,15 +420,175 @@ public abstract class RuinAndroid extends Monster {
             new net.neoforged.neoforge.fluids.capability.templates.FluidTank(TANK_CAPACITY),
             new net.neoforged.neoforge.fluids.capability.templates.FluidTank(TANK_CAPACITY)};
 
-    /** タンクアップグレードを積んでいるか。 */
+    /** 液体のタンクを積んでいるか（タンクの大きさも、積んだアップグレードに合わせる）。 */
     public boolean hasTank() {
-        return isTankUpgrade(inventory.getItem(SLOT_TANK));
+        int cap = fluidCapacity();
+        for (var t : tanks) {
+            if (t.getCapacity() != cap && cap > 0) {
+                t.setCapacity(cap);
+            }
+        }
+        return cap > 0;
     }
 
-    /** タンクが空か（タンクアップグレードを外せるか）。 */
+    /** 化学物質のタンクを積んでいるか。 */
+    public boolean hasChemTank() {
+        return chemCapacity() > 0;
+    }
+
+    // ------------------------------------------------------------------ タンク（化学物質。Mekanism）
+
+    /** 化学物質のタンク: 中身の ID（空なら ""）と量。Mekanism の型は使わない（{@link io.github.genichimaruo.singulo.android.work.Chemicals}）。 */
+    private final String[] chemIds = {"", ""};
+    private final long[] chemAmounts = new long[TANKS];
+
+    /** この化学物質が、タンクにいくつあるか。 */
+    public long chemAmount(String id) {
+        long n = 0;
+        for (int i = 0; i < TANKS; i++) {
+            if (chemIds[i].equals(id)) {
+                n += chemAmounts[i];
+            }
+        }
+        return n;
+    }
+
+    /** あと、この化学物質をどれだけ入れられるか。 */
+    public long chemSpace(String id) {
+        int cap = chemCapacity();
+        long n = 0;
+        for (int i = 0; cap > 0 && i < TANKS; i++) {
+            if (chemIds[i].isEmpty() || chemIds[i].equals(id)) {
+                n += cap - chemAmounts[i];
+            }
+        }
+        return n;
+    }
+
+    /** 化学物質をタンクに入れる（同じ物のタンクから、そのあと空のタンク）。入った量。 */
+    public long fillChem(String id, long amount, boolean simulate) {
+        int cap = chemCapacity();
+        if (cap <= 0 || id.isEmpty() || amount <= 0) {
+            return 0;
+        }
+        long left = amount;
+        boolean[] used = new boolean[TANKS];
+        for (int pass = 0; pass < 2 && left > 0; pass++) {
+            for (int i = 0; i < TANKS && left > 0; i++) {
+                boolean same = chemIds[i].equals(id);
+                boolean empty = chemIds[i].isEmpty() && !used[i];
+                if (pass == 0 ? !same : !empty) {
+                    continue;
+                }
+                long put = Math.min(cap - chemAmounts[i], left);
+                if (put <= 0) {
+                    continue;
+                }
+                used[i] = true;
+                if (!simulate) {
+                    chemIds[i] = id;
+                    chemAmounts[i] += put;
+                }
+                left -= put;
+            }
+        }
+        if (!simulate) {
+            syncTanks();
+        }
+        return amount - left;
+    }
+
+    /** 化学物質をタンクから出す（最大 amount）。出た量。 */
+    public long drainChem(String id, long amount, boolean simulate) {
+        long got = 0;
+        for (int i = 0; i < TANKS && got < amount; i++) {
+            if (!chemIds[i].equals(id) || chemIds[i].isEmpty()) {
+                continue;
+            }
+            long take = Math.min(chemAmounts[i], amount - got);
+            got += take;
+            if (!simulate) {
+                chemAmounts[i] -= take;
+                if (chemAmounts[i] <= 0) {
+                    chemAmounts[i] = 0;
+                    chemIds[i] = "";
+                }
+            }
+        }
+        if (!simulate && got > 0) {
+            syncTanks();
+        }
+        return got;
+    }
+
+    /** 化学物質のタンクの中身（ID → 量）。 */
+    public java.util.Map<String, Long> chemicals() {
+        java.util.Map<String, Long> out = new java.util.LinkedHashMap<>();
+        for (int i = 0; i < TANKS; i++) {
+            if (!chemIds[i].isEmpty() && chemAmounts[i] > 0) {
+                out.merge(chemIds[i], chemAmounts[i], Long::sum);
+            }
+        }
+        return out;
+    }
+
+    // ------------------------------------------------------------------ 液体・化学物質を、見本（流体の見本・化学物質の見本）で扱う
+
+    /** 見本の流体・化学物質が、タンクにいくつあるか。 */
+    public long liquidAmount(net.minecraft.world.item.ItemStack sample) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return chemAmount(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
+        }
+        return tankAmount(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+    }
+
+    /** 見本の流体・化学物質を、あとどれだけ入れられるか。 */
+    public long liquidSpace(net.minecraft.world.item.ItemStack sample) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return chemSpace(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample));
+        }
+        return tankSpace(io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample));
+    }
+
+    /** 見本の流体・化学物質を amount 入れる。入った量。 */
+    public long fillLiquid(net.minecraft.world.item.ItemStack sample, long amount, boolean simulate) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return fillChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
+        }
+        var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
+        return f.isEmpty() ? 0 : fillTanks(f.copyWithAmount((int) Math.min(Integer.MAX_VALUE, amount)), simulate);
+    }
+
+    /** 見本の流体・化学物質を最大 amount 出す。出た量。 */
+    public long drainLiquid(net.minecraft.world.item.ItemStack sample, long amount, boolean simulate) {
+        if (io.github.genichimaruo.singulo.android.work.ChemicalSamples.is(sample)) {
+            return drainChem(io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(sample), amount, simulate);
+        }
+        var f = io.github.genichimaruo.singulo.android.work.FluidSamples.fluid(sample);
+        return f.isEmpty() ? 0 : drainTanks(f, (int) Math.min(Integer.MAX_VALUE, amount), simulate).getAmount();
+    }
+
+    /** タンクの中身すべて（流体と化学物質の、量1の見本 → 量）。 */
+    public java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> liquids() {
+        java.util.List<java.util.Map.Entry<net.minecraft.world.item.ItemStack, Long>> out = new java.util.ArrayList<>();
+        for (var f : tankFluids()) {
+            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.FluidSamples.of(f.copyWithAmount(1)), (long) f.getAmount()));
+        }
+        for (var e : chemicals().entrySet()) {
+            out.add(java.util.Map.entry(io.github.genichimaruo.singulo.android.work.ChemicalSamples.of(e.getKey(), 1), e.getValue()));
+        }
+        return out;
+    }
+
+    /** タンクが空か（タンクアップグレードを外せるか）。化学物質のタンクも見る。 */
     public boolean tanksEmpty() {
         for (var t : tanks) {
             if (!t.isEmpty()) {
+                return false;
+            }
+        }
+        for (String id : chemIds) {
+            if (!id.isEmpty()) {
                 return false;
             }
         }
@@ -446,21 +684,175 @@ public abstract class RuinAndroid extends Monster {
         return got <= 0 ? net.neoforged.neoforge.fluids.FluidStack.EMPTY : like.copyWithAmount(got);
     }
 
+    /**
+     * 画面から: カーソルで持っている入れ物（バケツなど）を、タンク i に使う。中身があればタンクへ入れ（空か、同じ流体のタンクだけ）、
+     * 空の入れ物ならタンクから汲む。作業中は使えない（作業の素材なので）。使えたら true。
+     */
+    public boolean useTankContainer(Player player, int i) {
+        if (!hasTank() || i < 0 || i >= TANKS || isWorking()) {
+            return false;
+        }
+        net.minecraft.world.item.ItemStack carried = player.containerMenu.getCarried();
+        if (carried.isEmpty()) {
+            return false;
+        }
+        var handler = net.neoforged.neoforge.fluids.FluidUtil.getFluidHandler(carried.copyWithCount(1)).orElse(null);
+        if (handler == null) {
+            return false;
+        }
+        var tank = tanks[i];
+        var exec = net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        var contained = handler.drain(Integer.MAX_VALUE, net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
+        boolean filled = false, emptied = false;
+        if (!contained.isEmpty() && (tank.isEmpty() || net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents(tank.getFluid(), contained))) {
+            var got = handler.drain(Math.min(tank.getSpace(), contained.getAmount()), exec);     // バケツは1杯分入るときだけ
+            if (!got.isEmpty()) {
+                tank.fill(got, exec);
+                emptied = true;
+            }
+        } else if (contained.isEmpty() && !tank.isEmpty()) {
+            int put = handler.fill(tank.getFluid().copy(), exec);
+            if (put > 0) {
+                tank.drain(put, exec);
+                filled = true;
+            }
+        }
+        if (!filled && !emptied) {
+            return false;
+        }
+        net.minecraft.world.item.ItemStack result = handler.getContainer();
+        if (carried.getCount() == 1) {
+            player.containerMenu.setCarried(result);
+        } else {
+            carried.shrink(1);
+            if (!player.getInventory().add(result)) {
+                player.drop(result, false);
+            }
+        }
+        playSound(emptied ? SoundEvents.BUCKET_EMPTY : SoundEvents.BUCKET_FILL, 0.6F, 1.0F);
+        syncTanks();
+        return true;
+    }
+
+    /**
+     * 画面から: カーソルで持っている化学物質の入れ物（Mekanism のケミカルタンクなど）を、化学物質のタンク i に使う。
+     * 中身があればタンクへ入れ（空か、同じ物のタンクだけ）、空ならタンクから汲む。作業中は使えない。
+     */
+    public boolean useChemContainer(Player player, int i) {
+        int cap = chemCapacity();
+        if (cap <= 0 || i < 0 || i >= TANKS || isWorking()) {
+            return false;
+        }
+        net.minecraft.world.item.ItemStack carried = player.containerMenu.getCarried();
+        net.minecraft.world.item.ItemStack one = carried.copyWithCount(1);
+        var store = io.github.genichimaruo.singulo.android.work.Chemicals.itemStore(one);
+        if (store == null) {
+            return false;
+        }
+        var inside = io.github.genichimaruo.singulo.android.work.Chemicals.contained(one);
+        boolean moved = false;
+        if (inside != null && (chemIds[i].isEmpty() || chemIds[i].equals(inside.getKey()))) {
+            long got = store.extract(inside.getKey(), Math.min(cap - chemAmounts[i], inside.getValue()), false);
+            if (got > 0) {
+                chemIds[i] = inside.getKey();
+                chemAmounts[i] += got;
+                moved = true;
+            }
+        } else if (!chemIds[i].isEmpty()) {
+            long put = store.insert(chemIds[i], chemAmounts[i], false);
+            if (put > 0) {
+                chemAmounts[i] -= put;
+                if (chemAmounts[i] <= 0) {
+                    chemAmounts[i] = 0;
+                    chemIds[i] = "";
+                }
+                moved = true;
+            }
+        }
+        if (!moved) {
+            return false;
+        }
+        if (carried.getCount() == 1) {
+            player.containerMenu.setCarried(one);
+        } else {
+            carried.shrink(1);
+            if (!player.getInventory().add(one)) {
+                player.drop(one, false);
+            }
+        }
+        playSound(SoundEvents.BUCKET_FILL_POWDER_SNOW, 0.5F, 1.4F);
+        syncTanks();
+        return true;
+    }
+
+    /** 画面から: 化学物質のタンク i の中身を捨てる。作業中はできない。 */
+    public boolean clearChem(int i) {
+        if (chemCapacity() <= 0 || i < 0 || i >= TANKS || isWorking() || chemIds[i].isEmpty()) {
+            return false;
+        }
+        chemIds[i] = "";
+        chemAmounts[i] = 0;
+        playSound(SoundEvents.FIRE_EXTINGUISH, 0.3F, 1.6F);
+        syncTanks();
+        return true;
+    }
+
+    /** 画面から: タンク i の中身を捨てる。作業中はできない。 */
+    public boolean clearTank(int i) {
+        if (!hasTank() || i < 0 || i >= TANKS || isWorking() || tanks[i].isEmpty()) {
+            return false;
+        }
+        tanks[i].setFluid(net.neoforged.neoforge.fluids.FluidStack.EMPTY);
+        playSound(SoundEvents.BUCKET_EMPTY, 0.5F, 0.8F);
+        syncTanks();
+        return true;
+    }
+
     /** タンクの見た目を、クライアントへ知らせる。 */
     private void syncTanks() {
         if (level().isClientSide) {
             return;
         }
         boolean on = hasTank();
+        int cap = Math.max(1, fluidCapacity());
+        int chemCap = chemCapacity();
         for (int i = 0; i < TANKS; i++) {
             int v = -1;
             if (on) {
                 var f = tanks[i].getFluid();
                 v = f.isEmpty() ? 0 : (net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(f.getFluid()) + 1) << 8
-                        | Math.max(1, f.getAmount() * 100 / TANK_CAPACITY);
+                        | Math.max(1, f.getAmount() * 100 / cap);
             }
             entityData.set(i == 0 ? TANK_A : TANK_B, v);
+            entityData.set(CHEM[i], chemCap <= 0 ? "-"
+                    : chemIds[i] + ";" + (chemIds[i].isEmpty() ? 0 : Math.max(1, chemAmounts[i] * 100 / chemCap)));
         }
+    }
+
+    /** 化学物質のタンク i の入っている割合（クライアント。0〜1、化学物質のタンクがなければ -1）。 */
+    public float chemFill(int i) {
+        String v = entityData.get(CHEM[i]);
+        int sep = v.indexOf(';');
+        if (sep < 0) {
+            return -1;
+        }
+        try {
+            return Integer.parseInt(v.substring(sep + 1)) / 100F;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /** 化学物質のタンク i の中身の ID（クライアント。空なら ""）。 */
+    public String chemId(int i) {
+        String v = entityData.get(CHEM[i]);
+        int sep = v.indexOf(';');
+        return sep < 0 ? "" : v.substring(0, sep);
+    }
+
+    /** 液体のタンク1つの大きさ（クライアント。画面の数字のため）。 */
+    public int clientFluidCapacity() {
+        return fluidCapacity();
     }
 
     /** タンク i の入っている割合（クライアント。0〜1、タンクアップグレードがなければ -1）。 */
@@ -531,6 +923,11 @@ public abstract class RuinAndroid extends Monster {
         setTarget(null);
     }
 
+    /** 同じ作業指令台の、受け持つほかの注文へ移る（手が空いているとき。持ち主の物の区別はそのまま）。 */
+    public void switchOrder(int order) {
+        this.workOrder = order;
+    }
+
     /** 死亡後の転送・再印刷でも、持ち主の物と作業用の物を区別して復元する。 */
     public CompoundTag saveWorkState() {
         CompoundTag t = workGoal.saveWork();
@@ -540,7 +937,28 @@ public abstract class RuinAndroid extends Monster {
             fluids.add(tank.writeToNBT(registryAccess(), new CompoundTag()));
         }
         t.put("tanks", fluids);
+        t.put("chem_tanks", saveChems());
         return t;
+    }
+
+    /** 化学物質のタンクを保存する形に。 */
+    private net.minecraft.nbt.ListTag saveChems() {
+        net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+        for (int i = 0; i < TANKS; i++) {
+            CompoundTag c = new CompoundTag();
+            c.putString("id", chemIds[i]);
+            c.putLong("amount", chemAmounts[i]);
+            list.add(c);
+        }
+        return list;
+    }
+
+    private void loadChems(net.minecraft.nbt.ListTag list) {
+        for (int i = 0; i < TANKS; i++) {
+            CompoundTag c = i < list.size() ? list.getCompound(i) : new CompoundTag();
+            chemIds[i] = c.getString("id");
+            chemAmounts[i] = chemIds[i].isEmpty() ? 0 : Math.max(0, c.getLong("amount"));
+        }
     }
 
     public void restoreWorkState(CompoundTag t) {
@@ -553,6 +971,7 @@ public abstract class RuinAndroid extends Monster {
                 tanks[i].readFromNBT(registryAccess(), fluids.getCompound(i));
             }
         }
+        loadChems(t.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
         syncTanks();
     }
 
@@ -887,10 +1306,15 @@ public abstract class RuinAndroid extends Monster {
             builder.define(d, net.minecraft.world.item.ItemStack.EMPTY);
         }
         builder.define(TANK_B, -1);
+        for (EntityDataAccessor<String> c : CHEM) {
+            builder.define(c, "-");
+        }
+        builder.define(PATROL_LOG, new CompoundTag());
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
         builder.define(GESTURE, GESTURE_NONE);
+        builder.define(NAPPING, false);
         builder.define(TOOL, TOOL_PICKAXE);
     }
 
@@ -906,14 +1330,166 @@ public abstract class RuinAndroid extends Monster {
         setTarget(null);
     }
 
+    /** 巡回（巡回路・記録）。 */
+    final AndroidPatrol patrol = new AndroidPatrol(this);
+    /** 仲間に呼ばれて迎え撃つ相手（片付いたら、元の持ち場へ戻る）。 */
+    @Nullable
+    private LivingEntity assistTarget;
+    /** 巡回中に戦い始めた相手（仲間を呼ぶのは、相手が変わったときだけ）。 */
+    @Nullable
+    private LivingEntity engaged;
+
+    // ------------------------------------------------------------------ 経路（必須経由地点・進入禁止ゾーン）
+
+    /** 経路の決まり: 作業は作業指令台から、巡回はステーションから受け取る。 */
+    private java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> workRules = java.util.List.of(),
+            patrolRules = java.util.List.of();
+    /** 今の移動の行き先と、通る経由地点の決まり（なければ null）、もう通ったか、最後に {@link #moveVia} した時刻。 */
+    @Nullable
+    private Vec3 viaGoal;
+    @Nullable
+    private io.github.genichimaruo.singulo.android.work.PathRule viaRule;
+    private boolean viaPassed;
+    private int viaTick;
+    /** 今の移動で避ける進入禁止ゾーン（出発した所・行き先を含むゾーンは除いたもの）。 */
+    private java.util.List<net.minecraft.world.level.levelgen.structure.BoundingBox> avoidZones = java.util.List.of();
+
+    public void setWorkRules(java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> rules) {
+        workRules = rules;
+    }
+
+    public void setPatrolRules(java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> rules) {
+        patrolRules = rules;
+    }
+
+    public java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> workRules() {
+        return workRules;
+    }
+
+    public java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> patrolRules() {
+        return patrolRules;
+    }
+
+    /**
+     * 経路の決まりに従って goal へ向かう（毎 tick 呼ぶ）。対象範囲の中と外を行き来する移動なら、まず経由地点へ寄り、
+     * そのあいだ進入禁止ゾーンを避ける。repath なら経路を探し直す（経由地点を通ったときも探し直す）。経由地点を今通ったら true。
+     */
+    public boolean moveVia(Vec3 goal, double speed, java.util.List<io.github.genichimaruo.singulo.android.work.PathRule> rules, boolean repath) {
+        viaTick = tickCount;
+        if (viaGoal == null || viaGoal.distanceToSqr(goal) > 1) {
+            // 新しい移動: 対象範囲をまたぐ決まりのうち、経由地点が一番近いもの
+            viaGoal = goal;
+            viaPassed = false;
+            viaRule = null;
+            for (var r : rules) {
+                if (r.crosses(position(), goal) && (viaRule == null || r.stand().distanceToSqr(position()) < viaRule.stand().distanceToSqr(position()))) {
+                    viaRule = r;
+                }
+            }
+            java.util.List<net.minecraft.world.level.levelgen.structure.BoundingBox> zones = new java.util.ArrayList<>();
+            if (viaRule != null) {
+                for (var z : viaRule.zones()) {
+                    boolean exempt = io.github.genichimaruo.singulo.android.work.PathRule.inside(z, getX(), getY(), getZ())
+                            || io.github.genichimaruo.singulo.android.work.PathRule.inside(z, goal.x, goal.y, goal.z);
+                    if (!exempt) {
+                        zones.add(z);
+                    }
+                }
+            }
+            avoidZones = java.util.List.copyOf(zones);
+            repath = true;
+        }
+        boolean passed = false;
+        Vec3 dest = goal;
+        if (viaRule != null && !viaPassed) {
+            Vec3 w = viaRule.stand();
+            Vec3 d = w.subtract(position());
+            if (d.horizontalDistance() < 1.5 && Math.abs(d.y) < 2) {
+                viaPassed = true;                  // 経由地点を通った: 行き先へ
+                passed = true;
+                repath = true;
+            } else {
+                dest = w;
+            }
+        }
+        if (repath || getNavigation().isDone()) {
+            getNavigation().moveTo(dest.x, dest.y, dest.z, speed);
+        }
+        return passed;
+    }
+
+    /** 経路探しで、このブロックに入ってはいけないか（今の移動で避ける進入禁止ゾーンの中）。 */
+    boolean forbidden(int x, int y, int z) {
+        java.util.List<net.minecraft.world.level.levelgen.structure.BoundingBox> zones = avoidZones;
+        if (zones == null) {
+            return false;
+        }
+        for (var box : zones) {
+            if (io.github.genichimaruo.singulo.android.work.PathRule.inside(box, x + 0.5, y, z + 0.5)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 経路探しで、進入禁止ゾーンを通れないところとして扱う。 */
+    @Override
+    protected net.minecraft.world.entity.ai.navigation.PathNavigation createNavigation(Level level) {
+        return new net.minecraft.world.entity.ai.navigation.GroundPathNavigation(this, level) {
+            @Override
+            protected net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int maxVisitedNodes) {
+                this.nodeEvaluator = new net.minecraft.world.level.pathfinder.WalkNodeEvaluator() {
+                    @Override
+                    public net.minecraft.world.level.pathfinder.PathType getPathTypeOfMob(
+                            net.minecraft.world.level.pathfinder.PathfindingContext context, int x, int y, int z, net.minecraft.world.entity.Mob mob) {
+                        return mob instanceof RuinAndroid a && a.forbidden(x, y, z) ? net.minecraft.world.level.pathfinder.PathType.BLOCKED
+                                : super.getPathTypeOfMob(context, x, y, z, mob);
+                    }
+                };
+                this.nodeEvaluator.setCanPassDoors(true);
+                return new net.minecraft.world.level.pathfinder.PathFinder(this.nodeEvaluator, maxVisitedNodes);
+            }
+        };
+    }
+
+    /** ステーションの巡回の設定を受け取る。 */
+    public void setPatrol(java.util.List<BlockPos> route, boolean backAndForth, boolean nightOnly, int dwellTicks) {
+        patrol.configure(route, backAndForth, nightOnly, dwellTicks);
+    }
+
+    /** 仲間に呼ばれた: その相手を迎え撃つ（持ち場から離れていても）。 */
+    public void assist(LivingEntity target) {
+        assistTarget = target;
+        setTarget(target);
+    }
+
+    /** 巡回の記録が変わった: クライアントへ送る。 */
+    void syncPatrolLog() {
+        entityData.set(PATROL_LOG, patrol.logTag());
+    }
+
+    /** 巡回の記録（新しい順。クライアントでも読める）。 */
+    public java.util.List<AndroidPatrol.Entry> patrolLog() {
+        return AndroidPatrol.readLog(entityData.get(PATROL_LOG));
+    }
+
+    /** 倒した相手を、記録に残す（追従中は除く）。 */
+    @Override
+    public boolean killedEntity(ServerLevel level, LivingEntity killed) {
+        if (guard && mode != MODE_FOLLOW && killed != this) {
+            patrol.onKill(level, killed);
+        }
+        return super.killedEntity(level, killed);
+    }
+
     /** ステーションの設定を受け取る。 */
     public void configure(int mode, int retreatPercent) {
-        this.mode = Mth.clamp(mode, MODE_GUARD, MODE_FOLLOW);
+        this.mode = Mth.clamp(mode, MODE_GUARD, MODE_PATROL);
         this.retreatPercent = Mth.clamp(retreatPercent, 0, 90);
         if (home != null) {
             if (this.mode == MODE_WANDER) {
                 restrictTo(home, WANDER_RADIUS);
-            } else if (this.mode == MODE_FOLLOW) {
+            } else if (this.mode == MODE_FOLLOW || this.mode == MODE_PATROL) {
                 clearRestriction();
             } else {
                 restrictTo(home, 4);
@@ -923,6 +1499,37 @@ public abstract class RuinAndroid extends Monster {
 
     public boolean isGuard() {
         return level().isClientSide ? entityData.get(GUARD) : guard;
+    }
+
+    /** 廃アンドロイド工場の製造ラインが印刷した個体（何も落とさず、経験値もない）と、そのうちの試作機（体力はそのまま）。 */
+    private boolean factoryMade, prototype;
+
+    /** 工場で印刷された個体にする。量産型（prototype でない）は体力が半分。 */
+    public void makeFactoryMade(boolean prototype) {
+        this.factoryMade = true;
+        this.prototype = prototype;
+        xpReward = 0;
+        if (!prototype) {
+            var max = getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+            max.setBaseValue(max.getBaseValue() * 0.5);
+            setHealth(getMaxHealth());
+        }
+    }
+
+    public boolean factoryMade() {
+        return factoryMade;
+    }
+
+    public boolean prototype() {
+        return prototype;
+    }
+
+    /** 工場で印刷された個体は何も落とさない。 */
+    @Override
+    protected void dropFromLootTable(DamageSource source, boolean recentlyHit) {
+        if (!factoryMade) {
+            super.dropFromLootTable(source, recentlyHit);
+        }
     }
 
     @Nullable
@@ -1024,6 +1631,9 @@ public abstract class RuinAndroid extends Monster {
     /** 敵を探す中心（迎撃・徘徊はステーション、追従は持ち主）。 */
     @Nullable
     Vec3 guardAnchor() {
+        if (mode == MODE_PATROL) {
+            return position();                     // 巡回中は、今いる所のまわり
+        }
         if (mode == MODE_FOLLOW) {
             Player p = ownerPlayer();
             if (p != null) {
@@ -1061,6 +1671,9 @@ public abstract class RuinAndroid extends Monster {
 
     /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
     boolean guardTargets(LivingEntity e) {
+        if (e == assistTarget && e.isAlive() && e.distanceToSqr(this) < AndroidPatrol.CALL_RANGE * AndroidPatrol.CALL_RANGE) {
+            return true;                           // 仲間に呼ばれた相手
+        }
         if (workConsole != null) {
             // 作業中は、自分を襲ってきた相手だけ迎え撃つ（近くにいる間）。片付けたら作業に戻る
             return hostileToGuards(e) && e == getLastHurtByMob() && e.isAlive() && e.distanceToSqr(this) < WORK_DEFEND_RANGE * WORK_DEFEND_RANGE;
@@ -1173,6 +1786,11 @@ public abstract class RuinAndroid extends Monster {
         entityData.set(PRINT, 0);
     }
 
+    /** 印刷を ticks だけ進めておく（工場式印刷ユニット）。 */
+    public void skipPrinting(int ticks) {
+        entityData.set(PRINT, Mth.clamp(entityData.get(PRINT) + ticks, 0, PRINT_TICKS - 1));
+    }
+
     /** スポーンエッグやコマンドで出したときも、印刷されて現れる。 */
     @Override
     public net.minecraft.world.entity.SpawnGroupData finalizeSpawn(net.minecraft.world.level.ServerLevelAccessor level,
@@ -1224,6 +1842,8 @@ public abstract class RuinAndroid extends Monster {
         workGoal = new AndroidWorkGoal(this);
         goalSelector.addGoal(2, workGoal);
         registerCombat();
+        life = new AndroidLife(this);
+        goalSelector.addGoal(4, life);
         goalSelector.addGoal(5, new GuardGoal());
         goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
             @Override
@@ -1307,6 +1927,26 @@ public abstract class RuinAndroid extends Monster {
         if (guard && getTarget() != null && !guardTargets(getTarget())) {
             setTarget(null);
         }
+        if (getTarget() == null) {
+            assistTarget = null;
+        }
+        if (viaGoal != null && tickCount - viaTick > 40) {
+            // 経路に従った移動が終わった（着いた・ほかの動きになった）: 進入禁止ゾーンを避けるのをやめる
+            viaGoal = null;
+            viaRule = null;
+            avoidZones = java.util.List.of();
+        }
+        if (guard && mode == MODE_PATROL && printed() && active() && level() instanceof ServerLevel pl) {
+            // 巡回中: 戦い始めたら仲間を呼び、毎秒、敵の群れ・ボスを探して警報を出す
+            LivingEntity t = getTarget();
+            if (t != null && t != engaged) {
+                patrol.engage(pl, t);
+            }
+            engaged = t;
+            if (tickCount % 20 == 3 && patrol.active(pl)) {
+                patrol.scan(pl);
+            }
+        }
         if (gestureTicks > 0) {
             if (gestureLook != null && gestureLook.isAlive()) {
                 getLookControl().setLookAt(gestureLook, 60, 60);
@@ -1332,6 +1972,9 @@ public abstract class RuinAndroid extends Monster {
             entityData.set(PRINT, p + 1);
             setDeltaMovement(0, Math.min(0, getDeltaMovement().y), 0);
             if (p + 1 == PRINT_TICKS) {
+                if (guard && owner != null && level() instanceof ServerLevel server) {
+                    io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), owner, "android_printed");
+                }
                 playSound(SoundEvents.BEACON_ACTIVATE, 0.8F, 1.8F);
             } else if (p % 6 == 0) {
                 playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.4F, 1.4F + p / (float) PRINT_TICKS);
@@ -1398,6 +2041,9 @@ public abstract class RuinAndroid extends Monster {
     /** 遺構のアンドロイドがいなくなったら、印刷台に知らせる（倒されたか、ただ消えたか）。読み込みが外れただけなら知らせない。 */
     @Override
     public void remove(RemovalReason reason) {
+        if (reason.shouldDestroy() && level() instanceof ServerLevel && life != null) {
+            life.dropHeld();
+        }
         super.remove(reason);
         if (!guard && home != null && reason.shouldDestroy() && level() instanceof ServerLevel level && level.isLoaded(home)
                 && level.getBlockEntity(home) instanceof AndroidFabricatorBlockEntity fabricator) {
@@ -1484,6 +2130,10 @@ public abstract class RuinAndroid extends Monster {
         if (home != null) {
             tag.put("home", NbtUtils.writeBlockPos(home));
         }
+        if (factoryMade) {
+            tag.putBoolean("factory_made", true);
+            tag.putBoolean("prototype", prototype);
+        }
         net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items = net.minecraft.core.NonNullList.withSize(INVENTORY_SIZE,
                 net.minecraft.world.item.ItemStack.EMPTY);
         for (int i = 0; i < INVENTORY_SIZE; i++) {
@@ -1495,6 +2145,7 @@ public abstract class RuinAndroid extends Monster {
             tl.add(t.writeToNBT(registryAccess(), new CompoundTag()));
         }
         tag.put("tanks", tl);
+        tag.put("chem_tanks", saveChems());
         tag.putBoolean("work", workEnabled);
         if (workConsole != null) {
             tag.put("work_console", NbtUtils.writeBlockPos(workConsole));
@@ -1510,6 +2161,10 @@ public abstract class RuinAndroid extends Monster {
             }
             tag.putInt("mode", mode);
             tag.putInt("retreat", retreatPercent);
+            tag.put("patrol", patrol.save());
+            if (life != null) {
+                tag.put("life", life.save());
+            }
             tag.putBoolean("escort", escort);
             tag.putBoolean("escort_pending", escortPending);
             net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
@@ -1535,6 +2190,11 @@ public abstract class RuinAndroid extends Monster {
         NbtUtils.readBlockPos(tag, "home").ifPresent(this::setHome);
         guard = tag.getBoolean("guard");
         dismantling = tag.getBoolean("dismantling");
+        factoryMade = tag.getBoolean("factory_made");
+        prototype = tag.getBoolean("prototype");
+        if (factoryMade) {
+            xpReward = 0;
+        }
         entityData.set(GUARD, guard);
         loadInventory(tag);
         net.minecraft.nbt.ListTag tl = tag.getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND);
@@ -1544,6 +2204,7 @@ public abstract class RuinAndroid extends Monster {
                 tanks[i].readFromNBT(registryAccess(), tl.getCompound(i));
             }
         }
+        loadChems(tag.getList("chem_tanks", net.minecraft.nbt.Tag.TAG_COMPOUND));
         syncTanks();
         workEnabled = !tag.contains("work") || tag.getBoolean("work");
         NbtUtils.readBlockPos(tag, "work_console").ifPresentOrElse(p -> {
@@ -1566,6 +2227,11 @@ public abstract class RuinAndroid extends Monster {
                 members.add(NbtUtils.loadUUID(t));
             }
             leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
+            patrol.load(tag.getCompound("patrol"));
+            if (life != null) {
+                life.load(tag.getCompound("life"));
+            }
+            syncPatrolLog();
         }
         if (charge() <= 0) {
             setState(STATE_LOW_POWER);
@@ -1590,6 +2256,9 @@ public abstract class RuinAndroid extends Monster {
 
         @Override
         public void tick() {
+            if (mode == MODE_PATROL && level() instanceof ServerLevel pl && patrol.tick(pl)) {
+                return;                            // 巡回路を回っている（巡回しないとき（夜だけ・巡回路なし）は、ステーションのそばで待つ）
+            }
             if (mode == MODE_FOLLOW) {
                 Player p = ownerPlayer();
                 if (p == null) {
@@ -1814,8 +2483,8 @@ public abstract class RuinAndroid extends Monster {
                     if (!(home != null && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station
                             && station.drawCharge(AndroidStationBlockEntity.FE_PER_CHARGE_TICK))) {
                         rate = 0;
-                    } else if (stateTicks % 4 == 0 && getHealth() < getMaxHealth()) {
-                        heal(1);
+                    } else if (stateTicks % (station.hasPrintUnit() ? 2 : 4) == 0 && getHealth() < getMaxHealth()) {
+                        heal(1);                     // 工場式印刷ユニットがあれば2倍速く直す
                     }
                 }
                 setCharge(charge() + rate);

@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=north,running=false,warn=false": {
+      "model": "singulo:block/factory_conveyor"
+    },
+    "facing=north,running=false,warn=true": {
+      "model": "singulo:block/factory_conveyor"
+    },
+    "facing=north,running=true,warn=false": {
+      "model": "singulo:block/factory_conveyor_running"
+    },
+    "facing=north,running=true,warn=true": {
+      "model": "singulo:block/factory_conveyor_warn"
+    },
+    "facing=east,running=false,warn=false": {
+      "model": "singulo:block/factory_conveyor",
+      "y": 90
+    },
+    "facing=east,running=false,warn=true": {
+      "model": "singulo:block/factory_conveyor",
+      "y": 90
+    },
+    "facing=east,running=true,warn=false": {
+      "model": "singulo:block/factory_conveyor_running",
+      "y": 90
+    },
+    "facing=east,running=true,warn=true": {
+      "model": "singulo:block/factory_conveyor_warn",
+      "y": 90
+    },
+    "facing=south,running=false,warn=false": {
+      "model": "singulo:block/factory_conveyor",
+      "y": 180
+    },
+    "facing=south,running=false,warn=true": {
+      "model": "singulo:block/factory_conveyor",
+      "y": 180
+    },
+    "facing=south,running=true,warn=false": {
+      "model": "singulo:block/factory_conveyor_running",
+      "y": 180
+    },
+    "facing=south,running=true,warn=true": {
+      "model": "singulo:block/factory_conveyor_warn",
+      "y": 180
+    },
+    "facing=west,running=false,warn=false": {
+      "model": "singulo:block/factory_conveyor",
+      "y": 270
+    },
+    "facing=west,running=false,warn=true": {
+      "model": "singulo:block/factory_conveyor",
+      "y": 270
+    },
+    "facing=west,running=true,warn=false": {
+      "model": "singulo:block/factory_conveyor_running",
+      "y": 270
+    },
+    "facing=west,running=true,warn=true": {
+      "model": "singulo:block/factory_conveyor_warn",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RKR",
+    " B "
+  ],
+  "key": {
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "K": {
+      "item": "singulo:ceramic_substrate"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "id": "singulo:area_card",
+    "count": 4
+  }
+}

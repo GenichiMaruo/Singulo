@@ -2,5 +2,13 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "singulo:item/work_location_card"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "singulo:recorded": 1
+      },
+      "model": "singulo:item/work_location_card_recorded"
+    }
+  ]
 }

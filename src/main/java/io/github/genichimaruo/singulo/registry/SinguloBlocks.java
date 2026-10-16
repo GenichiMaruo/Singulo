@@ -391,6 +391,77 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.EchoProjectorBlock> ECHO_PROJECTOR = BLOCKS.register("echo_projector",
             () -> new io.github.genichimaruo.singulo.ruin.EchoProjectorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIAMOND)
                     .strength(1.5F, 6.0F).sound(SoundType.AMETHYST).lightLevel(s -> 8).noOcclusion()));
+    /** 製造ライン（廃アンドロイド工場のボス部屋の仕掛け。素手でも壊せ、何も落とさない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FactoryLineBlock> FACTORY_LINE = BLOCKS.register("factory_line",
+            () -> new io.github.genichimaruo.singulo.ruin.FactoryLineBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE)
+                    .strength(1.5F, 6.0F).sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 7).noOcclusion()));
+    /** 工場のコンベア（動いている間は、上に乗ったものを流す）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock> FACTORY_CONVEYOR = BLOCKS.register("factory_conveyor",
+            () -> new io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
+                    .strength(2.0F, 6.0F).sound(SoundType.METAL)));
+    // ---- 地下アンドロイド研究所（作れない。白い建材は硬く、鉄以上のツルハシで掘る）
+    public static final DeferredBlock<Block> LAB_PANEL = pristine("lab_panel", 0);
+    public static final DeferredBlock<Block> LAB_PANEL_LINED = pristine("lab_panel_lined", 0);
+    public static final DeferredBlock<Block> LAB_TILES = pristine("lab_tiles", 0);
+    public static final DeferredBlock<Block> LAB_FRAME = BLOCKS.registerSimpleBlock("lab_frame", BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_GRAY).strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK));
+    public static final DeferredBlock<TransparentBlock> LAB_GLASS = glass("lab_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.GLASS);
+    /** 施設灯（電力で白く光る）・非常灯（電力がない間だけ赤く光る）・炉心（電力で強く光る）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> FACILITY_LIGHT = BLOCKS.register("facility_light",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                    .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 0)));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> EMERGENCY_LIGHT = BLOCKS.register("emergency_light",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
+                    .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 0 : 7)));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> REACTOR_CORE = BLOCKS.register("reactor_core",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 3)));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> POWER_CONDUIT = BLOCKS.register("power_conduit",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN)
+                    .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 10 : 0)));
+    /** 耐圧殻（封じられている間は壊せない。黒曜石より硬い。爆発では壊れない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> PRESSURE_HULL = BLOCKS.register("pressure_hull",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
+                    .strength(75.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** 隔壁（ボス部屋の出入口。壊せない。電力が戻ると開く）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock> BULKHEAD = BLOCKS.register("bulkhead",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock(unbreakable().noOcclusion()
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** 動力炉の制御盤（壊せない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock> REACTOR_CONSOLE = BLOCKS.register("reactor_console",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlock(unbreakable().lightLevel(s -> 5)));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock> SERVER_RACK = BLOCKS.register("server_rack",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                    .strength(4.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabFacingBlock.POWERED) ? 4 : 0)));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabTerminalBlock> LAB_TERMINAL = BLOCKS.register("lab_terminal",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabTerminalBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                    .strength(4.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).lightLevel(s -> 4)));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.AndroidCapsuleBlock> ANDROID_CAPSULE = BLOCKS.register("android_capsule",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.AndroidCapsuleBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                    .strength(3.0F, 9.0F).sound(SoundType.GLASS).noOcclusion()));
+    /** 研究所の小物（机のモニター・コーヒーメーカー・書類の山・ごみ箱・自販機）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> DESK_MONITOR = BLOCKS.register("desk_monitor",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL).lightLevel(s -> 3), Block.box(2, 0, 2, 14, 12, 14), null, null));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> COFFEE_MAKER = BLOCKS.register("coffee_maker",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL), Block.box(4, 0, 4, 12, 13, 13), "lab.singulo.coffee",
+                    net.minecraft.sounds.SoundEvents.BREWING_STAND_BREW));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> PAPER_STACK = BLOCKS.register("paper_stack",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.WOOL).strength(0.3F), Block.box(3, 0, 3, 13, 5, 13), null, null));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> TRASH_BIN = BLOCKS.register("trash_bin",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL), Block.box(4, 0, 4, 12, 10, 12), null, null));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock> VENDING_MACHINE = BLOCKS.register("vending_machine",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock(decor(SoundType.METAL).strength(3.0F, 9.0F).lightLevel(s -> 6)));
+
+    private static BlockBehaviour.Properties decor(SoundType sound) {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(1.0F, 3.0F).sound(sound).noOcclusion();
+    }
+
     /** ニュートリノ観測所（設置型のニュートリノ・スキャナー）。 */
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.NeutrinoObservatoryBlockEntity>> NEUTRINO_OBSERVATORY =
             BLOCKS.register("neutrino_observatory", () -> new SimpleMachineBlock<>(machineProperties(),

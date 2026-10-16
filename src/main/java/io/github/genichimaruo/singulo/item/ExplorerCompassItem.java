@@ -32,10 +32,14 @@ import net.minecraft.world.level.levelgen.structure.Structure;
  * <p>
  * はじめは地表観測拠点しか探せない。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして右クリックすると、
  * そこに残る記録でコンパスを調整し、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設 → 沈んだ炉心区画）も探せるようになる。
+ * 廃アンドロイド工場は封鎖培養施設と並ぶ分かれ道で、研究棟で調整すると（封鎖培養施設と一緒に）探せるようになる。
  */
 public class ExplorerCompassItem extends SinguloItem {
     public static final String[] TARGETS = {"observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor"};
     public static final int SEARCH_CHUNKS = 64;
+    /** 分かれ道の遺構（封鎖培養施設と同じ段階）。TARGETS のこの段階まで探せるようになると、一緒に探せる。 */
+    public static final String BRANCH = "android_lab";
+    static final int BRANCH_LEVEL = 3;
 
     public ExplorerCompassItem(Properties properties, int stage) {
         super(properties.stacksTo(1), stage, false);
@@ -46,8 +50,23 @@ public class ExplorerCompassItem extends SinguloItem {
         return Math.max(1, Math.min(TARGETS.length, stack.getOrDefault(SinguloComponents.COMPASS_LEVEL.get(), 1)));
     }
 
+    /** 今探せる遺構（調整の段階までの TARGETS と、分かれ道の遺構）。 */
+    public static List<String> targets(ItemStack stack) {
+        int lv = level(stack);
+        List<String> out = new java.util.ArrayList<>(java.util.Arrays.asList(TARGETS).subList(0, lv));
+        if (lv >= BRANCH_LEVEL) {
+            out.add(BRANCH);
+        }
+        return out;
+    }
+
     public static int target(ItemStack stack) {
-        return Math.floorMod(stack.getOrDefault(SinguloComponents.HOLO_SIZE.get(), 0), level(stack));
+        return Math.floorMod(stack.getOrDefault(SinguloComponents.HOLO_SIZE.get(), 0), targets(stack).size());
+    }
+
+    /** 今探す遺構のID。 */
+    public static String targetId(ItemStack stack) {
+        return targets(stack).get(target(stack));
     }
 
     /**
@@ -84,8 +103,10 @@ public class ExplorerCompassItem extends SinguloItem {
             return net.minecraft.world.InteractionResult.FAIL;
         }
         upgrade(stack);
-        player.displayClientMessage(Component.translatable("compass.singulo.upgraded",
-                Component.translatable("ruin.singulo." + TARGETS[lv])), true);
+        player.displayClientMessage(lv + 1 == BRANCH_LEVEL
+                ? Component.translatable("compass.singulo.upgraded_branch", Component.translatable("ruin.singulo." + TARGETS[lv]),
+                        Component.translatable("ruin.singulo." + BRANCH))
+                : Component.translatable("compass.singulo.upgraded", Component.translatable("ruin.singulo." + TARGETS[lv])), true);
         level.playSound(null, context.getClickedPos(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1.0F, 0.7F);
         level.playSound(null, context.getClickedPos(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 1.2F);
         if (level instanceof ServerLevel server) {
@@ -120,11 +141,11 @@ public class ExplorerCompassItem extends SinguloItem {
             stack.set(SinguloComponents.HOLO_SIZE.get(), target(stack) + 1);
             stack.remove(DataComponents.LODESTONE_TRACKER);
             player.displayClientMessage(Component.translatable("compass.singulo.target",
-                    Component.translatable("ruin.singulo." + TARGETS[target(stack)])), true);
+                    Component.translatable("ruin.singulo." + targetId(stack))), true);
             return InteractionResultHolder.success(stack);
         }
         ServerLevel server = (ServerLevel) level;
-        String rid = TARGETS[target(stack)];
+        String rid = targetId(stack);
         Optional<Holder.Reference<Structure>> holder = server.registryAccess().registryOrThrow(Registries.STRUCTURE)
                 .getHolder(ResourceKey.create(Registries.STRUCTURE, Singulo.id(rid)));
         Pair<BlockPos, Holder<Structure>> found = holder.isEmpty() ? null : server.getChunkSource().getGenerator()
@@ -136,7 +157,8 @@ public class ExplorerCompassItem extends SinguloItem {
                     Component.translatable("ruin.singulo." + rid)), true);
             return InteractionResultHolder.fail(stack);
         }
-        BlockPos p = center(server, found.getFirst(), holder.get().value());
+        // 地下アンドロイド研究所は、施設の真ん中ではなく主立坑（探す位置そのもの）を指す
+        BlockPos p = rid.equals(BRANCH) ? found.getFirst() : center(server, found.getFirst(), holder.get().value());
         stack.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(level.dimension(), p)), false));
         int dist = (int) Math.sqrt(player.blockPosition().distSqr(new BlockPos(p.getX(), player.getBlockY(), p.getZ())));
         player.displayClientMessage(Component.translatable("compass.singulo.found",
@@ -168,7 +190,7 @@ public class ExplorerCompassItem extends SinguloItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        tooltip.add(Component.translatable("compass.singulo.target", Component.translatable("ruin.singulo." + TARGETS[target(stack)]))
+        tooltip.add(Component.translatable("compass.singulo.target", Component.translatable("ruin.singulo." + targetId(stack)))
                 .withStyle(ChatFormatting.GRAY));
         int lv = level(stack);
         tooltip.add(Component.translatable("compass.singulo.level", lv, TARGETS.length).withStyle(ChatFormatting.GRAY));

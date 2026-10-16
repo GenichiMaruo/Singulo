@@ -37,6 +37,8 @@ neoForge {
         }
         server {
             server()
+            // -PserverDir=... で別のフォルダのワールドを使う（遺構の自己点検を、開発用のワールドを汚さずに走らせる）
+            gameDirectory = project.file(providers.gradleProperty('serverDir').getOrElse('run'))
             programArgument '--nogui'
             systemProperty 'singulo.ruinSelfCheck', providers.gradleProperty('ruinSelfCheck').getOrElse('false')
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
@@ -46,7 +48,7 @@ neoForge {
             // Keep tests separate from development worlds and local server settings.
             gameDirectory = project.file('build/gametest')
             // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
-            systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse(project.mod_id)
+            systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_prototype,singulo_progression')
             // テストは tick で数えるので、時計を速めても結果は変わらない（-PtestTickRate=20 で普通の速さ）
             systemProperty 'singulo.gameTestTickRate', providers.gradleProperty('testTickRate').getOrElse('200')
         }
@@ -63,6 +65,15 @@ neoForge {
     }
 }
 
+// GameTest は毎回まっさらなワールドで走らせる。テストは実行ごとに新しい場所に組まれ、前の回の場所はワールドに残る
+// （世界線アンカーが読み込み続けるチャンクの反応炉・ワームホールなどが動き続け、回を重ねるほど遅く・不安定になる）。
+var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
+    delete layout.projectDirectory.dir('build/gametest/world')
+}
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    dependsOn cleanGameTestWorld
+}
+
 configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
@@ -77,6 +88,14 @@ repositories {
             includeGroup 'net.mezzdev.config'
         }
     }
+    // Mekanism（化学物質のタンクアップグレード。任意の連携）
+    maven {
+        name = 'ModMaven'
+        url = 'https://modmaven.dev/'
+        content {
+            includeGroup 'mekanism'
+        }
+    }
 }
 
 dependencies {
@@ -84,6 +103,12 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    // Mekanism も任意の連携（入っていなくても遊べる。依存関係には書かない）。API だけでコンパイルし、
+    // -PwithMekanism を付けたときだけ、開発中の起動（クライアント・GameTest）に本体を入れる
+    compileOnly "mekanism:Mekanism:${mekanism_version}:api"
+    if (providers.gradleProperty('withMekanism').isPresent()) {
+        localRuntime "mekanism:Mekanism:${mekanism_version}"
+    }
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

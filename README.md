@@ -18,6 +18,11 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 
 ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) や [GitHub Releases](https://github.com/GenichiMaruo/Singulo/releases) からも選べます。
 
+## 0.8.0の統合内容（Minecraft 1.21.1 / NeoForge）
+
+作業の連続処理、範囲カード・経路指定、巡回警備と記録、待機中の仕草、地下研究所と製造統括AI、試作機アルマ／ノクス、73件の実績ツリーを追加します。Mekanism導入時は化学物質の運搬にも対応します。
+この節はソースの統合内容です。配布済みファイルはダウンロード先で確認してください。1.20.1向けは引き続き別ブランチで管理します。
+
 ## 何ができる？
 
 - **工場を育てる** — 温度差で発電し、素材の焼成・圧縮・電解から超伝導や量子部品の生産へ進む、5段階の技術体系。
@@ -54,7 +59,7 @@ Singulo を気に入ってもらえたら、[Ko-fi](https://ko-fi.com/graycat9) 
 
 ## 開発するには
 
-GradleはJDK 25、Minecraftのコンパイルと実行はJDK 21を使用します。`gradle.properties` の `org.gradle.java.home` は開発者環境のパスなので、自分のJDK 25の場所に合わせてください。JDK 21はGradleのツールチェーンが取得します。
+Java 21を用意し、`JAVA_HOME` をその場所へ設定します。Gradleは呼び出し元のJavaを使用し、Minecraftのコンパイルと実行にはJava 21のツールチェーンを使います。
 
 ```sh
 ./gradlew build

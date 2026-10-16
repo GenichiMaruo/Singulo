@@ -71,6 +71,11 @@ public final class SinguloItems {
     /** 作業位置カードとレシピカード（アンドロイドの作業）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.WorkLocationCardItem> WORK_LOCATION_CARD = ITEMS.register(
             "work_location_card", () -> new io.github.genichimaruo.singulo.android.work.WorkLocationCardItem(new Item.Properties()));
+    /** 範囲カード（2つの角で囲った範囲）と、記録した場所を見せる測量メガネ。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.AreaCardItem> AREA_CARD = ITEMS.register(
+            "area_card", () -> new io.github.genichimaruo.singulo.android.work.AreaCardItem(new Item.Properties()));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.SurveyGlassesItem> SURVEY_GLASSES = ITEMS.register(
+            "survey_glasses", () -> new io.github.genichimaruo.singulo.android.work.SurveyGlassesItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.RecipeCardItem> RECIPE_CARD = ITEMS.register(
             "recipe_card", () -> new io.github.genichimaruo.singulo.android.work.RecipeCardItem(new Item.Properties()));
     /** アンドロイドの装飾（頭・背中/腰・手）。 */
@@ -113,6 +118,9 @@ public final class SinguloItems {
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
+    /** 化学物質の見本（Mekanism の化学物質。作業の自動化の内部の目印。手に入れる物ではない）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ChemicalSampleItem> CHEMICAL_SAMPLE = ITEMS.register(
+            "chemical_sample", () -> new io.github.genichimaruo.singulo.android.work.ChemicalSampleItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ProcedureCardItem> PROCEDURE_CARD = ITEMS.register(
             "procedure_card", () -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
@@ -123,6 +131,10 @@ public final class SinguloItems {
             () -> new DeferredSpawnEggItem(SinguloEntities.WHIP_ANDROID, 0x2A2A36, 0xFF6AC4, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SABER_ANDROID_SPAWN_EGG = ITEMS.register("saber_android_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.SABER_ANDROID, 0xDCE0E8, 0xFFC45A, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> AXE_ANDROID_SPAWN_EGG = ITEMS.register("axe_android_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.AXE_ANDROID, 0xB86A48, 0xFF6E40, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> BIT_ANDROID_SPAWN_EGG = ITEMS.register("bit_android_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.BIT_ANDROID, 0x2C345C, 0xB080FF, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
@@ -133,6 +145,8 @@ public final class SinguloItems {
             () -> new DeferredSpawnEggItem(SinguloEntities.ERGOSPHERE_LEVIATHAN, 0x1A1424, 0x8A5CFF, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> LAST_ARCHIVIST_SPAWN_EGG = ITEMS.register("last_archivist_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.LAST_ARCHIVIST, 0xECE4D2, 0xFFD27A, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> FOUNDRY_OVERSEER_SPAWN_EGG = ITEMS.register("foundry_overseer_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.FOUNDRY_OVERSEER, 0x2E333D, 0xF08C3C, new Item.Properties()));
     /** 封印コンテナからしか出ない道具。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.item.GravityBootsItem> GRAVITY_BOOTS = ITEMS.register(
             "gravity_boots", () -> new io.github.genichimaruo.singulo.item.GravityBootsItem(new Item.Properties().rarity(Rarity.RARE), 3));
@@ -185,6 +199,8 @@ public final class SinguloItems {
             Map.entry("android_teacup", 1),
             Map.entry("android_umbrella", 1),
             Map.entry("work_location_card", 2),
+            Map.entry("area_card", 2),
+            Map.entry("survey_glasses", 2),
             Map.entry("recipe_card", 2),
             Map.entry("procedure_card", 2),
             Map.entry("explorer_compass", 1),
@@ -267,6 +283,8 @@ public final class SinguloItems {
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
         TAB_ORDER.add(WORK_LOCATION_CARD);
+        TAB_ORDER.add(AREA_CARD);
+        TAB_ORDER.add(SURVEY_GLASSES);
         TAB_ORDER.add(RECIPE_CARD);
         TAB_ORDER.add(PROCEDURE_CARD);
         TAB_ORDER.addAll(ACCESSORIES);
@@ -350,10 +368,34 @@ public final class SinguloItems {
         block(SinguloBlocks.SEAL_CONSOLE, 1);
         block(SinguloBlocks.GUARDIAN_CORE, 1);
         block(SinguloBlocks.ECHO_PROJECTOR, 1);
+        block(SinguloBlocks.FACTORY_LINE, 1);
+        block(SinguloBlocks.FACTORY_CONVEYOR, 1);
+        block(SinguloBlocks.LAB_PANEL, 1);
+        block(SinguloBlocks.LAB_PANEL_LINED, 1);
+        block(SinguloBlocks.LAB_TILES, 1);
+        block(SinguloBlocks.LAB_FRAME, 1);
+        block(SinguloBlocks.LAB_GLASS, 1);
+        block(SinguloBlocks.FACILITY_LIGHT, 1);
+        block(SinguloBlocks.EMERGENCY_LIGHT, 1);
+        block(SinguloBlocks.REACTOR_CORE, 1);
+        block(SinguloBlocks.POWER_CONDUIT, 1);
+        block(SinguloBlocks.PRESSURE_HULL, 1);
+        block(SinguloBlocks.BULKHEAD, 1);
+        block(SinguloBlocks.REACTOR_CONSOLE, 1);
+        block(SinguloBlocks.SERVER_RACK, 1);
+        block(SinguloBlocks.LAB_TERMINAL, 1);
+        block(SinguloBlocks.ANDROID_CAPSULE, 1);
+        block(SinguloBlocks.DESK_MONITOR, 1);
+        block(SinguloBlocks.COFFEE_MAKER, 1);
+        block(SinguloBlocks.VENDING_MACHINE, 1);
+        block(SinguloBlocks.PAPER_STACK, 1);
+        block(SinguloBlocks.TRASH_BIN, 1);
         TAB_ORDER.add(SECURITY_DRONE_SPAWN_EGG);
         TAB_ORDER.add(BLADE_ANDROID_SPAWN_EGG);
         TAB_ORDER.add(WHIP_ANDROID_SPAWN_EGG);
         TAB_ORDER.add(SABER_ANDROID_SPAWN_EGG);
+        TAB_ORDER.add(AXE_ANDROID_SPAWN_EGG);
+        TAB_ORDER.add(BIT_ANDROID_SPAWN_EGG);
         for (var lamp : java.util.List.of(SinguloBlocks.RUIN_LAMP_AMBER, SinguloBlocks.RUIN_LAMP_VERDANT, SinguloBlocks.RUIN_LAMP_VIOLET,
                 SinguloBlocks.RUIN_LAMP_CRIMSON)) {
             block(lamp, 1);

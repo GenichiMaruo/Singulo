@@ -494,6 +494,132 @@
       }
     ]
   },
+  "foundry.emerge": {
+    "subtitle": "subtitles.singulo.foundry.emerge",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.activate",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.hurt": {
+    "subtitle": "subtitles.singulo.foundry.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.hurt",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.arm_aim": {
+    "subtitle": "subtitles.singulo.foundry.arm_aim",
+    "sounds": [
+      {
+        "name": "minecraft:block.piston.extend",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.arm_grab": {
+    "subtitle": "subtitles.singulo.foundry.arm_grab",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.attack",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.press_aim": {
+    "subtitle": "subtitles.singulo.foundry.press_aim",
+    "sounds": [
+      {
+        "name": "minecraft:block.vault.activate",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.press_slam": {
+    "subtitle": "subtitles.singulo.foundry.press_slam",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.conveyor_warn": {
+    "subtitle": "subtitles.singulo.foundry.conveyor_warn",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.pling",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.conveyor_flip": {
+    "subtitle": "subtitles.singulo.foundry.conveyor_flip",
+    "sounds": [
+      {
+        "name": "minecraft:block.piston.contract",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.laser_aim": {
+    "subtitle": "subtitles.singulo.foundry.laser_aim",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.power_select",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.laser_fire": {
+    "subtitle": "subtitles.singulo.foundry.laser_fire",
+    "sounds": [
+      {
+        "name": "minecraft:entity.guardian.attack",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.print": {
+    "subtitle": "subtitles.singulo.foundry.print",
+    "sounds": [
+      {
+        "name": "minecraft:block.crafter.craft",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.line_break": {
+    "subtitle": "subtitles.singulo.foundry.line_break",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.deactivate",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.enrage": {
+    "subtitle": "subtitles.singulo.foundry.enrage",
+    "sounds": [
+      {
+        "name": "minecraft:block.respawn_anchor.charge",
+        "type": "event"
+      }
+    ]
+  },
+  "foundry.death": {
+    "subtitle": "subtitles.singulo.foundry.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
   "echo_sentinel.emerge": {
     "subtitle": "subtitles.singulo.echo_sentinel.emerge",
     "sounds": [

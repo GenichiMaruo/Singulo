@@ -33,7 +33,7 @@ import net.minecraft.world.phys.AABB;
  *   <li>挑戦者が部屋に入ると、近くの封鎖された保管庫の遺構に応じた番人を起こす（研究棟は残響の番人、培養施設は重力の澱、
  *       沈んだ炉心区画はエルゴ球の大蛇）</li>
  *   <li>番人が倒されると保管庫の封鎖を解く。中身が再生すると保管庫はまた封鎖され、次に入ったときに番人が戻ってくる</li>
- *   <li>部屋の仕掛け（残響投影器・封じ込め槽）は最初に覚えておき、番人を起こすたびに元の形へ直す</li>
+ *   <li>部屋の仕掛け（残響投影器・封じ込め槽・製造ライン・工場のコンベア）は最初に覚えておき、番人を起こすたびに元の形へ直す</li>
  *   <li>攻略後の再戦: その遺構の覚醒核（覚醒の残響核・覚醒の重力核）を手に持って核に使うと、保管庫が開いていても
  *       覚醒した番人を起こす（{@link #awakenAwakened}）</li>
  * </ul>
@@ -59,6 +59,14 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     /** 封じ込め槽のブロック（位置と、元の形）。 */
     private final List<BlockPos> tankPos = new ArrayList<>();
     private final List<BlockState> tankState = new ArrayList<>();
+    /** 製造ラインと工場のコンベア（位置と、元の形）。 */
+    private final List<BlockPos> linePos = new ArrayList<>();
+    private final List<BlockState> lineState = new ArrayList<>();
+    private final List<BlockPos> conveyorPos = new ArrayList<>();
+    private final List<BlockState> conveyorState = new ArrayList<>();
+    /** 地下アンドロイド研究所のボス部屋の核なら、施設の範囲（番人を倒すと、その中の耐圧殻の封じが解ける）。 */
+    @Nullable
+    private net.minecraft.world.level.levelgen.structure.BoundingBox facility;
     /** 出現の演出で、槽をどこまで壊したか（0: 無傷、1: ひび、2: 砕けた）。 */
     private int tankStage;
 
@@ -73,6 +81,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
             case "research_building" -> SinguloEntities.ECHO_SENTINEL.get();
             case "culture_facility" -> SinguloEntities.GRAVITY_REMNANT.get();
             case "sunken_reactor" -> SinguloEntities.ERGOSPHERE_LEVIATHAN.get();
+            case "android_lab" -> SinguloEntities.FOUNDRY_OVERSEER.get();
             default -> null;
         };
     }
@@ -84,6 +93,7 @@ public class GuardianCoreBlockEntity extends BlockEntity {
             case "research_building" -> "awakening_echo_core";
             case "culture_facility" -> "awakening_gravity_core";
             case "sunken_reactor" -> "awakening_ergosphere_core";
+            case "android_lab" -> "awakening_foundry_core";
             default -> null;
         };
     }
@@ -93,14 +103,16 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     public static net.minecraft.world.item.Item awakeningCoreFor(EntityType<?> type) {
         String id = type == SinguloEntities.ECHO_SENTINEL.get() ? "awakening_echo_core"
                 : type == SinguloEntities.GRAVITY_REMNANT.get() ? "awakening_gravity_core"
-                : type == SinguloEntities.ERGOSPHERE_LEVIATHAN.get() ? "awakening_ergosphere_core" : null;
+                : type == SinguloEntities.ERGOSPHERE_LEVIATHAN.get() ? "awakening_ergosphere_core"
+                : type == SinguloEntities.FOUNDRY_OVERSEER.get() ? "awakening_foundry_core" : null;
         return id == null ? null : net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(id));
     }
 
     /** どれかの番人の覚醒核か。 */
     public static boolean isAwakeningCore(net.minecraft.world.item.ItemStack stack) {
         return stack.is(awakeningCoreFor(SinguloEntities.ECHO_SENTINEL.get())) || stack.is(awakeningCoreFor(SinguloEntities.GRAVITY_REMNANT.get()))
-                || stack.is(awakeningCoreFor(SinguloEntities.ERGOSPHERE_LEVIATHAN.get()));
+                || stack.is(awakeningCoreFor(SinguloEntities.ERGOSPHERE_LEVIATHAN.get()))
+                || stack.is(awakeningCoreFor(SinguloEntities.FOUNDRY_OVERSEER.get()));
     }
 
     public List<BlockPos> projectors() {
@@ -109,6 +121,32 @@ public class GuardianCoreBlockEntity extends BlockEntity {
 
     public List<BlockPos> tank() {
         return tankPos;
+    }
+
+    /** 研究所の範囲を覚える（生成のとき）。 */
+    public void setFacility(net.minecraft.world.level.levelgen.structure.BoundingBox box) {
+        facility = box;
+        setChanged();
+    }
+
+    @Nullable
+    public net.minecraft.world.level.levelgen.structure.BoundingBox facility() {
+        return facility;
+    }
+
+    public List<BlockPos> lines() {
+        return linePos;
+    }
+
+    public List<BlockPos> conveyors() {
+        return conveyorPos;
+    }
+
+    /** その位置の製造ラインの、元の形（覚えていなければ null）。 */
+    @Nullable
+    public BlockState lineStateAt(BlockPos p) {
+        int i = linePos.indexOf(p);
+        return i < 0 ? null : lineState.get(i);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, GuardianCoreBlockEntity be) {
@@ -141,10 +179,22 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         projectors.clear();
         tankPos.clear();
         tankState.clear();
+        linePos.clear();
+        lineState.clear();
+        conveyorPos.clear();
+        conveyorState.clear();
         int r = PROP_RADIUS;
         for (BlockPos p : BlockPos.betweenClosed(worldPosition.offset(-r, -2, -r), worldPosition.offset(r, 10, r))) {
-            if (level.getBlockState(p).is(SinguloBlocks.ECHO_PROJECTOR.get())) {
+            BlockState s = level.getBlockState(p);
+            if (s.is(SinguloBlocks.ECHO_PROJECTOR.get())) {
                 projectors.add(p.immutable());
+            } else if (s.is(SinguloBlocks.FACTORY_LINE.get())) {
+                linePos.add(p.immutable());
+                lineState.add(s);
+            } else if (s.is(SinguloBlocks.FACTORY_CONVEYOR.get())) {
+                conveyorPos.add(p.immutable());
+                // 覚えるのは止まった形（戦いの途中で読み込み直しても、動いたままにしない）
+                conveyorState.add(s.setValue(FactoryConveyorBlock.RUNNING, false).setValue(FactoryConveyorBlock.WARN, false));
             }
         }
         int t = (int) Math.ceil(TANK_RADIUS);
@@ -267,6 +317,10 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         if (b instanceof EchoSentinel s) {
             s.setProjectors(projectors);
         }
+        if (b instanceof FoundryOverseer f) {
+            f.setLines(linePos);
+            f.setConveyors(conveyorPos);
+        }
         b.startEmerging();
         level.addFreshEntity(b);
         boss = b.getUUID();
@@ -287,6 +341,16 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         for (int i = 0; i < tankPos.size(); i++) {
             if (level.getBlockState(tankPos.get(i)) != tankState.get(i)) {
                 level.setBlock(tankPos.get(i), tankState.get(i), Block.UPDATE_ALL);
+            }
+        }
+        restore(level, linePos, lineState);
+        restore(level, conveyorPos, conveyorState);
+    }
+
+    private static void restore(ServerLevel level, List<BlockPos> pos, List<BlockState> states) {
+        for (int i = 0; i < pos.size(); i++) {
+            if (level.getBlockState(pos.get(i)) != states.get(i)) {
+                level.setBlock(pos.get(i), states.get(i), Block.UPDATE_ALL);
             }
         }
     }
@@ -321,6 +385,11 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         if (vault != null) {
             vault.setSealed(false);
             level.playSound(null, vault.getBlockPos(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("vault.unseal"), SoundSource.BLOCKS, 1.5F, 1.0F);
+        }
+        if (facility != null) {
+            // 研究所: 耐圧殻の封じが解ける（黒曜石より硬いが、掘れるようになる）
+            io.github.genichimaruo.singulo.ruin.lab.LabPower.unseal(level, facility);
+            broadcast(level, "lab.singulo.hull_unsealed");
         }
         broadcast(level, "gui.singulo.guardian.defeated." + typeName(type));
     }
@@ -386,6 +455,36 @@ public class GuardianCoreBlockEntity extends BlockEntity {
             tank.add(t);
         }
         tag.put("tank", tank);
+        tag.put("lines", writeStates(linePos, lineState));
+        if (facility != null) {
+            tag.putIntArray("facility", io.github.genichimaruo.singulo.ruin.lab.LabPower.write(facility));
+        }
+        tag.put("conveyors", writeStates(conveyorPos, conveyorState));
+    }
+
+    private static ListTag writeStates(List<BlockPos> pos, List<BlockState> states) {
+        ListTag out = new ListTag();
+        for (int i = 0; i < pos.size(); i++) {
+            CompoundTag t = new CompoundTag();
+            t.put("pos", NbtUtils.writeBlockPos(pos.get(i)));
+            t.put("state", NbtUtils.writeBlockState(states.get(i)));
+            out.add(t);
+        }
+        return out;
+    }
+
+    private static void readStates(ListTag in, HolderLookup.Provider registries, List<BlockPos> pos, List<BlockState> states) {
+        pos.clear();
+        states.clear();
+        var blocks = registries.lookupOrThrow(Registries.BLOCK);
+        for (Tag t : in) {
+            CompoundTag c = (CompoundTag) t;
+            BlockState s = NbtUtils.readBlockState(blocks, c.getCompound("state"));
+            if (!s.isAir()) {
+                pos.add(NbtUtils.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
+                states.add(s);
+            }
+        }
     }
 
     @Override
@@ -409,6 +508,10 @@ public class GuardianCoreBlockEntity extends BlockEntity {
             tankPos.add(NbtUtils.readBlockPos(c, "pos").orElse(BlockPos.ZERO));
             tankState.add(s);
         }
+        readStates(tag.getList("lines", Tag.TAG_COMPOUND), registries, linePos, lineState);
+        int[] f = tag.getIntArray("facility");
+        facility = f.length == 6 ? io.github.genichimaruo.singulo.ruin.lab.LabPower.read(f) : null;
+        readStates(tag.getList("conveyors", Tag.TAG_COMPOUND), registries, conveyorPos, conveyorState);
     }
 
     private static CompoundTag wrap(Tag t) {

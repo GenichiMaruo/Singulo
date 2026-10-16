@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:meteor_compass"
+    },
+    "title": {
+      "translate": "advancement.singulo.compass.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.compass.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:meteor_compass"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:archive"
+}

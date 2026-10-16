@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:android_factory_print_unit"
+    },
+    "title": {
+      "translate": "advancement.singulo.android_factory_print.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.android_factory_print.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_factory_print_unit"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:ruin_android_lab"
+}

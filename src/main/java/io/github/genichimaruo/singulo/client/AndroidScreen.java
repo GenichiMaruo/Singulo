@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.Slot;
  * 右にハートの体力、電池の充電、動き方（追従中はクリックで「追従のみ」と「追従・護衛」を切り替える）、装甲の値、
  * 自己修理キットと装甲板のスロット。右下に小さな解体のボタン（2回押すと解体）。
  * 名前の帯の左端のボタンで「装備と持ち物」のページに切り替える（アップグレード・作業のオン／オフ・持ち物・バックパック）。
+ * その次は装飾、記録（巡回・警備で倒した相手と警報。新しい順）のページ。
  */
 public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private static final int PORTRAIT_X = 8, PORTRAIT_Y = 24, PORTRAIT_W = 72, PORTRAIT_H = 96;
@@ -32,12 +33,39 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private static final int PACK_X_FRAME = AndroidMenu.PACK_X - 4;
     /** タンクの目盛り（装備のページ、バックパックの下に2本）。 */
     private static final int TANK_Y = 111, TANK_W = 56, TANK_H = 8, TANK_GAP = 4;
+    /** タンクの目盛りの幅と、その右の「捨てる」ボタン（シフト＋クリック）。 */
+    private static final int BAR_W = 47, CLEAR_W = 8;
+
+    /** 装備のページのタンクの段（chem: 化学物質のタンク。液体と化学物質の両方なら、2段に細く並べる）。 */
+    private record TankRow(boolean chem, int y, int h) {}
+
+    private java.util.List<TankRow> tankRows() {
+        RuinAndroid a = menu.android();
+        if (a == null) {
+            return java.util.List.of();
+        }
+        boolean fluid = a.tankFill(0) >= 0, chem = a.chemFill(0) >= 0;
+        if (fluid && chem) {
+            return java.util.List.of(new TankRow(false, TANK_Y - 3, 6), new TankRow(true, TANK_Y + 5, 6));
+        }
+        return fluid ? java.util.List.of(new TankRow(false, TANK_Y, TANK_H)) : chem ? java.util.List.of(new TankRow(true, TANK_Y, TANK_H))
+                : java.util.List.of();
+    }
+
+    /** 積んでいるタンクのアップグレード（画面の欄の中身。タンクの大きさを決める）。 */
+    private net.minecraft.world.item.ItemStack tankUpgrade() {
+        return menu.getSlot(RuinAndroid.SLOT_TANK).getItem();
+    }
 
     private static final int PAPER = 0xFFE9ECF1;
     private static final int BORDER = 0xFF5C6475;
     private static final int INK = 0xFF3C4350;
     private static final int SLOT_EDGE = 0xFF373C48;
     private static final int SLOT_FILL = 0xFF8B8F98;
+
+    /** 記録のページ: 右の欄の位置、1件の高さ、見えている件数、いま一番上に見えている記録の番号。 */
+    private static final int LOG_X = RIGHT_X, LOG_Y = 24, LOG_W = 160, LOG_ROW = 19, LOG_ROWS = 5;
+    private int logScroll;
 
     private final NameEditor names = new NameEditor();
     /** 解体のボタンを1回押した時刻（もう一度押すと解体。3秒で戻る）。 */
@@ -98,6 +126,25 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         return menu.page() == AndroidMenu.PAGE_GEAR;
     }
 
+    private boolean logPage() {
+        return menu.page() == AndroidMenu.PAGE_LOG;
+    }
+
+    /** 巡回・警備の記録（新しい順）。 */
+    private java.util.List<io.github.genichimaruo.singulo.android.AndroidPatrol.Entry> log() {
+        RuinAndroid a = menu.android();
+        return a == null ? java.util.List.of() : a.patrolLog();
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (logPage()) {
+            logScroll = Mth.clamp(logScroll - (int) Math.signum(scrollY), 0, Math.max(0, log().size() - LOG_ROWS));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
     private boolean armed() {
         return Util.getMillis() - dismantleArmed < 3000;
     }
@@ -119,9 +166,30 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             return true;
         }
         if (Panel.inside(mouseX, mouseY, leftPos + PAGE_X, topPos + PAGE_Y, PAGE_S, PAGE_S)) {
-            menu.setPage((menu.page() + 1) % AndroidMenu.PAGES);           // 様子 → 装備 → 装飾 → 様子
+            menu.setPage((menu.page() + 1) % AndroidMenu.PAGES);           // 様子 → 装備 → 装飾 → 記録 → 様子
+            logScroll = 0;
             dismantleArmed = 0;
             return true;
+        }
+        if (gearPage() && minecraft != null && minecraft.gameMode != null) {
+            for (TankRow row : tankRows()) {
+                for (int i = 0; i < RuinAndroid.TANKS; i++) {
+                    int tx = leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                    if (Panel.inside(mouseX, mouseY, tx, topPos + row.y(), BAR_W, row.h()) && !menu.getCarried().isEmpty()) {
+                        // バケツ・ケミカルタンクなどで、タンクに入れる・タンクから汲む
+                        minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
+                                (row.chem() ? AndroidMenu.BUTTON_CHEM_USE : AndroidMenu.BUTTON_TANK_USE) + i);
+                        return true;
+                    }
+                    if (Panel.inside(mouseX, mouseY, tx + BAR_W + 1, topPos + row.y(), CLEAR_W, row.h())) {
+                        if (hasShiftDown()) {
+                            minecraft.gameMode.handleInventoryButtonClick(menu.containerId,
+                                    (row.chem() ? AndroidMenu.BUTTON_CHEM_CLEAR : AndroidMenu.BUTTON_TANK_CLEAR) + i);
+                        }
+                        return true;
+                    }
+                }
+            }
         }
         if (gearPage() && Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W,
                 AndroidMenu.WORK_H) && minecraft != null && minecraft.gameMode != null) {
@@ -183,8 +251,12 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
         }
         if (Panel.inside(mouseX, mouseY, leftPos + PAGE_X, topPos + PAGE_Y, PAGE_S, PAGE_S)) {
-            String[] next = {"gui.singulo.android.page.gear", "gui.singulo.android.page.decor", "gui.singulo.android.page.status"};
+            String[] next = {"gui.singulo.android.page.gear", "gui.singulo.android.page.decor", "gui.singulo.android.page.log",
+                    "gui.singulo.android.page.status"};
             g.renderTooltip(font, Component.translatable(next[menu.page()]), mouseX, mouseY);
+        }
+        if (logPage()) {
+            return;
         }
         if (decorPage()) {
             // 空いている装飾の枠: どこに着ける物か
@@ -201,14 +273,30 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.work.hint"), 180), mouseX, mouseY);
             }
             RuinAndroid android = menu.android();
-            for (int i = 0; android != null && android.tankFill(0) >= 0 && i < RuinAndroid.TANKS; i++) {
-                if (Panel.inside(mouseX, mouseY, leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP), topPos + TANK_Y, TANK_W, TANK_H)) {
-                    net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
-                    int amount = Math.round(android.tankFill(i) * RuinAndroid.TANK_CAPACITY);
-                    g.renderTooltip(font, fluid == null ? Component.translatable("gui.singulo.android.tank.empty", i + 1)
-                            : Component.translatable("gui.singulo.android.tank", i + 1,
-                                    new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName(), amount, RuinAndroid.TANK_CAPACITY),
-                            mouseX, mouseY);
+            for (TankRow row : android == null ? java.util.List.<TankRow>of() : tankRows()) {
+                for (int i = 0; i < RuinAndroid.TANKS; i++) {
+                    int tx = leftPos + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
+                    if (Panel.inside(mouseX, mouseY, tx, topPos + row.y(), BAR_W, row.h())) {
+                        java.util.List<Component> lines = new java.util.ArrayList<>();
+                        if (row.chem()) {
+                            String id = android.chemId(i);
+                            int cap = RuinAndroid.chemCapacity(tankUpgrade());
+                            lines.add(id.isEmpty() ? Component.translatable("gui.singulo.android.chem.empty", i + 1)
+                                    : Component.translatable("gui.singulo.android.chem", i + 1, io.github.genichimaruo.singulo.android.work.Chemicals.name(id),
+                                            Math.round(android.chemFill(i) * cap), cap));
+                        } else {
+                            net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                            int cap = RuinAndroid.fluidCapacity(tankUpgrade());
+                            lines.add(fluid == null ? Component.translatable("gui.singulo.android.tank.empty", i + 1)
+                                    : Component.translatable("gui.singulo.android.tank", i + 1,
+                                            new net.neoforged.neoforge.fluids.FluidStack(fluid, 1).getHoverName(), Math.round(android.tankFill(i) * cap), cap));
+                        }
+                        lines.add(Component.translatable(menu.working() ? "gui.singulo.android.tank.locked"
+                                : row.chem() ? "gui.singulo.android.chem.hint" : "gui.singulo.android.tank.hint").withStyle(net.minecraft.ChatFormatting.GRAY));
+                        g.renderComponentTooltip(font, lines, mouseX, mouseY);
+                    } else if (Panel.inside(mouseX, mouseY, tx + BAR_W + 1, topPos + row.y(), CLEAR_W, row.h())) {
+                        g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.tank.clear"), 160), mouseX, mouseY);
+                    }
                 }
             }
             return;
@@ -253,6 +341,15 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         g.flush();
         if (gearPage()) {
             renderGear(g, x, y, mouseX, mouseY, accent);
+            return;
+        }
+        if (logPage()) {
+            portrait(g, x, y, mouseX, mouseY, accent);
+            roundRect(g, x + LOG_X - 4, y + LOG_Y - 4, LOG_W + 4, LOG_ROW * LOG_ROWS + 4, mix(accent, PAPER, 0.88F));
+            // 記録の区切り線
+            for (int i = 1; i < LOG_ROWS; i++) {
+                g.fill(x + LOG_X, y + LOG_Y + i * LOG_ROW - 2, x + LOG_X + LOG_W - 6, y + LOG_Y + i * LOG_ROW - 1, mix(accent, PAPER, 0.7F));
+            }
             return;
         }
         if (decorPage()) {
@@ -340,25 +437,40 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
                     y + AndroidMenu.PACK_Y + 4 * 18 - 1, 0xC8E9ECF1);
         }
-        // タンクアップグレード: タンクの中身（流体の色で、入っている割合まで）
+        // タンク: 中身そのものの絵で、入っている割合まで（流れるアニメーションも動く）。液体と化学物質（Mekanism）の段
         RuinAndroid android = menu.android();
-        if (android != null && android.tankFill(0) >= 0) {
+        for (TankRow row : android == null ? java.util.List.<TankRow>of() : tankRows()) {
+            int ty = y + row.y(), th = row.h();
             for (int i = 0; i < RuinAndroid.TANKS; i++) {
                 int tx = x + PACK_X_FRAME + i * (TANK_W + TANK_GAP);
-                g.fill(tx - 1, y + TANK_Y - 1, tx + TANK_W + 1, y + TANK_Y + TANK_H + 1, BORDER);
-                g.fill(tx, y + TANK_Y, tx + TANK_W, y + TANK_Y + TANK_H, 0xFF2A3040);
-                net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
-                float fill = android.tankFill(i);
-                if (fluid != null && fill > 0) {
-                    int color = 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid)
-                            .getTintColor(new net.neoforged.neoforge.fluids.FluidStack(fluid, 1000));
-                    if (fluid.isSame(net.minecraft.world.level.material.Fluids.LAVA)) {
-                        color = 0xFFFF6A00;     // 溶岩はテクスチャ自体が着色され、tintだけだと白になる
+                // 捨てるボタン（小さな ×。シフト＋クリック）
+                int cx = tx + BAR_W + 1;
+                boolean ch = Panel.inside(mouseX, mouseY, cx, ty, CLEAR_W, th);
+                g.fill(cx, ty - 1, cx + CLEAR_W, ty + th + 1, BORDER);
+                g.fill(cx + 1, ty, cx + CLEAR_W - 1, ty + th, ch && hasShiftDown() ? 0xFFD05050 : ch ? 0xFF9AA0AC : 0xFFC4C9D2);
+                int arm = Math.min(4, th - 2);
+                for (int k = 0; k < arm; k++) {
+                    int ox = (4 - arm) / 2;
+                    g.fill(cx + 2 + ox + k, ty + 1 + k, cx + 3 + ox + k, ty + 2 + k, BORDER);
+                    g.fill(cx + 1 + ox + arm - k, ty + 1 + k, cx + 2 + ox + arm - k, ty + 2 + k, BORDER);
+                }
+                g.fill(tx - 1, ty - 1, tx + BAR_W + 1, ty + th + 1, BORDER);
+                g.fill(tx, ty, tx + BAR_W, ty + th, row.chem() ? 0xFF303A34 : 0xFF2A3040);
+                if (row.chem()) {
+                    String id = android.chemId(i);
+                    float fill = android.chemFill(i);
+                    if (!id.isEmpty() && fill > 0) {
+                        FluidDraw.fillChemical(g, id, tx, ty, Math.max(1, Math.round(BAR_W * Math.min(1, fill))), th);
                     }
-                    g.fill(tx, y + TANK_Y, tx + Math.max(1, Math.round(TANK_W * Math.min(1, fill))), y + TANK_Y + TANK_H, color);
+                } else {
+                    net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
+                    float fill = android.tankFill(i);
+                    if (fluid != null && fill > 0) {
+                        FluidDraw.fill(g, fluid, tx, ty, Math.max(1, Math.round(BAR_W * Math.min(1, fill))), th);
+                    }
                 }
                 for (int m = 1; m < 4; m++) {
-                    g.fill(tx + TANK_W * m / 4, y + TANK_Y, tx + TANK_W * m / 4 + 1, y + TANK_Y + 2, 0x80FFFFFF);      // 目盛り
+                    g.fill(tx + BAR_W * m / 4, ty, tx + BAR_W * m / 4 + 1, ty + 2, 0x80FFFFFF);      // 目盛り
                 }
             }
         }
@@ -392,8 +504,16 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private void pageButton(GuiGraphics g, int x, int y, boolean hover, int accent) {
         roundRect(g, x, y, PAGE_S, PAGE_S, hover ? mix(accent, 0xFFFFFF, 0.55F) : mix(accent, 0xFFFFFF, 0.35F));
         int c = 0xFF3C4350;
-        if (decorPage()) {
+        if (logPage()) {
             heart(g, x + 2, y + 2, 1);
+            return;
+        }
+        if (decorPage()) {
+            // 日誌: 表紙と、紙の行
+            g.fill(x + 3, y + 2, x + 9, y + 10, c);
+            g.fill(x + 4, y + 3, x + 9, y + 9, 0xFFE9ECF1);
+            g.fill(x + 5, y + 4, x + 8, y + 5, mix(accent, 0xFF3C4350, 0.4F));
+            g.fill(x + 5, y + 6, x + 8, y + 7, mix(accent, 0xFF3C4350, 0.4F));
             return;
         }
         if (gearPage()) {
@@ -419,6 +539,31 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             AndroidStationScreen.fitCentered(g, font, name(), 24, NAME_Y + 3, imageWidth - 48, 0xFFFFFFFF);
         }
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, INK, false);
+        if (logPage()) {
+            var log = log();
+            if (log.isEmpty()) {
+                for (int i = 0; i < 2; i++) {
+                    AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.android.log.empty." + i), LOG_X, LOG_Y + 4 + i * 11,
+                            LOG_W - 8, 0xFF8A949E);
+                }
+            }
+            logScroll = Mth.clamp(logScroll, 0, Math.max(0, log.size() - LOG_ROWS));
+            for (int i = 0; i < LOG_ROWS && i + logScroll < log.size(); i++) {
+                var e = log.get(i + logScroll);
+                int ry = LOG_Y + i * LOG_ROW;
+                AndroidStationScreen.fit(g, font, e.when().copy().append("  " + e.pos().getX() + ", " + e.pos().getY() + ", " + e.pos().getZ()),
+                        LOG_X, ry, LOG_W - 8, 0xFF8A949E);
+                AndroidStationScreen.fit(g, font, e.describe(), LOG_X, ry + 9, LOG_W - 8,
+                        e.kind() == 0 ? INK : 0xFFB04040);
+            }
+            if (log.size() > LOG_ROWS) {
+                AndroidStationScreen.fit(g, font, Component.literal((logScroll + 1) + "-" + Math.min(log.size(), logScroll + LOG_ROWS) + " / "
+                        + log.size()), LOG_X + LOG_W - 40, LOG_Y + LOG_ROW * LOG_ROWS + 1, 36, 0xFF8A949E);
+            }
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.log.speech"), PORTRAIT_X + 4,
+                    PORTRAIT_Y + PORTRAIT_H - 13, PORTRAIT_W - 8, INK);
+            return;
+        }
         if (decorPage()) {
             for (int i = 0; i < RuinAndroid.DECOR_SLOTS; i++) {
                 AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.android.decor." + i), AndroidMenu.DECOR_X + 22,

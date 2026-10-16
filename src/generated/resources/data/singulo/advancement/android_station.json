@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:android_station"
+    },
+    "title": {
+      "translate": "advancement.singulo.android_station.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.android_station.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_station"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:assembler"
+}

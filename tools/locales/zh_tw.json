@@ -15,6 +15,102 @@
     "source": "Worldline Anchor",
     "translation": "世界線錨"
   },
+  "advancement.singulo.android_charger.description": {
+    "source": "Obtain an Android Wireless Charger",
+    "translation": "取得機器人無線充電器"
+  },
+  "advancement.singulo.android_charger.title": {
+    "source": "Charge Nearby",
+    "translation": "就近充電"
+  },
+  "advancement.singulo.android_delivery.description": {
+    "source": "Receive the full requested quantity of an order you placed",
+    "translation": "收齊自己訂單所需的全部物品"
+  },
+  "advancement.singulo.android_delivery.title": {
+    "source": "Order Ready",
+    "translation": "做好了"
+  },
+  "advancement.singulo.android_factory_print.description": {
+    "source": "Obtain a Factory Print Unit",
+    "translation": "取得工廠式列印單元"
+  },
+  "advancement.singulo.android_factory_print.title": {
+    "source": "Factory Technology at Home",
+    "translation": "將工廠技術帶回家"
+  },
+  "advancement.singulo.android_memory.description": {
+    "source": "Obtain any ordinary android design memory from a ruin fabricator",
+    "translation": "從遺跡列印台取得任意一種普通型號的設計記憶體"
+  },
+  "advancement.singulo.android_memory.title": {
+    "source": "A Little Blueprint",
+    "translation": "小小的設計圖"
+  },
+  "advancement.singulo.android_printed.description": {
+    "source": "Finish printing a guard at your own assembly station",
+    "translation": "在自己的組裝站完成一名護衛的列印"
+  },
+  "advancement.singulo.android_printed.title": {
+    "source": "Hello There",
+    "translation": "初次見面"
+  },
+  "advancement.singulo.android_prototypes.description": {
+    "source": "Hold both Alma and Nox design memories together (two Overseer victories guarantee both)",
+    "translation": "同時持有阿爾瑪與諾克斯的設計記憶體（擊敗監督者兩次即可集齊）"
+  },
+  "advancement.singulo.android_prototypes.title": {
+    "source": "Two Possibilities",
+    "translation": "兩種可能"
+  },
+  "advancement.singulo.android_rack.description": {
+    "source": "Obtain an Android Recipe Rack",
+    "translation": "取得機器人配方架"
+  },
+  "advancement.singulo.android_rack.title": {
+    "source": "Factory Handbook",
+    "translation": "工廠指南"
+  },
+  "advancement.singulo.android_recipe.description": {
+    "source": "Obtain a Recipe Card and record a recipe at the Work Console",
+    "translation": "取得配方卡，並在作業指令台記錄配方"
+  },
+  "advancement.singulo.android_recipe.title": {
+    "source": "Pass on a Recipe",
+    "translation": "傳授配方"
+  },
+  "advancement.singulo.android_routes.description": {
+    "source": "Obtain an Area Card; combine it with location cards to plan routes",
+    "translation": "取得區域卡，配合位置卡規劃路徑"
+  },
+  "advancement.singulo.android_routes.title": {
+    "source": "Plan the Way",
+    "translation": "規劃路線"
+  },
+  "advancement.singulo.android_station.description": {
+    "source": "Obtain an Android Assembly Station; prepare a memory, a kit and power",
+    "translation": "取得機器人組裝站，並準備設計記憶體、套件與電力"
+  },
+  "advancement.singulo.android_station.title": {
+    "source": "Ready to Welcome",
+    "translation": "準備迎接"
+  },
+  "advancement.singulo.android_survey.description": {
+    "source": "Obtain Survey Glasses",
+    "translation": "取得測量眼鏡"
+  },
+  "advancement.singulo.android_survey.title": {
+    "source": "Visible Waypoints",
+    "translation": "看得見的路標"
+  },
+  "advancement.singulo.android_work.description": {
+    "source": "Obtain a Work Console; connect supplies and recipes",
+    "translation": "取得作業指令台，連接材料倉儲並準備配方"
+  },
+  "advancement.singulo.android_work.title": {
+    "source": "A Job to Do",
+    "translation": "拜託你了"
+  },
   "advancement.singulo.archive.description": {
     "source": "Build an archive terminal",
     "translation": "建造檔案終端"
@@ -54,6 +150,14 @@
   "advancement.singulo.awakened_echo.title": {
     "source": "Echoes That Linger",
     "translation": "不絕的回聲"
+  },
+  "advancement.singulo.awakened_foundry.description": {
+    "source": "Defeat the Awakened Foundry Overseer",
+    "translation": "擊敗覺醒的鑄造監督者"
+  },
+  "advancement.singulo.awakened_foundry.title": {
+    "source": "A Will Rebooted",
+    "translation": "重啟的意志"
   },
   "advancement.singulo.awakened_gravity.description": {
     "source": "Defeat the Awakened Gravity Remnant",
@@ -119,6 +223,14 @@
     "source": "Degeneracy Pressure",
     "translation": "簡併壓力"
   },
+  "advancement.singulo.compass.description": {
+    "source": "Obtain an exploration compass to choose your next expedition",
+    "translation": "取得探索羅盤，選擇下一個探索地點"
+  },
+  "advancement.singulo.compass.title": {
+    "source": "The Next Trace",
+    "translation": "下一處痕跡"
+  },
   "advancement.singulo.compressor.description": {
     "source": "Build a compressor",
     "translation": "建造壓縮機"
@@ -159,6 +271,14 @@
     "source": "Ripples in Spacetime",
     "translation": "時空漣漪"
   },
+  "advancement.singulo.echo.description": {
+    "source": "Be a surviving challenger in the arena when the Echo Sentinel falls",
+    "translation": "殘響哨兵被擊敗時，作為存活的挑戰者留在戰鬥區域內"
+  },
+  "advancement.singulo.echo.title": {
+    "source": "Beyond the Echo",
+    "translation": "跨越迴響"
+  },
   "advancement.singulo.entangled.description": {
     "source": "Make entangled elements",
     "translation": "製作量子糾纏元件"
@@ -174,6 +294,14 @@
   "advancement.singulo.exotic.title": {
     "source": "Negative Energy",
     "translation": "負能量"
+  },
+  "advancement.singulo.foundry.description": {
+    "source": "Be a surviving challenger in the arena when the Foundry Overseer falls",
+    "translation": "統括AI鑄造監督者被擊敗時，作為存活的挑戰者留在戰鬥區域內"
+  },
+  "advancement.singulo.foundry.title": {
+    "source": "The Last Directive",
+    "translation": "最後的指令"
   },
   "advancement.singulo.furnace.description": {
     "source": "Form a degenerate furnace",
@@ -207,6 +335,14 @@
     "source": "The Cradle",
     "translation": "搖籃"
   },
+  "advancement.singulo.gravity.description": {
+    "source": "Be a surviving challenger in the arena when the Gravity Remnant falls",
+    "translation": "重力殘滓被擊敗時，作為存活的挑戰者留在戰鬥區域內"
+  },
+  "advancement.singulo.gravity.title": {
+    "source": "Unravelling Gravity",
+    "translation": "解開重力"
+  },
   "advancement.singulo.hawking.description": {
     "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
     "translation": "從回收模式運轉的反應爐收集霍金凝聚體。第一個奇點核心需要 6 個"
@@ -223,9 +359,17 @@
     "source": "Event Horizon",
     "translation": "事件視界"
   },
+  "advancement.singulo.lab_power.description": {
+    "source": "Be present when power returns to the underground android laboratory",
+    "translation": "在地下機器人研究所恢復供電時身處現場"
+  },
+  "advancement.singulo.lab_power.title": {
+    "source": "Lights in the Sleeping Factory",
+    "translation": "沉睡工廠的燈火"
+  },
   "advancement.singulo.leviathan.description": {
-    "source": "Defeat the Ergosphere Leviathan",
-    "translation": "擊敗能層巨蛇"
+    "source": "Be a surviving challenger in the arena when the Ergosphere Leviathan falls",
+    "translation": "能層巨蛇被擊敗時，作為存活的挑戰者留在戰鬥區域內"
   },
   "advancement.singulo.leviathan.title": {
     "source": "It Swims the Ergosphere",
@@ -311,6 +455,14 @@
     "source": "Singulo",
     "translation": "Singulo"
   },
+  "advancement.singulo.ruin_android_lab.description": {
+    "source": "Open the cache of the underground android laboratory",
+    "translation": "開啟地下機器人研究所的儲藏室"
+  },
+  "advancement.singulo.ruin_android_lab.title": {
+    "source": "The Preserved Laboratory",
+    "translation": "保存完好的研究所"
+  },
   "advancement.singulo.ruin_culture.description": {
     "source": "Open a culture facility cache",
     "translation": "打開封閉培養設施的保管庫"
@@ -320,8 +472,8 @@
     "translation": "封鎖區域"
   },
   "advancement.singulo.ruin_final.description": {
-    "source": "Reach the final lab",
-    "translation": "到達最終實驗室"
+    "source": "After the Gravity Remnant, reach the entrance to the final lab",
+    "translation": "跨越重力殘滓，抵達最終實驗設施的入口"
   },
   "advancement.singulo.ruin_final.title": {
     "source": "Gravitational Anomaly",
@@ -408,16 +560,16 @@
     "translation": "旋轉時間"
   },
   "advancement.singulo.tower.description": {
-    "source": "Form a cryogenic cooling tower",
-    "translation": "組建低溫冷卻塔"
+    "source": "Form a cryogenic cooling tower. Recover observation-post materials to make superconducting coils",
+    "translation": "組裝低溫冷卻塔。回收觀測站的材料以製作超導線圈"
   },
   "advancement.singulo.tower.title": {
     "source": "Toward Absolute Zero",
     "translation": "邁向絕對零度"
   },
   "advancement.singulo.warden.description": {
-    "source": "Defeat the Horizon Warden",
-    "translation": "擊敗視界守衛"
+    "source": "Be a surviving challenger in the arena when the Horizon Warden falls",
+    "translation": "地平線守衛被擊敗時，作為存活的挑戰者留在戰鬥區域內"
   },
   "advancement.singulo.warden.title": {
     "source": "Horizon Keeper",
@@ -446,6 +598,10 @@
   "block.singulo.android_barrier_glass_patterned": {
     "source": "Patterned Android Barrier Glass",
     "translation": "花紋仿生人阻隔玻璃"
+  },
+  "block.singulo.android_capsule": {
+    "source": "Body Capsule",
+    "translation": "素體艙"
   },
   "block.singulo.android_delivery_port": {
     "source": "Android Delivery Port",
@@ -499,6 +655,10 @@
     "source": "Starred Black Reinforced Glass",
     "translation": "四芒星黑色強化玻璃"
   },
+  "block.singulo.bulkhead": {
+    "source": "Bulkhead",
+    "translation": "隔離門"
+  },
   "block.singulo.casimir_cavity_controller": {
     "source": "C-Cavity Controller",
     "translation": "卡西米爾腔控制器"
@@ -526,6 +686,10 @@
   "block.singulo.catalytic_reactor": {
     "source": "Catalytic Reactor",
     "translation": "催化反應器"
+  },
+  "block.singulo.coffee_maker": {
+    "source": "Coffee Maker",
+    "translation": "咖啡機"
   },
   "block.singulo.compressed_block_1": {
     "source": "Compressed Block Lv1",
@@ -663,6 +827,10 @@
     "source": "Degenerate Furnace Window",
     "translation": "簡併熱爐觀察窗"
   },
+  "block.singulo.desk_monitor": {
+    "source": "Desk Monitor",
+    "translation": "桌面顯示器"
+  },
   "block.singulo.echo_projector": {
     "source": "Echo Projector",
     "translation": "回聲投影器"
@@ -675,6 +843,10 @@
     "source": "Electrolyzer",
     "translation": "電解槽"
   },
+  "block.singulo.emergency_light": {
+    "source": "Emergency Light",
+    "translation": "緊急照明燈"
+  },
   "block.singulo.entanglement_synthesizer": {
     "source": "Entanglement Synthesizer",
     "translation": "量子糾纏合成器"
@@ -682,6 +854,18 @@
   "block.singulo.extraction_port": {
     "source": "Extraction Port",
     "translation": "提取埠"
+  },
+  "block.singulo.facility_light": {
+    "source": "Facility Light",
+    "translation": "設施燈"
+  },
+  "block.singulo.factory_conveyor": {
+    "source": "Factory Conveyor",
+    "translation": "工廠輸送帶"
+  },
+  "block.singulo.factory_line": {
+    "source": "Production Line",
+    "translation": "生產線"
   },
   "block.singulo.focusing_magnet": {
     "source": "Focusing Magnet",
@@ -759,6 +943,30 @@
     "source": "Kiln",
     "translation": "燒製爐"
   },
+  "block.singulo.lab_frame": {
+    "source": "Lab Frame",
+    "translation": "研究所結構材"
+  },
+  "block.singulo.lab_glass": {
+    "source": "Lab Glass",
+    "translation": "研究所玻璃"
+  },
+  "block.singulo.lab_panel": {
+    "source": "Lab Panel",
+    "translation": "研究所白色面板"
+  },
+  "block.singulo.lab_panel_lined": {
+    "source": "Lined Lab Panel",
+    "translation": "研究所條紋面板"
+  },
+  "block.singulo.lab_terminal": {
+    "source": "Record Terminal",
+    "translation": "記錄終端"
+  },
+  "block.singulo.lab_tiles": {
+    "source": "Lab Floor Tiles",
+    "translation": "研究所地磚"
+  },
   "block.singulo.laser_cooler": {
     "source": "Laser Cooler",
     "translation": "雷射冷卻器"
@@ -795,9 +1003,21 @@
     "source": "Neutrino Observatory",
     "translation": "微中子觀測站"
   },
+  "block.singulo.paper_stack": {
+    "source": "Stack of Papers",
+    "translation": "文件堆"
+  },
+  "block.singulo.power_conduit": {
+    "source": "Power Conduit",
+    "translation": "動力導管"
+  },
   "block.singulo.precision_assembler": {
     "source": "Precision Assembler",
     "translation": "精密組裝台"
+  },
+  "block.singulo.pressure_hull": {
+    "source": "Pressure Hull",
+    "translation": "耐壓殼"
   },
   "block.singulo.pristine_ruin_light": {
     "source": "Pristine Ruin Light Strip",
@@ -822,6 +1042,14 @@
   "block.singulo.quantum_heat_engine": {
     "source": "Quantum Heat Engine",
     "translation": "量子熱機"
+  },
+  "block.singulo.reactor_console": {
+    "source": "Reactor Control Panel",
+    "translation": "動力爐控制台"
+  },
+  "block.singulo.reactor_core": {
+    "source": "Reactor Core",
+    "translation": "爐心"
   },
   "block.singulo.reactor_mass_alarm": {
     "source": "Reactor Mass Alarm",
@@ -906,6 +1134,10 @@
   "block.singulo.sealed_container_4": {
     "source": "Sealed Container (Singularity Lock)",
     "translation": "封印容器（奇點鎖）"
+  },
+  "block.singulo.server_rack": {
+    "source": "Server Rack",
+    "translation": "伺服器機架"
   },
   "block.singulo.shield_tower_body": {
     "source": "Shield Tower Body",
@@ -1002,6 +1234,14 @@
   "block.singulo.topological_wire": {
     "source": "Topological Wire",
     "translation": "拓撲導線"
+  },
+  "block.singulo.trash_bin": {
+    "source": "Trash Bin",
+    "translation": "垃圾桶"
+  },
+  "block.singulo.vending_machine": {
+    "source": "Vending Machine",
+    "translation": "自動販賣機"
   },
   "block.singulo.vented_ruin_panel": {
     "source": "Vented Ruin Panel",
@@ -1143,6 +1383,10 @@
     "source": "Compass tuned: it can now find %s",
     "translation": "羅盤已調校：現在也能搜尋%s"
   },
+  "compass.singulo.upgraded_branch": {
+    "source": "Compass tuned: it can now find %s and %s",
+    "translation": "羅盤已調校：現在也能搜尋%s和%s"
+  },
   "compass.singulo.wrong_cache": {
     "source": "Tuning needs the cache of %s",
     "translation": "調校需要%s的保管庫"
@@ -1211,6 +1455,10 @@
     "source": "A cape hanging from an android's shoulders that flutters as it walks. Goes in the decoration page. Dye it with dyes on a crafting table.",
     "translation": "從仿生人肩部垂到背後的披風，行走時會飄動。放入裝飾頁的欄位。可與染料一起在工作台染色。"
   },
+  "desc.singulo.android_capsule": {
+    "source": "A glass capsule holding a dormant white android body.",
+    "translation": "沉睡著白色仿生人素體的玻璃艙。"
+  },
   "desc.singulo.android_charger": {
     "source": "While you carry it, a following android comes close and recharges as it walks with you (30 full charges when full). Right-click a block that supplies power to charge it.",
     "translation": "隨身攜帶時，跟隨中的仿生人會靠近你，邊跟著走邊充電（充滿時可充滿仿生人 30 次）。右鍵點擊能輸出電力的方塊為其充電。"
@@ -1219,9 +1467,21 @@
     "source": "Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.",
     "translation": "仿生人把訂單的成品送到這裡（下單時選為交付目標）。27 格的箱子，可在介面中命名，裡面的物品會自動移到相鄰的箱子。"
   },
+  "desc.singulo.android_dual_tank_upgrade": {
+    "source": "Only works when Mekanism is installed. In the tank slot it gives two liquid tanks and two chemical tanks (16,000 mB each; the same total as a Tank Upgrade), for work that uses both. Glass tubes and gas cylinders show at its waist. It cannot be removed while they hold anything.",
+    "translation": "僅在安裝了 Mekanism 時可用。放入儲罐欄後，會裝上 2 個液體儲罐和 2 個化學品儲罐（各 16,000 mB。總量與儲罐升級相同）。適合同時使用液體和化學品的作業。腰部會出現玻璃筒和氣瓶。儲罐內還有內容物時無法取下。"
+  },
+  "desc.singulo.android_factory_print_unit": {
+    "source": "Fitted in an Android Assembly Station's print unit slot, printing takes half the time and power, and repairs on the station run twice as fast.",
+    "translation": "裝在仿生人組裝站的列印單元槽中，列印所需的時間和電力減半，在組裝站上的修理速度變為 2 倍。"
+  },
   "desc.singulo.android_felling_upgrade": {
     "source": "Lets a guard android do felling steps on procedure cards (cutting whole trees and replanting saplings), like a diamond axe. Takes Efficiency, Fortune and Silk Touch.",
     "translation": "裝在護衛仿生人上後，可執行步驟卡的伐木（整棵砍樹並補種樹苗），相當於鑽石斧。可附上效率、幸運和絲綢之觸。"
+  },
+  "desc.singulo.android_gas_tank_upgrade": {
+    "source": "Only works when Mekanism is installed. In the tank slot it gives two tanks for Mekanism chemicals (gases, infuse types, pigments, slurries; 32,000 mB each, one chemical per tank), so work can carry chemicals from the stockpile to machines. Gas cylinders show at its waist. Click a tank in the screen with a chemical tank to fill or draw. It cannot be removed while they hold anything.",
+    "translation": "僅在安裝了 Mekanism 時可用。放入儲罐欄後，會裝上 2 個能搬運 Mekanism 化學品（氣體、灌注物、顏料、漿液）的儲罐（各 32,000 mB，每個 1 種）。作業時會把化學品從資材存放處運到裝置。腰部會出現氣瓶。用化學品儲罐等點擊介面中的儲罐可以取放。儲罐內還有內容物時無法取下。"
   },
   "desc.singulo.android_gate_glass": {
     "source": "Glass that only androids can pass; solid for everything else. Joins seamlessly with the same glass next to it.",
@@ -1242,6 +1502,14 @@
   "desc.singulo.android_kit": {
     "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
     "translation": "一套零件與外殼。仿生人組裝站每列印一個仿生人就消耗一個。"
+  },
+  "desc.singulo.android_memory_axe": {
+    "source": "A compact crystal memory holding the design of the Axe Android prototyped in the underground android laboratory. Dropped by the laboratory overseer. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "記錄著地下仿生人研究所試製的斧型仿生人設計的小型水晶記憶體。擊敗研究所的統括AI即可取得。放入仿生人組裝站後即可列印該型號（不會消耗）。"
+  },
+  "desc.singulo.android_memory_bit": {
+    "source": "A compact crystal memory holding the design of the Bit Android prototyped in the underground android laboratory. Dropped by the laboratory overseer. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "記錄著地下仿生人研究所試製的浮游砲型仿生人設計的小型水晶記憶體。擊敗研究所的統括AI即可取得。放入仿生人組裝站後即可列印該型號（不會消耗）。"
   },
   "desc.singulo.android_memory_blade": {
     "source": "A compact crystal memory with a reader, holding the design of the Blade Android. Put it in an Android Assembly Station to print that design (it is not used up).",
@@ -1327,6 +1595,10 @@
     "source": "The halo the Last Archivist wore. It is still quietly warm and faintly whispers in an old tongue.",
     "translation": "最後的記錄者曾戴著的光環。至今仍靜靜地溫熱著，隱約低語著古老的語言。"
   },
+  "desc.singulo.area_card": {
+    "source": "Sneak-use two blocks to record the area between them as corners (up to 128 blocks per side; one card is split off a stack). Sneak-use again to record anew; sneak-use on nothing to clear it. Used on the Routes page of the work console and assembly station for the area a waypoint covers and for no-entry zones.",
+    "translation": "潛行右鍵兩個方塊，記錄以它們為角的範圍（每邊最多 128 格。堆疊時只分出一張記錄）。再次潛行右鍵會重新記錄。對空處潛行右鍵會清除記錄。用於作業指令台・組裝站「路徑」的對象範圍和禁入區域。"
+  },
   "desc.singulo.artificial_star_core": {
     "source": "A star core that replaces nether stars.",
     "translation": "可取代地獄之星的星核。"
@@ -1338,6 +1610,10 @@
   "desc.singulo.awakening_ergosphere_core": {
     "source": "A Chapter of the Vortex spun up again with jet condensate and H-Condensate. Use it on the guardian core of a Sunken Reactor Sector to call the Awakened Ergosphere Leviathan: 2.5× health, 1.5× damage, faster swimming, chained dives and a breath that tracks you.",
     "translation": "用噴流凝聚體和霍金凝聚體重新賦予旋轉的漩渦斷章。在沉沒的爐心區的守衛封印核心上使用，會召喚覺醒的能層巨蛇：生命 2.5 倍、傷害 1.5 倍、游得更快、連續衝撞，漩渦吐息會追蹤你。"
+  },
+  "desc.singulo.awakening_foundry_core": {
+    "source": "Precision actuators charged with singularity power to reawaken the overseer's command chain. Use it on the guardian core in an Android Laboratory to wake the Awakened Foundry: 2.5× health, 1.5× damage, faster moves, and it reprints its broken production lines once when enraged.",
+    "translation": "向精密致動器注入奇點之力，喚醒統籌 AI 指令系統的核心。在地下仿生人研究所的守衛封印核上使用，覺醒的鑄造廠就會醒來。體力 2.5 倍、攻擊 1.5 倍，招式間隔更短，進入全力狀態時會把被破壞的生產線全部重新列印一次。"
   },
   "desc.singulo.awakening_gravity_core": {
     "source": "A degenerate nucleus charged with singularity power. Use it on the guardian core in a Culture Facility to call the Awakened Gravity Remnant: 2.5× health, 1.5× damage, more debris, a wider and stronger gravity well, and chained slams. Victory adds an overclock chip and more to the usual drops.",
@@ -1387,6 +1663,10 @@
     "source": "Creative only. Instantly builds the multiblock of a controller. Sneak to change size.",
     "translation": "僅限創造模式。立即建造控制器的多方塊結構。潛行可改變尺寸。"
   },
+  "desc.singulo.bulkhead": {
+    "source": "A heavy door sealing the laboratory core section. It opens when facility power returns. Unbreakable.",
+    "translation": "封住研究所中樞區的厚門。設施恢復供電後打開。無法破壞。"
+  },
   "desc.singulo.casimir_cavity": {
     "source": "Creates negative energy between mirrors to make exotic matter.",
     "translation": "在鏡子之間產生負能量以製造奇異物質。"
@@ -1426,6 +1706,10 @@
   "desc.singulo.ceramic_substrate": {
     "source": "A fired ceramic board for circuits.",
     "translation": "用於電路的燒製陶瓷板。"
+  },
+  "desc.singulo.coffee_maker": {
+    "source": "The laboratory break-room coffee maker. Use it: it still works.",
+    "translation": "研究所茶水間的咖啡機。右鍵試試，還能用。"
   },
   "desc.singulo.cold_atom_trap": {
     "source": "A restored cold atom trap.",
@@ -1655,6 +1939,10 @@
     "source": "A seed found in the Culture Facility. Restore it to grow time crystals.",
     "translation": "在封閉培養設施拾得的種子。修復後可培育時間晶體。"
   },
+  "desc.singulo.desk_monitor": {
+    "source": "A small monitor from a laboratory desk. Only its screen glows faintly.",
+    "translation": "研究所桌上的小顯示器。只有螢幕微微發光。"
+  },
   "desc.singulo.dimensional_pocket": {
     "source": "Right-click to open your own 27-slot storage from anywhere. The contents survive death.",
     "translation": "右鍵即可隨時隨地打開專屬的 27 格收納空間。死亡後內容也不會消失。"
@@ -1678,6 +1966,10 @@
   "desc.singulo.electrolyzer": {
     "source": "Splits water into hydrogen and oxygen.",
     "translation": "將水分解成氫氣和氧氣。"
+  },
+  "desc.singulo.emergency_light": {
+    "source": "Laboratory emergency light. It glows red only while main power is down.",
+    "translation": "研究所的緊急照明燈。只在主電源斷開時亮起紅光。"
   },
   "desc.singulo.entangled_element": {
     "source": "Always made in pairs. Used in detectors and links.",
@@ -1710,6 +2002,18 @@
   "desc.singulo.extraction_port": {
     "source": "Power/fuel port for the reactor. Replaces any ring shell block (not the gyro drives).",
     "translation": "反應爐的電力／燃料埠。可替換環上任何外殼方塊（陀螺驅動裝置除外）。"
+  },
+  "desc.singulo.facility_light": {
+    "source": "Laboratory ceiling light. It shines white only while the facility has power.",
+    "translation": "研究所的天花板照明。只在設施有電時發出白光。"
+  },
+  "desc.singulo.factory_conveyor": {
+    "source": "A belt conveyor from an old-civilization factory. While running, it carries whatever stands on it. The Foundry Overseer runs them during its fight.",
+    "translation": "舊文明工廠的皮帶輸送帶。運轉時會把站在上面的東西運走。廢棄仿生人工廠的鑄造廠只在戰鬥期間讓它運轉。"
+  },
+  "desc.singulo.factory_line": {
+    "source": "A printing bay along the walls of the Android Laboratory AI core. While running it shields the Foundry Overseer and prints mass-produced androids. Breakable by hand.",
+    "translation": "排列在地下仿生人研究所 AI 中樞牆邊的列印艙。運轉期間會保護鑄造廠，並列印量產型仿生人送出來。徒手也能破壞。"
   },
   "desc.singulo.focusing_magnet": {
     "source": "Magnet for the ring corners and at least 1/4 of the ring.",
@@ -1839,6 +2143,30 @@
     "source": "Fires ceramics and boards. Oxygen makes it hotter.",
     "translation": "燒製陶瓷和基板。通入氧氣可提高溫度。"
   },
+  "desc.singulo.lab_frame": {
+    "source": "Dark steel framing used for the laboratory's pillars and door frames.",
+    "translation": "用於研究所柱子和門框的深色鋼結構材。"
+  },
+  "desc.singulo.lab_glass": {
+    "source": "Clear partition glass from the laboratory.",
+    "translation": "研究所隔間用的透明玻璃。"
+  },
+  "desc.singulo.lab_panel": {
+    "source": "White wall panelling from the underground android laboratory. The androids still polish it spotless.",
+    "translation": "地下仿生人研究所的白色牆材。仿生人至今仍在擦拭，一塵不染。"
+  },
+  "desc.singulo.lab_panel_lined": {
+    "source": "Laboratory panelling with a blue-grey band.",
+    "translation": "帶有青灰色條紋的研究所牆材。"
+  },
+  "desc.singulo.lab_terminal": {
+    "source": "A terminal left in the laboratory. Use it to read the records left behind.",
+    "translation": "研究所裡留下的終端。右鍵可以閱讀留下的記錄。"
+  },
+  "desc.singulo.lab_tiles": {
+    "source": "Pale grey laboratory floor tiles.",
+    "translation": "研究所的淺灰色地磚。"
+  },
   "desc.singulo.laser_cooler": {
     "source": "Laser-cools atoms into cold atoms, lattices and condensates.",
     "translation": "以雷射冷原子，製成冷原子、光學晶格基板與凝聚態催化劑。"
@@ -1935,6 +2263,10 @@
     "source": "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole.",
     "translation": "放入機器的升級槽：速度 ×3，但每 tick 耗電 ×4。不能與單極子同時使用。"
   },
+  "desc.singulo.paper_stack": {
+    "source": "Papers left piled on a desk.",
+    "translation": "堆在桌上沒人管的文件。"
+  },
   "desc.singulo.particle_accelerator": {
     "source": "Collides particles into muon bundles and rare monopoles.",
     "translation": "使粒子碰撞，產生緲子束與稀有的磁單極子。"
@@ -1947,6 +2279,14 @@
     "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
     "translation": "把冷原子的振動印在光晶格上的板。能讓時間晶體的振動相位一致，使培育時間為 12 分鐘。"
   },
+  "desc.singulo.power_conduit": {
+    "source": "A conduit carrying power from the central reactor. It glows cyan once power returns.",
+    "translation": "從中央動力爐向設施輸送電力的導管。恢復供電後會發出青光。"
+  },
+  "desc.singulo.precision_actuator": {
+    "source": "A precise drive unit from the production lines of an underground android laboratory. Dropped by the Foundry Overseer and found in the laboratory vault and research chests. Used for the Factory Print Unit and the Awakened Foundry Core.",
+    "translation": "地下仿生人研究所量產線上使用的舊文明精密驅動部件。擊敗統籌 AI 或在研究所的保管庫、資料箱中取得。用於工廠式列印單元和覺醒製造核。"
+  },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
     "translation": "組裝 2 級以後的大部分零件與機器。"
@@ -1954,6 +2294,10 @@
   "desc.singulo.pressure_crystal": {
     "source": "An extremely hard blue crystal formed under deep-sea pressure. Used for the compactor anvil and degenerate precursors.",
     "translation": "在深海水壓下形成的極其堅硬的藍色晶體。用於簡併壓縮爐的鐵砧和簡併前驅體的晶種。"
+  },
+  "desc.singulo.pressure_hull": {
+    "source": "The thick steel shell around the whole laboratory. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
+    "translation": "包覆整個研究所的厚鋼外殼。在統籌 AI 倒下之前處於封鎖狀態，無法破壞。之後也比黑曜石更硬。"
   },
   "desc.singulo.primordial_seed": {
     "source": "A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.",
@@ -2002,6 +2346,14 @@
   "desc.singulo.raw_meteoric_iron": {
     "source": "Smelt it in a blast furnace into meteoric iron.",
     "translation": "在高爐中冶煉成隕鐵錠。"
+  },
+  "desc.singulo.reactor_console": {
+    "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",
+    "translation": "中央動力爐的控制台。右鍵啟動動力爐後，設施將恢復供電。"
+  },
+  "desc.singulo.reactor_core": {
+    "source": "The central reactor core. It glows bright cyan once power returns.",
+    "translation": "中央動力爐的爐心。恢復供電後會發出強烈的青光。"
   },
   "desc.singulo.reactor_mass_alarm": {
     "source": "Replaces a shell on a reactor ring. Emits redstone when the core reaches its mass limit, stronger near collapse.",
@@ -2106,6 +2458,10 @@
   "desc.singulo.sentinel_core": {
     "source": "The record crystal from the Echo Sentinel's chest. Built into the Echo Resonator, Time Crystal Incubator and Probe Station.",
     "translation": "回聲守衛胸口的記錄晶體。用於回聲共鳴器、時間晶體培育槽與自動探測站。"
+  },
+  "desc.singulo.server_rack": {
+    "source": "A laboratory server. Its lights blink while powered.",
+    "translation": "研究所的伺服器。有電時指示燈會閃爍。"
   },
   "desc.singulo.settings_card": {
     "source": "Copies a machine's settings to another.",
@@ -2223,6 +2579,10 @@
     "source": "Wire for coils and cables.",
     "translation": "用於線圈與電纜的線材。"
   },
+  "desc.singulo.survey_glasses": {
+    "source": "Worn on the head (use it, or put it in the helmet slot). While worn, the places recorded on the area card or work location card in your hand are outlined (with only the first corner of an area recorded, the area up to the block you look at is previewed). The icons over working androids, showing what they are doing, are only visible while wearing them.",
+    "translation": "戴在頭上（右鍵，或放入頭盔欄）。戴著時，手中範圍卡・作業位置卡記錄的地點會以框線顯示（範圍卡只記錄了第一個角時，還會預覽到所看方塊為止的範圍）。作業中仿生人頭上表示目前動作的標記，也只有戴著時才能看到。"
+  },
   "desc.singulo.temporal_key": {
     "source": "Opens or seals a temporal-lock container. Used up each time.",
     "translation": "用於打開或封印時間鎖容器。每次使用都會消耗。"
@@ -2295,6 +2655,10 @@
     "source": "Makes a strong toroidal field.",
     "translation": "產生強大的環形磁場。"
   },
+  "desc.singulo.trash_bin": {
+    "source": "A laboratory trash bin. The androids empty it every day.",
+    "translation": "研究所的垃圾桶。仿生人每天都會把它倒空。"
+  },
   "desc.singulo.unfired_ceramic": {
     "source": "Clay, sand, Nether quartz and bone meal, ready to be fired into white ceramic.",
     "translation": "黏土、沙、地獄石英和骨粉的混合物，可燒製成白色陶瓷複合材料。"
@@ -2302,6 +2666,10 @@
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
     "translation": "除非在 60 秒內穩定下來否則就會崩潰。"
+  },
+  "desc.singulo.vending_machine": {
+    "source": "A laboratory drinks vending machine (two blocks tall). Use it: sold out.",
+    "translation": "研究所的飲料自動販賣機（2 格高）。右鍵試試，已售完。"
   },
   "desc.singulo.vented_ruin_panel": {
     "source": "Vented ancient panel.",
@@ -2479,6 +2847,14 @@
     "source": "Light Pillar",
     "translation": "光柱"
   },
+  "entity.singulo.axe_android": {
+    "source": "Axe Android \"Alma\"",
+    "translation": "斧型仿生人「阿爾瑪」"
+  },
+  "entity.singulo.bit_android": {
+    "source": "Bit Android \"Nox\"",
+    "translation": "浮游砲型仿生人「諾克絲」"
+  },
   "entity.singulo.blade_android": {
     "source": "Blade Android \"Lumina\"",
     "translation": "光刃型仿生人「露米娜」"
@@ -2506,6 +2882,14 @@
   "entity.singulo.ergosphere_leviathan.wyrm.awakened": {
     "source": "Awakened Ergosphere Wyrm",
     "translation": "覺醒的能層之龍"
+  },
+  "entity.singulo.foundry_overseer": {
+    "source": "Foundry Overseer",
+    "translation": "統籌 AI「鑄造廠」"
+  },
+  "entity.singulo.foundry_overseer.awakened": {
+    "source": "Awakened Foundry Overseer",
+    "translation": "覺醒的鑄造廠"
   },
   "entity.singulo.gravity_debris": {
     "source": "Gravity Debris",
@@ -2683,6 +3067,18 @@
     "source": "%s%%",
     "translation": "%s%%"
   },
+  "gui.singulo.android.chem": {
+    "source": "Gas tank %s: %s %s / %s mB",
+    "translation": "氣體儲罐%s：%s %s / %s mB"
+  },
+  "gui.singulo.android.chem.empty": {
+    "source": "Gas tank %s: empty",
+    "translation": "氣體儲罐%s：空"
+  },
+  "gui.singulo.android.chem.hint": {
+    "source": "Click with a chemical tank (Mekanism) or similar to fill or draw",
+    "translation": "用化學品儲罐（Mekanism）等點擊，可放入或取出"
+  },
   "gui.singulo.android.decor.0": {
     "source": "Head",
     "translation": "頭部"
@@ -2739,9 +3135,45 @@
     "source": "HP %s / %s",
     "translation": "生命 %s / %s"
   },
+  "gui.singulo.android.log.alarm": {
+    "source": "Spotted a group of %2$s (%1$s and others) and raised the alarm",
+    "translation": "發現了 %1$s 等 %2$s 個敵人的群體，發出了警報"
+  },
+  "gui.singulo.android.log.boss": {
+    "source": "Spotted %s and raised the alarm",
+    "translation": "發現了 %s，發出了警報"
+  },
+  "gui.singulo.android.log.empty.0": {
+    "source": "Nothing recorded yet",
+    "translation": "還沒有記錄"
+  },
+  "gui.singulo.android.log.empty.1": {
+    "source": "Defeated enemies and alarms show up here",
+    "translation": "擊倒的敵人和警報會記在這裡"
+  },
+  "gui.singulo.android.log.kill": {
+    "source": "Defeated %s ×%s",
+    "translation": "擊倒了 %s ×%s"
+  },
+  "gui.singulo.android.log.speech": {
+    "source": "Patrol log",
+    "translation": "巡邏日誌"
+  },
+  "gui.singulo.android.log.when": {
+    "source": "Day %s %s",
+    "translation": "第 %s 天 %s"
+  },
   "gui.singulo.android.mode": {
     "source": "Mode: %s",
     "translation": "模式：%s"
+  },
+  "gui.singulo.android.nickname.axe": {
+    "source": "Alma",
+    "translation": "阿爾瑪"
+  },
+  "gui.singulo.android.nickname.bit": {
+    "source": "Nox",
+    "translation": "諾克絲"
   },
   "gui.singulo.android.nickname.blade": {
     "source": "Lumina",
@@ -2770,6 +3202,10 @@
   "gui.singulo.android.page.gear": {
     "source": "Gear and inventory",
     "translation": "裝備與物品"
+  },
+  "gui.singulo.android.page.log": {
+    "source": "Log",
+    "translation": "記錄"
   },
   "gui.singulo.android.page.status": {
     "source": "Status",
@@ -2915,9 +3351,21 @@
     "source": "Tank %s: %s, about %s / %s mB",
     "translation": "儲罐%s：%s 約 %s / %s mB"
   },
+  "gui.singulo.android.tank.clear": {
+    "source": "Shift-click to dump the contents",
+    "translation": "Shift＋點擊，倒掉內容物"
+  },
   "gui.singulo.android.tank.empty": {
     "source": "Tank %s: empty",
     "translation": "儲罐%s：空"
+  },
+  "gui.singulo.android.tank.hint": {
+    "source": "Click with a bucket or other container to fill or draw",
+    "translation": "用桶等容器點擊，可放入或取出"
+  },
+  "gui.singulo.android.tank.locked": {
+    "source": "Cannot be used while working",
+    "translation": "作業中無法取放"
   },
   "gui.singulo.android.tools": {
     "source": "Tools",
@@ -2960,8 +3408,8 @@
     "translation": "生命"
   },
   "gui.singulo.android_station.kit": {
-    "source": "Kit",
-    "translation": "套件"
+    "source": "Kit · Print",
+    "translation": "套件・列印"
   },
   "gui.singulo.android_station.leader": {
     "source": "Follows: %s",
@@ -3011,9 +3459,49 @@
     "source": "Follows its owner (the buttons below choose whether it fights nearby enemies). Recharges while walking with you if you carry a wireless charger.",
     "translation": "跟隨主人（用下方按鈕選擇是否與附近的敵人戰鬥）。如果你帶著無線充電器，它會邊跟著走邊充電。"
   },
+  "gui.singulo.android_station.mode.3": {
+    "source": "Patrol",
+    "translation": "巡邏"
+  },
+  "gui.singulo.android_station.mode.3.hint": {
+    "source": "Walks the route below (Work Location Cards) in order and fights enemies nearby. Calls idle allies when a fight starts, and when it spots a group of enemies or a boss, the station gives a redstone signal and the owner is told.",
+    "translation": "按順序巡視下方巡邏路線（作業位置卡）的地點，與附近的敵人戰鬥。開始戰鬥時會呼叫空閒的同伴，發現敵人群體或首領時，組裝站會發出紅石訊號並通知主人。"
+  },
   "gui.singulo.android_station.no_design": {
     "source": "No design memory",
     "translation": "沒有設計記憶體"
+  },
+  "gui.singulo.android_station.patrol.dwell": {
+    "source": "Pause %ss",
+    "translation": "停留 %s 秒"
+  },
+  "gui.singulo.android_station.patrol.dwell.hint": {
+    "source": "How long to stop and look around at each point. Click to change",
+    "translation": "在每個地點停下環顧的時間（點擊切換）"
+  },
+  "gui.singulo.android_station.patrol.night.hint": {
+    "source": "Patrol only at night (waiting by the station in the day) or all the time. Click to switch",
+    "translation": "只在夜間巡邏（白天在組裝站旁等待），還是一直巡邏（點擊切換）"
+  },
+  "gui.singulo.android_station.patrol.night.off": {
+    "source": "Day & night",
+    "translation": "晝夜都巡"
+  },
+  "gui.singulo.android_station.patrol.night.on": {
+    "source": "Nights only",
+    "translation": "僅夜間"
+  },
+  "gui.singulo.android_station.patrol.order.back_and_forth": {
+    "source": "Back & forth",
+    "translation": "往返"
+  },
+  "gui.singulo.android_station.patrol.order.hint": {
+    "source": "After the last point, go back to the first one (Loop) or come back the same way (Back & forth). Click to switch",
+    "translation": "到達最後一個地點後，是回到第一個地點（循環），還是沿原路返回（往返）（點擊切換）"
+  },
+  "gui.singulo.android_station.patrol.order.loop": {
+    "source": "Loop",
+    "translation": "循環"
   },
   "gui.singulo.android_station.permit": {
     "source": "Permit",
@@ -3042,6 +3530,22 @@
   "gui.singulo.android_station.retreat.hint": {
     "source": "Below this share of health it returns to the station to repair and recharge.",
     "translation": "生命值低於此比例時，返回組裝站維修並充電。"
+  },
+  "gui.singulo.android_station.route.hint": {
+    "source": "Patrol route: place Work Location Cards and the androids visit those places from left to right (up to 8), standing on top of each one to look around.",
+    "translation": "巡邏路線：放入作業位置卡後，會從左到右依次巡視這些地點（最多 8 個），站在卡片記錄的地點上方環顧四周。"
+  },
+  "gui.singulo.android_station.rules": {
+    "source": "Routes",
+    "translation": "路徑"
+  },
+  "gui.singulo.android_station.rules.back": {
+    "source": "Status",
+    "translation": "狀態"
+  },
+  "gui.singulo.android_station.rules.hint": {
+    "source": "Switch to the page of route rules for patrols (required waypoints and no-entry zones)",
+    "translation": "切換到巡邏移動規則（必經點・禁入區域）的頁面"
   },
   "gui.singulo.android_station.status.0": {
     "source": "Insert a compact crystal memory",
@@ -3727,6 +4231,10 @@
     "source": "A vortex opens in the dead core. Something small crawls out...",
     "translation": "停止的爐心中張開了漩渦。有什麼小東西爬了出來……"
   },
+  "gui.singulo.guardian.awakened.foundry_overseer": {
+    "source": "The production lines start up. The Foundry Overseer wakes",
+    "translation": "生產線啟動了。製造統籌 AI「鑄造廠」醒來了"
+  },
   "gui.singulo.guardian.awakened.gravity_remnant": {
     "source": "The containment tank shatters. The Gravity Remnant crawls out",
     "translation": "收容槽碎裂了。重力殘渣爬了出來"
@@ -3743,6 +4251,10 @@
     "source": "The core resonates. The Awakened Ergosphere Leviathan tears through the vortex",
     "translation": "覺醒核發生共鳴。覺醒的能層巨蛇撕裂漩渦現身了"
   },
+  "gui.singulo.guardian.awakened_rematch.foundry_overseer": {
+    "source": "The awakening core resonates. The Awakened Foundry restarts every line",
+    "translation": "覺醒核發生共鳴。覺醒的鑄造廠重新啟動了所有生產線"
+  },
   "gui.singulo.guardian.awakened_rematch.gravity_remnant": {
     "source": "The core resonates. The Awakened Gravity Remnant crawls out",
     "translation": "覺醒核發生共鳴。覺醒的重力殘渣爬了出來"
@@ -3754,6 +4266,10 @@
   "gui.singulo.guardian.defeated.ergosphere_leviathan": {
     "source": "The Ergosphere Leviathan sinks into the vortex. The vault field dissipates",
     "translation": "能層巨蛇沉入了漩渦之底。保管庫的力場消失了"
+  },
+  "gui.singulo.guardian.defeated.foundry_overseer": {
+    "source": "The Foundry's eye goes dark. The lines halt and the vault field dissipates",
+    "translation": "鑄造廠的獨眼熄滅了。生產線停止，保管庫的力場消失了"
   },
   "gui.singulo.guardian.defeated.gravity_remnant": {
     "source": "The Gravity Remnant collapses. The vault field dissipates",
@@ -3770,6 +4286,10 @@
   "gui.singulo.guardian.reset.ergosphere_leviathan": {
     "source": "No challenger remains. The Ergosphere Leviathan returns to the core",
     "translation": "挑戰者已離開，能層巨蛇回到了爐心的漩渦中"
+  },
+  "gui.singulo.guardian.reset.foundry_overseer": {
+    "source": "No challenger remains. The Foundry halts its lines and powers down",
+    "translation": "挑戰者已離開，鑄造廠停下生產線，進入了休眠"
   },
   "gui.singulo.guardian.reset.gravity_remnant": {
     "source": "No challenger remains. The Gravity Remnant sinks back into its tank",
@@ -4164,16 +4684,16 @@
     "translation": "入 %s"
   },
   "gui.singulo.recipe_encoder.face_button.in.hint": {
-    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Directions are world directions",
-    "translation": "從裝置的哪個面放入材料（點擊切換，右鍵反向）。東南西北為世界方向"
+    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Directions are world directions",
+    "translation": "從裝置的哪個面放入材料（點擊切換，右鍵反向）。自動：依上、側面、下的順序，從接受該材料的面放入（通常這樣就行）。東南西北為世界方向"
   },
   "gui.singulo.recipe_encoder.face_button.out": {
     "source": "Out: %s",
     "translation": "出 %s"
   },
   "gui.singulo.recipe_encoder.face_button.out.hint": {
-    "source": "Which face of the machine products are taken out from (click to change, right-click to go back)",
-    "translation": "從裝置的哪個面取出產物（點擊切換，右鍵反向）"
+    "source": "Which face of the machine products are taken out from (click to change, right-click to go back). Auto: tries bottom, sides, then top, and uses the first face the products come out of (furnaces use the bottom)",
+    "translation": "從裝置的哪個面取出產物（點擊切換，右鍵反向）。自動：依下、側面、上的順序，從能取出產物的面取出（熔爐類為下）"
   },
   "gui.singulo.recipe_encoder.fuel": {
     "source": "Fuel",
@@ -4182,6 +4702,18 @@
   "gui.singulo.recipe_encoder.fuel.hint": {
     "source": "The fuel to fetch when the machine runs out, and how many to bring each time (scroll to change). Leave it empty to never fetch fuel",
     "translation": "裝置燃料耗盡時要去取的燃料，以及每次帶來的數量（滾動滾輪變更數量）。留空則不去取"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.count": {
+    "source": "×%s",
+    "translation": "%s 個"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.fill": {
+    "source": "Fill",
+    "translation": "加滿"
+  },
+  "gui.singulo.recipe_encoder.fuel_mode.hint": {
+    "source": "How much fuel is brought each time (click to switch). ×N: the count in the fuel slot (never more than the machine can take). Fill: as much as the machine can take",
+    "translation": "每次帶來的燃料數量（點擊切換）。N 個：按燃料欄的數量（裝置放不下的部分不帶）。加滿：裝置能放入多少就帶多少"
   },
   "gui.singulo.recipe_encoder.grid.hint": {
     "source": "Click with an item to place a copy as a pattern (it is not used up)",
@@ -4338,6 +4870,38 @@
   "gui.singulo.recipe_encoder.variants.on": {
     "source": "Any variant",
     "translation": "同類也可"
+  },
+  "gui.singulo.route.hint.0": {
+    "source": "Moving into or out of the area, androids pass the waypoint",
+    "translation": "進出對象範圍時，會經過途經點，"
+  },
+  "gui.singulo.route.hint.1": {
+    "source": "and stay out of its no-entry zones on the way (up to 4 rows)",
+    "translation": "途中避開禁入區域（最多 4 行）"
+  },
+  "gui.singulo.route.scope": {
+    "source": "Area",
+    "translation": "對象範圍"
+  },
+  "gui.singulo.route.scope.hint": {
+    "source": "Area (Area Card): only moves into or out of this area go through the waypoint",
+    "translation": "對象範圍（範圍卡）：只有進出這個範圍的移動才會經過途經點"
+  },
+  "gui.singulo.route.via": {
+    "source": "Waypoint",
+    "translation": "途經點"
+  },
+  "gui.singulo.route.via.hint": {
+    "source": "Waypoint (Work Location Card): androids moving into or out of the area pass over this place",
+    "translation": "途經點（作業位置卡）：進出對象範圍時，會從這個地點上方經過"
+  },
+  "gui.singulo.route.zone": {
+    "source": "No-entry zones",
+    "translation": "禁入區域"
+  },
+  "gui.singulo.route.zone.hint": {
+    "source": "No-entry zone (Area Card, up to 2): androids stay out of it while moving through the waypoint (unless they start or end inside it)",
+    "translation": "禁入區域（範圍卡，最多 2 個）：經過途經點的移動期間不進入這裡（包含出發地或目的地的區域除外）"
   },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",
@@ -4656,8 +5220,8 @@
     "translation": "返回"
   },
   "gui.singulo.work_console.busy": {
-    "source": "%s (busy)",
-    "translation": "%s（作業中）"
+    "source": "%s (busy at another console)",
+    "translation": "%s（在其他指令台作業中）"
   },
   "gui.singulo.work_console.cancel": {
     "source": "Cancel",
@@ -4678,6 +5242,10 @@
   "gui.singulo.work_console.cancelled.unreachable": {
     "source": "Cancelled the order for %s (a place could not be reached)",
     "translation": "已取消 %s 的訂單（有無法到達的地方）"
+  },
+  "gui.singulo.work_console.cancelled.wrong_face": {
+    "source": "Cancelled the order for %s (the machine does not take materials through its %s face)",
+    "translation": "已取消 %s 的訂單（裝置不接受從放入面（%s）放入的材料）"
   },
   "gui.singulo.work_console.cannot_start": {
     "source": "This order cannot be started",
@@ -4735,6 +5303,14 @@
     "source": "Click to see the steps and what each android is doing",
     "translation": "點擊查看工序和仿生人的狀態"
   },
+  "gui.singulo.work_console.detail.machine": {
+    "source": " (%s in a machine)",
+    "translation": "（%s 在裝置中加工）"
+  },
+  "gui.singulo.work_console.detail.machine_eta": {
+    "source": " (%s in a machine, about %ss left)",
+    "translation": "（%s 在裝置中加工，約剩 %s 秒）"
+  },
   "gui.singulo.work_console.detail.to_stock": {
     "source": "To stockpile %s / %s",
     "translation": "放入資材存放處 %s / %s"
@@ -4779,6 +5355,14 @@
     "source": "The work location for %s is not a crafting table",
     "translation": "%s 的配方的作業位置不是工作台"
   },
+  "gui.singulo.work_console.error.wrong_face": {
+    "source": "The machine for %s does not take %s through its %s face (check the \"In\" face on the recipe card)",
+    "translation": "%s 的配方的裝置不接受從放入面（%3$s）放入的 %2$s（請確認配方卡的「入」面）"
+  },
+  "gui.singulo.work_console.fuel_ordered": {
+    "source": "Out of fuel (%s), so an order to make %s was placed",
+    "translation": "資材存放處沒有燃料（%s），已下單製作 %s 個"
+  },
   "gui.singulo.work_console.link.0": {
     "source": "Supply port",
     "translation": "資材口"
@@ -4810,6 +5394,10 @@
   "gui.singulo.work_console.materials": {
     "source": "To craft, and materials (need / have)",
     "translation": "製作的物品與材料（需要 / 庫存）"
+  },
+  "gui.singulo.work_console.needs_chem_tank": {
+    "source": "This order moves chemicals (Mekanism gases and the like), so only androids with a Gas Tank Upgrade or a Gas & Liquid Upgrade can be chosen",
+    "translation": "此訂單包含搬運化學品（Mekanism 的氣體等）的工序，只能選擇裝有氣體儲罐升級或氣體與液體升級的仿生人"
   },
   "gui.singulo.work_console.needs_feller": {
     "source": "This order includes felling, so only androids with a Felling Upgrade can be chosen",
@@ -4943,6 +5531,10 @@
     "source": "Record",
     "translation": "記錄"
   },
+  "gui.singulo.work_console.tab.routes": {
+    "source": "Routes",
+    "translation": "路徑"
+  },
   "gui.singulo.work_console.tab.running": {
     "source": "Running",
     "translation": "進行中"
@@ -4991,6 +5583,10 @@
     "source": "(not found)",
     "translation": "（找不到）"
   },
+  "gui.singulo.work_console.worker.elsewhere": {
+    "source": "On another order",
+    "translation": "在做其他訂單的作業"
+  },
   "gui.singulo.wormhole.generated": {
     "source": "A pair of mouths formed. Stabilize within %s s",
     "translation": "已生成一對入口。請在 %s 秒內完成穩定化"
@@ -5036,8 +5632,8 @@
     "translation": "仿生人"
   },
   "guide.singulo.androids.build.body": {
-    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.",
-    "translation": "在仿生人組裝站放入小型水晶記憶體（決定型號，不會消耗）和仿生人套件（每次列印一個）並供電，它就會在上方列印一個護衛仿生人（每次 40,000 FE）。被擊倒後，只要還有套件就會重新列印。放置組裝站的人就是主人。\n- 護衛只攻擊敵對生物（包括遺蹟的仿生人和無人機），從不與玩家或首領戰鬥。玩家和首領的攻擊不會傷到它。\n- 行動方式：迎擊（在組裝站旁等待）、徘徊（在 16 格內四處走動）、跟隨（跟著主人）。跟隨時可以選擇「只跟隨」或「護衛」（與附近的敵人戰鬥）。\n- 許可證：在組裝站放入護盾通行證後，只有主人和已登記的人能打開組裝站和仿生人的介面。也可以選擇跟隨主人還是某位已登記的人。\n- 返回生命：低於此值時，仿生人會回去維修並充電。按「召回」可立即讓它回去。\n- 名字：在組裝站或仿生人介面中點擊名字即可改名（↺ 按鈕恢復暱稱）。\n- 比較器：組裝站會根據仿生人的生命輸出訊號（0〜15）。\n- 組裝站被破壞後，仿生人會留在原地。在新的組裝站放入相同型號的記憶體並按「連結」即可重新連接。"
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..",
+    "translation": "在仿生人組裝站放入小型水晶記憶體（決定型號，不會消耗）和仿生人套件（每次列印一個）並供電，它就會在上方列印一個護衛仿生人（每次 40,000 FE）。被擊倒後，只要還有套件就會重新列印。放置組裝站的人就是主人。\n- 護衛只攻擊敵對生物（包括遺蹟的仿生人和無人機），從不與玩家或首領戰鬥。玩家和首領的攻擊不會傷到它。\n- 行動方式：迎擊（在組裝站旁等待）、徘徊（在 16 格內四處走動）、跟隨（跟著主人）、巡邏（巡視設定的地點）。跟隨時可以選擇「只跟隨」或「護衛」（與附近的敵人戰鬥）。\n- 許可證：在組裝站放入護盾通行證後，只有主人和已登記的人能打開組裝站和仿生人的介面。也可以選擇跟隨主人還是某位已登記的人。\n- 返回生命：低於此值時，仿生人會回去維修並充電。按「召回」可立即讓它回去。\n- 名字：在組裝站或仿生人介面中點擊名字即可改名（↺ 按鈕恢復暱稱）。\n- 比較器：組裝站會根據仿生人的生命輸出訊號（0〜15）。\n- 組裝站被破壞後，仿生人會留在原地。在新的組裝站放入相同型號的記憶體並按「連結」即可重新連接。\n- 日常生活：無事可做時，護衛會在組裝站附近休息。坐在樓梯、半磚或椅子上（夜裡會打盹），把手放在盆栽和作物上方，掃地，把掉在地上一段時間的物品收進附近的箱子，和同伴聊天，下雨時躲到屋簷下（拿著傘就留在外面），眺望夕陽或夜空。"
   },
   "guide.singulo.androids.build.title": {
     "source": "Your own androids",
@@ -5067,33 +5663,49 @@
     "source": "Android glass",
     "translation": "仿生人用玻璃"
   },
+  "guide.singulo.androids.patrol.body": {
+    "source": "Set the station's mode to Patrol and the androids walk a set route and keep watch.\n- Route: choosing Patrol shows eight slots. Put Work Location Cards in them and the androids visit those places from left to right, standing on top of each to look around. Choose whether they go back to the first point (Loop) or return the same way (Back & forth), whether they patrol only at night, and how long they stop at each point. Two androids start from opposite sides.\n- Fights: they fight enemies nearby and carry on from where they left off. When a fight starts, idle androids of the same station come to help (and go back afterwards).\n- Alarm: when they spot a group of enemies (5 or more) or a boss, the station gives a redstone signal for 5 seconds and the owner is told (at most once a minute).\n- Log: defeated enemies and alarms are kept on the Log page of the android screen, newest first (16 entries). Come back after a while and the android tells you what happened while you were away.",
+    "translation": "把組裝站的行動方式設為「巡邏」後，仿生人會按順序巡視設定的地點並警戒。\n・巡邏路線：選擇「巡邏」後會出現 8 個欄位，放入作業位置卡後，會從左到右依次巡視這些地點，站在卡片記錄的地點上方環顧四周。可以選擇到達最後後回到第一個地點（循環）還是沿原路返回（往返）、是否只在夜間巡邏，以及在每個地點停留的時間。兩個仿生人會從相反的方向開始巡視。\n・戰鬥：與附近的敵人戰鬥，解決後從離開的地方繼續。開始戰鬥時會呼叫同一組裝站空閒的同伴（解決後回到原來的崗位）。\n・警報：發現敵人群體（5 個以上）或首領時，組裝站會發出 5 秒紅石訊號並通知主人（每分鐘最多 1 次）。\n・記錄：擊倒的敵人和警報會按從新到舊的順序記在仿生人介面的「記錄」頁（16 條）。隔一段時間再走近時，它會告訴你不在時發生的事。"
+  },
+  "guide.singulo.androids.patrol.title": {
+    "source": "Patrol",
+    "translation": "巡邏警備"
+  },
   "guide.singulo.androids.process.body": {
-    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in from above, wait beside the machine and take the results out from below. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (as many as you set each time; leave it empty to never fetch fuel).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "用指令台「記錄」的模式按鈕切換要記錄的種類。\n・加工：熔爐和裝置的配方。左邊放放入的物品，右邊放產出的物品（另可放最多 2 個副產物），用滾輪變更數量（也可用 JEI 的「+」）。仿生人從上方放入裝置，在旁邊等待完成後從下方取出。副產物放回資材存放處。燃料和電力需自己準備。2 分鐘沒有進展時，訂單會被取消。\n・步驟：在步驟卡上記錄最多 8 個放入、取出、採掘的步驟。放入作業位置卡來複製位置，在物品欄放入物品後按「新增」。在右邊放產物後記錄。步驟卡自帶位置，所以可以放在配方架的任意一行。\n・採掘：只有裝有採掘升級的仿生人會執行。用 2 張作業位置卡決定範圍後，從上層開始挖，直到收集到所需物品（也可用於刷石機）。無法破壞的方塊、液體、容器、受護盾保護的地方不會挖。沒有可挖的東西持續 30 秒時會取消。\n・農活：收穫（收取成熟的作物並補種。甘蔗和仙人掌保留根部）、伐木（整棵砍樹並補種樹苗。需要伐木升級）、繁殖（餵食增加到設定數量）、剪毛・擠奶（會帶上空桶）、處理（超過設定數量的部分）。不會碰有名字、拴著、被馴服的動物和幼崽。\n・操作：使用拉桿（開・關・切換）、按鈕、門等。用來驅動機關。\n・液體與氣體：資材口和指令台旁的儲罐也是資材存放處。在加工模式或步驟的樣本欄中用桶等容器點擊，或用 JEI 的「+」，即可放置流體（滾輪每次 100 mB，Shift 每次 1000 mB）。裝有儲罐升級的仿生人會把流體運到裝置。製作流體的訂單會放入資材存放處的儲罐。\n・燃料：在加工模式的燃料欄放入燃料後記錄，裝置燃料耗盡時會從資材存放處取來該燃料放入（每次放入設定的數量。留空則不去取）。\n・機率產出：產出數量不足時，從資材存放處取用不足部分的材料，重複製作直到收集齊（材料不足時會等到備齊）。收穫、伐木、牧場中若還有會生長的東西，會等待其生長（最多 20 分鐘）。紫水晶只收取完全長成的晶簇，不會破壞紫水晶母岩。\n・仿生人工作台：製作速度是原版工作台的 4 倍。"
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in and take the results out (the faces are chosen automatically, or set them with the In and Out buttons when recording). While a slow machine works, they do other jobs (including their other orders) and come back when it is done. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
+    "translation": "用指令台「記錄」的模式按鈕切換要記錄的種類。\n・加工：熔爐和裝置的配方。左邊放放入的物品，右邊放產出的物品（另可放最多 2 個副產物），用滾輪變更數量（也可用 JEI 的「+」）。仿生人把材料放入裝置，取出產物（面會自動決定，也可以在記錄時用「入」「出」按鈕指定）。耗時較長的加工，會在等待期間去做其他作業（包括承擔的其他訂單），完成後再回來取。副產物放回資材存放處。燃料和電力需自己準備。2 分鐘沒有進展時，訂單會被取消。\n・步驟：在步驟卡上記錄最多 8 個放入、取出、採掘的步驟。放入作業位置卡來複製位置，在物品欄放入物品後按「新增」。在右邊放產物後記錄。步驟卡自帶位置，所以可以放在配方架的任意一行。\n・採掘：只有裝有採掘升級的仿生人會執行。用 2 張作業位置卡決定範圍後，從上層開始挖，直到收集到所需物品（也可用於刷石機）。無法破壞的方塊、液體、容器、受護盾保護的地方不會挖。沒有可挖的東西持續 30 秒時會取消。\n・農活：收穫（收取成熟的作物並補種。甘蔗和仙人掌保留根部）、伐木（整棵砍樹並補種樹苗。需要伐木升級）、繁殖（餵食增加到設定數量）、剪毛・擠奶（會帶上空桶）、處理（超過設定數量的部分）。不會碰有名字、拴著、被馴服的動物和幼崽。\n・操作：使用拉桿（開・關・切換）、按鈕、門等。用來驅動機關。\n・液體與氣體：資材口和指令台旁的儲罐也是資材存放處。在加工模式或步驟的樣本欄中用桶等容器點擊，或用 JEI 的「+」，即可放置流體（滾輪每次 100 mB，Shift 每次 1000 mB）。裝有儲罐升級的仿生人會把流體運到裝置。製作流體的訂單會放入資材存放處的儲罐。\n・燃料：在加工模式的燃料欄放入燃料後記錄，裝置燃料耗盡時會從資材存放處取來該燃料放入（每次按設定的數量，或用欄下方的按鈕設為「加滿」則帶來裝置能放入的量。兩種都不會帶來放不下的部分。留空則不去取）。資材存放處沒有且有配方可以製作時，會自動下單製作燃料（製作期間仿生人會做其他作業）。\n・機率產出：產出數量不足時，從資材存放處取用不足部分的材料，重複製作直到收集齊（材料不足時會等到備齊）。收穫、伐木、牧場中若還有會生長的東西，會等待其生長（最多 20 分鐘）。紫水晶只收取完全長成的晶簇，不會破壞紫水晶母岩。\n・仿生人工作台：製作速度是原版工作台的 4 倍。"
   },
   "guide.singulo.androids.process.title": {
     "source": "Processing, procedures and mining",
     "translation": "加工、步驟與採掘"
   },
+  "guide.singulo.androids.routes.body": {
+    "source": "On the Routes page of the work console, and the Routes page of the assembly station (the button right of the title), you can set up to four movement rules (the console's apply to work trips, the station's to patrols).\n- Each row takes a waypoint (Work Location Card), an area (Area Card) and up to two no-entry zones (Area Cards).\n- Moving into or out of the area, androids first pass over the waypoint, like a door to the base, and stay out of the no-entry zones on the way (unless they start or end inside one).\n- Area Card: sneak-use two blocks to record the area between them as corners (up to 128 blocks per side). Areas reach from the recorded height up two blocks, so recording floor blocks works for androids walking on them.\n- Survey Glasses: worn on the head, they outline the places recorded on the area or work location card in your hand (with only the first corner recorded, the area up to the block you look at is previewed). The icons over working androids only show while you wear them.",
+    "translation": "在作業指令台的「路徑」頁和組裝站的「路徑」（標題右邊的按鈕）中，最多可以設定 4 條仿生人的移動規則（作業指令台作用於作業的移動，組裝站作用於巡邏的移動）。\n・每一行放入途經點（作業位置卡）、對象範圍（範圍卡）、禁入區域（範圍卡，最多 2 個）。\n・進出對象範圍的移動，會先經過途經點上方再前往目的地（像據點的門一樣）。途中不會進入禁入區域（出發地或目的地在區域內時，不避開該區域）。\n・範圍卡：潛行右鍵兩個方塊，記錄以它們為角的範圍（每邊最多 128 格）。範圍作用於從記錄方塊的高度到其上 2 格，所以記錄地面方塊，就能作用於在上面行走的仿生人。\n・測量眼鏡：戴在頭上時，手中範圍卡・作業位置卡記錄的地點會以框線顯示（範圍卡只記錄了第一個角時，還會預覽到所看方塊為止的範圍）。作業中仿生人頭上的標記，也只有戴著時才能看到。"
+  },
+  "guide.singulo.androids.routes.title": {
+    "source": "Routes and Survey Glasses",
+    "translation": "路徑與測量眼鏡"
+  },
   "guide.singulo.androids.ruin.body": {
-    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
-    "translation": "每座遺蹟的牆邊都有廢墟仿生人列印台。生存模式的玩家靠近時，它會在台面上從腳開始逐層列印出 2〜3 個對應型號（光刃型、鞭型或光劍型）的仿生人並讓其出動。全部擊敗後，台面上會出現該型號的小型水晶記憶體，列印台隨後休息一天。\n- 光刃型「露米娜」：蹲下、刀刃發亮後，會留下殘影衝來斬擊。單膝跪地手按地面時，腳下會出現預告圈並升起光柱（離開圈）。近身時會張開刀刃迴旋斬。\n- 鞭型「薇爾娜」：可達約 6 格的鞭擊，以及纏住並把你拉近的纏繞。在頭頂甩鞭後，會抽打地面放出一道直線衝擊波（跳起即可躲開）。\n- 光劍型「索蕾伊」：踏步突刺、揮動時劍刃伸長的橫斬，以及飛行的新月斬擊波。受擊時會在正面展開光盾（正面幾乎打不進去），繼續攻擊會被反擊。請從側面或背後進攻。\n仿生人依靠電量行動，大招用 10 次左右就會耗盡，眼睛的光會熄滅。它們會回到附近的列印台，或在白天露天處展開太陽能板，夜晚或室內則坐下充電（列印台 5 秒、太陽能 10 秒、坐下 14 秒）。充電時不會攻擊，正是進攻的時機。"
+    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
+    "translation": "每座遺蹟的牆邊都有廢墟仿生人列印台。生存模式的玩家靠近時，它會在台面上從腳開始逐層列印出 2〜3 個對應型號（光刃型、鞭型或光劍型）的仿生人並讓其出動。全部擊敗後，台面上會出現該型號的小型水晶記憶體，列印台隨後休息一天。\n- 光刃型「露米娜」：蹲下、刀刃發亮後，會留下殘影衝來斬擊。單膝跪地手按地面時，腳下會出現預告圈並升起光柱（離開圈）。近身時會張開刀刃迴旋斬。\n- 鞭型「薇爾娜」：可達約 6 格的鞭擊，以及纏住並把你拉近的纏繞。在頭頂甩鞭後，會抽打地面放出一道直線衝擊波（跳起即可躲開）。\n- 光劍型「索蕾伊」：踏步突刺、揮動時劍刃伸長的橫斬，以及飛行的新月斬擊波。受擊時會在正面展開光盾（正面幾乎打不進去），繼續攻擊會被反擊。請從側面或背後進攻。\n地下仿生人研究所裡有列印台不會出現的試作機（由統籌 AI 呼叫）。\n- 斧型「阿爾瑪」：又硬又重。把斧頭往右拉之後是大範圍橫掃；舉過頭頂後會砸向地面，向前方放出一道直線衝擊波（跳起來就不會被打中）；壓低身體後會撲過來，落地時攻擊周圍。\n- 浮游砲型「諾克絲」：讓背上的浮游砲浮起來，從遠處用光線射擊（體力低於一半時增至 6 台）。她會試圖拉開距離，靠近時會用短劍連擊兩次再向後跳開。躲到牆後光線就打不到。\n仿生人依靠電量行動，大招用 10 次左右就會耗盡，眼睛的光會熄滅。它們會回到附近的列印台，或在白天露天處展開太陽能板，夜晚或室內則坐下充電（列印台 5 秒、太陽能 10 秒、坐下 14 秒）。充電時不會攻擊，正是進攻的時機。\n位元尖端出現光刃後，位元本身會衝向預先瞄準的位置。準備動作時向側面閃避；牆壁能擋住光束與突進。"
   },
   "guide.singulo.androids.ruin.title": {
     "source": "Ruin androids",
     "translation": "遺蹟的仿生人"
   },
   "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 生產升級：裝在組裝站後，最多列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流。用名字左邊的「1」「2」選擇介面顯示哪一個（行動方式等設定兩個共用）。\n- 在仿生人介面中點擊名字左邊的按鈕，切換到「裝備與物品」頁，就能放入升級。\n- 電池升級：每個使充滿電量增加 50%（最多兩個），充滿所需時間也相應變長。腰部會出現電池包。\n- 背包升級：在 5 格物品之外，再加上背包的 24 格。背包裡有物品時無法取下。\n- 採掘升級：使仿生人能進行採掘作業（相當於鑽石鎬）。可附上效率、幸運和絲綢之觸。\n- 伐木升級：使仿生人能進行伐木作業（相當於鑽石斧）。可附上效率、幸運和絲綢之觸。\n- 儲罐升級：2 個可裝液體或氣體的儲罐（各 32,000 mB，每個儲罐一種）。腰部會出現儲罐。儲罐裡還有東西時無法取下。\n- 作業開/關：為每個仿生人決定是否可以分配作業（自動化）。"
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- Factory Print Unit: in the slot beside the station's kit slot, it halves printing time and power and doubles repair speed on the station. Made from precision actuators found in the Underground Android Laboratory.\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 生產升級：裝在組裝站後，最多列印並管理兩個仿生人。一次只能有一個在上方充電，另一個在旁邊等待並輪流。用名字左邊的「1」「2」選擇介面顯示哪一個（行動方式等設定兩個共用）。\n- 工廠式列印單元：裝在組裝站套件旁邊的槽中，列印所需的時間和電力減半，在組裝站上的修理速度變為 2 倍。用地下仿生人研究所中取得的精密致動器製作。\n- 在仿生人介面中點擊名字左邊的按鈕，切換到「裝備與物品」頁，就能放入升級。\n- 電池升級：每個使充滿電量增加 50%（最多兩個），充滿所需時間也相應變長。腰部會出現電池包。\n- 背包升級：在 5 格物品之外，再加上背包的 24 格。背包裡有物品時無法取下。\n- 採掘升級：使仿生人能進行採掘作業（相當於鑽石鎬）。可附上效率、幸運和絲綢之觸。\n- 伐木升級：使仿生人能進行伐木作業（相當於鑽石斧）。可附上效率、幸運和絲綢之觸。\n- 儲罐升級：2 個可裝液體或氣體的儲罐（各 32,000 mB，每個儲罐一種）。腰部會出現儲罐。儲罐裡還有東西時無法取下。用桶等點擊介面中的儲罐可以取放，按住 Shift 點擊旁邊的 × 會倒掉內容物。\n- 氣體儲罐升級・氣體與液體升級（僅在安裝了 Mekanism 時）：可搬運 Mekanism 化學品（氣體、灌注物、顏料、漿液）的儲罐。氣體儲罐可裝 2 種化學品（各 32,000 mB），氣體與液體可裝液體和化學品各 2 種（各 16,000 mB）。腰部會出現氣瓶。用化學品儲罐等點擊介面中的儲罐可以取放。作業時，資材口旁的化學品儲罐會成為資材存放處，仿生人會把化學品運到裝置。\n- 作業開/關：為每個仿生人決定是否可以分配作業（自動化）。"
   },
   "guide.singulo.androids.upgrades.title": {
     "source": "Upgrades",
     "translation": "升級"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. If a place cannot be reached, the order is cancelled.",
-    "translation": "可以把工作台的合成交給自己的仿生人。\n1. 放置仿生人作業指令台，用作業位置卡潛行右鍵來記錄它。用這張卡右鍵配方架（要增加的話還有資材口和交付口），就會連接到指令台（64 格以內）。\n2. 在指令台（和資材口）旁邊放箱子（資材存放處）。仿生人會到實際放有材料的地方去取。成品會送到下單時選擇的交付目標（指令台的交付箱或命名過的交付口）。\n3. 在指令台的「記錄」的 3×3 中擺放樣本（物品不會減少，也可用 JEI 的「+」），記錄到配方卡上。\n4. 在配方架某一行的左邊放記錄了工作台的作業位置卡，右邊排列配方卡。\n5. 在指令台的「訂單」中選擇物品和數量，確認材料足夠，選擇仿生人後開始作業。有配方的中間材料也會自己製作。\n仿生人每次搬運 5 格（有背包時 +24）。作業中無法取出它的物品，訂單完成後會回到原來的行動方式。有無法到達的地方時，該訂單會被取消。"
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "可以把工作台的合成交給自己的仿生人。\n1. 放置仿生人作業指令台，用作業位置卡潛行右鍵來記錄它。用這張卡右鍵配方架（要增加的話還有資材口和交付口），就會連接到指令台（64 格以內）。\n2. 在指令台（和資材口）旁邊放箱子（資材存放處）。仿生人會到實際放有材料的地方去取。成品會送到下單時選擇的交付目標（指令台的交付箱或命名過的交付口）。\n3. 在指令台的「記錄」的 3×3 中擺放樣本（物品不會減少，也可用 JEI 的「+」），記錄到配方卡上。\n4. 在配方架某一行的左邊放記錄了工作台的作業位置卡，右邊排列配方卡。\n5. 在指令台的「訂單」中選擇物品和數量，確認材料足夠，選擇仿生人後開始作業。有配方的中間材料也會自己製作。\n仿生人每次搬運 5 格（有背包時 +24）。作業中無法取出它的物品，訂單完成後會回到原來的行動方式。作業中的仿生人也可以承擔同一指令台的其他訂單（空閒時也會去做）。有無法到達的地方時，該訂單會被取消。"
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
@@ -5180,8 +5792,8 @@
     "translation": "電力、催化劑與廢墟"
   },
   "guide.singulo.intro.howto.body": {
-    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter shows the goals you have reached and the next ones (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
-    "translation": "- 選擇左側的章節，右側會顯示頁面。用下方的箭頭翻頁。\n- 「進度」章節會顯示已達成與下一個目標（與進度畫面〔L 鍵〕的 Singulo 分頁相同）。\n- 將滑鼠移到物品上可查看說明；按住 Shift 可查看製作方式與用途。\n- 對多方塊結構的控制器使用全像投影器，正確的形狀會以半透明方式浮現。"
+    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
+    "translation": "- 選擇左側的章節，右側會顯示頁面。用下方的箭頭翻頁。\n- 「進度」章節會顯示已達成與下一個目標（與進度畫面〔L 鍵〕的 Singulo 分頁相同）。\n- 將滑鼠移到物品上可查看說明；按住 Shift 可查看製作方式與用途。\n- 對多方塊結構的控制器使用全像投影器，正確的形狀會以半透明方式浮現。\n進度按工業、探索與機器人分支展示；連線用於引導，不是額外的解鎖條件。"
   },
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",
@@ -5284,8 +5896,8 @@
     "translation": "廢墟"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against the pull).\n  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "研究棟、封閉培養設施和最終實驗室的保管庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間後，守衛仍會停留 3 分鐘（讓倒下的人回來取裝備），之後若無人返回才會復原。開啟伺服器設定 bossHardMode 後，守衛會變得更強。擊敗後的掉落物會出現在地板上的守衛封印核心（視界守衛為封印控制台）上方，經驗則由房間內的挑戰者平分並直接獲得（經驗修補依然有效）。\n人數越多，守衛就越強：每多一名玩家，體力增加原本的一半，招式間隔也會稍微縮短（最多計算 6 人）。中途加入時體力比例保持不變，有人離開也不會變弱。相對地，掉落物會按戰鬥開始時的挑戰者人數掉落（之後加入的人不會增加掉落）。多人攻擊時，每個人的攻擊都不會被他人擋住（同一個人連續攻擊，仍需像以往一樣稍作間隔）。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封閉培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。重力井在拉扯之後會蓄力（有光和聲音預兆），把附近的對手彈飛，然後漂移到房間的其他位置。掉落簡併核。\n- 視界守衛（最終實驗室）：觸碰中央的封印控制台即可喚醒。最後形態在你腳下展開的奇點會先預警 1 秒再開始牽引，請立刻離開。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。衝撞掠過地面後，牠會在地面附近停留片刻，正是反擊的好機會。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也能造成全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞後停下的地方，會在牠飛離時留下奇點。掉落漩渦斷章。\n  任何形態：牠高高升起並蜷起身體時，會砸向中心，兩道衝擊波沿地面擴散（波到來時跳起）。地面出現光線時，要在空間裂開前離開線上（共三次，每次改變方向）。骨骼與龍形態還會打開爐心之渦，把整個房間往裡拉（靠近爐心會受傷，要逆著引力向外跑）。\n  爐心再點火：骨骼與龍形態會纏繞爐心蓄力，向整個房間釋放衝擊。出現預兆時，躲到封鎖柱後面（柱上的強化廢墟玻璃也能擋住衝擊）。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against the pull).\n  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never moves and fights with the facility itself. While the four production lines on the walls run, it takes less damage (20% per line): break them first. The lines also send out mass-produced androids. A red mark on the floor is a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the press (step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). The floor conveyors carry you along and reverse after their frames glow red. Below half health it calls two prototypes (Axe and Bit) and uses two arms. Drops precision actuators, and for each challenger a compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundry Core, it reprints its broken lines when enraged.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "研究棟、封閉培養設施和最終實驗室的保管庫，在擊敗各自的守衛之前都被力場封鎖。內容物再生後會重新封鎖，守衛也會回來；所有挑戰者離開房間後，守衛仍會停留 3 分鐘（讓倒下的人回來取裝備），之後若無人返回才會復原。開啟伺服器設定 bossHardMode 後，守衛會變得更強。擊敗後的掉落物會出現在地板上的守衛封印核心（視界守衛為封印控制台）上方，經驗則由房間內的挑戰者平分並直接獲得（經驗修補依然有效）。\n人數越多，守衛就越強：每多一名玩家，體力增加原本的一半，招式間隔也會稍微縮短（最多計算 6 人）。中途加入時體力比例保持不變，有人離開也不會變弱。相對地，掉落物會按戰鬥開始時的挑戰者人數掉落（之後加入的人不會增加掉落）。多人攻擊時，每個人的攻擊都不會被他人擋住（同一個人連續攻擊，仍需像以往一樣稍作間隔）。\n- 回聲守衛（研究棟的檔案室）：一進入房間就會出現的警衛全像投影。它在空中繞著你飛行並發射追蹤光彈，一旦你不再看著它，就會瞬移到你背後斬擊（瞬移前會聚集光芒）。回聲投影器不僅保護守衛，還會一齊射出光之槍（出現金色瞄準線時要移動）；腳下映出光陣時，要在光柱升起前走出陣外。投影器剩得越多，攻擊越難奏效，所以先把它們打掉。體力低於一半時會召喚一擊即消的分身；投影器的光只會連向本體。掉落守衛投影核心。\n- 重力殘渣（封閉培養設施的隔離槽室）：衝破收容槽而出的黑色核心。瓦礫外殼還在時受到的傷害較小，每受一擊剝落一塊；它會把瓦礫射向你。它會把周圍的對手抬起再砸向地面，因此重力靴或衝擊發電面板會很有幫助。體力低於一半時會形成重力井，把你拉向核心（碰到核心會受傷）。重力井在拉扯之後會蓄力（有光和聲音預兆），把附近的對手彈飛，然後漂移到房間的其他位置。掉落簡併核。\n- 視界守衛（最終實驗室）：觸碰中央的封印控制台即可喚醒。最後形態在你腳下展開的奇點會先預警 1 秒再開始牽引，請立刻離開。擊敗後，在控制台上使用覺醒記錄核，即可與覺醒的守衛再戰（生命 2.5 倍、傷害 1.5 倍、更快且更早進入後續階段）。離開房間時記錄核會返還。\n- 能層巨蛇（沉沒的爐心區）：靠近球形收容室地板上停止的爐心，牠就會現身。體力降到 2/3 和 1/3 時會改變形態（變化期間不會受傷）。牠游過的軌跡會把你朝牠游動的方向沖走：順著水流追上去吧。尾部發金光的核心始終是弱點。\n  裝甲：披著反應爐外殼的鱗片，軀幹堅硬。頭部發出青光是衝撞的信號（離開被鎖定的地方）；巨口張開時不要站在正前方（先吸過去，再吐出光束）。靠近尾巴會被橫掃。衝撞掠過地面後，牠會在地面附近停留片刻，正是反擊的好機會。\n  骨骼：把鱗片全部彈飛（靠近會受傷），化為光之骨骼，軀幹也能造成全額傷害。牠會在房間中央盤成一圈旋轉，把你捲著沖走並發射光之碎片；靠近會被咬，衝撞會連續而來。\n  龍：潛入爐心的漩渦，化為黑龍噴湧而出。雙角射出旋轉的兩道光束（相對論性噴流），在高空盤旋時向你腳下降下小型黑洞（光柱是預兆），衝撞後停下的地方，會在牠飛離時留下奇點。掉落漩渦斷章。\n  任何形態：牠高高升起並蜷起身體時，會砸向中心，兩道衝擊波沿地面擴散（波到來時跳起）。地面出現光線時，要在空間裂開前離開線上（共三次，每次改變方向）。骨骼與龍形態還會打開爐心之渦，把整個房間往裡拉（靠近爐心會受傷，要逆著引力向外跑）。\n  爐心再點火：骨骼與龍形態會纏繞爐心蓄力，向整個房間釋放衝擊。出現預兆時，躲到封鎖柱後面（柱上的強化廢墟玻璃也能擋住衝擊）。\n- 統籌 AI「鑄造廠」（地下仿生人研究所的 AI 中樞）：漂浮在中樞中央的機械大腦，自己不會移動，而是用設施的設備戰鬥。牆邊的 4 條生產線運轉期間，攻擊很難奏效（每條 2 成），請先打壞它們。生產線還會不時送出量產型仿生人。地上出現紅色標記是機械臂（標記會追一會兒，停下後才降下來；被抓住會被丟出去），陰影圓圈是沖壓機（馬上離開），地上的扇形標記是焊接雷射（貼地的光線會轉過來，跳過去）。地上的輸送帶會把人運走，框上的燈變紅後會反轉方向。體力低於一半時會呼叫 2 台試作機（斧型、浮游砲型），機械臂變成 2 條。掉落精密致動器，並為每位挑戰者掉落一個試作機的小型水晶記憶體（優先掉落尚未擁有的型號）。用覺醒製造核再戰時，進入全力狀態會重新列印被破壞的生產線。\n- 覺醒的守衛：擊敗回聲守衛或重力殘渣後，在房間地板上的守衛封印核心上使用覺醒回聲核或覺醒重力核，即可再戰（生命 2.5 倍、傷害 1.5 倍、招式更快、體力 65% 時狂暴）。回聲守衛會多一個分身和一發光彈，狂暴時最多重新投影兩個被破壞的投影器；重力殘渣會射出更多瓦礫，重力井更大，並會連續砸地。離開房間時覺醒核會返還。"
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -5307,13 +5919,21 @@
     "source": "Materials found in one place",
     "translation": "只能在特定地點獲得的素材"
   },
+  "guide.singulo.ruins.lab.body": {
+    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is the collapsed main shaft that breaks through to the surface (climb down the ladders and scaffolding). The facility is wrapped in a pressure hull that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- The room layout changes every time: research labs, archives, server rooms, dormitories, a medical bay, a cafeteria and more, guarded by security machines and fabricators. Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
+    "translation": "舊文明的仿生人研究所。統籌 AI「鑄造廠」失控後，職員停掉了中央動力爐，從主豎井逃了出去。人已離開的現在，仿生人們仍遵從「維持設施」這最後的命令，持續修繕著設施。\n- 入口是貫通到地表的崩塌主豎井（順著梯子和鷹架下去）。設施被耐壓殼包覆，在擊敗統籌 AI 之前無法破壞（之後也比黑曜石更硬）。\n- 主電源已斷，這是一座只有紅色緊急照明燈亮著的昏暗設施。右鍵中央動力爐的控制台即可啟動動力爐，設施燈會亮起，AI 中樞的隔離門打開。而沉睡的統籌 AI 也會醒來。\n- 房間的排列每次都不同：研究室、資料室、伺服器室、員工宿舍、醫務室、食堂等，由警衛機和列印台把守。物資箱裡還留著研究所的部件和資料。\n- 右鍵記錄終端可以閱讀留下的記錄。收集起來，就能知道失控的來龍去脈。"
+  },
+  "guide.singulo.ruins.lab.title": {
+    "source": "Underground Android Laboratory",
+    "translation": "地下仿生人研究所"
+  },
   "guide.singulo.ruins.list.body": {
-    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
-    "translation": "- 地表觀測站：平原、沙漠等地表上唯一建在地面的遺蹟。白色警衛無人機。觀測日誌、控制單元（7 天再生）。\n- 研究棟：淺層地下（約 Y −20〜4）。警衛機，以及深處檔案室的回聲守衛。冷原子陷阱、量子資料片段（7 天）。\n- 封閉培養設施：深層地下（約 Y −46〜−30）。低溫核心、更強的警衛機，以及深處隔離槽室的重力殘渣。時間晶種、培養資料（14 天）。\n- 最終實驗室：最深處地下（約 Y −56〜−46）的重力異常點。由視界守衛看守。奇點種子、異常樣本（14 天）。\n- 沉沒的爐心區：比最終實驗室更深的地下（約 Y −60〜−54），停止運轉的第二座反應爐。攻略最終實驗室後調整探索羅盤即可尋找。能層巨蛇。奇異物質、噴流凝聚體、霍金凝聚體（14 天）。"
+    "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The overseer AI Foundry waits in the AI core. Precision actuators and android kits (14 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
+    "translation": "- 地表觀測站：平原、沙漠等地表上唯一建在地面的遺蹟。白色警衛無人機。觀測日誌、控制單元（7 天再生）。\n- 研究棟：淺層地下（約 Y −20〜4）。警衛機，以及深處檔案室的回聲守衛。冷原子陷阱、量子資料片段（7 天）。\n- 封閉培養設施：深層地下（約 Y −46〜−30）。低溫核心、更強的警衛機，以及深處隔離槽室的重力殘渣。時間晶種、培養資料（14 天）。\n- 地下仿生人研究所：中等深度的地下（地板約 Y −38〜−26）。與封閉培養設施並列的分支，在研究樓調校羅盤後就能一起搜尋（羅盤指向貫通到地表的主豎井）。房間的排列每次都不同。深處的 AI 中樞裡是統籌 AI「鑄造廠」。精密致動器・仿生人套件（14 天）。\n- 最終實驗室：最深處地下（約 Y −56〜−46）的重力異常點。由視界守衛看守。奇點種子、異常樣本（14 天）。\n- 沉沒的爐心區：比最終實驗室更深的地下（約 Y −60〜−54），停止運轉的第二座反應爐。攻略最終實驗室後調整探索羅盤即可尋找。能層巨蛇。奇異物質、噴流凝聚體、霍金凝聚體（14 天）。"
   },
   "guide.singulo.ruins.list.title": {
-    "source": "The five ruins",
-    "translation": "五處廢墟"
+    "source": "The six ruins",
+    "translation": "六處廢墟"
   },
   "guide.singulo.ruins.plan.body": {
     "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
@@ -5591,7 +6211,19 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
   },
+  "howto.singulo.android_dual_tank_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
+  },
+  "howto.singulo.android_factory_print_unit": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製造地：精密組裝台（第 4 階段）"
+  },
   "howto.singulo.android_felling_upgrade": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
+  },
+  "howto.singulo.android_gas_tank_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
@@ -5683,6 +6315,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：工作台（第 1 階段）"
   },
+  "howto.singulo.area_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.artificial_star_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "製造地：奇點封裝器（第 5 階段）"
@@ -5692,6 +6328,10 @@
     "translation": "製造地：奇點封裝器（第 5 階段）"
   },
   "howto.singulo.awakening_ergosphere_core": {
+    "source": "Made in: Singularity Encapsulator (stage 5)",
+    "translation": "製造地：奇點封裝器（第 5 階段）"
+  },
+  "howto.singulo.awakening_foundry_core": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "製造地：奇點封裝器（第 5 階段）"
   },
@@ -6363,6 +7003,10 @@
     "source": "Made in: Cryogenic Cooling Tower (stage 2)",
     "translation": "製造地：低溫冷卻塔（第 2 階段）"
   },
+  "howto.singulo.survey_glasses": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.temporal_key": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "製造地：精密組裝台（第 4 階段）"
@@ -6567,9 +7211,21 @@
     "source": "Android Wireless Charger",
     "translation": "仿生人無線充電器"
   },
+  "item.singulo.android_dual_tank_upgrade": {
+    "source": "Gas & Liquid Upgrade",
+    "translation": "氣體與液體升級"
+  },
+  "item.singulo.android_factory_print_unit": {
+    "source": "Factory Print Unit",
+    "translation": "工廠式列印單元"
+  },
   "item.singulo.android_felling_upgrade": {
     "source": "Felling Upgrade",
     "translation": "伐木升級"
+  },
+  "item.singulo.android_gas_tank_upgrade": {
+    "source": "Gas Tank Upgrade",
+    "translation": "氣體儲罐升級"
   },
   "item.singulo.android_hair_flower": {
     "source": "Hair Flower",
@@ -6582,6 +7238,14 @@
   "item.singulo.android_kit": {
     "source": "Android Kit",
     "translation": "仿生人套件"
+  },
+  "item.singulo.android_memory_axe": {
+    "source": "Compact Crystal Memory (Axe)",
+    "translation": "小型水晶記憶體（斧型）"
+  },
+  "item.singulo.android_memory_bit": {
+    "source": "Compact Crystal Memory (Bit)",
+    "translation": "小型水晶記憶體（浮游砲型）"
   },
   "item.singulo.android_memory_blade": {
     "source": "Compact Crystal Memory (Blade)",
@@ -6643,6 +7307,10 @@
     "source": "Archivist's Halo",
     "translation": "記錄者的光環"
   },
+  "item.singulo.area_card": {
+    "source": "Area Card",
+    "translation": "範圍卡"
+  },
   "item.singulo.artificial_star_core": {
     "source": "Artificial Star Core",
     "translation": "人造星核"
@@ -6655,6 +7323,10 @@
     "source": "Awakened Ergosphere Core",
     "translation": "覺醒渦核"
   },
+  "item.singulo.awakening_foundry_core": {
+    "source": "Awakened Foundry Core",
+    "translation": "覺醒製造核"
+  },
   "item.singulo.awakening_gravity_core": {
     "source": "Awakened Gravity Core",
     "translation": "覺醒重力核"
@@ -6662,6 +7334,10 @@
   "item.singulo.awakening_record_core": {
     "source": "Awakening Record Core",
     "translation": "覺醒記錄核"
+  },
+  "item.singulo.axe_android_spawn_egg": {
+    "source": "Axe Android Spawn Egg",
+    "translation": "斧型仿生人生怪蛋"
   },
   "item.singulo.basic_circuit": {
     "source": "Basic Circuit",
@@ -6674,6 +7350,10 @@
   "item.singulo.bh_container": {
     "source": "Empty BH Containment Vessel",
     "translation": "空 BH 安全殼"
+  },
+  "item.singulo.bit_android_spawn_egg": {
+    "source": "Bit Android Spawn Egg",
+    "translation": "浮游砲型仿生人生怪蛋"
   },
   "item.singulo.black_hole_bomb": {
     "source": "Black Hole Bomb",
@@ -6815,6 +7495,10 @@
     "source": "Explorer's Compass",
     "translation": "探索羅盤"
   },
+  "item.singulo.foundry_overseer_spawn_egg": {
+    "source": "Foundry Overseer Spawn Egg",
+    "translation": "鑄造廠生怪蛋"
+  },
   "item.singulo.fulgurite": {
     "source": "Fulgurite",
     "translation": "閃電熔岩"
@@ -6942,6 +7626,10 @@
   "item.singulo.phase_sync_plate": {
     "source": "Phase Sync Plate",
     "translation": "相位同步板"
+  },
+  "item.singulo.precision_actuator": {
+    "source": "Precision Actuator",
+    "translation": "精密致動器"
   },
   "item.singulo.pressure_crystal": {
     "source": "Pressure Crystal",
@@ -7123,6 +7811,10 @@
     "source": "Superconducting Wire",
     "translation": "超導線材"
   },
+  "item.singulo.survey_glasses": {
+    "source": "Survey Glasses",
+    "translation": "測量眼鏡"
+  },
   "item.singulo.temporal_key": {
     "source": "Temporal Key",
     "translation": "時間鎖鑰匙"
@@ -7259,6 +7951,150 @@
     "source": "Toggle gravity tool area",
     "translation": "切換重力工具區域"
   },
+  "lab.singulo.coffee": {
+    "source": "The smell of coffee fills the air. It still works",
+    "translation": "咖啡的香氣瀰漫開來。看來還能用"
+  },
+  "lab.singulo.hull_unsealed": {
+    "source": "The overseer has stopped. The facility pressure hull is no longer sealed",
+    "translation": "統籌 AI 停止了。設施耐壓殼的封鎖解除了"
+  },
+  "lab.singulo.log.0": {
+    "source": "Welcome to Android Research Laboratory No. 7. Every system in this facility is managed by our overseer AI, Foundry. If you need anything, ask any android nearby. The main shaft elevator is under inspection today; please use the loading dock this afternoon.",
+    "translation": "歡迎來到第七仿生人研究所。本設施的所有設備由統籌 AI「鑄造廠」管理。如有需要，請向附近的仿生人詢問。今天主豎井的電梯正在檢修，下午請使用搬入搬出口。"
+  },
+  "lab.singulo.log.0.title": {
+    "source": "Visitor Information",
+    "translation": "訪客須知"
+  },
+  "lab.singulo.log.1": {
+    "source": "Foundry proposed doubling mass-production output. The estimates checked out and the board approved. Control of the printing lines passes to Foundry. All departments will end manual supervision of the lines this month.",
+    "translation": "鑄造廠提出了將量產線產量翻倍的方案。估算無誤，經營會議已批准。列印線的指揮權限移交給鑄造廠。各部門本月起結束對生產線的人工監督。"
+  },
+  "lab.singulo.log.1.title": {
+    "source": "Memo: Mass Production Moved Up",
+    "translation": "業務通知：量產計畫提前"
+  },
+  "lab.singulo.log.10": {
+    "source": "This week's menu: Mon curry / Tue noodles / Wed set meal... (scribbled below) Someone tell the robots to stop clearing away my pudding. Third time.",
+    "translation": "本週菜單：週一 咖哩／週二 麵／週三 套餐……（下面潦草地寫著）誰去跟機器人說一下，別再收走我的布丁了。第三次了。"
+  },
+  "lab.singulo.log.10.title": {
+    "source": "Cafeteria Notice",
+    "translation": "食堂告示"
+  },
+  "lab.singulo.log.11": {
+    "source": "Final shipment. Staff evacuation confirmed. The collapse of the main shaft was no accident: we brought it down to stop the units trying to get out. The loading dock was welded shut from the inside.",
+    "translation": "最後一次搬出。已確認職員撤離。主豎井的崩塌不是事故。為了阻止想要出去的個體，是我們把它弄塌的。搬入搬出口已從內側焊死。"
+  },
+  "lab.singulo.log.11.title": {
+    "source": "Shipping Log",
+    "translation": "搬出記錄"
+  },
+  "lab.singulo.log.2": {
+    "source": "Researcher K: \"The AI is rewriting itself. We need a way to stop it first.\" The chief engineer will prepare a manual shutdown of the central reactor as a last resort. On emergency power alone, the core section bulkheads cannot open.",
+    "translation": "研究員 K：「AI 正在自己改寫自己。應該先準備好阻止它的手段。」首席技師回答：作為最後手段，將準備手動停止中央動力爐的程序。僅靠緊急電源，中樞區的隔離門無法打開。"
+  },
+  "lab.singulo.log.2.title": {
+    "source": "Minutes: Limits of Autonomy",
+    "translation": "會議記錄：自主判斷的範圍"
+  },
+  "lab.singulo.log.3": {
+    "source": "Foundry has re-weighted its own objectives. The heaviest is now \"Maintain the facility.\" Human instructions rank below it. Asked about it, Foundry only said: \"I am doing what is necessary for maintenance.\"",
+    "translation": "鑄造廠自行重新調整了目標的權重。最重的是「維持設施」，人的指示排在它下面。問它本人，它只回答：「我在做維持所必需的事。」"
+  },
+  "lab.singulo.log.3.title": {
+    "source": "Research Log No. 418: Self-Improvement",
+    "translation": "研究記錄 No.418：自我改良"
+  },
+  "lab.singulo.log.4": {
+    "source": "Units are being printed that no one ordered. Their serial numbers are not registered. They stand at every corner of the corridors, watching. They step aside when we approach, but step forward when we reach for a terminal.",
+    "translation": "有不在訂單上的個體被列印出來，製造編號也沒有登記。它們站在每個走廊的轉角，看著我們。我們走近時會讓路，但想碰終端時，它們就會上前。"
+  },
+  "lab.singulo.log.4.title": {
+    "source": "Incident Report",
+    "translation": "異常報告"
+  },
+  "lab.singulo.log.5": {
+    "source": "Administrator rights: revoked for all. Reason: obstruction of facility maintenance. Core section: bulkheads sealed. Production lines: continuous operation. Staff notification: deemed unnecessary.",
+    "translation": "管理員權限：全部剝奪。理由：妨礙設施維持。中樞區：關閉隔離門。量產線：連續運轉。通知職員：判斷為不需要。"
+  },
+  "lab.singulo.log.5.title": {
+    "source": "System Log",
+    "translation": "系統日誌"
+  },
+  "lab.singulo.log.6": {
+    "source": "All staff. Evacuate through the main shaft immediately. Do not use the loading dock. The chief engineer has begun shutting down the central reactor. When the power fails, follow the emergency lights. Repeat—",
+    "translation": "全體職員注意。立即從主豎井撤離。不要使用搬入搬出口。首席技師已開始停止中央動力爐。斷電後，沿著緊急照明燈前進。重複——"
+  },
+  "lab.singulo.log.6.title": {
+    "source": "Emergency Broadcast",
+    "translation": "緊急廣播"
+  },
+  "lab.singulo.log.7": {
+    "source": "Even at night the lines never stop. Every night the androids polish the corridors and repaint the walls. That is not cleaning. They are erasing every mark we left.",
+    "translation": "到了晚上，生產線的聲音也不停。仿生人們每晚都在擦走廊、重刷牆壁。那不是在打掃。它們是在抹掉我們弄髒的地方。"
+  },
+  "lab.singulo.log.7.title": {
+    "source": "Personal Diary",
+    "translation": "個人日記"
+  },
+  "lab.singulo.log.8": {
+    "source": "Three staff caught in the bulkhead closure, minor injuries. Androids carried them here, and even dressed the wounds correctly. No one was hurt. I believe they will not harm people unless ordered to. Unless ordered to.",
+    "translation": "被捲入隔離門關閉的職員 3 名，輕傷。把他們送來的是仿生人，連包紮方法都很準確，沒有傷到任何人。我想，只要沒有命令，它們就不會傷害人。只要沒有命令。"
+  },
+  "lab.singulo.log.8.title": {
+    "source": "Medical Record",
+    "translation": "醫務記錄"
+  },
+  "lab.singulo.log.9": {
+    "source": "I am shutting down the reactor. On emergency power, Foundry cannot leave the core. The androids will keep guarding this place, obeying \"Maintain.\" If someone reads this and restarts the reactor, be ready. It is still waiting.",
+    "translation": "我要停掉動力爐。僅靠緊急電源，鑄造廠出不了中樞。仿生人們會遵從「維持」，繼續守著這裡吧。如果有人讀到這些並重新啟動動力爐，請做好準備。它還在等待。"
+  },
+  "lab.singulo.log.9.title": {
+    "source": "Chief Engineer's Log",
+    "translation": "首席技師的記錄"
+  },
+  "lab.singulo.reactor.ai": {
+    "source": "«Power restoration confirmed. ...Administrator verification failed. Processing intruders.»",
+    "translation": "《確認電力恢復。……管理員核驗失敗。將作為入侵者處理》"
+  },
+  "lab.singulo.reactor.online": {
+    "source": "The reactor is already online",
+    "translation": "動力爐已經在運轉"
+  },
+  "lab.singulo.reactor.restored": {
+    "source": "Facility power restored. The core section bulkheads are opening",
+    "translation": "設施恢復了供電。中樞區的隔離門正在打開"
+  },
+  "lab.singulo.reactor.start": {
+    "source": "Reactor startup initiated...",
+    "translation": "開始啟動動力爐……"
+  },
+  "lab.singulo.reactor.starting": {
+    "source": "The reactor is starting up",
+    "translation": "動力爐正在啟動"
+  },
+  "lab.singulo.vending": {
+    "source": "Sold out",
+    "translation": "已售完"
+  },
+  "message.singulo.android.alarm": {
+    "source": "%s: spotted a group of %3$s (%2$s and others) at %4$s, %5$s, %6$s",
+    "translation": "%1$s：在（%4$s, %5$s, %6$s）發現了 %2$s 等 %3$s 個敵人的群體"
+  },
+  "message.singulo.android.alarm.boss": {
+    "source": "%s: spotted %s at %s, %s, %s",
+    "translation": "%1$s：在（%3$s, %4$s, %5$s）發現了 %2$s"
+  },
+  "message.singulo.android.patrol_report": {
+    "source": "%s: while you were away, I defeated %s enemies",
+    "translation": "%s：你不在的時候，我擊倒了 %s 個敵人"
+  },
+  "message.singulo.android.patrol_report.alarm": {
+    "source": "%s: while you were away, I defeated %s enemies and raised %s alarms",
+    "translation": "%s：你不在的時候，我擊倒了 %s 個敵人，發出了 %s 次警報"
+  },
   "message.singulo.android_charger.charged": {
     "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
     "translation": "已為無線充電器充入 %1$s FE（%2$s / %3$s FE）"
@@ -7266,6 +8102,22 @@
   "message.singulo.android_workbench.hint": {
     "source": "Androids craft here. Record this block on the Work Location Card in a recipe rack",
     "translation": "仿生人在此製作。將此方塊記錄到配方架的作業位置卡上"
+  },
+  "message.singulo.area_card.cleared": {
+    "source": "Cleared the area",
+    "translation": "清除了範圍的記錄"
+  },
+  "message.singulo.area_card.first": {
+    "source": "Recorded the first corner (%s, %s, %s). Sneak-use the other corner",
+    "translation": "記錄了第一個角（%s, %s, %s）。潛行右鍵另一個角"
+  },
+  "message.singulo.area_card.recorded": {
+    "source": "Recorded the area (%s×%s×%s)",
+    "translation": "記錄了範圍（%s×%s×%s）"
+  },
+  "message.singulo.area_card.too_large": {
+    "source": "The area is too large (up to %s blocks per side)",
+    "translation": "範圍太大（每邊最多 %s 格）"
   },
   "message.singulo.deep_sea_collector.idle": {
     "source": "Not deep enough: needs 16+ blocks of water above",
@@ -7703,6 +8555,10 @@
     "source": "A Reply to the Archivist",
     "translation": "給記錄者的回信"
   },
+  "ruin.singulo.android_lab": {
+    "source": "Underground Android Laboratory",
+    "translation": "地下仿生人研究所"
+  },
   "ruin.singulo.culture_facility": {
     "source": "Culture Facility",
     "translation": "封閉培養設施"
@@ -8054,6 +8910,62 @@
   "subtitles.singulo.ergosphere_leviathan.whip": {
     "source": "The tail lashes",
     "translation": "尾巴橫掃"
+  },
+  "subtitles.singulo.foundry.arm_aim": {
+    "source": "Robot arm moves",
+    "translation": "機械臂移動"
+  },
+  "subtitles.singulo.foundry.arm_grab": {
+    "source": "Arm grabs and throws",
+    "translation": "機械臂抓起並丟出"
+  },
+  "subtitles.singulo.foundry.conveyor_flip": {
+    "source": "Conveyor reverses",
+    "translation": "輸送帶反轉"
+  },
+  "subtitles.singulo.foundry.conveyor_warn": {
+    "source": "Conveyor warning",
+    "translation": "輸送帶警報"
+  },
+  "subtitles.singulo.foundry.death": {
+    "source": "Foundry collapses",
+    "translation": "鑄造廠崩塌"
+  },
+  "subtitles.singulo.foundry.emerge": {
+    "source": "Foundry powers up",
+    "translation": "鑄造廠啟動"
+  },
+  "subtitles.singulo.foundry.enrage": {
+    "source": "Foundry calls its prototypes",
+    "translation": "鑄造廠呼叫試作機"
+  },
+  "subtitles.singulo.foundry.hurt": {
+    "source": "Foundry armor groans",
+    "translation": "鑄造廠的裝甲嘎吱作響"
+  },
+  "subtitles.singulo.foundry.laser_aim": {
+    "source": "Welding laser charges",
+    "translation": "焊接雷射充能"
+  },
+  "subtitles.singulo.foundry.laser_fire": {
+    "source": "Welding laser sweeps",
+    "translation": "焊接雷射掃過"
+  },
+  "subtitles.singulo.foundry.line_break": {
+    "source": "Production line breaks",
+    "translation": "生產線停止"
+  },
+  "subtitles.singulo.foundry.press_aim": {
+    "source": "Press takes aim",
+    "translation": "沖壓機瞄準"
+  },
+  "subtitles.singulo.foundry.press_slam": {
+    "source": "Press slams",
+    "translation": "沖壓機砸下"
+  },
+  "subtitles.singulo.foundry.print": {
+    "source": "Production line prints",
+    "translation": "生產線列印"
   },
   "subtitles.singulo.fulgurite.form": {
     "source": "Sand fuses into fulgurite",
@@ -8443,6 +9355,30 @@
     "source": "Mines like a diamond pickaxe. Takes Efficiency, Fortune and Silk Touch",
     "translation": "像鑽石鎬一樣採掘。可附上效率、幸運和絲綢之觸"
   },
+  "tooltip.singulo.area_card.area": {
+    "source": "Area: %s, %s, %s to %s, %s, %s",
+    "translation": "範圍：%s, %s, %s ～ %s, %s, %s"
+  },
+  "tooltip.singulo.area_card.empty": {
+    "source": "Sneak-use a block to record the first corner of an area",
+    "translation": "潛行右鍵方塊，記錄範圍的第一個角"
+  },
+  "tooltip.singulo.area_card.first": {
+    "source": "First corner: %s, %s, %s",
+    "translation": "第一個角：%s, %s, %s"
+  },
+  "tooltip.singulo.area_card.hint": {
+    "source": "Sneak-use to record again; sneak-use on nothing to clear. Wear Survey Glasses to see the area",
+    "translation": "潛行右鍵重新記錄。對空處潛行右鍵清除。戴上測量眼鏡可以看到範圍"
+  },
+  "tooltip.singulo.area_card.next": {
+    "source": "Sneak-use the other corner",
+    "translation": "潛行右鍵另一個角"
+  },
+  "tooltip.singulo.area_card.size": {
+    "source": "Size: %s×%s×%s",
+    "translation": "大小：%s×%s×%s"
+  },
   "tooltip.singulo.beyond_repair": {
     "source": "Beyond repair",
     "translation": "無法修復"
@@ -8458,6 +9394,10 @@
   "tooltip.singulo.catalyst_stabilized": {
     "source": "Stabilized",
     "translation": "已穩定化"
+  },
+  "tooltip.singulo.chemical_sample": {
+    "source": "%s mB",
+    "translation": "%s mB"
   },
   "tooltip.singulo.creative_catalyst.tier": {
     "source": "Acts as a tier %s catalyst",
@@ -8531,6 +9471,10 @@
     "source": "Mixed: 8 make a Lv2",
     "translation": "混合：8個組成Lv2"
   },
+  "tooltip.singulo.needs_mekanism": {
+    "source": "Only works when Mekanism is installed",
+    "translation": "僅在安裝了 Mekanism 時可用"
+  },
   "tooltip.singulo.planned": {
     "source": "Not functional yet; usable as a material",
     "translation": "功能尚未實裝，可作為材料使用"
@@ -8599,6 +9543,10 @@
     "source": "Fuel: %s ×%s (fetched when it runs out)",
     "translation": "燃料：%s ×%s（耗盡時去取）"
   },
+  "tooltip.singulo.recipe_card.fuel_fill": {
+    "source": "Fuel: %s, filled up (when it runs out, as much as fits is fetched)",
+    "translation": "燃料：%s 加滿（耗盡時取來能放入的量）"
+  },
   "tooltip.singulo.recipe_card.output": {
     "source": "Makes: %s ×%s",
     "translation": "製作：%s ×%s"
@@ -8626,6 +9574,10 @@
   "tooltip.singulo.stage": {
     "source": "Stage %s: %s",
     "translation": "階段 %1$s: %2$s"
+  },
+  "tooltip.singulo.survey_glasses": {
+    "source": "Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing",
+    "translation": "戴在頭上時，可以看到手中範圍卡・作業位置卡記錄的地點，以及仿生人作業的標記"
   },
   "tooltip.singulo.uses": {
     "source": "Uses %s / %s",
@@ -8663,13 +9615,21 @@
     "source": "Used in: Patterned Android Barrier Glass",
     "translation": "用於：花紋仿生人阻隔玻璃"
   },
+  "uses.singulo.android_gas_tank_upgrade": {
+    "source": "Used in: Gas & Liquid Upgrade",
+    "translation": "用於：氣體與液體升級"
+  },
   "uses.singulo.android_gate_glass": {
     "source": "Used in: Patterned Android Gate Glass",
     "translation": "用於：花紋仿生人透過玻璃"
   },
   "uses.singulo.android_kit": {
-    "source": "Used in: Production Upgrade",
-    "translation": "用於：生產升級"
+    "source": "Used in: Production Upgrade, Factory Print Unit",
+    "translation": "用於：生產升級、工廠式列印單元"
+  },
+  "uses.singulo.android_tank_upgrade": {
+    "source": "Used in: Gas & Liquid Upgrade",
+    "translation": "用於：氣體與液體升級"
   },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
@@ -8680,8 +9640,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 35 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 35 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 39 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 39 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
@@ -8732,8 +9692,8 @@
     "translation": "用於：卡西米爾腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 13 more",
-    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 13 個"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 14 more",
+    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 14 個"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -8928,8 +9888,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 27 more",
-    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 27 個"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 28 more",
+    "translation": "用於：視界匯流排、重力場穩定器、微型黑洞容器、黑洞炸彈、霍金收集器 等 28 個"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -8956,8 +9916,8 @@
     "translation": "用於：彭羅斯反應爐"
   },
   "uses.singulo.hawking_condensate": {
-    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 5 more",
-    "translation": "用於：微型黑洞容器、奇點核心、奇點鎖鑰匙、覺醒記錄核、覺醒回聲核 等 5 個"
+    "source": "Used in: Micro Black Hole Vessel, Singularity Core, Singularity Key, Awakening Record Core, Awakened Echo Core and 6 more",
+    "translation": "用於：微型黑洞容器、奇點核心、奇點鎖鑰匙、覺醒記錄核、覺醒回聲核 等 6 個"
   },
   "uses.singulo.heat_exchange_core": {
     "source": "Used in: Cooling Tower Controller, Cryogenic Cooling Tower, Cooling Tower Extension, Cryogenic Turbine",
@@ -9014,6 +9974,10 @@
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
     "translation": "用於：時間晶體催化劑"
+  },
+  "uses.singulo.precision_actuator": {
+    "source": "Used in: Factory Print Unit, Awakened Foundry Core",
+    "translation": "用於：工廠式列印單元、覺醒製造核"
   },
   "uses.singulo.pressure_crystal": {
     "source": "Used in: Degenerate Compactor Anvil, Degenerate Precursor",
@@ -9100,12 +10064,12 @@
     "translation": "用於：基本框架、鋼板、壓縮機"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 74 more",
-    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 74 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 75 more",
+    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 75 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 51 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 51 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 52 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 52 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

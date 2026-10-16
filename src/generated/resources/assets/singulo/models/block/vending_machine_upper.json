@@ -1,0 +1,63 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "side": "singulo:block/vending_machine_front_lower",
+    "front": "singulo:block/vending_machine_front_upper",
+    "glow": "singulo:block/vending_machine_front_upper_glow",
+    "body": "singulo:block/lab_plastic",
+    "particle": "singulo:block/lab_plastic"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        1
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#body"
+        },
+        "east": {
+          "texture": "#body"
+        },
+        "west": {
+          "texture": "#body"
+        },
+        "up": {
+          "texture": "#body"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0.98
+      ],
+      "to": [
+        16,
+        16,
+        0.99
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    }
+  ]
+}

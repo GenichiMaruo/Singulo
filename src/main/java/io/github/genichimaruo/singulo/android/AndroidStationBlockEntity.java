@@ -46,18 +46,29 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 倒されてから印刷し直すまで。 */
     public static final int REPRINT_DELAY = 100;
 
-    /** スロット: 設計メモリ・キット・強化（転送アップグレード）・自己修理キットの補充・シールド許可証。 */
-    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_UPGRADE = 2, SLOT_REPAIR_STOCK = 3, SLOT_PERMIT = 4, SLOT_PRODUCTION = 5;
-    public static final int SLOTS = 6;
+    /** スロット: 設計メモリ・キット・強化（転送アップグレード）・自己修理キットの補充・シールド許可証・生産アップグレード・巡回路（作業位置カード8枚）。 */
+    public static final int SLOT_MEMORY = 0, SLOT_KIT = 1, SLOT_UPGRADE = 2, SLOT_REPAIR_STOCK = 3, SLOT_PERMIT = 4, SLOT_PRODUCTION = 5,
+            SLOT_ROUTE = 6, ROUTE_SLOTS = 8;
+    /** 経路の決まり（{@link io.github.genichimaruo.singulo.android.work.PathRule}）の欄（巡回の移動に効く）。 */
+    public static final int SLOT_RULES = SLOT_ROUTE + ROUTE_SLOTS;
+    /** 工場式印刷ユニット（印刷の時間と電力が半分、修理が2倍速）。古い保存と番号がずれないよう、最後に置く。 */
+    public static final int SLOT_PRINT_UNIT = SLOT_RULES + io.github.genichimaruo.singulo.android.work.PathRule.SLOTS;
+    public static final int SLOTS = SLOT_PRINT_UNIT + 1;
+    /** 巡回の各地点で立ち止まる時間の選び方（秒）。 */
+    public static final int[] DWELL_SECONDS = {0, 3, 5, 10, 20};
+    /** 警報のレッドストーン信号を出す時間。 */
+    public static final int ALARM_TICKS = 100;
     /** 受け持てるアンドロイドの数（生産アップグレードで2）。 */
     public static final int MAX_UNITS = 2;
 
     /** GUI に送る値。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_MODE = 2, D_RETREAT = 3, D_STATUS = 4, D_HP = 5, D_CHARGE = 6,
             D_KIND = 7, D_DELAY = 8, D_ESCORT = 9, D_LEADER = 10,
-            D_SELECTED = 11, D_UNITS = 12, COUNT = 13;
+            D_SELECTED = 11, D_UNITS = 12, D_PATROL = 13, D_DWELL = 14, COUNT = 15;
+    /** D_PATROL のビット: 往復する、夜だけ巡回する、警報中。 */
+    public static final int PATROL_BACK_AND_FORTH = 1, PATROL_NIGHT = 2, PATROL_ALARM = 4;
     /** 画面に出すモードの番号: 追従（ついていくだけ）。 */
-    public static final int MODE_FOLLOW_ONLY = 3;
+    public static final int MODE_FOLLOW_ONLY = 9;
     /** 状態（GUI の表示）。 */
     public static final int S_NO_MEMORY = 0, S_NO_KIT = 1, S_NO_ENERGY = 2, S_PRINTING = 3, S_ACTIVE = 4, S_RETURNING = 5,
             S_CHARGING = 6, S_WAITING = 7, S_BLOCKED = 8, S_AWAY = 9, S_LOW_POWER = 10, S_ORPHAN = 11;
@@ -69,6 +80,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             BUTTON_LEADER = 9;
     /** 画面で見るアンドロイドを選ぶ（BUTTON_SELECT + 番号）。 */
     public static final int BUTTON_SELECT = 10;
+    /** 巡回: 動き方を巡回に、周回 ⇔ 往復、夜だけ、立ち止まる時間。 */
+    public static final int BUTTON_MODE_PATROL = 12, BUTTON_ROUTE_ORDER = 13, BUTTON_NIGHT = 14, BUTTON_DWELL = 15;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
     /** 転送アップグレードで預かった持ち物（アンドロイドごと。次にその枠で印刷するアンドロイドに持たせる）。 */
@@ -82,13 +95,19 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
+            if (slot == SLOT_PRINT_UNIT) {
+                return isPrintUnit(stack);
+            }
             return switch (slot) {
                 case SLOT_MEMORY -> memoryKind(stack) != null;
                 case SLOT_KIT -> isKit(stack);
                 case SLOT_UPGRADE -> isTransferUpgrade(stack);
                 case SLOT_PERMIT -> isPermit(stack);
                 case SLOT_PRODUCTION -> isProductionUpgrade(stack);
-                default -> RuinAndroid.isRepairKit(stack);
+                case SLOT_REPAIR_STOCK -> RuinAndroid.isRepairKit(stack);
+                default -> slot >= SLOT_RULES
+                        ? io.github.genichimaruo.singulo.android.work.PathRule.fits((slot - SLOT_RULES) % io.github.genichimaruo.singulo.android.work.PathRule.COLS, stack)
+                        : io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.isCard(stack);   // 巡回路
             };
         }
 
@@ -121,6 +140,11 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     private int selected;
     /** コンパレーターの出力（アンドロイドの体力の低いほう。0 はいない）。 */
     private int signal;
+    /** 巡回: 往復するか（でなければ、最後まで行ったら最初へ）、夜だけ巡回するか、各地点で立ち止まる時間（{@link #DWELL_SECONDS} の番号）。 */
+    private boolean backAndForth, nightOnly;
+    private int dwell = 2;
+    /** 警報のレッドストーン信号を出し終える時刻（出していなければ 0）。 */
+    private long alarmUntil;
 
     /** リンクできる、身寄りのないアンドロイド。 */
     @Nullable
@@ -143,6 +167,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         case D_UNITS -> units();
         case D_ESCORT -> escort ? 1 : 0;
         case D_LEADER -> leaderIndex();
+        case D_PATROL -> (backAndForth ? PATROL_BACK_AND_FORTH : 0) | (nightOnly ? PATROL_NIGHT : 0) | (alarming() ? PATROL_ALARM : 0);
+        case D_DWELL -> DWELL_SECONDS[dwell];
         default -> 0;
     });
 
@@ -173,6 +199,25 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     public static boolean isProductionUpgrade(ItemStack stack) {
         return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_production_upgrade");
+    }
+
+    public static boolean isPrintUnit(ItemStack stack) {
+        return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("android_factory_print_unit");
+    }
+
+    /** 工場式印刷ユニットを積んでいるか。 */
+    public boolean hasPrintUnit() {
+        return isPrintUnit(items.getStackInSlot(SLOT_PRINT_UNIT));
+    }
+
+    /** 1体の印刷にかかる電力（工場式印刷ユニットで半分）。 */
+    public int printFe() {
+        return hasPrintUnit() ? PRINT_FE / 2 : PRINT_FE;
+    }
+
+    /** 倒されてから印刷し直すまで（工場式印刷ユニットで半分）。 */
+    public int reprintDelay() {
+        return hasPrintUnit() ? REPRINT_DELAY / 2 : REPRINT_DELAY;
     }
 
     /** 受け持てるアンドロイドの数（生産アップグレードを積んでいれば2）。 */
@@ -292,9 +337,43 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         }
     }
 
-    /** アンドロイドに今の設定（動き方・戻る体力・追従中に戦うか・許可証・追従する人）を渡す。 */
+    /** 巡回路: 巡回路の欄の作業位置カードの場所（左から順。この世界のものだけ）。 */
+    public java.util.List<BlockPos> route() {
+        java.util.List<BlockPos> out = new java.util.ArrayList<>();
+        for (int i = 0; i < ROUTE_SLOTS; i++) {
+            ItemStack card = items.getStackInSlot(SLOT_ROUTE + i);
+            BlockPos p = io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.pos(card);
+            if (p != null && level != null && io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.sameDimension(card, level)) {
+                out.add(p);
+            }
+        }
+        return out;
+    }
+
+    /** 警報: しばらくレッドストーン信号を出す（巡回中のアンドロイドが、敵の群れ・ボスを見つけた）。 */
+    public void alarm() {
+        if (level == null) {
+            return;
+        }
+        boolean was = alarming();
+        alarmUntil = level.getGameTime() + ALARM_TICKS;
+        if (!was) {
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+            level.playSound(null, worldPosition, SoundEvents.NOTE_BLOCK_BELL.value(), SoundSource.BLOCKS, 1.0F, 0.7F);
+        }
+        setChanged();
+    }
+
+    /** 警報のレッドストーン信号を出しているか。 */
+    public boolean alarming() {
+        return alarmUntil != 0 && level != null && level.getGameTime() < alarmUntil;
+    }
+
+    /** アンドロイドに今の設定（動き方・戻る体力・追従中に戦うか・許可証・追従する人・巡回路）を渡す。 */
     private void sync(RuinAndroid a) {
         a.configure(mode, retreat);
+        a.setPatrol(route(), backAndForth, nightOnly, DWELL_SECONDS[dwell] * 20);
+        a.setPatrolRules(level == null ? java.util.List.of() : io.github.genichimaruo.singulo.android.work.PathRule.read(items, SLOT_RULES, level));
         if (!a.escortPending()) {
             a.setEscort(escort);
         }
@@ -457,7 +536,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     /** アンドロイドが倒れたとき（RuinAndroid.die から）。 */
     public void onAndroidDied(UUID id) {
-        release(id, REPRINT_DELAY);
+        release(id, reprintDelay());
     }
 
     /** アンドロイドの枠を空ける（delay tick ののち、キットがあれば印刷し直す）。 */
@@ -479,6 +558,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     }
 
     private void tick(ServerLevel level) {
+        if (alarmUntil != 0 && level.getGameTime() >= alarmUntil) {
+            alarmUntil = 0;                          // 警報を止める
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+        }
         if (selected >= units() && androids[selected] == null) {
             selected = 0;
         }
@@ -508,7 +591,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 } else if (e == null) {
                     statuses[i] = S_AWAY;                // 読み込まれていない所にいる（追従で遠くへ行った）
                 } else {
-                    release(androids[i], REPRINT_DELAY);
+                    release(androids[i], reprintDelay());
                 }
                 continue;
             }
@@ -527,7 +610,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 statuses[i] = S_NO_MEMORY;
             } else if (!isKit(items.getStackInSlot(SLOT_KIT))) {
                 statuses[i] = S_NO_KIT;
-            } else if (energy.getEnergyStored() < PRINT_FE) {
+            } else if (energy.getEnergyStored() < printFe()) {
                 statuses[i] = S_NO_ENERGY;
             } else if (printing || !topClear(level)) {
                 statuses[i] = S_BLOCKED;                 // 上で印刷中・充電中のアンドロイドがどくのを待つ
@@ -565,7 +648,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
 
     private void print(ServerLevel level, AndroidKind kind, int unit) {
         RuinAndroid a = kind.type().create(level);
-        if (a == null || !energy.consume(PRINT_FE)) {
+        if (a == null || !energy.consume(printFe())) {
             return;
         }
         items.extractItem(SLOT_KIT, 1, false);
@@ -589,6 +672,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
         a.startPrinting();
+        if (hasPrintUnit()) {
+            a.skipPrinting(RuinAndroid.PRINT_TICKS / 2);           // 工場式印刷ユニット: 半分の時間で印刷し終える
+        }
         a.makeGuard(owner, worldPosition, mode, retreat);
         sync(a);
         if (!names[unit].isEmpty()) {
@@ -617,6 +703,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public void press(int id) {
         switch (id) {
             case BUTTON_MODE_GUARD, BUTTON_MODE_WANDER, BUTTON_MODE_FOLLOW -> mode = id;
+            case BUTTON_MODE_PATROL -> mode = RuinAndroid.MODE_PATROL;
+            case BUTTON_ROUTE_ORDER -> backAndForth = !backAndForth;
+            case BUTTON_NIGHT -> nightOnly = !nightOnly;
+            case BUTTON_DWELL -> dwell = (dwell + 1) % DWELL_SECONDS.length;
             case BUTTON_RETREAT_DOWN -> retreat = Mth.clamp(retreat - 10, 0, 90);
             case BUTTON_RETREAT_UP -> retreat = Mth.clamp(retreat + 10, 0, 90);
             case BUTTON_FOLLOW_ONLY -> escort = false;
@@ -758,6 +848,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             tag.putUUID("leader", leader);
         }
         tag.putInt("signal", signal);
+        tag.putBoolean("back_and_forth", backAndForth);
+        tag.putBoolean("night_only", nightOnly);
+        tag.putInt("dwell", dwell);
     }
 
     // 名前と持ち主はクライアントにも送る（ステーションの GUI に出すため。追従する人の候補から持ち主を除く）
@@ -820,10 +913,13 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             keptOrder[i] = tag.getInt("kept_order" + i);
             keptWork[i] = tag.contains("kept_work" + i) ? tag.getCompound("kept_work" + i).copy() : null;
         }
-        mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_FOLLOW);
+        mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_PATROL);
         retreat = tag.contains("retreat") ? Mth.clamp(tag.getInt("retreat"), 0, 90) : 30;
         escort = !tag.contains("escort") || tag.getBoolean("escort");
         leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;
         signal = tag.getInt("signal");
+        backAndForth = tag.getBoolean("back_and_forth");
+        nightOnly = tag.getBoolean("night_only");
+        dwell = tag.contains("dwell") ? Mth.clamp(tag.getInt("dwell"), 0, DWELL_SECONDS.length - 1) : 2;
     }
 }

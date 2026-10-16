@@ -27,6 +27,17 @@ public class AndroidStationBlock extends SimpleMachineBlock<AndroidStationBlockE
         return level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station ? station.signal() : 0;
     }
 
+    /** 警報: 巡回中のアンドロイドが敵の群れ・ボスを見つけると、しばらくレッドストーン信号を出す。 */
+    @Override
+    protected boolean isSignalSource(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getSignal(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, net.minecraft.core.Direction direction) {
+        return level.getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.alarming() ? 15 : 0;
+    }
+
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);

@@ -128,6 +128,10 @@ public class HandbookScreen extends Screen {
             for (JsonElement e : arr) {
                 JsonObject a = e.getAsJsonObject();
                 String id = a.get("id").getAsString();
+                // 進捗画面で隠す実績を、親を達成しただけで本に先出ししない。件数にも含めない。
+                if (a.has("hidden") && a.get("hidden").getAsBoolean() && !done(id)) {
+                    continue;
+                }
                 order.add(id);
                 stageOf.put(id, a.get("stage").getAsInt());
                 if (a.has("parent") && !a.get("parent").isJsonNull()) {
