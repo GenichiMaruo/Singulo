@@ -12,6 +12,6 @@ if target.exists():
     shutil.rmtree(target)
 shutil.copytree(source, target)
 (root / "options.txt").write_text(
-    "lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:2\nsimulationDistance:2\npauseOnLostFocus:false\n",
+    "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:2\nsimulationDistance:2\npauseOnLostFocus:false\n",
     encoding="utf-8",
 )

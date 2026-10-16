@@ -53,6 +53,13 @@ def main():
     write("empty", 16, 8, 16, namespace="singulo_automation")
     write("empty", *TEMPLATES["empty"], namespace="singulo_reactor")
     write("reactor_isolated", *TEMPLATES["reactor_isolated"], namespace="singulo_reactor")
+    # 分けて実行する群も同じ空テンプレートを使う。寸法変更時に複製を取り残さない。
+    for namespace, templates in {'singulo_mekanism': ('empty',), 'singulo_prototype': ('empty', 'huge'),
+                                 'singulo_progression': ('empty',), 'singulo_lab': ('empty', 'huge')}.items():
+        target = OUT_DIR.parent.parent / namespace / 'structures'
+        target.mkdir(parents=True, exist_ok=True)
+        for template in templates:
+            (target / f'{template}.nbt').write_bytes((OUT_DIR / f'{template}.nbt').read_bytes())
 
 
 if __name__ == '__main__':

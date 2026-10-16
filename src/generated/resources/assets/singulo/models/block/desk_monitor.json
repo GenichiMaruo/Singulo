@@ -1,0 +1,140 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "dark": "singulo:block/lab_plastic_dark",
+    "screen": "singulo:block/desk_monitor_screen",
+    "glow": "singulo:block/desk_monitor_screen_glow",
+    "particle": "singulo:block/lab_plastic_dark"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        0,
+        7
+      ],
+      "to": [
+        11,
+        1,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark"
+        },
+        "south": {
+          "texture": "#dark"
+        },
+        "east": {
+          "texture": "#dark"
+        },
+        "west": {
+          "texture": "#dark"
+        },
+        "up": {
+          "texture": "#dark"
+        },
+        "down": {
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        1,
+        8.5
+      ],
+      "to": [
+        8.5,
+        4,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark"
+        },
+        "south": {
+          "texture": "#dark"
+        },
+        "east": {
+          "texture": "#dark"
+        },
+        "west": {
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        4,
+        8
+      ],
+      "to": [
+        14,
+        12,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark"
+        },
+        "south": {
+          "texture": "#dark"
+        },
+        "east": {
+          "texture": "#dark"
+        },
+        "west": {
+          "texture": "#dark"
+        },
+        "up": {
+          "texture": "#dark"
+        },
+        "down": {
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        5,
+        7.98
+      ],
+      "to": [
+        13,
+        11,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#screen"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        5,
+        7.97
+      ],
+      "to": [
+        13,
+        11,
+        7.98
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow"
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    }
+  ]
+}

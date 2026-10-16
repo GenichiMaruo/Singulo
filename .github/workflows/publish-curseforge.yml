@@ -86,13 +86,15 @@ jobs:
           python tools/localization.py --check
           python tools/check_models.py
           python tools/check_supporters.py
+          python tools/check_advancements.py
+          python tools/check_recipe_parity.py
           python tools/check_port_1201.py
       - name: Build and run GameTests
         if: inputs.verified_run_id == ''
         run: |
           chmod +x gradlew
           mkdir -p build/reports/gametest
-          for namespace in singulo singulo_automation singulo_reactor; do
+          for namespace in singulo singulo_automation singulo_reactor singulo_prototype singulo_progression singulo_lab; do
             ./gradlew --no-daemon --max-workers=2 -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64 -PtestNamespace="$namespace" build runGameTestServer
             cp build/gametest/logs/latest.log "build/reports/gametest/$namespace.log"
           done
@@ -142,7 +144,9 @@ jobs:
           loaders: forge
           game-versions: ${{ steps.version.outputs.minecraft }}
           java: '17'
-          dependencies: jei(optional)
+          dependencies: |
+            jei(optional)
+            mekanism(optional)
           fail-mode: fail
 
   github-release:

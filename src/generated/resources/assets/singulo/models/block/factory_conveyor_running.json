@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "up": "singulo:block/factory_conveyor_top_moving",
+    "down": "singulo:block/factory_conveyor_bottom",
+    "north": "singulo:block/factory_conveyor_side",
+    "south": "singulo:block/factory_conveyor_side",
+    "east": "singulo:block/factory_conveyor_side",
+    "west": "singulo:block/factory_conveyor_side",
+    "particle": "singulo:block/factory_conveyor_side"
+  }
+}

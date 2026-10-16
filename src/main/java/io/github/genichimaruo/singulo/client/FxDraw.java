@@ -70,6 +70,28 @@ final class FxDraw {
     }
 
     /**
+     * XZ 平面の扇形の帯（両面）。角度は +X から +Z へ測る（度。ワールドの atan2(z, x) と同じ）。fromDeg から toDeg まで。
+     * 内側の縁の透明度 alphaIn、外側の縁の透明度 alphaOut。
+     */
+    static void sector(PoseStack.Pose last, VertexConsumer vc, float inner, float outer, float fromDeg, float toDeg,
+                       int rgb, int alphaIn, int alphaOut) {
+        int seg = Math.max(4, (int) (Math.abs(toDeg - fromDeg) / 6));
+        for (int s = 0; s < seg; s++) {
+            float a0 = (fromDeg + (toDeg - fromDeg) * s / seg) * Mth.DEG_TO_RAD;
+            float a1 = (fromDeg + (toDeg - fromDeg) * (s + 1) / seg) * Mth.DEG_TO_RAD;
+            float c0 = Mth.cos(a0), s0 = Mth.sin(a0), c1 = Mth.cos(a1), s1 = Mth.sin(a1);
+            vertex(vc, last, c0 * inner, 0, s0 * inner, rgb, alphaIn, FULL_BRIGHT, 0, 1, 0);
+            vertex(vc, last, c1 * inner, 0, s1 * inner, rgb, alphaIn, FULL_BRIGHT, 0, 1, 0);
+            vertex(vc, last, c1 * outer, 0, s1 * outer, rgb, alphaOut, FULL_BRIGHT, 0, 1, 0);
+            vertex(vc, last, c0 * outer, 0, s0 * outer, rgb, alphaOut, FULL_BRIGHT, 0, 1, 0);
+            vertex(vc, last, c0 * outer, 0, s0 * outer, rgb, alphaOut, FULL_BRIGHT, 0, -1, 0);
+            vertex(vc, last, c1 * outer, 0, s1 * outer, rgb, alphaOut, FULL_BRIGHT, 0, -1, 0);
+            vertex(vc, last, c1 * inner, 0, s1 * inner, rgb, alphaIn, FULL_BRIGHT, 0, -1, 0);
+            vertex(vc, last, c0 * inner, 0, s0 * inner, rgb, alphaIn, FULL_BRIGHT, 0, -1, 0);
+        }
+    }
+
+    /**
      * 水平な三日月（XZ 平面、中心が原点、正面は -Z）。角度は正面から測る（正が +X 側）。
      * fromDeg から toDeg まで、両端が細く真ん中が太い（太さ maxWidth）。外側の縁ほど透明に近づける。
      */

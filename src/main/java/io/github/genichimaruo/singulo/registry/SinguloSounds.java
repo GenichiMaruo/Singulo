@@ -60,6 +60,9 @@ public final class SinguloSounds {
             "last_archivist.death_flash",
             "genesis.form", "genesis.ambient", "genesis.seed", "genesis.ignite", "genesis.surge", "genesis.alarm",
             "genesis.collapse", "genesis.lever", "genesis.birth_collapse", "genesis.big_bang", "genesis.sky", "genesis.synth",
+            "foundry.emerge", "foundry.hurt", "foundry.arm_aim", "foundry.arm_grab", "foundry.press_aim", "foundry.press_slam",
+            "foundry.conveyor_warn", "foundry.conveyor_flip", "foundry.laser_aim", "foundry.laser_fire", "foundry.print",
+            "foundry.line_break", "foundry.enrage", "foundry.death",
     };
 
     static {

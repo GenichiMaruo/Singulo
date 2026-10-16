@@ -91,6 +91,7 @@
       "pages": [
         "ruins.list",
         "ruins.bosses",
+        "ruins.lab",
         "ruins.plan",
         "ruins.compass",
         "ruins.sealed",
@@ -104,6 +105,8 @@
       "pages": [
         "androids.ruin",
         "androids.build",
+        "androids.patrol",
+        "androids.routes",
         "androids.care",
         "androids.upgrades",
         "androids.work",
