@@ -584,7 +584,7 @@ public final class AndroidGameTests {
         });
         helper.succeedWhen(() -> {
             helper.assertTrue(!onBench[0], "作業台に座った（作業台の中に埋まる）");
-            helper.assertTrue(sat[0], "手の空いた護衛が、そばの階段に座らない");
+            helper.assertTrue(sat[0], "手の空いた護衛が、そばの階段に座らない: " + androids(helper).stream().map(a -> "pos=" + a.position() + " state=" + a.state() + " life=" + a.lifeState() + " health=" + a.getHealth() + " target=" + a.getTarget()).toList());
             androids(helper).forEach(RuinAndroid::discard);
         });
     }
@@ -1130,7 +1130,7 @@ public final class AndroidGameTests {
         var error = console.start(player, cobble, 2, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない" + " pos=" + a.position() + " ticks=" + a.tickCount + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " guard=" + a.isGuard() + " printed=" + a.printed() + " target=" + a.getTarget() + " work=" + a.saveWorkState() + " console=" + console.saveWithoutMetadata());
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない" + " pos=" + a.position() + " ticks=" + a.tickCount + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " guard=" + a.isGuard() + " printed=" + a.printed() + " target=" + a.getTarget() + " work=" + a.saveWorkState() + " console=" + console.saveWithoutMetadata() + " message=" + console.message() + " worker=" + a.saveWithoutId(new net.minecraft.nbt.CompoundTag()) + " delivery=" + io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, DELIVERY).saveWithoutMetadata());
             helper.assertTrue(level.getBlockState(helper.absolutePos(from)).isAir() && level.getBlockState(helper.absolutePos(to)).isAir(),
                     "範囲の石が掘られていない: from=" + helper.absolutePos(from) + "=" + level.getBlockState(helper.absolutePos(from))
                             + ", to=" + helper.absolutePos(to) + "=" + level.getBlockState(helper.absolutePos(to))
