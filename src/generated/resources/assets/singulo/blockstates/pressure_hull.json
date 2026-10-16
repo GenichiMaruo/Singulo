@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "sealed=true": {
+      "model": "singulo:block/pressure_hull"
+    },
+    "sealed=false": {
+      "model": "singulo:block/pressure_hull"
+    }
+  }
+}

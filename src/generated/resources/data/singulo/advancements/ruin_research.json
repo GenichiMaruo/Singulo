@@ -22,5 +22,5 @@
       }
     }
   },
-  "parent": "singulo:quantum"
+  "parent": "singulo:ruin_observation"
 }

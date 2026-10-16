@@ -1,0 +1,20 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "singulo:item/area_card"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "singulo:recorded": 0.5
+      },
+      "model": "singulo:item/area_card_first"
+    },
+    {
+      "predicate": {
+        "singulo:recorded": 1
+      },
+      "model": "singulo:item/area_card_recorded"
+    }
+  ]
+}

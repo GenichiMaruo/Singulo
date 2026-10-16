@@ -75,19 +75,47 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
      * 燃料の面が {@link #FACE_AUTO} なら、アンドロイドの立っている横の面。既定は 上・下・自動。
      */
     public static final int FACE_AUTO = 7;
-    public static final int DEFAULT_FACES = faces(net.minecraft.core.Direction.UP.get3DDataValue(),
-            net.minecraft.core.Direction.DOWN.get3DDataValue(), FACE_AUTO);
+    public static final int DEFAULT_FACES = faces(FACE_AUTO, FACE_AUTO, FACE_AUTO);
+    /** faces の10ビット目: 燃料を、装置に入るだけ持ってくる（なければ、燃料の欄の数ずつ。入りきらない分は持ってこない）。 */
+    public static final int FUEL_FILL = 1 << 9;
 
     public static int faces(int in, int out, int fuel) {
         return (in & 7) | (out & 7) << 3 | (fuel & 7) << 6;
     }
 
+    /** 素材を入れる面（自動なら上。実際に入れる面は {@link MachineWatch#inputFace} で決める）。 */
     public net.minecraft.core.Direction inputFace() {
         return face(faces & 7, net.minecraft.core.Direction.UP);
     }
 
+    /** 素材を入れる面が自動（上・横・下の順に、その素材を受け付ける面から入れる）か。 */
+    public boolean inputAuto() {
+        return (faces & 7) == FACE_AUTO;
+    }
+
+    /** 素材を入れる面の名前の鍵（up・north…・auto）。 */
+    public String inputFaceKey() {
+        return inputAuto() ? "auto" : inputFace().getName();
+    }
+
+    /** できた物を取り出す面（自動なら下。実際に取り出す面は {@link MachineWatch#outputFace} で決める）。 */
     public net.minecraft.core.Direction outputFace() {
         return face(faces >> 3 & 7, net.minecraft.core.Direction.DOWN);
+    }
+
+    /** 取り出す面が自動（下・横・上の順に、できた物が取り出せる面から。かまどの仲間は下）か。 */
+    public boolean outputAuto() {
+        return (faces >> 3 & 7) == FACE_AUTO;
+    }
+
+    /** 取り出す面の名前の鍵（down・north…・auto）。 */
+    public String outputFaceKey() {
+        return outputAuto() ? "auto" : outputFace().getName();
+    }
+
+    /** 燃料を、装置に入るだけ持ってくるか。 */
+    public boolean fuelFill() {
+        return (faces & FUEL_FILL) != 0;
     }
 
     /** 燃料を入れる面（自動なら null）。 */

@@ -24,19 +24,34 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** アンドロイド（充電・護衛・組立ステーション・転送アップグレード・アンドロイド用のガラス）の確認。 */
-@GameTestHolder(Singulo.MODID)
+@GameTestHolder("singulo_automation")
 @PrefixGameTestTemplate(false)
 public final class AndroidGameTests {
     private static final String EMPTY = "empty";
-    private static final BlockPos STATION = new BlockPos(2, 1, 2);
+    private static final BlockPos STATION = p(2, 1, 2);
 
     private AndroidGameTests() {}
+
+    // Preserve the original layout, with four walkable blocks on every side.
+    // Devices on the old 8x8 edge let pathfinding leave the fixture and become unreachable.
+    private static BlockPos p(int x, int y, int z) {
+        return new BlockPos(x + 4, y, z + 4);
+    }
+
+    private static net.minecraft.server.level.ServerPlayer player(GameTestHelper helper) {
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        // Keep the player within interaction range, away from machine approach squares.
+        var at = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(8, 1, 2)));
+        player.teleportTo(helper.getLevel(), at.x, at.y, at.z, 0, 0);
+        return player;
+    }
 
     private static Item item(String id) {
         return BuiltInRegistries.ITEM.get(Singulo.id(id));
@@ -45,7 +60,7 @@ public final class AndroidGameTests {
     /** 電力・設計メモリ・キットのあるステーションを置く。 */
     private static AndroidStationBlockEntity station(GameTestHelper helper, int kits) {
         // A printed guard needs walkable ground beside the station to clear its top.
-        for (int x = 0; x < 8; x++) for (int z = 0; z < 8; z++) {
+        for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) {
             helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
         }
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
@@ -56,10 +71,10 @@ public final class AndroidGameTests {
         return s;
     }
 
+    /** このテストのステーションが印刷したアンドロイド（並んで動くほかのテストのものは数えない。少し離れていても数える）。 */
     private static List<RuinAndroid> androids(GameTestHelper helper) {
-        // Adjacent 1.20.1 test fixtures can be within eight blocks; only count this station's guards.
-        return helper.getLevel().getEntitiesOfClass(RuinAndroid.class, new AABB(helper.absolutePos(STATION)).inflate(8),
-                a -> helper.absolutePos(STATION).equals(a.home()));
+        BlockPos station = helper.absolutePos(STATION);
+        return helper.getLevel().getEntitiesOfClass(RuinAndroid.class, new AABB(station).inflate(32), a -> station.equals(a.home()));
     }
 
     /** ステーションは、メモリとキットと電力で護衛を1体だけ印刷し、キットと電力を使う。印刷中は傷つかない。 */
@@ -82,12 +97,42 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 工場式印刷ユニットを積むと、印刷の電力が半分になり、半分の時間で印刷し終える。 */
+    @GameTest(template = EMPTY, batch = "android_print_unit", timeoutTicks = 120)
+    public static void printUnitHalvesPrinting(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        AndroidStationBlockEntity s = station(helper, 1);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRINT_UNIT, new ItemStack(item("android_factory_print_unit")));
+        helper.assertTrue(s.hasPrintUnit(), "工場式印刷ユニットを積めない");
+        long[] seen = {-1, -1};
+        int[] energy = {-1};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (!list.isEmpty() && seen[0] < 0) {
+                seen[0] = helper.getTick();
+                energy[0] = s.energy().getEnergyStored();
+            }
+            if (!list.isEmpty() && list.get(0).printed() && seen[1] < 0) {
+                seen[1] = helper.getTick();
+            }
+        });
+        helper.succeedWhen(() -> {
+            List<RuinAndroid> now = androids(helper);
+            helper.assertTrue(seen[1] >= 0, "印刷し終わらない: " + now.size() + " " + (now.isEmpty() ? "" : now.get(0).printProgress(0)
+                    + " state=" + now.get(0).state() + " alive=" + now.get(0).isAlive()) + " seen=" + seen[0]);
+            helper.assertTrue(energy[0] == AndroidStationBlockEntity.CAPACITY - AndroidStationBlockEntity.PRINT_FE / 2,
+                    "印刷の電力が半分にならない: " + (AndroidStationBlockEntity.CAPACITY - energy[0]));
+            helper.assertTrue(seen[1] - seen[0] <= RuinAndroid.PRINT_TICKS / 2 + 2, "印刷が半分の時間で終わらない: " + (seen[1] - seen[0]));
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
     /** 護衛はプレイヤーの攻撃で傷つかず、ふつうのダメージでは傷つく。体力はコンパレーターに出る。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 160)
+    @GameTest(template = EMPTY, batch = "android_guard_hp", timeoutTicks = 160)
     public static void guardIgnoresPlayersAndReportsHealth(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
             RuinAndroid a = androids(helper).get(0);
             float before = a.getHealth();
@@ -95,7 +140,8 @@ public final class AndroidGameTests {
             helper.assertTrue(a.getHealth() == before, "プレイヤーの攻撃で傷ついた");
             a.invulnerableTime = 0;
             a.hurt(helper.getLevel().damageSources().magic(), 15);
-            helper.assertTrue(a.getHealth() < before, "ふつうのダメージで傷つかない");
+            helper.assertTrue(a.getHealth() < before, "ふつうのダメージで傷つかない: printed=" + a.printed() + " state=" + a.state()
+                    + " hp=" + a.getHealth() + "/" + before);
             // 体力を知らせる（毎秒）のを待って、コンパレーターの値を見る
             helper.runAfterDelay(25, () -> {
                 int signal = s.signal();
@@ -108,15 +154,24 @@ public final class AndroidGameTests {
     }
 
     /** 転送アップグレードがあれば、倒れた護衛の持ち物はステーションへ送られ、次に印刷した護衛が持つ。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
+    @GameTest(template = EMPTY, batch = "android_transfer_inventory", timeoutTicks = 400)
     public static void transferUpgradePassesInventory(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 2);
         // A placed station belongs to its player; unrelated orphan fixtures must not block this reprint.
         s.setOwner(java.util.UUID.randomUUID());
         s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_UPGRADE, new ItemStack(item("android_transfer_upgrade")));
-        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
-            RuinAndroid first = androids(helper).get(0);
+        boolean[] transferred = {false};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> current = androids(helper);
+            // 持ち物の引継ぎだけを調べる。足場のない空テンプレートから歩いて落ちるのを避ける。
+            current.forEach(a -> { a.setNoAi(true); a.setNoGravity(true); });
+            if (transferred[0] || helper.getTick() < RuinAndroid.PRINT_TICKS + 30
+                    || current.isEmpty() || !current.get(0).printed()) {
+                return;
+            }
+            RuinAndroid first = current.get(0);
+            transferred[0] = true;
             first.inventory().setItem(RuinAndroid.SLOT_REPAIR, new ItemStack(item("android_repair_kit"), 5));
             first.kill();
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
@@ -124,8 +179,11 @@ public final class AndroidGameTests {
                     "転送アップグレードがあるのに持ち物が落ちた");
         });
         helper.succeedWhen(() -> {
-            List<RuinAndroid> list = androids(helper).stream().filter(RuinAndroid::isAlive).toList();
-            helper.assertTrue(list.size() == 1, "印刷し直されない: count=" + list.size() + ", station=" + s.saveWithoutMetadata());
+            helper.assertTrue(transferred[0], "最初の護衛が印刷されない");
+            // 同じ組で並んで動くほかのテストのアンドロイドは数えない（このステーションのものだけ）
+            List<RuinAndroid> list = androids(helper).stream()
+                    .filter(a -> a.isAlive() && helper.absolutePos(STATION).equals(a.home())).toList();
+            helper.assertTrue(list.size() == 1, "印刷し直されない: " + list.size());
             ItemStack kits = list.get(0).inventory().getItem(RuinAndroid.SLOT_REPAIR);
             helper.assertTrue(kits.getCount() == 5, "持ち物が次の護衛に渡らない: " + kits);
             list.get(0).discard();
@@ -152,7 +210,7 @@ public final class AndroidGameTests {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         a.setNoAi(true);
         a.setHome(helper.absolutePos(fabricator));
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 5))));
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(5, 1, 5))));
         helper.getLevel().addFreshEntity(a);
         return a;
     }
@@ -166,7 +224,7 @@ public final class AndroidGameTests {
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void fabricatorKeepsUnloadedAndroid(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        BlockPos at = new BlockPos(2, 1, 2);
+        BlockPos at = p(2, 1, 2);
         BladeAndroid a = ruinAndroid(helper, at);
         AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
         a.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
@@ -181,7 +239,7 @@ public final class AndroidGameTests {
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 160)
     public static void fabricatorDropsMemoryWhenAllDefeated(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        BlockPos at = new BlockPos(2, 1, 2);
+        BlockPos at = p(2, 1, 2);
         BladeAndroid a = ruinAndroid(helper, at);
         AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
         a.kill();
@@ -203,7 +261,7 @@ public final class AndroidGameTests {
         BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
         guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
         BladeAndroid ruin = SinguloEntities.BLADE_ANDROID.get().create(level);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         List<LivingEntity> spared = List.of(SinguloEntities.GRAVITY_REMNANT.get().create(level), EntityType.COW.create(level),
                 EntityType.VILLAGER.create(level), player);
@@ -223,8 +281,8 @@ public final class AndroidGameTests {
     public static void orphanGuardLaserSparesVillagers(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var level = helper.getLevel();
-        helper.setBlock(new BlockPos(3, 1, 3), net.minecraft.world.level.block.Blocks.STONE);
-        Vec3 at = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 2, 3)));
+        helper.setBlock(p(3, 1, 3), net.minecraft.world.level.block.Blocks.STONE);
+        Vec3 at = Vec3.atBottomCenterOf(helper.absolutePos(p(3, 2, 3)));
         BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
         guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
         guard.setNoAi(true);
@@ -280,9 +338,9 @@ public final class AndroidGameTests {
     public static void permitAndFollowSettings(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
-        var friend = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
-        var stranger = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var owner = player(helper);
+        var friend = player(helper);
+        var stranger = player(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -327,8 +385,8 @@ public final class AndroidGameTests {
     public static void removedMemberLosesAndroidScreen(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
-        var friend = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var owner = player(helper);
+        var friend = player(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -395,6 +453,225 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 巡回路の欄に作業位置カード（床のブロック）を置く。 */
+    private static void routeCard(GameTestHelper helper, AndroidStationBlockEntity s, int index, BlockPos floor) {
+        ItemStack card = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(card, helper.getLevel(), helper.absolutePos(floor),
+                helper.getLevel().getBlockState(helper.absolutePos(floor)).getBlock());
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_ROUTE + index, card);
+    }
+
+    /** 巡回: 巡回路の2つの地点を、順に回る（どちらの上にも立つ）。 */
+    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    public static void patrolWalksRoute(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        AndroidStationBlockEntity s = station(helper, 1);
+        BlockPos[] points = {p(1, 0, 6), p(6, 0, 6)};
+        for (int i = 0; i < points.length; i++) {
+            routeCard(helper, s, i, points[i]);
+        }
+        s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
+        for (int i = 0; i < 3; i++) {
+            s.press(AndroidStationBlockEntity.BUTTON_DWELL);     // 立ち止まる時間: 5秒 → 10 → 20 → 0秒
+        }
+        boolean[] visited = new boolean[points.length];
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : androids(helper)) {
+                for (int i = 0; i < points.length; i++) {
+                    Vec3 stand = Vec3.atBottomCenterOf(helper.absolutePos(points[i].above()));
+                    visited[i] |= a.printed() && a.position().subtract(stand).horizontalDistance() < 1.7;
+                }
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(androids(helper).stream().allMatch(a -> a.mode() == RuinAndroid.MODE_PATROL), "動き方が巡回にならない");
+            helper.assertTrue(visited[0] && visited[1], "巡回路の地点を回らない: " + visited[0] + ", " + visited[1]);
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /**
+     * 経路の決まり: 巡回の地点（東の帯の中）へ向かうとき、帯（対象範囲）に入るので経由地点（帯の南の端）を通り、
+     * そのあいだ進入禁止ゾーン（ステーションと帯のあいだの列。南の端だけ空いている）に入らない。
+     */
+    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    public static void patrolFollowsRouteRules(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        AndroidStationBlockEntity s = station(helper, 1);
+        var level = helper.getLevel();
+        BlockPos point = p(6, 0, 1), via = p(6, 0, 7);
+        routeCard(helper, s, 0, point);
+        // 1行目: 経由地点・対象範囲（x 5〜7 の帯）・進入禁止ゾーン（x 4 の列、z 0〜6）
+        ItemStack viaCard = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(viaCard, level, helper.absolutePos(via),
+                level.getBlockState(helper.absolutePos(via)).getBlock());
+        ItemStack scope = new ItemStack(item("area_card"));
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.record(scope, level, helper.absolutePos(p(5, 0, 0)),
+                helper.absolutePos(p(7, 0, 7)));
+        ItemStack zone = new ItemStack(item("area_card"));
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.record(zone, level, helper.absolutePos(p(4, 0, 0)),
+                helper.absolutePos(p(4, 0, 6)));
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_RULES, viaCard);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_RULES + 1, scope);
+        s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_RULES + 2, zone);
+        s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
+        boolean[] passedVia = {false}, reached = {false}, trespassed = {false};
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : androids(helper)) {
+                if (!a.printed()) {
+                    continue;
+                }
+                Vec3 rel = a.position().subtract(Vec3.atLowerCornerOf(helper.absolutePos(p(0, 0, 0))));
+                passedVia[0] |= rel.subtract(6.5, 1, 7.5).horizontalDistance() < 1.6;
+                reached[0] |= passedVia[0] && rel.subtract(6.5, 1, 1.5).horizontalDistance() < 1.6;
+                trespassed[0] |= !passedVia[0] && rel.x >= 4 && rel.x < 5 && rel.z >= 0 && rel.z < 7;
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertFalse(trespassed[0], "経由地点へ向かうあいだに、進入禁止ゾーンに入った");
+            helper.assertTrue(passedVia[0], "対象範囲に入るのに、経由地点を通らない");
+            helper.assertTrue(reached[0], "経由地点を通ったあと、巡回の地点へ行かない");
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** タンクの画面: 水入りバケツでクリックするとタンクに入り（空のバケツが残る）、空のバケツで汲み、捨てるボタンで空になる。 */
+    @GameTest(template = EMPTY)
+    public static void tankTakesBuckets(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        a.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
+        var player = player(helper);
+        player.containerMenu.setCarried(new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET));
+        helper.assertTrue(a.useTankContainer(player, 0), "水入りバケツでタンクに入れられない");
+        var water = new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1);
+        helper.assertTrue(a.tankAmount(water) == 1000 && player.containerMenu.getCarried().is(net.minecraft.world.item.Items.BUCKET),
+                "タンクに 1000 mB 入って、空のバケツが残らない: " + a.tankAmount(water));
+        helper.assertTrue(a.useTankContainer(player, 0) && player.containerMenu.getCarried().is(net.minecraft.world.item.Items.WATER_BUCKET)
+                && a.tankAmount(water) == 0, "空のバケツでタンクから汲めない");
+        player.containerMenu.setCarried(new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET));
+        a.useTankContainer(player, 1);
+        helper.assertTrue(a.clearTank(1) && a.tanksEmpty(), "捨てるボタンでタンクが空にならない");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** 拠点の暮らし: 昼、手の空いた護衛は、ステーションのそばの階段に座る（座れる物がなければ地面に。ほかに掃く仕草などもする）。 */
+    @GameTest(template = EMPTY, batch = "android_life", timeoutTicks = 2400)
+    public static void idleGuardSitsOnStairs(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        helper.getLevel().setDayTime(1000);
+        station(helper, 1);
+        BlockPos stair = p(5, 1, 2);
+        helper.setBlock(stair, net.minecraft.world.level.block.Blocks.OAK_STAIRS);
+        // 作業台（名前に "bench" が入る）は椅子ではない。階段より近くに置く
+        BlockPos bench = p(3, 1, 3);
+        helper.setBlock(bench, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORKBENCH.get());
+        boolean[] sat = {false}, onBench = {false};
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : androids(helper)) {
+                if (a.printed() && a.tickCount % 60 == 0 && a.state() == RuinAndroid.STATE_IDLE) {
+                    a.lifeNow();
+                }
+                sat[0] |= a.state() == RuinAndroid.STATE_SIT
+                        && a.position().subtract(Vec3.atBottomCenterOf(helper.absolutePos(stair))).horizontalDistance() < 0.45;
+                onBench[0] |= a.state() == RuinAndroid.STATE_SIT
+                        && a.position().subtract(Vec3.atBottomCenterOf(helper.absolutePos(bench))).horizontalDistance() < 0.6;
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(!onBench[0], "作業台に座った（作業台の中に埋まる）");
+            helper.assertTrue(sat[0], "手の空いた護衛が、そばの階段に座らない: " + androids(helper).stream().map(a -> "pos=" + a.position() + " state=" + a.state() + " life=" + a.lifeState() + " health=" + a.getHealth() + " target=" + a.getTarget()).toList());
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** 拠点の暮らし: しばらく落ちたままの物を拾って、そばのチェストへしまう。 */
+    @GameTest(template = EMPTY, batch = "android_life_tidy", timeoutTicks = 1200)
+    public static void idleGuardTidiesIntoChest(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        helper.getLevel().setDayTime(1000);
+        station(helper, 1);
+        BlockPos chest = p(6, 1, 6);
+        helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
+        net.minecraft.world.entity.item.ItemEntity drop = helper.spawnItem(Items.APPLE, 6.5F, 1, 10.5F);
+        drop.setPickUpDelay(0);
+        helper.onEachTick(() -> {
+            // 落ちた物が「しばらく落ちたまま」（10秒）になってから急かす（先に別の暮らしを始めて、時間切れにならないように）
+            if (drop.isAlive() && drop.getAge() < 20 * 11) {
+                return;
+            }
+            for (RuinAndroid a : androids(helper)) {
+                if (a.printed() && a.tickCount % 40 == 0 && a.state() == RuinAndroid.STATE_IDLE) {
+                    a.lifeNow();
+                }
+            }
+        });
+        helper.succeedWhen(() -> {
+            var be = (net.minecraft.world.level.block.entity.ChestBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, chest);
+            String why = " (落ちた物: " + (drop.isAlive() ? "残っている age=" + drop.getAge() + " at=" + drop.position() : "消えた")
+                    + androids(helper).stream().map(a -> " / " + a.state() + " hand=" + a.getMainHandItem() + " pos=" + a.blockPosition()
+                    + " exact=" + a.position() + " home=" + a.home() + " life=" + a.lifeState() + " guard=" + a.isGuard() + " active=" + a.active()
+                    + " target=" + a.getTarget()).reduce("", String::concat) + ")";
+            helper.assertTrue(!be.isEmpty() && be.getItem(0).is(Items.APPLE), "落ちていた物を、そばのチェストへしまわない" + why);
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** 範囲カード: 2つの角を記録すると、その範囲になる。 */
+    @GameTest(template = EMPTY)
+    public static void areaCardRecordsTwoCorners(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        ItemStack card = new ItemStack(item("area_card"));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.AreaCardItem.box(card) == null, "未記録なのに範囲がある");
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.recordFirst(card, helper.getLevel(), p(3, 1, 9));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.AreaCardItem.box(card) == null, "1つ目の角だけで範囲になった");
+        io.github.genichimaruo.singulo.android.work.AreaCardItem.recordSecond(card, p(1, 4, 5));
+        var box = io.github.genichimaruo.singulo.android.work.AreaCardItem.box(card);
+        helper.assertTrue(box != null && box.getXSpan() == 3 && box.getYSpan() == 4 && box.getZSpan() == 5, "範囲の大きさが違う: " + box);
+        helper.assertTrue(card.getMaxStackSize() == 1, "記録したカードが重なる");
+        helper.succeed();
+    }
+
+    /** 巡回中に敵の群れ（5体）を見つけたら、ステーションがレッドストーン信号を出し、記録に残す。倒した相手も記録に残る。 */
+    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    public static void patrolRaisesAlarm(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        AndroidStationBlockEntity s = station(helper, 1);
+        routeCard(helper, s, 0, p(2, 0, 5));
+        s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
+        boolean[] alarmed = {false};
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 40, () -> {
+            for (int i = 0; i < 5; i++) {
+                var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+                zombie.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(1 + i, 1, 6))));
+                zombie.setNoAi(true);
+                zombie.setPersistenceRequired();
+                helper.getLevel().addFreshEntity(zombie);
+            }
+        });
+        boolean[] powered = {false};
+        helper.onEachTick(() -> {
+            alarmed[0] |= s.alarming();
+            BlockPos at = helper.absolutePos(STATION);
+            powered[0] |= helper.getLevel().getBlockState(at).getSignal(helper.getLevel(), at, net.minecraft.core.Direction.EAST) == 15;
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(alarmed[0], "敵の群れを見つけても、警報を出さない");
+            helper.assertTrue(powered[0], "警報なのに、ステーションがレッドストーン信号を出さない");
+            RuinAndroid a = androids(helper).get(0);
+            var log = a.patrolLog();
+            helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_ALARM),
+                    "警報が記録に残らない");
+            helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_KILL),
+                    "倒した相手が記録に残らない");
+            a.discard();
+        });
+    }
+
     /** バッテリーアップグレード1個につき充電の満タンが50%増え、外すと満タンに合わせて減る。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void batteryUpgradeRaisesCharge(GameTestHelper helper) {
@@ -445,8 +722,8 @@ public final class AndroidGameTests {
     }
 
     /** 作業の場所: 指令台・資材口（隣にチェスト）・納品口・レシピ棚・作業台。 */
-    private static final BlockPos CONSOLE = new BlockPos(0, 1, 0), SUPPLY = new BlockPos(1, 1, 0), CHEST = new BlockPos(1, 1, 1),
-            DELIVERY = new BlockPos(3, 1, 0), RACK = new BlockPos(4, 1, 0), TABLE = new BlockPos(4, 1, 3);
+    private static final BlockPos CONSOLE = p(0, 1, 0), SUPPLY = p(1, 1, 0), CHEST = p(1, 1, 1),
+            DELIVERY = p(3, 1, 0), RACK = p(4, 1, 0), TABLE = p(4, 1, 3);
 
     private static ItemStack recipeCard(GameTestHelper helper, java.util.List<ItemStack> grid, ItemStack output) {
         ItemStack card = new ItemStack(item("recipe_card"));
@@ -462,7 +739,7 @@ public final class AndroidGameTests {
         var level = helper.getLevel();
         // The empty structure contains air, including y=0. Give the factory a real
         // floor so irrigation and farmland do not form a floating, two-block ledge.
-        for (int x = 0; x < 8; x++) for (int z = 0; z < 8; z++) {
+        for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) {
             helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.STONE);
         }
         helper.setBlock(CONSOLE, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -473,7 +750,7 @@ public final class AndroidGameTests {
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
         net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -515,10 +792,10 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 2);
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
-        a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.makeGuard(null, helper.absolutePos(p(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.assertTrue(a.isWorking(), "アンドロイドが作業中にならない");
@@ -557,8 +834,8 @@ public final class AndroidGameTests {
     /** 作業を始めたアンドロイド（採掘アップグレードつきにもできる）。 */
     private static BladeAndroid worker(GameTestHelper helper, boolean miner) {
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
-        a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
-        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.makeGuard(null, helper.absolutePos(p(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(2, 1, 2))));
         if (miner) {
             a.inventory().setItem(RuinAndroid.SLOT_MINING, new ItemStack(item("android_mining_upgrade")));
         }
@@ -572,7 +849,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        BlockPos furnacePos = p(0, 1, 3);
         helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
         net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, furnacePos);
         furnace.setItem(1, new ItemStack(net.minecraft.world.item.Items.COAL, 4));
@@ -590,13 +867,172 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない" + " pos=" + a.position() + " ticks=" + a.tickCount + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " guard=" + a.isGuard() + " printed=" + a.printed() + " target=" + a.getTarget() + " work=" + a.saveWorkState() + " console=" + console.saveWithoutMetadata() + " furnace=" + furnace.saveWithoutMetadata());
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /** 燃料の「満タン」: 燃料が切れたら、1個ずつではなく、装置に入るだけ（在庫の石炭5個を全部）持ってくる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidFillsFuel(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos furnacePos = p(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        chest.setItem(2, new ItemStack(net.minecraft.world.item.Items.COAL, 5));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(),
+                new ItemStack(net.minecraft.world.item.Items.COAL), io.github.genichimaruo.singulo.android.work.RecipeData.DEFAULT_FACES
+                        | io.github.genichimaruo.singulo.android.work.RecipeData.FUEL_FILL).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない");
+            int coal = 0;
+            for (int i = 0; i < chest.getContainerSize(); i++) {
+                coal += chest.getItem(i).is(net.minecraft.world.item.Items.COAL) ? chest.getItem(i).getCount() : 0;
+            }
+            helper.assertTrue(coal == 0, "満タンなのに石炭を全部持ってこない（残り " + coal + "）");
+            a.discard();
+        });
+    }
+
+    /**
+     * 燃料が素材置き場になく、作れるとき: 燃料（樫の板材）を作る注文を自動で出し、原木から板材を作って、かまどに足して焼き上げる。
+     */
+    @GameTest(template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
+    public static void androidOrdersMissingFuel(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 2);                  // 原木2本と、板材・棒のレシピ
+        var level = helper.getLevel();
+        BlockPos furnacePos = p(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(),
+                new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 2)).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        boolean[] fuelOrdered = {false};
+        helper.onEachTick(() -> fuelOrdered[0] |= console.orders().stream().anyMatch(o -> o.target.is(net.minecraft.world.item.Items.OAK_PLANKS)));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(fuelOrdered[0], "燃料（板材）を作る注文を出さない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "燃料を作って、鉄インゴットを2つ届けない");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /** 入れる面を間違えたレシピ（かまどの下の面から原鉄）: 立ち尽くさず、注文の時点で理由を出して断る。 */
+    @GameTest(template = EMPTY)
+    public static void wrongInputFaceIsRefused(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos furnacePos = p(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, furnacePos);
+        furnace.setItem(1, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 4));   // 下の面にも見える燃料の欄が埋まっていても見分ける
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        int down = net.minecraft.core.Direction.DOWN.get3DDataValue();
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(),
+                ItemStack.EMPTY, io.github.genichimaruo.singulo.android.work.RecipeData.faces(down, down,
+                        io.github.genichimaruo.singulo.android.work.RecipeData.FACE_AUTO)).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error != null && error.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
+                && t.getKey().equals("gui.singulo.work_console.error.wrong_face"), "入れる面の間違いを断らない: " + error);
+        a.discard();
+        helper.succeed();
+    }
+
+    /**
+     * 装置の加工を待つあいだに、ほかの作業をする: かまどに原鉄を入れたら、焼けるのを待たずに、もう1つの注文（棒）を作って届け、
+     * 焼けたら取りに戻って、鉄インゴットも届ける。
+     */
+    @GameTest(template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
+    public static void androidWorksWhileFurnaceSmelts(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 2);
+        var level = helper.getLevel();
+        BlockPos furnacePos = p(0, 1, 3);
+        helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
+        net.minecraft.world.level.block.entity.FurnaceBlockEntity furnace = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, furnacePos);
+        furnace.setItem(1, new ItemStack(net.minecraft.world.item.Items.COAL, 4));
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 4));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(furnacePos),
+                net.minecraft.world.level.block.Blocks.FURNACE);
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        new io.github.genichimaruo.singulo.android.work.RecipeData(io.github.genichimaruo.singulo.android.work.RecipeData.MODE_PROCESSING, in,
+                new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of()).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var player = player(helper);
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 4, List.of(a.getUUID()),
+                helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "鉄インゴットを注文できない: " + (error == null ? "" : error.getString()));
+        error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "作業中のアンドロイドに、2つ目の注文を受け持たせられない: " + (error == null ? "" : error.getString()));
+        int[] ingotsWhenSticksDone = {-1};
+        helper.onEachTick(() -> {
+            if (ingotsWhenSticksDone[0] < 0 && delivered(helper, net.minecraft.world.item.Items.STICK) >= 8) {
+                ingotsWhenSticksDone[0] = delivered(helper, net.minecraft.world.item.Items.IRON_INGOT);
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 4, "鉄インゴットが4つ届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8, "棒が8本届かない");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            helper.assertTrue(ingotsWhenSticksDone[0] >= 0 && ingotsWhenSticksDone[0] < 4,
+                    "かまどを待っているあいだに棒を作らなかった（棒が届いたときの鉄インゴット: " + ingotsWhenSticksDone[0] + "）");
+            helper.assertFalse(a.isWorking(), "注文が終わっても作業中のまま");
             a.discard();
         });
     }
@@ -624,7 +1060,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
         rack.items().setStackInSlot(2, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "白樺の板材で棒を注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -639,7 +1075,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        BlockPos furnacePos = p(0, 1, 3);
         helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
         net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
         chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.RAW_IRON, 2));
@@ -656,7 +1092,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -671,7 +1107,10 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos from = new BlockPos(0, 1, 5), to = new BlockPos(1, 1, 5);
+        BlockPos from = p(0, 1, 5), to = p(1, 1, 5);
+        // Natural gravel above the cleared template must not refill a mined cell.
+        helper.setBlock(from.above(6), net.minecraft.world.level.block.Blocks.STONE);
+        helper.setBlock(to.above(6), net.minecraft.world.level.block.Blocks.STONE);
         helper.setBlock(from, net.minecraft.world.level.block.Blocks.STONE);
         helper.setBlock(to, net.minecraft.world.level.block.Blocks.STONE);
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
@@ -682,7 +1121,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);   // 場所のカードがない行
         BladeAndroid plain = worker(helper, false);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         ItemStack cobble = new ItemStack(net.minecraft.world.item.Items.COBBLESTONE);
         helper.assertTrue(console.start(player, cobble, 2, List.of(plain.getUUID()), helper.absolutePos(DELIVERY)) != null,
                 "採掘アップグレードなしで採掘の注文ができた");
@@ -691,9 +1130,12 @@ public final class AndroidGameTests {
         var error = console.start(player, cobble, 2, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない" + " pos=" + a.position() + " ticks=" + a.tickCount + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " guard=" + a.isGuard() + " printed=" + a.printed() + " target=" + a.getTarget() + " work=" + a.saveWorkState() + " console=" + console.saveWithoutMetadata() + " message=" + console.message() + " worker=" + a.saveWithoutId(new net.minecraft.nbt.CompoundTag()) + " delivery=" + io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, DELIVERY).saveWithoutMetadata());
             helper.assertTrue(level.getBlockState(helper.absolutePos(from)).isAir() && level.getBlockState(helper.absolutePos(to)).isAir(),
-                    "範囲の石が掘られていない: " + level.getBlockState(helper.absolutePos(from)) + " / " + level.getBlockState(helper.absolutePos(to)));
+                    "範囲の石が掘られていない: from=" + helper.absolutePos(from) + "=" + level.getBlockState(helper.absolutePos(from))
+                            + ", to=" + helper.absolutePos(to) + "=" + level.getBlockState(helper.absolutePos(to))
+                            + ", delivery=" + delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) + ", worker=" + a.saveWithoutId(new net.minecraft.nbt.CompoundTag())
+                            + ", console=" + console.saveWithoutMetadata());
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
             a.discard();
         });
@@ -710,9 +1152,9 @@ public final class AndroidGameTests {
         net.minecraft.world.level.block.entity.ChestBlockEntity seed = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
         seed.setItem(5, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
         BladeAndroid a = worker(helper, false);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         var error = console.register(player, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 4,
-                io.github.genichimaruo.singulo.android.work.StandingOrder.KEEP, null, List.of());
+                io.github.genichimaruo.singulo.android.work.StandingOrder.KEEP, null, List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.assertTrue(error == null, "登録できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
             net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
@@ -735,9 +1177,9 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         console.register(player, new ItemStack(net.minecraft.world.item.Items.STICK), 4,
-                io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE, helper.absolutePos(DELIVERY), List.of());
+                io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE, helper.absolutePos(DELIVERY), List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(console.orders().isEmpty(), "信号がないのに注文した");
             console.onSignal(true);
@@ -756,7 +1198,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         net.minecraft.world.entity.monster.Zombie[] attacker = {null};
         helper.startSequence()
@@ -765,6 +1207,7 @@ public final class AndroidGameTests {
                     var zombie = EntityType.ZOMBIE.create(helper.getLevel());
                     zombie.moveTo(a.position().add(1.5, 0, 0));
                     zombie.setNoAi(true);
+                    zombie.setPersistenceRequired();       // プレイヤーから遠いと消える（遠くで動くほかのテストのプレイヤーが一番近いとき）
                     zombie.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
                     zombie.setHealth(200);
                     helper.getLevel().addFreshEntity(zombie);
@@ -801,33 +1244,33 @@ public final class AndroidGameTests {
         var console = workshop(helper, 0);
         // Light propagation on 1.20.1 is asynchronous. Plant only after the lit,
         // irrigated fixture is ready, rather than losing crops to survival updates.
-        helper.setBlock(new BlockPos(3, 3, 5), net.minecraft.world.level.block.Blocks.GLOWSTONE);
-        helper.setBlock(new BlockPos(2, 1, 5), net.minecraft.world.level.block.Blocks.WATER);
+        helper.setBlock(p(3, 3, 5), net.minecraft.world.level.block.Blocks.GLOWSTONE);
+        helper.setBlock(p(2, 1, 5), net.minecraft.world.level.block.Blocks.WATER);
         for (int x = 0; x < 2; x++) {
-            helper.setBlock(new BlockPos(x, 1, 5), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState()
+            helper.setBlock(p(x, 1, 5), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState()
                     .setValue(net.minecraft.world.level.block.FarmBlock.MOISTURE, 7));
         }
         helper.startSequence().thenWaitUntil(() -> {
             for (int x = 0; x < 2; x++) {
-                helper.assertTrue(helper.getLevel().getRawBrightness(helper.absolutePos(new BlockPos(x, 2, 5)), 0) >= 9,
+                helper.assertTrue(helper.getLevel().getRawBrightness(helper.absolutePos(p(x, 2, 5)), 0) >= 9,
                         "畑の照明更新が終わっていない");
             }
         }).thenExecute(() -> {
             for (int x = 0; x < 2; x++) {
-                helper.setBlock(new BlockPos(x, 2, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
+                helper.setBlock(p(x, 2, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
                         .getStateForAge(7));
             }
         procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
-                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 2, 5)),
-                helper.absolutePos(new BlockPos(1, 2, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(p(0, 2, 5)),
+                helper.absolutePos(p(1, 2, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(new BlockPos(0, 2, 5)) + " crop1=" + helper.getBlockState(new BlockPos(1, 2, 5)) + " soil0=" + helper.getBlockState(new BlockPos(0, 1, 5)) + " light=" + helper.getLevel().getRawBrightness(helper.absolutePos(new BlockPos(0, 2, 5)), 0) + " message=" + console.message());
-            helper.assertTrue(helper.getBlockState(new BlockPos(0, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
-                    && helper.getBlockState(new BlockPos(1, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(p(0, 2, 5)) + " crop1=" + helper.getBlockState(p(1, 2, 5)) + " soil0=" + helper.getBlockState(p(0, 1, 5)) + " light=" + helper.getLevel().getRawBrightness(helper.absolutePos(p(0, 2, 5)), 0) + " message=" + console.message());
+            helper.assertTrue(helper.getBlockState(p(0, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
+                    && helper.getBlockState(p(1, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
             a.discard();
         });
         });
@@ -838,18 +1281,18 @@ public final class AndroidGameTests {
     public static void androidHarvestsAmethyst(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
-        helper.setBlock(new BlockPos(1, 1, 6), net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST);
-        helper.setBlock(new BlockPos(1, 2, 6), net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER);
+        helper.setBlock(p(1, 1, 6), net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST);
+        helper.setBlock(p(1, 2, 6), net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER);
         procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
-                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 1, 5)),
-                helper.absolutePos(new BlockPos(2, 3, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD, 4));
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(p(0, 1, 5)),
+                helper.absolutePos(p(2, 3, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD, 4));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD), 4,
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD), 4,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.AMETHYST_SHARD) == 4, "アメジストの欠片が4つ届かない");
-            helper.assertTrue(helper.getBlockState(new BlockPos(1, 1, 6)).is(net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST),
+            helper.assertTrue(helper.getBlockState(p(1, 1, 6)).is(net.minecraft.world.level.block.Blocks.BUDDING_AMETHYST),
                     "芽生えたアメジストを壊した");
             a.discard();
         });
@@ -860,15 +1303,15 @@ public final class AndroidGameTests {
     public static void androidFellsTree(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
-        helper.setBlock(new BlockPos(1, 0, 6), net.minecraft.world.level.block.Blocks.DIRT);
+        helper.setBlock(p(1, 0, 6), net.minecraft.world.level.block.Blocks.DIRT);
         for (int y = 1; y <= 3; y++) {
-            helper.setBlock(new BlockPos(1, y, 6), net.minecraft.world.level.block.Blocks.OAK_LOG);
+            helper.setBlock(p(1, y, 6), net.minecraft.world.level.block.Blocks.OAK_LOG);
         }
-        helper.setBlock(new BlockPos(1, 4, 6), net.minecraft.world.level.block.Blocks.OAK_LEAVES);
+        helper.setBlock(p(1, 4, 6), net.minecraft.world.level.block.Blocks.OAK_LEAVES);
         procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
-                io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL, helper.absolutePos(new BlockPos(0, 1, 5)),
-                helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 3));
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL, helper.absolutePos(p(0, 1, 5)),
+                helper.absolutePos(p(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 3));
+        var player = player(helper);
         BladeAndroid plain = worker(helper, false);
         helper.assertTrue(console.start(player, new ItemStack(net.minecraft.world.item.Items.OAK_LOG), 3, List.of(plain.getUUID()),
                 helper.absolutePos(DELIVERY)) != null, "伐採アップグレードなしで伐採の注文ができた");
@@ -879,7 +1322,7 @@ public final class AndroidGameTests {
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.OAK_LOG) == 3, "原木が3つ届かない");
-            helper.assertFalse(helper.getBlockState(new BlockPos(1, 3, 6)).is(net.minecraft.world.level.block.Blocks.OAK_LOG), "木の上が残った");
+            helper.assertFalse(helper.getBlockState(p(1, 3, 6)).is(net.minecraft.world.level.block.Blocks.OAK_LOG), "木の上が残った");
             a.discard();
         });
     }
@@ -890,14 +1333,14 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
         var sheep = EntityType.SHEEP.create(helper.getLevel());
-        sheep.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 1, 6))));
+        sheep.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(1, 1, 6))));
         sheep.setNoAi(true);
         helper.getLevel().addFreshEntity(sheep);
         procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
-                io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, helper.absolutePos(new BlockPos(0, 1, 5)),
-                helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL));
+                io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, helper.absolutePos(p(0, 1, 5)),
+                helper.absolutePos(p(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL), 1,
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL), 1,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -920,7 +1363,7 @@ public final class AndroidGameTests {
         ItemStack worn = a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD);
         helper.assertTrue(worn.is(item("android_ribbon")), "頭の装飾が伝わらない");
         helper.assertTrue(((io.github.genichimaruo.singulo.android.AndroidAccessoryItem) worn.getItem()).color(worn) == 0x123456, "染めた色が使われない");
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = player(helper);
         var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
         helper.assertFalse(menu.getSlot(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND)
                 .mayPlace(new ItemStack(item("android_cape"))), "手の枠にマントが入る");
@@ -941,7 +1384,7 @@ public final class AndroidGameTests {
         chest.setItem(0, new ItemStack(planks, 3));
         BladeAndroid a = worker(helper, false);
         a.setNoAi(true);
-        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(planks), 3, List.of(a.getUUID()), null);
+        var error = console.start(player(helper), new ItemStack(planks), 3, List.of(a.getUUID()), null);
         helper.assertTrue(error == null, "在庫の納品を注文できない");
         var job = console.requestJob(a);
         var pickups = console.planPickup(job, a.blockPosition());
@@ -1005,7 +1448,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        BlockPos furnacePos = new BlockPos(0, 1, 3);
+        BlockPos furnacePos = p(0, 1, 3);
         helper.setBlock(furnacePos, net.minecraft.world.level.block.Blocks.FURNACE);
         BladeAndroid a = worker(helper, false);
         a.setNoAi(true);
@@ -1053,7 +1496,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 1);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない");
         helper.startSequence()
@@ -1121,18 +1564,18 @@ public final class AndroidGameTests {
         var goalField = RuinAndroid.class.getDeclaredField("workGoal");
         goalField.setAccessible(true);
         Object goal = goalField.get(a);
-        var insert = goal.getClass().getDeclaredMethod("insertOnce", net.minecraftforge.items.IItemHandler.class,
-                net.minecraftforge.fluids.capability.IFluidHandler.class,
+        var insert = goal.getClass().getDeclaredMethod("insertOnce", java.util.function.Function.class, java.util.function.Function.class,
                 io.github.genichimaruo.singulo.android.work.RecipeData.class);
+        java.util.function.Function<ItemStack, Object> toHandler = item -> handler, noFluid = item -> null;
         insert.setAccessible(true);
         int initialCharge = a.charge();
-        helper.assertFalse((Boolean) insert.invoke(goal, handler, null, recipe), "2種類とも入ったことになった");
+        helper.assertFalse((Boolean) insert.invoke(goal, toHandler, noFluid, recipe), "2種類とも入ったことになった");
         helper.assertTrue(handler.getStackInSlot(0).is(net.minecraft.world.item.Items.OAK_LOG), "最初の材料が入らない");
         helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START + 1).getCount() == 1, "未投入の材料を失った");
         handler.extractItem(0, 64, false);       // 装置が最初の材料を消費した
         CompoundTag checkpoint = a.saveWorkState();
         a.restoreWorkState(checkpoint);
-        helper.assertTrue((Boolean) insert.invoke(goal, handler, null, recipe), "未投入の材料から再開できない");
+        helper.assertTrue((Boolean) insert.invoke(goal, toHandler, noFluid, recipe), "未投入の材料から再開できない");
         helper.assertTrue(handler.getStackInSlot(0).is(net.minecraft.world.item.Items.COBBLESTONE), "最初の材料を再投入した");
         helper.assertTrue(a.carryEmpty(), "材料が持ち物に残った");
         helper.assertTrue(a.charge() == initialCharge - 10, "1回分の加工で充電を二重に使った");
@@ -1147,9 +1590,9 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
-        var friend = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
-        var stranger = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var owner = player(helper);
+        var friend = player(helper);
+        var stranger = player(helper);
         friend.moveTo(Vec3.atCenterOf(helper.absolutePos(SUPPLY)));
         console.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
@@ -1162,7 +1605,7 @@ public final class AndroidGameTests {
         var portMenu = new io.github.genichimaruo.singulo.android.work.DeliveryPortMenu(2, friend.getInventory(), helper.absolutePos(DELIVERY),
                 new net.minecraft.world.SimpleContainer(io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity.SLOTS));
         helper.assertTrue(rackMenu.stillValid(friend) && portMenu.stillValid(friend), "登録者が棚・納品口を使えない");
-        BlockPos other = new BlockPos(5, 1, 5);
+        BlockPos other = p(5, 1, 5);
         helper.setBlock(other, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity otherConsole = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, other);
         otherConsole.setOwner(stranger.getUUID());
@@ -1191,7 +1634,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         var pig = EntityType.PIG.create(helper.getLevel());
-        BlockPos at = helper.absolutePos(new BlockPos(1, 1, 1));
+        BlockPos at = helper.absolutePos(p(1, 1, 1));
         var barrier = SinguloBlocks.ANDROID_BARRIER_GLASS.get().defaultBlockState();
         var gate = SinguloBlocks.ANDROID_GATE_GLASS_PATTERNED.get().defaultBlockState();
         var level = helper.getLevel();

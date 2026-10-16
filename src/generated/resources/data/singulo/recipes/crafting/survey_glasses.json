@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "I I",
+    "GBG",
+    "I  "
+  ],
+  "key": {
+    "I": {
+      "tag": "forge:ingots/iron"
+    },
+    "G": {
+      "tag": "forge:glass_panes/colorless"
+    },
+    "B": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:survey_glasses"
+  }
+}

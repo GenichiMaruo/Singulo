@@ -29,7 +29,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 /**
  * ペンローズ・リアクターの確認。引力帯が周りのテストに届かないよう、別の組（batch）にして順番に流す。
  */
-@GameTestHolder(Singulo.MODID)
+@GameTestHolder("singulo_reactor")
 @PrefixGameTestTemplate(false)
 public final class ReactorGameTests {
     private static final String HUGE = "reactor_isolated";
@@ -285,12 +285,25 @@ public final class ReactorGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_HAWKING, new ItemStack(item("hawking_collector")));
+        // This is the unfed-core test: ambient mobs/falling-block drops must not
+        // raise the fresh 500-mass core above the collector's 500-mass ceiling.
+        // Matter absorption is exercised separately by the reactor hazard tests.
+        var pullArea = new net.minecraft.world.phys.AABB(helper.absolutePos(CENTER)).inflate(
+                Math.max(24, io.github.genichimaruo.singulo.generated.ServerConfig.BLACK_HOLE_PULL_RADIUS.get()));
+        Runnable clearAmbient = () -> helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, pullArea,
+                e -> !(e instanceof net.minecraft.world.entity.player.Player)).forEach(net.minecraft.world.entity.Entity::discard);
+        clearAmbient.run();
+        helper.onEachTick(clearAmbient);
+        long[] ignitionTick = {-1};
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち"))
-                .thenExecute(() -> r.forceCore(PenroseReactorBlockEntity.START_MASS, 0))
-                .thenWaitUntil(() -> helper.assertTrue(
+                .thenExecute(() -> { clearAmbient.run(); r.forceCore(PenroseReactorBlockEntity.START_MASS, 0); ignitionTick[0] = helper.getTick(); })
+                .thenWaitUntil(() -> {
+                    helper.assertTrue(r.mass() <= PenroseReactorBlockEntity.START_MASS + 1e-6,
+                            "無給餌の試験へ外部の質量が混入した: " + r.mass());
+                    helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "ホーキング凝縮体ができない: formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " missing=" + Structures.reactorLayout(CENTER).keySet().stream().filter(pos -> helper.getBlockState(pos).isAir()).limit(12).toList() + " data=" + r.saveWithoutMetadata())).thenSucceed();
+                "ホーキング凝縮体ができない: ignitionTick=" + ignitionTick[0] + " elapsed=" + (helper.getTick() - ignitionTick[0]) + " formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " missing=" + Structures.reactorLayout(CENTER).keySet().stream().filter(pos -> helper.getBlockState(pos).isAir()).limit(12).toList() + " data=" + r.saveWithoutMetadata()); }).thenSucceed();
     }
 
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 2000, batch = "reactor_isolated_ergosphereYieldsExoticMatterAndSpinsDown")
@@ -421,6 +434,25 @@ public final class ReactorGameTests {
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 120, batch = "reactor_isolated_pelletsNeverOverfillCore")
     public static void pelletsNeverOverfillCore(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        // This measures pellet feeding only. Foreign items are deliberately allowed
+        // to exceed MAX_MASS (covered by overfilledReactorCollapsesAndCanBeRecaptured).
+        // Horizontal padding does not stop gravel falling through the 15-block-high
+        // fixture from a previous crater. Seal all six faces before starting the core.
+        for (int x = 0; x < 64; x++) for (int z = 0; z < 64; z++) {
+            helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(x, 14, z), net.minecraft.world.level.block.Blocks.BEDROCK);
+        }
+        for (int y = 1; y < 14; y++) for (int n = 0; n < 64; n++) {
+            helper.setBlock(new BlockPos(0, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(63, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(n, y, 0), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(n, y, 63), net.minecraft.world.level.block.Blocks.BEDROCK);
+        }
+        var room = new net.minecraft.world.phys.AABB(helper.absolutePos(BlockPos.ZERO),
+                helper.absolutePos(new BlockPos(64, 15, 64)));
+        helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, room,
+                e -> e instanceof ItemEntity || e instanceof net.minecraft.world.entity.item.FallingBlockEntity)
+                .forEach(net.minecraft.world.entity.Entity::discard);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
         helper.runAtTickTime(3, () -> {

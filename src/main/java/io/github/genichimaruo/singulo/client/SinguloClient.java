@@ -42,6 +42,7 @@ public final class SinguloClient {
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         MinecraftForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) ->
                 ClientGalaxies.set(java.util.List.of(), false));
@@ -78,6 +79,12 @@ public final class SinguloClient {
         if (dark != null) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.dark_matter", dark).withStyle(ChatFormatting.GRAY));
         }
+        // Mekanism の化学物質のためのアップグレードは、Mekanism がなければ使えないことを知らせる
+        var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem());
+        if (Singulo.MODID.equals(id.getNamespace()) && (id.getPath().equals("android_gas_tank_upgrade") || id.getPath().equals("android_dual_tank_upgrade"))
+                && !io.github.genichimaruo.singulo.android.work.Chemicals.present()) {
+            event.getToolTip().add(Component.translatable("tooltip.singulo.needs_mekanism").withStyle(ChatFormatting.RED));
+        }
         UsesData data = SinguloComponents.get(event.getItemStack(), SinguloComponents.USES.get());
         if (data != null && event.getItemStack().is(Items.ECHO_SHARD)) {
             event.getToolTip().add(Component.translatable("tooltip.singulo.uses", data.remaining(), data.max())
@@ -112,6 +119,8 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
         event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));
         event.registerEntityRenderer(SinguloEntities.SABER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SABER));
+        event.registerEntityRenderer(SinguloEntities.AXE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.AXE));
+        event.registerEntityRenderer(SinguloEntities.BIT_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BIT));
         event.registerEntityRenderer(SinguloEntities.ANDROID_CRESCENT.get(), AndroidCrescentRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ANDROID_LASER.get(), AndroidLaserRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
@@ -120,6 +129,9 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.GRAVITY_DEBRIS.get(), GravityDebrisRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ERGOSPHERE_LEVIATHAN.get(), ErgosphereLeviathanRenderer::new);
         event.registerEntityRenderer(SinguloEntities.LAST_ARCHIVIST.get(), LastArchivistRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.FOUNDRY_OVERSEER.get(), FoundryOverseerRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.FACTORY_LINE.get(),
+                FactoryLineRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ECHO_PROJECTOR.get(),
                 EchoProjectorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),
@@ -179,6 +191,8 @@ public final class SinguloClient {
         event.registerLayerDefinition(AndroidModel.BLADE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BLADE));
         event.registerLayerDefinition(AndroidModel.WHIP_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.WHIP));
         event.registerLayerDefinition(AndroidModel.SABER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.SABER));
+        event.registerLayerDefinition(AndroidModel.AXE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.AXE));
+        event.registerLayerDefinition(AndroidModel.BIT_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BIT));
         event.registerLayerDefinition(HorizonWardenRenderer.LAYER, HorizonWardenRenderer::createLayer);
     }
 
@@ -208,6 +222,11 @@ public final class SinguloClient {
             }
             return 0xFF000000 | net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
         }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get());
+        // 化学物質の見本は、化学物質の色に
+        event.register((stack, layer) -> {
+            String id = io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(stack);
+            return id.isEmpty() ? 0xFFFFFFFF : 0xFF000000 | io.github.genichimaruo.singulo.android.work.Chemicals.tint(id);
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.CHEMICAL_SAMPLE.get());
         // アンドロイドの装飾: 染める絵（layer0）だけを、染めた色に
         for (var acc : io.github.genichimaruo.singulo.registry.SinguloItems.ACCESSORIES) {
             event.register((stack, layer) -> layer == 0 && stack.getItem() instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem a
@@ -220,6 +239,7 @@ public final class SinguloClient {
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.PROCEDURE_CARD.get(), WorkCardDecorator.RECIPE);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get(), FluidSampleDecorator.INSTANCE);
+        event.register(io.github.genichimaruo.singulo.registry.SinguloItems.CHEMICAL_SAMPLE.get(), FluidSampleDecorator.INSTANCE);
     }
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
@@ -242,6 +262,11 @@ public final class SinguloClient {
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
                 (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.pos(stack) != null ? 1 : 0));
+        // 範囲カード: 1つ目の角だけなら 0.5、範囲ができていれば 1
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.AREA_CARD.get(), Singulo.id("recorded"),
+                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.AreaCardItem.box(stack) != null ? 1
+                        : io.github.genichimaruo.singulo.android.work.AreaCardItem.first(stack) != null ? 0.5F : 0));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), new ResourceLocation("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->

@@ -77,7 +77,7 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
 
     private void tick(ServerLevel level) {
         if (kind == null) {
-            AndroidKind[] all = AndroidKind.values();
+            AndroidKind[] all = AndroidKind.ruinKinds();
             setKind(all[level.random.nextInt(all.length)]);
         }
         // 見つからない（読み込まれていない）だけのものは、倒されたとは限らないので残す。消えたものは forget で外れる

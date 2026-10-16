@@ -262,6 +262,9 @@ public final class BossRewardGameTests {
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_reward_xp_merge", timeoutTicks = 120)
     public static void protectedOrbsSurviveVanillaOrbsNearby(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        AABB around = new AABB(helper.absolutePos(new BlockPos(3, 1, 3))).inflate(16);
+        // This fixture supplies its own XP: unrelated rewards are not part of the sum.
+        helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around).forEach(ExperienceOrb::discard);
         EchoSentinel boss = sentinel(helper, new BlockPos(3, 1, 3));
         ServerPlayer far = survivor(helper, Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))).add(60, 0, 0));
         boss.setHealth(1);
@@ -269,8 +272,8 @@ public final class BossRewardGameTests {
         leave(helper, far);
         boss.discard();
         int want = (int) Math.round(500 * io.github.genichimaruo.singulo.ruin.BossScaling.xpMultiplier());
-        AABB around = new AABB(helper.absolutePos(new BlockPos(3, 1, 3))).inflate(16);
-        ExperienceOrb sample = helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around).get(0);
+        ExperienceOrb sample = helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around,
+                orb -> orb.getPersistentData().getBoolean(EventHorizonTargets.PROTECTED)).get(0);
         Vec3 at = sample.position();
         int vanilla = 0;
         // 保護されたオーブと近い値も含めて、ふつうの経験値を何度も出す
@@ -280,6 +283,14 @@ public final class BossRewardGameTests {
                 vanilla += amount;
             }
         }
+        // Exercise vanilla proximity merging without testing random ballistic movement.
+        // Values, counts, protected markers, ages and vanilla merge logic remain unchanged.
+        for (ExperienceOrb orb : helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around)) {
+            orb.setNoGravity(true);
+            orb.setDeltaMovement(Vec3.ZERO);
+        }
+        helper.assertTrue(helper.getLevel().players().stream().noneMatch(p -> p.position().distanceToSqr(at) < 16 * 16),
+                "経験値の合流試験に回収できるプレイヤーが残っている");
         int vanillaTotal = vanilla;
         helper.runAtTickTime(80, () -> {
             int protectedXp = 0;
@@ -300,7 +311,9 @@ public final class BossRewardGameTests {
                 orb.discard();
             }
             helper.assertTrue(protectedXp == want, "保護されたオーブの合計が変わった（取り込まれた）: " + protectedXp + " / " + want);
-            helper.assertTrue(ordinaryXp == vanillaTotal, "ふつうの経験値の合計が変わった: " + ordinaryXp + " / " + vanillaTotal);
+            helper.assertTrue(ordinaryXp == vanillaTotal, "ふつうの経験値の合計が変わった: " + ordinaryXp + " / " + vanillaTotal
+                    + " nearbyPlayers=" + helper.getLevel().players().stream().filter(p -> p.position().distanceToSqr(at) < 32 * 32).map(p -> p.getGameProfile().getName()).toList()
+                    + " outside=" + helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, around.inflate(32)).stream().map(orb -> orb.getValue() + "@" + orb.position()).toList());
             helper.succeed();
         });
     }
