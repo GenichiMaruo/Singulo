@@ -30,6 +30,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     public static final ModelLayerLocation SABER_LAYER = new ModelLayerLocation(Singulo.id("saber_android"), "main");
     public static final ModelLayerLocation AXE_LAYER = new ModelLayerLocation(Singulo.id("axe_android"), "main");
     public static final ModelLayerLocation BIT_LAYER = new ModelLayerLocation(Singulo.id("bit_android"), "main");
+    public static final ModelLayerLocation GUNNER_LAYER = new ModelLayerLocation(Singulo.id("gunner_android"), "main");
 
     final ModelPart root;
     final ModelPart hips;
@@ -63,6 +64,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     final ModelPart axeGrip;
     /** ビット型の短剣の握り（なければ null。箱は持たない）。+Y が刃の向き。 */
     final ModelPart daggerGrip;
+    /** 射撃型の銃の握り（なければ null。箱は持たない）。+Y が銃身の向き、+Z が握りの下の向き。銃は描画で出す。 */
+    final ModelPart gunGrip;
     /** サイドテールと長い房のある側（+1 は体の左、-1 は右）。髪の揺れの向きに使う。 */
     final float hairSide;
     /** 装甲板を積んだときだけ見える、胸の銀の板と左肩の小さな肩当て（さりげなく）。 */
@@ -106,6 +109,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         this.hilt = forearmR.hasChild("hilt") ? forearmR.getChild("hilt") : null;
         this.axeGrip = forearmR.hasChild("axe_grip") ? forearmR.getChild("axe_grip") : null;
         this.daggerGrip = forearmR.hasChild("dagger_grip") ? forearmR.getChild("dagger_grip") : null;
+        this.gunGrip = forearmR.hasChild("gun_grip") ? forearmR.getChild("gun_grip") : null;
         this.hairSide = ponytail.getInitialPose().x > 0 ? 1 : -1;
         this.armorChest = torso.getChild("armor_chest");
         this.armorPad = armL.getChild("armor_pad");
@@ -221,6 +225,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         if (variant == AndroidRenderer.Variant.AXE) {
             // 両手斧の握り（手の中。柄は前上がりに傾けて持つ）
             forearmR.addOrReplaceChild("axe_grip", CubeListBuilder.create(), PartPose.offsetAndRotation(0, 4.4F, -0.2F, -2.3F, 0, 0));
+        }
+        if (variant == AndroidRenderer.Variant.GUNNER) {
+            // 銃の握り（手の中。構えていないときは、銃口を足元へ向けて下げて持つ。人や前の物に向けない）
+            forearmR.addOrReplaceChild("gun_grip", CubeListBuilder.create(), PartPose.offsetAndRotation(0, 4.4F, -0.2F, 0.15F, 0, 0));
         }
         if (variant == AndroidRenderer.Variant.BIT) {
             // 短剣の握り（手から前へ）
@@ -339,6 +347,143 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
 
     @Override
     public void setupAnim(RuinAndroid android, float limbSwing, float limbSwingAmount, float age, float netHeadYaw, float headPitch) {
+        pose(android, limbSwing, limbSwingAmount, age, netHeadYaw, headPitch);
+        blend(android, age);
+    }
+
+    // ------------------------------------------------------------------ 動きのつなぎ
+
+    /** 個体ごとの、動きのつなぎの記録（前の絵の姿勢と、つなぎ始めの姿勢）。 */
+    private static final class Blend {
+        float[] last;
+        float[] from;
+        int key = Integer.MIN_VALUE;
+        float start;
+        float duration;
+    }
+
+    private final java.util.Map<RuinAndroid, Blend> blends = new java.util.WeakHashMap<>();
+    private ModelPart[] parts;
+
+    /** 姿勢を決める区切り（行動の状態と、状態を変えずに姿勢だけ変わる条件）。これが変わったらつなぐ。 */
+    private int poseKey(RuinAndroid android) {
+        int flags = (!android.printed() ? 1 : 0) | (android.napping() ? 2 : 0) | (android.showsHeldDecor() ? 4 : 0)
+                | (android instanceof io.github.genichimaruo.singulo.android.BitAndroid bit && bit.deployed() > 0 ? 8 : 0)
+                | (axeGrip != null && axeOneHanded(android) ? 16 : 0);
+        return android.state() << 5 | flags;
+    }
+
+    /** 区切り from から to へ移るときのつなぎの長さ（tick）。 */
+    private static int blendTicks(int from, int to) {
+        int a = from >> 5, b = to >> 5;
+        // 構え → 本打ちは、構えの終わりの姿勢から本打ちが始まるよう作ってあるので、つながずに振り抜く
+        if (b == a + 1 && (a == BladeAndroid.STATE_DASH_WINDUP || a == BladeAndroid.STATE_SPIN_WINDUP
+                || a == io.github.genichimaruo.singulo.android.WhipAndroid.STATE_LASH_WINDUP
+                || a == io.github.genichimaruo.singulo.android.WhipAndroid.STATE_SLAM_WINDUP
+                || a == io.github.genichimaruo.singulo.android.SaberAndroid.STATE_THRUST_WINDUP
+                || a == io.github.genichimaruo.singulo.android.SaberAndroid.STATE_SWEEP_WINDUP
+                || a == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_CLEAVE_WINDUP
+                || a == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_SLAM_WINDUP
+                || a == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_LEAP_WINDUP
+                || a == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_ASSEMBLE || a == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_CHARGE || a == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_FIRE)) {
+            return 0;
+        }
+        if (a != b && strike(b)) {
+            return 2;               // 構えなしの素早い打ち込みは、遅れて見えないよう短く
+        }
+        if (calm(a) || calm(b)) {
+            return 8;               // 座る・休む・作業に入る／抜けるときは、ゆっくり
+        }
+        if (a == b) {
+            return 10;              // 行動はそのままで持ち方などだけ変わるとき（片手持ち・ビットの出し入れ）
+        }
+        return 5;
+    }
+
+    /** 構えなしで出る、素早い打ち込み。 */
+    private static boolean strike(int state) {
+        return state == BladeAndroid.STATE_DASH || state == BladeAndroid.STATE_SLASH || state == BladeAndroid.STATE_SPIN
+                || state == BladeAndroid.STATE_SWING || state == io.github.genichimaruo.singulo.android.WhipAndroid.STATE_LASH
+                || state == io.github.genichimaruo.singulo.android.WhipAndroid.STATE_SLAM
+                || state == io.github.genichimaruo.singulo.android.WhipAndroid.STATE_CRACK
+                || state == io.github.genichimaruo.singulo.android.SaberAndroid.STATE_THRUST
+                || state == io.github.genichimaruo.singulo.android.SaberAndroid.STATE_SWEEP
+                || state == io.github.genichimaruo.singulo.android.SaberAndroid.STATE_RIPOSTE
+                || state == io.github.genichimaruo.singulo.android.SaberAndroid.STATE_CUT
+                || state == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_CLEAVE
+                || state == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_SLAM
+                || state == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_LEAP
+                || state == io.github.genichimaruo.singulo.android.AxeAndroid.STATE_CHOP
+                || state == io.github.genichimaruo.singulo.android.BitAndroid.STATE_STAB
+                || state == io.github.genichimaruo.singulo.android.BitAndroid.STATE_BACKSTEP
+                || state == io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_HOP;
+    }
+
+    /** 座る・休む・充電・作業など、落ち着いた行動。 */
+    private static boolean calm(int state) {
+        return state == RuinAndroid.STATE_LOW_POWER || state == RuinAndroid.STATE_CHARGING || state == RuinAndroid.STATE_SOLAR
+                || state == RuinAndroid.STATE_SOLAR_FOLD || state == RuinAndroid.STATE_RESTING || state == RuinAndroid.STATE_CRAFTING
+                || state == RuinAndroid.STATE_MINING || state == RuinAndroid.STATE_SIT || state == RuinAndroid.STATE_SIT_GROUND
+                || state == RuinAndroid.STATE_TEND || state == RuinAndroid.STATE_SWEEP;
+    }
+
+    /** 区切りが変わったら、前の絵の姿勢から新しい姿勢へ、なめらかに寄せる（どの型・どの行動の組み合わせでも）。 */
+    private void blend(RuinAndroid android, float age) {
+        if (parts == null) {
+            parts = root.getAllParts().toArray(ModelPart[]::new);
+        }
+        Blend b = blends.computeIfAbsent(android, a -> new Blend());
+        int key = poseKey(android);
+        if (key != b.key) {
+            if (b.last != null) {
+                b.from = b.last.clone();
+                b.start = age;
+                b.duration = blendTicks(b.key, key);
+            }
+            b.key = key;
+        }
+        if (b.from != null) {
+            float u = b.duration <= 0 ? 1 : Mth.clamp((age - b.start) / b.duration, 0, 1);
+            if (u >= 1) {
+                b.from = null;
+            } else {
+                float r = 1 - ease(u);
+                for (int i = 0; i < parts.length; i++) {
+                    ModelPart part = parts[i];
+                    int o = i * 6;
+                    part.x += (b.from[o] - part.x) * r;
+                    part.y += (b.from[o + 1] - part.y) * r;
+                    part.z += (b.from[o + 2] - part.z) * r;
+                    // 回転は近い向きの側から回す（回転技の後に、何回転も巻き戻さないよう）
+                    part.xRot += Mth.wrapDegrees((b.from[o + 3] - part.xRot) * Mth.RAD_TO_DEG) * Mth.DEG_TO_RAD * r;
+                    part.yRot += Mth.wrapDegrees((b.from[o + 4] - part.yRot) * Mth.RAD_TO_DEG) * Mth.DEG_TO_RAD * r;
+                    part.zRot += Mth.wrapDegrees((b.from[o + 5] - part.zRot) * Mth.RAD_TO_DEG) * Mth.DEG_TO_RAD * r;
+                }
+            }
+        }
+        float[] last = b.last != null ? b.last : new float[parts.length * 6];
+        for (int i = 0; i < parts.length; i++) {
+            ModelPart part = parts[i];
+            int o = i * 6;
+            last[o] = part.x;
+            last[o + 1] = part.y;
+            last[o + 2] = part.z;
+            last[o + 3] = part.xRot;
+            last[o + 4] = part.yRot;
+            last[o + 5] = part.zRot;
+        }
+        b.last = last;
+    }
+
+    /**
+     * 斧型の待機の持ち方。ふだんは両手で斧の先を下ろして持ち、ときどき（個体ごとにずらして、30秒のうち12秒）
+     * 右手だけで斧を前上がりに担ぐ。左手に装飾を持っている間は、いつも片手持ち。
+     */
+    private static boolean axeOneHanded(RuinAndroid android) {
+        return android.showsHeldDecor() || Math.floorMod(android.tickCount + android.getId() * 977, 600) < 240;
+    }
+
+    private void pose(RuinAndroid android, float limbSwing, float limbSwingAmount, float age, float netHeadYaw, float headPitch) {
         root.getAllParts().forEach(ModelPart::resetPose);
         boolean armored = !android.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).isEmpty();
         armorChest.visible = armored;
@@ -440,13 +585,24 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             case io.github.genichimaruo.singulo.android.BitAndroid.STATE_DEPLOY -> deploy(t);
             case io.github.genichimaruo.singulo.android.BitAndroid.STATE_STAB -> stab(t);
             case io.github.genichimaruo.singulo.android.BitAndroid.STATE_BACKSTEP -> backstep(t);
+            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_SHOT -> pistolAim(t, android instanceof io.github.genichimaruo.singulo.android.GunnerAndroid gun ? Mth.clamp((gun.shotFlash() - pt) / io.github.genichimaruo.singulo.android.GunnerAndroid.FLASH, 0, 1) : 0);
+            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_ASSEMBLE -> railHold(ease(t / 8), age, 0);
+            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_CHARGE -> railHold(1, age, Mth.clamp(t / io.github.genichimaruo.singulo.android.GunnerAndroid.RAIL_CHARGE, 0, 1));
+            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_FIRE -> railFire(t, age);
+            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_STOW -> railHold(1 - ease((t - 4) / 8), age, 0);
+            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_HOP -> backstep(t);
             default -> {
-                if (axeGrip != null) {
-                    // 両手斧を体の前で斜めに持つ（左手も柄に添える）
+                if (axeGrip != null && axeOneHanded(android)) {
+                    // 片手持ち: 右手だけで柄を握り、斧を前上がりに担ぐ。左手は歩きに合わせて楽に振る
                     armR.xRot -= 0.15F;
-                    armL.xRot = Mth.lerp(0.7F, armL.xRot, -0.75F);
-                    armL.zRot = 0.35F;
-                    forearmL.xRot = -0.75F;
+                } else if (axeGrip != null) {
+                    // 両手斧の先を右前の床近くへ下ろし、体の前で斜めに両手で持つ。
+                    // 柄頭は胸より下に収め、左手は右手から柄頭の側へ3.5ピクセルの所を握る（角度は柄の線に左手が乗るよう逆算した値）
+                    armR.xRot = -0.5F;
+                    forearmR.xRot = -0.5F;
+                    axeGrip.setRotation(-0.626F, 2.449F, 0.33F);
+                    armL.setRotation(-0.658F, 0.723F, 0.392F);
+                    forearmL.xRot = -0.351F;
                 }
                 if (android instanceof io.github.genichimaruo.singulo.android.BitAndroid bit && bit.deployed() > 0) {
                     // ビットを浮かべている間: 左手を相手の方へ差し向けて指揮する
@@ -804,6 +960,77 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtFront.xRot -= 0.5F * k;
         backHair.xRot -= 0.3F * k;
         ponytail.xRot -= 0.4F * k;
+    }
+
+    // ------------------------------------------------------------------ 射撃型の動き
+
+    /**
+     * 小型銃の3連射: 実銃のように両手で構える。両腕を前へ伸ばして銃を目の高さ・体の中心線に置き、左手で右手を下から包む
+     * （角度は、銃身が正面・握りが真下になり、左手が右手に重なるよう逆算した値）。上体を少し前へ倒し、足を前後に開いて腰を落とす。
+     * 頭の上下の向きに合わせて両腕ごと狙いを上下させ、撃つたびに反動で手元が小さく跳ね上がる（kick: 撃った直後ほど 1）。
+     */
+    private void pistolAim(float t, float kick) {
+        float k = ease(t / 5);                          // 下ろすときは、行動のつなぎで滑らかに戻る
+        float pitch = head.xRot;
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.642F + pitch - 0.1F * kick);
+        armR.yRot = Mth.lerp(k, armR.yRot, -0.362F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.155F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.273F - 0.12F * kick);
+        if (gunGrip != null) {
+            gunGrip.xRot = Mth.lerp(k, gunGrip.xRot, 0.321F);
+            gunGrip.yRot = Mth.lerp(k, gunGrip.yRot, 0.027F);
+            gunGrip.zRot = Mth.lerp(k, gunGrip.zRot, 0.391F);
+        }
+        armL.xRot = Mth.lerp(k, armL.xRot, -1.381F + pitch - 0.1F * kick);
+        armL.yRot = Mth.lerp(k, armL.yRot, 0.426F);
+        armL.zRot = Mth.lerp(k, armL.zRot, -0.086F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.59F - 0.12F * kick);
+        torso.xRot += 0.07F * k;
+        hips.y += 0.4F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.3F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 0.25F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.22F);
+        shinR.xRot = Mth.lerp(k, shinR.xRot, 0.15F);
+    }
+
+    /**
+     * レールガンを肩に当てて両手で構える（k: 0〜1）。右手は握り、左手は銃身の下に添える（角度は手が銃身に乗るよう逆算した値）。
+     * 構えると銃身が体の左へ少し傾くので、上体を右へひねって、銃身を正面へ向ける。charge: 溜めの進み（体が少し震える）。
+     */
+    private void railHold(float k, float age, float charge) {
+        float tremble = Mth.sin(age * 2.3F) * 0.012F * charge;
+        armR.xRot = Mth.lerp(k, armR.xRot, 0.051F);
+        armR.yRot = Mth.lerp(k, armR.yRot, -0.372F);
+        armR.zRot = Mth.lerp(k, armR.zRot, -0.397F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -1.955F + tremble);
+        if (gunGrip != null) {
+            gunGrip.xRot = Mth.lerp(k, gunGrip.xRot, 0.494F);
+            gunGrip.yRot = Mth.lerp(k, gunGrip.yRot, -0.408F);
+            gunGrip.zRot = Mth.lerp(k, gunGrip.zRot, -0.006F);
+        }
+        armL.xRot = Mth.lerp(k, armL.xRot, -0.94F);
+        armL.yRot = Mth.lerp(k, armL.yRot, 0.372F);
+        armL.zRot = Mth.lerp(k, armL.zRot, 0.568F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.203F + tremble);
+        torso.yRot += 0.219F * k;
+        head.yRot -= 0.219F * k;
+        hips.y += 0.6F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.35F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.3F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 0.3F);
+    }
+
+    /** レールガンの発射: 構えたまま、反動で上体と銃が跳ね上がり、少しのけぞってから戻る。 */
+    private void railFire(float t, float age) {
+        railHold(1, age, 0);
+        float kick = (1 - ease(t / 6)) * ease(t * 2);
+        torso.xRot -= 0.3F * kick;
+        forearmR.xRot -= 0.25F * kick;
+        forearmL.xRot -= 0.25F * kick;
+        head.xRot -= 0.15F * kick;
+        backHair.xRot += 0.4F * kick;
+        ponytail.xRot += 0.5F * kick;
+        skirtBack.xRot += 0.3F * kick;
     }
 
     // ------------------------------------------------------------------ 鞭型の動き

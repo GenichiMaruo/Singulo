@@ -3,6 +3,7 @@
 部品の配置は src/main/java/.../client/AndroidModel.createLayer と同じ。3体で形は共通で、髪・光の色・武器だけが違う。
 共通の目印: 白い陶磁の外装、黒いインナー、右のこめかみのセンサーの羽、胸の発光ライン、スカートの裾の発光ライン。
 """
+import json
 import random
 
 # 名前: (u, v, 幅, 高さ, 奥行き)
@@ -79,6 +80,15 @@ VARIANTS = {
         'accent': (255, 110, 64),
         'iris': ((150, 52, 30), (255, 144, 96)),
         'seed': 43,
+    },
+    # 射撃型「シエル」: 薄い青の髪に、深い青のひと房と、淡い水緑の光（組み立て式のレールガンと片手の小型銃）
+    'gunner_android': {
+        'hair': ((204, 228, 246), (168, 202, 232), (132, 168, 208)),
+        'streak': ((92, 150, 222), (62, 116, 192)),
+        'accent': (110, 240, 210),
+        'iris': ((30, 118, 140), (120, 236, 222)),
+        'seed': 53,
+        'inner': True,
     },
     # ビット型「ノクス」: 紺の髪に菫のひと房
     'bit_android': {
@@ -603,6 +613,12 @@ def item_textures(ti, save):
     from PIL import Image
     for name, pal in VARIANTS.items():
         kind = name.replace('_android', '')
+        if kind in ANIMATED_MEMORIES:
+            sheet = animated_memory(pal['accent'], Image)
+            save(sheet, ti / f'android_memory_{kind}.png')
+            (ti / f'android_memory_{kind}.png.mcmeta').write_text(
+                json.dumps({'animation': {'frametime': 2, 'interpolate': False}}), encoding='utf-8')
+            continue
         save(memory_icon(pal['accent'], Image), ti / f'android_memory_{kind}.png')
     save(kit_icon(Image), ti / 'android_kit.png')
     save(charger_icon(Image), ti / 'android_charger.png')
@@ -630,9 +646,45 @@ def item_textures(ti, save):
     save(area_card_icon(Image, 0), ti / 'area_card.png')
     save(area_card_icon(Image, 1), ti / 'area_card_first.png')
     save(area_card_icon(Image, 2), ti / 'area_card_recorded.png')
-    save(wear(glasses_icon(Image), 37), ti / 'survey_glasses.png')
+    save(glasses_icon(Image), ti / 'survey_glasses.png')         # レンズを透かすので、汚しを重ねない
+    save(glasses_worn_texture(Image), ti / 'survey_glasses_worn.png')
     save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
     save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
+
+
+# 結晶の中を光が流れるアニメーションつきのメモリ（射撃型だけ）
+ANIMATED_MEMORIES = ('gunner',)
+MEMORY_FRAMES = 16
+
+
+def animated_memory(accent, Image):
+    """アニメーションつきの小型クリスタルメモリ（縦に並べた16コマ）。
+
+    結晶を斜めに光の帯が下から上へ流れ、表示灯がゆっくり明滅する。帯が過ぎた後は、結晶の中に小さな光の粒が残って消える。
+    """
+    base = memory_icon(accent, Image)
+    sheet = Image.new('RGBA', (16, 16 * MEMORY_FRAMES), (0, 0, 0, 0))
+    for f in range(MEMORY_FRAMES):
+        im = base.copy()
+        px = im.load()
+        band = 14 - f * 22 / MEMORY_FRAMES          # 帯の位置（x + y の値。下から上へ）
+        for y in range(2, 10):
+            for x in range(5, 11):
+                r, g, b, a = px[x, y]
+                d = abs((x * 0.6 + y) - band)
+                k = max(0.0, 1 - d / 2.0)
+                if k > 0:
+                    px[x, y] = (min(255, int(r + (255 - r) * 0.95 * k)), min(255, int(g + (255 - g) * 0.95 * k)),
+                                min(255, int(b + (255 - b) * 0.95 * k)), min(255, int(a + 105 * k)))
+        # 帯が通った後に残る光の粒
+        for i, (x, y) in enumerate(((9, 8), (6, 6), (8, 4), (7, 8))):
+            if (f - i * 4) % MEMORY_FRAMES in (1, 2):
+                px[x, y] = (255, 255, 255, 230)
+        # 表示灯の明滅（明るい8コマ・暗い8コマ）
+        lamp = 1.0 if (f // 4) % 2 == 0 else 0.45
+        px[11, 11] = tuple(int(c * lamp) for c in accent) + (255,)
+        sheet.paste(im, (0, 16 * f))
+    return sheet
 
 
 def memory_icon(accent, Image):
@@ -895,25 +947,45 @@ def area_card_icon(Image, corners):
 
 
 def glasses_icon(Image):
-    """測量メガネ: 濃い枠の丸いレンズ2つ（淡い水色、左上に光）、真ん中のブリッジに小さな金の回路、両端につる。"""
+    """測量メガネ（持ち物の絵）: 縁なしの四角いレンズ2つ（透けて見える薄い水色。輪郭だけ少し濃く、左上に光）と、
+    真ん中の細いブリッジ、両端のつる（濃い金属）。つるの付け根に、小さな水色の表示灯。"""
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     px = im.load()
-    frame, lens, shine, gold = (54, 58, 72, 255), (150, 214, 240, 255), (232, 250, 255, 255), (226, 186, 92, 255)
-    for cx in (4, 11):
-        for y in range(5, 12):
-            for x in range(cx - 3, cx + 4):
-                d = (x - cx) ** 2 + (y - 8) ** 2
-                if d <= 10:
-                    px[x, y] = frame if d >= 6 else lens
-        px[cx - 1, 7] = shine
-        px[cx - 2, 8] = shine
+    metal = (58, 64, 80, 255)
+    lens, edge, shine = (170, 226, 246, 80), (150, 214, 240, 170), (240, 252, 255, 210)
+    led = (110, 240, 230, 255)
+    for x0 in (1, 9):
+        x1 = x0 + 5
+        for y in range(5, 11):
+            for x in range(x0, x1 + 1):
+                px[x, y] = edge if x in (x0, x1) or y in (5, 10) else lens
+        px[x0 + 1, 6] = shine
+        px[x0 + 2, 6] = shine
+        px[x0 + 1, 7] = shine
     for x in (7, 8):
-        px[x, 7] = frame
-    px[7, 6] = gold
-    px[8, 6] = gold
-    for x in (0, 15):
-        px[x, 7] = frame
-        px[x, 6] = frame
+        px[x, 6] = metal
+    px[0, 6] = metal
+    px[15, 6] = metal
+    px[1, 6] = metal
+    px[14, 6] = metal
+    px[14, 5] = led
+    return im
+
+
+def glasses_worn_texture(Image):
+    """頭に掛けたときの測量メガネの絵（16×16）: 左上は枠の金属（上の縁が明るい）、右上は透けたレンズ（薄い水色、斜めの光）、
+    左下は水色の表示灯。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(8):
+        for x in range(8):
+            px[x, y] = (128, 138, 158, 255) if y == 0 else (58, 64, 80, 255)
+    for y in range(8):
+        for x in range(8, 16):
+            px[x, y] = (240, 252, 255, 150) if (x - 8) == y or (x - 7) == y else (170, 226, 246, 70)
+    for y in range(8, 12):
+        for x in range(0, 4):
+            px[x, y] = (110, 240, 230, 255)
     return im
 
 

@@ -7,6 +7,7 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.android.AxeAndroid;
 import io.github.genichimaruo.singulo.android.BitAndroid;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
+import io.github.genichimaruo.singulo.android.GunnerAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 import io.github.genichimaruo.singulo.android.SaberAndroid;
 import io.github.genichimaruo.singulo.android.WhipAndroid;
@@ -38,7 +39,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         WHIP("whip_android", WhipAndroid.ACCENT, AndroidModel.WHIP_LAYER, true),
         SABER("saber_android", SaberAndroid.ACCENT, AndroidModel.SABER_LAYER, false),
         AXE("axe_android", AxeAndroid.ACCENT, AndroidModel.AXE_LAYER, false),
-        BIT("bit_android", BitAndroid.ACCENT, AndroidModel.BIT_LAYER, true);
+        BIT("bit_android", BitAndroid.ACCENT, AndroidModel.BIT_LAYER, true),
+        GUNNER("gunner_android", GunnerAndroid.ACCENT, AndroidModel.GUNNER_LAYER, false);
 
         final ResourceLocation texture;
         final ResourceLocation glow;
@@ -57,6 +59,24 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     private final Variant variant;
+    /** 今描いている個体の、体の原点の変形（銃口の位置を、体の原点からの位置に直すため）。 */
+    private final org.joml.Matrix4f base = new org.joml.Matrix4f();
+    /** 銃を描いたときの、銃口の位置（体の原点から。光弾・光線をここから出す）と、それを描いた個体の番号。 */
+    private Vec3 muzzle = Vec3.ZERO;
+    private int muzzleOf = -1;
+
+    /** 描いた銃の銃口の位置（体の原点から）。まだ描いていなければ fallback。 */
+    private Vec3 muzzle(RuinAndroid android, Vec3 fallback) {
+        return muzzleOf == android.getId() ? muzzle : fallback;
+    }
+
+    /** 今の変形での点 (x, y, z) を、体の原点からの位置として覚える。 */
+    private void rememberMuzzle(PoseStack pose, RuinAndroid android, float x, float y, float z) {
+        org.joml.Vector3f v = pose.last().pose().transformPosition(new org.joml.Vector3f(x, y, z));
+        new org.joml.Matrix4f(base).invert().transformPosition(v);
+        muzzle = new Vec3(v.x, v.y, v.z);
+        muzzleOf = android.getId();
+    }
 
     public AndroidRenderer(EntityRendererProvider.Context context, Variant variant) {
         super(context, new AndroidModel(context.bakeLayer(variant.layer)), 0.35F);
@@ -68,6 +88,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Axe(this));
         addLayer(new Dagger(this));
         addLayer(new StowedBits(this));
+        addLayer(new Gun(this));
         addLayer(new Solar(this));
         addLayer(new Pickaxe(this));
         addLayer(new Tanks(this));
@@ -117,10 +138,25 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             renderPrintHead(android, print, partialTick, pose, buffers);
             return;
         }
+        base.set(pose.last().pose());
+        muzzleOf = -1;
         super.render(android, yaw, partialTick, pose, buffers, light);
         renderMoves(android, partialTick, pose, buffers);
         if (android instanceof BitAndroid bit) {
             renderBits(bit, partialTick, pose, buffers, light);
+        }
+        if (android instanceof GunnerAndroid gun && gun.shotFlash() > 0) {
+            // 小型銃の光弾の跡（撃った直後だけ、だんだん細く薄く）と、銃口の光
+            float k = Mth.clamp((gun.shotFlash() - partialTick) / GunnerAndroid.FLASH, 0, 1);
+            Vec3 base = android.getPosition(partialTick);
+            Vec3 a = muzzle(android, gun.shotFrom().subtract(base)), b = gun.shotAt().subtract(base);
+            FxDraw.beam(pose.last(), buffers.getBuffer(GlowCore.TYPE), a, b, 0.02F + 0.02F * k, 0xFFFFFF, (int) (230 * k));
+            FxDraw.beam(pose.last(), buffers.getBuffer(RenderType.lightning()), a, b, 0.05F + 0.06F * k, variant.accent, (int) (150 * k));
+            VertexConsumer glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+            pose.pushPose();
+            pose.translate(a.x, a.y, a.z);
+            FxDraw.billboard(pose, glow, entityRenderDispatcher.cameraOrientation(), 0.12F + 0.25F * k, variant.accent, (int) (220 * k));
+            pose.popPose();
         }
         renderWorkIcon(android, partialTick, pose, buffers, light);
         if (android.napping() && android.printed()) {
@@ -209,6 +245,26 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
     }
 
+    /**
+     * 光の刃の芯（白い芯）の描き方: RenderType.lightning と同じだが、別の描き先にする。
+     * lightning は描く前に面を遠い順に並べ替えるので、芯と外側の光を同じ描き先に入れると、芯より先に外側の面が描かれて
+     * 奥行きを書き、中の芯が隠れることがある（見る角度で芯が消える）。芯をこの描き先で先に描き終えてから、外側を描く。
+     */
+    private static final class GlowCore extends RenderType {
+        static final RenderType TYPE = create("singulo_glow_core", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
+                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
+                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
+                        .setWriteMaskState(COLOR_DEPTH_WRITE)
+                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
+                        .setOutputState(WEATHER_TARGET)
+                        .createCompositeState(false));
+
+        private GlowCore(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
+                         boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
+            super(name, format, mode, size, crumbling, sort, setup, clear);
+        }
+    }
+
     /** 体を描くときと同じ変形（向き・裏返し・大きさ）を pose に積む。 */
     private void modelSpace(RuinAndroid android, float partialTick, PoseStack pose) {
         float bodyYaw = Mth.rotLerp(partialTick, android.yBodyRotO, android.yBodyRot);
@@ -283,6 +339,42 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 pose.popPose();
             }
             case BladeAndroid.STATE_DASH -> renderAfterimages(android, partialTick, pose, buffers, 1F);
+            case GunnerAndroid.STATE_RAIL_CHARGE -> {
+                if (android instanceof GunnerAndroid gun) {
+                    // 狙いの光線: 細く揺らぎながら、溜まるほど濃く太く。狙いが固まると白く点滅する
+                    boolean locked = t >= GunnerAndroid.RAIL_CHARGE - GunnerAndroid.RAIL_LOCK;
+                    float k = Mth.clamp(t / GunnerAndroid.RAIL_CHARGE, 0, 1);
+                    Vec3 base = android.getPosition(partialTick);
+                    int color = locked && ((int) (age * 0.8F)) % 2 == 0 ? 0xFFFFFF : accent;
+                    VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+                    FxDraw.beam(pose.last(), fx, muzzle(android, gun.railFrom().subtract(base)), gun.railTo().subtract(base),
+                            0.025F + 0.04F * k, color, (int) (70 + 120 * k));
+                    glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                    pose.pushPose();
+                    Vec3 at = muzzle(android, gun.railFrom().subtract(base));
+                    pose.translate(at.x, at.y, at.z);
+                    FxDraw.billboard(pose, glow, camera, 0.15F + 0.35F * k, accent, (int) (120 + 100 * k));
+                    pose.popPose();
+                }
+            }
+            case GunnerAndroid.STATE_RAIL_FIRE -> {
+                if (android instanceof GunnerAndroid gun && t < 8) {
+                    // 貫く光線: 太い水緑の外側と白い芯が、だんだん細く薄く消える
+                    float k = 1 - t / 8;
+                    Vec3 base = android.getPosition(partialTick);
+                    Vec3 a = muzzle(android, gun.railFrom().subtract(base)), b = gun.railTo().subtract(base);
+                    FxDraw.beam(pose.last(), buffers.getBuffer(GlowCore.TYPE), a, b, 0.07F + 0.12F * k, 0xFFFFFF, (int) (250 * k));
+                    FxDraw.beam(pose.last(), buffers.getBuffer(RenderType.lightning()), a, b, 0.2F + 0.5F * k, accent, (int) (170 * k));
+                    glow = buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
+                    for (Vec3 at : new Vec3[]{a, b}) {
+                        pose.pushPose();
+                        pose.translate(at.x, at.y, at.z);
+                        FxDraw.billboard(pose, glow, camera, 0.4F + 0.9F * k, accent, (int) (200 * k));
+                        FxDraw.billboard(pose, glow, camera, 0.2F + 0.4F * k, 0xFFFFFF, (int) (240 * k));
+                        pose.popPose();
+                    }
+                }
+            }
             case BladeAndroid.STATE_SLASH -> {
                 if (t < 3) {
                     renderAfterimages(android, partialTick, pose, buffers, 1 - t / 3);
@@ -576,6 +668,19 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             bitBody(pose, solid, light);
             pose.popPose();
         }
+        // 光の刃の白い芯を、別の描き先で先に描き終える（外側の光と同じ描き先だと、並べ替えで芯が隠れることがある）
+        float blade = Mth.clamp(bit.slashTime(partialTick) / BitAndroid.SLASH_WINDUP, 0, 1);
+        VertexConsumer core = buffers.getBuffer(GlowCore.TYPE);
+        for (int i = 0; i < n; i++) {
+            if (bit.bladeOut(i, partialTick)) {
+                pose.pushPose();
+                pose.translate(at[i].x, at[i].y, at[i].z);
+                orientBit(pose, bit.bitDirection(i, partialTick));
+                pose.scale(size[i], size[i], size[i]);
+                glowBox(pose, core, -0.025F * blade, -0.01F, -0.26F - 0.62F * blade, 0.025F * blade, 0.01F, -0.23F, 0xFFFFFF, 240);
+                pose.popPose();
+            }
+        }
         VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
         for (int i = 0; i < total; i++) {
             pose.pushPose();
@@ -592,12 +697,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent, (int) (200 * pulse));
             glowBox(pose, fx, -0.03F, -0.03F, 0.13F, 0.03F, 0.03F, 0.2F + 0.05F * pulse, variant.accent, (int) (120 * pulse));
             if (bit.bladeOut(i, partialTick)) {
-                // 先端(-Z)に現れる光の刃。予備動作で伸び、飛び出す前に攻撃を知らせる。
-                float blade = Mth.clamp(bit.slashTime(partialTick) / BitAndroid.SLASH_WINDUP, 0, 1);
+                // 先端(-Z)に現れる光の刃。予備動作で伸び、飛び出す前に攻撃を知らせる（白い芯は上で描いた）。
                 glowBox(pose, fx, -0.11F * blade, -0.022F, -0.26F - 0.65F * blade,
                         0.11F * blade, 0.022F, -0.23F, BitAndroid.ACCENT, 170);
-                glowBox(pose, fx, -0.025F * blade, -0.01F, -0.26F - 0.62F * blade,
-                        0.025F * blade, 0.01F, -0.23F, 0xFFFFFF, 240);
             }
             pose.popPose();
         }
@@ -1314,11 +1416,11 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             float l = len / SCALE;
             float outer = 0.045F * glow / SCALE;
             float core = 0.017F / SCALE;
-            VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
             int a = (int) Math.min(255, 140 * glow);
             int c = (int) (230 * Math.min(1, glow));
-            glowBox(pose, vc, -outer, 0, -outer, outer, l, outer, variant.accent, a);
-            glowBox(pose, vc, -core, 0, -core, core, l + 0.08F / SCALE, core, 0xFFFFFF, c);
+            // 芯を別の描き先で先に描いてから、外側を描く（同じ描き先だと、並べ替えで芯が隠れることがある）
+            glowBox(pose, buffers.getBuffer(GlowCore.TYPE), -core, 0, -core, core, l + 0.08F / SCALE, core, 0xFFFFFF, c);
+            glowBox(pose, buffers.getBuffer(RenderType.lightning()), -outer, 0, -outer, outer, l, outer, variant.accent, a);
             pose.popPose();
         }
     }
@@ -1423,13 +1525,193 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
             FxDraw.box(pose, body, -0.022F, -0.12F, -0.022F, 0.022F, 0.06F, 0.022F, light, 0x2C345C, 255);
             FxDraw.box(pose, body, -0.07F, 0.06F, -0.018F, 0.07F, 0.09F, 0.018F, light, 0x8C94B8, 255);
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
             float outer = 0.03F * glow;
-            // 白い芯を先に描く（外側の光が先に奥行きを書くと、中の芯が隠れて見えなくなる）
-            glowBox(pose, fx, -0.01F, 0.095F, -0.005F, 0.01F, 0.11F + len, 0.005F, 0xFFFFFF, (int) (230 * Math.min(1, glow)));
-            glowBox(pose, fx, -outer, 0.09F, -0.008F - outer * 0.4F, outer, 0.09F + len, 0.008F + outer * 0.4F, variant.accent,
-                    (int) Math.min(255, 150 * glow));
+            // 白い芯を別の描き先で先に描き終える（外側と同じ描き先だと、並べ替えで外側が先に奥行きを書き、芯が隠れる）
+            glowBox(pose, buffers.getBuffer(GlowCore.TYPE), -0.01F, 0.095F, -0.005F, 0.01F, 0.11F + len, 0.005F, 0xFFFFFF,
+                    (int) (230 * Math.min(1, glow)));
+            glowBox(pose, buffers.getBuffer(RenderType.lightning()), -outer, 0.09F, -0.008F - outer * 0.4F, outer, 0.09F + len,
+                    0.008F + outer * 0.4F, variant.accent, (int) Math.min(255, 150 * glow));
             pose.popPose();
+        }
+    }
+
+    /**
+     * 射撃型の銃: ふだんは右手の片手持ちの小型銃（白い外装に水緑の光の線）と、背中の細い格納箱。
+     * レールガンを出すと、格納箱が空になり、部品（機関部・握り・銃床・2本のレール・3つのコイル・照準・銃口）が
+     * 手元のまわりから順に飛んできて組み上がる（飛んでいる間は光る）。溜めの間はレールの間とコイルが光り、しまうときは逆に飛び去る。
+     */
+    final class Gun extends RenderLayer<RuinAndroid, AndroidModel> {
+        /** レールガンの部品: 箱（握りの座標、ブロックの長さ）・色・飛んでくる元の向き・組み上がり始める tick。 */
+        private record Part(float x0, float y0, float z0, float x1, float y1, float z1, int rgb, float sx, float sy, float sz, int delay) {
+        }
+
+        private static final int WHITE = 0xE6EAF0, DARK = 0x363C4C, LIGHT = 0xCDD3DE;
+        /** 小型銃の大きさ（握りを中心に）。 */
+        private static final float PISTOL_SCALE = 1.3F;
+        private static final Part[] RAIL = {
+                new Part(-0.05F, -0.1F, -0.09F, 0.05F, 0.2F, 0.02F, WHITE, 0, -0.3F, 0.5F, 0),        // 機関部
+                new Part(-0.02F, -0.04F, 0.0F, 0.02F, 0.02F, 0.12F, DARK, 0, 0, 0.4F, 0),             // 握り
+                new Part(-0.035F, -0.32F, -0.07F, 0.035F, -0.1F, 0.03F, LIGHT, 0, -0.6F, 0.3F, 2),    // 銃床
+                new Part(0.03F, 0.2F, -0.08F, 0.06F, 0.78F, -0.01F, DARK, 0.5F, 0.4F, -0.2F, 3),      // レール（左）
+                new Part(-0.06F, 0.2F, -0.08F, -0.03F, 0.78F, -0.01F, DARK, -0.5F, 0.4F, -0.2F, 3),   // レール（右）
+                new Part(-0.02F, 0.0F, -0.14F, 0.02F, 0.18F, -0.09F, DARK, 0, 0, -0.5F, 5),           // 照準
+                new Part(-0.075F, 0.33F, -0.1F, 0.075F, 0.365F, 0.01F, WHITE, 0.4F, 0.2F, -0.6F, 6), // コイル
+                new Part(-0.075F, 0.5F, -0.1F, 0.075F, 0.535F, 0.01F, WHITE, -0.4F, 0.2F, -0.6F, 7),
+                new Part(-0.075F, 0.67F, -0.1F, 0.075F, 0.705F, 0.01F, WHITE, 0.4F, 0.2F, -0.6F, 8),
+                new Part(-0.07F, 0.78F, -0.1F, 0.07F, 0.82F, 0.01F, DARK, 0, 0.6F, -0.3F, 9),          // 銃口
+        };
+
+        Gun(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            AndroidModel m = getParentModel();
+            if (m.gunGrip == null || !android.printed()) {
+                return;
+            }
+            int state = android.state();
+            float t = android.stateTime(partialTick);
+            boolean rail = GunnerAndroid.railOut(state);
+            float glow = state == RuinAndroid.STATE_LOW_POWER ? 0.3F : RuinAndroid.charging(state) ? 0.5F : 0.85F + 0.1F * Mth.sin(age * 0.2F);
+            if (!rail && !android.hasBackpack()) {
+                stowedCase(pose, buffers, light, m, glow);
+            }
+            pose.pushPose();
+            m.toBlade(pose);
+            m.gunGrip.translateAndRotate(pose);
+            float k = 1 / SCALE;
+            pose.scale(k, k, k);
+            GunnerAndroid gun = android instanceof GunnerAndroid g ? g : null;
+            Vec3 origin = android.getPosition(partialTick);
+            if (rail) {
+                if (gun != null && (state == GunnerAndroid.STATE_RAIL_CHARGE || state == GunnerAndroid.STATE_RAIL_FIRE)) {
+                    aimToward(pose, gun.railTo().subtract(origin), -0.045F, 25,
+                            state == GunnerAndroid.STATE_RAIL_CHARGE ? ease(t / 6) : 1);
+                }
+                railgun(pose, buffers, light, state, t, age);
+                rememberMuzzle(pose, android, 0, 0.83F, -0.045F);
+            } else {
+                pose.scale(PISTOL_SCALE, PISTOL_SCALE, PISTOL_SCALE);
+                if (gun != null && state == GunnerAndroid.STATE_SHOT) {
+                    // 撃った光が見えている間は、必ず銃身を狙いへぴったり向ける（構えの途中で撃っても射線とそろう）
+                    boolean firing = gun.shotFlash() > 0;
+                    aimToward(pose, gun.aim().subtract(origin), -0.025F, firing ? 70 : 35, firing ? 1 : ease(t / 4));
+                } else {
+                    // 構えていないとき: 腕の動き（作業・歩き）にかかわらず、銃口を足元の少し前の床へ向けて下げておく
+                    float yaw = Mth.rotLerp(partialTick, android.yBodyRotO, android.yBodyRot) * Mth.DEG_TO_RAD;
+                    Vec3 fwd = new Vec3(-Mth.sin(yaw), 0, Mth.cos(yaw));
+                    Vec3 right = new Vec3(-fwd.z, 0, fwd.x);
+                    aimToward(pose, fwd.scale(0.45).add(right.scale(0.25)), -0.025F, 90, ease(t / 5));
+                }
+                pistol(pose, buffers, light, glow);
+                rememberMuzzle(pose, android, 0, 0.205F, -0.025F);
+            }
+            pose.popPose();
+        }
+
+        /**
+         * 銃身（+Y、銃身の軸は z = axisZ）を、狙いの点 rel（体の原点から）へぴったり向ける（手首で合わせる）。
+         * 腕の向きで大まかに狙い、残りの差を手首で埋めるので、射線と銃の向きがそろう。曲げは maxDeg 度まで、k の割合で。
+         */
+        private void aimToward(PoseStack pose, Vec3 rel, float axisZ, float maxDeg, float k) {
+            org.joml.Vector3f v = base.transformPosition(new org.joml.Vector3f((float) rel.x, (float) rel.y, (float) rel.z), new org.joml.Vector3f());
+            new org.joml.Matrix4f(pose.last().pose()).invert().transformPosition(v);
+            v.sub(0, 0, axisZ);
+            if (v.lengthSquared() < 1e-6F || k <= 0) {
+                return;
+            }
+            v.normalize();
+            Quaternionf q = new Quaternionf().rotationTo(0, 1, 0, v.x, v.y, v.z);
+            float angle = (float) Math.acos(Mth.clamp(v.y, -1, 1));
+            float limit = maxDeg * Mth.DEG_TO_RAD;
+            float amount = k * (angle > limit ? limit / angle : 1);
+            if (amount < 1) {
+                q = new Quaternionf().slerp(q, amount);
+            }
+            pose.translate(0, 0, axisZ);
+            pose.mulPose(q);
+            pose.translate(0, 0, -axisZ);
+        }
+
+        /** 背中の格納箱（レールガンの部品をしまっている、細い白い箱。水緑の線が光る）。 */
+        private void stowedCase(PoseStack pose, MultiBufferSource buffers, int light, AndroidModel m, float glow) {
+            pose.pushPose();
+            m.toTorso(pose);
+            float p = 1 / 16F;
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            FxDraw.box(pose, body, -1.3F * p, -6.2F * p, 1.5F * p, 1.3F * p, -1.0F * p, 2.6F * p, light, WHITE, 255);
+            FxDraw.box(pose, body, -1.45F * p, -6.4F * p, 1.45F * p, 1.45F * p, -5.9F * p, 2.75F * p, light, DARK, 255);
+            FxDraw.box(pose, body, -1.45F * p, -1.3F * p, 1.45F * p, 1.45F * p, -0.8F * p, 2.75F * p, light, DARK, 255);
+            glowBox(pose, buffers.getBuffer(RenderType.lightning()), -0.25F * p, -5.6F * p, 2.6F * p, 0.25F * p, -1.6F * p, 2.68F * p,
+                    variant.accent, (int) (170 * glow));
+            pose.popPose();
+        }
+
+        /** 片手持ちの小型銃（握りの座標。+Y が銃口、+Z が握りの下）。 */
+        private void pistol(PoseStack pose, MultiBufferSource buffers, int light, float glow) {
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            FxDraw.box(pose, body, -0.022F, -0.03F, -0.05F, 0.022F, 0.17F, 0.0F, light, WHITE, 255);       // 遊底
+            FxDraw.box(pose, body, -0.012F, 0.17F, -0.038F, 0.012F, 0.2F, -0.012F, light, DARK, 255);      // 銃口
+            FxDraw.box(pose, body, -0.018F, -0.03F, 0.0F, 0.018F, 0.025F, 0.095F, light, DARK, 255);       // 握り
+            FxDraw.box(pose, body, -0.016F, 0.03F, 0.0F, 0.016F, 0.07F, 0.03F, light, DARK, 255);          // 用心金
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            int a = (int) (190 * glow);
+            glowBox(pose, fx, 0.022F, 0.0F, -0.032F, 0.026F, 0.14F, -0.024F, variant.accent, a);
+            glowBox(pose, fx, -0.026F, 0.0F, -0.032F, -0.022F, 0.14F, -0.024F, variant.accent, a);
+        }
+
+        /** 組み立て式のレールガン（部品ごとに、組み上がりの進み 0〜1）。 */
+        private void railgun(PoseStack pose, MultiBufferSource buffers, int light, int state, float t, float age) {
+            float[] done = new float[RAIL.length];
+            for (int i = 0; i < RAIL.length; i++) {
+                done[i] = switch (state) {
+                    case GunnerAndroid.STATE_RAIL_ASSEMBLE -> Mth.clamp((t - RAIL[i].delay) / 6F, 0, 1);
+                    case GunnerAndroid.STATE_RAIL_STOW -> 1 - Mth.clamp((t - (9 - RAIL[i].delay) * 0.5F) / 5F, 0, 1);
+                    default -> 1;
+                };
+            }
+            VertexConsumer body = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            for (int i = 0; i < RAIL.length; i++) {
+                if (done[i] <= 0) {
+                    continue;
+                }
+                Part p = RAIL[i];
+                float e = ease(done[i]);
+                float off = 1 - e, s = 0.4F + 0.6F * e;
+                float cx = (p.x0 + p.x1) / 2 + p.sx * off, cy = (p.y0 + p.y1) / 2 + p.sy * off, cz = (p.z0 + p.z1) / 2 + p.sz * off;
+                float hx = (p.x1 - p.x0) / 2 * s, hy = (p.y1 - p.y0) / 2 * s, hz = (p.z1 - p.z0) / 2 * s;
+                FxDraw.box(pose, body, cx - hx, cy - hy, cz - hz, cx + hx, cy + hy, cz + hz, light, p.rgb, 255);
+            }
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            // 飛んでいる部品は光に包まれている
+            for (int i = 0; i < RAIL.length; i++) {
+                if (done[i] <= 0 || done[i] >= 1) {
+                    continue;
+                }
+                Part p = RAIL[i];
+                float e = ease(done[i]);
+                float off = 1 - e, s = 0.4F + 0.6F * e, g = 0.02F;
+                float cx = (p.x0 + p.x1) / 2 + p.sx * off, cy = (p.y0 + p.y1) / 2 + p.sy * off, cz = (p.z0 + p.z1) / 2 + p.sz * off;
+                float hx = (p.x1 - p.x0) / 2 * s + g, hy = (p.y1 - p.y0) / 2 * s + g, hz = (p.z1 - p.z0) / 2 * s + g;
+                glowBox(pose, fx, cx - hx, cy - hy, cz - hz, cx + hx, cy + hy, cz + hz, variant.accent, (int) (170 * (1 - done[i] * 0.6F)));
+            }
+            // 溜めと発射: レールの間を光が満たし、コイルが光る
+            float charge = state == GunnerAndroid.STATE_RAIL_CHARGE ? Mth.clamp(t / GunnerAndroid.RAIL_CHARGE, 0, 1)
+                    : state == GunnerAndroid.STATE_RAIL_FIRE ? 1 - Mth.clamp(t / GunnerAndroid.RAIL_FIRE, 0, 1) : 0;
+            if (charge > 0) {
+                float pulse = 0.85F + 0.15F * Mth.sin(age * (1.2F + 2F * charge));
+                for (int i = 6; i <= 8; i++) {
+                    Part p = RAIL[i];
+                    float g = 0.012F + 0.01F * charge;
+                    glowBox(pose, fx, p.x0 - g, p.y0 - g, p.z0 - g, p.x1 + g, p.y1 + g, p.z1 + g, variant.accent, (int) (150 * charge * pulse));
+                }
+                glowBox(pose, fx, -0.03F, 0.2F, -0.075F, 0.03F, 0.78F, -0.015F, variant.accent, (int) (200 * charge * pulse));
+                glowBox(pose, buffers.getBuffer(GlowCore.TYPE), -0.012F, 0.2F, -0.055F, 0.012F, 0.8F, -0.035F, 0xFFFFFF,
+                        (int) (240 * charge));
+            }
         }
     }
 
@@ -1506,6 +1788,12 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             m.blade.render(pose, buffers.getBuffer(DepthGlow.TYPE.apply(variant.texture)), FxDraw.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, argb((int) (255 * k), 0xFFFFFF));
             m.blade.visible = false;
+            // 刃のまわりの、ほのかな光（刃より少しだけ大きい、薄い光の箱を2重に。刃の明るさに合わせて息づく）
+            m.blade.translateAndRotate(pose);
+            float p = 1 / 16F;
+            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            glowBox(pose, fx, -0.9F * p, -0.4F * p, -1.4F * p, 0.9F * p, 14.9F * p, 1.4F * p, variant.accent, (int) (38 * k));
+            glowBox(pose, fx, -1.5F * p, -0.8F * p, -2.0F * p, 1.5F * p, 15.3F * p, 2.0F * p, variant.accent, (int) (16 * k));
             pose.popPose();
         }
     }

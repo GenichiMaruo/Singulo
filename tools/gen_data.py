@@ -81,7 +81,8 @@ def stage_of(name):
             '隕石の溶融殻': 2, '隕鉄塊': 2, '星屑の結晶': 2, '隕石の核': 2, '雷ガラス塊': 3, '遺構の照明（琥珀）': 2, '遺構の照明（翠）': 3, '遺構の照明（菫）': 4,
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
-            '小型クリスタルメモリ（光剣型）': 2, '小型クリスタルメモリ（斧型）': 4, '小型クリスタルメモリ（ビット型）': 4}.get(name, 1)
+            '小型クリスタルメモリ（光剣型）': 2, '小型クリスタルメモリ（斧型）': 4, '小型クリスタルメモリ（ビット型）': 4,
+            '小型クリスタルメモリ（射撃型）': 4}.get(name, 1)
 
 
 def max_uses(name):
@@ -318,6 +319,7 @@ UI_LANG = {
     # key: (ja, en)
     'itemGroup.singulo': ('Singulo', 'Singulo'),
     'tooltip.singulo.stage': ('段階%s: %s', 'Stage %s: %s'),
+    'tooltip.singulo.more': ('Shift: 詳しく見る', 'Hold Shift for details'),
     'tooltip.singulo.planned': ('動作は未実装。素材として使える', 'Not functional yet; usable as a material'),
     'tooltip.singulo.uses': ('使用回数 %s / %s', 'Uses %s / %s'),
     'tooltip.singulo.lifetime': ('寿命 %s / %s', 'Lifetime %s / %s'),
@@ -739,6 +741,7 @@ UI_LANG = {
     'gui.singulo.android.nickname.saber': ('ソレイユ', 'Soleil'),
     'gui.singulo.android.nickname.axe': ('アルマ', 'Alma'),
     'gui.singulo.android.nickname.bit': ('ノクス', 'Nox'),
+    'gui.singulo.android.nickname.gunner': ('シエル', 'Ciel'),
     'gui.singulo.android.rename': ('クリックで名前を変える', 'Click to rename'),
     'gui.singulo.android.dismantle': ('解体する（2回押す）', 'Dismantle (press twice)'),
     'gui.singulo.android.rename.reset': ('名前を元に戻す', 'Reset name'),
@@ -931,11 +934,26 @@ UI_LANG = {
     'gui.singulo.work_console.done': ('%s ×%s を納品した', 'Delivered %s ×%s'),
     'gui.singulo.work_console.stock': ('在庫: %s', 'In stock: %s'),
     'gui.singulo.work_console.craftable': ('作れる', 'Craftable'),
+    'gui.singulo.android.pack.builtin': ('内蔵', 'Built-in'),
+    'gui.singulo.work_console.search.hint': ('検索（@ で mod）', 'Search (@ for mod)'),
+    'gui.singulo.work_console.no_match': ('検索に合う物がない', 'Nothing matches the search'),
+    'gui.singulo.work_console.search.help': ('名前で絞り込む。@ で始めると mod で絞り込む（例: @singulo）。空白で区切ると、すべてに合う物だけ。右クリックで消す',
+                                             'Filter by name. Start with @ to filter by mod (e.g. @singulo). Separate words with spaces to match all of them. Right-click to clear'),
+    'gui.singulo.work_console.sort': ('並び: %s', 'Sort: %s'),
+    'gui.singulo.work_console.sort.default': ('指令台の順', 'Default'),
+    'gui.singulo.work_console.sort.name': ('名前', 'Name'),
+    'gui.singulo.work_console.sort.count': ('在庫', 'Stock'),
+    'gui.singulo.work_console.sort.mod': ('mod', 'Mod'),
+    'gui.singulo.work_console.sort.craftable': ('作れる物', 'Craftable'),
+    'gui.singulo.work_console.sort.help': ('クリックで並びを変える（シフト+クリックで逆回り）', 'Click to change the order (Shift-click to go back)'),
+    'gui.singulo.work_console.sort.reverse': ('並びを逆にする', 'Reverse the order'),
+    'gui.singulo.work_console.jei.on': ('JEI の検索欄と連携する: オン', 'Linked with the JEI search bar: On'),
+    'gui.singulo.work_console.jei.off': ('JEI の検索欄と連携する: オフ', 'Linked with the JEI search bar: Off'),
     'gui.singulo.work_console.cancel': ('取り消す', 'Cancel'),
     'gui.singulo.work_console.count.hint': ('シフトで10ずつ、コントロールで64ずつ', 'Shift: 10 at a time, Ctrl: 64'),
     'gui.singulo.work_console.choose_android': ('選べるアンドロイドがいない', 'No android can take this order'),
     'gui.singulo.work_console.needs_miner': ('この注文には採掘の工程があるので、採掘アップグレードを積んだアンドロイドだけ選べる', 'This order includes mining, so only androids with a Mining Upgrade can be chosen'),
-    'gui.singulo.work_console.auto_android': ('選んでいないので、選べるアンドロイド全員（%s 体）で始める', 'None chosen: all %s available androids will start'),
+    'gui.singulo.work_console.auto_android': ('選んでいないので、選べる %s 体のうち、作業に必要な数だけで始める', 'None chosen: only as many of the %s available androids as the work needs will start'),
     'gui.singulo.work_console.cannot_start': ('この注文はできない', 'This order cannot be started'),
     'gui.singulo.work_console.tab.order': ('注文', 'Order'),
     'gui.singulo.work_console.tab.running': ('進行中', 'Running'),
@@ -1122,6 +1140,7 @@ UI_LANG = {
     'entity.singulo.saber_android': ('光剣型アンドロイド「ソレイユ」', 'Saber Android "Soleil"'),
     'entity.singulo.axe_android': ('斧型アンドロイド「アルマ」', 'Axe Android "Alma"'),
     'entity.singulo.bit_android': ('ビット型アンドロイド「ノクス」', 'Bit Android "Nox"'),
+    'entity.singulo.gunner_android': ('射撃型アンドロイド「シエル」', 'Gunner Android "Ciel"'),
     'entity.singulo.android_crescent': ('斬撃波', 'Crescent Slash'),
     'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
@@ -1241,6 +1260,7 @@ UI_LANG = {
     'item.singulo.saber_android_spawn_egg': ('光剣型アンドロイドのスポーンエッグ', 'Saber Android Spawn Egg'),
     'item.singulo.axe_android_spawn_egg': ('斧型アンドロイドのスポーンエッグ', 'Axe Android Spawn Egg'),
     'item.singulo.bit_android_spawn_egg': ('ビット型アンドロイドのスポーンエッグ', 'Bit Android Spawn Egg'),
+    'item.singulo.gunner_android_spawn_egg': ('射撃型アンドロイドのスポーンエッグ', 'Gunner Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -1687,7 +1707,7 @@ def textures():
                {'parent': 'minecraft:item/template_spawn_egg'})
     # 遺構のアンドロイド（128×64。tools/androids.py）
     androids.textures(te, save)
-    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android'):
+    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
@@ -2739,6 +2759,32 @@ def area_card_item_model():
                       {'predicate': {f'{MODID}:recorded': 1}, 'model': f'{MODID}:item/{iid}_recorded'}]})
 
 
+def glasses_item_model():
+    """測量メガネ: 持ち物・手では平らな絵、頭に掛けたときだけ立体の四角いメガネ（NeoForge の separate_transforms）。
+    頭の模型は、頭（16の箱の中で 1.6〜14.4）の前の面に沿って、目の高さに四角い枠2つ・ブリッジ・つるを置き、枠の中に透けたレンズを張る。"""
+    iid = 'survey_glasses'
+    t = {'frame': f'{MODID}:item/{iid}_worn', 'particle': f'{MODID}:item/{iid}_worn'}
+    frame_uv, lens_uv = [1, 1, 3, 3], [8, 0, 16, 8]
+
+    def box(a, b, uv=frame_uv, faces=('north', 'south', 'east', 'west', 'up', 'down')):
+        return {'from': a, 'to': b, 'faces': {d: {'uv': uv, 'texture': '#frame'} for d in faces}}
+    fz0, fz1 = 0.9, 1.5                      # 金具の奥行き（頭の前の面 1.6 より少し前）
+    els = []
+    # 縁なし（リムレス）: 枠はなく、透けたレンズの板を、ブリッジとつるの金具だけで支える（板の縁の面がうっすら見える）
+    for x0, x1 in ((2.4, 7.2), (8.8, 13.6)):
+        els.append(box([x0, 6.6, 1.05], [x1, 9.4, 1.35], lens_uv))
+    els += [box([7.2, 8.6, fz0], [8.8, 9.0, fz1]),                                   # ブリッジ
+            box([1.0, 8.6, fz0], [2.6, 9.0, fz1]), box([13.4, 8.6, fz0], [15.0, 9.0, fz1]),   # つるの付け根（レンズの端を留める）
+            box([1.0, 8.6, fz1], [1.6, 9.0, 10.0]), box([14.4, 8.6, fz1], [15.0, 9.0, 10.0]),  # つる
+            box([13.8, 9.0, fz0 + 0.1], [14.4, 9.4, fz0 + 0.5], [0, 8, 2, 10])]               # 表示灯
+    write_json(ASSETS / 'models' / 'item' / f'{iid}_worn.json', {
+        'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t, 'elements': els})
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
+        'loader': 'neoforge:separate_transforms',
+        'base': {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}},
+        'perspectives': {'head': {'parent': f'{MODID}:item/{iid}_worn'}}})
+
+
 def compass_item_model():
     """探索コンパス・隕石コンパス: 針の向き（minecraft:angle）で16コマを切り替える。"""
     for iid in ('explorer_compass', 'meteor_compass'):
@@ -3166,7 +3212,7 @@ TAB_GROUPS = [
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
                'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
-               'singularity_encapsulator', 'monopole_upgrade']),
+               'singularity_encapsulator', 'monopole_upgrade', 'overclock_chip']),
     # マルチブロック: 共通のポートのあと、形ごとにコントローラとその部品
     ('マルチブロック', ['multiblock_port',
                    'cooling_tower_controller', 'cooling_tower_base', 'cooling_tower_casing', 'cooling_tower_glass',
@@ -3191,29 +3237,45 @@ TAB_GROUPS = [
                      'high_gravity_panel', 'gravitational_wave_detector', 'neutrino_observatory',
                      'probe_station', 'worldline_anchor_advanced', 'halo_collector', 'gravitational_containment_tank',
                      'unstable_wormhole_mouth', 'wormhole_stabilizer', 'wormhole_mouth_casing', 'wormhole_mouth', 'wormhole_port']),
-    ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit', 'black_hole_bomb',
-               'graviton_manipulator', 'metric_drive', 'overclock_chip', 'gravity_boots', 'catalyst_stabilizer',
-               'dimensional_pocket', 'android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_transfer_upgrade',
-               'android_armor_plate', 'android_production_upgrade', 'android_factory_print_unit', 'android_battery_upgrade', 'android_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade', 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
-               'android_mining_upgrade', 'android_felling_upgrade', 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
-               'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card']),
+    ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit',
+               'black_hole_bomb', 'graviton_manipulator', 'metric_drive', 'gravity_boots', 'dimensional_pocket']),
+    # アンドロイド: 本体と道具 → 設計メモリ → アップグレード → 作業 → 装飾 → スポーンエッグ
+    ('アンドロイド', ['android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_armor_plate',
+                 'android_memory_blade', 'android_memory_whip', 'android_memory_saber', 'android_memory_axe', 'android_memory_bit',
+                 'android_memory_gunner',
+                 'android_production_upgrade', 'android_factory_print_unit', 'android_transfer_upgrade', 'android_battery_upgrade',
+                 'android_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade',
+                 'android_mining_upgrade', 'android_felling_upgrade',
+                 'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
+                 'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
+                 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
+                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
+                 'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
+                 'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
-    ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core']),
+    ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core', 'catalyst_stabilizer']),
     ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core', 'raw_meteoric_iron', 'meteoric_iron_ingot', 'stardust',
             'fulgurite_block', 'fulgurite', 'pressure_crystal', 'void_dust']),
     ('素材', None),
     ('回収物と記録', None),
+    # ボスの戦利品: 番人・遺構のボスの落とす物 → 記録の断章と終焉の記録 → 記録者の報酬 → 覚醒戦の核
+    ('ボスの戦利品', ['sentinel_core', 'degenerate_nucleus', 'precision_actuator', 'echo_chapter', 'gravity_chapter', 'horizon_chapter',
+                 'ergosphere_chapter', 'terminus_record', 'archivist_halo', 'afterglow_wings', 'awakening_record_core',
+                 'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_ergosphere_core']),
     ('建材', ['white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
             'black_reinforced_glass', 'black_star_glass', 'android_barrier_glass', 'android_barrier_glass_patterned',
             'android_gate_glass', 'android_gate_glass_patterned']),
     ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',
             'striped_ruin_panel', 'scorched_ruin_panel', 'pristine_ruin_panel', 'pristine_ruin_tiles', 'pristine_ruin_pillar',
-            'pristine_ruin_light', 'intact_ruin_glass', 'reinforced_ruin_glass', 'ruin_lamp', 'ruin_lamp_amber', 'ruin_lamp_verdant',
-            'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_glass', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
-            'android_memory_blade', 'android_memory_whip', 'android_memory_saber', 'android_memory_axe', 'android_memory_bit',
-            'seal_console', 'guardian_core', 'echo_projector', 'factory_line', 'factory_conveyor', 'security_drone_spawn_egg', 'blade_android_spawn_egg',
-            'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg', 'bit_android_spawn_egg']),
+            'pristine_ruin_light', 'intact_ruin_glass', 'reinforced_ruin_glass', 'ruin_glass', 'ruin_lamp', 'ruin_lamp_amber',
+            'ruin_lamp_verdant', 'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
+            'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
+    # 地下アンドロイド研究所: 建材 → 照明 → 装置 → 小物 → 製造ライン
+    ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'bulkhead',
+              'facility_light', 'emergency_light', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
+              'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'paper_stack', 'trash_bin',
+              'factory_line', 'factory_conveyor']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
                      'last_archivist_spawn_egg', 'foundry_overseer_spawn_egg']),
@@ -3589,6 +3651,7 @@ def main():
     accessory_item_models()          # 生成の一般の物のモデルのあとに、2枚重ねで書き直す
     work_card_item_model()           # 生成の一般の物のモデルのあとに、記録済みの絵へ切り替えるモデルを書き直す
     area_card_item_model()
+    glasses_item_model()
     opaque_block_textures()
     ghost_textures()
     rogue_black_hole_assets()

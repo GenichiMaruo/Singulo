@@ -53,6 +53,13 @@ public final class AndroidGameTests {
         return s;
     }
 
+    /** ふつうの拠点と同じく、ステーション・階段の下の段まで床を張る（上の面へ1段で上がれるように）。 */
+    private static void floor(GameTestHelper helper) {
+        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 7, 0, 7)) {
+            helper.setBlock(p, net.minecraft.world.level.block.Blocks.STONE);
+        }
+    }
+
     /** このテストのステーションが印刷したアンドロイド（並んで動くほかのテストのものは数えない。少し離れていても数える）。 */
     private static List<RuinAndroid> androids(GameTestHelper helper) {
         BlockPos station = helper.absolutePos(STATION);
@@ -522,11 +529,13 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
-    /** 拠点の暮らし: 昼、手の空いた護衛は、ステーションのそばの階段に座る（座れる物がなければ地面に。ほかに掃く仕草などもする）。 */
+    /** 拠点の暮らし: 昼、手の空いた護衛は、ステーションのそばの階段に座る（座れる物がなければ地面に。ほかに掃く仕草などもする）。
+     * 迎撃モードは暮らしをしないので、巡回路のない巡回モード（ステーションのそばで待つ）で確かめる。 */
     @GameTest(template = EMPTY, batch = "android_life", timeoutTicks = 2400)
     public static void idleGuardSitsOnStairs(GameTestHelper helper) {
         helper.getLevel().setDayTime(1000);
-        station(helper, 1);
+        floor(helper);
+        station(helper, 1).press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         BlockPos stair = new BlockPos(5, 1, 2);
         helper.setBlock(stair, net.minecraft.world.level.block.Blocks.OAK_STAIRS);
         // 作業台（名前に "bench" が入る）は椅子ではない。階段より近くに置く
@@ -555,7 +564,8 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, batch = "android_life_tidy", timeoutTicks = 1200)
     public static void idleGuardTidiesIntoChest(GameTestHelper helper) {
         helper.getLevel().setDayTime(1000);
-        station(helper, 1);
+        floor(helper);
+        station(helper, 1).press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         BlockPos chest = new BlockPos(6, 1, 6);
         helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
         net.minecraft.world.entity.item.ItemEntity drop = helper.spawnItem(Items.APPLE, 2.5F, 1, 6.5F);
@@ -579,6 +589,41 @@ public final class AndroidGameTests {
                     + " target=" + a.getTarget()).reduce("", String::concat) + ")";
             helper.assertTrue(!be.isEmpty() && be.getItem(0).is(Items.APPLE), "落ちていた物を、そばのチェストへしまわない" + why);
             androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** 迎撃モード: 手の空いた護衛は暮らし（座るなど）をせず、1体はステーションの上、もう1体はすぐ横で待つ。 */
+    @GameTest(template = EMPTY, batch = "android_guard_dock", timeoutTicks = 1200)
+    public static void interceptGuardsWaitOnStation(GameTestHelper helper) {
+        helper.getLevel().setDayTime(1000);
+        floor(helper);
+        // ステーションが2体印刷する（ステーションが受け持たない護衛は、はぐれになって持ち場を持たない）
+        AndroidStationBlockEntity station = station(helper, 2);
+        station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRODUCTION, new ItemStack(item("android_production_upgrade")));
+        helper.setBlock(new BlockPos(5, 1, 2), net.minecraft.world.level.block.Blocks.OAK_STAIRS);
+        java.util.function.Supplier<List<RuinAndroid>> guardsNow = () -> androids(helper).stream().filter(RuinAndroid::isAlive).toList();
+        Vec3 dock = Vec3.atBottomCenterOf(helper.absolutePos(STATION).above());
+        boolean[] lived = {false}, placed = {false};
+        String[] where = {""};
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : guardsNow.get()) {
+                if (a.tickCount % 40 == 0) {
+                    a.lifeNow();
+                }
+                lived[0] |= RuinAndroid.lifeState(a.state());
+            }
+            long on = guardsNow.get().stream().filter(a -> a.position().subtract(dock).horizontalDistance() < 0.6
+                    && Math.abs(a.getY() - dock.y) < 0.5).count();
+            long beside = guardsNow.get().stream().filter(a -> a.position().subtract(dock).horizontalDistance() < 1.6
+                    && Math.abs(a.getY() - (dock.y - 1)) < 0.5).count();
+            where[0] = "上=" + on + " 横=" + beside + guardsNow.get().stream().map(a -> " / " + a.position() + " s=" + a.state())
+                    .reduce("", String::concat);
+            placed[0] |= guardsNow.get().size() == 2 && on == 1 && beside == 1;
+        });
+        helper.succeedWhen(() -> {
+            helper.assertFalse(lived[0], "迎撃モードなのに、暮らし（座る・手入れなど）を始めた");
+            helper.assertTrue(placed[0], "1体が上、1体がすぐ横で待たない: " + where[0]);
+            guardsNow.get().forEach(RuinAndroid::discard);
         });
     }
 
@@ -767,6 +812,36 @@ public final class AndroidGameTests {
             }
             a.discard();
         });
+    }
+
+    /** アンドロイドを選ばずに注文すると、作業量に見合う人数だけ招集する（作業台1つの小さな注文に、3体のうち1体だけ）。 */
+    @GameTest(template = EMPTY)
+    public static void workConsoleRecruitsOnlyNeeded(GameTestHelper helper) {
+        var console = workshop(helper, 2);
+        List<BladeAndroid> crew = new java.util.ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+            a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + i, 1, 2))));
+            helper.getLevel().addFreshEntity(a);
+            crew.add(a);
+        }
+        var player = helper.makeMockServerPlayerInLevel();
+        helper.assertTrue(console.candidates(player).size() == 3, "3体とも選べる候補にならない: " + console.candidates(player).size());
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        var order = console.orders().get(0);
+        long working = crew.stream().filter(RuinAndroid::isWorking).count();
+        helper.assertTrue(order.workers.size() == 1 && working == 1, "必要以上に招集した: 受け持ち " + order.workers.size() + " / 作業中 " + working);
+        // 画面で「自動」（だれも選ばない）にすると、選べる候補をみな送ってくる。そのときも必要な数だけ
+        console.cancel(order.id, null);
+        var error2 = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+                crew.stream().map(RuinAndroid::getUUID).toList(), true, helper.absolutePos(DELIVERY));
+        helper.assertTrue(error2 == null, "自動で注文できない: " + (error2 == null ? "" : error2.getString()));
+        var auto = console.orders().get(console.orders().size() - 1);
+        helper.assertTrue(auto.workers.size() == 1, "自動の注文で、候補を全員招集した: " + auto.workers.size());
+        crew.forEach(RuinAndroid::discard);
+        helper.succeed();
     }
 
     /** 納品口に届いた item の数。 */

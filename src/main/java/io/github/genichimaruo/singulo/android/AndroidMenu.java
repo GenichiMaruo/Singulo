@@ -99,7 +99,7 @@ public class AndroidMenu extends AbstractContainerMenu {
         addSlot(new PageSlot(items, RuinAndroid.SLOT_BACKPACK, BACKPACK_X, BACKPACK_Y, PAGE_GEAR, 1) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return !working() && RuinAndroid.isBackpackUpgrade(stack);
+                return !working() && RuinAndroid.isBackpackUpgrade(stack) && !builtInPack();
             }
 
             /** 中に物が入っている間は、バックパックを外せない。 */
@@ -227,9 +227,14 @@ public class AndroidMenu extends AbstractContainerMenu {
         this.page = page;
     }
 
-    /** バックパックアップグレードを積んでいるか（スロットの中身で見るので、クライアントでも分かる）。 */
+    /** バックパックの欄が使えるか（アップグレードを積んでいるか、内蔵している。スロットの中身で見るので、クライアントでも分かる）。 */
     public boolean hasBackpack() {
-        return RuinAndroid.isBackpackUpgrade(items.getItem(RuinAndroid.SLOT_BACKPACK));
+        return builtInPack() || RuinAndroid.isBackpackUpgrade(items.getItem(RuinAndroid.SLOT_BACKPACK));
+    }
+
+    /** バックパックを内蔵している型か（バックパックアップグレードは要らない）。 */
+    public boolean builtInPack() {
+        return android != null && android.builtInPack();
     }
 
     /** 作業中か（持ち物を出し入れできない）。 */
