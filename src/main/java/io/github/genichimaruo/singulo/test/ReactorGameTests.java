@@ -285,12 +285,25 @@ public final class ReactorGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_HAWKING, new ItemStack(item("hawking_collector")));
+        // This is the unfed-core test: ambient mobs/falling-block drops must not
+        // raise the fresh 500-mass core above the collector's 500-mass ceiling.
+        // Matter absorption is exercised separately by the reactor hazard tests.
+        var pullArea = new net.minecraft.world.phys.AABB(helper.absolutePos(CENTER)).inflate(
+                Math.max(24, io.github.genichimaruo.singulo.generated.ServerConfig.BLACK_HOLE_PULL_RADIUS.get()));
+        Runnable clearAmbient = () -> helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, pullArea,
+                e -> !(e instanceof net.minecraft.world.entity.player.Player)).forEach(net.minecraft.world.entity.Entity::discard);
+        clearAmbient.run();
+        helper.onEachTick(clearAmbient);
+        long[] ignitionTick = {-1};
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち"))
-                .thenExecute(() -> r.forceCore(PenroseReactorBlockEntity.START_MASS, 0))
-                .thenWaitUntil(() -> helper.assertTrue(
+                .thenExecute(() -> { clearAmbient.run(); r.forceCore(PenroseReactorBlockEntity.START_MASS, 0); ignitionTick[0] = helper.getTick(); })
+                .thenWaitUntil(() -> {
+                    helper.assertTrue(r.mass() <= PenroseReactorBlockEntity.START_MASS + 1e-6,
+                            "無給餌の試験へ外部の質量が混入した: " + r.mass());
+                    helper.assertTrue(
                 r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("hawking_condensate")),
-                "ホーキング凝縮体ができない: formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " missing=" + Structures.reactorLayout(CENTER).keySet().stream().filter(pos -> helper.getBlockState(pos).isAir()).limit(12).toList() + " data=" + r.saveWithoutMetadata())).thenSucceed();
+                "ホーキング凝縮体ができない: ignitionTick=" + ignitionTick[0] + " elapsed=" + (helper.getTick() - ignitionTick[0]) + " formed=" + r.isFormed() + " live=" + (helper.getLevel().getBlockEntity(r.getBlockPos()) == r) + " missing=" + Structures.reactorLayout(CENTER).keySet().stream().filter(pos -> helper.getBlockState(pos).isAir()).limit(12).toList() + " data=" + r.saveWithoutMetadata()); }).thenSucceed();
     }
 
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 2000, batch = "reactor_isolated_ergosphereYieldsExoticMatterAndSpinsDown")
