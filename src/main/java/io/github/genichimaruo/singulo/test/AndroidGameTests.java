@@ -1129,7 +1129,10 @@ public final class AndroidGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない" + " pos=" + a.position() + " ticks=" + a.tickCount + " health=" + a.getHealth() + " charge=" + a.charge() + " removed=" + a.isRemoved() + " guard=" + a.isGuard() + " printed=" + a.printed() + " target=" + a.getTarget() + " work=" + a.saveWorkState() + " console=" + console.saveWithoutMetadata());
             helper.assertTrue(level.getBlockState(helper.absolutePos(from)).isAir() && level.getBlockState(helper.absolutePos(to)).isAir(),
-                    "範囲の石が掘られていない");
+                    "範囲の石が掘られていない: from=" + helper.absolutePos(from) + "=" + level.getBlockState(helper.absolutePos(from))
+                            + ", to=" + helper.absolutePos(to) + "=" + level.getBlockState(helper.absolutePos(to))
+                            + ", delivery=" + delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) + ", worker=" + a.saveWithoutId(new net.minecraft.nbt.CompoundTag())
+                            + ", console=" + console.saveWithoutMetadata());
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
             a.discard();
         });
