@@ -413,7 +413,7 @@ def _cube(texture, emissive=False, translucent=False):
 
 
 def _orientable(front, side='lab_machine_side', top='lab_machine_top', glow=None):
-    """前（north）が front の箱。glow を与えると、画面の画素だけの層を前の面のすぐ外に重ねて、そこだけ光らせる。"""
+    """前（north）が front の箱。glow を与えると、画面の画素だけの層をブロック境界に重ねて、そこだけ光らせる。"""
     t = {'front': f'{MODID}:block/{front}', 'side': f'{MODID}:block/{side}', 'top': f'{MODID}:block/{top}',
          'particle': f'{MODID}:block/{side}'}
     body = {'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': {
@@ -423,8 +423,9 @@ def _orientable(front, side='lab_machine_side', top='lab_machine_top', glow=None
     face = {'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': {'north': {'texture': '#front', 'cullface': 'north'}}}
     model = {'parent': 'minecraft:block/block', 'textures': t, 'elements': [body, face]}
     if glow:
+        face['from'][2] = 0.01  # 発光面と同一平面にしない。両方とも1マス内。
         t['glow'] = f'{MODID}:block/{glow}'
-        model['elements'].append({'from': [0, 0, -0.01], 'to': [16, 16, 0], 'neoforge_data': GLOW,
+        model['elements'].append({'from': [0, 0, 0], 'to': [16, 16, 0], 'neoforge_data': GLOW,
                                   'faces': {'north': {'texture': '#glow', 'cullface': 'north'}}})
         model['render_type'] = 'minecraft:cutout'
     return model
@@ -494,6 +495,10 @@ def models(write_json, assets):
     upper = [box([5.5, 0, 6.5], [10.5, 7, 9.5], '#body'), box([4.5, 1, 7], [5.5, 6, 9], '#body'), box([10.5, 1, 7], [11.5, 6, 9], '#body'),
              box([6.5, 7.5, 6.5], [9.5, 11, 9.5], '#body'),
              box([2, 0, 2], [14, 13, 14], '#glass'), box([1, 13, 1], [15, 16, 15], '#base', ('up',))]
+    # ガラスの上下の蓋は台座・天蓋で隠れ、中央の継ぎ目にも不要。素体の足・胴と同じ面を重ねない。
+    for glass in (lower[-1], upper[-2]):
+        glass['faces'].pop('up')
+        glass['faces'].pop('down')
     for half, els in (('lower', lower), ('upper', upper)):
         write_json(mb / f'android_capsule_{half}.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent',
                                                          'textures': t, 'elements': els})

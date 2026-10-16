@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:android_charger"
+    },
+    "title": {
+      "translate": "advancement.singulo.android_charger.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.android_charger.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_charger"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:android_printed"
+}

@@ -15,6 +15,102 @@
     "source": "Worldline Anchor",
     "translation": "세계선 닻"
   },
+  "advancement.singulo.android_charger.description": {
+    "source": "Obtain an Android Wireless Charger",
+    "translation": "안드로이드 무선 충전기를 획득하세요"
+  },
+  "advancement.singulo.android_charger.title": {
+    "source": "Charge Nearby",
+    "translation": "곁에서 충전"
+  },
+  "advancement.singulo.android_delivery.description": {
+    "source": "Receive the full requested quantity of an order you placed",
+    "translation": "자신이 주문한 수량을 모두 납품받으세요"
+  },
+  "advancement.singulo.android_delivery.title": {
+    "source": "Order Ready",
+    "translation": "완성했습니다"
+  },
+  "advancement.singulo.android_factory_print.description": {
+    "source": "Obtain a Factory Print Unit",
+    "translation": "공장식 인쇄 유닛을 획득하세요"
+  },
+  "advancement.singulo.android_factory_print.title": {
+    "source": "Factory Technology at Home",
+    "translation": "공장 기술을 기지로"
+  },
+  "advancement.singulo.android_memory.description": {
+    "source": "Obtain any ordinary android design memory from a ruin fabricator",
+    "translation": "유적 프린터에서 일반형 설계 메모리를 하나 획득하세요"
+  },
+  "advancement.singulo.android_memory.title": {
+    "source": "A Little Blueprint",
+    "translation": "작은 설계도"
+  },
+  "advancement.singulo.android_printed.description": {
+    "source": "Finish printing a guard at your own assembly station",
+    "translation": "자신의 조립 스테이션에서 호위 안드로이드 인쇄를 완료하세요"
+  },
+  "advancement.singulo.android_printed.title": {
+    "source": "Hello There",
+    "translation": "처음 뵙겠습니다"
+  },
+  "advancement.singulo.android_prototypes.description": {
+    "source": "Hold both Alma and Nox design memories together (two Overseer victories guarantee both)",
+    "translation": "알마와 녹스의 설계 메모리를 함께 소지하세요 (감독관을 두 번 쓰러뜨리면 모두 획득)"
+  },
+  "advancement.singulo.android_prototypes.title": {
+    "source": "Two Possibilities",
+    "translation": "두 가지 가능성"
+  },
+  "advancement.singulo.android_rack.description": {
+    "source": "Obtain an Android Recipe Rack",
+    "translation": "안드로이드 제작법 선반을 획득하세요"
+  },
+  "advancement.singulo.android_rack.title": {
+    "source": "Factory Handbook",
+    "translation": "공장의 안내서"
+  },
+  "advancement.singulo.android_recipe.description": {
+    "source": "Obtain a Recipe Card and record a recipe at the Work Console",
+    "translation": "제작법 카드를 획득하고 작업 지시대에서 제작법을 기록하세요"
+  },
+  "advancement.singulo.android_recipe.title": {
+    "source": "Pass on a Recipe",
+    "translation": "제작법을 전하다"
+  },
+  "advancement.singulo.android_routes.description": {
+    "source": "Obtain an Area Card; combine it with location cards to plan routes",
+    "translation": "범위 카드를 획득하고 위치 카드와 함께 경로를 정하세요"
+  },
+  "advancement.singulo.android_routes.title": {
+    "source": "Plan the Way",
+    "translation": "통로를 생각하다"
+  },
+  "advancement.singulo.android_station.description": {
+    "source": "Obtain an Android Assembly Station; prepare a memory, a kit and power",
+    "translation": "안드로이드 조립 스테이션을 획득하고 메모리, 키트와 전력을 준비하세요"
+  },
+  "advancement.singulo.android_station.title": {
+    "source": "Ready to Welcome",
+    "translation": "맞이할 준비"
+  },
+  "advancement.singulo.android_survey.description": {
+    "source": "Obtain Survey Glasses",
+    "translation": "측량 안경을 획득하세요"
+  },
+  "advancement.singulo.android_survey.title": {
+    "source": "Visible Waypoints",
+    "translation": "눈에 보이는 이정표"
+  },
+  "advancement.singulo.android_work.description": {
+    "source": "Obtain a Work Console; connect supplies and recipes",
+    "translation": "작업 지시대를 획득하고 자재 보관함과 제작법을 연결하세요"
+  },
+  "advancement.singulo.android_work.title": {
+    "source": "A Job to Do",
+    "translation": "일을 부탁하자"
+  },
   "advancement.singulo.archive.description": {
     "source": "Build an archive terminal",
     "translation": "기록 보관 단말기를 만드세요"
@@ -54,6 +150,14 @@
   "advancement.singulo.awakened_echo.title": {
     "source": "Echoes That Linger",
     "translation": "그치지 않는 메아리"
+  },
+  "advancement.singulo.awakened_foundry.description": {
+    "source": "Defeat the Awakened Foundry Overseer",
+    "translation": "각성한 파운드리 감독관을 쓰러뜨리세요"
+  },
+  "advancement.singulo.awakened_foundry.title": {
+    "source": "A Will Rebooted",
+    "translation": "재기동하는 의지"
   },
   "advancement.singulo.awakened_gravity.description": {
     "source": "Defeat the Awakened Gravity Remnant",
@@ -119,6 +223,14 @@
     "source": "Degeneracy Pressure",
     "translation": "축퇴압"
   },
+  "advancement.singulo.compass.description": {
+    "source": "Obtain an exploration compass to choose your next expedition",
+    "translation": "탐사 나침반을 획득해 다음 탐사지를 고르세요"
+  },
+  "advancement.singulo.compass.title": {
+    "source": "The Next Trace",
+    "translation": "다음 흔적으로"
+  },
   "advancement.singulo.compressor.description": {
     "source": "Build a compressor",
     "translation": "압축기를 만드세요. 질량 모드로 무엇이든 굳힐 수 있습니다"
@@ -159,6 +271,14 @@
     "source": "Ripples in Spacetime",
     "translation": "시공간의 잔물결"
   },
+  "advancement.singulo.echo.description": {
+    "source": "Be a surviving challenger in the arena when the Echo Sentinel falls",
+    "translation": "잔향 파수꾼이 쓰러질 때 생존한 도전자로 전투 구역에 있으세요"
+  },
+  "advancement.singulo.echo.title": {
+    "source": "Beyond the Echo",
+    "translation": "메아리 너머로"
+  },
   "advancement.singulo.entangled.description": {
     "source": "Make entangled elements",
     "translation": "양자 얽힘 소자를 만드세요"
@@ -174,6 +294,14 @@
   "advancement.singulo.exotic.title": {
     "source": "Negative Energy",
     "translation": "음의 에너지"
+  },
+  "advancement.singulo.foundry.description": {
+    "source": "Be a surviving challenger in the arena when the Foundry Overseer falls",
+    "translation": "총괄 AI 파운드리 감독관이 쓰러질 때 생존한 도전자로 전투 구역에 있으세요"
+  },
+  "advancement.singulo.foundry.title": {
+    "source": "The Last Directive",
+    "translation": "마지막 명령"
   },
   "advancement.singulo.furnace.description": {
     "source": "Form a degenerate furnace",
@@ -207,6 +335,14 @@
     "source": "The Cradle",
     "translation": "요람"
   },
+  "advancement.singulo.gravity.description": {
+    "source": "Be a surviving challenger in the arena when the Gravity Remnant falls",
+    "translation": "중력 잔재가 쓰러질 때 생존한 도전자로 전투 구역에 있으세요"
+  },
+  "advancement.singulo.gravity.title": {
+    "source": "Unravelling Gravity",
+    "translation": "중력을 풀다"
+  },
   "advancement.singulo.hawking.description": {
     "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
     "translation": "회수 운전 중인 블랙홀에서 호킹 응축물을 받으세요. 첫 코어에는 6개가 필요합니다(직접 4개, 이상 샘플 복원 2개)"
@@ -223,9 +359,17 @@
     "source": "Event Horizon",
     "translation": "사건의 지평선"
   },
+  "advancement.singulo.lab_power.description": {
+    "source": "Be present when power returns to the underground android laboratory",
+    "translation": "지하 안드로이드 연구소의 전력이 복구될 때 현장에 있으세요"
+  },
+  "advancement.singulo.lab_power.title": {
+    "source": "Lights in the Sleeping Factory",
+    "translation": "잠든 공장의 불빛"
+  },
   "advancement.singulo.leviathan.description": {
-    "source": "Defeat the Ergosphere Leviathan",
-    "translation": "에르고구의 거대 뱀을 쓰러뜨리세요"
+    "source": "Be a surviving challenger in the arena when the Ergosphere Leviathan falls",
+    "translation": "에르고스피어 리바이어던이 쓰러질 때 생존한 도전자로 전투 구역에 있으세요"
   },
   "advancement.singulo.leviathan.title": {
     "source": "It Swims the Ergosphere",
@@ -311,6 +455,14 @@
     "source": "Singulo",
     "translation": "Singulo"
   },
+  "advancement.singulo.ruin_android_lab.description": {
+    "source": "Open the cache of the underground android laboratory",
+    "translation": "지하 안드로이드 연구소의 보관함을 여세요"
+  },
+  "advancement.singulo.ruin_android_lab.title": {
+    "source": "The Preserved Laboratory",
+    "translation": "보존된 연구소"
+  },
   "advancement.singulo.ruin_culture.description": {
     "source": "Open a culture facility cache",
     "translation": "봉쇄 배양 시설의 보관고를 여세요"
@@ -320,8 +472,8 @@
     "translation": "봉쇄 구역"
   },
   "advancement.singulo.ruin_final.description": {
-    "source": "Reach the final lab",
-    "translation": "최종 실험 시설에 도달하세요"
+    "source": "After the Gravity Remnant, reach the entrance to the final lab",
+    "translation": "중력 잔재를 넘어 최종 실험 시설 입구에 도착하세요"
   },
   "advancement.singulo.ruin_final.title": {
     "source": "Gravitational Anomaly",
@@ -408,16 +560,16 @@
     "translation": "시간을 돌리다"
   },
   "advancement.singulo.tower.description": {
-    "source": "Form a cryogenic cooling tower",
-    "translation": "극저온 냉각탑을 조립하세요"
+    "source": "Form a cryogenic cooling tower. Recover observation-post materials to make superconducting coils",
+    "translation": "극저온 냉각탑을 조립하세요. 관측소의 재료를 회수해 초전도 코일을 만드세요"
   },
   "advancement.singulo.tower.title": {
     "source": "Toward Absolute Zero",
     "translation": "절대영도를 향하여"
   },
   "advancement.singulo.warden.description": {
-    "source": "Defeat the Horizon Warden",
-    "translation": "지평선 감시자를 물리치세요"
+    "source": "Be a surviving challenger in the arena when the Horizon Warden falls",
+    "translation": "호라이즌 워든이 쓰러질 때 생존한 도전자로 전투 구역에 있으세요"
   },
   "advancement.singulo.warden.title": {
     "source": "Horizon Keeper",
@@ -5536,8 +5688,8 @@
     "translation": "경로와 측량 안경"
   },
   "guide.singulo.androids.ruin.body": {
-    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. Beams cannot reach you behind a wall.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
-    "translation": "모든 유적에는 벽 쪽에 폐허 안드로이드 출력대가 있습니다. 서바이벌 플레이어가 다가오면, 받침대 위에 그 형(광날형·채찍형·광검형)의 안드로이드 2~3체를 아래부터 쌓아 올리듯 출력해 출격시킵니다. 모두 쓰러뜨리면 그 형의 소형 크리스털 메모리가 출력대 위에 나타나고, 출력대는 하루 동안 쉽니다.\n- 광날형 \"루미나\": 몸을 숙이고 칼날이 빛나면 잔상을 남기며 파고들어 벱니다. 한쪽 무릎을 꿇고 바닥에 손을 대면 발밑에 예고 고리가 생기고 빛기둥이 솟습니다(고리 밖으로). 가까이서는 칼날을 펼쳐 회전 베기.\n- 채찍형 \"베르나\": 약 6블록까지 닿는 채찍질과, 휘감아 끌어당기는 감기. 머리 위로 채찍을 돌리면 바닥을 내리쳐 일직선 충격파를 보냅니다(점프로 피함).\n- 광검형 \"솔레이유\": 파고드는 찌르기, 휘두르는 순간 칼날이 늘어나는 가로 베기, 날아가는 초승달 참격파. 맞으면 정면에 빛의 방패를 펼치고(정면으로는 거의 안 통함), 계속 치면 반격합니다. 옆이나 뒤에서 공격하세요.\n지하 안드로이드 연구소에는 인쇄대에서는 나오지 않는 시제기가 있습니다(총괄 AI가 부릅니다).\n- 도끼형 \"알마\": 단단하고 무겁습니다. 도끼를 오른쪽으로 당기면 넓은 휩쓸기, 머리 위로 치켜들면 바닥을 내리찍어 앞으로 일직선 충격파(뛰면 맞지 않음), 낮게 웅크리면 뛰어들어 착지할 때 주위를 내리칩니다.\n- 비트형 \"녹스\": 등의 비트를 띄워 멀리서 광선으로 쏩니다(체력이 절반 아래면 6기). 거리를 두려 하며, 가까이 가면 단검으로 두 번 벤 뒤 뒤로 뛰어 물러납니다. 벽 뒤에 숨으면 광선이 닿지 않습니다.\n안드로이드는 충전량으로 움직이며, 큰 기술을 10번쯤 쓰면 바닥나 눈의 빛이 꺼집니다. 가까운 출력대로 돌아가거나, 낮의 하늘 아래에서는 태양광 패널을 펼치고, 밤이나 실내에서는 앉아서 충전합니다(출력대 5초·태양광 10초·앉아서 14초). 충전 중에는 공격하지 않으니 공격할 기회입니다."
+    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
+    "translation": "모든 유적에는 벽 쪽에 폐허 안드로이드 출력대가 있습니다. 서바이벌 플레이어가 다가오면, 받침대 위에 그 형(광날형·채찍형·광검형)의 안드로이드 2~3체를 아래부터 쌓아 올리듯 출력해 출격시킵니다. 모두 쓰러뜨리면 그 형의 소형 크리스털 메모리가 출력대 위에 나타나고, 출력대는 하루 동안 쉽니다.\n- 광날형 \"루미나\": 몸을 숙이고 칼날이 빛나면 잔상을 남기며 파고들어 벱니다. 한쪽 무릎을 꿇고 바닥에 손을 대면 발밑에 예고 고리가 생기고 빛기둥이 솟습니다(고리 밖으로). 가까이서는 칼날을 펼쳐 회전 베기.\n- 채찍형 \"베르나\": 약 6블록까지 닿는 채찍질과, 휘감아 끌어당기는 감기. 머리 위로 채찍을 돌리면 바닥을 내리쳐 일직선 충격파를 보냅니다(점프로 피함).\n- 광검형 \"솔레이유\": 파고드는 찌르기, 휘두르는 순간 칼날이 늘어나는 가로 베기, 날아가는 초승달 참격파. 맞으면 정면에 빛의 방패를 펼치고(정면으로는 거의 안 통함), 계속 치면 반격합니다. 옆이나 뒤에서 공격하세요.\n지하 안드로이드 연구소에는 인쇄대에서는 나오지 않는 시제기가 있습니다(총괄 AI가 부릅니다).\n- 도끼형 \"알마\": 단단하고 무겁습니다. 도끼를 오른쪽으로 당기면 넓은 휩쓸기, 머리 위로 치켜들면 바닥을 내리찍어 앞으로 일직선 충격파(뛰면 맞지 않음), 낮게 웅크리면 뛰어들어 착지할 때 주위를 내리칩니다.\n- 비트형 \"녹스\": 등의 비트를 띄워 멀리서 광선으로 쏩니다(체력이 절반 아래면 6기). 거리를 두려 하며, 가까이 가면 단검으로 두 번 벤 뒤 뒤로 뛰어 물러납니다. 벽 뒤에 숨으면 광선이 닿지 않습니다.\n안드로이드는 충전량으로 움직이며, 큰 기술을 10번쯤 쓰면 바닥나 눈의 빛이 꺼집니다. 가까운 출력대로 돌아가거나, 낮의 하늘 아래에서는 태양광 패널을 펼치고, 밤이나 실내에서는 앉아서 충전합니다(출력대 5초·태양광 10초·앉아서 14초). 충전 중에는 공격하지 않으니 공격할 기회입니다.\n비트 끝에 빛의 칼날이 나타나면 비트가 조준한 위치로 돌진합니다. 준비 동작을 보고 옆으로 피하세요. 벽은 광선과 돌진을 모두 막습니다."
   },
   "guide.singulo.androids.ruin.title": {
     "source": "Ruin androids",
@@ -5640,8 +5792,8 @@
     "translation": "전력, 촉매, 유적"
   },
   "guide.singulo.intro.howto.body": {
-    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter shows the goals you have reached and the next ones (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
-    "translation": "- 왼쪽에서 장을 고르면 오른쪽에 페이지가 나옵니다. 아래쪽 화살표로 페이지를 넘깁니다.\n- '진행 상황' 장에서 달성한 목표와 다음 목표를 볼 수 있습니다(발전 과제 화면[L 키]의 Singulo 탭과 같음).\n- 아이템에 커서를 올리면 설명이 나오고, Shift를 누르면 제작법과 용도도 나옵니다.\n- 멀티블록 컨트롤러에 홀로그램 투영기를 사용하면 올바른 형태가 반투명하게 떠오릅니다."
+    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
+    "translation": "- 왼쪽에서 장을 고르면 오른쪽에 페이지가 나옵니다. 아래쪽 화살표로 페이지를 넘깁니다.\n- '진행 상황' 장에서 달성한 목표와 다음 목표를 볼 수 있습니다(발전 과제 화면[L 키]의 Singulo 탭과 같음).\n- 아이템에 커서를 올리면 설명이 나오고, Shift를 누르면 제작법과 용도도 나옵니다.\n- 멀티블록 컨트롤러에 홀로그램 투영기를 사용하면 올바른 형태가 반투명하게 떠오릅니다.\n발전 과제는 공업, 탐사, 안드로이드의 갈래로 안내합니다. 연결선은 안내이며 별도 해금 조건이 아닙니다."
   },
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",

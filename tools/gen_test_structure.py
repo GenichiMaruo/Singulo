@@ -50,6 +50,13 @@ def write(template, sx, sy, sz):
 def main():
     for template, size in TEMPLATES.items():
         write(template, *size)
+    # 分けて実行する群も同じ空テンプレートを使う。寸法変更時に複製を取り残さない。
+    for namespace, templates in {'singulo_mekanism': ('empty',), 'singulo_prototype': ('empty', 'huge'),
+                                 'singulo_progression': ('empty',)}.items():
+        target = OUT_DIR.parent.parent / namespace / 'structure'
+        target.mkdir(parents=True, exist_ok=True)
+        for template in templates:
+            (target / f'{template}.nbt').write_bytes((OUT_DIR / f'{template}.nbt').read_bytes())
 
 
 if __name__ == '__main__':

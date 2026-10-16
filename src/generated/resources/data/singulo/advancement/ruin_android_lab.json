@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "singulo:precision_actuator"
+    },
+    "title": {
+      "translate": "advancement.singulo.ruin_android_lab.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.ruin_android_lab.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "singulo:milestone",
+      "conditions": {
+        "id": "discover/android_lab"
+      }
+    }
+  },
+  "parent": "singulo:foundry"
+}

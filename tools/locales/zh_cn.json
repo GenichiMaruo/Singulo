@@ -15,6 +15,102 @@
     "source": "Worldline Anchor",
     "translation": "世界线锚"
   },
+  "advancement.singulo.android_charger.description": {
+    "source": "Obtain an Android Wireless Charger",
+    "translation": "获得机器人无线充电器"
+  },
+  "advancement.singulo.android_charger.title": {
+    "source": "Charge Nearby",
+    "translation": "就近充电"
+  },
+  "advancement.singulo.android_delivery.description": {
+    "source": "Receive the full requested quantity of an order you placed",
+    "translation": "收到自己订单所需的全部物品"
+  },
+  "advancement.singulo.android_delivery.title": {
+    "source": "Order Ready",
+    "translation": "做好了"
+  },
+  "advancement.singulo.android_factory_print.description": {
+    "source": "Obtain a Factory Print Unit",
+    "translation": "获得工厂式打印单元"
+  },
+  "advancement.singulo.android_factory_print.title": {
+    "source": "Factory Technology at Home",
+    "translation": "将工厂技术带回家"
+  },
+  "advancement.singulo.android_memory.description": {
+    "source": "Obtain any ordinary android design memory from a ruin fabricator",
+    "translation": "从遗迹打印台获得任意一种普通型号的设计存储器"
+  },
+  "advancement.singulo.android_memory.title": {
+    "source": "A Little Blueprint",
+    "translation": "小小的设计图"
+  },
+  "advancement.singulo.android_printed.description": {
+    "source": "Finish printing a guard at your own assembly station",
+    "translation": "在自己的组装站完成一名护卫的打印"
+  },
+  "advancement.singulo.android_printed.title": {
+    "source": "Hello There",
+    "translation": "初次见面"
+  },
+  "advancement.singulo.android_prototypes.description": {
+    "source": "Hold both Alma and Nox design memories together (two Overseer victories guarantee both)",
+    "translation": "同时持有阿尔玛与诺克斯的设计存储器（击败监督者两次即可集齐）"
+  },
+  "advancement.singulo.android_prototypes.title": {
+    "source": "Two Possibilities",
+    "translation": "两种可能"
+  },
+  "advancement.singulo.android_rack.description": {
+    "source": "Obtain an Android Recipe Rack",
+    "translation": "获得机器人配方架"
+  },
+  "advancement.singulo.android_rack.title": {
+    "source": "Factory Handbook",
+    "translation": "工厂指南"
+  },
+  "advancement.singulo.android_recipe.description": {
+    "source": "Obtain a Recipe Card and record a recipe at the Work Console",
+    "translation": "获得配方卡，并在作业指令台记录配方"
+  },
+  "advancement.singulo.android_recipe.title": {
+    "source": "Pass on a Recipe",
+    "translation": "传授配方"
+  },
+  "advancement.singulo.android_routes.description": {
+    "source": "Obtain an Area Card; combine it with location cards to plan routes",
+    "translation": "获得区域卡，配合位置卡规划路径"
+  },
+  "advancement.singulo.android_routes.title": {
+    "source": "Plan the Way",
+    "translation": "规划路线"
+  },
+  "advancement.singulo.android_station.description": {
+    "source": "Obtain an Android Assembly Station; prepare a memory, a kit and power",
+    "translation": "获得机器人组装站，并准备设计存储器、套件与电力"
+  },
+  "advancement.singulo.android_station.title": {
+    "source": "Ready to Welcome",
+    "translation": "准备迎接"
+  },
+  "advancement.singulo.android_survey.description": {
+    "source": "Obtain Survey Glasses",
+    "translation": "获得测量眼镜"
+  },
+  "advancement.singulo.android_survey.title": {
+    "source": "Visible Waypoints",
+    "translation": "看得见的路标"
+  },
+  "advancement.singulo.android_work.description": {
+    "source": "Obtain a Work Console; connect supplies and recipes",
+    "translation": "获得作业指令台，连接材料仓储并准备配方"
+  },
+  "advancement.singulo.android_work.title": {
+    "source": "A Job to Do",
+    "translation": "拜托你了"
+  },
   "advancement.singulo.archive.description": {
     "source": "Build an archive terminal",
     "translation": "制作档案终端"
@@ -54,6 +150,14 @@
   "advancement.singulo.awakened_echo.title": {
     "source": "Echoes That Linger",
     "translation": "不绝的回响"
+  },
+  "advancement.singulo.awakened_foundry.description": {
+    "source": "Defeat the Awakened Foundry Overseer",
+    "translation": "击败觉醒的铸造监督者"
+  },
+  "advancement.singulo.awakened_foundry.title": {
+    "source": "A Will Rebooted",
+    "translation": "重启的意志"
   },
   "advancement.singulo.awakened_gravity.description": {
     "source": "Defeat the Awakened Gravity Remnant",
@@ -119,6 +223,14 @@
     "source": "Degeneracy Pressure",
     "translation": "简并压力"
   },
+  "advancement.singulo.compass.description": {
+    "source": "Obtain an exploration compass to choose your next expedition",
+    "translation": "获得探索罗盘，选择下一个探索地点"
+  },
+  "advancement.singulo.compass.title": {
+    "source": "The Next Trace",
+    "translation": "下一处痕迹"
+  },
   "advancement.singulo.compressor.description": {
     "source": "Build a compressor",
     "translation": "建造压缩机。质量模式下什么都能压实"
@@ -159,6 +271,14 @@
     "source": "Ripples in Spacetime",
     "translation": "时空涟漪"
   },
+  "advancement.singulo.echo.description": {
+    "source": "Be a surviving challenger in the arena when the Echo Sentinel falls",
+    "translation": "残响哨兵被击败时，作为存活的挑战者留在战斗区域内"
+  },
+  "advancement.singulo.echo.title": {
+    "source": "Beyond the Echo",
+    "translation": "跨越回响"
+  },
   "advancement.singulo.entangled.description": {
     "source": "Make entangled elements",
     "translation": "制作量子纠缠元件"
@@ -174,6 +294,14 @@
   "advancement.singulo.exotic.title": {
     "source": "Negative Energy",
     "translation": "负能量"
+  },
+  "advancement.singulo.foundry.description": {
+    "source": "Be a surviving challenger in the arena when the Foundry Overseer falls",
+    "translation": "统括AI铸造监督者被击败时，作为存活的挑战者留在战斗区域内"
+  },
+  "advancement.singulo.foundry.title": {
+    "source": "The Last Directive",
+    "translation": "最后的指令"
   },
   "advancement.singulo.furnace.description": {
     "source": "Form a degenerate furnace",
@@ -207,6 +335,14 @@
     "source": "The Cradle",
     "translation": "摇篮"
   },
+  "advancement.singulo.gravity.description": {
+    "source": "Be a surviving challenger in the arena when the Gravity Remnant falls",
+    "translation": "重力残滓被击败时，作为存活的挑战者留在战斗区域内"
+  },
+  "advancement.singulo.gravity.title": {
+    "source": "Unravelling Gravity",
+    "translation": "解开重力"
+  },
   "advancement.singulo.hawking.description": {
     "source": "Collect H condensate from a reactor in harvest mode. The first core needs six",
     "translation": "从回收模式运行的黑洞中获取霍金凝聚体。第一个奇点核心需要 6 个（直接收集 4 个，复原异常样本得 2 个）"
@@ -223,9 +359,17 @@
     "source": "Event Horizon",
     "translation": "事件视界"
   },
+  "advancement.singulo.lab_power.description": {
+    "source": "Be present when power returns to the underground android laboratory",
+    "translation": "在地下机器人研究所恢复供电时身处现场"
+  },
+  "advancement.singulo.lab_power.title": {
+    "source": "Lights in the Sleeping Factory",
+    "translation": "沉睡工厂的灯火"
+  },
   "advancement.singulo.leviathan.description": {
-    "source": "Defeat the Ergosphere Leviathan",
-    "translation": "击败能层巨蛇"
+    "source": "Be a surviving challenger in the arena when the Ergosphere Leviathan falls",
+    "translation": "能层巨蛇被击败时，作为存活的挑战者留在战斗区域内"
   },
   "advancement.singulo.leviathan.title": {
     "source": "It Swims the Ergosphere",
@@ -311,6 +455,14 @@
     "source": "Singulo",
     "translation": "Singulo"
   },
+  "advancement.singulo.ruin_android_lab.description": {
+    "source": "Open the cache of the underground android laboratory",
+    "translation": "打开地下机器人研究所的储藏室"
+  },
+  "advancement.singulo.ruin_android_lab.title": {
+    "source": "The Preserved Laboratory",
+    "translation": "保存完好的研究所"
+  },
   "advancement.singulo.ruin_culture.description": {
     "source": "Open a culture facility cache",
     "translation": "打开封闭培养设施的保管库"
@@ -320,8 +472,8 @@
     "translation": "封锁区域"
   },
   "advancement.singulo.ruin_final.description": {
-    "source": "Reach the final lab",
-    "translation": "到达最终实验室"
+    "source": "After the Gravity Remnant, reach the entrance to the final lab",
+    "translation": "跨越重力残滓，抵达最终实验设施的入口"
   },
   "advancement.singulo.ruin_final.title": {
     "source": "Gravitational Anomaly",
@@ -408,16 +560,16 @@
     "translation": "旋转时间"
   },
   "advancement.singulo.tower.description": {
-    "source": "Form a cryogenic cooling tower",
-    "translation": "组建低温冷却塔"
+    "source": "Form a cryogenic cooling tower. Recover observation-post materials to make superconducting coils",
+    "translation": "组装低温冷却塔。回收观测站的材料以制作超导线圈"
   },
   "advancement.singulo.tower.title": {
     "source": "Toward Absolute Zero",
     "translation": "迈向绝对零度"
   },
   "advancement.singulo.warden.description": {
-    "source": "Defeat the Horizon Warden",
-    "translation": "击败视界守卫"
+    "source": "Be a surviving challenger in the arena when the Horizon Warden falls",
+    "translation": "地平线守卫被击败时，作为存活的挑战者留在战斗区域内"
   },
   "advancement.singulo.warden.title": {
     "source": "Horizon Keeper",
@@ -5536,8 +5688,8 @@
     "translation": "路径与测量眼镜"
   },
   "guide.singulo.androids.ruin.body": {
-    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. Beams cannot reach you behind a wall.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
-    "translation": "每座遗迹的墙边都有废墟仿生人打印台。生存模式的玩家靠近时，它会在台面上从脚开始逐层打印出 2〜3 个对应型号（光刃型、鞭型或光剑型）的仿生人并让其出动。全部击败后，台面上会出现该型号的小型水晶存储器，打印台随后休息一天。\n- 光刃型“露米娜”：蹲下、刀刃发亮后，会留下残影冲来斩击。单膝跪地手按地面时，脚下会出现预告圈并升起光柱（离开圈）。近身时会张开刀刃回旋斩。\n- 鞭型“薇尔娜”：可达约 6 格的鞭击，以及缠住并把你拉近的缠绕。在头顶甩鞭后，会抽打地面放出一道直线冲击波（跳起即可躲开）。\n- 光剑型“索蕾伊”：踏步突刺、挥动时剑刃伸长的横斩，以及飞行的新月斩击波。受击时会在正面展开光盾（正面几乎打不进去），继续攻击会被反击。请从侧面或背后进攻。\n地下仿生人研究所里有印刷台不会出现的试作机（由统筹 AI 呼叫）。\n- 斧型“阿尔玛”：又硬又重。把斧头往右拉之后是大范围横扫；举过头顶后会砸向地面，向前方放出一道直线冲击波（跳起来就不会被打中）；压低身体后会扑过来，落地时攻击周围。\n- 浮游炮型“诺克丝”：让背上的浮游炮浮起来，从远处用光线射击（体力低于一半时增至 6 台）。她会试图拉开距离，靠近时会用短剑连击两次再向后跳开。躲到墙后光线就打不到。\n仿生人依靠电量行动，大招用 10 次左右就会耗尽，眼睛的光会熄灭。它们会回到附近的打印台，或在白天露天处展开太阳能板，夜晚或室内则坐下充电（打印台 5 秒、太阳能 10 秒、坐下 14 秒）。充电时不会攻击，正是进攻的时机。"
+    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
+    "translation": "每座遗迹的墙边都有废墟仿生人打印台。生存模式的玩家靠近时，它会在台面上从脚开始逐层打印出 2〜3 个对应型号（光刃型、鞭型或光剑型）的仿生人并让其出动。全部击败后，台面上会出现该型号的小型水晶存储器，打印台随后休息一天。\n- 光刃型“露米娜”：蹲下、刀刃发亮后，会留下残影冲来斩击。单膝跪地手按地面时，脚下会出现预告圈并升起光柱（离开圈）。近身时会张开刀刃回旋斩。\n- 鞭型“薇尔娜”：可达约 6 格的鞭击，以及缠住并把你拉近的缠绕。在头顶甩鞭后，会抽打地面放出一道直线冲击波（跳起即可躲开）。\n- 光剑型“索蕾伊”：踏步突刺、挥动时剑刃伸长的横斩，以及飞行的新月斩击波。受击时会在正面展开光盾（正面几乎打不进去），继续攻击会被反击。请从侧面或背后进攻。\n地下仿生人研究所里有印刷台不会出现的试作机（由统筹 AI 呼叫）。\n- 斧型“阿尔玛”：又硬又重。把斧头往右拉之后是大范围横扫；举过头顶后会砸向地面，向前方放出一道直线冲击波（跳起来就不会被打中）；压低身体后会扑过来，落地时攻击周围。\n- 浮游炮型“诺克丝”：让背上的浮游炮浮起来，从远处用光线射击（体力低于一半时增至 6 台）。她会试图拉开距离，靠近时会用短剑连击两次再向后跳开。躲到墙后光线就打不到。\n仿生人依靠电量行动，大招用 10 次左右就会耗尽，眼睛的光会熄灭。它们会回到附近的打印台，或在白天露天处展开太阳能板，夜晚或室内则坐下充电（打印台 5 秒、太阳能 10 秒、坐下 14 秒）。充电时不会攻击，正是进攻的时机。\n比特尖端出现光刃后，比特本身会冲向预先瞄准的位置。准备动作时向侧面闪避；墙壁能挡住光束与突进。"
   },
   "guide.singulo.androids.ruin.title": {
     "source": "Ruin androids",
@@ -5640,8 +5792,8 @@
     "translation": "电力、催化剂和废墟"
   },
   "guide.singulo.intro.howto.body": {
-    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter shows the goals you have reached and the next ones (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
-    "translation": "- 在左侧选择章节，右侧会显示页面。用下方的箭头翻页。\n- “进度”章节显示已达成的目标和下一个目标（与进度界面〔L 键〕的 Singulo 选项卡相同）。\n- 将鼠标悬停在物品上可查看说明；按住 Shift 可查看配方和用途。\n- 对多方块结构的控制器使用全息投影仪，正确的形状会以半透明方式显示出来。"
+    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
+    "translation": "- 在左侧选择章节，右侧会显示页面。用下方的箭头翻页。\n- “进度”章节显示已达成的目标和下一个目标（与进度界面〔L 键〕的 Singulo 选项卡相同）。\n- 将鼠标悬停在物品上可查看说明；按住 Shift 可查看配方和用途。\n- 对多方块结构的控制器使用全息投影仪，正确的形状会以半透明方式显示出来。\n进度按工业、探索与机器人分支展示；连线用于引导，不是额外的解锁条件。"
   },
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",

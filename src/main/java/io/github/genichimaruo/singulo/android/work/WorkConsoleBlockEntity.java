@@ -1850,6 +1850,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private void finishIfDone(WorkOrder o) {
         if (o.finished()) {
             orders.remove(o);
+            if (o.orderer != null && level instanceof ServerLevel server) {
+                io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), o.orderer, "android_order_complete");
+            }
             message = Component.translatable("gui.singulo.work_console.done", o.target.getHoverName(), o.count);
             if (level != null) {
                 level.playSound(null, worldPosition, net.minecraft.sounds.SoundEvents.NOTE_BLOCK_CHIME.value(),
