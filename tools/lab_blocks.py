@@ -242,10 +242,24 @@ def coffee_front():
 
 
 def coffee_pot():
-    """コーヒーのポット: 暗い茶色の中身と、ガラスの光。"""
-    im, d = new(rgba((70, 42, 28)))
-    d.line([(2, 0), (2, S - 1)], fill=(150, 110, 80, 255))
-    d.rectangle([0, 0, S - 1, 3], fill=rgba((40, 40, 46)))
+    """コーヒーのポット（ガラスの器）。テクスチャを 1:1 で割り付ける（モデルの UV と合わせる）。
+
+    [0,0]-[6,6] 正面・背面（6x6）、[6,0]-[10,6] 側面（4x6）、[0,6]-[6,10] 上（蓋）、[6,6]-[12,10] 底、
+    [12,0]-[14,4] 取っ手。上1段は黒い襟、その下は空のガラス、下半分はコーヒー。左寄りに縦の光。
+    """
+    im, d = new(rgba((40, 40, 46)))
+    glass, coffee, coffee_hi = (176, 196, 208), (82, 48, 30), (112, 70, 44)
+    for x0, w in ((0, 6), (6, 4)):
+        d.rectangle([x0, 0, x0 + w - 1, 0], fill=rgba((34, 34, 40)))          # 黒い襟
+        d.rectangle([x0, 1, x0 + w - 1, 2], fill=rgba(glass))               # 空のガラス
+        d.rectangle([x0, 3, x0 + w - 1, 5], fill=rgba(coffee))              # コーヒー
+        d.line([(x0, 3), (x0 + w - 1, 3)], fill=rgba(coffee_hi))            # 液面
+        d.line([(x0 + 1, 1), (x0 + 1, 5)], fill=(236, 244, 250, 255))       # ガラスの光
+        d.point([(x0, 1), (x0, 2), (x0 + w - 1, 1), (x0 + w - 1, 2)], fill=rgba(mix(glass, (90, 100, 110), 0.5)))
+    d.rectangle([0, 6, 5, 9], fill=rgba((34, 34, 40)))                      # 蓋
+    d.rectangle([2, 7, 3, 8], fill=rgba((70, 72, 80)))                      # 蓋のつまみ
+    d.rectangle([6, 6, 11, 9], fill=rgba(coffee))                           # 底（ガラス越しのコーヒー）
+    d.rectangle([12, 0, 13, 3], fill=rgba((34, 34, 40)))                    # 取っ手
     return im
 
 
@@ -293,11 +307,32 @@ def paper_side():
 
 
 def bin_side():
-    """ごみ箱の側面: 灰色の樹脂に縦の溝、上の縁。"""
+    """ごみ箱の側面: 灰色の樹脂に縦の溝、上の縁（上3段。モデルは上端を縁に合わせる）。"""
     im, d = new(rgba((150, 156, 166)))
     for x in range(1, S, 3):
         d.line([(x, 3), (x, S - 1)], fill=rgba((130, 136, 146)))
     d.rectangle([0, 0, S - 1, 2], fill=rgba((110, 116, 126)))
+    d.line([(0, 0), (S - 1, 0)], fill=rgba((168, 174, 184)))
+    return im
+
+
+def bin_inner():
+    """ごみ箱の内側の壁: 上ほど明るく、底へ向かって暗くなる（深さが見えるように）。上端は縁の色。"""
+    im, d = new()
+    top, bottom = (104, 110, 120), (34, 37, 43)
+    for y in range(S):
+        d.line([(0, y), (S - 1, y)], fill=rgba(mix(top, bottom, min(1.0, y / 9))))
+    d.line([(0, 0), (S - 1, 0)], fill=rgba((110, 116, 126)))
+    return im
+
+
+def bin_bottom():
+    """ごみ箱の底: 暗い樹脂に、丸めた紙くずが少し。"""
+    im, d = new(rgba((30, 33, 38)))
+    d.rectangle([1, 1, 3, 2], fill=rgba((214, 216, 220)))
+    d.point([(2, 3), (1, 2)], fill=rgba((180, 184, 190)))
+    d.rectangle([4, 4, 5, 5], fill=rgba((196, 200, 206)))
+    d.point([(5, 4)], fill=rgba((232, 234, 238)))
     return im
 
 
@@ -390,6 +425,8 @@ def textures(tb, save_plain):
     save(paper(), tb / 'paper_stack_top.png')
     save(paper_side(), tb / 'paper_stack_side.png')
     save(bin_side(), tb / 'trash_bin_side.png')
+    save(bin_inner(), tb / 'trash_bin_inner.png')
+    save(bin_bottom(), tb / 'trash_bin_bottom.png')
     save(capsule_body(), tb / 'android_capsule_body.png')
 
 
@@ -516,6 +553,11 @@ def _box(a, b, faces, glow=False):
     return el
 
 
+def _uvbox(a, b, faces):
+    """要素（faces は 向き → (テクスチャ名, UV)。省いた向きは描かない）。"""
+    return {'from': a, 'to': b, 'faces': {d: {'uv': uv, 'texture': t} for d, (t, uv) in faces.items()}}
+
+
 def _all(tex, skip=()):
     return {d: tex for d in ('north', 'south', 'east', 'west', 'up', 'down') if d not in skip}
 
@@ -538,7 +580,11 @@ def decor_models(write_json, mb, mi, bs):
         'elements': [_box([4, 0, 4], [12, 1, 12], _all('#body')),
                      _box([4, 1, 9], [12, 11, 13], {**_all('#body', ('north',)), 'north': '#front'}),
                      _box([4, 11, 4], [12, 13, 13], {**_all('#body', ('north',)), 'north': '#front'}),
-                     _box([5.5, 1, 5], [10.5, 7, 9], _all('#pot', ('up',)))]})
+                     _uvbox([5, 1, 5], [11, 7, 9], {'north': ('#pot', [0, 0, 6, 6]), 'south': ('#pot', [0, 0, 6, 6]),
+                                                    'east': ('#pot', [6, 0, 10, 6]), 'west': ('#pot', [6, 0, 10, 6]),
+                                                    'up': ('#pot', [0, 6, 6, 10]), 'down': ('#pot', [6, 6, 12, 10])}),
+                     _uvbox([11, 2, 6.5], [12, 6, 7.5], {d: ('#pot', [12, 0, 13, 4]) for d in ('north', 'south', 'east', 'west')}
+                            | {'up': ('#pot', [12, 0, 13, 1]), 'down': ('#pot', [12, 3, 13, 4])})]})
     # 自販機: 2ブロック。外装は赤、前の上半分は光る見本の棚
     for half in ('lower', 'upper'):
         write_json(mb / f'vending_machine_{half}.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
@@ -555,11 +601,23 @@ def decor_models(write_json, mb, mi, bs):
         'textures': {'top': t('paper_stack_top'), 'side': t('paper_stack_side'), 'particle': t('paper_stack_top')},
         'elements': [_box([3, 0, 3], [11, 3, 13], {**_all('#side', ('up',)), 'up': '#top'}),
                      _box([6, 3, 4], [13, 5, 12], {**_all('#side', ('up',)), 'up': '#top'})]})
-    # ごみ箱: 灰色の筒（中は暗い）
+    # ごみ箱: 灰色の筒。厚さ1の壁4枚と底で中を空け、内側の壁は底へ向かって暗くする。外側の上端に縁の帯が来るよう UV を合わせる
+    def wall(a, b):
+        (x0, y0, z0), (x1, y1, z1) = a, b
+        v = [10 - y1, 10 - y0]
+        side = {'north': [16 - x1, v[0], 16 - x0, v[1]], 'south': [x0, v[0], x1, v[1]],
+                'east': [16 - z1, v[0], 16 - z0, v[1]], 'west': [z0, v[0], z1, v[1]]}
+        inward = {'north': z0 > 8, 'south': z1 < 8, 'east': x1 < 8, 'west': x0 > 8}
+        faces = {d: ('#inner' if inward[d] else '#side', uv) for d, uv in side.items()}
+        faces['up'] = ('#side', [x0, 1, x1, 2] if x1 - x0 > z1 - z0 else [z0, 1, z1, 2])
+        faces['down'] = ('#side', [x0, 15 - (z1 - z0), x1, 15] if x1 - x0 > z1 - z0 else [z0, 15 - (x1 - x0), z1, 15])
+        return _uvbox(a, b, faces)
     write_json(mb / 'trash_bin.json', {'parent': 'minecraft:block/block',
-        'textures': {'side': t('trash_bin_side'), 'dark': t('lab_plastic_dark'), 'particle': t('trash_bin_side')},
-        'elements': [_box([4, 0, 4], [12, 10, 12], {**_all('#side', ('up',))}),
-                     _box([5, 9.9, 5], [11, 10, 11], {'up': '#dark'})]})
+        'textures': {'side': t('trash_bin_side'), 'inner': t('trash_bin_inner'), 'bottom': t('trash_bin_bottom'),
+                     'particle': t('trash_bin_side')},
+        'elements': [wall([4, 0, 4], [12, 10, 5]), wall([4, 0, 11], [12, 10, 12]),
+                     wall([4, 0, 5], [5, 10, 11]), wall([11, 0, 5], [12, 10, 11]),
+                     _uvbox([5, 0, 5], [11, 1, 11], {'up': ('#bottom', [0, 0, 6, 6]), 'down': ('#side', [5, 5, 11, 11])})]})
     for iid in ('desk_monitor', 'coffee_maker', 'paper_stack', 'trash_bin'):
         write_json(bs / f'{iid}.json', {'variants': {f'facing={f}': _rot(iid, y) for f, y in FACING_Y.items()}})
         write_json(mi / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
