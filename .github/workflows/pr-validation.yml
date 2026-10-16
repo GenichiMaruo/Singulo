@@ -65,8 +65,8 @@ jobs:
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient
       - name: Require GUI captures
         run: |
-          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 15
-          grep -q 'SINGULO_GUI_COMPLETE 15' build/gui-review/logs/latest.log
+          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 20
+          grep -q 'SINGULO_GUI_COMPLETE 20' build/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py
       - name: Save build outputs and validation logs
@@ -82,3 +82,26 @@ jobs:
             build/gui-review/screenshots/
             build/gui-review/logs/
             build/gui-review/inventory-pixels.json
+
+  optional-mekanism:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - name: Run optional chemical integration tests against real Mekanism
+        run: bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism
+      - name: Require completed nonempty integration tests
+        run: grep -E 'All [1-9][0-9]* required tests passed' build/gametest/logs/latest.log
+      - name: Save integration logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mekanism-validation-${{ github.sha }}
+          path: build/gametest/logs/

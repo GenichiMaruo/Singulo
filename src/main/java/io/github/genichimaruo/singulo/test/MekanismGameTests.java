@@ -53,12 +53,17 @@ public final class MekanismGameTests {
             var store = Chemicals.store(helper.getLevel(), helper.absolutePos(tankPos), net.minecraft.core.Direction.UP);
             helper.assertTrue(store != null, "ケミカルタンクの化学物質の入れ口が見つからない");
             helper.assertTrue(Chemicals.exists("mekanism:hydrogen"), "水素が見つからない");
+            helper.assertTrue(store.insert("mekanism:hydrogen", 5000, true) == 5000 && store.amount("mekanism:hydrogen") == 0,
+                    "化学物質の挿入シミュレーションがタンクを変えた");
             long put = store.insert("mekanism:hydrogen", 5000, false);
             helper.assertTrue(put == 5000, "ケミカルタンクに水素が入らない: " + put);
             WorkConsoleBlockEntity console = helper.getBlockEntity(consolePos);
             ItemStack hydrogen = ChemicalSamples.of("mekanism:hydrogen", 1);
             helper.assertTrue(ItemCount.get(console.stock(), hydrogen) == 5000, "素材置き場の在庫に水素が数えられない");
             // 指令台はタンクの下（入れるだけの面）にあるが、出せる面（前）から取り出せる
+            var stores = io.github.genichimaruo.singulo.android.work.LiquidStores.at(helper.getLevel(), helper.absolutePos(consolePos));
+            helper.assertTrue(stores.drain(hydrogen, 1000, true) == 1000 && stores.amount(hydrogen) == 5000,
+                    "素材置き場の抽出シミュレーションが在庫を変えた");
             long drained = io.github.genichimaruo.singulo.android.work.LiquidStores.at(helper.getLevel(), helper.absolutePos(consolePos))
                     .drain(hydrogen, 1000, false);
             helper.assertTrue(drained == 1000 && ItemCount.get(console.stock(), hydrogen) == 4000, "素材置き場のケミカルタンクから取り出せない: " + drained);
@@ -71,6 +76,16 @@ public final class MekanismGameTests {
             helper.assertTrue(a.fillLiquid(hydrogen, 70000, false) == 64000 && a.liquidAmount(hydrogen) == 64000,
                     "化学物質のタンク2つに 64,000 mB 入らない: " + a.liquidAmount(hydrogen));
             helper.assertTrue(a.drainLiquid(hydrogen, 2000, false) == 2000 && a.liquidAmount(hydrogen) == 62000, "化学物質のタンクから出せない");
+            var reloaded = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+            reloaded.load(a.saveWithoutId(new net.minecraft.nbt.CompoundTag()));
+            helper.assertTrue(reloaded.hasChemTank() && reloaded.liquidAmount(hydrogen) == 62000,
+                    "再読み込みで化学物質の種類・量かタンク装備を失った");
+            helper.assertTrue(reloaded.drainLiquid(hydrogen, 2000, true) == 2000 && reloaded.liquidAmount(hydrogen) == 62000,
+                    "運搬タンクの抽出シミュレーションが内容を変えた");
+            helper.assertTrue(stores.fill(hydrogen, reloaded.drainLiquid(hydrogen, 2000, false), false) == 2000
+                            && stores.amount(hydrogen) == 6000 && reloaded.liquidAmount(hydrogen) == 60000,
+                    "運搬タンクから素材置き場への返却で化学物質を失うか増殖した");
+            reloaded.discard();
             a.drainLiquid(hydrogen, 62000, false);
             a.inventory().setItem(RuinAndroid.SLOT_TANK, item("android_dual_tank_upgrade"));
             helper.assertTrue(a.chemCapacity() == 16000 && a.fluidCapacity() == 16000, "ガス・液体アップグレードで、各 16,000 mB にならない");

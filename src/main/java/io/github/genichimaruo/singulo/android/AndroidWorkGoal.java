@@ -436,6 +436,10 @@ final class AndroidWorkGoal extends Goal {
             depositFirst = true;
             return;
         }
+        // requestJob は見積もりではなく貸出。今回は着手しないので、予約を必ず返す。
+        if (next.jobId() >= 0) {
+            c.fail(next, WorkConsoleBlockEntity.Failure.DEFERRED);
+        }
         returning = true;
     }
 

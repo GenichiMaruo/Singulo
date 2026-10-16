@@ -150,10 +150,7 @@ final class AndroidLife extends Goal {
             android.setState(RuinAndroid.STATE_IDLE);
         }
         android.setNapping(false);
-        if (!held.isEmpty()) {
-            android.spawnAtLocation(held);             // しまえなかった物は、足元に置く
-            held = ItemStack.EMPTY;
-        }
+        dropHeld();
         if (seat != null) {
             // 座っていた所から、前へ立ち上がる
             Vec3 front = seat.add(Vec3.directionFromRotation(0, seatYaw).scale(0.7));
@@ -306,6 +303,36 @@ final class AndroidLife extends Goal {
 
     // ------------------------------------------------------------------ 場所を探す
 
+    /** インベントリ外で片付け中の物も、死亡・破棄時には失わない。読み込み解除時はNBTで保持する。 */
+    void dropHeld() {
+        if (!held.isEmpty()) {
+            ItemStack drop = held;
+            held = ItemStack.EMPTY;
+            android.spawnAtLocation(drop);
+        }
+    }
+
+    private Vec3 seatPosition(ServerLevel level, BlockPos pos, BlockState state) {
+        var shape = state.getCollisionShape(level, pos);
+        double top = shape.isEmpty() ? 0.5 : shape.max(Direction.Axis.Y);
+        if (top <= 0 || top > 0.9) {
+            top = 0.5;
+        }
+        Direction front = seatFront(state);
+        double shift = state.getBlock() instanceof StairBlock ? 0.3 : 0;
+        return new Vec3(pos.getX() + 0.5 + front.getStepX() * shift, pos.getY() + top, pos.getZ() + 0.5 + front.getStepZ() * shift);
+    }
+
+    private Direction seatFront(BlockState state) {
+        Direction facing = state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
+                ? state.getValue(BlockStateProperties.HORIZONTAL_FACING) : Direction.fromYRot(android.getYRot());
+        return state.getBlock() instanceof StairBlock ? facing.getOpposite() : facing;
+    }
+
+    private boolean seatClear(ServerLevel level, Vec3 position) {
+        return level.noCollision(android, android.getBoundingBox().move(position.subtract(android.position())));
+    }
+
     /** ステーションのそばの、座れる物（下半分の階段・ハーフブロック、名前に chair・seat・bench・stool が入るブロック）。仲間が使っている物は除く。 */
     @Nullable
     private BlockPos findSeat(ServerLevel level) {
@@ -320,10 +347,10 @@ final class AndroidLife extends Goal {
                 return false;
             }
             if (s.getBlock() instanceof StairBlock) {
-                return s.getValue(StairBlock.HALF) == Half.BOTTOM;
+                return s.getValue(StairBlock.HALF) == Half.BOTTOM && seatClear(level, seatPosition(level, p, s));
             }
             if (s.getBlock() instanceof SlabBlock) {
-                return s.getValue(SlabBlock.TYPE) == SlabType.BOTTOM;
+                return s.getValue(SlabBlock.TYPE) == SlabType.BOTTOM && seatClear(level, seatPosition(level, p, s));
             }
             // ほかの mod の椅子: 名前の単語で見る（android_workbench の "bench" などは椅子ではない）。座面が高すぎる物は除く
             boolean named = false;
@@ -334,11 +361,11 @@ final class AndroidLife extends Goal {
                 return false;
             }
             var shape = s.getCollisionShape(level, p);
-            return shape.isEmpty() || shape.max(Direction.Axis.Y) <= 0.9;
+            return (shape.isEmpty() || shape.max(Direction.Axis.Y) <= 0.9) && seatClear(level, seatPosition(level, p, s));
         });
     }
 
-    /** ステーションのまわりで、条件に合う一番近いブロック（上に2マス空きがあるもの。座る・手入れ・しまう所）。 */
+    /** ステーションのまわりで、条件に合う一番近いブロック（座る・手入れ・しまう所。空間の条件は呼び出し側で確認）。 */
     @Nullable
     private BlockPos findBlock(ServerLevel level, java.util.function.Predicate<BlockState> ok) {
         return findBlock(level, (p, s) -> ok.test(s));
@@ -443,19 +470,13 @@ final class AndroidLife extends Goal {
                 return;
             }
             if (chair) {
-                double top = s.getCollisionShape(level, spot).max(Direction.Axis.Y);
-                if (top <= 0 || top > 0.9) {
-                    top = 0.5;
+                Vec3 candidate = seatPosition(level, spot, s);
+                if (!seatClear(level, candidate)) {
+                    left = 0; // 選んだ後に頭上などが塞がれても、ブロック内へ移動しない
+                    return;
                 }
-                Direction facing = s.hasProperty(BlockStateProperties.HORIZONTAL_FACING) ? s.getValue(BlockStateProperties.HORIZONTAL_FACING)
-                        : Direction.fromYRot(android.getYRot());
-                boolean stair = s.getBlock() instanceof StairBlock;
-                // 階段は上る向きに背を向けて座る。ほかの椅子は向いている方へ
-                Direction front = stair ? facing.getOpposite() : facing;
-                seatYaw = front.toYRot();
-                // 階段は高い段が後ろ半分にあるので、低い段の前寄りに座る（背中が段に埋まらないように）
-                double shift = stair ? 0.3 : 0;
-                seat = new Vec3(spot.getX() + 0.5 + front.getStepX() * shift, spot.getY() + top, spot.getZ() + 0.5 + front.getStepZ() * shift);
+                seatYaw = seatFront(s).toYRot();
+                seat = candidate;
                 android.setState(RuinAndroid.STATE_SIT);
             } else {
                 seat = android.position();

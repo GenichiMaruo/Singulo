@@ -2041,6 +2041,9 @@ public abstract class RuinAndroid extends Monster {
     /** 遺構のアンドロイドがいなくなったら、印刷台に知らせる（倒されたか、ただ消えたか）。読み込みが外れただけなら知らせない。 */
     @Override
     public void remove(RemovalReason reason) {
+        if (reason.shouldDestroy() && level() instanceof ServerLevel && life != null) {
+            life.dropHeld();
+        }
         super.remove(reason);
         if (!guard && home != null && reason.shouldDestroy() && level() instanceof ServerLevel level && level.isLoaded(home)
                 && level.getBlockEntity(home) instanceof AndroidFabricatorBlockEntity fabricator) {

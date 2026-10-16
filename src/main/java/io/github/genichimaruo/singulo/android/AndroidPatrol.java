@@ -253,10 +253,9 @@ public final class AndroidPatrol {
         BlockPos at = killed.blockPosition();
         if (!log.isEmpty()) {
             Entry last = log.get(0);
-            if (last.kind == KIND_KILL && last.what.equals(what) && level.getGameTime() - last.gameTime < MERGE_TICKS
+            if (unreported > 0 && last.kind == KIND_KILL && last.what.equals(what) && level.getGameTime() - last.gameTime < MERGE_TICKS
                     && last.pos.closerThan(at, MERGE_RANGE)) {
                 log.set(0, new Entry(level.getGameTime(), level.getDayTime(), KIND_KILL, what, last.count + 1, last.pos));
-                unreported++;
                 android.syncPatrolLog();
                 return;
             }
@@ -269,7 +268,7 @@ public final class AndroidPatrol {
         while (log.size() > LOG_SIZE) {
             log.remove(log.size() - 1);
         }
-        unreported++;
+        unreported = Math.min(log.size(), unreported + 1);
         android.syncPatrolLog();
     }
 

@@ -46,6 +46,8 @@ public final class GuiReviewHarness {
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) {
             return;
         }
+        // Opening menus and resizing can move the real cursor back onto a tooltip.
+        org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
         if (phase == 0) {
             phase = 1;
             mc.getSingleplayerServer().execute(() -> prepare(mc));
@@ -144,6 +146,39 @@ public final class GuiReviewHarness {
             }
             case 17 -> {
                 capture(mc, "station-ja-854x480");
+                openAndroid(mc);
+                phase = 19;
+            }
+            case 19 -> {
+                require(mc, AndroidScreen.class);
+                ((AndroidMenu) mc.player.containerMenu).setPage(AndroidMenu.PAGE_LOG);
+                phase++;
+            }
+            case 20 -> {
+                capture(mc, "android-log-ja-854x480");
+                openBlock(mc, STATION);
+                phase++;
+            }
+            case 21 -> {
+                require(mc, AndroidStationScreen.class);
+                mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId, AndroidStationBlockEntity.BUTTON_MODE_PATROL);
+                phase++;
+            }
+            case 22 -> {
+                if (!((AndroidStationMenu) mc.player.containerMenu).patrolling()) {
+                    throw new IllegalStateException("Patrol button did not reach server");
+                }
+                capture(mc, "station-patrol-ja-854x480");
+                mc.screen.mouseClicked((mc.getWindow().getGuiScaledWidth() - AndroidStationMenu.WIDTH) / 2 + 190,
+                        (mc.getWindow().getGuiScaledHeight() - AndroidStationMenu.HEIGHT) / 2 + 8, 0);
+                phase++;
+            }
+            case 23 -> {
+                if (!((AndroidStationMenu) mc.player.containerMenu).ruleView()) {
+                    throw new IllegalStateException("Route page button did not open route slots");
+                }
+                capture(mc, "station-rules-ja-854x480");
+                ((AndroidStationMenu) mc.player.containerMenu).setRuleView(false);
                 phase = 99;
                 mc.getLanguageManager().setSelected("en_us");
                 mc.reloadResourcePacks().thenRun(() -> mc.execute(() -> {
@@ -153,8 +188,26 @@ public final class GuiReviewHarness {
             }
             case 18 -> {
                 require(mc, AndroidStationScreen.class);
+                capture(mc, "station-patrol-en-854x480");
+                mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId, AndroidStationBlockEntity.BUTTON_MODE_GUARD);
+                phase = 26;
+            }
+            case 26 -> {
+                if (((AndroidStationMenu) mc.player.containerMenu).patrolling()) {
+                    throw new IllegalStateException("Return from patrol did not reach server");
+                }
                 capture(mc, "station-en-854x480");
-                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 15");
+                openAndroid(mc);
+                phase = 24;
+            }
+            case 24 -> {
+                require(mc, AndroidScreen.class);
+                ((AndroidMenu) mc.player.containerMenu).setPage(AndroidMenu.PAGE_LOG);
+                phase++;
+            }
+            case 25 -> {
+                capture(mc, "android-log-en-854x480");
+                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 20");
                 phase++;
                 mc.stop();
             }
@@ -302,6 +355,19 @@ public final class GuiReviewHarness {
         android.fillTanks(new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 16000), false);
         level.addFreshEntity(android);
         androidId = android.getUUID();
+        try {
+            var patrolField = RuinAndroid.class.getDeclaredField("patrol");
+            patrolField.setAccessible(true);
+            Object patrol = patrolField.get(android);
+            var onKill = patrol.getClass().getDeclaredMethod("onKill", net.minecraft.server.level.ServerLevel.class,
+                    net.minecraft.world.entity.LivingEntity.class);
+            onKill.setAccessible(true);
+            var zombie = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
+            zombie.setPos(android.position());
+            onKill.invoke(patrol, level, zombie);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Could not populate review patrol log", e);
+        }
         var console = (WorkConsoleBlockEntity) level.getBlockEntity(CONSOLE);
         console.setOwner(player.getUUID());
         ItemStack link = item("work_location_card");
