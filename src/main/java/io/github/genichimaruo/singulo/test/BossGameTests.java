@@ -487,7 +487,9 @@ public final class BossGameTests {
     }
 
     /** 戦いの最中に投げたブラックホール爆弾は着弾せず、記録者の頭の特異点に吸い込まれて体力が戻る。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
+    // The capture radius extends beyond a single fixture; concurrent archivists
+    // can legitimately capture this bomb first. Give this arena its own batch.
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100, batch = "archivist_bomb_absorption")
     public static void archivistSwallowsBlackHoleBombs(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         LastArchivist a = arena(helper).activateArchivist(helper.getLevel(), null);

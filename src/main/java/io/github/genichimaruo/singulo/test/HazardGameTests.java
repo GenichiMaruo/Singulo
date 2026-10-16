@@ -73,11 +73,24 @@ public final class HazardGameTests {
         BlockPos diamond = new BlockPos(1, 1, 5).offset(20000, 200, 20000);
         BlockPos debris = new BlockPos(5, 1, 1).offset(20000, 200, 20000);
         BlockPos ruin = new BlockPos(5, 1, 5).offset(20000, 200, 20000);
+        BlockPos c = helper.absolutePos(new BlockPos(3, 1, 3).offset(20000, 200, 20000));
+        // A distant scan still intersects naturally generated terrain. Clear the entire
+        // scan sphere so exact hidden-ore counts do not depend on world seed/height.
+        int radius = NeutrinoScannerItem.RADIUS;
+        for (int x = (c.getX() - radius) >> 4; x <= (c.getX() + radius) >> 4; x++) {
+            for (int z = (c.getZ() - radius) >> 4; z <= (c.getZ() + radius) >> 4; z++) {
+                helper.getLevel().getChunk(x, z);
+            }
+        }
+        for (BlockPos pos : BlockPos.betweenClosed(c.offset(-radius, -radius, -radius), c.offset(radius, radius, radius))) {
+            if (c.distSqr(pos) <= radius * radius && !helper.getLevel().getBlockState(pos).isAir()) {
+                helper.getLevel().setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+            }
+        }
         helper.setBlock(iron, Blocks.IRON_ORE);
         helper.setBlock(diamond, Blocks.DIAMOND_ORE);
         helper.setBlock(debris, Blocks.ANCIENT_DEBRIS);
         helper.setBlock(ruin, SinguloBlocks.RUIN_PANEL.get());
-        BlockPos c = helper.absolutePos(new BlockPos(3, 1, 3).offset(20000, 200, 20000));
         NeutrinoScannerItem.Result t1 = NeutrinoScannerItem.scan(helper.getLevel(), c, 1);
         NeutrinoScannerItem.Result t2 = NeutrinoScannerItem.scan(helper.getLevel(), c, 2);
         NeutrinoScannerItem.Result t3 = NeutrinoScannerItem.scan(helper.getLevel(), c, 3);
