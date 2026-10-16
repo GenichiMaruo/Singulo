@@ -229,6 +229,8 @@ public final class PrototypeGameTests {
         bit.setHealth(bit.getMaxHealth() / 2);
         Zombie target = dummy(helper, new BlockPos(7, 2, 10));
         target.setNoGravity(true);
+        // Keep the timing target inside the cleared arena after beam knockback.
+        target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         bit.setTarget(target);
         bit.setNoAi(false);
         float[] previous = {target.getHealth()};
@@ -244,7 +246,7 @@ public final class PrototypeGameTests {
             previous[0] = target.getHealth();
         });
         helper.succeedWhen(() -> {
-            helper.assertTrue(checked[0], "突進命中後の光線を検査できない");
+            helper.assertTrue(checked[0], "突進命中後の光線を検査できない: slashHit=" + slashHit[0] + " target=" + target.position() + " health=" + target.getHealth() + " bit=" + bit.position() + " charge=" + bit.charge());
             bit.discard(); target.discard();
         });
     }

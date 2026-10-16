@@ -327,6 +327,14 @@ public final class GuiReviewHarness {
         var level = player.serverLevel();
         player.setGameMode(GameType.CREATIVE);
         player.teleportTo(2.5, 80, 2.5);
+        // The copied GameTest world has an arbitrary seed and terrain height.
+        // Build a closed, empty review room before placing the preview entities.
+        for (BlockPos p : BlockPos.betweenClosed(-3, 80, -3, 9, 85, 6)) {
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        }
+        for (BlockPos p : BlockPos.betweenClosed(-3, 86, -3, 9, 86, 6)) {
+            level.setBlock(p, Blocks.STONE.defaultBlockState(), 2);
+        }
         for (BlockPos p : BlockPos.betweenClosed(-2, 79, -2, 8, 79, 5)) {
             level.setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());
         }
@@ -343,6 +351,7 @@ public final class GuiReviewHarness {
         BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(level);
         android.makeGuard(player.getUUID(), STATION, RuinAndroid.MODE_GUARD, 30);
         android.setNoAi(true);
+        android.setInvulnerable(true); // GUI preview must survive unrelated world hazards.
         android.moveTo(1.5, 80, 1.5);
         android.inventory().setItem(RuinAndroid.SLOT_BATTERY, item("android_battery_upgrade").copyWithCount(2));
         android.inventory().setItem(RuinAndroid.SLOT_BACKPACK, item("android_backpack_upgrade"));
