@@ -1108,6 +1108,9 @@ public final class AndroidGameTests {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
         BlockPos from = p(0, 1, 5), to = p(1, 1, 5);
+        // Natural gravel above the cleared template must not refill a mined cell.
+        helper.setBlock(from.above(6), net.minecraft.world.level.block.Blocks.STONE);
+        helper.setBlock(to.above(6), net.minecraft.world.level.block.Blocks.STONE);
         helper.setBlock(from, net.minecraft.world.level.block.Blocks.STONE);
         helper.setBlock(to, net.minecraft.world.level.block.Blocks.STONE);
         var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,

@@ -342,7 +342,7 @@ public final class BossFairnessGameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY, batch = "boss_fair_legacy")
     public static void legacySaveAdoptsPlayersWhoLogInInside(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper, 24);
         LastArchivist original = archivist(helper);
         Vec3 c = LastArchivist.shieldCenter(original.home());
         call(original, LastArchivist.class, "raiseShield", helper);

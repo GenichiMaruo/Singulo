@@ -67,6 +67,10 @@ public final class Legacy {
     }
     /** Completed machines and hostiles must not affect later fixtures in their search radius. */
     public static void isolateFixture(net.minecraft.gametest.framework.GameTestHelper helper) {
+        isolateFixture(helper, 0);
+    }
+    /** Include a test arena extending beyond its structure in chunk readiness and cleanup. */
+    public static void isolateFixture(net.minecraft.gametest.framework.GameTestHelper helper, int horizontalMargin) {
         try {
             var field = java.util.Arrays.stream(net.minecraft.gametest.framework.GameTestHelper.class.getDeclaredFields())
                     .filter(f -> f.getType() == net.minecraft.gametest.framework.GameTestInfo.class).findFirst().orElseThrow();
@@ -74,7 +78,7 @@ public final class Legacy {
             var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
             // Vanilla returns the last block coordinate, while AABB.contains uses
             // an exclusive upper bound. Include the final row/ceiling of blocks.
-            var bounds = info.getStructureBounds().expandTowards(1, 1, 1);
+            var bounds = info.getStructureBounds().expandTowards(1, 1, 1).inflate(horizontalMargin, 0, horizontalMargin);
             // GameTestServer advances ticks without a real-time delay. A fixed setupTicks
             // does not guarantee that asynchronously promoted chunks can tick entities yet.
             // Pump chunk tasks before the fixture starts, without advancing its game clock.
