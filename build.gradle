@@ -4,6 +4,15 @@ plugins {
     id 'idea'
 }
 
+// Select one legacy loader while sharing all production sources.
+def selectedLoader = providers.gradleProperty('loader').getOrElse('neoforge')
+if (!(selectedLoader in ['forge', 'neoforge'])) {
+    throw new GradleException('Use -Ploader=forge or -Ploader=neoforge')
+}
+def selectedSuffix = selectedLoader == 'forge' ? 'F' : 'N'
+def selectedLoaderVersion = selectedLoader == 'forge' ? forge_version : neoforge_version
+layout.buildDirectory = layout.projectDirectory.dir("build/${selectedLoader}")
+
 version = mod_version
 group = mod_group_id
 
@@ -16,7 +25,7 @@ base {
 }
 
 tasks.withType(net.neoforged.moddevgradle.legacyforge.tasks.RemapJar).configureEach {
-    archiveFileName = "${mod_name}-${mod_version}-${minecraft_version}${mod_loader_suffix}.jar"
+    archiveFileName = "${mod_name}-${mod_version}-${minecraft_version}${selectedSuffix}.jar"
 }
 
 // Minecraft 1.20.1 compiles and runs with Java 17.
@@ -24,8 +33,10 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 legacyForge {
     accessTransformers.from('src/main/resources/META-INF/accesstransformer.cfg')
-    enable {
-        neoForgeVersion = "${minecraft_version}-${forge_version}"
+    if (selectedLoader == 'forge') {
+        version = "${minecraft_version}-${selectedLoaderVersion}"
+    } else {
+        enable { neoForgeVersion = "${minecraft_version}-${selectedLoaderVersion}" }
     }
 
     parchment {
@@ -34,6 +45,7 @@ legacyForge {
     }
 
     runs {
+        configureEach { gameDirectory = layout.projectDirectory.dir("run/${selectedLoader}") }
         client {
             client()
             systemProperty 'singulo.clientSmokeTest', providers.gradleProperty('clientSmokeTest').getOrElse('false')
@@ -48,7 +60,7 @@ legacyForge {
         gameTestServer {
             type = "gameTestServer"
             // Keep tests separate from development worlds and local server settings.
-            gameDirectory = project.file('build/gametest')
+            gameDirectory = layout.buildDirectory.dir('gametest')
             // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
             systemProperty 'forge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab')
         }
@@ -96,7 +108,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
     var replaceProperties = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            forge_version          : forge_version,
+            forge_version          : selectedLoaderVersion,
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
@@ -107,7 +119,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
     inputs.properties replaceProperties
     expand replaceProperties
     from "src/main/templates"
-    into "build/generated/sources/modMetadata"
+    into layout.buildDirectory.dir("generated/sources/modMetadata")
 }
 sourceSets.main.resources.srcDir generateModMetadata
 legacyForge.ideSyncTask generateModMetadata
@@ -142,7 +154,7 @@ var verifyGameTestResults = tasks.register('verifyGameTestResults') {
         def log = gameTestResultLog.get().asFile
         def result = log.isFile() ? (log.getText('UTF-8') =~ /All ([1-9][0-9]*) required tests passed/) : null
         if (result == null || !result.find()) {
-            throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/gametest/logs/latest.log')
+            throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/<loader>/gametest/logs/latest.log')
         }
         def namespace = selectedGameTestNamespace
         def expected = ['singulo': 252, 'singulo_automation': 49, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 15, 'singulo_mekanism': 2][namespace]

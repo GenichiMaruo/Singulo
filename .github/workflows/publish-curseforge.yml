@@ -1,87 +1,69 @@
 name: Publish CurseForge Beta
 
+# Publish only artifacts from a successful validation of the exact tagged tree.
+# Tag creation alone never uploads a duplicate or triggers another full build.
 on:
-  push:
-    tags: ['v*-1.20.1N', 'v*-1.20.1N-r*']
   workflow_dispatch:
     inputs:
       verified_run_id:
-        description: 'Successful PR validation run to promote without rebuilding'
-        required: false
+        description: 'Successful validation run covering both 1.20.1 loaders'
+        required: true
         type: string
       release_tag:
-        description: 'Existing immutable tag matching the verified CI tree'
-        required: false
+        description: 'Existing immutable v<version>-1.20.1F or N tag'
+        required: true
         type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: curseforge-${{ inputs.release_tag || github.ref }}
+  group: curseforge-${{ inputs.release_tag }}
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 15
     permissions:
       contents: write
       actions: read
     env:
-      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
       VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
       RELEASE_TAG: ${{ inputs.release_tag }}
-      SOURCE_DIR: ${{ inputs.verified_run_id != '' && 'release-source' || '.' }}
       GH_TOKEN: ${{ github.token }}
     environment: curseforge
-    outputs:
-      name: ${{ steps.version.outputs.name }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
-        if: inputs.verified_run_id != ''
         with:
           ref: ${{ inputs.release_tag }}
           path: release-source
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: |
-            17
-            21
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: gradle/actions/setup-gradle@v4
-      - name: Validate version and changelog
+      - name: Validate version, loader and changelog
         id: version
         shell: bash
-        working-directory: ${{ env.SOURCE_DIR }}
+        working-directory: release-source
         run: |
-          if [[ -n "$VERIFIED_RUN_ID" && -z "$RELEASE_TAG" || -z "$VERIFIED_RUN_ID" && -n "$RELEASE_TAG" ]]; then
-            echo 'verified_run_id and release_tag must be supplied together'; exit 1
-          fi
           version=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')
           mod_name=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d '\r')
           minecraft=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')
-          suffix=$(sed -n 's/^mod_loader_suffix=//p' gradle.properties | tr -d '\r')
-          [[ "$suffix" == N ]] || { echo 'This workflow publishes NeoForge builds (N)'; exit 1; }
-          if [[ "$GITHUB_REF_TYPE" == tag || -n "$RELEASE_TAG" ]]; then
-            tag_name="${RELEASE_TAG:-$GITHUB_REF_NAME}"
-            tag_prefix="v$version-$minecraft$suffix"
-            retry_suffix="${tag_name#"$tag_prefix"}"
-            if [[ "$tag_name" != "$tag_prefix" && ( "$retry_suffix" == "$tag_name" || ! "$retry_suffix" =~ ^-r[1-9][0-9]*$ ) ]]; then
-              echo 'Tag must match the version, Minecraft and loader, optionally followed by -r<number>'
-              exit 1
-            fi
-          fi
+          case "$RELEASE_TAG" in
+            *-1.20.1F|*-1.20.1F-r*) loader=forge; suffix=F ;;
+            *-1.20.1N|*-1.20.1N-r*) loader=neoforge; suffix=N ;;
+            *) echo 'Invalid 1.20.1 loader tag'; exit 1 ;;
+          esac
+          # verified_release.py independently enforces the full version/tag match.
+          test "$minecraft" = 1.20.1
           test -f "docs/curseforge/changelog-$version.md"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "name=$mod_name-$version-$minecraft$suffix" >> "$GITHUB_OUTPUT"
           echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
+          echo "loader=$loader" >> "$GITHUB_OUTPUT"
       - name: Validate source and resources
-        working-directory: ${{ env.SOURCE_DIR }}
+        working-directory: release-source
         run: |
           python tools/localization.py --check
           python tools/check_models.py
@@ -89,82 +71,55 @@ jobs:
           python tools/check_advancements.py
           python tools/check_recipe_parity.py
           python tools/check_port_1201.py
-      - name: Build and run GameTests
-        if: inputs.verified_run_id == ''
-        run: |
-          chmod +x gradlew
-          mkdir -p build/reports/gametest
-          for namespace in singulo singulo_automation singulo_reactor singulo_prototype singulo_progression singulo_lab; do
-            ./gradlew --no-daemon --max-workers=2 -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64 -PtestNamespace="$namespace" build runGameTestServer
-            cp build/gametest/logs/latest.log "build/reports/gametest/$namespace.log"
-          done
-          python3 tools/check_port_1201.py --jar "build/libs/${{ steps.version.outputs.name }}.jar"
       - name: Verify CI provenance and immutable tag
         id: verified
-        if: inputs.verified_run_id != ''
         run: python3 tools/verified_release.py check --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
       - uses: actions/download-artifact@v4
-        if: inputs.verified_run_id != ''
         with:
           github-token: ${{ github.token }}
           run-id: ${{ inputs.verified_run_id }}
           pattern: ${{ steps.verified.outputs.pattern }}
           path: verified-artifacts
       - name: Promote the validated production JAR
-        if: inputs.verified_run_id != ''
         env:
           JAR_NAME: ${{ steps.version.outputs.name }}.jar
         run: |
-          python3 tools/verified_release.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source --output "build/libs/$JAR_NAME"
-          python3 release-source/tools/check_port_1201.py --jar "build/libs/$JAR_NAME"
+          python3 tools/verified_release.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source --output "release-artifacts/$JAR_NAME"
+          python3 release-source/tools/check_port_1201.py --jar "release-artifacts/$JAR_NAME"
       - name: Reserve release tag without distributing a GitHub JAR
-        if: github.ref_type == 'tag' || inputs.release_tag != ''
         env:
           RELEASE_NAME: ${{ steps.version.outputs.name }}
           MOD_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          tag_name="${RELEASE_TAG:-$GITHUB_REF_NAME}"
-          cp "$SOURCE_DIR/docs/curseforge/changelog-$MOD_VERSION.md" release-notes.md
+          cp "release-source/docs/curseforge/changelog-$MOD_VERSION.md" release-notes.md
           cat >> release-notes.md <<'NOTES'
 
           Download the mod from CurseForge: https://www.curseforge.com/minecraft/mc-mods/singulo/files
           NOTES
-          # Creating this asset-free draft fails if the tag was already reserved.
-          # Keep it on upload failure to prevent an accidental duplicate CF upload.
-          gh release create "$tag_name" --repo "$GITHUB_REPOSITORY" --verify-tag \
+          # Keep the asset-free draft on upload failure to prevent duplicate uploads.
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag \
             --draft --prerelease --latest=false --title "$RELEASE_NAME (Beta)" --notes-file release-notes.md
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.version.outputs.name }}
-          path: build/libs/${{ steps.version.outputs.name }}.jar
+          path: release-artifacts/${{ steps.version.outputs.name }}.jar
           if-no-files-found: error
       - name: Publish Beta to CurseForge
         uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3
         with:
           curseforge-id: ${{ secrets.CURSEFORGE_PROJECT_ID || vars.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          files: build/libs/${{ steps.version.outputs.name }}.jar
+          files: release-artifacts/${{ steps.version.outputs.name }}.jar
           name: ${{ steps.version.outputs.name }}
           version: ${{ steps.version.outputs.version }}
           version-type: beta
-          changelog-file: ${{ env.SOURCE_DIR }}/docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
-          loaders: neoforge
+          changelog-file: release-source/docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
+          loaders: ${{ steps.version.outputs.loader }}
           game-versions: ${{ steps.version.outputs.minecraft }}
           java: '17'
           dependencies: |
             jei(optional)
             mekanism(optional)
           fail-mode: fail
-
-  release-notes:
-    needs: publish
-    if: github.ref_type == 'tag' || inputs.release_tag != ''
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
       - name: Publish release notes with CurseForge download link only
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest=false

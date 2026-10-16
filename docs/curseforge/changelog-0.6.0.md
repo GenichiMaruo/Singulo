@@ -1,6 +1,6 @@
-## Singulo-0.6.0-1.20.1N
+## Singulo 0.6.0 — Minecraft 1.20.1 (Forge / NeoForge)
 
-Backport of Singulo 0.6.0 to Minecraft 1.20.1 / NeoForge 47.1.106 (Java 17). Update both client and server. New ruin fabricators appear in newly generated chunks. Minecraft 1.21.1 worlds cannot be downgraded with this file.
+Backport of Singulo 0.6.0 to Minecraft 1.20.1 / Forge・NeoForge 47.1.106 (Java 17). Update both client and server. New ruin fabricators appear in newly generated chunks. Minecraft 1.21.1 worlds cannot be downgraded with this file.
 
 ### Androids
 A new kind of enemy, and a companion you can build.

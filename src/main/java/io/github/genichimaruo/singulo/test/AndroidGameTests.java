@@ -599,11 +599,13 @@ public final class AndroidGameTests {
         helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
         net.minecraft.world.entity.item.ItemEntity drop = helper.spawnItem(Items.APPLE, 6.5F, 1, 10.5F);
         drop.setPickUpDelay(0);
+        // Test tidying an already-old item. Otherwise the guard can begin a random
+        // 20-40 second sit before this item ages, consuming almost the whole timeout.
+        CompoundTag droppedItem = drop.saveWithoutId(new CompoundTag());
+        droppedItem.putShort("Age", (short) (20 * 11));
+        drop.load(droppedItem);
+        helper.assertTrue(drop.getAge() >= 20 * 11, "片付け対象の落下物が十分に古くない");
         helper.onEachTick(() -> {
-            // 落ちた物が「しばらく落ちたまま」（10秒）になってから急かす（先に別の暮らしを始めて、時間切れにならないように）
-            if (drop.isAlive() && drop.getAge() < 20 * 11) {
-                return;
-            }
             for (RuinAndroid a : androids(helper)) {
                 if (a.printed() && a.tickCount % 40 == 0 && a.state() == RuinAndroid.STATE_IDLE) {
                     a.lifeNow();

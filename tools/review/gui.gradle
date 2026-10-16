@@ -3,8 +3,8 @@ allprojects {
     afterEvaluate {
         sourceSets.main.java.srcDir(file('tools/review/gui-src'))
         legacyForge.runs.client {
-            gameDirectory = file('build/gui-review')
-            systemProperty 'singulo.guiReviewOutput', file('build/gui-review/screenshots').absolutePath
+            gameDirectory = layout.buildDirectory.dir('gui-review').get().asFile
+            systemProperty 'singulo.guiReviewOutput', layout.buildDirectory.dir('gui-review/screenshots').get().asFile.absolutePath
             programArgument '--quickPlaySingleplayer'
             programArgument 'Review'
             programArgument '--width'

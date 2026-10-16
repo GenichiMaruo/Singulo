@@ -1,6 +1,6 @@
-## Singulo-0.8.0-1.20.1N
+## Singulo 0.8.0 — Minecraft 1.20.1 (Forge / NeoForge)
 
-For **Minecraft 1.20.1 / NeoForge**, Java 17. JEI and Mekanism are optional.
+For **Minecraft 1.20.1 / Forge・NeoForge**, Java 17. JEI and Mekanism are optional.
 
 ### Smarter android work
 - Androids can switch between orders at the same console and work on other jobs while a machine processes its inputs.
