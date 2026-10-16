@@ -43,5 +43,6 @@ public final class SinguloComponents {
     public static void remove(ItemStack stack, Key<?> key) {
         if (stack.getTag() != null) stack.getTag().remove(key.name());
     }
+    public static final Supplier<Key<io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content>> CHEMICAL_SAMPLE = key("chemical_sample", io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content.CODEC);
     private SinguloComponents() {}
 }

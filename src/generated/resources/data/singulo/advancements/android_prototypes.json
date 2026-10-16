@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "item": "singulo:android_memory_bit"
+    },
+    "title": {
+      "translate": "advancement.singulo.android_prototypes.title"
+    },
+    "description": {
+      "translate": "advancement.singulo.android_prototypes.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "singulo:android_memory_axe"
+            ]
+          },
+          {
+            "items": [
+              "singulo:android_memory_bit"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "singulo:foundry"
+}

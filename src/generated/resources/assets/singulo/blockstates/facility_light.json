@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=true": {
+      "model": "singulo:block/facility_light_on"
+    },
+    "powered=false": {
+      "model": "singulo:block/facility_light_off"
+    }
+  }
+}

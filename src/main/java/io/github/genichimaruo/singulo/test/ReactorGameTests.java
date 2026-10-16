@@ -29,7 +29,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 /**
  * ペンローズ・リアクターの確認。引力帯が周りのテストに届かないよう、別の組（batch）にして順番に流す。
  */
-@GameTestHolder(Singulo.MODID)
+@GameTestHolder("singulo_reactor")
 @PrefixGameTestTemplate(false)
 public final class ReactorGameTests {
     private static final String HUGE = "reactor_isolated";
@@ -421,6 +421,25 @@ public final class ReactorGameTests {
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 120, batch = "reactor_isolated_pelletsNeverOverfillCore")
     public static void pelletsNeverOverfillCore(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        // This measures pellet feeding only. Foreign items are deliberately allowed
+        // to exceed MAX_MASS (covered by overfilledReactorCollapsesAndCanBeRecaptured).
+        // Horizontal padding does not stop gravel falling through the 15-block-high
+        // fixture from a previous crater. Seal all six faces before starting the core.
+        for (int x = 0; x < 64; x++) for (int z = 0; z < 64; z++) {
+            helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(x, 14, z), net.minecraft.world.level.block.Blocks.BEDROCK);
+        }
+        for (int y = 1; y < 14; y++) for (int n = 0; n < 64; n++) {
+            helper.setBlock(new BlockPos(0, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(63, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(n, y, 0), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(n, y, 63), net.minecraft.world.level.block.Blocks.BEDROCK);
+        }
+        var room = new net.minecraft.world.phys.AABB(helper.absolutePos(BlockPos.ZERO),
+                helper.absolutePos(new BlockPos(64, 15, 64)));
+        helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, room,
+                e -> e instanceof ItemEntity || e instanceof net.minecraft.world.entity.item.FallingBlockEntity)
+                .forEach(net.minecraft.world.entity.Entity::discard);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
         helper.runAtTickTime(3, () -> {

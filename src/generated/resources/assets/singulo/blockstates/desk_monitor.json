@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "singulo:block/desk_monitor"
+    },
+    "facing=east": {
+      "model": "singulo:block/desk_monitor",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "singulo:block/desk_monitor",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "singulo:block/desk_monitor",
+      "y": 270
+    }
+  }
+}

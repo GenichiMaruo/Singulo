@@ -16,11 +16,9 @@
   },
   "criteria": {
     "done": {
-      "trigger": "minecraft:player_killed_entity",
+      "trigger": "singulo:milestone",
       "conditions": {
-        "entity": {
-          "type": "singulo:ergosphere_leviathan"
-        }
+        "id": "defeat/ergosphere_leviathan"
       }
     }
   },

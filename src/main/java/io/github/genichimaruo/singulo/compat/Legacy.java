@@ -25,10 +25,12 @@ public final class Legacy {
     private static final class FixtureScope {
         final net.minecraft.server.level.ServerLevel level;
         final net.minecraft.world.phys.AABB bounds;
+        final net.minecraft.gametest.framework.GameTestInfo info;
         final java.util.Set<net.minecraft.world.entity.Entity> entities =
                 java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
-        FixtureScope(net.minecraft.server.level.ServerLevel level, net.minecraft.world.phys.AABB bounds) {
-            this.level = level; this.bounds = bounds;
+        FixtureScope(net.minecraft.server.level.ServerLevel level, net.minecraft.world.phys.AABB bounds,
+                     net.minecraft.gametest.framework.GameTestInfo info) {
+            this.level = level; this.bounds = bounds; this.info = info;
         }
     }
     private static void trackFixtureEntity(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
@@ -70,15 +72,17 @@ public final class Legacy {
                     .filter(f -> f.getType() == net.minecraft.gametest.framework.GameTestInfo.class).findFirst().orElseThrow();
             field.setAccessible(true);
             var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
-            var bounds = info.getStructureBounds();
+            // Vanilla returns the last block coordinate, while AABB.contains uses
+            // an exclusive upper bound. Include the final row/ceiling of blocks.
+            var bounds = info.getStructureBounds().expandTowards(1, 1, 1);
             // GameTestServer advances ticks without a real-time delay. A fixed setupTicks
             // does not guarantee that asynchronously promoted chunks can tick entities yet.
             // Pump chunk tasks before the fixture starts, without advancing its game clock.
             var level = helper.getLevel();
             int minX = net.minecraft.util.Mth.floor(bounds.minX) >> 4;
-            int maxX = net.minecraft.util.Mth.floor(bounds.maxX) >> 4;
+            int maxX = net.minecraft.util.Mth.floor(bounds.maxX - 1) >> 4;
             int minZ = net.minecraft.util.Mth.floor(bounds.minZ) >> 4;
-            int maxZ = net.minecraft.util.Mth.floor(bounds.maxZ) >> 4;
+            int maxZ = net.minecraft.util.Mth.floor(bounds.maxZ - 1) >> 4;
             java.util.List<BlockPos> chunks = new java.util.ArrayList<>();
             for (int x = minX; x <= maxX; x++) for (int z = minZ; z <= maxZ; z++) {
                 level.setChunkForced(x, z, true);
@@ -87,13 +91,18 @@ public final class Legacy {
             }
             java.util.function.BooleanSupplier ready = () -> chunks.stream().allMatch(level::isPositionEntityTicking);
             long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
-            level.getServer().managedBlock(() -> ready.getAsBoolean() || System.nanoTime() >= deadline);
+            level.getServer().managedBlock(() -> {
+                // Ticket promotion is owned by the chunk event loop, not just the
+                // server queue. Pump it while waiting without advancing world ticks.
+                level.getChunkSource().pollTask();
+                return ready.getAsBoolean() || System.nanoTime() >= deadline;
+            });
             helper.assertTrue(ready.getAsBoolean(), "Fixture chunks did not become entity-ticking before setup");
             if (!fixtureTracking) {
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(Legacy::trackFixtureEntity);
                 fixtureTracking = true;
             }
-            var scope = new FixtureScope(level, bounds);
+            var scope = new FixtureScope(level, bounds, info);
             FIXTURES.add(scope);
             addCleanupListener(info, new net.minecraft.gametest.framework.GameTestListener() {
                 public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo test) {}
@@ -106,9 +115,9 @@ public final class Legacy {
                     for (var entity : scope.entities) entity.discard();
                     // Keep forced chunks intact: another simultaneously running fixture may share one.
                     int minX = net.minecraft.util.Mth.floor(bounds.minX) >> 4;
-                    int maxX = net.minecraft.util.Mth.floor(bounds.maxX) >> 4;
+                    int maxX = net.minecraft.util.Mth.floor(bounds.maxX - 1) >> 4;
                     int minZ = net.minecraft.util.Mth.floor(bounds.minZ) >> 4;
-                    int maxZ = net.minecraft.util.Mth.floor(bounds.maxZ) >> 4;
+                    int maxZ = net.minecraft.util.Mth.floor(bounds.maxZ - 1) >> 4;
                     for (int x = minX; x <= maxX; x++) for (int z = minZ; z <= maxZ; z++) {
                         var chunk = level.getChunkSource().getChunkNow(x, z);
                         if (chunk == null) continue;
@@ -149,6 +158,11 @@ public final class Legacy {
                     .filter(f -> f.getType() == net.minecraft.gametest.framework.GameTestInfo.class).findFirst().orElseThrow();
             field.setAccessible(true);
             var info = (net.minecraft.gametest.framework.GameTestInfo) field.get(helper);
+            // Workshop floors can replace the structure block. Use the snapshot taken
+            // by isolateFixture before any fixture blocks were placed.
+            var fixtureBounds = FIXTURES.stream().filter(f -> f.info == info).map(f -> f.bounds)
+                    .findFirst().orElseGet(info::getStructureBounds);
+            java.util.Objects.requireNonNull(fixtureBounds, "GameTest fixture bounds");
             addCleanupListener(info, new net.minecraft.gametest.framework.GameTestListener() {
                 public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo test) {}
                 public void testPassed(net.minecraft.gametest.framework.GameTestInfo test) { cleanup(); }
@@ -157,12 +171,13 @@ public final class Legacy {
                     // Automatic orders search nearby workers. Stop this completed fixture before
                     // the next batch places another workshop inside that search radius.
                     var level = helper.getLevel();
-                    var origin = helper.absolutePos(net.minecraft.core.BlockPos.ZERO);
-                    var bounds = new net.minecraft.world.phys.AABB(origin, helper.absolutePos(new net.minecraft.core.BlockPos(8, 8, 8)));
+                    var bounds = fixtureBounds;
+                    var origin = BlockPos.containing(bounds.minX, bounds.minY, bounds.minZ);
+                    var end = BlockPos.containing(bounds.maxX - 1, bounds.maxY - 1, bounds.maxZ - 1);
                     for (var android : level.getEntitiesOfClass(io.github.genichimaruo.singulo.android.RuinAndroid.class, bounds)) {
                         android.discard();
                     }
-                    for (var pos : net.minecraft.core.BlockPos.betweenClosed(origin, helper.absolutePos(new net.minecraft.core.BlockPos(7, 7, 7)))) {
+                    for (var pos : net.minecraft.core.BlockPos.betweenClosed(origin, end)) {
                         if (level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console) {
                             console.orders().clear();
                             console.standing().clear();

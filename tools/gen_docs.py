@@ -5,7 +5,7 @@
 - 進捗: data/singulo/advancement/*.json と advancement.singulo.* の文
 """
 
-from advancements import ADVANCEMENTS, HIDDEN_ADVANCEMENTS
+from advancements import ADVANCEMENTS, HIDDEN_ADVANCEMENTS, validate_advancements
 from descriptions import DESC
 from guide import CHAPTERS
 
@@ -74,6 +74,7 @@ def guide(ctx, ja, en):
 
 
 def advancements(ctx, ja, en):
+    validate_advancements()
     out = []
     for aid, parent, icon, frame, cond, stage, jt, jd, et, ed in ADVANCEMENTS:
         icon_id = icon if ':' in icon else f'{MODID}:{icon}'
@@ -92,6 +93,10 @@ def advancements(ctx, ja, en):
         elif kind == 'item':
             item = cond[1] if ':' in cond[1] else f'{MODID}:{cond[1]}'
             crit = {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': [{'items': item}]}}
+        elif kind in ('any_item', 'all_items'):
+            items = [item if ':' in item else f'{MODID}:{item}' for item in cond[1:]]
+            predicates = [{'items': item} for item in items] if kind == 'all_items' else [{'items': items}]
+            crit = {'trigger': 'minecraft:inventory_changed', 'conditions': {'items': predicates}}
         elif kind == 'milestone':
             crit = {'trigger': f'{MODID}:milestone', 'conditions': {'id': cond[1]}}
         elif kind == 'kill':
@@ -102,6 +107,9 @@ def advancements(ctx, ja, en):
         if parent is not None:
             adv['parent'] = f'{MODID}:{parent}'
         ctx['write_json'](ctx['DATA'] / 'advancement' / f'{aid}.json', adv)
-        out.append({'id': aid, 'parent': parent, 'stage': stage})
+        entry = {'id': aid, 'parent': parent, 'stage': stage}
+        if aid in HIDDEN_ADVANCEMENTS:
+            entry['hidden'] = True
+        out.append(entry)
     # ハンドブックが段階ごとに並べるための一覧
     ctx['write_json'](ctx['ASSETS'] / 'guide' / 'advancements.json', {'advancements': out})

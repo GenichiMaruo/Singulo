@@ -141,6 +141,7 @@ public final class RuinGameTests {
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void ruinTemplatesHaveCacheAndGuards(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        // 地下アンドロイド研究所は部屋の型紙を並べるので、LabGameTests で確かめる
         for (String ruin : List.of("observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor")) {
             Optional<StructureTemplate> template = helper.getLevel().getStructureManager().get(Singulo.id("ruins/" + ruin));
             helper.assertTrue(template.isPresent(), "構造物ファイルがない: " + ruin);

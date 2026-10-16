@@ -28,5 +28,5 @@
       }
     }
   },
-  "parent": "singulo:compressor"
+  "parent": "singulo:circuit"
 }

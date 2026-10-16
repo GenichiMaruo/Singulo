@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "open=false": {
+      "model": "singulo:block/bulkhead"
+    },
+    "open=true": {
+      "model": "singulo:block/bulkhead"
+    }
+  }
+}

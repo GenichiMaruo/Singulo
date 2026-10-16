@@ -19,5 +19,19 @@ public final class SinguloWorldgen {
     public static final RegistryObject<StructurePieceType> METEOR_CRATER_PIECE =
             PIECES.register("meteor_crater", () -> MeteorCraterPiece::new);
 
+    /** 地下アンドロイド研究所（部屋の型紙をランダムに並べる）と、その部品。 */
+    public static final RegistryObject<StructureType<io.github.genichimaruo.singulo.ruin.lab.LabStructure>> ANDROID_LAB =
+            STRUCTURE_TYPES.register("android_lab", () -> () -> io.github.genichimaruo.singulo.ruin.lab.LabStructure.CODEC);
+    public static final RegistryObject<StructurePieceType> LAB_HULL =
+            PIECES.register("lab_hull", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Hull::new);
+    public static final RegistryObject<StructurePieceType> LAB_ROOM =
+            PIECES.register("lab_room", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Room::new);
+    public static final RegistryObject<StructurePieceType> LAB_CORRIDOR =
+            PIECES.register("lab_corridor", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Corridor::new);
+    public static final RegistryObject<StructurePieceType> LAB_DOOR =
+            PIECES.register("lab_door", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Doors::new);
+    public static final RegistryObject<StructurePieceType> LAB_SHAFT =
+            PIECES.register("lab_shaft", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Shaft::new);
+
     private SinguloWorldgen() {}
 }
