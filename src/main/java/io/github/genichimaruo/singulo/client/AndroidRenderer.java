@@ -82,10 +82,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         if (super.shouldRender(android, frustum, x, y, z)) {
             return true;
         }
-        if (android instanceof BitAndroid bit && bit.deployed() > 0 && android.shouldRender(x, y, z)) {
-            // 本体が画面外でも、突進中のビットが見えるなら描く。当たり判定は変えない。
+        if (android instanceof BitAndroid bit && bit.recallingFrom(0) > 0 && android.shouldRender(x, y, z)) {
+            // 本体が画面外でも、突進中・背中へ帰還中のビットが見えるなら描く。当たり判定は変えない。
             var bounds = android.getBoundingBox();
-            for (int i = 0; i < bit.deployed(); i++) {
+            for (int i = 0; i < bit.recallingFrom(0); i++) {
                 Vec3 at = bit.bitPosition(i, 1);
                 bounds = bounds.minmax(new net.minecraft.world.phys.AABB(at, at).inflate(1));
             }

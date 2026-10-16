@@ -31,6 +31,7 @@ public final class Stage6ReviewHarness {
     private static BitAndroid bit;
     private static Zombie target;
     private static int ticks, phase, wait;
+    private static boolean observedRecall, observedRecallCulling;
     private static final Set<Integer> captured = new HashSet<>();
 
     @SubscribeEvent
@@ -57,8 +58,28 @@ public final class Stage6ReviewHarness {
             mc.player.setXRot((float) (-Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * 180 / Math.PI));
             int elapsed = (int) (mc.level.getGameTime() - started);
             int frame = elapsed / 3;
-            if (elapsed >= 15 && elapsed < 180 && captured.add(frame)) capture(mc, String.format("bits-%03d", elapsed));
+            if (elapsed >= 15 && elapsed < 200 && captured.add(frame)) capture(mc, String.format("bits-%03d", elapsed));
+            var localBit = mc.level.getEntitiesOfClass(BitAndroid.class, mc.player.getBoundingBox().inflate(30)).stream().findFirst().orElse(null);
+            if (elapsed > 170 && localBit != null && localBit.deployed() == 0 && localBit.recallingFrom(0) > 0) {
+                observedRecall = true;
+                var edge = new net.minecraft.client.renderer.culling.Frustum(new org.joml.Matrix4f(), new org.joml.Matrix4f()) {
+                    @Override
+                    public boolean isVisible(net.minecraft.world.phys.AABB box) {
+                        return box.getXsize() > 2.5 || box.getZsize() > 2.5;
+                    }
+                };
+                // Reject the body alone, accept the volume containing the floating bits.
+                var renderer = mc.getEntityRenderDispatcher().getRenderer(localBit);
+                Vec3 camera = mc.gameRenderer.getMainCamera().getPosition();
+                if (!localBit.shouldRender(camera.x, camera.y, camera.z))
+                    throw new IllegalStateException("Recall culling fixture is beyond render distance");
+                if (!renderer.shouldRender(localBit, edge, camera.x, camera.y, camera.z))
+                    throw new IllegalStateException("Recalling bits culled when only the body is outside the frustum");
+                observedRecallCulling = true;
+            }
             if (elapsed > 205) {
+                if (!observedRecall || !observedRecallCulling || localBit == null || localBit.recallingFrom(0) != 0)
+                    throw new IllegalStateException("Recall animation did not begin and finish on client");
                 phase = 2;
                 mc.options.hideGui = false;
                 mc.getSingleplayerServer().execute(() -> {
@@ -112,7 +133,7 @@ public final class Stage6ReviewHarness {
                 phase++;
             } else if (phase == 9) {
                 capture(mc, "handbook-hidden-after-ja");
-                Singulo.LOGGER.info("SINGULO_STAGE6_VISUAL_COMPLETE combatFrames={} advancements=3 handbook=2 hiddenBefore=false hiddenAfter=true", captured.size());
+                Singulo.LOGGER.info("SINGULO_STAGE6_VISUAL_COMPLETE combatFrames={} advancements=3 handbook=2 recall=true recallCulling=true hiddenBefore=false hiddenAfter=true", captured.size());
                 mc.stop();
                 phase++;
             }
@@ -124,6 +145,7 @@ public final class Stage6ReviewHarness {
         if (!prepared || started < 0 || bit == null || event.getServer() != Minecraft.getInstance().getSingleplayerServer()) return;
         int t = (int) (bit.level().getGameTime() - started);
         var level = (net.minecraft.server.level.ServerLevel) bit.level();
+        if (t == 170) bit.setDeployed(0);
         if (t == 25) bit.fire(level, 0, target);
         if (t == 50 || t == 150) bit.slash(level, 1, target);
         if (t >= 100 && t <= 135) {
