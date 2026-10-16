@@ -165,6 +165,40 @@ public class BitAndroid extends RuinAndroid {
         return new Vec3(-Math.sin(a) * r, y, Math.cos(a) * r);
     }
 
+    /** しまうとき、ビットが背中へ戻っていく長さ（tick。見た目だけ）。 */
+    public static final int RECALL = 12;
+    /** クライアント: 最後に見た浮かんでいる数と、減ったときの元の数・時刻（戻っていく見た目に使う）。 */
+    private int seenDeployed;
+    private int recallFrom;
+    private int recallStart = Integer.MIN_VALUE / 2;
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (key == DEPLOYED && level().isClientSide) {
+            int n = deployed();
+            if (n < seenDeployed) {
+                recallFrom = Math.max(seenDeployed, recalling(0) ? recallFrom : 0);
+                recallStart = tickCount;
+            }
+            seenDeployed = n;
+        }
+    }
+
+    private boolean recalling(float partialTick) {
+        return recallProgress(partialTick) < 1 && recallFrom > deployed();
+    }
+
+    /** 戻っていく途中のビットを含めた数（戻っていなければ浮かんでいる数）。 */
+    public int recallingFrom(float partialTick) {
+        return recalling(partialTick) ? recallFrom : deployed();
+    }
+
+    /** 背中へ戻る進み具合（0〜1）。 */
+    public float recallProgress(float partialTick) {
+        return Mth.clamp((tickCount + partialTick - recallStart) / RECALL, 0, 1);
+    }
+
     /** ビットを浮かべる・しまう。 */
     public void setDeployed(int n) {
         if (deployed() != n) {

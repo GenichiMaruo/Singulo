@@ -542,32 +542,52 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      */
     private void renderBits(BitAndroid bit, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         int n = bit.deployed();
-        if (n <= 0 || !bit.printed()) {
+        int total = Math.max(n, bit.recallingFrom(partialTick));     // n より後ろは、背中へ戻っていく途中
+        if (total <= 0 || !bit.printed()) {
             return;
         }
+        float back = ease(bit.recallProgress(partialTick));
         float age = bit.tickCount + partialTick;
         float bodyYaw = Mth.rotLerp(partialTick, bit.yBodyRotO, bit.yBodyRot);
         float out = 1;
         if (bit.state() == BitAndroid.STATE_DEPLOY) {
             out = ease(Mth.clamp((bit.stateTime(partialTick) - BitAndroid.DEPLOY / 2F) / 5, 0, 1));
         }
-        Vec3[] at = new Vec3[n];
-        for (int i = 0; i < n; i++) {
-            at[i] = stowedOffset(i % BitAndroid.BITS, bodyYaw).lerp(bit.bitPosition(i, partialTick).subtract(bit.getPosition(partialTick)), out);
+        Vec3[] at = new Vec3[total];
+        float[] size = new float[total];
+        for (int i = 0; i < total; i++) {
+            Vec3 stowed = stowedOffset(i % BitAndroid.BITS, bodyYaw);
+            Vec3 flying = bit.bitPosition(i, partialTick).subtract(bit.getPosition(partialTick));
+            if (i < n) {
+                at[i] = stowed.lerp(flying, out);
+                size[i] = 1;
+            } else {
+                // 戻る: 少し上へ弧を描きながら背中の差し込み口へ吸い込まれ、小さくなる
+                at[i] = flying.lerp(stowed, back).add(0, 0.35 * Mth.sin(Mth.PI * back), 0);
+                size[i] = Mth.lerp(back, 1F, 0.8F);
+            }
         }
         VertexConsumer solid = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < total; i++) {
             pose.pushPose();
             pose.translate(at[i].x, at[i].y, at[i].z);
             orientBit(pose, bit.bitDirection(i, partialTick));
+            pose.scale(size[i], size[i], size[i]);
             bitBody(pose, solid, light);
             pose.popPose();
         }
         VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < total; i++) {
             pose.pushPose();
             pose.translate(at[i].x, at[i].y, at[i].z);
             orientBit(pose, bit.bitDirection(i, partialTick));
+            pose.scale(size[i], size[i], size[i]);
+            if (i >= n) {
+                // 戻る途中: 光の芯と、通り道に残る短い光の尾
+                glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent, (int) (220 * (1 - back * 0.5F)));
+                pose.popPose();
+                continue;
+            }
             float pulse = 0.75F + 0.25F * Mth.sin(age * 0.4F + i * 1.3F);
             glowBox(pose, fx, -0.018F, -0.018F, -0.1F, 0.018F, 0.018F, 0.1F, variant.accent, (int) (200 * pulse));
             glowBox(pose, fx, -0.03F, -0.03F, 0.13F, 0.03F, 0.03F, 0.2F + 0.05F * pulse, variant.accent, (int) (120 * pulse));
@@ -1425,7 +1445,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             if (!(android instanceof BitAndroid bit) || !android.printed()) {
                 return;
             }
-            int out = bit.deployed();
+            int out = bit.recallingFrom(partialTick);          // 戻っていく途中のビットは、着くまで背中に描かない
             if (bit.state() == BitAndroid.STATE_DEPLOY && bit.stateTime(partialTick) < BitAndroid.DEPLOY / 2F) {
                 out = 0;                                  // 送り出す前は、まだ背中にある
             }
