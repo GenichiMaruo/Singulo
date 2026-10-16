@@ -16,7 +16,8 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 | **1.20.1** | **Forge** 47.4.26+ | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
 | **1.20.1** | **NeoForge** 47.1.106+ | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
 
-ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) や [GitHub Releases](https://github.com/GenichiMaruo/Singulo/releases) からも選べます。
+ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) からも選べます。配布用JARはCurseForgeからダウンロードしてください。GitHub Releasesには変更履歴と配布先へのリンクのみを掲載します。
+Download mod JARs from CurseForge. GitHub Releases contain release notes and a link to CurseForge only.
 
 ## 何ができる？
 
