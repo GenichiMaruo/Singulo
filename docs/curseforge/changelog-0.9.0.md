@@ -19,6 +19,7 @@ This release focuses on polishing existing content rather than adding new areas.
 
 ### Balance
 - Felling now costs charge based on the size of the tree (12 plus 2 per log) instead of a flat 24.
+- Ruin Android Fabricators now drop a compact crystal memory half the time when all their androids are defeated, instead of every time. The fabricator still rests for a day either way. Boss drops are unchanged.
 
 ### Handbook and tooltips
 - Each stage chapter now starts with an overview: what to build in order, the key to the next stage and common sticking points.

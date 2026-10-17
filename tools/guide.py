@@ -678,7 +678,7 @@ CHAPTERS = [
     ('androids', 'singulo:android_station', 'アンドロイド', 'Androids', [
         ('ruin', '遺構のアンドロイド',
          'どの遺構にも、壁際に遺構の印刷台があります。サバイバルのプレイヤーが近づくと、台の型（光刃型・鞭型・光剣型のどれか）の'
-         'アンドロイドを2〜3体、台の上へ下から積み上げるように印刷して出撃させます。全部倒すと、その型の小型クリスタルメモリが台の上に出て、台は1日休みます。\n'
+         'アンドロイドを2〜3体、台の上へ下から積み上げるように印刷して出撃させます。全部倒すと、半分の確率でその型の小型クリスタルメモリが台の上に出ます。出ても出なくても、台は1日休みます。\n'
          '・光刃型「ルミナ」: 身をかがめて刃が光ったら、残像を残して詰め寄る瞬歩斬り。片膝をついて床に手を当てたら、足元に予告の輪が出て光の柱が立つ（輪から出る）。'
          '近くでは刃を広げて回転斬り。\n'
          '・鞭型「ヴェルナ」: 約6ブロック先まで届く鞭打ちと、巻きつけて引き寄せる絡め取り。鞭を頭上で回したら、床に打ち付けて一直線の衝撃波（跳べば当たらない）。\n'
@@ -693,8 +693,8 @@ CHAPTERS = [
          '（印刷台5秒・太陽光10秒・座り込み14秒）。充電中は攻撃してこないので、攻めどきです。',
          'Ruin androids',
          'Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids '
-         'of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of '
-         'that design appears on the fabricator, which then rests for a day.\n'
+         'of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and, half the time, a compact crystal '
+         'memory of that design appears on the fabricator. Either way, the fabricator then rests for a day.\n'
          '- Blade Android "Lumina": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches '
          'the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n'
          '- Whip Android "Verna": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams '

@@ -217,12 +217,13 @@ public final class AndroidGameTests {
         });
     }
 
-    /** 出撃したアンドロイドが全部倒されたら、設計メモリが1つだけ出る。 */
+    /** 出撃したアンドロイドが全部倒されたら、設計メモリが（出る回なら）1つだけ出る。 */
     @GameTest(template = EMPTY, timeoutTicks = 160)
     public static void fabricatorDropsMemoryWhenAllDefeated(GameTestHelper helper) {
         BlockPos at = new BlockPos(2, 1, 2);
         BladeAndroid a = ruinAndroid(helper, at);
         AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
+        f.setMemoryChanceForTest(1);
         a.kill();
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(f.alive() == 0, "倒したアンドロイドが出撃に残っている");
@@ -230,6 +231,22 @@ public final class AndroidGameTests {
             for (ItemEntity e : helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(helper.absolutePos(at)).inflate(4))) {
                 e.discard();
             }
+            helper.succeed();
+        });
+    }
+
+    /** 設計メモリが出ない回: 全部倒しても何も出ず、台は1日休む（確率は半分）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 160)
+    public static void fabricatorSometimesDropsNoMemory(GameTestHelper helper) {
+        helper.assertTrue(AndroidFabricatorBlockEntity.MEMORY_CHANCE == 0.5F, "設計メモリの確率が半分でない: " + AndroidFabricatorBlockEntity.MEMORY_CHANCE);
+        BlockPos at = new BlockPos(2, 1, 2);
+        BladeAndroid a = ruinAndroid(helper, at);
+        AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
+        f.setMemoryChanceForTest(0);
+        a.kill();
+        helper.runAfterDelay(60, () -> {
+            helper.assertTrue(f.alive() == 0, "倒したアンドロイドが出撃に残っている");
+            helper.assertTrue(memories(helper, at) == 0, "出ない回なのに設計メモリが出た: " + memories(helper, at));
             helper.succeed();
         });
     }
