@@ -1031,6 +1031,36 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 手が空いていてステーションの近くにいれば、充電が減っているときは自分で戻って満タンにする。 */
+    @GameTest(template = EMPTY, timeoutTicks = 1600)
+    public static void idleGuardTopsUpCharge(GameTestHelper helper) {
+        floor(helper);
+        station(helper, 1);
+        boolean[] drained = {false}, docked = {false};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (list.isEmpty() || !list.get(0).printed() || drained[0] || list.get(0).state() != RuinAndroid.STATE_IDLE) {
+                if (!list.isEmpty() && drained[0]) {
+                    docked[0] |= list.get(0).state() == RuinAndroid.STATE_CHARGING;
+                }
+                return;
+            }
+            RuinAndroid a = list.get(0);
+            drained[0] = true;
+            CompoundTag saved = a.saveWithoutId(new CompoundTag());
+            saved.putInt("charge", a.maxCharge() / 2);                     // 半分（充電切れではない）
+            a.load(saved);
+            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(6, 1, 6))));
+        });
+        helper.succeedWhen(() -> {
+            List<RuinAndroid> list = androids(helper);
+            helper.assertTrue(drained[0] && docked[0], "充電が減っても、ステーションへ充電しに戻らない");
+            RuinAndroid a = list.get(0);
+            helper.assertTrue(a.charge() == a.maxCharge(), "満タンにならない: " + a.charge());
+            list.forEach(RuinAndroid::discard);
+        });
+    }
+
     /** 素材が足りない注文は、計算で止まる（原木1本では棒16本は作れない）。在庫で足りれば作れる。 */
     @GameTest(template = EMPTY)
     public static void workPlanNeedsMaterials(GameTestHelper helper) {

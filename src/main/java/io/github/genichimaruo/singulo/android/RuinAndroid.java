@@ -65,6 +65,8 @@ public abstract class RuinAndroid extends Monster {
     public static final int RATE_REST = CHARGE_MAX / 280;
     /** これより遠い印刷台へは戻らない（その場で充電する）。 */
     public static final double DOCK_RANGE = 32;
+    /** 手が空いているとき、充電が減っていれば満タンにしに戻る、ステーションからの距離。 */
+    static final double TOP_UP_RANGE = 24;
     /** 印刷にかかる tick。 */
     public static final int PRINT_TICKS = 60;
     /** 印刷台から離れていい距離（遺構のもの）。 */
@@ -2023,6 +2025,14 @@ public abstract class RuinAndroid extends Monster {
                 && retreatCooldown <= 0 && tickCount % 20 == 7 && getHealth() < getMaxHealth()
                 && tickCount - getLastHurtByMobTimestamp() > 100 && level().getBlockEntity(home) instanceof AndroidStationBlockEntity) {
             // 傷ついていて、手が空いている（戦っていない・作業していない）: ステーションへ戻って直す
+            setState(STATE_RETREAT);
+        }
+        if (guard && printed() && active() && mode != MODE_FOLLOW && getTarget() == null && !isWorking() && home != null
+                && retreatCooldown <= 0 && tickCount % 20 == 13 && charge() < maxCharge()
+                && tickCount - getLastHurtByMobTimestamp() > 100
+                && Vec3.atBottomCenterOf(home.above()).distanceToSqr(position()) < TOP_UP_RANGE * TOP_UP_RANGE
+                && level().getBlockEntity(home) instanceof AndroidStationBlockEntity) {
+            // 手が空いていて、ステーションの近くにいて、充電が減っている: 満タンにしに戻る（暇なときは満タンを目指す）
             setState(STATE_RETREAT);
         }
         if (guard && getTarget() != null && !guardTargets(getTarget())) {

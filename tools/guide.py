@@ -800,7 +800,8 @@ CHAPTERS = [
          'first corner recorded, the area up to the block you look at is previewed). The icons over working androids only show while you wear them.'),
         ('care', '充電と修理と装備',
          '・充電: 護衛はステーションへ戻って5秒で満タン（電力を使い、体力も直る）。追従中は、無線充電器を持っていれば持ち主のそばで、ついて歩きながら5秒で満タン'
-         '（充電器は満タンで30回分。電力を出すブロックを右クリックして充電する）。ステーションが遠く充電器もなければ、太陽光か座り込みで充電します。\n'
+         '（充電器は満タンで30回分。電力を出すブロックを右クリックして充電する）。ステーションが遠く充電器もなければ、太陽光か座り込みで充電します。'
+         '手が空いていてステーションから24ブロック以内にいれば、充電が減ったときは自分で満タンにしに戻ります。\n'
          '・持ち物: 自分のアンドロイドを右クリックすると画面が開きます。自己修理キット（1スタック）は、体力が戻る割合を下回ったときに1つ使って半分直します。'
          'アンドロイド用装甲板（1枚）は胸当てになり（防御 +8、防具強度 +2）、防具のエンチャントが付けられます。積むと胸と左肩に装甲が付きます。\n'
          '・ステーションの補充スロットに自己修理キットを入れておくと、1つでも減れば補充します。強化スロットに転送アップグレードを積むと、倒れたときの持ち物を'
@@ -809,7 +810,8 @@ CHAPTERS = [
          'Charging, repair and gear',
          '- Charging: a guard refills in 5 s back at its station (using power, and it heals too). While following, if you carry an Android Wireless Charger '
          'it comes to you and refills in 5 s as it walks with you (a full charger holds 30 refills; right-click a block that supplies power to charge it). '
-         'With the station far away and no charger, it uses solar power or sits down.\n'
+         'With the station far away and no charger, it uses solar power or sits down. When it has nothing to do and is within 24 blocks '
+         'of its station, it goes back on its own to top up whenever its charge is not full.\n'
          '- Inventory: right-click your android to open its screen. A stack of Self-Repair Kits: one is used to restore half its health when it drops below '
          'the return health. One Android Armor Plate works as its chestplate (+8 armor, +2 toughness) and takes armor enchantments; it shows as plating on '
          'the chest and left shoulder.\n'
