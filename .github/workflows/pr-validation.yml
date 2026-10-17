@@ -2,7 +2,7 @@ name: PR validation
 
 on:
   pull_request:
-    branches: [main, feature/0.8.0]
+    branches: [1.21.1, main]
 
 permissions:
   contents: read
@@ -105,3 +105,29 @@ jobs:
         with:
           name: mekanism-validation-${{ github.sha }}
           path: build/gametest/logs/
+
+  forge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - name: Build the Forge version and run the same GameTests
+        run: bash ./gradlew -p forge --no-daemon --max-workers=2 --no-configuration-cache build runGameTestServer -PtestTickRate=200
+      - name: Require a completed nonempty successful Forge GameTest run
+        run: grep -E 'All [1-9][0-9]* required tests passed' forge/build/gametest/logs/latest.log
+      - name: Save Forge build outputs and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-validation-${{ github.sha }}
+          if-no-files-found: warn
+          path: |
+            forge/build/libs/*.jar
+            forge/build/gametest/logs/

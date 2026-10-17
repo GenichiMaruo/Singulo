@@ -1,0 +1,112 @@
+# Forge 版への名前の置き換え（正規表現 => 置き換え）。上から順に適用する。具体的なものを先に、パッケージ全体を最後に。
+# 本体
+net\.neoforged\.neoforge\.common\.NeoForgeMod\b => net.minecraftforge.common.ForgeMod
+\bNeoForgeMod\b => ForgeMod
+net\.neoforged\.neoforge\.common\.NeoForge\b => net.minecraftforge.common.MinecraftForge
+\bNeoForge\.EVENT_BUS\b => MinecraftForge.EVENT_BUS
+# 設定
+net\.neoforged\.neoforge\.common\.ModConfigSpec\b => net.minecraftforge.common.ForgeConfigSpec
+\bModConfigSpec\b => ForgeConfigSpec
+# 登録・アイテム
+net\.neoforged\.neoforge\.common\.DeferredSpawnEggItem\b => net.minecraftforge.common.ForgeSpawnEggItem
+\bDeferredSpawnEggItem\b => ForgeSpawnEggItem
+net\.neoforged\.neoforge\.common\.extensions\.IMenuTypeExtension\b => net.minecraftforge.common.extensions.IForgeMenuType
+\bIMenuTypeExtension\b => IForgeMenuType
+# 画面を開くときの追加データは、Forge では素の FriendlyByteBuf で届く（登録の情報つきに包み直す）
+IForgeMenuType\.create\(([\w.]+)::client\) => IForgeMenuType.create((id, inv, buf) -> $1.client(id, inv, new net.minecraft.network.RegistryFriendlyByteBuf(buf, inv.player.registryAccess())))
+net\.neoforged\.neoforge\.items\.wrapper\.EmptyItemHandler\b => net.minecraftforge.items.wrapper.EmptyHandler
+\bEmptyItemHandler\b => EmptyHandler
+# 流体
+net\.neoforged\.neoforge\.fluids\.BaseFlowingFluid\b => net.minecraftforge.fluids.ForgeFlowingFluid
+\bBaseFlowingFluid\b => ForgeFlowingFluid
+# イベント
+net\.neoforged\.neoforge\.event\.EventHooks\b => net.minecraftforge.event.ForgeEventFactory
+\bEventHooks\b => ForgeEventFactory
+net\.neoforged\.fml\.common\.EventBusSubscriber\b => net.minecraftforge.fml.common.Mod.EventBusSubscriber
+\bEventBusSubscriber\.Bus\.GAME\b => EventBusSubscriber.Bus.FORGE
+# GameTest
+@PrefixGameTestTemplate\(false\) => @GameTestDontPrefix
+# 型（ストラクチャ）の名前空間: NeoForge は value、Forge は namespace
+@GameTestHolder\(([^)=]+)\) => @GameTestHolder(value = $1, namespace = $1)
+net\.neoforged\.neoforge\.gametest\.PrefixGameTestTemplate\b => net.minecraftforge.gametest.GameTestDontPrefix
+# レジストリ（Forge の RegistryObject を包む、同じ形の仲介役へ）
+net\.neoforged\.neoforge\.registries\.DeferredRegister\b => io.github.genichimaruo.singulo.forgecompat.DeferredRegister
+net\.neoforged\.neoforge\.registries\.DeferredHolder\b => io.github.genichimaruo.singulo.forgecompat.DeferredHolder
+net\.neoforged\.neoforge\.registries\.DeferredItem\b => io.github.genichimaruo.singulo.forgecompat.DeferredItem
+net\.neoforged\.neoforge\.registries\.DeferredBlock\b => io.github.genichimaruo.singulo.forgecompat.DeferredBlock
+net\.neoforged\.neoforge\.registries\.NeoForgeRegistries\.Keys\.FLUID_TYPES\b => net.minecraftforge.registries.ForgeRegistries.Keys.FLUID_TYPES
+\bNeoForgeRegistries\.Keys\.FLUID_TYPES\b => net.minecraftforge.registries.ForgeRegistries.Keys.FLUID_TYPES
+# 機能（Capability。forgecompat の、NeoForge と同じ形の仲介役へ）
+net\.neoforged\.neoforge\.capabilities\. => io.github.genichimaruo.singulo.forgecompat.
+(\b\w+(?:\.getLevel\(\))?)\.getCapability\( => io.github.genichimaruo.singulo.forgecompat.Caps.find($1, 
+(\b\w+)\.invalidateCapabilities\( => io.github.genichimaruo.singulo.forgecompat.Caps.invalidate($1, 
+# 流体（Forge の FluidStack にない操作は forgecompat.FluidStacks へ）
+(?:net\.neoforged\.neoforge\.fluids\.)?FluidStack\.isSameFluidSameComponents\( => io.github.genichimaruo.singulo.forgecompat.FluidStacks.same(
+(?:net\.neoforged\.neoforge\.fluids\.)?FluidStack\.(CODEC|STREAM_CODEC)\b => io.github.genichimaruo.singulo.forgecompat.FluidStacks.$1
+(?:net\.neoforged\.neoforge\.fluids\.)?\bFluidUtil\.getFluidHandler\( => io.github.genichimaruo.singulo.forgecompat.FluidStacks.itemHandler(
+(?:net\.neoforged\.neoforge\.fluids\.)?\bFluidUtil\.interactWithFluidHandler\( => io.github.genichimaruo.singulo.forgecompat.FluidStacks.interact(
+(\b\w+)\.copyWithAmount\( => io.github.genichimaruo.singulo.forgecompat.FluidStacks.copyWithAmount($1,
+net\.neoforged\.neoforge\.fluids\.SimpleFluidContent\b => io.github.genichimaruo.singulo.forgecompat.SimpleFluidContent
+\.(readFromNBT|writeToNBT)\((?:registries|registryAccess\(\)), => .$1(
+# 通信（forgecompat.Net の、NeoForge と同じ形の仲介役へ）
+net\.neoforged\.neoforge\.network\.handling\.IPayloadContext\b => io.github.genichimaruo.singulo.forgecompat.IPayloadContext
+net\.neoforged\.neoforge\.network\.PacketDistributor\b => io.github.genichimaruo.singulo.forgecompat.PacketDistributor
+net\.neoforged\.neoforge\.network\.event\.RegisterPayloadHandlersEvent\b => io.github.genichimaruo.singulo.forgecompat.RegisterPayloadHandlersEvent
+net\.neoforged\.neoforge\.network\.registration\.PayloadRegistrar\b => io.github.genichimaruo.singulo.forgecompat.PayloadRegistrar
+(\b[\w.]+)\.hasChannel\( => io.github.genichimaruo.singulo.forgecompat.Net.hasChannel($1,
+# データの付け足し（forgecompat.AttachmentType。実体の永続データに書く）
+net\.neoforged\.neoforge\.attachment\.AttachmentType\b => io.github.genichimaruo.singulo.forgecompat.AttachmentType
+DeferredRegister\.create\((?:net\.neoforged\.neoforge\.registries\.)?NeoForgeRegistries\.Keys\.ATTACHMENT_TYPES, ([\w.]+)\) => io.github.genichimaruo.singulo.forgecompat.AttachmentType.registry($1)
+import net\.neoforged\.neoforge\.registries\.NeoForgeRegistries; => // (Forge 版にない)
+(\b\w+)\.getData\(([A-Z][\w.]*)\) => io.github.genichimaruo.singulo.forgecompat.AttachmentType.get($1, $2)
+(\b\w+)\.setData\(([A-Z][\w.]*), => io.github.genichimaruo.singulo.forgecompat.AttachmentType.set($1, $2,
+# 毎tick の出来事（Forge は TickEvent の中。プレイヤーは getEntity() ではなく player）
+net\.neoforged\.neoforge\.client\.event\.ClientTickEvent\b => net.minecraftforge.event.TickEvent.ClientTickEvent
+net\.neoforged\.neoforge\.event\.tick\.(PlayerTickEvent|ServerTickEvent)\b => net.minecraftforge.event.TickEvent.$1
+(PlayerTickEvent\.Post event\) \{\s+if \(!?\(?)event\.getEntity\(\) => $1event.player
+net\.neoforged\.neoforge\.event\.tick\.EntityTickEvent\b => net.minecraftforge.event.entity.living.LivingEvent
+\bEntityTickEvent\.Post\b => LivingEvent.LivingTickEvent
+# 描く範囲（NeoForge は描き手、Forge はブロックエンティティが決める。ブロックエンティティから描き手に聞く）
+# あわせて、登録した機能を Forge の既定（入れ物の自動のアイテムの機能など）より先に返す
+import net\.minecraft\.client\.renderer\.blockentity\.BlockEntityRenderer; => import io.github.genichimaruo.singulo.forgecompat.BlockEntityRenderer;
+new net\.minecraft\.client\.renderer\.blockentity\.BlockEntityRenderer< => new io.github.genichimaruo.singulo.forgecompat.BlockEntityRenderer<
+net\.neoforged\.neoforge\.common\.world\.chunk\.TicketController\b => io.github.genichimaruo.singulo.forgecompat.TicketController
+(Holder<ArmorMaterial> \w+ = (?:GravityBootsItem\.)?MATERIALS)\.register\( => $1.registerHolder(
+(public (?:abstract )?class \w+BlockEntity\b[^{]*\{) => $1 @Override public net.minecraft.world.phys.AABB getRenderBoundingBox() { net.minecraft.world.phys.AABB b = io.github.genichimaruo.singulo.forgecompat.RenderBounds.of(this); return b != null ? b : super.getRenderBoundingBox(); } @Override public <CAP_T> net.minecraftforge.common.util.LazyOptional<CAP_T> getCapability(net.minecraftforge.common.capabilities.Capability<CAP_T> cap, net.minecraft.core.Direction side) { net.minecraftforge.common.util.LazyOptional<CAP_T> o = io.github.genichimaruo.singulo.forgecompat.Caps.override(this, cap, side); return o != null ? o : super.getCapability(cap, side); }
+# イベントの細かな違い
+EVENT_BUS\.post\(([^;]*?)\)\.isCanceled\(\) => EVENT_BUS.post($1)
+net\.neoforged\.neoforge\.common\.util\.TriState\.TRUE\b => net.minecraftforge.eventbus.api.Event.Result.ALLOW
+net\.neoforged\.neoforge\.common\.util\.TriState\.FALSE\b => net.minecraftforge.eventbus.api.Event.Result.DENY
+net\.neoforged\.neoforge\.common\.util\.TriState\.DEFAULT\b => net.minecraftforge.eventbus.api.Event.Result.DEFAULT
+net\.neoforged\.neoforge\.common\.util\.FakePlayerFactory\b => io.github.genichimaruo.singulo.forgecompat.FakePlayerFactory
+\.getNewAboutToBeSetTarget\(\) => .getNewTarget()
+\bLivingIncomingDamageEvent\b => LivingHurtEvent
+\bLivingDamageEvent\.Post\b => LivingDamageEvent
+event\.(getNewDamage|getOriginalDamage)\(\) => event.getAmount()
+event\.getBlockedDamage\(\) => 0F
+ForgeEventFactory\.canEntityGrief\( => ForgeEventFactory.getMobGriefingEvent(
+event\.setCanGrief\(false\) => event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY)
+MobSpawnEvent\.PositionCheck\.Result\.FAIL\b => net.minecraftforge.eventbus.api.Event.Result.DENY
+\bPlayer\.PERSISTED_NBT_TAG\b => net.minecraft.server.level.ServerPlayer.PERSISTED_NBT_TAG
+\.getDigSpeed\( => .getDestroySpeed(
+\bForgeMod\.CREATIVE_FLIGHT\b => io.github.genichimaruo.singulo.forgecompat.Flight.CREATIVE_FLIGHT
+event\.getSkin\( => event.getPlayerSkin(
+event\.getRenderer\((net\.minecraft\.world\.entity\.EntityType\.) => event.getEntityRenderer($1
+# 描画の出来事（Forge の RenderLevelStageEvent は、姿勢が行列・partialTick が数）
+\.getPartialTick\(\)\.getGameTimeDeltaPartialTick\(\w+\) => .getPartialTick()
+PoseStack (\w+) = event\.getPoseStack\(\); => PoseStack $1 = new PoseStack(); $1.mulPose(event.getPoseStack());
+event\.getModelViewMatrix\(\) => event.getPoseStack()
+net\.neoforged\.neoforge\.energy\.ComponentEnergyStorage\b => io.github.genichimaruo.singulo.forgecompat.ComponentEnergyStorage
+# 流体・JEI
+\.is\(((?:io\.github\.genichimaruo\.singulo\.registry\.)?SinguloFluids\.get\() => .getFluid().isSame($1
+(new net\.neoforged\.neoforge\.fluids\.FluidStack\(fluid, 1\)|\bf)\.getHoverName\(\) => $1.getDisplayName()
+mezz\.jei\.api\.neoforge\.NeoForgeTypes\b => mezz.jei.api.forge.ForgeTypes
+mezz\.jei\.api\.neoforge\. => mezz.jei.api.forge.
+# 画面とクライアントの拡張の登録（Forge 版は forgecompat か、SinguloClient の書き分け）
+net\.neoforged\.neoforge\.client\.event\.RegisterMenuScreensEvent\b => io.github.genichimaruo.singulo.forgecompat.RegisterMenuScreensEvent
+import net\.neoforged\.neoforge\.client\.extensions\.common\.RegisterClientExtensionsEvent; => // (Forge 版にない)
+# パッケージ全体（最後に）
+net\.neoforged\.bus\.api\. => net.minecraftforge.eventbus.api.
+net\.neoforged\.api\.distmarker\. => net.minecraftforge.api.distmarker.
+net\.neoforged\.fml\. => net.minecraftforge.fml.
+net\.neoforged\.neoforge\. => net.minecraftforge.

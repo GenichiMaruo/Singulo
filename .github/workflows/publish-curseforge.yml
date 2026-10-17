@@ -60,6 +60,7 @@ jobs:
           echo "type=$type" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "name=$mod_name-$version-$minecraft$suffix" >> "$GITHUB_OUTPUT"
+          echo "forge_name=$mod_name-$version-${minecraft}F" >> "$GITHUB_OUTPUT"
           echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
       - name: Validate translations
         run: python tools/localization.py --check
@@ -67,10 +68,16 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" build runGameTestServer
+      - name: Build the Forge version and run GameTests
+        run: |
+          ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" -p forge --no-configuration-cache build runGameTestServer
+          grep -E 'All [1-9][0-9]* required tests passed' forge/build/gametest/logs/latest.log
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.version.outputs.name }}
-          path: build/libs/${{ steps.version.outputs.name }}.jar
+          path: |
+            build/libs/${{ steps.version.outputs.name }}.jar
+            forge/build/libs/${{ steps.version.outputs.forge_name }}.jar
           if-no-files-found: error
       - name: Publish to CurseForge (${{ steps.version.outputs.type }})
         uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3
@@ -83,6 +90,21 @@ jobs:
           version-type: ${{ steps.version.outputs.type }}
           changelog-file: docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
           loaders: neoforge
+          game-versions: ${{ steps.version.outputs.minecraft }}
+          java: '21'
+          dependencies: jei(optional)
+          fail-mode: fail
+      - name: Publish the Forge version to CurseForge (${{ steps.version.outputs.type }})
+        uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3
+        with:
+          curseforge-id: ${{ secrets.CURSEFORGE_PROJECT_ID || vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: forge/build/libs/${{ steps.version.outputs.forge_name }}.jar
+          name: ${{ steps.version.outputs.forge_name }}
+          version: ${{ steps.version.outputs.version }}-forge
+          version-type: ${{ steps.version.outputs.type }}
+          changelog-file: docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
+          loaders: forge
           game-versions: ${{ steps.version.outputs.minecraft }}
           java: '21'
           dependencies: jei(optional)

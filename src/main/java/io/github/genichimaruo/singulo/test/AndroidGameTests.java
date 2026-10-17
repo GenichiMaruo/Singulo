@@ -470,7 +470,8 @@ public final class AndroidGameTests {
     public static void patrolFollowsRouteRules(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
         var level = helper.getLevel();
-        BlockPos point = new BlockPos(6, 0, 1), via = new BlockPos(6, 0, 7);
+        // 経由地点のカードは床の高さに置く（Forge の GameTest は型を NeoForge より1段低く置くので、床の上の空気だと立つ高さが2段ずれる）
+        BlockPos point = new BlockPos(6, 0, 1), via = new BlockPos(6, -1, 7);
         routeCard(helper, s, 0, point);
         // 1行目: 経由地点・対象範囲（x 5〜7 の帯）・進入禁止ゾーン（x 4 の列、z 0〜6）
         ItemStack viaCard = new ItemStack(item("work_location_card"));
@@ -501,7 +502,8 @@ public final class AndroidGameTests {
         helper.succeedWhen(() -> {
             helper.assertFalse(trespassed[0], "経由地点へ向かうあいだに、進入禁止ゾーンに入った");
             helper.assertTrue(passedVia[0], "対象範囲に入るのに、経由地点を通らない");
-            helper.assertTrue(reached[0], "経由地点を通ったあと、巡回の地点へ行かない");
+            helper.assertTrue(reached[0], "経由地点を通ったあと、巡回の地点へ行かない: " + androids(helper).stream()
+                    .map(a -> a.position().subtract(Vec3.atLowerCornerOf(helper.absolutePos(BlockPos.ZERO))).toString()).toList());
             androids(helper).forEach(RuinAndroid::discard);
         });
     }

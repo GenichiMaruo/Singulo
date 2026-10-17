@@ -124,12 +124,28 @@ public final class RuinGameTests {
     @GameTest(template = EMPTY)
     public static void detectorDescribesDirectionAndBand(GameTestHelper helper) {
         BlockPos origin = new BlockPos(0, 64, 0);
-        String northeast = GravitationalWaveDetectorBlockEntity.describe(origin, new BlockPos(400, 64, -400)).getString();
-        helper.assertTrue(northeast.contains("北東") || northeast.contains("northeast"), "北東にならない: " + northeast);
-        helper.assertTrue(northeast.contains("512") , "距離帯が 512〜1024 にならない: " + northeast);
-        String south = GravitationalWaveDetectorBlockEntity.describe(origin, new BlockPos(0, 64, 100)).getString();
-        helper.assertTrue(south.contains("南") || south.contains("south"), "南にならない: " + south);
+        // 翻訳キーで確かめる（Forge のサーバーは mod の言語ファイルを読まないので、文字にすると キーのままになる）
+        String northeast = translationKeys(GravitationalWaveDetectorBlockEntity.describe(origin, new BlockPos(400, 64, -400)));
+        helper.assertTrue(northeast.contains("direction.singulo.northeast"), "北東にならない: " + northeast);
+        helper.assertTrue(northeast.contains("gui.singulo.detector.band.2"), "距離帯が 512〜1024 にならない: " + northeast);
+        String south = translationKeys(GravitationalWaveDetectorBlockEntity.describe(origin, new BlockPos(0, 64, 100)));
+        helper.assertTrue(south.contains("direction.singulo.south"), "南にならない: " + south);
         helper.succeed();
+    }
+
+    /** 文に含まれる翻訳キー（引数の中も）を空白区切りで並べる。 */
+    private static String translationKeys(net.minecraft.network.chat.Component c) {
+        StringBuilder out = new StringBuilder();
+        if (c.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t) {
+            out.append(t.getKey()).append(' ');
+            for (Object arg : t.getArgs()) {
+                if (arg instanceof net.minecraft.network.chat.Component a) {
+                    out.append(translationKeys(a));
+                }
+            }
+        }
+        c.getSiblings().forEach(s -> out.append(translationKeys(s)));
+        return out.toString();
     }
 
     @GameTest(template = EMPTY)
