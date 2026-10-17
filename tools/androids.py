@@ -130,6 +130,54 @@ def textures(te, save):
         base, glow = paint(pal, Image)
         save(base, te / f'{name}.png')
         save(glow, te / f'{name}_glow.png')
+    save(gunner_charge(VARIANTS['gunner_android'], Image), te / 'gunner_android_charge.png')
+
+
+def gunner_charge(pal, Image):
+    """射撃型がレールガンを溜めている間だけ重ねる、髪の光（普段は光らない髪の筋の一部と毛先が、水緑に光る）。"""
+    im = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
+    accent = pal['accent']
+    tip = tuple(min(255, c + 90) for c in accent)
+
+    def put(x, y, c):
+        im.putpixel((x, y), tuple(c) + (255,))
+
+    def part(name):
+        return faces(*ANDROID_PARTS[name])
+
+    def strands(rect, cols, top, tip_rows=1):
+        """髪の面の縦の筋 cols（面の左からの列）を、top 段目から毛先まで光らせる（毛先は明るく）。"""
+        x0, y0, x1, y1 = rect
+        for c in cols:
+            for y in range(y0 + top, y1):
+                put(x0 + c, y, tip if y >= y1 - tip_rows else accent)
+
+    # 後ろ髪: 背中側の筋3本と、両側面の筋。裏（頭側）の差し色の縁
+    f = part('back_hair')
+    strands(f['back'], (2, 5, 8), 3, 2)
+    strands(f['side_a'], (0,), 4)
+    strands(f['side_b'], (1,), 4)
+    x0, y0, x1, y1 = f['down']
+    for x in range(x0, x1, 2):
+        put(x, y0, tip)
+    # 髪の殻の後ろ: 下半分の筋
+    f = part('hair')
+    strands(f['back'], (2, 5), 4)
+    # 横の房とサイドテール: 毛先と、筋1本
+    for name in ('side_lock_l', 'side_lock_r'):
+        f = part(name)
+        for k in ('front', 'back', 'side_a', 'side_b'):
+            strands(f[k], (0,), max(0, f[k][3] - f[k][1] - 3), 1)
+    f = part('ponytail')
+    for k in ('back', 'side_a', 'side_b'):
+        strands(f[k], (1 if k == 'back' else 0,), 2, 2)
+    # アホ毛の先
+    f = part('ahoge')
+    for k in ('side_a', 'side_b'):
+        x0, y0, x1, y1 = f[k]
+        put(x0, y0, tip)
+        put(x0 + 1, y0, tip)
+    return im
 
 
 def paint(pal, Image):

@@ -36,6 +36,9 @@ import org.joml.Vector3f;
  * </ul>
  */
 public class GunnerAndroid extends RuinAndroid {
+    /** 銃声の音量（届く距離は 16 × 音量 ブロック）: 小型銃は 64、レールガンは 96 ブロック先まで聞こえる。 */
+    static final float PISTOL_SOUND_VOLUME = 4.0F, RAIL_SOUND_VOLUME = 6.0F;
+
     public static final int ACCENT = 0x6EF0D2;
 
     public static final int STATE_SHOT = 60;
@@ -44,6 +47,16 @@ public class GunnerAndroid extends RuinAndroid {
     public static final int STATE_RAIL_FIRE = 63;
     public static final int STATE_RAIL_STOW = 64;
     public static final int STATE_HOP = 65;
+
+    /** 仕草: 3連射のあとのリロード（エネルギーカートリッジの交換）と、相手を倒したあとの小型銃の一回し。 */
+    public static final int GESTURE_RELOAD = 20, GESTURE_TWIRL = 21;
+    /**
+     * リロード（エネルギーカートリッジの交換）の流れ: 空のカートリッジが握りの底から抜け落ち（RELOAD_EJECT から）、
+     * 左手で新しいカートリッジを運んで、RELOAD_INSERT に押し込み、RELOAD_DONE に握りのエネルギーが満ちる（仕草の tick）。
+     */
+    public static final int RELOAD_EJECT = 2, RELOAD_INSERT = 13, RELOAD_DONE = 20;
+    /** 倒したあと、この tick 以内に手が空けば（構えを解けば）、小型銃を一回す。 */
+    static final int TWIRL_WINDOW = 60;
 
     /** 小型銃の3連射: 構えてから 6・11・16 tick 目以降、相手の方を向けていれば撃つ（向き終わるまでは待つ）。 */
     public static final int SHOT = 21;
@@ -54,6 +67,8 @@ public class GunnerAndroid extends RuinAndroid {
     public static final int RAIL_CHARGE = 26;
     /** 溜めの終わりのこの tick 数だけ、狙いを動かさない（避ける間）。 */
     public static final int RAIL_LOCK = 9;
+    /** 溜めの間、3つのコイルが銃床側から順に灯る tick。 */
+    public static final int[] RAIL_STAGES = {6, 12, 19};
     public static final int RAIL_FIRE = 12;
     public static final int RAIL_STOW = 12;
     public static final int HOP = 10;
@@ -243,7 +258,8 @@ public class GunnerAndroid extends RuinAndroid {
         target.hurt(damageSources().mobAttack(this), SHOT_DAMAGE);
         setFx(from, to, SHOT_FROM, SHOT_AT);
         entityData.set(SHOT_FLASH, FLASH);
-        playSound(SoundEvents.AMETHYST_BLOCK_HIT, 0.9F, 1.9F);
+        // 銃声は遠くまで届かせる（音の届く距離は 16 × 音量 ブロック。1 を超えると近くでは最大の大きさで、遠くへ行くほど小さくなる）
+        playSound(SoundEvents.AMETHYST_BLOCK_HIT, PISTOL_SOUND_VOLUME, 1.9F);
         playSound(SoundEvents.FIREWORK_ROCKET_BLAST, 0.35F, 1.8F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, to.x, to.y, to.z, 4, 0.1, 0.1, 0.1, 0.1);
         return true;
@@ -293,7 +309,7 @@ public class GunnerAndroid extends RuinAndroid {
         }
         level.sendParticles(ParticleTypes.FLASH, end.x, end.y, end.z, 1, 0, 0, 0, 0);
         sparks(level, end, 12, 0.4);
-        playSound(SoundEvents.WARDEN_SONIC_BOOM, 0.8F, 1.6F);
+        playSound(SoundEvents.WARDEN_SONIC_BOOM, RAIL_SOUND_VOLUME, 1.6F);   // レールガンの轟音は、さらに遠くまで
         playSound(SoundEvents.TRIDENT_THUNDER.value(), 0.5F, 1.8F);
         setDeltaMovement(getDeltaMovement().add(-dir.x * 0.35, 0.05, -dir.z * 0.35));
         hasImpulse = true;
@@ -317,12 +333,45 @@ public class GunnerAndroid extends RuinAndroid {
         return box;
     }
 
+    /** リロードの仕草を始めてからの tick（-1 はリロードしていない）。カートリッジを押し込む音・満ちた音を鳴らす。 */
+    private int reloadTicks = -1;
+    /** 相手を倒してから、小型銃を一回すのを待つ残りの tick（0 は待っていない）。 */
+    private int twirlWait;
+
+    /** 相手を倒した: 手が空いたら小型銃を一回す。 */
+    @Override
+    public boolean killedEntity(ServerLevel level, LivingEntity killed) {
+        if (killed != this) {
+            twirlWait = TWIRL_WINDOW;
+        }
+        return super.killedEntity(level, killed);
+    }
+
     @Override
     public void tick() {
         super.tick();
         if (level() instanceof ServerLevel) {
             if (shotFlash() > 0) {
                 entityData.set(SHOT_FLASH, shotFlash() - 1);
+            }
+            if (reloadTicks >= 0) {
+                if (gesture() != GESTURE_RELOAD || state() != STATE_IDLE) {
+                    reloadTicks = -1;               // 次の構えが始まった: 途中でやめる
+                } else if (++reloadTicks == RELOAD_INSERT) {
+                    playSound(SoundEvents.IRON_TRAPDOOR_CLOSE, 0.5F, 1.9F);                 // カチッと押し込む
+                } else if (reloadTicks == RELOAD_DONE) {
+                    playSound(SoundEvents.CROSSBOW_LOADING_END.value(), 0.5F, 2.0F);       // エネルギーが満ちた
+                    reloadTicks = -1;
+                }
+            }
+            if (twirlWait > 0) {
+                twirlWait--;
+                LivingEntity target = getTarget();
+                if (state() == STATE_IDLE && active() && (target == null || !target.isAlive())) {
+                    twirlWait = 0;
+                    gesture(GESTURE_TWIRL, null);
+                    playSound(SoundEvents.ARMOR_EQUIP_IRON.value(), 0.6F, 1.8F);
+                }
             }
             // 作業中だけ、歩く速さを上げる
             var speed = getAttribute(Attributes.MOVEMENT_SPEED);
@@ -408,6 +457,12 @@ public class GunnerAndroid extends RuinAndroid {
                     if (shots >= SHOT_TICKS.length && stateTicks >= SHOT || stateTicks >= SHOT + 20) {
                         setState(STATE_IDLE);
                         nextBurst = 26 + random.nextInt(16);
+                        if (shots >= SHOT_TICKS.length) {
+                            // 撃ち切った: エネルギーカートリッジを交換する仕草
+                            gesture(GESTURE_RELOAD, null);
+                            reloadTicks = 0;
+                            playSound(SoundEvents.CROSSBOW_LOADING_START.value(), 0.5F, 1.8F);     // 空のカートリッジを抜く
+                        }
                     }
                 }
                 case STATE_RAIL_ASSEMBLE -> {
@@ -427,6 +482,11 @@ public class GunnerAndroid extends RuinAndroid {
                         aimRail(target);
                     } else {
                         getNavigation().stop();         // 狙いを固めた: もう相手を追わない（横へ避けられる）
+                    }
+                    for (int i = 0; i < RAIL_STAGES.length; i++) {
+                        if (stateTicks == RAIL_STAGES[i]) {
+                            playSound(SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.2F + 0.3F * i);     // コイルが1つ灯る
+                        }
                     }
                     if (stateTicks == RAIL_CHARGE - RAIL_LOCK) {
                         playSound(SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.9F);
