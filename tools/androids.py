@@ -629,6 +629,8 @@ def item_textures(ti, save):
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
     save(wear(print_unit_icon(Image), 37), ti / 'android_factory_print_unit.png')
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
+    save(wear(backpack_icon(Image, 2), 23), ti / 'android_reinforced_backpack_upgrade.png')
+    save(wear(backpack_icon(Image, 3), 29), ti / 'android_large_backpack_upgrade.png')
     save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
     save(droplet_icon(Image), ti / 'fluid_sample.png')
     save(bubble_icon(Image), ti / 'chemical_sample.png')
@@ -1041,8 +1043,9 @@ def battery_icon(Image):
     return im
 
 
-def backpack_icon(Image):
-    """バックパックアップグレード: 白い箱のバックパックに、黒いふたと肩ひも、光るライン。"""
+def backpack_icon(Image, tier=1):
+    """バックパックアップグレード: 白い箱のバックパックに、黒いふたと肩ひも、光るライン。
+    ティアが上がるほど光るラインが増え、色が変わる（1: 水色の1本、2: 紫の2本、3: 金の3本とふたの金具）。"""
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     px = im.load()
     for y in range(4, 14):
@@ -1059,8 +1062,16 @@ def backpack_icon(Image):
     for y in range(9, 12):
         for x in range(6, 10):
             px[x, y] = (200, 206, 216, 255)
+    glow = {1: (120, 225, 255, 255), 2: (196, 140, 255, 255), 3: (255, 210, 90, 255)}[tier]
     for x in range(4, 12):
-        px[x, 12] = (120, 225, 255, 255)
+        px[x, 12] = glow
+    if tier >= 2:
+        for x in range(4, 12):
+            px[x, 8] = glow
+    if tier >= 3:
+        for y in range(9, 12):
+            px[4, y] = px[11, y] = glow
+        px[7, 6] = px[8, 6] = (255, 236, 160, 255)      # ふたの金具
     return im
 
 

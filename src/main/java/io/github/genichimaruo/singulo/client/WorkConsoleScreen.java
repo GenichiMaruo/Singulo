@@ -1361,7 +1361,16 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             for (int i = 0; i + workerScroll < workers.size() && i < DETAIL_ROWS; i++) {
                 CompoundTag w = workers.get(i + workerScroll);
                 int act = w.getInt("activity");
+                int stall = w.getInt("stall");
                 Component line = text(w, "name").copy();
+                if (stall > io.github.genichimaruo.singulo.android.RuinAndroid.STALL_NONE
+                        && stall < io.github.genichimaruo.singulo.android.RuinAndroid.STALL_KEYS.length) {
+                    // 止まっている理由（赤い字）: 作業の中身より先に知らせる
+                    line = line.copy().append(": ").append(Component.translatable("gui.singulo.android.stall."
+                            + io.github.genichimaruo.singulo.android.RuinAndroid.STALL_KEYS[stall]));
+                    AndroidStationScreen.fit(g, font, line, 147, TOP + i * DETAIL_H + 4, 99, 0xFFE06C5A);
+                    continue;
+                }
                 if (act == -2) {
                     line = line.copy().append(": ").append(Component.translatable("gui.singulo.work_console.worker.elsewhere"));
                 } else if (act >= 0) {

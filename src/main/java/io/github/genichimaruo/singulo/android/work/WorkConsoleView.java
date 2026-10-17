@@ -92,6 +92,7 @@ public final class WorkConsoleView {
                     // ほかの注文の作業をしている（装置を待つあいだなど）なら、-2
                     w.putInt("activity", a.workOrder() == o.id ? a.activity() : c.order(a.workOrder()) != null ? -2 : RuinAndroid.ACT_NONE);
                     w.putInt("accent", a.accent());
+                    w.putInt("stall", a.stall());
                 } else {
                     w.putString("name", Component.Serializer.toJson(Component.translatable("gui.singulo.work_console.worker.away"), reg));
                     w.putInt("activity", -1);

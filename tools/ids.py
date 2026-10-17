@@ -121,6 +121,8 @@ MOD = {
     '工場式印刷ユニット': ('android_factory_print_unit', 'Factory Print Unit', 'item'),
     'バッテリーアップグレード': ('android_battery_upgrade', 'Battery Upgrade', 'item'),
     'バックパックアップグレード': ('android_backpack_upgrade', 'Backpack Upgrade', 'item'),
+    '強化バックパックアップグレード': ('android_reinforced_backpack_upgrade', 'Reinforced Backpack Upgrade', 'item'),
+    '大型バックパックアップグレード': ('android_large_backpack_upgrade', 'Large Backpack Upgrade', 'item'),
     'タンクアップグレード': ('android_tank_upgrade', 'Tank Upgrade', 'item'),
     'ガスタンクアップグレード': ('android_gas_tank_upgrade', 'Gas Tank Upgrade', 'item'),
     'ガス・液体アップグレード': ('android_dual_tank_upgrade', 'Gas & Liquid Upgrade', 'item'),

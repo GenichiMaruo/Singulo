@@ -435,9 +435,10 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         roundRect(g, x + AndroidMenu.CARRY_X - 4, y + 22, 24, 104, mix(accent, PAPER, 0.88F));
         slots(g, x, y, accent, 2, 3);
         slots(g, x, y, accent, RuinAndroid.SLOT_FELLING, 2);
-        if (!menu.hasBackpack()) {
-            // バックパックがないときは、中のスロットを覆う
-            g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
+        int openRows = menu.packSlots() / 6;
+        if (openRows < 4) {
+            // バックパックがない段（ないか、ティアが低い）は、中のスロットを覆う（旧版で入れた物は見えて、取り出せる）
+            g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y + openRows * 18 - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
                     y + AndroidMenu.PACK_Y + 4 * 18 - 1, 0xC8E9ECF1);
         }
         // タンク: 中身そのものの絵で、入っている割合まで（流れるアニメーションも動く）。液体と化学物質（Mekanism）の段
@@ -613,8 +614,15 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 AndroidMenu.REPAIR_Y - 12, 36, INK);
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.plate"), AndroidMenu.PLATE_X - 10,
                 AndroidMenu.PLATE_Y - 12, 36, INK);
-        AndroidStationScreen.fitCentered(g, font, Component.translatable(speech(hp, max)), PORTRAIT_X + 4, PORTRAIT_Y + PORTRAIT_H - 13,
-                PORTRAIT_W - 8, INK);
+        int stall = menu.value(AndroidMenu.D_STALL);
+        if (stall > RuinAndroid.STALL_NONE && stall < RuinAndroid.STALL_KEYS.length) {
+            // 止まっている理由があれば、吹き出しのひとことの代わりに出す（赤い字）
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.stall." + RuinAndroid.STALL_KEYS[stall]),
+                    PORTRAIT_X + 4, PORTRAIT_Y + PORTRAIT_H - 13, PORTRAIT_W - 8, 0xFFC0392B);
+        } else {
+            AndroidStationScreen.fitCentered(g, font, Component.translatable(speech(hp, max)), PORTRAIT_X + 4, PORTRAIT_Y + PORTRAIT_H - 13,
+                    PORTRAIT_W - 8, INK);
+        }
     }
 
     /** 吹き出しのひとこと（状態ごとに数通り。5秒ごとに入れ替わる）。 */

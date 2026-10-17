@@ -189,12 +189,14 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     private void renderWorkIcon(RuinAndroid android, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         int act = android.activity();
         var viewer = net.minecraft.client.Minecraft.getInstance().player;
-        if (act == RuinAndroid.ACT_NONE || viewer == null || !io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.wearing(viewer)
+        boolean stalled = android.stall() != RuinAndroid.STALL_NONE;
+        if (act == RuinAndroid.ACT_NONE && !stalled || viewer == null || !io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.wearing(viewer)
                 || io.github.genichimaruo.singulo.generated.ClientConfig.SPEC.isLoaded()
                 && !io.github.genichimaruo.singulo.generated.ClientConfig.ANDROID_WORK_ICONS.get()) {
             return;
         }
-        net.minecraft.world.item.ItemStack icon = new net.minecraft.world.item.ItemStack(switch (act) {
+        // 止まっている理由があるときは、作業の印の代わりに、立ち入り禁止の印（理由はアンドロイドの画面に出る）
+        net.minecraft.world.item.ItemStack icon = new net.minecraft.world.item.ItemStack(stalled ? net.minecraft.world.item.Items.BARRIER : switch (act) {
             case RuinAndroid.ACT_FETCH -> net.minecraft.world.item.Items.CHEST;
             case RuinAndroid.ACT_CRAFT -> net.minecraft.world.item.Items.CRAFTING_TABLE;
             case RuinAndroid.ACT_PROCESS -> net.minecraft.world.item.Items.FURNACE;

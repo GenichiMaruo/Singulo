@@ -438,8 +438,18 @@ DESC = {
                           '全体の量はタンクアップグレードと同じ）。液体と化学物質を両方使う作業に。腰にガラスの筒とガスボンベが見える。中身が残っている間は外せない。',
         'Only works when Mekanism is installed. In the tank slot it gives two liquid tanks and two chemical tanks (16,000 mB each; the same total '
         'as a Tank Upgrade), for work that uses both. Glass tubes and gas cylinders show at its waist. It cannot be removed while they hold anything.'),
-    'バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が24スロット（縦4×横6）増える。背中にバックパックを背負う。',
-        'Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.'),
+    'バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が12スロット（縦2×横6）増える。背中にバックパックを背負う。'
+                          '強化バックパック（18スロット）・大型バックパック（24スロット）の材料になる。',
+        'Fitted to a guard android, it adds 12 inventory slots (2 rows of 6). The android wears it on its back. '
+        'Used to make the Reinforced Backpack (18 slots) and the Large Backpack (24 slots).'),
+    '強化バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が18スロット（縦3×横6）増える。'
+                            '中身がそのまま入るので、バックパックから中身を出さずに付け替えられる。大型バックパックの材料になる。',
+        'Fitted to a guard android, it adds 18 inventory slots (3 rows of 6). You can swap it in for a smaller backpack '
+        'without emptying it, since the contents still fit. Used to make the Large Backpack.'),
+    '大型バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が24スロット（縦4×横6）増える。いちばん大きいバックパック。'
+                            '中身を出さずに、小さいバックパックと付け替えられる。',
+        'Fitted to a guard android, it adds 24 inventory slots (4 rows of 6), the largest backpack. '
+        'You can swap it in for a smaller backpack without emptying it.'),
     '伐採アップグレード': ('護衛のアンドロイドに積むと、手順カードの伐採（木を丸ごと切って苗木を植え直す）ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。',
         'Lets a guard android do felling steps on procedure cards (cutting whole trees and replanting saplings), like a diamond axe. Takes Efficiency, Fortune and Silk Touch.'),
     '採掘アップグレード': ('護衛のアンドロイドに積むと、採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。',

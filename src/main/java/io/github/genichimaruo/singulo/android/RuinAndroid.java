@@ -229,6 +229,15 @@ public abstract class RuinAndroid extends Monster {
     public static final int GESTURE_TICKS = 30;
     /** 作業中に今していること（{@link #ACT_FETCH} など。クライアントでも見える）。 */
     private static final EntityDataAccessor<Integer> ACTIVITY = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 止まっている理由（{@link #STALL_NONE} など）。少しのあいだだけ出て、同じ理由が続く間は出し続ける。 */
+    private static final EntityDataAccessor<Integer> STALL = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    public static final int STALL_NONE = 0, STALL_NO_POWER = 1, STALL_UNREACHABLE = 2, STALL_MISSING = 3, STALL_PROTECTED = 4,
+            STALL_NO_TARGET = 5, STALL_FULL = 6;
+    /** 止まっている理由の名前（翻訳キー gui.singulo.android.stall.〜）。 */
+    public static final String[] STALL_KEYS = {"none", "no_power", "unreachable", "missing", "protected", "no_target", "full"};
+    /** 理由を出し続ける長さ（この間に同じことが起きなければ消える）。 */
+    private static final int STALL_SHOW_TICKS = 20 * 10;
+    private int stallUntil;
     public static final int ACT_NONE = 0, ACT_FETCH = 1, ACT_CRAFT = 2, ACT_PROCESS = 3, ACT_MINE = 4, ACT_DELIVER = 5, ACT_RETURN = 6,
             ACT_WAIT = 7, ACT_CHARGE = 8, ACT_FIGHT = 9, ACT_FARM = 10, ACT_RANCH = 11, ACT_FELL = 12, ACT_USE = 13;
     public static final String[] ACTIVITY_KEYS = {"none", "fetch", "craft", "process", "mine", "deliver", "return", "wait", "charge", "fight",
@@ -243,6 +252,8 @@ public abstract class RuinAndroid extends Monster {
      */
     public static final int SLOT_REPAIR = 0, SLOT_PLATE = 1, SLOT_BATTERY = 2, SLOT_BACKPACK = 3, SLOT_MINING = 4;
     public static final int CARRY_START = 5, CARRY_SLOTS = 5, PACK_START = 10, PACK_SLOTS = 24;
+    /** バックパックのティアごとの枠（縦2・3・4段 × 横6）。大型（と内蔵）は {@link #PACK_SLOTS} の全部。 */
+    public static final int BACKPACK_SLOTS_BASIC = 12, BACKPACK_SLOTS_REINFORCED = 18;
     /** 伐採アップグレード・タンクアップグレードの枠（あとから足したので、持ち物のうしろ）。 */
     public static final int SLOT_FELLING = PACK_START + PACK_SLOTS, SLOT_TANK = SLOT_FELLING + 1;
     /** 装飾の枠（頭・背中/腰・手）。 */
@@ -337,7 +348,20 @@ public abstract class RuinAndroid extends Monster {
     }
 
     public static boolean isBackpackUpgrade(net.minecraft.world.item.ItemStack stack) {
-        return isItem(stack, "android_backpack_upgrade");
+        return backpackSlots(stack) > 0;
+    }
+
+    /** バックパックアップグレードで使えるバックパックの枠の数（ティアごと。バックパックでなければ 0）。 */
+    public static int backpackSlots(net.minecraft.world.item.ItemStack stack) {
+        if (stack.isEmpty()) {
+            return 0;
+        }
+        return switch (net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()) {
+            case "android_backpack_upgrade" -> BACKPACK_SLOTS_BASIC;
+            case "android_reinforced_backpack_upgrade" -> BACKPACK_SLOTS_REINFORCED;
+            case "android_large_backpack_upgrade" -> PACK_SLOTS;
+            default -> 0;
+        };
     }
 
     public static boolean isMiningUpgrade(net.minecraft.world.item.ItemStack stack) {
@@ -921,7 +945,12 @@ public abstract class RuinAndroid extends Monster {
 
     /** バックパックの欄が使えるか（バックパックアップグレードを積んでいるか、内蔵しているか）。 */
     public boolean packOpen() {
-        return builtInPack() || isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK));
+        return packSlots() > 0;
+    }
+
+    /** 使えるバックパックの枠の数（内蔵なら全部。アップグレードならそのティアの数。旧版で入れた先の枠の物は、作業には使わない）。 */
+    public int packSlots() {
+        return builtInPack() ? PACK_SLOTS : backpackSlots(inventory.getItem(SLOT_BACKPACK));
     }
 
     /** 作業（自動化）に割り当ててよいか。 */
@@ -1031,6 +1060,17 @@ public abstract class RuinAndroid extends Monster {
         return entityData.get(WORKING);
     }
 
+    /** 止まっている理由を出す（{@link #STALL_SHOW_TICKS} のあいだ。同じことが起きるたびに延びる）。サーバーで呼ぶ。 */
+    public void setStall(int reason) {
+        entityData.set(STALL, reason);
+        stallUntil = tickCount + STALL_SHOW_TICKS;
+    }
+
+    /** 今出している、止まっている理由（なければ {@link #STALL_NONE}。クライアントでも見える）。 */
+    public int stall() {
+        return entityData.get(STALL);
+    }
+
     void setActivity(int activity) {
         if (entityData.get(ACTIVITY) != activity) {
             entityData.set(ACTIVITY, activity);
@@ -1052,9 +1092,9 @@ public abstract class RuinAndroid extends Monster {
         return entityData.get(ACTIVITY);
     }
 
-    /** 持ち物の5つと、バックパックがあればその24（全部）。 */
+    /** 持ち物の5つと、バックパックがあればそのティアの枠。 */
     private int[] allCarrySlots() {
-        int n = RuinAndroid.CARRY_SLOTS + (packOpen() ? PACK_SLOTS : 0);
+        int n = RuinAndroid.CARRY_SLOTS + packSlots();
         int[] out = new int[n];
         for (int i = 0; i < n; i++) {
             out[i] = i < CARRY_SLOTS ? CARRY_START + i : PACK_START + (i - CARRY_SLOTS);
@@ -1341,6 +1381,7 @@ public abstract class RuinAndroid extends Monster {
         builder.define(BACKPACK, false);
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
+        builder.define(STALL, STALL_NONE);
         builder.define(GESTURE, GESTURE_NONE);
         builder.define(NAPPING, false);
         builder.define(TOOL, TOOL_PICKAXE);
@@ -1904,6 +1945,9 @@ public abstract class RuinAndroid extends Monster {
             return;
         }
         stateTicks++;
+        if (entityData.get(STALL) != STALL_NONE && tickCount > stallUntil) {
+            entityData.set(STALL, STALL_NONE);
+        }
         if (dismantling) {
             // 印刷を逆にたどって、上から消えていく
             int p = entityData.get(PRINT);
@@ -2548,11 +2592,17 @@ public abstract class RuinAndroid extends Monster {
                         && level.getBlockEntity(home) instanceof AndroidStationBlockEntity dock) {
                     dock.refill(RuinAndroid.this);
                 }
+                if (s == STATE_CHARGING && guard && !(home != null && level.getBlockEntity(home) instanceof AndroidStationBlockEntity)) {
+                    // ステーションがなくなった（壊された・持ち場を外れた）: その場で自分で充電する（ステーションの上で止まったままにしない）
+                    setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
+                    return;
+                }
                 if (s == STATE_CHARGING && guard) {
                     // 護衛はステーションの電力で充電し、体力も直す（電力が足りなければ待つ）
-                    if (!(home != null && level.getBlockEntity(home) instanceof AndroidStationBlockEntity station
+                    if (!(level.getBlockEntity(home) instanceof AndroidStationBlockEntity station
                             && station.drawCharge(AndroidStationBlockEntity.FE_PER_CHARGE_TICK))) {
                         rate = 0;
+                        setStall(STALL_NO_POWER);           // ステーションの電力が足りず、充電が進まない
                     } else if (stateTicks % (station.hasPrintUnit() ? 2 : 4) == 0 && getHealth() < getMaxHealth()) {
                         heal(1);                     // 工場式印刷ユニットがあれば2倍速く直す
                     }

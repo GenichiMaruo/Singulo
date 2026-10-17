@@ -699,6 +699,48 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+    /**
+     * バックパックのティア: 12・18・24 の枠が作業で使える。ティアより後ろの枠（旧版の24枠で入れた物）は消さず、作業には使わない。
+     * 中身が入ったままでも、中身が収まるバックパックへは付け替えられ、収まらないものへは付け替えられない。
+     */
+    @GameTest(template = EMPTY)
+    public static void backpackTiersSetCapacity(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        String[] tiers = {"android_backpack_upgrade", "android_reinforced_backpack_upgrade", "android_large_backpack_upgrade"};
+        int[] slots = {12, 18, 24};
+        helper.assertTrue(a.carryCapacity() == RuinAndroid.CARRY_SLOTS, "バックパックなしで持ち物が5でない: " + a.carryCapacity());
+        for (int i = 0; i < tiers.length; i++) {
+            a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item(tiers[i])));
+            helper.assertTrue(a.carryCapacity() == RuinAndroid.CARRY_SLOTS + slots[i], tiers[i] + " の運べる欄が違う: " + a.carryCapacity());
+        }
+        // 旧版の24枠のバックパックで、20枠目に入れた物
+        a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item(tiers[0])));
+        a.inventory().setItem(RuinAndroid.PACK_START + 20, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 5));
+        for (int slot : a.carrySlots()) {
+            helper.assertTrue(slot != RuinAndroid.PACK_START + 20, "ティアより後ろの枠を作業に使う");
+        }
+        helper.assertTrue(a.inventory().getItem(RuinAndroid.PACK_START + 20).getCount() == 5, "ティアより後ろの枠の物が消えた");
+        var player = helper.makeMockServerPlayerInLevel();
+        var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
+        net.minecraft.world.inventory.Slot backpack = menu.slots.stream()
+                .filter(s -> s.container == a.inventory() && s.getContainerSlot() == RuinAndroid.SLOT_BACKPACK).findFirst().orElseThrow();
+        net.minecraft.world.inventory.Slot packSlot = menu.slots.stream()
+                .filter(s -> s.container == a.inventory() && s.getContainerSlot() == RuinAndroid.PACK_START + 14).findFirst().orElseThrow();
+        helper.assertFalse(packSlot.mayPlace(new ItemStack(net.minecraft.world.item.Items.DIRT)), "12枠のバックパックで15枠目に入れられる");
+        player.containerMenu = menu;
+        menu.setCarried(new ItemStack(item(tiers[1])));
+        helper.assertFalse(backpack.mayPickup(player), "中身（21枠目）が入らない強化バックパックへ付け替えられる");
+        menu.setCarried(new ItemStack(item(tiers[2])));
+        helper.assertTrue(backpack.mayPickup(player), "中身が収まる大型バックパックへ付け替えられない");
+        menu.setCarried(ItemStack.EMPTY);
+        helper.assertFalse(backpack.mayPickup(player), "中身があるのにバックパックを外せる");
+        a.discard();
+        helper.succeed();
+    }
+
     /** 持ち物は位置ごと保存する（空きスロットがあってもずれない）。0.6.0 の保存も、装甲板を装甲板の場所へ戻す。 */
     @GameTest(template = EMPTY)
     public static void androidInventoryKeepsSlots(GameTestHelper helper) {
@@ -1480,6 +1522,41 @@ public final class AndroidGameTests {
         var made = view.getList("crafted", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(0);
         helper.assertTrue(made.getLong("count") == 2000 && made.getLong("surplus") == 500, "mBで表示していない");
         helper.succeed();
+    }
+
+    /** 止まっている理由: 電力のないステーションで充電しようとすると、「ステーションの電力が足りない」を出す。電力が戻れば消える。 */
+    @GameTest(template = EMPTY, timeoutTicks = 1200)
+    public static void stallShowsStationOutOfPower(GameTestHelper helper) {
+        floor(helper);
+        AndroidStationBlockEntity s = station(helper, 1);
+        boolean[] drained = {false}, seen = {false};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (list.isEmpty() || !list.get(0).printed()) {
+                return;
+            }
+            RuinAndroid a = list.get(0);
+            if (!drained[0]) {
+                // 印刷できたら、ステーションの電力とアンドロイドの充電を空にする
+                drained[0] = true;
+                s.energy().setEnergy(0);
+                CompoundTag saved = a.saveWithoutId(new CompoundTag());
+                saved.putInt("charge", 0);
+                a.load(saved);
+            } else if (!seen[0] && a.stall() == RuinAndroid.STALL_NO_POWER) {
+                seen[0] = true;
+                s.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);     // 電力を戻す
+            }
+        });
+        helper.succeedWhen(() -> {
+            List<RuinAndroid> list = androids(helper);
+            helper.assertTrue(seen[0], "電力のないステーションで、止まっている理由が出ない: "
+                    + list.stream().map(a -> "state=" + a.state() + " stall=" + a.stall() + " charge=" + a.charge()).toList());
+            RuinAndroid a = list.get(0);
+            helper.assertTrue(a.charge() > 0 && a.stall() == RuinAndroid.STALL_NONE, "電力が戻っても理由が消えない: " + a.stall()
+                    + " charge=" + a.charge() + " state=" + a.state());
+            list.forEach(RuinAndroid::discard);
+        });
     }
 
     /** 加工のバッチ投入では、充電10で原鉄を1個だけ投入し、その場で止まる。 */

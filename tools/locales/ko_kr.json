@@ -1424,8 +1424,8 @@
     "translation": "호위 안드로이드에 하나 장착하면 흉갑으로 작동합니다(방어 +8, 방어 강도 +2). 방어구 마법 부여를 할 수 있습니다."
   },
   "desc.singulo.android_backpack_upgrade": {
-    "source": "Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.",
-    "translation": "호위 안드로이드에 넣으면 소지품이 24칸(4줄×6칸) 늘어납니다. 등에 백팩을 멥니다."
+    "source": "Fitted to a guard android, it adds 12 inventory slots (2 rows of 6). The android wears it on its back. Used to make the Reinforced Backpack (18 slots) and the Large Backpack (24 slots).",
+    "translation": "호위 안드로이드에 넣으면 소지품이 12칸(2줄×6칸) 늘어납니다. 등에 백팩을 멥니다. 강화 백팩(18칸)과 대형 백팩(24칸)의 재료가 됩니다."
   },
   "desc.singulo.android_barrier_glass": {
     "source": "Glass that only androids cannot pass. Players and other creatures go straight through. Joins seamlessly with the same glass next to it.",
@@ -1503,6 +1503,10 @@
     "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
     "translation": "부품과 외장 한 벌. 안드로이드 조립 스테이션이 안드로이드를 하나 출력할 때마다 하나씩 사용합니다."
   },
+  "desc.singulo.android_large_backpack_upgrade": {
+    "source": "Fitted to a guard android, it adds 24 inventory slots (4 rows of 6), the largest backpack. You can swap it in for a smaller backpack without emptying it.",
+    "translation": "호위 안드로이드에 넣으면 소지품이 24칸(4줄×6칸) 늘어나는, 가장 큰 백팩입니다. 물건을 빼지 않고 작은 백팩과 바꿔 낄 수 있습니다."
+  },
   "desc.singulo.android_memory_axe": {
     "source": "A compact crystal memory holding the design of the Axe Android prototyped in the underground android laboratory. Dropped by the laboratory overseer. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "지하 안드로이드 연구소에서 시제작된 도끼형 안드로이드의 설계를 담은 소형 크리스털 메모리. 연구소의 총괄 AI를 쓰러뜨리면 얻을 수 있다. 안드로이드 조립 스테이션에 넣으면 그 형을 인쇄할 수 있다(소모되지 않음)."
@@ -1538,6 +1542,10 @@
   "desc.singulo.android_recipe_rack": {
     "source": "A six-row rack. Put a Work Location Card on the left of a row and up to eight recipe cards on the right, and they can be ordered as recipes made at that location.",
     "translation": "6줄짜리 선반. 각 줄 왼쪽에 작업 위치 카드, 오른쪽에 레시피 카드를 8장까지 놓으면 그 위치에서 만드는 레시피로 주문할 수 있습니다."
+  },
+  "desc.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Fitted to a guard android, it adds 18 inventory slots (3 rows of 6). You can swap it in for a smaller backpack without emptying it, since the contents still fit. Used to make the Large Backpack.",
+    "translation": "호위 안드로이드에 넣으면 소지품이 18칸(3줄×6칸) 늘어납니다. 내용물이 그대로 들어가므로, 작은 백팩에서 물건을 빼지 않고 바꿔 낄 수 있습니다. 대형 백팩의 재료가 됩니다."
   },
   "desc.singulo.android_repair_kit": {
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
@@ -3358,6 +3366,30 @@
   "gui.singulo.android.say.retreat.1": {
     "source": "Off to get repaired",
     "translation": "수리하고 올게"
+  },
+  "gui.singulo.android.stall.full": {
+    "source": "Storage is full; can't put items away",
+    "translation": "보관 장소가 가득 차서 물건을 둘 수 없음"
+  },
+  "gui.singulo.android.stall.missing": {
+    "source": "Not enough materials in the stockpile",
+    "translation": "재료 보관소에 재료가 부족함"
+  },
+  "gui.singulo.android.stall.no_power": {
+    "source": "The station is out of power; can't charge",
+    "translation": "스테이션 전력이 부족해 충전할 수 없음"
+  },
+  "gui.singulo.android.stall.no_target": {
+    "source": "Nothing to work on in the area right now",
+    "translation": "작업 범위에 지금 할 수 있는 대상이 없음"
+  },
+  "gui.singulo.android.stall.protected": {
+    "source": "A protected block; can't break it",
+    "translation": "보호된 블록이라 부술 수 없음"
+  },
+  "gui.singulo.android.stall.unreachable": {
+    "source": "Can't reach the destination",
+    "translation": "목적지에 갈 수 없음"
   },
   "gui.singulo.android.storage": {
     "source": "Storage",
@@ -5764,8 +5796,8 @@
     "translation": "유적의 안드로이드"
   },
   "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- Factory Print Unit: in the slot beside the station's kit slot, it halves printing time and power and doubles repair speed on the station. Made from precision actuators found in the Underground Android Laboratory.\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 공장식 인쇄 유닛: 스테이션의 키트 옆 슬롯에 넣으면 인쇄에 드는 시간과 전력이 절반이 되고, 스테이션 위에서의 수리가 2배 빨라집니다. 지하 안드로이드 연구소에서 얻는 정밀 액추에이터로 만듭니다.\n- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩의 24칸이 더해집니다. 안에 물건이 있으면 뺄 수 없습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- Factory Print Unit: in the slot beside the station's kit slot, it halves printing time and power and doubles repair speed on the station. Made from precision actuators found in the Underground Android Laboratory.\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).",
+    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 공장식 인쇄 유닛: 스테이션의 키트 옆 슬롯에 넣으면 인쇄에 드는 시간과 전력이 절반이 되고, 스테이션 위에서의 수리가 2배 빨라집니다. 지하 안드로이드 연구소에서 얻는 정밀 액추에이터로 만듭니다.\n- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩 칸이 더해집니다. 3단계가 있으며 백팩 12칸, 강화 백팩 18칸, 대형 백팩 24칸이고, 각 단계는 한 단계 아래 백팩으로 만듭니다. 안에 물건이 있으면 뺄 수 없지만, 내용물이 그대로 들어가는 더 큰 백팩으로는 바꿔 낄 수 있습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
   },
   "guide.singulo.androids.upgrades.title": {
     "source": "Upgrades",
@@ -6315,6 +6347,10 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
+  "howto.singulo.android_large_backpack_upgrade": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작: 정밀 조립기(4단계)"
+  },
   "howto.singulo.android_mining_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
@@ -6326,6 +6362,10 @@
   "howto.singulo.android_recipe_rack": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
   },
   "howto.singulo.android_repair_kit": {
     "source": "Made in: Crafting Table (stage 2)",
@@ -7307,6 +7347,10 @@
     "source": "Android Kit",
     "translation": "안드로이드 키트"
   },
+  "item.singulo.android_large_backpack_upgrade": {
+    "source": "Large Backpack Upgrade",
+    "translation": "대형 백팩 업그레이드"
+  },
   "item.singulo.android_memory_axe": {
     "source": "Compact Crystal Memory (Axe)",
     "translation": "소형 크리스털 메모리(도끼형)"
@@ -7338,6 +7382,10 @@
   "item.singulo.android_production_upgrade": {
     "source": "Production Upgrade",
     "translation": "생산 업그레이드"
+  },
+  "item.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Reinforced Backpack Upgrade",
+    "translation": "강화 백팩 업그레이드"
   },
   "item.singulo.android_repair_kit": {
     "source": "Self-Repair Kit",
@@ -9791,6 +9839,10 @@
     "source": "Used in: Particle Accelerator",
     "translation": "사용 제품: 입자 가속기"
   },
+  "uses.singulo.android_backpack_upgrade": {
+    "source": "Used in: Reinforced Backpack Upgrade",
+    "translation": "사용 대상: 강화 백팩 업그레이드"
+  },
   "uses.singulo.android_barrier_glass": {
     "source": "Used in: Patterned Android Barrier Glass",
     "translation": "사용 대상: 무늬 안드로이드 차단 유리"
@@ -9806,6 +9858,10 @@
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
     "translation": "사용 대상: 생산 업그레이드, 공장식 인쇄 유닛"
+  },
+  "uses.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Used in: Large Backpack Upgrade",
+    "translation": "사용 대상: 대형 백팩 업그레이드"
   },
   "uses.singulo.android_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
@@ -10056,8 +10112,8 @@
     "translation": "사용 대상: 종언의 기록"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer, Echo Resonator and 18 more",
-    "translation": "사용 대상: 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기, 메아리 공명기 외 18개"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
+    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 19개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -10148,8 +10204,8 @@
     "translation": "사용 제품: 데이터 카드(관측 로그)"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판, 특이 물질 외 23개"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 24 more",
+    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 24개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -10244,12 +10300,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 75 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 75개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 77 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 77개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 52 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 52개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 54 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 54개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

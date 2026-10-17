@@ -49,6 +49,8 @@ final class AndroidWorkGoal extends Goal {
     private static final int LEAVE_TICKS = 20, LEAVE_ETA_TICKS = 20 * 15, LEAVE_UNKNOWN_TICKS = 20 * 10;
     /** 採掘: 掘れる物がないまま待つ限度、手の届く距離、1つ掘るごとに使う充電。 */
     private static final int MINE_IDLE_TICKS = 20 * 30, MINE_COST = 6;
+    /** 伐採の充電: 基本料金＋原木1本ごと（0.8.x までは木の大きさによらず24。大きな木ほど高くした）。 */
+    static final int FELL_BASE_COST = 12, FELL_COST_PER_LOG = 2;
     private static final double MINE_REACH = 4.0, MINE_NEAR = 2.0;
     /** 1回作るごとに使う充電。 */
     static final int CRAFT_COST = 10;
@@ -402,6 +404,7 @@ final class AndroidWorkGoal extends Goal {
                 return true;
             }
             dropIndex++;                       // ここはいっぱい: 次の場所へ
+            android.setStall(RuinAndroid.STALL_FULL);
         }
         return false;
     }
@@ -1075,6 +1078,7 @@ final class AndroidWorkGoal extends Goal {
         net.minecraft.world.entity.player.Player as = actor(level, c, job);
         if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level, target,
                 state, as)).isCanceled()) {
+            android.setStall(RuinAndroid.STALL_PROTECTED);   // 守られていて壊せない
             mineSkip.add(target);
             stopMining();
             return;
@@ -1196,6 +1200,8 @@ final class AndroidWorkGoal extends Goal {
         }
         if (growing) {
             android.setActivity(RuinAndroid.ACT_WAIT);
+        } else {
+            android.setStall(RuinAndroid.STALL_NO_TARGET);   // 範囲に、今できる作業の対象がない
         }
         if (++mineIdle >= (growing ? GROW_WAIT_TICKS : limit)) {
             fail(c, job, WorkConsoleBlockEntity.Failure.STALLED);
@@ -1335,6 +1341,9 @@ final class AndroidWorkGoal extends Goal {
         }
     }
 
+    /** 今切っている木の、伐採の充電（根元を決めたときに原木を数える）。 */
+    private int fellCost = FELL_BASE_COST;
+
     private boolean canPay(int cost) {
         if (android.charge() >= cost) {
             return true;
@@ -1417,6 +1426,7 @@ final class AndroidWorkGoal extends Goal {
         }
         stopMining();
         if (!mayBreak(level, c, target)) {
+            android.setStall(RuinAndroid.STALL_PROTECTED);   // 守られていて壊せない
             mineSkip.add(target);
             return;
         }
@@ -1539,7 +1549,7 @@ final class AndroidWorkGoal extends Goal {
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
             return;
         }
-        if (!canPay(MINE_COST * 4)) {
+        if (!canPay(FELL_BASE_COST)) {
             return;
         }
         ItemStack tool = fellingTool();
@@ -1559,12 +1569,19 @@ final class AndroidWorkGoal extends Goal {
                 idleNear(c, job, ps, FARM_IDLE_TICKS);
                 return;
             }
-            int total = 0;
+            int total = 0, logs = 0;
             for (BlockPos p : tree(level, mineTarget)) {
                 BlockState s = level.getBlockState(p);
-                total += s.is(net.minecraft.tags.BlockTags.LOGS) ? breakTicks(level, p, s, tool) : 0;
+                if (s.is(net.minecraft.tags.BlockTags.LOGS)) {
+                    total += breakTicks(level, p, s, tool);
+                    logs++;
+                }
             }
             mineNeed = Math.max(20, Math.min(200, total / 2));
+            fellCost = fellCost(logs);
+        }
+        if (!canPay(fellCost)) {
+            return;
         }
         mineIdle = 0;
         BlockPos base = mineTarget;
@@ -1595,6 +1612,7 @@ final class AndroidWorkGoal extends Goal {
         }
         stopMining();
         if (!mayBreak(level, c, base)) {
+            android.setStall(RuinAndroid.STALL_PROTECTED);   // 守られていて壊せない
             mineSkip.add(base);
             return;
         }
@@ -1623,7 +1641,12 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         collect(drops, what);
-        android.spend(MINE_COST * 4);
+        android.spend(fellCost);
+    }
+
+    /** 伐採1本ぶんの充電（原木の数で決まる）。 */
+    static int fellCost(int logs) {
+        return FELL_BASE_COST + FELL_COST_PER_LOG * Math.max(1, logs);
     }
 
     // ---------------- 牧場
@@ -2094,6 +2117,7 @@ final class AndroidWorkGoal extends Goal {
                 afterJob(c, job);
             } else {
                 wait = WAIT_TICKS;             // 納品口がいっぱい: 空くのを待つ
+                android.setStall(RuinAndroid.STALL_FULL);
             }
         }
     }
@@ -2140,6 +2164,11 @@ final class AndroidWorkGoal extends Goal {
 
     private void fail(WorkConsoleBlockEntity c, WorkJob job, WorkConsoleBlockEntity.Failure why) {
         pickups = null;
+        switch (why) {
+            case UNREACHABLE -> android.setStall(RuinAndroid.STALL_UNREACHABLE);
+            case MISSING -> android.setStall(RuinAndroid.STALL_MISSING);
+            default -> { }
+        }
         c.fail(job, why);
         android.workJob = null;
         wait = why == WorkConsoleBlockEntity.Failure.MISSING ? WAIT_TICKS : 0;

@@ -44,7 +44,7 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int DECOR_X = 96, DECOR_Y = 34, DECOR_STEP = 28;
 
     public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, D_WORK = 7,
-            COUNT = 8;
+            D_STALL = 8, COUNT = 9;
     public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1, BUTTON_WORK = 2;
     /** タンク i に、カーソルの入れ物を使う（BUTTON_TANK_USE + i）・中身を捨てる（BUTTON_TANK_CLEAR + i）。 */
     public static final int BUTTON_TANK_USE = 10, BUTTON_TANK_CLEAR = 20;
@@ -69,6 +69,7 @@ public class AndroidMenu extends AbstractContainerMenu {
             case D_ARMOR -> android.getArmorValue();
             case D_ALERT -> android.alert() ? 1 : 0;
             case D_WORK -> android.workEnabled() ? 1 : 0;
+            case D_STALL -> android.stall();
             default -> 0;
         }));
     }
@@ -102,10 +103,10 @@ public class AndroidMenu extends AbstractContainerMenu {
                 return !working() && RuinAndroid.isBackpackUpgrade(stack) && !builtInPack();
             }
 
-            /** 中に物が入っている間は、バックパックを外せない。 */
+            /** 中に物が入っている間は、バックパックを外せない。中身がそのまま入るバックパックへの付け替えだけはできる。 */
             @Override
             public boolean mayPickup(Player player) {
-                return !working() && packEmpty();
+                return !working() && (packEmpty() || RuinAndroid.backpackSlots(player.containerMenu.getCarried()) > lastUsedPackSlot());
             }
         });
         addSlot(new PageSlot(items, RuinAndroid.SLOT_MINING, MINING_X, MINING_Y, PAGE_GEAR, 1) {
@@ -121,7 +122,7 @@ public class AndroidMenu extends AbstractContainerMenu {
             addSlot(new PageSlot(items, RuinAndroid.PACK_START + i, PACK_X + (i % 6) * 18, PACK_Y + (i / 6) * 18, PAGE_GEAR, 64) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
-                    return !working() && hasBackpack();
+                    return !working() && getContainerSlot() - RuinAndroid.PACK_START < packSlots();
                 }
             });
         }
@@ -229,7 +230,22 @@ public class AndroidMenu extends AbstractContainerMenu {
 
     /** バックパックの欄が使えるか（アップグレードを積んでいるか、内蔵している。スロットの中身で見るので、クライアントでも分かる）。 */
     public boolean hasBackpack() {
-        return builtInPack() || RuinAndroid.isBackpackUpgrade(items.getItem(RuinAndroid.SLOT_BACKPACK));
+        return packSlots() > 0;
+    }
+
+    /** 使えるバックパックの枠の数（ティアごと。内蔵なら全部）。 */
+    public int packSlots() {
+        return builtInPack() ? RuinAndroid.PACK_SLOTS : RuinAndroid.backpackSlots(items.getItem(RuinAndroid.SLOT_BACKPACK));
+    }
+
+    /** 物が入っているバックパックの一番後ろの枠（何も入っていなければ -1）。 */
+    public int lastUsedPackSlot() {
+        for (int i = RuinAndroid.PACK_SLOTS - 1; i >= 0; i--) {
+            if (!items.getItem(RuinAndroid.PACK_START + i).isEmpty()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** バックパックを内蔵している型か（バックパックアップグレードは要らない）。 */
