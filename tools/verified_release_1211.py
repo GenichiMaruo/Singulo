@@ -70,7 +70,7 @@ def promote(metadata, artifacts, output):
         validate(root, loader, name)
         gui = (root / 'gui-review/logs/latest.log').read_text()
         pixels = json.loads((root / 'gui-review/inventory-pixels.json').read_text())
-        if 'SINGULO_GUI_COMPLETE 20' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 20:
+        if 'SINGULO_GUI_COMPLETE 22' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or 'SINGULO_HANDBOOK_SEARCH_COMPLETE' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 22:
             raise RuntimeError('Missing real GUI/search validation for ' + loader)
         if 'SINGULO_JEI_SYNC_COMPLETE' not in gui:
             raise RuntimeError('Missing bidirectional JEI search validation')

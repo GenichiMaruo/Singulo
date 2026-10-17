@@ -2491,6 +2491,7 @@ final class AndroidWorkGoal extends Goal {
      * 空いているスロットへ）。
      */
     private boolean fitsInCarry(java.util.List<ItemStack> drops) {
+        android.compactCarry();
         java.util.List<ItemStack> sim = new java.util.ArrayList<>();
         for (int slot : android.carrySlots()) {
             sim.add(android.inventory().getItem(slot).copy());
@@ -2509,8 +2510,9 @@ final class AndroidWorkGoal extends Goal {
             }
             for (int i = 0; i < sim.size() && left > 0; i++) {
                 if (sim.get(i).isEmpty()) {
-                    sim.set(i, d.copyWithCount(left));
-                    left = 0;
+                    int move = Math.min(left, d.getMaxStackSize());
+                    sim.set(i, d.copyWithCount(move));
+                    left -= move;
                 }
             }
             if (left > 0) {

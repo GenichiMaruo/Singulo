@@ -33,6 +33,7 @@ public final class GuiReviewHarness {
     private static UUID androidId;
     private static volatile boolean prepared;
     private static int ready;
+    private static int lookupChapter, lookupPage;
     private static String bootScreen = "";
     private static ItemStack item(String name) {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(name)));
@@ -125,6 +126,12 @@ public final class GuiReviewHarness {
                 var method = WorkConsoleScreen.class.getDeclaredMethod("openPicking", ItemStack.class);
                 method.setAccessible(true);
                 method.invoke(mc.screen, new ItemStack(Items.OAK_PLANKS));
+                int x = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
+                int y = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
+                mc.screen.mouseClicked(x + 110, y + 42, 0);
+                if (!(Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not enable");
+                mc.screen.mouseClicked(x + 110, y + 42, 0);
+                if ((Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not disable");
                 phase++;
             }
             case 10 -> { capture(mc, "console-order-confirmation"); openBlock(mc, RACK); phase++; }
@@ -231,8 +238,46 @@ public final class GuiReviewHarness {
             }
             case 25 -> {
                 capture(mc, "android-log-en-854x480");
-                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 20");
-                phase++;
+                if (!HandbookScreen.lookup(item("android_backpack_upgrade"))) {
+                    throw new IllegalStateException("Handbook item lookup did not open");
+                }
+                phase = 27;
+            }
+            case 27 -> {
+                require(mc, HandbookScreen.class);
+                lookupChapter = (Integer) field(mc.screen, "chapter");
+                lookupPage = (Integer) field(mc.screen, "page");
+                if (lookupChapter == 0 && lookupPage == 0) {
+                    throw new IllegalStateException("Item lookup stayed on the default page");
+                }
+                capture(mc, "handbook-item-lookup-en-854x480");
+                mc.getWindow().setWindowed(1280, 800);
+                phase = 28;
+            }
+            case 28 -> {
+                require(mc, HandbookScreen.class);
+                if ((Integer) field(mc.screen, "chapter") != lookupChapter || (Integer) field(mc.screen, "page") != lookupPage) {
+                    throw new IllegalStateException("Handbook item lookup was lost after window resize");
+                }
+                var box = (net.minecraft.client.gui.components.EditBox) field(mc.screen, "searchBox");
+                box.setValue("zzzz_singulo_no_matching_page");
+                if (!((List<?>) field(mc.screen, "results")).isEmpty()) {
+                    throw new IllegalStateException("Handbook no-results search failed");
+                }
+                box.setValue(item("android_backpack_upgrade").getHoverName().getString());
+                if (((List<?>) field(mc.screen, "results")).isEmpty()) {
+                    throw new IllegalStateException("Handbook did not find the backpack page");
+                }
+                box.setFocused(true);
+                mc.screen.setFocused(box);
+                mc.screen.keyPressed(262, 0, 0);
+                if ((Integer) field(mc.screen, "page") != lookupPage) {
+                    throw new IllegalStateException("Typing in handbook search turned the page");
+                }
+                capture(mc, "handbook-search-en-1280x800");
+                Singulo.LOGGER.info("SINGULO_HANDBOOK_SEARCH_COMPLETE");
+                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 22");
+                phase = 29;
                 mc.stop();
             }
             default -> {}

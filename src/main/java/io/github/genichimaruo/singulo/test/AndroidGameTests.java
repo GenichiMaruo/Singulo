@@ -2235,4 +2235,69 @@ public final class AndroidGameTests {
         a.discard();
         helper.succeed();
     }
+    /** A full nearby chest must not mask another storage that can accept the cargo. */
+    @GameTest(template = EMPTY)
+    public static void stashSkipsFullStorage(GameTestHelper helper) throws Exception {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(Items.STICK, 12));
+        BlockPos full = new BlockPos(3, 1, 2), empty = new BlockPos(6, 1, 2);
+        helper.setBlock(full, net.minecraft.world.level.block.Blocks.CHEST);
+        helper.setBlock(empty, net.minecraft.world.level.block.Blocks.CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(full);
+        for (int i = 0; i < chest.getContainerSize(); i++) chest.setItem(i, new ItemStack(Items.DIRT, 64));
+        var accepts = RuinAndroid.class.getDeclaredMethod("stashable", BlockPos.class);
+        accepts.setAccessible(true);
+        helper.assertFalse((boolean) accepts.invoke(a, helper.absolutePos(full)), "Full chest hides usable storage");
+        helper.assertTrue((boolean) accepts.invoke(a, helper.absolutePos(empty)), "Empty chest rejects cargo");
+        helper.assertTrue(a.requestStash() == null, "Usable storage was not found");
+        var target = RuinAndroid.class.getDeclaredField("stashTarget");
+        target.setAccessible(true);
+        helper.assertFalse(helper.absolutePos(full).equals(target.get(a)), "Selected full chest");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** Loot functions may return one stack whose count exceeds its item stack limit. */
+    @GameTest(template = EMPTY)
+    public static void miningCapacitySplitsOversizedLoot(GameTestHelper helper) throws Exception {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        var goalField = RuinAndroid.class.getDeclaredField("workGoal");
+        goalField.setAccessible(true);
+        Object goal = goalField.get(a);
+        var fits = goal.getClass().getDeclaredMethod("fitsInCarry", List.class);
+        fits.setAccessible(true);
+        for (int i = 0; i < 4; i++) a.inventory().setItem(RuinAndroid.CARRY_START + i, new ItemStack(Items.DIRT, 64));
+        helper.assertTrue((boolean) fits.invoke(goal, List.of(new ItemStack(Items.COBBLESTONE, 64))), "One stack should fit");
+        helper.assertFalse((boolean) fits.invoke(goal, List.of(new ItemStack(Items.COBBLESTONE, 128))), "Oversized loot was counted as one slot");
+        a.inventory().setItem(RuinAndroid.CARRY_START + 3, ItemStack.EMPTY);
+        helper.assertTrue((boolean) fits.invoke(goal, List.of(new ItemStack(Items.COBBLESTONE, 128))), "Two stacks should fit in two slots");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** Supply ports route cargo to adjacent storage instead of exposing their own inventory. */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void androidStashesViaSupplyPort(GameTestHelper helper) throws Exception {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(4, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(Items.STICK, 12));
+        BlockPos port = new BlockPos(5, 1, 2), box = new BlockPos(6, 1, 2);
+        helper.setBlock(port, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
+        helper.setBlock(box, net.minecraft.world.level.block.Blocks.CHEST);
+        var accepts = RuinAndroid.class.getDeclaredMethod("stashable", BlockPos.class);
+        accepts.setAccessible(true);
+        helper.assertTrue((boolean) accepts.invoke(a, helper.absolutePos(port)), "Supply port does not expose adjacent storage");
+        helper.assertTrue(a.requestStash() == null, "Supply storage was not found");
+        helper.succeedWhen(() -> {
+            net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(box);
+            helper.assertTrue(chest.getItem(0).is(Items.STICK) && chest.getItem(0).getCount() == 12, "Cargo did not arrive via supply port");
+            helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START).isEmpty(), "Stashed cargo remained in inventory");
+            a.discard();
+        });
+    }
+
 }

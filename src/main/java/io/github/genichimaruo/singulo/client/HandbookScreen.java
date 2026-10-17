@@ -133,9 +133,7 @@ public class HandbookScreen extends Screen {
                 }
                 if (score > best) {
                     best = score;
-                    chapter = c;
-                    page = p;
-                    scroll = 0;
+                    select(c, p);
                 }
             }
         }

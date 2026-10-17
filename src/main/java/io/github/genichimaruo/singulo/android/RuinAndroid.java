@@ -1189,7 +1189,29 @@ public abstract class RuinAndroid extends Monster {
             String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).getPath();
             box = path.contains("chest") || path.contains("barrel") || path.contains("crate");
         }
-        return box && level().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, p, null) != null;
+        if (!box) {
+            return false;
+        }
+        for (var handler : stashStorages(p)) {
+            for (int slot : allCarrySlots()) {
+                var cargo = inventory.getItem(slot);
+                if (!cargo.isEmpty() && net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, cargo.copy(), true).getCount() < cargo.getCount()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private java.util.List<net.neoforged.neoforge.items.IItemHandler> stashStorages(BlockPos pos) {
+        java.util.List<net.neoforged.neoforge.items.IItemHandler> out = new java.util.ArrayList<>();
+        if (level().getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity port) {
+            port.storages(level(), new java.util.HashSet<>(), out);
+        } else {
+            var handler = level().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, null);
+            if (handler != null) out.add(handler);
+        }
+        return out;
     }
 
     /** 箱へ預けに行く（ほかの動きより先。戦い・作業・充電が始まったらやめる）。 */
@@ -1234,13 +1256,15 @@ public abstract class RuinAndroid extends Monster {
                 return;
             }
             getNavigation().stop();
-            var handler = level().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, null);
-            if (handler != null) {
+            var handlers = stashStorages(at);
+            if (!handlers.isEmpty()) {
                 for (int slot : allCarrySlots()) {
-                    net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
-                    if (!s.isEmpty()) {
-                        inventory.setItem(slot, net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, s.copy(), false));
+                    net.minecraft.world.item.ItemStack rest = inventory.getItem(slot).copy();
+                    for (var handler : handlers) {
+                        if (rest.isEmpty()) break;
+                        rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, rest, false);
                     }
+                    inventory.setItem(slot, rest);
                 }
                 playSound(net.minecraft.sounds.SoundEvents.CHEST_CLOSE, 0.5F, 1.3F);
                 gesture(GESTURE_NOD, null);
