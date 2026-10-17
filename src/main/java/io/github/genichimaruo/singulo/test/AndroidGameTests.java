@@ -817,6 +817,145 @@ public final class AndroidGameTests {
         return helper.getBlockEntity(CONSOLE);
     }
 
+    /** オークのフェンス50個（原木 → 板材 → 棒 → フェンスの3工程）を作らせても、持ち物からあふれた物を地面に落とさない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 6000)
+    public static void fiftyFencesNeverDrop(GameTestHelper helper) {
+        fiftyFences(helper, false, false);
+    }
+
+    /** 同じ（JEI から記録したように、棒はどの板材でも作れるレシピ）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 6000)
+    public static void fiftyFencesWithVariantsNeverDrop(GameTestHelper helper) {
+        fiftyFences(helper, true, false);
+    }
+
+    /** 同じ（どの板材でも作れるレシピ、バックパックあり）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 6000)
+    public static void fiftyFencesWithBackpackNeverDrop(GameTestHelper helper) {
+        fiftyFences(helper, true, true);
+    }
+
+    private static void fiftyFences(GameTestHelper helper, boolean variants, boolean backpack) {
+        var console = workshop(helper, 22);
+        if (variants) {
+            // 棒のレシピを、どの板材でも作れるもの（JEI の「+」で記録したとき）に置き換える
+            java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+            sticks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+            sticks.set(3, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+            java.util.List<String> alts = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ""));
+            alts.set(0, "{\"tag\":\"minecraft:planks\"}");
+            alts.set(3, "{\"tag\":\"minecraft:planks\"}");
+            ItemStack card = new ItemStack(item("recipe_card"));
+            io.github.genichimaruo.singulo.android.work.RecipeData.crafting(sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4), alts)
+                    .write(card, helper.getLevel().registryAccess());
+            io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity r = helper.getBlockEntity(RACK);
+            r.items().setStackInSlot(2, card);
+        }
+        var level = helper.getLevel();
+        java.util.List<ItemStack> fence = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        for (int i : new int[]{0, 2, 3, 5}) {
+            fence.set(i, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+        }
+        fence.set(1, new ItemStack(net.minecraft.world.item.Items.STICK));
+        fence.set(4, new ItemStack(net.minecraft.world.item.Items.STICK));
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(3, recipeCard(helper, fence, new ItemStack(net.minecraft.world.item.Items.OAK_FENCE, 3)));
+        BladeAndroid a = worker(helper, false);
+        if (backpack) {
+            a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
+        }
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        java.util.Map<String, Integer> dropped = new java.util.TreeMap<>();
+        helper.onEachTick(() -> {
+            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(12))) {
+                dropped.merge(e.getItem().getHoverName().getString(), e.getItem().getCount(), Integer::sum);
+                e.discard();
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(dropped.isEmpty(), "地面に落とした: " + dropped);
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.OAK_FENCE) >= 50,
+                    "フェンスが50個届かない: " + delivered(helper, net.minecraft.world.item.Items.OAK_FENCE));
+            a.discard();
+        });
+    }
+
+    /**
+     * アンドロイド作業台の預かり箱: 作った物が持ち物に入りきらなければ足元に落とさず預かり箱へ入れ、あとの工程（棒）は預かり箱の
+     * 板材を持ち物へ戻して作り、残った完成品は取りに来て届ける（作り始めに、空いている持ち物を思いがけない物でふさぐ）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 3600)
+    public static void workbenchBufferCatchesOverflow(GameTestHelper helper) {
+        var console = workshop(helper, 2);
+        var level = helper.getLevel();
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        ItemStack bench = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(bench, level, helper.absolutePos(TABLE),
+                SinguloBlocks.ANDROID_WORKBENCH.get());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(0, bench);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity wb = helper.getBlockEntity(TABLE);
+        boolean[] stuffed = {false}, used = {false};
+        java.util.Map<String, Integer> dropped = new java.util.TreeMap<>();
+        helper.onEachTick(() -> {
+            if (!stuffed[0] && a.state() == RuinAndroid.STATE_CRAFTING) {
+                stuffed[0] = true;
+                for (int slot : a.carrySlots()) {
+                    if (a.inventory().getItem(slot).isEmpty()) {
+                        a.inventory().setItem(slot, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+                    }
+                }
+            }
+            used[0] |= !wb.bufferEmpty();
+            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(12))) {
+                dropped.merge(e.getItem().getHoverName().getString(), e.getItem().getCount(), Integer::sum);
+                e.discard();
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(stuffed[0] && used[0], "預かり箱を使っていない");
+            helper.assertTrue(dropped.isEmpty(), "地面に落とした: " + dropped);
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8,
+                    "棒が8本届かない: " + delivered(helper, net.minecraft.world.item.Items.STICK));
+            helper.assertTrue(wb.bufferEmpty(), "預かり箱に物が残った");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /** 預かり箱の物は、右クリックで受け取れ（取りに来られなくなったとき）、壊すと落ちる。保存しても消えない。 */
+    @GameTest(template = EMPTY)
+    public static void workbenchBufferIsKept(GameTestHelper helper) {
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity wb = helper.getBlockEntity(TABLE);
+        wb.buffer().insertItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_FENCE, 10), false);
+        CompoundTag tag = wb.saveWithoutMetadata(helper.getLevel().registryAccess());
+        var copy = new io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity(helper.absolutePos(TABLE),
+                helper.getBlockState(TABLE));
+        copy.loadWithComponents(tag, helper.getLevel().registryAccess());
+        helper.assertTrue(copy.buffer().getStackInSlot(0).getCount() == 10, "保存すると預かり箱の物が消える");
+        var player = helper.makeMockServerPlayerInLevel();
+        wb.openMenu(player);
+        helper.assertTrue(wb.bufferEmpty() && player.getInventory().countItem(net.minecraft.world.item.Items.OAK_FENCE) == 10,
+                "右クリックで預かり箱の物を受け取れない");
+        wb.buffer().insertItem(0, new ItemStack(net.minecraft.world.item.Items.STICK, 5), false);
+        helper.getLevel().destroyBlock(helper.absolutePos(TABLE), false);
+        helper.runAtTickTime(2, () -> {
+            helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(TABLE)).inflate(2), e -> e.getItem().is(net.minecraft.world.item.Items.STICK)).size() == 1,
+                    "壊しても預かり箱の物が落ちない");
+            helper.succeed();
+        });
+    }
+
     /** 素材が足りない注文は、計算で止まる（原木1本では棒16本は作れない）。在庫で足りれば作れる。 */
     @GameTest(template = EMPTY)
     public static void workPlanNeedsMaterials(GameTestHelper helper) {

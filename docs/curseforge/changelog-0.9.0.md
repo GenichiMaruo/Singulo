@@ -13,6 +13,7 @@ This release focuses on polishing existing content rather than adding new areas.
 - Androids now show why they are stuck: station out of power, destination unreachable, missing materials, protected block, nothing to work on in the area, or storage full. The reason appears in the android's status page, in the Work Console's order details, and as an icon over its head while you wear Survey Glasses.
 - Fixed a guard staying stuck in its charging state after its station disappeared.
 - Androids no longer drop items on the ground when their inventory fills up. Work plans now account for byproducts, leftover containers and items already carried while still using every free slot, and miners, lumberjacks and harvesters check that the drops will fit before breaking a block, going to put items away first when they would not.
+- The **Android Workbench** now has a 27-slot holding box. Crafted items that do not fit in the android's inventory go there instead of onto the ground; later steps and deliveries pick them up again. Right-click the workbench to take anything left behind; breaking it drops the contents.
 
 ### Balance
 - Felling now costs charge based on the size of the tree (12 plus 2 per log) instead of a flat 24.

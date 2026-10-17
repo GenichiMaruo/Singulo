@@ -1212,9 +1212,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
-    /** 受け渡し場所の隣のストレージ。 */
+    /** 受け渡し場所の隣のストレージ。アンドロイド作業台なら、その預かり箱（作った物があふれたときに入れた所）。 */
     public List<IItemHandler> storagesAt(BlockPos point, Set<BlockPos> seen) {
         List<IItemHandler> out = new ArrayList<>();
+        if (level.getBlockEntity(point) instanceof AndroidWorkbenchBlockEntity bench) {
+            out.add(bench.buffer());
+            return out;
+        }
         SupplyPortBlockEntity.collect(level, point, seen, out);
         return out;
     }
@@ -1715,6 +1719,33 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         setChanged();
         return true;
+    }
+
+    /**
+     * アンドロイド作業台の預かり箱へ、作った物を count 個入れた（持ち物に入りきらなかった）: この注文の素材置き場の物として予約する。
+     * あとの工程や納品では、ほかの受け渡し場所と同じように、ここへ取りに来る。
+     */
+    public void holdBuffered(WorkJob job, BlockPos bench, ItemStack item, long count) {
+        WorkOrder o = order(job.orderId());
+        if (o != null && count > 0) {
+            o.hold(bench, item, count);
+            setChanged();
+        }
+    }
+
+    /** 預かり箱から、この注文が count 個取り出した（作る前に、足りない素材を持ち物へ戻した）。 */
+    public void releaseBuffered(WorkJob job, BlockPos bench, ItemStack item, long count) {
+        WorkOrder o = order(job.orderId());
+        if (o != null && count > 0) {
+            o.release(bench, item, count);
+            setChanged();
+        }
+    }
+
+    /** この注文が預かり箱 bench に予約している、item の数。 */
+    public long buffered(WorkJob job, BlockPos bench, ItemStack item) {
+        WorkOrder o = order(job.orderId());
+        return o == null ? 0 : o.held(bench, item);
     }
 
     /** 持ち物を、受け渡し場所 point の隣のストレージへ戻す。全部戻せたら true（入りきらなければ残る。ほかの場所へ回る）。 */

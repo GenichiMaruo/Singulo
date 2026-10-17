@@ -466,8 +466,10 @@ DESC = {
         'Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.'),
     'アンドロイドレシピ棚': ('6行の棚。各行の左に作業位置カード、右にレシピカードを8枚まで並べると、その場所で作れるレシピとして注文できる。',
         'A six-row rack. Put a Work Location Card on the left of a row and up to eight recipe cards on the right, and they can be ordered as recipes made at that location.'),
-    'アンドロイド作業台': ('アンドロイドが作業台のレシピを作る場所。バニラの作業台の4倍の速さで作る。レシピ棚の作業位置カードにこの台を記録して使う。',
-        'Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.'),
+    'アンドロイド作業台': ('アンドロイドが作業台のレシピを作る場所。バニラの作業台の4倍の速さで作る。レシピ棚の作業位置カードにこの台を記録して使う。'
+                    '作った物がアンドロイドの持ち物に入りきらなければ、台の預かり箱に入れてあとで取りに来る（残った物は右クリックで受け取れる）。',
+        'Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack. '
+        "Crafted items that do not fit in the android's inventory go into its holding box until the android comes back (right-click to take what is left)."),
     '作業位置カード': ('ブロックをシフト右クリックして位置を記録する（重なっていれば1枚だけ分けて記録する）。何もない所でシフト右クリックすると記録を消す。作業指令台を記録したカードで資材口・納品口・レシピ棚を右クリックすると、つながる。シフトを押すと記録したブロックの絵になる。',
         'Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.'),
     '範囲カード': ('ブロックを2つシフト右クリックして、その2つを角とする範囲を記録する（1辺128ブロックまで。重なっていれば1枚だけ分けて記録する）。'
@@ -551,6 +553,7 @@ DESC = {
 
 # 長い説明の要約（説明欄にはこれだけを出し、Shift を押している間は説明の全文と作り方・使い道を出す）。名前: (日本語, 英語)
 SUMMARY = {
+    'アンドロイド作業台': ('アンドロイドが速く作る作業台。入りきらない物を預かる。', 'A workbench androids craft on quickly. Holds what does not fit.'),
     '隕石の核': ('隕石の芯の塊。掘ると隕鉄の原石と星屑が出る。',
         'The core of a meteorite. Mine it for raw meteoric iron and stardust.'),
     '衝撃発電パネル': ('落ちた高さで電力をため、重力パネルへ配る。落下ダメージを受けない。',

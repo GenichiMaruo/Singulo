@@ -924,6 +924,7 @@ UI_LANG = {
     'gui.singulo.work_console.needs_tank': ('この注文には液体・ガスを運ぶ工程があるので、タンクアップグレードを積んだアンドロイドだけ選べる', 'This order moves liquids or gases, so only androids with a Tank Upgrade can be chosen'),
     'gui.singulo.work_console.error.not_workbench': ('%s のレシピの作業場所が作業台ではない', 'The work location for %s is not a crafting table'),
     'message.singulo.android_workbench.hint': ('アンドロイドが作業台のレシピを作る台。レシピ棚の作業位置カードにこの台を記録する', 'Androids craft here. Record this block on the Work Location Card in a recipe rack'),
+    'message.singulo.android_workbench.buffer_taken': ('預かり箱の物を受け取った（作った物がアンドロイドの持ち物に入りきらなかった分）', "Took the items from the holding box (what did not fit in an android's inventory)"),
     'gui.singulo.work_console.cancelled': ('%s の注文を取り消した', 'Cancelled the order for %s'),
     'gui.singulo.work_console.cancelled.unreachable': ('%s の注文を取り消した（たどり着けない場所があった）', 'Cancelled the order for %s (a place could not be reached)'),
     'gui.singulo.work_console.cancelled.recipe': ('%s の注文を取り消した（レシピが合わない）', 'Cancelled the order for %s (the recipe does not match)'),

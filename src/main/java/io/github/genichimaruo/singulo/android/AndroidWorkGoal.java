@@ -500,7 +500,7 @@ final class AndroidWorkGoal extends Goal {
             android.spend(CRAFT_COST);
             return;
         }
-        if (!craftOnce(level, step.recipe())) {
+        if (!craftOnce(level, c, job, at, step.recipe())) {
             android.setState(RuinAndroid.STATE_IDLE);
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
             return;
@@ -2329,12 +2329,13 @@ final class AndroidWorkGoal extends Goal {
      * 作業台で1回作る: 持ち物から素材を取り、作業台のレシピで作って、できた物と残る物（バケツなど）を持ち物に入れる。
      * 素材が足りない・レシピが合わないときは false（何も減らさない）。
      */
-    private boolean craftOnce(ServerLevel level, @Nullable RecipeData recipe) {
+    private boolean craftOnce(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, BlockPos at, @Nullable RecipeData recipe) {
         if (recipe == null) {
             return false;
         }
+        unbuffer(level, c, job, at, recipe);
         if (recipe.variants()) {
-            return craftVariants(level, recipe);
+            return craftVariants(level, c, job, at, recipe);
         }
         NonNullList<ItemStack> grid = recipe.gridList();
         CraftingInput input = CraftingInput.of(3, 3, grid);
@@ -2358,20 +2359,76 @@ final class AndroidWorkGoal extends Goal {
         for (ItemCount in : recipe.inputs()) {
             android.takeFromCarry(in.item, (int) in.count);
         }
-        drop(android.addToCarry(result));
+        keepCrafted(level, c, job, at, result);
         for (ItemStack r : remaining) {
             if (!r.isEmpty()) {
-                drop(android.addToCarry(r));
+                keepCrafted(level, c, job, at, r);
             }
         }
         return true;
     }
 
     /**
+     * 作った物を持ち物に入れる。入りきらなければ、アンドロイド作業台の預かり箱へ入れて、この注文の物として予約する
+     * （あとの工程や納品で取りに来る）。預かり箱もいっぱい、またはバニラの作業台なら、足元に落とす。
+     */
+    private void keepCrafted(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, BlockPos at, ItemStack stack) {
+        ItemStack rest = android.addToCarry(stack);
+        if (!rest.isEmpty() && level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity bench) {
+            ItemStack left = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(bench.buffer(), rest, false);
+            c.holdBuffered(job, at, rest, rest.getCount() - left.getCount());
+            rest = left;
+        }
+        drop(rest);
+    }
+
+    /**
+     * 作る前に、足りない素材がこの作業台の預かり箱にあれば（前に作った物があふれて入れた分）、持ち物へ戻す。
+     * この注文が預けた分だけを、持ち物に入るだけ取る。
+     */
+    private void unbuffer(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, BlockPos at, RecipeData recipe) {
+        if (!(level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity bench) || bench.bufferEmpty()) {
+            return;
+        }
+        var buffer = bench.buffer();
+        for (ItemCount in : recipe.inputs()) {
+            long have = 0;
+            for (int slot : android.carrySlots()) {
+                if (in.matches(android.inventory().getItem(slot))) {
+                    have += android.inventory().getItem(slot).getCount();
+                }
+            }
+            long missing = in.count - have;
+            for (int i = 0; i < buffer.getSlots() && missing > 0; i++) {
+                ItemStack s = buffer.getStackInSlot(i);
+                if (s.isEmpty() || !in.matches(s)) {
+                    continue;
+                }
+                long mine = c.buffered(job, at, s);
+                int take = (int) Math.min(Math.min(missing, mine), s.getCount());
+                if (take <= 0) {
+                    continue;
+                }
+                ItemStack got = buffer.extractItem(i, take, false);
+                ItemStack back = android.addToCarry(got);
+                if (!back.isEmpty()) {
+                    buffer.insertItem(i, back, false);              // 持ち物に入りきらない分は戻す
+                }
+                int moved = got.getCount() - back.getCount();
+                c.releaseBuffered(job, at, got, moved);
+                missing -= moved;
+                if (moved < take) {
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
      * 同じ種類の別の物も使うレシピを1回作る: 見本の欄ごとに、持ち物から合う物を1つずつ選んで並べ、作業台のレシピで作る。
      * 選んだ物を減らし、できた物と残る物を持ち物に入れる。並べられない・レシピが合わないときは false（何も減らさない）。
      */
-    private boolean craftVariants(ServerLevel level, RecipeData recipe) {
+    private boolean craftVariants(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, BlockPos at, RecipeData recipe) {
         int[] carry = android.carrySlots();
         int[] used = new int[carry.length];
         int[] from = new int[9];
@@ -2410,10 +2467,10 @@ final class AndroidWorkGoal extends Goal {
                 android.inventory().setItem(carry[j], s.copyWithCount(s.getCount() - used[j]));
             }
         }
-        drop(android.addToCarry(result));
+        keepCrafted(level, c, job, at, result);
         for (ItemStack r : remaining) {
             if (!r.isEmpty()) {
-                drop(android.addToCarry(r));
+                keepCrafted(level, c, job, at, r);
             }
         }
         return true;

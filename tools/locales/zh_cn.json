@@ -1592,8 +1592,8 @@
     "translation": "汇总用作业位置卡连接的资材口、交付口和配方架，接受订单并把作业分配给附近的仿生人。指令台本身也兼作资材口和交付口，并可在界面的“记录”中把配方记录到配方卡上。材料不足的订单无法下单。"
   },
   "desc.singulo.android_workbench": {
-    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.",
-    "translation": "仿生人制作工作台配方的地方，速度是原版工作台的4倍。将它记录到配方架的作业位置卡上使用。"
+    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack. Crafted items that do not fit in the android's inventory go into its holding box until the android comes back (right-click to take what is left).",
+    "translation": "仿生人制作工作台配方的地方，速度是原版工作台的4倍。将它记录到配方架的作业位置卡上使用。作出的物品装不进仿生人的物品栏时，会放进台上的暂存箱，之后再来取（剩下的物品可以右键取出）。"
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -5760,8 +5760,8 @@
     "translation": "仿生人的装饰"
   },
   "guide.singulo.androids.farm.body": {
-    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次按设定的数量，或用栏下方的按钮设为“加满”则带来装置能放入的量。两种都不会带来放不下的部分。留空则不去取）。资材存放处没有且有配方可以制作时，会自动下单制作燃料（制作期间仿生人会做其他作业）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。"
+    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind).",
+    "translation": "・农活：收获（收取成熟的作物并补种。甘蔗和仙人掌保留根部）、伐木（整棵砍树并补种树苗。需要伐木升级）、繁殖（喂食增加到设定数量）、剪毛・挤奶（会带上空桶）、处理（超过设定数量的部分）。不会碰有名字、拴着、被驯服的动物和幼崽。\n・操作：使用拉杆（开・关・切换）、按钮、门等。用来驱动机关。\n・液体与气体：资材口和指令台旁的储罐也是资材存放处。在加工模式或步骤的样本栏中用桶等容器点击，或用 JEI 的“+”，即可放置流体（滚轮每次 100 mB，Shift 每次 1000 mB）。装有储罐升级的仿生人会把流体运到装置。制作流体的订单会放入资材存放处的储罐。\n・燃料：在加工模式的燃料栏放入燃料后记录，装置燃料耗尽时会从资材存放处取来该燃料放入（每次按设定的数量，或用栏下方的按钮设为“加满”则带来装置能放入的量。两种都不会带来放不下的部分。留空则不去取）。资材存放处没有且有配方可以制作时，会自动下单制作燃料（制作期间仿生人会做其他作业）。\n・概率产出：产出数量不足时，从资材存放处取用不足部分的材料，重复制作直到收集齐（材料不足时会等到备齐）。收获、伐木、牧场中若还有会生长的东西，会等待其生长（最多 20 分钟）。紫水晶只收取完全长成的簇，不会破坏紫水晶母岩。\n・仿生人工作台：制作速度是原版工作台的 4 倍。作出的物品装不进仿生人的物品栏时，不会掉在脚下，而是放进作业台的暂存箱，之后再来取（取不了的物品可以右键取出）。"
   },
   "guide.singulo.androids.farm.title": {
     "source": "Farming, fluids and fuel",
@@ -8283,6 +8283,10 @@
     "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
     "translation": "已为无线充电器充入 %1$s FE（%2$s / %3$s FE）"
   },
+  "message.singulo.android_workbench.buffer_taken": {
+    "source": "Took the items from the holding box (what did not fit in an android's inventory)",
+    "translation": "已取出暂存箱中的物品（仿生人物品栏装不下的部分）"
+  },
   "message.singulo.android_workbench.hint": {
     "source": "Androids craft here. Record this block on the Work Location Card in a recipe rack",
     "translation": "仿生人在此制作。将此方块记录到配方架的作业位置卡上"
@@ -9570,6 +9574,10 @@
   "summary.singulo.android_work_console": {
     "source": "Takes orders and assigns crafting and work to nearby androids.",
     "translation": "接受订单，把制作和工作分配给附近的仿生人。"
+  },
+  "summary.singulo.android_workbench": {
+    "source": "A workbench androids craft on quickly. Holds what does not fit.",
+    "translation": "仿生人快速制作的工作台。暂存装不下的物品。"
   },
   "summary.singulo.area_card": {
     "source": "Records an area by two corners, for android routes.",

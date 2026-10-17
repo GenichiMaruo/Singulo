@@ -1592,8 +1592,8 @@
     "translation": "작업 위치 카드로 연결한 자재구·납품구·레시피 선반을 모아 주문을 받고, 근처의 안드로이드에게 작업을 맡깁니다. 지령대 자체도 자재구와 납품구를 겸하며, 화면의 \"기록\"에서 레시피 카드에 레시피를 기록할 수 있습니다. 재료가 부족한 주문은 할 수 없습니다."
   },
   "desc.singulo.android_workbench": {
-    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.",
-    "translation": "안드로이드가 제작대 레시피를 만드는 곳. 바닐라 제작대보다 4배 빠르게 만듭니다. 레시피 선반의 작업 위치 카드에 기록해서 사용합니다."
+    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack. Crafted items that do not fit in the android's inventory go into its holding box until the android comes back (right-click to take what is left).",
+    "translation": "안드로이드가 제작대 레시피를 만드는 곳. 바닐라 제작대보다 4배 빠르게 만듭니다. 레시피 선반의 작업 위치 카드에 기록해서 사용합니다. 만든 물건이 안드로이드 소지품에 들어가지 않으면 작업대의 보관함에 넣었다가 나중에 가지러 옵니다(남은 물건은 우클릭으로 받을 수 있습니다)."
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -5760,8 +5760,8 @@
     "translation": "안드로이드의 장식"
   },
   "guide.singulo.androids.farm.body": {
-    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다."
+    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind).",
+    "translation": "・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다. 만든 물건이 안드로이드 소지품에 다 들어가지 않으면 발밑에 떨어뜨리지 않고 작업대의 보관함에 넣었다가 나중에 가지러 옵니다(가지러 올 수 없게 된 물건은 우클릭으로 받을 수 있습니다)."
   },
   "guide.singulo.androids.farm.title": {
     "source": "Farming, fluids and fuel",
@@ -8283,6 +8283,10 @@
     "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
     "translation": "무선 충전기에 %1$s FE를 충전했습니다(%2$s / %3$s FE)"
   },
+  "message.singulo.android_workbench.buffer_taken": {
+    "source": "Took the items from the holding box (what did not fit in an android's inventory)",
+    "translation": "보관함의 물건을 받았습니다(안드로이드 소지품에 들어가지 않은 만큼)"
+  },
   "message.singulo.android_workbench.hint": {
     "source": "Androids craft here. Record this block on the Work Location Card in a recipe rack",
     "translation": "안드로이드가 여기서 만듭니다. 레시피 선반의 작업 위치 카드에 이 블록을 기록하세요"
@@ -9570,6 +9574,10 @@
   "summary.singulo.android_work_console": {
     "source": "Takes orders and assigns crafting and work to nearby androids.",
     "translation": "주문을 받아 가까운 안드로이드에게 제작과 작업을 맡긴다."
+  },
+  "summary.singulo.android_workbench": {
+    "source": "A workbench androids craft on quickly. Holds what does not fit.",
+    "translation": "안드로이드가 빠르게 만드는 작업대. 들어가지 않는 물건을 보관합니다."
   },
   "summary.singulo.area_card": {
     "source": "Records an area by two corners, for android routes.",
