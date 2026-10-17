@@ -646,13 +646,15 @@ public final class AndroidGameTests {
     /** 巡回中に敵の群れ（5体）を見つけたら、ステーションがレッドストーン信号を出し、記録に残す。倒した相手も記録に残る。 */
     @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
     public static void patrolRaisesAlarm(GameTestHelper helper) {
+        floor(helper); // Keep the real combat path walkable on either loader.
         AndroidStationBlockEntity s = station(helper, 1);
         routeCard(helper, s, 0, new BlockPos(2, 0, 5));
         s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         boolean[] alarmed = {false};
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 40, () -> {
             for (int i = 0; i < 5; i++) {
-                var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+                // Sunlight must not kill the victim before the guard can earn a kill log.
+                var zombie = EntityType.HUSK.create(helper.getLevel());
                 zombie.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1 + i, 1, 6))));
                 zombie.setNoAi(true);
                 zombie.setPersistenceRequired();
@@ -673,7 +675,8 @@ public final class AndroidGameTests {
             helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_ALARM),
                     "警報が記録に残らない");
             helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_KILL),
-                    "倒した相手が記録に残らない");
+                    "倒した相手が記録に残らない: state=" + a.state() + " pos=" + a.position()
+                            + " target=" + a.getTarget() + " day=" + helper.getLevel().getDayTime());
             a.discard();
         });
     }
