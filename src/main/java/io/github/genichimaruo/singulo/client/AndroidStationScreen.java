@@ -95,7 +95,18 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
             g.renderTooltip(font, Component.translatable("gui.singulo.android.rename"), mouseX, mouseY);
         }
         if (Panel.inside(mouseX, mouseY, leftPos + MINUS_X + 16, topPos + RETREAT_Y, PLUS_X - MINUS_X - 18, 16)) {
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.retreat.hint"), 180), mouseX, mouseY);
+            java.util.List<net.minecraft.util.FormattedCharSequence> lines = new java.util.ArrayList<>(
+                    font.split(Component.translatable("gui.singulo.android_station.retreat.hint"), 180));
+            if (menu.value(AndroidStationBlockEntity.D_KIND) >= 0) {
+                // 目安: 見ているアンドロイドの今の体力と充電（戻る体力と比べられるように）
+                lines.addAll(font.split(Component.translatable("gui.singulo.android_station.retreat.now", menu.value(AndroidStationBlockEntity.D_HP),
+                        menu.value(AndroidStationBlockEntity.D_CHARGE)).withStyle(net.minecraft.ChatFormatting.AQUA), 180));
+            }
+            g.renderTooltip(font, lines, mouseX, mouseY);
+        }
+        if (!orphanWaiting() && Panel.inside(mouseX, mouseY, leftPos + RECALL_X, topPos + RETREAT_Y, RECALL_W, 16)) {
+            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.recall.hint", AndroidStationBlockEntity.RECALL_ALL_RANGE), 180),
+                    mouseX, mouseY);
         }
         if (menu.patrolling()) {
             return;                                  // 追従の設定（追従中に戦うか・追従する人）の段は、巡回の設定に置き換わっている
@@ -289,7 +300,8 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
             } else if (Panel.inside(mouseX, mouseY, leftPos + PLUS_X, topPos + RETREAT_Y, 16, 16)) {
                 id = AndroidStationBlockEntity.BUTTON_RETREAT_UP;
             } else if (Panel.inside(mouseX, mouseY, leftPos + RECALL_X, topPos + RETREAT_Y, RECALL_W, 16)) {
-                id = orphanWaiting() ? AndroidStationBlockEntity.BUTTON_LINK : AndroidStationBlockEntity.BUTTON_RECALL;
+                id = orphanWaiting() ? AndroidStationBlockEntity.BUTTON_LINK
+                        : hasShiftDown() ? AndroidStationBlockEntity.BUTTON_RECALL_ALL : AndroidStationBlockEntity.BUTTON_RECALL;
             }
             if (menu.patrolling()) {
                 for (int i = 0; i < 3; i++) {
@@ -495,8 +507,10 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
         }
         g.drawString(font, "-", MINUS_X + 6, RETREAT_Y + 4, Panel.TEXT, false);
         g.drawString(font, "+", PLUS_X + 5, RETREAT_Y + 4, Panel.TEXT, false);
+        boolean low = menu.value(AndroidStationBlockEntity.D_KIND) >= 0 && menu.value(AndroidStationBlockEntity.D_HP) > 0
+                && menu.value(AndroidStationBlockEntity.D_HP) < menu.value(AndroidStationBlockEntity.D_RETREAT);
         fitCentered(g, font, Component.translatable("gui.singulo.android_station.retreat", menu.value(AndroidStationBlockEntity.D_RETREAT)),
-                MINUS_X + 18, RETREAT_Y + 4, PLUS_X - MINUS_X - 20, Panel.TEXT);
+                MINUS_X + 18, RETREAT_Y + 4, PLUS_X - MINUS_X - 20, low ? 0xFFC06A20 : Panel.TEXT);
         fitCentered(g, font, Component.translatable(orphanWaiting() ? "gui.singulo.android_station.link" : "gui.singulo.android_station.recall"),
                 RECALL_X + 2, RETREAT_Y + 4, RECALL_W - 4, Panel.TEXT);
     }

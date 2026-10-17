@@ -21,13 +21,14 @@ CHAPTERS = [
          '・左の章を選ぶと、右にページが出ます。下の矢印でページをめくります。\n'
          '・「進み具合」の章は工業・探索・アンドロイドの枝に沿って、達成した目標と次の目標を示します（進捗画面［L キー］の Singulo タブとも同じです）。\n'
          '・アイテムにカーソルを合わせると説明が出ます。Shift を押すと作り方と使い道も出ます。\n'
-         '・Singulo のアイテムにカーソルを合わせて H キーを押すと、その物のことが書いてあるページが開きます（手に持っているときも）。\n'
+         '・Singulo のアイテムにカーソルを合わせて H キーを押すと、その物のことが書いてあるページが開きます（手に持っているときも）。'
+         '章の一覧の上の検索欄に言葉を入れると、合うページを探せます。\n'
          '・マルチブロックは「ホロ投影機」をコントローラに使うと、正しい形が半透明で浮かび上がります。',
          'Using this book',
          '- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the '
          'bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the '
          'Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift '
-         'to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it).\n- Use the Holo Projector on a multiblock controller '
+         'to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it). Type in the search box above the chapter list to find matching pages.\n- Use the Holo Projector on a multiblock controller '
          'to show the correct shape as a translucent outline.'),
         ('basics', '電力・触媒・遺構',
          '電力（FE）は自前のケーブルで運びます。アイテムと液体は装置の面ごとの設定と、他modのパイプで運びます。\n'
@@ -719,7 +720,8 @@ CHAPTERS = [
          '・許可証: ステーションにシールド許可証を入れると、持ち主と登録した人だけがステーションとアンドロイドの画面を開けます。'
          '登録していない人（クリエイティブを除く）は敵とみなして攻撃し、その人の攻撃はアンドロイドにも当たります。'
          '追従する人も、持ち主か登録した人から選べます。\n'
-         '・戻る体力: これを下回ると、ステーションへ戻って修理と充電をします。「呼び戻す」で戻すこともできます。\n'
+         '・戻る体力: これを下回ると、ステーションへ戻って修理と充電をします（カーソルを合わせると、今の体力と充電が出る）。'
+         '「呼び戻す」で戻すこともでき、Shift＋クリックなら近く（64ブロック以内）の操作できるステーションのアンドロイドをみな呼び戻します。\n'
          '・名前: ステーションやアンドロイドの画面で名前をクリックすると付けられます（↺で愛称に戻す）。\n'
          '・コンパレーター: ステーションから、アンドロイドの体力に応じた信号（0〜15）が出ます。\n'
          '・ステーションを壊すと、アンドロイドはその場に残ります。新しいステーションに同じ型のメモリを入れると、「リンク」でつなぎ直せます。\n'
@@ -733,7 +735,8 @@ CHAPTERS = [
          '- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. '
          'The android treats anyone else (except in Creative) as an enemy and attacks them, and their attacks can hurt it. '
          'You can also choose whether it follows the owner or one of the registered players.\n'
-         '- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n'
+         '- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). '
+         'Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n'
          '- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n'
          '- Comparator: the station outputs a signal (0-15) from the android\'s health.\n'
          '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n'
@@ -933,7 +936,7 @@ CHAPTERS = [
          'ない。空なら取りに行かない）。素材置き場になく、レシピで作れるなら、燃料を作る注文を自動で出す（作るあいだ、アンドロイドはほかの作業をする）。\n'
          '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ち'
          'きった塊だけ取り、芽生えたアメジストは壊さない。\n'
-         '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。作った物がアンドロイドの持ち物に入りきらないときは、足元に落とさずに台の預かり箱へ入れ、あとで取りに来る（取りに来られなくなった物は、右クリックで受け取れる）。',
+         '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。作った物がアンドロイドの持ち物に入りきらないときは、足元に落とさずに台の預かり箱へ入れ、あとで取りに来る（取りに来られなくなった物は、右クリックで受け取れる）。預かり箱に物があるあいだは、台の上にその物が浮かぶ。',
          'Farming, fluids and fuel',
          '- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole tr'
          'ees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk '
@@ -955,7 +958,7 @@ CHAPTERS = [
          'amethyst is never broken.\n'
          "- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's "
          "inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them "
-         "(right-click to take anything left behind)."),
+         "(right-click to take anything left behind). While the holding box has items, one of them floats above the workbench."),
         ('trouble', '止まっているとき',
          'アンドロイドが止まっているときは、理由を次の場所で確かめられます。\n'
          '・アンドロイドの画面の状態のページ: 吹き出しに赤い字で理由が出る。\n'

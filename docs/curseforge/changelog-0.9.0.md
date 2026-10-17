@@ -26,6 +26,9 @@ This release focuses on polishing existing content rather than adding new areas.
   - Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.
 - The android Gear page has two new buttons: **Sort** tidies the inventory and backpack, and **Put away** sends the android to a nearby chest, barrel, shulker box or supply port to empty them.
 - The Android Assembly Station's follow row tooltip now lists the players on the permit.
+- Shift-click **Recall** in an Android Assembly Station to call back every android from the stations you can use within 64 blocks.
+- Hovering over the return health setting shows the android's current health and charge, and the setting turns orange when health is below it.
+- While an Android Workbench's holding box has items, one of them floats above the workbench.
 - Redesigned the android **Bouquet**: clear wrapping with visible stems, a ribbon bow (dyeing now colors the ribbon) and a fuller arrangement of flowers, tilted forward so people in front can see it. The item icon matches.
 - The **Beret** is slightly smaller and no longer lets hair poke through on its lower side.
 - Fixed the glowing line at androids' left elbow flickering when the arm bends.
@@ -41,5 +44,6 @@ This release focuses on polishing existing content rather than adding new areas.
 - The Progress chapter opens at your current stage and links to that stage's overview.
 - More items show a short tooltip summary; hold **Shift** for full details.
 - Hover over a Singulo item and press **H** (or press it while holding the item) to open the handbook page about it.
+- The handbook has a search box above the chapter list.
 
 Published as **Beta**. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).

@@ -20,6 +20,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * <p>作った物がアンドロイドの持ち物に入りきらないときは、足元に落とさずに、ここの預かり箱（{@link #BUFFER_SLOTS} 枠）へ入れる。
  * 預かった物は、その注文の素材置き場として扱い（作業指令台の受け渡し場所の1つ）、あとの工程や納品で取りに来る。
  * 取りに来られなくなった物（注文を取り消したなど）は、右クリックで受け取れる。壊すと中身を落とす。
+ * 預かっている間は、台の上にその物が浮かんで回る（クライアントへは、見せる1つだけ送る）。
  */
 public class AndroidWorkbenchBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener {
     /** ここで作ると、1回あたりの時間がこの割合になる（バニラの作業台 2秒 → 0.5秒）。 */
@@ -31,8 +32,44 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
+            ItemStack now = firstStored();
+            if (level != null && !level.isClientSide && !ItemStack.isSameItemSameComponents(now, shown)) {
+                shown = now.copyWithCount(1);
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+            }
         }
     };
+    /** 台の上に見せる物（預かり箱の最初の物。空なら預かっていない）。クライアントでも分かる。 */
+    private ItemStack shown = ItemStack.EMPTY;
+
+    /** 台の上に浮かべて見せる物（預かっていなければ空）。 */
+    public ItemStack shown() {
+        return shown;
+    }
+
+    private ItemStack firstStored() {
+        for (int i = 0; i < buffer.getSlots(); i++) {
+            if (!buffer.getStackInSlot(i).isEmpty()) {
+                return buffer.getStackInSlot(i);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    // 見せる物はクライアントにも送る
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        if (!firstStored().isEmpty()) {
+            tag.put("shown", firstStored().copyWithCount(1).save(registries));
+        }
+        return tag;
+    }
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
 
     public AndroidWorkbenchBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.ANDROID_WORKBENCH.get(), pos, state);
@@ -87,5 +124,6 @@ public class AndroidWorkbenchBlockEntity extends BlockEntity implements Abstract
         if (tag.contains("buffer")) {
             buffer.deserializeNBT(registries, tag.getCompound("buffer"));
         }
+        shown = tag.contains("shown") ? ItemStack.parseOptional(registries, tag.getCompound("shown")) : firstStored().copyWithCount(1);
     }
 }
