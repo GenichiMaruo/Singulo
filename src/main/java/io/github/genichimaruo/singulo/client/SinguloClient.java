@@ -48,6 +48,7 @@ public final class SinguloClient {
                 ClientGalaxies.set(java.util.List.of(), false));
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
+        NeoForge.EVENT_BUS.addListener(SinguloKeys::onScreenKey);
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
         NeoForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
         NeoForge.EVENT_BUS.addListener(MachineSounds::onClientTick);

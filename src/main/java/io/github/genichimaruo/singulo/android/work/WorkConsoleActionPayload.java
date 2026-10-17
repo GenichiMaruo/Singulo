@@ -37,17 +37,29 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
     }
 
     public static CompoundTag plan(ItemStack item, long count, net.minecraft.core.HolderLookup.Provider reg) {
+        return plan(item, count, false, reg);
+    }
+
+    /** 計算を頼む。fresh: 完成品の在庫は使わず、新しく作る。 */
+    public static CompoundTag plan(ItemStack item, long count, boolean fresh, net.minecraft.core.HolderLookup.Provider reg) {
         CompoundTag t = new CompoundTag();
         t.putString("type", PLAN);
         t.put("item", item.copyWithCount(1).save(reg));
         t.putLong("count", count);
+        t.putBoolean("fresh", fresh);
         return t;
     }
 
     /** 注文する。auto: アンドロイドを選ばなかった（androids は選べる候補。指令台が、そのうち作業量に見合う人数だけを招集する）。 */
     public static CompoundTag start(ItemStack item, long count, List<UUID> androids, boolean auto, BlockPos destination,
                                     net.minecraft.core.HolderLookup.Provider reg) {
-        CompoundTag t = plan(item, count, reg);
+        return start(item, count, androids, auto, destination, false, reg);
+    }
+
+    /** 注文する（fresh: 完成品の在庫は使わず、新しく作る）。 */
+    public static CompoundTag start(ItemStack item, long count, List<UUID> androids, boolean auto, BlockPos destination, boolean fresh,
+                                    net.minecraft.core.HolderLookup.Provider reg) {
+        CompoundTag t = plan(item, count, fresh, reg);
         t.putString("type", START);
         t.putBoolean("auto", auto);
         t.putLong("destination", destination.asLong());
@@ -146,7 +158,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
             switch (a.getString("type")) {
                 case PLAN -> {
                     if (!item.isEmpty()) {
-                        plan = WorkConsoleView.plan(console, console.plan(item, count), reg);
+                        plan = WorkConsoleView.plan(console, console.plan(item, count, a.getBoolean("fresh")), reg);
                     }
                 }
                 case START -> {
@@ -156,7 +168,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                     }
                     BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLong("destination")) : null;
                     Component error = item.isEmpty() ? Component.literal("?")
-                            : console.start(player, item, count, ids, a.getBoolean("auto"), destination);
+                            : console.start(player, item, count, ids, a.getBoolean("auto"), destination, a.getBoolean("fresh"));
                     plan = new CompoundTag();
                     plan.putBoolean("started", error == null);
                     if (error != null) {

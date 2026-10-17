@@ -3367,6 +3367,10 @@
     "source": "Off to get repaired",
     "translation": "수리하고 올게"
   },
+  "gui.singulo.android.sort.hint": {
+    "source": "Sort the carried items and backpack contents (stacks the same items together)",
+    "translation": "소지품과 백팩 안을 정리합니다(같은 아이템은 합칩니다)"
+  },
   "gui.singulo.android.stall.full": {
     "source": "Storage is full; can't put items away",
     "translation": "보관 장소가 가득 차서 물건을 둘 수 없음"
@@ -3390,6 +3394,26 @@
   "gui.singulo.android.stall.unreachable": {
     "source": "Can't reach the destination",
     "translation": "목적지에 갈 수 없음"
+  },
+  "gui.singulo.android.stash.empty": {
+    "source": "Nothing to put away",
+    "translation": "맡길 물건이 없습니다"
+  },
+  "gui.singulo.android.stash.going": {
+    "source": "Going to put things in a nearby box",
+    "translation": "근처 상자에 맡기러 갑니다"
+  },
+  "gui.singulo.android.stash.hint": {
+    "source": "Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box or supply port)",
+    "translation": "소지품과 백팩 안의 물건을 근처 상자(상자·통·셜커 상자·자재구)에 맡기러 갑니다"
+  },
+  "gui.singulo.android.stash.none": {
+    "source": "No box nearby to put things in (within 12 blocks)",
+    "translation": "근처에 맡길 상자가 없습니다(12블록 이내)"
+  },
+  "gui.singulo.android.stash.working": {
+    "source": "Not while working",
+    "translation": "작업 중에는 할 수 없습니다"
   },
   "gui.singulo.android.storage": {
     "source": "Storage",
@@ -3566,6 +3590,10 @@
   "gui.singulo.android_station.permit.none": {
     "source": "No permit: anyone can use it",
     "translation": "허가증 없음: 누구나 조작 가능"
+  },
+  "gui.singulo.android_station.permit.others": {
+    "source": "Anyone else is treated as an enemy and attacked",
+    "translation": "그 밖의 사람은 적으로 여겨 공격합니다"
   },
   "gui.singulo.android_station.recall": {
     "source": "Recall",
@@ -5259,6 +5287,10 @@
     "source": "Waiting for materials",
     "translation": "재료를 기다리는 중"
   },
+  "gui.singulo.work_console.again": {
+    "source": "Order the same item again (you can change the amount before ordering)",
+    "translation": "같은 아이템을 다시 주문합니다(확인 화면에서 수를 바꿀 수 있습니다)"
+  },
   "gui.singulo.work_console.androids": {
     "source": "Androids (slots)",
     "translation": "안드로이드(나를 수 있는 칸)"
@@ -5411,6 +5443,14 @@
     "source": "The machine for %s does not take %s through its %s face (check the \"In\" face on the recipe card)",
     "translation": "%s 레시피의 장치가 넣는 면(%3$s)으로 %2$s을(를) 받지 않습니다(레시피 카드의 \"입\" 면을 확인하세요)"
   },
+  "gui.singulo.work_console.fresh": {
+    "source": "New",
+    "translation": "새로"
+  },
+  "gui.singulo.work_console.fresh.hint": {
+    "source": "When on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more). When off, items in storage count toward the order.",
+    "translation": "켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\"로 주문). 끄면 재고의 완성품도 수에 넣습니다."
+  },
   "gui.singulo.work_console.fuel_ordered": {
     "source": "Out of fuel (%s), so an order to make %s was placed",
     "translation": "재료 보관소에 연료(%s)가 없어서 %s개를 만드는 주문을 냈습니다"
@@ -5447,6 +5487,10 @@
     "source": "You are not on this work console's permit",
     "translation": "이 작업 지령대의 허가증에 등록되어 있지 않습니다"
   },
+  "gui.singulo.work_console.making": {
+    "source": "Being made: %s",
+    "translation": "제작 중: %s개"
+  },
   "gui.singulo.work_console.material.hint": {
     "source": "Taken from the stockpile (need / have)",
     "translation": "재료 보관소에서 쓰는 것(필요 / 재고)"
@@ -5454,6 +5498,18 @@
   "gui.singulo.work_console.materials": {
     "source": "To craft, and materials (need / have)",
     "translation": "만드는 것과 재료(필요 / 재고)"
+  },
+  "gui.singulo.work_console.missing": {
+    "source": "Missing materials:",
+    "translation": "부족한 재료:"
+  },
+  "gui.singulo.work_console.missing.more": {
+    "source": "Waiting for %s ×%s and %s more",
+    "translation": "재료 대기: %s ×%s 외 %s종"
+  },
+  "gui.singulo.work_console.missing.one": {
+    "source": "Waiting for %s ×%s",
+    "translation": "재료 대기: %s ×%s"
   },
   "gui.singulo.work_console.needs_chem_tank": {
     "source": "This order moves chemicals (Mekanism gases and the like), so only androids with a Gas Tank Upgrade or a Gas & Liquid Upgrade can be chosen",
@@ -5486,6 +5542,22 @@
   "gui.singulo.work_console.no_orders": {
     "source": "No running orders",
     "translation": "진행 중인 주문이 없습니다"
+  },
+  "gui.singulo.work_console.notify": {
+    "source": "[Work Console] %s",
+    "translation": "[작업 지령대] %s"
+  },
+  "gui.singulo.work_console.notify.missing": {
+    "source": "The order for %s is stuck waiting for materials (%s: %s more needed)",
+    "translation": "%s 주문이 재료를 기다리며 멈춰 있습니다(%s이(가) %s개 부족합니다)"
+  },
+  "gui.singulo.work_console.notify.missing.more": {
+    "source": "The order for %s is stuck waiting for materials (%s: %s more needed, and %s other kinds)",
+    "translation": "%s 주문이 재료를 기다리며 멈춰 있습니다(%s이(가) %s개 부족합니다. 그 밖에 %s종)"
+  },
+  "gui.singulo.work_console.notify.waiting": {
+    "source": "The order for %s is stuck waiting for materials",
+    "translation": "%s 주문이 재료를 기다리며 멈춰 있습니다"
   },
   "gui.singulo.work_console.outbox.hint": {
     "source": "Orders delivered to the console. Moved into adjacent chests automatically",
@@ -5776,8 +5848,8 @@
     "translation": "첫 작업 주문"
   },
   "guide.singulo.androids.gear.body": {
-    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩 칸이 더해집니다. 3단계가 있으며 백팩 12칸, 강화 백팩 18칸, 대형 백팩 24칸이고, 각 단계는 한 단계 아래 백팩으로 만듭니다. 안에 물건이 있으면 뺄 수 없지만, 내용물이 그대로 들어가는 더 큰 백팩으로는 바꿔 낄 수 있습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
+    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
+    "translation": "- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩 칸이 더해집니다. 3단계가 있으며 백팩 12칸, 강화 백팩 18칸, 대형 백팩 24칸이고, 각 단계는 한 단계 아래 백팩으로 만듭니다. 안에 물건이 있으면 뺄 수 없지만, 내용물이 그대로 들어가는 더 큰 백팩으로는 바꿔 낄 수 있습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다.\n- 정리・맡기기: 백팩 칸 오른쪽 위의 버튼으로 소지품과 백팩 안을 정리하거나, 근처 상자(12블록 이내의 상자・통・셜커 상자・자재구)에 걸어가서 맡기게 할 수 있습니다."
   },
   "guide.singulo.androids.gear.title": {
     "source": "Android upgrades",
@@ -5840,8 +5912,8 @@
     "translation": "스테이션 업그레이드"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
-    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +12·18·24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n- \"새로\": 켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\").\n- 주문 목록에서는 만드는 중인 아이템에 주황색 테두리가 붙습니다. 진행 중인 주문의 \"↻\"로 같은 아이템을 다시 주문할 수 있습니다. 재료를 기다리는 주문에는 부족한 아이템과 수가 나옵니다(행에 커서를 올리면 전부).\n- 화면에서 낸 주문은 끝났을 때, 재료를 기다리며 1분 이상 멈췄을 때, 취소되었을 때 주문한 사람에게 채팅으로 알립니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +12·18·24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
@@ -5928,8 +6000,8 @@
     "translation": "전력, 촉매, 유적"
   },
   "guide.singulo.intro.howto.body": {
-    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
-    "translation": "- 왼쪽에서 장을 고르면 오른쪽에 페이지가 나옵니다. 아래쪽 화살표로 페이지를 넘깁니다.\n- '진행 상황' 장에서 달성한 목표와 다음 목표를 볼 수 있습니다(발전 과제 화면[L 키]의 Singulo 탭과 같음).\n- 아이템에 커서를 올리면 설명이 나오고, Shift를 누르면 제작법과 용도도 나옵니다.\n- 멀티블록 컨트롤러에 홀로그램 투영기를 사용하면 올바른 형태가 반투명하게 떠오릅니다.\n발전 과제는 공업, 탐사, 안드로이드의 갈래로 안내합니다. 연결선은 안내이며 별도 해금 조건이 아닙니다."
+    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it).\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
+    "translation": "- 왼쪽에서 장을 고르면 오른쪽에 페이지가 나옵니다. 아래쪽 화살표로 페이지를 넘깁니다.\n- '진행 상황' 장에서 달성한 목표와 다음 목표를 볼 수 있습니다(발전 과제 화면[L 키]의 Singulo 탭과 같음).\n- 아이템에 커서를 올리면 설명이 나오고, Shift를 누르면 제작법과 용도도 나옵니다.\n- Singulo 아이템에 커서를 올리고 H 키를 누르면 그 아이템에 대해 쓰인 페이지가 열립니다(손에 들고 있을 때도).\n- 멀티블록 컨트롤러에 홀로그램 투영기를 사용하면 올바른 형태가 반투명하게 떠오릅니다.\n발전 과제는 공업, 탐사, 안드로이드의 갈래로 안내합니다. 연결선은 안내이며 별도 해금 조건이 아닙니다."
   },
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",
@@ -8130,6 +8202,10 @@
   "key.categories.singulo": {
     "source": "Singulo",
     "translation": "Singulo"
+  },
+  "key.singulo.handbook_lookup": {
+    "source": "Look up in Handbook",
+    "translation": "핸드북에서 찾아보기"
   },
   "key.singulo.toggle_area": {
     "source": "Toggle gravity tool area",

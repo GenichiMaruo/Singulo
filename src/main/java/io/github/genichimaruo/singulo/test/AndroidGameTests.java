@@ -1134,6 +1134,60 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+    /** 「新規」の注文: 在庫にある完成品は使わず、注文した数を新しく作る（在庫を使う注文なら、在庫だけで足りる）。 */
+    @GameTest(template = EMPTY)
+    public static void workOrderFreshIgnoresFinishedStock(GameTestHelper helper) {
+        var console = workshop(helper, 1);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.STICK, 4));
+        ItemStack stick = new ItemStack(net.minecraft.world.item.Items.STICK);
+        var fromStock = console.plan(stick, 4);
+        helper.assertTrue(fromStock.ok() && fromStock.steps.isEmpty(), "在庫の棒4本で足りるのに、作る工程がある: " + fromStock.steps.size());
+        var fresh = console.plan(stick, 4, true);
+        helper.assertTrue(fresh.ok() && fresh.steps.size() == 2, "新規なのに、在庫の棒を使った（工程の数: " + fresh.steps.size() + "）");
+        helper.succeed();
+    }
+
+    /** 持ち物とバックパックの中の並べ替え: 同じ物はまとめ、物の ID の順に前から詰める。 */
+    @GameTest(template = EMPTY)
+    public static void androidSortsCarriedItems(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.setNoAi(true);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        var inv = a.inventory();
+        inv.setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.STICK, 10));
+        inv.setItem(RuinAndroid.CARRY_START + 1, new ItemStack(net.minecraft.world.item.Items.DIRT, 5));
+        inv.setItem(RuinAndroid.CARRY_START + 3, new ItemStack(net.minecraft.world.item.Items.STICK, 20));
+        helper.assertTrue(a.sortCarry(), "並べ替えられない");
+        helper.assertTrue(inv.getItem(RuinAndroid.CARRY_START).is(net.minecraft.world.item.Items.DIRT) && inv.getItem(RuinAndroid.CARRY_START).getCount() == 5,
+                "1つめが土5個でない: " + inv.getItem(RuinAndroid.CARRY_START));
+        helper.assertTrue(inv.getItem(RuinAndroid.CARRY_START + 1).is(net.minecraft.world.item.Items.STICK) && inv.getItem(RuinAndroid.CARRY_START + 1).getCount() == 30,
+                "棒がまとまって2つめに来ない: " + inv.getItem(RuinAndroid.CARRY_START + 1));
+        helper.assertTrue(inv.getItem(RuinAndroid.CARRY_START + 2).isEmpty() && inv.getItem(RuinAndroid.CARRY_START + 3).isEmpty(), "後ろが空かない");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** 「預ける」: 近くのチェストまで行って、持ち物を入れる。近くに箱がなければ行かない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 400)
+    public static void androidStashesIntoNearbyChest(GameTestHelper helper) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(new BlockPos(1, 1, 1)), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.STICK, 12));
+        helper.assertTrue(a.requestStash() != null, "近くに箱がないのに、預けに行くことになった");
+        helper.setBlock(new BlockPos(5, 1, 2), net.minecraft.world.level.block.Blocks.CHEST);
+        helper.assertTrue(a.requestStash() == null, "近くのチェストへ預けに行かない");
+        helper.succeedWhen(() -> {
+            net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(new BlockPos(5, 1, 2));
+            helper.assertTrue(chest.getItem(0).is(net.minecraft.world.item.Items.STICK) && chest.getItem(0).getCount() == 12, "チェストに棒が入らない");
+            helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START).isEmpty(), "持ち物に棒が残っている");
+            a.discard();
+        });
+    }
+
     /** アンドロイドが資材口から原木を取り、作業台で板材と棒を作って、納品口へ棒を届ける。作業中は持ち物を取り出せない。 */
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void androidCraftsAndDelivers(GameTestHelper helper) {
@@ -1146,6 +1200,8 @@ public final class AndroidGameTests {
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.assertTrue(a.isWorking(), "アンドロイドが作業中にならない");
+        long making = io.github.genichimaruo.singulo.android.work.WorkConsoleView.making(console, new ItemStack(net.minecraft.world.item.Items.STICK));
+        helper.assertTrue(making == 8, "作っている最中の数（画面の枠）が注文の数でない: " + making);
         io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity port = helper.getBlockEntity(DELIVERY);
         helper.succeedWhen(() -> {
             int sticks = 0;

@@ -320,13 +320,19 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     public WorkPlanner.Plan plan(ItemStack target, long count) {
-        return WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), available());
+        return plan(target, count, false);
+    }
+
+    /** 計算する。fresh なら、完成品そのものの在庫は使わず、count 個を新しく作る（{@link #planFresh}）。 */
+    public WorkPlanner.Plan plan(ItemStack target, long count, boolean fresh) {
+        return fresh ? planFresh(target, count) : WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), available());
     }
 
     /**
-     * 作って増やす計算（在庫を保つ注文）: 完成品そのものの在庫は使わない（使うと、作らずに在庫を予約するだけで終わり、在庫が増えない）。
+     * 作って増やす計算（在庫を保つ注文と、「新しく作る」注文）: 完成品そのものの在庫は使わない
+     * （使うと、作らずに在庫を予約するだけで終わり、新しく増えない。例: 鉄の斧が3本あって、あと2本ほしいとき）。
      */
-    private WorkPlanner.Plan planToStock(ItemStack target, long count) {
+    private WorkPlanner.Plan planFresh(ItemStack target, long count) {
         List<ItemCount> stock = available();
         stock.removeIf(c -> c.matches(target));
         return WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), stock);
@@ -379,7 +385,32 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     @Nullable
     public Component start(ServerPlayer player, ItemStack target, long count, List<UUID> androids, boolean auto, @Nullable BlockPos destination) {
-        return start(player, target, count, androids, destination, false, auto);
+        return start(player, target, count, androids, auto, destination, false);
+    }
+
+    /** 注文する。fresh なら、完成品の在庫は使わず count 個を新しく作って届ける。できなければ理由を返す（できたら null）。 */
+    @Nullable
+    public Component start(ServerPlayer player, ItemStack target, long count, List<UUID> androids, boolean auto, @Nullable BlockPos destination,
+                           boolean fresh) {
+        Component why = start(player, target, count, androids, destination, false, auto, fresh);
+        if (why == null && !orders.isEmpty()) {
+            orders.get(orders.size() - 1).notify = true;     // 画面から今すぐ出した注文: できたら・止まったら知らせる
+        }
+        return why;
+    }
+
+    /** 素材を待ったまま、これだけ経ったら注文した人へ知らせる（tick）。 */
+    static final int STALL_NOTIFY_TICKS = 20 * 60;
+
+    /** 注文した人がいれば（同じサーバーにいれば）、チャットで知らせる。 */
+    private void tell(WorkOrder o, Component what) {
+        if (!o.notify || o.orderer == null || !(level instanceof ServerLevel server)) {
+            return;
+        }
+        ServerPlayer p = server.getServer().getPlayerList().getPlayer(o.orderer);
+        if (p != null) {
+            p.sendSystemMessage(Component.translatable("gui.singulo.work_console.notify", what));
+        }
     }
 
     /**
@@ -388,20 +419,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Nullable
     private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
                             boolean toStock) {
-        return start(player, target, count, androids, destination, toStock, false);
+        return start(player, target, count, androids, destination, toStock, false, false);
     }
 
     @Nullable
     private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
-                            boolean toStock, boolean auto) {
+                            boolean toStock, boolean auto, boolean fresh) {
         if (!mayOperate(player)) {
             return Component.translatable("gui.singulo.work_console.locked");
         }
-        WorkPlanner.Plan plan = toStock ? planToStock(target, count) : plan(target, count);
+        WorkPlanner.Plan plan = plan(target, count, toStock || fresh);
         if (!plan.ok()) {
             return Component.translatable(plan.loop ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
         }
-        if (toStock && plan.steps.isEmpty()) {
+        if ((toStock || fresh) && plan.steps.isEmpty()) {
             return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
         }
         boolean mining = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsMining());
@@ -631,6 +662,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         orders.remove(o);
         leases.removeIf(l -> l.job.orderId() == id);
         message = reason != null ? reason : Component.translatable("gui.singulo.work_console.cancelled", o.target.getHoverName());
+        if (reason != null) {
+            tell(o, reason);                           // 止まって取り消された（画面から取り消したときは知らせない）
+        }
         setChanged();
     }
 
@@ -1580,7 +1614,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (makingFuel(fuel)) {
             return !ItemStack.isSameItemSameComponents(parent.target, FluidSamples.key(fuel));
         }
-        WorkPlanner.Plan plan = planToStock(fuel, count);
+        WorkPlanner.Plan plan = planFresh(fuel, count);
         if (!plan.ok() || plan.steps.isEmpty()) {
             return false;
         }
@@ -1674,7 +1708,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         List<IItemHandler> stores = storagesAt(pickup.point(), new HashSet<>());
         LiquidStores liquids = LiquidStores.at(level, pickup.point());
         for (ItemCount need : pickup.items()) {
-            if (countAt(pickup.point(), need.item, stores) < need.count) {
+            long have = countAt(pickup.point(), need.item, stores);
+            if (have < need.count) {
+                WorkOrder short_ = order(job.orderId());
+                if (short_ != null) {
+                    // 画面の「足りない素材」に出す（同じ物は数を置き換える）
+                    short_.shortage.removeIf(c -> c.matches(need.item));
+                    short_.shortage.add(new ItemCount(need.item, need.count - have));
+                }
                 return false;
             }
             if (FluidSamples.liquid(need.item) && a.liquidSpace(need.item) < need.count) {
@@ -1682,6 +1723,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         WorkOrder o = order(job.orderId());
+        if (o != null) {
+            o.shortage.clear();                        // 取れた: 足りなかった物は、もう足りている
+        }
         for (ItemCount need : pickup.items()) {
             if (FluidSamples.liquid(need.item)) {
                 // 液体・化学物質: 入れ物から抜いて、タンクへ（入りきる分だけ抜く）
@@ -2018,6 +2062,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), o.orderer, "android_order_complete");
             }
             message = Component.translatable("gui.singulo.work_console.done", o.target.getHoverName(), o.count);
+            tell(o, message);
             if (level != null) {
                 level.playSound(null, worldPosition, net.minecraft.sounds.SoundEvents.NOTE_BLOCK_CHIME.value(),
                         net.minecraft.sounds.SoundSource.BLOCKS, 0.8F, 1.6F);
@@ -2416,6 +2461,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 o.pendingReserve.clear();
                 o.pendingReserve.addAll(reserveItems(o, need));
                 o.status = o.pendingReserve.isEmpty() ? WorkOrder.RUNNING : WorkOrder.WAIT_ITEMS;
+            }
+            // 素材を待ったまま長く経ったら、何が足りないかを注文した人へ知らせる（1回だけ）
+            if (o.status == WorkOrder.WAIT_ITEMS) {
+                if (o.waitingSince < 0) {
+                    o.waitingSince = now;
+                } else if (!o.stallNotified && now - o.waitingSince >= STALL_NOTIFY_TICKS) {
+                    o.stallNotified = true;
+                    List<ItemCount> missing = o.missing();
+                    tell(o, missing.isEmpty()
+                            ? Component.translatable("gui.singulo.work_console.notify.waiting", o.target.getHoverName())
+                            : Component.translatable(missing.size() > 1 ? "gui.singulo.work_console.notify.missing.more" : "gui.singulo.work_console.notify.missing",
+                            o.target.getHoverName(),
+                            missing.get(0).item.getHoverName(), missing.get(0).count, missing.size() - 1));
+                }
+            } else {
+                o.waitingSince = -1;
+                o.stallNotified = false;
             }
             // 加工を待っている装置を見て、取り出しに行ってよいかを決める
             for (WorkOrder.StepState s : o.steps) {

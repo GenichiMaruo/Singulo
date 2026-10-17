@@ -83,6 +83,58 @@ public class HandbookScreen extends Screen {
         Minecraft.getInstance().setScreen(new HandbookScreen());
     }
 
+    /** 開いたときに探す物の名前（なければ null）。 */
+    @javax.annotation.Nullable
+    private String focus;
+
+    /**
+     * Singulo の物なら、その物のことが書いてあるページを開く（持ち物などの画面は閉じる）。Singulo の物でなければ何もしない（false）。
+     */
+    public static boolean lookup(ItemStack stack) {
+        if (stack.isEmpty() || !Singulo.MODID.equals(BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace())) {
+            return false;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>) {
+            mc.player.closeContainer();
+        }
+        HandbookScreen screen = new HandbookScreen();
+        screen.focus = stack.getHoverName().getString();
+        mc.setScreen(screen);
+        return true;
+    }
+
+    /**
+     * 探す物のことが一番書いてあるページへ移る: 題名に名前があれば大きく、本文に名前が出てくる回数を足して比べる。
+     * 見つからなければ、前に開いていたページのまま。
+     */
+    private void focusPage() {
+        if (focus == null || focus.isBlank()) {
+            return;
+        }
+        int best = 0;
+        for (int c = 0; c < chapters.size(); c++) {
+            List<Page> pages = chapters.get(c).pages;
+            for (int p = 0; p < pages.size(); p++) {
+                Page pg = pages.get(p);
+                int score = pg.title().getString().contains(focus) ? 100 : 0;
+                for (Line l : pg.lines()) {
+                    String text = l.text().getString();
+                    for (int i = text.indexOf(focus); i >= 0; i = text.indexOf(focus, i + focus.length())) {
+                        score++;
+                    }
+                }
+                if (score > best) {
+                    best = score;
+                    chapter = c;
+                    page = p;
+                    scroll = 0;
+                }
+            }
+        }
+        focus = null;
+    }
+
     @Override
     protected void init() {
         left = (width - W) / 2;
@@ -95,6 +147,7 @@ public class HandbookScreen extends Screen {
         chapters.add(supportersChapter());
         chapter = Math.min(lastChapter, chapters.size() - 1);
         page = Math.min(lastPage, chapters.get(chapter).pages.size() - 1);
+        focusPage();
     }
 
     // ------------------------------------------------------------------ 中身

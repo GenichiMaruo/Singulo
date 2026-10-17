@@ -110,6 +110,16 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
             if (members > 0) {
                 java.util.List<net.minecraft.util.FormattedCharSequence> lines = new java.util.ArrayList<>();
                 lines.addAll(font.split(Component.translatable("gui.singulo.android_station.permit.members", members), 180));
+                // 登録した人の名前（許可証のスロットを見に行かなくても、だれが対象外かが分かるように）
+                var list = io.github.genichimaruo.singulo.item.ShieldPermitItem.members(menu.getSlot(AndroidStationBlockEntity.SLOT_PERMIT).getItem());
+                for (int i = 0; i < Math.min(8, list.size()); i++) {
+                    lines.add(Component.literal(" ・" + list.get(i).name()).withStyle(net.minecraft.ChatFormatting.AQUA).getVisualOrderText());
+                }
+                if (list.size() > 8) {
+                    lines.add(Component.translatable("item.singulo.shield_permit.more", list.size() - 8)
+                            .withStyle(net.minecraft.ChatFormatting.GRAY).getVisualOrderText());
+                }
+                lines.addAll(font.split(Component.translatable("gui.singulo.android_station.permit.others").withStyle(net.minecraft.ChatFormatting.GOLD), 180));
                 lines.addAll(font.split(Component.translatable("gui.singulo.android_station.leader.hint"), 180));
                 g.renderTooltip(font, lines, mouseX, mouseY);
             } else {

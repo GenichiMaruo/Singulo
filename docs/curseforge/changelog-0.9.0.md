@@ -18,6 +18,14 @@ This release focuses on polishing existing content rather than adding new areas.
 - The **Android Workbench** now has a 27-slot holding box. Crafted items that do not fit in the android's inventory go there instead of onto the ground; later steps and deliveries pick them up again. Right-click the workbench to take anything left behind; breaking it drops the contents.
 - With a **Shield Permit** in an Android Assembly Station, its androids now treat anyone not on the permit (except players in Creative) as an enemy. They attack those players, and those players can hurt them. As before, only the owner and registered players can open the station and android screens.
 - Androids now put away the weapons in their hands while crafting.
+- **Work Console** improvements:
+  - Items currently being made have an orange frame in the Order tab, and their tooltip shows how many.
+  - A **New** toggle when ordering crafts the full amount without using finished items already in storage. For example, with 3 iron axes in storage, order 2 to get 2 more.
+  - A ↻ button on running orders orders the same item again.
+  - Orders waiting for materials show what is missing and how many.
+  - Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.
+- The android Gear page has two new buttons: **Sort** tidies the inventory and backpack, and **Put away** sends the android to a nearby chest, barrel, shulker box or supply port to empty them.
+- The Android Assembly Station's follow row tooltip now lists the players on the permit.
 - Redesigned the android **Bouquet**: clear wrapping with visible stems, a ribbon bow (dyeing now colors the ribbon) and a fuller arrangement of flowers, tilted forward so people in front can see it. The item icon matches.
 - The **Beret** is slightly smaller and no longer lets hair poke through on its lower side.
 - Fixed the glowing line at androids' left elbow flickering when the arm bends.
@@ -32,5 +40,6 @@ This release focuses on polishing existing content rather than adding new areas.
 - Long pages about bosses, upgrades and processing were split into shorter pages.
 - The Progress chapter opens at your current stage and links to that stage's overview.
 - More items show a short tooltip summary; hold **Shift** for full details.
+- Hover over a Singulo item and press **H** (or press it while holding the item) to open the handbook page about it.
 
 Published as **Beta**. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).

@@ -45,7 +45,7 @@ public class AndroidMenu extends AbstractContainerMenu {
 
     public static final int D_HP = 0, D_MAX_HP = 1, D_CHARGE = 2, D_MODE = 3, D_STATE = 4, D_ARMOR = 5, D_ALERT = 6, D_WORK = 7,
             D_STALL = 8, COUNT = 9;
-    public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1, BUTTON_WORK = 2;
+    public static final int BUTTON_DISMANTLE = 0, BUTTON_ESCORT = 1, BUTTON_WORK = 2, BUTTON_SORT = 3, BUTTON_STASH = 4;
     /** タンク i に、カーソルの入れ物を使う（BUTTON_TANK_USE + i）・中身を捨てる（BUTTON_TANK_CLEAR + i）。 */
     public static final int BUTTON_TANK_USE = 10, BUTTON_TANK_CLEAR = 20;
     /** 化学物質のタンク i に、カーソルの入れ物を使う・中身を捨てる。 */
@@ -292,6 +292,17 @@ public class AndroidMenu extends AbstractContainerMenu {
         if (id == BUTTON_WORK) {
             android.setWorkEnabled(!android.workEnabled());
             return true;
+        }
+        if (id == BUTTON_SORT) {
+            return android.sortCarry();
+        }
+        if (id == BUTTON_STASH) {
+            net.minecraft.network.chat.Component why = android.requestStash();
+            player.displayClientMessage(why != null ? why : net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.going"), true);
+            if (why == null) {
+                player.closeContainer();               // 歩いて箱へ行くので、画面を閉じる
+            }
+            return why == null;
         }
         if (id >= BUTTON_TANK_USE && id < BUTTON_TANK_USE + RuinAndroid.TANKS) {
             return android.useTankContainer(player, id - BUTTON_TANK_USE);

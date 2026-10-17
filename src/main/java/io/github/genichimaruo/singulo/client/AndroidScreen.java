@@ -36,6 +36,9 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     /** タンクの目盛りの幅と、その右の「捨てる」ボタン（シフト＋クリック）。 */
     private static final int BAR_W = 47, CLEAR_W = 8;
 
+    /** 装備のページ: バックパックの欄の右上の小さなボタン（並べ替え・近くの箱へ預ける）。 */
+    private static final int SORT_X = 148, STASH_X = 159, TOOL_Y = 23, TOOL_S = 9;
+
     /** 装備のページのタンクの段（chem: 化学物質のタンク。液体と化学物質の両方なら、2段に細く並べる）。 */
     private record TankRow(boolean chem, int y, int h) {}
 
@@ -194,6 +197,16 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 }
             }
         }
+        if (gearPage() && minecraft != null && minecraft.gameMode != null) {
+            if (Panel.inside(mouseX, mouseY, leftPos + SORT_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_SORT);
+                return true;
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + STASH_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_STASH);
+                return true;
+            }
+        }
         if (gearPage() && Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W,
                 AndroidMenu.WORK_H) && minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_WORK);
@@ -274,6 +287,14 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         if (gearPage()) {
             if (Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W, AndroidMenu.WORK_H)) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.work.hint"), 180), mouseX, mouseY);
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + SORT_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                g.renderTooltip(font, font.split(Component.translatable(menu.working() ? "gui.singulo.android.stash.working"
+                        : "gui.singulo.android.sort.hint"), 180), mouseX, mouseY);
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + STASH_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                g.renderTooltip(font, font.split(Component.translatable(menu.working() ? "gui.singulo.android.stash.working"
+                        : "gui.singulo.android.stash.hint"), 180), mouseX, mouseY);
             }
             RuinAndroid android = menu.android();
             for (TankRow row : android == null ? java.util.List.<TankRow>of() : tankRows()) {
@@ -478,6 +499,23 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 }
             }
         }
+        // 並べ替え（3本の横線）と、近くの箱へ預ける（箱と下向きの矢印）のボタン
+        for (int i = 0; i < 2; i++) {
+            int bx = x + (i == 0 ? SORT_X : STASH_X), by = y + TOOL_Y;
+            boolean over = Panel.inside(mouseX, mouseY, bx, by, TOOL_S, TOOL_S);
+            roundRect(g, bx, by, TOOL_S, TOOL_S, BORDER);
+            roundRect(g, bx + 1, by + 1, TOOL_S - 2, TOOL_S - 2, menu.working() ? 0xFFC4C9D2 : over ? 0xFFFFFFFF : 0xFFE2E6EC);
+            int c = menu.working() ? 0xFF9AA0AC : INK;
+            if (i == 0) {
+                g.fill(bx + 2, by + 2, bx + 7, by + 3, c);
+                g.fill(bx + 2, by + 4, bx + 6, by + 5, c);
+                g.fill(bx + 2, by + 6, bx + 5, by + 7, c);
+            } else {
+                g.fill(bx + 4, by + 2, bx + 5, by + 5, c);
+                g.fill(bx + 3, by + 4, bx + 6, by + 5, c);
+                g.fill(bx + 2, by + 5, bx + 7, by + 7, c);
+            }
+        }
         // 作業のオン／オフ
         boolean on = menu.value(AndroidMenu.D_WORK) != 0;
         boolean hover = Panel.inside(mouseX, mouseY, x + AndroidMenu.WORK_X, y + AndroidMenu.WORK_Y, AndroidMenu.WORK_W, AndroidMenu.WORK_H);
@@ -585,7 +623,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.storage"), 6, AndroidMenu.BACKPACK_Y - 9, 48,
                     INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.tools"), 6, AndroidMenu.MINING_Y - 9, 48, INK);
-            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack"), PACK_X_FRAME, 24, 116, INK);
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack"), PACK_X_FRAME, 24, SORT_X - PACK_X_FRAME - 2, INK);   // 右上の小さなボタンに重ねない
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.carry"), AndroidMenu.CARRY_X - 4, 24, 24, INK);
             if (menu.builtInPack()) {
                 // バックパックを内蔵している型: アップグレードの欄を濃い色の札で覆い、白い字で「内蔵」と出す（アップグレードは入らない）

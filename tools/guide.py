@@ -21,12 +21,13 @@ CHAPTERS = [
          '・左の章を選ぶと、右にページが出ます。下の矢印でページをめくります。\n'
          '・「進み具合」の章は工業・探索・アンドロイドの枝に沿って、達成した目標と次の目標を示します（進捗画面［L キー］の Singulo タブとも同じです）。\n'
          '・アイテムにカーソルを合わせると説明が出ます。Shift を押すと作り方と使い道も出ます。\n'
+         '・Singulo のアイテムにカーソルを合わせて H キーを押すと、その物のことが書いてあるページが開きます（手に持っているときも）。\n'
          '・マルチブロックは「ホロ投影機」をコントローラに使うと、正しい形が半透明で浮かび上がります。',
          'Using this book',
          '- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the '
          'bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the '
          'Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift '
-         'to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller '
+         'to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it).\n- Use the Holo Projector on a multiblock controller '
          'to show the correct shape as a translucent outline.'),
         ('basics', '電力・触媒・遺構',
          '電力（FE）は自前のケーブルで運びます。アイテムと液体は装置の面ごとの設定と、他modのパイプで運びます。\n'
@@ -842,7 +843,8 @@ CHAPTERS = [
          '・ガスタンクアップグレード・ガス・液体アップグレード（Mekanism が入っているときだけ）: Mekanism の化学物質（ガス・注入材・顔料・スラリー）を運べるタンク。ガスタンクは化学物質を2種類（各32,000 '
          'mB）、ガス・液体は液体と化学物質を2種類ずつ（各16,000 mB）。腰にガスボンベが見える。画面のタンクはケミカルタンクなどでクリックして出し入れできる。作業では、資材口の隣のケミカルタンクを素材置き場として、化学物'
          '質を装置へ運ぶ。\n'
-         '・作業のオン／オフ: 作業（自動化）に割り当ててよいかを、アンドロイドごとに決める。',
+         '・作業のオン／オフ: 作業（自動化）に割り当ててよいかを、アンドロイドごとに決める。\n'
+         '・並べ替え・預ける: バックパックの欄の右上のボタンで、持ち物とバックパックの中を並べ替えたり、近くの箱（12ブロック以内のチェスト・樽・シュルカーボックス・資材口）へ歩いて預けに行かせたりできる。',
          'Android upgrades',
          '- The button left of the name in the android screen opens the "Gear and inventory" page, where upgrades go.\n'
          '- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A bat'
@@ -862,7 +864,8 @@ CHAPTERS = [
          's two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen '
          'with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and an'
          'droids carry chemicals to machines.\n'
-         '- Work on/off: choose for each android whether it may be given work (automation).'),
+         '- Work on/off: choose for each android whether it may be given work (automation).\n'
+         '- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).'),
         ('work', '作業の自動化',
          '自分のアンドロイドに、作業台のクラフトを任せられます。\n'
          '1. アンドロイド作業指令台を置き、作業位置カードでシフト右クリックして記録する。そのカードでレシピ棚（増やすなら資材口・納品口も）を右クリックすると、指令台につながる（64ブロック以内）。\n'
@@ -872,6 +875,10 @@ CHAPTERS = [
          '4. レシピ棚の行の左に、作業台を記録した作業位置カードを置き、右にレシピカードを並べる。\n'
          '5. 指令台の「注文」で作る物と個数を選び、素材が足りるのを確かめて、アンドロイドを選んで作業開始。'
          '途中の素材も、レシピがあれば自分で作ります。\n'
+         '・「新規」: オンにすると、在庫にある完成品は使わず、注文した数を新しく作る（例: 鉄の斧が3本あって、あと2本ほしいときは「2」）。\n'
+         '・注文の一覧では、作っている最中の物に橙の枠が付く。進行中の注文の「↻」で、同じ物をもう一度注文できる。'
+         '素材を待っている注文には、足りない物と数が出る（行にカーソルを合わせると全部）。\n'
+         '・画面から出した注文は、できたとき・1分以上素材を待って止まったとき・取り消されたときに、注文した人へチャットで知らせる。\n'
          'アンドロイドは5スロット（バックパックで+12・18・24）ずつ運びます。作業中は持ち物を取り出せず、終わると元の動き方に戻ります。'
          '作業中のアンドロイドにも、同じ指令台の次の注文を受け持たせられます（手が空いたら、そちらもする）。'
          'たどり着けない場所があると、その注文は取り消されます。',
@@ -885,6 +892,10 @@ CHAPTERS = [
          '4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n'
          '5. In the console\'s Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. '
          'Intermediate materials are crafted too when there is a recipe for them.\n'
+         '- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n'
+         '- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. '
+         'An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n'
+         '- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\n'
          'Androids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes '
          'back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. '
          'If a place cannot be reached, the order is cancelled.'),

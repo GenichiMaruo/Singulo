@@ -1099,6 +1099,156 @@ public abstract class RuinAndroid extends Monster {
         return entityData.get(ACTIVITY);
     }
 
+    /**
+     * 持ち物とバックパックの中を並べ替える: 同じ物はまとめ（スタックの上限まで）、物の ID の順に前から詰める（作業中はしない）。
+     */
+    public boolean sortCarry() {
+        if (isWorking()) {
+            return false;
+        }
+        int[] slots = allCarrySlots();
+        java.util.List<net.minecraft.world.item.ItemStack> items = new java.util.ArrayList<>();
+        for (int slot : slots) {
+            net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+            if (s.isEmpty()) {
+                continue;
+            }
+            s = s.copy();
+            for (net.minecraft.world.item.ItemStack have : items) {
+                if (s.isEmpty()) {
+                    break;
+                }
+                if (net.minecraft.world.item.ItemStack.isSameItemSameComponents(have, s) && have.getCount() < have.getMaxStackSize()) {
+                    int n = Math.min(s.getCount(), have.getMaxStackSize() - have.getCount());
+                    have.grow(n);
+                    s.shrink(n);
+                }
+            }
+            if (!s.isEmpty()) {
+                items.add(s);
+            }
+        }
+        items.sort(java.util.Comparator.comparing((net.minecraft.world.item.ItemStack s) -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(s.getItem()).toString())
+                .thenComparing(s -> s.getHoverName().getString()));
+        for (int i = 0; i < slots.length; i++) {
+            inventory.setItem(slots[i], i < items.size() ? items.get(i) : net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        return true;
+    }
+
+    /** 預けに行く箱を探す範囲（横・上下、ブロック）と、たどり着くまで待つ時間（tick）。 */
+    static final int STASH_RANGE = 12, STASH_HEIGHT = 4, STASH_TICKS = 20 * 30;
+    /** 預けに行く箱（なければ null）と、残りの時間。 */
+    @Nullable
+    private BlockPos stashTarget;
+    private int stashTicks;
+
+    /**
+     * 持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口など、入れられる所）へ預けに行く。
+     * 行けなければ理由を返す（行くなら null）。
+     */
+    @Nullable
+    public net.minecraft.network.chat.Component requestStash() {
+        if (isWorking()) {
+            return net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.working");
+        }
+        boolean any = false;
+        for (int slot : allCarrySlots()) {
+            any |= !inventory.getItem(slot).isEmpty();
+        }
+        if (!any) {
+            return net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.empty");
+        }
+        BlockPos best = null;
+        for (BlockPos p : BlockPos.betweenClosed(blockPosition().offset(-STASH_RANGE, -STASH_HEIGHT, -STASH_RANGE),
+                blockPosition().offset(STASH_RANGE, STASH_HEIGHT, STASH_RANGE))) {
+            if (stashable(p) && (best == null || p.distSqr(blockPosition()) < best.distSqr(blockPosition()))) {
+                best = p.immutable();
+            }
+        }
+        if (best == null) {
+            return net.minecraft.network.chat.Component.translatable("gui.singulo.android.stash.none");
+        }
+        stashTarget = best;
+        stashTicks = STASH_TICKS;
+        return null;
+    }
+
+    /** 預ける箱にしてよい所か（入れ物のブロックで、物を入れられる）。かまどなどの装置には入れない。 */
+    private boolean stashable(BlockPos p) {
+        var be = level().getBlockEntity(p);
+        if (be == null) {
+            return false;
+        }
+        boolean box = be instanceof net.minecraft.world.level.block.entity.ChestBlockEntity
+                || be instanceof net.minecraft.world.level.block.entity.BarrelBlockEntity
+                || be instanceof net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity
+                || be instanceof io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity;
+        if (!box) {
+            // ほかの MOD の箱: ブロックの名前に箱らしい言葉があるもの
+            String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).getPath();
+            box = path.contains("chest") || path.contains("barrel") || path.contains("crate");
+        }
+        return box && level().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, p, null) != null;
+    }
+
+    /** 箱へ預けに行く（ほかの動きより先。戦い・作業・充電が始まったらやめる）。 */
+    private final class StashGoal extends net.minecraft.world.entity.ai.goal.Goal {
+        StashGoal() {
+            setFlags(java.util.EnumSet.of(Flag.MOVE, Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            return stashTarget != null && guard && active() && getTarget() == null && !isWorking();
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return canUse() && stashTicks > 0;
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void stop() {
+            stashTarget = null;
+            getNavigation().stop();
+        }
+
+        @Override
+        public void tick() {
+            BlockPos at = stashTarget;
+            if (at == null) {
+                return;
+            }
+            stashTicks--;
+            getLookControl().setLookAt(Vec3.atCenterOf(at));
+            if (Vec3.atCenterOf(at).distanceToSqr(position().add(0, 0.5, 0)) > 2.6 * 2.6) {
+                if (tickCount % 10 == 0 || getNavigation().isDone()) {
+                    getNavigation().moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 1.0);
+                }
+                return;
+            }
+            getNavigation().stop();
+            var handler = level().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, at, null);
+            if (handler != null) {
+                for (int slot : allCarrySlots()) {
+                    net.minecraft.world.item.ItemStack s = inventory.getItem(slot);
+                    if (!s.isEmpty()) {
+                        inventory.setItem(slot, net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, s.copy(), false));
+                    }
+                }
+                playSound(net.minecraft.sounds.SoundEvents.CHEST_CLOSE, 0.5F, 1.3F);
+                gesture(GESTURE_NOD, null);
+            }
+            stashTarget = null;                        // 入りきらなかった物は、持ったまま
+        }
+    }
+
     /** 持ち物の5つと、バックパックがあればそのティアの枠。 */
     private int[] allCarrySlots() {
         int n = RuinAndroid.CARRY_SLOTS + packSlots();
@@ -1968,6 +2118,7 @@ public abstract class RuinAndroid extends Monster {
         goalSelector.addGoal(2, workGoal);
         registerCombat();
         life = new AndroidLife(this);
+        goalSelector.addGoal(3, new StashGoal());
         goalSelector.addGoal(4, life);
         goalSelector.addGoal(5, new GuardGoal());
         goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
