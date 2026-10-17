@@ -408,8 +408,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         boolean felling = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsFelling());
         List<RuinAndroid> chosen = new ArrayList<>();
         for (RuinAndroid a : candidates(player)) {
-            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a)
-                    && (!androids.isEmpty() || (!mining || a.canMine()) && (!felling || a.canFell()))) {
+            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a)) {
                 chosen.add(a);
             }
         }
@@ -423,7 +422,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (WorkOrder.StepState s : order.steps) {
             boolean fits = false;
             for (RuinAndroid a : chosen) {
-                fits |= maxCrafts(s.recipe, a.isWorking() ? a.carryCapacity() : a.freeCarry(), 1) >= 1 && tankLimit(a, s.recipe) >= 1;
+                fits |= canExecuteStep(a, s.recipe);
             }
             if (!fits) {
                 return Component.translatable("gui.singulo.work_console.error.capacity", s.recipe.output().getHoverName());
@@ -449,7 +448,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         if (androids.isEmpty() || auto) {
-            chosen = recruit(order, chosen, mining, felling);   // 選ばなかったとき: 作業量に見合う人数だけ招集する
+            chosen = recruit(order, chosen);   // 選ばなかったとき: 作業量に見合う人数だけ招集する
         }
         reserve(order, plan);
         orders.add(order);
@@ -469,15 +468,30 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 同じ作業場所では同時に1体しか作業できないので、同時に進められる作業場所の数（前の工程の材料待ちを考え、同じ段の工程の場所の数の最大）と、
      * 一度に運べる量で割った往復の数の、少ないほうまで。手の空いている・近いアンドロイドから選び、採掘・伐採が要るなら、それができる個体を必ず入れる。
      */
-    private List<RuinAndroid> recruit(WorkOrder order, List<RuinAndroid> eligible, boolean mining, boolean felling) {
+    private List<RuinAndroid> recruit(WorkOrder order, List<RuinAndroid> eligible) {
         int needed = workersNeeded(order, eligible.stream().mapToInt(RuinAndroid::carryCapacity).max().orElse(1));
         List<RuinAndroid> sorted = new ArrayList<>(eligible);
         sorted.sort(java.util.Comparator.comparing((RuinAndroid a) -> order(a.workOrder()) != null && worldPosition.equals(a.workConsole()))
                 .thenComparingDouble(a -> a.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(worldPosition))));
         List<RuinAndroid> picked = new ArrayList<>(sorted.subList(0, Math.min(needed, sorted.size())));
-        ensure(picked, sorted, mining, RuinAndroid::canMine);
-        ensure(picked, sorted, felling, RuinAndroid::canFell);
+        // Every step must still have a worker with all of its required skills,
+        // item slots and tanks after trimming the candidate list.
+        for (WorkOrder.StepState step : order.steps) {
+            ensure(picked, sorted, true, a -> canExecuteStep(a, step.recipe));
+        }
+        // Replace an incapable nearby worker instead of retaining extra idle crew.
+        for (int i = 0; i < picked.size() && picked.size() > needed;) {
+            RuinAndroid candidate = picked.get(i);
+            boolean covered = order.steps.stream().allMatch(step -> picked.stream()
+                    .anyMatch(a -> a != candidate && canExecuteStep(a, step.recipe)));
+            if (covered) picked.remove(i); else i++;
+        }
         return picked;
+    }
+
+    private static boolean canExecuteStep(RuinAndroid a, RecipeData recipe) {
+        return canDo(a, recipe)
+                && maxCrafts(recipe, a.isWorking() ? a.carryCapacity() : a.freeCarry(), 1) >= 1;
     }
 
     /** need なら、picked に ability を持つ個体が1体はいるようにする（いなければ、候補のうち一番よいものを足す）。 */

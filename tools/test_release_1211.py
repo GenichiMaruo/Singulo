@@ -1,0 +1,61 @@
+"""Release provenance must reject mixed loaders, trees and failed GUI validation."""
+import copy
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+import verified_release_1211 as release
+
+
+class ProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.source = Path(self.tmp.name)
+        (self.source / 'gradle.properties').write_text('mod_version=0.8.1\nminecraft_version=1.21.1\nmod_name=Singulo\n')
+        self.sha, self.tested, self.tree = 'a' * 40, 'b' * 40, 'c' * 40
+        self.data = {
+            'actions/runs/1': {'status': 'completed', 'conclusion': 'success', 'event': 'pull_request',
+                              'path': '.github/workflows/pr-validation.yml', 'head_repository': {'full_name': 'owner/repo'},
+                              'head_sha': self.sha, 'run_attempt': 1},
+            'actions/runs/1/jobs?per_page=100': {'jobs': [{'name': n, 'conclusion': 'success'} for n in ['build-and-gametest', 'optional-mekanism', 'forge']]},
+            'git/ref/tags/v0.8.1': {'object': {'type': 'commit', 'sha': self.sha}},
+            'git/commits/' + self.sha: {'tree': {'sha': self.tree}},
+            'git/commits/' + self.tested: {'tree': {'sha': self.tree}},
+            'actions/runs/1/artifacts?per_page=100': {'artifacts': [
+                {'id': i, 'name': n + '-validation-' + self.tested, 'expired': False} for i, n in enumerate(['pr', 'forge'])]},
+        }
+
+    def inspect(self):
+        with patch.object(release, 'api', side_effect=lambda repo, endpoint: copy.deepcopy(self.data[endpoint])), \
+             patch.object(release, 'git', side_effect=lambda source, *args: self.tree if args[-1] == 'HEAD^{tree}' else self.sha):
+            return release.inspect('owner/repo', 1, 'v0.8.1', self.source)
+
+    def test_both_loaders_selected_from_actual_tested_commit(self):
+        m = self.inspect()
+        self.assertEqual(set(m['artifacts']), {'forge', 'neoforge'})
+        self.assertEqual(m['tested_commit'], self.tested)
+
+    def test_forge_failure_blocks_both_uploads(self):
+        self.data['actions/runs/1/jobs?per_page=100']['jobs'][-1]['conclusion'] = 'failure'
+        with self.assertRaisesRegex(RuntimeError, 'Both loader'):
+            self.inspect()
+
+    def test_missing_forge_artifact_cannot_use_neoforge(self):
+        self.data['actions/runs/1/artifacts?per_page=100']['artifacts'].pop()
+        with self.assertRaisesRegex(RuntimeError, 'both loader artifacts'):
+            self.inspect()
+
+    def test_actual_merge_tree_must_match_release(self):
+        self.data['git/commits/' + self.tested]['tree']['sha'] = 'd' * 40
+        with self.assertRaisesRegex(RuntimeError, 'Actual tested merge tree'):
+            self.inspect()
+
+    def test_wrong_version_is_rejected_before_api_access(self):
+        (self.source / 'gradle.properties').write_text('mod_version=0.8.2\nminecraft_version=1.21.1\nmod_name=Singulo\n')
+        with self.assertRaisesRegex(RuntimeError, 'Tag must match'):
+            self.inspect()
+
+
+if __name__ == '__main__':
+    unittest.main()

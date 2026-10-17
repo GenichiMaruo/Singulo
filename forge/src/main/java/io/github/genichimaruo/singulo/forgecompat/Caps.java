@@ -30,7 +30,7 @@ public final class Caps {
 
     private static RegisterCapabilitiesEvent registered;
     // ブロックエンティティごとの、付けた機能（getCapability の書き足しから先に聞く）
-    private static final Map<BlockEntity, Provider<BlockEntity>> PROVIDERS = new java.util.WeakHashMap<>();
+    private static final Map<BlockEntity, java.lang.ref.WeakReference<Provider<BlockEntity>>> PROVIDERS = new java.util.WeakHashMap<>();
 
     private static synchronized RegisterCapabilitiesEvent registered() {
         if (registered == null) {
@@ -63,7 +63,8 @@ public final class Caps {
     public static <T> LazyOptional<T> override(BlockEntity be, Capability<T> cap, @Nullable Direction side) {
         Provider<BlockEntity> provider;
         synchronized (PROVIDERS) {
-            provider = PROVIDERS.get(be);
+            var reference = PROVIDERS.get(be);
+            provider = reference == null ? null : reference.get();
         }
         return provider != null && provider.handles(cap) ? provider.getCapability(cap, side) : null;
     }
@@ -83,7 +84,7 @@ public final class Caps {
         if (entries != null) {
             Provider<BlockEntity> provider = attach(event, be, entries);
             synchronized (PROVIDERS) {
-                PROVIDERS.put(be, provider);
+                PROVIDERS.put(be, new java.lang.ref.WeakReference<>(provider));
             }
         }
     }
@@ -128,11 +129,15 @@ public final class Caps {
                 if (entry.forgeCap() != cap) {
                     continue;
                 }
+                int key = i * 7 + (side == null ? 6 : side.ordinal());
                 Object value = entry.provider().getCapability(owner, side);
                 if (value == null) {
+                    synchronized (issued) {
+                        Issued last = issued.remove(key);
+                        if (last != null) last.optional().invalidate();
+                    }
                     continue;
                 }
-                int key = i * 7 + (side == null ? 6 : side.ordinal());
                 synchronized (issued) {
                     Issued last = issued.get(key);
                     if (last != null && last.value() == value && last.optional().isPresent()) {

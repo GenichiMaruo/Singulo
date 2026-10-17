@@ -82,6 +82,7 @@ public final class GuiReviewHarness {
             }
             case 6 -> {
                 require(mc, WorkConsoleScreen.class);
+                verifySearch(mc);
                 capture(mc, "console-orders");
                 ((WorkConsoleScreen) mc.screen).showRecordTab();
                 phase++;
@@ -219,6 +220,33 @@ public final class GuiReviewHarness {
         var field = target.getClass().getDeclaredField(name);
         field.setAccessible(true);
         return field.get(target);
+    }
+
+    /** Exercise the real search widget, inventory hotkey guard and sort buttons on both loaders. */
+    private static void verifySearch(Minecraft mc) throws Exception {
+        WorkConsoleScreen screen = (WorkConsoleScreen) mc.screen;
+        var box = (net.minecraft.client.gui.components.EditBox) field(screen, "searchBox");
+        var entries = WorkConsoleScreen.class.getDeclaredMethod("visibleEntries");
+        entries.setAccessible(true);
+        box.setValue("");
+        int initial = ((List<?>) entries.invoke(screen)).size();
+        if (initial == 0) throw new IllegalStateException("Search fixture has no entries");
+        box.setValue("singulo_review_no_matching_item_9823");
+        if (!((List<?>) entries.invoke(screen)).isEmpty()) throw new IllegalStateException("Search did not filter entries");
+        box.setValue("@minecraft");
+        if (((List<?>) entries.invoke(screen)).isEmpty()) throw new IllegalStateException("Mod search removed vanilla stock");
+        box.setFocused(true);
+        screen.keyPressed(69, 0, 0);
+        if (mc.screen != screen) throw new IllegalStateException("Inventory hotkey closed a focused search");
+        box.setFocused(false);
+        box.setValue("");
+        int left = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
+        int top = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
+        for (int i = 0; i < 5; i++) {
+            screen.mouseClicked(left + 130, top + 128, 0);
+            if (((List<?>) entries.invoke(screen)).size() != initial) throw new IllegalStateException("Sort lost entries");
+        }
+        Singulo.LOGGER.info("SINGULO_SEARCH_COMPLETE");
     }
 
     private static void setField(Object target, String name, Object value) throws Exception {

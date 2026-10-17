@@ -846,6 +846,43 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+    /** Automatic recruitment must retain the distant backpack worker needed by a six-stack cake recipe. */
+    @GameTest(template = EMPTY)
+    public static void workConsoleAutoKeepsCapableWorker(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        for (int i = 0; i < 3; i++) chest.setItem(i, new ItemStack(Items.MILK_BUCKET));
+        chest.setItem(3, new ItemStack(Items.SUGAR, 2));
+        chest.setItem(4, new ItemStack(Items.EGG));
+        chest.setItem(5, new ItemStack(Items.WHEAT, 3));
+        var grid = List.of(new ItemStack(Items.MILK_BUCKET), new ItemStack(Items.MILK_BUCKET), new ItemStack(Items.MILK_BUCKET),
+                new ItemStack(Items.SUGAR), new ItemStack(Items.EGG), new ItemStack(Items.SUGAR),
+                new ItemStack(Items.WHEAT), new ItemStack(Items.WHEAT), new ItemStack(Items.WHEAT));
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(3, recipeCard(helper, grid, new ItemStack(Items.CAKE)));
+        BladeAndroid small = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        BladeAndroid capable = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        for (BladeAndroid a : List.of(small, capable)) {
+            a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(a == small ? new BlockPos(1, 1, 0) : new BlockPos(6, 1, 6))));
+            helper.getLevel().addFreshEntity(a);
+        }
+        capable.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
+        var player = helper.makeMockServerPlayerInLevel();
+        for (boolean gui : List.of(false, true)) {
+            var ids = gui ? List.of(small.getUUID(), capable.getUUID()) : List.<java.util.UUID>of();
+            var error = console.start(player, new ItemStack(Items.CAKE), 1, ids, gui, helper.absolutePos(DELIVERY));
+            helper.assertTrue(error == null, "Cake order rejected before recruitment: " + error);
+            var order = console.orders().get(console.orders().size() - 1);
+            helper.assertTrue(order.workers.contains(capable.getUUID()), "Automatic recruitment discarded the only capable worker");
+            helper.assertTrue(order.workers.size() == 1, "Cake requires only its capable worker, not extra idle workers");
+            console.cancel(order.id, null);
+        }
+        small.discard();
+        capable.discard();
+        helper.succeed();
+    }
+
     /** 納品口に届いた item の数。 */
     private static int delivered(GameTestHelper helper, net.minecraft.world.item.Item item) {
         io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity port = helper.getBlockEntity(DELIVERY);

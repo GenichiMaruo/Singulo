@@ -25,6 +25,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 def root = file('..')
 def mainJava = [new File(root, 'src/main/java'), new File(root, 'src/generated/java')]
+def guiReview = providers.gradleProperty('guiReview').map { it.toBoolean() }.getOrElse(false)
+if (guiReview) mainJava.add(new File(root, 'tools/review/gui-src'))
 def mainResources = [new File(root, 'src/main/resources'), new File(root, 'src/generated/resources')]
 def overlayJava = file('src/main/java')
 def rulesFile = file('rules.txt')
@@ -65,6 +67,7 @@ def loadRules = {
 }
 
 def preprocessJava = tasks.register('preprocessJava') {
+    inputs.property('guiReview', guiReview)
     inputs.files(mainJava).withPropertyName('main')
     inputs.dir(overlayJava).withPropertyName('overlay')
     inputs.file(rulesFile)
@@ -153,7 +156,13 @@ minecraft {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             systemProperty 'forge.enableGameTest', 'true'
         }
-        register('client')
+        register('client') {
+            if (guiReview) {
+                workingDir = layout.projectDirectory.dir('build/gui-review')
+                systemProperty 'singulo.guiReviewOutput', file('build/gui-review/screenshots').absolutePath
+                args '--quickPlaySingleplayer', 'Review', '--width', '1280', '--height', '800'
+            }
+        }
         register('server') { args '--nogui' }
         register('gameTestServer') {
             workingDir = layout.projectDirectory.dir('build/gametest')
@@ -191,3 +200,10 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.compilerArgs += ['-Xmaxerrs', '100000']
 }
+
+// Prevent stale worlds or successful logs from masking an early server exit.
+var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
+    delete layout.buildDirectory.dir('gametest/world')
+    delete layout.buildDirectory.file('gametest/logs/latest.log')
+}
+tasks.named('runGameTestServer') { dependsOn cleanGameTestWorld }
