@@ -1845,6 +1845,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             a.inventory().setItem(slot, s.copyWithCount(s.getCount() - give + notIn));
             all &= notIn == 0;
         }
+        a.compactCarry();
         active.remainingDelivery = Math.max(0, active.remainingDelivery - moved);
         all = active.remainingDelivery == 0;
         if (o != null) {

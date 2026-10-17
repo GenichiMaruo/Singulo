@@ -958,6 +958,7 @@ final class AndroidWorkGoal extends Goal {
             moved += in;
             android.inventory().setItem(slot, s.copyWithCount(s.getCount() - in));
         }
+        android.compactCarry();
         return moved;
     }
 
@@ -2467,6 +2468,7 @@ final class AndroidWorkGoal extends Goal {
                 android.inventory().setItem(carry[j], s.copyWithCount(s.getCount() - used[j]));
             }
         }
+        android.compactCarry();
         keepCrafted(level, c, job, at, result);
         for (ItemStack r : remaining) {
             if (!r.isEmpty()) {

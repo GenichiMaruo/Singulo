@@ -1147,6 +1147,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 持ち物に入れる（同じ物に重ねてから、空きへ）。入りきらなかった分を返す。 */
     public net.minecraft.world.item.ItemStack addToCarry(net.minecraft.world.item.ItemStack stack) {
+        compactCarry();                                 // 同じ物の半端なスタックをまとめてから入れる（分かれたままだと枠が足りなくなる）
         net.minecraft.world.item.ItemStack rest = stack.copy();
         for (int pass = 0; pass < 2 && !rest.isEmpty(); pass++) {
             for (int slot : carrySlots()) {
@@ -1187,8 +1188,36 @@ public abstract class RuinAndroid extends Monster {
                 count -= take;
             }
         }
+        compactCarry();
         inventory.setChanged();
         return true;
+    }
+
+    /**
+     * 作業の持ち物で、同じ物の半端なスタックを前のスロットへまとめる（素材を使うと、いくつものスロットに少しずつ残るため）。
+     * 作業の計画は、同じ物は同じスタックにまとまるとして枠を数えるので、まとめないと、できた物が入りきらなくなる。
+     */
+    public void compactCarry() {
+        int[] slots = carrySlots();
+        boolean changed = false;
+        for (int i = 0; i < slots.length; i++) {
+            net.minecraft.world.item.ItemStack into = inventory.getItem(slots[i]);
+            if (into.isEmpty() || into.getCount() >= into.getMaxStackSize()) {
+                continue;
+            }
+            for (int j = i + 1; j < slots.length && into.getCount() < into.getMaxStackSize(); j++) {
+                net.minecraft.world.item.ItemStack from = inventory.getItem(slots[j]);
+                if (!from.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameComponents(into, from)) {
+                    int move = Math.min(from.getCount(), into.getMaxStackSize() - into.getCount());
+                    into.grow(move);
+                    from.shrink(move);
+                    changed = true;
+                }
+            }
+        }
+        if (changed) {
+            inventory.setChanged();
+        }
     }
 
     /** 護衛の持ち物（GUI のスロット）。 */

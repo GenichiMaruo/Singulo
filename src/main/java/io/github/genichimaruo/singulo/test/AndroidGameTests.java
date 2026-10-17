@@ -956,6 +956,32 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 作業の持ち物: 同じ物は1つのスタックにまとまる（半端なスタックに分かれたままにしない）。入れるときも、使ったあとも。 */
+    @GameTest(template = EMPTY)
+    public static void carryStacksSameItems(GameTestHelper helper) {
+        BladeAndroid a = worker(helper, false);
+        int[] slots = a.carrySlots();                                  // 作業していないときは、持ち物の5つ全部
+        java.util.function.Supplier<Integer> stacks = () -> {
+            int n = 0;
+            for (int slot : a.carrySlots()) {
+                n += a.inventory().getItem(slot).isEmpty() ? 0 : 1;
+            }
+            return n;
+        };
+        // 素材を使ったあとのように、板材が3つのスロットに少しずつ残っている
+        a.inventory().setItem(slots[0], new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 20));
+        a.inventory().setItem(slots[2], new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 20));
+        a.inventory().setItem(slots[4], new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 20));
+        ItemStack rest = a.addToCarry(new ItemStack(net.minecraft.world.item.Items.OAK_FENCE, 3));
+        helper.assertTrue(rest.isEmpty() && stacks.get() == 2, "入れるときに同じ物がまとまらない: " + stacks.get() + " スロット");
+        a.addToCarry(new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 50));           // 板材 110 → 2スタック
+        helper.assertTrue(stacks.get() == 3, "板材が2スタックにまとまらない: " + stacks.get() + " スロット");
+        a.takeFromCarry(new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 60);        // 板材 50 → 1スタック
+        helper.assertTrue(stacks.get() == 2, "使ったあとに半端なスタックが残る: " + stacks.get() + " スロット");
+        a.discard();
+        helper.succeed();
+    }
+
     /** 素材が足りない注文は、計算で止まる（原木1本では棒16本は作れない）。在庫で足りれば作れる。 */
     @GameTest(template = EMPTY)
     public static void workPlanNeedsMaterials(GameTestHelper helper) {
