@@ -68,12 +68,10 @@ public class AfterglowWingsItem extends ArmorItem {
         return true;                                    // 壊れない
     }
 
-    //#if neoforge
     @Override
     public boolean isDamageable(ItemStack stack) {
         return false;
     }
-    //#endif
 
     /** 滑空中のスニークで羽ばたく。滑空中は光の粒の尾を引く。 */
     @Override

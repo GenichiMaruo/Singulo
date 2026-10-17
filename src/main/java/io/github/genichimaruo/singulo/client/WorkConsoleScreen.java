@@ -55,6 +55,12 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     private static final int LINK_ROWS = 6, LINK_H = 13;
     private static final int LIST_Y = 70, LIST_ROWS = 7, LIST_H = 16;
     private static final int START_X = 132, START_W = 70, BACK_X = 208, BACK_W = 40, BUTTON_Y = 206, BUTTON_H = 16;
+    /** 注文の確認: 「新規」（完成品の在庫を使わず、新しく作る）のボタン。 */
+    private static final int FRESH_X = 94, FRESH_Y = 36, FRESH_W = 34, FRESH_H = 14;
+    /** 進行中の行: 「もう一度注文」のボタン。 */
+    private static final int AGAIN_X = 216;
+    /** 作っている最中の物の枠の色。 */
+    private static final int MAKING = 0xFFF0B040;
     private static final int RED = 0xFFD04848, GREEN = 0xFF3A9A60, MUTED = 0xFF8A949E;
 
     private int tab;
@@ -67,6 +73,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     @Nullable
     private EditBox countBox;
     private long count = 1;
+    /** 完成品の在庫を使わず、新しく作る（今すぐの注文だけ。在庫を保つ登録は、もともと新しく作る）。 */
+    private boolean fresh;
     /** 個数を変えたあと、計算を頼むまでの待ち（打つたびに頼まないように）。 */
     private int planDelay;
     @Nullable
@@ -273,7 +281,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             }
         }
         if (planDelay > 0 && --planDelay == 0 && picking != null) {
-            send(WorkConsoleActionPayload.plan(picking, count, reg()));
+            send(WorkConsoleActionPayload.plan(picking, count, freshOrder(), reg()));
         }
         menu.setVisibility(picking == null, tab == 2, tab == TAB_RECORD, tab == TAB_OUTBOX, tab == TAB_ROUTE);
         if (searchBox != null) {
@@ -324,9 +332,20 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
 
     // ------------------------------------------------------------------ 注文の確認
 
+    /** 「新規」で注文するか（今すぐの注文のときだけ効く）。 */
+    private boolean freshOrder() {
+        return fresh && trigger < 0;
+    }
+
     private void openPicking(ItemStack item) {
+        openPicking(item, 1);
+    }
+
+    /** 注文の確認を開く（数は n から）。 */
+    private void openPicking(ItemStack item, long n) {
         picking = item.copyWithCount(1);
-        count = 1;
+        count = Math.max(1, Math.min(WorkConsoleBlockEntity.MAX_COUNT, n));
+        fresh = false;
         plan = null;
         error = null;
         listScroll = 0;
@@ -337,13 +356,13 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         countBox = new EditBox(font, leftPos + 26, topPos + 36, 46, 14, Component.empty());
         countBox.setMaxLength(4);
         countBox.setFilter(s -> s.isEmpty() || s.chars().allMatch(c -> c >= '0' && c <= '9'));
-        countBox.setValue("1");
+        countBox.setValue(String.valueOf(count));
         countBox.setResponder(s -> {
             count = s.isEmpty() ? 1 : Math.max(1, Math.min(WorkConsoleBlockEntity.MAX_COUNT, Long.parseLong(s)));
             planDelay = 6;
         });
         addRenderableWidget(countBox);
-        send(WorkConsoleActionPayload.plan(picking, count, reg()));
+        send(WorkConsoleActionPayload.plan(picking, count, freshOrder(), reg()));
     }
 
     private void closePicking() {
@@ -453,6 +472,13 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                     return true;
                 }
             }
+            if (trigger < 0 && Panel.inside(mouseX, mouseY, x + FRESH_X, y + FRESH_Y, FRESH_W, FRESH_H)) {
+                fresh = !fresh;                        // 新規: 計算し直す
+                plan = null;
+                error = null;
+                planDelay = 1;
+                return true;
+            }
             List<CompoundTag> deliveries = list("deliveries");
             if (Panel.inside(mouseX, mouseY, x + DEST_X, y + DEST_Y, DEST_W, DEST_H) && !deliveries.isEmpty()) {
                 destination = (destination + (button == 1 ? deliveries.size() - 1 : 1)) % deliveries.size();
@@ -461,8 +487,13 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             if (Panel.inside(mouseX, mouseY, x + TRIGGER_X, y + BUTTON_Y, TRIGGER_W, BUTTON_H)) {
                 // 今すぐ → 在庫を保つ → 信号で1回 → 信号の間だけ在庫を保つ（右クリックで逆順）
                 int n = io.github.genichimaruo.singulo.android.work.StandingOrder.TRIGGERS + 1;
+                boolean wasFresh = freshOrder();
                 trigger = Math.floorMod(trigger + 1 + (button == 1 ? -1 : 1), n) - 1;
                 error = null;
+                if (wasFresh != freshOrder()) {
+                    plan = null;
+                    planDelay = 1;                     // 「新規」が効く・効かないが変わった: 計算し直す
+                }
                 return true;
             }
             if (Panel.inside(mouseX, mouseY, x + START_X, y + BUTTON_Y, START_W, BUTTON_H) && canStart()) {
@@ -474,7 +505,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                     List<UUID> picked = new ArrayList<>(chosen);
                     send(WorkConsoleActionPayload.register(picking, count, trigger, picked, dest, reg()));
                 } else {
-                    send(WorkConsoleActionPayload.start(picking, count, startAndroids(), autoAndroids(), dest, reg()));
+                    send(WorkConsoleActionPayload.start(picking, count, startAndroids(), autoAndroids(), dest, freshOrder(), reg()));
                 }
                 return true;
             }
@@ -621,7 +652,14 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                     send(WorkConsoleActionPayload.cancel(orders.get(idx).getInt("id")));
                     return true;
                 }
-                if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, 222, ROW_H - 1)) {
+                if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + AGAIN_X, y + TOP + i * ROW_H + 3, 12, 12)) {
+                    // 同じ物を、もう一度注文する（数はこの注文と同じから。確認の画面で変えられる）
+                    CompoundTag o = orders.get(idx);
+                    tab = 0;
+                    openPicking(stack(o, "target"), o.getLong("count"));
+                    return true;
+                }
+                if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, AGAIN_X - 10, ROW_H - 1)) {
                     detail = orders.get(idx).getInt("id");     // 行をクリック: 詳しい様子を見る
                     detailScroll = workerScroll = 0;
                     return true;
@@ -729,6 +767,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                     if (e.getBoolean("craft")) {
                         lines.add(Component.translatable("gui.singulo.work_console.craftable").withStyle(net.minecraft.ChatFormatting.AQUA));
                     }
+                    if (e.getLong("making") > 0) {
+                        lines.add(Component.translatable("gui.singulo.work_console.making", e.getLong("making")).withStyle(net.minecraft.ChatFormatting.GOLD));
+                    }
                     g.renderComponentTooltip(font, lines, mouseX, mouseY);
                 }
             }
@@ -738,8 +779,20 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 int idx = i + scroll;
                 if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 232, y + TOP + i * ROW_H + 3, 12, 12)) {
                     g.renderTooltip(font, Component.translatable("gui.singulo.work_console.cancel"), mouseX, mouseY);
-                } else if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, 222, ROW_H - 1)) {
-                    g.renderTooltip(font, Component.translatable("gui.singulo.work_console.detail.hint"), mouseX, mouseY);
+                } else if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + AGAIN_X, y + TOP + i * ROW_H + 3, 12, 12)) {
+                    g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.again"), 180), mouseX, mouseY);
+                } else if (idx < orders.size() && Panel.inside(mouseX, mouseY, x + 8, y + TOP + i * ROW_H, AGAIN_X - 10, ROW_H - 1)) {
+                    // 素材を待っている注文: 足りない物を全部並べる
+                    List<Component> lines = new ArrayList<>();
+                    List<CompoundTag> missing = tags(orders.get(idx), "missing");
+                    if (!missing.isEmpty()) {
+                        lines.add(Component.translatable("gui.singulo.work_console.missing").withStyle(net.minecraft.ChatFormatting.GOLD));
+                        for (CompoundTag m : missing) {
+                            lines.add(Component.literal(" ").append(stack(m, "item").getHoverName()).append(" ×" + compact(m.getLong("count"))));
+                        }
+                    }
+                    lines.add(Component.translatable("gui.singulo.work_console.detail.hint").withStyle(net.minecraft.ChatFormatting.GRAY));
+                    g.renderComponentTooltip(font, lines, mouseX, mouseY);
                 }
             }
         } else if (tab == TAB_RECORD) {
@@ -858,6 +911,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     }
 
     private void renderPickingTooltips(GuiGraphics g, int mouseX, int mouseY) {
+        if (trigger < 0 && Panel.inside(mouseX, mouseY, leftPos + FRESH_X, topPos + FRESH_Y, FRESH_W, FRESH_H)) {
+            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.work_console.fresh.hint"), 200), mouseX, mouseY);
+            return;
+        }
         int x = leftPos, y = topPos;
         if (Panel.inside(mouseX, mouseY, x + TRIGGER_X, y + BUTTON_Y, TRIGGER_W, BUTTON_H)) {
             String key = trigger < 0 ? "now" : io.github.genichimaruo.singulo.android.work.StandingOrder.TRIGGER_KEYS[trigger];
@@ -1111,10 +1168,15 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             long n = e.getLong("count");
             g.renderItemDecorations(font, s, cx + 1, cy + 1, "");
             drawCount(g, cx + 1, cy + 1, n <= 0 ? "" : compact(n));
-            if (e.getBoolean("craft")) {
+            if (e.getBoolean("craft") || e.getLong("making") > 0) {
                 g.pose().pushPose();
                 g.pose().translate(0, 0, 250);
-                g.fill(cx + 1, cy + 1, cx + 4, cy + 4, 0xFF78D2F0);     // 作れる印
+                if (e.getBoolean("craft")) {
+                    g.fill(cx + 1, cy + 1, cx + 4, cy + 4, 0xFF78D2F0);     // 作れる印
+                }
+                if (e.getLong("making") > 0) {
+                    g.renderOutline(cx, cy, CELL, CELL, MAKING);             // 作っている最中の枠
+                }
                 g.pose().popPose();
             }
         }
@@ -1160,8 +1222,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             int ry = y + TOP + i * ROW_H;
             g.fill(x + 8, ry, x + 248, ry + ROW_H - 1, 0xFFF4F6F8);
             g.renderItem(stack(o, "target"), x + 9, ry + 1);
-            Panel.well(g, x + 160, ry + 6, 66, 5);
-            g.fill(x + 160, ry + 6, x + 160 + 66 * o.getInt("progress") / 1000, ry + 11, GREEN);
+            Panel.well(g, x + 160, ry + 6, 52, 5);
+            g.fill(x + 160, ry + 6, x + 160 + 52 * o.getInt("progress") / 1000, ry + 11, GREEN);
+            g.fill(x + AGAIN_X, ry + 3, x + AGAIN_X + 12, ry + 15, 0xFFB8D8E8);
             g.fill(x + 232, ry + 3, x + 244, ry + 15, 0xFFE8B0B0);
         }
     }
@@ -1266,6 +1329,11 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         g.fill(x + 76, y + 36, x + 90, y + 50, Panel.inside(mouseX, mouseY, x + 76, y + 36, 14, 14) ? 0xFFD6E6EE : 0xFFF4F6F8);
         Panel.well(g, x + 8, y + LIST_Y, 116, LIST_ROWS * LIST_H);
         Panel.well(g, x + 132, y + LIST_Y, 116, LIST_ROWS * LIST_H);
+        if (trigger < 0) {
+            g.fill(x + FRESH_X - 1, y + FRESH_Y - 1, x + FRESH_X + FRESH_W + 1, y + FRESH_Y + FRESH_H + 1, Panel.WELL_EDGE);
+            g.fill(x + FRESH_X, y + FRESH_Y, x + FRESH_X + FRESH_W, y + FRESH_Y + FRESH_H,
+                    fresh ? 0xFF3A8FB0 : Panel.inside(mouseX, mouseY, x + FRESH_X, y + FRESH_Y, FRESH_W, FRESH_H) ? 0xFFD6E6EE : 0xFFF4F6F8);
+        }
         g.fill(x + DEST_X - 1, y + DEST_Y - 1, x + DEST_X + DEST_W + 1, y + DEST_Y + DEST_H + 1, Panel.WELL_EDGE);
         g.fill(x + DEST_X, y + DEST_Y, x + DEST_X + DEST_W, y + DEST_Y + DEST_H,
                 Panel.inside(mouseX, mouseY, x + DEST_X, y + DEST_Y, DEST_W, DEST_H) ? 0xFFD6E6EE : 0xFFF4F6F8);
@@ -1361,7 +1429,16 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             for (int i = 0; i + workerScroll < workers.size() && i < DETAIL_ROWS; i++) {
                 CompoundTag w = workers.get(i + workerScroll);
                 int act = w.getInt("activity");
+                int stall = w.getInt("stall");
                 Component line = text(w, "name").copy();
+                if (stall > io.github.genichimaruo.singulo.android.RuinAndroid.STALL_NONE
+                        && stall < io.github.genichimaruo.singulo.android.RuinAndroid.STALL_KEYS.length) {
+                    // 止まっている理由（赤い字）: 作業の中身より先に知らせる
+                    line = line.copy().append(": ").append(Component.translatable("gui.singulo.android.stall."
+                            + io.github.genichimaruo.singulo.android.RuinAndroid.STALL_KEYS[stall]));
+                    AndroidStationScreen.fit(g, font, line, 147, TOP + i * DETAIL_H + 4, 99, 0xFFE06C5A);
+                    continue;
+                }
                 if (act == -2) {
                     line = line.copy().append(": ").append(Component.translatable("gui.singulo.work_console.worker.elsewhere"));
                 } else if (act >= 0) {
@@ -1388,9 +1465,17 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 AndroidStationScreen.fit(g, font, stack(o, "target").getHoverName().copy().append(" ×" + compact(o.getLong("count"))), 28, ry + 1, 128,
                         Panel.TEXT);
                 int status = o.getInt("status");
-                AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.work_console.status." + status, o.getInt("workers")), 28,
-                        ry + 10, 128, status == WorkOrder.RUNNING ? GREEN : 0xFFC08020);
+                Component state = Component.translatable("gui.singulo.work_console.status." + status, o.getInt("workers"));
+                List<CompoundTag> missing = tags(o, "missing");
+                if (!missing.isEmpty()) {
+                    // 足りない物（1つめと、ほかの種類の数）
+                    CompoundTag m = missing.get(0);
+                    state = Component.translatable(missing.size() > 1 ? "gui.singulo.work_console.missing.more" : "gui.singulo.work_console.missing.one",
+                            stack(m, "item").getHoverName(), compact(m.getLong("count")), missing.size() - 1);
+                }
+                AndroidStationScreen.fit(g, font, state, 28, ry + 10, 128, status == WorkOrder.RUNNING ? GREEN : 0xFFC08020);
                 g.drawString(font, "×", 235, ry + 5, 0xFF803030, false);
+                g.drawString(font, "\u21BB", AGAIN_X + 3, ry + 5, 0xFF2A6A8A, false);
             }
             if (message != null) {
                 AndroidStationScreen.fit(g, font, message, 8, TOP + ORDER_ROWS * ROW_H + 2, 240, MUTED);
@@ -1508,6 +1593,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         AndroidStationScreen.fit(g, font, picking.getHoverName(), 28, 19, 220, Panel.TEXT);
         g.drawString(font, "−", 12, 39, Panel.TEXT, false);
         g.drawString(font, "+", 80, 39, Panel.TEXT, false);
+        if (trigger < 0) {
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.fresh"), FRESH_X + 1, FRESH_Y + 3, FRESH_W - 2,
+                    fresh ? 0xFFFFFFFF : Panel.TEXT);
+        }
         List<CompoundTag> deliveries = list("deliveries");
         if (!deliveries.isEmpty()) {
             CompoundTag d = deliveries.get(Math.min(destination, deliveries.size() - 1));

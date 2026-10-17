@@ -45,11 +45,30 @@ public final class WorkOrder {
     public long retryAt;
     /** あとから足した回数の素材で、まだ予約できていない物（在庫がそろうのを待つ）。 */
     public final List<ItemCount> pendingReserve = new ArrayList<>();
+    /** 取りに行ったら足りなかった物と、足りなかった数（画面で「足りない素材」として見せる。取れたら消す。保存しない）。 */
+    public final List<ItemCount> shortage = new ArrayList<>();
+
+    /** 素材を待っている注文で、足りない物（まだ予約できていない物と、取りに行ったら足りなかった物）。 */
+    public List<ItemCount> missing() {
+        List<ItemCount> out = new ArrayList<>();
+        for (ItemCount c : pendingReserve) {
+            ItemCount.add(out, c.item, c.count);
+        }
+        for (ItemCount c : shortage) {
+            ItemCount.add(out, c.item, c.count);
+        }
+        return out;
+    }
     /** 納品先（作業指令台か、納品口）。 */
     @Nullable
     public BlockPos destination;
     /** できた物を、納品先ではなく素材置き場へ入れる（登録した注文の「在庫を保つ」）。 */
     public boolean toStock;
+    /** 画面から今すぐ出した注文: できたとき・止まったときに、注文した人へ知らせる（登録した注文の繰り返しでは知らせない）。 */
+    public boolean notify;
+    /** 素材を待ち始めた時刻（待っていなければ -1）と、待っていると知らせたか（保存しない）。 */
+    public long waitingSince = -1;
+    public boolean stallNotified;
 
     public WorkOrder(int id, ItemStack target, long count, @Nullable UUID orderer) {
         this.id = id;
@@ -239,6 +258,7 @@ public final class WorkOrder {
             t.put("destination", NbtUtils.writeBlockPos(destination));
         }
         t.putBoolean("to_stock", toStock);
+        t.putBoolean("notify", notify);
         ListTag pr = new ListTag();
         for (ItemCount c : pendingReserve) {
             pr.add(c.save(registries));
@@ -285,6 +305,7 @@ public final class WorkOrder {
         o.delivered = t.getLong("delivered");
         o.destination = NbtUtils.readBlockPos(t, "destination").orElse(null);
         o.toStock = t.getBoolean("to_stock");
+        o.notify = t.getBoolean("notify");
         for (Tag p : t.getList("pending_reserve", Tag.TAG_COMPOUND)) {
             ItemCount c = ItemCount.load((CompoundTag) p, registries);
             if (c != null) {

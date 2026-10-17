@@ -73,11 +73,7 @@ public final class BossCombatLog {
         Mob attacker = boss(source.getEntity());
         Slam slam = attacker == null ? slamFor(victim, source) : null;
         if (victim instanceof Player player && slam != null) {
-            //#if neoforge
             if (player.getHealth() > 0) {
-            //#else
-            //$ if (player.getHealth() - event.getAmount() > 0) {     // Forge 版は体力が減る前に呼ばれる
-            //#endif
                 // 倒れなかった: この叩きつけの記録はここまで（倒れたときは、死亡の記録で使ってから消す）
                 SLAMS.remove(player.getUUID());
             }

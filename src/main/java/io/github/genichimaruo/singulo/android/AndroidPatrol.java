@@ -216,7 +216,7 @@ public final class AndroidPatrol {
             return;
         }
         List<LivingEntity> enemies = level.getEntitiesOfClass(LivingEntity.class, android.getBoundingBox().inflate(ALARM_RANGE),
-                e -> e.isAlive() && RuinAndroid.hostileToGuards(e));
+                e -> e.isAlive() && android.hostile(e));
         if (enemies.size() >= ALARM_COUNT) {
             // 一番多い種類の名前で知らせる
             java.util.Map<EntityType<?>, Integer> counts = new java.util.HashMap<>();

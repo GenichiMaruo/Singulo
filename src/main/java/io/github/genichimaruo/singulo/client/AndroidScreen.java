@@ -36,6 +36,9 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     /** タンクの目盛りの幅と、その右の「捨てる」ボタン（シフト＋クリック）。 */
     private static final int BAR_W = 47, CLEAR_W = 8;
 
+    /** 装備のページ: バックパックの欄の右上の小さなボタン（並べ替え・近くの箱へ預ける）。 */
+    private static final int SORT_X = 148, STASH_X = 159, TOOL_Y = 23, TOOL_S = 9;
+
     /** 装備のページのタンクの段（chem: 化学物質のタンク。液体と化学物質の両方なら、2段に細く並べる）。 */
     private record TankRow(boolean chem, int y, int h) {}
 
@@ -194,6 +197,16 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 }
             }
         }
+        if (gearPage() && minecraft != null && minecraft.gameMode != null) {
+            if (Panel.inside(mouseX, mouseY, leftPos + SORT_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_SORT);
+                return true;
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + STASH_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_STASH);
+                return true;
+            }
+        }
         if (gearPage() && Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W,
                 AndroidMenu.WORK_H) && minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, AndroidMenu.BUTTON_WORK);
@@ -274,6 +287,14 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         if (gearPage()) {
             if (Panel.inside(mouseX, mouseY, leftPos + AndroidMenu.WORK_X, topPos + AndroidMenu.WORK_Y, AndroidMenu.WORK_W, AndroidMenu.WORK_H)) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android.work.hint"), 180), mouseX, mouseY);
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + SORT_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                g.renderTooltip(font, font.split(Component.translatable(menu.working() ? "gui.singulo.android.stash.working"
+                        : "gui.singulo.android.sort.hint"), 180), mouseX, mouseY);
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + STASH_X, topPos + TOOL_Y, TOOL_S, TOOL_S)) {
+                g.renderTooltip(font, font.split(Component.translatable(menu.working() ? "gui.singulo.android.stash.working"
+                        : "gui.singulo.android.stash.hint"), 180), mouseX, mouseY);
             }
             RuinAndroid android = menu.android();
             for (TankRow row : android == null ? java.util.List.<TankRow>of() : tankRows()) {
@@ -435,9 +456,10 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         roundRect(g, x + AndroidMenu.CARRY_X - 4, y + 22, 24, 104, mix(accent, PAPER, 0.88F));
         slots(g, x, y, accent, 2, 3);
         slots(g, x, y, accent, RuinAndroid.SLOT_FELLING, 2);
-        if (!menu.hasBackpack()) {
-            // バックパックがないときは、中のスロットを覆う
-            g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
+        int openRows = menu.packSlots() / 6;
+        if (openRows < 4) {
+            // バックパックがない段（ないか、ティアが低い）は、中のスロットを覆う（旧版で入れた物は見えて、取り出せる）
+            g.fill(x + AndroidMenu.PACK_X - 1, y + AndroidMenu.PACK_Y + openRows * 18 - 1, x + AndroidMenu.PACK_X + 6 * 18 - 1,
                     y + AndroidMenu.PACK_Y + 4 * 18 - 1, 0xC8E9ECF1);
         }
         // タンク: 中身そのものの絵で、入っている割合まで（流れるアニメーションも動く）。液体と化学物質（Mekanism）の段
@@ -475,6 +497,23 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 for (int m = 1; m < 4; m++) {
                     g.fill(tx + BAR_W * m / 4, ty, tx + BAR_W * m / 4 + 1, ty + 2, 0x80FFFFFF);      // 目盛り
                 }
+            }
+        }
+        // 並べ替え（3本の横線）と、近くの箱へ預ける（箱と下向きの矢印）のボタン
+        for (int i = 0; i < 2; i++) {
+            int bx = x + (i == 0 ? SORT_X : STASH_X), by = y + TOOL_Y;
+            boolean over = Panel.inside(mouseX, mouseY, bx, by, TOOL_S, TOOL_S);
+            roundRect(g, bx, by, TOOL_S, TOOL_S, BORDER);
+            roundRect(g, bx + 1, by + 1, TOOL_S - 2, TOOL_S - 2, menu.working() ? 0xFFC4C9D2 : over ? 0xFFFFFFFF : 0xFFE2E6EC);
+            int c = menu.working() ? 0xFF9AA0AC : INK;
+            if (i == 0) {
+                g.fill(bx + 2, by + 2, bx + 7, by + 3, c);
+                g.fill(bx + 2, by + 4, bx + 6, by + 5, c);
+                g.fill(bx + 2, by + 6, bx + 5, by + 7, c);
+            } else {
+                g.fill(bx + 4, by + 2, bx + 5, by + 5, c);
+                g.fill(bx + 3, by + 4, bx + 6, by + 5, c);
+                g.fill(bx + 2, by + 5, bx + 7, by + 7, c);
             }
         }
         // 作業のオン／オフ
@@ -584,7 +623,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.storage"), 6, AndroidMenu.BACKPACK_Y - 9, 48,
                     INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.tools"), 6, AndroidMenu.MINING_Y - 9, 48, INK);
-            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack"), PACK_X_FRAME, 24, 116, INK);
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack"), PACK_X_FRAME, 24, SORT_X - PACK_X_FRAME - 2, INK);   // 右上の小さなボタンに重ねない
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.carry"), AndroidMenu.CARRY_X - 4, 24, 24, INK);
             if (menu.builtInPack()) {
                 // バックパックを内蔵している型: アップグレードの欄を濃い色の札で覆い、白い字で「内蔵」と出す（アップグレードは入らない）
@@ -613,8 +652,15 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                 AndroidMenu.REPAIR_Y - 12, 36, INK);
         AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.plate"), AndroidMenu.PLATE_X - 10,
                 AndroidMenu.PLATE_Y - 12, 36, INK);
-        AndroidStationScreen.fitCentered(g, font, Component.translatable(speech(hp, max)), PORTRAIT_X + 4, PORTRAIT_Y + PORTRAIT_H - 13,
-                PORTRAIT_W - 8, INK);
+        int stall = menu.value(AndroidMenu.D_STALL);
+        if (stall > RuinAndroid.STALL_NONE && stall < RuinAndroid.STALL_KEYS.length) {
+            // 止まっている理由があれば、吹き出しのひとことの代わりに出す（赤い字）
+            AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.stall." + RuinAndroid.STALL_KEYS[stall]),
+                    PORTRAIT_X + 4, PORTRAIT_Y + PORTRAIT_H - 13, PORTRAIT_W - 8, 0xFFC0392B);
+        } else {
+            AndroidStationScreen.fitCentered(g, font, Component.translatable(speech(hp, max)), PORTRAIT_X + 4, PORTRAIT_Y + PORTRAIT_H - 13,
+                    PORTRAIT_W - 8, INK);
+        }
     }
 
     /** 吹き出しのひとこと（状態ごとに数通り。5秒ごとに入れ替わる）。 */

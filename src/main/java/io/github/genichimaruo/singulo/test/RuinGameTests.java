@@ -124,7 +124,7 @@ public final class RuinGameTests {
     @GameTest(template = EMPTY)
     public static void detectorDescribesDirectionAndBand(GameTestHelper helper) {
         BlockPos origin = new BlockPos(0, 64, 0);
-        // 翻訳キーで確かめる（Forge のサーバーは mod の言語ファイルを読まないので、文字にすると キーのままになる）
+        // サーバー側の翻訳に頼らないよう、翻訳キーで確かめる
         String northeast = translationKeys(GravitationalWaveDetectorBlockEntity.describe(origin, new BlockPos(400, 64, -400)));
         helper.assertTrue(northeast.contains("direction.singulo.northeast"), "北東にならない: " + northeast);
         helper.assertTrue(northeast.contains("gui.singulo.detector.band.2"), "距離帯が 512〜1024 にならない: " + northeast);

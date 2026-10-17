@@ -295,10 +295,10 @@ DESC = {
     '設定カード': ('装置の設定を写して、ほかの装置に貼る。', 'Copies a machine\'s settings to another.'),
     'ニュートリノ観測所': ('電力で広い範囲を調べ続け、鉱石と遺構を近くの人に見せ続ける。右クリックで表示を切り替える。',
                    'Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.'),
-    'シールド許可証': ('シールド発生塔に入れると、登録した人だけが守りの中で作業できる。アンドロイド組立ステーションに入れると、登録した人もアンドロイドを操作できる。'
+    'シールド許可証': ('シールド発生塔に入れると、登録した人だけが守りの中で作業できる。アンドロイド組立ステーションに入れると、登録した人もアンドロイドを操作でき、登録していない人はアンドロイドに攻撃される。'
                 '右クリックで自分を、ほかのプレイヤーに右クリックでその人と自分を登録する。放射冠だけはだれでも壊せる。',
                 'Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, '
-                'registered players may also control the android. Use to register yourself; '
+                'registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; '
                 'use on a player to register them and you. Anyone can break the emitter crown.'),
     'シールド発生塔コア': ('イベントホライズン・シールド発生塔の頭脳。基壇の2段目の手前の中央に置く。', 'The brain of the Event Horizon Shield Tower. Goes in the front middle of the second plinth layer.'),
     'イベントホライズン・シールド発生塔': ('半径32の中を爆発・荒らし・敵の湧きから守る塔。', 'Protects a 32-block radius from explosions, griefing and hostile spawns.'),
@@ -400,8 +400,8 @@ DESC = {
     '原初の種': ('渦の断章に刻まれた最初の運転記録をもとに、点火の手順を逆にたどって作り出した種。創世炉の核に使うと、宇宙の誕生が始まる。',
              'A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.'),
     '警備機ドック': ('警備ドローンを出撃させるドック。', 'Launches security drones.'),
-    '遺構の印刷台': ('アンドロイドを台の上に印刷して出撃させる。全部倒すと、その型の小型クリスタルメモリが出る。',
-               'Prints androids onto its bed and sends them out. Defeat them all to get a compact crystal memory of their design.'),
+    '遺構の印刷台': ('アンドロイドを台の上に印刷して出撃させる。全部倒すと、半分の確率でその型の小型クリスタルメモリが出る。',
+               'Prints androids onto its bed and sends them out. Defeat them all for a 50% chance at a compact crystal memory of their design.'),
     '小型クリスタルメモリ（光刃型）': ('光刃型アンドロイドの設計を記録した、読み取り端子つきの小型クリスタルメモリ。組立ステーションに入れると、その型を印刷できる（減らない）。',
         'A compact crystal memory with a reader, holding the design of the Blade Android. Put it in an Android Assembly Station to print that design (it is not used up).'),
     '小型クリスタルメモリ（鞭型）': ('鞭型アンドロイドの設計を記録した、読み取り端子つきの小型クリスタルメモリ。組立ステーションに入れると、その型を印刷できる（減らない）。',
@@ -438,8 +438,18 @@ DESC = {
                           '全体の量はタンクアップグレードと同じ）。液体と化学物質を両方使う作業に。腰にガラスの筒とガスボンベが見える。中身が残っている間は外せない。',
         'Only works when Mekanism is installed. In the tank slot it gives two liquid tanks and two chemical tanks (16,000 mB each; the same total '
         'as a Tank Upgrade), for work that uses both. Glass tubes and gas cylinders show at its waist. It cannot be removed while they hold anything.'),
-    'バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が24スロット（縦4×横6）増える。背中にバックパックを背負う。',
-        'Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.'),
+    'バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が12スロット（縦2×横6）増える。背中にバックパックを背負う。'
+                          '強化バックパック（18スロット）・大型バックパック（24スロット）の材料になる。',
+        'Fitted to a guard android, it adds 12 inventory slots (2 rows of 6). The android wears it on its back. '
+        'Used to make the Reinforced Backpack (18 slots) and the Large Backpack (24 slots).'),
+    '強化バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が18スロット（縦3×横6）増える。'
+                            '中身がそのまま入るので、バックパックから中身を出さずに付け替えられる。大型バックパックの材料になる。',
+        'Fitted to a guard android, it adds 18 inventory slots (3 rows of 6). You can swap it in for a smaller backpack '
+        'without emptying it, since the contents still fit. Used to make the Large Backpack.'),
+    '大型バックパックアップグレード': ('護衛のアンドロイドに積むと、持ち物が24スロット（縦4×横6）増える。いちばん大きいバックパック。'
+                            '中身を出さずに、小さいバックパックと付け替えられる。',
+        'Fitted to a guard android, it adds 24 inventory slots (4 rows of 6), the largest backpack. '
+        'You can swap it in for a smaller backpack without emptying it.'),
     '伐採アップグレード': ('護衛のアンドロイドに積むと、手順カードの伐採（木を丸ごと切って苗木を植え直す）ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。',
         'Lets a guard android do felling steps on procedure cards (cutting whole trees and replanting saplings), like a diamond axe. Takes Efficiency, Fortune and Silk Touch.'),
     '採掘アップグレード': ('護衛のアンドロイドに積むと、採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。',
@@ -456,8 +466,10 @@ DESC = {
         'Androids bring finished orders here (choose it as the destination when ordering). A 27-slot box you can name in its screen; it moves its contents into adjacent chests by itself.'),
     'アンドロイドレシピ棚': ('6行の棚。各行の左に作業位置カード、右にレシピカードを8枚まで並べると、その場所で作れるレシピとして注文できる。',
         'A six-row rack. Put a Work Location Card on the left of a row and up to eight recipe cards on the right, and they can be ordered as recipes made at that location.'),
-    'アンドロイド作業台': ('アンドロイドが作業台のレシピを作る場所。バニラの作業台の4倍の速さで作る。レシピ棚の作業位置カードにこの台を記録して使う。',
-        'Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.'),
+    'アンドロイド作業台': ('アンドロイドが作業台のレシピを作る場所。バニラの作業台の4倍の速さで作る。レシピ棚の作業位置カードにこの台を記録して使う。'
+                    '作った物がアンドロイドの持ち物に入りきらなければ、台の預かり箱に入れてあとで取りに来る（残った物は右クリックで受け取れる）。',
+        'Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack. '
+        "Crafted items that do not fit in the android's inventory go into its holding box until the android comes back (right-click to take what is left)."),
     '作業位置カード': ('ブロックをシフト右クリックして位置を記録する（重なっていれば1枚だけ分けて記録する）。何もない所でシフト右クリックすると記録を消す。作業指令台を記録したカードで資材口・納品口・レシピ棚を右クリックすると、つながる。シフトを押すと記録したブロックの絵になる。',
         'Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.'),
     '範囲カード': ('ブロックを2つシフト右クリックして、その2つを角とする範囲を記録する（1辺128ブロックまで。重なっていれば1枚だけ分けて記録する）。'
@@ -541,6 +553,33 @@ DESC = {
 
 # 長い説明の要約（説明欄にはこれだけを出し、Shift を押している間は説明の全文と作り方・使い道を出す）。名前: (日本語, 英語)
 SUMMARY = {
+    'アンドロイド作業台': ('アンドロイドが速く作る作業台。入りきらない物を預かる。', 'A workbench androids craft on quickly. Holds what does not fit.'),
+    '隕石の核': ('隕石の芯の塊。掘ると隕鉄の原石と星屑が出る。',
+        'The core of a meteorite. Mine it for raw meteoric iron and stardust.'),
+    '衝撃発電パネル': ('落ちた高さで電力をため、重力パネルへ配る。落下ダメージを受けない。',
+        'Stores power from how far you fall and feeds gravity panels. No fall damage.'),
+    '終焉の記録': ('最終実験施設の封印コンソールで使う、最後の頁。',
+        'The last page, used on the Seal Console of the Final Lab.'),
+    '縮退熱炉': ('圧縮ブロックLv2 を燃やす大型の発電機（時間結晶触媒で 5 MFE/t）。',
+        'A large generator burning Lv2 blocks (5 MFE/t on time crystals).'),
+    'ワームホールの口': ('対の口とつながる。エキゾチック物質で開いたまま保つ。',
+        'Links to its twin. Kept open with exotic matter.'),
+    '小型クリスタルメモリ（射撃型）': ('射撃型アンドロイドの設計。組立ステーションで印刷できる（減らない）。',
+        'The Gunner Android design. Prints it in an Android Assembly Station (not used up).'),
+    '生産アップグレード': ('組立ステーションで、アンドロイドを2体まで受け持てる。',
+        'Lets an Android Assembly Station look after up to two androids.'),
+    'バックパックアップグレード': ('アンドロイドの持ち物 +12スロット。',
+        'Adds 12 inventory slots to an android.'),
+    '強化バックパックアップグレード': ('アンドロイドの持ち物 +18スロット。',
+        'Adds 18 inventory slots to an android.'),
+    '大型バックパックアップグレード': ('アンドロイドの持ち物 +24スロット（いちばん大きい）。',
+        'Adds 24 inventory slots to an android (the largest).'),
+    '伐採アップグレード': ('アンドロイドが木を丸ごと切り、苗木を植え直せる。',
+        'Lets an android fell whole trees and replant saplings.'),
+    'アンドロイド用無線充電器': ('持ち歩くと、ついてくるアンドロイドを歩きながら充電する。',
+        'Recharges a following android as it walks with you.'),
+    '製造ライン': ('ファウンドリを守り、量産型のアンドロイドを送り出す印刷ベイ。',
+        'A printing bay that shields the Foundry and sends out mass-produced androids.'),
     'マルチブロック搬入出ポート': ('マルチブロックの外装板と入れ替えて、ケーブルやパイプをつなぐ搬入出口。',
         'Swaps in for a multiblock shell panel to connect cables and pipes.'),
     'ケラウノス放電塔': ('ためた電力で人工の雷を起こし、近くの避雷針へ撃つ。',
