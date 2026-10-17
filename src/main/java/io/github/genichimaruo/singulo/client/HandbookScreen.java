@@ -47,7 +47,21 @@ public class HandbookScreen extends Screen {
     }
 
     /** 本文の1行（色つき）。 */
-    private record Line(Component text, int color) {}
+    /** 本文の1行。link があれば、押すとそのページへ移る（"章のid/ページのid"）。 */
+    private record Line(Component text, int color, @javax.annotation.Nullable String link) {
+        Line(Component text, int color) {
+            this(text, color, null);
+        }
+    }
+
+    /** ページの行き先（"章のid/ページのid" から引く）。 */
+    private record Target(Chapter chapter, int page) {}
+
+    private final Map<String, Target> targets = new HashMap<>();
+    /** 描いた行き先つきの行の場所（x, y, 幅, 高さ）と行き先。描くたびに作り直す。 */
+    private final List<Object[]> linkAreas = new ArrayList<>();
+    /** 「進み具合」の章を開いたときに出す段階（次の目標のある、いちばん若い段階）。 */
+    private int progressStart;
 
     private record Chapter(Component title, ItemStack icon, List<Page> pages) {}
 
@@ -74,6 +88,7 @@ public class HandbookScreen extends Screen {
         left = (width - W) / 2;
         top = (height - H) / 2;
         chapters.clear();
+        targets.clear();
         loadChapters();
         chapters.add(1, progressChapter());
         chapters.add(recordsChapter());
@@ -91,11 +106,17 @@ public class HandbookScreen extends Screen {
                 JsonObject c = e.getAsJsonObject();
                 String id = c.get("id").getAsString();
                 List<Page> pages = new ArrayList<>();
+                List<String> pageIds = new ArrayList<>();
                 for (JsonElement p : c.getAsJsonArray("pages")) {
                     String key = "guide.singulo." + p.getAsString();
                     pages.add(textPage(Component.translatable(key + ".title"), Component.translatable(key + ".body").getString()));
+                    pageIds.add(p.getAsString());
                 }
-                chapters.add(new Chapter(Component.translatable("guide.singulo." + id), icon(c.get("icon").getAsString()), pages));
+                Chapter chapter = new Chapter(Component.translatable("guide.singulo." + id), icon(c.get("icon").getAsString()), pages);
+                chapters.add(chapter);
+                for (int i = 0; i < pageIds.size(); i++) {
+                    targets.put(pageIds.get(i), new Target(chapter, i));      // ページのidは "章のid.ページのid"
+                }
             }
         } catch (Exception ex) {
             Singulo.LOGGER.error("ハンドブックの章を読めなかった", ex);
@@ -147,9 +168,12 @@ public class HandbookScreen extends Screen {
                 doneAll++;
             }
         }
+        progressStart = -1;
         for (int stage = 1; stage <= 5; stage++) {
             List<Line> lines = new ArrayList<>();
             lines.add(new Line(Component.translatable("gui.singulo.handbook.done_count", doneAll, order.size()), Panel.WELL_EDGE));
+            // この段階の流れ（やることの順番）のページへ
+            lines.add(new Line(Component.translatable("gui.singulo.handbook.read_flow", stage), 0xFF2A8FB8, "stage" + stage + ".flow"));
             List<Line> next = new ArrayList<>();
             List<Line> rest = new ArrayList<>();
             for (String id : order) {
@@ -171,6 +195,9 @@ public class HandbookScreen extends Screen {
                 }
             }
             if (!next.isEmpty()) {
+                if (progressStart < 0) {
+                    progressStart = stage - 1;
+                }
                 lines.add(new Line(Component.translatable("gui.singulo.handbook.next"), 0xFF2A8FB8));
                 lines.addAll(next);
             }
@@ -178,6 +205,7 @@ public class HandbookScreen extends Screen {
             pages.add(new Page(Component.translatable("gui.singulo.handbook.stage", stage)
                     .append(" ").append(Component.translatable("stage.singulo." + stage)), lines));
         }
+        progressStart = Math.max(0, progressStart);
         return new Chapter(Component.translatable("gui.singulo.handbook.progress"), new ItemStack(Items.WRITABLE_BOOK), pages);
     }
 
@@ -269,10 +297,19 @@ public class HandbookScreen extends Screen {
         g.enableScissor(px, bodyTop, px + pw, bodyTop + bodyH);
         int y = bodyTop - scroll;
         SupporterCredits.Entry hoveredSupporter = null;
+        linkAreas.clear();
         for (Line line : p.lines) {
-            for (FormattedCharSequence seq : font.split(line.text, pw)) {
-                g.drawString(font, seq, px, y, line.color, false);
+            int lineTop = y;
+            boolean link = line.link != null && targets.containsKey(line.link);
+            boolean hover = link && Panel.inside(mouseX, mouseY, px, lineTop, pw, font.split(line.text, pw).size() * 10)
+                    && mouseY >= bodyTop && mouseY < bodyTop + bodyH;
+            Component text = link ? line.text.copy().withStyle(hover ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) : line.text;
+            for (FormattedCharSequence seq : font.split(text, pw)) {
+                g.drawString(font, seq, px, y, hover ? 0xFF1E5A73 : line.color, false);
                 y += 10;
+            }
+            if (link) {
+                linkAreas.add(new Object[]{px, lineTop, pw, y - lineTop, line.link});
             }
             y += 3;
         }
@@ -348,8 +385,22 @@ public class HandbookScreen extends Screen {
         if (Panel.inside(mx, my, left + 6, listTop, LIST_W, listH)) {
             int i = (int) ((my - listTop + listScroll) / ROW);
             if (i >= 0 && i < chapters.size()) {
-                select(i, 0);
+                // 「進み具合」は、次の目標のある段階のページから開く
+                select(i, i == 1 ? Math.min(progressStart, chapters.get(i).pages.size() - 1) : 0);
                 return true;
+            }
+        }
+        int bodyTop = top + 38;
+        int bodyH = H - 38 - 22;
+        if (my >= bodyTop && my < bodyTop + bodyH) {
+            for (Object[] area : linkAreas) {
+                if (Panel.inside(mx, my, (int) area[0], (int) area[1], (int) area[2], (int) area[3])) {
+                    Target t = targets.get((String) area[4]);
+                    if (t != null && chapters.contains(t.chapter())) {
+                        select(chapters.indexOf(t.chapter()), t.page());
+                        return true;
+                    }
+                }
             }
         }
         int px = left + LIST_W + 14;

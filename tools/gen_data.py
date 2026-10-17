@@ -460,6 +460,7 @@ UI_LANG = {
     'gui.singulo.handbook.page': ('%s / %s', '%s / %s'),
     'gui.singulo.handbook.stage': ('段階%s', 'Stage %s'),
     'gui.singulo.handbook.next': ('次の目標', 'Next goals'),
+    'gui.singulo.handbook.read_flow': ('→ 段階%sの流れ（やることの順番）を読む', '→ Read the stage %s overview (what to do, in order)'),
     'gui.singulo.handbook.done_count': ('達成 %s / %s', 'Completed %s / %s'),
     'gui.singulo.handbook.locked': ('？？？', '???'),
     'gui.singulo.handbook.no_records': ('まだ解読した記録がない。遺構でクリスタルメモリを探し、アーカイブ端末で解読しよう。',

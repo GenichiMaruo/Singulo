@@ -41,6 +41,37 @@ CHAPTERS = [
          'Ancient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.'),
     ]),
     ('stage1', 'singulo:thermoelectric_generator', '段階1 起動', 'Stage 1: Startup', [
+        ('flow', '段階1の流れ',
+         'この段階でやること（上から順に）:\n'
+         '1. 鋼鉄・セラミック・基礎回路・基礎フレームを作る（「最初の素材」）。\n'
+         '2. 熱電発電機を2〜4台置き、銅導線で装置につなぐ。マグマブロック＋青氷なら溶けずに長持ちする。\n'
+         '3. 焼成炉・圧縮機（鋼板）・アーカイブ端末をそろえる。探索コンパスとホロ投影機も作っておく。\n'
+         '4. 探索コンパスで地表観測拠点を探し、保管庫から劣化した制御ユニットと観測ログを持ち帰る。\n'
+         '5. アーカイブ端末で制御ユニットを修復し、極低温冷却塔の部品を作って、ホロ投影機を見ながら組み立てる。\n'
+         '6. 冷却塔で「超伝導コイル」を作れたら段階2。\n'
+         'つまずきやすい所:\n'
+         '・低温側のブロックが溶ける: 溶岩や、焚き火＋水・雪・氷は短い時間で溶ける。「溶けない組み合わせ」のページを見る。\n'
+         '・冷却塔が組み上がらない: 中心の列は熱交換コア、てっぺんは通気格子。ホロ投影機をコントローラに使うと、足りない所が分かる。\n'
+         '・電力が足りない: 冷却塔は液体窒素を作るのに 240 FE/t ほど使う。発電機を増やすか、装置を交互に動かす。',
+         'Stage 1 at a glance',
+         'What to do, in order:\n'
+         '1. Make steel, ceramic, basic circuits and basic frames (see "First materials").\n'
+         '2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks w'
+         'ith blue ice last without melting.\n'
+         "3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Pr"
+         'ojector too.\n'
+         '4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observat'
+         'ion logs from its cache.\n'
+         '5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it followi'
+         'ng the Holo Projector.\n'
+         '6. Once the tower makes a Superconducting Coil, you are in stage 2.\n'
+         'Common sticking points:\n'
+         '- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the "Pairs that don\'t '
+         'melt" page.\n'
+         "- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Pr"
+         'ojector on the controller to see what is missing.\n'
+         '- Not enough power: the tower uses about 240 FE/t to make liquid nitrogen. Add generators or run machines in t'
+         'urns.'),
         ('materials', '最初の素材',
          '1. 鉄と石炭で「鋼の素」を作り、溶鉱炉で鋼鉄インゴットにする。\n'
          '2. 粘土・ネザー水晶・骨粉・砂で「未焼成セラミック」を作り、かまどでホワイトセラミック複合材にする。'
@@ -94,19 +125,36 @@ CHAPTERS = [
          'plates. In mass mode it turns materials with a mass value into "mass" and presses it into compressed '
          'blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen.\n- Archive Terminal: '
          'copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.'),
-        ('goal', '段階2へ進むには',
-         '段階2の鍵は「超伝導コイル」です。これは極低温冷却塔で作り、材料に地表観測拠点で拾う「制御ユニット」が要ります。\n'
-         '・地表観測拠点（平原・砂漠などの地表）を探し、保管庫から劣化した制御ユニットと観測ログを持ち帰る。\n'
-         '・アーカイブ端末で制御ユニットを修復する。\n'
-         '・冷却塔の部品をそろえ、ホロ投影機で組み立てる。',
-         'Reaching stage 2',
-         'The key to stage 2 is the Superconducting Coil. It is made in the Cryogenic Cooling Tower and needs '
-         'a Control Unit found at an Observation Post.\n- Find an Observation Post (on plains, deserts and '
-         'other surfaces) and bring back the degraded control unit and observation log from its cache.\n- '
-         'Restore the control unit in the Archive Terminal.\n- Gather the cooling tower parts and build it with '
-         'the Holo Projector.'),
     ]),
     ('stage2', 'singulo:superconducting_coil', '段階2 極低温', 'Stage 2: Cryogenic', [
+        ('flow', '段階2の流れ',
+         'この段階でやること:\n'
+         '1. 精密組立台を作る。段階3から先の部品と装置は、ほとんどここで作る。\n'
+         '2. 極低温タービン（液体窒素の気化で 5 kFE/t）で電力を増やす。\n'
+         '3. 粒子加速器でミュオン束を作り、触媒反応器でミュオン触媒（ティア2）を作る。\n'
+         '4. 冷却塔を高さ10以上にし、圧縮機で深層岩を砕いて出るヘリウムを液化する。\n'
+         '5. 地表観測拠点の保管庫で探索コンパスを調整し、研究棟を探す。量子データ片と冷却原子トラップを集める（奥の残響の番人を倒すと保管庫が開く）。\n'
+         '6. 量子演算モジュールと液体ヘリウムがそろえば段階3。\n'
+         '今のうちに: アンドロイド組立ステーションで護衛を作れる（アンドロイドの章）。隕石クレーター（隕鉄・星屑）と氷山（青氷）も探しておく。\n'
+         'つまずきやすい所:\n'
+         '・液体ヘリウムができない: 冷却塔の高さが10未満だと作れない。\n'
+         '・触媒が使えない・すぐ減る: 装置より1つ下のティアは遅く減りも速く、2つ下は使えない。',
+         'Stage 2 at a glance',
+         'What to do:\n'
+         '1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n'
+         '2. Add power with Cryogenic Turbines (5 kFE/t from evaporating liquid nitrogen).\n'
+         '3. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n'
+         '4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the C'
+         'ompressor.\n'
+         "5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect"
+         ' quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n'
+         '6. With a Quantum Computing Module and liquid helium, you are in stage 3.\n'
+         'While you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor '
+         'craters (meteoric iron, stardust) and icebergs (blue ice) too.\n'
+         'Common sticking points:\n'
+         '- No liquid helium: the tower must be at least 10 high.\n'
+         "- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot"
+         ' be used.'),
         ('tower', '極低温冷却塔',
          '5×5 の土台から、くびれた双曲面の塔を高さ7〜15で建てます。中心の列は熱交換コア、てっぺんは通気格子でふさぎます。'
          'コントローラは手前の面の下から2段目の中央。高いほど速く、高さ10以上で液体ヘリウムも作れます。\n'
@@ -144,15 +192,35 @@ CHAPTERS = [
          'power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- '
          "Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and "
          '+50% power efficiency.'),
-        ('goal', '段階3へ進むには',
-         '段階3の鍵は「量子演算モジュール」と液体ヘリウムです。冷却塔を高さ10以上にし、圧縮機で深層岩を砕いて出るヘリウムを液化します。'
-         '研究棟（地表〜浅い地下）で量子データ片も集めましょう。',
-         'Reaching stage 3',
-         'The keys to stage 3 are the Quantum Computing Module and liquid helium. Build the cooling tower 10 '
-         'or more blocks high and liquefy helium released by crushing deepslate in the compressor. Also '
-         'collect quantum data fragments from Research Buildings (surface to shallow underground).'),
     ]),
     ('stage3', 'singulo:quantum_computing_module', '段階3 量子', 'Stage 3: Quantum', [
+        ('flow', '段階3の流れ',
+         'この段階でやること:\n'
+         '1. 量子もつれ合成器とレーザー冷却器を作る。\n'
+         '2. 量子熱機関で発電する（BE凝縮触媒で 200 kFE/t。作るまではミュオン触媒で25%の仮運転）。\n'
+         '3. レーザー冷却器でBE凝縮触媒（ティア3）と光格子基板を作る。\n'
+         '4. 深海圧力収集器を早めに置き、高圧結晶を貯めておく（あとで殻とアンビルに約30個）。\n'
+         '5. 研究棟の保管庫で探索コンパスを調整し、封鎖培養施設を探す。時間結晶の種と培養データを集める（奥の重力の澱を倒すと保管庫が開く）。同じ調整で地下アンドロイド研究所も探せる。\n'
+         '6. 時間結晶の種と培養データがそろったら、段階4の時間結晶育成槽へ進む。\n'
+         'つまずきやすい所:\n'
+         '・封鎖培養施設がつらい: 極低温区画と強い警備機がいる。防具と回復をそろえ、護衛のアンドロイドを連れていく。\n'
+         '・重力の澱に浮かされる: 落下が痛いので、重力ブーツや衝撃発電パネルが助けになる。',
+         'Stage 3 at a glance',
+         'What to do:\n'
+         '1. Build an Entanglement Synthesizer and a Laser Cooler.\n'
+         '2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs a'
+         't 25% on muon catalysts).\n'
+         '3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n'
+         '4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about'
+         ' 30 later).\n'
+         "5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds"
+         ' and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Und'
+         'erground Android Laboratory.\n'
+         '6. With seeds and culture data, move on to the Time Crystal Incubator of stage 4.\n'
+         'Common sticking points:\n'
+         '- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing an'
+         'd your guard androids.\n'
+         '- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.'),
         ('quantum', '量子の装置',
          '・量子もつれ合成器: 量子もつれ素子を2個1組で作る。\n'
          '・レーザー冷却器: 冷却原子・光格子基板・BE凝縮触媒（ティア3）を作る。冷却原子トラップの復元もここ。\n'
@@ -176,15 +244,36 @@ CHAPTERS = [
          'ruins and ores through terrain for 10 seconds. At first it shows up to iron and redstone; '
          'sensitivity modules (Mk2: gold, diamond, emerald; Mk3: ancient debris) reveal deeper ores. It also '
          'works on the observatory.'),
-        ('goal', '段階4へ進むには',
-         '段階4の鍵は「エキゾチック物質」です。C空洞で作り、時間結晶触媒が要ります。'
-         '封鎖培養施設（ディープスレート層）で時間結晶の種と培養データを探しましょう。極低温区画と強い警備機に注意。',
-         'Reaching stage 4',
-         'The key to stage 4 is exotic matter. It is made in the C-Cavity and needs time crystal catalysts. '
-         'Search the Culture Facility (deepslate layer) for time crystal seeds and culture data. Watch out for '
-         'the cryogenic section and the stronger security machines.'),
     ]),
     ('stage4', 'singulo:time_crystal_catalyst', '段階4 時間', 'Stage 4: Temporal', [
+        ('flow', '段階4の流れ',
+         'この段階でやること:\n'
+         '1. 時間結晶育成槽で時間結晶触媒を育てる（要求の80%以上の電力なら純度が落ちない。設備用と運転用で取り合うので、2台あると楽）。\n'
+         '2. C空洞でエキゾチック物質とアクシオン凝縮体を作る。\n'
+         '3. 圧縮機の質量モードで圧縮ブロックを作り、縮退熱炉（5 MFE/t）で発電する。\n'
+         '4. 縮退圧縮炉で縮退物質殻を7個作る（炉殻用6・特異点の種用1）。\n'
+         '5. 封鎖培養施設の保管庫で探索コンパスを調整し、最終実験施設を探す。封印コンソールで目覚めるホライズン・ウォーデンを倒し、「休眠した特異点の種」を手に入れる。\n'
+         '6. 種を手に入れたら段階5。特異点封入台で目覚めさせ、Pリアクターに入れる。\n'
+         'つまずきやすい所:\n'
+         '・時間結晶が足りない: 時間結晶モジュール（設備用）と触媒（運転用）の両方に使う。育成槽を増やす。\n'
+         '・最終実験施設が見つからない: いちばん深い地下（Y−56〜−46あたり）。重力波検出器でおおよその方角と距離が分かる。',
+         'Stage 4 at a glance',
+         'What to do:\n'
+         '1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity '
+         'does not drop; facilities and running machines compete for crystals, so two incubators help).\n'
+         '2. Make exotic matter and axion condensate in the C-Cavity.\n'
+         "3. Make compressed blocks in the Compressor's mass mode and generate power with the Degenerate Heat Furnace (5"
+         ' MFE/t).\n'
+         '4. Make seven degenerate matter shells in the Degenerate Compactor (six for reactor shells, one for the singul'
+         'arity seed).\n'
+         "5. Tune the compass at the Culture Facility's cache and find the Final Lab. Beat the Horizon Warden that wakes"
+         ' at the Seal Console to get the Dormant Singularity Seed.\n'
+         '6. With the seed, you are in stage 5: awaken it in the Singularity Encapsulator and put it in the P-Reactor.\n'
+         'Common sticking points:\n'
+         '- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add i'
+         'ncubators.\n'
+         "- Can't find the Final Lab: it is the deepest ruin (around Y -56 to -46). The Gravitational Wave Detector show"
+         's its rough direction and distance.'),
         ('compression', '圧縮の連鎖',
          '圧縮機の質量モードで質量値のある素材を「質量」に変え、圧縮ブロックLv1→Lv2→Lv3 と固めます。'
          '3種類以上の元ブロックから作った Lv1 は「混成」になり、8個で Lv2 にできます。金属だけを固めた金属圧縮ブロックもあります。\n'
@@ -224,15 +313,34 @@ CHAPTERS = [
          'plating plus 1 for the singularity seed. Gathering rock and metal in bulk helps.\n- Probe Station: '
          'sends probes to discovered Observation Posts and brings back half the loot.\n- Topological wire and '
          'SMES modules carry and store large amounts of power.'),
-        ('goal', '段階5へ進むには',
-         '最終実験施設（重力異常点）で封印コンソールに触れると、守護機ホライズン・ウォーデンが目覚めます。倒すと保管庫が開き、'
-         '「休眠した特異点の種」が手に入ります。特異点封入台で目覚めさせ、Pリアクターに入れて点火します。',
-         'Reaching stage 5',
-         'At the Final Lab (gravity anomaly), touch the seal console to wake the Horizon Warden. Defeat it and '
-         'the cache opens, giving you a dormant singularity seed. Awaken it in the Singularity Encapsulator, '
-         'then load it into the P-Reactor and ignite it.'),
     ]),
     ('stage5', 'singulo:singularity_core', '段階5 特異点', 'Stage 5: Singularity', [
+        ('flow', '段階5の流れ',
+         'この段階でやること:\n'
+         '1. 炉殻ブロックなどPリアクターの部品をそろえ、ホロ投影機を炉心制御装置に使って、形を見ながら組み立てる。\n'
+         '2. 点火のため、50 GFE を10秒以内に送れるよう、SMES とホライズン・バスで配線する（受電の目安は平均 250 MFE/t）。\n'
+         '3. 特異点の種を入れて点火する。最初は回収運転でH凝縮体を集める（最初のシンギュラリティ・コアに6個）。\n'
+         '4. 発電運転に切り替え、質量ペレットを自動で送り込む。\n'
+         '5. シンギュラリティ・コアで特異点技術（シールド・Tシリンダー・ワームホール）を動かし、最後の目標「創世炉」へ。\n'
+         'つまずきやすい所:\n'
+         '・点火に失敗する: ケーブル網の上限は、いちばん細いケーブルで決まる。画面の受電の速さと届く見込みを見て配線を直す。\n'
+         '・炉に吸い込まれる: リングの内側は逃げられない強い引力で、黒い球に触れたものは必ず消える。近くで作業するときは気をつける。',
+         'Stage 5 at a glance',
+         'What to do:\n'
+         '1. Gather the P-Reactor parts such as reactor shell blocks, and build it with the Holo Projector used on the C'
+         'ore Controller.\n'
+         '2. For ignition, wire SMES storage and a Horizon Bus so that 50 GFE arrives within 10 seconds (about 250 MFE/t'
+         ' on average).\n'
+         '3. Insert the singularity seed and ignite. Start in harvest mode to collect H condensate (six for the first Si'
+         'ngularity Core).\n'
+         '4. Switch to generation mode and feed mass pellets automatically.\n'
+         '5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the fina'
+         'l goal, the Genesis Engine.\n'
+         'Common sticking points:\n'
+         '- Ignition fails: a cable network is limited by its thinnest cable. Check the incoming rate and the estimate o'
+         'n the screen and fix the wiring.\n'
+         '- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destro'
+         'yed. Take care when working nearby.'),
         ('reactor', 'Pリアクターを組む',
          '炉心の中心を通る3つの直交面に、半径6の円環を途切れずにつなげて作ります（各48ブロック）。3本が交わる6点はジャイロ駆動部、'
          '各円環の斜め45°の点（計12）は炉心安定化コイル、残りは炉殻ブロック（抽出ポートと警報器に交換可）、中心の 3×3×3 は空気。炉心制御装置は中心の5ブロック下です。'
@@ -402,92 +510,96 @@ CHAPTERS = [
          'Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. '
          'The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).'),
         ('bosses', '遺構の番人',
-         '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。'
-         '番人は部屋から挑戦者がいなくなっても3分は残り、それでも誰も戻らなければ元に戻ります（倒れて装備を取りに戻る猶予）。'
-         'サーバー設定 bossHardMode をオンにすると、番人はもっと強くなります。倒したときの落とし物は床の封印核（ウォーデンは封印コンソール）の上に出て、経験値は部屋にいる挑戦者で等しく分けて直接入ります（修繕も効きます）。\n'
-         '大勢で挑むと、番人は人数に合わせて強くなります（1人増えるごとに体力が5割増え、技の間も少し縮む。6人まで）。'
-         '途中で加わっても体力の割合は保たれ、人が抜けても弱くはなりません。そのかわり、落とす物は戦いが始まったときの挑戦者の人数ぶん出ます（あとから加わった人のぶんは増えません）。'
-         '大勢で攻撃しても、ほかの人の攻撃に邪魔されず全員の攻撃が通ります（同じ人の連打は、これまでどおり少し間を置かないと通りません）。\n'
-         '・残響の番人（研究棟の記録保管室）: 部屋に入ると現れる警備ホログラム。宙を回りながら追いかける光弾を撃ち、'
-         'しばらく見ていないと背後へ跳んで斬りつけてきます（跳ぶ前に光が集まる）。残響投影器は番人を守るだけでなく、一斉に光の槍も撃ちます'
-         '（金色の狙いの線が出たら動くこと）。足元に光の陣が映ったら、柱が立つ前に陣の外へ。投影器が残っているほど攻撃が通りにくいので、先に壊すこと。'
-         '体力が半分を切ると、1撃で消える分身を呼びます。投影器の光は本体にしか伸びません。番人の投影核を落とします。\n'
-         '・重力の澱（封鎖培養施設の隔離槽室）: 封じ込め槽を破って出てくる黒い核。瓦礫の殻がある間は1撃ごとに殻が1つ剥がれる代わりにダメージが小さく、'
-         '殻の瓦礫を撃ち出します。周りの相手を浮かせてから床へ叩きつけるので、重力ブーツや衝撃発電パネルがあると楽です。'
-         '体力が半分を切ると重力井戸ができ、核へ引き寄せられます（核に触れると傷つく）。井戸は引き寄せたあと力をため（光と音が前触れ）、'
-         '近くの相手を吹き飛ばしてから、部屋の別の場所へ漂って移ります。縮退核を落とします。\n'
-         '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。'
-         '最後の姿で足元に出す特異点は、1秒の前触れのあとに引き寄せ始めるので、すぐ離れること。'
-         '倒したあとは、覚醒の記録核をコンソールに使うと「覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。'
-         'やめて部屋を離れると記録核は戻ります。\n'
-         '・統括AI「ファウンドリ」（地下アンドロイド研究所のAI中枢）: 中枢の中心に浮かぶ機械の頭脳で、自分では動かず施設の設備で戦います。'
-         '壁の4つの製造ラインが動いている間は攻撃が通りにくい（1つにつき2割）ので、先に殴って壊すこと。ラインはときどき量産型のアンドロイドを送り出します。'
-         '床に赤い印が出たらロボットアーム（印は少しの間追ってきて、止まってから降りてくる。つかまれると投げられる）、影の丸はプレス（すぐ外へ）、'
-         '床の扇形の印は溶接レーザー（床すれすれの光線が回ってくるので、跳んで越える）。床のコンベアは相手を流し、枠の灯が赤く光ったあと向きを変えます。'
-         '体力が半分を切ると試作機（斧型・ビット型）を2体呼び、アームが2本になります。精密アクチュエーターと、挑戦した人それぞれに'
-         '試作機の小型クリスタルメモリ（まだ持っていない型が先）を落とします。覚醒の製造核で再戦すると、本気になったとき壊したラインを印刷し直します。\n'
-         '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます'
-         '（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増え、本気になると壊した投影器を2つまで映し直します。'
-         '重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。\n'
-         '・エルゴ球の大蛇（沈んだ炉心区画）: 球形の封じ込め室の床の、止まった炉心に近づくと現れます。体力の 2/3・1/3 で姿を変えます（変える間は傷つきません）。'
-         '泳いだ跡の帯の中では泳ぐ向きへ流されるので、流れに乗って追いかけましょう。尾の金色に光る芯はいつも弱点です。\n'
-         '　装甲: 炉殻の鱗をまとい、胴は硬い。頭が水色に光ったら突進（狙われた場所から離れる）、口の渦が開いたら前に立たない（吸い寄せてから光線）。'
-         '尾のそばにいると薙ぎ払われます。突進で床をかすめたあとは、しばらく床の近くで止まるので反撃の好機です。\n'
-         '　骨格: 鱗を弾き飛ばし（近くにいると痛い）、光の骨格になる。胴も効くようになります。部屋の中央でとぐろを巻いて回り、'
-         'まわりを押し流しながら光の欠片を撃つ。近づくと噛みつき、突進は続けて来ます。\n'
-         '　龍: 炉心の渦へ潜り、黒い龍となって噴き上がる。頭の両角から回る2本の光線（相対論的ジェット）、上空を回りながら足元に'
-         '小さなブラックホールを降らせる嵐（光の柱が前触れ）。突進のあとに止まった場所には、飛び去るときに特異点が残ります。渦の断章を落とします。\n'
-         '　どの姿でも: 高く昇って身を丸めたら「地殻の波」（中心へ叩きつけ、床を伝う衝撃の輪が2つ。輪が来たら跳ぶ）。'
-         '床に光の線が走ったら「重力の裂け目」（線の上から離れる。向きを変えて3回）。骨格と龍は、炉心の渦が開いて部屋じゅうを引き込む'
-         '「引き潮」も使います（炉心の近くは傷つくので、流れに逆らって外へ走る）。\n'
-         '　炉心の再点火: 骨格と龍の姿では、炉心に巻きついて力を溜め、部屋じゅうへ衝撃を放ちます。画面に前触れが出たら、封じ込め柱の陰へ'
-         '（柱の強化遺構ガラスも衝撃を遮ります）。',
+         '研究棟・封鎖培養施設・最終実験施設の保管庫は、それぞれの番人を倒すまで力場で封鎖されています。中身が再生すると封鎖し直され、番人も戻ってきます。番人は部屋から挑戦者がいなくなっても3分は残り、それでも誰も戻らなければ元に'
+         '戻ります（倒れて装備を取りに戻る猶予）。サーバー設定 bossHardMode をオンにすると、番人はもっと強くなります。倒したときの落とし物は床の封印核（ウォーデンは封印コンソール）の上に出て、経験値は部屋にいる挑戦者'
+         'で等しく分けて直接入ります（修繕も効きます）。\n'
+         '大勢で挑むと、番人は人数に合わせて強くなります（1人増えるごとに体力が5割増え、技の間も少し縮む。6人まで）。途中で加わっても体力の割合は保たれ、人が抜けても弱くはなりません。そのかわり、落とす物は戦いが始まったときの挑'
+         '戦者の人数ぶん出ます（あとから加わった人のぶんは増えません）。大勢で攻撃しても、ほかの人の攻撃に邪魔されず全員の攻撃が通ります（同じ人の連打は、これまでどおり少し間を置かないと通りません）。\n'
+         '・残響の番人（研究棟の記録保管室）: 部屋に入ると現れる警備ホログラム。宙を回りながら追いかける光弾を撃ち、しばらく見ていないと背後へ跳んで斬りつけてきます（跳ぶ前に光が集まる）。残響投影器は番人を守るだけでなく、一斉に'
+         '光の槍も撃ちます（金色の狙いの線が出たら動くこと）。足元に光の陣が映ったら、柱が立つ前に陣の外へ。投影器が残っているほど攻撃が通りにくいので、先に壊すこと。体力が半分を切ると、1撃で消える分身を呼びます。投影器の光は本体'
+         'にしか伸びません。番人の投影核を落とします。\n'
+         '・重力の澱（封鎖培養施設の隔離槽室）: 封じ込め槽を破って出てくる黒い核。瓦礫の殻がある間は1撃ごとに殻が1つ剥がれる代わりにダメージが小さく、殻の瓦礫を撃ち出します。周りの相手を浮かせてから床へ叩きつけるので、重力ブー'
+         'ツや衝撃発電パネルがあると楽です。体力が半分を切ると重力井戸ができ、核へ引き寄せられます（核に触れると傷つく）。井戸は引き寄せたあと力をため（光と音が前触れ）、近くの相手を吹き飛ばしてから、部屋の別の場所へ漂って移ります'
+         '。縮退核を落とします。\n'
+         '・ホライズン・ウォーデン（最終実験施設）: 中央の封印コンソールに触れると起動します。最後の姿で足元に出す特異点は、1秒の前触れのあとに引き寄せ始めるので、すぐ離れること。倒したあとは、覚醒の記録核をコンソールに使うと「'
+         '覚醒した」個体と再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、早く本気になる）。やめて部屋を離れると記録核は戻ります。',
          'Ruin guardians',
-         'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. '
-         'When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes '
-         '(time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. '
-         'Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly '
-         'among the challengers in the room and goes straight to them (Mending still works).\n'
-         'Guardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their '
-         'attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. '
-         'In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). '
-         'Everyone\'s attacks land without blocking each other, though each player still needs the usual short pause between hits.\n'
-         '- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you '
-         'to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys '
-         '(move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it '
-         'summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n'
-         '- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts '
-         'it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, '
-         'so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a '
-         'glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n'
-         '- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; '
-         'they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console '
-         'for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n'
-         '- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. '
-         'It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. '
-         'The glowing gold core in its tail is always a weak point.\n'
-         '  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, '
-         'do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive grazes the floor '
-         'it lingers low for a moment: your chance to strike back.\n'
-         '  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. '
-         'It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n'
-         '  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high '
-         'and rains small black holes where you stand (a light pillar warns you); where it rests after a dive, it leaves a singularity as it takes off. '
-         'Drops Chapters of the Vortex.\n'
-         '  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump them). When lines of light '
-         'cross the floor, get off them before the rift tears open (three volleys, each at a new angle). The skeleton and wyrm also open the core '
-         'vortex to drag everything in (the core hurts; run against the pull).\n'
-         '  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, '
-         'hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n'
-         '- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never moves and fights with the facility itself. '
-         'While the four production lines on the walls run, it takes less damage (20% per line): break them first. The lines also send out mass-produced androids. '
-         'A red mark on the floor is a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the press '
-         '(step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). '
-         'The floor conveyors carry you along and reverse after their frames glow red. Below half health it calls two prototypes (Axe and Bit) and uses two arms. '
-         'Drops precision actuators, and for each challenger a compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundry Core, it reprints its broken lines when enraged.\n'
-         '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core '
-         'in the room\'s floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two '
-         'broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
+         'The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardia'
+         'n. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian wa'
+         'its three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes gua'
+         'rdians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), an'
+         'd their experience is split evenly among the challengers in the room and goes straight to them (Mending still '
+         'works).\n'
+         'Guardians grow stronger with the number of challengers: each extra player adds half of their health and shorte'
+         'ns their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving ne'
+         'ver weakens them. In return they drop their loot once per challenger present when the fight begins (late joine'
+         "rs do not add more). Everyone's attacks land without blocking each other, though each player still needs the u"
+         'sual short pause between hits.\n'
+         '- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blink'
+         's behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light '
+         'lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar ri'
+         'ses. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the r'
+         'eal one. Drops Sentinel Projection Cores.\n'
+         '- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its ru'
+         'bble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearb'
+         'y foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags'
+         ' you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts'
+         ' the Remnant to another spot. Drops Degenerate Nuclei.\n'
+         '- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularit'
+         'ies at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Re'
+         'cord Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier '
+         'phases). Leave and the core is returned.'),
+        ('foundry', '統括AIと覚醒した番人',
+         '・統括AI「ファウンドリ」（地下アンドロイド研究所のAI中枢）: 中枢の中心に浮かぶ機械の頭脳で、自分では動かず施設の設備で戦います。壁の4つの製造ラインが動いている間は攻撃が通りにくい（1つにつき2割）ので、先に殴って'
+         '壊すこと。ラインはときどき量産型のアンドロイドを送り出します。床に赤い印が出たらロボットアーム（印は少しの間追ってきて、止まってから降りてくる。つかまれると投げられる）、影の丸はプレス（すぐ外へ）、床の扇形の印は溶接レー'
+         'ザー（床すれすれの光線が回ってくるので、跳んで越える）。床のコンベアは相手を流し、枠の灯が赤く光ったあと向きを変えます。体力が半分を切ると試作機（斧型・ビット型）を2体呼び、アームが2本になります。精密アクチュエーターと'
+         '、挑戦した人それぞれに試作機の小型クリスタルメモリ（まだ持っていない型が先）を落とします。覚醒の製造核で再戦すると、本気になったとき壊したラインを印刷し直します。\n'
+         '・覚醒した番人: 残響の番人と重力の澱も、倒したあとに部屋の床の封印核へ「覚醒の残響核」「覚醒の重力核」を使うと再戦できます（体力2.5倍・攻撃1.5倍・技の間が短く、体力65%で本気になる）。残響の番人は分身と光弾が増'
+         'え、本気になると壊した投影器を2つまで映し直します。重力の澱は瓦礫が増え、重力井戸が広く強くなり、叩きつけを続けて放ちます。やめて部屋を離れると覚醒核は封印核の上に戻ります。',
+         'The Foundry and awakened guardians',
+         '- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber a'
+         'nd it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along'
+         ' the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n'
+         '  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); w'
+         'hen the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it la'
+         'shes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.'),
+        ('leviathan', 'エルゴ球の大蛇',
+         '・エルゴ球の大蛇（沈んだ炉心区画）: 球形の封じ込め室の床の、止まった炉心に近づくと現れます。体力の 2/3・1/3 で姿を変えます（変える間は傷つきません）。泳いだ跡の帯の中では泳ぐ向きへ流されるので、流れに乗って追い'
+         'かけましょう。尾の金色に光る芯はいつも弱点です。\n'
+         '\u3000装甲: 炉殻の鱗をまとい、胴は硬い。頭が水色に光ったら突進（狙われた場所から離れる）、口の渦が開いたら前に立たない（吸い寄せてから光線）。尾のそばにいると薙ぎ払われます。突進で床をかすめたあとは、しばらく床の近くで止ま'
+         'るので反撃の好機です。\n'
+         '\u3000骨格: 鱗を弾き飛ばし（近くにいると痛い）、光の骨格になる。胴も効くようになります。部屋の中央でとぐろを巻いて回り、まわりを押し流しながら光の欠片を撃つ。近づくと噛みつき、突進は続けて来ます。\n'
+         '\u3000龍: 炉心の渦へ潜り、黒い龍となって噴き上がる。頭の両角から回る2本の光線（相対論的ジェット）、上空を回りながら足元に小さなブラックホールを降らせる嵐（光の柱が前触れ）。突進のあとに止まった場所には、飛び去るときに特異'
+         '点が残ります。渦の断章を落とします。\n'
+         '\u3000どの姿でも: 高く昇って身を丸めたら「地殻の波」（中心へ叩きつけ、床を伝う衝撃の輪が2つ。輪が来たら跳ぶ）。床に光の線が走ったら「重力の裂け目」（線の上から離れる。向きを変えて3回）。骨格と龍は、炉心の渦が開いて部屋じ'
+         'ゅうを引き込む「引き潮」も使います（炉心の近くは傷つくので、流れに逆らって外へ走る）。\n'
+         '\u3000炉心の再点火: 骨格と龍の姿では、炉心に巻きついて力を溜め、部屋じゅうへ衝撃を放ちます。画面に前触れが出たら、封じ込め柱の陰へ（柱の強化遺構ガラスも衝撃を遮ります）。',
+         'The Ergosphere Leviathan',
+         '  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes f'
+         'ull damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you '
+         'come close and chains its dives.\n'
+         '  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, '
+         'it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a'
+         ' dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n'
+         '  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump '
+         'them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a '
+         'new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against'
+         ' the pull).\n'
+         '  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the'
+         ' warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n'
+         '- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never m'
+         'oves and fights with the facility itself. While the four production lines on the walls run, it takes less dama'
+         'ge (20% per line): break them first. The lines also send out mass-produced androids. A red mark on the floor i'
+         's a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the pr'
+         'ess (step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns;'
+         ' jump over it). The floor conveyors carry you along and reverse after their frames glow red. Below half health'
+         ' it calls two prototypes (Axe and Bit) and uses two arms. Drops precision actuators, and for each challenger a'
+         ' compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundr'
+         'y Core, it reprints its broken lines when enraged.\n'
+         '- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakene'
+         "d Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65"
+         '%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant'
+         ' fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.'),
         ('lab', '地下アンドロイド研究所',
          '旧文明のアンドロイドの研究所。統括AI「ファウンドリ」が暴走し、職員は中央動力炉を止めて主立坑から逃げ出しました。'
          '人がいなくなった今も、アンドロイドたちは「施設を維持せよ」という最後の命令に従って施設を直し続けています。\n'
@@ -623,6 +735,30 @@ CHAPTERS = [
          '- Comparator: the station outputs a signal (0-15) from the android\'s health.\n'
          '- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n'
          '- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..'),
+        ('first', 'はじめての作業注文',
+         '作業の自動化を、いちばん少ない手順で試す例（パンを作らせる）:\n'
+         '1. ステーションで護衛を1体印刷する。\n'
+         '2. 作業指令台・レシピ棚・作業台を近くに置き、指令台の隣に小麦を入れたチェストを置く（素材置き場）。\n'
+         '3. 作業位置カードで指令台をシフト右クリックして記録し、そのカードでレシピ棚を右クリックしてつなぐ。\n'
+         '4. 別の作業位置カードで作業台をシフト右クリックして記録し、レシピ棚の行の左に置く。\n'
+         '5. 指令台の「記録」で 3×3 の横一列に小麦を3つ置き、レシピカードに記録して、レシピ棚の行の右に置く。\n'
+         '6. 「注文」でパンを選び、個数を決めて作業開始。できたパンは指令台の納品箱に届く。\n'
+         '注文の画面: 検索欄をクリックすると文字を打てる（@ のあとにmod名を打つと、そのmodの物だけ）。並べ替えと逆順のボタン、JEI の検索欄と同期するかの切り替えもある。アンドロイドを自動にすると、注文に必要な数だけ選'
+         'んで呼ぶ。',
+         'Your first work order',
+         'The shortest way to try work automation (having bread made):\n'
+         '1. Print one guard at a station.\n'
+         '2. Place an Android Work Console, a Recipe Rack and a crafting table nearby, and a chest with wheat next to th'
+         'e console (the stockpile).\n'
+         '3. Shift-right-click the console with a Work Location Card to record it, then right-click the Recipe Rack with'
+         ' that card to link it.\n'
+         '4. Shift-right-click the crafting table with another Work Location Card and put it on the left of a rack row.\n'
+         "5. In the console's Record tab, put three wheat in one row of the 3x3, record it on a Recipe Card and put the "
+         'card on the right of the rack row.\n'
+         "6. In the Order tab, pick bread, set a count and start. The bread arrives in the console's delivery box.\n"
+         "The order screen: click the search box to type (type @ and a mod name to show only that mod's items). There ar"
+         "e sort and reverse buttons, and a toggle to sync with JEI's search box. With androids set to automatic, it cal"
+         'ls just as many as the order needs.'),
         ('patrol', '巡回警備',
          'ステーションの動き方を「巡回」にすると、決めた場所を順に回って見張ります。\n'
          '・巡回路: 「巡回」を選ぶと出る8つの欄に作業位置カードを置くと、その場所を左から順に回り、カードの場所の上に立って見回します。'
@@ -680,38 +816,48 @@ CHAPTERS = [
          '- Kits in the station\'s refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android\'s '
          'inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n'
          '- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.'),
-        ('upgrades', 'アップグレード',
-         '・生産アップグレード: ステーションに積むと、アンドロイドを2体まで印刷して受け持つ。上で充電できるのは1体ずつで、もう1体はそばで待って交代する。'
-         '画面の名前の左の「1」「2」で、見るアンドロイドを選ぶ（動き方などの設定は2体共通）。\n'
-         '・工場式印刷ユニット: ステーションのキットの横のスロットに積むと、印刷にかかる時間と電力が半分になり、上での修理が2倍速くなる。'
-         '地下アンドロイド研究所で手に入る精密アクチュエーターで作る。\n'
+        ('upgrades', 'ステーションのアップグレード',
+         '・生産アップグレード: ステーションに積むと、アンドロイドを2体まで印刷して受け持つ。上で充電できるのは1体ずつで、もう1体はそばで待って交代する。画面の名前の左の「1」「2」で、見るアンドロイドを選ぶ（動き方などの設定'
+         'は2体共通）。\n'
+         '・工場式印刷ユニット: ステーションのキットの横のスロットに積むと、印刷にかかる時間と電力が半分になり、上での修理が2倍速くなる。地下アンドロイド研究所で手に入る精密アクチュエーターで作る。',
+         'Station upgrades',
+         '- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on'
+         ' top at a time; the other waits beside it and takes its turn. Use "1" and "2" left of the name to choose which'
+         ' android the screen shows (settings are shared).\n'
+         "- Factory Print Unit: in the slot beside the station's kit slot, it halves printing time and power and doubles"
+         ' repair speed on the station. Made from precision actuators found in the Underground Android Laboratory.'),
+        ('gear', 'アンドロイドのアップグレード',
          '・アンドロイドの画面の名前の左のボタンで「装備と持ち物」のページに切り替えると、アップグレードを積める。\n'
          '・バッテリーアップグレード: 1個につき充電の満タンが50%増える（2個まで）。満タンまでの充電の時間もそのぶん延びる。腰にバッテリーパックが付く。\n'
-         '・バックパックアップグレード: 持ち物（5スロット）に、バックパックのスロットが加わる。3段階あり、バックパックは12・強化バックパックは18・大型バックパックは24スロット。上の段階は1つ下を材料にして作る。中に物があるうちは外せないが、中身がそのまま入る大きいバックパックへは付け替えられる。\n'
+         '・バックパックアップグレード: 持ち物（5スロット）に、バックパックのスロットが加わる。3段階あり、バックパックは12・強化バックパックは18・大型バックパックは24スロット。上の段階は1つ下を材料にして作る。中に物があ'
+         'るうちは外せないが、中身がそのまま入る大きいバックパックへは付け替えられる。\n'
          '・採掘アップグレード: 採掘の作業ができるようになる（ダイヤのツルハシ相当）。効率強化・幸運・シルクタッチを付けられる。\n'
          '・伐採アップグレード: 伐採の作業ができるようになる（ダイヤの斧相当）。効率強化・幸運・シルクタッチを付けられる。\n'
-         '・タンクアップグレード: 液体・ガスを運べるタンクが2つ（各32,000 mB、1つに1種類）。腰にタンクが見える。中身が残っている間は外せない。'
-         '画面のタンクをバケツなどでクリックすると出し入れでき、横の × をシフト＋クリックすると中身を捨てる。\n'
-         '・ガスタンクアップグレード・ガス・液体アップグレード（Mekanism が入っているときだけ）: Mekanism の化学物質（ガス・注入材・顔料・スラリー）を'
-         '運べるタンク。ガスタンクは化学物質を2種類（各32,000 mB）、ガス・液体は液体と化学物質を2種類ずつ（各16,000 mB）。腰にガスボンベが見える。'
-         '画面のタンクはケミカルタンクなどでクリックして出し入れできる。作業では、資材口の隣のケミカルタンクを素材置き場として、化学物質を装置へ運ぶ。\n'
+         '・タンクアップグレード: 液体・ガスを運べるタンクが2つ（各32,000 mB、1つに1種類）。腰にタンクが見える。中身が残っている間は外せない。画面のタンクをバケツなどでクリックすると出し入れでき、横の × をシフト＋'
+         'クリックすると中身を捨てる。\n'
+         '・ガスタンクアップグレード・ガス・液体アップグレード（Mekanism が入っているときだけ）: Mekanism の化学物質（ガス・注入材・顔料・スラリー）を運べるタンク。ガスタンクは化学物質を2種類（各32,000 '
+         'mB）、ガス・液体は液体と化学物質を2種類ずつ（各16,000 mB）。腰にガスボンベが見える。画面のタンクはケミカルタンクなどでクリックして出し入れできる。作業では、資材口の隣のケミカルタンクを素材置き場として、化学物'
+         '質を装置へ運ぶ。\n'
          '・作業のオン／オフ: 作業（自動化）に割り当ててよいかを、アンドロイドごとに決める。',
-         'Upgrades',
-         '- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits '
-         'beside it and takes its turn. Use "1" and "2" left of the name to choose which android the screen shows (settings are shared).\n'
-         '- Factory Print Unit: in the slot beside the station\'s kit slot, it halves printing time and power and doubles repair speed on the station. '
-         'Made from precision actuators found in the Underground Android Laboratory.\n'
+         'Android upgrades',
          '- The button left of the name in the android screen opens the "Gear and inventory" page, where upgrades go.\n'
-         '- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n'
-         '- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n'
-         '- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n'
-         '- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n'
-         '- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. '
-         'Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n'
-         '- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, '
-         'slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). '
-         'Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a '
-         'supply port join the stockpile and androids carry chemicals to machines.\n'
+         '- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A bat'
+         'tery pack appears on the waist.\n'
+         '- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforce'
+         'd Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while i'
+         't holds items, but you can swap in a larger one whose slots still fit the contents.\n'
+         '- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk'
+         ' Touch.\n'
+         '- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.'
+         '\n'
+         '- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It c'
+         'annot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill'
+         ' or draw; shift-click the × beside it to dump the contents.\n'
+         '- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gase'
+         's, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid hold'
+         's two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen '
+         'with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and an'
+         'droids carry chemicals to machines.\n'
          '- Work on/off: choose for each android whether it may be given work (automation).'),
         ('work', '作業の自動化',
          '自分のアンドロイドに、作業台のクラフトを任せられます。\n'
@@ -722,7 +868,7 @@ CHAPTERS = [
          '4. レシピ棚の行の左に、作業台を記録した作業位置カードを置き、右にレシピカードを並べる。\n'
          '5. 指令台の「注文」で作る物と個数を選び、素材が足りるのを確かめて、アンドロイドを選んで作業開始。'
          '途中の素材も、レシピがあれば自分で作ります。\n'
-         'アンドロイドは5スロット（バックパックで+24）ずつ運びます。作業中は持ち物を取り出せず、終わると元の動き方に戻ります。'
+         'アンドロイドは5スロット（バックパックで+12・18・24）ずつ運びます。作業中は持ち物を取り出せず、終わると元の動き方に戻ります。'
          '作業中のアンドロイドにも、同じ指令台の次の注文を受け持たせられます（手が空いたら、そちらもする）。'
          'たどり着けない場所があると、その注文は取り消されます。',
          'Work automation',
@@ -735,61 +881,95 @@ CHAPTERS = [
          '4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n'
          '5. In the console\'s Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. '
          'Intermediate materials are crafted too when there is a recipe for them.\n'
-         'Androids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes '
+         'Androids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes '
          'back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. '
          'If a place cannot be reached, the order is cancelled.'),
         ('process', '加工・手順・採掘',
          '指令台の「記録」のモードボタンで、記録する種類を切り替えます。\n'
-         '・加工: かまどや装置のレシピ。左に入れる物、右に出てくる物（ほかに出てくる副産物も2つまで）を置き、ホイールで数を変える'
-         '（JEI の「+」でも置ける）。アンドロイドは装置に素材を入れ、できた物を取り出す（面は自動。記録の「入」「出」のボタンで決めることもできる）。長くかかる加工は、待つあいだにほかの作業'
-         '（受け持つほかの注文も）をして、できたら取りに戻る。副産物は素材置き場へ戻す。'
-         '燃料や電力は自分で用意する。2分たっても進まなければ、注文は取り消される。\n'
-         '・手順: 手順カードに、投入・取り出し・採掘の手順を8つまで記録する。作業位置カードを置いて場所を写し、物の欄に物を置いて「足す」。'
-         '右にできる物を置いて記録する。手順カードは場所を自分で持つので、レシピ棚のどの行にも並べられる。\n'
-         '・採掘: 採掘アップグレードを積んだアンドロイドだけが行う。作業位置カード2枚で範囲を決めると、上の段から掘り、目当ての物がそろうまで続ける'
-         '（丸石製造機にも使える）。壊せないブロック・液体・入れ物・シールドで守られた所は掘らない。掘る物がない状態が30秒続くと取り消される。\n'
-         '・農作業: 収穫（育ちきった作物を取って植え直す。サトウキビ・サボテンは根元を残す）、伐採（木を丸ごと切って苗木を植え直す。'
-         '伐採アップグレードが要る）、繁殖（えさを与えて、決めた数まで増やす）、毛刈り・搾乳（空のバケツを持っていく）、'
-         '処理（決めた数を超えた分）。名前付き・つながれた・飼われている動物と子どもには手を出さない。\n'
-         '・操作: レバー（オン・オフ・切り替え）、ボタン、ドアなどを使う。仕掛けを動かす合図に。\n'
-         '・液体・ガス: 資材口や指令台の隣のタンクも素材置き場になる。加工モードや手順の見本の欄を、バケツなどの入れ物でクリックするか JEI の「+」で、'
-         '流体を置ける（ホイールで 100 mB ずつ、シフトで 1000 mB ずつ）。タンクアップグレードを積んだアンドロイドが、流体を装置へ運ぶ。'
-         '流体を作る注文は、素材置き場のタンクへ入れる。\n'
-         '・燃料: 加工モードの燃料の欄に燃料を置いて記録すると、装置の燃料が切れたとき、その燃料を素材置き場から取ってきて入れる'
-         '（置いた数ずつか、欄の下のボタンで「満タン」にすると装置に入るだけ。どちらも入りきらない分は持ってこない。空なら取りに行かない）。'
-         '素材置き場になく、レシピで作れるなら、燃料を作る注文を自動で出す（作るあいだ、アンドロイドはほかの作業をする）。\n'
-         '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。'
-         '収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ちきった塊だけ取り、芽生えたアメジストは壊さない。\n'
-         '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。',
+         '・加工: かまどや装置のレシピ。左に入れる物、右に出てくる物（ほかに出てくる副産物も2つまで）を置き、ホイールで数を変える（JEI の「+」でも置ける）。アンドロイドは装置に素材を入れ、できた物を取り出す（面は自動。記録'
+         'の「入」「出」のボタンで決めることもできる）。長くかかる加工は、待つあいだにほかの作業（受け持つほかの注文も）をして、できたら取りに戻る。副産物は素材置き場へ戻す。燃料や電力は自分で用意する。2分たっても進まなければ、注'
+         '文は取り消される。\n'
+         '・手順: 手順カードに、投入・取り出し・採掘の手順を8つまで記録する。作業位置カードを置いて場所を写し、物の欄に物を置いて「足す」。右にできる物を置いて記録する。手順カードは場所を自分で持つので、レシピ棚のどの行にも並べ'
+         'られる。\n'
+         '・採掘: 採掘アップグレードを積んだアンドロイドだけが行う。作業位置カード2枚で範囲を決めると、上の段から掘り、目当ての物がそろうまで続ける（丸石製造機にも使える）。壊せないブロック・液体・入れ物・シールドで守られた所は'
+         '掘らない。掘る物がない状態が30秒続くと取り消される。',
          'Processing, procedures and mining',
-         'The mode button in the console\'s Record tab switches what you record.\n'
-         '- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), '
-         'and scroll to change counts (JEI\'s + button works too). Androids put the items in and take the results out (the faces are chosen '
-         'automatically, or set them with the In and Out buttons when recording). '
-         'While a slow machine works, they do other jobs (including their other orders) and come back when it is done. '
-         'Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, '
-         'the order is cancelled.\n'
-         '- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put '
-         'the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they '
-         'work in any recipe rack row.\n'
-         '- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until '
-         'enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and '
-         'shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n'
-         '- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants '
-         'saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull '
-         '(anything above a set number). Named, leashed and tamed animals and babies are left alone.\n'
+         "The mode button in the console's Record tab switches what you record.\n"
+         '- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus '
+         "up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in and t"
+         'ake the results out (the faces are chosen automatically, or set them with the In and Out buttons when recordin'
+         'g). While a slow machine works, they do other jobs (including their other orders) and come back when it is don'
+         'e. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, th'
+         'e order is cancelled.\n'
+         '- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card'
+         ' to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Proc'
+         'edure cards hold their own places, so they work in any recipe rack row.\n'
+         '- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the '
+         'top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbre'
+         'akable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 '
+         'seconds, the order is cancelled.'),
+        ('farm', '農作業・液体・燃料',
+         '・農作業: 収穫（育ちきった作物を取って植え直す。サトウキビ・サボテンは根元を残す）、伐採（木を丸ごと切って苗木を植え直す。伐採アップグレードが要る）、繁殖（えさを与えて、決めた数まで増やす）、毛刈り・搾乳（空のバケツを'
+         '持っていく）、処理（決めた数を超えた分）。名前付き・つながれた・飼われている動物と子どもには手を出さない。\n'
+         '・操作: レバー（オン・オフ・切り替え）、ボタン、ドアなどを使う。仕掛けを動かす合図に。\n'
+         '・液体・ガス: 資材口や指令台の隣のタンクも素材置き場になる。加工モードや手順の見本の欄を、バケツなどの入れ物でクリックするか JEI の「+」で、流体を置ける（ホイールで 100 mB ずつ、シフトで 1000 mB '
+         'ずつ）。タンクアップグレードを積んだアンドロイドが、流体を装置へ運ぶ。流体を作る注文は、素材置き場のタンクへ入れる。\n'
+         '・燃料: 加工モードの燃料の欄に燃料を置いて記録すると、装置の燃料が切れたとき、その燃料を素材置き場から取ってきて入れる（置いた数ずつか、欄の下のボタンで「満タン」にすると装置に入るだけ。どちらも入りきらない分は持ってこ'
+         'ない。空なら取りに行かない）。素材置き場になく、レシピで作れるなら、燃料を作る注文を自動で出す（作るあいだ、アンドロイドはほかの作業をする）。\n'
+         '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ち'
+         'きった塊だけ取り、芽生えたアメジストは壊さない。\n'
+         '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。',
+         'Farming, fluids and fuel',
+         '- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole tr'
+         'ees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk '
+         '(empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and b'
+         'abies are left alone.\n'
          '- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n'
-         '- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure '
-         'mode with a bucket or other fluid container, or use JEI\'s + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). '
-         'Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n'
-         '- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the '
-         'stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than '
-         'the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make '
-         'the fuel is placed automatically (the androids do other work meanwhile).\n'
-         '- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until '
-         'enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing '
-         '(up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n'
+         '- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in pro'
+         "cessing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scr"
+         'oll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that m'
+         'ake a fluid fill the stockpile tanks.\n'
+         '- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch t'
+         'hat fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button '
+         'below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile ha'
+         's none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other '
+         'work meanwhile).\n'
+         '- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the '
+         'step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wa'
+         'it for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding '
+         'amethyst is never broken.\n'
          '- Android Workbench: crafts four times as fast as a vanilla crafting table.'),
+        ('trouble', '止まっているとき',
+         'アンドロイドが止まっているときは、理由を次の場所で確かめられます。\n'
+         '・アンドロイドの画面の状態のページ: 吹き出しに赤い字で理由が出る。\n'
+         '・作業指令台の注文の詳細: 担当のアンドロイドの名前の横に出る。\n'
+         '・測量メガネを掛けると、止まっているアンドロイドの頭の上に立ち入り禁止の印が出る。\n'
+         '理由と直し方:\n'
+         '・ステーションの電力が足りない: 発電を増やすか、ステーションへのケーブルを確かめる。\n'
+         '・行き先にたどり着けない: 段差・扉・水で道が切れていないか、経路の決まり（進入禁止ゾーン）が道をふさいでいないか確かめる。\n'
+         '・素材置き場に素材が足りない: 資材口や指令台の隣のチェストに素材を足す。途中の素材は、レシピがあれば自分で作る。\n'
+         '・守られたブロック: シールドやほかのmodの保護で壊せない。注文した人に壊す権限があるか確かめる。\n'
+         '・作業の範囲に対象がない: 作業位置カードの範囲を見直す。作物が育つのを待っている間は止まらない（時計の印）。\n'
+         '・置き場がいっぱい: 納品口や素材置き場のチェストを空ける。\n'
+         '注文が取り消されたときは、指令台に理由が出ます（たどり着けない・レシピが合わない・長く進まない・入れる面が違う）。',
+         'When an android stops',
+         'When an android is stuck, you can see why in these places:\n'
+         '- The status page of the android screen: the reason appears in red in the speech bubble.\n'
+         "- Order details in the Work Console: it appears next to the assigned android's name.\n"
+         "- With Survey Glasses on, a barrier icon floats over a stuck android's head.\n"
+         'Reasons and fixes:\n'
+         '- The station is out of power: add generation or check the cable to the station.\n'
+         "- Can't reach the destination: check that steps, doors or water don't cut the path, and that a route rule (no-"
+         "go zone) doesn't block it.\n"
+         '- Not enough materials in the stockpile: add materials to the chests beside the supply port or the console. In'
+         'termediate materials are crafted if there is a recipe.\n'
+         "- A protected block: a shield or another mod's protection stops it. Check that the person who placed the order"
+         ' may break it.\n'
+         '- Nothing to work on in the area: check the Work Location Card area. Waiting for crops to grow does not count '
+         'as stuck (clock icon).\n'
+         '- Storage is full: empty the delivery port or stockpile chests.\n'
+         "When an order is cancelled, the console shows why (unreachable, recipe doesn't match, no progress for a long t"
+         'ime, or the wrong input face).'),
         ('decor', 'アンドロイドの装飾',
          'アンドロイドの画面の、名前の左のボタンでページを切り替えると、3枚目が「装飾」のページ。頭・背中/腰・手の枠に装飾を着けられる。'
          '戦い・作業には影響しない。どれも作業台で作り、染料と一緒に作業台で染められる（革の防具と同じ）。\n'
