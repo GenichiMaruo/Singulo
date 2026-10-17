@@ -3,11 +3,12 @@
 For **Minecraft 1.21.1**, Java 21. Starting with this version, Singulo is available for both **NeoForge** (`N`) and **Forge** (`F`, 52.1.20 or later). JEI is optional on both. Mekanism integration is available only on NeoForge.
 
 ### Forge support
-- Added a Forge build for Minecraft 1.21.1 with the same content, recipes and worlds as the NeoForge build.
+- Added a Forge build for Minecraft 1.21.1 with shared content, recipes and world generation.
+- Fixed stale capability handles and block-entity references in the Forge compatibility layer.
 - Mekanism chemical transport and its tank upgrades are not available on Forge, because Mekanism for 1.21.1 runs only on NeoForge.
 
 ### Android work
-- The work console now recruits only the androids an order needs, both when you choose androids and when it picks them automatically.
+- Automatic recruitment now picks only the androids an order needs, while retaining workers with the required carrying capacity, tanks and work upgrades. Explicitly selected workers remain under your control.
 - The order tab is larger and now has a search box, sorting, reverse order and optional JEI search sync. Click the box to start typing. Type `@` to search by mod.
 - Intercept mode: androids now wait on their charging station, and extra androids wait beside it. They no longer start idle activities while on guard and take a short standing nap at night.
 - Napping androids no longer chat with others.

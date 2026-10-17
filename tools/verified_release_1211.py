@@ -72,6 +72,8 @@ def promote(metadata, artifacts, output):
         pixels = json.loads((root / 'gui-review/inventory-pixels.json').read_text())
         if 'SINGULO_GUI_COMPLETE 20' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 20:
             raise RuntimeError('Missing real GUI/search validation for ' + loader)
+        if loader == 'neoforge' and 'SINGULO_JEI_SYNC_COMPLETE' not in gui:
+            raise RuntimeError('Missing bidirectional JEI search validation')
         if len(pixels) != 3 or sum(p['checked_empty_slot_centers'] for p in pixels) != 105:
             raise RuntimeError('Missing inventory PNG verification for ' + loader)
         target = output / name

@@ -62,6 +62,7 @@ jobs:
           test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 20
           grep -q 'SINGULO_GUI_COMPLETE 20' build/gui-review/logs/latest.log
           grep -q 'SINGULO_SEARCH_COMPLETE' build/gui-review/logs/latest.log
+          grep -q 'SINGULO_JEI_SYNC_COMPLETE' build/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py
       - name: Save build outputs and validation logs
