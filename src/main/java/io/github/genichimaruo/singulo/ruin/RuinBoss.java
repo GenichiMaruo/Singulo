@@ -278,6 +278,10 @@ public abstract class RuinBoss extends Monster {
         return new String[0][];
     }
 
+    /** 覚醒した個体を倒したときの、人数で増えない特別な報酬（1回の撃破で1回だけ）。 */
+    protected void dropAwakenedBonus(ServerLevel level) {
+    }
+
     /** 技の間（tick）。覚醒した個体と、大勢で挑まれたときは短い。 */
     protected int pace(int ticks) {
         float k = (awakened() ? AWAKENED_PACE : 1F) * BossScaling.paceFactor(participants);
@@ -503,6 +507,7 @@ public abstract class RuinBoss extends Monster {
                 spawnAtLocation(new net.minecraft.world.item.ItemStack(item, Integer.parseInt(r[1])), 1.0F);
             }
         }
+        dropAwakenedBonus(level);
         String id = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath();
         io.github.genichimaruo.singulo.registry.SinguloTriggers.milestoneNear(level, blockPosition(), arenaRadius() + 16, "awakened_" + id);
         Component msg = Component.translatable("gui.singulo.guardian.awakened_defeated");

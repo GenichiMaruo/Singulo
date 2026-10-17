@@ -1515,6 +1515,10 @@
     "source": "A compact crystal memory with a reader, holding the design of the Blade Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "记录了光刃型仿生人设计、带读取端子的小型水晶存储器。放入仿生人组装站即可打印该型号（不会消耗）。"
   },
+  "desc.singulo.android_memory_gunner": {
+    "source": "A compact crystal memory holding the design of the Gunner Android. Light keeps flowing through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "记录了射击型仿生人设计的小型水晶存储器。光芒在晶体中不停流动。放入仿生人组装站即可打印该型号（不会消耗）。"
+  },
   "desc.singulo.android_memory_saber": {
     "source": "A compact crystal memory with a reader, holding the design of the Saber Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "记录了光剑型仿生人设计、带读取端子的小型水晶存储器。放入仿生人组装站即可打印该型号（不会消耗）。"
@@ -2903,6 +2907,10 @@
     "source": "Awakened Gravity Remnant",
     "translation": "觉醒的重力残渣"
   },
+  "entity.singulo.gunner_android": {
+    "source": "Gunner Android \"Ciel\"",
+    "translation": "射击型仿生人“希艾尔”"
+  },
   "entity.singulo.horizon_bolt": {
     "source": "Horizon Bolt",
     "translation": "视界光弹"
@@ -3179,6 +3187,10 @@
     "source": "Lumina",
     "translation": "露米娜"
   },
+  "gui.singulo.android.nickname.gunner": {
+    "source": "Ciel",
+    "translation": "希艾尔"
+  },
   "gui.singulo.android.nickname.saber": {
     "source": "Soleil",
     "translation": "索蕾伊"
@@ -3190,6 +3202,10 @@
   "gui.singulo.android.pack": {
     "source": "Backpack",
     "translation": "背包内"
+  },
+  "gui.singulo.android.pack.builtin": {
+    "source": "Built-in",
+    "translation": "内置"
   },
   "gui.singulo.android.pack.none": {
     "source": "No backpack",
@@ -5212,8 +5228,8 @@
     "translation": "仿生人（可携带格数）"
   },
   "gui.singulo.work_console.auto_android": {
-    "source": "None chosen: all %s available androids will start",
-    "translation": "未选择，将由全部可用的仿生人（%s 个）开始"
+    "source": "None chosen: only as many of the %s available androids as the work needs will start",
+    "translation": "未选择，将从可选的 %s 个仿生人中只派出工作所需的数量"
   },
   "gui.singulo.work_console.back": {
     "source": "Back",
@@ -5363,6 +5379,14 @@
     "source": "Out of fuel (%s), so an order to make %s was placed",
     "translation": "资材存放处没有燃料（%s），已下单制作 %s 个"
   },
+  "gui.singulo.work_console.jei.off": {
+    "source": "Linked with the JEI search bar: Off",
+    "translation": "与 JEI 搜索栏联动：关"
+  },
+  "gui.singulo.work_console.jei.on": {
+    "source": "Linked with the JEI search bar: On",
+    "translation": "与 JEI 搜索栏联动：开"
+  },
   "gui.singulo.work_console.link.0": {
     "source": "Supply port",
     "translation": "资材口"
@@ -5419,6 +5443,10 @@
     "source": "Nothing is linked",
     "translation": "没有连接的方块"
   },
+  "gui.singulo.work_console.no_match": {
+    "source": "Nothing matches the search",
+    "translation": "没有符合搜索的物品"
+  },
   "gui.singulo.work_console.no_orders": {
     "source": "No running orders",
     "translation": "没有进行中的订单"
@@ -5447,6 +5475,14 @@
     "source": "Save",
     "translation": "登记"
   },
+  "gui.singulo.work_console.search.help": {
+    "source": "Filter by name. Start with @ to filter by mod (e.g. @singulo). Separate words with spaces to match all of them. Right-click to clear",
+    "translation": "按名称筛选。以 @ 开头则按模组筛选（例：@singulo）。用空格分隔时只保留全部符合的物品。右键清空"
+  },
+  "gui.singulo.work_console.search.hint": {
+    "source": "Search (@ for mod)",
+    "translation": "搜索（@ 搜模组）"
+  },
   "gui.singulo.work_console.signal.off": {
     "source": "Redstone signal: off",
     "translation": "红石信号：无"
@@ -5454,6 +5490,38 @@
   "gui.singulo.work_console.signal.on": {
     "source": "Redstone signal: on",
     "translation": "红石信号：有"
+  },
+  "gui.singulo.work_console.sort": {
+    "source": "Sort: %s",
+    "translation": "排序：%s"
+  },
+  "gui.singulo.work_console.sort.count": {
+    "source": "Stock",
+    "translation": "库存"
+  },
+  "gui.singulo.work_console.sort.craftable": {
+    "source": "Craftable",
+    "translation": "可制作"
+  },
+  "gui.singulo.work_console.sort.default": {
+    "source": "Default",
+    "translation": "指令台顺序"
+  },
+  "gui.singulo.work_console.sort.help": {
+    "source": "Click to change the order (Shift-click to go back)",
+    "translation": "点击切换排序（Shift+点击反向切换）"
+  },
+  "gui.singulo.work_console.sort.mod": {
+    "source": "Mod",
+    "translation": "模组"
+  },
+  "gui.singulo.work_console.sort.name": {
+    "source": "Name",
+    "translation": "名称"
+  },
+  "gui.singulo.work_console.sort.reverse": {
+    "source": "Reverse the order",
+    "translation": "反转排序"
   },
   "gui.singulo.work_console.standing.added": {
     "source": "Saved the order for %s",
@@ -7251,6 +7319,10 @@
     "source": "Compact Crystal Memory (Blade)",
     "translation": "小型水晶存储器（光刃型）"
   },
+  "item.singulo.android_memory_gunner": {
+    "source": "Compact Crystal Memory (Gunner)",
+    "translation": "小型水晶存储器（射击型）"
+  },
   "item.singulo.android_memory_saber": {
     "source": "Compact Crystal Memory (Saber)",
     "translation": "小型水晶存储器（光剑型）"
@@ -7522,6 +7594,10 @@
   "item.singulo.gravity_remnant_spawn_egg": {
     "source": "Gravity Remnant Spawn Egg",
     "translation": "重力残渣刷怪蛋"
+  },
+  "item.singulo.gunner_android_spawn_egg": {
+    "source": "Gunner Android Spawn Egg",
+    "translation": "射击型仿生人刷怪蛋"
   },
   "item.singulo.handbook": {
     "source": "Singulo Handbook",
@@ -9327,6 +9403,106 @@
     "source": "Wormhole stabilizer runs",
     "translation": "虫洞稳定器运行"
   },
+  "summary.singulo.android_dual_tank_upgrade": {
+    "source": "Two liquid and two chemical tanks (only with Mekanism).",
+    "translation": "装上液体和化学品储罐各 2 个（仅限安装 Mekanism 时）。"
+  },
+  "summary.singulo.android_gas_tank_upgrade": {
+    "source": "Two tanks for Mekanism chemicals (only with Mekanism).",
+    "translation": "装上 2 个运送 Mekanism 化学品的储罐（仅限安装 Mekanism 时）。"
+  },
+  "summary.singulo.android_memory_axe": {
+    "source": "The Axe Android design. Prints it in an Android Assembly Station (not used up).",
+    "translation": "斧型仿生人的设计。可在组装站打印（不会消耗）。"
+  },
+  "summary.singulo.android_memory_bit": {
+    "source": "The Bit Android design. Prints it in an Android Assembly Station (not used up).",
+    "translation": "浮游炮型仿生人的设计。可在组装站打印（不会消耗）。"
+  },
+  "summary.singulo.android_station": {
+    "source": "Prints guard androids from a memory, a kit and power.",
+    "translation": "用存储器、套件和电力打印护卫仿生人。"
+  },
+  "summary.singulo.android_tank_upgrade": {
+    "source": "Gives a guard android two tanks for liquids and gases.",
+    "translation": "为护卫仿生人装上 2 个运送液体或气体的储罐。"
+  },
+  "summary.singulo.android_transfer_upgrade": {
+    "source": "Passes a fallen android's inventory on to the next one printed.",
+    "translation": "把倒下仿生人的物品转交给下一个打印的仿生人。"
+  },
+  "summary.singulo.android_work_console": {
+    "source": "Takes orders and assigns crafting and work to nearby androids.",
+    "translation": "接受订单，把制作和工作分配给附近的仿生人。"
+  },
+  "summary.singulo.area_card": {
+    "source": "Records an area by two corners, for android routes.",
+    "translation": "用两个角记录范围，用于设置仿生人的路线。"
+  },
+  "summary.singulo.awakening_echo_core": {
+    "source": "Use on a Research Building's guardian core to fight the Awakened Echo Sentinel.",
+    "translation": "在研究楼的守卫封印核心上使用，可与觉醒的回响守卫战斗。"
+  },
+  "summary.singulo.awakening_ergosphere_core": {
+    "source": "Use on a Sunken Reactor Sector's guardian core to fight the Awakened Ergosphere Leviathan.",
+    "translation": "在沉没的炉心区的守卫封印核心上使用，可与觉醒的能层巨蛇战斗。"
+  },
+  "summary.singulo.awakening_foundry_core": {
+    "source": "Use on an Android Laboratory's guardian core to fight the Awakened Foundry.",
+    "translation": "在地下仿生人研究所的守卫封印核心上使用，可与觉醒的“铸造厂”战斗。"
+  },
+  "summary.singulo.awakening_gravity_core": {
+    "source": "Use on a Culture Facility's guardian core to fight the Awakened Gravity Remnant.",
+    "translation": "在封锁培养设施的守卫封印核心上使用，可与觉醒的重力残渣战斗。"
+  },
+  "summary.singulo.awakening_record_core": {
+    "source": "Use on the Seal Console to fight the Awakened Horizon Warden.",
+    "translation": "在封印控制台上使用，可与觉醒的视界守卫战斗。"
+  },
+  "summary.singulo.genesis_core": {
+    "source": "The heart of an engine that makes a universe from energy.",
+    "translation": "以能量创造宇宙的炉之核心。"
+  },
+  "summary.singulo.gravity_panel_receiver": {
+    "source": "Powers every connected gravity panel.",
+    "translation": "向所有相连的重力面板供电。"
+  },
+  "summary.singulo.keraunos_tower": {
+    "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
+    "translation": "用储存的电力制造人工闪电，击向附近的避雷针。"
+  },
+  "summary.singulo.multiblock_port": {
+    "source": "Swaps in for a multiblock shell panel to connect cables and pipes.",
+    "translation": "替换多方块结构外壳板，用于连接线缆和管道的进出口。"
+  },
+  "summary.singulo.precision_actuator": {
+    "source": "A precise drive unit found in underground android laboratories.",
+    "translation": "在地下仿生人研究所获得的旧文明精密驱动部件。"
+  },
+  "summary.singulo.procedure_card": {
+    "source": "Records up to eight work steps for androids.",
+    "translation": "记录要让仿生人执行的作业步骤（最多 8 个）。"
+  },
+  "summary.singulo.shield_permit": {
+    "source": "Lets only registered players work inside a shield or control a station's android.",
+    "translation": "只让登记的玩家在护盾内作业或操作仿生人。"
+  },
+  "summary.singulo.survey_glasses": {
+    "source": "While worn, shows places recorded on cards and what working androids are doing.",
+    "translation": "戴上后可看到卡片记录的位置以及工作中仿生人在做什么。"
+  },
+  "summary.singulo.time_crystal_module": {
+    "source": "A stackable part sealing a slice of a time crystal's life.",
+    "translation": "截取时间晶体催化剂寿命并封存的可堆叠部件。"
+  },
+  "summary.singulo.work_location_card": {
+    "source": "Records a block position and links work consoles with ports.",
+    "translation": "记录方块位置，连接作业指令台与材料口等。"
+  },
+  "summary.singulo.wormhole_port": {
+    "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
+    "translation": "与另一侧入口附近同编号的端口连通电力、物品和液体。"
+  },
   "tooltip.singulo.android_accessory.0": {
     "source": "Worn on an android's head (decoration page)",
     "translation": "戴在仿生人头上（装饰页）"
@@ -9470,6 +9646,10 @@
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "混合：8个组成Lv2"
+  },
+  "tooltip.singulo.more": {
+    "source": "Hold Shift for details",
+    "translation": "Shift：查看详情"
   },
   "tooltip.singulo.needs_mekanism": {
     "source": "Only works when Mekanism is installed",

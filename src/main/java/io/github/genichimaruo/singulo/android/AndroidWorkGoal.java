@@ -489,7 +489,7 @@ final class AndroidWorkGoal extends Goal {
             return;
         }
         boolean fast = android.level().getBlockState(at).is(io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORKBENCH.get());
-        if (++craftTimer < (fast ? io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity.CRAFT_TICKS : CRAFT_TICKS)) {
+        if (++craftTimer < android.workTicks(fast ? io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity.CRAFT_TICKS : CRAFT_TICKS)) {
             return;
         }
         craftTimer = 0;
@@ -1013,7 +1013,7 @@ final class AndroidWorkGoal extends Goal {
                 return;
             }
             BlockState state = level.getBlockState(mineTarget);
-            mineNeed = breakTicks(level, mineTarget, state, tool);
+            mineNeed = android.workTicks(breakTicks(level, mineTarget, state, tool));
         }
         mineIdle = 0;
         BlockPos target = mineTarget;
@@ -1412,7 +1412,7 @@ final class AndroidWorkGoal extends Goal {
         if (android.state() != RuinAndroid.STATE_CRAFTING) {
             android.setState(RuinAndroid.STATE_CRAFTING);
         }
-        if (++mineTimer < HARVEST_TICKS) {
+        if (++mineTimer < android.workTicks(HARVEST_TICKS)) {
             return;
         }
         stopMining();
@@ -1707,7 +1707,7 @@ final class AndroidWorkGoal extends Goal {
         if (android.state() != RuinAndroid.STATE_CRAFTING) {
             android.setState(RuinAndroid.STATE_CRAFTING);
         }
-        if (++craftTimer < RANCH_TICKS) {
+        if (++craftTimer < android.workTicks(RANCH_TICKS)) {
             return;
         }
         craftTimer = 0;
@@ -1810,7 +1810,7 @@ final class AndroidWorkGoal extends Goal {
         if (android.state() != RuinAndroid.STATE_CRAFTING) {
             android.setState(RuinAndroid.STATE_CRAFTING);
         }
-        if (++craftTimer < RANCH_TICKS) {
+        if (++craftTimer < android.workTicks(RANCH_TICKS)) {
             return;
         }
         craftTimer = 0;

@@ -44,10 +44,12 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
         return t;
     }
 
-    public static CompoundTag start(ItemStack item, long count, List<UUID> androids, BlockPos destination,
+    /** 注文する。auto: アンドロイドを選ばなかった（androids は選べる候補。指令台が、そのうち作業量に見合う人数だけを招集する）。 */
+    public static CompoundTag start(ItemStack item, long count, List<UUID> androids, boolean auto, BlockPos destination,
                                     net.minecraft.core.HolderLookup.Provider reg) {
         CompoundTag t = plan(item, count, reg);
         t.putString("type", START);
+        t.putBoolean("auto", auto);
         t.putLong("destination", destination.asLong());
         net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
         for (UUID id : androids) {
@@ -60,7 +62,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
     /** 注文を登録する（trigger は {@link StandingOrder#KEEP} など）。 */
     public static CompoundTag register(ItemStack item, long count, int trigger, List<UUID> androids, BlockPos destination,
                                        net.minecraft.core.HolderLookup.Provider reg) {
-        CompoundTag t = start(item, count, androids, destination, reg);
+        CompoundTag t = start(item, count, androids, false, destination, reg);
         t.putString("type", REGISTER);
         t.putInt("trigger", trigger);
         return t;
@@ -153,7 +155,8 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) impl
                         ids.add(NbtUtils.loadUUID(t));
                     }
                     BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLong("destination")) : null;
-                    Component error = item.isEmpty() ? Component.literal("?") : console.start(player, item, count, ids, destination);
+                    Component error = item.isEmpty() ? Component.literal("?")
+                            : console.start(player, item, count, ids, a.getBoolean("auto"), destination);
                     plan = new CompoundTag();
                     plan.putBoolean("started", error == null);
                     if (error != null) {

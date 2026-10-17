@@ -139,6 +139,10 @@ CLIENT = [
     ('render', 'lensingQuality', '"high"', '"low" / "medium" / "high"', '歪み処理の解像度'),
     ('render', 'formationEffects', 'true', 'true / false', 'マルチブロック形成時の光の演出'),
     ('render', 'androidWorkIcons', 'true', 'true / false', '作業中のアンドロイドの頭の上に、今していること（取りに行く・作る・採掘 など）のアイコンを出す（測量メガネを掛けているときだけ見える）'),
+    ('gui', 'workOrderSort', '"default"', '"default" / "name" / "count" / "mod" / "craftable"',
+     'アンドロイド作業指令台の注文タブの並び（default: 指令台の並びのまま / name: 名前順 / count: 在庫の多い順 / mod: mod ごと / craftable: 作れる物を先に）。画面のボタンでも変えられる'),
+    ('gui', 'workOrderSortReversed', 'false', 'true / false', '注文タブの並びを逆にする（画面のボタンでも変えられる）'),
+    ('gui', 'workOrderJeiSync', 'false', 'true / false', '注文タブの検索欄を JEI の検索欄と連携する（JEI を入れているときだけ。画面のボタンでも変えられる）'),
 ]
 
 DATAPACK = [

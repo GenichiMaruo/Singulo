@@ -181,7 +181,8 @@ public final class GravitationalLensing {
 
     private static Pending pending;
 
-    /** GUI を描く直前（シェーダーパックの合成が終わったあと）に、覚えておいたレンズを掛ける。 */
+    //#if neoforge
+    /** GUI を描く直前（シェーダーパックの合成が終わったあと）に、覚えておいたレンズを掛ける（Forge 版にはこの出来事がない）。 */
     static void onRenderGui(net.neoforged.neoforge.client.event.RenderGuiEvent.Pre event) {
         Pending p = pending;
         pending = null;
@@ -196,6 +197,7 @@ public final class GravitationalLensing {
             SOURCES.clear();
         }
     }
+    //#endif
 
     static void onRenderStage(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) {

@@ -47,6 +47,10 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     private static final int DEST_X = 132, DEST_Y = 36, DEST_W = 116, DEST_H = 14;
     private static final int TOP = 33;
     private static final int COLS = 13, ROWS = 5, CELL = 18;
+    /** 注文タブの下の段（インベントリの見出しのすぐ上）: 検索欄・並びのボタン・逆順のボタン・JEI 連携のボタン。 */
+    private static final int SEARCH_Y = TOP + ROWS * CELL + 2, SEARCH_H = 12, SEARCH_X = 8, SEARCH_W = 116,
+            SORT_X = 128, SORT_W = 80, REV_X = 210, REV_W = 12, JEI_X = 224, JEI_W = 24;
+    private static final String[] SORTS = {"default", "name", "count", "mod", "craftable"};
     private static final int ROW_H = 18, ORDER_ROWS = 5;
     private static final int LINK_ROWS = 6, LINK_H = 13;
     private static final int LIST_Y = 70, LIST_ROWS = 7, LIST_H = 16;
@@ -81,6 +85,12 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     /** 選んだ納品先（様子の deliveries の番号）。 */
     private int destination;
     private int seenVersion = -1;
+    /** 注文タブの検索欄（押してから文字を打てる。勝手に打ち込み先にはならない）。 */
+    @Nullable
+    private EditBox searchBox;
+    /** 絞り込み・並べ替えた注文の一覧の覚え（様子・検索の文字・並びが変わったら作り直す）。 */
+    private List<CompoundTag> visible = List.of();
+    private Object visibleKey;
 
     public WorkConsoleScreen(WorkConsoleMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -88,6 +98,128 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         imageHeight = WorkConsoleMenu.HEIGHT;
         inventoryLabelX = WorkConsoleMenu.INV_X;
         inventoryLabelY = WorkConsoleMenu.INV_Y - 11;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        String keep = searchBox != null ? searchBox.getValue() : jeiSync() ? java.util.Objects.requireNonNullElse(jeiText(), "") : "";
+        searchBox = new EditBox(font, leftPos + SEARCH_X + 3, topPos + SEARCH_Y + 2, SEARCH_W - 6, SEARCH_H - 2,
+                Component.translatable("gui.singulo.work_console.search.hint"));
+        searchBox.setBordered(false);
+        searchBox.setMaxLength(64);
+        searchBox.setTextColor(0xFFECEEF0);
+        searchBox.setHint(Component.translatable("gui.singulo.work_console.search.hint").withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+        searchBox.setValue(keep);
+        searchBox.setCanLoseFocus(true);
+        searchBox.setFocused(false);
+        searchBox.setResponder(text -> {
+            scroll = 0;
+            if (jeiSync()) {
+                jeiSet(text);
+            }
+        });
+        addRenderableWidget(searchBox);
+    }
+
+    // ------------------------------------------------------------------ 検索と並べ替え
+
+    /** 検索欄を出しているか（注文タブで、注文の確認をしていないとき）。 */
+    private boolean searchShown() {
+        return searchBox != null && tab == 0 && picking == null;
+    }
+
+    private static boolean jeiLoaded() {
+        return net.neoforged.fml.ModList.get().isLoaded("jei");
+    }
+
+    private static boolean jeiSync() {
+        return jeiLoaded() && io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_JEI_SYNC.get();
+    }
+
+    @Nullable
+    private static String jeiText() {
+        return jeiLoaded() ? io.github.genichimaruo.singulo.compat.jei.JeiSearch.get() : null;
+    }
+
+    private static void jeiSet(String text) {
+        if (jeiLoaded()) {
+            io.github.genichimaruo.singulo.compat.jei.JeiSearch.set(text);
+        }
+    }
+
+    private static String sortMode() {
+        return io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT.get();
+    }
+
+    private static boolean sortReversed() {
+        return io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT_REVERSED.get();
+    }
+
+    private static <T> void saveConfig(net.neoforged.neoforge.common.ModConfigSpec.ConfigValue<T> value, T v) {
+        value.set(v);
+        value.save();
+    }
+
+    /**
+     * 注文タブに並べる物: 検索欄の文字で絞り込み、選んだ並びに並べ替える。
+     * 文字は空白で区切り、すべてに合う物だけ残す。@ で始まる語は mod（ID・名前）、ほかは物の名前か ID で合わせる。
+     */
+    private List<CompoundTag> visibleEntries() {
+        String query = searchBox == null ? "" : searchBox.getValue().trim().toLowerCase(java.util.Locale.ROOT);
+        Object key = java.util.List.of(menu.viewVersion(), query, sortMode(), sortReversed());
+        if (key.equals(visibleKey)) {
+            return visible;
+        }
+        String[] words = query.isEmpty() ? new String[0] : query.split("\\s+");
+        List<CompoundTag> out = new ArrayList<>();
+        java.util.Map<CompoundTag, ItemStack> stacks = new java.util.IdentityHashMap<>();
+        for (CompoundTag e : list("entries")) {
+            ItemStack item = stack(e, "item");
+            if (matches(item, words)) {
+                out.add(e);
+                stacks.put(e, item);
+            }
+        }
+        java.text.Collator collator = java.text.Collator.getInstance(java.util.Locale.forLanguageTag(
+                minecraft.getLanguageManager().getSelected().replace('_', '-')));
+        java.util.Comparator<CompoundTag> order = switch (sortMode()) {
+            case "name" -> java.util.Comparator.comparing(e -> stacks.get(e).getHoverName().getString(), collator);
+            case "count" -> java.util.Comparator.comparingLong((CompoundTag e) -> e.getLong("count")).reversed();
+            case "mod" -> java.util.Comparator.comparing(e -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stacks.get(e).getItem()).getNamespace());
+            case "craftable" -> java.util.Comparator.comparing((CompoundTag e) -> !e.getBoolean("craft"));
+            default -> null;                            // 指令台の順のまま
+        };
+        if (order != null) {
+            out.sort(order);                            // 同じ順位の物は、指令台の順のまま
+        }
+        if (sortReversed()) {
+            java.util.Collections.reverse(out);
+        }
+        visible = out;
+        visibleKey = key;
+        return out;
+    }
+
+    private static boolean matches(ItemStack item, String[] words) {
+        if (words.length == 0) {
+            return true;
+        }
+        net.minecraft.resources.ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item.getItem());
+        String name = item.getHoverName().getString().toLowerCase(java.util.Locale.ROOT);
+        for (String w : words) {
+            if (w.startsWith("@")) {
+                String mod = w.substring(1);
+                String modName = net.neoforged.fml.ModList.get().getModContainerById(id.getNamespace())
+                        .map(c -> c.getModInfo().getDisplayName()).orElse(id.getNamespace()).toLowerCase(java.util.Locale.ROOT);
+                if (!id.getNamespace().contains(mod) && !modName.contains(mod)) {
+                    return false;
+                }
+            } else if (!name.contains(w) && !id.getPath().contains(w)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // ------------------------------------------------------------------ 様子
@@ -144,6 +276,20 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             send(WorkConsoleActionPayload.plan(picking, count, reg()));
         }
         menu.setVisibility(picking == null, tab == 2, tab == TAB_RECORD, tab == TAB_OUTBOX, tab == TAB_ROUTE);
+        if (searchBox != null) {
+            boolean shown = searchShown();
+            searchBox.visible = shown;
+            searchBox.active = shown;
+            if (!shown && searchBox.isFocused()) {
+                searchBox.setFocused(false);
+                setFocused(null);
+            }
+            // JEI と連携している間: JEI の検索欄で打った文字も、こちらへ写す（こちらで打っている間はそのまま）
+            String jei = jeiSync() && !searchBox.isFocused() ? jeiText() : null;
+            if (jei != null && !jei.equals(searchBox.getValue())) {
+                searchBox.setValue(jei);
+            }
+        }
     }
 
     /** 記録のページを見せる（JEI の「+」で見本を置いたとき）。 */
@@ -225,6 +371,15 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         if (picking != null && keyCode == 256) {        // Esc: 確認をやめる（画面は閉じない）
             closePicking();
             return true;
+        }
+        if (searchShown() && searchBox.isFocused()) {
+            if (keyCode == 256) {                       // Esc: 打つのをやめる（画面は閉じない）
+                searchBox.setFocused(false);
+                setFocused(null);
+                return true;
+            }
+            searchBox.keyPressed(keyCode, scanCode, modifiers);
+            return true;                                // 打っている間は、E などで画面を閉じない
         }
         if (countBox != null && countBox.isFocused() && countBox.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
@@ -319,7 +474,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                     List<UUID> picked = new ArrayList<>(chosen);
                     send(WorkConsoleActionPayload.register(picking, count, trigger, picked, dest, reg()));
                 } else {
-                    send(WorkConsoleActionPayload.start(picking, count, startAndroids(), dest, reg()));
+                    send(WorkConsoleActionPayload.start(picking, count, startAndroids(), autoAndroids(), dest, reg()));
                 }
                 return true;
             }
@@ -400,8 +555,47 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 return true;
             }
         }
+        if (searchShown()) {
+            boolean inSearch = Panel.inside(mouseX, mouseY, x + SEARCH_X, y + SEARCH_Y, SEARCH_W, SEARCH_H);
+            searchBox.setFocused(inSearch);
+            setFocused(inSearch ? searchBox : null);
+            if (inSearch) {
+                if (button == 1) {
+                    searchBox.setValue("");               // 右クリック: 消す
+                } else {
+                    searchBox.mouseClicked(mouseX, mouseY, button);
+                }
+                return true;
+            }
+            if (Panel.inside(mouseX, mouseY, x + SORT_X, y + SEARCH_Y, SORT_W, SEARCH_H)) {
+                int i = java.util.Arrays.asList(SORTS).indexOf(sortMode());
+                int next = Math.floorMod(i + (Screen.hasShiftDown() || button == 1 ? -1 : 1), SORTS.length);
+                saveConfig(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT, SORTS[next]);
+                scroll = 0;
+                return true;
+            }
+            if (Panel.inside(mouseX, mouseY, x + REV_X, y + SEARCH_Y, REV_W, SEARCH_H)) {
+                saveConfig(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT_REVERSED, !sortReversed());
+                scroll = 0;
+                return true;
+            }
+            if (jeiLoaded() && Panel.inside(mouseX, mouseY, x + JEI_X, y + SEARCH_Y, JEI_W, SEARCH_H)) {
+                boolean on = !jeiSync();
+                saveConfig(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_JEI_SYNC, on);
+                if (on) {
+                    // 連携を始める: こちらが空なら JEI の文字を写し、文字があれば JEI へ送る
+                    String jei = jeiText();
+                    if (searchBox.getValue().isEmpty() && jei != null) {
+                        searchBox.setValue(jei);
+                    } else {
+                        jeiSet(searchBox.getValue());
+                    }
+                }
+                return true;
+            }
+        }
         if (tab == 0) {
-            List<CompoundTag> entries = list("entries");
+            List<CompoundTag> entries = visibleEntries();
             for (int i = 0; i < COLS * ROWS; i++) {
                 int idx = i + scroll * COLS;
                 int cx = x + 8 + (i % COLS) * CELL, cy = y + TOP + (i / COLS) * CELL;
@@ -472,6 +666,11 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
                 && (plan == null || !plan.getBoolean("chemicals") || a.getBoolean("chem_tank"));
     }
 
+    /** だれも選んでいない（選べる候補をみな送り、指令台が作業量に見合う人数だけを招集する）。 */
+    private boolean autoAndroids() {
+        return chosen.stream().noneMatch(id -> list("androids").stream().anyMatch(a -> a.getUUID("id").equals(id) && selectable(a)));
+    }
+
     /** 作業を始めるアンドロイド: 選んだうちの選べるもの。だれも選んでいなければ、選べるもの全部。 */
     private List<UUID> startAndroids() {
         List<UUID> picked = new ArrayList<>(), all = new ArrayList<>();
@@ -502,8 +701,23 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             int col = (hoveredSlot.index - WorkConsoleMenu.SLOT_ROUTE) % io.github.genichimaruo.singulo.android.work.PathRule.COLS;
             g.renderTooltip(font, font.split(Component.translatable("gui.singulo.route." + ROUTE_COL_KEYS[col] + ".hint"), 180), mouseX, mouseY);
         }
+        if (searchShown()) {
+            Component help = null;
+            if (Panel.inside(mouseX, mouseY, x + SEARCH_X, y + SEARCH_Y, SEARCH_W, SEARCH_H) && !searchBox.isFocused()) {
+                help = Component.translatable("gui.singulo.work_console.search.help");
+            } else if (Panel.inside(mouseX, mouseY, x + SORT_X, y + SEARCH_Y, SORT_W, SEARCH_H)) {
+                help = Component.translatable("gui.singulo.work_console.sort.help");
+            } else if (Panel.inside(mouseX, mouseY, x + REV_X, y + SEARCH_Y, REV_W, SEARCH_H)) {
+                help = Component.translatable("gui.singulo.work_console.sort.reverse");
+            } else if (jeiLoaded() && Panel.inside(mouseX, mouseY, x + JEI_X, y + SEARCH_Y, JEI_W, SEARCH_H)) {
+                help = Component.translatable(jeiSync() ? "gui.singulo.work_console.jei.on" : "gui.singulo.work_console.jei.off");
+            }
+            if (help != null) {
+                g.renderTooltip(font, font.split(help, 200), mouseX, mouseY);
+            }
+        }
         if (tab == 0) {
-            List<CompoundTag> entries = list("entries");
+            List<CompoundTag> entries = visibleEntries();
             for (int i = 0; i < COLS * ROWS; i++) {
                 int idx = i + scroll * COLS;
                 int cx = x + 8 + (i % COLS) * CELL, cy = y + TOP + (i / COLS) * CELL;
@@ -877,7 +1091,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     }
 
     private void renderEntries(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
-        List<CompoundTag> entries = list("entries");
+        renderSearchRow(g, x, y, mouseX, mouseY);
+        List<CompoundTag> entries = visibleEntries();
         int maxScroll = Math.max(0, (entries.size() + COLS - 1) / COLS - ROWS);
         scroll = Math.min(scroll, maxScroll);
         Panel.well(g, x + 8, y + TOP, COLS * CELL, ROWS * CELL);
@@ -910,6 +1125,27 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
             g.fill(x + 8 + COLS * CELL + 2, y + TOP, x + 8 + COLS * CELL + 5, y + TOP + h, Panel.SEAM);
             g.fill(x + 8 + COLS * CELL + 2, by, x + 8 + COLS * CELL + 5, by + bar, 0xFF3A8FB0);
         }
+    }
+
+    /** 注文タブの下の段: 検索欄の地（打っている間は縁が光る）・並びのボタン・逆順のボタン・JEI 連携のボタン。 */
+    private void renderSearchRow(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+        boolean typing = searchBox != null && searchBox.isFocused();
+        g.fill(x + SEARCH_X - 1, y + SEARCH_Y - 1, x + SEARCH_X + SEARCH_W + 1, y + SEARCH_Y + SEARCH_H + 1, typing ? 0xFF3A8FB0 : Panel.WELL_EDGE);
+        g.fill(x + SEARCH_X, y + SEARCH_Y, x + SEARCH_X + SEARCH_W, y + SEARCH_Y + SEARCH_H, Panel.WELL);
+        button(g, x + SORT_X, y + SEARCH_Y, SORT_W, mouseX, mouseY, false,
+                Component.translatable("gui.singulo.work_console.sort", Component.translatable("gui.singulo.work_console.sort." + sortMode())));
+        button(g, x + REV_X, y + SEARCH_Y, REV_W, mouseX, mouseY, sortReversed(), Component.literal(sortReversed() ? "↑" : "↓"));
+        if (jeiLoaded()) {
+            button(g, x + JEI_X, y + SEARCH_Y, JEI_W, mouseX, mouseY, jeiSync(), Component.literal("JEI"));
+        }
+    }
+
+    /** 下の段の小さなボタン（on: 押されている色）。 */
+    private void button(GuiGraphics g, int bx, int by, int bw, int mouseX, int mouseY, boolean on, Component label) {
+        boolean hover = Panel.inside(mouseX, mouseY, bx, by, bw, SEARCH_H);
+        g.fill(bx - 1, by - 1, bx + bw + 1, by + SEARCH_H + 1, Panel.WELL_EDGE);
+        g.fill(bx, by, bx + bw, by + SEARCH_H, on ? 0xFF3A8FB0 : hover ? 0xFFD6E6EE : 0xFFF4F6F8);
+        AndroidStationScreen.fitCentered(g, font, label, bx + 1, by + 2, bw - 2, on ? 0xFFFFFFFF : Panel.TEXT);
     }
 
     private void renderOrders(GuiGraphics g, int x, int y) {
@@ -1085,11 +1321,16 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         Component message = v != null && v.contains("message") ? text(v, "message") : null;
         if (tab == 0) {
             if (list("entries").isEmpty()) {
-                AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.empty"), 8, TOP + 38, COLS * CELL,
+                AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.empty"), 8, TOP + ROWS * CELL / 2 - 4, COLS * CELL,
+                        0xFFBFC8D0);
+            } else if (visibleEntries().isEmpty()) {
+                AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.work_console.no_match"), 8, TOP + ROWS * CELL / 2 - 4, COLS * CELL,
                         0xFFBFC8D0);
             }
             if (message != null) {
-                AndroidStationScreen.fit(g, font, message, 8, TOP + ROWS * CELL + 4, 240, MUTED);
+                // お知らせは、インベントリの見出しと同じ行の右側に（注文の欄はインベントリのすぐ上まで使う）
+                int mx = inventoryLabelX + font.width(playerInventoryTitle) + 8;
+                AndroidStationScreen.fit(g, font, message, mx, inventoryLabelY, imageWidth - 8 - mx, MUTED);
             }
         } else if (tab == 1 && detailOrder() != null) {
             CompoundTag o = detailOrder();

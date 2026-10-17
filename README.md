@@ -3,7 +3,7 @@
 [日本語](docs/manual-ja.md) · [English](docs/manual-en.md) · [简体中文](docs/manual-zh-cn.md) · [繁體中文](docs/manual-zh-tw.md) · [한국어](docs/manual-ko-kr.md) · [レシピ一覧](docs/recipes/README.md)
 
 **熱電発電から始めて、回転ブラックホールを運用し、最後は宇宙をひとつ生み出す工業modです。**
-Minecraft 1.21.1（NeoForge）と 1.20.1（Forge / NeoForge）向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
+Minecraft 1.21.1 と 1.20.1（どちらも Forge / NeoForge）向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
 
 ## 対応バージョン / Minecraft versions
 
@@ -12,7 +12,8 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 
 | Minecraft | ローダー / Loader | Java | ソース / Source | ダウンロード / Download |
 | --- | --- | --- | --- | --- |
-| **1.21.1** | **NeoForge** 21.1.256+ | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) |
+| **1.21.1** | **NeoForge** 21.1.256+ | **21** | [1.21.1](https://github.com/GenichiMaruo/Singulo/tree/1.21.1) | [1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) |
+| **1.21.1** | **Forge** 52.1.20+ | **21** | [1.21.1](https://github.com/GenichiMaruo/Singulo/tree/1.21.1)（`forge/`） | [1.21.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=1) |
 | **1.20.1** | **Forge** 47.4.26+ | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
 | **1.20.1** | **NeoForge** 47.1.106+ | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
 
@@ -35,14 +36,14 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 - **アンドロイドに作業を頼む** — 0.7.0の作業指令台で製作・加工・採掘を注文し、手順カードで農作業や装置の操作も任せられます。在庫やレッドストーンで注文を自動化でき、流体搬送用のタンクや装飾も付けられます。
 - **みんなで挑む** — ボスは挑戦者の人数に合わせて強くなり、全員の攻撃がそれぞれ通ります。報酬は戦いが始まったときの人数ぶん。
 
-**Singulo** is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge / NeoForge). Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/manual-en.md).
+**Singulo** is a technology mod for Minecraft 1.21.1 and 1.20.1, on both Forge and NeoForge. Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/manual-en.md).
 
 ## 遊び始めるには
 
 0.7.0では、アンドロイドの作業自動化・追加アップグレード・装飾を1.20.1のForge / NeoForgeにも対応させました。[NeoForge版](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.7.0-1.20.1N-r1)・[Forge版](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.7.0-1.20.1F-r2)から選んでください。両版のCurseForge配布・検証記録は[移植検証の記録](docs/reviews/port-0.7.0-1.20.1-findings.md)を参照してください。
-Version 0.7.0 brings Android work automation, additional upgrades and decorations to Minecraft 1.20.1 on both Forge and NeoForge. Choose the matching loader above. The `main` branch remains dedicated to Minecraft 1.21.1.
+Version 0.7.0 brings Android work automation, additional upgrades and decorations to Minecraft 1.20.1 on both Forge and NeoForge. Choose the matching loader above. The `1.21.1` branch is dedicated to Minecraft 1.21.1 and builds both the NeoForge and Forge versions.
 
-上の表の Minecraft とローダーが必要です（1.21.1 版なら NeoForge **21.1.256以上の1.21.1対応版**）。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
+上の表の Minecraft とローダーが必要です（1.21.1 版なら NeoForge **21.1.256以上**、または Forge **52.1.20以上**）。1.21.1 の Forge 版では、Mekanism との連携は使えません（Mekanism の 1.21.1 版は NeoForge 専用のため）。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
 
 初めてワールドに入ると **Singulo ハンドブック**を受け取ります。右クリックで開き、鋼鉄・セラミック・基礎回路から始めましょう。アイテムの説明はカーソルを合わせると表示され、Shiftで作り方と使い道を確認できます。
 
@@ -68,6 +69,14 @@ Java 21を用意し、`JAVA_HOME` をその場所へ設定します。Gradleは�
 ```
 
 WindowsのPowerShellでは `./gradlew.bat` を使います。ビルドしたJARは `build/libs/` に出力されます。
+
+1.21.1 の Forge 版は同じソースから作ります。`src/` の NeoForge 版を正とし、`forge/` のビルドが毎回 Forge 向けに変換してからコンパイルします（`//#if neoforge … //#else … //#endif` の書き分け、`forge/rules.txt` の名前の置き換え、`forge/src/main/java` の差し替えと互換層 `forgecompat`）。
+
+```sh
+./gradlew -p forge build              # forge/build/libs/Singulo-<版>-1.21.1F.jar
+./gradlew -p forge runClient
+./gradlew -p forge runGameTestServer
+```
 
 | 場所 | 内容 |
 | --- | --- |

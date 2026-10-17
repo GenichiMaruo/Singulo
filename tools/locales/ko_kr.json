@@ -1515,6 +1515,10 @@
     "source": "A compact crystal memory with a reader, holding the design of the Blade Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "광날형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
   },
+  "desc.singulo.android_memory_gunner": {
+    "source": "A compact crystal memory holding the design of the Gunner Android. Light keeps flowing through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "사격형 안드로이드의 설계를 기록한 소형 크리스털 메모리. 결정 속을 빛이 계속 흐르고 있다. 안드로이드 조립 스테이션에 넣으면 그 형을 인쇄할 수 있다 (줄어들지 않음)."
+  },
   "desc.singulo.android_memory_saber": {
     "source": "A compact crystal memory with a reader, holding the design of the Saber Android. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "광검형 안드로이드의 설계를 기록한, 판독 단자가 달린 소형 크리스털 메모리. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있습니다(소모되지 않음)."
@@ -2903,6 +2907,10 @@
     "source": "Awakened Gravity Remnant",
     "translation": "각성한 중력 잔재"
   },
+  "entity.singulo.gunner_android": {
+    "source": "Gunner Android \"Ciel\"",
+    "translation": "사격형 안드로이드 \"시엘\""
+  },
   "entity.singulo.horizon_bolt": {
     "source": "Horizon Bolt",
     "translation": "호라이즌 볼트"
@@ -3179,6 +3187,10 @@
     "source": "Lumina",
     "translation": "루미나"
   },
+  "gui.singulo.android.nickname.gunner": {
+    "source": "Ciel",
+    "translation": "시엘"
+  },
   "gui.singulo.android.nickname.saber": {
     "source": "Soleil",
     "translation": "솔레이유"
@@ -3190,6 +3202,10 @@
   "gui.singulo.android.pack": {
     "source": "Backpack",
     "translation": "백팩 안"
+  },
+  "gui.singulo.android.pack.builtin": {
+    "source": "Built-in",
+    "translation": "내장"
   },
   "gui.singulo.android.pack.none": {
     "source": "No backpack",
@@ -5212,8 +5228,8 @@
     "translation": "안드로이드(나를 수 있는 칸)"
   },
   "gui.singulo.work_console.auto_android": {
-    "source": "None chosen: all %s available androids will start",
-    "translation": "고르지 않았으므로, 고를 수 있는 안드로이드 전원(%s대)으로 시작합니다"
+    "source": "None chosen: only as many of the %s available androids as the work needs will start",
+    "translation": "선택하지 않았으므로, 선택 가능한 %s대 중 작업에 필요한 수만 시작한다"
   },
   "gui.singulo.work_console.back": {
     "source": "Back",
@@ -5363,6 +5379,14 @@
     "source": "Out of fuel (%s), so an order to make %s was placed",
     "translation": "재료 보관소에 연료(%s)가 없어서 %s개를 만드는 주문을 냈습니다"
   },
+  "gui.singulo.work_console.jei.off": {
+    "source": "Linked with the JEI search bar: Off",
+    "translation": "JEI 검색창과 연동: 끔"
+  },
+  "gui.singulo.work_console.jei.on": {
+    "source": "Linked with the JEI search bar: On",
+    "translation": "JEI 검색창과 연동: 켬"
+  },
   "gui.singulo.work_console.link.0": {
     "source": "Supply port",
     "translation": "자재구"
@@ -5419,6 +5443,10 @@
     "source": "Nothing is linked",
     "translation": "연결된 블록이 없습니다"
   },
+  "gui.singulo.work_console.no_match": {
+    "source": "Nothing matches the search",
+    "translation": "검색에 맞는 것이 없다"
+  },
   "gui.singulo.work_console.no_orders": {
     "source": "No running orders",
     "translation": "진행 중인 주문이 없습니다"
@@ -5447,6 +5475,14 @@
     "source": "Save",
     "translation": "등록"
   },
+  "gui.singulo.work_console.search.help": {
+    "source": "Filter by name. Start with @ to filter by mod (e.g. @singulo). Separate words with spaces to match all of them. Right-click to clear",
+    "translation": "이름으로 걸러 낸다. @로 시작하면 모드로 걸러 낸다 (예: @singulo). 공백으로 나누면 모두에 맞는 것만. 우클릭으로 지운다"
+  },
+  "gui.singulo.work_console.search.hint": {
+    "source": "Search (@ for mod)",
+    "translation": "검색 (@로 모드)"
+  },
   "gui.singulo.work_console.signal.off": {
     "source": "Redstone signal: off",
     "translation": "레드스톤 신호: 꺼짐"
@@ -5454,6 +5490,38 @@
   "gui.singulo.work_console.signal.on": {
     "source": "Redstone signal: on",
     "translation": "레드스톤 신호: 켜짐"
+  },
+  "gui.singulo.work_console.sort": {
+    "source": "Sort: %s",
+    "translation": "정렬: %s"
+  },
+  "gui.singulo.work_console.sort.count": {
+    "source": "Stock",
+    "translation": "재고"
+  },
+  "gui.singulo.work_console.sort.craftable": {
+    "source": "Craftable",
+    "translation": "제작 가능"
+  },
+  "gui.singulo.work_console.sort.default": {
+    "source": "Default",
+    "translation": "지령대 순서"
+  },
+  "gui.singulo.work_console.sort.help": {
+    "source": "Click to change the order (Shift-click to go back)",
+    "translation": "클릭으로 정렬을 바꾼다 (Shift+클릭으로 반대 방향)"
+  },
+  "gui.singulo.work_console.sort.mod": {
+    "source": "Mod",
+    "translation": "모드"
+  },
+  "gui.singulo.work_console.sort.name": {
+    "source": "Name",
+    "translation": "이름"
+  },
+  "gui.singulo.work_console.sort.reverse": {
+    "source": "Reverse the order",
+    "translation": "정렬을 뒤집는다"
   },
   "gui.singulo.work_console.standing.added": {
     "source": "Saved the order for %s",
@@ -7251,6 +7319,10 @@
     "source": "Compact Crystal Memory (Blade)",
     "translation": "소형 크리스털 메모리(광날형)"
   },
+  "item.singulo.android_memory_gunner": {
+    "source": "Compact Crystal Memory (Gunner)",
+    "translation": "소형 크리스털 메모리(사격형)"
+  },
   "item.singulo.android_memory_saber": {
     "source": "Compact Crystal Memory (Saber)",
     "translation": "소형 크리스털 메모리(광검형)"
@@ -7522,6 +7594,10 @@
   "item.singulo.gravity_remnant_spawn_egg": {
     "source": "Gravity Remnant Spawn Egg",
     "translation": "중력 잔재 생성 알"
+  },
+  "item.singulo.gunner_android_spawn_egg": {
+    "source": "Gunner Android Spawn Egg",
+    "translation": "사격형 안드로이드 생성 알"
   },
   "item.singulo.handbook": {
     "source": "Singulo Handbook",
@@ -9327,6 +9403,106 @@
     "source": "Wormhole stabilizer runs",
     "translation": "웜홀 안정기가 작동한다"
   },
+  "summary.singulo.android_dual_tank_upgrade": {
+    "source": "Two liquid and two chemical tanks (only with Mekanism).",
+    "translation": "액체와 화학 물질 탱크를 2개씩 단다 (Mekanism이 있을 때만)."
+  },
+  "summary.singulo.android_gas_tank_upgrade": {
+    "source": "Two tanks for Mekanism chemicals (only with Mekanism).",
+    "translation": "Mekanism 화학 물질을 나르는 탱크를 2개 단다 (Mekanism이 있을 때만)."
+  },
+  "summary.singulo.android_memory_axe": {
+    "source": "The Axe Android design. Prints it in an Android Assembly Station (not used up).",
+    "translation": "도끼형 안드로이드의 설계. 조립 스테이션에서 인쇄할 수 있다 (줄어들지 않음)."
+  },
+  "summary.singulo.android_memory_bit": {
+    "source": "The Bit Android design. Prints it in an Android Assembly Station (not used up).",
+    "translation": "비트형 안드로이드의 설계. 조립 스테이션에서 인쇄할 수 있다 (줄어들지 않음)."
+  },
+  "summary.singulo.android_station": {
+    "source": "Prints guard androids from a memory, a kit and power.",
+    "translation": "메모리와 키트와 전력으로 호위 안드로이드를 인쇄한다."
+  },
+  "summary.singulo.android_tank_upgrade": {
+    "source": "Gives a guard android two tanks for liquids and gases.",
+    "translation": "호위 안드로이드에게 액체나 기체를 나르는 탱크를 2개 단다."
+  },
+  "summary.singulo.android_transfer_upgrade": {
+    "source": "Passes a fallen android's inventory on to the next one printed.",
+    "translation": "쓰러진 안드로이드의 소지품을 다음에 인쇄할 안드로이드에게 넘긴다."
+  },
+  "summary.singulo.android_work_console": {
+    "source": "Takes orders and assigns crafting and work to nearby androids.",
+    "translation": "주문을 받아 가까운 안드로이드에게 제작과 작업을 맡긴다."
+  },
+  "summary.singulo.area_card": {
+    "source": "Records an area by two corners, for android routes.",
+    "translation": "두 모서리로 범위를 기록한다. 안드로이드의 경로 설정에 쓴다."
+  },
+  "summary.singulo.awakening_echo_core": {
+    "source": "Use on a Research Building's guardian core to fight the Awakened Echo Sentinel.",
+    "translation": "연구동의 수호자 봉인 핵에 사용하면 각성한 메아리 파수꾼과 싸울 수 있다."
+  },
+  "summary.singulo.awakening_ergosphere_core": {
+    "source": "Use on a Sunken Reactor Sector's guardian core to fight the Awakened Ergosphere Leviathan.",
+    "translation": "가라앉은 노심 구역의 수호자 봉인 핵에 사용하면 각성한 에르고구의 거대 뱀과 싸울 수 있다."
+  },
+  "summary.singulo.awakening_foundry_core": {
+    "source": "Use on an Android Laboratory's guardian core to fight the Awakened Foundry.",
+    "translation": "지하 안드로이드 연구소의 수호자 봉인 핵에 사용하면 각성한 파운드리와 싸울 수 있다."
+  },
+  "summary.singulo.awakening_gravity_core": {
+    "source": "Use on a Culture Facility's guardian core to fight the Awakened Gravity Remnant.",
+    "translation": "봉쇄 배양 시설의 수호자 봉인 핵에 사용하면 각성한 중력 잔재와 싸울 수 있다."
+  },
+  "summary.singulo.awakening_record_core": {
+    "source": "Use on the Seal Console to fight the Awakened Horizon Warden.",
+    "translation": "봉인 콘솔에 사용하면 각성한 지평선 감시자와 싸울 수 있다."
+  },
+  "summary.singulo.genesis_core": {
+    "source": "The heart of an engine that makes a universe from energy.",
+    "translation": "에너지로 우주를 만들어 내는 노의 핵."
+  },
+  "summary.singulo.gravity_panel_receiver": {
+    "source": "Powers every connected gravity panel.",
+    "translation": "연결된 모든 중력 패널에 전력을 나눠 준다."
+  },
+  "summary.singulo.keraunos_tower": {
+    "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
+    "translation": "모은 전력으로 인공 번개를 일으켜 가까운 피뢰침에 쏜다."
+  },
+  "summary.singulo.multiblock_port": {
+    "source": "Swaps in for a multiblock shell panel to connect cables and pipes.",
+    "translation": "멀티블록의 외장판과 바꿔 끼워 케이블과 파이프를 잇는 반출입구."
+  },
+  "summary.singulo.precision_actuator": {
+    "source": "A precise drive unit found in underground android laboratories.",
+    "translation": "지하 안드로이드 연구소에서 얻을 수 있는 구문명의 정밀 구동부."
+  },
+  "summary.singulo.procedure_card": {
+    "source": "Records up to eight work steps for androids.",
+    "translation": "안드로이드에게 시킬 작업 순서 (최대 8개)를 기록한다."
+  },
+  "summary.singulo.shield_permit": {
+    "source": "Lets only registered players work inside a shield or control a station's android.",
+    "translation": "등록한 사람만 실드 안에서 작업하거나 안드로이드를 조작할 수 있게 한다."
+  },
+  "summary.singulo.survey_glasses": {
+    "source": "While worn, shows places recorded on cards and what working androids are doing.",
+    "translation": "쓰면 카드에 기록한 장소와 작업 중인 안드로이드가 하는 일이 보인다."
+  },
+  "summary.singulo.time_crystal_module": {
+    "source": "A stackable part sealing a slice of a time crystal's life.",
+    "translation": "시간 결정 촉매의 수명을 잘라 내어 봉인한, 겹쳐 들 수 있는 부품."
+  },
+  "summary.singulo.work_location_card": {
+    "source": "Records a block position and links work consoles with ports.",
+    "translation": "블록의 위치를 기록하고 작업 지령대와 자재구 등을 잇는다."
+  },
+  "summary.singulo.wormhole_port": {
+    "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
+    "translation": "반대편 입구 근처의 같은 번호 포트와 전력·아이템·액체를 잇는다."
+  },
   "tooltip.singulo.android_accessory.0": {
     "source": "Worn on an android's head (decoration page)",
     "translation": "안드로이드 머리에 답니다(장식 페이지)"
@@ -9470,6 +9646,10 @@
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "혼합: 8개로 Lv2가 됨"
+  },
+  "tooltip.singulo.more": {
+    "source": "Hold Shift for details",
+    "translation": "Shift: 자세히 보기"
   },
   "tooltip.singulo.needs_mekanism": {
     "source": "Only works when Mekanism is installed",

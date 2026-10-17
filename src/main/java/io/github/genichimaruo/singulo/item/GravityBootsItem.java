@@ -24,7 +24,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class GravityBootsItem extends ArmorItem {
     public static final int WALL_JUMPS = 3;
     public static final DeferredRegister<ArmorMaterial> MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, Singulo.MODID);
-    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> MATERIAL = MATERIALS.register("gravity", () -> {
+    public static final Holder<ArmorMaterial> MATERIAL = MATERIALS.register("gravity", () -> {
         EnumMap<ArmorItem.Type, Integer> defense = new EnumMap<>(ArmorItem.Type.class);
         for (ArmorItem.Type t : ArmorItem.Type.values()) {
             defense.put(t, t == ArmorItem.Type.BOOTS ? 3 : 0);

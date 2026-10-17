@@ -370,7 +370,16 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     /** 注文する。できなければ理由を返す（できたら null）。 */
     @Nullable
     public Component start(ServerPlayer player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination) {
-        return start(player, target, count, androids, destination, false);
+        return start(player, target, count, androids, false, destination);
+    }
+
+    /**
+     * 注文する。auto なら、androids は画面で選べた候補（だれも選ばなかった）で、そのうち作業量に見合う人数だけを招集する。
+     * できなければ理由を返す（できたら null）。
+     */
+    @Nullable
+    public Component start(ServerPlayer player, ItemStack target, long count, List<UUID> androids, boolean auto, @Nullable BlockPos destination) {
+        return start(player, target, count, androids, destination, false, auto);
     }
 
     /**
@@ -379,6 +388,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Nullable
     private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
                             boolean toStock) {
+        return start(player, target, count, androids, destination, toStock, false);
+    }
+
+    @Nullable
+    private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
+                            boolean toStock, boolean auto) {
         if (!mayOperate(player)) {
             return Component.translatable("gui.singulo.work_console.locked");
         }
@@ -393,8 +408,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         boolean felling = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsFelling());
         List<RuinAndroid> chosen = new ArrayList<>();
         for (RuinAndroid a : candidates(player)) {
-            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a)
-                    && (!androids.isEmpty() || (!mining || a.canMine()) && (!felling || a.canFell()))) {
+            if ((androids.isEmpty() || androids.contains(a.getUUID())) && !busy(a)) {
                 chosen.add(a);
             }
         }
@@ -408,7 +422,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (WorkOrder.StepState s : order.steps) {
             boolean fits = false;
             for (RuinAndroid a : chosen) {
-                fits |= maxCrafts(s.recipe, a.isWorking() ? a.carryCapacity() : a.freeCarry(), 1) >= 1 && tankLimit(a, s.recipe) >= 1;
+                fits |= canExecuteStep(a, s.recipe);
             }
             if (!fits) {
                 return Component.translatable("gui.singulo.work_console.error.capacity", s.recipe.output().getHoverName());
@@ -433,6 +447,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 return Component.translatable("gui.singulo.work_console.error.no_feller", s.recipe.output().getHoverName());
             }
         }
+        if (androids.isEmpty() || auto) {
+            chosen = recruit(order, chosen);   // 選ばなかったとき: 作業量に見合う人数だけ招集する
+        }
         reserve(order, plan);
         orders.add(order);
         for (RuinAndroid a : chosen) {
@@ -444,6 +461,76 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         message = null;
         setChanged();
         return null;
+    }
+
+    /**
+     * 注文に招集する人数を、作業量に見合うだけにして選ぶ（アンドロイドを指定しなかった注文）。
+     * 同じ作業場所では同時に1体しか作業できないので、同時に進められる作業場所の数（前の工程の材料待ちを考え、同じ段の工程の場所の数の最大）と、
+     * 一度に運べる量で割った往復の数の、少ないほうまで。手の空いている・近いアンドロイドから選び、採掘・伐採が要るなら、それができる個体を必ず入れる。
+     */
+    private List<RuinAndroid> recruit(WorkOrder order, List<RuinAndroid> eligible) {
+        int needed = workersNeeded(order, eligible.stream().mapToInt(RuinAndroid::carryCapacity).max().orElse(1));
+        List<RuinAndroid> sorted = new ArrayList<>(eligible);
+        sorted.sort(java.util.Comparator.comparing((RuinAndroid a) -> order(a.workOrder()) != null && worldPosition.equals(a.workConsole()))
+                .thenComparingDouble(a -> a.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(worldPosition))));
+        List<RuinAndroid> picked = new ArrayList<>(sorted.subList(0, Math.min(needed, sorted.size())));
+        // Every step must still have a worker with all of its required skills,
+        // item slots and tanks after trimming the candidate list.
+        for (WorkOrder.StepState step : order.steps) {
+            ensure(picked, sorted, true, a -> canExecuteStep(a, step.recipe));
+        }
+        // Replace an incapable nearby worker instead of retaining extra idle crew.
+        for (int i = 0; i < picked.size() && picked.size() > needed;) {
+            RuinAndroid candidate = picked.get(i);
+            boolean covered = order.steps.stream().allMatch(step -> picked.stream()
+                    .anyMatch(a -> a != candidate && canExecuteStep(a, step.recipe)));
+            if (covered) picked.remove(i); else i++;
+        }
+        return picked;
+    }
+
+    private static boolean canExecuteStep(RuinAndroid a, RecipeData recipe) {
+        return canDo(a, recipe)
+                && maxCrafts(recipe, a.isWorking() ? a.carryCapacity() : a.freeCarry(), 1) >= 1;
+    }
+
+    /** need なら、picked に ability を持つ個体が1体はいるようにする（いなければ、候補のうち一番よいものを足す）。 */
+    private static void ensure(List<RuinAndroid> picked, List<RuinAndroid> sorted, boolean need,
+                               java.util.function.Predicate<RuinAndroid> ability) {
+        if (need && picked.stream().noneMatch(ability)) {
+            sorted.stream().filter(ability).findFirst().ifPresent(picked::add);
+        }
+    }
+
+    /** 注文に役立つ人数（1以上）。slots は、招集できる個体のうち一番多く運べる個体の欄の数。 */
+    static int workersNeeded(WorkOrder order, int slots) {
+        if (order.steps.isEmpty()) {
+            return 1;                                       // 素材置き場から届けるだけ
+        }
+        int n = order.steps.size();
+        int[] depth = new int[n];
+        java.util.Map<Integer, java.util.Set<BlockPos>> places = new java.util.HashMap<>();
+        long trips = 0;
+        for (int i = 0; i < n; i++) {
+            WorkOrder.StepState s = order.steps.get(i);
+            depth[i] = depth(order, i, depth);
+            places.computeIfAbsent(depth[i], d -> new java.util.HashSet<>()).add(s.location);
+            long perTrip = Math.max(1, maxCrafts(s.recipe, slots, Math.max(1, s.total)));
+            trips += (Math.max(1, s.total) + perTrip - 1) / perTrip;
+        }
+        int width = places.values().stream().mapToInt(java.util.Set::size).max().orElse(1);
+        return (int) Math.max(1, Math.min(width, trips));
+    }
+
+    /** 工程 i の段（材料を作る前の工程がなければ 0。前の工程の段の最大 + 1）。 */
+    private static int depth(WorkOrder order, int i, int[] memo) {
+        int d = 0;
+        for (int j : order.steps.get(i).after) {
+            if (j != i && j >= 0 && j < i) {
+                d = Math.max(d, memo[j] + 1);
+            }
+        }
+        return d;
     }
 
     // ------------------------------------------------------------------ 登録した注文

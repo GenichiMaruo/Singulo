@@ -179,6 +179,21 @@ public class FoundryOverseer extends RuinBoss {
         return new String[][] {{"overclock_chip", "1"}, {"precision_actuator", "3"}, {"android_kit", "2"}};
     }
 
+    /** 射撃型「シエル」の設計メモリが落ちる確率（覚醒戦で倒したとき。人数に関係なく、1回の撃破で最大1個）。 */
+    public static final float GUNNER_MEMORY_CHANCE = 0.25F;
+
+    /**
+     * 覚醒戦の隠し報酬: 射撃型「シエル」の設計メモリ（ここでだけ手に入る。ハンドブック・JEI・説明欄・設定には、
+     * どこで手に入るかを一切載せない）。
+     */
+    @Override
+    protected void dropAwakenedBonus(ServerLevel level) {
+        if (random.nextFloat() < GUNNER_MEMORY_CHANCE) {
+            spawnAtLocation(new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                    io.github.genichimaruo.singulo.Singulo.id(io.github.genichimaruo.singulo.android.AndroidKind.GUNNER.memoryId()))), 1.0F);
+        }
+    }
+
     @Override
     protected void registerGoals() {
         targetSelector.addGoal(1, new HurtByTargetGoal(this));

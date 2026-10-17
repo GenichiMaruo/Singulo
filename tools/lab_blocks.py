@@ -536,12 +536,20 @@ def models(write_json, assets):
     for glass in (lower[-1], upper[-2]):
         glass['faces'].pop('up')
         glass['faces'].pop('down')
+    # 台座・素体は solid、ガラスだけ translucent に分ける。全部を translucent にすると、半透明の並べ替えが面の中心の距離で
+    # 決まるため、見る角度によってガラスが先に描かれて奥行きを書き込み、中の素体が消える。
     for half, els in (('lower', lower), ('upper', upper)):
-        write_json(mb / f'android_capsule_{half}.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent',
-                                                         'textures': t, 'elements': els})
+        glass = [e for e in els if e['faces'].get('north', {}).get('texture') == '#glass']
+        solid = [e for e in els if e not in glass]
+        write_json(mb / f'android_capsule_{half}.json', {'parent': 'minecraft:block/block', 'loader': 'neoforge:composite',
+            'textures': {'particle': t['particle']},
+            'children': {'solid': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:solid', 'textures': t, 'elements': solid},
+                         'glass': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t,
+                                   'elements': glass}},
+            'item_render_order': ['solid', 'glass']})
     write_json(bs / 'android_capsule.json', {'variants': {
         f'facing={f},half={h}': _rot(f'android_capsule_{h}', y) for f, y in FACING_Y.items() for h in ('lower', 'upper')}})
-    write_json(mi / 'android_capsule.json', {'parent': f'{MODID}:block/android_capsule_lower'})
+    write_json(mi / 'android_capsule.json', {'parent': f'{MODID}:block/android_capsule_lower', 'display': held_display(lower)})
     decor_models(write_json, mb, mi, bs)
 
 
@@ -554,19 +562,65 @@ def _box(a, b, faces, glow=False):
 
 
 def _uvbox(a, b, faces):
-    """要素（faces は 向き → (テクスチャ名, UV)。省いた向きは描かない）。"""
-    return {'from': a, 'to': b, 'faces': {d: {'uv': uv, 'texture': t} for d, (t, uv) in faces.items()}}
+    """要素（faces は 向き → (テクスチャ名, UV) か (テクスチャ名, UV, 回転)。省いた向きは描かない）。"""
+    def face(f):
+        out = {'uv': f[1], 'texture': f[0]}
+        if len(f) > 2 and f[2]:
+            out['rotation'] = f[2]
+        return out
+    return {'from': a, 'to': b, 'faces': {d: face(f) for d, f in faces.items()}}
 
 
 def _all(tex, skip=()):
     return {d: tex for d in ('north', 'south', 'east', 'west', 'up', 'down') if d not in skip}
 
 
+def held_display(elements):
+    """小さく偏った模型を、手・額・地面・持ち物欄で真ん中に見せる（バニラの block/block の向きのまま）。
+
+    バニラの変形は模型の箱（16x16x16）の中心を基準にするので、下に寄った小物は一人称で画面の外へ沈む。
+    模型の実際の範囲の中心が基準に来るよう平行移動を足し、小さいものは少し大きく見せる。
+    """
+    import math
+    lo = [min(e['from'][i] for e in elements) for i in range(3)]
+    hi = [max(e['to'][i] for e in elements) for i in range(3)]
+    c = [(lo[i] + hi[i]) / 2 - 8 for i in range(3)]
+    grow = min(1.5, 14 / max(hi[i] - lo[i] for i in range(3)))
+
+    def rot(v, r):
+        x, y, z = v
+        for axis, deg in ((2, r[2]), (1, r[1]), (0, r[0])):       # rotationXYZ: Rx・Ry・Rz の順に掛かる
+            a = math.radians(deg)
+            co, si = math.cos(a), math.sin(a)
+            if axis == 0:
+                y, z = y * co - z * si, y * si + z * co
+            elif axis == 1:
+                x, z = x * co + z * si, -x * si + z * co
+            else:
+                x, y = x * co - y * si, x * si + y * co
+        return x, y, z
+
+    def view(r, scale, t=(0, 0, 0), k=grow):
+        s = scale * k
+        off = rot([-ci * s for ci in c], r)
+        return {'rotation': r, 'translation': [round(t[i] + off[i], 3) for i in range(3)], 'scale': [round(s, 4)] * 3}
+    tp = view([75, 45, 0], 0.375, (0, 2.5, 0))
+    fp = view([0, 45, 0], 0.40)
+    return {'gui': view([30, 225, 0], 0.625, k=min(grow, 1.25)), 'ground': view([0, 0, 0], 0.25, (0, 3, 0)),
+            'fixed': view([0, 0, 0], 0.5), 'thirdperson_righthand': tp, 'thirdperson_lefthand': tp,
+            'firstperson_righthand': fp, 'firstperson_lefthand': view([0, 225, 0], 0.40)}
+
+
 def decor_models(write_json, mb, mi, bs):
     """研究所の小物: 机のモニター・コーヒーメーカー・自販機（2ブロック）・書類の山・ごみ箱。前は north。"""
     t = lambda n: f'{MODID}:block/{n}'
+    models = {}
+
+    def wm(path, data):
+        models[path.stem] = data
+        write_json(path, data)
     # 机のモニター: 台・首・画面の枠（暗い樹脂）と、前の画面（光るのは画面だけ）
-    write_json(mb / 'desk_monitor.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
+    wm(mb / 'desk_monitor.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
         'textures': {'dark': t('lab_plastic_dark'), 'screen': t('desk_monitor_screen'), 'glow': t('desk_monitor_screen_glow'),
                      'particle': t('lab_plastic_dark')},
         'elements': [_box([5, 0, 7], [11, 1, 11], _all('#dark')),
@@ -575,7 +629,7 @@ def decor_models(write_json, mb, mi, bs):
                      _box([3, 5, 7.98], [13, 11, 8], {'north': '#screen'}),
                      _box([3, 5, 7.97], [13, 11, 7.98], {'north': '#glow'}, glow=True)]})
     # コーヒーメーカー: 白い本体、黒い正面、上の張り出し、ポット
-    write_json(mb / 'coffee_maker.json', {'parent': 'minecraft:block/block',
+    wm(mb / 'coffee_maker.json', {'parent': 'minecraft:block/block',
         'textures': {'body': t('lab_plastic'), 'front': t('coffee_maker_front'), 'pot': t('coffee_maker_pot'), 'particle': t('lab_plastic')},
         'elements': [_box([4, 0, 4], [12, 1, 12], _all('#body')),
                      _box([4, 1, 9], [12, 11, 13], {**_all('#body', ('north',)), 'north': '#front'}),
@@ -587,7 +641,7 @@ def decor_models(write_json, mb, mi, bs):
                             | {'up': ('#pot', [12, 0, 13, 1]), 'down': ('#pot', [12, 3, 13, 4])})]})
     # 自販機: 2ブロック。外装は赤、前の上半分は光る見本の棚
     for half in ('lower', 'upper'):
-        write_json(mb / f'vending_machine_{half}.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
+        wm(mb / f'vending_machine_{half}.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
             'textures': {'side': t('vending_machine_front_lower'), 'front': t(f'vending_machine_front_{half}'),
                          'glow': t(f'vending_machine_front_{half}_glow'), 'body': t('lab_plastic'), 'particle': t('lab_plastic')},
             'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', 'south': '#body', 'east': '#body', 'west': '#body',
@@ -595,9 +649,10 @@ def decor_models(write_json, mb, mi, bs):
                          _box([0, 0, 0.98], [16, 16, 0.99], {'north': '#glow'}, glow=True)]})
     write_json(bs / 'vending_machine.json', {'variants': {
         f'facing={f},half={h}': _rot(f'vending_machine_{h}', y) for f, y in FACING_Y.items() for h in ('lower', 'upper')}})
-    write_json(mi / 'vending_machine.json', {'parent': f'{MODID}:block/vending_machine_lower'})
+    write_json(mi / 'vending_machine.json', {'parent': f'{MODID}:block/vending_machine_lower',
+                                             'display': held_display(models['vending_machine_lower']['elements'])})
     # 書類の山: 少しずれた2つの束
-    write_json(mb / 'paper_stack.json', {'parent': 'minecraft:block/block',
+    wm(mb / 'paper_stack.json', {'parent': 'minecraft:block/block',
         'textures': {'top': t('paper_stack_top'), 'side': t('paper_stack_side'), 'particle': t('paper_stack_top')},
         'elements': [_box([3, 0, 3], [11, 3, 13], {**_all('#side', ('up',)), 'up': '#top'}),
                      _box([6, 3, 4], [13, 5, 12], {**_all('#side', ('up',)), 'up': '#top'})]})
@@ -609,10 +664,12 @@ def decor_models(write_json, mb, mi, bs):
                 'east': [16 - z1, v[0], 16 - z0, v[1]], 'west': [z0, v[0], z1, v[1]]}
         inward = {'north': z0 > 8, 'south': z1 < 8, 'east': x1 < 8, 'west': x0 > 8}
         faces = {d: ('#inner' if inward[d] else '#side', uv) for d, uv in side.items()}
-        faces['up'] = ('#side', [x0, 1, x1, 2] if x1 - x0 > z1 - z0 else [z0, 1, z1, 2])
-        faces['down'] = ('#side', [x0, 15 - (z1 - z0), x1, 15] if x1 - x0 > z1 - z0 else [z0, 15 - (x1 - x0), z1, 15])
+        # 上面（縁）・下面: 横に長い壁はそのまま、奥へ長い壁は絵を90度回して、長さに合ったピクセル数で貼る
+        long_x = x1 - x0 > z1 - z0
+        faces['up'] = ('#side', [x0, 1, x1, 2]) if long_x else ('#side', [16 - z1, 1, 16 - z0, 2], 90)
+        faces['down'] = ('#side', [x0, 15 - (z1 - z0), x1, 15]) if long_x else ('#side', [16 - z1, 15 - (x1 - x0), 16 - z0, 15], 90)
         return _uvbox(a, b, faces)
-    write_json(mb / 'trash_bin.json', {'parent': 'minecraft:block/block',
+    wm(mb / 'trash_bin.json', {'parent': 'minecraft:block/block',
         'textures': {'side': t('trash_bin_side'), 'inner': t('trash_bin_inner'), 'bottom': t('trash_bin_bottom'),
                      'particle': t('trash_bin_side')},
         'elements': [wall([4, 0, 4], [12, 10, 5]), wall([4, 0, 11], [12, 10, 12]),
@@ -620,7 +677,7 @@ def decor_models(write_json, mb, mi, bs):
                      _uvbox([5, 0, 5], [11, 1, 11], {'up': ('#bottom', [0, 0, 6, 6]), 'down': ('#side', [5, 5, 11, 11])})]})
     for iid in ('desk_monitor', 'coffee_maker', 'paper_stack', 'trash_bin'):
         write_json(bs / f'{iid}.json', {'variants': {f'facing={f}': _rot(iid, y) for f, y in FACING_Y.items()}})
-        write_json(mi / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
+        write_json(mi / f'{iid}.json', {'parent': f'{MODID}:block/{iid}', 'display': held_display(models[iid]['elements'])})
 
 
 # ---------------------------------------------------------------- 落とす物
