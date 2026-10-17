@@ -24,6 +24,8 @@ This release focuses on polishing existing content rather than adding new areas.
   - A ↻ button on running orders orders the same item again.
   - Orders waiting for materials show what is missing and how many.
   - Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.
+- Put away skips storage that cannot accept the cargo and can deposit through a supply port into its adjacent storage.
+- Mining and harvesting capacity checks also handle loot stacks larger than one inventory slot.
 - The android Gear page has two new buttons: **Sort** tidies the inventory and backpack, and **Put away** sends the android to a nearby chest, barrel, shulker box or supply port to empty them.
 - The Android Assembly Station's follow row tooltip now lists the players on the permit.
 - Shift-click **Recall** in an Android Assembly Station to call back every android from the stations you can use within 64 blocks.
@@ -44,6 +46,6 @@ This release focuses on polishing existing content rather than adding new areas.
 - The Progress chapter opens at your current stage and links to that stage's overview.
 - More items show a short tooltip summary; hold **Shift** for full details.
 - Hover over a Singulo item and press **H** (or press it while holding the item) to open the handbook page about it.
-- The handbook has a search box above the chapter list.
+- The handbook has a search box above the chapter list. Item lookup keeps its selected page when resizing the window.
 
 Published as **Beta**. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).
