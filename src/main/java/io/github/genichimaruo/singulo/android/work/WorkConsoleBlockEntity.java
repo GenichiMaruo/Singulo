@@ -656,10 +656,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     static long maxCrafts(RecipeData recipe, int slots, long limit) {
+        return maxCrafts(recipe, slots, limit, List.of());
+    }
+
+    /**
+     * 持ち物の枠 slots に、作っている間ずっと収まる一番多い回数（limit まで）。枠は全部使う（決まった数を空けておかない）。
+     * carried: 今持っている物（この工程の素材も含む）。k 回作るとき、素材に使う分を除いた残りは、作っている間ずっと持っている。
+     */
+    static long maxCrafts(RecipeData recipe, int slots, long limit, List<ItemCount> carried) {
         long lo = 0, hi = limit;
         while (lo < hi) {                                     // 収まる回数は、回数を増やすほど収まりにくくなるので二分探索
             long mid = (lo + hi + 1) / 2;
-            if (peakStacks(recipe, mid) <= slots) {
+            if (peakStacks(recipe, mid, rest(carried, recipe, mid)) <= slots) {
                 lo = mid;
             } else {
                 hi = mid - 1;
@@ -668,24 +676,51 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return lo;
     }
 
-    /** crafts 回作るあいだに、持ち物が一番場所を取るときのスタック数（素材の残り + できた物 + 残る物）。 */
+    /** carried から、crafts 回分の素材を除いた残り（作っている間ずっと持っている物）。 */
+    private static List<ItemCount> rest(List<ItemCount> carried, RecipeData recipe, long crafts) {
+        List<ItemCount> rest = new ArrayList<>();
+        for (ItemCount c : carried) {
+            ItemCount.add(rest, c.item, c.count);
+        }
+        for (ItemCount in : recipe.inputs()) {
+            ItemCount.add(rest, in.item, -Math.min(ItemCount.get(rest, in.item), in.count * crafts));
+        }
+        return rest;
+    }
+
     static int peakStacks(RecipeData recipe, long crafts) {
+        return peakStacks(recipe, crafts, List.of());
+    }
+
+    /**
+     * crafts 回を1回ずつ作っていくあいだ、持ち物が一番場所を取るときのスタック数。作るたびに、素材の残り・できた物・
+     * 残る物（バケツなど）・ほかに出てくる物（記録した数ずつ）がどう変わるかを数える。base はずっと持っている物
+     * （同じ物は同じスタックにまとまる）。採掘・伐採・収穫で一緒に出る物は前もって分からないので、掘る前に収まるかを確かめる
+     * （AndroidWorkGoal）。
+     */
+    static int peakStacks(RecipeData recipe, long crafts, List<ItemCount> base) {
         int peak = 0;
         long step = Math.max(1, crafts / 256);
         for (long done = 0; done <= crafts; done = done == crafts ? crafts + 1 : Math.min(crafts, done + step)) {
-            int stacks = 0;
+            List<ItemCount> now = new ArrayList<>();
+            for (ItemCount c : base) {
+                ItemCount.add(now, c.item, c.count);
+            }
             for (ItemCount in : recipe.inputs()) {
-                stacks += stacks(in.item, in.count * (crafts - done));
+                ItemCount.add(now, in.item, in.count * (crafts - done));
                 if (in.item.hasCraftingRemainingItem()) {
-                    stacks += stacks(in.item.getCraftingRemainingItem(), in.count * done);   // バケツなど、作ると残る物
+                    ItemCount.add(now, in.item.getCraftingRemainingItem(), in.count * done);   // バケツなど、作ると残る物
                 }
             }
-            stacks += stacks(recipe.output(), (long) recipe.outputCount() * done);
-            peak = Math.max(peak, stacks);
+            ItemCount.add(now, recipe.output(), (long) recipe.outputCount() * done);
+            for (ItemStack e : recipe.extras()) {
+                if (!e.isEmpty()) {
+                    ItemCount.add(now, e, (long) e.getCount() * done);           // 副産物: 記録した数ずつ
+                }
+            }
+            peak = Math.max(peak, stacks(now));
         }
-        // ほかに出てくる物（副産物、採掘で出るほかの物）の分も空けておく
-        int extra = recipe.extras().size() + (recipe.needsMining() ? 2 : 0);
-        return peak + extra + (crafts > 256 ? 1 : 0);      // 間引いて数えたときは、1つ余裕を見る
+        return peak + (crafts > 256 ? 1 : 0);              // 間引いて数えたときは、1つ余裕を見る
     }
 
     private static int stacks(ItemStack item, long count) {
@@ -918,9 +953,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             for (ItemCount in : s.recipe.inputs()) {
                 k = Math.min(k, carried(a, in) / in.count);
             }
-            if (s.recipe.inputs().isEmpty()) {
-                k = maxCrafts(s.recipe, a.freeCarry(), k);
-            }
+            // できた物とほかに出てくる物が、今持っている物と一緒に収まる回数まで（持ち物があふれて足元に落ちないように）
+            k = maxCrafts(s.recipe, a.carryCapacity(), k, carriedList(a));
             if (k <= 0) {
                 continue;
             }
@@ -1040,21 +1074,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         int peak = stacks(carry);
         for (WorkJob.Batch b : batch) {
-            List<ItemCount> during = new ArrayList<>();
-            for (ItemCount c : carry) {
-                ItemCount.add(during, c.item, c.count);
-            }
-            ItemCount.add(during, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
-            for (ItemCount in : b.recipe().inputs()) {
-                if (in.item.hasCraftingRemainingItem()) {
-                    ItemCount.add(during, in.item.getCraftingRemainingItem(), in.count * b.crafts());
-                }
-            }
-            peak = Math.max(peak, stacks(during));
+            // この工程を1回ずつ作るあいだ: ほかの工程の物はずっと持っていて、この工程の素材・できた物・残る物・副産物が入れ替わる
+            peak = Math.max(peak, peakStacks(b.recipe(), b.crafts(), rest(carry, b.recipe(), b.crafts())));
             for (ItemCount in : b.recipe().inputs()) {
                 ItemCount.add(carry, in.item, -in.count * b.crafts());
+                if (in.item.hasCraftingRemainingItem()) {
+                    ItemCount.add(carry, in.item.getCraftingRemainingItem(), in.count * b.crafts());     // 残る物は、このあとも持っている
+                }
             }
             ItemCount.add(carry, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
+            for (ItemStack e : b.recipe().extras()) {
+                if (!e.isEmpty()) {
+                    ItemCount.add(carry, e, (long) e.getCount() * b.crafts());
+                }
+            }
         }
         return peak <= slots ? fetch : null;
     }
@@ -1082,6 +1115,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         return n;
+    }
+
+    /** 作業で運ぶ持ち物（作業のスロットにある物すべて）。 */
+    private static List<ItemCount> carriedList(RuinAndroid a) {
+        List<ItemCount> out = new ArrayList<>();
+        for (int slot : a.carrySlots()) {
+            ItemStack s = a.inventory().getItem(slot);
+            if (!s.isEmpty() && !FluidSamples.liquid(s)) {
+                ItemCount.add(out, s, s.getCount());
+            }
+        }
+        return out;
     }
 
     private static long carried(RuinAndroid a, ItemStack like) {

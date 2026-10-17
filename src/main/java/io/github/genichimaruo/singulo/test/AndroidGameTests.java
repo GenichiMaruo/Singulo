@@ -1559,6 +1559,72 @@ public final class AndroidGameTests {
         });
     }
 
+    /**
+     * 計画の持ち物の見積もり: 副産物も記録した数ずつ数え、1回ずつ作るあいだ一度も枠を超えない一番多い回数を選ぶ（決まった数の枠を
+     * 空けておかない。1回多くすると、途中のどこかであふれる）。
+     */
+    @GameTest(template = EMPTY)
+    public static void planCountsByproductsExactly(GameTestHelper helper) throws Exception {
+        java.util.List<ItemStack> grid = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        var recipe = new io.github.genichimaruo.singulo.android.work.RecipeData(
+                io.github.genichimaruo.singulo.android.work.RecipeData.MODE_PROCESSING, grid,
+                new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 3)));
+        var max = io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.class.getDeclaredMethod("maxCrafts",
+                io.github.genichimaruo.singulo.android.work.RecipeData.class, int.class, long.class);
+        max.setAccessible(true);
+        int slots = 5;
+        long k = (long) max.invoke(null, recipe, slots, 10_000L);
+        java.util.function.LongUnaryOperator peak = n -> {
+            long worst = 0;
+            for (long d = 0; d <= n; d++) {
+                worst = Math.max(worst, (n - d + 63) / 64 + (d + 63) / 64 + (3 * d + 63) / 64);   // 原鉄の残り・インゴット・丸石
+            }
+            return worst;
+        };
+        helper.assertTrue(k > 0 && peak.applyAsLong(k) <= slots, "選んだ回数で途中にあふれる: " + k + " 回で " + peak.applyAsLong(k));
+        helper.assertTrue(peak.applyAsLong(k + 1) > slots, "枠を使い切っていない（あと1回作れる）: " + k);
+        helper.succeed();
+    }
+
+    /**
+     * 採掘で一緒に出る物（前もって分からない）で持ち物がいっぱいになっても、足元に落とさない: 掘る前に収まるかを確かめ、
+     * 収まらなければ置きに戻ってから続ける。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 3600)
+    public static void miningNeverDropsWhenFull(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        // 上の段は花崗岩（目当てではない物が出る）、下の段は石（丸石が出る）
+        for (int x = 0; x <= 1; x++) {
+            helper.setBlock(new BlockPos(x, 2, 5), net.minecraft.world.level.block.Blocks.GRANITE);
+            helper.setBlock(new BlockPos(x, 1, 5), net.minecraft.world.level.block.Blocks.STONE);
+        }
+        var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
+                helper.absolutePos(new BlockPos(0, 1, 5)), helper.absolutePos(new BlockPos(1, 2, 5)), ItemStack.EMPTY);
+        ItemStack card = new ItemStack(item("procedure_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
+                .write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);
+        BladeAndroid a = worker(helper, true);
+        // 持ち物5つのうち4つは私物でふさがっている（作業に使えるのは1つ）
+        for (int i = 0; i < 4; i++) {
+            a.inventory().setItem(RuinAndroid.CARRY_START + i, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+        }
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        boolean[] dropped = {false};
+        helper.onEachTick(() -> dropped[0] |= !level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(10)).isEmpty());
+        helper.succeedWhen(() -> {
+            helper.assertFalse(dropped[0], "持ち物からあふれた物が足元に落ちた");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");
+            a.discard();
+        });
+    }
+
     /** 加工のバッチ投入では、充電10で原鉄を1個だけ投入し、その場で止まる。 */
     @GameTest(template = EMPTY)
     public static void processingStopsWhenChargeRunsOut(GameTestHelper helper) throws Exception {

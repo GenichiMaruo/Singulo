@@ -1085,6 +1085,11 @@ final class AndroidWorkGoal extends Goal {
         }
         java.util.List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(state, level, target, level.getBlockEntity(target),
                 android, tool);
+        if (!fitsInCarry(drops)) {
+            stopMining();
+            endFull(c, job, what);                   // 壊すと持ち物からあふれる: 壊さずに、ここまでの分で置きに戻る
+            return;
+        }
         level.destroyBlock(target, false, android);
         collect(drops, what);
         stopMining();
@@ -1430,20 +1435,30 @@ final class AndroidWorkGoal extends Goal {
             mineSkip.add(target);
             return;
         }
-        collect(harvestBlock(level, target), what);
+        Harvest h = harvestBlock(level, target);
+        if (!fitsInCarry(h.drops())) {
+            endFull(c, job, what);                   // 取ると持ち物からあふれる: 取らずに、ここまでの分で置きに戻る
+            return;
+        }
+        h.apply().run();
+        collect(h.drops(), what);
         android.spend(CRAFT_COST);
     }
 
-    /** 収穫する: 作物は種を1つ使って植え直し、スイートベリーは実だけ摘み、ほかは壊して取る。手に入った物を返す。 */
-    private java.util.List<ItemStack> harvestBlock(ServerLevel level, BlockPos p) {
+    /** 収穫で手に入る物と、実際に取る（ブロックを変える）こと。手に入る物を先に決めて、持ち物に収まるときだけ取る。 */
+    private record Harvest(java.util.List<ItemStack> drops, Runnable apply) {}
+
+    /** 収穫する: 作物は種を1つ使って植え直し、スイートベリーは実だけ摘み、ほかは壊して取る。 */
+    private Harvest harvestBlock(ServerLevel level, BlockPos p) {
         BlockState s = level.getBlockState(p);
         net.minecraft.world.level.block.Block b = s.getBlock();
         if (b instanceof net.minecraft.world.level.block.SweetBerryBushBlock) {
             int age = s.getValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE);
             int n = (age >= 3 ? 2 : 1) + level.random.nextInt(2);
-            level.setBlock(p, s.setValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE, 1), 2);
-            level.playSound(null, p, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
-            return new java.util.ArrayList<>(java.util.List.of(new ItemStack(net.minecraft.world.item.Items.SWEET_BERRIES, n)));
+            return new Harvest(new java.util.ArrayList<>(java.util.List.of(new ItemStack(net.minecraft.world.item.Items.SWEET_BERRIES, n))), () -> {
+                level.setBlock(p, s.setValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE, 1), 2);
+                level.playSound(null, p, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
+            });
         }
         // アメジストの塊はツルハシで取る（欠片が多く出る。採掘アップグレードがあれば、そのエンチャントも効く）
         ItemStack tool = s.is(net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER)
@@ -1459,12 +1474,13 @@ final class AndroidWorkGoal extends Goal {
             replant = s.setValue(net.minecraft.world.level.block.CocoaBlock.AGE, 0);
         }
         if (replant != null && takeSeed(drops, b.asItem())) {
-            level.levelEvent(2001, p, net.minecraft.world.level.block.Block.getId(s));     // 壊れる粒と音
-            level.setBlock(p, replant, 2);
-            return drops;
+            BlockState again = replant;
+            return new Harvest(drops, () -> {
+                level.levelEvent(2001, p, net.minecraft.world.level.block.Block.getId(s));     // 壊れる粒と音
+                level.setBlock(p, again, 2);
+            });
         }
-        level.destroyBlock(p, false, android);
-        return drops;
+        return new Harvest(drops, () -> level.destroyBlock(p, false, android));
     }
 
     /** 手に入った物から、植え直す種を1つ取る。取れたら true。 */
@@ -1618,6 +1634,7 @@ final class AndroidWorkGoal extends Goal {
         }
         // 木を丸ごと切る（守られたブロックは残す）
         java.util.List<ItemStack> drops = new java.util.ArrayList<>();
+        java.util.List<BlockPos> cut = new java.util.ArrayList<>();
         net.minecraft.world.entity.player.Player as = actor(level, c, null);
         for (BlockPos p : tree(level, base)) {
             if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.locked(level, p, as)
@@ -1626,6 +1643,13 @@ final class AndroidWorkGoal extends Goal {
             }
             BlockState s = level.getBlockState(p);
             drops.addAll(net.minecraft.world.level.block.Block.getDrops(s, level, p, level.getBlockEntity(p), android, tool));
+            cut.add(p);
+        }
+        if (!fitsInCarry(drops)) {
+            endFull(c, job, what);                   // 切ると持ち物からあふれる: 切らずに、ここまでの分で置きに戻る
+            return;
+        }
+        for (BlockPos p : cut) {
             level.removeBlock(p, false);
         }
         level.levelEvent(2001, base, net.minecraft.world.level.block.Block.getId(net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState()));
@@ -2393,6 +2417,58 @@ final class AndroidWorkGoal extends Goal {
             }
         }
         return true;
+    }
+
+    /**
+     * drops を全部、今の持ち物（作業のスロット）に入れられるか。持ち物へ入れるときと同じ順で数える（同じ物のスタックの空きへ足してから、
+     * 空いているスロットへ）。
+     */
+    private boolean fitsInCarry(java.util.List<ItemStack> drops) {
+        java.util.List<ItemStack> sim = new java.util.ArrayList<>();
+        for (int slot : android.carrySlots()) {
+            sim.add(android.inventory().getItem(slot).copy());
+        }
+        for (ItemStack d : drops) {
+            if (d.isEmpty()) {
+                continue;
+            }
+            int left = d.getCount();
+            for (ItemStack held : sim) {
+                if (left > 0 && !held.isEmpty() && ItemStack.isSameItemSameComponents(held, d)) {
+                    int move = Math.min(left, held.getMaxStackSize() - held.getCount());
+                    held.grow(move);
+                    left -= move;
+                }
+            }
+            for (int i = 0; i < sim.size() && left > 0; i++) {
+                if (sim.get(i).isEmpty()) {
+                    sim.set(i, d.copyWithCount(left));
+                    left = 0;
+                }
+            }
+            if (left > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 掘る・切る・取ると持ち物からあふれると分かった（一緒に出る物は前もって分からない）: 足元に落とさず、ここまでの分で作業を終える。
+     * 手順の最後の工程で集めていた分は、足りない分を注文に戻して、持っている物を置きに行く（残りは、あとでまた集める）。
+     * 途中の工程や、まだ何も集めていなければ、この作業をあとに回して持ち物を置きに戻る。
+     */
+    private void endFull(WorkConsoleBlockEntity c, WorkJob job, ItemStack what) {
+        WorkJob.Batch step = batchIndex < job.batch().size() ? job.batch().get(batchIndex) : null;
+        long want = step == null ? 0 : Math.max(1, FluidSamples.amount(what)) * step.crafts();
+        boolean last = step != null && procIndex == step.recipe().steps().size() - 1
+                && ItemStack.isSameItemSameComponents(what, step.recipe().output());
+        if (last && progress > 0 && progress < want) {
+            endShort(c, job, want - progress);
+        } else {
+            fail(c, job, WorkConsoleBlockEntity.Failure.DEFERRED);
+            returning = true;
+        }
     }
 
     /** 持ち物に入りきらなかった物は、足元に落とす（ふつうは起きない）。 */
