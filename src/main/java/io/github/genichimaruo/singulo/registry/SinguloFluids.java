@@ -42,32 +42,7 @@ public final class SinguloFluids {
                         .density(def.gas() ? -1000 : 1000)
                         .viscosity(def.gas() ? 200 : 1000)
                         .temperature(temperatureOf(def.id()))
-                        //#if neoforge
                         .canSwim(false).canDrown(false).canPushEntity(false)));
-                        //#else
-                        //$ .canSwim(false).canDrown(false).canPushEntity(false)) {
-                        //$     // Forge 版: 描き方（水の絵に色を付ける）は流体の種類が持つ（NeoForge 版は SinguloClient.registerExtensions）
-                        //$     @Override
-                        //$     public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions> consumer) {
-                        //$         consumer.accept(new net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions() {
-                        //$             @Override
-                        //$             public net.minecraft.resources.ResourceLocation getStillTexture() {
-                        //$                 return net.minecraft.resources.ResourceLocation.withDefaultNamespace("block/water_still");
-                        //$             }
-                        //$
-                        //$             @Override
-                        //$             public net.minecraft.resources.ResourceLocation getFlowingTexture() {
-                        //$                 return net.minecraft.resources.ResourceLocation.withDefaultNamespace("block/water_flow");
-                        //$             }
-                        //$
-                        //$             @Override
-                        //$             public int getTintColor() {
-                        //$                 return def.color();
-                        //$             }
-                        //$         });
-                        //$     }
-                        //$ });
-                        //#endif
         @SuppressWarnings("unchecked")
         Supplier<BaseFlowingFluid.Properties>[] props = new Supplier[1];
         DeferredHolder<Fluid, BaseFlowingFluid.Source> source =

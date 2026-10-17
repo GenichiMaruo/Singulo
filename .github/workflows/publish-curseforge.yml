@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       verified_run_id:
-        description: 'Successful PR validation with both loaders, GUI and Mekanism'
+        description: 'Successful PR validation with NeoForge, GUI and Mekanism'
         required: true
         type: string
       release_tag:
@@ -65,7 +65,6 @@ jobs:
           echo "type=$type" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "neo_name=$mod_name-$version-${minecraft}N" >> "$GITHUB_OUTPUT"
-          echo "forge_name=$mod_name-$version-${minecraft}F" >> "$GITHUB_OUTPUT"
       - name: Verify CI provenance and exact tagged source
         id: verified
         run: python3 tools/verified_release_1211.py check --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
@@ -75,13 +74,7 @@ jobs:
           run-id: ${{ inputs.verified_run_id }}
           name: ${{ steps.verified.outputs.neoforge_artifact }}
           path: verified-artifacts/${{ steps.verified.outputs.neoforge_artifact }}
-      - uses: actions/download-artifact@v4
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.verified_run_id }}
-          name: ${{ steps.verified.outputs.forge_artifact }}
-          path: verified-artifacts/${{ steps.verified.outputs.forge_artifact }}
-      - name: Promote both validated production JARs without rebuilding
+      - name: Promote the validated production JAR without rebuilding
         run: python3 tools/verified_release_1211.py promote --repo "$GITHUB_REPOSITORY" --run "$VERIFIED_RUN_ID" --tag "$RELEASE_TAG" --source release-source
       - name: Reserve an asset-free release to guard duplicate uploads
         env:
@@ -91,7 +84,7 @@ jobs:
           cp "release-source/docs/curseforge/changelog-$VERSION.md" release-notes.md
           cat >> release-notes.md <<'NOTES'
 
-          Download both Forge and NeoForge JARs from CurseForge: https://www.curseforge.com/minecraft/mc-mods/singulo/files
+          Download the NeoForge JAR from CurseForge: https://www.curseforge.com/minecraft/mc-mods/singulo/files
           NOTES
           prerelease=--prerelease
           if [[ "$TYPE" == release ]]; then prerelease=--prerelease=false; fi
@@ -118,21 +111,6 @@ jobs:
           dependencies: |
             jei(optional)
             mekanism(optional)
-          fail-mode: fail
-      - name: Publish Forge to CurseForge
-        uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3
-        with:
-          curseforge-id: ${{ secrets.CURSEFORGE_PROJECT_ID || vars.CURSEFORGE_PROJECT_ID }}
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          files: release-artifacts/${{ steps.version.outputs.forge_name }}.jar
-          name: ${{ steps.version.outputs.forge_name }}
-          version: ${{ steps.version.outputs.version }}-forge
-          version-type: ${{ steps.version.outputs.type }}
-          changelog-file: release-source/docs/curseforge/changelog-${{ steps.version.outputs.version }}.md
-          loaders: forge
-          game-versions: '1.21.1'
-          java: '21'
-          dependencies: jei(optional)
           fail-mode: fail
       - name: Publish release notes with CurseForge links only
         run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest=false
