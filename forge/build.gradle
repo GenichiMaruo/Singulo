@@ -206,4 +206,4 @@ var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
     delete layout.buildDirectory.dir('gametest/world')
     delete layout.buildDirectory.file('gametest/logs/latest.log')
 }
-tasks.named('runGameTestServer') { dependsOn cleanGameTestWorld }
+tasks.matching { it.name == 'runGameTestServer' }.configureEach { dependsOn cleanGameTestWorld }
