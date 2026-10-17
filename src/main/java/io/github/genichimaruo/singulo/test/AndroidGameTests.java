@@ -832,11 +832,14 @@ public final class AndroidGameTests {
             crew.add(a);
         }
         var player = helper.makeMockServerPlayerInLevel();
-        helper.assertTrue(console.candidates(player).size() == 3, "3体とも選べる候補にならない: " + console.candidates(player).size());
+        // Other concurrently running fixtures may also have unowned guards in range.
+        var candidates = console.candidates(player);
+        helper.assertTrue(candidates.containsAll(crew), "用意した3体が選べる候補にならない");
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         var order = console.orders().get(0);
-        long working = crew.stream().filter(RuinAndroid::isWorking).count();
+        long working = order.workers.stream().map(id -> helper.getLevel().getEntity(id))
+                .filter(e -> e instanceof RuinAndroid a && a.isWorking()).count();
         helper.assertTrue(order.workers.size() == 1 && working == 1, "必要以上に招集した: 受け持ち " + order.workers.size() + " / 作業中 " + working);
         // 画面で「自動」（だれも選ばない）にすると、選べる候補をみな送ってくる。そのときも必要な数だけ
         console.cancel(order.id, null);
@@ -877,7 +880,15 @@ public final class AndroidGameTests {
             var error = console.start(player, new ItemStack(Items.CAKE), 1, ids, gui, helper.absolutePos(DELIVERY));
             helper.assertTrue(error == null, "Cake order rejected before recruitment: " + error);
             var order = console.orders().get(console.orders().size() - 1);
-            helper.assertTrue(order.workers.contains(capable.getUUID()), "Automatic recruitment discarded the only capable worker");
+            if (gui) {
+                // Explicit GUI candidates isolate the closest-small / distant-capable regression.
+                helper.assertTrue(order.workers.contains(capable.getUUID()), "Automatic recruitment discarded the only capable worker");
+            } else {
+                // Empty IDs deliberately discover all nearby guards, including other fixtures.
+                helper.assertTrue(order.workers.stream().allMatch(id ->
+                                helper.getLevel().getEntity(id) instanceof RuinAndroid a && a.carryCapacity() >= 6),
+                        "Automatic recruitment selected a worker unable to carry the six cake input stacks");
+            }
             helper.assertTrue(order.workers.size() == 1, "Cake requires only its capable worker, not extra idle workers");
             console.cancel(order.id, null);
         }
