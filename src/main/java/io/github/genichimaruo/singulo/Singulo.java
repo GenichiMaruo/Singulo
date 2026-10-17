@@ -26,7 +26,9 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
+//#if neoforge
 import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
+//#endif
 import org.slf4j.Logger;
 
 @Mod(Singulo.MODID)
@@ -34,7 +36,12 @@ public final class Singulo {
     public static final String MODID = "singulo";
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    //#if neoforge
     public Singulo(IEventBus modBus, ModContainer container) {
+    //#else
+    //$ public Singulo(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext container) {
+    //$     IEventBus modBus = container.getModEventBus();
+    //#endif
         SinguloComponents.REGISTER.register(modBus);
         io.github.genichimaruo.singulo.registry.SinguloTriggers.REGISTER.register(modBus);
         SinguloFluids.FLUID_TYPES.register(modBus);
@@ -55,12 +62,24 @@ public final class Singulo {
         SinguloRecipes.SERIALIZERS.register(modBus);
         SinguloCreativeTab.REGISTER.register(modBus);
 
-        modBus.addListener(SinguloCapabilities::register);
+        //#if neoforge
+        modBus.addListener(SinguloCapabilities::register);  // Forge 版は forgecompat.Caps が最初に使うときに読む
+        //#endif
+        //#if neoforge
         modBus.addListener(io.github.genichimaruo.singulo.network.SinguloNetwork::register);
+        //#else
+        //$ io.github.genichimaruo.singulo.forgecompat.Net.init();
+        //$ io.github.genichimaruo.singulo.forgecompat.FlightRegistry.register(modBus);   // NeoForge の「飛べる」能力値の代わり
+        //$ io.github.genichimaruo.singulo.forgecompat.ComponentsIngredient.register(modBus);   // 材料「neoforge:components」の代わり
+        //#endif
         java.util.Objects.requireNonNull(io.github.genichimaruo.singulo.ruin.PrototypeMemories.RECEIVED);  // 記録の登録先へ加える
         io.github.genichimaruo.singulo.ruin.AncientRecords.REGISTER.register(modBus);
         modBus.addListener(SinguloEntities::registerAttributes);
+        //#if neoforge
         modBus.addListener((RegisterTicketControllersEvent e) -> e.register(WorldlineAnchorBlockEntity.TICKETS));
+        //#else
+        //$ WorldlineAnchorBlockEntity.TICKETS.register();
+        //#endif
         NeoForge.EVENT_BUS.addListener(SinguloReloadListeners::register);
         NeoForge.EVENT_BUS.addListener(Singulo::speedUpGameTests);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onTeleport);
@@ -99,6 +118,13 @@ public final class Singulo {
         modBus.addListener((net.neoforged.fml.event.config.ModConfigEvent.Reloading e) -> io.github.genichimaruo.singulo.data.ConfigMigration.onConfig(e));
         container.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+        //#if neoforge
+        //#else
+        //$ // Forge 版は Mod の入口が1つだけなので、クライアントの準備もここから始める
+        //$ if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT) {
+        //$     new io.github.genichimaruo.singulo.client.SinguloClient(modBus);
+        //$ }
+        //#endif
     }
 
     /**

@@ -63,8 +63,11 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
     private static final int SLOT_EDGE = 0xFF373C48;
     private static final int SLOT_FILL = 0xFF8B8F98;
 
-    /** 記録のページ: 右の欄の位置、1件の高さ、見えている件数、いま一番上に見えている記録の番号。 */
-    private static final int LOG_X = RIGHT_X, LOG_Y = 24, LOG_W = 160, LOG_ROW = 19, LOG_ROWS = 5;
+    /**
+     * 記録のページ: 右の欄の位置・幅（画面の右端の内側に収める）、1件の高さ、見えている件数、下の件数の段の高さ、
+     * いま一番上に見えている記録の番号。
+     */
+    private static final int LOG_X = RIGHT_X, LOG_Y = 24, LOG_W = AndroidMenu.WIDTH - RIGHT_X - 8, LOG_ROW = 19, LOG_ROWS = 5, LOG_FOOTER = 10;
     private int logScroll;
 
     private final NameEditor names = new NameEditor();
@@ -345,7 +348,7 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
         }
         if (logPage()) {
             portrait(g, x, y, mouseX, mouseY, accent);
-            roundRect(g, x + LOG_X - 4, y + LOG_Y - 4, LOG_W + 4, LOG_ROW * LOG_ROWS + 4, mix(accent, PAPER, 0.88F));
+            roundRect(g, x + LOG_X - 4, y + LOG_Y - 4, LOG_W + 4, LOG_ROW * LOG_ROWS + 4 + LOG_FOOTER, mix(accent, PAPER, 0.88F));
             // 記録の区切り線
             for (int i = 1; i < LOG_ROWS; i++) {
                 g.fill(x + LOG_X, y + LOG_Y + i * LOG_ROW - 2, x + LOG_X + LOG_W - 6, y + LOG_Y + i * LOG_ROW - 1, mix(accent, PAPER, 0.7F));
@@ -557,8 +560,10 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
                         e.kind() == 0 ? INK : 0xFFB04040);
             }
             if (log.size() > LOG_ROWS) {
-                AndroidStationScreen.fit(g, font, Component.literal((logScroll + 1) + "-" + Math.min(log.size(), logScroll + LOG_ROWS) + " / "
-                        + log.size()), LOG_X + LOG_W - 40, LOG_Y + LOG_ROW * LOG_ROWS + 1, 36, 0xFF8A949E);
+                // 件数: 欄の中の下の段に、右寄せで
+                Component count = Component.literal((logScroll + 1) + "-" + Math.min(log.size(), logScroll + LOG_ROWS) + " / " + log.size());
+                int cw = Math.min(font.width(count), 40);
+                AndroidStationScreen.fit(g, font, count, LOG_X + LOG_W - 6 - cw, LOG_Y + LOG_ROW * LOG_ROWS, 40, 0xFF8A949E);
             }
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.log.speech"), PORTRAIT_X + 4,
                     PORTRAIT_Y + PORTRAIT_H - 13, PORTRAIT_W - 8, INK);
@@ -581,6 +586,13 @@ public class AndroidScreen extends AbstractContainerScreen<AndroidMenu> {
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.tools"), 6, AndroidMenu.MINING_Y - 9, 48, INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack"), PACK_X_FRAME, 24, 116, INK);
             AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.carry"), AndroidMenu.CARRY_X - 4, 24, 24, INK);
+            if (menu.builtInPack()) {
+                // バックパックを内蔵している型: アップグレードの欄を濃い色の札で覆い、白い字で「内蔵」と出す（アップグレードは入らない）
+                g.fill(AndroidMenu.BACKPACK_X - 1, AndroidMenu.BACKPACK_Y - 1, AndroidMenu.BACKPACK_X + 17, AndroidMenu.BACKPACK_Y + 17, 0xFF1E5A73);
+                g.fill(AndroidMenu.BACKPACK_X, AndroidMenu.BACKPACK_Y, AndroidMenu.BACKPACK_X + 16, AndroidMenu.BACKPACK_Y + 16, 0xFF2A7FA0);
+                AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack.builtin"), AndroidMenu.BACKPACK_X - 1,
+                        AndroidMenu.BACKPACK_Y + 4, 18, 0xFFFFFFFF);
+            }
             if (!menu.hasBackpack()) {
                 AndroidStationScreen.fitCentered(g, font, Component.translatable("gui.singulo.android.pack.none"), AndroidMenu.PACK_X,
                         AndroidMenu.PACK_Y + 32, 6 * 18 - 2, 0xFF8A949E);

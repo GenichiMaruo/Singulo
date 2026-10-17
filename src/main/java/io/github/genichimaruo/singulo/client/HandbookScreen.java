@@ -372,9 +372,22 @@ public class HandbookScreen extends Screen {
             int max = Math.max(0, chapters.size() * ROW - (H - 28));
             listScroll = Math.max(0, Math.min(max, listScroll - (int) (dy * ROW)));
         } else if (chapters.get(chapter).pages.get(page).supporters.isEmpty()) {
-            scroll = Math.max(0, scroll - (int) (dy * 12));
+            scroll = Math.max(0, Math.min(maxScroll(), scroll - (int) (dy * 12)));
         }
         return true;
+    }
+
+    /** 本文のスクロールの上限（本文の高さが見える高さを超えた分。超えなければ 0）。描画と同じ行の高さで数える。 */
+    private int maxScroll() {
+        Page p = chapters.get(chapter).pages.get(page);
+        int pw = W - LIST_W - 22;
+        int bodyH = H - 38 - 22;
+        int height = 0;
+        for (Line line : p.lines) {
+            height += font.split(line.text, pw).size() * 10 + 3;
+        }
+        height += p.supporters.size() * (SupporterPlaque.HEIGHT + SupporterPlaque.GAP);
+        return Math.max(0, height - bodyH);
     }
 
     @Override

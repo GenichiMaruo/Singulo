@@ -20,16 +20,22 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
+//#if neoforge
 @Mod(value = Singulo.MODID, dist = Dist.CLIENT)
+//#endif
 public final class SinguloClient {
     private static final ResourceLocation STILL = ResourceLocation.withDefaultNamespace("block/water_still");
     private static final ResourceLocation FLOWING = ResourceLocation.withDefaultNamespace("block/water_flow");
 
     public SinguloClient(IEventBus modBus) {
+        //#if neoforge
         modBus.addListener(SinguloClient::registerScreens);
+        //#endif
         modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerItemColors);
-        modBus.addListener(SinguloClient::registerExtensions);
+        //#if neoforge
+        modBus.addListener(SinguloClient::registerExtensions);   // Forge 版は流体の種類が自分で持つ（SinguloFluids）
+        //#endif
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(SinguloClient::addWingLayers);
@@ -40,7 +46,9 @@ public final class SinguloClient {
         modBus.addListener(SinguloKeys::register);
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
+        //#if neoforge
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
+        //#endif
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
@@ -108,6 +116,7 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.SABER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SABER));
         event.registerEntityRenderer(SinguloEntities.AXE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.AXE));
         event.registerEntityRenderer(SinguloEntities.BIT_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BIT));
+        event.registerEntityRenderer(SinguloEntities.GUNNER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.GUNNER));
         event.registerEntityRenderer(SinguloEntities.ANDROID_CRESCENT.get(), AndroidCrescentRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ANDROID_LASER.get(), AndroidLaserRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
@@ -184,6 +193,7 @@ public final class SinguloClient {
         event.registerLayerDefinition(AndroidModel.SABER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.SABER));
         event.registerLayerDefinition(AndroidModel.AXE_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.AXE));
         event.registerLayerDefinition(AndroidModel.BIT_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BIT));
+        event.registerLayerDefinition(AndroidModel.GUNNER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.GUNNER));
         event.registerLayerDefinition(HorizonWardenRenderer.LAYER, HorizonWardenRenderer::createLayer);
     }
 
@@ -235,13 +245,32 @@ public final class SinguloClient {
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
     private static void addPacks(net.neoforged.neoforge.event.AddPackFindersEvent event) {
+        //#if neoforge
         event.addPackFinders(Singulo.id("resourcepacks/singulo_hd"), net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
                 Component.translatable("pack.singulo.hd"), net.minecraft.server.packs.repository.PackSource.BUILT_IN, false,
                 net.minecraft.server.packs.repository.Pack.Position.TOP);
+        //#else
+        //$ if (event.getPackType() != net.minecraft.server.packs.PackType.CLIENT_RESOURCES) {
+        //$     return;
+        //$ }
+        //$ java.nio.file.Path path = net.minecraftforge.fml.ModList.get().getModFileById(Singulo.MODID).getFile().findResource("resourcepacks/singulo_hd");
+        //$ var info = new net.minecraft.server.packs.PackLocationInfo("mod/" + Singulo.MODID + "/singulo_hd", Component.translatable("pack.singulo.hd"),
+        //$         net.minecraft.server.packs.repository.PackSource.BUILT_IN, java.util.Optional.empty());
+        //$ var pack = net.minecraft.server.packs.repository.Pack.readMetaAndCreate(info, new net.minecraft.server.packs.PathPackResources.PathResourcesSupplier(path),
+        //$         net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
+        //$         new net.minecraft.server.packs.PackSelectionConfig(false, net.minecraft.server.packs.repository.Pack.Position.TOP, false));
+        //$ if (pack != null) {
+        //$     event.addRepositorySource(consumer -> consumer.accept(pack));
+        //$ }
+        //#endif
     }
 
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+        //#if neoforge
+        //#else
+        //$ event.enqueueWork(() -> registerScreens(new io.github.genichimaruo.singulo.forgecompat.RegisterMenuScreensEvent()));
+        //#endif
         // 作業位置カード: 記録済みなら絵を切り替える
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
@@ -261,7 +290,10 @@ public final class SinguloClient {
                         io.github.genichimaruo.singulo.item.ExplorerCompassItem.pointing(stack))));
     }
 
-    /** 説明（折り返し）と、Shift を押している間は作り方・使い道。 */
+    /**
+     * 説明（折り返し）。長い説明には短い要約があり、ふだんは要約だけを出す。
+     * Shift を押している間は、説明の全文と作り方・使い道を出す（詳しく見られるものには「Shift: 詳しく見る」を添える）。
+     */
     private static void describe(ItemTooltipEvent event) {
         net.minecraft.resources.ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.ITEM
                 .getKey(event.getItemStack().getItem());
@@ -276,32 +308,35 @@ public final class SinguloClient {
         if (!net.minecraft.client.resources.language.I18n.exists(key)) {
             return;
         }
-        java.util.List<Component> tip = event.getToolTip();
-        net.minecraft.client.gui.Font font = net.minecraft.client.Minecraft.getInstance().font;
-        for (net.minecraft.network.chat.FormattedText line : font.getSplitter().splitLines(Component.translatable(key), 220,
-                net.minecraft.network.chat.Style.EMPTY)) {
-            tip.add(Component.literal(line.getString()).withStyle(ChatFormatting.GRAY));
-        }
+        String summary = "summary.singulo." + id.getPath();
+        boolean hasSummary = net.minecraft.client.resources.language.I18n.exists(summary);
         boolean hasHowto = net.minecraft.client.resources.language.I18n.exists("howto.singulo." + id.getPath());
         boolean hasUses = net.minecraft.client.resources.language.I18n.exists("uses.singulo." + id.getPath());
-        if (!hasHowto && !hasUses) {
-            return;
-        }
-        if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
+        boolean detailed = net.minecraft.client.gui.screens.Screen.hasShiftDown();
+        java.util.List<Component> tip = event.getToolTip();
+        addWrapped(tip, hasSummary && !detailed ? summary : key, ChatFormatting.GRAY);
+        if (detailed) {
             for (String k : new String[]{"howto", "uses"}) {
                 String full = k + ".singulo." + id.getPath();
                 if (net.minecraft.client.resources.language.I18n.exists(full)) {
-                    for (net.minecraft.network.chat.FormattedText line : font.getSplitter().splitLines(Component.translatable(full),
-                            220, net.minecraft.network.chat.Style.EMPTY)) {
-                        tip.add(Component.literal(line.getString()).withStyle(ChatFormatting.DARK_AQUA));
-                    }
+                    addWrapped(tip, full, ChatFormatting.DARK_AQUA);
                 }
             }
-        } else {
+        } else if (hasSummary || hasHowto || hasUses) {
             tip.add(Component.translatable("tooltip.singulo.more").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
+    /** 翻訳キー key の文を、説明欄の幅で折り返して足す。 */
+    private static void addWrapped(java.util.List<Component> tip, String key, ChatFormatting color) {
+        net.minecraft.client.gui.Font font = net.minecraft.client.Minecraft.getInstance().font;
+        for (net.minecraft.network.chat.FormattedText line : font.getSplitter().splitLines(Component.translatable(key), 220,
+                net.minecraft.network.chat.Style.EMPTY)) {
+            tip.add(Component.literal(line.getString()).withStyle(color));
+        }
+    }
+
+    //#if neoforge
     private static void registerExtensions(RegisterClientExtensionsEvent event) {
         for (SinguloFluids.Entry entry : SinguloFluids.ALL.values()) {
             int color = entry.def().color();
@@ -323,4 +358,5 @@ public final class SinguloClient {
             }, entry.type().get());
         }
     }
+    //#endif
 }

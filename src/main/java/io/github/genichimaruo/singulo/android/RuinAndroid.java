@@ -145,8 +145,8 @@ public abstract class RuinAndroid extends Monster {
 
     /** 毎秒: 久しぶりにそばに来た持ち主へ手を振り、そばを通る仲間と会釈する。 */
     private void greetings(ServerLevel level) {
-        if (!guard || !printed() || !active() || getTarget() != null || gestureTicks > 0) {
-            return;
+        if (!guard || !printed() || !active() || getTarget() != null || gestureTicks > 0 || napping()) {
+            return;                                    // 昼寝中は、挨拶もしない
         }
         long now = level.getGameTime();
         for (Player p : level.players()) {
@@ -167,7 +167,7 @@ public abstract class RuinAndroid extends Monster {
         }
         for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, getBoundingBox().inflate(2.5),
                 a -> a != this && a.isAlive() && a.guard && a.printed() && a.active() && a.getTarget() == null && a.gestureTicks <= 0
-                        && java.util.Objects.equals(a.owner, owner))) {
+                        && !a.napping() && java.util.Objects.equals(a.owner, owner))) {
             Long last = lastPeerGreet.get(a.getUUID());
             if (last == null || now - last > PEER_GREET_TICKS) {
                 lastPeerGreet.put(a.getUUID(), now);
@@ -185,6 +185,9 @@ public abstract class RuinAndroid extends Monster {
     /** ステーションの上の番が、仲間に上を譲っているところ。 */
     private boolean yielding;
     private static final Vec3[] STAND_OFFSETS = {new Vec3(2, 0, 0), new Vec3(-2, 0, 0), new Vec3(0, 0, 2), new Vec3(0, 0, -2)};
+    /** 迎撃モードで、上に乗れない2体目からが待つ所（ステーションの四方のすぐ横の床。上の面から1段下）。5体目からは一回り外側。 */
+    private static final Vec3[] GUARD_SIDE_OFFSETS = {new Vec3(1, -1, 0), new Vec3(-1, -1, 0), new Vec3(0, -1, 1), new Vec3(0, -1, -1),
+            new Vec3(1, -1, 1), new Vec3(-1, -1, -1), new Vec3(-1, -1, 1), new Vec3(1, -1, -1)};
 
     /** 充電器から電力をもらって、ついて歩いている持ち主（見た目のため。いなければ -1）。 */
     private static final EntityDataAccessor<Integer> CHARGER_LINK = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
@@ -348,7 +351,7 @@ public abstract class RuinAndroid extends Monster {
     /** 手に持つ装飾を見せるか: 待機していて（戦い・作業・充電をしていない）、挨拶の仕草もしていない。 */
     public boolean showsHeldDecor() {
         int s = state();
-        boolean calm = s == STATE_IDLE || (s == STATE_SIT || s == STATE_SIT_GROUND) && !napping();     // 座って本を読む、など
+        boolean calm = (s == STATE_IDLE || s == STATE_SIT || s == STATE_SIT_GROUND) && !napping();     // 座って本を読む、など（昼寝中はしまう）
         return printed() && calm && !isWorking() && !entityData.get(ALERT) && gesture() == GESTURE_NONE
                 && !decor(AndroidAccessoryItem.HAND).isEmpty();
     }
@@ -891,9 +894,34 @@ public abstract class RuinAndroid extends Monster {
         return isMiningUpgrade(inventory.getItem(SLOT_MINING));
     }
 
-    /** 充電の満タン（バッテリーアップグレード1個につき +50%）。 */
+    /** 充電の満タン（バッテリーアップグレード1個につき +50%。内蔵のバッテリーも同じだけ）。 */
     public int maxCharge() {
-        return CHARGE_MAX * (2 + batteries()) / 2;
+        return CHARGE_MAX * (2 + batteries() + builtInBatteries()) / 2;
+    }
+
+    /** 護衛が敵を探す範囲（ステーションか持ち主から。型によって広い）。 */
+    public double guardRange() {
+        return GUARD_RANGE;
+    }
+
+    /** 作業（作る・掘る・収穫・家畜の世話）にかかる時間。型によって速い。 */
+    public int workTicks(int ticks) {
+        return ticks;
+    }
+
+    /** 体に内蔵しているバッテリーの数（アップグレードとは別に、充電の満タンを増やす）。 */
+    public int builtInBatteries() {
+        return 0;
+    }
+
+    /** バックパックを内蔵しているか（アップグレードなしでも、バックパックの欄が使える）。 */
+    public boolean builtInPack() {
+        return false;
+    }
+
+    /** バックパックの欄が使えるか（バックパックアップグレードを積んでいるか、内蔵しているか）。 */
+    public boolean packOpen() {
+        return builtInPack() || isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK));
     }
 
     /** 作業（自動化）に割り当ててよいか。 */
@@ -1026,7 +1054,7 @@ public abstract class RuinAndroid extends Monster {
 
     /** 持ち物の5つと、バックパックがあればその24（全部）。 */
     private int[] allCarrySlots() {
-        int n = RuinAndroid.CARRY_SLOTS + (isBackpackUpgrade(inventory.getItem(SLOT_BACKPACK)) ? PACK_SLOTS : 0);
+        int n = RuinAndroid.CARRY_SLOTS + (packOpen() ? PACK_SLOTS : 0);
         int[] out = new int[n];
         for (int i = 0; i < n; i++) {
             out[i] = i < CARRY_SLOTS ? CARRY_START + i : PACK_START + (i - CARRY_SLOTS);
@@ -1682,7 +1710,7 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         Vec3 anchor = guardAnchor();
-        return anchor == null || e.position().distanceToSqr(anchor) < GUARD_RANGE * GUARD_RANGE;
+        return anchor == null || e.position().distanceToSqr(anchor) < guardRange() * guardRange();
     }
 
     /**
@@ -2286,7 +2314,8 @@ public abstract class RuinAndroid extends Monster {
                 boolean keeper = mode == MODE_GUARD && dockKeeper(level) == RuinAndroid.this;
                 boolean yield = keeper && (needer != null || level.getBlockEntity(home) instanceof AndroidStationBlockEntity s && s.wantsTop());
                 if (keeper && yield && !yielding) {
-                    // 「どうぞ」: 戻ってくる仲間の方を向いて知らせる
+                    // 「どうぞ」: 戻ってくる仲間の方を向いて知らせる（昼寝していたら、起きてから）
+                    setNapping(false);
                     chirp(level, needer, 1.7F);
                 }
                 yielding = keeper && yield;
@@ -2296,12 +2325,34 @@ public abstract class RuinAndroid extends Monster {
                         if (getNavigation().isDone() || tickCount % 20 == 0) {
                             getNavigation().moveTo(dock.x, dock.y, dock.z, 0.9);
                         }
+                        setNapping(false);
                     } else {
                         // 上に着いた: 中央に寄って止まる
                         getNavigation().stop();
                         if (dv.length() > 0.05) {
                             setDeltaMovement(dv.x * 0.3, getDeltaMovement().y, dv.z * 0.3);
                         }
+                        standNap(level);
+                    }
+                    return;
+                }
+                if (mode == MODE_GUARD) {
+                    // 迎撃モードの2体目から: ステーションのすぐ横（四方の1マス）に、仲間と重ならないよう1体ずつ並んで待つ
+                    Vec3 spot = dock.add(GUARD_SIDE_OFFSETS[sideSlot(level) % GUARD_SIDE_OFFSETS.length]);
+                    Vec3 dv = spot.subtract(position()).multiply(1, 0, 1);
+                    if (dv.length() > 1.5 || onDock || Math.abs(getY() - spot.y) > 0.5) {
+                        if (getNavigation().isDone() || tickCount % 20 == 0) {
+                            getNavigation().moveTo(spot.x, spot.y, spot.z, 0.9);
+                        }
+                        setNapping(false);
+                    } else if (dv.length() > 0.3) {
+                        // 道のりの探索は1マスほど手前で「着いた」とするので、最後は自分で持ち場の真ん中へ歩く
+                        getNavigation().stop();
+                        getMoveControl().setWantedPosition(spot.x, getY(), spot.z, 0.7);
+                        setNapping(false);
+                    } else {
+                        getNavigation().stop();
+                        standNap(level);
                     }
                     return;
                 }
@@ -2310,6 +2361,25 @@ public abstract class RuinAndroid extends Monster {
                     getNavigation().moveTo(spot.x, spot.y, spot.z, 0.9);
                 }
             }
+        }
+
+        @Override
+        public void stop() {
+            setNapping(false);
+        }
+
+        /** 迎撃モードで持ち場に着いて待っている間: 夜はその場で立ったまま昼寝する（昼は起きている）。 */
+        private void standNap(ServerLevel level) {
+            setNapping(mode == MODE_GUARD && state() == STATE_IDLE && level.isNight());
+        }
+
+        /** ステーションの横で待つ順番（上の番を除いた、待っている仲間の UUID の順）。自分が数えられていなければ UUID で決める。 */
+        private int sideSlot(ServerLevel level) {
+            RuinAndroid keeper = dockKeeper(level);
+            java.util.List<RuinAndroid> peers = idlePeers(level).stream().filter(a -> a != keeper)
+                    .sorted(java.util.Comparator.comparing(Entity::getUUID)).toList();
+            int i = peers.indexOf(RuinAndroid.this);
+            return i >= 0 ? i : Math.floorMod(getUUID().hashCode(), GUARD_SIDE_OFFSETS.length);
         }
     }
 

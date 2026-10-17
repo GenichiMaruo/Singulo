@@ -1,4 +1,8 @@
 """Check actual PNG player-inventory pixels; independent of NativeImage's in-memory sampling."""
+import argparse
+_parser = argparse.ArgumentParser()
+_parser.add_argument('--build-dir', default='build')
+_build = _parser.parse_args().build_dir
 import json
 import pathlib
 import struct
@@ -40,7 +44,7 @@ def rgba(path):
         previous = row
     return width, height, channels, rows
 
-root = pathlib.Path("build/gui-review/screenshots")
+root = pathlib.Path(_build + "/gui-review/screenshots")
 results = []
 for name in ("android-status", "android-gear", "android-decor"):
     width, height, channels, rows = rgba(root / (name + ".png"))
@@ -56,5 +60,5 @@ for name in ("android-status", "android-gear", "android-decor"):
         if pixel != (139, 143, 152):
             raise SystemExit(f"{name}: missing player inventory at {x},{y}: {pixel}")
     results.append({"screen": name, "checked_empty_slot_centers": len(points), "rgb": pixels[0]})
-pathlib.Path("build/gui-review/inventory-pixels.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+pathlib.Path(_build + "/gui-review/inventory-pixels.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
 print(json.dumps(results))

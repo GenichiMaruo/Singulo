@@ -210,9 +210,11 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return isPrintUnit(items.getStackInSlot(SLOT_PRINT_UNIT));
     }
 
-    /** 1体の印刷にかかる電力（工場式印刷ユニットで半分）。 */
+    /** 1体の印刷にかかる電力（入れた設計メモリの型の倍率。工場式印刷ユニットで半分）。 */
     public int printFe() {
-        return hasPrintUnit() ? PRINT_FE / 2 : PRINT_FE;
+        AndroidKind kind = memoryKind(items.getStackInSlot(SLOT_MEMORY));
+        int fe = PRINT_FE * (kind == null ? 1 : kind.printCost);
+        return hasPrintUnit() ? fe / 2 : fe;
     }
 
     /** 倒されてから印刷し直すまで（工場式印刷ユニットで半分）。 */
