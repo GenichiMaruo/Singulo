@@ -288,6 +288,14 @@ final class AndroidWorkGoal extends Goal {
         if (!(android.level() instanceof ServerLevel level)) {
             return;
         }
+        // 充電切れ・充電中・襲われているときは何もしない。目的の見直しは1tickおきなので、充電切れになった次のtickにも
+        // 作業が呼ばれ、作る姿勢に戻して「動ける」状態にしてしまい、充電に行かずに切れと起動を繰り返していた
+        if (!canUse()) {
+            if (android.state() == RuinAndroid.STATE_CRAFTING || android.state() == RuinAndroid.STATE_MINING) {
+                android.setState(RuinAndroid.STATE_IDLE);
+            }
+            return;
+        }
         WorkConsoleBlockEntity c = console(level);
         if (c == null) {
             return;

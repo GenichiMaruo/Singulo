@@ -982,6 +982,55 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+    /**
+     * 作っている途中で充電が切れたら、作業を中断してステーションへ充電しに行き、満タンになったら続きをして注文を終える
+     * （充電切れと起動を繰り返して止まったままにならない）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 4800)
+    public static void craftingPausesToRecharge(GameTestHelper helper) {
+        floor(helper);
+        var console = workshop(helper, 4);
+        AndroidStationBlockEntity s = station(helper, 1);
+        int[] lowPower = {0};
+        int[] last = {-1};
+        boolean[] ordered = {false}, charged = {false};
+        StringBuilder trail = new StringBuilder();
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (list.isEmpty() || !list.get(0).printed()) {
+                return;
+            }
+            RuinAndroid a = list.get(0);
+            if (!ordered[0] && a.state() == RuinAndroid.STATE_IDLE) {
+                ordered[0] = true;
+                CompoundTag saved = a.saveWithoutId(new CompoundTag());
+                saved.putInt("charge", 25);                        // 2回作ると切れる
+                a.load(saved);
+                var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
+                        List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+                helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+            }
+            int st = a.state();
+            if (st == RuinAndroid.STATE_LOW_POWER && last[0] != RuinAndroid.STATE_LOW_POWER) {
+                lowPower[0]++;
+            }
+            charged[0] |= st == RuinAndroid.STATE_CHARGING;
+            if (st != last[0] && trail.length() < 1200) {
+                trail.append(helper.getTick()).append(':').append(st).append('(').append(a.charge()).append(") ");
+            }
+            last[0] = st;
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(ordered[0], "印刷されない");
+            helper.assertTrue(lowPower[0] >= 1 && lowPower[0] <= 2, "充電切れを繰り返している: " + lowPower[0] + " 回 " + trail);
+            helper.assertTrue(charged[0], "ステーションで充電していない: " + trail);
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 16,
+                    "棒が16本届かない: " + delivered(helper, net.minecraft.world.item.Items.STICK));
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
     /** 素材が足りない注文は、計算で止まる（原木1本では棒16本は作れない）。在庫で足りれば作れる。 */
     @GameTest(template = EMPTY)
     public static void workPlanNeedsMaterials(GameTestHelper helper) {
