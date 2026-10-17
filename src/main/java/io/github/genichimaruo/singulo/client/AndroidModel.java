@@ -201,7 +201,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         // 腕（左はふつう、右は肩当てと籠手）
         PartDefinition armL = torso.addOrReplaceChild("arm_l", cube(48, 32, -1, -0.5F, -1, 2, 5, 2, def(-0.05F)),
                 PartPose.offsetAndRotation(4, -7.5F, 0, 0, 0, -0.08F));
-        armL.addOrReplaceChild("forearm_l", cube(64, 32, -1, 0, -1, 2, 5, 2, def(-0.05F)), PartPose.offset(0, 4.5F, 0));
+        // 前腕は上腕より少し細く: 同じ太さだと、肘を曲げたとき両方の横の面が同じ平面で重なり、肘の光る線がちらつく
+        armL.addOrReplaceChild("forearm_l", cube(64, 32, -1, 0, -1, 2, 5, 2, def(-0.1F)), PartPose.offset(0, 4.5F, 0));
         // 装甲板: 左肩の小さな肩当て（右の肩当てより薄い）
         armL.addOrReplaceChild("armor_pad", cube(110, 46, -1, -1.2F, -2, 3, 1, 4, def(0.02F, -0.1F, -0.1F)),
                 PartPose.rotation(0, 0, -0.15F));
@@ -500,6 +501,13 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         int batteries = android.batteries();
         batteryL.visible = batteries >= 1;
         batteryR.visible = batteries >= 2;
+        // 物を作っている間は、手の武器をしまう（両手を使う。射撃型の小型銃は腰に差す: 描画の側）
+        boolean armed = !android.weaponStowed();
+        for (ModelPart grip : new ModelPart[]{whipHandle, hilt, axeGrip, daggerGrip, gunGrip}) {
+            if (grip != null) {
+                grip.visible = armed;
+            }
+        }
         float pt = age - android.tickCount;
         int state = android.state();
         float t = android.stateTime(pt);

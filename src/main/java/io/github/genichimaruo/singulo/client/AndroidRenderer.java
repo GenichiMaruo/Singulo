@@ -1147,8 +1147,33 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     }
                     default -> m.toLeftHand(pose);
                 }
+                if (acc.style().equals("bouquet")) {
+                    pose.mulPose(Axis.XP.rotationDegrees(25));      // 花を前へ傾けて、前に立った人に見せる
+                }
                 draw(acc.style(), pose, vc, light, c, Math.min(1, limbSwingAmount), age);
+                if (acc.style().equals("bouquet")) {
+                    // 透ける包装は、形を描き終えてから別の描き方で（描き方を混ぜないよう、形の受け口は取り直す）
+                    bouquetWrap(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
+                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                }
                 pose.popPose();
+            }
+        }
+
+        /** 花束の透明な包装（下ほど細い3段と、開いた口の縁。うっすら水色に透ける）。 */
+        private void bouquetWrap(PoseStack pose, VertexConsumer vc, int light) {
+            int film = 0xE6F4FF, edge = 0xF4FAFF;
+            float[][] boxes = {
+                    {-0.55F, -0.05F, -0.9F, 0.55F, 1.05F, 0.6F}, {-0.95F, -0.45F, -1.7F, 0.95F, 1.45F, -0.8F},
+                    {-1.35F, -0.85F, -2.6F, 1.35F, 1.85F, -1.6F}};
+            for (float[] q : boxes) {
+                FxDraw.box(pose, vc, q[0] * P, q[1] * P, q[2] * P, q[3] * P, q[4] * P, q[5] * P, light, film, 80);
+            }
+            float[][] rim = {
+                    {-1.55F, 1.8F, -2.95F, 1.55F, 2.02F, -2.5F}, {-1.55F, -1.02F, -2.95F, 1.55F, -0.8F, -2.5F},
+                    {-1.57F, -0.85F, -2.9F, -1.3F, 1.85F, -2.5F}, {1.3F, -0.85F, -2.9F, 1.57F, 1.85F, -2.5F}};
+            for (float[] q : rim) {
+                FxDraw.box(pose, vc, q[0] * P, q[1] * P, q[2] * P, q[3] * P, q[4] * P, q[5] * P, light, edge, 130);
             }
         }
 
@@ -1183,13 +1208,16 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     b(pose, vc, light, x - 0.4F, -7.4F, -0.9F, x + 0.1F, -6.4F, 0.3F, c);
                 }
                 case "beret" -> {
-                    // 頭の上に少し傾けた円盤と、てっぺんの小さな柄
+                    // 頭の上に少し傾けた円盤と、てっぺんの小さな柄。頭より少し小さく、少し右（-X）へ寄せて載せる。
+                    // 傾けて低くなる側でも髪の殻（頭のてっぺん -8.45）がつばを突き抜けないよう少し上げ、つばを下へ厚くする
+                    // （高い側は、つばの下の端が髪のてっぺんに届くので、すき間もできない）。
+                    // 髪の殻の面（x ±4.45・z ±3.95）とつばの面は重ねない（重なるとちらつく）
                     pose.pushPose();
-                    pose.translate(0, -8 * P, 0);
+                    pose.translate(-0.3F * P, -8.4F * P, 0);
                     pose.mulPose(Axis.ZP.rotationDegrees(-10));
-                    b(pose, vc, light, -4.8F, -1.1F, -4.2F, 4.8F, 0.1F, 4.2F, c);
-                    b(pose, vc, light, -4.2F, -1.6F, -3.6F, 4.2F, -1.1F, 3.6F, c);
-                    b(pose, vc, light, -0.3F, -2.3F, -0.3F, 0.3F, -1.6F, 0.3F, dark);
+                    b(pose, vc, light, -4.5F, -1.1F, -4.0F, 4.5F, 0.75F, 4.0F, c);
+                    b(pose, vc, light, -3.8F, -1.6F, -3.3F, 3.8F, -1.0F, 3.3F, c);
+                    b(pose, vc, light, -0.3F, -2.3F, -0.3F, 0.3F, -1.5F, 0.3F, dark);
                     pose.popPose();
                 }
                 case "headdress" -> {
@@ -1245,13 +1273,49 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     b(pose, vc, light, -0.1F, 0.2F, -3.6F, 0.1F, 1.1F, -0.2F, dark);
                 }
                 case "bouquet" -> {
-                    // 茎と包み紙、上に花（赤・黄・白・桃）
-                    b(pose, vc, light, -0.3F, 0.2F, -2.2F, 0.3F, 0.8F, 0.4F, 0x4E8A3A);
-                    b(pose, vc, light, -1.0F, -0.2F, -2.8F, 1.0F, 1.2F, -1.0F, c);
-                    int[] petals = {0xE04848, 0xF2D24A, 0xF4F4F4, 0xEE8FB0};
-                    for (int i = 0; i < 4; i++) {
-                        float x = (i % 2 == 0 ? -0.8F : 0.2F), y = (i < 2 ? -0.4F : 0.6F);
-                        b(pose, vc, light, x, y, -3.9F, x + 0.9F, y + 0.9F, -2.8F, petals[i]);
+                    // 透明な包装（下ほど細い。透けて茎が見える。包装は透けるので、最後に別の描き方で描く: bouquetWrap）と、
+                    // 正面に染めた色のリボンの蝶結び。
+                    // 口の上に花をこんもり盛る: 中央に高く赤いバラ、まわりに6輪（白・桃・黄・薄桃のデイジーなど、芯つき）、
+                    // 紫のラベンダーの穂、かすみ草の白い粒、外へ広がる葉。
+                    // 面がぴったり重なるとちらつくので、箱どうしは少しずつ食い込ませ、高さもずらす
+                    int leaf = 0x5E9E48, deep = 0x3F7A34, stem = 0x4E8A3A;
+                    b(pose, vc, light, -0.4F, 0.15F, -2.6F, -0.1F, 0.45F, 0.5F, stem);         // 茎（包装ごしに見える）
+                    b(pose, vc, light, 0.1F, 0.25F, -2.6F, 0.4F, 0.55F, 0.3F, stem);
+                    b(pose, vc, light, -0.15F, 0.6F, -2.6F, 0.15F, 0.9F, 0.4F, 0x5A9A44);
+                    b(pose, vc, light, -1.25F, -0.75F, -2.8F, 1.25F, 1.75F, -2.45F, deep);     // 口の中の葉
+                    b(pose, vc, light, -1.0F, -0.5F, -1.45F, 1.0F, 1.5F, -1.1F, c);            // リボン（染めた色）
+                    b(pose, vc, light, -1.3F, 1.45F, -1.75F, -0.2F, 1.8F, -0.85F, c);
+                    b(pose, vc, light, 0.2F, 1.45F, -1.75F, 1.3F, 1.8F, -0.85F, c);
+                    b(pose, vc, light, -0.25F, 1.45F, -1.5F, 0.25F, 1.9F, -1.05F, dark);
+                    b(pose, vc, light, -0.6F, 1.52F, -1.1F, -0.3F, 1.7F, 0.05F, c);
+                    b(pose, vc, light, 0.3F, 1.52F, -1.1F, 0.6F, 1.7F, -0.15F, c);
+                    // 外へ広がる葉
+                    b(pose, vc, light, -2.25F, 0.2F, -3.6F, -1.45F, 0.8F, -2.6F, leaf);
+                    b(pose, vc, light, 1.45F, 0.15F, -3.5F, 2.25F, 0.75F, -2.6F, leaf);
+                    b(pose, vc, light, -0.3F, -1.45F, -3.55F, 0.3F, -0.7F, -2.65F, leaf);
+                    b(pose, vc, light, -0.25F, 1.75F, -3.45F, 0.35F, 2.4F, -2.7F, leaf);
+                    // 中央のバラ（高く、濃い芯）
+                    b(pose, vc, light, -0.65F, -0.15F, -4.6F, 0.65F, 1.15F, -3.4F, 0xD8334A);
+                    b(pose, vc, light, -0.25F, 0.25F, -4.7F, 0.25F, 0.75F, -4.5F, 0x9E1E34);
+                    // まわりの6輪: x, y, てっぺん, 花びら, 芯
+                    float[][] ring = {
+                            {1.1F, 0.5F, -3.9F}, {-1.1F, 0.5F, -3.8F}, {0.55F, 1.45F, -3.95F},
+                            {-0.55F, 1.45F, -3.85F}, {0.55F, -0.45F, -3.75F}, {-0.55F, -0.45F, -3.9F}};
+                    int[][] colors = {
+                            {0xFAFAFA, 0xF6C83A}, {0xF29AB8, 0xF6D24A}, {0xF6D24A, 0xE88A2A},
+                            {0xFAFAFA, 0xF6C83A}, {0xF8C4D6, 0xF6D24A}, {0xF6D24A, 0xE88A2A}};
+                    for (int i = 0; i < ring.length; i++) {
+                        float x = ring[i][0], y = ring[i][1], top = ring[i][2];
+                        b(pose, vc, light, x - 0.55F, y - 0.55F, top, x + 0.55F, y + 0.55F, top + 1.0F, colors[i][0]);
+                        b(pose, vc, light, x - 0.2F, y - 0.2F, top - 0.1F, x + 0.2F, y + 0.2F, top + 0.05F, colors[i][1]);
+                    }
+                    // ラベンダーの穂
+                    b(pose, vc, light, -1.65F, -0.45F, -4.4F, -1.15F, 0.05F, -3.0F, 0xA68AD8);
+                    b(pose, vc, light, 1.23F, 1.18F, -4.2F, 1.67F, 1.62F, -3.0F, 0xB89CE6);
+                    // かすみ草
+                    float[][] dots = {{0.0F, 2.05F, -3.5F}, {-1.5F, 1.3F, -3.4F}, {1.55F, -0.3F, -3.45F}, {-1.0F, -1.0F, -3.4F}, {1.1F, 1.95F, -3.3F}};
+                    for (float[] d : dots) {
+                        b(pose, vc, light, d[0] - 0.17F, d[1] - 0.17F, d[2], d[0] + 0.17F, d[1] + 0.17F, d[2] + 0.34F, 0xFFFFFF);
                     }
                 }
                 case "teacup" -> {
@@ -1306,7 +1370,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float age, float netHeadYaw, float headPitch) {
             AndroidModel m = getParentModel();
-            if (m.whipHandle == null || !(android instanceof WhipAndroid whip)) {
+            if (m.whipHandle == null || !(android instanceof WhipAndroid whip) || android.weaponStowed()) {
                 return;
             }
             Vec3 camera = entityRenderDispatcher.camera.getPosition();
@@ -1435,7 +1499,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float age, float netHeadYaw, float headPitch) {
             AndroidModel m = getParentModel();
-            if (m.hilt == null) {
+            if (m.hilt == null || android.weaponStowed()) {
                 return;
             }
             int state = android.state();
@@ -1488,7 +1552,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float age, float netHeadYaw, float headPitch) {
             AndroidModel m = getParentModel();
-            if (m.axeGrip == null || !android.printed()) {
+            if (m.axeGrip == null || !android.printed() || android.weaponStowed()) {
                 return;
             }
             int state = android.state();
@@ -1560,7 +1624,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float age, float netHeadYaw, float headPitch) {
             AndroidModel m = getParentModel();
-            if (m.daggerGrip == null || !android.printed()) {
+            if (m.daggerGrip == null || !android.printed() || android.weaponStowed()) {
                 return;
             }
             int state = android.state();
@@ -1691,6 +1755,20 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             boolean rail = GunnerAndroid.railOut(state);
             float glow = state == RuinAndroid.STATE_LOW_POWER ? 0.3F : RuinAndroid.charging(state) ? 0.5F : 0.85F + 0.1F * Mth.sin(age * 0.2F);
             org.joml.Matrix4f back = stowedFrame(pose, m), hand = null;
+            if (!rail && android.weaponStowed()) {
+                // 物を作っている間: 小型銃は右の腰のホルスターに差す（銃口を下へ、握りを後ろへ）
+                pose.pushPose();
+                m.toHips(pose);
+                pose.translate(-4.6F / 16, -1.2F / 16, 0.2F / 16);
+                pose.mulPose(new Quaternionf().setFromNormalized(new org.joml.Matrix3f(0, 1, 0, 0, 0, 1, 1, 0, 0)));
+                float s = PISTOL_SCALE / SCALE / 18;
+                pose.scale(s, s, s);
+                pose.translate(-0.6F, 0, 0);
+                pistol(pose, buffers, light, glow, age, 0, -1);
+                pose.popPose();
+                railgun(pose, buffers, light, android, state, t, age, glow, back, null);
+                return;
+            }
             pose.pushPose();
             m.toBlade(pose);
             m.gunGrip.translateAndRotate(pose);
@@ -2149,7 +2227,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
                            float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
             AndroidModel m = getParentModel();
-            if (m.blade == null) {
+            if (m.blade == null || android.weaponStowed()) {
                 return;
             }
             int state = android.state();

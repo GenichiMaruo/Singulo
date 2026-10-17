@@ -85,6 +85,11 @@ public abstract class RuinAndroid extends Monster {
     /** 拠点の暮らし（{@link AndroidLife}）: 椅子・階段に座る、地面に座る、植木鉢・作物に手をかざす、床を掃く。 */
     public static final int STATE_SIT = 90, STATE_SIT_GROUND = 91, STATE_TEND = 92, STATE_SWEEP = 93;
 
+    /** 手の武器をしまっているか（作業台などで物を作っている間。両手を使うので。クライアントでも見える）。 */
+    public boolean weaponStowed() {
+        return state() == STATE_CRAFTING;
+    }
+
     /** 拠点の暮らしの動きか。 */
     public static boolean lifeState(int state) {
         return state >= STATE_SIT && state <= STATE_SWEEP;
@@ -1750,7 +1755,22 @@ public abstract class RuinAndroid extends Monster {
     }
 
     /**
-     * 技（斬撃・光柱・斬撃波・衝撃波）を当ててよい相手か。護衛の技は {@link #hostileToGuards} の相手だけに当たり、
+     * 許可証に載っていない人か（ステーションの許可証にだれかが登録されているときだけ。持ち主と登録者、クリエイティブ・観戦は除く）。
+     * 護衛は、こういう人を敵とみなして攻撃する（打たれれば仕返しし、ダメージも受ける）。許可証がなければ、だれも当たらない。
+     */
+    public boolean intruder(LivingEntity e) {
+        return guard && !members.isEmpty() && e instanceof Player p && !p.isCreative() && !p.isSpectator()
+                && !p.getUUID().equals(owner) && !members.contains(p.getUUID());
+    }
+
+    /** この護衛が戦う相手か（敵対モブと、許可証に載っていない人。範囲は見ない）。 */
+    boolean hostile(LivingEntity e) {
+        return hostileToGuards(e) || intruder(e);
+    }
+
+    /**
+     * 技（斬撃・光柱・斬撃波・衝撃波）を当ててよい相手か。護衛の技は {@link #hostileToGuards} の相手と、技を出した護衛の
+     * 許可証に載っていない人（{@link #intruder}）だけに当たり、
      * 遺構のアンドロイドの技は守り手（遺構のアンドロイド・ドローン・ボス）とその味方以外に当たる。
      * owner は技を出したアンドロイド（もういなければ null。そのときも guardSide で決める）。
      */
@@ -1759,7 +1779,7 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         if (guardSide) {
-            return hostileToGuards(e);
+            return hostileToGuards(e) || owner instanceof RuinAndroid a && a.intruder(e);
         }
         return !RuinGuards.isGuard(e) && !(owner != null && owner.isAlliedTo(e));
     }
@@ -1769,16 +1789,21 @@ public abstract class RuinAndroid extends Monster {
         return canHit(guard, this, e);
     }
 
-    /** 護衛が狙う相手か（敵対モブ。護衛のアンドロイドと飼われた動物は除く）。 */
+    /** テスト用: {@link #guardTargets}。 */
+    public boolean guardTargetsForTest(LivingEntity e) {
+        return guardTargets(e);
+    }
+
+    /** 護衛が狙う相手か（敵対モブと、許可証に載っていない人。護衛のアンドロイドと飼われた動物は除く）。 */
     boolean guardTargets(LivingEntity e) {
         if (e == assistTarget && e.isAlive() && e.distanceToSqr(this) < AndroidPatrol.CALL_RANGE * AndroidPatrol.CALL_RANGE) {
             return true;                           // 仲間に呼ばれた相手
         }
         if (workConsole != null) {
             // 作業中は、自分を襲ってきた相手だけ迎え撃つ（近くにいる間）。片付けたら作業に戻る
-            return hostileToGuards(e) && e == getLastHurtByMob() && e.isAlive() && e.distanceToSqr(this) < WORK_DEFEND_RANGE * WORK_DEFEND_RANGE;
+            return hostile(e) && e == getLastHurtByMob() && e.isAlive() && e.distanceToSqr(this) < WORK_DEFEND_RANGE * WORK_DEFEND_RANGE;
         }
-        if (!hostileToGuards(e) || mode == MODE_FOLLOW && !escort) {
+        if (!hostile(e) || mode == MODE_FOLLOW && !escort) {
             return false;
         }
         Vec3 anchor = guardAnchor();
@@ -1953,15 +1978,16 @@ public abstract class RuinAndroid extends Monster {
         });
         goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 10));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
-        // 遺構のものはプレイヤーを、護衛は敵対モブを狙う。護衛はプレイヤーに打たれても仕返ししない
+        // 遺構のものはプレイヤーを、護衛は敵対モブと、許可証に載っていない人を狙う。
+        // 護衛は、許可証に載っている人（許可証がなければ、だれでも）に打たれても仕返ししない
         targetSelector.addGoal(1, new HurtByTargetGoal(this) {
             @Override
             public boolean canUse() {
-                return super.canUse() && !(guard && (getLastHurtByMob() instanceof Player
+                return super.canUse() && !(guard && (getLastHurtByMob() instanceof Player p && !intruder(p)
                         || getLastHurtByMob() instanceof RuinAndroid a && a.isGuard()));
             }
         });
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, p -> !guard));
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, p -> !guard || guardTargets(p)));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.Mob.class, 5, true, false,
                 e -> guard && guardTargets(e)));
     }
@@ -2104,8 +2130,8 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public boolean isAlliedTo(Entity other) {
         if (guard) {
-            // 護衛はプレイヤーとほかの護衛の味方
-            return other instanceof Player || other instanceof RuinAndroid a && a.isGuard()
+            // 護衛はプレイヤー（許可証に載っていない人は除く）とほかの護衛の味方
+            return other instanceof Player p && !intruder(p) || other instanceof RuinAndroid a && a.isGuard()
                     || other instanceof net.minecraft.world.entity.animal.AbstractGolem
                     || other instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame() || super.isAlliedTo(other);
         }
@@ -2121,7 +2147,7 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         Entity by = source.getEntity();
-        if (guard ? by instanceof Player || by instanceof RuinAndroid a && a.isGuard() || isBoss(by)
+        if (guard ? by instanceof Player p && !intruder(p) || by instanceof RuinAndroid a && a.isGuard() || isBoss(by)
                 || by instanceof net.minecraft.world.entity.animal.AbstractGolem : RuinGuards.isGuard(by)) {
             return false;
         }

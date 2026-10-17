@@ -326,6 +326,50 @@ public final class AndroidGameTests {
     }
 
     /**
+     * 許可証にだれかが登録されていれば、護衛は許可証に載っていない人を敵とみなす（狙う・技が当たる・味方ではない・ダメージを受ける）。
+     * 持ち主・登録者・クリエイティブの人は対象外。許可証がなければ、だれも敵とみなさない。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 400)
+    public static void guardsAttackPlayersOffThePermit(GameTestHelper helper) {
+        AndroidStationBlockEntity s = station(helper, 1);
+        // makeMockServerPlayerInLevel の人はいつもクリエイティブ扱いなので、サバイバルの人を作る
+        var owner = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var friend = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var stranger = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var builder = helper.makeMockPlayer(net.minecraft.world.level.GameType.CREATIVE);
+        s.setOwner(owner.getUUID());
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
+            RuinAndroid a = androids(helper).get(0);
+            a.setNoAi(true);
+            helper.assertFalse(a.intruder(stranger), "許可証がないのに、登録していない人を敵とみなした");
+            helper.assertTrue(a.isAlliedTo(stranger), "許可証がないのに、登録していない人が味方でない");
+            ItemStack permit = new ItemStack(item("shield_permit"));
+            io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
+            io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, friend);
+            s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PERMIT, permit);
+            s.press(AndroidStationBlockEntity.BUTTON_MODE_FOLLOW);       // 設定を押すと、許可証もアンドロイドへ渡る
+            s.press(AndroidStationBlockEntity.BUTTON_MODE_GUARD);
+            helper.assertTrue(a.intruder(stranger), "許可証に載っていない人を敵とみなさない");
+            helper.assertFalse(a.intruder(owner) || a.intruder(friend), "持ち主か登録した人を敵とみなした");
+            helper.assertFalse(a.intruder(builder), "クリエイティブの人を敵とみなした");
+            helper.assertTrue(RuinAndroid.canHit(true, a, stranger), "許可証に載っていない人に護衛の技が当たらない");
+            helper.assertFalse(RuinAndroid.canHit(true, a, friend), "登録した人に護衛の技が当たる");
+            helper.assertFalse(a.isAlliedTo(stranger), "許可証に載っていない人が味方のまま");
+            helper.assertTrue(a.isAlliedTo(friend), "登録した人が味方でない");
+            stranger.moveTo(a.position().add(2, 0, 0));
+            helper.assertTrue(a.guardTargetsForTest(stranger), "ステーションの近くにいる、許可証に載っていない人を狙わない");
+            float before = a.getHealth();
+            a.invulnerableTime = 0;
+            a.hurt(helper.getLevel().damageSources().playerAttack(friend), 2);
+            helper.assertTrue(a.getHealth() == before, "登録した人の攻撃でダメージを受けた");
+            a.invulnerableTime = 0;
+            a.hurt(helper.getLevel().damageSources().playerAttack(stranger), 2);
+            helper.assertTrue(a.getHealth() < before, "許可証に載っていない人の攻撃でダメージを受けない");
+            helper.succeed();
+        });
+    }
+
+    /**
      * 許可証: 持ち主と登録した人だけが操作でき、追従する人を登録した人から選べる。
      * 追従中「ついていくだけ」なら敵を狙わず、「護衛する」なら狙う。
      */
