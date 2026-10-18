@@ -33,6 +33,8 @@ public final class GuiReviewHarness {
     private static UUID androidId;
     private static volatile boolean prepared;
     private static int ready;
+    private static int lookupChapter, lookupPage;
+    private static String bootScreen = "";
     private static ItemStack item(String name) {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(name)));
     }
@@ -42,7 +44,29 @@ public final class GuiReviewHarness {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         if (++ticks > 20 * 180) {
-            throw new IllegalStateException("GUI review timed out");
+            capture(mc, "diagnostic-timeout");
+            throw new IllegalStateException("GUI review timed out: phase=" + phase + " screen=" + mc.screen + " overlay=" + mc.getOverlay());
+        }
+        if (phase == 0 && mc.getOverlay() == null && mc.screen != null) {
+            String screen = mc.screen.getClass().getName();
+            if (!screen.equals(bootScreen)) {
+                bootScreen = screen;
+                Singulo.LOGGER.info("SINGULO_GUI_BOOT {} {}", screen, mc.screen.getTitle().getString());
+            }
+            // The disposable GameTest save enables experimental feature packs.
+            // Forge asks for confirmation; accept only this specific review prompt.
+            if (mc.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen
+                    && mc.screen.getTitle().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents title
+                    && "selectWorld.backupQuestion.experimental".equals(title.getKey())) {
+                for (var child : mc.screen.children()) {
+                    if (child instanceof net.minecraft.client.gui.components.Button button
+                            && button.getMessage().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents label
+                            && "selectWorld.backupJoinSkipButton".equals(label.getKey()) && button.active) {
+                        button.onPress();
+                        return;
+                    }
+                }
+            }
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) {
             return;
@@ -83,6 +107,7 @@ public final class GuiReviewHarness {
             }
             case 6 -> {
                 require(mc, WorkConsoleScreen.class);
+                verifySearch(mc);
                 capture(mc, "console-orders");
                 ((WorkConsoleScreen) mc.screen).showRecordTab();
                 phase++;
@@ -102,6 +127,12 @@ public final class GuiReviewHarness {
                 var method = WorkConsoleScreen.class.getDeclaredMethod("openPicking", ItemStack.class);
                 method.setAccessible(true);
                 method.invoke(mc.screen, new ItemStack(Items.OAK_PLANKS));
+                int x = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
+                int y = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
+                mc.screen.mouseClicked(x + 110, y + 42, 0);
+                if (!(Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not enable");
+                mc.screen.mouseClicked(x + 110, y + 42, 0);
+                if ((Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not disable");
                 phase++;
             }
             case 10 -> { capture(mc, "console-order-confirmation"); openBlock(mc, RACK); phase++; }
@@ -208,8 +239,46 @@ public final class GuiReviewHarness {
             }
             case 25 -> {
                 capture(mc, "android-log-en-854x480");
-                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 20");
-                phase++;
+                if (!HandbookScreen.lookup(item("android_backpack_upgrade"))) {
+                    throw new IllegalStateException("Handbook item lookup did not open");
+                }
+                phase = 27;
+            }
+            case 27 -> {
+                require(mc, HandbookScreen.class);
+                lookupChapter = (Integer) field(mc.screen, "chapter");
+                lookupPage = (Integer) field(mc.screen, "page");
+                if (lookupChapter == 0 && lookupPage == 0) {
+                    throw new IllegalStateException("Item lookup stayed on the default page");
+                }
+                capture(mc, "handbook-item-lookup-en-854x480");
+                mc.getWindow().setWindowed(1280, 800);
+                phase = 28;
+            }
+            case 28 -> {
+                require(mc, HandbookScreen.class);
+                if ((Integer) field(mc.screen, "chapter") != lookupChapter || (Integer) field(mc.screen, "page") != lookupPage) {
+                    throw new IllegalStateException("Handbook item lookup was lost after window resize");
+                }
+                var box = (net.minecraft.client.gui.components.EditBox) field(mc.screen, "searchBox");
+                box.setValue("zzzz_singulo_no_matching_page");
+                if (!((List<?>) field(mc.screen, "results")).isEmpty()) {
+                    throw new IllegalStateException("Handbook no-results search failed");
+                }
+                box.setValue(item("android_backpack_upgrade").getHoverName().getString());
+                if (((List<?>) field(mc.screen, "results")).isEmpty()) {
+                    throw new IllegalStateException("Handbook did not find the backpack page");
+                }
+                box.setFocused(true);
+                mc.screen.setFocused(box);
+                mc.screen.keyPressed(262, 0, 0);
+                if ((Integer) field(mc.screen, "page") != lookupPage) {
+                    throw new IllegalStateException("Typing in handbook search turned the page");
+                }
+                capture(mc, "handbook-search-en-1280x800");
+                Singulo.LOGGER.info("SINGULO_HANDBOOK_SEARCH_COMPLETE");
+                Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 22");
+                phase = 29;
                 mc.stop();
             }
             default -> {}
@@ -220,6 +289,53 @@ public final class GuiReviewHarness {
         var field = target.getClass().getDeclaredField(name);
         field.setAccessible(true);
         return field.get(target);
+    }
+
+    /** Exercise the real search widget, inventory hotkey guard and sort buttons on both loaders. */
+    private static void verifySearch(Minecraft mc) throws Exception {
+        WorkConsoleScreen screen = (WorkConsoleScreen) mc.screen;
+        var box = (net.minecraft.client.gui.components.EditBox) field(screen, "searchBox");
+        var entries = WorkConsoleScreen.class.getDeclaredMethod("visibleEntries");
+        entries.setAccessible(true);
+        box.setValue("");
+        int initial = ((List<?>) entries.invoke(screen)).size();
+        if (initial == 0) throw new IllegalStateException("Search fixture has no entries");
+        box.setValue("singulo_review_no_matching_item_9823");
+        if (!((List<?>) entries.invoke(screen)).isEmpty()) throw new IllegalStateException("Search did not filter entries");
+        box.setValue("@minecraft");
+        if (((List<?>) entries.invoke(screen)).isEmpty()) throw new IllegalStateException("Mod search removed vanilla stock");
+        box.setFocused(true);
+        screen.keyPressed(69, 0, 0);
+        if (mc.screen != screen) throw new IllegalStateException("Inventory hotkey closed a focused search");
+        box.setFocused(false);
+        box.setValue("");
+        int left = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
+        int top = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
+        for (int i = 0; i < 5; i++) {
+            screen.mouseClicked(left + 130, top + 128, 0);
+            if (((List<?>) entries.invoke(screen)).size() != initial) throw new IllegalStateException("Sort lost entries");
+        }
+        if (net.minecraftforge.fml.ModList.get().isLoaded("jei")) {
+            String previous = io.github.genichimaruo.singulo.compat.jei.JeiSearch.get();
+            if (previous == null) throw new IllegalStateException("JEI runtime unavailable in search review");
+            boolean sync = io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_JEI_SYNC.get();
+            try {
+                io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_JEI_SYNC.set(true);
+                box.setValue("@minecraft oak");
+                if (!box.getValue().equals(io.github.genichimaruo.singulo.compat.jei.JeiSearch.get())) {
+                    throw new IllegalStateException("Console search did not update JEI");
+                }
+                io.github.genichimaruo.singulo.compat.jei.JeiSearch.set("minecraft:oak_log");
+                screen.containerTick();
+                if (!"minecraft:oak_log".equals(box.getValue())) throw new IllegalStateException("JEI search did not update console");
+            } finally {
+                io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_JEI_SYNC.set(sync);
+                io.github.genichimaruo.singulo.compat.jei.JeiSearch.set(previous);
+                box.setValue("");
+            }
+            Singulo.LOGGER.info("SINGULO_JEI_SYNC_COMPLETE");
+        }
+        Singulo.LOGGER.info("SINGULO_SEARCH_COMPLETE");
     }
 
     private static void setField(Object target, String name, Object value) throws Exception {

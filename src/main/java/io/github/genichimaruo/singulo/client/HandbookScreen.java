@@ -35,6 +35,8 @@ public class HandbookScreen extends Screen {
     private static final int H = 232;
     private static final int LIST_W = 112;
     private static final int ROW = 16;
+    /** 章の一覧の上の検索欄の高さ（一覧はその下から）。 */
+    private static final int SEARCH_H = 14;
 
     /** 1ページぶんの中身。title と本文の行。 */
     /** 作者への支援（Ko-fi）。題名の行の右端の小さなボタンから、確認の画面を出してブラウザで開く。 */
@@ -47,11 +49,30 @@ public class HandbookScreen extends Screen {
     }
 
     /** 本文の1行（色つき）。 */
-    private record Line(Component text, int color) {}
+    /** 本文の1行。link があれば、押すとそのページへ移る（"章のid/ページのid"）。 */
+    private record Line(Component text, int color, @javax.annotation.Nullable String link) {
+        Line(Component text, int color) {
+            this(text, color, null);
+        }
+    }
+
+    /** ページの行き先（"章のid/ページのid" から引く）。 */
+    private record Target(Chapter chapter, int page) {}
+
+    private final Map<String, Target> targets = new HashMap<>();
+    /** 描いた行き先つきの行の場所（x, y, 幅, 高さ）と行き先。描くたびに作り直す。 */
+    private final List<Object[]> linkAreas = new ArrayList<>();
+    /** 「進み具合」の章を開いたときに出す段階（次の目標のある、いちばん若い段階）。 */
+    private int progressStart;
 
     private record Chapter(Component title, ItemStack icon, List<Page> pages) {}
 
     private final List<Chapter> chapters = new ArrayList<>();
+    /** 検索欄（文字があれば、左の一覧は章の代わりに、合うページの一覧になる）。 */
+    @javax.annotation.Nullable
+    private net.minecraft.client.gui.components.EditBox searchBox;
+    /** 検索で合ったページ（章の番号・ページの番号。よく合う順）。 */
+    private final List<int[]> results = new ArrayList<>();
     private static int lastChapter;
     private static int lastPage;
     private int chapter;
@@ -69,17 +90,121 @@ public class HandbookScreen extends Screen {
         Minecraft.getInstance().setScreen(new HandbookScreen());
     }
 
+    /** 開いたときに探す物の名前（なければ null）。 */
+    @javax.annotation.Nullable
+    private String focus;
+
+    /**
+     * Singulo の物なら、その物のことが書いてあるページを開く（持ち物などの画面は閉じる）。Singulo の物でなければ何もしない（false）。
+     */
+    public static boolean lookup(ItemStack stack) {
+        if (stack.isEmpty() || !Singulo.MODID.equals(BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace())) {
+            return false;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>) {
+            mc.player.closeContainer();
+        }
+        HandbookScreen screen = new HandbookScreen();
+        screen.focus = stack.getHoverName().getString();
+        mc.setScreen(screen);
+        return true;
+    }
+
+    /**
+     * 探す物のことが一番書いてあるページへ移る: 題名に名前があれば大きく、本文に名前が出てくる回数を足して比べる。
+     * 見つからなければ、前に開いていたページのまま。
+     */
+    private void focusPage() {
+        if (focus == null || focus.isBlank()) {
+            return;
+        }
+        int best = 0;
+        for (int c = 0; c < chapters.size(); c++) {
+            List<Page> pages = chapters.get(c).pages;
+            for (int p = 0; p < pages.size(); p++) {
+                Page pg = pages.get(p);
+                int score = pg.title().getString().contains(focus) ? 100 : 0;
+                for (Line l : pg.lines()) {
+                    String text = l.text().getString();
+                    for (int i = text.indexOf(focus); i >= 0; i = text.indexOf(focus, i + focus.length())) {
+                        score++;
+                    }
+                }
+                if (score > best) {
+                    best = score;
+                    select(c, p);
+                }
+            }
+        }
+        focus = null;
+    }
+
     @Override
     protected void init() {
         left = (width - W) / 2;
         top = (height - H) / 2;
         chapters.clear();
+        targets.clear();
         loadChapters();
         chapters.add(1, progressChapter());
         chapters.add(recordsChapter());
         chapters.add(supportersChapter());
         chapter = Math.min(lastChapter, chapters.size() - 1);
         page = Math.min(lastPage, chapters.get(chapter).pages.size() - 1);
+        String query = searchBox != null ? searchBox.getValue() : focus != null ? focus : "";
+        focusPage();
+        searchBox = new net.minecraft.client.gui.components.EditBox(font, left + 9, top + 22, LIST_W - 6, SEARCH_H - 4,
+                Component.translatable("gui.singulo.handbook.search"));
+        searchBox.setBordered(false);
+        searchBox.setMaxLength(48);
+        searchBox.setTextColor(0xFFECEEF0);
+        searchBox.setHint(Component.translatable("gui.singulo.handbook.search").withStyle(ChatFormatting.DARK_GRAY));
+        searchBox.setValue(query);
+        searchBox.setResponder(text -> {
+            search(text);
+            listScroll = 0;
+        });
+        addRenderableWidget(searchBox);
+        search(query);
+    }
+
+    /** 検索: 題名に文字があれば大きく、本文に出てくる回数を足して、合うページをよく合う順に並べる（大文字・小文字は区別しない）。 */
+    private void search(String text) {
+        results.clear();
+        String q = text.trim().toLowerCase(java.util.Locale.ROOT);
+        if (q.isEmpty()) {
+            return;
+        }
+        List<int[]> scored = new ArrayList<>();
+        for (int c = 0; c < chapters.size(); c++) {
+            List<Page> pages = chapters.get(c).pages;
+            for (int p = 0; p < pages.size(); p++) {
+                Page pg = pages.get(p);
+                int score = pg.title().getString().toLowerCase(java.util.Locale.ROOT).contains(q) ? 100 : 0;
+                for (Line l : pg.lines()) {
+                    String body = l.text().getString().toLowerCase(java.util.Locale.ROOT);
+                    for (int i = body.indexOf(q); i >= 0; i = body.indexOf(q, i + q.length())) {
+                        score++;
+                    }
+                }
+                if (score > 0) {
+                    scored.add(new int[]{c, p, score});
+                }
+            }
+        }
+        scored.sort((a, b) -> Integer.compare(b[2], a[2]));
+        results.addAll(scored);
+    }
+
+    /** 検索しているか（左の一覧が、合うページの一覧になっている）。 */
+    private boolean searching() {
+        return searchBox != null && !searchBox.getValue().isBlank();
+    }
+
+    /** 左の一覧の行の数（章か、検索で合ったページ）。 */
+    private int listRows() {
+        return searching() ? results.size() : chapters.size();
     }
 
     // ------------------------------------------------------------------ 中身
@@ -91,11 +216,17 @@ public class HandbookScreen extends Screen {
                 JsonObject c = e.getAsJsonObject();
                 String id = c.get("id").getAsString();
                 List<Page> pages = new ArrayList<>();
+                List<String> pageIds = new ArrayList<>();
                 for (JsonElement p : c.getAsJsonArray("pages")) {
                     String key = "guide.singulo." + p.getAsString();
                     pages.add(textPage(Component.translatable(key + ".title"), Component.translatable(key + ".body").getString()));
+                    pageIds.add(p.getAsString());
                 }
-                chapters.add(new Chapter(Component.translatable("guide.singulo." + id), icon(c.get("icon").getAsString()), pages));
+                Chapter chapter = new Chapter(Component.translatable("guide.singulo." + id), icon(c.get("icon").getAsString()), pages);
+                chapters.add(chapter);
+                for (int i = 0; i < pageIds.size(); i++) {
+                    targets.put(pageIds.get(i), new Target(chapter, i));      // ページのidは "章のid.ページのid"
+                }
             }
         } catch (Exception ex) {
             Singulo.LOGGER.error("ハンドブックの章を読めなかった", ex);
@@ -147,9 +278,12 @@ public class HandbookScreen extends Screen {
                 doneAll++;
             }
         }
+        progressStart = -1;
         for (int stage = 1; stage <= 5; stage++) {
             List<Line> lines = new ArrayList<>();
             lines.add(new Line(Component.translatable("gui.singulo.handbook.done_count", doneAll, order.size()), Panel.WELL_EDGE));
+            // この段階の流れ（やることの順番）のページへ
+            lines.add(new Line(Component.translatable("gui.singulo.handbook.read_flow", stage), 0xFF2A8FB8, "stage" + stage + ".flow"));
             List<Line> next = new ArrayList<>();
             List<Line> rest = new ArrayList<>();
             for (String id : order) {
@@ -171,6 +305,9 @@ public class HandbookScreen extends Screen {
                 }
             }
             if (!next.isEmpty()) {
+                if (progressStart < 0) {
+                    progressStart = stage - 1;
+                }
                 lines.add(new Line(Component.translatable("gui.singulo.handbook.next"), 0xFF2A8FB8));
                 lines.addAll(next);
             }
@@ -178,6 +315,7 @@ public class HandbookScreen extends Screen {
             pages.add(new Page(Component.translatable("gui.singulo.handbook.stage", stage)
                     .append(" ").append(Component.translatable("stage.singulo." + stage)), lines));
         }
+        progressStart = Math.max(0, progressStart);
         return new Chapter(Component.translatable("gui.singulo.handbook.progress"), new ItemStack(Items.WRITABLE_BOOK), pages);
     }
 
@@ -235,16 +373,21 @@ public class HandbookScreen extends Screen {
         Panel.background(g, left, top, W, H);
         g.drawString(font, title, left + 8, top + 7, Panel.TEXT, false);
         drawSupport(g, mouseX, mouseY);
-        // 章の一覧
-        int listTop = top + 20;
-        int listH = H - 28;
+        // 検索欄と、章の一覧（検索しているときは、合うページの一覧）
+        Panel.well(g, left + 6, top + 20, LIST_W, SEARCH_H - 2);
+        if (searchBox != null) {
+            searchBox.render(g, mouseX, mouseY, partialTick);
+        }
+        int listTop = top + 20 + SEARCH_H;
+        int listH = H - 28 - SEARCH_H;
         Panel.well(g, left + 6, listTop, LIST_W, listH);
         g.enableScissor(left + 6, listTop, left + 6 + LIST_W, listTop + listH);
-        for (int i = 0; i < chapters.size(); i++) {
+        for (int i = 0; i < listRows(); i++) {
             int y = listTop + i * ROW - listScroll;
-            Chapter c = chapters.get(i);
+            Chapter c = chapters.get(searching() ? results.get(i)[0] : i);
+            boolean on = searching() ? results.get(i)[0] == chapter && results.get(i)[1] == page : i == chapter;
             boolean hover = Panel.inside(mouseX, mouseY, left + 6, y, LIST_W, ROW) && mouseY >= listTop && mouseY < listTop + listH;
-            if (i == chapter) {
+            if (on) {
                 g.fill(left + 6, y, left + 6 + LIST_W, y + ROW, 0xFF2A6F8A);
             } else if (hover) {
                 g.fill(left + 6, y, left + 6 + LIST_W, y + ROW, 0xFF4A535C);
@@ -254,7 +397,12 @@ public class HandbookScreen extends Screen {
             g.pose().scale(0.75F, 0.75F, 1);
             g.renderItem(c.icon, 0, 0);
             g.pose().popPose();
-            g.drawString(font, font.plainSubstrByWidth(c.title.getString(), LIST_W - 22), left + 22, y + 4, 0xFFECEEF0, false);
+            String label = searching() ? c.pages.get(results.get(i)[1]).title().getString() : c.title.getString();
+            g.drawString(font, font.plainSubstrByWidth(label, LIST_W - 22), left + 22, y + 4, 0xFFECEEF0, false);
+        }
+        if (searching() && results.isEmpty()) {
+            g.drawString(font, font.plainSubstrByWidth(Component.translatable("gui.singulo.handbook.search.none").getString(), LIST_W - 8),
+                    left + 10, listTop + 4, 0xFFBFC8D0, false);
         }
         g.disableScissor();
 
@@ -270,10 +418,19 @@ public class HandbookScreen extends Screen {
         g.enableScissor(px, bodyTop, px + pw, bodyTop + bodyH);
         int y = bodyTop - scroll;
         SupporterCredits.Entry hoveredSupporter = null;
+        linkAreas.clear();
         for (Line line : p.lines) {
-            for (FormattedCharSequence seq : font.split(line.text, pw)) {
-                g.drawString(font, seq, px, y, line.color, false);
+            int lineTop = y;
+            boolean link = line.link != null && targets.containsKey(line.link);
+            boolean hover = link && Panel.inside(mouseX, mouseY, px, lineTop, pw, font.split(line.text, pw).size() * 10)
+                    && mouseY >= bodyTop && mouseY < bodyTop + bodyH;
+            Component text = link ? line.text.copy().withStyle(hover ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) : line.text;
+            for (FormattedCharSequence seq : font.split(text, pw)) {
+                g.drawString(font, seq, px, y, hover ? 0xFF1E5A73 : line.color, false);
                 y += 10;
+            }
+            if (link) {
+                linkAreas.add(new Object[]{px, lineTop, pw, y - lineTop, line.link});
             }
             y += 3;
         }
@@ -344,13 +501,41 @@ public class HandbookScreen extends Screen {
             net.minecraft.client.gui.screens.ConfirmLinkScreen.confirmLinkNow(SUPPORT_URL, this, true);
             return true;
         }
-        int listTop = top + 20;
-        int listH = H - 28;
+        if (searchBox != null && Panel.inside(mx, my, left + 6, top + 20, LIST_W, SEARCH_H - 2)) {
+            searchBox.setFocused(true);
+            setFocused(searchBox);
+            return true;
+        }
+        if (searchBox != null) {
+            searchBox.setFocused(false);
+        }
+        int listTop = top + 20 + SEARCH_H;
+        int listH = H - 28 - SEARCH_H;
         if (Panel.inside(mx, my, left + 6, listTop, LIST_W, listH)) {
             int i = (int) ((my - listTop + listScroll) / ROW);
-            if (i >= 0 && i < chapters.size()) {
-                select(i, 0);
+            if (searching()) {
+                if (i >= 0 && i < results.size()) {
+                    select(results.get(i)[0], results.get(i)[1]);
+                }
                 return true;
+            }
+            if (i >= 0 && i < chapters.size()) {
+                // 「進み具合」は、次の目標のある段階のページから開く
+                select(i, i == 1 ? Math.min(progressStart, chapters.get(i).pages.size() - 1) : 0);
+                return true;
+            }
+        }
+        int bodyTop = top + 38;
+        int bodyH = H - 38 - 22;
+        if (my >= bodyTop && my < bodyTop + bodyH) {
+            for (Object[] area : linkAreas) {
+                if (Panel.inside(mx, my, (int) area[0], (int) area[1], (int) area[2], (int) area[3])) {
+                    Target t = targets.get((String) area[4]);
+                    if (t != null && chapters.contains(t.chapter())) {
+                        select(chapters.indexOf(t.chapter()), t.page());
+                        return true;
+                    }
+                }
             }
         }
         int px = left + LIST_W + 14;
@@ -370,16 +555,32 @@ public class HandbookScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mx, double my, double dy) {
         if (mx < left + LIST_W + 8) {
-            int max = Math.max(0, chapters.size() * ROW - (H - 28));
+            int max = Math.max(0, listRows() * ROW - (H - 28 - SEARCH_H));
             listScroll = Math.max(0, Math.min(max, listScroll - (int) (dy * ROW)));
         } else if (chapters.get(chapter).pages.get(page).supporters.isEmpty()) {
-            scroll = Math.max(0, scroll - (int) (dy * 12));
+            scroll = Math.max(0, Math.min(maxScroll(), scroll - (int) (dy * 12)));
         }
         return true;
     }
 
+    /** 本文のスクロールの上限（本文の高さが見える高さを超えた分。超えなければ 0）。描画と同じ行の高さで数える。 */
+    private int maxScroll() {
+        Page p = chapters.get(chapter).pages.get(page);
+        int pw = W - LIST_W - 22;
+        int bodyH = H - 38 - 22;
+        int height = 0;
+        for (Line line : p.lines) {
+            height += font.split(line.text, pw).size() * 10 + 3;
+        }
+        height += p.supporters.size() * (SupporterPlaque.HEIGHT + SupporterPlaque.GAP);
+        return Math.max(0, height - bodyH);
+    }
+
     @Override
     public boolean keyPressed(int key, int scan, int mods) {
+        if (searchBox != null && searchBox.isFocused() && key != 256) {
+            return searchBox.keyPressed(key, scan, mods) || searchBox.canConsumeInput();   // 打っている間は、ページ送りや画面を閉じるキーにしない
+        }
         if (key == 262 && page < chapters.get(chapter).pages.size() - 1) {          // →
             select(chapter, page + 1);
             return true;

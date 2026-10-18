@@ -1478,22 +1478,23 @@ def degenerate_nucleus():
 
 
 def precision_actuator():
-    """精密アクチュエーター: 鋼の歯車と、そこから斜め上へ伸びるピストンの腕。継ぎ目に橙の警告色、軸は光る。"""
+    """精密アクチュエーター: 鋼の歯車と、そこから斜め上へ伸びるピストンの腕。継ぎ目に橙の警告色、軸は光る。
+    縁取りを含めて枠の内側に1マスの余白が残るよう、絵は 2〜13 の範囲に収める。"""
     def f(d):
         steel, dark, hi = (150, 158, 172, 255), (70, 76, 90, 255), (214, 220, 230, 255)
         orange = (240, 140, 60, 255)
         # 歯車（左下）
-        d.ellipse([1, 6, 10, 15], fill=steel)
-        for x, y in ((5, 5), (5, 15), (0, 10), (10, 10), (2, 7), (8, 7), (2, 13), (8, 13)):
+        d.ellipse([3, 6, 9, 12], fill=steel)
+        for x, y in ((6, 5), (6, 13), (2, 9), (10, 9), (3, 7), (9, 7), (3, 11), (9, 11)):
             d.point((x, y), fill=steel)
-        d.ellipse([3, 8, 8, 13], fill=dark)
-        d.ellipse([4, 9, 7, 12], fill=(255, 200, 120, 255))
+        d.ellipse([4, 7, 8, 11], fill=dark)
+        d.ellipse([5, 8, 7, 10], fill=(255, 200, 120, 255))
         # ピストンの腕（右上へ）
-        d.line([(6, 9), (13, 2)], fill=dark, width=3)
-        d.line([(7, 8), (12, 3)], fill=hi)
-        d.rectangle([9, 4, 11, 6], fill=orange)
-        d.rectangle([12, 1, 14, 3], fill=steel)
-        d.point((13, 2), fill=(255, 255, 255, 255))
+        d.line([(7, 8), (12, 3)], fill=dark, width=3)
+        d.line([(8, 7), (11, 4)], fill=hi)
+        d.rectangle([9, 5, 10, 6], fill=orange)
+        d.rectangle([11, 2, 13, 4], fill=steel)
+        d.point((12, 3), fill=(255, 255, 255, 255))
     return outlined(f)
 
 

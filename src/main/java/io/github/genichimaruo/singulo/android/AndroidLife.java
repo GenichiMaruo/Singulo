@@ -30,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * 拠点の暮らし: 手が空いている護衛（戦い・作業・充電・修理・巡回をしていない）が、ときどきすること。持ち主がそばに来ても続ける。
+ * 迎撃モードの護衛はステーションの上（2体目からはすぐ横）で待つことに専念し、暮らしはしない（夜はその場で立ったまま昼寝する）。
  * <ul>
  * <li>座る: ステーションのそばの階段・ハーフブロック・ほかの mod の椅子に座る（なければ、地面に座る）。夜は座って昼寝（目を閉じて Z）。</li>
  * <li>小さな手入れ: 植木鉢・作物に手をかざす（きらきら。成長は早めない）、床を掃く仕草、しばらく落ちたままの物を拾って、そばのチェストへしまう。</li>
@@ -96,7 +97,7 @@ final class AndroidLife extends Goal {
     /** 手が空いているか（暮らしを始めてよい・続けてよい）。 */
     private boolean free() {
         if (!android.isGuard() || !android.printed() || !android.active() || android.getTarget() != null || android.isWorking()
-                || android.home() == null || android.mode() == RuinAndroid.MODE_FOLLOW) {
+                || android.home() == null || android.mode() == RuinAndroid.MODE_FOLLOW || android.mode() == RuinAndroid.MODE_GUARD) {
             return false;
         }
         int s = android.state();
@@ -295,7 +296,7 @@ final class AndroidLife extends Goal {
     private RuinAndroid findPeer(ServerLevel level) {
         for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, new AABB(anchor()).inflate(RANGE),
                 a -> a != android && a.isAlive() && a.isGuard() && java.util.Objects.equals(a.owner(), android.owner()) && a.life != null
-                        && !a.life.busy() && a.life.free())) {
+                        && !a.napping() && !a.life.busy() && a.life.free())) {
             return a;
         }
         return null;

@@ -15,11 +15,28 @@ import org.lwjgl.glfw.GLFW;
 public final class SinguloKeys {
     public static final KeyMapping TOGGLE_AREA = new KeyMapping("key.singulo.toggle_area", InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_G, "key.categories.singulo");
+    /** カーソルを合わせた物（画面の外では手に持った物）の、ハンドブックのページを開く。 */
+    public static final KeyMapping HANDBOOK = new KeyMapping("key.singulo.handbook_lookup", InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_H, "key.categories.singulo");
 
     private SinguloKeys() {}
 
     static void register(RegisterKeyMappingsEvent event) {
         event.register(TOGGLE_AREA);
+        event.register(HANDBOOK);
+    }
+
+    /** 持ち物などの画面で、カーソルを合わせた Singulo の物のハンドブックのページを開く。 */
+    static void onScreenKey(net.minecraftforge.client.event.ScreenEvent.KeyPressed.Pre event) {
+        if (!HANDBOOK.isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))
+                || !(event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen)
+                || screen.getFocused() instanceof net.minecraft.client.gui.components.EditBox) {
+            return;                                    // 文字を打っている間は、ふつうの文字として打てるように
+        }
+        var slot = screen.getSlotUnderMouse();
+        if (slot != null && HandbookScreen.lookup(slot.getItem())) {
+            event.setCanceled(true);
+        }
     }
 
     /** グラビトン・マニピュレーターの左右のクリックの状態（変わったときだけサーバーへ送る）。 */
@@ -56,6 +73,11 @@ public final class SinguloKeys {
         if (right != rightDown && mc.getConnection() != null) {
             rightDown = right;
             SinguloNetwork.sendToServer(new io.github.genichimaruo.singulo.network.ManipulatorInputPayload(true, right));
+        }
+        while (HANDBOOK.consumeClick()) {
+            if (mc.player != null && mc.screen == null) {
+                HandbookScreen.lookup(mc.player.getMainHandItem());
+            }
         }
         while (TOGGLE_AREA.consumeClick()) {
             if (mc.player == null) {

@@ -90,8 +90,11 @@ jobs:
       - name: Require GUI captures
         if: matrix.namespace == 'singulo'
         run: |
-          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 20
-          grep -q 'SINGULO_GUI_COMPLETE 20' build/${{ matrix.loader }}/gui-review/logs/latest.log
+          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 22
+          grep -q 'SINGULO_GUI_COMPLETE 22' build/${{ matrix.loader }}/gui-review/logs/latest.log
+          grep -q 'SINGULO_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
+          grep -q 'SINGULO_JEI_SYNC_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
+          grep -q 'SINGULO_HANDBOOK_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
         if: matrix.namespace == 'singulo'
         run: python3 tools/review/check_gui_png.py --loader "$LOADER"

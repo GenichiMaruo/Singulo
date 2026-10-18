@@ -21,6 +21,8 @@ import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 
 public final class SinguloItems {
+    private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner");
+    public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner");
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(net.minecraft.core.registries.Registries.ITEM, Singulo.MODID);
 
     /** 手持ちの道具（生成表ではなく専用クラスで作る）。 */
@@ -134,6 +136,8 @@ public final class SinguloItems {
             () -> new ForgeSpawnEggItem(SinguloEntities.AXE_ANDROID, 0xB86A48, 0xFF6E40, new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> BIT_ANDROID_SPAWN_EGG = ITEMS.register("bit_android_spawn_egg",
             () -> new ForgeSpawnEggItem(SinguloEntities.BIT_ANDROID, 0x2C345C, 0xB080FF, new Item.Properties()));
+    public static final RegistryObject<ForgeSpawnEggItem> GUNNER_ANDROID_SPAWN_EGG = ITEMS.register("gunner_android_spawn_egg",
+            () -> new ForgeSpawnEggItem(SinguloEntities.GUNNER_ANDROID, 0xC8E2F6, 0x6EF0D2, new Item.Properties().rarity(Rarity.EPIC)));
     public static final RegistryObject<ForgeSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new ForgeSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
     public static final RegistryObject<ForgeSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
@@ -418,7 +422,10 @@ public final class SinguloItems {
         }
         // 素材・部品・回収物（生成表から）
         for (ItemDef def : GeneratedContent.ITEMS) {
-            TAB_ORDER.add(ITEMS.register(def.id(), () -> create(def)));
+            RegistryObject<Item> item = ITEMS.register(def.id(), () -> create(def));
+            if (!HIDDEN.contains(def.id())) {
+                TAB_ORDER.add(item);
+            }
         }
         // 用途ごとのまとまり（GeneratedContent.TAB_ORDER の順）。そこにないものは最後に段階順で
         TAB_ORDER.sort(java.util.Comparator.comparingInt((RegistryObject<? extends Item> item) -> tabIndex(item))
@@ -427,7 +434,9 @@ public final class SinguloItems {
 
     private static Item create(ItemDef def) {
         Item.Properties props = new Item.Properties();
-        if (def.stage() >= 5) {
+        if (EPIC.contains(def.id())) {
+            props.rarity(Rarity.EPIC);
+        } else if (def.stage() >= 5) {
             props.rarity(Rarity.EPIC);
         } else if (def.stage() >= 4) {
             props.rarity(Rarity.RARE);

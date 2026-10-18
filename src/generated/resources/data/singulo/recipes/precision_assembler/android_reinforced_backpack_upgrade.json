@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 160,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:android_backpack_upgrade"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:android_reinforced_backpack_upgrade",
+    "count": 1
+  }
+}

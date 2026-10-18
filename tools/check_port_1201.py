@@ -36,7 +36,8 @@ def validate_jar(path):
         check_layout(names)
         metadata = tomllib.loads(archive.read('META-INF/mods.toml').decode())
         mod = next(m for m in metadata['mods'] if m['modId'] == 'singulo')
-        assert mod['version'] == '0.8.0', 'Incorrect mod version'
+        version = next(line.split('=', 1)[1].strip() for line in (ROOT / 'gradle.properties').read_text().splitlines() if line.startswith('mod_version='))
+        assert mod['version'] == version, 'Incorrect mod version'
         dependencies = {d['modId']: d for d in metadata['dependencies']['singulo']}
         assert dependencies['minecraft']['versionRange'] == '[1.20.1]', 'Incorrect Minecraft dependency'
         assert 'forge' in dependencies, 'Missing 1.20.1 loader dependency'
