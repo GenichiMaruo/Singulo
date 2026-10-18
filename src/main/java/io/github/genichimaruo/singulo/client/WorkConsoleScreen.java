@@ -171,8 +171,8 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     }
 
     private static <T> void saveConfig(net.minecraftforge.common.ForgeConfigSpec.ConfigValue<T> value, T v) {
+        // Forge 47's file config already autosaves each set.
         value.set(v);
-        value.save();
     }
 
     /**

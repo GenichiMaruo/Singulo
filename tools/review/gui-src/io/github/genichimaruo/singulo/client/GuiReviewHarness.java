@@ -39,6 +39,20 @@ public final class GuiReviewHarness {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(name)));
     }
 
+    @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class ConfigReloadReview {
+        private static int reloads;
+
+        @SubscribeEvent
+        public static void reloaded(net.minecraftforge.fml.event.config.ModConfigEvent.Reloading event) {
+            if (event.getConfig().getSpec() != io.github.genichimaruo.singulo.generated.ClientConfig.SPEC) return;
+            if (!Minecraft.getInstance().isSameThread()) {
+                throw new IllegalStateException("Client config reload raced the render thread");
+            }
+            reloads++;
+        }
+    }
+
     @SubscribeEvent
     public static void tick(TickEvent.ClientTickEvent event) throws Exception {
         if (event.phase != TickEvent.Phase.END) return;
@@ -277,6 +291,14 @@ public final class GuiReviewHarness {
                 }
                 capture(mc, "handbook-search-en-1280x800");
                 Singulo.LOGGER.info("SINGULO_HANDBOOK_SEARCH_COMPLETE");
+                if (ConfigReloadReview.reloads == 0) throw new IllegalStateException("Client config watcher never reloaded after UI autosaves");
+                var savedConfig = new com.electronwill.nightconfig.toml.TomlParser().parse(Files.readString(
+                        net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get().resolve("singulo-client.toml")));
+                if (!java.util.Objects.equals(savedConfig.get("gui.workOrderSort"),
+                        io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT.get())) {
+                    throw new IllegalStateException("Persisted sort mode differs from the reloaded setting");
+                }
+                Singulo.LOGGER.info("SINGULO_CONFIG_FILE_RELOAD_COMPLETE");
                 Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 22");
                 phase = 29;
                 mc.stop();

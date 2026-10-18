@@ -28,6 +28,7 @@ public final class SinguloClient {
     public static void init() { new SinguloClient(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()); }
 
     public SinguloClient(IEventBus modBus) {
+        LegacyClientConfig.register(modBus);
         modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerItemColors);
         modBus.addListener(SinguloClient::registerRenderers);
