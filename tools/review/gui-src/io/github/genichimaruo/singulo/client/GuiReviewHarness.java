@@ -335,6 +335,29 @@ public final class GuiReviewHarness {
             }
             Singulo.LOGGER.info("SINGULO_JEI_SYNC_COMPLETE");
         }
+        // Forge 47 reloads config caches on a file-watcher thread after saving.
+        // Read the real UI concurrently with cache invalidation to cover that race.
+        var reloading = new java.util.concurrent.atomic.AtomicBoolean(true);
+        Thread watcher = new Thread(() -> {
+            while (reloading.get()) {
+                io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT.clearCache();
+                io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT_REVERSED.clearCache();
+                Thread.yield();
+            }
+        }, "singulo-review-config-reload");
+        watcher.setDaemon(true);
+        watcher.start();
+        try {
+            for (int i = 0; i < 10000; i++) {
+                if (((List<?>) entries.invoke(screen)).size() != initial) {
+                    throw new IllegalStateException("Config reload changed the unfiltered stock list");
+                }
+            }
+        } finally {
+            reloading.set(false);
+            watcher.join();
+        }
+        Singulo.LOGGER.info("SINGULO_CONFIG_RELOAD_COMPLETE");
         Singulo.LOGGER.info("SINGULO_SEARCH_COMPLETE");
     }
 

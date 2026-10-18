@@ -142,7 +142,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     }
 
     private static boolean jeiSync() {
-        return jeiLoaded() && io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_JEI_SYNC.get();
+        return jeiLoaded() && configValue(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_JEI_SYNC);
     }
 
     @Nullable
@@ -157,11 +157,17 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
     }
 
     private static String sortMode() {
-        return io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT.get();
+        return configValue(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT);
     }
 
     private static boolean sortReversed() {
-        return io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT_REVERSED.get();
+        return configValue(io.github.genichimaruo.singulo.generated.ClientConfig.WORK_ORDER_SORT_REVERSED);
+    }
+
+    /** Forge 47 can clear its cached value during an asynchronous config reload. */
+    private static <T> T configValue(net.minecraftforge.common.ForgeConfigSpec.ConfigValue<T> setting) {
+        T value = setting.get();
+        return value == null ? setting.getDefault() : value;
     }
 
     private static <T> void saveConfig(net.minecraftforge.common.ForgeConfigSpec.ConfigValue<T> value, T v) {
@@ -175,7 +181,9 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
      */
     private List<CompoundTag> visibleEntries() {
         String query = searchBox == null ? "" : searchBox.getValue().trim().toLowerCase(java.util.Locale.ROOT);
-        Object key = java.util.List.of(menu.viewVersion(), query, sortMode(), sortReversed());
+        String sort = sortMode();
+        boolean reversed = sortReversed();
+        Object key = java.util.List.of(menu.viewVersion(), query, sort, reversed);
         if (key.equals(visibleKey)) {
             return visible;
         }
@@ -191,7 +199,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         }
         java.text.Collator collator = java.text.Collator.getInstance(java.util.Locale.forLanguageTag(
                 minecraft.getLanguageManager().getSelected().replace('_', '-')));
-        java.util.Comparator<CompoundTag> order = switch (sortMode()) {
+        java.util.Comparator<CompoundTag> order = switch (sort) {
             case "name" -> java.util.Comparator.comparing(e -> stacks.get(e).getHoverName().getString(), collator);
             case "count" -> java.util.Comparator.comparingLong((CompoundTag e) -> e.getLong("count")).reversed();
             case "mod" -> java.util.Comparator.comparing(e -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stacks.get(e).getItem()).getNamespace());
@@ -201,7 +209,7 @@ public class WorkConsoleScreen extends AbstractContainerScreen<WorkConsoleMenu> 
         if (order != null) {
             out.sort(order);                            // 同じ順位の物は、指令台の順のまま
         }
-        if (sortReversed()) {
+        if (reversed) {
             java.util.Collections.reverse(out);
         }
         visible = out;

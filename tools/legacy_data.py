@@ -23,6 +23,8 @@ def convert(path: Path, obj):
             return value
         if not isinstance(value, dict): return value
         value = {k: visit(v) for k, v in value.items()}
+        if isinstance(value.get('loader'), str) and value['loader'].startswith('neoforge:'):
+            value['loader'] = 'forge:' + value['loader'].split(':', 1)[1]
         if value.get('type') == 'neoforge:mod_loaded':
             value['type'] = 'forge:mod_loaded'
         if value.get('type') == 'neoforge:components':
