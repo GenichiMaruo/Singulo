@@ -3,6 +3,7 @@
 部品の配置は src/main/java/.../client/AndroidModel.createLayer と同じ。3体で形は共通で、髪・光の色・武器だけが違う。
 共通の目印: 白い陶磁の外装、黒いインナー、右のこめかみのセンサーの羽、胸の発光ライン、スカートの裾の発光ライン。
 """
+import json
 import random
 
 # 名前: (u, v, 幅, 高さ, 奥行き)
@@ -80,6 +81,15 @@ VARIANTS = {
         'iris': ((150, 52, 30), (255, 144, 96)),
         'seed': 43,
     },
+    # 射撃型「シエル」: 薄い青の髪に、深い青のひと房と、淡い水緑の光（組み立て式のレールガンと片手の小型銃）
+    'gunner_android': {
+        'hair': ((204, 228, 246), (168, 202, 232), (132, 168, 208)),
+        'streak': ((92, 150, 222), (62, 116, 192)),
+        'accent': (110, 240, 210),
+        'iris': ((30, 118, 140), (120, 236, 222)),
+        'seed': 53,
+        'inner': True,
+    },
     # ビット型「ノクス」: 紺の髪に菫のひと房
     'bit_android': {
         'hair': ((50, 58, 98), (36, 42, 76), (24, 28, 54)),
@@ -120,6 +130,54 @@ def textures(te, save):
         base, glow = paint(pal, Image)
         save(base, te / f'{name}.png')
         save(glow, te / f'{name}_glow.png')
+    save(gunner_charge(VARIANTS['gunner_android'], Image), te / 'gunner_android_charge.png')
+
+
+def gunner_charge(pal, Image):
+    """射撃型がレールガンを溜めている間だけ重ねる、髪の光（普段は光らない髪の筋の一部と毛先が、水緑に光る）。"""
+    im = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
+    accent = pal['accent']
+    tip = tuple(min(255, c + 90) for c in accent)
+
+    def put(x, y, c):
+        im.putpixel((x, y), tuple(c) + (255,))
+
+    def part(name):
+        return faces(*ANDROID_PARTS[name])
+
+    def strands(rect, cols, top, tip_rows=1):
+        """髪の面の縦の筋 cols（面の左からの列）を、top 段目から毛先まで光らせる（毛先は明るく）。"""
+        x0, y0, x1, y1 = rect
+        for c in cols:
+            for y in range(y0 + top, y1):
+                put(x0 + c, y, tip if y >= y1 - tip_rows else accent)
+
+    # 後ろ髪: 背中側の筋3本と、両側面の筋。裏（頭側）の差し色の縁
+    f = part('back_hair')
+    strands(f['back'], (2, 5, 8), 3, 2)
+    strands(f['side_a'], (0,), 4)
+    strands(f['side_b'], (1,), 4)
+    x0, y0, x1, y1 = f['down']
+    for x in range(x0, x1, 2):
+        put(x, y0, tip)
+    # 髪の殻の後ろ: 下半分の筋
+    f = part('hair')
+    strands(f['back'], (2, 5), 4)
+    # 横の房とサイドテール: 毛先と、筋1本
+    for name in ('side_lock_l', 'side_lock_r'):
+        f = part(name)
+        for k in ('front', 'back', 'side_a', 'side_b'):
+            strands(f[k], (0,), max(0, f[k][3] - f[k][1] - 3), 1)
+    f = part('ponytail')
+    for k in ('back', 'side_a', 'side_b'):
+        strands(f[k], (1 if k == 'back' else 0,), 2, 2)
+    # アホ毛の先
+    f = part('ahoge')
+    for k in ('side_a', 'side_b'):
+        x0, y0, x1, y1 = f[k]
+        put(x0, y0, tip)
+        put(x0 + 1, y0, tip)
+    return im
 
 
 def paint(pal, Image):
@@ -603,6 +661,12 @@ def item_textures(ti, save):
     from PIL import Image
     for name, pal in VARIANTS.items():
         kind = name.replace('_android', '')
+        if kind in ANIMATED_MEMORIES:
+            sheet = animated_memory(pal['accent'], Image)
+            save(sheet, ti / f'android_memory_{kind}.png')
+            (ti / f'android_memory_{kind}.png.mcmeta').write_text(
+                json.dumps({'animation': {'frametime': 2, 'interpolate': False}}), encoding='utf-8')
+            continue
         save(memory_icon(pal['accent'], Image), ti / f'android_memory_{kind}.png')
     save(kit_icon(Image), ti / 'android_kit.png')
     save(charger_icon(Image), ti / 'android_charger.png')
@@ -613,6 +677,8 @@ def item_textures(ti, save):
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
     save(wear(print_unit_icon(Image), 37), ti / 'android_factory_print_unit.png')
     save(wear(backpack_icon(Image), 19), ti / 'android_backpack_upgrade.png')
+    save(wear(backpack_icon(Image, 2), 23), ti / 'android_reinforced_backpack_upgrade.png')
+    save(wear(backpack_icon(Image, 3), 29), ti / 'android_large_backpack_upgrade.png')
     save(wear(tank_icon(Image), 31), ti / 'android_tank_upgrade.png')
     save(droplet_icon(Image), ti / 'fluid_sample.png')
     save(bubble_icon(Image), ti / 'chemical_sample.png')
@@ -630,9 +696,45 @@ def item_textures(ti, save):
     save(area_card_icon(Image, 0), ti / 'area_card.png')
     save(area_card_icon(Image, 1), ti / 'area_card_first.png')
     save(area_card_icon(Image, 2), ti / 'area_card_recorded.png')
-    save(wear(glasses_icon(Image), 37), ti / 'survey_glasses.png')
+    save(glasses_icon(Image), ti / 'survey_glasses.png')         # レンズを透かすので、汚しを重ねない
+    save(glasses_worn_texture(Image), ti / 'survey_glasses_worn.png')
     save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
     save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
+
+
+# 結晶の中を光が流れるアニメーションつきのメモリ（射撃型だけ）
+ANIMATED_MEMORIES = ('gunner',)
+MEMORY_FRAMES = 16
+
+
+def animated_memory(accent, Image):
+    """アニメーションつきの小型クリスタルメモリ（縦に並べた16コマ）。
+
+    結晶を斜めに光の帯が下から上へ流れ、表示灯がゆっくり明滅する。帯が過ぎた後は、結晶の中に小さな光の粒が残って消える。
+    """
+    base = memory_icon(accent, Image)
+    sheet = Image.new('RGBA', (16, 16 * MEMORY_FRAMES), (0, 0, 0, 0))
+    for f in range(MEMORY_FRAMES):
+        im = base.copy()
+        px = im.load()
+        band = 14 - f * 22 / MEMORY_FRAMES          # 帯の位置（x + y の値。下から上へ）
+        for y in range(2, 10):
+            for x in range(5, 11):
+                r, g, b, a = px[x, y]
+                d = abs((x * 0.6 + y) - band)
+                k = max(0.0, 1 - d / 2.0)
+                if k > 0:
+                    px[x, y] = (min(255, int(r + (255 - r) * 0.95 * k)), min(255, int(g + (255 - g) * 0.95 * k)),
+                                min(255, int(b + (255 - b) * 0.95 * k)), min(255, int(a + 105 * k)))
+        # 帯が通った後に残る光の粒
+        for i, (x, y) in enumerate(((9, 8), (6, 6), (8, 4), (7, 8))):
+            if (f - i * 4) % MEMORY_FRAMES in (1, 2):
+                px[x, y] = (255, 255, 255, 230)
+        # 表示灯の明滅（明るい8コマ・暗い8コマ）
+        lamp = 1.0 if (f // 4) % 2 == 0 else 0.45
+        px[11, 11] = tuple(int(c * lamp) for c in accent) + (255,)
+        sheet.paste(im, (0, 16 * f))
+    return sheet
 
 
 def memory_icon(accent, Image):
@@ -895,25 +997,45 @@ def area_card_icon(Image, corners):
 
 
 def glasses_icon(Image):
-    """測量メガネ: 濃い枠の丸いレンズ2つ（淡い水色、左上に光）、真ん中のブリッジに小さな金の回路、両端につる。"""
+    """測量メガネ（持ち物の絵）: 縁なしの四角いレンズ2つ（透けて見える薄い水色。輪郭だけ少し濃く、左上に光）と、
+    真ん中の細いブリッジ、両端のつる（濃い金属）。つるの付け根に、小さな水色の表示灯。"""
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     px = im.load()
-    frame, lens, shine, gold = (54, 58, 72, 255), (150, 214, 240, 255), (232, 250, 255, 255), (226, 186, 92, 255)
-    for cx in (4, 11):
-        for y in range(5, 12):
-            for x in range(cx - 3, cx + 4):
-                d = (x - cx) ** 2 + (y - 8) ** 2
-                if d <= 10:
-                    px[x, y] = frame if d >= 6 else lens
-        px[cx - 1, 7] = shine
-        px[cx - 2, 8] = shine
+    metal = (58, 64, 80, 255)
+    lens, edge, shine = (170, 226, 246, 80), (150, 214, 240, 170), (240, 252, 255, 210)
+    led = (110, 240, 230, 255)
+    for x0 in (1, 9):
+        x1 = x0 + 5
+        for y in range(5, 11):
+            for x in range(x0, x1 + 1):
+                px[x, y] = edge if x in (x0, x1) or y in (5, 10) else lens
+        px[x0 + 1, 6] = shine
+        px[x0 + 2, 6] = shine
+        px[x0 + 1, 7] = shine
     for x in (7, 8):
-        px[x, 7] = frame
-    px[7, 6] = gold
-    px[8, 6] = gold
-    for x in (0, 15):
-        px[x, 7] = frame
-        px[x, 6] = frame
+        px[x, 6] = metal
+    px[0, 6] = metal
+    px[15, 6] = metal
+    px[1, 6] = metal
+    px[14, 6] = metal
+    px[14, 5] = led
+    return im
+
+
+def glasses_worn_texture(Image):
+    """頭に掛けたときの測量メガネの絵（16×16）: 左上は枠の金属（上の縁が明るい）、右上は透けたレンズ（薄い水色、斜めの光）、
+    左下は水色の表示灯。"""
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(8):
+        for x in range(8):
+            px[x, y] = (128, 138, 158, 255) if y == 0 else (58, 64, 80, 255)
+    for y in range(8):
+        for x in range(8, 16):
+            px[x, y] = (240, 252, 255, 150) if (x - 8) == y or (x - 7) == y else (170, 226, 246, 70)
+    for y in range(8, 12):
+        for x in range(0, 4):
+            px[x, y] = (110, 240, 230, 255)
     return im
 
 
@@ -969,8 +1091,9 @@ def battery_icon(Image):
     return im
 
 
-def backpack_icon(Image):
-    """バックパックアップグレード: 白い箱のバックパックに、黒いふたと肩ひも、光るライン。"""
+def backpack_icon(Image, tier=1):
+    """バックパックアップグレード: 白い箱のバックパックに、黒いふたと肩ひも、光るライン。
+    ティアが上がるほど光るラインが増え、色が変わる（1: 水色の1本、2: 紫の2本、3: 金の3本とふたの金具）。"""
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     px = im.load()
     for y in range(4, 14):
@@ -987,8 +1110,16 @@ def backpack_icon(Image):
     for y in range(9, 12):
         for x in range(6, 10):
             px[x, y] = (200, 206, 216, 255)
+    glow = {1: (120, 225, 255, 255), 2: (196, 140, 255, 255), 3: (255, 210, 90, 255)}[tier]
     for x in range(4, 12):
-        px[x, 12] = (120, 225, 255, 255)
+        px[x, 12] = glow
+    if tier >= 2:
+        for x in range(4, 12):
+            px[x, 8] = glow
+    if tier >= 3:
+        for y in range(9, 12):
+            px[4, y] = px[11, y] = glow
+        px[7, 6] = px[8, 6] = (255, 236, 160, 255)      # ふたの金具
     return im
 
 
@@ -1219,14 +1350,49 @@ def accessory_icons(Image):
         rect(d, 6, y, 10, y, (180, 176, 166, 255))
     rect(d, 3, 2, 4, 14, (90, 70, 60, 255))
     out['android_book'] = (b, d)
-    # 花束: 包み紙（染める）と、上の色とりどりの花、茎
+    # 花束: 透明な包装（下ほど細い。透けて茎が見える）と、染めた色のリボンの蝶結び。
+    # 上に色とりどりの花（花びらの十字と芯）、葉の茂み、かすみ草
     b, d = new(), new()
-    for y in range(8, 15):
-        w = (15 - y) // 2 + 1
-        shaded(b, 8 - w, y, 7 + w, y)
-    for (x, y, c) in ((3, 3, (224, 72, 72, 255)), (7, 2, (242, 210, 74, 255)), (10, 4, (238, 143, 176, 255)), (6, 5, (244, 244, 244, 255))):
-        rect(d, x, y, x + 2, y + 2, c)
-    rect(d, 7, 7, 8, 8, (78, 138, 58, 255))
+    film, edge, clear = (226, 242, 255, 110), (196, 222, 244, 190), (0, 0, 0, 0)
+    stem, stem2 = (78, 138, 58, 255), (98, 160, 72, 255)
+    for y in range(8, 16):
+        w = max(1, (15 - y) * 5 // 7 + 1)
+        rect(d, 8 - w, y, 7 + w, y, film)
+        rect(d, 8 - w, y, 8 - w, y, edge)
+        rect(d, 7 + w, y, 7 + w, y, edge)
+    rect(d, 2, 8, 13, 8, edge)                               # 開いた口の縁
+    for x, y0 in ((6, 9), (7, 9), (8, 10), (9, 9)):          # 包装ごしの茎
+        rect(d, x, y0, x, 14 if x in (7, 8) else 12, stem if x % 2 else stem2)
+    leaf, white = (94, 158, 72, 255), (250, 250, 250, 255)
+    rect(d, 3, 4, 12, 7, (64, 120, 52, 255))                 # 花の後ろの葉の茂み
+    rect(d, 4, 3, 11, 3, (64, 120, 52, 255))
+    rect(d, 1, 6, 2, 7, leaf)
+    rect(d, 13, 6, 14, 7, leaf)
+    rect(d, 7, 0, 8, 0, leaf)
+
+    def flower(cx, cy, petal, core):
+        for x, y in ((cx, cy - 1), (cx - 1, cy), (cx + 1, cy), (cx, cy + 1)):
+            rect(d, x, y, x, y, petal)
+        rect(d, cx, cy, cx, cy, core)
+
+    flower(4, 5, (242, 154, 184, 255), (246, 210, 74, 255))     # 桃
+    flower(11, 5, white, (246, 200, 58, 255))                   # 白いデイジー
+    flower(9, 2, (246, 210, 74, 255), (232, 138, 42, 255))      # 黄
+    rect(d, 6, 3, 9, 6, (216, 51, 74, 255))                     # 中央の赤いバラ
+    rect(d, 7, 4, 8, 5, (158, 30, 52, 255))
+    rect(d, 6, 3, 6, 3, clear)
+    rect(d, 9, 6, 9, 6, clear)
+    rect(d, 3, 1, 3, 3, (184, 156, 230, 255))                   # ラベンダー
+    rect(d, 4, 2, 4, 2, (166, 138, 216, 255))
+    for x, y in ((2, 4), (13, 3), (6, 7), (10, 7), (12, 8)):
+        rect(d, x, y, x, y, white)                              # かすみ草
+    # リボン（染める）。重なる包装の絵は抜く
+    for (x0, y0, x1, y1) in ((6, 11, 9, 11), (5, 10, 6, 11), (9, 10, 10, 11), (6, 12, 6, 12), (9, 12, 9, 12)):
+        rect(b, x0, y0, x1, y1, W)
+        rect(d, x0, y0, x1, y1, clear)
+    rect(b, 5, 11, 6, 11, S)
+    rect(b, 9, 11, 10, 11, S)
+    rect(b, 7, 11, 8, 11, E)
     out['android_bouquet'] = (b, d)
     # ティーカップ: カップと受け皿（染める）、金の縁、紅茶、取っ手
     b, d = new(), new()

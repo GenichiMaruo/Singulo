@@ -56,6 +56,10 @@ public final class WorkConsoleView {
             ItemCount e = entries.get(i);
             CompoundTag et = e.save(reg);
             et.putBoolean("craft", i < craftable.size());
+            long making = making(c, e.item);
+            if (making > 0) {
+                et.putLong("making", making);            // 進行中の注文で作っている（画面で枠を付ける）
+            }
             es.add(et);
         }
         t.put("entries", es);
@@ -82,6 +86,14 @@ public final class WorkConsoleView {
                 st.add(x);
             }
             ot.put("steps", st);
+            if (o.status == WorkOrder.WAIT_ITEMS) {
+                // 足りない素材（画面で、何があといくつ足りないかを見せる）
+                ListTag ms = new ListTag();
+                for (ItemCount m : o.missing()) {
+                    ms.add(m.save(reg));
+                }
+                ot.put("missing", ms);
+            }
             ot.putLong("delivered", o.delivered);
             ot.putBoolean("to_stock", o.toStock);
             ListTag wt = new ListTag();
@@ -92,6 +104,7 @@ public final class WorkConsoleView {
                     // ほかの注文の作業をしている（装置を待つあいだなど）なら、-2
                     w.putInt("activity", a.workOrder() == o.id ? a.activity() : c.order(a.workOrder()) != null ? -2 : RuinAndroid.ACT_NONE);
                     w.putInt("accent", a.accent());
+                    w.putInt("stall", a.stall());
                 } else {
                     w.putString("name", Component.Serializer.toJson(Component.translatable("gui.singulo.work_console.worker.away")));
                     w.putInt("activity", -1);
@@ -170,6 +183,25 @@ public final class WorkConsoleView {
             t.put("plan", plan);
         }
         return t;
+    }
+
+    /**
+     * 進行中の注文で作っている、この物の数: 完成品として注文された数のうちまだ届けていない数と、途中の工程で作る（まだ作り終えていない）数。
+     */
+    public static long making(WorkConsoleBlockEntity c, ItemStack item) {
+        long n = 0;
+        for (WorkOrder o : c.orders()) {
+            if (ItemStack.isSameItemSameTags(o.target, item)) {
+                n += Math.max(0, o.count - o.delivered);
+                continue;
+            }
+            for (WorkOrder.StepState s : o.steps) {
+                if (!s.finished() && ItemStack.isSameItemSameTags(s.recipe.outputKey(), item)) {
+                    n += (s.total - s.done) * Math.max(1, s.recipe.outputCount());
+                }
+            }
+        }
+        return n;
     }
 
     /** 計算の結果（画面に出す）。 */

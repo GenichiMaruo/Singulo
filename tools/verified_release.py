@@ -93,8 +93,16 @@ def promote(metadata, artifact_dir, output, jar_name):
         raise RuntimeError("The tested production JARs have different contents")
     root = artifact_dir / metadata["artifacts"]["singulo"]["name"]
     gui_log = one((p for p in root.rglob("latest.log") if "gui-review" in p.parts), "GUI completion log")
-    if "SINGULO_GUI_COMPLETE 20" not in gui_log.read_text() or len(list((gui_log.parents[1] / "screenshots").glob("*.png"))) != 20:
-        raise RuntimeError("Missing complete 20-screen GUI validation")
+    if "SINGULO_GUI_COMPLETE 22" not in gui_log.read_text() or len(list((gui_log.parents[1] / "screenshots").glob("*.png"))) != 22:
+        raise RuntimeError("Missing complete 22-screen GUI validation")
+    gui = gui_log.read_text()
+    for marker in ("SINGULO_SEARCH_COMPLETE", "SINGULO_JEI_SYNC_COMPLETE", "SINGULO_HANDBOOK_SEARCH_COMPLETE"):
+        if marker not in gui:
+            raise RuntimeError("Missing GUI interaction validation: " + marker)
+    pixels = one(root.rglob("inventory-pixels.json"), "inventory pixel verification")
+    pixel_results = json.loads(pixels.read_text())
+    if len(pixel_results) != 3 or sum(row["checked_empty_slot_centers"] for row in pixel_results) != 105:
+        raise RuntimeError("Missing 105-point inventory verification")
     output.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(jars["singulo"], output)
     metadata["jar_sha256"] = hashlib.sha256(output.read_bytes()).hexdigest()

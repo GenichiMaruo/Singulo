@@ -16,10 +16,10 @@ final class Panel {
 
     private Panel() {}
 
+    /** 画面の地（縁と、上の発光ライン）。真ん中の横の継ぎ目の線は、中身や文字にかかるので描かない。 */
     static void background(GuiGraphics g, int x, int y, int w, int h) {
         g.fill(x, y, x + w, y + h, SEAM);
         g.fill(x + 1, y + 1, x + w - 1, y + h - 1, BACKGROUND);
-        g.fill(x + 3, y + h / 2, x + w - 3, y + h / 2 + 1, SHADE);
         // 発光ライン
         g.fill(x + 4, y + 2, x + w - 4, y + 3, GLOW);
     }

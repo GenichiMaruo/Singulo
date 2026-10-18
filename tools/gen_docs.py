@@ -6,7 +6,7 @@
 """
 
 from advancements import ADVANCEMENTS, HIDDEN_ADVANCEMENTS, validate_advancements
-from descriptions import DESC
+from descriptions import DESC, SUMMARY
 from guide import CHAPTERS
 
 MODID = 'singulo'
@@ -34,6 +34,8 @@ def descriptions(ctx, ja, en):
                 ctx['warn'](f'説明がない: {name}')
             continue
         ja[f'desc.{MODID}.{iid}'], en[f'desc.{MODID}.{iid}'] = d
+        if name in SUMMARY:
+            ja[f'summary.{MODID}.{iid}'], en[f'summary.{MODID}.{iid}'] = SUMMARY[name]
         # 作り方
         r = RECIPES.get(name)
         if name in ctx['EXPLORE']:

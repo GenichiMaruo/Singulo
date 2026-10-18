@@ -246,7 +246,7 @@ public final class PrototypeGameTests {
             previous[0] = target.getHealth();
         });
         helper.succeedWhen(() -> {
-            helper.assertTrue(checked[0], "突進命中後の光線を検査できない: slashHit=" + slashHit[0] + " target=" + target.position() + " health=" + target.getHealth() + " bit=" + bit.position() + " charge=" + bit.charge());
+            helper.assertTrue(checked[0], "突進命中後の光線を検査できない: slashHit=" + slashHit[0] + " target=" + target.position() + " health=" + target.getHealth() + " bit=" + bit.position() + " charge=" + bit.charge() + " tick=" + bit.tickCount + " state=" + bit.state() + " targetMatches=" + (bit.getTarget() == target) + " sight=" + bit.hasLineOfSight(target) + " shot=" + bit.shotBit());
             bit.discard(); target.discard();
         });
     }

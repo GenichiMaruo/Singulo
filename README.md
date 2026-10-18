@@ -12,7 +12,7 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 
 | Minecraft | ローダー / Loader | Java | ソース / Source | ダウンロード / Download |
 | --- | --- | --- | --- | --- |
-| **1.21.1** | **NeoForge** 21.1.256+ | **21** | [main](https://github.com/GenichiMaruo/Singulo/tree/main) | [1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) |
+| **1.21.1** | **NeoForge** 21.1.256+ | **21** | [1.21.1](https://github.com/GenichiMaruo/Singulo/tree/1.21.1) | [1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) |
 | **1.20.1** | **Forge** 47.4.26+ | **17** | [1.20.1](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
 | **1.20.1** | **NeoForge** 47.1.106+ | **17** | [1.20.1](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
 

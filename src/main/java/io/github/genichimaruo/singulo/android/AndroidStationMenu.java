@@ -164,6 +164,15 @@ public class AndroidStationMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.mayOperate(player)) {
+            if (id == AndroidStationBlockEntity.BUTTON_RECALL_ALL) {
+                // 近くのステーション（この人が操作できるもの）のアンドロイドを、みな呼び戻す
+                int n = 0;
+                for (AndroidStationBlockEntity s : AndroidStationBlockEntity.nearby(player.level(), pos, AndroidStationBlockEntity.RECALL_ALL_RANGE, player)) {
+                    n += s.recallAll();
+                }
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("gui.singulo.android_station.recall_all.done", n), true);
+                return true;
+            }
             station.press(id);
             return true;
         }

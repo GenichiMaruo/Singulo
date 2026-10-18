@@ -71,6 +71,13 @@ public final class AndroidGameTests {
         return s;
     }
 
+    /** ふつうの拠点と同じく、ステーション・階段の下の段まで床を張る（上の面へ1段で上がれるように）。 */
+    private static void floor(GameTestHelper helper) {
+        for (BlockPos p : BlockPos.betweenClosed(0, 0, 0, 7, 0, 7)) {
+            helper.setBlock(p, net.minecraft.world.level.block.Blocks.STONE);
+        }
+    }
+
     /** このテストのステーションが印刷したアンドロイド（並んで動くほかのテストのものは数えない。少し離れていても数える）。 */
     private static List<RuinAndroid> androids(GameTestHelper helper) {
         BlockPos station = helper.absolutePos(STATION);
@@ -78,7 +85,7 @@ public final class AndroidGameTests {
     }
 
     /** ステーションは、メモリとキットと電力で護衛を1体だけ印刷し、キットと電力を使う。印刷中は傷つかない。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100, batch = "automation_stationPrintsOneGuard")
     public static void stationPrintsOneGuard(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 3);
@@ -98,7 +105,7 @@ public final class AndroidGameTests {
     }
 
     /** 工場式印刷ユニットを積むと、印刷の電力が半分になり、半分の時間で印刷し終える。 */
-    @GameTest(template = EMPTY, batch = "android_print_unit", timeoutTicks = 120)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_print_unit", timeoutTicks = 120)
     public static void printUnitHalvesPrinting(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
@@ -128,7 +135,7 @@ public final class AndroidGameTests {
     }
 
     /** 護衛はプレイヤーの攻撃で傷つかず、ふつうのダメージでは傷つく。体力はコンパレーターに出る。 */
-    @GameTest(template = EMPTY, batch = "android_guard_hp", timeoutTicks = 160)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_guard_hp", timeoutTicks = 160)
     public static void guardIgnoresPlayersAndReportsHealth(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
@@ -154,7 +161,7 @@ public final class AndroidGameTests {
     }
 
     /** 転送アップグレードがあれば、倒れた護衛の持ち物はステーションへ送られ、次に印刷した護衛が持つ。 */
-    @GameTest(template = EMPTY, batch = "android_transfer_inventory", timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_transfer_inventory", timeoutTicks = 400)
     public static void transferUpgradePassesInventory(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 2);
@@ -221,7 +228,7 @@ public final class AndroidGameTests {
     }
 
     /** 読み込みが外れただけ（見つからないだけ）の生きているアンドロイドは、倒した扱いにならない（設計メモリは出ない）。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100, batch = "automation_fabricatorKeepsUnloadedAndroid")
     public static void fabricatorKeepsUnloadedAndroid(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos at = p(2, 1, 2);
@@ -235,13 +242,14 @@ public final class AndroidGameTests {
         });
     }
 
-    /** 出撃したアンドロイドが全部倒されたら、設計メモリが1つだけ出る。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 160)
+    /** 出撃したアンドロイドが全部倒されたら、設計メモリが（出る回なら）1つだけ出る。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 160, batch = "automation_fabricatorDropsMemoryWhenAllDefeated")
     public static void fabricatorDropsMemoryWhenAllDefeated(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos at = p(2, 1, 2);
         BladeAndroid a = ruinAndroid(helper, at);
         AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
+        f.setMemoryChanceForTest(1);
         a.kill();
         helper.runAfterDelay(60, () -> {
             helper.assertTrue(f.alive() == 0, "倒したアンドロイドが出撃に残っている");
@@ -253,8 +261,25 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 設計メモリが出ない回: 全部倒しても何も出ず、台は1日休む（確率は半分）。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 160, batch = "automation_fabricatorSometimesDropsNoMemory")
+    public static void fabricatorSometimesDropsNoMemory(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        helper.assertTrue(AndroidFabricatorBlockEntity.MEMORY_CHANCE == 0.5F, "設計メモリの確率が半分でない: " + AndroidFabricatorBlockEntity.MEMORY_CHANCE);
+        BlockPos at = p(2, 1, 2);
+        BladeAndroid a = ruinAndroid(helper, at);
+        AndroidFabricatorBlockEntity f = fabricatorWith(helper, at, a);
+        f.setMemoryChanceForTest(0);
+        a.kill();
+        helper.runAfterDelay(60, () -> {
+            helper.assertTrue(f.alive() == 0, "倒したアンドロイドが出撃に残っている");
+            helper.assertTrue(memories(helper, at) == 0, "出ない回なのに設計メモリが出た: " + memories(helper, at));
+            helper.succeed();
+        });
+    }
+
     /** 護衛の技はボス・中立の動物・村人・プレイヤーに当たらず、敵対モブには当たる。遺構の技は仲間以外に当たる。 */
-    @GameTest(setupTicks = 20, template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_guardAttacksSpareBossesAndNeutrals")
     public static void guardAttacksSpareBossesAndNeutrals(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var level = helper.getLevel();
@@ -277,7 +302,7 @@ public final class AndroidGameTests {
     }
 
     /** 出した護衛がいなくなっても、光柱は村人を傷つけず、敵対モブだけを傷つける。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60, batch = "automation_orphanGuardLaserSparesVillagers")
     public static void orphanGuardLaserSparesVillagers(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var level = helper.getLevel();
@@ -309,7 +334,7 @@ public final class AndroidGameTests {
     }
 
     /** 同じ場所にステーションを置き直しても、前の護衛は身寄りのないアンドロイドになり、新しいステーションでリンクできる。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300, batch = "automation_replacedStationRelinksOldGuard")
     public static void replacedStationRelinksOldGuard(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         station(helper, 1);
@@ -331,10 +356,59 @@ public final class AndroidGameTests {
     }
 
     /**
+     * 許可証にだれかが登録されていれば、護衛は許可証に載っていない人を敵とみなす（狙う・技が当たる・味方ではない・ダメージを受ける）。
+     * 持ち主・登録者・クリエイティブの人は対象外。許可証がなければ、だれも敵とみなさない。
+     */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400, batch = "automation_guardsAttackPlayersOffThePermit")
+    public static void guardsAttackPlayersOffThePermit(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        AndroidStationBlockEntity s = station(helper, 1);
+        // makeMockServerPlayerInLevel の人はいつもクリエイティブ扱いなので、サバイバルの人を作る
+        var owner = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var friend = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var stranger = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var builder = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        builder.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+        owner.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        friend.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        stranger.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        s.setOwner(owner.getUUID());
+        helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
+            RuinAndroid a = androids(helper).get(0);
+            a.setNoAi(true);
+            helper.assertFalse(a.intruder(stranger), "許可証がないのに、登録していない人を敵とみなした");
+            helper.assertTrue(a.isAlliedTo(stranger), "許可証がないのに、登録していない人が味方でない");
+            ItemStack permit = new ItemStack(item("shield_permit"));
+            io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
+            io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, friend);
+            s.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PERMIT, permit);
+            s.press(AndroidStationBlockEntity.BUTTON_MODE_FOLLOW);       // 設定を押すと、許可証もアンドロイドへ渡る
+            s.press(AndroidStationBlockEntity.BUTTON_MODE_GUARD);
+            helper.assertTrue(a.intruder(stranger), "許可証に載っていない人を敵とみなさない");
+            helper.assertFalse(a.intruder(owner) || a.intruder(friend), "持ち主か登録した人を敵とみなした");
+            helper.assertFalse(a.intruder(builder), "クリエイティブの人を敵とみなした");
+            helper.assertTrue(RuinAndroid.canHit(true, a, stranger), "許可証に載っていない人に護衛の技が当たらない");
+            helper.assertFalse(RuinAndroid.canHit(true, a, friend), "登録した人に護衛の技が当たる");
+            helper.assertFalse(a.isAlliedTo(stranger), "許可証に載っていない人が味方のまま");
+            helper.assertTrue(a.isAlliedTo(friend), "登録した人が味方でない");
+            stranger.moveTo(a.position().add(2, 0, 0));
+            helper.assertTrue(a.guardTargetsForTest(stranger), "ステーションの近くにいる、許可証に載っていない人を狙わない");
+            float before = a.getHealth();
+            a.invulnerableTime = 0;
+            a.hurt(helper.getLevel().damageSources().playerAttack(friend), 2);
+            helper.assertTrue(a.getHealth() == before, "登録した人の攻撃でダメージを受けた");
+            a.invulnerableTime = 0;
+            a.hurt(helper.getLevel().damageSources().playerAttack(stranger), 2);
+            helper.assertTrue(a.getHealth() < before, "許可証に載っていない人の攻撃でダメージを受けない");
+            helper.succeed();
+        });
+    }
+
+    /**
      * 許可証: 持ち主と登録した人だけが操作でき、追従する人を登録した人から選べる。
      * 追従中「ついていくだけ」なら敵を狙わず、「護衛する」なら狙う。
      */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400, batch = "automation_permitAndFollowSettings")
     public static void permitAndFollowSettings(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
@@ -381,7 +455,7 @@ public final class AndroidGameTests {
     }
 
     /** 許可証から外された人は、開いていたアンドロイドの画面でも、名前の変更・解体・持ち物の出し入れができない。持ち主はできる。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200, batch = "automation_removedMemberLosesAndroidScreen")
     public static void removedMemberLosesAndroidScreen(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
@@ -418,7 +492,7 @@ public final class AndroidGameTests {
     }
 
     /** アンドロイドの画面で「追従のみ／追従・護衛」を切り替えると、ステーションの設定も変わり、上書きで戻らない。 */
-    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200, batch = "automation_androidScreenSwitchesEscort")
     public static void androidScreenSwitchesEscort(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
@@ -462,7 +536,7 @@ public final class AndroidGameTests {
     }
 
     /** 巡回: 巡回路の2つの地点を、順に回る（どちらの上にも立つ）。 */
-    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
     public static void patrolWalksRoute(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
@@ -494,7 +568,7 @@ public final class AndroidGameTests {
      * 経路の決まり: 巡回の地点（東の帯の中）へ向かうとき、帯（対象範囲）に入るので経由地点（帯の南の端）を通り、
      * そのあいだ進入禁止ゾーン（ステーションと帯のあいだの列。南の端だけ空いている）に入らない。
      */
-    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
     public static void patrolFollowsRouteRules(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         AndroidStationBlockEntity s = station(helper, 1);
@@ -530,13 +604,14 @@ public final class AndroidGameTests {
         helper.succeedWhen(() -> {
             helper.assertFalse(trespassed[0], "経由地点へ向かうあいだに、進入禁止ゾーンに入った");
             helper.assertTrue(passedVia[0], "対象範囲に入るのに、経由地点を通らない");
-            helper.assertTrue(reached[0], "経由地点を通ったあと、巡回の地点へ行かない");
+            helper.assertTrue(reached[0], "経由地点を通ったあと、巡回の地点へ行かない: " + androids(helper).stream()
+                    .map(a -> a.position().subtract(Vec3.atLowerCornerOf(helper.absolutePos(BlockPos.ZERO))).toString()).toList());
             androids(helper).forEach(RuinAndroid::discard);
         });
     }
 
     /** タンクの画面: 水入りバケツでクリックするとタンクに入り（空のバケツが残る）、空のバケツで汲み、捨てるボタンで空になる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_tankTakesBuckets")
     public static void tankTakesBuckets(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
@@ -559,12 +634,14 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
-    /** 拠点の暮らし: 昼、手の空いた護衛は、ステーションのそばの階段に座る（座れる物がなければ地面に。ほかに掃く仕草などもする）。 */
-    @GameTest(template = EMPTY, batch = "android_life", timeoutTicks = 2400)
+    /** 拠点の暮らし: 昼、手の空いた護衛は、ステーションのそばの階段に座る（座れる物がなければ地面に。ほかに掃く仕草などもする）。
+     * 迎撃モードは暮らしをしないので、巡回路のない巡回モード（ステーションのそばで待つ）で確かめる。 */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_life", timeoutTicks = 2400)
     public static void idleGuardSitsOnStairs(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         helper.getLevel().setDayTime(1000);
-        station(helper, 1);
+        floor(helper);
+        station(helper, 1).press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         BlockPos stair = p(5, 1, 2);
         helper.setBlock(stair, net.minecraft.world.level.block.Blocks.OAK_STAIRS);
         // 作業台（名前に "bench" が入る）は椅子ではない。階段より近くに置く
@@ -590,11 +667,12 @@ public final class AndroidGameTests {
     }
 
     /** 拠点の暮らし: しばらく落ちたままの物を拾って、そばのチェストへしまう。 */
-    @GameTest(template = EMPTY, batch = "android_life_tidy", timeoutTicks = 1200)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_life_tidy", timeoutTicks = 1200)
     public static void idleGuardTidiesIntoChest(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         helper.getLevel().setDayTime(1000);
-        station(helper, 1);
+        floor(helper);
+        station(helper, 1).press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         BlockPos chest = p(6, 1, 6);
         helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
         net.minecraft.world.entity.item.ItemEntity drop = helper.spawnItem(Items.APPLE, 6.5F, 1, 10.5F);
@@ -623,8 +701,44 @@ public final class AndroidGameTests {
         });
     }
 
+    /** 迎撃モード: 手の空いた護衛は暮らし（座るなど）をせず、1体はステーションの上、もう1体はすぐ横で待つ。 */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_guard_dock", timeoutTicks = 1200)
+    public static void interceptGuardsWaitOnStation(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        helper.getLevel().setDayTime(1000);
+        floor(helper);
+        // ステーションが2体印刷する（ステーションが受け持たない護衛は、はぐれになって持ち場を持たない）
+        AndroidStationBlockEntity station = station(helper, 2);
+        station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PRODUCTION, new ItemStack(item("android_production_upgrade")));
+        helper.setBlock(p(5, 1, 2), net.minecraft.world.level.block.Blocks.OAK_STAIRS);
+        java.util.function.Supplier<List<RuinAndroid>> guardsNow = () -> androids(helper).stream().filter(RuinAndroid::isAlive).toList();
+        Vec3 dock = Vec3.atBottomCenterOf(helper.absolutePos(STATION).above());
+        boolean[] lived = {false}, placed = {false};
+        String[] where = {""};
+        helper.onEachTick(() -> {
+            for (RuinAndroid a : guardsNow.get()) {
+                if (a.tickCount % 40 == 0) {
+                    a.lifeNow();
+                }
+                lived[0] |= RuinAndroid.lifeState(a.state());
+            }
+            long on = guardsNow.get().stream().filter(a -> a.position().subtract(dock).horizontalDistance() < 0.6
+                    && Math.abs(a.getY() - dock.y) < 0.5).count();
+            long beside = guardsNow.get().stream().filter(a -> a.position().subtract(dock).horizontalDistance() < 1.6
+                    && Math.abs(a.getY() - (dock.y - 1)) < 0.5).count();
+            where[0] = "上=" + on + " 横=" + beside + guardsNow.get().stream().map(a -> " / " + a.position() + " s=" + a.state())
+                    .reduce("", String::concat);
+            placed[0] |= guardsNow.get().size() == 2 && on == 1 && beside == 1;
+        });
+        helper.succeedWhen(() -> {
+            helper.assertFalse(lived[0], "迎撃モードなのに、暮らし（座る・手入れなど）を始めた");
+            helper.assertTrue(placed[0], "1体が上、1体がすぐ横で待たない: " + where[0]);
+            guardsNow.get().forEach(RuinAndroid::discard);
+        });
+    }
+
     /** 範囲カード: 2つの角を記録すると、その範囲になる。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_areaCardRecordsTwoCorners")
     public static void areaCardRecordsTwoCorners(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         ItemStack card = new ItemStack(item("area_card"));
@@ -639,16 +753,18 @@ public final class AndroidGameTests {
     }
 
     /** 巡回中に敵の群れ（5体）を見つけたら、ステーションがレッドストーン信号を出し、記録に残す。倒した相手も記録に残る。 */
-    @GameTest(template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_patrol", timeoutTicks = 1200)
     public static void patrolRaisesAlarm(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        floor(helper); // Keep the real combat path walkable on either loader.
         AndroidStationBlockEntity s = station(helper, 1);
         routeCard(helper, s, 0, p(2, 0, 5));
         s.press(AndroidStationBlockEntity.BUTTON_MODE_PATROL);
         boolean[] alarmed = {false};
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 40, () -> {
             for (int i = 0; i < 5; i++) {
-                var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+                // Sunlight must not kill the victim before the guard can earn a kill log.
+                var zombie = EntityType.HUSK.create(helper.getLevel());
                 zombie.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(1 + i, 1, 6))));
                 zombie.setNoAi(true);
                 zombie.setPersistenceRequired();
@@ -669,13 +785,14 @@ public final class AndroidGameTests {
             helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_ALARM),
                     "警報が記録に残らない");
             helper.assertTrue(log.stream().anyMatch(e -> e.kind() == io.github.genichimaruo.singulo.android.AndroidPatrol.KIND_KILL),
-                    "倒した相手が記録に残らない");
+                    "倒した相手が記録に残らない: state=" + a.state() + " pos=" + a.position()
+                            + " target=" + a.getTarget() + " day=" + helper.getLevel().getDayTime());
             a.discard();
         });
     }
 
     /** バッテリーアップグレード1個につき充電の満タンが50%増え、外すと満タンに合わせて減る。 */
-    @GameTest(setupTicks = 20, template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_batteryUpgradeRaisesCharge")
     public static void batteryUpgradeRaisesCharge(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
@@ -693,8 +810,51 @@ public final class AndroidGameTests {
         helper.succeed();
     }
 
+    /**
+     * バックパックのティア: 12・18・24 の枠が作業で使える。ティアより後ろの枠（旧版の24枠で入れた物）は消さず、作業には使わない。
+     * 中身が入ったままでも、中身が収まるバックパックへは付け替えられ、収まらないものへは付け替えられない。
+     */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_backpackTiersSetCapacity")
+    public static void backpackTiersSetCapacity(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        String[] tiers = {"android_backpack_upgrade", "android_reinforced_backpack_upgrade", "android_large_backpack_upgrade"};
+        int[] slots = {12, 18, 24};
+        helper.assertTrue(a.carryCapacity() == RuinAndroid.CARRY_SLOTS, "バックパックなしで持ち物が5でない: " + a.carryCapacity());
+        for (int i = 0; i < tiers.length; i++) {
+            a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item(tiers[i])));
+            helper.assertTrue(a.carryCapacity() == RuinAndroid.CARRY_SLOTS + slots[i], tiers[i] + " の運べる欄が違う: " + a.carryCapacity());
+        }
+        // 旧版の24枠のバックパックで、20枠目に入れた物
+        a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item(tiers[0])));
+        a.inventory().setItem(RuinAndroid.PACK_START + 20, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 5));
+        for (int slot : a.carrySlots()) {
+            helper.assertTrue(slot != RuinAndroid.PACK_START + 20, "ティアより後ろの枠を作業に使う");
+        }
+        helper.assertTrue(a.inventory().getItem(RuinAndroid.PACK_START + 20).getCount() == 5, "ティアより後ろの枠の物が消えた");
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
+        net.minecraft.world.inventory.Slot backpack = menu.slots.stream()
+                .filter(s -> s.container == a.inventory() && s.getContainerSlot() == RuinAndroid.SLOT_BACKPACK).findFirst().orElseThrow();
+        net.minecraft.world.inventory.Slot packSlot = menu.slots.stream()
+                .filter(s -> s.container == a.inventory() && s.getContainerSlot() == RuinAndroid.PACK_START + 14).findFirst().orElseThrow();
+        helper.assertFalse(packSlot.mayPlace(new ItemStack(net.minecraft.world.item.Items.DIRT)), "12枠のバックパックで15枠目に入れられる");
+        player.containerMenu = menu;
+        menu.setCarried(new ItemStack(item(tiers[1])));
+        helper.assertFalse(backpack.mayPickup(player), "中身（21枠目）が入らない強化バックパックへ付け替えられる");
+        menu.setCarried(new ItemStack(item(tiers[2])));
+        helper.assertTrue(backpack.mayPickup(player), "中身が収まる大型バックパックへ付け替えられない");
+        menu.setCarried(ItemStack.EMPTY);
+        helper.assertFalse(backpack.mayPickup(player), "中身があるのにバックパックを外せる");
+        a.discard();
+        helper.succeed();
+    }
+
     /** 持ち物は位置ごと保存する（空きスロットがあってもずれない）。0.6.0 の保存も、装甲板を装甲板の場所へ戻す。 */
-    @GameTest(setupTicks = 20, template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_androidInventoryKeepsSlots")
     public static void androidInventoryKeepsSlots(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
@@ -775,8 +935,260 @@ public final class AndroidGameTests {
         return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONSOLE);
     }
 
+    /** オークのフェンス50個（原木 → 板材 → 棒 → フェンスの3工程）を作らせても、持ち物からあふれた物を地面に落とさない。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 6000, batch = "automation_fiftyFencesNeverDrop")
+    public static void fiftyFencesNeverDrop(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        fiftyFences(helper, false, false);
+    }
+
+    /** 同じ（JEI から記録したように、棒はどの板材でも作れるレシピ）。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 6000, batch = "automation_fiftyFencesWithVariantsNeverDrop")
+    public static void fiftyFencesWithVariantsNeverDrop(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        fiftyFences(helper, true, false);
+    }
+
+    /** 同じ（どの板材でも作れるレシピ、バックパックあり）。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 6000, batch = "automation_fiftyFencesWithBackpackNeverDrop")
+    public static void fiftyFencesWithBackpackNeverDrop(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        fiftyFences(helper, true, true);
+    }
+
+    private static void fiftyFences(GameTestHelper helper, boolean variants, boolean backpack) {
+        var console = workshop(helper, 22);
+        if (variants) {
+            // 棒のレシピを、どの板材でも作れるもの（JEI の「+」で記録したとき）に置き換える
+            java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+            sticks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+            sticks.set(3, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+            java.util.List<String> alts = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ""));
+            alts.set(0, "{\"tag\":\"minecraft:planks\"}");
+            alts.set(3, "{\"tag\":\"minecraft:planks\"}");
+            ItemStack card = new ItemStack(item("recipe_card"));
+            io.github.genichimaruo.singulo.android.work.RecipeData.crafting(sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4), alts)
+                    .write(card, helper.getLevel().registryAccess());
+            io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity r = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+            r.items().setStackInSlot(2, card);
+        }
+        var level = helper.getLevel();
+        java.util.List<ItemStack> fence = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        for (int i : new int[]{0, 2, 3, 5}) {
+            fence.set(i, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
+        }
+        fence.set(1, new ItemStack(net.minecraft.world.item.Items.STICK));
+        fence.set(4, new ItemStack(net.minecraft.world.item.Items.STICK));
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(3, recipeCard(helper, fence, new ItemStack(net.minecraft.world.item.Items.OAK_FENCE, 3)));
+        BladeAndroid a = worker(helper, false);
+        if (backpack) {
+            a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
+        }
+        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        java.util.Map<String, Integer> dropped = new java.util.TreeMap<>();
+        helper.onEachTick(() -> {
+            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(BlockPos.ZERO), helper.absolutePos(new BlockPos(16, 8, 16))))) {
+                dropped.merge(e.getItem().getHoverName().getString(), e.getItem().getCount(), Integer::sum);
+                e.discard();
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(dropped.isEmpty(), "地面に落とした: " + dropped);
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.OAK_FENCE) >= 50,
+                    "フェンスが50個届かない: " + delivered(helper, net.minecraft.world.item.Items.OAK_FENCE));
+            a.discard();
+        });
+    }
+
+    /**
+     * アンドロイド作業台の預かり箱: 作った物が持ち物に入りきらなければ足元に落とさず預かり箱へ入れ、あとの工程（棒）は預かり箱の
+     * 板材を持ち物へ戻して作り、残った完成品は取りに来て届ける（作り始めに、空いている持ち物を思いがけない物でふさぐ）。
+     */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 3600, batch = "automation_workbenchBufferCatchesOverflow")
+    public static void workbenchBufferCatchesOverflow(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 2);
+        var level = helper.getLevel();
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        ItemStack bench = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(bench, level, helper.absolutePos(TABLE),
+                SinguloBlocks.ANDROID_WORKBENCH.get());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(0, bench);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity wb = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TABLE);
+        boolean[] stuffed = {false}, used = {false};
+        java.util.Map<String, Integer> dropped = new java.util.TreeMap<>();
+        helper.onEachTick(() -> {
+            if (!stuffed[0] && a.state() == RuinAndroid.STATE_CRAFTING) {
+                stuffed[0] = true;
+                for (int slot : a.carrySlots()) {
+                    if (a.inventory().getItem(slot).isEmpty()) {
+                        a.inventory().setItem(slot, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+                    }
+                }
+            }
+            used[0] |= !wb.bufferEmpty();
+            for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(BlockPos.ZERO), helper.absolutePos(new BlockPos(16, 8, 16))))) {
+                dropped.merge(e.getItem().getHoverName().getString(), e.getItem().getCount(), Integer::sum);
+                e.discard();
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(stuffed[0] && used[0], "預かり箱を使っていない");
+            helper.assertTrue(dropped.isEmpty(), "地面に落とした: " + dropped);
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 8,
+                    "棒が8本届かない: " + delivered(helper, net.minecraft.world.item.Items.STICK));
+            helper.assertTrue(wb.bufferEmpty(), "預かり箱に物が残った");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /** 預かり箱の物は、右クリックで受け取れ（取りに来られなくなったとき）、壊すと落ちる。保存しても消えない。 */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_workbenchBufferIsKept")
+    public static void workbenchBufferIsKept(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity wb = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, TABLE);
+        wb.buffer().insertItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_FENCE, 10), false);
+        CompoundTag tag = wb.saveWithoutMetadata();
+        var copy = new io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity(helper.absolutePos(TABLE),
+                helper.getBlockState(TABLE));
+        copy.load(tag);
+        helper.assertTrue(copy.buffer().getStackInSlot(0).getCount() == 10, "保存すると預かり箱の物が消える");
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        wb.openMenu(player);
+        helper.assertTrue(wb.bufferEmpty() && player.getInventory().countItem(net.minecraft.world.item.Items.OAK_FENCE) == 10,
+                "右クリックで預かり箱の物を受け取れない");
+        wb.buffer().insertItem(0, new ItemStack(net.minecraft.world.item.Items.STICK, 5), false);
+        helper.getLevel().destroyBlock(helper.absolutePos(TABLE), false);
+        helper.runAtTickTime(2, () -> {
+            helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(TABLE)).inflate(2), e -> e.getItem().is(net.minecraft.world.item.Items.STICK)).size() == 1,
+                    "壊しても預かり箱の物が落ちない");
+            helper.succeed();
+        });
+    }
+
+    /** 作業の持ち物: 同じ物は1つのスタックにまとまる（半端なスタックに分かれたままにしない）。入れるときも、使ったあとも。 */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_carryStacksSameItems")
+    public static void carryStacksSameItems(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = worker(helper, false);
+        int[] slots = a.carrySlots();                                  // 作業していないときは、持ち物の5つ全部
+        java.util.function.Supplier<Integer> stacks = () -> {
+            int n = 0;
+            for (int slot : a.carrySlots()) {
+                n += a.inventory().getItem(slot).isEmpty() ? 0 : 1;
+            }
+            return n;
+        };
+        // 素材を使ったあとのように、板材が3つのスロットに少しずつ残っている
+        a.inventory().setItem(slots[0], new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 20));
+        a.inventory().setItem(slots[2], new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 20));
+        a.inventory().setItem(slots[4], new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 20));
+        ItemStack rest = a.addToCarry(new ItemStack(net.minecraft.world.item.Items.OAK_FENCE, 3));
+        helper.assertTrue(rest.isEmpty() && stacks.get() == 2, "入れるときに同じ物がまとまらない: " + stacks.get() + " スロット");
+        a.addToCarry(new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 50));           // 板材 110 → 2スタック
+        helper.assertTrue(stacks.get() == 3, "板材が2スタックにまとまらない: " + stacks.get() + " スロット");
+        a.takeFromCarry(new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 60);        // 板材 50 → 1スタック
+        helper.assertTrue(stacks.get() == 2, "使ったあとに半端なスタックが残る: " + stacks.get() + " スロット");
+        a.discard();
+        helper.succeed();
+    }
+
+    /**
+     * 作っている途中で充電が切れたら、作業を中断してステーションへ充電しに行き、満タンになったら続きをして注文を終える
+     * （充電切れと起動を繰り返して止まったままにならない）。
+     */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 4800, batch = "automation_craftingPausesToRecharge")
+    public static void craftingPausesToRecharge(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        floor(helper);
+        var console = workshop(helper, 4);
+        AndroidStationBlockEntity s = station(helper, 1);
+        int[] lowPower = {0};
+        int[] last = {-1};
+        boolean[] ordered = {false}, charged = {false};
+        StringBuilder trail = new StringBuilder();
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (list.isEmpty() || !list.get(0).printed()) {
+                return;
+            }
+            RuinAndroid a = list.get(0);
+            if (!ordered[0] && a.state() == RuinAndroid.STATE_IDLE) {
+                ordered[0] = true;
+                CompoundTag saved = a.saveWithoutId(new CompoundTag());
+                saved.putInt("charge", 25);                        // 2回作ると切れる
+                a.load(saved);
+                var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
+                        List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+                helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+            }
+            int st = a.state();
+            if (st == RuinAndroid.STATE_LOW_POWER && last[0] != RuinAndroid.STATE_LOW_POWER) {
+                lowPower[0]++;
+            }
+            charged[0] |= st == RuinAndroid.STATE_CHARGING;
+            if (st != last[0] && trail.length() < 1200) {
+                trail.append(helper.getTick()).append(':').append(st).append('(').append(a.charge()).append(") ");
+            }
+            last[0] = st;
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(ordered[0], "印刷されない");
+            helper.assertTrue(lowPower[0] >= 1 && lowPower[0] <= 2, "充電切れを繰り返している: " + lowPower[0] + " 回 " + trail);
+            helper.assertTrue(charged[0], "ステーションで充電していない: " + trail);
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 16,
+                    "棒が16本届かない: " + delivered(helper, net.minecraft.world.item.Items.STICK));
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            androids(helper).forEach(RuinAndroid::discard);
+        });
+    }
+
+    /** 手が空いていてステーションの近くにいれば、充電が減っているときは自分で戻って満タンにする。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 1600, batch = "automation_idleGuardTopsUpCharge")
+    public static void idleGuardTopsUpCharge(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        floor(helper);
+        station(helper, 1);
+        boolean[] drained = {false}, docked = {false};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (list.isEmpty() || !list.get(0).printed() || drained[0] || list.get(0).state() != RuinAndroid.STATE_IDLE) {
+                if (!list.isEmpty() && drained[0]) {
+                    docked[0] |= list.get(0).state() == RuinAndroid.STATE_CHARGING;
+                }
+                return;
+            }
+            RuinAndroid a = list.get(0);
+            drained[0] = true;
+            CompoundTag saved = a.saveWithoutId(new CompoundTag());
+            saved.putInt("charge", a.maxCharge() / 2);                     // 半分（充電切れではない）
+            a.load(saved);
+            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(6, 1, 6))));
+        });
+        helper.succeedWhen(() -> {
+            List<RuinAndroid> list = androids(helper);
+            helper.assertTrue(drained[0] && docked[0], "充電が減っても、ステーションへ充電しに戻らない");
+            RuinAndroid a = list.get(0);
+            helper.assertTrue(a.charge() == a.maxCharge(), "満タンにならない: " + a.charge());
+            list.forEach(RuinAndroid::discard);
+        });
+    }
+
     /** 素材が足りない注文は、計算で止まる（原木1本では棒16本は作れない）。在庫で足りれば作れる。 */
-    @GameTest(setupTicks = 20, template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_workPlanNeedsMaterials")
     public static void workPlanNeedsMaterials(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 1);
@@ -786,6 +1198,63 @@ public final class AndroidGameTests {
         var ok = console.plan(stick, 8);
         helper.assertTrue(ok.ok() && ok.steps.size() == 2, "原木1本から棒8本の工程が2つにならない: " + ok.steps.size());
         helper.succeed();
+    }
+
+    /** 「新規」の注文: 在庫にある完成品は使わず、注文した数を新しく作る（在庫を使う注文なら、在庫だけで足りる）。 */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_workOrderFreshIgnoresFinishedStock")
+    public static void workOrderFreshIgnoresFinishedStock(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 1);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
+        chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.STICK, 4));
+        ItemStack stick = new ItemStack(net.minecraft.world.item.Items.STICK);
+        var fromStock = console.plan(stick, 4);
+        helper.assertTrue(fromStock.ok() && fromStock.steps.isEmpty(), "在庫の棒4本で足りるのに、作る工程がある: " + fromStock.steps.size());
+        var fresh = console.plan(stick, 4, true);
+        helper.assertTrue(fresh.ok() && fresh.steps.size() == 2, "新規なのに、在庫の棒を使った（工程の数: " + fresh.steps.size() + "）");
+        helper.succeed();
+    }
+
+    /** 持ち物とバックパックの中の並べ替え: 同じ物はまとめ、物の ID の順に前から詰める。 */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_androidSortsCarriedItems")
+    public static void androidSortsCarriedItems(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.setNoAi(true);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        var inv = a.inventory();
+        inv.setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.STICK, 10));
+        inv.setItem(RuinAndroid.CARRY_START + 1, new ItemStack(net.minecraft.world.item.Items.DIRT, 5));
+        inv.setItem(RuinAndroid.CARRY_START + 3, new ItemStack(net.minecraft.world.item.Items.STICK, 20));
+        helper.assertTrue(a.sortCarry(), "並べ替えられない");
+        helper.assertTrue(inv.getItem(RuinAndroid.CARRY_START).is(net.minecraft.world.item.Items.DIRT) && inv.getItem(RuinAndroid.CARRY_START).getCount() == 5,
+                "1つめが土5個でない: " + inv.getItem(RuinAndroid.CARRY_START));
+        helper.assertTrue(inv.getItem(RuinAndroid.CARRY_START + 1).is(net.minecraft.world.item.Items.STICK) && inv.getItem(RuinAndroid.CARRY_START + 1).getCount() == 30,
+                "棒がまとまって2つめに来ない: " + inv.getItem(RuinAndroid.CARRY_START + 1));
+        helper.assertTrue(inv.getItem(RuinAndroid.CARRY_START + 2).isEmpty() && inv.getItem(RuinAndroid.CARRY_START + 3).isEmpty(), "後ろが空かない");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** 「預ける」: 近くのチェストまで行って、持ち物を入れる。近くに箱がなければ行かない。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400, batch = "automation_androidStashesIntoNearbyChest")
+    public static void androidStashesIntoNearbyChest(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(p(1, 1, 1)), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(2, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(net.minecraft.world.item.Items.STICK, 12));
+        helper.assertTrue(a.requestStash() != null, "近くに箱がないのに、預けに行くことになった");
+        helper.setBlock(p(5, 1, 2), net.minecraft.world.level.block.Blocks.CHEST);
+        helper.assertTrue(a.requestStash() == null, "近くのチェストへ預けに行かない");
+        helper.succeedWhen(() -> {
+            net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, p(5, 1, 2));
+            helper.assertTrue(chest.getItem(0).is(net.minecraft.world.item.Items.STICK) && chest.getItem(0).getCount() == 12, "チェストに棒が入らない");
+            helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START).isEmpty(), "持ち物に棒が残っている");
+            a.discard();
+        });
     }
 
     /** アンドロイドが資材口から原木を取り、作業台で板材と棒を作って、納品口へ棒を届ける。作業中は持ち物を取り出せない。 */
@@ -801,6 +1270,8 @@ public final class AndroidGameTests {
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.assertTrue(a.isWorking(), "アンドロイドが作業中にならない");
+        long making = io.github.genichimaruo.singulo.android.work.WorkConsoleView.making(console, new ItemStack(net.minecraft.world.item.Items.STICK));
+        helper.assertTrue(making == 8, "作っている最中の数（画面の枠）が注文の数でない: " + making);
         io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity port = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, DELIVERY);
         helper.succeedWhen(() -> {
             int sticks = 0;
@@ -819,6 +1290,86 @@ public final class AndroidGameTests {
             }
             a.discard();
         });
+    }
+
+    /** アンドロイドを選ばずに注文すると、作業量に見合う人数だけ招集する（作業台1つの小さな注文に、3体のうち1体だけ）。 */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_workConsoleRecruitsOnlyNeeded")
+    public static void workConsoleRecruitsOnlyNeeded(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 2);
+        List<BladeAndroid> crew = new java.util.ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+            a.makeGuard(null, helper.absolutePos(p(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(1 + i, 1, 2))));
+            helper.getLevel().addFreshEntity(a);
+            crew.add(a);
+        }
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        // Other concurrently running fixtures may also have unowned guards in range.
+        var candidates = console.candidates(player);
+        helper.assertTrue(candidates.containsAll(crew), "用意した3体が選べる候補にならない");
+        var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        var order = console.orders().get(0);
+        long working = order.workers.stream().map(id -> helper.getLevel().getEntity(id))
+                .filter(e -> e instanceof RuinAndroid a && a.isWorking()).count();
+        helper.assertTrue(order.workers.size() == 1 && working == 1, "必要以上に招集した: 受け持ち " + order.workers.size() + " / 作業中 " + working);
+        // 画面で「自動」（だれも選ばない）にすると、選べる候補をみな送ってくる。そのときも必要な数だけ
+        console.cancel(order.id, null);
+        var error2 = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+                crew.stream().map(RuinAndroid::getUUID).toList(), true, helper.absolutePos(DELIVERY));
+        helper.assertTrue(error2 == null, "自動で注文できない: " + (error2 == null ? "" : error2.getString()));
+        var auto = console.orders().get(console.orders().size() - 1);
+        helper.assertTrue(auto.workers.size() == 1, "自動の注文で、候補を全員招集した: " + auto.workers.size());
+        crew.forEach(RuinAndroid::discard);
+        helper.succeed();
+    }
+
+    /** Automatic recruitment must retain the distant backpack worker needed by a six-stack cake recipe. */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_workConsoleAutoKeepsCapableWorker")
+    public static void workConsoleAutoKeepsCapableWorker(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 0);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
+        for (int i = 0; i < 3; i++) chest.setItem(i, new ItemStack(Items.MILK_BUCKET));
+        chest.setItem(3, new ItemStack(Items.SUGAR, 2));
+        chest.setItem(4, new ItemStack(Items.EGG));
+        chest.setItem(5, new ItemStack(Items.WHEAT, 3));
+        var grid = List.of(new ItemStack(Items.MILK_BUCKET), new ItemStack(Items.MILK_BUCKET), new ItemStack(Items.MILK_BUCKET),
+                new ItemStack(Items.SUGAR), new ItemStack(Items.EGG), new ItemStack(Items.SUGAR),
+                new ItemStack(Items.WHEAT), new ItemStack(Items.WHEAT), new ItemStack(Items.WHEAT));
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(3, recipeCard(helper, grid, new ItemStack(Items.CAKE)));
+        BladeAndroid small = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        BladeAndroid capable = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        for (BladeAndroid a : List.of(small, capable)) {
+            a.makeGuard(null, helper.absolutePos(p(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
+            a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(a == small ? p(1, 1, 0) : p(6, 1, 6))));
+            helper.getLevel().addFreshEntity(a);
+        }
+        capable.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        for (boolean gui : List.of(false, true)) {
+            var ids = gui ? List.of(small.getUUID(), capable.getUUID()) : List.<java.util.UUID>of();
+            var error = console.start(player, new ItemStack(Items.CAKE), 1, ids, gui, helper.absolutePos(DELIVERY));
+            helper.assertTrue(error == null, "Cake order rejected before recruitment: " + error);
+            var order = console.orders().get(console.orders().size() - 1);
+            if (gui) {
+                // Explicit GUI candidates isolate the closest-small / distant-capable regression.
+                helper.assertTrue(order.workers.contains(capable.getUUID()), "Automatic recruitment discarded the only capable worker");
+            } else {
+                // Empty IDs deliberately discover all nearby guards, including other fixtures.
+                helper.assertTrue(order.workers.stream().allMatch(id ->
+                                helper.getLevel().getEntity(id) instanceof RuinAndroid a && a.carryCapacity() >= 6),
+                        "Automatic recruitment selected a worker unable to carry the six cake input stacks");
+            }
+            helper.assertTrue(order.workers.size() == 1, "Cake requires only its capable worker, not extra idle workers");
+            console.cancel(order.id, null);
+        }
+        small.discard();
+        capable.discard();
+        helper.succeed();
     }
 
     /** 納品口に届いた item の数。 */
@@ -881,7 +1432,7 @@ public final class AndroidGameTests {
     }
 
     /** 燃料の「満タン」: 燃料が切れたら、1個ずつではなく、装置に入るだけ（在庫の石炭5個を全部）持ってくる。 */
-    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2400, batch = "automation_androidFillsFuel")
     public static void androidFillsFuel(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
@@ -921,7 +1472,7 @@ public final class AndroidGameTests {
     /**
      * 燃料が素材置き場になく、作れるとき: 燃料（樫の板材）を作る注文を自動で出し、原木から板材を作って、かまどに足して焼き上げる。
      */
-    @GameTest(template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
     public static void androidOrdersMissingFuel(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 2);                  // 原木2本と、板材・棒のレシピ
@@ -956,7 +1507,7 @@ public final class AndroidGameTests {
     }
 
     /** 入れる面を間違えたレシピ（かまどの下の面から原鉄）: 立ち尽くさず、注文の時点で理由を出して断る。 */
-    @GameTest(template = EMPTY)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_wrongInputFaceIsRefused")
     public static void wrongInputFaceIsRefused(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
@@ -993,7 +1544,7 @@ public final class AndroidGameTests {
      * 装置の加工を待つあいだに、ほかの作業をする: かまどに原鉄を入れたら、焼けるのを待たずに、もう1つの注文（棒）を作って届け、
      * 焼けたら取りに戻って、鉄インゴットも届ける。
      */
-    @GameTest(template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "android_multitask", timeoutTicks = 3000)
     public static void androidWorksWhileFurnaceSmelts(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 2);
@@ -1244,37 +1795,38 @@ public final class AndroidGameTests {
     public static void androidHarvestsAndReplants(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
-        // Light propagation on 1.20.1 is asynchronous. Plant only after the lit,
-        // irrigated fixture is ready, rather than losing crops to survival updates.
+        // Keep the farm level with the walking surface; raised crops create a
+        // pathfinding ledge beside the machines. Light propagation is asynchronous:
+        // wait for irrigation and lighting before planting crops.
         helper.setBlock(p(3, 3, 5), net.minecraft.world.level.block.Blocks.GLOWSTONE);
-        helper.setBlock(p(2, 1, 5), net.minecraft.world.level.block.Blocks.WATER);
+        helper.setBlock(p(2, 0, 5), net.minecraft.world.level.block.Blocks.WATER);
         for (int x = 0; x < 2; x++) {
-            helper.setBlock(p(x, 1, 5), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState()
+            helper.setBlock(p(x, 0, 5), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState()
                     .setValue(net.minecraft.world.level.block.FarmBlock.MOISTURE, 7));
         }
         helper.startSequence().thenWaitUntil(() -> {
             for (int x = 0; x < 2; x++) {
-                helper.assertTrue(helper.getLevel().getRawBrightness(helper.absolutePos(p(x, 2, 5)), 0) >= 9,
+                helper.assertTrue(helper.getLevel().getRawBrightness(helper.absolutePos(p(x, 1, 5)), 0) >= 9,
                         "畑の照明更新が終わっていない");
             }
         }).thenExecute(() -> {
             for (int x = 0; x < 2; x++) {
-                helper.setBlock(p(x, 2, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
+                helper.setBlock(p(x, 1, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
                         .getStateForAge(7));
             }
-        procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
-                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(p(0, 2, 5)),
-                helper.absolutePos(p(1, 2, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
-        BladeAndroid a = worker(helper, false);
-        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
-                helper.absolutePos(DELIVERY));
-        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
-        helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(p(0, 2, 5)) + " crop1=" + helper.getBlockState(p(1, 2, 5)) + " soil0=" + helper.getBlockState(p(0, 1, 5)) + " light=" + helper.getLevel().getRawBrightness(helper.absolutePos(p(0, 2, 5)), 0) + " message=" + console.message());
-            helper.assertTrue(helper.getBlockState(p(0, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
-                    && helper.getBlockState(p(1, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
-            a.discard();
-        });
+            procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
+                    io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(p(0, 1, 5)),
+                    helper.absolutePos(p(1, 1, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
+            BladeAndroid a = worker(helper, false);
+            var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
+                    helper.absolutePos(DELIVERY));
+            helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+            helper.succeedWhen(() -> {
+                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " position=" + a.position() + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(p(0, 1, 5)) + " crop1=" + helper.getBlockState(p(1, 1, 5)) + " soil0=" + helper.getBlockState(p(0, 0, 5)) + " light=" + helper.getLevel().getRawBrightness(helper.absolutePos(p(0, 1, 5)), 0) + " message=" + console.message());
+                helper.assertTrue(helper.getBlockState(p(0, 1, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
+                        && helper.getBlockState(p(1, 1, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
+                a.discard();
+            });
         });
     }
 
@@ -1442,6 +1994,111 @@ public final class AndroidGameTests {
         var made = view.getList("crafted", net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(0);
         helper.assertTrue(made.getLong("count") == 2000 && made.getLong("surplus") == 500, "mBで表示していない");
         helper.succeed();
+    }
+
+    /** 止まっている理由: 電力のないステーションで充電しようとすると、「ステーションの電力が足りない」を出す。電力が戻れば消える。 */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 1200, batch = "automation_stallShowsStationOutOfPower")
+    public static void stallShowsStationOutOfPower(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        floor(helper);
+        AndroidStationBlockEntity s = station(helper, 1);
+        boolean[] drained = {false}, seen = {false};
+        helper.onEachTick(() -> {
+            List<RuinAndroid> list = androids(helper);
+            if (list.isEmpty() || !list.get(0).printed()) {
+                return;
+            }
+            RuinAndroid a = list.get(0);
+            if (!drained[0]) {
+                // 印刷できたら、ステーションの電力とアンドロイドの充電を空にする
+                drained[0] = true;
+                s.energy().setEnergy(0);
+                CompoundTag saved = a.saveWithoutId(new CompoundTag());
+                saved.putInt("charge", 0);
+                a.load(saved);
+            } else if (!seen[0] && a.stall() == RuinAndroid.STALL_NO_POWER) {
+                seen[0] = true;
+                s.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);     // 電力を戻す
+            }
+        });
+        helper.succeedWhen(() -> {
+            List<RuinAndroid> list = androids(helper);
+            helper.assertTrue(seen[0], "電力のないステーションで、止まっている理由が出ない: "
+                    + list.stream().map(a -> "state=" + a.state() + " stall=" + a.stall() + " charge=" + a.charge()).toList());
+            RuinAndroid a = list.get(0);
+            helper.assertTrue(a.charge() > 0 && a.stall() == RuinAndroid.STALL_NONE, "電力が戻っても理由が消えない: " + a.stall()
+                    + " charge=" + a.charge() + " state=" + a.state());
+            list.forEach(RuinAndroid::discard);
+        });
+    }
+
+    /**
+     * 計画の持ち物の見積もり: 副産物も記録した数ずつ数え、1回ずつ作るあいだ一度も枠を超えない一番多い回数を選ぶ（決まった数の枠を
+     * 空けておかない。1回多くすると、途中のどこかであふれる）。
+     */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_planCountsByproductsExactly")
+    public static void planCountsByproductsExactly(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        java.util.List<ItemStack> grid = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(net.minecraft.world.item.Items.RAW_IRON));
+        var recipe = new io.github.genichimaruo.singulo.android.work.RecipeData(
+                io.github.genichimaruo.singulo.android.work.RecipeData.MODE_PROCESSING, grid,
+                new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), List.of(new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 3)));
+        var max = io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.class.getDeclaredMethod("maxCrafts",
+                io.github.genichimaruo.singulo.android.work.RecipeData.class, int.class, long.class);
+        max.setAccessible(true);
+        int slots = 5;
+        long k = (long) max.invoke(null, recipe, slots, 10_000L);
+        java.util.function.LongUnaryOperator peak = n -> {
+            long worst = 0;
+            for (long d = 0; d <= n; d++) {
+                worst = Math.max(worst, (n - d + 63) / 64 + (d + 63) / 64 + (3 * d + 63) / 64);   // 原鉄の残り・インゴット・丸石
+            }
+            return worst;
+        };
+        helper.assertTrue(k > 0 && peak.applyAsLong(k) <= slots, "選んだ回数で途中にあふれる: " + k + " 回で " + peak.applyAsLong(k));
+        helper.assertTrue(peak.applyAsLong(k + 1) > slots, "枠を使い切っていない（あと1回作れる）: " + k);
+        helper.succeed();
+    }
+
+    /**
+     * 採掘で一緒に出る物（前もって分からない）で持ち物がいっぱいになっても、足元に落とさない: 掘る前に収まるかを確かめ、
+     * 収まらなければ置きに戻ってから続ける。
+     */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 3600, batch = "automation_miningNeverDropsWhenFull")
+    public static void miningNeverDropsWhenFull(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        // 上の段は花崗岩（目当てではない物が出る）、下の段は石（丸石が出る）
+        for (int x = 0; x <= 1; x++) {
+            helper.setBlock(p(x, 2, 5), net.minecraft.world.level.block.Blocks.GRANITE);
+            helper.setBlock(p(x, 1, 5), net.minecraft.world.level.block.Blocks.STONE);
+        }
+        var step = new io.github.genichimaruo.singulo.android.work.ProcedureStep(io.github.genichimaruo.singulo.android.work.ProcedureStep.MINE,
+                helper.absolutePos(p(0, 1, 5)), helper.absolutePos(p(1, 2, 5)), ItemStack.EMPTY);
+        ItemStack card = new ItemStack(item("procedure_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.procedure(List.of(step), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE))
+                .write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);
+        BladeAndroid a = worker(helper, true);
+        // 持ち物5つのうち4つは私物でふさがっている（作業に使えるのは1つ）
+        for (int i = 0; i < 4; i++) {
+            a.inventory().setItem(RuinAndroid.CARRY_START + i, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+        }
+        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        boolean[] dropped = {false};
+        helper.onEachTick(() -> dropped[0] |= !level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                new AABB(helper.absolutePos(BlockPos.ZERO),
+                        helper.absolutePos(new BlockPos(16, 8, 16)))).isEmpty());
+        helper.succeedWhen(() -> {
+            helper.assertFalse(dropped[0], "持ち物からあふれた物が足元に落ちた");
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");
+            a.discard();
+        });
     }
 
     /** 加工のバッチ投入では、充電10で原鉄を1個だけ投入し、その場で止まる。 */
@@ -1700,4 +2357,72 @@ public final class AndroidGameTests {
         a.discard();
         helper.succeed();
     }
+    /** A full nearby chest must not mask another storage that can accept the cargo. */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_stashSkipsFullStorage")
+    public static void stashSkipsFullStorage(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(2, 1, 2))));
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(Items.STICK, 12));
+        BlockPos full = p(3, 1, 2), empty = p(6, 1, 2);
+        helper.setBlock(full, net.minecraft.world.level.block.Blocks.CHEST);
+        helper.setBlock(empty, net.minecraft.world.level.block.Blocks.CHEST);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, full);
+        for (int i = 0; i < chest.getContainerSize(); i++) chest.setItem(i, new ItemStack(Items.DIRT, 64));
+        var accepts = RuinAndroid.class.getDeclaredMethod("stashable", BlockPos.class);
+        accepts.setAccessible(true);
+        helper.assertFalse((boolean) accepts.invoke(a, helper.absolutePos(full)), "Full chest hides usable storage");
+        helper.assertTrue((boolean) accepts.invoke(a, helper.absolutePos(empty)), "Empty chest rejects cargo");
+        helper.assertTrue(a.requestStash() == null, "Usable storage was not found");
+        var target = RuinAndroid.class.getDeclaredField("stashTarget");
+        target.setAccessible(true);
+        helper.assertFalse(helper.absolutePos(full).equals(target.get(a)), "Selected full chest");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** Loot functions may return one stack whose count exceeds its item stack limit. */
+    @GameTest(setupTicks = 20, template = EMPTY, batch = "automation_miningCapacitySplitsOversizedLoot")
+    public static void miningCapacitySplitsOversizedLoot(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        var goalField = RuinAndroid.class.getDeclaredField("workGoal");
+        goalField.setAccessible(true);
+        Object goal = goalField.get(a);
+        var fits = goal.getClass().getDeclaredMethod("fitsInCarry", List.class);
+        fits.setAccessible(true);
+        for (int i = 0; i < 4; i++) a.inventory().setItem(RuinAndroid.CARRY_START + i, new ItemStack(Items.DIRT, 64));
+        helper.assertTrue((boolean) fits.invoke(goal, List.of(new ItemStack(Items.COBBLESTONE, 64))), "One stack should fit");
+        helper.assertFalse((boolean) fits.invoke(goal, List.of(new ItemStack(Items.COBBLESTONE, 128))), "Oversized loot was counted as one slot");
+        a.inventory().setItem(RuinAndroid.CARRY_START + 3, ItemStack.EMPTY);
+        helper.assertTrue((boolean) fits.invoke(goal, List.of(new ItemStack(Items.COBBLESTONE, 128))), "Two stacks should fit in two slots");
+        a.discard();
+        helper.succeed();
+    }
+
+    /** Supply ports route cargo to adjacent storage instead of exposing their own inventory. */
+    @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200, batch = "automation_androidStashesViaSupplyPort")
+    public static void androidStashesViaSupplyPort(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(p(4, 1, 2))));
+        helper.getLevel().addFreshEntity(a);
+        a.inventory().setItem(RuinAndroid.CARRY_START, new ItemStack(Items.STICK, 12));
+        BlockPos port = p(5, 1, 2), box = p(6, 1, 2);
+        helper.setBlock(port, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
+        helper.setBlock(box, net.minecraft.world.level.block.Blocks.CHEST);
+        var accepts = RuinAndroid.class.getDeclaredMethod("stashable", BlockPos.class);
+        accepts.setAccessible(true);
+        helper.assertTrue((boolean) accepts.invoke(a, helper.absolutePos(port)), "Supply port does not expose adjacent storage");
+        helper.assertTrue(a.requestStash() == null, "Supply storage was not found");
+        helper.succeedWhen(() -> {
+            net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, box);
+            helper.assertTrue(chest.getItem(0).is(Items.STICK) && chest.getItem(0).getCount() == 12, "Cargo did not arrive via supply port");
+            helper.assertTrue(a.inventory().getItem(RuinAndroid.CARRY_START).isEmpty(), "Stashed cargo remained in inventory");
+            a.discard();
+        });
+    }
+
 }

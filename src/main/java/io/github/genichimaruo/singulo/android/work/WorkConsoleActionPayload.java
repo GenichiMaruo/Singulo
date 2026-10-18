@@ -24,17 +24,31 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) {
 
 
     public static CompoundTag plan(ItemStack item, long count, net.minecraft.core.HolderLookup.Provider reg) {
+        return plan(item, count, false, reg);
+    }
+
+    /** 計算を頼む。fresh: 完成品の在庫は使わず、新しく作る。 */
+    public static CompoundTag plan(ItemStack item, long count, boolean fresh, net.minecraft.core.HolderLookup.Provider reg) {
         CompoundTag t = new CompoundTag();
         t.putString("type", PLAN);
         t.put("item", item.copyWithCount(1).save(new net.minecraft.nbt.CompoundTag()));
         t.putLong("count", count);
+        t.putBoolean("fresh", fresh);
         return t;
     }
 
-    public static CompoundTag start(ItemStack item, long count, List<UUID> androids, BlockPos destination,
+    /** 注文する。auto: アンドロイドを選ばなかった（androids は選べる候補。指令台が、そのうち作業量に見合う人数だけを招集する）。 */
+    public static CompoundTag start(ItemStack item, long count, List<UUID> androids, boolean auto, BlockPos destination,
                                     net.minecraft.core.HolderLookup.Provider reg) {
-        CompoundTag t = plan(item, count, reg);
+        return start(item, count, androids, auto, destination, false, reg);
+    }
+
+    /** 注文する（fresh: 完成品の在庫は使わず、新しく作る）。 */
+    public static CompoundTag start(ItemStack item, long count, List<UUID> androids, boolean auto, BlockPos destination, boolean fresh,
+                                    net.minecraft.core.HolderLookup.Provider reg) {
+        CompoundTag t = plan(item, count, fresh, reg);
         t.putString("type", START);
+        t.putBoolean("auto", auto);
         t.putLong("destination", destination.asLong());
         net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
         for (UUID id : androids) {
@@ -47,7 +61,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) {
     /** 注文を登録する（trigger は {@link StandingOrder#KEEP} など）。 */
     public static CompoundTag register(ItemStack item, long count, int trigger, List<UUID> androids, BlockPos destination,
                                        net.minecraft.core.HolderLookup.Provider reg) {
-        CompoundTag t = start(item, count, androids, destination, reg);
+        CompoundTag t = start(item, count, androids, false, destination, reg);
         t.putString("type", REGISTER);
         t.putInt("trigger", trigger);
         return t;
@@ -135,7 +149,7 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) {
             switch (a.getString("type")) {
                 case PLAN -> {
                     if (!item.isEmpty()) {
-                        plan = WorkConsoleView.plan(console, console.plan(item, count), reg);
+                        plan = WorkConsoleView.plan(console, console.plan(item, count, a.getBoolean("fresh")), reg);
                     }
                 }
                 case START -> {
@@ -144,7 +158,8 @@ public record WorkConsoleActionPayload(int containerId, CompoundTag action) {
                         ids.add(NbtUtils.loadUUID(t));
                     }
                     BlockPos destination = a.contains("destination") ? BlockPos.of(a.getLong("destination")) : null;
-                    Component error = item.isEmpty() ? Component.literal("?") : console.start(player, item, count, ids, destination);
+                    Component error = item.isEmpty() ? Component.literal("?")
+                            : console.start(player, item, count, ids, a.getBoolean("auto"), destination, a.getBoolean("fresh"));
                     plan = new CompoundTag();
                     plan.putBoolean("started", error == null);
                     if (error != null) {
