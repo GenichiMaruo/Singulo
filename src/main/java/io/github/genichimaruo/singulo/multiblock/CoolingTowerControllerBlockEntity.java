@@ -8,7 +8,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * 極低温冷却塔のコントローラ。双曲面の塔（高さ7〜15、形は Shapes.tower）。高いほど速い（高さ÷5倍）。
+ * 極低温冷却塔のコントローラ。双曲面の塔（高さ7〜15、形は Shapes.tower）。高いほど速い（高さ÷5倍。1回あたりの電力は同じなので、
+ * 毎tickの電力もそのぶん増える）。
  * 高さ10以上で液体ヘリウムを作れる。形は20 tick ごとに確かめ、崩れたら止まる。
  */
 public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
@@ -51,6 +52,12 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
     @Override
     protected double speedMultiplier() {
         return height / 5.0;
+    }
+
+    /** 高い塔は速いが、そのぶん毎tickの電力も増える（液体窒素1 mBあたりの電力は、塔の高さによらず同じ）。 */
+    @Override
+    protected boolean fixedEnergyPerCraft() {
+        return true;
     }
 
     @Override

@@ -91,7 +91,7 @@ public final class RecipeTweaks {
                 + '|' + ServerConfig.STARS_PER_SINGULARITY_CORE.get() + '|' + ServerConfig.ALLOW_ARTIFICIAL_STAR_CORE.get()
                 + '|' + ServerConfig.ARTIFICIAL_STAR_CORE_JET_CONDENSATE.get() + '|' + ServerConfig.SPENT_RECYCLE_RATIO.get()
                 + '|' + ServerConfig.TIME_CRYSTAL_GROWTH_TICKS.get() + '|' + ServerConfig.SHELL_ROCK_LV3.get()
-                + '|' + ServerConfig.SHELL_METAL_CORES.get() + '|' + ServerConfig.SHELL_COOLANT_MB.get()
+                + '|' + ServerConfig.SHELL_METAL_CORES.get() + '|' + ServerConfig.SHELL_NITROGEN_MB.get()
                 + '|' + ServerConfig.REACTOR_PLATES_PER_SHELL.get() + '|' + ServerConfig.SCULK_PER_SHARD.get()
                 + '|' + ServerConfig.LIFETIME_MULTIPLIER.get() + '|' + ServerConfig.MUON_LIFETIME_MINUTES.get()
                 + '|' + ServerConfig.BOSE_LIFETIME_MINUTES.get() + '|' + ServerConfig.TIME_CRYSTAL_LIFETIME_MINUTES.get()
@@ -152,15 +152,15 @@ public final class RecipeTweaks {
                 Predicate<Ingredient> metal = accepts(item("compressed_metal_block_2"));
                 setCount(items, rock, Difficulty.compression(configured(ServerConfig.SHELL_ROCK_LV3, countOf(items, rock))));
                 setCount(items, metal, Difficulty.compression(configured(ServerConfig.SHELL_METAL_CORES, countOf(items, metal))));
-                setNitrogen(fluids, amount -> fitTank(Difficulty.compression(configured(ServerConfig.SHELL_COOLANT_MB, amount))));
+                setNitrogen(fluids, amount -> fitTank(Difficulty.compression(configured(ServerConfig.SHELL_NITROGEN_MB, amount))));
             }
             case "degenerate_compactor/degenerate_matter_shell_from_strange_matter" -> {
                 Predicate<Ingredient> metal = accepts(item("compressed_metal_block_2"));
                 setCount(items, metal, Difficulty.compression(configured(ServerConfig.SHELL_METAL_CORES, countOf(items, metal))));
-                // ストレンジ物質はすでに縮退しているので、冷却材は通常の殻の半分（設定 shellCoolantMb も半分に換算する）
+                // ストレンジ物質はすでに縮退しているので、冷却材は通常の殻の半分（設定 shellNitrogenMb も半分に換算する）
                 setNitrogen(fluids, amount -> {
-                    int v = ServerConfig.SHELL_COOLANT_MB.get();
-                    int base = v == ServerConfig.SHELL_COOLANT_MB.getDefault() ? amount : (int) Math.round(v / 2.0);
+                    int v = ServerConfig.SHELL_NITROGEN_MB.get();
+                    int base = v == ServerConfig.SHELL_NITROGEN_MB.getDefault() ? amount : (int) Math.round(v / 2.0);
                     return fitTank(Difficulty.compression(base));
                 });
             }

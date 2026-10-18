@@ -39,7 +39,7 @@
   "fluid_ingredients": [
     {
       "fluid": "singulo:liquid_nitrogen",
-      "amount": 200
+      "amount": 40
     }
   ],
   "result": {

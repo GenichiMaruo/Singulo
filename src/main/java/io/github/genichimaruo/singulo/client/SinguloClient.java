@@ -195,6 +195,7 @@ public final class SinguloClient {
     private static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(SinguloMenus.MACHINE.get(), MachineScreen::new);
         event.register(SinguloMenus.THERMOELECTRIC_GENERATOR.get(), ThermoelectricGeneratorScreen::new);
+        event.register(SinguloMenus.GENERATOR_SLOTS.get(), GeneratorSlotsScreen::new);
         event.register(SinguloMenus.CATALYST_DEVICE.get(), CatalystDeviceScreen::new);
         event.register(SinguloMenus.PENROSE_REACTOR.get(), PenroseReactorScreen::new);
         event.register(SinguloMenus.SMES.get(), SmesScreen::new);

@@ -230,6 +230,8 @@ ICONS = {
     'link': ["........", ".##..##.", "#..##..#", "#..++..#", "#..##..#", ".##..##.", "........", "........"],
     'beam': ["#......#", ".#....#.", "..#..#..", "...++...", "...++...", "..#..#..", ".#....#.", "#......#"],
     'atom': ["...##...", ".#.##.#.", "#..##..#", ".##++##.", ".##++##.", "#..##..#", ".#.##.#.", "...##..."],
+    # 核融合: プラズマの輪（トカマク）と、まん中で光る火
+    'fusion': ["..####..", ".#....#.", "#..++..#", "#.++++.#", "#.++++.#", "#..++..#", ".#....#.", "..####.."],
     'wave': ["........", "........", "#..#....", ".##.#..#", "....#.#.", ".....#..", "........", "........"],
     'shield': [".######.", "#++++++#", "#+####+#", "#+#..#+#", ".#+##+#.", "..#++#..", "...##...", "........"],
     'echo': ["#.#..#.#", "#.#..#.#", "..#..#..", "...++...", "...++...", "..#..#..", "#.#..#.#", "#.#..#.#"],
@@ -257,6 +259,7 @@ MACHINE_ICONS = {
     'archive_terminal': ('screen', (140, 240, 220)), 'thermoelectric_generator': ('thermo', (255, 120, 90)),
     'precision_assembler': ('arm', None), 'catalytic_reactor': ('flask', (150, 255, 180)),
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
+    'muon_fusion_reactor': ('fusion', (200, 150, 255)),
     'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),
@@ -1396,6 +1399,20 @@ def coolant_cartridge():
     return outlined(f)
 
 
+def empty_coolant_cartridge():
+    """空の冷媒カートリッジ: 冷媒カートリッジと同じ鋼の容器で、窓の帯が暗い（中が空）。"""
+    steel = (176, 184, 196)
+
+    def f(d):
+        d.rectangle([5, 3, 10, 13], fill=rgba(steel))
+        d.rectangle([5, 3, 6, 13], fill=rgba(lighten(steel, 0.25)))
+        d.rectangle([9, 3, 10, 13], fill=rgba(darken(steel, 0.2)))
+        d.rectangle([5, 7, 10, 9], fill=(70, 82, 98, 255))
+        d.line([(6, 8), (7, 8)], fill=(120, 136, 156, 255))
+        d.rectangle([6, 1, 9, 2], fill=rgba(darken(steel, 0.35)))
+    return outlined(f)
+
+
 def phase_sync_plate():
     """位相同期板: 薄い光格子の板に、そろった波の縞（琥珀と菫）。"""
     def f(d):
@@ -1685,6 +1702,7 @@ ITEM_ART = {
     'pressure_crystal': lambda: crystal_cluster((60, 104, 206), seed=5, mark=(210, 235, 255)),
     'void_dust': void_dust,
     'coolant_cartridge': coolant_cartridge,
+    'empty_coolant_cartridge': empty_coolant_cartridge,
     'phase_sync_plate': phase_sync_plate,
     'degenerate_precursor': degenerate_precursor,
     'confinement_ring': confinement_ring,

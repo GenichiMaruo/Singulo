@@ -395,6 +395,14 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return 1.0;
     }
 
+    /**
+     * 1回あたりの電力を、速さによらず一定にするか（速くなると、そのぶん毎tickの電力が増える）。
+     * 極低温冷却塔: 液体窒素に詰めた電力を極低温タービンが取り戻すので、速くして安く作れると、取り戻す電力のほうが多くなる。
+     */
+    protected boolean fixedEnergyPerCraft() {
+        return false;
+    }
+
     /** レシピを1回完了した直後に呼ばれる。 */
     protected void onCrafted(Level level, MachineRecipe recipe) {}
 
@@ -583,8 +591,14 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 speed *= 3;
             }
             maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
-            usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
-                    / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
+            if (fixedEnergyPerCraft()) {
+                // 1回あたりの電力（レシピの電力 × 時間）を、速さ・単極子・オーバークロックによらず保つ
+                usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
+                        * found.value().time() / (double) maxProgress);
+            } else {
+                usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
+                        / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
+            }
         }
     }
 

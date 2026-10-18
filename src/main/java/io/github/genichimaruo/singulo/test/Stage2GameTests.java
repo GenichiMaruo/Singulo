@@ -85,6 +85,8 @@ public final class Stage2GameTests {
     @GameTest(template = TALL, timeoutTicks = 300)
     public static void tallCoolingTowerLiquefiesHelium(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 10);
+        // 高い塔は速いぶん毎tickの電力も多い（1回 100,000 FE）ので、電源の代わりに毎tick満たす
+        helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
         tower.automationFluids().fill(new FluidStack(fluid("helium"), 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
             helper.assertTrue(tower.structureSize() == 10, "高さ10の塔として形成されない: " + tower.structureSize());
@@ -195,6 +197,10 @@ public final class Stage2GameTests {
 
     // ------------------------------------------------------------------ 発電・蓄電・送電
 
+    /**
+     * 極低温タービン（液体窒素の蓄電）: 溶岩の横で、液体窒素に詰めた電力（1 mBに250 FE）の9割を取り戻す。
+     * 出力の上限 4.5 kFE/t に見合う 20 mB/t を使う。取り戻す電力は、冷却塔で詰めた電力より少ない（電力は増えない）。
+     */
     @GameTest(template = EMPTY)
     public static void cryogenicTurbineRunsOnLavaAndNitrogen(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
@@ -203,11 +209,82 @@ public final class Stage2GameTests {
         CryogenicTurbineBlockEntity turbine = helper.getBlockEntity(pos);
         turbine.tank().fill(new FluidStack(fluid("liquid_nitrogen"), 4000), IFluidHandler.FluidAction.EXECUTE);
         helper.runAtTickTime(40, () -> {
-            // 溶岩なら 5 kFE/t。最初の走査まで最大10 tick
+            // 最初の走査まで最大10 tick
             int energy = turbine.energy().getEnergyStored();
-            helper.assertTrue(energy >= 5000 * 28 && energy <= 5000 * 41, "出力が設計値から外れている: " + energy);
-            int left = turbine.tank().getFluidInTank(0).getAmount();
-            helper.assertTrue(left < 4000 && left >= 4000 - 2 * 41, "液体窒素の消費が毎tick 2 mB でない: " + left);
+            helper.assertTrue(energy >= 4500 * 28 && energy <= 4500 * 43, "出力が設計値から外れている: " + energy);
+            int used = 4000 - turbine.tank().getFluidInTank(0).getAmount();
+            helper.assertTrue(used >= 20 * 28 && used <= 20 * 43, "液体窒素の消費が毎tick 20 mB でない: " + used);
+            double perMb = energy / (double) used;
+            helper.assertTrue(perMb <= 250 * 0.9 + 1e-6, "液体窒素1 mBから、詰めた電力の9割より多く取り戻した: " + perMb);
+            helper.succeed();
+        });
+    }
+
+    /** 極低温タービンの入口の冷媒カートリッジは、タンクに空けて、空のカートリッジが出口に出る。 */
+    @GameTest(template = EMPTY)
+    public static void cryogenicTurbineEmptiesCartridges(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.CRYOGENIC_TURBINE.get());
+        CryogenicTurbineBlockEntity turbine = helper.getBlockEntity(pos);
+        turbine.items().setStackInSlot(0, new ItemStack(item("coolant_cartridge"), 3));
+        helper.runAtTickTime(10, () -> {
+            helper.assertTrue(turbine.tank().getFluidInTank(0).getAmount() == 300, "冷媒カートリッジ3個で、液体窒素が300 mB入らない: "
+                    + turbine.tank().getFluidInTank(0).getAmount());
+            helper.assertTrue(turbine.items().getStackInSlot(0).isEmpty(), "入口に冷媒カートリッジが残っている");
+            ItemStack out = turbine.items().getStackInSlot(1);
+            helper.assertTrue(out.is(item("empty_coolant_cartridge")) && out.getCount() == 3, "出口に空のカートリッジが3個出ない: " + out);
+            helper.succeed();
+        });
+    }
+
+    /** 冷媒カートリッジは液体窒素100 mBの容器: 満タンから空へ、空から満タンへ（半端な量では出し入れしない）。 */
+    @GameTest(template = EMPTY)
+    public static void coolantCartridgeIsAFluidContainer(GameTestHelper helper) {
+        var full = new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(new ItemStack(item("coolant_cartridge")));
+        helper.assertTrue(full.drain(50, IFluidHandler.FluidAction.SIMULATE).isEmpty(), "50 mBだけ汲み出せてしまう");
+        FluidStack out = full.drain(100, IFluidHandler.FluidAction.EXECUTE);
+        helper.assertTrue(out.getAmount() == 100 && out.getFluid().isSame(fluid("liquid_nitrogen")), "100 mBの液体窒素が出ない");
+        helper.assertTrue(full.getContainer().is(item("empty_coolant_cartridge")), "空けたのに空のカートリッジにならない");
+        var empty = new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(new ItemStack(item("empty_coolant_cartridge")));
+        helper.assertTrue(empty.fill(new FluidStack(fluid("liquid_nitrogen"), 60), IFluidHandler.FluidAction.EXECUTE) == 0, "60 mBで詰まってしまう");
+        helper.assertTrue(empty.fill(new FluidStack(fluid("liquid_nitrogen"), 500), IFluidHandler.FluidAction.EXECUTE) == 100, "100 mB詰まらない");
+        helper.assertTrue(empty.getContainer().is(item("coolant_cartridge")), "詰めたのに冷媒カートリッジにならない");
+        helper.succeed();
+    }
+
+    /** 冷却塔の液体窒素は、塔の高さによらず 100 mB に 25,000 FE（高い塔は速いぶん、毎tickの電力が多い）。 */
+    @GameTest(template = TALL, timeoutTicks = 200)
+    public static void coolingTowerNitrogenCostIsFixedPerCraft(GameTestHelper helper) {
+        MachineBlockEntity tower = buildTower(helper, 10);
+        int start = tower.energy().getEnergyStored();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(drainable(tower.automationFluids(), "liquid_nitrogen") >= 100, "液体窒素がまだできない");
+            int used = start - tower.energy().getEnergyStored();
+            helper.assertTrue(used >= 24_900 && used <= 25_100, "高さ10の塔で、液体窒素100 mBの電力が25,000 FEでない: " + used);
+        });
+    }
+
+    /**
+     * ミュオン触媒核融合炉: 触媒を炉へ入れ、水を4 tickに1 mB使って 4 kFE/t。触媒が尽きると、失活したミュオン触媒が出口に出る。
+     */
+    @GameTest(template = EMPTY)
+    public static void muonFusionReactorBurnsCatalystAndWater(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.MUON_FUSION_REACTOR.get());
+        io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity reactor = helper.getBlockEntity(pos);
+        reactor.tank().fill(new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        reactor.items().setStackInSlot(0, new ItemStack(item("muon_catalyst"), 1));
+        helper.runAtTickTime(21, () -> {
+            helper.assertTrue(reactor.items().getStackInSlot(0).isEmpty(), "触媒が炉へ入らない");
+            int energy = reactor.energy().getEnergyStored();
+            helper.assertTrue(energy >= 4000 * 19 && energy <= 4000 * 21, "出力が 4 kFE/t でない: " + energy);
+            int used = 1000 - reactor.tank().getFluidInTank(0).getAmount();
+            helper.assertTrue(used >= 4 && used <= 6, "水が4 tickに1 mB減らない: " + used);
+            reactor.setBurnForTest(3);
+        });
+        helper.runAtTickTime(30, () -> {
+            helper.assertTrue(reactor.burn() == 0, "触媒が尽きない");
+            helper.assertTrue(reactor.items().getStackInSlot(1).is(item("spent_muon_catalyst")), "失活したミュオン触媒が出口に出ない");
             helper.succeed();
         });
     }

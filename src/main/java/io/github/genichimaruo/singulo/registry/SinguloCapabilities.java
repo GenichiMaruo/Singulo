@@ -41,6 +41,17 @@ public final class SinguloCapabilities {
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.CRYOGENIC_TURBINE.get(),
                 (be, side) -> be.tank());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.CRYOGENIC_TURBINE.get(),
+                (be, side) -> be.automationItems());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.MUON_FUSION_REACTOR.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.MUON_FUSION_REACTOR.get(),
+                (be, side) -> be.tank());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.MUON_FUSION_REACTOR.get(),
+                (be, side) -> be.automationItems());
+        // 冷媒カートリッジは液体窒素100 mBの容器（バケツと同じく、装置を右クリックして注ぐ・汲む）
+        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(stack),
+                io.github.genichimaruo.singulo.machine.CoolantCartridges.filled(), io.github.genichimaruo.singulo.machine.CoolantCartridges.empty());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_CELL.get(),
                 (be, side) -> be.energyFor(side));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_DELIVERY_PORT.get(), (be, side) -> be.handler());

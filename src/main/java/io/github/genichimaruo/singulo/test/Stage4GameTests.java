@@ -102,13 +102,13 @@ public final class Stage4GameTests {
         m.items().setStackInSlot(0, new ItemStack(item("compressed_block_3"), 4));
         m.items().setStackInSlot(1, new ItemStack(item("degenerate_precursor"), 4));
         m.items().setStackInSlot(2, new ItemStack(item("compressed_metal_block_2"), 1));
-        m.automationFluids().fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 6000), IFluidHandler.FluidAction.EXECUTE);
+        m.automationFluids().fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 1200), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
             helper.assertTrue(m.structureSize() == 5, "5×5×5 として形成されない");
             helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).is(item("degenerate_matter_shell")),
                     "縮退物質殻ができない");
             helper.assertTrue(drainable(m.automationFluids(), "liquid_nitrogen") == 0
-                    && m.automationFluids().getFluidInTank(0).isEmpty(), "圧縮熱の除去に液体窒素6000 mBを使っていない");
+                    && m.automationFluids().getFluidInTank(0).isEmpty(), "圧縮熱の除去に液体窒素1200 mBを使っていない");
         });
     }
 

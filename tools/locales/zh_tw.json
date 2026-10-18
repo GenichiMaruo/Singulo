@@ -999,6 +999,10 @@
     "source": "Multiblock I/O Port",
     "translation": "多方塊輸入輸出埠"
   },
+  "block.singulo.muon_fusion_reactor": {
+    "source": "Muon-Catalyzed Fusion Reactor",
+    "translation": "緲子催化核融合爐"
+  },
   "block.singulo.neutrino_observatory": {
     "source": "Neutrino Observatory",
     "translation": "微中子觀測站"
@@ -1768,8 +1772,8 @@
     "translation": "經過修復的古代控制單元，可使用次數有限。"
   },
   "desc.singulo.coolant_cartridge": {
-    "source": "A steel canister holding 100 mB of liquid nitrogen. Lets the Precision Assembler build cryogenic parts such as quantum computing modules.",
-    "translation": "裝有 100 mB 液態氮的鋼罐。讓無法放入液體的精密組裝台也能組裝量子運算模組等低溫零件。"
+    "source": "A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as quantum computing modules.",
+    "translation": "裝有 100 mB 液態氮的容器。右鍵點擊裝置即可倒入，並取回空冷媒罐（沒有管線也能運送液態氮）。也可以放進低溫渦輪機的入口。精密組裝台會直接把它用作量子運算模組等低溫零件的材料。"
   },
   "desc.singulo.cooling_tower_base": {
     "source": "The 5×5 foundation of the tower.",
@@ -1832,8 +1836,8 @@
     "translation": "從空氣製造液態氮的多方塊結構；塔高 10 以上時還能將氦液化為液態氦。"
   },
   "desc.singulo.cryogenic_turbine": {
-    "source": "Generates power from evaporating cryogens.",
-    "translation": "透過蒸發冷媒產生電力。"
+    "source": "Recovers the power stored in liquid nitrogen by boiling it against a heat source next to it (up to 90% next to lava). It stores and moves power; it does not create any.",
+    "translation": "利用旁邊的高溫源使液態氮汽化，取回儲存在液態氮中的電力（在熔岩旁最多 9 成）。這是用來儲存和運送電力的裝置，不會增加電力。"
   },
   "desc.singulo.culture_data": {
     "source": "A record from the culture facility.",
@@ -1982,6 +1986,10 @@
   "desc.singulo.emergency_light": {
     "source": "Laboratory emergency light. It glows red only while main power is down.",
     "translation": "研究所的緊急照明燈。只在主電源斷開時亮起紅光。"
+  },
+  "desc.singulo.empty_coolant_cartridge": {
+    "source": "A steel canister that holds 100 mB of liquid nitrogen. Right-click the cooling tower controller, or process it in the tower, to fill it.",
+    "translation": "可裝 100 mB 液態氮的鋼製容器。用它右鍵點擊極低溫冷卻塔的控制器，或在冷卻塔中加工，就會變成裝滿的冷媒罐。"
   },
   "desc.singulo.entangled_element": {
     "source": "Always made in pairs. Used in detectors and links.",
@@ -2254,6 +2262,10 @@
   "desc.singulo.muon_catalyst": {
     "source": "Tier 2 catalyst with a lifetime. Leaves a spent catalyst when used up.",
     "translation": "有使用壽命的 2 級催化劑。用完後會留下失效的催化劑。"
+  },
+  "desc.singulo.muon_fusion_reactor": {
+    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Each catalyst lasts 10 minutes and comes out spent.",
+    "translation": "用緲子催化劑和水（氘）發電的第 2 階段發電機（4 kFE/t）。每個催化劑可運轉 10 分鐘，之後變為失活的緲子催化劑。"
   },
   "desc.singulo.neutrino_observatory": {
     "source": "Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.",
@@ -4082,6 +4094,42 @@
   "gui.singulo.fluid": {
     "source": "%s: %s / %s mB",
     "translation": "%1$s: %2$s / %3$s mB"
+  },
+  "gui.singulo.generator_slots.catalyst": {
+    "source": "Catalyst left: %s%%",
+    "translation": "催化劑剩餘 %s%%"
+  },
+  "gui.singulo.generator_slots.efficiency": {
+    "source": "Recovers: %s%%",
+    "translation": "可取回的電力：%s%%"
+  },
+  "gui.singulo.generator_slots.fusion.in": {
+    "source": "Insert muon catalysts. Each one runs the reactor for 10 minutes, then comes out spent below",
+    "translation": "放入緲子催化劑。每個可運轉 10 分鐘，失活後從下方送出"
+  },
+  "gui.singulo.generator_slots.nitrogen": {
+    "source": "Liquid nitrogen %s / %s mB",
+    "translation": "液態氮 %s / %s mB"
+  },
+  "gui.singulo.generator_slots.no_catalyst": {
+    "source": "No catalyst",
+    "translation": "沒有催化劑"
+  },
+  "gui.singulo.generator_slots.no_heat": {
+    "source": "No heat source (put lava or a magma block next to it)",
+    "translation": "沒有高溫源（在旁邊放熔岩或岩漿塊等）"
+  },
+  "gui.singulo.generator_slots.standby": {
+    "source": "Storage full: standing by",
+    "translation": "蓄電已滿：待機中"
+  },
+  "gui.singulo.generator_slots.turbine.in": {
+    "source": "Insert coolant cartridges: the liquid nitrogen goes into the tank and the empty cartridges come out below",
+    "translation": "放入冷媒罐後，會把液態氮倒進儲槽，並在下方送出空罐"
+  },
+  "gui.singulo.generator_slots.water": {
+    "source": "Water %s / %s mB",
+    "translation": "水 %s / %s mB"
   },
   "gui.singulo.genesis.bar.kindling": {
     "source": "Kindling %s  Intake %s/t",
@@ -6260,24 +6308,24 @@
     "translation": "粒子加速器與緲子催化劑"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Add power with Cryogenic Turbines (5 kFE/t from evaporating liquid nitrogen).\n3. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用低溫渦輪機（液氮汽化，5 kFE/t）增加電力。\n3. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和冷原子阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. Each catalyst lasts 10 minutes.\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。每個催化劑可運轉 10 分鐘。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和冷原子阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（電力不足時不會停止，只是變慢）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
     "translation": "第 2 階段的流程"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Cryogenic Turbine: generates power from evaporating liquid nitrogen (5 kFE/t).\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
-    "translation": "- 精密組裝台：第 3 階段以後幾乎所有零件與裝置都在這裡製作。\n- 低溫渦輪機：利用液態氮氣化發電（5 kFE/t）。\n- SMES 電池：儲存大量電力。\n- 世界線錨（小型）：放入催化劑後持續載入周圍的區塊。\n- 單極子升級模組：以磁單極子製作，插入裝置的單極子槽後速度 ×2、電力效率 +50%。"
+    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). Each catalyst lasts 10 minutes and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
+    "translation": "- 精密組裝台：第 3 階段以後幾乎所有零件與裝置都在這裡製作。\n- 緲子催化核融合爐：用緲子催化劑和水發電（4 kFE/t）。每個催化劑可運轉 10 分鐘，之後變為失活的催化劑（可在催化反應器中變回緲子束）。也可以用桶右鍵加水。\n- 低溫渦輪機：取回儲存在液態氮中的電力（在熔岩旁 9 成，最大 4.5 kFE/t）。這是用來儲存和運送電力的裝置，不會增加電力。把冷媒罐放進入口，就會倒出液態氮並送出空罐。\n- SMES 電池：儲存大量電力。\n- 世界線錨（小型）：放入催化劑後持續載入周圍的區塊。\n- 單極子升級模組：以磁單極子製作，插入裝置的單極子槽後速度 ×2、電力效率 +50%。"
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",
     "translation": "其他第 2 階段設備"
   },
   "guide.singulo.stage2.tower.body": {
-    "source": "Build a waisted hyperboloid tower 7–15 high on a 5×5 base. The middle column is heat exchange cores and the top is closed with a vent grate. The controller goes in the middle of the front face, second layer from the bottom. Taller towers are faster, and at 10 or more they also make liquid helium.\nIt makes liquid nitrogen from the air with no inputs. Superconducting coils are made from copper, redstone, steel plates, substrates, a control unit and liquid nitrogen.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 cryogenic turbines and a 10-high tower 5 (fewer when it also processes coils; recipes with inputs run before nitrogen).",
-    "translation": "在 5×5 的基座上建造高 7–15 的收腰雙曲面塔。中央一列為熱交換核心，頂部用通風格柵封住。控制器放在正面從下往上第二層的中央。越高越快，10 格以上還能製造液態氦。\n無需任何材料即可從空氣製造液態氮。超導線圈由銅、紅石、鋼板、基板、控制單元與液態氮製成。\n熱交換核心和冷卻帶可用 3 個浮冰代替藍冰。只製造液態氮時，高 7 的塔約可供 3.5 台低溫渦輪機，高 10 的塔可供 5 台（同時加工線圈等時會減少；有材料的配方優先於液態氮）。"
+    "source": "Build a waisted hyperboloid tower 7–15 high on a 5×5 base. The middle column is heat exchange cores and the top is closed with a vent grate. The controller goes in the middle of the front face, second layer from the bottom. Taller towers are faster, and at 10 or more they also make liquid helium.\nIt makes liquid nitrogen from the air with no inputs. Superconducting coils are made from copper, redstone, steel plates, substrates, a control unit and liquid nitrogen.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Taller towers work faster but draw more power per tick (liquid nitrogen costs 250 FE per mB at any height; recipes with inputs run before nitrogen).\nRight-click the controller with an empty coolant cartridge to fill it with liquid nitrogen (processing it in the tower works too). Right-click a machine with a filled cartridge to pour it in, so no pipes are needed.",
+    "translation": "在 5×5 的基座上建造高 7–15 的收腰雙曲面塔。中央一列為熱交換核心，頂部用通風格柵封住。控制器放在正面從下往上第二層的中央。越高越快，10 格以上還能製造液態氦。\n無需任何材料即可從空氣製造液態氮。超導線圈由銅、紅石、鋼板、基板、控制單元與液態氮製成。\n熱交換核心和冷卻帶可用 3 個浮冰代替藍冰。塔越高製作越快，但每 tick 的耗電也會相應增加（液態氮無論塔多高，每 1 mB 都需要 250 FE；有材料的配方優先於液態氮）。\n用空冷媒罐右鍵點擊控制器即可裝入液態氮（在冷卻塔中加工也可以）。用冷媒罐右鍵點擊裝置即可倒入，沒有管線也能運送。"
   },
   "guide.singulo.stage2.tower.title": {
     "source": "Cryogenic Cooling Tower",
@@ -6899,6 +6947,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：工作台（第 1 階段）"
   },
+  "howto.singulo.empty_coolant_cartridge": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.entangled_element": {
     "source": "Made in: Entanglement Synthesizer (stage 3)",
     "translation": "製造地：量子糾纏合成器（第 3 階段）"
@@ -7082,6 +7134,10 @@
   "howto.singulo.muon_catalyst": {
     "source": "Made in: Catalytic Reactor (stage 2)",
     "translation": "製造地：催化反應器（第 2 階段）"
+  },
+  "howto.singulo.muon_fusion_reactor": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "製造地：精密組裝台（第 2 階段）"
   },
   "howto.singulo.neutrino_observatory": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -7742,6 +7798,10 @@
   "item.singulo.echo_sentinel_spawn_egg": {
     "source": "Echo Sentinel Spawn Egg",
     "translation": "回聲守衛生怪蛋"
+  },
+  "item.singulo.empty_coolant_cartridge": {
+    "source": "Empty Coolant Cartridge",
+    "translation": "空冷媒罐"
   },
   "item.singulo.entangled_element": {
     "source": "Entangled Element",
@@ -10096,8 +10156,8 @@
     "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 39 個"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
-    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 36 個"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 37 more",
+    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 37 個"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -10184,8 +10244,8 @@
     "translation": "用於：超導線圈"
   },
   "uses.singulo.coolant_cartridge": {
-    "source": "Used in: Quantum Computing Module, SMES Module",
-    "translation": "用於：量子運算模組、SMES 模組"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, Quantum Computing Module, SMES Module",
+    "translation": "用於：緲子催化核融合爐、量子運算模組、SMES 模組"
   },
   "uses.singulo.cooling_tower_base": {
     "source": "Used in: Cryogenic Cooling Tower",
@@ -10327,6 +10387,10 @@
     "source": "Used in: Terminus Record",
     "translation": "用於：終焉之記錄"
   },
+  "uses.singulo.empty_coolant_cartridge": {
+    "source": "Used in: Coolant Cartridge",
+    "translation": "用於：冷媒罐"
+  },
   "uses.singulo.entangled_element": {
     "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
     "translation": "用於：強化背包升級、量子運算模組、光學晶格基板、微中子掃描器、慣性穩定器 等 19 個"
@@ -10408,8 +10472,8 @@
     "translation": "用於：緲子催化劑"
   },
   "uses.singulo.muon_catalyst": {
-    "source": "Used in: BE Condensate Catalyst",
-    "translation": "用於：玻色凝聚態催化劑"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, BE Condensate Catalyst",
+    "translation": "用於：緲子催化核融合爐、玻色凝聚態催化劑"
   },
   "uses.singulo.neutrino_scanner": {
     "source": "Used in: Neutrino Observatory",
@@ -10516,12 +10580,12 @@
     "translation": "用於：基本框架、鋼板、壓縮機"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 77 more",
-    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 77 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 78 more",
+    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 78 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 54 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 54 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 55 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

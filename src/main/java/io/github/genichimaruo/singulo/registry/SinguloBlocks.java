@@ -149,6 +149,10 @@ public final class SinguloBlocks {
     public static final DeferredBlock<SimpleMachineBlock<CryogenicTurbineBlockEntity>> CRYOGENIC_TURBINE = BLOCKS.register(
             "cryogenic_turbine", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.CRYOGENIC_TURBINE, CryogenicTurbineBlockEntity::new, CryogenicTurbineBlockEntity::serverTick));
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity>> MUON_FUSION_REACTOR = BLOCKS.register(
+            "muon_fusion_reactor", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.MUON_FUSION_REACTOR,
+                    io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity::new,
+                    io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity::serverTick));
     public static final DeferredBlock<SimpleMachineBlock<SmesCellBlockEntity>> SMES_CELL = BLOCKS.register(
             "smes_cell", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.SMES_CELL, SmesCellBlockEntity::new, SmesCellBlockEntity::serverTick));

@@ -41,6 +41,8 @@ RECESSES = {
     # 放熱フィン・吸気口・排気口
     'thermoelectric_generator': SIDE_FINS,
     'cryogenic_turbine': SIDE_INTAKE,
+    # 炉心のプラズマが見える窓
+    'muon_fusion_reactor': [WINDOW],
     'quantum_heat_engine': TOP_VENT,
     # 天面の検出窓（宇宙線を受ける）
     'cosmic_muon_collector': [('up', (4, 4, 12, 12), 2, '#inner', True, False)],

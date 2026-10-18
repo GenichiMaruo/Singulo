@@ -98,8 +98,14 @@ DESC = {
                         'つないだケーブルやパイプはコントローラへ届き、できた物や発電した電力は隣へ自動で押し出す。',
                         'Replaces a plain shell panel of a multiblock (not frames or functional parts; for the accelerator, either side of the controller). '
                         'Cables and pipes reach the controller, and outputs and generated power are pushed out automatically.'),
-    '冷媒カートリッジ': ('液体窒素100 mBを詰めた鋼の容器。液体を入れられない精密組立台で、量子演算モジュールなど極低温の部品を組み立てるのに使う。',
-                 'A steel canister holding 100 mB of liquid nitrogen. Lets the Precision Assembler build cryogenic parts such as quantum computing modules.'),
+    '冷媒カートリッジ': ('液体窒素100 mBを詰めた容器。装置を右クリックすると注いで、空の冷媒カートリッジが戻る（パイプがなくても液体窒素を運べる）。'
+                 '極低温タービンは入口に入れてもよい。精密組立台では、量子演算モジュールなど極低温の部品の材料にそのまま使う。',
+                 'A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are '
+                 'needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as '
+                 'quantum computing modules.'),
+    '空の冷媒カートリッジ': ('液体窒素を100 mB詰められる鋼の容器。極低温冷却塔のコントローラを右クリックするか、冷却塔で加工すると、満タンの冷媒カートリッジになる。',
+                   'A steel canister that holds 100 mB of liquid nitrogen. Right-click the cooling tower controller, or process it in the tower, '
+                   'to fill it.'),
     '隕石の溶融殻': ('隕石クレーターの中心の隕石を包む、焼けて溶けた黒い殻。クレーターに最初からある殻だけが、表面に星屑の結晶を少しずつ育てる。',
                'The burnt, melted shell of a crater meteorite. Only shells still in their crater slowly grow stardust clusters.'),
     '隕鉄塊': ('隕石の中の、鉄とニッケルの天然の合金。掘ると隕鉄の原石が出る（鉄以上のツルハシ）。隕石クレーターでしか採れない。',
@@ -120,7 +126,8 @@ DESC = {
     '極低温冷却塔': ('空気から液体窒素を、高さ10以上ならヘリウムから液体ヘリウムを作るマルチブロック。',
                   'A multiblock that liquefies nitrogen from the air, and helium too once it is 10 or more blocks tall.'),
     '冷却塔拡張（高さ10）': ('冷却塔を高さ10以上にすると液体ヘリウムを作れる。', 'Build the tower 10+ high to liquefy helium.'),
-    '液体窒素': ('77 K の冷却材。超伝導の材料作りに使う。', 'A 77 K coolant for superconductors.'),
+    '液体窒素': ('77 K の冷却材。超伝導の材料作りに使うほか、作るのに使った電力（1 mBに250 FE）を極低温タービンで取り戻せる。',
+             'A 77 K coolant for superconductors. It also stores the power used to make it (250 FE per mB), which a Cryogenic Turbine can recover.'),
     '超伝導コイル': ('電気抵抗ゼロのコイル。段階2以降の装置の要。', 'A zero-resistance coil, core of tier 2 tech.'),
     '超伝導線材': ('超伝導コイルとケーブルの材料。', 'Wire for coils and cables.'),
     '超伝導ケーブル': ('損失なしで大電力を運ぶ段階2のケーブル。', 'Tier 2 lossless high-capacity cable.'),
@@ -133,7 +140,11 @@ DESC = {
     '触媒反応器': ('触媒を作る装置。ミュオン触媒はここで作る。', 'Makes catalysts, starting with the muon catalyst.'),
     'ミュオン触媒': ('ティア2の触媒。使い切ると失活触媒が残る。',
                  'Tier 2 catalyst with a lifetime. Leaves a spent catalyst when used up.'),
-    '極低温タービン': ('液体窒素や液体ヘリウムの気化で発電する。', 'Generates power from evaporating cryogens.'),
+    '極低温タービン': ('液体窒素に詰めた電力を、隣の高温源での気化で取り戻す（溶岩の横で9割まで）。電力を貯めて運ぶための装置で、電力は増えない。',
+               'Recovers the power stored in liquid nitrogen by boiling it against a heat source next to it (up to 90% next to lava). '
+               'It stores and moves power; it does not create any.'),
+    'ミュオン触媒核融合炉': ('ミュオン触媒と水（重水素）で発電する、段階2の発電機（4 kFE/t）。触媒1個で10分動き、失活したミュオン触媒が出る。',
+                  'A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Each catalyst lasts 10 minutes and comes out spent.'),
     '宇宙線ミュオン収集器': ('空が見える高い場所で、電力なしでミュオンを集める。',
                      'Collects cosmic-ray muons for free high up under open sky.'),
     'SMESセル': ('超伝導の磁気エネルギー貯蔵。大量の電力をためる。右クリックで画面を開く。', 'Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its '

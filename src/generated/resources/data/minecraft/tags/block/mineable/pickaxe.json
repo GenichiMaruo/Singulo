@@ -28,6 +28,7 @@
     "singulo:accelerator_controller",
     "singulo:catalytic_reactor",
     "singulo:cryogenic_turbine",
+    "singulo:muon_fusion_reactor",
     "singulo:cosmic_muon_collector",
     "singulo:smes_cell",
     "singulo:precision_assembler",

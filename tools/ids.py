@@ -63,6 +63,7 @@ MOD = {
     'マルチブロック搬入出ポート': ('multiblock_port', 'Multiblock I/O Port', 'part_block'),
     '冷却塔コントローラ': ('cooling_tower_controller', 'Cooling Tower Controller', 'machine'),
     '冷媒カートリッジ': ('coolant_cartridge', 'Coolant Cartridge', 'item'),
+    '空の冷媒カートリッジ': ('empty_coolant_cartridge', 'Empty Coolant Cartridge', 'item'),
     # 隕石クレーター（地表の小さな構造物）で採れるもの
     '隕石の溶融殻': ('meteorite_crust', 'Meteorite Fusion Crust', 'nature'),
     '隕鉄塊': ('meteoric_iron_chunk', 'Meteoric Iron Chunk', 'nature'),
@@ -88,6 +89,7 @@ MOD = {
     '触媒反応器': ('catalytic_reactor', 'Catalytic Reactor', 'machine'),
     'ミュオン触媒': ('muon_catalyst', 'Muon Catalyst', 'catalyst'),
     '極低温タービン': ('cryogenic_turbine', 'Cryogenic Turbine', 'machine'),
+    'ミュオン触媒核融合炉': ('muon_fusion_reactor', 'Muon-Catalyzed Fusion Reactor', 'machine'),
     '宇宙線ミュオン収集器': ('cosmic_muon_collector', 'Cosmic Muon Collector', 'machine'),
     'SMESセル': ('smes_cell', 'SMES Cell', 'machine'),
     '精密組立台': ('precision_assembler', 'Precision Assembler', 'machine'),

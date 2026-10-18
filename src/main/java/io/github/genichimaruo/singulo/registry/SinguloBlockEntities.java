@@ -90,6 +90,9 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<CryogenicTurbineBlockEntity>> CRYOGENIC_TURBINE =
             REGISTER.register("cryogenic_turbine", () -> build(CryogenicTurbineBlockEntity::new,
                     SinguloBlocks.CRYOGENIC_TURBINE.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity>> MUON_FUSION_REACTOR =
+            REGISTER.register("muon_fusion_reactor", () -> build(io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity::new,
+                    SinguloBlocks.MUON_FUSION_REACTOR.get()));
 
     public static final Supplier<BlockEntityType<SmesCellBlockEntity>> SMES_CELL =
             REGISTER.register("smes_cell", () -> build(SmesCellBlockEntity::new, SinguloBlocks.SMES_CELL.get()));

@@ -321,6 +321,7 @@ public final class SinguloItems {
         block(SinguloBlocks.WORMHOLE_PORT, 5);
         block(SinguloBlocks.GENESIS_CORE, 5);
         block(SinguloBlocks.CRYOGENIC_TURBINE, 2);
+        block(SinguloBlocks.MUON_FUSION_REACTOR, 2);
         block(SinguloBlocks.SMES_CELL, 2);
         block(SinguloBlocks.COSMIC_MUON_COLLECTOR, 2);
         block(SinguloBlocks.WORLDLINE_ANCHOR_SMALL, 2);
