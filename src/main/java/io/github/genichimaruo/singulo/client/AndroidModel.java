@@ -201,7 +201,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         // 腕（左はふつう、右は肩当てと籠手）
         PartDefinition armL = torso.addOrReplaceChild("arm_l", cube(48, 32, -1, -0.5F, -1, 2, 5, 2, def(-0.05F)),
                 PartPose.offsetAndRotation(4, -7.5F, 0, 0, 0, -0.08F));
-        armL.addOrReplaceChild("forearm_l", cube(64, 32, -1, 0, -1, 2, 5, 2, def(-0.05F)), PartPose.offset(0, 4.5F, 0));
+        // 前腕は上腕より少し細く: 同じ太さだと、肘を曲げたとき両方の横の面が同じ平面で重なり、肘の光る線がちらつく
+        armL.addOrReplaceChild("forearm_l", cube(64, 32, -1, 0, -1, 2, 5, 2, def(-0.1F)), PartPose.offset(0, 4.5F, 0));
         // 装甲板: 左肩の小さな肩当て（右の肩当てより薄い）
         armL.addOrReplaceChild("armor_pad", cube(110, 46, -1, -1.2F, -2, 3, 1, 4, def(0.02F, -0.1F, -0.1F)),
                 PartPose.rotation(0, 0, -0.15F));
@@ -500,6 +501,13 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         int batteries = android.batteries();
         batteryL.visible = batteries >= 1;
         batteryR.visible = batteries >= 2;
+        // 物を作っている間は、手の武器をしまう（両手を使う。射撃型の小型銃は腰に差す: 描画の側）
+        boolean armed = !android.weaponStowed();
+        for (ModelPart grip : new ModelPart[]{whipHandle, hilt, axeGrip, daggerGrip, gunGrip}) {
+            if (grip != null) {
+                grip.visible = armed;
+            }
+        }
         float pt = age - android.tickCount;
         int state = android.state();
         float t = android.stateTime(pt);
@@ -589,7 +597,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_ASSEMBLE -> railHold(ease(t / 8), age, 0);
             case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_CHARGE -> railHold(1, age, Mth.clamp(t / io.github.genichimaruo.singulo.android.GunnerAndroid.RAIL_CHARGE, 0, 1));
             case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_FIRE -> railFire(t, age);
-            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_STOW -> railHold(1 - ease((t - 4) / 8), age, 0);
+            case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_RAIL_STOW -> railHold(1 - ease((t - 7.5F) / 4.5F), age, 0);   // 部品が背中へ戻り終わってから腕を下ろす（銃が体に刺さらない）
             case io.github.genichimaruo.singulo.android.GunnerAndroid.STATE_HOP -> backstep(t);
             default -> {
                 if (axeGrip != null && axeOneHanded(android)) {
@@ -664,7 +672,52 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             armR.zRot = Mth.lerp(k, armR.zRot, 0.35F);
             forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.9F + Mth.sin(t * 0.8F) * 0.2F);
             head.zRot += 0.1F * k * Mth.sin(t * 0.3F);
+        } else if (android.state() == RuinAndroid.STATE_IDLE) {
+            // 射撃型の仕草は、構えていない間だけ（次の構えが始まったら、そちらを優先）
+            if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_RELOAD) {
+                reload(t, k);
+            } else if (g == io.github.genichimaruo.singulo.android.GunnerAndroid.GESTURE_TWIRL) {
+                twirl(t, k);
+            }
         }
+    }
+
+    /**
+     * リロード: 小型銃を胸の前へ引き寄せて見下ろし、左手で新しいエネルギーカートリッジを握りの下へ運んで、ぐっと押し込む
+     * （カートリッジの出し入れと、握りの窓が満ちていくのは描画の側）。
+     */
+    private void reload(float t, float k) {
+        float slap = Math.max(0, Mth.sin(Mth.clamp((t - io.github.genichimaruo.singulo.android.GunnerAndroid.RELOAD_INSERT + 2) / 4, 0, 1) * Mth.PI));
+        armR.xRot = Mth.lerp(k, armR.xRot, -0.5F);
+        armR.yRot = Mth.lerp(k, armR.yRot, -0.1F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.05F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -1.1F);
+        float reach = k * ease((t - 4) / 5) * (1 - ease((t - 16) / 5));
+        armL.xRot = Mth.lerp(reach, armL.xRot, -0.75F + 0.2F * slap);
+        armL.yRot = Mth.lerp(reach, armL.yRot, 0.55F);
+        armL.zRot = Mth.lerp(reach, armL.zRot, 0.05F);
+        forearmL.xRot = Mth.lerp(reach, forearmL.xRot, -0.95F + 0.15F * slap);
+        head.xRot += 0.35F * k;
+        head.yRot -= 0.2F * k;
+    }
+
+    /**
+     * 相手を倒したあと: 小型銃を指で2回転させてから、銃口を上へ立てて顔の横に構え、首をかしげる（回すのは描画の側）。
+     * アホ毛も小さく跳ねる。
+     */
+    private void twirl(float t, float k) {
+        float pose = ease((t - 13) / 5);
+        armR.xRot = Mth.lerp(k, armR.xRot, Mth.lerp(pose, -0.7F, -0.15F));
+        armR.yRot = Mth.lerp(k, armR.yRot, Mth.lerp(pose, -0.2F, 0.15F));
+        armR.zRot = Mth.lerp(k, armR.zRot, Mth.lerp(pose, 0.3F, 0.55F));
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, Mth.lerp(pose, -0.55F, -1.6F));
+        float tilt = k * pose;
+        head.zRot += 0.22F * tilt;
+        head.xRot -= 0.05F * tilt;
+        torso.zRot += 0.04F * tilt;
+        float hop = t > 13 ? Mth.sin((t - 13) * 0.9F) * Math.max(0, 1 - (t - 13) / 10) : 0;
+        ahoge.zRot += 0.35F * hop * k;
+        ahoge.xRot -= 0.15F * Math.abs(hop) * k;
     }
 
     // ------------------------------------------------------------------ 光剣型の動き
@@ -1015,14 +1068,32 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         torso.yRot += 0.219F * k;
         head.yRot -= 0.219F * k;
         hips.y += 0.6F * k;
+        hairFlare(charge, age);
         legL.xRot = Mth.lerp(k, legL.xRot, -0.35F);
         legR.xRot = Mth.lerp(k, legR.xRot, 0.3F);
         shinL.xRot = Mth.lerp(k, shinL.xRot, 0.3F);
     }
 
+    /** レールガンを溜めている間、髪がふわっと浮いて広がる（c: 0〜1）。毛先は小さく揺れる。 */
+    private void hairFlare(float c, float age) {
+        if (c <= 0) {
+            return;
+        }
+        float sway = Mth.sin(age * 0.35F) * 0.05F * c;
+        backHair.xRot += 0.3F * c + sway;
+        sideLockL.zRot -= (0.3F * c + sway) * hairSide;
+        sideLockR.zRot += (0.3F * c - sway) * hairSide;
+        sideLockL.xRot -= 0.1F * c;
+        sideLockR.xRot -= 0.1F * c;
+        ponytail.zRot -= (0.35F * c + sway) * hairSide;
+        ponytail.xRot += 0.15F * c;
+        ahoge.xRot -= 0.2F * c;
+    }
+
     /** レールガンの発射: 構えたまま、反動で上体と銃が跳ね上がり、少しのけぞってから戻る。 */
     private void railFire(float t, float age) {
         railHold(1, age, 0);
+        hairFlare(1 - ease(t / 8), age);           // 溜めで広がった髪は、撃ったあと落ち着く
         float kick = (1 - ease(t / 6)) * ease(t * 2);
         torso.xRot -= 0.3F * kick;
         forearmR.xRot -= 0.25F * kick;

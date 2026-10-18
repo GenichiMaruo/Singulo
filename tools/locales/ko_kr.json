@@ -1424,8 +1424,8 @@
     "translation": "호위 안드로이드에 하나 장착하면 흉갑으로 작동합니다(방어 +8, 방어 강도 +2). 방어구 마법 부여를 할 수 있습니다."
   },
   "desc.singulo.android_backpack_upgrade": {
-    "source": "Fitted to a guard android, it adds 24 inventory slots (4 rows of 6). The android wears it on its back.",
-    "translation": "호위 안드로이드에 넣으면 소지품이 24칸(4줄×6칸) 늘어납니다. 등에 백팩을 멥니다."
+    "source": "Fitted to a guard android, it adds 12 inventory slots (2 rows of 6). The android wears it on its back. Used to make the Reinforced Backpack (18 slots) and the Large Backpack (24 slots).",
+    "translation": "호위 안드로이드에 넣으면 소지품이 12칸(2줄×6칸) 늘어납니다. 등에 백팩을 멥니다. 강화 백팩(18칸)과 대형 백팩(24칸)의 재료가 됩니다."
   },
   "desc.singulo.android_barrier_glass": {
     "source": "Glass that only androids cannot pass. Players and other creatures go straight through. Joins seamlessly with the same glass next to it.",
@@ -1503,6 +1503,10 @@
     "source": "A set of parts and shell. An Android Assembly Station uses one each time it prints an android.",
     "translation": "부품과 외장 한 벌. 안드로이드 조립 스테이션이 안드로이드를 하나 출력할 때마다 하나씩 사용합니다."
   },
+  "desc.singulo.android_large_backpack_upgrade": {
+    "source": "Fitted to a guard android, it adds 24 inventory slots (4 rows of 6), the largest backpack. You can swap it in for a smaller backpack without emptying it.",
+    "translation": "호위 안드로이드에 넣으면 소지품이 24칸(4줄×6칸) 늘어나는, 가장 큰 백팩입니다. 물건을 빼지 않고 작은 백팩과 바꿔 낄 수 있습니다."
+  },
   "desc.singulo.android_memory_axe": {
     "source": "A compact crystal memory holding the design of the Axe Android prototyped in the underground android laboratory. Dropped by the laboratory overseer. Put it in an Android Assembly Station to print that design (it is not used up).",
     "translation": "지하 안드로이드 연구소에서 시제작된 도끼형 안드로이드의 설계를 담은 소형 크리스털 메모리. 연구소의 총괄 AI를 쓰러뜨리면 얻을 수 있다. 안드로이드 조립 스테이션에 넣으면 그 형을 인쇄할 수 있다(소모되지 않음)."
@@ -1538,6 +1542,10 @@
   "desc.singulo.android_recipe_rack": {
     "source": "A six-row rack. Put a Work Location Card on the left of a row and up to eight recipe cards on the right, and they can be ordered as recipes made at that location.",
     "translation": "6줄짜리 선반. 각 줄 왼쪽에 작업 위치 카드, 오른쪽에 레시피 카드를 8장까지 놓으면 그 위치에서 만드는 레시피로 주문할 수 있습니다."
+  },
+  "desc.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Fitted to a guard android, it adds 18 inventory slots (3 rows of 6). You can swap it in for a smaller backpack without emptying it, since the contents still fit. Used to make the Large Backpack.",
+    "translation": "호위 안드로이드에 넣으면 소지품이 18칸(3줄×6칸) 늘어납니다. 내용물이 그대로 들어가므로, 작은 백팩에서 물건을 빼지 않고 바꿔 낄 수 있습니다. 대형 백팩의 재료가 됩니다."
   },
   "desc.singulo.android_repair_kit": {
     "source": "Kept in a guard android's inventory, one is used to restore half its health when it gets hurt (when they run out, it returns to its station).",
@@ -1584,8 +1592,8 @@
     "translation": "작업 위치 카드로 연결한 자재구·납품구·레시피 선반을 모아 주문을 받고, 근처의 안드로이드에게 작업을 맡깁니다. 지령대 자체도 자재구와 납품구를 겸하며, 화면의 \"기록\"에서 레시피 카드에 레시피를 기록할 수 있습니다. 재료가 부족한 주문은 할 수 없습니다."
   },
   "desc.singulo.android_workbench": {
-    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack.",
-    "translation": "안드로이드가 제작대 레시피를 만드는 곳. 바닐라 제작대보다 4배 빠르게 만듭니다. 레시피 선반의 작업 위치 카드에 기록해서 사용합니다."
+    "source": "Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack. Crafted items that do not fit in the android's inventory go into its holding box until the android comes back (right-click to take what is left).",
+    "translation": "안드로이드가 제작대 레시피를 만드는 곳. 바닐라 제작대보다 4배 빠르게 만듭니다. 레시피 선반의 작업 위치 카드에 기록해서 사용합니다. 만든 물건이 안드로이드 소지품에 들어가지 않으면 작업대의 보관함에 넣었다가 나중에 가지러 옵니다(남은 물건은 우클릭으로 받을 수 있습니다)."
   },
   "desc.singulo.anomaly_sample": {
     "source": "A restored anomaly sample.",
@@ -2384,8 +2392,8 @@
     "translation": "가라앉은 노심 구획의 봉쇄 기둥에 끼워진, 반응로의 충격을 견디기 위한 창입니다. 매우 단단하며 폭발로도 부서지지 않습니다."
   },
   "desc.singulo.ruin_android_fabricator": {
-    "source": "Prints androids onto its bed and sends them out. Defeat them all to get a compact crystal memory of their design.",
-    "translation": "받침대 위에 안드로이드를 출력해 출격시킵니다. 모두 쓰러뜨리면 그 형의 소형 크리스털 메모리를 얻습니다."
+    "source": "Prints androids onto its bed and sends them out. Defeat them all for a 50% chance at a compact crystal memory of their design.",
+    "translation": "받침대 위에 안드로이드를 출력해 출격시킵니다. 모두 쓰러뜨리면 절반의 확률로 그 형의 소형 크리스털 메모리를 얻습니다."
   },
   "desc.singulo.ruin_cache": {
     "source": "Holds ruin loot and refills some days after it is emptied (not if moved). Hoppers and pipes cannot take from it.",
@@ -2472,8 +2480,8 @@
     "translation": "기기의 설정을 다른 기기에 복사합니다."
   },
   "desc.singulo.shield_permit": {
-    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
-    "translation": "보호막 탑에 넣으면 등록된 플레이어만 그 안에서 블록을 설치하거나 부수거나 아이템을 가져갈 수 있습니다. 안드로이드 조립 스테이션에 넣으면 등록된 사람도 안드로이드를 조작할 수 있습니다. 사용하면 자신을, 다른 플레이어에게 사용하면 그 플레이어와 자신을 등록합니다. 이미터 크라운은 누구나 부술 수 있습니다."
+    "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
+    "translation": "보호막 탑에 넣으면 등록된 플레이어만 그 안에서 블록을 설치하거나 부수거나 아이템을 가져갈 수 있습니다. 안드로이드 조립 스테이션에 넣으면 등록된 사람도 안드로이드를 조작할 수 있고, 등록되지 않은 사람은 안드로이드에게 공격받습니다. 사용하면 자신을, 다른 플레이어에게 사용하면 그 플레이어와 자신을 등록합니다. 이미터 크라운은 누구나 부술 수 있습니다."
   },
   "desc.singulo.shield_tower_body": {
     "source": "Corners of the 3×3 body and the base of the spire.",
@@ -3359,6 +3367,54 @@
     "source": "Off to get repaired",
     "translation": "수리하고 올게"
   },
+  "gui.singulo.android.sort.hint": {
+    "source": "Sort the carried items and backpack contents (stacks the same items together)",
+    "translation": "소지품과 백팩 안을 정리합니다(같은 아이템은 합칩니다)"
+  },
+  "gui.singulo.android.stall.full": {
+    "source": "Storage is full; can't put items away",
+    "translation": "보관 장소가 가득 차서 물건을 둘 수 없음"
+  },
+  "gui.singulo.android.stall.missing": {
+    "source": "Not enough materials in the stockpile",
+    "translation": "재료 보관소에 재료가 부족함"
+  },
+  "gui.singulo.android.stall.no_power": {
+    "source": "The station is out of power; can't charge",
+    "translation": "스테이션 전력이 부족해 충전할 수 없음"
+  },
+  "gui.singulo.android.stall.no_target": {
+    "source": "Nothing to work on in the area right now",
+    "translation": "작업 범위에 지금 할 수 있는 대상이 없음"
+  },
+  "gui.singulo.android.stall.protected": {
+    "source": "A protected block; can't break it",
+    "translation": "보호된 블록이라 부술 수 없음"
+  },
+  "gui.singulo.android.stall.unreachable": {
+    "source": "Can't reach the destination",
+    "translation": "목적지에 갈 수 없음"
+  },
+  "gui.singulo.android.stash.empty": {
+    "source": "Nothing to put away",
+    "translation": "맡길 물건이 없습니다"
+  },
+  "gui.singulo.android.stash.going": {
+    "source": "Going to put things in a nearby box",
+    "translation": "근처 상자에 맡기러 갑니다"
+  },
+  "gui.singulo.android.stash.hint": {
+    "source": "Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box or supply port)",
+    "translation": "소지품과 백팩 안의 물건을 근처 상자(상자·통·셜커 상자·자재구)에 맡기러 갑니다"
+  },
+  "gui.singulo.android.stash.none": {
+    "source": "No box nearby to put things in (within 12 blocks)",
+    "translation": "근처에 맡길 상자가 없습니다(12블록 이내)"
+  },
+  "gui.singulo.android.stash.working": {
+    "source": "Not while working",
+    "translation": "작업 중에는 할 수 없습니다"
+  },
   "gui.singulo.android.storage": {
     "source": "Storage",
     "translation": "수납"
@@ -3524,8 +3580,8 @@
     "translation": "허가증"
   },
   "gui.singulo.android_station.permit.hint": {
-    "source": "With a shield permit inside, only the owner and registered players can open the station and android screens, and you can choose which of them it follows.",
-    "translation": "보호막 허가증을 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있고, 그중에서 따라갈 사람도 고를 수 있습니다."
+    "source": "With a shield permit inside, only the owner and registered players can open the station and android screens, and the android treats anyone else as an enemy and attacks them. You can also choose which registered player it follows.",
+    "translation": "보호막 허가증을 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있고, 안드로이드는 그 밖의 사람을 적으로 여겨 공격합니다. 등록한 사람 중에서 따라갈 사람도 고를 수 있습니다."
   },
   "gui.singulo.android_station.permit.members": {
     "source": "Only the owner and %s registered can use it",
@@ -3535,9 +3591,21 @@
     "source": "No permit: anyone can use it",
     "translation": "허가증 없음: 누구나 조작 가능"
   },
+  "gui.singulo.android_station.permit.others": {
+    "source": "Anyone else is treated as an enemy and attacked",
+    "translation": "그 밖의 사람은 적으로 여겨 공격합니다"
+  },
   "gui.singulo.android_station.recall": {
     "source": "Recall",
     "translation": "불러오기"
+  },
+  "gui.singulo.android_station.recall.hint": {
+    "source": "Click: recall the android shown. Shift-click: recall every android from the stations you can use within %s blocks.",
+    "translation": "클릭: 보고 있는 안드로이드를 불러옵니다. Shift+클릭: 근처(%s블록 이내)에서 조작할 수 있는 스테이션의 안드로이드를 모두 불러옵니다."
+  },
+  "gui.singulo.android_station.recall_all.done": {
+    "source": "Recalled %s androids",
+    "translation": "안드로이드 %s체를 불러왔습니다"
   },
   "gui.singulo.android_station.retreat": {
     "source": "Return at %s%%",
@@ -3546,6 +3614,10 @@
   "gui.singulo.android_station.retreat.hint": {
     "source": "Below this share of health it returns to the station to repair and recharge.",
     "translation": "체력이 이 비율보다 낮아지면 스테이션으로 돌아가 수리와 충전을 합니다."
+  },
+  "gui.singulo.android_station.retreat.now": {
+    "source": "Now: health %s%%, charge %s%%",
+    "translation": "현재 체력 %s%%・충전 %s%%"
   },
   "gui.singulo.android_station.route.hint": {
     "source": "Patrol route: place Work Location Cards and the androids visit those places from left to right (up to 8), standing on top of each one to look around.",
@@ -4347,9 +4419,21 @@
     "source": "Progress",
     "translation": "진행 상황"
   },
+  "gui.singulo.handbook.read_flow": {
+    "source": "→ Read the stage %s overview (what to do, in order)",
+    "translation": "→ %s단계의 흐름(할 일의 순서) 읽기"
+  },
   "gui.singulo.handbook.records": {
     "source": "Ancient Records",
     "translation": "고대 기록"
+  },
+  "gui.singulo.handbook.search": {
+    "source": "Search pages",
+    "translation": "페이지 검색"
+  },
+  "gui.singulo.handbook.search.none": {
+    "source": "No matches",
+    "translation": "찾을 수 없습니다"
   },
   "gui.singulo.handbook.stage": {
     "source": "Stage %s",
@@ -5223,6 +5307,10 @@
     "source": "Waiting for materials",
     "translation": "재료를 기다리는 중"
   },
+  "gui.singulo.work_console.again": {
+    "source": "Order the same item again (you can change the amount before ordering)",
+    "translation": "같은 아이템을 다시 주문합니다(확인 화면에서 수를 바꿀 수 있습니다)"
+  },
   "gui.singulo.work_console.androids": {
     "source": "Androids (slots)",
     "translation": "안드로이드(나를 수 있는 칸)"
@@ -5375,6 +5463,14 @@
     "source": "The machine for %s does not take %s through its %s face (check the \"In\" face on the recipe card)",
     "translation": "%s 레시피의 장치가 넣는 면(%3$s)으로 %2$s을(를) 받지 않습니다(레시피 카드의 \"입\" 면을 확인하세요)"
   },
+  "gui.singulo.work_console.fresh": {
+    "source": "New",
+    "translation": "새로"
+  },
+  "gui.singulo.work_console.fresh.hint": {
+    "source": "When on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more). When off, items in storage count toward the order.",
+    "translation": "켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\"로 주문). 끄면 재고의 완성품도 수에 넣습니다."
+  },
   "gui.singulo.work_console.fuel_ordered": {
     "source": "Out of fuel (%s), so an order to make %s was placed",
     "translation": "재료 보관소에 연료(%s)가 없어서 %s개를 만드는 주문을 냈습니다"
@@ -5411,6 +5507,10 @@
     "source": "You are not on this work console's permit",
     "translation": "이 작업 지령대의 허가증에 등록되어 있지 않습니다"
   },
+  "gui.singulo.work_console.making": {
+    "source": "Being made: %s",
+    "translation": "제작 중: %s개"
+  },
   "gui.singulo.work_console.material.hint": {
     "source": "Taken from the stockpile (need / have)",
     "translation": "재료 보관소에서 쓰는 것(필요 / 재고)"
@@ -5418,6 +5518,18 @@
   "gui.singulo.work_console.materials": {
     "source": "To craft, and materials (need / have)",
     "translation": "만드는 것과 재료(필요 / 재고)"
+  },
+  "gui.singulo.work_console.missing": {
+    "source": "Missing materials:",
+    "translation": "부족한 재료:"
+  },
+  "gui.singulo.work_console.missing.more": {
+    "source": "Waiting for %s ×%s and %s more",
+    "translation": "재료 대기: %s ×%s 외 %s종"
+  },
+  "gui.singulo.work_console.missing.one": {
+    "source": "Waiting for %s ×%s",
+    "translation": "재료 대기: %s ×%s"
   },
   "gui.singulo.work_console.needs_chem_tank": {
     "source": "This order moves chemicals (Mekanism gases and the like), so only androids with a Gas Tank Upgrade or a Gas & Liquid Upgrade can be chosen",
@@ -5450,6 +5562,22 @@
   "gui.singulo.work_console.no_orders": {
     "source": "No running orders",
     "translation": "진행 중인 주문이 없습니다"
+  },
+  "gui.singulo.work_console.notify": {
+    "source": "[Work Console] %s",
+    "translation": "[작업 지령대] %s"
+  },
+  "gui.singulo.work_console.notify.missing": {
+    "source": "The order for %s is stuck waiting for materials (%s: %s more needed)",
+    "translation": "%s 주문이 재료를 기다리며 멈춰 있습니다(%s이(가) %s개 부족합니다)"
+  },
+  "gui.singulo.work_console.notify.missing.more": {
+    "source": "The order for %s is stuck waiting for materials (%s: %s more needed, and %s other kinds)",
+    "translation": "%s 주문이 재료를 기다리며 멈춰 있습니다(%s이(가) %s개 부족합니다. 그 밖에 %s종)"
+  },
+  "gui.singulo.work_console.notify.waiting": {
+    "source": "The order for %s is stuck waiting for materials",
+    "translation": "%s 주문이 재료를 기다리며 멈춰 있습니다"
   },
   "gui.singulo.work_console.outbox.hint": {
     "source": "Orders delivered to the console. Moved into adjacent chests automatically",
@@ -5700,16 +5828,16 @@
     "translation": "안드로이드"
   },
   "guide.singulo.androids.build.body": {
-    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge. Recall sends it back at once.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..",
-    "translation": "안드로이드 조립 스테이션에 소형 크리스털 메모리(형을 정함, 소모되지 않음)와 안드로이드 키트(출력마다 하나)를 넣고 전력을 보내면, 위에 호위 안드로이드를 하나 출력합니다(1회 40,000 FE). 쓰러지면 키트가 남아 있는 한 다시 출력합니다. 스테이션을 놓은 사람이 주인입니다.\n- 호위는 적대적 몹(유적의 안드로이드와 드론 포함)만 노리고, 플레이어나 보스와는 절대 싸우지 않습니다. 플레이어와 보스의 공격으로는 다치지 않습니다.\n- 움직임: 요격(스테이션 곁에서 대기)·배회(16블록 안을 돌아다님)·따라가기(주인을 따라감)·순찰(정한 장소를 돎). 따라가는 중에는 \"따라가기만\"과 \"호위하기\"(근처의 적과 싸움) 중에서 고릅니다.\n- 허가증: 스테이션에 보호막 허가증을 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있습니다. 주인과 등록한 사람 중 누구를 따라갈지도 고를 수 있습니다.\n- 복귀 체력: 이보다 낮아지면 안드로이드가 돌아가 수리와 충전을 합니다. \"불러오기\"로 바로 돌려보낼 수도 있습니다.\n- 이름: 스테이션이나 안드로이드 화면에서 이름을 클릭하면 바꿀 수 있습니다(↺ 버튼으로 애칭으로 되돌림).\n- 비교기: 스테이션이 안드로이드의 체력에 따라 신호(0~15)를 냅니다.\n- 스테이션이 부서지면 안드로이드는 그 자리에 남습니다. 새 스테이션에 같은 형의 메모리를 넣고 \"연결\"을 누르면 다시 이어집니다.\n- 일상: 할 일이 없으면 호위는 스테이션 근처에서 쉽니다. 계단, 반 블록, 의자에 앉고(밤에는 낮잠), 화분과 작물에 손을 대고, 바닥을 쓸고, 한동안 떨어져 있던 아이템을 근처 상자에 넣고, 동료와 수다를 떨고, 비가 오면 지붕 아래로 피하고(우산을 들고 있으면 그대로), 노을이나 밤하늘을 바라봅니다.."
+    "source": "Put a compact crystal memory (sets the design; never used up) and android kits (one per print) in an Android Assembly Station and supply power, and it prints one guard android on top (40,000 FE each). If it falls, the station prints it again while kits last. Whoever places the station owns it.\n- Guards attack hostile mobs only (ruin androids and drones too) and never fight players or bosses. Player and boss attacks do not hurt them.\n- Modes: Guard (waits by the station), Wander (roams within 16 blocks), Follow (goes with its owner), Patrol (walks a set route). While following, choose \"Just follow\" or \"Escort\" (fights nearby enemies).\n- Permit: with a Shield Permit in the station, only the owner and registered players can open the station and android screens. The android treats anyone else (except in Creative) as an enemy and attacks them, and their attacks can hurt it. You can also choose whether it follows the owner or one of the registered players.\n- Return health: below it, the android goes back to repair and recharge (hover to see its current health and charge). Recall sends it back at once; shift-click Recall to call back every android from the stations you can use within 64 blocks.\n- Name: click the name in the station or android screen to rename it (the ↺ button restores the nickname).\n- Comparator: the station outputs a signal (0-15) from the android's health.\n- Break the station and the android stays where it is. Put a matching memory in a new station and press Link to bring it back.\n- Daily life: with nothing to do, guards relax near the station. They sit on stairs, slabs or chairs (napping at night), hold a hand over potted plants and crops, sweep the floor, put items left lying around into a nearby chest, chat with each other, shelter from the rain (or stay out under an umbrella if they hold one), and watch the sunset or the night sky..",
+    "translation": "안드로이드 조립 스테이션에 소형 크리스털 메모리(형을 정함, 소모되지 않음)와 안드로이드 키트(출력마다 하나)를 넣고 전력을 보내면, 위에 호위 안드로이드를 하나 출력합니다(1회 40,000 FE). 쓰러지면 키트가 남아 있는 한 다시 출력합니다. 스테이션을 놓은 사람이 주인입니다.\n- 호위는 적대적 몹(유적의 안드로이드와 드론 포함)만 노리고, 플레이어나 보스와는 절대 싸우지 않습니다. 플레이어와 보스의 공격으로는 다치지 않습니다.\n- 움직임: 요격(스테이션 곁에서 대기)·배회(16블록 안을 돌아다님)·따라가기(주인을 따라감)·순찰(정한 장소를 돎). 따라가는 중에는 \"따라가기만\"과 \"호위하기\"(근처의 적과 싸움) 중에서 고릅니다.\n- 허가증: 스테이션에 보호막 허가증을 넣으면 주인과 등록한 사람만 스테이션과 안드로이드 화면을 열 수 있습니다. 안드로이드는 그 밖의 사람(크리에이티브 제외)을 적으로 여겨 공격하며, 그 사람의 공격은 안드로이드에게도 맞습니다. 주인과 등록한 사람 중 누구를 따라갈지도 고를 수 있습니다.\n- 복귀 체력: 이보다 낮아지면 안드로이드가 돌아가 수리와 충전을 합니다. \"불러오기\"로 바로 돌려보낼 수도 있습니다. (커서를 올리면 현재 체력과 충전이 나옵니다.) \"불러오기\"를 Shift+클릭하면 근처(64블록 이내)에서 조작할 수 있는 스테이션의 안드로이드를 모두 불러옵니다.\n- 이름: 스테이션이나 안드로이드 화면에서 이름을 클릭하면 바꿀 수 있습니다(↺ 버튼으로 애칭으로 되돌림).\n- 비교기: 스테이션이 안드로이드의 체력에 따라 신호(0~15)를 냅니다.\n- 스테이션이 부서지면 안드로이드는 그 자리에 남습니다. 새 스테이션에 같은 형의 메모리를 넣고 \"연결\"을 누르면 다시 이어집니다.\n- 일상: 할 일이 없으면 호위는 스테이션 근처에서 쉽니다. 계단, 반 블록, 의자에 앉고(밤에는 낮잠), 화분과 작물에 손을 대고, 바닥을 쓸고, 한동안 떨어져 있던 아이템을 근처 상자에 넣고, 동료와 수다를 떨고, 비가 오면 지붕 아래로 피하고(우산을 들고 있으면 그대로), 노을이나 밤하늘을 바라봅니다.."
   },
   "guide.singulo.androids.build.title": {
     "source": "Your own androids",
     "translation": "나만의 안드로이드"
   },
   "guide.singulo.androids.care.body": {
-    "source": "- Charging: a guard refills in 5 s back at its station (using power, and it heals too). While following, if you carry an Android Wireless Charger it comes to you and refills in 5 s as it walks with you (a full charger holds 30 refills; right-click a block that supplies power to charge it). With the station far away and no charger, it uses solar power or sits down.\n- Inventory: right-click your android to open its screen. A stack of Self-Repair Kits: one is used to restore half its health when it drops below the return health. One Android Armor Plate works as its chestplate (+8 armor, +2 toughness) and takes armor enchantments; it shows as plating on the chest and left shoulder.\n- Kits in the station's refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android's inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.",
-    "translation": "- 충전: 호위는 스테이션으로 돌아가 5초 만에 가득 찹니다(전력을 쓰고, 체력도 회복). 따라가는 중에 안드로이드 무선 충전기를 들고 있으면, 곁으로 와서 함께 걸으며 5초 만에 가득 찹니다(충전기는 가득 차 있으면 30회분. 전력을 내보내는 블록을 우클릭해 충전). 스테이션이 멀고 충전기도 없으면 태양광이나 앉아서 충전합니다.\n- 소지품: 내 안드로이드를 우클릭하면 화면이 열립니다. 자가 수리 키트 한 묶음: 체력이 복귀 체력보다 낮아지면 하나를 써서 체력을 절반 회복. 안드로이드용 장갑판 하나는 흉갑으로 작동하며(방어 +8, 방어 강도 +2), 방어구 마법 부여를 할 수 있고, 장착하면 가슴과 왼쪽 어깨에 장갑이 붙습니다.\n- 스테이션의 보충 슬롯에 넣은 자가 수리 키트는, 안드로이드가 하나라도 쓰면 자동으로 보충됩니다. 강화 슬롯의 전송 업그레이드는 쓰러진 안드로이드의 소지품을 다음 안드로이드에게 넘깁니다(없으면 그 자리에 떨어짐). 호퍼와 파이프로 스테이션에 넣을 수 있지만, 꺼낼 수는 없습니다.\n- 해체: 안드로이드 화면의 스패너를 두 번 누르면 위에서부터 사라지고, 스테이션이 곧바로 새로 출력합니다."
+    "source": "- Charging: a guard refills in 5 s back at its station (using power, and it heals too). While following, if you carry an Android Wireless Charger it comes to you and refills in 5 s as it walks with you (a full charger holds 30 refills; right-click a block that supplies power to charge it). With the station far away and no charger, it uses solar power or sits down. When it has nothing to do and is within 24 blocks of its station, it goes back on its own to top up whenever its charge is not full.\n- Inventory: right-click your android to open its screen. A stack of Self-Repair Kits: one is used to restore half its health when it drops below the return health. One Android Armor Plate works as its chestplate (+8 armor, +2 toughness) and takes armor enchantments; it shows as plating on the chest and left shoulder.\n- Kits in the station's refill slot top up the android whenever it has used one. A Transfer Upgrade in the upgrade slot passes a fallen android's inventory to the next one (otherwise it drops). Hoppers and pipes can insert into the station; nothing can be pulled out.\n- Dismantle: press the wrench in the android screen twice; it fades away from the top and the station prints a new one at once.",
+    "translation": "- 충전: 호위는 스테이션으로 돌아가 5초 만에 가득 찹니다(전력을 쓰고, 체력도 회복). 따라가는 중에 안드로이드 무선 충전기를 들고 있으면, 곁으로 와서 함께 걸으며 5초 만에 가득 찹니다(충전기는 가득 차 있으면 30회분. 전력을 내보내는 블록을 우클릭해 충전). 스테이션이 멀고 충전기도 없으면 태양광이나 앉아서 충전합니다. 할 일이 없고 스테이션에서 24블록 이내에 있으면, 충전이 줄었을 때 스스로 돌아가 가득 채웁니다.\n- 소지품: 내 안드로이드를 우클릭하면 화면이 열립니다. 자가 수리 키트 한 묶음: 체력이 복귀 체력보다 낮아지면 하나를 써서 체력을 절반 회복. 안드로이드용 장갑판 하나는 흉갑으로 작동하며(방어 +8, 방어 강도 +2), 방어구 마법 부여를 할 수 있고, 장착하면 가슴과 왼쪽 어깨에 장갑이 붙습니다.\n- 스테이션의 보충 슬롯에 넣은 자가 수리 키트는, 안드로이드가 하나라도 쓰면 자동으로 보충됩니다. 강화 슬롯의 전송 업그레이드는 쓰러진 안드로이드의 소지품을 다음 안드로이드에게 넘깁니다(없으면 그 자리에 떨어짐). 호퍼와 파이프로 스테이션에 넣을 수 있지만, 꺼낼 수는 없습니다.\n- 해체: 안드로이드 화면의 스패너를 두 번 누르면 위에서부터 사라지고, 스테이션이 곧바로 새로 출력합니다."
   },
   "guide.singulo.androids.care.title": {
     "source": "Charging, repair and gear",
@@ -5722,6 +5850,30 @@
   "guide.singulo.androids.decor.title": {
     "source": "Android decorations",
     "translation": "안드로이드의 장식"
+  },
+  "guide.singulo.androids.farm.body": {
+    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench.",
+    "translation": "・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다. 만든 물건이 안드로이드 소지품에 다 들어가지 않으면 발밑에 떨어뜨리지 않고 작업대의 보관함에 넣었다가 나중에 가지러 옵니다(가지러 올 수 없게 된 물건은 우클릭으로 받을 수 있습니다). 보관함에 물건이 있는 동안에는 작업대 위에 그 물건이 떠 있습니다."
+  },
+  "guide.singulo.androids.farm.title": {
+    "source": "Farming, fluids and fuel",
+    "translation": "농사・액체・연료"
+  },
+  "guide.singulo.androids.first.body": {
+    "source": "The shortest way to try work automation (having bread made):\n1. Print one guard at a station.\n2. Place an Android Work Console, a Recipe Rack and a crafting table nearby, and a chest with wheat next to the console (the stockpile).\n3. Shift-right-click the console with a Work Location Card to record it, then right-click the Recipe Rack with that card to link it.\n4. Shift-right-click the crafting table with another Work Location Card and put it on the left of a rack row.\n5. In the console's Record tab, put three wheat in one row of the 3x3, record it on a Recipe Card and put the card on the right of the rack row.\n6. In the Order tab, pick bread, set a count and start. The bread arrives in the console's delivery box.\nThe order screen: click the search box to type (type @ and a mod name to show only that mod's items). There are sort and reverse buttons, and a toggle to sync with JEI's search box. With androids set to automatic, it calls just as many as the order needs.",
+    "translation": "가장 적은 단계로 작업 자동화를 시험하는 예(빵을 만들게 하기):\n1. 스테이션에서 호위를 1체 인쇄합니다.\n2. 안드로이드 작업 지령대·레시피 선반·제작대를 가까이 두고, 지령대 옆에 밀을 넣은 상자를 둡니다(재료 보관소).\n3. 작업 위치 카드로 지령대를 웅크린 채 우클릭해 기록하고, 그 카드로 레시피 선반을 우클릭해 잇습니다.\n4. 다른 작업 위치 카드로 제작대를 웅크린 채 우클릭해 기록하고, 레시피 선반 줄의 왼쪽에 둡니다.\n5. 지령대의 \"기록\"에서 3×3의 가로 한 줄에 밀 3개를 놓고 레시피 카드에 기록해, 레시피 선반 줄의 오른쪽에 둡니다.\n6. \"주문\"에서 빵을 고르고 개수를 정해 작업을 시작합니다. 완성된 빵은 지령대의 납품 상자로 옵니다.\n주문 화면: 검색창을 클릭하면 글자를 입력할 수 있습니다(@ 뒤에 모드 이름을 입력하면 그 모드의 물건만). 정렬·역순 버튼과 JEI 검색창과 동기화할지 고르는 전환도 있습니다. 안드로이드를 자동으로 하면 주문에 필요한 수만큼만 골라 부릅니다."
+  },
+  "guide.singulo.androids.first.title": {
+    "source": "Your first work order",
+    "translation": "첫 작업 주문"
+  },
+  "guide.singulo.androids.gear.body": {
+    "source": "- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrades: add backpack slots to the 5-slot inventory. There are three tiers: Backpack 12, Reinforced Backpack 18 and Large Backpack 24 slots, each made from the tier below. A backpack cannot be removed while it holds items, but you can swap in a larger one whose slots still fit the contents.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).\n- Sort and put away: the buttons at the top right of the backpack area sort the inventory and backpack, or send the android to put them in a nearby box (a chest, barrel, shulker box or supply port within 12 blocks).",
+    "translation": "- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩 칸이 더해집니다. 3단계가 있으며 백팩 12칸, 강화 백팩 18칸, 대형 백팩 24칸이고, 각 단계는 한 단계 아래 백팩으로 만듭니다. 안에 물건이 있으면 뺄 수 없지만, 내용물이 그대로 들어가는 더 큰 백팩으로는 바꿔 낄 수 있습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다.\n- 정리・맡기기: 백팩 칸 오른쪽 위의 버튼으로 소지품과 백팩 안을 정리하거나, 근처 상자(12블록 이내의 상자・통・셜커 상자・자재구)에 걸어가서 맡기게 할 수 있습니다."
+  },
+  "guide.singulo.androids.gear.title": {
+    "source": "Android upgrades",
+    "translation": "안드로이드 업그레이드"
   },
   "guide.singulo.androids.glass.body": {
     "source": "- Android Barrier Glass (amber): only androids cannot pass; players and other creatures go straight through. Good for doorways.\n- Android Gate Glass (cyan): only androids can pass; solid glass for everything else. Good for a guard's own path.\nAndroids also plan their paths around it: barrier glass counts as blocked, gate glass as open. The plain kinds join seamlessly with the same glass next to them, and four plain panes make the patterned kind.",
@@ -5740,8 +5892,8 @@
     "translation": "순찰 경비"
   },
   "guide.singulo.androids.process.body": {
-    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in and take the results out (the faces are chosen automatically, or set them with the In and Out buttons when recording). While a slow machine works, they do other jobs (including their other orders) and come back when it is done. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.\n- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table.",
-    "translation": "지령대 \"기록\"의 모드 버튼으로 기록할 종류를 전환합니다.\n・가공: 화로와 장치의 레시피. 왼쪽에 넣는 것, 오른쪽에 나오는 것(부산물도 2개까지)을 놓고, 휠로 개수를 바꿉니다(JEI의 \"+\"로도 가능). 안드로이드는 장치에 재료를 넣고 완성품을 꺼냅니다(면은 자동. 기록할 때 \"입\" \"출\" 버튼으로 정할 수도 있음). 오래 걸리는 가공은 기다리는 동안 다른 작업(맡은 다른 주문도)을 하고, 완성되면 가지러 돌아옵니다. 부산물은 재료 보관소로 돌려놓습니다. 연료와 전력은 직접 준비하세요. 2분 동안 진행이 없으면 주문이 취소됩니다.\n・절차: 절차 카드에 투입·꺼내기·채굴 절차를 8개까지 기록합니다. 작업 위치 카드를 놓아 위치를 옮기고, 아이템 칸에 아이템을 놓은 뒤 \"추가\"를 누릅니다. 오른쪽에 만들어지는 것을 놓고 기록합니다. 절차 카드는 위치를 스스로 가지므로 레시피 선반의 어느 줄에나 놓을 수 있습니다.\n・채굴: 채굴 업그레이드를 단 안드로이드만 합니다. 작업 위치 카드 2장으로 범위를 정하면 위층부터 캐며, 목표 아이템이 모일 때까지 계속합니다(조약돌 생성기에도 쓸 수 있음). 부술 수 없는 블록·액체·보관함·실드로 보호된 곳은 캐지 않습니다. 캘 것이 없는 상태가 30초 계속되면 취소됩니다.\n・농사: 수확(다 자란 작물을 거두고 다시 심기. 사탕수수·선인장은 밑동을 남김), 벌목(나무를 통째로 베고 묘목을 다시 심기. 벌목 업그레이드 필요), 번식(먹이를 주어 정한 수까지 늘리기), 털 깎기·우유 짜기(빈 양동이를 가져감), 처리(정한 수를 넘는 만큼). 이름이 붙은·묶인·길들인 동물과 새끼는 건드리지 않습니다.\n・조작: 레버(켜기·끄기·전환), 버튼, 문 등을 사용합니다. 장치를 움직이는 신호로.\n・액체·기체: 자재구와 지령대 옆의 탱크도 재료 보관소가 됩니다. 가공 모드나 절차의 견본 칸을 양동이 등으로 클릭하거나 JEI의 \"+\"로 유체를 놓을 수 있습니다(휠로 100 mB씩, Shift로 1000 mB씩). 탱크 업그레이드를 단 안드로이드가 유체를 장치로 나릅니다. 유체를 만드는 주문은 재료 보관소의 탱크에 넣습니다.\n・연료: 가공 모드의 연료 칸에 연료를 놓고 기록하면, 장치의 연료가 떨어졌을 때 그 연료를 재료 보관소에서 가져와 넣습니다(놓은 수씩, 또는 칸 아래 버튼으로 \"가득\"으로 하면 장치에 들어가는 만큼. 어느 쪽이든 들어가지 않는 만큼은 가져오지 않음. 비워 두면 가지러 가지 않음). 재료 보관소에 없고 레시피로 만들 수 있으면 연료를 만드는 주문을 자동으로 냅니다(만드는 동안 안드로이드는 다른 작업을 함).\n・확률로 나오는 것: 나온 수가 부족하면 부족한 만큼의 재료를 재료 보관소에서 꺼내, 모일 때까지 다시 만듭니다(재료가 없으면 갖춰질 때까지 기다림). 수확·벌목·목장에서는 아직 자랄 것이 있으면 자라기를 기다립니다(20분까지). 자수정은 다 자란 송이만 따고, 싹트는 자수정은 부수지 않습니다.\n・안드로이드 작업대: 바닐라 제작대보다 4배 빠르게 만듭니다."
+    "source": "The mode button in the console's Record tab switches what you record.\n- Processing: furnace and machine recipes. Put what goes in on the left and what comes out on the right (plus up to two byproducts), and scroll to change counts (JEI's + button works too). Androids put the items in and take the results out (the faces are chosen automatically, or set them with the In and Out buttons when recording). While a slow machine works, they do other jobs (including their other orders) and come back when it is done. Byproducts go back to the stockpile. Provide fuel or power yourself. If nothing happens for two minutes, the order is cancelled.\n- Procedure: record up to eight insert, extract and mine steps on a Procedure Card. Place a Work Location Card to copy the place, put the item in the item slot and press Add. Put the product on the right and record. Procedure cards hold their own places, so they work in any recipe rack row.\n- Mining: only androids with a Mining Upgrade do it. Two Work Location Cards mark an area; it is dug from the top layer down until enough of the wanted item is collected (it works with a cobblestone generator too). Unbreakable blocks, liquids, containers and shield-protected places are skipped. If there is nothing to dig for 30 seconds, the order is cancelled.",
+    "translation": "지령대 \"기록\"의 모드 버튼으로 기록할 종류를 전환합니다.\n・가공: 화로와 장치의 레시피. 왼쪽에 넣는 것, 오른쪽에 나오는 것(부산물도 2개까지)을 놓고, 휠로 개수를 바꿉니다(JEI의 \"+\"로도 가능). 안드로이드는 장치에 재료를 넣고 완성품을 꺼냅니다(면은 자동. 기록할 때 \"입\" \"출\" 버튼으로 정할 수도 있음). 오래 걸리는 가공은 기다리는 동안 다른 작업(맡은 다른 주문도)을 하고, 완성되면 가지러 돌아옵니다. 부산물은 재료 보관소로 돌려놓습니다. 연료와 전력은 직접 준비하세요. 2분 동안 진행이 없으면 주문이 취소됩니다.\n・절차: 절차 카드에 투입·꺼내기·채굴 절차를 8개까지 기록합니다. 작업 위치 카드를 놓아 위치를 옮기고, 아이템 칸에 아이템을 놓은 뒤 \"추가\"를 누릅니다. 오른쪽에 만들어지는 것을 놓고 기록합니다. 절차 카드는 위치를 스스로 가지므로 레시피 선반의 어느 줄에나 놓을 수 있습니다.\n・채굴: 채굴 업그레이드를 단 안드로이드만 합니다. 작업 위치 카드 2장으로 범위를 정하면 위층부터 캐며, 목표 아이템이 모일 때까지 계속합니다(조약돌 생성기에도 쓸 수 있음). 부술 수 없는 블록·액체·보관함·실드로 보호된 곳은 캐지 않습니다. 캘 것이 없는 상태가 30초 계속되면 취소됩니다."
   },
   "guide.singulo.androids.process.title": {
     "source": "Processing, procedures and mining",
@@ -5756,24 +5908,32 @@
     "translation": "경로와 측량 안경"
   },
   "guide.singulo.androids.ruin.body": {
-    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and a compact crystal memory of that design appears on the fabricator, which then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
-    "translation": "모든 유적에는 벽 쪽에 폐허 안드로이드 출력대가 있습니다. 서바이벌 플레이어가 다가오면, 받침대 위에 그 형(광날형·채찍형·광검형)의 안드로이드 2~3체를 아래부터 쌓아 올리듯 출력해 출격시킵니다. 모두 쓰러뜨리면 그 형의 소형 크리스털 메모리가 출력대 위에 나타나고, 출력대는 하루 동안 쉽니다.\n- 광날형 \"루미나\": 몸을 숙이고 칼날이 빛나면 잔상을 남기며 파고들어 벱니다. 한쪽 무릎을 꿇고 바닥에 손을 대면 발밑에 예고 고리가 생기고 빛기둥이 솟습니다(고리 밖으로). 가까이서는 칼날을 펼쳐 회전 베기.\n- 채찍형 \"베르나\": 약 6블록까지 닿는 채찍질과, 휘감아 끌어당기는 감기. 머리 위로 채찍을 돌리면 바닥을 내리쳐 일직선 충격파를 보냅니다(점프로 피함).\n- 광검형 \"솔레이유\": 파고드는 찌르기, 휘두르는 순간 칼날이 늘어나는 가로 베기, 날아가는 초승달 참격파. 맞으면 정면에 빛의 방패를 펼치고(정면으로는 거의 안 통함), 계속 치면 반격합니다. 옆이나 뒤에서 공격하세요.\n지하 안드로이드 연구소에는 인쇄대에서는 나오지 않는 시제기가 있습니다(총괄 AI가 부릅니다).\n- 도끼형 \"알마\": 단단하고 무겁습니다. 도끼를 오른쪽으로 당기면 넓은 휩쓸기, 머리 위로 치켜들면 바닥을 내리찍어 앞으로 일직선 충격파(뛰면 맞지 않음), 낮게 웅크리면 뛰어들어 착지할 때 주위를 내리칩니다.\n- 비트형 \"녹스\": 등의 비트를 띄워 멀리서 광선으로 쏩니다(체력이 절반 아래면 6기). 거리를 두려 하며, 가까이 가면 단검으로 두 번 벤 뒤 뒤로 뛰어 물러납니다. 벽 뒤에 숨으면 광선이 닿지 않습니다.\n안드로이드는 충전량으로 움직이며, 큰 기술을 10번쯤 쓰면 바닥나 눈의 빛이 꺼집니다. 가까운 출력대로 돌아가거나, 낮의 하늘 아래에서는 태양광 패널을 펼치고, 밤이나 실내에서는 앉아서 충전합니다(출력대 5초·태양광 10초·앉아서 14초). 충전 중에는 공격하지 않으니 공격할 기회입니다.\n비트 끝에 빛의 칼날이 나타나면 비트가 조준한 위치로 돌진합니다. 준비 동작을 보고 옆으로 피하세요. 벽은 광선과 돌진을 모두 막습니다."
+    "source": "Every ruin has Ruin Android Fabricators against its walls. When a survival player comes near, a fabricator prints two or three androids of its kind (Blade, Whip or Saber) onto its bed, built up from the feet, and sends them out. Defeat them all and, half the time, a compact crystal memory of that design appears on the fabricator. Either way, the fabricator then rests for a day.\n- Blade Android \"Lumina\": when she crouches and her blade flares, she dashes in leaving afterimages and slashes. When she kneels and touches the floor, rings appear at your feet and pillars of light rise (step out of the rings). Up close she spins with her blade spread.\n- Whip Android \"Verna\": a lash that reaches about 6 blocks and a bind that wraps and pulls you in. When she twirls the whip overhead, she slams the floor and sends a straight shockwave (jump it).\n- Saber Android \"Soleil\": a lunging thrust, a sweep whose blade stretches as she swings, and a flying crescent slash. When hit she raises a light shield in front (little gets through from the front) and counters if you keep striking it. Attack from the side or behind.\nThe Android Laboratory holds prototypes that fabricators never print (its overseer calls them).\n- Axe Android \"Alma\": tough and heavy. When she draws the axe back to the right, a wide cleave follows; raised overhead, she slams the floor and sends a straight shockwave ahead (jump it); crouched low, she leaps in and strikes all around where she lands.\n- Bit Android \"Nox\": she floats the bits from her back and shoots you with beams from range (six bits below half health). She keeps her distance; get close and she stabs twice with a dagger, then hops back. When a blade lights up at a bit’s tip, the bit itself lunges at the marked position. Dodge sideways during the windup; walls stop both beams and lunges.\nAndroids run on charge. After about ten big moves they run out and their eyes go dark. They return to a nearby fabricator, or unfold a solar panel under the open daytime sky, or sit down at night or indoors to recharge (fabricator 5 s, solar 10 s, sitting 14 s). They do not attack while charging: your chance to strike.",
+    "translation": "모든 유적에는 벽 쪽에 폐허 안드로이드 출력대가 있습니다. 서바이벌 플레이어가 다가오면, 받침대 위에 그 형(광날형·채찍형·광검형)의 안드로이드 2~3체를 아래부터 쌓아 올리듯 출력해 출격시킵니다. 모두 쓰러뜨리면 절반의 확률로 그 형의 소형 크리스털 메모리가 출력대 위에 나타납니다. 나타나든 나타나지 않든, 출력대는 하루 동안 쉽니다.\n- 광날형 \"루미나\": 몸을 숙이고 칼날이 빛나면 잔상을 남기며 파고들어 벱니다. 한쪽 무릎을 꿇고 바닥에 손을 대면 발밑에 예고 고리가 생기고 빛기둥이 솟습니다(고리 밖으로). 가까이서는 칼날을 펼쳐 회전 베기.\n- 채찍형 \"베르나\": 약 6블록까지 닿는 채찍질과, 휘감아 끌어당기는 감기. 머리 위로 채찍을 돌리면 바닥을 내리쳐 일직선 충격파를 보냅니다(점프로 피함).\n- 광검형 \"솔레이유\": 파고드는 찌르기, 휘두르는 순간 칼날이 늘어나는 가로 베기, 날아가는 초승달 참격파. 맞으면 정면에 빛의 방패를 펼치고(정면으로는 거의 안 통함), 계속 치면 반격합니다. 옆이나 뒤에서 공격하세요.\n지하 안드로이드 연구소에는 인쇄대에서는 나오지 않는 시제기가 있습니다(총괄 AI가 부릅니다).\n- 도끼형 \"알마\": 단단하고 무겁습니다. 도끼를 오른쪽으로 당기면 넓은 휩쓸기, 머리 위로 치켜들면 바닥을 내리찍어 앞으로 일직선 충격파(뛰면 맞지 않음), 낮게 웅크리면 뛰어들어 착지할 때 주위를 내리칩니다.\n- 비트형 \"녹스\": 등의 비트를 띄워 멀리서 광선으로 쏩니다(체력이 절반 아래면 6기). 거리를 두려 하며, 가까이 가면 단검으로 두 번 벤 뒤 뒤로 뛰어 물러납니다. 벽 뒤에 숨으면 광선이 닿지 않습니다.\n안드로이드는 충전량으로 움직이며, 큰 기술을 10번쯤 쓰면 바닥나 눈의 빛이 꺼집니다. 가까운 출력대로 돌아가거나, 낮의 하늘 아래에서는 태양광 패널을 펼치고, 밤이나 실내에서는 앉아서 충전합니다(출력대 5초·태양광 10초·앉아서 14초). 충전 중에는 공격하지 않으니 공격할 기회입니다.\n비트 끝에 빛의 칼날이 나타나면 비트가 조준한 위치로 돌진합니다. 준비 동작을 보고 옆으로 피하세요. 벽은 광선과 돌진을 모두 막습니다."
   },
   "guide.singulo.androids.ruin.title": {
     "source": "Ruin androids",
     "translation": "유적의 안드로이드"
   },
+  "guide.singulo.androids.trouble.body": {
+    "source": "When an android is stuck, you can see why in these places:\n- The status page of the android screen: the reason appears in red in the speech bubble.\n- Order details in the Work Console: it appears next to the assigned android's name.\n- With Survey Glasses on, a barrier icon floats over a stuck android's head.\nReasons and fixes:\n- The station is out of power: add generation or check the cable to the station.\n- Can't reach the destination: check that steps, doors or water don't cut the path, and that a route rule (no-go zone) doesn't block it.\n- Not enough materials in the stockpile: add materials to the chests beside the supply port or the console. Intermediate materials are crafted if there is a recipe.\n- A protected block: a shield or another mod's protection stops it. Check that the person who placed the order may break it.\n- Nothing to work on in the area: check the Work Location Card area. Waiting for crops to grow does not count as stuck (clock icon).\n- Storage is full: empty the delivery port or stockpile chests.\nWhen an order is cancelled, the console shows why (unreachable, recipe doesn't match, no progress for a long time, or the wrong input face).",
+    "translation": "안드로이드가 멈춰 있을 때는 다음 곳에서 이유를 확인할 수 있습니다.\n・안드로이드 화면의 상태 페이지: 말풍선에 빨간 글씨로 이유가 나옵니다.\n・작업 지령대의 주문 상세: 담당 안드로이드의 이름 옆에 나옵니다.\n・측량 안경을 쓰면, 멈춘 안드로이드의 머리 위에 출입 금지 표시가 나옵니다.\n이유와 고치는 법:\n・스테이션 전력 부족: 발전을 늘리거나 스테이션으로 가는 케이블을 확인합니다.\n・목적지에 갈 수 없음: 단차·문·물로 길이 끊기지 않았는지, 경로 규칙(진입 금지 구역)이 길을 막지 않았는지 확인합니다.\n・재료 보관소에 재료 부족: 자재구나 지령대 옆 상자에 재료를 더합니다. 중간 재료는 레시피가 있으면 스스로 만듭니다.\n・보호된 블록: 실드나 다른 모드의 보호로 부술 수 없습니다. 주문한 사람에게 부술 권한이 있는지 확인합니다.\n・작업 범위에 대상이 없음: 작업 위치 카드의 범위를 다시 봅니다. 작물이 자라기를 기다리는 동안은 멈춘 것이 아닙니다(시계 표시).\n・보관 장소가 가득 참: 납품구나 재료 보관소의 상자를 비웁니다.\n주문이 취소되면 지령대에 이유가 나옵니다(갈 수 없음·레시피가 맞지 않음·오래 진행되지 않음·넣는 면이 다름)."
+  },
+  "guide.singulo.androids.trouble.title": {
+    "source": "When an android stops",
+    "translation": "멈춰 있을 때"
+  },
   "guide.singulo.androids.upgrades.body": {
-    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- Factory Print Unit: in the slot beside the station's kit slot, it halves printing time and power and doubles repair speed on the station. Made from precision actuators found in the Underground Android Laboratory.\n- The button left of the name in the android screen opens the \"Gear and inventory\" page, where upgrades go.\n- Battery Upgrade: each adds 50% to the full charge (up to two); a full recharge takes that much longer. A battery pack appears on the waist.\n- Backpack Upgrade: adds the backpack's 24 slots to the 5-slot inventory. It cannot be removed while it holds items.\n- Mining Upgrade: lets the android do mining work (like a diamond pickaxe). Takes Efficiency, Fortune and Silk Touch.\n- Felling Upgrade: lets the android fell trees (like a diamond axe). Takes Efficiency, Fortune and Silk Touch.\n- Tank Upgrade: two tanks for liquids and gases (32,000 mB each, one fluid per tank), shown at the waist. It cannot be removed while they hold anything. Click a tank in the screen with a bucket or other container to fill or draw; shift-click the × beside it to dump the contents.\n- Gas Tank Upgrade and Gas & Liquid Upgrade (only with Mekanism installed): tanks for Mekanism chemicals (gases, infuse types, pigments, slurries). The Gas Tank holds two chemicals (32,000 mB each); the Gas & Liquid holds two liquids and two chemicals (16,000 mB each). Gas cylinders show at the waist. Click a tank in the screen with a chemical tank to fill or draw. For work, chemical tanks next to a supply port join the stockpile and androids carry chemicals to machines.\n- Work on/off: choose for each android whether it may be given work (automation).",
-    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 공장식 인쇄 유닛: 스테이션의 키트 옆 슬롯에 넣으면 인쇄에 드는 시간과 전력이 절반이 되고, 스테이션 위에서의 수리가 2배 빨라집니다. 지하 안드로이드 연구소에서 얻는 정밀 액추에이터로 만듭니다.\n- 안드로이드 화면에서 이름 왼쪽의 버튼을 누르면 \"장비와 소지품\" 페이지로 바뀌고, 여기에 업그레이드를 넣습니다.\n- 배터리 업그레이드: 하나당 완충량 +50%(둘까지). 완충까지 걸리는 시간도 그만큼 늘어납니다. 허리에 배터리 팩이 붙습니다.\n- 백팩 업그레이드: 소지품 5칸에 백팩의 24칸이 더해집니다. 안에 물건이 있으면 뺄 수 없습니다.\n- 채굴 업그레이드: 채굴 작업을 할 수 있게 됩니다(다이아몬드 곡괭이 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 벌목 업그레이드: 벌목 작업을 할 수 있게 됩니다(다이아몬드 도끼 수준). 효율·행운·섬세한 손길을 부여할 수 있습니다.\n- 탱크 업그레이드: 액체·기체를 담는 탱크 2개(각 32,000 mB, 탱크 하나에 한 종류). 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다. 화면의 탱크를 양동이 등으로 클릭하면 넣고 뺄 수 있고, 옆의 ×를 Shift+클릭하면 내용물을 버립니다.\n- 가스 탱크 업그레이드·가스·액체 업그레이드(Mekanism이 설치되어 있을 때만): Mekanism의 화학 물질(가스·주입재·안료·슬러리)을 나르는 탱크. 가스 탱크는 화학 물질 2종류(각 32,000 mB), 가스·액체는 액체와 화학 물질을 2종류씩(각 16,000 mB). 허리에 가스통이 보입니다. 화면의 탱크는 케미컬 탱크 등으로 클릭해 넣고 뺄 수 있습니다. 작업에서는 자재구 옆의 케미컬 탱크가 재료 보관소가 되어, 화학 물질을 장치로 나릅니다.\n- 작업 켬/끔: 안드로이드마다 작업(자동화)을 맡겨도 되는지 정합니다."
+    "source": "- Production Upgrade: fitted in the station, it prints and looks after up to two androids. Only one charges on top at a time; the other waits beside it and takes its turn. Use \"1\" and \"2\" left of the name to choose which android the screen shows (settings are shared).\n- Factory Print Unit: in the slot beside the station's kit slot, it halves printing time and power and doubles repair speed on the station. Made from precision actuators found in the Underground Android Laboratory.",
+    "translation": "- 생산 업그레이드: 스테이션에 넣으면 안드로이드를 둘까지 출력해 맡습니다. 위에서 충전할 수 있는 것은 한 번에 하나이고, 다른 하나는 옆에서 기다렸다가 교대합니다. 이름 왼쪽의 \"1\" \"2\"로 화면에 보일 안드로이드를 고릅니다(움직이는 방식 등의 설정은 둘이 같습니다).\n- 공장식 인쇄 유닛: 스테이션의 키트 옆 슬롯에 넣으면 인쇄에 드는 시간과 전력이 절반이 되고, 스테이션 위에서의 수리가 2배 빨라집니다. 지하 안드로이드 연구소에서 얻는 정밀 액추에이터로 만듭니다."
   },
   "guide.singulo.androids.upgrades.title": {
-    "source": "Upgrades",
-    "translation": "업그레이드"
+    "source": "Station upgrades",
+    "translation": "스테이션 업그레이드"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\nAndroids carry 5 slots at a time (+24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
-    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n- \"새로\": 켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\").\n- 주문 목록에서는 만드는 중인 아이템에 주황색 테두리가 붙습니다. 진행 중인 주문의 \"↻\"로 같은 아이템을 다시 주문할 수 있습니다. 재료를 기다리는 주문에는 부족한 아이템과 수가 나옵니다(행에 커서를 올리면 전부).\n- 화면에서 낸 주문은 끝났을 때, 재료를 기다리며 1분 이상 멈췄을 때, 취소되었을 때 주문한 사람에게 채팅으로 알립니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +12·18·24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
@@ -5860,8 +6020,8 @@
     "translation": "전력, 촉매, 유적"
   },
   "guide.singulo.intro.howto.body": {
-    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
-    "translation": "- 왼쪽에서 장을 고르면 오른쪽에 페이지가 나옵니다. 아래쪽 화살표로 페이지를 넘깁니다.\n- '진행 상황' 장에서 달성한 목표와 다음 목표를 볼 수 있습니다(발전 과제 화면[L 키]의 Singulo 탭과 같음).\n- 아이템에 커서를 올리면 설명이 나오고, Shift를 누르면 제작법과 용도도 나옵니다.\n- 멀티블록 컨트롤러에 홀로그램 투영기를 사용하면 올바른 형태가 반투명하게 떠오릅니다.\n발전 과제는 공업, 탐사, 안드로이드의 갈래로 안내합니다. 연결선은 안내이며 별도 해금 조건이 아닙니다."
+    "source": "- Pick a chapter on the left to show its pages on the right. Turn pages with the arrows at the bottom.\n- The Progress chapter follows industry, exploration and android branches and shows completed and upcoming goals (the same as the Singulo tab of the advancements screen, L key).\n- Hover over an item for its description; hold Shift to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it). Type in the search box above the chapter list to find matching pages.\n- Use the Holo Projector on a multiblock controller to show the correct shape as a translucent outline.",
+    "translation": "- 왼쪽에서 장을 고르면 오른쪽에 페이지가 나옵니다. 아래쪽 화살표로 페이지를 넘깁니다.\n- '진행 상황' 장에서 달성한 목표와 다음 목표를 볼 수 있습니다(발전 과제 화면[L 키]의 Singulo 탭과 같음).\n- 아이템에 커서를 올리면 설명이 나오고, Shift를 누르면 제작법과 용도도 나옵니다.\n- Singulo 아이템에 커서를 올리고 H 키를 누르면 그 아이템에 대해 쓰인 페이지가 열립니다(손에 들고 있을 때도). 장 목록 위의 검색창에 말을 넣으면 맞는 페이지를 찾을 수 있습니다.\n- 멀티블록 컨트롤러에 홀로그램 투영기를 사용하면 올바른 형태가 반투명하게 떠오릅니다.\n발전 과제는 공업, 탐사, 안드로이드의 갈래로 안내합니다. 연결선은 안내이며 별도 해금 조건이 아닙니다."
   },
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",
@@ -5964,8 +6124,8 @@
     "translation": "유적"
   },
   "guide.singulo.ruins.bosses.body": {
-    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.\n- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.\n  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against the pull).\n  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never moves and fights with the facility itself. While the four production lines on the walls run, it takes less damage (20% per line): break them first. The lines also send out mass-produced androids. A red mark on the floor is a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the press (step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). The floor conveyors carry you along and reverse after their frames glow red. Below half health it calls two prototypes (Axe and Bit) and uses two arms. Drops precision actuators, and for each challenger a compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundry Core, it reprints its broken lines when enraged.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
-    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관고는 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나도 수호자는 3분 동안 남아 있고(쓰러진 사람이 장비를 찾으러 돌아올 시간), 그래도 아무도 돌아오지 않으면 원래대로 돌아갑니다. 서버 설정 bossHardMode를 켜면 수호자가 더 강해집니다. 쓰러뜨렸을 때의 전리품은 바닥의 수호자 봉인 핵(지평선 감시자는 봉인 콘솔) 위에 나타나고, 경험치는 방에 있는 도전자들이 똑같이 나누어 바로 받습니다(수선도 적용됩니다).\n여럿이 도전하면 수호자는 인원에 맞춰 강해집니다. 한 명 늘 때마다 체력이 원래의 절반만큼 늘고 기술 간격도 조금 짧아집니다(최대 6명까지). 도중에 합류해도 체력 비율은 유지되며, 누가 빠져도 약해지지 않습니다. 대신 전리품은 전투가 시작될 때의 도전자 수만큼 떨어집니다(나중에 합류한 사람의 몫은 늘지 않습니다). 여럿이 공격해도 서로의 공격에 막히지 않고 모두의 공격이 들어갑니다(같은 사람의 연타는 지금처럼 조금 간격을 두어야 들어갑니다).\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 우물은 끌어당긴 뒤 힘을 모으고(빛과 소리가 전조), 가까운 상대를 날려 보낸 다음 방의 다른 곳으로 떠갑니다. 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 봉인 콘솔을 만지면 깨어납니다. 마지막 모습에서 발밑에 여는 특이점은 1초 전조 뒤에 끌어당기기 시작하니 바로 벗어나세요. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 감시자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다.\n- 에르고구의 거대 뱀(가라앉은 노심 구획): 구형 격납실 바닥의 멈춘 노심에 다가가면 나타납니다. 체력 2/3과 1/3에서 모습을 바꿉니다(바뀌는 동안은 피해를 받지 않습니다). 헤엄친 자리의 띠 안에서는 헤엄친 방향으로 떠밀리니, 흐름을 타고 쫓아가세요. 꼬리의 금빛으로 빛나는 핵은 언제나 약점입니다.\n  장갑: 반응로 외피 비늘을 두르고 몸통이 단단합니다. 머리가 하늘색으로 빛나면 돌진(노려진 곳에서 벗어나세요), 아가리의 소용돌이가 열리면 정면에 서지 마세요(빨아들인 뒤 광선). 꼬리 근처에 있으면 휩쓸립니다. 돌진으로 바닥을 스친 뒤에는 잠시 바닥 근처에 머무르니 반격할 기회입니다.\n  골격: 비늘을 모두 튕겨 내고(가까이 있으면 아픕니다) 빛의 골격이 됩니다. 몸통도 제대로 피해를 받습니다. 방 중앙에서 똬리를 틀고 돌며 주변을 떠밀고 빛의 파편을 쏩니다. 다가가면 물고, 돌진이 연달아 옵니다.\n  용: 노심의 소용돌이로 잠수했다가 검은 용이 되어 솟구칩니다. 두 뿔에서 도는 두 줄기 광선(상대론적 제트), 하늘을 돌며 발밑에 작은 블랙홀을 떨어뜨리는 폭풍(빛의 기둥이 전조), 돌진 뒤에 머문 자리에는 날아오를 때 특이점이 남습니다. 소용돌이의 단장을 떨어뜨립니다.\n  모든 모습: 높이 솟아 몸을 웅크리면 중심에 내리꽂고, 두 개의 충격파가 바닥을 따라 퍼집니다(충격파가 오면 뛰세요). 바닥에 빛의 선이 그어지면 공간이 찢어지기 전에 선 위에서 벗어나세요(방향을 바꿔 세 번). 골격과 용은 노심의 소용돌이를 열어 방 전체를 끌어들이기도 합니다(노심 근처는 다치니 흐름을 거슬러 바깥으로 달리세요).\n  노심 재점화: 골격과 용의 모습에서는 노심을 감고 힘을 모아 방 전체에 충격을 내뿜습니다. 전조가 화면에 나타나면 봉쇄 기둥 뒤에 숨으세요(기둥의 강화 폐허 유리도 충격을 막습니다).\n- 총괄 AI \"파운드리\"(지하 안드로이드 연구소의 AI 중추): 중추 중앙에 떠 있는 기계 두뇌로, 스스로는 움직이지 않고 시설 설비로 싸웁니다. 벽가의 생산 라인 4개가 가동되는 동안은 공격이 잘 통하지 않으니(하나당 2할) 먼저 부수세요. 라인은 가끔 양산형 안드로이드를 내보냅니다. 바닥에 빨간 표시가 나오면 로봇 팔(표시는 잠시 따라오다 멈춘 뒤 내려옵니다. 붙잡히면 던져집니다), 그림자 원은 프레스(바로 밖으로), 바닥의 부채꼴 표시는 용접 레이저(바닥에 붙은 광선이 돌아오니 점프로 넘으세요). 바닥의 컨베이어는 위에 선 것을 실어 나르고, 틀의 등이 빨갛게 빛난 뒤 방향을 바꿉니다. 체력이 절반 아래로 내려가면 시제기 2대(도끼형, 비트형)를 부르고 로봇 팔이 2개가 됩니다. 정밀 액추에이터와, 도전한 사람마다 시제기의 소형 크리스털 메모리(아직 없는 형이 먼저)를 떨어뜨립니다. 각성의 제조핵으로 재대결하면 전력을 다할 때 부서진 라인을 다시 인쇄합니다.\n- 각성한 수호자: 메아리 파수꾼이나 중력 잔재를 쓰러뜨린 뒤 방 바닥의 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하면 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠른 기술, 체력 65%에서 분노). 메아리 파수꾼은 분신과 광탄이 하나씩 늘고, 분노하면 부서진 투영기를 두 개까지 다시 투영합니다. 중력 잔재는 잔해를 더 많이 쏘고, 중력 우물이 넓어지며, 연속으로 내려찍습니다. 방을 떠나면 각성핵은 돌려받습니다."
+    "source": "The caches of the Research Building, Culture Facility and Final Lab stay sealed until you defeat their guardian. When the loot regrows the cache reseals and the guardian returns. If every challenger leaves, a guardian waits three minutes (time to come back after falling) and then resets. The server setting bossHardMode makes guardians stronger. Their drops appear on the guardian core in the floor (on the seal console for the Warden), and their experience is split evenly among the challengers in the room and goes straight to them (Mending still works).\nGuardians grow stronger with the number of challengers: each extra player adds half of their health and shortens their attack gaps a little (up to six players). Joining mid-fight keeps the health fraction, and leaving never weakens them. In return they drop their loot once per challenger present when the fight begins (late joiners do not add more). Everyone's attacks land without blocking each other, though each player still needs the usual short pause between hits.\n- Echo Sentinel (Research Building archive): a security hologram that orbits you firing homing bolts and blinks behind you to strike when you stop watching it. The Echo Projectors in the corners shield it and fire light lances in volleys (move when the golden aim lines appear); step out of a projected circle before its pillar rises. Break the projectors first. Below half health it summons one-hit echoes; projector beams only reach the real one. Drops Sentinel Projection Cores.\n- Gravity Remnant (Culture Facility containment chamber): a black core that bursts from its tank. While its rubble shell lasts it takes reduced damage and loses a piece per hit; it fires the rubble at you. It lifts nearby foes and slams them down, so Gravity Boots or Impact Generators help. Below half health a gravity well drags you toward the core. The well pulls, charges with a glow and a sound, bursts nearby foes outward, then drifts the Remnant to another spot. Drops Degenerate Nuclei.\n- Horizon Warden (Final Lab): touch the central Seal Console to wake it. In its last phase it opens singularities at your feet; they warn for a second before they pull, so step away. After beating it, use an Awakening Record Core on the console for a rematch with the awakened warden (2.5× health, 1.5× damage, faster and earlier phases). Leave and the core is returned.",
+    "translation": "연구동·봉쇄 배양 시설·최종 실험 시설의 보관고는 각 수호자를 쓰러뜨릴 때까지 역장으로 봉쇄되어 있습니다. 내용물이 재생되면 다시 봉쇄되고 수호자도 돌아오며, 도전자가 모두 방을 떠나도 수호자는 3분 동안 남아 있고(쓰러진 사람이 장비를 찾으러 돌아올 시간), 그래도 아무도 돌아오지 않으면 원래대로 돌아갑니다. 서버 설정 bossHardMode를 켜면 수호자가 더 강해집니다. 쓰러뜨렸을 때의 전리품은 바닥의 수호자 봉인 핵(지평선 감시자는 봉인 콘솔) 위에 나타나고, 경험치는 방에 있는 도전자들이 똑같이 나누어 바로 받습니다(수선도 적용됩니다).\n여럿이 도전하면 수호자는 인원에 맞춰 강해집니다. 한 명 늘 때마다 체력이 원래의 절반만큼 늘고 기술 간격도 조금 짧아집니다(최대 6명까지). 도중에 합류해도 체력 비율은 유지되며, 누가 빠져도 약해지지 않습니다. 대신 전리품은 전투가 시작될 때의 도전자 수만큼 떨어집니다(나중에 합류한 사람의 몫은 늘지 않습니다). 여럿이 공격해도 서로의 공격에 막히지 않고 모두의 공격이 들어갑니다(같은 사람의 연타는 지금처럼 조금 간격을 두어야 들어갑니다).\n- 메아리 파수꾼(연구동의 기록 보관실): 방에 들어서면 나타나는 경비 홀로그램입니다. 공중에서 주위를 돌며 추적하는 광탄을 쏘고, 한동안 쳐다보지 않으면 등 뒤로 순간이동해 베어 옵니다(이동 전에 빛이 모입니다). 메아리 투영기는 파수꾼을 지킬 뿐 아니라 일제히 빛의 창도 쏩니다(금색 조준선이 보이면 움직이세요). 발밑에 빛의 진이 비치면 기둥이 솟기 전에 진 밖으로 나가세요. 투영기가 많이 남아 있을수록 공격이 잘 통하지 않으니 먼저 부수세요. 체력이 절반 아래로 떨어지면 한 방에 사라지는 분신을 부릅니다. 투영기의 빛은 본체에만 이어집니다. 파수꾼 투영 핵을 떨어뜨립니다.\n- 중력 잔재(봉쇄 배양 시설의 격리 수조실): 격리 수조를 깨고 나오는 검은 핵입니다. 잔해 껍질이 남아 있는 동안은 받는 피해가 작고 한 번 맞을 때마다 껍질이 하나씩 떨어지며, 그 잔해를 쏘아 보냅니다. 주변의 상대를 띄웠다가 바닥에 내리꽂으므로 중력 부츠나 충격 발전 패널이 있으면 수월합니다. 체력이 절반 아래가 되면 중력 우물이 생겨 핵 쪽으로 끌려갑니다(핵에 닿으면 다칩니다). 우물은 끌어당긴 뒤 힘을 모으고(빛과 소리가 전조), 가까운 상대를 날려 보낸 다음 방의 다른 곳으로 떠갑니다. 축퇴 핵을 떨어뜨립니다.\n- 지평선 감시자(최종 실험 시설): 중앙의 봉인 콘솔을 만지면 깨어납니다. 마지막 모습에서 발밑에 여는 특이점은 1초 전조 뒤에 끌어당기기 시작하니 바로 벗어나세요. 쓰러뜨린 뒤 콘솔에 각성의 기록핵을 사용하면 각성한 감시자와 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠르고 일찍 다음 단계로). 방을 떠나면 기록핵은 돌려받습니다."
   },
   "guide.singulo.ruins.bosses.title": {
     "source": "Ruin guardians",
@@ -5978,6 +6138,14 @@
   "guide.singulo.ruins.compass.title": {
     "source": "Tuning the Explorer Compass",
     "translation": "탐험가의 나침반 조정"
+  },
+  "guide.singulo.ruins.foundry.body": {
+    "source": "- Ergosphere Leviathan (Sunken Reactor Sector): approach the dead core in the floor of the spherical chamber and it appears. It changes form at 2/3 and 1/3 health (invulnerable while it changes). Its wake drags you along the way it swam: ride the flow to keep up. The glowing gold core in its tail is always a weak point.\n  Armored: reactor-plate scales, armored body. A cyan glow on the head means a dive (leave the marked spot); when the maw opens, do not stand in front (it pulls you in, then breathes a beam). Stay near its tail and it lashes you. After a dive grazes the floor it lingers low for a moment: your chance to strike back.",
+    "translation": "- 에르고구의 거대 뱀(가라앉은 노심 구획): 구형 격납실 바닥의 멈춘 노심에 다가가면 나타납니다. 체력 2/3과 1/3에서 모습을 바꿉니다(바뀌는 동안은 피해를 받지 않습니다). 헤엄친 자리의 띠 안에서는 헤엄친 방향으로 떠밀리니, 흐름을 타고 쫓아가세요. 꼬리의 금빛으로 빛나는 핵은 언제나 약점입니다.\n  장갑: 반응로 외피 비늘을 두르고 몸통이 단단합니다. 머리가 하늘색으로 빛나면 돌진(노려진 곳에서 벗어나세요), 아가리의 소용돌이가 열리면 정면에 서지 마세요(빨아들인 뒤 광선). 꼬리 근처에 있으면 휩쓸립니다. 돌진으로 바닥을 스친 뒤에는 잠시 바닥 근처에 머무르니 반격할 기회입니다."
+  },
+  "guide.singulo.ruins.foundry.title": {
+    "source": "The Foundry and awakened guardians",
+    "translation": "통괄 AI와 각성한 수호자"
   },
   "guide.singulo.ruins.gathering.body": {
     "source": "- Meteor craters (plains, deserts, forests and other surface biomes): a shallow bowl about 10 blocks across with a half-buried meteorite. Mine meteoric iron chunks (iron pickaxe or better) for raw meteoric iron and stardust clusters on the black crust for stardust. Clusters slowly regrow, but only on crust still in its crater. Each meteorite has one meteorite core at its heart; mine it for raw meteoric iron and stardust together. The Meteor Compass points to the nearest core not yet mined.\n- Fulgurite: lightning striking sand turns it into fulgurite. Stand a lightning rod on sand and it forms under the rod in thunderstorms. The stage 3 Keraunos Discharge Tower fires artificial lightning at a rod on demand.\n- Pressure crystals (stage 3): a Deep-Sea Pressure Collector on the sea floor with 16+ blocks of water above slowly makes them; deeper is faster.\n- Void dust (stages 4-5): a Void Collector in the End, placed over open void, gathers it.",
@@ -5994,6 +6162,14 @@
   "guide.singulo.ruins.lab.title": {
     "source": "Underground Android Laboratory",
     "translation": "지하 안드로이드 연구소"
+  },
+  "guide.singulo.ruins.leviathan.body": {
+    "source": "  Skeleton: it blasts its scales away (painful up close) and becomes a skeleton of light; its body now takes full damage. It coils in the middle of the room, dragging you around while firing light shards, bites when you come close and chains its dives.\n  Wyrm: it dives into the core vortex and erupts as a black wyrm. Two relativistic jets sweep from its horns, it circles high and rains small black holes where you stand (a light pillar warns you); where it rests after a dive, it leaves a singularity as it takes off. Drops Chapters of the Vortex.\n  In any form: when it rises and curls up, it slams the center and two shockwaves race across the floor (jump them). When lines of light cross the floor, get off them before the rift tears open (three volleys, each at a new angle). The skeleton and wyrm also open the core vortex to drag everything in (the core hurts; run against the pull).\n  Core Reignition: as skeleton and wyrm it coils around the core, charges, and blasts the whole room. When the warning appears, hide behind a containment pillar (the Reinforced Ruin Glass in the pillars blocks it too).\n- Foundry Overseer (AI core of the Android Laboratory): a mechanical brain floating over the core that never moves and fights with the facility itself. While the four production lines on the walls run, it takes less damage (20% per line): break them first. The lines also send out mass-produced androids. A red mark on the floor is a robot arm (it follows you briefly, stops, then drops; caught, you are thrown), a shadowed circle is the press (step out at once), and a fan drawn on the floor is the welding laser (a beam skims the floor as it turns; jump over it). The floor conveyors carry you along and reverse after their frames glow red. Below half health it calls two prototypes (Axe and Bit) and uses two arms. Drops precision actuators, and for each challenger a compact crystal memory of a prototype (one you do not have yet comes first). Awakened with an Awakened Foundry Core, it reprints its broken lines when enraged.\n- Awakened guardians: after beating the Echo Sentinel or Gravity Remnant, use an Awakened Echo Core or Awakened Gravity Core on the guardian core in the room's floor (2.5× health, 1.5× damage, faster moves, enraged at 65%). The sentinel adds an echo and a bolt and re-projects up to two broken projectors when enraged; the remnant fires more debris, widens its gravity well and chains its slams. Leave and the core is returned.",
+    "translation": "  골격: 비늘을 모두 튕겨 내고(가까이 있으면 아픕니다) 빛의 골격이 됩니다. 몸통도 제대로 피해를 받습니다. 방 중앙에서 똬리를 틀고 돌며 주변을 떠밀고 빛의 파편을 쏩니다. 다가가면 물고, 돌진이 연달아 옵니다.\n  용: 노심의 소용돌이로 잠수했다가 검은 용이 되어 솟구칩니다. 두 뿔에서 도는 두 줄기 광선(상대론적 제트), 하늘을 돌며 발밑에 작은 블랙홀을 떨어뜨리는 폭풍(빛의 기둥이 전조), 돌진 뒤에 머문 자리에는 날아오를 때 특이점이 남습니다. 소용돌이의 단장을 떨어뜨립니다.\n  모든 모습: 높이 솟아 몸을 웅크리면 중심에 내리꽂고, 두 개의 충격파가 바닥을 따라 퍼집니다(충격파가 오면 뛰세요). 바닥에 빛의 선이 그어지면 공간이 찢어지기 전에 선 위에서 벗어나세요(방향을 바꿔 세 번). 골격과 용은 노심의 소용돌이를 열어 방 전체를 끌어들이기도 합니다(노심 근처는 다치니 흐름을 거슬러 바깥으로 달리세요).\n  노심 재점화: 골격과 용의 모습에서는 노심을 감고 힘을 모아 방 전체에 충격을 내뿜습니다. 전조가 화면에 나타나면 봉쇄 기둥 뒤에 숨으세요(기둥의 강화 폐허 유리도 충격을 막습니다).\n- 총괄 AI \"파운드리\"(지하 안드로이드 연구소의 AI 중추): 중추 중앙에 떠 있는 기계 두뇌로, 스스로는 움직이지 않고 시설 설비로 싸웁니다. 벽가의 생산 라인 4개가 가동되는 동안은 공격이 잘 통하지 않으니(하나당 2할) 먼저 부수세요. 라인은 가끔 양산형 안드로이드를 내보냅니다. 바닥에 빨간 표시가 나오면 로봇 팔(표시는 잠시 따라오다 멈춘 뒤 내려옵니다. 붙잡히면 던져집니다), 그림자 원은 프레스(바로 밖으로), 바닥의 부채꼴 표시는 용접 레이저(바닥에 붙은 광선이 돌아오니 점프로 넘으세요). 바닥의 컨베이어는 위에 선 것을 실어 나르고, 틀의 등이 빨갛게 빛난 뒤 방향을 바꿉니다. 체력이 절반 아래로 내려가면 시제기 2대(도끼형, 비트형)를 부르고 로봇 팔이 2개가 됩니다. 정밀 액추에이터와, 도전한 사람마다 시제기의 소형 크리스털 메모리(아직 없는 형이 먼저)를 떨어뜨립니다. 각성의 제조핵으로 재대결하면 전력을 다할 때 부서진 라인을 다시 인쇄합니다.\n- 각성한 수호자: 메아리 파수꾼이나 중력 잔재를 쓰러뜨린 뒤 방 바닥의 수호자 봉인 핵에 각성의 메아리핵이나 각성의 중력핵을 사용하면 재대결할 수 있습니다(체력 2.5배, 피해 1.5배, 더 빠른 기술, 체력 65%에서 분노). 메아리 파수꾼은 분신과 광탄이 하나씩 늘고, 분노하면 부서진 투영기를 두 개까지 다시 투영합니다. 중력 잔재는 잔해를 더 많이 쏘고, 중력 우물이 넓어지며, 연속으로 내려찍습니다. 방을 떠나면 각성핵은 돌려받습니다."
+  },
+  "guide.singulo.ruins.leviathan.title": {
+    "source": "The Ergosphere Leviathan",
+    "translation": "에르고구의 큰뱀"
   },
   "guide.singulo.ruins.list.body": {
     "source": "- Observation Post: the only ruin above ground, on plains, deserts and similar surfaces. White security drones. Observation logs and control units (regrow in 7 days).\n- Research Building: shallow underground (around Y −20 to 4). Security machines and the Echo Sentinel in the archive room at the back. Cold atom traps and quantum data fragments (7 days).\n- Culture Facility: deep underground (around Y −46 to −30). A cryogenic core, stronger security machines and the Gravity Remnant in the containment room at the back. Time crystal seeds and culture data (14 days).\n- Underground Android Laboratory: mid-depth underground (floors around Y −38 to −26). A branch beside the Culture Facility: tuning the compass at the Research Building lets it find both (it points to the main shaft, which breaks through to the surface). The room layout changes every time. The overseer AI Foundry waits in the AI core. Precision actuators and android kits (14 days).\n- Final Lab: a gravity anomaly deepest underground (around Y −56 to −46). The Horizon Warden guards it. Singularity seeds and anomaly samples (14 days).\n- Sunken Reactor Sector: a dead second reactor even deeper than the Final Lab (around Y −60 to −54). Tune the explorer compass after clearing the Final Lab to find it. The Ergosphere Leviathan. Exotic matter, jet condensate and H-Condensate (14 days).",
@@ -6031,13 +6207,13 @@
     "source": "Stage 1: Startup",
     "translation": "1단계: 시작"
   },
-  "guide.singulo.stage1.goal.body": {
-    "source": "The key to stage 2 is the Superconducting Coil. It is made in the Cryogenic Cooling Tower and needs a Control Unit found at an Observation Post.\n- Find an Observation Post (on plains, deserts and other surfaces) and bring back the degraded control unit and observation log from its cache.\n- Restore the control unit in the Archive Terminal.\n- Gather the cooling tower parts and build it with the Holo Projector.",
-    "translation": "2단계로 가는 열쇠는 초전도 코일입니다. 극저온 냉각탑에서 만들며, 재료로 지표 관측소에서 얻는 제어 장치가 필요합니다.\n- 지표 관측소(평원·사막 등 지상)를 찾아, 보관고에서 열화된 제어 장치와 관측 로그를 가져옵니다.\n- 기록 보관 단말기에서 제어 장치를 복원합니다.\n- 냉각탑 부품을 갖춰 홀로그램 투영기로 조립합니다."
+  "guide.singulo.stage1.flow.body": {
+    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: the tower uses about 240 FE/t to make liquid nitrogen. Add generators or run machines in turns.",
+    "translation": "이 단계에서 할 일(위에서부터 차례로):\n1. 강철·세라믹·기초 회로·기초 프레임을 만듭니다(\"첫 재료\" 참고).\n2. 열전 발전기를 2〜4대 놓고 구리 도선으로 장치에 잇습니다. 마그마 블록＋푸른 얼음이면 녹지 않고 오래갑니다.\n3. 소성로·압축기(강철판)·기록 보관 단말기을 갖춥니다. 탐험가의 나침반과 홀로그램 투영기도 만들어 둡니다.\n4. 탐험가의 나침반으로 지표 관측소을 찾아, 보관고에서 열화된 제어 유닛과 관측 로그를 가져옵니다.\n5. 기록 보관 단말기로 제어 유닛을 복원하고, 극저온 냉각탑 부품을 만들어 홀로그램 투영기를 보며 조립합니다.\n6. 냉각탑에서 \"초전도 코일\"을 만들면 2단계입니다.\n막히기 쉬운 곳:\n・저온 쪽 블록이 녹음: 용암이나, 모닥불＋물·눈·얼음은 금방 녹습니다. \"녹지 않는 조합\" 페이지를 보세요.\n・냉각탑이 완성되지 않음: 가운데 줄은 열교환 코어, 꼭대기는 통풍 격자입니다. 홀로그램 투영기를 제어기에 쓰면 모자란 곳이 보입니다.\n・전력 부족: 냉각탑은 액체 질소를 만드는 데 240 FE/t쯤 씁니다. 발전기를 늘리거나 장치를 번갈아 돌리세요."
   },
-  "guide.singulo.stage1.goal.title": {
-    "source": "Reaching stage 2",
-    "translation": "2단계 도달"
+  "guide.singulo.stage1.flow.title": {
+    "source": "Stage 1 at a glance",
+    "translation": "1단계의 흐름"
   },
   "guide.singulo.stage1.machines.body": {
     "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
@@ -6083,13 +6259,13 @@
     "source": "Particle Accelerator and muon catalyst",
     "translation": "입자 가속기 및 뮤온 촉매"
   },
-  "guide.singulo.stage2.goal.body": {
-    "source": "The keys to stage 3 are the Quantum Computing Module and liquid helium. Build the cooling tower 10 or more blocks high and liquefy helium released by crushing deepslate in the compressor. Also collect quantum data fragments from Research Buildings (surface to shallow underground).",
-    "translation": "3단계로 가는 열쇠는 양자 연산 모듈과 액체 헬륨입니다. 냉각탑을 높이 10 이상으로 짓고, 압축기로 심층암을 분쇄할 때 나오는 헬륨을 액화합니다. 연구동(지표~얕은 지하)에서 양자 데이터 조각도 모으세요."
+  "guide.singulo.stage2.flow.body": {
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Add power with Cryogenic Turbines (5 kFE/t from evaporating liquid nitrogen).\n3. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "이 단계에서 할 일:\n1. 정밀 조립기를 만듭니다. 3단계부터의 부품과 장치는 거의 모두 여기서 만듭니다.\n2. 극저온 터빈(액체 질소 기화로 5 kFE/t)으로 전력을 늘립니다.\n3. 입자 가속기로 뮤온 다발을, 촉매 반응기로 뮤온 촉매(2티어)를 만듭니다.\n4. 냉각탑을 높이 10 이상으로 하고, 압축기로 심층암을 부숴 나온 헬륨을 액화합니다.\n5. 지표 관측소의 보관고에서 탐험가의 나침반을 조정해 연구동을 찾습니다. 양자 데이터 조각과 냉원자 트랩을 모읍니다(안쪽의 메아리 파수꾼를 쓰러뜨리면 보관고가 열립니다).\n6. 양자 연산 모듈과 액체 헬륨이 갖춰지면 3단계입니다.\n지금 해 두면 좋은 것: 안드로이드 조립 스테이션으로 호위를 만들 수 있습니다(안드로이드 장). 운석 크레이터(운철·별가루)와 빙산(푸른 얼음)도 찾아 둡니다.\n막히기 쉬운 곳:\n・액체 헬륨이 안 생김: 냉각탑 높이가 10 미만이면 만들 수 없습니다.\n・촉매를 못 쓰거나 금방 닳음: 장치보다 한 티어 아래는 느리고 빨리 닳으며, 두 티어 아래는 쓸 수 없습니다."
   },
-  "guide.singulo.stage2.goal.title": {
-    "source": "Reaching stage 3",
-    "translation": "3단계 도달"
+  "guide.singulo.stage2.flow.title": {
+    "source": "Stage 2 at a glance",
+    "translation": "2단계의 흐름"
   },
   "guide.singulo.stage2.others.body": {
     "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Cryogenic Turbine: generates power from evaporating liquid nitrogen (5 kFE/t).\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
@@ -6111,13 +6287,13 @@
     "source": "Stage 3: Quantum",
     "translation": "3단계: 양자"
   },
-  "guide.singulo.stage3.goal.body": {
-    "source": "The key to stage 4 is exotic matter. It is made in the C-Cavity and needs time crystal catalysts. Search the Culture Facility (deepslate layer) for time crystal seeds and culture data. Watch out for the cryogenic section and the stronger security machines.",
-    "translation": "4단계로 가는 열쇠는 특이 물질입니다. 카시미르 공동에서 만들며, 시간 결정 촉매가 필요합니다. 봉쇄 배양 시설(심층암 층)에서 시간 결정 씨앗과 배양 데이터를 찾으세요. 극저온 구역과 강한 경비기에 주의하세요."
+  "guide.singulo.stage3.flow.body": {
+    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler.\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds and culture data, move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
+    "translation": "이 단계에서 할 일:\n1. 양자 얽힘 합성기와 레이저 냉각기를 만듭니다.\n2. 양자 열기관으로 발전합니다(BE 응축 촉매로 200 kFE/t. 만들기 전까지는 뮤온 촉매로 25% 시험 운전).\n3. 레이저 냉각기로 BE 응축 촉매(3티어)와 광학 격자 기판을 만듭니다.\n4. 심해 압력 수집기를 일찍 놓아 고압 결정을 모아 둡니다(나중에 껍질과 모루에 약 30개).\n5. 연구동의 보관고에서 나침반을 조정해 봉쇄 배양 시설을 찾습니다. 시간 결정 씨앗과 배양 데이터를 모읍니다(안쪽의 중력 잔재을 쓰러뜨리면 보관고가 열립니다). 같은 조정으로 지하 안드로이드 연구소도 찾을 수 있습니다.\n6. 씨앗과 배양 데이터가 갖춰지면 4단계의 시간 결정 배양기로 넘어갑니다.\n막히기 쉬운 곳:\n・봉쇄 배양 시설이 힘듦: 극저온 구역과 강한 경비기가 있습니다. 방어구와 회복을 갖추고 호위 안드로이드를 데려가세요.\n・중력 잔재에 띄워짐: 낙하가 아프므로 중력 부츠나 충격 발전 패널이 도움이 됩니다."
   },
-  "guide.singulo.stage3.goal.title": {
-    "source": "Reaching stage 4",
-    "translation": "4단계 도달"
+  "guide.singulo.stage3.flow.title": {
+    "source": "Stage 3 at a glance",
+    "translation": "3단계의 흐름"
   },
   "guide.singulo.stage3.quantum.body": {
     "source": "- Entanglement Synthesizer: entangled elements, two at a time.\n- Laser Cooler: cold atoms, lattices, BE condensate catalyst.\n- Quantum Heat Engine: catalyst-driven generator, 200 kFE/t on BE catalysts; a muon catalyst runs it at 25% (50 kFE/t) as a stopgap. It waits without wearing the catalyst while its storage is full.",
@@ -6147,13 +6323,13 @@
     "source": "Compression chain",
     "translation": "압축 체인"
   },
-  "guide.singulo.stage4.goal.body": {
-    "source": "At the Final Lab (gravity anomaly), touch the seal console to wake the Horizon Warden. Defeat it and the cache opens, giving you a dormant singularity seed. Awaken it in the Singularity Encapsulator, then load it into the P-Reactor and ignite it.",
-    "translation": "최종 실험 시설(중력 이상 지점)에서 봉인 콘솔을 만지면 지평선 감시자가 깨어납니다. 쓰러뜨리면 보관고가 열리고 휴면 특이점 씨앗을 얻습니다. 특이점 캡슐화기에서 깨운 뒤, 펜로즈 반응로에 넣어 점화합니다."
+  "guide.singulo.stage4.flow.body": {
+    "source": "What to do:\n1. Grow time crystal catalysts in the Time Crystal Incubator (at 80% or more of the required power the purity does not drop; facilities and running machines compete for crystals, so two incubators help).\n2. Make exotic matter and axion condensate in the C-Cavity.\n3. Make compressed blocks in the Compressor's mass mode and generate power with the Degenerate Heat Furnace (5 MFE/t).\n4. Make seven degenerate matter shells in the Degenerate Compactor (six for reactor shells, one for the singularity seed).\n5. Tune the compass at the Culture Facility's cache and find the Final Lab. Beat the Horizon Warden that wakes at the Seal Console to get the Dormant Singularity Seed.\n6. With the seed, you are in stage 5: awaken it in the Singularity Encapsulator and put it in the P-Reactor.\nCommon sticking points:\n- Not enough time crystals: they go into both time crystal modules (facilities) and catalysts (running). Add incubators.\n- Can't find the Final Lab: it is the deepest ruin (around Y -56 to -46). The Gravitational Wave Detector shows its rough direction and distance.",
+    "translation": "이 단계에서 할 일:\n1. 시간 결정 배양기로 시간 결정 촉매를 키웁니다(요구 전력의 80% 이상이면 순도가 떨어지지 않습니다. 설비용과 운전용이 서로 다투므로 2대 있으면 편합니다).\n2. 카시미르 공동으로 특이 물질과 액시온 응축물를 만듭니다.\n3. 압축기의 질량 모드로 압축 블록을 만들고, 축퇴 열로(5 MFE/t)로 발전합니다.\n4. 축퇴 압축로로 축퇴 물질 껍질을 7개 만듭니다(노 껍질용 6개, 특이점 씨앗용 1개).\n5. 봉쇄 배양 시설의 보관고에서 나침반을 조정해 최종 실험 시설을 찾습니다. 봉인 콘솔에서 깨어나는 지평선 감시자을 쓰러뜨려 \"휴면 특이점 씨앗\"을 얻습니다.\n6. 씨앗을 얻으면 5단계입니다. 특이점 캡슐화기로 깨우고 P 반응로에 넣습니다.\n막히기 쉬운 곳:\n・시간 결정이 모자람: 시간 결정 모듈(설비용)과 촉매(운전용) 양쪽에 씁니다. 배양기를 늘리세요.\n・최종 실험 시설을 못 찾음: 가장 깊은 지하(Y−56〜−46쯤)에 있습니다. 중력파 검출기로 대략의 방향과 거리를 알 수 있습니다."
   },
-  "guide.singulo.stage4.goal.title": {
-    "source": "Reaching stage 5",
-    "translation": "5단계 도달"
+  "guide.singulo.stage4.flow.title": {
+    "source": "Stage 4 at a glance",
+    "translation": "4단계의 흐름"
   },
   "guide.singulo.stage4.power.body": {
     "source": "- Degenerate Furnace (5×5×7): crushes compressed blocks Lv2 for 5 MFE/t. It uses a time crystal catalyst (a BE condensate catalyst runs it at 25%, 1.25 MFE/t, as a stopgap). Power leaves through its I/O ports automatically; while its storage is full it waits without using fuel or catalyst.\n- Shells: one degenerate matter shell makes 24 reactor shell blocks. Ignition needs 6 shells for the plating plus 1 for the singularity seed. Gathering rock and metal in bulk helps.\n- Probe Station: sends probes to discovered Observation Posts and brings back half the loot.\n- Topological wire and SMES modules carry and store large amounts of power.",
@@ -6190,6 +6366,14 @@
   "guide.singulo.stage5.endgame.title": {
     "source": "Beyond",
     "translation": "너머"
+  },
+  "guide.singulo.stage5.flow.body": {
+    "source": "What to do:\n1. Gather the P-Reactor parts such as reactor shell blocks, and build it with the Holo Projector used on the Core Controller.\n2. For ignition, wire SMES storage and a Horizon Bus so that 50 GFE arrives within 10 seconds (about 250 MFE/t on average).\n3. Insert the singularity seed and ignite. Start in harvest mode to collect H condensate (six for the first Singularity Core).\n4. Switch to generation mode and feed mass pellets automatically.\n5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the final goal, the Genesis Engine.\nCommon sticking points:\n- Ignition fails: a cable network is limited by its thinnest cable. Check the incoming rate and the estimate on the screen and fix the wiring.\n- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destroyed. Take care when working nearby.",
+    "translation": "이 단계에서 할 일:\n1. 노 껍질 블록 등 P 반응로 부품을 갖추고, 홀로그램 투영기를 노심 제어기에 써서 모양을 보며 조립합니다.\n2. 점화를 위해 50 GFE를 10초 안에 보낼 수 있도록 SMES와 지평선 버스로 배선합니다(평균 약 250 MFE/t).\n3. 특이점 씨앗을 넣고 점화합니다. 처음에는 회수 운전으로 H 응축체를 모읍니다(첫 특이점 코어에 6개).\n4. 발전 운전으로 바꾸고 질량 펠릿을 자동으로 보냅니다.\n5. 특이점 코어로 특이점 기술(보호막·티플러 원통·웜홀)을 움직이고, 마지막 목표 \"창세로\"로 향합니다.\n막히기 쉬운 곳:\n・점화 실패: 케이블망의 상한은 가장 가는 케이블로 정해집니다. 화면의 수전 속도와 도달 예상을 보고 배선을 고치세요.\n・반응로에 빨려 들어감: 고리 안쪽은 벗어날 수 없는 강한 인력이고, 검은 구에 닿은 것은 반드시 사라집니다. 근처에서 작업할 때 조심하세요."
+  },
+  "guide.singulo.stage5.flow.title": {
+    "source": "Stage 5 at a glance",
+    "translation": "5단계의 흐름"
   },
   "guide.singulo.stage5.ignite.body": {
     "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a horizon bus is required). The screen shows the intake needed (250 MFE/t on average by default). While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nThe fuel is mass pellets. Accretion efficiency depends on spin (5.7–42.3%); a core of mass 5000 at full spin gives about 2.1 GFE/t.\nOutside the ring (out to radius 24) a weak pull acts, inside the ring a pull you cannot escape, and anything that touches the black sphere is destroyed no matter how tough. Radius 4 is a tidal zone that ignores armour. Time runs slower in the pull zone: machines at ×0.8, catalyst wear at ×0.5.",
@@ -6315,6 +6499,10 @@
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
   },
+  "howto.singulo.android_large_backpack_upgrade": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작: 정밀 조립기(4단계)"
+  },
   "howto.singulo.android_mining_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "제작: 정밀 조립기(2단계)"
@@ -6326,6 +6514,10 @@
   "howto.singulo.android_recipe_rack": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
   },
   "howto.singulo.android_repair_kit": {
     "source": "Made in: Crafting Table (stage 2)",
@@ -7307,6 +7499,10 @@
     "source": "Android Kit",
     "translation": "안드로이드 키트"
   },
+  "item.singulo.android_large_backpack_upgrade": {
+    "source": "Large Backpack Upgrade",
+    "translation": "대형 백팩 업그레이드"
+  },
   "item.singulo.android_memory_axe": {
     "source": "Compact Crystal Memory (Axe)",
     "translation": "소형 크리스털 메모리(도끼형)"
@@ -7338,6 +7534,10 @@
   "item.singulo.android_production_upgrade": {
     "source": "Production Upgrade",
     "translation": "생산 업그레이드"
+  },
+  "item.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Reinforced Backpack Upgrade",
+    "translation": "강화 백팩 업그레이드"
   },
   "item.singulo.android_repair_kit": {
     "source": "Self-Repair Kit",
@@ -8023,6 +8223,10 @@
     "source": "Singulo",
     "translation": "Singulo"
   },
+  "key.singulo.handbook_lookup": {
+    "source": "Look up in Handbook",
+    "translation": "핸드북에서 찾아보기"
+  },
   "key.singulo.toggle_area": {
     "source": "Toggle gravity tool area",
     "translation": "중력 도구 영역 전환"
@@ -8174,6 +8378,10 @@
   "message.singulo.android_charger.charged": {
     "source": "Charged %1$s FE into the wireless charger (%2$s / %3$s FE)",
     "translation": "무선 충전기에 %1$s FE를 충전했습니다(%2$s / %3$s FE)"
+  },
+  "message.singulo.android_workbench.buffer_taken": {
+    "source": "Took the items from the holding box (what did not fit in an android's inventory)",
+    "translation": "보관함의 물건을 받았습니다(안드로이드 소지품에 들어가지 않은 만큼)"
   },
   "message.singulo.android_workbench.hint": {
     "source": "Androids craft here. Record this block on the Work Location Card in a recipe rack",
@@ -9403,13 +9611,29 @@
     "source": "Wormhole stabilizer runs",
     "translation": "웜홀 안정기가 작동한다"
   },
+  "summary.singulo.android_backpack_upgrade": {
+    "source": "Adds 12 inventory slots to an android.",
+    "translation": "안드로이드 소지품 +12칸."
+  },
+  "summary.singulo.android_charger": {
+    "source": "Recharges a following android as it walks with you.",
+    "translation": "들고 다니면 따라오는 안드로이드를 걸으면서 충전합니다."
+  },
   "summary.singulo.android_dual_tank_upgrade": {
     "source": "Two liquid and two chemical tanks (only with Mekanism).",
     "translation": "액체와 화학 물질 탱크를 2개씩 단다 (Mekanism이 있을 때만)."
   },
+  "summary.singulo.android_felling_upgrade": {
+    "source": "Lets an android fell whole trees and replant saplings.",
+    "translation": "안드로이드가 나무를 통째로 베고 묘목을 다시 심습니다."
+  },
   "summary.singulo.android_gas_tank_upgrade": {
     "source": "Two tanks for Mekanism chemicals (only with Mekanism).",
     "translation": "Mekanism 화학 물질을 나르는 탱크를 2개 단다 (Mekanism이 있을 때만)."
+  },
+  "summary.singulo.android_large_backpack_upgrade": {
+    "source": "Adds 24 inventory slots to an android (the largest).",
+    "translation": "안드로이드 소지품 +24칸(가장 큼)."
   },
   "summary.singulo.android_memory_axe": {
     "source": "The Axe Android design. Prints it in an Android Assembly Station (not used up).",
@@ -9418,6 +9642,18 @@
   "summary.singulo.android_memory_bit": {
     "source": "The Bit Android design. Prints it in an Android Assembly Station (not used up).",
     "translation": "비트형 안드로이드의 설계. 조립 스테이션에서 인쇄할 수 있다 (줄어들지 않음)."
+  },
+  "summary.singulo.android_memory_gunner": {
+    "source": "The Gunner Android design. Prints it in an Android Assembly Station (not used up).",
+    "translation": "사격형 안드로이드의 설계. 조립 스테이션에서 인쇄할 수 있습니다(줄지 않음)."
+  },
+  "summary.singulo.android_production_upgrade": {
+    "source": "Lets an Android Assembly Station look after up to two androids.",
+    "translation": "조립 스테이션이 안드로이드를 둘까지 맡을 수 있게 합니다."
+  },
+  "summary.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Adds 18 inventory slots to an android.",
+    "translation": "안드로이드 소지품 +18칸."
   },
   "summary.singulo.android_station": {
     "source": "Prints guard androids from a memory, a kit and power.",
@@ -9434,6 +9670,10 @@
   "summary.singulo.android_work_console": {
     "source": "Takes orders and assigns crafting and work to nearby androids.",
     "translation": "주문을 받아 가까운 안드로이드에게 제작과 작업을 맡긴다."
+  },
+  "summary.singulo.android_workbench": {
+    "source": "A workbench androids craft on quickly. Holds what does not fit.",
+    "translation": "안드로이드가 빠르게 만드는 작업대. 들어가지 않는 물건을 보관합니다."
   },
   "summary.singulo.area_card": {
     "source": "Records an area by two corners, for android routes.",
@@ -9459,6 +9699,14 @@
     "source": "Use on the Seal Console to fight the Awakened Horizon Warden.",
     "translation": "봉인 콘솔에 사용하면 각성한 지평선 감시자와 싸울 수 있다."
   },
+  "summary.singulo.degenerate_furnace": {
+    "source": "A large generator burning Lv2 blocks (5 MFE/t on time crystals).",
+    "translation": "압축 블록 Lv2를 태우는 대형 발전기(시간 결정 촉매로 5 MFE/t)."
+  },
+  "summary.singulo.factory_line": {
+    "source": "A printing bay that shields the Foundry and sends out mass-produced androids.",
+    "translation": "파운드리를 지키고 양산형 안드로이드를 내보내는 인쇄 베이."
+  },
   "summary.singulo.genesis_core": {
     "source": "The heart of an engine that makes a universe from energy.",
     "translation": "에너지로 우주를 만들어 내는 노의 핵."
@@ -9467,9 +9715,17 @@
     "source": "Powers every connected gravity panel.",
     "translation": "연결된 모든 중력 패널에 전력을 나눠 준다."
   },
+  "summary.singulo.impact_generator_panel": {
+    "source": "Stores power from how far you fall and feeds gravity panels. No fall damage.",
+    "translation": "떨어진 높이만큼 전력을 모아 중력 패널에 보냅니다. 낙하 피해를 받지 않습니다."
+  },
   "summary.singulo.keraunos_tower": {
     "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
     "translation": "모은 전력으로 인공 번개를 일으켜 가까운 피뢰침에 쏜다."
+  },
+  "summary.singulo.meteorite_core": {
+    "source": "The core of a meteorite. Mine it for raw meteoric iron and stardust.",
+    "translation": "운석 중심의 덩어리. 캐면 운철 원석과 별가루가 나옵니다."
   },
   "summary.singulo.multiblock_port": {
     "source": "Swaps in for a multiblock shell panel to connect cables and pipes.",
@@ -9491,6 +9747,10 @@
     "source": "While worn, shows places recorded on cards and what working androids are doing.",
     "translation": "쓰면 카드에 기록한 장소와 작업 중인 안드로이드가 하는 일이 보인다."
   },
+  "summary.singulo.terminus_record": {
+    "source": "The last page, used on the Seal Console of the Final Lab.",
+    "translation": "최종 실험 시설의 봉인 콘솔에서 쓰는 마지막 페이지."
+  },
   "summary.singulo.time_crystal_module": {
     "source": "A stackable part sealing a slice of a time crystal's life.",
     "translation": "시간 결정 촉매의 수명을 잘라 내어 봉인한, 겹쳐 들 수 있는 부품."
@@ -9498,6 +9758,10 @@
   "summary.singulo.work_location_card": {
     "source": "Records a block position and links work consoles with ports.",
     "translation": "블록의 위치를 기록하고 작업 지령대와 자재구 등을 잇는다."
+  },
+  "summary.singulo.wormhole_mouth": {
+    "source": "Links to its twin. Kept open with exotic matter.",
+    "translation": "짝이 되는 입구와 이어집니다. 특이 물질로 열린 채로 유지합니다."
   },
   "summary.singulo.wormhole_port": {
     "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
@@ -9791,6 +10055,10 @@
     "source": "Used in: Particle Accelerator",
     "translation": "사용 제품: 입자 가속기"
   },
+  "uses.singulo.android_backpack_upgrade": {
+    "source": "Used in: Reinforced Backpack Upgrade",
+    "translation": "사용 대상: 강화 백팩 업그레이드"
+  },
   "uses.singulo.android_barrier_glass": {
     "source": "Used in: Patterned Android Barrier Glass",
     "translation": "사용 대상: 무늬 안드로이드 차단 유리"
@@ -9806,6 +10074,10 @@
   "uses.singulo.android_kit": {
     "source": "Used in: Production Upgrade, Factory Print Unit",
     "translation": "사용 대상: 생산 업그레이드, 공장식 인쇄 유닛"
+  },
+  "uses.singulo.android_reinforced_backpack_upgrade": {
+    "source": "Used in: Large Backpack Upgrade",
+    "translation": "사용 대상: 대형 백팩 업그레이드"
   },
   "uses.singulo.android_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
@@ -10056,8 +10328,8 @@
     "translation": "사용 대상: 종언의 기록"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer, Echo Resonator and 18 more",
-    "translation": "사용 대상: 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기, 메아리 공명기 외 18개"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
+    "translation": "사용 대상: 강화 백팩 업그레이드, 양자 연산 모듈, 광학 격자 기판, 중성미자 스캐너, 관성 안정기 외 19개"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -10148,8 +10420,8 @@
     "translation": "사용 제품: 데이터 카드(관측 로그)"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate, Exotic Matter and 23 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판, 특이 물질 외 23개"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 24 more",
+    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 24개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -10244,12 +10516,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 75 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 75개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 77 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 77개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 52 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 52개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 54 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 54개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",

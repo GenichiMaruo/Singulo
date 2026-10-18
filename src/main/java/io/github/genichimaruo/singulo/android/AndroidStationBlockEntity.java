@@ -82,6 +82,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public static final int BUTTON_SELECT = 10;
     /** 巡回: 動き方を巡回に、周回 ⇔ 往復、夜だけ、立ち止まる時間。 */
     public static final int BUTTON_MODE_PATROL = 12, BUTTON_ROUTE_ORDER = 13, BUTTON_NIGHT = 14, BUTTON_DWELL = 15;
+    /** 近くのステーション（{@link #RECALL_ALL_RANGE} 以内。操作できるものだけ）のアンドロイドを、みな呼び戻す。 */
+    public static final int BUTTON_RECALL_ALL = 16;
+    public static final int RECALL_ALL_RANGE = 64;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
     /** 転送アップグレードで預かった持ち物（アンドロイドごと。次にその枠で印刷するアンドロイドに持たせる）。 */
@@ -325,6 +328,41 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     @Nullable
     public UUID owner() {
         return owner;
+    }
+
+    /** このステーションのアンドロイドを、みな呼び戻す。呼び戻した数。 */
+    public int recallAll() {
+        int n = 0;
+        if (level instanceof ServerLevel server) {
+            for (UUID unit : androids) {
+                if (unit != null && server.getEntity(unit) instanceof RuinAndroid a && a.isAlive()) {
+                    a.recall();
+                    n++;
+                }
+            }
+        }
+        return n;
+    }
+
+    /**
+     * player が操作できる、from のまわり range ブロック以内のステーション（読み込まれている所だけ）。
+     */
+    public static java.util.List<AndroidStationBlockEntity> nearby(Level level, BlockPos from, int range, Player player) {
+        java.util.List<AndroidStationBlockEntity> out = new java.util.ArrayList<>();
+        int c = (range >> 4) + 1;
+        for (int cx = (from.getX() >> 4) - c; cx <= (from.getX() >> 4) + c; cx++) {
+            for (int cz = (from.getZ() >> 4) - c; cz <= (from.getZ() >> 4) + c; cz++) {
+                if (!level.hasChunk(cx, cz)) {
+                    continue;
+                }
+                for (var be : level.getChunk(cx, cz).getBlockEntities().values()) {
+                    if (be instanceof AndroidStationBlockEntity s && s.getBlockPos().distSqr(from) <= (double) range * range && s.mayOperate(player)) {
+                        out.add(s);
+                    }
+                }
+            }
+        }
+        return out;
     }
 
     public boolean escort() {

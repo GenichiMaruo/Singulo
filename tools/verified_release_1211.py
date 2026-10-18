@@ -1,4 +1,4 @@
-"""Promote both 1.21.1 loader artifacts from the exact tested/tagged source tree."""
+"""Promote the 1.21.1 NeoForge artifact from the exact tested/tagged source tree (Forge ended with 0.8.1)."""
 import argparse
 import hashlib
 import json
@@ -29,8 +29,8 @@ def inspect(repo, run_id, tag, source):
             and run['head_repository']['full_name'] == repo):
         raise RuntimeError('Expected successful PR validation in this repository')
     jobs = api(repo, f'actions/runs/{run_id}/jobs?per_page=100')['jobs']
-    if len(jobs) != 3 or {j['name'] for j in jobs} != {'build-and-gametest', 'optional-mekanism', 'forge'} or any(j['conclusion'] != 'success' for j in jobs):
-        raise RuntimeError('Both loader/GUI jobs and real Mekanism validation must succeed')
+    if len(jobs) != 2 or {j['name'] for j in jobs} != {'build-and-gametest', 'optional-mekanism'} or any(j['conclusion'] != 'success' for j in jobs):
+        raise RuntimeError('The NeoForge/GUI job and real Mekanism validation must succeed')
     ref = api(repo, f'git/ref/tags/{tag}')['object']
     while ref['type'] == 'tag':
         ref = api(repo, 'git/tags/' + ref['sha'])['object']
@@ -43,16 +43,16 @@ def inspect(repo, run_id, tag, source):
     selected = {}
     commits = set()
     for a in artifacts:
-        m = re.fullmatch(r'(pr|forge)-validation-([0-9a-f]{40})', a['name'])
+        m = re.fullmatch(r'pr-validation-([0-9a-f]{40})', a['name'])
         if not m:
             continue
-        loader = 'neoforge' if m[1] == 'pr' else 'forge'
+        loader = 'neoforge'
         if a['expired'] or loader in selected:
             raise RuntimeError('Expired or ambiguous artifacts')
-        commits.add(m[2])
+        commits.add(m[1])
         selected[loader] = {'id': a['id'], 'name': a['name']}
-    if set(selected) != {'forge', 'neoforge'} or len(commits) != 1:
-        raise RuntimeError('Expected both loader artifacts from one actual tested commit')
+    if set(selected) != {'neoforge'} or len(commits) != 1:
+        raise RuntimeError('Expected the NeoForge artifact from one actual tested commit')
     tested = commits.pop()
     if api(repo, 'git/commits/' + tested)['tree']['sha'] != tree:
         raise RuntimeError('Actual tested merge tree differs from tagged tree')
@@ -64,15 +64,15 @@ def inspect(repo, run_id, tag, source):
 def promote(metadata, artifacts, output):
     output.mkdir(parents=True, exist_ok=True)
     hashes = {}
-    for loader, suffix in [('neoforge', 'N'), ('forge', 'F')]:
+    for loader, suffix in [('neoforge', 'N')]:
         root = artifacts / metadata['artifacts'][loader]['name']
         name = f"{metadata['mod_name']}-{metadata['version']}-1.21.1{suffix}.jar"
         validate(root, loader, name)
         gui = (root / 'gui-review/logs/latest.log').read_text()
         pixels = json.loads((root / 'gui-review/inventory-pixels.json').read_text())
-        if 'SINGULO_GUI_COMPLETE 20' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 20:
+        if 'SINGULO_GUI_COMPLETE 22' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or 'SINGULO_HANDBOOK_SEARCH_COMPLETE' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 22:
             raise RuntimeError('Missing real GUI/search validation for ' + loader)
-        if loader == 'neoforge' and 'SINGULO_JEI_SYNC_COMPLETE' not in gui:
+        if 'SINGULO_JEI_SYNC_COMPLETE' not in gui:
             raise RuntimeError('Missing bidirectional JEI search validation')
         if len(pixels) != 3 or sum(p['checked_empty_slot_centers'] for p in pixels) != 105:
             raise RuntimeError('Missing inventory PNG verification for ' + loader)
@@ -106,9 +106,9 @@ def main():
         a.metadata.write_text(json.dumps(metadata, indent=2) + '\n')
         if os.environ.get('GITHUB_OUTPUT'):
             with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-                for loader in ('neoforge', 'forge'):
+                for loader in ('neoforge',):
                     output.write(f"{loader}_artifact={metadata['artifacts'][loader]['name']}\n")
-        print('Verified both loader CI jobs, immutable tag and actual tested source tree')
+        print('Verified the NeoForge CI jobs, immutable tag and actual tested source tree')
 
 
 if __name__ == '__main__':

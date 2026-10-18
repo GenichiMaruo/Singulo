@@ -320,13 +320,19 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     public WorkPlanner.Plan plan(ItemStack target, long count) {
-        return WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), available());
+        return plan(target, count, false);
+    }
+
+    /** 計算する。fresh なら、完成品そのものの在庫は使わず、count 個を新しく作る（{@link #planFresh}）。 */
+    public WorkPlanner.Plan plan(ItemStack target, long count, boolean fresh) {
+        return fresh ? planFresh(target, count) : WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), available());
     }
 
     /**
-     * 作って増やす計算（在庫を保つ注文）: 完成品そのものの在庫は使わない（使うと、作らずに在庫を予約するだけで終わり、在庫が増えない）。
+     * 作って増やす計算（在庫を保つ注文と、「新しく作る」注文）: 完成品そのものの在庫は使わない
+     * （使うと、作らずに在庫を予約するだけで終わり、新しく増えない。例: 鉄の斧が3本あって、あと2本ほしいとき）。
      */
-    private WorkPlanner.Plan planToStock(ItemStack target, long count) {
+    private WorkPlanner.Plan planFresh(ItemStack target, long count) {
         List<ItemCount> stock = available();
         stock.removeIf(c -> c.matches(target));
         return WorkPlanner.plan(target, Math.max(1, Math.min(MAX_COUNT, count)), recipes(), stock);
@@ -379,7 +385,32 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     @Nullable
     public Component start(ServerPlayer player, ItemStack target, long count, List<UUID> androids, boolean auto, @Nullable BlockPos destination) {
-        return start(player, target, count, androids, destination, false, auto);
+        return start(player, target, count, androids, auto, destination, false);
+    }
+
+    /** 注文する。fresh なら、完成品の在庫は使わず count 個を新しく作って届ける。できなければ理由を返す（できたら null）。 */
+    @Nullable
+    public Component start(ServerPlayer player, ItemStack target, long count, List<UUID> androids, boolean auto, @Nullable BlockPos destination,
+                           boolean fresh) {
+        Component why = start(player, target, count, androids, destination, false, auto, fresh);
+        if (why == null && !orders.isEmpty()) {
+            orders.get(orders.size() - 1).notify = true;     // 画面から今すぐ出した注文: できたら・止まったら知らせる
+        }
+        return why;
+    }
+
+    /** 素材を待ったまま、これだけ経ったら注文した人へ知らせる（tick）。 */
+    static final int STALL_NOTIFY_TICKS = 20 * 60;
+
+    /** 注文した人がいれば（同じサーバーにいれば）、チャットで知らせる。 */
+    private void tell(WorkOrder o, Component what) {
+        if (!o.notify || o.orderer == null || !(level instanceof ServerLevel server)) {
+            return;
+        }
+        ServerPlayer p = server.getServer().getPlayerList().getPlayer(o.orderer);
+        if (p != null) {
+            p.sendSystemMessage(Component.translatable("gui.singulo.work_console.notify", what));
+        }
     }
 
     /**
@@ -388,20 +419,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Nullable
     private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
                             boolean toStock) {
-        return start(player, target, count, androids, destination, toStock, false);
+        return start(player, target, count, androids, destination, toStock, false, false);
     }
 
     @Nullable
     private Component start(Player player, ItemStack target, long count, List<UUID> androids, @Nullable BlockPos destination,
-                            boolean toStock, boolean auto) {
+                            boolean toStock, boolean auto, boolean fresh) {
         if (!mayOperate(player)) {
             return Component.translatable("gui.singulo.work_console.locked");
         }
-        WorkPlanner.Plan plan = toStock ? planToStock(target, count) : plan(target, count);
+        WorkPlanner.Plan plan = plan(target, count, toStock || fresh);
         if (!plan.ok()) {
             return Component.translatable(plan.loop ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
         }
-        if (toStock && plan.steps.isEmpty()) {
+        if ((toStock || fresh) && plan.steps.isEmpty()) {
             return Component.translatable("gui.singulo.work_console.error.missing");   // 作る工程がない（レシピがない）
         }
         boolean mining = plan.steps.stream().anyMatch(s -> s.entry().recipe().needsMining());
@@ -631,6 +662,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         orders.remove(o);
         leases.removeIf(l -> l.job.orderId() == id);
         message = reason != null ? reason : Component.translatable("gui.singulo.work_console.cancelled", o.target.getHoverName());
+        if (reason != null) {
+            tell(o, reason);                           // 止まって取り消された（画面から取り消したときは知らせない）
+        }
         setChanged();
     }
 
@@ -656,10 +690,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     }
 
     static long maxCrafts(RecipeData recipe, int slots, long limit) {
+        return maxCrafts(recipe, slots, limit, List.of());
+    }
+
+    /**
+     * 持ち物の枠 slots に、作っている間ずっと収まる一番多い回数（limit まで）。枠は全部使う（決まった数を空けておかない）。
+     * carried: 今持っている物（この工程の素材も含む）。k 回作るとき、素材に使う分を除いた残りは、作っている間ずっと持っている。
+     */
+    static long maxCrafts(RecipeData recipe, int slots, long limit, List<ItemCount> carried) {
         long lo = 0, hi = limit;
         while (lo < hi) {                                     // 収まる回数は、回数を増やすほど収まりにくくなるので二分探索
             long mid = (lo + hi + 1) / 2;
-            if (peakStacks(recipe, mid) <= slots) {
+            if (peakStacks(recipe, mid, rest(carried, recipe, mid)) <= slots) {
                 lo = mid;
             } else {
                 hi = mid - 1;
@@ -668,24 +710,51 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return lo;
     }
 
-    /** crafts 回作るあいだに、持ち物が一番場所を取るときのスタック数（素材の残り + できた物 + 残る物）。 */
+    /** carried から、crafts 回分の素材を除いた残り（作っている間ずっと持っている物）。 */
+    private static List<ItemCount> rest(List<ItemCount> carried, RecipeData recipe, long crafts) {
+        List<ItemCount> rest = new ArrayList<>();
+        for (ItemCount c : carried) {
+            ItemCount.add(rest, c.item, c.count);
+        }
+        for (ItemCount in : recipe.inputs()) {
+            ItemCount.add(rest, in.item, -Math.min(ItemCount.get(rest, in.item), in.count * crafts));
+        }
+        return rest;
+    }
+
     static int peakStacks(RecipeData recipe, long crafts) {
+        return peakStacks(recipe, crafts, List.of());
+    }
+
+    /**
+     * crafts 回を1回ずつ作っていくあいだ、持ち物が一番場所を取るときのスタック数。作るたびに、素材の残り・できた物・
+     * 残る物（バケツなど）・ほかに出てくる物（記録した数ずつ）がどう変わるかを数える。base はずっと持っている物
+     * （同じ物は同じスタックにまとまる）。採掘・伐採・収穫で一緒に出る物は前もって分からないので、掘る前に収まるかを確かめる
+     * （AndroidWorkGoal）。
+     */
+    static int peakStacks(RecipeData recipe, long crafts, List<ItemCount> base) {
         int peak = 0;
         long step = Math.max(1, crafts / 256);
         for (long done = 0; done <= crafts; done = done == crafts ? crafts + 1 : Math.min(crafts, done + step)) {
-            int stacks = 0;
+            List<ItemCount> now = new ArrayList<>();
+            for (ItemCount c : base) {
+                ItemCount.add(now, c.item, c.count);
+            }
             for (ItemCount in : recipe.inputs()) {
-                stacks += stacks(in.item, in.count * (crafts - done));
+                ItemCount.add(now, in.item, in.count * (crafts - done));
                 if (in.item.hasCraftingRemainingItem()) {
-                    stacks += stacks(in.item.getCraftingRemainingItem(), in.count * done);   // バケツなど、作ると残る物
+                    ItemCount.add(now, in.item.getCraftingRemainingItem(), in.count * done);   // バケツなど、作ると残る物
                 }
             }
-            stacks += stacks(recipe.output(), (long) recipe.outputCount() * done);
-            peak = Math.max(peak, stacks);
+            ItemCount.add(now, recipe.output(), (long) recipe.outputCount() * done);
+            for (ItemStack e : recipe.extras()) {
+                if (!e.isEmpty()) {
+                    ItemCount.add(now, e, (long) e.getCount() * done);           // 副産物: 記録した数ずつ
+                }
+            }
+            peak = Math.max(peak, stacks(now));
         }
-        // ほかに出てくる物（副産物、採掘で出るほかの物）の分も空けておく
-        int extra = recipe.extras().size() + (recipe.needsMining() ? 2 : 0);
-        return peak + extra + (crafts > 256 ? 1 : 0);      // 間引いて数えたときは、1つ余裕を見る
+        return peak + (crafts > 256 ? 1 : 0);              // 間引いて数えたときは、1つ余裕を見る
     }
 
     private static int stacks(ItemStack item, long count) {
@@ -918,9 +987,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             for (ItemCount in : s.recipe.inputs()) {
                 k = Math.min(k, carried(a, in) / in.count);
             }
-            if (s.recipe.inputs().isEmpty()) {
-                k = maxCrafts(s.recipe, a.freeCarry(), k);
-            }
+            // できた物とほかに出てくる物が、今持っている物と一緒に収まる回数まで（持ち物があふれて足元に落ちないように）
+            k = maxCrafts(s.recipe, a.carryCapacity(), k, carriedList(a));
             if (k <= 0) {
                 continue;
             }
@@ -1040,21 +1108,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         int peak = stacks(carry);
         for (WorkJob.Batch b : batch) {
-            List<ItemCount> during = new ArrayList<>();
-            for (ItemCount c : carry) {
-                ItemCount.add(during, c.item, c.count);
-            }
-            ItemCount.add(during, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
-            for (ItemCount in : b.recipe().inputs()) {
-                if (in.item.hasCraftingRemainingItem()) {
-                    ItemCount.add(during, in.item.getCraftingRemainingItem(), in.count * b.crafts());
-                }
-            }
-            peak = Math.max(peak, stacks(during));
+            // この工程を1回ずつ作るあいだ: ほかの工程の物はずっと持っていて、この工程の素材・できた物・残る物・副産物が入れ替わる
+            peak = Math.max(peak, peakStacks(b.recipe(), b.crafts(), rest(carry, b.recipe(), b.crafts())));
             for (ItemCount in : b.recipe().inputs()) {
                 ItemCount.add(carry, in.item, -in.count * b.crafts());
+                if (in.item.hasCraftingRemainingItem()) {
+                    ItemCount.add(carry, in.item.getCraftingRemainingItem(), in.count * b.crafts());     // 残る物は、このあとも持っている
+                }
             }
             ItemCount.add(carry, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
+            for (ItemStack e : b.recipe().extras()) {
+                if (!e.isEmpty()) {
+                    ItemCount.add(carry, e, (long) e.getCount() * b.crafts());
+                }
+            }
         }
         return peak <= slots ? fetch : null;
     }
@@ -1082,6 +1149,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         return n;
+    }
+
+    /** 作業で運ぶ持ち物（作業のスロットにある物すべて）。 */
+    private static List<ItemCount> carriedList(RuinAndroid a) {
+        List<ItemCount> out = new ArrayList<>();
+        for (int slot : a.carrySlots()) {
+            ItemStack s = a.inventory().getItem(slot);
+            if (!s.isEmpty() && !FluidSamples.liquid(s)) {
+                ItemCount.add(out, s, s.getCount());
+            }
+        }
+        return out;
     }
 
     private static long carried(RuinAndroid a, ItemStack like) {
@@ -1167,9 +1246,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
-    /** 受け渡し場所の隣のストレージ。 */
+    /** 受け渡し場所の隣のストレージ。アンドロイド作業台なら、その預かり箱（作った物があふれたときに入れた所）。 */
     public List<IItemHandler> storagesAt(BlockPos point, Set<BlockPos> seen) {
         List<IItemHandler> out = new ArrayList<>();
+        if (level.getBlockEntity(point) instanceof AndroidWorkbenchBlockEntity bench) {
+            out.add(bench.buffer());
+            return out;
+        }
         SupplyPortBlockEntity.collect(level, point, seen, out);
         return out;
     }
@@ -1531,7 +1614,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (makingFuel(fuel)) {
             return !ItemStack.isSameItemSameComponents(parent.target, FluidSamples.key(fuel));
         }
-        WorkPlanner.Plan plan = planToStock(fuel, count);
+        WorkPlanner.Plan plan = planFresh(fuel, count);
         if (!plan.ok() || plan.steps.isEmpty()) {
             return false;
         }
@@ -1625,7 +1708,14 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         List<IItemHandler> stores = storagesAt(pickup.point(), new HashSet<>());
         LiquidStores liquids = LiquidStores.at(level, pickup.point());
         for (ItemCount need : pickup.items()) {
-            if (countAt(pickup.point(), need.item, stores) < need.count) {
+            long have = countAt(pickup.point(), need.item, stores);
+            if (have < need.count) {
+                WorkOrder short_ = order(job.orderId());
+                if (short_ != null) {
+                    // 画面の「足りない素材」に出す（同じ物は数を置き換える）
+                    short_.shortage.removeIf(c -> c.matches(need.item));
+                    short_.shortage.add(new ItemCount(need.item, need.count - have));
+                }
                 return false;
             }
             if (FluidSamples.liquid(need.item) && a.liquidSpace(need.item) < need.count) {
@@ -1633,6 +1723,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
         }
         WorkOrder o = order(job.orderId());
+        if (o != null) {
+            o.shortage.clear();                        // 取れた: 足りなかった物は、もう足りている
+        }
         for (ItemCount need : pickup.items()) {
             if (FluidSamples.liquid(need.item)) {
                 // 液体・化学物質: 入れ物から抜いて、タンクへ（入りきる分だけ抜く）
@@ -1670,6 +1763,33 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         setChanged();
         return true;
+    }
+
+    /**
+     * アンドロイド作業台の預かり箱へ、作った物を count 個入れた（持ち物に入りきらなかった）: この注文の素材置き場の物として予約する。
+     * あとの工程や納品では、ほかの受け渡し場所と同じように、ここへ取りに来る。
+     */
+    public void holdBuffered(WorkJob job, BlockPos bench, ItemStack item, long count) {
+        WorkOrder o = order(job.orderId());
+        if (o != null && count > 0) {
+            o.hold(bench, item, count);
+            setChanged();
+        }
+    }
+
+    /** 預かり箱から、この注文が count 個取り出した（作る前に、足りない素材を持ち物へ戻した）。 */
+    public void releaseBuffered(WorkJob job, BlockPos bench, ItemStack item, long count) {
+        WorkOrder o = order(job.orderId());
+        if (o != null && count > 0) {
+            o.release(bench, item, count);
+            setChanged();
+        }
+    }
+
+    /** この注文が預かり箱 bench に予約している、item の数。 */
+    public long buffered(WorkJob job, BlockPos bench, ItemStack item) {
+        WorkOrder o = order(job.orderId());
+        return o == null ? 0 : o.held(bench, item);
     }
 
     /** 持ち物を、受け渡し場所 point の隣のストレージへ戻す。全部戻せたら true（入りきらなければ残る。ほかの場所へ回る）。 */
@@ -1769,6 +1889,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             a.inventory().setItem(slot, s.copyWithCount(s.getCount() - give + notIn));
             all &= notIn == 0;
         }
+        a.compactCarry();
         active.remainingDelivery = Math.max(0, active.remainingDelivery - moved);
         all = active.remainingDelivery == 0;
         if (o != null) {
@@ -1941,6 +2062,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), o.orderer, "android_order_complete");
             }
             message = Component.translatable("gui.singulo.work_console.done", o.target.getHoverName(), o.count);
+            tell(o, message);
             if (level != null) {
                 level.playSound(null, worldPosition, net.minecraft.sounds.SoundEvents.NOTE_BLOCK_CHIME.value(),
                         net.minecraft.sounds.SoundSource.BLOCKS, 0.8F, 1.6F);
@@ -2339,6 +2461,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 o.pendingReserve.clear();
                 o.pendingReserve.addAll(reserveItems(o, need));
                 o.status = o.pendingReserve.isEmpty() ? WorkOrder.RUNNING : WorkOrder.WAIT_ITEMS;
+            }
+            // 素材を待ったまま長く経ったら、何が足りないかを注文した人へ知らせる（1回だけ）
+            if (o.status == WorkOrder.WAIT_ITEMS) {
+                if (o.waitingSince < 0) {
+                    o.waitingSince = now;
+                } else if (!o.stallNotified && now - o.waitingSince >= STALL_NOTIFY_TICKS) {
+                    o.stallNotified = true;
+                    List<ItemCount> missing = o.missing();
+                    tell(o, missing.isEmpty()
+                            ? Component.translatable("gui.singulo.work_console.notify.waiting", o.target.getHoverName())
+                            : Component.translatable(missing.size() > 1 ? "gui.singulo.work_console.notify.missing.more" : "gui.singulo.work_console.notify.missing",
+                            o.target.getHoverName(),
+                            missing.get(0).item.getHoverName(), missing.get(0).count, missing.size() - 1));
+                }
+            } else {
+                o.waitingSince = -1;
+                o.stallNotified = false;
             }
             // 加工を待っている装置を見て、取り出しに行ってよいかを決める
             for (WorkOrder.StepState s : o.steps) {

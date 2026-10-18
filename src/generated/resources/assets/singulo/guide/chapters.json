@@ -13,46 +13,47 @@
       "id": "stage1",
       "icon": "singulo:thermoelectric_generator",
       "pages": [
+        "stage1.flow",
         "stage1.materials",
         "stage1.power",
         "stage1.thermal_pairs",
-        "stage1.machines",
-        "stage1.goal"
+        "stage1.machines"
       ]
     },
     {
       "id": "stage2",
       "icon": "singulo:superconducting_coil",
       "pages": [
+        "stage2.flow",
         "stage2.tower",
         "stage2.accelerator",
-        "stage2.others",
-        "stage2.goal"
+        "stage2.others"
       ]
     },
     {
       "id": "stage3",
       "icon": "singulo:quantum_computing_module",
       "pages": [
+        "stage3.flow",
         "stage3.quantum",
-        "stage3.tools",
-        "stage3.goal"
+        "stage3.tools"
       ]
     },
     {
       "id": "stage4",
       "icon": "singulo:time_crystal_catalyst",
       "pages": [
+        "stage4.flow",
         "stage4.compression",
         "stage4.time",
-        "stage4.power",
-        "stage4.goal"
+        "stage4.power"
       ]
     },
     {
       "id": "stage5",
       "icon": "singulo:singularity_core",
       "pages": [
+        "stage5.flow",
         "stage5.reactor",
         "stage5.ignite",
         "stage5.byproducts",
@@ -91,6 +92,8 @@
       "pages": [
         "ruins.list",
         "ruins.bosses",
+        "ruins.foundry",
+        "ruins.leviathan",
         "ruins.lab",
         "ruins.plan",
         "ruins.compass",
@@ -105,12 +108,16 @@
       "pages": [
         "androids.ruin",
         "androids.build",
+        "androids.first",
         "androids.patrol",
         "androids.routes",
         "androids.care",
         "androids.upgrades",
+        "androids.gear",
         "androids.work",
         "androids.process",
+        "androids.farm",
+        "androids.trouble",
         "androids.decor",
         "androids.glass"
       ]

@@ -1,4 +1,4 @@
-"""Release provenance must reject mixed loaders, trees and failed GUI validation."""
+"""Release provenance must reject mixed trees, missing artifacts and failed validation (1.21.1 is NeoForge only from 0.9.0)."""
 import copy
 from pathlib import Path
 import tempfile
@@ -18,12 +18,12 @@ class ProvenanceTests(unittest.TestCase):
             'actions/runs/1': {'status': 'completed', 'conclusion': 'success', 'event': 'pull_request',
                               'path': '.github/workflows/pr-validation.yml', 'head_repository': {'full_name': 'owner/repo'},
                               'head_sha': self.sha, 'run_attempt': 1},
-            'actions/runs/1/jobs?per_page=100': {'jobs': [{'name': n, 'conclusion': 'success'} for n in ['build-and-gametest', 'optional-mekanism', 'forge']]},
+            'actions/runs/1/jobs?per_page=100': {'jobs': [{'name': n, 'conclusion': 'success'} for n in ['build-and-gametest', 'optional-mekanism']]},
             'git/ref/tags/v0.8.1': {'object': {'type': 'commit', 'sha': self.sha}},
             'git/commits/' + self.sha: {'tree': {'sha': self.tree}},
             'git/commits/' + self.tested: {'tree': {'sha': self.tree}},
             'actions/runs/1/artifacts?per_page=100': {'artifacts': [
-                {'id': i, 'name': n + '-validation-' + self.tested, 'expired': False} for i, n in enumerate(['pr', 'forge'])]},
+                {'id': i, 'name': n + '-validation-' + self.tested, 'expired': False} for i, n in enumerate(['pr'])]},
         }
 
     def inspect(self):
@@ -31,19 +31,24 @@ class ProvenanceTests(unittest.TestCase):
              patch.object(release, 'git', side_effect=lambda source, *args: self.tree if args[-1] == 'HEAD^{tree}' else self.sha):
             return release.inspect('owner/repo', 1, 'v0.8.1', self.source)
 
-    def test_both_loaders_selected_from_actual_tested_commit(self):
+    def test_neoforge_selected_from_actual_tested_commit(self):
         m = self.inspect()
-        self.assertEqual(set(m['artifacts']), {'forge', 'neoforge'})
+        self.assertEqual(set(m['artifacts']), {'neoforge'})
         self.assertEqual(m['tested_commit'], self.tested)
 
-    def test_forge_failure_blocks_both_uploads(self):
+    def test_mekanism_failure_blocks_upload(self):
         self.data['actions/runs/1/jobs?per_page=100']['jobs'][-1]['conclusion'] = 'failure'
-        with self.assertRaisesRegex(RuntimeError, 'Both loader'):
+        with self.assertRaisesRegex(RuntimeError, 'Mekanism validation'):
             self.inspect()
 
-    def test_missing_forge_artifact_cannot_use_neoforge(self):
+    def test_leftover_forge_job_is_rejected(self):
+        self.data['actions/runs/1/jobs?per_page=100']['jobs'].append({'name': 'forge', 'conclusion': 'success'})
+        with self.assertRaisesRegex(RuntimeError, 'Mekanism validation'):
+            self.inspect()
+
+    def test_missing_artifact_is_rejected(self):
         self.data['actions/runs/1/artifacts?per_page=100']['artifacts'].pop()
-        with self.assertRaisesRegex(RuntimeError, 'both loader artifacts'):
+        with self.assertRaisesRegex(RuntimeError, 'NeoForge artifact'):
             self.inspect()
 
     def test_actual_merge_tree_must_match_release(self):

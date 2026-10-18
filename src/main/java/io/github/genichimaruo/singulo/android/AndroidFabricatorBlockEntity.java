@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * 遺構の印刷台。1つの型（光刃型など。置かれたときに決まる）のアンドロイド専用。
  * 近くにプレイヤー（クリエイティブ・観戦を除く）が来ると、2〜3体を1体ずつ台の上に印刷する。
- * アンドロイドは充電が切れるとこの台へ戻って充電する。全部倒すと、1日（24000 tick）休む。
+ * アンドロイドは充電が切れるとこの台へ戻って充電する。全部倒すと、半分の確率でその型の設計メモリが出て、1日（24000 tick）休む。
  */
 public class AndroidFabricatorBlockEntity extends BlockEntity {
     public static final int DETECT_RANGE = 16;
@@ -35,6 +35,8 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
     static final int LOST_TIMEOUT = 6000;
     /** 打ち切ったあと、次に出撃できるまで。 */
     static final int LOST_COOLDOWN = 1200;
+    /** 全部倒したときに、設計メモリが出る確率（出なくても1日休む）。 */
+    public static final float MEMORY_CHANCE = 0.5F;
 
     @Nullable
     private AndroidKind kind;
@@ -44,6 +46,8 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
     private int printed;
     private long lastPrint;
     private long nextWave;
+    /** 設計メモリが出る確率（テストで決め打ちにする。保存しない）。 */
+    private float memoryChance = MEMORY_CHANCE;
     /** 倒されずにいなくなったアンドロイドがいる（このときは全滅しても設計メモリを出さない）。 */
     private boolean lost;
     /** 残りが全員見つからなくなってからの時間（tick）。 */
@@ -169,10 +173,15 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    /** 全部倒されたとき: この型の設計メモリ（小型クリスタルメモリ）が台の上に出る。 */
+    /** テスト用: 設計メモリが出る確率を決め打ちにする（1 で必ず、0 で出ない）。 */
+    public void setMemoryChanceForTest(float chance) {
+        memoryChance = chance;
+    }
+
+    /** 全部倒されたとき: MEMORY_CHANCE の確率で、この型の設計メモリ（小型クリスタルメモリ）が台の上に出る。 */
     private void cleared(ServerLevel level) {
         level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 1.0F, 1.2F);
-        if (kind == null) {
+        if (kind == null || level.random.nextFloat() >= memoryChance) {
             return;
         }
         var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(kind.memoryId()));

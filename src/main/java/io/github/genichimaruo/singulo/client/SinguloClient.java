@@ -20,22 +20,16 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
-//#if neoforge
 @Mod(value = Singulo.MODID, dist = Dist.CLIENT)
-//#endif
 public final class SinguloClient {
     private static final ResourceLocation STILL = ResourceLocation.withDefaultNamespace("block/water_still");
     private static final ResourceLocation FLOWING = ResourceLocation.withDefaultNamespace("block/water_flow");
 
     public SinguloClient(IEventBus modBus) {
-        //#if neoforge
         modBus.addListener(SinguloClient::registerScreens);
-        //#endif
         modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerItemColors);
-        //#if neoforge
-        modBus.addListener(SinguloClient::registerExtensions);   // Forge 版は流体の種類が自分で持つ（SinguloFluids）
-        //#endif
+        modBus.addListener(SinguloClient::registerExtensions);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
         modBus.addListener(SinguloClient::addWingLayers);
@@ -46,9 +40,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloKeys::register);
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
-        //#if neoforge
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
-        //#endif
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
@@ -56,6 +48,7 @@ public final class SinguloClient {
                 ClientGalaxies.set(java.util.List.of(), false));
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
+        NeoForge.EVENT_BUS.addListener(SinguloKeys::onScreenKey);
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
         NeoForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
         NeoForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
@@ -102,6 +95,8 @@ public final class SinguloClient {
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ANDROID_WORKBENCH.get(),
+                WorkbenchRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.ACCELERATOR_CONTROLLER.get(),
                 AcceleratorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CABLE.get(),
@@ -245,32 +240,13 @@ public final class SinguloClient {
 
     /** 組み込みのリソースパック「Singulo HD」（32×32 のテクスチャ）。リソースパックの画面で選ぶと使える。 */
     private static void addPacks(net.neoforged.neoforge.event.AddPackFindersEvent event) {
-        //#if neoforge
         event.addPackFinders(Singulo.id("resourcepacks/singulo_hd"), net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
                 Component.translatable("pack.singulo.hd"), net.minecraft.server.packs.repository.PackSource.BUILT_IN, false,
                 net.minecraft.server.packs.repository.Pack.Position.TOP);
-        //#else
-        //$ if (event.getPackType() != net.minecraft.server.packs.PackType.CLIENT_RESOURCES) {
-        //$     return;
-        //$ }
-        //$ java.nio.file.Path path = net.minecraftforge.fml.ModList.get().getModFileById(Singulo.MODID).getFile().findResource("resourcepacks/singulo_hd");
-        //$ var info = new net.minecraft.server.packs.PackLocationInfo("mod/" + Singulo.MODID + "/singulo_hd", Component.translatable("pack.singulo.hd"),
-        //$         net.minecraft.server.packs.repository.PackSource.BUILT_IN, java.util.Optional.empty());
-        //$ var pack = net.minecraft.server.packs.repository.Pack.readMetaAndCreate(info, new net.minecraft.server.packs.PathPackResources.PathResourcesSupplier(path),
-        //$         net.minecraft.server.packs.PackType.CLIENT_RESOURCES,
-        //$         new net.minecraft.server.packs.PackSelectionConfig(false, net.minecraft.server.packs.repository.Pack.Position.TOP, false));
-        //$ if (pack != null) {
-        //$     event.addRepositorySource(consumer -> consumer.accept(pack));
-        //$ }
-        //#endif
     }
 
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
-        //#if neoforge
-        //#else
-        //$ event.enqueueWork(() -> registerScreens(new io.github.genichimaruo.singulo.forgecompat.RegisterMenuScreensEvent()));
-        //#endif
         // 作業位置カード: 記録済みなら絵を切り替える
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
@@ -336,7 +312,6 @@ public final class SinguloClient {
         }
     }
 
-    //#if neoforge
     private static void registerExtensions(RegisterClientExtensionsEvent event) {
         for (SinguloFluids.Entry entry : SinguloFluids.ALL.values()) {
             int color = entry.def().color();
@@ -358,5 +333,4 @@ public final class SinguloClient {
             }, entry.type().get());
         }
     }
-    //#endif
 }
