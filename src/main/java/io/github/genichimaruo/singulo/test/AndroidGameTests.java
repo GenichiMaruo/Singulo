@@ -2092,7 +2092,8 @@ public final class AndroidGameTests {
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         boolean[] dropped = {false};
         helper.onEachTick(() -> dropped[0] |= !level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
-                new AABB(helper.absolutePos(BlockPos.ZERO)).inflate(10)).isEmpty());
+                new AABB(helper.absolutePos(BlockPos.ZERO),
+                        helper.absolutePos(new BlockPos(16, 8, 16)))).isEmpty());
         helper.succeedWhen(() -> {
             helper.assertFalse(dropped[0], "持ち物からあふれた物が足元に落ちた");
             helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.COBBLESTONE) == 2, "丸石が2つ届かない");

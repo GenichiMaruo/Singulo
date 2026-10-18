@@ -70,7 +70,11 @@ def main():
         target = OUT_DIR.parent.parent / namespace / 'structures'
         target.mkdir(parents=True, exist_ok=True)
         for template in templates:
-            (target / f'{template}.nbt').write_bytes((OUT_DIR / f'{template}.nbt').read_bytes())
+            if namespace == 'singulo_prototype' and template == 'huge':
+                # Falling terrain and water must not obstruct the combat timing fixture.
+                write(template, *TEMPLATES[template], namespace=namespace, sealed=True)
+            else:
+                (target / f'{template}.nbt').write_bytes((OUT_DIR / f'{template}.nbt').read_bytes())
 
 
 if __name__ == '__main__':
