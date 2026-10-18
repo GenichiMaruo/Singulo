@@ -100,7 +100,8 @@ def promote(metadata, artifact_dir, output, jar_name):
         if marker not in gui:
             raise RuntimeError("Missing GUI interaction validation: " + marker)
     pixels = one(root.rglob("inventory-pixels.json"), "inventory pixel verification")
-    if sum(row["checked_empty_slot_centers"] for row in json.loads(pixels.read_text())) != 105:
+    pixel_results = json.loads(pixels.read_text())
+    if len(pixel_results) != 3 or sum(row["checked_empty_slot_centers"] for row in pixel_results) != 105:
         raise RuntimeError("Missing 105-point inventory verification")
     output.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(jars["singulo"], output)
