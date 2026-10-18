@@ -1795,37 +1795,38 @@ public final class AndroidGameTests {
     public static void androidHarvestsAndReplants(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 0);
-        // Light propagation on 1.20.1 is asynchronous. Plant only after the lit,
-        // irrigated fixture is ready, rather than losing crops to survival updates.
+        // Keep the farm level with the walking surface; raised crops create a
+        // pathfinding ledge beside the machines. Light propagation is asynchronous:
+        // wait for irrigation and lighting before planting crops.
         helper.setBlock(p(3, 3, 5), net.minecraft.world.level.block.Blocks.GLOWSTONE);
-        helper.setBlock(p(2, 1, 5), net.minecraft.world.level.block.Blocks.WATER);
+        helper.setBlock(p(2, 0, 5), net.minecraft.world.level.block.Blocks.WATER);
         for (int x = 0; x < 2; x++) {
-            helper.setBlock(p(x, 1, 5), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState()
+            helper.setBlock(p(x, 0, 5), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState()
                     .setValue(net.minecraft.world.level.block.FarmBlock.MOISTURE, 7));
         }
         helper.startSequence().thenWaitUntil(() -> {
             for (int x = 0; x < 2; x++) {
-                helper.assertTrue(helper.getLevel().getRawBrightness(helper.absolutePos(p(x, 2, 5)), 0) >= 9,
+                helper.assertTrue(helper.getLevel().getRawBrightness(helper.absolutePos(p(x, 1, 5)), 0) >= 9,
                         "畑の照明更新が終わっていない");
             }
         }).thenExecute(() -> {
             for (int x = 0; x < 2; x++) {
-                helper.setBlock(p(x, 2, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
+                helper.setBlock(p(x, 1, 5), ((net.minecraft.world.level.block.CropBlock) net.minecraft.world.level.block.Blocks.WHEAT)
                         .getStateForAge(7));
             }
-        procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
-                io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(p(0, 2, 5)),
-                helper.absolutePos(p(1, 2, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
-        BladeAndroid a = worker(helper, false);
-        var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
-                helper.absolutePos(DELIVERY));
-        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
-        helper.succeedWhen(() -> {
-            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(p(0, 2, 5)) + " crop1=" + helper.getBlockState(p(1, 2, 5)) + " soil0=" + helper.getBlockState(p(0, 1, 5)) + " light=" + helper.getLevel().getRawBrightness(helper.absolutePos(p(0, 2, 5)), 0) + " message=" + console.message());
-            helper.assertTrue(helper.getBlockState(p(0, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
-                    && helper.getBlockState(p(1, 2, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
-            a.discard();
-        });
+            procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
+                    io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(p(0, 1, 5)),
+                    helper.absolutePos(p(1, 1, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
+            BladeAndroid a = worker(helper, false);
+            var error = console.start(player(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
+                    helper.absolutePos(DELIVERY));
+            helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+            helper.succeedWhen(() -> {
+                helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.WHEAT) == 2, "小麦が2つ届かない: count=" + delivered(helper, net.minecraft.world.item.Items.WHEAT) + " position=" + a.position() + " target=" + a.getTarget() + " health=" + a.getHealth() + " work=" + a.saveWorkState() + " crop0=" + helper.getBlockState(p(0, 1, 5)) + " crop1=" + helper.getBlockState(p(1, 1, 5)) + " soil0=" + helper.getBlockState(p(0, 0, 5)) + " light=" + helper.getLevel().getRawBrightness(helper.absolutePos(p(0, 1, 5)), 0) + " message=" + console.message());
+                helper.assertTrue(helper.getBlockState(p(0, 1, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT)
+                        && helper.getBlockState(p(1, 1, 5)).is(net.minecraft.world.level.block.Blocks.WHEAT), "植え直していない");
+                a.discard();
+            });
         });
     }
 
