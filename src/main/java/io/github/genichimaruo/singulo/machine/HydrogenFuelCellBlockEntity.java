@@ -137,7 +137,9 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
         if (!standby && perMb > 0) {
             // 出力に見合う水素を使う（水素2 mB に酸素1 mB）。足りない分だけ出力を下げる
             double want = output / perMb;
-            double available = Math.min(hydrogen.getFluidAmount() + carry, oxygen.getFluidAmount() * 2.0 + carry);
+            // Only whole 2H:1O pairs can be withdrawn. An odd last mB must stay in the tank,
+            // rather than being credited as a second mB that drain() never supplied.
+            double available = Math.min(hydrogen.getFluidAmount() / 2, oxygen.getFluidAmount()) * 2.0 + carry;
             double use = Math.min(want, available);
             if (use > 0) {
                 carry -= use;

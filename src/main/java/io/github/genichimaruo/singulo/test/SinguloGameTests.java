@@ -347,4 +347,26 @@ public final class SinguloGameTests {
         helper.succeedWhen(() -> helper.assertTrue(kiln.energy().getEnergyStored() > 200,
                 "導線の先の焼成炉に電力が届かない: " + kiln.energy().getEnergyStored()));
     }
+    /** Odd hydrogen amounts must not create credit for gas that was never removed from the tank. */
+    @GameTest(template = EMPTY, timeoutTicks = 30)
+    public static void fuelCellKeepsUnpairedHydrogenUntilOxygenPairIsComplete(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.HYDROGEN_FUEL_CELL.get());
+        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = helper.getBlockEntity(pos);
+        cell.fluids().fill(new FluidStack(SinguloFluids.get("hydrogen"), 3), IFluidHandler.FluidAction.EXECUTE);
+        cell.fluids().fill(new FluidStack(SinguloFluids.get("oxygen"), 2), IFluidHandler.FluidAction.EXECUTE);
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(cell.energy().getEnergyStored() == 9,
+                    "Unpaired hydrogen created energy credit: " + cell.energy().getEnergyStored());
+            helper.assertTrue(cell.hydrogen().getFluidAmount() == 1 && cell.oxygen().getFluidAmount() == 1,
+                    "The incomplete hydrogen/oxygen pair was consumed");
+            cell.fluids().fill(new FluidStack(SinguloFluids.get("hydrogen"), 1), IFluidHandler.FluidAction.EXECUTE);
+        });
+        helper.runAtTickTime(12, () -> {
+            helper.assertTrue(cell.energy().getEnergyStored() == 18, "The completed second gas pair did not generate power");
+            helper.assertTrue(cell.hydrogen().isEmpty() && cell.oxygen().isEmpty(), "Complete gas pairs were not consumed exactly");
+            helper.succeed();
+        });
+    }
+
 }
