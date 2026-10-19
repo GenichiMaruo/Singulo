@@ -1,0 +1,26 @@
+{
+  "type": "singulo:machine",
+  "station": "particle_accelerator",
+  "stage": 3,
+  "time": 400,
+  "energy": 600,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:ingots/zinc"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:ingots/bismuth"
+      },
+      "count": 1
+    }
+  ],
+  "min_size": 16,
+  "result": {
+    "id": "singulo:nihonium",
+    "count": 1
+  }
+}

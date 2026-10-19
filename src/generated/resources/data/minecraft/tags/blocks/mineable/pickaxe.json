@@ -1,5 +1,9 @@
 {
   "values": [
+    "singulo:hydrogen_fuel_cell",
+    "singulo:peltier_cooler",
+    "singulo:bismuth_crystal_block",
+    "singulo:glowing_bismuth_crystal",
     "singulo:creative_energy_source",
     "singulo:copper_wire",
     "singulo:compressed_block_1",
@@ -28,6 +32,7 @@
     "singulo:accelerator_controller",
     "singulo:catalytic_reactor",
     "singulo:cryogenic_turbine",
+    "singulo:muon_fusion_reactor",
     "singulo:cosmic_muon_collector",
     "singulo:smes_cell",
     "singulo:precision_assembler",

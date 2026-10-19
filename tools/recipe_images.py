@@ -38,21 +38,25 @@ FONT_BOLD_PATHS = ['C:/Windows/Fonts/BIZ-UDGothicB.ttc', 'C:/Windows/Fonts/meiry
 
 # タグ・バニラの代表の絵（textures の中の名前）
 TAG_ICONS = {
-    'forge:glass_blocks/colorless': 'block/glass', 'forge:dusts/glowstone': 'item/glowstone_dust', 'forge:ender_pearls': 'item/ender_pearl',
-    'forge:slime_balls': 'item/slime_ball', 'forge:gems/diamond': 'item/diamond', 'singulo:star_core': 'item/nether_star',
-    'forge:gems/quartz': 'item/quartz', 'forge:dusts/redstone': 'item/redstone', 'singulo:helium_bearing_stone': 'block/deepslate',
-    'forge:sand': 'block/sand', 'forge:ingots/iron': 'item/iron_ingot', 'forge:ingots/copper': 'item/copper_ingot', 'forge:obsidians': 'block/obsidian',
+    'c:glass_blocks/colorless': 'block/glass', 'c:dusts/glowstone': 'item/glowstone_dust', 'c:ender_pearls': 'item/ender_pearl',
+    'c:slime_balls': 'item/slime_ball', 'c:gems/diamond': 'item/diamond', 'singulo:star_core': 'item/nether_star',
+    'c:gems/quartz': 'item/quartz', 'c:dusts/redstone': 'item/redstone', 'singulo:helium_bearing_stone': 'block/deepslate',
+    'singulo:ceramic_flux': 'item/bone_meal', 'singulo:limestone': 'block/calcite', 'singulo:carbon': 'item/coal',
+    'c:cobblestones/normal': 'block/cobblestone', 'c:gravels': 'block/gravel', 'minecraft:logs': 'block/oak_log',
+    'c:storage_blocks/coal': 'block/coal_block', 'c:raw_materials/copper': 'item/raw_copper', 'c:rods/blaze': 'item/blaze_rod',
+    'c:sands': 'block/sand', 'c:ingots/iron': 'item/iron_ingot', 'c:ingots/copper': 'item/copper_ingot', 'c:obsidians': 'block/obsidian',
 }
 VANILLA_TEXTURE_OVERRIDES = {
     'minecraft:piston': 'block/piston_side', 'minecraft:blast_furnace': 'block/blast_furnace_front',
-    'minecraft:blue_ice': 'block/blue_ice', 'minecraft:sculk': 'block/sculk', 'minecraft:sculk_sensor': 'block/sculk_sensor_side',
+    'minecraft:blue_ice': 'block/blue_ice', 'minecraft:lava': 'block/lava_still', 'minecraft:sculk': 'block/sculk', 'minecraft:sculk_sensor': 'block/sculk_sensor_side',
 }
 # 液体の色（Java の SinguloFluids と同じ値）
 FLUID_COLORS = {'dark_matter': 0x2A1E3C, 'hydrogen': 0xE6F5FF, 'oxygen': 0xF5E1E1, 'liquid_nitrogen': 0xBFEFFF,
-                'helium': 0xF5F0C8, 'liquid_helium': 0xE6D2FF, 'axion_condensate': 0xA078E6, 'minecraft:water': 0x3F76E4}
+                'helium': 0xF5F0C8, 'liquid_helium': 0xE6D2FF, 'axion_condensate': 0xA078E6, 'minecraft:water': 0x3F76E4,
+                'minecraft:lava': 0xFF7A1E}
 # 製作場所 → 装置の正面の絵（mod の装置ID）
 STATION_BLOCKS = {
-    '焼成炉': 'kiln', '圧縮機': 'compressor', '電解槽': 'electrolyzer', 'アーカイブ端末': 'archive_terminal',
+    '焼成炉': 'kiln', 'ペルチェ冷却器': 'peltier_cooler', '圧縮機': 'compressor', '電解槽': 'electrolyzer', 'アーカイブ端末': 'archive_terminal',
     '精密組立台': 'precision_assembler', '触媒反応器': 'catalytic_reactor', '極低温冷却塔': 'cooling_tower_controller',
     '粒子加速器': 'accelerator_controller', '量子もつれ合成器': 'entanglement_synthesizer', 'レーザー冷却器': 'laser_cooler',
     '縮退圧縮炉': 'degenerate_compactor_controller', 'C空洞': 'casimir_cavity_controller', '時間結晶育成槽': 'time_crystal_incubator',

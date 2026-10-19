@@ -85,6 +85,10 @@ public final class GuiReviewHarness {
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) {
             return;
         }
+        if (phase == 29 && Boolean.getBoolean("singulo.machineGuiReview")) {
+            MachineGuiReviewHarness.tick(mc);
+            return;
+        }
         // Opening menus and resizing can move the real cursor back onto a tooltip.
         org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
         if (phase == 0) {
@@ -301,7 +305,8 @@ public final class GuiReviewHarness {
                 Singulo.LOGGER.info("SINGULO_CONFIG_FILE_RELOAD_COMPLETE");
                 Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 22");
                 phase = 29;
-                mc.stop();
+                if (Boolean.getBoolean("singulo.machineGuiReview")) MachineGuiReviewHarness.start(mc);
+                else mc.stop();
             }
             default -> {}
         }

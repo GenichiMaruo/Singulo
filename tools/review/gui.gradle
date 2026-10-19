@@ -5,6 +5,7 @@ allprojects {
         legacyForge.runs.client {
             gameDirectory = layout.buildDirectory.dir('gui-review').get().asFile
             systemProperty 'singulo.guiReviewOutput', layout.buildDirectory.dir('gui-review/screenshots').get().asFile.absolutePath
+            systemProperty 'singulo.machineGuiReview', providers.gradleProperty('machineGuiReview').isPresent().toString()
             programArgument '--quickPlaySingleplayer'
             programArgument 'Review'
             programArgument '--width'

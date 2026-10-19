@@ -234,6 +234,10 @@ def draw_icon(d, kind, box, col, on):
             d.line([(sx, y0 + 2), (cx, cy)], fill=col)
             d.line([(sx, y1 - 2), (cx, cy)], fill=col)
         d.ellipse([cx - 1, cy - 1, cx + 1, cy + 1], fill=rgba((255, 255, 255)))
+    elif kind == 'fusion':
+        d.ellipse([cx - 7, cy - 7, cx + 7, cy + 7], outline=col, width=2)
+        d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=col)
+        d.ellipse([cx - 1, cy - 1, cx + 1, cy + 1], fill=rgba((255, 255, 255)))
     elif kind == 'atom':
         d.ellipse([cx - 7, cy - 3, cx + 7, cy + 3], outline=col)
         d.line([(cx - 5, cy - 5), (cx + 5, cy + 5)], fill=col)
@@ -321,6 +325,8 @@ MACHINE_ICONS = {
     'archive_terminal': ('screen', (140, 240, 220)), 'thermoelectric_generator': ('thermo', None),
     'precision_assembler': ('arm', None), 'catalytic_reactor': ('flask', (150, 255, 180)),
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
+    'muon_fusion_reactor': ('fusion', (200, 150, 255)),
+    'hydrogen_fuel_cell': ('battery', (150, 220, 255)), 'peltier_cooler': ('snow', (170, 230, 255)),
     'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),

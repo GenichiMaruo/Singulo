@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 1,
+  "time": 80,
+  "energy": 60,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:ingots/iron"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "singulo:carbon"
+      },
+      "count": 1
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:oxygen",
+      "amount": 250
+    }
+  ],
+  "result": {
+    "id": "singulo:steel_ingot",
+    "count": 2
+  }
+}

@@ -71,7 +71,8 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         }
     };
     private final io.github.genichimaruo.singulo.multiblock.PortLinks ports = new io.github.genichimaruo.singulo.multiblock.PortLinks();
-    private boolean firstCheck = true;
+    /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
+    private boolean firstCheck;
     private long nextCheck;
 
     public ShieldTowerBlockEntity(BlockPos pos, BlockState state) {
@@ -222,6 +223,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     public void load(net.minecraft.nbt.CompoundTag tag) {
         super.load(tag);
+        firstCheck = true;
         if (tag.contains("permit")) {
             permit.deserializeNBT(tag.getCompound("permit"));
         }

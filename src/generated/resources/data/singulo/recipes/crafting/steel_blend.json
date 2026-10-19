@@ -6,10 +6,10 @@
       "tag": "forge:ingots/iron"
     },
     {
-      "item": "minecraft:coal"
+      "tag": "singulo:carbon"
     },
     {
-      "item": "minecraft:coal"
+      "tag": "singulo:carbon"
     }
   ],
   "result": {

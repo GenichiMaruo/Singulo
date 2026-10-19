@@ -15,6 +15,7 @@ public final class Capabilities {
         public static final Capability<IItemHandler> BLOCK = ForgeCapabilities.ITEM_HANDLER;
     }
     public static final class FluidHandler {
+        public static final Capability<net.minecraftforge.fluids.capability.IFluidHandlerItem> ITEM = ForgeCapabilities.FLUID_HANDLER_ITEM;
         public static final Capability<IFluidHandler> BLOCK = ForgeCapabilities.FLUID_HANDLER;
     }
     public static <T> T get(net.minecraft.world.level.Level level, Capability<T> cap,

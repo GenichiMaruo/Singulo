@@ -153,6 +153,14 @@ public final class SinguloBlocks {
     public static final RegistryObject<SimpleMachineBlock<CryogenicTurbineBlockEntity>> CRYOGENIC_TURBINE = BLOCKS.register(
             "cryogenic_turbine", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.CRYOGENIC_TURBINE, CryogenicTurbineBlockEntity::new, CryogenicTurbineBlockEntity::serverTick));
+    public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity>> MUON_FUSION_REACTOR = BLOCKS.register(
+            "muon_fusion_reactor", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.MUON_FUSION_REACTOR,
+                    io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity::new,
+                    io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity::serverTick));
+    public static final RegistryObject<SimpleMachineBlock<io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity>> HYDROGEN_FUEL_CELL = BLOCKS.register(
+            "hydrogen_fuel_cell", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.HYDROGEN_FUEL_CELL,
+                    io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity::new,
+                    io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity::serverTick));
     public static final RegistryObject<SimpleMachineBlock<SmesCellBlockEntity>> SMES_CELL = BLOCKS.register(
             "smes_cell", () -> new SimpleMachineBlock<>(machineProperties(),
                     SinguloBlockEntities.SMES_CELL, SmesCellBlockEntity::new, SmesCellBlockEntity::serverTick));
@@ -285,6 +293,13 @@ public final class SinguloBlocks {
     public static final RegistryObject<Block> WHITE_LIGHT_PANEL = simpleBlock("white_light_panel",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.GLASS).lightLevel(s -> 15));
+    /** ビスマス結晶ブロック（溶かしたビスマスが冷えてできる、階段状の虹色の骸晶）と、その光るもの。 */
+    public static final RegistryObject<Block> BISMUTH_CRYSTAL_BLOCK = simpleBlock("bismuth_crystal_block",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.AMETHYST));
+    public static final RegistryObject<Block> GLOWING_BISMUTH_CRYSTAL = simpleBlock("glowing_bismuth_crystal",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.AMETHYST).lightLevel(s -> 12));
     /** 黒色強化パネル（黒曜石なみに爆発に強い）。 */
     public static final RegistryObject<Block> BLACK_REINFORCED_PANEL = simpleBlock("black_reinforced_panel",
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()

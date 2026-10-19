@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "time_crystal_incubator",
+  "stage": 4,
+  "time": 400,
+  "energy": 1000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:cobblestone/normal"
+      },
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "minecraft:mossy_cobblestone",
+    "count": 8
+  }
+}

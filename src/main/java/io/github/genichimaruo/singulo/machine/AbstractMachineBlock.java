@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.machine;
 
+import io.github.genichimaruo.singulo.compat.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -123,6 +124,12 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
     /** 手に持ったアイテムで右クリックしたとき、ブロックエンティティが受け取れば使う（触媒を入れるなど）。 */
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
+        // 液体の容器（バケツ・冷媒カートリッジ）: タンクを持つブロックなら、直接出し入れする（加工装置は MachineBlock が受け持つ）
+        if (!(this instanceof MachineBlock) && net.minecraftforge.fluids.FluidUtil.getFluidHandler(stack).isPresent()
+                && Capabilities.get(level, io.github.genichimaruo.singulo.compat.Capabilities.FluidHandler.BLOCK, pos, hit.getDirection()) != null
+                && net.minecraftforge.fluids.FluidUtil.interactWithFluidHandler(player, hand, level, pos, hit.getDirection())) {
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
         // クライアントは素通しし、使うかどうかはサーバーが決める（使わなければ通常どおりGUIを開く）
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof MenuOpener opener && opener.useItem(serverPlayer, stack, hand)) {

@@ -5,17 +5,20 @@ package io.github.genichimaruo.singulo.machine;
  * 何を作れるかはレシピ（station がこの id のもの）で決まる。
  */
 public enum MachineType {
-    KILN("kiln", 1, 2, 1, 0, 0, false),
+    /** 入力タンクは純酸素転炉の酸素用。 */
+    KILN("kiln", 1, 2, 1, 1, 0, false),
     COMPRESSOR("compressor", 1, 1, 1, 0, 1, true),
     ELECTROLYZER("electrolyzer", 1, 0, 0, 1, 2, false),
     ARCHIVE_TERMINAL("archive_terminal", 1, 4, 1, 0, 0, false),
     /** 段階3以降の装置・部品・道具を組み立てる。材料は種類と個数だけで指定する（入力6枠）。 */
     PRECISION_ASSEMBLER("precision_assembler", 2, 6, 1, 0, 0, false),
-    CATALYTIC_REACTOR("catalytic_reactor", 2, 5, 1, 1, 0, false),
+    /** 2つめの出力枠に、粗銅の精錬で出るビスマスなどの副産物が出る。 */
+    CATALYTIC_REACTOR("catalytic_reactor", 2, 5, 2, 1, 0, false),
     /** マルチブロック。入力タンクはヘリウム用、出力タンクは液体窒素と液体ヘリウム。 */
     CRYOGENIC_COOLING_TOWER("cryogenic_cooling_tower", 2, 5, 1, 1, 2, false),
-    /** マルチブロック。2つめの出力枠に、ごく稀に磁気単極子が出る。 */
-    PARTICLE_ACCELERATOR("particle_accelerator", 2, 0, 2, 1, 0, false),
+    /** マルチブロック。水素からミュオン束、入力の2枠の原子核どうし（亜鉛とビスマス）を衝突させてニホニウムを作る。
+     *  2つめの出力枠に、ごく稀に磁気単極子が出る。 */
+    PARTICLE_ACCELERATOR("particle_accelerator", 2, 2, 2, 1, 0, false),
     /** 量子もつれ素子を必ず2個1組で作る。 */
     ENTANGLEMENT_SYNTHESIZER("entanglement_synthesizer", 3, 5, 1, 1, 0, false),
     /** 入力タンクは液体窒素と液体ヘリウム。冷却原子トラップの復元もここで行う。 */
@@ -29,7 +32,9 @@ public enum MachineType {
     /** 時間結晶触媒を育てる。電力が要求の80%を割った時間の割合だけ純度（寿命）が下がる。 */
     TIME_CRYSTAL_INCUBATOR("time_crystal_incubator", 4, 5, 1, 0, 0, false),
     /** 人工星核・特異点の種・シンギュラリティ・コアを作り、アノマリー・サンプルを復元する。 */
-    SINGULARITY_ENCAPSULATOR("singularity_encapsulator", 5, 6, 1, 0, 0, false);
+    SINGULARITY_ENCAPSULATOR("singularity_encapsulator", 5, 6, 1, 0, 0, false),
+    /** 熱電素子に電流を流して熱を運び出し、タンクの水を凍らせる（熱電発電機の逆）。 */
+    PELTIER_COOLER("peltier_cooler", 1, 0, 1, 1, 0, false);
 
     public static final int ENERGY_CAPACITY = 20_000;
     public static final int TANK_CAPACITY = 8_000;
@@ -124,6 +129,18 @@ public enum MachineType {
     /** 任意のブロックを質量として溜め、圧縮ブロックや質量ペレットにするモードを持つか。 */
     public boolean massMode() {
         return massMode;
+    }
+
+    /**
+     * 0.10.0 より前のスロットの並び（入力・出力の数）。スロットの数が変わった装置だけ。並びを書いていない古いデータは、
+     * これで読み替える（{@link MachineBlockEntity} の読み込み）。
+     */
+    public int[] legacyLayout() {
+        return switch (this) {
+            case PARTICLE_ACCELERATOR -> new int[]{0, 2};
+            case CATALYTIC_REACTOR -> new int[]{5, 1};
+            default -> new int[]{inputSlots, outputSlots};
+        };
     }
 
     /** マルチブロック（コントローラで動く）か。 */

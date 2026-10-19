@@ -71,10 +71,10 @@ class ArtifactPromotionTests(unittest.TestCase):
         import json
         import tempfile
         import zipfile
-        for defect in (None, 'jar', 'handbook', 'pixels'):
+        for defect in (None, 'jar', 'handbook', 'pixels', 'machine_marker', 'machine_pixels'):
             with self.subTest(defect=defect), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder)
-                name = 'Singulo-0.9.0-1.20.1F.jar'
+                name = 'Singulo-0.10.0-1.20.1F.jar'
                 metadata = {'artifacts': {ns: {'name': ns} for ns in release.GROUPS}}
                 for index, (ns, count) in enumerate(release.GROUPS.items()):
                     build = root / ns
@@ -86,12 +86,16 @@ class ArtifactPromotionTests(unittest.TestCase):
                     (logs / 'latest.log').write_text(f'All {count} required tests passed')
                 gui = root / 'singulo/gui-review'
                 (gui / 'screenshots').mkdir(parents=True)
-                for index in range(22):
+                for index in range(142):
                     (gui / 'screenshots' / f'{index}.png').touch()
                 (gui / 'logs').mkdir()
                 markers = ['SINGULO_GUI_COMPLETE 22', 'SINGULO_SEARCH_COMPLETE', 'SINGULO_JEI_SYNC_COMPLETE']
                 if defect != 'handbook':
                     markers.append('SINGULO_HANDBOOK_SEARCH_COMPLETE')
+                if defect != 'machine_marker':
+                    markers.append('SINGULO_MACHINE_GUI_COMPLETE 120')
+                (gui / 'machine-pixels.json').write_text(json.dumps({'languages': ['ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'],
+                    'machine_captures': 120, 'headers_without_title_status_overlap': 79 if defect == 'machine_pixels' else 80, 'generator_font_probes': 5}))
                 (gui / 'logs/latest.log').write_text('\n'.join(markers))
                 (gui / 'inventory-pixels.json').write_text(json.dumps([
                     {'checked_empty_slot_centers': 35}, {'checked_empty_slot_centers': 35},

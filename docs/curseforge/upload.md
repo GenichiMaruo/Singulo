@@ -7,9 +7,9 @@
 
 | Minecraft | ブランチ | 配布ファイル |
 | --- | --- | --- |
-| 1.21.1 / NeoForge | `main` | `build/libs/Singulo-<版>-1.21.1N.jar` |
-| 1.20.1 / Forge | `port/1.20.1-forge` | `build/libs/Singulo-<版>-1.20.1F.jar` |
-| 1.20.1 / NeoForge | `port/1.20.1-neoforge` | `build/libs/Singulo-<版>-1.20.1N.jar` |
+| 1.21.1 / NeoForge | `1.21.1` | `build/libs/Singulo-<版>-1.21.1N.jar` |
+| 1.20.1 / Forge | `1.20.1` (`-Ploader=forge`) | `build/forge/libs/Singulo-<版>-1.20.1F.jar` |
+| 1.20.1 / NeoForge | `1.20.1` (`-Ploader=neoforge`) | `build/neoforge/libs/Singulo-<版>-1.20.1N.jar` |
 
 `<版>` は各ブランチの `gradle.properties` の `mod_version` です。
 
@@ -52,7 +52,7 @@ GitHub Actions では自動で決まります（下の「GitHub Actions で公�
 
 ## GitHub Actions で公開する
 
-[公開ワークフロー](../../.github/workflows/publish-curseforge.yml) は、`main` では `v<mod_version>`、1.20.1 Forgeブランチでは `v<mod_version>-1.20.1F`、NeoForgeブランチでは `v<mod_version>-1.20.1N` タグの push または手動実行で動きます。`curseforge` 環境の `CURSEFORGE_PROJECT_ID`（Secret または Variable）と `CURSEFORGE_TOKEN`（Secret）を利用します。トークンをリポジトリに記載する必要はありません。
+[公開ワークフロー](../../.github/workflows/publish-curseforge.yml) は、`1.21.1` では `v<mod_version>`、1.20.1 Forgeブランチでは `v<mod_version>-1.20.1F`、NeoForgeブランチでは `v<mod_version>-1.20.1N` タグの push または手動実行で動きます。`curseforge` 環境の `CURSEFORGE_PROJECT_ID`（Secret または Variable）と `CURSEFORGE_TOKEN`（Secret）を利用します。トークンをリポジトリに記載する必要はありません。
 
 版番号・変更履歴・翻訳を検証し、ビルドと GameTest が成功した JAR を成果物として保存したあと、同じ JAR をアップロードします。
 

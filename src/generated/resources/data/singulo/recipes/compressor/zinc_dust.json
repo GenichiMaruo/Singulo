@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 80,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:tuff"
+      },
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "singulo:zinc_dust",
+    "count": 1
+  }
+}

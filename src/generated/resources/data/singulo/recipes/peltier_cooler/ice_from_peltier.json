@@ -1,0 +1,18 @@
+{
+  "type": "singulo:machine",
+  "station": "peltier_cooler",
+  "stage": 1,
+  "time": 200,
+  "energy": 60,
+  "ingredients": [],
+  "fluid_ingredients": [
+    {
+      "fluid": "minecraft:water",
+      "amount": 1000
+    }
+  ],
+  "result": {
+    "id": "minecraft:ice",
+    "count": 1
+  }
+}

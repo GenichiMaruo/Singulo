@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 3,
+  "time": 80,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:nihonium_ingot"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:nihonium_plate",
+    "count": 1
+  }
+}

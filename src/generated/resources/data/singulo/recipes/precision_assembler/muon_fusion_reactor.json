@@ -1,0 +1,43 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 2,
+  "time": 400,
+  "energy": 200,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 4
+    },
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 6
+    },
+    {
+      "ingredient": {
+        "item": "singulo:muon_catalyst"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:coolant_cartridge"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:muon_fusion_reactor",
+    "count": 1
+  }
+}

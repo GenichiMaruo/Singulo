@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 40,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:charcoal"
+      },
+      "count": 3
+    }
+  ],
+  "result": {
+    "id": "singulo:carbon_dust",
+    "count": 2
+  }
+}

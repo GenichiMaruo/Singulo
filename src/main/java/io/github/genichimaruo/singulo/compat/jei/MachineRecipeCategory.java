@@ -93,6 +93,9 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
         if (!r.result().isEmpty()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 112, 10).setBackground(slot, -1, -1).addItemStack(r.result());
         }
+        if (!r.byproduct().isEmpty()) {
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 112, 30).setBackground(slot, -1, -1).addItemStack(r.byproduct());
+        }
         int oy = 1;
         for (FluidStack f : r.fluidResults()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 134, oy).setBackground(slot, -1, -1)
