@@ -65,7 +65,7 @@ public final class BalanceGameTests {
     public static void coreControllerFromModulesByNormalInsertion(GameTestHelper helper) {
         MachineBlockEntity m = assembler(helper, new BlockPos(2, 1, 2));
         IItemHandler auto = m.automationItems();
-        insert(helper, auto, new ItemStack(item("basic_frame")));
+        insert(helper, auto, new ItemStack(item("nihonium_frame")));
         insert(helper, auto, new ItemStack(item("quantum_computing_module"), 2));
         insert(helper, auto, new ItemStack(item("time_crystal_module"), 4));
         insert(helper, auto, new ItemStack(item("gravity_field_stabilizer"), 2));

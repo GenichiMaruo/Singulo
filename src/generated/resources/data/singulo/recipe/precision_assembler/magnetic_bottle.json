@@ -25,7 +25,7 @@
     },
     {
       "ingredient": {
-        "tag": "c:plates/steel"
+        "item": "singulo:meteoric_iron_ingot"
       },
       "count": 1
     }

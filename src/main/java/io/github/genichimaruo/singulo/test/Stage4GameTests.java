@@ -174,6 +174,22 @@ public final class Stage4GameTests {
         });
     }
 
+    /** 触媒でない物の時間加工（銅ブロック → 錆びた銅）は、電力が少しずつしか来なければ進まない（触媒の育成だけが不足でも進む）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 600)
+    public static void incubatorNeedsFullPowerForPlainItems(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.TIME_CRYSTAL_INCUBATOR).get());
+        MachineBlockEntity m = helper.getBlockEntity(pos);
+        m.energy().setEnergy(0);
+        m.items().setStackInSlot(0, new ItemStack(Items.COPPER_BLOCK));
+        helper.onEachTick(() -> m.energy().setEnergy(1));
+        helper.runAtTickTime(500, () -> {
+            helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).isEmpty(), "1 FE/t で錆びた銅ができてしまう");
+            helper.assertTrue(m.items().getStackInSlot(0).is(Items.COPPER_BLOCK), "銅ブロックが減る");
+            helper.succeed();
+        });
+    }
+
     // ------------------------------------------------------------------ 縮退熱炉
 
     /** 縮退熱炉（5×5×7）を設計図どおりに建て、外装板の1枚を搬入出ポートに替える。コントローラの位置を返す。 */

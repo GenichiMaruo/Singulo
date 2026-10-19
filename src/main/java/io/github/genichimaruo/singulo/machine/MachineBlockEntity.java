@@ -396,10 +396,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     /**
-     * 1回あたりの電力を、速さによらず一定にするか（速くなると、そのぶん毎tickの電力が増える）。
-     * 極低温冷却塔: 液体窒素に詰めた電力を極低温タービンが取り戻すので、速くして安く作れると、取り戻す電力のほうが多くなる。
+     * このレシピの1回あたりの電力を、速さによらず一定にするか（速くなると、そのぶん毎tickの電力が増える）。
+     * 極低温冷却塔の液体窒素: 詰めた電力を極低温タービンが取り戻すので、速くして安く作れると、取り戻す電力のほうが多くなる。
      */
-    protected boolean fixedEnergyPerCraft() {
+    protected boolean fixedEnergyPerCraft(MachineRecipe recipe) {
         return false;
     }
 
@@ -407,10 +407,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     protected void onCrafted(Level level, MachineRecipe recipe) {}
 
     /**
-     * 電力が足りなくても、ある分だけ使って進めるか（時間結晶育成槽）。進めた場合、要求の80%を割った tick は
+     * このレシピは、電力が足りなくても、ある分だけ使って進めるか（時間結晶育成槽の触媒）。進めた場合、要求の80%を割った tick は
      * 「不純」として数え、完成品の adjustResult に純度（不純でなかった割合）を渡す。
      */
-    protected boolean runsUnderpowered() {
+    protected boolean runsUnderpowered(MachineRecipe recipe) {
         return false;
     }
 
@@ -462,7 +462,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 } else if (steps == 0) {
                     active = true;
                     status = Status.RUNNING;
-                } else if (energy.consume(usage * steps) || runsUnderpowered() && drawPartial()) {
+                } else if (energy.consume(usage * steps) || runsUnderpowered(recipe) && drawPartial()) {
                     timeCarry -= steps;
                     active = true;
                     status = Status.RUNNING;
@@ -596,7 +596,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 speed *= 3;
             }
             maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
-            if (fixedEnergyPerCraft()) {
+            if (fixedEnergyPerCraft(found.value())) {
                 // 1回あたりの電力（レシピの電力 × 時間）を、速さ・単極子・オーバークロックによらず保つ
                 usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
                         * found.value().time() / (double) maxProgress);

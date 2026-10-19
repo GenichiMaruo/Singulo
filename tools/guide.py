@@ -158,7 +158,7 @@ CHAPTERS = [
          'この段階でやること:\n'
          '1. 精密組立台を作る。段階3から先の部品と装置は、ほとんどここで作る。\n'
          '2. 粒子加速器でミュオン束を作り、触媒反応器でミュオン触媒（ティア2）を作る。\n'
-         '3. ミュオン触媒核融合炉（4 kFE/t）を作り、ミュオン触媒と水で電力を増やす。触媒1個で10分動く。\n'
+         '3. ミュオン触媒核融合炉（4 kFE/t）を作り、ミュオン触媒と水で電力を増やす。新品の触媒1個で10分動く（使いかけは残りの分だけ）。\n'
          '4. 冷却塔を高さ10以上にし、圧縮機で深層岩を砕いて出るヘリウムを液化する。\n'
          '5. 地表観測拠点の保管庫で探索コンパスを調整し、研究棟を探す。量子データ片と冷却原子トラップを集める（奥の残響の番人を倒すと保管庫が開く）。\n'
          '6. 量子演算モジュールと液体ヘリウムがそろえば段階3。\n'
@@ -171,7 +171,7 @@ CHAPTERS = [
          'What to do:\n'
          '1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n'
          '2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n'
-         '3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. Each catalyst lasts 10 minutes.\n'
+         '3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one only its remaining life).\n'
          '4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the C'
          'ompressor.\n'
          "5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect"
@@ -224,7 +224,7 @@ CHAPTERS = [
          'bismuth (any ring size).'),
         ('others', 'そのほかの段階2の装置',
          '・精密組立台: 段階3以降の部品と装置はほぼすべてここで作ります。\n'
-         '・ミュオン触媒核融合炉: ミュオン触媒と水で発電（4 kFE/t）。触媒1個で10分動き、失活した触媒が出る（触媒反応器でミュオン束に戻せる）。'
+         '・ミュオン触媒核融合炉: ミュオン触媒と水で発電（4 kFE/t）。新品の触媒1個で10分（使いかけは残りの分だけ）動き、失活した触媒が出る（触媒反応器でミュオン束に戻せる）。'
          '水はバケツで右クリックしても入る。\n'
          '・極低温タービン: 液体窒素に詰めた電力を取り戻す（溶岩の横で9割、最大4.5 kFE/t）。電力を貯めて運ぶための装置で、電力は増えない。'
          '冷媒カートリッジを入口に入れると、液体窒素を空けて空のカートリッジを出す。\n'
@@ -233,7 +233,7 @@ CHAPTERS = [
          '・単極子アップグレード: 磁気単極子から作り、装置の単極子スロットに挿すと速度×2・電力効率+50%。',
          'Other stage 2 devices',
          '- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: '
-         'generates power from muon catalysts and water (4 kFE/t). Each catalyst lasts 10 minutes and comes out spent (the Catalytic '
+         'generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one only its remaining life) and comes out spent (the Catalytic '
          'Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power '
          'stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant '
          'cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of '

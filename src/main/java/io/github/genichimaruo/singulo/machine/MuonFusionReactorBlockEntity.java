@@ -33,7 +33,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * ミュオン触媒核融合炉（第2段階の発電機）。水から取り出した重水素を、ミュオン（電子の約200倍重い粒子）が原子核どうしを
  * 近づけることで常温のまま融合させる。ミュオンはいつか原子核にくっついて働かなくなるので、ミュオン触媒は使ううちに失活する。
  * <ul>
- * <li>ミュオン触媒1個で {@link #CATALYST_TICKS} tick（10分）動き、失活したミュオン触媒が出口に出る（触媒反応器でミュオン束に戻せる）。</li>
+ * <li>ミュオン触媒の使用回数を毎tick {@link #USES_PER_TICK} 回ずつ使う（新品なら寿命20分の半分の10分。使いかけは残りの分だけ。
+ *     触媒の寿命の設定にも連動する）。使い切ると、失活したミュオン触媒が出口に出る（触媒反応器でミュオン束に戻せる）。</li>
  * <li>水を {@link #WATER_INTERVAL} tick ごとに 1 mB 使う（タンク1杯で約27分。バケツで右クリックしても、パイプでも入る）。</li>
  * <li>出力は fusionReactorOutput（既定 4 kFE/t）。蓄電がほぼいっぱいの間は待機して、触媒も水も減らさない。</li>
  * </ul>
@@ -41,7 +42,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  */
 public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuProvider, AbstractMachineBlock.MenuOpener,
         AbstractMachineBlock.BreakListener, GeneratorSlotsMenu.Owner {
-    public static final int CATALYST_TICKS = 20 * 60 * 10;
+    /** 触媒の使用回数を1 tickに使う回数（核融合炉は触媒を2倍の速さで消耗する）。 */
+    public static final int USES_PER_TICK = 2;
     /** 水を 1 mB 使う間隔（tick）。 */
     public static final int WATER_INTERVAL = 4;
     static final int PUSH_PER_TICK = 20_000;
@@ -97,8 +99,9 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
             return slot == 0 && items.isItemValid(0, stack);
         }
     };
-    /** 炉の中で働いている触媒の残り（tick。0 なら入っていない）。 */
+    /** 炉の中で働いている触媒の残り（tick。0 なら入っていない）と、入れたときの長さ（残りの割合の表示用）。 */
     private int burn;
+    private int burnTotal;
     private double rate;
     private boolean standby;
 
@@ -138,6 +141,13 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
     /** テスト用: 働いている触媒の残りを決め打ちにする。 */
     public void setBurnForTest(int ticks) {
         burn = ticks;
+        burnTotal = Math.max(burnTotal, ticks);
+    }
+
+    /** 触媒1個が炉の中で燃える長さ（tick）。残りの使用回数を {@link #USES_PER_TICK} で割った分（端数は切り上げ）。 */
+    public static int burnTicks(ItemStack catalyst) {
+        int remaining = io.github.genichimaruo.singulo.item.UsesHelper.remaining(catalyst);
+        return Math.max(1, (remaining + USES_PER_TICK - 1) / USES_PER_TICK);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MuonFusionReactorBlockEntity be) {
@@ -152,9 +162,10 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
         }
         if (!standby && burn <= 0 && items.getStackInSlot(0).is(catalyst()) && tank.getFluidAmount() >= 1
                 && items.insertItem(1, new ItemStack(spent()), true).isEmpty()) {
-            // 新しい触媒を炉へ入れる（失活したら出口へ出すので、出口が空いているときだけ）
-            items.extractItem(0, 1, false);
-            burn = CATALYST_TICKS;
+            // 新しい触媒を炉へ入れる（失活したら出口へ出すので、出口が空いているときだけ）。残りの使用回数の分だけ燃える
+            ItemStack fuel = items.extractItem(0, 1, false);
+            burn = burnTicks(fuel);
+            burnTotal = burn;
         }
         if (!standby && burn > 0 && tank.getFluidAmount() >= 1) {
             if (burn % WATER_INTERVAL == 0) {
@@ -192,7 +203,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
             case GeneratorSlotsMenu.D_CAPACITY -> energy.getMaxEnergyStored();
             case GeneratorSlotsMenu.D_FLUID -> tank.getFluidAmount();
             case GeneratorSlotsMenu.D_FLUID_CAP -> tank.getCapacity();
-            case GeneratorSlotsMenu.D_EXTRA -> burn > 0 ? (int) Math.ceil(1000.0 * burn / CATALYST_TICKS) : -1;
+            case GeneratorSlotsMenu.D_EXTRA -> burn > 0 ? (int) Math.ceil(1000.0 * burn / Math.max(1, burnTotal)) : -1;
             case GeneratorSlotsMenu.D_STANDBY -> standby ? 1 : 0;
             default -> 0;
         });
@@ -230,6 +241,7 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
         tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
         tag.put("items", items.serializeNBT(registries));
         tag.putInt("burn", burn);
+        tag.putInt("burn_total", burnTotal);
     }
 
     @Override
@@ -241,5 +253,6 @@ public class MuonFusionReactorBlockEntity extends BlockEntity implements MenuPro
             items.deserializeNBT(registries, tag.getCompound("items"));
         }
         burn = tag.getInt("burn");
+        burnTotal = tag.contains("burn_total") ? tag.getInt("burn_total") : Math.max(burn, 12_000);
     }
 }

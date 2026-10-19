@@ -25,9 +25,9 @@
     },
     {
       "ingredient": {
-        "tag": "c:plates/steel"
+        "item": "singulo:nihonium_plate"
       },
-      "count": 4
+      "count": 2
     }
   ],
   "result": {

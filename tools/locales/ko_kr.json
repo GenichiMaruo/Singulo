@@ -2280,8 +2280,8 @@
     "translation": "수명이 있는 티어 2 촉매. 다 쓰면 소모된 촉매가 남습니다."
   },
   "desc.singulo.muon_fusion_reactor": {
-    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Each catalyst lasts 10 minutes and comes out spent.",
-    "translation": "뮤온 촉매와 물(중수소)로 발전하는 2단계 발전기입니다(4 kFE/t). 촉매 1개로 10분 동안 움직이고, 소모된 뮤온 촉매가 나옵니다."
+    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one only its remaining life, then comes out spent.",
+    "translation": "뮤온 촉매와 물(중수소)로 발전하는 2단계 발전기입니다(4 kFE/t). 촉매는 2배 빨리 닳아, 새 촉매 1개로 10분(쓰던 것은 남은 수명만큼) 움직이고, 소모된 뮤온 촉매가 나옵니다."
   },
   "desc.singulo.neutrino_observatory": {
     "source": "Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.",
@@ -6416,16 +6416,16 @@
     "translation": "입자 가속기 및 뮤온 촉매"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. Each catalyst lasts 10 minutes.\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "이 단계에서 할 일:\n1. 정밀 조립기를 만듭니다. 3단계부터의 부품과 장치는 거의 모두 여기서 만듭니다.\n2. 입자 가속기로 뮤온 다발을, 촉매 반응기로 뮤온 촉매(2티어)를 만듭니다.\n3. 뮤온 촉매 핵융합로(4 kFE/t)를 만들고, 뮤온 촉매와 물로 전력을 늘립니다. 촉매 1개로 10분 동안 움직입니다.\n4. 냉각탑을 높이 10 이상으로 하고, 압축기로 심층암을 부숴 나온 헬륨을 액화합니다.\n5. 지표 관측소의 보관고에서 탐험가의 나침반을 조정해 연구동을 찾습니다. 양자 데이터 조각과 냉원자 트랩을 모읍니다(안쪽의 메아리 파수꾼를 쓰러뜨리면 보관고가 열립니다).\n6. 양자 연산 모듈과 액체 헬륨이 갖춰지면 3단계입니다.\n지금 해 두면 좋은 것: 안드로이드 조립 스테이션으로 호위를 만들 수 있습니다(안드로이드 장). 운석 크레이터(운철·별가루)와 빙산(푸른 얼음)도 찾아 둡니다.\n막히기 쉬운 곳:\n・액체 헬륨이 안 생김: 냉각탑 높이가 10 미만이면 만들 수 없습니다.\n・냉각탑이 느림: 액체 질소는 1 mB에 250 FE가 듭니다. 핵융합로가 생길 때까지는 열전 발전기를 늘립니다(전력이 모자라도 멈추지 않고 느려질 뿐입니다).\n・촉매를 못 쓰거나 금방 닳음: 장치보다 한 티어 아래는 느리고 빨리 닳으며, 두 티어 아래는 쓸 수 없습니다."
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one only its remaining life).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "이 단계에서 할 일:\n1. 정밀 조립기를 만듭니다. 3단계부터의 부품과 장치는 거의 모두 여기서 만듭니다.\n2. 입자 가속기로 뮤온 다발을, 촉매 반응기로 뮤온 촉매(2티어)를 만듭니다.\n3. 뮤온 촉매 핵융합로(4 kFE/t)를 만들고, 뮤온 촉매와 물로 전력을 늘립니다. 새 촉매 1개로 10분(쓰던 것은 남은 수명만큼) 움직입니다.\n4. 냉각탑을 높이 10 이상으로 하고, 압축기로 심층암을 부숴 나온 헬륨을 액화합니다.\n5. 지표 관측소의 보관고에서 탐험가의 나침반을 조정해 연구동을 찾습니다. 양자 데이터 조각과 냉원자 트랩을 모읍니다(안쪽의 메아리 파수꾼를 쓰러뜨리면 보관고가 열립니다).\n6. 양자 연산 모듈과 액체 헬륨이 갖춰지면 3단계입니다.\n지금 해 두면 좋은 것: 안드로이드 조립 스테이션으로 호위를 만들 수 있습니다(안드로이드 장). 운석 크레이터(운철·별가루)와 빙산(푸른 얼음)도 찾아 둡니다.\n막히기 쉬운 곳:\n・액체 헬륨이 안 생김: 냉각탑 높이가 10 미만이면 만들 수 없습니다.\n・냉각탑이 느림: 액체 질소는 1 mB에 250 FE가 듭니다. 핵융합로가 생길 때까지는 열전 발전기를 늘립니다(전력이 모자라도 멈추지 않고 느려질 뿐입니다).\n・촉매를 못 쓰거나 금방 닳음: 장치보다 한 티어 아래는 느리고 빨리 닳으며, 두 티어 아래는 쓸 수 없습니다."
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
     "translation": "2단계의 흐름"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). Each catalyst lasts 10 minutes and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
-    "translation": "- 정밀 조립기: 3단계 이후의 부품과 장치는 거의 모두 여기서 만듭니다.\n- 뮤온 촉매 핵융합로: 뮤온 촉매와 물로 발전합니다(4 kFE/t). 촉매 1개로 10분 동안 움직이고, 소모된 촉매가 나옵니다(촉매 반응기에서 뮤온 다발로 되돌릴 수 있습니다). 물은 양동이로 우클릭해도 들어갑니다.\n- 극저온 터빈: 액체 질소에 저장된 전력을 되찾습니다(용암 옆에서 90%, 최대 4.5 kFE/t). 전력을 저장하고 옮기기 위한 장치이며, 전력이 늘어나지는 않습니다. 냉매 카트리지를 입구에 넣으면 액체 질소를 비우고 빈 카트리지를 내보냅니다.\n- SMES 셀: 많은 전력을 저장합니다.\n- 세계선 앵커 (소형): 촉매를 넣으면 주변 청크를 계속 로드합니다.\n- 홀극 업그레이드: 자기 홀극으로 만들며, 장치의 홀극 슬롯에 넣으면 속도 ×2, 전력 효율 +50%."
+    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one only its remaining life) and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
+    "translation": "- 정밀 조립기: 3단계 이후의 부품과 장치는 거의 모두 여기서 만듭니다.\n- 뮤온 촉매 핵융합로: 뮤온 촉매와 물로 발전합니다(4 kFE/t). 촉매는 2배 빨리 닳아, 새 촉매 1개로 10분(쓰던 것은 남은 수명만큼) 움직이고, 소모된 촉매가 나옵니다(촉매 반응기에서 뮤온 다발로 되돌릴 수 있습니다). 물은 양동이로 우클릭해도 들어갑니다.\n- 극저온 터빈: 액체 질소에 저장된 전력을 되찾습니다(용암 옆에서 90%, 최대 4.5 kFE/t). 전력을 저장하고 옮기기 위한 장치이며, 전력이 늘어나지는 않습니다. 냉매 카트리지를 입구에 넣으면 액체 질소를 비우고 빈 카트리지를 내보냅니다.\n- SMES 셀: 많은 전력을 저장합니다.\n- 세계선 앵커 (소형): 촉매를 넣으면 주변 청크를 계속 로드합니다.\n- 홀극 업그레이드: 자기 홀극으로 만들며, 장치의 홀극 슬롯에 넣으면 속도 ×2, 전력 효율 +50%."
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",
@@ -10356,8 +10356,8 @@
     "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 39개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 32 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 32개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 23 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 23개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -10660,8 +10660,8 @@
     "translation": "사용 제품: 홀극 업그레이드"
   },
   "uses.singulo.meteoric_iron_ingot": {
-    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, Magnetic Confinement Ring, Magnetic Key",
-    "translation": "사용 대상: 집속 자석, 중력파 검출기, 자기 가둠 고리, 자기 잠금 열쇠"
+    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 2 more",
+    "translation": "사용 대상: 집속 자석, 중력파 검출기, 카시미르 공동 자기 차폐, 자기 병, 자이로 구동 장치 외 2개"
   },
   "uses.singulo.micro_black_hole": {
     "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
@@ -10688,16 +10688,16 @@
     "translation": "사용 대상: 니호늄 주괴"
   },
   "uses.singulo.nihonium_frame": {
-    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 1 more",
-    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 축퇴 열로 제어기, 자동 탐사기 기지 외 1개"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 10 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 축퇴 열로 제어기, 자동 탐사기 기지 외 10개"
   },
   "uses.singulo.nihonium_ingot": {
     "source": "Used in: Nihonium Plate",
     "translation": "사용 대상: 니호늄 판"
   },
   "uses.singulo.nihonium_plate": {
-    "source": "Used in: Nihonium Frame",
-    "translation": "사용 대상: 니호늄 프레임"
+    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame",
+    "translation": "사용 대상: 지평선 버스, 자이로 구동 장치, 호킹 수집기, 제트 콜렉터, 니호늄 프레임"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
@@ -10800,8 +10800,8 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 78 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 78개"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 73 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 검은 강화 유리, 냉각탑 베이스, 냉각탑 케이싱 외 73개"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",

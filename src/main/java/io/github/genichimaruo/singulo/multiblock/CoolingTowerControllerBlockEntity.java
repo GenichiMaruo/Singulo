@@ -54,10 +54,14 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
         return height / 5.0;
     }
 
-    /** 高い塔は速いが、そのぶん毎tickの電力も増える（液体窒素1 mBあたりの電力は、塔の高さによらず同じ）。 */
+    /**
+     * 材料なしで作る液体窒素だけは、高い塔でも1 mBあたりの電力が同じ（そのぶん毎tickの電力が増える）。
+     * 液体窒素は極低温タービンで電力に戻せるので、高い塔で安く作れると電力が増えてしまう。
+     * コイルや液体ヘリウムなどほかの加工は、これまでどおり高い塔ほど少ない電力で済む。
+     */
     @Override
-    protected boolean fixedEnergyPerCraft() {
-        return true;
+    protected boolean fixedEnergyPerCraft(io.github.genichimaruo.singulo.recipe.MachineRecipe recipe) {
+        return isFree(recipe);
     }
 
     @Override

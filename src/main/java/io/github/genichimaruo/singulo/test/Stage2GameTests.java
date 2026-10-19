@@ -418,6 +418,40 @@ public final class Stage2GameTests {
         });
     }
 
+    /** 核融合炉は触媒の使用回数を毎tick2回使う: 新品は10分、半分使った触媒は5分だけ燃える。 */
+    @GameTest(template = EMPTY)
+    public static void muonFusionReactorBurnsOnlyRemainingCatalystLife(GameTestHelper helper) {
+        ItemStack fresh = new ItemStack(item("muon_catalyst"));
+        int max = io.github.genichimaruo.singulo.item.UsesHelper.get(fresh).max();
+        helper.assertTrue(io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity.burnTicks(fresh) == max / 2,
+                "新品の触媒が寿命の半分の時間だけ燃えない: " + max);
+        ItemStack half = io.github.genichimaruo.singulo.item.UsesHelper.consume(fresh, max / 2);
+        int burn = io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity.burnTicks(half);
+        helper.assertTrue(burn == max / 4, "半分使った触媒が、残りの分だけ燃えない: " + burn);
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.MUON_FUSION_REACTOR.get());
+        io.github.genichimaruo.singulo.machine.MuonFusionReactorBlockEntity reactor = helper.getBlockEntity(pos);
+        reactor.tank().fill(new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        reactor.items().setStackInSlot(0, half);
+        helper.runAtTickTime(2, () -> {
+            helper.assertTrue(reactor.burn() > 0 && reactor.burn() <= max / 4, "炉に入れた使いかけの触媒が新品の長さで燃える: " + reactor.burn());
+            helper.succeed();
+        });
+    }
+
+    /** 冷却塔の液体窒素以外の加工（超伝導線材）は、高い塔でも毎tickの電力がレシピどおり（速いぶん1回あたりは安い）。 */
+    @GameTest(template = TALL, timeoutTicks = 200)
+    public static void coolingTowerOtherRecipesStayCheaperWhenTall(GameTestHelper helper) {
+        MachineBlockEntity tower = buildTower(helper, 10);
+        tower.items().setStackInSlot(0, new ItemStack(item("superconducting_coil")));
+        helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
+        helper.succeedWhen(() -> {
+            int usage = tower.syncData().getInt(MachineBlockEntity.D_USAGE);
+            helper.assertTrue(usage > 0, "線材の加工が始まらない");
+            helper.assertTrue(usage <= 210, "高さ10の塔で、線材の毎tickの電力がレシピ（200 FE/t）より増える: " + usage);
+        });
+    }
+
     @GameTest(template = EMPTY)
     public static void smesFeedsKilnThroughSuperconductingCable(GameTestHelper helper) {
         BlockPos smesPos = new BlockPos(1, 1, 4);

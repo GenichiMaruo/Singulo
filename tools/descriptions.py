@@ -171,8 +171,8 @@ DESC = {
     '極低温タービン': ('液体窒素に詰めた電力を、隣の高温源での気化で取り戻す（溶岩の横で9割まで）。電力を貯めて運ぶための装置で、電力は増えない。',
                'Recovers the power stored in liquid nitrogen by boiling it against a heat source next to it (up to 90% next to lava). '
                'It stores and moves power; it does not create any.'),
-    'ミュオン触媒核融合炉': ('ミュオン触媒と水（重水素）で発電する、段階2の発電機（4 kFE/t）。触媒1個で10分動き、失活したミュオン触媒が出る。',
-                  'A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Each catalyst lasts 10 minutes and comes out spent.'),
+    'ミュオン触媒核融合炉': ('ミュオン触媒と水（重水素）で発電する、段階2の発電機（4 kFE/t）。触媒は2倍の速さで減り、新品1個で10分（使いかけは残りの分だけ）動いて、失活したミュオン触媒が出る。',
+                  'A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one only its remaining life, then comes out spent.'),
     '宇宙線ミュオン収集器': ('空が見える高い場所で、電力なしでミュオンを集める。',
                      'Collects cosmic-ray muons for free high up under open sky.'),
     'SMESセル': ('超伝導の磁気エネルギー貯蔵。大量の電力をためる。右クリックで画面を開く。', 'Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its '
