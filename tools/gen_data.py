@@ -1123,8 +1123,9 @@ UI_LANG = {
     'gui.singulo.android.work.off': ('作業：オフ', 'Work: off'),
     'gui.singulo.generator_slots.turbine.in': ('冷媒カートリッジを入れると、液体窒素をタンクに空けて、空のカートリッジを下に出す',
                                                'Insert coolant cartridges: the liquid nitrogen goes into the tank and the empty cartridges come out below'),
-    'gui.singulo.generator_slots.fusion.in': ('ミュオン触媒を入れる。1個で10分動き、失活した触媒を下に出す',
-                                              'Insert muon catalysts. Each one runs the reactor for 10 minutes, then comes out spent below'),
+    'gui.singulo.generator_slots.fusion.in': ('ミュオン触媒を入れる。既定設定では新品で10分、使いかけは残寿命の半分だけ動き、失活した触媒を下に出す',
+                                              'Insert muon catalysts. At default settings, a fresh one lasts 10 minutes; a used one burns for half its '
+                                              'remaining lifetime. Spent catalysts come out below.'),
     'gui.singulo.generator_slots.no_heat': ('高温源がない（溶岩・マグマブロックなどを隣に）', 'No heat source (put lava or a magma block next to it)'),
     'gui.singulo.generator_slots.efficiency': ('取り戻せる電力: %s%%', 'Recovers: %s%%'),
     'gui.singulo.generator_slots.nitrogen': ('液体窒素 %s / %s mB', 'Liquid nitrogen %s / %s mB'),

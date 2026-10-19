@@ -22,10 +22,10 @@ DESC = {
               'so it does not decay. Two make an ingot.'),
     'ニホニウムインゴット': ('ニホニウムを焼成炉で溶かし固めた、重い金属の地金。圧縮機で板にする。',
                    'A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.'),
-    'ニホニウム板': ('ニホニウムインゴットを押し延ばした板。ニホニウム筐体の材料。',
-               'Pressed nihonium. Used to make nihonium frames.'),
-    'ニホニウム筐体': ('ニホニウム板で基礎フレームを包んだ筐体。段階4の装置は、これを土台に組む。',
-                'A basic frame clad in nihonium plates. Stage 4 machines are built on it.'),
+    'ニホニウム板': ('ニホニウムインゴットを押し延ばした板。ニホニウム筐体や終盤の耐圧・遮蔽部品に使う。',
+               'Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.'),
+    'ニホニウム筐体': ('ニホニウム板で基礎フレームを包んだ筐体。段階4〜5の高度な装置の土台になる。',
+                'A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.'),
     '未焼成の蛍光体': ('亜鉛の粉と火薬（硫黄）と銅を混ぜた粉。焼成炉で焼くと、蓄光体のグロウストーンダストが4個できる。',
                   'Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.'),
     '水素燃料電池': ('水素と酸素から電力を作る段階1の発電機。電解槽で水素に詰めた電力の6割を取り戻す蓄電で、水素1 mBで4.8 FE、最大240 FE/t。'
@@ -138,11 +138,13 @@ DESC = {
                  '水素（電解槽→粒子加速器）やヘリウム（圧縮機→冷却塔）、液体ヘリウムを、液体のパイプがなくても運べる。',
                  'Holds up to 1,000 mB of any liquid or gas. Right-click a machine to fill it from the output tank or pour it into the input tank. '
                  'Carries hydrogen (Electrolyzer to Particle Accelerator), helium (Compressor to Cooling Tower) and liquid helium without pipes.'),
-    '冷媒カートリッジ': ('液体窒素100 mBを詰めた容器。装置を右クリックすると注いで、空の冷媒カートリッジが戻る（パイプがなくても液体窒素を運べる）。'
-                 '極低温タービンは入口に入れてもよい。精密組立台では、量子演算モジュールなど極低温の部品の材料にそのまま使う。',
-                 'A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are '
-                 'needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as '
-                 'quantum computing modules.'),
+    '冷媒カートリッジ': ('液体窒素100 '
+                                 'mBを詰めた容器。装置を右クリックすると注いで、空の冷媒カートリッジが戻る（パイプがなくても液体窒素を運べる）。極低温タービンは入口に入れてもよい。精密組立台では、量子演算モジュールなど極低温の部品の材料にそのまま使う。'
+                                 ' 精密組立では容器ごと消費され、空容器は戻らない。',
+                 'A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge '
+                 'back, so no pipes are needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler '
+                 'uses it as is for cryogenic parts such as quantum computing modules. Assembly consumes the cartridge, '
+                 'including its container; no empty cartridge is returned.'),
     '空の冷媒カートリッジ': ('液体窒素を100 mB詰められる鋼の容器。極低温冷却塔のコントローラを右クリックするか、冷却塔で加工すると、満タンの冷媒カートリッジになる。',
                    'A steel canister that holds 100 mB of liquid nitrogen. Right-click the cooling tower controller, or process it in the tower, '
                    'to fill it.'),
@@ -183,8 +185,8 @@ DESC = {
     '極低温タービン': ('液体窒素に詰めた電力を、隣の高温源での気化で取り戻す（溶岩の横で9割まで）。電力を貯めて運ぶための装置で、電力は増えない。',
                'Recovers the power stored in liquid nitrogen by boiling it against a heat source next to it (up to 90% next to lava). '
                'It stores and moves power; it does not create any.'),
-    'ミュオン触媒核融合炉': ('ミュオン触媒と水（重水素）で発電する、段階2の発電機（4 kFE/t）。触媒は2倍の速さで減り、新品1個で10分（使いかけは残りの分だけ）動いて、失活したミュオン触媒が出る。',
-                  'A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one only its remaining life, then comes out spent.'),
+    'ミュオン触媒核融合炉': ('ミュオン触媒と水（重水素）で発電する、段階2の発電機（4 kFE/t）。触媒は2倍の速さで減り、新品1個で10分（使いかけは残寿命の半分）動いて、失活したミュオン触媒が出る。',
+                  'A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one for half its remaining lifetime, then comes out spent.'),
     '宇宙線ミュオン収集器': ('空が見える高い場所で、電力なしでミュオンを集める。',
                      'Collects cosmic-ray muons for free high up under open sky.'),
     'SMESセル': ('超伝導の磁気エネルギー貯蔵。大量の電力をためる。右クリックで画面を開く。', 'Superconducting magnetic energy storage that holds a large amount of power. Right-click to open its '

@@ -5,7 +5,7 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 ### Stage 2 power rework
 - New generator: the **Muon-Catalyzed Fusion Reactor** (stage 2, made in the Precision Assembler).
   - Runs on muon catalysts and water (deuterium) and produces 4 kFE/t.
-  - It wears catalysts twice as fast as other machines: a fresh catalyst lasts 10 minutes, and a partly used one burns only for its remaining life.
+  - It wears catalysts twice as fast as other machines: a fresh catalyst lasts 10 minutes, and a partly used one burns for half its remaining catalyst lifetime.
   - Used-up catalysts come out as spent muon catalysts, which the Catalytic Reactor can turn back into muon bundles.
   - It uses 1 mB of water every 4 ticks. Water can be poured in with a bucket.
   - It stands by while its storage is full.
@@ -14,7 +14,7 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
   - Liquid nitrogen now holds the power used to make it: 250 FE per mB. The turbine recovers up to 90% of that next to lava, and less with cooler heat sources.
   - Output is up to 4.5 kFE/t. The tank holds 32,000 mB.
 - **Liquid nitrogen** now costs 250 FE per mB in the cooling tower. A taller tower still works faster, but it draws proportionally more power per tick, so the cost per mB is the same at any height.
-- Recipes that use liquid nitrogen now need about a fifth as much, so crafting costs roughly the same power as before.
+- Several existing liquid-nitrogen recipes now need a fifth as much nitrogen to offset its higher production cost. Coolant cartridges still hold 100 mB; their filling cost and container cost have increased. Precision Assembler recipes consume the cartridge container too.
 - Only liquid nitrogen has a fixed power cost per mB. Other cooling tower recipes (coils, wire, liquid helium and more) still get cheaper on a taller tower.
 - The `shellCoolantMb` setting is renamed to `shellNitrogenMb` (default 1200 mB) so old configs do not keep the old amount.
 

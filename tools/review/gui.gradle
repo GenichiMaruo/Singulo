@@ -4,6 +4,7 @@ allprojects {
         sourceSets.main.java.srcDir(file('tools/review/gui-src'))
         neoForge.runs.client {
             gameDirectory = file('build/gui-review')
+            systemProperty 'singulo.machineGuiReview', providers.gradleProperty('machineGuiReview').isPresent().toString()
             systemProperty 'singulo.guiReviewOutput', file('build/gui-review/screenshots').absolutePath
             programArgument '--quickPlaySingleplayer'
             programArgument 'Review'

@@ -135,18 +135,19 @@ CHAPTERS = [
          '・焚き火＋青氷: 約56 FE/t\n'
          '・焚き火＋氷塊: 約55 FE/t\n'
          '溶岩は熱すぎて、青氷でも約40秒で氷塊に変わり、さらに溶けていきます。焚き火に水・雪・氷を合わせると、1分足らずで溶けます。\n'
-         '段階2の極低温冷却塔（液体窒素で240 FE/t）を動かすには、マグマブロック＋青氷で4台以上、焚き火＋氷塊なら5台以上が目安です'
-         '（銅導線の損失は含めていません）。いきなり全部そろえず、2〜4台で装置を1つずつ交互に動かし、増やしていけば十分です。',
+         '段階2の液体窒素は100 mBに約25,000 FE。高さ7の塔では稼働中に約1,786 '
+         'FE/tを使います。給電不足なら進捗を保って待つので、初期は2〜4台で装置を交互に動かし、発電機と蓄電を増やして核融合炉を目指せます。定速運転を最初から満たす必要はありません。',
          'Pairs that last',
          'Pairs whose cold block never melts (output of one generator):\n'
          '- Magma block + blue ice: about 76 FE/t (best)\n'
          '- Running kiln + blue ice: about 66 FE/t\n'
          '- Campfire + blue ice: about 56 FE/t\n'
          '- Campfire + packed ice: about 55 FE/t\n'
-         'Lava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them '
-         'in under a minute.\n'
-         'To run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with '
-         'campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.'),
+         'Lava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, '
+         'snow or ice melt them in under a minute.\n'
+         'Stage 2 liquid nitrogen costs about 25,000 FE per 100 mB. A height-7 tower draws about 1,786 FE/t while '
+         'working. It retains progress while waiting for enough power. Start with 2–4 generators and one machine at a '
+         'time, add generation and storage, then build a fusion reactor; full-speed power is not a prerequisite.'),
         ('machines', '段階1の装置',
          '・焼成炉: セラミック基板などを焼く。鋼鉄も速く焼ける。酸素を入れると、鉄2と石炭1から鋼鉄2を作る純酸素転炉になる。\n'
          '・圧縮機: 鋼板を作る。質量モードでは質量値のある素材を「質量」に変えて圧縮ブロックや質量ペレットにする。\n'
@@ -168,7 +169,7 @@ CHAPTERS = [
          'この段階でやること:\n'
          '1. 精密組立台を作る。段階3から先の部品と装置は、ほとんどここで作る。\n'
          '2. 粒子加速器でミュオン束を作り、触媒反応器でミュオン触媒（ティア2）を作る。\n'
-         '3. ミュオン触媒核融合炉（4 kFE/t）を作り、ミュオン触媒と水で電力を増やす。新品の触媒1個で10分動く（使いかけは残りの分だけ）。\n'
+         '3. ミュオン触媒核融合炉（4 kFE/t）を作り、ミュオン触媒と水で電力を増やす。新品の触媒1個で10分動く（使いかけは残寿命の半分）。\n'
          '4. 冷却塔を高さ10以上にし、圧縮機で深層岩を砕いて出るヘリウムを液化する。\n'
          '5. 地表観測拠点の保管庫で探索コンパスを調整し、研究棟を探す。量子データ片と冷却原子トラップを集める（奥の残響の番人を倒すと保管庫が開く）。\n'
          '6. 量子演算モジュールと液体ヘリウムがそろえば段階3。\n'
@@ -181,7 +182,7 @@ CHAPTERS = [
          'What to do:\n'
          '1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n'
          '2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n'
-         '3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one only its remaining life).\n'
+         '3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n'
          '4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the C'
          'ompressor.\n'
          "5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect"
@@ -219,7 +220,7 @@ CHAPTERS = [
          '触媒反応器でミュオン束からミュオン触媒（ティア2）を作ります。宇宙線ミュオン収集器を高所に置けば、電力なしでもミュオン束が少しずつ集まります。\n'
          '一辺16以上のリングなら、入力に亜鉛とビスマスのインゴットを入れると、原子核が融合して新元素ニホニウムができます。'
          '亜鉛は凝灰岩を圧縮機で砕いて、ビスマスは触媒反応器で粗銅を精錬した副産物として手に入ります。'
-         'ニホニウム2個でインゴット、インゴットを圧縮機で板にし、精密組立台でニホニウム筐体を作ります。段階4の装置の土台です。'
+         'ニホニウム2個でインゴット、インゴットを圧縮機で板にし、精密組立台でニホニウム筐体を作ります。段階4〜5の装置や、終盤の耐圧・遮蔽部品に使います。'
          'ビスマスと炭素粉を入れると、ビスマスの原子核から陽子がはぎ取られて金になります（リングの大きさは問わない）。',
          'Particle Accelerator and muon catalyst',
          'Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller '
@@ -230,11 +231,11 @@ CHAPTERS = [
          'With a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. '
          'Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. '
          'Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. '
-         'Stage 4 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the '
+         'Advanced stage 4 and 5 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the '
          'bismuth (any ring size).'),
         ('others', 'そのほかの段階2の装置',
          '・精密組立台: 段階3以降の部品と装置はほぼすべてここで作ります。\n'
-         '・ミュオン触媒核融合炉: ミュオン触媒と水で発電（4 kFE/t）。新品の触媒1個で10分（使いかけは残りの分だけ）動き、失活した触媒が出る（触媒反応器でミュオン束に戻せる）。'
+         '・ミュオン触媒核融合炉: ミュオン触媒と水で発電（4 kFE/t）。新品の触媒1個で10分（使いかけは残寿命の半分）動き、失活した触媒が出る（触媒反応器でミュオン束に戻せる）。'
          '水はバケツで右クリックしても入る。\n'
          '・極低温タービン: 液体窒素に詰めた電力を取り戻す（溶岩の横で9割、最大4.5 kFE/t）。電力を貯めて運ぶための装置で、電力は増えない。'
          '冷媒カートリッジを入口に入れると、液体窒素を空けて空のカートリッジを出す。\n'
@@ -243,7 +244,7 @@ CHAPTERS = [
          '・単極子アップグレード: 磁気単極子から作り、装置の単極子スロットに挿すと速度×2・電力効率+50%。',
          'Other stage 2 devices',
          '- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: '
-         'generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one only its remaining life) and comes out spent (the Catalytic '
+         'generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime) and comes out spent (the Catalytic '
          'Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power '
          'stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant '
          'cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of '

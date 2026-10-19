@@ -36,9 +36,9 @@ Cooling tower heat exchange cores and coolant bands can use three packed ice ins
 | Stage | Your focus | What it enables |
 | --- | --- | --- |
 | 1: Startup | Steel, ceramic, circuits and thermoelectric power | Firing, compression, electrolysis, copying records and repairing components |
-| 2: Cryogenics | Cooling towers, accelerator rings and Muon Catalysts | Superconductors, cryogenic turbines, SMES storage, precision assembly and chunk loading |
+| 2: Cryogenics | Cooling towers, accelerator rings and Muon Catalysts | Muon-Catalyzed Fusion Reactors, Superconductors, cryogenic turbines, SMES storage, precision assembly and chunk loading |
 | 3: Quantum | Research Building salvage and liquid helium | Quantum components, laser cooling, BE Condensate Catalysts, exploration tools and inertial control |
-| 4: Temporal | Culture Facility salvage and time crystal growth | Degenerate Compactors, exotic matter from C-Cavities, Degenerate Furnaces and Probe Stations |
+| 4: Temporal | Nihonium frames, Culture Facility salvage and time crystal growth | Degenerate Compactors, exotic matter from C-Cavities, Degenerate Furnaces and Probe Stations |
 | 5: Singularity | Defeat the Final Lab guardian and awaken a singularity seed | Penrose reactors, Singularity Cores, shields, time acceleration, gravity tools and wormhole logistics |
 
 After stage 5, awakened rematches, a hidden boss and the final goal, the Genesis Engine, are waiting.
@@ -53,11 +53,22 @@ Ordinary processing machines have a Sides screen for face-specific input, output
 
 Catalysts are consumables placed in dedicated slots. The progression is Muon Catalyst, BE Condensate Catalyst, Time Crystal Catalyst, then Singularity Core. Matching tiers give normal operation. One tier below gives half speed and twice the wear; two or more below cannot run the machine. Higher tiers provide speed and wear bonuses. Depleted catalysts increase power requirements, and insufficient power can affect catalyst wear or product quality. The Quantum Heat Engine and Degenerate Furnace give 25% of their rated output on a catalyst one tier below. These rules apply to devices running from a catalyst slot; a catalyst listed as a recipe ingredient just uses a fixed count or amount of life and does not change processing speed.
 
-Generators (Cryogenic Turbine, Quantum Heat Engine, Degenerate Furnace) wait when their storage is nearly full and use no nitrogen, fuel or catalyst until it drops below 75%.
+Fusion reactors, Quantum Heat Engines, Degenerate Furnaces and nitrogen-storage Cryogenic Turbines stand by when their energy buffer is nearly full, consume no resources while waiting, and resume below 75%.
 
 Time crystal growth defaults to **14,400 running ticks**, or 12 minutes at 20 TPS. It does not progress in unloaded chunks. Time fields and server configuration can change the effective duration. Purity is kept at 80% of the requested power or more; time below that shortens the crystal's life. Spent catalysts have recycling recipes.
 
 Equipment such as the Core Controller, Singularity Encapsulator, Shield Tower Core and Wormhole Generator Core uses stackable **Time Crystal Modules** from the Precision Assembler. Each cuts two thirds of a fresh crystal's life (30 minutes by default) from the crystal in the catalyst slot; the rest (15 minutes by default) stays usable. Crystals with less than that left cannot be cut. Changing catalyst lifetime settings scales the amount.
+
+### Power and materials in 0.10.0
+
+- The Muon-Catalyzed Fusion Reactor is the stage 2 power source: at default settings, 4 kFE/t, 3000 mB of water and one fresh muon catalyst for 10 minutes. It wears catalysts twice as fast, so a used catalyst runs for half its remaining lifetime.
+- The Cryogenic Turbine recovers stored power from liquid nitrogen. It does not make net power. Nitrogen costs 250 FE/mB to produce; lava allows up to 90% recovery, capped at 4.5 kFE/t. A height-7 tower draws about 1786 FE/t for nitrogen and keeps progress when power runs short. Other cooling tower processes still use less total power on taller towers.
+- Fluid Canisters carry 1000 mB of liquids or gases. Coolant Cartridges carry 100 mB of nitrogen and return empty when poured into a machine. Precision Assembler recipes consume the container too.
+- Crush tuff for zinc and collect bismuth as a by-product of raw copper refining. Fuse them into nihonium in a ring of side 16 or more. Plates and frames are used in stage 4 and 5 machines and parts. Meteoric iron also goes into magnetic shields, Magnetic Bottles and Gyro Drives.
+- Limestone powder replaces bone meal, and carbon dust replaces coal. Two flint can replace quartz in Unfired Ceramic; zinc phosphor provides glowstone dust. In the Kiln, 250 mB oxygen, 2 iron and 1 coal or carbon dust make 2 steel. The Peltier Cooler freezes 1000 mB water into 1 ice.
+- The Hydrogen Fuel Cell stores and returns energy, rather than producing a surplus: it uses hydrogen and oxygen at 2:1 and returns 4.8 FE/mB of hydrogen, up to 240 FE/t, at default settings.
+- Only catalyst growth in the Time Crystal Incubator tolerates partial power, with reduced purity and lifetime. Coal, mossy cobblestone and oxidized copper need full power to progress.
+
 
 ## Building multiblocks
 

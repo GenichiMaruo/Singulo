@@ -65,7 +65,7 @@ public class GeneratorSlotsScreen extends AbstractContainerScreen<GeneratorSlots
 
     @Override
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        g.drawString(font, title, titleLabelX, titleLabelY, Panel.TEXT, false);
+        AndroidStationScreen.fit(g, font, title, titleLabelX, titleLabelY, imageWidth - titleLabelX - 8, Panel.TEXT);
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
         int x = 22, y = 18, w = GeneratorSlotsMenu.IN_X - x - 4;
         int fluid = menu.value(GeneratorSlotsMenu.D_FLUID), cap = menu.value(GeneratorSlotsMenu.D_FLUID_CAP);

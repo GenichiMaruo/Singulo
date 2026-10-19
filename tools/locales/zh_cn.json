@@ -1673,7 +1673,7 @@
   },
   "desc.singulo.bismuth_ingot": {
     "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
-    "translation": "带有彩虹色氧化膜的铋金属，在催化反应器中精炼粗铜时作为副产物得到。与锌一起在粒子加速器中碰撞即可制成鉨。"
+    "translation": "带有彩虹色氧化膜的铋金属，在催化反应器中精炼粗铜时作为副产物得到。与锌一起在粒子加速器中碰撞即可制成鿭。"
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -1800,8 +1800,8 @@
     "translation": "修复后的古代控制单元，有使用次数限制。"
   },
   "desc.singulo.coolant_cartridge": {
-    "source": "A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as quantum computing modules.",
-    "translation": "装有 100 mB 液氮的容器。右键点击装置即可倒入，并取回空冷媒罐（没有管道也能运送液氮）。也可以放进低温涡轮机的入口。精密组装台会直接把它用作量子计算模块等低温部件的材料。"
+    "source": "A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as quantum computing modules. Assembly consumes the cartridge, including its container; no empty cartridge is returned.",
+    "translation": "装有 100 mB 液氮的容器。右键点击装置即可倒入，并取回空冷媒罐，无需管道。低温涡轮机的入口也接受冷媒罐。精密组装台会将它作为低温部件的材料连同容器一起消耗，不会返还空冷媒罐。"
   },
   "desc.singulo.cooling_tower_base": {
     "source": "The 5×5 foundation of the tower.",
@@ -2308,8 +2308,8 @@
     "translation": "有使用寿命的 2 级催化剂。用完后会留下失活的催化剂。"
   },
   "desc.singulo.muon_fusion_reactor": {
-    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one only its remaining life, then comes out spent.",
-    "translation": "用缪子催化剂和水（氘）发电的第 2 阶段发电机（4 kFE/t）。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命），之后变为失活的缪子催化剂。"
+    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one for half its remaining lifetime, then comes out spent.",
+    "translation": "用缪子催化剂和水（氘）发电的第 2 阶段发电机（4 kFE/t）。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半），之后变为失活的缪子催化剂。"
   },
   "desc.singulo.neutrino_observatory": {
     "source": "Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.",
@@ -2324,16 +2324,16 @@
     "translation": "在粒子加速器中使锌和铋的原子核融合而成的第 113 号元素。这种富中子的同位体是稳定的，不会衰变。2 个可制成一个锭。"
   },
   "desc.singulo.nihonium_frame": {
-    "source": "A basic frame clad in nihonium plates. Stage 4 machines are built on it.",
-    "translation": "用鉨板包覆的基础框架。第 4 阶段的装置都以它为基础组装。"
+    "source": "A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.",
+    "translation": "用鿭板包覆的基础框架，用作第 4、5 阶段高级装置的结构基础。"
   },
   "desc.singulo.nihonium_ingot": {
     "source": "A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.",
-    "translation": "在烧制炉中熔合鉨制成的沉重锭。用压缩机压成板。"
+    "translation": "在烧制炉中熔合鿭制成的沉重锭。用压缩机压成板。"
   },
   "desc.singulo.nihonium_plate": {
-    "source": "Pressed nihonium. Used to make nihonium frames.",
-    "translation": "压制而成的鉨板。用于制作鉨框架。"
+    "source": "Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.",
+    "translation": "压制而成的鿭板，用于鿭框架及后期的耐压、屏蔽部件。"
   },
   "desc.singulo.observation_log": {
     "source": "A record from observation posts. Copy it onto data cards.",
@@ -2857,7 +2857,7 @@
   },
   "desc.singulo.zinc_ingot": {
     "source": "Zinc metal. Collide it with bismuth in the Particle Accelerator to make nihonium. Zinc ingots from other mods work too.",
-    "translation": "锌金属。与铋一起在粒子加速器中碰撞即可制成鉨。其他模组的锌锭也能同样使用。"
+    "translation": "锌金属。与铋一起在粒子加速器中碰撞即可制成鿭。其他模组的锌锭也能同样使用。"
   },
   "direction.singulo.east": {
     "source": "east",
@@ -4180,8 +4180,8 @@
     "translation": "可取回的电力：%s%%"
   },
   "gui.singulo.generator_slots.fusion.in": {
-    "source": "Insert muon catalysts. Each one runs the reactor for 10 minutes, then comes out spent below",
-    "translation": "放入缪子催化剂。每个可运转 10 分钟，失活后从下方送出"
+    "source": "Insert muon catalysts. At default settings, a fresh one lasts 10 minutes; a used one burns for half its remaining lifetime. Spent catalysts come out below.",
+    "translation": "放入缪子催化剂。默认设置下，新的可运转 10 分钟，用过的仅运转其剩余寿命的一半。失活的催化剂从下方输出。"
   },
   "gui.singulo.generator_slots.nitrogen": {
     "source": "Liquid nitrogen %s / %s mB",
@@ -6432,8 +6432,8 @@
     "translation": "最初的电源"
   },
   "guide.singulo.stage1.thermal_pairs.body": {
-    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nTo run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.",
-    "translation": "冷方块可以一直使用而不融化的组合（每台发电机的输出）：\n- 岩浆块＋蓝冰：约 76 FE/t（最推荐）\n- 运转中的烧制炉＋蓝冰：约 66 FE/t\n- 篝火＋蓝冰：约 56 FE/t\n- 篝火＋浮冰：约 55 FE/t\n熔岩太热：即使是蓝冰也会在约 40 秒内变成浮冰并继续融化。篝火搭配水、雪或冰，不到 1 分钟就会融化。\n要运行第 2 阶段的低温冷却塔（液氮 240 FE/t），岩浆块＋蓝冰大约需要 4 台以上，篝火＋浮冰则需要 5 台以上（不含铜导线损耗）。先用 2–4 台，一次运行一台机器，再逐步增加。"
+    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nStage 2 liquid nitrogen costs about 25,000 FE per 100 mB. A height-7 tower draws about 1,786 FE/t while working. It retains progress while waiting for enough power. Start with 2–4 generators and one machine at a time, add generation and storage, then build a fusion reactor; full-speed power is not a prerequisite.",
+    "translation": "冷方块可以一直使用而不融化的组合（每台发电机的输出）：\n- 岩浆块＋蓝冰：约 76 FE/t\n- 运转中的烧制炉＋蓝冰：约 66 FE/t\n- 篝火＋蓝冰：约 56 FE/t\n- 篝火＋浮冰：约 55 FE/t\n熔岩太热，即使蓝冰也会在约 40 秒内变成浮冰并继续融化；篝火搭配水、雪或冰，不到 1 分钟就会融化。\n第 2 阶段每 100 mB 液氮约需 25,000 FE。高度为 7 的冷却塔工作时约需 1,786 FE/t，电力不足时会保留进度等待。初期可先用 2–4 台发电机交替运行装置，再扩大发电和储能，逐步建造核聚变反应堆，不必一开始就满足全速供电。"
   },
   "guide.singulo.stage1.thermal_pairs.title": {
     "source": "Pairs that last",
@@ -6444,24 +6444,24 @@
     "translation": "第二阶段：低温"
   },
   "guide.singulo.stage2.accelerator.body": {
-    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Stage 4 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
-    "translation": "用加速管和聚焦磁体搭建一个方形环（边长 8–32），并让控制器贴着环放置。四个角必须是聚焦磁体，且磁体至少占环的四分之一。它用氢制造缪子束，极少数情况下会产生磁单极子。\n催化反应器用缪子束制作缪子催化剂（2 级）。把宇宙线缪子收集器放在高处，无需电力也能慢慢收集缪子束。\n环长 16 以上时，在输入槽放入锌锭和铋锭，原子核就会融合成新元素鉨。锌由压缩机粉碎凝灰岩获得，铋是催化反应器精炼粗铜时的副产物。2 个鉨制成一个锭，用压缩机压成板，再在精密组装台制作鉨框架。它是第 4 阶段装置的基础。放入铋和碳粉时，铋原子核的质子会被剥离而变成金（不限环的大小）。"
+    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Advanced stage 4 and 5 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
+    "translation": "用加速管和聚焦磁体搭建一个方形环（边长 8–32），并让控制器贴着环放置。四个角必须是聚焦磁体，且磁体至少占环的四分之一。它用氢制造缪子束，极少数情况下会产生磁单极子。\n催化反应器用缪子束制作缪子催化剂（2 级）。把宇宙线缪子收集器放在高处，无需电力也能慢慢收集缪子束。\n环长 16 以上时，在输入槽放入锌锭和铋锭，原子核就会融合成新元素鿭。锌由压缩机粉碎凝灰岩获得，铋是催化反应器精炼粗铜时的副产物。2 个鿭制成一个锭，用压缩机压成板，再在精密组装台制作鿭框架。它是第 4、5 阶段高级装置的基础。放入铋和碳粉时，铋原子核的质子会被剥离而变成金（不限环的大小）。"
   },
   "guide.singulo.stage2.accelerator.title": {
     "source": "Particle Accelerator and muon catalyst",
     "translation": "粒子加速器和缪子催化剂"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one only its remaining life).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "这一阶段要做的事：\n1. 制作精密组装台。第 3 阶段以后的部件和装置几乎都在这里制作。\n2. 用粒子加速器制作缪子束，用催化反应器制作缪子催化剂（第 2 级）。\n3. 制作缪子催化核聚变炉（4 kFE/t），用缪子催化剂和水增加电力。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命）。\n4. 把冷却塔加高到 10 以上，把压缩机粉碎深板岩得到的氦液化。\n5. 在地表观测站的保管库调整探索罗盘，寻找研究楼。收集量子数据片段和冷原子阱（打倒深处的回响守卫后保管库会打开）。\n6. 备齐量子计算模块和液氦，就进入第 3 阶段。\n趁现在：可以用仿生人组装站制作护卫（见仿生人一章）。也去找陨石坑（陨铁、星尘）和冰山（蓝冰）。\n容易卡住的地方：\n・做不出液氦：冷却塔高度不到 10 就无法制作。\n・冷却塔很慢：液氮每 1 mB 需要 250 FE。在核聚变炉建好之前，多放几台热电发电机（电力不足时不会停止，只是变慢）。\n・催化剂不能用或消耗很快：比装置低一级会变慢且消耗更快，低两级无法使用。"
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "这一阶段要做的事：\n1. 制作精密组装台。第 3 阶段以后的部件和装置几乎都在这里制作。\n2. 用粒子加速器制作缪子束，用催化反应器制作缪子催化剂（第 2 级）。\n3. 制作缪子催化核聚变炉（4 kFE/t），用缪子催化剂和水增加电力。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半）。\n4. 把冷却塔加高到 10 以上，把压缩机粉碎深板岩得到的氦液化。\n5. 在地表观测站的保管库调整探索罗盘，寻找研究楼。收集量子数据片段和冷原子阱（打倒深处的回响守卫后保管库会打开）。\n6. 备齐量子计算模块和液氦，就进入第 3 阶段。\n趁现在：可以用仿生人组装站制作护卫（见仿生人一章）。也去找陨石坑（陨铁、星尘）和冰山（蓝冰）。\n容易卡住的地方：\n・做不出液氦：冷却塔高度不到 10 就无法制作。\n・冷却塔很慢：液氮每 1 mB 需要 250 FE。在核聚变炉建好之前，多放几台热电发电机（电力不足时不会停止，只是变慢）。\n・催化剂不能用或消耗很快：比装置低一级会变慢且消耗更快，低两级无法使用。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
     "translation": "第 2 阶段的流程"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one only its remaining life) and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
-    "translation": "- 精密组装台：第 3 阶段以后的几乎所有部件和装置都在这里制作。\n- 缪子催化核聚变炉：用缪子催化剂和水发电（4 kFE/t）。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命），之后变为失活的催化剂（可在催化反应器中变回缪子束）。也可以用桶右键加水。\n- 低温涡轮机：取回储存在液氮中的电力（在熔岩旁 9 成，最大 4.5 kFE/t）。这是用来储存和运送电力的装置，不会增加电力。把冷媒罐放进入口，就会倒出液氮并送出空罐。\n- SMES 电池：储存大量电力。\n- 世界线锚（小型）：放入催化剂后持续加载周围的区块。\n- 单极子升级模块：用磁单极子制作，插入装置的单极子槽后速度 ×2、电力效率 +50%。"
+    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime) and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
+    "translation": "- 精密组装台：第 3 阶段以后的几乎所有部件和装置都在这里制作。\n- 缪子催化核聚变炉：用缪子催化剂和水发电（4 kFE/t）。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半），之后变为失活的催化剂（可在催化反应器中变回缪子束）。也可以用桶右键加水。\n- 低温涡轮机：取回储存在液氮中的电力（在熔岩旁 9 成，最大 4.5 kFE/t）。这是用来储存和运送电力的装置，不会增加电力。把冷媒罐放进入口，就会倒出液氮并送出空罐。\n- SMES 电池：储存大量电力。\n- 世界线锚（小型）：放入催化剂后持续加载周围的区块。\n- 单极子升级模块：用磁单极子制作，插入装置的单极子槽后速度 ×2、电力效率 +50%。"
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",
@@ -8169,19 +8169,19 @@
   },
   "item.singulo.nihonium": {
     "source": "Nihonium",
-    "translation": "鉨"
+    "translation": "鿭"
   },
   "item.singulo.nihonium_frame": {
     "source": "Nihonium Frame",
-    "translation": "鉨框架"
+    "translation": "鿭框架"
   },
   "item.singulo.nihonium_ingot": {
     "source": "Nihonium Ingot",
-    "translation": "鉨锭"
+    "translation": "鿭锭"
   },
   "item.singulo.nihonium_plate": {
     "source": "Nihonium Plate",
-    "translation": "鉨板"
+    "translation": "鿭板"
   },
   "item.singulo.observation_log": {
     "source": "Observation Log",
@@ -10441,7 +10441,7 @@
   },
   "uses.singulo.bismuth_ingot": {
     "source": "Used in: Nihonium, Bismuth Crystal Block",
-    "translation": "用于：鉨、铋晶体块"
+    "translation": "用于：鿭、铋晶体块"
   },
   "uses.singulo.black_reinforced_glass": {
     "source": "Used in: Starred Black Reinforced Glass",
@@ -10761,7 +10761,7 @@
   },
   "uses.singulo.nihonium": {
     "source": "Used in: Nihonium Ingot",
-    "translation": "用于：鉨锭"
+    "translation": "用于：鿭锭"
   },
   "uses.singulo.nihonium_frame": {
     "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 10 more",
@@ -10769,11 +10769,11 @@
   },
   "uses.singulo.nihonium_ingot": {
     "source": "Used in: Nihonium Plate",
-    "translation": "用于：鉨板"
+    "translation": "用于：鿭板"
   },
   "uses.singulo.nihonium_plate": {
     "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame",
-    "translation": "用于：视界总线、陀螺驱动装置、霍金收集器、喷流收集器、鉨框架"
+    "translation": "用于：视界总线、陀螺驱动装置、霍金收集器、喷流收集器、鿭框架"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
@@ -10989,6 +10989,6 @@
   },
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",
-    "translation": "用于：鉨"
+    "translation": "用于：鿭"
   }
 }

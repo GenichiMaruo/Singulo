@@ -80,6 +80,15 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         return Component.translatable("gui.singulo.status." + status.name().toLowerCase());
     }
 
+    /** Reserve independent header regions; translated status labels may be wider than the machine name. */
+    private int statusWidth() {
+        return Math.min(font.width(statusText()), (imageWidth - 20) / 2);
+    }
+
+    private int statusX() {
+        return imageWidth - 8 - statusWidth();
+    }
+
     /** 状態の文字に重ねたときの説明（どうすれば動くか）。 */
     private List<Component> statusTooltip() {
         return switch (status()) {
@@ -476,7 +485,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        g.drawString(font, title, titleLabelX, titleLabelY, Panel.TEXT, false);
+        AndroidStationScreen.fit(g, font, title, titleLabelX, titleLabelY, statusX() - titleLabelX - 4, Panel.TEXT);
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
         MachineBlockEntity.Status status = status();
         Component text = statusText();
@@ -489,7 +498,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             case IDLE -> waiting ? 0xFF8A949E : 0xFFC08020;
             default -> 0xFFC08020;
         };
-        g.drawString(font, text, imageWidth - 8 - font.width(text), titleLabelY, color, false);
+        AndroidStationScreen.fit(g, font, text, statusX(), titleLabelY, statusWidth(), color);
         int size = menu.value(MachineBlockEntity.D_STRUCTURE);
         if (size > 0) {
             Component info = Component.translatable("gui.singulo.structure." + type().id(), size);
@@ -531,8 +540,12 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         MachineLayout l = layout();
         int x = leftPos;
         int y = topPos;
-        int statusWidth = font.width(statusText());
-        if (Panel.inside(mouseX, mouseY, x + imageWidth - 8 - statusWidth, y + titleLabelY - 1, statusWidth, 10)) {
+        if (Panel.inside(mouseX, mouseY, x + titleLabelX, y + titleLabelY - 1, statusX() - titleLabelX - 4, 10)
+                && font.width(title) > statusX() - titleLabelX - 4) {
+            g.renderTooltip(font, title, mouseX, mouseY);
+            return;
+        }
+        if (Panel.inside(mouseX, mouseY, x + statusX(), y + titleLabelY - 1, statusWidth(), 10)) {
             List<Component> lines = statusTooltip();
             if (!lines.isEmpty()) {
                 List<net.minecraft.util.FormattedCharSequence> wrapped = new ArrayList<>();

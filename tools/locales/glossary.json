@@ -229,7 +229,21 @@
     "Waist Ribbon": "腰部缎带",
     "Procedure Card": "步骤卡",
     "Recipe Card": "配方卡",
-    "Work Location Card": "作业位置卡"
+    "Work Location Card": "作业位置卡",
+    "Bismuth Crystal Block": "铋晶体块",
+    "Glowing Bismuth Crystal": "发光铋晶体",
+    "Hydrogen Fuel Cell": "氢燃料电池",
+    "Peltier Cooler": "珀耳帖冷却器",
+    "Bismuth Ingot": "铋锭",
+    "Coolant Cartridge": "冷媒罐",
+    "Empty Coolant Cartridge": "空冷媒罐",
+    "Fluid Canister": "流体罐",
+    "Nihonium": "鿭",
+    "Nihonium Frame": "鿭框架",
+    "Nihonium Ingot": "鿭锭",
+    "Nihonium Plate": "鿭板",
+    "Zinc Dust": "锌粉",
+    "Zinc Ingot": "锌锭"
   },
   "zh_tw": {
     "Cooling Tower Base": "冷卻塔底座",
@@ -461,7 +475,21 @@
     "Waist Ribbon": "腰部緞帶",
     "Procedure Card": "步驟卡",
     "Recipe Card": "配方卡",
-    "Work Location Card": "作業位置卡"
+    "Work Location Card": "作業位置卡",
+    "Bismuth Crystal Block": "鉍晶體方塊",
+    "Glowing Bismuth Crystal": "發光鉍晶體",
+    "Hydrogen Fuel Cell": "氫燃料電池",
+    "Peltier Cooler": "珀耳帖冷卻器",
+    "Bismuth Ingot": "鉍錠",
+    "Coolant Cartridge": "冷媒罐",
+    "Empty Coolant Cartridge": "空冷媒罐",
+    "Fluid Canister": "流體罐",
+    "Nihonium": "鉨",
+    "Nihonium Frame": "鉨框架",
+    "Nihonium Ingot": "鉨錠",
+    "Nihonium Plate": "鉨板",
+    "Zinc Dust": "鋅粉",
+    "Zinc Ingot": "鋅錠"
   },
   "ko_kr": {
     "Cooling Tower Base": "냉각탑 베이스",
@@ -693,6 +721,20 @@
     "Waist Ribbon": "허리 리본",
     "Procedure Card": "절차 카드",
     "Recipe Card": "레시피 카드",
-    "Work Location Card": "작업 위치 카드"
+    "Work Location Card": "작업 위치 카드",
+    "Bismuth Crystal Block": "비스무트 결정 블록",
+    "Glowing Bismuth Crystal": "빛나는 비스무트 결정",
+    "Hydrogen Fuel Cell": "수소 연료 전지",
+    "Peltier Cooler": "펠티에 냉각기",
+    "Bismuth Ingot": "비스무트 주괴",
+    "Coolant Cartridge": "냉매 카트리지",
+    "Empty Coolant Cartridge": "빈 냉매 카트리지",
+    "Fluid Canister": "유체 캐니스터",
+    "Nihonium": "니호늄",
+    "Nihonium Frame": "니호늄 프레임",
+    "Nihonium Ingot": "니호늄 주괴",
+    "Nihonium Plate": "니호늄 판",
+    "Zinc Dust": "아연 가루",
+    "Zinc Ingot": "아연 주괴"
   }
 }

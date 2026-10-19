@@ -266,7 +266,7 @@ public final class ServerConfig {
         SHELL_ROCK_LV3_ = b.defineInRange("shellRockLv3", 4, 0, 9);
         b.comment("縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）", "範囲: 0〜9（整数）");
         SHELL_METAL_CORES_ = b.defineInRange("shellMetalCores", 1, 0, 9);
-        b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分。0.10.0 で液体窒素が5倍の値段になったので、旧名 shellCoolantMb から改名して既定値を1200に）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限", "範囲: 0〜8,000（mB）");
+        b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分。0.10.0 で液体窒素の加工電力と必要量を調整したため、旧名 shellCoolantMb から改名して既定値を1200に）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限", "範囲: 0〜8,000（mB）");
         SHELL_NITROGEN_MB_ = b.defineInRange("shellNitrogenMb", 1200, 0, 8000);
         b.comment("縮退物質殻1個から作れる炉殻ブロックの数", "範囲: 1〜64（整数）");
         REACTOR_PLATES_PER_SHELL_ = b.defineInRange("reactorPlatesPerShell", 24, 1, 64);

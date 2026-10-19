@@ -1673,7 +1673,7 @@
   },
   "desc.singulo.bismuth_ingot": {
     "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
-    "translation": "무지갯빛 산화막이 낀 비스무트 금속. 촉매 반응기에서 구리 원석을 정련하면 부산물로 나온다. 아연과 함께 입자 가속기에서 충돌시키면 니호늄이 된다."
+    "translation": "무지갯빛 산화막이 낀 비스무트 금속. 촉매 반응기에서 구리 원석을 정련하면 부산물로 나옵니다. 아연과 함께 입자 가속기에서 충돌시키면 니호늄이 됩니다."
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -1709,7 +1709,7 @@
   },
   "desc.singulo.carbon_dust": {
     "source": "Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and black reinforced panels.",
-    "translation": "목탄을 압축기로 부숴 굳힌 탄소 가루(목탄 3개에서 2개). 스틸 블렌드와 검은 강화 패널에서 석탄 대신 쓸 수 있다."
+    "translation": "목탄을 압축기로 부숴 굳힌 탄소 가루(목탄 3개에서 2개). 스틸 블렌드와 검은 강화 패널에서 석탄 대신 쓸 수 있습니다."
   },
   "desc.singulo.casimir_cavity": {
     "source": "Creates negative energy between mirrors to make exotic matter.",
@@ -1800,8 +1800,8 @@
     "translation": "복원한 고대 문명의 제어 장치. 사용 횟수에 제한이 있습니다."
   },
   "desc.singulo.coolant_cartridge": {
-    "source": "A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as quantum computing modules.",
-    "translation": "액체 질소 100 mB를 채운 용기입니다. 장치를 우클릭하면 부어 넣고 빈 냉매 카트리지가 돌아옵니다(파이프 없이도 액체 질소를 옮길 수 있습니다). 극저온 터빈의 입구에 넣어도 됩니다. 정밀 조립기는 양자 연산 모듈 등 극저온 부품의 재료로 그대로 씁니다."
+    "source": "A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as quantum computing modules. Assembly consumes the cartridge, including its container; no empty cartridge is returned.",
+    "translation": "액체 질소 100 mB를 채운 용기입니다. 장치를 우클릭하면 부어 넣고 빈 냉매 카트리지를 돌려받으므로 파이프가 필요하지 않습니다. 극저온 터빈의 입구에도 넣을 수 있습니다. 정밀 조립기는 극저온 부품을 조립할 때 용기까지 소모하며, 빈 카트리지를 돌려주지 않습니다."
   },
   "desc.singulo.cooling_tower_base": {
     "source": "The 5×5 foundation of the tower.",
@@ -2065,7 +2065,7 @@
   },
   "desc.singulo.fluid_canister": {
     "source": "Holds up to 1,000 mB of any liquid or gas. Right-click a machine to fill it from the output tank or pour it into the input tank. Carries hydrogen (Electrolyzer to Particle Accelerator), helium (Compressor to Cooling Tower) and liquid helium without pipes.",
-    "translation": "어떤 액체나 기체든 최대 1,000 mB까지 담는 용기. 기계를 우클릭하면 출력 탱크에서 담거나 입력 탱크에 붓는다. 액체 파이프 없이도 수소(전해조→입자 가속기), 헬륨(압축기→냉각탑), 액체 헬륨을 옮길 수 있다."
+    "translation": "어떤 액체나 기체든 최대 1,000 mB까지 담는 용기. 기계를 우클릭하면 출력 탱크에서 담거나 입력 탱크에 붓습니다. 액체 파이프 없이도 수소(전해조→입자 가속기), 헬륨(압축기→냉각탑), 액체 헬륨을 옮길 수 있습니다."
   },
   "desc.singulo.focusing_magnet": {
     "source": "Magnet for the ring corners and at least 1/4 of the ring.",
@@ -2169,7 +2169,7 @@
   },
   "desc.singulo.hydrogen_fuel_cell": {
     "source": "A stage 1 generator that makes power from hydrogen and oxygen. It returns 60% of the power the Electrolyzer put into the hydrogen: 4.8 FE per mB, up to 240 FE/t, using 1 mB of oxygen per 2 mB of hydrogen. Right-click with an empty hand to see its status.",
-    "translation": "수소와 산소로 전력을 만드는 1단계 발전기. 전해조가 수소에 담은 전력의 6할을 되돌려 주는 축전 장치로, 수소 1 mB당 4.8 FE, 최대 240 FE/t. 수소 2 mB에 산소 1 mB를 쓴다. 맨손으로 우클릭하면 상태를 표시한다."
+    "translation": "수소와 산소로 전력을 만드는 1단계 발전기. 전해조가 수소에 담은 전력의 6할을 되돌려 주는 축전 장치로, 수소 1 mB당 4.8 FE, 최대 240 FE/t. 수소 2 mB에 산소 1 mB를 씁니다. 맨손으로 우클릭하면 상태를 표시합니다."
   },
   "desc.singulo.impact_generator_panel": {
     "source": "Landing on it causes no fall damage. Stores 1,000 FE per block fallen (up to 20,000 FE) and powers connected gravity panels.",
@@ -2233,7 +2233,7 @@
   },
   "desc.singulo.limestone_powder": {
     "source": "White calcium carbonate powder, crushed from calcite or dripstone blocks (2 in the Compressor, 1 at a crafting table). Use it instead of bone meal in Unfired Ceramic (it turns to lime in the kiln and binds the clay).",
-    "translation": "방해석이나 점적석 블록을 부순 흰 탄산칼슘 가루(압축기는 2개, 제작대는 1개). 소성되지 않은 세라믹에서 뼛가루 대신 쓸 수 있다(구우면 석회가 되어 점토를 굳힌다)."
+    "translation": "방해석이나 점적석 블록을 부순 흰 탄산칼슘 가루(압축기는 2개, 제작대는 1개). 소성되지 않은 세라믹에서 뼛가루 대신 쓸 수 있습니다(구우면 석회가 되어 점토를 굳힌다)."
   },
   "desc.singulo.low_gravity_panel": {
     "source": "When powered, standing on it cuts your gravity to a fifth until you next land (less fall damage too). Joins visually with its neighbours.",
@@ -2308,8 +2308,8 @@
     "translation": "수명이 있는 티어 2 촉매. 다 쓰면 소모된 촉매가 남습니다."
   },
   "desc.singulo.muon_fusion_reactor": {
-    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one only its remaining life, then comes out spent.",
-    "translation": "뮤온 촉매와 물(중수소)로 발전하는 2단계 발전기입니다(4 kFE/t). 촉매는 2배 빨리 닳아, 새 촉매 1개로 10분(쓰던 것은 남은 수명만큼) 움직이고, 소모된 뮤온 촉매가 나옵니다."
+    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one for half its remaining lifetime, then comes out spent.",
+    "translation": "뮤온 촉매와 물(중수소)로 발전하는 2단계 발전기입니다(4 kFE/t). 촉매는 2배 빨리 닳아, 새 촉매 1개로 10분(쓰던 것은 남은 수명의 절반만큼) 움직이고, 소모된 뮤온 촉매가 나옵니다."
   },
   "desc.singulo.neutrino_observatory": {
     "source": "Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.",
@@ -2321,19 +2321,19 @@
   },
   "desc.singulo.nihonium": {
     "source": "Element 113, fused from zinc and bismuth nuclei in the Particle Accelerator. This neutron-rich isotope is stable, so it does not decay. Two make an ingot.",
-    "translation": "입자 가속기에서 아연과 비스무트의 원자핵을 융합시켜 만든 113번 원소. 중성자가 많은 안정 동위체라서 붕괴하지 않는다. 2개로 주괴가 된다."
+    "translation": "입자 가속기에서 아연과 비스무트의 원자핵을 융합시켜 만든 113번 원소. 중성자가 많은 안정 동위체라서 붕괴하지 않습니다. 2개로 주괴가 됩니다."
   },
   "desc.singulo.nihonium_frame": {
-    "source": "A basic frame clad in nihonium plates. Stage 4 machines are built on it.",
-    "translation": "기초 프레임을 니호늄 판으로 감싼 프레임. 4단계 기계는 이것을 바탕으로 조립한다."
+    "source": "A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.",
+    "translation": "기초 프레임을 니호늄 판으로 감싼 프레임입니다. 4~5단계 고급 기계의 구조 기반으로 사용합니다."
   },
   "desc.singulo.nihonium_ingot": {
     "source": "A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.",
-    "translation": "니호늄을 소성로에서 녹여 굳힌 무거운 주괴. 압축기로 판을 만든다."
+    "translation": "니호늄을 소성로에서 녹여 굳힌 무거운 주괴. 압축기로 판을 만듭니다."
   },
   "desc.singulo.nihonium_plate": {
-    "source": "Pressed nihonium. Used to make nihonium frames.",
-    "translation": "니호늄 주괴를 눌러 편 판. 니호늄 프레임의 재료."
+    "source": "Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.",
+    "translation": "니호늄 주괴를 눌러 편 판입니다. 니호늄 프레임과 후반의 내압·차폐 부품에 사용합니다."
   },
   "desc.singulo.observation_log": {
     "source": "A record from observation posts. Copy it onto data cards.",
@@ -2753,7 +2753,7 @@
   },
   "desc.singulo.unfired_phosphor": {
     "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
-    "translation": "아연 가루와 화약(황)과 구리를 섞은 가루. 소성로에서 구우면 축광체인 발광석 가루 4개가 된다."
+    "translation": "아연 가루와 화약(황)과 구리를 섞은 가루. 소성로에서 구우면 축광체인 발광석 가루 4개가 됩니다."
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -2853,11 +2853,11 @@
   },
   "desc.singulo.zinc_dust": {
     "source": "Zinc sorted out of crushed tuff in the Compressor. Fire it in the Kiln into a zinc ingot.",
-    "translation": "응회암을 압축기로 부숴 골라낸 아연 가루. 소성로에서 구우면 아연 주괴가 된다."
+    "translation": "응회암을 압축기로 부숴 골라낸 아연 가루. 소성로에서 구우면 아연 주괴가 됩니다."
   },
   "desc.singulo.zinc_ingot": {
     "source": "Zinc metal. Collide it with bismuth in the Particle Accelerator to make nihonium. Zinc ingots from other mods work too.",
-    "translation": "아연 금속. 비스무트와 함께 입자 가속기에서 충돌시키면 니호늄이 된다. 다른 모드의 아연 주괴도 똑같이 쓸 수 있다."
+    "translation": "아연 금속. 비스무트와 함께 입자 가속기에서 충돌시키면 니호늄이 됩니다. 다른 모드의 아연 주괴도 똑같이 쓸 수 있습니다."
   },
   "direction.singulo.east": {
     "source": "east",
@@ -4180,8 +4180,8 @@
     "translation": "되찾는 전력: %s%%"
   },
   "gui.singulo.generator_slots.fusion.in": {
-    "source": "Insert muon catalysts. Each one runs the reactor for 10 minutes, then comes out spent below",
-    "translation": "뮤온 촉매를 넣습니다. 1개로 10분 동안 움직이고, 소모된 촉매를 아래로 내보냅니다"
+    "source": "Insert muon catalysts. At default settings, a fresh one lasts 10 minutes; a used one burns for half its remaining lifetime. Spent catalysts come out below.",
+    "translation": "뮤온 촉매를 넣습니다. 기본 설정에서 새 촉매는 10분, 쓰던 촉매는 남은 수명의 절반 동안 작동합니다. 소모된 촉매는 아래로 나옵니다."
   },
   "gui.singulo.generator_slots.nitrogen": {
     "source": "Liquid nitrogen %s / %s mB",
@@ -6432,8 +6432,8 @@
     "translation": "첫 전원"
   },
   "guide.singulo.stage1.thermal_pairs.body": {
-    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nTo run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.",
-    "translation": "차가운 블록이 녹지 않고 계속 쓸 수 있는 조합(발전기 1대의 출력):\n- 마그마 블록＋푸른 얼음: 약 76 FE/t(가장 추천)\n- 가동 중인 소성로＋푸른 얼음: 약 66 FE/t\n- 모닥불＋푸른 얼음: 약 56 FE/t\n- 모닥불＋꽁꽁 언 얼음: 약 55 FE/t\n용암은 너무 뜨거워서, 푸른 얼음도 약 40초 만에 꽁꽁 언 얼음으로 바뀌고 계속 녹습니다. 모닥불에 물, 눈, 얼음을 맞추면 1분도 안 되어 녹습니다.\n2단계 극저온 냉각탑(액체 질소 240 FE/t)을 돌리려면 마그마 블록＋푸른 얼음으로 4대 이상, 모닥불＋꽁꽁 언 얼음이면 5대 이상이 기준입니다(구리 전선 손실 제외). 처음에는 2~4대로 장치를 하나씩 돌리며 늘려 가면 충분합니다."
+    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nStage 2 liquid nitrogen costs about 25,000 FE per 100 mB. A height-7 tower draws about 1,786 FE/t while working. It retains progress while waiting for enough power. Start with 2–4 generators and one machine at a time, add generation and storage, then build a fusion reactor; full-speed power is not a prerequisite.",
+    "translation": "차가운 블록이 녹지 않는 조합(발전기 1대의 출력):\n- 마그마 블록＋푸른 얼음: 약 76 FE/t\n- 가동 중인 소성로＋푸른 얼음: 약 66 FE/t\n- 모닥불＋푸른 얼음: 약 56 FE/t\n- 모닥불＋꽁꽁 언 얼음: 약 55 FE/t\n용암 옆에서는 푸른 얼음도 약 40초 만에 꽁꽁 언 얼음이 된 뒤 계속 녹습니다. 모닥불 옆의 물·눈·얼음은 1분 안에 녹습니다.\n2단계 액체 질소는 100 mB당 약 25,000 FE가 듭니다. 높이 7인 냉각탑은 작동 중 약 1,786 FE/t를 쓰며, 전력이 부족하면 진행도를 유지하고 기다립니다. 처음에는 발전기 2~4대로 기계를 번갈아 돌리고 발전·축전을 늘려 핵융합로를 목표로 하세요. 처음부터 정속 전력을 갖출 필요는 없습니다."
   },
   "guide.singulo.stage1.thermal_pairs.title": {
     "source": "Pairs that last",
@@ -6444,24 +6444,24 @@
     "translation": "2단계: 극저온"
   },
   "guide.singulo.stage2.accelerator.body": {
-    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Stage 4 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
-    "translation": "가속관과 집속 자석으로 정사각형 링(한 변 8~32)을 만들고, 컨트롤러를 링에 붙여 설치합니다. 네 모서리는 집속 자석이어야 하고, 자석은 링의 1/4 이상이어야 합니다. 수소로 뮤온 다발을 만들며, 아주 드물게 자기 홀극이 생깁니다.\n촉매 반응기에서 뮤온 다발로 뮤온 촉매(티어 2)를 만듭니다. 우주선 뮤온 수집기를 높은 곳에 두면 전력 없이도 뮤온 다발이 조금씩 모입니다.\n한 변이 16 이상인 링이면, 입력에 아연 주괴와 비스무트 주괴를 넣으면 원자핵이 융합해 새 원소 니호늄이 됩니다. 아연은 응회암을 압축기로 부숴서, 비스무트는 촉매 반응기에서 구리 원석을 정련할 때 부산물로 얻습니다. 니호늄 2개로 주괴를 만들고, 압축기로 판을 만든 뒤 정밀 조립기에서 니호늄 프레임을 만듭니다. 4단계 기계의 토대입니다. 비스무트와 탄소 가루를 넣으면 비스무트 원자핵의 양성자가 떨어져 나가 금이 됩니다(링 크기는 상관없음)."
+    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Advanced stage 4 and 5 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
+    "translation": "가속관과 집속 자석으로 정사각형 링(한 변 8~32)을 만들고, 컨트롤러를 링에 붙여 설치합니다. 네 모서리는 집속 자석이어야 하고, 자석은 링의 1/4 이상이어야 합니다. 수소로 뮤온 다발을 만들며, 아주 드물게 자기 홀극이 생깁니다.\n촉매 반응기에서 뮤온 다발로 뮤온 촉매(티어 2)를 만듭니다. 우주선 뮤온 수집기를 높은 곳에 두면 전력 없이도 뮤온 다발이 조금씩 모입니다.\n한 변이 16 이상인 링이면, 입력에 아연 주괴와 비스무트 주괴를 넣으면 원자핵이 융합해 새 원소 니호늄이 됩니다. 아연은 응회암을 압축기로 부숴서, 비스무트는 촉매 반응기에서 구리 원석을 정련할 때 부산물로 얻습니다. 니호늄 2개로 주괴를 만들고, 압축기로 판을 만든 뒤 정밀 조립기에서 니호늄 프레임을 만듭니다. 4~5단계 고급 기계의 토대입니다. 비스무트와 탄소 가루를 넣으면 비스무트 원자핵의 양성자가 떨어져 나가 금이 됩니다(링 크기는 상관없음)."
   },
   "guide.singulo.stage2.accelerator.title": {
     "source": "Particle Accelerator and muon catalyst",
     "translation": "입자 가속기 및 뮤온 촉매"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one only its remaining life).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "이 단계에서 할 일:\n1. 정밀 조립기를 만듭니다. 3단계부터의 부품과 장치는 거의 모두 여기서 만듭니다.\n2. 입자 가속기로 뮤온 다발을, 촉매 반응기로 뮤온 촉매(2티어)를 만듭니다.\n3. 뮤온 촉매 핵융합로(4 kFE/t)를 만들고, 뮤온 촉매와 물로 전력을 늘립니다. 새 촉매 1개로 10분(쓰던 것은 남은 수명만큼) 움직입니다.\n4. 냉각탑을 높이 10 이상으로 하고, 압축기로 심층암을 부숴 나온 헬륨을 액화합니다.\n5. 지표 관측소의 보관고에서 탐험가의 나침반을 조정해 연구동을 찾습니다. 양자 데이터 조각과 냉원자 트랩을 모읍니다(안쪽의 메아리 파수꾼를 쓰러뜨리면 보관고가 열립니다).\n6. 양자 연산 모듈과 액체 헬륨이 갖춰지면 3단계입니다.\n지금 해 두면 좋은 것: 안드로이드 조립 스테이션으로 호위를 만들 수 있습니다(안드로이드 장). 운석 크레이터(운철·별가루)와 빙산(푸른 얼음)도 찾아 둡니다.\n막히기 쉬운 곳:\n・액체 헬륨이 안 생김: 냉각탑 높이가 10 미만이면 만들 수 없습니다.\n・냉각탑이 느림: 액체 질소는 1 mB에 250 FE가 듭니다. 핵융합로가 생길 때까지는 열전 발전기를 늘립니다(전력이 모자라도 멈추지 않고 느려질 뿐입니다).\n・촉매를 못 쓰거나 금방 닳음: 장치보다 한 티어 아래는 느리고 빨리 닳으며, 두 티어 아래는 쓸 수 없습니다."
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "이 단계에서 할 일:\n1. 정밀 조립기를 만듭니다. 3단계부터의 부품과 장치는 거의 모두 여기서 만듭니다.\n2. 입자 가속기로 뮤온 다발을, 촉매 반응기로 뮤온 촉매(2티어)를 만듭니다.\n3. 뮤온 촉매 핵융합로(4 kFE/t)를 만들고, 뮤온 촉매와 물로 전력을 늘립니다. 새 촉매 1개로 10분(쓰던 것은 남은 수명의 절반만큼) 움직입니다.\n4. 냉각탑을 높이 10 이상으로 하고, 압축기로 심층암을 부숴 나온 헬륨을 액화합니다.\n5. 지표 관측소의 보관고에서 탐험가의 나침반을 조정해 연구동을 찾습니다. 양자 데이터 조각과 냉원자 트랩을 모읍니다(안쪽의 메아리 파수꾼를 쓰러뜨리면 보관고가 열립니다).\n6. 양자 연산 모듈과 액체 헬륨이 갖춰지면 3단계입니다.\n지금 해 두면 좋은 것: 안드로이드 조립 스테이션으로 호위를 만들 수 있습니다(안드로이드 장). 운석 크레이터(운철·별가루)와 빙산(푸른 얼음)도 찾아 둡니다.\n막히기 쉬운 곳:\n・액체 헬륨이 안 생김: 냉각탑 높이가 10 미만이면 만들 수 없습니다.\n・냉각탑이 느림: 액체 질소는 1 mB에 250 FE가 듭니다. 핵융합로가 생길 때까지는 열전 발전기를 늘립니다(전력이 모자라도 멈추지 않고 느려질 뿐입니다).\n・촉매를 못 쓰거나 금방 닳음: 장치보다 한 티어 아래는 느리고 빨리 닳으며, 두 티어 아래는 쓸 수 없습니다."
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
     "translation": "2단계의 흐름"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one only its remaining life) and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
-    "translation": "- 정밀 조립기: 3단계 이후의 부품과 장치는 거의 모두 여기서 만듭니다.\n- 뮤온 촉매 핵융합로: 뮤온 촉매와 물로 발전합니다(4 kFE/t). 촉매는 2배 빨리 닳아, 새 촉매 1개로 10분(쓰던 것은 남은 수명만큼) 움직이고, 소모된 촉매가 나옵니다(촉매 반응기에서 뮤온 다발로 되돌릴 수 있습니다). 물은 양동이로 우클릭해도 들어갑니다.\n- 극저온 터빈: 액체 질소에 저장된 전력을 되찾습니다(용암 옆에서 90%, 최대 4.5 kFE/t). 전력을 저장하고 옮기기 위한 장치이며, 전력이 늘어나지는 않습니다. 냉매 카트리지를 입구에 넣으면 액체 질소를 비우고 빈 카트리지를 내보냅니다.\n- SMES 셀: 많은 전력을 저장합니다.\n- 세계선 앵커 (소형): 촉매를 넣으면 주변 청크를 계속 로드합니다.\n- 홀극 업그레이드: 자기 홀극으로 만들며, 장치의 홀극 슬롯에 넣으면 속도 ×2, 전력 효율 +50%."
+    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime) and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
+    "translation": "- 정밀 조립기: 3단계 이후의 부품과 장치는 거의 모두 여기서 만듭니다.\n- 뮤온 촉매 핵융합로: 뮤온 촉매와 물로 발전합니다(4 kFE/t). 촉매는 2배 빨리 닳아, 새 촉매 1개로 10분(쓰던 것은 남은 수명의 절반만큼) 움직이고, 소모된 촉매가 나옵니다(촉매 반응기에서 뮤온 다발로 되돌릴 수 있습니다). 물은 양동이로 우클릭해도 들어갑니다.\n- 극저온 터빈: 액체 질소에 저장된 전력을 되찾습니다(용암 옆에서 90%, 최대 4.5 kFE/t). 전력을 저장하고 옮기기 위한 장치이며, 전력이 늘어나지는 않습니다. 냉매 카트리지를 입구에 넣으면 액체 질소를 비우고 빈 카트리지를 내보냅니다.\n- SMES 셀: 많은 전력을 저장합니다.\n- 세계선 앵커 (소형): 촉매를 넣으면 주변 청크를 계속 로드합니다.\n- 홀극 업그레이드: 자기 홀극으로 만들며, 장치의 홀극 슬롯에 넣으면 속도 ×2, 전력 효율 +50%."
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",

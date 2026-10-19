@@ -66,7 +66,7 @@ SERVER = [
     # 圧縮・質量
     ('compression', 'shellRockLv3', '4', '0〜9（整数）', '縮退物質殻1個に要る岩石の圧縮ブロックLv3'),
     ('compression', 'shellMetalCores', '1', '0〜9（整数）', '縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）'),
-    ('compression', 'shellNitrogenMb', '1200', '0〜8,000（mB）', '縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分。0.10.0 で液体窒素が5倍の値段になったので、旧名 shellCoolantMb から改名して既定値を1200に）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限'),
+    ('compression', 'shellNitrogenMb', '1200', '0〜8,000（mB）', '縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分。0.10.0 で液体窒素の加工電力と必要量を調整したため、旧名 shellCoolantMb から改名して既定値を1200に）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限'),
     ('compression', 'reactorPlatesPerShell', '24', '1〜64（整数）', '縮退物質殻1個から作れる炉殻ブロックの数'),
     ('compression', 'mixedBonusEnabled', 'true', 'true / false', '混成ボーナス（Lv1が3種類以上ならLv2を8個で作れる）'),
     ('compression', 'mixedBonusMinKinds', '3', '2〜9（整数）', '混成ボーナスに要る元ブロックの種類数'),
