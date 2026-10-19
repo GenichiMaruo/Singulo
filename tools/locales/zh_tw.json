@@ -6445,7 +6445,7 @@
   },
   "guide.singulo.stage2.accelerator.body": {
     "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Advanced stage 4 and 5 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
-    "translation": "用加速管與聚焦磁鐵組成方形環（邊長 8–32），並讓控制器緊貼著環放置。四個角落必須是聚焦磁鐵，且磁鐵至少佔環的四分之一。它以氫製造緲子束，極少數情況下會產生磁單極子。\n催化反應器以緲子束製作緲子催化劑（2 級）。把宇宙射線緲子收集器放在高處，無需電力也能慢慢收集緲子束。\n環長 16 以上時，在輸入槽放入鋅錠和鉍錠，原子核就會融合成新元素鉨。鋅由壓縮機粉碎凝灰岩取得，鉍是催化反應器精煉粗銅時的副產物。2 個鉨製成一個錠，用壓縮機壓成板，再在精密組裝台製作鉨框架。它是第 4、5 階段進階裝置的基礎。放入鉍和碳粉時，鉍原子核的質子會被剝離而變成金（不限環的大小）。"
+    "translation": "用加速管與聚焦磁鐵組成方形環（邊長 8–32），並讓控制器緊貼著環放置。四個角落必須是聚焦磁鐵，且磁鐵至少佔環的四分之一。它以氫製造緲子束，極少數情況下會產生磁單極子。\n催化反應器以緲子束製作緲子催化劑（2 級）。把宇宙射線緲子收集器放在高處，無需電力也能慢慢收集緲子束。\n邊長 16 以上時，在輸入槽放入鋅錠和鉍錠，原子核就會融合成新元素鉨。鋅由壓縮機粉碎凝灰岩取得，鉍是催化反應器精煉粗銅時的副產物。2 個鉨製成一個錠，用壓縮機壓成板，再在精密組裝台製作鉨框架。它是第 4、5 階段進階裝置的基礎。放入鉍和碳粉時，鉍原子核的質子會被剝離而變成金（不限環的大小）。"
   },
   "guide.singulo.stage2.accelerator.title": {
     "source": "Particle Accelerator and muon catalyst",

@@ -31,14 +31,14 @@ public class GeneratorSlotsScreen extends AbstractContainerScreen<GeneratorSlots
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + 17, 8, BAR_H)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.energy",
-                    menu.value(GeneratorSlotsMenu.D_ENERGY), menu.value(GeneratorSlotsMenu.D_CAPACITY)), mouseX, mouseY);
+            Panel.tooltip(g, font, java.util.List.of(Component.translatable("gui.singulo.energy",
+                    menu.value(GeneratorSlotsMenu.D_ENERGY), menu.value(GeneratorSlotsMenu.D_CAPACITY))), 160, mouseX, mouseY);
         }
         var in = menu.getSlot(0);
         if (!in.hasItem() && menu.getCarried().isEmpty()
                 && Panel.inside(mouseX, mouseY, leftPos + in.x, topPos + in.y, 16, 16)) {
-            g.renderTooltip(font, font.split(Component.translatable(turbine() ? "gui.singulo.generator_slots.turbine.in"
-                    : "gui.singulo.generator_slots.fusion.in"), 160), mouseX, mouseY);
+            Panel.tooltip(g, font, java.util.List.of(Component.translatable(turbine() ? "gui.singulo.generator_slots.turbine.in"
+                    : "gui.singulo.generator_slots.fusion.in")), 160, mouseX, mouseY);
         }
     }
 

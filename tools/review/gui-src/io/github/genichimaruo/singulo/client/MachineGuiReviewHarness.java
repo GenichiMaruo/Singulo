@@ -14,12 +14,14 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 /** Real font/resource-pack rendering of deterministic menu fixtures, in all shipped languages. Development only. */
-final class MachineGuiReviewHarness {
+@net.neoforged.fml.common.EventBusSubscriber(modid = Singulo.MODID, value = net.neoforged.api.distmarker.Dist.CLIENT)
+public final class MachineGuiReviewHarness {
     private static final String[] LANGUAGES = {"ja_jp", "en_us", "zh_cn", "zh_tw", "ko_kr"};
     private static final int SCREENS = MachineType.values().length + 8;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen, wait;
     private static boolean shown;
+    private static int hoverX = -1, hoverY;
 
     static void start(Minecraft mc) {
         mc.player.closeContainer();
@@ -65,6 +67,7 @@ final class MachineGuiReviewHarness {
     }
 
     private static void show(Minecraft mc) throws Exception {
+        hoverX = -1;
         org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
         int extra = screen - MachineType.values().length;
         if (screen < MachineType.values().length || extra >= 4 && extra <= 6) {
@@ -121,10 +124,24 @@ final class MachineGuiReviewHarness {
         }
     }
     private static void hover(Minecraft mc, int width, int x, int y) {
-        double scale = mc.getWindow().getGuiScale();
         double left = (mc.getWindow().getGuiScaledWidth() - width) / 2;
         double top = (mc.getWindow().getGuiScaledHeight() - MachineLayout.HEIGHT) / 2;
-        org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), (left + x) * scale, (top + y) * scale);
+        hoverX = (int) left + x;
+        hoverY = (int) top + y;
+    }
+
+    /** Draw the real tooltip hit-testing path at a deterministic GUI coordinate.
+     * Virtual displays need not dispatch native cursor motion, so do not depend on OS focus. */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void renderTooltips(net.neoforged.neoforge.client.event.ScreenEvent.Render.Post event) throws Exception {
+        if (!shown || hoverX < 0) return;
+        if (event.getScreen() instanceof MachineScreen screen) {
+            var method = MachineScreen.class.getDeclaredMethod("renderOwnTooltips", net.minecraft.client.gui.GuiGraphics.class, int.class, int.class);
+            method.setAccessible(true);
+            method.invoke(screen, event.getGuiGraphics(), hoverX, hoverY);
+        } else if (event.getScreen() instanceof GeneratorSlotsScreen screen) {
+            screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
+        }
     }
 
 }

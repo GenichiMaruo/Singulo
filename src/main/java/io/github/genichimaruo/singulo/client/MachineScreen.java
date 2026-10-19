@@ -542,17 +542,13 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int y = topPos;
         if (Panel.inside(mouseX, mouseY, x + titleLabelX, y + titleLabelY - 1, statusX() - titleLabelX - 4, 10)
                 && font.width(title) > statusX() - titleLabelX - 4) {
-            g.renderTooltip(font, title, mouseX, mouseY);
+            Panel.tooltip(g, font, List.of(title), 200, mouseX, mouseY);
             return;
         }
         if (Panel.inside(mouseX, mouseY, x + statusX(), y + titleLabelY - 1, statusWidth(), 10)) {
             List<Component> lines = statusTooltip();
             if (!lines.isEmpty()) {
-                List<net.minecraft.util.FormattedCharSequence> wrapped = new ArrayList<>();
-                for (Component c : lines) {
-                    wrapped.addAll(font.split(c, 200));
-                }
-                g.renderTooltip(font, wrapped, mouseX, mouseY);
+                Panel.tooltip(g, font, lines, 200, mouseX, mouseY);
                 return;
             }
         }

@@ -6445,7 +6445,7 @@
   },
   "guide.singulo.stage2.accelerator.body": {
     "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Advanced stage 4 and 5 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
-    "translation": "用加速管和聚焦磁体搭建一个方形环（边长 8–32），并让控制器贴着环放置。四个角必须是聚焦磁体，且磁体至少占环的四分之一。它用氢制造缪子束，极少数情况下会产生磁单极子。\n催化反应器用缪子束制作缪子催化剂（2 级）。把宇宙线缪子收集器放在高处，无需电力也能慢慢收集缪子束。\n环长 16 以上时，在输入槽放入锌锭和铋锭，原子核就会融合成新元素鿭。锌由压缩机粉碎凝灰岩获得，铋是催化反应器精炼粗铜时的副产物。2 个鿭制成一个锭，用压缩机压成板，再在精密组装台制作鿭框架。它是第 4、5 阶段高级装置的基础。放入铋和碳粉时，铋原子核的质子会被剥离而变成金（不限环的大小）。"
+    "translation": "用加速管和聚焦磁体搭建一个方形环（边长 8–32），并让控制器贴着环放置。四个角必须是聚焦磁体，且磁体至少占环的四分之一。它用氢制造缪子束，极少数情况下会产生磁单极子。\n催化反应器用缪子束制作缪子催化剂（2 级）。把宇宙线缪子收集器放在高处，无需电力也能慢慢收集缪子束。\n边长 16 以上时，在输入槽放入锌锭和铋锭，原子核就会融合成新元素鿭。锌由压缩机粉碎凝灰岩获得，铋是催化反应器精炼粗铜时的副产物。2 个鿭制成一个锭，用压缩机压成板，再在精密组装台制作鿭框架。它是第 4、5 阶段高级装置的基础。放入铋和碳粉时，铋原子核的质子会被剥离而变成金（不限环的大小）。"
   },
   "guide.singulo.stage2.accelerator.title": {
     "source": "Particle Accelerator and muon catalyst",
