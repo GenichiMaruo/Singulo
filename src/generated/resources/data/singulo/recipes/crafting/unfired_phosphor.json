@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:zinc_dust"
+    },
+    {
+      "item": "singulo:zinc_dust"
+    },
+    {
+      "tag": "forge:ingots/copper"
+    },
+    {
+      "item": "minecraft:gunpowder"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "singulo:unfired_phosphor"
+  }
+}

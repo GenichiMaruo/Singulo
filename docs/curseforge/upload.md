@@ -1,71 +1,24 @@
-# CurseForge ファイルのアップロード欄
+# CurseForge公開手順 — Minecraft 1.20.1
 
-プロジェクトを作ったあと、「Upload File」で入れる内容。
+共有ブランチは`1.20.1`。Forge / NeoForgeの配布ファイルは別々に作成する。Java 17が必要。Minecraft 1.21.1の開発・公開は`1.21.1`ブランチで行う。
 
-## File
-対応ブランチで `./gradlew build` を実行します。
-
-| Minecraft | ブランチ | 配布ファイル |
+| Loader | ローカルビルド | 配布ファイル |
 | --- | --- | --- |
-| 1.21.1 / NeoForge | `main` | `build/libs/Singulo-<版>-1.21.1N.jar` |
-| 1.20.1 / Forge | `port/1.20.1-forge` | `build/libs/Singulo-<版>-1.20.1F.jar` |
-| 1.20.1 / NeoForge | `port/1.20.1-neoforge` | `build/libs/Singulo-<版>-1.20.1N.jar` |
+| Forge | `./gradlew -Ploader=forge build` | `build/forge/libs/Singulo-<版>-1.20.1F.jar` |
+| NeoForge | `./gradlew -Ploader=neoforge build` | `build/neoforge/libs/Singulo-<版>-1.20.1N.jar` |
 
-`<版>` は各ブランチの `gradle.properties` の `mod_version` です。
+`<版>`は`gradle.properties`の`mod_version`。現在の公開ワークフローはBetaとして公開する。表示名は拡張子を除いたファイル名、ゲームバージョンは1.20.1、Javaは17、ローダーはファイルに対応する一方だけを指定する。JEIとMekanismは任意依存。
 
-## Display name
-Singulo-<版>-1.21.1N、Singulo-<版>-1.20.1F、または Singulo-<版>-1.20.1N（例: Singulo-0.4.0-1.21.1N）
+## 検証済み成果物を公開する
 
-命名規則は `mod名-modバージョン-Minecraftバージョン＋ローダー記号`。`N` は NeoForge、`F` は Forge を表します。1.21.1版は NeoForge、1.20.1版は Forge と NeoForge の専用ファイルを用意します。Beta / Release は Release type で指定し、名前には入れません。
+1. `PR validation`の両ローダー・全6名前空間と実Mekanismの計14ジョブが成功していることを確認する。
+2. 全422必須GameTest、実Mekanism各2件、GUI各142枚、持ち物欄105点、機械ヘッダー80か所、数字の言語間比較5件の証跡を確認する。
+3. 検証されたソースと同一のツリーを`1.20.1`へマージし、そのコミットへ`v<版>-1.20.1F`と`v<版>-1.20.1N`の変更しないタグを作成する。
+4. Actionsの`Publish CurseForge Beta`を`1.20.1`で手動実行する。`verified_run_id`に成功した検証run ID、`release_tag`に対象ローダーのタグを渡す。ローダーごとに1回実行する。タグ作成だけでは公開されない。
+5. ワークフローはツリー・タグ・CIジョブ・テスト件数・GUI証跡・各名前空間のJAR内容を照合し、テストしたJARをそのまま公開する。変更履歴は`changelog-<版>.md`を使用する。
 
-## Release type
-1.0.0 より前は Beta、1.0.0 以降の正式な版は Release。
+`curseforge`環境の`CURSEFORGE_PROJECT_ID`（SecretまたはVariable）と`CURSEFORGE_TOKEN`（Secret）を使用する。トークンをリポジトリへ記載しない。
 
-GitHub Actions では自動で決まります（下の「GitHub Actions で公開する」）。
+GitHub Releasesには変更履歴とCurseForgeへのダウンロードリンクのみを載せ、modのJARは添付しない。ワークフローはアップロード前に公開タグを予約するため、途中失敗した場合はCurseForgeの状態を確認し、重複アップロードを避ける。成功した公開ジョブは再実行しない。
 
-## Changelog
-`changelog-<版>.md`（例: [changelog-0.4.0.md](changelog-0.4.0.md)）の中身を貼る（Markdown）。
-
-## Game versions
-| Minecraft | Mod loader | Java |
-| --- | --- | --- |
-| 1.21.1 | NeoForge | Java 21 |
-| 1.20.1 | Forge | Java 17 |
-| 1.20.1 | NeoForge | Java 17 |
-
-- Environment: Client, Server（両方に必要）
-
-## Related projects
-| プロジェクト | 種類 |
-| --- | --- |
-| Just Enough Items (JEI) | Optional Dependency |
-
-## プロジェクト作成時のほかの欄
-- **License**: All Rights Reserved（`gradle.properties` の `mod_license` と同じ）。ほかのライセンスにするなら両方を変える。
-- **Description**: [description.md](description.md)。
-- **Gallery**: ゲーム内のスクリーンショットを数枚（リアクター、マルチブロック、重力レンズ、遺構など）。ロゴとは別に用意する。
-
-## 次の版を出すとき
-1. `gradle.properties` の `mod_version` を上げる。
-2. `changelog-<版>.md` を書く。
-3. `./gradlew build` で JAR を作り、上の欄を同じように埋める。
-
-## GitHub Actions で公開する
-
-[公開ワークフロー](../../.github/workflows/publish-curseforge.yml) は、`main` では `v<mod_version>`、1.20.1 Forgeブランチでは `v<mod_version>-1.20.1F`、NeoForgeブランチでは `v<mod_version>-1.20.1N` タグの push または手動実行で動きます。`curseforge` 環境の `CURSEFORGE_PROJECT_ID`（Secret または Variable）と `CURSEFORGE_TOKEN`（Secret）を利用します。トークンをリポジトリに記載する必要はありません。
-
-版番号・変更履歴・翻訳を検証し、ビルドと GameTest が成功した JAR を成果物として保存したあと、同じ JAR をアップロードします。
-
-mainの公開の種類（Release type）は、既定（`auto`）では版番号から決まります。1.20.1の0.7.0用ワークフローはBeta固定です。
-
-| `mod_version` | 公開の種類 |
-| --- | --- |
-| `0.x.y`（例: 0.4.0） | Beta |
-| `1.0.0` 以降で、`-beta` などの付かない版（例: 1.0.0、1.2.3） | **Release** |
-| 後ろに `-alpha`・`-beta.1`・`-rc1` などが付く版（例: 1.0.0-beta.1） | Beta |
-
-mainの手動実行（Actions タブの「Run workflow」）では、`release_type` に `beta`・`release`・`alpha` を選んで上書きできます。1.20.1版にはこの上書き入力はありません。タグと `gradle.properties` の版番号が一致しない場合は公開しません。再実行すると重複アップロードになる可能性があるため、成功済みの公開ジョブは再実行しないでください。
-
-公開後の CurseForge の審査・承認はアップロードとは別の手続きです。
-
-1.20.1ブランチのタグ公開では、CurseForgeへのアップロードが成功すると、同じJARをMinecraftバージョン入りのGitHub Releaseにも添付します。
+アップロード後はCurseForgeの審査状況を確認する。公開後のファイル名・ゲームバージョン・ローダー・公開種別と、ダウンロードしたJARのSHA-256が検証済み成果物と一致することを確認する。

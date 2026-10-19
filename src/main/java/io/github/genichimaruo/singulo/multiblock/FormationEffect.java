@@ -12,7 +12,7 @@ import net.minecraftforge.event.TickEvent.ServerTickEvent;
 
 /**
  * マルチブロックの形成演出: 正しく組み上がると、コントローラから近い順に部品の継ぎ目へ白い光が走り、起動音が鳴る。
- * 読み込み直したときの最初の判定では鳴らさない（firstCheck）。
+ * 保存データから読み込み直したときの最初の判定では鳴らさない（firstCheck）。新しく置いたコントローラで完成させたときは鳴らす。
  */
 public final class FormationEffect {
     private record Spark(ServerLevel level, BlockPos pos, long at) {}
@@ -54,6 +54,8 @@ public final class FormationEffect {
         }
         io.github.genichimaruo.singulo.registry.SinguloSounds.playAt(level, controller, "multiblock_formed", 1.5F, 1.0F);
     }
+
+    public static int queuedSparks() { return QUEUE.size(); }
 
     public static void onServerTick(ServerTickEvent event) {
         if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) return;

@@ -44,9 +44,9 @@ final class TestBuild {
         return Shapes.spec(kind, size).pos(helper.absolutePos(controllerRel), back, x, y, z);
     }
 
-    /** 形の (x, y, z)（外装板の位置）をマルチブロック搬入出ポートに替え、その絶対位置を返す。 */
+    /** 形の (x, y, z)（外装板か、外装板と同じブロックの位置）をマルチブロック搬入出ポートに替え、その絶対位置を返す。 */
     static BlockPos port(GameTestHelper helper, Blueprints.Kind kind, BlockPos controllerRel, Direction back, int size, int x, int y, int z) {
-        if (Shapes.spec(kind, size).slot(x, y, z).kind() != ShapeSpec.Kind.PANEL) {
+        if (!Shapes.spec(kind, size).acceptsPort(x, y, z)) {
             throw new IllegalArgumentException("not a panel: " + x + "," + y + "," + z);
         }
         BlockPos abs = at(helper, kind, controllerRel, back, size, x, y, z);

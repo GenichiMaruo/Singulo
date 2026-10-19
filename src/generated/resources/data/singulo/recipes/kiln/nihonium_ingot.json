@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 3,
+  "time": 200,
+  "energy": 200,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:nihonium"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:nihonium_ingot",
+    "count": 1
+  }
+}

@@ -42,10 +42,14 @@ public final class GuiReviewHarness {
     @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
     public static final class ConfigReloadReview {
         private static int reloads;
+        private static volatile boolean uiActive;
 
         @SubscribeEvent
         public static void reloaded(net.minecraftforge.fml.event.config.ModConfigEvent.Reloading event) {
             if (event.getConfig().getSpec() != io.github.genichimaruo.singulo.generated.ClientConfig.SPEC) return;
+            // Forge may finish an initial file-correction callback before the UI exists.
+            // The runtime watcher must serialize every reload once GUI inspection starts.
+            if (!uiActive) return;
             if (!Minecraft.getInstance().isSameThread()) {
                 throw new IllegalStateException("Client config reload raced the render thread");
             }
@@ -85,9 +89,14 @@ public final class GuiReviewHarness {
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) {
             return;
         }
+        if (phase == 29 && Boolean.getBoolean("singulo.machineGuiReview")) {
+            MachineGuiReviewHarness.tick(mc);
+            return;
+        }
         // Opening menus and resizing can move the real cursor back onto a tooltip.
         org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 20, 20);
         if (phase == 0) {
+            ConfigReloadReview.uiActive = true;
             phase = 1;
             mc.getSingleplayerServer().execute(() -> prepare(mc));
             return;
@@ -301,7 +310,8 @@ public final class GuiReviewHarness {
                 Singulo.LOGGER.info("SINGULO_CONFIG_FILE_RELOAD_COMPLETE");
                 Singulo.LOGGER.info("SINGULO_GUI_COMPLETE 22");
                 phase = 29;
-                mc.stop();
+                if (Boolean.getBoolean("singulo.machineGuiReview")) MachineGuiReviewHarness.start(mc);
+                else mc.stop();
             }
             default -> {}
         }

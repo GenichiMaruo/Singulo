@@ -96,7 +96,7 @@ Defeat a fabricator's androids to recover a compact crystal memory of their desi
 Choose how it guards (stay, wander or follow you), give it a name, self-repair kits and an enchantable armor plate, recharge it on the go with a wireless charger,
 and keep it out of (or let it through) places with android barrier and gate glass.
 
-From 0.7.0, androids in both supported Minecraft versions can also take crafting, processing and mining orders from an **Android Work Console**.
+On the 1.21.1 branch, androids can also take crafting, processing and mining orders from an **Android Work Console**.
 Record recipes and procedures, keep items in stock or trigger orders with redstone, and let them farm, tend animals and operate blocks.
 Upgrades add battery capacity, inventory space and fluid tanks; head, back/waist and hand decorations can be dyed.
 
@@ -131,9 +131,9 @@ Choose the file for your Minecraft version. The suffix **F** means Forge and **N
 
 | Minecraft | Mod loader | Java | Files and source |
 | --- | --- | --- | --- |
-| **1.20.1** | **Forge 47.4.26** or later for 1.20.1 | **17** | [1.20.1F files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) · [1.20.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) |
-| **1.20.1** | **NeoForge 47.1.106** or later for 1.20.1 | **17** | [1.20.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) · [1.20.1 NeoForge source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) |
-| **1.21.1** | **NeoForge 21.1.256** or later for 1.21.1 | **21** | [1.21.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) · [1.21.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/main) |
+| **1.20.1** | **Forge 47.4.26** or later for 1.20.1 | **17** | [1.20.1F files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) · [1.20.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) |
+| **1.20.1** | **NeoForge 47.1.106** or later for 1.20.1 | **17** | [1.20.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) · [1.20.1 NeoForge source and manuals](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) |
+| **1.21.1** | **NeoForge 21.1.256** or later for 1.21.1 | **21** | [1.21.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) · [1.21.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/1.21.1) |
 
 You can also filter the CurseForge Files tab by Minecraft version and mod loader.
 JEI is optional and supported on both versions.

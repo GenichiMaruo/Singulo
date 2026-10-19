@@ -80,6 +80,49 @@ def weathered(base, seed, edge=True, strength=1.0):
     return im
 
 
+def grime(im, seed, drips=4, dirt=1.0, rust=0, mineral=0, rust_col=(150, 92, 54), only_opaque=True):
+    """汚し: 上から垂れた雨だれの筋、裾にたまった汚れ、錆の点（下へ短く垂れる）、白い水垢の筋。
+    半透明の所（ガラス）は触らない（only_opaque）。同じ seed なら同じ汚れになる。"""
+    rnd = random.Random(seed * 7919 + 13)
+    px = im.load()
+
+    def shade(x, y, k, col=None):
+        if not (0 <= x < S and 0 <= y < S):
+            return
+        r, g, b, a = px[x, y]
+        if a == 0 or only_opaque and a < 200:
+            return
+        if col is None:
+            c = darken((r, g, b), k) if k > 0 else lighten((r, g, b), -k)
+        else:
+            c = mix((r, g, b), col, k)
+        px[x, y] = (c[0], c[1], c[2], a)
+
+    # 裾の汚れ（下ほど濃く、むらがある）
+    for y in range(S - 4, S):
+        depth = (y - (S - 5)) / 4
+        for x in range(S):
+            shade(x, y, dirt * depth * (0.05 + 0.05 * rnd.random()))
+    # 雨だれ: 上の方から下へ、だんだん薄くなる筋
+    for _ in range(drips):
+        x, y0 = rnd.randrange(1, S - 1), rnd.randrange(0, 7)
+        length = rnd.randrange(4, 11)
+        for k in range(length):
+            shade(x, y0 + k, 0.16 * (1 - k / length) + 0.04)
+    # 錆の点と、そこから垂れた錆
+    for _ in range(rust):
+        x, y = rnd.randrange(1, S - 1), rnd.randrange(1, S - 3)
+        shade(x, y, 0.55, rust_col)
+        for k in range(1, rnd.randrange(2, 5)):
+            shade(x, y + k, 0.35 / k, rust_col)
+    # 水垢: 白っぽい細い筋
+    for _ in range(mineral):
+        x, y0 = rnd.randrange(1, S - 1), rnd.randrange(2, 9)
+        for k in range(rnd.randrange(2, 6)):
+            shade(x, y0 + k, -0.10 * (1 - k / 6))
+    return im
+
+
 def edge_line(d, inset, color, gap=1, dotted=False):
     """縁に沿って内側を一周する線（角は gap だけ空ける）。"""
     a, b = inset, S - 1 - inset
@@ -230,6 +273,8 @@ ICONS = {
     'link': ["........", ".##..##.", "#..##..#", "#..++..#", "#..##..#", ".##..##.", "........", "........"],
     'beam': ["#......#", ".#....#.", "..#..#..", "...++...", "...++...", "..#..#..", ".#....#.", "#......#"],
     'atom': ["...##...", ".#.##.#.", "#..##..#", ".##++##.", ".##++##.", "#..##..#", ".#.##.#.", "...##..."],
+    # 核融合: プラズマの輪（トカマク）と、まん中で光る火
+    'fusion': ["..####..", ".#....#.", "#..++..#", "#.++++.#", "#.++++.#", "#..++..#", ".#....#.", "..####.."],
     'wave': ["........", "........", "#..#....", ".##.#..#", "....#.#.", ".....#..", "........", "........"],
     'shield': [".######.", "#++++++#", "#+####+#", "#+#..#+#", ".#+##+#.", "..#++#..", "...##...", "........"],
     'echo': ["#.#..#.#", "#.#..#.#", "..#..#..", "...++...", "...++...", "..#..#..", "#.#..#.#", "#.#..#.#"],
@@ -257,6 +302,8 @@ MACHINE_ICONS = {
     'archive_terminal': ('screen', (140, 240, 220)), 'thermoelectric_generator': ('thermo', (255, 120, 90)),
     'precision_assembler': ('arm', None), 'catalytic_reactor': ('flask', (150, 255, 180)),
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
+    'muon_fusion_reactor': ('fusion', (200, 150, 255)),
+    'hydrogen_fuel_cell': ('battery', (150, 220, 255)), 'peltier_cooler': ('snow', (170, 230, 255)),
     'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),
@@ -653,8 +700,27 @@ def mat_coil(m, seed, vertical=False):
     return im
 
 
+# 冷却塔の部品の汚し: (雨だれ, 裾の汚れ, 錆, 水垢)。屋外に立つ濡れた塔なので、筋と水垢が多い
+TOWER_GRIME = {
+    'cooling_tower_base': (5, 1.6, 1, 3),
+    'cooling_tower_casing': (5, 1.2, 2, 2),
+    'cooling_tower_glass': (3, 1.0, 1, 1),
+    'cooling_tower_coolant_band': (3, 1.0, 1, 4),
+    'cooling_tower_rim': (4, 1.0, 2, 2),
+    'cooling_tower_grate': (2, 0.6, 4, 0),
+}
+
+
 def multiblock_part(iid):
-    """縮退熱炉以外のマルチブロックの部品。対応しないものは None。"""
+    """縮退熱炉以外のマルチブロックの部品。対応しないものは None。冷却塔の部品には汚しを入れる。"""
+    im = _multiblock_part(iid)
+    if im is not None and iid in TOWER_GRIME:
+        drips, dirt, rust, mineral = TOWER_GRIME[iid]
+        grime(im, seed=sum(map(ord, iid)), drips=drips, dirt=dirt, rust=rust, mineral=mineral)
+    return im
+
+
+def _multiblock_part(iid):
     T, C, V, SH, TI, W = (MATERIALS[k] for k in ('tower', 'compactor', 'cavity', 'shield', 'tipler', 'wormhole'))
     # ---- 冷却塔
     if iid == 'cooling_tower_base':
@@ -887,7 +953,11 @@ def controller_front(iid, on, frame=0, frames=1):
     m = MATERIALS[mat]
     im = multiblock_part(skin)
     d = ImageDraw.Draw(im)
-    d.rectangle([3, 3, 12, 10], fill=rgba(m['dark']), outline=rgba(m['trim']))
+    # 画面の縁（凹みのまわりの1ドット。面の上）と、凹みの中の画面（絵の 4〜11。shapes.py の SCREEN と同じ所）
+    d.rectangle([3, 3, 12, 12], outline=rgba(m['trim']))
+    for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+        d.point((x, y), fill=rgba(darken(m['trim'], 0.3)))
+    d.rectangle([4, 4, 11, 11], fill=rgba(m['dark']))
     t = 2 * math.pi * frame / max(1, frames)
     if on:
         pulse = 0.5 + 0.5 * math.sin(t)
@@ -896,7 +966,7 @@ def controller_front(iid, on, frame=0, frames=1):
     else:
         col = rgba(mix(m['glow'], m['dark'], 0.65))
         hi = rgba(mix(m['glow'], m['dark'], 0.45))
-    # 8×8 の絵柄の中央 8×6 を画面に入れる
+    # 8×8 の絵柄の中央 8×6 を画面の上に、いちばん下の行を計器にする
     rows = ICONS.get(icon, ICONS['generic'])[1:7]
     for y, row in enumerate(rows):
         for x, ch in enumerate(row):
@@ -904,15 +974,16 @@ def controller_front(iid, on, frame=0, frames=1):
                 d.point((4 + x, 4 + y), fill=col)
             elif ch == '+':
                 d.point((4 + x, 4 + y), fill=hi)
-    d.rectangle([3, 12, 12, 13], fill=rgba(darken(m['frame'], 0.3)))
     if on:
-        n = 7 + int(round(1.5 + 1.5 * math.sin(t)))
+        n = 5 + int(round(1.5 + 1.5 * math.sin(t)))
         for x in range(4, 4 + n):
-            k = (x - 4) / 9
-            d.point((x, 12), fill=rgba(mix(m['glow'], m['hot'], k)))
-            d.point((x, 13), fill=rgba(darken(mix(m['glow'], m['hot'], k), 0.25)))
+            d.point((x, 11), fill=rgba(mix(m['glow'], m['hot'], (x - 4) / 7)))
     else:
-        d.point((4, 12), fill=rgba(darken(m['glow'], 0.5)))
+        d.point((4, 11), fill=rgba(darken(m['glow'], 0.5)))
+    # 画面の下の面に、状態の小さなランプ2つ
+    lamp = m['glow'] if on else mix(m['glow'], m['dark'], 0.7)
+    d.point((10, 14), fill=rgba(lamp))
+    d.point((12, 14), fill=rgba(darken(lamp, 0.3)))
     return im
 
 
@@ -952,7 +1023,8 @@ def part_texture(iid):
             d.line([(x, 1), (x, S - 2)], fill=(214, 144, 92, 255))
         d.line([(0, 7), (S - 1, 7)], fill=(150, 230, 255, 255))
         d.line([(0, 8), (S - 1, 8)], fill=(110, 200, 240, 255))
-        return im
+        # 汚し: 濡れた銅の緑青と、垂れた筋
+        return grime(im, seed=11, drips=4, dirt=1.2, rust=3, mineral=1, rust_col=(92, 160, 128))
     if iid == 'accelerator_tube':
         im = weathered((206, 212, 220), seed=12)
         d = ImageDraw.Draw(im)
@@ -1396,6 +1468,134 @@ def coolant_cartridge():
     return outlined(f)
 
 
+def fluid_canister():
+    """液体キャニスター: 鉄の筒に、縦長の窓（中身は窓の絵を重ねて染める。ここでは空の暗い窓）。口に赤い弁。"""
+    iron = (196, 200, 206)
+
+    def f(d):
+        d.rectangle([4, 4, 11, 14], fill=rgba(iron))
+        d.rectangle([4, 4, 5, 14], fill=rgba(lighten(iron, 0.25)))
+        d.rectangle([10, 4, 11, 14], fill=rgba(darken(iron, 0.22)))
+        d.line([(4, 14), (11, 14)], fill=rgba(darken(iron, 0.3)))
+        d.rectangle([6, 2, 9, 3], fill=rgba(darken(iron, 0.3)))
+        d.rectangle([6, 1, 9, 1], fill=(200, 64, 56, 255))
+        d.rectangle([6, 6, 9, 11], fill=(52, 60, 74, 255))
+        d.point((6, 6), fill=(96, 108, 128, 255))
+    return outlined(f)
+
+
+def limestone_powder():
+    """石灰粉: 白っぽい粉の小山。粒の陰と、方解石らしい灰色の粒。"""
+    def f(d):
+        d.polygon([(2, 13), (5, 8), (8, 6), (11, 8), (14, 13)], fill=(232, 230, 222, 255))
+        d.polygon([(8, 6), (11, 8), (14, 13), (9, 13)], fill=(206, 204, 196, 255))
+        d.line([(3, 13), (13, 13)], fill=(188, 186, 178, 255))
+        for x, y in ((6, 9), (9, 10), (5, 11), (11, 11), (8, 8)):
+            d.point((x, y), fill=(172, 174, 170, 255))
+        for x, y in ((7, 7), (4, 11)):
+            d.point((x, y), fill=(250, 250, 246, 255))
+    return outlined(f)
+
+
+def carbon_dust():
+    """炭素粉: 黒い粉の小山。鈍い光沢の粒。"""
+    def f(d):
+        d.polygon([(2, 13), (5, 8), (8, 6), (11, 8), (14, 13)], fill=(58, 58, 64, 255))
+        d.polygon([(8, 6), (11, 8), (14, 13), (9, 13)], fill=(40, 40, 46, 255))
+        d.line([(3, 13), (13, 13)], fill=(30, 30, 34, 255))
+        for x, y in ((6, 9), (9, 10), (5, 11), (11, 11)):
+            d.point((x, y), fill=(26, 26, 30, 255))
+        for x, y in ((7, 7), (4, 11), (10, 9)):
+            d.point((x, y), fill=(120, 122, 132, 255))
+    return outlined(f)
+
+
+def zinc_dust():
+    """亜鉛の粉: 青みがかった灰色の粉の小山。"""
+    def f(d):
+        d.polygon([(2, 13), (5, 8), (8, 6), (11, 8), (14, 13)], fill=(168, 178, 190, 255))
+        d.polygon([(8, 6), (11, 8), (14, 13), (9, 13)], fill=(140, 150, 164, 255))
+        d.line([(3, 13), (13, 13)], fill=(118, 128, 142, 255))
+        for x, y in ((6, 9), (9, 10), (5, 11), (11, 11)):
+            d.point((x, y), fill=(120, 132, 148, 255))
+        for x, y in ((7, 7), (4, 11), (10, 9)):
+            d.point((x, y), fill=(214, 224, 236, 255))
+    return outlined(f)
+
+
+def bismuth_ingot():
+    """ビスマスインゴット: 銀白の地に、酸化膜の虹色（紫・青・金）が帯になって浮く。"""
+    c = (196, 188, 200)
+
+    def f(d):
+        d.polygon([(2, 9), (6, 5), (13, 5), (9, 9)], fill=rgba(lighten(c, 0.2)))
+        d.rectangle([2, 9, 9, 12], fill=rgba(c))
+        d.polygon([(9, 9), (13, 5), (13, 8), (9, 12)], fill=rgba(darken(c, 0.25)))
+        for (x0, x1), col in (((4, 6), (200, 120, 230)), ((6, 8), (110, 170, 240)), ((8, 10), (236, 200, 90))):
+            d.line([(x0, 8), (x1, 6)], fill=rgba(col))
+        d.line([(3, 10), (5, 10)], fill=(150, 120, 220, 255))
+        d.line([(6, 11), (8, 11)], fill=(230, 180, 90, 255))
+        d.point((12, 6), fill=(120, 210, 220, 255))
+    return outlined(f)
+
+
+NIHONIUM = (150, 166, 176)
+NIHONIUM_GLOW = (120, 236, 214)
+
+
+def nihonium():
+    """ニホニウム: 小さな重い金属の粒に、安定な原子核のかすかな光（青緑）と、軌道の輪。"""
+    def f(d):
+        d.ellipse([4, 4, 11, 11], fill=rgba(NIHONIUM))
+        d.ellipse([5, 5, 8, 8], fill=rgba(lighten(NIHONIUM, 0.3)))
+        d.point((6, 6), fill=(240, 250, 250, 255))
+        d.arc([1, 5, 14, 10], 0, 360, fill=rgba(NIHONIUM_GLOW))
+        d.point((13, 7), fill=(220, 255, 246, 255))
+        d.point((2, 8), fill=rgba(darken(NIHONIUM_GLOW, 0.2)))
+    return outlined(f)
+
+
+def nihonium_ingot():
+    """ニホニウムインゴット: 青みの灰色の重い地金に、青緑の光の筋。"""
+    c = NIHONIUM
+
+    def f(d):
+        d.polygon([(2, 9), (6, 5), (13, 5), (9, 9)], fill=rgba(lighten(c, 0.25)))
+        d.rectangle([2, 9, 9, 12], fill=rgba(c))
+        d.polygon([(9, 9), (13, 5), (13, 8), (9, 12)], fill=rgba(darken(c, 0.28)))
+        d.line([(3, 10), (8, 10)], fill=rgba(NIHONIUM_GLOW))
+        d.line([(6, 7), (10, 6)], fill=rgba(lighten(c, 0.5)))
+    return outlined(f)
+
+
+def unfired_phosphor():
+    """未焼成の蛍光体: 灰白色の粉の小山に、硫黄の黄色と銅の赤茶の粒。"""
+    def f(d):
+        d.polygon([(2, 13), (5, 8), (8, 6), (11, 8), (14, 13)], fill=(206, 206, 190, 255))
+        d.polygon([(8, 6), (11, 8), (14, 13), (9, 13)], fill=(178, 178, 162, 255))
+        d.line([(3, 13), (13, 13)], fill=(150, 150, 136, 255))
+        for x, y in ((6, 9), (10, 11), (4, 11)):
+            d.point((x, y), fill=(232, 210, 80, 255))
+        for x, y in ((9, 9), (7, 11)):
+            d.point((x, y), fill=(190, 110, 70, 255))
+        d.point((8, 7), fill=(240, 240, 226, 255))
+    return outlined(f)
+
+
+def empty_coolant_cartridge():
+    """空の冷媒カートリッジ: 冷媒カートリッジと同じ鋼の容器で、窓の帯が暗い（中が空）。"""
+    steel = (176, 184, 196)
+
+    def f(d):
+        d.rectangle([5, 3, 10, 13], fill=rgba(steel))
+        d.rectangle([5, 3, 6, 13], fill=rgba(lighten(steel, 0.25)))
+        d.rectangle([9, 3, 10, 13], fill=rgba(darken(steel, 0.2)))
+        d.rectangle([5, 7, 10, 9], fill=(70, 82, 98, 255))
+        d.line([(6, 8), (7, 8)], fill=(120, 136, 156, 255))
+        d.rectangle([6, 1, 9, 2], fill=rgba(darken(steel, 0.35)))
+    return outlined(f)
+
+
 def phase_sync_plate():
     """位相同期板: 薄い光格子の板に、そろった波の縞（琥珀と菫）。"""
     def f(d):
@@ -1685,6 +1885,18 @@ ITEM_ART = {
     'pressure_crystal': lambda: crystal_cluster((60, 104, 206), seed=5, mark=(210, 235, 255)),
     'void_dust': void_dust,
     'coolant_cartridge': coolant_cartridge,
+    'empty_coolant_cartridge': empty_coolant_cartridge,
+    'fluid_canister': fluid_canister,
+    'limestone_powder': limestone_powder,
+    'carbon_dust': carbon_dust,
+    'zinc_dust': zinc_dust,
+    'zinc_ingot': lambda: ingot((176, 186, 196)),
+    'bismuth_ingot': bismuth_ingot,
+    'nihonium': nihonium,
+    'nihonium_ingot': nihonium_ingot,
+    'nihonium_plate': lambda: plate(NIHONIUM, stripes=2, accent=NIHONIUM_GLOW),
+    'nihonium_frame': lambda: frame(NIHONIUM, NIHONIUM_GLOW),
+    'unfired_phosphor': unfired_phosphor,
     'phase_sync_plate': phase_sync_plate,
     'degenerate_precursor': degenerate_precursor,
     'confinement_ring': confinement_ring,

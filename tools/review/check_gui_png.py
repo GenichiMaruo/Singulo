@@ -9,7 +9,7 @@ import pathlib
 import struct
 import zlib
 
-def rgba(path):
+def rgba(path, max_row=None):
     data = path.read_bytes()
     assert data[:8] == b"\x89PNG\r\n\x1a\n"
     at, payload = 8, bytearray()
@@ -32,7 +32,7 @@ def rgba(path):
         p = a + b - c
         distances = abs(p - a), abs(p - b), abs(p - c)
         return (a, b, c)[distances.index(min(distances))]
-    for y in range(height):
+    for y in range(min(height, max_row or height)):
         start = y * (stride + 1)
         mode, row = raw[start], bytearray(raw[start + 1:start + 1 + stride])
         for x in range(stride):
@@ -63,3 +63,47 @@ for name in ("android-status", "android-gear", "android-decor"):
     results.append({"screen": name, "checked_empty_slot_centers": len(points), "rgb": pixels[0]})
 pathlib.Path(_build + "/gui-review/inventory-pixels.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
 print(json.dumps(results))
+
+# Actual exported pixels, not just successful screen opens: long machine names must
+# not draw their dark title glyphs into the orange NO_POWER label's header region.
+metrics_path = pathlib.Path(_build + "/gui-review/machine-font-metrics.tsv")
+if metrics_path.exists():
+    rows = [line.split('\t') for line in metrics_path.read_text().splitlines()]
+    if len(rows) != 120:
+        raise SystemExit(f"Expected 120 machine GUI fixtures, got {len(rows)}")
+    locales = ('ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr')
+    checked_headers = 0
+    rate_reference = None
+    for locale in locales:
+        entries = [r for r in rows if r[0] == locale]
+        if len(entries) != 24:
+            raise SystemExit(f"Expected 24 fixtures for {locale}, got {len(entries)}")
+        for index, entry in enumerate(entries[:16]):
+            _, name, title_width, status_width, panel_width = entry
+            panel_width, status_width = int(panel_width), int(status_width)
+            width, height, channels, pixels = rgba(root / f"machine-{locale}-{index:02d}.png", max_row=104)
+            assert (width, height) == (854, 480)
+            left, top = (width - panel_width * 2) // 2, (height - 166 * 2) // 2
+            label_width = min(status_width, (panel_width - 20) // 2)
+            x0, x1 = left + (panel_width - 8 - label_width) * 2, left + (panel_width - 8) * 2
+            colors = [tuple(pixels[y][x * channels:x * channels + 3])
+                      for y in range(top + 12, top + 30) for x in range(x0, x1)]
+            dark_title = any(55 <= r <= 65 and 65 <= g <= 75 and 75 <= b <= 85 for r, g, b in colors)
+            orange_status = any(180 <= r <= 200 and 115 <= g <= 140 and 25 <= b <= 40 for r, g, b in colors)
+            if dark_title or not orange_status:
+                raise SystemExit(f"{locale}/{name}: title/status overlap or missing status glyphs in PNG")
+            checked_headers += 1
+        # ASCII output is language-independent. Catch stale/corrupt font-atlas pixels
+        # after language changes rather than counting an unreadable capture as success.
+        width, height, channels, pixels = rgba(root / f"machine-{locale}-18.png", max_row=194)
+        left, top = (width - 176 * 2) // 2, (height - 166 * 2) // 2
+        rate = [bytes(pixels[y][(left + 44) * channels:(left + 224) * channels])
+                for y in range(top + 102, top + 120)]
+        if rate_reference is None:
+            rate_reference = rate
+        elif rate != rate_reference:
+            raise SystemExit(f"{locale}: generator ASCII glyph pixels differ after language switch")
+    summary = {"languages": list(locales), "machine_captures": len(rows),
+               "headers_without_title_status_overlap": checked_headers, "generator_font_probes": 5}
+    pathlib.Path(_build + "/gui-review/machine-pixels.json").write_text(json.dumps(summary, indent=2))
+    print(json.dumps(summary))

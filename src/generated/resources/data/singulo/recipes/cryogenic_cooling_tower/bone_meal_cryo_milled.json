@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "cryogenic_cooling_tower",
+  "stage": 2,
+  "time": 20,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:bone"
+      },
+      "count": 1
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "singulo:liquid_nitrogen",
+      "amount": 10
+    }
+  ],
+  "result": {
+    "id": "minecraft:bone_meal",
+    "count": 6
+  }
+}

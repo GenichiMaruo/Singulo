@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:basic_frame"
+    },
+    {
+      "item": "singulo:thermocouple_module"
+    },
+    {
+      "item": "singulo:thermocouple_module"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    },
+    {
+      "tag": "forge:ingots/copper"
+    },
+    {
+      "tag": "forge:ingots/copper"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "singulo:peltier_cooler"
+  }
+}

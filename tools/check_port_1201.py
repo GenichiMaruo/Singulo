@@ -62,7 +62,8 @@ def validate_jar(path):
                         'android/work/RecipeData', 'android/AndroidAccessoryItem',
                         'android/AxeAndroid', 'android/BitAndroid', 'android/AndroidPatrol', 'android/AndroidLife',
                         'ruin/FoundryOverseer', 'ruin/lab/LabStructure', 'android/work/AreaCardItem',
-                        'registry/PendingMilestones', 'compat/mekanism/MekanismChemicals'):
+                        'registry/PendingMilestones', 'item/FluidCanisterItem', 'machine/GeneratorSlotsMenu',
+                        'machine/HydrogenFuelCellBlockEntity', 'machine/MuonFusionReactorBlockEntity', 'compat/mekanism/MekanismChemicals'):
             assert f'io/github/genichimaruo/singulo/{feature}.class' in names, f'Missing feature: {feature}'
         count = 0
         for name in names:

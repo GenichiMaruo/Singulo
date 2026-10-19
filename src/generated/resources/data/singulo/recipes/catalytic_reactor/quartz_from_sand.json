@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "catalytic_reactor",
+  "stage": 2,
+  "time": 200,
+  "energy": 200,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:sand"
+      },
+      "count": 2
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "minecraft:water",
+      "amount": 250
+    }
+  ],
+  "result": {
+    "id": "minecraft:quartz",
+    "count": 1
+  }
+}

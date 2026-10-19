@@ -13,9 +13,15 @@
     },
     {
       "ingredient": {
-        "tag": "forge:plates/steel"
+        "item": "singulo:nihonium_plate"
       },
-      "count": 4
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:meteoric_iron_ingot"
+      },
+      "count": 2
     },
     {
       "ingredient": {

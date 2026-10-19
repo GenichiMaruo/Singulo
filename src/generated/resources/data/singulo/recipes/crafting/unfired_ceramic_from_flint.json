@@ -15,7 +15,7 @@
       "item": "minecraft:flint"
     },
     {
-      "item": "minecraft:bone_meal"
+      "tag": "singulo:ceramic_flux"
     },
     {
       "tag": "forge:sand"

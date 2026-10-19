@@ -11,7 +11,7 @@
       "tag": "forge:plates/steel"
     },
     "C": {
-      "item": "minecraft:coal"
+      "tag": "singulo:carbon"
     },
     "O": {
       "tag": "forge:obsidian"

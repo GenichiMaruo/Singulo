@@ -8,6 +8,7 @@
 アイテムの絵は生成したテクスチャ（mod）と、ビルドで用意されるマイクラ本体の資源（バニラ）から取る。
 """
 import io
+import os
 import zipfile
 from fractions import Fraction as F
 from pathlib import Path
@@ -18,8 +19,16 @@ from ids import MOD, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / 'src' / 'generated' / 'resources' / 'assets' / 'singulo'
-VANILLA_JAR = next(iter(sorted((ROOT / 'build' / 'moddev' / 'artifacts').glob('*minecraft-resources.jar'))), None) \
-    if (ROOT / 'build' / 'moddev' / 'artifacts').exists() else None
+# Legacy loaders have separate build directories; the runtime cache contains the
+# original Java 17 client resources even before a loader-specific resource JAR exists.
+_version = next(line.split('=', 1)[1].strip() for line in (ROOT / 'gradle.properties').read_text().splitlines()
+                if line.startswith('minecraft_version='))
+_gradle_cache = Path(os.environ.get('GRADLE_USER_HOME', str(Path.home() / '.gradle')))
+_vanilla_candidates = [Path(os.environ['SINGULO_VANILLA_JAR'])] if os.environ.get('SINGULO_VANILLA_JAR') else []
+for _build in ('build', 'build/forge', 'build/neoforge'):
+    _vanilla_candidates += sorted((ROOT / _build / 'moddev/artifacts').glob('*minecraft-resources.jar'))
+_vanilla_candidates.append(_gradle_cache / 'caches/neoformruntime/artifacts' / f'minecraft_{_version}_client.jar')
+VANILLA_JAR = next((path for path in _vanilla_candidates if path.is_file()), None)
 OUT = ROOT / 'docs' / 'recipes'
 
 Z = 3                       # 16px の絵を何倍で描くか
@@ -38,21 +47,29 @@ FONT_BOLD_PATHS = ['C:/Windows/Fonts/BIZ-UDGothicB.ttc', 'C:/Windows/Fonts/meiry
 
 # タグ・バニラの代表の絵（textures の中の名前）
 TAG_ICONS = {
-    'forge:glass_blocks/colorless': 'block/glass', 'forge:dusts/glowstone': 'item/glowstone_dust', 'forge:ender_pearls': 'item/ender_pearl',
-    'forge:slime_balls': 'item/slime_ball', 'forge:gems/diamond': 'item/diamond', 'singulo:star_core': 'item/nether_star',
-    'forge:gems/quartz': 'item/quartz', 'forge:dusts/redstone': 'item/redstone', 'singulo:helium_bearing_stone': 'block/deepslate',
-    'forge:sand': 'block/sand', 'forge:ingots/iron': 'item/iron_ingot', 'forge:ingots/copper': 'item/copper_ingot', 'forge:obsidians': 'block/obsidian',
+    'c:glass_blocks/colorless': 'block/glass', 'c:dusts/glowstone': 'item/glowstone_dust', 'c:ender_pearls': 'item/ender_pearl',
+    'c:slime_balls': 'item/slime_ball', 'c:gems/diamond': 'item/diamond', 'singulo:star_core': 'item/nether_star',
+    'c:gems/quartz': 'item/quartz', 'c:dusts/redstone': 'item/redstone', 'singulo:helium_bearing_stone': 'block/deepslate',
+    'singulo:ceramic_flux': 'item/bone_meal', 'singulo:limestone': 'block/calcite', 'singulo:carbon': 'item/coal',
+    'c:cobblestones/normal': 'block/cobblestone', 'c:gravels': 'block/gravel', 'minecraft:logs': 'block/oak_log',
+    'c:storage_blocks/coal': 'block/coal_block', 'c:raw_materials/copper': 'item/raw_copper', 'c:rods/blaze': 'item/blaze_rod',
+    'c:sands': 'block/sand', 'c:ingots/iron': 'item/iron_ingot', 'c:ingots/copper': 'item/copper_ingot', 'c:obsidians': 'block/obsidian',
 }
+# The shared recipe catalog includes canonical c: names and existing Forge names.
+# Keep both spellings available when rendering the legacy documentation.
+TAG_ICONS.update({key.replace('c:', 'forge:', 1): value for key, value in list(TAG_ICONS.items()) if key.startswith('c:')})
+TAG_ICONS['forge:sand'] = 'block/sand'
 VANILLA_TEXTURE_OVERRIDES = {
     'minecraft:piston': 'block/piston_side', 'minecraft:blast_furnace': 'block/blast_furnace_front',
-    'minecraft:blue_ice': 'block/blue_ice', 'minecraft:sculk': 'block/sculk', 'minecraft:sculk_sensor': 'block/sculk_sensor_side',
+    'minecraft:blue_ice': 'block/blue_ice', 'minecraft:lava': 'block/lava_still', 'minecraft:sculk': 'block/sculk', 'minecraft:sculk_sensor': 'block/sculk_sensor_side',
 }
 # 液体の色（Java の SinguloFluids と同じ値）
 FLUID_COLORS = {'dark_matter': 0x2A1E3C, 'hydrogen': 0xE6F5FF, 'oxygen': 0xF5E1E1, 'liquid_nitrogen': 0xBFEFFF,
-                'helium': 0xF5F0C8, 'liquid_helium': 0xE6D2FF, 'axion_condensate': 0xA078E6, 'minecraft:water': 0x3F76E4}
+                'helium': 0xF5F0C8, 'liquid_helium': 0xE6D2FF, 'axion_condensate': 0xA078E6, 'minecraft:water': 0x3F76E4,
+                'minecraft:lava': 0xFF7A1E}
 # 製作場所 → 装置の正面の絵（mod の装置ID）
 STATION_BLOCKS = {
-    '焼成炉': 'kiln', '圧縮機': 'compressor', '電解槽': 'electrolyzer', 'アーカイブ端末': 'archive_terminal',
+    '焼成炉': 'kiln', 'ペルチェ冷却器': 'peltier_cooler', '圧縮機': 'compressor', '電解槽': 'electrolyzer', 'アーカイブ端末': 'archive_terminal',
     '精密組立台': 'precision_assembler', '触媒反応器': 'catalytic_reactor', '極低温冷却塔': 'cooling_tower_controller',
     '粒子加速器': 'accelerator_controller', '量子もつれ合成器': 'entanglement_synthesizer', 'レーザー冷却器': 'laser_cooler',
     '縮退圧縮炉': 'degenerate_compactor_controller', 'C空洞': 'casimir_cavity_controller', '時間結晶育成槽': 'time_crystal_incubator',

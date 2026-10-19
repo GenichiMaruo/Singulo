@@ -29,10 +29,12 @@ import net.minecraftforge.fluids.FluidStack;
  * @param restore      修復・復元の対象。成果物は対象の使用回数を回復したもの
  * @param minSize      マルチブロックの大きさの下限（冷却塔の高さなど）。0なら条件なし
  * @param priority     大きいほど先に試す（混成ボーナスのように、通常のレシピより優先したいもの）
+ * @param byproduct    成果物と一緒に出る副産物（粗銅の精錬のビスマスなど）。空ならなし
  */
 public record MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
                             List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
-                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority) implements Recipe<MachineRecipe.Input> {
+                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct)
+        implements Recipe<MachineRecipe.Input> {
 
     public record ItemInput(Ingredient ingredient, int count, int uses) {
     }
@@ -218,9 +220,13 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 }
             }
             var recipe = new MachineRecipe(json.get("station").getAsString(), integer(json,"stage",1), integer(json,"time",1), integer(json,"energy",0), ingredients, fluids, mass,
-                    json.has("restore") ? Optional.of(Ingredient.fromJson(json.get("restore"))) : Optional.empty(), result, outputs, integer(json,"min_size",0), integer(json,"priority",0));
+                    json.has("restore") ? Optional.of(Ingredient.fromJson(json.get("restore"))) : Optional.empty(), result, outputs, integer(json,"min_size",0), integer(json,"priority",0), json.has("byproduct") ? readOutput(json.getAsJsonObject("byproduct")) : ItemStack.EMPTY);
             IDS.put(recipe,id);
             return recipe;
+        }
+        private static ItemStack readOutput(com.google.gson.JsonObject json) {
+            return new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(
+                    json.get(json.has("id") ? "id" : "item").getAsString())), integer(json, "count", 1));
         }
         private static int integer(com.google.gson.JsonObject o, String key, int fallback) { return o.has(key) ? o.get(key).getAsInt() : fallback; }
         public MachineRecipe fromNetwork(net.minecraft.resources.ResourceLocation id, FriendlyByteBuf buf) {
@@ -230,7 +236,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             Optional<Ingredient> restore = buf.readBoolean() ? Optional.of(Ingredient.fromNetwork(buf)) : Optional.empty();
             ItemStack result = buf.readItem();
             var outputs = buf.readList(FluidStack::readFromPacket);
-            var recipe = new MachineRecipe(buf.readUtf(),buf.readVarInt(),buf.readVarInt(),buf.readVarInt(),ingredients,fluids,mass,restore,result,outputs,buf.readVarInt(),buf.readVarInt());
+            var recipe = new MachineRecipe(buf.readUtf(),buf.readVarInt(),buf.readVarInt(),buf.readVarInt(),ingredients,fluids,mass,restore,result,outputs,buf.readVarInt(),buf.readVarInt(),buf.readItem());
             IDS.put(recipe,id); return recipe;
         }
         public void toNetwork(FriendlyByteBuf buf, MachineRecipe r) {
@@ -239,7 +245,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             buf.writeBoolean(r.mass().isPresent()); r.mass().ifPresent(v -> { buf.writeDouble(v.amount()); buf.writeBoolean(v.metalOnly()); });
             buf.writeBoolean(r.restore().isPresent()); r.restore().ifPresent(v -> v.toNetwork(buf));
             buf.writeItem(r.result()); buf.writeCollection(r.fluidResults(), (b,v) -> v.writeToPacket(b));
-            buf.writeUtf(r.station()); buf.writeVarInt(r.stage()); buf.writeVarInt(r.time()); buf.writeVarInt(r.energy()); buf.writeVarInt(r.minSize()); buf.writeVarInt(r.priority());
+            buf.writeUtf(r.station()); buf.writeVarInt(r.stage()); buf.writeVarInt(r.time()); buf.writeVarInt(r.energy()); buf.writeVarInt(r.minSize()); buf.writeVarInt(r.priority()); buf.writeItem(r.byproduct());
         }
     }
 }

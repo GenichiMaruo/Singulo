@@ -20,7 +20,8 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
 
     private int side;
     private final PortLinks ports = new PortLinks();
-    private boolean firstCheck = true;
+    /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
+    private boolean firstCheck;
     private long nextCheck;
 
     public AcceleratorControllerBlockEntity(BlockPos pos, BlockState state) {
@@ -53,6 +54,12 @@ public class AcceleratorControllerBlockEntity extends MachineBlockEntity {
             firstCheck = false;
         }
         return side > 0;
+    }
+
+    @Override
+    public void load(net.minecraft.nbt.CompoundTag tag) {
+        super.load(tag);
+        firstCheck = true;
     }
 
     @Override

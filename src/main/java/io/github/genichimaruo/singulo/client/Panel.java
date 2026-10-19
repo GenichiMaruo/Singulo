@@ -79,4 +79,17 @@ final class Panel {
     static boolean inside(double mx, double my, int x, int y, int w, int h) {
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
+    /** Keep wrapped explanatory tooltips, including their border, inside small windows. */
+    static void tooltip(GuiGraphics g, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> text,
+                        int maxWidth, int mouseX, int mouseY) {
+        var lines = new java.util.ArrayList<net.minecraft.util.FormattedCharSequence>();
+        for (var line : text) lines.addAll(font.split(line, Math.min(maxWidth, g.guiWidth() - 8)));
+        g.renderTooltip(font, lines, (screenWidth, screenHeight, x, y, width, height) -> {
+            var preferred = net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner.INSTANCE
+                    .positionTooltip(screenWidth, screenHeight, x, y, width, height);
+            return new org.joml.Vector2i(Math.max(4, Math.min(preferred.x(), screenWidth - width - 4)),
+                    Math.max(4, Math.min(preferred.y(), screenHeight - height - 4)));
+        }, mouseX, mouseY);
+    }
+
 }

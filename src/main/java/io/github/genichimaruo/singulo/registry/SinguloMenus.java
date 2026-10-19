@@ -19,6 +19,8 @@ public final class SinguloMenus {
 
     public static final Supplier<MenuType<ThermoelectricGeneratorMenu>> THERMOELECTRIC_GENERATOR = REGISTER.register(
             "thermoelectric_generator", () -> IForgeMenuType.create(ThermoelectricGeneratorMenu::client));
+    public static final Supplier<MenuType<io.github.genichimaruo.singulo.machine.GeneratorSlotsMenu>> GENERATOR_SLOTS = REGISTER.register(
+            "generator_slots", () -> IForgeMenuType.create(io.github.genichimaruo.singulo.machine.GeneratorSlotsMenu::client));
 
     public static final Supplier<MenuType<CatalystDeviceMenu>> CATALYST_DEVICE = REGISTER.register(
             "catalyst_device", () -> IForgeMenuType.create(CatalystDeviceMenu::client));

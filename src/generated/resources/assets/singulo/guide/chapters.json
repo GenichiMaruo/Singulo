@@ -6,7 +6,8 @@
       "pages": [
         "intro.welcome",
         "intro.howto",
-        "intro.basics"
+        "intro.basics",
+        "intro.vanilla"
       ]
     },
     {

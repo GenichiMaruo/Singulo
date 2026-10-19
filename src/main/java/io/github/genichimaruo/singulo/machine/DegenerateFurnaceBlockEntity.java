@@ -51,7 +51,8 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     private int output;
     private int formed;
     private final io.github.genichimaruo.singulo.multiblock.PortLinks ports = new io.github.genichimaruo.singulo.multiblock.PortLinks();
-    private boolean firstCheck = true;
+    /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
+    private boolean firstCheck;
     private long nextCheck;
 
     public DegenerateFurnaceBlockEntity(BlockPos pos, BlockState state) {
@@ -192,6 +193,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
+        firstCheck = true;
         fuel.deserializeNBT(tag.getCompound("fuel"));
         burn = tag.getInt("burn");
     }

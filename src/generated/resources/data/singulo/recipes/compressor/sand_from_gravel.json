@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 20,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:gravel"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:sand",
+    "count": 1
+  }
+}
