@@ -37,6 +37,62 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         return menu.type();
     }
 
+    /** 待機している理由（待機中だけ、何 tick かごとに調べ直す）。 */
+    @javax.annotation.Nullable
+    private io.github.genichimaruo.singulo.machine.MachineDiagnosis.Result idleReason;
+    private int reasonTimer;
+
+    private MachineBlockEntity.Status status() {
+        return MachineBlockEntity.Status.values()[menu.value(MachineBlockEntity.D_STATUS)];
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        if (status() != MachineBlockEntity.Status.IDLE || menu.value(MachineBlockEntity.D_MODE) > 0 || Minecraft.getInstance().level == null) {
+            idleReason = null;
+            return;
+        }
+        if (idleReason != null && reasonTimer++ % 5 != 0) {
+            return;
+        }
+        List<ItemStack> inputs = new ArrayList<>();
+        for (int i = 0; i < type().recipeSlots(); i++) {
+            inputs.add(menu.getSlot(type().recipeSlot(i)).getItem());
+        }
+        List<net.neoforged.neoforge.fluids.FluidStack> tanks = new ArrayList<>();
+        for (int i = 0; i < type().tanks(); i++) {
+            int fluidId = menu.value(MachineBlockEntity.D_TANKS + i * 2);
+            tanks.add(fluidId > 0 ? new net.neoforged.neoforge.fluids.FluidStack(BuiltInRegistries.FLUID.byId(fluidId - 1),
+                    menu.value(MachineBlockEntity.D_TANKS + i * 2 + 1)) : net.neoforged.neoforge.fluids.FluidStack.EMPTY);
+        }
+        idleReason = io.github.genichimaruo.singulo.machine.MachineDiagnosis.idle(Minecraft.getInstance().level, type(), inputs, tanks,
+                menu.value(MachineBlockEntity.D_STRUCTURE));
+    }
+
+    /** 右上の状態の文字。待機中で理由が分かれば、理由を短く出す。 */
+    private Component statusText() {
+        MachineBlockEntity.Status status = status();
+        if (status == MachineBlockEntity.Status.IDLE && idleReason != null
+                && idleReason.kind() != io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.EMPTY) {
+            return Component.translatable("gui.singulo.reason.label." + idleReason.kind().name().toLowerCase());
+        }
+        return Component.translatable("gui.singulo.status." + status.name().toLowerCase());
+    }
+
+    /** 状態の文字に重ねたときの説明（どうすれば動くか）。 */
+    private List<Component> statusTooltip() {
+        return switch (status()) {
+            case IDLE -> idleReason == null ? List.of() : idleReason.lines();
+            case NO_POWER -> List.of(Component.translatable("gui.singulo.reason.no_power", menu.value(MachineBlockEntity.D_USAGE),
+                    menu.value(MachineBlockEntity.D_ENERGY)));
+            case OUTPUT_FULL -> List.of(Component.translatable("gui.singulo.reason.output_full"));
+            case NOT_FORMED -> List.of(Component.translatable("gui.singulo.reason.not_formed"));
+            case OFF -> List.of(Component.translatable("gui.singulo.reason.off"));
+            case RUNNING -> List.of();
+        };
+    }
+
     /** 面の設定の画面を開いているか。開いている間は装置の部分にかぶせて描く。 */
     private boolean sidesOpen;
     /** 0 はアイテム、1 以降はタンクごと（1 + タンクの番号、MachineBlockEntity.sideChannels）。 */
@@ -422,12 +478,15 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
         g.drawString(font, title, titleLabelX, titleLabelY, Panel.TEXT, false);
         g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
-        MachineBlockEntity.Status status = MachineBlockEntity.Status.values()[menu.value(MachineBlockEntity.D_STATUS)];
-        Component text = Component.translatable("gui.singulo.status." + status.name().toLowerCase());
+        MachineBlockEntity.Status status = status();
+        Component text = statusText();
+        boolean waiting = status == MachineBlockEntity.Status.IDLE && (idleReason == null
+                || idleReason.kind() == io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.EMPTY);
         int color = switch (status) {
             case RUNNING -> 0xFF3A9CC0;
             case NOT_FORMED -> 0xFFC05050;
-            case IDLE, OFF -> 0xFF8A949E;
+            case OFF -> 0xFF8A949E;
+            case IDLE -> waiting ? 0xFF8A949E : 0xFFC08020;
             default -> 0xFFC08020;
         };
         g.drawString(font, text, imageWidth - 8 - font.width(text), titleLabelY, color, false);
@@ -472,6 +531,18 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         MachineLayout l = layout();
         int x = leftPos;
         int y = topPos;
+        int statusWidth = font.width(statusText());
+        if (Panel.inside(mouseX, mouseY, x + imageWidth - 8 - statusWidth, y + titleLabelY - 1, statusWidth, 10)) {
+            List<Component> lines = statusTooltip();
+            if (!lines.isEmpty()) {
+                List<net.minecraft.util.FormattedCharSequence> wrapped = new ArrayList<>();
+                for (Component c : lines) {
+                    wrapped.addAll(font.split(c, 200));
+                }
+                g.renderTooltip(font, wrapped, mouseX, mouseY);
+                return;
+            }
+        }
         if (hasSides() && Panel.inside(mouseX, mouseY, x + sidesButtonX(), y + MachineLayout.SIDES_Y, MachineLayout.SIDES_SIZE,
                 MachineLayout.SIDES_SIZE)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.sides.button"), mouseX, mouseY);

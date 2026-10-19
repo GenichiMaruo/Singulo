@@ -35,10 +35,12 @@ import net.neoforged.neoforge.fluids.FluidStack;
  * @param restore      修復・復元の対象。成果物は対象の使用回数を回復したもの
  * @param minSize      マルチブロックの大きさの下限（冷却塔の高さなど）。0なら条件なし
  * @param priority     大きいほど先に試す（混成ボーナスのように、通常のレシピより優先したいもの）
+ * @param byproduct    成果物と一緒に出る副産物（粗銅の精錬のビスマスなど）。空ならなし
  */
 public record MachineRecipe(String station, int stage, int time, int energy, List<ItemInput> ingredients,
                             List<FluidInput> fluidIngredients, Optional<MassInput> mass, Optional<Ingredient> restore,
-                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority) implements Recipe<MachineRecipe.Input> {
+                            ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct)
+        implements Recipe<MachineRecipe.Input> {
 
     public record ItemInput(Ingredient ingredient, int count, int uses) {
         public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -110,7 +112,8 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             ItemStack.CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MachineRecipe::result),
             FluidStack.CODEC.listOf().optionalFieldOf("fluid_results", List.of()).forGetter(MachineRecipe::fluidResults),
             Codec.INT.optionalFieldOf("min_size", 0).forGetter(MachineRecipe::minSize),
-            Codec.INT.optionalFieldOf("priority", 0).forGetter(MachineRecipe::priority)
+            Codec.INT.optionalFieldOf("priority", 0).forGetter(MachineRecipe::priority),
+            ItemStack.CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(MachineRecipe::byproduct)
     ).apply(i, MachineRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MachineRecipe> STREAM_CODEC = StreamCodec.of(
@@ -127,6 +130,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buf, r.fluidResults);
                 buf.writeVarInt(r.minSize);
                 buf.writeVarInt(r.priority);
+                ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, r.byproduct);
             },
             buf -> new MachineRecipe(
                     buf.readUtf(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
@@ -137,7 +141,8 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                     ItemStack.OPTIONAL_STREAM_CODEC.decode(buf),
                     FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buf),
                     buf.readVarInt(),
-                    buf.readVarInt()));
+                    buf.readVarInt(),
+                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf)));
 
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable

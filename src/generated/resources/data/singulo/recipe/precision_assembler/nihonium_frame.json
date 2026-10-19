@@ -1,0 +1,31 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 400,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:basic_frame"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:nihonium_plate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_wire"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "id": "singulo:nihonium_frame",
+    "count": 1
+  }
+}

@@ -100,6 +100,8 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
     private int hot;
     private double rate;
     private boolean standby;
+    /** 0.10.0 より前（発電機だったころ）に置かれたタービン。最初に画面を開いた人に、蓄電装置に変わったことを一度だけ知らせる。 */
+    private boolean legacyNotice;
 
     public CryogenicTurbineBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.CRYOGENIC_TURBINE.get(), pos, state);
@@ -219,10 +221,21 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
 
     @Override
     public void openMenu(ServerPlayer player) {
+        noticeIfLegacy(player);
         player.openMenu(this, buf -> {
             buf.writeBlockPos(worldPosition);
             buf.writeVarInt(GeneratorSlotsMenu.KIND_TURBINE);
         });
+    }
+
+    /** 0.10.0 より前のタービンなら、蓄電装置に変わったことを一度だけ知らせる。 */
+    public void noticeIfLegacy(ServerPlayer player) {
+        if (legacyNotice) {
+            legacyNotice = false;
+            setChanged();
+            player.sendSystemMessage(Component.translatable("message.singulo.cryogenic_turbine.now_storage")
+                    .withStyle(net.minecraft.ChatFormatting.AQUA));
+        }
     }
 
     @Override
@@ -238,6 +251,14 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
         tag.putInt("energy", energy.getEnergyStored());
         tag.put("tank", tank.writeToNBT(registries, new CompoundTag()));
         tag.put("items", items.serializeNBT(registries));
+        if (legacyNotice) {
+            tag.putBoolean("legacy_notice", true);
+        }
+    }
+
+    /** 0.10.0 より前に置かれたタービンか（まだ知らせていない）。 */
+    public boolean legacyNotice() {
+        return legacyNotice;
     }
 
     @Override
@@ -248,5 +269,7 @@ public class CryogenicTurbineBlockEntity extends BlockEntity implements MenuProv
         if (tag.contains("items")) {
             items.deserializeNBT(registries, tag.getCompound("items"));
         }
+        // 前の版はスロットを持たなかった（タンクだけを書いていた）
+        legacyNotice = tag.getBoolean("legacy_notice") || tag.contains("tank") && !tag.contains("items");
     }
 }

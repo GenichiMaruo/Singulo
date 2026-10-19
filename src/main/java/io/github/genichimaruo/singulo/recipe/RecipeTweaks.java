@@ -39,7 +39,7 @@ public final class RecipeTweaks {
     /** 当てはめた結果（元のレシピ → 調整後。無効にしたレシピは DISABLED）。設定が変わったら作り直す。 */
     private static final Map<MachineRecipe, MachineRecipe> CACHE = new IdentityHashMap<>();
     private static final MachineRecipe DISABLED = new MachineRecipe("", 0, 1, 0, List.of(), List.of(), java.util.Optional.empty(),
-            java.util.Optional.empty(), ItemStack.EMPTY, List.of(), 0, 0);
+            java.util.Optional.empty(), ItemStack.EMPTY, List.of(), 0, 0, ItemStack.EMPTY);
     private static String stamp = "";
     private static long stampCheckedAt;
 
@@ -228,7 +228,7 @@ public final class RecipeTweaks {
             return r;
         }
         return new MachineRecipe(r.station(), r.stage(), time, r.energy(), List.copyOf(items), List.copyOf(fluids), r.mass(),
-                r.restore(), result, r.fluidResults(), r.minSize(), r.priority());
+                r.restore(), result, r.fluidResults(), r.minSize(), r.priority(), r.byproduct());
     }
 
     /** 液体の材料は装置のタンク（{@link MachineType#TANK_CAPACITY}）1つに収まる量まで（超えると加工が始まらない）。 */

@@ -52,6 +52,9 @@ public final class SinguloCapabilities {
         // 冷媒カートリッジは液体窒素100 mBの容器（バケツと同じく、装置を右クリックして注ぐ・汲む）
         event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new io.github.genichimaruo.singulo.machine.CoolantCartridges.Handler(stack),
                 io.github.genichimaruo.singulo.machine.CoolantCartridges.filled(), io.github.genichimaruo.singulo.machine.CoolantCartridges.empty());
+        // 液体キャニスターは、どの液体でも1,000 mBまでの容器
+        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> io.github.genichimaruo.singulo.item.FluidCanisterItem.handler(stack),
+                SinguloItems.FLUID_CANISTER.get());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.SMES_CELL.get(),
                 (be, side) -> be.energyFor(side));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.ANDROID_DELIVERY_PORT.get(), (be, side) -> be.handler());

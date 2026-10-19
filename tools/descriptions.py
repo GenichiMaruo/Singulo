@@ -10,8 +10,32 @@ DESC = {
              'A mix of iron and coal. Smelt it in a blast furnace to get steel.'),
     '鋼鉄インゴット': ('Singulo の装置の骨組みになる基本の金属。他modの鋼鉄も使える。',
                   'The basic structural metal. Steel from other mods works too.'),
-    '未焼成セラミック': ('粘土・砂・ネザー水晶・骨粉を練ったもの。かまどで焼くとホワイトセラミック複合材になる。',
-                  'Clay, sand, Nether quartz and bone meal, ready to be fired into white ceramic.'),
+    '亜鉛の粉': ('凝灰岩を圧縮機で砕いて選り分けた亜鉛の粉。焼成炉で亜鉛インゴットになる。',
+              'Zinc sorted out of crushed tuff in the Compressor. Fire it in the Kiln into a zinc ingot.'),
+    '亜鉛インゴット': ('亜鉛の地金。ビスマスと一緒に粒子加速器でぶつけると、ニホニウムができる。他modの亜鉛インゴットも同じに使える。',
+                'Zinc metal. Collide it with bismuth in the Particle Accelerator to make nihonium. Zinc ingots from other mods work too.'),
+    'ビスマスインゴット': ('虹色に曇るビスマスの地金。触媒反応器で粗銅を精錬すると、副産物として出る。亜鉛と一緒に粒子加速器でぶつけるとニホニウムになる。',
+                  'Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with '
+                  'zinc in the Particle Accelerator to make nihonium.'),
+    'ニホニウム': ('粒子加速器で亜鉛とビスマスの原子核を融合させてできた113番元素。中性子の多い安定な同位体なので壊れずに残る。2個でインゴットになる。',
+              'Element 113, fused from zinc and bismuth nuclei in the Particle Accelerator. This neutron-rich isotope is stable, '
+              'so it does not decay. Two make an ingot.'),
+    'ニホニウムインゴット': ('ニホニウムを焼成炉で溶かし固めた、重い金属の地金。圧縮機で板にする。',
+                   'A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.'),
+    'ニホニウム板': ('ニホニウムインゴットを押し延ばした板。ニホニウム筐体の材料。',
+               'Pressed nihonium. Used to make nihonium frames.'),
+    'ニホニウム筐体': ('ニホニウム板で基礎フレームを包んだ筐体。段階4の装置は、これを土台に組む。',
+                'A basic frame clad in nihonium plates. Stage 4 machines are built on it.'),
+    '炭素粉': ('木炭を圧縮機で砕いて固めた炭素の粉（木炭3個から2個）。鋼の素や黒色強化パネルで、石炭の代わりに使える。',
+            'Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and '
+            'black reinforced panels.'),
+    '石灰粉': ('方解石や鍾乳石ブロックを砕いた（圧縮機なら2個、作業台なら1個）、炭酸カルシウムの白い粉。未焼成セラミックで骨粉の代わりに使える'
+            '（焼くと石灰になって、粘土を固める）。',
+            'White calcium carbonate powder, crushed from calcite or dripstone blocks (2 in the Compressor, 1 at a crafting table). '
+            'Use it instead of bone meal '
+            'in Unfired Ceramic (it turns to lime in the kiln and binds the clay).'),
+    '未焼成セラミック': ('粘土・砂・ネザー水晶・骨粉（石灰粉でも可）を練ったもの。かまどで焼くとホワイトセラミック複合材になる。',
+                  'Clay, sand, Nether quartz and bone meal (or limestone powder), ready to be fired into white ceramic.'),
     'ホワイトセラミック複合材': ('白い外装と回路基板の材料。Singulo の装置の白い見た目はここから来る。',
                      'The white ceramic used for casings and circuit boards.'),
     '基礎回路': ('段階1の装置の頭脳になる回路。', 'The brain of every early machine.'),
@@ -98,6 +122,10 @@ DESC = {
                         'つないだケーブルやパイプはコントローラへ届き、できた物や発電した電力は隣へ自動で押し出す。',
                         'Replaces a plain shell panel of a multiblock (not frames or functional parts; for the accelerator, either side of the controller). '
                         'Cables and pipes reach the controller, and outputs and generated power are pushed out automatically.'),
+    '液体キャニスター': ('どの液体・ガスでも1,000 mBまで入る容器。装置を右クリックすると、出口のタンクから汲むか、入口のタンクへ注ぐ。'
+                 '水素（電解槽→粒子加速器）やヘリウム（圧縮機→冷却塔）、液体ヘリウムを、液体のパイプがなくても運べる。',
+                 'Holds up to 1,000 mB of any liquid or gas. Right-click a machine to fill it from the output tank or pour it into the input tank. '
+                 'Carries hydrogen (Electrolyzer to Particle Accelerator), helium (Compressor to Cooling Tower) and liquid helium without pipes.'),
     '冷媒カートリッジ': ('液体窒素100 mBを詰めた容器。装置を右クリックすると注いで、空の冷媒カートリッジが戻る（パイプがなくても液体窒素を運べる）。'
                  '極低温タービンは入口に入れてもよい。精密組立台では、量子演算モジュールなど極低温の部品の材料にそのまま使う。',
                  'A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are '

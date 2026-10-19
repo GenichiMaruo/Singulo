@@ -11,11 +11,13 @@ public enum MachineType {
     ARCHIVE_TERMINAL("archive_terminal", 1, 4, 1, 0, 0, false),
     /** 段階3以降の装置・部品・道具を組み立てる。材料は種類と個数だけで指定する（入力6枠）。 */
     PRECISION_ASSEMBLER("precision_assembler", 2, 6, 1, 0, 0, false),
-    CATALYTIC_REACTOR("catalytic_reactor", 2, 5, 1, 1, 0, false),
+    /** 2つめの出力枠に、粗銅の精錬で出るビスマスなどの副産物が出る。 */
+    CATALYTIC_REACTOR("catalytic_reactor", 2, 5, 2, 1, 0, false),
     /** マルチブロック。入力タンクはヘリウム用、出力タンクは液体窒素と液体ヘリウム。 */
     CRYOGENIC_COOLING_TOWER("cryogenic_cooling_tower", 2, 5, 1, 1, 2, false),
-    /** マルチブロック。2つめの出力枠に、ごく稀に磁気単極子が出る。 */
-    PARTICLE_ACCELERATOR("particle_accelerator", 2, 0, 2, 1, 0, false),
+    /** マルチブロック。水素からミュオン束、入力の2枠の原子核どうし（亜鉛とビスマス）を衝突させてニホニウムを作る。
+     *  2つめの出力枠に、ごく稀に磁気単極子が出る。 */
+    PARTICLE_ACCELERATOR("particle_accelerator", 2, 2, 2, 1, 0, false),
     /** 量子もつれ素子を必ず2個1組で作る。 */
     ENTANGLEMENT_SYNTHESIZER("entanglement_synthesizer", 3, 5, 1, 1, 0, false),
     /** 入力タンクは液体窒素と液体ヘリウム。冷却原子トラップの復元もここで行う。 */
@@ -124,6 +126,18 @@ public enum MachineType {
     /** 任意のブロックを質量として溜め、圧縮ブロックや質量ペレットにするモードを持つか。 */
     public boolean massMode() {
         return massMode;
+    }
+
+    /**
+     * 0.10.0 より前のスロットの並び（入力・出力の数）。スロットの数が変わった装置だけ。並びを書いていない古いデータは、
+     * これで読み替える（{@link MachineBlockEntity} の読み込み）。
+     */
+    public int[] legacyLayout() {
+        return switch (this) {
+            case PARTICLE_ACCELERATOR -> new int[]{0, 2};
+            case CATALYTIC_REACTOR -> new int[]{5, 1};
+            default -> new int[]{inputSlots, outputSlots};
+        };
     }
 
     /** マルチブロック（コントローラで動く）か。 */

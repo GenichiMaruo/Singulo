@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "singulo:limestone"
+    }
+  ],
+  "result": {
+    "id": "singulo:limestone_powder",
+    "count": 1
+  }
+}

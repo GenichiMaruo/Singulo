@@ -45,6 +45,8 @@ public final class SinguloItems {
             "handbook", () -> new io.github.genichimaruo.singulo.item.HandbookItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.DecodedRecordItem> DECODED_RECORD = ITEMS.register(
             "decoded_record", () -> new io.github.genichimaruo.singulo.item.DecodedRecordItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.FluidCanisterItem> FLUID_CANISTER = ITEMS.register(
+            "fluid_canister", () -> new io.github.genichimaruo.singulo.item.FluidCanisterItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.MagneticBottleItem> MAGNETIC_BOTTLE = ITEMS.register(
             "magnetic_bottle", () -> new io.github.genichimaruo.singulo.item.MagneticBottleItem(new Item.Properties().rarity(Rarity.RARE), 4));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.NeutrinoScannerItem> NEUTRINO_SCANNER = ITEMS.register(

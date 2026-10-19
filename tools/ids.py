@@ -32,6 +32,16 @@ MOD = {
     '設定カード': ('settings_card', 'Settings Card', 'tool'),
     '探索コンパス': ('explorer_compass', 'Explorer\'s Compass', 'tool'),
     '隕石コンパス': ('meteor_compass', 'Meteor Compass', 'tool'),
+    '液体キャニスター': ('fluid_canister', 'Fluid Canister', 'tool'),
+    '石灰粉': ('limestone_powder', 'Limestone Powder', 'item'),
+    '炭素粉': ('carbon_dust', 'Carbon Dust', 'item'),
+    '亜鉛の粉': ('zinc_dust', 'Zinc Dust', 'item'),
+    '亜鉛インゴット': ('zinc_ingot', 'Zinc Ingot', 'item'),
+    'ビスマスインゴット': ('bismuth_ingot', 'Bismuth Ingot', 'item'),
+    'ニホニウム': ('nihonium', 'Nihonium', 'item'),
+    'ニホニウムインゴット': ('nihonium_ingot', 'Nihonium Ingot', 'item'),
+    'ニホニウム板': ('nihonium_plate', 'Nihonium Plate', 'item'),
+    'ニホニウム筐体': ('nihonium_frame', 'Nihonium Frame', 'item'),
     # クリエイティブ専用（レシピなし）
     'クリエイティブ電源': ('creative_energy_source', 'Creative Energy Source', 'machine'),
     '無限の触媒': ('creative_catalyst', 'Infinite Catalyst', 'tool'),
@@ -407,8 +417,57 @@ OUTPUT_ALIASES = {
     '時間結晶触媒（リサイクル）': 'singulo:time_crystal_catalyst',
     '残響の欠片': 'minecraft:echo_shard',
     '未焼成セラミック（火打石）': 'singulo:unfired_ceramic',
+    '石灰粉（作業台）': 'singulo:limestone_powder',
+    # 0.10.0: 装置で作るバニラの素材
+    '砂利（粉砕）': 'minecraft:gravel',
+    '砂（粉砕）': 'minecraft:sand',
+    '砂（砂岩）': 'minecraft:sand',
+    '氷（圧縮）': 'minecraft:ice',
+    '氷塊（圧縮）': 'minecraft:packed_ice',
+    '青氷（圧縮）': 'minecraft:blue_ice',
+    '氷塊（冷却塔）': 'minecraft:packed_ice',
+    '黒曜石（冷却塔）': 'minecraft:obsidian',
+    'ネザー水晶（合成）': 'minecraft:quartz',
+    'エンダーパール（量子もつれ）': 'minecraft:ender_pearl',
+    'ダイヤモンド（縮退）': 'minecraft:diamond',
+    '石炭（時間）': 'minecraft:coal',
+    '苔むした丸石（時間）': 'minecraft:mossy_cobblestone',
+    '錆びた銅（時間）': 'minecraft:oxidized_copper',
+    '銅インゴット（精錬）': 'minecraft:copper_ingot',
+    '金インゴット（核変換）': 'minecraft:gold_ingot',
     '熱交換コア（氷塊）': 'singulo:heat_exchange_core',
     '冷却塔冷却帯（氷塊）': 'singulo:cooling_tower_coolant_band',
+}
+
+# 同じ成果物の別レシピの、レシピのファイル名（成果物のIDのままだと、同じ装置の中で重なるもの）
+ALIAS_RECIPE_IDS = {
+    '砂利（粉砕）': 'gravel_from_cobblestone',
+    '砂（粉砕）': 'sand_from_gravel',
+    '砂（砂岩）': 'sand_from_sandstone',
+    '氷（圧縮）': 'ice_from_snow',
+    '氷塊（圧縮）': 'packed_ice_from_ice',
+    '青氷（圧縮）': 'blue_ice_from_packed_ice',
+    '氷塊（冷却塔）': 'packed_ice_from_water',
+    '黒曜石（冷却塔）': 'obsidian_from_lava',
+    'ネザー水晶（合成）': 'quartz_from_sand',
+    'エンダーパール（量子もつれ）': 'ender_pearl_from_entanglement',
+    'ダイヤモンド（縮退）': 'diamond_from_coal',
+    '石炭（時間）': 'coal_from_logs',
+    '苔むした丸石（時間）': 'mossy_cobblestone_from_time',
+    '錆びた銅（時間）': 'oxidized_copper_from_time',
+    '銅インゴット（精錬）': 'copper_ingot_refined',
+    '金インゴット（核変換）': 'gold_ingot_from_bismuth',
+}
+
+# 成果物と一緒に出る副産物: レシピ名 → (副産物, 個数)
+BYPRODUCTS = {
+    '銅インゴット（精錬）': ('ビスマスインゴット', 1),
+}
+
+# 材料にするときは、他modの同じ金属も受け付けるタグにする（成果物は mod のアイテム）
+INGREDIENT_TAGS = {
+    '亜鉛インゴット': 'c:ingots/zinc',
+    'ビスマスインゴット': 'c:ingots/bismuth',
 }
 
 VANILLA = {
@@ -448,7 +507,8 @@ VANILLA = {
     '残響の欠片（型）': 'minecraft:echo_shard',
     '深層岩': '#singulo:helium_bearing_stone',
     '溶鉱炉': 'minecraft:blast_furnace',
-    '石炭': 'minecraft:coal',
+    # 石炭の代わりに炭素粉（木炭から）でもよい（タグ singulo:carbon）
+    '石炭': '#singulo:carbon',
     '砂': '#c:sands',
     '粘土玉': 'minecraft:clay_ball',
     '鉄インゴット': '#c:ingots/iron',
@@ -457,13 +517,27 @@ VANILLA = {
     '青氷': 'minecraft:blue_ice',
     '氷塊': 'minecraft:packed_ice',
     '火打石': 'minecraft:flint',
-    '骨粉': 'minecraft:bone_meal',
+    # 骨粉の代わりに石灰粉でもよい（タグ singulo:ceramic_flux）
+    '骨粉': '#singulo:ceramic_flux',
+    '方解石': '#singulo:limestone',
+    '丸石': '#c:cobblestones/normal',
+    '砂利': '#c:gravels',
+    '砂岩': 'minecraft:sandstone',
+    '雪ブロック': 'minecraft:snow_block',
+    '氷': 'minecraft:ice',
+    '原木': '#minecraft:logs',
+    '木炭': 'minecraft:charcoal',
+    '石炭ブロック': '#c:storage_blocks/coal',
+    '銅ブロック': 'minecraft:copper_block',
+    '凝灰岩': 'minecraft:tuff',
+    '粗銅': '#c:raw_materials/copper',
     '黒曜石': '#c:obsidians',
 }
 
 # 液体（バニラ）
 VANILLA_FLUIDS = {
     '水': 'minecraft:water',
+    '溶岩': 'minecraft:lava',
 }
 
 # 質量で受け付ける疑似材料（圧縮機の質量バッファで扱う）
@@ -521,4 +595,4 @@ SPENT = {
 ACCEPTS_SPENT = {('BE凝縮触媒', 'ミュオン触媒')}
 
 # マルチブロックの大きさの下限（冷却塔の高さなど）があるレシピ
-MIN_SIZE = {'液体ヘリウム': 10}
+MIN_SIZE = {'液体ヘリウム': 10, 'ニホニウム': 16}

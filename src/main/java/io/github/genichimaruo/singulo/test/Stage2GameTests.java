@@ -154,6 +154,102 @@ public final class Stage2GameTests {
         });
     }
 
+    /** 一辺16のリングで、亜鉛とビスマスの原子核をぶつけるとニホニウムができる（一辺8では小さすぎて作れない）。 */
+    @GameTest(template = "huge", timeoutTicks = 600)
+    public static void acceleratorFusesNihonium(GameTestHelper helper) {
+        int side = 16;
+        for (int x = 0; x < side; x++) {
+            for (int z = 0; z < side; z++) {
+                boolean edge = x == 0 || z == 0 || x == side - 1 || z == side - 1;
+                if (!edge) {
+                    continue;
+                }
+                boolean corner = (x == 0 || x == side - 1) && (z == 0 || z == side - 1);
+                helper.setBlock(new BlockPos(x, 1, z), corner || (x + z) % 3 == 0
+                        ? SinguloBlocks.FOCUSING_MAGNET.get() : SinguloBlocks.ACCELERATOR_TUBE.get());
+            }
+        }
+        BlockPos controllerPos = new BlockPos(1, 1, 1);
+        helper.setBlock(controllerPos, SinguloBlocks.CONTROLLERS.get(MachineType.PARTICLE_ACCELERATOR).get());
+        MachineBlockEntity accelerator = helper.getBlockEntity(controllerPos);
+        accelerator.items().setStackInSlot(0, new ItemStack(item("zinc_ingot")));
+        accelerator.items().setStackInSlot(1, new ItemStack(item("bismuth_ingot")));
+        helper.onEachTick(() -> accelerator.energy().setEnergy(accelerator.energy().getMaxEnergyStored()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(accelerator.structureSize() == side, "一辺16のリングとして形成されない: " + accelerator.structureSize());
+            helper.assertTrue(accelerator.items().getStackInSlot(accelerator.type().outputSlot()).is(item("nihonium")), "ニホニウムができない");
+        });
+    }
+
+    /** 一辺8のリングでも、ビスマスと炭素粉を入れると金インゴットができる（炭素の原子核で陽子をはぎ取る核変換）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 400)
+    public static void acceleratorTransmutesBismuthIntoGold(GameTestHelper helper) {
+        int side = 8;
+        for (int x = 0; x < side; x++) {
+            for (int z = 0; z < side; z++) {
+                boolean edge = x == 0 || z == 0 || x == side - 1 || z == side - 1;
+                if (!edge) {
+                    continue;
+                }
+                boolean corner = (x == 0 || x == side - 1) && (z == 0 || z == side - 1);
+                boolean extraMagnet = (x == 3 && z == 0) || (x == 0 && z == 4) || (x == side - 1 && z == 3);
+                helper.setBlock(new BlockPos(x, 1, z), corner || extraMagnet
+                        ? SinguloBlocks.FOCUSING_MAGNET.get() : SinguloBlocks.ACCELERATOR_TUBE.get());
+            }
+        }
+        BlockPos controllerPos = new BlockPos(1, 1, 1);
+        helper.setBlock(controllerPos, SinguloBlocks.CONTROLLERS.get(MachineType.PARTICLE_ACCELERATOR).get());
+        MachineBlockEntity accelerator = helper.getBlockEntity(controllerPos);
+        accelerator.items().setStackInSlot(0, new ItemStack(item("bismuth_ingot")));
+        accelerator.items().setStackInSlot(1, new ItemStack(item("carbon_dust")));
+        helper.onEachTick(() -> accelerator.energy().setEnergy(accelerator.energy().getMaxEnergyStored()));
+        helper.succeedWhen(() -> helper.assertTrue(
+                accelerator.items().getStackInSlot(accelerator.type().outputSlot()).is(Items.GOLD_INGOT), "金インゴットができない"));
+    }
+
+    /** 古いデータ（スロットの並びを書いていない）の加速器と触媒反応器は、出力と単極子のスロットを新しい位置へ写して読む。 */
+    @GameTest(template = EMPTY)
+    public static void oldMachinesKeepTheirItemsAfterSlotChanges(GameTestHelper helper) {
+        var registries = helper.getLevel().registryAccess();
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.CATALYTIC_REACTOR).get());
+        MachineBlockEntity reactor = helper.getBlockEntity(pos);
+        net.neoforged.neoforge.items.ItemStackHandler old = new net.neoforged.neoforge.items.ItemStackHandler(7);
+        old.setStackInSlot(0, new ItemStack(Items.COPPER_INGOT, 3));
+        old.setStackInSlot(5, new ItemStack(item("muon_catalyst"), 2));
+        old.setStackInSlot(6, new ItemStack(item("monopole_upgrade")));
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        tag.put("items", old.serializeNBT(registries));
+        reactor.loadCustomOnly(tag, registries);
+        helper.assertTrue(reactor.items().getStackInSlot(0).getCount() == 3, "入力が残らない");
+        helper.assertTrue(reactor.items().getStackInSlot(5).is(item("muon_catalyst")), "出力が1つめの出口に残らない");
+        helper.assertTrue(reactor.items().getStackInSlot(6).isEmpty(), "2つめの出口に別の物が入る: " + reactor.items().getStackInSlot(6));
+        helper.assertTrue(reactor.items().getStackInSlot(MachineType.CATALYTIC_REACTOR.upgradeSlot()).is(item("monopole_upgrade")),
+                "単極子アップグレードが新しいスロットへ移らない");
+        // 保存し直したデータは、新しい並びのまま読める
+        reactor.loadCustomOnly(reactor.saveCustomOnly(registries), registries);
+        helper.assertTrue(reactor.items().getStackInSlot(MachineType.CATALYTIC_REACTOR.upgradeSlot()).is(item("monopole_upgrade")),
+                "保存し直すと単極子アップグレードがずれる");
+        helper.succeed();
+    }
+
+    /** 触媒反応器で粗銅を精錬すると、銅インゴット6個と、副産物のビスマスインゴットが2つめの出口に出る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 600)
+    public static void catalyticReactorRefinesCopperWithBismuth(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.CATALYTIC_REACTOR).get());
+        MachineBlockEntity reactor = helper.getBlockEntity(pos);
+        helper.onEachTick(() -> reactor.energy().setEnergy(reactor.energy().getMaxEnergyStored()));
+        reactor.items().setStackInSlot(0, new ItemStack(Items.RAW_COPPER, 8));
+        reactor.automationFluids().fill(new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        int out = MachineType.CATALYTIC_REACTOR.outputSlot();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(reactor.items().getStackInSlot(out).is(Items.COPPER_INGOT) && reactor.items().getStackInSlot(out).getCount() == 6,
+                    "銅インゴットが6個出ない: " + reactor.items().getStackInSlot(out));
+            helper.assertTrue(reactor.items().getStackInSlot(out + 1).is(item("bismuth_ingot")), "ビスマスが2つめの出口に出ない");
+        });
+    }
+
     // ------------------------------------------------------------------ 触媒反応器と触媒
 
     @GameTest(template = EMPTY, timeoutTicks = 500)
@@ -220,6 +316,28 @@ public final class Stage2GameTests {
         });
     }
 
+    /** 0.10.0 より前のタービン（スロットを書いていない）だけが、最初に画面を開いた人へ一度だけ知らせる。 */
+    @GameTest(template = EMPTY)
+    public static void oldCryogenicTurbineNoticesOnce(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.CRYOGENIC_TURBINE.get());
+        CryogenicTurbineBlockEntity turbine = helper.getBlockEntity(pos);
+        var registries = helper.getLevel().registryAccess();
+        helper.assertTrue(!turbine.legacyNotice(), "新しく置いたタービンが知らせようとする");
+        net.minecraft.nbt.CompoundTag old = new net.minecraft.nbt.CompoundTag();
+        old.putInt("energy", 0);
+        old.put("tank", new net.minecraft.nbt.CompoundTag());
+        turbine.loadCustomOnly(old, registries);
+        helper.assertTrue(turbine.legacyNotice(), "前の版のタービンが知らせない");
+        turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
+        helper.assertTrue(turbine.legacyNotice(), "保存し直すと知らせを忘れる");
+        turbine.noticeIfLegacy(helper.makeMockServerPlayerInLevel());
+        helper.assertTrue(!turbine.legacyNotice(), "画面を開いても知らせが残る");
+        turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
+        helper.assertTrue(!turbine.legacyNotice(), "知らせたあと保存し直すと、また知らせる");
+        helper.succeed();
+    }
+
     /** 極低温タービンの入口の冷媒カートリッジは、タンクに空けて、空のカートリッジが出口に出る。 */
     @GameTest(template = EMPTY)
     public static void cryogenicTurbineEmptiesCartridges(GameTestHelper helper) {
@@ -253,6 +371,17 @@ public final class Stage2GameTests {
     }
 
     /** 冷却塔の液体窒素は、塔の高さによらず 100 mB に 25,000 FE（高い塔は速いぶん、毎tickの電力が多い）。 */
+    /** 冷却塔: 溶岩を自分で作った液体窒素で急に冷やすと黒曜石になる。 */
+    @GameTest(template = TALL, timeoutTicks = 300)
+    public static void coolingTowerQuenchesLavaIntoObsidian(GameTestHelper helper) {
+        MachineBlockEntity tower = buildTower(helper, 10);
+        tower.automationFluids().fill(new FluidStack(net.minecraft.world.level.material.Fluids.LAVA, 1000), IFluidHandler.FluidAction.EXECUTE);
+        helper.succeedWhen(() -> {
+            tower.energy().setEnergy(tower.energy().getMaxEnergyStored());
+            helper.assertTrue(tower.items().getStackInSlot(tower.type().outputSlot()).is(Items.OBSIDIAN), "黒曜石ができない");
+        });
+    }
+
     @GameTest(template = TALL, timeoutTicks = 200)
     public static void coolingTowerNitrogenCostIsFixedPerCraft(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 10);

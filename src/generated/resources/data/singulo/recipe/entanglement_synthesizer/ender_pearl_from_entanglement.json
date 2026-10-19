@@ -1,0 +1,25 @@
+{
+  "type": "singulo:machine",
+  "station": "entanglement_synthesizer",
+  "stage": 3,
+  "time": 200,
+  "energy": 2000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:entangled_element"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "c:slime_balls"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:ender_pearl",
+    "count": 1
+  }
+}

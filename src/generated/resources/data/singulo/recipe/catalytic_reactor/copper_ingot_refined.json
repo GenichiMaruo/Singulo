@@ -1,0 +1,29 @@
+{
+  "type": "singulo:machine",
+  "station": "catalytic_reactor",
+  "stage": 2,
+  "time": 400,
+  "energy": 300,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "c:raw_materials/copper"
+      },
+      "count": 8
+    }
+  ],
+  "fluid_ingredients": [
+    {
+      "fluid": "minecraft:water",
+      "amount": 250
+    }
+  ],
+  "result": {
+    "id": "minecraft:copper_ingot",
+    "count": 6
+  },
+  "byproduct": {
+    "id": "singulo:bismuth_ingot",
+    "count": 1
+  }
+}

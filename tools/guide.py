@@ -31,16 +31,39 @@ CHAPTERS = [
          'to see how it is made and what it is used for.\n- Hover over a Singulo item and press H to open the page about it (or press H while holding it). Type in the search box above the chapter list to find matching pages.\n- Use the Holo Projector on a multiblock controller '
          'to show the correct shape as a translucent outline.'),
         ('basics', '電力・触媒・遺構',
-         '電力（FE）は自前のケーブルで運びます。アイテムと液体は装置の面ごとの設定と、他modのパイプで運びます。\n'
+         '電力（FE）は自前のケーブルで運びます。アイテムと液体は装置の面ごとの設定と、他modのパイプで運びます。'
+         '液体とガスは、液体キャニスター（1,000 mB）で装置を右クリックすれば、パイプがなくても汲んで運べます。\n'
          '段階2から「触媒」が登場します。触媒は寿命のある消耗品で、触媒を入れる装置は触媒専用のスロットを持ちます。'
          'ティアが装置より1つ上なら速く、1つ下なら遅く減りも速く、2つ下は使えません。\n'
          'ワールドには旧文明の「遺構」があり、そこでしか手に入らない記録や部品があります。'
          '段階1から地表観測拠点を探しておきましょう。',
          'Power, catalysts and ruins',
-         'Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods\' pipes.\n'
+         'Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods\' pipes. '
+         'Without pipes, right-click machines with a Fluid Canister (1,000 mB) to carry liquids and gases.\n'
          'From stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. '
          'One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\n'
          'Ancient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.'),
+        ('vanilla', '装置で作るバニラの素材',
+         '狩りや遠出の代わりに、装置で作れるバニラの素材です。\n'
+         '・圧縮機（段階1）: 丸石→砂利→砂、砂岩→砂2。雪ブロック4→氷、氷4→氷塊、氷塊4→青氷。'
+         '方解石→石灰粉（骨粉の代わり）、木炭3→炭素粉2（石炭の代わり）。\n'
+         '・極低温冷却塔（段階2）: 水＋液体窒素→氷塊、溶岩＋液体窒素→黒曜石。\n'
+         '・触媒反応器（段階2）: 砂＋水→ネザー水晶。\n'
+         '・量子もつれ合成器（段階3）: 量子もつれ素子＋スライムボール→エンダーパール。\n'
+         '・粒子加速器（段階3）: ビスマスインゴット＋炭素粉→金インゴット。\n'
+         '・縮退圧縮炉（段階4）: 石炭ブロック8→ダイヤモンド。\n'
+         '・時間結晶育成槽（段階4）: 原木→石炭、丸石→苔むした丸石、銅ブロック→錆びた銅。',
+         'Vanilla materials from machines',
+         'Machines can make these vanilla materials, so you can skip some hunting and travel.\n'
+         '- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, '
+         '4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust '
+         '(instead of coal).\n'
+         '- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian.\n'
+         '- Catalytic Reactor (stage 2): sand + water to nether quartz.\n'
+         '- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n'
+         '- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n'
+         '- Degenerate Compactor (stage 4): 8 coal blocks to a diamond.\n'
+         '- Time Crystal Incubator (stage 4): logs to coal, cobblestone to mossy cobblestone, copper block to oxidized copper.'),
     ]),
     ('stage1', 'singulo:thermoelectric_generator', '段階1 起動', 'Stage 1: Startup', [
         ('flow', '段階1の流れ',
@@ -77,13 +100,15 @@ CHAPTERS = [
         ('materials', '最初の素材',
          '1. 鉄と石炭で「鋼の素」を作り、溶鉱炉で鋼鉄インゴットにする。\n'
          '2. 粘土・ネザー水晶・骨粉・砂で「未焼成セラミック」を作り、かまどでホワイトセラミック複合材にする。'
+         '骨粉の代わりに、方解石を砕いた石灰粉でもよい（作業台で1個から1個、圧縮機なら2個）。'
          'ネザーへ行く前なら、ネザー水晶の代わりに火打石2個でも作れる。\n'
          '3. セラミック・レッドストーン・銅で「基礎回路」、鋼鉄とセラミックで「基礎フレーム」を作る。\n'
          'この3つ（鋼鉄・セラミック・回路）がほとんどの装置の材料です。',
          'First materials',
          '1. Mix iron and coal into steel blend and smelt it into steel ingots in a blast furnace.\n2. Make '
          'unfired ceramic from clay, nether quartz, bone meal and sand, and fire it in a furnace into white '
-         'ceramic composite. Before you reach the Nether, two flint can replace the nether quartz.\n3. Make '
+         'ceramic composite. Before you reach the Nether, two flint can replace the nether quartz. Limestone powder, crushed '
+         'from calcite (1 at a crafting table, 2 in the Compressor), can replace the bone meal.\n3. Make '
          'basic circuits from ceramic, redstone and copper, and basic frames from steel and ceramic.\nThese '
          'three (steel, ceramic and circuits) go into almost every machine.'),
         ('power', '最初の電源',
@@ -120,12 +145,12 @@ CHAPTERS = [
         ('machines', '段階1の装置',
          '・焼成炉: セラミック基板などを焼く。鋼鉄も速く焼ける。\n'
          '・圧縮機: 鋼板を作る。質量モードでは質量値のある素材を「質量」に変えて圧縮ブロックや質量ペレットにする。\n'
-         '・電解槽: 水を水素と酸素に分ける。\n'
+         '・電解槽: 水を水素と酸素に分ける。水素は液体キャニスターで汲んで、段階2の粒子加速器へ運べる。\n'
          '・アーカイブ端末: 遺構の記録をデータカードに書き写し、劣化した部品を修復する。クリスタルメモリの解読もできる。',
          'Stage 1 machines',
          '- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel '
          'plates. In mass mode it turns materials with a mass value into "mass" and presses it into compressed '
-         'blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen.\n- Archive Terminal: '
+         'blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Archive Terminal: '
          'copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.'),
     ]),
     ('stage2', 'singulo:superconducting_coil', '段階2 極低温', 'Stage 2: Cryogenic', [
@@ -181,13 +206,22 @@ CHAPTERS = [
         ('accelerator', '粒子加速器とミュオン触媒',
          '加速管と収束磁石で正方形のリング（一辺8〜32）を作り、コントローラをリングに接して置きます。四隅は収束磁石、'
          '収束磁石はリングの1/4以上。水素からミュオン束を作り、ごく稀に磁気単極子が生まれます。\n'
-         '触媒反応器でミュオン束からミュオン触媒（ティア2）を作ります。宇宙線ミュオン収集器を高所に置けば、電力なしでもミュオン束が少しずつ集まります。',
+         '触媒反応器でミュオン束からミュオン触媒（ティア2）を作ります。宇宙線ミュオン収集器を高所に置けば、電力なしでもミュオン束が少しずつ集まります。\n'
+         '一辺16以上のリングなら、入力に亜鉛とビスマスのインゴットを入れると、原子核が融合して新元素ニホニウムができます。'
+         '亜鉛は凝灰岩を圧縮機で砕いて、ビスマスは触媒反応器で粗銅を精錬した副産物として手に入ります。'
+         'ニホニウム2個でインゴット、インゴットを圧縮機で板にし、精密組立台でニホニウム筐体を作ります。段階4の装置の土台です。'
+         'ビスマスと炭素粉を入れると、ビスマスの原子核から陽子がはぎ取られて金になります（リングの大きさは問わない）。',
          'Particle Accelerator and muon catalyst',
          'Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller '
          'against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter '
          'of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic '
          'Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up '
-         'slowly gathers muon bundles without power.'),
+         'slowly gathers muon bundles without power.\n'
+         'With a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. '
+         'Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. '
+         'Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. '
+         'Stage 4 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the '
+         'bismuth (any ring size).'),
         ('others', 'そのほかの段階2の装置',
          '・精密組立台: 段階3以降の部品と装置はほぼすべてここで作ります。\n'
          '・ミュオン触媒核融合炉: ミュオン触媒と水で発電（4 kFE/t）。触媒1個で10分動き、失活した触媒が出る（触媒反応器でミュオン束に戻せる）。'

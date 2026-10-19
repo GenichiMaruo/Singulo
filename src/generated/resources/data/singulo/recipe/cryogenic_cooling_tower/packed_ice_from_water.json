@@ -1,0 +1,22 @@
+{
+  "type": "singulo:machine",
+  "station": "cryogenic_cooling_tower",
+  "stage": 2,
+  "time": 40,
+  "energy": 100,
+  "ingredients": [],
+  "fluid_ingredients": [
+    {
+      "fluid": "minecraft:water",
+      "amount": 1000
+    },
+    {
+      "fluid": "singulo:liquid_nitrogen",
+      "amount": 50
+    }
+  ],
+  "result": {
+    "id": "minecraft:packed_ice",
+    "count": 1
+  }
+}
