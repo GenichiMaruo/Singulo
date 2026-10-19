@@ -50,7 +50,22 @@ public final class ReactorGameTests {
         return BuiltInRegistries.ITEM.get(Singulo.id(id));
     }
 
+    /** All running-core fixtures need a stable vacuum, not just horizontal padding. */
+    private static void sealFixture(GameTestHelper helper) {
+        for (int x = 0; x < 64; x++) for (int z = 0; z < 64; z++) {
+            helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(x, 14, z), net.minecraft.world.level.block.Blocks.BEDROCK);
+        }
+        for (int y = 1; y < 14; y++) for (int n = 0; n < 64; n++) {
+            helper.setBlock(new BlockPos(0, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(63, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(n, y, 0), net.minecraft.world.level.block.Blocks.BEDROCK);
+            helper.setBlock(new BlockPos(n, y, 63), net.minecraft.world.level.block.Blocks.BEDROCK);
+        }
+    }
+
     private static PenroseReactorBlockEntity build(GameTestHelper helper) {
+        sealFixture(helper);
         for (Map.Entry<BlockPos, MultiblockPart.Role> e : Structures.reactorLayout(CENTER).entrySet()) {
             Block block = switch (e.getValue()) {
                 case GYRO_DRIVE -> SinguloBlocks.GYRO_DRIVE.get();
@@ -311,12 +326,14 @@ public final class ReactorGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_ERGO, new ItemStack(item("ergosphere_ring")));
+        // Simulate a natural water source immediately above the fixture ceiling.
+        helper.setBlock(CENTER.offset(1, 8, 1), net.minecraft.world.level.block.Blocks.WATER);
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(r.isFormed(), "炉の形成待ち"))
                 .thenExecute(() -> r.forceCore(1000, 0.95))
                 .thenWaitUntil(() -> {
             helper.assertTrue(r.items().getStackInSlot(PenroseReactorBlockEntity.SLOT_OUT).is(item("exotic_matter")),
-                    "エルゴ抽出でエキゾチック物質ができない: " + r.saveWithoutMetadata());
+                    "エルゴ抽出でエキゾチック物質ができない: formed=" + r.isFormed() + " core=" + java.util.stream.StreamSupport.stream(BlockPos.betweenClosed(CENTER.offset(-1, -1, -1), CENTER.offset(1, 1, 1)).spliterator(), false).filter(p -> !helper.getBlockState(p).isAir()).map(p -> p + "=" + helper.getBlockState(p)).toList() + " data=" + r.saveWithoutMetadata());
             helper.assertTrue(r.spin() < 0.95, "エルゴ抽出でスピンが減らない");
         }).thenSucceed();
     }
@@ -436,18 +453,7 @@ public final class ReactorGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         // This measures pellet feeding only. Foreign items are deliberately allowed
         // to exceed MAX_MASS (covered by overfilledReactorCollapsesAndCanBeRecaptured).
-        // Horizontal padding does not stop gravel falling through the 15-block-high
-        // fixture from a previous crater. Seal all six faces before starting the core.
-        for (int x = 0; x < 64; x++) for (int z = 0; z < 64; z++) {
-            helper.setBlock(new BlockPos(x, 0, z), net.minecraft.world.level.block.Blocks.BEDROCK);
-            helper.setBlock(new BlockPos(x, 14, z), net.minecraft.world.level.block.Blocks.BEDROCK);
-        }
-        for (int y = 1; y < 14; y++) for (int n = 0; n < 64; n++) {
-            helper.setBlock(new BlockPos(0, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
-            helper.setBlock(new BlockPos(63, y, n), net.minecraft.world.level.block.Blocks.BEDROCK);
-            helper.setBlock(new BlockPos(n, y, 0), net.minecraft.world.level.block.Blocks.BEDROCK);
-            helper.setBlock(new BlockPos(n, y, 63), net.minecraft.world.level.block.Blocks.BEDROCK);
-        }
+        // build() seals the common fixture. Remove ambient entities as well for this unfed measurement.
         var room = new net.minecraft.world.phys.AABB(helper.absolutePos(BlockPos.ZERO),
                 helper.absolutePos(new BlockPos(64, 15, 64)));
         helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.Entity.class, room,
