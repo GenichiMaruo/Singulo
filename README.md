@@ -35,8 +35,8 @@ Download mod JARs from CurseForge. GitHub Releases contain release notes and a l
 
 ## 遊び始めるには
 
-0.7.0では、1.21.1版と1.20.1のForge / NeoForge版で、アンドロイドの作業自動化・追加アップグレード・装飾に対応しています。
-Android work automation, additional upgrades and decorations are available in 0.7.0 for both Minecraft 1.21.1 and the Forge / NeoForge editions of 1.20.1.
+0.10.0では、第2段階の発電にミュオン触媒核融合炉を追加し、極低温タービンを液体窒素の蓄電装置へ変更しています。以前のタービンを主電源にしているワールドは、核融合炉への切り替えが必要です。
+In 0.10.0, the Muon-Catalyzed Fusion Reactor supplies stage 2 power, while the Cryogenic Turbine stores and recovers energy through liquid nitrogen. Existing worlds using turbines as their main power source need to switch to fusion reactors.
 
 上の表の Minecraft とローダーが必要です（1.21.1 版なら NeoForge **21.1.256以上の1.21.1対応版**）。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
 
