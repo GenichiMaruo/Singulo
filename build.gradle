@@ -157,8 +157,8 @@ var verifyGameTestResults = tasks.register('verifyGameTestResults') {
             throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/<loader>/gametest/logs/latest.log')
         }
         def namespace = selectedGameTestNamespace
-        def expected = ['singulo': 279, 'singulo_automation': 72, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 15, 'singulo_mekanism': 2][namespace]
-        if (namespace == 'singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab') expected = 410
+        def expected = ['singulo': 291, 'singulo_automation': 72, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 15, 'singulo_mekanism': 2][namespace]
+        if (namespace == 'singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab') expected = 422
         if (expected != null && result.group(1).toInteger() != expected) {
             throw new GradleException("Expected ${expected} required tests for ${namespace}, found ${result.group(1)}")
         }
