@@ -324,6 +324,7 @@ public final class SinguloItems {
         block(SinguloBlocks.GENESIS_CORE, 5);
         block(SinguloBlocks.CRYOGENIC_TURBINE, 2);
         block(SinguloBlocks.MUON_FUSION_REACTOR, 2);
+        block(SinguloBlocks.HYDROGEN_FUEL_CELL, 1);
         block(SinguloBlocks.SMES_CELL, 2);
         block(SinguloBlocks.COSMIC_MUON_COLLECTOR, 2);
         block(SinguloBlocks.WORLDLINE_ANCHOR_SMALL, 2);
@@ -360,6 +361,8 @@ public final class SinguloItems {
         }
         block(SinguloBlocks.WHITE_PANEL, 1);
         block(SinguloBlocks.WHITE_LIGHT_PANEL, 1);
+        block(SinguloBlocks.BISMUTH_CRYSTAL_BLOCK, 2);
+        block(SinguloBlocks.GLOWING_BISMUTH_CRYSTAL, 2);
         block(SinguloBlocks.BLACK_REINFORCED_PANEL, 1);
         block(SinguloBlocks.WHITE_GLASS_PANEL, 1);
         block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);

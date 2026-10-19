@@ -194,7 +194,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     /** 炉心質量警報器の位置。 */
     private List<BlockPos> alarms = List.of();
     private boolean formed;
-    private boolean firstCheck = true;
+    /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
+    private boolean firstCheck;
     private boolean ignitedBefore;
 
     public PenroseReactorBlockEntity(BlockPos pos, BlockState state) {
@@ -326,6 +327,13 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             link(level, ports, null);
             link(level, newPorts, worldPosition);
             ports = newPorts;
+        } else {
+            // 同じ位置でも、ポートを壊して置き直すと新しいポートはつながっていない
+            for (BlockPos p : ports) {
+                if (level.isLoaded(p) && level.getBlockEntity(p) instanceof PortBlockEntity port && !worldPosition.equals(port.controllerPos())) {
+                    port.link(worldPosition);
+                }
+            }
         }
         io.github.genichimaruo.singulo.multiblock.FormationEffect.onChange(level, worldPosition, formed, r != null, firstCheck, 7, 1, 12);
         firstCheck = false;
@@ -1340,6 +1348,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        firstCheck = true;
         if (tag.contains("items")) {
             items.deserializeNBT(registries, tag.getCompound("items"));
         }

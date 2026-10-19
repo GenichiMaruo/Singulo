@@ -72,11 +72,26 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - The Catalytic Reactor now has a second output slot for by-products, and JEI shows by-products under the main result.
 - Accelerators and Catalytic Reactors in existing worlds keep their items: outputs and the upgrade slot move to their new positions when the world loads.
 
+### Oxygen, phosphor and more stage 1 options
+- **Basic oxygen furnace**: the Kiln now has an oxygen tank. 2 iron ingots, 1 coal (or carbon dust) and 250 mB of oxygen make 2 steel ingots, using less coal than steel blend. Oxygen from the Electrolyzer finally has a use.
+- **Phosphor**: mix zinc dust, copper and gunpowder into **Unfired Phosphor** at a crafting table and fire it in the Kiln for 4 glowstone dust (a ZnS:Cu glow-in-the-dark phosphor). The Archive Terminal no longer needs a Nether trip. Zinc dust and ingots are now stage 1.
+- New generator: the **Hydrogen Fuel Cell** (stage 1). It turns hydrogen and oxygen back into power at 4.8 FE per mB of hydrogen, up to 240 FE/t, returning 60% of what the Electrolyzer used. Right-click it with an empty hand for its status.
+  - Electrolysis now has a fixed power cost per craft, so upgrades cannot make hydrogen cheap enough to turn the fuel cell into free power.
+- New machine: the **Peltier Cooler** (stage 1) freezes 1,000 mB of water into ice with power. Compress the ice into packed and blue ice.
+- New building blocks: **Bismuth Crystal Block** (bismuth ingot fired in the Kiln) and **Glowing Bismuth Crystal**.
+- **Recycling**: the Compressor crushes iron and gold tools and armor into nuggets, about two thirds of the ingots used. Damaged items work too.
+- **Cryo-milling** in the cooling tower with liquid nitrogen: a bone gives 6 bone meal, a blaze rod 4 blaze powder and wool 4 string.
+
 ### Textures
 - Multiblock controller screens (Cooling Tower, Degenerate Compactor, Casimir Cavity) now line up with the recessed screen in the block model.
 - Cooling tower blocks and the heat exchange core are weathered with drip streaks, grime at the bottom, rust spots and mineral stains.
 
 ### Existing worlds
 - The first time you open a Cryogenic Turbine that was placed before this version, a chat message explains that it is now energy storage and points to the fusion reactor.
+
+### Fixes
+- Multiblock ports could stop working until the controller was broken and placed again. This happened when a port was placed again in the same spot, or when only the port's chunk was reloaded. Controllers now relink any unlinked port on every structure check.
+- Multiblock ports can now replace any block that looks like a shell panel, such as the casing at the corners of the cooling tower walls and the shield tower plinth. Before, some identical-looking casing blocks did not accept ports and the structure stopped forming.
+- The multiblock formation effect now also plays when the controller is the last block placed. It is still skipped right after a world or chunk loads.
 
 Published as **Beta**. Please report issues on the [issue tracker](https://github.com/GenichiMaruo/Singulo/issues).

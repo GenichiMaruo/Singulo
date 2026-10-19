@@ -349,8 +349,30 @@ RUIN_ART = {
     'pristine_ruin_panel': pristine_ruin_panel, 'pristine_ruin_tiles': pristine_ruin_tiles,
     'pristine_ruin_pillar': pristine_ruin_pillar, 'pristine_ruin_light': pristine_ruin_light,
 }
+def bismuth_crystal(glow=False):
+    """ビスマス結晶: 銀灰色の階段状の骸晶（入れ子の四角が段ごとに沈む）。段の縁にだけ、酸化膜の色（金・紫・青・緑）が薄く出る。"""
+    tints = [(236, 196, 110), (206, 130, 210), (120, 140, 236), (100, 200, 200)]
+    silver = (176, 172, 188)
+    im, d = new(rgba(mix(silver, (0, 0, 0), 0.25)))
+    for k in range(7):
+        # 内側の段ほど深く沈んで暗い
+        face = mix(silver, (0, 0, 0), 0.06 * k)
+        d.rectangle([k, k, S - 1 - k, S - 1 - k], fill=rgba(face))
+        edge = mix(face, tints[k % len(tints)], 0.55 if glow else 0.4)
+        d.line([(k, k), (S - 1 - k, k)], fill=rgba(edge))
+        d.line([(k, k), (k, S - 1 - k)], fill=rgba(edge))
+        d.line([(k + 1, S - 1 - k), (S - 1 - k, S - 1 - k)], fill=rgba(mix(face, (0, 0, 0), 0.25)))
+        d.line([(S - 1 - k, k + 1), (S - 1 - k, S - 1 - k)], fill=rgba(mix(face, (0, 0, 0), 0.25)))
+    if glow:
+        d.rectangle([7, 7, 8, 8], fill=(255, 246, 214, 255))
+        for p in ((6, 7), (9, 8), (7, 6), (8, 9)):
+            d.point(p, fill=(240, 220, 170, 255))
+    return im
+
+
 DECO_ART = {'white_panel': white_panel, 'white_light_panel': white_light_panel,
-            'black_reinforced_panel': black_reinforced_panel}
+            'black_reinforced_panel': black_reinforced_panel,
+            'bismuth_crystal_block': bismuth_crystal, 'glowing_bismuth_crystal': lambda: bismuth_crystal(True)}
 
 
 def is_pristine(iid):

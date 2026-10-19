@@ -326,6 +326,7 @@ MACHINE_ICONS = {
     'precision_assembler': ('arm', None), 'catalytic_reactor': ('flask', (150, 255, 180)),
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
     'muon_fusion_reactor': ('fusion', (200, 150, 255)),
+    'hydrogen_fuel_cell': ('battery', (150, 220, 255)), 'peltier_cooler': ('snow', (170, 230, 255)),
     'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),

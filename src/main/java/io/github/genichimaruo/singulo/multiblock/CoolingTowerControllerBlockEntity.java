@@ -18,7 +18,8 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
     private int height;
     private final PortLinks ports = new PortLinks();
     private long nextCheck;
-    private boolean firstCheck = true;
+    /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
+    private boolean firstCheck;
 
     public CoolingTowerControllerBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.COOLING_TOWER_CONTROLLER.get(), pos, state);
@@ -41,6 +42,12 @@ public class CoolingTowerControllerBlockEntity extends MachineBlockEntity {
             firstCheck = false;
         }
         return height > 0;
+    }
+
+    @Override
+    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        firstCheck = true;
     }
 
     @Override

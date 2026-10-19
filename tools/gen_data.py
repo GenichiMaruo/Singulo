@@ -482,6 +482,9 @@ UI_LANG = {
         '（冷却塔とつないで回しても電力は増えません）。第2段階の発電には、ミュオン触媒核融合炉を使ってください。',
         'The Cryogenic Turbine is now liquid-nitrogen energy storage. It returns up to 90% of the power the cooling tower put into '
         'the nitrogen, so running it from a cooling tower no longer makes power. For stage 2 power, build a Muon-Catalyzed Fusion Reactor.'),
+    'message.singulo.fuel_cell.status': ('水素 %s/%s mB　酸素 %s/%s mB　蓄電 %s/%s FE　%s',
+                                         'Hydrogen %s/%s mB · Oxygen %s/%s mB · Stored %s/%s FE · %s'),
+    'message.singulo.fuel_cell.standby': ('待機中（蓄電がいっぱい）', 'Standing by (storage full)'),
     'tooltip.singulo.fluid_canister.empty': ('空（%s mBまで入る）', 'Empty (holds %s mB)'),
     'tooltip.singulo.fluid_canister.amount': ('%s %s / %s mB', '%s %s / %s mB'),
     'item.singulo.fluid_canister.filled': ('液体キャニスター（%s）', 'Fluid Canister (%s)'),
@@ -3313,9 +3316,9 @@ def thermal():
 # 用途ごとにまとめ、まとまりの中は段階順・レシピ順。並べ忘れたアイテムは「素材」の最後に入る。
 TAB_GROUPS = [
     ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'decoded_record']),
-    ('発電・蓄電・送電', ['thermoelectric_generator', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
+    ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
-    ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
+    ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
                'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
                'singularity_encapsulator', 'monopole_upgrade', 'overclock_chip']),
     # マルチブロック: 共通のポートのあと、形ごとにコントローラとその部品
@@ -3368,7 +3371,7 @@ TAB_GROUPS = [
     ('ボスの戦利品', ['sentinel_core', 'degenerate_nucleus', 'precision_actuator', 'echo_chapter', 'gravity_chapter', 'horizon_chapter',
                  'ergosphere_chapter', 'terminus_record', 'archivist_halo', 'afterglow_wings', 'awakening_record_core',
                  'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_ergosphere_core']),
-    ('建材', ['white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
+    ('建材', ['white_panel', 'white_light_panel', 'bismuth_crystal_block', 'glowing_bismuth_crystal', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
             'black_reinforced_glass', 'black_star_glass', 'android_barrier_glass', 'android_barrier_glass_patterned',
             'android_gate_glass', 'android_gate_glass_patterned']),
     ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',

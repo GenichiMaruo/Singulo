@@ -66,6 +66,88 @@ public final class Stage2GameTests {
         return controller;
     }
 
+    /** 冷却塔の外壁の角（外装板と同じブロック）をポートに替えても形成され、ポートがつながる。 */
+    @GameTest(template = TALL, timeoutTicks = 100)
+    public static void coolingTowerAcceptsPortAtCasingCorner(GameTestHelper helper) {
+        var kind = io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER;
+        MachineBlockEntity tower = buildTower(helper, 7);
+        BlockPos corner = TestBuild.port(helper, kind, TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 0, 1, 0);
+        helper.runAtTickTime(45, () -> {
+            helper.assertTrue(tower.structureSize() == 7, "外壁の角をポートに替えると形成されない: " + tower.structureSize());
+            helper.assertTrue(helper.getLevel().getBlockEntity(corner) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
+                    && helper.absolutePos(TOWER_CONTROLLER).equals(p.controllerPos()), "角のポートがコントローラにつながらない");
+            helper.succeed();
+        });
+    }
+
+    /** ポートを壊してすぐ同じ場所に置き直しても（形の確認の間隔より速く）、新しいポートがつながる。 */
+    @GameTest(template = TALL, timeoutTicks = 150)
+    public static void replacedPortAtSamePositionRelinks(GameTestHelper helper) {
+        MachineBlockEntity tower = buildTower(helper, 7);
+        BlockPos port = towerPort;
+        BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
+        helper.runAtTickTime(30, () -> {
+            helper.assertTrue(helper.getLevel().getBlockEntity(port) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
+                    && controller.equals(p.controllerPos()), "最初のポートがつながらない");
+            helper.getLevel().setBlockAndUpdate(port, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+            helper.getLevel().setBlockAndUpdate(port, SinguloBlocks.MULTIBLOCK_PORT.get().defaultBlockState());
+        });
+        helper.runAtTickTime(80, () -> {
+            helper.assertTrue(helper.getLevel().getBlockEntity(port) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
+                    && controller.equals(p.controllerPos()), "置き直したポートがつながらない");
+            helper.assertTrue(tower.structureSize() == 7, "置き直したあと形成が外れる");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * 完成した塔の外装板を1枚削ってポートに替えると、コントローラを置き直さなくてもポートとして使える。
+     * ポートの側のつながりだけが消えたとき（ポートのチャンクだけ読み込み直されたときなど）も、次の確認でつなぎ直す。
+     */
+    @GameTest(template = TALL, timeoutTicks = 200)
+    public static void portSwappedIntoFormedTowerWorksWithoutReplacingController(GameTestHelper helper) {
+        var kind = io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER;
+        MachineBlockEntity tower = buildTower(helper, 7);
+        BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
+        BlockPos panel = TestBuild.at(helper, kind, TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 3, 1, 0);
+        helper.runAtTickTime(30, () -> {
+            helper.assertTrue(tower.structureSize() == 7, "塔が形成されない");
+            helper.getLevel().destroyBlock(panel, false);
+            helper.getLevel().setBlockAndUpdate(panel, SinguloBlocks.MULTIBLOCK_PORT.get().defaultBlockState());
+        });
+        helper.runAtTickTime(80, () -> {
+            helper.assertTrue(helper.getLevel().getBlockEntity(panel) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
+                    && controller.equals(p.controllerPos()), "削って替えたポートがつながらない");
+            helper.assertTrue(helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, panel, null) != null,
+                    "替えたポートからアイテムを出し入れできない");
+            // ポートの側だけつながりが消えた（チャンクの読み込み直しと同じ）
+            ((io.github.genichimaruo.singulo.multiblock.PortBlockEntity) helper.getLevel().getBlockEntity(panel)).link(null);
+        });
+        helper.runAtTickTime(130, () -> {
+            helper.assertTrue(helper.getLevel().getBlockEntity(panel) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
+                    && controller.equals(p.controllerPos()), "つながりが消えたポートを付け直さない");
+            helper.succeed();
+        });
+    }
+
+    /** コントローラを最後に置いて完成させても、形成の演出が出る（読み込み直したときだけ出さない）。 */
+    @GameTest(template = TALL, timeoutTicks = 100)
+    public static void placingControllerLastPlaysFormation(GameTestHelper helper) {
+        buildTower(helper, 7);
+        BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
+        var state = helper.getLevel().getBlockState(controller);
+        helper.getLevel().setBlockAndUpdate(controller, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(controller, state);
+        MachineBlockEntity fresh = helper.getBlockEntity(TOWER_CONTROLLER);
+        fresh.energy().setEnergy(fresh.energy().getMaxEnergyStored());
+        int before = io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedSparks();
+        helper.runAtTickTime(2, () -> {
+            helper.assertTrue(fresh.structureSize() == 7, "形成されない");
+            helper.assertTrue(io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedSparks() > before, "形成の演出が出ない");
+            helper.succeed();
+        });
+    }
+
     @GameTest(template = TALL, timeoutTicks = 200)
     public static void coolingTowerMakesLiquidNitrogen(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
@@ -449,6 +531,38 @@ public final class Stage2GameTests {
             int usage = tower.syncData().getInt(MachineBlockEntity.D_USAGE);
             helper.assertTrue(usage > 0, "線材の加工が始まらない");
             helper.assertTrue(usage <= 210, "高さ10の塔で、線材の毎tickの電力がレシピ（200 FE/t）より増える: " + usage);
+        });
+    }
+
+    /** 水素燃料電池: 水素2 mB に酸素1 mB を使い、最大 240 FE/t。水素1 mB で 4.8 FE。 */
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void hydrogenFuelCellBurnsHydrogenAndOxygen(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.HYDROGEN_FUEL_CELL.get());
+        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = helper.getBlockEntity(pos);
+        cell.fluids().fill(new FluidStack(fluid("hydrogen"), 1000), IFluidHandler.FluidAction.EXECUTE);
+        cell.fluids().fill(new FluidStack(fluid("oxygen"), 500), IFluidHandler.FluidAction.EXECUTE);
+        helper.runAtTickTime(11, () -> {
+            int energy = cell.energy().getEnergyStored();
+            int usedH = 1000 - cell.hydrogen().getFluidAmount();
+            int usedO = 500 - cell.oxygen().getFluidAmount();
+            helper.assertTrue(energy >= 240 * 9 && energy <= 240 * 11, "出力が 240 FE/t でない: " + energy);
+            helper.assertTrue(usedH >= 450 && usedH <= 560, "水素が1 tickに50 mB 減らない: " + usedH);
+            helper.assertTrue(Math.abs(usedO * 2 - usedH) <= 2, "酸素が水素の半分だけ減らない: H " + usedH + " / O " + usedO);
+            helper.assertTrue(energy <= usedH * 4.8 + 1, "水素1 mB あたり 4.8 FE より多く出る: " + energy + " / " + usedH);
+            helper.succeed();
+        });
+    }
+
+    /** 凍結粉砕: 冷却塔で骨を液体窒素で冷やして砕くと、骨粉6個。 */
+    @GameTest(template = TALL, timeoutTicks = 300)
+    public static void coolingTowerCryoMillsBones(GameTestHelper helper) {
+        MachineBlockEntity tower = buildTower(helper, 7);
+        helper.onEachTick(() -> tower.energy().setEnergy(tower.energy().getMaxEnergyStored()));
+        tower.items().setStackInSlot(0, new ItemStack(Items.BONE));
+        helper.succeedWhen(() -> {
+            ItemStack out = tower.items().getStackInSlot(tower.type().outputSlot());
+            helper.assertTrue(out.is(Items.BONE_MEAL) && out.getCount() == 6, "骨粉が6個できない: " + out);
         });
     }
 

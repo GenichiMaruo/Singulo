@@ -146,6 +146,78 @@ public final class SinguloGameTests {
         });
     }
 
+    /** 純酸素転炉: 焼成炉に鉄2・石炭1・酸素250 mB で鋼鉄インゴット2。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void kilnBlowsOxygenIntoSteel(GameTestHelper helper) {
+        MachineBlockEntity kiln = machine(helper, MachineType.KILN);
+        helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        kiln.items().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 2));
+        kiln.items().setStackInSlot(1, new ItemStack(net.minecraft.world.item.Items.COAL));
+        kiln.automationFluids().fill(new FluidStack(SinguloFluids.get("oxygen"), 250), IFluidHandler.FluidAction.EXECUTE);
+        helper.succeedWhen(() -> {
+            ItemStack out = kiln.items().getStackInSlot(kiln.type().outputSlot());
+            helper.assertTrue(out.is(item("steel_ingot")) && out.getCount() == 2, "鋼鉄インゴットが2個できない: " + out);
+        });
+    }
+
+    /** 蛍光体: 焼成炉で未焼成の蛍光体を焼くと、グロウストーンダスト4個。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void kilnFiresPhosphorIntoGlowstone(GameTestHelper helper) {
+        MachineBlockEntity kiln = machine(helper, MachineType.KILN);
+        helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        kiln.items().setStackInSlot(0, new ItemStack(item("unfired_phosphor")));
+        helper.succeedWhen(() -> {
+            ItemStack out = kiln.items().getStackInSlot(kiln.type().outputSlot());
+            helper.assertTrue(out.is(net.minecraft.world.item.Items.GLOWSTONE_DUST) && out.getCount() == 4, "グロウストーンダストが4個できない: " + out);
+        });
+    }
+
+    /** ペルチェ冷却器: 水1,000 mB を凍らせて氷1個。 */
+    @GameTest(template = EMPTY, timeoutTicks = 400)
+    public static void peltierCoolerFreezesWater(GameTestHelper helper) {
+        MachineBlockEntity cooler = machine(helper, MachineType.PELTIER_COOLER);
+        helper.onEachTick(() -> cooler.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        cooler.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        helper.succeedWhen(() -> helper.assertTrue(
+                cooler.items().getStackInSlot(cooler.type().outputSlot()).is(net.minecraft.world.item.Items.ICE), "氷ができない"));
+    }
+
+    /** 圧縮機で鉄のチェストプレート（インゴット8個）を砕くと、鉄の塊48個（インゴット約5個ぶん）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void compressorRecyclesIronArmor(GameTestHelper helper) {
+        MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
+        helper.onEachTick(() -> compressor.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        ItemStack worn = new ItemStack(net.minecraft.world.item.Items.IRON_CHESTPLATE);
+        worn.setDamageValue(100);
+        compressor.items().setStackInSlot(0, worn);
+        helper.succeedWhen(() -> {
+            ItemStack out = compressor.items().getStackInSlot(compressor.type().outputSlot());
+            helper.assertTrue(out.is(net.minecraft.world.item.Items.IRON_NUGGET) && out.getCount() == 48, "鉄の塊が48個出ない: " + out);
+        });
+    }
+
+    /**
+     * 単極子を入れた電解槽でも、水素1 mB あたりの電力は変わらない（8 FE）。速くなったぶん毎tickの電力が増える。
+     * 水素燃料電池（1 mB で 4.8 FE）と組んでも電力は増えない。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void electrolyzerHydrogenCostIgnoresMonopole(GameTestHelper helper) {
+        MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
+        electrolyzer.items().setStackInSlot(MachineType.ELECTROLYZER.upgradeSlot(), new ItemStack(item("monopole_upgrade")));
+        helper.onEachTick(() -> electrolyzer.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        electrolyzer.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        helper.succeedWhen(() -> {
+            var data = electrolyzer.syncData();
+            int usage = data.getInt(MachineBlockEntity.D_USAGE);
+            int ticks = data.getInt(MachineBlockEntity.D_MAX_PROGRESS);
+            helper.assertTrue(usage > 0, "電解が始まらない");
+            double perMb = usage * (double) ticks / 200.0;
+            helper.assertTrue(perMb >= 7.9, "単極子で水素1 mB あたりの電力が下がる: " + perMb + " FE/mB");
+            helper.assertTrue(perMb > io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity.fePerMb(),
+                    "燃料電池で取り戻せる電力のほうが多い");
+        });
+    }
+
     /** 待機の理由:空・作れない材料・液体不足（何がいくつ足りないか）を見分ける。 */
     @GameTest(template = EMPTY)
     public static void idleMachineExplainsWhy(GameTestHelper helper) {

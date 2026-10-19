@@ -303,6 +303,7 @@ MACHINE_ICONS = {
     'precision_assembler': ('arm', None), 'catalytic_reactor': ('flask', (150, 255, 180)),
     'cryogenic_turbine': ('fan', None), 'cosmic_muon_collector': ('dish', None), 'smes_cell': ('battery', None),
     'muon_fusion_reactor': ('fusion', (200, 150, 255)),
+    'hydrogen_fuel_cell': ('battery', (150, 220, 255)), 'peltier_cooler': ('snow', (170, 230, 255)),
     'worldline_anchor_small': ('anchor', None), 'entanglement_synthesizer': ('link', None), 'laser_cooler': ('beam', (255, 90, 120)),
     'quantum_heat_engine': ('atom', None), 'gravitational_wave_detector': ('wave', None), 'inertial_stabilizer': ('shield', None),
     'echo_resonator': ('echo', (120, 255, 220)), 'time_crystal_incubator': ('crystal', None), 'probe_station': ('probe', None),
@@ -1567,6 +1568,20 @@ def nihonium_ingot():
     return outlined(f)
 
 
+def unfired_phosphor():
+    """未焼成の蛍光体: 灰白色の粉の小山に、硫黄の黄色と銅の赤茶の粒。"""
+    def f(d):
+        d.polygon([(2, 13), (5, 8), (8, 6), (11, 8), (14, 13)], fill=(206, 206, 190, 255))
+        d.polygon([(8, 6), (11, 8), (14, 13), (9, 13)], fill=(178, 178, 162, 255))
+        d.line([(3, 13), (13, 13)], fill=(150, 150, 136, 255))
+        for x, y in ((6, 9), (10, 11), (4, 11)):
+            d.point((x, y), fill=(232, 210, 80, 255))
+        for x, y in ((9, 9), (7, 11)):
+            d.point((x, y), fill=(190, 110, 70, 255))
+        d.point((8, 7), fill=(240, 240, 226, 255))
+    return outlined(f)
+
+
 def empty_coolant_cartridge():
     """空の冷媒カートリッジ: 冷媒カートリッジと同じ鋼の容器で、窓の帯が暗い（中が空）。"""
     steel = (176, 184, 196)
@@ -1881,6 +1896,7 @@ ITEM_ART = {
     'nihonium_ingot': nihonium_ingot,
     'nihonium_plate': lambda: plate(NIHONIUM, stripes=2, accent=NIHONIUM_GLOW),
     'nihonium_frame': lambda: frame(NIHONIUM, NIHONIUM_GLOW),
+    'unfired_phosphor': unfired_phosphor,
     'phase_sync_plate': phase_sync_plate,
     'degenerate_precursor': degenerate_precursor,
     'confinement_ring': confinement_ring,

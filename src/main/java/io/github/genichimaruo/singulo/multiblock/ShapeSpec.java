@@ -19,7 +19,8 @@ import net.minecraft.world.phys.Vec3;
  * z: 奥行き 0〜depth−1）ごとに「何を置くか」で決める。コントローラは (cx, cy, cz) で、z が小さい側が手前（コントローラの正面側）。
  * <p>
  * 判定はワールドの4つの向きを試す。設計図（ホロ投影機・組み立てコマンド・JEI）も同じ定義から作るので、判定とずれない。
- * 外装板（PANEL）の位置にはマルチブロック搬入出ポートを置いてもよい。
+ * 外装板（PANEL）の位置にはマルチブロック搬入出ポートを置いてもよい。外装板と同じブロックを部品（PART）として置く位置
+ * （冷却塔の外壁の角など）も、見た目では区別がつかないので、同じようにポートと入れ替えられる。
  */
 public final class ShapeSpec {
     public enum Kind {
@@ -59,6 +60,9 @@ public final class ShapeSpec {
     private final int cy;
     private final int cz;
     private final Layout layout;
+    /** 外装板として使うブロック（初めて判定するときに設計図から集める。登録が済む前には作れないため）。 */
+    @Nullable
+    private java.util.Set<Block> panelBlocks;
 
     public ShapeSpec(int width, int height, int depth, int cx, int cy, int cz, Layout layout) {
         this.width = width;
@@ -118,6 +122,34 @@ public final class ShapeSpec {
         return null;
     }
 
+    /** 外装板と同じブロックを部品として置く位置も、外装板として扱う（ポートと入れ替えられる）。 */
+    private Kind effectiveKind(Slot slot) {
+        if (slot.kind() != Kind.PART) {
+            return slot.kind();
+        }
+        if (panelBlocks == null) {
+            java.util.Set<Block> found = new java.util.HashSet<>();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    for (int z = 0; z < depth; z++) {
+                        Slot s = layout.at(x, y, z);
+                        if (s.kind() == Kind.PANEL) {
+                            found.add(s.block().get());
+                        }
+                    }
+                }
+            }
+            panelBlocks = found;
+        }
+        return panelBlocks.contains(slot.block().get()) ? Kind.PANEL : Kind.PART;
+    }
+
+    /** この位置にマルチブロック搬入出ポートを置けるか（外装板の位置か、外装板と同じブロックの位置）。 */
+    public boolean acceptsPort(int x, int y, int z) {
+        Slot slot = layout.at(x, y, z);
+        return slot.kind() != Kind.IGNORE && effectiveKind(slot) == Kind.PANEL;
+    }
+
     public boolean matches(Level level, BlockPos controller, Direction back, Block controllerBlock, List<BlockPos> ports) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -128,7 +160,7 @@ public final class ShapeSpec {
                     }
                     BlockPos p = pos(controller, back, x, y, z);
                     BlockState s = level.getBlockState(p);
-                    boolean ok = switch (slot.kind()) {
+                    boolean ok = switch (effectiveKind(slot)) {
                         case PART -> s.is(slot.block().get());
                         case PANEL -> {
                             if (s.is(SinguloBlocks.MULTIBLOCK_PORT.get()) || (s.is(SinguloBlocks.WORMHOLE_GENERATOR_PORT.get())

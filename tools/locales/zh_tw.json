@@ -643,6 +643,10 @@
     "source": "Hologram Floor",
     "translation": "全像地板"
   },
+  "block.singulo.bismuth_crystal_block": {
+    "source": "Bismuth Crystal Block",
+    "translation": "鉍晶體方塊"
+  },
   "block.singulo.black_reinforced_glass": {
     "source": "Black Reinforced Glass",
     "translation": "黑色強化玻璃"
@@ -887,6 +891,10 @@
     "source": "Genesis Pylon",
     "translation": "創世爐支柱"
   },
+  "block.singulo.glowing_bismuth_crystal": {
+    "source": "Glowing Bismuth Crystal",
+    "translation": "發光鉍晶體"
+  },
   "block.singulo.gravitational_containment_tank": {
     "source": "Gravitational Containment Tank",
     "translation": "重力約束槽"
@@ -922,6 +930,10 @@
   "block.singulo.horizon_bus": {
     "source": "Horizon Bus",
     "translation": "視界匯流排"
+  },
+  "block.singulo.hydrogen_fuel_cell": {
+    "source": "Hydrogen Fuel Cell",
+    "translation": "氫燃料電池"
   },
   "block.singulo.impact_generator_panel": {
     "source": "Impact Generator Panel",
@@ -1010,6 +1022,10 @@
   "block.singulo.paper_stack": {
     "source": "Stack of Papers",
     "translation": "文件堆"
+  },
+  "block.singulo.peltier_cooler": {
+    "source": "Peltier Cooler",
+    "translation": "珀耳帖冷卻器"
   },
   "block.singulo.power_conduit": {
     "source": "Power Conduit",
@@ -1651,6 +1667,10 @@
     "source": "A vessel for holding a tiny black hole.",
     "translation": "容納微小黑洞的容器。"
   },
+  "desc.singulo.bismuth_crystal_block": {
+    "source": "Stepped, rainbow-tarnished crystals grown from molten bismuth. A building block.",
+    "translation": "熔化的鉍冷卻後形成的階梯狀彩虹色晶體。建材。"
+  },
   "desc.singulo.bismuth_ingot": {
     "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
     "translation": "帶有彩虹色氧化膜的鉍金屬，在催化反應器中精煉粗銅時作為副產物得到。與鋅一起在粒子加速器中碰撞即可製成鉨。"
@@ -2071,6 +2091,10 @@
     "source": "Stacked three high on each diagonal frame of the Genesis Engine; they focus power into the newborn universe.",
     "translation": "在創世爐每個斜向框架上各疊 3 層，將電力匯聚送往即將誕生的宇宙。"
   },
+  "desc.singulo.glowing_bismuth_crystal": {
+    "source": "Bismuth crystal mixed with phosphor so it glows. A building block.",
+    "translation": "摻入螢光體而會發光的鉍晶體。建材。"
+  },
   "desc.singulo.gravitational_containment_tank": {
     "source": "The only tank that holds dark matter. Keeps its contents when broken.",
     "translation": "唯一能容納暗物質的儲槽。破壞後仍會保留內容物。"
@@ -2142,6 +2166,10 @@
   "desc.singulo.horizon_chapter": {
     "source": "A passage of records found in the Awakened Horizon Warden's wreck, naming what the warden was guarding. Bound with other chapters, it might be readable.",
     "translation": "在覺醒的視界守衛殘骸中找到的一段記錄，寫著守衛所守護之物的名字。與其他斷章合在一起，或許就能讀懂。"
+  },
+  "desc.singulo.hydrogen_fuel_cell": {
+    "source": "A stage 1 generator that makes power from hydrogen and oxygen. It returns 60% of the power the Electrolyzer put into the hydrogen: 4.8 FE per mB, up to 240 FE/t, using 1 mB of oxygen per 2 mB of hydrogen. Right-click with an empty hand to see its status.",
+    "translation": "用氫和氧發電的第 1 階段發電機。它是取回電解槽灌入氫中的電力的 6 成的儲能裝置：每 mB 氫 4.8 FE，最大 240 FE/t。每 2 mB 氫使用 1 mB 氧。空手右鍵可顯示狀態。"
   },
   "desc.singulo.impact_generator_panel": {
     "source": "Landing on it causes no fall damage. Stores 1,000 FE per block fallen (up to 20,000 FE) and powers connected gravity panels.",
@@ -2326,6 +2354,10 @@
   "desc.singulo.particle_accelerator": {
     "source": "Collides particles into muon bundles and rare monopoles.",
     "translation": "使粒子碰撞，產生緲子束與稀有的磁單極子。"
+  },
+  "desc.singulo.peltier_cooler": {
+    "source": "Runs current through thermoelectric elements to freeze water (a thermoelectric generator in reverse). 1,000 mB of water makes 1 ice.",
+    "translation": "給熱電元件通電使水結冰的裝置（熱電發電機的反向）。1,000 mB 水可製成 1 個冰。"
   },
   "desc.singulo.penrose_reactor": {
     "source": "Draws energy from a spinning black hole.",
@@ -2718,6 +2750,10 @@
   "desc.singulo.unfired_ceramic": {
     "source": "Clay, sand, Nether quartz and bone meal (or limestone powder), ready to be fired into white ceramic.",
     "translation": "黏土、沙、地獄石英和骨粉（或石灰粉）的混合物，可燒製成白色陶瓷複合材料。"
+  },
+  "desc.singulo.unfired_phosphor": {
+    "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
+    "translation": "把鋅粉、火藥（硫）和銅混合而成的粉末。在燒製爐中燒製後可得到 4 個蓄光體螢石粉。"
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -6176,8 +6212,8 @@
     "translation": "本手冊的使用方式"
   },
   "guide.singulo.intro.vanilla.body": {
-    "source": "Machines can make these vanilla materials, so you can skip some hunting and travel.\n- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, 4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust (instead of coal).\n- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian.\n- Catalytic Reactor (stage 2): sand + water to nether quartz.\n- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n- Degenerate Compactor (stage 4): 8 coal blocks to a diamond.\n- Time Crystal Incubator (stage 4): logs to coal, cobblestone to mossy cobblestone, copper block to oxidized copper.",
-    "translation": "這些原版材料可以用裝置製作，省去一些狩獵和遠行。\n・壓縮機（第 1 階段）：鵝卵石→礫石→沙，砂岩→沙×2。雪塊×4→冰，冰×4→冰塊，冰塊×4→藍冰。方解石→石灰粉（代替骨粉），木炭×3→碳粉×2（代替煤炭）。\n・極低溫冷卻塔（第 2 階段）：水＋液態氮→冰塊，熔岩＋液態氮→黑曜石。\n・催化反應器（第 2 階段）：沙＋水→地獄石英。\n・量子糾纏合成器（第 3 階段）：量子糾纏元件＋史萊姆球→終界珍珠。\n・粒子加速器（第 3 階段）：鉍錠＋碳粉→金錠。\n・簡併壓縮爐（第 4 階段）：煤炭方塊×8→鑽石。\n・時間晶體培育槽（第 4 階段）：原木→煤炭，鵝卵石→青苔鵝卵石，銅方塊→氧化銅方塊。"
+    "source": "Machines can make these vanilla materials, so you can skip some hunting and travel.\n- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, 4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust (instead of coal). Iron and gold tools and armor to nuggets (about two thirds of the ingots).\n- Kiln (stage 1): unfired phosphor (zinc dust + copper + gunpowder) to 4 glowstone dust.\n- Peltier Cooler (stage 1): water to ice.\n- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian. Cryo-milling turns a bone into 6 bone meal, a blaze rod into 4 powder and wool into 4 string.\n- Catalytic Reactor (stage 2): sand + water to nether quartz.\n- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n- Degenerate Compactor (stage 4): 8 coal blocks to a diamond.\n- Time Crystal Incubator (stage 4): logs to coal, cobblestone to mossy cobblestone, copper block to oxidized copper.",
+    "translation": "這些原版材料可以用裝置製作，省去一些狩獵和遠行。\n・壓縮機（第 1 階段）：鵝卵石→礫石→沙，砂岩→沙×2。雪塊×4→冰，冰×4→冰塊，冰塊×4→藍冰。方解石→石灰粉（代替骨粉），木炭×3→碳粉×2（代替煤炭）。鐵和金的工具、盔甲→粒（約為錠的三分之二）。\n・燒製爐（第 1 階段）：未燒製螢光體（鋅粉＋銅＋火藥）→螢石粉×4。\n・珀耳帖冷卻器（第 1 階段）：水→冰。\n・極低溫冷卻塔（第 2 階段）：水＋液態氮→冰塊，熔岩＋液態氮→黑曜石。冷凍粉碎：骨頭→骨粉×6，烈焰桿→烈焰粉×4，羊毛→線×4。\n・催化反應器（第 2 階段）：沙＋水→地獄石英。\n・量子糾纏合成器（第 3 階段）：量子糾纏元件＋史萊姆球→終界珍珠。\n・粒子加速器（第 3 階段）：鉍錠＋碳粉→金錠。\n・簡併壓縮爐（第 4 階段）：煤炭方塊×8→鑽石。\n・時間晶體培育槽（第 4 階段）：原木→煤炭，鵝卵石→青苔鵝卵石，銅方塊→氧化銅方塊。"
   },
   "guide.singulo.intro.vanilla.title": {
     "source": "Vanilla materials from machines",
@@ -6372,8 +6408,8 @@
     "translation": "第 1 階段的流程"
   },
   "guide.singulo.stage1.machines.body": {
-    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
-    "translation": "- 燒製爐：燒製陶瓷基板等，也能更快地煉鋼。\n- 壓縮機：製作鋼板。質量模式下會把有質量值的材料變成「質量」，壓成壓縮塊或質量顆粒。\n- 電解槽：將水分解為氫氣與氧氣。氫氣可以用流體罐裝走，運到第 2 階段的粒子加速器。\n- 檔案終端：把遺蹟的記錄抄寫到資料卡上，修復退化的零件，也能解讀水晶記憶體。"
+    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster. With oxygen it works as a basic oxygen furnace: 2 iron and 1 coal make 2 steel.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Hydrogen Fuel Cell: makes power from hydrogen and oxygen, returning 60% of the power the Electrolyzer put in (up to 240 FE/t).\n- Peltier Cooler: freezes water with power. Compress the ice into packed and blue ice.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
+    "translation": "- 燒製爐：燒製陶瓷基板等，也能更快地煉鋼。放入氧氣後，就成為用 2 個鐵和 1 個煤製作 2 個鋼的純氧轉爐。\n- 壓縮機：製作鋼板。質量模式下會把有質量值的材料變成「質量」，壓成壓縮塊或質量顆粒。\n- 電解槽：將水分解為氫氣與氧氣。氫氣可以用流體罐裝走，運到第 2 階段的粒子加速器。\n- 氫燃料電池：用氫和氧發電（取回電解槽灌入電力的 6 成的儲能，最大 240 FE/t）。\n- 珀耳帖冷卻器：用電力使水結冰。冰可以用壓縮機壓成冰塊、藍冰。\n- 檔案終端：把遺蹟的記錄抄寫到資料卡上，修復退化的零件，也能解讀水晶記憶體。"
   },
   "guide.singulo.stage1.machines.title": {
     "source": "Stage 1 machines",
@@ -6771,6 +6807,10 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
   },
+  "howto.singulo.bismuth_crystal_block": {
+    "source": "Made in: Kiln (stage 2)",
+    "translation": "製造地：燒製爐（第 2 階段）"
+  },
   "howto.singulo.black_hole_bomb": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "製造地：奇點封裝器（第 5 階段）"
@@ -7111,6 +7151,10 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
   },
+  "howto.singulo.glowing_bismuth_crystal": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
   "howto.singulo.gravitational_containment_tank": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
@@ -7166,6 +7210,10 @@
   "howto.singulo.horizon_bus": {
     "source": "Made in: Degenerate Compactor (stage 5)",
     "translation": "製造地：簡併壓縮爐（第 5 階段）"
+  },
+  "howto.singulo.hydrogen_fuel_cell": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：製作台（第 1 階段）"
   },
   "howto.singulo.impact_generator_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -7294,6 +7342,10 @@
   "howto.singulo.particle_accelerator": {
     "source": "Made in: Multiblock assembly (stage 2)",
     "translation": "製造地：多方塊組裝（第 2 階段）"
+  },
+  "howto.singulo.peltier_cooler": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：製作台（第 1 階段）"
   },
   "howto.singulo.penrose_reactor": {
     "source": "Made in: Multiblock assembly (stage 5)",
@@ -7531,6 +7583,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
   },
+  "howto.singulo.unfired_phosphor": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：製作台（第 1 階段）"
+  },
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
     "translation": "製造地：蟲洞產生器（第 5 階段）"
@@ -7616,12 +7672,12 @@
     "translation": "製造地：精密組裝台（第 5 階段）"
   },
   "howto.singulo.zinc_dust": {
-    "source": "Made in: Compressor (stage 2)",
-    "translation": "製造地：壓縮機（第 2 階段）"
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "製造地：壓縮機（第 1 階段）"
   },
   "howto.singulo.zinc_ingot": {
-    "source": "Made in: Kiln (stage 2)",
-    "translation": "製造地：燒製爐（第 2 階段）"
+    "source": "Made in: Kiln (stage 1)",
+    "translation": "製造地：燒製爐（第 1 階段）"
   },
   "item.singulo.afterglow_wings": {
     "source": "Afterglow Wings",
@@ -8363,6 +8419,10 @@
     "source": "Unfired Ceramic",
     "translation": "未燒製陶瓷"
   },
+  "item.singulo.unfired_phosphor": {
+    "source": "Unfired Phosphor",
+    "translation": "未燒製螢光體"
+  },
   "item.singulo.unstable_wormhole_mouth": {
     "source": "Unstable Wormhole Mouth",
     "translation": "不穩定蟲洞入口"
@@ -8662,6 +8722,14 @@
   "message.singulo.deep_sea_collector.rate": {
     "source": "Pressure %s%%: one Pressure Crystal every %ss",
     "translation": "水壓 %s%%：約每 %s 秒生成 1 個高壓晶體"
+  },
+  "message.singulo.fuel_cell.standby": {
+    "source": "Standing by (storage full)",
+    "translation": "待機中（儲電已滿）"
+  },
+  "message.singulo.fuel_cell.status": {
+    "source": "Hydrogen %s/%s mB · Oxygen %s/%s mB · Stored %s/%s FE · %s",
+    "translation": "氫 %s/%s mB　氧 %s/%s mB　儲電 %s/%s FE　%s"
   },
   "message.singulo.gravity_receiver.status": {
     "source": "Gravity panels active: %s / %s (%s FE/t each)",
@@ -9186,6 +9254,10 @@
   "station.singulo.particle_accelerator": {
     "source": "Particle Accelerator",
     "translation": "粒子加速器"
+  },
+  "station.singulo.peltier_cooler": {
+    "source": "Peltier Cooler",
+    "translation": "珀耳帖冷卻器"
   },
   "station.singulo.penrose_reactor_catalyst": {
     "source": "P-Reactor",
@@ -10352,20 +10424,24 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 39 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 39 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 41 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 41 個"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 23 more",
-    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 23 個"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
+    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 25 個"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
     "translation": "用於：微型黑洞容器"
   },
+  "uses.singulo.bismuth_crystal_block": {
+    "source": "Used in: Glowing Bismuth Crystal",
+    "translation": "用於：發光鉍晶體"
+  },
   "uses.singulo.bismuth_ingot": {
-    "source": "Used in: Nihonium",
-    "translation": "用於：鉨"
+    "source": "Used in: Nihonium, Bismuth Crystal Block",
+    "translation": "用於：鉨、鉍晶體方塊"
   },
   "uses.singulo.black_reinforced_glass": {
     "source": "Used in: Starred Black Reinforced Glass",
@@ -10408,8 +10484,8 @@
     "translation": "用於：卡西米爾腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 14 more",
-    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 14 個"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 15 more",
+    "translation": "用於：空白資料卡、冷卻塔控制器、超導線圈、加速器控制器、催化反應器 等 15 個"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -10812,8 +10888,8 @@
     "translation": "用於：超導電纜、量子糾纏元件、玻色凝聚態催化劑、簡併熱爐熱交換管、拓撲導線 等 1 個"
   },
   "uses.singulo.thermocouple_module": {
-    "source": "Used in: Thermoelectric Generator, Impact Generator Panel",
-    "translation": "用於：熱電發電機、衝擊發電面板"
+    "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
+    "translation": "用於：熱電發電機、衝擊發電面板、珀耳帖冷卻器"
   },
   "uses.singulo.time_crystal_catalyst": {
     "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
@@ -10908,8 +10984,8 @@
     "translation": "用於：蟲洞入口"
   },
   "uses.singulo.zinc_dust": {
-    "source": "Used in: Zinc Ingot",
-    "translation": "用於：鋅錠"
+    "source": "Used in: Zinc Ingot, Unfired Phosphor",
+    "translation": "用於：鋅錠、未燒製螢光體"
   },
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",

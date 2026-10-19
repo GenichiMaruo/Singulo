@@ -43,7 +43,7 @@ TAG_ICONS = {
     'c:gems/quartz': 'item/quartz', 'c:dusts/redstone': 'item/redstone', 'singulo:helium_bearing_stone': 'block/deepslate',
     'singulo:ceramic_flux': 'item/bone_meal', 'singulo:limestone': 'block/calcite', 'singulo:carbon': 'item/coal',
     'c:cobblestones/normal': 'block/cobblestone', 'c:gravels': 'block/gravel', 'minecraft:logs': 'block/oak_log',
-    'c:storage_blocks/coal': 'block/coal_block', 'c:raw_materials/copper': 'item/raw_copper',
+    'c:storage_blocks/coal': 'block/coal_block', 'c:raw_materials/copper': 'item/raw_copper', 'c:rods/blaze': 'item/blaze_rod',
     'c:sands': 'block/sand', 'c:ingots/iron': 'item/iron_ingot', 'c:ingots/copper': 'item/copper_ingot', 'c:obsidians': 'block/obsidian',
 }
 VANILLA_TEXTURE_OVERRIDES = {
@@ -56,7 +56,7 @@ FLUID_COLORS = {'dark_matter': 0x2A1E3C, 'hydrogen': 0xE6F5FF, 'oxygen': 0xF5E1E
                 'minecraft:lava': 0xFF7A1E}
 # 製作場所 → 装置の正面の絵（mod の装置ID）
 STATION_BLOCKS = {
-    '焼成炉': 'kiln', '圧縮機': 'compressor', '電解槽': 'electrolyzer', 'アーカイブ端末': 'archive_terminal',
+    '焼成炉': 'kiln', 'ペルチェ冷却器': 'peltier_cooler', '圧縮機': 'compressor', '電解槽': 'electrolyzer', 'アーカイブ端末': 'archive_terminal',
     '精密組立台': 'precision_assembler', '触媒反応器': 'catalytic_reactor', '極低温冷却塔': 'cooling_tower_controller',
     '粒子加速器': 'accelerator_controller', '量子もつれ合成器': 'entanglement_synthesizer', 'レーザー冷却器': 'laser_cooler',
     '縮退圧縮炉': 'degenerate_compactor_controller', 'C空洞': 'casimir_cavity_controller', '時間結晶育成槽': 'time_crystal_incubator',

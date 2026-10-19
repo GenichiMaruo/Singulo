@@ -5,7 +5,8 @@ package io.github.genichimaruo.singulo.machine;
  * 何を作れるかはレシピ（station がこの id のもの）で決まる。
  */
 public enum MachineType {
-    KILN("kiln", 1, 2, 1, 0, 0, false),
+    /** 入力タンクは純酸素転炉の酸素用。 */
+    KILN("kiln", 1, 2, 1, 1, 0, false),
     COMPRESSOR("compressor", 1, 1, 1, 0, 1, true),
     ELECTROLYZER("electrolyzer", 1, 0, 0, 1, 2, false),
     ARCHIVE_TERMINAL("archive_terminal", 1, 4, 1, 0, 0, false),
@@ -31,7 +32,9 @@ public enum MachineType {
     /** 時間結晶触媒を育てる。電力が要求の80%を割った時間の割合だけ純度（寿命）が下がる。 */
     TIME_CRYSTAL_INCUBATOR("time_crystal_incubator", 4, 5, 1, 0, 0, false),
     /** 人工星核・特異点の種・シンギュラリティ・コアを作り、アノマリー・サンプルを復元する。 */
-    SINGULARITY_ENCAPSULATOR("singularity_encapsulator", 5, 6, 1, 0, 0, false);
+    SINGULARITY_ENCAPSULATOR("singularity_encapsulator", 5, 6, 1, 0, 0, false),
+    /** 熱電素子に電流を流して熱を運び出し、タンクの水を凍らせる（熱電発電機の逆）。 */
+    PELTIER_COOLER("peltier_cooler", 1, 0, 1, 1, 0, false);
 
     public static final int ENERGY_CAPACITY = 20_000;
     public static final int TANK_CAPACITY = 8_000;

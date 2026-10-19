@@ -1,7 +1,7 @@
 {
   "type": "singulo:machine",
   "station": "kiln",
-  "stage": 2,
+  "stage": 1,
   "time": 100,
   "energy": 40,
   "ingredients": [

@@ -14,7 +14,8 @@ public abstract class FixedShapeControllerBlockEntity extends MachineBlockEntity
 
     private int size;
     private final PortLinks ports = new PortLinks();
-    private boolean firstCheck = true;
+    /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
+    private boolean firstCheck;
     private long nextCheck;
 
     protected FixedShapeControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -40,6 +41,12 @@ public abstract class FixedShapeControllerBlockEntity extends MachineBlockEntity
             firstCheck = false;
         }
         return size > 0;
+    }
+
+    @Override
+    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        firstCheck = true;
     }
 
     @Override

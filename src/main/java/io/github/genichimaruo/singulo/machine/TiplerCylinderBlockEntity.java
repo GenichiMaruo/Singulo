@@ -67,7 +67,8 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     /** 円柱の軸の根元（格納筒の底の内側の中心）。形成したときに決まる。 */
     private BlockPos axis;
     private final io.github.genichimaruo.singulo.multiblock.PortLinks ports = new io.github.genichimaruo.singulo.multiblock.PortLinks();
-    private boolean firstCheck = true;
+    /** 保存データから読み込んだ直後の最初の判定か（そのときは形成の演出を出さない。新しく置いたコントローラでは出す）。 */
+    private boolean firstCheck;
     private boolean running;
     private long nextCheck;
     private double extraTickCarry;
@@ -339,6 +340,7 @@ public class TiplerCylinderBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        firstCheck = true;
         fuel.deserializeNBT(registries, tag.getCompound("fuel"));
         burn = tag.getInt("burn");
         running = tag.getBoolean("running");

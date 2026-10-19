@@ -43,6 +43,9 @@ RECESSES = {
     'cryogenic_turbine': SIDE_INTAKE,
     # 炉心のプラズマが見える窓
     'muon_fusion_reactor': [WINDOW],
+    # 水蒸気を出す天面の排気口
+    'hydrogen_fuel_cell': TOP_VENT,
+    'peltier_cooler': SIDE_FINS,
     'quantum_heat_engine': TOP_VENT,
     # 天面の検出窓（宇宙線を受ける）
     'cosmic_muon_collector': [('up', (4, 4, 12, 12), 2, '#inner', True, False)],

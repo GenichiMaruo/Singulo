@@ -643,6 +643,10 @@
     "source": "Hologram Floor",
     "translation": "홀로그램 바닥"
   },
+  "block.singulo.bismuth_crystal_block": {
+    "source": "Bismuth Crystal Block",
+    "translation": "비스무트 결정 블록"
+  },
   "block.singulo.black_reinforced_glass": {
     "source": "Black Reinforced Glass",
     "translation": "검은 강화 유리"
@@ -887,6 +891,10 @@
     "source": "Genesis Pylon",
     "translation": "창세로 기둥"
   },
+  "block.singulo.glowing_bismuth_crystal": {
+    "source": "Glowing Bismuth Crystal",
+    "translation": "빛나는 비스무트 결정"
+  },
   "block.singulo.gravitational_containment_tank": {
     "source": "Gravitational Containment Tank",
     "translation": "중력 격납 탱크"
@@ -922,6 +930,10 @@
   "block.singulo.horizon_bus": {
     "source": "Horizon Bus",
     "translation": "지평선 버스"
+  },
+  "block.singulo.hydrogen_fuel_cell": {
+    "source": "Hydrogen Fuel Cell",
+    "translation": "수소 연료 전지"
   },
   "block.singulo.impact_generator_panel": {
     "source": "Impact Generator Panel",
@@ -1010,6 +1022,10 @@
   "block.singulo.paper_stack": {
     "source": "Stack of Papers",
     "translation": "서류 더미"
+  },
+  "block.singulo.peltier_cooler": {
+    "source": "Peltier Cooler",
+    "translation": "펠티에 냉각기"
   },
   "block.singulo.power_conduit": {
     "source": "Power Conduit",
@@ -1651,6 +1667,10 @@
     "source": "A vessel for holding a tiny black hole.",
     "translation": "작은 블랙홀을 담아두는 용기."
   },
+  "desc.singulo.bismuth_crystal_block": {
+    "source": "Stepped, rainbow-tarnished crystals grown from molten bismuth. A building block.",
+    "translation": "녹인 비스무트를 식혀 만든 계단 모양의 무지갯빛 결정. 건축 재료."
+  },
   "desc.singulo.bismuth_ingot": {
     "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
     "translation": "무지갯빛 산화막이 낀 비스무트 금속. 촉매 반응기에서 구리 원석을 정련하면 부산물로 나온다. 아연과 함께 입자 가속기에서 충돌시키면 니호늄이 된다."
@@ -2071,6 +2091,10 @@
     "source": "Stacked three high on each diagonal frame of the Genesis Engine; they focus power into the newborn universe.",
     "translation": "창세로의 대각선 프레임 위에 3단씩 쌓습니다. 갓 태어나려는 우주로 전력을 모아 보냅니다."
   },
+  "desc.singulo.glowing_bismuth_crystal": {
+    "source": "Bismuth crystal mixed with phosphor so it glows. A building block.",
+    "translation": "형광체를 섞어 빛나게 만든 비스무트 결정. 건축 재료."
+  },
   "desc.singulo.gravitational_containment_tank": {
     "source": "The only tank that holds dark matter. Keeps its contents when broken.",
     "translation": "암흑 물질을 보관할 수 있는 유일한 탱크. 부숴도 내용물이 유지됩니다. 전력이 끊기면 새어 나옵니다."
@@ -2142,6 +2166,10 @@
   "desc.singulo.horizon_chapter": {
     "source": "A passage of records found in the Awakened Horizon Warden's wreck, naming what the warden was guarding. Bound with other chapters, it might be readable.",
     "translation": "각성한 지평선 감시자의 잔해에서 찾은 기록의 한 구절로, 감시자가 지키던 것의 이름이 적혀 있습니다. 다른 단장과 묶으면 읽을 수 있을지도 모릅니다."
+  },
+  "desc.singulo.hydrogen_fuel_cell": {
+    "source": "A stage 1 generator that makes power from hydrogen and oxygen. It returns 60% of the power the Electrolyzer put into the hydrogen: 4.8 FE per mB, up to 240 FE/t, using 1 mB of oxygen per 2 mB of hydrogen. Right-click with an empty hand to see its status.",
+    "translation": "수소와 산소로 전력을 만드는 1단계 발전기. 전해조가 수소에 담은 전력의 6할을 되돌려 주는 축전 장치로, 수소 1 mB당 4.8 FE, 최대 240 FE/t. 수소 2 mB에 산소 1 mB를 쓴다. 맨손으로 우클릭하면 상태를 표시한다."
   },
   "desc.singulo.impact_generator_panel": {
     "source": "Landing on it causes no fall damage. Stores 1,000 FE per block fallen (up to 20,000 FE) and powers connected gravity panels.",
@@ -2326,6 +2354,10 @@
   "desc.singulo.particle_accelerator": {
     "source": "Collides particles into muon bundles and rare monopoles.",
     "translation": "입자를 충돌시켜 뮤온 다발과 희귀한 자기 홀극을 만듭니다."
+  },
+  "desc.singulo.peltier_cooler": {
+    "source": "Runs current through thermoelectric elements to freeze water (a thermoelectric generator in reverse). 1,000 mB of water makes 1 ice.",
+    "translation": "열전 소자에 전류를 흘려 물을 얼리는 장치(열전 발전기의 반대). 물 1,000 mB로 얼음 1개."
   },
   "desc.singulo.penrose_reactor": {
     "source": "Draws energy from a spinning black hole.",
@@ -2718,6 +2750,10 @@
   "desc.singulo.unfired_ceramic": {
     "source": "Clay, sand, Nether quartz and bone meal (or limestone powder), ready to be fired into white ceramic.",
     "translation": "점토, 모래, 네더 석영, 뼛가루(또는 석회 가루)를 반죽한 것. 구우면 화이트 세라믹 복합재가 됩니다."
+  },
+  "desc.singulo.unfired_phosphor": {
+    "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
+    "translation": "아연 가루와 화약(황)과 구리를 섞은 가루. 소성로에서 구우면 축광체인 발광석 가루 4개가 된다."
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -6176,8 +6212,8 @@
     "translation": "이 책의 사용법"
   },
   "guide.singulo.intro.vanilla.body": {
-    "source": "Machines can make these vanilla materials, so you can skip some hunting and travel.\n- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, 4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust (instead of coal).\n- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian.\n- Catalytic Reactor (stage 2): sand + water to nether quartz.\n- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n- Degenerate Compactor (stage 4): 8 coal blocks to a diamond.\n- Time Crystal Incubator (stage 4): logs to coal, cobblestone to mossy cobblestone, copper block to oxidized copper.",
-    "translation": "기계로 만들 수 있는 바닐라 재료입니다. 사냥이나 먼 여행을 줄일 수 있습니다.\n・압축기(1단계): 조약돌→자갈→모래, 사암→모래 2개. 눈 블록 4개→얼음, 얼음 4개→꽁꽁 언 얼음, 꽁꽁 언 얼음 4개→푸른 얼음. 방해석→석회 가루(뼛가루 대신), 목탄 3개→탄소 가루 2개(석탄 대신).\n・극저온 냉각탑(2단계): 물＋액체 질소→꽁꽁 언 얼음, 용암＋액체 질소→흑요석.\n・촉매 반응기(2단계): 모래＋물→네더 석영.\n・양자 얽힘 합성기(3단계): 양자 얽힘 소자＋슬라임 볼→엔더 진주.\n・입자 가속기(3단계): 비스무트 주괴＋탄소 가루→금 주괴.\n・축퇴 압축로(4단계): 석탄 블록 8개→다이아몬드.\n・시간 결정 배양기(4단계): 원목→석탄, 조약돌→이끼 낀 조약돌, 구리 블록→산화된 구리."
+    "source": "Machines can make these vanilla materials, so you can skip some hunting and travel.\n- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, 4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust (instead of coal). Iron and gold tools and armor to nuggets (about two thirds of the ingots).\n- Kiln (stage 1): unfired phosphor (zinc dust + copper + gunpowder) to 4 glowstone dust.\n- Peltier Cooler (stage 1): water to ice.\n- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian. Cryo-milling turns a bone into 6 bone meal, a blaze rod into 4 powder and wool into 4 string.\n- Catalytic Reactor (stage 2): sand + water to nether quartz.\n- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n- Degenerate Compactor (stage 4): 8 coal blocks to a diamond.\n- Time Crystal Incubator (stage 4): logs to coal, cobblestone to mossy cobblestone, copper block to oxidized copper.",
+    "translation": "기계로 만들 수 있는 바닐라 재료입니다. 사냥이나 먼 여행을 줄일 수 있습니다.\n・압축기(1단계): 조약돌→자갈→모래, 사암→모래 2개. 눈 블록 4개→얼음, 얼음 4개→꽁꽁 언 얼음, 꽁꽁 언 얼음 4개→푸른 얼음. 방해석→석회 가루(뼛가루 대신), 목탄 3개→탄소 가루 2개(석탄 대신). 철·금 도구와 갑옷→조각(주괴의 약 3분의 2).\n・소성로(1단계): 소성되지 않은 형광체(아연 가루＋구리＋화약)→발광석 가루 4개.\n・펠티에 냉각기(1단계): 물→얼음.\n・극저온 냉각탑(2단계): 물＋액체 질소→꽁꽁 언 얼음, 용암＋액체 질소→흑요석. 동결 분쇄로 뼈→뼛가루 6개, 블레이즈 막대→블레이즈 가루 4개, 양털→실 4개.\n・촉매 반응기(2단계): 모래＋물→네더 석영.\n・양자 얽힘 합성기(3단계): 양자 얽힘 소자＋슬라임 볼→엔더 진주.\n・입자 가속기(3단계): 비스무트 주괴＋탄소 가루→금 주괴.\n・축퇴 압축로(4단계): 석탄 블록 8개→다이아몬드.\n・시간 결정 배양기(4단계): 원목→석탄, 조약돌→이끼 낀 조약돌, 구리 블록→산화된 구리."
   },
   "guide.singulo.intro.vanilla.title": {
     "source": "Vanilla materials from machines",
@@ -6372,8 +6408,8 @@
     "translation": "1단계의 흐름"
   },
   "guide.singulo.stage1.machines.body": {
-    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
-    "translation": "- 소성로: 세라믹 기판 등을 굽습니다. 강철도 빨리 만듭니다.\n- 압축기: 강판을 만듭니다. 질량 모드에서는 질량 값이 있는 재료를 '질량'으로 바꿔 압축 블록이나 질량 펠릿으로 굳힙니다.\n- 전해조: 물을 수소와 산소로 분해합니다. 수소는 유체 캐니스터에 담아 2단계 입자 가속기로 옮길 수 있습니다.\n- 기록 보관 단말기: 유적의 기록을 데이터 카드에 옮겨 적고, 열화된 부품을 복원합니다. 크리스털 메모리 해독도 할 수 있습니다."
+    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster. With oxygen it works as a basic oxygen furnace: 2 iron and 1 coal make 2 steel.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Hydrogen Fuel Cell: makes power from hydrogen and oxygen, returning 60% of the power the Electrolyzer put in (up to 240 FE/t).\n- Peltier Cooler: freezes water with power. Compress the ice into packed and blue ice.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
+    "translation": "- 소성로: 세라믹 기판 등을 굽습니다. 강철도 빨리 만듭니다. 산소를 넣으면 철 2개와 석탄 1개로 강철 2개를 만드는 순산소 전로가 됩니다.\n- 압축기: 강판을 만듭니다. 질량 모드에서는 질량 값이 있는 재료를 '질량'으로 바꿔 압축 블록이나 질량 펠릿으로 굳힙니다.\n- 전해조: 물을 수소와 산소로 분해합니다. 수소는 유체 캐니스터에 담아 2단계 입자 가속기로 옮길 수 있습니다.\n- 수소 연료 전지: 수소와 산소로 발전합니다(전해조가 담은 전력의 6할을 되돌려 주는 축전, 최대 240 FE/t).\n- 펠티에 냉각기: 전력으로 물을 얼립니다. 얼음은 압축기로 꽁꽁 언 얼음·푸른 얼음으로 만들 수 있습니다.\n- 기록 보관 단말기: 유적의 기록을 데이터 카드에 옮겨 적고, 열화된 부품을 복원합니다. 크리스털 메모리 해독도 할 수 있습니다."
   },
   "guide.singulo.stage1.machines.title": {
     "source": "Stage 1 machines",
@@ -6771,6 +6807,10 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
+  "howto.singulo.bismuth_crystal_block": {
+    "source": "Made in: Kiln (stage 2)",
+    "translation": "제작: 소성로(2단계)"
+  },
   "howto.singulo.black_hole_bomb": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "제작: 특이점 캡슐화기(5단계)"
@@ -7111,6 +7151,10 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
+  "howto.singulo.glowing_bismuth_crystal": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
   "howto.singulo.gravitational_containment_tank": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
@@ -7166,6 +7210,10 @@
   "howto.singulo.horizon_bus": {
     "source": "Made in: Degenerate Compactor (stage 5)",
     "translation": "제작: 축퇴 압축로(5단계)"
+  },
+  "howto.singulo.hydrogen_fuel_cell": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.impact_generator_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -7294,6 +7342,10 @@
   "howto.singulo.particle_accelerator": {
     "source": "Made in: Multiblock assembly (stage 2)",
     "translation": "제작: 멀티블록 조립(2단계)"
+  },
+  "howto.singulo.peltier_cooler": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.penrose_reactor": {
     "source": "Made in: Multiblock assembly (stage 5)",
@@ -7531,6 +7583,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
+  "howto.singulo.unfired_phosphor": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
     "translation": "제작: 웜홀 생성기(5단계)"
@@ -7616,12 +7672,12 @@
     "translation": "제작: 정밀 조립기(5단계)"
   },
   "howto.singulo.zinc_dust": {
-    "source": "Made in: Compressor (stage 2)",
-    "translation": "제작: 압축기(2단계)"
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "제작: 압축기(1단계)"
   },
   "howto.singulo.zinc_ingot": {
-    "source": "Made in: Kiln (stage 2)",
-    "translation": "제작: 소성로(2단계)"
+    "source": "Made in: Kiln (stage 1)",
+    "translation": "제작: 소성로(1단계)"
   },
   "item.singulo.afterglow_wings": {
     "source": "Afterglow Wings",
@@ -8363,6 +8419,10 @@
     "source": "Unfired Ceramic",
     "translation": "소성되지 않은 세라믹"
   },
+  "item.singulo.unfired_phosphor": {
+    "source": "Unfired Phosphor",
+    "translation": "소성되지 않은 형광체"
+  },
   "item.singulo.unstable_wormhole_mouth": {
     "source": "Unstable Wormhole Mouth",
     "translation": "불안정한 웜홀 입구"
@@ -8662,6 +8722,14 @@
   "message.singulo.deep_sea_collector.rate": {
     "source": "Pressure %s%%: one Pressure Crystal every %ss",
     "translation": "수압 %s%%: 약 %s초마다 고압 결정 1개"
+  },
+  "message.singulo.fuel_cell.standby": {
+    "source": "Standing by (storage full)",
+    "translation": "대기 중(축전 가득 참)"
+  },
+  "message.singulo.fuel_cell.status": {
+    "source": "Hydrogen %s/%s mB · Oxygen %s/%s mB · Stored %s/%s FE · %s",
+    "translation": "수소 %s/%s mB · 산소 %s/%s mB · 축전 %s/%s FE · %s"
   },
   "message.singulo.gravity_receiver.status": {
     "source": "Gravity panels active: %s / %s (%s FE/t each)",
@@ -9186,6 +9254,10 @@
   "station.singulo.particle_accelerator": {
     "source": "Particle Accelerator",
     "translation": "입자 가속기"
+  },
+  "station.singulo.peltier_cooler": {
+    "source": "Peltier Cooler",
+    "translation": "펠티에 냉각기"
   },
   "station.singulo.penrose_reactor_catalyst": {
     "source": "P-Reactor",
@@ -10352,20 +10424,24 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 39 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 39개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 41 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 41개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 23 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 23개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 25개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
     "translation": "사용 제품: 소형 블랙홀 용기"
   },
+  "uses.singulo.bismuth_crystal_block": {
+    "source": "Used in: Glowing Bismuth Crystal",
+    "translation": "사용 대상: 빛나는 비스무트 결정"
+  },
   "uses.singulo.bismuth_ingot": {
-    "source": "Used in: Nihonium",
-    "translation": "사용 대상: 니호늄"
+    "source": "Used in: Nihonium, Bismuth Crystal Block",
+    "translation": "사용 대상: 니호늄, 비스무트 결정 블록"
   },
   "uses.singulo.black_reinforced_glass": {
     "source": "Used in: Starred Black Reinforced Glass",
@@ -10408,8 +10484,8 @@
     "translation": "사용 제품: 카시미르 공동"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 14 more",
-    "translation": "사용 제품: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 14개"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 15 more",
+    "translation": "사용 대상: 빈 데이터 카드, 냉각탑 제어기, 초전도 코일, 가속기 제어기, 촉매 반응기 외 15개"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -10812,8 +10888,8 @@
     "translation": "사용 대상: 초전도 케이블, 양자 얽힘 소자, BE 응축 촉매, 축퇴 열로 열교환 튜브, 위상 전선 외 1개"
   },
   "uses.singulo.thermocouple_module": {
-    "source": "Used in: Thermoelectric Generator, Impact Generator Panel",
-    "translation": "사용 대상: 열전 발전기, 충격 발전 패널"
+    "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
+    "translation": "사용 대상: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
   },
   "uses.singulo.time_crystal_catalyst": {
     "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
@@ -10908,8 +10984,8 @@
     "translation": "사용 대상: 웜홀 입구"
   },
   "uses.singulo.zinc_dust": {
-    "source": "Used in: Zinc Ingot",
-    "translation": "사용 대상: 아연 주괴"
+    "source": "Used in: Zinc Ingot, Unfired Phosphor",
+    "translation": "사용 대상: 아연 주괴, 소성되지 않은 형광체"
   },
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",

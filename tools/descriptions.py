@@ -26,6 +26,18 @@ DESC = {
                'Pressed nihonium. Used to make nihonium frames.'),
     'ニホニウム筐体': ('ニホニウム板で基礎フレームを包んだ筐体。段階4の装置は、これを土台に組む。',
                 'A basic frame clad in nihonium plates. Stage 4 machines are built on it.'),
+    '未焼成の蛍光体': ('亜鉛の粉と火薬（硫黄）と銅を混ぜた粉。焼成炉で焼くと、蓄光体のグロウストーンダストが4個できる。',
+                  'Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.'),
+    '水素燃料電池': ('水素と酸素から電力を作る段階1の発電機。電解槽で水素に詰めた電力の6割を取り戻す蓄電で、水素1 mBで4.8 FE、最大240 FE/t。'
+                 '水素2 mBに酸素1 mBを使う。素手で右クリックすると状態を表示する。',
+                 'A stage 1 generator that makes power from hydrogen and oxygen. It returns 60% of the power the Electrolyzer put into the '
+                 'hydrogen: 4.8 FE per mB, up to 240 FE/t, using 1 mB of oxygen per 2 mB of hydrogen. Right-click with an empty hand to see its status.'),
+    'ペルチェ冷却器': ('熱電素子に電流を流して水を凍らせる装置（熱電発電機の逆）。水1,000 mBから氷1個。',
+                  'Runs current through thermoelectric elements to freeze water (a thermoelectric generator in reverse). 1,000 mB of water makes 1 ice.'),
+    'ビスマス結晶ブロック': ('溶かしたビスマスを冷ましてできる、階段状の虹色の結晶。建材。',
+                    'Stepped, rainbow-tarnished crystals grown from molten bismuth. A building block.'),
+    '発光ビスマス結晶': ('蛍光体を練り込んで光るようにしたビスマス結晶。建材。',
+                  'Bismuth crystal mixed with phosphor so it glows. A building block.'),
     '炭素粉': ('木炭を圧縮機で砕いて固めた炭素の粉（木炭3個から2個）。鋼の素や黒色強化パネルで、石炭の代わりに使える。',
             'Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and '
             'black reinforced panels.'),

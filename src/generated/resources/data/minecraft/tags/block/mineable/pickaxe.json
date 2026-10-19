@@ -1,5 +1,9 @@
 {
   "values": [
+    "singulo:hydrogen_fuel_cell",
+    "singulo:peltier_cooler",
+    "singulo:bismuth_crystal_block",
+    "singulo:glowing_bismuth_crystal",
     "singulo:creative_energy_source",
     "singulo:copper_wire",
     "singulo:compressed_block_1",

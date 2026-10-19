@@ -1,7 +1,7 @@
 {
   "type": "singulo:machine",
   "station": "compressor",
-  "stage": 2,
+  "stage": 1,
   "time": 80,
   "energy": 40,
   "ingredients": [

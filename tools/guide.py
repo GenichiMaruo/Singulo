@@ -46,8 +46,10 @@ CHAPTERS = [
         ('vanilla', '装置で作るバニラの素材',
          '狩りや遠出の代わりに、装置で作れるバニラの素材です。\n'
          '・圧縮機（段階1）: 丸石→砂利→砂、砂岩→砂2。雪ブロック4→氷、氷4→氷塊、氷塊4→青氷。'
-         '方解石→石灰粉（骨粉の代わり）、木炭3→炭素粉2（石炭の代わり）。\n'
-         '・極低温冷却塔（段階2）: 水＋液体窒素→氷塊、溶岩＋液体窒素→黒曜石。\n'
+         '方解石→石灰粉（骨粉の代わり）、木炭3→炭素粉2（石炭の代わり）。鉄・金の道具や防具→塊（インゴットの約3分の2）。\n'
+         '・焼成炉（段階1）: 未焼成の蛍光体（亜鉛の粉＋銅＋火薬）→グロウストーンダスト4。\n'
+         '・ペルチェ冷却器（段階1）: 水→氷。\n'
+         '・極低温冷却塔（段階2）: 水＋液体窒素→氷塊、溶岩＋液体窒素→黒曜石。凍結粉砕で 骨→骨粉6、ブレイズロッド→パウダー4、羊毛→糸4。\n'
          '・触媒反応器（段階2）: 砂＋水→ネザー水晶。\n'
          '・量子もつれ合成器（段階3）: 量子もつれ素子＋スライムボール→エンダーパール。\n'
          '・粒子加速器（段階3）: ビスマスインゴット＋炭素粉→金インゴット。\n'
@@ -57,8 +59,11 @@ CHAPTERS = [
          'Machines can make these vanilla materials, so you can skip some hunting and travel.\n'
          '- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, '
          '4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust '
-         '(instead of coal).\n'
-         '- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian.\n'
+         '(instead of coal). Iron and gold tools and armor to nuggets (about two thirds of the ingots).\n'
+         '- Kiln (stage 1): unfired phosphor (zinc dust + copper + gunpowder) to 4 glowstone dust.\n'
+         '- Peltier Cooler (stage 1): water to ice.\n'
+         '- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian. '
+         'Cryo-milling turns a bone into 6 bone meal, a blaze rod into 4 powder and wool into 4 string.\n'
          '- Catalytic Reactor (stage 2): sand + water to nether quartz.\n'
          '- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n'
          '- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n'
@@ -143,14 +148,19 @@ CHAPTERS = [
          'To run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with '
          'campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.'),
         ('machines', '段階1の装置',
-         '・焼成炉: セラミック基板などを焼く。鋼鉄も速く焼ける。\n'
+         '・焼成炉: セラミック基板などを焼く。鋼鉄も速く焼ける。酸素を入れると、鉄2と石炭1から鋼鉄2を作る純酸素転炉になる。\n'
          '・圧縮機: 鋼板を作る。質量モードでは質量値のある素材を「質量」に変えて圧縮ブロックや質量ペレットにする。\n'
          '・電解槽: 水を水素と酸素に分ける。水素は液体キャニスターで汲んで、段階2の粒子加速器へ運べる。\n'
+         '・水素燃料電池: 水素と酸素で発電する（電解槽で詰めた電力の6割を取り戻す蓄電。最大240 FE/t）。\n'
+         '・ペルチェ冷却器: 電力で水を凍らせる。氷は圧縮機で氷塊・青氷にできる。\n'
          '・アーカイブ端末: 遺構の記録をデータカードに書き写し、劣化した部品を修復する。クリスタルメモリの解読もできる。',
          'Stage 1 machines',
-         '- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel '
+         '- Kiln: fires ceramic substrates and more. It also makes steel faster. With oxygen it works as a basic oxygen furnace: '
+         '2 iron and 1 coal make 2 steel.\n- Compressor: makes steel '
          'plates. In mass mode it turns materials with a mass value into "mass" and presses it into compressed '
-         'blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Archive Terminal: '
+         'blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n'
+         '- Hydrogen Fuel Cell: makes power from hydrogen and oxygen, returning 60% of the power the Electrolyzer put in (up to 240 FE/t).\n'
+         '- Peltier Cooler: freezes water with power. Compress the ice into packed and blue ice.\n- Archive Terminal: '
          'copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.'),
     ]),
     ('stage2', 'singulo:superconducting_coil', '段階2 極低温', 'Stage 2: Cryogenic', [

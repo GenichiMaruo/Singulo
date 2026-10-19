@@ -43,6 +43,10 @@ public final class SinguloCapabilities {
                 (be, side) -> be.tank());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.CRYOGENIC_TURBINE.get(),
                 (be, side) -> be.automationItems());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.HYDROGEN_FUEL_CELL.get(),
+                (be, side) -> be.energy());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.HYDROGEN_FUEL_CELL.get(),
+                (be, side) -> be.fluids());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.MUON_FUSION_REACTOR.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.MUON_FUSION_REACTOR.get(),

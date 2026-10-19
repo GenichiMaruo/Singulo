@@ -400,7 +400,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      * 極低温冷却塔の液体窒素: 詰めた電力を極低温タービンが取り戻すので、速くして安く作れると、取り戻す電力のほうが多くなる。
      */
     protected boolean fixedEnergyPerCraft(MachineRecipe recipe) {
-        return false;
+        // 電解槽の水素と酸素は水素燃料電池で電力に戻せるので、単極子などで安く作れると電力が増えてしまう
+        return type == MachineType.ELECTROLYZER;
     }
 
     /** レシピを1回完了した直後に呼ばれる。 */
