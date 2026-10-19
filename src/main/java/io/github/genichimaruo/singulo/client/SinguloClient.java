@@ -195,6 +195,7 @@ public final class SinguloClient {
     private static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(SinguloMenus.MACHINE.get(), MachineScreen::new);
         event.register(SinguloMenus.THERMOELECTRIC_GENERATOR.get(), ThermoelectricGeneratorScreen::new);
+        event.register(SinguloMenus.GENERATOR_SLOTS.get(), GeneratorSlotsScreen::new);
         event.register(SinguloMenus.CATALYST_DEVICE.get(), CatalystDeviceScreen::new);
         event.register(SinguloMenus.PENROSE_REACTOR.get(), PenroseReactorScreen::new);
         event.register(SinguloMenus.SMES.get(), SmesScreen::new);
@@ -218,6 +219,14 @@ public final class SinguloClient {
             }
             return 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
         }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_SAMPLE.get());
+        // 液体キャニスター: 窓の絵（layer1）だけを中身の色に。空なら窓を描かない
+        event.register((stack, layer) -> {
+            var f = io.github.genichimaruo.singulo.item.FluidCanisterItem.fluid(stack);
+            if (layer != 1) {
+                return 0xFFFFFFFF;
+            }
+            return f.isEmpty() ? 0 : 0xFF000000 | net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(f.getFluid()).getTintColor(f);
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CANISTER.get());
         // 化学物質の見本は、化学物質の色に
         event.register((stack, layer) -> {
             String id = io.github.genichimaruo.singulo.android.work.ChemicalSamples.id(stack);

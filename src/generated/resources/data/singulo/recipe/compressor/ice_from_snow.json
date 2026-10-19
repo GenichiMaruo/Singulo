@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 40,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:snow_block"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "minecraft:ice",
+    "count": 1
+  }
+}

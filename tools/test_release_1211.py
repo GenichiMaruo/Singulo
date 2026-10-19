@@ -1,5 +1,6 @@
 """Release provenance must reject mixed trees, missing artifacts and failed validation (1.21.1 is NeoForge only from 0.9.0)."""
 import copy
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -60,6 +61,49 @@ class ProvenanceTests(unittest.TestCase):
         (self.source / 'gradle.properties').write_text('mod_version=0.8.2\nminecraft_version=1.21.1\nmod_name=Singulo\n')
         with self.assertRaisesRegex(RuntimeError, 'Tag must match'):
             self.inspect()
+
+
+class PromotionTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.base = Path(self.tmp.name)
+        self.root = self.base / 'artifacts' / 'validated'
+        self.gui = self.root / 'gui-review'
+        (self.gui / 'logs').mkdir(parents=True)
+        (self.gui / 'screenshots').mkdir()
+        (self.root / 'libs').mkdir()
+        self.jar = 'Singulo-0.10.0-1.21.1N.jar'
+        (self.root / 'libs' / self.jar).write_bytes(b'the exact validated jar')
+        self.metadata = {'mod_name': 'Singulo', 'version': '0.10.0',
+                         'artifacts': {'neoforge': {'name': 'validated'}}}
+        self.markers = 'SINGULO_GUI_COMPLETE 22\nSINGULO_MACHINE_GUI_COMPLETE 120\nSINGULO_SEARCH_COMPLETE\nSINGULO_HANDBOOK_SEARCH_COMPLETE\nSINGULO_JEI_SYNC_COMPLETE\n'
+        (self.gui / 'logs/latest.log').write_text(self.markers)
+        (self.gui / 'inventory-pixels.json').write_text(json.dumps([{'checked_empty_slot_centers': 35}] * 3))
+        self.machine = {'languages': ['ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'], 'machine_captures': 120,
+                        'headers_without_title_status_overlap': 80, 'generator_font_probes': 5}
+        (self.gui / 'machine-pixels.json').write_text(json.dumps(self.machine))
+        for i in range(142):
+            (self.gui / 'screenshots' / f'{i}.png').touch()
+
+    def promote(self):
+        with patch.object(release, 'validate'):
+            return release.promote(self.metadata, self.base / 'artifacts', self.base / 'output')
+
+    def test_full_gui_evidence_promotes_exact_validated_bytes(self):
+        self.promote()
+        self.assertEqual((self.base / 'output' / self.jar).read_bytes(), b'the exact validated jar')
+
+    def test_legacy_gui_completion_is_not_enough(self):
+        (self.gui / 'logs/latest.log').write_text(self.markers.replace('SINGULO_MACHINE_GUI_COMPLETE 120\n', ''))
+        with self.assertRaisesRegex(RuntimeError, 'GUI/search validation'):
+            self.promote()
+
+    def test_incomplete_machine_pixel_evidence_blocks_promotion(self):
+        self.machine['headers_without_title_status_overlap'] = 79
+        (self.gui / 'machine-pixels.json').write_text(json.dumps(self.machine))
+        with self.assertRaisesRegex(RuntimeError, 'machine PNG verification'):
+            self.promote()
 
 
 if __name__ == '__main__':

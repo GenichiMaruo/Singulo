@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 40,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:iron_shovel"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:iron_nugget",
+    "count": 6
+  }
+}

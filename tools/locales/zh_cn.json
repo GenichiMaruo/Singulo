@@ -643,6 +643,10 @@
     "source": "Hologram Floor",
     "translation": "全息地板"
   },
+  "block.singulo.bismuth_crystal_block": {
+    "source": "Bismuth Crystal Block",
+    "translation": "铋晶体块"
+  },
   "block.singulo.black_reinforced_glass": {
     "source": "Black Reinforced Glass",
     "translation": "黑色强化玻璃"
@@ -887,6 +891,10 @@
     "source": "Genesis Pylon",
     "translation": "创世炉支柱"
   },
+  "block.singulo.glowing_bismuth_crystal": {
+    "source": "Glowing Bismuth Crystal",
+    "translation": "发光铋晶体"
+  },
   "block.singulo.gravitational_containment_tank": {
     "source": "Gravitational Containment Tank",
     "translation": "引力约束罐"
@@ -922,6 +930,10 @@
   "block.singulo.horizon_bus": {
     "source": "Horizon Bus",
     "translation": "视界总线"
+  },
+  "block.singulo.hydrogen_fuel_cell": {
+    "source": "Hydrogen Fuel Cell",
+    "translation": "氢燃料电池"
   },
   "block.singulo.impact_generator_panel": {
     "source": "Impact Generator Panel",
@@ -999,6 +1011,10 @@
     "source": "Multiblock I/O Port",
     "translation": "多方块输入输出端口"
   },
+  "block.singulo.muon_fusion_reactor": {
+    "source": "Muon-Catalyzed Fusion Reactor",
+    "translation": "缪子催化核聚变炉"
+  },
   "block.singulo.neutrino_observatory": {
     "source": "Neutrino Observatory",
     "translation": "中微子观测站"
@@ -1006,6 +1022,10 @@
   "block.singulo.paper_stack": {
     "source": "Stack of Papers",
     "translation": "文件堆"
+  },
+  "block.singulo.peltier_cooler": {
+    "source": "Peltier Cooler",
+    "translation": "珀耳帖冷却器"
   },
   "block.singulo.power_conduit": {
     "source": "Power Conduit",
@@ -1647,6 +1667,14 @@
     "source": "A vessel for holding a tiny black hole.",
     "translation": "容纳微小黑洞的容器。"
   },
+  "desc.singulo.bismuth_crystal_block": {
+    "source": "Stepped, rainbow-tarnished crystals grown from molten bismuth. A building block.",
+    "translation": "熔化的铋冷却后形成的阶梯状彩虹色晶体。建材。"
+  },
+  "desc.singulo.bismuth_ingot": {
+    "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
+    "translation": "带有彩虹色氧化膜的铋金属，在催化反应器中精炼粗铜时作为副产物得到。与锌一起在粒子加速器中碰撞即可制成鿭。"
+  },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
     "translation": "投掷后在命中处打开一个小黑洞，吞噬周围的一切。"
@@ -1678,6 +1706,10 @@
   "desc.singulo.bulkhead": {
     "source": "A heavy door sealing the laboratory core section. It opens when facility power returns. Unbreakable.",
     "translation": "封住研究所中枢区的厚门。设施恢复供电后打开。无法破坏。"
+  },
+  "desc.singulo.carbon_dust": {
+    "source": "Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and black reinforced panels.",
+    "translation": "用压缩机把木炭粉碎压实得到的碳粉（3 个木炭得 2 个）。可在钢混合物和黑色强化面板中代替煤炭。"
   },
   "desc.singulo.casimir_cavity": {
     "source": "Creates negative energy between mirrors to make exotic matter.",
@@ -1768,8 +1800,8 @@
     "translation": "修复后的古代控制单元，有使用次数限制。"
   },
   "desc.singulo.coolant_cartridge": {
-    "source": "A steel canister holding 100 mB of liquid nitrogen. Lets the Precision Assembler build cryogenic parts such as quantum computing modules.",
-    "translation": "装有 100 mB 液氮的钢罐。让无法放入液体的精密组装台也能组装量子运算模块等低温零件。"
+    "source": "A canister holding 100 mB of liquid nitrogen. Right-click a machine to pour it in and get the empty cartridge back, so no pipes are needed. Cryogenic Turbines also take it in their input slot. The Precision Assembler uses it as is for cryogenic parts such as quantum computing modules. Assembly consumes the cartridge, including its container; no empty cartridge is returned.",
+    "translation": "装有 100 mB 液氮的容器。右键点击装置即可倒入，并取回空冷媒罐，无需管道。低温涡轮机的入口也接受冷媒罐。精密组装台会将它作为低温部件的材料连同容器一起消耗，不会返还空冷媒罐。"
   },
   "desc.singulo.cooling_tower_base": {
     "source": "The 5×5 foundation of the tower.",
@@ -1832,8 +1864,8 @@
     "translation": "从空气中制造液氮的多方块结构；塔高 10 以上时还能将氦液化为液氦。"
   },
   "desc.singulo.cryogenic_turbine": {
-    "source": "Generates power from evaporating cryogens.",
-    "translation": "通过蒸发制冷剂产生电力。"
+    "source": "Recovers the power stored in liquid nitrogen by boiling it against a heat source next to it (up to 90% next to lava). It stores and moves power; it does not create any.",
+    "translation": "利用旁边的高温源使液氮汽化，取回储存在液氮中的电力（在熔岩旁最多 9 成）。这是用来储存和运送电力的装置，不会增加电力。"
   },
   "desc.singulo.culture_data": {
     "source": "A record from the culture facility.",
@@ -1983,6 +2015,10 @@
     "source": "Laboratory emergency light. It glows red only while main power is down.",
     "translation": "研究所的应急灯。只在主电源断开时亮起红光。"
   },
+  "desc.singulo.empty_coolant_cartridge": {
+    "source": "A steel canister that holds 100 mB of liquid nitrogen. Right-click the cooling tower controller, or process it in the tower, to fill it.",
+    "translation": "可装 100 mB 液氮的钢制容器。用它右键点击极低温冷却塔的控制器，或在冷却塔中加工，就会变成装满的冷媒罐。"
+  },
   "desc.singulo.entangled_element": {
     "source": "Always made in pairs. Used in detectors and links.",
     "translation": "总是成对制作。用于探测器和链路。"
@@ -2027,6 +2063,10 @@
     "source": "A printing bay along the walls of the Android Laboratory AI core. While running it shields the Foundry Overseer and prints mass-produced androids. Breakable by hand.",
     "translation": "排列在地下仿生人研究所 AI 中枢墙边的打印舱。运转期间会保护铸造厂，并打印量产型仿生人送出来。徒手也能破坏。"
   },
+  "desc.singulo.fluid_canister": {
+    "source": "Holds up to 1,000 mB of any liquid or gas. Right-click a machine to fill it from the output tank or pour it into the input tank. Carries hydrogen (Electrolyzer to Particle Accelerator), helium (Compressor to Cooling Tower) and liquid helium without pipes.",
+    "translation": "可装入任意液体或气体，最多 1,000 mB。右键机器时，会从输出储罐中灌装，或倒入输入储罐。无需流体管道即可搬运氢气（电解槽→粒子加速器）、氦气（压缩机→冷却塔）和液氦。"
+  },
   "desc.singulo.focusing_magnet": {
     "source": "Magnet for the ring corners and at least 1/4 of the ring.",
     "translation": "放在环的四角，且至少占环的 1/4 的磁体。"
@@ -2050,6 +2090,10 @@
   "desc.singulo.genesis_pylon": {
     "source": "Stacked three high on each diagonal frame of the Genesis Engine; they focus power into the newborn universe.",
     "translation": "在创世炉的每个斜向框架上叠放3层，将电力汇聚并送入将生未生的宇宙。"
+  },
+  "desc.singulo.glowing_bismuth_crystal": {
+    "source": "Bismuth crystal mixed with phosphor so it glows. A building block.",
+    "translation": "掺入荧光体而会发光的铋晶体。建材。"
   },
   "desc.singulo.gravitational_containment_tank": {
     "source": "The only tank that holds dark matter. Keeps its contents when broken.",
@@ -2123,6 +2167,10 @@
     "source": "A passage of records found in the Awakened Horizon Warden's wreck, naming what the warden was guarding. Bound with other chapters, it might be readable.",
     "translation": "在觉醒的视界守卫残骸中找到的一段记录，写着守卫所守护之物的名字。与其他断章合在一起，或许就能读懂。"
   },
+  "desc.singulo.hydrogen_fuel_cell": {
+    "source": "A stage 1 generator that makes power from hydrogen and oxygen. It returns 60% of the power the Electrolyzer put into the hydrogen: 4.8 FE per mB, up to 240 FE/t, using 1 mB of oxygen per 2 mB of hydrogen. Right-click with an empty hand to see its status.",
+    "translation": "用氢和氧发电的第 1 阶段发电机。它是取回电解槽灌入氢中的电力的 6 成的储能装置：每 mB 氢 4.8 FE，最大 240 FE/t。每 2 mB 氢使用 1 mB 氧。空手右键可显示状态。"
+  },
   "desc.singulo.impact_generator_panel": {
     "source": "Landing on it causes no fall damage. Stores 1,000 FE per block fallen (up to 20,000 FE) and powers connected gravity panels.",
     "translation": "落在上面不会受到摔落伤害。每下落 1 格储存 1,000 FE（最多 20,000 FE），并为相连的重力面板供电。"
@@ -2182,6 +2230,10 @@
   "desc.singulo.laser_cooler": {
     "source": "Laser-cools atoms into cold atoms, lattices and condensates.",
     "translation": "激光将原子冷却成冷原子、晶格和凝聚体。"
+  },
+  "desc.singulo.limestone_powder": {
+    "source": "White calcium carbonate powder, crushed from calcite or dripstone blocks (2 in the Compressor, 1 at a crafting table). Use it instead of bone meal in Unfired Ceramic (it turns to lime in the kiln and binds the clay).",
+    "translation": "把方解石或滴水石块粉碎得到的白色碳酸钙粉末（压缩机得 2 个，工作台得 1 个）。可在未烧制陶瓷中代替骨粉（烧制后变成石灰，使粘土凝固）。"
   },
   "desc.singulo.low_gravity_panel": {
     "source": "When powered, standing on it cuts your gravity to a fifth until you next land (less fall damage too). Joins visually with its neighbours.",
@@ -2255,6 +2307,10 @@
     "source": "Tier 2 catalyst with a lifetime. Leaves a spent catalyst when used up.",
     "translation": "有使用寿命的 2 级催化剂。用完后会留下失活的催化剂。"
   },
+  "desc.singulo.muon_fusion_reactor": {
+    "source": "A stage 2 generator that runs on muon catalysts and water (deuterium), 4 kFE/t. Catalysts wear twice as fast: a fresh one lasts 10 minutes, a used one for half its remaining lifetime, then comes out spent.",
+    "translation": "用缪子催化剂和水（氘）发电的第 2 阶段发电机（4 kFE/t）。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半），之后变为失活的缪子催化剂。"
+  },
   "desc.singulo.neutrino_observatory": {
     "source": "Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.",
     "translation": "持续扫描大范围区域，向附近玩家显示矿石和废墟。使用可切换显示。"
@@ -2262,6 +2318,22 @@
   "desc.singulo.neutrino_scanner": {
     "source": "Shows the outlines of nearby ruin blocks and ores through terrain for 10 seconds. Uses power. Sensitivity modules reveal deeper ores.",
     "translation": "使用后，在 10 秒内透过地形显示周围的废墟方块和矿石轮廓。消耗电力。更深层的矿石需要灵敏度模块才能显示。"
+  },
+  "desc.singulo.nihonium": {
+    "source": "Element 113, fused from zinc and bismuth nuclei in the Particle Accelerator. This neutron-rich isotope is stable, so it does not decay. Two make an ingot.",
+    "translation": "在粒子加速器中使锌和铋的原子核融合而成的第 113 号元素。这种富中子的同位体是稳定的，不会衰变。2 个可制成一个锭。"
+  },
+  "desc.singulo.nihonium_frame": {
+    "source": "A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.",
+    "translation": "用鿭板包覆的基础框架，用作第 4、5 阶段高级装置的结构基础。"
+  },
+  "desc.singulo.nihonium_ingot": {
+    "source": "A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.",
+    "translation": "在烧制炉中熔合鿭制成的沉重锭。用压缩机压成板。"
+  },
+  "desc.singulo.nihonium_plate": {
+    "source": "Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.",
+    "translation": "压制而成的鿭板，用于鿭框架及后期的耐压、屏蔽部件。"
   },
   "desc.singulo.observation_log": {
     "source": "A record from observation posts. Copy it onto data cards.",
@@ -2282,6 +2354,10 @@
   "desc.singulo.particle_accelerator": {
     "source": "Collides particles into muon bundles and rare monopoles.",
     "translation": "通过粒子碰撞制造缪子束和稀有的磁单极子。"
+  },
+  "desc.singulo.peltier_cooler": {
+    "source": "Runs current through thermoelectric elements to freeze water (a thermoelectric generator in reverse). 1,000 mB of water makes 1 ice.",
+    "translation": "给热电元件通电使水结冰的装置（热电发电机的反向）。1,000 mB 水可制成 1 个冰。"
   },
   "desc.singulo.penrose_reactor": {
     "source": "Draws energy from a spinning black hole.",
@@ -2672,8 +2748,12 @@
     "translation": "研究所的垃圾桶。仿生人每天都会把它倒空。"
   },
   "desc.singulo.unfired_ceramic": {
-    "source": "Clay, sand, Nether quartz and bone meal, ready to be fired into white ceramic.",
-    "translation": "粘土、沙子、下界石英和骨粉，准备烧成白色陶瓷。"
+    "source": "Clay, sand, Nether quartz and bone meal (or limestone powder), ready to be fired into white ceramic.",
+    "translation": "粘土、沙子、下界石英和骨粉（或石灰粉），准备烧成白色陶瓷。"
+  },
+  "desc.singulo.unfired_phosphor": {
+    "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
+    "translation": "把锌粉、火药（硫）和铜混合而成的粉末。在烧制炉中烧制后可得到 4 个蓄光体荧石粉。"
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -2770,6 +2850,14 @@
   "desc.singulo.wormhole_stabilizer": {
     "source": "Stabilizes an unstable wormhole mouth with exotic matter so that it can be placed.",
     "translation": "用奇异物质稳定不稳定虫洞入口，使其成为可以放置的入口。"
+  },
+  "desc.singulo.zinc_dust": {
+    "source": "Zinc sorted out of crushed tuff in the Compressor. Fire it in the Kiln into a zinc ingot.",
+    "translation": "用压缩机粉碎凝灰岩后分选出的锌粉。在烧制炉中烧成锌锭。"
+  },
+  "desc.singulo.zinc_ingot": {
+    "source": "Zinc metal. Collide it with bismuth in the Particle Accelerator to make nihonium. Zinc ingots from other mods work too.",
+    "translation": "锌金属。与铋一起在粒子加速器中碰撞即可制成鿭。其他模组的锌锭也能同样使用。"
   },
   "direction.singulo.east": {
     "source": "east",
@@ -4083,6 +4171,42 @@
     "source": "%s: %s / %s mB",
     "translation": "%1$s: %2$s / %3$s mB"
   },
+  "gui.singulo.generator_slots.catalyst": {
+    "source": "Catalyst left: %s%%",
+    "translation": "催化剂剩余 %s%%"
+  },
+  "gui.singulo.generator_slots.efficiency": {
+    "source": "Recovers: %s%%",
+    "translation": "可取回的电力：%s%%"
+  },
+  "gui.singulo.generator_slots.fusion.in": {
+    "source": "Insert muon catalysts. At default settings, a fresh one lasts 10 minutes; a used one burns for half its remaining lifetime. Spent catalysts come out below.",
+    "translation": "放入缪子催化剂。默认设置下，新的可运转 10 分钟，用过的仅运转其剩余寿命的一半。失活的催化剂从下方输出。"
+  },
+  "gui.singulo.generator_slots.nitrogen": {
+    "source": "Liquid nitrogen %s / %s mB",
+    "translation": "液氮 %s / %s mB"
+  },
+  "gui.singulo.generator_slots.no_catalyst": {
+    "source": "No catalyst",
+    "translation": "没有催化剂"
+  },
+  "gui.singulo.generator_slots.no_heat": {
+    "source": "No heat source (put lava or a magma block next to it)",
+    "translation": "没有高温源（在旁边放熔岩或岩浆块等）"
+  },
+  "gui.singulo.generator_slots.standby": {
+    "source": "Storage full: standing by",
+    "translation": "蓄电已满：待机中"
+  },
+  "gui.singulo.generator_slots.turbine.in": {
+    "source": "Insert coolant cartridges: the liquid nitrogen goes into the tank and the empty cartridges come out below",
+    "translation": "放入冷媒罐后，会把液氮倒进储罐，并在下方送出空罐"
+  },
+  "gui.singulo.generator_slots.water": {
+    "source": "Water %s / %s mB",
+    "translation": "水 %s / %s mB"
+  },
   "gui.singulo.genesis.bar.kindling": {
     "source": "Kindling %s  Intake %s/t",
     "translation": "火种 %s  受电 %s/t"
@@ -4710,6 +4834,66 @@
   "gui.singulo.reactor.state.unformed": {
     "source": "Not formed",
     "translation": "未形成"
+  },
+  "gui.singulo.reason.arrange": {
+    "source": "- The amounts are there. Try putting each material in its own slot.",
+    "translation": "・数量已经足够。请试着把每种材料分别放进不同的槽位。"
+  },
+  "gui.singulo.reason.empty": {
+    "source": "Put in materials to start",
+    "translation": "放入材料即可开始运作"
+  },
+  "gui.singulo.reason.label.missing": {
+    "source": "Missing input",
+    "translation": "材料不足"
+  },
+  "gui.singulo.reason.label.no_match": {
+    "source": "No recipe",
+    "translation": "无法制作"
+  },
+  "gui.singulo.reason.label.too_small": {
+    "source": "Too small",
+    "translation": "规模不足"
+  },
+  "gui.singulo.reason.making": {
+    "source": "Trying to make: %s",
+    "translation": "正在尝试制作：%s"
+  },
+  "gui.singulo.reason.need_fluid": {
+    "source": "- %s: %s mB more needed (%s mB per craft)",
+    "translation": "・%s：还需要 %s mB（每次 %s mB）"
+  },
+  "gui.singulo.reason.need_item": {
+    "source": "- %s: %s more needed",
+    "translation": "・%s：还需要 %s 个"
+  },
+  "gui.singulo.reason.need_uses": {
+    "source": "- %s with at least %s uses left",
+    "translation": "・需要剩余 %2$s 次以上的 %1$s"
+  },
+  "gui.singulo.reason.no_match": {
+    "source": "Nothing this machine makes uses these materials. Check the handbook or JEI for the right inputs.",
+    "translation": "这台装置无法用放入的材料制作任何东西。请在手册或 JEI 中确认所需的材料。"
+  },
+  "gui.singulo.reason.no_power": {
+    "source": "Needs %s FE per tick but only %s FE is stored. Add generators or turn off other machines.",
+    "translation": "每 tick 需要 %s FE，但只储存了 %s FE。请增加发电，或关闭其他装置。"
+  },
+  "gui.singulo.reason.not_formed": {
+    "source": "The structure is not complete. Use a Holo Projector on the controller to see missing blocks.",
+    "translation": "结构尚未完成。对控制器使用全息投影仪，即可查看缺少的方块。"
+  },
+  "gui.singulo.reason.off": {
+    "source": "Turned off with the power switch",
+    "translation": "已用电源开关停止"
+  },
+  "gui.singulo.reason.output_full": {
+    "source": "The output slot or tank is full. Take things out, or turn on auto-eject in the side settings.",
+    "translation": "输出槽或输出储罐已满。请取出物品，或在面设置中开启自动输出。"
+  },
+  "gui.singulo.reason.too_small": {
+    "source": "- Needs size %s or more (now %s)",
+    "translation": "・规模需要 %s 以上（当前 %s）"
   },
   "gui.singulo.recipe_encoder.card": {
     "source": "Recorded",
@@ -6012,8 +6196,8 @@
     "translation": "入门"
   },
   "guide.singulo.intro.basics.body": {
-    "source": "Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods' pipes.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
-    "translation": "电力（FE）通过 Singulo 自带的线缆传输；物品和流体通过装置各个面的设置和其他模组的管道传输。\n从第 2 阶段开始会用到催化剂：一种有寿命的消耗品，放在专用的催化剂槽中。等级比装置高一级则更快；低一级则更慢且消耗更快；低两级无法使用。\n古代废墟中保存着无法合成的记录和零件。尽早开始寻找地表观测站。"
+    "source": "Power (FE) travels through Singulo cables; items and fluids use per-side settings and other mods' pipes. Without pipes, right-click machines with a Fluid Canister (1,000 mB) to carry liquids and gases.\nFrom stage 2 you use catalysts: consumables with a lifetime, placed in a dedicated catalyst slot. One tier above the machine is faster; one below is slower and wears faster; two below cannot be used.\nAncient ruins hold records and parts you cannot craft. Start looking for Observation Posts early.",
+    "translation": "电力（FE）通过 Singulo 自带的线缆传输；物品和流体通过装置各个面的设置和其他模组的管道传输。没有管道时，拿着流体罐（1,000 mB）右键机器即可搬运液体和气体。\n从第 2 阶段开始会用到催化剂：一种有寿命的消耗品，放在专用的催化剂槽中。等级比装置高一级则更快；低一级则更慢且消耗更快；低两级无法使用。\n古代废墟中保存着无法合成的记录和零件。尽早开始寻找地表观测站。"
   },
   "guide.singulo.intro.basics.title": {
     "source": "Power, catalysts and ruins",
@@ -6026,6 +6210,14 @@
   "guide.singulo.intro.howto.title": {
     "source": "Using this book",
     "translation": "使用本书"
+  },
+  "guide.singulo.intro.vanilla.body": {
+    "source": "Machines can make these vanilla materials, so you can skip some hunting and travel.\n- Compressor (stage 1): cobblestone to gravel to sand, sandstone to 2 sand. 4 snow blocks to ice, 4 ice to packed ice, 4 packed ice to blue ice. Calcite to limestone powder (instead of bone meal), 3 charcoal to 2 carbon dust (instead of coal). Iron and gold tools and armor to nuggets (about two thirds of the ingots).\n- Kiln (stage 1): unfired phosphor (zinc dust + copper + gunpowder) to 4 glowstone dust.\n- Peltier Cooler (stage 1): water to ice.\n- Cryogenic Cooling Tower (stage 2): water + liquid nitrogen to packed ice, lava + liquid nitrogen to obsidian. Cryo-milling turns a bone into 6 bone meal, a blaze rod into 4 powder and wool into 4 string.\n- Catalytic Reactor (stage 2): sand + water to nether quartz.\n- Entanglement Synthesizer (stage 3): entangled element + slime ball to ender pearl.\n- Particle Accelerator (stage 3): bismuth ingot + carbon dust to a gold ingot.\n- Degenerate Compactor (stage 4): 8 coal blocks to a diamond.\n- Time Crystal Incubator (stage 4): logs to coal, cobblestone to mossy cobblestone, copper block to oxidized copper.",
+    "translation": "这些原版材料可以用装置制作，省去一些狩猎和远行。\n・压缩机（第 1 阶段）：圆石→沙砾→沙子，砂岩→沙子×2。雪块×4→冰，冰×4→浮冰，浮冰×4→蓝冰。方解石→石灰粉（代替骨粉），木炭×3→碳粉×2（代替煤炭）。铁和金的工具、盔甲→粒（约为锭的三分之二）。\n・烧制炉（第 1 阶段）：未烧制荧光体（锌粉＋铜＋火药）→荧石粉×4。\n・珀耳帖冷却器（第 1 阶段）：水→冰。\n・极低温冷却塔（第 2 阶段）：水＋液氮→浮冰，熔岩＋液氮→黑曜石。冷冻粉碎：骨头→骨粉×6，烈焰棒→烈焰粉×4，羊毛→线×4。\n・催化反应器（第 2 阶段）：沙子＋水→下界石英。\n・量子纠缠合成器（第 3 阶段）：量子纠缠元件＋黏液球→末影珍珠。\n・粒子加速器（第 3 阶段）：铋锭＋碳粉→金锭。\n・简并压缩炉（第 4 阶段）：煤炭块×8→钻石。\n・时间晶体育成槽（第 4 阶段）：原木→煤炭，圆石→苔石，铜块→氧化铜块。"
+  },
+  "guide.singulo.intro.vanilla.title": {
+    "source": "Vanilla materials from machines",
+    "translation": "用装置制作的原版材料"
   },
   "guide.singulo.intro.welcome.body": {
     "source": "Singulo is a tech mod about extracting energy from mass. Start with thermoelectric power, build up cryogenic, quantum and temporal technology stage by stage, and finally generate power from a spinning black hole (the P-Reactor).\nThere are five stages. Each has a goal machine and a key material that opens the next stage. Read from \"Stage 1\" on the left to know what to build next.",
@@ -6216,16 +6408,16 @@
     "translation": "第 1 阶段的流程"
   },
   "guide.singulo.stage1.machines.body": {
-    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
-    "translation": "- 烧制炉：烧制陶瓷基板等，也能更快地炼钢。\n- 压缩机：制作钢板。质量模式下会把有质量值的材料变成“质量”，压成压缩块或质量颗粒。\n- 电解槽：将水分解为氢气和氧气。\n- 档案终端：把遗迹的记录抄写到数据卡上，修复退化的部件，还能解读水晶存储器。"
+    "source": "- Kiln: fires ceramic substrates and more. It also makes steel faster. With oxygen it works as a basic oxygen furnace: 2 iron and 1 coal make 2 steel.\n- Compressor: makes steel plates. In mass mode it turns materials with a mass value into \"mass\" and presses it into compressed blocks and mass pellets.\n- Electrolyzer: splits water into hydrogen and oxygen. Carry the hydrogen to the stage 2 Particle Accelerator in a Fluid Canister.\n- Hydrogen Fuel Cell: makes power from hydrogen and oxygen, returning 60% of the power the Electrolyzer put in (up to 240 FE/t).\n- Peltier Cooler: freezes water with power. Compress the ice into packed and blue ice.\n- Archive Terminal: copies ruin records onto data cards and restores degraded parts. It also decodes crystal memories.",
+    "translation": "- 烧制炉：烧制陶瓷基板等，也能更快地炼钢。放入氧气后，就成为用 2 个铁和 1 个煤制作 2 个钢的纯氧转炉。\n- 压缩机：制作钢板。质量模式下会把有质量值的材料变成“质量”，压成压缩块或质量颗粒。\n- 电解槽：将水分解为氢气和氧气。氢气可以用流体罐装走，运到第 2 阶段的粒子加速器。\n- 氢燃料电池：用氢和氧发电（取回电解槽灌入电力的 6 成的储能，最大 240 FE/t）。\n- 珀耳帖冷却器：用电力使水结冰。冰可以用压缩机压成浮冰、蓝冰。\n- 档案终端：把遗迹的记录抄写到数据卡上，修复退化的部件，还能解读水晶存储器。"
   },
   "guide.singulo.stage1.machines.title": {
     "source": "Stage 1 machines",
     "translation": "第一阶段机器"
   },
   "guide.singulo.stage1.materials.body": {
-    "source": "1. Mix iron and coal into steel blend and smelt it into steel ingots in a blast furnace.\n2. Make unfired ceramic from clay, nether quartz, bone meal and sand, and fire it in a furnace into white ceramic composite. Before you reach the Nether, two flint can replace the nether quartz.\n3. Make basic circuits from ceramic, redstone and copper, and basic frames from steel and ceramic.\nThese three (steel, ceramic and circuits) go into almost every machine.",
-    "translation": "1. 用铁和煤制作钢混合物，在高炉中炼成钢锭。\n2. 用粘土、下界石英、骨粉和沙子制作未烧制陶瓷，在熔炉中烧成白色陶瓷复合材料。去下界之前，可用 2 个燧石代替下界石英。\n3. 用陶瓷、红石和铜制作基本电路，用钢和陶瓷制作基本框架。\n这三样（钢、陶瓷、电路）是几乎所有装置的材料。"
+    "source": "1. Mix iron and coal into steel blend and smelt it into steel ingots in a blast furnace.\n2. Make unfired ceramic from clay, nether quartz, bone meal and sand, and fire it in a furnace into white ceramic composite. Before you reach the Nether, two flint can replace the nether quartz. Limestone powder, crushed from calcite (1 at a crafting table, 2 in the Compressor), can replace the bone meal.\n3. Make basic circuits from ceramic, redstone and copper, and basic frames from steel and ceramic.\nThese three (steel, ceramic and circuits) go into almost every machine.",
+    "translation": "1. 用铁和煤制作钢混合物，在高炉中炼成钢锭。\n2. 用粘土、下界石英、骨粉和沙子制作未烧制陶瓷，在熔炉中烧成白色陶瓷复合材料。去下界之前，可用 2 个燧石代替下界石英。骨粉可用粉碎方解石得到的石灰粉代替（工作台 1 个得 1 个，压缩机得 2 个）。\n3. 用陶瓷、红石和铜制作基本电路，用钢和陶瓷制作基本框架。\n这三样（钢、陶瓷、电路）是几乎所有装置的材料。"
   },
   "guide.singulo.stage1.materials.title": {
     "source": "First materials",
@@ -6240,8 +6432,8 @@
     "translation": "最初的电源"
   },
   "guide.singulo.stage1.thermal_pairs.body": {
-    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nTo run the stage 2 Cryogenic Cooling Tower (240 FE/t for liquid nitrogen), plan on 4 or more generators with magma + blue ice, or 5 or more with campfire + packed ice (before copper wire losses). Start with 2–4 and run one machine at a time while you add more.",
-    "translation": "冷方块可以一直使用而不融化的组合（每台发电机的输出）：\n- 岩浆块＋蓝冰：约 76 FE/t（最推荐）\n- 运转中的烧制炉＋蓝冰：约 66 FE/t\n- 篝火＋蓝冰：约 56 FE/t\n- 篝火＋浮冰：约 55 FE/t\n熔岩太热：即使是蓝冰也会在约 40 秒内变成浮冰并继续融化。篝火搭配水、雪或冰，不到 1 分钟就会融化。\n要运行第 2 阶段的低温冷却塔（液氮 240 FE/t），岩浆块＋蓝冰大约需要 4 台以上，篝火＋浮冰则需要 5 台以上（不含铜导线损耗）。先用 2–4 台，一次运行一台机器，再逐步增加。"
+    "source": "Pairs whose cold block never melts (output of one generator):\n- Magma block + blue ice: about 76 FE/t (best)\n- Running kiln + blue ice: about 66 FE/t\n- Campfire + blue ice: about 56 FE/t\n- Campfire + packed ice: about 55 FE/t\nLava is too hot: even blue ice turns into packed ice in about 40 s and keeps melting. Campfires with water, snow or ice melt them in under a minute.\nStage 2 liquid nitrogen costs about 25,000 FE per 100 mB. A height-7 tower draws about 1,786 FE/t while working. It retains progress while waiting for enough power. Start with 2–4 generators and one machine at a time, add generation and storage, then build a fusion reactor; full-speed power is not a prerequisite.",
+    "translation": "冷方块可以一直使用而不融化的组合（每台发电机的输出）：\n- 岩浆块＋蓝冰：约 76 FE/t\n- 运转中的烧制炉＋蓝冰：约 66 FE/t\n- 篝火＋蓝冰：约 56 FE/t\n- 篝火＋浮冰：约 55 FE/t\n熔岩太热，即使蓝冰也会在约 40 秒内变成浮冰并继续融化；篝火搭配水、雪或冰，不到 1 分钟就会融化。\n第 2 阶段每 100 mB 液氮约需 25,000 FE。高度为 7 的冷却塔工作时约需 1,786 FE/t，电力不足时会保留进度等待。初期可先用 2–4 台发电机交替运行装置，再扩大发电和储能，逐步建造核聚变反应堆，不必一开始就满足全速供电。"
   },
   "guide.singulo.stage1.thermal_pairs.title": {
     "source": "Pairs that last",
@@ -6252,32 +6444,32 @@
     "translation": "第二阶段：低温"
   },
   "guide.singulo.stage2.accelerator.body": {
-    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.",
-    "translation": "用加速管和聚焦磁体搭建一个方形环（边长 8–32），并让控制器贴着环放置。四个角必须是聚焦磁体，且磁体至少占环的四分之一。它用氢制造缪子束，极少数情况下会产生磁单极子。\n催化反应器用缪子束制作缪子催化剂（2 级）。把宇宙线缪子收集器放在高处，无需电力也能慢慢收集缪子束。"
+    "source": "Build a square ring (8–32 wide) of accelerator tubes and focusing magnets and place the controller against the ring. The corners must be focusing magnets, and magnets must make up at least a quarter of the ring. It makes muon bundles from hydrogen, and very rarely a magnetic monopole.\nThe Catalytic Reactor turns muon bundles into muon catalysts (tier 2). A Cosmic Muon Collector placed high up slowly gathers muon bundles without power.\nWith a ring of side 16 or more, put zinc and bismuth ingots in the inputs to fuse their nuclei into the new element nihonium. Zinc comes from crushing tuff in the Compressor, and bismuth is a by-product of refining raw copper in the Catalytic Reactor. Two nihonium make an ingot; press ingots into plates and build nihonium frames in the Precision Assembler. Advanced stage 4 and 5 machines are built on them. Bismuth with carbon dust turns into gold as the carbon nuclei strip protons from the bismuth (any ring size).",
+    "translation": "用加速管和聚焦磁体搭建一个方形环（边长 8–32），并让控制器贴着环放置。四个角必须是聚焦磁体，且磁体至少占环的四分之一。它用氢制造缪子束，极少数情况下会产生磁单极子。\n催化反应器用缪子束制作缪子催化剂（2 级）。把宇宙线缪子收集器放在高处，无需电力也能慢慢收集缪子束。\n边长 16 以上时，在输入槽放入锌锭和铋锭，原子核就会融合成新元素鿭。锌由压缩机粉碎凝灰岩获得，铋是催化反应器精炼粗铜时的副产物。2 个鿭制成一个锭，用压缩机压成板，再在精密组装台制作鿭框架。它是第 4、5 阶段高级装置的基础。放入铋和碳粉时，铋原子核的质子会被剥离而变成金（不限环的大小）。"
   },
   "guide.singulo.stage2.accelerator.title": {
     "source": "Particle Accelerator and muon catalyst",
     "translation": "粒子加速器和缪子催化剂"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Add power with Cryogenic Turbines (5 kFE/t from evaporating liquid nitrogen).\n3. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "这一阶段要做的事：\n1. 制作精密组装台。第 3 阶段以后的部件和装置几乎都在这里制作。\n2. 用低温涡轮机（液氮汽化，5 kFE/t）增加电力。\n3. 用粒子加速器制作缪子束，用催化反应器制作缪子催化剂（第 2 级）。\n4. 把冷却塔加高到 10 以上，把压缩机粉碎深板岩得到的氦液化。\n5. 在地表观测站的保管库调整探索罗盘，寻找研究楼。收集量子数据片段和冷原子阱（打倒深处的回响守卫后保管库会打开）。\n6. 备齐量子计算模块和液氦，就进入第 3 阶段。\n趁现在：可以用仿生人组装站制作护卫（见仿生人一章）。也去找陨石坑（陨铁、星尘）和冰山（蓝冰）。\n容易卡住的地方：\n・做不出液氦：冷却塔高度不到 10 就无法制作。\n・催化剂不能用或消耗很快：比装置低一级会变慢且消耗更快，低两级无法使用。"
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "这一阶段要做的事：\n1. 制作精密组装台。第 3 阶段以后的部件和装置几乎都在这里制作。\n2. 用粒子加速器制作缪子束，用催化反应器制作缪子催化剂（第 2 级）。\n3. 制作缪子催化核聚变炉（4 kFE/t），用缪子催化剂和水增加电力。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半）。\n4. 把冷却塔加高到 10 以上，把压缩机粉碎深板岩得到的氦液化。\n5. 在地表观测站的保管库调整探索罗盘，寻找研究楼。收集量子数据片段和冷原子阱（打倒深处的回响守卫后保管库会打开）。\n6. 备齐量子计算模块和液氦，就进入第 3 阶段。\n趁现在：可以用仿生人组装站制作护卫（见仿生人一章）。也去找陨石坑（陨铁、星尘）和冰山（蓝冰）。\n容易卡住的地方：\n・做不出液氦：冷却塔高度不到 10 就无法制作。\n・冷却塔很慢：液氮每 1 mB 需要 250 FE。在核聚变炉建好之前，多放几台热电发电机（电力不足时不会停止，只是变慢）。\n・催化剂不能用或消耗很快：比装置低一级会变慢且消耗更快，低两级无法使用。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
     "translation": "第 2 阶段的流程"
   },
   "guide.singulo.stage2.others.body": {
-    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Cryogenic Turbine: generates power from evaporating liquid nitrogen (5 kFE/t).\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
-    "translation": "- 精密组装台：第 3 阶段以后的几乎所有部件和装置都在这里制作。\n- 低温涡轮机：利用液氮气化发电（5 kFE/t）。\n- SMES 电池：储存大量电力。\n- 世界线锚（小型）：放入催化剂后持续加载周围的区块。\n- 单极子升级模块：用磁单极子制作，插入装置的单极子槽后速度 ×2、电力效率 +50%。"
+    "source": "- Precision Assembler: makes almost every part and machine from stage 3 on.\n- Muon-Catalyzed Fusion Reactor: generates power from muon catalysts and water (4 kFE/t). A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime) and comes out spent (the Catalytic Reactor turns spent ones back into muon bundles). Water can be poured in with a bucket.\n- Cryogenic Turbine: recovers the power stored in liquid nitrogen (90% next to lava, up to 4.5 kFE/t). It stores and moves power; it does not create any. Coolant cartridges in its input slot are emptied into the tank and come out empty.\n- SMES Cell: stores a large amount of power.\n- Small Worldline Anchor: keeps the surrounding chunks loaded while it has a catalyst.\n- Monopole Upgrade: made from a magnetic monopole; in a machine's monopole slot it gives ×2 speed and +50% power efficiency.",
+    "translation": "- 精密组装台：第 3 阶段以后的几乎所有部件和装置都在这里制作。\n- 缪子催化核聚变炉：用缪子催化剂和水发电（4 kFE/t）。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半），之后变为失活的催化剂（可在催化反应器中变回缪子束）。也可以用桶右键加水。\n- 低温涡轮机：取回储存在液氮中的电力（在熔岩旁 9 成，最大 4.5 kFE/t）。这是用来储存和运送电力的装置，不会增加电力。把冷媒罐放进入口，就会倒出液氮并送出空罐。\n- SMES 电池：储存大量电力。\n- 世界线锚（小型）：放入催化剂后持续加载周围的区块。\n- 单极子升级模块：用磁单极子制作，插入装置的单极子槽后速度 ×2、电力效率 +50%。"
   },
   "guide.singulo.stage2.others.title": {
     "source": "Other stage 2 devices",
     "translation": "其他第 2 阶段设备"
   },
   "guide.singulo.stage2.tower.body": {
-    "source": "Build a waisted hyperboloid tower 7–15 high on a 5×5 base. The middle column is heat exchange cores and the top is closed with a vent grate. The controller goes in the middle of the front face, second layer from the bottom. Taller towers are faster, and at 10 or more they also make liquid helium.\nIt makes liquid nitrogen from the air with no inputs. Superconducting coils are made from copper, redstone, steel plates, substrates, a control unit and liquid nitrogen.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Making only nitrogen, a 7-high tower feeds about 3.5 cryogenic turbines and a 10-high tower 5 (fewer when it also processes coils; recipes with inputs run before nitrogen).",
-    "translation": "在 5×5 的底座上建造高 7–15 的收腰双曲面塔。中间一列为热交换核心，顶部用通风格栅封住。控制器放在正面从下往上第二层的中央。越高越快，10 格以上还能制造液氦。\n无需任何材料即可从空气中制造液氮。超导线圈由铜、红石、钢板、基板、控制单元和液氮制成。\n热交换核心和冷却带可用 3 个浮冰代替蓝冰。只制造液氮时，高 7 的塔约可供 3.5 台低温涡轮机，高 10 的塔可供 5 台（同时加工线圈等时会减少；有材料的配方优先于液氮）。"
+    "source": "Build a waisted hyperboloid tower 7–15 high on a 5×5 base. The middle column is heat exchange cores and the top is closed with a vent grate. The controller goes in the middle of the front face, second layer from the bottom. Taller towers are faster, and at 10 or more they also make liquid helium.\nIt makes liquid nitrogen from the air with no inputs. Superconducting coils are made from copper, redstone, steel plates, substrates, a control unit and liquid nitrogen.\nHeat exchange cores and coolant bands can use 3 packed ice instead of blue ice. Taller towers work faster but draw more power per tick (liquid nitrogen costs 250 FE per mB at any height; recipes with inputs run before nitrogen).\nRight-click the controller with an empty coolant cartridge to fill it with liquid nitrogen (processing it in the tower works too). Right-click a machine with a filled cartridge to pour it in, so no pipes are needed.",
+    "translation": "在 5×5 的底座上建造高 7–15 的收腰双曲面塔。中间一列为热交换核心，顶部用通风格栅封住。控制器放在正面从下往上第二层的中央。越高越快，10 格以上还能制造液氦。\n无需任何材料即可从空气中制造液氮。超导线圈由铜、红石、钢板、基板、控制单元和液氮制成。\n热交换核心和冷却带可用 3 个浮冰代替蓝冰。塔越高制作越快，但每 tick 的耗电也会相应增加（液氮无论塔多高，每 1 mB 都需要 250 FE；有材料的配方优先于液氮）。\n用空冷媒罐右键点击控制器即可装入液氮（在冷却塔中加工也可以）。用冷媒罐右键点击装置即可倒入，没有管道也能运送。"
   },
   "guide.singulo.stage2.tower.title": {
     "source": "Cryogenic Cooling Tower",
@@ -6615,6 +6807,10 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
   },
+  "howto.singulo.bismuth_crystal_block": {
+    "source": "Made in: Kiln (stage 2)",
+    "translation": "制造地：烧制炉（第 2 阶段）"
+  },
   "howto.singulo.black_hole_bomb": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "制造地：奇点封装器（第 5 阶段）"
@@ -6638,6 +6834,10 @@
   "howto.singulo.bose_condensate_catalyst": {
     "source": "Made in: Laser Cooler (stage 3)",
     "translation": "制造地：激光冷却器（第 3 阶段）"
+  },
+  "howto.singulo.carbon_dust": {
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "制造地：压缩机（第 1 阶段）"
   },
   "howto.singulo.casimir_cavity": {
     "source": "Made in: Multiblock assembly (stage 4)",
@@ -6899,6 +7099,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制造地：工作台（第 1 阶段）"
   },
+  "howto.singulo.empty_coolant_cartridge": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
   "howto.singulo.entangled_element": {
     "source": "Made in: Entanglement Synthesizer (stage 3)",
     "translation": "制造地：量子纠缠合成器（第 3 阶段）"
@@ -6927,6 +7131,10 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
   },
+  "howto.singulo.fluid_canister": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
   "howto.singulo.focusing_magnet": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
@@ -6942,6 +7150,10 @@
   "howto.singulo.genesis_pylon": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
+  },
+  "howto.singulo.glowing_bismuth_crystal": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
   },
   "howto.singulo.gravitational_containment_tank": {
     "source": "Made in: Precision Assembler (stage 5)",
@@ -6999,6 +7211,10 @@
     "source": "Made in: Degenerate Compactor (stage 5)",
     "translation": "制造地：简并压缩炉（第 5 阶段）"
   },
+  "howto.singulo.hydrogen_fuel_cell": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
   "howto.singulo.impact_generator_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "制造地：精密组装台（第 3 阶段）"
@@ -7030,6 +7246,10 @@
   "howto.singulo.laser_cooler": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "制造地：精密组装台（第 3 阶段）"
+  },
+  "howto.singulo.limestone_powder": {
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "制造地：压缩机（第 1 阶段）"
   },
   "howto.singulo.low_gravity_panel": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -7083,6 +7303,10 @@
     "source": "Made in: Catalytic Reactor (stage 2)",
     "translation": "制造地：催化反应器（第 2 阶段）"
   },
+  "howto.singulo.muon_fusion_reactor": {
+    "source": "Made in: Precision Assembler (stage 2)",
+    "translation": "制造地：精密组装台（第 2 阶段）"
+  },
   "howto.singulo.neutrino_observatory": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "制造地：精密组装台（第 3 阶段）"
@@ -7090,6 +7314,22 @@
   "howto.singulo.neutrino_scanner": {
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "制造地：精密组装台（第 3 阶段）"
+  },
+  "howto.singulo.nihonium": {
+    "source": "Made in: Particle Accelerator (stage 3)",
+    "translation": "制造地：粒子加速器（第 3 阶段）"
+  },
+  "howto.singulo.nihonium_frame": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "制造地：精密组装台（第 3 阶段）"
+  },
+  "howto.singulo.nihonium_ingot": {
+    "source": "Made in: Kiln (stage 3)",
+    "translation": "制造地：烧制炉（第 3 阶段）"
+  },
+  "howto.singulo.nihonium_plate": {
+    "source": "Made in: Compressor (stage 3)",
+    "translation": "制造地：压缩机（第 3 阶段）"
   },
   "howto.singulo.observation_log": {
     "source": "Found in: ruin caches",
@@ -7102,6 +7342,10 @@
   "howto.singulo.particle_accelerator": {
     "source": "Made in: Multiblock assembly (stage 2)",
     "translation": "制造地：多方块组装（第 2 阶段）"
+  },
+  "howto.singulo.peltier_cooler": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
   },
   "howto.singulo.penrose_reactor": {
     "source": "Made in: Multiblock assembly (stage 5)",
@@ -7339,6 +7583,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制造地：工作台（第 1 阶段）"
   },
+  "howto.singulo.unfired_phosphor": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
     "translation": "制造地：虫洞生成器（第 5 阶段）"
@@ -7422,6 +7670,14 @@
   "howto.singulo.wormhole_stabilizer": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "制造地：精密组装台（第 5 阶段）"
+  },
+  "howto.singulo.zinc_dust": {
+    "source": "Made in: Compressor (stage 1)",
+    "translation": "制造地：压缩机（第 1 阶段）"
+  },
+  "howto.singulo.zinc_ingot": {
+    "source": "Made in: Kiln (stage 1)",
+    "translation": "制造地：烧制炉（第 1 阶段）"
   },
   "item.singulo.afterglow_wings": {
     "source": "Afterglow Wings",
@@ -7623,6 +7879,10 @@
     "source": "Empty BH Containment Vessel",
     "translation": "空黑洞容器"
   },
+  "item.singulo.bismuth_ingot": {
+    "source": "Bismuth Ingot",
+    "translation": "铋锭"
+  },
   "item.singulo.bit_android_spawn_egg": {
     "source": "Bit Android Spawn Egg",
     "translation": "浮游炮型仿生人刷怪蛋"
@@ -7646,6 +7906,10 @@
   "item.singulo.builder_wand": {
     "source": "Builder's Wand",
     "translation": "建造者魔杖"
+  },
+  "item.singulo.carbon_dust": {
+    "source": "Carbon Dust",
+    "translation": "碳粉"
   },
   "item.singulo.catalyst_stabilizer": {
     "source": "Catalyst Stabilizer",
@@ -7743,6 +8007,10 @@
     "source": "Echo Sentinel Spawn Egg",
     "translation": "回响守卫刷怪蛋"
   },
+  "item.singulo.empty_coolant_cartridge": {
+    "source": "Empty Coolant Cartridge",
+    "translation": "空冷媒罐"
+  },
   "item.singulo.entangled_element": {
     "source": "Entangled Element",
     "translation": "量子纠缠元件"
@@ -7766,6 +8034,14 @@
   "item.singulo.explorer_compass": {
     "source": "Explorer's Compass",
     "translation": "探索罗盘"
+  },
+  "item.singulo.fluid_canister": {
+    "source": "Fluid Canister",
+    "translation": "流体罐"
+  },
+  "item.singulo.fluid_canister.filled": {
+    "source": "Fluid Canister (%s)",
+    "translation": "流体罐（%s）"
   },
   "item.singulo.foundry_overseer_spawn_egg": {
     "source": "Foundry Overseer Spawn Egg",
@@ -7839,6 +8115,10 @@
     "source": "Last Archivist Spawn Egg",
     "translation": "最后的记录者刷怪蛋"
   },
+  "item.singulo.limestone_powder": {
+    "source": "Limestone Powder",
+    "translation": "石灰粉"
+  },
   "item.singulo.magnetic_bottle": {
     "source": "Magnetic Bottle",
     "translation": "磁瓶"
@@ -7886,6 +8166,22 @@
   "item.singulo.neutrino_scanner": {
     "source": "Neutrino Scanner",
     "translation": "中微子扫描仪"
+  },
+  "item.singulo.nihonium": {
+    "source": "Nihonium",
+    "translation": "鿭"
+  },
+  "item.singulo.nihonium_frame": {
+    "source": "Nihonium Frame",
+    "translation": "鿭框架"
+  },
+  "item.singulo.nihonium_ingot": {
+    "source": "Nihonium Ingot",
+    "translation": "鿭锭"
+  },
+  "item.singulo.nihonium_plate": {
+    "source": "Nihonium Plate",
+    "translation": "鿭板"
   },
   "item.singulo.observation_log": {
     "source": "Observation Log",
@@ -8123,6 +8419,10 @@
     "source": "Unfired Ceramic",
     "translation": "未烧制陶瓷"
   },
+  "item.singulo.unfired_phosphor": {
+    "source": "Unfired Phosphor",
+    "translation": "未烧制荧光体"
+  },
   "item.singulo.unstable_wormhole_mouth": {
     "source": "Unstable Wormhole Mouth",
     "translation": "不稳定虫洞入口"
@@ -8146,6 +8446,14 @@
   "item.singulo.wormhole_mouth_casing": {
     "source": "Wormhole Mouth Casing",
     "translation": "虫洞入口外壳"
+  },
+  "item.singulo.zinc_dust": {
+    "source": "Zinc Dust",
+    "translation": "锌粉"
+  },
+  "item.singulo.zinc_ingot": {
+    "source": "Zinc Ingot",
+    "translation": "锌锭"
   },
   "itemGroup.singulo": {
     "source": "Singulo",
@@ -8403,6 +8711,10 @@
     "source": "The area is too large (up to %s blocks per side)",
     "translation": "范围太大（每边最多 %s 格）"
   },
+  "message.singulo.cryogenic_turbine.now_storage": {
+    "source": "The Cryogenic Turbine is now liquid-nitrogen energy storage. It returns up to 90% of the power the cooling tower put into the nitrogen, so running it from a cooling tower no longer makes power. For stage 2 power, build a Muon-Catalyzed Fusion Reactor.",
+    "translation": "低温涡轮机现在是液氮储能装置。它能取回冷却塔灌入液氮的电力的最多 90%（与冷却塔连在一起循环也不会增加电力）。第 2 阶段的发电请使用缪子催化核聚变炉。"
+  },
   "message.singulo.deep_sea_collector.idle": {
     "source": "Not deep enough: needs 16+ blocks of water above",
     "translation": "水深不够（上方需要 16 格以上的水）"
@@ -8410,6 +8722,14 @@
   "message.singulo.deep_sea_collector.rate": {
     "source": "Pressure %s%%: one Pressure Crystal every %ss",
     "translation": "水压 %s%%：约每 %s 秒生成 1 个高压晶体"
+  },
+  "message.singulo.fuel_cell.standby": {
+    "source": "Standing by (storage full)",
+    "translation": "待机中（储电已满）"
+  },
+  "message.singulo.fuel_cell.status": {
+    "source": "Hydrogen %s/%s mB · Oxygen %s/%s mB · Stored %s/%s FE · %s",
+    "translation": "氢 %s/%s mB　氧 %s/%s mB　储电 %s/%s FE　%s"
   },
   "message.singulo.gravity_receiver.status": {
     "source": "Gravity panels active: %s / %s (%s FE/t each)",
@@ -8934,6 +9254,10 @@
   "station.singulo.particle_accelerator": {
     "source": "Particle Accelerator",
     "translation": "粒子加速器"
+  },
+  "station.singulo.peltier_cooler": {
+    "source": "Peltier Cooler",
+    "translation": "珀耳帖冷却器"
   },
   "station.singulo.penrose_reactor_catalyst": {
     "source": "P-Reactor",
@@ -9863,6 +10187,14 @@
     "source": "Exotic charge: %s s",
     "translation": "奇异物质剩余：%s 秒"
   },
+  "tooltip.singulo.fluid_canister.amount": {
+    "source": "%s %s / %s mB",
+    "translation": "%s %s / %s mB"
+  },
+  "tooltip.singulo.fluid_canister.empty": {
+    "source": "Empty (holds %s mB)",
+    "translation": "空（可装 %s mB）"
+  },
   "tooltip.singulo.fluid_sample": {
     "source": "%s mB",
     "translation": "%s mB"
@@ -10092,16 +10424,24 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 39 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 39 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 41 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 41 个"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 36 more",
-    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 36 个"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
+    "translation": "用于：热电发电机、烧制炉、压缩机、电解槽、档案终端 等 25 个"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
     "translation": "用于：微型黑洞容器"
+  },
+  "uses.singulo.bismuth_crystal_block": {
+    "source": "Used in: Glowing Bismuth Crystal",
+    "translation": "用于：发光铋晶体"
+  },
+  "uses.singulo.bismuth_ingot": {
+    "source": "Used in: Nihonium, Bismuth Crystal Block",
+    "translation": "用于：鿭、铋晶体块"
   },
   "uses.singulo.black_reinforced_glass": {
     "source": "Used in: Starred Black Reinforced Glass",
@@ -10144,8 +10484,8 @@
     "translation": "用于：卡西米尔腔"
   },
   "uses.singulo.ceramic_substrate": {
-    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 14 more",
-    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 14 个"
+    "source": "Used in: Blank Data Card, Cooling Tower Controller, Superconducting Coil, Accelerator Controller, Catalytic Reactor and 15 more",
+    "translation": "用于：空白数据卡、冷却塔控制器、超导线圈、加速器控制器、催化反应器 等 15 个"
   },
   "uses.singulo.cold_atom_trap": {
     "source": "Used in: Cold Atoms",
@@ -10184,8 +10524,8 @@
     "translation": "用于：超导线圈"
   },
   "uses.singulo.coolant_cartridge": {
-    "source": "Used in: Quantum Computing Module, SMES Module",
-    "translation": "用于：量子计算模块、SMES 模块"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, Quantum Computing Module, SMES Module",
+    "translation": "用于：缪子催化核聚变炉、量子计算模块、SMES 模块"
   },
   "uses.singulo.cooling_tower_base": {
     "source": "Used in: Cryogenic Cooling Tower",
@@ -10327,6 +10667,10 @@
     "source": "Used in: Terminus Record",
     "translation": "用于：终焉之记录"
   },
+  "uses.singulo.empty_coolant_cartridge": {
+    "source": "Used in: Coolant Cartridge",
+    "translation": "用于：冷媒罐"
+  },
   "uses.singulo.entangled_element": {
     "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 19 more",
     "translation": "用于：强化背包升级、量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器 等 19 个"
@@ -10392,8 +10736,8 @@
     "translation": "用于：单极子升级模块"
   },
   "uses.singulo.meteoric_iron_ingot": {
-    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, Magnetic Confinement Ring, Magnetic Key",
-    "translation": "用于：聚焦磁体、引力波探测器、磁约束环、磁力锁钥匙"
+    "source": "Used in: Focusing Magnet, Gravitational Wave Detector, C-Cavity Magnetic Shield, Magnetic Bottle, Gyro Drive and 2 more",
+    "translation": "用于：聚焦磁体、引力波探测器、C型腔磁屏蔽、磁瓶、陀螺驱动装置 等 2 个"
   },
   "uses.singulo.micro_black_hole": {
     "source": "Used in: Black Hole Bomb, Graviton Manipulator, Singularity Key",
@@ -10408,12 +10752,28 @@
     "translation": "用于：缪子催化剂"
   },
   "uses.singulo.muon_catalyst": {
-    "source": "Used in: BE Condensate Catalyst",
-    "translation": "用于：玻色凝聚态催化剂"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, BE Condensate Catalyst",
+    "translation": "用于：缪子催化核聚变炉、玻色凝聚态催化剂"
   },
   "uses.singulo.neutrino_scanner": {
     "source": "Used in: Neutrino Observatory",
     "translation": "用于：中微子观测站"
+  },
+  "uses.singulo.nihonium": {
+    "source": "Used in: Nihonium Ingot",
+    "translation": "用于：鿭锭"
+  },
+  "uses.singulo.nihonium_frame": {
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Degenerate Furnace Controller, Autonomous Probe Station and 10 more",
+    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、简并热炉控制器、自动探测站 等 10 个"
+  },
+  "uses.singulo.nihonium_ingot": {
+    "source": "Used in: Nihonium Plate",
+    "translation": "用于：鿭板"
+  },
+  "uses.singulo.nihonium_plate": {
+    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame",
+    "translation": "用于：视界总线、陀螺驱动装置、霍金收集器、喷流收集器、鿭框架"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
@@ -10516,20 +10876,20 @@
     "translation": "用于：基本框架、钢板、压缩机"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 77 more",
-    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 77 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 73 more",
+    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 73 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 54 more",
-    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 54 个"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",
+    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 55 个"
   },
   "uses.singulo.superconducting_wire": {
-    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire",
-    "translation": "用于：超导电缆、量子纠缠元件、玻色凝聚态催化剂、简并热炉换热管、拓扑导线"
+    "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
+    "translation": "用于：超导电缆、量子纠缠元件、玻色凝聚态催化剂、简并热炉换热管、拓扑导线 等 1 个"
   },
   "uses.singulo.thermocouple_module": {
-    "source": "Used in: Thermoelectric Generator, Impact Generator Panel",
-    "translation": "用于：热电发电机、冲击发电面板"
+    "source": "Used in: Thermoelectric Generator, Impact Generator Panel, Peltier Cooler",
+    "translation": "用于：热电发电机、冲击发电面板、珀耳帖冷却器"
   },
   "uses.singulo.time_crystal_catalyst": {
     "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
@@ -10622,5 +10982,13 @@
   "uses.singulo.wormhole_mouth_casing": {
     "source": "Used in: Wormhole Mouth",
     "translation": "用于：虫洞入口"
+  },
+  "uses.singulo.zinc_dust": {
+    "source": "Used in: Zinc Ingot, Unfired Phosphor",
+    "translation": "用于：锌锭、未烧制荧光体"
+  },
+  "uses.singulo.zinc_ingot": {
+    "source": "Used in: Nihonium",
+    "translation": "用于：鿭"
   }
 }

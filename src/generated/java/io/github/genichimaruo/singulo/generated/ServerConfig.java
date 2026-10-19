@@ -17,6 +17,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.DoubleValue GENERATOR_OUTPUT_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue THERMOELECTRIC_COEFFICIENT;
     public static final ModConfigSpec.IntValue CRYO_TURBINE_OUTPUT;
+    public static final ModConfigSpec.IntValue FUSION_REACTOR_OUTPUT;
     public static final ModConfigSpec.IntValue QUANTUM_ENGINE_OUTPUT;
     public static final ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT;
     public static final ModConfigSpec.DoubleValue GENERATOR_LOWER_TIER_OUTPUT;
@@ -41,7 +42,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.IntValue TIME_CRYSTAL_GROWTH_TICKS;
     public static final ModConfigSpec.IntValue SHELL_ROCK_LV3;
     public static final ModConfigSpec.IntValue SHELL_METAL_CORES;
-    public static final ModConfigSpec.IntValue SHELL_COOLANT_MB;
+    public static final ModConfigSpec.IntValue SHELL_NITROGEN_MB;
     public static final ModConfigSpec.IntValue REACTOR_PLATES_PER_SHELL;
     public static final ModConfigSpec.BooleanValue MIXED_BONUS_ENABLED;
     public static final ModConfigSpec.IntValue MIXED_BONUS_MIN_KINDS;
@@ -107,6 +108,7 @@ public final class ServerConfig {
         ModConfigSpec.DoubleValue GENERATOR_OUTPUT_MULTIPLIER_;
         ModConfigSpec.DoubleValue THERMOELECTRIC_COEFFICIENT_;
         ModConfigSpec.IntValue CRYO_TURBINE_OUTPUT_;
+        ModConfigSpec.IntValue FUSION_REACTOR_OUTPUT_;
         ModConfigSpec.IntValue QUANTUM_ENGINE_OUTPUT_;
         ModConfigSpec.IntValue DEGENERATE_FURNACE_OUTPUT_;
         ModConfigSpec.DoubleValue GENERATOR_LOWER_TIER_OUTPUT_;
@@ -131,7 +133,7 @@ public final class ServerConfig {
         ModConfigSpec.IntValue TIME_CRYSTAL_GROWTH_TICKS_;
         ModConfigSpec.IntValue SHELL_ROCK_LV3_;
         ModConfigSpec.IntValue SHELL_METAL_CORES_;
-        ModConfigSpec.IntValue SHELL_COOLANT_MB_;
+        ModConfigSpec.IntValue SHELL_NITROGEN_MB_;
         ModConfigSpec.IntValue REACTOR_PLATES_PER_SHELL_;
         ModConfigSpec.BooleanValue MIXED_BONUS_ENABLED_;
         ModConfigSpec.IntValue MIXED_BONUS_MIN_KINDS_;
@@ -208,8 +210,10 @@ public final class ServerConfig {
         GENERATOR_OUTPUT_MULTIPLIER_ = b.defineInRange("generatorOutputMultiplier", 1.0, 0.1, 100.0);
         b.comment("熱電発電機の温度差1Kあたり出力", "範囲: 0.001〜10.0（FE/t・K）");
         THERMOELECTRIC_COEFFICIENT_ = b.defineInRange("thermoelectricCoefficient", 0.1, 0.001, 10.0);
-        b.comment("極低温タービンの出力", "範囲: 1〜1,000,000（FE/t）");
-        CRYO_TURBINE_OUTPUT_ = b.defineInRange("cryoTurbineOutput", 5000, 1, 1000000);
+        b.comment("極低温タービンの最大出力（液体窒素はこれに見合う量だけ使う。取り戻せる電力は、冷却塔で液体窒素に詰めた電力の9割まで）", "範囲: 1〜1,000,000（FE/t）");
+        CRYO_TURBINE_OUTPUT_ = b.defineInRange("cryoTurbineOutput", 4500, 1, 1000000);
+        b.comment("ミュオン触媒核融合炉の出力", "範囲: 1〜1,000,000（FE/t）");
+        FUSION_REACTOR_OUTPUT_ = b.defineInRange("fusionReactorOutput", 4000, 1, 1000000);
         b.comment("量子熱機関の出力", "範囲: 1〜100,000,000（FE/t）");
         QUANTUM_ENGINE_OUTPUT_ = b.defineInRange("quantumEngineOutput", 200000, 1, 100000000);
         b.comment("縮退熱炉の出力", "範囲: 1〜1,000,000,000（FE/t）");
@@ -262,8 +266,8 @@ public final class ServerConfig {
         SHELL_ROCK_LV3_ = b.defineInRange("shellRockLv3", 4, 0, 9);
         b.comment("縮退物質殻1個に要る金属圧縮ブロックLv2（金属の核）", "範囲: 0〜9（整数）");
         SHELL_METAL_CORES_ = b.defineInRange("shellMetalCores", 1, 0, 9);
-        b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限", "範囲: 0〜8,000（mB）");
-        SHELL_COOLANT_MB_ = b.defineInRange("shellCoolantMb", 6000, 0, 8000);
+        b.comment("縮退物質殻1個の圧縮熱を除くのに要る液体窒素（ストレンジ物質版はこの半分。0.10.0 で液体窒素の加工電力と必要量を調整したため、旧名 shellCoolantMb から改名して既定値を1200に）。プリセットの倍率を掛けても装置のタンク1つ（8,000 mB）が上限", "範囲: 0〜8,000（mB）");
+        SHELL_NITROGEN_MB_ = b.defineInRange("shellNitrogenMb", 1200, 0, 8000);
         b.comment("縮退物質殻1個から作れる炉殻ブロックの数", "範囲: 1〜64（整数）");
         REACTOR_PLATES_PER_SHELL_ = b.defineInRange("reactorPlatesPerShell", 24, 1, 64);
         b.comment("混成ボーナス（Lv1が3種類以上ならLv2を8個で作れる）", "範囲: true / false");
@@ -391,6 +395,7 @@ public final class ServerConfig {
         GENERATOR_OUTPUT_MULTIPLIER = GENERATOR_OUTPUT_MULTIPLIER_;
         THERMOELECTRIC_COEFFICIENT = THERMOELECTRIC_COEFFICIENT_;
         CRYO_TURBINE_OUTPUT = CRYO_TURBINE_OUTPUT_;
+        FUSION_REACTOR_OUTPUT = FUSION_REACTOR_OUTPUT_;
         QUANTUM_ENGINE_OUTPUT = QUANTUM_ENGINE_OUTPUT_;
         DEGENERATE_FURNACE_OUTPUT = DEGENERATE_FURNACE_OUTPUT_;
         GENERATOR_LOWER_TIER_OUTPUT = GENERATOR_LOWER_TIER_OUTPUT_;
@@ -415,7 +420,7 @@ public final class ServerConfig {
         TIME_CRYSTAL_GROWTH_TICKS = TIME_CRYSTAL_GROWTH_TICKS_;
         SHELL_ROCK_LV3 = SHELL_ROCK_LV3_;
         SHELL_METAL_CORES = SHELL_METAL_CORES_;
-        SHELL_COOLANT_MB = SHELL_COOLANT_MB_;
+        SHELL_NITROGEN_MB = SHELL_NITROGEN_MB_;
         REACTOR_PLATES_PER_SHELL = REACTOR_PLATES_PER_SHELL_;
         MIXED_BONUS_ENABLED = MIXED_BONUS_ENABLED_;
         MIXED_BONUS_MIN_KINDS = MIXED_BONUS_MIN_KINDS_;

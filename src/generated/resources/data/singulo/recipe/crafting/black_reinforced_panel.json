@@ -11,7 +11,7 @@
       "tag": "c:plates/steel"
     },
     "C": {
-      "item": "minecraft:coal"
+      "tag": "singulo:carbon"
     },
     "O": {
       "tag": "c:obsidians"

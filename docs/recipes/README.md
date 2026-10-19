@@ -8,7 +8,7 @@
 
 ![鋼の素](000_steel_blend.png)
 
-不定形レシピ
+不定形レシピ。石炭は炭素粉（圧縮機で木炭3→2）でも可
 
 ### 鋼鉄インゴット
 
@@ -19,6 +19,8 @@
 ### 未焼成セラミック
 
 ![未焼成セラミック](002_unfired_ceramic.png)
+
+骨粉は石灰粉でも可（圧縮機で方解石を砕く）
 
 ### ホワイトセラミック複合材
 
@@ -176,75 +178,255 @@ Pリアクターの燃料
 
 ### リボン
 
-![リボン](090_android_ribbon.png)
+![リボン](092_android_ribbon.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### 髪飾り
 
-![髪飾り](091_android_hair_flower.png)
+![髪飾り](093_android_hair_flower.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### ベレー帽
 
-![ベレー帽](092_android_beret.png)
+![ベレー帽](094_android_beret.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### ヘッドドレス
 
-![ヘッドドレス](093_android_headdress.png)
+![ヘッドドレス](095_android_headdress.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### マント
 
-![マント](094_android_cape.png)
+![マント](096_android_cape.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### マフラー
 
-![マフラー](095_android_scarf.png)
+![マフラー](097_android_scarf.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### 腰リボン
 
-![腰リボン](096_android_waist_ribbon.png)
+![腰リボン](098_android_waist_ribbon.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### 文庫本
 
-![文庫本](097_android_book.png)
+![文庫本](099_android_book.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### 花束
 
-![花束](098_android_bouquet.png)
+![花束](100_android_bouquet.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### ティーカップ
 
-![ティーカップ](099_android_teacup.png)
+![ティーカップ](101_android_teacup.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### 傘
 
-![傘](100_android_umbrella.png)
+![傘](102_android_umbrella.png)
 
 アンドロイドの装飾。染料で染められる
 
 ### 未焼成セラミック（火打石）
 
-![未焼成セラミック（火打石）](243_recipe_243.png)
+![未焼成セラミック（火打石）](245_recipe_245.png)
 
 ネザー水晶の代わりに火打石2個。ネザーへ行く前から始められる
+
+### 石灰粉
+
+![石灰粉](258_limestone_powder.png)
+
+粉砕。方解石か鍾乳石ブロックを砕いた炭酸カルシウムの粉。未焼成セラミックの骨粉の代わりになる（タグ singulo:ceramic_flux）。作業台なら1→1（効率半分）
+
+### 炭素粉
+
+![炭素粉](259_carbon_dust.png)
+
+粉砕。木炭を砕いて固めた炭素の粉。鋼の素などで石炭の代わりになる（タグ singulo:carbon）。木炭3個で石炭2個ぶん
+
+### 砂利（粉砕）
+
+![砂利（粉砕）](260_recipe_260.png)
+
+粉砕
+
+### 砂（粉砕）
+
+![砂（粉砕）](261_recipe_261.png)
+
+粉砕
+
+### 砂（砂岩）
+
+![砂（砂岩）](262_recipe_262.png)
+
+粉砕（質量値を保つので2個）
+
+### 氷（圧縮）
+
+![氷（圧縮）](263_recipe_263.png)
+
+雪が押し固められて氷河の氷になるのと同じ
+
+### 氷塊（圧縮）
+
+![氷塊（圧縮）](264_recipe_264.png)
+
+作業台（9個）より少ない氷で済む
+
+### 青氷（圧縮）
+
+![青氷（圧縮）](265_recipe_265.png)
+
+熱電発電機の冷える側に
+
+### 亜鉛の粉
+
+![亜鉛の粉](274_zinc_dust.png)
+
+粉砕。凝灰岩（地下の深層岩の層に多い）に含まれる亜鉛を選り分ける
+
+### 亜鉛インゴット
+
+![亜鉛インゴット](275_zinc_ingot.png)
+
+他modの亜鉛インゴットも同じに使える（タグ c:ingots/zinc）
+
+### 鋼鉄インゴット（転炉）
+
+![鋼鉄インゴット（転炉）](282_recipe_282.png)
+
+純酸素転炉: 炭素を溶かした鉄に酸素を吹き込み、余分な炭素を燃やして鋼にする。鋼の素より石炭が少なくて済み、酸素（電解槽の副産物）の使い道になる
+
+### 未焼成の蛍光体
+
+![未焼成の蛍光体](283_unfired_phosphor.png)
+
+亜鉛と、火薬の硫黄と、少しの銅を混ぜたもの。焼成炉で焼くと、光をためて光る蛍光体（ZnS:Cu）になる
+
+### グロウストーンダスト（蛍光体）
+
+![グロウストーンダスト（蛍光体）](284_recipe_284.png)
+
+硫化亜鉛に銅を混ぜた蓄光体。ネザーへ行かずにグロウストーンダストを作れる
+
+### 水素燃料電池
+
+![水素燃料電池](285_hydrogen_fuel_cell.png)
+
+水素と酸素から電力を作る（電解槽で詰めた電力の6割を取り戻す蓄電）。水素1 mBで4.8 FE、最大240 FE/t。水素2 mBに酸素1 mB
+
+### ペルチェ冷却器
+
+![ペルチェ冷却器](286_peltier_cooler.png)
+
+熱電素子に電流を流して熱を運び出し、水を凍らせる（熱電発電機の逆）
+
+### 氷（ペルチェ）
+
+![氷（ペルチェ）](287_recipe_287.png)
+
+できた氷は、圧縮機で氷塊・青氷にできる
+
+### 鉄の塊（鉄の剣）
+
+![鉄の塊（鉄の剣）](290_recipe_290.png)
+
+### 鉄の塊（鉄のツルハシ）
+
+![鉄の塊（鉄のツルハシ）](291_recipe_291.png)
+
+### 鉄の塊（鉄の斧）
+
+![鉄の塊（鉄の斧）](292_recipe_292.png)
+
+### 鉄の塊（鉄のシャベル）
+
+![鉄の塊（鉄のシャベル）](293_recipe_293.png)
+
+### 鉄の塊（鉄のクワ）
+
+![鉄の塊（鉄のクワ）](294_recipe_294.png)
+
+### 鉄の塊（鉄のヘルメット）
+
+![鉄の塊（鉄のヘルメット）](295_recipe_295.png)
+
+### 鉄の塊（鉄のチェストプレート）
+
+![鉄の塊（鉄のチェストプレート）](296_recipe_296.png)
+
+### 鉄の塊（鉄のレギンス）
+
+![鉄の塊（鉄のレギンス）](297_recipe_297.png)
+
+### 鉄の塊（鉄のブーツ）
+
+![鉄の塊（鉄のブーツ）](298_recipe_298.png)
+
+### 金の塊（金の剣）
+
+![金の塊（金の剣）](299_recipe_299.png)
+
+### 金の塊（金のツルハシ）
+
+![金の塊（金のツルハシ）](300_recipe_300.png)
+
+### 金の塊（金の斧）
+
+![金の塊（金の斧）](301_recipe_301.png)
+
+### 金の塊（金のシャベル）
+
+![金の塊（金のシャベル）](302_recipe_302.png)
+
+### 金の塊（金のクワ）
+
+![金の塊（金のクワ）](303_recipe_303.png)
+
+### 金の塊（金のヘルメット）
+
+![金の塊（金のヘルメット）](304_recipe_304.png)
+
+### 金の塊（金のチェストプレート）
+
+![金の塊（金のチェストプレート）](305_recipe_305.png)
+
+### 金の塊（金のレギンス）
+
+![金の塊（金のレギンス）](306_recipe_306.png)
+
+### 金の塊（金のブーツ）
+
+![金の塊（金のブーツ）](307_recipe_307.png)
+
+### 石灰粉（作業台）
+
+![石灰粉（作業台）](311_recipe_311.png)
+
+圧縮機がまだないとき用（効率半分）。最初のセラミックから骨粉なしで作れる
+
+### 液体キャニスター
+
+![液体キャニスター](312_fluid_canister.png)
+
+どの液体・ガスでも1,000 mBまで入る。装置を右クリックすると、出口のタンクから汲むか、入口のタンクへ注ぐ（パイプがなくても水素やヘリウムを運べる）
 
 ## 段階2　極低温
 
@@ -302,7 +484,7 @@ Pリアクターの燃料
 
 ![液体窒素](044_liquid_nitrogen.png)
 
-単位mB。空気から分離・液化（入力なし）
+単位mB。空気から分離・液化（入力なし）。100 mBに25,000 FE（1 mBに250 FE）。高い塔は速いが、1回の電力は同じ
 
 ### 超伝導コイル
 
@@ -312,281 +494,345 @@ Pリアクターの燃料
 
 ![超伝導線材](046_superconducting_wire.png)
 
+### 空の冷媒カートリッジ
+
+![空の冷媒カートリッジ](047_empty_coolant_cartridge.png)
+
+液体窒素を100 mB詰められる鋼の容器。冷却塔で詰める（右クリックでも詰められる）
+
 ### 冷媒カートリッジ
 
-![冷媒カートリッジ](047_coolant_cartridge.png)
+![冷媒カートリッジ](048_coolant_cartridge.png)
 
-液体窒素100 mBを詰めた鋼の容器。液体を入れられない精密組立台で、極低温の組み立てに使う
+液体窒素100 mBを詰めた容器。装置を右クリックすると注いで空のカートリッジが戻る（極低温タービンは入口に入れてもよい）。精密組立台の極低温の組み立てでは、そのまま使う
 
 ### 隕鉄インゴット
 
-![隕鉄インゴット](048_meteoric_iron_ingot.png)
+![隕鉄インゴット](049_meteoric_iron_ingot.png)
 
 隕石クレーターの隕鉄塊から採れる。鉄とニッケルの天然の合金で、強い磁性を持つ
 
 ### 超伝導ケーブル
 
-![超伝導ケーブル](049_superconducting_cable.png)
+![超伝導ケーブル](050_superconducting_cable.png)
 
 送電1 MFE/t、損失ゼロ
 
 ### 加速管
 
-![加速管](050_accelerator_tube.png)
+![加速管](051_accelerator_tube.png)
 
 ### 収束磁石
 
-![収束磁石](051_focusing_magnet.png)
+![収束磁石](052_focusing_magnet.png)
 
 隕鉄（鉄とニッケルの天然の合金）の磁極片で、超伝導コイルの磁場をビームに絞る。2個ずつできる
 
 ### 加速器コントローラ
 
-![加速器コントローラ](052_accelerator_controller.png)
+![加速器コントローラ](053_accelerator_controller.png)
 
 ### 粒子加速器
 
-![粒子加速器](053_particle_accelerator.png)
+![粒子加速器](054_particle_accelerator.png)
 
 最小は一辺8の正方形の環（成立する最小構成は加速管21・収束磁石7。ホロ投影の既定は加速管18・収束磁石10）。一辺を広げるほど高速・単極子が出やすい
 
 ### ミュオン束
 
-![ミュオン束](054_muon_bundle.png)
+![ミュオン束](055_muon_bundle.png)
 
 宇宙線ミュオン収集器でも無電力で少量
 
 ### 触媒反応器
 
-![触媒反応器](055_catalytic_reactor.png)
+![触媒反応器](056_catalytic_reactor.png)
 
 ### ミュオン触媒
 
-![ミュオン触媒](056_muon_catalyst.png)
+![ミュオン触媒](057_muon_catalyst.png)
 
 寿命20分（ティア2装置）
 
 ### 極低温タービン
 
-![極低温タービン](057_cryogenic_turbine.png)
+![極低温タービン](058_cryogenic_turbine.png)
 
-出力5 kFE/t。高温源×液体窒素の膨張
+液体窒素の蓄電: 冷却塔で詰めた電力の最大9割（溶岩の横）を取り戻す。最大4.5 kFE/t
+
+### ミュオン触媒核融合炉
+
+![ミュオン触媒核融合炉](059_muon_fusion_reactor.png)
+
+出力4 kFE/t。水（重水素）とミュオン触媒を使う。触媒は2倍の速さで減り、新品1個で10分（使いかけは残りの分だけ。失活したミュオン触媒になる）。水は4 tickに1 mB。蓄電がいっぱいの間は待機
 
 ### 宇宙線ミュオン収集器
 
-![宇宙線ミュオン収集器](058_cosmic_muon_collector.png)
+![宇宙線ミュオン収集器](060_cosmic_muon_collector.png)
 
 ### SMESセル
 
-![SMESセル](059_smes_cell.png)
+![SMESセル](061_smes_cell.png)
 
 10 MFE蓄電
 
 ### 精密組立台
 
-![精密組立台](060_precision_assembler.png)
+![精密組立台](062_precision_assembler.png)
 
 段階3以降の装置・部品・道具を組み立てる。材料は種類と個数だけで指定（入力6枠、各枠は何個でも可）
 
 ### ワールドライン・アンカー（小）
 
-![ワールドライン・アンカー（小）](061_worldline_anchor_small.png)
+![ワールドライン・アンカー（小）](063_worldline_anchor_small.png)
 
 ### アンドロイドキット
 
-![アンドロイドキット](062_android_kit.png)
+![アンドロイドキット](064_android_kit.png)
 
 組立ステーションで1体印刷するたびに1つ使う
 
 ### アンドロイド組立ステーション
 
-![アンドロイド組立ステーション](063_android_station.png)
+![アンドロイド組立ステーション](065_android_station.png)
 
 小型クリスタルメモリ（遺構の印刷台のアンドロイドを全部倒すと、半分の確率で出る）で型を決める
 
 ### アンドロイド遮断ガラス
 
-![アンドロイド遮断ガラス](064_android_barrier_glass.png)
+![アンドロイド遮断ガラス](066_android_barrier_glass.png)
 
 アンドロイドだけが通れない
 
 ### 模様入りアンドロイド遮断ガラス
 
-![模様入りアンドロイド遮断ガラス](065_android_barrier_glass_patterned.png)
+![模様入りアンドロイド遮断ガラス](067_android_barrier_glass_patterned.png)
 
 ### アンドロイド透過ガラス
 
-![アンドロイド透過ガラス](066_android_gate_glass.png)
+![アンドロイド透過ガラス](068_android_gate_glass.png)
 
 アンドロイドだけが通れる
 
 ### 模様入りアンドロイド透過ガラス
 
-![模様入りアンドロイド透過ガラス](067_android_gate_glass_patterned.png)
+![模様入りアンドロイド透過ガラス](069_android_gate_glass_patterned.png)
 
 ### 転送アップグレード
 
-![転送アップグレード](068_android_transfer_upgrade.png)
+![転送アップグレード](070_android_transfer_upgrade.png)
 
 組立ステーションの強化スロットに積む
 
 ### 生産アップグレード
 
-![生産アップグレード](069_android_production_upgrade.png)
+![生産アップグレード](071_android_production_upgrade.png)
 
 組立ステーションで2体まで印刷できる
 
 ### バッテリーアップグレード
 
-![バッテリーアップグレード](071_android_battery_upgrade.png)
+![バッテリーアップグレード](073_android_battery_upgrade.png)
 
 アンドロイドの充電の満タン +50%（2個まで）
 
 ### バックパックアップグレード
 
-![バックパックアップグレード](072_android_backpack_upgrade.png)
+![バックパックアップグレード](074_android_backpack_upgrade.png)
 
 アンドロイドの持ち物 +12スロット（バックパックの1段目）
 
 ### タンクアップグレード
 
-![タンクアップグレード](075_android_tank_upgrade.png)
+![タンクアップグレード](077_android_tank_upgrade.png)
 
 アンドロイドが液体・ガスを運べる（2種類まで、各32,000 mB）
 
 ### ガスタンクアップグレード
 
-![ガスタンクアップグレード](076_android_gas_tank_upgrade.png)
+![ガスタンクアップグレード](078_android_gas_tank_upgrade.png)
 
 アンドロイドが Mekanism のガス・化学物質を運べる（2種類まで、各32,000 mB）。Mekanism が必要
 
 ### ガス・液体アップグレード
 
-![ガス・液体アップグレード](077_android_dual_tank_upgrade.png)
+![ガス・液体アップグレード](079_android_dual_tank_upgrade.png)
 
 液体と化学物質を2種類ずつ運べる（各16,000 mB）。Mekanism が必要
 
 ### 採掘アップグレード
 
-![採掘アップグレード](078_android_mining_upgrade.png)
+![採掘アップグレード](080_android_mining_upgrade.png)
 
 アンドロイドが採掘できる。ツルハシのエンチャントを付けられる
 
 ### 伐採アップグレード
 
-![伐採アップグレード](079_android_felling_upgrade.png)
+![伐採アップグレード](081_android_felling_upgrade.png)
 
 アンドロイドが木を切れる。斧のエンチャントを付けられる
 
 ### アンドロイド作業指令台
 
-![アンドロイド作業指令台](080_android_work_console.png)
+![アンドロイド作業指令台](082_android_work_console.png)
 
 資材口・レシピの記録を兼ね、アンドロイドに作業を割り当てる
 
 ### アンドロイド資材口
 
-![アンドロイド資材口](081_android_supply_port.png)
+![アンドロイド資材口](083_android_supply_port.png)
 
 隣のストレージを作業の素材置き場にする
 
 ### アンドロイド納品口
 
-![アンドロイド納品口](082_android_delivery_port.png)
+![アンドロイド納品口](084_android_delivery_port.png)
 
 注文の完成品が届く
 
 ### アンドロイドレシピ棚
 
-![アンドロイドレシピ棚](083_android_recipe_rack.png)
+![アンドロイドレシピ棚](085_android_recipe_rack.png)
 
 レシピカードを並べる
 
 ### アンドロイド作業台
 
-![アンドロイド作業台](084_android_workbench.png)
+![アンドロイド作業台](086_android_workbench.png)
 
 アンドロイドが速く作れる作業台
 
 ### 作業位置カード
 
-![作業位置カード](085_work_location_card.png)
+![作業位置カード](087_work_location_card.png)
 
 ブロックの位置を記録する。作業指令台へのつなぎにも使う
 
 ### 範囲カード
 
-![範囲カード](086_area_card.png)
+![範囲カード](088_area_card.png)
 
 2つの角で囲った範囲を記録する。経路の対象範囲・進入禁止ゾーンに使う
 
 ### 測量メガネ
 
-![測量メガネ](087_survey_glasses.png)
+![測量メガネ](089_survey_glasses.png)
 
 掛けると、手に持ったカードの記録した場所と、アンドロイドの作業の印が見える
 
 ### レシピカード
 
-![レシピカード](088_recipe_card.png)
+![レシピカード](090_recipe_card.png)
 
 作業指令台の「記録」でレシピを記録する
 
 ### 手順カード
 
-![手順カード](089_procedure_card.png)
+![手順カード](091_procedure_card.png)
 
 投入・取り出し・採掘の手順を記録する
 
 ### 自己修理キット
 
-![自己修理キット](101_android_repair_kit.png)
+![自己修理キット](103_android_repair_kit.png)
 
 護衛のアンドロイドが体力の減ったときに使う
 
 ### アンドロイド用装甲板
 
-![アンドロイド用装甲板](102_android_armor_plate.png)
+![アンドロイド用装甲板](104_android_armor_plate.png)
 
 護衛のアンドロイドの防具。エンチャントできる
 
 ### アンドロイド用無線充電器
 
-![アンドロイド用無線充電器](103_android_charger.png)
+![アンドロイド用無線充電器](105_android_charger.png)
 
 300,000 FE。アンドロイドの満充電30回分
 
 ### ミュオン束（リサイクル）
 
-![ミュオン束（リサイクル）](227_recipe_227.png)
+![ミュオン束（リサイクル）](229_recipe_229.png)
 
 ### 単極子アップグレード
 
-![単極子アップグレード](231_monopole_upgrade.png)
+![単極子アップグレード](233_monopole_upgrade.png)
 
 磁気単極子は粒子加速器の衝突で約1/1000
 
 ### 磁気錠の鍵
 
-![磁気錠の鍵](234_magnetic_key.png)
+![磁気錠の鍵](236_magnetic_key.png)
 
 隕鉄の天然の磁性に、錠の磁気パターンを書き込む
 
 ### 封印コンテナ（磁気錠）
 
-![封印コンテナ（磁気錠）](238_sealed_container_1.png)
+![封印コンテナ（磁気錠）](240_sealed_container_1.png)
 
 ### 熱交換コア（氷塊）
 
-![熱交換コア（氷塊）](244_recipe_244.png)
+![熱交換コア（氷塊）](246_recipe_246.png)
 
 青氷の代わりに氷塊3個（氷27個ぶん。青氷1個は氷81個ぶん）
 
 ### 冷却塔冷却帯（氷塊）
 
-![冷却塔冷却帯（氷塊）](245_recipe_245.png)
+![冷却塔冷却帯（氷塊）](247_recipe_247.png)
 
 青氷の代わりに氷塊3個
+
+### 氷塊（冷却塔）
+
+![氷塊（冷却塔）](266_recipe_266.png)
+
+水を液体窒素で一気に凍らせる
+
+### 黒曜石（冷却塔）
+
+![黒曜石（冷却塔）](267_recipe_267.png)
+
+溶岩を液体窒素で急に冷やす
+
+### ネザー水晶（合成）
+
+![ネザー水晶（合成）](268_recipe_268.png)
+
+水熱合成: 熱い水に砂（石英）を溶かし、結晶として育てる
+
+### 銅インゴット（精錬）
+
+![銅インゴット（精錬）](276_recipe_276.png)
+
+電解精錬。銅インゴット6個と、副産物のビスマスインゴット1個（2つめの出口）。実際のビスマスも、ほとんどが銅や鉛の精錬の副産物
+
+### ビスマス結晶ブロック
+
+![ビスマス結晶ブロック](288_bismuth_crystal_block.png)
+
+溶かしたビスマスをゆっくり冷ますと、階段状の骸晶が育ち、表面の酸化膜が虹色に光る
+
+### 発光ビスマス結晶
+
+![発光ビスマス結晶](289_glowing_bismuth_crystal.png)
+
+### 骨粉（凍結粉砕）
+
+![骨粉（凍結粉砕）](308_recipe_308.png)
+
+凍結粉砕: 液体窒素で冷やして脆くしてから砕く。作業台（3個）より多く取れる
+
+### ブレイズパウダー（凍結粉砕）
+
+![ブレイズパウダー（凍結粉砕）](309_recipe_309.png)
+
+凍結粉砕
+
+### 糸（凍結粉砕）
+
+![糸（凍結粉砕）](310_recipe_310.png)
+
+凍結粉砕で羊毛の繊維をほぐす
 
 ## 段階3　量子
 
@@ -598,740 +844,798 @@ Pリアクターの燃料
 
 ### 強化バックパックアップグレード
 
-![強化バックパックアップグレード](073_android_reinforced_backpack_upgrade.png)
+![強化バックパックアップグレード](075_android_reinforced_backpack_upgrade.png)
 
 アンドロイドの持ち物 +18スロット（バックパックの2段目）
 
 ### ヘリウム
 
-![ヘリウム](104_helium.png)
+![ヘリウム](106_helium.png)
 
 単位mB。玄武岩でも可（粉砕モード）
 
 ### 液体ヘリウム
 
-![液体ヘリウム](105_liquid_helium.png)
+![液体ヘリウム](107_liquid_helium.png)
 
 高さ10以上の冷却塔が必要
 
 ### データカード（量子データ片）
 
-![データカード（量子データ片）](106_data_card_quantum_fragment.png)
+![データカード（量子データ片）](108_data_card_quantum_fragment.png)
 
 ### 量子演算モジュール
 
-![量子演算モジュール](107_quantum_computing_module.png)
+![量子演算モジュール](109_quantum_computing_module.png)
 
 量子もつれ素子4個を1つの部品にまとめる
 
 ### 量子もつれ合成器
 
-![量子もつれ合成器](108_entanglement_synthesizer.png)
+![量子もつれ合成器](110_entanglement_synthesizer.png)
 
 ### 量子もつれ素子
 
-![量子もつれ素子](109_entangled_element.png)
+![量子もつれ素子](111_entangled_element.png)
 
 必ず2個1組で出る
 
 ### レーザー冷却器
 
-![レーザー冷却器](110_laser_cooler.png)
+![レーザー冷却器](112_laser_cooler.png)
 
 ### 冷却原子
 
-![冷却原子](111_cold_atoms.png)
+![冷却原子](113_cold_atoms.png)
 
 ### 光格子基板
 
-![光格子基板](112_optical_lattice_substrate.png)
+![光格子基板](114_optical_lattice_substrate.png)
 
 雷で溶けて固まった高純度の石英ガラスに、量子もつれ素子の光で格子を刻む
 
 ### BE凝縮触媒
 
-![BE凝縮触媒](113_bose_condensate_catalyst.png)
+![BE凝縮触媒](115_bose_condensate_catalyst.png)
 
 寿命30分。ミュオン触媒は失活品でも可
 
 ### 量子熱機関
 
-![量子熱機関](114_quantum_heat_engine.png)
+![量子熱機関](116_quantum_heat_engine.png)
 
 出力200 kFE/t。BE凝縮触媒を消費。1段下のミュオン触媒でも定格の25%（50 kFE/t）で仮運転できる。蓄電がいっぱいの間は待機して触媒を減らさない
 
 ### 重力波検出器
 
-![重力波検出器](115_gravitational_wave_detector.png)
+![重力波検出器](117_gravitational_wave_detector.png)
 
 隕鉄の重い試験質量を吊るし、ダイヤモンドの鏡で揺れを測る
 
 ### ニュートリノ・スキャナー
 
-![ニュートリノ・スキャナー](116_neutrino_scanner.png)
+![ニュートリノ・スキャナー](118_neutrino_scanner.png)
 
 ### ニュートリノ観測所
 
-![ニュートリノ観測所](117_neutrino_observatory.png)
+![ニュートリノ観測所](119_neutrino_observatory.png)
 
 電力で半径48を調べ続け、見つけた鉱石と遺構を近くの人に見せ続ける
 
 ### 慣性スタビライザー
 
-![慣性スタビライザー](118_inertial_stabilizer.png)
+![慣性スタビライザー](120_inertial_stabilizer.png)
 
 ### ケラウノス放電塔
 
-![ケラウノス放電塔](119_keraunos_tower.png)
+![ケラウノス放電塔](121_keraunos_tower.png)
 
 超伝導コイルで高電圧をため、16ブロック以内の避雷針へ人工の雷を撃つ。砂の上の避雷針なら雷ガラス塊ができる
 
 ### 深海圧力収集器
 
-![深海圧力収集器](120_deep_sea_collector.png)
+![深海圧力収集器](122_deep_sea_collector.png)
 
 水深16以上の海底に置くと、水圧で鉱物を押し固めて高圧結晶を作る（水深48で1分に1個）
 
 ### 重力パネル受電器
 
-![重力パネル受電器](121_gravity_panel_receiver.png)
+![重力パネル受電器](123_gravity_panel_receiver.png)
 
 ### 衝撃発電パネル
 
-![衝撃発電パネル](122_impact_generator_panel.png)
+![衝撃発電パネル](124_impact_generator_panel.png)
 
 上に落ちても落下ダメージなし。落ちた高さ1ブロックにつき1,000 FE をためて重力パネルへ配る
 
 ### 低重力パネル
 
-![低重力パネル](123_low_gravity_panel.png)
+![低重力パネル](125_low_gravity_panel.png)
 
 電力の届いたパネルに乗ると、次の着地まで重力×0.2
 
 ### 高重力パネル
 
-![高重力パネル](124_high_gravity_panel.png)
+![高重力パネル](126_high_gravity_panel.png)
 
 電力の届いたパネルに乗ると、次の着地まで重力×2.5
 
 ### 残響共鳴器
 
-![残響共鳴器](125_echo_resonator.png)
+![残響共鳴器](127_echo_resonator.png)
 
 稼働時4 kFE/t。型の残響の欠片の振動をスカルクに転写する
 
 ### 残響の欠片
 
-![残響の欠片](126_recipe_126.png)
+![残響の欠片](128_recipe_128.png)
 
 型の欠片は消費されず、使用回数を1減らして16回で割れる。できた欠片もまた型にできるので、材料があれば複製を続けられる
 
 ### 慣性制御ガントレット
 
-![慣性制御ガントレット](127_inertial_control_gauntlet.png)
+![慣性制御ガントレット](129_inertial_control_gauntlet.png)
 
 ### ミュオン触媒（リサイクル）
 
-![ミュオン触媒（リサイクル）](228_recipe_228.png)
+![ミュオン触媒（リサイクル）](230_recipe_230.png)
 
 ### 量子錠の鍵
 
-![量子錠の鍵](235_quantum_key.png)
+![量子錠の鍵](237_quantum_key.png)
 
 ### 封印コンテナ（量子錠）
 
-![封印コンテナ（量子錠）](239_sealed_container_2.png)
+![封印コンテナ（量子錠）](241_sealed_container_2.png)
+
+### エンダーパール（量子もつれ）
+
+![エンダーパール（量子もつれ）](269_recipe_269.png)
+
+もつれた粒子の片割れを封じた玉。投げると、もう片方の所（落ちた所）へ移る
+
+### ニホニウム
+
+![ニホニウム](277_nihonium.png)
+
+亜鉛とビスマスの原子核を融合させた113番元素。ふつうは一瞬で壊れるが、中性子の多い「安定の島」の同位体は残る。一辺16以上のリングが要る
+
+### ニホニウムインゴット
+
+![ニホニウムインゴット](278_nihonium_ingot.png)
+
+### 金インゴット（核変換）
+
+![金インゴット（核変換）](279_recipe_279.png)
+
+ビスマスに炭素の原子核をぶつけ、陽子を4つはぎ取って金に変える（1980年にシーボーグらが実際に行った核変換）
+
+### ニホニウム板
+
+![ニホニウム板](280_nihonium_plate.png)
+
+### ニホニウム筐体
+
+![ニホニウム筐体](281_nihonium_frame.png)
+
+段階4〜5の高度な装置の筐体。重く放射線に強いニホニウムの板で、基礎フレームを包む
 
 ## 段階4　時間
 
 ### 工場式印刷ユニット
 
-![工場式印刷ユニット](070_android_factory_print_unit.png)
+![工場式印刷ユニット](072_android_factory_print_unit.png)
 
 組立ステーションの印刷ユニットのスロットに積む。印刷の時間と電力が半分、修理が2倍速
 
 ### 大型バックパックアップグレード
 
-![大型バックパックアップグレード](074_android_large_backpack_upgrade.png)
+![大型バックパックアップグレード](076_android_large_backpack_upgrade.png)
 
 アンドロイドの持ち物 +24スロット（バックパックの3段目）
 
 ### 圧縮ブロックLv2
 
-![圧縮ブロックLv2](128_compressed_block_2.png)
+![圧縮ブロックLv2](130_compressed_block_2.png)
 
 質量値81
 
 ### 圧縮ブロックLv3
 
-![圧縮ブロックLv3](129_compressed_block_3.png)
+![圧縮ブロックLv3](131_compressed_block_3.png)
 
 質量値729
 
 ### 縮退圧縮炉コントローラ
 
-![縮退圧縮炉コントローラ](130_degenerate_compactor_controller.png)
+![縮退圧縮炉コントローラ](132_degenerate_compactor_controller.png)
 
 ### 縮退圧縮炉フレーム
 
-![縮退圧縮炉フレーム](131_degenerate_compactor_frame.png)
+![縮退圧縮炉フレーム](133_degenerate_compactor_frame.png)
 
 ### 縮退圧縮炉装甲板
 
-![縮退圧縮炉装甲板](132_degenerate_compactor_plate.png)
+![縮退圧縮炉装甲板](134_degenerate_compactor_plate.png)
 
 ### 縮退圧縮炉ラム
 
-![縮退圧縮炉ラム](133_degenerate_compactor_ram.png)
+![縮退圧縮炉ラム](135_degenerate_compactor_ram.png)
 
 ### 縮退圧縮炉アンビル
 
-![縮退圧縮炉アンビル](134_degenerate_compactor_anvil.png)
+![縮退圧縮炉アンビル](136_degenerate_compactor_anvil.png)
 
 高圧結晶を受け面にはめた金床（ダイヤモンド・アンビル・セルの大型版）
 
 ### 縮退圧縮炉冷却口
 
-![縮退圧縮炉冷却口](135_degenerate_compactor_vent.png)
+![縮退圧縮炉冷却口](137_degenerate_compactor_vent.png)
 
 ### 縮退圧縮炉観察窓
 
-![縮退圧縮炉観察窓](136_degenerate_compactor_window.png)
+![縮退圧縮炉観察窓](138_degenerate_compactor_window.png)
 
 ### 縮退圧縮炉
 
-![縮退圧縮炉](137_degenerate_compactor.png)
+![縮退圧縮炉](139_degenerate_compactor.png)
 
 5×5×5の閉じたプレス。天面のラムが底のアンビルへ打ち下ろす
 
 ### 金属圧縮ブロックLv1
 
-![金属圧縮ブロックLv1](138_compressed_metal_block_1.png)
+![金属圧縮ブロックLv1](140_compressed_metal_block_1.png)
 
 質量値9ぶんの金属ブロック（鉄・銅・金・他modの金属タグ）。鉄ブロックなら3個
 
 ### 金属圧縮ブロックLv2
 
-![金属圧縮ブロックLv2](139_compressed_metal_block_2.png)
+![金属圧縮ブロックLv2](141_compressed_metal_block_2.png)
 
 質量値81。重力崩壊の「鉄の核」
 
 ### 圧縮ブロックLv2（混成）
 
-![圧縮ブロックLv2（混成）](140_compressed_block_2_mixed.png)
+![圧縮ブロックLv2（混成）](142_compressed_block_2_mixed.png)
 
 成果物は圧縮ブロックLv2。材料のLv1が3種類以上の元ブロックから作られているときだけ8個で済む（Lv2段だけ・約11%節約）
 
 ### 縮退前駆体
 
-![縮退前駆体](141_degenerate_precursor.png)
+![縮退前駆体](143_degenerate_precursor.png)
 
 高圧結晶を種にして、圧縮ブロックLv2を縮退の手前まで押し固めたもの（質量値486）。殻の岩石を減らす
 
 ### 縮退物質殻
 
-![縮退物質殻](142_degenerate_matter_shell.png)
+![縮退物質殻](144_degenerate_matter_shell.png)
 
 質量値約5,000。金属の核がないと崩壊が始まらない。前駆体の結晶が崩壊をそろえるので、量子もつれ素子は要らない。圧縮熱を液体窒素で除去（質量1あたり約1 mB）
 
 ### 縮退物質殻（ストレンジ物質）
 
-![縮退物質殻（ストレンジ物質）](143_recipe_143.png)
+![縮退物質殻（ストレンジ物質）](145_recipe_145.png)
 
 ストレンジ物質（質量値100）はすでに縮退しているので、液体窒素が半分で済む
 
 ### 鏡面プレート
 
-![鏡面プレート](144_mirror_plate.png)
+![鏡面プレート](146_mirror_plate.png)
 
 ### C空洞コントローラ
 
-![C空洞コントローラ](145_casimir_cavity_controller.png)
+![C空洞コントローラ](147_casimir_cavity_controller.png)
 
 ### C空洞フレーム
 
-![C空洞フレーム](146_casimir_cavity_frame.png)
+![C空洞フレーム](148_casimir_cavity_frame.png)
 
 ### C空洞真空ポンプ
 
-![C空洞真空ポンプ](147_casimir_cavity_pump.png)
+![C空洞真空ポンプ](149_casimir_cavity_pump.png)
 
 ### C空洞容器壁
 
-![C空洞容器壁](148_casimir_cavity_wall.png)
+![C空洞容器壁](150_casimir_cavity_wall.png)
 
 ### C空洞磁気シールド
 
-![C空洞磁気シールド](149_casimir_cavity_shield.png)
+![C空洞磁気シールド](151_casimir_cavity_shield.png)
 
 ### C空洞観察窓
 
-![C空洞観察窓](150_casimir_cavity_window.png)
+![C空洞観察窓](152_casimir_cavity_window.png)
 
 ### C空洞
 
-![C空洞](151_casimir_cavity.png)
+![C空洞](153_casimir_cavity.png)
 
 5×5×5の真空容器。天面と底面の内側に向かい合う2枚の鏡面
 
 ### アクシオン凝縮体
 
-![アクシオン凝縮体](152_axion_condensate.png)
+![アクシオン凝縮体](154_axion_condensate.png)
 
 単位mB。強磁場モード（入力なし）
 
 ### データカード（培養データ）
 
-![データカード（培養データ）](153_data_card_culture_data.png)
+![データカード（培養データ）](155_data_card_culture_data.png)
 
 ### 時間結晶育成槽
 
-![時間結晶育成槽](154_time_crystal_incubator.png)
+![時間結晶育成槽](156_time_crystal_incubator.png)
 
 ### 位相同期板
 
-![位相同期板](155_phase_sync_plate.png)
+![位相同期板](157_phase_sync_plate.png)
 
 冷却原子の振動を光格子に写した板。時間結晶の振動の位相をそろえ、育成を早める
 
 ### 時間結晶触媒
 
-![時間結晶触媒](156_time_crystal_catalyst.png)
+![時間結晶触媒](158_time_crystal_catalyst.png)
 
 寿命45分。位相同期板のおかげで育成12分。育成槽1台で触媒を使う装置3台を回せる。設備の材料には時間結晶モジュールに加工して使う
 
 ### エキゾチック物質
 
-![エキゾチック物質](157_exotic_matter.png)
+![エキゾチック物質](159_exotic_matter.png)
 
 時間結晶触媒をスロットで2分ぶん消耗。ネザースターは人工星核でも可（タグ singulo:star_core）
 
 ### 縮退熱炉フレーム
 
-![縮退熱炉フレーム](158_degenerate_furnace_frame.png)
+![縮退熱炉フレーム](160_degenerate_furnace_frame.png)
 
 ### 縮退熱炉外装板
 
-![縮退熱炉外装板](159_degenerate_furnace_shell.png)
+![縮退熱炉外装板](161_degenerate_furnace_shell.png)
 
 ### 縮退熱炉ピストン部
 
-![縮退熱炉ピストン部](160_degenerate_furnace_piston.png)
+![縮退熱炉ピストン部](162_degenerate_furnace_piston.png)
 
 ### 縮退熱炉放熱フィン
 
-![縮退熱炉放熱フィン](161_degenerate_furnace_fin.png)
+![縮退熱炉放熱フィン](163_degenerate_furnace_fin.png)
 
 ### 縮退熱炉熱交換管
 
-![縮退熱炉熱交換管](162_degenerate_furnace_tube.png)
+![縮退熱炉熱交換管](164_degenerate_furnace_tube.png)
 
 ### 縮退熱炉観察窓
 
-![縮退熱炉観察窓](163_degenerate_furnace_window.png)
+![縮退熱炉観察窓](165_degenerate_furnace_window.png)
 
 ### 縮退熱炉コントローラ
 
-![縮退熱炉コントローラ](164_degenerate_furnace_controller.png)
+![縮退熱炉コントローラ](166_degenerate_furnace_controller.png)
 
 ### 縮退熱炉
 
-![縮退熱炉](165_degenerate_furnace.png)
+![縮退熱炉](167_degenerate_furnace.png)
 
 5×5×7の閉じた炉。出力5 MFE/t（1段下のBE凝縮触媒なら25%の1.25 MFE/t）、燃料は圧縮ブロックLv2、時間結晶触媒を消費。蓄電がいっぱいの間は待機する。外装板はマルチブロック搬入出ポートに替えられる
 
 ### トポロジカル導線
 
-![トポロジカル導線](166_topological_wire.png)
+![トポロジカル導線](168_topological_wire.png)
 
 送電100 MFE/t、損失ゼロ
 
 ### トロイダル磁気コイル
 
-![トロイダル磁気コイル](167_toroidal_magnetic_coil.png)
+![トロイダル磁気コイル](169_toroidal_magnetic_coil.png)
 
 トポロジカル導線8本を巻いたドーナツ型のコイル
 
 ### SMESモジュール
 
-![SMESモジュール](168_smes_module.png)
+![SMESモジュール](170_smes_module.png)
 
 2 GFE蓄電
 
 ### 自動探査機ステーション
 
-![自動探査機ステーション](169_probe_station.png)
+![自動探査機ステーション](171_probe_station.png)
 
 ### 虚空捕集器
 
-![虚空捕集器](170_void_collector.png)
+![虚空捕集器](172_void_collector.png)
 
 ジ・エンドで、真下が奈落まで空いている所に置くと、虚空から湧く塵を集める（1分に1個）
 
 ### 磁気瓶
 
-![磁気瓶](171_magnetic_bottle.png)
+![磁気瓶](173_magnetic_bottle.png)
 
 ### BE凝縮触媒（リサイクル）
 
-![BE凝縮触媒（リサイクル）](229_recipe_229.png)
+![BE凝縮触媒（リサイクル）](231_recipe_231.png)
 
 ### ニュートリノ感度モジュール（Mk2）
 
-![ニュートリノ感度モジュール（Mk2）](232_scanner_module_2.png)
+![ニュートリノ感度モジュール（Mk2）](234_scanner_module_2.png)
 
 段階2: 金・ダイヤモンド・エメラルドが映る
 
 ### 時間錠の鍵
 
-![時間錠の鍵](236_temporal_key.png)
+![時間錠の鍵](238_temporal_key.png)
 
 ### 封印コンテナ（時間錠）
 
-![封印コンテナ（時間錠）](240_sealed_container_3.png)
+![封印コンテナ（時間錠）](242_sealed_container_3.png)
 
 ### 時間結晶モジュール
 
-![時間結晶モジュール](242_time_crystal_module.png)
+![時間結晶モジュール](244_time_crystal_module.png)
 
 時間結晶触媒の寿命の2/3（既定の寿命45分なら30分）を切り出して封じた、重ねられる部品。炉心制御装置・特異点封入台などの設備に使う。触媒は触媒枠へ。新品の寿命の2/3以上が残っている触媒だけ使え、残りの寿命は触媒のまま戻る。寿命の設定を変えると必要量も比例して変わる
+
+### ダイヤモンド（縮退）
+
+![ダイヤモンド（縮退）](270_recipe_270.png)
+
+高い圧力で、炭素がダイヤモンドに変わる
+
+### 石炭（時間）
+
+![石炭（時間）](271_recipe_271.png)
+
+何百万年もかかる石炭化を早送りする
+
+### 苔むした丸石（時間）
+
+![苔むした丸石（時間）](272_recipe_272.png)
+
+年月を早送りして苔を生やす
+
+### 錆びた銅（時間）
+
+![錆びた銅（時間）](273_recipe_273.png)
+
+年月を早送りして錆びさせる
 
 ## 段階5　特異点
 
 ### ホライズン・バス
 
-![ホライズン・バス](172_horizon_bus.png)
+![ホライズン・バス](174_horizon_bus.png)
 
 送電量は実質無制限（Singulo の装置どうしは長整数で受け渡す。他modの装置へは1回 約21億FE/tまで）、損失ゼロ。網の上限は最も細いケーブルで決まる
 
 ### 炉殻ブロック
 
-![炉殻ブロック](173_reactor_shell.png)
+![炉殻ブロック](175_reactor_shell.png)
 
 殻1個を24枚の炉殻に成形（点火までに殻は炉殻用6個＋特異点の種用1個）
 
 ### ジャイロ駆動部
 
-![ジャイロ駆動部](174_gyro_drive.png)
+![ジャイロ駆動部](176_gyro_drive.png)
+
+ニホニウムの耐圧の支えと、隕鉄の磁極で回す
 
 ### 抽出ポート
 
-![抽出ポート](175_extraction_port.png)
+![抽出ポート](177_extraction_port.png)
 
 ### 重力場安定化ユニット
 
-![重力場安定化ユニット](176_gravity_field_stabilizer.png)
+![重力場安定化ユニット](178_gravity_field_stabilizer.png)
 
 エキゾチック物質で局所の重力場を固定する部品
 
 ### 炉心制御装置
 
-![炉心制御装置](177_core_controller.png)
+![炉心制御装置](179_core_controller.png)
 
 ### 炉心安定化コイル
 
-![炉心安定化コイル](178_reactor_stabilizer.png)
+![炉心安定化コイル](180_reactor_stabilizer.png)
 
 ### 炉心質量警報器
 
-![炉心質量警報器](179_reactor_mass_alarm.png)
+![炉心質量警報器](181_reactor_mass_alarm.png)
 
 炉殻の代わりにリングのどこにでも置ける。炉心の質量が上限に達すると赤石信号を出す
 
 ### Pリアクター
 
-![Pリアクター](180_penrose_reactor.png)
+![Pリアクター](182_penrose_reactor.png)
 
 13×13×13。直交するリング3本。交点6か所にジャイロ、斜め45°の12か所に安定化コイル。抽出ポートと警報器は炉殻の代わりにどこにでも置ける
 
 ### 磁気閉じ込め環
 
-![磁気閉じ込め環](181_confinement_ring.png)
+![磁気閉じ込め環](183_confinement_ring.png)
 
 ブラックホールや特異点を、磁場の檻に閉じ込める環。隕鉄の芯で磁束を集める
 
 ### 空のBH格納容器
 
-![空のBH格納容器](182_bh_container.png)
+![空のBH格納容器](184_bh_container.png)
 
 ### 小型BH格納容器
 
-![小型BH格納容器](183_micro_black_hole.png)
+![小型BH格納容器](185_micro_black_hole.png)
 
 小さなブラックホールを閉じ込めた容器。爆弾やマニピュレーターの材料
 
 ### ブラックホール爆弾
 
-![ブラックホール爆弾](184_black_hole_bomb.png)
+![ブラックホール爆弾](186_black_hole_bomb.png)
 
 投げると、当たった所に6秒ほど小さなブラックホールが開く
 
 ### Hコレクター
 
-![Hコレクター](185_hawking_collector.png)
+![Hコレクター](187_hawking_collector.png)
 
 ### ジェット・コレクター
 
-![ジェット・コレクター](186_jet_collector.png)
+![ジェット・コレクター](188_jet_collector.png)
 
 ### エルゴスフィア・リング
 
-![エルゴスフィア・リング](187_ergosphere_ring.png)
+![エルゴスフィア・リング](189_ergosphere_ring.png)
 
 ### ジェット凝縮体
 
-![ジェット凝縮体](188_jet_condensate.png)
+![ジェット凝縮体](190_jet_condensate.png)
 
 発電中、ジェット・コレクター1基につき1分に1個。発電は止めない
 
 ### 人工星核
 
-![人工星核](189_artificial_star_core.png)
+![人工星核](191_artificial_star_core.png)
 
 ネザースターの代わりになる（タグ singulo:star_core）。点火後に作れる
 
 ### H凝縮体
 
-![H凝縮体](190_hawking_condensate.png)
+![H凝縮体](192_hawking_condensate.png)
 
 炉心質量150〜500（点火直後から）で5分に1個
 
 ### 特異点封入台
 
-![特異点封入台](191_singularity_encapsulator.png)
+![特異点封入台](193_singularity_encapsulator.png)
 
 ### 特異点の種
 
-![特異点の種](192_singularity_seed.png)
+![特異点の種](194_singularity_seed.png)
 
 最初の点火に使う一回限りの素材。休眠状態を縮退物質殻で包んで目覚めさせる
 
 ### シンギュラリティ・コア
 
-![シンギュラリティ・コア](193_singularity_core.png)
+![シンギュラリティ・コア](195_singularity_core.png)
 
 寿命60分。装置に埋め込むと永続。ネザースターは人工星核でも可
 
 ### ハロー捕集器
 
-![ハロー捕集器](194_halo_collector.png)
+![ハロー捕集器](196_halo_collector.png)
 
 ダークマター（WIMP）を回収
 
 ### ダークマター
 
-![ダークマター](195_dark_matter.png)
+![ダークマター](197_dark_matter.png)
 
 炉心から16ブロック以内。炉心質量100ごとに毎秒1 mB
 
 ### 重力閉じ込めタンク
 
-![重力閉じ込めタンク](196_gravitational_containment_tank.png)
+![重力閉じ込めタンク](198_gravitational_containment_tank.png)
 
 ### シールド許可証
 
-![シールド許可証](197_shield_permit.png)
+![シールド許可証](199_shield_permit.png)
 
 シールド発生塔の許可証スロットに入れると、守りの中で設置・破壊・取り出しができるのは登録した人だけになる
 
 ### シールド発生塔コア
 
-![シールド発生塔コア](198_shield_tower_core.png)
+![シールド発生塔コア](200_shield_tower_core.png)
 
 ### シールド発生塔基壇
 
-![シールド発生塔基壇](199_shield_tower_plinth.png)
+![シールド発生塔基壇](201_shield_tower_plinth.png)
 
 ### シールド発生塔電力コイル
 
-![シールド発生塔電力コイル](200_shield_tower_coil.png)
+![シールド発生塔電力コイル](202_shield_tower_coil.png)
 
 ### シールド発生塔本体
 
-![シールド発生塔本体](201_shield_tower_body.png)
+![シールド発生塔本体](203_shield_tower_body.png)
 
 ### シールド発生塔導波管
 
-![シールド発生塔導波管](202_shield_tower_waveguide.png)
+![シールド発生塔導波管](204_shield_tower_waveguide.png)
 
 ### シールド発生塔放射冠
 
-![シールド発生塔放射冠](203_shield_tower_crown.png)
+![シールド発生塔放射冠](205_shield_tower_crown.png)
 
 ### イベントホライズン・シールド発生塔
 
-![イベントホライズン・シールド発生塔](204_event_horizon_shield.png)
+![イベントホライズン・シールド発生塔](206_event_horizon_shield.png)
 
 5×5の基壇から尖塔へすぼまる高さ9の塔
 
 ### ワールドライン・アンカー（上位）
 
-![ワールドライン・アンカー（上位）](205_worldline_anchor_advanced.png)
+![ワールドライン・アンカー（上位）](207_worldline_anchor_advanced.png)
 
 ### メトリック・ドライブ
 
-![メトリック・ドライブ](206_metric_drive.png)
+![メトリック・ドライブ](208_metric_drive.png)
 
 ### グラビトン・マニピュレーター
 
-![グラビトン・マニピュレーター](207_graviton_manipulator.png)
+![グラビトン・マニピュレーター](209_graviton_manipulator.png)
 
 ### Tコア
 
-![Tコア](208_tipler_core.png)
+![Tコア](210_tipler_core.png)
 
 ### Tシリンダーフレーム
 
-![Tシリンダーフレーム](209_tipler_frame.png)
+![Tシリンダーフレーム](211_tipler_frame.png)
 
 ### Tシリンダー外殻
 
-![Tシリンダー外殻](210_tipler_housing.png)
+![Tシリンダー外殻](212_tipler_housing.png)
 
 ### Tシリンダー軸受
 
-![Tシリンダー軸受](211_tipler_bearing.png)
+![Tシリンダー軸受](213_tipler_bearing.png)
 
 ### Tシリンダー観察窓
 
-![Tシリンダー観察窓](212_tipler_window.png)
+![Tシリンダー観察窓](214_tipler_window.png)
 
 ### Tシリンダー時間結晶ホルダー
 
-![Tシリンダー時間結晶ホルダー](213_tipler_holder.png)
+![Tシリンダー時間結晶ホルダー](215_tipler_holder.png)
 
 ### Tシリンダー
 
-![Tシリンダー](214_tipler_cylinder.png)
+![Tシリンダー](216_tipler_cylinder.png)
 
 5×5×9の格納筒。中で円柱が回る
 
 ### ワームホール生成器コア
 
-![ワームホール生成器コア](215_wormhole_generator_core.png)
+![ワームホール生成器コア](217_wormhole_generator_core.png)
 
 ### ワームホール生成器外殻
 
-![ワームホール生成器外殻](216_wormhole_generator_shell.png)
+![ワームホール生成器外殻](218_wormhole_generator_shell.png)
 
 ### ワームホール生成器場コイル
 
-![ワームホール生成器場コイル](217_wormhole_generator_coil.png)
+![ワームホール生成器場コイル](219_wormhole_generator_coil.png)
 
 ### ワームホール生成器収束器
 
-![ワームホール生成器収束器](218_wormhole_generator_focuser.png)
+![ワームホール生成器収束器](220_wormhole_generator_focuser.png)
 
 ### ワームホール生成器観察窓
 
-![ワームホール生成器観察窓](219_wormhole_generator_window.png)
+![ワームホール生成器観察窓](221_wormhole_generator_window.png)
 
 ### ワームホール生成器ポート
 
-![ワームホール生成器ポート](220_wormhole_generator_port.png)
+![ワームホール生成器ポート](222_wormhole_generator_port.png)
 
 生成器の外殻の代わりに置く受電・搬出口
 
 ### ワームホール生成器
 
-![ワームホール生成器](221_wormhole_generator.png)
+![ワームホール生成器](223_wormhole_generator.png)
 
 5×5×5の球。外殻の代わりにマルチブロック搬入出ポートを置くと、電力を入れ、できた口を押し出す
 
 ### 不安定なワームホールの口
 
-![不安定なワームホールの口](222_unstable_wormhole_mouth.png)
+![不安定なワームホールの口](224_unstable_wormhole_mouth.png)
 
 一対で生まれる。60秒以内に固定化しないと消える
 
 ### ワームホールの口の筐体
 
-![ワームホールの口の筐体](223_wormhole_mouth_casing.png)
+![ワームホールの口の筐体](225_wormhole_mouth_casing.png)
 
 内張りの虚空の塵が、固定化した喉のまわりの空間を落ち着かせる
 
 ### ワームホールの口
 
-![ワームホールの口](224_wormhole_mouth.png)
+![ワームホールの口](226_wormhole_mouth.png)
 
 ### ワームホール固定化装置
 
-![ワームホール固定化装置](225_wormhole_stabilizer.png)
+![ワームホール固定化装置](227_wormhole_stabilizer.png)
 
 ### ワームホール・ポート
 
-![ワームホール・ポート](226_wormhole_port.png)
+![ワームホール・ポート](228_wormhole_port.png)
 
 ### 時間結晶触媒（リサイクル）
 
-![時間結晶触媒（リサイクル）](230_recipe_230.png)
+![時間結晶触媒（リサイクル）](232_recipe_232.png)
 
 ### ニュートリノ感度モジュール（Mk3）
 
-![ニュートリノ感度モジュール（Mk3）](233_scanner_module_3.png)
+![ニュートリノ感度モジュール（Mk3）](235_scanner_module_3.png)
 
 段階3: 古代の残骸と、ダイヤモンドのツルハシが要る鉱石が映る
 
 ### 特異点錠の鍵
 
-![特異点錠の鍵](237_singularity_key.png)
+![特異点錠の鍵](239_singularity_key.png)
 
 ### 封印コンテナ（特異点錠）
 
-![封印コンテナ（特異点錠）](241_sealed_container_4.png)
+![封印コンテナ（特異点錠）](243_sealed_container_4.png)
 
 ### 覚醒の記録核
 
-![覚醒の記録核](246_awakening_record_core.png)
+![覚醒の記録核](248_awakening_record_core.png)
 
 最終実験施設の封印コンソールで使うと、覚醒したホライズン・ウォーデンと再戦できる。勝つとオーバークロック・チップ2・エキゾチック物質8・H凝縮体2。挑戦をやめると記録核は戻る
 
 ### 覚醒の残響核
 
-![覚醒の残響核](247_awakening_echo_core.png)
+![覚醒の残響核](249_awakening_echo_core.png)
 
 研究棟の封印核で使うと、覚醒した残響の番人と再戦できる。勝つと通常のドロップに加えてオーバークロック・チップ1・番人の投影核2・クリスタルメモリ2。挑戦をやめると覚醒核は戻る
 
 ### 覚醒の重力核
 
-![覚醒の重力核](248_awakening_gravity_core.png)
+![覚醒の重力核](250_awakening_gravity_core.png)
 
 封鎖培養施設の封印核で使うと、覚醒した重力の澱と再戦できる。勝つと通常のドロップに加えてオーバークロック・チップ1・縮退核2・エキゾチック物質4。挑戦をやめると覚醒核は戻る
 
 ### 覚醒の製造核
 
-![覚醒の製造核](249_awakening_foundry_core.png)
+![覚醒の製造核](251_awakening_foundry_core.png)
 
 地下アンドロイド研究所の封印核で使うと、覚醒したファウンドリと再戦できる。勝つと通常のドロップに加えてオーバークロック・チップ1・精密アクチュエーター3・アンドロイドキット2。挑戦をやめると覚醒核は戻る
 
 ### 覚醒の渦核
 
-![覚醒の渦核](250_awakening_ergosphere_core.png)
+![覚醒の渦核](252_awakening_ergosphere_core.png)
 
 沈んだ炉心区画の封印核で使うと、覚醒したエルゴ球の大蛇と再戦できる。勝つと通常のドロップに加えてオーバークロック・チップ2・ジェット凝縮体4・エキゾチック物質6。挑戦をやめると覚醒核は戻る
 
 ### 終焉の記録
 
-![終焉の記録](251_terminus_record.png)
+![終焉の記録](253_terminus_record.png)
 
 最終実験施設の封印コンソールで使うと、最後の記録者が目覚める。挑戦をやめると記録は戻る
 
 ### 創世炉の核
 
-![創世炉の核](252_genesis_core.png)
+![創世炉の核](254_genesis_core.png)
 
 枠8と柱12（4本×3段）で囲むと形ができる。原初の種を使い、1.5 TFE を注ぐと、宇宙の誕生が始まる
 
 ### 創世炉の枠
 
-![創世炉の枠](253_genesis_frame.png)
+![創世炉の枠](255_genesis_frame.png)
 
 ### 創世炉の柱
 
-![創世炉の柱](254_genesis_pylon.png)
+![創世炉の柱](256_genesis_pylon.png)
 
 ### 原初の種
 
-![原初の種](255_primordial_seed.png)
+![原初の種](257_primordial_seed.png)
 
 創世炉の核に使うと、宇宙の誕生が始まる。渦の断章（エルゴ球の大蛇が落とす）が要る

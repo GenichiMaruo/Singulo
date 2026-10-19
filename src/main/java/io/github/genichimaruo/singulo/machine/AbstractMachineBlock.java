@@ -117,6 +117,12 @@ public abstract class AbstractMachineBlock extends BaseEntityBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
+        // 液体の容器（バケツ・冷媒カートリッジ）: タンクを持つブロックなら、直接出し入れする（加工装置は MachineBlock が受け持つ）
+        if (!(this instanceof MachineBlock) && net.neoforged.neoforge.fluids.FluidUtil.getFluidHandler(stack).isPresent()
+                && level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, pos, hit.getDirection()) != null
+                && net.neoforged.neoforge.fluids.FluidUtil.interactWithFluidHandler(player, hand, level, pos, hit.getDirection())) {
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
         // クライアントは素通しし、使うかどうかはサーバーが決める（使わなければ通常どおりGUIを開く）
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof MenuOpener opener && opener.useItem(serverPlayer, stack, hand)) {

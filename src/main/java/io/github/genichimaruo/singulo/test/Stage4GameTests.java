@@ -102,13 +102,13 @@ public final class Stage4GameTests {
         m.items().setStackInSlot(0, new ItemStack(item("compressed_block_3"), 4));
         m.items().setStackInSlot(1, new ItemStack(item("degenerate_precursor"), 4));
         m.items().setStackInSlot(2, new ItemStack(item("compressed_metal_block_2"), 1));
-        m.automationFluids().fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 6000), IFluidHandler.FluidAction.EXECUTE);
+        m.automationFluids().fill(new FluidStack(SinguloFluids.get("liquid_nitrogen"), 1200), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
             helper.assertTrue(m.structureSize() == 5, "5×5×5 として形成されない");
             helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).is(item("degenerate_matter_shell")),
                     "縮退物質殻ができない");
             helper.assertTrue(drainable(m.automationFluids(), "liquid_nitrogen") == 0
-                    && m.automationFluids().getFluidInTank(0).isEmpty(), "圧縮熱の除去に液体窒素6000 mBを使っていない");
+                    && m.automationFluids().getFluidInTank(0).isEmpty(), "圧縮熱の除去に液体窒素1200 mBを使っていない");
         });
     }
 
@@ -171,6 +171,22 @@ public final class Stage4GameTests {
             int life = UsesHelper.get(out).max();
             int full = 45 * 60 * 20;
             helper.assertTrue(Math.abs(life - full / 2) <= full / 20, "純度約50%で寿命が半分にならない: " + life + " / " + full);
+        });
+    }
+
+    /** 触媒でない物の時間加工（銅ブロック → 錆びた銅）は、電力が少しずつしか来なければ進まない（触媒の育成だけが不足でも進む）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 600)
+    public static void incubatorNeedsFullPowerForPlainItems(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.TIME_CRYSTAL_INCUBATOR).get());
+        MachineBlockEntity m = helper.getBlockEntity(pos);
+        m.energy().setEnergy(0);
+        m.items().setStackInSlot(0, new ItemStack(Items.COPPER_BLOCK));
+        helper.onEachTick(() -> m.energy().setEnergy(1));
+        helper.runAtTickTime(500, () -> {
+            helper.assertTrue(m.items().getStackInSlot(m.type().outputSlot()).isEmpty(), "1 FE/t で錆びた銅ができてしまう");
+            helper.assertTrue(m.items().getStackInSlot(0).is(Items.COPPER_BLOCK), "銅ブロックが減る");
+            helper.succeed();
         });
     }
 

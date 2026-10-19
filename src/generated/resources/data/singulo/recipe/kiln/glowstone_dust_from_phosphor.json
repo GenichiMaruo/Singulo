@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 1,
+  "time": 100,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:unfired_phosphor"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:glowstone_dust",
+    "count": 4
+  }
+}

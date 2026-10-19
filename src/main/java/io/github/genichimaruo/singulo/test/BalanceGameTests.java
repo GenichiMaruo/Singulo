@@ -65,7 +65,7 @@ public final class BalanceGameTests {
     public static void coreControllerFromModulesByNormalInsertion(GameTestHelper helper) {
         MachineBlockEntity m = assembler(helper, new BlockPos(2, 1, 2));
         IItemHandler auto = m.automationItems();
-        insert(helper, auto, new ItemStack(item("basic_frame")));
+        insert(helper, auto, new ItemStack(item("nihonium_frame")));
         insert(helper, auto, new ItemStack(item("quantum_computing_module"), 2));
         insert(helper, auto, new ItemStack(item("time_crystal_module"), 4));
         insert(helper, auto, new ItemStack(item("gravity_field_stabilizer"), 2));
@@ -222,19 +222,19 @@ public final class BalanceGameTests {
         helper.succeed();
     }
 
-    /** SNG-025: shellCoolantMb はストレンジ物質版にも（半分として）効く。0 なら窒素は要らない。 */
+    /** SNG-025: shellNitrogenMb はストレンジ物質版にも（半分として）効く。0 なら窒素は要らない。 */
     @GameTest(template = EMPTY, batch = "balance_strange")
     public static void zeroShellCoolantAppliesToAlternative(GameTestHelper helper) {
-        int old = ServerConfig.SHELL_COOLANT_MB.get();
+        int old = ServerConfig.SHELL_NITROGEN_MB.get();
         try {
-            ServerConfig.SHELL_COOLANT_MB.set(0);
+            ServerConfig.SHELL_NITROGEN_MB.set(0);
             helper.assertTrue(adjusted(helper, "degenerate_compactor/degenerate_matter_shell_from_strange_matter").fluidIngredients().isEmpty(),
-                    "shellCoolantMb=0 でもストレンジ物質版に窒素が要る");
-            ServerConfig.SHELL_COOLANT_MB.set(4000);
+                    "shellNitrogenMb=0 でもストレンジ物質版に窒素が要る");
+            ServerConfig.SHELL_NITROGEN_MB.set(4000);
             helper.assertTrue(nitrogen(adjusted(helper, "degenerate_compactor/degenerate_matter_shell_from_strange_matter")) == 2000,
-                    "shellCoolantMb=4000 でストレンジ物質版が半分の2000 mBにならない");
+                    "shellNitrogenMb=4000 でストレンジ物質版が半分の2000 mBにならない");
         } finally {
-            ServerConfig.SHELL_COOLANT_MB.set(old);
+            ServerConfig.SHELL_NITROGEN_MB.set(old);
             RecipeTweaks.invalidate();
         }
         helper.succeed();

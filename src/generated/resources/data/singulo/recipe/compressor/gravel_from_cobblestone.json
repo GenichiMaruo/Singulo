@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 20,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "c:cobblestones/normal"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:gravel",
+    "count": 1
+  }
+}

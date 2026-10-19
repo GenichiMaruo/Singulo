@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 80,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:packed_ice"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "minecraft:blue_ice",
+    "count": 1
+  }
+}

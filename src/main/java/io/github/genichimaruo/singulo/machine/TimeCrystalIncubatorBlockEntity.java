@@ -11,8 +11,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * 時間結晶育成槽。育成は実際に動いた tick で進み（チャンクが読み込まれている間だけ）、電力が足りなくてもある分で進む。
+ * 時間結晶育成槽。育成は実際に動いた tick で進み（チャンクが読み込まれている間だけ）、触媒の育成は電力が足りなくてもある分で進む。
  * ただし要求の80%を割った tick の割合だけ純度が下がり、できた触媒の寿命もその割合になる（純度50%なら寿命も半分）。
+ * 石炭化・苔・錆のような、触媒でない物の時間加工は、ほかの装置と同じく電力が全部そろわないと進まない。
  */
 public class TimeCrystalIncubatorBlockEntity extends MachineBlockEntity {
     public TimeCrystalIncubatorBlockEntity(BlockPos pos, BlockState state) {
@@ -20,8 +21,8 @@ public class TimeCrystalIncubatorBlockEntity extends MachineBlockEntity {
     }
 
     @Override
-    protected boolean runsUnderpowered() {
-        return true;
+    protected boolean runsUnderpowered(MachineRecipe recipe) {
+        return recipe.result().getItem() instanceof UsesItem uses && uses.isCatalyst();
     }
 
     @Override

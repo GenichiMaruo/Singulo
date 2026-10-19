@@ -16,6 +16,12 @@ public final class PortLinks {
     /** 見つかったポートにつなぎ直す（形成できていなければ空の一覧を渡す）。変わったら true。 */
     public boolean update(Level level, BlockPos controller, List<BlockPos> found) {
         if (found.equals(ports)) {
+            // 同じ位置でも、ポートを壊して置き直すと新しいポートはつながっていない。つながっていないものだけ付け直す
+            for (BlockPos p : found) {
+                if (level.isLoaded(p) && level.getBlockEntity(p) instanceof PortBlockEntity port && !controller.equals(port.controllerPos())) {
+                    port.link(controller);
+                }
+            }
             return false;
         }
         link(level, ports, null);

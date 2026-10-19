@@ -119,6 +119,144 @@ public final class SinguloGameTests {
         });
     }
 
+    /** 圧縮機で方解石を砕くと石灰粉が2個。石灰粉はセラミックの骨粉の代わり（タグ singulo:ceramic_flux）になる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void compressorCrushesCalciteIntoLimestonePowder(GameTestHelper helper) {
+        MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
+        compressor.items().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.CALCITE));
+        helper.assertTrue(new ItemStack(item("limestone_powder")).is(net.minecraft.tags.TagKey.create(
+                net.minecraft.core.registries.Registries.ITEM, Singulo.id("ceramic_flux"))), "石灰粉が骨粉の代わりにならない");
+        helper.succeedWhen(() -> {
+            ItemStack out = compressor.items().getStackInSlot(compressor.type().outputSlot());
+            helper.assertTrue(out.is(item("limestone_powder")) && out.getCount() == 2, "石灰粉が2個出ない: " + out);
+        });
+    }
+
+    /** 圧縮機で木炭3個を砕くと炭素粉が2個。炭素粉は鋼の素などで石炭の代わり（タグ singulo:carbon）になる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void compressorTurnsCharcoalIntoCarbonDust(GameTestHelper helper) {
+        MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
+        compressor.items().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.CHARCOAL, 3));
+        helper.assertTrue(new ItemStack(item("carbon_dust")).is(net.minecraft.tags.TagKey.create(
+                net.minecraft.core.registries.Registries.ITEM, Singulo.id("carbon"))), "炭素粉が石炭の代わりにならない");
+        helper.succeedWhen(() -> {
+            ItemStack out = compressor.items().getStackInSlot(compressor.type().outputSlot());
+            helper.assertTrue(out.is(item("carbon_dust")) && out.getCount() == 2, "炭素粉が2個出ない: " + out);
+            helper.assertTrue(compressor.items().getStackInSlot(0).isEmpty(), "木炭が3個減らない");
+        });
+    }
+
+    /** 純酸素転炉: 焼成炉に鉄2・石炭1・酸素250 mB で鋼鉄インゴット2。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void kilnBlowsOxygenIntoSteel(GameTestHelper helper) {
+        MachineBlockEntity kiln = machine(helper, MachineType.KILN);
+        helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        kiln.items().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 2));
+        kiln.items().setStackInSlot(1, new ItemStack(net.minecraft.world.item.Items.COAL));
+        kiln.automationFluids().fill(new FluidStack(SinguloFluids.get("oxygen"), 250), IFluidHandler.FluidAction.EXECUTE);
+        helper.succeedWhen(() -> {
+            ItemStack out = kiln.items().getStackInSlot(kiln.type().outputSlot());
+            helper.assertTrue(out.is(item("steel_ingot")) && out.getCount() == 2, "鋼鉄インゴットが2個できない: " + out);
+        });
+    }
+
+    /** 蛍光体: 焼成炉で未焼成の蛍光体を焼くと、グロウストーンダスト4個。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void kilnFiresPhosphorIntoGlowstone(GameTestHelper helper) {
+        MachineBlockEntity kiln = machine(helper, MachineType.KILN);
+        helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        kiln.items().setStackInSlot(0, new ItemStack(item("unfired_phosphor")));
+        helper.succeedWhen(() -> {
+            ItemStack out = kiln.items().getStackInSlot(kiln.type().outputSlot());
+            helper.assertTrue(out.is(net.minecraft.world.item.Items.GLOWSTONE_DUST) && out.getCount() == 4, "グロウストーンダストが4個できない: " + out);
+        });
+    }
+
+    /** ペルチェ冷却器: 水1,000 mB を凍らせて氷1個。 */
+    @GameTest(template = EMPTY, timeoutTicks = 400)
+    public static void peltierCoolerFreezesWater(GameTestHelper helper) {
+        MachineBlockEntity cooler = machine(helper, MachineType.PELTIER_COOLER);
+        helper.onEachTick(() -> cooler.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        cooler.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        helper.succeedWhen(() -> helper.assertTrue(
+                cooler.items().getStackInSlot(cooler.type().outputSlot()).is(net.minecraft.world.item.Items.ICE), "氷ができない"));
+    }
+
+    /** 圧縮機で鉄のチェストプレート（インゴット8個）を砕くと、鉄の塊48個（インゴット約5個ぶん）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void compressorRecyclesIronArmor(GameTestHelper helper) {
+        MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
+        helper.onEachTick(() -> compressor.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        ItemStack worn = new ItemStack(net.minecraft.world.item.Items.IRON_CHESTPLATE);
+        worn.setDamageValue(100);
+        compressor.items().setStackInSlot(0, worn);
+        helper.succeedWhen(() -> {
+            ItemStack out = compressor.items().getStackInSlot(compressor.type().outputSlot());
+            helper.assertTrue(out.is(net.minecraft.world.item.Items.IRON_NUGGET) && out.getCount() == 48, "鉄の塊が48個出ない: " + out);
+        });
+    }
+
+    /**
+     * 単極子を入れた電解槽でも、水素1 mB あたりの電力は変わらない（8 FE）。速くなったぶん毎tickの電力が増える。
+     * 水素燃料電池（1 mB で 4.8 FE）と組んでも電力は増えない。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void electrolyzerHydrogenCostIgnoresMonopole(GameTestHelper helper) {
+        MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
+        electrolyzer.items().setStackInSlot(MachineType.ELECTROLYZER.upgradeSlot(), new ItemStack(item("monopole_upgrade")));
+        helper.onEachTick(() -> electrolyzer.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        electrolyzer.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        helper.succeedWhen(() -> {
+            var data = electrolyzer.syncData();
+            int usage = data.getInt(MachineBlockEntity.D_USAGE);
+            int ticks = data.getInt(MachineBlockEntity.D_MAX_PROGRESS);
+            helper.assertTrue(usage > 0, "電解が始まらない");
+            double perMb = usage * (double) ticks / 200.0;
+            helper.assertTrue(perMb >= 7.9, "単極子で水素1 mB あたりの電力が下がる: " + perMb + " FE/mB");
+            helper.assertTrue(perMb > io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity.fePerMb(),
+                    "燃料電池で取り戻せる電力のほうが多い");
+        });
+    }
+
+    /** 待機の理由:空・作れない材料・液体不足（何がいくつ足りないか）を見分ける。 */
+    @GameTest(template = EMPTY)
+    public static void idleMachineExplainsWhy(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var none = java.util.List.<FluidStack>of(FluidStack.EMPTY, FluidStack.EMPTY, FluidStack.EMPTY);
+        var empty = io.github.genichimaruo.singulo.machine.MachineDiagnosis.idle(level, MachineType.ELECTROLYZER, java.util.List.of(), none, -1);
+        helper.assertTrue(empty.kind() == io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.EMPTY, "空なのに " + empty.kind());
+        var dirt = io.github.genichimaruo.singulo.machine.MachineDiagnosis.idle(level, MachineType.KILN,
+                java.util.List.of(new ItemStack(net.minecraft.world.item.Items.DIRT)), java.util.List.of(), -1);
+        helper.assertTrue(dirt.kind() == io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.NO_MATCH, "土で焼成炉が " + dirt.kind());
+        var water = io.github.genichimaruo.singulo.machine.MachineDiagnosis.idle(level, MachineType.ELECTROLYZER, java.util.List.of(),
+                java.util.List.of(new FluidStack(Fluids.WATER, 50), FluidStack.EMPTY, FluidStack.EMPTY), -1);
+        helper.assertTrue(water.kind() == io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.MISSING
+                && water.lines().stream().anyMatch(c -> c.getString().contains("150")), "水50 mBで、あと150 mBと言わない: " + water.lines());
+        helper.succeed();
+    }
+
+    /** 液体キャニスター: 水を注いで電解槽を動かし、空いたキャニスターで水素を汲む。重ねたままでは出し入れしない。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void fluidCanisterCarriesAnyFluid(GameTestHelper helper) {
+        MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
+        ItemStack canister = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CANISTER.get());
+        helper.assertTrue(io.github.genichimaruo.singulo.item.FluidCanisterItem.handler(canister.copyWithCount(2))
+                .fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE) == 0, "重ねたまま詰まってしまう");
+        ItemStack water = io.github.genichimaruo.singulo.item.FluidCanisterItem.filled(canister, new FluidStack(Fluids.WATER, 1000));
+        var poured = net.neoforged.neoforge.fluids.FluidUtil.tryEmptyContainer(water, electrolyzer.automationFluids(), 1000, null, true);
+        helper.assertTrue(poured.isSuccess() && io.github.genichimaruo.singulo.item.FluidCanisterItem.fluid(poured.getResult()).isEmpty()
+                && poured.getResult().isStackable(), "水を注いだあと空にならない: " + poured.getResult());
+        helper.succeedWhen(() -> {
+            var got = net.neoforged.neoforge.fluids.FluidUtil.tryFillContainer(canister.copy(), electrolyzer.automationFluids(), 1000, null, true);
+            helper.assertTrue(got.isSuccess(), "水素を汲めない");
+            FluidStack h = io.github.genichimaruo.singulo.item.FluidCanisterItem.fluid(got.getResult());
+            helper.assertTrue(h.getFluid().isSame(SinguloFluids.get("hydrogen")) && h.getAmount() >= 200, "水素が入らない: " + h.getAmount());
+            var mixed = io.github.genichimaruo.singulo.item.FluidCanisterItem.handler(got.getResult());
+            helper.assertTrue(mixed.fill(new FluidStack(SinguloFluids.get("oxygen"), 100), IFluidHandler.FluidAction.SIMULATE) == 0,
+                    "水素の入ったキャニスターに酸素が混ざる");
+        });
+    }
+
     @GameTest(template = EMPTY, timeoutTicks = 500)
     public static void archiveCopiesObservationLog(GameTestHelper helper) {
         MachineBlockEntity archive = machine(helper, MachineType.ARCHIVE_TERMINAL);
@@ -209,4 +347,26 @@ public final class SinguloGameTests {
         helper.succeedWhen(() -> helper.assertTrue(kiln.energy().getEnergyStored() > 200,
                 "導線の先の焼成炉に電力が届かない: " + kiln.energy().getEnergyStored()));
     }
+    /** Odd hydrogen amounts must not create credit for gas that was never removed from the tank. */
+    @GameTest(template = EMPTY, timeoutTicks = 30)
+    public static void fuelCellKeepsUnpairedHydrogenUntilOxygenPairIsComplete(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.HYDROGEN_FUEL_CELL.get());
+        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = helper.getBlockEntity(pos);
+        cell.fluids().fill(new FluidStack(SinguloFluids.get("hydrogen"), 3), IFluidHandler.FluidAction.EXECUTE);
+        cell.fluids().fill(new FluidStack(SinguloFluids.get("oxygen"), 2), IFluidHandler.FluidAction.EXECUTE);
+        helper.runAtTickTime(5, () -> {
+            helper.assertTrue(cell.energy().getEnergyStored() == 9,
+                    "Unpaired hydrogen created energy credit: " + cell.energy().getEnergyStored());
+            helper.assertTrue(cell.hydrogen().getFluidAmount() == 1 && cell.oxygen().getFluidAmount() == 1,
+                    "The incomplete hydrogen/oxygen pair was consumed");
+            cell.fluids().fill(new FluidStack(SinguloFluids.get("hydrogen"), 1), IFluidHandler.FluidAction.EXECUTE);
+        });
+        helper.runAtTickTime(12, () -> {
+            helper.assertTrue(cell.energy().getEnergyStored() == 18, "The completed second gas pair did not generate power");
+            helper.assertTrue(cell.hydrogen().isEmpty() && cell.oxygen().isEmpty(), "Complete gas pairs were not consumed exactly");
+            helper.succeed();
+        });
+    }
+
 }

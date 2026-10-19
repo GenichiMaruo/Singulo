@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:bismuth_crystal_block"
+    },
+    {
+      "item": "singulo:bismuth_crystal_block"
+    },
+    {
+      "item": "singulo:bismuth_crystal_block"
+    },
+    {
+      "item": "singulo:bismuth_crystal_block"
+    },
+    {
+      "tag": "c:dusts/glowstone"
+    }
+  ],
+  "result": {
+    "id": "singulo:glowing_bismuth_crystal",
+    "count": 4
+  }
+}

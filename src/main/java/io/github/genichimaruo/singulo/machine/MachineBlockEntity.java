@@ -395,14 +395,23 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return 1.0;
     }
 
+    /**
+     * このレシピの1回あたりの電力を、速さによらず一定にするか（速くなると、そのぶん毎tickの電力が増える）。
+     * 極低温冷却塔の液体窒素: 詰めた電力を極低温タービンが取り戻すので、速くして安く作れると、取り戻す電力のほうが多くなる。
+     */
+    protected boolean fixedEnergyPerCraft(MachineRecipe recipe) {
+        // 電解槽の水素と酸素は水素燃料電池で電力に戻せるので、単極子などで安く作れると電力が増えてしまう
+        return type == MachineType.ELECTROLYZER;
+    }
+
     /** レシピを1回完了した直後に呼ばれる。 */
     protected void onCrafted(Level level, MachineRecipe recipe) {}
 
     /**
-     * 電力が足りなくても、ある分だけ使って進めるか（時間結晶育成槽）。進めた場合、要求の80%を割った tick は
+     * このレシピは、電力が足りなくても、ある分だけ使って進めるか（時間結晶育成槽の触媒）。進めた場合、要求の80%を割った tick は
      * 「不純」として数え、完成品の adjustResult に純度（不純でなかった割合）を渡す。
      */
-    protected boolean runsUnderpowered() {
+    protected boolean runsUnderpowered(MachineRecipe recipe) {
         return false;
     }
 
@@ -454,7 +463,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 } else if (steps == 0) {
                     active = true;
                     status = Status.RUNNING;
-                } else if (energy.consume(usage * steps) || runsUnderpowered() && drawPartial()) {
+                } else if (energy.consume(usage * steps) || runsUnderpowered(recipe) && drawPartial()) {
                     timeCarry -= steps;
                     active = true;
                     status = Status.RUNNING;
@@ -494,6 +503,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      * （冷却塔の液体窒素など）は、ほかに作れるものがないときだけ動く。
      */
     private List<RecipeHolder<MachineRecipe>> stationRecipes(Level level) {
+        return stationRecipes(level, type);
+    }
+
+    /** {@link #stationRecipes(Level)} の装置の種類ごとの版（画面で待機の理由を調べるときにも使う）。 */
+    public static List<RecipeHolder<MachineRecipe>> stationRecipes(Level level, MachineType type) {
         List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
         for (RecipeHolder<MachineRecipe> holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
             if (holder.value().station().equals(type.id())) {
@@ -583,8 +597,14 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 speed *= 3;
             }
             maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
-            usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
-                    / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
+            if (fixedEnergyPerCraft(found.value())) {
+                // 1回あたりの電力（レシピの電力 × 時間）を、速さ・単極子・オーバークロックによらず保つ
+                usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
+                        * found.value().time() / (double) maxProgress);
+            } else {
+                usage = (int) Math.ceil(found.value().energy() * ServerConfig.MACHINE_ENERGY_MULTIPLIER.get()
+                        / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
+            }
         }
     }
 
@@ -703,11 +723,38 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             if (plan == null) {
                 return false;
             }
-            if (!insertOutput(previewResult(r, plan), true).isEmpty()) {
+            if (!fitsOutputs(previewResult(r, plan), r.byproduct())) {
                 return false;
             }
         }
         return assignFluidOutputs(r.fluidResults(), true);
+    }
+
+    /** 成果物と副産物が、両方とも出力スロットに入り切るか（同じスロットを取り合う分も数える）。 */
+    private boolean fitsOutputs(ItemStack result, ItemStack byproduct) {
+        ItemStack[] slots = new ItemStack[type.outputSlots()];
+        for (int i = 0; i < slots.length; i++) {
+            slots[i] = items.getStackInSlot(type.outputSlot() + i).copy();
+        }
+        for (ItemStack want : new ItemStack[]{result, byproduct}) {
+            int left = want.getCount();
+            for (int i = 0; i < slots.length && left > 0 && !want.isEmpty(); i++) {
+                if (slots[i].isEmpty()) {
+                    slots[i] = want.copyWithCount(Math.min(left, want.getMaxStackSize()));
+                    left -= slots[i].getCount();
+                } else if (ItemStack.isSameItemSameComponents(slots[i], want)) {
+                    int move = Math.min(left, Math.min(slots[i].getMaxStackSize(), items.getSlotLimit(type.outputSlot() + i)) - slots[i].getCount());
+                    if (move > 0) {
+                        slots[i].grow(move);
+                        left -= move;
+                    }
+                }
+            }
+            if (!want.isEmpty() && left > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** 出力スロットへ順に入れ、入り切らなかった分を返す。 */
@@ -783,6 +830,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         });
         if (!out.isEmpty()) {
             insertOutput(out, false);
+        }
+        if (!r.byproduct().isEmpty()) {
+            insertOutput(r.byproduct().copy(), false);
         }
         assignFluidOutputs(r.fluidResults(), false);
         onCrafted(level, r);
@@ -942,6 +992,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("items", items.serializeNBT(registries));
+        tag.putIntArray("slot_layout", new int[]{type.inputSlots(), type.outputSlots()});
         tag.putInt("item_sides", itemSides.packed());
         tag.putBoolean("eject_master", true);
         tag.putIntArray("tank_sides", tankSidesPacked());
@@ -962,14 +1013,35 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
     }
 
+    /**
+     * 今のスロット i に入れる、保存したデータのスロットの番号（入力 → 出力 → 触媒 → 単極子 の並びを、区切りごとに写す）。
+     * 対応するものがなければ -1。
+     */
+    private int savedSlot(int i, int savedInputs, int savedOutputs) {
+        if (i < type.inputSlots()) {
+            return i < savedInputs ? i : -1;
+        }
+        if (i < type.outputSlot() + type.outputSlots()) {
+            int k = i - type.outputSlot();
+            return k < savedOutputs ? savedInputs + k : -1;
+        }
+        int tail = i - (type.inputSlots() + type.outputSlots());    // 触媒・単極子は出力の後ろの同じ位置
+        return savedInputs + savedOutputs + tail;
+    }
+
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         // スロット数が変わった古いデータでも読めるよう、いったん別の入れ物に読んでから写す
         ItemStackHandler loaded = new ItemStackHandler();
         loaded.deserializeNBT(registries, tag.getCompound("items"));
+        int[] layout = tag.getIntArray("slot_layout");
+        if (layout.length != 2) {
+            layout = type.legacyLayout();
+        }
         for (int i = 0; i < items.getSlots(); i++) {
-            items.setStackInSlot(i, i < loaded.getSlots() ? loaded.getStackInSlot(i) : ItemStack.EMPTY);
+            int from = savedSlot(i, layout[0], layout[1]);
+            items.setStackInSlot(i, from >= 0 && from < loaded.getSlots() ? loaded.getStackInSlot(from) : ItemStack.EMPTY);
         }
         if (tag.contains("item_sides")) {
             itemSides.setPacked(tag.getInt("item_sides"));

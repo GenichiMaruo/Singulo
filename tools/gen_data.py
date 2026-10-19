@@ -28,7 +28,7 @@ from recipes import (RECIPES, ORDER, EXPLORE, REPAIR, RESTORED, CARDS, STAGE_NAM
 import config_spec  # noqa: E402
 import ruins  # noqa: E402
 import androids  # noqa: E402
-from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
+from ids import (MOD, CUSTOM_STATIONS, OUTPUT_ALIASES, ALIAS_RECIPE_IDS, BYPRODUCTS, INGREDIENT_TAGS, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL_TAG, STEEL_PLATE_TAG,  # noqa: E402
                  STATIONS, STAGE_COLORS, SPENT, ACCEPTS_SPENT, MIN_SIZE)
 
 MODID = 'singulo'
@@ -110,6 +110,8 @@ def resolve(name):
         return ('tag', STEEL_TAG[1:])
     if name == '鋼板':
         return ('tag', STEEL_PLATE_TAG[1:])
+    if name in INGREDIENT_TAGS:
+        return ('tag', INGREDIENT_TAGS[name])
     if name in OUTPUT_ALIASES:
         return ('item', OUTPUT_ALIASES[name])
     if name in VANILLA:
@@ -180,7 +182,9 @@ def recipe_files():
         else:
             result_kind, result_id = 'item', mid(name)
         rid = result_id.split(':')[1]
-        if name in OUTPUT_ALIASES:
+        if name in ALIAS_RECIPE_IDS:
+            rid = ALIAS_RECIPE_IDS[name]
+        elif name in OUTPUT_ALIASES:
             # 同じ成果物の別レシピ（リサイクル・ストレンジ物質）はパスを分ける
             rid += '_from_strange_matter' if 'ストレンジ' in name else '_recycled' if 'リサイクル' in name \
                 else '_from_flint' if '火打石' in name else '_from_packed_ice' if '氷塊' in name else ''
@@ -268,6 +272,9 @@ def recipe_files():
                 obj['fluid_results'] = [{'id': result_id, 'amount': r['out']}]
             else:
                 obj['result'] = {'id': result_id, 'count': r['out']}
+            if name in BYPRODUCTS:
+                by, n = BYPRODUCTS[name]
+                obj['byproduct'] = {'id': mid(by), 'count': n}
             if name == '水素':  # 電解槽の副産物
                 obj['fluid_results'].append({'id': mid('酸素'), 'amount': r['out'] // 2})
             add(f'{STATIONS[station]}/{rid}', obj)
@@ -470,6 +477,17 @@ UI_LANG = {
     'message.singulo.record_read': ('旧文明の記録「%s」を読んだ。ハンドブックの「旧文明の記録」から読み返せる', 'You read the ancient record "%s". Find it in the handbook'),
     'message.singulo.records_complete': ('旧文明の記録をすべて読み終えた', 'You have read every ancient record'),
     'message.singulo.strangelet_contained': ('ストレンジレットを磁気瓶に封じ込めた', 'Strangelet contained'),
+    'message.singulo.cryogenic_turbine.now_storage': (
+        '極低温タービンは、液体窒素の蓄電装置に変わりました。冷却塔で液体窒素に詰めた電力の最大9割を取り戻します'
+        '（冷却塔とつないで回しても電力は増えません）。第2段階の発電には、ミュオン触媒核融合炉を使ってください。',
+        'The Cryogenic Turbine is now liquid-nitrogen energy storage. It returns up to 90% of the power the cooling tower put into '
+        'the nitrogen, so running it from a cooling tower no longer makes power. For stage 2 power, build a Muon-Catalyzed Fusion Reactor.'),
+    'message.singulo.fuel_cell.status': ('水素 %s/%s mB　酸素 %s/%s mB　蓄電 %s/%s FE　%s',
+                                         'Hydrogen %s/%s mB · Oxygen %s/%s mB · Stored %s/%s FE · %s'),
+    'message.singulo.fuel_cell.standby': ('待機中（蓄電がいっぱい）', 'Standing by (storage full)'),
+    'tooltip.singulo.fluid_canister.empty': ('空（%s mBまで入る）', 'Empty (holds %s mB)'),
+    'tooltip.singulo.fluid_canister.amount': ('%s %s / %s mB', '%s %s / %s mB'),
+    'item.singulo.fluid_canister.filled': ('液体キャニスター（%s）', 'Fluid Canister (%s)'),
     'tooltip.singulo.magnetic_bottle': ('残り %s / %s 回', '%s / %s uses left'),
     'message.singulo.sealed.need_key': ('%sが必要だ', 'Needs a %s'),
     'message.singulo.sealed.busy': ('封印装置が作動している', 'The seal is working'),
@@ -572,6 +590,25 @@ UI_LANG = {
     'gui.singulo.make_free.on': ('材料なしのレシピも作る', 'Also runs recipes without ingredients'),
     'gui.singulo.make_free.off': ('材料なしのレシピは作らない', 'Skips recipes without ingredients'),
     'gui.singulo.status.off': ('停止', 'Off'),
+    'gui.singulo.reason.label.no_match': ('作れない材料', 'No recipe'),
+    'gui.singulo.reason.label.missing': ('材料不足', 'Missing input'),
+    'gui.singulo.reason.label.too_small': ('大きさ不足', 'Too small'),
+    'gui.singulo.reason.empty': ('材料を入れると動きます', 'Put in materials to start'),
+    'gui.singulo.reason.no_match': ('入っている材料では、この装置で作れるものがありません。ハンドブックや JEI で、何から作るかを確かめてください',
+                                   'Nothing this machine makes uses these materials. Check the handbook or JEI for the right inputs.'),
+    'gui.singulo.reason.making': ('作ろうとしているもの: %s', 'Trying to make: %s'),
+    'gui.singulo.reason.need_item': ('・%s があと %s 個要る', '- %s: %s more needed'),
+    'gui.singulo.reason.need_uses': ('・%s（残り %s 回以上）が要る', '- %s with at least %s uses left'),
+    'gui.singulo.reason.need_fluid': ('・%s があと %s mB 要る（1回に %s mB）', '- %s: %s mB more needed (%s mB per craft)'),
+    'gui.singulo.reason.too_small': ('・大きさが %s 以上要る（今は %s）', '- Needs size %s or more (now %s)'),
+    'gui.singulo.reason.arrange': ('・数は足りています。同じ材料を別々のスロットに分けて入れてみてください', '- The amounts are there. Try putting each material in its own slot.'),
+    'gui.singulo.reason.no_power': ('1 tick に %s FE 要りますが、蓄電は %s FE です。発電を増やすか、ほかの装置を止めてください',
+                                   'Needs %s FE per tick but only %s FE is stored. Add generators or turn off other machines.'),
+    'gui.singulo.reason.output_full': ('出口のスロットかタンクがいっぱいです。取り出すか、面の設定で自動排出をオンにしてください',
+                                      'The output slot or tank is full. Take things out, or turn on auto-eject in the side settings.'),
+    'gui.singulo.reason.not_formed': ('形ができていません。ホロ投影機をコントローラに使うと、足りないブロックが分かります',
+                                     'The structure is not complete. Use a Holo Projector on the controller to see missing blocks.'),
+    'gui.singulo.reason.off': ('電源のスイッチで止めています', 'Turned off with the power switch'),
     'gui.singulo.sides.legend': ('灰:無効 青:入力 橙:出力 緑:入出力', 'Grey off · Blue in · Orange out · Green both'),
     'gui.singulo.sides.face.front': ('前', 'Front'),
     'gui.singulo.sides.face.back': ('後', 'Back'),
@@ -1084,6 +1121,18 @@ UI_LANG = {
     'gui.singulo.android.stall.full': ('置き場がいっぱいで、物を置けない', "Storage is full; can't put items away"),
     'gui.singulo.android.work.on': ('作業：オン', 'Work: on'),
     'gui.singulo.android.work.off': ('作業：オフ', 'Work: off'),
+    'gui.singulo.generator_slots.turbine.in': ('冷媒カートリッジを入れると、液体窒素をタンクに空けて、空のカートリッジを下に出す',
+                                               'Insert coolant cartridges: the liquid nitrogen goes into the tank and the empty cartridges come out below'),
+    'gui.singulo.generator_slots.fusion.in': ('ミュオン触媒を入れる。既定設定では新品で10分、使いかけは残寿命の半分だけ動き、失活した触媒を下に出す',
+                                              'Insert muon catalysts. At default settings, a fresh one lasts 10 minutes; a used one burns for half its '
+                                              'remaining lifetime. Spent catalysts come out below.'),
+    'gui.singulo.generator_slots.no_heat': ('高温源がない（溶岩・マグマブロックなどを隣に）', 'No heat source (put lava or a magma block next to it)'),
+    'gui.singulo.generator_slots.efficiency': ('取り戻せる電力: %s%%', 'Recovers: %s%%'),
+    'gui.singulo.generator_slots.nitrogen': ('液体窒素 %s / %s mB', 'Liquid nitrogen %s / %s mB'),
+    'gui.singulo.generator_slots.no_catalyst': ('触媒がない', 'No catalyst'),
+    'gui.singulo.generator_slots.catalyst': ('触媒の残り %s%%', 'Catalyst left: %s%%'),
+    'gui.singulo.generator_slots.water': ('水 %s / %s mB', 'Water %s / %s mB'),
+    'gui.singulo.generator_slots.standby': ('蓄電がいっぱい: 待機中', 'Storage full: standing by'),
     'gui.singulo.android.work.hint': ('作業（自動化）に割り当ててよいか。オフにすると、作業の候補に出ない。', 'Whether this android may be given work (automation). When off, it is never offered for work.'),
     'gui.singulo.android.sort.hint': ('持ち物とバックパックの中を並べ替える（同じ物はまとめる）', 'Sort the carried items and backpack contents (stacks the same items together)'),
     'gui.singulo.android.stash.hint': ('持ち物とバックパックの中を、近くの箱（チェスト・樽・シュルカーボックス・資材口）へ預けに行く', 'Go and put the carried items and backpack contents in a nearby box (chest, barrel, shulker box or supply port)'),
@@ -2763,6 +2812,23 @@ def accessory_item_models():
             'layer0': f'{MODID}:item/{iid}', 'layer1': f'{MODID}:item/{iid}_detail'}})
 
 
+def fluid_canister_item_model():
+    """液体キャニスター: 容器の絵（layer0）と、中身の色に染める窓の絵（layer1。空なら描かない）。"""
+    from PIL import Image
+    iid = 'fluid_canister'
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {'parent': 'minecraft:item/generated', 'textures': {
+        'layer0': f'{MODID}:item/{iid}', 'layer1': f'{MODID}:item/{iid}_fluid'}})
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(6, 12):
+        for x in range(6, 10):
+            v = 255 if x == 6 or y == 6 else 225 if x < 9 else 190
+            px[x, y] = (v, v, v, 255)
+    path = ASSETS / 'textures' / 'item' / f'{iid}_fluid.png'
+    path.parent.mkdir(parents=True, exist_ok=True)
+    im.save(path)
+
+
 def fluid_sample_item_model():
     """流体の見本: しずくの絵（流体の色に染める）。"""
     write_json(ASSETS / 'models' / 'item' / 'fluid_sample.json',
@@ -2841,7 +2907,12 @@ def mid_entity(eid):
 def tags():
     t = RES / 'data'
     write_json(t / 'c' / 'tags' / 'item' / 'ingots' / 'steel.json', {'values': [mid('鋼鉄インゴット')]})
-    write_json(t / 'c' / 'tags' / 'item' / 'ingots.json', {'values': [mid('鋼鉄インゴット')]})
+    write_json(t / 'c' / 'tags' / 'item' / 'ingots.json', {'values': [mid(n) for n in ('鋼鉄インゴット', '亜鉛インゴット',
+                                                                                'ビスマスインゴット', 'ニホニウムインゴット')]})
+    for n, tag in INGREDIENT_TAGS.items():
+        write_json(t / tag.split(':')[0] / 'tags' / 'item' / (tag.split(':')[1] + '.json'), {'values': [mid(n)]})
+    write_json(t / 'c' / 'tags' / 'item' / 'ingots' / 'nihonium.json', {'values': [mid('ニホニウムインゴット')]})
+    write_json(t / 'c' / 'tags' / 'item' / 'dusts' / 'zinc.json', {'values': [mid('亜鉛の粉')]})
     write_json(t / 'c' / 'tags' / 'item' / 'plates' / 'steel.json', {'values': [mid('鋼板')]})
     write_json(t / 'c' / 'tags' / 'item' / 'plates.json', {'values': [mid('鋼板')]})
     write_json(DATA / 'tags' / 'item' / 'star_core.json',
@@ -2858,6 +2929,9 @@ def tags():
     write_json(DATA / 'tags' / 'item' / 'metal_core.json', {'values': metal_items})
     for _, cat in ACCEPTS_SPENT:
         write_json(DATA / 'tags' / 'item' / f'{MOD[cat][0]}s.json', {'values': [mid(cat), mid(SPENT[cat])]})
+    write_json(DATA / 'tags' / 'item' / 'ceramic_flux.json', {'values': ['minecraft:bone_meal', mid('石灰粉')]})
+    write_json(DATA / 'tags' / 'item' / 'carbon.json', {'values': ['minecraft:coal', mid('炭素粉')]})
+    write_json(DATA / 'tags' / 'item' / 'limestone.json', {'values': ['minecraft:calcite', 'minecraft:dripstone_block']})
     write_json(DATA / 'tags' / 'item' / 'helium_bearing_stone.json', {'values': [
         'minecraft:deepslate', 'minecraft:cobbled_deepslate', 'minecraft:basalt', 'minecraft:smooth_basalt']})
     write_json(DATA / 'tags' / 'block' / 'ruin_blocks.json',
@@ -3243,9 +3317,9 @@ def thermal():
 # 用途ごとにまとめ、まとまりの中は段階順・レシピ順。並べ忘れたアイテムは「素材」の最後に入る。
 TAB_GROUPS = [
     ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'decoded_record']),
-    ('発電・蓄電・送電', ['thermoelectric_generator', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
+    ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
-    ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
+    ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
                'cosmic_muon_collector', 'entanglement_synthesizer', 'laser_cooler', 'echo_resonator', 'time_crystal_incubator',
                'singularity_encapsulator', 'monopole_upgrade', 'overclock_chip']),
     # マルチブロック: 共通のポートのあと、形ごとにコントローラとその部品
@@ -3272,7 +3346,7 @@ TAB_GROUPS = [
                      'high_gravity_panel', 'gravitational_wave_detector', 'neutrino_observatory',
                      'probe_station', 'worldline_anchor_advanced', 'halo_collector', 'gravitational_containment_tank',
                      'unstable_wormhole_mouth', 'wormhole_stabilizer', 'wormhole_mouth_casing', 'wormhole_mouth', 'wormhole_port']),
-    ('道具と装備', ['neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit',
+    ('道具と装備', ['fluid_canister', 'neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit',
                'black_hole_bomb', 'graviton_manipulator', 'metric_drive', 'gravity_boots', 'dimensional_pocket']),
     # アンドロイド: 本体と道具 → 設計メモリ → アップグレード → 作業 → 装飾 → スポーンエッグ
     ('アンドロイド', ['android_station', 'android_kit', 'android_charger', 'android_repair_kit', 'android_armor_plate',
@@ -3298,7 +3372,7 @@ TAB_GROUPS = [
     ('ボスの戦利品', ['sentinel_core', 'degenerate_nucleus', 'precision_actuator', 'echo_chapter', 'gravity_chapter', 'horizon_chapter',
                  'ergosphere_chapter', 'terminus_record', 'archivist_halo', 'afterglow_wings', 'awakening_record_core',
                  'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_ergosphere_core']),
-    ('建材', ['white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
+    ('建材', ['white_panel', 'white_light_panel', 'bismuth_crystal_block', 'glowing_bismuth_crystal', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
             'black_reinforced_glass', 'black_star_glass', 'android_barrier_glass', 'android_barrier_glass_patterned',
             'android_gate_glass', 'android_gate_glass_patterned']),
     ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',
@@ -3568,7 +3642,7 @@ def validate():
     checks = {
         'shellRockLv3': r['縮退物質殻']['inputs']['圧縮ブロックLv3'],
         'shellMetalCores': r['縮退物質殻']['inputs']['金属圧縮ブロックLv2'],
-        'shellCoolantMb': r['縮退物質殻']['inputs']['液体窒素'],
+        'shellNitrogenMb': r['縮退物質殻']['inputs']['液体窒素'],
         'reactorPlatesPerShell': r['炉殻ブロック']['out'],
         'exoticBatchSize': r['エキゾチック物質']['out'],
         'starsPerExoticBatch': r['エキゾチック物質']['inputs']['ネザースター'],
@@ -3684,6 +3758,7 @@ def main():
     models()
     textures()
     accessory_item_models()          # 生成の一般の物のモデルのあとに、2枚重ねで書き直す
+    fluid_canister_item_model()
     work_card_item_model()           # 生成の一般の物のモデルのあとに、記録済みの絵へ切り替えるモデルを書き直す
     area_card_item_model()
     glasses_item_model()

@@ -61,6 +61,9 @@ final class MachineSounds {
         put(0.8F, "singularity_encapsulator", "singularity_encapsulator_running");
         put(0.5F, "thermoelectric_generator", "thermoelectric_generator_running");
         put(0.8F, "cryogenic_turbine", "cryogenic_turbine_running");
+        put(0.7F, "muon_fusion_reactor", "quantum_heat_engine_running");
+        put(0.5F, "hydrogen_fuel_cell", "electrolyzer_running");               // 電解槽の逆の反応なので、電解槽の音を借りる
+        put(0.5F, "peltier_cooler", "thermoelectric_generator_running");      // 熱電素子どうし     // 触媒で動く発電機どうし、量子熱機関の音を借りる
         put(0.7F, "quantum_heat_engine", "quantum_heat_engine_running");
         put(0.5F, "smes_cell", "smes_cell_running");
         put(0.5F, "cosmic_muon_collector", "muon_collector_running");

@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "compressor",
+  "stage": 1,
+  "time": 40,
+  "energy": 20,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "minecraft:golden_hoe"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "minecraft:gold_nugget",
+    "count": 12
+  }
+}
