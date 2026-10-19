@@ -8,6 +8,7 @@
 アイテムの絵は生成したテクスチャ（mod）と、ビルドで用意されるマイクラ本体の資源（バニラ）から取る。
 """
 import io
+import os
 import zipfile
 from fractions import Fraction as F
 from pathlib import Path
@@ -18,8 +19,16 @@ from ids import MOD, OUTPUT_ALIASES, VANILLA, VANILLA_FLUIDS, MASS_INPUTS, STEEL
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / 'src' / 'generated' / 'resources' / 'assets' / 'singulo'
-VANILLA_JAR = next(iter(sorted((ROOT / 'build' / 'moddev' / 'artifacts').glob('*minecraft-resources.jar'))), None) \
-    if (ROOT / 'build' / 'moddev' / 'artifacts').exists() else None
+# Legacy loaders have separate build directories; the runtime cache contains the
+# original Java 17 client resources even before a loader-specific resource JAR exists.
+_version = next(line.split('=', 1)[1].strip() for line in (ROOT / 'gradle.properties').read_text().splitlines()
+                if line.startswith('minecraft_version='))
+_gradle_cache = Path(os.environ.get('GRADLE_USER_HOME', str(Path.home() / '.gradle')))
+_vanilla_candidates = [Path(os.environ['SINGULO_VANILLA_JAR'])] if os.environ.get('SINGULO_VANILLA_JAR') else []
+for _build in ('build', 'build/forge', 'build/neoforge'):
+    _vanilla_candidates += sorted((ROOT / _build / 'moddev/artifacts').glob('*minecraft-resources.jar'))
+_vanilla_candidates.append(_gradle_cache / 'caches/neoformruntime/artifacts' / f'minecraft_{_version}_client.jar')
+VANILLA_JAR = next((path for path in _vanilla_candidates if path.is_file()), None)
 OUT = ROOT / 'docs' / 'recipes'
 
 Z = 3                       # 16px の絵を何倍で描くか
@@ -46,6 +55,10 @@ TAG_ICONS = {
     'c:storage_blocks/coal': 'block/coal_block', 'c:raw_materials/copper': 'item/raw_copper', 'c:rods/blaze': 'item/blaze_rod',
     'c:sands': 'block/sand', 'c:ingots/iron': 'item/iron_ingot', 'c:ingots/copper': 'item/copper_ingot', 'c:obsidians': 'block/obsidian',
 }
+# The shared recipe catalog includes canonical c: names and existing Forge names.
+# Keep both spellings available when rendering the legacy documentation.
+TAG_ICONS.update({key.replace('c:', 'forge:', 1): value for key, value in list(TAG_ICONS.items()) if key.startswith('c:')})
+TAG_ICONS['forge:sand'] = 'block/sand'
 VANILLA_TEXTURE_OVERRIDES = {
     'minecraft:piston': 'block/piston_side', 'minecraft:blast_furnace': 'block/blast_furnace_front',
     'minecraft:blue_ice': 'block/blue_ice', 'minecraft:lava': 'block/lava_still', 'minecraft:sculk': 'block/sculk', 'minecraft:sculk_sensor': 'block/sculk_sensor_side',
