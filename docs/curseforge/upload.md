@@ -18,7 +18,7 @@ Minecraft 1.21.1は0.9.0以降NeoForgeのみ。Forge版の最終版は0.8.1。1.
 
 [公開ワークフロー](../../.github/workflows/publish-curseforge.yml)は**手動実行のみ**。タグのpushだけでは公開しない。
 
-1. `mod_version`と[変更履歴](changelog-0.9.0.md)を更新したPRで、PR validationを成功させる。GameTest・GUI・Mekanism連携の両ジョブが必要。
+1. `mod_version`と対象版の[変更履歴](./)を更新したPRで、PR validationを成功させる。408件のGameTest・142画面のGUI（5言語の機械画面・画素検査を含む）とMekanism連携の両ジョブが必要。
 2. PRを`1.21.1`へマージし、マージ後のソースが成功CIの検証対象ツリーと一致することを確認する。
 3. マージコミットに`v<mod_version>`タグを作成する。既存タグは移動しない。
 4. ActionsのPublish CurseForgeを`1.21.1`から実行する。`verified_run_id`に成功したPR validationの実行ID、`release_tag`に上記タグ、`release_type`に通常`auto`を指定する。

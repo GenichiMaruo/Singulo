@@ -131,8 +131,8 @@ Choose the file for your Minecraft version. The suffix **F** means Forge and **N
 
 | Minecraft | Mod loader | Java | Files and source |
 | --- | --- | --- | --- |
-| **1.20.1** | **Forge 47.4.26** or later for 1.20.1 | **17** | [1.20.1F files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) · [1.20.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) |
-| **1.20.1** | **NeoForge 47.1.106** or later for 1.20.1 | **17** | [1.20.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) · [1.20.1 NeoForge source and manuals](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) |
+| **1.20.1** | **Forge 47.4.26** or later for 1.20.1 | **17** | [1.20.1F files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) · [1.20.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) |
+| **1.20.1** | **NeoForge 47.1.106** or later for 1.20.1 | **17** | [1.20.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) · [1.20.1 NeoForge source and manuals](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) |
 | **1.21.1** | **NeoForge 21.1.256** or later for 1.21.1 | **21** | [1.21.1N files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) · [1.21.1 source and manuals](https://github.com/GenichiMaruo/Singulo/tree/main) |
 
 You can also filter the CurseForge Files tab by Minecraft version and mod loader.

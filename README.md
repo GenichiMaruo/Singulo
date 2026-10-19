@@ -14,13 +14,13 @@ Choose the download that matches your Minecraft version and mod loader. Each "Do
 | --- | --- | --- | --- | --- |
 | **1.21.1** | **NeoForge** 21.1.256+ | **21** | [1.21.1](https://github.com/GenichiMaruo/Singulo/tree/1.21.1) | [1.21.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=6) |
 | **1.21.1** | **Forge** 52.1.20+（**0.8.1まで / up to 0.8.1**） | **21** | [v0.8.1](https://github.com/GenichiMaruo/Singulo/tree/v0.8.1)（`forge/`） | [1.21.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.21.1&gameVersionTypeId=1) |
-| **1.20.1** | **Forge** 47.4.26+ | **17** | [port/1.20.1-forge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-forge) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
-| **1.20.1** | **NeoForge** 47.1.106+ | **17** | [port/1.20.1-neoforge](https://github.com/GenichiMaruo/Singulo/tree/port/1.20.1-neoforge) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
+| **1.20.1** | **Forge** 47.4.26+ | **17** | [1.20.1](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) | [1.20.1F](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=1) |
+| **1.20.1** | **NeoForge** 47.1.106+ | **17** | [1.20.1](https://github.com/GenichiMaruo/Singulo/tree/1.20.1) | [1.20.1N](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all?version=1.20.1&gameVersionTypeId=6) |
 
 1.21.1 の Forge 版は 0.8.1 で終了し、0.9.0 以降の 1.21.1 は NeoForge 版のみです。1.20.1 の Forge / NeoForge 版は引き続き対応します。
 Forge support for Minecraft 1.21.1 ended with 0.8.1; from 0.9.0 on, 1.21.1 is NeoForge only. Minecraft 1.20.1 remains supported on both Forge and NeoForge.
 
-ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。[全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) や [GitHub Releases](https://github.com/GenichiMaruo/Singulo/releases) からも選べます。
+ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。配布JARは [CurseForgeの全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) からダウンロードしてください。[GitHub Releases](https://github.com/GenichiMaruo/Singulo/releases) では変更履歴を確認できます。
 
 ## 0.8.0の統合内容（Minecraft 1.21.1 / NeoForge）
 
