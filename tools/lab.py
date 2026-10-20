@@ -142,7 +142,8 @@ class Room(Builder):
         self.put(x, y, z, f'{MODID}:desk_monitor', {'facing': facing})
 
     def coffee(self, x, y, z, facing):
-        self.put(x, y, z, f'{MODID}:coffee_maker', {'facing': facing})
+        """コーヒーメーカー（研究所のものは、はじめから3杯分入っている）。"""
+        self.put(x, y, z, f'{MODID}:coffee_maker', {'facing': facing, 'cups': '3', 'brewing': 'false'})
 
     def papers(self, x, y, z, facing='north'):
         self.put(x, y, z, f'{MODID}:paper_stack', {'facing': facing})
@@ -152,8 +153,9 @@ class Room(Builder):
 
     def vending(self, x, z, facing):
         if not self.door_zone(x, z):
-            self.set(x, 1, z, f'{MODID}:vending_machine', {'facing': facing, 'half': 'lower'})
-            self.set(x, 2, z, f'{MODID}:vending_machine', {'facing': facing, 'half': 'upper'})
+            # 施設の電力が戻るまで止まっている
+            self.set(x, 1, z, f'{MODID}:vending_machine', {'facing': facing, 'half': 'lower', 'powered': 'false'})
+            self.set(x, 2, z, f'{MODID}:vending_machine', {'facing': facing, 'half': 'upper', 'powered': 'false'})
 
     def tray(self, x, y, z):
         self.put(x, y, z, 'minecraft:light_weighted_pressure_plate', {'power': '0'})
