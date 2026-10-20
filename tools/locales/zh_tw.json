@@ -1723,6 +1723,10 @@
     "source": "A heavy door sealing the laboratory core section. It opens when facility power returns. Unbreakable.",
     "translation": "封住研究所中樞區的厚門。設施恢復供電後打開。無法破壞。"
   },
+  "desc.singulo.canned_soda": {
+    "source": "A blue can of soda from the laboratory's vending machine. Drinking it gives Speed for 2 minutes.",
+    "translation": "研究所自動販賣機裡的藍色罐裝汽水。飲用後 2 分鐘內移動速度提升。"
+  },
   "desc.singulo.carbon_dust": {
     "source": "Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and black reinforced panels.",
     "translation": "用壓縮機把木炭粉碎壓實得到的碳粉（3 個木炭得 2 個）。可在鋼混合物和黑色強化面板中代替煤炭。"
@@ -1766,6 +1770,10 @@
   "desc.singulo.ceramic_substrate": {
     "source": "A fired ceramic board for circuits.",
     "translation": "用於電路的燒製陶瓷板。"
+  },
+  "desc.singulo.coffee": {
+    "source": "Coffee from a coffee maker, in a bottle. Drinking it gives Haste for 3 minutes and wakes you up, resetting the time until phantoms appear. The bottle is left over.",
+    "translation": "用咖啡機沖泡的瓶裝咖啡。飲用後 3 分鐘內挖掘速度提升，並能提神（重置夜魅出現前的時間）。喝完會留下玻璃瓶。"
   },
   "desc.singulo.coffee_maker": {
     "source": "The laboratory break-room coffee maker. Use it: it still works.",
@@ -2034,6 +2042,10 @@
   "desc.singulo.empty_coolant_cartridge": {
     "source": "A steel canister that holds 100 mB of liquid nitrogen. Right-click the cooling tower controller, or process it in the tower, to fill it.",
     "translation": "可裝 100 mB 液態氮的鋼製容器。用它右鍵點擊極低溫冷卻塔的控制器，或在冷卻塔中加工，就會變成裝滿的冷媒罐。"
+  },
+  "desc.singulo.energy_drink": {
+    "source": "A yellow can of energy drink from the laboratory's vending machine. Drinking it gives Haste II for 2 minutes.",
+    "translation": "研究所自動販賣機裡的黃色罐裝飲料。飲用後 2 分鐘內挖掘速度大幅提升（挖掘加速 II）。"
   },
   "desc.singulo.entangled_element": {
     "source": "Always made in pairs. Used in detectors and links.",
@@ -2642,6 +2654,10 @@
   "desc.singulo.spent_time_crystal_catalyst": {
     "source": "A used-up Time Crystal Catalyst. About 25% can be recovered as a lower-tier catalyst.",
     "translation": "用盡的時間晶體催化劑。約 25% 可回收為低一級的催化劑。"
+  },
+  "desc.singulo.sports_drink": {
+    "source": "A white can of sports drink from the laboratory's vending machine. Drinking it gives Regeneration for 15 seconds.",
+    "translation": "研究所自動販賣機裡的白色罐裝飲料。飲用後 15 秒內持續恢復生命值。"
   },
   "desc.singulo.stardust": {
     "source": "Cosmic grains carrying rare isotopes. The raw material for cold atoms.",
@@ -7947,6 +7963,10 @@
     "source": "Builder's Wand",
     "translation": "建造者魔杖"
   },
+  "item.singulo.canned_soda": {
+    "source": "Canned Soda",
+    "translation": "罐裝汽水"
+  },
   "item.singulo.carbon_dust": {
     "source": "Carbon Dust",
     "translation": "碳粉"
@@ -7958,6 +7978,10 @@
   "item.singulo.ceramic_substrate": {
     "source": "Ceramic Substrate",
     "translation": "陶瓷基板"
+  },
+  "item.singulo.coffee": {
+    "source": "Coffee",
+    "translation": "咖啡"
   },
   "item.singulo.cold_atom_trap": {
     "source": "Cold Atom Trap",
@@ -8050,6 +8074,10 @@
   "item.singulo.empty_coolant_cartridge": {
     "source": "Empty Coolant Cartridge",
     "translation": "空冷媒罐"
+  },
+  "item.singulo.energy_drink": {
+    "source": "Energy Drink",
+    "translation": "能量飲料"
   },
   "item.singulo.entangled_element": {
     "source": "Entangled Element",
@@ -8398,6 +8426,10 @@
   "item.singulo.spent_time_crystal_catalyst": {
     "source": "Spent Time Crystal Catalyst",
     "translation": "失活的時間晶體催化劑"
+  },
+  "item.singulo.sports_drink": {
+    "source": "Sports Drink",
+    "translation": "運動飲料"
   },
   "item.singulo.stardust": {
     "source": "Stardust",

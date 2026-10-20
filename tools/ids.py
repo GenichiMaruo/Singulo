@@ -369,6 +369,11 @@ MOD = {
     '机のモニター': ('desk_monitor', 'Desk Monitor', 'lab'),
     'コーヒーメーカー': ('coffee_maker', 'Coffee Maker', 'lab'),
     '自動販売機': ('vending_machine', 'Vending Machine', 'lab'),
+    # 自動販売機の缶と、コーヒーメーカーのコーヒー（飲める。Java の DrinkItem）
+    '缶ソーダ': ('canned_soda', 'Canned Soda', 'item'),
+    'スポーツドリンク': ('sports_drink', 'Sports Drink', 'item'),
+    'エナジードリンク': ('energy_drink', 'Energy Drink', 'item'),
+    'コーヒー': ('coffee', 'Coffee', 'item'),
     '書類の山': ('paper_stack', 'Stack of Papers', 'lab'),
     'ごみ箱': ('trash_bin', 'Trash Bin', 'lab'),
     '遺構の照明（琥珀）': ('ruin_lamp_amber', 'Ruin Lamp (Amber)', 'ruin_block'),

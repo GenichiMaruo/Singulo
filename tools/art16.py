@@ -1885,6 +1885,30 @@ def bottle():
                                d.rectangle([7, 8, 8, 9], fill=(200, 120, 255, 255))))
 
 
+def drink_can(body, top, label):
+    """飲み物の缶（真ん中に立つ円筒）: 銀のふちと飲み口、胴の色、帯の模様。輪郭は胴の色を濃くした色。"""
+    def f(d):
+        d.rectangle([5, 3, 10, 13], fill=rgba(body))
+        d.rectangle([5, 3, 10, 4], fill=(200, 204, 212, 255))           # 上のふち
+        d.point((7, 3), fill=(120, 124, 132, 255))                       # 飲み口
+        d.rectangle([5, 13, 10, 13], fill=(170, 174, 182, 255))          # 下のふち
+        d.rectangle([5, 7, 10, 9], fill=rgba(top))                       # 帯
+        d.point((6, 8), fill=rgba(label))
+        d.line([(6, 5), (6, 12)], fill=rgba(lighten(body, 0.35)))       # 光
+    return outlined(f)
+
+
+def coffee_bottle():
+    """瓶のコーヒー: ガラス瓶に、こげ茶のコーヒーと、白い湯気の点。"""
+    def f(d):
+        d.rectangle([7, 2, 8, 4], fill=(150, 156, 164, 255))             # 口
+        d.rectangle([5, 5, 10, 13], fill=(196, 216, 228, 150))           # ガラス
+        d.rectangle([5, 8, 10, 13], fill=(92, 54, 32, 255))              # コーヒー
+        d.line([(5, 8), (10, 8)], fill=(132, 84, 52, 255))               # 液面
+        d.line([(6, 6), (6, 12)], fill=(236, 244, 250, 180))             # ガラスの光
+    return outlined(f)
+
+
 def unit(body, lamp, broken=False):
     def f(d):
         d.rectangle([2, 3, 13, 12], fill=rgba(body))
@@ -1991,6 +2015,10 @@ COPPER = (206, 126, 78)
 STEEL = (172, 178, 188)
 
 ITEM_ART = {
+    'canned_soda': lambda: drink_can((70, 150, 255), (236, 244, 252), (70, 150, 255)),
+    'sports_drink': lambda: drink_can((240, 244, 248), (60, 120, 220), (240, 244, 248)),
+    'energy_drink': lambda: drink_can((250, 206, 40), (40, 40, 44), (250, 206, 40)),
+    'coffee': lambda: coffee_bottle(),
     'steel_blend': lambda: pellet((92, 92, 104)),
     'steel_ingot': lambda: vcenter(ingot(STEEL)),
     'unfired_ceramic': lambda: plate((190, 178, 164)),

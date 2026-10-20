@@ -454,6 +454,9 @@ public final class SinguloItems {
         } else if (def.stage() >= 4) {
             props.rarity(Rarity.RARE);
         }
+        if (io.github.genichimaruo.singulo.item.DrinkItem.DRINKS.containsKey(def.id())) {
+            return new io.github.genichimaruo.singulo.item.DrinkItem(props, def.stage(), def.id());   // 自販機の缶・コーヒー
+        }
         return switch (def.kind()) {
             case "uses" -> new UsesItem(props, def.stage(), def.maxUses(), false);
             case "catalyst" -> new UsesItem(props, def.stage(), def.maxUses(), true);

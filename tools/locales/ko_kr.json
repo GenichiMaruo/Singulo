@@ -1723,6 +1723,10 @@
     "source": "A heavy door sealing the laboratory core section. It opens when facility power returns. Unbreakable.",
     "translation": "연구소 중추 구역을 막는 두꺼운 문입니다. 시설에 전력이 돌아오면 열립니다. 부술 수 없습니다."
   },
+  "desc.singulo.canned_soda": {
+    "source": "A blue can of soda from the laboratory's vending machine. Drinking it gives Speed for 2 minutes.",
+    "translation": "연구소 자판기의 파란 캔 탄산음료입니다. 마시면 2분 동안 발이 빨라집니다."
+  },
   "desc.singulo.carbon_dust": {
     "source": "Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and black reinforced panels.",
     "translation": "목탄을 압축기로 부숴 굳힌 탄소 가루(목탄 3개에서 2개). 스틸 블렌드와 검은 강화 패널에서 석탄 대신 쓸 수 있습니다."
@@ -1766,6 +1770,10 @@
   "desc.singulo.ceramic_substrate": {
     "source": "A fired ceramic board for circuits.",
     "translation": "회로용 소성 세라믹 기판입니다."
+  },
+  "desc.singulo.coffee": {
+    "source": "Coffee from a coffee maker, in a bottle. Drinking it gives Haste for 3 minutes and wakes you up, resetting the time until phantoms appear. The bottle is left over.",
+    "translation": "커피 메이커로 내린 병 커피입니다. 마시면 3분 동안 채굴이 빨라지고 잠이 깹니다(팬텀이 나타날 때까지의 시간이 초기화됩니다). 다 마시면 병이 남습니다."
   },
   "desc.singulo.coffee_maker": {
     "source": "The laboratory break-room coffee maker. Use it: it still works.",
@@ -2034,6 +2042,10 @@
   "desc.singulo.empty_coolant_cartridge": {
     "source": "A steel canister that holds 100 mB of liquid nitrogen. Right-click the cooling tower controller, or process it in the tower, to fill it.",
     "translation": "액체 질소를 100 mB 채울 수 있는 강철 용기입니다. 극저온 냉각탑의 컨트롤러를 우클릭하거나 냉각탑에서 가공하면 가득 찬 냉매 카트리지가 됩니다."
+  },
+  "desc.singulo.energy_drink": {
+    "source": "A yellow can of energy drink from the laboratory's vending machine. Drinking it gives Haste II for 2 minutes.",
+    "translation": "연구소 자판기의 노란 캔 음료입니다. 마시면 2분 동안 채굴이 매우 빨라집니다(성급함 II)."
   },
   "desc.singulo.entangled_element": {
     "source": "Always made in pairs. Used in detectors and links.",
@@ -2642,6 +2654,10 @@
   "desc.singulo.spent_time_crystal_catalyst": {
     "source": "A used-up Time Crystal Catalyst. About 25% can be recovered as a lower-tier catalyst.",
     "translation": "다 쓴 시간 결정 촉매. 약 25%를 한 티어 아래 촉매로 회수할 수 있습니다."
+  },
+  "desc.singulo.sports_drink": {
+    "source": "A white can of sports drink from the laboratory's vending machine. Drinking it gives Regeneration for 15 seconds.",
+    "translation": "연구소 자판기의 하얀 캔 음료입니다. 마시면 15초 동안 체력이 회복됩니다."
   },
   "desc.singulo.stardust": {
     "source": "Cosmic grains carrying rare isotopes. The raw material for cold atoms.",
@@ -7947,6 +7963,10 @@
     "source": "Builder's Wand",
     "translation": "건축가의 지팡이"
   },
+  "item.singulo.canned_soda": {
+    "source": "Canned Soda",
+    "translation": "캔 소다"
+  },
   "item.singulo.carbon_dust": {
     "source": "Carbon Dust",
     "translation": "탄소 가루"
@@ -7958,6 +7978,10 @@
   "item.singulo.ceramic_substrate": {
     "source": "Ceramic Substrate",
     "translation": "세라믹 기판"
+  },
+  "item.singulo.coffee": {
+    "source": "Coffee",
+    "translation": "커피"
   },
   "item.singulo.cold_atom_trap": {
     "source": "Cold Atom Trap",
@@ -8050,6 +8074,10 @@
   "item.singulo.empty_coolant_cartridge": {
     "source": "Empty Coolant Cartridge",
     "translation": "빈 냉매 카트리지"
+  },
+  "item.singulo.energy_drink": {
+    "source": "Energy Drink",
+    "translation": "에너지 드링크"
   },
   "item.singulo.entangled_element": {
     "source": "Entangled Element",
@@ -8398,6 +8426,10 @@
   "item.singulo.spent_time_crystal_catalyst": {
     "source": "Spent Time Crystal Catalyst",
     "translation": "소모된 시간 결정 촉매"
+  },
+  "item.singulo.sports_drink": {
+    "source": "Sports Drink",
+    "translation": "스포츠 드링크"
   },
   "item.singulo.stardust": {
     "source": "Stardust",

@@ -3448,7 +3448,8 @@ TAB_GROUPS = [
     # 地下アンドロイド研究所: 建材 → 照明 → 装置 → 小物 → 製造ライン
     ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead', 'lab_door',
               'facility_light', 'emergency_light', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
-              'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'paper_stack', 'trash_bin',
+              'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'canned_soda', 'sports_drink', 'energy_drink',
+              'coffee', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',

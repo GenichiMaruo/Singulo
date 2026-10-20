@@ -592,6 +592,10 @@ DESC = {
                'Steel plates welded shut over the lab\'s supply shaft. Sealed until the lab\'s AI is defeated; after that it can be '
                'mined with a diamond pickaxe.'),
     '耐圧殻': ('研究所の部屋と廊下を包む、厚さ2の鋼の殻。統括AIが倒れるまでは封じられていて壊せない。そのあとも黒曜石より硬い。', 'The two-block-thick steel shell around the laboratory\'s rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.'),
+    '缶ソーダ': ('研究所の自動販売機の、青い缶の炭酸飲料。飲むと2分間、足が速くなる。', "A blue can of soda from the laboratory's vending machine. Drinking it gives Speed for 2 minutes."),
+    'スポーツドリンク': ('研究所の自動販売機の、白い缶の飲み物。飲むと15秒間、体力が回復していく。', "A white can of sports drink from the laboratory's vending machine. Drinking it gives Regeneration for 15 seconds."),
+    'エナジードリンク': ('研究所の自動販売機の、黄色い缶の飲み物。飲むと2分間、採掘がとても速くなる。', "A yellow can of energy drink from the laboratory's vending machine. Drinking it gives Haste II for 2 minutes."),
+    'コーヒー': ('コーヒーメーカーで淹れた、瓶入りのコーヒー。飲むと3分間採掘が速くなり、眠気が覚める（ファントムが出るまでの時間が戻る）。飲み終えると瓶が残る。', 'Coffee from a coffee maker, in a bottle. Drinking it gives Haste for 3 minutes and wakes you up, resetting the time until phantoms appear. The bottle is left over.'),
     '研究所のスライドドア': ('研究所の個室や厨房の、白い2枚の引き戸。右クリックで左右の壁の中へ滑って開き、通る人がいなくなると自分で閉まる。レッドストーンの信号が入っている間は開いたまま。作れない。', "The white twin sliding doors of the laboratory's private rooms and kitchen. Right-click to slide them open into the walls; they close by themselves once no one is passing through. They stay open while powered by redstone. Cannot be crafted."),
     '隔壁': ('研究所の中枢区画をふさぐ厚い扉。施設の電力が戻ると開く。壊せない。', 'A heavy door sealing the laboratory core section. It opens when facility power returns. Unbreakable.'),
     '動力炉の制御盤': ('中央動力炉の制御盤。右クリックで動力炉を起動すると、施設の電力が戻る。', 'Central reactor control panel. Use it to restart the reactor and restore facility power.'),
