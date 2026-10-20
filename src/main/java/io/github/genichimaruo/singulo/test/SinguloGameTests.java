@@ -146,6 +146,16 @@ public final class SinguloGameTests {
         });
     }
 
+    /** 隕鉄の原石は、溶鉱炉だけでなく焼成炉でも隕鉄インゴットに焼ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void kilnSmeltsRawMeteoricIron(GameTestHelper helper) {
+        MachineBlockEntity kiln = machine(helper, MachineType.KILN);
+        helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        kiln.items().setStackInSlot(0, new ItemStack(item("raw_meteoric_iron")));
+        helper.succeedWhen(() -> helper.assertTrue(
+                kiln.items().getStackInSlot(kiln.type().outputSlot()).is(item("meteoric_iron_ingot")), "隕鉄インゴットが焼けない"));
+    }
+
     /** 純酸素転炉: 焼成炉に鉄2・石炭1・酸素250 mB で鋼鉄インゴット2。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void kilnBlowsOxygenIntoSteel(GameTestHelper helper) {

@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 2,
+  "time": 60,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:raw_meteoric_iron"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:meteoric_iron_ingot",
+    "count": 1
+  }
+}

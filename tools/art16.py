@@ -1126,8 +1126,77 @@ def compressed_block(level, metal):
 OUT = (24, 28, 36, 255)
 
 
-def outlined(fn):
-    """形を描き、外側に1ドットの輪郭を付ける。輪郭は真っ黒にせず、内側の色をぐっと暗くした色にする。"""
+def vcenter(im):
+    """絵を上下中央へ寄せる（上と下の透明な余白をそろえる。差が奇数のときは下の余白を1ドット広く残す）。"""
+    from PIL import Image as _Image
+    box = im.getbbox()
+    if box is None:
+        return im
+    top, bottom = box[1], im.size[1] - box[3]
+    dy = (top - bottom) // 2
+    if dy == 0:
+        return im
+    out = _Image.new('RGBA', im.size, (0, 0, 0, 0))
+    out.paste(im, (0, -dy))
+    return out
+
+
+def shrink(im, axis='x'):
+    """絵を1ドット縮める: 内側（端から2ドットより内）の行（axis='y'）か列（axis='x'）のうち、隣といちばん似ているものを抜き、
+    残りを詰める。拡大縮小と違って、ドットの形が崩れない。"""
+    from PIL import Image as _Image
+    box = im.getbbox()
+    if box is None:
+        return im
+    px = im.load()
+    w, h = im.size
+    if axis == 'x':
+        lines = range(box[0] + 2, box[2] - 3)
+        diff = lambda k: sum(sum(abs(a - b) for a, b in zip(px[k, y], px[k + 1, y])) for y in range(h))
+    else:
+        lines = range(box[1] + 2, box[3] - 3)
+        diff = lambda k: sum(sum(abs(a - b) for a, b in zip(px[x, k], px[x, k + 1])) for x in range(w))
+    drop = min(lines, key=diff)
+    out = _Image.new('RGBA', im.size, (0, 0, 0, 0))
+    po = out.load()
+    for y in range(h):
+        for x in range(w):
+            sx, sy = (x if x < drop else x + 1, y) if axis == 'x' else (x, y if y < drop else y + 1)
+            if sx < w and sy < h:
+                po[x, y] = px[sx, sy]
+    return out
+
+
+def center(im):
+    """絵を上下左右の中央へ寄せる（上下・左右それぞれの透明な余白をそろえる。差が奇数なら下・右を1ドット広く残す）。"""
+    from PIL import Image as _Image
+    box = im.getbbox()
+    if box is None:
+        return im
+    dx = (box[0] - (im.size[0] - box[2])) // 2
+    dy = (box[1] - (im.size[1] - box[3])) // 2
+    if dx == 0 and dy == 0:
+        return im
+    out = _Image.new('RGBA', im.size, (0, 0, 0, 0))
+    out.paste(im, (-dx, -dy))
+    return out
+
+
+def deepen(c, dark, vivid=1.5):
+    """同じ色の濃い版: 灰色や紺を混ぜずに、明るさを dark だけ落とし、鮮やかさを vivid 倍にする（色味が残る）。"""
+    import colorsys
+    h, s, v = colorsys.rgb_to_hsv(*(x / 255 for x in c))
+    r, g, b = colorsys.hsv_to_rgb(h, min(1.0, s * vivid + 0.06), v * (1 - dark))
+    return (round(r * 255), round(g * 255), round(b * 255))
+
+
+# インゴット・板の輪郭: 地金や板の色をそのまま濃くした縁（灰色を足さない）
+SOFT_EDGE = dict(dark=0.45, deep=True)
+
+
+def outlined(fn, dark=0.62, tint=0.25, deep=True):
+    """形を描き、外側に1ドットの輪郭を付ける。輪郭は真っ黒にせず、内側の色を dark だけ暗くし、紺を tint だけ混ぜた色にする。
+    deep（既定）なら紺を混ぜずに、内側の色をそのまま濃くする（deepen）。"""
     im, d = new()
     fn(d)
     px = im.load()
@@ -1144,7 +1213,7 @@ def outlined(fn):
                         cols.append(px[nx, ny][:3])
                 if cols:
                     avg = tuple(sum(c[i] for c in cols) // len(cols) for i in range(3))
-                    po[x, y] = rgba(mix(darken(avg, 0.62), (40, 44, 60), 0.25))
+                    po[x, y] = rgba(deepen(avg, dark) if deep else mix(darken(avg, dark), (40, 44, 60), tint))
                     edge.add((x, y))
     out.info['outline'] = edge
     return out
@@ -1186,7 +1255,7 @@ def ingot(c):
     return outlined(lambda d: (d.polygon([(2, 9), (6, 5), (13, 5), (9, 9)], fill=rgba(lighten(c, 0.3))),
                                d.rectangle([2, 9, 9, 12], fill=rgba(c)),
                                d.polygon([(9, 9), (13, 5), (13, 8), (9, 12)], fill=rgba(darken(c, 0.25))),
-                               d.line([(3, 10), (8, 10)], fill=rgba(lighten(c, 0.45)))))
+                               d.line([(3, 10), (8, 10)], fill=rgba(lighten(c, 0.45)))), **SOFT_EDGE)
 
 
 def plate(c, stripes=0, accent=(110, 205, 238)):
@@ -1196,7 +1265,7 @@ def plate(c, stripes=0, accent=(110, 205, 238)):
         d.polygon([(6, 10), (14, 6), (14, 8), (6, 12)], fill=rgba(darken(c, 0.1)))
         for k in range(stripes):
             d.line([(4 + k * 2, 7), (8 + k * 2, 5)], fill=rgba(accent))
-    return outlined(f)
+    return outlined(f, **SOFT_EDGE)
 
 
 def circuit(board, chip, trace):
@@ -1239,12 +1308,13 @@ def frame(c, trim):
 
 
 def module(body, lamp):
+    """モジュール: 基板（circuit）と同じ外形（輪郭込みで 14×12）。上の明るい縁、表示窓のランプ、下の光る帯。"""
     def f(d):
-        d.rectangle([2, 4, 13, 12], fill=rgba(body))
-        d.line([(2, 4), (13, 4)], fill=rgba(lighten(body, 0.3)))
-        d.rectangle([4, 6, 11, 8], fill=(30, 38, 48, 255))
+        d.rectangle([2, 3, 13, 12], fill=rgba(body))
+        d.line([(2, 3), (13, 3)], fill=rgba(lighten(body, 0.3)))
+        d.rectangle([4, 5, 11, 8], fill=(30, 38, 48, 255))
         for x in (5, 7, 9):
-            d.point((x, 7), fill=rgba(lamp))
+            d.point((x, 6), fill=rgba(lamp))
         d.line([(4, 10), (11, 10)], fill=rgba(lamp))
     return outlined(f)
 
@@ -1407,22 +1477,24 @@ def meteoric_ingot():
         d.line([(3, 11), (5, 9)], fill=rgba(darken(c, 0.15)))
         d.line([(6, 12), (8, 10)], fill=rgba(darken(c, 0.15)))
         d.point((7, 10), fill=rgba(lighten(c, 0.5)))
-    return outlined(f)
+    return outlined(f, **SOFT_EDGE)
 
 
 def stardust():
     """星屑: 小さな山に、水色と菫色にまたたく粒。"""
     def f(d):
-        d.polygon([(2, 12), (5, 8), (8, 7), (11, 8), (14, 12), (8, 13)], fill=(70, 76, 110, 255))
-        d.polygon([(5, 9), (8, 7), (11, 8), (8, 10)], fill=(104, 112, 160, 255))
-        for x, y, col in ((5, 10, (150, 230, 255)), (8, 8, (255, 255, 255)), (10, 10, (210, 170, 255)), (7, 11, (150, 230, 255)),
-                          (12, 11, (210, 170, 255))):
+        # 山は x2〜13 の左右対称（輪郭込みで14ドット幅。16ドットの中でちょうど中央に置ける）
+        d.polygon([(2, 12), (5, 8), (7, 7), (8, 7), (10, 8), (13, 12), (8, 13), (7, 13)], fill=(70, 76, 110, 255))
+        d.polygon([(5, 9), (7, 7), (8, 7), (10, 9), (8, 10), (7, 10)], fill=(104, 112, 160, 255))
+        for x, y, col in ((4, 11, (150, 230, 255)), (7, 8, (255, 255, 255)), (9, 10, (210, 170, 255)), (6, 11, (150, 230, 255)),
+                          (11, 11, (210, 170, 255))):
             d.point((x, y), fill=rgba(col))
-        # 上に舞う粒
-        for x, y in ((4, 4), (9, 3), (12, 5)):
+        # 上に舞う粒（縁が欠けないよう、粒どうし・山から2ドット以上離す）
+        for x, y in ((3, 4), (12, 5)):
             d.point((x, y), fill=(200, 236, 255, 255))
-        d.line([(9, 2), (9, 4)], fill=(255, 255, 255, 200))
-        d.line([(8, 3), (10, 3)], fill=(255, 255, 255, 200))
+        d.point((8, 3), fill=(200, 236, 255, 255))
+        d.line([(8, 2), (8, 4)], fill=(255, 255, 255, 200))
+        d.line([(7, 3), (9, 3)], fill=(255, 255, 255, 200))
     return outlined(f)
 
 
@@ -1536,7 +1608,7 @@ def bismuth_ingot():
         d.line([(3, 10), (5, 10)], fill=(150, 120, 220, 255))
         d.line([(6, 11), (8, 11)], fill=(230, 180, 90, 255))
         d.point((12, 6), fill=(120, 210, 220, 255))
-    return outlined(f)
+    return outlined(f, **SOFT_EDGE)
 
 
 NIHONIUM = (150, 166, 176)
@@ -1555,6 +1627,28 @@ def nihonium():
     return outlined(f)
 
 
+def zinc_ingot():
+    """亜鉛インゴット: 鋼鉄より明るく青みのある地金。上の面に、亜鉛が固まるときにできるスパングル（花のような結晶の模様）。"""
+    c = (172, 196, 230)
+
+    def f(d):
+        d.polygon([(2, 9), (6, 5), (13, 5), (9, 9)], fill=rgba(lighten(c, 0.22)))
+        d.rectangle([2, 9, 9, 12], fill=rgba(c))
+        d.polygon([(9, 9), (13, 5), (13, 8), (9, 12)], fill=rgba(darken(c, 0.25)))
+        # スパングル: 結晶の区画ごとに明るさが違い、境目に細い線
+        d.polygon([(6, 6), (9, 6), (7, 8)], fill=rgba(lighten(c, 0.45)))
+        d.polygon([(9, 6), (12, 6), (10, 7)], fill=rgba(lighten(c, 0.08)))
+        d.line([(5, 7), (8, 7)], fill=rgba(darken(c, 0.12)))
+        d.line([(9, 6), (8, 8)], fill=rgba(darken(c, 0.12)))
+        d.point((10, 7), fill=rgba(lighten(c, 0.55)))
+        # 前の面: 区画の境目と、明るい結晶面
+        d.line([(5, 9), (5, 12)], fill=rgba(darken(c, 0.12)))
+        d.rectangle([6, 10, 8, 11], fill=rgba(lighten(c, 0.18)))
+        d.point((3, 11), fill=rgba(lighten(c, 0.3)))
+        d.point((11, 9), fill=rgba(lighten(c, 0.1)))
+    return outlined(f, **SOFT_EDGE)
+
+
 def nihonium_ingot():
     """ニホニウムインゴット: 青みの灰色の重い地金に、青緑の光の筋。"""
     c = NIHONIUM
@@ -1565,7 +1659,7 @@ def nihonium_ingot():
         d.polygon([(9, 9), (13, 5), (13, 8), (9, 12)], fill=rgba(darken(c, 0.28)))
         d.line([(3, 10), (8, 10)], fill=rgba(NIHONIUM_GLOW))
         d.line([(6, 7), (10, 6)], fill=rgba(lighten(c, 0.5)))
-    return outlined(f)
+    return outlined(f, **SOFT_EDGE)
 
 
 def unfired_phosphor():
@@ -1580,6 +1674,25 @@ def unfired_phosphor():
             d.point((x, y), fill=(190, 110, 70, 255))
         d.point((8, 7), fill=(240, 240, 226, 255))
     return outlined(f)
+
+
+def unfired_teacup():
+    """未焼成のティーカップ: 焼く前の粘土のカップ（ティーカップと同じ形。金の縁も紅茶もない）。"""
+    from PIL import Image as _Image
+    import androids
+    base, _, inner = androids.teacup_layers(_Image)
+    clay = (178, 152, 130)
+    im = _Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    src, px = base.load(), im.load()
+    for y in range(S):
+        for x in range(S):
+            r, g, b, a = src[x, y]
+            if a:
+                k = r / 255
+                px[x, y] = (int(clay[0] * k), int(clay[1] * k), int(clay[2] * k), 255)
+    for p in inner:
+        px[p] = rgba(darken(clay, 0.35))
+    return im
 
 
 def empty_coolant_cartridge():
@@ -1605,7 +1718,7 @@ def phase_sync_plate():
         for k in range(4):
             col = (255, 196, 110) if k % 2 == 0 else (200, 160, 255)
             d.line([(3 + k * 2, 7 + (k % 2)), (7 + k * 2, 5 + (k % 2))], fill=rgba(col))
-    return outlined(f)
+    return outlined(f, **SOFT_EDGE)
 
 
 def degenerate_precursor():
@@ -1613,12 +1726,14 @@ def degenerate_precursor():
     c = (40, 36, 56)
 
     def f(d):
-        d.polygon([(3, 6), (8, 3), (13, 6), (8, 9)], fill=rgba(lighten(c, 0.25)))
-        d.polygon([(3, 6), (8, 9), (8, 14), (3, 11)], fill=rgba(c))
-        d.polygon([(8, 9), (13, 6), (13, 11), (8, 14)], fill=rgba(darken(c, 0.3)))
-        d.line([(5, 8), (6, 11)], fill=(200, 150, 255, 255))
-        d.line([(10, 9), (11, 11), (10, 12)], fill=(200, 150, 255, 255))
-        d.point((8, 6), fill=(230, 210, 255, 255))
+        # 頂点を2ドット幅にして左右対称に（横幅が偶数なので、16ドットの中でちょうど中央に置ける）
+        d.polygon([(2, 5), (7, 2), (8, 2), (13, 5), (8, 8), (7, 8)], fill=rgba(lighten(c, 0.25)))
+        d.polygon([(2, 5), (7, 8), (7, 13), (2, 10)], fill=rgba(c))
+        d.polygon([(8, 8), (13, 5), (13, 10), (8, 13)], fill=rgba(darken(c, 0.3)))
+        d.line([(4, 7), (5, 10)], fill=(200, 150, 255, 255))
+        d.line([(10, 8), (11, 10), (10, 11)], fill=(200, 150, 255, 255))
+        d.point((7, 5), fill=(230, 210, 255, 255))
+        d.point((8, 5), fill=(230, 210, 255, 255))
     return outlined(f)
 
 
@@ -1867,7 +1982,7 @@ STEEL = (172, 178, 188)
 
 ITEM_ART = {
     'steel_blend': lambda: pellet((92, 92, 104)),
-    'steel_ingot': lambda: ingot(STEEL),
+    'steel_ingot': lambda: vcenter(ingot(STEEL)),
     'unfired_ceramic': lambda: plate((190, 178, 164)),
     'white_ceramic_composite': lambda: plate((236, 238, 240)),
     'basic_circuit': lambda: circuit((60, 120, 90), (40, 44, 52), COPPER),
@@ -1879,26 +1994,27 @@ ITEM_ART = {
     'basic_frame': lambda: frame(STEEL, (236, 238, 240)),
     'wormhole_mouth_casing': lambda: frame((58, 48, 82), (214, 144, 255)),
     'raw_meteoric_iron': raw_meteoric_iron,
-    'meteoric_iron_ingot': meteoric_ingot,
-    'stardust': stardust,
+    'meteoric_iron_ingot': lambda: vcenter(meteoric_ingot()),
+    'stardust': lambda: center(stardust()),
     'fulgurite': fulgurite,
     'pressure_crystal': lambda: crystal_cluster((60, 104, 206), seed=5, mark=(210, 235, 255)),
     'void_dust': void_dust,
-    'coolant_cartridge': coolant_cartridge,
-    'empty_coolant_cartridge': empty_coolant_cartridge,
+    'coolant_cartridge': lambda: center(shrink(coolant_cartridge(), 'y')),
+    'empty_coolant_cartridge': lambda: center(shrink(empty_coolant_cartridge(), 'y')),
     'fluid_canister': fluid_canister,
-    'limestone_powder': limestone_powder,
-    'carbon_dust': carbon_dust,
-    'zinc_dust': zinc_dust,
-    'zinc_ingot': lambda: ingot((176, 186, 196)),
-    'bismuth_ingot': bismuth_ingot,
+    'limestone_powder': lambda: center(shrink(limestone_powder(), 'x')),
+    'carbon_dust': lambda: center(shrink(carbon_dust(), 'x')),
+    'zinc_dust': lambda: center(shrink(zinc_dust(), 'x')),
+    'zinc_ingot': lambda: vcenter(zinc_ingot()),
+    'bismuth_ingot': lambda: vcenter(bismuth_ingot()),
     'nihonium': nihonium,
-    'nihonium_ingot': nihonium_ingot,
+    'nihonium_ingot': lambda: vcenter(nihonium_ingot()),
     'nihonium_plate': lambda: plate(NIHONIUM, stripes=2, accent=NIHONIUM_GLOW),
     'nihonium_frame': lambda: frame(NIHONIUM, NIHONIUM_GLOW),
-    'unfired_phosphor': unfired_phosphor,
+    'unfired_phosphor': lambda: center(shrink(unfired_phosphor(), 'x')),
+    'unfired_teacup': lambda: vcenter(unfired_teacup()),
     'phase_sync_plate': phase_sync_plate,
-    'degenerate_precursor': degenerate_precursor,
+    'degenerate_precursor': lambda: center(degenerate_precursor()),
     'confinement_ring': confinement_ring,
     'sentinel_core': sentinel_core,
     'afterglow_wings': afterglow_wings,
@@ -2170,14 +2286,14 @@ def bomb_item():
 
 def settings_card():
     """設定カード: 白いカードに、写す・貼るの矢印。"""
-    im, d = new()
-    d.rectangle([2, 3, 13, 12], fill=(236, 240, 246, 255), outline=(140, 150, 165, 255))
-    d.rectangle([3, 4, 12, 5], fill=(110, 205, 238, 255))
-    d.line([(4, 8), (8, 8)], fill=(60, 110, 170, 255))
-    d.point([(7, 7), (7, 9)], fill=(60, 110, 170, 255))
-    d.line([(7, 10), (11, 10)], fill=(240, 160, 60, 255))
-    d.point([(8, 9), (8, 11)], fill=(240, 160, 60, 255))
-    return im
+    def f(d):
+        d.rectangle([2, 4, 13, 11], fill=(236, 240, 246, 255))
+        d.rectangle([2, 4, 13, 5], fill=(110, 205, 238, 255))
+        d.line([(4, 7), (8, 7)], fill=(60, 110, 170, 255))
+        d.point([(7, 6), (7, 8)], fill=(60, 110, 170, 255))
+        d.line([(7, 10), (11, 10)], fill=(240, 160, 60, 255))
+        d.point([(8, 9), (8, 11)], fill=(240, 160, 60, 255))
+    return outlined(f)
 
 
 def permit_card():
@@ -2244,10 +2360,24 @@ def _anim_vial(t, liquid, glow, bubbles=True, sparkle=None):
     wave = round(math.sin(t * 2 * math.pi))
 
     def f(d):
+        from PIL import Image as _Image, ImageDraw as _Draw
         d.rectangle([6, 2, 9, 3], fill=(150, 156, 164, 255))
         d.polygon([(6, 4), (9, 4), (12, 13), (3, 13)], fill=(220, 236, 246, 120))
         top = 8 + wave * 0.5
-        d.polygon([(5, top), (10, top - wave * 0.5), (12, 13), (3, 13)], fill=rgba(liquid))
+        # ガラスのいちばん外側の1ドットは不透明な縁にし、液はその内側だけに塗る。
+        # 液面が動いても瓶の外形（と、その外の輪郭）がどのコマでも同じになり、液が瓶の外へはみ出さない
+        glass = d._image.load()
+        inside = {(x, y) for y in range(S) for x in range(S) if glass[x, y][3] > 0}
+        rim = {(x, y) for (x, y) in inside if y >= 4
+               and any((x + dx, y + dy) not in inside for dx, dy in ((1, 0), (-1, 0), (0, 1)))}
+        for p in rim:
+            d.point(p, fill=(196, 212, 224, 255))
+        layer = _Image.new('L', (S, S), 0)
+        _Draw.Draw(layer).polygon([(5, top), (10, top - wave * 0.5), (12, 13), (3, 13)], fill=255)
+        mask = layer.load()
+        for (x, y) in inside - rim:
+            if mask[x, y]:
+                d.point((x, y), fill=rgba(liquid))
         if glow and bubbles:
             for k in range(2):
                 y = 12 - ((t + k * 0.5) % 1.0) * 4

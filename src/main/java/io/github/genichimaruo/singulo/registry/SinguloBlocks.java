@@ -289,6 +289,10 @@ public final class SinguloBlocks {
     public static final DeferredBlock<Block> WHITE_LIGHT_PANEL = BLOCKS.registerSimpleBlock("white_light_panel",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.GLASS).lightLevel(s -> 15));
+    /** 置いたティーカップ（アイテムはアンドロイドの装飾のティーカップ。ブロック用のアイテムは作らない）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.android.TeacupBlock> TEACUP = BLOCKS.register("teacup",
+            () -> new io.github.genichimaruo.singulo.android.TeacupBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                    .strength(0.3F).sound(SoundType.DECORATED_POT).noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
     /** ビスマス結晶ブロック（溶かしたビスマスが冷えてできる、階段状の虹色の骸晶）と、その光るもの。 */
     public static final DeferredBlock<Block> BISMUTH_CRYSTAL_BLOCK = BLOCKS.registerSimpleBlock("bismuth_crystal_block",
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()

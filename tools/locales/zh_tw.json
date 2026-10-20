@@ -1215,6 +1215,10 @@
     "source": "Superconducting Cable",
     "translation": "超導電纜"
   },
+  "block.singulo.teacup": {
+    "source": "Teacup",
+    "translation": "茶杯"
+  },
   "block.singulo.thermoelectric_generator": {
     "source": "Thermoelectric Generator",
     "translation": "熱電發電機"
@@ -1592,8 +1596,8 @@
     "translation": "裝在護衛仿生人上後，會有 2 個可裝液體或氣體的儲罐（各 32,000 mB，每個儲罐一種）。作業時可把流體從資材存放處運到裝置。腰部會出現儲罐。儲罐裡還有東西時無法取下。"
   },
   "desc.singulo.android_teacup": {
-    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
-    "translation": "待機中的仿生人拿在手上的茶杯。放入裝飾頁的欄位。可與染料一起在工作台染色。"
+    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table. Right-click to place it as a cup on a saucer; it keeps its color and comes back when broken.",
+    "translation": "待機的仿生人拿在手中的茶杯。裝在裝飾頁的欄位中。可與染料一起在製作台上染色。右鍵可將它放置為放在茶碟上的杯子（保留染好的顏色，破壞後會變回物品）。"
   },
   "desc.singulo.android_transfer_upgrade": {
     "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
@@ -2754,6 +2758,10 @@
   "desc.singulo.unfired_phosphor": {
     "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
     "translation": "把鋅粉、火藥（硫）和銅混合而成的粉末。在燒製爐中燒製後可得到 4 個蓄光體螢石粉。"
+  },
+  "desc.singulo.unfired_teacup": {
+    "source": "A teacup shaped from clay, not yet fired. Fire it in a furnace or the Kiln to get a teacup.",
+    "translation": "用黏土捏成、尚未燒製的茶杯。在熔爐或燒製爐中燒製後即成為茶杯。"
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -6736,8 +6744,8 @@
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
   "howto.singulo.android_teacup": {
-    "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "source": "Made in: Furnace (stage 1)",
+    "translation": "製造地：熔爐（第 1 階段）"
   },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -7587,6 +7595,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
   },
+  "howto.singulo.unfired_teacup": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：製作台（第 1 階段）"
+  },
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
     "translation": "製造地：蟲洞產生器（第 5 階段）"
@@ -8422,6 +8434,10 @@
   "item.singulo.unfired_phosphor": {
     "source": "Unfired Phosphor",
     "translation": "未燒製螢光體"
+  },
+  "item.singulo.unfired_teacup": {
+    "source": "Unfired Teacup",
+    "translation": "未燒製茶杯"
   },
   "item.singulo.unstable_wormhole_mouth": {
     "source": "Unstable Wormhole Mouth",
@@ -10938,6 +10954,10 @@
   "uses.singulo.unfired_ceramic": {
     "source": "Used in: White Ceramic Composite",
     "translation": "用於：白色陶瓷複合材料"
+  },
+  "uses.singulo.unfired_teacup": {
+    "source": "Used in: Teacup",
+    "translation": "用於：茶杯"
   },
   "uses.singulo.unstable_wormhole_mouth": {
     "source": "Used in: Wormhole Mouth",

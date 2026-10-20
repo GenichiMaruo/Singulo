@@ -685,6 +685,15 @@ def item_textures(ti, save):
     save(wear(gas_tank_icon(Image), 33), ti / 'android_gas_tank_upgrade.png')
     save(wear(dual_tank_icon(Image), 35), ti / 'android_dual_tank_upgrade.png')
     for n, (iid, (base, detail)) in enumerate(accessory_icons(Image).items()):
+        # 染めない層（layer1）のあるドットは、染める層（layer0）から抜く。手に持ったときの立体では両方の層の
+        # 側面が同じ位置に重なり、ちらつく（Zファイティング）ため。上に重なる絵なので見た目は変わらない
+        bp, dp = base.load(), detail.load()
+        for y in range(16):
+            for x in range(16):
+                if dp[x, y][3] > 0:
+                    bp[x, y] = (0, 0, 0, 0)
+        if iid in CENTERED_ACCESSORIES:
+            base, detail = _vcenter_pair(Image, base, detail)
         if iid in FABRIC_ACCESSORIES:
             fabric(base, 41 + n)                       # 布の織り目
         save(wear(base, 41 + n), ti / f'{iid}.png')     # 使い込んだ汚し（染める所も、染めない所も）
@@ -953,13 +962,14 @@ def card_icon(Image, stripe, recorded=None):
     作業位置カードは、未記録（recorded=False）なら帯が灰色で点が消え、記録済みなら帯が緑で、右上に位置の印（ピン）が付く。"""
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     px = im.load()
+    # 外形はデータカードと同じ 14×10（x1〜14、y3〜12）。縁はカードの白を濃くした色
     for y in range(3, 13):
-        for x in range(2, 14):
-            if (x, y) in ((2, 3), (13, 3), (2, 12), (13, 12)):
+        for x in range(1, 15):
+            if (x, y) in ((1, 3), (14, 3), (1, 12), (14, 12)):
                 continue
-            px[x, y] = ((150, 156, 170) if x in (2, 13) or y in (3, 12) else (238, 240, 244)) + (255,)
+            px[x, y] = ((150, 156, 170) if x in (1, 14) or y in (3, 12) else (238, 240, 244)) + (255,)
     for y in range(4, 7):
-        for x in range(3, 13):
+        for x in range(2, 14):
             px[x, y] = stripe + (255,)
     for x in (4, 6, 8):
         px[x, 10] = (226, 186, 92, 255)
@@ -1246,6 +1256,25 @@ ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'andr
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella')
 
 
+# 2枚の層を合わせた外形で、上下中央に寄せる装飾
+CENTERED_ACCESSORIES = ('android_teacup', 'android_umbrella')
+
+
+def _vcenter_pair(Image, base, detail):
+    """2枚の層を、合わせた外形の上下の余白がそろうように、同じだけずらす。"""
+    boxes = [b for b in (base.getbbox(), detail.getbbox()) if b]
+    top, bottom = min(b[1] for b in boxes), 16 - max(b[3] for b in boxes)
+    dy = (top - bottom) // 2
+    if dy == 0:
+        return base, detail
+    out = []
+    for im in (base, detail):
+        moved = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+        moved.paste(im, (0, -dy))
+        out.append(moved)
+    return out[0], out[1]
+
+
 FABRIC_ACCESSORIES = ('android_ribbon', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf', 'android_waist_ribbon')
 
 
@@ -1265,6 +1294,49 @@ def fabric(im, seed):
             if rng.random() < 0.06:
                 k += 10                                  # 毛羽
             px[x, y] = (max(0, min(255, r + k)), max(0, min(255, g + k)), max(0, min(255, b + k)), a)
+
+
+def teacup_layers(Image):
+    """ティーカップの絵（斜め上から見た、受け皿にのったカップ）。返り値は (染める所, 染めない所, 口の中)。
+    口は楕円で、奥の内壁が見え、紅茶は縁より低い所に張る。縁は金。右に輪の取っ手（輪の中は抜く）。
+    口の中（紅茶の面）は「口の中」として別に返す（未焼成のカップでは、紅茶の代わりに内側の陰で塗る）。"""
+    W, S, E = (255, 255, 255, 255), (216, 216, 216, 255), (160, 160, 160, 255)
+    base = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    detail = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    b, d = base.load(), detail.load()
+    # 受け皿: 上の面（白）、手前の厚み（影）、下の縁
+    for x in range(3, 13):
+        b[x, 12] = W
+    for x in range(1, 15):
+        b[x, 13] = S
+    for x in range(3, 13):
+        b[x, 14] = E
+    b[2, 12] = b[13, 12] = E
+    b[1, 13] = b[14, 13] = E
+    # カップの胴: 下へすぼまる。左は光、右は影、両端は縁
+    for y, (x0, x1) in ((7, (3, 11)), (8, (3, 11)), (9, (3, 11)), (10, (4, 10)), (11, (5, 9))):
+        for x in range(x0, x1 + 1):
+            b[x, y] = E if x in (x0, x1) else S if x >= x1 - 2 else W
+    # 口の縁（楕円。染める所にも置いて、金の縁の下地にする）
+    rim = [(x, 4) for x in range(5, 10)] + [(3, 5), (4, 5), (10, 5), (11, 5), (3, 6), (11, 6)] + [(x, 7) for x in range(4, 11)]
+    for p in rim:
+        b[p] = W
+        d[p] = (226, 186, 84, 255)
+    for p in ((6, 4), (7, 4)):
+        d[p] = (250, 222, 140, 255)                       # 縁の光
+    # 奥の内壁（口の上半分。陰になって暗い）
+    for x in range(5, 10):
+        b[x, 5] = E
+    # 取っ手: 右に輪（輪の中は抜く）
+    for p in ((12, 8), (13, 8), (13, 9), (13, 10), (12, 11)):
+        b[p] = S
+    b[13, 9] = E
+    # 口の中の紅茶（縁より低い所に張る。左に光）
+    inner = [(x, 6) for x in range(4, 11)]
+    for p in inner:
+        d[p] = (130, 82, 52, 255)
+    d[5, 6] = (176, 120, 78, 255)
+    return base, detail, inner
 
 
 def accessory_icons(Image):
@@ -1394,23 +1466,40 @@ def accessory_icons(Image):
     rect(b, 9, 11, 10, 11, S)
     rect(b, 7, 11, 8, 11, E)
     out['android_bouquet'] = (b, d)
-    # ティーカップ: カップと受け皿（染める）、金の縁、紅茶、取っ手
-    b, d = new(), new()
-    shaded(b, 1, 12, 14, 13)
-    shaded(b, 3, 5, 11, 11)
-    shaded(b, 11, 6, 13, 9)
-    rect(d, 3, 5, 11, 5, (224, 184, 80, 255))
-    rect(d, 4, 6, 10, 6, (138, 90, 58, 255))
+    # ティーカップ: 受け皿にのったカップ（染める）。口の奥に紅茶、金の縁、輪の取っ手
+    b, d, _ = teacup_layers(Image)
     out['android_teacup'] = (b, d)
-    # 傘: 半円の傘（染める）と柄
+    # 傘: てっぺんの石突き、骨で区切られた布（1枚おきに陰）、縁は骨の先でとがる波形、
+    # まっすぐな柄と、下で曲がった持ち手（J の形）
     b, d = new(), new()
-    for y in range(2, 8):
-        w = min(7, 2 + (y - 2) * 2)
-        shaded(b, 8 - w, y, 7 + w, y)
-    rect(b, 1, 7, 14, 7, S)
-    rect(d, 7, 8, 8, 14, (90, 74, 58, 255))
-    rect(d, 5, 13, 7, 14, (90, 74, 58, 255))
-    rect(d, 7, 1, 8, 1, (200, 200, 200, 255))
+    canopy = {2: (6, 9), 3: (4, 11), 4: (3, 12), 5: (2, 13), 6: (1, 14), 7: (1, 14)}
+    ribs = (1, 4, 8, 11, 14)                                  # 縁で骨の先がとがる位置（8 は中心の骨）
+
+    def rib_x(rib, y):
+        """骨の線（石突きの下 (7.5, 1) から縁の骨の先へ）の、高さ y での x。"""
+        return round(7.5 + (rib - 7.5) * (y - 1) / 7)
+
+    for y, (x0, x1) in canopy.items():
+        for x in range(x0, x1 + 1):
+            # 布の区画: 骨と骨の間を数え、1枚おきに陰
+            k = sum(1 for r in ribs if rib_x(r, y) <= x)
+            b.load()[x, y] = S if k % 2 == 0 else W
+        b.load()[x0, y] = E
+        b.load()[x1, y] = E
+    for r in (4, 11):                                          # 骨の線
+        for y in range(3, 8):
+            b.load()[rib_x(r, y), y] = E
+    for r in ribs:                                             # 縁の波: 骨の先だけ1段下がってとがる
+        if r != 8:
+            b.load()[r, 8] = E
+    wood, wood_dark, metal = (110, 82, 58, 255), (78, 58, 42, 255), (200, 204, 212, 255)
+    d.load()[7, 1] = metal                                     # 石突き
+    d.load()[8, 1] = metal
+    for y in range(8, 13):                                     # 柄
+        d.load()[8, y] = wood
+    for p in ((8, 13), (7, 14), (6, 14), (5, 13)):             # 曲がった持ち手
+        d.load()[p] = wood_dark
+    d.load()[5, 12] = wood_dark
     out['android_umbrella'] = (b, d)
     return out
 

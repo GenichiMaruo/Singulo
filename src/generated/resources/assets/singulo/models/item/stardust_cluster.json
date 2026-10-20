@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "singulo:block/stardust_cluster"
+    "layer0": "singulo:item/stardust_cluster"
   }
 }

@@ -516,7 +516,7 @@ def compressed_block(level, metal):
 OUT = (26, 30, 38, 255)
 
 
-def outlined(draw_fn, size=S):
+def outlined(draw_fn, size=S, dark=0.62, tint=0.25, deep=True):
     """形を描き、外側に1ドットの暗い縁を付ける。"""
     im, d = new(size)
     draw_fn(d)
@@ -534,7 +534,11 @@ def outlined(draw_fn, size=S):
                 if cols:
                     # 輪郭は真っ黒にせず、内側の色をぐっと暗くした色
                     avg = tuple(sum(c[i] for c in cols) // len(cols) for i in range(3))
-                    po[x, y] = rgba(mix(darken(avg, 0.62), (40, 44, 60), 0.25))
+                    if deep:
+                        import art16
+                        po[x, y] = rgba(art16.deepen(avg, dark))
+                    else:
+                        po[x, y] = rgba(mix(darken(avg, dark), (40, 44, 60), tint))
     return out
 
 
@@ -545,7 +549,8 @@ def item_ingot(color):
         d.rectangle([5, 18, 20, 24], fill=rgba(front))
         d.polygon([(20, 18), (27, 11), (27, 17), (20, 24)], fill=rgba(side))
         d.line([(7, 19), (17, 19)], fill=rgba(lighten(color, 0.5)))
-    return outlined(f)
+    import art16
+    return art16.vcenter(outlined(f, **art16.SOFT_EDGE))
 
 
 def item_plate(color, lines=None, accent=None):
@@ -556,7 +561,8 @@ def item_plate(color, lines=None, accent=None):
         if lines:
             for k in range(lines):
                 d.line([(8 + k * 3, 12 + k), (16 + k * 3, 9 + k)], fill=rgba(accent or (120, 210, 240)))
-    return outlined(f)
+    import art16
+    return outlined(f, **art16.SOFT_EDGE)
 
 
 def item_circuit(board, chip, trace):

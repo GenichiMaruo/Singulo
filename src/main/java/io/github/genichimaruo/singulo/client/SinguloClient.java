@@ -29,6 +29,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerScreens);
         modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerItemColors);
+        modBus.addListener(SinguloClient::registerBlockColors);
         modBus.addListener(SinguloClient::registerExtensions);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
@@ -239,6 +240,17 @@ public final class SinguloClient {
         }
     }
 
+    /** 置いたティーカップ: 色付けの番号0（カップと受け皿）を、ブロックエンティティの色に。 */
+    private static void registerBlockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) {
+        event.register((state, level, pos, tint) -> {
+            if (tint == 0 && level != null && pos != null
+                    && level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.TeacupBlockEntity cup) {
+                return 0xFF000000 | cup.color();
+            }
+            return 0xFFFFFFFF;
+        }, io.github.genichimaruo.singulo.registry.SinguloBlocks.TEACUP.get());
+    }
+
     private static void registerDecorations(net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent event) {
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), WorkCardDecorator.LOCATION);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
@@ -322,6 +334,15 @@ public final class SinguloClient {
     }
 
     private static void registerExtensions(RegisterClientExtensionsEvent event) {
+        // 傘を手に持つ間は、腕を上げて柄を握る構えにする（ほかの人から見て、手で持って見えるように）
+        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+            @Override
+            public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,
+                                                                              net.minecraft.world.InteractionHand hand,
+                                                                              net.minecraft.world.item.ItemStack stack) {
+                return UmbrellaArmPose.UMBRELLA.getValue();
+            }
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.ANDROID_UMBRELLA.get());
         for (SinguloFluids.Entry entry : SinguloFluids.ALL.values()) {
             int color = entry.def().color();
             event.registerFluidType(new IClientFluidTypeExtensions() {

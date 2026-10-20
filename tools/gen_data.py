@@ -484,6 +484,7 @@ UI_LANG = {
         'the nitrogen, so running it from a cooling tower no longer makes power. For stage 2 power, build a Muon-Catalyzed Fusion Reactor.'),
     'message.singulo.fuel_cell.status': ('水素 %s/%s mB　酸素 %s/%s mB　蓄電 %s/%s FE　%s',
                                          'Hydrogen %s/%s mB · Oxygen %s/%s mB · Stored %s/%s FE · %s'),
+    'block.singulo.teacup': ('ティーカップ', 'Teacup'),
     'message.singulo.fuel_cell.standby': ('待機中（蓄電がいっぱい）', 'Standing by (storage full)'),
     'tooltip.singulo.fluid_canister.empty': ('空（%s mBまで入る）', 'Empty (holds %s mB)'),
     'tooltip.singulo.fluid_canister.amount': ('%s %s / %s mB', '%s %s / %s mB'),
@@ -2812,6 +2813,62 @@ def accessory_item_models():
             'layer0': f'{MODID}:item/{iid}', 'layer1': f'{MODID}:item/{iid}_detail'}})
 
 
+def umbrella_item_model():
+    """傘: インベントリ・地面・額縁・一人称は平らな絵のまま、三人称で手に持つと開いた傘の立体になる
+    （neoforge:separate_transforms）。布は色付けの番号0（染めた色）、柄と石突きは染めない。"""
+    from PIL import Image, ImageDraw
+    iid = 'android_umbrella'
+    ti = ASSETS / 'textures' / 'item'
+    # 立体の布（白。染めた色で塗る。骨の区切りがうっすら見える）と、柄の木と、石突きの金属
+    cloth = Image.new('RGBA', (16, 16), (246, 246, 246, 255))
+    dc = ImageDraw.Draw(cloth)
+    for x in (0, 5, 10, 15):
+        dc.line([(x, 0), (x, 15)], fill=(214, 214, 214, 255))
+    wood = Image.new('RGBA', (16, 16), (110, 82, 58, 255))
+    ImageDraw.Draw(wood).line([(0, 0), (15, 15)], fill=(92, 68, 48, 255))
+    metal = Image.new('RGBA', (16, 16), (200, 204, 212, 255))
+    for name, im in (('umbrella_cloth', cloth), ('umbrella_wood', wood), ('umbrella_metal', metal)):
+        path = ti / f'{name}.png'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        im.save(path)
+
+    def box(a, b, tex, tint=False):
+        faces = {}
+        for f in ('north', 'south', 'east', 'west', 'up', 'down'):
+            # UV を明示する（座標が 0〜16 の外に出る面で、テクスチャ置き場の隣の絵を拾わないように）
+            faces[f] = {'texture': tex, 'uv': [0, 0, 16, 16], **({'tintindex': 0} if tint else {})}
+        return {'from': a, 'to': b, 'faces': faces}
+
+    def ring(outer, inner, y0, y1):
+        """布の1段: 外の四角から内の四角を抜いた輪（4枚の板）。下から見ると、内側が上の段へ凹んで見える。"""
+        o0, o1, i0, i1 = outer[0], outer[1], inner[0], inner[1]
+        return [box([o0, y0, o0], [o1, y1, i0], '#cloth', True), box([o0, y0, i1], [o1, y1, o1], '#cloth', True),
+                box([o0, y0, i0], [i0, y1, i1], '#cloth', True), box([i1, y0, i0], [o1, y1, i1], '#cloth', True)]
+
+    # 柄を下へのばし（モデルは y −16 まで使える）、持ち手で握る。布は頭より上に来る
+    elements = [
+        box([7.5, -9, 7.5], [8.5, 28, 8.5], '#wood'),                      # 柄
+        box([8.5, -10, 7.5], [10.5, -9, 8.5], '#wood'),                    # 曲がった持ち手
+        box([9.5, -9, 7.5], [10.5, -7, 8.5], '#wood'),
+        *ring((-4, 20), (-1, 17), 26, 27),                                 # 布: 下ほど広い4段の輪。内側は段々に凹む
+        *ring((-1, 17), (3, 13), 27, 28.5),
+        *ring((3, 13), (6, 10), 28.5, 29.5),
+        box([6, 29.5, 6], [10, 30.5, 10], '#cloth', True),                 # てっぺん（ここだけ板でふさぐ）
+        box([7.5, 30.5, 7.5], [8.5, 32, 8.5], '#metal'),                   # 石突き
+    ]
+    hand = {'rotation': [54, 0, 0], 'translation': [0, 2.6, 7.5], 'scale': [0.7, 0.7, 0.7]}
+    base = {'textures': {'cloth': f'{MODID}:item/umbrella_cloth', 'wood': f'{MODID}:item/umbrella_wood',
+                         'metal': f'{MODID}:item/umbrella_metal', 'particle': f'{MODID}:item/{iid}'},
+            'elements': elements,
+            'display': {'thirdperson_righthand': hand, 'thirdperson_lefthand': hand}}
+    flat = {'parent': 'minecraft:item/generated',
+            'textures': {'layer0': f'{MODID}:item/{iid}', 'layer1': f'{MODID}:item/{iid}_detail'}}
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
+        'loader': 'neoforge:separate_transforms',
+        'base': base,
+        'perspectives': {k: flat for k in ('gui', 'ground', 'fixed', 'head', 'firstperson_righthand', 'firstperson_lefthand')}})
+
+
 def fluid_canister_item_model():
     """液体キャニスター: 容器の絵（layer0）と、中身の色に染める窓の絵（layer1。空なら描かない）。"""
     from PIL import Image
@@ -3358,14 +3415,19 @@ TAB_GROUPS = [
                  'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
                  'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
                  'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
-                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
+                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',
                  'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core', 'catalyst_stabilizer']),
-    ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core', 'raw_meteoric_iron', 'meteoric_iron_ingot', 'stardust',
+    ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core', 'raw_meteoric_iron', 'stardust',
             'fulgurite_block', 'fulgurite', 'pressure_crystal', 'void_dust']),
+    # インゴットは段階順にまとめて、素材の手前に
+    ('インゴット', ['steel_ingot', 'zinc_ingot', 'bismuth_ingot', 'meteoric_iron_ingot', 'nihonium_ingot']),
+    # 板と基板（板 → 基板 → 回路とモジュール。それぞれ段階順）
+    ('板・基板', ['steel_plate', 'nihonium_plate', 'phase_sync_plate', 'ceramic_substrate', 'optical_lattice_substrate',
+               'basic_circuit', 'quantum_computing_module', 'thermocouple_module', 'time_crystal_module']),
     ('素材', None),
     ('回収物と記録', None),
     # ボスの戦利品: 番人・遺構のボスの落とす物 → 記録の断章と終焉の記録 → 記録者の報酬 → 覚醒戦の核
@@ -3758,6 +3820,7 @@ def main():
     models()
     textures()
     accessory_item_models()          # 生成の一般の物のモデルのあとに、2枚重ねで書き直す
+    umbrella_item_model()            # 傘は、三人称で手に持つと開いた傘の立体に
     fluid_canister_item_model()
     work_card_item_model()           # 生成の一般の物のモデルのあとに、記録済みの絵へ切り替えるモデルを書き直す
     area_card_item_model()

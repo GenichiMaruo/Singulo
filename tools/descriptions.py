@@ -26,6 +26,8 @@ DESC = {
                'Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.'),
     'ニホニウム筐体': ('ニホニウム板で基礎フレームを包んだ筐体。段階4〜5の高度な装置の土台になる。',
                 'A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.'),
+    '未焼成のティーカップ': ('粘土で形を作った、焼く前のティーカップ。かまどか焼成炉で焼くとティーカップになる。',
+                    'A teacup shaped from clay, not yet fired. Fire it in a furnace or the Kiln to get a teacup.'),
     '未焼成の蛍光体': ('亜鉛の粉と火薬（硫黄）と銅を混ぜた粉。焼成炉で焼くと、蓄光体のグロウストーンダストが4個できる。',
                   'Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.'),
     '水素燃料電池': ('水素と酸素から電力を作る段階1の発電機。電解槽で水素に詰めた電力の6割を取り戻す蓄電で、水素1 mBで4.8 FE、最大240 FE/t。'
@@ -556,8 +558,10 @@ DESC = {
         'A book an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.'),
     '花束': ('待機しているアンドロイドが手に持つ花束。装飾のページの枠に着ける。染料と一緒に作業台で染められる。',
         'A bouquet an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.'),
-    'ティーカップ': ('待機しているアンドロイドが手に持つティーカップ。装飾のページの枠に着ける。染料と一緒に作業台で染められる。',
-        'A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.'),
+    'ティーカップ': ('待機しているアンドロイドが手に持つティーカップ。装飾のページの枠に着ける。染料と一緒に作業台で染められる。'
+        '右クリックすると、受け皿にのったカップとして置ける（染めた色のまま。壊すと戻る）。',
+        'A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table. '
+        'Right-click to place it as a cup on a saucer; it keeps its color and comes back when broken.'),
     '傘': ('待機しているアンドロイドが差す傘。装飾のページの枠に着ける。染料と一緒に作業台で染められる。',
         'An umbrella an android holds up while idle. Goes in the decoration page. Dye it with dyes on a crafting table.'),
     '手順カード': ('作業指令台の「記録」の手順モードで、手順（最大8つ）と、できる物を記録する。手順は、投入・取り出し・採掘・収穫・伐採・繁殖・毛刈り・搾乳・処理・操作（レバーやボタン）。場所はカードの中に記録するので、レシピ棚では作業位置カードのない行にも並べられる。採掘には採掘アップグレード、伐採には伐採アップグレードが要る。',

@@ -43,6 +43,34 @@ public final class AndroidGameTests {
         return BuiltInRegistries.ITEM.get(Singulo.id(id));
     }
 
+    /** 染めたティーカップを右クリックで置くと、その色のカップのブロックになり、壊すと同じ色のティーカップが落ちる。 */
+    @GameTest(template = EMPTY)
+    public static void teacupPlacesAsDyedBlockAndDropsItself(GameTestHelper helper) {
+        BlockPos floor = new BlockPos(2, 1, 2);
+        helper.setBlock(floor, net.minecraft.world.level.block.Blocks.STONE);
+        ItemStack cup = new ItemStack(item("android_teacup"));
+        cup.set(net.minecraft.core.component.DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x3366CC, true));
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, cup);
+        BlockPos abs = helper.absolutePos(floor);
+        var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs).add(0, 0.5, 0),
+                net.minecraft.core.Direction.UP, abs, false);
+        cup.useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+        BlockPos placed = floor.above();
+        helper.assertBlockPresent(io.github.genichimaruo.singulo.registry.SinguloBlocks.TEACUP.get(), placed);
+        helper.assertTrue(helper.getBlockEntity(placed) instanceof io.github.genichimaruo.singulo.android.TeacupBlockEntity be
+                && be.color() == 0x3366CC, "置いたカップが染めた色にならない");
+        helper.assertTrue(player.getMainHandItem().isEmpty(), "置いたのにティーカップが減らない");
+        helper.getLevel().destroyBlock(helper.absolutePos(placed), true);
+        helper.succeedWhen(() -> {
+            var drops = helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(helper.absolutePos(placed)).inflate(2));
+            helper.assertTrue(drops.stream().anyMatch(e -> e.getItem().is(item("android_teacup"))
+                    && (net.minecraft.world.item.component.DyedItemColor.getOrDefault(e.getItem(), 0) & 0xFFFFFF) == 0x3366CC),
+                    "壊しても同じ色のティーカップが落ちない: " + drops.stream().map(e -> e.getItem() + " " + e.getItem().getComponents()).toList());
+        });
+    }
+
     /** 電力・設計メモリ・キットのあるステーションを置く。 */
     private static AndroidStationBlockEntity station(GameTestHelper helper, int kits) {
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());

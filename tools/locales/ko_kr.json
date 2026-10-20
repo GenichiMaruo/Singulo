@@ -1215,6 +1215,10 @@
     "source": "Superconducting Cable",
     "translation": "초전도 케이블"
   },
+  "block.singulo.teacup": {
+    "source": "Teacup",
+    "translation": "찻잔"
+  },
   "block.singulo.thermoelectric_generator": {
     "source": "Thermoelectric Generator",
     "translation": "열전 발전기"
@@ -1592,8 +1596,8 @@
     "translation": "호위 안드로이드에 달면 액체나 기체를 담는 탱크가 2개(각 32,000 mB, 탱크 하나에 한 종류) 생깁니다. 작업에서 유체를 재료 보관소에서 장치로 나릅니다. 허리에 탱크가 보입니다. 안에 남아 있는 동안은 뗄 수 없습니다."
   },
   "desc.singulo.android_teacup": {
-    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
-    "translation": "대기 중인 안드로이드가 손에 드는 찻잔.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
+    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table. Right-click to place it as a cup on a saucer; it keeps its color and comes back when broken.",
+    "translation": "대기 중인 안드로이드가 손에 드는 찻잔. 장식 페이지의 칸에 장착한다. 염료와 함께 제작대에서 염색할 수 있다. 우클릭하면 받침 접시에 놓인 찻잔으로 설치할 수 있다(염색한 색 그대로, 부수면 돌아온다)."
   },
   "desc.singulo.android_transfer_upgrade": {
     "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
@@ -2754,6 +2758,10 @@
   "desc.singulo.unfired_phosphor": {
     "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
     "translation": "아연 가루와 화약(황)과 구리를 섞은 가루. 소성로에서 구우면 축광체인 발광석 가루 4개가 됩니다."
+  },
+  "desc.singulo.unfired_teacup": {
+    "source": "A teacup shaped from clay, not yet fired. Fire it in a furnace or the Kiln to get a teacup.",
+    "translation": "점토로 모양을 만든, 아직 굽지 않은 찻잔. 화로나 소성로에서 구우면 찻잔이 된다."
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -6736,8 +6744,8 @@
     "translation": "제작: 정밀 조립기(2단계)"
   },
   "howto.singulo.android_teacup": {
-    "source": "Made in: Crafting Table (stage 1)",
-    "translation": "제작: 제작대(1단계)"
+    "source": "Made in: Furnace (stage 1)",
+    "translation": "제작: 화로(1단계)"
   },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -7587,6 +7595,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작: 제작대(1단계)"
   },
+  "howto.singulo.unfired_teacup": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
+  },
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
     "translation": "제작: 웜홀 생성기(5단계)"
@@ -8422,6 +8434,10 @@
   "item.singulo.unfired_phosphor": {
     "source": "Unfired Phosphor",
     "translation": "소성되지 않은 형광체"
+  },
+  "item.singulo.unfired_teacup": {
+    "source": "Unfired Teacup",
+    "translation": "굽지 않은 찻잔"
   },
   "item.singulo.unstable_wormhole_mouth": {
     "source": "Unstable Wormhole Mouth",
@@ -10938,6 +10954,10 @@
   "uses.singulo.unfired_ceramic": {
     "source": "Used in: White Ceramic Composite",
     "translation": "사용 제품: 화이트 세라믹 복합재"
+  },
+  "uses.singulo.unfired_teacup": {
+    "source": "Used in: Teacup",
+    "translation": "사용 대상: 찻잔"
   },
   "uses.singulo.unstable_wormhole_mouth": {
     "source": "Used in: Wormhole Mouth",

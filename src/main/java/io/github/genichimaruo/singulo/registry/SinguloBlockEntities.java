@@ -90,6 +90,8 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<CryogenicTurbineBlockEntity>> CRYOGENIC_TURBINE =
             REGISTER.register("cryogenic_turbine", () -> build(CryogenicTurbineBlockEntity::new,
                     SinguloBlocks.CRYOGENIC_TURBINE.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.TeacupBlockEntity>> TEACUP =
+            REGISTER.register("teacup", () -> build(io.github.genichimaruo.singulo.android.TeacupBlockEntity::new, SinguloBlocks.TEACUP.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity>> HYDROGEN_FUEL_CELL =
             REGISTER.register("hydrogen_fuel_cell", () -> build(io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity::new,
                     SinguloBlocks.HYDROGEN_FUEL_CELL.get()));
