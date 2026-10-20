@@ -26,6 +26,8 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - New room: **private rooms**, eight researchers' rooms lined up on both sides of a hall, each behind its own door with a bed, a desk and a few belongings.
 - The cafeteria now has a **kitchen** behind a door, with a serving hatch, smokers, a sink and food storage.
 - New **Lab Sliding Door**: white twin doors that slide into the walls when right-clicked, close by themselves once no one is passing through, and stay open while powered by redstone. Lab doors cannot be crafted.
+- Once facility power is restored, the lab's **vending machines** work: hold emeralds and press the button under a column to buy Canned Soda (1 emerald, Speed), Sports Drink (1, Regeneration) or Energy Drink (2, Haste II). Vending machines you place yourself work right away.
+- **Coffee makers** brew three cups from a cocoa bean; fill glass bottles from the pot to get Coffee (Haste, and it resets the time until phantoms appear). Lab coffee makers start with a full pot.
 - Lab chests are fuller and hold everyday items that fit the room: kitchen supplies in the cafeteria, personal belongings in private rooms and dormitories (their lockers too), stationery in the office, first aid in the medical bay, and materials and research notes elsewhere, alongside the usual lab parts.
 - Sculk veins no longer creep into the rooms when a lab generates under a deep dark (for example beneath mountains).
 - Generated only in newly explored chunks; labs already generated are unchanged.
