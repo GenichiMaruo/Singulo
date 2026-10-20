@@ -1776,8 +1776,8 @@
     "translation": "커피 메이커로 내린 병 커피입니다. 마시면 3분 동안 채굴이 빨라지고 잠이 깹니다(팬텀이 나타날 때까지의 시간이 초기화됩니다). 다 마시면 병이 남습니다."
   },
   "desc.singulo.coffee_maker": {
-    "source": "The laboratory break-room coffee maker. Use it: it still works.",
-    "translation": "연구소 탕비실의 커피 메이커입니다. 우클릭하면 아직 작동합니다."
+    "source": "The laboratory break-room coffee maker. Add cocoa beans to brew three cups, then fill glass bottles from the pot. The ones in the laboratory already have coffee in them.",
+    "translation": "연구소 탕비실의 커피 메이커입니다. 코코아 콩을 넣으면 커피 3잔을 내리고, 유리병으로 포트에서 뜰 수 있습니다. 연구소에 있는 것은 처음부터 커피가 내려져 있습니다."
   },
   "desc.singulo.cold_atom_trap": {
     "source": "A restored cold atom trap.",
@@ -8615,9 +8615,17 @@
     "source": "Toggle gravity tool area",
     "translation": "중력 도구 영역 전환"
   },
-  "lab.singulo.coffee": {
-    "source": "The smell of coffee fills the air. It still works",
-    "translation": "커피 향이 퍼졌다. 아직 작동하는 모양이다"
+  "lab.singulo.coffee.brewing": {
+    "source": "Brewing coffee...",
+    "translation": "커피를 내리는 중…"
+  },
+  "lab.singulo.coffee.empty": {
+    "source": "The pot is empty. Add cocoa beans to brew",
+    "translation": "포트가 비어 있다. 코코아 콩을 넣으면 내릴 수 있다"
+  },
+  "lab.singulo.coffee.ready": {
+    "source": "%s cups of coffee left. Fill a glass bottle",
+    "translation": "커피가 %s잔 남았다. 유리병으로 뜰 수 있다"
   },
   "lab.singulo.hull_unsealed": {
     "source": "The overseer has stopped. The facility pressure hull is no longer sealed",

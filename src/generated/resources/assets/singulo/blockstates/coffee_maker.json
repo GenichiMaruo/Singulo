@@ -1,17 +1,122 @@
 {
   "variants": {
-    "facing=north": {
+    "facing=north,brewing=false,cups=0": {
+      "model": "singulo:block/coffee_maker_empty"
+    },
+    "facing=north,brewing=false,cups=1": {
       "model": "singulo:block/coffee_maker"
     },
-    "facing=east": {
+    "facing=north,brewing=false,cups=2": {
+      "model": "singulo:block/coffee_maker"
+    },
+    "facing=north,brewing=false,cups=3": {
+      "model": "singulo:block/coffee_maker"
+    },
+    "facing=north,brewing=true,cups=0": {
+      "model": "singulo:block/coffee_maker"
+    },
+    "facing=north,brewing=true,cups=1": {
+      "model": "singulo:block/coffee_maker"
+    },
+    "facing=north,brewing=true,cups=2": {
+      "model": "singulo:block/coffee_maker"
+    },
+    "facing=north,brewing=true,cups=3": {
+      "model": "singulo:block/coffee_maker"
+    },
+    "facing=east,brewing=false,cups=0": {
+      "model": "singulo:block/coffee_maker_empty",
+      "y": 90
+    },
+    "facing=east,brewing=false,cups=1": {
       "model": "singulo:block/coffee_maker",
       "y": 90
     },
-    "facing=south": {
+    "facing=east,brewing=false,cups=2": {
+      "model": "singulo:block/coffee_maker",
+      "y": 90
+    },
+    "facing=east,brewing=false,cups=3": {
+      "model": "singulo:block/coffee_maker",
+      "y": 90
+    },
+    "facing=east,brewing=true,cups=0": {
+      "model": "singulo:block/coffee_maker",
+      "y": 90
+    },
+    "facing=east,brewing=true,cups=1": {
+      "model": "singulo:block/coffee_maker",
+      "y": 90
+    },
+    "facing=east,brewing=true,cups=2": {
+      "model": "singulo:block/coffee_maker",
+      "y": 90
+    },
+    "facing=east,brewing=true,cups=3": {
+      "model": "singulo:block/coffee_maker",
+      "y": 90
+    },
+    "facing=south,brewing=false,cups=0": {
+      "model": "singulo:block/coffee_maker_empty",
+      "y": 180
+    },
+    "facing=south,brewing=false,cups=1": {
       "model": "singulo:block/coffee_maker",
       "y": 180
     },
-    "facing=west": {
+    "facing=south,brewing=false,cups=2": {
+      "model": "singulo:block/coffee_maker",
+      "y": 180
+    },
+    "facing=south,brewing=false,cups=3": {
+      "model": "singulo:block/coffee_maker",
+      "y": 180
+    },
+    "facing=south,brewing=true,cups=0": {
+      "model": "singulo:block/coffee_maker",
+      "y": 180
+    },
+    "facing=south,brewing=true,cups=1": {
+      "model": "singulo:block/coffee_maker",
+      "y": 180
+    },
+    "facing=south,brewing=true,cups=2": {
+      "model": "singulo:block/coffee_maker",
+      "y": 180
+    },
+    "facing=south,brewing=true,cups=3": {
+      "model": "singulo:block/coffee_maker",
+      "y": 180
+    },
+    "facing=west,brewing=false,cups=0": {
+      "model": "singulo:block/coffee_maker_empty",
+      "y": 270
+    },
+    "facing=west,brewing=false,cups=1": {
+      "model": "singulo:block/coffee_maker",
+      "y": 270
+    },
+    "facing=west,brewing=false,cups=2": {
+      "model": "singulo:block/coffee_maker",
+      "y": 270
+    },
+    "facing=west,brewing=false,cups=3": {
+      "model": "singulo:block/coffee_maker",
+      "y": 270
+    },
+    "facing=west,brewing=true,cups=0": {
+      "model": "singulo:block/coffee_maker",
+      "y": 270
+    },
+    "facing=west,brewing=true,cups=1": {
+      "model": "singulo:block/coffee_maker",
+      "y": 270
+    },
+    "facing=west,brewing=true,cups=2": {
+      "model": "singulo:block/coffee_maker",
+      "y": 270
+    },
+    "facing=west,brewing=true,cups=3": {
       "model": "singulo:block/coffee_maker",
       "y": 270
     }

@@ -472,9 +472,8 @@ public final class SinguloBlocks {
     /** 研究所の小物（机のモニター・コーヒーメーカー・書類の山・ごみ箱・自販機）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> DESK_MONITOR = BLOCKS.register("desk_monitor",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL).lightLevel(s -> 3), Block.box(2, 0, 2, 14, 12, 14), null, null));
-    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> COFFEE_MAKER = BLOCKS.register("coffee_maker",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL), Block.box(4, 0, 4, 12, 13, 13), "lab.singulo.coffee",
-                    net.minecraft.sounds.SoundEvents.BREWING_STAND_BREW));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock> COFFEE_MAKER = BLOCKS.register("coffee_maker",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock(decor(SoundType.METAL)));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> PAPER_STACK = BLOCKS.register("paper_stack",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.WOOL).strength(0.3F), Block.box(3, 0, 3, 13, 5, 13), null, null));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> TRASH_BIN = BLOCKS.register("trash_bin",

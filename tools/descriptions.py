@@ -604,7 +604,7 @@ DESC = {
     'サーバーラック': ('研究所のサーバー。電力があると灯が瞬く。', 'A laboratory server. Its lights blink while powered.'),
     '記録端末': ('研究所に残された端末。右クリックで、残された記録を読める。', 'A terminal left in the laboratory. Use it to read the records left behind.'),
     '机のモニター': ('研究所の机に置かれた小さなモニター。画面だけがほのかに光る。', 'A small monitor from a laboratory desk. Only its screen glows faintly.'),
-    'コーヒーメーカー': ('研究所の給湯室のコーヒーメーカー。右クリックすると、まだ動く。', 'The laboratory break-room coffee maker. Use it: it still works.'),
+    'コーヒーメーカー': ('研究所の給湯室のコーヒーメーカー。カカオ豆を入れると3杯分のコーヒーを淹れ、ガラス瓶でくめる。研究所のものは、はじめから淹れてある。', 'The laboratory break-room coffee maker. Add cocoa beans to brew three cups, then fill glass bottles from the pot. The ones in the laboratory already have coffee in them.'),
     '自動販売機': ('研究所の飲み物の自動販売機（2ブロックの高さ）。エメラルドを持って正面の列のボタンを押すと、缶ソーダ（1）・スポーツドリンク（1）・エナジードリンク（2）が買える。研究所のものは、施設の電力が戻ると動き出す。', 'A laboratory drinks vending machine (two blocks tall). Hold emeralds and press the button under a column to buy Canned Soda (1), Sports Drink (1) or Energy Drink (2). The ones in the laboratory start working once facility power is restored.'),
     '書類の山': ('机に積まれたままの書類。', 'Papers left piled on a desk.'),
     'ごみ箱': ('研究所のごみ箱。アンドロイドが毎日空にしている。', 'A laboratory trash bin. The androids empty it every day.'),

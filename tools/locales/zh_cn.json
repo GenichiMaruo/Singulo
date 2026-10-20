@@ -1776,8 +1776,8 @@
     "translation": "用咖啡机冲泡的瓶装咖啡。饮用后 3 分钟内挖掘速度提升，并能提神（重置幻翼出现前的时间）。喝完会留下玻璃瓶。"
   },
   "desc.singulo.coffee_maker": {
-    "source": "The laboratory break-room coffee maker. Use it: it still works.",
-    "translation": "研究所茶水间的咖啡机。右键试试，还能用。"
+    "source": "The laboratory break-room coffee maker. Add cocoa beans to brew three cups, then fill glass bottles from the pot. The ones in the laboratory already have coffee in them.",
+    "translation": "研究所茶水间的咖啡机。放入可可豆可冲泡 3 杯咖啡，再用玻璃瓶从壶中盛取。研究所里的咖啡机一开始就已经泡好了咖啡。"
   },
   "desc.singulo.cold_atom_trap": {
     "source": "A restored cold atom trap.",
@@ -8615,9 +8615,17 @@
     "source": "Toggle gravity tool area",
     "translation": "切换重力操控范围"
   },
-  "lab.singulo.coffee": {
-    "source": "The smell of coffee fills the air. It still works",
-    "translation": "咖啡的香气弥漫开来。看来还能用"
+  "lab.singulo.coffee.brewing": {
+    "source": "Brewing coffee...",
+    "translation": "正在冲泡咖啡……"
+  },
+  "lab.singulo.coffee.empty": {
+    "source": "The pot is empty. Add cocoa beans to brew",
+    "translation": "壶是空的。放入可可豆即可冲泡"
+  },
+  "lab.singulo.coffee.ready": {
+    "source": "%s cups of coffee left. Fill a glass bottle",
+    "translation": "咖啡还剩 %s 杯。可以用玻璃瓶盛取"
   },
   "lab.singulo.hull_unsealed": {
     "source": "The overseer has stopped. The facility pressure hull is no longer sealed",

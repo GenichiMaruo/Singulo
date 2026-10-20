@@ -342,6 +342,20 @@ def coffee_pot():
     return im
 
 
+def coffee_pot_empty():
+    """空のポット（コーヒーの所もガラス）。割り付けは coffee_pot と同じ。"""
+    im = coffee_pot()
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(im)
+    glass = (176, 196, 208)
+    for x0, w in ((0, 6), (6, 4)):
+        d.rectangle([x0, 3, x0 + w - 1, 5], fill=rgba(glass))
+        d.line([(x0 + 1, 1), (x0 + 1, 5)], fill=(236, 244, 250, 255))
+        d.point([(x0, 3), (x0, 4), (x0, 5), (x0 + w - 1, 3), (x0 + w - 1, 4), (x0 + w - 1, 5)], fill=rgba(mix(glass, (90, 100, 110), 0.5)))
+    d.rectangle([6, 6, 11, 9], fill=rgba(mix(glass, (40, 40, 46), 0.5)))   # 底（空のガラス越しの台）
+    return im
+
+
 # 自販機の3列（左から 缶ソーダ・スポーツドリンク・エナジードリンク）: 缶の色と、缶の上の色。Java の VendingMachineBlock.DRINKS と同じ順
 VENDING_CANS = [((70, 150, 255), (200, 224, 250)), ((248, 250, 252), (60, 120, 220)), ((250, 206, 40), (40, 40, 44))]
 
@@ -513,6 +527,7 @@ def textures(tb, save_plain):
     save(plastic((60, 64, 72)), tb / 'lab_plastic_dark.png')
     save(coffee_front(), tb / 'coffee_maker_front.png')
     save(coffee_pot(), tb / 'coffee_maker_pot.png')
+    save(coffee_pot_empty(), tb / 'coffee_maker_pot_empty.png')
     for upper in (False, True):
         half = 'upper' if upper else 'lower'
         save(vending_front(upper), tb / f'vending_machine_front_{half}.png')
@@ -799,6 +814,13 @@ def decor_models(write_json, mb, mi, bs):
     for iid in ('desk_monitor', 'coffee_maker', 'paper_stack', 'trash_bin'):
         write_json(bs / f'{iid}.json', {'variants': {f'facing={f}': _rot(iid, y) for f, y in FACING_Y.items()}})
         write_json(mi / f'{iid}.json', {'parent': f'{MODID}:block/{iid}', 'display': held_display(models[iid]['elements'])})
+    # コーヒーメーカー: ポットが空なら空のガラス（淹れている間と、残りがあるときはコーヒー）
+    empty = json.loads(json.dumps(models['coffee_maker']))
+    empty['textures']['pot'] = t('coffee_maker_pot_empty')
+    write_json(mb / 'coffee_maker_empty.json', empty)
+    write_json(bs / 'coffee_maker.json', {'variants': {
+        f'facing={f},brewing={b},cups={c}': _rot('coffee_maker' if b == 'true' or c > 0 else 'coffee_maker_empty', y)
+        for f, y in FACING_Y.items() for b in ('false', 'true') for c in range(4)}})
 
 
 # ---------------------------------------------------------------- 落とす物
