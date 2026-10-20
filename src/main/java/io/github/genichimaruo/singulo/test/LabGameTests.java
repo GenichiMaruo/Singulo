@@ -5,6 +5,7 @@ import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock;
 import io.github.genichimaruo.singulo.ruin.lab.LabLayout;
 import io.github.genichimaruo.singulo.ruin.lab.LabPieces;
+import io.github.genichimaruo.singulo.ruin.lab.LabPower;
 import io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock;
 import io.github.genichimaruo.singulo.ruin.lab.LabStructure;
 import io.github.genichimaruo.singulo.ruin.lab.LabTerminalBlock;
@@ -19,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
@@ -350,6 +352,99 @@ public final class LabGameTests {
                 net.minecraft.world.level.block.Blocks.BARREL)) {
             helper.assertTrue(info.nbt() != null && info.nbt().getString("LootTable").endsWith("chests/lab_locker"), "個室のロッカーが空");
         }
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------ 自販機・コーヒーメーカー
+
+    private static net.minecraft.world.item.Item item(String id) {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id(id));
+    }
+
+    /**
+     * 自販機: 研究所のもの（止まっている）は売らない。施設の電力が戻ると、エメラルドで押した列の飲み物が出る
+     * （左からソーダ1・スポーツドリンク1・エナジードリンク2。足りないと買えない。正面以外を押しても買えない）。
+     */
+    @GameTest(template = EMPTY)
+    public static void vendingMachineSellsForEmeralds(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BlockPos at = new BlockPos(2, 1, 2);
+        var lower = SinguloBlocks.VENDING_MACHINE.get().defaultBlockState().setValue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.FACING, net.minecraft.core.Direction.NORTH)
+                .setValue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.POWERED, false);
+        helper.setBlock(at, lower);
+        helper.setBlock(at.above(), lower.setValue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+        BlockPos abs = helper.absolutePos(at);
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var emeralds = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 3);
+        // 北を向いた正面に向き合うと、右手は西（x が小さい側）。左の列は x の大きい側
+        java.util.function.BiFunction<Double, net.minecraft.core.Direction, BlockHitResult> press = (dx, face) ->
+                new BlockHitResult(new net.minecraft.world.phys.Vec3(abs.getX() + dx, abs.getY() + 0.5, abs.getZ()), face, abs, false);
+        java.util.function.Supplier<net.minecraft.world.level.block.state.BlockState> state = () -> level.getBlockState(abs);
+        helper.assertTrue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.buy(state.get(), level, abs, player, emeralds, press.apply(0.9, net.minecraft.core.Direction.NORTH)) == null
+                && emeralds.getCount() == 3, "電力のない自販機で買えた");
+        LabPower.restore(level, new BoundingBox(abs.getX(), abs.getY(), abs.getZ(), abs.getX(), abs.getY() + 1, abs.getZ()));
+        helper.assertTrue(state.get().getValue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.POWERED) && level.getBlockState(abs.above()).getValue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.POWERED), "電力が戻っても動かない");
+        helper.assertTrue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.buy(state.get(), level, abs, player, emeralds, press.apply(0.5, net.minecraft.core.Direction.EAST)) == null,
+                "正面以外を押して買えた");
+        var soda = io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.buy(state.get(), level, abs, player, emeralds, press.apply(0.9, net.minecraft.core.Direction.NORTH));
+        helper.assertTrue(soda != null && soda.is(item("canned_soda")) && emeralds.getCount() == 2, "左の列でソーダが1エメラルドで買えない");
+        var energy = io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.buy(state.get(), level, abs, player, emeralds, press.apply(0.1, net.minecraft.core.Direction.NORTH));
+        helper.assertTrue(energy != null && energy.is(item("energy_drink")) && emeralds.isEmpty(), "右の列でエナジードリンクが2エメラルドで買えない");
+        var one = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1);
+        helper.assertTrue(io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.buy(state.get(), level, abs, player, one, press.apply(0.1, net.minecraft.core.Direction.NORTH)) == null
+                && one.getCount() == 1, "エメラルドが足りないのに買えた");
+        var sports = io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock.buy(state.get(), level, abs, player, one, press.apply(0.5, net.minecraft.core.Direction.NORTH));
+        helper.assertTrue(sports != null && sports.is(item("sports_drink")), "真ん中の列でスポーツドリンクが買えない");
+        helper.succeed();
+    }
+
+    /** コーヒーメーカー: カカオ豆で淹れ（少しして3杯分）、ガラス瓶でくむとコーヒーになり、杯数が減る。空のときは瓶でくめない。 */
+    @GameTest(template = EMPTY, timeoutTicks = io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock.BREW_TIME + 40)
+    public static void coffeeMakerBrewsAndFillsBottles(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BlockPos at = new BlockPos(2, 1, 2);
+        helper.setBlock(at, SinguloBlocks.COFFEE_MAKER.get().defaultBlockState());
+        BlockPos abs = helper.absolutePos(at);
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var hit = new BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs), net.minecraft.core.Direction.NORTH, abs, false);
+        java.util.function.Consumer<net.minecraft.world.item.ItemStack> use = stack -> {
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
+            level.getBlockState(abs).useItemOn(stack, level, player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+        };
+        var bottle = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE, 4);
+        use.accept(bottle);
+        helper.assertTrue(bottle.getCount() == 4, "空のポットから瓶でくめた");
+        var beans = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COCOA_BEANS, 2);
+        use.accept(beans);
+        helper.assertTrue(beans.getCount() == 1 && helper.getBlockState(at).getValue(io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock.BREWING), "カカオ豆で淹れはじめない");
+        helper.runAtTickTime(io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock.BREW_TIME + 5, () -> {
+            var s = helper.getBlockState(at);
+            helper.assertTrue(!s.getValue(io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock.BREWING) && s.getValue(io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock.CUPS) == 3, "淹れ上がって3杯分にならない");
+            use.accept(bottle);
+            helper.assertTrue(bottle.getCount() == 3 && player.getInventory().countItem(item("coffee")) == 1
+                    && helper.getBlockState(at).getValue(io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock.CUPS) == 2, "瓶でコーヒーがくめない");
+            helper.succeed();
+        });
+    }
+
+    /** 飲み物: 飲むと効果がつく（エナジードリンクは採掘速度上昇 II）。コーヒーは眠気を覚まし（最後に眠ってからの時間が 0）、瓶が残る。 */
+    @GameTest(template = EMPTY)
+    public static void drinksGiveTheirEffects(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var player = helper.makeMockServerPlayerInLevel();
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);           // クリエイティブでは飲んでも減らない（瓶も残らない）
+        new net.minecraft.world.item.ItemStack(item("energy_drink")).finishUsingItem(level, player);
+        var haste = player.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED);
+        helper.assertTrue(haste != null && haste.getAmplifier() == 1, "エナジードリンクで採掘速度上昇 II がつかない");
+        new net.minecraft.world.item.ItemStack(item("canned_soda")).finishUsingItem(level, player);
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED), "ソーダで移動速度上昇がつかない");
+        new net.minecraft.world.item.ItemStack(item("sports_drink")).finishUsingItem(level, player);
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION), "スポーツドリンクで再生がつかない");
+        var rest = net.minecraft.stats.Stats.CUSTOM.get(net.minecraft.stats.Stats.TIME_SINCE_REST);
+        player.getStats().setValue(player, rest, 100000);
+        var left = new net.minecraft.world.item.ItemStack(item("coffee")).finishUsingItem(level, player);
+        helper.assertTrue(player.getStats().getValue(rest) == 0, "コーヒーで眠気が覚めない");
+        helper.assertTrue(left.is(net.minecraft.world.item.Items.GLASS_BOTTLE), "コーヒーを飲んでも瓶が残らない: " + left);
         helper.succeed();
     }
 
