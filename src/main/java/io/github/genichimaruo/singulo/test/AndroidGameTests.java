@@ -2328,4 +2328,29 @@ public final class AndroidGameTests {
         });
     }
 
+    /**
+     * 技の光が本体から離れて届く個体は、技の間だけ描画の箱が広がる（本体が画面の外でも、画面に入った技の光が描かれる）。
+     * 斬撃の軌跡・鞭と叩きつけの衝撃波・突き・斧の衝撃波の先まで入り、ふだんは広がらない。
+     */
+    @GameTest(template = EMPTY)
+    public static void attackEffectsWidenTheRenderBox(GameTestHelper helper) throws ReflectiveOperationException {
+        var level = helper.getLevel();
+        java.lang.reflect.Method setState = io.github.genichimaruo.singulo.android.RuinAndroid.class.getDeclaredMethod("setState", int.class);
+        setState.setAccessible(true);
+        record Move(net.minecraft.world.entity.EntityType<? extends io.github.genichimaruo.singulo.android.RuinAndroid> type, int state, double reach) {}
+        for (Move m : List.of(
+                new Move(SinguloEntities.BLADE_ANDROID.get(), BladeAndroid.STATE_SLASH, 4),
+                new Move(SinguloEntities.WHIP_ANDROID.get(), io.github.genichimaruo.singulo.android.WhipAndroid.STATE_SLAM, io.github.genichimaruo.singulo.android.WhipAndroid.WAVE_RANGE),
+                new Move(SinguloEntities.SABER_ANDROID.get(), io.github.genichimaruo.singulo.android.SaberAndroid.STATE_THRUST, io.github.genichimaruo.singulo.android.SaberAndroid.THRUST_REACH),
+                new Move(SinguloEntities.AXE_ANDROID.get(), io.github.genichimaruo.singulo.android.AxeAndroid.STATE_SLAM, io.github.genichimaruo.singulo.android.AxeAndroid.SHOCKWAVE_LENGTH))) {
+            var a = m.type().create(level);
+            a.moveTo(100.5, 64, 100.5, 0, 0);
+            var far = new net.minecraft.world.phys.Vec3(100.5 + m.reach(), 65, 100.5);
+            helper.assertFalse(a.getBoundingBoxForCulling().contains(far), m.type().getDescriptionId() + ": ふだんから描画の箱が広い");
+            setState.invoke(a, m.state());
+            helper.assertTrue(a.getBoundingBoxForCulling().contains(far), m.type().getDescriptionId() + ": 技の先まで描画の箱が届かない");
+            a.discard();
+        }
+        helper.succeed();
+    }
 }

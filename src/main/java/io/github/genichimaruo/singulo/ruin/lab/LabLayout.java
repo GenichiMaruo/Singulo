@@ -26,7 +26,7 @@ public final class LabLayout {
     public static final String BOSS = "boss_hall", REACTOR = "reactor", ENTRANCE = "entrance";
     public static final String[] REQUIRED = {"control", "loading_dock"};
     public static final String[] OPTIONAL = {"research_lab", "meeting", "archive", "office", "server_room", "clean_room", "prototype",
-            "mass_factory", "dorm", "body_storage", "test_ground", "bio_parts", "waste", "medical", "cafeteria"};
+            "mass_factory", "dorm", "body_storage", "test_ground", "bio_parts", "waste", "medical", "cafeteria", "private_rooms"};
     public static final String[] ANNEXES = {"annex_storage", "annex_locker", "annex_observation"};
     public static final String SUBSTATION = "annex_substation";
     /** 選ばれる部屋の数。 */

@@ -633,7 +633,7 @@ def item_card(stripe, blank=False):
     return outlined(f)
 
 
-def item_gem(color, facets=True):
+def item_gem(color, facets=True, star=False):
     def f(d):
         d.polygon([(16, 3), (25, 11), (22, 27), (10, 27), (7, 11)], fill=rgba(color))
         if facets:
@@ -641,6 +641,16 @@ def item_gem(color, facets=True):
             d.line([(16, 13), (16, 27)], fill=rgba(darken(color, 0.2)))
             d.line([(16, 13), (10, 27)], fill=rgba(darken(color, 0.1)))
             d.point((12, 8), fill=(255, 255, 255, 255))
+        if star:
+            # 中央に光る星: 白い芯から上下左右へのびる光（先ほど細く淡い）と、斜めの小さな輝き
+            glow, tip = rgba(lighten(color, 0.75)), rgba(lighten(color, 0.45))
+            d.rectangle([15, 13, 16, 22], fill=glow)
+            d.rectangle([11, 17, 20, 18], fill=glow)
+            d.line([(15.5, 10), (15.5, 25)], fill=tip)
+            d.line([(8, 17.5), (23, 17.5)], fill=tip)
+            for x, y in ((13, 15), (18, 15), (13, 20), (18, 20)):
+                d.point((x, y), fill=glow)
+            d.rectangle([15, 17, 16, 18], fill=(255, 255, 255, 255))
     return outlined(f)
 
 
@@ -893,10 +903,10 @@ ITEM_ART = {
     'degenerate_matter_shell': lambda: item_sphere_dark(None, white_seams=True),
     'time_crystal_catalyst': lambda: item_gem((255, 190, 90)),
     'time_crystal_module': lambda: item_module((236, 238, 244), (255, 190, 90)),
-    'awakening_record_core': lambda: item_gem((180, 120, 255)),
-    'awakening_echo_core': lambda: item_gem((120, 220, 255)),
-    'awakening_gravity_core': lambda: item_gem((255, 110, 140)),
-    'awakening_ergosphere_core': lambda: item_gem((150, 110, 255)),
+    'awakening_record_core': lambda: item_gem((180, 120, 255), star=True),
+    'awakening_echo_core': lambda: item_gem((120, 220, 255), star=True),
+    'awakening_gravity_core': lambda: item_gem((255, 110, 140), star=True),
+    'awakening_ergosphere_core': lambda: item_gem((150, 110, 255), star=True),
     'echo_chapter': lambda: item_scroll((232, 246, 255), (80, 196, 240)),
     'gravity_chapter': lambda: item_scroll((236, 226, 250), (140, 90, 230)),
     'horizon_chapter': lambda: item_scroll((242, 242, 255), (150, 190, 255)),

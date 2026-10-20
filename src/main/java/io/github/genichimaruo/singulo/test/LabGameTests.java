@@ -10,6 +10,7 @@ import io.github.genichimaruo.singulo.ruin.lab.LabStructure;
 import io.github.genichimaruo.singulo.ruin.lab.LabTerminalBlock;
 import io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock;
 import io.github.genichimaruo.singulo.ruin.lab.ReactorConsoleBlockEntity;
+import io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -202,6 +203,84 @@ public final class LabGameTests {
         });
     }
 
+    /** 部品を、テストの場所の絶対座標の範囲（チャンクの区切りの代わりに全体）で描く。 */
+    private static void draw(GameTestHelper helper, net.minecraft.world.level.levelgen.structure.StructurePiece piece) {
+        var level = helper.getLevel();
+        piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
+                piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(piece.getBoundingBox().getCenter()), piece.getBoundingBox().getCenter());
+    }
+
+    /** 耐圧殻は部屋の箱から2マス以内だけ（部屋の中と、3マス以上離れた所は描かない）。 */
+    @GameTest(template = "huge")
+    public static void hullWrapsRoomsTwoThick(GameTestHelper helper) {
+        BlockPos o = helper.absolutePos(new BlockPos(2, 1, 2));
+        var room = new net.minecraft.world.level.levelgen.structure.BoundingBox(o.getX() + 6, o.getY() + 4, o.getZ() + 6,
+                o.getX() + 10, o.getY() + 8, o.getZ() + 10);
+        var facility = new net.minecraft.world.level.levelgen.structure.BoundingBox(o.getX(), o.getY(), o.getZ(), o.getX() + 16, o.getY() + 14, o.getZ() + 16);
+        draw(helper, new LabPieces.Hull(facility, List.of(room)));
+        var level = helper.getLevel();
+        java.util.function.Function<BlockPos, Boolean> sealed = p -> level.getBlockState(p).is(SinguloBlocks.PRESSURE_HULL.get())
+                && level.getBlockState(p).getValue(PressureHullBlock.SEALED);
+        BlockPos c = new BlockPos(o.getX() + 8, o.getY() + 6, o.getZ() + 8);
+        helper.assertTrue(!level.getBlockState(c).is(SinguloBlocks.PRESSURE_HULL.get()), "部屋の中に耐圧殻がある");
+        helper.assertTrue(sealed.apply(c.east(3)) && sealed.apply(c.east(4)), "部屋の外の1〜2マスが封じられた耐圧殻でない");
+        helper.assertTrue(sealed.apply(c.above(3)) && sealed.apply(c.above(4)), "部屋の上の1〜2マスが封じられた耐圧殻でない");
+        helper.assertTrue(!level.getBlockState(c.east(5)).is(SinguloBlocks.PRESSURE_HULL.get()), "部屋から3マス離れた所にも耐圧殻がある");
+        helper.assertTrue(!level.getBlockState(new BlockPos(o.getX() + 1, o.getY() + 1, o.getZ() + 1)).is(SinguloBlocks.PRESSURE_HULL.get()),
+                "施設の範囲の隅（部屋から遠い所）まで耐圧殻で埋まる");
+        helper.succeed();
+    }
+
+    /**
+     * 搬入出の立坑: 部屋の天井と地表の1段下は封じられた溶接の蓋、間は空洞で壁はパネル。封じが解けると、ダイヤのツルハシで掘れる
+     * （鉄のツルハシでは掘っても落ちない）。
+     */
+    @GameTest(template = "huge")
+    public static void accessShaftIsWeldedAtBothEnds(GameTestHelper helper) {
+        BlockPos o = helper.absolutePos(new BlockPos(6, 1, 6));
+        var box = new net.minecraft.world.level.levelgen.structure.BoundingBox(o.getX() - 2, o.getY(), o.getZ() - 2,
+                o.getX() + 2, o.getY() + 14, o.getZ() + 2);
+        draw(helper, new LabPieces.AccessShaft(box));
+        var level = helper.getLevel();
+        BlockPos bottom = o, top = o.above(13), mid = o.above(7);
+        for (BlockPos p : new BlockPos[]{bottom, top}) {
+            helper.assertTrue(level.getBlockState(p).is(SinguloBlocks.WELDED_HATCH.get()) && level.getBlockState(p).getValue(PressureHullBlock.SEALED),
+                    "立坑の端が封じられた溶接の蓋でない: " + p);
+        }
+        helper.assertTrue(level.getBlockState(mid).isAir() && level.getBlockState(o.above(14)).isAir(), "立坑の中か地表の口が空洞でない");
+        helper.assertTrue(level.getBlockState(mid.east(2)).is(SinguloBlocks.LAB_PANEL.get()), "立坑の壁が研究所のパネルでない");
+        helper.assertTrue(level.getBlockState(o.above(1).east(2)).is(SinguloBlocks.PRESSURE_HULL.get()), "耐圧殻の高さの壁が耐圧殻でない");
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE));
+        helper.assertTrue(level.getBlockState(top).getDestroyProgress(player, level, top) == 0, "封じられた蓋が掘れる");
+        io.github.genichimaruo.singulo.ruin.lab.LabPower.unseal(level, box);
+        helper.assertTrue(level.getBlockState(top).getDestroyProgress(player, level, top) > 0 && player.hasCorrectToolForDrops(level.getBlockState(top)),
+                "封じが解けた蓋がダイヤのツルハシで掘れない");
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE));
+        helper.assertFalse(player.hasCorrectToolForDrops(level.getBlockState(top)), "鉄のツルハシでも蓋が掘れる");
+        helper.succeed();
+    }
+
+    /** 地表の建物: 床・昇降路の扉の枠・入場ゲートの柱・受付のカウンター・出入口・屋根。 */
+    @GameTest(template = "huge")
+    public static void entranceBuildingStandsOverTheShaft(GameTestHelper helper) {
+        BlockPos o = helper.absolutePos(new BlockPos(8, 2, 6));
+        draw(helper, new LabPieces.Entrance(o.getX(), o.getZ(), o.getY(), 7));
+        var level = helper.getLevel();
+        java.util.function.BiFunction<Integer, Integer, java.util.function.IntFunction<net.minecraft.world.level.block.state.BlockState>> at =
+                (dx, dz) -> h -> level.getBlockState(o.offset(dx, h, dz));
+        helper.assertTrue(at.apply(0, 6).apply(0).is(SinguloBlocks.LAB_TILES.get()), "ホールの床が研究所の床タイルでない");
+        helper.assertTrue(at.apply(0, 0).apply(0).isAir(), "昇降路の口がふさがっている");
+        helper.assertTrue(at.apply(2, 3).apply(1).is(SinguloBlocks.LAB_FRAME.get()) && at.apply(0, 3).apply(1).isAir(),
+                "エレベーターの扉の枠と口がない");
+        helper.assertTrue(at.apply(-1, 6).apply(1).is(SinguloBlocks.LAB_FRAME.get()), "入場ゲートの柱がない");
+        helper.assertTrue(at.apply(-3, 8).apply(1).is(SinguloBlocks.LAB_PANEL_LINED.get()), "受付のカウンターがない");
+        helper.assertTrue(at.apply(0, 9).apply(1).isAir() && at.apply(0, 9).apply(2).isAir(), "出入口が開いていない");
+        helper.assertTrue(at.apply(0, 6).apply(5).is(SinguloBlocks.LAB_PANEL.get()) || at.apply(0, 6).apply(5).is(SinguloBlocks.LAB_PANEL_LINED.get()),
+                "屋根がない");
+        helper.succeed();
+    }
+
     /** 封じられた耐圧殻は掘れず（壊す速さ 0）、封じが解けると、黒曜石よりは遅いが掘れる。 */
     @GameTest(template = EMPTY)
     public static void sealedHullCannotBeMined(GameTestHelper helper) {
@@ -216,6 +295,155 @@ public final class LabGameTests {
         helper.setBlock(at, net.minecraft.world.level.block.Blocks.OBSIDIAN);
         float obsidian = helper.getBlockState(at).getDestroyProgress(player, helper.getLevel(), abs);
         helper.assertTrue(hull > 0 && hull < obsidian, "封じが解けた耐圧殻の硬さが違う: " + hull + " / 黒曜石 " + obsidian);
+        helper.succeed();
+    }
+
+    /**
+     * 研究所は地下の飾り（スカルクの塊・スカルクヴェイン）より後、木や草より前に置く。先に置くと部屋の中にスカルクヴェインが這う
+     * （耐圧殻で囲まれた中へは、あとから外のスカルクは広がれない）。
+     */
+    @GameTest(template = EMPTY)
+    public static void labIsPlacedAfterSculk(GameTestHelper helper) {
+        var lab = helper.getLevel().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE).get(Singulo.id("android_lab"));
+        helper.assertTrue(lab != null, "研究所の構造物がない");
+        var step = lab.step();
+        helper.assertTrue(step.ordinal() > net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_DECORATION.ordinal()
+                && step.ordinal() < net.minecraft.world.level.levelgen.GenerationStep.Decoration.VEGETAL_DECORATION.ordinal(),
+                "研究所を置く段階がスカルクの後・木の前でない: " + step);
+        helper.succeed();
+    }
+
+    /**
+     * 収納の中身: どの表も、開けたときに何種類も入っていて（20回引いた平均で5種類以上の束）、バニラの品を含む。
+     * 部屋に合った表を使う（食堂は厨房、個室は私物、医務室は手当ての品、個室のロッカーの樽は私物）。
+     */
+    @GameTest(template = EMPTY)
+    public static void labContainersHoldFittingLoot(GameTestHelper helper) {
+        var level = helper.getLevel();
+        for (String name : List.of("lab_supplies", "lab_research", "lab_office", "lab_quarters", "lab_locker", "lab_kitchen", "lab_medical")) {
+            var table = level.getServer().reloadableRegistries().getLootTable(net.minecraft.resources.ResourceKey.create(
+                    net.minecraft.core.registries.Registries.LOOT_TABLE, Singulo.id("chests/" + name)));
+            int stacks = 0;
+            boolean vanilla = false;
+            for (int i = 0; i < 20; i++) {
+                var items = table.getRandomItems(new net.minecraft.world.level.storage.loot.LootParams.Builder(level)
+                        .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, helper.absoluteVec(net.minecraft.world.phys.Vec3.ZERO))
+                        .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST));
+                stacks += items.size();
+                vanilla |= items.stream().anyMatch(s -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(s.getItem()).getNamespace().equals("minecraft"));
+            }
+            int min = name.equals("lab_locker") ? 2 : 5;
+            helper.assertTrue(stacks >= min * 20, name + " の中身が少ない: 平均 " + stacks / 20F);
+            helper.assertTrue(vanilla, name + " にバニラの品が入らない");
+        }
+        for (var room : List.of(java.util.Map.entry("cafeteria", "lab_kitchen"), java.util.Map.entry("private_rooms", "lab_quarters"),
+                java.util.Map.entry("dorm", "lab_quarters"), java.util.Map.entry("medical", "lab_medical"), java.util.Map.entry("office", "lab_office"))) {
+            StructureTemplate t = template(helper, room.getKey()).orElseThrow();
+            var chests = t.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), net.minecraft.world.level.block.Blocks.CHEST);
+            helper.assertFalse(chests.isEmpty(), room.getKey() + " にチェストがない");
+            for (var info : chests) {
+                helper.assertTrue(info.nbt() != null && info.nbt().getString("LootTable").equals(Singulo.MODID + ":chests/" + room.getValue()),
+                        room.getKey() + " のチェストの中身が " + room.getValue() + " でない");
+            }
+        }
+        for (var info : template(helper, "private_rooms").orElseThrow().filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(),
+                net.minecraft.world.level.block.Blocks.BARREL)) {
+            helper.assertTrue(info.nbt() != null && info.nbt().getString("LootTable").endsWith("chests/lab_locker"), "個室のロッカーが空");
+        }
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------ スライドドア
+
+    /** 下半分と上半分のスライドドアを置く（扉の面は north）。 */
+    private static void placeDoor(GameTestHelper helper, BlockPos at, Block door) {
+        var state = door.defaultBlockState().setValue(SlidingDoorBlock.FACING, net.minecraft.core.Direction.NORTH);
+        helper.setBlock(at, state);
+        helper.setBlock(at.above(), state.setValue(SlidingDoorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+    }
+
+    /** ドアの真ん中を通れるか（閉じていると扉に当たり、開いていると左右の枠だけが残る）。 */
+    private static boolean passable(GameTestHelper helper, BlockPos at) {
+        var shape = helper.getBlockState(at).getCollisionShape(helper.getLevel(), helper.absolutePos(at));
+        return !net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(shape,
+                net.minecraft.world.phys.shapes.Shapes.box(0.25, 0, 0.25, 0.75, 1, 0.75), net.minecraft.world.phys.shapes.BooleanOp.AND);
+    }
+
+    private static boolean open(GameTestHelper helper, BlockPos at) {
+        return helper.getBlockState(at).getValue(SlidingDoorBlock.OPEN);
+    }
+
+    /** 右クリックで上下とも開いて通れるようになり、誰もいなければ少しして自分で閉まる。 */
+    @GameTest(template = EMPTY, timeoutTicks = SlidingDoorBlock.CLOSE_DELAY + 40)
+    public static void slidingDoorClosesByItself(GameTestHelper helper) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        placeDoor(helper, at, SinguloBlocks.LAB_DOOR.get());
+        helper.assertFalse(passable(helper, at) || passable(helper, at.above()), "閉じたドアを通れる");
+        helper.useBlock(at.above(), helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL));
+        helper.assertTrue(open(helper, at) && open(helper, at.above()), "右クリックで上下とも開かない");
+        helper.assertTrue(passable(helper, at) && passable(helper, at.above()), "開いたドアを通れない");
+        helper.runAtTickTime(SlidingDoorBlock.CLOSE_DELAY + 10, () -> {
+            helper.assertFalse(open(helper, at) || open(helper, at.above()), "誰もいないのに閉まらない");
+            helper.succeed();
+        });
+    }
+
+    /** ドアの中に誰かいる間と、レッドストーンの信号が入っている間は閉まらない。 */
+    @GameTest(template = EMPTY, timeoutTicks = SlidingDoorBlock.CLOSE_DELAY * 2 + 60)
+    public static void slidingDoorWaitsForPassersAndRedstone(GameTestHelper helper) {
+        BlockPos at = new BlockPos(2, 1, 2), wired = new BlockPos(5, 1, 2);
+        placeDoor(helper, at, SinguloBlocks.WHITE_SLIDING_DOOR.get());
+        placeDoor(helper, wired, SinguloBlocks.WHITE_SLIDING_DOOR.get());
+        var stand = helper.spawn(net.minecraft.world.entity.EntityType.ARMOR_STAND, at);
+        helper.useBlock(at, helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL));
+        helper.setBlock(wired.west(), net.minecraft.world.level.block.Blocks.REDSTONE_BLOCK);
+        helper.assertTrue(open(helper, wired) && helper.getBlockState(wired.above()).getValue(SlidingDoorBlock.POWERED), "信号で開かない");
+        helper.runAtTickTime(SlidingDoorBlock.CLOSE_DELAY + 20, () -> {
+            helper.assertTrue(open(helper, at), "中に人がいるのに閉まった");
+            helper.assertTrue(open(helper, wired), "信号が入っているのに閉まった");
+            stand.discard();
+            helper.setBlock(wired.west(), net.minecraft.world.level.block.Blocks.AIR);
+        });
+        helper.runAtTickTime(SlidingDoorBlock.CLOSE_DELAY * 2 + 40, () -> {
+            helper.assertFalse(open(helper, at), "人がいなくなっても閉まらない");
+            helper.assertFalse(open(helper, wired), "信号が切れても閉まらない");
+            helper.succeed();
+        });
+    }
+
+    /** 研究所のドアはレシピがなく、似せたホワイトスライドドアは作業台で作れる。どちらも下半分だけが落とす（壊すと1つ）。 */
+    @GameTest(template = EMPTY)
+    public static void onlyTheWhiteSlidingDoorIsCraftable(GameTestHelper helper) {
+        var level = helper.getLevel();
+        java.util.function.Predicate<net.minecraft.world.item.Item> craftable = item -> level.getRecipeManager().getRecipes().stream()
+                .anyMatch(r -> r.value().getResultItem(level.registryAccess()).is(item));
+        helper.assertFalse(craftable.test(SinguloBlocks.LAB_DOOR.get().asItem()), "研究所のドアにレシピがある");
+        helper.assertTrue(craftable.test(SinguloBlocks.WHITE_SLIDING_DOOR.get().asItem()), "ホワイトスライドドアにレシピがない");
+        BlockPos at = new BlockPos(2, 1, 2);
+        placeDoor(helper, at, SinguloBlocks.LAB_DOOR.get());
+        level.destroyBlock(helper.absolutePos(at.above()), true);
+        helper.assertTrue(helper.getBlockState(at).isAir() && helper.getBlockState(at.above()).isAir(), "上を壊しても下が残る");
+        helper.succeed();
+    }
+
+    /** 個室区画には個室のドアが8つ（16ブロック）、食堂には厨房のドアが1つ。どのドアも前後が空いている（家具でふさがれていない）。 */
+    @GameTest(template = EMPTY)
+    public static void privateRoomsAndKitchenHaveDoors(GameTestHelper helper) {
+        for (var room : List.of(java.util.Map.entry("private_rooms", 16), java.util.Map.entry("cafeteria", 2))) {
+            StructureTemplate t = template(helper, room.getKey()).orElseThrow();
+            helper.assertTrue(count(t, SinguloBlocks.LAB_DOOR.get()) == room.getValue(),
+                    room.getKey() + " のドアの数が違う: " + count(t, SinguloBlocks.LAB_DOOR.get()));
+            java.util.Map<BlockPos, net.minecraft.world.level.block.state.BlockState> all = new java.util.HashMap<>();
+            for (var info : t.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), net.minecraft.world.level.block.Blocks.AIR)) {
+                all.put(info.pos(), info.state());
+            }
+            for (var info : t.filterBlocks(BlockPos.ZERO, new StructurePlaceSettings(), SinguloBlocks.LAB_DOOR.get())) {
+                var facing = info.state().getValue(SlidingDoorBlock.FACING);
+                for (BlockPos side : List.of(info.pos().relative(facing), info.pos().relative(facing.getOpposite()))) {
+                    helper.assertTrue(all.containsKey(side), room.getKey() + " のドアの前後がふさがっている: " + side);
+                }
+            }
+        }
         helper.succeed();
     }
 

@@ -360,6 +360,7 @@ public final class SinguloItems {
             block(ruin, 1);
         }
         block(SinguloBlocks.WHITE_PANEL, 1);
+        block(SinguloBlocks.WHITE_SLIDING_DOOR, 1);
         block(SinguloBlocks.WHITE_LIGHT_PANEL, 1);
         block(SinguloBlocks.BISMUTH_CRYSTAL_BLOCK, 2);
         block(SinguloBlocks.GLOWING_BISMUTH_CRYSTAL, 2);
@@ -393,6 +394,8 @@ public final class SinguloItems {
         block(SinguloBlocks.REACTOR_CORE, 1);
         block(SinguloBlocks.POWER_CONDUIT, 1);
         block(SinguloBlocks.PRESSURE_HULL, 1);
+        block(SinguloBlocks.WELDED_HATCH, 1);
+        block(SinguloBlocks.LAB_DOOR, 1);
         block(SinguloBlocks.BULKHEAD, 1);
         block(SinguloBlocks.REACTOR_CONSOLE, 1);
         block(SinguloBlocks.SERVER_RACK, 1);

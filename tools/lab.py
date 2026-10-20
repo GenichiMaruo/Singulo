@@ -25,6 +25,7 @@ LIGHT = (f'{MODID}:facility_light', {'powered': 'false'})
 EMERGENCY = (f'{MODID}:emergency_light', {'powered': 'false'})
 REACTOR_CORE = (f'{MODID}:reactor_core', {'powered': 'false'})
 CONDUIT = (f'{MODID}:power_conduit', {'powered': 'false'})
+DOOR = f'{MODID}:lab_door'
 DARK = 'minecraft:polished_deepslate'
 SLAB_TOP = ('minecraft:smooth_quartz_slab', {'type': 'top', 'waterlogged': 'false'})
 CATWALK = ('minecraft:polished_deepslate_slab', {'type': 'top', 'waterlogged': 'false'})
@@ -38,8 +39,14 @@ LOGS = 12
 # ボス部屋をほかの部屋より深く置く分（LabStructure.BOSS_DEPTH と同じ）
 BOSS_DEPTH = 4
 
+# 収納の中身（loot table）。部屋に合ったもの: 物資・研究・事務・個室・ロッカー（樽）・厨房・医務
 SUPPLIES = f'{MODID}:chests/lab_supplies'
 RESEARCH = f'{MODID}:chests/lab_research'
+OFFICE = f'{MODID}:chests/lab_office'
+QUARTERS = f'{MODID}:chests/lab_quarters'
+LOCKER = f'{MODID}:chests/lab_locker'
+KITCHEN = f'{MODID}:chests/lab_kitchen'
+MEDICAL = f'{MODID}:chests/lab_medical'
 
 
 def stairs(facing):
@@ -102,8 +109,8 @@ class Room(Builder):
     def chest(self, x, y, z, facing, table=SUPPLIES):
         self.put(x, y, z, 'minecraft:chest', {'facing': facing, 'type': 'single', 'waterlogged': 'false'}, {'LootTable': table})
 
-    def barrel(self, x, y, z, facing='up'):
-        self.put(x, y, z, 'minecraft:barrel', {'facing': facing, 'open': 'false'})
+    def barrel(self, x, y, z, facing='up', table=None):
+        self.put(x, y, z, 'minecraft:barrel', {'facing': facing, 'open': 'false'}, {'LootTable': table} if table else None)
 
     def capsule(self, x, z, facing):
         if not self.door_zone(x, z):
@@ -153,6 +160,16 @@ class Room(Builder):
 
     def cup(self, x, y, z, color='white'):
         self.put(x, y, z, f'minecraft:{color}_candle', {'candles': '1', 'lit': 'false', 'waterlogged': 'false'})
+
+    def door(self, x, z, facing, open_=False):
+        """研究所のスライドドア（2ブロックの高さ。facing は扉の面の向き。壁の中に置く）。"""
+        for y, half in ((1, 'lower'), (2, 'upper')):
+            self.set(x, y, z, DOOR, {'facing': facing, 'half': half, 'open': str(open_).lower(), 'powered': 'false'})
+
+    def partition(self, x0, z0, x1, z1):
+        """部屋の中の仕切りの壁（床から天井の下まで。腰の高さは帯入りパネル）。"""
+        for y in range(1, self.h - 1):
+            self.fill(x0, y, z0, x1, y, z1, LINED if y == 1 else PANEL)
 
     def screens(self, z, x0, x1, ys):
         """壁の大きな監視画面（黒いガラスと施設灯の格子）。"""
@@ -509,7 +526,7 @@ def office():
         b.barrel(11, 1, z, 'west')
     b.coffee(11, 2, 1, 'west')
     b.papers(11, 2, 2)
-    b.chest(1, 1, 9, 'east')
+    b.chest(1, 1, 9, 'east', OFFICE)
     b.vending(1, 1, 'south')
     b.trash(11, 9)
     b.trash(4, 9)
@@ -598,7 +615,7 @@ def dorm():
         b.put(x, 1, 7, 'minecraft:white_bed', {'facing': 'south', 'occupied': 'false', 'part': 'head'})
         b.put(x, 1, 6, 'minecraft:white_bed', {'facing': 'south', 'occupied': 'false', 'part': 'foot'})
     for x in (3, 11):
-        b.barrel(x, 1, 1, 'south')
+        b.barrel(x, 1, 1, 'south', LOCKER)
         b.put(x, 2, 1, 'minecraft:lantern', {'hanging': 'false', 'waterlogged': 'false'})
     b.terminal(3, 1, 4, 'east', LOG_DORM)
     for x in (2, 4, 10, 12):
@@ -606,8 +623,51 @@ def dorm():
         b.put(x, 1, 5, 'minecraft:light_gray_carpet')
     b.trash(13, 7)
     b.papers(11, 2, 1)
-    b.chest(11, 1, 7, 'north')
+    b.chest(11, 1, 7, 'north', QUARTERS)
     b.dock(7, 1, 4, 3)
+    return b
+
+
+def private_rooms():
+    """個室区画（21×15、天井が低い）: 真ん中の廊下の両側に、スライドドアのついた研究員の個室が4つずつ並ぶ。
+    個室（中は3×3）には寝台・机と椅子・モニターか書類・物入れの樽。開いたままのドアもある。北の出入口から廊下へは、個室の間の通路で抜ける。"""
+    b = Room(21, 7, 15, 726)
+    b.shell()
+    cells = (1, 5, 13, 17)
+    for north in (True, False):
+        front = 4 if north else 10
+        z0, z1 = (1, 3) if north else (11, 13)
+        b.partition(1, front, 8, front)
+        b.partition(12, front, 19, front)
+        for x in (4, 8, 12, 16):
+            b.partition(x, z0, x, z1)
+        back, mid = (z0, z0 + 1) if north else (z1, z1 - 1)
+        for k, a in enumerate(cells):
+            n = k + (0 if north else 4)
+            b.door(a + 1, front, 'south' if north else 'north', open_=n in (2, 5))
+            b.put(a, 1, back, 'minecraft:white_bed', {'facing': 'north' if north else 'south', 'occupied': 'false', 'part': 'head'})
+            b.put(a, 1, mid, 'minecraft:white_bed', {'facing': 'north' if north else 'south', 'occupied': 'false', 'part': 'foot'})
+            b.put(a + 2, 1, back, *SLAB_TOP)
+            b.put(a + 2, 1, mid, *stairs('south' if north else 'north'))
+            if n == 1:
+                b.terminal(a + 2, 2, back, 'south', LOG_DORM)          # 個人の記録の端末
+            elif n % 3 == 0:
+                b.papers(a + 2, 2, back)
+            else:
+                b.monitor(a + 2, 2, back, 'south' if north else 'north')
+            near = z1 if north else z0                            # ドアの側の列（真ん中はドアの前なので空ける）
+            if n in (3, 6):
+                b.chest(a, 1, near, 'east', QUARTERS)
+            else:
+                b.barrel(a, 1, near, 'east', LOCKER)
+            if n % 2:
+                b.trash(a + 2, near)
+            elif n != 0:
+                b.plant(a + 2, near)
+    b.plant(8, 5)                                                 # 廊下の小物は、ドアの前を避けて仕切りの角に
+    b.plant(12, 9)
+    b.trash(16, 9)
+    b.dock(10, 1, 7, 2)
     return b
 
 
@@ -703,15 +763,21 @@ def medical():
     b.put(8, 2, 1, 'minecraft:brewing_stand', {'has_bottle_0': 'false', 'has_bottle_1': 'false', 'has_bottle_2': 'false'})
     b.terminal(1, 1, 1, 'east', LOG_MEDICAL)
     b.trash(2, 1)
-    b.chest(9, 2, 1, 'south')
+    b.chest(9, 2, 1, 'south', MEDICAL)
     return b
 
 
 def cafeteria():
-    """食堂（15×13、天井が低い）: 4人がけの机と椅子、調理の台（燻製器・大釜）。"""
+    """食堂（15×13、天井が低い）: 4人がけの机と椅子。南西の隅は、スライドドアと配膳の窓のある厨房（燻製器・流し・食料の樽）。"""
     b = Room(15, 7, 13, 725)
     b.shell()
-    for x0, z0 in ((3, 3), (9, 3), (3, 9), (9, 9)):
+    # 厨房（中は x 1〜4、z 9〜11）: 仕切りの壁、ドア、配膳の窓（腰の高さのカウンターの上が開いている）
+    b.partition(1, 8, 5, 8)
+    b.partition(5, 8, 5, 11)
+    b.door(4, 8, 'north')                                         # 扉がしまわれる両脇（x 3・5）は壁のまま
+    for x in (1, 2):
+        b.set(x, 2, 8, AIR)
+    for x0, z0 in ((3, 3), (9, 3), (9, 9)):
         b.put(x0, 1, z0, *SLAB_TOP)
         b.put(x0 + 1, 1, z0, *SLAB_TOP)
         for x, z, f in ((x0, z0 - 1, 'north'), (x0 + 1, z0 - 1, 'north'), (x0, z0 + 1, 'south'), (x0 + 1, z0 + 1, 'south')):
@@ -719,10 +785,14 @@ def cafeteria():
         b.tray(x0, 2, z0)
         b.cup(x0 + 1, 2, z0, 'light_gray' if x0 == 3 else 'white')
     b.put(10, 2, 9, 'minecraft:cake', {'bites': '2'})
-    for x in (1, 2, 3):
-        b.put(x, 1, 11, 'minecraft:smoker' if x % 2 else 'minecraft:cauldron', {'facing': 'north', 'lit': 'false'} if x % 2 else None)
+    b.put(1, 1, 11, 'minecraft:smoker', {'facing': 'north', 'lit': 'false'})
+    b.put(2, 1, 11, 'minecraft:water_cauldron', {'level': '3'})
+    b.put(3, 1, 11, 'minecraft:smoker', {'facing': 'north', 'lit': 'false'})
     b.put(4, 1, 11, *SLAB_TOP)
     b.coffee(4, 2, 11, 'north')
+    b.barrel(1, 1, 9, 'east', KITCHEN)                            # 配膳の窓の内側の台（食料の樽）
+    b.barrel(1, 1, 10, 'east', KITCHEN)
+    b.tray(1, 2, 9)
     for x in (1, 2):
         b.vending(x, 1, 'south')
     b.vending(12, 1, 'south')
@@ -730,7 +800,7 @@ def cafeteria():
     b.trash(4, 1)
     b.plant(1, 3)
     b.terminal(13, 1, 2, 'west', LOG_CAFETERIA)
-    b.chest(13, 1, 11, 'north')
+    b.chest(13, 1, 11, 'north', KITCHEN)
     b.dock(7, 1, 6, 3)
     return b
 
@@ -799,7 +869,7 @@ REQUIRED = {'entrance': entrance, 'reactor': reactor, 'control': control, 'loadi
 OPTIONAL = {'research_lab': research_lab, 'meeting': meeting, 'archive': archive, 'office': office, 'server_room': server_room,
             'clean_room': clean_room, 'prototype': prototype, 'mass_factory': mass_factory, 'dorm': dorm,
             'body_storage': body_storage, 'test_ground': test_ground, 'bio_parts': bio_parts, 'waste': waste,
-            'medical': medical, 'cafeteria': cafeteria}
+            'medical': medical, 'cafeteria': cafeteria, 'private_rooms': private_rooms}
 ANNEX = {'annex_storage': annex_storage, 'annex_locker': annex_locker, 'annex_observation': annex_observation,
          'annex_substation': annex_substation}
 
@@ -824,7 +894,9 @@ def write_all(data, write_json, placement, depth):
     write_json(data / 'worldgen' / 'structure' / 'android_lab.json', {
         'type': f'{MODID}:android_lab',
         'biomes': f'#{MODID}:has_structure/android_lab',
-        'step': 'underground_structures',
+        # 地下の飾り（ディープダークのスカルクの塊・スカルクヴェイン、鍾乳石など）のあとに置く。先に置くと、部屋の空洞に
+        # スカルクの塊の起点が来て、床や壁にスカルクヴェインが這う。木や草（vegetal_decoration）よりは前なので、地表の建物は避けて生える
+        'step': 'fluid_springs',
         # 暗くても、ふつうの敵は湧かない（施設を守るのは、警備機と遺構の印刷台のアンドロイドだけ）
         'spawn_overrides': {'monster': {'bounding_box': 'full', 'spawns': []}},
         'terrain_adaptation': 'none',
@@ -840,17 +912,68 @@ def write_all(data, write_json, placement, depth):
 
 
 def chest_loot(write_json, data, mid):
-    """物資棚（チェスト）の中身: 研究所の消耗品と、研究の資料。"""
-    def entry(name, lo, hi, weight):
-        e = {'type': 'minecraft:item', 'name': mid(name), 'weight': weight}
+    """収納の中身。どれも、研究所の部品（Singulo の品）の組と、その部屋にあったバニラの品の組の2つを引く。
+    バニラの品を多めに引いて、開けたときに中がにぎやかに見えるようにする（ばらばらの枠に散らばる）。"""
+    def count(e, lo, hi):
         if hi > 1:
             e['functions'] = [{'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]
         return e
-    write_json(data / 'loot_table' / 'chests' / 'lab_supplies.json', {'type': 'minecraft:chest', 'pools': [
-        {'rolls': {'type': 'minecraft:uniform', 'min': 2, 'max': 4}, 'entries': [
-            entry('鋼鉄インゴット', 2, 6, 6), entry('基礎回路', 1, 3, 5), entry('鋼板', 2, 4, 4), entry('超伝導コイル', 1, 2, 3),
-            entry('自己修理キット', 1, 2, 3), entry('アンドロイドキット', 1, 1, 1)]}]})
-    write_json(data / 'loot_table' / 'chests' / 'lab_research.json', {'type': 'minecraft:chest', 'pools': [
-        {'rolls': {'type': 'minecraft:uniform', 'min': 1, 'max': 3}, 'entries': [
-            entry('クリスタルメモリ', 1, 2, 5), entry('基礎回路', 2, 4, 4), entry('精密アクチュエーター', 1, 1, 2),
-            entry('量子もつれ素子', 1, 2, 3)]}]})
+
+    def entry(name, lo, hi, weight):
+        return count({'type': 'minecraft:item', 'name': mid(name), 'weight': weight}, lo, hi)
+
+    def v(name, lo, hi, weight, *functions):
+        e = count({'type': 'minecraft:item', 'name': f'minecraft:{name}', 'weight': weight}, lo, hi)
+        if functions:
+            e['functions'] = e.get('functions', []) + list(functions)
+        return e
+
+    def table(name, mod_rolls, mod, vanilla_rolls, vanilla):
+        pools = [{'rolls': {'type': 'minecraft:uniform', 'min': vanilla_rolls[0], 'max': vanilla_rolls[1]}, 'entries': vanilla}]
+        if mod:
+            pools.insert(0, {'rolls': {'type': 'minecraft:uniform', 'min': mod_rolls[0], 'max': mod_rolls[1]}, 'entries': mod})
+        write_json(data / 'loot_table' / 'chests' / f'{name}.json', {'type': 'minecraft:chest', 'pools': pools})
+
+    healing = {'function': 'minecraft:set_potion', 'id': 'minecraft:healing'}
+    regeneration = {'function': 'minecraft:set_potion', 'id': 'minecraft:regeneration'}
+    # 物資棚（搬入口・倉庫）: 部品と、資材
+    table('lab_supplies', (2, 4), [
+        entry('鋼鉄インゴット', 2, 6, 6), entry('基礎回路', 1, 3, 5), entry('鋼板', 2, 4, 4), entry('超伝導コイル', 1, 2, 3),
+        entry('自己修理キット', 1, 2, 3), entry('アンドロイドキット', 1, 1, 1)], (4, 7), [
+        v('iron_ingot', 2, 6, 6), v('copper_ingot', 2, 8, 6), v('iron_nugget', 3, 9, 5), v('redstone', 2, 8, 5), v('glass', 2, 6, 4),
+        v('chain', 1, 3, 3), v('string', 1, 4, 3), v('quartz', 1, 4, 3), v('gunpowder', 1, 3, 2), v('paper', 2, 6, 3),
+        v('lever', 1, 2, 2), v('rail', 2, 6, 2), v('bucket', 1, 1, 1)])
+    # 研究の資料（研究室・資料室・試作室・生体部品室・制御室）
+    table('lab_research', (1, 3), [
+        entry('クリスタルメモリ', 1, 2, 5), entry('基礎回路', 2, 4, 4), entry('精密アクチュエーター', 1, 1, 2),
+        entry('量子もつれ素子', 1, 2, 3)], (4, 7), [
+        v('paper', 3, 10, 6), v('book', 1, 3, 4), v('writable_book', 1, 1, 2), v('glass_bottle', 1, 4, 4), v('redstone', 1, 5, 4),
+        v('glowstone_dust', 1, 4, 3), v('amethyst_shard', 1, 3, 3), v('quartz', 1, 4, 3), v('comparator', 1, 1, 2),
+        v('repeater', 1, 2, 2), v('ender_pearl', 1, 1, 1), v('experience_bottle', 1, 2, 1)])
+    # 事務室の机の引き出し
+    table('lab_office', (0, 1), [entry('基礎回路', 1, 2, 3), entry('クリスタルメモリ', 1, 1, 1)], (5, 8), [
+        v('paper', 4, 12, 8), v('book', 1, 3, 4), v('writable_book', 1, 1, 3), v('ink_sac', 1, 3, 3), v('feather', 1, 3, 3),
+        v('map', 1, 1, 2), v('clock', 1, 1, 1), v('compass', 1, 1, 1), v('cookie', 1, 4, 3), v('string', 1, 3, 2),
+        v('name_tag', 1, 1, 1), v('white_candle', 1, 2, 2)])
+    # 個室・社員寮の私物
+    table('lab_quarters', (0, 1), [entry('自己修理キット', 1, 1, 2), entry('クリスタルメモリ', 1, 1, 1)], (5, 8), [
+        v('bread', 1, 4, 5), v('cookie', 2, 6, 4), v('apple', 1, 3, 4), v('book', 1, 2, 4), v('writable_book', 1, 1, 2),
+        v('paper', 2, 6, 3), v('white_candle', 1, 3, 3), v('white_wool', 1, 3, 3), v('leather_boots', 1, 1, 1), v('clock', 1, 1, 1),
+        v('spyglass', 1, 1, 1), v('gold_nugget', 2, 6, 3), v('emerald', 1, 2, 2), v('item_frame', 1, 2, 2), v('painting', 1, 1, 2),
+        v('flower_pot', 1, 1, 2), v('music_disc_13', 1, 1, 1), v('music_disc_cat', 1, 1, 1)])
+    # 個室・社員寮のロッカー（樽）: 少しの私物
+    table('lab_locker', None, None, (2, 4), [
+        v('leather_boots', 1, 1, 2), v('leather_chestplate', 1, 1, 1), v('white_wool', 1, 2, 3), v('string', 1, 3, 3),
+        v('paper', 1, 4, 3), v('book', 1, 1, 2), v('cookie', 1, 3, 3), v('white_candle', 1, 2, 2), v('stick', 1, 3, 2),
+        v('gold_nugget', 1, 3, 2), v('name_tag', 1, 1, 1)])
+    # 厨房・食堂: 食料と調理の道具
+    table('lab_kitchen', None, None, (6, 9), [
+        v('bread', 2, 6, 6), v('wheat', 3, 8, 4), v('sugar', 2, 6, 4), v('egg', 1, 4, 4), v('apple', 2, 5, 4), v('carrot', 2, 5, 4),
+        v('potato', 2, 6, 4), v('baked_potato', 1, 4, 3), v('beetroot', 2, 5, 3), v('cookie', 2, 8, 4), v('pumpkin_pie', 1, 2, 2),
+        v('honey_bottle', 1, 2, 2), v('bowl', 1, 4, 3), v('mushroom_stew', 1, 1, 1), v('glass_bottle', 1, 3, 2), v('milk_bucket', 1, 1, 1),
+        v('cocoa_beans', 1, 4, 2), v('cake', 1, 1, 1)])
+    # 医務室: 手当ての品
+    table('lab_medical', (1, 2), [entry('自己修理キット', 1, 2, 4)], (4, 7), [
+        v('potion', 1, 1, 3, healing), v('potion', 1, 1, 2, regeneration), v('glass_bottle', 2, 5, 4), v('paper', 2, 5, 3),
+        v('honey_bottle', 1, 3, 3), v('sugar', 1, 4, 3), v('white_wool', 1, 3, 3), v('golden_carrot', 1, 2, 2), v('glistering_melon_slice', 1, 2, 2),
+        v('golden_apple', 1, 1, 1), v('string', 1, 3, 2)])

@@ -1330,8 +1330,9 @@ def card(stripe, blank=False):
     return outlined(f)
 
 
-def crystal_cluster(c, seed=0, spent=False, mark=None):
-    """固まった結晶の塊: 傾いた六角柱を3本寄せ、光の当たる面・陰の面・稜線で立体感を出す。"""
+def crystal_cluster(c, seed=0, spent=False, mark=None, star=False):
+    """固まった結晶の塊: 傾いた六角柱を3本寄せ、光の当たる面・陰の面・稜線で立体感を出す。
+    star なら、中央の結晶の真ん中に光る星（白い芯から上下左右へのびる光と、斜めの小さな輝き）を浮かべる（覚醒の核）。"""
     if spent:
         c = mix(c, (118, 116, 120), 0.75)
 
@@ -1348,7 +1349,16 @@ def crystal_cluster(c, seed=0, spent=False, mark=None):
         prism(d, 9, 5, 12, 3, 1)
         prism(d, 5, 2, 13, 5, 0)
         d.line([(3, 13), (12, 13)], fill=rgba(darken(c, 0.35)))
-        if mark:
+        if star:
+            glow, tip = rgba(mix(mark or c, (255, 255, 255), 0.7)), rgba(mark or lighten(c, 0.6))
+            for x, y in ((7, 6), (7, 7), (7, 9), (7, 10), (5, 8), (6, 8), (8, 8), (9, 8)):
+                d.point((x, y), fill=glow)
+            for x, y in ((7, 5), (7, 11), (4, 8), (10, 8)):           # 光の先（少し淡く）
+                d.point((x, y), fill=tip)
+            for x, y in ((6, 7), (8, 7), (6, 9), (8, 9)):              # 斜めの小さな輝き
+                d.point((x, y), fill=rgba(mark or lighten(c, 0.6)))
+            d.point((7, 8), fill=(255, 255, 255, 255))                 # 白い芯
+        elif mark:
             d.point((7, 8), fill=rgba(mark))
             d.point((8, 9), fill=rgba(mark))
         if spent:
@@ -2033,11 +2043,11 @@ ITEM_ART = {
     'bose_condensate_catalyst': lambda: crystal_cluster((110, 220, 236), mark=(255, 255, 255)),
     'time_crystal_catalyst': lambda: crystal_cluster((250, 182, 84), mark=(255, 250, 220)),
     'time_crystal_module': lambda: module((236, 238, 244), (250, 182, 84)),
-    'awakening_record_core': lambda: crystal_cluster((176, 120, 255), mark=(255, 230, 255)),
-    'awakening_echo_core': lambda: crystal_cluster((112, 214, 255), mark=(230, 250, 255)),
-    'awakening_gravity_core': lambda: crystal_cluster((236, 96, 132), mark=(255, 225, 235)),
-    'awakening_ergosphere_core': lambda: crystal_cluster((140, 104, 250), mark=(240, 228, 255)),
-    'awakening_foundry_core': lambda: crystal_cluster((246, 136, 64), mark=(255, 236, 214)),
+    'awakening_record_core': lambda: crystal_cluster((176, 120, 255), mark=(255, 230, 255), star=True),
+    'awakening_echo_core': lambda: crystal_cluster((112, 214, 255), mark=(230, 250, 255), star=True),
+    'awakening_gravity_core': lambda: crystal_cluster((236, 96, 132), mark=(255, 225, 235), star=True),
+    'awakening_ergosphere_core': lambda: crystal_cluster((140, 104, 250), mark=(240, 228, 255), star=True),
+    'awakening_foundry_core': lambda: crystal_cluster((246, 136, 64), mark=(255, 236, 214), star=True),
     'precision_actuator': precision_actuator,
     'echo_chapter': lambda: scroll((232, 246, 255), (80, 196, 240)),
     'gravity_chapter': lambda: scroll((236, 226, 250), (140, 90, 230)),

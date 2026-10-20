@@ -447,6 +447,11 @@ public final class SinguloBlocks {
             () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
                     .strength(75.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** 溶接された蓋（搬入出の立坑をふさぐ。封じられている間は壊せない。封じが解けるとダイヤのツルハシで掘れる）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> WELDED_HATCH = BLOCKS.register("welded_hatch",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL)
+                    .strength(20.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 隔壁（ボス部屋の出入口。壊せない。電力が戻ると開く）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock> BULKHEAD = BLOCKS.register("bulkhead",
             () -> new io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock(unbreakable().noOcclusion()
@@ -476,6 +481,17 @@ public final class SinguloBlocks {
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL), Block.box(4, 0, 4, 12, 10, 12), null, null));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock> VENDING_MACHINE = BLOCKS.register("vending_machine",
             () -> new io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock(decor(SoundType.METAL).strength(3.0F, 9.0F).lightLevel(s -> 6)));
+
+    /** 研究所のスライドドア（作れない）と、それに似せた作れるスライドドア。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock> LAB_DOOR = BLOCKS.register("lab_door",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor()));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock> WHITE_SLIDING_DOOR = BLOCKS.register("white_sliding_door",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor()));
+
+    private static BlockBehaviour.Properties slidingDoor() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(5.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
+                .noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK);
+    }
 
     private static BlockBehaviour.Properties decor(SoundType sound) {
         return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(1.0F, 3.0F).sound(sound).noOcclusion();

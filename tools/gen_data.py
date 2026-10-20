@@ -3014,9 +3014,12 @@ def tags():
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
     blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
+    diamond_only = ('welded_hatch',)                      # 溶接された蓋はダイヤのツルハシ以上でないと掘れない
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                          or v[0].startswith('pristine_')]})
+               {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
+                   v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
+                   or v[0].startswith('pristine_'))]})
+    write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
@@ -3434,7 +3437,7 @@ TAB_GROUPS = [
     ('ボスの戦利品', ['sentinel_core', 'degenerate_nucleus', 'precision_actuator', 'echo_chapter', 'gravity_chapter', 'horizon_chapter',
                  'ergosphere_chapter', 'terminus_record', 'archivist_halo', 'afterglow_wings', 'awakening_record_core',
                  'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_ergosphere_core']),
-    ('建材', ['white_panel', 'white_light_panel', 'bismuth_crystal_block', 'glowing_bismuth_crystal', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
+    ('建材', ['white_panel', 'white_light_panel', 'bismuth_crystal_block', 'glowing_bismuth_crystal', 'white_glass_panel', 'white_star_glass_panel', 'white_sliding_door', 'black_reinforced_panel',
             'black_reinforced_glass', 'black_star_glass', 'android_barrier_glass', 'android_barrier_glass_patterned',
             'android_gate_glass', 'android_gate_glass_patterned']),
     ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',
@@ -3443,7 +3446,7 @@ TAB_GROUPS = [
             'ruin_lamp_verdant', 'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
             'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
     # 地下アンドロイド研究所: 建材 → 照明 → 装置 → 小物 → 製造ライン
-    ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'bulkhead',
+    ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead', 'lab_door',
               'facility_light', 'emergency_light', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
               'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),

@@ -30,7 +30,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
-/** 地下アンドロイド研究所の部品（{@link LabStructure}）。耐圧殻 → 部屋 → 廊下 → 出入口 → 主立坑の順に描く。 */
+/** 地下アンドロイド研究所の部品（{@link LabStructure}）。耐圧殻 → 部屋 → 廊下 → 出入口 → 搬入出の立坑 → 地表の建物 → 主立坑の順に描く。 */
 public final class LabPieces {
     private LabPieces() {}
 
@@ -38,6 +38,17 @@ public final class LabPieces {
 
     private static BlockState hull(boolean sealed) {
         return SinguloBlocks.PRESSURE_HULL.get().defaultBlockState().setValue(PressureHullBlock.SEALED, sealed);
+    }
+
+    /** 溶接された蓋（封じられている間は壊せない。ボスを倒すとダイヤのツルハシで掘れる）。 */
+    private static BlockState weld() {
+        return SinguloBlocks.WELDED_HATCH.get().defaultBlockState().setValue(PressureHullBlock.SEALED, true);
+    }
+
+    /** 場所ごとに決まった 0〜1 の値（チャンクの境目をまたいでも同じ）。 */
+    private static float noise(long seed, int x, int y, int z) {
+        long h = seed ^ (x * 73428767L) ^ (y * 912931L) ^ (z * 438289L);
+        return RandomSource.create(h).nextFloat();
     }
 
     private static ListTag boxes(List<BoundingBox> list) {
@@ -58,7 +69,11 @@ public final class LabPieces {
 
     // ------------------------------------------------------------------ 耐圧殻
 
-    /** 施設全体を包む耐圧殻（部屋と廊下の中は描かない。部屋・廊下の壁と合わせて二重になる）。ボスを倒すまで封じられている。 */
+    /**
+     * 部屋と廊下を包む耐圧殻。部屋・廊下の箱から {@link LabStructure#HULL}（2）マス以内で、部屋と廊下の中でない所だけに置く
+     * （部屋・廊下の壁と合わせて二重になる）。どの部屋・廊下も外側を厚さ2の殻で囲むので、外から掘って入れる穴はない。
+     * 施設の範囲のそれ以外（部屋と部屋の間など）は、もとの地面のまま。ボスを倒すまで封じられている。
+     */
     public static class Hull extends StructurePiece {
         private final List<BoundingBox> rooms;
 
@@ -81,17 +96,34 @@ public final class LabPieces {
         public void postProcess(WorldGenLevel level, StructureManager structures, ChunkGenerator generator, RandomSource random,
                                 BoundingBox chunk, ChunkPos chunkPos, BlockPos pivot) {
             BlockState sealed = hull(true);
+            // このチャンクにかかる殻の範囲（部屋・廊下の箱を殻の厚さだけ広げたもの）
+            List<BoundingBox> shells = new ArrayList<>();
+            for (BoundingBox b : rooms) {
+                BoundingBox s = b.inflatedBy(LabStructure.HULL);
+                if (s.intersects(chunk)) {
+                    shells.add(s);
+                }
+            }
             BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
             for (int x = Math.max(chunk.minX(), boundingBox.minX()); x <= Math.min(chunk.maxX(), boundingBox.maxX()); x++) {
                 for (int z = Math.max(chunk.minZ(), boundingBox.minZ()); z <= Math.min(chunk.maxZ(), boundingBox.maxZ()); z++) {
                     for (int y = boundingBox.minY(); y <= boundingBox.maxY(); y++) {
                         p.set(x, y, z);
-                        if (!inRoom(p)) {
+                        if (inAny(shells, p) && !inRoom(p)) {
                             level.setBlock(p, sealed, SET);
                         }
                     }
                 }
             }
+        }
+
+        private static boolean inAny(List<BoundingBox> boxes, BlockPos p) {
+            for (BoundingBox b : boxes) {
+                if (b.isInside(p)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private boolean inRoom(BlockPos p) {
@@ -112,12 +144,21 @@ public final class LabPieces {
         private final BlockPos pos;
         private final Rotation rotation;
         private final BoundingBox facility;
+        /** 搬入出の立坑の範囲（ボスを倒すと、ここの溶接も解く）。なければ null。 */
+        @javax.annotation.Nullable
+        private final BoundingBox access;
 
         public Room(StructureTemplateManager templates, String name, BlockPos min, Rotation rotation, BoundingBox facility) {
+            this(templates, name, min, rotation, facility, null);
+        }
+
+        public Room(StructureTemplateManager templates, String name, BlockPos min, Rotation rotation, BoundingBox facility,
+                    @javax.annotation.Nullable BoundingBox access) {
             super(SinguloWorldgen.LAB_ROOM.get(), 0, place(templates, name, min, rotation));
             this.name = name;
             this.rotation = rotation;
             this.facility = facility;
+            this.access = access;
             this.pos = origin(templates, name, min, rotation);
         }
 
@@ -127,6 +168,8 @@ public final class LabPieces {
             this.pos = new BlockPos(tag.getInt("px"), tag.getInt("py"), tag.getInt("pz"));
             this.rotation = Rotation.values()[tag.getInt("rot") & 3];
             this.facility = LabPower.read(tag.getIntArray("facility"));
+            int[] a = tag.getIntArray("access");
+            this.access = a.length == 6 ? LabPower.read(a) : null;
         }
 
         public static ResourceLocation id(String name) {
@@ -156,6 +199,9 @@ public final class LabPieces {
             tag.putInt("pz", pos.getZ());
             tag.putInt("rot", rotation.ordinal());
             tag.putIntArray("facility", LabPower.write(facility));
+            if (access != null) {
+                tag.putIntArray("access", LabPower.write(access));
+            }
         }
 
         @Override
@@ -181,6 +227,7 @@ public final class LabPieces {
                     console.setFacility(facility);
                 } else if (be instanceof GuardianCoreBlockEntity core) {
                     core.setFacility(facility);
+                    core.setAccess(access);
                 }
             }
         }
@@ -363,11 +410,206 @@ public final class LabPieces {
         }
     }
 
+    // ------------------------------------------------------------------ 搬入出の立坑
+
+    /**
+     * 搬入出の立坑（内のり3×3、壁は厚さ1）。部屋の天井から地表まで。荒れていない（壁は研究所のパネルで、はしごを掛けられる）。
+     * 部屋の天井の3×3と、地表の1段下の3×3は溶接された蓋でふさがれ、その間は空洞。地表の口のまわりは構造材の縁。
+     * 耐圧殻の高さでは、壁は封じられた耐圧殻。蓋はボスを倒すと封じが解け、ダイヤのツルハシで掘れる。
+     */
+    public static class AccessShaft extends StructurePiece {
+        /** 部屋の天井から地表までの、いちばん浅い深さ（耐圧殻の厚さを除く）。 */
+        public static final int MIN_DEPTH = 6;
+
+        public AccessShaft(BoundingBox box) {
+            super(SinguloWorldgen.LAB_ACCESS.get(), 0, box);
+        }
+
+        public AccessShaft(StructurePieceSerializationContext context, CompoundTag tag) {
+            super(SinguloWorldgen.LAB_ACCESS.get(), tag);
+        }
+
+        @Override
+        protected void addAdditionalSaveData(StructurePieceSerializationContext context, CompoundTag tag) {
+        }
+
+        @Override
+        public void postProcess(WorldGenLevel level, StructureManager structures, ChunkGenerator generator, RandomSource random,
+                                BoundingBox chunk, ChunkPos chunkPos, BlockPos pivot) {
+            BlockState air = Blocks.AIR.defaultBlockState();
+            BlockState wall = SinguloBlocks.LAB_PANEL.get().defaultBlockState();
+            BlockState rim = SinguloBlocks.LAB_FRAME.get().defaultBlockState();
+            int cx = boundingBox.getCenter().getX(), cz = boundingBox.getCenter().getZ();
+            int top = boundingBox.minY(), mouth = boundingBox.maxY();
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            for (int x = cx - 2; x <= cx + 2; x++) {
+                for (int z = cz - 2; z <= cz + 2; z++) {
+                    int r = Math.max(Math.abs(x - cx), Math.abs(z - cz));
+                    for (int y = top; y <= mouth; y++) {
+                        p.set(x, y, z);
+                        if (!chunk.isInside(p)) {
+                            continue;
+                        }
+                        if (r <= 1) {
+                            // 中: 部屋の天井と地表の1段下は溶接された蓋、間は空洞、地表の口は開いている
+                            level.setBlock(p, y == top || y == mouth - 1 ? weld() : air, SET);
+                        } else if (y > top) {
+                            // 壁: 耐圧殻の高さは封じられた耐圧殻、その上は研究所のパネル、地表の口は構造材の縁
+                            level.setBlock(p, y <= top + LabStructure.HULL ? hull(true) : y == mouth ? rim : wall, SET);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 地表の建物
+
+    /**
+     * 地表に残る研究所の入口（白い小さな建物）。主立坑（もとのエレベーターの昇降路）を北側に抱え、南へ
+     * エレベーターホール → 入場ゲート（改札の柱）→ 受付（西）と出入口（南）が並ぶ。アンドロイドが手入れしていないので、
+     * 窓の割れ・ゲートの柱の欠け・苔・クモの巣が少しだけある。昇降路には、天井からエレベーターの吊り鎖が垂れている。
+     * 床は地表の高さ（主立坑の口）。建物の下の地面のくぼみは石で埋める。
+     */
+    public static class Entrance extends StructurePiece {
+        /** 主立坑の中心から見た建物の範囲（x は ±4、z は −4〜+9）と、壁の高さ。 */
+        static final int HALF_X = 4, NORTH = -4, SOUTH = 9, WALL_H = 4;
+        private final int sx, sz, floorY;
+        private final long seed;
+
+        public Entrance(int sx, int sz, int floorY, long seed) {
+            super(SinguloWorldgen.LAB_ENTRANCE.get(), 0, new BoundingBox(sx - HALF_X, floorY - 4, sz + NORTH, sx + HALF_X, floorY + WALL_H + 2, sz + SOUTH));
+            this.sx = sx;
+            this.sz = sz;
+            this.floorY = floorY;
+            this.seed = seed;
+        }
+
+        public Entrance(StructurePieceSerializationContext context, CompoundTag tag) {
+            super(SinguloWorldgen.LAB_ENTRANCE.get(), tag);
+            this.sx = tag.getInt("sx");
+            this.sz = tag.getInt("sz");
+            this.floorY = tag.getInt("floor");
+            this.seed = tag.getLong("seed");
+        }
+
+        @Override
+        protected void addAdditionalSaveData(StructurePieceSerializationContext context, CompoundTag tag) {
+            tag.putInt("sx", sx);
+            tag.putInt("sz", sz);
+            tag.putInt("floor", floorY);
+            tag.putLong("seed", seed);
+        }
+
+        @Override
+        public void postProcess(WorldGenLevel level, StructureManager structures, ChunkGenerator generator, RandomSource random,
+                                BoundingBox chunk, ChunkPos chunkPos, BlockPos pivot) {
+            BlockState air = Blocks.AIR.defaultBlockState();
+            BlockState panel = SinguloBlocks.LAB_PANEL.get().defaultBlockState();
+            BlockState lined = SinguloBlocks.LAB_PANEL_LINED.get().defaultBlockState();
+            BlockState tiles = SinguloBlocks.LAB_TILES.get().defaultBlockState();
+            BlockState frame = SinguloBlocks.LAB_FRAME.get().defaultBlockState();
+            BlockState glass = SinguloBlocks.LAB_GLASS.get().defaultBlockState();
+            BlockState light = SinguloBlocks.FACILITY_LIGHT.get().defaultBlockState();
+            BlockState monitor = SinguloBlocks.DESK_MONITOR.get().defaultBlockState();
+            BlockState chain = Blocks.CHAIN.defaultBlockState();
+            BlockState stone = Blocks.STONE.defaultBlockState();
+            int f = floorY, roof = floorY + WALL_H + 1;
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            for (int x = sx - HALF_X; x <= sx + HALF_X; x++) {
+                for (int z = sz + NORTH; z <= sz + SOUTH; z++) {
+                    int dx = x - sx, dz = z - sz;
+                    boolean outer = Math.abs(dx) == HALF_X || dz == NORTH || dz == SOUTH;
+                    boolean well = Math.abs(dx) <= 3 && dz >= -3 && dz <= 3;       // 昇降路（主立坑）とその壁
+                    int wr = Math.max(Math.abs(dx), Math.abs(dz));
+                    for (int y = boundingBox.minY(); y <= boundingBox.maxY(); y++) {
+                        p.set(x, y, z);
+                        if (!chunk.isInside(p)) {
+                            continue;
+                        }
+                        float n = noise(seed, x, y, z);
+                        BlockState s = null;
+                        if (y < f) {
+                            // 基礎: 建物の下のくぼみを石で埋める（昇降路の中は主立坑）
+                            if (!(well && wr <= 2) && level.getBlockState(p).canBeReplaced()) {
+                                s = stone;
+                            }
+                        } else if (y == f) {
+                            s = well && wr <= 2 ? null : outer || (well && wr == 3) ? panel : tiles;
+                        } else if (y < roof) {
+                            s = wallOrInside(dx, dz, y - f, n, outer, well, wr, air, panel, lined, frame, glass, light, monitor, chain);
+                        } else if (y == roof) {
+                            s = n < 0.06F ? lined : panel;                       // 屋根（ところどころ帯入りの継ぎ板）
+                        } else if (y == roof + 1 && n < 0.10F && !outer) {
+                            s = Blocks.MOSS_CARPET.defaultBlockState();          // 屋根に少し苔
+                        }
+                        if (s != null) {
+                            level.setBlock(p, s, SET);
+                        }
+                    }
+                }
+            }
+        }
+
+        /** 壁の高さ（h = 床から 1〜4）での、外壁・昇降路の壁・中のもの。 */
+        private static BlockState wallOrInside(int dx, int dz, int h, float n, boolean outer, boolean well, int wr, BlockState air,
+                                               BlockState panel, BlockState lined, BlockState frame, BlockState glass, BlockState light,
+                                               BlockState monitor, BlockState chain) {
+            if (outer) {
+                if (dz == SOUTH && Math.abs(dx) <= 1 && h <= 3) {
+                    return air;                                                  // 出入口
+                }
+                boolean window = h >= 2 && h <= 3 && (Math.abs(dx) == HALF_X && dz >= 5 && dz <= 7
+                        || dz == SOUTH && Math.abs(dx) == 3);
+                if (window) {
+                    return n < 0.22F ? air : glass;                              // 窓（ところどころ割れている）
+                }
+                return h == 1 ? lined : panel;                                   // 外壁（腰の高さに帯）
+            }
+            if (well && wr == 3) {
+                // 昇降路の壁。南（ホールの側）にエレベーターの扉の枠
+                if (dz == 3 && Math.abs(dx) <= 1) {
+                    return h <= 3 ? air : frame;
+                }
+                if (dz == 3 && Math.abs(dx) == 2) {
+                    return frame;
+                }
+                return panel;
+            }
+            if (well) {
+                // 昇降路の中: 天井からエレベーターの吊り鎖
+                return dx == 0 && dz == 0 && h >= 2 ? chain : air;
+            }
+            if (h == 1 && dz == 6 && (dx == -3 || dx == -1 || dx == 1 || dx == 3)) {
+                return dx == 3 && n < 0.5F ? air : frame;                       // 入場ゲートの柱（1本欠けていることも）
+            }
+            if (dx <= -2 && dz >= 7 && dz <= 8) {
+                if (h == 1) {
+                    return lined;                                                // 受付のカウンター
+                }
+                if (h == 2 && dx == -3 && dz == 7) {
+                    return monitor;                                              // カウンターのモニター
+                }
+            }
+            if (h == WALL_H && dx == 0 && dz == 6) {
+                return light;                                                    // 天井の施設灯（消えている）
+            }
+            if (h == WALL_H && (Math.abs(dx) == 3) && (dz == 4 || dz == 8) && n < 0.45F) {
+                return Blocks.COBWEB.defaultBlockState();                        // 隅のクモの巣
+            }
+            if (h == 1 && dz >= 7 && n < 0.10F) {
+                return Blocks.MOSS_CARPET.defaultBlockState();                   // 出入口の近くの苔
+            }
+            return air;
+        }
+    }
+
     // ------------------------------------------------------------------ 主立坑
 
     /**
-     * 崩れた主立坑。エントランスの天井から地表まで、5×5 の縦穴。壁は耐圧殻（施設の殻の高さでは封じられたまま）と、崩れた構造材・岩。
-     * 北の壁に、ところどころ途切れたはしご。エントランスの床には瓦礫の山と、天井まで届く足場（はしごの下）。地表の口のまわりには瓦礫。
+     * 崩れた主立坑（もとはエレベーターの昇降路）。エントランスの天井から地表まで、5×5 の縦穴。壁は耐圧殻（施設の殻の高さでは
+     * 封じられたまま）と、崩れた構造材・岩。南の壁に、ところどころ途切れたはしご（登りきると、地表の建物のエレベーターの扉からホールへ出る）。
+     * エントランスの床には瓦礫の山と、天井まで届く足場（はしごの下）。地表の口は、地表の建物（{@link Entrance}）が覆う。
      */
     public static class Shaft extends StructurePiece {
         private final int sx, sz, floor, surface;
@@ -410,7 +652,7 @@ public final class LabPieces {
         public void postProcess(WorldGenLevel level, StructureManager structures, ChunkGenerator generator, RandomSource random,
                                 BoundingBox chunk, ChunkPos chunkPos, BlockPos pivot) {
             BlockState air = Blocks.AIR.defaultBlockState();
-            BlockState ladder = Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.SOUTH);
+            BlockState ladder = Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.NORTH);
             BlockState scaffold = Blocks.SCAFFOLDING.defaultBlockState();
             BlockState frame = SinguloBlocks.LAB_FRAME.get().defaultBlockState();
             BlockState[] rubble = {Blocks.COBBLED_DEEPSLATE.defaultBlockState(), Blocks.GRAVEL.defaultBlockState(),
@@ -423,7 +665,7 @@ public final class LabPieces {
                 for (int z = sz - 4; z <= sz + 4; z++) {
                     int dx = x - sx, dz = z - sz;
                     int r = Math.max(Math.abs(dx), Math.abs(dz));
-                    boolean ladderColumn = dx == 0 && dz == -2;
+                    boolean ladderColumn = dx == 0 && dz == 2;
                     for (int y = floor + 1; y <= surface + 3; y++) {
                         p.set(x, y, z);
                         if (!chunk.isInside(p)) {
@@ -443,26 +685,22 @@ public final class LabPieces {
                             continue;
                         }
                         if (r <= 2) {
-                            if (y > surface + 2) {
-                                continue;
+                            if (y > surface) {
+                                continue;                                       // 地表より上は、地表の建物のエレベーターの昇降路
                             }
                             if (ladderColumn) {
                                 boolean gap = y > ceiling + 3 && y < surface - 3 && n < 0.07F;
                                 level.setBlock(p, y == ceiling ? scaffold : gap ? air : ladder, SET);
                             } else if (r == 2 && y > ceiling + 2 && y < surface - 2 && n < 0.04F && Math.abs(dx) + Math.abs(dz) > 2
-                                    && !(dz == -2 && Math.abs(dx) <= 1)) {
+                                    && !(dz == 2 && Math.abs(dx) <= 1)) {
                                 level.setBlock(p, rubble[0], SET);              // 壁から突き出た崩れた岩
                             } else {
                                 level.setBlock(p, air, SET);
                             }
                         } else if (r == 3 && y <= surface) {
                             // 立坑の壁（施設の殻の高さは封じられた耐圧殻、上は崩れた内張り）
-                            boolean anchor = dx == 0 && dz == -3;
+                            boolean anchor = dx == 0 && dz == 3;
                             level.setBlock(p, y <= hullTop ? hull(true) : anchor ? hull(false) : lining[(int) (n * 131) % lining.length], SET);
-                        } else if (r == 4 && y == surface && n < 0.6F) {
-                            level.setBlock(p, rubble[(int) (n * 53) % 2], SET);  // 地表の口のまわりの瓦礫
-                        } else if (r == 4 && Math.abs(dx) == 4 && Math.abs(dz) == 4 && y > surface && y <= surface + 2) {
-                            level.setBlock(p, frame, SET);                     // 折れた柵の柱
                         }
                     }
                 }

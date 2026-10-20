@@ -67,6 +67,9 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     /** 地下アンドロイド研究所のボス部屋の核なら、施設の範囲（番人を倒すと、その中の耐圧殻の封じが解ける）。 */
     @Nullable
     private net.minecraft.world.level.levelgen.structure.BoundingBox facility;
+    /** 研究所の搬入出の立坑の範囲（ボスを倒すと、ここの溶接も解く）。 */
+    @Nullable
+    private net.minecraft.world.level.levelgen.structure.BoundingBox access;
     /** 出現の演出で、槽をどこまで壊したか（0: 無傷、1: ひび、2: 砕けた）。 */
     private int tankStage;
 
@@ -132,6 +135,17 @@ public class GuardianCoreBlockEntity extends BlockEntity {
     @Nullable
     public net.minecraft.world.level.levelgen.structure.BoundingBox facility() {
         return facility;
+    }
+
+    /** 研究所の搬入出の立坑の範囲を覚える（生成のとき。なければ null）。 */
+    public void setAccess(@Nullable net.minecraft.world.level.levelgen.structure.BoundingBox box) {
+        access = box;
+        setChanged();
+    }
+
+    @Nullable
+    public net.minecraft.world.level.levelgen.structure.BoundingBox access() {
+        return access;
     }
 
     public List<BlockPos> lines() {
@@ -389,6 +403,9 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         if (facility != null) {
             // 研究所: 耐圧殻の封じが解ける（黒曜石より硬いが、掘れるようになる）
             io.github.genichimaruo.singulo.ruin.lab.LabPower.unseal(level, facility);
+            if (access != null) {
+                io.github.genichimaruo.singulo.ruin.lab.LabPower.unseal(level, access);   // 搬入出の立坑の溶接された蓋
+            }
             broadcast(level, "lab.singulo.hull_unsealed");
         }
         broadcast(level, "gui.singulo.guardian.defeated." + typeName(type));
@@ -459,6 +476,9 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         if (facility != null) {
             tag.putIntArray("facility", io.github.genichimaruo.singulo.ruin.lab.LabPower.write(facility));
         }
+        if (access != null) {
+            tag.putIntArray("access", io.github.genichimaruo.singulo.ruin.lab.LabPower.write(access));
+        }
         tag.put("conveyors", writeStates(conveyorPos, conveyorState));
     }
 
@@ -511,6 +531,8 @@ public class GuardianCoreBlockEntity extends BlockEntity {
         readStates(tag.getList("lines", Tag.TAG_COMPOUND), registries, linePos, lineState);
         int[] f = tag.getIntArray("facility");
         facility = f.length == 6 ? io.github.genichimaruo.singulo.ruin.lab.LabPower.read(f) : null;
+        int[] a = tag.getIntArray("access");
+        access = a.length == 6 ? io.github.genichimaruo.singulo.ruin.lab.LabPower.read(a) : null;
         readStates(tag.getList("conveyors", Tag.TAG_COMPOUND), registries, conveyorPos, conveyorState);
     }
 

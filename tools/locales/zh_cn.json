@@ -955,6 +955,10 @@
     "source": "Kiln",
     "translation": "烧制炉"
   },
+  "block.singulo.lab_door": {
+    "source": "Lab Sliding Door",
+    "translation": "研究所滑动门"
+  },
   "block.singulo.lab_frame": {
     "source": "Lab Frame",
     "translation": "研究所结构材"
@@ -1275,6 +1279,10 @@
     "source": "Void Collector",
     "translation": "虚空收集器"
   },
+  "block.singulo.welded_hatch": {
+    "source": "Welded Hatch",
+    "translation": "焊死的舱盖"
+  },
   "block.singulo.white_glass_panel": {
     "source": "White Glass Panel",
     "translation": "白色玻璃面板"
@@ -1286,6 +1294,10 @@
   "block.singulo.white_panel": {
     "source": "White Panel",
     "translation": "白色面板"
+  },
+  "block.singulo.white_sliding_door": {
+    "source": "White Sliding Door",
+    "translation": "白色滑动门"
   },
   "block.singulo.white_star_glass_panel": {
     "source": "Starred White Glass Panel",
@@ -2207,6 +2219,10 @@
     "source": "Fires ceramics and boards. Oxygen makes it hotter.",
     "translation": "烧制陶瓷和基板。通入氧气可提高温度。"
   },
+  "desc.singulo.lab_door": {
+    "source": "The white twin sliding doors of the laboratory's private rooms and kitchen. Right-click to slide them open into the walls; they close by themselves once no one is passing through. They stay open while powered by redstone. Cannot be crafted.",
+    "translation": "研究所单间和厨房的白色双扇推拉门。右键点击后会滑入左右墙内打开，没有人通过时会自动关闭。接收到红石信号时保持打开。无法合成。"
+  },
   "desc.singulo.lab_frame": {
     "source": "Dark steel framing used for the laboratory's pillars and door frames.",
     "translation": "用于研究所柱子和门框的深色钢结构材。"
@@ -2388,8 +2404,8 @@
     "translation": "在深海水压下形成的极其坚硬的蓝色晶体。用于简并压缩炉砧座和简并前驱体的晶种。"
   },
   "desc.singulo.pressure_hull": {
-    "source": "The thick steel shell around the whole laboratory. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
-    "translation": "包裹整个研究所的厚钢外壳。在统筹 AI 倒下之前处于封锁状态，无法破坏。之后也比黑曜石更硬。"
+    "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
+    "translation": "包裹研究所房间和走廊的、厚度为 2 格的钢外壳。在统筹 AI 倒下之前处于封锁状态，无法破坏。之后也比黑曜石更硬。"
   },
   "desc.singulo.primordial_seed": {
     "source": "A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.",
@@ -2783,6 +2799,10 @@
     "source": "Dust condensed from the fluctuations of empty space, gathered only above the End void. Steadies space in singularity tech.",
     "translation": "只有在末地虚空上方才能收集到、由空间本身的涨落凝成的尘埃。在奇点技术中用来稳定空间。"
   },
+  "desc.singulo.welded_hatch": {
+    "source": "Steel plates welded shut over the lab's supply shaft. Sealed until the lab's AI is defeated; after that it can be mined with a diamond pickaxe.",
+    "translation": "封住研究所搬运竖井的焊接钢板舱盖。在统括 AI 被打倒之前处于封锁状态，无法破坏。之后可以用钻石镐挖掘。"
+  },
   "desc.singulo.white_ceramic_composite": {
     "source": "The white ceramic used for casings and circuit boards.",
     "translation": "用于外壳和电路板的白色陶瓷。"
@@ -2798,6 +2818,10 @@
   "desc.singulo.white_panel": {
     "source": "A clean, seamless white panel for your own buildings.",
     "translation": "可以自己制作的干净无缝白色面板，用于你自己的建筑。"
+  },
+  "desc.singulo.white_sliding_door": {
+    "source": "White twin sliding doors modeled on the laboratory doors. Right-click to slide them open; they close by themselves once no one is passing through, and stay open while powered by redstone. Set into a wall, the doors slide away inside it.",
+    "translation": "仿照研究所的门制作的白色双扇推拉门。右键点击后向左右滑开，没有人通过时会自动关闭，接收到红石信号时保持打开。嵌在墙中放置时，门扇会收进墙里。"
   },
   "desc.singulo.white_star_glass_panel": {
     "source": "A see-through white panel with a four-pointed star.",
@@ -6356,8 +6380,8 @@
     "translation": "只能在特定地点获得的素材"
   },
   "guide.singulo.ruins.lab.body": {
-    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is the collapsed main shaft that breaks through to the surface (climb down the ladders and scaffolding). The facility is wrapped in a pressure hull that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- The room layout changes every time: research labs, archives, server rooms, dormitories, a medical bay, a cafeteria and more, guarded by security machines and fabricators. Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
-    "translation": "旧文明的仿生人研究所。统筹 AI“铸造厂”失控后，职员停掉了中央动力炉，从主竖井逃了出去。人已离开的现在，仿生人们仍遵从“维持设施”这最后的命令，持续修缮着设施。\n- 入口是贯通到地表的崩塌主竖井（顺着梯子和脚手架下去）。设施被耐压壳包裹，在击败统筹 AI 之前无法破坏（之后也比黑曜石更硬）。\n- 主电源已断，这是一座只有红色应急灯亮着的昏暗设施。右键中央动力炉的控制台即可启动动力炉，设施灯会亮起，AI 中枢的隔离门打开。而沉睡的统筹 AI 也会醒来。\n- 房间的排列每次都不同：研究室、资料室、服务器室、员工宿舍、医务室、食堂等，由警卫机和打印台把守。物资箱里还留着研究所的部件和资料。\n- 右键记录终端可以阅读留下的记录。收集起来，就能知道失控的来龙去脉。"
+    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is a small white building left on the surface, the old reception and elevator hall. Climb down the collapsed main shaft, once the elevator well, on its ladders and scaffolding. The rooms and corridors are wrapped in a pressure hull two blocks thick that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- A supply shaft runs from the ceiling of an outlying room to the surface. It is welded shut just above the room and one block below the surface; once the overseer falls, the welded hatches can be mined with a diamond pickaxe. The shaft is intact, so with ladders it becomes a shortcut to the surface.\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- The room layout changes every time: research labs, archives, server rooms, dormitories, private rooms lined up along a hall, a medical bay, a cafeteria with a kitchen and more, guarded by security machines and fabricators. The sliding doors of the private rooms and kitchen open with a right-click and close by themselves after a while (the lab doors cannot be crafted, but the similar White Sliding Door is made at a Crafting Table). Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
+    "translation": "旧文明的仿生人研究所。统筹 AI“铸造厂”失控后，职员停掉了中央动力炉，从主竖井逃了出去。人已离开的现在，仿生人们仍遵从“维持设施”这最后的命令，持续修缮着设施。\n- 入口是残留在地表的白色小建筑（原来的接待处和电梯厅）。顺着梯子和脚手架，沿曾经的电梯井——崩塌的主竖井下去。房间和走廊被厚度为 2 格的耐压壳包裹，在击败统筹 AI 之前无法破坏（之后也比黑曜石更硬）。\n- 设施边缘房间的天花板有一条通往地表的搬运竖井。房间上方和地表下一格被焊死的舱盖封住，击败统筹 AI 后可以用钻石镐挖开。竖井没有损坏，架上梯子就能成为通往地表的捷径。\n- 主电源已断，这是一座只有红色应急灯亮着的昏暗设施。右键中央动力炉的控制台即可启动动力炉，设施灯会亮起，AI 中枢的隔离门打开。而沉睡的统筹 AI 也会醒来。\n- 房间的排列每次都不同：研究室、资料室、服务器室、员工宿舍、研究员单间排成一列的单间区、医务室、带厨房的食堂等，由警卫机和打印台把守。单间和厨房的滑动门右键点击即可打开，过一会儿会自动关闭（研究所的门无法合成，但相似的白色滑动门可以在工作台制作）。物资箱里还留着研究所的部件和资料。\n- 右键记录终端可以阅读留下的记录。收集起来，就能知道失控的来龙去脉。"
   },
   "guide.singulo.ruins.lab.title": {
     "source": "Underground Android Laboratory",
@@ -7620,6 +7644,10 @@
     "translation": "制造地：工作台（第 1 阶段）"
   },
   "howto.singulo.white_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
+  },
+  "howto.singulo.white_sliding_door": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制造地：工作台（第 1 阶段）"
   },
@@ -10892,8 +10920,8 @@
     "translation": "用于：基本框架、钢板、压缩机"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 73 more",
-    "translation": "用于：白色面板、黑色强化面板、黑色强化玻璃、冷却塔底座、冷却塔外壳 等 73 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 74 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 74 个"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",
@@ -10976,8 +11004,8 @@
     "translation": "用于：四芒星白色玻璃面板"
   },
   "uses.singulo.white_panel": {
-    "source": "Used in: Glowing White Panel, Low-Gravity Panel",
-    "translation": "用于：发光白色面板、低重力面板"
+    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel",
+    "translation": "用于：发光白色面板、白色滑动门、低重力面板"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",

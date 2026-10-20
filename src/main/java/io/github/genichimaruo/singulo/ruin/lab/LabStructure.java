@@ -19,7 +19,10 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 /**
  * 地下アンドロイド研究所。大きさのちがう部屋の型紙（data/singulo/structure/lab/*.nbt）を、狭い廊下でつないでランダムに並べ
- * （{@link LabLayout}）、全体を耐圧殻で包み、出入口を開け、エントランスの真上から地表まで崩れた主立坑を通す。
+ * （{@link LabLayout}）、部屋と廊下を厚さ2の耐圧殻で包み、出入口を開け、エントランスの真上から地表まで崩れた主立坑を通す。
+ * 主立坑の上の地表には、研究所の入口だった白い小さな建物（受付・入場ゲート・エレベーターホール）が残る。
+ * 主立坑からいちばん遠い部屋の天井からは、地表まで搬入出の立坑（内のり3×3）が通っているが、部屋の手前と地表の1段下で溶接されて
+ * ふさがれている（ボスを倒すと掘れる）。
  * 主立坑はチャンクの真ん中に立つ（構造物の置き方の locate_offset が [8, 0, 8] なので、探索コンパスは主立坑を指す）。
  * 水の上には作らない（主立坑から水が流れ込まないように）。
  */
@@ -64,12 +67,41 @@ public class LabStructure extends Structure {
         long seed = r.nextLong();
         StructureTemplateManager templates = context.structureTemplateManager();
         return Optional.of(new GenerationStub(new BlockPos(sx, floor, sz),
-                builder -> addPieces(builder, templates, seed, sx, sz, floor, surface)));
+                builder -> addPieces(builder, templates, seed, sx, sz, floor, surface,
+                        (x, z) -> context.chunkGenerator().getFirstOccupiedHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG,
+                                context.heightAccessor(), context.randomState()))));
     }
 
-    /** 部屋の並びを決め、部品（耐圧殻・部屋・廊下・出入口・主立坑）をこの順に並べる。 */
+    /** 地表の高さがどこも主立坑と同じとみなして並べる（テスト用）。 */
     public static void addPieces(StructurePiecesBuilder builder, StructureTemplateManager templates, long seed, int sx, int sz, int floor,
                                  int surface) {
+        addPieces(builder, templates, seed, sx, sz, floor, surface, (x, z) -> surface);
+    }
+
+    /** 搬入出の立坑を通す部屋（ボス部屋・エントランス・動力炉を除き、主立坑からいちばん遠い部屋）。なければ null。 */
+    @javax.annotation.Nullable
+    public static LabLayout.Placed accessRoom(LabLayout layout, int sx, int sz) {
+        LabLayout.Placed best = null;
+        long bestD = -1;
+        for (LabLayout.Placed p : layout.rooms) {
+            if (p.name().equals(LabLayout.BOSS) || p.name().equals(LabLayout.ENTRANCE) || p.name().equals(LabLayout.REACTOR)) {
+                continue;
+            }
+            long dx = p.box().getCenter().getX() - sx, dz = p.box().getCenter().getZ() - sz;
+            if (dx * dx + dz * dz > bestD) {
+                best = p;
+                bestD = dx * dx + dz * dz;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * 部屋の並びを決め、部品（耐圧殻・部屋・廊下・出入口・搬入出の立坑・地表の建物・主立坑）をこの順に並べる。
+     * surfaceAt は地表の高さ（搬入出の立坑の口を決める）。
+     */
+    public static void addPieces(StructurePiecesBuilder builder, StructureTemplateManager templates, long seed, int sx, int sz, int floor,
+                                 int surface, java.util.function.IntBinaryOperator surfaceAt) {
         LabLayout layout = LabLayout.create(seed, name -> templates.getOrCreate(LabPieces.Room.id(name)).getSize(), sx, sz, floor);
         BoundingBox facility = layout.bounds(HULL);
         List<BoundingBox> hollow = new ArrayList<>();
@@ -78,13 +110,29 @@ public class LabStructure extends Structure {
         }
         hollow.addAll(layout.corridorBoxes());
         builder.addPiece(new LabPieces.Hull(facility, hollow));
+        // 搬入出の立坑（地表まで十分な深さがあるときだけ）
+        BoundingBox access = null;
+        LabLayout.Placed room = accessRoom(layout, sx, sz);
+        if (room != null) {
+            int cx = room.box().getCenter().getX(), cz = room.box().getCenter().getZ();
+            int top = room.box().maxY();
+            int mouth = surfaceAt.applyAsInt(cx, cz);
+            if (mouth >= top + HULL + LabPieces.AccessShaft.MIN_DEPTH) {
+                access = new BoundingBox(cx - 2, top, cz - 2, cx + 2, mouth, cz + 2);
+            }
+        }
         for (LabLayout.Placed p : layout.rooms) {
-            builder.addPiece(new LabPieces.Room(templates, p.name(), new BlockPos(p.box().minX(), p.box().minY(), p.box().minZ()), p.rotation(), facility));
+            builder.addPiece(new LabPieces.Room(templates, p.name(), new BlockPos(p.box().minX(), p.box().minY(), p.box().minZ()), p.rotation(),
+                    facility, access));
         }
         for (LabLayout.Corridor c : layout.corridors) {
             builder.addPiece(new LabPieces.Corridor(c.points(), floor));
         }
         builder.addPiece(new LabPieces.Doors(LabPieces.Doors.walls(layout), floor));
+        if (access != null) {
+            builder.addPiece(new LabPieces.AccessShaft(access));
+        }
+        builder.addPiece(new LabPieces.Entrance(sx, sz, surface, seed));
         builder.addPiece(new LabPieces.Shaft(sx, sz, floor, surface, seed));
     }
 

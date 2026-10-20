@@ -357,7 +357,9 @@ MOD = {
     '施設灯': ('facility_light', 'Facility Light', 'lab'),
     '非常灯': ('emergency_light', 'Emergency Light', 'lab'),
     '耐圧殻': ('pressure_hull', 'Pressure Hull', 'lab'),
+    '溶接された蓋': ('welded_hatch', 'Welded Hatch', 'lab'),
     '隔壁': ('bulkhead', 'Bulkhead', 'lab'),
+    '研究所のスライドドア': ('lab_door', 'Lab Sliding Door', 'lab'),
     '動力炉の制御盤': ('reactor_console', 'Reactor Control Panel', 'lab'),
     '炉心': ('reactor_core', 'Reactor Core', 'lab'),
     '動力導管': ('power_conduit', 'Power Conduit', 'lab'),
@@ -377,6 +379,8 @@ MOD = {
     # ---- 建材（自分で作れる。遺構の建材とは別の、新しいパネル）
     'ホワイトパネル': ('white_panel', 'White Panel', 'deco'),
     '発光ホワイトパネル': ('white_light_panel', 'Glowing White Panel', 'deco'),
+    # 研究所のスライドドアに似せた、作れるドア（絵とモデルは lab_blocks.py）
+    'ホワイトスライドドア': ('white_sliding_door', 'White Sliding Door', 'lab'),
     '黒色強化パネル': ('black_reinforced_panel', 'Black Reinforced Panel', 'deco'),
     'ホワイトガラスパネル': ('white_glass_panel', 'White Glass Panel', 'deco_glass'),
     '四芒星ホワイトガラスパネル': ('white_star_glass_panel', 'Starred White Glass Panel', 'deco_glass'),

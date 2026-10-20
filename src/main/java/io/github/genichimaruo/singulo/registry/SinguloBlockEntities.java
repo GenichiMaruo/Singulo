@@ -194,6 +194,10 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity>> ANDROID_RECIPE_RACK =
             REGISTER.register("android_recipe_rack", () -> build(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity::new, SinguloBlocks.ANDROID_RECIPE_RACK.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlockEntity>> SLIDING_DOOR =
+            REGISTER.register("sliding_door", () -> build(io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlockEntity::new,
+                    SinguloBlocks.LAB_DOOR.get(), SinguloBlocks.WHITE_SLIDING_DOOR.get()));
+
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity>> ANDROID_FABRICATOR =
             REGISTER.register("android_fabricator", () -> build(io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity::new,
                     SinguloBlocks.RUIN_ANDROID_FABRICATOR.get()));

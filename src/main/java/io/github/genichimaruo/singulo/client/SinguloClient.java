@@ -106,6 +106,8 @@ public final class SinguloClient {
                 KeraunosTowerRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEALED_CONTAINER.get(),
                 SealedContainerRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SLIDING_DOOR.get(),
+                SlidingDoorRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
         event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
         event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));

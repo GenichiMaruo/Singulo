@@ -66,6 +66,21 @@ public class WhipAndroid extends RuinAndroid {
     static final int COST_SLAM = 310;
     static final int COST_CRACK = 60;
 
+    /** 鞭の先（届く距離）と、叩きつけの衝撃波（前へ WAVE_RANGE まで走る）。 */
+    @Override
+    protected double moveReach() {
+        int s = state();
+        return s >= STATE_LASH_WINDUP && s <= STATE_CRACK ? WAVE_RANGE + 1 : 0;
+    }
+
+    /** 巻きついた相手が遠くへ動いても、そこまで伸びた鞭を描く。 */
+    @Override
+    public net.minecraft.world.phys.AABB getBoundingBoxForCulling() {
+        net.minecraft.world.phys.AABB box = super.getBoundingBoxForCulling();
+        Entity linked = state() == STATE_BIND ? linked() : null;
+        return linked != null ? box.minmax(linked.getBoundingBox()) : box;
+    }
+
     public WhipAndroid(EntityType<? extends WhipAndroid> type, Level level) {
         super(type, level);
     }

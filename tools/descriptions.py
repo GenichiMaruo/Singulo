@@ -413,6 +413,7 @@ DESC = {
     # 自分で作れる建材
     'ホワイトパネル': ('自分で作れる、継ぎ目のない白いパネル。建物の壁や床に。', 'A clean, seamless white panel for your own buildings.'),
     '発光ホワイトパネル': ('明るく光る白いパネル（明るさ15）。', 'A white panel that glows brightly (light 15).'),
+    'ホワイトスライドドア': ('研究所のドアに似せた、白い2枚の引き戸。右クリックで左右へ滑って開き、通る人がいなくなると自分で閉まる。レッドストーンの信号が入っている間は開いたまま。壁に埋めて置くと、扉が壁の中へしまわれる。', 'White twin sliding doors modeled on the laboratory doors. Right-click to slide them open; they close by themselves once no one is passing through, and stay open while powered by redstone. Set into a wall, the doors slide away inside it.'),
     'ホワイトガラスパネル': ('ホワイトパネルと同じ系統の、透けるパネル。', 'A see-through panel in the White Panel style.'),
     '四芒星ホワイトガラスパネル': ('四芒星の模様が入った、透けるホワイトパネル。', 'A see-through white panel with a four-pointed star.'),
     '黒色強化ガラス': ('黒色強化パネルと同じくらい硬く、爆発に強い透けるパネル。鉄以上のツルハシで掘る。',
@@ -586,7 +587,12 @@ DESC = {
     '研究所のガラス': ('研究所の仕切りの、曇りのないガラス。', 'Clear partition glass from the laboratory.'),
     '施設灯': ('研究所の天井の照明。施設に電力がある間だけ白く光る。', 'Laboratory ceiling light. It shines white only while the facility has power.'),
     '非常灯': ('研究所の非常灯。主電源が落ちている間だけ、赤く灯る。', 'Laboratory emergency light. It glows red only while main power is down.'),
-    '耐圧殻': ('研究所全体を包む厚い鋼の殻。統括AIが倒れるまでは封じられていて壊せない。そのあとも黒曜石より硬い。', 'The thick steel shell around the whole laboratory. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.'),
+    '溶接された蓋': ('研究所の搬入出の立坑をふさぐ、鋼の板を溶接した蓋。統括AIが倒れるまでは封じられていて壊せない。'
+               'そのあとはダイヤのツルハシで掘れる。',
+               'Steel plates welded shut over the lab\'s supply shaft. Sealed until the lab\'s AI is defeated; after that it can be '
+               'mined with a diamond pickaxe.'),
+    '耐圧殻': ('研究所の部屋と廊下を包む、厚さ2の鋼の殻。統括AIが倒れるまでは封じられていて壊せない。そのあとも黒曜石より硬い。', 'The two-block-thick steel shell around the laboratory\'s rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.'),
+    '研究所のスライドドア': ('研究所の個室や厨房の、白い2枚の引き戸。右クリックで左右の壁の中へ滑って開き、通る人がいなくなると自分で閉まる。レッドストーンの信号が入っている間は開いたまま。作れない。', "The white twin sliding doors of the laboratory's private rooms and kitchen. Right-click to slide them open into the walls; they close by themselves once no one is passing through. They stay open while powered by redstone. Cannot be crafted."),
     '隔壁': ('研究所の中枢区画をふさぐ厚い扉。施設の電力が戻ると開く。壊せない。', 'A heavy door sealing the laboratory core section. It opens when facility power returns. Unbreakable.'),
     '動力炉の制御盤': ('中央動力炉の制御盤。右クリックで動力炉を起動すると、施設の電力が戻る。', 'Central reactor control panel. Use it to restart the reactor and restore facility power.'),
     '動力導管': ('中央動力炉から施設へ電力を送る管。電力が戻ると水色に光る。', 'A conduit carrying power from the central reactor. It glows cyan once power returns.'),

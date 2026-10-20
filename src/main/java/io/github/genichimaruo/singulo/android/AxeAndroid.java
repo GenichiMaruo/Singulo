@@ -63,6 +63,13 @@ public class AxeAndroid extends RuinAndroid {
     static final int COST_LEAP = 280;
     static final int COST_CHOP = 70;
 
+    /** 薙ぎの軌跡・跳びかかりの輪と、叩きつけの衝撃波（前へ SHOCKWAVE_LENGTH まで走る）。 */
+    @Override
+    protected double moveReach() {
+        int s = state();
+        return s >= STATE_CLEAVE_WINDUP && s <= STATE_CHOP ? SHOCKWAVE_LENGTH + 1 : 0;
+    }
+
     public AxeAndroid(EntityType<? extends AxeAndroid> type, Level level) {
         super(type, level);
     }
