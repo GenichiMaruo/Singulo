@@ -2800,8 +2800,8 @@
     "translation": "若 60 秒内未被稳定就会坍缩。"
   },
   "desc.singulo.vending_machine": {
-    "source": "A laboratory drinks vending machine (two blocks tall). Use it: sold out.",
-    "translation": "研究所的饮料自动售货机（2 格高）。右键试试，已售罄。"
+    "source": "A laboratory drinks vending machine (two blocks tall). Hold emeralds and press the button under a column to buy Canned Soda (1), Sports Drink (1) or Energy Drink (2). The ones in the laboratory start working once facility power is restored.",
+    "translation": "研究所的饮料自动售货机（2 格高）。手持绿宝石按下正面某一列的按钮，即可购买罐装汽水（1）、运动饮料（1）或能量饮料（2）。研究所里的售货机在设施恢复供电后开始运转。"
   },
   "desc.singulo.vented_ruin_panel": {
     "source": "Vented ancient panel.",
@@ -8740,8 +8740,16 @@
     "translation": "动力炉正在启动"
   },
   "lab.singulo.vending": {
-    "source": "Sold out",
-    "translation": "已售罄"
+    "source": "No power. It might work once facility power is restored",
+    "translation": "没有通电。设施恢复供电后也许就能运转"
+  },
+  "lab.singulo.vending.how": {
+    "source": "Hold emeralds and press the button under the drink you want (left to right: Soda 1, Sports Drink 1, Energy Drink 2)",
+    "translation": "手持绿宝石，按下想要的饮料那一列的按钮（从左到右：汽水 1、运动饮料 1、能量饮料 2）"
+  },
+  "lab.singulo.vending.short": {
+    "source": "Not enough emeralds (needs %s)",
+    "translation": "绿宝石不够（需要 %s 个）"
   },
   "message.singulo.android.alarm": {
     "source": "%s: spotted a group of %3$s (%2$s and others) at %4$s, %5$s, %6$s",

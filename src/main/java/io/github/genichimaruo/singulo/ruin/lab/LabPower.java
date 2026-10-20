@@ -9,7 +9,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 /**
  * 地下アンドロイド研究所の電力。施設の範囲（耐圧殻で包んだ箱）の中の仕掛けを、まとめて切り替える。
  * <ul>
- *   <li>{@link #restore}: 中央動力炉を起動したとき。施設灯・炉心・サーバーラック・制御盤が動き出し、非常灯が消え、隔壁が開く</li>
+ *   <li>{@link #restore}: 中央動力炉を起動したとき。施設灯・炉心・サーバーラック・制御盤・自販機が動き出し、非常灯が消え、隔壁が開く</li>
  *   <li>{@link #unseal}: 研究所のボスを倒したとき。耐圧殻の封じが解け、掘れるようになる</li>
  * </ul>
  */
@@ -37,6 +37,8 @@ public final class LabPower {
             BlockState t = s;
             if (s.getBlock() instanceof LabPoweredBlock || s.getBlock() instanceof LabFacingBlock || s.getBlock() instanceof ReactorConsoleBlock) {
                 t = s.setValue(LabPoweredBlock.POWERED, true);
+            } else if (s.getBlock() instanceof VendingMachineBlock) {
+                t = s.setValue(VendingMachineBlock.POWERED, true);          // 自販機が動き出す（エメラルドで買える）
             } else if (s.getBlock() instanceof BulkheadBlock) {
                 t = s.setValue(BulkheadBlock.OPEN, true);
             }

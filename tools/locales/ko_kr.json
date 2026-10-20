@@ -2800,8 +2800,8 @@
     "translation": "60초 이내에 웜홀 안정기로 안정시키지 않으면 붕괴합니다."
   },
   "desc.singulo.vending_machine": {
-    "source": "A laboratory drinks vending machine (two blocks tall). Use it: sold out.",
-    "translation": "연구소의 음료 자판기입니다(2블록 높이). 우클릭해도 품절입니다."
+    "source": "A laboratory drinks vending machine (two blocks tall). Hold emeralds and press the button under a column to buy Canned Soda (1), Sports Drink (1) or Energy Drink (2). The ones in the laboratory start working once facility power is restored.",
+    "translation": "연구소의 음료 자판기입니다(2블록 높이). 에메랄드를 들고 정면의 줄 버튼을 누르면 캔 소다(1)・스포츠 드링크(1)・에너지 드링크(2)를 살 수 있습니다. 연구소에 있는 것은 시설의 전력이 돌아오면 움직이기 시작합니다."
   },
   "desc.singulo.vented_ruin_panel": {
     "source": "Vented ancient panel.",
@@ -8740,8 +8740,16 @@
     "translation": "동력로가 기동 중이다"
   },
   "lab.singulo.vending": {
-    "source": "Sold out",
-    "translation": "품절"
+    "source": "No power. It might work once facility power is restored",
+    "translation": "전원이 들어와 있지 않다. 시설의 전력이 돌아오면 움직일 것 같다"
+  },
+  "lab.singulo.vending.how": {
+    "source": "Hold emeralds and press the button under the drink you want (left to right: Soda 1, Sports Drink 1, Energy Drink 2)",
+    "translation": "에메랄드를 들고 원하는 음료 줄의 버튼을 누른다(왼쪽부터 소다 1・스포츠 드링크 1・에너지 드링크 2)"
+  },
+  "lab.singulo.vending.short": {
+    "source": "Not enough emeralds (needs %s)",
+    "translation": "에메랄드가 부족하다(%s개 필요)"
   },
   "message.singulo.android.alarm": {
     "source": "%s: spotted a group of %3$s (%2$s and others) at %4$s, %5$s, %6$s",

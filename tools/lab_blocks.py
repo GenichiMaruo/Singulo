@@ -342,20 +342,29 @@ def coffee_pot():
     return im
 
 
-def vending_front(upper):
-    """自販機の正面。上半分: 光る見本の棚（色とりどりの缶）。下半分: 押しボタンと取り出し口。"""
+# 自販機の3列（左から 缶ソーダ・スポーツドリンク・エナジードリンク）: 缶の色と、缶の上の色。Java の VendingMachineBlock.DRINKS と同じ順
+VENDING_CANS = [((70, 150, 255), (200, 224, 250)), ((248, 250, 252), (60, 120, 220)), ((250, 206, 40), (40, 40, 44))]
+
+
+def vending_front(upper, on=True):
+    """自販機の正面。上半分: 光る見本の棚（3列。列ごとに同じ飲み物の缶）。下半分: 列ごとの押しボタン（缶の色）と、
+    お金の口・取り出し口。止まっている（on=False）と棚もボタンも暗い。"""
     im, d = new(rgba((236, 76, 70)))
     d.rectangle([0, 0, S - 1, S - 1], outline=rgba((150, 40, 36)))
+    dim = (lambda c: c) if on else (lambda c: mix(c, (24, 26, 30), 0.6))
     if upper:
-        d.rectangle([2, 2, 13, 14], fill=rgba((236, 244, 250)))
-        cans = [(255, 80, 70), (80, 160, 255), (250, 210, 70), (90, 210, 120), (240, 240, 240), (180, 110, 220)]
-        for row, y in enumerate((3, 7, 11)):
-            for k, x in enumerate((3, 6, 9, 12)):
-                c = cans[(row * 4 + k) % len(cans)]
-                d.rectangle([x, y, x, y + 2], fill=rgba(c))
+        d.rectangle([2, 2, 13, 14], fill=rgba(dim((206, 222, 234))))
+        for k, x0 in enumerate((2, 6, 10)):
+            body, top = VENDING_CANS[k]
+            for y in (3, 7, 11):
+                for x in (x0 + 1, x0 + 2):
+                    d.rectangle([x, y, x, y + 2], fill=rgba(dim(body)))
+                    d.point((x, y), fill=rgba(dim(top)))
+        for x in (5, 9):
+            d.line([(x, 2), (x, 14)], fill=rgba(dim((182, 198, 212))))      # 列の仕切り
     else:
-        for k, x in enumerate((3, 6, 9, 12)):
-            d.point((x, 2), fill=rgba((255, 230, 120)))
+        for k, x in enumerate((3, 7, 11)):
+            d.rectangle([x, 2, x + 1, 2], fill=rgba(dim(VENDING_CANS[k][0])))
         d.rectangle([2, 4, 9, 6], fill=rgba((30, 30, 34)))           # お金の口・表示
         d.rectangle([2, 10, 13, 13], fill=rgba((24, 24, 28)))         # 取り出し口
         d.rectangle([11, 4, 13, 7], fill=rgba((210, 210, 214)))
@@ -507,6 +516,7 @@ def textures(tb, save_plain):
     for upper in (False, True):
         half = 'upper' if upper else 'lower'
         save(vending_front(upper), tb / f'vending_machine_front_{half}.png')
+        save(vending_front(upper, on=False), tb / f'vending_machine_front_{half}_off.png')
         save_plain(vending_glow(upper), tb / f'vending_machine_front_{half}_glow.png')
     save(paper(), tb / 'paper_stack_top.png')
     save(paper_side(), tb / 'paper_stack_side.png')
@@ -752,8 +762,14 @@ def decor_models(write_json, mb, mi, bs):
             'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', 'south': '#body', 'east': '#body', 'west': '#body',
                                                          **({'up': '#body'} if half == 'upper' else {'down': '#body'})}),
                          _box([0, 0, 0.98], [16, 16, 0.99], {'north': '#glow'}, glow=True)]})
+        # 止まっている（電力が戻る前の研究所）: 暗い正面で、光る層なし
+        wm(mb / f'vending_machine_{half}_off.json', {'parent': 'minecraft:block/block',
+            'textures': {'front': t(f'vending_machine_front_{half}_off'), 'body': t('lab_plastic'), 'particle': t('lab_plastic')},
+            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', 'south': '#body', 'east': '#body', 'west': '#body',
+                                                         **({'up': '#body'} if half == 'upper' else {'down': '#body'})})]})
     write_json(bs / 'vending_machine.json', {'variants': {
-        f'facing={f},half={h}': _rot(f'vending_machine_{h}', y) for f, y in FACING_Y.items() for h in ('lower', 'upper')}})
+        f'facing={f},half={h},powered={p}': _rot(f'vending_machine_{h}' + ('' if p == 'true' else '_off'), y)
+        for f, y in FACING_Y.items() for h in ('lower', 'upper') for p in ('false', 'true')}})
     write_json(mi / 'vending_machine.json', {'parent': f'{MODID}:block/vending_machine_lower',
                                              'display': held_display(models['vending_machine_lower']['elements'])})
     # 書類の山: 少しずれた2つの束
