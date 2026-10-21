@@ -519,11 +519,11 @@ CHAPTERS = [
     ('power', 'singulo:superconducting_cable', '電力と輸送', 'Power and Logistics', [
         ('cables', 'ケーブル',
          '銅導線（2 kFE/t、損失あり）→ 超伝導ケーブル（1 MFE/t）→ トポロジカル導線（100 MFE/t）→ ホライズン・バス（上限なし。ほかの mod の装置へは1台あたり約2.1 GFE/t まで）。'
-         '送電量は、その経路で容量が最も小さいケーブルで決まり、別の分岐のケーブルには制限されません。同じケーブルを通る複数の送電は、1 tick の容量を共有します。',
+         '送電量は、その経路で容量が最も小さいケーブルで決まり、別の分岐のケーブルには制限されません。同じケーブルを通る複数の送電は、1 tick の容量を共有します。\n受電する装置からケーブル経由で近い電源を先に使い、不足分を遠い電源で補います。同じ距離なら座標順です。近い電源が空の場合や、途中のケーブルの容量が足りない場合も、残りを別の電源が補います。ケーブルを切断すると、その配線の発光はすぐに消えます。',
          'Cables',
          'Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) '
          '→ horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. '
-         'Transfers sharing a cable share its per-tick capacity.'),
+         'Transfers sharing a cable share its per-tick capacity.\nSources nearer to the receiver along the cables supply power first; more distant sources cover the deficit. Equal distances use a stable coordinate order. An empty nearby source or a bottleneck on its route does not block the backup sources. Breaking a cable immediately clears the glow of that wiring.'),
         ('sides', '面ごとの設定',
          '通常の加工装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
          '自動排出の全体スイッチは初期状態ではオフです。オンにすると、自動排出を許可した出力可能な面から隣接先へ搬出します。面にカーソルを合わせると隣接ブロック名が分かります。出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'

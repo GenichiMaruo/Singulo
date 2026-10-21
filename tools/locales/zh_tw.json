@@ -6308,8 +6308,8 @@
     "translation": "電力與物流"
   },
   "guide.singulo.power.cables.body": {
-    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. Transfers sharing a cable share its per-tick capacity.",
-    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。每條路徑的傳輸量由該路徑中容量最低的線纜決定，不受其他分支的限制。經過同一線纜的多次傳輸共用每刻容量。"
+    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. Transfers sharing a cable share its per-tick capacity.\nSources nearer to the receiver along the cables supply power first; more distant sources cover the deficit. Equal distances use a stable coordinate order. An empty nearby source or a bottleneck on its route does not block the backup sources. Breaking a cable immediately clears the glow of that wiring.",
+    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。每條路徑的傳輸量由該路徑中容量最低的線纜決定，不受其他分支的限制。經過同一線纜的多次傳輸共用每刻容量。\n依線纜路徑到受電裝置的距離，優先使用較近的電源，不足部分由較遠的電源補充。距離相同時依固定座標順序處理。近處電源已空或其路徑容量不足時，也會由其他電源補足。切斷線纜後，該線路的發光會立即消失。"
   },
   "guide.singulo.power.cables.title": {
     "source": "Cables",

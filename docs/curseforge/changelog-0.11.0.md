@@ -29,6 +29,9 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - Machine input slots accept **one** usage-tracked item. Shift-click also inserts one, leaving the rest of the stack in your inventory.
 
 ### Device relocation and logistics
+- Receivers use the nearest available power sources along the cables first, then draw any missing power from more distant sources. Equal distances have a stable order.
+- Cable networks now combine unbranched runs into segments and cache their paths. Individual cables no longer run server tickers; changing a machine's activity light does not rebuild the wiring.
+- Breaking a cable clears its network's glowing lines immediately, including client-side prediction. Cancelled breaks restore the display, and stale lighting updates cannot relight the cut.
 - Cable transfer limits now apply to the actual power route. A copper branch no longer throttles a superconducting line supplying the Cooling Tower. Transfers using the same cable share its per-tick capacity, including multiple sources and simulated transfers.
 - New **Relocation Wrench**: sneak-use to pack supported processing machines, generators, SMES and catalyst devices with their contents, fluids, energy and settings. Crafted from steel, copper and a basic circuit, with a dedicated ceramic-and-copper icon.
 - New machines start with **automatic ejection off**. Turning the master switch on enables output through the prepared faces. Existing saved settings are retained.
