@@ -252,6 +252,38 @@ def loading_dock():
     return b
 
 
+def freight_lift():
+    """Dedicated cargo shaft room, with a clear central 3×3 lift and handling equipment."""
+    b = Room(17, 11, 17, 727)
+    b.shell()
+    # Lift landing: reinforced platform and safety border, open up to the shaft ceiling.
+    b.fill(6, 0, 6, 10, 0, 10, FRAME)
+    b.fill(7, 0, 7, 9, 0, 9, 'minecraft:iron_block')
+    for x in range(5, 12):
+        for z in range(5, 12):
+            if x in (5, 11) or z in (5, 11):
+                b.set(x, 0, z, STRIPE_Y if (x+z)%2 else STRIPE_K)
+    # Overhead hoist rails flank the central opening; chains stop above walking height.
+    for x in (5, 11):
+        b.fill(x, 7, 4, x, 7, 12, FRAME)
+        for z in (4, 12):
+            b.fill(x, 1, z, x, 6, z, FRAME)
+        b.fill(x, 5, 8, x, 6, 8, *CHAIN_Y)
+        b.set(x, 4, 8, 'minecraft:lightning_rod', {'facing':'down','powered':'false','waterlogged':'false'})
+    # Rail trolley lane and conveyor staging bay are separate from all four door approaches.
+    for x in range(3, 14):
+        b.put(x, 1, 3, 'minecraft:rail', {'shape':'east_west','waterlogged':'false'})
+        b.put(x, 0, 13, CONVEYOR, {'facing':'west','running':'false','warn':'false'})
+    for x,z,height in ((2,5,2),(2,11,3),(14,5,3),(14,11,2)):
+        for y in range(1,height+1): b.barrel(x,y,z)
+    b.chest(2,1,13,'east')
+    b.terminal(14,1,3,'west',LOG_DOCK)
+    for x in (6,10):
+        b.set(x,1,5,'minecraft:iron_bars')
+        b.set(x,1,11,'minecraft:iron_bars')
+    return b
+
+
 def reactor():
     """
     中央動力炉（19×19、天井が高い）: ボス部屋の直前の部屋。真ん中に天井まで届く炉心の柱（四隅は構造材、面はガラス、中の 3×3 が炉心）。
@@ -867,7 +899,7 @@ def annex_substation():
     return b
 
 
-REQUIRED = {'entrance': entrance, 'reactor': reactor, 'control': control, 'loading_dock': loading_dock}
+REQUIRED = {'entrance': entrance, 'reactor': reactor, 'control': control, 'loading_dock': loading_dock, 'freight_lift': freight_lift}
 OPTIONAL = {'research_lab': research_lab, 'meeting': meeting, 'archive': archive, 'office': office, 'server_room': server_room,
             'clean_room': clean_room, 'prototype': prototype, 'mass_factory': mass_factory, 'dorm': dorm,
             'body_storage': body_storage, 'test_ground': test_ground, 'bio_parts': bio_parts, 'waste': waste,
