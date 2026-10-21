@@ -279,6 +279,10 @@ public final class SinguloClient {
                 io.github.genichimaruo.singulo.registry.SinguloItems.AREA_CARD.get(), Singulo.id("recorded"),
                 (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.AreaCardItem.box(stack) != null ? 1
                         : io.github.genichimaruo.singulo.android.work.AreaCardItem.first(stack) != null ? 0.5F : 0));
+        // 移設レンチ: ケーブル撤去モードは表示灯が橙の絵
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.RELOCATION_WRENCH.get(), Singulo.id("mode"),
+                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.item.RelocationWrenchItem.mode(stack)));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->

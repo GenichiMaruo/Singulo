@@ -8395,9 +8395,33 @@
     "source": "Relocation Wrench",
     "translation": "이전 렌치"
   },
+  "item.singulo.relocation_wrench.cables_removed": {
+    "source": "Took back %s cables",
+    "translation": "케이블 %s개를 회수했다"
+  },
+  "item.singulo.relocation_wrench.hint.0": {
+    "source": "Sneak-use on a device to pack it with its contents and settings.",
+    "translation": "웅크린 채 장치에 사용하면 내용물과 설정째로 회수한다"
+  },
+  "item.singulo.relocation_wrench.hint.1": {
+    "source": "Use on a cable to take it back; sneak-use to take up to 64 joined cables of that kind. Left-click also breaks cables at once.",
+    "translation": "케이블에 사용하면 1개 회수, 웅크린 채 사용하면 이어진 같은 케이블을 최대 64개까지 한꺼번에 회수. 좌클릭으로도 바로 부술 수 있다"
+  },
+  "item.singulo.relocation_wrench.mode.0": {
+    "source": "Mode: relocate devices",
+    "translation": "모드: 장치 이전"
+  },
+  "item.singulo.relocation_wrench.mode.1": {
+    "source": "Mode: remove cables",
+    "translation": "모드: 케이블 철거"
+  },
   "item.singulo.relocation_wrench.packed": {
     "source": "Device packed with contents and settings",
     "translation": "내용물과 설정을 보존하여 장치를 회수했습니다"
+  },
+  "item.singulo.relocation_wrench.switch": {
+    "source": "Sneak-use in the air to switch modes.",
+    "translation": "웅크린 채 허공에 사용하면 모드를 전환한다"
   },
   "item.singulo.saber_android_spawn_egg": {
     "source": "Saber Android Spawn Egg",

@@ -2547,22 +2547,28 @@ def cable_end(iid, core, on=False, glow=None):
     return im
 
 
-def relocation_wrench():
-    """Ceramic service wrench: open steel jaws, copper collar, dark grip and cyan status light."""
+def relocation_wrench(cable=False):
+    """Ceramic service wrench: open steel jaws, copper collar, slate grip and a status light.
+
+    The jaws are light grey rather than near-black so the head stays visible on the dark hotbar.
+    cable=True is the cable-removal mode: the status lights turn amber.
+    """
     im, d = new()
+    light = (255, 178, 74, 255) if cable else (118, 211, 239, 255)
+    light_hi = (255, 206, 120, 255) if cable else (106, 222, 246, 255)
     # Diagonal handle, outlined so it stays readable against snow and machine casings.
-    d.line([(3, 13), (10, 6)], fill=(40, 48, 62, 255), width=5)
+    d.line([(3, 13), (10, 6)], fill=(86, 97, 112, 255), width=5)
     d.line([(3, 13), (10, 6)], fill=(188, 198, 210, 255), width=3)
     d.line([(3, 12), (7, 8)], fill=(242, 245, 248, 255), width=2)
-    d.line([(3, 14), (6, 11)], fill=(54, 67, 83, 255), width=2)
-    d.point((3, 13), fill=(118, 211, 239, 255))
+    d.line([(3, 14), (6, 11)], fill=(98, 112, 128, 255), width=2)
+    d.point((3, 13), fill=light)
     d.line([(7, 7), (9, 9)], fill=(129, 74, 45, 255), width=3)
     d.line([(7, 7), (9, 9)], fill=(215, 144, 86, 255), width=1)
     # Open-ended head; transparent mouth, never a solid hammer silhouette.
     d.polygon([(8, 1), (11, 1), (9, 3), (12, 6), (14, 4), (14, 7),
-               (11, 9), (7, 5), (7, 3)], fill=(42, 52, 68, 255))
+               (11, 9), (7, 5), (7, 3)], fill=(132, 143, 157, 255))
     d.polygon([(8, 2), (9, 2), (8, 3), (12, 7), (13, 6), (13, 7),
-               (11, 8), (8, 5)], fill=(192, 204, 217, 255))
-    d.line([(8, 3), (8, 5), (10, 7)], fill=(246, 249, 251, 255))
-    d.point((11, 7), fill=(106, 222, 246, 255))
+               (11, 8), (8, 5)], fill=(206, 216, 227, 255))
+    d.line([(8, 3), (8, 5), (10, 7)], fill=(250, 252, 253, 255))
+    d.point((11, 7), fill=light_hi)
     return im

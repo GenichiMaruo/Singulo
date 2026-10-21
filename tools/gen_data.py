@@ -542,6 +542,12 @@ UI_LANG = {
     'gui.singulo.reactor.recaptured': ('野良ブラックホールを炉心に取り込んだ', 'The rogue black hole is now the core'),
     'block.singulo.rogue_black_hole': ('野良ブラックホール', 'Rogue Black Hole'),
     'item.singulo.relocation_wrench.packed': ('中身と設定を保持して回収した', 'Device packed with contents and settings'),
+    'item.singulo.relocation_wrench.cables_removed': ('ケーブルを %s 本回収した', 'Took back %s cables'),
+    'item.singulo.relocation_wrench.switch': ('スニークして空中で使うとモードを切り替える', 'Sneak-use in the air to switch modes.'),
+    'item.singulo.relocation_wrench.hint.1': ('ケーブルに使うと1本回収、スニークして使うとつながった同じケーブルを最大64本まとめて回収。左クリックでもすぐ壊せる', 'Use on a cable to take it back; sneak-use to take up to 64 joined cables of that kind. Left-click also breaks cables at once.'),
+    'item.singulo.relocation_wrench.hint.0': ('スニークして装置に使うと、中身と設定ごと回収する', 'Sneak-use on a device to pack it with its contents and settings.'),
+    'item.singulo.relocation_wrench.mode.1': ('モード: ケーブルの撤去', 'Mode: remove cables'),
+    'item.singulo.relocation_wrench.mode.0': ('モード: 装置の移設', 'Mode: relocate devices'),
     'tooltip.singulo.packed_device': ('中身・電力・設定を保持', 'Contents, energy and settings preserved'),
     'item.singulo.settings_card.copied': ('設定を写した', 'Settings copied'),
     'item.singulo.settings_card.pasted': ('設定を貼った', 'Settings pasted'),
@@ -1628,9 +1634,14 @@ def models():
         else:
             if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'meteor_compass', 'graviton_manipulator'):
                 continue                                       # 立体のモデル・針のモデルは別に作る
-            write_json(ASSETS / 'models' / 'item' / f'{iid}.json',
-                       {'parent': 'minecraft:item/handheld' if iid == 'relocation_wrench' else 'minecraft:item/generated',
-                        'textures': {'layer0': f'{MODID}:item/{iid}'}})
+            model = {'parent': 'minecraft:item/handheld' if iid == 'relocation_wrench' else 'minecraft:item/generated',
+                     'textures': {'layer0': f'{MODID}:item/{iid}'}}
+            if iid == 'relocation_wrench':
+                # ケーブル撤去モード（singulo:mode = 1）は表示灯が橙の絵
+                model['overrides'] = [{'predicate': {f'{MODID}:mode': 1}, 'model': f'{MODID}:item/relocation_wrench_cable'}]
+                write_json(ASSETS / 'models' / 'item' / 'relocation_wrench_cable.json',
+                           {'parent': 'minecraft:item/handheld', 'textures': {'layer0': f'{MODID}:item/relocation_wrench_cable'}})
+            write_json(ASSETS / 'models' / 'item' / f'{iid}.json', model)
     blocks_extra.models(write_json, ASSETS)
     import blocks_extra3
     blocks_extra3.models(write_json, ASSETS)
@@ -2061,6 +2072,9 @@ def art_textures():
             art16.save(art16.item_texture(iid, stage_of(name)), ti / f'{iid}.png')
             if iid in art.ITEM_ART:
                 art.save(art.item_texture(iid, stage_of(name)), hi / f'{iid}.png')
+    # 移設レンチのケーブル撤去モード（表示灯が橙）
+    art16.save(art16.grain(art16.relocation_wrench(cable=True), seed=art16.stable_hash('relocation_wrench') % 1000),
+               ti / 'relocation_wrench_cable.png')
     # ケーブルの被覆（電力が流れている間の芯の色つき）
     for iid, core in CABLES.items():
         art16.save(art16.cable_texture(iid, core), tb / f'{iid}.png')
