@@ -363,8 +363,8 @@ VENDING_CANS = [((70, 150, 255), (200, 224, 250)), ((248, 250, 252), (60, 120, 2
 def vending_front(upper, on=True):
     """自販機の正面。上半分: 光る見本の棚（3列。列ごとに同じ飲み物の缶）。下半分: 列ごとの押しボタン（缶の色）と、
     お金の口・取り出し口。止まっている（on=False）と棚もボタンも暗い。"""
-    im, d = new(rgba((236, 76, 70)))
-    d.rectangle([0, 0, S - 1, S - 1], outline=rgba((150, 40, 36)))
+    im, d = new(rgba(VENDING_RED))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(VENDING_EDGE))
     dim = (lambda c: c) if on else (lambda c: mix(c, (24, 26, 30), 0.6))
     if upper:
         d.rectangle([2, 2, 13, 14], fill=rgba(dim((206, 222, 234))))
@@ -382,6 +382,40 @@ def vending_front(upper, on=True):
         d.rectangle([2, 4, 9, 6], fill=rgba((30, 30, 34)))           # お金の口・表示
         d.rectangle([2, 10, 13, 13], fill=rgba((24, 24, 28)))         # 取り出し口
         d.rectangle([11, 4, 13, 7], fill=rgba((210, 210, 214)))
+    return im
+
+
+VENDING_RED, VENDING_EDGE = (236, 76, 70), (150, 40, 36)
+
+
+def vending_side(upper):
+    """自販機の側面・背面: 正面と同じ赤い外装。縁は上下2ブロックで1枚の板に見えるよう、継ぎ目には引かない。
+    上半分に白い帯（正面の見本の棚の高さ）、下半分の裾に暗い蹴込み。"""
+    im, d = new(rgba(VENDING_RED))
+    hi = mix(VENDING_RED, (255, 255, 255), 0.22)
+    d.line([(0, 0), (0, S - 1)], fill=rgba(VENDING_EDGE))
+    d.line([(S - 1, 0), (S - 1, S - 1)], fill=rgba(VENDING_EDGE))
+    d.line([(1, 0), (1, S - 1)], fill=rgba(hi))
+    if upper:
+        d.line([(0, 0), (S - 1, 0)], fill=rgba(VENDING_EDGE))
+        d.line([(1, 1), (S - 2, 1)], fill=rgba(hi))
+        d.rectangle([2, 4, S - 3, 6], fill=rgba((248, 248, 250)))
+        d.line([(2, 8), (S - 3, 8)], fill=rgba((248, 248, 250)))
+        d.line([(2, 7), (S - 3, 7)], fill=rgba(mix(VENDING_RED, (255, 255, 255), 0.5)))
+    else:
+        d.rectangle([1, 12, S - 2, 14], fill=rgba(mix(VENDING_EDGE, (24, 24, 28), 0.5)))
+        d.line([(0, S - 1), (S - 1, S - 1)], fill=rgba(VENDING_EDGE))
+        for x in range(3, S - 3, 2):
+            d.point((x, 13), fill=rgba(mix(VENDING_EDGE, (24, 24, 28), 0.2)))           # 通気の穴
+    return im
+
+
+def vending_top():
+    """自販機の天面・底面: 赤い外装に縁と面取り。"""
+    im, d = new(rgba(VENDING_RED))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(VENDING_EDGE))
+    d.line([(1, 1), (S - 2, 1)], fill=rgba(mix(VENDING_RED, (255, 255, 255), 0.22)))
+    d.line([(1, 1), (1, S - 2)], fill=rgba(mix(VENDING_RED, (255, 255, 255), 0.22)))
     return im
 
 
@@ -533,6 +567,8 @@ def textures(tb, save_plain):
         save(vending_front(upper), tb / f'vending_machine_front_{half}.png')
         save(vending_front(upper, on=False), tb / f'vending_machine_front_{half}_off.png')
         save_plain(vending_glow(upper), tb / f'vending_machine_front_{half}_glow.png')
+        save(vending_side(upper), tb / f'vending_machine_side_{half}.png')
+    save(vending_top(), tb / 'vending_machine_top.png')
     save(paper(), tb / 'paper_stack_top.png')
     save(paper_side(), tb / 'paper_stack_side.png')
     save(bin_side(), tb / 'trash_bin_side.png')
@@ -662,7 +698,16 @@ def models(write_json, assets):
             'item_render_order': ['solid', 'glass']})
     write_json(bs / 'android_capsule.json', {'variants': {
         f'facing={f},half={h}': _rot(f'android_capsule_{h}', y) for f, y in FACING_Y.items() for h in ('lower', 'upper')}})
-    write_json(mi / 'android_capsule.json', {'parent': f'{MODID}:block/android_capsule_lower', 'display': held_display(lower)})
+    # 持ったときは上下2ブロックを1ブロックの大きさに縮めた模型（下半分だけだと、ガラスの筒が途中で切れて見える）
+    is_glass = lambda e: e['faces'].get('north', {}).get('texture') == '#glass'
+    held_solid = compress_halves([e for e in lower if not is_glass(e)], [e for e in upper if not is_glass(e)], suffix=False)
+    held_glass = compress_halves([e for e in lower if is_glass(e)], [e for e in upper if is_glass(e)], suffix=False)
+    write_json(mi / 'android_capsule.json', {'parent': 'minecraft:block/block', 'loader': 'neoforge:composite',
+        'textures': {'particle': t['particle']},
+        'children': {'solid': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:solid', 'textures': t, 'elements': held_solid},
+                     'glass': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t,
+                               'elements': held_glass}},
+        'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass)})
     decor_models(write_json, mb, mi, bs)
     door_models(write_json, mb, mi, bs)
 
@@ -703,6 +748,36 @@ def _uvbox(a, b, faces):
 
 def _all(tex, skip=()):
     return {d: tex for d in ('north', 'south', 'east', 'west', 'up', 'down') if d not in skip}
+
+
+def _default_uv(face, a, b):
+    """要素に UV が書いていないときにバニラが使う UV（要素の位置から決まる）。"""
+    (x1, y1, z1), (x2, y2, z2) = a, b
+    return {'down': [x1, 16 - z2, x2, 16 - z1], 'up': [x1, z1, x2, z2], 'north': [16 - x2, 16 - y2, 16 - x1, 16 - y1],
+            'south': [x1, 16 - y2, x2, 16 - y1], 'west': [z1, 16 - y2, z2, 16 - y1], 'east': [16 - z2, 16 - y2, 16 - z1, 16 - y1]}[face]
+
+
+def compress_halves(lower, upper, suffix=True):
+    """2ブロックの高さのモデル（下半分・上半分の要素）を、1ブロックに収まるよう縦横とも半分に縮めた要素にする。
+
+    位置を縮めると、UV が書いていない面の UV（位置から決まる）も変わってしまうので、縮める前の UV を書き込む。
+    suffix=True なら、テクスチャ名に _lower / _upper を付ける（上下で同じ名前のテクスチャが違う絵のとき）。
+    継ぎ目で隠れる面の cullface は外す（持ったときは隣のブロックがない）。
+    """
+    import copy
+    out = []
+    for half, els, dy in (('lower', lower, 0), ('upper', upper, 16)):
+        for el in els:
+            e = copy.deepcopy(el)
+            for f, face in e['faces'].items():
+                face.setdefault('uv', _default_uv(f, el['from'], el['to']))
+                face.pop('cullface', None)
+                if suffix and face['texture'].startswith('#'):
+                    face['texture'] = f"{face['texture']}_{half}"
+            e['from'] = [round(4 + el['from'][0] / 2, 4), round((el['from'][1] + dy) / 2, 4), round(4 + el['from'][2] / 2, 4)]
+            e['to'] = [round(4 + el['to'][0] / 2, 4), round((el['to'][1] + dy) / 2, 4), round(4 + el['to'][2] / 2, 4)]
+            out.append(e)
+    return out
 
 
 def held_display(elements):
@@ -769,24 +844,29 @@ def decor_models(write_json, mb, mi, bs):
                                                     'up': ('#pot', [0, 6, 6, 10]), 'down': ('#pot', [6, 6, 12, 10])}),
                      _uvbox([11, 2, 6.5], [12, 6, 7.5], {d: ('#pot', [12, 0, 13, 4]) for d in ('north', 'south', 'east', 'west')}
                             | {'up': ('#pot', [12, 0, 13, 1]), 'down': ('#pot', [12, 3, 13, 4])})]})
-    # 自販機: 2ブロック。外装は赤、前の上半分は光る見本の棚
+    # 自販機: 2ブロック。外装は正面も側面・背面・天面も同じ赤、前の上半分は光る見本の棚
     for half in ('lower', 'upper'):
+        body = {'south': '#side', 'east': '#side', 'west': '#side', **({'up': '#top'} if half == 'upper' else {'down': '#top'})}
         wm(mb / f'vending_machine_{half}.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
-            'textures': {'side': t('vending_machine_front_lower'), 'front': t(f'vending_machine_front_{half}'),
-                         'glow': t(f'vending_machine_front_{half}_glow'), 'body': t('lab_plastic'), 'particle': t('lab_plastic')},
-            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', 'south': '#body', 'east': '#body', 'west': '#body',
-                                                         **({'up': '#body'} if half == 'upper' else {'down': '#body'})}),
+            'textures': {'front': t(f'vending_machine_front_{half}'), 'glow': t(f'vending_machine_front_{half}_glow'),
+                         'side': t(f'vending_machine_side_{half}'), 'top': t('vending_machine_top'), 'particle': t('vending_machine_top')},
+            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', **body}),
                          _box([0, 0, 0.98], [16, 16, 0.99], {'north': '#glow'}, glow=True)]})
         # 止まっている（電力が戻る前の研究所）: 暗い正面で、光る層なし
         wm(mb / f'vending_machine_{half}_off.json', {'parent': 'minecraft:block/block',
-            'textures': {'front': t(f'vending_machine_front_{half}_off'), 'body': t('lab_plastic'), 'particle': t('lab_plastic')},
-            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', 'south': '#body', 'east': '#body', 'west': '#body',
-                                                         **({'up': '#body'} if half == 'upper' else {'down': '#body'})})]})
+            'textures': {'front': t(f'vending_machine_front_{half}_off'), 'side': t(f'vending_machine_side_{half}'),
+                         'top': t('vending_machine_top'), 'particle': t('vending_machine_top')},
+            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', **body})]})
     write_json(bs / 'vending_machine.json', {'variants': {
         f'facing={f},half={h},powered={p}': _rot(f'vending_machine_{h}' + ('' if p == 'true' else '_off'), y)
         for f, y in FACING_Y.items() for h in ('lower', 'upper') for p in ('false', 'true')}})
-    write_json(mi / 'vending_machine.json', {'parent': f'{MODID}:block/vending_machine_lower',
-                                             'display': held_display(models['vending_machine_lower']['elements'])})
+    # 持ったときは上下2ブロックを1ブロックの大きさに縮めた模型（下半分だけだと、上の断面が切れて見える）
+    lower, upper = models['vending_machine_lower'], models['vending_machine_upper']
+    held = compress_halves(lower['elements'], upper['elements'])
+    write_json(mi / 'vending_machine.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
+        'textures': {**{f'{k}_lower': v for k, v in lower['textures'].items()}, **{f'{k}_upper': v for k, v in upper['textures'].items()},
+                     'particle': t('vending_machine_top')},
+        'elements': held, 'display': held_display(held)})
     # 書類の山: 少しずれた2つの束
     wm(mb / 'paper_stack.json', {'parent': 'minecraft:block/block',
         'textures': {'top': t('paper_stack_top'), 'side': t('paper_stack_side'), 'particle': t('paper_stack_top')},
