@@ -11,7 +11,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-@net.neoforged.neoforge.gametest.GameTestHolder("singulo")
+@net.neoforged.neoforge.gametest.GameTestHolder("singulo_cable")
 @net.neoforged.neoforge.gametest.PrefixGameTestTemplate(false)
 public final class CableCapacityGameTests {
     private static IEnergyStorage port(GameTestHelper h, BlockPos pos) {
@@ -50,17 +50,18 @@ public final class CableCapacityGameTests {
         superCable(h,entry.east());
         superCable(h,entry.east(2));
         var main=sink(h,entry.east(3));
+        main.energy().setEnergy(main.energy().getMaxEnergyStored()-50_000);
         h.setBlock(entry.east().south(),SinguloBlocks.COPPER_WIRE.get());
         h.setBlock(entry.east().south(2),SinguloBlocks.COPPER_WIRE.get());
         var branch=sink(h,entry.east().south(3));
         var cap=port(h,entry);
         int simulated=cap.receiveEnergy(100_000,true);
-        h.assertTrue(main.energy().getEnergyStored()==0 && branch.energy().getEnergyStored()==0,"Simulation delivered energy");
+        h.assertTrue(main.energy().getEnergyStored()==main.energy().getMaxEnergyStored()-50_000 && branch.energy().getEnergyStored()==0,"Simulation delivered energy");
         int paid=cap.receiveEnergy(100_000,false);
         h.assertTrue(paid==simulated && paid>2_000,"Simulation and real branch budgets disagree");
-        h.assertTrue(main.energy().getEnergyStored()==50_000,"Copper branch throttled superconducting destination");
+        h.assertTrue(main.energy().getEnergyStored()==main.energy().getMaxEnergyStored(),"Copper branch throttled superconducting destination");
         h.assertTrue(branch.energy().getEnergyStored()>0 && branch.energy().getEnergyStored()<=2_000,"Copper branch exceeded its rating");
-        h.assertTrue((long)main.energy().getEnergyStored()+branch.energy().getEnergyStored()<=paid,"Cable created energy");
+        h.assertTrue(50_000L+branch.energy().getEnergyStored()<=paid,"Cable created energy");
         h.succeed();
     }
 
