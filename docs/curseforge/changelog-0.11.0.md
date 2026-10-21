@@ -19,10 +19,16 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - Androids hold the umbrella tilted back over the shoulder, with a curved handle and rib tips.
 - Android decorations no longer flicker when held, because their dyed and undyed layers no longer overlap.
 
+### Device relocation and logistics
+- New **Relocation Wrench**: sneak-use to pack supported processing machines, generators, SMES and catalyst devices with their contents, fluids, energy and settings. Crafted from steel, copper and a basic circuit, with a dedicated ceramic-and-copper icon.
+- New machines start with **automatic ejection off**. Turning the master switch on enables output through the prepared faces. Existing saved settings are retained.
+- Hover a face in the **Sides** panel to see the adjacent block's name.
+- Adjacent I/O ports belonging to different multiblock structures can now transfer outputs to each other.
+
 ### Underground Android Laboratory
 - The pressure hull now wraps only the rooms and corridors, two blocks thick, instead of filling the whole facility area. There are still no gaps to dig in through from outside.
 - A small white building now stands over the main shaft: the old entrance with a reception desk, entry gates and an elevator hall, slightly weathered. The ladder in the main shaft now leads straight out through the elevator door.
-- A new **supply shaft** (3×3) runs from an outlying room to the surface. It is welded shut just above the room and one block below the surface with **Welded Hatches**, which can be mined with a diamond pickaxe once the overseer is defeated. The shaft itself is intact, so ladders turn it into a shortcut.
+- A new **supply shaft** (3×3) always connects a dedicated **cargo lift room** to the surface. The room has hoists, rails, conveyors, a loading platform and storage. Both the main and supply shafts are guaranteed in generated labs; the cargo lift adds one mandatory room. It is welded shut just above the room and one block below the surface with **Welded Hatches**, which can be mined with a diamond pickaxe once the overseer is defeated. The shaft itself is intact, so ladders turn it into a shortcut.
 - New room: **private rooms**, eight researchers' rooms lined up on both sides of a hall, each behind its own door with a bed, a desk and a few belongings.
 - The cafeteria now has a **kitchen** behind a door, with a serving hatch, smokers, a sink and food storage.
 - New **Lab Sliding Door**: white twin doors that slide into the walls when right-clicked, close by themselves once no one is passing through, and stay open while powered by redstone. Lab doors cannot be crafted.

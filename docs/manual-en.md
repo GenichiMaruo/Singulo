@@ -181,3 +181,10 @@ Standard textures are 16×16. Enable the bundled **Singulo HD** resource pack fo
 The server setting `preset` changes difficulty: `casual` removes nether stars, doubles catalyst life and halves ruin regrowth, Warden health and shell compression; `expert` doubles stars, uses 0.75× catalyst life, allows two repairs, uses 1.5× shell compression and doubles ignition energy. Individual settings such as star counts, shell materials and growth time also apply to recipes and JEI when changed from their defaults.
 
 This manual describes the current implementation and default settings. See the [recipe gallery](recipes/README.md) and [documentation audit](documentation-audit.md) for references. Server settings and data packs may change recipes or behavior; use the actual in-game information for your world.
+
+
+## Relocation and automatic ejection
+
+Craft the Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack a supported device with its items, fluids, energy, progress and side settings. Only the controller of a multiblock is packed. See “Power and Logistics → Relocation Wrench” in the handbook for supported devices.
+
+Automatic ejection on ordinary processing machines defaults off. Enable the master switch in Sides to eject through allowed output faces. Hover a face to see the adjacent block. Newly generated underground labs always include both shafts, with the supply shaft connected to a dedicated cargo lift room.
