@@ -34,7 +34,14 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid = Singulo.MODID, value = Dist.CLIENT)
 public final class V011ReviewHarness {
     /** A camera shot: where to stand, what to look at, what to hold, and the camera type. */
-    record Shot(String name, Vec3 eye, Vec3 look, String main, String off, CameraType camera, int settle) {}
+    record Shot(String name, Vec3 eye, Vec3 look, String main, String off, CameraType camera, int settle, int fov, int glasses,
+                boolean screen) {
+        Shot(String name, Vec3 eye, Vec3 look, String main, String off, CameraType camera, int settle) {
+            this(name, eye, look, main, off, camera, settle, 70, NO_GLASSES, false);
+        }
+    }
+
+    private static final int NO_GLASSES = Integer.MIN_VALUE;
 
     private static final List<Shot> SHOTS = new ArrayList<>();
     private static int ticks, phase, index, wait;
@@ -57,6 +64,16 @@ public final class V011ReviewHarness {
                 "android_capsule", CameraType.FIRST_PERSON, 20));
         SHOTS.add(new Shot("held-third", new Vec3(12.5, 82.0, -6.5), new Vec3(12.5, 81.4, -12.5), "vending_machine",
                 "android_capsule", CameraType.THIRD_PERSON_FRONT, 20));
+        SHOTS.add(new Shot("android-glasses", new Vec3(20.5, 81.8, 1.3), new Vec3(20.5, 81.3, 2.5), "", "",
+                CameraType.FIRST_PERSON, 20, 50, NO_GLASSES, false));
+        SHOTS.add(new Shot("android-glasses-side", new Vec3(21.4, 81.8, 1.5), new Vec3(20.5, 81.3, 2.5), "", "",
+                CameraType.FIRST_PERSON, 10, 50, NO_GLASSES, false));
+        SHOTS.add(new Shot("stand-glasses", new Vec3(8.5, 82.2, -5.6), new Vec3(8.5, 81.75, -3.5), "", "",
+                CameraType.FIRST_PERSON, 15, 40, NO_GLASSES, false));
+        SHOTS.add(new Shot("player-glasses", new Vec3(8.5, 82.0, -8.5), new Vec3(8.5, 82.0, -2.5), "", "",
+                CameraType.THIRD_PERSON_FRONT, 15, 30, 2, false));
+        SHOTS.add(new Shot("glasses-screen", new Vec3(8.5, 82.0, -8.5), new Vec3(8.5, 82.0, -2.5), "survey_glasses", "",
+                CameraType.FIRST_PERSON, 15, 70, NO_GLASSES, true));
     }
 
     /** Client-side cable glow for the three flow levels (rows z = 0, 2, 4), re-applied every tick. */
@@ -92,14 +109,20 @@ public final class V011ReviewHarness {
         Shot shot = SHOTS.get(index);
         if (wait == 0) {
             mc.setScreen(null);
-            mc.options.hideGui = shot.main().isEmpty() && shot.off().isEmpty();
-            mc.options.fov().set(70);
+            mc.options.hideGui = shot.main().isEmpty() && shot.off().isEmpty() && !shot.screen();
+            mc.options.fov().set(shot.fov());
             mc.options.setCameraType(shot.camera());
             var server = mc.getSingleplayerServer();
             server.execute(() -> {
                 var player = server.getPlayerList().getPlayers().getFirst();
                 player.setItemInHand(InteractionHand.MAIN_HAND, item(shot.main()));
                 player.setItemInHand(InteractionHand.OFF_HAND, item(shot.off()));
+                ItemStack head = ItemStack.EMPTY;
+                if (shot.glasses() != NO_GLASSES) {
+                    head = item("survey_glasses");
+                    io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(head, shot.glasses());
+                }
+                player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, head);
                 Vec3 d = shot.look().subtract(shot.eye());
                 float yaw = (float) (Math.atan2(d.z, d.x) * 180 / Math.PI) - 90;
                 float pitch = (float) (-Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * 180 / Math.PI);
@@ -110,7 +133,10 @@ public final class V011ReviewHarness {
             Vec3 d = shot.look().subtract(mc.player.getEyePosition());
             mc.player.setYRot((float) (Math.atan2(d.z, d.x) * 180 / Math.PI) - 90);
             mc.player.setXRot((float) (-Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * 180 / Math.PI));
-            if (wait >= shot.settle() + 2) {
+            if (shot.screen() && wait == shot.settle()) {
+                GlassesHeightScreen.open(InteractionHand.MAIN_HAND);
+            }
+            if (wait >= shot.settle() + 4) {
                 capture(mc, shot.name());
                 index++;
                 wait = 0;
@@ -152,6 +178,30 @@ public final class V011ReviewHarness {
         // vending machine (powered) and android capsule, both halves
         place(level, new BlockPos(14, 80, 3), "vending_machine", s -> s.setValue(BlockStateProperties.POWERED, true));
         place(level, new BlockPos(16, 80, 3), "android_capsule", s -> s);
+        // android wearing glasses (and one with a beret too, to check that they do not clash)
+        for (int i = 0; i < 2; i++) {
+            var android = io.github.genichimaruo.singulo.registry.SinguloEntities.BLADE_ANDROID.get().create(level);
+            android.setNoAi(true);
+            android.moveTo(20.5 + i * 1.6, 80, 2.5, 180, 0);
+            android.setYHeadRot(180);
+            android.setYBodyRot(180);
+            android.makeGuard(null, new BlockPos(20, 80, 2), io.github.genichimaruo.singulo.android.RuinAndroid.MODE_GUARD, 30);
+            android.inventory().setItem(io.github.genichimaruo.singulo.android.RuinAndroid.SLOT_DECOR, item("android_glasses"));
+            android.setPersistenceRequired();
+            level.addFreshEntity(android);
+        }
+        // armor stands wearing survey glasses at -2, 0 and +3 pixels
+        int[] heights = {-2, 0, 3};
+        for (int i = 0; i < heights.length; i++) {
+            var stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(level);
+            stand.moveTo(7.5 + i, 80, -3.5, 180, 0);
+            stand.setYHeadRot(180);
+            stand.setYBodyRot(180);
+            ItemStack glasses = item("survey_glasses");
+            io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(glasses, heights[i]);
+            stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, glasses);
+            level.addFreshEntity(stand);
+        }
         var player = level.getServer().getPlayerList().getPlayers().getFirst();
         player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
         player.getAbilities().flying = true;
