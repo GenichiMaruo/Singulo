@@ -2353,4 +2353,30 @@ public final class AndroidGameTests {
         }
         helper.succeed();
     }
+
+    /** メガネ（装飾）は頭の枠に着けられ、染められる。測量メガネの掛ける高さは範囲に収まり、絵の切り替えの値になる。 */
+    @GameTest(template = EMPTY)
+    public static void glassesFitTheHeadAndSurveyGlassesKeepTheirHeight(GameTestHelper helper) {
+        ItemStack glasses = new ItemStack(item("android_glasses"));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.isAccessory(glasses,
+                io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD), "メガネが頭の装飾にならない");
+        helper.assertTrue(glasses.is(net.minecraft.tags.ItemTags.DYEABLE), "メガネが染められない");
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.inventory().setItem(RuinAndroid.SLOT_DECOR, glasses);
+        helper.assertTrue(a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD).is(item("android_glasses")),
+                "頭の装飾にメガネが伝わらない");
+        ItemStack survey = new ItemStack(item("survey_glasses"));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.height(survey) == 0, "新しいメガネの高さが0でない");
+        io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(survey, 3);
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.height(survey) == 3, "高さが残らない");
+        io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(survey, 99);
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.height(survey)
+                == io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.MAX_HEIGHT, "高さが上限に収まらない");
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.heightPredicate(survey) == 1F, "上限の絵の値が1でない");
+        io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(survey, 0);
+        helper.assertTrue(survey.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA) == null
+                || !survey.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA).copyTag().contains("glasses_height"),
+                "高さ0のメガネに値が残り、高さ0の新品と重ならない");
+        helper.succeed();
+    }
 }
