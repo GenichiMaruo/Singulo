@@ -35,12 +35,17 @@ public final class RelocationGameTests {
         original.setEjectEnabled(0,true);
         int sides=original.itemSides().packed();
         var player=h.makeMockServerPlayerInLevel();
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var viewer=h.makeMockServerPlayerInLevel();
+        viewer.setPos(Vec3.atCenterOf(h.absolutePos(a)));
+        viewer.containerMenu = new MachineMenu(1, viewer.getInventory(), original);
         try {
             var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
             player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
             player.setShiftKeyDown(true);
             wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(a)));
             h.assertTrue(h.getBlockState(a).isAir(),"Machine remained after packing");
+            h.assertTrue(viewer.containerMenu == viewer.inventoryMenu,"Other player's stale machine menu stayed open");
             ItemStack packed=ItemStack.EMPTY;
             for(int i=0;i<player.getInventory().getContainerSize();i++) {
                 var candidate=player.getInventory().getItem(i);
@@ -59,7 +64,7 @@ public final class RelocationGameTests {
             h.assertTrue(restored.energy().getEnergyStored()==1234,"Energy not preserved");
             h.assertTrue(restored.automationFluids().getFluidInTank(0).getAmount()==750,"Fluid not preserved");
             h.assertTrue(restored.itemSides().packed()==sides,"Side settings not preserved");
-        } finally {player.discard();}
+        } finally {player.discard(); viewer.discard();}
         h.succeed();
     }
 
