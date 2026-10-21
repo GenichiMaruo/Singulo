@@ -19,6 +19,10 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - Androids hold the umbrella tilted back over the shoulder, with a curved handle and rib tips.
 - Android decorations no longer flicker when held, because their dyed and undyed layers no longer overlap.
 
+### Machine fixes
+- Machines now resume correctly when you take the finished output and shift-click more materials into a partially filled input. Inventory edits now notify the real item handler, allowing processing recipes to be checked again.
+- The same inventory notification fix also covers generator, catalyst-device, reactor and wormhole-device menus.
+
 ### Inventory
 - Unused **Observation Logs**, **Quantum Data Fragments**, **Culture Data** and restored parts now stack to **64** when their usage and repair data match. Partly used items remain individual.
 - Machine input slots accept **one** usage-tracked item. Shift-click also inserts one, leaving the rest of the stack in your inventory.
