@@ -66,6 +66,8 @@ public class GeneratorSlotsMenu extends AbstractContainerMenu {
         return data.getInt(index);
     }
 
+    public BlockPos pos() { return pos; }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);

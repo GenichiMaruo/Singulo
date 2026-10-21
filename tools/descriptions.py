@@ -347,6 +347,7 @@ DESC = {
     '空のBH格納容器': ('小さなブラックホールを閉じ込めるための容器。', 'A vessel for holding a tiny black hole.'),
     '小型BH格納容器': ('小さなブラックホールを閉じ込めた容器。持つと周りの景色が歪む。', 'Holds a tiny black hole. Bends light around it.'),
     'ブラックホール爆弾': ('投げると、当たった所に小さなブラックホールが開き、周りを飲み込む。', 'Thrown: opens a tiny black hole that swallows its surroundings.'),
+    '移設レンチ': ('スニーク＋右クリックで加工装置・発電機・蓄電器・触媒装置を回収。中身・液体・電力・設定を保持する。', 'Sneak-use to relocate processing machines, generators, energy storage and catalyst devices with their items, fluids, energy and settings.'),
     '設定カード': ('装置の設定を写して、ほかの装置に貼る。', 'Copies a machine\'s settings to another.'),
     'ニュートリノ観測所': ('電力で広い範囲を調べ続け、鉱石と遺構を近くの人に見せ続ける。右クリックで表示を切り替える。',
                    'Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.'),

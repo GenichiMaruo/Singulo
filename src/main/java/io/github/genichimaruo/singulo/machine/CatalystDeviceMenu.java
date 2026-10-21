@@ -76,6 +76,8 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
 
     public static final int BUTTON_POWER = 0;
 
+    public BlockPos pos() { return pos; }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == BUTTON_POWER && player.level().getBlockEntity(pos) instanceof CatalystDeviceBlockEntity device) {

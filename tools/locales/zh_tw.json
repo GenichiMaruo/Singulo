@@ -2499,6 +2499,10 @@
     "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
     "translation": "嵌在沉沒的爐心區封鎖柱上的窗，用來承受反應爐的衝擊。非常堅硬，爆炸也無法破壞。"
   },
+  "desc.singulo.relocation_wrench": {
+    "source": "Sneak-use to relocate processing machines, generators, energy storage and catalyst devices with their items, fluids, energy and settings.",
+    "translation": "潛行使用可移設加工裝置、發電機、儲能裝置及觸媒裝置，並保留物品、流體、電力與設定。"
+  },
   "desc.singulo.ruin_android_fabricator": {
     "source": "Prints androids onto its bed and sends them out. Defeat them all for a 50% chance at a compact crystal memory of their design.",
     "translation": "在台面上列印仿生人並讓其出動。全部擊敗後，有一半的機率得到對應型號的小型水晶記憶體。"
@@ -7455,6 +7459,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
   },
+  "howto.singulo.relocation_wrench": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作於：工作台（階段 1）"
+  },
   "howto.singulo.scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "製造地：精密組裝台（第 4 階段）"
@@ -8310,6 +8318,14 @@
   "item.singulo.record_fragment": {
     "source": "Crystal Memory",
     "translation": "水晶記憶體"
+  },
+  "item.singulo.relocation_wrench": {
+    "source": "Relocation Wrench",
+    "translation": "移設扳手"
+  },
+  "item.singulo.relocation_wrench.packed": {
+    "source": "Device packed with contents and settings",
+    "translation": "已保留內容與設定並回收裝置"
   },
   "item.singulo.saber_android_spawn_egg": {
     "source": "Saber Android Spawn Egg",
@@ -10347,6 +10363,10 @@
     "source": "Only works when Mekanism is installed",
     "translation": "僅在安裝了 Mekanism 時可用"
   },
+  "tooltip.singulo.packed_device": {
+    "source": "Contents, energy and settings preserved",
+    "translation": "保留內容、電力與設定"
+  },
   "tooltip.singulo.planned": {
     "source": "Not functional yet; usable as a material",
     "translation": "功能尚未實裝，可作為材料使用"
@@ -10520,8 +10540,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 41 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 41 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 42 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 42 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
@@ -10968,8 +10988,8 @@
     "translation": "用於：鋼錠"
   },
   "uses.singulo.steel_ingot": {
-    "source": "Used in: Basic Frame, Steel Plate, Compressor",
-    "translation": "用於：基本框架、鋼板、壓縮機"
+    "source": "Used in: Basic Frame, Steel Plate, Compressor, Relocation Wrench",
+    "translation": "用於：基本框架、鋼板、壓縮機, 移設扳手"
   },
   "uses.singulo.steel_plate": {
     "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 74 more",

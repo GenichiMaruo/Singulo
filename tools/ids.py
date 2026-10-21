@@ -29,6 +29,7 @@ MOD = {
     '基礎回路': ('basic_circuit', 'Basic Circuit', 'item'),
     'Singuloハンドブック': ('handbook', 'Singulo Handbook', 'tool'),
     'ホロ投影機': ('holo_projector', 'Holo Projector', 'tool'),
+    '移設レンチ': ('relocation_wrench', 'Relocation Wrench', 'tool'),
     '設定カード': ('settings_card', 'Settings Card', 'tool'),
     '探索コンパス': ('explorer_compass', 'Explorer\'s Compass', 'tool'),
     '隕石コンパス': ('meteor_compass', 'Meteor Compass', 'tool'),

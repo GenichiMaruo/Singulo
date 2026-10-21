@@ -2499,6 +2499,10 @@
     "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
     "translation": "가라앉은 노심 구획의 봉쇄 기둥에 끼워진, 반응로의 충격을 견디기 위한 창입니다. 매우 단단하며 폭발로도 부서지지 않습니다."
   },
+  "desc.singulo.relocation_wrench": {
+    "source": "Sneak-use to relocate processing machines, generators, energy storage and catalyst devices with their items, fluids, energy and settings.",
+    "translation": "웅크리고 사용하면 아이템, 유체, 에너지 및 설정을 보존하여 가공 장치, 발전기, 에너지 저장 장치 및 촉매 장치를 이전합니다."
+  },
   "desc.singulo.ruin_android_fabricator": {
     "source": "Prints androids onto its bed and sends them out. Defeat them all for a 50% chance at a compact crystal memory of their design.",
     "translation": "받침대 위에 안드로이드를 출력해 출격시킵니다. 모두 쓰러뜨리면 절반의 확률로 그 형의 소형 크리스털 메모리를 얻습니다."
@@ -7455,6 +7459,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
   },
+  "howto.singulo.relocation_wrench": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작 장소: 제작대 (단계 1)"
+  },
   "howto.singulo.scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "제작: 정밀 조립기(4단계)"
@@ -8310,6 +8318,14 @@
   "item.singulo.record_fragment": {
     "source": "Crystal Memory",
     "translation": "크리스털 메모리"
+  },
+  "item.singulo.relocation_wrench": {
+    "source": "Relocation Wrench",
+    "translation": "이전 렌치"
+  },
+  "item.singulo.relocation_wrench.packed": {
+    "source": "Device packed with contents and settings",
+    "translation": "내용물과 설정을 보존하여 장치를 회수했습니다"
   },
   "item.singulo.saber_android_spawn_egg": {
     "source": "Saber Android Spawn Egg",
@@ -10347,6 +10363,10 @@
     "source": "Only works when Mekanism is installed",
     "translation": "Mekanism이 설치되어 있을 때만 쓸 수 있습니다"
   },
+  "tooltip.singulo.packed_device": {
+    "source": "Contents, energy and settings preserved",
+    "translation": "내용물, 에너지 및 설정 보존"
+  },
   "tooltip.singulo.planned": {
     "source": "Not functional yet; usable as a material",
     "translation": "아직 기능 미구현. 재료로 사용 가능"
@@ -10520,8 +10540,8 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 41 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 41개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 42 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 42개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
@@ -10968,8 +10988,8 @@
     "translation": "사용 제품: 강철 주괴"
   },
   "uses.singulo.steel_ingot": {
-    "source": "Used in: Basic Frame, Steel Plate, Compressor",
-    "translation": "사용 대상: 기본 프레임, 강판, 압축기"
+    "source": "Used in: Basic Frame, Steel Plate, Compressor, Relocation Wrench",
+    "translation": "사용 대상: 기본 프레임, 강판, 압축기, 이전 렌치"
   },
   "uses.singulo.steel_plate": {
     "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 74 more",

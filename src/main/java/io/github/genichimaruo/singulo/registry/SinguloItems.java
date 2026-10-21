@@ -35,6 +35,8 @@ public final class SinguloItems {
             "unstable_wormhole_mouth", () -> new io.github.genichimaruo.singulo.wormhole.UnstableMouthItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.BlackHoleBombItem> BLACK_HOLE_BOMB = ITEMS.register(
             "black_hole_bomb", () -> new io.github.genichimaruo.singulo.item.BlackHoleBombItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.RelocationWrenchItem> RELOCATION_WRENCH = ITEMS.register(
+            "relocation_wrench", () -> new io.github.genichimaruo.singulo.item.RelocationWrenchItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.SettingsCardItem> SETTINGS_CARD = ITEMS.register(
             "settings_card", () -> new io.github.genichimaruo.singulo.item.SettingsCardItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ShieldPermitItem> SHIELD_PERMIT = ITEMS.register(
@@ -181,6 +183,7 @@ public final class SinguloItems {
             Map.entry("shield_permit", 5),
             Map.entry("black_hole_bomb", 5),
             Map.entry("settings_card", 1),
+            Map.entry("relocation_wrench", 1),
             Map.entry("metric_drive", 5),
             Map.entry("unstable_wormhole_mouth", 5),
             Map.entry("holo_projector", 1),
@@ -230,6 +233,7 @@ public final class SinguloItems {
         }
         TAB_ORDER.add(HANDBOOK);
         TAB_ORDER.add(SETTINGS_CARD);
+        TAB_ORDER.add(RELOCATION_WRENCH);
         TAB_ORDER.add(HOLO_PROJECTOR);
         TAB_ORDER.add(EXPLORER_COMPASS);
         TAB_ORDER.add(METEOR_COMPASS);

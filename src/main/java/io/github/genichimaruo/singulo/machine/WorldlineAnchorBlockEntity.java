@@ -213,13 +213,18 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
         }
     }
 
-    @Override
-    public void onBroken(Level level) {
+    /** Remove this position's tickets and owner quota without dropping its catalyst. */
+    public void prepareForRelocation() {
         if (level instanceof ServerLevel server) {
             forceChunks(server, loadedRadius, false);
             loadedRadius = -1;
         }
         claim(false);
+    }
+
+    @Override
+    public void onBroken(Level level) {
+        prepareForRelocation();
         super.onBroken(level);
     }
 

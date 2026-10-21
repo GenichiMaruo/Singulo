@@ -541,6 +541,8 @@ UI_LANG = {
     'gui.singulo.reactor.collapse': ('炉が質量に耐えきれず、崩壊していく！', 'The reactor is collapsing under the mass!'),
     'gui.singulo.reactor.recaptured': ('野良ブラックホールを炉心に取り込んだ', 'The rogue black hole is now the core'),
     'block.singulo.rogue_black_hole': ('野良ブラックホール', 'Rogue Black Hole'),
+    'item.singulo.relocation_wrench.packed': ('中身と設定を保持して回収した', 'Device packed with contents and settings'),
+    'tooltip.singulo.packed_device': ('中身・電力・設定を保持', 'Contents, energy and settings preserved'),
     'item.singulo.settings_card.copied': ('設定を写した', 'Settings copied'),
     'item.singulo.settings_card.pasted': ('設定を貼った', 'Settings pasted'),
     'item.singulo.settings_card.empty': ('まだ何も写していない', 'Nothing copied yet'),
@@ -3382,7 +3384,7 @@ def thermal():
 # ---------------------------------------------------------------- クリエイティブタブ（と JEI）の並び
 # 用途ごとにまとめ、まとまりの中は段階順・レシピ順。並べ忘れたアイテムは「素材」の最後に入る。
 TAB_GROUPS = [
-    ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'decoded_record']),
+    ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'relocation_wrench', 'decoded_record']),
     ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',

@@ -18,6 +18,9 @@ public class SinguloBlockItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         SinguloItem.addStageLine(tooltip, stage);
+        if (stack.has(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA)) {
+            tooltip.add(Component.translatable("tooltip.singulo.packed_device").withStyle(net.minecraft.ChatFormatting.AQUA));
+        }
         if (Boolean.TRUE.equals(stack.get(io.github.genichimaruo.singulo.registry.SinguloComponents.MIXED_SOURCE.get()))) {
             tooltip.add(Component.translatable("tooltip.singulo.mixed_source")
                     .withStyle(net.minecraft.ChatFormatting.GREEN));

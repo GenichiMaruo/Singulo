@@ -768,3 +768,5 @@ for _name, (_rows, _key) in SHAPED.items():
                 _counts[_key[_ch]] = _counts.get(_key[_ch], 0) + 1
     RECIPES[_name]['inputs'] = _counts
     RECIPES[_name]['shape'] = (_rows, _key)
+
+R('移設レンチ', 1, '作業台', {'鋼鉄インゴット': 3, '銅インゴット': 2, '基礎回路': 1}, cat='tool')

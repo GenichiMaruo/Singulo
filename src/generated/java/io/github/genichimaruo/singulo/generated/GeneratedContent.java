@@ -156,6 +156,7 @@ public final class GeneratedContent {
             "explorer_compass",
             "meteor_compass",
             "settings_card",
+            "relocation_wrench",
             "decoded_record",
             "thermoelectric_generator",
             "hydrogen_fuel_cell",
