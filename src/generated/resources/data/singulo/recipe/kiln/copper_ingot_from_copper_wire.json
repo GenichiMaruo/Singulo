@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 1,
+  "time": 100,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:copper_wire"
+      },
+      "count": 8
+    }
+  ],
+  "result": {
+    "id": "minecraft:copper_ingot",
+    "count": 2
+  }
+}

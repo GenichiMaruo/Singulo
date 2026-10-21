@@ -479,6 +479,9 @@ OUTPUT_ALIASES = {
     '金の塊（金のブーツ）': 'minecraft:gold_nugget',
     '熱交換コア（氷塊）': 'singulo:heat_exchange_core',
     '冷却塔冷却帯（氷塊）': 'singulo:cooling_tower_coolant_band',
+    '超伝導ケーブル（銅導線）': 'singulo:superconducting_cable',
+    'トポロジカル導線（超伝導ケーブル）': 'singulo:topological_wire',
+    '銅インゴット（銅導線）': 'minecraft:copper_ingot',
 }
 
 # 同じ成果物の別レシピの、レシピのファイル名（成果物のIDのままだと、同じ装置の中で重なるもの）
@@ -525,6 +528,9 @@ ALIAS_RECIPE_IDS = {
     '金の塊（金のチェストプレート）': 'gold_nugget_from_golden_chestplate',
     '金の塊（金のレギンス）': 'gold_nugget_from_golden_leggings',
     '金の塊（金のブーツ）': 'gold_nugget_from_golden_boots',
+    '超伝導ケーブル（銅導線）': 'superconducting_cable_from_copper_wire',
+    'トポロジカル導線（超伝導ケーブル）': 'topological_wire_from_superconducting_cable',
+    '銅インゴット（銅導線）': 'copper_ingot_from_copper_wire',
 }
 
 # 成果物と一緒に出る副産物: レシピ名 → (副産物, 個数)
