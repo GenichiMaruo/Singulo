@@ -33,6 +33,7 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
     private int inThisTick;
     private int lastIn;
     private int lastOut;
+    private int externallyExtracted;
 
     public SmesCellBlockEntity(BlockPos pos, BlockState state) {
         this(SinguloBlockEntities.SMES_CELL.get(), pos, state, CAPACITY, RATE);
@@ -69,17 +70,18 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SmesCellBlockEntity be) {
         Direction front = state.getValue(AbstractMachineBlock.FACING);
-        boolean active = false;
+        boolean active = be.externallyExtracted > 0;
         be.lastIn = be.inThisTick;
         be.inThisTick = 0;
-        be.lastOut = 0;
+        be.lastOut = be.externallyExtracted;
+        be.externallyExtracted = 0;
         if (be.energy.getEnergyStored() > 0) {
             IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(front), front.getOpposite());
             if (target != null && target.canReceive()) {
                 int sent = target.receiveEnergy(Math.min(be.energy.getEnergyStored(), be.rate), false);
                 if (sent > 0) {
                     be.energy.consume(sent);
-                    be.lastOut = sent;
+                    be.lastOut += sent;
                     active = true;
                 }
             }
@@ -146,7 +148,9 @@ public class SmesCellBlockEntity extends BlockEntity implements AbstractMachineB
 
         @Override
         public int extractEnergy(int amount, boolean simulate) {
-            return receive ? 0 : energy.extractEnergy(amount, simulate);
+            int sent = receive ? 0 : energy.extractEnergy(amount, simulate);
+            if (!simulate) externallyExtracted += sent;
+            return sent;
         }
 
         @Override

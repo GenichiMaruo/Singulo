@@ -86,6 +86,8 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.genesis.GenesisGalaxies::onLogin);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.command.SinguloCommands::register);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.FormationEffect::onServerTick);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.cable.EnergyNetwork::onServerTick);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.cable.EnergyNetwork::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
