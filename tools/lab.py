@@ -22,6 +22,7 @@ FRAME = f'{MODID}:lab_frame'
 GLASS = f'{MODID}:lab_glass'
 HULL = (f'{MODID}:pressure_hull', {'sealed': 'true'})
 LIGHT = (f'{MODID}:facility_light', {'powered': 'false'})
+RAYLEIGH = (f'{MODID}:lab_rayleigh_panel', {'lit': 'false'})
 EMERGENCY = (f'{MODID}:emergency_light', {'powered': 'false'})
 REACTOR_CORE = (f'{MODID}:reactor_core', {'powered': 'false'})
 CONDUIT = (f'{MODID}:power_conduit', {'powered': 'false'})
@@ -102,6 +103,12 @@ class Room(Builder):
         # 非常灯: 天井の2つの隅
         self.set(1, h - 1, 1, *EMERGENCY)
         self.set(w - 2, h - 1, d - 2, *EMERGENCY)
+
+    def skylight(self, x0, z0, x1, z1):
+        """天井の一部をレイリー散乱パネルにする（電力が戻ると、天窓のように青空が映る）。"""
+        for x in range(x0, x1 + 1):
+            for z in range(z0, z1 + 1):
+                self.set(x, self.h - 1, z, *RAYLEIGH)
 
     def terminal(self, x, y, z, facing, log):
         self.put(x, y, z, f'{MODID}:lab_terminal', {'facing': facing, 'log': str(log)})
@@ -481,6 +488,7 @@ def research_lab():
     """研究室（15×11）: 壁際の実験台（醸造台・大釜）、標本の槽、端末。警備機が1体。"""
     b = Room(15, 9, 11, 711)
     b.shell()
+    b.skylight(5, 4, 9, 6)                                        # 真ん中の天井に 5×3 の空
     for x in range(1, 14):
         b.put(x, 1, 1, *SLAB_TOP)
         b.put(x, 1, 9, *SLAB_TOP)
@@ -805,6 +813,7 @@ def cafeteria():
     """食堂（15×13、天井が低い）: 4人がけの机と椅子。南西の隅は、スライドドアと配膳の窓のある厨房（燻製器・流し・食料の樽）。"""
     b = Room(15, 7, 13, 725)
     b.shell()
+    b.skylight(6, 5, 8, 7)                                        # 机の間の天井に 3×3 の空
     # 厨房（中は x 1〜4、z 9〜11）: 仕切りの壁、ドア、配膳の窓（腰の高さのカウンターの上が開いている）
     b.partition(1, 8, 5, 8)
     b.partition(5, 8, 5, 11)
