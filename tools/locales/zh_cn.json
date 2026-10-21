@@ -5268,12 +5268,12 @@
     "translation": "侧面设置"
   },
   "gui.singulo.sides.eject_off": {
-    "source": "Auto-eject: off",
-    "translation": "自动弹出：关闭"
+    "source": "Face auto-eject: blocked",
+    "translation": "此面的自动排出：禁止"
   },
   "gui.singulo.sides.eject_on": {
-    "source": "Auto-eject: on",
-    "translation": "自动弹出：开"
+    "source": "Face auto-eject: allowed",
+    "translation": "此面的自动排出：允许"
   },
   "gui.singulo.sides.face.back": {
     "source": "Back",
@@ -6315,9 +6315,17 @@
     "source": "Cables",
     "translation": "电缆"
   },
+  "guide.singulo.power.relocation.body": {
+    "source": "Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\nFor multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.",
+    "translation": "用3个钢锭、2个铜锭和1个基础电路制作迁移扳手。潜行使用可回收加工装置、常规发电机、SMES及催化装置，并在重新放置时恢复物品、流体、电力、进度和侧面设置。背包已满时会掉落1个已打包的装置。\n多方块结构只回收控制器，周围部件留在原处；迁移后需重新组装。彭罗斯反应堆、虫洞装置及仿生人设施等不在支持范围内。"
+  },
+  "guide.singulo.power.relocation.title": {
+    "source": "Relocation Wrench",
+    "translation": "迁移扳手"
+  },
   "guide.singulo.power.sides.body": {
-    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports. Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.",
-    "translation": "使用普通加工机屏幕中的“侧面”按钮将每个面设置为关闭/输入/输出/两者，并可选择自动弹出。多块使用指定的 I/O 端口； 彭罗斯反应堆 使用提取端口。输出两种气体的装置（如电解槽）可为每种气体单独设置输出面。电源按钮可让装置停止；能仅靠电力制造产物的装置有开关，可跳过这些配方。"
+    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. The master auto-eject switch defaults off; turn it on to push through output-capable faces with auto-eject enabled. Hover a face to see its adjacent block. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports. Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.",
+    "translation": "使用普通加工机屏幕中的“侧面”按钮将每个面设置为关闭/输入/输出/两者，并可选择自动弹出。多块使用指定的 I/O 端口； 彭罗斯反应堆 使用提取端口。输出两种气体的装置（如电解槽）可为每种气体单独设置输出面。电源按钮可让装置停止；能仅靠电力制造产物的装置有开关，可跳过这些配方。 自动排出的总开关默认关闭；开启后，会从允许自动排出的输出面向相邻方块搬出。将鼠标悬停在一个面上可查看相邻方块的名称。"
   },
   "guide.singulo.power.sides.title": {
     "source": "Side configuration",
@@ -6404,8 +6412,8 @@
     "translation": "只能在特定地点获得的素材"
   },
   "guide.singulo.ruins.lab.body": {
-    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is a small white building left on the surface, the old reception and elevator hall. Climb down the collapsed main shaft, once the elevator well, on its ladders and scaffolding. The rooms and corridors are wrapped in a pressure hull two blocks thick that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- A supply shaft runs from the ceiling of an outlying room to the surface. It is welded shut just above the room and one block below the surface; once the overseer falls, the welded hatches can be mined with a diamond pickaxe. The shaft is intact, so with ladders it becomes a shortcut to the surface.\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- Once power is back, the vending machines sell drinks for emeralds (press the column you want: soda for Speed, sports drink for Regeneration, energy drink for Haste). The break-room coffee makers brew with cocoa beans; fill glass bottles from the pot (Haste, and it keeps you awake).\n- The room layout changes every time: research labs, archives, server rooms, dormitories, private rooms lined up along a hall, a medical bay, a cafeteria with a kitchen and more, guarded by security machines and fabricators. The sliding doors of the private rooms and kitchen open with a right-click and close by themselves after a while (the lab doors cannot be crafted, but the similar White Sliding Door is made at a Crafting Table). Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
-    "translation": "旧文明的仿生人研究所。统筹 AI“铸造厂”失控后，职员停掉了中央动力炉，从主竖井逃了出去。人已离开的现在，仿生人们仍遵从“维持设施”这最后的命令，持续修缮着设施。\n- 入口是残留在地表的白色小建筑（原来的接待处和电梯厅）。顺着梯子和脚手架，沿曾经的电梯井——崩塌的主竖井下去。房间和走廊被厚度为 2 格的耐压壳包裹，在击败统筹 AI 之前无法破坏（之后也比黑曜石更硬）。\n- 设施边缘房间的天花板有一条通往地表的搬运竖井。房间上方和地表下一格被焊死的舱盖封住，击败统筹 AI 后可以用钻石镐挖开。竖井没有损坏，架上梯子就能成为通往地表的捷径。\n- 主电源已断，这是一座只有红色应急灯亮着的昏暗设施。右键中央动力炉的控制台即可启动动力炉，设施灯会亮起，AI 中枢的隔离门打开。而沉睡的统筹 AI 也会醒来。\n- 恢复供电后，自动售货机会开始用绿宝石出售饮料（按下想要的那一列：汽水提升移动速度，运动饮料带来生命恢复，能量饮料提升挖掘速度）。茶水间的咖啡机用可可豆冲泡，可以用玻璃瓶盛取（提升挖掘速度并提神）。\n- 房间的排列每次都不同：研究室、资料室、服务器室、员工宿舍、研究员单间排成一列的单间区、医务室、带厨房的食堂等，由警卫机和打印台把守。单间和厨房的滑动门右键点击即可打开，过一会儿会自动关闭（研究所的门无法合成，但相似的白色滑动门可以在工作台制作）。物资箱里还留着研究所的部件和资料。\n- 右键记录终端可以阅读留下的记录。收集起来，就能知道失控的来龙去脉。"
+    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is a small white building left on the surface, the old reception and elevator hall. Climb down the collapsed main shaft, once the elevator well, on its ladders and scaffolding. The rooms and corridors are wrapped in a pressure hull two blocks thick that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- A supply shaft always runs from a dedicated cargo lift room, with hoists, rails, conveyors and storage, to the surface. Both the main and supply shafts are generated. It is welded shut just above the room and one block below the surface; once the overseer falls, the welded hatches can be mined with a diamond pickaxe. The shaft is intact, so with ladders it becomes a shortcut to the surface.\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- Once power is back, the vending machines sell drinks for emeralds (press the column you want: soda for Speed, sports drink for Regeneration, energy drink for Haste). The break-room coffee makers brew with cocoa beans; fill glass bottles from the pot (Haste, and it keeps you awake).\n- The room layout changes every time: research labs, archives, server rooms, dormitories, private rooms lined up along a hall, a medical bay, a cafeteria with a kitchen and more, guarded by security machines and fabricators. The sliding doors of the private rooms and kitchen open with a right-click and close by themselves after a while (the lab doors cannot be crafted, but the similar White Sliding Door is made at a Crafting Table). Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
+    "translation": "旧文明的仿生人研究所。统筹 AI“铸造厂”失控后，职员停掉了中央动力炉，从主竖井逃了出去。人已离开的现在，仿生人们仍遵从“维持设施”这最后的命令，持续修缮着设施。\n- 入口是残留在地表的白色小建筑（原来的接待处和电梯厅）。顺着梯子和脚手架，沿曾经的电梯井——崩塌的主竖井下去。房间和走廊被厚度为 2 格的耐压壳包裹，在击败统筹 AI 之前无法破坏（之后也比黑曜石更硬）。\n- 专用货运升降室设有吊机、轨道、输送带和货物堆放区，搬运竖井必定从其天花板通往地表。主竖井和搬运竖井都会生成。房间上方和地表下一格被焊死的舱盖封住，击败统筹 AI 后可以用钻石镐挖开。竖井没有损坏，架上梯子就能成为通往地表的捷径。\n- 主电源已断，这是一座只有红色应急灯亮着的昏暗设施。右键中央动力炉的控制台即可启动动力炉，设施灯会亮起，AI 中枢的隔离门打开。而沉睡的统筹 AI 也会醒来。\n- 恢复供电后，自动售货机会开始用绿宝石出售饮料（按下想要的那一列：汽水提升移动速度，运动饮料带来生命恢复，能量饮料提升挖掘速度）。茶水间的咖啡机用可可豆冲泡，可以用玻璃瓶盛取（提升挖掘速度并提神）。\n- 房间的排列每次都不同：研究室、资料室、服务器室、员工宿舍、研究员单间排成一列的单间区、医务室、带厨房的食堂等，由警卫机和打印台把守。单间和厨房的滑动门右键点击即可打开，过一会儿会自动关闭（研究所的门无法合成，但相似的白色滑动门可以在工作台制作）。物资箱里还留着研究所的部件和资料。\n- 右键记录终端可以阅读留下的记录。收集起来，就能知道失控的来龙去脉。"
   },
   "guide.singulo.ruins.lab.title": {
     "source": "Underground Android Laboratory",

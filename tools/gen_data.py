@@ -623,8 +623,8 @@ UI_LANG = {
     'gui.singulo.sides.mode.1': ('入力', 'Input'),
     'gui.singulo.sides.mode.2': ('出力', 'Output'),
     'gui.singulo.sides.mode.3': ('入出力', 'Input & output'),
-    'gui.singulo.sides.eject_on': ('自動排出: オン', 'Auto-eject: on'),
-    'gui.singulo.sides.eject_off': ('自動排出: オフ', 'Auto-eject: off'),
+    'gui.singulo.sides.eject_on': ('この面の自動排出: 許可', 'Face auto-eject: allowed'),
+    'gui.singulo.sides.eject_off': ('この面の自動排出: 禁止', 'Face auto-eject: blocked'),
     'gui.singulo.sides.master_on': ('自動排出 オン', 'Auto-eject ON'),
     'gui.singulo.sides.master_off': ('自動排出 オフ', 'Auto-eject OFF'),
     'gui.singulo.sides.adjacent': ('隣接ブロック: %s', 'Adjacent block: %s'),
@@ -1613,7 +1613,8 @@ def models():
             if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'meteor_compass', 'graviton_manipulator'):
                 continue                                       # 立体のモデル・針のモデルは別に作る
             write_json(ASSETS / 'models' / 'item' / f'{iid}.json',
-                       {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
+                       {'parent': 'minecraft:item/handheld' if iid == 'relocation_wrench' else 'minecraft:item/generated',
+                        'textures': {'layer0': f'{MODID}:item/{iid}'}})
     blocks_extra.models(write_json, ASSETS)
     import blocks_extra3
     blocks_extra3.models(write_json, ASSETS)

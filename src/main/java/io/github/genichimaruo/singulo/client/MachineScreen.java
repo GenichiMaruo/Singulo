@@ -321,7 +321,6 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         String legend = channelTank() < 0 ? "gui.singulo.sides.legend"
                 : channelIsInputTank() ? "gui.singulo.sides.legend_tank_in" : "gui.singulo.sides.legend_tank_out";
         g.drawString(font, Component.translatable(legend), x + 4, ly, Panel.TEXT, false);
-        g.pose().popPose();
         if (hovered != null) {
             int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, hovered);
             List<Component> lines = new ArrayList<>();
@@ -339,9 +338,11 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             lines.add(Component.translatable("gui.singulo.sides.mode." + mode));
             lines.add(Component.translatable(io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, hovered)
                     ? "gui.singulo.sides.eject_on" : "gui.singulo.sides.eject_off"));
+            if (!channelIsInputTank()) lines.add(Component.translatable(master ? "gui.singulo.sides.master_on" : "gui.singulo.sides.master_off"));
             lines.add(Component.translatable("gui.singulo.sides.hint").withStyle(s -> s.withColor(0xFF8A949E)));
             Panel.tooltip(g, font, lines, 230, mouseX, mouseY);
         }
+        g.pose().popPose();
     }
 
     private boolean clickSides(double mouseX, double mouseY, int button) {

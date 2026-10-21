@@ -526,12 +526,18 @@ CHAPTERS = [
          'carries only what its thinnest cable can.'),
         ('sides', '面ごとの設定',
          '通常の加工装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
-         '出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'
+         '自動排出の全体スイッチは初期状態ではオフです。オンにすると、自動排出を許可した出力可能な面から隣接先へ搬出します。面にカーソルを合わせると隣接ブロック名が分かります。出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'
          '2種類の気体を出す装置（電解槽など）は、気体ごとに出す面を決められます。画面右の電源ボタンで装置を止められ、'
          '電力だけで作れるもの（冷却塔の液体窒素など）がある装置には、それを作るかどうかのスイッチがあります。',
          'Side configuration',
-         'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'
+         'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. The master auto-eject switch defaults off; turn it on to push through output-capable faces with auto-eject enabled. Hover a face to see its adjacent block. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'
          ' Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.'),
+        ('relocation', '移設レンチ',
+         '移設レンチは鋼鉄インゴット3個・銅インゴット2個・基礎回路1個から作れます。スニーク＋右クリックで、加工装置・通常の発電機・SMES・触媒装置を回収できます。中身・液体・電力・進捗・面設定を保持し、再設置すると復元します。持ち物が満杯なら、その場に装置を1個落とします。\n'
+         'マルチブロックはコントローラだけを回収し、周囲の部材は残ります。再設置後は形を組み直してください。Pリアクター・ワームホール装置・アンドロイド用設備などは対象外です。',
+         'Relocation Wrench',
+         'Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\n'
+         'For multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.'),
         ('wormhole', 'ワームホール',
          '唯一の無線化。生成器で一対の口を作り、60秒以内に固定化装置でエキゾチック物質と口の筐体を使って固定化し、片方を運んで置きます。'
          '口から8ブロック以内のワームホール・ポートは、向こう側の口の近くにある同じポート番号（0〜127、画面の7つの丸で決める）のポートとつながり、'
@@ -665,7 +671,7 @@ CHAPTERS = [
          '・入口は、地表に残る白い小さな建物（もとの受付とエレベーターホール）。エレベーターの昇降路だった崩れた主立坑を、'
          'はしごと足場で降ります。部屋と廊下は厚さ2の耐圧殻で包まれていて、統括AIを倒すまでは壊せません'
          '（倒したあとも黒曜石より硬い）。\n'
-         '・施設のはずれの部屋の天井からは、地表まで搬入出の立坑が通っています。部屋の手前と地表の1段下は溶接された蓋でふさがれていて、'
+         '・専用の貨物昇降室にはクレーン・線路・コンベア・荷物置き場があり、その天井から地表まで搬入出の立坑が必ず通っています。主立坑と搬入出立坑は両方とも生成されます。部屋の手前と地表の1段下は溶接された蓋でふさがれていて、'
          '統括AIを倒すとダイヤのツルハシで掘れます。立坑は荒れていないので、はしごを掛ければ地表との近道になります。\n'
          '・主電源は落ちていて、非常灯だけが赤く灯る薄暗い施設です。中央動力炉の制御盤を右クリックすると動力炉が起動し、'
          '施設の明かりがついて、AI中枢の隔壁が開きます。そして、眠っていた統括AIも目を覚まします。\n'
@@ -681,7 +687,7 @@ CHAPTERS = [
          '- The way in is a small white building left on the surface, the old reception and elevator hall. Climb down the collapsed main shaft, once '
          'the elevator well, on its ladders and scaffolding. The rooms and corridors are wrapped in a pressure hull two blocks thick that cannot be '
          'broken until the overseer falls (and is harder than obsidian even then).\n'
-         '- A supply shaft runs from the ceiling of an outlying room to the surface. It is welded shut just above the room and one block below the '
+         '- A supply shaft always runs from a dedicated cargo lift room, with hoists, rails, conveyors and storage, to the surface. Both the main and supply shafts are generated. It is welded shut just above the room and one block below the '
          'surface; once the overseer falls, the welded hatches can be mined with a diamond pickaxe. The shaft is intact, so with ladders it becomes '
          'a shortcut to the surface.\n'
          '- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, '
