@@ -65,8 +65,9 @@ public final class LogisticsGameTests {
         BlockPos ca=new BlockPos(2,1,1),cb=ca.east(5);
         TestBuild.build(h,kind,ca,Direction.SOUTH,7);
         TestBuild.build(h,kind,cb,Direction.SOUTH,7);
-        TestBuild.port(h,kind,ca,Direction.SOUTH,7,4,1,2);
-        TestBuild.port(h,kind,cb,Direction.SOUTH,7,0,1,2);
+        var pa=TestBuild.port(h,kind,ca,Direction.SOUTH,7,0,1,2);
+        var pb=TestBuild.port(h,kind,cb,Direction.SOUTH,7,4,1,2);
+        h.assertTrue(pa.distManhattan(pb)==1,"Test ports must share a face");
         MachineBlockEntity a=h.getBlockEntity(ca),b=h.getBlockEntity(cb);
         a.items().setStackInSlot(a.type().outputSlot(),new ItemStack(Items.IRON_INGOT,9));
         h.succeedWhen(()->{
