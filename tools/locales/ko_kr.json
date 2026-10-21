@@ -5255,6 +5255,10 @@
     "source": "Permit: only %s players may build inside",
     "translation": "허가증: %s명만 내부에서 작업할 수 있음"
   },
+  "gui.singulo.sides.adjacent": {
+    "source": "Adjacent block: %s",
+    "translation": "인접 블록: %s"
+  },
   "gui.singulo.sides.button": {
     "source": "Sides",
     "translation": "면 설정"

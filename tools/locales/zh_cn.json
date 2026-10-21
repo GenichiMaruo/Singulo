@@ -5255,6 +5255,10 @@
     "source": "Permit: only %s players may build inside",
     "translation": "许可证：只有 %s 名玩家可在内部建造"
   },
+  "gui.singulo.sides.adjacent": {
+    "source": "Adjacent block: %s",
+    "translation": "相邻方块：%s"
+  },
   "gui.singulo.sides.button": {
     "source": "Sides",
     "translation": "侧面设置"

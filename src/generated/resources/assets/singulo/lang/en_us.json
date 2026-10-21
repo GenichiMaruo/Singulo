@@ -1313,6 +1313,7 @@
   "gui.singulo.shield.locked": "Not on the permit",
   "gui.singulo.shield.permit_off": "No permit",
   "gui.singulo.shield.permit_on": "Permit: only %s players may build inside",
+  "gui.singulo.sides.adjacent": "Adjacent block: %s",
   "gui.singulo.sides.button": "Sides",
   "gui.singulo.sides.eject_off": "Auto-eject: off",
   "gui.singulo.sides.eject_on": "Auto-eject: on",

@@ -625,6 +625,7 @@ UI_LANG = {
     'gui.singulo.sides.eject_off': ('自動排出: オフ', 'Auto-eject: off'),
     'gui.singulo.sides.master_on': ('自動排出 オン', 'Auto-eject ON'),
     'gui.singulo.sides.master_off': ('自動排出 オフ', 'Auto-eject OFF'),
+    'gui.singulo.sides.adjacent': ('隣接ブロック: %s', 'Adjacent block: %s'),
     'gui.singulo.sides.hint': ('ドラッグで回す　クリックで切り替え　右クリックで自動排出', 'Drag to rotate · click to change · right-click for auto-eject'),
     'gui.singulo.smes.in': ('受け取り: %s FE/t', 'In: %s FE/t'),
     'gui.singulo.smes.out': ('送り出し %s FE/t', 'Output %s FE/t'),

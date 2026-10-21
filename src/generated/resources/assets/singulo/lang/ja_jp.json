@@ -1313,6 +1313,7 @@
   "gui.singulo.shield.locked": "許可証に登録されていない",
   "gui.singulo.shield.permit_off": "許可証なし",
   "gui.singulo.shield.permit_on": "許可証: %s人だけが中で作業できる",
+  "gui.singulo.sides.adjacent": "隣接ブロック: %s",
   "gui.singulo.sides.button": "面の設定",
   "gui.singulo.sides.eject_off": "自動排出: オフ",
   "gui.singulo.sides.eject_on": "自動排出: オン",

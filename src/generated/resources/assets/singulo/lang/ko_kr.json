@@ -1313,6 +1313,7 @@
   "gui.singulo.shield.locked": "허가증에 없음",
   "gui.singulo.shield.permit_off": "허가증 없음",
   "gui.singulo.shield.permit_on": "허가증: %s명만 내부에서 작업할 수 있음",
+  "gui.singulo.sides.adjacent": "인접 블록: %s",
   "gui.singulo.sides.button": "면 설정",
   "gui.singulo.sides.eject_off": "자동 배출: 꺼짐",
   "gui.singulo.sides.eject_on": "자동 배출: 켜짐",

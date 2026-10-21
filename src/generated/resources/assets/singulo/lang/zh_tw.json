@@ -1313,6 +1313,7 @@
   "gui.singulo.shield.locked": "未登錄在許可證上",
   "gui.singulo.shield.permit_off": "沒有許可證",
   "gui.singulo.shield.permit_on": "許可證：只有 %s 名玩家可在內部建造",
+  "gui.singulo.sides.adjacent": "相鄰方塊：%s",
   "gui.singulo.sides.button": "面設定",
   "gui.singulo.sides.eject_off": "自動排出：關",
   "gui.singulo.sides.eject_on": "自動排出：開",

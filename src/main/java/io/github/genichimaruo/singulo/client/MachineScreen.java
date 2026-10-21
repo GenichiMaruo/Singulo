@@ -326,11 +326,21 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, hovered);
             List<Component> lines = new ArrayList<>();
             lines.add(Component.translatable("gui.singulo.sides.face." + hovered.name().toLowerCase()));
+            var level = Minecraft.getInstance().level;
+            if (level != null) {
+                var state = level.getBlockState(menu.pos());
+                var facing = state.hasProperty(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING)
+                        ? state.getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING)
+                        : net.minecraft.core.Direction.NORTH;
+                var direction = io.github.genichimaruo.singulo.machine.SideConfig.directionOf(facing, hovered);
+                var adjacent = menu.pos().relative(direction);
+                lines.add(Component.translatable("gui.singulo.sides.adjacent", level.getBlockState(adjacent).getBlock().getName()));
+            }
             lines.add(Component.translatable("gui.singulo.sides.mode." + mode));
             lines.add(Component.translatable(io.github.genichimaruo.singulo.machine.SideConfig.eject(packed, hovered)
                     ? "gui.singulo.sides.eject_on" : "gui.singulo.sides.eject_off"));
             lines.add(Component.translatable("gui.singulo.sides.hint").withStyle(s -> s.withColor(0xFF8A949E)));
-            g.renderComponentTooltip(font, lines, mouseX, mouseY);
+            Panel.tooltip(g, font, lines, 230, mouseX, mouseY);
         }
     }
 
