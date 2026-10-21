@@ -15,7 +15,8 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
  * つながったケーブルのまとまり。ケーブルの設置・撤去や隣のブロックの変化で無効になり、次に使われたときに作り直す。
- * 種類の違うケーブルもひとつのネットワークになり、運べる量はいちばん細いケーブルで決まる（ホライズン・バスだけなら上限なし）。
+ * 種類の違うケーブルもひとつのネットワークになるが、容量は実際に通る経路だけで決まる。
+ * ケーブル1本ごとに同じ tick の通電量を合算し、複数の入口・分岐で共有しても定格を超えない。
  * 損失は入口から受け手までに通るケーブルの lossPerBlock の合計（銅導線は1ブロック0.1%、超伝導はゼロ）。最大50%。
  * 電力は入口から受け手まで、ケーブルの数がいちばん少ない道を通る。どのケーブルをどちら向きにどれだけ通ったかを tick ごとに記録する
  * （ケーブルの光り方に使う）。
@@ -39,34 +40,31 @@ final class EnergyNetwork {
     private final Level level;
     private final Map<BlockPos, Double> cableLoss;
     private final List<Acceptor> acceptors;
-    private final long capacity;
+    private final Map<BlockPos, Long> capacities;
     private final Map<BlockPos, Route> routes = new HashMap<>();
     private boolean valid = true;
     private long tick = -1;
-    private long sentThisTick;
     private Map<BlockPos, Flow> flowThisTick = new HashMap<>();
     private Map<BlockPos, Flow> flowLastTick = new HashMap<>();
 
-    private EnergyNetwork(Level level, Map<BlockPos, Double> cableLoss, List<Acceptor> acceptors, long capacity) {
+    private EnergyNetwork(Level level, Map<BlockPos, Double> cableLoss, List<Acceptor> acceptors, Map<BlockPos, Long> capacities) {
         this.level = level;
         this.cableLoss = cableLoss;
         this.acceptors = acceptors;
-        this.capacity = capacity;
+        this.capacities = capacities;
     }
 
     static void build(Level level, BlockPos start) {
         Map<BlockPos, Double> cables = new HashMap<>();
         List<Acceptor> acceptors = new ArrayList<>();
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-        long capacity = Long.MAX_VALUE;
-        boolean anyCable = false;
+        Map<BlockPos, Long> capacities = new HashMap<>();
         queue.add(start);
         cables.put(start, lossOf(level, start));
         while (!queue.isEmpty()) {
             BlockPos pos = queue.poll();
             if (level.getBlockState(pos).getBlock() instanceof CableBlock cable) {
-                capacity = Math.min(capacity, cable.capacity());
-                anyCable = true;
+                capacities.put(pos, cable.capacity());
             }
             for (Direction dir : Direction.values()) {
                 BlockPos next = pos.relative(dir);
@@ -83,7 +81,7 @@ final class EnergyNetwork {
                 }
             }
         }
-        EnergyNetwork network = new EnergyNetwork(level, cables, acceptors, anyCable ? capacity : 0);
+        EnergyNetwork network = new EnergyNetwork(level, cables, acceptors, capacities);
         for (BlockPos pos : cables.keySet()) {
             if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
                 cable.network = network;
@@ -103,8 +101,8 @@ final class EnergyNetwork {
         valid = false;
     }
 
-    long capacity() {
-        return capacity;
+    long capacity(BlockPos pos) {
+        return capacities.getOrDefault(pos, 0L);
     }
 
     /** 直前の tick に pos のケーブルを通った電力（通っていなければ null）。 */
@@ -121,14 +119,15 @@ final class EnergyNetwork {
             flowLastTick = now == tick + 1 ? flowThisTick : new HashMap<>();
             flowThisTick = new HashMap<>();
             tick = now;
-            sentThisTick = 0;
         }
     }
 
     /** entry のケーブルから amount を配り、実際に引き取った量（送り手が払う量）を返す。source は送り手の位置（入ってきた面）。 */
     long distribute(BlockPos entry, @Nullable BlockPos source, long amount, boolean simulate) {
         roll();
-        long budget = Math.min(amount, capacity - sentThisTick);
+        // Private reservations also make simulations honour cable budgets shared by several targets.
+        Map<BlockPos, Long> reserved = new HashMap<>();
+        long budget = Math.min(amount, available(entry, reserved));
         if (budget <= 0 || acceptors.isEmpty()) {
             return 0;
         }
@@ -147,25 +146,43 @@ final class EnergyNetwork {
             if (remaining <= 0) {
                 break;
             }
-            long share = (remaining + left - 1) / left;
+            long share = remaining / left + (remaining % left == 0 ? 0 : 1);
             left--;
             IEnergyStorage target = level.getCapability(Capabilities.EnergyStorage.BLOCK, a.pos(), a.side());
             if (target == null || !target.canReceive()) {
                 continue;
             }
+            share = Math.min(share, available(route, a.cable(), reserved));
+            if (share <= 0) continue;
             double eff = Math.max(MIN_EFFICIENCY, 1.0 - route.loss().getOrDefault(a.cable(), 0.0));
             long accepted = LongEnergyStorage.receive(target, (long) (share * eff), simulate);
             long paid = Math.min(share, (long) Math.ceil(accepted / eff));
             remaining -= paid;
-            if (!simulate && paid > 0) {
-                record(route, entry, source, a, paid);
+            if (paid > 0) {
+                if (simulate) {
+                    for (BlockPos at = a.cable(); at != null; at = route.parent().get(at)) {
+                        reserved.merge(at, paid, Long::sum);
+                    }
+                } else {
+                    record(route, entry, source, a, paid);
+                }
             }
         }
-        long sent = budget - remaining;
-        if (!simulate) {
-            sentThisTick += sent;
+        return budget - remaining;
+    }
+
+    private long available(BlockPos pos, Map<BlockPos, Long> reserved) {
+        Flow flow = flowThisTick.get(pos);
+        return capacity(pos) - (flow == null ? 0 : flow.amount) - reserved.getOrDefault(pos, 0L);
+    }
+
+    /** Remaining capacity of the actual route, including shared segments used earlier this tick. */
+    private long available(Route route, BlockPos end, Map<BlockPos, Long> reserved) {
+        long available = Long.MAX_VALUE;
+        for (BlockPos at = end; at != null; at = route.parent().get(at)) {
+            available = Math.min(available, available(at, reserved));
         }
-        return sent;
+        return available;
     }
 
     /** 受け手 a へ届いた電力の道（入口から a のとなりのケーブルまで）を記録する。 */

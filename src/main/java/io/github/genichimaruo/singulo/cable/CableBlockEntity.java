@@ -197,7 +197,7 @@ public class CableBlockEntity extends BlockEntity {
 
         @Override
         public int getMaxEnergyStored() {
-            return (int) Math.min(Integer.MAX_VALUE, network().capacity());
+            return (int) Math.min(Integer.MAX_VALUE, network().capacity(worldPosition));
         }
 
         @Override
