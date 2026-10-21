@@ -203,7 +203,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             out[i] = new SideConfig();
             int mode = i < type.fluidInputs() ? SideConfig.INPUT : SideConfig.OUTPUT;
             for (SideConfig.Face f : SideConfig.Face.values()) {
-                out[i].set(f, mode, false);
+                out[i].set(f, mode, i >= type.fluidInputs());
             }
         }
         return out;
@@ -233,7 +233,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** 自動排出の全体スイッチを切り替える。 */
     public void setEjectEnabled(int channel, boolean on) {
-        sides(channel).setEjectEnabled(on);
+        SideConfig config = sides(channel);
+        // Old settings often had every per-face flag off despite the master being on.
+        // Turning the master on must be sufficient to start the configured outputs.
+        if (on && java.util.Arrays.stream(SideConfig.Face.values()).noneMatch(f -> config.canExtract(f) && config.eject(f))) {
+            for (SideConfig.Face face : SideConfig.Face.values()) {
+                if (config.canExtract(face)) config.set(face, config.mode(face), true);
+            }
+        }
+        config.setEjectEnabled(on);
         setChanged();
     }
 
