@@ -56,6 +56,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     private final MachineType type;
     private final ItemStackHandler items;
+    /** Exhausted recipe tools waiting for space in the normal output slots. */
+    private final java.util.BitSet pendingReturns = new java.util.BitSet();
     private final FluidTank[] tanks;
     private final SinguloEnergyStorage energy;
     private final IItemHandler automationItems;
@@ -97,6 +99,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         this.items = new ItemStackHandler(type.itemSlots()) {
             @Override
             protected void onContentsChanged(int slot) {
+                pendingReturns.clear(slot);
                 markDirty();
             }
 
@@ -178,6 +181,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** そのスロットにそのアイテムを入れてよいか（触媒は専用スロットだけ、アップグレードはアップグレード枠だけ）。 */
     public boolean slotAccepts(int slot, ItemStack stack) {
+        if (pendingReturns.get(slot)) return false;
         if (slot == type.upgradeSlot()) {
             return isUpgrade(stack);
         }
@@ -295,7 +299,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return !type.isMultiblock();
     }
 
-    /** 搬入出ポートが押し出してよい出力（出力スロットと出力タンクだけ）。 */
+    /** 搬入出ポートが押し出してよい出力（完成品・使用済み部品・出力タンク）。 */
     @Override
     public IItemHandler ejectItems() {
         return type.hasOutput() ? new SidedItems(false, true) : null;
@@ -359,13 +363,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 IItemHandler dest = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                         target, dir.getOpposite());
                 if (dest != null) {
+                    // Finished products first, then exhausted tools still waiting in their input slots.
                     for (int i = 0; i < type.outputSlots(); i++) {
-                        int slot = type.outputSlot() + i;
-                        ItemStack stack = items.getStackInSlot(slot);
-                        if (!stack.isEmpty()) {
-                            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
-                            items.setStackInSlot(slot, rest);
-                        }
+                        ejectItem(dest, type.outputSlot() + i);
+                    }
+                    for (int slot = pendingReturns.nextSetBit(0); slot >= 0; slot = pendingReturns.nextSetBit(slot + 1)) {
+                        ejectItem(dest, slot);
                     }
                 }
             }
@@ -383,6 +386,27 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private void ejectItem(IItemHandler dest, int slot) {
+        ItemStack stack = items.getStackInSlot(slot);
+        if (stack.isEmpty()) return;
+        ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
+        if (rest.getCount() != stack.getCount()) {
+            items.setStackInSlot(slot, rest);
+        }
+    }
+
+    /** Keep a blocked return visible in its original slot; never discard or consume it again. */
+    private void flushReturns() {
+        for (int slot = pendingReturns.nextSetBit(0); slot >= 0; slot = pendingReturns.nextSetBit(slot + 1)) {
+            ItemStack stack = items.getStackInSlot(slot);
+            ItemStack rest = insertOutput(stack.copy(), false);
+            if (rest.getCount() != stack.getCount() || stack.isEmpty()) {
+                items.setStackInSlot(slot, rest);
+                if (!rest.isEmpty()) pendingReturns.set(slot);
             }
         }
     }
@@ -441,6 +465,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     protected void tick(Level level, BlockPos pos, BlockState state) {
+        flushReturns();
         if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
             autoEject(level);
         }
@@ -651,7 +676,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private List<ItemStack> inputStacks() {
         List<ItemStack> list = new ArrayList<>(type.recipeSlots());
         for (int i = 0; i < type.recipeSlots(); i++) {
-            list.add(items.getStackInSlot(type.recipeSlot(i)));
+            int slot = type.recipeSlot(i);
+            list.add(pendingReturns.get(slot) ? ItemStack.EMPTY : items.getStackInSlot(slot));
         }
         return list;
     }
@@ -823,7 +849,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         for (int i = 0; i < type.recipeSlots(); i++) {
             int slot = type.recipeSlot(i);
             if (plan.uses()[i] > 0) {
-                items.setStackInSlot(slot, UsesHelper.consume(items.getStackInSlot(slot), plan.uses()[i]));
+                ItemStack used = UsesHelper.consume(items.getStackInSlot(slot), plan.uses()[i]);
+                items.setStackInSlot(slot, used);
+                if (!used.isEmpty() && UsesHelper.remaining(used) == 0) {
+                    pendingReturns.set(slot);
+                }
             }
             if (plan.consume()[i] > 0) {
                 items.extractItem(slot, plan.consume()[i], false);
@@ -848,6 +878,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (!r.byproduct().isEmpty()) {
             insertOutput(r.byproduct().copy(), false);
         }
+        flushReturns();
         assignFluidOutputs(r.fluidResults(), false);
         onCrafted(level, r);
     }
@@ -1006,6 +1037,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("items", items.serializeNBT(registries));
+        tag.putIntArray("pending_returns", pendingReturns.stream().toArray());
         tag.putIntArray("slot_layout", new int[]{type.inputSlots(), type.outputSlots()});
         tag.putInt("item_sides", itemSides.packed());
         tag.putBoolean("eject_master", true);
@@ -1057,6 +1089,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             int from = savedSlot(i, layout[0], layout[1]);
             items.setStackInSlot(i, from >= 0 && from < loaded.getSlots() ? loaded.getStackInSlot(from) : ItemStack.EMPTY);
         }
+        java.util.BitSet savedReturns = new java.util.BitSet();
+        for (int slot : tag.getIntArray("pending_returns")) {
+            if (slot >= 0 && slot < loaded.getSlots()) savedReturns.set(slot);
+        }
+        pendingReturns.clear();
+        for (int i = 0; i < type.recipeSlots(); i++) {
+            int slot = type.recipeSlot(i);
+            int from = savedSlot(slot, layout[0], layout[1]);
+            if (from >= 0 && savedReturns.get(from) && !items.getStackInSlot(slot).isEmpty()) {
+                pendingReturns.set(slot);
+            }
+        }
         if (tag.contains("item_sides")) {
             itemSides.setPacked(tag.getInt("item_sides"));
             if (!tag.contains("eject_master")) {
@@ -1099,7 +1143,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     // ------------------------------------------------------------------ 自動搬入出
 
-    /** 入力スロットへは入れるだけ、出力スロットからは取り出すだけ。 */
+    /** 入力は搬入、完成品とこの装置で使い切った部品は搬出できる。 */
     private final class AutomationItems implements IItemHandler {
         @Override
         public int getSlots() {
@@ -1118,7 +1162,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()
+            return (slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()) || pendingReturns.get(slot)
                     ? items.extractItem(slot, amount, simulate) : ItemStack.EMPTY;
         }
 
