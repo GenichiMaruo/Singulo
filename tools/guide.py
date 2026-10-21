@@ -382,7 +382,7 @@ CHAPTERS = [
          '4. 発電運転に切り替え、質量ペレットを自動で送り込む。\n'
          '5. シンギュラリティ・コアで特異点技術（シールド・Tシリンダー・ワームホール）を動かし、最後の目標「創世炉」へ。\n'
          'つまずきやすい所:\n'
-         '・点火に失敗する: ケーブル網の上限は、いちばん細いケーブルで決まる。画面の受電の速さと届く見込みを見て配線を直す。\n'
+         '・点火に失敗する: 送電経路の上限は、その経路で容量が最も小さいケーブルで決まる。画面の受電の速さと届く見込みを見て配線を直す。\n'
          '・炉に吸い込まれる: リングの内側は逃げられない強い引力で、黒い球に触れたものは必ず消える。近くで作業するときは気をつける。',
          'Stage 5 at a glance',
          'What to do:\n'
@@ -396,7 +396,7 @@ CHAPTERS = [
          '5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the fina'
          'l goal, the Genesis Engine.\n'
          'Common sticking points:\n'
-         '- Ignition fails: a cable network is limited by its thinnest cable. Check the incoming rate and the estimate o'
+         '- Ignition fails: a power route is limited by its lowest-capacity cable. Check the incoming rate and the estimate o'
          'n the screen and fix the wiring.\n'
          '- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destro'
          'yed. Take care when working nearby.'),
@@ -411,9 +411,9 @@ CHAPTERS = [
          'extraction ports and mass alarms). The central 3×3×3 is air. The core controller sits 5 blocks below '
          'the centre. Use the Holo Projector on the core controller to show the whole structure.'),
         ('ignite', '点火と運転',
-         '種を入れて「点火」を押し、10秒以内に 50 GFE をポートかコントローラに注ぎます（ホライズン・バスが必要）。'
+         '種を入れて「点火」を押し、10秒以内に 50 GFE をポートかコントローラに注ぎます（ホライズン・バスを推奨）。'
          '画面には点火に要る受電（既定は平均 250 MFE/t）が出ます。点火中は受電の速さと届く見込みが出るので、足りなければ配線を見直します。'
-         'ケーブル網の上限はいちばん細いケーブルで決まり、トポロジカル導線1本の網では10秒に20 GFEしか届きません。\n'
+         '送電経路の上限は、その経路で容量が最も小さいケーブルで決まり、トポロジカル導線の1経路では10秒に20 GFEしか届きません。\n'
          '点火した炉心は「回収運転」で始まります。質量を480以下に保ち、Hコレクターを入れておけばH凝縮体が5分に1個できます。'
          '最初のシンギュラリティ・コアには6個（直接4・アノマリー・サンプルの復元2）要るので、約30分そのまま回し、集まったら回収運転を切って発電運転にします。'
          '育ちすぎた炉心も、回収運転にすると毎秒2ずつ質量を放出して戻ります。\n'
@@ -421,9 +421,9 @@ CHAPTERS = [
          'リングの外（半径24まで）は弱い引力、リングの内側は逃げられない強い引力で、黒い球に触れたものはどんなに頑丈でも必ず消えます。半径4は防具を無視する潮汐帯です。引力帯の中は時間が遅れ、装置が×0.8、触媒の減りが×0.5になります。',
          'Ignition and operation',
          'Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a '
-         'horizon bus is required). The screen shows the intake needed (250 MFE/t on average by default). '
+         'horizon bus is recommended). The screen shows the intake needed (250 MFE/t on average by default). '
          'While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a '
-         'network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 '
+         'power route is capped by its lowest-capacity cable, so a single topological-wire route delivers at most 20 GFE in 10 '
          's.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 '
          'minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to '
          'restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. '
@@ -519,11 +519,11 @@ CHAPTERS = [
     ('power', 'singulo:superconducting_cable', '電力と輸送', 'Power and Logistics', [
         ('cables', 'ケーブル',
          '銅導線（2 kFE/t、損失あり）→ 超伝導ケーブル（1 MFE/t）→ トポロジカル導線（100 MFE/t）→ ホライズン・バス（上限なし。ほかの mod の装置へは1台あたり約2.1 GFE/t まで）。'
-         'つながったケーブルの容量は、いちばん細いところで決まります。',
+         '送電量は、その経路で容量が最も小さいケーブルで決まり、別の分岐のケーブルには制限されません。同じケーブルを通る複数の送電は、1 tick の容量を共有します。',
          'Cables',
          'Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) '
-         '→ horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). A connected network '
-         'carries only what its thinnest cable can.'),
+         '→ horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. '
+         'Transfers sharing a cable share its per-tick capacity.'),
         ('sides', '面ごとの設定',
          '通常の加工装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
          '自動排出の全体スイッチは初期状態ではオフです。オンにすると、自動排出を許可した出力可能な面から隣接先へ搬出します。面にカーソルを合わせると隣接ブロック名が分かります。出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'

@@ -29,6 +29,7 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - Machine input slots accept **one** usage-tracked item. Shift-click also inserts one, leaving the rest of the stack in your inventory.
 
 ### Device relocation and logistics
+- Cable transfer limits now apply to the actual power route. A copper branch no longer throttles a superconducting line supplying the Cooling Tower. Transfers using the same cable share its per-tick capacity, including multiple sources and simulated transfers.
 - New **Relocation Wrench**: sneak-use to pack supported processing machines, generators, SMES and catalyst devices with their contents, fluids, energy and settings. Crafted from steel, copper and a basic circuit, with a dedicated ceramic-and-copper icon.
 - New machines start with **automatic ejection off**. Turning the master switch on enables output through the prepared faces. Existing saved settings are retained.
 - Hover a face in the **Sides** panel to see the adjacent block's name.

@@ -4780,8 +4780,8 @@
     "translation": "點火失敗：電力未能及時送達"
   },
   "gui.singulo.reactor.ignition_failed.detail": {
-    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake",
-    "translation": "送達 %s / %s GFE，最大受電 %s MFE/t（需要 %s MFE/t）。即使儲能足夠，網路中最細的線纜也會限制受電上限"
+    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the lowest-capacity cable on the power route caps the intake",
+    "translation": "送達 %s / %s GFE，最大受電 %s MFE/t（需要 %s MFE/t）。即使儲能足夠，送電路徑中容量最低的線纜也會限制受電上限"
   },
   "gui.singulo.reactor.interval": {
     "source": "Feed interval",
@@ -6308,8 +6308,8 @@
     "translation": "電力與物流"
   },
   "guide.singulo.power.cables.body": {
-    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). A connected network carries only what its thinnest cable can.",
-    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。相連網路的傳輸量取決於其中最細的電纜。"
+    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. Transfers sharing a cable share its per-tick capacity.",
+    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。每條路徑的傳輸量由該路徑中容量最低的線纜決定，不受其他分支的限制。經過同一線纜的多次傳輸共用每刻容量。"
   },
   "guide.singulo.power.cables.title": {
     "source": "Cables",
@@ -6624,16 +6624,16 @@
     "translation": "更遠的前方"
   },
   "guide.singulo.stage5.flow.body": {
-    "source": "What to do:\n1. Gather the P-Reactor parts such as reactor shell blocks, and build it with the Holo Projector used on the Core Controller.\n2. For ignition, wire SMES storage and a Horizon Bus so that 50 GFE arrives within 10 seconds (about 250 MFE/t on average).\n3. Insert the singularity seed and ignite. Start in harvest mode to collect H condensate (six for the first Singularity Core).\n4. Switch to generation mode and feed mass pellets automatically.\n5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the final goal, the Genesis Engine.\nCommon sticking points:\n- Ignition fails: a cable network is limited by its thinnest cable. Check the incoming rate and the estimate on the screen and fix the wiring.\n- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destroyed. Take care when working nearby.",
-    "translation": "這一階段要做的事：\n1. 備齊爐殼方塊等 P 反應爐零件，把全像投影器用在爐心控制器上，看著形狀組裝。\n2. 為了點火，用 SMES 和視界匯流排佈線，讓 50 GFE 能在 10 秒內送到（平均約 250 MFE/t）。\n3. 放入奇點種子並點火。一開始用回收運轉收集 H 凝聚體（第一個奇點核心需要 6 個）。\n4. 切換到發電運轉，自動送入質量顆粒。\n5. 用奇點核心驅動奇點技術（護盾、蒂普勒圓柱、蟲洞），朝最終目標「創世爐」前進。\n容易卡住的地方：\n・點火失敗：線纜網路的上限由最細的線纜決定。看介面上的受電速度和預計能否送達來修正佈線。\n・被吸進爐裡：環的內側是無法逃脫的強引力，碰到黑色球體的東西一定會消失。在附近作業時要小心。"
+    "source": "What to do:\n1. Gather the P-Reactor parts such as reactor shell blocks, and build it with the Holo Projector used on the Core Controller.\n2. For ignition, wire SMES storage and a Horizon Bus so that 50 GFE arrives within 10 seconds (about 250 MFE/t on average).\n3. Insert the singularity seed and ignite. Start in harvest mode to collect H condensate (six for the first Singularity Core).\n4. Switch to generation mode and feed mass pellets automatically.\n5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the final goal, the Genesis Engine.\nCommon sticking points:\n- Ignition fails: a power route is limited by its lowest-capacity cable. Check the incoming rate and the estimate on the screen and fix the wiring.\n- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destroyed. Take care when working nearby.",
+    "translation": "這一階段要做的事：\n1. 備齊爐殼方塊等 P 反應爐零件，把全像投影器用在爐心控制器上，看著形狀組裝。\n2. 為了點火，用 SMES 和視界匯流排佈線，讓 50 GFE 能在 10 秒內送到（平均約 250 MFE/t）。\n3. 放入奇點種子並點火。一開始用回收運轉收集 H 凝聚體（第一個奇點核心需要 6 個）。\n4. 切換到發電運轉，自動送入質量顆粒。\n5. 用奇點核心驅動奇點技術（護盾、蒂普勒圓柱、蟲洞），朝最終目標「創世爐」前進。\n容易卡住的地方：\n・點火失敗：送電路徑的上限由該路徑中容量最低的線纜決定。看介面上的受電速度和預計能否送達來修正佈線。\n・被吸進爐裡：環的內側是無法逃脫的強引力，碰到黑色球體的東西一定會消失。在附近作業時要小心。"
   },
   "guide.singulo.stage5.flow.title": {
     "source": "Stage 5 at a glance",
     "translation": "第 5 階段的流程"
   },
   "guide.singulo.stage5.ignite.body": {
-    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a horizon bus is required). The screen shows the intake needed (250 MFE/t on average by default). While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nThe fuel is mass pellets. Accretion efficiency depends on spin (5.7–42.3%); a core of mass 5000 at full spin gives about 2.1 GFE/t.\nOutside the ring (out to radius 24) a weak pull acts, inside the ring a pull you cannot escape, and anything that touches the black sphere is destroyed no matter how tough. Radius 4 is a tidal zone that ignores armour. Time runs slower in the pull zone: machines at ×0.8, catalyst wear at ×0.5.",
-    "translation": "插入種子，按下「點火」，在 10 秒內經由埠或控制器輸送 50 GFE（需要視界匯流排）。介面會顯示點火所需的受電（預設平均 250 MFE/t）。點火時會顯示受電速度與預計送達量，不足時請重新檢查線路；網路上限由最細的線纜決定，因此只用拓撲導線的網路 10 秒內只能送達 20 GFE。\n新爐心以回收運轉開始：爐心質量保持在 480 以下，配合霍金收集器每 5 分鐘產生 1 個霍金凝聚體。第一個奇點核心需要 6 個（直接 4 個、修復異常樣本 2 個），因此先運轉約 30 分鐘，再關閉回收運轉轉為發電。回收運轉還會讓質量過大的爐心每秒釋放 2 質量。\n燃料是質量顆粒。吸積效率取決於自旋（5.7–42.3%）；爐心質量 5000、自旋最大時約 2.1 GFE/t。\n環外（到半徑 24）是弱引力區，環內是無法逃脫的強引力區，碰到黑色球體的東西無論多堅固都會消失。半徑 4 是無視護甲的潮汐區。引力區內時間變慢：裝置 ×0.8，催化劑消耗 ×0.5。"
+    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a horizon bus is recommended). The screen shows the intake needed (250 MFE/t on average by default). While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a power route is capped by its lowest-capacity cable, so a single topological-wire route delivers at most 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nThe fuel is mass pellets. Accretion efficiency depends on spin (5.7–42.3%); a core of mass 5000 at full spin gives about 2.1 GFE/t.\nOutside the ring (out to radius 24) a weak pull acts, inside the ring a pull you cannot escape, and anything that touches the black sphere is destroyed no matter how tough. Radius 4 is a tidal zone that ignores armour. Time runs slower in the pull zone: machines at ×0.8, catalyst wear at ×0.5.",
+    "translation": "插入種子，按下「點火」，在 10 秒內經由埠或控制器輸送 50 GFE（建議使用視界匯流排）。介面會顯示點火所需的受電（預設平均 250 MFE/t）。點火時會顯示受電速度與預計送達量，不足時請重新檢查線路；送電路徑的上限由該路徑中容量最低的線纜決定，因此拓撲導線的單一路徑 10 秒內最多送達 20 GFE。\n新爐心以回收運轉開始：爐心質量保持在 480 以下，配合霍金收集器每 5 分鐘產生 1 個霍金凝聚體。第一個奇點核心需要 6 個（直接 4 個、修復異常樣本 2 個），因此先運轉約 30 分鐘，再關閉回收運轉轉為發電。回收運轉還會讓質量過大的爐心每秒釋放 2 質量。\n燃料是質量顆粒。吸積效率取決於自旋（5.7–42.3%）；爐心質量 5000、自旋最大時約 2.1 GFE/t。\n環外（到半徑 24）是弱引力區，環內是無法逃脫的強引力區，碰到黑色球體的東西無論多堅固都會消失。半徑 4 是無視護甲的潮汐區。引力區內時間變慢：裝置 ×0.8，催化劑消耗 ×0.5。"
   },
   "guide.singulo.stage5.ignite.title": {
     "source": "Ignition and operation",
