@@ -72,6 +72,12 @@ public final class V011ReviewHarness {
                 CameraType.FIRST_PERSON, 15, 40, NO_GLASSES, false));
         SHOTS.add(new Shot("player-glasses", new Vec3(8.5, 82.0, -8.5), new Vec3(8.5, 82.0, -2.5), "", "",
                 CameraType.THIRD_PERSON_FRONT, 15, 30, 2, false));
+        SHOTS.add(new Shot("rayleigh-up", new Vec3(30.5, 81.7, 3.2), new Vec3(30.0, 84.0, -2.0), "", "",
+                CameraType.FIRST_PERSON, 50, 80, NO_GLASSES, false));
+        SHOTS.add(new Shot("rayleigh-floor", new Vec3(30.5, 82.6, 3.4), new Vec3(30.0, 80.0, -2.5), "", "",
+                CameraType.FIRST_PERSON, 10, 80, NO_GLASSES, false));
+        SHOTS.add(new Shot("rayleigh-lab", new Vec3(28.5, 81.7, 3.0), new Vec3(28.5, 84.0, 1.0), "", "",
+                CameraType.FIRST_PERSON, 10, 80, NO_GLASSES, false));
         SHOTS.add(new Shot("glasses-screen", new Vec3(8.5, 82.0, -8.5), new Vec3(8.5, 82.0, -2.5), "survey_glasses", "",
                 CameraType.FIRST_PERSON, 15, 70, NO_GLASSES, true));
     }
@@ -163,7 +169,7 @@ public final class V011ReviewHarness {
     private static void prepare(ServerLevel level) {
         level.setDayTime(6000);
         level.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DAYLIGHT).set(false, level.getServer());
-        for (int x = -4; x <= 22; x++) {
+        for (int x = -4; x <= 40; x++) {
             for (int z = -14; z <= 8; z++) {
                 level.setBlockAndUpdate(new BlockPos(x, 79, z), Blocks.SMOOTH_STONE.defaultBlockState());
                 for (int y = 80; y <= 86; y++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
@@ -190,6 +196,32 @@ public final class V011ReviewHarness {
             android.setPersistenceRequired();
             level.addFreshEntity(android);
         }
+        // Rayleigh sky panels: a closed room (x 25..35, z -6..4) whose ceiling (y 84) holds a lit 3x3 of crafted panels fed by
+        // creative sources above, an unpowered 3x1 row, and a lit 3x2 of lab panels; daylight detectors with lamps below
+        var LABP = BuiltInRegistries.BLOCK.get(Singulo.id("lab_panel")).defaultBlockState();
+        for (int x = 25; x <= 35; x++) {
+            for (int z = -6; z <= 4; z++) {
+                level.setBlockAndUpdate(new BlockPos(x, 79, z), BuiltInRegistries.BLOCK.get(Singulo.id("lab_tiles")).defaultBlockState());
+                for (int y = 80; y <= 85; y++) {
+                    boolean wall = x == 25 || x == 35 || z == -6 || z == 4;
+                    level.setBlockAndUpdate(new BlockPos(x, y, z), wall || y == 84 ? LABP : Blocks.AIR.defaultBlockState());
+                }
+            }
+        }
+        var made = SinguloBlocks.RAYLEIGH_PANEL.get().defaultBlockState();
+        for (int x = 27; x <= 29; x++) {
+            for (int z = -4; z <= -2; z++) {
+                level.setBlockAndUpdate(new BlockPos(x, 84, z), made);
+                level.setBlockAndUpdate(new BlockPos(x, 85, z), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get().defaultBlockState());
+            }
+        }
+        for (int x = 31; x <= 33; x++) level.setBlockAndUpdate(new BlockPos(x, 84, -4), made);
+        var lab = SinguloBlocks.LAB_RAYLEIGH_PANEL.get().defaultBlockState().setValue(io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock.LIT, true);
+        for (int x = 27; x <= 29; x++) for (int z = 1; z <= 2; z++) level.setBlockAndUpdate(new BlockPos(x, 84, z), lab);
+        level.setBlockAndUpdate(new BlockPos(28, 80, -3), Blocks.DAYLIGHT_DETECTOR.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(29, 80, -3), Blocks.REDSTONE_LAMP.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(32, 80, -4), Blocks.DAYLIGHT_DETECTOR.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(33, 80, -4), Blocks.REDSTONE_LAMP.defaultBlockState());
         // armor stands wearing survey glasses at -2, 0 and +3 pixels
         int[] heights = {-2, 0, 3};
         for (int i = 0; i < heights.length; i++) {
