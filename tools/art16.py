@@ -2127,6 +2127,7 @@ ITEM_ART = {
     'micro_black_hole': lambda: vessel((200, 140, 255)),
     'black_hole_bomb': lambda: bomb_item(),
     'settings_card': lambda: settings_card(),
+    'relocation_wrench': lambda: relocation_wrench(),
     'builder_wand': lambda: outlined(lambda d: (d.line([(3, 12), (10, 5)], fill=(150, 110, 70, 255), width=2),
                                                d.ellipse([10, 2, 13, 5], fill=(255, 120, 255, 255)))),
     'scanner_module_2': lambda: module((60, 54, 90), (250, 200, 90)),
@@ -2543,4 +2544,25 @@ def cable_end(iid, core, on=False, glow=None):
     im, d = new()
     for k in range(len(bands) - 1, -1, -1):
         d.rectangle([7 - k, 7 - k, 8 + k, 8 + k], fill=rgba(bands[k]))
+    return im
+
+
+def relocation_wrench():
+    """Ceramic service wrench: open steel jaws, copper collar, dark grip and cyan status light."""
+    im, d = new()
+    # Diagonal handle, outlined so it stays readable against snow and machine casings.
+    d.line([(3, 13), (10, 6)], fill=(40, 48, 62, 255), width=5)
+    d.line([(3, 13), (10, 6)], fill=(188, 198, 210, 255), width=3)
+    d.line([(3, 12), (7, 8)], fill=(242, 245, 248, 255), width=2)
+    d.line([(3, 14), (6, 11)], fill=(54, 67, 83, 255), width=2)
+    d.point((3, 13), fill=(118, 211, 239, 255))
+    d.line([(7, 7), (9, 9)], fill=(129, 74, 45, 255), width=3)
+    d.line([(7, 7), (9, 9)], fill=(215, 144, 86, 255), width=1)
+    # Open-ended head; transparent mouth, never a solid hammer silhouette.
+    d.polygon([(8, 1), (11, 1), (9, 3), (12, 6), (14, 4), (14, 7),
+               (11, 9), (7, 5), (7, 3)], fill=(42, 52, 68, 255))
+    d.polygon([(8, 2), (9, 2), (8, 3), (12, 7), (13, 6), (13, 7),
+               (11, 8), (8, 5)], fill=(192, 204, 217, 255))
+    d.line([(8, 3), (8, 5), (10, 7)], fill=(246, 249, 251, 255))
+    d.point((11, 7), fill=(106, 222, 246, 255))
     return im

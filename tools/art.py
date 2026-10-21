@@ -954,6 +954,10 @@ ITEM_ART = {
 
 
 def item_texture(iid, stage):
+    if iid == 'relocation_wrench':
+        import art16
+        return art16.relocation_wrench().resize((S, S), Image.Resampling.NEAREST)
+
     fn = ITEM_ART.get(iid)
     if fn is not None:
         return fn()
