@@ -53,7 +53,7 @@ public final class LabGameTests {
         for (long seed = 0; seed < 120; seed++) {
             LabLayout l = layout(helper, seed);
             List<String> names = l.rooms.stream().map(LabLayout.Placed::name).toList();
-            for (String need : List.of(LabLayout.ENTRANCE, LabLayout.REACTOR, LabLayout.BOSS, LabLayout.SUBSTATION, "control", "loading_dock")) {
+            for (String need : List.of(LabLayout.ENTRANCE, LabLayout.REACTOR, LabLayout.BOSS, LabLayout.SUBSTATION, "control", "loading_dock", LabLayout.FREIGHT_LIFT)) {
                 helper.assertTrue(names.contains(need), "種 " + seed + ": " + need + " がない");
             }
             helper.assertTrue(names.stream().distinct().count() == names.size() || names.stream().filter(n -> n.startsWith("annex_")).count() > 1,
@@ -113,13 +113,19 @@ public final class LabGameTests {
             LabStructure.addPieces(b, templates, seed, 1000, 2000, -30, 70);
             List<StructurePiece> pieces = b.build().pieces();
             LabLayout l = layout(helper, seed);
+            helper.assertTrue(pieces.stream().filter(p -> p instanceof LabPieces.AccessShaft).count() == 1, "搬入出立坑がないか重複している");
+            var freight = LabStructure.accessRoom(l, 1000, 2000);
+            var shaft = pieces.stream().filter(p -> p instanceof LabPieces.AccessShaft).findFirst().orElseThrow().getBoundingBox();
+            helper.assertTrue(shaft.getCenter().getX() == freight.box().getCenter().getX()
+                    && shaft.getCenter().getZ() == freight.box().getCenter().getZ(), "搬入出立坑が専用室につながっていない");
             helper.assertTrue(pieces.get(0) instanceof LabPieces.Hull, "耐圧殻がいちばん先でない");
             helper.assertTrue(pieces.get(pieces.size() - 1) instanceof LabPieces.Shaft, "主立坑がいちばん後でない");
             helper.assertTrue(pieces.stream().filter(p -> p instanceof LabPieces.Room).count() == l.rooms.size(), "部屋の部品の数が違う");
             helper.assertTrue(pieces.stream().filter(p -> p instanceof LabPieces.Corridor).count() == l.corridors.size(), "廊下の部品の数が違う");
             for (StructurePiece p : pieces) {
                 if (p instanceof LabPieces.Room r) {
-                    LabLayout.Placed placed = l.rooms.stream().filter(x -> x.name().equals(r.name())).findFirst().orElseThrow();
+                    LabLayout.Placed placed = l.rooms.stream().filter(x -> x.name().equals(r.name()) && x.box().minX() == r.getBoundingBox().minX()
+                            && x.box().minZ() == r.getBoundingBox().minZ()).findFirst().orElseThrow();
                     helper.assertTrue(r.getBoundingBox().getXSpan() == placed.box().getXSpan() && r.getBoundingBox().getZSpan() == placed.box().getZSpan(),
                             "種 " + seed + ": " + r.name() + " の型紙が並びの大きさと合わない");
                 }
@@ -553,4 +559,18 @@ public final class LabGameTests {
         }
         helper.succeed();
     }
+    @GameTest(template = EMPTY)
+    public static void bothShaftsRemainPresentOnSlopingTerrain(GameTestHelper helper) {
+        var templates = helper.getLevel().getStructureManager();
+        for (int height : new int[]{-20, 0, 20, 45, 70}) {
+            int floor = LabStructure.floorForShafts(-30, 70, height, 11);
+            var builder = new StructurePiecesBuilder();
+            LabStructure.addPieces(builder, templates, 17, 1000, 2000, floor, 70, (x,z) -> height);
+            var pieces = builder.build().pieces();
+            helper.assertTrue(pieces.stream().filter(p -> p instanceof LabPieces.Shaft).count()==1, "主立坑がない");
+            helper.assertTrue(pieces.stream().filter(p -> p instanceof LabPieces.AccessShaft).count()==1, "斜面で搬入出立坑が省略された");
+        }
+        helper.succeed();
+    }
+
 }
