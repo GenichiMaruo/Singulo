@@ -975,6 +975,10 @@
     "source": "Lined Lab Panel",
     "translation": "연구소 띠 패널"
   },
+  "block.singulo.lab_rayleigh_panel": {
+    "source": "Lab Rayleigh Sky Panel",
+    "translation": "레일리 산란 패널(연구소)"
+  },
   "block.singulo.lab_terminal": {
     "source": "Record Terminal",
     "translation": "기록 단말"
@@ -1066,6 +1070,10 @@
   "block.singulo.quantum_heat_engine": {
     "source": "Quantum Heat Engine",
     "translation": "양자 열기관"
+  },
+  "block.singulo.rayleigh_panel": {
+    "source": "Rayleigh Sky Panel",
+    "translation": "레일리 산란 패널"
   },
   "block.singulo.reactor_console": {
     "source": "Reactor Control Panel",
@@ -2255,6 +2263,10 @@
     "source": "Laboratory panelling with a blue-grey band.",
     "translation": "청회색 띠가 들어간 연구소 벽재입니다."
   },
+  "desc.singulo.lab_rayleigh_panel": {
+    "source": "A sky projection panel in the laboratory ceiling. Once facility power returns, its underside shows a cloudless midday sky and lights the space below like sunlight (daylight detectors underneath read midday). Panels side by side join into one wide sky. Leaves nothing when broken.",
+    "translation": "연구소 천장의 하늘 투영판. 시설 전력이 돌아오면 아래 면에 구름 없는 한낮의 푸른 하늘이 비치고, 바로 아래를 햇살처럼 비춘다(바로 아래의 햇빛 감지기는 계속 한낮의 값을 낸다). 나란히 놓으면 하나의 넓은 하늘이 된다. 부수면 아무것도 남지 않는다."
+  },
   "desc.singulo.lab_terminal": {
     "source": "A terminal left in the laboratory. Use it to read the records left behind.",
     "translation": "연구소에 남겨진 단말입니다. 우클릭하면 남겨진 기록을 읽을 수 있습니다."
@@ -2470,6 +2482,10 @@
   "desc.singulo.raw_meteoric_iron": {
     "source": "Smelt it in a blast furnace into meteoric iron.",
     "translation": "용광로에서 녹이면 운철 주괴가 됩니다."
+  },
+  "desc.singulo.rayleigh_panel": {
+    "source": "A sky projection panel for ceilings. Fed FE (20 FE/t), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
+    "translation": "천장에 붙이는 하늘 투영판. FE를 보내면(20 FE/t) 아래 면에 구름·태양이 없는 한낮의 푸른 하늘이 비치고, 바로 아래를 햇살처럼 비춘다(밝기 15. 바로 아래의 햇빛 감지기는 계속 한낮의 값을 낸다). 밤이 되지 않는다. 전력이 끊기면 한밤중처럼 어둡다. 나란히 놓으면 테두리가 사라져 하나의 넓은 하늘이 된다. 레일리 산란 패널의 설계도로 만든다."
   },
   "desc.singulo.reactor_console": {
     "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",

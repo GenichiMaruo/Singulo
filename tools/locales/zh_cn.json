@@ -975,6 +975,10 @@
     "source": "Lined Lab Panel",
     "translation": "研究所条纹面板"
   },
+  "block.singulo.lab_rayleigh_panel": {
+    "source": "Lab Rayleigh Sky Panel",
+    "translation": "瑞利散射面板（研究所）"
+  },
   "block.singulo.lab_terminal": {
     "source": "Record Terminal",
     "translation": "记录终端"
@@ -1066,6 +1070,10 @@
   "block.singulo.quantum_heat_engine": {
     "source": "Quantum Heat Engine",
     "translation": "量子热机"
+  },
+  "block.singulo.rayleigh_panel": {
+    "source": "Rayleigh Sky Panel",
+    "translation": "瑞利散射面板"
   },
   "block.singulo.reactor_console": {
     "source": "Reactor Control Panel",
@@ -2255,6 +2263,10 @@
     "source": "Laboratory panelling with a blue-grey band.",
     "translation": "带有青灰色条纹的研究所墙材。"
   },
+  "desc.singulo.lab_rayleigh_panel": {
+    "source": "A sky projection panel in the laboratory ceiling. Once facility power returns, its underside shows a cloudless midday sky and lights the space below like sunlight (daylight detectors underneath read midday). Panels side by side join into one wide sky. Leaves nothing when broken.",
+    "translation": "研究所天花板上的天空投影板。设施电力恢复后，底面会映出无云的正午蓝天，并像阳光一样照亮正下方（正下方的阳光探测器始终输出正午的数值）。并排放置会连成一片宽广的天空。破坏后什么也不会留下。"
+  },
   "desc.singulo.lab_terminal": {
     "source": "A terminal left in the laboratory. Use it to read the records left behind.",
     "translation": "研究所里留下的终端。右键可以阅读留下的记录。"
@@ -2470,6 +2482,10 @@
   "desc.singulo.raw_meteoric_iron": {
     "source": "Smelt it in a blast furnace into meteoric iron.",
     "translation": "在高炉中冶炼成陨铁锭。"
+  },
+  "desc.singulo.rayleigh_panel": {
+    "source": "A sky projection panel for ceilings. Fed FE (20 FE/t), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
+    "translation": "贴在天花板上的天空投影板。输入FE（20 FE/t）后，底面会映出没有云和太阳的正午蓝天，并像阳光一样照亮正下方（亮度15，正下方的阳光探测器始终输出正午的数值）。不会变成夜晚。断电后像午夜一样漆黑。并排放置时边框会消失，连成一片宽广的天空。用瑞利散射面板的设计图制作。"
   },
   "desc.singulo.reactor_console": {
     "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",

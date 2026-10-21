@@ -168,6 +168,8 @@
     "singulo:vending_machine",
     "singulo:paper_stack",
     "singulo:trash_bin",
+    "singulo:lab_rayleigh_panel",
+    "singulo:rayleigh_panel",
     "singulo:ruin_lamp_amber",
     "singulo:ruin_lamp_verdant",
     "singulo:ruin_lamp_violet",

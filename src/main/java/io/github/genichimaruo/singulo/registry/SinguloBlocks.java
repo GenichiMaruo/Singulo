@@ -481,6 +481,20 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock> VENDING_MACHINE = BLOCKS.register("vending_machine",
             () -> new io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock(decor(SoundType.METAL).strength(3.0F, 9.0F).lightLevel(s -> 6)));
 
+    /**
+     * レイリー散乱パネル（天井の空の投影板）。研究所の天井のものは研究所の電力で点き、壊すと何も残らない（作れない）。
+     * 作れるものは FE で点く。点いている間は真下を真昼の日差しで照らす（明るさ15）。
+     */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock> LAB_RAYLEIGH_PANEL = BLOCKS.register(
+            "lab_rayleigh_panel", () -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh().noLootTable(), true));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock> RAYLEIGH_PANEL = BLOCKS.register(
+            "rayleigh_panel", () -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh(), false));
+
+    private static BlockBehaviour.Properties rayleigh() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
+                .sound(SoundType.GLASS).lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock.LIT) ? 15 : 0);
+    }
+
     /** 研究所のスライドドア（作れない）と、それに似せた作れるスライドドア。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock> LAB_DOOR = BLOCKS.register("lab_door",
             () -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor()));

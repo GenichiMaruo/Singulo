@@ -237,6 +237,10 @@ public final class SinguloBlockEntities {
             () -> build(CableBlockEntity::new, SinguloBlocks.COPPER_WIRE.get(), SinguloBlocks.SUPERCONDUCTING_CABLE.get(),
                     SinguloBlocks.TOPOLOGICAL_WIRE.get(), SinguloBlocks.HORIZON_BUS.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity>> RAYLEIGH_PANEL =
+            REGISTER.register("rayleigh_panel", () -> build(io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity::new,
+                    SinguloBlocks.LAB_RAYLEIGH_PANEL.get(), SinguloBlocks.RAYLEIGH_PANEL.get()));
+
     @SuppressWarnings("DataFlowIssue")
     private static <T extends BlockEntity> BlockEntityType<T> build(BlockEntityType.BlockEntitySupplier<T> factory, Block... blocks) {
         return BlockEntityType.Builder.of(factory, blocks).build(null);

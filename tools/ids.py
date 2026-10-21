@@ -378,6 +378,9 @@ MOD = {
     'コーヒー': ('coffee', 'Coffee', 'item'),
     '書類の山': ('paper_stack', 'Stack of Papers', 'lab'),
     'ごみ箱': ('trash_bin', 'Trash Bin', 'lab'),
+    # レイリー散乱パネル: 天井の空の投影板。研究所の天井のもの（作れない・回収できない）と、設計図から作るもの（FE で点く）
+    'レイリー散乱パネル（研究所）': ('lab_rayleigh_panel', 'Lab Rayleigh Sky Panel', 'lab'),
+    'レイリー散乱パネル': ('rayleigh_panel', 'Rayleigh Sky Panel', 'lab'),
     '遺構の照明（琥珀）': ('ruin_lamp_amber', 'Ruin Lamp (Amber)', 'ruin_block'),
     '遺構の照明（翠）': ('ruin_lamp_verdant', 'Ruin Lamp (Verdant)', 'ruin_block'),
     '遺構の照明（菫）': ('ruin_lamp_violet', 'Ruin Lamp (Violet)', 'ruin_block'),

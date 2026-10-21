@@ -414,6 +414,8 @@ public final class SinguloItems {
         block(SinguloBlocks.VENDING_MACHINE, 1);
         block(SinguloBlocks.PAPER_STACK, 1);
         block(SinguloBlocks.TRASH_BIN, 1);
+        block(SinguloBlocks.LAB_RAYLEIGH_PANEL, 1);
+        block(SinguloBlocks.RAYLEIGH_PANEL, 1);
         TAB_ORDER.add(SECURITY_DRONE_SPAWN_EGG);
         TAB_ORDER.add(BLADE_ANDROID_SPAWN_EGG);
         TAB_ORDER.add(WHIP_ANDROID_SPAWN_EGG);

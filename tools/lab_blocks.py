@@ -419,6 +419,47 @@ def vending_top():
     return im
 
 
+# レイリー散乱パネル: 空の色（Java の RayleighPanelRenderer と同じ）と縁の色
+RAYLEIGH_NOON = ((188, 217, 248), (63, 127, 228))       # 地平線の近く・真上
+RAYLEIGH_NIGHT = (12, 20, 38)
+RAYLEIGH_FRAME = {True: (214, 220, 228), False: (76, 82, 94)}
+
+
+def rayleigh_casing(lab):
+    """レイリー散乱パネルの側面・上面。研究所のもの: 白いパネルに淡い青の細い帯（下の端）。作ったもの: 鋼の板に青の帯と四隅のボルト。"""
+    if lab:
+        im = lab_panel()
+        from PIL import ImageDraw
+        d = ImageDraw.Draw(im)
+    else:
+        im, d = new(rgba(STEEL_HI))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(STEEL))
+        d.point([(2, 2), (13, 2), (2, 13), (13, 13)], fill=rgba(STEEL_DARK))
+    d.line([(1, S - 3), (S - 2, S - 3)], fill=rgba(mix(RAYLEIGH_NOON[1], (255, 255, 255), 0.35)))
+    return im
+
+
+def rayleigh_bottom(lab):
+    """下の面（投影面）: 縁1ドット（光らない）と、消えているときの暗い面。点いている空は Java が上に描く。"""
+    im, d = new(rgba(RAYLEIGH_NIGHT))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(RAYLEIGH_FRAME[lab]))
+    return im
+
+
+def rayleigh_icon(lab):
+    """持ち物の絵: 縁の中に、見上げた空（真ん中ほど深い青）。研究所のものは白い縁、作ったものは鋼の縁。"""
+    im, d = new((0, 0, 0, 0))
+    lo, hi = RAYLEIGH_NOON
+    for y in range(1, S - 1):
+        for x in range(1, S - 1):
+            r = max(abs(x - 7.5), abs(y - 7.5)) / 6.5
+            im.putpixel((x, y), rgba(mix(hi, lo, min(1.0, r * r))))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(RAYLEIGH_FRAME[lab]))
+    if not lab:
+        d.point([(0, 0), (S - 1, 0), (0, S - 1), (S - 1, S - 1)], fill=rgba(STEEL_DARK))
+    return im
+
+
 def vending_glow(upper):
     """自販機の光る所（見本の棚と、ボタンの灯）。"""
     im = vending_front(upper)
@@ -569,6 +610,11 @@ def textures(tb, save_plain):
         save_plain(vending_glow(upper), tb / f'vending_machine_front_{half}_glow.png')
         save(vending_side(upper), tb / f'vending_machine_side_{half}.png')
     save(vending_top(), tb / 'vending_machine_top.png')
+    for lab in (True, False):
+        name = 'lab_rayleigh_panel' if lab else 'rayleigh_panel'
+        save(rayleigh_casing(lab), tb / f'{name}_side.png')
+        save_plain(rayleigh_bottom(lab), tb / f'{name}_bottom.png')
+        save_plain(rayleigh_icon(lab), tb.parent / 'item' / f'{name}.png')
     save(paper(), tb / 'paper_stack_top.png')
     save(paper_side(), tb / 'paper_stack_side.png')
     save(bin_side(), tb / 'trash_bin_side.png')
@@ -710,6 +756,19 @@ def models(write_json, assets):
         'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass)})
     decor_models(write_json, mb, mi, bs)
     door_models(write_json, mb, mi, bs)
+    rayleigh_models(write_json, mb, mi, bs)
+
+
+def rayleigh_models(write_json, mb, mi, bs):
+    """レイリー散乱パネル: 箱（側面・上面は外装、下の面は縁と暗い面）。点いている空は RayleighPanelRenderer が下の面に重ねて描く。"""
+    for iid in ('lab_rayleigh_panel', 'rayleigh_panel'):
+        side, bottom = f'{MODID}:block/{iid}_side', f'{MODID}:block/{iid}_bottom'
+        faces = {d: {'texture': '#side', 'cullface': d} for d in ('north', 'south', 'east', 'west', 'up')}
+        faces['down'] = {'texture': '#bottom', 'cullface': 'down'}
+        write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/block', 'textures': {'side': side, 'bottom': bottom, 'particle': side},
+                                        'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': faces}]})
+        write_json(bs / f'{iid}.json', {'variants': {f'lit={v}': {'model': f'{MODID}:block/{iid}'} for v in ('false', 'true')}})
+        write_json(mi / f'{iid}.json', {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
 
 
 def door_models(write_json, mb, mi, bs):
@@ -918,7 +977,7 @@ def loot(write_json, data):
             'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:{iid}'}],
             'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:{iid}',
                             'properties': {'half': 'lower'}}, {'condition': 'minecraft:survives_explosion'}]}]})
-    for iid in ('bulkhead', 'reactor_console'):
+    for iid in ('bulkhead', 'reactor_console', 'lab_rayleigh_panel'):      # 天井のレイリー散乱パネルは回収できない
         write_json(data / 'loot_table' / 'blocks' / f'{iid}.json', {'type': 'minecraft:block', 'pools': []})
     write_json(data / 'loot_table' / 'blocks' / 'android_capsule.json', {'type': 'minecraft:block', 'pools': [{
         'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:android_capsule'}],

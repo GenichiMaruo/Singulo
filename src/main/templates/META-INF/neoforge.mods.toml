@@ -38,3 +38,6 @@ Recover the lost catalytic engineering of a vanished civilization and finish its
 
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"
+
+[[mixins]]
+config="singulo.mixins.json"
