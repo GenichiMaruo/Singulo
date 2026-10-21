@@ -106,8 +106,14 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             }
 
             @Override
+            protected int getStackLimit(int slot, ItemStack stack) {
+                return (slot < type.inputSlots() || slot == type.catalystSlot()) && UsesHelper.hasUses(stack)
+                        ? 1 : super.getStackLimit(slot, stack);
+            }
+
+            @Override
             public int getSlotLimit(int slot) {
-                return slot == type.upgradeSlot() ? 1 : 64;
+                return slot == type.upgradeSlot() || slot == type.catalystSlot() ? 1 : 64;
             }
         };
         this.tanks = new FluidTank[type.tanks()];
