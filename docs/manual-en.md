@@ -190,3 +190,5 @@ Craft the Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic cir
 Automatic ejection on ordinary processing machines defaults off. Enable the master switch in Sides to eject through allowed output faces. Hover a face to see the adjacent block. Newly generated underground labs always include both shafts, with the supply shaft connected to a dedicated cargo lift room.
 
 Unused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.
+
+Restored parts and original records exhausted during processing become item outputs with their usage and repair data intact. If the output slot is occupied, they wait in their input slot and can still be extracted by hoppers or item pipes. Enable automatic ejection to send them to adjacent inventories. Parts inserted for repair are not automatically ejected.

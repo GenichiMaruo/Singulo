@@ -20,6 +20,7 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - Android decorations no longer flicker when held, because their dyed and undyed layers no longer overlap.
 
 ### Machine fixes
+- Processing machines now treat exhausted control units, restored parts and original records as item outputs. If the output slot is occupied, the spent item waits safely in its input slot and can still be collected by hoppers or item pipes. Automatic ejection also handles these returns when enabled, including through multiblock I/O ports. Usage and repair data are preserved; parts inserted for repair stay as inputs.
 - Machines now resume correctly when you take the finished output and shift-click more materials into a partially filled input. Inventory edits now notify the real item handler, allowing processing recipes to be checked again.
 - The same inventory notification fix also covers generator, catalyst-device, reactor and wormhole-device menus.
 
