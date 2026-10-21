@@ -184,4 +184,45 @@ public final class RelocationGameTests {
         });
     }
 
+    /** ケーブル撤去モード: 使うと1本、スニークするとつながった同じケーブルをまとめて回収する。ほかの種類のケーブルは残す。 */
+    @GameTest(template="empty")
+    public static void wrenchCableModeTakesBackCables(GameTestHelper h) {
+        var copper=SinguloBlocks.COPPER_WIRE.get();
+        for(int x=1;x<=5;x++) h.setBlock(new BlockPos(x,1,2),copper);
+        h.setBlock(new BlockPos(6,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
+        h.setBlock(new BlockPos(1,1,4),copper);
+        var player=h.makeMockServerPlayerInLevel();
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        try {
+            var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
+            player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
+            // スニークして空中で使うとモードが変わる
+            player.setShiftKeyDown(true);
+            wrench.getItem().use(h.getLevel(),player,InteractionHand.MAIN_HAND);
+            h.assertTrue(io.github.genichimaruo.singulo.item.RelocationWrenchItem.mode(wrench)==1,"Mode did not switch to cable removal");
+            h.assertTrue(wrench.getDestroySpeed(copper.defaultBlockState())>=1000,"Cable mode does not break cables instantly");
+            // 1本だけ
+            player.setShiftKeyDown(false);
+            wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(new BlockPos(1,1,4))));
+            h.assertTrue(h.getBlockState(new BlockPos(1,1,4)).isAir(),"Single cable not removed");
+            // つながった同じ種類をまとめて
+            player.setShiftKeyDown(true);
+            wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(new BlockPos(3,1,2))));
+            for(int x=1;x<=5;x++) h.assertTrue(h.getBlockState(new BlockPos(x,1,2)).isAir(),"Connected copper wire left at x="+x);
+            h.assertTrue(h.getBlockState(new BlockPos(6,1,2)).is(SinguloBlocks.SUPERCONDUCTING_CABLE.get()),"Other cable kind was removed");
+            int got=0;
+            for(int i=0;i<player.getInventory().getContainerSize();i++) {
+                var st=player.getInventory().getItem(i);
+                if(st.is(copper.asItem())) got+=st.getCount();
+            }
+            h.assertTrue(got==6,"Expected 6 copper wires back, got "+got);
+            // 移設モードに戻すと、ケーブルには何もしない
+            wrench.getItem().use(h.getLevel(),player,InteractionHand.MAIN_HAND);
+            h.assertTrue(io.github.genichimaruo.singulo.item.RelocationWrenchItem.mode(wrench)==0,"Mode did not switch back");
+            wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(new BlockPos(6,1,2))));
+            h.assertFalse(h.getBlockState(new BlockPos(6,1,2)).isAir(),"Relocation mode removed a cable");
+        } finally {player.discard();}
+        h.succeed();
+    }
+
 }
