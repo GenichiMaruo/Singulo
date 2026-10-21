@@ -19,6 +19,10 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - Androids hold the umbrella tilted back over the shoulder, with a curved handle and rib tips.
 - Android decorations no longer flicker when held, because their dyed and undyed layers no longer overlap.
 
+### Inventory
+- Unused **Observation Logs**, **Quantum Data Fragments**, **Culture Data** and restored parts now stack to **64** when their usage and repair data match. Partly used items remain individual.
+- Machine input slots accept **one** usage-tracked item. Shift-click also inserts one, leaving the rest of the stack in your inventory.
+
 ### Device relocation and logistics
 - New **Relocation Wrench**: sneak-use to pack supported processing machines, generators, SMES and catalyst devices with their contents, fluids, energy and settings. Crafted from steel, copper and a basic circuit, with a dedicated ceramic-and-copper icon.
 - New machines start with **automatic ejection off**. Turning the master switch on enables output through the prepared faces. Existing saved settings are retained.

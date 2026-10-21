@@ -706,7 +706,8 @@ CHAPTERS = [
          '・段階3のうち: 研究棟。深海圧力収集器は早めに置いて、高圧結晶を貯めておく（殻とアンビルで約30個）。雷雨の日は砂に避雷針。\n'
          '・段階4の前に: 封鎖培養施設、古代都市（スカルク・残響の欠片。欠片は残響共鳴器で複製し続けられるので、1つあれば足りる）、'
          'エンドの虚空（虚空捕集器）、ウィザー（ネザースター。点火後は人工星核で代わりになる）。\n'
-         '・原本の記録は修復でき、新品＋修復3回で約2.7倍使えます。何度も遠征し直すより、修復を使いましょう。',
+         '・原本の記録は修復でき、新品＋修復3回で約2.7倍使えます。何度も遠征し直すより、修復を使いましょう。\n'
+         '未使用の観測ログ・量子データ片・培養データや復元部品は、同じ状態のものを64個まで重ねられます。装置の入力枠には1個だけ入り、Shiftクリックでも1個だけ投入します。使用途中のものは重なりません。',
          'Planning expeditions',
          'Destinations pile up in later stages; gathering early keeps the factory running.\n'
          '- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n'
@@ -714,7 +715,8 @@ CHAPTERS = [
          'Put lightning rods on sand in thunderstorms.\n'
          '- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void '
          '(void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n'
-         '- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.'),
+         '- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.\n'
+         'Unused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.'),
         ('compass', '探索コンパスの調整',
          '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
          '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設 → 沈んだ炉心区画）も探せるようになります。'

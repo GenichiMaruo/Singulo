@@ -188,3 +188,5 @@ This manual describes the current implementation and default settings. See the [
 Craft the Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack a supported device with its items, fluids, energy, progress and side settings. Only the controller of a multiblock is packed. See “Power and Logistics → Relocation Wrench” in the handbook for supported devices.
 
 Automatic ejection on ordinary processing machines defaults off. Enable the master switch in Sides to eject through allowed output faces. Hover a face to see the adjacent block. Newly generated underground labs always include both shafts, with the supply shaft connected to a dedicated cargo lift room.
+
+Unused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.
