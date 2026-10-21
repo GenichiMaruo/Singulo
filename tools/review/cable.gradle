@@ -1,0 +1,16 @@
+// Development only: exclude the client fixture from normal builds and distribution JARs.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/cable-src'))
+        neoForge.runs.client {
+            gameDirectory = file('build/gui-review')
+            systemProperty 'singulo.guiReviewOutput', file('build/gui-review/cable-screenshots').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}
