@@ -279,6 +279,10 @@ public final class SinguloClient {
                 io.github.genichimaruo.singulo.registry.SinguloItems.AREA_CARD.get(), Singulo.id("recorded"),
                 (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.AreaCardItem.box(stack) != null ? 1
                         : io.github.genichimaruo.singulo.android.work.AreaCardItem.first(stack) != null ? 0.5F : 0));
+        // 測量メガネ: 掛ける高さごとに、頭の模型を切り替える
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.SURVEY_GLASSES.get(), Singulo.id("height"),
+                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.heightPredicate(stack)));
         // 移設レンチ: ケーブル撤去モードは表示灯が橙の絵
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.RELOCATION_WRENCH.get(), Singulo.id("mode"),

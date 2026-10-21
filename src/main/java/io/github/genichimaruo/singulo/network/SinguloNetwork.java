@@ -10,6 +10,7 @@ public final class SinguloNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar r = event.registrar("1");
         r.playToServer(ToggleAreaPayload.TYPE, ToggleAreaPayload.STREAM_CODEC, ToggleAreaPayload::handle);
+        r.playToServer(GlassesHeightPayload.TYPE, GlassesHeightPayload.STREAM_CODEC, GlassesHeightPayload::handle);
         r.playToClient(RecordsPayload.TYPE, RecordsPayload.STREAM_CODEC, RecordsPayload::handle);
         r.playToClient(GalaxyPayload.TYPE, GalaxyPayload.STREAM_CODEC, GalaxyPayload::handle);
         r.playToClient(EndingPayload.TYPE, EndingPayload.STREAM_CODEC, EndingPayload::handle);

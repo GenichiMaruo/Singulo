@@ -1141,6 +1141,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     bouquetWrap(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
                     vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
                 }
+                if (acc.style().equals("glasses")) {
+                    glassesLenses(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
+                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                }
                 pose.popPose();
             }
         }
@@ -1162,6 +1166,13 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     {-1.57F, -0.85F, -2.9F, -1.3F, 1.85F, -2.5F}, {1.3F, -0.85F, -2.9F, 1.57F, 1.85F, -2.5F}};
             for (float[] q : rim) {
                 FxDraw.box(pose, vc, q[0] * P, q[1] * P, q[2] * P, q[3] * P, q[4] * P, q[5] * P, light, edge, 130);
+            }
+        }
+
+        /** メガネのレンズ（縁の内側に、うっすら水色に透ける板）。縁は draw の "glasses"。 */
+        private void glassesLenses(PoseStack pose, VertexConsumer vc, int light) {
+            for (float x0 : new float[] {-3.25F, 0.85F}) {
+                FxDraw.box(pose, vc, x0 * P, -3.15F * P, -3.8F * P, (x0 + 2.4F) * P, -1.05F * P, -3.74F * P, light, 0xD2ECFF, 70);
             }
         }
 
@@ -1226,6 +1237,15 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     }
                     b(pose, vc, light, -4.6F, -8.4F, -1.8F, -4.2F, -6.8F, -1.0F, dark);
                     b(pose, vc, light, 4.2F, -8.4F, -1.8F, 4.6F, -6.8F, -1.0F, dark);
+                }
+                case "glasses" -> {
+                    // 目（x -3〜-1・1〜3、y -3〜-1）を囲む四角い縁2つ、ブリッジ、髪の中へ消えるつる。顔の前の面（z -3.5）より少し前
+                    float z0 = -3.9F, z1 = -3.62F;
+                    ring(pose, vc, light, -3.75F, -3.6F, -0.35F, -0.6F, -3.25F, -3.15F, -0.85F, -1.05F, z0, z1, c);
+                    ring(pose, vc, light, 0.35F, -3.6F, 3.75F, -0.6F, 0.85F, -3.15F, 3.25F, -1.05F, z0, z1, c);
+                    b(pose, vc, light, -0.35F, -2.75F, z0 + 0.05F, 0.35F, -2.35F, z1 - 0.05F, c);
+                    b(pose, vc, light, -4.1F, -2.75F, z0, -3.75F, -2.35F, 0.5F, dark);
+                    b(pose, vc, light, 3.75F, -2.75F, z0, 4.1F, -2.35F, 0.5F, dark);
                 }
                 // ---- 背中（胴の箱: x -3〜3、y -8〜0、z -1.5〜1.5。後ろは +z）
                 case "cape" -> {

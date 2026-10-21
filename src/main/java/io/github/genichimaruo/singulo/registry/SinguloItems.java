@@ -95,6 +95,9 @@ public final class SinguloItems {
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_HEADDRESS = ITEMS.register(
             "android_headdress", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "headdress", 0xF5F5F5));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_GLASSES = ITEMS.register(
+            "android_glasses", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "glasses", 0x3A3F4A));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAPE = ITEMS.register(
             "android_cape", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "cape", 0x8E2F3F));
@@ -118,7 +121,7 @@ public final class SinguloItems {
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "umbrella", 0x4A78C8));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<DeferredItem<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
-            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA);
+            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
@@ -198,6 +201,7 @@ public final class SinguloItems {
             Map.entry("android_ribbon", 1),
             Map.entry("android_hair_flower", 1),
             Map.entry("android_beret", 1),
+            Map.entry("android_glasses", 1),
             Map.entry("android_headdress", 1),
             Map.entry("android_cape", 1),
             Map.entry("android_scarf", 1),

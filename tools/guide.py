@@ -1073,14 +1073,14 @@ CHAPTERS = [
         ('decor', 'アンドロイドの装飾',
          'アンドロイドの画面の、名前の左のボタンでページを切り替えると、3枚目が「装飾」のページ。頭・背中/腰・手の枠に装飾を着けられる。'
          '戦い・作業には影響しない。どれも作業台で作り、染料と一緒に作業台で染められる（革の防具と同じ）。\n'
-         '・頭: リボン・髪飾り・ベレー帽・ヘッドドレス\n'
+         '・頭: リボン・髪飾り・ベレー帽・ヘッドドレス・メガネ\n'
          '・背中/腰: マント・マフラー・腰リボン（マントとマフラーの垂れは、歩くとなびく）\n'
          '・手: 文庫本・花束・ティーカップ・傘（待機している間だけ持つ。戦い・作業・充電の間はしまう）',
          'Android decorations',
          'Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand '
          'slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like '
          'leather armor.\n'
-         '- Head: ribbon, hair flower, beret or headdress\n'
+         '- Head: ribbon, hair flower, beret, headdress or glasses\n'
          '- Back/waist: cape, scarf or waist ribbon (the cape and the scarf\'s tail flutter as it walks)\n'
          '- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)'),
         ('glass', 'アンドロイド用のガラス',

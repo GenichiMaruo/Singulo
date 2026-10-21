@@ -150,6 +150,7 @@ MOD = {
     'リボン': ('android_ribbon', 'Ribbon', 'tool'),
     '髪飾り': ('android_hair_flower', 'Hair Flower', 'tool'),
     'ベレー帽': ('android_beret', 'Beret', 'tool'),
+    'メガネ': ('android_glasses', 'Glasses', 'tool'),
     'ヘッドドレス': ('android_headdress', 'Headdress', 'tool'),
     'マント': ('android_cape', 'Cape', 'tool'),
     'マフラー': ('android_scarf', 'Scarf', 'tool'),

@@ -1253,7 +1253,7 @@ def felling_icon(Image):
 # ---------------------------------------------------------------- アンドロイドの装飾
 
 ACCESSORY_IDS = ('android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
-                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella')
+                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella', 'android_glasses')
 
 
 # 2枚の層を合わせた外形で、上下中央に寄せる装飾
@@ -1501,6 +1501,20 @@ def accessory_icons(Image):
         d.load()[p] = wood_dark
     d.load()[5, 12] = wood_dark
     out['android_umbrella'] = (b, d)
+    # メガネ: 四角い縁2つとブリッジ・つる（染める）、水色に透けるレンズ
+    b, d = new(), new()
+    for x0 in (1, 9):
+        rect(b, x0, 5, x0 + 5, 5, E)
+        rect(b, x0, 10, x0 + 5, 10, E)
+        rect(b, x0, 5, x0, 10, E)
+        rect(b, x0 + 5, 5, x0 + 5, 10, E)
+        rect(b, x0 + 1, 6, x0 + 4, 6, W)
+        rect(d, x0 + 1, 7, x0 + 4, 9, (190, 226, 250, 150))
+        rect(d, x0 + 1, 7, x0 + 1, 7, (250, 254, 255, 220))
+    rect(b, 7, 6, 8, 6, W)
+    rect(b, 0, 6, 0, 7, E)
+    rect(b, 15, 6, 15, 7, E)
+    out['android_glasses'] = (b, d)
     return out
 
 

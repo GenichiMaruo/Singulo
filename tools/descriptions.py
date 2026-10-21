@@ -550,6 +550,8 @@ DESC = {
         'A beret for an android\'s head. Goes in the decoration page. Dye it with dyes on a crafting table.'),
     'ヘッドドレス': ('アンドロイドの頭に着ける、ひだ飾りのヘッドドレス。装飾のページの枠に着ける。染料と一緒に作業台で染められる。',
         'A frilled headdress for an android\'s head. Goes in the decoration page. Dye it with dyes on a crafting table.'),
+    'メガネ': ('アンドロイドの目にかける四角いメガネ（レンズは水色に透ける）。装飾のページの頭の枠に着ける。染料と一緒に作業台で染められる（縁の色）。',
+        'Square glasses for an android, with clear light-blue lenses. Goes in the head slot of the decoration page. Dye the frames with dyes on a crafting table.'),
     'マント': ('アンドロイドの肩から背中へ垂れるマント。歩くとなびく。装飾のページの枠に着ける。染料と一緒に作業台で染められる。',
         'A cape hanging from an android\'s shoulders that flutters as it walks. Goes in the decoration page. Dye it with dyes on a crafting table.'),
     'マフラー': ('アンドロイドの首に巻くマフラー。装飾のページの枠に着ける。染料と一緒に作業台で染められる。',

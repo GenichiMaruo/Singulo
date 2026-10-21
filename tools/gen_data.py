@@ -871,7 +871,7 @@ UI_LANG = {
     'gui.singulo.android.decor.0': ('頭', 'Head'),
     'gui.singulo.android.decor.1': ('背中・腰', 'Back / waist'),
     'gui.singulo.android.decor.2': ('手', 'Hand'),
-    'gui.singulo.android.decor.0.hint': ('リボン・髪飾り・ベレー帽・ヘッドドレス', 'Ribbon, hair flower, beret or headdress'),
+    'gui.singulo.android.decor.0.hint': ('リボン・髪飾り・ベレー帽・ヘッドドレス・メガネ', 'Ribbon, hair flower, beret, headdress or glasses'),
     'gui.singulo.android.decor.1.hint': ('マント・マフラー・腰リボン', 'Cape, scarf or waist ribbon'),
     'gui.singulo.android.decor.2.hint': ('文庫本・花束・ティーカップ・傘（待機している間だけ持つ）', 'Paperback, bouquet, teacup or umbrella (held only while idle)'),
     'gui.singulo.android.decor.dye': ('染料と一緒に作業台で染められる', 'Dye them with dyes on a crafting table'),
@@ -894,6 +894,12 @@ UI_LANG = {
     'tooltip.singulo.area_card.size': ('大きさ: %s×%s×%s', 'Size: %s×%s×%s'),
     'tooltip.singulo.area_card.hint': ('シフト右クリックで記録し直す。何もない所でシフト右クリックで消す。測量メガネを掛けると範囲が見える', 'Sneak-use to record again; sneak-use on nothing to clear. Wear Survey Glasses to see the area'),
     'tooltip.singulo.survey_glasses': ('頭に掛けると、手に持った範囲カード・作業位置カードの場所と、アンドロイドの作業の印が見える', 'Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing'),
+    'gui.singulo.glasses.hint': ('1ピクセルずつ上下に動かせる。高さはメガネに残り、ほかの人にも同じに見える', 'Moves one pixel at a time. The height stays with the glasses and others see it too.'),
+    'gui.singulo.glasses.reset': ('戻す', 'Reset'),
+    'gui.singulo.glasses.height': ('%s ピクセル', '%s px'),
+    'gui.singulo.glasses.title': ('測量メガネの高さ', 'Survey Glasses Height'),
+    'tooltip.singulo.survey_glasses.adjust': ('持ってスニークして使うと、掛ける高さを変えられる', 'Sneak-use while holding it to change how high it sits.'),
+    'tooltip.singulo.survey_glasses.height': ('掛ける高さ: %s ピクセル', 'Worn height: %s px'),
     'tooltip.singulo.recipe_card.empty': ('まだ記録していない（作業指令台の「記録」で記録する）', 'Blank: record a recipe in a work console\'s Record tab'),
     'message.singulo.work_location.cleared': ('記録を消した', 'Cleared the record'),
     'message.singulo.recipe_card.cleared': ('レシピを消した', 'Cleared the recipe'),
@@ -2976,10 +2982,26 @@ def glasses_item_model():
             box([13.8, 9.0, fz0 + 0.1], [14.4, 9.4, fz0 + 0.5], [0, 8, 2, 10])]               # 表示灯
     write_json(ASSETS / 'models' / 'item' / f'{iid}_worn.json', {
         'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t, 'elements': els})
-    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
-        'loader': 'neoforge:separate_transforms',
-        'base': {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}},
-        'perspectives': {'head': {'parent': f'{MODID}:item/{iid}_worn'}}})
+
+    def held(worn):
+        return {'loader': 'neoforge:separate_transforms',
+                'base': {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}},
+                'perspectives': {'head': {'parent': f'{MODID}:item/{worn}'}}}
+    # 掛ける高さ（ピクセル。Java の SurveyGlassesItem.MIN_HEIGHT〜MAX_HEIGHT）ごとに、頭の模型を上下にずらした版。
+    # 頭の模型の 1.6 が頭の1ピクセル。アイテムの絵の切り替え singulo:height（高さを 0〜1 にした値）で選ぶ
+    lo, hi = -4, 4
+    overrides = []
+    for h in range(lo, hi + 1):
+        name = f'{iid}_worn' if h == 0 else f'{iid}_worn_{"up" if h > 0 else "down"}{abs(h)}'
+        if h != 0:
+            moved = [{**e, 'from': [e['from'][0], round(e['from'][1] + 1.6 * h, 3), e['from'][2]],
+                      'to': [e['to'][0], round(e['to'][1] + 1.6 * h, 3), e['to'][2]]} for e in els]
+            write_json(ASSETS / 'models' / 'item' / f'{name}.json', {
+                'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t, 'elements': moved})
+        variant = f'{iid}_h' + ('0' if h == 0 else ('p' if h > 0 else 'm') + str(abs(h)))
+        write_json(ASSETS / 'models' / 'item' / f'{variant}.json', held(name))
+        overrides.append({'predicate': {f'{MODID}:height': round((h - lo) / (hi - lo), 4)}, 'model': f'{MODID}:item/{variant}'})
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {**held(f'{iid}_worn'), 'overrides': overrides})
 
 
 def compass_item_model():
@@ -3456,7 +3478,7 @@ TAB_GROUPS = [
                  'android_mining_upgrade', 'android_felling_upgrade',
                  'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
                  'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
-                 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
+                 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_glasses', 'android_cape', 'android_scarf',
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',
                  'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),

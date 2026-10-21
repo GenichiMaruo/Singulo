@@ -1527,6 +1527,10 @@
     "source": "Patterned glass that only androids can pass.",
     "translation": "안드로이드만 지나갈 수 있는 무늬 유리."
   },
+  "desc.singulo.android_glasses": {
+    "source": "Square glasses for an android, with clear light-blue lenses. Goes in the head slot of the decoration page. Dye the frames with dyes on a crafting table.",
+    "translation": "안드로이드의 눈에 씌우는 네모난 안경(렌즈는 하늘색으로 비친다). 장식 페이지의 머리 칸에 단다. 염료와 함께 제작대에서 염색할 수 있다(테의 색)."
+  },
   "desc.singulo.android_hair_flower": {
     "source": "A flower hair ornament worn on the right side of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
     "translation": "안드로이드 머리 오른쪽에 다는 꽃 머리 장식.장식 페이지의 칸에 답니다. 염료와 함께 제작대에서 물들일 수 있습니다."
@@ -3240,8 +3244,8 @@
     "translation": "머리"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret or headdress",
-    "translation": "리본·머리 장식·베레모·헤드드레스"
+    "source": "Ribbon, hair flower, beret, headdress or glasses",
+    "translation": "리본·머리 장식·베레모·헤드드레스·안경"
   },
   "gui.singulo.android.decor.1": {
     "source": "Back / waist",
@@ -4482,6 +4486,22 @@
   "gui.singulo.genesis.unformed": {
     "source": "Not formed (surround the core with 8 frames and 12 pylons)",
     "translation": "형성되지 않음 (프레임 8개와 기둥 12개로 코어를 둘러쌀 것)"
+  },
+  "gui.singulo.glasses.height": {
+    "source": "%s px",
+    "translation": "%s 픽셀"
+  },
+  "gui.singulo.glasses.hint": {
+    "source": "Moves one pixel at a time. The height stays with the glasses and others see it too.",
+    "translation": "1픽셀씩 위아래로 움직일 수 있다. 높이는 안경에 남고, 다른 사람에게도 똑같이 보인다"
+  },
+  "gui.singulo.glasses.reset": {
+    "source": "Reset",
+    "translation": "초기화"
+  },
+  "gui.singulo.glasses.title": {
+    "source": "Survey Glasses Height",
+    "translation": "측량 안경 높이"
   },
   "gui.singulo.guardian.active": {
     "source": "The guardian is already awake",
@@ -6148,8 +6168,8 @@
     "translation": "충전·수리·장비"
   },
   "guide.singulo.androids.decor.body": {
-    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret or headdress\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
-    "translation": "안드로이드 화면에서 이름 왼쪽의 버튼으로 페이지를 바꾸면, 3번째가 \"장식\" 페이지입니다. 머리·등/허리·손 칸에 장식을 달 수 있습니다. 전투·작업에는 영향이 없습니다. 모두 제작대에서 만들고, 염료와 함께 제작대에서 물들일 수 있습니다(가죽 방어구와 같음).\n・머리: 리본·머리 장식·베레모·헤드드레스\n・등/허리: 망토·목도리·허리 리본(망토와 목도리 끝은 걸으면 나부낍니다)\n・손: 문고본·꽃다발·찻잔·우산(대기 중에만 듭니다. 전투·작업·충전 중에는 넣어 둡니다)"
+    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret, headdress or glasses\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
+    "translation": "안드로이드 화면에서 이름 왼쪽의 버튼으로 페이지를 바꾸면, 3번째가 \"장식\" 페이지입니다. 머리·등/허리·손 칸에 장식을 달 수 있습니다. 전투·작업에는 영향이 없습니다. 모두 제작대에서 만들고, 염료와 함께 제작대에서 물들일 수 있습니다(가죽 방어구와 같음).\n・머리: 리본·머리 장식·베레모·헤드드레스·안경\n・등/허리: 망토·목도리·허리 리본(망토와 목도리 끝은 걸으면 나부낍니다)\n・손: 문고본·꽃다발·찻잔·우산(대기 중에만 듭니다. 전투·작업·충전 중에는 넣어 둡니다)"
   },
   "guide.singulo.androids.decor.title": {
     "source": "Android decorations",
@@ -6806,6 +6826,10 @@
   "howto.singulo.android_gate_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "제작: 제작대(2단계)"
+  },
+  "howto.singulo.android_glasses": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.android_hair_flower": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -7882,6 +7906,10 @@
   "item.singulo.android_gas_tank_upgrade": {
     "source": "Gas Tank Upgrade",
     "translation": "가스 탱크 업그레이드"
+  },
+  "item.singulo.android_glasses": {
+    "source": "Glasses",
+    "translation": "안경"
   },
   "item.singulo.android_hair_flower": {
     "source": "Hair Flower",
@@ -10566,6 +10594,14 @@
   "tooltip.singulo.survey_glasses": {
     "source": "Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing",
     "translation": "머리에 쓰면 손에 든 범위 카드·작업 위치 카드가 기록한 장소와 안드로이드의 작업 표시가 보입니다"
+  },
+  "tooltip.singulo.survey_glasses.adjust": {
+    "source": "Sneak-use while holding it to change how high it sits.",
+    "translation": "든 채 웅크리고 사용하면 착용 높이를 바꿀 수 있다"
+  },
+  "tooltip.singulo.survey_glasses.height": {
+    "source": "Worn height: %s px",
+    "translation": "착용 높이: %s 픽셀"
   },
   "tooltip.singulo.uses": {
     "source": "Uses %s / %s",

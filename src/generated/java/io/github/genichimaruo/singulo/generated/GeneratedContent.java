@@ -314,6 +314,7 @@ public final class GeneratedContent {
             "android_hair_flower",
             "android_beret",
             "android_headdress",
+            "android_glasses",
             "android_cape",
             "android_scarf",
             "android_waist_ribbon",

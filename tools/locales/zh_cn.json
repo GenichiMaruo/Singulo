@@ -1527,6 +1527,10 @@
     "source": "Patterned glass that only androids can pass.",
     "translation": "只有仿生人可以通过的花纹玻璃。"
   },
+  "desc.singulo.android_glasses": {
+    "source": "Square glasses for an android, with clear light-blue lenses. Goes in the head slot of the decoration page. Dye the frames with dyes on a crafting table.",
+    "translation": "戴在仿生人眼睛上的方形眼镜（镜片透出淡蓝色）。装在装饰页的头部栏位。可与染料一起在工作台染色（镜框颜色）。"
+  },
   "desc.singulo.android_hair_flower": {
     "source": "A flower hair ornament worn on the right side of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
     "translation": "戴在仿生人头部右侧的花朵发饰。放入装饰页的栏位。可与染料一起在工作台染色。"
@@ -3240,8 +3244,8 @@
     "translation": "头部"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret or headdress",
-    "translation": "缎带、发饰、贝雷帽、头饰"
+    "source": "Ribbon, hair flower, beret, headdress or glasses",
+    "translation": "缎带、发饰、贝雷帽、头饰、眼镜"
   },
   "gui.singulo.android.decor.1": {
     "source": "Back / waist",
@@ -4482,6 +4486,22 @@
   "gui.singulo.genesis.unformed": {
     "source": "Not formed (surround the core with 8 frames and 12 pylons)",
     "translation": "未成形（用8个框架和12根支柱围住核心）"
+  },
+  "gui.singulo.glasses.height": {
+    "source": "%s px",
+    "translation": "%s 像素"
+  },
+  "gui.singulo.glasses.hint": {
+    "source": "Moves one pixel at a time. The height stays with the glasses and others see it too.",
+    "translation": "每次上下移动1像素。高度保存在眼镜上，其他人看到的也一样"
+  },
+  "gui.singulo.glasses.reset": {
+    "source": "Reset",
+    "translation": "重置"
+  },
+  "gui.singulo.glasses.title": {
+    "source": "Survey Glasses Height",
+    "translation": "测量眼镜高度"
   },
   "gui.singulo.guardian.active": {
     "source": "The guardian is already awake",
@@ -6148,8 +6168,8 @@
     "translation": "充电、修理与装备"
   },
   "guide.singulo.androids.decor.body": {
-    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret or headdress\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
-    "translation": "在仿生人界面中用名字左边的按钮切换页面，第 3 页是“装饰”页。可在头部、背部/腰部、手部的栏位装上装饰。不影响战斗和作业。全部在工作台制作，可与染料一起在工作台染色（与皮革盔甲相同）。\n・头部：缎带、发饰、贝雷帽、头饰\n・背部/腰部：披风、围巾、腰部缎带（披风和围巾的末端行走时会飘动）\n・手部：文库本、花束、茶杯、伞（仅在待机时拿着。战斗、作业、充电时会收起）"
+    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret, headdress or glasses\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
+    "translation": "在仿生人界面中用名字左边的按钮切换页面，第 3 页是“装饰”页。可在头部、背部/腰部、手部的栏位装上装饰。不影响战斗和作业。全部在工作台制作，可与染料一起在工作台染色（与皮革盔甲相同）。\n・头部：缎带、发饰、贝雷帽、头饰、眼镜\n・背部/腰部：披风、围巾、腰部缎带（披风和围巾的末端行走时会飘动）\n・手部：文库本、花束、茶杯、伞（仅在待机时拿着。战斗、作业、充电时会收起）"
   },
   "guide.singulo.androids.decor.title": {
     "source": "Android decorations",
@@ -6806,6 +6826,10 @@
   "howto.singulo.android_gate_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.android_glasses": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
   },
   "howto.singulo.android_hair_flower": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -7882,6 +7906,10 @@
   "item.singulo.android_gas_tank_upgrade": {
     "source": "Gas Tank Upgrade",
     "translation": "气体储罐升级"
+  },
+  "item.singulo.android_glasses": {
+    "source": "Glasses",
+    "translation": "眼镜"
   },
   "item.singulo.android_hair_flower": {
     "source": "Hair Flower",
@@ -10566,6 +10594,14 @@
   "tooltip.singulo.survey_glasses": {
     "source": "Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing",
     "translation": "戴在头上时，可以看到手中范围卡・作业位置卡记录的地点，以及仿生人作业的标记"
+  },
+  "tooltip.singulo.survey_glasses.adjust": {
+    "source": "Sneak-use while holding it to change how high it sits.",
+    "translation": "手持时潜行使用可调整佩戴高度"
+  },
+  "tooltip.singulo.survey_glasses.height": {
+    "source": "Worn height: %s px",
+    "translation": "佩戴高度：%s 像素"
   },
   "tooltip.singulo.uses": {
     "source": "Uses %s / %s",
