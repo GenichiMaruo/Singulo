@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * 設定カード: 装置の設定を写して、ほかの装置に貼る。スニークして装置に使うと写し、そのまま使うと貼る。
- * 写せるのは、装置の面の設定（搬入出と自動排出）と、Pリアクターのスピンの目標と投入間隔。
+ * 写せるのは、装置の面の設定（搬入出と自動排出）と作るものの指定（同じ種類の装置だけ）、Pリアクターのスピンの目標と投入間隔。
  */
 public class SettingsCardItem extends SinguloItem {
     private static final String KEY = "settings";
@@ -47,6 +47,10 @@ public class SettingsCardItem extends SinguloItem {
             if (be instanceof MachineBlockEntity m) {
                 tag.putInt("item_sides", m.itemSides().packed());
                 tag.putIntArray("tank_sides", m.tankSidesPacked());
+                tag.putString("machine_type", m.type().id());
+                if (m.selectedRecipe() != null) {
+                    tag.putString("selected_recipe", m.selectedRecipe().toString());
+                }
             } else if (be instanceof PenroseReactorBlockEntity r) {
                 tag.putInt("spin_target", r.spinTargetIndex());
                 tag.putInt("feed_interval", r.feedInterval());
@@ -67,6 +71,10 @@ public class SettingsCardItem extends SinguloItem {
         }
         if (be instanceof MachineBlockEntity m) {
             m.pasteSides(tag.getInt("item_sides"), tag.getIntArray("tank_sides"));
+            if (m.type().id().equals(tag.getString("machine_type"))) {
+                m.pasteSelectedRecipe(tag.contains("selected_recipe")
+                        ? net.minecraft.resources.ResourceLocation.tryParse(tag.getString("selected_recipe")) : null);
+            }
         } else if (be instanceof PenroseReactorBlockEntity r) {
             r.setSpinTargetIndex(tag.getInt("spin_target"));
             r.setFeedInterval(tag.getInt("feed_interval"));

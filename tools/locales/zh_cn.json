@@ -4887,6 +4887,10 @@
     "source": "Not formed",
     "translation": "未形成"
   },
+  "gui.singulo.reason.ambiguous": {
+    "source": "The materials for %s are in, but the same mix appears while loading other recipes, so it is not made automatically.",
+    "translation": "%s 的材料已齐，但与放入其他配方材料途中的组合相同，因此不会自动制作"
+  },
   "gui.singulo.reason.arrange": {
     "source": "- The amounts are there. Try putting each material in its own slot.",
     "translation": "・数量已经足够。请试着把每种材料分别放进不同的槽位。"
@@ -4894,6 +4898,18 @@
   "gui.singulo.reason.empty": {
     "source": "Put in materials to start",
     "translation": "放入材料即可开始运作"
+  },
+  "gui.singulo.reason.extra": {
+    "source": "The materials for %s are in, but so are items it does not use, so it is not made automatically.",
+    "translation": "%s 的材料已齐，但还放有用不到的物品，因此不会自动制作"
+  },
+  "gui.singulo.reason.label.ambiguous": {
+    "source": "Pick a recipe",
+    "translation": "请指定配方"
+  },
+  "gui.singulo.reason.label.extra": {
+    "source": "Extra items",
+    "translation": "多余材料"
   },
   "gui.singulo.reason.label.missing": {
     "source": "Missing input",
@@ -4942,6 +4958,10 @@
   "gui.singulo.reason.output_full": {
     "source": "The output slot or tank is full. Take things out, or turn on auto-eject in the side settings.",
     "translation": "输出槽或输出储罐已满。请取出物品，或在面设置中开启自动输出。"
+  },
+  "gui.singulo.reason.select_hint": {
+    "source": "Pick what to make with the button below the output.",
+    "translation": "请用输出栏下方的按钮指定要制作的物品"
   },
   "gui.singulo.reason.too_small": {
     "source": "- Needs size %s or more (now %s)",
@@ -5238,6 +5258,50 @@
   "gui.singulo.route.zone.hint": {
     "source": "No-entry zone (Area Card, up to 2): androids stay out of it while moving through the waypoint (unless they start or end inside it)",
     "translation": "禁入区域（范围卡，最多 2 个）：经过途经点的移动期间不进入这里（包含出发地或目的地的区域除外）"
+  },
+  "gui.singulo.select.auto": {
+    "source": "Make: automatic",
+    "translation": "制作目标：自动"
+  },
+  "gui.singulo.select.auto_hint": {
+    "source": "Makes only a recipe that uses everything inside, and never one whose mix also appears partway through another recipe.",
+    "translation": "只制作会用到全部已放入物品的配方，不制作与其他配方中途相同的材料组合"
+  },
+  "gui.singulo.select.auto_short": {
+    "source": "A",
+    "translation": "自"
+  },
+  "gui.singulo.select.button_hint": {
+    "source": "Click to choose; right-click for automatic.",
+    "translation": "单击选择，右键恢复自动"
+  },
+  "gui.singulo.select.fixed": {
+    "source": "Make: %s",
+    "translation": "制作目标：%s"
+  },
+  "gui.singulo.select.fixed_hint": {
+    "source": "Makes only this recipe; anything else inside is left alone.",
+    "translation": "只制作这个配方，放入的其他物品不会被使用"
+  },
+  "gui.singulo.select.fluid": {
+    "source": "- %s %s mB",
+    "translation": "・%s %s mB"
+  },
+  "gui.singulo.select.item": {
+    "source": "- %s x%s",
+    "translation": "・%s ×%s"
+  },
+  "gui.singulo.select.restore": {
+    "source": "- Restores: %s",
+    "translation": "・修复对象：%s"
+  },
+  "gui.singulo.select.title": {
+    "source": "Make",
+    "translation": "制作目标"
+  },
+  "gui.singulo.select.uses": {
+    "source": "- %s (%s uses)",
+    "translation": "・%s（%s 次）"
   },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",

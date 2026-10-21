@@ -50,7 +50,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      * D_STRUCTURE はマルチブロックの大きさ（-1 = マルチブロックでない、0 = 未形成）。D_FLAGS は FLAG_* のビット。
      */
     public static final int D_PROGRESS = 0, D_MAX_PROGRESS = 1, D_ENERGY = 2, D_CAPACITY = 3, D_USAGE = 4,
-            D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_TANKS = 11;
+            D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_SELECTED = 11,
+            D_TANKS = 12;
     /** 動かす（電源スイッチ）・材料なしのレシピも作る・材料なしのレシピがある。 */
     public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
@@ -88,6 +89,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private boolean makeFree = true;
     /** この装置に材料のいらないレシピがあるか（画面にスイッチを出すか）。 */
     private boolean hasFree;
+    /** 指定した作るもの（{@link MachineType#selectsRecipe()} の装置だけ）。null なら自動で選ぶ。 */
+    @Nullable
+    private ResourceLocation selectedRecipe;
 
     public MachineBlockEntity(BlockPos pos, BlockState state) {
         this(SinguloBlockEntities.MACHINE.get(), pos, state);
@@ -601,7 +605,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 boolean free = isFree(r);
                 hasFree |= free;
                 if (r.isMassRecipe() || !sizeAllows(r) || r.plan(inputs) == null || !fluidsAvailable(r)
-                        || free && !makeFree || found != null) {
+                        || free && !makeFree || found != null || !selectionAllows(level, holder, inputs)) {
                     continue;
                 }
                 if (canOutput(r)) {
@@ -645,6 +649,57 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                         / (hasMonopole() ? 1.5 : 1.0) * (hasOverclock() ? 4.0 : 1.0));
             }
         }
+    }
+
+    /**
+     * 作るものを選べる装置で、このレシピを作ってよいか（{@link RecipeSelection}）。指定があればそのレシピだけ、
+     * なければ入っている物をすべて使い、ほかのレシピの途中になりえないものだけ。
+     */
+    private boolean selectionAllows(Level level, RecipeHolder<MachineRecipe> holder, List<ItemStack> inputs) {
+        if (!type.selectsRecipe()) {
+            return true;
+        }
+        if (selectedRecipe != null) {
+            return holder.id().equals(selectedRecipe);
+        }
+        MachineRecipe.Plan plan = holder.value().plan(inputs);
+        return plan != null && RecipeSelection.usesEveryInput(type, inputs, plan)
+                && !RecipeSelection.ambiguous(level, type, holder);
+    }
+
+    /** 作るものを指定する（GUIから）。index は {@link RecipeSelection#selectable} の番号、範囲外なら指定を外す。 */
+    public void selectRecipe(int index) {
+        if (!type.selectsRecipe() || level == null) {
+            return;
+        }
+        RecipeHolder<MachineRecipe> holder = RecipeSelection.byIndex(level, type, index);
+        selectedRecipe = holder == null ? null : holder.id();
+        selectedIndex = -2;
+        markDirty();
+    }
+
+    /** 指定したレシピの {@link RecipeSelection#selectable} での番号（-1 = 指定なし）。同期のたびに探さないよう覚えておく。 */
+    private int selectedIndex = -2;
+
+    private int selectedIndex() {
+        if (selectedIndex == -2 && level != null) {
+            selectedIndex = RecipeSelection.indexOf(level, type, selectedRecipe);
+        }
+        return Math.max(-1, selectedIndex);
+    }
+
+    /** 設定カードから: 指定を貼る（同じ種類の装置でなければ何もしない）。 */
+    public void pasteSelectedRecipe(@Nullable ResourceLocation id) {
+        if (type.selectsRecipe()) {
+            selectedRecipe = id;
+            selectedIndex = -2;
+            markDirty();
+        }
+    }
+
+    @Nullable
+    public ResourceLocation selectedRecipe() {
+        return selectedRecipe;
     }
 
     /** 材料（アイテム・液体・質量・復元するもの）がいらず、電力だけで作るレシピか（冷却塔の液体窒素など）。 */
@@ -940,6 +995,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_MASS -> massTargetIsMetal() ? (int) Math.round(metalMass * 100) : (int) Math.round(mass * 100);
             case D_MASS_TARGET -> massTarget();
             case D_STRUCTURE -> structureSize();
+            case D_SELECTED -> selectedIndex() + 1;
             case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
                 if (index >= sidesIndex(type)) {
@@ -1052,6 +1108,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         tag.putInt("energy", energy.getEnergyStored());
         tag.putInt("progress", progress);
         tag.putInt("mode", mode);
+        if (selectedRecipe != null) {
+            tag.putString("selected_recipe", selectedRecipe.toString());
+        }
         tag.putDouble("mass", mass);
         tag.putDouble("metal_mass", metalMass);
         if (current != null) {
@@ -1135,6 +1194,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         energy.setEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
         mode = tag.getInt("mode");
+        selectedRecipe = tag.contains("selected_recipe") ? ResourceLocation.tryParse(tag.getString("selected_recipe")) : null;
+        selectedIndex = -2;
         mass = tag.getDouble("mass");
         metalMass = tag.getDouble("metal_mass");
         resumeRecipe = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;

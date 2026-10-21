@@ -14,6 +14,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class MachineMenu extends AbstractContainerMenu {
     public static final int BUTTON_CYCLE_MODE = 0, BUTTON_POWER = 1, BUTTON_MAKE_FREE = 2;
+    /** 作るものの指定を外す。BUTTON_SELECT + n は {@link RecipeSelection#selectable} の n 番を指定する。 */
+    public static final int BUTTON_CLEAR_SELECTION = 3, BUTTON_SELECT = 100;
 
     private final MachineType type;
     private final BlockPos pos;
@@ -110,8 +112,12 @@ public class MachineMenu extends AbstractContainerMenu {
             case BUTTON_CYCLE_MODE -> machine.cycleMode();
             case BUTTON_POWER -> machine.togglePower();
             case BUTTON_MAKE_FREE -> machine.toggleMakeFree();
+            case BUTTON_CLEAR_SELECTION -> machine.selectRecipe(-1);
             default -> {
-                return false;
+                if (id < BUTTON_SELECT) {
+                    return false;
+                }
+                machine.selectRecipe(id - BUTTON_SELECT);
             }
         }
         return true;
