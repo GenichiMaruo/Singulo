@@ -2608,8 +2608,8 @@
     "translation": "研究所的伺服器。有電時指示燈會閃爍。"
   },
   "desc.singulo.settings_card": {
-    "source": "Copies a machine's settings to another.",
-    "translation": "將一台機器的設定複製到另一台機器。"
+    "source": "Copies machine side and auto-eject settings, plus the recipe choice between machines of the same type. For a P-Reactor, copies the spin target and feed interval.",
+    "translation": "複製並貼上機器各面與自動排出的設定。同種機器之間也會複製配方選擇。用於彭羅斯反應爐時，複製目標自旋與投料間隔。"
   },
   "desc.singulo.shield_permit": {
     "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
@@ -2636,8 +2636,8 @@
     "translation": "5×5 的兩層底座；上層的邊緣可放置輸入輸出埠。"
   },
   "desc.singulo.shield_tower_waveguide": {
-    "source": "Middle of each body face; shows the rising energy.",
-    "translation": "位於塔身每一面的中央；可看到上升的能量。"
+    "source": "Middle of each body face and midway up the spire; shows the rising energy.",
+    "translation": "塔身各面的中央及尖塔中段；可看到上升的能量。"
   },
   "desc.singulo.singularity_core": {
     "source": "The tier 5 catalyst.",
@@ -6564,8 +6564,8 @@
     "translation": "第一階段：啟動"
   },
   "guide.singulo.stage1.flow.body": {
-    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: the tower uses about 240 FE/t to make liquid nitrogen. Add generators or run machines in turns.",
-    "translation": "這一階段要做的事（依序）：\n1. 製作鋼、陶瓷、基礎電路和基礎框架（見「最初的材料」）。\n2. 放置 2〜4 台熱電發電機，用銅導線連到裝置。岩漿塊＋藍冰不會融化，能長久使用。\n3. 備齊燒製爐、壓縮機（鋼板）和檔案終端。探索羅盤和全像投影器也先做好。\n4. 用探索羅盤找到地表觀測站，從保管庫帶回退化的控制單元和觀測日誌。\n5. 在檔案終端修復控制單元，製作低溫冷卻塔的零件，對照全像投影器組裝。\n6. 冷卻塔能做出「超導線圈」後，就進入第 2 階段。\n容易卡住的地方：\n・低溫側的方塊融化：岩漿，或營火配水、雪、冰，很快就會融化。請看「不會融化的組合」一頁。\n・冷卻塔組不起來：中心一列是熱交換核心，頂部是通風格柵。把全像投影器用在控制器上，就能看出缺了哪裡。\n・電力不足：冷卻塔製作液氮約需 240 FE/t。增加發電機，或讓裝置輪流運轉。"
+    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
+    "translation": "這一階段要做的事（依序）：\n1. 製作鋼、陶瓷、基礎電路和基礎框架（見「最初的材料」）。\n2. 放置 2〜4 台熱電發電機，用銅導線連到裝置。岩漿塊＋藍冰不會融化，能長久使用。\n3. 備齊燒製爐、壓縮機（鋼板）和檔案終端。探索羅盤和全像投影器也先做好。\n4. 用探索羅盤找到地表觀測站，從保管庫帶回退化的控制單元和觀測日誌。\n5. 在檔案終端修復控制單元，製作低溫冷卻塔的零件，對照全像投影器組裝。\n6. 冷卻塔能做出「超導線圈」後，就進入第 2 階段。\n容易卡住的地方：\n・低溫側的方塊融化：岩漿，或營火配水、雪、冰，很快就會融化。請看「不會融化的組合」一頁。\n・冷卻塔組不起來：中心一列是熱交換核心，頂部是通風格柵。把全像投影器用在控制器上，就能看出缺了哪裡。\n・電力不足：預設設定下，高度為 7 的冷卻塔連續製造液態氮時約需 1,786 FE/t。供電不足時會保留進度並等待，因此可以讓裝置交替運轉，並增加發電與儲電。"
   },
   "guide.singulo.stage1.flow.title": {
     "source": "Stage 1 at a glance",
@@ -6616,8 +6616,8 @@
     "translation": "粒子加速器與緲子催化劑"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和冷原子阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（電力不足時不會停止，只是變慢）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和冷原子阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（供電不足時保留進度並等待，因此平均產量會降低）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
@@ -8512,8 +8512,8 @@
     "translation": "潛行時使用以複製 · 直接使用以貼上"
   },
   "item.singulo.settings_card.holds.machine": {
-    "source": "Machine side settings",
-    "translation": "機器各面的設定"
+    "source": "Machine sides and recipe choice",
+    "translation": "機器各面及配方選擇的設定"
   },
   "item.singulo.settings_card.holds.reactor": {
     "source": "P-Reactor settings",

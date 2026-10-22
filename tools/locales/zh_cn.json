@@ -2608,8 +2608,8 @@
     "translation": "研究所的服务器。有电时指示灯会闪烁。"
   },
   "desc.singulo.settings_card": {
-    "source": "Copies a machine's settings to another.",
-    "translation": "将一台机器的设置复制到另一台机器。"
+    "source": "Copies machine side and auto-eject settings, plus the recipe choice between machines of the same type. For a P-Reactor, copies the spin target and feed interval.",
+    "translation": "复制并粘贴机器各面和自动排出的设置。同种机器之间还会复制配方选择。用于彭罗斯反应堆时，复制目标自旋和投料间隔。"
   },
   "desc.singulo.shield_permit": {
     "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
@@ -2636,8 +2636,8 @@
     "translation": "5×5 的两层底座；上层边缘可替换为 I/O 端口。"
   },
   "desc.singulo.shield_tower_waveguide": {
-    "source": "Middle of each body face; shows the rising energy.",
-    "translation": "塔身每个面的中央；可看到上升的能量。"
+    "source": "Middle of each body face and midway up the spire; shows the rising energy.",
+    "translation": "塔身各面的中央以及尖塔中段；可看到上升的能量。"
   },
   "desc.singulo.singularity_core": {
     "source": "The tier 5 catalyst.",
@@ -5401,7 +5401,7 @@
   },
   "gui.singulo.sides.hint": {
     "source": "Drag to rotate · click to change · right-click for auto-eject",
-    "translation": "拖动旋转 · 点击切换 · 右键切换自动弹出"
+    "translation": "拖动旋转 · 点击切换 · 右键切换自动排出"
   },
   "gui.singulo.sides.items": {
     "source": "Items",
@@ -5421,11 +5421,11 @@
   },
   "gui.singulo.sides.master_off": {
     "source": "Auto-eject OFF",
-    "translation": "自动弹出关闭"
+    "translation": "自动排出关闭"
   },
   "gui.singulo.sides.master_on": {
     "source": "Auto-eject ON",
-    "translation": "自动弹出开启"
+    "translation": "自动排出开启"
   },
   "gui.singulo.sides.mode.0": {
     "source": "Disabled",
@@ -6425,7 +6425,7 @@
   },
   "guide.singulo.power.sides.body": {
     "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. The master auto-eject switch defaults off; turn it on to push through output-capable faces with auto-eject enabled. Hover a face to see its adjacent block. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports. Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.",
-    "translation": "使用普通加工机屏幕中的“侧面”按钮将每个面设置为关闭/输入/输出/两者，并可选择自动弹出。多块使用指定的 I/O 端口； 彭罗斯反应堆 使用提取端口。输出两种气体的装置（如电解槽）可为每种气体单独设置输出面。电源按钮可让装置停止；能仅靠电力制造产物的装置有开关，可跳过这些配方。 自动排出的总开关默认关闭；开启后，会从允许自动排出的输出面向相邻方块搬出。将鼠标悬停在一个面上可查看相邻方块的名称。"
+    "translation": "使用普通加工机屏幕中的“侧面”按钮将每个面设置为关闭/输入/输出/两者，并可选择自动排出。多块使用指定的 I/O 端口； 彭罗斯反应堆 使用提取端口。输出两种气体的装置（如电解槽）可为每种气体单独设置输出面。电源按钮可让装置停止；能仅靠电力制造产物的装置有开关，可跳过这些配方。 自动排出的总开关默认关闭；开启后，会从允许自动排出的输出面向相邻方块搬出。将鼠标悬停在一个面上可查看相邻方块的名称。"
   },
   "guide.singulo.power.sides.title": {
     "source": "Side configuration",
@@ -6564,8 +6564,8 @@
     "translation": "第一阶段：启动"
   },
   "guide.singulo.stage1.flow.body": {
-    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: the tower uses about 240 FE/t to make liquid nitrogen. Add generators or run machines in turns.",
-    "translation": "这一阶段要做的事（按顺序）：\n1. 制作钢、陶瓷、基础电路和基础框架（见“最初的材料”）。\n2. 放置 2〜4 台热电发电机，用铜导线连到装置。岩浆块＋蓝冰不会融化，能长久使用。\n3. 备齐烧制炉、压缩机（钢板）和档案终端。探索罗盘和全息投影仪也先做好。\n4. 用探索罗盘找到地表观测站，从保管库带回退化的控制单元和观测日志。\n5. 在档案终端修复控制单元，制作低温冷却塔的部件，对照全息投影仪组装。\n6. 冷却塔能做出“超导线圈”后，就进入第 2 阶段。\n容易卡住的地方：\n・低温侧的方块融化：岩浆，或篝火配水、雪、冰，很快就会融化。请看“不会融化的组合”一页。\n・冷却塔组不起来：中心一列是热交换核心，顶部是通风格栅。把全息投影仪用在控制器上，就能看出缺了哪里。\n・电力不足：冷却塔制作液氮约需 240 FE/t。增加发电机，或让装置轮流运转。"
+    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
+    "translation": "这一阶段要做的事（按顺序）：\n1. 制作钢、陶瓷、基础电路和基础框架（见“最初的材料”）。\n2. 放置 2〜4 台热电发电机，用铜导线连到装置。岩浆块＋蓝冰不会融化，能长久使用。\n3. 备齐烧制炉、压缩机（钢板）和档案终端。探索罗盘和全息投影仪也先做好。\n4. 用探索罗盘找到地表观测站，从保管库带回退化的控制单元和观测日志。\n5. 在档案终端修复控制单元，制作低温冷却塔的部件，对照全息投影仪组装。\n6. 冷却塔能做出“超导线圈”后，就进入第 2 阶段。\n容易卡住的地方：\n・低温侧的方块融化：岩浆，或篝火配水、雪、冰，很快就会融化。请看“不会融化的组合”一页。\n・冷却塔组不起来：中心一列是热交换核心，顶部是通风格栅。把全息投影仪用在控制器上，就能看出缺了哪里。\n・电力不足：默认设置下，高度为 7 的冷却塔连续制造液氮时约需 1,786 FE/t。供电不足时会保留进度并等待，因此可以让装置交替运转，并增加发电和储能。"
   },
   "guide.singulo.stage1.flow.title": {
     "source": "Stage 1 at a glance",
@@ -6616,8 +6616,8 @@
     "translation": "粒子加速器和缪子催化剂"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "这一阶段要做的事：\n1. 制作精密组装台。第 3 阶段以后的部件和装置几乎都在这里制作。\n2. 用粒子加速器制作缪子束，用催化反应器制作缪子催化剂（第 2 级）。\n3. 制作缪子催化核聚变炉（4 kFE/t），用缪子催化剂和水增加电力。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半）。\n4. 把冷却塔加高到 10 以上，把压缩机粉碎深板岩得到的氦液化。\n5. 在地表观测站的保管库调整探索罗盘，寻找研究楼。收集量子数据片段和冷原子阱（打倒深处的回响守卫后保管库会打开）。\n6. 备齐量子计算模块和液氦，就进入第 3 阶段。\n趁现在：可以用仿生人组装站制作护卫（见仿生人一章）。也去找陨石坑（陨铁、星尘）和冰山（蓝冰）。\n容易卡住的地方：\n・做不出液氦：冷却塔高度不到 10 就无法制作。\n・冷却塔很慢：液氮每 1 mB 需要 250 FE。在核聚变炉建好之前，多放几台热电发电机（电力不足时不会停止，只是变慢）。\n・催化剂不能用或消耗很快：比装置低一级会变慢且消耗更快，低两级无法使用。"
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "这一阶段要做的事：\n1. 制作精密组装台。第 3 阶段以后的部件和装置几乎都在这里制作。\n2. 用粒子加速器制作缪子束，用催化反应器制作缪子催化剂（第 2 级）。\n3. 制作缪子催化核聚变炉（4 kFE/t），用缪子催化剂和水增加电力。催化剂消耗速度为 2 倍，新的催化剂可运转 10 分钟（用过的只运转剩余寿命的一半）。\n4. 把冷却塔加高到 10 以上，把压缩机粉碎深板岩得到的氦液化。\n5. 在地表观测站的保管库调整探索罗盘，寻找研究楼。收集量子数据片段和冷原子阱（打倒深处的回响守卫后保管库会打开）。\n6. 备齐量子计算模块和液氦，就进入第 3 阶段。\n趁现在：可以用仿生人组装站制作护卫（见仿生人一章）。也去找陨石坑（陨铁、星尘）和冰山（蓝冰）。\n容易卡住的地方：\n・做不出液氦：冷却塔高度不到 10 就无法制作。\n・冷却塔很慢：液氮每 1 mB 需要 250 FE。在核聚变炉建好之前，多放几台热电发电机（供电不足时保留进度并等待，因此平均产量会降低）。\n・催化剂不能用或消耗很快：比装置低一级会变慢且消耗更快，低两级无法使用。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
@@ -8512,8 +8512,8 @@
     "translation": "潜行使用以复制 · 直接使用以粘贴"
   },
   "item.singulo.settings_card.holds.machine": {
-    "source": "Machine side settings",
-    "translation": "机器各面的设置"
+    "source": "Machine sides and recipe choice",
+    "translation": "机器各面及配方选择的设置"
   },
   "item.singulo.settings_card.holds.reactor": {
     "source": "P-Reactor settings",

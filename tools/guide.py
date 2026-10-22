@@ -82,7 +82,7 @@ CHAPTERS = [
          'つまずきやすい所:\n'
          '・低温側のブロックが溶ける: 溶岩や、焚き火＋水・雪・氷は短い時間で溶ける。「溶けない組み合わせ」のページを見る。\n'
          '・冷却塔が組み上がらない: 中心の列は熱交換コア、てっぺんは通気格子。ホロ投影機をコントローラに使うと、足りない所が分かる。\n'
-         '・電力が足りない: 冷却塔は液体窒素を作るのに 240 FE/t ほど使う。発電機を増やすか、装置を交互に動かす。',
+         '・電力が足りない: 既定設定では高さ7の冷却塔は液体窒素の連続製造に約1,786 FE/t使う。給電不足なら進捗を保って待つので、装置を交互に動かし、発電機と蓄電を増やす。',
          'Stage 1 at a glance',
          'What to do, in order:\n'
          '1. Make steel, ceramic, basic circuits and basic frames (see "First materials").\n'
@@ -100,8 +100,8 @@ CHAPTERS = [
          'melt" page.\n'
          "- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Pr"
          'ojector on the controller to see what is missing.\n'
-         '- Not enough power: the tower uses about 240 FE/t to make liquid nitrogen. Add generators or run machines in t'
-         'urns.'),
+         '- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress '
+         'while waiting for power. Run machines in turns and add generation and storage.'),
         ('materials', '最初の素材',
          '1. 鉄と石炭で「鋼の素」を作り、溶鉱炉で鋼鉄インゴットにする。\n'
          '2. 粘土・ネザー水晶・骨粉・砂で「未焼成セラミック」を作り、かまどでホワイトセラミック複合材にする。'
@@ -176,7 +176,7 @@ CHAPTERS = [
          '今のうちに: アンドロイド組立ステーションで護衛を作れる（アンドロイドの章）。隕石クレーター（隕鉄・星屑）と氷山（青氷）も探しておく。\n'
          'つまずきやすい所:\n'
          '・液体ヘリウムができない: 冷却塔の高さが10未満だと作れない。\n'
-         '・冷却塔が遅い: 液体窒素は1 mBに250 FEかかる。核融合炉ができるまでは、熱電発電機を増やす（電力が足りなくても止まらず、遅くなるだけ）。\n'
+         '・冷却塔が遅い: 液体窒素は1 mBに250 FEかかる。核融合炉ができるまでは、熱電発電機を増やす（給電不足なら進捗を保って待つので、平均の生産速度が下がる）。\n'
          '・触媒が使えない・すぐ減る: 装置より1つ下のティアは遅く減りも速く、2つ下は使えない。',
          'Stage 2 at a glance',
          'What to do:\n'
@@ -193,7 +193,7 @@ CHAPTERS = [
          'Common sticking points:\n'
          '- No liquid helium: the tower must be at least 10 high.\n'
          '- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running '
-         '(short of power it slows down instead of stopping).\n'
+         '(it keeps its progress while waiting for power, reducing average throughput).\n'
          "- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot"
          ' be used.'),
         ('tower', '極低温冷却塔',

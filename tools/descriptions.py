@@ -110,7 +110,7 @@ DESC = {
     'シールド発生塔基壇': ('シールド発生塔の土台。2段目の辺は搬入出ポートに替えられる。', 'The 5×5 two-layer plinth; its upper edge takes I/O ports.'),
     'シールド発生塔電力コイル': ('シールド発生塔の基壇の2段目の内側 3×3。', 'Inner 3×3 of the upper plinth layer.'),
     'シールド発生塔本体': ('シールド発生塔の 3×3 の胴の四隅と、尖塔の根元。', 'Corners of the 3×3 body and the base of the spire.'),
-    'シールド発生塔導波管': ('シールド発生塔の胴の各面の中央と尖塔の中ほど。中を昇るエネルギーが見える。', 'Middle of each body face; shows the rising energy.'),
+    'シールド発生塔導波管': ('シールド発生塔の胴の各面の中央と尖塔の中ほど。中を昇るエネルギーが見える。', 'Middle of each body face and midway up the spire; shows the rising energy.'),
     'シールド発生塔放射冠': ('シールド発生塔のてっぺん。ここからドームを放つ。', 'The top of the tower; the dome is cast from here.'),
     'Tシリンダーフレーム': ('Tシリンダーの格納筒の12本の辺になる枠。', 'Frame along the 12 edges of the housing.'),
     'Tシリンダー外殻': ('Tシリンダーの外装。どの外殻もマルチブロック搬入出ポートに替えられる。', 'Housing; any panel can be swapped for an I/O port.'),
@@ -348,7 +348,8 @@ DESC = {
     '小型BH格納容器': ('小さなブラックホールを閉じ込めた容器。持つと周りの景色が歪む。', 'Holds a tiny black hole. Bends light around it.'),
     'ブラックホール爆弾': ('投げると、当たった所に小さなブラックホールが開き、周りを飲み込む。', 'Thrown: opens a tiny black hole that swallows its surroundings.'),
     '移設レンチ': ('スニーク＋右クリックで加工装置・発電機・蓄電器・触媒装置を回収。中身・液体・電力・設定を保持する。', 'Sneak-use to relocate processing machines, generators, energy storage and catalyst devices with their items, fluids, energy and settings.'),
-    '設定カード': ('装置の設定を写して、ほかの装置に貼る。', 'Copies a machine\'s settings to another.'),
+    '設定カード': ('装置の搬入出面と自動搬出の設定を写して貼る。同じ種類の装置では作るものの指定も写す。Pリアクターではスピン目標と投入間隔を写す。',
+              "Copies machine side and auto-eject settings, plus the recipe choice between machines of the same type. For a P-Reactor, copies the spin target and feed interval."),
     'ニュートリノ観測所': ('電力で広い範囲を調べ続け、鉱石と遺構を近くの人に見せ続ける。右クリックで表示を切り替える。',
                    'Keeps scanning a wide area and shows ores and ruins to nearby players. Use to toggle.'),
     'シールド許可証': ('シールド発生塔に入れると、登録した人だけが守りの中で作業できる。アンドロイド組立ステーションに入れると、登録した人もアンドロイドを操作でき、登録していない人はアンドロイドに攻撃される。'

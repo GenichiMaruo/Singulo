@@ -27,6 +27,7 @@ jobs:
       - name: Validate translations and models
         run: |
           python3 tools/localization.py --check
+          python3 tools/check_gameplay_text.py
           python3 tools/check_models.py
           python3 tools/check_advancements.py
           python3 tools/check_supporters.py

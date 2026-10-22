@@ -554,7 +554,7 @@ UI_LANG = {
     'item.singulo.settings_card.empty': ('まだ何も写していない', 'Nothing copied yet'),
     'item.singulo.settings_card.mismatch': ('種類の違う装置には貼れない', 'Different kind of machine'),
     'item.singulo.settings_card.blank': ('空', 'Blank'),
-    'item.singulo.settings_card.holds.machine': ('装置の面の設定', 'Machine side settings'),
+    'item.singulo.settings_card.holds.machine': ('装置の面・作るものの設定', 'Machine sides and recipe choice'),
     'item.singulo.settings_card.holds.reactor': ('Pリアクターの設定', 'P-Reactor settings'),
     'item.singulo.settings_card.hint': ('スニークして使うと写す　そのまま使うと貼る', 'Sneak-use to copy · Use to paste'),
     'gui.singulo.observatory.on': ('表示 入　鉱石 %s　遺構 %s', 'Display on · ores %s · ruins %s'),
