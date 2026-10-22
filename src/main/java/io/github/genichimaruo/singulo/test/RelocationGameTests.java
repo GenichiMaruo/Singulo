@@ -225,4 +225,39 @@ public final class RelocationGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty")
+    public static void wrenchRespectsCanceledBreaksForEachBlock(GameTestHelper h) {
+        BlockPos machine = new BlockPos(2, 1, 2);
+        h.setBlock(machine, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
+        MachineBlockEntity kiln = h.getBlockEntity(machine);
+        kiln.items().setStackInSlot(0, new ItemStack(Items.COAL, 13));
+        for (int x = 1; x <= 3; x++) h.setBlock(new BlockPos(x, 1, 4), SinguloBlocks.COPPER_WIRE.get());
+        var player = h.makeMockServerPlayerInLevel();
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        java.util.function.Consumer<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> protect = event -> {
+            if (event.getPlayer() == player && (event.getPos().equals(h.absolutePos(machine))
+                    || event.getPos().equals(h.absolutePos(new BlockPos(2, 1, 4))))) event.setCanceled(true);
+        };
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(protect);
+        try {
+            var wrench = new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
+            player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
+            player.setShiftKeyDown(true);
+            wrench.getItem().onItemUseFirst(wrench, context(player, h.absolutePos(machine)));
+            h.assertTrue(h.getLevel().getBlockEntity(h.absolutePos(machine)) == kiln && kiln.items().getStackInSlot(0).getCount() == 13,
+                    "Canceled machine break was packed anyway");
+            io.github.genichimaruo.singulo.item.RelocationWrenchItem.setMode(wrench, 1);
+            wrench.getItem().onItemUseFirst(wrench, context(player, h.absolutePos(new BlockPos(1, 1, 4))));
+            h.assertTrue(h.getBlockState(new BlockPos(2, 1, 4)).is(SinguloBlocks.COPPER_WIRE.get()),
+                    "Bulk removal bypassed a canceled cable break");
+            h.assertTrue(h.getBlockState(new BlockPos(1, 1, 4)).isAir() && h.getBlockState(new BlockPos(3, 1, 4)).isAir(),
+                    "Unprotected cables were not removed");
+            h.assertTrue(player.getInventory().countItem(SinguloBlocks.COPPER_WIRE.get().asItem()) == 2,
+                    "Canceled removal returned extra cable items");
+        } finally {
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(protect);
+            player.discard();
+        }
+        h.succeed();
+    }
 }

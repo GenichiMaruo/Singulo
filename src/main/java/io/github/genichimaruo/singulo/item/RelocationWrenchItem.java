@@ -93,6 +93,11 @@ public final class RelocationWrenchItem extends SinguloItem {
         ItemStack packed = new ItemStack(state.getBlock());
         if (packed.isEmpty()) return InteractionResult.FAIL;
         if (level.isClientSide) return InteractionResult.SUCCESS;
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
+                || net.neoforged.neoforge.common.CommonHooks.fireBlockBreak(level,
+                        serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos, state).isCanceled()) {
+            return InteractionResult.FAIL;
+        }
         // Close menus before taking the snapshot, including other players viewing the same device.
         for (var viewer : level.players()) {
             var menu = viewer.containerMenu;
@@ -146,9 +151,12 @@ public final class RelocationWrenchItem extends SinguloItem {
                 ? connectedRun(level, start, cable) : java.util.List.of(start);
         int removed = 0;
         for (var pos : run) {
-            if (!level.mayInteract(player, pos)) continue;
-            level.removeBlock(pos, false);
-            removed++;
+            if (!level.isLoaded(pos) || !level.getBlockState(pos).is(cable)
+                    || !level.mayInteract(player, pos) || !player.mayUseItemAt(pos, context.getClickedFace(), wrench)
+                    || !(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
+                    || net.neoforged.neoforge.common.CommonHooks.fireBlockBreak(level,
+                            serverPlayer.gameMode.getGameModeForPlayer(), serverPlayer, pos, level.getBlockState(pos)).isCanceled()) continue;
+            if (level.removeBlock(pos, false)) removed++;
         }
         if (removed == 0) return InteractionResult.FAIL;
         level.playSound(null, start, state.getSoundType(level, start, player).getBreakSound(),
@@ -180,7 +188,7 @@ public final class RelocationWrenchItem extends SinguloItem {
             out.add(pos);
             for (var dir : net.minecraft.core.Direction.values()) {
                 var next = pos.relative(dir);
-                if (seen.add(next) && level.getBlockState(next).is(cable)) queue.add(next);
+                if (seen.add(next) && level.isLoaded(next) && level.getBlockState(next).is(cable)) queue.add(next);
             }
         }
         return out;
