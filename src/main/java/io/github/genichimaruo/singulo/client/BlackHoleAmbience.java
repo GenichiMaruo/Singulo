@@ -21,6 +21,13 @@ final class BlackHoleAmbience {
 
     private BlackHoleAmbience() {}
 
+    static void reset() {
+        Minecraft mc = Minecraft.getInstance();
+        for (var sound : PLAYING.values()) mc.getSoundManager().stop(sound);
+        PLAYING.clear();
+    }
+
+
     /** うなりを鳴らすもの（稼働中の炉心と、野良ブラックホール）。 */
     private interface Source {
         Vec3 center();
@@ -38,6 +45,7 @@ final class BlackHoleAmbience {
         }
         PLAYING.values().removeIf(Loop::isStopped);
         for (PenroseReactorBlockEntity r : PenroseReactorBlockEntity.clientRunning(mc.level)) {
+            if (PLAYING.containsKey(r.getBlockPos())) continue;
             start(mc, r.getBlockPos(), new Source() {
                 public Vec3 center() {
                     return r.coreCenter();
@@ -53,6 +61,7 @@ final class BlackHoleAmbience {
             });
         }
         for (var hole : io.github.genichimaruo.singulo.reactor.RogueBlackHoleBlockEntity.clientLoaded(mc.level)) {
+            if (PLAYING.containsKey(hole.getBlockPos())) continue;
             start(mc, hole.getBlockPos(), new Source() {
                 public Vec3 center() {
                     return hole.center();

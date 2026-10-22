@@ -34,6 +34,13 @@ final class BossSounds {
 
     private BossSounds() {}
 
+    static void reset() {
+        Minecraft mc = Minecraft.getInstance();
+        for (var sound : PLAYING.values()) mc.getSoundManager().stop(sound);
+        PLAYING.clear();
+    }
+
+
     static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {

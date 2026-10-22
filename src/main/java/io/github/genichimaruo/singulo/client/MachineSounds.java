@@ -82,6 +82,16 @@ final class MachineSounds {
 
     private MachineSounds() {}
 
+    static void reset() {
+        Minecraft mc = Minecraft.getInstance();
+        for (var sound : PLAYING.values()) mc.getSoundManager().stop(sound);
+        PLAYING.clear();
+        if (active != null) mc.getSoundManager().stop(active);
+        if (charge != null) mc.getSoundManager().stop(charge);
+        active = null; charge = null;
+    }
+
+
     private static void put(float volume, String block, String sound) {
         BY_BLOCK.put(block, new Spec(sound, volume, true));
     }

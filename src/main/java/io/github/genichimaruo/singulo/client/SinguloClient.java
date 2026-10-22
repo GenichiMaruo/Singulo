@@ -45,8 +45,14 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) ->
-                ClientGalaxies.set(java.util.List.of(), false));
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
+            ClientGalaxies.set(java.util.List.of(), false);
+            ClientRecords.set(java.util.List.of());
+            clearWorldState();
+        });
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.level.LevelEvent.Unload e) -> {
+            if (e.getLevel().isClientSide()) clearWorldState();
+        });
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onScreenKey);
@@ -56,6 +62,15 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(BossSounds::onClientTick);
         NeoForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
+    }
+
+    static void clearWorldState() {
+        ShapeCache.clear();
+        HologramRenderer.clear();
+        NeutrinoOverlay.clear();
+        BlackHoleAmbience.reset();
+        MachineSounds.reset();
+        BossSounds.reset();
     }
 
     /** 型として使っている残響の欠片（バニラのアイテム）に使用回数を出す。Singulo のアイテムには説明と作り方・使い道を出す。 */
