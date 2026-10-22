@@ -1,0 +1,16 @@
+{
+  "region": [
+    500,
+    350,
+    780,
+    650
+  ],
+  "compared_pixels": 84000,
+  "different_RGB_channels_noon_vs_rainy_night": 0,
+  "different_RGB_channels_powered_vs_repowered": 0,
+  "power_off_mean_RGB_drop": [
+    173.12764285714286,
+    178.0979880952381,
+    179.0912261904762
+  ]
+}
