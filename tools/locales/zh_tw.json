@@ -1684,8 +1684,8 @@
     "translation": "用奇點之力重鑄被擊敗守衛記錄而成的核心。在最終實驗室的封印控制台上使用，即可喚醒覺醒的視界守衛：生命 2.5 倍、傷害 1.5 倍、招式更快。獲勝可獲得超頻晶片等獎勵。"
   },
   "desc.singulo.basic_circuit": {
-    "source": "The brain of every early machine.",
-    "translation": "每台早期機器的大腦。"
+    "source": "An electronic circuit for basic control.",
+    "translation": "用於基礎控制的電子電路。"
   },
   "desc.singulo.basic_frame": {
     "source": "The frame almost every machine is built on.",
@@ -1700,8 +1700,8 @@
     "translation": "熔化的鉍冷卻後形成的階梯狀彩虹色晶體。建材。"
   },
   "desc.singulo.bismuth_ingot": {
-    "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
-    "translation": "帶有彩虹色氧化膜的鉍金屬，在催化反應器中精煉粗銅時作為副產物得到。與鋅一起在粒子加速器中碰撞即可製成鉨。"
+    "source": "A metal with an iridescent surface.",
+    "translation": "表面泛著虹彩的金屬。"
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -1740,8 +1740,8 @@
     "translation": "研究所自動販賣機裡的藍色罐裝汽水。飲用後 2 分鐘內移動速度提升。"
   },
   "desc.singulo.carbon_dust": {
-    "source": "Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and black reinforced panels.",
-    "translation": "用壓縮機把木炭粉碎壓實得到的碳粉（3 個木炭得 2 個）。可在鋼混合物和黑色強化面板中代替煤炭。"
+    "source": "Finely powdered carbon.",
+    "translation": "細碎的碳粉。"
   },
   "desc.singulo.casimir_cavity": {
     "source": "Creates negative energy between mirrors to make exotic matter.",
@@ -1780,8 +1780,8 @@
     "translation": "製造催化劑，最初是緲子催化劑。"
   },
   "desc.singulo.ceramic_substrate": {
-    "source": "A fired ceramic board for circuits.",
-    "translation": "用於電路的燒製陶瓷板。"
+    "source": "An electrically insulating ceramic substrate.",
+    "translation": "絕緣性優良的陶瓷基板。"
   },
   "desc.singulo.coffee": {
     "source": "Coffee from a coffee maker, in a bottle. Drinking it gives Haste for 3 minutes and wakes you up, resetting the time until phantoms appear. The bottle is left over.",
@@ -1904,8 +1904,8 @@
     "translation": "利用旁邊的高溫源使液態氮汽化，取回儲存在液態氮中的電力（在熔岩旁最多 9 成）。這是用來儲存和運送電力的裝置，不會增加電力。"
   },
   "desc.singulo.culture_data": {
-    "source": "A record from the culture facility.",
-    "translation": "來自封閉培養設施的記錄。"
+    "source": "Records of ancient cultivation experiments.",
+    "translation": "舊文明留下的培養實驗紀錄。"
   },
   "desc.singulo.data_card_culture_data": {
     "source": "A copy of culture data.",
@@ -1992,8 +1992,8 @@
     "translation": "熱爐每面中央的一列；可看到發光的爐心。"
   },
   "desc.singulo.degenerate_matter_shell": {
-    "source": "A shell of neutron-star matter.",
-    "translation": "中子星物質的外殼。"
+    "source": "A dense shell of neutron-star matter.",
+    "translation": "由中子星物質構成的緻密外殼。"
   },
   "desc.singulo.degenerate_nucleus": {
     "source": "The uncollapsed gravity knot left at the heart of the Gravity Remnant. Used for the Singularity Encapsulator, Singularity Seed and Graviton Manipulator.",
@@ -2004,20 +2004,20 @@
     "translation": "以高壓晶體為種，把壓縮方塊 Lv2 壓到接近簡併的狀態。用於簡併物質殼時可以減少岩石用量。"
   },
   "desc.singulo.degraded_anomaly_sample": {
-    "source": "A sample from the final lab.",
-    "translation": "來自最終實驗室的樣本。"
+    "source": "A gravitational-anomaly sample altered by time.",
+    "translation": "歷經歲月而變質的重力異常樣本。"
   },
   "desc.singulo.degraded_cold_atom_trap": {
     "source": "Restore it in the Laser Cooler.",
     "translation": "在雷射冷卻器中修復它。"
   },
   "desc.singulo.degraded_control_unit": {
-    "source": "A degraded part. Restore it in the Archive Terminal.",
-    "translation": "劣化的零件。在檔案終端中修復它。"
+    "source": "An ancient control unit worn by time.",
+    "translation": "歷經歲月而損壞的舊文明控制裝置。"
   },
   "desc.singulo.degraded_time_crystal_seed": {
-    "source": "A seed found in the Culture Facility. Restore it to grow time crystals.",
-    "translation": "在封閉培養設施拾得的種子。修復後可培育時間晶體。"
+    "source": "A crystal seed destabilized by long dormancy.",
+    "translation": "因長期休眠而變得不穩定的晶核。"
   },
   "desc.singulo.desk_monitor": {
     "source": "A small monitor from a laboratory desk. Only its screen glows faintly.",
@@ -2060,8 +2060,8 @@
     "translation": "研究所自動販賣機裡的黃色罐裝飲料。飲用後 2 分鐘內挖掘速度大幅提升（挖掘加速 II）。"
   },
   "desc.singulo.entangled_element": {
-    "source": "Always made in pairs. Used in detectors and links.",
-    "translation": "總是成對產生。用於探測器與遠端連結。"
+    "source": "A pair of elements with entangled quantum states.",
+    "translation": "量子態彼此糾纏的一對元件。"
   },
   "desc.singulo.entanglement_synthesizer": {
     "source": "Produces entangled elements in pairs.",
@@ -2156,8 +2156,8 @@
     "translation": "覺醒的重力殘渣坍縮後留下的一段記錄，刻著關於重量的記憶。與其他斷章合在一起，或許就能讀懂。"
   },
   "desc.singulo.gravity_field_stabilizer": {
-    "source": "A component of the core controller.",
-    "translation": "爐心控制器的零件。"
+    "source": "A component that suppresses gravitational fluctuations.",
+    "translation": "抑制重力場波動的部件。"
   },
   "desc.singulo.gravity_panel_receiver": {
     "source": "Powers every gravity panel connected to it. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active.",
@@ -2184,8 +2184,8 @@
     "translation": "爐心質量較小時（催化劑模式；開啟回收運轉即可保持），每5分鐘收集1個霍金凝聚體。"
   },
   "desc.singulo.hawking_condensate": {
-    "source": "Condensed Hawking radiation. An ingredient of the Singularity Core.",
-    "translation": "收集霍金輻射凝聚而成。奇點核心的材料。"
+    "source": "Condensed Hawking radiation.",
+    "translation": "匯聚霍金輻射的凝聚體。"
   },
   "desc.singulo.heat_exchange_core": {
     "source": "Heat exchangers stacked up the middle of the tower.",
@@ -2232,8 +2232,8 @@
     "translation": "從反應爐收集噴流凝聚體。"
   },
   "desc.singulo.jet_condensate": {
-    "source": "Particles from the relativistic jet.",
-    "translation": "來自相對論性噴流的粒子。"
+    "source": "Condensed particles from a relativistic jet.",
+    "translation": "匯聚相對論性噴流粒子的凝聚體。"
   },
   "desc.singulo.keraunos_tower": {
     "source": "Builds up 1,000,000 FE and hurls artificial lightning at the nearest lightning rod within 16 blocks. Sand under the rod turns into fulgurite. Three firing modes: manual, redstone and auto (sneak-right-click to switch).",
@@ -2280,8 +2280,8 @@
     "translation": "以雷射冷原子，製成冷原子、光學晶格基板與凝聚態催化劑。"
   },
   "desc.singulo.limestone_powder": {
-    "source": "White calcium carbonate powder, crushed from calcite or dripstone blocks (2 in the Compressor, 1 at a crafting table). Use it instead of bone meal in Unfired Ceramic (it turns to lime in the kiln and binds the clay).",
-    "translation": "把方解石或鐘乳石塊粉碎得到的白色碳酸鈣粉末（壓縮機得 2 個，製作台得 1 個）。可在未燒製陶瓷中代替骨粉（燒製後變成石灰，使黏土凝固）。"
+    "source": "A white calcium carbonate powder.",
+    "translation": "白色的碳酸鈣粉末。"
   },
   "desc.singulo.low_gravity_panel": {
     "source": "When powered, standing on it cuts your gravity to a fifth until you next land (less fall damage too). Joins visually with its neighbours.",
@@ -2312,8 +2312,8 @@
     "translation": "隕石中的鐵鎳天然合金。用鐵鎬或更好的鎬開採可得到粗隕鐵。只在隕石坑中出現。"
   },
   "desc.singulo.meteoric_iron_ingot": {
-    "source": "A strongly magnetic natural iron-nickel alloy, used for magnet pole pieces, magnetic keys and confinement rings.",
-    "translation": "具有強磁性的鐵鎳天然合金。用於磁鐵的磁極片、磁鎖鑰匙和磁約束環。"
+    "source": "A naturally magnetic alloy of iron and nickel.",
+    "translation": "具有強磁性的天然鐵鎳合金。"
   },
   "desc.singulo.meteorite_core": {
     "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
@@ -2368,28 +2368,28 @@
     "translation": "使用後，在 10 秒內透過地形顯示周圍的廢墟方塊與礦石輪廓。消耗電力。更深層的礦石需要靈敏度模組才能顯示。"
   },
   "desc.singulo.nihonium": {
-    "source": "Element 113, fused from zinc and bismuth nuclei in the Particle Accelerator. This neutron-rich isotope is stable, so it does not decay. Two make an ingot.",
-    "translation": "在粒子加速器中使鋅和鉍的原子核融合而成的第 113 號元素。這種富中子的同位素是穩定的，不會衰變。2 個可製成一個錠。"
+    "source": "Stabilized element 113.",
+    "translation": "穩定化的113號元素。"
   },
   "desc.singulo.nihonium_frame": {
-    "source": "A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.",
-    "translation": "用鉨板包覆的基礎框架，用作第 4、5 階段進階裝置的結構基礎。"
+    "source": "A sturdy frame clad in nihonium.",
+    "translation": "覆有鉨的堅固框架。"
   },
   "desc.singulo.nihonium_ingot": {
-    "source": "A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.",
-    "translation": "在燒製爐中熔合鉨製成的沉重錠。用壓縮機壓成板。"
+    "source": "A heavy, dense ingot of nihonium.",
+    "translation": "沉重緻密的鉨錠。"
   },
   "desc.singulo.nihonium_plate": {
-    "source": "Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.",
-    "translation": "壓製而成的鉨板，用於鉨框架及後期的耐壓、屏蔽部件。"
+    "source": "Nihonium pressed into a thin plate.",
+    "translation": "壓成薄板的鉨。"
   },
   "desc.singulo.observation_log": {
-    "source": "A record from observation posts. Copy it onto data cards.",
-    "translation": "地表觀測站的記錄。可複製到資料卡上。"
+    "source": "Observation records left by the old civilization.",
+    "translation": "舊文明留下的觀測紀錄。"
   },
   "desc.singulo.optical_lattice_substrate": {
-    "source": "Atoms held in a lattice of light.",
-    "translation": "原子被固定在光的晶格中。"
+    "source": "A substrate of atoms arranged in an optical lattice.",
+    "translation": "將原子排列在光晶格中的基板。"
   },
   "desc.singulo.overclock_chip": {
     "source": "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole.",
@@ -2412,24 +2412,24 @@
     "translation": "從旋轉的黑洞中汲取能量。"
   },
   "desc.singulo.phase_sync_plate": {
-    "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
-    "translation": "把冷原子的振動印在光晶格上的板。能讓時間晶體的振動相位一致，使培育時間為 12 分鐘。"
+    "source": "A component that synchronizes atomic oscillations.",
+    "translation": "使原子振動同步的部件。"
   },
   "desc.singulo.power_conduit": {
     "source": "A conduit carrying power from the central reactor. It glows cyan once power returns.",
     "translation": "從中央動力爐向設施輸送電力的導管。恢復供電後會發出青光。"
   },
   "desc.singulo.precision_actuator": {
-    "source": "A precise drive unit from the production lines of an underground android laboratory. Dropped by the Foundry Overseer and found in the laboratory vault and research chests. Used for the Factory Print Unit and the Awakened Foundry Core.",
-    "translation": "地下仿生人研究所量產線上使用的舊文明精密驅動部件。擊敗統籌 AI 或在研究所的保管庫、資料箱中取得。用於工廠式列印單元和覺醒製造核。"
+    "source": "A precision drive unit of the old civilization.",
+    "translation": "舊文明的精密驅動部件。"
   },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
     "translation": "組裝 2 級以後的大部分零件與機器。"
   },
   "desc.singulo.pressure_crystal": {
-    "source": "An extremely hard blue crystal formed under deep-sea pressure. Used for the compactor anvil and degenerate precursors.",
-    "translation": "在深海水壓下形成的極其堅硬的藍色晶體。用於簡併壓縮爐的鐵砧和簡併前驅體的晶種。"
+    "source": "A hard blue crystal formed under high water pressure.",
+    "translation": "在高水壓下形成的堅硬藍色晶體。"
   },
   "desc.singulo.pressure_hull": {
     "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
@@ -2464,12 +2464,12 @@
     "translation": "在作業指令台「記錄」的步驟模式中，記錄最多8個步驟及其產物。步驟有放入、取出、採掘、收穫、伐木、繁殖、剪毛、擠奶、處理、操作（拉桿或按鈕）。位置記錄在卡中，因此可放在配方架中沒有作業位置卡的行。採掘需要採掘升級，伐木需要伐木升級。"
   },
   "desc.singulo.quantum_computing_module": {
-    "source": "The brain of advanced machines.",
-    "translation": "先進機器的大腦。"
+    "source": "A computing module that uses quantum states.",
+    "translation": "利用量子態進行運算的模組。"
   },
   "desc.singulo.quantum_data_fragment": {
-    "source": "A record from research buildings.",
-    "translation": "來自研究棟的記錄。"
+    "source": "A fragment of quantum-state analysis data.",
+    "translation": "量子態分析紀錄的片段。"
   },
   "desc.singulo.quantum_heat_engine": {
     "source": "Generates power from the quantum effects of a catalyst. Higher-tier catalysts give more output.",
@@ -2480,8 +2480,8 @@
     "translation": "用於打開或封印量子鎖容器。每次使用都會消耗。"
   },
   "desc.singulo.raw_meteoric_iron": {
-    "source": "Smelt it in a blast furnace into meteoric iron.",
-    "translation": "在高爐中冶煉成隕鐵錠。"
+    "source": "Raw meteoric metal containing iron and nickel.",
+    "translation": "含有鐵和鎳的隕石原礦。"
   },
   "desc.singulo.rayleigh_panel": {
     "source": "A sky projection panel for ceilings. Fed FE (20 FE/t), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
@@ -2512,8 +2512,8 @@
     "translation": "在作業指令台的「記錄」中記錄配方，然後放進配方架。對著空處潛行右鍵會清除配方。按住 Shift 會顯示製作的物品。"
   },
   "desc.singulo.record_fragment": {
-    "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
-    "translation": "古代的儲存媒介：用光把記錄刻在玻璃之中。在檔案終端讀取後會加入手冊。"
+    "source": "A storage medium with records etched in glass by light.",
+    "translation": "以光在玻璃內部刻錄資訊的儲存媒體。"
   },
   "desc.singulo.reinforced_ruin_glass": {
     "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
@@ -2664,20 +2664,20 @@
     "translation": "高容量儲能。"
   },
   "desc.singulo.spent_bose_condensate_catalyst": {
-    "source": "A used-up BE Condensate Catalyst. About 25% can be recovered as a lower-tier catalyst.",
-    "translation": "用盡的玻色凝聚態催化劑。約 25% 可回收為低一級的催化劑。"
+    "source": "A Bose condensate catalyst that has lost its activity.",
+    "translation": "已失去活性的玻色凝聚催化劑。"
   },
   "desc.singulo.spent_muon_catalyst": {
-    "source": "A used-up catalyst. Partly recyclable.",
-    "translation": "用過的催化劑。部分可回收。"
+    "source": "A muon catalyst that has lost its activity.",
+    "translation": "已失去活性的緲子催化劑。"
   },
   "desc.singulo.spent_singularity_core": {
     "source": "A used-up Singularity Core. About 25% can be recovered as a lower-tier catalyst.",
     "translation": "用盡的奇點核心。約 25% 可回收為低一級的催化劑。"
   },
   "desc.singulo.spent_time_crystal_catalyst": {
-    "source": "A used-up Time Crystal Catalyst. About 25% can be recovered as a lower-tier catalyst.",
-    "translation": "用盡的時間晶體催化劑。約 25% 可回收為低一級的催化劑。"
+    "source": "A time crystal catalyst that has lost its activity.",
+    "translation": "已失去活性的時間晶體催化劑。"
   },
   "desc.singulo.sports_drink": {
     "source": "A white can of sports drink from the laboratory's vending machine. Drinking it gives Regeneration for 15 seconds.",
@@ -2692,16 +2692,16 @@
     "translation": "長在隕石熔殼上的宇宙微粒晶體。破壞後掉落星塵。"
   },
   "desc.singulo.steel_blend": {
-    "source": "A mix of iron and coal. Smelt it in a blast furnace to get steel.",
-    "translation": "鐵和煤的混合物。將其在高爐中熔煉以獲得鋼材。"
+    "source": "A blend of iron and carbon.",
+    "translation": "鐵與碳混合而成的鋼鐵原料。"
   },
   "desc.singulo.steel_ingot": {
-    "source": "The basic structural metal. Steel from other mods works too.",
-    "translation": "基本結構金屬。其他模組的鋼鐵也可以。"
+    "source": "A sturdy structural metal.",
+    "translation": "堅固的結構金屬。"
   },
   "desc.singulo.steel_plate": {
-    "source": "Pressed steel used for casings and parts. Steel plates from other mods (c:plates/steel) work too.",
-    "translation": "用於外殼和零件的壓製鋼。其他模組的鋼板（c:plates/steel）也可使用。"
+    "source": "Steel pressed into a thin plate.",
+    "translation": "壓成薄板的鋼鐵。"
   },
   "desc.singulo.strange_matter": {
     "source": "Ultra-dense matter left by strangelets. Worth 100 mass and usable for degenerate shells.",
@@ -2720,8 +2720,8 @@
     "translation": "2 級無損高容量電纜。"
   },
   "desc.singulo.superconducting_coil": {
-    "source": "A zero-resistance coil, core of tier 2 tech.",
-    "translation": "零電阻線圈，2 級技術的核心。"
+    "source": "A coil with zero electrical resistance.",
+    "translation": "電阻為零的線圈。"
   },
   "desc.singulo.superconducting_wire": {
     "source": "Wire for coils and cables.",
@@ -2740,8 +2740,8 @@
     "translation": "用奇點之力把四段斷章重新裝訂成的最後一頁。在最終實驗室的封印控制台上使用，在時間場中沉睡的某物將會醒來。離開房間時記錄會返還。"
   },
   "desc.singulo.thermocouple_module": {
-    "source": "Turns a temperature difference into electricity.",
-    "translation": "將溫差轉化為電能。"
+    "source": "An element that converts heat differences into power.",
+    "translation": "將溫差轉化為電力的元件。"
   },
   "desc.singulo.thermoelectric_generator": {
     "source": "Place it between something hot and something cold to generate power. Your first generator. Magma block + blue ice gives about 76 FE/t without melting.",
@@ -2760,8 +2760,8 @@
     "translation": "培育時間晶體催化劑。電力不足會降低其純度。"
   },
   "desc.singulo.time_crystal_module": {
-    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
-    "translation": "封存了新品時間晶體壽命 2/3（預設設定下為 30 分鐘）的可堆疊零件。用於爐心控制器、奇點封裝器、護盾塔核心等設備。剩餘壽命不足此值的晶體（用過的或純度低的）無法切割。改變壽命設定或預設時，所需量也會按比例變化。"
+    "source": "A component containing time-crystal oscillations.",
+    "translation": "封存時間晶體振動的部件。"
   },
   "desc.singulo.time_crystal_seed": {
     "source": "Seed for time crystal catalysts.",
@@ -2812,12 +2812,12 @@
     "translation": "黏土、沙、地獄石英和骨粉（或石灰粉）的混合物，可燒製成白色陶瓷複合材料。"
   },
   "desc.singulo.unfired_phosphor": {
-    "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
-    "translation": "把鋅粉、火藥（硫）和銅混合而成的粉末。在燒製爐中燒製後可得到 4 個蓄光體螢石粉。"
+    "source": "An unfired phosphor mixture.",
+    "translation": "燒製前的螢光體原料。"
   },
   "desc.singulo.unfired_teacup": {
-    "source": "A teacup shaped from clay, not yet fired. Fire it in a furnace or the Kiln to get a teacup.",
-    "translation": "用黏土捏成、尚未燒製的茶杯。在熔爐或燒製爐中燒製後即成為茶杯。"
+    "source": "An unfired clay cup.",
+    "translation": "尚未燒製的黏土杯。"
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -2924,12 +2924,12 @@
     "translation": "以奇異物質穩定不穩定蟲洞入口，使其成為可以放置的入口。"
   },
   "desc.singulo.zinc_dust": {
-    "source": "Zinc sorted out of crushed tuff in the Compressor. Fire it in the Kiln into a zinc ingot.",
-    "translation": "用壓縮機粉碎凝灰岩後分選出的鋅粉。在燒製爐中燒成鋅錠。"
+    "source": "Finely powdered zinc.",
+    "translation": "細碎的鋅粉。"
   },
   "desc.singulo.zinc_ingot": {
-    "source": "Zinc metal. Collide it with bismuth in the Particle Accelerator to make nihonium. Zinc ingots from other mods work too.",
-    "translation": "鋅金屬。與鉍一起在粒子加速器中碰撞即可製成鉨。其他模組的鋅錠也能同樣使用。"
+    "source": "An ingot of zinc.",
+    "translation": "鋅的金屬錠。"
   },
   "direction.singulo.east": {
     "source": "east",
@@ -10308,8 +10308,8 @@
     "translation": "替換多方塊結構外殼板，用於連接線纜和管線的進出口。"
   },
   "summary.singulo.precision_actuator": {
-    "source": "A precise drive unit found in underground android laboratories.",
-    "translation": "在地下仿生人研究所取得的舊文明精密驅動零件。"
+    "source": "A precision drive unit of the old civilization.",
+    "translation": "舊文明的精密驅動部件。"
   },
   "summary.singulo.procedure_card": {
     "source": "Records up to eight work steps for androids.",
@@ -10328,8 +10328,8 @@
     "translation": "在最終實驗設施的封印控制台使用的最後一頁。"
   },
   "summary.singulo.time_crystal_module": {
-    "source": "A stackable part sealing a slice of a time crystal's life.",
-    "translation": "截取時間晶體催化劑壽命並封存的可堆疊零件。"
+    "source": "A component containing time-crystal oscillations.",
+    "translation": "封存時間晶體振動的部件。"
   },
   "summary.singulo.work_location_card": {
     "source": "Records a block position and links work consoles with ports.",

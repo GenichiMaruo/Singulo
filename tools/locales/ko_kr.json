@@ -1684,8 +1684,8 @@
     "translation": "쓰러뜨린 감시자의 기록을 특이점의 힘으로 다시 구운 핵입니다. 최종 실험 시설의 봉인 콘솔에 사용하면 각성한 지평선 감시자가 깨어납니다. 체력 2.5배, 피해 1.5배, 기술이 더 빠릅니다. 이기면 오버클럭 칩 등을 얻습니다."
   },
   "desc.singulo.basic_circuit": {
-    "source": "The brain of every early machine.",
-    "translation": "모든 초기 기계의 두뇌."
+    "source": "An electronic circuit for basic control.",
+    "translation": "기본 제어를 담당하는 전자 회로."
   },
   "desc.singulo.basic_frame": {
     "source": "The frame almost every machine is built on.",
@@ -1700,8 +1700,8 @@
     "translation": "녹인 비스무트를 식혀 만든 계단 모양의 무지갯빛 결정. 건축 재료."
   },
   "desc.singulo.bismuth_ingot": {
-    "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
-    "translation": "무지갯빛 산화막이 낀 비스무트 금속. 촉매 반응기에서 구리 원석을 정련하면 부산물로 나옵니다. 아연과 함께 입자 가속기에서 충돌시키면 니호늄이 됩니다."
+    "source": "A metal with an iridescent surface.",
+    "translation": "표면이 무지갯빛으로 빛나는 금속."
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -1740,8 +1740,8 @@
     "translation": "연구소 자판기의 파란 캔 탄산음료입니다. 마시면 2분 동안 발이 빨라집니다."
   },
   "desc.singulo.carbon_dust": {
-    "source": "Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and black reinforced panels.",
-    "translation": "목탄을 압축기로 부숴 굳힌 탄소 가루(목탄 3개에서 2개). 스틸 블렌드와 검은 강화 패널에서 석탄 대신 쓸 수 있습니다."
+    "source": "Finely powdered carbon.",
+    "translation": "곱게 빻은 탄소."
   },
   "desc.singulo.casimir_cavity": {
     "source": "Creates negative energy between mirrors to make exotic matter.",
@@ -1780,8 +1780,8 @@
     "translation": "뮤온 촉매를 시작으로 촉매를 만듭니다."
   },
   "desc.singulo.ceramic_substrate": {
-    "source": "A fired ceramic board for circuits.",
-    "translation": "회로용 소성 세라믹 기판입니다."
+    "source": "An electrically insulating ceramic substrate.",
+    "translation": "절연성이 뛰어난 세라믹 기판."
   },
   "desc.singulo.coffee": {
     "source": "Coffee from a coffee maker, in a bottle. Drinking it gives Haste for 3 minutes and wakes you up, resetting the time until phantoms appear. The bottle is left over.",
@@ -1904,8 +1904,8 @@
     "translation": "옆의 고온원으로 액체 질소를 기화시켜, 액체 질소에 저장된 전력을 되찾습니다(용암 옆에서 최대 90%). 전력을 저장하고 옮기기 위한 장치이며, 전력이 늘어나지는 않습니다."
   },
   "desc.singulo.culture_data": {
-    "source": "A record from the culture facility.",
-    "translation": "봉쇄 배양 시설에서 얻는 기록입니다."
+    "source": "Records of ancient cultivation experiments.",
+    "translation": "옛 문명이 남긴 배양 실험 기록."
   },
   "desc.singulo.data_card_culture_data": {
     "source": "A copy of culture data.",
@@ -1992,8 +1992,8 @@
     "translation": "축퇴 열로 각 측면 중앙의 세로 3단. 짓눌려 백열하는 노심이 보입니다."
   },
   "desc.singulo.degenerate_matter_shell": {
-    "source": "A shell of neutron-star matter.",
-    "translation": "중성자별 물질로 된 껍질. 특이점 씨앗을 감쌉니다."
+    "source": "A dense shell of neutron-star matter.",
+    "translation": "중성자별 물질로 이루어진 치밀한 껍질."
   },
   "desc.singulo.degenerate_nucleus": {
     "source": "The uncollapsed gravity knot left at the heart of the Gravity Remnant. Used for the Singularity Encapsulator, Singularity Seed and Graviton Manipulator.",
@@ -2004,20 +2004,20 @@
     "translation": "고압 결정을 씨앗으로 압축 블록 Lv2를 축퇴 직전까지 눌러 굳힌 것입니다. 축퇴 물질 껍질에 쓰면 암석이 덜 듭니다."
   },
   "desc.singulo.degraded_anomaly_sample": {
-    "source": "A sample from the final lab.",
-    "translation": "최종 실험 시설에서 얻는 샘플."
+    "source": "A gravitational-anomaly sample altered by time.",
+    "translation": "오랜 세월로 변질된 중력 이상 시료."
   },
   "desc.singulo.degraded_cold_atom_trap": {
     "source": "Restore it in the Laser Cooler.",
     "translation": "연구동에서 얻는 부품. 레이저 냉각기에서 복원합니다."
   },
   "desc.singulo.degraded_control_unit": {
-    "source": "A degraded part. Restore it in the Archive Terminal.",
-    "translation": "지표 관측소에서 얻는 부품. 기록 보관 단말기에서 복원하면 사용할 수 있습니다."
+    "source": "An ancient control unit worn by time.",
+    "translation": "오랜 세월로 손상된 옛 문명의 제어 장치."
   },
   "desc.singulo.degraded_time_crystal_seed": {
-    "source": "A seed found in the Culture Facility. Restore it to grow time crystals.",
-    "translation": "봉쇄 배양 시설에서 얻는 씨앗. 복원하면 시간 결정을 기를 수 있습니다."
+    "source": "A crystal seed destabilized by long dormancy.",
+    "translation": "오랜 휴면으로 불안정해진 결정핵."
   },
   "desc.singulo.desk_monitor": {
     "source": "A small monitor from a laboratory desk. Only its screen glows faintly.",
@@ -2060,8 +2060,8 @@
     "translation": "연구소 자판기의 노란 캔 음료입니다. 마시면 2분 동안 채굴이 매우 빨라집니다(성급함 II)."
   },
   "desc.singulo.entangled_element": {
-    "source": "Always made in pairs. Used in detectors and links.",
-    "translation": "반드시 2개 1쌍으로 만들어지는 소자. 검출기와 원격 연동의 재료입니다."
+    "source": "A pair of elements with entangled quantum states.",
+    "translation": "양자 상태가 서로 얽힌 한 쌍의 소자."
   },
   "desc.singulo.entanglement_synthesizer": {
     "source": "Produces entangled elements in pairs.",
@@ -2156,8 +2156,8 @@
     "translation": "각성한 중력 잔재가 붕괴한 뒤 남는 기록의 한 구절로, 무게의 기억이 새겨져 있습니다. 다른 단장과 묶으면 읽을 수 있을지도 모릅니다."
   },
   "desc.singulo.gravity_field_stabilizer": {
-    "source": "A component of the core controller.",
-    "translation": "노심 제어기의 재료."
+    "source": "A component that suppresses gravitational fluctuations.",
+    "translation": "중력장의 요동을 억제하는 부품."
   },
   "desc.singulo.gravity_panel_receiver": {
     "source": "Powers every gravity panel connected to it. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active.",
@@ -2184,8 +2184,8 @@
     "translation": "노심 질량이 작을 때(촉매 모드, 회수 운전으로 유지 가능) 5분마다 호킹 응축물를 1개 모읍니다."
   },
   "desc.singulo.hawking_condensate": {
-    "source": "Condensed Hawking radiation. An ingredient of the Singularity Core.",
-    "translation": "호킹 복사를 모은 응축물. 특이점 코어의 재료입니다."
+    "source": "Condensed Hawking radiation.",
+    "translation": "호킹 복사를 모은 응축체."
   },
   "desc.singulo.heat_exchange_core": {
     "source": "Heat exchangers stacked up the middle of the tower.",
@@ -2232,8 +2232,8 @@
     "translation": "반응로의 제트에서 제트 응축물을 수집합니다."
   },
   "desc.singulo.jet_condensate": {
-    "source": "Particles from the relativistic jet.",
-    "translation": "상대론적 제트의 입자. 인공 항성 코어의 재료입니다."
+    "source": "Condensed particles from a relativistic jet.",
+    "translation": "상대론적 제트의 입자를 모은 응축체."
   },
   "desc.singulo.keraunos_tower": {
     "source": "Builds up 1,000,000 FE and hurls artificial lightning at the nearest lightning rod within 16 blocks. Sand under the rod turns into fulgurite. Three firing modes: manual, redstone and auto (sneak-right-click to switch).",
@@ -2280,8 +2280,8 @@
     "translation": "원자를 레이저로 냉각해 냉각 원자, 광학 격자 기판, BE 응축 촉매를 만듭니다."
   },
   "desc.singulo.limestone_powder": {
-    "source": "White calcium carbonate powder, crushed from calcite or dripstone blocks (2 in the Compressor, 1 at a crafting table). Use it instead of bone meal in Unfired Ceramic (it turns to lime in the kiln and binds the clay).",
-    "translation": "방해석이나 점적석 블록을 부순 흰 탄산칼슘 가루(압축기는 2개, 제작대는 1개). 소성되지 않은 세라믹에서 뼛가루 대신 쓸 수 있습니다(구우면 석회가 되어 점토를 굳힌다)."
+    "source": "A white calcium carbonate powder.",
+    "translation": "흰 탄산칼슘 가루."
   },
   "desc.singulo.low_gravity_panel": {
     "source": "When powered, standing on it cuts your gravity to a fifth until you next land (less fall damage too). Joins visually with its neighbours.",
@@ -2312,8 +2312,8 @@
     "translation": "운석 속의 철과 니켈의 천연 합금입니다. 철 곡괭이 이상으로 캐면 운철 원석이 나옵니다. 운석 구덩이에만 있습니다."
   },
   "desc.singulo.meteoric_iron_ingot": {
-    "source": "A strongly magnetic natural iron-nickel alloy, used for magnet pole pieces, magnetic keys and confinement rings.",
-    "translation": "강한 자성을 지닌 철과 니켈의 천연 합금입니다. 자석의 자극편, 자기 잠금 열쇠, 자기 가둠 고리에 씁니다."
+    "source": "A naturally magnetic alloy of iron and nickel.",
+    "translation": "강한 자성을 띠는 철과 니켈의 천연 합금."
   },
   "desc.singulo.meteorite_core": {
     "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
@@ -2368,28 +2368,28 @@
     "translation": "사용하면 10초 동안 지형 너머로 주변 유적 블록과 광석의 윤곽을 보여 줍니다. 전력을 사용합니다. 깊은 층의 광석은 감도 모듈이 있어야 보입니다."
   },
   "desc.singulo.nihonium": {
-    "source": "Element 113, fused from zinc and bismuth nuclei in the Particle Accelerator. This neutron-rich isotope is stable, so it does not decay. Two make an ingot.",
-    "translation": "입자 가속기에서 아연과 비스무트의 원자핵을 융합시켜 만든 113번 원소. 중성자가 많은 안정 동위체라서 붕괴하지 않습니다. 2개로 주괴가 됩니다."
+    "source": "Stabilized element 113.",
+    "translation": "안정화된 113번 원소."
   },
   "desc.singulo.nihonium_frame": {
-    "source": "A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.",
-    "translation": "기초 프레임을 니호늄 판으로 감싼 프레임입니다. 4~5단계 고급 기계의 구조 기반으로 사용합니다."
+    "source": "A sturdy frame clad in nihonium.",
+    "translation": "니호늄으로 덮은 견고한 프레임."
   },
   "desc.singulo.nihonium_ingot": {
-    "source": "A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.",
-    "translation": "니호늄을 소성로에서 녹여 굳힌 무거운 주괴. 압축기로 판을 만듭니다."
+    "source": "A heavy, dense ingot of nihonium.",
+    "translation": "무겁고 치밀한 니호늄 주괴."
   },
   "desc.singulo.nihonium_plate": {
-    "source": "Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.",
-    "translation": "니호늄 주괴를 눌러 편 판입니다. 니호늄 프레임과 후반의 내압·차폐 부품에 사용합니다."
+    "source": "Nihonium pressed into a thin plate.",
+    "translation": "얇게 편 니호늄 판."
   },
   "desc.singulo.observation_log": {
-    "source": "A record from observation posts. Copy it onto data cards.",
-    "translation": "지표 관측소에서 얻는 기록입니다. 기록 보관 단말기에서 데이터 카드에 복사해 쓰세요."
+    "source": "Observation records left by the old civilization.",
+    "translation": "옛 문명이 남긴 관측 기록."
   },
   "desc.singulo.optical_lattice_substrate": {
-    "source": "Atoms held in a lattice of light.",
-    "translation": "빛의 격자에 원자를 붙잡아 둔 기판. 양자 부품의 토대입니다."
+    "source": "A substrate of atoms arranged in an optical lattice.",
+    "translation": "광격자에 원자를 배열한 기판."
   },
   "desc.singulo.overclock_chip": {
     "source": "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole.",
@@ -2412,24 +2412,24 @@
     "translation": "회전하는 블랙홀에서 에너지를 끌어옵니다."
   },
   "desc.singulo.phase_sync_plate": {
-    "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
-    "translation": "냉각 원자의 진동을 광격자에 새긴 판입니다. 시간 결정의 진동 위상을 맞춰 배양 시간을 12분으로 만듭니다."
+    "source": "A component that synchronizes atomic oscillations.",
+    "translation": "원자의 진동을 동기화하는 부품."
   },
   "desc.singulo.power_conduit": {
     "source": "A conduit carrying power from the central reactor. It glows cyan once power returns.",
     "translation": "중앙 동력로에서 시설로 전력을 보내는 관입니다. 전력이 돌아오면 하늘색으로 빛납니다."
   },
   "desc.singulo.precision_actuator": {
-    "source": "A precise drive unit from the production lines of an underground android laboratory. Dropped by the Foundry Overseer and found in the laboratory vault and research chests. Used for the Factory Print Unit and the Awakened Foundry Core.",
-    "translation": "지하 안드로이드 연구소의 양산 라인에 쓰이던 옛 문명의 정밀 구동부입니다. 총괄 AI를 쓰러뜨리거나 연구소의 보관고・자료 상자에서 얻습니다. 공장식 인쇄 유닛과 각성의 제조핵에 씁니다."
+    "source": "A precision drive unit of the old civilization.",
+    "translation": "옛 문명의 정밀 구동 부품."
   },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
     "translation": "티어 2 이후의 부품과 기계 대부분을 조립합니다."
   },
   "desc.singulo.pressure_crystal": {
-    "source": "An extremely hard blue crystal formed under deep-sea pressure. Used for the compactor anvil and degenerate precursors.",
-    "translation": "심해의 수압으로 눌려 굳은 매우 단단한 푸른 결정입니다. 축퇴 압축로 앤빌과 축퇴 전구체의 씨앗에 씁니다."
+    "source": "A hard blue crystal formed under high water pressure.",
+    "translation": "높은 수압으로 형성된 단단한 푸른 결정."
   },
   "desc.singulo.pressure_hull": {
     "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
@@ -2464,12 +2464,12 @@
     "translation": "작업 지령대 「기록」의 절차 모드에서 절차(최대 8개)와 만들어지는 것을 기록합니다. 절차는 투입·꺼내기·채굴·수확·벌목·번식·털 깎기·우유 짜기·처리·조작(레버나 버튼). 위치는 카드 안에 기록되므로 레시피 선반에서 작업 위치 카드가 없는 줄에도 놓을 수 있습니다. 채굴에는 채굴 업그레이드, 벌목에는 벌목 업그레이드가 필요합니다."
   },
   "desc.singulo.quantum_computing_module": {
-    "source": "The brain of advanced machines.",
-    "translation": "첨단 기계의 두뇌."
+    "source": "A computing module that uses quantum states.",
+    "translation": "양자 상태를 이용하는 연산 장치."
   },
   "desc.singulo.quantum_data_fragment": {
-    "source": "A record from research buildings.",
-    "translation": "연구동에서 얻는 기록입니다."
+    "source": "A fragment of quantum-state analysis data.",
+    "translation": "양자 상태 분석 기록의 조각."
   },
   "desc.singulo.quantum_heat_engine": {
     "source": "Generates power from the quantum effects of a catalyst. Higher-tier catalysts give more output.",
@@ -2480,8 +2480,8 @@
     "translation": "양자 잠금 컨테이너를 열거나 봉인합니다. 쓸 때마다 소모됩니다."
   },
   "desc.singulo.raw_meteoric_iron": {
-    "source": "Smelt it in a blast furnace into meteoric iron.",
-    "translation": "용광로에서 녹이면 운철 주괴가 됩니다."
+    "source": "Raw meteoric metal containing iron and nickel.",
+    "translation": "철과 니켈을 함유한 운석 원석."
   },
   "desc.singulo.rayleigh_panel": {
     "source": "A sky projection panel for ceilings. Fed FE (20 FE/t), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
@@ -2512,8 +2512,8 @@
     "translation": "작업 지령대의 \"기록\"에서 레시피를 기록하고 레시피 선반에 놓습니다. 아무것도 없는 곳에서 웅크리고 우클릭하면 레시피를 지웁니다. Shift를 누르면 만드는 것의 그림이 됩니다."
   },
   "desc.singulo.record_fragment": {
-    "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
-    "translation": "빛으로 유리 속에 기록을 새긴 고대 문명의 기록 매체입니다. 기록 보관 단말기에서 읽어 내면 안내서에 추가됩니다."
+    "source": "A storage medium with records etched in glass by light.",
+    "translation": "빛으로 유리 내부에 기록을 새긴 저장 매체."
   },
   "desc.singulo.reinforced_ruin_glass": {
     "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
@@ -2664,20 +2664,20 @@
     "translation": "대용량 에너지 저장 장치."
   },
   "desc.singulo.spent_bose_condensate_catalyst": {
-    "source": "A used-up BE Condensate Catalyst. About 25% can be recovered as a lower-tier catalyst.",
-    "translation": "다 쓴 BE 응축 촉매. 약 25%를 한 티어 아래 촉매로 회수할 수 있습니다."
+    "source": "A Bose condensate catalyst that has lost its activity.",
+    "translation": "활성을 잃은 보스 응축 촉매."
   },
   "desc.singulo.spent_muon_catalyst": {
-    "source": "A used-up catalyst. Partly recyclable.",
-    "translation": "다 쓴 촉매. 부분적으로 재활용 가능."
+    "source": "A muon catalyst that has lost its activity.",
+    "translation": "활성을 잃은 뮤온 촉매."
   },
   "desc.singulo.spent_singularity_core": {
     "source": "A used-up Singularity Core. About 25% can be recovered as a lower-tier catalyst.",
     "translation": "다 쓴 특이점 코어. 약 25%를 한 티어 아래 촉매로 회수할 수 있습니다."
   },
   "desc.singulo.spent_time_crystal_catalyst": {
-    "source": "A used-up Time Crystal Catalyst. About 25% can be recovered as a lower-tier catalyst.",
-    "translation": "다 쓴 시간 결정 촉매. 약 25%를 한 티어 아래 촉매로 회수할 수 있습니다."
+    "source": "A time crystal catalyst that has lost its activity.",
+    "translation": "활성을 잃은 시간 결정 촉매."
   },
   "desc.singulo.sports_drink": {
     "source": "A white can of sports drink from the laboratory's vending machine. Drinking it gives Regeneration for 15 seconds.",
@@ -2692,16 +2692,16 @@
     "translation": "운석 용융각에 자라는, 우주에서 온 미립자의 결정입니다. 부수면 별가루가 나옵니다."
   },
   "desc.singulo.steel_blend": {
-    "source": "A mix of iron and coal. Smelt it in a blast furnace to get steel.",
-    "translation": "철과 석탄의 혼합. 용광로에서 제련하면 강철을 얻을 수 있습니다."
+    "source": "A blend of iron and carbon.",
+    "translation": "철과 탄소를 섞은 강철 원료."
   },
   "desc.singulo.steel_ingot": {
-    "source": "The basic structural metal. Steel from other mods works too.",
-    "translation": "기본 구조용 금속. 다른 모드의 강철도 쓸 수 있습니다."
+    "source": "A sturdy structural metal.",
+    "translation": "튼튼한 구조용 금속."
   },
   "desc.singulo.steel_plate": {
-    "source": "Pressed steel used for casings and parts. Steel plates from other mods (c:plates/steel) work too.",
-    "translation": "케이싱과 부품에 쓰는, 압축기로 편 강철판. 다른 모드의 강철판(c:plates/steel)도 사용할 수 있습니다."
+    "source": "Steel pressed into a thin plate.",
+    "translation": "얇게 편 강철 판."
   },
   "desc.singulo.strange_matter": {
     "source": "Ultra-dense matter left by strangelets. Worth 100 mass and usable for degenerate shells.",
@@ -2720,8 +2720,8 @@
     "translation": "티어 2 무손실 대용량 케이블."
   },
   "desc.singulo.superconducting_coil": {
-    "source": "A zero-resistance coil, core of tier 2 tech.",
-    "translation": "티어 2 기술의 핵심인 무저항 코일입니다."
+    "source": "A coil with zero electrical resistance.",
+    "translation": "전기 저항이 없는 코일."
   },
   "desc.singulo.superconducting_wire": {
     "source": "Wire for coils and cables.",
@@ -2740,8 +2740,8 @@
     "translation": "네 개의 단장을 특이점의 힘으로 다시 묶은 마지막 페이지입니다. 최종 실험 시설의 봉인 콘솔에 사용하면 시간의 장 속에서 잠들어 있던 무언가가 깨어납니다. 방을 떠나면 기록은 돌려받습니다."
   },
   "desc.singulo.thermocouple_module": {
-    "source": "Turns a temperature difference into electricity.",
-    "translation": "온도차를 전기로 변환합니다."
+    "source": "An element that converts heat differences into power.",
+    "translation": "온도 차를 전력으로 바꾸는 소자."
   },
   "desc.singulo.thermoelectric_generator": {
     "source": "Place it between something hot and something cold to generate power. Your first generator. Magma block + blue ice gives about 76 FE/t without melting.",
@@ -2760,8 +2760,8 @@
     "translation": "시간 결정 촉매를 기릅니다. 전력이 부족하면 순도가 낮아집니다."
   },
   "desc.singulo.time_crystal_module": {
-    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
-    "translation": "새 시간 결정 수명의 2/3(기본 설정에서 30분)를 봉인한, 겹쳐 쌓을 수 있는 부품입니다. 노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등의 설비에 들어갑니다. 남은 수명이 그보다 적은 결정(쓰던 것·순도가 낮은 것)은 자를 수 없습니다. 수명 설정이나 프리셋을 바꾸면 필요량도 비례해서 바뀝니다."
+    "source": "A component containing time-crystal oscillations.",
+    "translation": "시간 결정의 진동을 담은 부품."
   },
   "desc.singulo.time_crystal_seed": {
     "source": "Seed for time crystal catalysts.",
@@ -2812,12 +2812,12 @@
     "translation": "점토, 모래, 네더 석영, 뼛가루(또는 석회 가루)를 반죽한 것. 구우면 화이트 세라믹 복합재가 됩니다."
   },
   "desc.singulo.unfired_phosphor": {
-    "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
-    "translation": "아연 가루와 화약(황)과 구리를 섞은 가루. 소성로에서 구우면 축광체인 발광석 가루 4개가 됩니다."
+    "source": "An unfired phosphor mixture.",
+    "translation": "굽기 전의 형광체 원료."
   },
   "desc.singulo.unfired_teacup": {
-    "source": "A teacup shaped from clay, not yet fired. Fire it in a furnace or the Kiln to get a teacup.",
-    "translation": "점토로 모양을 만든, 아직 굽지 않은 찻잔. 화로나 소성로에서 구우면 찻잔이 된다."
+    "source": "An unfired clay cup.",
+    "translation": "아직 굽지 않은 점토 찻잔."
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
@@ -2924,12 +2924,12 @@
     "translation": "불안정한 웜홀 입구를 특이 물질로 안정시켜 설치할 수 있는 입구로 만듭니다."
   },
   "desc.singulo.zinc_dust": {
-    "source": "Zinc sorted out of crushed tuff in the Compressor. Fire it in the Kiln into a zinc ingot.",
-    "translation": "응회암을 압축기로 부숴 골라낸 아연 가루. 소성로에서 구우면 아연 주괴가 됩니다."
+    "source": "Finely powdered zinc.",
+    "translation": "곱게 빻은 아연."
   },
   "desc.singulo.zinc_ingot": {
-    "source": "Zinc metal. Collide it with bismuth in the Particle Accelerator to make nihonium. Zinc ingots from other mods work too.",
-    "translation": "아연 금속. 비스무트와 함께 입자 가속기에서 충돌시키면 니호늄이 됩니다. 다른 모드의 아연 주괴도 똑같이 쓸 수 있습니다."
+    "source": "An ingot of zinc.",
+    "translation": "아연 금속 주괴."
   },
   "direction.singulo.east": {
     "source": "east",
@@ -10308,8 +10308,8 @@
     "translation": "멀티블록의 외장판과 바꿔 끼워 케이블과 파이프를 잇는 반출입구."
   },
   "summary.singulo.precision_actuator": {
-    "source": "A precise drive unit found in underground android laboratories.",
-    "translation": "지하 안드로이드 연구소에서 얻을 수 있는 구문명의 정밀 구동부."
+    "source": "A precision drive unit of the old civilization.",
+    "translation": "옛 문명의 정밀 구동 부품."
   },
   "summary.singulo.procedure_card": {
     "source": "Records up to eight work steps for androids.",
@@ -10328,8 +10328,8 @@
     "translation": "최종 실험 시설의 봉인 콘솔에서 쓰는 마지막 페이지."
   },
   "summary.singulo.time_crystal_module": {
-    "source": "A stackable part sealing a slice of a time crystal's life.",
-    "translation": "시간 결정 촉매의 수명을 잘라 내어 봉인한, 겹쳐 들 수 있는 부품."
+    "source": "A component containing time-crystal oscillations.",
+    "translation": "시간 결정의 진동을 담은 부품."
   },
   "summary.singulo.work_location_card": {
     "source": "Records a block position and links work consoles with ports.",
