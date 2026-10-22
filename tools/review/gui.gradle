@@ -6,6 +6,7 @@ allprojects {
             gameDirectory = file('build/gui-review')
             systemProperty 'singulo.sidesGuiReview', providers.gradleProperty('sidesGuiReview').isPresent().toString()
             systemProperty 'singulo.machineGuiReview', providers.gradleProperty('machineGuiReview').isPresent().toString()
+            systemProperty 'singulo.selectorGuiReview', providers.gradleProperty('selectorGuiReview').isPresent().toString()
             systemProperty 'singulo.guiReviewOutput', file('build/gui-review/screenshots').absolutePath
             programArgument '--quickPlaySingleplayer'
             programArgument 'Review'

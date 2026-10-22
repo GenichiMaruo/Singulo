@@ -18,7 +18,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 public final class MachineGuiReviewHarness {
     private static final String[] LANGUAGES = {"ja_jp", "en_us", "zh_cn", "zh_tw", "ko_kr"};
     private static final boolean SIDES = Boolean.getBoolean("singulo.sidesGuiReview");
-    private static final int SCREENS = SIDES ? 1 : MachineType.values().length + 8;
+    private static final boolean SELECTOR = Boolean.getBoolean("singulo.selectorGuiReview");
+    private static final int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 8;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen, wait;
     private static boolean shown;
@@ -48,7 +49,7 @@ public final class MachineGuiReviewHarness {
             return;
         }
         Path output = Path.of(System.getProperty("singulo.guiReviewOutput"));
-        String name = (SIDES ? "sides-" : "machine-") + LANGUAGES[language] + "-" + String.format("%02d", screen);
+        String name = (SELECTOR ? "selector-" : SIDES ? "sides-" : "machine-") + LANGUAGES[language] + "-" + String.format("%02d", screen);
         try (var pixels = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
             pixels.writeToFile(output.resolve(name + ".png"));
         }
@@ -74,6 +75,7 @@ public final class MachineGuiReviewHarness {
         if (screen < MachineType.values().length || extra >= 4 && extra <= 6) {
             MachineType type = extra == 4 ? MachineType.CATALYTIC_REACTOR : extra == 5 ? MachineType.PARTICLE_ACCELERATOR
                     : extra == 6 ? MachineType.ENTANGLEMENT_SYNTHESIZER : MachineType.values()[screen];
+            if (SELECTOR) type = screen < 3 ? MachineType.PRECISION_ASSEMBLER : MachineType.SINGULARITY_ENCAPSULATOR;
             SyncedInts data = SyncedInts.client(MachineBlockEntity.syncedCount(type));
             value(data, MachineBlockEntity.D_STATUS, (extra == 4 || extra == 5 ? MachineBlockEntity.Status.IDLE : MachineBlockEntity.Status.NO_POWER).ordinal());
             value(data, MachineBlockEntity.D_STRUCTURE, type.isMultiblock() ? (type == MachineType.PARTICLE_ACCELERATOR ? 16 : 10) : -1);
@@ -105,6 +107,20 @@ public final class MachineGuiReviewHarness {
             // Multiblock menu titles use the machine name, not the controller item name.
             MachineScreen gui = new MachineScreen(menu, mc.player.getInventory(), title);
             mc.setScreen(gui);
+            if (SELECTOR) {
+                var entries = io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(mc.level, type);
+                if (screen % 3 == 0) {
+                    value(data, MachineBlockEntity.D_SELECTED, entries.size());
+                    hover(mc, menu.layout.width, menu.layout.outputX + 8, 64);
+                } else {
+                    var open = MachineScreen.class.getDeclaredField("selectorOpen");
+                    open.setAccessible(true);
+                    open.setBoolean(gui, true);
+                    var scroll = MachineScreen.class.getDeclaredField("selectorScroll");
+                    scroll.setAccessible(true);
+                    scroll.setInt(gui, screen % 3 == 2 ? Math.max(0, (entries.size() + 9) / 9 - 3) : 0);
+                }
+            }
             if (SIDES) {
                 var open = MachineScreen.class.getDeclaredField("sidesOpen");
                 open.setAccessible(true);
