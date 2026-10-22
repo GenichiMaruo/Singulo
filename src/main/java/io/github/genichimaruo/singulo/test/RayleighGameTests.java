@@ -91,4 +91,37 @@ public final class RayleighGameTests {
         helper.assertTrue(made.size() == 1 && made.get(0).is(SinguloBlocks.RAYLEIGH_PANEL.get().asItem()), "作ったパネルが自分を落とさない");
         helper.succeed();
     }
+    /** The End and Nether lack vanilla detector tickers; panel light must still update automatically. */
+    @GameTest(template = EMPTY)
+    public static void skylessDetectorTickerFollowsPanelPower(GameTestHelper helper) {
+        var level = helper.getLevel().getServer().getLevel(net.minecraft.world.level.Level.NETHER);
+        helper.assertTrue(level != null && !level.dimensionType().hasSkyLight(), "Missing skyless dimension fixture");
+        var block = (DaylightDetectorBlock) Blocks.DAYLIGHT_DETECTOR;
+        var ticker = block.getTicker(level, block.defaultBlockState(), net.minecraft.world.level.block.entity.BlockEntityType.DAYLIGHT_DETECTOR);
+        helper.assertTrue(ticker != null, "Daylight detector never updates beneath a panel in a skyless dimension");
+        helper.succeedWhen(() -> {
+            helper.assertTrue(level.getGameTime() % 20L == 0L, "Waiting for detector update tick");
+            BlockPos sensor = helper.absolutePos(new BlockPos(2, 1, 2)).atY(200), panel = sensor.above(2);
+            var oldSensor = level.getBlockState(sensor);
+            var oldGap = level.getBlockState(sensor.above());
+            var oldPanel = level.getBlockState(panel);
+            try {
+                level.setBlockAndUpdate(sensor, block.defaultBlockState());
+                level.setBlockAndUpdate(sensor.above(), Blocks.AIR.defaultBlockState());
+                level.setBlockAndUpdate(panel, SinguloBlocks.RAYLEIGH_PANEL.get().defaultBlockState().setValue(RayleighPanelBlock.LIT, true));
+                var be = (net.minecraft.world.level.block.entity.DaylightDetectorBlockEntity) level.getBlockEntity(sensor);
+                ticker.tick(level, sensor, level.getBlockState(sensor), be);
+                helper.assertTrue(level.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == 15,
+                        "Powered panel does not update skyless detector");
+                level.setBlockAndUpdate(panel, SinguloBlocks.RAYLEIGH_PANEL.get().defaultBlockState());
+                ticker.tick(level, sensor, level.getBlockState(sensor), be);
+                helper.assertTrue(level.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == 0,
+                        "Skyless detector stays powered after panel turns off");
+            } finally {
+                level.setBlockAndUpdate(sensor, oldSensor);
+                level.setBlockAndUpdate(sensor.above(), oldGap);
+                level.setBlockAndUpdate(panel, oldPanel);
+            }
+        });
+    }
 }
