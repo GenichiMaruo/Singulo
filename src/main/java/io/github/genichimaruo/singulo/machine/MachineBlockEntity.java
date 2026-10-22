@@ -9,7 +9,6 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -469,7 +468,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     protected void tick(Level level, BlockPos pos, BlockState state) {
-        refreshSelectionSnapshot();
+        refreshRecipeSnapshot();
         flushReturns();
         if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
             autoEject(level);
@@ -552,31 +551,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** {@link #stationRecipes(Level)} の装置の種類ごとの版（画面で待機の理由を調べるときにも使う）。 */
     public static List<RecipeHolder<MachineRecipe>> stationRecipes(Level level, MachineType type) {
-        List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        for (RecipeHolder<MachineRecipe> holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
-            if (holder.value().station().equals(type.id())) {
-                out.add(holder);
-            }
-        }
-        // サーバー設定（プリセット・殻の材料・育成時間など）を当てはめる
-        out = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(out);
-        out.sort(Comparator.comparingInt((RecipeHolder<MachineRecipe> h) -> -h.value().priority())
-                .thenComparingInt(h -> -(h.value().ingredients().size() + h.value().fluidIngredients().size()
-                        + (h.value().restore().isPresent() ? 1 : 0))).thenComparing(h -> h.id().toString()));
-        return out;
+        return MachineRecipeIndex.station(level, type);
     }
 
-    /** 質量モードで選べるレシピ（ID順）。クライアントの画面でも同じ順に並べる。 */
+    /** 質量モードで選べるレシピ（ID順）。 */
     public static List<RecipeHolder<MachineRecipe>> massRecipes(Level level, MachineType type) {
-        List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        for (RecipeHolder<MachineRecipe> holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
-            if (holder.value().station().equals(type.id()) && holder.value().isMassRecipe()) {
-                out.add(holder);
-            }
-        }
-        out = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(out);
-        out.sort(Comparator.comparing(h -> h.id().toString()));
-        return out;
+        return MachineRecipeIndex.mass(level, type);
     }
 
     @Nullable
@@ -682,21 +662,21 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     /** 指定したレシピの {@link RecipeSelection#selectable} での番号（-1 = 指定なし）。同期のたびに探さないよう覚えておく。 */
     private int selectedIndex = -2;
     @Nullable
-    private Object selectionSnapshot;
+    private Object recipeSnapshot;
 
     /** A data pack reload can change both automatic matching and the synchronized recipe order. */
-    private void refreshSelectionSnapshot() {
-        if (!type.selectsRecipe() || level == null) return;
-        Object snapshot = level.getRecipeManager().getRecipes();
-        if (selectionSnapshot != snapshot) {
-            selectionSnapshot = snapshot;
+    private void refreshRecipeSnapshot() {
+        if (level == null) return;
+        Object snapshot = MachineRecipeIndex.snapshot(level);
+        if (recipeSnapshot != snapshot) {
+            recipeSnapshot = snapshot;
             selectedIndex = -2;
             markDirty();
         }
     }
 
     private int selectedIndex() {
-        refreshSelectionSnapshot();
+        refreshRecipeSnapshot();
         if (selectedIndex == -2 && level != null) {
             selectedIndex = RecipeSelection.indexOf(level, type, selectedRecipe);
         }

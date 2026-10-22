@@ -2,7 +2,6 @@ package io.github.genichimaruo.singulo.machine;
 
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,14 +33,7 @@ public final class RecipeSelection {
 
     /** 選べるレシピ（質量・材料なしのものを除き、ID順）。画面のボタンの番号と同期の値はこの並びの番号。 */
     public static List<RecipeHolder<MachineRecipe>> selectable(Level level, MachineType type) {
-        List<RecipeHolder<MachineRecipe>> out = new ArrayList<>();
-        for (RecipeHolder<MachineRecipe> h : MachineBlockEntity.stationRecipes(level, type)) {
-            if (!h.value().isMassRecipe() && !MachineBlockEntity.isFree(h.value())) {
-                out.add(h);
-            }
-        }
-        out.sort(Comparator.comparing(h -> h.id().toString()));
-        return out;
+        return MachineRecipeIndex.selectable(level, type);
     }
 
     /** 選べるレシピの並びでの番号（なければ -1）。 */
@@ -79,6 +71,10 @@ public final class RecipeSelection {
     private record AmbiguityCache(Object recipes, Map<ResourceLocation, Boolean> values) {}
     private static final Map<RecipeManager, AmbiguityCache> AMBIGUOUS = new WeakHashMap<>();
 
+    public static synchronized void clear() {
+        synchronized (AMBIGUOUS) { AMBIGUOUS.clear(); }
+    }
+
     /**
      * このレシピの材料の種類が、同じ装置のほかのレシピの材料の種類にすべて含まれるか。含まれるなら、ほかのレシピの
      * 材料を入れている途中でも同じ状態になるので、自動では作らない（作るものの指定が要る）。
@@ -87,7 +83,7 @@ public final class RecipeSelection {
         Map<ResourceLocation, Boolean> cache;
         synchronized (AMBIGUOUS) {
             RecipeManager manager = level.getRecipeManager();
-            Object snapshot = manager.getRecipes();
+            Object snapshot = MachineRecipeIndex.snapshot(level);
             AmbiguityCache known = AMBIGUOUS.get(manager);
             // /reload replaces the immutable recipe collection inside the SAME manager.
             if (known == null || known.recipes() != snapshot) {
