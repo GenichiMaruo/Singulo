@@ -97,6 +97,20 @@ public class GravitonManipulatorItem extends GravityGauntletItem {
     private record Thrown(java.util.List<Integer> entityIds, Vec3 velocity, int[] ticksLeft) {}
     private static final java.util.Map<java.util.UUID, Thrown> THROWN = new java.util.HashMap<>();
     private static final int THROW_HOLD_TICKS = 3;
+
+    public static void forgetPlayer(ServerPlayer player) {
+        java.util.UUID id = player.getUUID();
+        LEFT_DOWN.remove(id);
+        CHARGING.remove(id);
+        THROWN.remove(id);
+        LIFTED.remove(id);
+        release(player);
+    }
+
+    public static void clearRuntime() {
+        LEFT_DOWN.clear(); CHARGING.clear(); THROWN.clear(); LIFTED.clear();
+        GravityGauntletItem.clearRuntime();
+    }
     /**
      * 浮遊で持ち上げている対象と、最後に持ち上げた時刻（プレイヤーごと）。
      * 1体を狙うときも、円錐（G キー）で何体も持ち上げるときも、実際に浮かせたものをここに記録して、投げるときに使う。

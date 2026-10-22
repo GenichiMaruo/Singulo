@@ -36,6 +36,10 @@ public final class ArenaShield {
 
     private ArenaShield() {}
 
+    public static void forgetLevel(Level level) {
+        ACTIVE.values().removeIf(s -> s.dimension() == level.dimension());
+    }
+
     public static void raise(UUID owner, Level level, Vec3 center, double radius, int floorY, double floorRadius) {
         ACTIVE.put(owner, new Sphere(level.dimension(), center, radius, floorY, floorRadius));
     }

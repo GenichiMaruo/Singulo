@@ -35,6 +35,15 @@ public final class BossCombatLog {
 
     private BossCombatLog() {}
 
+    public static void forgetLevel(net.minecraft.world.level.Level level) {
+        SLAMS.values().removeIf(s -> s.boss().level() == level);
+    }
+
+    public static void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        SLAMS.values().removeIf(s -> s.boss().isRemoved()
+                || s.boss().level().getGameTime() > s.until());
+    }
+
     /** ボスが相手を叩きつけた（このあと数秒の落下ダメージを、その技で受けたものとして記録する）。 */
     public static void slammed(LivingEntity target, Mob boss, String attack) {
         if (target instanceof Player && enabled()) {
