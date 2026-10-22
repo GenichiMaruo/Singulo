@@ -76,7 +76,8 @@ public final class RecipeSelection {
     }
 
     /** レシピマネージャーごとの「ほかのレシピの途中になりうるか」の結果（レシピの再読み込みで作り直す）。 */
-    private static final Map<RecipeManager, Map<ResourceLocation, Boolean>> AMBIGUOUS = new WeakHashMap<>();
+    private record AmbiguityCache(Object recipes, Map<ResourceLocation, Boolean> values) {}
+    private static final Map<RecipeManager, AmbiguityCache> AMBIGUOUS = new WeakHashMap<>();
 
     /**
      * このレシピの材料の種類が、同じ装置のほかのレシピの材料の種類にすべて含まれるか。含まれるなら、ほかのレシピの
@@ -85,7 +86,15 @@ public final class RecipeSelection {
     public static boolean ambiguous(Level level, MachineType type, RecipeHolder<MachineRecipe> recipe) {
         Map<ResourceLocation, Boolean> cache;
         synchronized (AMBIGUOUS) {
-            cache = AMBIGUOUS.computeIfAbsent(level.getRecipeManager(), m -> new HashMap<>());
+            RecipeManager manager = level.getRecipeManager();
+            Object snapshot = manager.getRecipes();
+            AmbiguityCache known = AMBIGUOUS.get(manager);
+            // /reload replaces the immutable recipe collection inside the SAME manager.
+            if (known == null || known.recipes() != snapshot) {
+                known = new AmbiguityCache(snapshot, new HashMap<>());
+                AMBIGUOUS.put(manager, known);
+            }
+            cache = known.values();
         }
         synchronized (cache) {
             Boolean known = cache.get(recipe.id());

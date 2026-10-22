@@ -469,6 +469,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     protected void tick(Level level, BlockPos pos, BlockState state) {
+        refreshSelectionSnapshot();
         flushReturns();
         if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
             autoEject(level);
@@ -680,8 +681,22 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** 指定したレシピの {@link RecipeSelection#selectable} での番号（-1 = 指定なし）。同期のたびに探さないよう覚えておく。 */
     private int selectedIndex = -2;
+    @Nullable
+    private Object selectionSnapshot;
+
+    /** A data pack reload can change both automatic matching and the synchronized recipe order. */
+    private void refreshSelectionSnapshot() {
+        if (!type.selectsRecipe() || level == null) return;
+        Object snapshot = level.getRecipeManager().getRecipes();
+        if (selectionSnapshot != snapshot) {
+            selectionSnapshot = snapshot;
+            selectedIndex = -2;
+            markDirty();
+        }
+    }
 
     private int selectedIndex() {
+        refreshSelectionSnapshot();
         if (selectedIndex == -2 && level != null) {
             selectedIndex = RecipeSelection.indexOf(level, type, selectedRecipe);
         }
