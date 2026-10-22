@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 /**
  * レイリー散乱パネル: 天井に張る空の投影板。下の面だけが投影面で、点いている間は雲も太陽もない真昼の青空が見え、
- * 真下を真昼の日差しのように照らす（明るさ15。真下の日照センサーは真昼の値を出す: {@link RayleighSky}）。
+ * 真下へ晴天・正午と同じ空の光を届ける（遮蔽物がなければSKY=15。減衰・日照判定は {@link RayleighSky}）。
  * 消えていると、星のない真夜中のように暗い。夜にはならない。
  * <ul>
  *   <li>研究所の天井のもの（lab）: 研究所の中央動力炉を起動すると点く（{@link LabPower#restore}）。壊すと何も残らない。</li>
@@ -68,6 +68,19 @@ public class RayleighPanelBlock extends BaseEntityBlock {
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
+    }
+
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
+        super.onPlace(state, level, pos, oldState, moved);
+        RayleighSky.register(level, pos);
+        RayleighSky.changed(level, pos);
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+        if (!(newState.getBlock() instanceof RayleighPanelBlock)) RayleighSky.unregister(level, pos);
+        super.onRemove(state, level, pos, newState, moved);
     }
 
     @Nullable

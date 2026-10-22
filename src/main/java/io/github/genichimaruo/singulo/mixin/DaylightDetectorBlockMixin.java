@@ -34,15 +34,23 @@ public abstract class DaylightDetectorBlockMixin {
         }
     }
 
+    // Keep the native natural/inverted formula, then combine it with local noon. Do this
+    // before vanilla writes POWER so a steady panel cannot produce transient redstone pulses.
     @Inject(method = "updateSignalStrength", at = @At("HEAD"), cancellable = true)
     private static void singulo$rayleighNoon(BlockState state, Level level, BlockPos pos, CallbackInfo ci) {
-        if (!RayleighSky.litAbove(level, pos)) {
-            return;
+        int daylight = RayleighSky.light(level, pos);
+        if (daylight == 0) return;
+        boolean inverted = state.getValue(DaylightDetectorBlock.INVERTED);
+        int natural = level.getBrightness(net.minecraft.world.level.LightLayer.SKY, pos) - level.getSkyDarken();
+        if (inverted) natural = 15 - natural;
+        else if (natural > 0) {
+            float angle = level.getSunAngle(1.0F);
+            angle += ((angle < Math.PI ? 0 : (float) (Math.PI * 2)) - angle) * .2F;
+            natural = Math.round(natural * net.minecraft.util.Mth.cos(angle));
         }
-        int signal = RayleighSky.noonSignal(state.getValue(DaylightDetectorBlock.INVERTED));
-        if (state.getValue(DaylightDetectorBlock.POWER) != signal) {
-            level.setBlock(pos, state.setValue(DaylightDetectorBlock.POWER, signal), 3);
-        }
+        natural = net.minecraft.util.Mth.clamp(natural, 0, 15);
+        int signal = inverted ? Math.min(natural, 15 - daylight) : Math.max(natural, daylight);
+        if (state.getValue(DaylightDetectorBlock.POWER) != signal) level.setBlock(pos, state.setValue(DaylightDetectorBlock.POWER, signal), 3);
         ci.cancel();
     }
 }

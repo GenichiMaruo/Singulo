@@ -40,6 +40,36 @@ public class RayleighPanelBlockEntity extends BlockEntity {
     }
 
     @Override
+    public void setBlockState(BlockState state) {
+        boolean changed = getBlockState() != state;
+        super.setBlockState(state);
+        if (changed && level != null) RayleighSky.changed(level, worldPosition);
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null) {
+            RayleighSky.register(level, worldPosition);
+            // Existing saves can contain the old panel's BLOCK=15 data. Remove that obsolete
+            // source as well as registering the new artificial sky; the light engine propagates it.
+            level.getLightEngine().checkBlock(worldPosition);
+        }
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        if (level != null) RayleighSky.unregister(level, worldPosition);
+        super.onChunkUnloaded();
+    }
+
+    @Override
+    public void setRemoved() {
+        if (level != null) RayleighSky.unregister(level, worldPosition);
+        super.setRemoved();
+    }
+
+    @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("energy", energy.getEnergyStored());

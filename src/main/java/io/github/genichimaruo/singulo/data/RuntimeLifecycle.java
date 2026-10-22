@@ -25,7 +25,9 @@ public final class RuntimeLifecycle {
 
     @SubscribeEvent
     public static void unload(LevelEvent.Unload event) {
-        if (!(event.getLevel() instanceof Level level) || level.isClientSide) return;
+        if (!(event.getLevel() instanceof Level level)) return;
+        io.github.genichimaruo.singulo.ruin.lab.RayleighSky.forgetLevel(level);
+        if (level.isClientSide) return;
         InertialStabilizerBlockEntity.forgetLevel(level);
         ShieldTowerBlockEntity.forgetLevel(level);
         PenroseReactorBlockEntity.forgetLevel(level);

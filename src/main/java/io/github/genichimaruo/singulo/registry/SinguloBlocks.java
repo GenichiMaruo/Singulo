@@ -492,7 +492,7 @@ public final class SinguloBlocks {
 
     private static BlockBehaviour.Properties rayleigh() {
         return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
-                .sound(SoundType.GLASS).lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock.LIT) ? 15 : 0);
+                .sound(SoundType.GLASS);
     }
 
     /** 研究所のスライドドア（作れない）と、それに似せた作れるスライドドア。 */

@@ -54,6 +54,7 @@ public final class SinguloClient {
             if (e.getLevel().isClientSide()) clearWorldState();
         });
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(RayleighLighting::tick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onScreenKey);
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);

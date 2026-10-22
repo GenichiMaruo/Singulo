@@ -44,12 +44,13 @@ public final class RayleighGameTests {
         helper.setBlock(inverted, Blocks.DAYLIGHT_DETECTOR.defaultBlockState().setValue(DaylightDetectorBlock.INVERTED, true));
         helper.runAtTickTime(60, () -> {
             helper.assertTrue(helper.getBlockState(panel).getValue(RayleighPanelBlock.LIT), "FE を送っているのに点かない");
-            helper.assertTrue(helper.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, helper.absolutePos(sensor)) >= 10,
+            helper.assertTrue(helper.getLevel().getBrightness(net.minecraft.world.level.LightLayer.SKY, helper.absolutePos(sensor)) == 15,
                     "真下が明るくならない");
             helper.assertTrue(helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == 15, "日照センサーが真昼の値にならない: "
                     + helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER));
             helper.assertTrue(helper.getBlockState(inverted).getValue(DaylightDetectorBlock.POWER) == 0, "反転した日照センサーが0にならない");
             helper.setBlock(source, Blocks.AIR);
+            helper.setBlock(new BlockPos(3, 6, 2), Blocks.AIR);
         });
         helper.runAtTickTime(60 + io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity.CAPACITY / io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity.USAGE + 40, () -> {
             helper.assertFalse(helper.getBlockState(panel).getValue(RayleighPanelBlock.LIT), "電力が切れても点いたまま");
@@ -113,6 +114,8 @@ public final class RayleighGameTests {
                 ticker.tick(level, sensor, level.getBlockState(sensor), be);
                 helper.assertTrue(level.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == 15,
                         "Powered panel does not update skyless detector");
+                helper.assertTrue(level.getBrightness(net.minecraft.world.level.LightLayer.SKY, sensor) == 15 && level.getRawBrightness(sensor, 11) == 15,
+                        "Artificial skylight is absent/darkened in a skyless dimension");
                 level.setBlockAndUpdate(panel, SinguloBlocks.RAYLEIGH_PANEL.get().defaultBlockState());
                 ticker.tick(level, sensor, level.getBlockState(sensor), be);
                 helper.assertTrue(level.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == 0,
