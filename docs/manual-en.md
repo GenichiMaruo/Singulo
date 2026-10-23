@@ -47,7 +47,9 @@ These stages describe the material and technology progression. Unlocking an adva
 
 ## Power, logistics and catalysts
 
-Energy is measured in FE. Upgrade from Copper Wire to Superconducting Cable, Topological Wire and the Horizon Bus as your factory grows. Copper loses energy, and the lowest-capacity cable on each route limits its transfer rate. Unrelated branches do not lower that limit; transfers using the same cable share its per-tick capacity. The Horizon Bus has no limit: between Singulo devices it can move more than about 2.1 billion FE per tick (other mods' devices still accept up to about 2.1 billion FE/t each). Only cables that are actually carrying power glow, with a gentle wave running in the direction of flow; the brightness follows the amount of power.
+Energy is measured in FE. Upgrade from Copper Wire to Superconducting Cable, Topological Wire and the Horizon Bus as your factory grows. Copper loses energy, and the lowest-capacity cable on each route limits its transfer rate. Unrelated branches do not lower that limit; transfers using the same cable share its per-tick capacity. The Horizon Bus has no limit: between Singulo devices it can move more than about 2.1 billion FE per tick (other mods' devices still accept up to about 2.1 billion FE/t each). Only cables that are actually carrying power glow, with a gentle wave running in the direction of flow; the brightness follows the amount of power. Above 100 MFE/t the Horizon Bus is wrapped in a larger glowing sheath, and above 1 GFE/t square frames of light travel along it with the flow.
+
+Spare lower-tier cables feed higher tiers: a crafting table turns 1 Superconducting Wire and 4 Copper Wire into 4 Superconducting Cable, and the Cryogenic Cooling Tower turns 1 Entangled Element and 16 Superconducting Cable into 8 Topological Wire. The Kiln melts 8 Copper Wire back into 2 copper ingots.
 
 Sources nearer to the receiver along the cables supply power first; more distant sources cover the deficit. Equal distances use a stable coordinate order. An empty nearby source or a bottleneck on its route does not block the backup sources. Breaking a cable immediately clears the glow of that wiring.
 
@@ -134,7 +136,7 @@ Androids run on charge and run out after about ten big moves. They return to a n
 - **Farming and using blocks:** procedure cards can also harvest (pick crops and replant), fell (cut whole trees and replant; needs a **Felling Upgrade**), breed, shear, milk, cull, and use blocks (levers on/off, buttons, doors).
 - **When an android stops:** the reason (station out of power, destination unreachable, missing materials, protected block, nothing to work on in the area, storage full) appears in red in the android screen's speech bubble and in the Work Console's order details. With **Survey Glasses** on, a barrier icon floats over its head.
 - **Liquids and gases:** androids with a **Tank Upgrade** (two tanks of 32,000 mB) take liquids and gases from tanks next to supply ports and carry them to machines. Click a pattern slot with a bucket or other container, or use JEI's + button, to place a fluid in processing or procedure mode.
-- **Decorations:** the third page of the android screen holds a head slot (ribbon, hair flower, beret, headdress), a back/waist slot (cape, scarf, waist ribbon) and a hand slot (paperback, bouquet, teacup, umbrella). They are crafted on a crafting table and can be dyed.
+- **Decorations:** the third page of the android screen holds a head slot (ribbon, hair flower, beret, headdress), a back/waist slot (cape, scarf, waist ribbon) and a hand slot (paperback, bouquet, teacup, umbrella) and a face slot (glasses). They are crafted on a crafting table and can be dyed. Sneak-use **Survey Glasses** or Glasses to set how high they sit, up to 4 pixels up or down (others see the same height).
 - The station has a refill slot (tops up repair kits automatically) and an upgrade slot (a **Transfer Upgrade** passes a fallen android's inventory to the next one), and hoppers can insert into it.
 - Name your android in the station or android screen, and read its health with a comparator. If the station is broken, Link the android to a new one.
 
@@ -189,8 +191,31 @@ This manual describes the current implementation and default settings. See the [
 
 Craft the Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack a supported device with its items, fluids, energy, progress and side settings. Only the controller of a multiblock is packed. See “Power and Logistics → Relocation Wrench” in the handbook for supported devices.
 
+The wrench also has a **cable mode**; sneak-use it in the air to switch modes. In cable mode, use a cable to take back that one cable, sneak-use to take up to 64 connected cables of the same kind, and left-click to break cables instantly.
+
 Automatic ejection on ordinary processing machines defaults off. Enable the master switch in Sides to eject through allowed output faces. Hover a face to see the adjacent block. Newly generated underground labs always include both shafts, with the supply shaft connected to a dedicated cargo lift room.
 
 Unused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.
 
 Restored parts and original records exhausted during processing become item outputs with their usage and repair data intact. If the output slot is occupied, they wait in their input slot and can still be extracted by hoppers or item pipes. Enable automatic ejection to send them to adjacent inventories. Parts inserted for repair are not automatically ejected.
+
+## Precision Assembler recipe selection
+
+Without a chosen recipe, the Precision Assembler starts crafting when the kinds of items inside exactly match a recipe. A mix that could also be part of another recipe starts only after items have stopped going in for 3 seconds. Choose a recipe with the button below the output slot to craft only that one; the choice is saved, and other items may be present. Androids select their recorded recipe before inserting materials. The Singularity Encapsulator works the same way.
+
+## Facility blueprints
+
+Ruin and laboratory chests hold **blueprints**: Ruin Panel, Pristine Ruin Material, Ruin Glass, Lighting, Laboratory Material, Laboratory Furnishing and Rayleigh Sky Panel. Arrange a blueprint and materials in its shape on a crafting table to make building blocks; the blueprint stays in the grid. Tooltips and JEI show where each is found and its recipes. Lab doors and the Lab Rayleigh Sky Panels in lab ceilings cannot be collected or crafted.
+
+## Sky and gravity panels
+
+A **Panel Receiver** powers connected low-gravity, high-gravity and zero-gravity panels and crafted Rayleigh Sky Panels. The nearest receivers pay first, and other receivers cover what they cannot. One receiver can handle thousands of panels.
+
+- **Rayleigh Sky Panel:** placed in a ceiling, it lights the space below with clear noon sunlight (sky light, daylight detectors and sunlight-burning mobs all respond). World time and weather are unchanged. The Lab Rayleigh Sky Panel runs on facility power.
+- **Zero-Gravity Block:** makes a weightless space above it. Jump to drift up and sneak to drift down. The height is 5 blocks by default and changes with a **Zero-Gravity Control Box**. Each block uses 30 FE/t at height 5, and each extra block of height multiplies that by 1.4. Control boxes joined through zero-gravity blocks share one height, and a broken box remembers it. Androids are not affected by gravity changes.
+
+## Laboratory rooms
+
+Every newly generated underground lab has at least one of a **Solarium**, planted under an artificial sky, or an **Outdoor Test Ground** for training. The observation hut chest at the test ground usually holds the Rayleigh Sky Panel Blueprint. Each of the eight **private rooms** has a **Room Light** in its ceiling, switched by the lever beside it (no facility power needed; craftable from the Lighting Blueprint).
+
+Androids printed by Ruin Android Fabricators and drones launched by Guard Docks drop a few parts when killed by a player. Ones from spawn eggs and similar sources drop nothing.
