@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
-/** レイリー散乱パネル: FE で点き、真下の日照センサーは真昼の値。研究所のものは研究所の電力で点き、壊すと何も残らない。 */
+/** レイリー散乱パネル: パネル受電器から電力を受けて点き、真下の日照センサーは真昼の値。研究所のものは研究所の電力で点き、壊すと何も残らない。 */
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class RayleighGameTests {
@@ -21,10 +21,10 @@ public final class RayleighGameTests {
 
     private RayleighGameTests() {}
 
-    /** 天井（y 5）のパネルの下の日照センサー: 点いていれば15（反転は0）。電力が切れ、ためた分も使い切ると、空の値に戻る（天井の下なので0）。 */
+    /** 天井（y 5）のパネル2枚を、上の受電器1台で点ける。真下の日照センサーは15（反転は0）。電力が切れると空の値に戻る。 */
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void poweredPanelMakesNoonBelow(GameTestHelper helper) {
-        BlockPos panel = new BlockPos(2, 5, 2), source = new BlockPos(2, 6, 2);
+        BlockPos panel = new BlockPos(2, 5, 2), receiver = new BlockPos(2, 6, 2), source = new BlockPos(2, 7, 2);
         BlockPos sensor = new BlockPos(2, 1, 2), inverted = new BlockPos(3, 1, 2), panel2 = new BlockPos(3, 5, 2);
         // 屋根と壁で囲んで日を遮る（パネル以外は不透明。中に空の光が入らない）
         for (int x = 0; x <= 5; x++) {
@@ -38,21 +38,21 @@ public final class RayleighGameTests {
         }
         helper.setBlock(panel, SinguloBlocks.RAYLEIGH_PANEL.get());
         helper.setBlock(panel2, SinguloBlocks.RAYLEIGH_PANEL.get());
+        helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(source, SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        helper.setBlock(new BlockPos(3, 6, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         helper.setBlock(sensor, Blocks.DAYLIGHT_DETECTOR);
         helper.setBlock(inverted, Blocks.DAYLIGHT_DETECTOR.defaultBlockState().setValue(DaylightDetectorBlock.INVERTED, true));
         helper.runAtTickTime(60, () -> {
-            helper.assertTrue(helper.getBlockState(panel).getValue(RayleighPanelBlock.LIT), "FE を送っているのに点かない");
+            helper.assertTrue(helper.getBlockState(panel).getValue(RayleighPanelBlock.LIT), "受電器から電力を送っているのに点かない");
+            helper.assertTrue(helper.getBlockState(panel2).getValue(RayleighPanelBlock.LIT), "つながったパネルに電力が届かない");
             helper.assertTrue(helper.getLevel().getBrightness(net.minecraft.world.level.LightLayer.SKY, helper.absolutePos(sensor)) == 15,
                     "真下が明るくならない");
             helper.assertTrue(helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == 15, "日照センサーが真昼の値にならない: "
                     + helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER));
             helper.assertTrue(helper.getBlockState(inverted).getValue(DaylightDetectorBlock.POWER) == 0, "反転した日照センサーが0にならない");
             helper.setBlock(source, Blocks.AIR);
-            helper.setBlock(new BlockPos(3, 6, 2), Blocks.AIR);
         });
-        helper.runAtTickTime(60 + io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity.CAPACITY / io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity.USAGE + 40, () -> {
+        helper.runAtTickTime(120, () -> {
             helper.assertFalse(helper.getBlockState(panel).getValue(RayleighPanelBlock.LIT), "電力が切れても点いたまま");
             int expected = vanillaSignal(helper, sensor);
             helper.assertTrue(helper.getBlockState(sensor).getValue(DaylightDetectorBlock.POWER) == expected,
