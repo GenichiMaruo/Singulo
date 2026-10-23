@@ -4976,8 +4976,8 @@
     "translation": "未形成"
   },
   "gui.singulo.reason.ambiguous": {
-    "source": "The materials for %s are in, but the same mix appears while loading other recipes, so it is not made automatically.",
-    "translation": "%s 的材料已齐，但与放入其他配方材料途中的组合相同，因此不会自动制作"
+    "source": "The materials for %s are in, but the same mix appears while loading other recipes, so it starts 3 seconds after you stop adding items.",
+    "translation": "%s 的材料已齐，但与其他配方中途的组合相同，因此会在停止放入3秒后开始制作"
   },
   "gui.singulo.reason.arrange": {
     "source": "- The amounts are there. Try putting each material in its own slot.",
@@ -5352,8 +5352,8 @@
     "translation": "制作目标：自动"
   },
   "gui.singulo.select.auto_hint": {
-    "source": "Makes only a recipe that uses everything inside, and never one whose mix also appears partway through another recipe.",
-    "translation": "只制作会用到全部已放入物品的配方，不制作与其他配方中途相同的材料组合"
+    "source": "Makes a recipe that uses everything inside. A mix that also appears partway through another recipe starts 3 seconds after you stop adding items.",
+    "translation": "制作会用到全部已放入物品的配方。与其他配方中途相同的材料组合，会在停止放入3秒后开始制作"
   },
   "gui.singulo.select.auto_short": {
     "source": "A",
@@ -10984,8 +10984,8 @@
     "translation": "用于：桌面显示器、咖啡机、自动售货机、文件堆、垃圾桶 等 2 个"
   },
   "uses.singulo.blueprint_lighting": {
-    "source": "Used in: Ruin Lamp, Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson) and 3 more",
-    "translation": "用于：废墟灯、废墟灯（琥珀）、废墟灯（翠绿）、废墟灯（紫罗兰）、废墟灯（深红） 等 3 个"
+    "source": "Used in: Ruin Lamp, Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson) and 4 more",
+    "translation": "用于：废墟灯、废墟灯（琥珀）、废墟灯（翠绿）、废墟灯（紫罗兰）、废墟灯（深红） 等 4 个"
   },
   "uses.singulo.blueprint_pristine_ruin": {
     "source": "Used in: Pristine Ruin Panel, Pristine Ruin Tiles, Pristine Ruin Pillar",
@@ -11524,8 +11524,8 @@
     "translation": "用于：重力场稳定器、虫洞生成器聚焦器、虫洞入口外壳"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 21 more",
-    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 21 个"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 22 more",
+    "translation": "用于：基本电路、设置卡、基本框架、陶瓷基板、铜导线 等 22 个"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",

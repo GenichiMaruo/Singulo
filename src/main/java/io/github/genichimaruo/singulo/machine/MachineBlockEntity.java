@@ -103,6 +103,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             @Override
             protected void onContentsChanged(int slot) {
                 pendingReturns.clear(slot);
+                if (!crafting && slot < type.inputSlots() && level != null) {
+                    inputsChangedAt = level.getGameTime();          // 人・ホッパー・アンドロイドが入れ替えた（装置が使った分は数えない）
+                }
                 markDirty();
             }
 
@@ -487,7 +490,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             if (type.massMode() && mode > 0) {
                 absorbMass(level);
             }
-            if (dirty) {
+            if (dirty || waitingSettle) {
                 dirty = false;
                 refreshRecipe(level);
             }
@@ -570,6 +573,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void refreshRecipe(Level level) {
+        waitingSettle = false;
         RecipeHolder<MachineRecipe> found = null;
         List<ItemStack> inputs = inputStacks();
         if (mode > 0) {
@@ -644,8 +648,57 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             return holder.id().equals(selectedRecipe);
         }
         MachineRecipe.Plan plan = holder.value().plan(inputs);
-        return plan != null && RecipeSelection.usesEveryInput(type, inputs, plan)
-                && !RecipeSelection.ambiguous(level, type, holder);
+        if (plan == null || !RecipeSelection.usesEveryInput(type, inputs, plan)) {
+            return false;
+        }
+        if (!RecipeSelection.ambiguous(level, type, holder)) {
+            return true;
+        }
+        // ほかのレシピの途中と同じ組み合わせ: 入れるのが SETTLE_TICKS 止まったら、入れ終わったとみなして作る
+        if (level.getGameTime() - inputsChangedAt >= RecipeSelection.SETTLE_TICKS) {
+            return true;
+        }
+        waitingSettle = true;
+        return false;
+    }
+
+    /** 人・ホッパー・アンドロイドが入力の欄を最後に変えた時刻（装置が材料を使った分は含めない）。 */
+    private long inputsChangedAt;
+    /** 装置が材料を使っている最中か（その変化は inputsChangedAt に数えない）。 */
+    private boolean crafting;
+    /** 入れ終わるのを待っているレシピがあるか（あれば毎 tick 選び直す）。 */
+    private boolean waitingSettle;
+
+    /**
+     * アンドロイドが作りたい物 output（材料 inputs）に合うレシピを指定する（作るものを選べる装置だけ）。
+     * 材料の一部が別のレシピと同じでも、アンドロイドの決めたレシピ通りの物ができる。
+     */
+    public void selectFor(net.minecraft.world.item.ItemStack output, List<net.minecraft.world.item.ItemStack> inputs) {
+        if (!type.selectsRecipe() || level == null || output.isEmpty()) {
+            return;
+        }
+        RecipeHolder<MachineRecipe> best = null;
+        int bestScore = -1;
+        for (RecipeHolder<MachineRecipe> h : RecipeSelection.selectable(level, type)) {
+            if (!net.minecraft.world.item.ItemStack.isSameItem(h.value().result(), output)) {
+                continue;
+            }
+            int score = 0;
+            for (MachineRecipe.ItemInput in : h.value().ingredients()) {
+                if (inputs.stream().anyMatch(in.ingredient())) {
+                    score++;
+                }
+            }
+            if (score > bestScore) {
+                best = h;
+                bestScore = score;
+            }
+        }
+        if (best != null && !best.id().equals(selectedRecipe)) {
+            selectedRecipe = best.id();
+            selectedIndex = -2;
+            markDirty();
+        }
     }
 
     /** 作るものを指定する（GUIから）。index は {@link RecipeSelection#selectable} の番号、範囲外なら指定を外す。 */
@@ -884,6 +937,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void craft(Level level, MachineRecipe r) {
+        crafting = true;
+        try {
+            craftNow(level, r);
+        } finally {
+            crafting = false;
+        }
+    }
+
+    private void craftNow(Level level, MachineRecipe r) {
         MachineRecipe.Plan plan = r.plan(r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks());
         if (plan == null || !massAvailable(r) || !fluidsAvailable(r)) {
             return;
