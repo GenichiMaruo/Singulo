@@ -20,6 +20,11 @@ for name in ("inventory-pixels.json", "machine-pixels.json", "machine-font-metri
              "sides-font-metrics.tsv", "selector-font-metrics.tsv"):
     (root / name).unlink(missing_ok=True)
 shutil.copytree(source, target)
+# Retain tested save metadata, but generate fresh flat chunks for GUI fixtures.
+# Completed server tests may leave large facilities or forced chunks in their disposable world.
+for name in ("region", "entities", "poi", "DIM-1", "DIM1"):
+    shutil.rmtree(target / name, ignore_errors=True)
+(target / "data/forcedchunks.dat").unlink(missing_ok=True)
 (root / "options.txt").write_text(
     "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:2\nsimulationDistance:5\npauseOnLostFocus:false\n",
     encoding="utf-8",

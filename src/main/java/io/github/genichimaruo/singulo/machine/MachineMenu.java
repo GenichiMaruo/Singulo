@@ -51,6 +51,11 @@ public class MachineMenu extends AbstractContainerMenu {
                 public int getMaxStackSize(ItemStack stack) {
                     return io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack) ? 1 : super.getMaxStackSize(stack);
                 }
+
+                @Override
+                public int getMaxStackSize() {
+                    return io.github.genichimaruo.singulo.item.UsesHelper.hasUses(getItem()) ? 1 : super.getMaxStackSize();
+                }
             });
         }
         for (int i = 0; i < type.outputSlots(); i++) {
@@ -148,11 +153,13 @@ public class MachineMenu extends AbstractContainerMenu {
             }
         } else if (io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack)) {
             // A single template per shift-click, rather than filling every input with originals.
+            ItemStack single = stack.copyWithCount(1);
             boolean moved = false;
             for (int i = 0; i < type.inputSlots() && !moved; i++) {
-                moved = moveItemStackTo(stack, i, i + 1, false);
+                moved = moveItemStackTo(single, i, i + 1, false);
             }
             if (!moved) return ItemStack.EMPTY;
+            stack.shrink(1 - single.getCount());
         } else if (!moveItemStackTo(stack, 0, type.inputSlots(), false)) {
             return ItemStack.EMPTY;
         }

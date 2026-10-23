@@ -78,8 +78,16 @@ public final class UsesStackGameTests {
             int total=0;
             for (int i=0;i<archive.type().inputSlots();i++) total+=archive.items().getStackInSlot(i).getCount();
             h.assertTrue(total==1 && player.getInventory().getItem(9).getCount()==63,"Shift-click scattered or lost originals");
-            ItemStack rest=archive.items().insertItem(1,new ItemStack(Items.IRON_INGOT,64),false);
-            h.assertTrue(rest.isEmpty() && archive.items().getStackInSlot(1).getCount()==64,"Ordinary ingredients stopped stacking");
+            menu.quickMoveStack(player,archive.type().itemSlots());
+            total=0;
+            for (int i=0;i<archive.type().inputSlots();i++) {
+                int count=archive.items().getStackInSlot(i).getCount();
+                h.assertTrue(count<=1,"Repeated shift-click merged originals past the slot limit");
+                total+=count;
+            }
+            h.assertTrue(total==2 && player.getInventory().getItem(9).getCount()==62,"Repeated shift-click lost originals");
+            ItemStack rest=archive.items().insertItem(2,new ItemStack(Items.IRON_INGOT,64),false);
+            h.assertTrue(rest.isEmpty() && archive.items().getStackInSlot(2).getCount()==64,"Ordinary ingredients stopped stacking");
         } finally {player.discard();}
         h.succeed();
     }
