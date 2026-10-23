@@ -62,6 +62,18 @@ def lab_tiles():
     return im
 
 
+def room_light(on):
+    """居室灯: 白い枠の中の、乳白色の灯の面（点くと暖かい白、消えると灰色）。四隅に留め具。"""
+    im, d = new(rgba((236, 238, 242)))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(SEAM))
+    face = (255, 246, 222) if on else (168, 172, 180)
+    d.rectangle([2, 2, S - 3, S - 3], fill=rgba(face), outline=rgba((210, 212, 218) if on else (140, 144, 152)))
+    if on:
+        d.rectangle([4, 4, S - 5, S - 5], fill=(255, 252, 240, 255))
+    d.point([(1, 1), (S - 2, 1), (1, S - 2), (S - 2, S - 2)], fill=rgba(SEAM))
+    return im
+
+
 def power_conduit(on):
     """動力導管: 暗い鋼の管に、縦の筋。止まっていると鈍い青、動いていると明るい水色に光る。"""
     im, d = new(rgba(STEEL_DARK))
@@ -456,9 +468,10 @@ def rayleigh_top(lab):
     return im
 
 
-def rayleigh_bottom(lab):
-    """下の面（投影面）: 縁1ドット（光らない）と、消えているときの暗い面。点いている空は Java が上に描く。"""
-    im, d = new(rgba(RAYLEIGH_NIGHT))
+def rayleigh_bottom(lab, lit=False):
+    """下の面（投影面）: 縁1ドット（光らない）と、消えているときの暗い面。点いている空は Java が上に描く。
+    点いているときの絵（lit）は空の中ほどの色にしておく: 空を描く処理が画面の端で一瞬省かれても、黒くちらつかない。"""
+    im, d = new(rgba(mix(*RAYLEIGH_NOON, 0.5) if lit else RAYLEIGH_NIGHT))
     d.rectangle([0, 0, S - 1, S - 1], outline=rgba(RAYLEIGH_FRAME[lab]))
     return im
 
@@ -627,10 +640,13 @@ def textures(tb, save_plain):
         save_plain(vending_glow(upper), tb / f'vending_machine_front_{half}_glow.png')
         save(vending_side(upper), tb / f'vending_machine_side_{half}.png')
     save(vending_top(), tb / 'vending_machine_top.png')
+    save(room_light(False), tb / 'room_light_off.png')
+    save(room_light(True), tb / 'room_light_on.png')
     for lab in (True, False):
         name = 'lab_rayleigh_panel' if lab else 'rayleigh_panel'
         save(rayleigh_casing(lab), tb / f'{name}_side.png')
         save_plain(rayleigh_bottom(lab), tb / f'{name}_bottom.png')
+        save_plain(rayleigh_bottom(lab, True), tb / f'{name}_bottom_lit.png')
         save(rayleigh_top(lab), tb / f'{name}_top.png')
         save_plain(rayleigh_icon(lab), tb / f'{name}_sky.png')
     save(paper(), tb / 'paper_stack_top.png')
@@ -773,6 +789,12 @@ def models(write_json, assets):
                                'elements': held_glass}},
         'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass)})
     decor_models(write_json, mb, mi, bs)
+    # 居室灯（レッドストーンで点く）
+    for tag, on in (('off', False), ('on', True)):
+        write_json(mb / f'room_light_{tag}.json', _cube(f'room_light_{tag}', emissive=on))
+    write_json(bs / 'room_light.json', {'variants': {'lit=false': {'model': f'{MODID}:block/room_light_off'},
+                                                     'lit=true': {'model': f'{MODID}:block/room_light_on'}}})
+    write_json(mi / 'room_light.json', {'parent': f'{MODID}:block/room_light_on'})
     door_models(write_json, mb, mi, bs)
     rayleigh_models(write_json, mb, mi, bs)
 
@@ -788,7 +810,13 @@ def rayleigh_models(write_json, mb, mi, bs):
         write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/block',
                                         'textures': {'side': side, 'top': top, 'bottom': bottom, 'particle': side},
                                         'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': faces}]})
-        write_json(bs / f'{iid}.json', {'variants': {f'lit={v}': {'model': f'{MODID}:block/{iid}'} for v in ('false', 'true')}})
+        lit_faces = dict(faces)
+        lit_faces['down'] = {'texture': '#bottom_lit', 'cullface': 'down'}
+        write_json(mb / f'{iid}_lit.json', {'parent': 'minecraft:block/block',
+                                            'textures': {'side': side, 'top': top, 'bottom_lit': f'{bottom}_lit', 'particle': side},
+                                            'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': lit_faces}]})
+        write_json(bs / f'{iid}.json', {'variants': {'lit=false': {'model': f'{MODID}:block/{iid}'},
+                                                     'lit=true': {'model': f'{MODID}:block/{iid}_lit'}}})
         # 持ったとき: 立体のまま、下の面には空の絵を貼り、持ち物欄では下から見上げる向きにして空を見せる
         item_faces = dict(faces)
         item_faces['down'] = {'texture': '#sky'}

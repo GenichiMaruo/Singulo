@@ -4,7 +4,7 @@
       "model": "singulo:block/rayleigh_panel"
     },
     "lit=true": {
-      "model": "singulo:block/rayleigh_panel"
+      "model": "singulo:block/rayleigh_panel_lit"
     }
   }
 }

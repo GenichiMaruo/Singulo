@@ -47,24 +47,29 @@ public final class BlueprintRecipeGameTests {
     @GameTest(template = EMPTY)
     public static void blueprintStaysAfterCrafting(GameTestHelper helper) {
         var level = helper.getLevel();
-        CraftingInput input = grid(new ItemStack(SinguloItems.BLUEPRINT_LAB_FURNITURE.get()), new ItemStack(Items.PAPER),
-                new ItemStack(Items.PAPER), new ItemStack(Items.PAPER), new ItemStack(Items.PAPER));
+        ItemStack bp = new ItemStack(SinguloItems.BLUEPRINT_LAB_FURNITURE.get()), paper = new ItemStack(Items.PAPER), none = ItemStack.EMPTY;
+        // 書類の山: 「紙 紙 / 設計図 紙 / 紙」の並べ方で作れる
+        CraftingInput input = grid(paper, paper, none, bp, paper, none, paper, none, none);
         var recipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
         helper.assertTrue(recipe.isPresent(), "設計図と紙で書類の山が作れない");
         helper.assertTrue(recipe.get().value().assemble(input, level.registryAccess()).is(SinguloBlocks.PAPER_STACK.get().asItem()),
                 "書類の山ができない");
         var rest = recipe.get().value().getRemainingItems(input);
         helper.assertTrue(rest.stream().anyMatch(s -> s.is(SinguloItems.BLUEPRINT_LAB_FURNITURE.get())), "設計図が残らない");
+        // 同じ材料でも並べ方が違えば作れない（不定形ではない）
+        CraftingInput wrong = grid(bp, paper, paper, paper, paper, none, none, none, none);
+        helper.assertTrue(level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, wrong, level)
+                .map(r -> !r.value().assemble(wrong, level.registryAccess()).is(SinguloBlocks.PAPER_STACK.get().asItem())).orElse(true),
+                "並べ方が違うのに作れてしまう");
         // 設計図がなければ作れない
-        CraftingInput without = grid(new ItemStack(Items.PAPER), new ItemStack(Items.PAPER), new ItemStack(Items.PAPER),
-                new ItemStack(Items.PAPER));
+        CraftingInput without = grid(paper, paper, none, none, paper, none, paper, none, none);
         helper.assertTrue(level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, without, level)
                 .map(r -> !r.value().assemble(without, level.registryAccess()).is(SinguloBlocks.PAPER_STACK.get().asItem())).orElse(true),
                 "設計図なしで作れてしまう");
-        // レイリー散乱パネルも設計図から
-        CraftingInput sky = grid(new ItemStack(SinguloItems.BLUEPRINT_RAYLEIGH.get()), new ItemStack(Items.GLASS), new ItemStack(Items.GLASS),
-                new ItemStack(Items.GLOWSTONE_DUST), new ItemStack(Items.GLOWSTONE_DUST), new ItemStack(Items.LAPIS_LAZULI),
-                item("basic_circuit"), item("steel_plate"));
+        // レイリー散乱パネル: 「ガラス ラピス ガラス / グロウ 設計図 グロウ / 鋼板 回路 鋼板」
+        ItemStack glass = new ItemStack(Items.GLASS), glow = new ItemStack(Items.GLOWSTONE_DUST), plate = item("steel_plate");
+        CraftingInput sky = grid(glass, new ItemStack(Items.LAPIS_LAZULI), glass, glow, new ItemStack(SinguloItems.BLUEPRINT_RAYLEIGH.get()), glow,
+                plate, item("basic_circuit"), plate);
         var skyRecipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, sky, level);
         helper.assertTrue(skyRecipe.isPresent() && skyRecipe.get().value().assemble(sky, level.registryAccess())
                 .is(SinguloBlocks.RAYLEIGH_PANEL.get().asItem()), "設計図からレイリー散乱パネルが作れない");

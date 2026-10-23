@@ -1,32 +1,25 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "GFG",
+    "GBG",
+    "FD "
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lab_furniture"
     },
-    {
+    "G": {
       "tag": "c:glass_blocks/colorless"
     },
-    {
-      "tag": "c:glass_blocks/colorless"
-    },
-    {
-      "tag": "c:glass_blocks/colorless"
-    },
-    {
-      "tag": "c:glass_blocks/colorless"
-    },
-    {
+    "F": {
       "item": "singulo:lab_frame"
     },
-    {
-      "item": "singulo:lab_frame"
-    },
-    {
+    "D": {
       "tag": "singulo:ceramic_flux"
     }
-  ],
+  },
   "result": {
     "id": "singulo:android_capsule",
     "count": 1

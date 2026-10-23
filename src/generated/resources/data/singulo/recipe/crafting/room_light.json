@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WGW",
+    "RBR"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lighting"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "G": {
+      "tag": "c:dusts/glowstone"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    }
+  },
+  "result": {
+    "id": "singulo:room_light",
+    "count": 4
+  }
+}

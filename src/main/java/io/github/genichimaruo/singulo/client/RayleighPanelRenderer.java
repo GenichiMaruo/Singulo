@@ -35,6 +35,15 @@ public class RayleighPanelRenderer implements BlockEntityRenderer<RayleighPanelB
     public RayleighPanelRenderer(BlockEntityRendererProvider.Context context) {}
 
     /**
+     * 描く範囲を1マス広げる。ブロックの箱ちょうどだと、画面の端で面が途切れて見えるとき、空の描画だけが先に省かれて
+     * モデルの下の面がのぞき、歩くと端が黒くちらついた。
+     */
+    @Override
+    public net.minecraft.world.phys.AABB getRenderBoundingBox(RayleighPanelBlockEntity be) {
+        return new net.minecraft.world.phys.AABB(be.getBlockPos()).inflate(1);
+    }
+
+    /**
      * 目から見た向き dir（正規化済み）の空の色。頂点の法線は上向きにする（下向きだと、エンティティの陰影で下の面が暗く沈み、
      * 真昼の空に見えない）。
      */

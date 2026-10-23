@@ -1103,6 +1103,10 @@
     "source": "Rogue Black Hole",
     "translation": "떠돌이 블랙홀"
   },
+  "block.singulo.room_light": {
+    "source": "Room Light",
+    "translation": "거실등"
+  },
   "block.singulo.ruin_android_fabricator": {
     "source": "Ruin Android Fabricator",
     "translation": "폐허 안드로이드 출력대"
@@ -2559,6 +2563,10 @@
     "source": "Sneak-use to relocate processing machines, generators, energy storage and catalyst devices with their items, fluids, energy and settings.",
     "translation": "웅크리고 사용하면 아이템, 유체, 에너지 및 설정을 보존하여 가공 장치, 발전기, 에너지 저장 장치 및 촉매 장치를 이전합니다."
   },
+  "desc.singulo.room_light": {
+    "source": "The ceiling light of a laboratory private room. It glows only while it gets a redstone signal (flip the lever beside it on the ceiling). Needs no facility power. Made from the Lighting Blueprint.",
+    "translation": "연구소 개인실의 천장등. 레드스톤 신호가 들어오는 동안만 빛난다(천장 옆의 레버로 켜고 끈다). 시설 전력은 필요 없다. 조명 설계도로 만든다."
+  },
   "desc.singulo.ruin_android_fabricator": {
     "source": "Prints androids onto its bed and sends them out. Defeat them all for a 50% chance at a compact crystal memory of their design.",
     "translation": "받침대 위에 안드로이드를 출력해 출격시킵니다. 모두 쓰러뜨리면 절반의 확률로 그 형의 소형 크리스털 메모리를 얻습니다."
@@ -2964,8 +2972,8 @@
     "translation": "패널 수전기에서 전력이 오면 위의 공간(처음에는 5블록)이 무중력이 된다. 그 안에서는 점프 키로 위로, 웅크리기로 아래로 떠다니며 낙하 피해도 없다. 1개 30 FE/t. 높이는 무중력 컨트롤 박스로 바꿀 수 있다. 옆의 같은 블록과 모양이 이어진다."
   },
   "desc.singulo.zero_gravity_controller": {
-    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Each extra block of height multiplies the power of every zero-gravity block by 1.6.",
-    "translation": "무중력 블록에 붙이면 이어진 무중력 블록 전체의 무중력 높이를 바꿀 수 있다(우클릭으로 1블록 올리고, 웅크린 채 우클릭으로 내린다. 상한 없음). 높이 1블록마다 무중력 블록 1개의 전력이 1.6배가 된다."
+    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Boxes on the same group share one height, and a broken box keeps its height as an item. Each extra block of height multiplies the power of every zero-gravity block by 1.4.",
+    "translation": "무중력 블록에 붙이면 이어진 무중력 블록 전체의 무중력 높이를 바꿀 수 있다(우클릭으로 1블록 올리고, 웅크린 채 우클릭으로 내린다. 상한 없음). 같은 무리의 박스는 같은 높이를 공유하고, 부숴도 높이는 아이템에 남는다. 높이 1블록마다 무중력 블록 1개의 전력이 1.4배가 된다."
   },
   "desc.singulo.zinc_dust": {
     "source": "Finely powdered zinc.",
@@ -4968,8 +4976,8 @@
     "translation": "형성되지 않음"
   },
   "gui.singulo.reason.ambiguous": {
-    "source": "The materials for %s are in, but the same mix appears while loading other recipes, so it is not made automatically.",
-    "translation": "%s의 재료는 갖춰졌지만, 다른 레시피의 재료를 넣는 도중과 같은 조합이라 자동으로는 만들지 않습니다"
+    "source": "The materials for %s are in, but the same mix appears while loading other recipes, so it starts 3 seconds after you stop adding items.",
+    "translation": "%s의 재료는 갖춰졌지만, 다른 레시피 도중과 같은 조합이라 넣기를 멈추고 3초 뒤에 만들기 시작합니다"
   },
   "gui.singulo.reason.arrange": {
     "source": "- The amounts are there. Try putting each material in its own slot.",
@@ -5344,8 +5352,8 @@
     "translation": "만들 것: 자동"
   },
   "gui.singulo.select.auto_hint": {
-    "source": "Makes only a recipe that uses everything inside, and never one whose mix also appears partway through another recipe.",
-    "translation": "들어 있는 물건을 모두 쓰는 레시피만 만든다. 다른 레시피 도중과 같은 재료 조합은 만들지 않는다"
+    "source": "Makes a recipe that uses everything inside. A mix that also appears partway through another recipe starts 3 seconds after you stop adding items.",
+    "translation": "들어 있는 물건을 모두 쓰는 레시피를 만든다. 다른 레시피 도중과 같은 재료 조합은 넣기를 멈추고 3초 뒤에 만든다"
   },
   "gui.singulo.select.auto_short": {
     "source": "A",
@@ -7702,6 +7710,10 @@
   "howto.singulo.relocation_wrench": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "제작 장소: 제작대 (단계 1)"
+  },
+  "howto.singulo.room_light": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "제작: 제작대(1단계)"
   },
   "howto.singulo.ruin_glass": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -10972,8 +10984,8 @@
     "translation": "사용 대상: 책상 모니터, 커피 메이커, 자판기, 서류 더미, 쓰레기통 외 2개"
   },
   "uses.singulo.blueprint_lighting": {
-    "source": "Used in: Ruin Lamp, Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson) and 3 more",
-    "translation": "사용 대상: 폐허 램프, 폐허 조명 (호박색), 폐허 조명 (비취색), 폐허 조명 (보라색), 폐허 조명 (진홍색) 외 3개"
+    "source": "Used in: Ruin Lamp, Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson) and 4 more",
+    "translation": "사용 대상: 폐허 램프, 폐허 조명 (호박색), 폐허 조명 (비취색), 폐허 조명 (보라색), 폐허 조명 (진홍색) 외 4개"
   },
   "uses.singulo.blueprint_pristine_ruin": {
     "source": "Used in: Pristine Ruin Panel, Pristine Ruin Tiles, Pristine Ruin Pillar",
@@ -11512,8 +11524,8 @@
     "translation": "사용 대상: 중력장 안정기, 웜홀 생성기 포커서, 웜홀 입구 케이싱"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 21 more",
-    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 21개"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 22 more",
+    "translation": "사용 대상: 기본 회로, 설정 카드, 기본 프레임, 세라믹 기판, 구리 전선 외 22개"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",

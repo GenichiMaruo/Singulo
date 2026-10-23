@@ -620,13 +620,13 @@ UI_LANG = {
     'gui.singulo.select.button_hint': ('クリックで選ぶ・右クリックで自動に戻す', 'Click to choose; right-click for automatic.'),
     'gui.singulo.select.fixed_hint': ('このレシピだけを作る。ほかの物が入っていても使わない', 'Makes only this recipe; anything else inside is left alone.'),
     'gui.singulo.select.fixed': ('作るもの: %s', 'Make: %s'),
-    'gui.singulo.select.auto_hint': ('入っている物をすべて使うレシピだけを作る。ほかのレシピの途中と同じ材料の組み合わせは作らない', 'Makes only a recipe that uses everything inside, and never one whose mix also appears partway through another recipe.'),
+    'gui.singulo.select.auto_hint': ('入っている物をすべて使うレシピを作る。ほかのレシピの途中と同じ材料の組み合わせは、入れ終わって3秒たってから作る', 'Makes a recipe that uses everything inside. A mix that also appears partway through another recipe starts 3 seconds after you stop adding items.'),
     'gui.singulo.select.auto': ('作るもの: 自動', 'Make: automatic'),
     'gui.singulo.select.auto_short': ('自', 'A'),
     'gui.singulo.select.title': ('作るもの', 'Make'),
     'gui.singulo.reason.select_hint': ('出力の下のボタンで作るものを指定してください', 'Pick what to make with the button below the output.'),
     'gui.singulo.reason.extra': ('%s の材料は揃っていますが、使わない物も入っているので、自動では作りません', 'The materials for %s are in, but so are items it does not use, so it is not made automatically.'),
-    'gui.singulo.reason.ambiguous': ('%s の材料は揃っていますが、ほかのレシピの材料を入れている途中と同じ組み合わせなので、自動では作りません', 'The materials for %s are in, but the same mix appears while loading other recipes, so it is not made automatically.'),
+    'gui.singulo.reason.ambiguous': ('%s の材料は揃っていますが、ほかのレシピの途中と同じ組み合わせなので、入れ終わって3秒たってから作り始めます', 'The materials for %s are in, but the same mix appears while loading other recipes, so it starts 3 seconds after you stop adding items.'),
     'gui.singulo.reason.label.extra': ('余分な材料', 'Extra items'),
     'gui.singulo.reason.label.ambiguous': ('作るものを指定', 'Pick a recipe'),
     'gui.singulo.reason.no_power': ('1 tick に %s FE 要りますが、蓄電は %s FE です。発電を増やすか、ほかの装置を止めてください',
@@ -3023,6 +3023,31 @@ def compass_item_model():
         write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
             'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}_00'}, 'overrides': overrides})
 
+def facility_loot():
+    """遺構・研究所の印刷台のアンドロイドと、警備機ドックのドローンが、プレイヤーに倒されたときに落とす物（高価ではないが役に立つ部品）。
+    スポーンエッグなどで出した個体は落とさない（Java の facilitySpawned）。"""
+    def item(name, lo, hi, weight, vanilla=False):
+        e = {'type': 'minecraft:item', 'name': f'minecraft:{name}' if vanilla else mid(name), 'weight': weight}
+        if hi > 1:
+            e['functions'] = [{'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]
+        return e
+    killed = [{'condition': 'minecraft:killed_by_player'}]
+    android = [
+        {'rolls': {'type': 'minecraft:uniform', 'min': 1, 'max': 2}, 'conditions': killed, 'entries': [
+            item('基礎回路', 1, 2, 4), item('鋼板', 1, 3, 4), item('copper_ingot', 2, 4, 3, True), item('redstone', 2, 5, 3, True)]},
+        {'rolls': 1, 'conditions': killed, 'entries': [
+            item('自己修理キット', 1, 1, 15), item('超伝導コイル', 1, 1, 8), item('クリスタルメモリ', 1, 1, 3), {'type': 'minecraft:empty', 'weight': 74}]},
+    ]
+    drone = [
+        {'rolls': 1, 'conditions': killed, 'entries': [
+            item('copper_ingot', 1, 3, 4, True), item('redstone', 1, 4, 4, True), item('iron_nugget', 2, 6, 3, True), item('基礎回路', 1, 1, 2)]},
+        {'rolls': 1, 'conditions': killed, 'entries': [
+            item('glowstone_dust', 1, 2, 18, True), item('自己修理キット', 1, 1, 5), {'type': 'minecraft:empty', 'weight': 77}]},
+    ]
+    write_json(DATA / 'loot_table' / 'entities' / 'facility_android.json', {'type': 'minecraft:entity', 'pools': android})
+    write_json(DATA / 'loot_table' / 'entities' / 'facility_drone.json', {'type': 'minecraft:entity', 'pools': drone})
+
+
 def mid_entity(eid):
     return f'{MODID}:{eid}'
 
@@ -3088,6 +3113,7 @@ def tags():
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
+                       'zero_gravity_controller': ['minecraft:block_entity_data'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
     for n, (iid, _, kind) in MOD.items():
         if kind in BLOCK_KINDS and iid != 'strangelet':
@@ -3185,6 +3211,7 @@ def boss_loot():
                                        'count': lo if lo == hi else {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]
             pools.append({'rolls': 1, 'entries': [entry]})
         write_json(DATA / 'loot_table' / 'entities' / f'{boss}.json', {'type': 'minecraft:entity', 'pools': pools})
+    facility_loot()
 
 
 def ruins_data():
@@ -3517,7 +3544,7 @@ TAB_GROUPS = [
             'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
     # 地下アンドロイド研究所: 建材 → 照明 → 装置 → 小物 → 製造ライン
     ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead', 'lab_door',
-              'facility_light', 'emergency_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
+              'facility_light', 'emergency_light', 'room_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
               'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'canned_soda', 'sports_drink', 'energy_drink',
               'coffee', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),

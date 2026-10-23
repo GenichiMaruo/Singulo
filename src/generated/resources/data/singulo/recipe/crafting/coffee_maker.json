@@ -1,26 +1,27 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "WGW",
+    "IBK"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lab_furniture"
     },
-    {
+    "W": {
       "item": "singulo:white_ceramic_composite"
     },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
+    "G": {
       "tag": "c:glass_blocks/colorless"
     },
-    {
+    "I": {
       "tag": "c:ingots/iron"
     },
-    {
+    "K": {
       "item": "singulo:basic_circuit"
     }
-  ],
+  },
   "result": {
     "id": "singulo:coffee_maker",
     "count": 1
