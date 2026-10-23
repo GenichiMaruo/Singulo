@@ -33,7 +33,7 @@ jobs:
         with:
           distribution: temurin
           java-version: |
-            17
+            17.0.21
             21
           cache: gradle
       - name: Validate translations and models
@@ -131,7 +131,7 @@ jobs:
         with:
           distribution: temurin
           java-version: |
-            17
+            17.0.21
             21
           cache: gradle
       - name: Verify all four legacy chemical families with real Mekanism
