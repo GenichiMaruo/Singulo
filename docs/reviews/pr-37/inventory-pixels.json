@@ -1,0 +1,29 @@
+[
+  {
+    "screen": "android-status",
+    "checked_empty_slot_centers": 35,
+    "rgb": [
+      139,
+      143,
+      152
+    ]
+  },
+  {
+    "screen": "android-gear",
+    "checked_empty_slot_centers": 35,
+    "rgb": [
+      139,
+      143,
+      152
+    ]
+  },
+  {
+    "screen": "android-decor",
+    "checked_empty_slot_centers": 35,
+    "rgb": [
+      139,
+      143,
+      152
+    ]
+  }
+]

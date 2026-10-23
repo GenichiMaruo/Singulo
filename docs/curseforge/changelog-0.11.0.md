@@ -38,10 +38,19 @@ For **Minecraft 1.21.1 / NeoForge**, Java 21. JEI and Mekanism are optional.
 - Hover a face in the **Sides** panel to see the adjacent block's name.
 - Adjacent I/O ports belonging to different multiblock structures can now transfer outputs to each other.
 
+### Building and panel power
+- Reusable **facility blueprints** found in ruin caches and lab storage unlock crafting recipes for ruin materials, laboratory furnishings and lighting. Crafting uses the building materials and returns the blueprint.
+- **Panel Receivers** power connected low-gravity, high-gravity, zero-gravity and crafted Rayleigh panels. Nearby receivers pay first, with other receivers covering panels they cannot power.
+- **Zero-Gravity Blocks** create a weightless area above them. Hold jump to drift up or sneak to drift down. A **Zero-Gravity Control Box** changes the height; greater heights use more power.
+- **Rayleigh Sky Panels** provide local clear-noon sunlight, including sky light, daylight sensors and sunlight-sensitive creatures, while world time and weather continue normally. Crafted panels use a Panel Receiver; lab panels use facility power.
+- Saved panels now stop when no power is available, and unloading a receiver releases its active panels. Fast landings inside a powered weightless zone no longer cause fall damage. Impact Generators reserve power using the actual cost of their connected panels.
+- Material and blueprint descriptions are shorter; detailed crafting and usage information remains available through Shift and JEI.
+
 ### Underground Android Laboratory
 - The pressure hull now wraps only the rooms and corridors, two blocks thick, instead of filling the whole facility area. There are still no gaps to dig in through from outside.
 - A small white building now stands over the main shaft: the old entrance with a reception desk, entry gates and an elevator hall, slightly weathered. The ladder in the main shaft now leads straight out through the elevator door.
 - A new **supply shaft** (3×3) always connects a dedicated **cargo lift room** to the surface. The room has hoists, rails, conveyors, a loading platform and storage. Both the main and supply shafts are guaranteed in generated labs; the cargo lift adds one mandatory room. It is welded shut just above the room and one block below the surface with **Welded Hatches**, which can be mined with a diamond pickaxe once the overseer is defeated. The shaft itself is intact, so ladders turn it into a shortcut.
+- Each new lab includes a **Solarium** or an **Outdoor Test Ground**, sometimes both, with an artificial sky and planted or training areas. The reactor entrance now faces its access corridor, with the passage to the AI hall behind the control console.
 - New room: **private rooms**, eight researchers' rooms lined up on both sides of a hall, each behind its own door with a bed, a desk and a few belongings.
 - The cafeteria now has a **kitchen** behind a door, with a serving hatch, smokers, a sink and food storage.
 - New **Lab Sliding Door**: white twin doors that slide into the walls when right-clicked, close by themselves once no one is passing through, and stay open while powered by redstone. Lab doors cannot be crafted.

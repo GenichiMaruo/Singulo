@@ -1,0 +1,12 @@
+{
+  "languages": [
+    "ja_jp",
+    "en_us",
+    "zh_cn",
+    "zh_tw",
+    "ko_kr"
+  ],
+  "machine_captures": 120,
+  "headers_without_title_status_overlap": 80,
+  "generator_font_probes": 5
+}
