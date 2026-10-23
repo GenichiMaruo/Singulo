@@ -7,7 +7,7 @@ import net.minecraftforge.client.IArmPoseTransformer;
 
 /**
  * 傘を差す腕の構え: 肘を曲げて手を胸の高さまで上げ、少し体の内側へ寄せる（ほかの人から見て、傘の柄を手で握って見えるように）。
- * HumanoidModel.ArmPose の拡張（META-INF/enumextensions.json）。
+ * HumanoidModel.ArmPose の拡張（Forge / NeoForge 1.20.1 の create API）。
  */
 public final class UmbrellaArmPose {
     /** 腕を前へ上げる角度（ラジアン。負が前）と、体の内側へ寄せる角度。 */

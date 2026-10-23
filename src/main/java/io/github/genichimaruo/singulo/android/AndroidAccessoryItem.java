@@ -74,12 +74,11 @@ public class AndroidAccessoryItem extends Item implements net.minecraft.world.it
 
     @Override
     public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> consumer) {
-        if (!style.equals("umbrella")) return;
         consumer.accept(new net.minecraftforge.client.extensions.common.IClientItemExtensions() {
             @Override
             public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,
                     net.minecraft.world.InteractionHand hand, ItemStack stack) {
-                return io.github.genichimaruo.singulo.client.UmbrellaArmPose.UMBRELLA;
+                return "umbrella".equals(style) ? io.github.genichimaruo.singulo.client.UmbrellaArmPose.UMBRELLA : null;
             }
         });
     }
