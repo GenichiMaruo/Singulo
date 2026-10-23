@@ -1732,32 +1732,32 @@
     "translation": "在档案终端中抄写记录用的空白卡。"
   },
   "desc.singulo.blueprint_lab_building": {
-    "source": "Plans for the laboratory white panels, lined panels, floor tiles, frames, glass and power conduits. Found on laboratory supply shelves and in research chests.",
-    "translation": "研究所白色面板、带纹面板、地砖、结构材、玻璃、动力导管的设计图。可在研究所物资架和研究室收纳中找到。"
+    "source": "Plans for laboratory walls and floors.",
+    "translation": "研究所墙壁与地板的图纸。"
   },
   "desc.singulo.blueprint_lab_furniture": {
-    "source": "Plans for desk monitors, coffee makers, vending machines, paper stacks, trash bins, server racks and body capsules. Found in laboratory office, quarters and kitchen storage.",
-    "translation": "桌面显示器、咖啡机、自动售货机、文件堆、垃圾桶、服务器机架、素体胶囊的设计图。可在研究所办公室、个人房间和厨房的收纳中找到。"
+    "source": "Plans for ancient furniture and fixtures.",
+    "translation": "旧文明家具与设施的图纸。"
   },
   "desc.singulo.blueprint_lighting": {
-    "source": "Plans for ruin lamps (white, amber, verdant, violet and crimson), pristine ruin light panels and the laboratory facility and emergency lights. Found in ruin caches and laboratory supply shelves.",
-    "translation": "遗迹照明（白、琥珀、翠、堇、红）、无瑕遗迹导光板、研究所设施灯与应急灯的设计图。可在遗迹保管库和研究所物资架中找到。"
+    "source": "Plans for ancient lighting fixtures.",
+    "translation": "旧文明照明器具的图纸。"
   },
   "desc.singulo.blueprint_pristine_ruin": {
-    "source": "Plans for flawless pristine ruin panels, tiles and pillars. Found in the caches of research buildings and deeper ruins.",
-    "translation": "无瑕的遗迹面板、瓷砖、柱子的设计图。可在研究楼及更深处遗迹的保管库中找到。"
+    "source": "Plans for pristine ruin materials.",
+    "translation": "完好遗迹建材的图纸。"
   },
   "desc.singulo.blueprint_rayleigh": {
-    "source": "Plans for the Rayleigh sky panel that shows a blue sky on the ceiling. Found in laboratory research chests. The panels in the laboratory ceiling cannot be recovered, so build them from this.",
-    "translation": "在天花板上映出蓝天的瑞利散射面板的设计图。可在研究所研究室的收纳中找到。研究所天花板上的面板无法回收，因此要用它来制作。"
+    "source": "Plans for an artificial blue-sky panel.",
+    "translation": "投映人造蓝天的面板图纸。"
   },
   "desc.singulo.blueprint_ruin_glass": {
-    "source": "Plans for ruin glass (broken, intact and reinforced). Found in the caches of research buildings and deeper ruins.",
-    "translation": "遗迹玻璃（破碎、普通、强化）的设计图。可在研究楼及更深处遗迹的保管库中找到。"
+    "source": "Plans for recreating ruin glass.",
+    "translation": "复现遗迹玻璃的图纸。"
   },
   "desc.singulo.blueprint_ruin_panels": {
-    "source": "Plans for the white outer ruin panels (plain, cracked, mossy, tiled, vented, striped and scorched). Found in the caches of observation posts and research buildings.",
-    "translation": "遗迹白色外墙面板（普通、开裂、长苔、瓷砖、通风、带纹、烧焦）的设计图。可在地表观测据点和研究楼的保管库中找到。"
+    "source": "Plans for recreating ruin walls.",
+    "translation": "复现遗迹外墙的图纸。"
   },
   "desc.singulo.bose_condensate_catalyst": {
     "source": "Tier 3 catalyst.",
@@ -10527,6 +10527,10 @@
     "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
     "translation": "用储存的电力制造人工闪电，击向附近的避雷针。"
   },
+  "summary.singulo.lab_rayleigh_panel": {
+    "source": "A ceiling panel that projects a midday sky using facility power.",
+    "translation": "由设施供电、投映正午天空的天花板面板。"
+  },
   "summary.singulo.meteorite_core": {
     "source": "The core of a meteorite. Mine it for raw meteoric iron and stardust.",
     "translation": "陨石核心的团块。挖掘后获得陨铁原矿和星尘。"
@@ -10542,6 +10546,10 @@
   "summary.singulo.procedure_card": {
     "source": "Records up to eight work steps for androids.",
     "translation": "记录要让仿生人执行的作业步骤（最多 8 个）。"
+  },
+  "summary.singulo.rayleigh_panel": {
+    "source": "A powered ceiling panel that provides midday sunlight below.",
+    "translation": "通电后向下提供正午日光的天花板面板。"
   },
   "summary.singulo.shield_permit": {
     "source": "Lets only registered players work inside a shield or control a station's android.",
@@ -10570,6 +10578,10 @@
   "summary.singulo.wormhole_port": {
     "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
     "translation": "与另一侧入口附近同编号的端口连通电力、物品和液体。"
+  },
+  "summary.singulo.zero_gravity_block": {
+    "source": "Creates a weightless space above when powered.",
+    "translation": "通电后在上方形成无重力空间。"
   },
   "summary.singulo.zero_gravity_controller": {
     "source": "Sets the weightless height of joined zero-gravity blocks.",

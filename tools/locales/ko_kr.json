@@ -1732,32 +1732,32 @@
     "translation": "기록 보관 단말기의 기록을 복사하기 위한 빈 카드입니다."
   },
   "desc.singulo.blueprint_lab_building": {
-    "source": "Plans for the laboratory white panels, lined panels, floor tiles, frames, glass and power conduits. Found on laboratory supply shelves and in research chests.",
-    "translation": "연구소의 흰 패널·띠 패널·바닥 타일·구조재·유리·동력 도관의 설계도. 연구소의 물자 선반이나 연구실 수납에서 발견된다."
+    "source": "Plans for laboratory walls and floors.",
+    "translation": "연구소 벽과 바닥의 도면."
   },
   "desc.singulo.blueprint_lab_furniture": {
-    "source": "Plans for desk monitors, coffee makers, vending machines, paper stacks, trash bins, server racks and body capsules. Found in laboratory office, quarters and kitchen storage.",
-    "translation": "책상 모니터·커피 메이커·자동판매기·서류 더미·쓰레기통·서버 랙·소체 캡슐의 설계도. 연구소의 사무실·개인실·주방 수납에서 발견된다."
+    "source": "Plans for ancient furniture and fixtures.",
+    "translation": "옛 문명의 가구와 설비 도면."
   },
   "desc.singulo.blueprint_lighting": {
-    "source": "Plans for ruin lamps (white, amber, verdant, violet and crimson), pristine ruin light panels and the laboratory facility and emergency lights. Found in ruin caches and laboratory supply shelves.",
-    "translation": "유적 조명(흰색·호박·비취·제비꽃·진홍)·무구한 유적 도광판·연구소의 시설등과 비상등의 설계도. 유적 보관고나 연구소의 물자 선반에서 발견된다."
+    "source": "Plans for ancient lighting fixtures.",
+    "translation": "옛 문명의 조명 기구 도면."
   },
   "desc.singulo.blueprint_pristine_ruin": {
-    "source": "Plans for flawless pristine ruin panels, tiles and pillars. Found in the caches of research buildings and deeper ruins.",
-    "translation": "흠 없는 무구한 유적 패널·타일·기둥의 설계도. 연구동보다 깊은 유적의 보관고에서 발견된다."
+    "source": "Plans for pristine ruin materials.",
+    "translation": "온전한 유적 건축 자재의 도면."
   },
   "desc.singulo.blueprint_rayleigh": {
-    "source": "Plans for the Rayleigh sky panel that shows a blue sky on the ceiling. Found in laboratory research chests. The panels in the laboratory ceiling cannot be recovered, so build them from this.",
-    "translation": "천장에 푸른 하늘을 비추는 레일리 산란 패널의 설계도. 연구소 연구실의 수납에서 발견된다. 연구소 천장의 패널은 회수할 수 없으므로 이것으로 만든다."
+    "source": "Plans for an artificial blue-sky panel.",
+    "translation": "인공 푸른 하늘을 비추는 패널의 도면."
   },
   "desc.singulo.blueprint_ruin_glass": {
-    "source": "Plans for ruin glass (broken, intact and reinforced). Found in the caches of research buildings and deeper ruins.",
-    "translation": "유적 유리(깨진·보통·강화)의 설계도. 연구동보다 깊은 유적의 보관고에서 발견된다."
+    "source": "Plans for recreating ruin glass.",
+    "translation": "유적 유리를 재현하는 도면."
   },
   "desc.singulo.blueprint_ruin_panels": {
-    "source": "Plans for the white outer ruin panels (plain, cracked, mossy, tiled, vented, striped and scorched). Found in the caches of observation posts and research buildings.",
-    "translation": "유적의 흰 외벽 패널(보통·금 간·이끼 낀·타일·통풍·띠·그을린)의 설계도. 지표 관측 거점이나 연구동의 보관고에서 발견된다."
+    "source": "Plans for recreating ruin walls.",
+    "translation": "유적 외벽을 재현하는 도면."
   },
   "desc.singulo.bose_condensate_catalyst": {
     "source": "Tier 3 catalyst.",
@@ -10527,6 +10527,10 @@
     "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
     "translation": "모은 전력으로 인공 번개를 일으켜 가까운 피뢰침에 쏜다."
   },
+  "summary.singulo.lab_rayleigh_panel": {
+    "source": "A ceiling panel that projects a midday sky using facility power.",
+    "translation": "시설 전력으로 한낮의 하늘을 비추는 천장 패널."
+  },
   "summary.singulo.meteorite_core": {
     "source": "The core of a meteorite. Mine it for raw meteoric iron and stardust.",
     "translation": "운석 중심의 덩어리. 캐면 운철 원석과 별가루가 나옵니다."
@@ -10542,6 +10546,10 @@
   "summary.singulo.procedure_card": {
     "source": "Records up to eight work steps for androids.",
     "translation": "안드로이드에게 시킬 작업 순서 (최대 8개)를 기록한다."
+  },
+  "summary.singulo.rayleigh_panel": {
+    "source": "A powered ceiling panel that provides midday sunlight below.",
+    "translation": "전력을 받아 아래에 한낮의 햇빛을 비추는 천장 패널."
   },
   "summary.singulo.shield_permit": {
     "source": "Lets only registered players work inside a shield or control a station's android.",
@@ -10570,6 +10578,10 @@
   "summary.singulo.wormhole_port": {
     "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
     "translation": "반대편 입구 근처의 같은 번호 포트와 전력·아이템·액체를 잇는다."
+  },
+  "summary.singulo.zero_gravity_block": {
+    "source": "Creates a weightless space above when powered.",
+    "translation": "전력을 받아 위쪽에 무중력 공간을 만든다."
   },
   "summary.singulo.zero_gravity_controller": {
     "source": "Sets the weightless height of joined zero-gravity blocks.",

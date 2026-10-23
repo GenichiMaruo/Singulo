@@ -684,4 +684,7 @@ SUMMARY = {
         'Records up to eight work steps for androids.'),
     'アンドロイド組立ステーション': ('メモリとキットと電力で、護衛のアンドロイドを印刷する。',
         'Prints guard androids from a memory, a kit and power.'),
+    'レイリー散乱パネル': ('電力で真下を真昼の日差しに照らす天井パネル。', 'A powered ceiling panel that provides midday sunlight below.'),
+    'レイリー散乱パネル（研究所）': ('施設の電力で真昼の空を映す天井パネル。', 'A ceiling panel that projects a midday sky using facility power.'),
+    '無重力ブロック': ('電力で真上に無重力の空間を作る。', 'Creates a weightless space above when powered.'),
 }

@@ -29,20 +29,13 @@ BLUEPRINTS = {
 }
 
 DESCRIPTIONS = {
-    '遺構パネルの設計図': ('遺構の白い外壁パネル（ふつう・ひび割れ・苔むし・タイル・通気・帯・焦げ）の設計図。地表観測拠点や研究棟の保管庫で見つかる。',
-                         'Plans for the white outer ruin panels (plain, cracked, mossy, tiled, vented, striped and scorched). Found in the caches of observation posts and research buildings.'),
-    '無垢の遺構建材の設計図': ('傷のない無垢の遺構パネル・タイル・柱の設計図。研究棟より奥の遺構の保管庫で見つかる。',
-                           'Plans for flawless pristine ruin panels, tiles and pillars. Found in the caches of research buildings and deeper ruins.'),
-    '遺構ガラスの設計図': ('遺構ガラス（割れた・ふつう・強化）の設計図。研究棟より奥の遺構の保管庫で見つかる。',
-                         'Plans for ruin glass (broken, intact and reinforced). Found in the caches of research buildings and deeper ruins.'),
-    '照明の設計図': ('遺構の照明（白・琥珀・翠・菫・紅）・無垢の遺構導光板・研究所の施設灯と非常灯の設計図。遺構の保管庫や研究所の物資棚で見つかる。',
-                   'Plans for ruin lamps (white, amber, verdant, violet and crimson), pristine ruin light panels and the laboratory facility and emergency lights. Found in ruin caches and laboratory supply shelves.'),
-    '研究所建材の設計図': ('研究所の白いパネル・帯入りパネル・床タイル・構造材・ガラス・動力導管の設計図。研究所の物資棚や研究室の収納で見つかる。',
-                         'Plans for the laboratory white panels, lined panels, floor tiles, frames, glass and power conduits. Found on laboratory supply shelves and in research chests.'),
-    '研究所の調度品の設計図': ('机のモニター・コーヒーメーカー・自動販売機・書類の山・ごみ箱・サーバーラック・素体カプセルの設計図。研究所の事務室・個室・厨房の収納で見つかる。',
-                           'Plans for desk monitors, coffee makers, vending machines, paper stacks, trash bins, server racks and body capsules. Found in laboratory office, quarters and kitchen storage.'),
-    'レイリー散乱パネルの設計図': ('天井に青空を映すレイリー散乱パネルの設計図。研究所の研究室の収納で見つかる。研究所の天井のパネルは回収できないので、これから作る。',
-                               'Plans for the Rayleigh sky panel that shows a blue sky on the ceiling. Found in laboratory research chests. The panels in the laboratory ceiling cannot be recovered, so build them from this.'),
+    '遺構パネルの設計図': ('遺構の外壁を再現する図面。', 'Plans for recreating ruin walls.'),
+    '無垢の遺構建材の設計図': ('傷のない遺構建材の図面。', 'Plans for pristine ruin materials.'),
+    '遺構ガラスの設計図': ('遺構のガラスを再現する図面。', 'Plans for recreating ruin glass.'),
+    '照明の設計図': ('旧文明の照明器具の図面。', 'Plans for ancient lighting fixtures.'),
+    '研究所建材の設計図': ('研究所の壁や床の図面。', 'Plans for laboratory walls and floors.'),
+    '研究所の調度品の設計図': ('旧文明の家具や設備の図面。', 'Plans for ancient furniture and fixtures.'),
+    'レイリー散乱パネルの設計図': ('人工の青空を映すパネルの図面。', 'Plans for an artificial blue-sky panel.'),
 }
 
 # 設計図の紙の色（青焼き）と線の色
