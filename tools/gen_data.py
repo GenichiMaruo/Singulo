@@ -542,6 +542,7 @@ UI_LANG = {
     'gui.singulo.reactor.recaptured': ('野良ブラックホールを炉心に取り込んだ', 'The rogue black hole is now the core'),
     'block.singulo.rogue_black_hole': ('野良ブラックホール', 'Rogue Black Hole'),
     'item.singulo.relocation_wrench.packed': ('中身と設定を保持して回収した', 'Device packed with contents and settings'),
+    'item.singulo.blueprint.hint': ('作業台で素材と一緒に並べると、建材を作れる。設計図は使ってもなくならない', 'Place it with materials on a crafting table to make building blocks. The blueprint is not used up.'),
     'item.singulo.relocation_wrench.cables_removed': ('ケーブルを %s 本回収した', 'Took back %s cables'),
     'item.singulo.relocation_wrench.switch': ('スニークして空中で使うとモードを切り替える', 'Sneak-use in the air to switch modes.'),
     'item.singulo.relocation_wrench.hint.1': ('ケーブルに使うと1本回収、スニークして使うとつながった同じケーブルを最大64本まとめて回収。左クリックでもすぐ壊せる', 'Use on a cable to take it back; sneak-use to take up to 64 joined cables of that kind. Left-click also breaks cables at once.'),
@@ -2078,6 +2079,9 @@ def art_textures():
             art16.save(art16.item_texture(iid, stage_of(name)), ti / f'{iid}.png')
             if iid in art.ITEM_ART:
                 art.save(art.item_texture(iid, stage_of(name)), hi / f'{iid}.png')
+    # 施設の建材の設計図（青焼きの紙）
+    import blueprints
+    blueprints.item_textures(ti, art16.save)
     # 移設レンチのケーブル撤去モード（表示灯が橙）
     art16.save(art16.grain(art16.relocation_wrench(cable=True), seed=art16.stable_hash('relocation_wrench') % 1000),
                ti / 'relocation_wrench_cable.png')
@@ -3251,6 +3255,10 @@ def ruins_data():
     for rid, (lo, hi) in fragments.items():
         pools.setdefault(rid, []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid('クリスタルメモリ'), 'functions': [
             {'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
+    # 施設の建材の設計図（遺構の種類ごとに、確率で1枚）
+    import blueprints
+    for rid in list(pools):
+        pools[rid] += blueprints.loot_pools(f'ruin:{rid}')
     for rid, plist in pools.items():
         write_json(DATA / 'loot_table' / 'ruins' / f'{rid}.json', {'type': 'minecraft:chest', 'pools': plist})
     for rid, plist in first.items():
@@ -3512,6 +3520,9 @@ TAB_GROUPS = [
               'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'canned_soda', 'sports_drink', 'energy_drink',
               'coffee', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),
+    # 施設の建材の設計図（遺構 → 研究所）
+    ('設計図', ['blueprint_ruin_panels', 'blueprint_pristine_ruin', 'blueprint_ruin_glass', 'blueprint_lighting',
+             'blueprint_lab_building', 'blueprint_lab_furniture', 'blueprint_rayleigh']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
                      'last_archivist_spawn_egg', 'foundry_overseer_spawn_egg']),

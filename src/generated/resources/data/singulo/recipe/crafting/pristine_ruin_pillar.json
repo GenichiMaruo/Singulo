@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_pristine_ruin"
+    },
+    {
+      "item": "singulo:pristine_ruin_panel"
+    },
+    {
+      "item": "singulo:pristine_ruin_panel"
+    },
+    {
+      "tag": "c:ingots/steel"
+    }
+  ],
+  "result": {
+    "id": "singulo:pristine_ruin_pillar",
+    "count": 2
+  }
+}

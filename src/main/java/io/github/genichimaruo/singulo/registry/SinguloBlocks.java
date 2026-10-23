@@ -418,7 +418,7 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock> FACTORY_CONVEYOR = BLOCKS.register("factory_conveyor",
             () -> new io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
                     .strength(2.0F, 6.0F).sound(SoundType.METAL)));
-    // ---- 地下アンドロイド研究所（作れない。白い建材は硬く、鉄以上のツルハシで掘る）
+    // ---- 地下アンドロイド研究所（白い建材は硬く、鉄以上のツルハシで掘る）。建材・照明・調度品は、研究所で見つかる設計図から作れる
     public static final DeferredBlock<Block> LAB_PANEL = pristine("lab_panel", 0);
     public static final DeferredBlock<Block> LAB_PANEL_LINED = pristine("lab_panel_lined", 0);
     public static final DeferredBlock<Block> LAB_TILES = pristine("lab_tiles", 0);
@@ -429,7 +429,7 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> FACILITY_LIGHT = BLOCKS.register("facility_light",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
-                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 0)));
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 0), true));
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> EMERGENCY_LIGHT = BLOCKS.register("emergency_light",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
@@ -441,7 +441,7 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> POWER_CONDUIT = BLOCKS.register("power_conduit",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN)
                     .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
-                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 10 : 0)));
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 10 : 0), true));
     /** 耐圧殻（封じられている間は壊せない。黒曜石より硬い。爆発では壊れない）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> PRESSURE_HULL = BLOCKS.register("pressure_hull",
             () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)

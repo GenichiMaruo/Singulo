@@ -975,6 +975,8 @@ def chest_loot(write_json, data, mid):
         pools = [{'rolls': {'type': 'minecraft:uniform', 'min': vanilla_rolls[0], 'max': vanilla_rolls[1]}, 'entries': vanilla}]
         if mod:
             pools.insert(0, {'rolls': {'type': 'minecraft:uniform', 'min': mod_rolls[0], 'max': mod_rolls[1]}, 'entries': mod})
+        import blueprints
+        pools += blueprints.loot_pools(f'lab:{name}')                    # 施設の建材の設計図（確率で1枚）
         write_json(data / 'loot_table' / 'chests' / f'{name}.json', {'type': 'minecraft:chest', 'pools': pools})
 
     healing = {'function': 'minecraft:set_potion', 'id': 'minecraft:healing'}

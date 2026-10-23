@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_lighting"
+    },
+    {
+      "item": "singulo:pristine_ruin_panel"
+    },
+    {
+      "item": "singulo:pristine_ruin_panel"
+    },
+    {
+      "item": "singulo:pristine_ruin_panel"
+    },
+    {
+      "item": "singulo:pristine_ruin_panel"
+    },
+    {
+      "tag": "c:dusts/glowstone"
+    },
+    {
+      "tag": "c:dusts/glowstone"
+    }
+  ],
+  "result": {
+    "id": "singulo:pristine_ruin_light",
+    "count": 4
+  }
+}

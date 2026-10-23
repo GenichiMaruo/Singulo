@@ -1723,6 +1723,34 @@
     "source": "An empty card for copying records in the Archive Terminal.",
     "translation": "用於在檔案終端中抄錄記錄的空白卡片。"
   },
+  "desc.singulo.blueprint_lab_building": {
+    "source": "Plans for the laboratory white panels, lined panels, floor tiles, frames, glass and power conduits. Found on laboratory supply shelves and in research chests.",
+    "translation": "研究所白色面板、帶紋面板、地磚、結構材、玻璃、動力導管的設計圖。可在研究所物資架和研究室收納中找到。"
+  },
+  "desc.singulo.blueprint_lab_furniture": {
+    "source": "Plans for desk monitors, coffee makers, vending machines, paper stacks, trash bins, server racks and body capsules. Found in laboratory office, quarters and kitchen storage.",
+    "translation": "桌面顯示器、咖啡機、自動販賣機、文件堆、垃圾桶、伺服器機架、素體膠囊的設計圖。可在研究所辦公室、個人房間和廚房的收納中找到。"
+  },
+  "desc.singulo.blueprint_lighting": {
+    "source": "Plans for ruin lamps (white, amber, verdant, violet and crimson), pristine ruin light panels and the laboratory facility and emergency lights. Found in ruin caches and laboratory supply shelves.",
+    "translation": "遺跡照明（白、琥珀、翠、堇、紅）、無瑕遺跡導光板、研究所設施燈與緊急燈的設計圖。可在遺跡保管庫和研究所物資架中找到。"
+  },
+  "desc.singulo.blueprint_pristine_ruin": {
+    "source": "Plans for flawless pristine ruin panels, tiles and pillars. Found in the caches of research buildings and deeper ruins.",
+    "translation": "無瑕的遺跡面板、瓷磚、柱子的設計圖。可在研究樓及更深處遺跡的保管庫中找到。"
+  },
+  "desc.singulo.blueprint_rayleigh": {
+    "source": "Plans for the Rayleigh sky panel that shows a blue sky on the ceiling. Found in laboratory research chests. The panels in the laboratory ceiling cannot be recovered, so build them from this.",
+    "translation": "在天花板上映出藍天的瑞利散射面板的設計圖。可在研究所研究室的收納中找到。研究所天花板上的面板無法回收，因此要用它來製作。"
+  },
+  "desc.singulo.blueprint_ruin_glass": {
+    "source": "Plans for ruin glass (broken, intact and reinforced). Found in the caches of research buildings and deeper ruins.",
+    "translation": "遺跡玻璃（破碎、普通、強化）的設計圖。可在研究樓及更深處遺跡的保管庫中找到。"
+  },
+  "desc.singulo.blueprint_ruin_panels": {
+    "source": "Plans for the white outer ruin panels (plain, cracked, mossy, tiled, vented, striped and scorched). Found in the caches of observation posts and research buildings.",
+    "translation": "遺跡白色外牆面板（普通、龜裂、長苔、瓷磚、通風、帶紋、燒焦）的設計圖。可在地表觀測據點和研究樓的保管庫中找到。"
+  },
   "desc.singulo.bose_condensate_catalyst": {
     "source": "Tier 3 catalyst.",
     "translation": "三級催化劑。"
@@ -6811,6 +6839,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：工作台（第 1 階段）"
   },
+  "howto.singulo.android_capsule": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.android_charger": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
@@ -7043,6 +7075,10 @@
     "source": "Made in: Kiln (stage 1)",
     "translation": "製造地：燒製爐（第 1 階段）"
   },
+  "howto.singulo.coffee_maker": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.cold_atom_trap": {
     "source": "Restore a Degraded Cold Atom Trap",
     "translation": "取得方式：修復退化冷原子陷阱"
@@ -7134,6 +7170,10 @@
   "howto.singulo.cosmic_muon_collector": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.cracked_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.cryogenic_cooling_tower": {
     "source": "Made in: Multiblock assembly (stage 2)",
@@ -7255,6 +7295,10 @@
     "source": "Found in: ruin caches",
     "translation": "取得方式：封閉培養設施的保管庫"
   },
+  "howto.singulo.desk_monitor": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.dormant_singularity_seed": {
     "source": "Found in: ruin caches",
     "translation": "取得方式：最終實驗室的保管庫"
@@ -7264,6 +7308,10 @@
     "translation": "製造地：精密組裝台（第 3 階段）"
   },
   "howto.singulo.electrolyzer": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.emergency_light": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：工作台（第 1 階段）"
   },
@@ -7298,6 +7346,10 @@
   "howto.singulo.extraction_port": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.facility_light": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.fluid_canister": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -7395,6 +7447,10 @@
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "製造地：精密組裝台（第 3 階段）"
   },
+  "howto.singulo.intact_ruin_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.jet_collector": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
@@ -7410,6 +7466,26 @@
   "howto.singulo.kiln": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
+  },
+  "howto.singulo.lab_frame": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_panel_lined": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_tiles": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.laser_cooler": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -7459,6 +7535,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
   },
+  "howto.singulo.mossy_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.multiblock_port": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
@@ -7507,6 +7587,10 @@
     "source": "Made in: Laser Cooler (stage 3)",
     "translation": "製造地：雷射冷卻器（第 3 階段）"
   },
+  "howto.singulo.paper_stack": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.particle_accelerator": {
     "source": "Made in: Multiblock assembly (stage 2)",
     "translation": "製造地：多方塊組裝（第 2 階段）"
@@ -7523,6 +7607,10 @@
     "source": "Made in: Entanglement Synthesizer (stage 4)",
     "translation": "製造地：量子糾纏合成器（第 4 階段）"
   },
+  "howto.singulo.power_conduit": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.precision_assembler": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
@@ -7530,6 +7618,22 @@
   "howto.singulo.primordial_seed": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "製造地：奇點封裝器（第 5 階段）"
+  },
+  "howto.singulo.pristine_ruin_light": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.pristine_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.pristine_ruin_pillar": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.pristine_ruin_tiles": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.probe_station": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -7555,6 +7659,10 @@
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "製造地：精密組裝台（第 3 階段）"
   },
+  "howto.singulo.rayleigh_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.reactor_mass_alarm": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
@@ -7571,9 +7679,41 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
   },
+  "howto.singulo.reinforced_ruin_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.relocation_wrench": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製作於：工作台（階段 1）"
+  },
+  "howto.singulo.ruin_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.ruin_lamp": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.ruin_lamp_amber": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.ruin_lamp_crimson": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製造地：工作台（第 5 階段）"
+  },
+  "howto.singulo.ruin_lamp_verdant": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製造地：工作台（第 3 階段）"
+  },
+  "howto.singulo.ruin_lamp_violet": {
+    "source": "Made in: Crafting Table (stage 4)",
+    "translation": "製造地：工作台（第 4 階段）"
+  },
+  "howto.singulo.ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -7582,6 +7722,10 @@
   "howto.singulo.scanner_module_3": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.scorched_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.sealed_container_1": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -7598,6 +7742,10 @@
   "howto.singulo.sealed_container_4": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.server_rack": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.settings_card": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -7667,6 +7815,10 @@
     "source": "Made in: Compressor (stage 1)",
     "translation": "製造地：壓縮機（第 1 階段）"
   },
+  "howto.singulo.striped_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.superconducting_cable": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
@@ -7698,6 +7850,10 @@
   "howto.singulo.thermoelectric_generator": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
+  },
+  "howto.singulo.tiled_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.time_crystal_catalyst": {
     "source": "Made in: Time Crystal Incubator (stage 4)",
@@ -7751,6 +7907,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "製造地：精密組裝台（第 4 階段）"
   },
+  "howto.singulo.trash_bin": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.unfired_ceramic": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
@@ -7766,6 +7926,14 @@
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
     "translation": "製造地：蟲洞產生器（第 5 階段）"
+  },
+  "howto.singulo.vending_machine": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.vented_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.void_collector": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -8082,6 +8250,38 @@
   "item.singulo.blank_data_card": {
     "source": "Blank Data Card",
     "translation": "空白資料卡"
+  },
+  "item.singulo.blueprint.hint": {
+    "source": "Place it with materials on a crafting table to make building blocks. The blueprint is not used up.",
+    "translation": "與材料一起放在工作台上即可製作建材。設計圖使用後不會消失"
+  },
+  "item.singulo.blueprint_lab_building": {
+    "source": "Laboratory Material Blueprint",
+    "translation": "研究所建材設計圖"
+  },
+  "item.singulo.blueprint_lab_furniture": {
+    "source": "Laboratory Furnishing Blueprint",
+    "translation": "研究所家具設計圖"
+  },
+  "item.singulo.blueprint_lighting": {
+    "source": "Lighting Blueprint",
+    "translation": "照明設計圖"
+  },
+  "item.singulo.blueprint_pristine_ruin": {
+    "source": "Pristine Ruin Material Blueprint",
+    "translation": "無瑕遺跡建材設計圖"
+  },
+  "item.singulo.blueprint_rayleigh": {
+    "source": "Rayleigh Sky Panel Blueprint",
+    "translation": "瑞利散射面板設計圖"
+  },
+  "item.singulo.blueprint_ruin_glass": {
+    "source": "Ruin Glass Blueprint",
+    "translation": "遺跡玻璃設計圖"
+  },
+  "item.singulo.blueprint_ruin_panels": {
+    "source": "Ruin Panel Blueprint",
+    "translation": "遺跡面板設計圖"
   },
   "item.singulo.bose_condensate_catalyst": {
     "source": "BE Condensate Catalyst",
@@ -10688,8 +10888,8 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 42 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 42 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 47 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 47 個"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
@@ -10718,6 +10918,34 @@
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
     "translation": "用於：資料卡（觀測日誌）、資料卡（量子資料片段）、資料卡（培養資料）"
+  },
+  "uses.singulo.blueprint_lab_building": {
+    "source": "Used in: Lab Panel, Lined Lab Panel, Lab Floor Tiles, Lab Frame, Lab Glass and 1 more",
+    "translation": "用於：研究所白色面板、研究所條紋面板、研究所地磚、研究所結構材、研究所玻璃 等 1 個"
+  },
+  "uses.singulo.blueprint_lab_furniture": {
+    "source": "Used in: Desk Monitor, Coffee Maker, Vending Machine, Stack of Papers, Trash Bin and 2 more",
+    "translation": "用於：桌面顯示器、咖啡機、自動販賣機、文件堆、垃圾桶 等 2 個"
+  },
+  "uses.singulo.blueprint_lighting": {
+    "source": "Used in: Ruin Lamp, Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson) and 3 more",
+    "translation": "用於：廢墟燈、廢墟燈（琥珀）、廢墟燈（翠綠）、廢墟燈（紫羅蘭）、廢墟燈（深紅） 等 3 個"
+  },
+  "uses.singulo.blueprint_pristine_ruin": {
+    "source": "Used in: Pristine Ruin Panel, Pristine Ruin Tiles, Pristine Ruin Pillar",
+    "translation": "用於：無瑕廢墟面板、無瑕廢墟磁磚、無瑕廢墟柱"
+  },
+  "uses.singulo.blueprint_rayleigh": {
+    "source": "Used in: Rayleigh Sky Panel",
+    "translation": "用於：瑞利散射面板"
+  },
+  "uses.singulo.blueprint_ruin_glass": {
+    "source": "Used in: Ruin Glass, Broken Ruin Glass, Reinforced Ruin Glass",
+    "translation": "用於：廢墟玻璃、破碎的廢墟玻璃、強化廢墟玻璃"
+  },
+  "uses.singulo.blueprint_ruin_panels": {
+    "source": "Used in: Ruin Panel, Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel and 2 more",
+    "translation": "用於：廢墟面板、破裂的廢墟面板、長滿青苔的廢墟面板、磁磚廢墟面板、通風廢墟面板 等 2 個"
   },
   "uses.singulo.bose_condensate_catalyst": {
     "source": "Used in: Time Crystal Catalyst",
@@ -10991,9 +11219,21 @@
     "source": "Used in: Graviton Manipulator",
     "translation": "用於：重力子操控器"
   },
+  "uses.singulo.intact_ruin_glass": {
+    "source": "Used in: Broken Ruin Glass, Reinforced Ruin Glass",
+    "translation": "用於：破碎的廢墟玻璃、強化廢墟玻璃"
+  },
   "uses.singulo.jet_condensate": {
     "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon",
     "translation": "用於：人造星核、覺醒渦核、創世爐支柱"
+  },
+  "uses.singulo.lab_frame": {
+    "source": "Used in: Power Conduit, Body Capsule",
+    "translation": "用於：動力導管、素體艙"
+  },
+  "uses.singulo.lab_panel": {
+    "source": "Used in: Lined Lab Panel, Lab Floor Tiles",
+    "translation": "用於：研究所條紋面板、研究所地磚"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
@@ -11059,6 +11299,10 @@
     "source": "Used in: Degenerate Compactor Anvil, Degenerate Precursor",
     "translation": "用於：簡併壓縮爐砧座、簡併前驅體"
   },
+  "uses.singulo.pristine_ruin_panel": {
+    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip",
+    "translation": "用於：無瑕廢墟磁磚、無瑕廢墟柱、無瑕廢墟導光板"
+  },
   "uses.singulo.quantum_computing_module": {
     "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 18 more",
     "translation": "用於：量子熱機、重力波探測器、微中子觀測站、簡併壓縮爐控制器、卡西米爾腔控制器 等 18 個"
@@ -11082,6 +11326,14 @@
   "uses.singulo.record_fragment": {
     "source": "Used in: Decoded Record",
     "translation": "用於：解碼記錄"
+  },
+  "uses.singulo.ruin_lamp": {
+    "source": "Used in: Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson)",
+    "translation": "用於：廢墟燈（琥珀）、廢墟燈（翠綠）、廢墟燈（紫羅蘭）、廢墟燈（深紅）"
+  },
+  "uses.singulo.ruin_panel": {
+    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 1 more",
+    "translation": "用於：破裂的廢墟面板、長滿青苔的廢墟面板、磁磚廢墟面板、通風廢墟面板、帶狀廢墟面板 等 1 個"
   },
   "uses.singulo.scanner_module_2": {
     "source": "Used in: Neutrino Sensitivity Module Mk3",
@@ -11136,12 +11388,12 @@
     "translation": "用於：鋼錠"
   },
   "uses.singulo.steel_ingot": {
-    "source": "Used in: Basic Frame, Steel Plate, Compressor, Relocation Wrench",
-    "translation": "用於：基本框架、鋼板、壓縮機, 移設扳手"
+    "source": "Used in: Basic Frame, Steel Plate, Compressor, Relocation Wrench, Pristine Ruin Pillar and 1 more",
+    "translation": "用於：基本框架、鋼板、壓縮機、移設扳手、無瑕廢墟柱 等 1 個"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 74 more",
-    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 74 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 83 more",
+    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 83 個"
   },
   "uses.singulo.superconducting_coil": {
     "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",
@@ -11216,8 +11468,8 @@
     "translation": "用於：重力場穩定器、蟲洞產生器聚焦器、蟲洞入口外殼"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 12 more",
-    "translation": "用於：基本電路、設定卡、基本框架、陶瓷基板、銅導線 等 12 個"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 21 more",
+    "translation": "用於：基本電路、設定卡、基本框架、陶瓷基板、銅導線 等 21 個"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",

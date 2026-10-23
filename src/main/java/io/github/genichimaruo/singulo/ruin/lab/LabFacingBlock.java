@@ -32,6 +32,7 @@ public class LabFacingBlock extends HorizontalDirectionalBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        // 置いたもの（設計図から作ったもの）は動いている状態で置く。研究所の中のものは構造物として置かれ、電力が戻ると動く
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(POWERED, true);
     }
 }

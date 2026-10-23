@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_ruin_panels"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "minecraft:moss_block"
+    }
+  ],
+  "result": {
+    "id": "singulo:mossy_ruin_panel",
+    "count": 4
+  }
+}

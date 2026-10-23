@@ -597,6 +597,9 @@ DESC = {
     '失活した時間結晶触媒': ('活性を失った時間結晶触媒。', 'A time crystal catalyst that has lost its activity.'),
     '失活したシンギュラリティ・コア': ('使い切ったシンギュラリティ・コア。下のティアの触媒として約25%回収できる。', 'A used-up Singularity Core. About 25% can be recovered as a lower-tier catalyst.'),
 }
+# 施設の建材の設計図（tools/blueprints.py）
+from blueprints import DESCRIPTIONS as _BLUEPRINT_DESC  # noqa: E402
+DESC.update(_BLUEPRINT_DESC)
 
 
 # 長い説明の要約（説明欄にはこれだけを出し、Shift を押している間は説明の全文と作り方・使い道を出す）。名前: (日本語, 英語)

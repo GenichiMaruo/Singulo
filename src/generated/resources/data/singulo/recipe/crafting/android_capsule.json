@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "tag": "c:glass_blocks/colorless"
+    },
+    {
+      "item": "singulo:lab_frame"
+    },
+    {
+      "item": "singulo:lab_frame"
+    },
+    {
+      "tag": "singulo:ceramic_flux"
+    }
+  ],
+  "result": {
+    "id": "singulo:android_capsule",
+    "count": 1
+  }
+}

@@ -37,6 +37,21 @@ public final class SinguloItems {
             "black_hole_bomb", () -> new io.github.genichimaruo.singulo.item.BlackHoleBombItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.RelocationWrenchItem> RELOCATION_WRENCH = ITEMS.register(
             "relocation_wrench", () -> new io.github.genichimaruo.singulo.item.RelocationWrenchItem(new Item.Properties(), 1));
+    /** 施設の建材の設計図（作業台で素材と並べると建材ができ、設計図は残る）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RUIN_PANELS = ITEMS.register(
+            "blueprint_ruin_panels", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_PRISTINE_RUIN = ITEMS.register(
+            "blueprint_pristine_ruin", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RUIN_GLASS = ITEMS.register(
+            "blueprint_ruin_glass", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LIGHTING = ITEMS.register(
+            "blueprint_lighting", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LAB_BUILDING = ITEMS.register(
+            "blueprint_lab_building", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LAB_FURNITURE = ITEMS.register(
+            "blueprint_lab_furniture", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RAYLEIGH = ITEMS.register(
+            "blueprint_rayleigh", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.SettingsCardItem> SETTINGS_CARD = ITEMS.register(
             "settings_card", () -> new io.github.genichimaruo.singulo.item.SettingsCardItem(new Item.Properties(), 1));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ShieldPermitItem> SHIELD_PERMIT = ITEMS.register(
@@ -187,6 +202,13 @@ public final class SinguloItems {
             Map.entry("black_hole_bomb", 5),
             Map.entry("settings_card", 1),
             Map.entry("relocation_wrench", 1),
+            Map.entry("blueprint_ruin_panels", 1),
+            Map.entry("blueprint_pristine_ruin", 1),
+            Map.entry("blueprint_ruin_glass", 1),
+            Map.entry("blueprint_lighting", 1),
+            Map.entry("blueprint_lab_building", 1),
+            Map.entry("blueprint_lab_furniture", 1),
+            Map.entry("blueprint_rayleigh", 1),
             Map.entry("metric_drive", 5),
             Map.entry("unstable_wormhole_mouth", 5),
             Map.entry("holo_projector", 1),
