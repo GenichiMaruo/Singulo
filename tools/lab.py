@@ -908,11 +908,180 @@ def annex_substation():
     return b
 
 
+# ---------------------------------------------------------------- 屋外の代わりの部屋（どちらかは必ず置く: LabLayout.OUTDOOR）
+
+def _lawn(b, x0, z0, x1, z1, seed):
+    """芝生の床（草ブロックに、ところどころ花と草）。"""
+    rng = random.Random(seed)
+    for x in range(x0, x1 + 1):
+        for z in range(z0, z1 + 1):
+            b.set(x, 0, z, 'minecraft:grass_block', {'snowy': 'false'})
+            k = rng.random()
+            if k < 0.10:
+                b.put(x, 1, z, 'minecraft:short_grass')
+            elif k < 0.14:
+                b.put(x, 1, z, rng.choice(('minecraft:dandelion', 'minecraft:poppy', 'minecraft:oxeye_daisy',
+                                           'minecraft:cornflower', 'minecraft:azure_bluet')))
+
+
+def _tree(b, x, z, height=4, log='minecraft:birch_log', leaves='minecraft:birch_leaves'):
+    """小さな木（幹と、丸い葉の塊）。"""
+    for y in range(1, height + 1):
+        b.set(x, y, z, log, {'axis': 'y'})
+    for dy in range(height - 1, height + 2):
+        r = 1 if dy == height + 1 else 2
+        for dx in range(-r, r + 1):
+            for dz in range(-r, r + 1):
+                if abs(dx) + abs(dz) <= r + (0 if dy == height + 1 else 1) and (dx or dz or dy > height):
+                    if b.get(x + dx, dy, z + dz) in (None, AIR):
+                        b.set(x + dx, dy, z + dz, leaves, {'persistent': 'true', 'distance': '1', 'waterlogged': 'false'})
+
+
+def _sky_walls(b):
+    """壁の上のほうを空色にして、遠くの空のように見せる（腰の高さまでは生け垣。下ほど淡い）。"""
+    w, h, d = b.size
+    for y in range(1, h - 1):
+        for x in range(w):
+            for z in range(d):
+                if x in (0, w - 1) or z in (0, d - 1):
+                    if y <= 2:
+                        b.set(x, y, z, 'minecraft:oak_leaves', {'persistent': 'true', 'distance': '1', 'waterlogged': 'false'})
+                    else:
+                        # 地平線の近く（下）ほど淡く、上ほど濃い空色
+                        b.set(x, y, z, 'minecraft:light_blue_wool' if y <= 4 else 'minecraft:light_blue_concrete')
+
+
+def solarium():
+    """
+    日光浴室（リフレッシュルーム、21×9×17）: 地下でも日光浴ができるように、天井一面にレイリー散乱パネルを張った部屋。
+    施設の電力が戻ると真昼の空と日差しが戻る。芝生と花、白樺の木、砂浜のある小さな池、デッキチェアとパラソル、
+    ハンモックの代わりの吊りベンチ、自動販売機とコーヒーの屋台、日照センサーで灯る看板。壁は空色で、腰までは生け垣。
+    """
+    b = Room(21, 9, 17, 741)
+    b.shell()
+    _sky_walls(b)
+    b.skylight(1, 1, b.w - 2, b.d - 2)
+    _lawn(b, 1, 1, b.w - 2, b.d - 2, 741)
+    # 池と砂浜（南東）
+    for x in range(12, 19):
+        for z in range(9, 15):
+            edge = x in (12, 18) or z in (9, 14)
+            b.set(x, 0, z, 'minecraft:sand' if edge else 'minecraft:water', None if edge else {'level': '0'})
+            b.set(x, 1, z, AIR)
+    for x, z in ((13, 8), (17, 8), (11, 11)):
+        b.set(x, 0, z, 'minecraft:sand')
+    # 木（北西と北東）
+    _tree(b, 3, 4)
+    _tree(b, 17, 4, 5)
+    # デッキチェア（階段とハーフ）とパラソル（柵と旗の代わりの羊毛）
+    for x0 in (5, 9):
+        for dz in (0, 1):
+            b.put(x0, 1, 11 + dz, *stairs('north'))
+        b.put(x0 + 1, 1, 11, *SLAB_TOP)
+        for y in (1, 2, 3):
+            b.set(x0 + 2, y, 12, 'minecraft:birch_fence', {'east': 'false', 'north': 'false', 'south': 'false', 'west': 'false',
+                                                           'waterlogged': 'false'})
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                b.set(x0 + 2 + dx, 4, 12 + dz, 'minecraft:white_wool' if (dx + dz) % 2 else 'minecraft:orange_wool')
+    # 屋台: 自動販売機・コーヒー
+    b.vending(1, 8, 'east')
+    b.put(1, 1, 10, *SLAB_TOP)
+    b.coffee(1, 2, 10, 'east')
+    # 吊りベンチ（鎖とハーフ）
+    for x in (8, 9, 10):
+        b.put(x, 1, 3, 'minecraft:birch_slab', {'type': 'bottom', 'waterlogged': 'false'})
+    for x in (8, 10):
+        b.fill(x, 2, 3, x, b.h - 2, 3, *CHAIN_Y)
+    # 日照センサーとランプ（電力が戻ると、真昼の日差しで灯る）
+    b.put(14, 1, 3, 'minecraft:daylight_detector', {'inverted': 'false', 'power': '0'})
+    b.put(15, 1, 3, 'minecraft:redstone_lamp', {'lit': 'false'})
+    for x, z in ((6, 6), (13, 6)):
+        b.plant(x, z)
+    b.trash(19, 15)
+    b.barrel(19, 1, 1, 'up', QUARTERS)                          # タオルや私物の樽
+    b.dock(10, 1, 7, 3)
+    return b
+
+
+def outdoor_test_ground():
+    """
+    屋外試験場（25×13×25）: 屋外での動きを試すための、空のある大きな実験場。天井一面のレイリー散乱パネルが真昼の空を映す
+    （施設の電力が戻ると点く）。芝生の丘と土の道、岩場、倒木、池、的と干し草の標的、柵の障害物コース、白線の走路。
+    北西の隅にガラス張りの観測小屋（モニターと計器）。警備機が2体、印刷台が1つ。
+    """
+    b = Room(25, 13, 25, 742)
+    b.shell()
+    _sky_walls(b)
+    b.skylight(1, 1, b.w - 2, b.d - 2)
+    _lawn(b, 1, 1, b.w - 2, b.d - 2, 742)
+    rng = random.Random(742)
+    # 白線の走路（東西）: 灰色の道と、白い線
+    for x in range(1, b.w - 1):
+        for z in (18, 19, 20):
+            b.set(x, 0, z, 'minecraft:gray_concrete' if z != 19 or x % 3 else 'minecraft:white_concrete')
+            b.set(x, 1, z, AIR)
+    # 土の道（南北）
+    for z in range(1, 18):
+        for x in (12, 13):
+            b.set(x, 0, z, 'minecraft:dirt_path')
+            b.set(x, 1, z, AIR)
+    # 丘（北東）: 草ブロックを積んだ低い山
+    for x in range(16, 23):
+        for z in range(3, 10):
+            hgt = 3 - max(abs(x - 19), abs(z - 6)) + (1 if (x + z) % 3 == 0 else 0)
+            for y in range(1, max(0, hgt) + 1):
+                b.set(x, y, z, 'minecraft:grass_block' if y == hgt else 'minecraft:dirt', {'snowy': 'false'} if y == hgt else None)
+    # 岩場（南西）
+    for _ in range(14):
+        x, z = rng.randint(2, 9), rng.randint(11, 16)
+        b.put(x, 1, z, rng.choice(('minecraft:cobblestone', 'minecraft:mossy_cobblestone', 'minecraft:andesite', 'minecraft:stone')))
+    # 倒木と木
+    for x in range(4, 9):
+        b.put(x, 1, 8, 'minecraft:oak_log', {'axis': 'x'})
+    _tree(b, 3, 3, 4, 'minecraft:oak_log', 'minecraft:oak_leaves')
+    _tree(b, 21, 14, 5)
+    # 池（東）
+    for x in range(17, 22):
+        for z in range(12, 16):
+            b.set(x, 0, z, 'minecraft:water', {'level': '0'})
+            b.set(x, 1, z, AIR)
+    # 的と干し草の標的（走路の北）
+    for x in (5, 10, 15, 20):
+        b.put(x, 1, 22, 'minecraft:target', {'power': '0'})
+        b.put(x, 2, 22, 'minecraft:hay_block', {'axis': 'y'})
+    # 柵の障害物コース（道の西）
+    for k, z in enumerate(range(3, 16, 3)):
+        for x in range(8, 11):
+            if (x + k) % 2:
+                b.put(x, 1, z, 'minecraft:oak_fence', {'east': 'false', 'north': 'false', 'south': 'false', 'west': 'false',
+                                                     'waterlogged': 'false'})
+    # 観測小屋（南東の隅）: ガラスの壁と構造材の柱、中にモニター
+    for x in range(19, 24):
+        for z in range(19, 24):
+            if x in (19, 23) or z in (19, 23):
+                for y in (1, 2, 3):
+                    b.set(x, y, z, FRAME if (x in (19, 23) and z in (19, 23)) or y == 1 else GLASS)
+            b.set(x, 4, z, PANEL)
+            b.set(x, 0, z, TILES)
+    b.set(21, 1, 19, AIR)
+    b.set(21, 2, 19, AIR)
+    b.monitor(21, 1, 22, 'north')
+    b.put(20, 1, 22, *SLAB_TOP)
+    b.papers(20, 2, 22)
+    b.dock(12, 1, 10, 3)
+    b.dock(6, 1, 20, 3)
+    b.set(2, 1, 22, FABRICATOR)
+    return b
+
+
 REQUIRED = {'entrance': entrance, 'reactor': reactor, 'control': control, 'loading_dock': loading_dock, 'freight_lift': freight_lift}
 OPTIONAL = {'research_lab': research_lab, 'meeting': meeting, 'archive': archive, 'office': office, 'server_room': server_room,
             'clean_room': clean_room, 'prototype': prototype, 'mass_factory': mass_factory, 'dorm': dorm,
             'body_storage': body_storage, 'test_ground': test_ground, 'bio_parts': bio_parts, 'waste': waste,
             'medical': medical, 'cafeteria': cafeteria, 'private_rooms': private_rooms}
+# 屋外の代わりの部屋（どちらかは必ず置き、もう一方もときどき置く。LabLayout.OUTDOOR）
+OUTDOOR = {'solarium': solarium, 'outdoor_test_ground': outdoor_test_ground}
 ANNEX = {'annex_storage': annex_storage, 'annex_locker': annex_locker, 'annex_observation': annex_observation,
          'annex_substation': annex_substation}
 
@@ -929,7 +1098,7 @@ def write_all(data, write_json, placement, depth):
     folder.mkdir(parents=True, exist_ok=True)
     for old in folder.glob('*.nbt'):
         old.unlink()
-    for name, make in {**REQUIRED, **OPTIONAL, **ANNEX, 'boss_hall': boss_hall}.items():
+    for name, make in {**REQUIRED, **OPTIONAL, **OUTDOOR, **ANNEX, 'boss_hall': boss_hall}.items():
         nbt.write_gzip(folder / f'{name}.nbt', to_nbt(make()))
     spacing, separation, salt, biomes = placement
     lo, hi = depth
