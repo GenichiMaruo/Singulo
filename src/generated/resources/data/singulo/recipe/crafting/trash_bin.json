@@ -1,20 +1,18 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "IBI",
+    " I "
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lab_furniture"
     },
-    {
-      "tag": "c:ingots/iron"
-    },
-    {
-      "tag": "c:ingots/iron"
-    },
-    {
+    "I": {
       "tag": "c:ingots/iron"
     }
-  ],
+  },
   "result": {
     "id": "singulo:trash_bin",
     "count": 1

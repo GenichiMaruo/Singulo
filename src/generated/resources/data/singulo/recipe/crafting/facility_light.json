@@ -1,26 +1,24 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "WRW",
+    "YBY"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lighting"
     },
-    {
+    "W": {
       "item": "singulo:white_ceramic_composite"
     },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
-      "tag": "c:dusts/glowstone"
-    },
-    {
-      "tag": "c:dusts/glowstone"
-    },
-    {
+    "R": {
       "tag": "c:dusts/redstone"
+    },
+    "Y": {
+      "tag": "c:dusts/glowstone"
     }
-  ],
+  },
   "result": {
     "id": "singulo:facility_light",
     "count": 4

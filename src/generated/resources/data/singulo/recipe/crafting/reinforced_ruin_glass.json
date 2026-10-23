@@ -1,32 +1,25 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "SOS",
+    "GBG",
+    "G G"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_ruin_glass"
     },
-    {
-      "item": "singulo:intact_ruin_glass"
-    },
-    {
-      "item": "singulo:intact_ruin_glass"
-    },
-    {
-      "item": "singulo:intact_ruin_glass"
-    },
-    {
-      "item": "singulo:intact_ruin_glass"
-    },
-    {
+    "S": {
       "tag": "c:plates/steel"
     },
-    {
-      "tag": "c:plates/steel"
-    },
-    {
+    "O": {
       "tag": "c:obsidians"
+    },
+    "G": {
+      "item": "singulo:intact_ruin_glass"
     }
-  ],
+  },
   "result": {
     "id": "singulo:reinforced_ruin_glass",
     "count": 4

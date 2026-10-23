@@ -1,26 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "PCP",
+    "PBP"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lab_building"
     },
-    {
+    "P": {
       "item": "singulo:lab_panel"
     },
-    {
-      "item": "singulo:lab_panel"
-    },
-    {
-      "item": "singulo:lab_panel"
-    },
-    {
-      "item": "singulo:lab_panel"
-    },
-    {
+    "C": {
       "item": "minecraft:clay_ball"
     }
-  ],
+  },
   "result": {
     "id": "singulo:lab_tiles",
     "count": 4

@@ -1,26 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "WSW",
+    "WBW"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_pristine_ruin"
     },
-    {
+    "W": {
       "item": "singulo:white_ceramic_composite"
     },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
+    "S": {
       "tag": "c:plates/steel"
     }
-  ],
+  },
   "result": {
     "id": "singulo:pristine_ruin_panel",
     "count": 8
