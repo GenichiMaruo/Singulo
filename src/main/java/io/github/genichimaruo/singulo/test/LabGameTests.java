@@ -71,6 +71,14 @@ public final class LabGameTests {
                     helper.assertFalse(inner.intersects(bi), "種 " + seed + ": 廊下が部屋の中を通った: " + names.get(i));
                 }
             }
+            // 屋外の代わりの部屋はどちらか必ずある
+            helper.assertTrue(java.util.Arrays.stream(LabLayout.OUTDOOR).anyMatch(names::contains), "種 " + seed + ": 日光浴室も屋外試験場もない");
+            // 動力炉は型紙の北を入口へ、ボス部屋は型紙の南（操作卓の背後）へ
+            LabLayout.Placed rp = l.rooms.get(names.indexOf(LabLayout.REACTOR));
+            net.minecraft.core.BlockPos southWall = LabLayout.wallCenter(rp.box(), rp.rotation().rotate(net.minecraft.core.Direction.SOUTH));
+            net.minecraft.core.BlockPos northWall = LabLayout.wallCenter(rp.box(), rp.rotation().rotate(net.minecraft.core.Direction.NORTH));
+            helper.assertTrue(l.doors.stream().anyMatch(o -> o.wall().equals(southWall) && !o.bulkhead()), "種 " + seed + ": ボス部屋への出口が動力炉の操作卓の背後にない");
+            helper.assertTrue(l.doors.stream().anyMatch(o -> o.wall().equals(northWall)), "種 " + seed + ": 動力炉の入口が型紙の北にない");
             long bulkheads = l.doors.stream().filter(LabLayout.Door::bulkhead).count();
             helper.assertTrue(bulkheads == 1, "種 " + seed + ": 隔壁が " + bulkheads);
             int boss = names.indexOf(LabLayout.BOSS), reactor = names.indexOf(LabLayout.REACTOR);
