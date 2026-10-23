@@ -45,6 +45,25 @@ public final class BugFix0111GameTests {
     }
 
     @GameTest(template = EMPTY)
+    public static void generatedRoomLightsUseTheirLevers(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var template = level.getStructureManager().getOrCreate(Singulo.id("lab/private_rooms"));
+        BlockPos origin = helper.absolutePos(new BlockPos(0, 40, 0));
+        var settings = new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings();
+        template.placeInWorld(level, origin, origin, settings, level.random, 2);
+        var lights = template.filterBlocks(origin, settings, SinguloBlocks.ROOM_LIGHT.get());
+        helper.assertTrue(lights.size() == 8, "Expected a light in every private room");
+        for (var light : lights) {
+            BlockPos leverPos = light.pos().west().below();
+            var leverState = level.getBlockState(leverPos);
+            helper.assertTrue(leverState.getBlock() instanceof net.minecraft.world.level.block.LeverBlock, "Missing room lever");
+            ((net.minecraft.world.level.block.LeverBlock) leverState.getBlock()).pull(leverState, level, leverPos, null);
+            helper.assertTrue(level.getBlockState(light.pos()).getValue(RoomLightBlock.LIT), "Generated lever did not light its room");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
     public static void controllersShareHeightAcrossMixedPanels(GameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.RAYLEIGH_PANEL.get());
