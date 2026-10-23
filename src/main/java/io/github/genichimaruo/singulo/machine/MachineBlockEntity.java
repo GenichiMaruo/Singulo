@@ -1149,6 +1149,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        tag.putLong("inputs_changed_at", inputsChangedAt);
         tag.put("items", items.serializeNBT(registries));
         tag.putIntArray("pending_returns", pendingReturns.stream().toArray());
         tag.putIntArray("slot_layout", new int[]{type.inputSlots(), type.outputSlots()});
@@ -1256,6 +1257,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         mass = tag.getDouble("mass");
         metalMass = tag.getDouble("metal_mass");
         resumeRecipe = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;
+        // Loading usually happens before setLevel, so inventory callbacks cannot restore this clock.
+        inputsChangedAt = tag.getLong("inputs_changed_at");
         dirty = true;
     }
 

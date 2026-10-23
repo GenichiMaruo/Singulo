@@ -47,6 +47,30 @@ public final class RecipeSelectionGameTests {
         return m.items().getStackInSlot(m.type().outputSlot());
     }
 
+    /** Chunk loading must not bypass the automatic input settling period. */
+    @GameTest(template = EMPTY, timeoutTicks = 120)
+    public static void restoredInputsWaitBeforeCrafting(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        MachineBlockEntity source = assembler(helper, pos);
+        helper.runAtTickTime(70, () -> {
+            var level = helper.getLevel();
+            source.items().setStackInSlot(0, new ItemStack(item("superconducting_coil"), 16));
+            source.items().setStackInSlot(1, new ItemStack(item("steel_plate"), 32));
+            var tag = source.saveWithoutMetadata(level.registryAccess());
+            var absolute = helper.absolutePos(pos);
+            var state = level.getBlockState(absolute);
+            MachineBlockEntity restored = new MachineBlockEntity(absolute, state);
+            restored.loadWithComponents(tag, level.registryAccess());
+            restored.setLevel(level);
+            restored.onLoad();
+            restored.energy().setEnergy(restored.energy().getMaxEnergyStored());
+            MachineBlockEntity.serverTick(level, absolute, state, restored);
+            helper.assertTrue(restored.status() == MachineBlockEntity.Status.IDLE,
+                    "Reload bypassed the input settling period: " + restored.status());
+            helper.succeed();
+        });
+    }
+
     /** 超伝導コイルと鋼板だけ（Tシリンダー軸受の材料）は、ほかの設備の途中でもあるので、入れ終わって少し待ってから自動で作る。指定すればすぐ作る。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void partialLoadWaitsBeforeCraftingAmbiguousRecipe(GameTestHelper helper) {

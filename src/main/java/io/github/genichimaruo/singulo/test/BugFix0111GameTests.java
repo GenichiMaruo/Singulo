@@ -44,6 +44,23 @@ public final class BugFix0111GameTests {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)));
     }
 
+    @GameTest(template = EMPTY)
+    public static void controllersShareHeightAcrossMixedPanels(GameTestHelper helper) {
+        helper.setBlock(new BlockPos(1, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
+        helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.RAYLEIGH_PANEL.get());
+        helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
+        BlockPos a = new BlockPos(1, 1, 3), b = new BlockPos(3, 1, 3);
+        helper.setBlock(a, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
+        helper.setBlock(b, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
+        ZeroGravityControllerBlockEntity first = helper.getBlockEntity(a);
+        ZeroGravityControllerBlockEntity second = helper.getBlockEntity(b);
+        first.setHeight(9);
+        helper.assertTrue(second.height() == 9, "Mixed power group must share its height");
+        second.setHeight(3);
+        helper.assertTrue(first.height() == 3, "Either controller must be able to lower the group's height");
+        helper.succeed();
+    }
+
     /**
      * コントロールボックス: 同じ集まりのボックスは高さを共有する。壊すと高さがアイテムに残り、置き直してもその高さのまま
      * （高さ5の安い設定に戻って、足りない電力のまま無重力が働くことがない）。

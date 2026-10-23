@@ -71,7 +71,9 @@ public class ZeroGravityControllerBlockEntity extends BlockEntity {
         BlockPos.MutableBlockPos n = new BlockPos.MutableBlockPos();
         while (!queue.isEmpty() && seen.size() < GravityReceiverBlockEntity.MAX_PANELS) {
             p.set(queue.dequeueLong());
-            boolean fromController = p.asLong() == from.asLong() || level.getBlockEntity(p) instanceof ZeroGravityControllerBlockEntity;
+            boolean fromController = p.asLong() == from.asLong();
+            var current = level.getBlockState(p);
+            boolean fromZero = current.getBlock() instanceof GravityPanelBlock g && g.kind() == GravityPanelBlock.Kind.ZERO;
             for (Direction d : Direction.values()) {
                 n.setWithOffset(p, d);
                 long key = n.asLong();
@@ -79,10 +81,13 @@ public class ZeroGravityControllerBlockEntity extends BlockEntity {
                     continue;
                 }
                 var state = level.getBlockState(n);
-                if (state.getBlock() instanceof GravityPanelBlock g && g.kind() == GravityPanelBlock.Kind.ZERO) {
+                // Match the receiver's power-group traversal, including mixed panel bridges.
+                // A controller itself still has to touch a zero-gravity block.
+                if (GravityReceiverBlockEntity.isPanel(state) && (!fromController
+                        || state.getBlock() instanceof GravityPanelBlock g && g.kind() == GravityPanelBlock.Kind.ZERO)) {
                     seen.add(key);
                     queue.enqueue(key);
-                } else if (!fromController && level.getBlockEntity(n) instanceof ZeroGravityControllerBlockEntity c) {
+                } else if (fromZero && level.getBlockEntity(n) instanceof ZeroGravityControllerBlockEntity c) {
                     seen.add(key);
                     out.add(c);                                       // ボックスからは先へたどらない（別の集まりをつながない）
                 }
