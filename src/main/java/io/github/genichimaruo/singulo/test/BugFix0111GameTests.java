@@ -180,4 +180,22 @@ public final class BugFix0111GameTests {
             helper.succeed();
         });
     }
+
+    /** 動力炉の部屋の型紙を回して置くと、制御盤（とほかの向きのある物）も部屋に合わせて回る。 */
+    @GameTest(template = EMPTY)
+    public static void reactorConsoleTurnsWithItsRoom(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var template = level.getStructureManager().getOrCreate(Singulo.id("lab/reactor"));
+        BlockPos origin = helper.absolutePos(new BlockPos(0, 40, 0));
+        for (net.minecraft.world.level.block.Rotation rotation : net.minecraft.world.level.block.Rotation.values()) {
+            var settings = new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings().setRotation(rotation);
+            var found = template.filterBlocks(origin, settings, SinguloBlocks.REACTOR_CONSOLE.get());
+            helper.assertTrue(found.size() == 1, "制御盤が型紙にない");
+            var state = found.get(0).state();
+            // 型紙では北向き（炉心のほう）。回した分だけ向きも回る
+            helper.assertTrue(state.getValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING) == rotation.rotate(Direction.NORTH),
+                    "回転 " + rotation + " で制御盤の向きが部屋に合わない: " + state);
+        }
+        helper.succeed();
+    }
 }
