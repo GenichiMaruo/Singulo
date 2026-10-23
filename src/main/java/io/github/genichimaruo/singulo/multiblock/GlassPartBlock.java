@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.multiblock;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.block.GlassBlock;
 
 /** 白縁の強化ガラス。中の部品が見える観察窓。 */

@@ -80,27 +80,30 @@ public final class Singulo {
         io.github.genichimaruo.singulo.machine.ShieldPermits.register();
         MinecraftForge.EVENT_BUS.addListener(MetricDriveItem::onPlayerTick);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravityBootsItem::onFall);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.AfterglowWingsItem::onFall);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravitonManipulatorItem::onPlayerTick);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.MultiblockInteraction::onRightClickBlock);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.SealedContainerBlock::onRightClickBlock);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.gravity.GravityEffects::onEntityTick);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.gravity.ZeroGravity::onFall);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.nature.Fulgurite::onEntityJoin);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.HandbookItem::onLogin);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.AncientRecords::onLogin);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.genesis.GenesisGalaxies::onLogin);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.command.SinguloCommands::register);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.FormationEffect::onServerTick);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.cable.EnergyNetwork::onServerTick);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.cable.EnergyNetwork::onLevelUnload);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDeath);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onTeleport);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onBreak);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onExplosion);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.RuinAndroid::onChangeTarget);
-        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.AfterglowWingsItem::onFall);
-        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
-        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
-        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.genesis.GenesisGalaxies::onLogin);
-        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
         MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST, io.github.genichimaruo.singulo.ruin.BossCombatLog::onHurt);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onShield);
-        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDeath);
         if (RuinSelfCheck.enabled()) {
             MinecraftForge.EVENT_BUS.addListener(RuinSelfCheck::onServerStarted);
         }

@@ -82,7 +82,7 @@ CHAPTERS = [
          'つまずきやすい所:\n'
          '・低温側のブロックが溶ける: 溶岩や、焚き火＋水・雪・氷は短い時間で溶ける。「溶けない組み合わせ」のページを見る。\n'
          '・冷却塔が組み上がらない: 中心の列は熱交換コア、てっぺんは通気格子。ホロ投影機をコントローラに使うと、足りない所が分かる。\n'
-         '・電力が足りない: 冷却塔は液体窒素を作るのに 240 FE/t ほど使う。発電機を増やすか、装置を交互に動かす。',
+         '・電力が足りない: 既定設定では高さ7の冷却塔は液体窒素の連続製造に約1,786 FE/t使う。給電不足なら進捗を保って待つので、装置を交互に動かし、発電機と蓄電を増やす。',
          'Stage 1 at a glance',
          'What to do, in order:\n'
          '1. Make steel, ceramic, basic circuits and basic frames (see "First materials").\n'
@@ -100,8 +100,8 @@ CHAPTERS = [
          'melt" page.\n'
          "- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Pr"
          'ojector on the controller to see what is missing.\n'
-         '- Not enough power: the tower uses about 240 FE/t to make liquid nitrogen. Add generators or run machines in t'
-         'urns.'),
+         '- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress '
+         'while waiting for power. Run machines in turns and add generation and storage.'),
         ('materials', '最初の素材',
          '1. 鉄と石炭で「鋼の素」を作り、溶鉱炉で鋼鉄インゴットにする。\n'
          '2. 粘土・ネザー水晶・骨粉・砂で「未焼成セラミック」を作り、かまどでホワイトセラミック複合材にする。'
@@ -176,7 +176,7 @@ CHAPTERS = [
          '今のうちに: アンドロイド組立ステーションで護衛を作れる（アンドロイドの章）。隕石クレーター（隕鉄・星屑）と氷山（青氷）も探しておく。\n'
          'つまずきやすい所:\n'
          '・液体ヘリウムができない: 冷却塔の高さが10未満だと作れない。\n'
-         '・冷却塔が遅い: 液体窒素は1 mBに250 FEかかる。核融合炉ができるまでは、熱電発電機を増やす（電力が足りなくても止まらず、遅くなるだけ）。\n'
+         '・冷却塔が遅い: 液体窒素は1 mBに250 FEかかる。核融合炉ができるまでは、熱電発電機を増やす（給電不足なら進捗を保って待つので、平均の生産速度が下がる）。\n'
          '・触媒が使えない・すぐ減る: 装置より1つ下のティアは遅く減りも速く、2つ下は使えない。',
          'Stage 2 at a glance',
          'What to do:\n'
@@ -193,7 +193,7 @@ CHAPTERS = [
          'Common sticking points:\n'
          '- No liquid helium: the tower must be at least 10 high.\n'
          '- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running '
-         '(short of power it slows down instead of stopping).\n'
+         '(it keeps its progress while waiting for power, reducing average throughput).\n'
          "- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot"
          ' be used.'),
         ('tower', '極低温冷却塔',
@@ -382,7 +382,7 @@ CHAPTERS = [
          '4. 発電運転に切り替え、質量ペレットを自動で送り込む。\n'
          '5. シンギュラリティ・コアで特異点技術（シールド・Tシリンダー・ワームホール）を動かし、最後の目標「創世炉」へ。\n'
          'つまずきやすい所:\n'
-         '・点火に失敗する: ケーブル網の上限は、いちばん細いケーブルで決まる。画面の受電の速さと届く見込みを見て配線を直す。\n'
+         '・点火に失敗する: 送電経路の上限は、その経路で容量が最も小さいケーブルで決まる。画面の受電の速さと届く見込みを見て配線を直す。\n'
          '・炉に吸い込まれる: リングの内側は逃げられない強い引力で、黒い球に触れたものは必ず消える。近くで作業するときは気をつける。',
          'Stage 5 at a glance',
          'What to do:\n'
@@ -396,7 +396,7 @@ CHAPTERS = [
          '5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the fina'
          'l goal, the Genesis Engine.\n'
          'Common sticking points:\n'
-         '- Ignition fails: a cable network is limited by its thinnest cable. Check the incoming rate and the estimate o'
+         '- Ignition fails: a power route is limited by its lowest-capacity cable. Check the incoming rate and the estimate o'
          'n the screen and fix the wiring.\n'
          '- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destro'
          'yed. Take care when working nearby.'),
@@ -411,9 +411,9 @@ CHAPTERS = [
          'extraction ports and mass alarms). The central 3×3×3 is air. The core controller sits 5 blocks below '
          'the centre. Use the Holo Projector on the core controller to show the whole structure.'),
         ('ignite', '点火と運転',
-         '種を入れて「点火」を押し、10秒以内に 50 GFE をポートかコントローラに注ぎます（ホライズン・バスが必要）。'
+         '種を入れて「点火」を押し、10秒以内に 50 GFE をポートかコントローラに注ぎます（ホライズン・バスを推奨）。'
          '画面には点火に要る受電（既定は平均 250 MFE/t）が出ます。点火中は受電の速さと届く見込みが出るので、足りなければ配線を見直します。'
-         'ケーブル網の上限はいちばん細いケーブルで決まり、トポロジカル導線1本の網では10秒に20 GFEしか届きません。\n'
+         '送電経路の上限は、その経路で容量が最も小さいケーブルで決まり、トポロジカル導線の1経路では10秒に20 GFEしか届きません。\n'
          '点火した炉心は「回収運転」で始まります。質量を480以下に保ち、Hコレクターを入れておけばH凝縮体が5分に1個できます。'
          '最初のシンギュラリティ・コアには6個（直接4・アノマリー・サンプルの復元2）要るので、約30分そのまま回し、集まったら回収運転を切って発電運転にします。'
          '育ちすぎた炉心も、回収運転にすると毎秒2ずつ質量を放出して戻ります。\n'
@@ -421,9 +421,9 @@ CHAPTERS = [
          'リングの外（半径24まで）は弱い引力、リングの内側は逃げられない強い引力で、黒い球に触れたものはどんなに頑丈でも必ず消えます。半径4は防具を無視する潮汐帯です。引力帯の中は時間が遅れ、装置が×0.8、触媒の減りが×0.5になります。',
          'Ignition and operation',
          'Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a '
-         'horizon bus is required). The screen shows the intake needed (250 MFE/t on average by default). '
+         'horizon bus is recommended). The screen shows the intake needed (250 MFE/t on average by default). '
          'While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a '
-         'network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 '
+         'power route is capped by its lowest-capacity cable, so a single topological-wire route delivers at most 20 GFE in 10 '
          's.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 '
          'minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to '
          'restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. '
@@ -519,19 +519,25 @@ CHAPTERS = [
     ('power', 'singulo:superconducting_cable', '電力と輸送', 'Power and Logistics', [
         ('cables', 'ケーブル',
          '銅導線（2 kFE/t、損失あり）→ 超伝導ケーブル（1 MFE/t）→ トポロジカル導線（100 MFE/t）→ ホライズン・バス（上限なし。ほかの mod の装置へは1台あたり約2.1 GFE/t まで）。'
-         'つながったケーブルの容量は、いちばん細いところで決まります。',
+         '送電量は、その経路で容量が最も小さいケーブルで決まり、別の分岐のケーブルには制限されません。同じケーブルを通る複数の送電は、1 tick の容量を共有します。\n受電する装置からケーブル経由で近い電源を先に使い、不足分を遠い電源で補います。同じ距離なら座標順です。近い電源が空の場合や、途中のケーブルの容量が足りない場合も、残りを別の電源が補います。ケーブルを切断すると、その配線の発光はすぐに消えます。',
          'Cables',
          'Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) '
-         '→ horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). A connected network '
-         'carries only what its thinnest cable can.'),
+         '→ horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. '
+         'Transfers sharing a cable share its per-tick capacity.\nSources nearer to the receiver along the cables supply power first; more distant sources cover the deficit. Equal distances use a stable coordinate order. An empty nearby source or a bottleneck on its route does not block the backup sources. Breaking a cable immediately clears the glow of that wiring.'),
         ('sides', '面ごとの設定',
          '通常の加工装置の画面右上の「面」ボタンで、6つの面それぞれを「無効・入力・出力・入出力」に切り替えられます。'
-         '出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'
+         '自動排出の全体スイッチは初期状態ではオフです。オンにすると、自動排出を許可した出力可能な面から隣接先へ搬出します。面にカーソルを合わせると隣接ブロック名が分かります。出力の面には、できたものを自動で押し出す（自動排出）設定もあります。マルチブロックは指定位置の搬入出ポートを使い、Pリアクターは抽出ポートを使います。'
          '2種類の気体を出す装置（電解槽など）は、気体ごとに出す面を決められます。画面右の電源ボタンで装置を止められ、'
          '電力だけで作れるもの（冷却塔の液体窒素など）がある装置には、それを作るかどうかのスイッチがあります。',
          'Side configuration',
-         'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'
+         'Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. The master auto-eject switch defaults off; turn it on to push through output-capable faces with auto-eject enabled. Hover a face to see its adjacent block. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports.'
          ' Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.'),
+        ('relocation', '移設レンチ',
+         '移設レンチは鋼鉄インゴット3個・銅インゴット2個・基礎回路1個から作れます。スニーク＋右クリックで、加工装置・通常の発電機・SMES・触媒装置を回収できます。中身・液体・電力・進捗・面設定を保持し、再設置すると復元します。持ち物が満杯なら、その場に装置を1個落とします。\n'
+         'マルチブロックはコントローラだけを回収し、周囲の部材は残ります。再設置後は形を組み直してください。Pリアクター・ワームホール装置・アンドロイド用設備などは対象外です。',
+         'Relocation Wrench',
+         'Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\n'
+         'For multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.'),
         ('wormhole', 'ワームホール',
          '唯一の無線化。生成器で一対の口を作り、60秒以内に固定化装置でエキゾチック物質と口の筐体を使って固定化し、片方を運んで置きます。'
          '口から8ブロック以内のワームホール・ポートは、向こう側の口の近くにある同じポート番号（0〜127、画面の7つの丸で決める）のポートとつながり、'
@@ -662,22 +668,37 @@ CHAPTERS = [
         ('lab', '地下アンドロイド研究所',
          '旧文明のアンドロイドの研究所。統括AI「ファウンドリ」が暴走し、職員は中央動力炉を止めて主立坑から逃げ出しました。'
          '人がいなくなった今も、アンドロイドたちは「施設を維持せよ」という最後の命令に従って施設を直し続けています。\n'
-         '・入口は、地表まで突き抜けた崩れた主立坑（はしごと足場で降りる）。施設は耐圧殻で包まれていて、統括AIを倒すまでは壊せません'
+         '・入口は、地表に残る白い小さな建物（もとの受付とエレベーターホール）。エレベーターの昇降路だった崩れた主立坑を、'
+         'はしごと足場で降ります。部屋と廊下は厚さ2の耐圧殻で包まれていて、統括AIを倒すまでは壊せません'
          '（倒したあとも黒曜石より硬い）。\n'
+         '・専用の貨物昇降室にはクレーン・線路・コンベア・荷物置き場があり、その天井から地表まで搬入出の立坑が必ず通っています。主立坑と搬入出立坑は両方とも生成されます。部屋の手前と地表の1段下は溶接された蓋でふさがれていて、'
+         '統括AIを倒すとダイヤのツルハシで掘れます。立坑は荒れていないので、はしごを掛ければ地表との近道になります。\n'
          '・主電源は落ちていて、非常灯だけが赤く灯る薄暗い施設です。中央動力炉の制御盤を右クリックすると動力炉が起動し、'
          '施設の明かりがついて、AI中枢の隔壁が開きます。そして、眠っていた統括AIも目を覚まします。\n'
-         '・部屋の並びは毎回変わります。研究室・資料室・サーバールーム・社員寮・医務室・食堂などが並び、警備機や印刷台が守っています。'
+         '・電力が戻ると、自販機がエメラルドで飲み物を売りはじめます（押した列の飲み物。ソーダは移動速度、スポーツドリンクは再生、'
+         'エナジードリンクは採掘速度）。給湯室のコーヒーメーカーはカカオ豆で淹れ、ガラス瓶でくめます（採掘速度と眠気覚まし）。\n'
+         '・部屋の並びは毎回変わります。研究室・資料室・サーバールーム・社員寮・研究員の個室の並ぶ個室区画・医務室・厨房のある食堂などが並び、警備機や印刷台が守っています。'
+         '個室や厨房のスライドドアは右クリックで開き、しばらくすると自分で閉まります（研究所のドアは作れませんが、似たホワイトスライドドアは作業台で作れます）。'
          '物資の棚には研究所の部品や資料が残っています。\n'
          '・記録端末を右クリックすると、残された記録を読めます。集めると、暴走のいきさつが分かります。',
          'Underground Android Laboratory',
          'An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through '
          'the main shaft. Even now the androids keep repairing the facility, obeying their last order: "Maintain the facility."\n'
-         '- The way in is the collapsed main shaft that breaks through to the surface (climb down the ladders and scaffolding). The facility is wrapped in a '
-         'pressure hull that cannot be broken until the overseer falls (and is harder than obsidian even then).\n'
+         '- The way in is a small white building left on the surface, the old reception and elevator hall. Climb down the collapsed main shaft, once '
+         'the elevator well, on its ladders and scaffolding. The rooms and corridors are wrapped in a pressure hull two blocks thick that cannot be '
+         'broken until the overseer falls (and is harder than obsidian even then).\n'
+         '- A supply shaft always runs from a dedicated cargo lift room, with hoists, rails, conveyors and storage, to the surface. Both the main and supply shafts are generated. It is welded shut just above the room and one block below the '
+         'surface; once the overseer falls, the welded hatches can be mined with a diamond pickaxe. The shaft is intact, so with ladders it becomes '
+         'a shortcut to the surface.\n'
          '- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, '
          'the AI core bulkheads open, and the dormant overseer wakes.\n'
-         '- The room layout changes every time: research labs, archives, server rooms, dormitories, a medical bay, a cafeteria and more, guarded by security '
-         'machines and fabricators. Supply chests still hold laboratory parts and records.\n'
+         '- Once power is back, the vending machines sell drinks for emeralds (press the column you want: soda for Speed, sports drink for '
+         'Regeneration, energy drink for Haste). The break-room coffee makers brew with cocoa beans; fill glass bottles from the pot '
+         '(Haste, and it keeps you awake).\n'
+         '- The room layout changes every time: research labs, archives, server rooms, dormitories, private rooms lined up along a hall, a medical bay, a cafeteria '
+         'with a kitchen and more, guarded by security '
+         'machines and fabricators. The sliding doors of the private rooms and kitchen open with a right-click and close by '
+         'themselves after a while (the lab doors cannot be crafted, but the similar White Sliding Door is made at a Crafting Table). Supply chests still hold laboratory parts and records.\n'
          '- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.'),
         ('plan', '探索の段取り',
          '段階が進むと探索先が一度に増えます。先に集めておくと、あとで工場が止まりません。\n'
@@ -685,7 +706,8 @@ CHAPTERS = [
          '・段階3のうち: 研究棟。深海圧力収集器は早めに置いて、高圧結晶を貯めておく（殻とアンビルで約30個）。雷雨の日は砂に避雷針。\n'
          '・段階4の前に: 封鎖培養施設、古代都市（スカルク・残響の欠片。欠片は残響共鳴器で複製し続けられるので、1つあれば足りる）、'
          'エンドの虚空（虚空捕集器）、ウィザー（ネザースター。点火後は人工星核で代わりになる）。\n'
-         '・原本の記録は修復でき、新品＋修復3回で約2.7倍使えます。何度も遠征し直すより、修復を使いましょう。',
+         '・原本の記録は修復でき、新品＋修復3回で約2.7倍使えます。何度も遠征し直すより、修復を使いましょう。\n'
+         '未使用の観測ログ・量子データ片・培養データや復元部品は、同じ状態のものを64個まで重ねられます。装置の入力枠には1個だけ入り、Shiftクリックでも1個だけ投入します。使用途中のものは重なりません。\n加工で使い切った制御ユニットなどの復元部品や原本は、使用後の状態のまま出力に回ります。出力枠が埋まっている間は入力枠で待機し、そこからもホッパーやアイテムパイプで回収できます。自動搬出をオンにすると隣接先へ搬出します。修復用に投入した部品は自動で搬出しません。',
          'Planning expeditions',
          'Destinations pile up in later stages; gathering early keeps the factory running.\n'
          '- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n'
@@ -693,7 +715,8 @@ CHAPTERS = [
          'Put lightning rods on sand in thunderstorms.\n'
          '- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void '
          '(void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n'
-         '- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.'),
+         '- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.\n'
+         'Unused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.\nRestored parts and original records exhausted during processing become item outputs with their usage and repair data intact. If the output slot is occupied, they wait in their input slot and can still be extracted by hoppers or item pipes. Enable automatic ejection to send them to adjacent inventories. Parts inserted for repair are not automatically ejected.'),
         ('compass', '探索コンパスの調整',
          '探索コンパスは、はじめは地表観測拠点しか探せません。攻略した（保管庫を自分で開けた）遺構の保管庫をスニークして'
          '右クリックすると、そこに残る記録で調整され、次の遺構（研究棟 → 封鎖培養施設 → 最終実験施設 → 沈んだ炉心区画）も探せるようになります。'
@@ -1050,14 +1073,14 @@ CHAPTERS = [
         ('decor', 'アンドロイドの装飾',
          'アンドロイドの画面の、名前の左のボタンでページを切り替えると、3枚目が「装飾」のページ。頭・背中/腰・手の枠に装飾を着けられる。'
          '戦い・作業には影響しない。どれも作業台で作り、染料と一緒に作業台で染められる（革の防具と同じ）。\n'
-         '・頭: リボン・髪飾り・ベレー帽・ヘッドドレス\n'
+         '・頭: リボン・髪飾り・ベレー帽・ヘッドドレス・メガネ\n'
          '・背中/腰: マント・マフラー・腰リボン（マントとマフラーの垂れは、歩くとなびく）\n'
          '・手: 文庫本・花束・ティーカップ・傘（待機している間だけ持つ。戦い・作業・充電の間はしまう）',
          'Android decorations',
          'Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand '
          'slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like '
          'leather armor.\n'
-         '- Head: ribbon, hair flower, beret or headdress\n'
+         '- Head: ribbon, hair flower, beret, headdress or glasses\n'
          '- Back/waist: cape, scarf or waist ribbon (the cape and the scarf\'s tail flutter as it walks)\n'
          '- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)'),
         ('glass', 'アンドロイド用のガラス',

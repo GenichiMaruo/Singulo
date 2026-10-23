@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_lab_building"
+    },
+    {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    {
+      "tag": "forge:plates/steel"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:lab_glass"
+  }
+}

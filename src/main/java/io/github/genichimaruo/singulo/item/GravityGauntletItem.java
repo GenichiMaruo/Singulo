@@ -307,7 +307,9 @@ public class GravityGauntletItem extends SinguloItem {
         return id == null ? null : player.serverLevel().getEntity(id);
     }
 
-    static void release(ServerPlayer player) {
+    public static void clearRuntime() { TARGETS.clear(); }
+
+    public static void release(ServerPlayer player) {
         TARGETS.remove(player.getUUID());
     }
 

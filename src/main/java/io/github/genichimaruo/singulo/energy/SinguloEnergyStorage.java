@@ -42,7 +42,7 @@ public class SinguloEnergyStorage extends EnergyStorage {
     /** 発電機が電力を生む。入り切らなかった分は捨てる。 */
     public void generate(int amount) {
         int before = energy;
-        energy = Math.min(capacity, energy + amount);
+        energy = (int) Math.min(capacity, (long) energy + amount);
         if (energy != before) {
             onChange.run();
         }

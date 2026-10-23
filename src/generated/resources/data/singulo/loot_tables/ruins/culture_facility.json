@@ -42,6 +42,48 @@
           "functions": []
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "singulo:blueprint_pristine_ruin",
+          "weight": 40
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 60
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "singulo:blueprint_ruin_glass",
+          "weight": 30
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 70
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "singulo:blueprint_lighting",
+          "weight": 25
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 75
+        }
+      ]
     }
   ]
 }

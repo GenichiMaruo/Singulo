@@ -36,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
  * 白い警備ドローン。遺構の警備機ドックからだけ出撃する。強さは3段階（地表観測拠点=1、研究棟=2、封鎖培養施設と最終実験施設=3）。
  * 相手の周りを回りながら光弾を撃ち（段階2は3連射、段階3は追尾の3連射）、ときどき止まってレンズを光らせてから突進する。
  * 段階3は近づかれると、ためてから電磁パルスの輪を放つ（ダメージ・吹き飛ばし・鈍足）。何も落とさないので、トラップで稼げない。
+ * 体力が {@link #CRIPPLED_AT} を切ると壊れかけになり、地面から {@link #LOW_FLIGHT} ブロックより上へは飛べなくなる（煙と火花を出す）。
  */
 public class SecurityDrone extends Monster {
     private static final EntityDataAccessor<Integer> TIER = SynchedEntityData.defineId(SecurityDrone.class, EntityDataSerializers.INT);
@@ -46,15 +47,20 @@ public class SecurityDrone extends Monster {
     public static final int STATE_RAM = 2;
     public static final int STATE_PULSE = 3;
 
-    static final double[] HEALTH = {10, 24, 40};
+    static final double[] HEALTH = {6, 14, 24};
     /** 突進のダメージ。 */
-    static final double[] DAMAGE = {3, 5, 7};
+    static final double[] DAMAGE = {2, 3, 4};
     /** 光弾のダメージと、1回に撃つ数。 */
-    static final float[] BOLT_DAMAGE = {2, 3.5F, 5};
+    static final float[] BOLT_DAMAGE = {1, 2, 3};
     static final int[] BURST = {1, 3, 3};
     /** 段階ごとの光の色（レンズ・光弾）。 */
     public static final int[] COLORS = {0x78D2F0, 0xF0B450, 0xE86060};
-    static final float PULSE_DAMAGE = 6;
+    static final float PULSE_DAMAGE = 4;
+    /** 壊れかけになる体力の割合と、壊れかけで飛べる地面からの高さ（ブロック）。 */
+    static final float CRIPPLED_AT = 0.5F;
+    static final double LOW_FLIGHT = 1.5;
+    /** 地面を探す深さ（これより下に足場がなければ、地面は見つからない扱いで沈み続ける）。 */
+    static final int GROUND_SEARCH = 12;
     static final double PULSE_RADIUS = 4.5;
     static final int RAM_WINDUP = 12;
     static final int RAM_TICKS = 16;
@@ -133,6 +139,45 @@ public class SecurityDrone extends Monster {
             return false;
         }
         return super.hurt(source, amount);
+    }
+
+    /** 壊れかけか（体力が最大の {@link #CRIPPLED_AT} 以下）。 */
+    public boolean crippled() {
+        return getHealth() <= getMaxHealth() * CRIPPLED_AT;
+    }
+
+    /** 真下のいちばん近い足場の上の高さ（{@link #GROUND_SEARCH} ブロックまで探す。なければ今の高さから探した深さだけ下）。 */
+    double groundBelow() {
+        net.minecraft.core.BlockPos.MutableBlockPos p = blockPosition().mutable();
+        for (int i = 0; i <= GROUND_SEARCH; i++) {
+            if (!level().getBlockState(p).getCollisionShape(level(), p).isEmpty()) {
+                return p.getY() + level().getBlockState(p).getCollisionShape(level(), p).max(net.minecraft.core.Direction.Axis.Y);
+            }
+            p.move(net.minecraft.core.Direction.DOWN);
+        }
+        return getY() - GROUND_SEARCH;
+    }
+
+    /** 壊れかけなら、地面から {@link #LOW_FLIGHT} より上にいられない（上にいれば沈む）。煙と火花をときどき出す。 */
+    @Override
+    public void aiStep() {
+        super.aiStep();
+        if (!(level() instanceof ServerLevel level) || !crippled() || !isAlive()) {
+            return;
+        }
+        double ceiling = groundBelow() + LOW_FLIGHT;
+        Vec3 v = getDeltaMovement();
+        if (getY() > ceiling) {
+            setDeltaMovement(v.x, Math.min(v.y, -0.12), v.z);
+        } else if (v.y > 0 && getY() + v.y > ceiling) {
+            setDeltaMovement(v.x, Math.max(0, ceiling - getY()), v.z);
+        }
+        if (tickCount % 6 == 0) {
+            level.sendParticles(ParticleTypes.SMOKE, getX(), getY() + 0.3, getZ(), 1, 0.15, 0.1, 0.15, 0.01);
+        }
+        if (random.nextInt(25) == 0) {
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 0.3, getZ(), 3, 0.2, 0.1, 0.2, 0.05);
+        }
     }
 
     /** 光弾を1発撃つ（段階3は追尾）。 */
@@ -301,6 +346,9 @@ public class SecurityDrone extends Monster {
             orbitAngle += 0.035;
             double r = 6;
             Vec3 want = target.position().add(Math.cos(orbitAngle) * r, target.getBbHeight() + 1.8, Math.sin(orbitAngle) * r);
+            if (crippled()) {
+                want = new Vec3(want.x, Math.min(want.y, groundBelow() + LOW_FLIGHT - 0.5), want.z);   // 壊れかけは地面すれすれを回る
+            }
             getMoveControl().setWantedPosition(want.x, want.y, want.z, 1.1);
             getLookControl().setLookAt(target, 30, 30);
             boolean seen = hasLineOfSight(target);

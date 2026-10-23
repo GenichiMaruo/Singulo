@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.reactor;
 
+import io.github.genichimaruo.singulo.machine.NotifyingItemSlot;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import javax.annotation.Nullable;
@@ -12,7 +13,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 /** ペンローズ・リアクターの画面。種・燃料・抽出装置3種・副産物4つ。ボタンは「点火」「スピン目標」「回収運転」。 */
 public class PenroseReactorMenu extends AbstractContainerMenu {
@@ -46,7 +46,7 @@ public class PenroseReactorMenu extends AbstractContainerMenu {
         for (int i = 0; i < PenroseReactorBlockEntity.SLOTS; i++) {
             boolean out = i >= PenroseReactorBlockEntity.SLOT_OUT;
             final int index = i;
-            addSlot(new SlotItemHandler(items, i, SLOT_POS[i][0], SLOT_POS[i][1]) {
+            addSlot(new NotifyingItemSlot(items, i, SLOT_POS[i][0], SLOT_POS[i][1]) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return !out && (reactor == null || reactor.items().isItemValid(index, stack));

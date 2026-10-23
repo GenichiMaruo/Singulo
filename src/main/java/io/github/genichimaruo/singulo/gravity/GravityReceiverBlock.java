@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.gravity;
 
-import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -65,7 +64,7 @@ public class GravityReceiverBlock extends BaseEntityBlock {
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity be) {
             player.displayClientMessage(Component.translatable("message.singulo.gravity_receiver.status",
-                    be.activePanels(), be.panels(), GravityReceiverBlockEntity.perPanel()), true);
+                    be.activePanels(), be.panels(), be.demand()), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

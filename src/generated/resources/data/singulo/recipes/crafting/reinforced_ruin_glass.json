@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "tag": "forge:plates/steel"
+    },
+    {
+      "tag": "forge:plates/steel"
+    },
+    {
+      "tag": "forge:obsidian"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:reinforced_ruin_glass"
+  }
+}

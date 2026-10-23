@@ -32,6 +32,7 @@ public final class GravityEffects {
     public static void onEntityTick(LivingTickEvent event) {
         { LivingEntity living = event.getEntity();
             update(living);
+            ZeroGravity.update(living);
         }
     }
 
@@ -45,7 +46,7 @@ public final class GravityEffects {
         }
         BlockState below = living.level().getBlockState(living.getOnPos());
         GravityPanelBlock.Kind kind = below.getBlock() instanceof GravityPanelBlock panel && below.getValue(GravityPanelBlock.POWERED)
-                ? panel.kind() : null;
+                && panel.kind() != GravityPanelBlock.Kind.ZERO ? panel.kind() : null;
         apply(living, gravity, kind);
     }
 

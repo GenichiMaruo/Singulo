@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    {
+      "tag": "forge:plates/steel"
+    },
+    {
+      "tag": "forge:plates/steel"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    },
+    {
+      "tag": "forge:dusts/redstone"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "singulo:server_rack"
+  }
+}

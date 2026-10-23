@@ -11,10 +11,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 public class MachineMenu extends AbstractContainerMenu {
     public static final int BUTTON_CYCLE_MODE = 0, BUTTON_POWER = 1, BUTTON_MAKE_FREE = 2;
+    /** 作るものの指定を外す。BUTTON_SELECT + n は {@link RecipeSelection#selectable} の n 番を指定する。 */
+    public static final int BUTTON_CLEAR_SELECTION = 3, BUTTON_SELECT = 100;
 
     private final MachineType type;
     private final BlockPos pos;
@@ -45,10 +46,15 @@ public class MachineMenu extends AbstractContainerMenu {
         this.layout = new MachineLayout(type);
 
         for (int i = 0; i < type.inputSlots(); i++) {
-            addSlot(new SlotItemHandler(handler, i, layout.inputX[i], layout.inputY[i]));
+            addSlot(new NotifyingItemSlot(handler, i, layout.inputX[i], layout.inputY[i]) {
+                @Override
+                public int getMaxStackSize(ItemStack stack) {
+                    return io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack) ? 1 : super.getMaxStackSize(stack);
+                }
+            });
         }
         for (int i = 0; i < type.outputSlots(); i++) {
-            addSlot(new SlotItemHandler(handler, type.outputSlot() + i, layout.outputX, layout.outputY[i]) {
+            addSlot(new NotifyingItemSlot(handler, type.outputSlot() + i, layout.outputX, layout.outputY[i]) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false;
@@ -56,14 +62,14 @@ public class MachineMenu extends AbstractContainerMenu {
             });
         }
         if (type.hasCatalystSlot()) {
-            addSlot(new SlotItemHandler(handler, type.catalystSlot(), layout.catalystX, layout.catalystY) {
+            addSlot(new NotifyingItemSlot(handler, type.catalystSlot(), layout.catalystX, layout.catalystY) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return MachineBlockEntity.isCatalyst(stack);
                 }
             });
         }
-        addSlot(new SlotItemHandler(handler, type.upgradeSlot(), layout.sideColumnX + 4, MachineLayout.UPGRADE_Y) {
+        addSlot(new NotifyingItemSlot(handler, type.upgradeSlot(), layout.sideColumnX + 4, MachineLayout.UPGRADE_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return MachineBlockEntity.isUpgrade(stack);
@@ -106,8 +112,12 @@ public class MachineMenu extends AbstractContainerMenu {
             case BUTTON_CYCLE_MODE -> machine.cycleMode();
             case BUTTON_POWER -> machine.togglePower();
             case BUTTON_MAKE_FREE -> machine.toggleMakeFree();
+            case BUTTON_CLEAR_SELECTION -> machine.selectRecipe(-1);
             default -> {
-                return false;
+                if (id < BUTTON_SELECT) {
+                    return false;
+                }
+                machine.selectRecipe(id - BUTTON_SELECT);
             }
         }
         return true;
@@ -136,6 +146,13 @@ public class MachineMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, catalystIndex, catalystIndex + 1, false)) {
                 return ItemStack.EMPTY;
             }
+        } else if (io.github.genichimaruo.singulo.item.UsesHelper.hasUses(stack)) {
+            // A single template per shift-click, rather than filling every input with originals.
+            boolean moved = false;
+            for (int i = 0; i < type.inputSlots() && !moved; i++) {
+                moved = moveItemStackTo(stack, i, i + 1, false);
+            }
+            if (!moved) return ItemStack.EMPTY;
         } else if (!moveItemStackTo(stack, 0, type.inputSlots(), false)) {
             return ItemStack.EMPTY;
         }

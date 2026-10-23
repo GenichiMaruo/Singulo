@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.nature;
 
-import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloWorldgen;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;

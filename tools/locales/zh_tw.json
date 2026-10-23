@@ -904,8 +904,8 @@
     "translation": "重力波探測器"
   },
   "block.singulo.gravity_panel_receiver": {
-    "source": "Gravity Panel Receiver",
-    "translation": "重力面板受電器"
+    "source": "Panel Receiver",
+    "translation": "面板受電器"
   },
   "block.singulo.guardian_core": {
     "source": "Guardian Seal Core",
@@ -955,6 +955,10 @@
     "source": "Kiln",
     "translation": "燒製爐"
   },
+  "block.singulo.lab_door": {
+    "source": "Lab Sliding Door",
+    "translation": "研究所滑動門"
+  },
   "block.singulo.lab_frame": {
     "source": "Lab Frame",
     "translation": "研究所結構材"
@@ -970,6 +974,10 @@
   "block.singulo.lab_panel_lined": {
     "source": "Lined Lab Panel",
     "translation": "研究所條紋面板"
+  },
+  "block.singulo.lab_rayleigh_panel": {
+    "source": "Lab Rayleigh Sky Panel",
+    "translation": "瑞利散射面板（研究所）"
   },
   "block.singulo.lab_terminal": {
     "source": "Record Terminal",
@@ -1062,6 +1070,10 @@
   "block.singulo.quantum_heat_engine": {
     "source": "Quantum Heat Engine",
     "translation": "量子熱機"
+  },
+  "block.singulo.rayleigh_panel": {
+    "source": "Rayleigh Sky Panel",
+    "translation": "瑞利散射面板"
   },
   "block.singulo.reactor_console": {
     "source": "Reactor Control Panel",
@@ -1215,6 +1227,10 @@
     "source": "Superconducting Cable",
     "translation": "超導電纜"
   },
+  "block.singulo.teacup": {
+    "source": "Teacup",
+    "translation": "茶杯"
+  },
   "block.singulo.thermoelectric_generator": {
     "source": "Thermoelectric Generator",
     "translation": "熱電發電機"
@@ -1271,6 +1287,10 @@
     "source": "Void Collector",
     "translation": "虛空收集器"
   },
+  "block.singulo.welded_hatch": {
+    "source": "Welded Hatch",
+    "translation": "焊死的艙蓋"
+  },
   "block.singulo.white_glass_panel": {
     "source": "White Glass Panel",
     "translation": "白色玻璃面板"
@@ -1282,6 +1302,10 @@
   "block.singulo.white_panel": {
     "source": "White Panel",
     "translation": "白色面板"
+  },
+  "block.singulo.white_sliding_door": {
+    "source": "White Sliding Door",
+    "translation": "白色滑動門"
   },
   "block.singulo.white_star_glass_panel": {
     "source": "Starred White Glass Panel",
@@ -1330,6 +1354,14 @@
   "block.singulo.wormhole_stabilizer": {
     "source": "Wormhole Stabilizer",
     "translation": "蟲洞穩定器"
+  },
+  "block.singulo.zero_gravity_block": {
+    "source": "Zero-Gravity Block",
+    "translation": "無重力方塊"
+  },
+  "block.singulo.zero_gravity_controller": {
+    "source": "Zero-Gravity Control Box",
+    "translation": "無重力控制箱"
   },
   "command.singulo.blackhole.done": {
     "source": "Rogue black hole at %s, %s, %s · mass %s",
@@ -1511,6 +1543,10 @@
     "source": "Patterned glass that only androids can pass.",
     "translation": "只有仿生人可以通過的花紋玻璃。"
   },
+  "desc.singulo.android_glasses": {
+    "source": "Square glasses for an android, with clear light-blue lenses. Goes in the head slot of the decoration page. Dye the frames with dyes on a crafting table.",
+    "translation": "戴在仿生人眼睛上的方形眼鏡（鏡片透出淡藍色）。裝在裝飾頁的頭部欄位。可與染料一起在工作台染色（鏡框顏色）。"
+  },
   "desc.singulo.android_hair_flower": {
     "source": "A flower hair ornament worn on the right side of an android's head. Goes in the decoration page. Dye it with dyes on a crafting table.",
     "translation": "戴在仿生人頭部右側的花朵髮飾。放入裝飾頁的欄位。可與染料一起在工作台染色。"
@@ -1592,8 +1628,8 @@
     "translation": "裝在護衛仿生人上後，會有 2 個可裝液體或氣體的儲罐（各 32,000 mB，每個儲罐一種）。作業時可把流體從資材存放處運到裝置。腰部會出現儲罐。儲罐裡還有東西時無法取下。"
   },
   "desc.singulo.android_teacup": {
-    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table.",
-    "translation": "待機中的仿生人拿在手上的茶杯。放入裝飾頁的欄位。可與染料一起在工作台染色。"
+    "source": "A teacup an android holds while idle. Goes in the decoration page. Dye it with dyes on a crafting table. Right-click to place it as a cup on a saucer; it keeps its color and comes back when broken.",
+    "translation": "待機的仿生人拿在手中的茶杯。裝在裝飾頁的欄位中。可與染料一起在製作台上染色。右鍵可將它放置為放在茶碟上的杯子（保留染好的顏色，破壞後會變回物品）。"
   },
   "desc.singulo.android_transfer_upgrade": {
     "source": "Fitted in an Android Assembly Station's upgrade slot, an android that falls or is dismantled sends its inventory (repair kits, armor plate, upgrades and carried items) to the station instead of dropping it, and the next android it prints carries it.",
@@ -1656,8 +1692,8 @@
     "translation": "用奇點之力重鑄被擊敗守衛記錄而成的核心。在最終實驗室的封印控制台上使用，即可喚醒覺醒的視界守衛：生命 2.5 倍、傷害 1.5 倍、招式更快。獲勝可獲得超頻晶片等獎勵。"
   },
   "desc.singulo.basic_circuit": {
-    "source": "The brain of every early machine.",
-    "translation": "每台早期機器的大腦。"
+    "source": "An electronic circuit for basic control.",
+    "translation": "用於基礎控制的電子電路。"
   },
   "desc.singulo.basic_frame": {
     "source": "The frame almost every machine is built on.",
@@ -1672,8 +1708,8 @@
     "translation": "熔化的鉍冷卻後形成的階梯狀彩虹色晶體。建材。"
   },
   "desc.singulo.bismuth_ingot": {
-    "source": "Bismuth metal with a rainbow tarnish, a by-product of refining raw copper in the Catalytic Reactor. Collide it with zinc in the Particle Accelerator to make nihonium.",
-    "translation": "帶有彩虹色氧化膜的鉍金屬，在催化反應器中精煉粗銅時作為副產物得到。與鋅一起在粒子加速器中碰撞即可製成鉨。"
+    "source": "A metal with an iridescent surface.",
+    "translation": "表面泛著虹彩的金屬。"
   },
   "desc.singulo.black_hole_bomb": {
     "source": "Thrown: opens a tiny black hole that swallows its surroundings.",
@@ -1695,6 +1731,34 @@
     "source": "An empty card for copying records in the Archive Terminal.",
     "translation": "用於在檔案終端中抄錄記錄的空白卡片。"
   },
+  "desc.singulo.blueprint_lab_building": {
+    "source": "Plans for laboratory walls and floors.",
+    "translation": "研究所牆壁與地板的圖紙。"
+  },
+  "desc.singulo.blueprint_lab_furniture": {
+    "source": "Plans for ancient furniture and fixtures.",
+    "translation": "舊文明家具與設施的圖紙。"
+  },
+  "desc.singulo.blueprint_lighting": {
+    "source": "Plans for ancient lighting fixtures.",
+    "translation": "舊文明照明器具的圖紙。"
+  },
+  "desc.singulo.blueprint_pristine_ruin": {
+    "source": "Plans for pristine ruin materials.",
+    "translation": "完好遺跡建材的圖紙。"
+  },
+  "desc.singulo.blueprint_rayleigh": {
+    "source": "Plans for an artificial blue-sky panel.",
+    "translation": "投映人造藍天的面板圖紙。"
+  },
+  "desc.singulo.blueprint_ruin_glass": {
+    "source": "Plans for recreating ruin glass.",
+    "translation": "重現遺跡玻璃的圖紙。"
+  },
+  "desc.singulo.blueprint_ruin_panels": {
+    "source": "Plans for recreating ruin walls.",
+    "translation": "重現遺跡外牆的圖紙。"
+  },
   "desc.singulo.bose_condensate_catalyst": {
     "source": "Tier 3 catalyst.",
     "translation": "三級催化劑。"
@@ -1707,9 +1771,13 @@
     "source": "A heavy door sealing the laboratory core section. It opens when facility power returns. Unbreakable.",
     "translation": "封住研究所中樞區的厚門。設施恢復供電後打開。無法破壞。"
   },
+  "desc.singulo.canned_soda": {
+    "source": "A blue can of soda from the laboratory's vending machine. Drinking it gives Speed for 2 minutes.",
+    "translation": "研究所自動販賣機裡的藍色罐裝汽水。飲用後 2 分鐘內移動速度提升。"
+  },
   "desc.singulo.carbon_dust": {
-    "source": "Carbon powder crushed from charcoal in the Compressor (2 from 3 charcoal). Use it instead of coal in steel blend and black reinforced panels.",
-    "translation": "用壓縮機把木炭粉碎壓實得到的碳粉（3 個木炭得 2 個）。可在鋼混合物和黑色強化面板中代替煤炭。"
+    "source": "Finely powdered carbon.",
+    "translation": "細碎的碳粉。"
   },
   "desc.singulo.casimir_cavity": {
     "source": "Creates negative energy between mirrors to make exotic matter.",
@@ -1748,12 +1816,16 @@
     "translation": "製造催化劑，最初是緲子催化劑。"
   },
   "desc.singulo.ceramic_substrate": {
-    "source": "A fired ceramic board for circuits.",
-    "translation": "用於電路的燒製陶瓷板。"
+    "source": "An electrically insulating ceramic substrate.",
+    "translation": "絕緣性優良的陶瓷基板。"
+  },
+  "desc.singulo.coffee": {
+    "source": "Coffee from a coffee maker, in a bottle. Drinking it gives Haste for 3 minutes and wakes you up, resetting the time until phantoms appear. The bottle is left over.",
+    "translation": "用咖啡機沖泡的瓶裝咖啡。飲用後 3 分鐘內挖掘速度提升，並能提神（重置夜魅出現前的時間）。喝完會留下玻璃瓶。"
   },
   "desc.singulo.coffee_maker": {
-    "source": "The laboratory break-room coffee maker. Use it: it still works.",
-    "translation": "研究所茶水間的咖啡機。右鍵試試，還能用。"
+    "source": "The laboratory break-room coffee maker. Add cocoa beans to brew three cups, then fill glass bottles from the pot. The ones in the laboratory already have coffee in them.",
+    "translation": "研究所茶水間的咖啡機。放入可可豆可沖泡 3 杯咖啡，再用玻璃瓶從壺中盛取。研究所裡的咖啡機一開始就已經泡好了咖啡。"
   },
   "desc.singulo.cold_atom_trap": {
     "source": "A restored cold atom trap.",
@@ -1868,8 +1940,8 @@
     "translation": "利用旁邊的高溫源使液態氮汽化，取回儲存在液態氮中的電力（在熔岩旁最多 9 成）。這是用來儲存和運送電力的裝置，不會增加電力。"
   },
   "desc.singulo.culture_data": {
-    "source": "A record from the culture facility.",
-    "translation": "來自封閉培養設施的記錄。"
+    "source": "Records of ancient cultivation experiments.",
+    "translation": "舊文明留下的培養實驗紀錄。"
   },
   "desc.singulo.data_card_culture_data": {
     "source": "A copy of culture data.",
@@ -1956,8 +2028,8 @@
     "translation": "熱爐每面中央的一列；可看到發光的爐心。"
   },
   "desc.singulo.degenerate_matter_shell": {
-    "source": "A shell of neutron-star matter.",
-    "translation": "中子星物質的外殼。"
+    "source": "A dense shell of neutron-star matter.",
+    "translation": "由中子星物質構成的緻密外殼。"
   },
   "desc.singulo.degenerate_nucleus": {
     "source": "The uncollapsed gravity knot left at the heart of the Gravity Remnant. Used for the Singularity Encapsulator, Singularity Seed and Graviton Manipulator.",
@@ -1968,20 +2040,20 @@
     "translation": "以高壓晶體為種，把壓縮方塊 Lv2 壓到接近簡併的狀態。用於簡併物質殼時可以減少岩石用量。"
   },
   "desc.singulo.degraded_anomaly_sample": {
-    "source": "A sample from the final lab.",
-    "translation": "來自最終實驗室的樣本。"
+    "source": "A gravitational-anomaly sample altered by time.",
+    "translation": "歷經歲月而變質的重力異常樣本。"
   },
   "desc.singulo.degraded_cold_atom_trap": {
     "source": "Restore it in the Laser Cooler.",
     "translation": "在雷射冷卻器中修復它。"
   },
   "desc.singulo.degraded_control_unit": {
-    "source": "A degraded part. Restore it in the Archive Terminal.",
-    "translation": "劣化的零件。在檔案終端中修復它。"
+    "source": "An ancient control unit worn by time.",
+    "translation": "歷經歲月而損壞的舊文明控制裝置。"
   },
   "desc.singulo.degraded_time_crystal_seed": {
-    "source": "A seed found in the Culture Facility. Restore it to grow time crystals.",
-    "translation": "在封閉培養設施拾得的種子。修復後可培育時間晶體。"
+    "source": "A crystal seed destabilized by long dormancy.",
+    "translation": "因長期休眠而變得不穩定的晶核。"
   },
   "desc.singulo.desk_monitor": {
     "source": "A small monitor from a laboratory desk. Only its screen glows faintly.",
@@ -2019,9 +2091,13 @@
     "source": "A steel canister that holds 100 mB of liquid nitrogen. Right-click the cooling tower controller, or process it in the tower, to fill it.",
     "translation": "可裝 100 mB 液態氮的鋼製容器。用它右鍵點擊極低溫冷卻塔的控制器，或在冷卻塔中加工，就會變成裝滿的冷媒罐。"
   },
+  "desc.singulo.energy_drink": {
+    "source": "A yellow can of energy drink from the laboratory's vending machine. Drinking it gives Haste II for 2 minutes.",
+    "translation": "研究所自動販賣機裡的黃色罐裝飲料。飲用後 2 分鐘內挖掘速度大幅提升（挖掘加速 II）。"
+  },
   "desc.singulo.entangled_element": {
-    "source": "Always made in pairs. Used in detectors and links.",
-    "translation": "總是成對產生。用於探測器與遠端連結。"
+    "source": "A pair of elements with entangled quantum states.",
+    "translation": "量子態彼此糾纏的一對元件。"
   },
   "desc.singulo.entanglement_synthesizer": {
     "source": "Produces entangled elements in pairs.",
@@ -2116,12 +2192,12 @@
     "translation": "覺醒的重力殘渣坍縮後留下的一段記錄，刻著關於重量的記憶。與其他斷章合在一起，或許就能讀懂。"
   },
   "desc.singulo.gravity_field_stabilizer": {
-    "source": "A component of the core controller.",
-    "translation": "爐心控制器的零件。"
+    "source": "A component that suppresses gravitational fluctuations.",
+    "translation": "抑制重力場波動的部件。"
   },
   "desc.singulo.gravity_panel_receiver": {
-    "source": "Powers every gravity panel connected to it. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active.",
-    "translation": "為與其相連的所有重力面板供電。電力不足時，只有它能負擔的最近的面板會運作。右鍵查看正在運作的數量。"
+    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It accepts any amount per tick and stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
+    "translation": "從線纜接收電力，分配給相接的面板以及與其以面相連的全部面板（低重力、高重力面板，無重力方塊，製作的瑞利散射面板）。每刻可接收任意電量，即使相連數量極多也不會卡頓。電力不足時，按距離由近到遠只驅動付得起的數量。右鍵查看運行數量與耗電。"
   },
   "desc.singulo.guardian_core": {
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
@@ -2144,8 +2220,8 @@
     "translation": "爐心質量較小時（催化劑模式；開啟回收運轉即可保持），每5分鐘收集1個霍金凝聚體。"
   },
   "desc.singulo.hawking_condensate": {
-    "source": "Condensed Hawking radiation. An ingredient of the Singularity Core.",
-    "translation": "收集霍金輻射凝聚而成。奇點核心的材料。"
+    "source": "Condensed Hawking radiation.",
+    "translation": "匯聚霍金輻射的凝聚體。"
   },
   "desc.singulo.heat_exchange_core": {
     "source": "Heat exchangers stacked up the middle of the tower.",
@@ -2192,8 +2268,8 @@
     "translation": "從反應爐收集噴流凝聚體。"
   },
   "desc.singulo.jet_condensate": {
-    "source": "Particles from the relativistic jet.",
-    "translation": "來自相對論性噴流的粒子。"
+    "source": "Condensed particles from a relativistic jet.",
+    "translation": "匯聚相對論性噴流粒子的凝聚體。"
   },
   "desc.singulo.keraunos_tower": {
     "source": "Builds up 1,000,000 FE and hurls artificial lightning at the nearest lightning rod within 16 blocks. Sand under the rod turns into fulgurite. Three firing modes: manual, redstone and auto (sneak-right-click to switch).",
@@ -2202,6 +2278,10 @@
   "desc.singulo.kiln": {
     "source": "Fires ceramics and boards. Oxygen makes it hotter.",
     "translation": "燒製陶瓷和基板。通入氧氣可提高溫度。"
+  },
+  "desc.singulo.lab_door": {
+    "source": "The white twin sliding doors of the laboratory's private rooms and kitchen. Right-click to slide them open into the walls; they close by themselves once no one is passing through. They stay open while powered by redstone. Cannot be crafted.",
+    "translation": "研究所單間與廚房的白色雙扇拉門。右鍵點擊後會滑入左右牆內打開，沒有人通過時會自動關閉。接收到紅石訊號時保持打開。無法合成。"
   },
   "desc.singulo.lab_frame": {
     "source": "Dark steel framing used for the laboratory's pillars and door frames.",
@@ -2219,6 +2299,10 @@
     "source": "Laboratory panelling with a blue-grey band.",
     "translation": "帶有青灰色條紋的研究所牆材。"
   },
+  "desc.singulo.lab_rayleigh_panel": {
+    "source": "A sky projection panel in the laboratory ceiling. Once facility power returns, its underside shows a cloudless midday sky and lights the space below like sunlight (daylight detectors underneath read midday). Panels side by side join into one wide sky. Leaves nothing when broken.",
+    "translation": "研究所天花板上的天空投影板。設施電力恢復後，底面會映出無雲的正午藍天，並像陽光一樣照亮正下方（正下方的陽光感測器始終輸出正午的數值）。並排放置會連成一片寬廣的天空。破壞後什麼也不會留下。"
+  },
   "desc.singulo.lab_terminal": {
     "source": "A terminal left in the laboratory. Use it to read the records left behind.",
     "translation": "研究所裡留下的終端。右鍵可以閱讀留下的記錄。"
@@ -2232,8 +2316,8 @@
     "translation": "以雷射冷原子，製成冷原子、光學晶格基板與凝聚態催化劑。"
   },
   "desc.singulo.limestone_powder": {
-    "source": "White calcium carbonate powder, crushed from calcite or dripstone blocks (2 in the Compressor, 1 at a crafting table). Use it instead of bone meal in Unfired Ceramic (it turns to lime in the kiln and binds the clay).",
-    "translation": "把方解石或鐘乳石塊粉碎得到的白色碳酸鈣粉末（壓縮機得 2 個，製作台得 1 個）。可在未燒製陶瓷中代替骨粉（燒製後變成石灰，使黏土凝固）。"
+    "source": "A white calcium carbonate powder.",
+    "translation": "白色的碳酸鈣粉末。"
   },
   "desc.singulo.low_gravity_panel": {
     "source": "When powered, standing on it cuts your gravity to a fifth until you next land (less fall damage too). Joins visually with its neighbours.",
@@ -2264,8 +2348,8 @@
     "translation": "隕石中的鐵鎳天然合金。用鐵鎬或更好的鎬開採可得到粗隕鐵。只在隕石坑中出現。"
   },
   "desc.singulo.meteoric_iron_ingot": {
-    "source": "A strongly magnetic natural iron-nickel alloy, used for magnet pole pieces, magnetic keys and confinement rings.",
-    "translation": "具有強磁性的鐵鎳天然合金。用於磁鐵的磁極片、磁鎖鑰匙和磁約束環。"
+    "source": "A naturally magnetic alloy of iron and nickel.",
+    "translation": "具有強磁性的天然鐵鎳合金。"
   },
   "desc.singulo.meteorite_core": {
     "source": "A fused lump of meteoric iron and stardust, one at the heart of each meteorite. Mine it (iron pickaxe or better) for raw meteoric iron and stardust. The Meteor Compass points to it.",
@@ -2320,28 +2404,28 @@
     "translation": "使用後，在 10 秒內透過地形顯示周圍的廢墟方塊與礦石輪廓。消耗電力。更深層的礦石需要靈敏度模組才能顯示。"
   },
   "desc.singulo.nihonium": {
-    "source": "Element 113, fused from zinc and bismuth nuclei in the Particle Accelerator. This neutron-rich isotope is stable, so it does not decay. Two make an ingot.",
-    "translation": "在粒子加速器中使鋅和鉍的原子核融合而成的第 113 號元素。這種富中子的同位素是穩定的，不會衰變。2 個可製成一個錠。"
+    "source": "Stabilized element 113.",
+    "translation": "穩定化的113號元素。"
   },
   "desc.singulo.nihonium_frame": {
-    "source": "A basic frame clad in nihonium plates. The structural base for advanced stage 4 and 5 machines.",
-    "translation": "用鉨板包覆的基礎框架，用作第 4、5 階段進階裝置的結構基礎。"
+    "source": "A sturdy frame clad in nihonium.",
+    "translation": "覆有鉨的堅固框架。"
   },
   "desc.singulo.nihonium_ingot": {
-    "source": "A heavy ingot of nihonium melted together in the Kiln. Press it into plates in the Compressor.",
-    "translation": "在燒製爐中熔合鉨製成的沉重錠。用壓縮機壓成板。"
+    "source": "A heavy, dense ingot of nihonium.",
+    "translation": "沉重緻密的鉨錠。"
   },
   "desc.singulo.nihonium_plate": {
-    "source": "Pressed nihonium. Used for nihonium frames and late-game pressure-resistant and shielding parts.",
-    "translation": "壓製而成的鉨板，用於鉨框架及後期的耐壓、屏蔽部件。"
+    "source": "Nihonium pressed into a thin plate.",
+    "translation": "壓成薄板的鉨。"
   },
   "desc.singulo.observation_log": {
-    "source": "A record from observation posts. Copy it onto data cards.",
-    "translation": "地表觀測站的記錄。可複製到資料卡上。"
+    "source": "Observation records left by the old civilization.",
+    "translation": "舊文明留下的觀測紀錄。"
   },
   "desc.singulo.optical_lattice_substrate": {
-    "source": "Atoms held in a lattice of light.",
-    "translation": "原子被固定在光的晶格中。"
+    "source": "A substrate of atoms arranged in an optical lattice.",
+    "translation": "將原子排列在光晶格中的基板。"
   },
   "desc.singulo.overclock_chip": {
     "source": "Goes in a machine's upgrade slot: ×3 speed for ×4 power per tick. Cannot be combined with a monopole.",
@@ -2364,28 +2448,28 @@
     "translation": "從旋轉的黑洞中汲取能量。"
   },
   "desc.singulo.phase_sync_plate": {
-    "source": "Imprints cold-atom oscillations on an optical lattice. Phase-locks time crystals so they grow in 12 minutes.",
-    "translation": "把冷原子的振動印在光晶格上的板。能讓時間晶體的振動相位一致，使培育時間為 12 分鐘。"
+    "source": "A component that synchronizes atomic oscillations.",
+    "translation": "使原子振動同步的部件。"
   },
   "desc.singulo.power_conduit": {
     "source": "A conduit carrying power from the central reactor. It glows cyan once power returns.",
     "translation": "從中央動力爐向設施輸送電力的導管。恢復供電後會發出青光。"
   },
   "desc.singulo.precision_actuator": {
-    "source": "A precise drive unit from the production lines of an underground android laboratory. Dropped by the Foundry Overseer and found in the laboratory vault and research chests. Used for the Factory Print Unit and the Awakened Foundry Core.",
-    "translation": "地下仿生人研究所量產線上使用的舊文明精密驅動部件。擊敗統籌 AI 或在研究所的保管庫、資料箱中取得。用於工廠式列印單元和覺醒製造核。"
+    "source": "A precision drive unit of the old civilization.",
+    "translation": "舊文明的精密驅動部件。"
   },
   "desc.singulo.precision_assembler": {
     "source": "Assembles most parts and machines from tier 2 on.",
     "translation": "組裝 2 級以後的大部分零件與機器。"
   },
   "desc.singulo.pressure_crystal": {
-    "source": "An extremely hard blue crystal formed under deep-sea pressure. Used for the compactor anvil and degenerate precursors.",
-    "translation": "在深海水壓下形成的極其堅硬的藍色晶體。用於簡併壓縮爐的鐵砧和簡併前驅體的晶種。"
+    "source": "A hard blue crystal formed under high water pressure.",
+    "translation": "在高水壓下形成的堅硬藍色晶體。"
   },
   "desc.singulo.pressure_hull": {
-    "source": "The thick steel shell around the whole laboratory. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
-    "translation": "包覆整個研究所的厚鋼外殼。在統籌 AI 倒下之前處於封鎖狀態，無法破壞。之後也比黑曜石更硬。"
+    "source": "The two-block-thick steel shell around the laboratory's rooms and corridors. Sealed and unbreakable until the overseer AI falls, and harder than obsidian even after.",
+    "translation": "包覆研究所房間與走廊的、厚度為 2 格的鋼外殼。在統籌 AI 倒下之前處於封鎖狀態，無法破壞。之後也比黑曜石更硬。"
   },
   "desc.singulo.primordial_seed": {
     "source": "A seed made by running the ignition log in the Chapter of the Vortex backwards. Use it on a Genesis Core to begin the birth of a universe.",
@@ -2416,12 +2500,12 @@
     "translation": "在作業指令台「記錄」的步驟模式中，記錄最多8個步驟及其產物。步驟有放入、取出、採掘、收穫、伐木、繁殖、剪毛、擠奶、處理、操作（拉桿或按鈕）。位置記錄在卡中，因此可放在配方架中沒有作業位置卡的行。採掘需要採掘升級，伐木需要伐木升級。"
   },
   "desc.singulo.quantum_computing_module": {
-    "source": "The brain of advanced machines.",
-    "translation": "先進機器的大腦。"
+    "source": "A computing module that uses quantum states.",
+    "translation": "利用量子態進行運算的模組。"
   },
   "desc.singulo.quantum_data_fragment": {
-    "source": "A record from research buildings.",
-    "translation": "來自研究棟的記錄。"
+    "source": "A fragment of quantum-state analysis data.",
+    "translation": "量子態分析紀錄的片段。"
   },
   "desc.singulo.quantum_heat_engine": {
     "source": "Generates power from the quantum effects of a catalyst. Higher-tier catalysts give more output.",
@@ -2432,8 +2516,12 @@
     "translation": "用於打開或封印量子鎖容器。每次使用都會消耗。"
   },
   "desc.singulo.raw_meteoric_iron": {
-    "source": "Smelt it in a blast furnace into meteoric iron.",
-    "translation": "在高爐中冶煉成隕鐵錠。"
+    "source": "Raw meteoric metal containing iron and nickel.",
+    "translation": "含有鐵和鎳的隕石原礦。"
+  },
+  "desc.singulo.rayleigh_panel": {
+    "source": "A sky projection panel for ceilings. Powered by a panel receiver (20 FE/t each, shared across all joined panels), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
+    "translation": "貼在天花板上的天空投影板。由面板受電器供電後（每塊20 FE/t，分配給相連的全部面板），底面會映出沒有雲和太陽的正午藍天，並像陽光一樣照亮正下方（亮度15，正下方的陽光感測器始終輸出正午的數值）。不會變成夜晚。斷電後像午夜一樣漆黑。並排放置時邊框會消失，連成一片寬廣的天空。用瑞利散射面板的設計圖製作。"
   },
   "desc.singulo.reactor_console": {
     "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",
@@ -2460,12 +2548,16 @@
     "translation": "在作業指令台的「記錄」中記錄配方，然後放進配方架。對著空處潛行右鍵會清除配方。按住 Shift 會顯示製作的物品。"
   },
   "desc.singulo.record_fragment": {
-    "source": "An ancient storage medium: records etched by light inside glass. Read it in the Archive Terminal to add it to the handbook.",
-    "translation": "古代的儲存媒介：用光把記錄刻在玻璃之中。在檔案終端讀取後會加入手冊。"
+    "source": "A storage medium with records etched in glass by light.",
+    "translation": "以光在玻璃內部刻錄資訊的儲存媒體。"
   },
   "desc.singulo.reinforced_ruin_glass": {
     "source": "A window set into the containment pillars of the Sunken Reactor Sector, built to survive the reactor's blasts. Very hard and blast-proof.",
     "translation": "嵌在沉沒的爐心區封鎖柱上的窗，用來承受反應爐的衝擊。非常堅硬，爆炸也無法破壞。"
+  },
+  "desc.singulo.relocation_wrench": {
+    "source": "Sneak-use to relocate processing machines, generators, energy storage and catalyst devices with their items, fluids, energy and settings.",
+    "translation": "潛行使用可移設加工裝置、發電機、儲能裝置及觸媒裝置，並保留物品、流體、電力與設定。"
   },
   "desc.singulo.ruin_android_fabricator": {
     "source": "Prints androids onto its bed and sends them out. Defeat them all for a 50% chance at a compact crystal memory of their design.",
@@ -2552,8 +2644,8 @@
     "translation": "研究所的伺服器。有電時指示燈會閃爍。"
   },
   "desc.singulo.settings_card": {
-    "source": "Copies a machine's settings to another.",
-    "translation": "將一台機器的設定複製到另一台機器。"
+    "source": "Copies machine side and auto-eject settings, plus the recipe choice between machines of the same type. For a P-Reactor, copies the spin target and feed interval.",
+    "translation": "複製並貼上機器各面與自動排出的設定。同種機器之間也會複製配方選擇。用於彭羅斯反應爐時，複製目標自旋與投料間隔。"
   },
   "desc.singulo.shield_permit": {
     "source": "Put it in a shield tower: only registered players may build, break or take items inside. In an Android Assembly Station, registered players may also control the android, and the android attacks anyone not registered. Use to register yourself; use on a player to register them and you. Anyone can break the emitter crown.",
@@ -2580,8 +2672,8 @@
     "translation": "5×5 的兩層底座；上層的邊緣可放置輸入輸出埠。"
   },
   "desc.singulo.shield_tower_waveguide": {
-    "source": "Middle of each body face; shows the rising energy.",
-    "translation": "位於塔身每一面的中央；可看到上升的能量。"
+    "source": "Middle of each body face and midway up the spire; shows the rising energy.",
+    "translation": "塔身各面的中央及尖塔中段；可看到上升的能量。"
   },
   "desc.singulo.singularity_core": {
     "source": "The tier 5 catalyst.",
@@ -2608,20 +2700,24 @@
     "translation": "高容量儲能。"
   },
   "desc.singulo.spent_bose_condensate_catalyst": {
-    "source": "A used-up BE Condensate Catalyst. About 25% can be recovered as a lower-tier catalyst.",
-    "translation": "用盡的玻色凝聚態催化劑。約 25% 可回收為低一級的催化劑。"
+    "source": "A Bose condensate catalyst that has lost its activity.",
+    "translation": "已失去活性的玻色凝聚催化劑。"
   },
   "desc.singulo.spent_muon_catalyst": {
-    "source": "A used-up catalyst. Partly recyclable.",
-    "translation": "用過的催化劑。部分可回收。"
+    "source": "A muon catalyst that has lost its activity.",
+    "translation": "已失去活性的緲子催化劑。"
   },
   "desc.singulo.spent_singularity_core": {
     "source": "A used-up Singularity Core. About 25% can be recovered as a lower-tier catalyst.",
     "translation": "用盡的奇點核心。約 25% 可回收為低一級的催化劑。"
   },
   "desc.singulo.spent_time_crystal_catalyst": {
-    "source": "A used-up Time Crystal Catalyst. About 25% can be recovered as a lower-tier catalyst.",
-    "translation": "用盡的時間晶體催化劑。約 25% 可回收為低一級的催化劑。"
+    "source": "A time crystal catalyst that has lost its activity.",
+    "translation": "已失去活性的時間晶體催化劑。"
+  },
+  "desc.singulo.sports_drink": {
+    "source": "A white can of sports drink from the laboratory's vending machine. Drinking it gives Regeneration for 15 seconds.",
+    "translation": "研究所自動販賣機裡的白色罐裝飲料。飲用後 15 秒內持續恢復生命值。"
   },
   "desc.singulo.stardust": {
     "source": "Cosmic grains carrying rare isotopes. The raw material for cold atoms.",
@@ -2632,16 +2728,16 @@
     "translation": "長在隕石熔殼上的宇宙微粒晶體。破壞後掉落星塵。"
   },
   "desc.singulo.steel_blend": {
-    "source": "A mix of iron and coal. Smelt it in a blast furnace to get steel.",
-    "translation": "鐵和煤的混合物。將其在高爐中熔煉以獲得鋼材。"
+    "source": "A blend of iron and carbon.",
+    "translation": "鐵與碳混合而成的鋼鐵原料。"
   },
   "desc.singulo.steel_ingot": {
-    "source": "The basic structural metal. Steel from other mods works too.",
-    "translation": "基本結構金屬。其他模組的鋼鐵也可以。"
+    "source": "A sturdy structural metal.",
+    "translation": "堅固的結構金屬。"
   },
   "desc.singulo.steel_plate": {
-    "source": "Pressed steel used for casings and parts. Steel plates from other mods (forge:plates/steel) work too.",
-    "translation": "用於外殼和零件的壓製鋼。其他模組的鋼板（forge:plates/steel）也可使用。"
+    "source": "Steel pressed into a thin plate.",
+    "translation": "壓成薄板的鋼鐵。"
   },
   "desc.singulo.strange_matter": {
     "source": "Ultra-dense matter left by strangelets. Worth 100 mass and usable for degenerate shells.",
@@ -2660,8 +2756,8 @@
     "translation": "2 級無損高容量電纜。"
   },
   "desc.singulo.superconducting_coil": {
-    "source": "A zero-resistance coil, core of tier 2 tech.",
-    "translation": "零電阻線圈，2 級技術的核心。"
+    "source": "A coil with zero electrical resistance.",
+    "translation": "電阻為零的線圈。"
   },
   "desc.singulo.superconducting_wire": {
     "source": "Wire for coils and cables.",
@@ -2680,8 +2776,8 @@
     "translation": "用奇點之力把四段斷章重新裝訂成的最後一頁。在最終實驗室的封印控制台上使用，在時間場中沉睡的某物將會醒來。離開房間時記錄會返還。"
   },
   "desc.singulo.thermocouple_module": {
-    "source": "Turns a temperature difference into electricity.",
-    "translation": "將溫差轉化為電能。"
+    "source": "An element that converts heat differences into power.",
+    "translation": "將溫差轉化為電力的元件。"
   },
   "desc.singulo.thermoelectric_generator": {
     "source": "Place it between something hot and something cold to generate power. Your first generator. Magma block + blue ice gives about 76 FE/t without melting.",
@@ -2700,8 +2796,8 @@
     "translation": "培育時間晶體催化劑。電力不足會降低其純度。"
   },
   "desc.singulo.time_crystal_module": {
-    "source": "Two thirds of a fresh time crystal's life (30 minutes with default settings) sealed into a stackable part. Built into the Core Controller, Singularity Encapsulator, Shield Tower Core and other equipment. Crystals with less life left than that (used or low-purity ones) cannot be cut. Lifetime settings and presets scale the amount.",
-    "translation": "封存了新品時間晶體壽命 2/3（預設設定下為 30 分鐘）的可堆疊零件。用於爐心控制器、奇點封裝器、護盾塔核心等設備。剩餘壽命不足此值的晶體（用過的或純度低的）無法切割。改變壽命設定或預設時，所需量也會按比例變化。"
+    "source": "A component containing time-crystal oscillations.",
+    "translation": "封存時間晶體振動的部件。"
   },
   "desc.singulo.time_crystal_seed": {
     "source": "Seed for time crystal catalysts.",
@@ -2752,16 +2848,20 @@
     "translation": "黏土、沙、地獄石英和骨粉（或石灰粉）的混合物，可燒製成白色陶瓷複合材料。"
   },
   "desc.singulo.unfired_phosphor": {
-    "source": "Zinc dust mixed with gunpowder (sulfur) and copper. Fire it in the Kiln for 4 glowstone dust, a glow-in-the-dark phosphor.",
-    "translation": "把鋅粉、火藥（硫）和銅混合而成的粉末。在燒製爐中燒製後可得到 4 個蓄光體螢石粉。"
+    "source": "An unfired phosphor mixture.",
+    "translation": "燒製前的螢光體原料。"
+  },
+  "desc.singulo.unfired_teacup": {
+    "source": "An unfired clay cup.",
+    "translation": "尚未燒製的黏土杯。"
   },
   "desc.singulo.unstable_wormhole_mouth": {
     "source": "Collapses unless stabilized within 60 s.",
     "translation": "除非在 60 秒內穩定下來否則就會崩潰。"
   },
   "desc.singulo.vending_machine": {
-    "source": "A laboratory drinks vending machine (two blocks tall). Use it: sold out.",
-    "translation": "研究所的飲料自動販賣機（2 格高）。右鍵試試，已售完。"
+    "source": "A laboratory drinks vending machine (two blocks tall). Hold emeralds and press the button under a column to buy Canned Soda (1), Sports Drink (1) or Energy Drink (2). The ones in the laboratory start working once facility power is restored.",
+    "translation": "研究所的飲料自動販賣機（2 格高）。手持綠寶石按下正面某一列的按鈕，即可購買罐裝汽水（1）、運動飲料（1）或能量飲料（2）。研究所裡的販賣機在設施恢復供電後開始運轉。"
   },
   "desc.singulo.vented_ruin_panel": {
     "source": "Vented ancient panel.",
@@ -2774,6 +2874,10 @@
   "desc.singulo.void_dust": {
     "source": "Dust condensed from the fluctuations of empty space, gathered only above the End void. Steadies space in singularity tech.",
     "translation": "只有在終界虛空上方才能收集到、由空間本身的漲落凝成的塵埃。在奇點技術中用來穩定空間。"
+  },
+  "desc.singulo.welded_hatch": {
+    "source": "Steel plates welded shut over the lab's supply shaft. Sealed until the lab's AI is defeated; after that it can be mined with a diamond pickaxe.",
+    "translation": "封住研究所搬運豎井的焊接鋼板艙蓋。在統括 AI 被打倒之前處於封鎖狀態，無法破壞。之後可以用鑽石鎬挖掘。"
   },
   "desc.singulo.white_ceramic_composite": {
     "source": "The white ceramic used for casings and circuit boards.",
@@ -2790,6 +2894,10 @@
   "desc.singulo.white_panel": {
     "source": "A clean, seamless white panel for your own buildings.",
     "translation": "可以自己製作的乾淨無縫白色面板，用於你自己的建築。"
+  },
+  "desc.singulo.white_sliding_door": {
+    "source": "White twin sliding doors modeled on the laboratory doors. Right-click to slide them open; they close by themselves once no one is passing through, and stay open while powered by redstone. Set into a wall, the doors slide away inside it.",
+    "translation": "仿照研究所的門製作的白色雙扇拉門。右鍵點擊後向左右滑開，沒有人通過時會自動關閉，接收到紅石訊號時保持打開。嵌在牆中放置時，門扇會收進牆裡。"
   },
   "desc.singulo.white_star_glass_panel": {
     "source": "A see-through white panel with a four-pointed star.",
@@ -2851,13 +2959,21 @@
     "source": "Stabilizes an unstable wormhole mouth with exotic matter so that it can be placed.",
     "translation": "以奇異物質穩定不穩定蟲洞入口，使其成為可以放置的入口。"
   },
+  "desc.singulo.zero_gravity_block": {
+    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Joins visually with its neighbours.",
+    "translation": "由面板受電器供電時，上方的空間（初始為5格）會變成無重力。在其中按跳躍鍵向上、潛行向下漂浮，也不會受到摔落傷害。每個30 FE/t。高度可用無重力控制箱改變。與相鄰的同種方塊外觀相連。"
+  },
+  "desc.singulo.zero_gravity_controller": {
+    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Each extra block of height multiplies the power of every zero-gravity block by 1.6.",
+    "translation": "裝在無重力方塊上後，可改變相連的全部無重力方塊的無重力高度（右鍵升高1格，潛行右鍵降低，沒有上限）。高度每增加1格，每個無重力方塊的耗電變為1.6倍。"
+  },
   "desc.singulo.zinc_dust": {
-    "source": "Zinc sorted out of crushed tuff in the Compressor. Fire it in the Kiln into a zinc ingot.",
-    "translation": "用壓縮機粉碎凝灰岩後分選出的鋅粉。在燒製爐中燒成鋅錠。"
+    "source": "Finely powdered zinc.",
+    "translation": "細碎的鋅粉。"
   },
   "desc.singulo.zinc_ingot": {
-    "source": "Zinc metal. Collide it with bismuth in the Particle Accelerator to make nihonium. Zinc ingots from other mods work too.",
-    "translation": "鋅金屬。與鉍一起在粒子加速器中碰撞即可製成鉨。其他模組的鋅錠也能同樣使用。"
+    "source": "An ingot of zinc.",
+    "translation": "鋅的金屬錠。"
   },
   "direction.singulo.east": {
     "source": "east",
@@ -3188,8 +3304,8 @@
     "translation": "頭部"
   },
   "gui.singulo.android.decor.0.hint": {
-    "source": "Ribbon, hair flower, beret or headdress",
-    "translation": "緞帶、髮飾、貝雷帽、頭飾"
+    "source": "Ribbon, hair flower, beret, headdress or glasses",
+    "translation": "緞帶、髮飾、貝雷帽、頭飾、眼鏡"
   },
   "gui.singulo.android.decor.1": {
     "source": "Back / waist",
@@ -4431,6 +4547,22 @@
     "source": "Not formed (surround the core with 8 frames and 12 pylons)",
     "translation": "未成形（用 8 個框架與 12 根支柱圍住核心）"
   },
+  "gui.singulo.glasses.height": {
+    "source": "%s px",
+    "translation": "%s 像素"
+  },
+  "gui.singulo.glasses.hint": {
+    "source": "Moves one pixel at a time. The height stays with the glasses and others see it too.",
+    "translation": "每次上下移動1像素。高度保存在眼鏡上，其他人看到的也一樣"
+  },
+  "gui.singulo.glasses.reset": {
+    "source": "Reset",
+    "translation": "重設"
+  },
+  "gui.singulo.glasses.title": {
+    "source": "Survey Glasses Height",
+    "translation": "測量眼鏡高度"
+  },
   "gui.singulo.guardian.active": {
     "source": "The guardian is already awake",
     "translation": "守衛已經甦醒"
@@ -4728,8 +4860,8 @@
     "translation": "點火失敗：電力未能及時送達"
   },
   "gui.singulo.reactor.ignition_failed.detail": {
-    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake",
-    "translation": "送達 %s / %s GFE，最大受電 %s MFE/t（需要 %s MFE/t）。即使儲能足夠，網路中最細的線纜也會限制受電上限"
+    "source": "Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the lowest-capacity cable on the power route caps the intake",
+    "translation": "送達 %s / %s GFE，最大受電 %s MFE/t（需要 %s MFE/t）。即使儲能足夠，送電路徑中容量最低的線纜也會限制受電上限"
   },
   "gui.singulo.reactor.interval": {
     "source": "Feed interval",
@@ -4835,6 +4967,10 @@
     "source": "Not formed",
     "translation": "未形成"
   },
+  "gui.singulo.reason.ambiguous": {
+    "source": "The materials for %s are in, but the same mix appears while loading other recipes, so it is not made automatically.",
+    "translation": "%s 的材料已齊，但與放入其他配方材料途中的組合相同，因此不會自動製作"
+  },
   "gui.singulo.reason.arrange": {
     "source": "- The amounts are there. Try putting each material in its own slot.",
     "translation": "・數量已經足夠。請試著把每種材料分別放進不同的槽位。"
@@ -4842,6 +4978,18 @@
   "gui.singulo.reason.empty": {
     "source": "Put in materials to start",
     "translation": "放入材料即可開始運作"
+  },
+  "gui.singulo.reason.extra": {
+    "source": "The materials for %s are in, but so are items it does not use, so it is not made automatically.",
+    "translation": "%s 的材料已齊，但還放有用不到的物品，因此不會自動製作"
+  },
+  "gui.singulo.reason.label.ambiguous": {
+    "source": "Pick a recipe",
+    "translation": "請指定配方"
+  },
+  "gui.singulo.reason.label.extra": {
+    "source": "Extra items",
+    "translation": "多餘材料"
   },
   "gui.singulo.reason.label.missing": {
     "source": "Missing input",
@@ -4890,6 +5038,10 @@
   "gui.singulo.reason.output_full": {
     "source": "The output slot or tank is full. Take things out, or turn on auto-eject in the side settings.",
     "translation": "輸出槽或輸出儲槽已滿。請取出物品，或在面設定中開啟自動輸出。"
+  },
+  "gui.singulo.reason.select_hint": {
+    "source": "Pick what to make with the button below the output.",
+    "translation": "請用輸出欄下方的按鈕指定要製作的物品"
   },
   "gui.singulo.reason.too_small": {
     "source": "- Needs size %s or more (now %s)",
@@ -5187,6 +5339,50 @@
     "source": "No-entry zone (Area Card, up to 2): androids stay out of it while moving through the waypoint (unless they start or end inside it)",
     "translation": "禁入區域（範圍卡，最多 2 個）：經過途經點的移動期間不進入這裡（包含出發地或目的地的區域除外）"
   },
+  "gui.singulo.select.auto": {
+    "source": "Make: automatic",
+    "translation": "製作目標：自動"
+  },
+  "gui.singulo.select.auto_hint": {
+    "source": "Makes only a recipe that uses everything inside, and never one whose mix also appears partway through another recipe.",
+    "translation": "只製作會用到全部已放入物品的配方，不製作與其他配方中途相同的材料組合"
+  },
+  "gui.singulo.select.auto_short": {
+    "source": "A",
+    "translation": "自"
+  },
+  "gui.singulo.select.button_hint": {
+    "source": "Click to choose; right-click for automatic.",
+    "translation": "點擊選擇，右鍵恢復自動"
+  },
+  "gui.singulo.select.fixed": {
+    "source": "Make: %s",
+    "translation": "製作目標：%s"
+  },
+  "gui.singulo.select.fixed_hint": {
+    "source": "Makes only this recipe; anything else inside is left alone.",
+    "translation": "只製作這個配方，放入的其他物品不會被使用"
+  },
+  "gui.singulo.select.fluid": {
+    "source": "- %s %s mB",
+    "translation": "・%s %s mB"
+  },
+  "gui.singulo.select.item": {
+    "source": "- %s x%s",
+    "translation": "・%s ×%s"
+  },
+  "gui.singulo.select.restore": {
+    "source": "- Restores: %s",
+    "translation": "・修復對象：%s"
+  },
+  "gui.singulo.select.title": {
+    "source": "Make",
+    "translation": "製作目標"
+  },
+  "gui.singulo.select.uses": {
+    "source": "- %s (%s uses)",
+    "translation": "・%s（%s 次）"
+  },
   "gui.singulo.shield.basic": {
     "source": "Guards: explosions, mob griefing",
     "translation": "防護：爆炸、生物破壞"
@@ -5207,17 +5403,21 @@
     "source": "Permit: only %s players may build inside",
     "translation": "許可證：只有 %s 名玩家可在內部建造"
   },
+  "gui.singulo.sides.adjacent": {
+    "source": "Adjacent block: %s",
+    "translation": "相鄰方塊：%s"
+  },
   "gui.singulo.sides.button": {
     "source": "Sides",
     "translation": "面設定"
   },
   "gui.singulo.sides.eject_off": {
-    "source": "Auto-eject: off",
-    "translation": "自動排出：關"
+    "source": "Face auto-eject: blocked",
+    "translation": "此面的自動排出：禁止"
   },
   "gui.singulo.sides.eject_on": {
-    "source": "Auto-eject: on",
-    "translation": "自動排出：開"
+    "source": "Face auto-eject: allowed",
+    "translation": "此面的自動排出：允許"
   },
   "gui.singulo.sides.face.back": {
     "source": "Back",
@@ -6028,8 +6228,8 @@
     "translation": "充電、修理與裝備"
   },
   "guide.singulo.androids.decor.body": {
-    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret or headdress\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
-    "translation": "在仿生人介面中用名字左邊的按鈕切換頁面，第 3 頁是「裝飾」頁。可在頭部、背部/腰部、手部的欄位裝上裝飾。不影響戰鬥和作業。全部在工作台製作，可與染料一起在工作台染色（與皮革盔甲相同）。\n・頭部：緞帶、髮飾、貝雷帽、頭飾\n・背部/腰部：披風、圍巾、腰部緞帶（披風和圍巾的末端行走時會飄動）\n・手部：文庫本、花束、茶杯、傘（僅在待機時拿著。戰鬥、作業、充電時會收起）"
+    "source": "Switch pages with the button left of the name in the android screen; the third page is Decorations, with head, back/waist and hand slots. Decorations do not affect fighting or work. They are all made on a crafting table and can be dyed there with dyes, like leather armor.\n- Head: ribbon, hair flower, beret, headdress or glasses\n- Back/waist: cape, scarf or waist ribbon (the cape and the scarf's tail flutter as it walks)\n- Hand: paperback, bouquet, teacup or umbrella (held only while idle; put away while fighting, working or charging)",
+    "translation": "在仿生人介面中用名字左邊的按鈕切換頁面，第 3 頁是「裝飾」頁。可在頭部、背部/腰部、手部的欄位裝上裝飾。不影響戰鬥和作業。全部在工作台製作，可與染料一起在工作台染色（與皮革盔甲相同）。\n・頭部：緞帶、髮飾、貝雷帽、頭飾、眼鏡\n・背部/腰部：披風、圍巾、腰部緞帶（披風和圍巾的末端行走時會飄動）\n・手部：文庫本、花束、茶杯、傘（僅在待機時拿著。戰鬥、作業、充電時會收起）"
   },
   "guide.singulo.androids.decor.title": {
     "source": "Android decorations",
@@ -6252,16 +6452,24 @@
     "translation": "電力與物流"
   },
   "guide.singulo.power.cables.body": {
-    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). A connected network carries only what its thinnest cable can.",
-    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。相連網路的傳輸量取決於其中最細的電纜。"
+    "source": "Copper wire (2 kFE/t, with losses) → superconducting cable (1 MFE/t) → topological wire (100 MFE/t) → horizon bus (no limit; up to about 2.1 GFE/t per machine from other mods). Each route is limited by its lowest-capacity cable; unrelated branches do not lower that limit. Transfers sharing a cable share its per-tick capacity.\nSources nearer to the receiver along the cables supply power first; more distant sources cover the deficit. Equal distances use a stable coordinate order. An empty nearby source or a bottleneck on its route does not block the backup sources. Breaking a cable immediately clears the glow of that wiring.",
+    "translation": "銅導線（2 kFE/t，有損耗）→ 超導電纜（1 MFE/t）→ 拓撲導線（100 MFE/t）→ 視界匯流排（無上限；送往其他模組的裝置每台最多約 2.1 GFE/t）。每條路徑的傳輸量由該路徑中容量最低的線纜決定，不受其他分支的限制。經過同一線纜的多次傳輸共用每刻容量。\n依線纜路徑到受電裝置的距離，優先使用較近的電源，不足部分由較遠的電源補充。距離相同時依固定座標順序處理。近處電源已空或其路徑容量不足時，也會由其他電源補足。切斷線纜後，該線路的發光會立即消失。"
   },
   "guide.singulo.power.cables.title": {
     "source": "Cables",
     "translation": "電纜"
   },
+  "guide.singulo.power.relocation.body": {
+    "source": "Craft a Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack processing machines, conventional generators, SMES and catalyst devices. Items, fluids, energy, progress and side settings are restored on placement. A full inventory drops one packed device on the ground.\nFor multiblocks only the controller is packed; the surrounding parts stay in place. Rebuild the structure after moving it. P-Reactors, wormhole devices and android facilities are not supported.",
+    "translation": "用3個鋼錠、2個銅錠與1個基礎電路製作移設扳手。潛行使用可回收加工裝置、一般發電機、SMES及觸媒裝置，並在重新放置時恢復物品、流體、電力、進度與面設定。背包已滿時會掉落1個已打包的裝置。\n多方塊結構只回收控制器，周圍部件留在原處；移設後需重新組裝。彭羅斯反應爐、蟲洞裝置及仿生人設施等不在支援範圍內。"
+  },
+  "guide.singulo.power.relocation.title": {
+    "source": "Relocation Wrench",
+    "translation": "移設扳手"
+  },
   "guide.singulo.power.sides.body": {
-    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports. Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.",
-    "translation": "使用一般加工機器畫面中的「面設定」按鈕，可將每個面設為停用／輸入／輸出／輸入輸出，並可開啟自動排出。多方塊結構使用指定的輸入輸出埠；彭羅斯反應爐使用提取埠。輸出兩種氣體的裝置（如電解槽）可為每種氣體分別設定輸出面。電源按鈕可讓裝置停止；能只靠電力製造產物的裝置有開關，可跳過這些配方。"
+    "source": "Use the Sides button in an ordinary processing machine screen to set each face to off / input / output / both, with optional auto-eject. The master auto-eject switch defaults off; turn it on to push through output-capable faces with auto-eject enabled. Hover a face to see its adjacent block. Multiblocks use designated I/O ports; the P-Reactor uses Extraction Ports. Machines that output two gases, such as the electrolyzer, have a tab for each gas. The power button stops a machine, and machines that can make something from power alone have a switch to skip those recipes.",
+    "translation": "使用一般加工機器畫面中的「面設定」按鈕，可將每個面設為停用／輸入／輸出／輸入輸出，並可開啟自動排出。多方塊結構使用指定的輸入輸出埠；彭羅斯反應爐使用提取埠。輸出兩種氣體的裝置（如電解槽）可為每種氣體分別設定輸出面。電源按鈕可讓裝置停止；能只靠電力製造產物的裝置有開關，可跳過這些配方。 自動排出的總開關預設關閉；開啟後，會從允許自動排出的輸出面向相鄰方塊搬出。將滑鼠停在一個面上可查看相鄰方塊的名稱。"
   },
   "guide.singulo.power.sides.title": {
     "source": "Side configuration",
@@ -6348,8 +6556,8 @@
     "translation": "只能在特定地點獲得的素材"
   },
   "guide.singulo.ruins.lab.body": {
-    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is the collapsed main shaft that breaks through to the surface (climb down the ladders and scaffolding). The facility is wrapped in a pressure hull that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- The room layout changes every time: research labs, archives, server rooms, dormitories, a medical bay, a cafeteria and more, guarded by security machines and fabricators. Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
-    "translation": "舊文明的仿生人研究所。統籌 AI「鑄造廠」失控後，職員停掉了中央動力爐，從主豎井逃了出去。人已離開的現在，仿生人們仍遵從「維持設施」這最後的命令，持續修繕著設施。\n- 入口是貫通到地表的崩塌主豎井（順著梯子和鷹架下去）。設施被耐壓殼包覆，在擊敗統籌 AI 之前無法破壞（之後也比黑曜石更硬）。\n- 主電源已斷，這是一座只有紅色緊急照明燈亮著的昏暗設施。右鍵中央動力爐的控制台即可啟動動力爐，設施燈會亮起，AI 中樞的隔離門打開。而沉睡的統籌 AI 也會醒來。\n- 房間的排列每次都不同：研究室、資料室、伺服器室、員工宿舍、醫務室、食堂等，由警衛機和列印台把守。物資箱裡還留著研究所的部件和資料。\n- 右鍵記錄終端可以閱讀留下的記錄。收集起來，就能知道失控的來龍去脈。"
+    "source": "An old-civilization android laboratory. When its overseer AI, Foundry, went rogue, the staff shut down the central reactor and fled through the main shaft. Even now the androids keep repairing the facility, obeying their last order: \"Maintain the facility.\"\n- The way in is a small white building left on the surface, the old reception and elevator hall. Climb down the collapsed main shaft, once the elevator well, on its ladders and scaffolding. The rooms and corridors are wrapped in a pressure hull two blocks thick that cannot be broken until the overseer falls (and is harder than obsidian even then).\n- A supply shaft always runs from a dedicated cargo lift room, with hoists, rails, conveyors and storage, to the surface. Both the main and supply shafts are generated. It is welded shut just above the room and one block below the surface; once the overseer falls, the welded hatches can be mined with a diamond pickaxe. The shaft is intact, so with ladders it becomes a shortcut to the surface.\n- Main power is down: only red emergency lights glow in the gloom. Use the central reactor control panel to restart the reactor: the lights come on, the AI core bulkheads open, and the dormant overseer wakes.\n- Once power is back, the vending machines sell drinks for emeralds (press the column you want: soda for Speed, sports drink for Regeneration, energy drink for Haste). The break-room coffee makers brew with cocoa beans; fill glass bottles from the pot (Haste, and it keeps you awake).\n- The room layout changes every time: research labs, archives, server rooms, dormitories, private rooms lined up along a hall, a medical bay, a cafeteria with a kitchen and more, guarded by security machines and fabricators. The sliding doors of the private rooms and kitchen open with a right-click and close by themselves after a while (the lab doors cannot be crafted, but the similar White Sliding Door is made at a Crafting Table). Supply chests still hold laboratory parts and records.\n- Use a record terminal to read what was left behind. Collect them to learn how the rampage began.",
+    "translation": "舊文明的仿生人研究所。統籌 AI「鑄造廠」失控後，職員停掉了中央動力爐，從主豎井逃了出去。人已離開的現在，仿生人們仍遵從「維持設施」這最後的命令，持續修繕著設施。\n- 入口是殘留在地表的白色小建築（原本的接待處與電梯廳）。順著梯子和鷹架，沿曾經的電梯井——崩塌的主豎井下去。房間與走廊被厚度為 2 格的耐壓殼包覆，在擊敗統籌 AI 之前無法破壞（之後也比黑曜石更硬）。\n- 專用貨運升降室設有吊機、軌道、輸送帶與貨物堆放區，搬運豎井必定從其天花板通往地表。主豎井與搬運豎井都會生成。房間上方與地表下一格被焊死的艙蓋封住，擊敗統籌 AI 後可以用鑽石鎬挖開。豎井沒有損壞，架上梯子就能成為通往地表的捷徑。\n- 主電源已斷，這是一座只有紅色緊急照明燈亮著的昏暗設施。右鍵中央動力爐的控制台即可啟動動力爐，設施燈會亮起，AI 中樞的隔離門打開。而沉睡的統籌 AI 也會醒來。\n- 恢復供電後，自動販賣機會開始用綠寶石販售飲料（按下想要的那一列：汽水提升移動速度，運動飲料帶來生命恢復，能量飲料提升挖掘速度）。茶水間的咖啡機用可可豆沖泡，可以用玻璃瓶盛取（提升挖掘速度並提神）。\n- 房間的排列每次都不同：研究室、資料室、伺服器室、員工宿舍、研究員單間排成一列的單間區、醫務室、附廚房的食堂等，由警衛機和列印台把守。單間與廚房的滑動門右鍵點擊即可打開，過一會兒會自動關閉（研究所的門無法合成，但相似的白色滑動門可以在工作台製作）。物資箱裡還留著研究所的部件和資料。\n- 右鍵記錄終端可以閱讀留下的記錄。收集起來，就能知道失控的來龍去脈。"
   },
   "guide.singulo.ruins.lab.title": {
     "source": "Underground Android Laboratory",
@@ -6372,8 +6580,8 @@
     "translation": "六處廢墟"
   },
   "guide.singulo.ruins.plan.body": {
-    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.",
-    "translation": "後期階段的目的地會一下子增多；提前收集可以讓工廠不停工。\n- 第 2 階段期間：隕石坑（隕鐵、星塵），冰山或冰刺（浮冰和藍冰）。\n- 第 3 階段期間：研究棟。儘早放置深海壓力收集器，囤積高壓晶體（外殼和砧約需 30 個）。雷雨天在沙子上放避雷針。\n- 第 4 階段之前：封閉培養設施、遠古城市（幽匿塊和回聲碎片；回聲共鳴器可以一直複製一片）、終界虛空（虛空收集器）、凋零怪（地獄之星；點火後可用人造星核代替）。\n- 原始記錄可以修復：新品加三次修復約為 2.7 倍的使用次數。重刷遺跡之前先修復。"
+    "source": "Destinations pile up in later stages; gathering early keeps the factory running.\n- During stage 2: meteor craters (meteoric iron, stardust), icebergs or ice spikes (packed and blue ice).\n- During stage 3: Research Buildings. Place deep-sea pressure collectors early to stock pressure crystals (about 30 for shells and the anvil). Put lightning rods on sand in thunderstorms.\n- Before stage 4: Culture Facility, an ancient city (sculk and echo shards; the echo resonator keeps copying one shard), the End void (void collector), and the Wither (nether stars; artificial star cores replace them after ignition).\n- Original records can be repaired: new plus three repairs gives about 2.7× the uses. Repair before re-running a ruin.\nUnused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.\nRestored parts and original records exhausted during processing become item outputs with their usage and repair data intact. If the output slot is occupied, they wait in their input slot and can still be extracted by hoppers or item pipes. Enable automatic ejection to send them to adjacent inventories. Parts inserted for repair are not automatically ejected.",
+    "translation": "後期階段的目的地會一下子增多；提前收集可以讓工廠不停工。\n- 第 2 階段期間：隕石坑（隕鐵、星塵），冰山或冰刺（浮冰和藍冰）。\n- 第 3 階段期間：研究棟。儘早放置深海壓力收集器，囤積高壓晶體（外殼和砧約需 30 個）。雷雨天在沙子上放避雷針。\n- 第 4 階段之前：封閉培養設施、遠古城市（幽匿塊和回聲碎片；回聲共鳴器可以一直複製一片）、終界虛空（虛空收集器）、凋零怪（地獄之星；點火後可用人造星核代替）。\n- 原始記錄可以修復：新品加三次修復約為 2.7 倍的使用次數。重刷遺跡之前先修復。\n未使用的觀測日誌、量子資料片段、培養資料及復原部件，在狀態相同時最多可堆疊64個。裝置的每個輸入槽只接受1個，Shift點擊也只投入1個。使用中的物品不可堆疊。\n加工中耗盡使用次數的復原部件和原始記錄會作為物品輸出，並保留使用及修復資料。輸出槽被占用時，它們會在原輸入槽等待，仍可由漏斗或物品管線取出。開啟自動輸出後可將其送入相鄰容器。為修復而放入的部件不會自動輸出。"
   },
   "guide.singulo.ruins.plan.title": {
     "source": "Planning expeditions",
@@ -6400,8 +6608,8 @@
     "translation": "第一階段：啟動"
   },
   "guide.singulo.stage1.flow.body": {
-    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: the tower uses about 240 FE/t to make liquid nitrogen. Add generators or run machines in turns.",
-    "translation": "這一階段要做的事（依序）：\n1. 製作鋼、陶瓷、基礎電路和基礎框架（見「最初的材料」）。\n2. 放置 2〜4 台熱電發電機，用銅導線連到裝置。岩漿塊＋藍冰不會融化，能長久使用。\n3. 備齊燒製爐、壓縮機（鋼板）和檔案終端。探索羅盤和全像投影器也先做好。\n4. 用探索羅盤找到地表觀測站，從保管庫帶回退化的控制單元和觀測日誌。\n5. 在檔案終端修復控制單元，製作低溫冷卻塔的零件，對照全像投影器組裝。\n6. 冷卻塔能做出「超導線圈」後，就進入第 2 階段。\n容易卡住的地方：\n・低溫側的方塊融化：岩漿，或營火配水、雪、冰，很快就會融化。請看「不會融化的組合」一頁。\n・冷卻塔組不起來：中心一列是熱交換核心，頂部是通風格柵。把全像投影器用在控制器上，就能看出缺了哪裡。\n・電力不足：冷卻塔製作液氮約需 240 FE/t。增加發電機，或讓裝置輪流運轉。"
+    "source": "What to do, in order:\n1. Make steel, ceramic, basic circuits and basic frames (see \"First materials\").\n2. Place two to four Thermoelectric Generators and wire them to your machines with copper wire. Magma blocks with blue ice last without melting.\n3. Build a Kiln, a Compressor (steel plates) and an Archive Terminal. Make an Explorer's Compass and a Holo Projector too.\n4. Use the compass to find the Surface Observation Post and bring back the degraded control units and observation logs from its cache.\n5. Restore a control unit in the Archive Terminal, make the Cryogenic Cooling Tower parts and build it following the Holo Projector.\n6. Once the tower makes a Superconducting Coil, you are in stage 2.\nCommon sticking points:\n- The cold block melts: lava, or a campfire with water, snow or ice, melts quickly. See the \"Pairs that don't melt\" page.\n- The tower won't form: the center column is heat exchanger cores and the top is vent grilles. Use the Holo Projector on the controller to see what is missing.\n- Not enough power: with default settings, a height-7 tower draws about 1,786 FE/t while making liquid nitrogen. It keeps its progress while waiting for power. Run machines in turns and add generation and storage.",
+    "translation": "這一階段要做的事（依序）：\n1. 製作鋼、陶瓷、基礎電路和基礎框架（見「最初的材料」）。\n2. 放置 2〜4 台熱電發電機，用銅導線連到裝置。岩漿塊＋藍冰不會融化，能長久使用。\n3. 備齊燒製爐、壓縮機（鋼板）和檔案終端。探索羅盤和全像投影器也先做好。\n4. 用探索羅盤找到地表觀測站，從保管庫帶回退化的控制單元和觀測日誌。\n5. 在檔案終端修復控制單元，製作低溫冷卻塔的零件，對照全像投影器組裝。\n6. 冷卻塔能做出「超導線圈」後，就進入第 2 階段。\n容易卡住的地方：\n・低溫側的方塊融化：岩漿，或營火配水、雪、冰，很快就會融化。請看「不會融化的組合」一頁。\n・冷卻塔組不起來：中心一列是熱交換核心，頂部是通風格柵。把全像投影器用在控制器上，就能看出缺了哪裡。\n・電力不足：預設設定下，高度為 7 的冷卻塔連續製造液態氮時約需 1,786 FE/t。供電不足時會保留進度並等待，因此可以讓裝置交替運轉，並增加發電與儲電。"
   },
   "guide.singulo.stage1.flow.title": {
     "source": "Stage 1 at a glance",
@@ -6452,8 +6660,8 @@
     "translation": "粒子加速器與緲子催化劑"
   },
   "guide.singulo.stage2.flow.body": {
-    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (short of power it slows down instead of stopping).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
-    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和冷原子阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（電力不足時不會停止，只是變慢）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
+    "source": "What to do:\n1. Build a Precision Assembler. Almost every part and machine from stage 3 on is made there.\n2. Make muon bundles in the Particle Accelerator and muon catalysts (tier 2) in the Catalytic Reactor.\n3. Build a Muon-Catalyzed Fusion Reactor (4 kFE/t) and run it on muon catalysts and water. A fresh catalyst lasts 10 minutes (a used one for half its remaining lifetime).\n4. Raise the cooling tower to height 10 or more, and liquefy the helium you get by crushing deepslate in the Compressor.\n5. Tune the Explorer's Compass at the Surface Observation Post's cache and find the Research Building. Collect quantum data fragments and cold atom traps (beat the Echo Sentinel at the back to open the cache).\n6. With a Quantum Computing Module and liquid helium, you are in stage 3.\nWhile you are here: the Android Assembly Station can print guards (see the Androids chapter). Look for meteor craters (meteoric iron, stardust) and icebergs (blue ice) too.\nCommon sticking points:\n- No liquid helium: the tower must be at least 10 high.\n- The cooling tower is slow: liquid nitrogen costs 250 FE per mB. Add Thermoelectric Generators until the fusion reactor is running (it keeps its progress while waiting for power, reducing average throughput).\n- A catalyst won't work or wears fast: one tier below the machine is slower and wears faster; two below cannot be used.",
+    "translation": "這一階段要做的事：\n1. 製作精密組裝台。第 3 階段以後的零件和裝置幾乎都在這裡製作。\n2. 用粒子加速器製作緲子束，用催化反應器製作緲子催化劑（第 2 級）。\n3. 製作緲子催化核融合爐（4 kFE/t），用緲子催化劑和水增加電力。催化劑消耗速度為 2 倍，新的催化劑可運轉 10 分鐘（用過的只運轉剩餘壽命的一半）。\n4. 把冷卻塔加高到 10 以上，把壓縮機粉碎深板岩得到的氦液化。\n5. 在地表觀測站的保管庫調整探索羅盤，尋找研究棟。收集量子資料片段和冷原子阱（打倒深處的回聲守衛後保管庫會打開）。\n6. 備齊量子運算模組和液氦，就進入第 3 階段。\n趁現在：可以用仿生人組裝站製作護衛（見仿生人一章）。也去找隕石坑（隕鐵、星塵）和冰山（藍冰）。\n容易卡住的地方：\n・做不出液氦：冷卻塔高度不到 10 就無法製作。\n・冷卻塔很慢：液態氮每 1 mB 需要 250 FE。在核融合爐建好之前，多放幾台熱電發電機（供電不足時保留進度並等待，因此平均產量會降低）。\n・催化劑不能用或消耗很快：比裝置低一級會變慢且消耗更快，低兩級無法使用。"
   },
   "guide.singulo.stage2.flow.title": {
     "source": "Stage 2 at a glance",
@@ -6560,16 +6768,16 @@
     "translation": "更遠的前方"
   },
   "guide.singulo.stage5.flow.body": {
-    "source": "What to do:\n1. Gather the P-Reactor parts such as reactor shell blocks, and build it with the Holo Projector used on the Core Controller.\n2. For ignition, wire SMES storage and a Horizon Bus so that 50 GFE arrives within 10 seconds (about 250 MFE/t on average).\n3. Insert the singularity seed and ignite. Start in harvest mode to collect H condensate (six for the first Singularity Core).\n4. Switch to generation mode and feed mass pellets automatically.\n5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the final goal, the Genesis Engine.\nCommon sticking points:\n- Ignition fails: a cable network is limited by its thinnest cable. Check the incoming rate and the estimate on the screen and fix the wiring.\n- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destroyed. Take care when working nearby.",
-    "translation": "這一階段要做的事：\n1. 備齊爐殼方塊等 P 反應爐零件，把全像投影器用在爐心控制器上，看著形狀組裝。\n2. 為了點火，用 SMES 和視界匯流排佈線，讓 50 GFE 能在 10 秒內送到（平均約 250 MFE/t）。\n3. 放入奇點種子並點火。一開始用回收運轉收集 H 凝聚體（第一個奇點核心需要 6 個）。\n4. 切換到發電運轉，自動送入質量顆粒。\n5. 用奇點核心驅動奇點技術（護盾、蒂普勒圓柱、蟲洞），朝最終目標「創世爐」前進。\n容易卡住的地方：\n・點火失敗：線纜網路的上限由最細的線纜決定。看介面上的受電速度和預計能否送達來修正佈線。\n・被吸進爐裡：環的內側是無法逃脫的強引力，碰到黑色球體的東西一定會消失。在附近作業時要小心。"
+    "source": "What to do:\n1. Gather the P-Reactor parts such as reactor shell blocks, and build it with the Holo Projector used on the Core Controller.\n2. For ignition, wire SMES storage and a Horizon Bus so that 50 GFE arrives within 10 seconds (about 250 MFE/t on average).\n3. Insert the singularity seed and ignite. Start in harvest mode to collect H condensate (six for the first Singularity Core).\n4. Switch to generation mode and feed mass pellets automatically.\n5. Use Singularity Cores for singularity technology (shields, the T-Cylinder, wormholes) and head for the final goal, the Genesis Engine.\nCommon sticking points:\n- Ignition fails: a power route is limited by its lowest-capacity cable. Check the incoming rate and the estimate on the screen and fix the wiring.\n- Getting pulled in: inside the ring the pull is inescapable, and anything touching the black sphere is destroyed. Take care when working nearby.",
+    "translation": "這一階段要做的事：\n1. 備齊爐殼方塊等 P 反應爐零件，把全像投影器用在爐心控制器上，看著形狀組裝。\n2. 為了點火，用 SMES 和視界匯流排佈線，讓 50 GFE 能在 10 秒內送到（平均約 250 MFE/t）。\n3. 放入奇點種子並點火。一開始用回收運轉收集 H 凝聚體（第一個奇點核心需要 6 個）。\n4. 切換到發電運轉，自動送入質量顆粒。\n5. 用奇點核心驅動奇點技術（護盾、蒂普勒圓柱、蟲洞），朝最終目標「創世爐」前進。\n容易卡住的地方：\n・點火失敗：送電路徑的上限由該路徑中容量最低的線纜決定。看介面上的受電速度和預計能否送達來修正佈線。\n・被吸進爐裡：環的內側是無法逃脫的強引力，碰到黑色球體的東西一定會消失。在附近作業時要小心。"
   },
   "guide.singulo.stage5.flow.title": {
     "source": "Stage 5 at a glance",
     "translation": "第 5 階段的流程"
   },
   "guide.singulo.stage5.ignite.body": {
-    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a horizon bus is required). The screen shows the intake needed (250 MFE/t on average by default). While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nThe fuel is mass pellets. Accretion efficiency depends on spin (5.7–42.3%); a core of mass 5000 at full spin gives about 2.1 GFE/t.\nOutside the ring (out to radius 24) a weak pull acts, inside the ring a pull you cannot escape, and anything that touches the black sphere is destroyed no matter how tough. Radius 4 is a tidal zone that ignores armour. Time runs slower in the pull zone: machines at ×0.8, catalyst wear at ×0.5.",
-    "translation": "插入種子，按下「點火」，在 10 秒內經由埠或控制器輸送 50 GFE（需要視界匯流排）。介面會顯示點火所需的受電（預設平均 250 MFE/t）。點火時會顯示受電速度與預計送達量，不足時請重新檢查線路；網路上限由最細的線纜決定，因此只用拓撲導線的網路 10 秒內只能送達 20 GFE。\n新爐心以回收運轉開始：爐心質量保持在 480 以下，配合霍金收集器每 5 分鐘產生 1 個霍金凝聚體。第一個奇點核心需要 6 個（直接 4 個、修復異常樣本 2 個），因此先運轉約 30 分鐘，再關閉回收運轉轉為發電。回收運轉還會讓質量過大的爐心每秒釋放 2 質量。\n燃料是質量顆粒。吸積效率取決於自旋（5.7–42.3%）；爐心質量 5000、自旋最大時約 2.1 GFE/t。\n環外（到半徑 24）是弱引力區，環內是無法逃脫的強引力區，碰到黑色球體的東西無論多堅固都會消失。半徑 4 是無視護甲的潮汐區。引力區內時間變慢：裝置 ×0.8，催化劑消耗 ×0.5。"
+    "source": "Insert the seed, press Ignite and deliver 50 GFE within 10 s through a port or the controller (a horizon bus is recommended). The screen shows the intake needed (250 MFE/t on average by default). While igniting it shows the intake and what will arrive, so rework the wiring if it falls short; a power route is capped by its lowest-capacity cable, so a single topological-wire route delivers at most 20 GFE in 10 s.\nA new core starts in harvest mode: it keeps mass at 480 or below, so H-Condensate forms every 5 minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the anomaly sample), so run it for about 30 minutes, then switch harvest mode off for power. Harvest mode also sheds 2 mass per second from an overgrown core.\nThe fuel is mass pellets. Accretion efficiency depends on spin (5.7–42.3%); a core of mass 5000 at full spin gives about 2.1 GFE/t.\nOutside the ring (out to radius 24) a weak pull acts, inside the ring a pull you cannot escape, and anything that touches the black sphere is destroyed no matter how tough. Radius 4 is a tidal zone that ignores armour. Time runs slower in the pull zone: machines at ×0.8, catalyst wear at ×0.5.",
+    "translation": "插入種子，按下「點火」，在 10 秒內經由埠或控制器輸送 50 GFE（建議使用視界匯流排）。介面會顯示點火所需的受電（預設平均 250 MFE/t）。點火時會顯示受電速度與預計送達量，不足時請重新檢查線路；送電路徑的上限由該路徑中容量最低的線纜決定，因此拓撲導線的單一路徑 10 秒內最多送達 20 GFE。\n新爐心以回收運轉開始：爐心質量保持在 480 以下，配合霍金收集器每 5 分鐘產生 1 個霍金凝聚體。第一個奇點核心需要 6 個（直接 4 個、修復異常樣本 2 個），因此先運轉約 30 分鐘，再關閉回收運轉轉為發電。回收運轉還會讓質量過大的爐心每秒釋放 2 質量。\n燃料是質量顆粒。吸積效率取決於自旋（5.7–42.3%）；爐心質量 5000、自旋最大時約 2.1 GFE/t。\n環外（到半徑 24）是弱引力區，環內是無法逃脫的強引力區，碰到黑色球體的東西無論多堅固都會消失。半徑 4 是無視護甲的潮汐區。引力區內時間變慢：裝置 ×0.8，催化劑消耗 ×0.5。"
   },
   "guide.singulo.stage5.ignite.title": {
     "source": "Ignition and operation",
@@ -6647,6 +6855,10 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：工作台（第 1 階段）"
   },
+  "howto.singulo.android_capsule": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.android_charger": {
     "source": "Made in: Precision Assembler (stage 2)",
     "translation": "製造地：精密組裝台（第 2 階段）"
@@ -6678,6 +6890,10 @@
   "howto.singulo.android_gate_glass_patterned": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.android_glasses": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.android_hair_flower": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -6736,8 +6952,8 @@
     "translation": "製造地：精密組裝台（第 2 階段）"
   },
   "howto.singulo.android_teacup": {
-    "source": "Made in: Crafting Table (stage 1)",
-    "translation": "製造地：工作台（第 1 階段）"
+    "source": "Made in: Furnace (stage 1)",
+    "translation": "製造地：熔爐（第 1 階段）"
   },
   "howto.singulo.android_transfer_upgrade": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -6875,6 +7091,10 @@
     "source": "Made in: Kiln (stage 1)",
     "translation": "製造地：燒製爐（第 1 階段）"
   },
+  "howto.singulo.coffee_maker": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.cold_atom_trap": {
     "source": "Restore a Degraded Cold Atom Trap",
     "translation": "取得方式：修復退化冷原子陷阱"
@@ -6966,6 +7186,10 @@
   "howto.singulo.cosmic_muon_collector": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.cracked_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.cryogenic_cooling_tower": {
     "source": "Made in: Multiblock assembly (stage 2)",
@@ -7087,6 +7311,10 @@
     "source": "Found in: ruin caches",
     "translation": "取得方式：封閉培養設施的保管庫"
   },
+  "howto.singulo.desk_monitor": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.dormant_singularity_seed": {
     "source": "Found in: ruin caches",
     "translation": "取得方式：最終實驗室的保管庫"
@@ -7096,6 +7324,10 @@
     "translation": "製造地：精密組裝台（第 3 階段）"
   },
   "howto.singulo.electrolyzer": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.emergency_light": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：工作台（第 1 階段）"
   },
@@ -7130,6 +7362,10 @@
   "howto.singulo.extraction_port": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.facility_light": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.fluid_canister": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -7227,6 +7463,10 @@
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "製造地：精密組裝台（第 3 階段）"
   },
+  "howto.singulo.intact_ruin_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.jet_collector": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
@@ -7242,6 +7482,26 @@
   "howto.singulo.kiln": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
+  },
+  "howto.singulo.lab_frame": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_panel_lined": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.lab_tiles": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.laser_cooler": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -7291,6 +7551,10 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
   },
+  "howto.singulo.mossy_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.multiblock_port": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
@@ -7339,6 +7603,10 @@
     "source": "Made in: Laser Cooler (stage 3)",
     "translation": "製造地：雷射冷卻器（第 3 階段）"
   },
+  "howto.singulo.paper_stack": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.particle_accelerator": {
     "source": "Made in: Multiblock assembly (stage 2)",
     "translation": "製造地：多方塊組裝（第 2 階段）"
@@ -7355,6 +7623,10 @@
     "source": "Made in: Entanglement Synthesizer (stage 4)",
     "translation": "製造地：量子糾纏合成器（第 4 階段）"
   },
+  "howto.singulo.power_conduit": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.precision_assembler": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
@@ -7362,6 +7634,22 @@
   "howto.singulo.primordial_seed": {
     "source": "Made in: Singularity Encapsulator (stage 5)",
     "translation": "製造地：奇點封裝器（第 5 階段）"
+  },
+  "howto.singulo.pristine_ruin_light": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.pristine_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.pristine_ruin_pillar": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.pristine_ruin_tiles": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.probe_station": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -7387,6 +7675,10 @@
     "source": "Made in: Precision Assembler (stage 3)",
     "translation": "製造地：精密組裝台（第 3 階段）"
   },
+  "howto.singulo.rayleigh_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.reactor_mass_alarm": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
@@ -7403,6 +7695,42 @@
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
   },
+  "howto.singulo.reinforced_ruin_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.relocation_wrench": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製作於：工作台（階段 1）"
+  },
+  "howto.singulo.ruin_glass": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.ruin_lamp": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.ruin_lamp_amber": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.ruin_lamp_crimson": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "製造地：工作台（第 5 階段）"
+  },
+  "howto.singulo.ruin_lamp_verdant": {
+    "source": "Made in: Crafting Table (stage 3)",
+    "translation": "製造地：工作台（第 3 階段）"
+  },
+  "howto.singulo.ruin_lamp_violet": {
+    "source": "Made in: Crafting Table (stage 4)",
+    "translation": "製造地：工作台（第 4 階段）"
+  },
+  "howto.singulo.ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.scanner_module_2": {
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "製造地：精密組裝台（第 4 階段）"
@@ -7410,6 +7738,10 @@
   "howto.singulo.scanner_module_3": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.scorched_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.sealed_container_1": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -7426,6 +7758,10 @@
   "howto.singulo.sealed_container_4": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.server_rack": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.settings_card": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -7495,6 +7831,10 @@
     "source": "Made in: Compressor (stage 1)",
     "translation": "製造地：壓縮機（第 1 階段）"
   },
+  "howto.singulo.striped_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.superconducting_cable": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：製作台（第 2 階段）"
@@ -7526,6 +7866,10 @@
   "howto.singulo.thermoelectric_generator": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
+  },
+  "howto.singulo.tiled_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.time_crystal_catalyst": {
     "source": "Made in: Time Crystal Incubator (stage 4)",
@@ -7579,6 +7923,10 @@
     "source": "Made in: Precision Assembler (stage 4)",
     "translation": "製造地：精密組裝台（第 4 階段）"
   },
+  "howto.singulo.trash_bin": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
   "howto.singulo.unfired_ceramic": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
@@ -7587,9 +7935,21 @@
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
   },
+  "howto.singulo.unfired_teacup": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：製作台（第 1 階段）"
+  },
   "howto.singulo.unstable_wormhole_mouth": {
     "source": "Made in: Wormhole Generator (stage 5)",
     "translation": "製造地：蟲洞產生器（第 5 階段）"
+  },
+  "howto.singulo.vending_machine": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
+  },
+  "howto.singulo.vented_ruin_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：工作台（第 1 階段）"
   },
   "howto.singulo.void_collector": {
     "source": "Made in: Precision Assembler (stage 4)",
@@ -7608,6 +7968,10 @@
     "translation": "製造地：製作台（第 1 階段）"
   },
   "howto.singulo.white_panel": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "製造地：製作台（第 1 階段）"
+  },
+  "howto.singulo.white_sliding_door": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "製造地：製作台（第 1 階段）"
   },
@@ -7670,6 +8034,14 @@
   "howto.singulo.wormhole_stabilizer": {
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
+  },
+  "howto.singulo.zero_gravity_block": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製造地：精密組裝台（第 3 階段）"
+  },
+  "howto.singulo.zero_gravity_controller": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製造地：精密組裝台（第 3 階段）"
   },
   "howto.singulo.zinc_dust": {
     "source": "Made in: Compressor (stage 1)",
@@ -7742,6 +8114,10 @@
   "item.singulo.android_gas_tank_upgrade": {
     "source": "Gas Tank Upgrade",
     "translation": "氣體儲罐升級"
+  },
+  "item.singulo.android_glasses": {
+    "source": "Glasses",
+    "translation": "眼鏡"
   },
   "item.singulo.android_hair_flower": {
     "source": "Hair Flower",
@@ -7899,6 +8275,38 @@
     "source": "Blank Data Card",
     "translation": "空白資料卡"
   },
+  "item.singulo.blueprint.hint": {
+    "source": "Place it with materials on a crafting table to make building blocks. The blueprint is not used up.",
+    "translation": "與材料一起放在工作台上即可製作建材。設計圖使用後不會消失"
+  },
+  "item.singulo.blueprint_lab_building": {
+    "source": "Laboratory Material Blueprint",
+    "translation": "研究所建材設計圖"
+  },
+  "item.singulo.blueprint_lab_furniture": {
+    "source": "Laboratory Furnishing Blueprint",
+    "translation": "研究所家具設計圖"
+  },
+  "item.singulo.blueprint_lighting": {
+    "source": "Lighting Blueprint",
+    "translation": "照明設計圖"
+  },
+  "item.singulo.blueprint_pristine_ruin": {
+    "source": "Pristine Ruin Material Blueprint",
+    "translation": "無瑕遺跡建材設計圖"
+  },
+  "item.singulo.blueprint_rayleigh": {
+    "source": "Rayleigh Sky Panel Blueprint",
+    "translation": "瑞利散射面板設計圖"
+  },
+  "item.singulo.blueprint_ruin_glass": {
+    "source": "Ruin Glass Blueprint",
+    "translation": "遺跡玻璃設計圖"
+  },
+  "item.singulo.blueprint_ruin_panels": {
+    "source": "Ruin Panel Blueprint",
+    "translation": "遺跡面板設計圖"
+  },
   "item.singulo.bose_condensate_catalyst": {
     "source": "BE Condensate Catalyst",
     "translation": "玻色凝聚態催化劑"
@@ -7906,6 +8314,10 @@
   "item.singulo.builder_wand": {
     "source": "Builder's Wand",
     "translation": "建造者魔杖"
+  },
+  "item.singulo.canned_soda": {
+    "source": "Canned Soda",
+    "translation": "罐裝汽水"
   },
   "item.singulo.carbon_dust": {
     "source": "Carbon Dust",
@@ -7918,6 +8330,10 @@
   "item.singulo.ceramic_substrate": {
     "source": "Ceramic Substrate",
     "translation": "陶瓷基板"
+  },
+  "item.singulo.coffee": {
+    "source": "Coffee",
+    "translation": "咖啡"
   },
   "item.singulo.cold_atom_trap": {
     "source": "Cold Atom Trap",
@@ -8010,6 +8426,10 @@
   "item.singulo.empty_coolant_cartridge": {
     "source": "Empty Coolant Cartridge",
     "translation": "空冷媒罐"
+  },
+  "item.singulo.energy_drink": {
+    "source": "Energy Drink",
+    "translation": "能量飲料"
   },
   "item.singulo.entangled_element": {
     "source": "Entangled Element",
@@ -8239,6 +8659,38 @@
     "source": "Crystal Memory",
     "translation": "水晶記憶體"
   },
+  "item.singulo.relocation_wrench": {
+    "source": "Relocation Wrench",
+    "translation": "移設扳手"
+  },
+  "item.singulo.relocation_wrench.cables_removed": {
+    "source": "Took back %s cables",
+    "translation": "回收了 %s 格線纜"
+  },
+  "item.singulo.relocation_wrench.hint.0": {
+    "source": "Sneak-use on a device to pack it with its contents and settings.",
+    "translation": "潛行對裝置使用，可連同內容物和設定一起回收"
+  },
+  "item.singulo.relocation_wrench.hint.1": {
+    "source": "Use on a cable to take it back; sneak-use to take up to 64 joined cables of that kind. Left-click also breaks cables at once.",
+    "translation": "對線纜使用可回收1格，潛行使用可一次回收最多64格相連的同種線纜。左鍵也能立即破壞"
+  },
+  "item.singulo.relocation_wrench.mode.0": {
+    "source": "Mode: relocate devices",
+    "translation": "模式：搬遷裝置"
+  },
+  "item.singulo.relocation_wrench.mode.1": {
+    "source": "Mode: remove cables",
+    "translation": "模式：拆除線纜"
+  },
+  "item.singulo.relocation_wrench.packed": {
+    "source": "Device packed with contents and settings",
+    "translation": "已保留內容與設定並回收裝置"
+  },
+  "item.singulo.relocation_wrench.switch": {
+    "source": "Sneak-use in the air to switch modes.",
+    "translation": "潛行對空氣使用可切換模式"
+  },
   "item.singulo.saber_android_spawn_egg": {
     "source": "Saber Android Spawn Egg",
     "translation": "光劍型仿生人生怪蛋"
@@ -8284,8 +8736,8 @@
     "translation": "潛行時使用以複製 · 直接使用以貼上"
   },
   "item.singulo.settings_card.holds.machine": {
-    "source": "Machine side settings",
-    "translation": "機器各面的設定"
+    "source": "Machine sides and recipe choice",
+    "translation": "機器各面及配方選擇的設定"
   },
   "item.singulo.settings_card.holds.reactor": {
     "source": "P-Reactor settings",
@@ -8359,6 +8811,10 @@
     "source": "Spent Time Crystal Catalyst",
     "translation": "失活的時間晶體催化劑"
   },
+  "item.singulo.sports_drink": {
+    "source": "Sports Drink",
+    "translation": "運動飲料"
+  },
   "item.singulo.stardust": {
     "source": "Stardust",
     "translation": "星塵"
@@ -8422,6 +8878,10 @@
   "item.singulo.unfired_phosphor": {
     "source": "Unfired Phosphor",
     "translation": "未燒製螢光體"
+  },
+  "item.singulo.unfired_teacup": {
+    "source": "Unfired Teacup",
+    "translation": "未燒製茶杯"
   },
   "item.singulo.unstable_wormhole_mouth": {
     "source": "Unstable Wormhole Mouth",
@@ -8539,9 +8999,17 @@
     "source": "Toggle gravity tool area",
     "translation": "切換重力工具區域"
   },
-  "lab.singulo.coffee": {
-    "source": "The smell of coffee fills the air. It still works",
-    "translation": "咖啡的香氣瀰漫開來。看來還能用"
+  "lab.singulo.coffee.brewing": {
+    "source": "Brewing coffee...",
+    "translation": "正在沖泡咖啡……"
+  },
+  "lab.singulo.coffee.empty": {
+    "source": "The pot is empty. Add cocoa beans to brew",
+    "translation": "壺是空的。放入可可豆即可沖泡"
+  },
+  "lab.singulo.coffee.ready": {
+    "source": "%s cups of coffee left. Fill a glass bottle",
+    "translation": "咖啡還剩 %s 杯。可以用玻璃瓶盛取"
   },
   "lab.singulo.hull_unsealed": {
     "source": "The overseer has stopped. The facility pressure hull is no longer sealed",
@@ -8664,8 +9132,16 @@
     "translation": "動力爐正在啟動"
   },
   "lab.singulo.vending": {
-    "source": "Sold out",
-    "translation": "已售完"
+    "source": "No power. It might work once facility power is restored",
+    "translation": "沒有通電。設施恢復供電後也許就能運轉"
+  },
+  "lab.singulo.vending.how": {
+    "source": "Hold emeralds and press the button under the drink you want (left to right: Soda 1, Sports Drink 1, Energy Drink 2)",
+    "translation": "手持綠寶石，按下想要的飲料那一列的按鈕（從左到右：汽水 1、運動飲料 1、能量飲料 2）"
+  },
+  "lab.singulo.vending.short": {
+    "source": "Not enough emeralds (needs %s)",
+    "translation": "綠寶石不夠（需要 %s 個）"
   },
   "message.singulo.android.alarm": {
     "source": "%s: spotted a group of %3$s (%2$s and others) at %4$s, %5$s, %6$s",
@@ -8732,8 +9208,8 @@
     "translation": "氫 %s/%s mB　氧 %s/%s mB　儲電 %s/%s FE　%s"
   },
   "message.singulo.gravity_receiver.status": {
-    "source": "Gravity panels active: %s / %s (%s FE/t each)",
-    "translation": "正在運作的重力面板：%s / %s（每塊 %s FE/t）"
+    "source": "Panels active: %s / %s (%s FE/t in total)",
+    "translation": "面板 %s / %s 塊運行中（合計 %s FE/t）"
   },
   "message.singulo.hidden_records_complete": {
     "source": "You have read every sealed record",
@@ -8886,6 +9362,10 @@
   "message.singulo.work_location.recorded": {
     "source": "Recorded %s at %s, %s, %s",
     "translation": "已記錄 %s 的位置（%s, %s, %s）"
+  },
+  "message.singulo.zero_gravity_controller.height": {
+    "source": "Weightless height: %s blocks (%s FE/t per zero-gravity block)",
+    "translation": "無重力高度：%s 格（每個無重力方塊 %s FE/t）"
   },
   "metric_drive.singulo.mode.high_gravity": {
     "source": "High gravity",
@@ -10036,8 +10516,8 @@
     "translation": "以能量創造宇宙的爐之核心。"
   },
   "summary.singulo.gravity_panel_receiver": {
-    "source": "Powers every connected gravity panel.",
-    "translation": "向所有相連的重力面板供電。"
+    "source": "Powers every connected gravity panel, zero-gravity block and Rayleigh sky panel.",
+    "translation": "向相連的重力面板、無重力方塊和瑞利散射面板分配電力。"
   },
   "summary.singulo.impact_generator_panel": {
     "source": "Stores power from how far you fall and feeds gravity panels. No fall damage.",
@@ -10046,6 +10526,10 @@
   "summary.singulo.keraunos_tower": {
     "source": "Stores power and fires artificial lightning at a nearby lightning rod.",
     "translation": "用儲存的電力製造人工閃電，擊向附近的避雷針。"
+  },
+  "summary.singulo.lab_rayleigh_panel": {
+    "source": "A ceiling panel that projects a midday sky using facility power.",
+    "translation": "由設施供電、投映正午天空的天花板面板。"
   },
   "summary.singulo.meteorite_core": {
     "source": "The core of a meteorite. Mine it for raw meteoric iron and stardust.",
@@ -10056,12 +10540,16 @@
     "translation": "替換多方塊結構外殼板，用於連接線纜和管線的進出口。"
   },
   "summary.singulo.precision_actuator": {
-    "source": "A precise drive unit found in underground android laboratories.",
-    "translation": "在地下仿生人研究所取得的舊文明精密驅動零件。"
+    "source": "A precision drive unit of the old civilization.",
+    "translation": "舊文明的精密驅動部件。"
   },
   "summary.singulo.procedure_card": {
     "source": "Records up to eight work steps for androids.",
     "translation": "記錄要讓仿生人執行的作業步驟（最多 8 個）。"
+  },
+  "summary.singulo.rayleigh_panel": {
+    "source": "A powered ceiling panel that provides midday sunlight below.",
+    "translation": "通電後向下提供正午日光的天花板面板。"
   },
   "summary.singulo.shield_permit": {
     "source": "Lets only registered players work inside a shield or control a station's android.",
@@ -10076,8 +10564,8 @@
     "translation": "在最終實驗設施的封印控制台使用的最後一頁。"
   },
   "summary.singulo.time_crystal_module": {
-    "source": "A stackable part sealing a slice of a time crystal's life.",
-    "translation": "截取時間晶體催化劑壽命並封存的可堆疊零件。"
+    "source": "A component containing time-crystal oscillations.",
+    "translation": "封存時間晶體振動的部件。"
   },
   "summary.singulo.work_location_card": {
     "source": "Records a block position and links work consoles with ports.",
@@ -10090,6 +10578,14 @@
   "summary.singulo.wormhole_port": {
     "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
     "translation": "與另一側入口附近同編號的連接埠連通電力、物品和液體。"
+  },
+  "summary.singulo.zero_gravity_block": {
+    "source": "Creates a weightless space above when powered.",
+    "translation": "通電後在上方形成無重力空間。"
+  },
+  "summary.singulo.zero_gravity_controller": {
+    "source": "Sets the weightless height of joined zero-gravity blocks.",
+    "translation": "設定相連無重力方塊的無重力高度。"
   },
   "tooltip.singulo.android_accessory.0": {
     "source": "Worn on an android's head (decoration page)",
@@ -10251,6 +10747,10 @@
     "source": "Only works when Mekanism is installed",
     "translation": "僅在安裝了 Mekanism 時可用"
   },
+  "tooltip.singulo.packed_device": {
+    "source": "Contents, energy and settings preserved",
+    "translation": "保留內容、電力與設定"
+  },
   "tooltip.singulo.planned": {
     "source": "Not functional yet; usable as a material",
     "translation": "功能尚未實裝，可作為材料使用"
@@ -10355,6 +10855,14 @@
     "source": "Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing",
     "translation": "戴在頭上時，可以看到手中範圍卡・作業位置卡記錄的地點，以及仿生人作業的標記"
   },
+  "tooltip.singulo.survey_glasses.adjust": {
+    "source": "Sneak-use while holding it to change how high it sits.",
+    "translation": "手持時潛行使用可調整佩戴高度"
+  },
+  "tooltip.singulo.survey_glasses.height": {
+    "source": "Worn height: %s px",
+    "translation": "佩戴高度：%s 像素"
+  },
   "tooltip.singulo.uses": {
     "source": "Uses %s / %s",
     "translation": "使用次數 %1$s / %2$s"
@@ -10424,12 +10932,12 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 41 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 41 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 48 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 48 個"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
-    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 25 個"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
+    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 26 個"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -10454,6 +10962,34 @@
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data)",
     "translation": "用於：資料卡（觀測日誌）、資料卡（量子資料片段）、資料卡（培養資料）"
+  },
+  "uses.singulo.blueprint_lab_building": {
+    "source": "Used in: Lab Panel, Lined Lab Panel, Lab Floor Tiles, Lab Frame, Lab Glass and 1 more",
+    "translation": "用於：研究所白色面板、研究所條紋面板、研究所地磚、研究所結構材、研究所玻璃 等 1 個"
+  },
+  "uses.singulo.blueprint_lab_furniture": {
+    "source": "Used in: Desk Monitor, Coffee Maker, Vending Machine, Stack of Papers, Trash Bin and 2 more",
+    "translation": "用於：桌面顯示器、咖啡機、自動販賣機、文件堆、垃圾桶 等 2 個"
+  },
+  "uses.singulo.blueprint_lighting": {
+    "source": "Used in: Ruin Lamp, Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson) and 3 more",
+    "translation": "用於：廢墟燈、廢墟燈（琥珀）、廢墟燈（翠綠）、廢墟燈（紫羅蘭）、廢墟燈（深紅） 等 3 個"
+  },
+  "uses.singulo.blueprint_pristine_ruin": {
+    "source": "Used in: Pristine Ruin Panel, Pristine Ruin Tiles, Pristine Ruin Pillar",
+    "translation": "用於：無瑕廢墟面板、無瑕廢墟磁磚、無瑕廢墟柱"
+  },
+  "uses.singulo.blueprint_rayleigh": {
+    "source": "Used in: Rayleigh Sky Panel",
+    "translation": "用於：瑞利散射面板"
+  },
+  "uses.singulo.blueprint_ruin_glass": {
+    "source": "Used in: Ruin Glass, Broken Ruin Glass, Reinforced Ruin Glass",
+    "translation": "用於：廢墟玻璃、破碎的廢墟玻璃、強化廢墟玻璃"
+  },
+  "uses.singulo.blueprint_ruin_panels": {
+    "source": "Used in: Ruin Panel, Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel and 2 more",
+    "translation": "用於：廢墟面板、破裂的廢墟面板、長滿青苔的廢墟面板、磁磚廢墟面板、通風廢墟面板 等 2 個"
   },
   "uses.singulo.bose_condensate_catalyst": {
     "source": "Used in: Time Crystal Catalyst",
@@ -10727,9 +11263,21 @@
     "source": "Used in: Graviton Manipulator",
     "translation": "用於：重力子操控器"
   },
+  "uses.singulo.intact_ruin_glass": {
+    "source": "Used in: Broken Ruin Glass, Reinforced Ruin Glass",
+    "translation": "用於：破碎的廢墟玻璃、強化廢墟玻璃"
+  },
   "uses.singulo.jet_condensate": {
     "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon",
     "translation": "用於：人造星核、覺醒渦核、創世爐支柱"
+  },
+  "uses.singulo.lab_frame": {
+    "source": "Used in: Power Conduit, Body Capsule",
+    "translation": "用於：動力導管、素體艙"
+  },
+  "uses.singulo.lab_panel": {
+    "source": "Used in: Lined Lab Panel, Lab Floor Tiles",
+    "translation": "用於：研究所條紋面板、研究所地磚"
   },
   "uses.singulo.magnetic_monopole": {
     "source": "Used in: Monopole Upgrade",
@@ -10795,6 +11343,10 @@
     "source": "Used in: Degenerate Compactor Anvil, Degenerate Precursor",
     "translation": "用於：簡併壓縮爐砧座、簡併前驅體"
   },
+  "uses.singulo.pristine_ruin_panel": {
+    "source": "Used in: Pristine Ruin Tiles, Pristine Ruin Pillar, Pristine Ruin Light Strip",
+    "translation": "用於：無瑕廢墟磁磚、無瑕廢墟柱、無瑕廢墟導光板"
+  },
   "uses.singulo.quantum_computing_module": {
     "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 18 more",
     "translation": "用於：量子熱機、重力波探測器、微中子觀測站、簡併壓縮爐控制器、卡西米爾腔控制器 等 18 個"
@@ -10818,6 +11370,14 @@
   "uses.singulo.record_fragment": {
     "source": "Used in: Decoded Record",
     "translation": "用於：解碼記錄"
+  },
+  "uses.singulo.ruin_lamp": {
+    "source": "Used in: Ruin Lamp (Amber), Ruin Lamp (Verdant), Ruin Lamp (Violet), Ruin Lamp (Crimson)",
+    "translation": "用於：廢墟燈（琥珀）、廢墟燈（翠綠）、廢墟燈（紫羅蘭）、廢墟燈（深紅）"
+  },
+  "uses.singulo.ruin_panel": {
+    "source": "Used in: Cracked Ruin Panel, Mossy Ruin Panel, Tiled Ruin Panel, Vented Ruin Panel, Striped Ruin Panel and 1 more",
+    "translation": "用於：破裂的廢墟面板、長滿青苔的廢墟面板、磁磚廢墟面板、通風廢墟面板、帶狀廢墟面板 等 1 個"
   },
   "uses.singulo.scanner_module_2": {
     "source": "Used in: Neutrino Sensitivity Module Mk3",
@@ -10872,16 +11432,16 @@
     "translation": "用於：鋼錠"
   },
   "uses.singulo.steel_ingot": {
-    "source": "Used in: Basic Frame, Steel Plate, Compressor",
-    "translation": "用於：基本框架、鋼板、壓縮機"
+    "source": "Used in: Basic Frame, Steel Plate, Compressor, Relocation Wrench, Pristine Ruin Pillar and 1 more",
+    "translation": "用於：基本框架、鋼板、壓縮機、移設扳手、無瑕廢墟柱 等 1 個"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, Black Reinforced Glass, Cooling Tower Base, Cooling Tower Casing and 73 more",
-    "translation": "用於：白色面板、黑色強化面板、黑色強化玻璃、冷卻塔底座、冷卻塔外壁 等 73 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 83 more",
+    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 83 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 55 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 57 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 57 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
@@ -10939,6 +11499,10 @@
     "source": "Used in: White Ceramic Composite",
     "translation": "用於：白色陶瓷複合材料"
   },
+  "uses.singulo.unfired_teacup": {
+    "source": "Used in: Teacup",
+    "translation": "用於：茶杯"
+  },
   "uses.singulo.unstable_wormhole_mouth": {
     "source": "Used in: Wormhole Mouth",
     "translation": "用於：蟲洞入口"
@@ -10948,16 +11512,16 @@
     "translation": "用於：重力場穩定器、蟲洞產生器聚焦器、蟲洞入口外殼"
   },
   "uses.singulo.white_ceramic_composite": {
-    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 12 more",
-    "translation": "用於：基本電路、設定卡、基本框架、陶瓷基板、銅導線 等 12 個"
+    "source": "Used in: Basic Circuit, Settings Card, Basic Frame, Ceramic Substrate, Copper Wire and 21 more",
+    "translation": "用於：基本電路、設定卡、基本框架、陶瓷基板、銅導線 等 21 個"
   },
   "uses.singulo.white_glass_panel": {
     "source": "Used in: Starred White Glass Panel",
     "translation": "用於：四芒星白色玻璃面板"
   },
   "uses.singulo.white_panel": {
-    "source": "Used in: Glowing White Panel, Low-Gravity Panel",
-    "translation": "用於：發光白色面板、低重力面板"
+    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block",
+    "translation": "用於：發光白色面板、白色滑動門、低重力面板、無重力方塊"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",

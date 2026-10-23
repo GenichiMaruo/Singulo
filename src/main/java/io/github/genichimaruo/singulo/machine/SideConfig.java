@@ -11,17 +11,16 @@ public final class SideConfig {
 
     public static final int NONE = 0, INPUT = 1, OUTPUT = 2, BOTH = 3;
     private static final int EJECT = 4;
-    /** 自動排出の全体スイッチ（ビット18）。オフなら面ごとの自動排出は働かない。既定はオン。 */
+    /** 自動排出の全体スイッチ（ビット18）。オフなら面ごとの自動排出は働かない。既定はオフ。 */
     private static final int MASTER = 1 << 18;
 
-    /** 6面 × 3ビット。既定はすべて「入出力」で自動排出なし。 */
+    /** 6面 × 3ビット。既定はすべて「入出力」で、全体スイッチをオンにすると自動排出。 */
     private int bits;
 
     public SideConfig() {
         for (Face f : Face.values()) {
-            set(f, BOTH, false);
+            set(f, BOTH, true);
         }
-        bits |= MASTER;
     }
 
     public static boolean ejectEnabled(int packed) {

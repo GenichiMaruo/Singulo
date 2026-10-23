@@ -1,8 +1,11 @@
 {
-  "singulo": 291,
-  "singulo_automation": 72,
+  "singulo": 338,
+  "singulo_automation": 75,
   "singulo_reactor": 21,
   "singulo_prototype": 10,
   "singulo_progression": 13,
-  "singulo_lab": 15
+  "singulo_lab": 28,
+  "singulo_cable": 16,
+  "singulo_rayleigh": 8,
+  "singulo_panel_review": 6
 }

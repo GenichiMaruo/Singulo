@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.machine;
 
-import com.mojang.serialization.MapCodec;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;

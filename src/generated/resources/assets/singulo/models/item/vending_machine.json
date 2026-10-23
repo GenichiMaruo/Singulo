@@ -1,5 +1,193 @@
 {
-  "parent": "singulo:block/vending_machine_lower",
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "front_lower": "singulo:block/vending_machine_front_lower",
+    "glow_lower": "singulo:block/vending_machine_front_lower_glow",
+    "side_lower": "singulo:block/vending_machine_side_lower",
+    "top_lower": "singulo:block/vending_machine_top",
+    "particle_lower": "singulo:block/vending_machine_top",
+    "front_upper": "singulo:block/vending_machine_front_upper",
+    "glow_upper": "singulo:block/vending_machine_front_upper_glow",
+    "side_upper": "singulo:block/vending_machine_side_upper",
+    "top_upper": "singulo:block/vending_machine_top",
+    "particle_upper": "singulo:block/vending_machine_top",
+    "particle": "singulo:block/vending_machine_top"
+  },
+  "elements": [
+    {
+      "from": [
+        4.0,
+        0.0,
+        4.5
+      ],
+      "to": [
+        12.0,
+        8.0,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_lower",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#side_lower",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side_lower",
+          "uv": [
+            0,
+            0,
+            15,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side_lower",
+          "uv": [
+            1,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#top_lower",
+          "uv": [
+            0,
+            0,
+            16,
+            15
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4.0,
+        0.0,
+        4.49
+      ],
+      "to": [
+        12.0,
+        8.0,
+        4.495
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow_lower",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        4.0,
+        8.0,
+        4.5
+      ],
+      "to": [
+        12.0,
+        16.0,
+        12.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_upper",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#side_upper",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side_upper",
+          "uv": [
+            0,
+            0,
+            15,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side_upper",
+          "uv": [
+            1,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#top_upper",
+          "uv": [
+            0,
+            1,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4.0,
+        8.0,
+        4.49
+      ],
+      "to": [
+        12.0,
+        16.0,
+        4.495
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glow_upper",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      },
+      "forge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    }
+  ],
   "display": {
     "gui": {
       "rotation": [
@@ -8,9 +196,9 @@
         0
       ],
       "translation": [
-        0.189,
-        -0.095,
-        0.164
+        0.095,
+        -0.047,
+        0.082
       ],
       "scale": [
         0.5469,
@@ -27,7 +215,7 @@
       "translation": [
         0.0,
         3.0,
-        -0.107
+        -0.054
       ],
       "scale": [
         0.2188,
@@ -44,7 +232,7 @@
       "translation": [
         0.0,
         0.0,
-        -0.214
+        -0.107
       ],
       "scale": [
         0.4375,
@@ -59,9 +247,9 @@
         0
       ],
       "translation": [
-        -0.114,
-        2.61,
-        -0.029
+        -0.057,
+        2.555,
+        -0.015
       ],
       "scale": [
         0.3281,
@@ -76,9 +264,9 @@
         0
       ],
       "translation": [
-        -0.114,
-        2.61,
-        -0.029
+        -0.057,
+        2.555,
+        -0.015
       ],
       "scale": [
         0.3281,
@@ -93,9 +281,9 @@
         0
       ],
       "translation": [
-        -0.121,
+        -0.061,
         0.0,
-        -0.121
+        -0.061
       ],
       "scale": [
         0.35,
@@ -110,9 +298,9 @@
         0
       ],
       "translation": [
-        0.121,
+        0.061,
         0.0,
-        0.121
+        0.061
       ],
       "scale": [
         0.35,

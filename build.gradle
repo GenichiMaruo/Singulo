@@ -62,7 +62,7 @@ legacyForge {
             // Keep tests separate from development worlds and local server settings.
             gameDirectory = layout.buildDirectory.dir('gametest')
             // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
-            systemProperty 'forge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab')
+            systemProperty 'forge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review')
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -146,7 +146,7 @@ var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
 tasks.named('runGameTestServer') { dependsOn cleanGameTestWorld }
 
 // Minecraft's bootstrap can exit with status 0 before running any tests. Require the completion report.
-var selectedGameTestNamespace = providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab')
+var selectedGameTestNamespace = providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review')
 var gameTestResultLog = layout.buildDirectory.file('gametest/logs/latest.log')
 var verifyGameTestResults = tasks.register('verifyGameTestResults') {
     group = 'verification'
@@ -157,11 +157,23 @@ var verifyGameTestResults = tasks.register('verifyGameTestResults') {
             throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/<loader>/gametest/logs/latest.log')
         }
         def namespace = selectedGameTestNamespace
-        def expected = ['singulo': 291, 'singulo_automation': 72, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 15, 'singulo_mekanism': 2][namespace]
-        if (namespace == 'singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab') expected = 422
+        def expected = ['singulo': 338, 'singulo_automation': 75, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 28, 'singulo_cable': 16, 'singulo_rayleigh': 8, 'singulo_panel_review': 6, 'singulo_mekanism': 2][namespace]
+        if (namespace == 'singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review') expected = 515
         if (expected != null && result.group(1).toInteger() != expected) {
             throw new GradleException("Expected ${expected} required tests for ${namespace}, found ${result.group(1)}")
         }
     }
 }
 tasks.named('runGameTestServer') { finalizedBy verifyGameTestResults }
+
+// LegacyForge provides refmap generation and remapping for production obfuscated names.
+mixin {
+    add sourceSets.main, 'singulo.refmap.json'
+    config 'singulo.mixins.json'
+}
+dependencies {
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+// The legacy loader discovers production mixins through the JAR manifest.
+tasks.named('jar') { manifest.attributes('MixinConfigs': 'singulo.mixins.json') }

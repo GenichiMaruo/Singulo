@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.ruin;
 
-import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.List;
 import javax.annotation.Nullable;

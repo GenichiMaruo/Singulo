@@ -43,6 +43,11 @@ def validate_jar(path):
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
         check_layout(names)
+        assert 'MixinConfigs: singulo.mixins.json' in archive.read('META-INF/MANIFEST.MF').decode(), 'Production mixins not registered'
+        mixins = json.loads(archive.read('singulo.mixins.json'))
+        assert mixins['compatibilityLevel'] == 'JAVA_17', 'Incorrect mixin Java version'
+        refmap = json.loads(archive.read(mixins['refmap']))
+        assert refmap.get('mappings'), 'Production mixin refmap is empty'
         metadata = tomllib.loads(archive.read('META-INF/mods.toml').decode())
         mod = next(m for m in metadata['mods'] if m['modId'] == 'singulo')
         version = next(line.split('=', 1)[1].strip() for line in (ROOT / 'gradle.properties').read_text().splitlines() if line.startswith('mod_version='))

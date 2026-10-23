@@ -191,18 +191,17 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
     // ------------------------------------------------------------------ 点火と、ブラックホールができる瞬間
 
     /** 炉心ごとの、前に見た状態と、ブラックホールができた時刻（クライアント）。 */
-    private static final java.util.Map<net.minecraft.core.BlockPos, PenroseReactorBlockEntity.State> LAST_STATE = new java.util.HashMap<>();
-    private static final java.util.Map<net.minecraft.core.BlockPos, Long> FORMED_AT = new java.util.HashMap<>();
+    private static final java.util.Map<PenroseReactorBlockEntity, PenroseReactorBlockEntity.State> LAST_STATE = new java.util.WeakHashMap<>();
+    private static final java.util.Map<PenroseReactorBlockEntity, Long> FORMED_AT = new java.util.WeakHashMap<>();
     private static final int FLASH_TICKS = 40;
 
     /** 点火から稼働に変わった瞬間を見つけ、光と粒を出す。光っている間はその時刻を返す。 */
     @javax.annotation.Nullable
     private static Long trackFormation(PenroseReactorBlockEntity be, PenroseReactorBlockEntity.State state) {
-        net.minecraft.core.BlockPos pos = be.getBlockPos();
         long now = be.getLevel().getGameTime();
-        PenroseReactorBlockEntity.State last = LAST_STATE.put(pos.immutable(), state);
+        PenroseReactorBlockEntity.State last = LAST_STATE.put(be, state);
         if (last == PenroseReactorBlockEntity.State.IGNITING && state == PenroseReactorBlockEntity.State.RUNNING) {
-            FORMED_AT.put(pos.immutable(), now);
+            FORMED_AT.put(be, now);
             Vec3 c = be.coreCenter();
             var level = be.getLevel();
             var rnd = level.random;
@@ -215,9 +214,9 @@ public class PenroseReactorRenderer implements BlockEntityRenderer<PenroseReacto
                         c.y + rnd.nextGaussian() * 2, c.z + rnd.nextGaussian() * 2, 0, 0, 0);
             }
         }
-        Long at = FORMED_AT.get(pos);
+        Long at = FORMED_AT.get(be);
         if (at != null && now - at > FLASH_TICKS) {
-            FORMED_AT.remove(pos);
+            FORMED_AT.remove(be);
             return null;
         }
         return at;

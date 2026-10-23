@@ -1,0 +1,16 @@
+// Development-only real-lightmap and terrain capture; excluded from normal builds.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/rayleigh-src'))
+        legacyForge.runs.client {
+            gameDirectory = layout.buildDirectory.dir('rayleigh-review').get().asFile
+            systemProperty 'singulo.rayleighOutput', layout.buildDirectory.dir('rayleigh-review/screenshots').get().asFile.absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

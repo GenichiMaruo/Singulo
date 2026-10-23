@@ -426,7 +426,7 @@ public class ErgosphereLeviathan extends RuinBoss {
             Vec3 dir = head.subtract(last.pos()).normalize();
             trail.addFirst(new TrailPoint(head, dir, tickCount));
             while (trail.size() > 400) {
-                trail.removeLast();
+                trail.remove(trail.size() - 1);
             }
         }
     }

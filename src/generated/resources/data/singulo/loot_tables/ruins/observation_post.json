@@ -42,6 +42,34 @@
           "functions": []
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "singulo:blueprint_ruin_panels",
+          "weight": 45
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 55
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "singulo:blueprint_lighting",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 80
+        }
+      ]
     }
   ]
 }

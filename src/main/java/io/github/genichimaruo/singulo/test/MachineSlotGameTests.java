@@ -91,6 +91,7 @@ public final class MachineSlotGameTests {
         // 上の面を「入力だけ」に、後ろ（南）の面を「出力・自動排出」に
         m.setSide(0, SideConfig.Face.TOP, SideConfig.INPUT, false);
         m.setSide(0, SideConfig.Face.BACK, SideConfig.OUTPUT, true);
+        m.setEjectEnabled(0, true);
         m.setSide(0, SideConfig.Face.LEFT, SideConfig.NONE, false);
         IItemHandler top = Capabilities.get(helper.getLevel(), Capabilities.ItemHandler.BLOCK, abs, Direction.UP);
         IItemHandler left = Capabilities.get(helper.getLevel(), Capabilities.ItemHandler.BLOCK, abs,

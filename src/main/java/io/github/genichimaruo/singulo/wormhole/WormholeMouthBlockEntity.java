@@ -6,7 +6,6 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +74,9 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
     public static final double MOUTH_HEIGHT = 0.5;
 
     private static final Map<Level, Set<WormholeMouthBlockEntity>> LOADED = new WeakHashMap<>();
+
+    /** Release runtime references when this level closes. */
+    public static void forgetLevel(Level level) { LOADED.remove(level); }
 
     private final ItemStackHandler fuel = new ItemStackHandler(1) {
         @Override
@@ -306,7 +308,7 @@ public class WormholeMouthBlockEntity extends BlockEntity implements AbstractMac
             WormholeNetwork.get(level.getServer()).register(data.pair(), GlobalPos.of(level.dimension(), pos));
             registered = true;
         }
-        LOADED.computeIfAbsent(level, l -> Collections.newSetFromMap(new IdentityHashMap<>())).add(this);
+        LOADED.computeIfAbsent(level, l -> Collections.newSetFromMap(new WeakHashMap<>())).add(this);
         if (level.getGameTime() % 20 == 0) {
             GlobalPos p = partnerPos();
             crossDimension = p != null && !p.dimension().equals(level.dimension());

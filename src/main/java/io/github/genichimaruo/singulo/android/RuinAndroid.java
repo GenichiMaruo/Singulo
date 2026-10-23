@@ -2008,6 +2008,21 @@ public abstract class RuinAndroid extends Monster {
         return id < 0 ? null : level().getEntity(id);
     }
 
+    /**
+     * 技の光（斬撃の軌跡・衝撃波・鞭・ビットなど）が、本体からどこまで届くか（ブロック）。0 は届かない。
+     * 描画するかを決める箱をこの分だけ広げる（本体が画面の外でも、画面に入っている技の光は描く）。当たり判定は変えない。
+     */
+    protected double moveReach() {
+        return 0;
+    }
+
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        AABB box = super.getBoundingBoxForCulling();
+        double r = moveReach();
+        return r > 0 ? box.inflate(r, 1.5, r) : box;
+    }
+
     // ------------------------------------------------------------------ 状態
 
     public int state() {

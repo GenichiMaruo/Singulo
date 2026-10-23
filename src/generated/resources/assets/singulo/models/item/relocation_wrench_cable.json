@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "singulo:item/relocation_wrench_cable"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_ruin_panels"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "tag": "forge:gems/lapis"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:striped_ruin_panel"
+  }
+}

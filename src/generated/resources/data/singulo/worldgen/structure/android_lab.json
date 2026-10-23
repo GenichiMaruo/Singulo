@@ -1,7 +1,7 @@
 {
   "type": "singulo:android_lab",
   "biomes": "#singulo:has_structure/android_lab",
-  "step": "underground_structures",
+  "step": "fluid_springs",
   "spawn_overrides": {
     "monster": {
       "bounding_box": "full",

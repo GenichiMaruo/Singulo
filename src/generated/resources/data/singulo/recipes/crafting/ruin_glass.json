@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "item": "singulo:intact_ruin_glass"
+    },
+    {
+      "item": "minecraft:flint"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:ruin_glass"
+  }
+}

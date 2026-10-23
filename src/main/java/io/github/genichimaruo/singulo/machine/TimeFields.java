@@ -30,6 +30,9 @@ public final class TimeFields {
     /** 場の持ち主（装置の位置）→ 場。 */
     private static final Map<Level, Map<BlockPos, Field>> FIELDS = new WeakHashMap<>();
 
+    /** Release runtime references when this level closes. */
+    public static void forgetLevel(Level level) { FIELDS.remove(level); }
+
     /** 場を張る（radius が 0 以下なら外す）。owner は装置の位置、center は場の中心。 */
     public static void set(Level level, BlockPos owner, BlockPos center, int radius, boolean accelerate) {
         if (radius <= 0 || !accelerate && !dilationEnabled()) {

@@ -41,6 +41,49 @@ public class AndroidAccessoryItem extends Item implements net.minecraft.world.it
         return (hasCustomColor(stack) ? getColor(stack) : defaultColor) & 0xFFFFFF;
     }
 
+    /** ティーカップは右クリックで、受け皿にのったカップのブロックとして置ける（染めた色のまま）。 */
+    @Override
+    public net.minecraft.world.InteractionResult useOn(net.minecraft.world.item.context.UseOnContext context) {
+        if (!"teacup".equals(style)) {
+            return super.useOn(context);
+        }
+        net.minecraft.world.item.context.BlockPlaceContext place = new net.minecraft.world.item.context.BlockPlaceContext(context);
+        if (!place.canPlace()) {
+            return net.minecraft.world.InteractionResult.FAIL;
+        }
+        net.minecraft.world.level.Level level = context.getLevel();
+        net.minecraft.core.BlockPos pos = place.getClickedPos();
+        net.minecraft.world.level.block.Block block = io.github.genichimaruo.singulo.registry.SinguloBlocks.TEACUP.get();
+        net.minecraft.world.level.block.state.BlockState state = block.getStateForPlacement(place);
+        if (state == null || !state.canSurvive(level, pos)) {
+            return net.minecraft.world.InteractionResult.FAIL;
+        }
+        if (!level.isClientSide) {
+            level.setBlock(pos, state, net.minecraft.world.level.block.Block.UPDATE_ALL_IMMEDIATE);
+            ItemStack stack = context.getItemInHand();
+            if (level.getBlockEntity(pos) instanceof TeacupBlockEntity cup) {
+                cup.setColor(color(stack));
+            }
+            var sound = state.getSoundType(level, pos, context.getPlayer());
+            level.playSound(null, pos, sound.getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS,
+                    (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);
+            if (context.getPlayer() == null || !context.getPlayer().getAbilities().instabuild) stack.shrink(1);
+        }
+        return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> consumer) {
+        if (!style.equals("umbrella")) return;
+        consumer.accept(new net.minecraftforge.client.extensions.common.IClientItemExtensions() {
+            @Override
+            public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,
+                    net.minecraft.world.InteractionHand hand, ItemStack stack) {
+                return io.github.genichimaruo.singulo.client.UmbrellaArmPose.UMBRELLA;
+            }
+        });
+    }
+
     public static boolean isAccessory(ItemStack stack, int part) {
         return stack.getItem() instanceof AndroidAccessoryItem a && a.part == part;
     }

@@ -126,6 +126,14 @@ public enum MachineType {
     private static final java.util.Set<MachineType> CATALYST_TYPES = java.util.EnumSet.of(PRECISION_ASSEMBLER, LASER_COOLER,
             CASIMIR_CAVITY, TIME_CRYSTAL_INCUBATOR, SINGULARITY_ENCAPSULATOR);
 
+    /**
+     * 作るものを画面で指定できるか（{@link RecipeSelection}）。材料を種類と個数だけで指定するため、あるレシピの材料を
+     * 入れている途中が、別のレシピの材料と同じになることがある装置。
+     */
+    public boolean selectsRecipe() {
+        return this == PRECISION_ASSEMBLER || this == SINGULARITY_ENCAPSULATOR;
+    }
+
     /** 任意のブロックを質量として溜め、圧縮ブロックや質量ペレットにするモードを持つか。 */
     public boolean massMode() {
         return massMode;

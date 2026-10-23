@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_lighting"
+    },
+    {
+      "item": "singulo:white_ceramic_composite"
+    },
+    {
+      "item": "singulo:white_ceramic_composite"
+    },
+    {
+      "tag": "forge:dusts/redstone"
+    },
+    {
+      "tag": "forge:dusts/redstone"
+    },
+    {
+      "tag": "forge:dyes/red"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:emergency_light"
+  }
+}

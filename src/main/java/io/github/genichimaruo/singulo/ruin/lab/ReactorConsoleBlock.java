@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.ruin.lab;
 
-import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -38,7 +37,7 @@ public class ReactorConsoleBlock extends BaseEntityBlock {
 
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HorizontalDirectionalBlock.FACING, POWERED);
     }
 

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_lab_building"
+    },
+    {
+      "item": "singulo:lab_panel"
+    },
+    {
+      "item": "singulo:lab_panel"
+    },
+    {
+      "item": "singulo:lab_panel"
+    },
+    {
+      "item": "singulo:lab_panel"
+    },
+    {
+      "item": "minecraft:clay_ball"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:lab_tiles"
+  }
+}

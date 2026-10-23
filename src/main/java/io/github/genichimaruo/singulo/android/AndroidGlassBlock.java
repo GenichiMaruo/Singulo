@@ -46,7 +46,7 @@ public class AndroidGlassBlock extends HalfTransparentBlock {
 
     /** 6方向のつながり（使うのは無地のガラスだけ。模様のガラスはいつもつながらない）。 */
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(PipeBlock.NORTH, PipeBlock.SOUTH, PipeBlock.EAST, PipeBlock.WEST, PipeBlock.UP, PipeBlock.DOWN);
     }
 

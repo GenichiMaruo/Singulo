@@ -57,8 +57,14 @@ public class MultiblockPortBlockEntity extends PortBlockEntity {
         }
         for (Direction dir : Direction.values()) {
             BlockPos target = pos.relative(dir);
-            if (target.equals(controller) || !level.isLoaded(target)
-                    || level.getBlockState(target).getBlock() instanceof MultiblockPart) {
+            if (target.equals(controller) || !level.isLoaded(target)) {
+                continue;
+            }
+            // A port of another formed structure is a valid destination. Only our
+            // own ports/structure parts must be excluded to avoid feeding ourselves.
+            if (level.getBlockState(target).getBlock() instanceof MultiblockPart
+                    && !(level.getBlockEntity(target) instanceof PortBlockEntity other
+                    && other.controllerPos() != null && !other.controllerPos().equals(controller))) {
                 continue;
             }
             Direction from = dir.getOpposite();

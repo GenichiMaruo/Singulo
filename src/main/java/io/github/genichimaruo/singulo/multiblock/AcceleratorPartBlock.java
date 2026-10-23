@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.multiblock;
 
-import com.mojang.serialization.MapCodec;
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Locale;

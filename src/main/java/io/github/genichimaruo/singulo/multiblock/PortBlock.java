@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.multiblock;
 
-import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BaseEntityBlock;

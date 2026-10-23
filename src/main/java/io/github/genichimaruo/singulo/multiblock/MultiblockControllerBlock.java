@@ -1,7 +1,6 @@
 package io.github.genichimaruo.singulo.multiblock;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.genichimaruo.singulo.machine.MachineBlock;
 import io.github.genichimaruo.singulo.machine.MachineBlockEntity;

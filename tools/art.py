@@ -516,7 +516,7 @@ def compressed_block(level, metal):
 OUT = (26, 30, 38, 255)
 
 
-def outlined(draw_fn, size=S):
+def outlined(draw_fn, size=S, dark=0.62, tint=0.25, deep=True):
     """形を描き、外側に1ドットの暗い縁を付ける。"""
     im, d = new(size)
     draw_fn(d)
@@ -534,7 +534,11 @@ def outlined(draw_fn, size=S):
                 if cols:
                     # 輪郭は真っ黒にせず、内側の色をぐっと暗くした色
                     avg = tuple(sum(c[i] for c in cols) // len(cols) for i in range(3))
-                    po[x, y] = rgba(mix(darken(avg, 0.62), (40, 44, 60), 0.25))
+                    if deep:
+                        import art16
+                        po[x, y] = rgba(art16.deepen(avg, dark))
+                    else:
+                        po[x, y] = rgba(mix(darken(avg, dark), (40, 44, 60), tint))
     return out
 
 
@@ -545,7 +549,8 @@ def item_ingot(color):
         d.rectangle([5, 18, 20, 24], fill=rgba(front))
         d.polygon([(20, 18), (27, 11), (27, 17), (20, 24)], fill=rgba(side))
         d.line([(7, 19), (17, 19)], fill=rgba(lighten(color, 0.5)))
-    return outlined(f)
+    import art16
+    return art16.vcenter(outlined(f, **art16.SOFT_EDGE))
 
 
 def item_plate(color, lines=None, accent=None):
@@ -556,7 +561,8 @@ def item_plate(color, lines=None, accent=None):
         if lines:
             for k in range(lines):
                 d.line([(8 + k * 3, 12 + k), (16 + k * 3, 9 + k)], fill=rgba(accent or (120, 210, 240)))
-    return outlined(f)
+    import art16
+    return outlined(f, **art16.SOFT_EDGE)
 
 
 def item_circuit(board, chip, trace):
@@ -627,7 +633,7 @@ def item_card(stripe, blank=False):
     return outlined(f)
 
 
-def item_gem(color, facets=True):
+def item_gem(color, facets=True, star=False):
     def f(d):
         d.polygon([(16, 3), (25, 11), (22, 27), (10, 27), (7, 11)], fill=rgba(color))
         if facets:
@@ -635,6 +641,16 @@ def item_gem(color, facets=True):
             d.line([(16, 13), (16, 27)], fill=rgba(darken(color, 0.2)))
             d.line([(16, 13), (10, 27)], fill=rgba(darken(color, 0.1)))
             d.point((12, 8), fill=(255, 255, 255, 255))
+        if star:
+            # 中央に光る星: 白い芯から上下左右へのびる光（先ほど細く淡い）と、斜めの小さな輝き
+            glow, tip = rgba(lighten(color, 0.75)), rgba(lighten(color, 0.45))
+            d.rectangle([15, 13, 16, 22], fill=glow)
+            d.rectangle([11, 17, 20, 18], fill=glow)
+            d.line([(15.5, 10), (15.5, 25)], fill=tip)
+            d.line([(8, 17.5), (23, 17.5)], fill=tip)
+            for x, y in ((13, 15), (18, 15), (13, 20), (18, 20)):
+                d.point((x, y), fill=glow)
+            d.rectangle([15, 17, 16, 18], fill=(255, 255, 255, 255))
     return outlined(f)
 
 
@@ -887,10 +903,10 @@ ITEM_ART = {
     'degenerate_matter_shell': lambda: item_sphere_dark(None, white_seams=True),
     'time_crystal_catalyst': lambda: item_gem((255, 190, 90)),
     'time_crystal_module': lambda: item_module((236, 238, 244), (255, 190, 90)),
-    'awakening_record_core': lambda: item_gem((180, 120, 255)),
-    'awakening_echo_core': lambda: item_gem((120, 220, 255)),
-    'awakening_gravity_core': lambda: item_gem((255, 110, 140)),
-    'awakening_ergosphere_core': lambda: item_gem((150, 110, 255)),
+    'awakening_record_core': lambda: item_gem((180, 120, 255), star=True),
+    'awakening_echo_core': lambda: item_gem((120, 220, 255), star=True),
+    'awakening_gravity_core': lambda: item_gem((255, 110, 140), star=True),
+    'awakening_ergosphere_core': lambda: item_gem((150, 110, 255), star=True),
     'echo_chapter': lambda: item_scroll((232, 246, 255), (80, 196, 240)),
     'gravity_chapter': lambda: item_scroll((236, 226, 250), (140, 90, 230)),
     'horizon_chapter': lambda: item_scroll((242, 242, 255), (150, 190, 255)),
@@ -938,6 +954,10 @@ ITEM_ART = {
 
 
 def item_texture(iid, stage):
+    if iid == 'relocation_wrench':
+        import art16
+        return art16.relocation_wrench().resize((S, S), Image.Resampling.NEAREST)
+
     fn = ITEM_ART.get(iid)
     if fn is not None:
         return fn()

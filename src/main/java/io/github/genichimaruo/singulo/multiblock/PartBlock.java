@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.multiblock;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.block.Block;
 
 public class PartBlock extends Block implements MultiblockPart {

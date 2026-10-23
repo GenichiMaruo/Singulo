@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_ruin_panels"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "singulo:ruin_panel"
+    },
+    {
+      "item": "minecraft:charcoal"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:scorched_ruin_panel"
+  }
+}

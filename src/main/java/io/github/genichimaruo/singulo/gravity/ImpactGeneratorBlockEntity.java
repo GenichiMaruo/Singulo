@@ -18,7 +18,8 @@ import net.minecraftforge.energy.IEnergyStorage;
  * 余りを送り出す。外へ出せるのは、何面につないでも、隣から取り出される分と合わせて1 tick に PUSH_PER_TICK まで。
  * ケーブルから電力を受け取ることはない。
  * <p>
- * 6枚以上を働かせていると、残す分（パネル1枚あたり 4,000 FE）が容量を超えるので、外へは出さない。
+ * 低重力・高重力パネルは、既定の電力で6枚以上を働かせると予約が容量を超えるため、外へは出さない。
+ * 無重力・日照パネルでは、それぞれの実際の消費電力に応じて予約する。
  */
 public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
     public static final long ENERGY_PER_BLOCK = 1_000;
@@ -86,7 +87,8 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
 
     /** パネルのために残す分を除いた、外へ出せる量。 */
     public long surplus() {
-        long reserve = (long) perPanel() * supplyingPanels() * RESERVE_TICKS;
+        long demand = supplyingDemand();
+        long reserve = demand > Long.MAX_VALUE / RESERVE_TICKS ? Long.MAX_VALUE : demand * RESERVE_TICKS;
         return Math.max(0, stored - reserve);
     }
 

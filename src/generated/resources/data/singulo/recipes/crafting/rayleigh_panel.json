@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_rayleigh"
+    },
+    {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    {
+      "tag": "forge:glass_blocks/colorless"
+    },
+    {
+      "tag": "forge:dusts/glowstone"
+    },
+    {
+      "tag": "forge:dusts/glowstone"
+    },
+    {
+      "tag": "forge:gems/lapis"
+    },
+    {
+      "item": "singulo:basic_circuit"
+    },
+    {
+      "tag": "forge:plates/steel"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "singulo:rayleigh_panel"
+  }
+}

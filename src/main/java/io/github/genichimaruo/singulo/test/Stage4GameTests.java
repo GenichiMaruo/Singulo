@@ -183,6 +183,7 @@ public final class Stage4GameTests {
     /** 触媒でない物の時間加工（銅ブロック → 錆びた銅）は、電力が少しずつしか来なければ進まない（触媒の育成だけが不足でも進む）。 */
     @GameTest(template = EMPTY, timeoutTicks = 600)
     public static void incubatorNeedsFullPowerForPlainItems(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.TIME_CRYSTAL_INCUBATOR).get());
         MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);

@@ -10,7 +10,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 /** Versioned Forge 1.20.1 channel; handlers execute on the game thread. */
 public final class SinguloNetwork {
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(Singulo.id("main"),
-            () -> "3", "3"::equals, "3"::equals);
+            () -> "4", "4"::equals, "4"::equals);
     public static void register() {
         CHANNEL.messageBuilder(ToggleAreaPayload.class, 0, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(ToggleAreaPayload::encode).decoder(ToggleAreaPayload::decode)
@@ -42,6 +42,9 @@ public final class SinguloNetwork {
         CHANNEL.messageBuilder(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.class, 9, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload::encode).decoder(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload::decode)
                 .consumerMainThread((p, c) -> io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.handle(p, c.get())).add();
+        CHANNEL.messageBuilder(GlassesHeightPayload.class, 10, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(GlassesHeightPayload::encode).decoder(GlassesHeightPayload::decode)
+                .consumerMainThread((p, c) -> GlassesHeightPayload.handle(p, c.get())).add();
     }
     public static void sendToServer(Object packet) { CHANNEL.sendToServer(packet); }
     public static void sendToPlayer(ServerPlayer player, Object packet) {
