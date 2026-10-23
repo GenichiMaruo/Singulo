@@ -86,6 +86,12 @@ public final class V011ReviewHarness {
                 CameraType.FIRST_PERSON, 60, 80, NO_GLASSES, false));
         SHOTS.add(new Shot("zero-gravity", new Vec3(4.5, 84.0, 13.0), new Vec3(4.5, 79.5, 17.0), "rayleigh_panel", "zero_gravity_block",
                 CameraType.FIRST_PERSON, 30, 70, NO_GLASSES, false));
+        SHOTS.add(new Shot("items-0111", new Vec3(8.5, 82.0, -8.5), new Vec3(8.5, 81.0, -14.5), "pressure_crystal", "muon_catalyst",
+                CameraType.FIRST_PERSON, 15, 70, NO_GLASSES, false));
+        SHOTS.add(new Shot("private-room-lit", new Vec3(52.5, 81.7, 71.6), new Vec3(52.5, 86.0, 72.4), "", "",
+                CameraType.FIRST_PERSON, 20, 80, NO_GLASSES, false));
+        SHOTS.add(new Shot("private-corridor", new Vec3(60.5, 81.7, 67.5), new Vec3(52.0, 82.5, 72.0), "", "",
+                CameraType.FIRST_PERSON, 10, 80, NO_GLASSES, false));
         SHOTS.add(new Shot("glasses-screen", new Vec3(8.5, 82.0, -8.5), new Vec3(8.5, 82.0, -2.5), "survey_glasses", "",
                 CameraType.FIRST_PERSON, 15, 70, NO_GLASSES, true));
     }
@@ -233,6 +239,14 @@ public final class V011ReviewHarness {
         // lab rooms that replace the outdoors, with facility power restored (their ceilings are lab Rayleigh panels)
         placeRoom(level, "solarium", new BlockPos(50, 80, 0));
         placeRoom(level, "outdoor_test_ground", new BlockPos(50, 80, 30));
+        placeRoom(level, "private_rooms", new BlockPos(50, 80, 60));
+        // 南の西端の個室（x 51..53, z 71..73）のレバーだけ入れる
+        for (BlockPos p : BlockPos.betweenClosed(50, 85, 70, 54, 85, 74)) {
+            var st = level.getBlockState(p);
+            if (st.getBlock() instanceof net.minecraft.world.level.block.LeverBlock lever) {
+                lever.pull(st, level, p.immutable(), null);
+            }
+        }
         // zero-gravity blocks with a control box, a panel receiver and a creative source
         for (int x = -2; x <= 10; x++) for (int z = 9; z <= 22; z++) {
             level.setBlockAndUpdate(new BlockPos(x, 79, z), Blocks.SMOOTH_STONE.defaultBlockState());
