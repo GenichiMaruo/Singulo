@@ -1330,6 +1330,26 @@ def card(stripe, blank=False):
     return outlined(f)
 
 
+def pressure_gem():
+    """高圧結晶: 圧力で押し固められた八面体の宝石（淡い紫）。面ごとに明暗を分け、左右から押さえる圧力の印（括弧）を添える。
+    ミュオン触媒（青い結晶の束）と見分けがつくよう、形も色も変える。"""
+    im, d = new()
+    light, mid, dark, edge = (238, 214, 255), (182, 132, 236), (112, 70, 170), (58, 30, 96)
+    top, left, right, bottom = (8, 2), (3, 8), (12, 8), (8, 14)
+    d.polygon([top, left, (8, 8)], fill=rgba(light))
+    d.polygon([top, right, (8, 8)], fill=rgba(mid))
+    d.polygon([left, bottom, (8, 8)], fill=rgba(mid))
+    d.polygon([right, bottom, (8, 8)], fill=rgba(dark))
+    d.line([top, left, bottom, right, top], fill=rgba(edge))
+    d.line([left, right], fill=rgba(mix(mid, light, 0.5)))
+    d.point([(7, 4), (6, 5)], fill=(255, 255, 255, 255))
+    # 圧力の印: 左右の括弧
+    for x, dx in ((1, 1), (14, -1)):
+        d.line([(x, 5), (x, 11)], fill=rgba((150, 160, 176)))
+        d.point([(x + dx, 5), (x + dx, 11)], fill=rgba((150, 160, 176)))
+    return im
+
+
 def crystal_cluster(c, seed=0, spent=False, mark=None, star=False):
     """固まった結晶の塊: 傾いた六角柱を3本寄せ、光の当たる面・陰の面・稜線で立体感を出す。
     star なら、中央の結晶の真ん中に光る星（白い芯から上下左右へのびる光と、斜めの小さな輝き）を浮かべる（覚醒の核）。"""
@@ -2035,7 +2055,7 @@ ITEM_ART = {
     'meteoric_iron_ingot': lambda: vcenter(meteoric_ingot()),
     'stardust': lambda: center(stardust()),
     'fulgurite': fulgurite,
-    'pressure_crystal': lambda: crystal_cluster((60, 104, 206), seed=5, mark=(210, 235, 255)),
+    'pressure_crystal': lambda: pressure_gem(),
     'void_dust': void_dust,
     'coolant_cartridge': lambda: center(shrink(coolant_cartridge(), 'y')),
     'empty_coolant_cartridge': lambda: center(shrink(empty_coolant_cartridge(), 'y')),
