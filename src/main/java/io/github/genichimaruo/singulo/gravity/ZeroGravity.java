@@ -122,7 +122,8 @@ public final class ZeroGravity {
         if (gravity == null) {
             return;
         }
-        boolean in = inZone(living.level(), living.getX(), living.getY(), living.getZ());
+        // アンドロイドは足裏の磁気で床をとらえて、無重力の中でも自分で歩いて動ける（重力を変えない）
+        boolean in = !GravityEffects.selfPropelled(living) && inZone(living.level(), living.getX(), living.getY(), living.getZ());
         boolean has = gravity.hasModifier(ID);
         if (in && !has) {
             gravity.addTransientModifier(new AttributeModifier(ID, -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
