@@ -78,6 +78,14 @@ public final class V011ReviewHarness {
                 CameraType.FIRST_PERSON, 10, 80, NO_GLASSES, false));
         SHOTS.add(new Shot("rayleigh-lab", new Vec3(28.5, 81.7, 3.0), new Vec3(28.5, 84.0, 1.0), "", "",
                 CameraType.FIRST_PERSON, 10, 80, NO_GLASSES, false));
+        SHOTS.add(new Shot("solarium", new Vec3(61.5, 83.0, 2.5), new Vec3(56.0, 81.0, 12.0), "", "",
+                CameraType.FIRST_PERSON, 60, 80, NO_GLASSES, false));
+        SHOTS.add(new Shot("solarium-up", new Vec3(56.5, 82.0, 3.5), new Vec3(58.0, 88.0, 9.0), "", "",
+                CameraType.FIRST_PERSON, 10, 80, NO_GLASSES, false));
+        SHOTS.add(new Shot("outdoor", new Vec3(61.5, 86.0, 32.0), new Vec3(62.0, 81.0, 48.0), "", "",
+                CameraType.FIRST_PERSON, 60, 80, NO_GLASSES, false));
+        SHOTS.add(new Shot("zero-gravity", new Vec3(4.5, 84.0, 13.0), new Vec3(4.5, 79.5, 17.0), "rayleigh_panel", "zero_gravity_block",
+                CameraType.FIRST_PERSON, 30, 70, NO_GLASSES, false));
         SHOTS.add(new Shot("glasses-screen", new Vec3(8.5, 82.0, -8.5), new Vec3(8.5, 82.0, -2.5), "survey_glasses", "",
                 CameraType.FIRST_PERSON, 15, 70, NO_GLASSES, true));
     }
@@ -222,6 +230,23 @@ public final class V011ReviewHarness {
         level.setBlockAndUpdate(new BlockPos(29, 80, -3), Blocks.REDSTONE_LAMP.defaultBlockState());
         level.setBlockAndUpdate(new BlockPos(32, 80, -4), Blocks.DAYLIGHT_DETECTOR.defaultBlockState());
         level.setBlockAndUpdate(new BlockPos(33, 80, -4), Blocks.REDSTONE_LAMP.defaultBlockState());
+        // lab rooms that replace the outdoors, with facility power restored (their ceilings are lab Rayleigh panels)
+        placeRoom(level, "solarium", new BlockPos(50, 80, 0));
+        placeRoom(level, "outdoor_test_ground", new BlockPos(50, 80, 30));
+        // zero-gravity blocks with a control box, a panel receiver and a creative source
+        for (int x = -2; x <= 10; x++) for (int z = 9; z <= 22; z++) {
+            level.setBlockAndUpdate(new BlockPos(x, 79, z), Blocks.SMOOTH_STONE.defaultBlockState());
+            for (int y = 80; y <= 86; y++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+        }
+        var zombie = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
+        zombie.setNoAi(true);
+        zombie.setPersistenceRequired();
+        zombie.moveTo(3.5, 81.5, 17.5, 180, 0);
+        level.addFreshEntity(zombie);
+        for (int x = 2; x <= 6; x++) level.setBlockAndUpdate(new BlockPos(x, 79, 17), SinguloBlocks.ZERO_GRAVITY_BLOCK.get().defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(7, 79, 17), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get().defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(8, 79, 17), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get().defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(4, 80, 18), SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get().defaultBlockState());
         // armor stands wearing survey glasses at -2, 0 and +3 pixels
         int[] heights = {-2, 0, 3};
         for (int i = 0; i < heights.length; i++) {
@@ -240,6 +265,18 @@ public final class V011ReviewHarness {
         player.onUpdateAbilities();
         player.getInventory().clearContent();
         prepared = true;
+    }
+
+    private static void placeRoom(ServerLevel level, String name, BlockPos at) {
+        var template = level.getStructureManager().getOrCreate(Singulo.id("lab/" + name));
+        var size = template.getSize();
+        for (BlockPos p : BlockPos.betweenClosed(at.offset(-1, -1, -1), at.offset(size.getX(), size.getY(), size.getZ()))) {
+            level.setBlock(p, Blocks.STONE.defaultBlockState(), 2);
+        }
+        template.placeInWorld(level, at, at, new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings(),
+                level.getRandom(), 2);
+        io.github.genichimaruo.singulo.ruin.lab.LabPower.restore(level, new net.minecraft.world.level.levelgen.structure.BoundingBox(
+                at.getX(), at.getY(), at.getZ(), at.getX() + size.getX() - 1, at.getY() + size.getY() - 1, at.getZ() + size.getZ() - 1));
     }
 
     private static void place(ServerLevel level, BlockPos pos, String id, java.util.function.UnaryOperator<BlockState> extra) {
