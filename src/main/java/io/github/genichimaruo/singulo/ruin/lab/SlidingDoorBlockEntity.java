@@ -35,4 +35,8 @@ public class SlidingDoorBlockEntity extends BlockEntity {
         float v = Mth.lerp(partialTick, previous, slide);
         return v * v * (3 - 2 * v);
     }
+    @Override
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        return new net.minecraft.world.phys.AABB(worldPosition).inflate(0.5, 0, 0.5);
+    }
 }
