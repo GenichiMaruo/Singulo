@@ -80,6 +80,7 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.multiblock.MultiblockInteraction::onRightClickBlock);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.SealedContainerBlock::onRightClickBlock);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.gravity.GravityEffects::onEntityTick);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.gravity.ZeroGravity::onFall);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.nature.Fulgurite::onEntityJoin);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.HandbookItem::onLogin);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.AncientRecords::onLogin);

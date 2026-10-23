@@ -134,6 +134,15 @@ public final class ZeroGravity {
         }
     }
 
+    /** A fast fall can enter and land within one tick, before the post-tick distance reset. */
+    public static void onFall(net.neoforged.neoforge.event.entity.living.LivingFallEvent event) {
+        LivingEntity living = event.getEntity();
+        if (!living.level().isClientSide && inZone(living.level(), living.getX(), living.getY(), living.getZ())) {
+            event.setCanceled(true);
+            living.resetFallDistance();
+        }
+    }
+
     public static void forgetLevel(Level level) {
         ZONES.remove(level);
     }

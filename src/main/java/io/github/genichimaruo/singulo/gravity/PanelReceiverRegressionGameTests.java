@@ -74,6 +74,40 @@ public final class PanelReceiverRegressionGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void fastLandingInsideWeightlessZoneDoesNotHurt(GameTestHelper helper) {
+        helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
+        BlockPos control = PANEL.south();
+        helper.setBlock(control, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
+        ((ZeroGravityControllerBlockEntity) helper.getBlockEntity(control)).setHeight(1);
+        GravityReceiverBlockEntity receiver = receiver(helper);
+        tick(helper, receiver);
+        receiver.energy().receiveLong(ZeroGravity.costPerBlock(1), false);
+        tick(helper, receiver);
+        var zombie = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.ZOMBIE, PANEL.above(5));
+        try {
+            float health = zombie.getHealth();
+            zombie.fallDistance = 30;
+            zombie.move(net.minecraft.world.entity.MoverType.SELF, new net.minecraft.world.phys.Vec3(0, -8, 0));
+            helper.assertTrue(zombie.onGround(), "Fixture did not land");
+            helper.assertTrue(zombie.getHealth() == health, "Crossing a thin weightless zone and landing in one tick still causes fall damage");
+        } finally {
+            zombie.discard();
+        }
+        BlockPos outside = PANEL.east(3);
+        helper.setBlock(outside, net.minecraft.world.level.block.Blocks.STONE);
+        var controlZombie = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.ZOMBIE, outside.above(5));
+        try {
+            float health = controlZombie.getHealth();
+            controlZombie.fallDistance = 30;
+            controlZombie.move(net.minecraft.world.entity.MoverType.SELF, new net.minecraft.world.phys.Vec3(0, -8, 0));
+            helper.assertTrue(controlZombie.getHealth() < health, "Ordinary falls outside the powered zone must still cause damage");
+        } finally {
+            controlZombie.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void saturatedDemandDoesNotCreateFreePower(GameTestHelper helper) {
         helper.setBlock(PANEL, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos second = PANEL.east();
