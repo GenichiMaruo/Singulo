@@ -14,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 /**
  * スロットの少ない装置の画面をまとめたもの（ワームホール生成器・口・ポート、閉じ込めタンク、ハロー捕集器、ミュオン収集器、重力波検出器）。
@@ -117,7 +116,7 @@ public class DeviceMenu extends AbstractContainerMenu {
         this.host = host;
         int[][] at = slotPos(kind);
         for (int i = 0; i < kind.slots; i++) {
-            addSlot(new SlotItemHandler(items, i, at[i][0], at[i][1]) {
+            addSlot(new NotifyingItemSlot(items, i, at[i][0], at[i][1]) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     // 燃料を入れられるのは口だけ。生成器とミュオン収集器は取り出すだけ

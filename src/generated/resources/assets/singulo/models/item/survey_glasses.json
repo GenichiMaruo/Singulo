@@ -10,5 +10,61 @@
     "head": {
       "parent": "singulo:item/survey_glasses_worn"
     }
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "singulo:height": 0.0
+      },
+      "model": "singulo:item/survey_glasses_hm4"
+    },
+    {
+      "predicate": {
+        "singulo:height": 0.125
+      },
+      "model": "singulo:item/survey_glasses_hm3"
+    },
+    {
+      "predicate": {
+        "singulo:height": 0.25
+      },
+      "model": "singulo:item/survey_glasses_hm2"
+    },
+    {
+      "predicate": {
+        "singulo:height": 0.375
+      },
+      "model": "singulo:item/survey_glasses_hm1"
+    },
+    {
+      "predicate": {
+        "singulo:height": 0.5
+      },
+      "model": "singulo:item/survey_glasses_h0"
+    },
+    {
+      "predicate": {
+        "singulo:height": 0.625
+      },
+      "model": "singulo:item/survey_glasses_hp1"
+    },
+    {
+      "predicate": {
+        "singulo:height": 0.75
+      },
+      "model": "singulo:item/survey_glasses_hp2"
+    },
+    {
+      "predicate": {
+        "singulo:height": 0.875
+      },
+      "model": "singulo:item/survey_glasses_hp3"
+    },
+    {
+      "predicate": {
+        "singulo:height": 1.0
+      },
+      "model": "singulo:item/survey_glasses_hp4"
+    }
+  ]
 }

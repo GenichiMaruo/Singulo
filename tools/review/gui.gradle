@@ -4,8 +4,10 @@ allprojects {
         sourceSets.main.java.srcDir(file('tools/review/gui-src'))
         legacyForge.runs.client {
             gameDirectory = layout.buildDirectory.dir('gui-review').get().asFile
-            systemProperty 'singulo.guiReviewOutput', layout.buildDirectory.dir('gui-review/screenshots').get().asFile.absolutePath
+            systemProperty 'singulo.sidesGuiReview', providers.gradleProperty('sidesGuiReview').isPresent().toString()
             systemProperty 'singulo.machineGuiReview', providers.gradleProperty('machineGuiReview').isPresent().toString()
+            systemProperty 'singulo.selectorGuiReview', providers.gradleProperty('selectorGuiReview').isPresent().toString()
+            systemProperty 'singulo.guiReviewOutput', layout.buildDirectory.dir('gui-review/screenshots').get().asFile.absolutePath
             programArgument '--quickPlaySingleplayer'
             programArgument 'Review'
             programArgument '--width'

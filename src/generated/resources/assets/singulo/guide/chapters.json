@@ -84,6 +84,7 @@
       "pages": [
         "power.cables",
         "power.sides",
+        "power.relocation",
         "power.wormhole"
       ]
     },

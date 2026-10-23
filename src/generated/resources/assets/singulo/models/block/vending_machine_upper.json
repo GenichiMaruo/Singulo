@@ -2,11 +2,11 @@
   "parent": "minecraft:block/block",
   "render_type": "minecraft:cutout",
   "textures": {
-    "side": "singulo:block/vending_machine_front_lower",
     "front": "singulo:block/vending_machine_front_upper",
     "glow": "singulo:block/vending_machine_front_upper_glow",
-    "body": "singulo:block/lab_plastic",
-    "particle": "singulo:block/lab_plastic"
+    "side": "singulo:block/vending_machine_side_upper",
+    "top": "singulo:block/vending_machine_top",
+    "particle": "singulo:block/vending_machine_top"
   },
   "elements": [
     {
@@ -25,16 +25,16 @@
           "texture": "#front"
         },
         "south": {
-          "texture": "#body"
+          "texture": "#side"
         },
         "east": {
-          "texture": "#body"
+          "texture": "#side"
         },
         "west": {
-          "texture": "#body"
+          "texture": "#side"
         },
         "up": {
-          "texture": "#body"
+          "texture": "#top"
         }
       }
     },

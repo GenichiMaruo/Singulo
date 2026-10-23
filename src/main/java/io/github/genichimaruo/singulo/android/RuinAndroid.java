@@ -1714,7 +1714,7 @@ public abstract class RuinAndroid extends Monster {
     /** 経路探しで、進入禁止ゾーンを通れないところとして扱う。 */
     @Override
     protected net.minecraft.world.entity.ai.navigation.PathNavigation createNavigation(Level level) {
-        return new net.minecraft.world.entity.ai.navigation.GroundPathNavigation(this, level) {
+        return new io.github.genichimaruo.singulo.compat.LegacyConstructors.GroundNavigation(this, level) {
             @Override
             protected net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int maxVisitedNodes) {
                 this.nodeEvaluator = new net.minecraft.world.level.pathfinder.WalkNodeEvaluator() {
@@ -1782,6 +1782,26 @@ public abstract class RuinAndroid extends Monster {
 
     /** 廃アンドロイド工場の製造ラインが印刷した個体（何も落とさず、経験値もない）と、そのうちの試作機（体力はそのまま）。 */
     private boolean factoryMade, prototype;
+    /**
+     * 遺構・研究所の印刷台が印刷した個体か。この個体だけが、プレイヤーに倒されると部品を少し落とす（{@link #FACILITY_LOOT}）。
+     * スポーンエッグやコマンド、ほかの mod で出した個体には付かない（保存される）。
+     */
+    private boolean facilitySpawned;
+    public static final net.minecraft.resources.ResourceLocation FACILITY_LOOT = io.github.genichimaruo.singulo.Singulo.id("entities/facility_android");
+
+    /** 印刷台が印刷した印を付ける。 */
+    public void markFacilitySpawned() {
+        facilitySpawned = true;
+    }
+
+    public boolean facilitySpawned() {
+        return facilitySpawned;
+    }
+
+    @Override
+    protected net.minecraft.resources.ResourceLocation getDefaultLootTable() {
+        return facilitySpawned ? FACILITY_LOOT : super.getDefaultLootTable();
+    }
 
     /** 工場で印刷された個体にする。量産型（prototype でない）は体力が半分。 */
     public void makeFactoryMade(boolean prototype) {
@@ -2008,6 +2028,21 @@ public abstract class RuinAndroid extends Monster {
         return id < 0 ? null : level().getEntity(id);
     }
 
+    /**
+     * 技の光（斬撃の軌跡・衝撃波・鞭・ビットなど）が、本体からどこまで届くか（ブロック）。0 は届かない。
+     * 描画するかを決める箱をこの分だけ広げる（本体が画面の外でも、画面に入っている技の光は描く）。当たり判定は変えない。
+     */
+    protected double moveReach() {
+        return 0;
+    }
+
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        AABB box = super.getBoundingBoxForCulling();
+        double r = moveReach();
+        return r > 0 ? box.inflate(r, 1.5, r) : box;
+    }
+
     // ------------------------------------------------------------------ 状態
 
     public int state() {
@@ -2145,7 +2180,7 @@ public abstract class RuinAndroid extends Monster {
         goalSelector.addGoal(3, new StashGoal());
         goalSelector.addGoal(4, life);
         goalSelector.addGoal(5, new GuardGoal());
-        goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
+        goalSelector.addGoal(6, new io.github.genichimaruo.singulo.compat.LegacyConstructors.StrollGoal(this, 0.7) {
             @Override
             public boolean canUse() {
                 return (!guard || mode == MODE_WANDER) && super.canUse();
@@ -2155,7 +2190,7 @@ public abstract class RuinAndroid extends Monster {
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         // 遺構のものはプレイヤーを、護衛は敵対モブと、許可証に載っていない人を狙う。
         // 護衛は、許可証に載っている人（許可証がなければ、だれでも）に打たれても仕返ししない
-        targetSelector.addGoal(1, new HurtByTargetGoal(this) {
+        targetSelector.addGoal(1, new io.github.genichimaruo.singulo.compat.LegacyConstructors.RetaliationGoal(this) {
             @Override
             public boolean canUse() {
                 return super.canUse() && !(guard && (getLastHurtByMob() instanceof Player p && !intruder(p)
@@ -2437,6 +2472,7 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putBoolean("facility_spawned", facilitySpawned);
         tag.putInt("charge", charge());
         tag.putInt("print", entityData.get(PRINT));
         if (home != null) {
@@ -2493,6 +2529,7 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        facilitySpawned = tag.getBoolean("facility_spawned");
         if (tag.contains("charge")) {
             setCharge(tag.getInt("charge"));
         }

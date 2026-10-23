@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CWC",
+    "WBW",
+    "CWC"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_ruin_panels"
+    },
+    "C": {
+      "tag": "forge:cobblestone/normal"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "singulo:ruin_panel"
+  }
+}

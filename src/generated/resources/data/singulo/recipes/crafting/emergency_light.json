@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WDW",
+    "RBR"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lighting"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "D": {
+      "tag": "forge:dyes/red"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:emergency_light"
+  }
+}

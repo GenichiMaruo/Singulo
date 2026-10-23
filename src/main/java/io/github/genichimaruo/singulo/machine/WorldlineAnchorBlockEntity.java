@@ -35,6 +35,15 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
      * 止める・壊す・触媒が切れると枠が空く。動き出した時刻は保存するので、再起動しても同じものが残る。
      */
     private static final java.util.Map<java.util.UUID, java.util.Map<String, Long>> ACTIVE = new java.util.HashMap<>();
+    /** Drop runtime quota entries for a closed dimension; saved start times remain unchanged. */
+    public static void forgetLevel(Level level) {
+        String prefix = level.dimension().location() + "@";
+        ACTIVE.entrySet().removeIf(e -> {
+            e.getValue().keySet().removeIf(key -> key.startsWith(prefix));
+            return e.getValue().isEmpty();
+        });
+    }
+
     /** 動き出したゲーム時刻（止まっていれば -1）。 */
     private long startedAt = -1;
 
@@ -205,13 +214,18 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
         }
     }
 
-    @Override
-    public void onBroken(Level level) {
+    /** Remove this position's tickets and owner quota without dropping its catalyst. */
+    public void prepareForRelocation() {
         if (level instanceof ServerLevel server) {
             forceChunks(server, loadedRadius, false);
             loadedRadius = -1;
         }
         claim(false);
+    }
+
+    @Override
+    public void onBroken(Level level) {
+        prepareForRelocation();
         super.onBroken(level);
     }
 

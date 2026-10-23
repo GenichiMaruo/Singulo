@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.ruin.lab;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
@@ -21,12 +20,13 @@ public class LabFacingBlock extends HorizontalDirectionalBlock {
 
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, POWERED);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        // 置いたもの（設計図から作ったもの）は動いている状態で置く。研究所の中のものは構造物として置かれ、電力が戻ると動く
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(POWERED, true);
     }
 }

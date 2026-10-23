@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GFG",
+    "GBG"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_ruin_glass"
+    },
+    "G": {
+      "item": "singulo:intact_ruin_glass"
+    },
+    "F": {
+      "item": "minecraft:flint"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:ruin_glass"
+  }
+}

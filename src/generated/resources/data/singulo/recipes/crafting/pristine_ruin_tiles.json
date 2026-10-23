@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "P P"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_pristine_ruin"
+    },
+    "P": {
+      "item": "singulo:pristine_ruin_panel"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:pristine_ruin_tiles"
+  }
+}

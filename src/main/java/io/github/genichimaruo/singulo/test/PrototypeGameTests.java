@@ -53,6 +53,7 @@ public final class PrototypeGameTests {
     @GameTest(template = "empty")
     @SuppressWarnings("removal")
     public static void prototypeMemoriesMissingFirst(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
         Set<AndroidKind> got = new HashSet<>();
         got.add(PrototypeMemories.next(player, player.getRandom()));

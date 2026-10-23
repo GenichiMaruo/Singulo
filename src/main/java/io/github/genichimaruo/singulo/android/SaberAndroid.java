@@ -66,6 +66,13 @@ public class SaberAndroid extends RuinAndroid {
     static final int COST_WAVE = 295;
     static final int COST_CUT = 60;
 
+    /** 薙ぎ払い・突きの軌跡と、光の盾（飛ぶ斬撃は別の実体なので、それ自身で描かれる）。 */
+    @Override
+    protected double moveReach() {
+        int s = state();
+        return s >= STATE_THRUST_WINDUP && s <= STATE_CUT ? THRUST_REACH + 1 : 0;
+    }
+
     public SaberAndroid(EntityType<? extends SaberAndroid> type, Level level) {
         super(type, level);
     }

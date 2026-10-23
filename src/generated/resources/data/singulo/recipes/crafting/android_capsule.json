@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GFG",
+    "GBG",
+    "FD "
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "F": {
+      "item": "singulo:lab_frame"
+    },
+    "D": {
+      "tag": "singulo:ceramic_flux"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:android_capsule"
+  }
+}

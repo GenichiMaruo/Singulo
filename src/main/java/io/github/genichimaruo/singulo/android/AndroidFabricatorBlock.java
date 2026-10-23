@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.android;
 
-import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;

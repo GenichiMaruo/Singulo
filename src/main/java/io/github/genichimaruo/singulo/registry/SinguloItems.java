@@ -36,6 +36,23 @@ public final class SinguloItems {
             "unstable_wormhole_mouth", () -> new io.github.genichimaruo.singulo.wormhole.UnstableMouthItem(new Item.Properties().rarity(Rarity.EPIC), 5));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.BlackHoleBombItem> BLACK_HOLE_BOMB = ITEMS.register(
             "black_hole_bomb", () -> new io.github.genichimaruo.singulo.item.BlackHoleBombItem(new Item.Properties().rarity(Rarity.EPIC), 5));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.RelocationWrenchItem> RELOCATION_WRENCH = ITEMS.register(
+            "relocation_wrench", () -> new io.github.genichimaruo.singulo.item.RelocationWrenchItem(new Item.Properties(), 1));
+    /** 施設の建材の設計図（作業台で素材と並べると建材ができ、設計図は残る）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RUIN_PANELS = ITEMS.register(
+            "blueprint_ruin_panels", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_PRISTINE_RUIN = ITEMS.register(
+            "blueprint_pristine_ruin", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RUIN_GLASS = ITEMS.register(
+            "blueprint_ruin_glass", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LIGHTING = ITEMS.register(
+            "blueprint_lighting", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LAB_BUILDING = ITEMS.register(
+            "blueprint_lab_building", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_LAB_FURNITURE = ITEMS.register(
+            "blueprint_lab_furniture", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
+    public static final RegistryObject<io.github.genichimaruo.singulo.item.BlueprintItem> BLUEPRINT_RAYLEIGH = ITEMS.register(
+            "blueprint_rayleigh", () -> new io.github.genichimaruo.singulo.item.BlueprintItem(new Item.Properties(), 1));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.SettingsCardItem> SETTINGS_CARD = ITEMS.register(
             "settings_card", () -> new io.github.genichimaruo.singulo.item.SettingsCardItem(new Item.Properties(), 1));
     public static final RegistryObject<io.github.genichimaruo.singulo.item.ShieldPermitItem> SHIELD_PERMIT = ITEMS.register(
@@ -94,6 +111,9 @@ public final class SinguloItems {
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_HEADDRESS = ITEMS.register(
             "android_headdress", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "headdress", 0xF5F5F5));
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_GLASSES = ITEMS.register(
+            "android_glasses", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
+                    io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD, "glasses", 0x3A3F4A));
     public static final RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem> ANDROID_CAPE = ITEMS.register(
             "android_cape", () -> new io.github.genichimaruo.singulo.android.AndroidAccessoryItem(new Item.Properties(),
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.BACK, "cape", 0x8E2F3F));
@@ -117,7 +137,7 @@ public final class SinguloItems {
                     io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND, "umbrella", 0x4A78C8));
     /** アンドロイドの装飾の一覧（染めた色の付け方・描き方で使う）。 */
     public static final java.util.List<RegistryObject<io.github.genichimaruo.singulo.android.AndroidAccessoryItem>> ACCESSORIES = java.util.List.of(
-            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA);
+            ANDROID_RIBBON, ANDROID_HAIR_FLOWER, ANDROID_BERET, ANDROID_HEADDRESS, ANDROID_GLASSES, ANDROID_CAPE, ANDROID_SCARF, ANDROID_WAIST_RIBBON, ANDROID_BOOK, ANDROID_BOUQUET, ANDROID_TEACUP, ANDROID_UMBRELLA);
     /** 流体の見本（作業の自動化の内部の目印。手に入れる物ではない）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.android.work.FluidSampleItem> FLUID_SAMPLE = ITEMS.register(
             "fluid_sample", () -> new io.github.genichimaruo.singulo.android.work.FluidSampleItem(new Item.Properties()));
@@ -181,6 +201,14 @@ public final class SinguloItems {
             Map.entry("shield_permit", 5),
             Map.entry("black_hole_bomb", 5),
             Map.entry("settings_card", 1),
+            Map.entry("relocation_wrench", 1),
+            Map.entry("blueprint_ruin_panels", 1),
+            Map.entry("blueprint_pristine_ruin", 1),
+            Map.entry("blueprint_ruin_glass", 1),
+            Map.entry("blueprint_lighting", 1),
+            Map.entry("blueprint_lab_building", 1),
+            Map.entry("blueprint_lab_furniture", 1),
+            Map.entry("blueprint_rayleigh", 1),
             Map.entry("metric_drive", 5),
             Map.entry("unstable_wormhole_mouth", 5),
             Map.entry("holo_projector", 1),
@@ -195,6 +223,7 @@ public final class SinguloItems {
             Map.entry("android_ribbon", 1),
             Map.entry("android_hair_flower", 1),
             Map.entry("android_beret", 1),
+            Map.entry("android_glasses", 1),
             Map.entry("android_headdress", 1),
             Map.entry("android_cape", 1),
             Map.entry("android_scarf", 1),
@@ -226,6 +255,7 @@ public final class SinguloItems {
         }
         TAB_ORDER.add(HANDBOOK);
         TAB_ORDER.add(SETTINGS_CARD);
+        TAB_ORDER.add(RELOCATION_WRENCH);
         TAB_ORDER.add(HOLO_PROJECTOR);
         TAB_ORDER.add(EXPLORER_COMPASS);
         TAB_ORDER.add(METEOR_COMPASS);
@@ -330,6 +360,8 @@ public final class SinguloItems {
         block(SinguloBlocks.LOW_GRAVITY_PANEL, 3);
         block(SinguloBlocks.HIGH_GRAVITY_PANEL, 3);
         block(SinguloBlocks.GRAVITY_PANEL_RECEIVER, 3);
+        block(SinguloBlocks.ZERO_GRAVITY_BLOCK, 3);
+        block(SinguloBlocks.ZERO_GRAVITY_CONTROLLER, 3);
         block(SinguloBlocks.IMPACT_GENERATOR, 3);
         block(SinguloBlocks.KERAUNOS_TOWER, 3);
         block(SinguloBlocks.DEEP_SEA_COLLECTOR, 3);
@@ -356,6 +388,7 @@ public final class SinguloItems {
             block(ruin, 1);
         }
         block(SinguloBlocks.WHITE_PANEL, 1);
+        block(SinguloBlocks.WHITE_SLIDING_DOOR, 1);
         block(SinguloBlocks.WHITE_LIGHT_PANEL, 1);
         block(SinguloBlocks.BISMUTH_CRYSTAL_BLOCK, 2);
         block(SinguloBlocks.GLOWING_BISMUTH_CRYSTAL, 2);
@@ -386,9 +419,12 @@ public final class SinguloItems {
         block(SinguloBlocks.LAB_GLASS, 1);
         block(SinguloBlocks.FACILITY_LIGHT, 1);
         block(SinguloBlocks.EMERGENCY_LIGHT, 1);
+        block(SinguloBlocks.ROOM_LIGHT, 1);
         block(SinguloBlocks.REACTOR_CORE, 1);
         block(SinguloBlocks.POWER_CONDUIT, 1);
         block(SinguloBlocks.PRESSURE_HULL, 1);
+        block(SinguloBlocks.WELDED_HATCH, 1);
+        block(SinguloBlocks.LAB_DOOR, 1);
         block(SinguloBlocks.BULKHEAD, 1);
         block(SinguloBlocks.REACTOR_CONSOLE, 1);
         block(SinguloBlocks.SERVER_RACK, 1);
@@ -399,6 +435,8 @@ public final class SinguloItems {
         block(SinguloBlocks.VENDING_MACHINE, 1);
         block(SinguloBlocks.PAPER_STACK, 1);
         block(SinguloBlocks.TRASH_BIN, 1);
+        block(SinguloBlocks.LAB_RAYLEIGH_PANEL, 1);
+        block(SinguloBlocks.RAYLEIGH_PANEL, 1);
         TAB_ORDER.add(SECURITY_DRONE_SPAWN_EGG);
         TAB_ORDER.add(BLADE_ANDROID_SPAWN_EGG);
         TAB_ORDER.add(WHIP_ANDROID_SPAWN_EGG);
@@ -446,6 +484,9 @@ public final class SinguloItems {
             props.rarity(Rarity.EPIC);
         } else if (def.stage() >= 4) {
             props.rarity(Rarity.RARE);
+        }
+        if (io.github.genichimaruo.singulo.item.DrinkItem.DRINKS.containsKey(def.id())) {
+            return new io.github.genichimaruo.singulo.item.DrinkItem(props, def.stage(), def.id());   // 自販機の缶・コーヒー
         }
         return switch (def.kind()) {
             case "uses" -> new UsesItem(props, def.stage(), def.maxUses(), false);

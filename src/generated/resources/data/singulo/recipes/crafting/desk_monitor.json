@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "G ",
+    "BK",
+    "S "
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "K": {
+      "item": "singulo:basic_circuit"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:desk_monitor"
+  }
+}

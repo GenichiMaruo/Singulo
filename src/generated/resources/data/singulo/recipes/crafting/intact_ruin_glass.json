@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GWG",
+    "GBG"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_ruin_glass"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:intact_ruin_glass"
+  }
+}

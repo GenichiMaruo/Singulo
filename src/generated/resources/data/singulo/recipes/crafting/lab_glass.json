@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GSG",
+    "GBG"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_building"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:lab_glass"
+  }
+}

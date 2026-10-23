@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LL",
+    "PR",
+    "LL"
+  ],
+  "key": {
+    "L": {
+      "item": "singulo:white_panel"
+    },
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "singulo:white_sliding_door"
+  }
+}

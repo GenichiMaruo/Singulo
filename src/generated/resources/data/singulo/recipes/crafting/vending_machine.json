@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS",
+    "SBS",
+    "DKG"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "D": {
+      "tag": "forge:dyes/red"
+    },
+    "K": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:vending_machine"
+  }
+}

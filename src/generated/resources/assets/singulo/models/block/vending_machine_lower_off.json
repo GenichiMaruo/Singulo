@@ -1,0 +1,40 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "front": "singulo:block/vending_machine_front_lower_off",
+    "side": "singulo:block/vending_machine_side_lower",
+    "top": "singulo:block/vending_machine_top",
+    "particle": "singulo:block/vending_machine_top"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        1
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "down": {
+          "texture": "#top"
+        }
+      }
+    }
+  ]
+}

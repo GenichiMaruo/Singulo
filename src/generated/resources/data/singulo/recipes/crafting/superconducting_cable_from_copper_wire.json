@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:superconducting_wire"
+    },
+    {
+      "item": "singulo:copper_wire"
+    },
+    {
+      "item": "singulo:copper_wire"
+    },
+    {
+      "item": "singulo:copper_wire"
+    },
+    {
+      "item": "singulo:copper_wire"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "item": "singulo:superconducting_cable"
+  }
+}

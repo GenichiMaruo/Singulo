@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.wormhole;
 
 import io.github.genichimaruo.singulo.item.ExoticCharge;
+import io.github.genichimaruo.singulo.machine.NotifyingItemSlot;
 import io.github.genichimaruo.singulo.machine.SyncedInts;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
 import javax.annotation.Nullable;
@@ -13,7 +14,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 /** ワームホール固定化装置の画面。左右の2つの喉（口を入れる）と、エキゾチック物質・口の筐体。 */
 public class WormholeStabilizerMenu extends AbstractContainerMenu {
@@ -36,7 +36,7 @@ public class WormholeStabilizerMenu extends AbstractContainerMenu {
         this.data = data;
         for (int i = 0; i < WormholeStabilizerBlockEntity.SLOTS; i++) {
             final int index = i;
-            addSlot(new SlotItemHandler(items, i, SLOT_POS[i][0], SLOT_POS[i][1]) {
+            addSlot(new NotifyingItemSlot(items, i, SLOT_POS[i][0], SLOT_POS[i][1]) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return index == WormholeStabilizerBlockEntity.SLOT_FUEL ? ExoticCharge.isExoticMatter(stack)

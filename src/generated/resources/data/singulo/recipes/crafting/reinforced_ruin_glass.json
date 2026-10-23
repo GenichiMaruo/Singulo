@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SOS",
+    "GBG",
+    "G G"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_ruin_glass"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    },
+    "O": {
+      "tag": "forge:obsidian"
+    },
+    "G": {
+      "item": "singulo:intact_ruin_glass"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:reinforced_ruin_glass"
+  }
+}

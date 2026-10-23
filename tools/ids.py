@@ -29,6 +29,7 @@ MOD = {
     '基礎回路': ('basic_circuit', 'Basic Circuit', 'item'),
     'Singuloハンドブック': ('handbook', 'Singulo Handbook', 'tool'),
     'ホロ投影機': ('holo_projector', 'Holo Projector', 'tool'),
+    '移設レンチ': ('relocation_wrench', 'Relocation Wrench', 'tool'),
     '設定カード': ('settings_card', 'Settings Card', 'tool'),
     '探索コンパス': ('explorer_compass', 'Explorer\'s Compass', 'tool'),
     '隕石コンパス': ('meteor_compass', 'Meteor Compass', 'tool'),
@@ -43,6 +44,7 @@ MOD = {
     'ニホニウム板': ('nihonium_plate', 'Nihonium Plate', 'item'),
     'ニホニウム筐体': ('nihonium_frame', 'Nihonium Frame', 'item'),
     '未焼成の蛍光体': ('unfired_phosphor', 'Unfired Phosphor', 'item'),
+    '未焼成のティーカップ': ('unfired_teacup', 'Unfired Teacup', 'item'),
     '水素燃料電池': ('hydrogen_fuel_cell', 'Hydrogen Fuel Cell', 'machine'),
     'ペルチェ冷却器': ('peltier_cooler', 'Peltier Cooler', 'machine'),
     'ビスマス結晶ブロック': ('bismuth_crystal_block', 'Bismuth Crystal Block', 'deco'),
@@ -148,6 +150,15 @@ MOD = {
     'リボン': ('android_ribbon', 'Ribbon', 'tool'),
     '髪飾り': ('android_hair_flower', 'Hair Flower', 'tool'),
     'ベレー帽': ('android_beret', 'Beret', 'tool'),
+    'メガネ': ('android_glasses', 'Glasses', 'tool'),
+    # 施設の建材の設計図（tools/blueprints.py。作業台で素材と並べると建材ができ、設計図は残る）
+    '遺構パネルの設計図': ('blueprint_ruin_panels', 'Ruin Panel Blueprint', 'tool'),
+    '無垢の遺構建材の設計図': ('blueprint_pristine_ruin', 'Pristine Ruin Material Blueprint', 'tool'),
+    '遺構ガラスの設計図': ('blueprint_ruin_glass', 'Ruin Glass Blueprint', 'tool'),
+    '照明の設計図': ('blueprint_lighting', 'Lighting Blueprint', 'tool'),
+    '研究所建材の設計図': ('blueprint_lab_building', 'Laboratory Material Blueprint', 'tool'),
+    '研究所の調度品の設計図': ('blueprint_lab_furniture', 'Laboratory Furnishing Blueprint', 'tool'),
+    'レイリー散乱パネルの設計図': ('blueprint_rayleigh', 'Rayleigh Sky Panel Blueprint', 'tool'),
     'ヘッドドレス': ('android_headdress', 'Headdress', 'tool'),
     'マント': ('android_cape', 'Cape', 'tool'),
     'マフラー': ('android_scarf', 'Scarf', 'tool'),
@@ -172,10 +183,12 @@ MOD = {
     '慣性スタビライザー': ('inertial_stabilizer', 'Inertial Stabilizer', 'machine'),
     '残響共鳴器': ('echo_resonator', 'Echo Resonator', 'machine'),
     '慣性制御ガントレット': ('inertial_control_gauntlet', 'Inertial Control Gauntlet', 'tool'),
-    '重力パネル受電器': ('gravity_panel_receiver', 'Gravity Panel Receiver', 'gravity'),
+    'パネル受電器': ('gravity_panel_receiver', 'Panel Receiver', 'gravity'),
     '衝撃発電パネル': ('impact_generator_panel', 'Impact Generator Panel', 'gravity'),
     '低重力パネル': ('low_gravity_panel', 'Low-Gravity Panel', 'gravity'),
     '高重力パネル': ('high_gravity_panel', 'High-Gravity Panel', 'gravity'),
+    '無重力ブロック': ('zero_gravity_block', 'Zero-Gravity Block', 'gravity'),
+    '無重力コントロールボックス': ('zero_gravity_controller', 'Zero-Gravity Control Box', 'gravity'),
 
     # ---- 段階4 ----
     '圧縮ブロックLv2': ('compressed_block_2', 'Compressed Block Lv2', 'block'),
@@ -356,7 +369,9 @@ MOD = {
     '施設灯': ('facility_light', 'Facility Light', 'lab'),
     '非常灯': ('emergency_light', 'Emergency Light', 'lab'),
     '耐圧殻': ('pressure_hull', 'Pressure Hull', 'lab'),
+    '溶接された蓋': ('welded_hatch', 'Welded Hatch', 'lab'),
     '隔壁': ('bulkhead', 'Bulkhead', 'lab'),
+    '研究所のスライドドア': ('lab_door', 'Lab Sliding Door', 'lab'),
     '動力炉の制御盤': ('reactor_console', 'Reactor Control Panel', 'lab'),
     '炉心': ('reactor_core', 'Reactor Core', 'lab'),
     '動力導管': ('power_conduit', 'Power Conduit', 'lab'),
@@ -366,8 +381,17 @@ MOD = {
     '机のモニター': ('desk_monitor', 'Desk Monitor', 'lab'),
     'コーヒーメーカー': ('coffee_maker', 'Coffee Maker', 'lab'),
     '自動販売機': ('vending_machine', 'Vending Machine', 'lab'),
+    # 自動販売機の缶と、コーヒーメーカーのコーヒー（飲める。Java の DrinkItem）
+    '缶ソーダ': ('canned_soda', 'Canned Soda', 'item'),
+    'スポーツドリンク': ('sports_drink', 'Sports Drink', 'item'),
+    'エナジードリンク': ('energy_drink', 'Energy Drink', 'item'),
+    'コーヒー': ('coffee', 'Coffee', 'item'),
     '書類の山': ('paper_stack', 'Stack of Papers', 'lab'),
     'ごみ箱': ('trash_bin', 'Trash Bin', 'lab'),
+    '居室灯': ('room_light', 'Room Light', 'lab'),
+    # レイリー散乱パネル: 天井の空の投影板。研究所の天井のもの（作れない・回収できない）と、設計図から作るもの（FE で点く）
+    'レイリー散乱パネル（研究所）': ('lab_rayleigh_panel', 'Lab Rayleigh Sky Panel', 'lab'),
+    'レイリー散乱パネル': ('rayleigh_panel', 'Rayleigh Sky Panel', 'lab'),
     '遺構の照明（琥珀）': ('ruin_lamp_amber', 'Ruin Lamp (Amber)', 'ruin_block'),
     '遺構の照明（翠）': ('ruin_lamp_verdant', 'Ruin Lamp (Verdant)', 'ruin_block'),
     '遺構の照明（菫）': ('ruin_lamp_violet', 'Ruin Lamp (Violet)', 'ruin_block'),
@@ -376,6 +400,8 @@ MOD = {
     # ---- 建材（自分で作れる。遺構の建材とは別の、新しいパネル）
     'ホワイトパネル': ('white_panel', 'White Panel', 'deco'),
     '発光ホワイトパネル': ('white_light_panel', 'Glowing White Panel', 'deco'),
+    # 研究所のスライドドアに似せた、作れるドア（絵とモデルは lab_blocks.py）
+    'ホワイトスライドドア': ('white_sliding_door', 'White Sliding Door', 'lab'),
     '黒色強化パネル': ('black_reinforced_panel', 'Black Reinforced Panel', 'deco'),
     'ホワイトガラスパネル': ('white_glass_panel', 'White Glass Panel', 'deco_glass'),
     '四芒星ホワイトガラスパネル': ('white_star_glass_panel', 'Starred White Glass Panel', 'deco_glass'),
@@ -441,6 +467,8 @@ OUTPUT_ALIASES = {
     '銅インゴット（精錬）': 'minecraft:copper_ingot',
     '金インゴット（核変換）': 'minecraft:gold_ingot',
     '鋼鉄インゴット（転炉）': 'singulo:steel_ingot',
+    '隕鉄インゴット（焼成炉）': 'singulo:meteoric_iron_ingot',
+    'ティーカップ（焼成炉）': 'singulo:android_teacup',
     'グロウストーンダスト（蛍光体）': 'minecraft:glowstone_dust',
     '氷（ペルチェ）': 'minecraft:ice',
     '骨粉（凍結粉砕）': 'minecraft:bone_meal',
@@ -466,6 +494,9 @@ OUTPUT_ALIASES = {
     '金の塊（金のブーツ）': 'minecraft:gold_nugget',
     '熱交換コア（氷塊）': 'singulo:heat_exchange_core',
     '冷却塔冷却帯（氷塊）': 'singulo:cooling_tower_coolant_band',
+    '超伝導ケーブル（銅導線）': 'singulo:superconducting_cable',
+    'トポロジカル導線（超伝導ケーブル）': 'singulo:topological_wire',
+    '銅インゴット（銅導線）': 'minecraft:copper_ingot',
 }
 
 # 同じ成果物の別レシピの、レシピのファイル名（成果物のIDのままだと、同じ装置の中で重なるもの）
@@ -487,6 +518,8 @@ ALIAS_RECIPE_IDS = {
     '銅インゴット（精錬）': 'copper_ingot_refined',
     '金インゴット（核変換）': 'gold_ingot_from_bismuth',
     '鋼鉄インゴット（転炉）': 'steel_ingot_from_oxygen',
+    '隕鉄インゴット（焼成炉）': 'meteoric_iron_ingot_from_kiln',
+    'ティーカップ（焼成炉）': 'android_teacup_from_kiln',
     'グロウストーンダスト（蛍光体）': 'glowstone_dust_from_phosphor',
     '氷（ペルチェ）': 'ice_from_peltier',
     '骨粉（凍結粉砕）': 'bone_meal_cryo_milled',
@@ -510,6 +543,9 @@ ALIAS_RECIPE_IDS = {
     '金の塊（金のチェストプレート）': 'gold_nugget_from_golden_chestplate',
     '金の塊（金のレギンス）': 'gold_nugget_from_golden_leggings',
     '金の塊（金のブーツ）': 'gold_nugget_from_golden_boots',
+    '超伝導ケーブル（銅導線）': 'superconducting_cable_from_copper_wire',
+    'トポロジカル導線（超伝導ケーブル）': 'topological_wire_from_superconducting_cable',
+    '銅インゴット（銅導線）': 'copper_ingot_from_copper_wire',
 }
 
 # 成果物と一緒に出る副産物: レシピ名 → (副産物, 個数)
@@ -528,6 +564,14 @@ VANILLA = {
     'エンダーアイ': 'minecraft:ender_eye',
     'エンダーパール': '#c:ender_pearls',
     'ガラス': '#c:glass_blocks/colorless',
+    # 施設の建材（設計図）の材料
+    '苔ブロック': 'minecraft:moss_block',
+    '鉄格子': 'minecraft:iron_bars',
+    'ラピスラズリ': '#c:gems/lapis',
+    '橙色の染料': '#c:dyes/orange',
+    '緑色の染料': '#c:dyes/green',
+    '紫色の染料': '#c:dyes/purple',
+    '赤色の染料': '#c:dyes/red',
     'ガラス板': '#c:glass_panes/colorless',
     # Mekanism（任意の連携。Mekanism が入っているときだけ読まれるレシピに使う）
     '基本ケミカルタンク': 'mekanism:basic_chemical_tank',

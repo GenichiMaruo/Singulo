@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.ruin;
 
-import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -29,6 +28,12 @@ public class EchoProjectorBlock extends BaseEntityBlock {
         super(properties);
     }
 
+
+    /** ボスが出現している演出の間は壊せない（素手でも少しずつ壊せる仕掛けを、演出の最中に壊されないように）。 */
+    @Override
+    public float getDestroyProgress(BlockState state, net.minecraft.world.entity.player.Player player, BlockGetter level, BlockPos pos) {
+        return RuinBoss.emergingNear(level, pos) ? 0 : super.getDestroyProgress(state, player, level, pos);
+    }
 
     @Override
     public RenderShape getRenderShape(BlockState state) {

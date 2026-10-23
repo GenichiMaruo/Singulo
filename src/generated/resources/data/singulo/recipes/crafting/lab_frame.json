@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SIS",
+    "IBI"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_building"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    },
+    "I": {
+      "tag": "forge:ingots/steel"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:lab_frame"
+  }
+}

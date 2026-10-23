@@ -9,7 +9,6 @@ import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -50,12 +49,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      * D_STRUCTURE はマルチブロックの大きさ（-1 = マルチブロックでない、0 = 未形成）。D_FLAGS は FLAG_* のビット。
      */
     public static final int D_PROGRESS = 0, D_MAX_PROGRESS = 1, D_ENERGY = 2, D_CAPACITY = 3, D_USAGE = 4,
-            D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_TANKS = 11;
+            D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_SELECTED = 11,
+            D_TANKS = 12;
     /** 動かす（電源スイッチ）・材料なしのレシピも作る・材料なしのレシピがある。 */
     public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
     private final MachineType type;
     private final ItemStackHandler items;
+    /** Exhausted recipe tools waiting for space in the normal output slots. */
+    private final java.util.BitSet pendingReturns = new java.util.BitSet();
     private final FluidTank[] tanks;
     private final SinguloEnergyStorage energy;
     private final IItemHandler automationItems;
@@ -86,6 +88,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private boolean makeFree = true;
     /** この装置に材料のいらないレシピがあるか（画面にスイッチを出すか）。 */
     private boolean hasFree;
+    /** 指定した作るもの（{@link MachineType#selectsRecipe()} の装置だけ）。null なら自動で選ぶ。 */
+    @Nullable
+    private ResourceLocation selectedRecipe;
 
     public MachineBlockEntity(BlockPos pos, BlockState state) {
         this(SinguloBlockEntities.MACHINE.get(), pos, state);
@@ -97,6 +102,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         this.items = new ItemStackHandler(type.itemSlots()) {
             @Override
             protected void onContentsChanged(int slot) {
+                pendingReturns.clear(slot);
+                if (!crafting && slot < type.inputSlots() && level != null) {
+                    inputsChangedAt = level.getGameTime();          // 人・ホッパー・アンドロイドが入れ替えた（装置が使った分は数えない）
+                }
                 markDirty();
             }
 
@@ -106,8 +115,14 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             }
 
             @Override
+            protected int getStackLimit(int slot, ItemStack stack) {
+                return (slot < type.inputSlots() || slot == type.catalystSlot()) && UsesHelper.hasUses(stack)
+                        ? 1 : super.getStackLimit(slot, stack);
+            }
+
+            @Override
             public int getSlotLimit(int slot) {
-                return slot == type.upgradeSlot() ? 1 : 64;
+                return slot == type.upgradeSlot() || slot == type.catalystSlot() ? 1 : 64;
             }
         };
         this.tanks = new FluidTank[type.tanks()];
@@ -172,6 +187,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** そのスロットにそのアイテムを入れてよいか（触媒は専用スロットだけ、アップグレードはアップグレード枠だけ）。 */
     public boolean slotAccepts(int slot, ItemStack stack) {
+        if (pendingReturns.get(slot)) return false;
         if (slot == type.upgradeSlot()) {
             return isUpgrade(stack);
         }
@@ -203,7 +219,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             out[i] = new SideConfig();
             int mode = i < type.fluidInputs() ? SideConfig.INPUT : SideConfig.OUTPUT;
             for (SideConfig.Face f : SideConfig.Face.values()) {
-                out[i].set(f, mode, false);
+                out[i].set(f, mode, i >= type.fluidInputs());
             }
         }
         return out;
@@ -233,7 +249,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** 自動排出の全体スイッチを切り替える。 */
     public void setEjectEnabled(int channel, boolean on) {
-        sides(channel).setEjectEnabled(on);
+        SideConfig config = sides(channel);
+        // Old settings often had every per-face flag off despite the master being on.
+        // Turning the master on must be sufficient to start the configured outputs.
+        if (on && java.util.Arrays.stream(SideConfig.Face.values()).noneMatch(f -> config.canExtract(f) && config.eject(f))) {
+            for (SideConfig.Face face : SideConfig.Face.values()) {
+                if (config.canExtract(face)) config.set(face, config.mode(face), true);
+            }
+        }
+        config.setEjectEnabled(on);
         setChanged();
     }
 
@@ -279,7 +303,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         return !type.isMultiblock();
     }
 
-    /** 搬入出ポートが押し出してよい出力（出力スロットと出力タンクだけ）。 */
+    /** 搬入出ポートが押し出してよい出力（完成品・使用済み部品・出力タンク）。 */
     @Override
     public IItemHandler ejectItems() {
         return type.hasOutput() ? new SidedItems(false, true) : null;
@@ -343,13 +367,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 IItemHandler dest = io.github.genichimaruo.singulo.compat.Capabilities.get(level, io.github.genichimaruo.singulo.compat.Capabilities.ItemHandler.BLOCK,
                         target, dir.getOpposite());
                 if (dest != null) {
+                    // Finished products first, then exhausted tools still waiting in their input slots.
                     for (int i = 0; i < type.outputSlots(); i++) {
-                        int slot = type.outputSlot() + i;
-                        ItemStack stack = items.getStackInSlot(slot);
-                        if (!stack.isEmpty()) {
-                            ItemStack rest = net.minecraftforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
-                            items.setStackInSlot(slot, rest);
-                        }
+                        ejectItem(dest, type.outputSlot() + i);
+                    }
+                    for (int slot = pendingReturns.nextSetBit(0); slot >= 0; slot = pendingReturns.nextSetBit(slot + 1)) {
+                        ejectItem(dest, slot);
                     }
                 }
             }
@@ -367,6 +390,27 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private void ejectItem(IItemHandler dest, int slot) {
+        ItemStack stack = items.getStackInSlot(slot);
+        if (stack.isEmpty()) return;
+        ItemStack rest = net.minecraftforge.items.ItemHandlerHelper.insertItem(dest, stack.copy(), false);
+        if (rest.getCount() != stack.getCount()) {
+            items.setStackInSlot(slot, rest);
+        }
+    }
+
+    /** Keep a blocked return visible in its original slot; never discard or consume it again. */
+    private void flushReturns() {
+        for (int slot = pendingReturns.nextSetBit(0); slot >= 0; slot = pendingReturns.nextSetBit(slot + 1)) {
+            ItemStack stack = items.getStackInSlot(slot);
+            ItemStack rest = insertOutput(stack.copy(), false);
+            if (rest.getCount() != stack.getCount() || stack.isEmpty()) {
+                items.setStackInSlot(slot, rest);
+                if (!rest.isEmpty()) pendingReturns.set(slot);
             }
         }
     }
@@ -424,7 +468,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         be.tick(level, pos, state);
     }
 
-    public void tick(Level level, BlockPos pos, BlockState state) {
+    protected void tick(Level level, BlockPos pos, BlockState state) {
+        refreshRecipeSnapshot();
+        flushReturns();
         if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
             autoEject(level);
         }
@@ -442,7 +488,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             if (type.massMode() && mode > 0) {
                 absorbMass(level);
             }
-            if (dirty) {
+            if (dirty || waitingSettle) {
                 dirty = false;
                 refreshRecipe(level);
             }
@@ -506,31 +552,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     /** {@link #stationRecipes(Level)} の装置の種類ごとの版（画面で待機の理由を調べるときにも使う）。 */
     public static List<MachineRecipe> stationRecipes(Level level, MachineType type) {
-        List<MachineRecipe> out = new ArrayList<>();
-        for (MachineRecipe holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
-            if (holder.value().station().equals(type.id())) {
-                out.add(holder);
-            }
-        }
-        // サーバー設定（プリセット・殻の材料・育成時間など）を当てはめる
-        out = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(out);
-        out.sort(Comparator.comparingInt((MachineRecipe h) -> -h.value().priority())
-                .thenComparingInt(h -> -(h.value().ingredients().size() + h.value().fluidIngredients().size()
-                        + (h.value().restore().isPresent() ? 1 : 0))).thenComparing(h -> h.id().toString()));
-        return out;
+        return MachineRecipeIndex.station(level, type);
     }
 
-    /** 質量モードで選べるレシピ（ID順）。クライアントの画面でも同じ順に並べる。 */
+    /** 質量モードで選べるレシピ（ID順）。 */
     public static List<MachineRecipe> massRecipes(Level level, MachineType type) {
-        List<MachineRecipe> out = new ArrayList<>();
-        for (MachineRecipe holder : level.getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get())) {
-            if (holder.value().station().equals(type.id()) && holder.value().isMassRecipe()) {
-                out.add(holder);
-            }
-        }
-        out = io.github.genichimaruo.singulo.recipe.RecipeTweaks.adjustAll(out);
-        out.sort(Comparator.comparing(h -> h.id().toString()));
-        return out;
+        return MachineRecipeIndex.mass(level, type);
     }
 
     @Nullable
@@ -544,6 +571,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void refreshRecipe(Level level) {
+        waitingSettle = false;
         MachineRecipe found = null;
         List<ItemStack> inputs = inputStacks();
         if (mode > 0) {
@@ -560,7 +588,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                 boolean free = isFree(r);
                 hasFree |= free;
                 if (r.isMassRecipe() || !sizeAllows(r) || r.plan(inputs) == null || !fluidsAvailable(r)
-                        || free && !makeFree || found != null) {
+                        || free && !makeFree || found != null || !selectionAllows(level, holder, inputs)) {
                     continue;
                 }
                 if (canOutput(r)) {
@@ -606,6 +634,120 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
     }
 
+    /**
+     * 作るものを選べる装置で、このレシピを作ってよいか（{@link RecipeSelection}）。指定があればそのレシピだけ、
+     * なければ入っている物をすべて使い、ほかのレシピの途中になりえないものだけ。
+     */
+    private boolean selectionAllows(Level level, MachineRecipe holder, List<ItemStack> inputs) {
+        if (!type.selectsRecipe()) {
+            return true;
+        }
+        if (selectedRecipe != null) {
+            return holder.id().equals(selectedRecipe);
+        }
+        MachineRecipe.Plan plan = holder.value().plan(inputs);
+        if (plan == null || !RecipeSelection.usesEveryInput(type, inputs, plan)) {
+            return false;
+        }
+        if (!RecipeSelection.ambiguous(level, type, holder)) {
+            return true;
+        }
+        // ほかのレシピの途中と同じ組み合わせ: 入れるのが SETTLE_TICKS 止まったら、入れ終わったとみなして作る
+        if (level.getGameTime() - inputsChangedAt >= RecipeSelection.SETTLE_TICKS) {
+            return true;
+        }
+        waitingSettle = true;
+        return false;
+    }
+
+    /** 人・ホッパー・アンドロイドが入力の欄を最後に変えた時刻（装置が材料を使った分は含めない）。 */
+    private long inputsChangedAt;
+    /** 装置が材料を使っている最中か（その変化は inputsChangedAt に数えない）。 */
+    private boolean crafting;
+    /** 入れ終わるのを待っているレシピがあるか（あれば毎 tick 選び直す）。 */
+    private boolean waitingSettle;
+
+    /**
+     * アンドロイドが作りたい物 output（材料 inputs）に合うレシピを指定する（作るものを選べる装置だけ）。
+     * 材料の一部が別のレシピと同じでも、アンドロイドの決めたレシピ通りの物ができる。
+     */
+    public void selectFor(net.minecraft.world.item.ItemStack output, List<net.minecraft.world.item.ItemStack> inputs) {
+        if (!type.selectsRecipe() || level == null || output.isEmpty()) {
+            return;
+        }
+        MachineRecipe best = null;
+        int bestScore = -1;
+        for (MachineRecipe h : RecipeSelection.selectable(level, type)) {
+            if (!net.minecraft.world.item.ItemStack.isSameItem(h.value().result(), output)) {
+                continue;
+            }
+            int score = 0;
+            for (MachineRecipe.ItemInput in : h.value().ingredients()) {
+                if (inputs.stream().anyMatch(in.ingredient())) {
+                    score++;
+                }
+            }
+            if (score > bestScore) {
+                best = h;
+                bestScore = score;
+            }
+        }
+        if (best != null && !best.id().equals(selectedRecipe)) {
+            selectedRecipe = best.id();
+            selectedIndex = -2;
+            markDirty();
+        }
+    }
+
+    /** 作るものを指定する（GUIから）。index は {@link RecipeSelection#selectable} の番号、範囲外なら指定を外す。 */
+    public void selectRecipe(int index) {
+        if (!type.selectsRecipe() || level == null) {
+            return;
+        }
+        MachineRecipe holder = RecipeSelection.byIndex(level, type, index);
+        selectedRecipe = holder == null ? null : holder.id();
+        selectedIndex = -2;
+        markDirty();
+    }
+
+    /** 指定したレシピの {@link RecipeSelection#selectable} での番号（-1 = 指定なし）。同期のたびに探さないよう覚えておく。 */
+    private int selectedIndex = -2;
+    @Nullable
+    private Object recipeSnapshot;
+
+    /** A data pack reload can change both automatic matching and the synchronized recipe order. */
+    private void refreshRecipeSnapshot() {
+        if (level == null) return;
+        Object snapshot = MachineRecipeIndex.snapshot(level);
+        if (recipeSnapshot != snapshot) {
+            recipeSnapshot = snapshot;
+            selectedIndex = -2;
+            markDirty();
+        }
+    }
+
+    private int selectedIndex() {
+        refreshRecipeSnapshot();
+        if (selectedIndex == -2 && level != null) {
+            selectedIndex = RecipeSelection.indexOf(level, type, selectedRecipe);
+        }
+        return Math.max(-1, selectedIndex);
+    }
+
+    /** 設定カードから: 指定を貼る（同じ種類の装置でなければ何もしない）。 */
+    public void pasteSelectedRecipe(@Nullable ResourceLocation id) {
+        if (type.selectsRecipe()) {
+            selectedRecipe = id;
+            selectedIndex = -2;
+            markDirty();
+        }
+    }
+
+    @Nullable
+    public ResourceLocation selectedRecipe() {
+        return selectedRecipe;
+    }
+
     /** 材料（アイテム・液体・質量・復元するもの）がいらず、電力だけで作るレシピか（冷却塔の液体窒素など）。 */
     public static boolean isFree(MachineRecipe r) {
         return r.ingredients().isEmpty() && r.fluidIngredients().isEmpty() && r.mass().isEmpty() && r.restore().isEmpty();
@@ -635,7 +777,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private List<ItemStack> inputStacks() {
         List<ItemStack> list = new ArrayList<>(type.recipeSlots());
         for (int i = 0; i < type.recipeSlots(); i++) {
-            list.add(items.getStackInSlot(type.recipeSlot(i)));
+            int slot = type.recipeSlot(i);
+            list.add(pendingReturns.get(slot) ? ItemStack.EMPTY : items.getStackInSlot(slot));
         }
         return list;
     }
@@ -792,6 +935,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     }
 
     private void craft(Level level, MachineRecipe r) {
+        crafting = true;
+        try {
+            craftNow(level, r);
+        } finally {
+            crafting = false;
+        }
+    }
+
+    private void craftNow(Level level, MachineRecipe r) {
         MachineRecipe.Plan plan = r.plan(r.isMassRecipe() ? inputsExceptMassSlot() : inputStacks());
         if (plan == null || !massAvailable(r) || !fluidsAvailable(r)) {
             return;
@@ -807,7 +959,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         for (int i = 0; i < type.recipeSlots(); i++) {
             int slot = type.recipeSlot(i);
             if (plan.uses()[i] > 0) {
-                items.setStackInSlot(slot, UsesHelper.consume(items.getStackInSlot(slot), plan.uses()[i]));
+                ItemStack used = UsesHelper.consume(items.getStackInSlot(slot), plan.uses()[i]);
+                items.setStackInSlot(slot, used);
+                if (!used.isEmpty() && UsesHelper.remaining(used) == 0) {
+                    pendingReturns.set(slot);
+                }
             }
             if (plan.consume()[i] > 0) {
                 items.extractItem(slot, plan.consume()[i], false);
@@ -832,6 +988,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         if (!r.byproduct().isEmpty()) {
             insertOutput(r.byproduct().copy(), false);
         }
+        flushReturns();
         assignFluidOutputs(r.fluidResults(), false);
         onCrafted(level, r);
     }
@@ -893,6 +1050,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_MASS -> massTargetIsMetal() ? (int) Math.round(metalMass * 100) : (int) Math.round(mass * 100);
             case D_MASS_TARGET -> massTarget();
             case D_STRUCTURE -> structureSize();
+            case D_SELECTED -> selectedIndex() + 1;
             case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
                 if (index >= sidesIndex(type)) {
@@ -989,7 +1147,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
+        tag.putLong("inputs_changed_at", inputsChangedAt);
         tag.put("items", items.serializeNBT());
+        tag.putIntArray("pending_returns", pendingReturns.stream().toArray());
         tag.putIntArray("slot_layout", new int[]{type.inputSlots(), type.outputSlots()});
         tag.putInt("item_sides", itemSides.packed());
         tag.putBoolean("eject_master", true);
@@ -1004,6 +1164,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         tag.putInt("energy", energy.getEnergyStored());
         tag.putInt("progress", progress);
         tag.putInt("mode", mode);
+        if (selectedRecipe != null) {
+            tag.putString("selected_recipe", selectedRecipe.toString());
+        }
         tag.putDouble("mass", mass);
         tag.putDouble("metal_mass", metalMass);
         if (current != null) {
@@ -1041,6 +1204,18 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             int from = savedSlot(i, layout[0], layout[1]);
             items.setStackInSlot(i, from >= 0 && from < loaded.getSlots() ? loaded.getStackInSlot(from) : ItemStack.EMPTY);
         }
+        java.util.BitSet savedReturns = new java.util.BitSet();
+        for (int slot : tag.getIntArray("pending_returns")) {
+            if (slot >= 0 && slot < loaded.getSlots()) savedReturns.set(slot);
+        }
+        pendingReturns.clear();
+        for (int i = 0; i < type.recipeSlots(); i++) {
+            int slot = type.recipeSlot(i);
+            int from = savedSlot(slot, layout[0], layout[1]);
+            if (from >= 0 && savedReturns.get(from) && !items.getStackInSlot(slot).isEmpty()) {
+                pendingReturns.set(slot);
+            }
+        }
         if (tag.contains("item_sides")) {
             itemSides.setPacked(tag.getInt("item_sides"));
             if (!tag.contains("eject_master")) {
@@ -1075,15 +1250,19 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         energy.setEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
         mode = tag.getInt("mode");
+        selectedRecipe = tag.contains("selected_recipe") ? ResourceLocation.tryParse(tag.getString("selected_recipe")) : null;
+        selectedIndex = -2;
         mass = tag.getDouble("mass");
         metalMass = tag.getDouble("metal_mass");
         resumeRecipe = tag.contains("recipe") ? ResourceLocation.tryParse(tag.getString("recipe")) : null;
+        // Loading usually happens before setLevel, so inventory callbacks cannot restore this clock.
+        inputsChangedAt = tag.getLong("inputs_changed_at");
         dirty = true;
     }
 
     // ------------------------------------------------------------------ 自動搬入出
 
-    /** 入力スロットへは入れるだけ、出力スロットからは取り出すだけ。 */
+    /** 入力は搬入、完成品とこの装置で使い切った部品は搬出できる。 */
     private final class AutomationItems implements IItemHandler {
         @Override
         public int getSlots() {
@@ -1102,7 +1281,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()
+            return (slot >= type.outputSlot() && slot < type.outputSlot() + type.outputSlots()) || pendingReturns.get(slot)
                     ? items.extractItem(slot, amount, simulate) : ItemStack.EMPTY;
         }
 

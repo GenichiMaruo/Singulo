@@ -43,7 +43,7 @@ def inspect(repo, run_id, tag, source, loader):
     selected = {}
     tested_commits = set()
     for artifact in artifacts:
-        match = re.fullmatch(rf"pr-validation-([0-9a-f]{{40}})-{loader}-(singulo(?:_[a-z]+)?)", artifact["name"])
+        match = re.fullmatch(rf"pr-validation-([0-9a-f]{{40}})-{loader}-(singulo(?:_[a-z]+)*)", artifact["name"])
         if match:
             ns = match[2]
             if artifact["expired"] or ns in selected:

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SWS",
+    "WBW"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_building"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "singulo:lab_panel"
+  }
+}

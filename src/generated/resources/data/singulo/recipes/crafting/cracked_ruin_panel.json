@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PXP",
+    "PBP"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_ruin_panels"
+    },
+    "P": {
+      "item": "singulo:ruin_panel"
+    },
+    "X": {
+      "item": "minecraft:flint"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:cracked_ruin_panel"
+  }
+}

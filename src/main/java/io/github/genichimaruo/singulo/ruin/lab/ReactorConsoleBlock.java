@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.ruin.lab;
 
-import com.mojang.serialization.MapCodec;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -38,13 +37,24 @@ public class ReactorConsoleBlock extends BaseEntityBlock {
 
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HorizontalDirectionalBlock.FACING, POWERED);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite());
+    }
+
+    /** 型紙を回して置いたとき（研究所の部屋など）にも、向きを部屋に合わせて回す。 */
+    @Override
+    public BlockState rotate(BlockState state, net.minecraft.world.level.block.Rotation rotation) {
+        return state.setValue(HorizontalDirectionalBlock.FACING, rotation.rotate(state.getValue(HorizontalDirectionalBlock.FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, net.minecraft.world.level.block.Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(HorizontalDirectionalBlock.FACING)));
     }
 
     @Override

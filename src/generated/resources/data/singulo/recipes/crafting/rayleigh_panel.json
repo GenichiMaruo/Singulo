@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GLG",
+    "YBY",
+    "SKS"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_rayleigh"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "L": {
+      "tag": "forge:gems/lapis"
+    },
+    "Y": {
+      "tag": "forge:dusts/glowstone"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    },
+    "K": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "singulo:rayleigh_panel"
+  }
+}

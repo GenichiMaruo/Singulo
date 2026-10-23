@@ -28,6 +28,8 @@ public final class NeutrinoOverlay {
 
     private NeutrinoOverlay() {}
 
+    public static void clear() { ores.clear(); ruins.clear(); until = 0; }
+
     public static void show(List<BlockPos> o, List<BlockPos> r) {
         ores = new ArrayList<>(o);
         ruins = new ArrayList<>(r);

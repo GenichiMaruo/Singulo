@@ -153,7 +153,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             }
         });
         for (int i = 0; i < WorkConsoleBlockEntity.OUTBOX_SLOTS; i++) {
-            addSlot(new Slot(outbox, i, OUTBOX_X + (i % 9) * 18, OUTBOX_Y + (i / 9) * 18) {
+            addSlot(new io.github.genichimaruo.singulo.compat.LegacyConstructors.MenuSlot(outbox, i, OUTBOX_X + (i % 9) * 18, OUTBOX_Y + (i / 9) * 18) {
                 @Override
                 public boolean isActive() {
                     return showOutbox && showInventory;
@@ -176,7 +176,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
+                addSlot(new io.github.genichimaruo.singulo.compat.LegacyConstructors.MenuSlot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
                     @Override
                     public boolean isActive() {
                         return showInventory;
@@ -185,7 +185,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inventory, col, INV_X + col * 18, HOTBAR_Y) {
+            addSlot(new io.github.genichimaruo.singulo.compat.LegacyConstructors.MenuSlot(inventory, col, INV_X + col * 18, HOTBAR_Y) {
                 @Override
                 public boolean isActive() {
                     return showInventory;

@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.ruin;
 
-import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -38,7 +37,7 @@ public class FactoryLineBlock extends BaseEntityBlock {
 
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
@@ -50,6 +49,12 @@ public class FactoryLineBlock extends BaseEntityBlock {
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    /** ボスが出現している演出の間は壊せない（素手でも少しずつ壊せる仕掛けを、演出の最中に壊されないように）。 */
+    @Override
+    public float getDestroyProgress(BlockState state, net.minecraft.world.entity.player.Player player, BlockGetter level, BlockPos pos) {
+        return RuinBoss.emergingNear(level, pos) ? 0 : super.getDestroyProgress(state, player, level, pos);
     }
 
     @Override

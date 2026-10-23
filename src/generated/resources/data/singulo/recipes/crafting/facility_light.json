@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WRW",
+    "YBY"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lighting"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    },
+    "Y": {
+      "tag": "forge:dusts/glowstone"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:facility_light"
+  }
+}

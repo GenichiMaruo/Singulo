@@ -293,6 +293,10 @@ public final class SinguloBlocks {
     public static final RegistryObject<Block> WHITE_LIGHT_PANEL = simpleBlock("white_light_panel",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.GLASS).lightLevel(s -> 15));
+    /** 置いたティーカップ（アイテムはアンドロイドの装飾のティーカップ。ブロック用のアイテムは作らない）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.android.TeacupBlock> TEACUP = BLOCKS.register("teacup",
+            () -> new io.github.genichimaruo.singulo.android.TeacupBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                    .strength(0.3F).sound(SoundType.DECORATED_POT).noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
     /** ビスマス結晶ブロック（溶かしたビスマスが冷えてできる、階段状の虹色の骸晶）と、その光るもの。 */
     public static final RegistryObject<Block> BISMUTH_CRYSTAL_BLOCK = simpleBlock("bismuth_crystal_block",
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(3.0F, 6.0F).requiresCorrectToolForDrops()
@@ -370,6 +374,12 @@ public final class SinguloBlocks {
     public static final RegistryObject<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> HIGH_GRAVITY_PANEL = BLOCKS.register(
             "high_gravity_panel", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_BLACK),
                     io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.HIGH));
+    /** 無重力ブロック（働いている間、上の空間が無重力になる。高さは無重力コントロールボックスで変える）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> ZERO_GRAVITY_BLOCK = BLOCKS.register(
+            "zero_gravity_block", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_PURPLE),
+                    io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.ZERO));
+    public static final RegistryObject<io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlock> ZERO_GRAVITY_CONTROLLER = BLOCKS.register(
+            "zero_gravity_controller", () -> new io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlock(machineProperties()));
     public static final RegistryObject<io.github.genichimaruo.singulo.gravity.GravityReceiverBlock> GRAVITY_PANEL_RECEIVER = BLOCKS.register(
             "gravity_panel_receiver", () -> new io.github.genichimaruo.singulo.gravity.GravityReceiverBlock(machineProperties()));
     /** 衝撃発電パネル（上に落ちても落下ダメージを受けず、落ちた高さに応じてわずかに発電し、重力パネルへ配る）。 */
@@ -418,18 +428,23 @@ public final class SinguloBlocks {
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock> FACTORY_CONVEYOR = BLOCKS.register("factory_conveyor",
             () -> new io.github.genichimaruo.singulo.ruin.FactoryConveyorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
                     .strength(2.0F, 6.0F).sound(SoundType.METAL)));
-    // ---- 地下アンドロイド研究所（作れない。白い建材は硬く、鉄以上のツルハシで掘る）
+    // ---- 地下アンドロイド研究所（白い建材は硬く、鉄以上のツルハシで掘る）。建材・照明・調度品は、研究所で見つかる設計図から作れる
     public static final RegistryObject<Block> LAB_PANEL = pristine("lab_panel", 0);
     public static final RegistryObject<Block> LAB_PANEL_LINED = pristine("lab_panel_lined", 0);
     public static final RegistryObject<Block> LAB_TILES = pristine("lab_tiles", 0);
     public static final RegistryObject<Block> LAB_FRAME = BLOCKS.register("lab_frame", () -> new Block(BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_GRAY).strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)));
-    public static final RegistryObject<net.minecraft.world.level.block.GlassBlock> LAB_GLASS = glass("lab_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.GLASS);
+    public static final RegistryObject<GlassBlock> LAB_GLASS = glass("lab_glass", MapColor.NONE, 4.0F, 9.0F, SoundType.GLASS);
     /** 施設灯（電力で白く光る）・非常灯（電力がない間だけ赤く光る）・炉心（電力で強く光る）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> FACILITY_LIGHT = BLOCKS.register("facility_light",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
-                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 0)));
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 0), true));
+    /** 居室灯（個室の天井灯。レバーなどのレッドストーンの信号で点く）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock> ROOM_LIGHT = BLOCKS.register("room_light",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                    .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock.LIT) ? 15 : 0)));
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> EMERGENCY_LIGHT = BLOCKS.register("emergency_light",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
@@ -441,11 +456,16 @@ public final class SinguloBlocks {
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> POWER_CONDUIT = BLOCKS.register("power_conduit",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN)
                     .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
-                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 10 : 0)));
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 10 : 0), true));
     /** 耐圧殻（封じられている間は壊せない。黒曜石より硬い。爆発では壊れない）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> PRESSURE_HULL = BLOCKS.register("pressure_hull",
             () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY)
                     .strength(75.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** 溶接された蓋（搬入出の立坑をふさぐ。封じられている間は壊せない。封じが解けるとダイヤのツルハシで掘れる）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock> WELDED_HATCH = BLOCKS.register("welded_hatch",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL)
+                    .strength(20.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.NETHERITE_BLOCK)
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     /** 隔壁（ボス部屋の出入口。壊せない。電力が戻ると開く）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.BulkheadBlock> BULKHEAD = BLOCKS.register("bulkhead",
@@ -467,15 +487,39 @@ public final class SinguloBlocks {
     /** 研究所の小物（机のモニター・コーヒーメーカー・書類の山・ごみ箱・自販機）。 */
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> DESK_MONITOR = BLOCKS.register("desk_monitor",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL).lightLevel(s -> 3), Block.box(2, 0, 2, 14, 12, 14), null, null));
-    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> COFFEE_MAKER = BLOCKS.register("coffee_maker",
-            () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL), Block.box(4, 0, 4, 12, 13, 13), "lab.singulo.coffee",
-                    net.minecraft.sounds.SoundEvents.BREWING_STAND_BREW));
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock> COFFEE_MAKER = BLOCKS.register("coffee_maker",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.CoffeeMakerBlock(decor(SoundType.METAL)));
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> PAPER_STACK = BLOCKS.register("paper_stack",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.WOOL).strength(0.3F), Block.box(3, 0, 3, 13, 5, 13), null, null));
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock> TRASH_BIN = BLOCKS.register("trash_bin",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabDecorBlock(decor(SoundType.METAL), Block.box(4, 0, 4, 12, 10, 12), null, null));
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock> VENDING_MACHINE = BLOCKS.register("vending_machine",
             () -> new io.github.genichimaruo.singulo.ruin.lab.VendingMachineBlock(decor(SoundType.METAL).strength(3.0F, 9.0F).lightLevel(s -> 6)));
+
+    /**
+     * レイリー散乱パネル（天井の空の投影板）。研究所の天井のものは研究所の電力で点き、壊すと何も残らない（作れない）。
+     * 作れるものは FE で点く。点いている間は真下を真昼の日差しで照らす（明るさ15）。
+     */
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock> LAB_RAYLEIGH_PANEL = BLOCKS.register(
+            "lab_rayleigh_panel", () -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh().noLootTable(), true));
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock> RAYLEIGH_PANEL = BLOCKS.register(
+            "rayleigh_panel", () -> new io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlock(rayleigh(), false));
+
+    private static BlockBehaviour.Properties rayleigh() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).strength(3.0F, 9.0F).requiresCorrectToolForDrops()
+                .sound(SoundType.GLASS);
+    }
+
+    /** 研究所のスライドドア（作れない）と、それに似せた作れるスライドドア。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock> LAB_DOOR = BLOCKS.register("lab_door",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor()));
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock> WHITE_SLIDING_DOOR = BLOCKS.register("white_sliding_door",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlock(slidingDoor()));
+
+    private static BlockBehaviour.Properties slidingDoor() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(5.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
+                .noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK);
+    }
 
     private static BlockBehaviour.Properties decor(SoundType sound) {
         return BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(1.0F, 3.0F).sound(sound).noOcclusion();

@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WGW",
+    "IBK"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    "W": {
+      "item": "singulo:white_ceramic_composite"
+    },
+    "G": {
+      "tag": "forge:glass/colorless"
+    },
+    "I": {
+      "tag": "forge:ingots/iron"
+    },
+    "K": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:coffee_maker"
+  }
+}

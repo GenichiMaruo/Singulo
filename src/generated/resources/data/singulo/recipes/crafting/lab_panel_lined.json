@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PLP",
+    "PBP"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_building"
+    },
+    "P": {
+      "item": "singulo:lab_panel"
+    },
+    "L": {
+      "tag": "forge:gems/lapis"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:lab_panel_lined"
+  }
+}

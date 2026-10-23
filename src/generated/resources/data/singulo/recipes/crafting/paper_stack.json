@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PP",
+    "BP",
+    "P "
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:paper_stack"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LDL",
+    "LBL"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lighting"
+    },
+    "L": {
+      "item": "singulo:ruin_lamp"
+    },
+    "D": {
+      "tag": "forge:dyes/green"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:ruin_lamp_verdant"
+  }
+}

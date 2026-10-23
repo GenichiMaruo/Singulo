@@ -141,6 +141,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     /** 炉心がある（稼働中の）リアクター（ワールドごと）。ハロー捕集器が探す。 */
     private static final java.util.Map<Level, java.util.Set<PenroseReactorBlockEntity>> RUNNING = new java.util.WeakHashMap<>();
 
+    /** Release runtime references when this level closes. */
+    public static void forgetLevel(Level level) { RUNNING.remove(level); }
+
     /** 稼働中のリアクターの位置（そのワールドの全部。テストの後片付け用）。 */
     public static java.util.List<BlockPos> runningPositions(Level level) {
         java.util.Set<PenroseReactorBlockEntity> set = RUNNING.get(level);
@@ -295,7 +298,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
             updateAlarms(level);
         }
         java.util.Set<PenroseReactorBlockEntity> running = RUNNING.computeIfAbsent(level,
-                l -> java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
+                l -> java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>()));
         if (state == State.RUNNING) {
             running.add(this);
         } else {

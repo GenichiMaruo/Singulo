@@ -19,11 +19,19 @@ public class SinguloBlockItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         SinguloItem.addStageLine(tooltip, stage);
-        if (Boolean.TRUE.equals(SinguloComponents.get(stack, io.github.genichimaruo.singulo.registry.SinguloComponents.MIXED_SOURCE.get()))) {
+        if (packed(stack)) {
+            tooltip.add(Component.translatable("tooltip.singulo.packed_device").withStyle(net.minecraft.ChatFormatting.AQUA));
+        }
+        if (Boolean.TRUE.equals(SinguloComponents.get(stack, SinguloComponents.MIXED_SOURCE.get()))) {
             tooltip.add(Component.translatable("tooltip.singulo.mixed_source")
                     .withStyle(net.minecraft.ChatFormatting.GREEN));
         }
     }
+    private static boolean packed(ItemStack stack) {
+        return stack.hasTag() && stack.getTag().getBoolean("singulo:packed_device") && stack.getTag().contains("BlockEntityTag", 10);
+    }
+    @Override
+    public int getMaxStackSize(ItemStack stack) { return packed(stack) ? 1 : super.getMaxStackSize(stack); }
     @Override
     public boolean isFoil(net.minecraft.world.item.ItemStack stack) {
         return super.isFoil(stack) || io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity.remembersUniverse(stack);

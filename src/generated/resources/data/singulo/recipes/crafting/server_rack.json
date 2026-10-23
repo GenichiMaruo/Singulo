@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SRS",
+    "KBK"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lab_furniture"
+    },
+    "S": {
+      "tag": "forge:plates/steel"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    },
+    "K": {
+      "item": "singulo:basic_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "singulo:server_rack"
+  }
+}

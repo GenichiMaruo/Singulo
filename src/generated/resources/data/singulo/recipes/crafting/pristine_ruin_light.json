@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PYP",
+    "PBP",
+    " Y "
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:blueprint_lighting"
+    },
+    "P": {
+      "item": "singulo:pristine_ruin_panel"
+    },
+    "Y": {
+      "tag": "forge:dusts/glowstone"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "singulo:pristine_ruin_light"
+  }
+}
