@@ -456,9 +456,10 @@ def rayleigh_top(lab):
     return im
 
 
-def rayleigh_bottom(lab):
-    """下の面（投影面）: 縁1ドット（光らない）と、消えているときの暗い面。点いている空は Java が上に描く。"""
-    im, d = new(rgba(RAYLEIGH_NIGHT))
+def rayleigh_bottom(lab, lit=False):
+    """下の面（投影面）: 縁1ドット（光らない）と、消えているときの暗い面。点いている空は Java が上に描く。
+    点いているときの絵（lit）は空の中ほどの色にしておく: 空を描く処理が画面の端で一瞬省かれても、黒くちらつかない。"""
+    im, d = new(rgba(mix(*RAYLEIGH_NOON, 0.5) if lit else RAYLEIGH_NIGHT))
     d.rectangle([0, 0, S - 1, S - 1], outline=rgba(RAYLEIGH_FRAME[lab]))
     return im
 
@@ -645,6 +646,7 @@ def textures(tb, save_plain):
 
 GLOW = {'block_light': 15, 'sky_light': 15}
 FACING_Y = {'north': 0, 'east': 90, 'south': 180, 'west': 270}
+        save_plain(rayleigh_bottom(lab, True), tb / f'{name}_bottom_lit.png')
 SIMPLE = ('lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'pressure_hull', 'welded_hatch', 'bulkhead')
 
 
@@ -788,7 +790,13 @@ def rayleigh_models(write_json, mb, mi, bs):
         write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/block',
                                         'textures': {'side': side, 'top': top, 'bottom': bottom, 'particle': side},
                                         'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': faces}]})
-        write_json(bs / f'{iid}.json', {'variants': {f'lit={v}': {'model': f'{MODID}:block/{iid}'} for v in ('false', 'true')}})
+        lit_faces = dict(faces)
+        lit_faces['down'] = {'texture': '#bottom_lit', 'cullface': 'down'}
+        write_json(mb / f'{iid}_lit.json', {'parent': 'minecraft:block/block',
+                                            'textures': {'side': side, 'top': top, 'bottom_lit': f'{bottom}_lit', 'particle': side},
+                                            'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': lit_faces}]})
+        write_json(bs / f'{iid}.json', {'variants': {'lit=false': {'model': f'{MODID}:block/{iid}'},
+                                                     'lit=true': {'model': f'{MODID}:block/{iid}_lit'}}})
         # 持ったとき: 立体のまま、下の面には空の絵を貼り、持ち物欄では下から見上げる向きにして空を見せる
         item_faces = dict(faces)
         item_faces['down'] = {'texture': '#sky'}
