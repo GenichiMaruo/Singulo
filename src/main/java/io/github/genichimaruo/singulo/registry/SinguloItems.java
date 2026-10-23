@@ -423,6 +423,7 @@ public final class SinguloItems {
         block(SinguloBlocks.LAB_GLASS, 1);
         block(SinguloBlocks.FACILITY_LIGHT, 1);
         block(SinguloBlocks.EMERGENCY_LIGHT, 1);
+        block(SinguloBlocks.ROOM_LIGHT, 1);
         block(SinguloBlocks.REACTOR_CORE, 1);
         block(SinguloBlocks.POWER_CONDUIT, 1);
         block(SinguloBlocks.PRESSURE_HULL, 1);

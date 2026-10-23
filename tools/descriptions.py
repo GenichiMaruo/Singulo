@@ -589,6 +589,8 @@ DESC = {
     '自動販売機': ('研究所の飲み物の自動販売機（2ブロックの高さ）。エメラルドを持って正面の列のボタンを押すと、缶ソーダ（1）・スポーツドリンク（1）・エナジードリンク（2）が買える。研究所のものは、施設の電力が戻ると動き出す。', 'A laboratory drinks vending machine (two blocks tall). Hold emeralds and press the button under a column to buy Canned Soda (1), Sports Drink (1) or Energy Drink (2). The ones in the laboratory start working once facility power is restored.'),
     '書類の山': ('机に積まれたままの書類。', 'Papers left piled on a desk.'),
     'ごみ箱': ('研究所のごみ箱。アンドロイドが毎日空にしている。', 'A laboratory trash bin. The androids empty it every day.'),
+    '居室灯': ('研究所の個室の天井灯。レッドストーンの信号が入っている間だけ光る（天井のそばのレバーで点けたり消したりする）。施設の電力はいらない。照明の設計図から作れる。',
+        'The ceiling light of a laboratory private room. It glows only while it gets a redstone signal (flip the lever beside it on the ceiling). Needs no facility power. Made from the Lighting Blueprint.'),
     'レイリー散乱パネル（研究所）': ('研究所の天井の空の投影板。施設の電力が戻ると、下の面に雲のない真昼の青空が映り、真下を日差しのように照らす（真下の日照センサーはずっと真昼の値を出す）。並べると1枚の広い空になる。壊すと何も残らない。',
         'A sky projection panel in the laboratory ceiling. Once facility power returns, its underside shows a cloudless midday sky and lights the space below like sunlight (daylight detectors underneath read midday). Panels side by side join into one wide sky. Leaves nothing when broken.'),
     'レイリー散乱パネル': ('天井に張る空の投影板。パネル受電器から電力が届くと（1枚 20 FE/t。つながったパネル全体へ配られる）、下の面に雲・太陽のない真昼の青空が映り、真下を日差しのように照らす（明るさ15。真下の日照センサーはずっと真昼の値を出す）。夜にはならない。電力が切れると真夜中のように暗い。並べると縁が消えて1枚の広い空になる。レイリー散乱パネルの設計図から作る。',

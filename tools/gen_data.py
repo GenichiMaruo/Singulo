@@ -3517,7 +3517,7 @@ TAB_GROUPS = [
             'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
     # 地下アンドロイド研究所: 建材 → 照明 → 装置 → 小物 → 製造ライン
     ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead', 'lab_door',
-              'facility_light', 'emergency_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
+              'facility_light', 'emergency_light', 'room_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
               'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'canned_soda', 'sports_drink', 'energy_drink',
               'coffee', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),

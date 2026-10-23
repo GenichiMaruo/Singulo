@@ -1103,6 +1103,10 @@
     "source": "Rogue Black Hole",
     "translation": "流浪黑洞"
   },
+  "block.singulo.room_light": {
+    "source": "Room Light",
+    "translation": "居室灯"
+  },
   "block.singulo.ruin_android_fabricator": {
     "source": "Ruin Android Fabricator",
     "translation": "废墟仿生人打印台"
@@ -2558,6 +2562,10 @@
   "desc.singulo.relocation_wrench": {
     "source": "Sneak-use to relocate processing machines, generators, energy storage and catalyst devices with their items, fluids, energy and settings.",
     "translation": "潜行使用可迁移加工装置、发电机、储能装置及催化装置，并保留物品、流体、电力和设置。"
+  },
+  "desc.singulo.room_light": {
+    "source": "The ceiling light of a laboratory private room. It glows only while it gets a redstone signal (flip the lever beside it on the ceiling). Needs no facility power. Made from the Lighting Blueprint.",
+    "translation": "研究所个人房间的天花板灯。仅在接收红石信号时发光（用旁边天花板上的拉杆开关）。不需要设施电力。用照明设计图制作。"
   },
   "desc.singulo.ruin_android_fabricator": {
     "source": "Prints androids onto its bed and sends them out. Defeat them all for a 50% chance at a compact crystal memory of their design.",
@@ -7702,6 +7710,10 @@
   "howto.singulo.relocation_wrench": {
     "source": "Made in: Crafting Table (stage 1)",
     "translation": "制作于：工作台（阶段 1）"
+  },
+  "howto.singulo.room_light": {
+    "source": "Made in: Crafting Table (stage 1)",
+    "translation": "制造地：工作台（第 1 阶段）"
   },
   "howto.singulo.ruin_glass": {
     "source": "Made in: Crafting Table (stage 1)",

@@ -44,6 +44,7 @@
     "singulo:vending_machine",
     "singulo:paper_stack",
     "singulo:trash_bin",
+    "singulo:room_light",
     "singulo:lab_rayleigh_panel",
     "singulo:rayleigh_panel",
     "singulo:white_panel",
