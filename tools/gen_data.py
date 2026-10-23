@@ -3113,6 +3113,7 @@ def tags():
 
 
 RUIN_PLACEMENT = {
+                       'zero_gravity_controller': ['minecraft:block_entity_data'],
     # 遺構ID: (間隔, 最小間隔, salt, バイオーム)。間隔はチャンク（同じ遺構どうしのおおよその距離）
     'observation_post': (40, 16, 19370501, ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:desert',
                                             'minecraft:savanna', 'minecraft:savanna_plateau', 'minecraft:snowy_plains',

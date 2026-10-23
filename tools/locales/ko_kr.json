@@ -2972,8 +2972,8 @@
     "translation": "패널 수전기에서 전력이 오면 위의 공간(처음에는 5블록)이 무중력이 된다. 그 안에서는 점프 키로 위로, 웅크리기로 아래로 떠다니며 낙하 피해도 없다. 1개 30 FE/t. 높이는 무중력 컨트롤 박스로 바꿀 수 있다. 옆의 같은 블록과 모양이 이어진다."
   },
   "desc.singulo.zero_gravity_controller": {
-    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Each extra block of height multiplies the power of every zero-gravity block by 1.6.",
-    "translation": "무중력 블록에 붙이면 이어진 무중력 블록 전체의 무중력 높이를 바꿀 수 있다(우클릭으로 1블록 올리고, 웅크린 채 우클릭으로 내린다. 상한 없음). 높이 1블록마다 무중력 블록 1개의 전력이 1.6배가 된다."
+    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Boxes on the same group share one height, and a broken box keeps its height as an item. Each extra block of height multiplies the power of every zero-gravity block by 1.4.",
+    "translation": "무중력 블록에 붙이면 이어진 무중력 블록 전체의 무중력 높이를 바꿀 수 있다(우클릭으로 1블록 올리고, 웅크린 채 우클릭으로 내린다. 상한 없음). 같은 무리의 박스는 같은 높이를 공유하고, 부숴도 높이는 아이템에 남는다. 높이 1블록마다 무중력 블록 1개의 전력이 1.4배가 된다."
   },
   "desc.singulo.zinc_dust": {
     "source": "Finely powdered zinc.",

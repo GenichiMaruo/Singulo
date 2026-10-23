@@ -59,6 +59,17 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
         }
     }
 
+    /** 置いたら、同じ集まりのボックスの高さに合わせる（ブロックのデータを読んだあと）。 */
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer,
+                            net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ZeroGravityControllerBlockEntity be) {
+            be.adoptGroupHeight();
+            ZeroGravityControllerBlockEntity.notifyReceivers(level, pos);
+        }
+    }
+
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
         boolean removed = !state.is(newState.getBlock());

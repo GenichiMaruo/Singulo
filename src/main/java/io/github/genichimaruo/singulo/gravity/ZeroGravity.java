@@ -26,7 +26,7 @@ public final class ZeroGravity {
     public static final int DEFAULT_HEIGHT = 5;
     /** 高さ {@value #DEFAULT_HEIGHT} のときの、無重力ブロック1つの電力（FE/t）と、高さ1ブロックごとの倍率。 */
     public static final long BASE_COST = 30;
-    public static final double GROWTH = 1.6;
+    public static final double GROWTH = 1.4;
     static final ResourceLocation ID = Singulo.id("zero_gravity");
 
     /** ワールドごとの一覧: 列（x, z） → その列の無重力ブロック（y と高さを1つの long に）。 */

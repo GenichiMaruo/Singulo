@@ -2972,8 +2972,8 @@
     "translation": "由面板受电器供电时，上方的空间（初始为5格）会变成无重力。在其中按跳跃键向上、潜行向下漂浮，也不会受到摔落伤害。每个30 FE/t。高度可用无重力控制箱改变。与相邻的同种方块外观相连。"
   },
   "desc.singulo.zero_gravity_controller": {
-    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Each extra block of height multiplies the power of every zero-gravity block by 1.6.",
-    "translation": "装在无重力方块上后，可改变相连的全部无重力方块的无重力高度（右键升高1格，潜行右键降低，没有上限）。高度每增加1格，每个无重力方块的耗电变为1.6倍。"
+    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Boxes on the same group share one height, and a broken box keeps its height as an item. Each extra block of height multiplies the power of every zero-gravity block by 1.4.",
+    "translation": "装在无重力方块上后，可改变相连的全部无重力方块的无重力高度（右键升高1格，潜行右键降低，没有上限）。同一组的控制箱共享同一高度，破坏后高度也会保留在物品上。高度每增加1格，每个无重力方块的耗电变为1.4倍。"
   },
   "desc.singulo.zinc_dust": {
     "source": "Finely powdered zinc.",

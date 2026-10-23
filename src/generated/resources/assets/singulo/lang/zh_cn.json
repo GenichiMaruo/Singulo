@@ -742,7 +742,7 @@
   "desc.singulo.wormhole_port": "在入口 8 格内时，把机器连接到另一端入口附近编号相同（0-127）的端口。每个入口按喉部大小可让 8、32 或 128 个端口工作，按距离由近到远。工作时会发光。",
   "desc.singulo.wormhole_stabilizer": "用奇异物质稳定不稳定虫洞入口，使其成为可以放置的入口。",
   "desc.singulo.zero_gravity_block": "由面板受电器供电时，上方的空间（初始为5格）会变成无重力。在其中按跳跃键向上、潜行向下漂浮，也不会受到摔落伤害。每个30 FE/t。高度可用无重力控制箱改变。与相邻的同种方块外观相连。",
-  "desc.singulo.zero_gravity_controller": "装在无重力方块上后，可改变相连的全部无重力方块的无重力高度（右键升高1格，潜行右键降低，没有上限）。高度每增加1格，每个无重力方块的耗电变为1.6倍。",
+  "desc.singulo.zero_gravity_controller": "装在无重力方块上后，可改变相连的全部无重力方块的无重力高度（右键升高1格，潜行右键降低，没有上限）。同一组的控制箱共享同一高度，破坏后高度也会保留在物品上。高度每增加1格，每个无重力方块的耗电变为1.4倍。",
   "desc.singulo.zinc_dust": "细碎的锌粉。",
   "desc.singulo.zinc_ingot": "锌的金属锭。",
   "direction.singulo.east": "东",
