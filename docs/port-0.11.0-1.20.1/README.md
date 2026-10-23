@@ -1,6 +1,6 @@
 # Singulo 0.11.0 — Minecraft 1.20.1
 
-Forge 47.4.26 / NeoForge 47.1.106、Java 17。両ローダーを共通ソースからビルドする。CIのコンパイラは17.0.21に固定し、17.0.20でMixin注釈処理中に発生する匿名クラスのコンパイルエラーを避ける。配布物はJava 17形式。
+Forge 47.4.26 / NeoForge 47.1.106、Java 17。両ローダーを共通ソースからビルドする。CIのコンパイラは17.0.21に固定する。旧Minecraftバイトコードの重複した引数名でMixin注釈処理が失敗しないよう、匿名サブクラスの親コンストラクタには明示した引数名を持つ互換クラスを使用する。配布物はJava 17形式。
 
 ```sh
 bash ./gradlew -Ploader=forge build runGameTestServer

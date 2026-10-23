@@ -34,7 +34,7 @@ public class GenesisCoreMenu extends AbstractContainerMenu {
         super(SinguloMenus.GENESIS_CORE.get(), containerId);
         this.pos = pos;
         Player player = inventory.player;
-        addSlot(new Slot(output, 0, OUTPUT_X, OUTPUT_Y) {
+        addSlot(new io.github.genichimaruo.singulo.compat.LegacyConstructors.MenuSlot(output, 0, OUTPUT_X, OUTPUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -46,7 +46,7 @@ public class GenesisCoreMenu extends AbstractContainerMenu {
                 return complete(player);
             }
         });
-        addSlot(new Slot(template, 0, TEMPLATE_X, TEMPLATE_Y) {
+        addSlot(new io.github.genichimaruo.singulo.compat.LegacyConstructors.MenuSlot(template, 0, TEMPLATE_X, TEMPLATE_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -64,11 +64,11 @@ public class GenesisCoreMenu extends AbstractContainerMenu {
         });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inventory, col + row * 9 + 9, INVENTORY_X + col * 18, INVENTORY_Y + row * 18));
+                addSlot(new io.github.genichimaruo.singulo.compat.LegacyConstructors.MenuSlot(inventory, col + row * 9 + 9, INVENTORY_X + col * 18, INVENTORY_Y + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inventory, col, INVENTORY_X + col * 18, INVENTORY_Y + 58));
+            addSlot(new io.github.genichimaruo.singulo.compat.LegacyConstructors.MenuSlot(inventory, col, INVENTORY_X + col * 18, INVENTORY_Y + 58));
         }
     }
 

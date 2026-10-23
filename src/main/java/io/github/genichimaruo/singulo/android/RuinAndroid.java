@@ -1714,7 +1714,7 @@ public abstract class RuinAndroid extends Monster {
     /** 経路探しで、進入禁止ゾーンを通れないところとして扱う。 */
     @Override
     protected net.minecraft.world.entity.ai.navigation.PathNavigation createNavigation(Level level) {
-        return new net.minecraft.world.entity.ai.navigation.GroundPathNavigation(this, level) {
+        return new io.github.genichimaruo.singulo.compat.LegacyConstructors.GroundNavigation(this, level) {
             @Override
             protected net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int maxVisitedNodes) {
                 this.nodeEvaluator = new net.minecraft.world.level.pathfinder.WalkNodeEvaluator() {
@@ -2160,7 +2160,7 @@ public abstract class RuinAndroid extends Monster {
         goalSelector.addGoal(3, new StashGoal());
         goalSelector.addGoal(4, life);
         goalSelector.addGoal(5, new GuardGoal());
-        goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7) {
+        goalSelector.addGoal(6, new io.github.genichimaruo.singulo.compat.LegacyConstructors.StrollGoal(this, 0.7) {
             @Override
             public boolean canUse() {
                 return (!guard || mode == MODE_WANDER) && super.canUse();
@@ -2170,7 +2170,7 @@ public abstract class RuinAndroid extends Monster {
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         // 遺構のものはプレイヤーを、護衛は敵対モブと、許可証に載っていない人を狙う。
         // 護衛は、許可証に載っている人（許可証がなければ、だれでも）に打たれても仕返ししない
-        targetSelector.addGoal(1, new HurtByTargetGoal(this) {
+        targetSelector.addGoal(1, new io.github.genichimaruo.singulo.compat.LegacyConstructors.RetaliationGoal(this) {
             @Override
             public boolean canUse() {
                 return super.canUse() && !(guard && (getLastHurtByMob() instanceof Player p && !intruder(p)
