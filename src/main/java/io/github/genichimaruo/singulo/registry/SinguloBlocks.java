@@ -370,6 +370,12 @@ public final class SinguloBlocks {
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> HIGH_GRAVITY_PANEL = BLOCKS.register(
             "high_gravity_panel", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_BLACK),
                     io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.HIGH));
+    /** 無重力ブロック（働いている間、上の空間が無重力になる。高さは無重力コントロールボックスで変える）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityPanelBlock> ZERO_GRAVITY_BLOCK = BLOCKS.register(
+            "zero_gravity_block", () -> new io.github.genichimaruo.singulo.gravity.GravityPanelBlock(gravityProperties(MapColor.COLOR_PURPLE),
+                    io.github.genichimaruo.singulo.gravity.GravityPanelBlock.Kind.ZERO));
+    public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlock> ZERO_GRAVITY_CONTROLLER = BLOCKS.register(
+            "zero_gravity_controller", () -> new io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlock(machineProperties()));
     public static final DeferredBlock<io.github.genichimaruo.singulo.gravity.GravityReceiverBlock> GRAVITY_PANEL_RECEIVER = BLOCKS.register(
             "gravity_panel_receiver", () -> new io.github.genichimaruo.singulo.gravity.GravityReceiverBlock(machineProperties()));
     /** 衝撃発電パネル（上に落ちても落下ダメージを受けず、落ちた高さに応じてわずかに発電し、重力パネルへ配る）。 */

@@ -35,9 +35,6 @@ public final class SinguloCapabilities {
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, SinguloBlockEntities.MULTIBLOCK_PORT.get(),
                 (be, side) -> be.delegate(Capabilities.FluidHandler.BLOCK));
 
-        // レイリー散乱パネル（作ったものだけ FE を受ける）
-        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.RAYLEIGH_PANEL.get(),
-                (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.THERMOELECTRIC_GENERATOR.get(),
                 (be, side) -> be.energy());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.CRYOGENIC_TURBINE.get(),

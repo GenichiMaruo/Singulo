@@ -904,8 +904,8 @@
     "translation": "중력파 검출기"
   },
   "block.singulo.gravity_panel_receiver": {
-    "source": "Gravity Panel Receiver",
-    "translation": "중력 패널 수전기"
+    "source": "Panel Receiver",
+    "translation": "패널 수전기"
   },
   "block.singulo.guardian_core": {
     "source": "Guardian Seal Core",
@@ -1354,6 +1354,14 @@
   "block.singulo.wormhole_stabilizer": {
     "source": "Wormhole Stabilizer",
     "translation": "웜홀 안정기"
+  },
+  "block.singulo.zero_gravity_block": {
+    "source": "Zero-Gravity Block",
+    "translation": "무중력 블록"
+  },
+  "block.singulo.zero_gravity_controller": {
+    "source": "Zero-Gravity Control Box",
+    "translation": "무중력 컨트롤 박스"
   },
   "command.singulo.blackhole.done": {
     "source": "Rogue black hole at %s, %s, %s · mass %s",
@@ -2188,8 +2196,8 @@
     "translation": "중력장의 요동을 억제하는 부품."
   },
   "desc.singulo.gravity_panel_receiver": {
-    "source": "Powers every gravity panel connected to it. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active.",
-    "translation": "연결된 모든 중력 패널에 전력을 공급합니다. 전력이 부족하면 감당할 수 있는 가장 가까운 패널만 작동합니다. 우클릭하면 작동 중인 개수를 볼 수 있습니다."
+    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It accepts any amount per tick and stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
+    "translation": "케이블에서 전력을 받아, 맞닿은 패널과 거기서 면으로 이어진 패널 전체에 나눠 준다(저중력·고중력 패널, 무중력 블록, 만든 레일리 산란 패널). 1틱에 얼마든지 받을 수 있고, 이어진 수가 아주 많아도 무거워지지 않는다. 전력이 부족하면 가까운 순으로 낼 수 있는 만큼만 작동한다. 우클릭으로 작동 중인 수와 전력을 본다."
   },
   "desc.singulo.guardian_core": {
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
@@ -2512,8 +2520,8 @@
     "translation": "철과 니켈을 함유한 운석 원석."
   },
   "desc.singulo.rayleigh_panel": {
-    "source": "A sky projection panel for ceilings. Fed FE (20 FE/t), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
-    "translation": "천장에 붙이는 하늘 투영판. FE를 보내면(20 FE/t) 아래 면에 구름·태양이 없는 한낮의 푸른 하늘이 비치고, 바로 아래를 햇살처럼 비춘다(밝기 15. 바로 아래의 햇빛 감지기는 계속 한낮의 값을 낸다). 밤이 되지 않는다. 전력이 끊기면 한밤중처럼 어둡다. 나란히 놓으면 테두리가 사라져 하나의 넓은 하늘이 된다. 레일리 산란 패널의 설계도로 만든다."
+    "source": "A sky projection panel for ceilings. Powered by a panel receiver (20 FE/t each, shared across all joined panels), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
+    "translation": "천장에 붙이는 하늘 투영판. 패널 수전기에서 전력이 오면(1장 20 FE/t. 이어진 패널 전체에 나눠진다) 아래 면에 구름·태양이 없는 한낮의 푸른 하늘이 비치고, 바로 아래를 햇살처럼 비춘다(밝기 15. 바로 아래의 햇빛 감지기는 계속 한낮의 값을 낸다). 밤이 되지 않는다. 전력이 끊기면 한밤중처럼 어둡다. 나란히 놓으면 테두리가 사라져 하나의 넓은 하늘이 된다. 레일리 산란 패널의 설계도로 만든다."
   },
   "desc.singulo.reactor_console": {
     "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",
@@ -2950,6 +2958,14 @@
   "desc.singulo.wormhole_stabilizer": {
     "source": "Stabilizes an unstable wormhole mouth with exotic matter so that it can be placed.",
     "translation": "불안정한 웜홀 입구를 특이 물질로 안정시켜 설치할 수 있는 입구로 만듭니다."
+  },
+  "desc.singulo.zero_gravity_block": {
+    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Joins visually with its neighbours.",
+    "translation": "패널 수전기에서 전력이 오면 위의 공간(처음에는 5블록)이 무중력이 된다. 그 안에서는 점프 키로 위로, 웅크리기로 아래로 떠다니며 낙하 피해도 없다. 1개 30 FE/t. 높이는 무중력 컨트롤 박스로 바꿀 수 있다. 옆의 같은 블록과 모양이 이어진다."
+  },
+  "desc.singulo.zero_gravity_controller": {
+    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Each extra block of height multiplies the power of every zero-gravity block by 1.6.",
+    "translation": "무중력 블록에 붙이면 이어진 무중력 블록 전체의 무중력 높이를 바꿀 수 있다(우클릭으로 1블록 올리고, 웅크린 채 우클릭으로 내린다. 상한 없음). 높이 1블록마다 무중력 블록 1개의 전력이 1.6배가 된다."
   },
   "desc.singulo.zinc_dust": {
     "source": "Finely powdered zinc.",
@@ -8019,6 +8035,14 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "제작: 정밀 조립기(5단계)"
   },
+  "howto.singulo.zero_gravity_block": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.zero_gravity_controller": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
   "howto.singulo.zinc_dust": {
     "source": "Made in: Compressor (stage 1)",
     "translation": "제작: 압축기(1단계)"
@@ -9184,8 +9208,8 @@
     "translation": "수소 %s/%s mB · 산소 %s/%s mB · 축전 %s/%s FE · %s"
   },
   "message.singulo.gravity_receiver.status": {
-    "source": "Gravity panels active: %s / %s (%s FE/t each)",
-    "translation": "작동 중인 중력 패널: %s / %s (개당 %s FE/t)"
+    "source": "Panels active: %s / %s (%s FE/t in total)",
+    "translation": "패널 %s / %s장 작동 중(합계 %s FE/t)"
   },
   "message.singulo.hidden_records_complete": {
     "source": "You have read every sealed record",
@@ -9338,6 +9362,10 @@
   "message.singulo.work_location.recorded": {
     "source": "Recorded %s at %s, %s, %s",
     "translation": "%s의 위치를 기록했습니다(%s, %s, %s)"
+  },
+  "message.singulo.zero_gravity_controller.height": {
+    "source": "Weightless height: %s blocks (%s FE/t per zero-gravity block)",
+    "translation": "무중력 높이: %s블록(무중력 블록 1개 %s FE/t)"
   },
   "metric_drive.singulo.mode.high_gravity": {
     "source": "High gravity",
@@ -10488,8 +10516,8 @@
     "translation": "에너지로 우주를 만들어 내는 노의 핵."
   },
   "summary.singulo.gravity_panel_receiver": {
-    "source": "Powers every connected gravity panel.",
-    "translation": "연결된 모든 중력 패널에 전력을 나눠 준다."
+    "source": "Powers every connected gravity panel, zero-gravity block and Rayleigh sky panel.",
+    "translation": "이어진 중력 패널·무중력 블록·레일리 산란 패널에 전력을 나눠 준다."
   },
   "summary.singulo.impact_generator_panel": {
     "source": "Stores power from how far you fall and feeds gravity panels. No fall damage.",
@@ -10542,6 +10570,10 @@
   "summary.singulo.wormhole_port": {
     "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
     "translation": "반대편 입구 근처의 같은 번호 포트와 전력·아이템·액체를 잇는다."
+  },
+  "summary.singulo.zero_gravity_controller": {
+    "source": "Sets the weightless height of joined zero-gravity blocks.",
+    "translation": "이어진 무중력 블록의 무중력 높이를 정한다."
   },
   "tooltip.singulo.android_accessory.0": {
     "source": "Worn on an android's head (decoration page)",
@@ -10888,12 +10920,12 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 47 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 47개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 48 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 48개"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
-    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 25개"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
+    "translation": "사용 대상: 열전 발전기, 소성로, 압축기, 전해조, 기록 보관 단말기 외 26개"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -11396,8 +11428,8 @@
     "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 83개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 55개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 57 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 57개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
@@ -11476,8 +11508,8 @@
     "translation": "사용 대상: 사방별 흰색 유리 패널"
   },
   "uses.singulo.white_panel": {
-    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel",
-    "translation": "사용 대상: 발광 흰색 패널, 흰색 슬라이딩 도어, 저중력 패널"
+    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block",
+    "translation": "사용 대상: 발광 흰색 패널, 흰색 슬라이딩 도어, 저중력 패널, 무중력 블록"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",

@@ -904,8 +904,8 @@
     "translation": "重力波探測器"
   },
   "block.singulo.gravity_panel_receiver": {
-    "source": "Gravity Panel Receiver",
-    "translation": "重力面板受電器"
+    "source": "Panel Receiver",
+    "translation": "面板受電器"
   },
   "block.singulo.guardian_core": {
     "source": "Guardian Seal Core",
@@ -1354,6 +1354,14 @@
   "block.singulo.wormhole_stabilizer": {
     "source": "Wormhole Stabilizer",
     "translation": "蟲洞穩定器"
+  },
+  "block.singulo.zero_gravity_block": {
+    "source": "Zero-Gravity Block",
+    "translation": "無重力方塊"
+  },
+  "block.singulo.zero_gravity_controller": {
+    "source": "Zero-Gravity Control Box",
+    "translation": "無重力控制箱"
   },
   "command.singulo.blackhole.done": {
     "source": "Rogue black hole at %s, %s, %s · mass %s",
@@ -2188,8 +2196,8 @@
     "translation": "抑制重力場波動的部件。"
   },
   "desc.singulo.gravity_panel_receiver": {
-    "source": "Powers every gravity panel connected to it. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active.",
-    "translation": "為與其相連的所有重力面板供電。電力不足時，只有它能負擔的最近的面板會運作。右鍵查看正在運作的數量。"
+    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It accepts any amount per tick and stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
+    "translation": "從線纜接收電力，分配給相接的面板以及與其以面相連的全部面板（低重力、高重力面板，無重力方塊，製作的瑞利散射面板）。每刻可接收任意電量，即使相連數量極多也不會卡頓。電力不足時，按距離由近到遠只驅動付得起的數量。右鍵查看運行數量與耗電。"
   },
   "desc.singulo.guardian_core": {
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
@@ -2512,8 +2520,8 @@
     "translation": "含有鐵和鎳的隕石原礦。"
   },
   "desc.singulo.rayleigh_panel": {
-    "source": "A sky projection panel for ceilings. Fed FE (20 FE/t), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
-    "translation": "貼在天花板上的天空投影板。輸入FE（20 FE/t）後，底面會映出沒有雲和太陽的正午藍天，並像陽光一樣照亮正下方（亮度15，正下方的陽光感測器始終輸出正午的數值）。不會變成夜晚。斷電後像午夜一樣漆黑。並排放置時邊框會消失，連成一片寬廣的天空。用瑞利散射面板的設計圖製作。"
+    "source": "A sky projection panel for ceilings. Powered by a panel receiver (20 FE/t each, shared across all joined panels), its underside shows a midday sky with no clouds or sun and lights the space below like sunlight (light level 15; daylight detectors underneath read midday). It never turns to night; without power it is dark as midnight. Panels side by side lose their edges and join into one wide sky. Made from the Rayleigh Sky Panel Blueprint.",
+    "translation": "貼在天花板上的天空投影板。由面板受電器供電後（每塊20 FE/t，分配給相連的全部面板），底面會映出沒有雲和太陽的正午藍天，並像陽光一樣照亮正下方（亮度15，正下方的陽光感測器始終輸出正午的數值）。不會變成夜晚。斷電後像午夜一樣漆黑。並排放置時邊框會消失，連成一片寬廣的天空。用瑞利散射面板的設計圖製作。"
   },
   "desc.singulo.reactor_console": {
     "source": "Central reactor control panel. Use it to restart the reactor and restore facility power.",
@@ -2950,6 +2958,14 @@
   "desc.singulo.wormhole_stabilizer": {
     "source": "Stabilizes an unstable wormhole mouth with exotic matter so that it can be placed.",
     "translation": "以奇異物質穩定不穩定蟲洞入口，使其成為可以放置的入口。"
+  },
+  "desc.singulo.zero_gravity_block": {
+    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Joins visually with its neighbours.",
+    "translation": "由面板受電器供電時，上方的空間（初始為5格）會變成無重力。在其中按跳躍鍵向上、潛行向下漂浮，也不會受到摔落傷害。每個30 FE/t。高度可用無重力控制箱改變。與相鄰的同種方塊外觀相連。"
+  },
+  "desc.singulo.zero_gravity_controller": {
+    "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Each extra block of height multiplies the power of every zero-gravity block by 1.6.",
+    "translation": "裝在無重力方塊上後，可改變相連的全部無重力方塊的無重力高度（右鍵升高1格，潛行右鍵降低，沒有上限）。高度每增加1格，每個無重力方塊的耗電變為1.6倍。"
   },
   "desc.singulo.zinc_dust": {
     "source": "Finely powdered zinc.",
@@ -8019,6 +8035,14 @@
     "source": "Made in: Precision Assembler (stage 5)",
     "translation": "製造地：精密組裝台（第 5 階段）"
   },
+  "howto.singulo.zero_gravity_block": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製造地：精密組裝台（第 3 階段）"
+  },
+  "howto.singulo.zero_gravity_controller": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製造地：精密組裝台（第 3 階段）"
+  },
   "howto.singulo.zinc_dust": {
     "source": "Made in: Compressor (stage 1)",
     "translation": "製造地：壓縮機（第 1 階段）"
@@ -9184,8 +9208,8 @@
     "translation": "氫 %s/%s mB　氧 %s/%s mB　儲電 %s/%s FE　%s"
   },
   "message.singulo.gravity_receiver.status": {
-    "source": "Gravity panels active: %s / %s (%s FE/t each)",
-    "translation": "正在運作的重力面板：%s / %s（每塊 %s FE/t）"
+    "source": "Panels active: %s / %s (%s FE/t in total)",
+    "translation": "面板 %s / %s 塊運行中（合計 %s FE/t）"
   },
   "message.singulo.hidden_records_complete": {
     "source": "You have read every sealed record",
@@ -9338,6 +9362,10 @@
   "message.singulo.work_location.recorded": {
     "source": "Recorded %s at %s, %s, %s",
     "translation": "已記錄 %s 的位置（%s, %s, %s）"
+  },
+  "message.singulo.zero_gravity_controller.height": {
+    "source": "Weightless height: %s blocks (%s FE/t per zero-gravity block)",
+    "translation": "無重力高度：%s 格（每個無重力方塊 %s FE/t）"
   },
   "metric_drive.singulo.mode.high_gravity": {
     "source": "High gravity",
@@ -10488,8 +10516,8 @@
     "translation": "以能量創造宇宙的爐之核心。"
   },
   "summary.singulo.gravity_panel_receiver": {
-    "source": "Powers every connected gravity panel.",
-    "translation": "向所有相連的重力面板供電。"
+    "source": "Powers every connected gravity panel, zero-gravity block and Rayleigh sky panel.",
+    "translation": "向相連的重力面板、無重力方塊和瑞利散射面板分配電力。"
   },
   "summary.singulo.impact_generator_panel": {
     "source": "Stores power from how far you fall and feeds gravity panels. No fall damage.",
@@ -10542,6 +10570,10 @@
   "summary.singulo.wormhole_port": {
     "source": "Links power, items and fluids with the same-numbered port by the twin mouth.",
     "translation": "與另一側入口附近同編號的連接埠連通電力、物品和液體。"
+  },
+  "summary.singulo.zero_gravity_controller": {
+    "source": "Sets the weightless height of joined zero-gravity blocks.",
+    "translation": "設定相連無重力方塊的無重力高度。"
   },
   "tooltip.singulo.android_accessory.0": {
     "source": "Worn on an android's head (decoration page)",
@@ -10888,12 +10920,12 @@
     "translation": "用於：創世爐核心、原初之種"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 47 more",
-    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 47 個"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 48 more",
+    "translation": "用於：設定卡、探索羅盤、全像投影器、熱電發電機、燒製爐 等 48 個"
   },
   "uses.singulo.basic_frame": {
-    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 25 more",
-    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 25 個"
+    "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
+    "translation": "用於：熱電發電機、燒製爐、壓縮機、電解槽、檔案終端 等 26 個"
   },
   "uses.singulo.bh_container": {
     "source": "Used in: Micro Black Hole Vessel",
@@ -11396,8 +11428,8 @@
     "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 83 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 55 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 55 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 57 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 57 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
@@ -11476,8 +11508,8 @@
     "translation": "用於：四芒星白色玻璃面板"
   },
   "uses.singulo.white_panel": {
-    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel",
-    "translation": "用於：發光白色面板、白色滑動門、低重力面板"
+    "source": "Used in: Glowing White Panel, White Sliding Door, Low-Gravity Panel, Zero-Gravity Block",
+    "translation": "用於：發光白色面板、白色滑動門、低重力面板、無重力方塊"
   },
   "uses.singulo.wormhole_generator_coil": {
     "source": "Used in: Wormhole Generator",

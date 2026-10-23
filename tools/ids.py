@@ -183,10 +183,12 @@ MOD = {
     '慣性スタビライザー': ('inertial_stabilizer', 'Inertial Stabilizer', 'machine'),
     '残響共鳴器': ('echo_resonator', 'Echo Resonator', 'machine'),
     '慣性制御ガントレット': ('inertial_control_gauntlet', 'Inertial Control Gauntlet', 'tool'),
-    '重力パネル受電器': ('gravity_panel_receiver', 'Gravity Panel Receiver', 'gravity'),
+    'パネル受電器': ('gravity_panel_receiver', 'Panel Receiver', 'gravity'),
     '衝撃発電パネル': ('impact_generator_panel', 'Impact Generator Panel', 'gravity'),
     '低重力パネル': ('low_gravity_panel', 'Low-Gravity Panel', 'gravity'),
     '高重力パネル': ('high_gravity_panel', 'High-Gravity Panel', 'gravity'),
+    '無重力ブロック': ('zero_gravity_block', 'Zero-Gravity Block', 'gravity'),
+    '無重力コントロールボックス': ('zero_gravity_controller', 'Zero-Gravity Control Box', 'gravity'),
 
     # ---- 段階4 ----
     '圧縮ブロックLv2': ('compressed_block_2', 'Compressed Block Lv2', 'block'),

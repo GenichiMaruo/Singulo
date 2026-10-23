@@ -56,6 +56,8 @@
     "singulo:impact_generator_panel",
     "singulo:low_gravity_panel",
     "singulo:high_gravity_panel",
+    "singulo:zero_gravity_block",
+    "singulo:zero_gravity_controller",
     "singulo:compressed_block_2",
     "singulo:compressed_block_3",
     "singulo:degenerate_compactor_frame",

@@ -2,6 +2,7 @@
   "parent": "minecraft:block/block",
   "textures": {
     "side": "singulo:block/lab_rayleigh_panel_side",
+    "top": "singulo:block/lab_rayleigh_panel_top",
     "bottom": "singulo:block/lab_rayleigh_panel_bottom",
     "particle": "singulo:block/lab_rayleigh_panel_side"
   },
@@ -35,7 +36,7 @@
           "cullface": "west"
         },
         "up": {
-          "texture": "#side",
+          "texture": "#top",
           "cullface": "up"
         },
         "down": {

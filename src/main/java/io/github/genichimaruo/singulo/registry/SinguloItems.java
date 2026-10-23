@@ -364,6 +364,8 @@ public final class SinguloItems {
         block(SinguloBlocks.LOW_GRAVITY_PANEL, 3);
         block(SinguloBlocks.HIGH_GRAVITY_PANEL, 3);
         block(SinguloBlocks.GRAVITY_PANEL_RECEIVER, 3);
+        block(SinguloBlocks.ZERO_GRAVITY_BLOCK, 3);
+        block(SinguloBlocks.ZERO_GRAVITY_CONTROLLER, 3);
         block(SinguloBlocks.IMPACT_GENERATOR, 3);
         block(SinguloBlocks.KERAUNOS_TOWER, 3);
         block(SinguloBlocks.DEEP_SEA_COLLECTOR, 3);

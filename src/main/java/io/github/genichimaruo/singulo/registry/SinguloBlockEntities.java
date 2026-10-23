@@ -140,6 +140,9 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity>> GRAVITY_RECEIVER =
             REGISTER.register("gravity_panel_receiver", () -> build(io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity::new,
                     SinguloBlocks.GRAVITY_PANEL_RECEIVER.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlockEntity>> ZERO_GRAVITY_CONTROLLER =
+            REGISTER.register("zero_gravity_controller", () -> build(io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlockEntity::new,
+                    SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity>> DEEP_SEA_COLLECTOR =
             REGISTER.register("deep_sea_collector", () -> build(io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity::new,
                     SinguloBlocks.DEEP_SEA_COLLECTOR.get()));

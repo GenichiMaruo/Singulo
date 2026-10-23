@@ -439,6 +439,23 @@ def rayleigh_casing(lab):
     return im
 
 
+def rayleigh_top(lab):
+    """上面（天井の裏側）: 研究所のものは白い板に配線の溝、作ったものは鋼の板に受電の端子。中央に空色の小さな窓。"""
+    if lab:
+        im = lab_panel()
+        from PIL import ImageDraw
+        d = ImageDraw.Draw(im)
+        d.line([(3, 8), (12, 8)], fill=rgba(SEAM))
+    else:
+        im, d = new(rgba(STEEL))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(STEEL_DARK))
+        d.rectangle([2, 2, S - 3, S - 3], outline=rgba(STEEL_HI))
+        for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+            d.point((x, y), fill=rgba(STEEL_DARK))
+    d.rectangle([6, 6, 9, 9], fill=rgba(RAYLEIGH_NOON[1]), outline=rgba(RAYLEIGH_FRAME[lab]))
+    return im
+
+
 def rayleigh_bottom(lab):
     """下の面（投影面）: 縁1ドット（光らない）と、消えているときの暗い面。点いている空は Java が上に描く。"""
     im, d = new(rgba(RAYLEIGH_NIGHT))
@@ -614,7 +631,8 @@ def textures(tb, save_plain):
         name = 'lab_rayleigh_panel' if lab else 'rayleigh_panel'
         save(rayleigh_casing(lab), tb / f'{name}_side.png')
         save_plain(rayleigh_bottom(lab), tb / f'{name}_bottom.png')
-        save_plain(rayleigh_icon(lab), tb.parent / 'item' / f'{name}.png')
+        save(rayleigh_top(lab), tb / f'{name}_top.png')
+        save_plain(rayleigh_icon(lab), tb / f'{name}_sky.png')
     save(paper(), tb / 'paper_stack_top.png')
     save(paper_side(), tb / 'paper_stack_side.png')
     save(bin_side(), tb / 'trash_bin_side.png')
@@ -763,12 +781,25 @@ def rayleigh_models(write_json, mb, mi, bs):
     """レイリー散乱パネル: 箱（側面・上面は外装、下の面は縁と暗い面）。点いている空は RayleighPanelRenderer が下の面に重ねて描く。"""
     for iid in ('lab_rayleigh_panel', 'rayleigh_panel'):
         side, bottom = f'{MODID}:block/{iid}_side', f'{MODID}:block/{iid}_bottom'
-        faces = {d: {'texture': '#side', 'cullface': d} for d in ('north', 'south', 'east', 'west', 'up')}
+        top = f'{MODID}:block/{iid}_top'
+        faces = {d: {'texture': '#side', 'cullface': d} for d in ('north', 'south', 'east', 'west')}
+        faces['up'] = {'texture': '#top', 'cullface': 'up'}
         faces['down'] = {'texture': '#bottom', 'cullface': 'down'}
-        write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/block', 'textures': {'side': side, 'bottom': bottom, 'particle': side},
+        write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/block',
+                                        'textures': {'side': side, 'top': top, 'bottom': bottom, 'particle': side},
                                         'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': faces}]})
         write_json(bs / f'{iid}.json', {'variants': {f'lit={v}': {'model': f'{MODID}:block/{iid}'} for v in ('false', 'true')}})
-        write_json(mi / f'{iid}.json', {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
+        # 持ったとき: 立体のまま、下の面には空の絵を貼り、持ち物欄では下から見上げる向きにして空を見せる
+        item_faces = dict(faces)
+        item_faces['down'] = {'texture': '#sky'}
+        tilt = {'gui': {'rotation': [-30, 225, 0], 'translation': [0, 0, 0], 'scale': [0.625, 0.625, 0.625]}}
+        write_json(mi / f'{iid}.json', {'parent': 'minecraft:block/block',
+                                        'textures': {'side': side, 'top': top, 'bottom': bottom, 'sky': f'{MODID}:block/{iid}_sky',
+                                                     'particle': side},
+                                        'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16],
+                                                      'faces': {d: {k: v for k, v in f.items() if k != 'cullface'}
+                                                                for d, f in item_faces.items()}}],
+                                        'display': tilt})
 
 
 def door_models(write_json, mb, mi, bs):

@@ -1,6 +1,63 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "minecraft:block/block",
   "textures": {
-    "layer0": "singulo:item/lab_rayleigh_panel"
+    "side": "singulo:block/lab_rayleigh_panel_side",
+    "top": "singulo:block/lab_rayleigh_panel_top",
+    "bottom": "singulo:block/lab_rayleigh_panel_bottom",
+    "sky": "singulo:block/lab_rayleigh_panel_sky",
+    "particle": "singulo:block/lab_rayleigh_panel_side"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "down": {
+          "texture": "#sky"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        -30,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.625,
+        0.625,
+        0.625
+      ]
+    }
   }
 }

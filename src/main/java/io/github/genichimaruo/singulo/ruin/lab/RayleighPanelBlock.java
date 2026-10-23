@@ -24,7 +24,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
  * 消えていると、星のない真夜中のように暗い。夜にはならない。
  * <ul>
  *   <li>研究所の天井のもの（lab）: 研究所の中央動力炉を起動すると点く（{@link LabPower#restore}）。壊すと何も残らない。</li>
- *   <li>設計図から作るもの: FE を送ると点く（{@link RayleighPanelBlockEntity}）。縁が鋼の色で、研究所のものと少し違う。</li>
+ *   <li>設計図から作るもの: パネル受電器から電力を受けて点く（1枚 20 FE/t。受電器に接したパネルからつながった全体へ配る）。
+ *       縁が鋼の色で、研究所のものと少し違う。</li>
  * </ul>
  * 同じ種類のパネルを並べると、境目の縁が消えて1枚の広い空に見える（空の色は見る向きで決まるので、つなぎ目が出ない）。
  */
@@ -92,8 +93,7 @@ public class RayleighPanelBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        // 研究所のものは研究所の電力で切り替わるだけ。作ったものは FE を使って点く
-        return level.isClientSide || lab ? null
-                : createTickerHelper(type, SinguloBlockEntities.RAYLEIGH_PANEL.get(), RayleighPanelBlockEntity::serverTick);
+        // 研究所のものは研究所の電力で、作ったものはパネル受電器で切り替わる（パネル自身は何もしない）
+        return null;
     }
 }
