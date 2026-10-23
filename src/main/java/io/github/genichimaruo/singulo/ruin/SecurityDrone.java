@@ -235,15 +235,34 @@ public class SecurityDrone extends Monster {
         return SoundEvents.IRON_GOLEM_DEATH;
     }
 
+    /** 警備機ドックが出した個体か。この個体だけが、プレイヤーに倒されると部品を少し落とす（スポーンエッグなどの個体は落とさない）。 */
+    private boolean facilitySpawned;
+    public static final net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable> FACILITY_LOOT = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, io.github.genichimaruo.singulo.Singulo.id("entities/facility_drone"));
+
+    public void markFacilitySpawned() {
+        facilitySpawned = true;
+    }
+
+    public boolean facilitySpawned() {
+        return facilitySpawned;
+    }
+
+    @Override
+    protected net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable> getDefaultLootTable() {
+        return facilitySpawned ? FACILITY_LOOT : super.getDefaultLootTable();
+    }
+
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("tier", tier());
+        tag.putBoolean("facility_spawned", facilitySpawned);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        facilitySpawned = tag.getBoolean("facility_spawned");
         if (tag.contains("tier")) {
             entityData.set(TIER, Mth.clamp(tag.getInt("tier"), 1, 3));
         }

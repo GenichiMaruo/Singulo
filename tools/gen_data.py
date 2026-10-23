@@ -3023,6 +3023,31 @@ def compass_item_model():
         write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
             'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}_00'}, 'overrides': overrides})
 
+def facility_loot():
+    """遺構・研究所の印刷台のアンドロイドと、警備機ドックのドローンが、プレイヤーに倒されたときに落とす物（高価ではないが役に立つ部品）。
+    スポーンエッグなどで出した個体は落とさない（Java の facilitySpawned）。"""
+    def item(name, lo, hi, weight, vanilla=False):
+        e = {'type': 'minecraft:item', 'name': f'minecraft:{name}' if vanilla else mid(name), 'weight': weight}
+        if hi > 1:
+            e['functions'] = [{'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]
+        return e
+    killed = [{'condition': 'minecraft:killed_by_player'}]
+    android = [
+        {'rolls': {'type': 'minecraft:uniform', 'min': 1, 'max': 2}, 'conditions': killed, 'entries': [
+            item('基礎回路', 1, 2, 4), item('鋼板', 1, 3, 4), item('copper_ingot', 2, 4, 3, True), item('redstone', 2, 5, 3, True)]},
+        {'rolls': 1, 'conditions': killed, 'entries': [
+            item('自己修理キット', 1, 1, 15), item('超伝導コイル', 1, 1, 8), item('クリスタルメモリ', 1, 1, 3), {'type': 'minecraft:empty', 'weight': 74}]},
+    ]
+    drone = [
+        {'rolls': 1, 'conditions': killed, 'entries': [
+            item('copper_ingot', 1, 3, 4, True), item('redstone', 1, 4, 4, True), item('iron_nugget', 2, 6, 3, True), item('基礎回路', 1, 1, 2)]},
+        {'rolls': 1, 'conditions': killed, 'entries': [
+            item('glowstone_dust', 1, 2, 18, True), item('自己修理キット', 1, 1, 5), {'type': 'minecraft:empty', 'weight': 77}]},
+    ]
+    write_json(DATA / 'loot_table' / 'entities' / 'facility_android.json', {'type': 'minecraft:entity', 'pools': android})
+    write_json(DATA / 'loot_table' / 'entities' / 'facility_drone.json', {'type': 'minecraft:entity', 'pools': drone})
+
+
 def mid_entity(eid):
     return f'{MODID}:{eid}'
 
@@ -3088,6 +3113,7 @@ def tags():
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
+                       'zero_gravity_controller': ['minecraft:block_entity_data'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
     for n, (iid, _, kind) in MOD.items():
         if kind in BLOCK_KINDS and iid != 'strangelet':
@@ -3113,7 +3139,6 @@ def tags():
 
 
 RUIN_PLACEMENT = {
-                       'zero_gravity_controller': ['minecraft:block_entity_data'],
     # 遺構ID: (間隔, 最小間隔, salt, バイオーム)。間隔はチャンク（同じ遺構どうしのおおよその距離）
     'observation_post': (40, 16, 19370501, ['minecraft:plains', 'minecraft:sunflower_plains', 'minecraft:desert',
                                             'minecraft:savanna', 'minecraft:savanna_plateau', 'minecraft:snowy_plains',
@@ -3186,6 +3211,7 @@ def boss_loot():
                                        'count': lo if lo == hi else {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]
             pools.append({'rolls': 1, 'entries': [entry]})
         write_json(DATA / 'loot_table' / 'entities' / f'{boss}.json', {'type': 'minecraft:entity', 'pools': pools})
+    facility_loot()
 
 
 def ruins_data():
