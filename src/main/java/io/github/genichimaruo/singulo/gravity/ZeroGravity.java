@@ -134,6 +134,23 @@ public final class ZeroGravity {
         }
     }
 
+    public static void forgetLevel(Level level) {
+        ZONES.remove(level);
+    }
+
+    /** Only 256 indexed column lookups, independent of the size of the world or zone height. */
+    public static void forgetChunk(Level level, net.minecraft.world.level.ChunkPos chunk) {
+        Long2ObjectOpenHashMap<LongArrayList> zones = ZONES.get(level);
+        if (zones == null) return;
+        synchronized (zones) {
+            for (int x = chunk.getMinBlockX(); x <= chunk.getMaxBlockX(); x++) {
+                for (int z = chunk.getMinBlockZ(); z <= chunk.getMaxBlockZ(); z++) {
+                    zones.remove(column(x, z));
+                }
+            }
+        }
+    }
+
     /** いま無重力か（属性の修飾を見る。サーバーでもプレイヤーの手元でも使える）。 */
     public static boolean weightless(LivingEntity living) {
         AttributeInstance gravity = living.getAttribute(Attributes.GRAVITY);

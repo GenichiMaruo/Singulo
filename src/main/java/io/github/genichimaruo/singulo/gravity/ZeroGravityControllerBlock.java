@@ -43,7 +43,8 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ZeroGravityControllerBlockEntity be) {
-            be.setHeight(be.height() + (player.isSecondaryUseActive() ? -1 : 1));
+            be.setHeight(player.isSecondaryUseActive() ? be.height() - 1
+                    : be.height() == Integer.MAX_VALUE ? Integer.MAX_VALUE : be.height() + 1);
             player.displayClientMessage(Component.translatable("message.singulo.zero_gravity_controller.height", be.height(),
                     ZeroGravity.costPerBlock(be.height())), true);
         }

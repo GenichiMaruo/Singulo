@@ -66,6 +66,8 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     private long[] cost = new long[0];
     /** 受電器ごとの、いちばん近いパネルの電力の合計（ふつうの tick に払う分）。 */
     private long[] share = new long[0];
+    /** Stable panel counts per owner; the normal tick never traverses the panels. */
+    private int[] shareCount = new int[0];
     /** パネルごとの、いま働かせているか。 */
     private BitSet on = new BitSet();
     /** 前の tick に、すべてのパネルを働かせられたか（ふつうの tick の近道を使えるか）。 */
@@ -85,6 +87,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     private int active;
     /** この受電器が電力を払っているパネルの数（まとめ役が書く）。 */
     private int supplying;
+    private long supplyingDemand;
     protected long stored;
     private long nextScan;
 
@@ -172,6 +175,10 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         return supplying;
     }
 
+    public long supplyingDemand() {
+        return supplyingDemand;
+    }
+
     public boolean leader() {
         return leader;
     }
@@ -248,6 +255,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
             nearest = new int[0];
             cost = new long[0];
             share = new long[0];
+            shareCount = new int[0];
             on = new BitSet();
             allOn = false;
             return;
@@ -281,7 +289,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                 anyZero = true;
                 for (Direction d : DIRECTIONS) {
                     n.setWithOffset(p, d);
-                    if (level.getBlockEntity(n) instanceof ZeroGravityControllerBlockEntity c) {
+                    if (level.isLoaded(n) && level.getBlockEntity(n) instanceof ZeroGravityControllerBlockEntity c) {
                         height = Math.max(height, c.height());
                     }
                 }
@@ -300,6 +308,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         nearest = owner.toIntArray();
         cost = new long[count];
         share = new long[found.size()];
+        shareCount = new int[found.size()];
         long zeroCost = ZeroGravity.costPerBlock(zeroHeight);
         long demand = 0;
         for (int i = 0; i < count; i++) {
@@ -309,6 +318,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                     : RAYLEIGH_COST;
             cost[i] = c;
             share[nearest[i]] = ZeroGravity.saturatedAdd(share[nearest[i]], c);
+            shareCount[nearest[i]]++;
             demand = ZeroGravity.saturatedAdd(demand, c);
         }
         groupDemand = demand;
@@ -329,6 +339,12 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                     setPowered(level, p.set(oldOrder[i]), false, 0);
                 }
             }
+        }
+        for (int i = 0; i < count; i++) {
+            p.set(order[i]);
+            BlockState actual = level.getBlockState(p);
+            moved.set(i, actual.getBlock() instanceof GravityPanelBlock
+                    ? actual.getValue(GravityPanelBlock.POWERED) : actual.getValue(RayleighPanelBlock.LIT));
         }
         on = moved;
         allOn = false;                                            // 形が変わったので、次の tick はパネルを見直す
@@ -368,6 +384,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         }
         int count = order.length;
         int[] supplied = new int[rc];
+        long[] paid = new long[rc];
         // ふつうの tick: どの受電器も自分の受け持ちを払えるなら、パネルには触らない
         boolean easy = allOn && share.length == rc;
         for (int r = 0; easy && r < rc; r++) {
@@ -376,9 +393,8 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         if (easy) {
             for (int r = 0; r < rc; r++) {
                 budget[r] -= share[r];
-            }
-            for (int i = 0; i < count; i++) {
-                supplied[nearest[i]]++;
+                supplied[r] = shareCount[r];
+                paid[r] = share[r];
             }
         } else {
             BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
@@ -401,6 +417,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                 if (want) {
                     budget[payer] -= c;
                     supplied[payer]++;
+                    paid[payer] = ZeroGravity.saturatedAdd(paid[payer], c);
                     lit++;
                 }
                 if (want != on.get(i)) {
@@ -412,9 +429,9 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                     }
                 }
             }
-            allOn = lit == count;
+            allOn = lit == count && on.cardinality() == count;
         }
-        int now = on.cardinality();
+        int now = easy ? count : on.cardinality();
         for (int r = 0; r < rc; r++) {
             GravityReceiverBlockEntity other = group[r];
             if (other == null) {
@@ -425,6 +442,7 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                 other.setChanged();
             }
             other.supplying = supplied[r];
+            other.supplyingDemand = paid[r];
             other.active = now;
             other.groupPanels = count;
             other.groupDemand = groupDemand;
@@ -471,10 +489,22 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         allOn = false;
         // 同じ集まりのほかの受電器は、すぐに調べ直して引き継ぐ
         for (BlockPos r : receivers) {
-            if (!r.equals(worldPosition) && level.getBlockEntity(r) instanceof GravityReceiverBlockEntity other) {
+            if (!r.equals(worldPosition) && level.isLoaded(r) && level.getBlockEntity(r) instanceof GravityReceiverBlockEntity other) {
                 other.requestScan();
             }
         }
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        if (level != null && !level.isClientSide) onBroken(level);
+        super.onChunkUnloaded();
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        requestScan();
     }
 
     @Override
@@ -486,6 +516,6 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        stored = tag.getLong("energy");
+        stored = Math.max(0, tag.getLong("energy"));
     }
 }
