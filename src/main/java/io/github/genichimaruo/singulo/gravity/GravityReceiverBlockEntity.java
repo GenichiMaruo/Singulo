@@ -340,6 +340,8 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                 }
             }
         }
+        // Saved block states survive reload and leadership changes; transient BitSets do not.
+        // Reconcile the real state so an unfunded saved panel is explicitly switched off.
         for (int i = 0; i < count; i++) {
             p.set(order[i]);
             BlockState actual = level.getBlockState(p);

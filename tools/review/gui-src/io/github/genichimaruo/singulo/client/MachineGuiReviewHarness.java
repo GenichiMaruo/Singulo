@@ -17,9 +17,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 @net.neoforged.fml.common.EventBusSubscriber(modid = Singulo.MODID, value = net.neoforged.api.distmarker.Dist.CLIENT)
 public final class MachineGuiReviewHarness {
     private static final String[] LANGUAGES = {"ja_jp", "en_us", "zh_cn", "zh_tw", "ko_kr"};
-    private static final boolean SIDES = Boolean.getBoolean("singulo.sidesGuiReview");
-    private static final boolean SELECTOR = Boolean.getBoolean("singulo.selectorGuiReview");
-    private static final int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 8;
+    private static final boolean COMBINED = Boolean.getBoolean("singulo.sidesGuiReview")
+            && Boolean.getBoolean("singulo.selectorGuiReview");
+    private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
+    private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
+    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 8;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen, wait;
     private static boolean shown;
@@ -58,9 +60,19 @@ public final class MachineGuiReviewHarness {
         if (++screen < SCREENS) return;
         screen = 0;
         if (++language < LANGUAGES.length) {selectLanguage(mc); return;}
-        Files.write(output.getParent().resolve("machine-font-metrics.tsv"), metrics);
+        String prefix = SELECTOR ? "selector" : SIDES ? "sides" : "machine";
+        Files.write(output.getParent().resolve(prefix + "-font-metrics.tsv"), metrics);
         Singulo.LOGGER.info("SINGULO_MACHINE_GUI_COMPLETE {}", SCREENS * LANGUAGES.length);
-        mc.stop();
+        if (COMBINED && !SELECTOR) {
+            SELECTOR = SIDES;
+            SIDES = !SIDES;
+            SCREENS = SELECTOR ? 6 : 1;
+            language = 0;
+            metrics.clear();
+            selectLanguage(mc);
+        } else {
+            mc.stop();
+        }
     }
 
     private static void value(SyncedInts data, int index, int value) {
