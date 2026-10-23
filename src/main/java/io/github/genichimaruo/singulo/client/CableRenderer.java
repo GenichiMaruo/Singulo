@@ -104,8 +104,9 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
             }
         }
         if (cable.profile() == io.github.genichimaruo.singulo.cable.CableProfile.HORIZON && flow >= SHEATH_FLOW) {
-            // 加算で重ねる（下の芯や周りが透けたまま明るくなり、光の膜に見える）
-            VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
+            // 加算で重ねる（下の芯や周りが透けたまま明るくなり、光の膜に見える）。奥行きは書かない: 書くと、あとから描かれる
+            // 芯の光の筋（被膜の内側）が被膜に隠れて、ところどころ欠けて見える
+            VertexConsumer fx = buffers.getBuffer(GlowLayer.TYPE);
             sheath(be, last, fx, flow, time, phase);
             if (flow >= FRAME_FLOW) {
                 frames(be, last, fx, flow, time);
@@ -307,5 +308,21 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
                                float nx, float ny, float nz) {
         vc.vertex(p.pose(), x, y, z).color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha).uv(0.5F, 0.5F)
                 .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(FxDraw.FULL_BRIGHT).normal(p.normal(), nx, ny, nz).endVertex();
+    }
+
+    /** 被膜と箱の枠の描き方: RenderType.lightning と同じ加算だが、奥行きを書かない（中の芯の光の筋を隠さない）。 */
+    private static final class GlowLayer extends RenderType {
+        static final RenderType TYPE = create("singulo_cable_glow", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
+                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
+                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
+                        .setWriteMaskState(COLOR_WRITE)
+                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
+                        .setOutputState(WEATHER_TARGET)
+                        .createCompositeState(false));
+
+        private GlowLayer(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
+                     boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
+            super(name, format, mode, size, crumbling, sort, setup, clear);
+        }
     }
 }

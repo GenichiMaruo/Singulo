@@ -440,6 +440,11 @@ public final class SinguloBlocks {
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
                     .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock.POWERED) ? 15 : 0), true));
+    /** 居室灯（個室の天井灯。レバーなどのレッドストーンの信号で点く）。 */
+    public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock> ROOM_LIGHT = BLOCKS.register("room_light",
+            () -> new io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock(BlockBehaviour.Properties.of().mapColor(MapColor.SNOW)
+                    .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)
+                    .lightLevel(s -> s.getValue(io.github.genichimaruo.singulo.ruin.lab.RoomLightBlock.LIT) ? 15 : 0)));
     public static final RegistryObject<io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock> EMERGENCY_LIGHT = BLOCKS.register("emergency_light",
             () -> new io.github.genichimaruo.singulo.ruin.lab.LabPoweredBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED)
                     .strength(3.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS)

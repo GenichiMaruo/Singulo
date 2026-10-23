@@ -1,35 +1,28 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "SGS",
+    "SBS",
+    "DKG"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lab_furniture"
     },
-    {
+    "S": {
       "tag": "forge:plates/steel"
     },
-    {
-      "tag": "forge:plates/steel"
+    "G": {
+      "tag": "forge:glass/colorless"
     },
-    {
-      "tag": "forge:plates/steel"
-    },
-    {
-      "tag": "forge:plates/steel"
-    },
-    {
-      "tag": "forge:glass_blocks/colorless"
-    },
-    {
-      "tag": "forge:glass_blocks/colorless"
-    },
-    {
-      "item": "singulo:basic_circuit"
-    },
-    {
+    "D": {
       "tag": "forge:dyes/red"
+    },
+    "K": {
+      "item": "singulo:basic_circuit"
     }
-  ],
+  },
   "result": {
     "count": 1,
     "item": "singulo:vending_machine"

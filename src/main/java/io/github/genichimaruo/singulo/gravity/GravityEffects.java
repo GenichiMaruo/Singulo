@@ -41,6 +41,10 @@ public final class GravityEffects {
         if (gravity == null) {
             return;
         }
+        if (selfPropelled(living)) {
+            apply(living, gravity, null);              // アンドロイドは重力パネルの影響を受けず、自分の意思で動ける
+            return;
+        }
         if (!living.onGround()) {
             return;                                    // 宙にいる間は、乗ったときの重力のまま
         }
@@ -48,6 +52,14 @@ public final class GravityEffects {
         GravityPanelBlock.Kind kind = below.getBlock() instanceof GravityPanelBlock panel && below.getValue(GravityPanelBlock.POWERED)
                 && panel.kind() != GravityPanelBlock.Kind.ZERO ? panel.kind() : null;
         apply(living, gravity, kind);
+    }
+
+    /**
+     * 重力の変化を受けない生き物（アンドロイド）。足裏の磁気と姿勢制御で、低重力・高重力・無重力の中でも、ふつうに歩いて
+     * 目的の場所へ向かえる（重力が変わると、経路をたどる歩き方が崩れて漂ってしまうため）。
+     */
+    public static boolean selfPropelled(LivingEntity living) {
+        return living instanceof io.github.genichimaruo.singulo.android.RuinAndroid;
     }
 
     /** 今の重力の種類（どちらでもなければ null）。 */

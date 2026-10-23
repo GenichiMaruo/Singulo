@@ -304,6 +304,18 @@ public abstract class RuinBoss extends Monster {
     }
 
     /** 出現の演出の残り tick。 */
+    /** 仕掛け（残響投影器・製造ラインなど）を守る範囲（ブロック）。 */
+    public static final double EMERGE_GUARD_RADIUS = 48;
+
+    /** pos の近くで、ボスが出現の演出をしている最中か（その間、ボス部屋の仕掛けは壊せない）。クライアントでも同じに判定できる。 */
+    public static boolean emergingNear(net.minecraft.world.level.BlockGetter getter, net.minecraft.core.BlockPos pos) {
+        if (!(getter instanceof net.minecraft.world.level.Level level)) {
+            return false;
+        }
+        return !level.getEntitiesOfClass(RuinBoss.class, new net.minecraft.world.phys.AABB(pos).inflate(EMERGE_GUARD_RADIUS),
+                b -> b.isAlive() && b.emergeTicks() > 0).isEmpty();
+    }
+
     public int emergeTicks() {
         return entityData.get(EMERGE);
     }

@@ -1,26 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "PXP",
+    "PBP"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_ruin_panels"
     },
-    {
+    "P": {
       "item": "singulo:ruin_panel"
     },
-    {
-      "item": "singulo:ruin_panel"
-    },
-    {
-      "item": "singulo:ruin_panel"
-    },
-    {
-      "item": "singulo:ruin_panel"
-    },
-    {
+    "X": {
       "item": "minecraft:charcoal"
     }
-  ],
+  },
   "result": {
     "count": 4,
     "item": "singulo:scorched_ruin_panel"

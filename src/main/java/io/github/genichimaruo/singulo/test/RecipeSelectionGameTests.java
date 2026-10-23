@@ -47,9 +47,34 @@ public final class RecipeSelectionGameTests {
         return m.items().getStackInSlot(m.type().outputSlot());
     }
 
-    /** 超伝導コイルと鋼板だけ（Tシリンダー軸受の材料）は、ほかの設備の途中でもあるので、自動では作らない。指定すれば作る。 */
+    /** Chunk loading must not bypass the automatic input settling period. */
+    @GameTest(template = EMPTY, timeoutTicks = 120)
+    public static void restoredInputsWaitBeforeCrafting(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        BlockPos pos = new BlockPos(1, 1, 1);
+        MachineBlockEntity source = assembler(helper, pos);
+        helper.runAtTickTime(70, () -> {
+            var level = helper.getLevel();
+            source.items().setStackInSlot(0, new ItemStack(item("superconducting_coil"), 16));
+            source.items().setStackInSlot(1, new ItemStack(item("steel_plate"), 32));
+            var tag = source.saveWithoutMetadata();
+            var absolute = helper.absolutePos(pos);
+            var state = level.getBlockState(absolute);
+            MachineBlockEntity restored = new MachineBlockEntity(absolute, state);
+            restored.load(tag);
+            restored.setLevel(level);
+            restored.onLoad();
+            restored.energy().setEnergy(restored.energy().getMaxEnergyStored());
+            MachineBlockEntity.serverTick(level, absolute, state, restored);
+            helper.assertTrue(restored.status() == MachineBlockEntity.Status.IDLE,
+                    "Reload bypassed the input settling period: " + restored.status());
+            helper.succeed();
+        });
+    }
+
+    /** 超伝導コイルと鋼板だけ（Tシリンダー軸受の材料）は、ほかの設備の途中でもあるので、入れ終わって少し待ってから自動で作る。指定すればすぐ作る。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
-    public static void partialLoadDoesNotCraftAnotherRecipe(GameTestHelper helper) {
+    public static void partialLoadWaitsBeforeCraftingAmbiguousRecipe(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         MachineBlockEntity auto = assembler(helper, new BlockPos(1, 1, 1));
         MachineBlockEntity fixed = assembler(helper, new BlockPos(4, 1, 1));
@@ -61,9 +86,13 @@ public final class RecipeSelectionGameTests {
                 RecipeSelection.byIndex(helper.getLevel(), MachineType.PRECISION_ASSEMBLER, indexOf(helper, "tipler_bearing"))),
                 "Tシリンダー軸受がほかのレシピの途中と判定されない");
         fixed.selectRecipe(indexOf(helper, "tipler_bearing"));
-        helper.runAtTickTime(200, () -> {
-            helper.assertTrue(output(auto).isEmpty(), "自動で途中の材料から作られた: " + output(auto));
-            helper.assertTrue(auto.status() == MachineBlockEntity.Status.IDLE, "自動が待機にならない: " + auto.status());
+        // 入れている途中（入れるのが止まって SETTLE_TICKS 経つまで）は、自動では作り始めない
+        helper.runAtTickTime(RecipeSelection.SETTLE_TICKS / 2, () -> {
+            helper.assertTrue(auto.status() == MachineBlockEntity.Status.IDLE, "入れている途中で自動が動き出した: " + auto.status());
+        });
+        // 入れ終わって止まっていれば、自動でも作る（0.11.0 では、いつまでも始まらなかった）
+        helper.runAtTickTime(RecipeSelection.SETTLE_TICKS + 160, () -> {
+            helper.assertTrue(output(auto).is(item("tipler_bearing")), "入れ終わっても自動で作られない: " + output(auto));
             helper.assertTrue(output(fixed).is(item("tipler_bearing")), "指定したのに作られない: " + output(fixed));
             helper.succeed();
         });
@@ -144,7 +173,7 @@ public final class RecipeSelectionGameTests {
         int before = indexOf(helper, "quantum_computing_module");
         var selected = RecipeSelection.byIndex(helper.getLevel(), m.type(), before);
         m.selectRecipe(before);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
         var menu = new io.github.genichimaruo.singulo.machine.MachineMenu(1, player.getInventory(), m);
         helper.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == before + 1, "Initial choice not synchronized");
         try {

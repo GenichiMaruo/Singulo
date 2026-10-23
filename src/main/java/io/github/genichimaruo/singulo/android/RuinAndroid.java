@@ -1782,6 +1782,26 @@ public abstract class RuinAndroid extends Monster {
 
     /** 廃アンドロイド工場の製造ラインが印刷した個体（何も落とさず、経験値もない）と、そのうちの試作機（体力はそのまま）。 */
     private boolean factoryMade, prototype;
+    /**
+     * 遺構・研究所の印刷台が印刷した個体か。この個体だけが、プレイヤーに倒されると部品を少し落とす（{@link #FACILITY_LOOT}）。
+     * スポーンエッグやコマンド、ほかの mod で出した個体には付かない（保存される）。
+     */
+    private boolean facilitySpawned;
+    public static final net.minecraft.resources.ResourceLocation FACILITY_LOOT = io.github.genichimaruo.singulo.Singulo.id("entities/facility_android");
+
+    /** 印刷台が印刷した印を付ける。 */
+    public void markFacilitySpawned() {
+        facilitySpawned = true;
+    }
+
+    public boolean facilitySpawned() {
+        return facilitySpawned;
+    }
+
+    @Override
+    protected net.minecraft.resources.ResourceLocation getDefaultLootTable() {
+        return facilitySpawned ? FACILITY_LOOT : super.getDefaultLootTable();
+    }
 
     /** 工場で印刷された個体にする。量産型（prototype でない）は体力が半分。 */
     public void makeFactoryMade(boolean prototype) {
@@ -2452,6 +2472,7 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putBoolean("facility_spawned", facilitySpawned);
         tag.putInt("charge", charge());
         tag.putInt("print", entityData.get(PRINT));
         if (home != null) {
@@ -2508,6 +2529,7 @@ public abstract class RuinAndroid extends Monster {
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        facilitySpawned = tag.getBoolean("facility_spawned");
         if (tag.contains("charge")) {
             setCharge(tag.getInt("charge"));
         }

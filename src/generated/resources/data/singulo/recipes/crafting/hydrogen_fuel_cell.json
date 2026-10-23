@@ -21,10 +21,10 @@
       "tag": "forge:ingots/copper"
     },
     {
-      "tag": "forge:glass_blocks/colorless"
+      "tag": "forge:glass/colorless"
     },
     {
-      "tag": "forge:glass_blocks/colorless"
+      "tag": "forge:glass/colorless"
     }
   ],
   "result": {

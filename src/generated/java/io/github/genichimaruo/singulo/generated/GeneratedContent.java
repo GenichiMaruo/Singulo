@@ -497,6 +497,7 @@ public final class GeneratedContent {
             "lab_door",
             "facility_light",
             "emergency_light",
+            "room_light",
             "lab_rayleigh_panel",
             "rayleigh_panel",
             "power_conduit",

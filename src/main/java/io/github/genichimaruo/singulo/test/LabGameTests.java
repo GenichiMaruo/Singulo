@@ -457,7 +457,7 @@ public final class LabGameTests {
     public static void drinksGiveTheirEffects(GameTestHelper helper) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var level = helper.getLevel();
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);           // クリエイティブでは飲んでも減らない（瓶も残らない）
         new net.minecraft.world.item.ItemStack(item("energy_drink")).finishUsingItem(level, player);
         var haste = player.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED);

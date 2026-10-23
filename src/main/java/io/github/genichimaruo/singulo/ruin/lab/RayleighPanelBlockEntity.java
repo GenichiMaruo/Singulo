@@ -47,4 +47,9 @@ public class RayleighPanelBlockEntity extends BlockEntity {
     }
 
 
+    /** Keep the sky surface visible when its block reaches the edge of the camera frustum. */
+    @Override
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        return new net.minecraft.world.phys.AABB(worldPosition).inflate(1);
+    }
 }

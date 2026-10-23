@@ -26,7 +26,7 @@ public final class ZeroGravity {
     public static final int DEFAULT_HEIGHT = 5;
     /** 高さ {@value #DEFAULT_HEIGHT} のときの、無重力ブロック1つの電力（FE/t）と、高さ1ブロックごとの倍率。 */
     public static final long BASE_COST = 30;
-    public static final double GROWTH = 1.6;
+    public static final double GROWTH = 1.4;
     static final java.util.UUID ID = io.github.genichimaruo.singulo.compat.Legacy.uuid(Singulo.id("zero_gravity"));
 
     /** ワールドごとの一覧: 列（x, z） → その列の無重力ブロック（y と高さを1つの long に）。 */
@@ -122,7 +122,8 @@ public final class ZeroGravity {
         if (gravity == null) {
             return;
         }
-        boolean in = inZone(living.level(), living.getX(), living.getY(), living.getZ());
+        // アンドロイドは足裏の磁気で床をとらえて、無重力の中でも自分で歩いて動ける（重力を変えない）
+        boolean in = !GravityEffects.selfPropelled(living) && inZone(living.level(), living.getX(), living.getY(), living.getZ());
         boolean has = (gravity.getModifier(ID) != null);
         if (in && !has) {
             gravity.addTransientModifier(new AttributeModifier(ID, "singulo:zero_gravity", -1, AttributeModifier.Operation.MULTIPLY_TOTAL));

@@ -6,7 +6,8 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "singulo:zero_gravity_controller"
+          "name": "singulo:zero_gravity_controller",
+          "functions": []
         }
       ],
       "conditions": [

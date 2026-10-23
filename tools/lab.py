@@ -23,6 +23,7 @@ GLASS = f'{MODID}:lab_glass'
 HULL = (f'{MODID}:pressure_hull', {'sealed': 'true'})
 LIGHT = (f'{MODID}:facility_light', {'powered': 'false'})
 RAYLEIGH = (f'{MODID}:lab_rayleigh_panel', {'lit': 'false'})
+ROOM_LIGHT = f'{MODID}:room_light'
 EMERGENCY = (f'{MODID}:emergency_light', {'powered': 'false'})
 REACTOR_CORE = (f'{MODID}:reactor_core', {'powered': 'false'})
 CONDUIT = (f'{MODID}:power_conduit', {'powered': 'false'})
@@ -48,6 +49,7 @@ QUARTERS = f'{MODID}:chests/lab_quarters'
 LOCKER = f'{MODID}:chests/lab_locker'
 KITCHEN = f'{MODID}:chests/lab_kitchen'
 MEDICAL = f'{MODID}:chests/lab_medical'
+TEST_HUT = f'{MODID}:chests/lab_test_hut'
 
 
 def stairs(facing):
@@ -687,6 +689,9 @@ def private_rooms():
         for k, a in enumerate(cells):
             n = k + (0 if north else 4)
             b.door(a + 1, front, 'south' if north else 'north', open_=n in (2, 5))
+            # 天井の真ん中に居室灯、その西の天井にレバー（レバーで点け消し。施設の電力はいらない）
+            b.set(a + 1, b.h - 1, z0 + 1, ROOM_LIGHT, {'lit': 'false'})
+            b.set(a, b.h - 2, z0 + 1, 'minecraft:lever', {'face': 'ceiling', 'facing': 'north', 'powered': 'false'})
             b.put(a, 1, back, 'minecraft:white_bed', {'facing': 'north' if north else 'south', 'occupied': 'false', 'part': 'head'})
             b.put(a, 1, mid, 'minecraft:white_bed', {'facing': 'north' if north else 'south', 'occupied': 'false', 'part': 'foot'})
             b.put(a + 2, 1, back, *SLAB_TOP)
@@ -975,8 +980,8 @@ def solarium():
     _tree(b, 17, 4, 5)
     # デッキチェア（階段とハーフ）とパラソル（柵と旗の代わりの羊毛）
     for x0 in (5, 9):
-        for dz in (0, 1):
-            b.put(x0, 1, 11 + dz, *stairs('north'))
+        b.put(x0, 1, 11, *stairs('north'))                          # 背もたれ
+        b.put(x0, 1, 12, 'minecraft:smooth_quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})   # 座面
         b.put(x0 + 1, 1, 11, *SLAB_TOP)
         for y in (1, 2, 3):
             b.set(x0 + 2, y, 12, 'minecraft:birch_fence', {'east': 'false', 'north': 'false', 'south': 'false', 'west': 'false',
@@ -990,7 +995,7 @@ def solarium():
     b.coffee(1, 2, 10, 'east')
     # 吊りベンチ（鎖とハーフ）
     for x in (8, 9, 10):
-        b.put(x, 1, 3, 'minecraft:birch_slab', {'type': 'bottom', 'waterlogged': 'false'})
+        b.put(x, 1, 3, 'minecraft:birch_slab', {'type': 'top', 'waterlogged': 'false'})
     for x in (8, 10):
         b.fill(x, 2, 3, x, b.h - 2, 3, *CHAIN_Y)
     # 日照センサーとランプ（電力が戻ると、真昼の日差しで灯る）
@@ -1040,7 +1045,7 @@ def outdoor_test_ground():
     for x in range(4, 9):
         b.put(x, 1, 8, 'minecraft:oak_log', {'axis': 'x'})
     _tree(b, 3, 3, 4, 'minecraft:oak_log', 'minecraft:oak_leaves')
-    _tree(b, 21, 14, 5)
+    _tree(b, 15, 13, 5)                                          # 池（x 17〜21）の西の岸
     # 池（東）
     for x in range(17, 22):
         for z in range(12, 16):
@@ -1069,6 +1074,7 @@ def outdoor_test_ground():
     b.monitor(21, 1, 22, 'north')
     b.put(20, 1, 22, *SLAB_TOP)
     b.papers(20, 2, 22)
+    b.chest(22, 1, 22, 'north', TEST_HUT)                        # 観測の記録と、レイリー散乱パネルの設計図
     b.dock(12, 1, 10, 3)
     b.dock(6, 1, 20, 3)
     b.set(2, 1, 22, FABRICATOR)
@@ -1186,6 +1192,10 @@ def chest_loot(write_json, data, mid):
         v('potato', 2, 6, 4), v('baked_potato', 1, 4, 3), v('beetroot', 2, 5, 3), v('cookie', 2, 8, 4), v('pumpkin_pie', 1, 2, 2),
         v('honey_bottle', 1, 2, 2), v('bowl', 1, 4, 3), v('mushroom_stew', 1, 1, 1), v('glass_bottle', 1, 3, 2), v('milk_bucket', 1, 1, 1),
         v('cocoa_beans', 1, 4, 2), v('cake', 1, 1, 1)])
+    # 屋外試験場の観測小屋: 観測の記録（設計図は blueprints.py で、高い確率で入る）
+    table('lab_test_hut', (1, 2), [entry('基礎回路', 1, 2, 3), entry('クリスタルメモリ', 1, 1, 1)], (3, 5), [
+        v('paper', 2, 6, 5), v('writable_book', 1, 1, 2), v('spyglass', 1, 1, 2), v('compass', 1, 1, 2), v('clock', 1, 1, 1),
+        v('redstone', 1, 4, 3), v('glowstone_dust', 1, 3, 2)])
     # 医務室: 手当ての品
     table('lab_medical', (1, 2), [entry('自己修理キット', 1, 2, 4)], (4, 7), [
         v('potion', 1, 1, 3, healing), v('potion', 1, 1, 2, regeneration), v('glass_bottle', 2, 5, 4), v('paper', 2, 5, 3),

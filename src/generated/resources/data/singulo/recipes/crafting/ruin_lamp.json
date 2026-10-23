@@ -1,26 +1,24 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "WGW",
+    "YBY"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lighting"
     },
-    {
+    "W": {
       "item": "singulo:white_ceramic_composite"
     },
-    {
-      "item": "singulo:white_ceramic_composite"
+    "G": {
+      "tag": "forge:glass/colorless"
     },
-    {
+    "Y": {
       "tag": "forge:dusts/glowstone"
-    },
-    {
-      "tag": "forge:dusts/glowstone"
-    },
-    {
-      "tag": "forge:glass_blocks/colorless"
     }
-  ],
+  },
   "result": {
     "count": 4,
     "item": "singulo:ruin_lamp"

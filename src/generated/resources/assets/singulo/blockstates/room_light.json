@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "singulo:block/room_light_off"
+    },
+    "lit=true": {
+      "model": "singulo:block/room_light_on"
+    }
+  }
+}

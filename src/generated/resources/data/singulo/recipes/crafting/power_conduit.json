@@ -1,23 +1,25 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "CYC",
+    " B ",
+    " F "
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lab_building"
     },
-    {
-      "item": "singulo:lab_frame"
-    },
-    {
+    "C": {
       "tag": "forge:ingots/copper"
     },
-    {
-      "tag": "forge:ingots/copper"
-    },
-    {
+    "Y": {
       "tag": "forge:dusts/glowstone"
+    },
+    "F": {
+      "item": "singulo:lab_frame"
     }
-  ],
+  },
   "result": {
     "count": 2,
     "item": "singulo:power_conduit"

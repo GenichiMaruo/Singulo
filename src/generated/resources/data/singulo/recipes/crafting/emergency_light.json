@@ -1,26 +1,24 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "WDW",
+    "RBR"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lighting"
     },
-    {
+    "W": {
       "item": "singulo:white_ceramic_composite"
     },
-    {
-      "item": "singulo:white_ceramic_composite"
-    },
-    {
-      "tag": "forge:dusts/redstone"
-    },
-    {
-      "tag": "forge:dusts/redstone"
-    },
-    {
+    "D": {
       "tag": "forge:dyes/red"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
     }
-  ],
+  },
   "result": {
     "count": 4,
     "item": "singulo:emergency_light"

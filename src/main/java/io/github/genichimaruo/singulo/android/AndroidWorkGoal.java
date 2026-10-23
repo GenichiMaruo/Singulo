@@ -560,6 +560,10 @@ final class AndroidWorkGoal extends Goal {
                 return;
             }
         }
+        // 作るものを選べる装置（精密組立台など）: 材料の一部が別のレシピと同じでも、記録したレシピの物を作らせる
+        if (level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.machine.MachineBlockEntity machine) {
+            machine.selectFor(r.output(), r.inputs().stream().map(ic -> ic.item).toList());
+        }
         boolean progress = false;
         while (inserted < step.crafts()) {
             if (!processingPaid && android.charge() < CRAFT_COST) {

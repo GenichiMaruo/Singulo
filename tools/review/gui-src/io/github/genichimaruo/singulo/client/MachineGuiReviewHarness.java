@@ -25,6 +25,7 @@ public final class MachineGuiReviewHarness {
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen, wait;
     private static boolean shown;
+    private static int renderedFrames;
     private static int hoverX = -1, hoverY;
 
     static void start(Minecraft mc) {
@@ -47,9 +48,11 @@ public final class MachineGuiReviewHarness {
         if (mc.getOverlay() != null || ++wait % 6 != 0) return;
         if (!shown) {
             show(mc);
+            renderedFrames = 0;
             shown = true;
             return;
         }
+        if (renderedFrames < 2) return;
         Path output = Path.of(System.getProperty("singulo.guiReviewOutput"));
         String name = (SELECTOR ? "selector-" : SIDES ? "sides-" : "machine-") + LANGUAGES[language] + "-" + String.format("%02d", screen);
         try (var pixels = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
@@ -182,6 +185,7 @@ public final class MachineGuiReviewHarness {
      * Virtual displays need not dispatch native cursor motion, so do not depend on OS focus. */
     @net.minecraftforge.eventbus.api.SubscribeEvent
     public static void renderTooltips(net.minecraftforge.client.event.ScreenEvent.Render.Post event) throws Exception {
+        if (shown) renderedFrames++;
         if (!shown || hoverX < 0) return;
         if (event.getScreen() instanceof MachineScreen screen) {
             var method = MachineScreen.class.getDeclaredMethod(SIDES ? "renderSides" : "renderOwnTooltips", net.minecraft.client.gui.GuiGraphics.class, int.class, int.class);

@@ -25,7 +25,7 @@ BLUEPRINTS = {
     '研究所の調度品の設計図': ('blueprint_lab_furniture', 'Laboratory Furnishing Blueprint',
                            {'lab:lab_office': 0.35, 'lab:lab_quarters': 0.20, 'lab:lab_kitchen': 0.35}, 'monitor'),
     'レイリー散乱パネルの設計図': ('blueprint_rayleigh', 'Rayleigh Sky Panel Blueprint',
-                               {'lab:lab_research': 0.30}, 'sky'),
+                               {'lab:lab_research': 0.30, 'lab:lab_test_hut': 0.85}, 'sky'),
 }
 
 DESCRIPTIONS = {

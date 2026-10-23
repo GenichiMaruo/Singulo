@@ -1,26 +1,24 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "SRS",
+    "KBK"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lab_furniture"
     },
-    {
+    "S": {
       "tag": "forge:plates/steel"
     },
-    {
-      "tag": "forge:plates/steel"
-    },
-    {
-      "item": "singulo:basic_circuit"
-    },
-    {
-      "item": "singulo:basic_circuit"
-    },
-    {
+    "R": {
       "tag": "forge:dusts/redstone"
+    },
+    "K": {
+      "item": "singulo:basic_circuit"
     }
-  ],
+  },
   "result": {
     "count": 1,
     "item": "singulo:server_rack"

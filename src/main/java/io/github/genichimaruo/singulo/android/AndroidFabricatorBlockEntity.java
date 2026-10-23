@@ -165,6 +165,7 @@ public class AndroidFabricatorBlockEntity extends BlockEntity {
         Vec3 top = Vec3.atBottomCenterOf(worldPosition.above());
         a.moveTo(top.x, top.y, top.z, level.random.nextFloat() * 360, 0);
         a.setHome(worldPosition);
+        a.markFacilitySpawned();                                   // 倒すと部品を少し落とす（印刷台の個体だけ）
         a.startPrinting();
         level.addFreshEntity(a);
         androids.add(a.getUUID());

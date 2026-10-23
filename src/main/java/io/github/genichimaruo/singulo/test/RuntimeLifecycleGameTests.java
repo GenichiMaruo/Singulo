@@ -73,7 +73,7 @@ public final class RuntimeLifecycleGameTests {
     @GameTest(template = "empty", batch = "lifecycle_cleanup")
     public static void logoutAndDimensionChangeClearHeldInput(GameTestHelper h) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
-        var player = h.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SinguloItems.GRAVITON_MANIPULATOR.get()));
         try {
             GravitonManipulatorItem.setInput(player, true, true);
@@ -91,7 +91,7 @@ public final class RuntimeLifecycleGameTests {
     public static void expiredCombatAttributionReleasesBossReference(GameTestHelper h) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
         boolean old = ServerConfig.BOSS_COMBAT_LOG.get();
-        var player = h.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
         var boss = h.spawn(SinguloEntities.ECHO_SENTINEL.get(), new BlockPos(4, 1, 4));
         try {
             ServerConfig.BOSS_COMBAT_LOG.set(true);

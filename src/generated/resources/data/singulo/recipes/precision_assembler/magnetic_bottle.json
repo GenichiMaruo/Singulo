@@ -19,7 +19,7 @@
     },
     {
       "ingredient": {
-        "tag": "forge:glass_blocks/colorless"
+        "tag": "forge:glass/colorless"
       },
       "count": 4
     },

@@ -1,26 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "LDL",
+    "LBL"
+  ],
+  "key": {
+    "B": {
       "item": "singulo:blueprint_lighting"
     },
-    {
+    "L": {
       "item": "singulo:ruin_lamp"
     },
-    {
-      "item": "singulo:ruin_lamp"
-    },
-    {
-      "item": "singulo:ruin_lamp"
-    },
-    {
-      "item": "singulo:ruin_lamp"
-    },
-    {
+    "D": {
       "tag": "forge:dyes/purple"
     }
-  ],
+  },
   "result": {
     "count": 4,
     "item": "singulo:ruin_lamp_violet"

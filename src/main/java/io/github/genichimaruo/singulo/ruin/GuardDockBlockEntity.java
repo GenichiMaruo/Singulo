@@ -90,6 +90,7 @@ public class GuardDockBlockEntity extends BlockEntity {
             drone.moveTo(worldPosition.getX() + 0.5 + Math.cos(angle), worldPosition.getY() + 1.5,
                     worldPosition.getZ() + 0.5 + Math.sin(angle), level.random.nextFloat() * 360, 0);
             drone.setTier(tier);
+            drone.markFacilitySpawned();                           // 倒すと部品を少し落とす（ドックの個体だけ）
             drone.restrictTo(worldPosition, HOME_RADIUS);
             level.addFreshEntity(drone);
             drones.add(drone.getUUID());

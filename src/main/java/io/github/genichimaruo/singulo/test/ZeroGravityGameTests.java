@@ -67,7 +67,7 @@ public final class ZeroGravityGameTests {
         ZeroGravityControllerBlockEntity box = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, controller);
         box.setHeight(8);
         Zombie high = zombie(helper, new BlockPos(1, 8, 2));
-        helper.assertTrue(ZeroGravity.costPerBlock(9) > ZeroGravity.costPerBlock(8) * 3 / 2, "高さ1ブロックで電力が1.5倍以上にならない");
+        helper.assertTrue(Math.abs(ZeroGravity.costPerBlock(15) / (double) ZeroGravity.costPerBlock(14) - 1.4) < 0.02, "高さ1ブロックで電力が1.4倍にならない");
         helper.assertTrue(ZeroGravity.costPerBlock(10_000) == Long.MAX_VALUE, "とても高いときに電力が飽和しない");
         helper.runAtTickTime(40, () -> {
             GravityReceiverBlockEntity r = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);

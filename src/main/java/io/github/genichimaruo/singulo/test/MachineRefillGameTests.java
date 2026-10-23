@@ -32,7 +32,7 @@ public final class MachineRefillGameTests {
     private static void refillCompressor(GameTestHelper h, boolean shift) {
         MachineBlockEntity machine=machine(h,new BlockPos(2,1,2),MachineType.COMPRESSOR);
         machine.items().setStackInSlot(0,new ItemStack(Items.CHARCOAL,4));
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
         MachineMenu menu=new MachineMenu(1,player.getInventory(),machine);
         h.onEachTick(()->machine.energy().setEnergy(machine.energy().getMaxEnergyStored()));
         h.startSequence()
@@ -67,7 +67,7 @@ public final class MachineRefillGameTests {
         var kiln=machine(h,new BlockPos(2,1,2),MachineType.KILN);
         var reactor=machine(h,new BlockPos(5,1,2),MachineType.CATALYTIC_REACTOR);
         var machines=List.of(kiln,reactor);
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
         var menus=List.of(new MachineMenu(1,player.getInventory(),kiln),new MachineMenu(2,player.getInventory(),reactor));
         kiln.items().setStackInSlot(0,item("nihonium",3));
         reactor.items().setStackInSlot(0,item("spent_muon_catalyst",5));
@@ -111,7 +111,7 @@ public final class MachineRefillGameTests {
     @GameTest(template="empty")
     public static void otherDeviceMenusNotifyInventoryWhenShiftMergingFuel(GameTestHelper h) {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
         try {
             var pos=h.absolutePos(new BlockPos(2,1,2));
             checkMenuMerge(h,player,"generator",2,0,new ItemStack(Items.CHARCOAL),

@@ -82,4 +82,15 @@ public class TeacupBlock extends BaseEntityBlock {
         return drops;
     }
 
+
+    /** 型紙を回して置いたとき（研究所の部屋など）にも、向きを部屋に合わせて回す。 */
+    @Override
+    public BlockState rotate(BlockState state, net.minecraft.world.level.block.Rotation rotation) {
+        return state.setValue(HorizontalDirectionalBlock.FACING, rotation.rotate(state.getValue(HorizontalDirectionalBlock.FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, net.minecraft.world.level.block.Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(HorizontalDirectionalBlock.FACING)));
+    }
 }

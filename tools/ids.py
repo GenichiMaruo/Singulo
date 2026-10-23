@@ -388,6 +388,7 @@ MOD = {
     'コーヒー': ('coffee', 'Coffee', 'item'),
     '書類の山': ('paper_stack', 'Stack of Papers', 'lab'),
     'ごみ箱': ('trash_bin', 'Trash Bin', 'lab'),
+    '居室灯': ('room_light', 'Room Light', 'lab'),
     # レイリー散乱パネル: 天井の空の投影板。研究所の天井のもの（作れない・回収できない）と、設計図から作るもの（FE で点く）
     'レイリー散乱パネル（研究所）': ('lab_rayleigh_panel', 'Lab Rayleigh Sky Panel', 'lab'),
     'レイリー散乱パネル': ('rayleigh_panel', 'Rayleigh Sky Panel', 'lab'),
