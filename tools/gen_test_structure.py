@@ -52,7 +52,7 @@ def main():
         write(template, *size)
     # 分けて実行する群も同じ空テンプレートを使う。寸法変更時に複製を取り残さない。
     for namespace, templates in {'singulo_mekanism': ('empty',), 'singulo_prototype': ('empty', 'huge'),
-                                 'singulo_progression': ('empty',)}.items():
+                                 'singulo_progression': ('empty',), 'singulo_rayleigh': ('empty',), 'singulo_panel_review': ('empty',), 'singulo_cable': ('empty', 'tall', 'huge')}.items():
         target = OUT_DIR.parent.parent / namespace / 'structure'
         target.mkdir(parents=True, exist_ok=True)
         for template in templates:

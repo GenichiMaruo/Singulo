@@ -1,0 +1,8 @@
+GameTests: 501 required tests passed
+GUI: 22 + 120 + 5 + 30 = 177 fresh captures
+Visual fixtures: 18 captures
+Inventory: 105 empty-slot centers checked
+Machine headers: 80 without title/status overlap
+Generator text: 5 probes
+JAR: Singulo-0.10.0-1.21.1N.jar
+SHA-256: 5bc5ead67edcb1a56a2e11a6e519abb67bfc682b80dac53d4f21646d04c02cc6

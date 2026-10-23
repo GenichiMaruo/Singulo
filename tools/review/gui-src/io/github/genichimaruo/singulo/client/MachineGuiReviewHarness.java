@@ -17,7 +17,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 @net.neoforged.fml.common.EventBusSubscriber(modid = Singulo.MODID, value = net.neoforged.api.distmarker.Dist.CLIENT)
 public final class MachineGuiReviewHarness {
     private static final String[] LANGUAGES = {"ja_jp", "en_us", "zh_cn", "zh_tw", "ko_kr"};
-    private static final int SCREENS = MachineType.values().length + 8;
+    private static final boolean COMBINED = Boolean.getBoolean("singulo.sidesGuiReview")
+            && Boolean.getBoolean("singulo.selectorGuiReview");
+    private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
+    private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
+    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 8;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen, wait;
     private static boolean shown;
@@ -47,7 +51,7 @@ public final class MachineGuiReviewHarness {
             return;
         }
         Path output = Path.of(System.getProperty("singulo.guiReviewOutput"));
-        String name = "machine-" + LANGUAGES[language] + "-" + String.format("%02d", screen);
+        String name = (SELECTOR ? "selector-" : SIDES ? "sides-" : "machine-") + LANGUAGES[language] + "-" + String.format("%02d", screen);
         try (var pixels = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
             pixels.writeToFile(output.resolve(name + ".png"));
         }
@@ -56,9 +60,19 @@ public final class MachineGuiReviewHarness {
         if (++screen < SCREENS) return;
         screen = 0;
         if (++language < LANGUAGES.length) {selectLanguage(mc); return;}
-        Files.write(output.getParent().resolve("machine-font-metrics.tsv"), metrics);
+        String prefix = SELECTOR ? "selector" : SIDES ? "sides" : "machine";
+        Files.write(output.getParent().resolve(prefix + "-font-metrics.tsv"), metrics);
         Singulo.LOGGER.info("SINGULO_MACHINE_GUI_COMPLETE {}", SCREENS * LANGUAGES.length);
-        mc.stop();
+        if (COMBINED && !SELECTOR) {
+            SELECTOR = SIDES;
+            SIDES = !SIDES;
+            SCREENS = SELECTOR ? 6 : 1;
+            language = 0;
+            metrics.clear();
+            selectLanguage(mc);
+        } else {
+            mc.stop();
+        }
     }
 
     private static void value(SyncedInts data, int index, int value) {
@@ -73,6 +87,7 @@ public final class MachineGuiReviewHarness {
         if (screen < MachineType.values().length || extra >= 4 && extra <= 6) {
             MachineType type = extra == 4 ? MachineType.CATALYTIC_REACTOR : extra == 5 ? MachineType.PARTICLE_ACCELERATOR
                     : extra == 6 ? MachineType.ENTANGLEMENT_SYNTHESIZER : MachineType.values()[screen];
+            if (SELECTOR) type = screen < 3 ? MachineType.PRECISION_ASSEMBLER : MachineType.SINGULARITY_ENCAPSULATOR;
             SyncedInts data = SyncedInts.client(MachineBlockEntity.syncedCount(type));
             value(data, MachineBlockEntity.D_STATUS, (extra == 4 || extra == 5 ? MachineBlockEntity.Status.IDLE : MachineBlockEntity.Status.NO_POWER).ordinal());
             value(data, MachineBlockEntity.D_STRUCTURE, type.isMultiblock() ? (type == MachineType.PARTICLE_ACCELERATOR ? 16 : 10) : -1);
@@ -90,13 +105,46 @@ public final class MachineGuiReviewHarness {
             var ctor = MachineMenu.class.getDeclaredConstructor(int.class, net.minecraft.world.entity.player.Inventory.class,
                     MachineType.class, BlockPos.class, IItemHandler.class, SyncedInts.class, MachineBlockEntity.class);
             ctor.setAccessible(true);
-            MachineMenu menu = ctor.newInstance(0, mc.player.getInventory(), type, BlockPos.ZERO,
+            BlockPos reviewPos = SIDES ? mc.player.blockPosition().above(3) : BlockPos.ZERO;
+            if (SIDES) {
+                mc.level.setBlock(reviewPos, io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES.get(type).get().defaultBlockState(), 2);
+                for (var direction : net.minecraft.core.Direction.values())
+                    mc.level.setBlock(reviewPos.relative(direction), net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState(), 2);
+                value(data, MachineBlockEntity.sidesIndex(type), new io.github.genichimaruo.singulo.machine.SideConfig().packed());
+            }
+            MachineMenu menu = ctor.newInstance(0, mc.player.getInventory(), type, reviewPos,
                     items, data, null);
             Component title = Component.translatable((type.isMultiblock() ? io.github.genichimaruo.singulo.registry.SinguloBlocks.CONTROLLERS
                     : io.github.genichimaruo.singulo.registry.SinguloBlocks.MACHINES).get(type).get().getDescriptionId());
             // Multiblock menu titles use the machine name, not the controller item name.
             MachineScreen gui = new MachineScreen(menu, mc.player.getInventory(), title);
             mc.setScreen(gui);
+            if (SELECTOR) {
+                var entries = io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(mc.level, type);
+                if (screen % 3 == 0) {
+                    value(data, MachineBlockEntity.D_SELECTED, entries.size());
+                    hover(mc, menu.layout.width, menu.layout.outputX + 8, 64);
+                } else {
+                    var open = MachineScreen.class.getDeclaredField("selectorOpen");
+                    open.setAccessible(true);
+                    open.setBoolean(gui, true);
+                    var scroll = MachineScreen.class.getDeclaredField("selectorScroll");
+                    scroll.setAccessible(true);
+                    scroll.setInt(gui, screen % 3 == 2 ? Math.max(0, (entries.size() + 9) / 9 - 3) : 0);
+                }
+            }
+            if (SIDES) {
+                var open = MachineScreen.class.getDeclaredField("sidesOpen");
+                open.setAccessible(true);
+                open.setBoolean(gui, true);
+                var quads = MachineScreen.class.getDeclaredMethod("cubeQuads");
+                quads.setAccessible(true);
+                @SuppressWarnings("unchecked") var faces = (java.util.List<SideCube.Quad>) quads.invoke(gui);
+                var face = faces.getLast();
+                hoverX = (int) face.cx(); hoverY = (int) face.cy();
+                Singulo.LOGGER.info("SINGULO_SIDES_GUI {} adjacent={}", LANGUAGES[language],
+                        Component.translatable("gui.singulo.sides.adjacent", net.minecraft.world.level.block.Blocks.CHEST.getName()).getString());
+            }
             if (extra >= 4 && extra <= 6) hover(mc, menu.layout.width, extra == 6 ? 40 : menu.layout.width - 30, 10);
             int titleWidth = mc.font.width(title), statusWidth = mc.font.width(Component.translatable("gui.singulo.status.no_power"));
             metrics.add(LANGUAGES[language] + "\t" + type.id() + "\t" + titleWidth + "\t" + statusWidth + "\t" + menu.layout.width);
@@ -136,7 +184,7 @@ public final class MachineGuiReviewHarness {
     public static void renderTooltips(net.neoforged.neoforge.client.event.ScreenEvent.Render.Post event) throws Exception {
         if (!shown || hoverX < 0) return;
         if (event.getScreen() instanceof MachineScreen screen) {
-            var method = MachineScreen.class.getDeclaredMethod("renderOwnTooltips", net.minecraft.client.gui.GuiGraphics.class, int.class, int.class);
+            var method = MachineScreen.class.getDeclaredMethod(SIDES ? "renderSides" : "renderOwnTooltips", net.minecraft.client.gui.GuiGraphics.class, int.class, int.class);
             method.setAccessible(true);
             method.invoke(screen, event.getGuiGraphics(), hoverX, hoverY);
         } else if (event.getScreen() instanceof GeneratorSlotsScreen screen) {

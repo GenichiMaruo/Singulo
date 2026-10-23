@@ -82,6 +82,16 @@ final class MachineSounds {
 
     private MachineSounds() {}
 
+    static void reset() {
+        Minecraft mc = Minecraft.getInstance();
+        for (var sound : PLAYING.values()) mc.getSoundManager().stop(sound);
+        PLAYING.clear();
+        if (active != null) mc.getSoundManager().stop(active);
+        if (charge != null) mc.getSoundManager().stop(charge);
+        active = null; charge = null;
+    }
+
+
     private static void put(float volume, String block, String sound) {
         BY_BLOCK.put(block, new Spec(sound, volume, true));
     }
@@ -207,7 +217,11 @@ final class MachineSounds {
         return loop;
     }
 
-    /** 自分のプレイヤーの手元から鳴る音。ため音は時間とともに高くなる（2秒でいちばん高い）。 */
+    /**
+     * 自分のプレイヤーの手元から鳴る音。ため音は時間とともに高くなる（2秒でいちばん高い）。
+     * 聞き手（カメラ）からの相対位置で鳴らす: 位置を毎tick追いかけるだけだと、動いている間は耳のほうが先に進み、
+     * ごく近くの音源の向きが左右に振れて聞こえるため。
+     */
     private static final class HeldLoop extends AbstractTickableSoundInstance {
         private final boolean rising;
         private int age;
@@ -219,16 +233,11 @@ final class MachineSounds {
             this.delay = 0;
             this.volume = volume;
             this.pitch = rising ? 0.8F : 1.0F;
-            follow();
-        }
-
-        private void follow() {
-            LocalPlayer p = Minecraft.getInstance().player;
-            if (p != null) {
-                this.x = p.getX();
-                this.y = p.getEyeY();
-                this.z = p.getZ();
-            }
+            this.relative = true;
+            this.attenuation = SoundInstance.Attenuation.NONE;
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
         }
 
         void end() {
@@ -241,7 +250,6 @@ final class MachineSounds {
                 stop();
                 return;
             }
-            follow();
             age++;
             if (rising) {
                 this.pitch = 0.8F + 0.8F * Math.min(1, age / (float) GravitonManipulatorItem.MAX_CHARGE);

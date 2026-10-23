@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "sealed=true": {
+      "model": "singulo:block/welded_hatch"
+    },
+    "sealed=false": {
+      "model": "singulo:block/welded_hatch"
+    }
+  }
+}

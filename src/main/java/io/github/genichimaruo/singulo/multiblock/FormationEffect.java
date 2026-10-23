@@ -22,6 +22,10 @@ public final class FormationEffect {
 
     private FormationEffect() {}
 
+    public static void forgetLevel(net.minecraft.world.level.Level level) {
+        QUEUE.removeIf(s -> s.level == level);
+    }
+
     /** 形成の状態が変わったら呼ぶ。未形成から形成になったときだけ演出する。 */
     public static void onChange(ServerLevel level, BlockPos controller, boolean wasFormed, boolean nowFormed, boolean firstCheck,
                                 int horizontal, int down, int up) {

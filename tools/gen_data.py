@@ -384,8 +384,8 @@ UI_LANG = {
     'gui.singulo.reactor.ignition.need': ('点火: %s GFE を %s 秒で（平均 %s MFE/t）', 'Ignition: %s GFE within %s s (avg %s MFE/t)'),
     'gui.singulo.reactor.ignition.band': ('受電 %s / 必要 %s MFE/t', 'Receiving %s / need %s MFE/t'),
     'gui.singulo.reactor.ignition.reach': ('この速さで届く量 %s / %s GFE', 'Reachable at this rate %s / %s GFE'),
-    'gui.singulo.reactor.ignition_failed.detail': ('届いた電力 %s / %s GFE、最大受電 %s MFE/t（必要 %s MFE/t）。蓄電が足りていても、送電網でいちばん細いケーブルが受電の上限になる',
-                                                   'Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the thinnest cable in the network caps the intake'),
+    'gui.singulo.reactor.ignition_failed.detail': ('届いた電力 %s / %s GFE、最大受電 %s MFE/t（必要 %s MFE/t）。蓄電が足りていても、送電経路の中で容量が最も小さいケーブルが受電の上限になる',
+                                                   'Delivered %s / %s GFE, peak intake %s MFE/t (need %s MFE/t). Even with enough storage, the lowest-capacity cable on the power route caps the intake'),
     'gui.singulo.reactor.ignite': ('点火', 'Ignite'),
     'gui.singulo.reactor.spin_target': ('スピン目標', 'Spin target'),
     'gui.singulo.reactor.slot.seed': ('種', 'Seed'),
@@ -484,6 +484,7 @@ UI_LANG = {
         'the nitrogen, so running it from a cooling tower no longer makes power. For stage 2 power, build a Muon-Catalyzed Fusion Reactor.'),
     'message.singulo.fuel_cell.status': ('水素 %s/%s mB　酸素 %s/%s mB　蓄電 %s/%s FE　%s',
                                          'Hydrogen %s/%s mB · Oxygen %s/%s mB · Stored %s/%s FE · %s'),
+    'block.singulo.teacup': ('ティーカップ', 'Teacup'),
     'message.singulo.fuel_cell.standby': ('待機中（蓄電がいっぱい）', 'Standing by (storage full)'),
     'tooltip.singulo.fluid_canister.empty': ('空（%s mBまで入る）', 'Empty (holds %s mB)'),
     'tooltip.singulo.fluid_canister.amount': ('%s %s / %s mB', '%s %s / %s mB'),
@@ -497,7 +498,8 @@ UI_LANG = {
     'message.singulo.stabilizer.need_catalyst': ('もう片方の手に触媒を持って使うこと', 'Hold a catalyst in your other hand'),
     'message.singulo.stabilizer.already': ('この触媒はすでに安定化してある', 'This catalyst is already stabilized'),
     'message.singulo.stabilizer.done': ('触媒を安定化した（残りの寿命が2倍になった）', 'Catalyst stabilized: remaining life doubled'),
-    'message.singulo.gravity_receiver.status': ('重力パネル %s / %s 枚が稼働中（1枚あたり %s FE/t）', 'Gravity panels active: %s / %s (%s FE/t each)'),
+    'message.singulo.gravity_receiver.status': ('パネル %s / %s 枚が稼働中（合計 %s FE/t）', 'Panels active: %s / %s (%s FE/t in total)'),
+    'message.singulo.zero_gravity_controller.height': ('無重力の高さ: %s ブロック（無重力ブロック1つ %s FE/t）', 'Weightless height: %s blocks (%s FE/t per zero-gravity block)'),
     'message.singulo.impact_generator.status': ('蓄電 %s / %s FE、重力パネル %s / %s 枚が稼働中（このパネルが %s 枚分を払い、ケーブルへ出せるのは %s FE）',
                                                 'Stored %s / %s FE, gravity panels active: %s / %s (paying for %s, %s FE spare for cables)'),
     'message.singulo.deep_sea_collector.idle': ('水深が足りない（真上に16ブロック以上の水が必要）', 'Not deep enough: needs 16+ blocks of water above'),
@@ -540,12 +542,21 @@ UI_LANG = {
     'gui.singulo.reactor.collapse': ('炉が質量に耐えきれず、崩壊していく！', 'The reactor is collapsing under the mass!'),
     'gui.singulo.reactor.recaptured': ('野良ブラックホールを炉心に取り込んだ', 'The rogue black hole is now the core'),
     'block.singulo.rogue_black_hole': ('野良ブラックホール', 'Rogue Black Hole'),
+    'item.singulo.relocation_wrench.packed': ('中身と設定を保持して回収した', 'Device packed with contents and settings'),
+    'item.singulo.blueprint.hint': ('作業台で素材と一緒に並べると、建材を作れる。設計図は使ってもなくならない', 'Place it with materials on a crafting table to make building blocks. The blueprint is not used up.'),
+    'item.singulo.relocation_wrench.cables_removed': ('ケーブルを %s 本回収した', 'Took back %s cables'),
+    'item.singulo.relocation_wrench.switch': ('スニークして空中で使うとモードを切り替える', 'Sneak-use in the air to switch modes.'),
+    'item.singulo.relocation_wrench.hint.1': ('ケーブルに使うと1本回収、スニークして使うとつながった同じケーブルを最大64本まとめて回収。左クリックでもすぐ壊せる', 'Use on a cable to take it back; sneak-use to take up to 64 joined cables of that kind. Left-click also breaks cables at once.'),
+    'item.singulo.relocation_wrench.hint.0': ('スニークして装置に使うと、中身と設定ごと回収する', 'Sneak-use on a device to pack it with its contents and settings.'),
+    'item.singulo.relocation_wrench.mode.1': ('モード: ケーブルの撤去', 'Mode: remove cables'),
+    'item.singulo.relocation_wrench.mode.0': ('モード: 装置の移設', 'Mode: relocate devices'),
+    'tooltip.singulo.packed_device': ('中身・電力・設定を保持', 'Contents, energy and settings preserved'),
     'item.singulo.settings_card.copied': ('設定を写した', 'Settings copied'),
     'item.singulo.settings_card.pasted': ('設定を貼った', 'Settings pasted'),
     'item.singulo.settings_card.empty': ('まだ何も写していない', 'Nothing copied yet'),
     'item.singulo.settings_card.mismatch': ('種類の違う装置には貼れない', 'Different kind of machine'),
     'item.singulo.settings_card.blank': ('空', 'Blank'),
-    'item.singulo.settings_card.holds.machine': ('装置の面の設定', 'Machine side settings'),
+    'item.singulo.settings_card.holds.machine': ('装置の面・作るものの設定', 'Machine sides and recipe choice'),
     'item.singulo.settings_card.holds.reactor': ('Pリアクターの設定', 'P-Reactor settings'),
     'item.singulo.settings_card.hint': ('スニークして使うと写す　そのまま使うと貼る', 'Sneak-use to copy · Use to paste'),
     'gui.singulo.observatory.on': ('表示 入　鉱石 %s　遺構 %s', 'Display on · ores %s · ruins %s'),
@@ -602,6 +613,22 @@ UI_LANG = {
     'gui.singulo.reason.need_fluid': ('・%s があと %s mB 要る（1回に %s mB）', '- %s: %s mB more needed (%s mB per craft)'),
     'gui.singulo.reason.too_small': ('・大きさが %s 以上要る（今は %s）', '- Needs size %s or more (now %s)'),
     'gui.singulo.reason.arrange': ('・数は足りています。同じ材料を別々のスロットに分けて入れてみてください', '- The amounts are there. Try putting each material in its own slot.'),
+    'gui.singulo.select.restore': ('・復元する物: %s', '- Restores: %s'),
+    'gui.singulo.select.fluid': ('・%s %s mB', '- %s %s mB'),
+    'gui.singulo.select.uses': ('・%s（%s 回分）', '- %s (%s uses)'),
+    'gui.singulo.select.item': ('・%s ×%s', '- %s x%s'),
+    'gui.singulo.select.button_hint': ('クリックで選ぶ・右クリックで自動に戻す', 'Click to choose; right-click for automatic.'),
+    'gui.singulo.select.fixed_hint': ('このレシピだけを作る。ほかの物が入っていても使わない', 'Makes only this recipe; anything else inside is left alone.'),
+    'gui.singulo.select.fixed': ('作るもの: %s', 'Make: %s'),
+    'gui.singulo.select.auto_hint': ('入っている物をすべて使うレシピだけを作る。ほかのレシピの途中と同じ材料の組み合わせは作らない', 'Makes only a recipe that uses everything inside, and never one whose mix also appears partway through another recipe.'),
+    'gui.singulo.select.auto': ('作るもの: 自動', 'Make: automatic'),
+    'gui.singulo.select.auto_short': ('自', 'A'),
+    'gui.singulo.select.title': ('作るもの', 'Make'),
+    'gui.singulo.reason.select_hint': ('出力の下のボタンで作るものを指定してください', 'Pick what to make with the button below the output.'),
+    'gui.singulo.reason.extra': ('%s の材料は揃っていますが、使わない物も入っているので、自動では作りません', 'The materials for %s are in, but so are items it does not use, so it is not made automatically.'),
+    'gui.singulo.reason.ambiguous': ('%s の材料は揃っていますが、ほかのレシピの材料を入れている途中と同じ組み合わせなので、自動では作りません', 'The materials for %s are in, but the same mix appears while loading other recipes, so it is not made automatically.'),
+    'gui.singulo.reason.label.extra': ('余分な材料', 'Extra items'),
+    'gui.singulo.reason.label.ambiguous': ('作るものを指定', 'Pick a recipe'),
     'gui.singulo.reason.no_power': ('1 tick に %s FE 要りますが、蓄電は %s FE です。発電を増やすか、ほかの装置を止めてください',
                                    'Needs %s FE per tick but only %s FE is stored. Add generators or turn off other machines.'),
     'gui.singulo.reason.output_full': ('出口のスロットかタンクがいっぱいです。取り出すか、面の設定で自動排出をオンにしてください',
@@ -620,10 +647,11 @@ UI_LANG = {
     'gui.singulo.sides.mode.1': ('入力', 'Input'),
     'gui.singulo.sides.mode.2': ('出力', 'Output'),
     'gui.singulo.sides.mode.3': ('入出力', 'Input & output'),
-    'gui.singulo.sides.eject_on': ('自動排出: オン', 'Auto-eject: on'),
-    'gui.singulo.sides.eject_off': ('自動排出: オフ', 'Auto-eject: off'),
+    'gui.singulo.sides.eject_on': ('この面の自動排出: 許可', 'Face auto-eject: allowed'),
+    'gui.singulo.sides.eject_off': ('この面の自動排出: 禁止', 'Face auto-eject: blocked'),
     'gui.singulo.sides.master_on': ('自動排出 オン', 'Auto-eject ON'),
     'gui.singulo.sides.master_off': ('自動排出 オフ', 'Auto-eject OFF'),
+    'gui.singulo.sides.adjacent': ('隣接ブロック: %s', 'Adjacent block: %s'),
     'gui.singulo.sides.hint': ('ドラッグで回す　クリックで切り替え　右クリックで自動排出', 'Drag to rotate · click to change · right-click for auto-eject'),
     'gui.singulo.smes.in': ('受け取り: %s FE/t', 'In: %s FE/t'),
     'gui.singulo.smes.out': ('送り出し %s FE/t', 'Output %s FE/t'),
@@ -640,8 +668,13 @@ UI_LANG = {
     'lab.singulo.reactor.restored': ('施設の電力が戻った。中枢区画の隔壁が開いていく', 'Facility power restored. The core section bulkheads are opening'),
     'lab.singulo.reactor.ai': ('《電力の復旧を確認。……管理者の照合に失敗。侵入者として処理します》',
                                '«Power restoration confirmed. ...Administrator verification failed. Processing intruders.»'),
-    'lab.singulo.coffee': ('コーヒーの香りが広がった。まだ動くらしい', 'The smell of coffee fills the air. It still works'),
-    'lab.singulo.vending': ('売り切れ', 'Sold out'),
+    'lab.singulo.coffee.empty': ('ポットは空。カカオ豆を入れると淹れられる', 'The pot is empty. Add cocoa beans to brew'),
+    'lab.singulo.coffee.brewing': ('コーヒーを淹れている…', 'Brewing coffee...'),
+    'lab.singulo.coffee.ready': ('コーヒーが残り%s杯。ガラス瓶でくめる', '%s cups of coffee left. Fill a glass bottle'),
+    'lab.singulo.vending': ('電源が入っていない。施設の電力が戻れば動きそうだ', 'No power. It might work once facility power is restored'),
+    'lab.singulo.vending.how': ('エメラルドを持って、ほしい飲み物の列のボタンを押す（左から ソーダ1・スポーツドリンク1・エナジードリンク2）',
+                                'Hold emeralds and press the button under the drink you want (left to right: Soda 1, Sports Drink 1, Energy Drink 2)'),
+    'lab.singulo.vending.short': ('エメラルドが足りない（%s個いる）', 'Not enough emeralds (needs %s)'),
     'lab.singulo.hull_unsealed': ('統括AIが止まった。施設の耐圧殻の封じが解けた', 'The overseer has stopped. The facility pressure hull is no longer sealed'),
     'lab.singulo.log.0.title': ('来訪者のご案内', 'Visitor Information'),
     'lab.singulo.log.0': ('ようこそ、第七アンドロイド研究所へ。施設のすべての設備は、統括AI「ファウンドリ」が管理しています。ご用の際は、近くのアンドロイドにお声がけください。本日、主立坑のエレベーターは点検のため、午後は搬入搬出口をご利用ください。', 'Welcome to Android Research Laboratory No. 7. Every system in this facility is managed by our overseer AI, Foundry. If you need anything, ask any android nearby. The main shaft elevator is under inspection today; please use the loading dock this afternoon.'),
@@ -840,7 +873,7 @@ UI_LANG = {
     'gui.singulo.android.decor.0': ('頭', 'Head'),
     'gui.singulo.android.decor.1': ('背中・腰', 'Back / waist'),
     'gui.singulo.android.decor.2': ('手', 'Hand'),
-    'gui.singulo.android.decor.0.hint': ('リボン・髪飾り・ベレー帽・ヘッドドレス', 'Ribbon, hair flower, beret or headdress'),
+    'gui.singulo.android.decor.0.hint': ('リボン・髪飾り・ベレー帽・ヘッドドレス・メガネ', 'Ribbon, hair flower, beret, headdress or glasses'),
     'gui.singulo.android.decor.1.hint': ('マント・マフラー・腰リボン', 'Cape, scarf or waist ribbon'),
     'gui.singulo.android.decor.2.hint': ('文庫本・花束・ティーカップ・傘（待機している間だけ持つ）', 'Paperback, bouquet, teacup or umbrella (held only while idle)'),
     'gui.singulo.android.decor.dye': ('染料と一緒に作業台で染められる', 'Dye them with dyes on a crafting table'),
@@ -863,6 +896,12 @@ UI_LANG = {
     'tooltip.singulo.area_card.size': ('大きさ: %s×%s×%s', 'Size: %s×%s×%s'),
     'tooltip.singulo.area_card.hint': ('シフト右クリックで記録し直す。何もない所でシフト右クリックで消す。測量メガネを掛けると範囲が見える', 'Sneak-use to record again; sneak-use on nothing to clear. Wear Survey Glasses to see the area'),
     'tooltip.singulo.survey_glasses': ('頭に掛けると、手に持った範囲カード・作業位置カードの場所と、アンドロイドの作業の印が見える', 'Worn on the head, it shows the places held by the area or work location card in your hand, and what working androids are doing'),
+    'gui.singulo.glasses.hint': ('1ピクセルずつ上下に動かせる。高さはメガネに残り、ほかの人にも同じに見える', 'Moves one pixel at a time. The height stays with the glasses and others see it too.'),
+    'gui.singulo.glasses.reset': ('戻す', 'Reset'),
+    'gui.singulo.glasses.height': ('%s ピクセル', '%s px'),
+    'gui.singulo.glasses.title': ('測量メガネの高さ', 'Survey Glasses Height'),
+    'tooltip.singulo.survey_glasses.adjust': ('持ってスニークして使うと、掛ける高さを変えられる', 'Sneak-use while holding it to change how high it sits.'),
+    'tooltip.singulo.survey_glasses.height': ('掛ける高さ: %s ピクセル', 'Worn height: %s px'),
     'tooltip.singulo.recipe_card.empty': ('まだ記録していない（作業指令台の「記録」で記録する）', 'Blank: record a recipe in a work console\'s Record tab'),
     'message.singulo.work_location.cleared': ('記録を消した', 'Cleared the record'),
     'message.singulo.recipe_card.cleared': ('レシピを消した', 'Cleared the recipe'),
@@ -1603,8 +1642,14 @@ def models():
         else:
             if iid in BLACK_HOLE_ITEMS or iid in ('explorer_compass', 'meteor_compass', 'graviton_manipulator'):
                 continue                                       # 立体のモデル・針のモデルは別に作る
-            write_json(ASSETS / 'models' / 'item' / f'{iid}.json',
-                       {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
+            model = {'parent': 'minecraft:item/handheld' if iid == 'relocation_wrench' else 'minecraft:item/generated',
+                     'textures': {'layer0': f'{MODID}:item/{iid}'}}
+            if iid == 'relocation_wrench':
+                # ケーブル撤去モード（singulo:mode = 1）は表示灯が橙の絵
+                model['overrides'] = [{'predicate': {f'{MODID}:mode': 1}, 'model': f'{MODID}:item/relocation_wrench_cable'}]
+                write_json(ASSETS / 'models' / 'item' / 'relocation_wrench_cable.json',
+                           {'parent': 'minecraft:item/handheld', 'textures': {'layer0': f'{MODID}:item/relocation_wrench_cable'}})
+            write_json(ASSETS / 'models' / 'item' / f'{iid}.json', model)
     blocks_extra.models(write_json, ASSETS)
     import blocks_extra3
     blocks_extra3.models(write_json, ASSETS)
@@ -2035,6 +2080,12 @@ def art_textures():
             art16.save(art16.item_texture(iid, stage_of(name)), ti / f'{iid}.png')
             if iid in art.ITEM_ART:
                 art.save(art.item_texture(iid, stage_of(name)), hi / f'{iid}.png')
+    # 施設の建材の設計図（青焼きの紙）
+    import blueprints
+    blueprints.item_textures(ti, art16.save)
+    # 移設レンチのケーブル撤去モード（表示灯が橙）
+    art16.save(art16.grain(art16.relocation_wrench(cable=True), seed=art16.stable_hash('relocation_wrench') % 1000),
+               ti / 'relocation_wrench_cable.png')
     # ケーブルの被覆（電力が流れている間の芯の色つき）
     for iid, core in CABLES.items():
         art16.save(art16.cable_texture(iid, core), tb / f'{iid}.png')
@@ -2812,6 +2863,62 @@ def accessory_item_models():
             'layer0': f'{MODID}:item/{iid}', 'layer1': f'{MODID}:item/{iid}_detail'}})
 
 
+def umbrella_item_model():
+    """傘: インベントリ・地面・額縁・一人称は平らな絵のまま、三人称で手に持つと開いた傘の立体になる
+    （neoforge:separate_transforms）。布は色付けの番号0（染めた色）、柄と石突きは染めない。"""
+    from PIL import Image, ImageDraw
+    iid = 'android_umbrella'
+    ti = ASSETS / 'textures' / 'item'
+    # 立体の布（白。染めた色で塗る。骨の区切りがうっすら見える）と、柄の木と、石突きの金属
+    cloth = Image.new('RGBA', (16, 16), (246, 246, 246, 255))
+    dc = ImageDraw.Draw(cloth)
+    for x in (0, 5, 10, 15):
+        dc.line([(x, 0), (x, 15)], fill=(214, 214, 214, 255))
+    wood = Image.new('RGBA', (16, 16), (110, 82, 58, 255))
+    ImageDraw.Draw(wood).line([(0, 0), (15, 15)], fill=(92, 68, 48, 255))
+    metal = Image.new('RGBA', (16, 16), (200, 204, 212, 255))
+    for name, im in (('umbrella_cloth', cloth), ('umbrella_wood', wood), ('umbrella_metal', metal)):
+        path = ti / f'{name}.png'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        im.save(path)
+
+    def box(a, b, tex, tint=False):
+        faces = {}
+        for f in ('north', 'south', 'east', 'west', 'up', 'down'):
+            # UV を明示する（座標が 0〜16 の外に出る面で、テクスチャ置き場の隣の絵を拾わないように）
+            faces[f] = {'texture': tex, 'uv': [0, 0, 16, 16], **({'tintindex': 0} if tint else {})}
+        return {'from': a, 'to': b, 'faces': faces}
+
+    def ring(outer, inner, y0, y1):
+        """布の1段: 外の四角から内の四角を抜いた輪（4枚の板）。下から見ると、内側が上の段へ凹んで見える。"""
+        o0, o1, i0, i1 = outer[0], outer[1], inner[0], inner[1]
+        return [box([o0, y0, o0], [o1, y1, i0], '#cloth', True), box([o0, y0, i1], [o1, y1, o1], '#cloth', True),
+                box([o0, y0, i0], [i0, y1, i1], '#cloth', True), box([i1, y0, i0], [o1, y1, i1], '#cloth', True)]
+
+    # 柄を下へのばし（モデルは y −16 まで使える）、持ち手で握る。布は頭より上に来る
+    elements = [
+        box([7.5, -9, 7.5], [8.5, 28, 8.5], '#wood'),                      # 柄
+        box([8.5, -10, 7.5], [10.5, -9, 8.5], '#wood'),                    # 曲がった持ち手
+        box([9.5, -9, 7.5], [10.5, -7, 8.5], '#wood'),
+        *ring((-4, 20), (-1, 17), 26, 27),                                 # 布: 下ほど広い4段の輪。内側は段々に凹む
+        *ring((-1, 17), (3, 13), 27, 28.5),
+        *ring((3, 13), (6, 10), 28.5, 29.5),
+        box([6, 29.5, 6], [10, 30.5, 10], '#cloth', True),                 # てっぺん（ここだけ板でふさぐ）
+        box([7.5, 30.5, 7.5], [8.5, 32, 8.5], '#metal'),                   # 石突き
+    ]
+    hand = {'rotation': [54, 0, 0], 'translation': [0, 2.6, 7.5], 'scale': [0.7, 0.7, 0.7]}
+    base = {'textures': {'cloth': f'{MODID}:item/umbrella_cloth', 'wood': f'{MODID}:item/umbrella_wood',
+                         'metal': f'{MODID}:item/umbrella_metal', 'particle': f'{MODID}:item/{iid}'},
+            'elements': elements,
+            'display': {'thirdperson_righthand': hand, 'thirdperson_lefthand': hand}}
+    flat = {'parent': 'minecraft:item/generated',
+            'textures': {'layer0': f'{MODID}:item/{iid}', 'layer1': f'{MODID}:item/{iid}_detail'}}
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
+        'loader': 'neoforge:separate_transforms',
+        'base': base,
+        'perspectives': {k: flat for k in ('gui', 'ground', 'fixed', 'head', 'firstperson_righthand', 'firstperson_lefthand')}})
+
+
 def fluid_canister_item_model():
     """液体キャニスター: 容器の絵（layer0）と、中身の色に染める窓の絵（layer1。空なら描かない）。"""
     from PIL import Image
@@ -2880,10 +2987,26 @@ def glasses_item_model():
             box([13.8, 9.0, fz0 + 0.1], [14.4, 9.4, fz0 + 0.5], [0, 8, 2, 10])]               # 表示灯
     write_json(ASSETS / 'models' / 'item' / f'{iid}_worn.json', {
         'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t, 'elements': els})
-    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {
-        'loader': 'neoforge:separate_transforms',
-        'base': {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}},
-        'perspectives': {'head': {'parent': f'{MODID}:item/{iid}_worn'}}})
+
+    def held(worn):
+        return {'loader': 'neoforge:separate_transforms',
+                'base': {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}},
+                'perspectives': {'head': {'parent': f'{MODID}:item/{worn}'}}}
+    # 掛ける高さ（ピクセル。Java の SurveyGlassesItem.MIN_HEIGHT〜MAX_HEIGHT）ごとに、頭の模型を上下にずらした版。
+    # 頭の模型の 1.6 が頭の1ピクセル。アイテムの絵の切り替え singulo:height（高さを 0〜1 にした値）で選ぶ
+    lo, hi = -4, 4
+    overrides = []
+    for h in range(lo, hi + 1):
+        name = f'{iid}_worn' if h == 0 else f'{iid}_worn_{"up" if h > 0 else "down"}{abs(h)}'
+        if h != 0:
+            moved = [{**e, 'from': [e['from'][0], round(e['from'][1] + 1.6 * h, 3), e['from'][2]],
+                      'to': [e['to'][0], round(e['to'][1] + 1.6 * h, 3), e['to'][2]]} for e in els]
+            write_json(ASSETS / 'models' / 'item' / f'{name}.json', {
+                'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t, 'elements': moved})
+        variant = f'{iid}_h' + ('0' if h == 0 else ('p' if h > 0 else 'm') + str(abs(h)))
+        write_json(ASSETS / 'models' / 'item' / f'{variant}.json', held(name))
+        overrides.append({'predicate': {f'{MODID}:height': round((h - lo) / (hi - lo), 4)}, 'model': f'{MODID}:item/{variant}'})
+    write_json(ASSETS / 'models' / 'item' / f'{iid}.json', {**held(f'{iid}_worn'), 'overrides': overrides})
 
 
 def compass_item_model():
@@ -2957,9 +3080,12 @@ def tags():
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
     blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
+    diamond_only = ('welded_hatch',)                      # 溶接された蓋はダイヤのツルハシ以上でないと掘れない
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
-               {'values': [mid(n) for n, v in MOD.items() if v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                          or v[0].startswith('pristine_')]})
+               {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
+                   v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
+                   or v[0].startswith('pristine_'))]})
+    write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter'],
                        'wormhole_mouth': [f'{MODID}:wormhole']}
@@ -3130,6 +3256,10 @@ def ruins_data():
     for rid, (lo, hi) in fragments.items():
         pools.setdefault(rid, []).append({'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': mid('クリスタルメモリ'), 'functions': [
             {'function': 'minecraft:set_count', 'count': {'type': 'minecraft:uniform', 'min': lo, 'max': hi}}]}]})
+    # 施設の建材の設計図（遺構の種類ごとに、確率で1枚）
+    import blueprints
+    for rid in list(pools):
+        pools[rid] += blueprints.loot_pools(f'ruin:{rid}')
     for rid, plist in pools.items():
         write_json(DATA / 'loot_table' / 'ruins' / f'{rid}.json', {'type': 'minecraft:chest', 'pools': plist})
     for rid, plist in first.items():
@@ -3316,7 +3446,7 @@ def thermal():
 # ---------------------------------------------------------------- クリエイティブタブ（と JEI）の並び
 # 用途ごとにまとめ、まとまりの中は段階順・レシピ順。並べ忘れたアイテムは「素材」の最後に入る。
 TAB_GROUPS = [
-    ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'decoded_record']),
+    ('案内と設定', ['handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'settings_card', 'relocation_wrench', 'decoded_record']),
     ('発電・蓄電・送電', ['thermoelectric_generator', 'hydrogen_fuel_cell', 'muon_fusion_reactor', 'cryogenic_turbine', 'quantum_heat_engine', 'smes_cell', 'smes_module',
                        'copper_wire', 'superconducting_cable', 'topological_wire', 'horizon_bus']),
     ('加工装置', ['kiln', 'compressor', 'electrolyzer', 'peltier_cooler', 'archive_terminal', 'catalytic_reactor', 'precision_assembler',
@@ -3343,7 +3473,7 @@ TAB_GROUPS = [
                    'genesis_core', 'genesis_frame', 'genesis_pylon', 'primordial_seed']),
     ('時空と探査の装置', ['worldline_anchor_small', 'inertial_stabilizer', 'gravity_panel_receiver', 'impact_generator_panel', 'keraunos_tower', 'deep_sea_collector', 'void_collector',
                      'low_gravity_panel',
-                     'high_gravity_panel', 'gravitational_wave_detector', 'neutrino_observatory',
+                     'high_gravity_panel', 'zero_gravity_block', 'zero_gravity_controller', 'gravitational_wave_detector', 'neutrino_observatory',
                      'probe_station', 'worldline_anchor_advanced', 'halo_collector', 'gravitational_containment_tank',
                      'unstable_wormhole_mouth', 'wormhole_stabilizer', 'wormhole_mouth_casing', 'wormhole_mouth', 'wormhole_port']),
     ('道具と装備', ['fluid_canister', 'neutrino_scanner', 'scanner_module_2', 'scanner_module_3', 'inertial_control_gauntlet', 'magnetic_bottle', 'shield_permit',
@@ -3357,22 +3487,27 @@ TAB_GROUPS = [
                  'android_mining_upgrade', 'android_felling_upgrade',
                  'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
                  'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
-                 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_cape', 'android_scarf',
-                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'android_teacup', 'android_umbrella',
+                 'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_glasses', 'android_cape', 'android_scarf',
+                 'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',
                  'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
                  'bit_android_spawn_egg', 'gunner_android_spawn_egg']),
     ('封印コンテナ', ['sealed_container_1', 'magnetic_key', 'sealed_container_2', 'quantum_key', 'sealed_container_3',
                  'temporal_key', 'sealed_container_4', 'singularity_key']),
     ('触媒', ['muon_catalyst', 'bose_condensate_catalyst', 'time_crystal_catalyst', 'singularity_core', 'catalyst_stabilizer']),
-    ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core', 'raw_meteoric_iron', 'meteoric_iron_ingot', 'stardust',
+    ('採集', ['meteorite_crust', 'meteoric_iron_chunk', 'stardust_cluster', 'meteorite_core', 'raw_meteoric_iron', 'stardust',
             'fulgurite_block', 'fulgurite', 'pressure_crystal', 'void_dust']),
+    # インゴットは段階順にまとめて、素材の手前に
+    ('インゴット', ['steel_ingot', 'zinc_ingot', 'bismuth_ingot', 'meteoric_iron_ingot', 'nihonium_ingot']),
+    # 板と基板（板 → 基板 → 回路とモジュール。それぞれ段階順）
+    ('板・基板', ['steel_plate', 'nihonium_plate', 'phase_sync_plate', 'ceramic_substrate', 'optical_lattice_substrate',
+               'basic_circuit', 'quantum_computing_module', 'thermocouple_module', 'time_crystal_module']),
     ('素材', None),
     ('回収物と記録', None),
     # ボスの戦利品: 番人・遺構のボスの落とす物 → 記録の断章と終焉の記録 → 記録者の報酬 → 覚醒戦の核
     ('ボスの戦利品', ['sentinel_core', 'degenerate_nucleus', 'precision_actuator', 'echo_chapter', 'gravity_chapter', 'horizon_chapter',
                  'ergosphere_chapter', 'terminus_record', 'archivist_halo', 'afterglow_wings', 'awakening_record_core',
                  'awakening_echo_core', 'awakening_gravity_core', 'awakening_foundry_core', 'awakening_ergosphere_core']),
-    ('建材', ['white_panel', 'white_light_panel', 'bismuth_crystal_block', 'glowing_bismuth_crystal', 'white_glass_panel', 'white_star_glass_panel', 'black_reinforced_panel',
+    ('建材', ['white_panel', 'white_light_panel', 'bismuth_crystal_block', 'glowing_bismuth_crystal', 'white_glass_panel', 'white_star_glass_panel', 'white_sliding_door', 'black_reinforced_panel',
             'black_reinforced_glass', 'black_star_glass', 'android_barrier_glass', 'android_barrier_glass_patterned',
             'android_gate_glass', 'android_gate_glass_patterned']),
     ('遺構', ['ruin_panel', 'cracked_ruin_panel', 'mossy_ruin_panel', 'tiled_ruin_panel', 'vented_ruin_panel',
@@ -3381,10 +3516,14 @@ TAB_GROUPS = [
             'ruin_lamp_verdant', 'ruin_lamp_violet', 'ruin_lamp_crimson', 'ruin_cache', 'ruin_guard_dock', 'ruin_android_fabricator',
             'seal_console', 'guardian_core', 'echo_projector', 'security_drone_spawn_egg']),
     # 地下アンドロイド研究所: 建材 → 照明 → 装置 → 小物 → 製造ライン
-    ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'bulkhead',
-              'facility_light', 'emergency_light', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
-              'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'paper_stack', 'trash_bin',
+    ('研究所', ['lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'lab_glass', 'pressure_hull', 'welded_hatch', 'bulkhead', 'lab_door',
+              'facility_light', 'emergency_light', 'lab_rayleigh_panel', 'rayleigh_panel', 'power_conduit', 'reactor_core', 'reactor_console', 'server_rack', 'lab_terminal',
+              'android_capsule', 'desk_monitor', 'coffee_maker', 'vending_machine', 'canned_soda', 'sports_drink', 'energy_drink',
+              'coffee', 'paper_stack', 'trash_bin',
               'factory_line', 'factory_conveyor']),
+    # 施設の建材の設計図（遺構 → 研究所）
+    ('設計図', ['blueprint_ruin_panels', 'blueprint_pristine_ruin', 'blueprint_ruin_glass', 'blueprint_lighting',
+             'blueprint_lab_building', 'blueprint_lab_furniture', 'blueprint_rayleigh']),
     ('クリエイティブ専用', ['creative_energy_source', 'creative_catalyst', 'builder_wand', 'horizon_warden_spawn_egg',
                      'echo_sentinel_spawn_egg', 'gravity_remnant_spawn_egg', 'ergosphere_leviathan_spawn_egg',
                      'last_archivist_spawn_egg', 'foundry_overseer_spawn_egg']),
@@ -3758,6 +3897,7 @@ def main():
     models()
     textures()
     accessory_item_models()          # 生成の一般の物のモデルのあとに、2枚重ねで書き直す
+    umbrella_item_model()            # 傘は、三人称で手に持つと開いた傘の立体に
     fluid_canister_item_model()
     work_card_item_model()           # 生成の一般の物のモデルのあとに、記録済みの絵へ切り替えるモデルを書き直す
     area_card_item_model()

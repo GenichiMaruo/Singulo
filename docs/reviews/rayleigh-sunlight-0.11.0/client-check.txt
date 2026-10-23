@@ -1,0 +1,8 @@
+256/256 artificial lightmap pixels equal vanilla clear noon
+256/256 pixels remain identical during rainy midnight
+outside lightmap retains night/weather
+client SKY=15 / raw darkened=15
+power off SKY=0, no stale noon marker
+power on SKY=15 restored
+NeoForge smooth light pipeline and entity renderer retain local noon
+4 terrain screenshots

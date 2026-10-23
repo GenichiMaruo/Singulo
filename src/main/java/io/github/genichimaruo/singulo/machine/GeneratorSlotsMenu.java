@@ -10,7 +10,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 /**
  * 入口と出口のスロットを持つ発電機の画面（極低温タービン: 冷媒カートリッジ → 空のカートリッジ、
@@ -34,8 +33,8 @@ public class GeneratorSlotsMenu extends AbstractContainerMenu {
         this.pos = pos;
         this.kind = kind;
         this.data = data;
-        addSlot(new SlotItemHandler(items, 0, IN_X, IN_Y));
-        addSlot(new SlotItemHandler(items, 1, OUT_X, OUT_Y) {
+        addSlot(new NotifyingItemSlot(items, 0, IN_X, IN_Y));
+        addSlot(new NotifyingItemSlot(items, 1, OUT_X, OUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;                          // 出口: 取り出すだけ
@@ -65,6 +64,8 @@ public class GeneratorSlotsMenu extends AbstractContainerMenu {
     public int value(int index) {
         return data.getInt(index);
     }
+
+    public BlockPos pos() { return pos; }
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {

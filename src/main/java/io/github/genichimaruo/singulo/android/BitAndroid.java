@@ -88,6 +88,23 @@ public class BitAndroid extends RuinAndroid {
     private static final EntityDataAccessor<Integer> SHOT_FLASH = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Vector3f> SHOT_AT = SynchedEntityData.defineId(BitAndroid.class, EntityDataSerializers.VECTOR3);
 
+    /**
+     * 描画するかを決める箱: 飛んでいるビット（送り出したもの・背中へ戻る途中のもの）と、ビットの光線の両端まで広げる
+     * （本体が画面の外でも、画面に入っているビットと光線は描く）。当たり判定は変えない。
+     */
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        AABB box = super.getBoundingBoxForCulling();
+        int out = Math.max(deployed(), recallingFrom(1));
+        for (int i = 0; i < out; i++) {
+            box = box.minmax(new AABB(bitPosition(i, 1), bitPosition(i, 1)).inflate(1));
+        }
+        if (shotFlash() > 0) {
+            box = box.minmax(new AABB(shotFrom(), shotAt()));
+        }
+        return box;
+    }
+
     public BitAndroid(EntityType<? extends BitAndroid> type, Level level) {
         super(type, level);
     }

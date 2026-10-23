@@ -26,6 +26,9 @@ GRAVITY = {
                               on=(80, 200, 255), core=(214, 248, 255), up=True),
     'high_gravity_panel': dict(base=(42, 38, 54), outer=(14, 12, 20), inner=(100, 90, 126), off=(84, 74, 104),
                                on=(255, 96, 196), core=(255, 214, 244), up=False),
+    # 無重力ブロック: 矢印の代わりに、浮かんだ輪（ring）
+    'zero_gravity_block': dict(base=(52, 42, 86), outer=(22, 16, 40), inner=(126, 108, 190), off=(96, 82, 146),
+                               on=(176, 132, 255), core=(240, 226, 255), up=True, ring=True),
 }
 
 # 面ごとに、隣の向き → その面の絵のどの辺に当たるか（マインクラフトの面の UV の向きに合わせる）
@@ -277,6 +280,17 @@ def gravity_base(iid, on):
     g = GRAVITY[iid]
     im, d = new(rgba(g['base']))
     col = g['on'] if on else g['off']
+    if g.get('ring'):
+        # 浮かんだ輪を2つ（左上と右下にずらす）
+        for cx, cy, r in ((5, 5, 3), (11, 11, 2)):
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=rgba(col))
+            if on:
+                d.point((cx, cy - r), fill=rgba(g['core']))
+        if on:
+            rnd = random.Random(len(iid))
+            for _ in range(6):
+                d.point((rnd.randrange(S), rnd.randrange(S)), fill=rgba(mix(g['base'], g['on'], 0.5)))
+        return im
     for oy in (2, 9):
         pts = [(3, oy + 4), (8, oy - 1), (12, oy + 4)] if g['up'] else [(3, oy), (8, oy + 5), (12, oy)]
         d.line(pts, fill=rgba(col), width=1)
@@ -316,6 +330,25 @@ def gravity_framed(iid):
     im = gravity_base(iid, False)
     for side in ('top', 'bottom', 'left', 'right'):
         im.alpha_composite(gravity_edge(iid, side))
+    return im
+
+
+def zero_controller_side():
+    """無重力コントロールボックスの側面: 白い外装に、高さの目盛りと紫の表示灯。"""
+    im = white_panel()
+    d = ImageDraw.Draw(im)
+    d.rectangle([4, 3, 11, 12], fill=(36, 30, 58, 255), outline=(150, 160, 172, 255))
+    for k, y in enumerate((10, 8, 6, 4)):
+        d.line([(6, y), (9, y)], fill=rgba((176, 132, 255) if k < 3 else (96, 82, 146)))
+    return im
+
+
+def zero_controller_top():
+    """上面: 上向きの山形と、浮かんだ輪。"""
+    im = white_panel()
+    d = ImageDraw.Draw(im)
+    d.ellipse([4, 4, 11, 11], outline=(126, 108, 190, 255))
+    d.line([(6, 9), (8, 6), (10, 9)], fill=(176, 132, 255, 255))
     return im
 
 
@@ -394,6 +427,8 @@ def textures(tb, save):
         suffix = '_on' if on else ''
         save(receiver_side(on), tb / f'gravity_panel_receiver{suffix}.png')
         save(receiver_top(on), tb / f'gravity_panel_receiver_top{suffix}.png')
+    save(zero_controller_side(), tb / 'zero_gravity_controller.png')
+    save(zero_controller_top(), tb / 'zero_gravity_controller_top.png')
 
 
 def _cube(textures):
@@ -448,3 +483,9 @@ def models(write_json, assets):
         'lit=false': {'model': f'{MODID}:block/gravity_panel_receiver'},
         'lit=true': {'model': f'{MODID}:block/gravity_panel_receiver_on'}}})
     write_json(mi / 'gravity_panel_receiver.json', {'parent': f'{MODID}:block/gravity_panel_receiver'})
+    # 無重力コントロールボックス
+    write_json(mb / 'zero_gravity_controller.json', {'parent': 'minecraft:block/cube_bottom_top', 'textures': {
+        'top': f'{MODID}:block/zero_gravity_controller_top', 'bottom': f'{MODID}:block/white_panel',
+        'side': f'{MODID}:block/zero_gravity_controller'}})
+    write_json(bs / 'zero_gravity_controller.json', {'variants': {'': {'model': f'{MODID}:block/zero_gravity_controller'}}})
+    write_json(mi / 'zero_gravity_controller.json', {'parent': f'{MODID}:block/zero_gravity_controller'})

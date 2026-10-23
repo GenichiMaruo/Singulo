@@ -1,0 +1,19 @@
+{
+  "type": "singulo:machine",
+  "station": "kiln",
+  "stage": 1,
+  "time": 100,
+  "energy": 40,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:unfired_teacup"
+      },
+      "count": 1
+    }
+  ],
+  "result": {
+    "id": "singulo:android_teacup",
+    "count": 1
+  }
+}

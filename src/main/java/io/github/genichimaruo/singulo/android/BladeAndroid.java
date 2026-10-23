@@ -51,6 +51,13 @@ public class BladeAndroid extends RuinAndroid {
     static final int COST_CAST = 310;
     static final int COST_SWING = 60;
 
+    /** 斬撃の軌跡と、突進の残像（来た道に残る）。 */
+    @Override
+    protected double moveReach() {
+        int s = state();
+        return s >= STATE_DASH_WINDUP && s <= STATE_SWING ? 5 : 0;
+    }
+
     public BladeAndroid(EntityType<? extends BladeAndroid> type, Level level) {
         super(type, level);
     }

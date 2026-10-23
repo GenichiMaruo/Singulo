@@ -10,6 +10,7 @@ displayName="${mod_name}"
 authors="${mod_authors}"
 displayURL="https://github.com/GenichiMaruo/Singulo"
 logoFile="singulo_logo.png"
+enumExtensions="META-INF/enumextensions.json"
 description='''
 Recover the lost catalytic engineering of a vanished civilization and finish its rotating black hole power plant.
 '''
@@ -37,3 +38,6 @@ Recover the lost catalytic engineering of a vanished civilization and finish its
 
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"
+
+[[mixins]]
+config="singulo.mixins.json"

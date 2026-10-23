@@ -42,6 +42,7 @@ public final class RecipeTweaks {
             java.util.Optional.empty(), ItemStack.EMPTY, List.of(), 0, 0, ItemStack.EMPTY);
     private static String stamp = "";
     private static long stampCheckedAt;
+    private static long revision;
 
     /** 設定を当てはめたレシピ。設定で無効になったレシピは null。 */
     @Nullable
@@ -66,6 +67,17 @@ public final class RecipeTweaks {
     public static synchronized void invalidate() {
         CACHE.clear();
         stamp = "";
+        revision++;
+    }
+
+    /** Revision includes the existing one-second configuration polling and config unload/reload. */
+    public static synchronized long revision() {
+        if (ServerConfig.SPEC.isLoaded()) {
+            refreshStamp();
+        } else if (!stamp.isEmpty()) {
+            invalidate();
+        }
+        return revision;
     }
 
     /** レシピの一覧に当てはめる（無効になったものは除く）。 */
@@ -99,6 +111,7 @@ public final class RecipeTweaks {
         if (!s.equals(stamp)) {
             stamp = s;
             CACHE.clear();
+            revision++;
         }
     }
 

@@ -131,21 +131,28 @@ public final class Stage2GameTests {
     }
 
     /** コントローラを最後に置いて完成させても、形成の演出が出る（読み込み直したときだけ出さない）。 */
-    @GameTest(template = TALL, timeoutTicks = 100)
+    @GameTest(template = TALL, batch = "controller_last_formation", timeoutTicks = 100)
     public static void placingControllerLastPlaysFormation(GameTestHelper helper) {
-        buildTower(helper, 7);
-        BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
-        var state = helper.getLevel().getBlockState(controller);
-        helper.getLevel().setBlockAndUpdate(controller, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-        helper.getLevel().setBlockAndUpdate(controller, state);
-        MachineBlockEntity fresh = helper.getBlockEntity(TOWER_CONTROLLER);
-        fresh.energy().setEnergy(fresh.energy().getMaxEnergyStored());
-        int before = io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedSparks();
-        helper.runAtTickTime(2, () -> {
-            helper.assertTrue(fresh.structureSize() == 7, "形成されない");
-            helper.assertTrue(io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedSparks() > before, "形成の演出が出ない");
-            helper.succeed();
-        });
+        // The particle queue is global. Wait for older batches and run without other forming structures.
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(
+                        io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedSparks() == 0,
+                        "前の演出が残っている"))
+                .thenExecute(() -> {
+                    buildTower(helper, 7);
+                    BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
+                    var state = helper.getLevel().getBlockState(controller);
+                    helper.getLevel().setBlockAndUpdate(controller, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    helper.getLevel().setBlockAndUpdate(controller, state);
+                    MachineBlockEntity fresh = helper.getBlockEntity(TOWER_CONTROLLER);
+                    fresh.energy().setEnergy(fresh.energy().getMaxEnergyStored());
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    MachineBlockEntity fresh = helper.getBlockEntity(TOWER_CONTROLLER);
+                    helper.assertTrue(fresh.structureSize() == 7, "形成されない");
+                    helper.assertTrue(io.github.genichimaruo.singulo.multiblock.FormationEffect.queuedSparks() > 0, "形成の演出が出ない");
+                }).thenSucceed();
     }
 
     @GameTest(template = TALL, timeoutTicks = 200)

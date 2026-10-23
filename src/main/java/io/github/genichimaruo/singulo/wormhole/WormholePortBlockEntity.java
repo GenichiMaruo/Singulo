@@ -4,7 +4,6 @@ import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +35,9 @@ import net.neoforged.neoforge.items.IItemHandler;
  */
 public class WormholePortBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
     private static final Map<Level, Set<WormholePortBlockEntity>> LOADED = new WeakHashMap<>();
+
+    /** Release runtime references when this level closes. */
+    public static void forgetLevel(Level level) { LOADED.remove(level); }
     /** 転送中に転送を呼び返さないための印（サーバーは1スレッド）。 */
     private static boolean busy;
 
@@ -86,7 +88,7 @@ public class WormholePortBlockEntity extends BlockEntity implements AbstractMach
     public void onLoad() {
         super.onLoad();
         if (level != null && !level.isClientSide) {
-            LOADED.computeIfAbsent(level, l -> Collections.newSetFromMap(new IdentityHashMap<>())).add(this);
+            LOADED.computeIfAbsent(level, l -> Collections.newSetFromMap(new WeakHashMap<>())).add(this);
         }
     }
 

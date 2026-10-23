@@ -13,7 +13,7 @@ public class UsesItem extends SinguloItem {
     private final boolean catalyst;
 
     public UsesItem(Properties properties, int stage, int defaultMax, boolean catalyst) {
-        super(properties.stacksTo(1), stage, false);
+        super(properties.stacksTo(catalyst ? 1 : 64), stage, false);
         this.defaultMax = defaultMax;
         this.catalyst = catalyst;
     }
@@ -24,6 +24,13 @@ public class UsesItem extends SinguloItem {
 
     public boolean isCatalyst() {
         return catalyst;
+    }
+
+    /** Fresh originals and restored parts stack; worn items keep individual usage state. */
+    @Override
+    public int getMaxStackSize(ItemStack stack) {
+        UsesData data = UsesHelper.get(stack);
+        return catalyst || data.used() > 0 || data.remaining() == 0 ? 1 : super.getMaxStackSize(stack);
     }
 
     @Override

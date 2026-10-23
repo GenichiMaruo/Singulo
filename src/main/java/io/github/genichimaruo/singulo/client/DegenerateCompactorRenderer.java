@@ -7,7 +7,7 @@ import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import io.github.genichimaruo.singulo.multiblock.FixedShapeControllerBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.Shapes;
-import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -39,7 +39,7 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
     private static final float WALL = 1.5F;
     /** ラムの先の高さ（上がっているとき・塊を打ったとき）。 */
     private static final float UP = 1.2F;
-    private static final Map<BlockPos, Long> LAST_SLAM = new HashMap<>();
+    private static final Map<FixedShapeControllerBlockEntity.Compactor, Long> LAST_SLAM = new WeakHashMap<>();
 
     public DegenerateCompactorRenderer(BlockEntityRendererProvider.Context context) {}
 
@@ -69,7 +69,7 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         int lit = LightTexture.pack(Math.min(15, (int) (4 + 11 * Math.max(flash, running ? 0.35F : 0F))), sky);
 
         if (running) {
-            sparks(level, be.getBlockPos(), Vec3.atCenterOf(center).add(0, lumpTop, 0), time);
+            sparks(be, level, Vec3.atCenterOf(center).add(0, lumpTop, 0), time);
         }
         pose.pushPose();
         pose.translate(offset.x, offset.y, offset.z);
@@ -127,13 +127,13 @@ public class DegenerateCompactorRenderer implements BlockEntityRenderer<FixedSha
         return phase < SLAM ? 0F : (float) Math.exp(-(phase - SLAM) / 5.0);
     }
 
-    private static void sparks(Level level, BlockPos controller, Vec3 at, float time) {
+    private static void sparks(FixedShapeControllerBlockEntity.Compactor be, Level level, Vec3 at, float time) {
         long cycle = (long) (time / STROKE);
         float phase = time % STROKE;
         if (phase < SLAM || phase > SLAM + 4) {
             return;
         }
-        Long last = LAST_SLAM.put(controller.immutable(), cycle);
+        Long last = LAST_SLAM.put(be, cycle);
         if (last != null && last == cycle) {
             return;
         }

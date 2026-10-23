@@ -129,6 +129,24 @@ def pressure_hull():
     return im
 
 
+def welded_hatch():
+    """溶接された蓋: 鋼の板を十字の溶接のビードでつないだ蓋。ビードの両脇には焼けの色（青紫〜麦わら色）。"""
+    im, d = new(rgba((86, 92, 102)))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba((48, 52, 60)))
+    for c in (7, 8):                                       # 十字のビード（盛り上がった継ぎ目）
+        d.line([(c, 1), (c, S - 2)], fill=rgba((150, 152, 156) if c == 7 else (104, 106, 112)))
+        d.line([(1, c), (S - 2, c)], fill=rgba((150, 152, 156) if c == 7 else (104, 106, 112)))
+    for k in range(1, S - 1, 2):                            # ビードのうろこ模様
+        d.point((7, k), fill=rgba((176, 178, 182)))
+        d.point((k, 7), fill=rgba((176, 178, 182)))
+    for c, col in ((6, (96, 90, 140)), (9, (150, 128, 80))):   # 焼けの色
+        d.line([(c, 1), (c, S - 2)], fill=rgba(col))
+        d.line([(1, c), (S - 2, c)], fill=rgba(col))
+    for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):        # 四隅のボルト
+        d.rectangle([x, y, x + 1, y + 1], fill=rgba((120, 126, 136)))
+    return im
+
+
 def bulkhead():
     """隔壁: 黄と黒の斜めの警告の縞と、真ん中の継ぎ目。"""
     im, d = new(rgba((240, 196, 40)))
@@ -137,6 +155,67 @@ def bulkhead():
     d.line([(7, 0), (7, S - 1)], fill=rgba(STEEL_DARK))
     d.line([(8, 0), (8, S - 1)], fill=rgba(STEEL_HI))
     d.rectangle([0, 0, S - 1, S - 1], outline=rgba(STEEL_DARK))
+    return im
+
+
+# スライドドア: lab は研究所のドア（帯は青灰色、足もとに警告の縞）、white は作れるドア（帯は淡い灰色に水色の線）
+DOORS = {'lab_door': True, 'white_sliding_door': False}
+DOOR_GLASS = (40, 54, 70)
+
+
+def door_leaf(upper, lab):
+    """スライドドアの2枚の扉（上半分か下半分の 16×16。左半分が左の扉、右半分が右の扉）。左右の外の列は扉の小口の色。
+
+    上半分: 縦長の細い窓（暗いガラスに映り込みの点）。上の2行は鴨居に隠れる。
+    下半分: いちばん上に帯（扉の真ん中の高さ）。研究所のドアは足もとに黄と黒の縞、作れるドアは淡い灰色の蹴板。
+    """
+    im, d = new(rgba(WHITE))
+    for x0 in (0, 8):
+        d.line([(x0 + 1, 0), (x0 + 1, S - 1)], fill=(255, 255, 255, 255))     # 扉の面の明るい縁
+        d.line([(x0 + 6, 0), (x0 + 6, S - 1)], fill=rgba(SHADE))
+    d.line([(0, 0), (0, S - 1)], fill=rgba(SEAM))
+    d.line([(S - 1, 0), (S - 1, S - 1)], fill=rgba(SEAM))
+    if upper:
+        for x in (3, 13):                                              # 左右の扉で鏡写し（左 1〜4、右 11〜14）
+            d.rectangle([x - 2, 2, x + 1, 12], outline=rgba(SEAM))
+            d.rectangle([x - 1, 3, x, 11], fill=rgba(DOOR_GLASS))
+            d.point((x - 1, 4), fill=rgba((120, 150, 176)))
+            d.point((x, 10), fill=rgba((70, 92, 112)))
+    else:
+        band = BAND if lab else (200, 206, 216)
+        d.rectangle([1, 0, S - 2, 2], fill=rgba(band))
+        d.line([(1, 1), (S - 2, 1)], fill=rgba(mix(BAND, (255, 255, 255), 0.35)) if lab else rgba(CYAN))
+        if lab:
+            for x in range(1, S - 1):
+                for y in (12, 13, 14):
+                    d.point((x, y), fill=rgba((240, 196, 40)) if (x + y) // 2 % 2 else rgba((30, 30, 34)))
+        else:
+            d.rectangle([1, 12, S - 2, 14], fill=rgba(SHADE))
+            d.line([(1, 12), (S - 2, 12)], fill=rgba(SEAM))
+        d.line([(0, S - 1), (S - 1, S - 1)], fill=rgba(SEAM))
+    d.line([(7, 0), (7, S - 1)], fill=rgba((150, 158, 170)))                   # 真ん中の合わせ目
+    d.line([(8, 0), (8, S - 1)], fill=rgba((196, 204, 214)))
+    return im
+
+
+def door_item(lab):
+    """スライドドアの持ち物の絵: 枠（研究所は暗い鋼、作れるドアは白より濃い灰色）の中の、合わせ目のある2枚の扉。"""
+    im, d = new()
+    edge = STEEL if lab else (150, 158, 172)
+    d.rectangle([3, 0, 12, 15], fill=rgba(edge))
+    d.rectangle([4, 1, 11, 15], fill=rgba(WHITE))
+    d.line([(7, 1), (7, 15)], fill=rgba((150, 158, 170)))
+    d.line([(8, 1), (8, 15)], fill=rgba((206, 212, 220)))
+    for x in (5, 10):
+        d.line([(x, 3), (x, 6)], fill=rgba(DOOR_GLASS))
+    band = BAND if lab else (200, 206, 216)
+    d.line([(4, 9), (11, 9)], fill=rgba(band))
+    d.line([(4, 10), (11, 10)], fill=rgba(mix(BAND, (255, 255, 255), 0.35)) if lab else rgba(CYAN))
+    if lab:
+        for x in range(4, 12):
+            d.point((x, 14), fill=rgba((240, 196, 40)) if x % 2 else rgba((30, 30, 34)))
+    else:
+        d.line([(4, 14), (11, 14)], fill=rgba(SHADE))
     return im
 
 
@@ -263,23 +342,138 @@ def coffee_pot():
     return im
 
 
-def vending_front(upper):
-    """自販機の正面。上半分: 光る見本の棚（色とりどりの缶）。下半分: 押しボタンと取り出し口。"""
-    im, d = new(rgba((236, 76, 70)))
-    d.rectangle([0, 0, S - 1, S - 1], outline=rgba((150, 40, 36)))
+def coffee_pot_empty():
+    """空のポット（コーヒーの所もガラス）。割り付けは coffee_pot と同じ。"""
+    im = coffee_pot()
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(im)
+    glass = (176, 196, 208)
+    for x0, w in ((0, 6), (6, 4)):
+        d.rectangle([x0, 3, x0 + w - 1, 5], fill=rgba(glass))
+        d.line([(x0 + 1, 1), (x0 + 1, 5)], fill=(236, 244, 250, 255))
+        d.point([(x0, 3), (x0, 4), (x0, 5), (x0 + w - 1, 3), (x0 + w - 1, 4), (x0 + w - 1, 5)], fill=rgba(mix(glass, (90, 100, 110), 0.5)))
+    d.rectangle([6, 6, 11, 9], fill=rgba(mix(glass, (40, 40, 46), 0.5)))   # 底（空のガラス越しの台）
+    return im
+
+
+# 自販機の3列（左から 缶ソーダ・スポーツドリンク・エナジードリンク）: 缶の色と、缶の上の色。Java の VendingMachineBlock.DRINKS と同じ順
+VENDING_CANS = [((70, 150, 255), (200, 224, 250)), ((248, 250, 252), (60, 120, 220)), ((250, 206, 40), (40, 40, 44))]
+
+
+def vending_front(upper, on=True):
+    """自販機の正面。上半分: 光る見本の棚（3列。列ごとに同じ飲み物の缶）。下半分: 列ごとの押しボタン（缶の色）と、
+    お金の口・取り出し口。止まっている（on=False）と棚もボタンも暗い。"""
+    im, d = new(rgba(VENDING_RED))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(VENDING_EDGE))
+    dim = (lambda c: c) if on else (lambda c: mix(c, (24, 26, 30), 0.6))
     if upper:
-        d.rectangle([2, 2, 13, 14], fill=rgba((236, 244, 250)))
-        cans = [(255, 80, 70), (80, 160, 255), (250, 210, 70), (90, 210, 120), (240, 240, 240), (180, 110, 220)]
-        for row, y in enumerate((3, 7, 11)):
-            for k, x in enumerate((3, 6, 9, 12)):
-                c = cans[(row * 4 + k) % len(cans)]
-                d.rectangle([x, y, x, y + 2], fill=rgba(c))
+        d.rectangle([2, 2, 13, 14], fill=rgba(dim((206, 222, 234))))
+        for k, x0 in enumerate((2, 6, 10)):
+            body, top = VENDING_CANS[k]
+            for y in (3, 7, 11):
+                for x in (x0 + 1, x0 + 2):
+                    d.rectangle([x, y, x, y + 2], fill=rgba(dim(body)))
+                    d.point((x, y), fill=rgba(dim(top)))
+        for x in (5, 9):
+            d.line([(x, 2), (x, 14)], fill=rgba(dim((182, 198, 212))))      # 列の仕切り
     else:
-        for k, x in enumerate((3, 6, 9, 12)):
-            d.point((x, 2), fill=rgba((255, 230, 120)))
+        for k, x in enumerate((3, 7, 11)):
+            d.rectangle([x, 2, x + 1, 2], fill=rgba(dim(VENDING_CANS[k][0])))
         d.rectangle([2, 4, 9, 6], fill=rgba((30, 30, 34)))           # お金の口・表示
         d.rectangle([2, 10, 13, 13], fill=rgba((24, 24, 28)))         # 取り出し口
         d.rectangle([11, 4, 13, 7], fill=rgba((210, 210, 214)))
+    return im
+
+
+VENDING_RED, VENDING_EDGE = (236, 76, 70), (150, 40, 36)
+
+
+def vending_side(upper):
+    """自販機の側面・背面: 正面と同じ赤い外装。縁は上下2ブロックで1枚の板に見えるよう、継ぎ目には引かない。
+    上半分に白い帯（正面の見本の棚の高さ）、下半分の裾に暗い蹴込み。"""
+    im, d = new(rgba(VENDING_RED))
+    hi = mix(VENDING_RED, (255, 255, 255), 0.22)
+    d.line([(0, 0), (0, S - 1)], fill=rgba(VENDING_EDGE))
+    d.line([(S - 1, 0), (S - 1, S - 1)], fill=rgba(VENDING_EDGE))
+    d.line([(1, 0), (1, S - 1)], fill=rgba(hi))
+    if upper:
+        d.line([(0, 0), (S - 1, 0)], fill=rgba(VENDING_EDGE))
+        d.line([(1, 1), (S - 2, 1)], fill=rgba(hi))
+        d.rectangle([2, 4, S - 3, 6], fill=rgba((248, 248, 250)))
+        d.line([(2, 8), (S - 3, 8)], fill=rgba((248, 248, 250)))
+        d.line([(2, 7), (S - 3, 7)], fill=rgba(mix(VENDING_RED, (255, 255, 255), 0.5)))
+    else:
+        d.rectangle([1, 12, S - 2, 14], fill=rgba(mix(VENDING_EDGE, (24, 24, 28), 0.5)))
+        d.line([(0, S - 1), (S - 1, S - 1)], fill=rgba(VENDING_EDGE))
+        for x in range(3, S - 3, 2):
+            d.point((x, 13), fill=rgba(mix(VENDING_EDGE, (24, 24, 28), 0.2)))           # 通気の穴
+    return im
+
+
+def vending_top():
+    """自販機の天面・底面: 赤い外装に縁と面取り。"""
+    im, d = new(rgba(VENDING_RED))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(VENDING_EDGE))
+    d.line([(1, 1), (S - 2, 1)], fill=rgba(mix(VENDING_RED, (255, 255, 255), 0.22)))
+    d.line([(1, 1), (1, S - 2)], fill=rgba(mix(VENDING_RED, (255, 255, 255), 0.22)))
+    return im
+
+
+# レイリー散乱パネル: 空の色（Java の RayleighPanelRenderer と同じ）と縁の色
+RAYLEIGH_NOON = ((188, 217, 248), (63, 127, 228))       # 地平線の近く・真上
+RAYLEIGH_NIGHT = (12, 20, 38)
+RAYLEIGH_FRAME = {True: (214, 220, 228), False: (76, 82, 94)}
+
+
+def rayleigh_casing(lab):
+    """レイリー散乱パネルの側面・上面。研究所のもの: 白いパネルに淡い青の細い帯（下の端）。作ったもの: 鋼の板に青の帯と四隅のボルト。"""
+    if lab:
+        im = lab_panel()
+        from PIL import ImageDraw
+        d = ImageDraw.Draw(im)
+    else:
+        im, d = new(rgba(STEEL_HI))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(STEEL))
+        d.point([(2, 2), (13, 2), (2, 13), (13, 13)], fill=rgba(STEEL_DARK))
+    d.line([(1, S - 3), (S - 2, S - 3)], fill=rgba(mix(RAYLEIGH_NOON[1], (255, 255, 255), 0.35)))
+    return im
+
+
+def rayleigh_top(lab):
+    """上面（天井の裏側）: 研究所のものは白い板に配線の溝、作ったものは鋼の板に受電の端子。中央に空色の小さな窓。"""
+    if lab:
+        im = lab_panel()
+        from PIL import ImageDraw
+        d = ImageDraw.Draw(im)
+        d.line([(3, 8), (12, 8)], fill=rgba(SEAM))
+    else:
+        im, d = new(rgba(STEEL))
+        d.rectangle([0, 0, S - 1, S - 1], outline=rgba(STEEL_DARK))
+        d.rectangle([2, 2, S - 3, S - 3], outline=rgba(STEEL_HI))
+        for x, y in ((3, 3), (12, 3), (3, 12), (12, 12)):
+            d.point((x, y), fill=rgba(STEEL_DARK))
+    d.rectangle([6, 6, 9, 9], fill=rgba(RAYLEIGH_NOON[1]), outline=rgba(RAYLEIGH_FRAME[lab]))
+    return im
+
+
+def rayleigh_bottom(lab):
+    """下の面（投影面）: 縁1ドット（光らない）と、消えているときの暗い面。点いている空は Java が上に描く。"""
+    im, d = new(rgba(RAYLEIGH_NIGHT))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(RAYLEIGH_FRAME[lab]))
+    return im
+
+
+def rayleigh_icon(lab):
+    """持ち物の絵: 縁の中に、見上げた空（真ん中ほど深い青）。研究所のものは白い縁、作ったものは鋼の縁。"""
+    im, d = new((0, 0, 0, 0))
+    lo, hi = RAYLEIGH_NOON
+    for y in range(1, S - 1):
+        for x in range(1, S - 1):
+            r = max(abs(x - 7.5), abs(y - 7.5)) / 6.5
+            im.putpixel((x, y), rgba(mix(hi, lo, min(1.0, r * r))))
+    d.rectangle([0, 0, S - 1, S - 1], outline=rgba(RAYLEIGH_FRAME[lab]))
+    if not lab:
+        d.point([(0, 0), (S - 1, 0), (0, S - 1), (S - 1, S - 1)], fill=rgba(STEEL_DARK))
     return im
 
 
@@ -396,8 +590,15 @@ def textures(tb, save_plain):
         save(reactor_core(on), tb / f'reactor_core_{tag}.png')
         save(power_conduit(on), tb / f'power_conduit_{tag}.png')
     save(pressure_hull(), tb / 'pressure_hull.png')
+    save(welded_hatch(), tb / 'welded_hatch.png')
     save(bulkhead(), tb / 'bulkhead.png')
     save(machine_side(), tb / 'lab_machine_side.png')
+    for iid, lab in DOORS.items():
+        save(door_leaf(False, lab), tb / f'{iid}_leaf_lower.png')
+        save(door_leaf(True, lab), tb / f'{iid}_leaf_upper.png')
+        item = door_item(lab)
+        grime(item, seed(f'{iid}.png'), 0.6)
+        save_plain(item, tb.parent / 'item' / f'{iid}.png')
     save(machine_top(), tb / 'lab_machine_top.png')
     save(rack_front(False), tb / 'server_rack_front_off.png')
     sheet = Image.new('RGBA', (S, S * RACK_FRAMES))
@@ -418,10 +619,20 @@ def textures(tb, save_plain):
     save(plastic((60, 64, 72)), tb / 'lab_plastic_dark.png')
     save(coffee_front(), tb / 'coffee_maker_front.png')
     save(coffee_pot(), tb / 'coffee_maker_pot.png')
+    save(coffee_pot_empty(), tb / 'coffee_maker_pot_empty.png')
     for upper in (False, True):
         half = 'upper' if upper else 'lower'
         save(vending_front(upper), tb / f'vending_machine_front_{half}.png')
+        save(vending_front(upper, on=False), tb / f'vending_machine_front_{half}_off.png')
         save_plain(vending_glow(upper), tb / f'vending_machine_front_{half}_glow.png')
+        save(vending_side(upper), tb / f'vending_machine_side_{half}.png')
+    save(vending_top(), tb / 'vending_machine_top.png')
+    for lab in (True, False):
+        name = 'lab_rayleigh_panel' if lab else 'rayleigh_panel'
+        save(rayleigh_casing(lab), tb / f'{name}_side.png')
+        save_plain(rayleigh_bottom(lab), tb / f'{name}_bottom.png')
+        save(rayleigh_top(lab), tb / f'{name}_top.png')
+        save_plain(rayleigh_icon(lab), tb / f'{name}_sky.png')
     save(paper(), tb / 'paper_stack_top.png')
     save(paper_side(), tb / 'paper_stack_side.png')
     save(bin_side(), tb / 'trash_bin_side.png')
@@ -434,7 +645,7 @@ def textures(tb, save_plain):
 
 GLOW = {'block_light': 15, 'sky_light': 15}
 FACING_Y = {'north': 0, 'east': 90, 'south': 180, 'west': 270}
-SIMPLE = ('lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'pressure_hull', 'bulkhead')
+SIMPLE = ('lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'pressure_hull', 'welded_hatch', 'bulkhead')
 
 
 def _cube(texture, emissive=False, translucent=False):
@@ -488,6 +699,8 @@ def models(write_json, assets):
     write_json(bs / 'lab_frame.json', {'variants': {'': {'model': f'{MODID}:block/lab_frame'}}})
     write_json(bs / 'pressure_hull.json', {'variants': {'sealed=true': {'model': f'{MODID}:block/pressure_hull'},
                                                         'sealed=false': {'model': f'{MODID}:block/pressure_hull'}}})
+    write_json(bs / 'welded_hatch.json', {'variants': {'sealed=true': {'model': f'{MODID}:block/welded_hatch'},
+                                                       'sealed=false': {'model': f'{MODID}:block/welded_hatch'}}})
     # 隔壁: 開いていると描かない（Java で見えなくする）。形は同じものを当てておく
     write_json(bs / 'bulkhead.json', {'variants': {'open=false': {'model': f'{MODID}:block/bulkhead'},
                                                    'open=true': {'model': f'{MODID}:block/bulkhead'}}})
@@ -549,8 +762,60 @@ def models(write_json, assets):
             'item_render_order': ['solid', 'glass']})
     write_json(bs / 'android_capsule.json', {'variants': {
         f'facing={f},half={h}': _rot(f'android_capsule_{h}', y) for f, y in FACING_Y.items() for h in ('lower', 'upper')}})
-    write_json(mi / 'android_capsule.json', {'parent': f'{MODID}:block/android_capsule_lower', 'display': held_display(lower)})
+    # 持ったときは上下2ブロックを1ブロックの大きさに縮めた模型（下半分だけだと、ガラスの筒が途中で切れて見える）
+    is_glass = lambda e: e['faces'].get('north', {}).get('texture') == '#glass'
+    held_solid = compress_halves([e for e in lower if not is_glass(e)], [e for e in upper if not is_glass(e)], suffix=False)
+    held_glass = compress_halves([e for e in lower if is_glass(e)], [e for e in upper if is_glass(e)], suffix=False)
+    write_json(mi / 'android_capsule.json', {'parent': 'minecraft:block/block', 'loader': 'neoforge:composite',
+        'textures': {'particle': t['particle']},
+        'children': {'solid': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:solid', 'textures': t, 'elements': held_solid},
+                     'glass': {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent', 'textures': t,
+                               'elements': held_glass}},
+        'item_render_order': ['solid', 'glass'], 'display': held_display(held_solid + held_glass)})
     decor_models(write_json, mb, mi, bs)
+    door_models(write_json, mb, mi, bs)
+    rayleigh_models(write_json, mb, mi, bs)
+
+
+def rayleigh_models(write_json, mb, mi, bs):
+    """レイリー散乱パネル: 箱（側面・上面は外装、下の面は縁と暗い面）。点いている空は RayleighPanelRenderer が下の面に重ねて描く。"""
+    for iid in ('lab_rayleigh_panel', 'rayleigh_panel'):
+        side, bottom = f'{MODID}:block/{iid}_side', f'{MODID}:block/{iid}_bottom'
+        top = f'{MODID}:block/{iid}_top'
+        faces = {d: {'texture': '#side', 'cullface': d} for d in ('north', 'south', 'east', 'west')}
+        faces['up'] = {'texture': '#top', 'cullface': 'up'}
+        faces['down'] = {'texture': '#bottom', 'cullface': 'down'}
+        write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/block',
+                                        'textures': {'side': side, 'top': top, 'bottom': bottom, 'particle': side},
+                                        'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': faces}]})
+        write_json(bs / f'{iid}.json', {'variants': {f'lit={v}': {'model': f'{MODID}:block/{iid}'} for v in ('false', 'true')}})
+        # 持ったとき: 立体のまま、下の面には空の絵を貼り、持ち物欄では下から見上げる向きにして空を見せる
+        item_faces = dict(faces)
+        item_faces['down'] = {'texture': '#sky'}
+        tilt = {'gui': {'rotation': [-30, 225, 0], 'translation': [0, 0, 0], 'scale': [0.625, 0.625, 0.625]}}
+        write_json(mi / f'{iid}.json', {'parent': 'minecraft:block/block',
+                                        'textures': {'side': side, 'top': top, 'bottom': bottom, 'sky': f'{MODID}:block/{iid}_sky',
+                                                     'particle': side},
+                                        'elements': [{'from': [0, 0, 0], 'to': [16, 16, 16],
+                                                      'faces': {d: {k: v for k, v in f.items() if k != 'cullface'}
+                                                                for d, f in item_faces.items()}}],
+                                        'display': tilt})
+
+
+def door_models(write_json, mb, mi, bs):
+    """スライドドア: ブロックのモデルは左右の枠（と上半分の鴨居）だけ。扉は SlidingDoorRenderer が描いて動かす。"""
+    for iid, lab in DOORS.items():
+        frame = f'{MODID}:block/{"lab_frame" if lab else "white_panel"}'
+        for half in ('lower', 'upper'):
+            els = [_box([0, 0, 5.5], [1.5, 16, 10.5], _all('#frame')), _box([14.5, 0, 5.5], [16, 16, 10.5], _all('#frame'))]
+            if half == 'upper':
+                els.append(_box([1.5, 14, 5.5], [14.5, 16, 10.5], _all('#frame')))
+            write_json(mb / f'{iid}_{half}.json', {'parent': 'minecraft:block/block',
+                                                   'textures': {'frame': frame, 'particle': frame}, 'elements': els})
+        write_json(bs / f'{iid}.json', {'variants': {
+            f'facing={f},half={h},open={o},powered={p}': _rot(f'{iid}_{h}', y)
+            for f, y in FACING_Y.items() for h in ('lower', 'upper') for o in ('false', 'true') for p in ('false', 'true')}})
+        write_json(mi / f'{iid}.json', {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
 
 
 def _box(a, b, faces, glow=False):
@@ -573,6 +838,36 @@ def _uvbox(a, b, faces):
 
 def _all(tex, skip=()):
     return {d: tex for d in ('north', 'south', 'east', 'west', 'up', 'down') if d not in skip}
+
+
+def _default_uv(face, a, b):
+    """要素に UV が書いていないときにバニラが使う UV（要素の位置から決まる）。"""
+    (x1, y1, z1), (x2, y2, z2) = a, b
+    return {'down': [x1, 16 - z2, x2, 16 - z1], 'up': [x1, z1, x2, z2], 'north': [16 - x2, 16 - y2, 16 - x1, 16 - y1],
+            'south': [x1, 16 - y2, x2, 16 - y1], 'west': [z1, 16 - y2, z2, 16 - y1], 'east': [16 - z2, 16 - y2, 16 - z1, 16 - y1]}[face]
+
+
+def compress_halves(lower, upper, suffix=True):
+    """2ブロックの高さのモデル（下半分・上半分の要素）を、1ブロックに収まるよう縦横とも半分に縮めた要素にする。
+
+    位置を縮めると、UV が書いていない面の UV（位置から決まる）も変わってしまうので、縮める前の UV を書き込む。
+    suffix=True なら、テクスチャ名に _lower / _upper を付ける（上下で同じ名前のテクスチャが違う絵のとき）。
+    継ぎ目で隠れる面の cullface は外す（持ったときは隣のブロックがない）。
+    """
+    import copy
+    out = []
+    for half, els, dy in (('lower', lower, 0), ('upper', upper, 16)):
+        for el in els:
+            e = copy.deepcopy(el)
+            for f, face in e['faces'].items():
+                face.setdefault('uv', _default_uv(f, el['from'], el['to']))
+                face.pop('cullface', None)
+                if suffix and face['texture'].startswith('#'):
+                    face['texture'] = f"{face['texture']}_{half}"
+            e['from'] = [round(4 + el['from'][0] / 2, 4), round((el['from'][1] + dy) / 2, 4), round(4 + el['from'][2] / 2, 4)]
+            e['to'] = [round(4 + el['to'][0] / 2, 4), round((el['to'][1] + dy) / 2, 4), round(4 + el['to'][2] / 2, 4)]
+            out.append(e)
+    return out
 
 
 def held_display(elements):
@@ -639,18 +934,29 @@ def decor_models(write_json, mb, mi, bs):
                                                     'up': ('#pot', [0, 6, 6, 10]), 'down': ('#pot', [6, 6, 12, 10])}),
                      _uvbox([11, 2, 6.5], [12, 6, 7.5], {d: ('#pot', [12, 0, 13, 4]) for d in ('north', 'south', 'east', 'west')}
                             | {'up': ('#pot', [12, 0, 13, 1]), 'down': ('#pot', [12, 3, 13, 4])})]})
-    # 自販機: 2ブロック。外装は赤、前の上半分は光る見本の棚
+    # 自販機: 2ブロック。外装は正面も側面・背面・天面も同じ赤、前の上半分は光る見本の棚
     for half in ('lower', 'upper'):
+        body = {'south': '#side', 'east': '#side', 'west': '#side', **({'up': '#top'} if half == 'upper' else {'down': '#top'})}
         wm(mb / f'vending_machine_{half}.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
-            'textures': {'side': t('vending_machine_front_lower'), 'front': t(f'vending_machine_front_{half}'),
-                         'glow': t(f'vending_machine_front_{half}_glow'), 'body': t('lab_plastic'), 'particle': t('lab_plastic')},
-            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', 'south': '#body', 'east': '#body', 'west': '#body',
-                                                         **({'up': '#body'} if half == 'upper' else {'down': '#body'})}),
+            'textures': {'front': t(f'vending_machine_front_{half}'), 'glow': t(f'vending_machine_front_{half}_glow'),
+                         'side': t(f'vending_machine_side_{half}'), 'top': t('vending_machine_top'), 'particle': t('vending_machine_top')},
+            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', **body}),
                          _box([0, 0, 0.98], [16, 16, 0.99], {'north': '#glow'}, glow=True)]})
+        # 止まっている（電力が戻る前の研究所）: 暗い正面で、光る層なし
+        wm(mb / f'vending_machine_{half}_off.json', {'parent': 'minecraft:block/block',
+            'textures': {'front': t(f'vending_machine_front_{half}_off'), 'side': t(f'vending_machine_side_{half}'),
+                         'top': t('vending_machine_top'), 'particle': t('vending_machine_top')},
+            'elements': [_box([0, 0, 1], [16, 16, 16], {'north': '#front', **body})]})
     write_json(bs / 'vending_machine.json', {'variants': {
-        f'facing={f},half={h}': _rot(f'vending_machine_{h}', y) for f, y in FACING_Y.items() for h in ('lower', 'upper')}})
-    write_json(mi / 'vending_machine.json', {'parent': f'{MODID}:block/vending_machine_lower',
-                                             'display': held_display(models['vending_machine_lower']['elements'])})
+        f'facing={f},half={h},powered={p}': _rot(f'vending_machine_{h}' + ('' if p == 'true' else '_off'), y)
+        for f, y in FACING_Y.items() for h in ('lower', 'upper') for p in ('false', 'true')}})
+    # 持ったときは上下2ブロックを1ブロックの大きさに縮めた模型（下半分だけだと、上の断面が切れて見える）
+    lower, upper = models['vending_machine_lower'], models['vending_machine_upper']
+    held = compress_halves(lower['elements'], upper['elements'])
+    write_json(mi / 'vending_machine.json', {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
+        'textures': {**{f'{k}_lower': v for k, v in lower['textures'].items()}, **{f'{k}_upper': v for k, v in upper['textures'].items()},
+                     'particle': t('vending_machine_top')},
+        'elements': held, 'display': held_display(held)})
     # 書類の山: 少しずれた2つの束
     wm(mb / 'paper_stack.json', {'parent': 'minecraft:block/block',
         'textures': {'top': t('paper_stack_top'), 'side': t('paper_stack_side'), 'particle': t('paper_stack_top')},
@@ -678,6 +984,13 @@ def decor_models(write_json, mb, mi, bs):
     for iid in ('desk_monitor', 'coffee_maker', 'paper_stack', 'trash_bin'):
         write_json(bs / f'{iid}.json', {'variants': {f'facing={f}': _rot(iid, y) for f, y in FACING_Y.items()}})
         write_json(mi / f'{iid}.json', {'parent': f'{MODID}:block/{iid}', 'display': held_display(models[iid]['elements'])})
+    # コーヒーメーカー: ポットが空なら空のガラス（淹れている間と、残りがあるときはコーヒー）
+    empty = json.loads(json.dumps(models['coffee_maker']))
+    empty['textures']['pot'] = t('coffee_maker_pot_empty')
+    write_json(mb / 'coffee_maker_empty.json', empty)
+    write_json(bs / 'coffee_maker.json', {'variants': {
+        f'facing={f},brewing={b},cups={c}': _rot('coffee_maker' if b == 'true' or c > 0 else 'coffee_maker_empty', y)
+        for f, y in FACING_Y.items() for b in ('false', 'true') for c in range(4)}})
 
 
 # ---------------------------------------------------------------- 落とす物
@@ -689,7 +1002,13 @@ def loot(write_json, data):
         'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:vending_machine'}],
         'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:vending_machine',
                         'properties': {'half': 'lower'}}, {'condition': 'minecraft:survives_explosion'}]}]})
-    for iid in ('bulkhead', 'reactor_console'):
+    # スライドドアも下半分だけが落とす
+    for iid in DOORS:
+        write_json(data / 'loot_table' / 'blocks' / f'{iid}.json', {'type': 'minecraft:block', 'pools': [{
+            'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:{iid}'}],
+            'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:{iid}',
+                            'properties': {'half': 'lower'}}, {'condition': 'minecraft:survives_explosion'}]}]})
+    for iid in ('bulkhead', 'reactor_console', 'lab_rayleigh_panel'):      # 天井のレイリー散乱パネルは回収できない
         write_json(data / 'loot_table' / 'blocks' / f'{iid}.json', {'type': 'minecraft:block', 'pools': []})
     write_json(data / 'loot_table' / 'blocks' / 'android_capsule.json', {'type': 'minecraft:block', 'pools': [{
         'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:android_capsule'}],

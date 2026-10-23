@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "SINGULO_UMBRELLA",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "io/github/genichimaruo/singulo/client/UmbrellaArmPose",
+        "field": "UMBRELLA"
+      }
+    }
+  ]
+}

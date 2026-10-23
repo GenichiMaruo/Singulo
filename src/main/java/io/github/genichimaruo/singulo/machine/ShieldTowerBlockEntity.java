@@ -9,7 +9,6 @@ import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.multiblock.Structures;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -45,6 +44,9 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
     static final int REPEL_INTERVAL = 5;
 
     private static final Map<Level, Set<ShieldTowerBlockEntity>> ACTIVE = new WeakHashMap<>();
+
+    /** Release runtime references when this level closes. */
+    public static void forgetLevel(Level level) { ACTIVE.remove(level); }
 
     /** 0 は停止中、4 は防爆・防荒らし、5 はさらに湧き止めと押し返し。 */
     private int protection;
@@ -135,7 +137,7 @@ public class ShieldTowerBlockEntity extends CatalystDeviceBlockEntity {
         if (now != protection) {
             protection = now;
             world.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
-            Set<ShieldTowerBlockEntity> set = ACTIVE.computeIfAbsent(world, l -> Collections.newSetFromMap(new IdentityHashMap<>()));
+            Set<ShieldTowerBlockEntity> set = ACTIVE.computeIfAbsent(world, l -> Collections.newSetFromMap(new WeakHashMap<>()));
             if (protection > 0) {
                 set.add(this);
             } else {

@@ -30,6 +30,10 @@ public final class SinguloWorldgen {
             PIECES.register("lab_corridor", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Corridor::new);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> LAB_DOOR =
             PIECES.register("lab_door", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Doors::new);
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> LAB_ACCESS =
+            PIECES.register("lab_access", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.AccessShaft::new);
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> LAB_ENTRANCE =
+            PIECES.register("lab_entrance", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Entrance::new);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> LAB_SHAFT =
             PIECES.register("lab_shaft", () -> io.github.genichimaruo.singulo.ruin.lab.LabPieces.Shaft::new);
 

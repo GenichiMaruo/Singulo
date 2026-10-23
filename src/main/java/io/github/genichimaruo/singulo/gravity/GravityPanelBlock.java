@@ -15,8 +15,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 /**
- * 重力パネル（低重力・高重力）。電力が届いている（POWERED）パネルに乗ると、次に着地するまで重力が変わる
- * （{@link GravityEffects}）。電力は重力パネル受電器から、つながったパネルを伝って届く（{@link GravityReceiverBlockEntity}）。
+ * 重力パネル（低重力・高重力）と無重力ブロック。電力が届いている（POWERED）低重力・高重力パネルに乗ると、次に着地するまで重力が変わる
+ * （{@link GravityEffects}）。働いている無重力ブロックの上の空間は無重力になる（{@link ZeroGravity}）。
+ * 電力はパネル受電器から、つながったパネルを伝って届く（{@link GravityReceiverBlockEntity}）。
  * <p>
  * 見た目は隣の同じパネルとつながる: 6方向の接続（同じ種類のパネルが隣にあるか）を状態に持ち、
  * つながっていない辺にだけ縁取りを重ねる（ブロックの状態定義は tools/gen_data.py の gravity_panel_models）。
@@ -36,7 +37,7 @@ public class GravityPanelBlock extends Block {
 
     /** 重力の種類。 */
     public enum Kind {
-        LOW, HIGH
+        LOW, HIGH, ZERO
     }
 
     private final Kind kind;
@@ -80,6 +81,14 @@ public class GravityPanelBlock extends Block {
             state = state.setValue(CONNECTIONS.get(dir), joins(level.getBlockState(pos.relative(dir))));
         }
         return state;
+    }
+
+    @Override
+    protected void onRemove(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState newState, boolean moving) {
+        if (kind == Kind.ZERO && !state.is(newState.getBlock())) {
+            ZeroGravity.remove(level, pos);                           // 壊れた無重力ブロックの上は、すぐに重力が戻る
+        }
+        super.onRemove(state, level, pos, newState, moving);
     }
 
     @Override

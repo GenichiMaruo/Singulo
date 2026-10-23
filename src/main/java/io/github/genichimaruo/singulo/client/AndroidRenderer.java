@@ -110,24 +110,6 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     }
 
     @Override
-    public boolean shouldRender(RuinAndroid android, net.minecraft.client.renderer.culling.Frustum frustum,
-                                double x, double y, double z) {
-        if (super.shouldRender(android, frustum, x, y, z)) {
-            return true;
-        }
-        if (android instanceof BitAndroid bit && bit.recallingFrom(0) > 0 && android.shouldRender(x, y, z)) {
-            // 本体が画面外でも、突進中・背中へ帰還中のビットが見えるなら描く。当たり判定は変えない。
-            var bounds = android.getBoundingBox();
-            for (int i = 0; i < bit.recallingFrom(0); i++) {
-                Vec3 at = bit.bitPosition(i, 1);
-                bounds = bounds.minmax(new net.minecraft.world.phys.AABB(at, at).inflate(1));
-            }
-            return frustum.isVisible(bounds);
-        }
-        return false;
-    }
-
-    @Override
     public ResourceLocation getTextureLocation(RuinAndroid android) {
         return variant.texture;
     }
@@ -1150,15 +1132,25 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 if (acc.style().equals("bouquet")) {
                     pose.mulPose(Axis.XP.rotationDegrees(25));      // 花を前へ傾けて、前に立った人に見せる
                 }
+                if (acc.style().equals("umbrella")) {
+                    pose.mulPose(Axis.XP.rotationDegrees(UMBRELLA_TILT));   // 傘を後ろへ傾け、肩にあずけるように持つ
+                }
                 draw(acc.style(), pose, vc, light, c, Math.min(1, limbSwingAmount), age);
                 if (acc.style().equals("bouquet")) {
                     // 透ける包装は、形を描き終えてから別の描き方で（描き方を混ぜないよう、形の受け口は取り直す）
                     bouquetWrap(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
                     vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
                 }
+                if (acc.style().equals("glasses")) {
+                    glassesLenses(pose, buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE)), light);
+                    vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+                }
                 pose.popPose();
             }
         }
+
+        /** アンドロイドが傘を持つ傾き（度。手の向きに対して後ろへ）。 */
+        static final float UMBRELLA_TILT = -30;
 
         /** 花束の透明な包装（下ほど細い3段と、開いた口の縁。うっすら水色に透ける）。 */
         private void bouquetWrap(PoseStack pose, VertexConsumer vc, int light) {
@@ -1175,6 +1167,22 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             for (float[] q : rim) {
                 FxDraw.box(pose, vc, q[0] * P, q[1] * P, q[2] * P, q[3] * P, q[4] * P, q[5] * P, light, edge, 130);
             }
+        }
+
+        /** メガネのレンズ（縁の内側に、うっすら水色に透ける板）。縁は draw の "glasses"。 */
+        private void glassesLenses(PoseStack pose, VertexConsumer vc, int light) {
+            for (float x0 : new float[] {-3.25F, 0.85F}) {
+                FxDraw.box(pose, vc, x0 * P, -3.15F * P, -3.8F * P, (x0 + 2.4F) * P, -1.05F * P, -3.74F * P, light, 0xD2ECFF, 70);
+            }
+        }
+
+        /** 輪（外の四角 x0..x1・y0..y1 から、内の四角 i… を抜いた4枚の板。高さ z0..z1）。 */
+        private void ring(PoseStack pose, VertexConsumer vc, int light, float x0, float y0, float x1, float y1,
+                          float ix0, float iy0, float ix1, float iy1, float z0, float z1, int rgb) {
+            b(pose, vc, light, x0, y0, z0, x1, iy0, z1, rgb);
+            b(pose, vc, light, x0, iy1, z0, x1, y1, z1, rgb);
+            b(pose, vc, light, x0, iy0, z0, ix0, iy1, z1, rgb);
+            b(pose, vc, light, ix1, iy0, z0, x1, iy1, z1, rgb);
         }
 
         /** 箱（ピクセル単位）。 */
@@ -1229,6 +1237,15 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     }
                     b(pose, vc, light, -4.6F, -8.4F, -1.8F, -4.2F, -6.8F, -1.0F, dark);
                     b(pose, vc, light, 4.2F, -8.4F, -1.8F, 4.6F, -6.8F, -1.0F, dark);
+                }
+                case "glasses" -> {
+                    // 目（x -3〜-1・1〜3、y -3〜-1）を囲む四角い縁2つ、ブリッジ、髪の中へ消えるつる。顔の前の面（z -3.5）より少し前
+                    float z0 = -3.9F, z1 = -3.62F;
+                    ring(pose, vc, light, -3.75F, -3.6F, -0.35F, -0.6F, -3.25F, -3.15F, -0.85F, -1.05F, z0, z1, c);
+                    ring(pose, vc, light, 0.35F, -3.6F, 3.75F, -0.6F, 0.85F, -3.15F, 3.25F, -1.05F, z0, z1, c);
+                    b(pose, vc, light, -0.35F, -2.75F, z0 + 0.05F, 0.35F, -2.35F, z1 - 0.05F, c);
+                    b(pose, vc, light, -4.1F, -2.75F, z0, -3.75F, -2.35F, 0.5F, dark);
+                    b(pose, vc, light, 3.75F, -2.75F, z0, 4.1F, -2.35F, 0.5F, dark);
                 }
                 // ---- 背中（胴の箱: x -3〜3、y -8〜0、z -1.5〜1.5。後ろは +z）
                 case "cape" -> {
@@ -1319,21 +1336,41 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     }
                 }
                 case "teacup" -> {
-                    // 手のひらの上に、受け皿とカップ（金の縁）、横に取っ手
-                    b(pose, vc, light, -1.5F, -0.1F, -0.4F, 1.5F, 2.7F, -0.15F, c);
-                    b(pose, vc, light, -0.9F, 0.4F, -2.0F, 0.9F, 2.2F, -0.4F, c);
-                    b(pose, vc, light, -0.95F, 0.35F, -2.2F, 0.95F, 2.25F, -2.0F, 0xE0B850);
-                    b(pose, vc, light, 0.9F, 1.0F, -1.6F, 1.5F, 1.6F, -0.8F, c);
-                    b(pose, vc, light, -0.7F, 0.6F, -2.05F, 0.7F, 2.0F, -1.95F, 0x8A5A3A);    // 紅茶
+                    // 手のひらの上に、受け皿とカップ。カップは底と4枚の壁で中が凹み、紅茶は縁より低い所に張る。
+                    // 縁は金、横に輪の取っ手（z は負の向きが上）
+                    b(pose, vc, light, -1.5F, -0.1F, -0.4F, 1.5F, 2.7F, -0.15F, c);                 // 受け皿
+                    b(pose, vc, light, -1.25F, 0.15F, -0.5F, 1.25F, 2.45F, -0.4F, c);               // 受け皿の縁の盛り上がり
+                    b(pose, vc, light, -0.9F, 0.4F, -0.7F, 0.9F, 2.2F, -0.4F, c);                   // 底
+                    b(pose, vc, light, -0.9F, 0.4F, -2.0F, 0.9F, 0.65F, -0.7F, c);                  // 手前の壁
+                    b(pose, vc, light, -0.9F, 1.95F, -2.0F, 0.9F, 2.2F, -0.7F, c);                  // 奥の壁
+                    b(pose, vc, light, -0.9F, 0.65F, -2.0F, -0.65F, 1.95F, -0.7F, c);               // 左の壁
+                    b(pose, vc, light, 0.65F, 0.65F, -2.0F, 0.9F, 1.95F, -0.7F, c);                 // 右の壁
+                    b(pose, vc, light, -0.95F, 0.35F, -2.15F, 0.95F, 0.65F, -2.0F, 0xE0B850);        // 金の縁（手前）
+                    b(pose, vc, light, -0.95F, 1.95F, -2.15F, 0.95F, 2.25F, -2.0F, 0xE0B850);        // 金の縁（奥）
+                    b(pose, vc, light, -0.95F, 0.65F, -2.15F, -0.65F, 1.95F, -2.0F, 0xE0B850);       // 金の縁（左）
+                    b(pose, vc, light, 0.65F, 0.65F, -2.15F, 0.95F, 1.95F, -2.0F, 0xE0B850);         // 金の縁（右）
+                    b(pose, vc, light, -0.65F, 0.65F, -1.55F, 0.65F, 1.95F, -1.45F, 0x8A5A3A);       // 紅茶（縁より低い）
+                    b(pose, vc, light, 0.9F, 1.05F, -1.75F, 1.55F, 1.55F, -1.55F, c);               // 取っ手（上）
+                    b(pose, vc, light, 0.9F, 1.05F, -0.95F, 1.55F, 1.55F, -0.75F, c);               // 取っ手（下）
+                    b(pose, vc, light, 1.35F, 1.05F, -1.55F, 1.55F, 1.55F, -0.95F, c);              // 取っ手（外側）
                 }
                 case "umbrella" -> {
-                    // 柄を上へ。頭の上に、染めた色の傘（2段の円盤）と、てっぺんの石突き
-                    b(pose, vc, light, -0.25F, 0.2F, -22F, 0.25F, 0.7F, 0.6F, 0x5A4A3A);
-                    b(pose, vc, light, -0.6F, 0.0F, 0.6F, 0.6F, 1.6F, 1.2F, 0x5A4A3A);
-                    b(pose, vc, light, -8.5F, -8.0F, -21.6F, 8.5F, 8.9F, -21.0F, c);
-                    b(pose, vc, light, -6.0F, -5.5F, -22.4F, 6.0F, 6.4F, -21.6F, c);
-                    b(pose, vc, light, -3.0F, -2.5F, -23.0F, 3.0F, 3.4F, -22.4F, dark);
-                    b(pose, vc, light, -0.3F, 0.15F, -24.0F, 0.3F, 0.75F, -23.0F, 0xC8C8C8);
+                    // 柄を上へ。頭の上に、染めた色の傘（下ほど広い4段のなだらかな屋根）、縁の8か所に骨の先、
+                    // てっぺんの石突き。手元は曲がった持ち手（z は負の向きが上）
+                    b(pose, vc, light, -0.25F, 0.2F, -22F, 0.25F, 0.7F, 0.6F, 0x5A4A3A);              // 柄
+                    b(pose, vc, light, -0.25F, 0.2F, 0.6F, 1.2F, 0.7F, 1.1F, 0x4A3A2C);              // 持ち手（下へ曲がる）
+                    b(pose, vc, light, 0.8F, 0.2F, -0.4F, 1.3F, 0.7F, 0.6F, 0x4A3A2C);
+                    // 布: 下ほど広い4段の輪（内側を抜く）。下から見ると、内側が段々に凹んで見える
+                    ring(pose, vc, light, -8.5F, -8.0F, 8.5F, 8.9F, -6.8F, -6.3F, 6.8F, 7.2F, -21.3F, -20.8F, c);
+                    ring(pose, vc, light, -6.8F, -6.3F, 6.8F, 7.2F, -4.5F, -4.0F, 4.5F, 4.9F, -22.0F, -21.3F, c);
+                    ring(pose, vc, light, -4.5F, -4.0F, 4.5F, 4.9F, -2.2F, -1.7F, 2.2F, 2.6F, -22.6F, -22.0F, dark);
+                    b(pose, vc, light, -2.2F, -1.7F, -23.1F, 2.2F, 2.6F, -22.6F, c);                // てっぺん
+                    b(pose, vc, light, -0.3F, 0.15F, -24.0F, 0.3F, 0.75F, -23.1F, 0xC8C8C8);         // 石突き
+                    float[][] tips = {{-8.5F, -8.0F}, {-0.3F, -8.0F}, {8.0F, -8.0F}, {-8.5F, 0.15F}, {8.0F, 0.15F},
+                            {-8.5F, 8.4F}, {-0.3F, 8.4F}, {8.0F, 8.4F}};
+                    for (float[] t : tips) {                                                            // 骨の先
+                        b(pose, vc, light, t[0], t[1], -20.8F, t[0] + 0.5F, t[1] + 0.5F, -20.4F, 0xC8C8C8);
+                    }
                 }
                 default -> {
                 }

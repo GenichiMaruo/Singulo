@@ -26,6 +26,9 @@ public class InertialStabilizerBlockEntity extends CatalystDeviceBlockEntity {
     /** 稼働中のスタビライザー（ワールドごと）。 */
     private static final Map<Level, Set<InertialStabilizerBlockEntity>> ACTIVE = new WeakHashMap<>();
 
+    /** Release runtime references when this level closes. */
+    public static void forgetLevel(Level level) { ACTIVE.remove(level); }
+
     private boolean active;
 
     public InertialStabilizerBlockEntity(BlockPos pos, BlockState state) {
@@ -54,7 +57,7 @@ public class InertialStabilizerBlockEntity extends CatalystDeviceBlockEntity {
         }
         active = nowActive;
         Set<InertialStabilizerBlockEntity> set = ACTIVE.computeIfAbsent(level,
-                l -> Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
+                l -> Collections.newSetFromMap(new java.util.WeakHashMap<>()));
         if (active) {
             set.add(this);
         } else {

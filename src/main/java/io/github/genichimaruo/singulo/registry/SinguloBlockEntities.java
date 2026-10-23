@@ -90,6 +90,8 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<CryogenicTurbineBlockEntity>> CRYOGENIC_TURBINE =
             REGISTER.register("cryogenic_turbine", () -> build(CryogenicTurbineBlockEntity::new,
                     SinguloBlocks.CRYOGENIC_TURBINE.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.TeacupBlockEntity>> TEACUP =
+            REGISTER.register("teacup", () -> build(io.github.genichimaruo.singulo.android.TeacupBlockEntity::new, SinguloBlocks.TEACUP.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity>> HYDROGEN_FUEL_CELL =
             REGISTER.register("hydrogen_fuel_cell", () -> build(io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity::new,
                     SinguloBlocks.HYDROGEN_FUEL_CELL.get()));
@@ -138,6 +140,9 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity>> GRAVITY_RECEIVER =
             REGISTER.register("gravity_panel_receiver", () -> build(io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity::new,
                     SinguloBlocks.GRAVITY_PANEL_RECEIVER.get()));
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlockEntity>> ZERO_GRAVITY_CONTROLLER =
+            REGISTER.register("zero_gravity_controller", () -> build(io.github.genichimaruo.singulo.gravity.ZeroGravityControllerBlockEntity::new,
+                    SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity>> DEEP_SEA_COLLECTOR =
             REGISTER.register("deep_sea_collector", () -> build(io.github.genichimaruo.singulo.nature.DeepSeaCollectorBlockEntity::new,
                     SinguloBlocks.DEEP_SEA_COLLECTOR.get()));
@@ -192,6 +197,10 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity>> ANDROID_RECIPE_RACK =
             REGISTER.register("android_recipe_rack", () -> build(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity::new, SinguloBlocks.ANDROID_RECIPE_RACK.get()));
 
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlockEntity>> SLIDING_DOOR =
+            REGISTER.register("sliding_door", () -> build(io.github.genichimaruo.singulo.ruin.lab.SlidingDoorBlockEntity::new,
+                    SinguloBlocks.LAB_DOOR.get(), SinguloBlocks.WHITE_SLIDING_DOOR.get()));
+
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity>> ANDROID_FABRICATOR =
             REGISTER.register("android_fabricator", () -> build(io.github.genichimaruo.singulo.android.AndroidFabricatorBlockEntity::new,
                     SinguloBlocks.RUIN_ANDROID_FABRICATOR.get()));
@@ -230,6 +239,10 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<CableBlockEntity>> CABLE = REGISTER.register("cable",
             () -> build(CableBlockEntity::new, SinguloBlocks.COPPER_WIRE.get(), SinguloBlocks.SUPERCONDUCTING_CABLE.get(),
                     SinguloBlocks.TOPOLOGICAL_WIRE.get(), SinguloBlocks.HORIZON_BUS.get()));
+
+    public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity>> RAYLEIGH_PANEL =
+            REGISTER.register("rayleigh_panel", () -> build(io.github.genichimaruo.singulo.ruin.lab.RayleighPanelBlockEntity::new,
+                    SinguloBlocks.LAB_RAYLEIGH_PANEL.get(), SinguloBlocks.RAYLEIGH_PANEL.get()));
 
     @SuppressWarnings("DataFlowIssue")
     private static <T extends BlockEntity> BlockEntityType<T> build(BlockEntityType.BlockEntitySupplier<T> factory, Block... blocks) {

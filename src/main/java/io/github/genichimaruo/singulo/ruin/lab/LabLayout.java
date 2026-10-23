@@ -19,14 +19,20 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
  *   <li>エントランス（主立坑の真下）から始めて、置いた部屋の空いている辺から廊下を伸ばし、その先に次の部屋を置く。
  *       部屋どうし・廊下どうしは1マス以上離す（間は耐圧殻で埋まり、どこも二重の壁になる）</li>
  *   <li>大きな部屋には、小部屋（倉庫・ロッカー室・観察室）を壁に直接くっつけることがある</li>
- *   <li>中央動力炉は最後に置き（行き止まり）、その先に短い廊下と隔壁を挟んでボス部屋（AI中枢）。動力炉の横には変電室</li>
+ *   <li>屋外の代わりの部屋（日光浴室・屋外試験場）は、どちらかを必ず置き、もう一方もときどき置く（選ばれる部屋の数とは別）</li>
+ *   <li>中央動力炉は最後に置き（行き止まり）、その先に短い廊下と隔壁を挟んでボス部屋（AI中枢）。動力炉の横には変電室。
+ *       動力炉は型紙の北（はしごの側）を入ってきた廊下へ向け、ボス部屋はその反対側（南の操作卓の背後）に置く</li>
  * </ul>
  */
 public final class LabLayout {
     public static final String BOSS = "boss_hall", REACTOR = "reactor", ENTRANCE = "entrance";
-    public static final String[] REQUIRED = {"control", "loading_dock"};
+    public static final String FREIGHT_LIFT = "freight_lift";
+    public static final String[] REQUIRED = {"control", "loading_dock", FREIGHT_LIFT};
     public static final String[] OPTIONAL = {"research_lab", "meeting", "archive", "office", "server_room", "clean_room", "prototype",
-            "mass_factory", "dorm", "body_storage", "test_ground", "bio_parts", "waste", "medical", "cafeteria"};
+            "mass_factory", "dorm", "body_storage", "test_ground", "bio_parts", "waste", "medical", "cafeteria", "private_rooms"};
+    /** 屋外の代わりの部屋。どちらかは必ず置き、もう一方は {@link #SECOND_OUTDOOR} の確率で置く。 */
+    public static final String[] OUTDOOR = {"solarium", "outdoor_test_ground"};
+    static final float SECOND_OUTDOOR = 0.4F;
     public static final String[] ANNEXES = {"annex_storage", "annex_locker", "annex_observation"};
     public static final String SUBSTATION = "annex_substation";
     /** 選ばれる部屋の数。 */
@@ -71,7 +77,7 @@ public final class LabLayout {
      * うまく置けない種なら、種をずらして作り直す。
      */
     public static LabLayout create(long seed, Function<String, Vec3i> sizes, int cx, int cz, int floor) {
-        for (int k = 0; k < 64; k++) {
+        for (int k = 0; k < 256; k++) {
             LabLayout l = new LabLayout(seed + k * 7919L, sizes, cx, cz, floor);
             if (l.build()) {
                 return l;
@@ -97,11 +103,17 @@ public final class LabLayout {
         Collections.shuffle(chosen, new java.util.Random(r.nextLong()));
         List<String> order = new ArrayList<>(List.of(REQUIRED));
         order.addAll(chosen.subList(0, CHOSEN));
+        int first = r.nextInt(OUTDOOR.length);
+        String outdoor = OUTDOOR[first];
+        order.add(outdoor);
+        if (r.nextFloat() < SECOND_OUTDOOR) {
+            order.add(OUTDOOR[1 - first]);
+        }
         Collections.shuffle(order, new java.util.Random(r.nextLong()));
         for (String name : order) {
-            int idx = viaCorridor(name, true);
+            int idx = viaCorridor(name, true, false);
             if (idx < 0) {
-                if (List.of(REQUIRED).contains(name)) {
+                if (List.of(REQUIRED).contains(name) || name.equals(outdoor)) {
                     return false;
                 }
                 continue;
@@ -111,8 +123,8 @@ public final class LabLayout {
             }
         }
         // 中央動力炉（行き止まり）と、その先のボス部屋。動力炉の横に変電室
-        for (int attempt = 0; attempt < 12; attempt++) {
-            int reactor = viaCorridor(REACTOR, false);
+        for (int attempt = 0; attempt < 48; attempt++) {
+            int reactor = viaCorridor(REACTOR, false, true);
             if (reactor < 0) {
                 return false;
             }
@@ -194,8 +206,11 @@ public final class LabLayout {
         return true;
     }
 
-    /** 空いている辺から廊下を伸ばして、その先に部屋を置く。置けたら部屋の番号、だめなら -1。 */
-    private int viaCorridor(String name, boolean keepOpen) {
+    /**
+     * 空いている辺から廊下を伸ばして、その先に部屋を置く。置けたら部屋の番号、だめなら -1。
+     * facingEntrance なら、型紙の北を出入口（廊下の来る側）へ向ける（向きのある部屋。ほかは向きを選ぶ）。
+     */
+    private int viaCorridor(String name, boolean keepOpen, boolean facingEntrance) {
         for (int attempt = 0; attempt < 80 && !open.isEmpty(); attempt++) {
             Object[] slot = open.get(r.nextInt(open.size()));
             int from = (int) slot[0];
@@ -210,7 +225,7 @@ public final class LabLayout {
                 end = r.nextBoolean() ? d.getClockWise() : d.getCounterClockWise();
                 pts.add(p1.relative(end, 4 + r.nextInt(7)));
             }
-            Rotation rot = Rotation.values()[r.nextInt(4)];
+            Rotation rot = facingEntrance ? northTowards(end.getOpposite()) : Rotation.values()[r.nextInt(4)];
             BoundingBox box = boxAt(pts.get(pts.size() - 1), end.getOpposite(), size(name, rot));
             List<BoundingBox> segs = new ArrayList<>();
             for (int i = 0; i + 1 < pts.size(); i++) {
@@ -243,6 +258,16 @@ public final class LabLayout {
         return -1;
     }
 
+    /** 型紙の北（-z）を、置いた世界の向き side へ向ける回転。 */
+    static Rotation northTowards(Direction side) {
+        return switch (side) {
+            case EAST -> Rotation.CLOCKWISE_90;
+            case SOUTH -> Rotation.CLOCKWISE_180;
+            case WEST -> Rotation.COUNTERCLOCKWISE_90;
+            default -> Rotation.NONE;
+        };
+    }
+
     /** 最後に廊下で置いた部屋（動力炉・ボス部屋）と、その廊下・出入口・つながりを取り消す。 */
     private void undoLast(boolean reopen) {
         rooms.remove(rooms.size() - 1);
@@ -258,12 +283,14 @@ public final class LabLayout {
         }
     }
 
-    /** 動力炉の空いている辺から、短いまっすぐな廊下と隔壁を挟んでボス部屋を置く。 */
+    /**
+     * 動力炉の、入口の反対側（型紙の南。操作卓の背後）から、短いまっすぐな廊下と隔壁を挟んでボス部屋を置く。
+     * 入口は型紙の北（{@link #northTowards}）なので、型紙の南は回転を当てた「南」の向き。
+     */
     private boolean boss(int reactor) {
         Placed rp = rooms.get(reactor);
-        List<Direction> sides = new ArrayList<>(Direction.Plane.HORIZONTAL.stream().toList());
-        Collections.shuffle(sides, new java.util.Random(r.nextLong()));
-        for (Direction d : sides) {
+        Direction back = rp.rotation().rotate(Direction.SOUTH);
+        for (Direction d : List.of(back)) {
             if (doors.stream().anyMatch(o -> o.wall().equals(wallCenter(rp.box, d)))) {
                 continue;
             }

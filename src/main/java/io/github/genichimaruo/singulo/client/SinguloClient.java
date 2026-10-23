@@ -29,6 +29,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::registerScreens);
         modBus.addListener(SinguloClient::registerDecorations);
         modBus.addListener(SinguloClient::registerItemColors);
+        modBus.addListener(SinguloClient::registerBlockColors);
         modBus.addListener(SinguloClient::registerExtensions);
         modBus.addListener(SinguloClient::registerRenderers);
         modBus.addListener(SinguloClient::registerLayers);
@@ -44,9 +45,16 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SkyGalaxyRenderer::onRenderStage);
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) ->
-                ClientGalaxies.set(java.util.List.of(), false));
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
+            ClientGalaxies.set(java.util.List.of(), false);
+            ClientRecords.set(java.util.List.of());
+            clearWorldState();
+        });
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.level.LevelEvent.Unload e) -> {
+            if (e.getLevel().isClientSide()) clearWorldState();
+        });
         NeoForge.EVENT_BUS.addListener(NeutrinoOverlay::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(RayleighLighting::tick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onScreenKey);
         NeoForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
@@ -55,6 +63,15 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(BossSounds::onClientTick);
         NeoForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
+    }
+
+    static void clearWorldState() {
+        ShapeCache.clear();
+        HologramRenderer.clear();
+        NeutrinoOverlay.clear();
+        BlackHoleAmbience.reset();
+        MachineSounds.reset();
+        BossSounds.reset();
     }
 
     /** 型として使っている残響の欠片（バニラのアイテム）に使用回数を出す。Singulo のアイテムには説明と作り方・使い道を出す。 */
@@ -101,10 +118,14 @@ public final class SinguloClient {
                 AcceleratorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CABLE.get(),
                 CableRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.RAYLEIGH_PANEL.get(),
+                RayleighPanelRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.KERAUNOS_TOWER.get(),
                 KeraunosTowerRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEALED_CONTAINER.get(),
                 SealedContainerRenderer::new);
+        event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SLIDING_DOOR.get(),
+                SlidingDoorRenderer::new);
         event.registerEntityRenderer(SinguloEntities.SECURITY_DRONE.get(), SecurityDroneRenderer::new);
         event.registerEntityRenderer(SinguloEntities.BLADE_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BLADE));
         event.registerEntityRenderer(SinguloEntities.WHIP_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.WHIP));
@@ -239,6 +260,17 @@ public final class SinguloClient {
         }
     }
 
+    /** 置いたティーカップ: 色付けの番号0（カップと受け皿）を、ブロックエンティティの色に。 */
+    private static void registerBlockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) {
+        event.register((state, level, pos, tint) -> {
+            if (tint == 0 && level != null && pos != null
+                    && level.getBlockEntity(pos) instanceof io.github.genichimaruo.singulo.android.TeacupBlockEntity cup) {
+                return 0xFF000000 | cup.color();
+            }
+            return 0xFFFFFFFF;
+        }, io.github.genichimaruo.singulo.registry.SinguloBlocks.TEACUP.get());
+    }
+
     private static void registerDecorations(net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent event) {
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), WorkCardDecorator.LOCATION);
         event.register(io.github.genichimaruo.singulo.registry.SinguloItems.RECIPE_CARD.get(), WorkCardDecorator.RECIPE);
@@ -265,6 +297,14 @@ public final class SinguloClient {
                 io.github.genichimaruo.singulo.registry.SinguloItems.AREA_CARD.get(), Singulo.id("recorded"),
                 (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.AreaCardItem.box(stack) != null ? 1
                         : io.github.genichimaruo.singulo.android.work.AreaCardItem.first(stack) != null ? 0.5F : 0));
+        // 測量メガネ: 掛ける高さごとに、頭の模型を切り替える
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.SURVEY_GLASSES.get(), Singulo.id("height"),
+                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.heightPredicate(stack)));
+        // 移設レンチ: ケーブル撤去モードは表示灯が橙の絵
+        event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
+                io.github.genichimaruo.singulo.registry.SinguloItems.RELOCATION_WRENCH.get(), Singulo.id("mode"),
+                (stack, level, entity, seed) -> io.github.genichimaruo.singulo.item.RelocationWrenchItem.mode(stack)));
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get(), ResourceLocation.withDefaultNamespace("angle"),
                 new net.minecraft.client.renderer.item.CompassItemPropertyFunction((level, stack, entity) ->
@@ -322,6 +362,15 @@ public final class SinguloClient {
     }
 
     private static void registerExtensions(RegisterClientExtensionsEvent event) {
+        // 傘を手に持つ間は、腕を上げて柄を握る構えにする（ほかの人から見て、手で持って見えるように）
+        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+            @Override
+            public net.minecraft.client.model.HumanoidModel.ArmPose getArmPose(net.minecraft.world.entity.LivingEntity entity,
+                                                                              net.minecraft.world.InteractionHand hand,
+                                                                              net.minecraft.world.item.ItemStack stack) {
+                return UmbrellaArmPose.UMBRELLA.getValue();
+            }
+        }, io.github.genichimaruo.singulo.registry.SinguloItems.ANDROID_UMBRELLA.get());
         for (SinguloFluids.Entry entry : SinguloFluids.ALL.values()) {
             int color = entry.def().color();
             event.registerFluidType(new IClientFluidTypeExtensions() {

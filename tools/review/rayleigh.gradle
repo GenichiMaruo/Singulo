@@ -1,0 +1,16 @@
+// Development-only real-lightmap and terrain capture; excluded from normal builds.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/rayleigh-src'))
+        neoForge.runs.client {
+            gameDirectory = file('build/rayleigh-review')
+            systemProperty 'singulo.rayleighOutput', file('build/rayleigh-review/screenshots').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}

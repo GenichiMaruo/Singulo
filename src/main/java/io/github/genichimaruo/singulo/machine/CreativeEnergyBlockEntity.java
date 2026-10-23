@@ -17,7 +17,13 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
  * ケーブルや装置から取り出すこともできる。検証用。
  */
 public class CreativeEnergyBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener {
-    private final IEnergyStorage infinite = new IEnergyStorage() {
+    private final io.github.genichimaruo.singulo.energy.LongEnergyStorage infinite = new io.github.genichimaruo.singulo.energy.LongEnergyStorage() {
+        @Override
+        public long receiveLong(long amount, boolean simulate) { return amount; }
+
+        @Override
+        public long extractLong(long amount, boolean simulate) { return amount; }
+
         @Override
         public int receiveEnergy(int amount, boolean simulate) {
             return amount;            // 何でも飲み込む（捨てる）

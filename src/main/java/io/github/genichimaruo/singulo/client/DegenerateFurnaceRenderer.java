@@ -7,7 +7,7 @@ import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import io.github.genichimaruo.singulo.machine.DegenerateFurnaceBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import io.github.genichimaruo.singulo.multiblock.Shapes;
-import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -42,7 +42,7 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
     private static final float HOLD_TICKS = 10F;
 
     /** 炉ごとの、最後に火花を散らした往復の番号（同じ打ち込みで何度も散らさないように）。 */
-    private static final Map<BlockPos, Long> LAST_SLAM = new HashMap<>();
+    private static final Map<DegenerateFurnaceBlockEntity, Long> LAST_SLAM = new WeakHashMap<>();
 
     public DegenerateFurnaceRenderer(BlockEntityRendererProvider.Context context) {}
 
@@ -67,7 +67,7 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
         float heat = running ? 0.45F + 0.55F * flash : 0F;
 
         if (running) {
-            sparks(level, be.getBlockPos(), Vec3.atCenterOf(center), time);
+            sparks(be, level, Vec3.atCenterOf(center), time);
         }
 
         pose.pushPose();
@@ -154,13 +154,13 @@ public class DegenerateFurnaceRenderer implements BlockEntityRenderer<Degenerate
     }
 
     /** 打ち込んだ瞬間に、炉の中で火花を散らし、天面から熱気を吹き出す。 */
-    private static void sparks(Level level, BlockPos controller, Vec3 c, float time) {
+    private static void sparks(DegenerateFurnaceBlockEntity be, Level level, Vec3 c, float time) {
         long cycle = (long) (time / DegenerateFurnaceBlockEntity.STROKE_TICKS);
         float phase = time % DegenerateFurnaceBlockEntity.STROKE_TICKS;
         if (phase < DegenerateFurnaceBlockEntity.SLAM_TICK || phase > DegenerateFurnaceBlockEntity.SLAM_TICK + 4) {
             return;
         }
-        Long last = LAST_SLAM.put(controller.immutable(), cycle);
+        Long last = LAST_SLAM.put(be, cycle);
         if (last != null && last == cycle) {
             return;
         }

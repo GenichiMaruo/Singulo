@@ -17,8 +17,12 @@ import java.util.List;
  * サーバーと同じレシピの並び（{@link MachineBlockEntity#stationRecipes}）を使うので、クライアントでも同じ結果になる。
  */
 public final class MachineDiagnosis {
-    /** 待機の理由。EMPTY = 何も入っていない、NO_MATCH = 入っている物で作れるものがない、MISSING = 材料が足りない、TOO_SMALL = 大きさが足りない。 */
-    public enum Kind { EMPTY, NO_MATCH, MISSING, TOO_SMALL }
+    /**
+     * 待機の理由。EMPTY = 何も入っていない、NO_MATCH = 入っている物で作れるものがない、MISSING = 材料が足りない、
+     * TOO_SMALL = 大きさが足りない、AMBIGUOUS = 材料はあるが、ほかのレシピの途中と同じなので自動では作らない、
+     * EXTRA = 材料はあるが、使わない物も入っているので自動では作らない（作るものを選べる装置だけ）。
+     */
+    public enum Kind { EMPTY, NO_MATCH, MISSING, TOO_SMALL, AMBIGUOUS, EXTRA }
 
     public record Result(Kind kind, List<Component> lines) {}
 
@@ -29,6 +33,12 @@ public final class MachineDiagnosis {
      * @param tanks  タンクの中身（入力タンク → 出力タンク）
      */
     public static Result idle(Level level, MachineType type, List<ItemStack> inputs, List<FluidStack> tanks, int structureSize) {
+        return idle(level, type, inputs, tanks, structureSize, null);
+    }
+
+    /** @param selected 指定した作るもの（{@link RecipeSelection}）。null なら自動 */
+    public static Result idle(Level level, MachineType type, List<ItemStack> inputs, List<FluidStack> tanks, int structureSize,
+                              @javax.annotation.Nullable RecipeHolder<MachineRecipe> selected) {
         boolean anything = inputs.stream().anyMatch(s -> !s.isEmpty());
         for (int i = 0; i < type.fluidInputs() && i < tanks.size(); i++) {
             anything |= !tanks.get(i).isEmpty();
@@ -36,11 +46,29 @@ public final class MachineDiagnosis {
         if (!anything) {
             return new Result(Kind.EMPTY, List.of(Component.translatable("gui.singulo.reason.empty")));
         }
-        MachineRecipe best = null;
+        if (type.selectsRecipe() && selected == null) {
+            // 自動: 材料は揃っているのに、選び方の決まりで止めているものがあれば、それを理由にする
+            for (RecipeHolder<MachineRecipe> holder : RecipeSelection.selectable(level, type)) {
+                MachineRecipe.Plan plan = holder.value().plan(inputs);
+                if (plan == null) {
+                    continue;
+                }
+                Component name = holder.value().result().getHoverName();
+                if (!RecipeSelection.usesEveryInput(type, inputs, plan)) {
+                    return new Result(Kind.EXTRA, List.of(Component.translatable("gui.singulo.reason.extra", name),
+                            Component.translatable("gui.singulo.reason.select_hint")));
+                }
+                if (RecipeSelection.ambiguous(level, type, holder)) {
+                    return new Result(Kind.AMBIGUOUS, List.of(Component.translatable("gui.singulo.reason.ambiguous", name),
+                            Component.translatable("gui.singulo.reason.select_hint")));
+                }
+            }
+        }
+        MachineRecipe best = selected == null ? null : selected.value();
         double bestScore = 0;
         for (RecipeHolder<MachineRecipe> holder : MachineBlockEntity.stationRecipes(level, type)) {
             MachineRecipe r = holder.value();
-            if (r.isMassRecipe() || MachineBlockEntity.isFree(r)) {
+            if (r.isMassRecipe() || MachineBlockEntity.isFree(r) || selected != null) {
                 continue;
             }
             int total = r.ingredients().size() + r.fluidIngredients().size();

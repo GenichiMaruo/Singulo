@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "singulo:block/rayleigh_panel"
+    },
+    "lit=true": {
+      "model": "singulo:block/rayleigh_panel"
+    }
+  }
+}

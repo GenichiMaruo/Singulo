@@ -11,7 +11,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 /** 触媒装置の画面。触媒スロットと（装置によって）燃料か許可証のスロット、状態表示。 */
 public class CatalystDeviceMenu extends AbstractContainerMenu {
@@ -34,14 +33,14 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
         this.pos = pos;
         this.kind = kind;
         this.data = data;
-        addSlot(new SlotItemHandler(slot, 0, SLOT_X, SLOT_Y) {
+        addSlot(new NotifyingItemSlot(slot, 0, SLOT_X, SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return CatalystHelper.tierOf(stack) > 0;
             }
         });
         if (kind.extraSlot() != null) {
-            addSlot(new SlotItemHandler(slot, 1, EXTRA_X, SLOT_Y) {
+            addSlot(new NotifyingItemSlot(slot, 1, EXTRA_X, SLOT_Y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return kind.extraAccepts(stack);
@@ -75,6 +74,8 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
     }
 
     public static final int BUTTON_POWER = 0;
+
+    public BlockPos pos() { return pos; }
 
     @Override
     public boolean clickMenuButton(Player player, int id) {

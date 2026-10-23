@@ -47,7 +47,9 @@ These stages describe the material and technology progression. Unlocking an adva
 
 ## Power, logistics and catalysts
 
-Energy is measured in FE. Upgrade from Copper Wire to Superconducting Cable, Topological Wire and the Horizon Bus as your factory grows. Copper loses energy, and the weakest cable limits a connected network's capacity. The Horizon Bus has no limit: between Singulo devices it can move more than about 2.1 billion FE per tick (other mods' devices still accept up to about 2.1 billion FE/t each). Only cables that are actually carrying power glow, with a gentle wave running in the direction of flow; the brightness follows the amount of power.
+Energy is measured in FE. Upgrade from Copper Wire to Superconducting Cable, Topological Wire and the Horizon Bus as your factory grows. Copper loses energy, and the lowest-capacity cable on each route limits its transfer rate. Unrelated branches do not lower that limit; transfers using the same cable share its per-tick capacity. The Horizon Bus has no limit: between Singulo devices it can move more than about 2.1 billion FE per tick (other mods' devices still accept up to about 2.1 billion FE/t each). Only cables that are actually carrying power glow, with a gentle wave running in the direction of flow; the brightness follows the amount of power.
+
+Sources nearer to the receiver along the cables supply power first; more distant sources cover the deficit. Equal distances use a stable coordinate order. An empty nearby source or a bottleneck on its route does not block the backup sources. Breaking a cable immediately clears the glow of that wiring.
 
 Ordinary processing machines have a Sides screen for face-specific input, output and auto-ejection. Machines that output two gases, such as the Electrolyzer, let you choose the output faces for each gas. The power button on the right of the screen stops a machine, and machines that can make something from power alone, such as liquid nitrogen in the cooling tower, have a switch to skip those recipes. Multiblocks use shared Multiblock I/O Ports; the Penrose reactor uses its own Extraction Ports. Singulo's cables carry energy, not items or fluids.
 
@@ -140,7 +142,7 @@ Androids run on charge and run out after about ten big moves. They return to a n
 
 ## Black holes and late-game technology
 
-Insert your first Singularity Seed into the Core Controller, start ignition, and supply **50 GFE within ten seconds** under default settings. The formation sequence then creates the core. Prepare a high-capacity power network before attempting ignition: 50 GFE in ten seconds averages 250 MFE/t, and a network is capped by its thinnest cable, so a topological-wire network only delivers 20 GFE. While igniting the screen shows the intake and what will arrive, and a failure reports what was missing.
+Insert your first Singularity Seed into the Core Controller, start ignition, and supply **50 GFE within ten seconds** under default settings. The formation sequence then creates the core. Prepare a high-capacity power network before attempting ignition: 50 GFE in ten seconds averages 250 MFE/t, and a power route is capped by its lowest-capacity cable, so a single topological-wire route delivers at most 20 GFE. While igniting the screen shows the intake and what will arrive, and a failure reports what was missing.
 
 A new core starts in **harvest mode**: it keeps mass at 480 or below, so H-Condensate forms every five minutes with a Hawking Collector. The first Singularity Core needs six (four directly, two to restore the Anomaly Sample). Turn harvest mode off afterwards for full power. Harvest mode also sheds 2 mass per second from an overgrown core.
 
@@ -181,3 +183,14 @@ Standard textures are 16×16. Enable the bundled **Singulo HD** resource pack fo
 The server setting `preset` changes difficulty: `casual` removes nether stars, doubles catalyst life and halves ruin regrowth, Warden health and shell compression; `expert` doubles stars, uses 0.75× catalyst life, allows two repairs, uses 1.5× shell compression and doubles ignition energy. Individual settings such as star counts, shell materials and growth time also apply to recipes and JEI when changed from their defaults.
 
 This manual describes the current implementation and default settings. See the [recipe gallery](recipes/README.md) and [documentation audit](documentation-audit.md) for references. Server settings and data packs may change recipes or behavior; use the actual in-game information for your world.
+
+
+## Relocation and automatic ejection
+
+Craft the Relocation Wrench from 3 steel ingots, 2 copper ingots and a basic circuit. Sneak-use it to pack a supported device with its items, fluids, energy, progress and side settings. Only the controller of a multiblock is packed. See “Power and Logistics → Relocation Wrench” in the handbook for supported devices.
+
+Automatic ejection on ordinary processing machines defaults off. Enable the master switch in Sides to eject through allowed output faces. Hover a face to see the adjacent block. Newly generated underground labs always include both shafts, with the supply shaft connected to a dedicated cargo lift room.
+
+Unused Observation Logs, Quantum Data Fragments, Culture Data and restored parts stack to 64 when their state matches. Each machine input slot accepts only one; shift-click inserts one as well. Partly used items do not stack.
+
+Restored parts and original records exhausted during processing become item outputs with their usage and repair data intact. If the output slot is occupied, they wait in their input slot and can still be extracted by hoppers or item pipes. Enable automatic ejection to send them to adjacent inventories. Parts inserted for repair are not automatically ejected.

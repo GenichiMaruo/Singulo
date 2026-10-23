@@ -102,17 +102,32 @@ public final class RuinGameTests {
                 new AABB(helper.absolutePos(POS)).inflate(4));
         helper.assertTrue(drones.size() == 3, "段階2のドックは3機出撃する: " + drones.size());
         for (SecurityDrone d : drones) {
-            helper.assertTrue(d.tier() == 2 && d.getMaxHealth() == 24, "段階2のドローンはHP24");
+            helper.assertTrue(d.tier() == 2 && d.getMaxHealth() == 14, "段階2のドローンはHP14");
             helper.assertTrue(d.isNoGravity(), "ドローンが飛んでいない");
         }
         helper.succeed();
+    }
+
+    /** 体力が半分を切ったドローンは壊れかけになり、地面から1.5ブロックより上へは飛べない（高い所にいれば沈む）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 120)
+    public static void crippledDroneFliesLow(GameTestHelper helper) {
+        SecurityDrone drone = helper.spawn(io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 6, 3));
+        drone.setTier(1);
+        helper.assertFalse(drone.crippled(), "無傷のドローンが壊れかけになっている");
+        drone.setHealth(drone.getMaxHealth() * 0.4F);
+        helper.assertTrue(drone.crippled(), "体力4割のドローンが壊れかけにならない");
+        double floor = helper.absolutePos(new BlockPos(3, 1, 3)).getY();
+        helper.runAtTickTime(80, () -> {
+            helper.assertTrue(drone.getY() <= floor + 1.5 + 0.3, "壊れかけのドローンが地面近くまで下りない: 床 " + floor + " / " + drone.getY());
+            helper.succeed();
+        });
     }
 
     @GameTest(template = EMPTY)
     public static void droneDropsNothing(GameTestHelper helper) {
         SecurityDrone drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above());
         drone.setTier(3);
-        helper.assertTrue(drone.getMaxHealth() == 40, "段階3のドローンはHP40");
+        helper.assertTrue(drone.getMaxHealth() == 24, "段階3のドローンはHP24");
         drone.kill();
         helper.runAtTickTime(5, () -> {
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "singulo:blueprint_lighting"
+    },
+    {
+      "item": "singulo:ruin_lamp"
+    },
+    {
+      "item": "singulo:ruin_lamp"
+    },
+    {
+      "item": "singulo:ruin_lamp"
+    },
+    {
+      "item": "singulo:ruin_lamp"
+    },
+    {
+      "tag": "c:dyes/purple"
+    }
+  ],
+  "result": {
+    "id": "singulo:ruin_lamp_violet",
+    "count": 4
+  }
+}

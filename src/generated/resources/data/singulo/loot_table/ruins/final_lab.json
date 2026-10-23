@@ -38,6 +38,34 @@
           ]
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "singulo:blueprint_pristine_ruin",
+          "weight": 30
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 70
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "singulo:blueprint_ruin_glass",
+          "weight": 40
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 60
+        }
+      ]
     }
   ]
 }

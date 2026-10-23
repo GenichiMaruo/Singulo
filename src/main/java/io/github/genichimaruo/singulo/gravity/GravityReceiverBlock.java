@@ -65,7 +65,7 @@ public class GravityReceiverBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity be) {
             player.displayClientMessage(Component.translatable("message.singulo.gravity_receiver.status",
-                    be.activePanels(), be.panels(), GravityReceiverBlockEntity.perPanel()), true);
+                    be.activePanels(), be.panels(), be.demand()), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

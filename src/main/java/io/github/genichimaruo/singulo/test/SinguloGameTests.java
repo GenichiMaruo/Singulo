@@ -146,6 +146,16 @@ public final class SinguloGameTests {
         });
     }
 
+    /** 隕鉄の原石は、溶鉱炉だけでなく焼成炉でも隕鉄インゴットに焼ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void kilnSmeltsRawMeteoricIron(GameTestHelper helper) {
+        MachineBlockEntity kiln = machine(helper, MachineType.KILN);
+        helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        kiln.items().setStackInSlot(0, new ItemStack(item("raw_meteoric_iron")));
+        helper.succeedWhen(() -> helper.assertTrue(
+                kiln.items().getStackInSlot(kiln.type().outputSlot()).is(item("meteoric_iron_ingot")), "隕鉄インゴットが焼けない"));
+    }
+
     /** 純酸素転炉: 焼成炉に鉄2・石炭1・酸素250 mB で鋼鉄インゴット2。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void kilnBlowsOxygenIntoSteel(GameTestHelper helper) {
@@ -369,4 +379,18 @@ public final class SinguloGameTests {
         });
     }
 
+
+    /** 張り替えで余った下位のケーブル: 銅導線は焼成炉で銅に戻り、超伝導ケーブル・トポロジカル導線の材料にもなる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void spareCablesAreRecycled(GameTestHelper helper) {
+        var recipes = helper.getLevel().getRecipeManager();
+        helper.assertTrue(recipes.byKey(Singulo.id("crafting/superconducting_cable_from_copper_wire")).isPresent(), "銅導線で超伝導ケーブルを作れない");
+        helper.assertTrue(recipes.byKey(Singulo.id("cryogenic_cooling_tower/topological_wire_from_superconducting_cable")).isPresent(),
+                "超伝導ケーブルでトポロジカル導線を作れない");
+        MachineBlockEntity kiln = machine(helper, MachineType.KILN);
+        helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
+        kiln.items().setStackInSlot(0, new ItemStack(item("copper_wire"), 8));
+        helper.succeedWhen(() -> helper.assertTrue(kiln.items().getStackInSlot(kiln.type().outputSlot())
+                .is(net.minecraft.world.item.Items.COPPER_INGOT), "銅導線から銅インゴットが出ない"));
+    }
 }

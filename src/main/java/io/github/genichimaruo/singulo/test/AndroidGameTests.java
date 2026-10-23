@@ -43,6 +43,34 @@ public final class AndroidGameTests {
         return BuiltInRegistries.ITEM.get(Singulo.id(id));
     }
 
+    /** 染めたティーカップを右クリックで置くと、その色のカップのブロックになり、壊すと同じ色のティーカップが落ちる。 */
+    @GameTest(template = EMPTY)
+    public static void teacupPlacesAsDyedBlockAndDropsItself(GameTestHelper helper) {
+        BlockPos floor = new BlockPos(2, 1, 2);
+        helper.setBlock(floor, net.minecraft.world.level.block.Blocks.STONE);
+        ItemStack cup = new ItemStack(item("android_teacup"));
+        cup.set(net.minecraft.core.component.DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0x3366CC, true));
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, cup);
+        BlockPos abs = helper.absolutePos(floor);
+        var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(abs).add(0, 0.5, 0),
+                net.minecraft.core.Direction.UP, abs, false);
+        cup.useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+        BlockPos placed = floor.above();
+        helper.assertBlockPresent(io.github.genichimaruo.singulo.registry.SinguloBlocks.TEACUP.get(), placed);
+        helper.assertTrue(helper.getBlockEntity(placed) instanceof io.github.genichimaruo.singulo.android.TeacupBlockEntity be
+                && be.color() == 0x3366CC, "置いたカップが染めた色にならない");
+        helper.assertTrue(player.getMainHandItem().isEmpty(), "置いたのにティーカップが減らない");
+        helper.getLevel().destroyBlock(helper.absolutePos(placed), true);
+        helper.succeedWhen(() -> {
+            var drops = helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(helper.absolutePos(placed)).inflate(2));
+            helper.assertTrue(drops.stream().anyMatch(e -> e.getItem().is(item("android_teacup"))
+                    && (net.minecraft.world.item.component.DyedItemColor.getOrDefault(e.getItem(), 0) & 0xFFFFFF) == 0x3366CC),
+                    "壊しても同じ色のティーカップが落ちない: " + drops.stream().map(e -> e.getItem() + " " + e.getItem().getComponents()).toList());
+        });
+    }
+
     /** 電力・設計メモリ・キットのあるステーションを置く。 */
     private static AndroidStationBlockEntity station(GameTestHelper helper, int kits) {
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
@@ -2300,4 +2328,55 @@ public final class AndroidGameTests {
         });
     }
 
+    /**
+     * 技の光が本体から離れて届く個体は、技の間だけ描画の箱が広がる（本体が画面の外でも、画面に入った技の光が描かれる）。
+     * 斬撃の軌跡・鞭と叩きつけの衝撃波・突き・斧の衝撃波の先まで入り、ふだんは広がらない。
+     */
+    @GameTest(template = EMPTY)
+    public static void attackEffectsWidenTheRenderBox(GameTestHelper helper) throws ReflectiveOperationException {
+        var level = helper.getLevel();
+        java.lang.reflect.Method setState = io.github.genichimaruo.singulo.android.RuinAndroid.class.getDeclaredMethod("setState", int.class);
+        setState.setAccessible(true);
+        record Move(net.minecraft.world.entity.EntityType<? extends io.github.genichimaruo.singulo.android.RuinAndroid> type, int state, double reach) {}
+        for (Move m : List.of(
+                new Move(SinguloEntities.BLADE_ANDROID.get(), BladeAndroid.STATE_SLASH, 4),
+                new Move(SinguloEntities.WHIP_ANDROID.get(), io.github.genichimaruo.singulo.android.WhipAndroid.STATE_SLAM, io.github.genichimaruo.singulo.android.WhipAndroid.WAVE_RANGE),
+                new Move(SinguloEntities.SABER_ANDROID.get(), io.github.genichimaruo.singulo.android.SaberAndroid.STATE_THRUST, io.github.genichimaruo.singulo.android.SaberAndroid.THRUST_REACH),
+                new Move(SinguloEntities.AXE_ANDROID.get(), io.github.genichimaruo.singulo.android.AxeAndroid.STATE_SLAM, io.github.genichimaruo.singulo.android.AxeAndroid.SHOCKWAVE_LENGTH))) {
+            var a = m.type().create(level);
+            a.moveTo(100.5, 64, 100.5, 0, 0);
+            var far = new net.minecraft.world.phys.Vec3(100.5 + m.reach(), 65, 100.5);
+            helper.assertFalse(a.getBoundingBoxForCulling().contains(far), m.type().getDescriptionId() + ": ふだんから描画の箱が広い");
+            setState.invoke(a, m.state());
+            helper.assertTrue(a.getBoundingBoxForCulling().contains(far), m.type().getDescriptionId() + ": 技の先まで描画の箱が届かない");
+            a.discard();
+        }
+        helper.succeed();
+    }
+
+    /** メガネ（装飾）は頭の枠に着けられ、染められる。測量メガネの掛ける高さは範囲に収まり、絵の切り替えの値になる。 */
+    @GameTest(template = EMPTY)
+    public static void glassesFitTheHeadAndSurveyGlassesKeepTheirHeight(GameTestHelper helper) {
+        ItemStack glasses = new ItemStack(item("android_glasses"));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.isAccessory(glasses,
+                io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD), "メガネが頭の装飾にならない");
+        helper.assertTrue(glasses.is(net.minecraft.tags.ItemTags.DYEABLE), "メガネが染められない");
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.inventory().setItem(RuinAndroid.SLOT_DECOR, glasses);
+        helper.assertTrue(a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD).is(item("android_glasses")),
+                "頭の装飾にメガネが伝わらない");
+        ItemStack survey = new ItemStack(item("survey_glasses"));
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.height(survey) == 0, "新しいメガネの高さが0でない");
+        io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(survey, 3);
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.height(survey) == 3, "高さが残らない");
+        io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(survey, 99);
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.height(survey)
+                == io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.MAX_HEIGHT, "高さが上限に収まらない");
+        helper.assertTrue(io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.heightPredicate(survey) == 1F, "上限の絵の値が1でない");
+        io.github.genichimaruo.singulo.android.work.SurveyGlassesItem.setHeight(survey, 0);
+        helper.assertTrue(survey.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA) == null
+                || !survey.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA).copyTag().contains("glasses_height"),
+                "高さ0のメガネに値が残り、高さ0の新品と重ならない");
+        helper.succeed();
+    }
 }

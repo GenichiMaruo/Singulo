@@ -190,10 +190,62 @@ def keraunos_crown(on):
     return im
 
 
+def stardust_cluster_item():
+    """星屑の結晶の持ったときの絵: ブロックの絵から目立たない1行を抜いて縦を1ドット縮め、上下左右の中央に寄せる。
+    （ブロックは地面から生えるので下に寄ったまま。アイテムの欄では中央に置く）"""
+    import art16
+    im = stardust_cluster()
+    px = im.load()
+    box = im.getbbox()
+    top, bottom = box[1], box[3] - 1
+    # 抜く行: 上下2行ずつを除いた中で、すぐ下の行といちばん似ている行（抜いても形が変わらない）
+    def diff(y):
+        return sum(sum(abs(a - b) for a, b in zip(px[x, y], px[x, y + 1])) for x in range(S))
+    drop = min(range(top + 2, bottom - 2), key=diff)
+    out = Image.new('RGBA', im.size, (0, 0, 0, 0))
+    po = out.load()
+    for y in range(S):
+        src = y if y < drop else y + 1
+        if src >= S:
+            continue
+        for x in range(S):
+            po[x, y] = px[x, src]
+    return art16.center(out)
+
+
+def teacup_porcelain():
+    """置いたティーカップの磁器（白。染めた色で塗る）。光の当たる上は明るく、下はわずかに影。"""
+    im, d = new((248, 248, 248, 255))
+    for y in range(S):
+        v = 255 - y * 2
+        d.line([(0, y), (S - 1, y)], fill=(v, v, v, 255))
+    return im
+
+
+def teacup_gold():
+    """金の縁。"""
+    im, d = new((226, 186, 84, 255))
+    for x in range(0, S, 3):
+        d.point((x, 0), fill=(250, 222, 140, 255))
+    return im
+
+
+def teacup_tea():
+    """紅茶の面: 茶色に、光の映りこみ。"""
+    im, d = new((130, 82, 52, 255))
+    d.line([(4, 4), (7, 4)], fill=(176, 120, 78, 255))
+    d.point((5, 5), fill=(176, 120, 78, 255))
+    return im
+
+
 def textures(tb, save):
+    save(teacup_porcelain(), tb / 'teacup_porcelain.png')
+    save(teacup_gold(), tb / 'teacup_gold.png')
+    save(teacup_tea(), tb / 'teacup_tea.png')
     save(meteorite_crust(), tb / 'meteorite_crust.png')
     save(meteoric_iron_chunk(), tb / 'meteoric_iron_chunk.png')
     save(stardust_cluster(), tb / 'stardust_cluster.png')
+    save(stardust_cluster_item(), tb.parent / 'item' / 'stardust_cluster.png')
     save(meteorite_core(), tb / 'meteorite_core.png')
     save(fulgurite_block(), tb / 'fulgurite_block.png')
     for on in (False, True):
@@ -235,10 +287,48 @@ def keraunos_elements(on):
     return els
 
 
+def teacup_elements():
+    """置いたティーカップ: 受け皿、底と4枚の壁で中が凹んだカップ、縁より低い紅茶、金の縁、東に輪の取っ手。
+    磁器の面は色付けの番号0（ブロックエンティティの染めた色）。"""
+    def box(a, b, tex, tint=True, faces=None):
+        out = {}
+        for f in faces or ('north', 'south', 'east', 'west', 'up', 'down'):
+            face = {'texture': tex}
+            if tint:
+                face['tintindex'] = 0
+            out[f] = face
+        return {'from': a, 'to': b, 'faces': out}
+
+    p, g, t = '#porcelain', '#gold', '#tea'
+    return [
+        box([3, 0, 3], [13, 1, 13], p),                       # 受け皿
+        box([5, 1, 5], [11, 2, 11], p),                       # 底
+        box([5, 2, 5], [11, 7, 6], p),                        # 北の壁
+        box([5, 2, 10], [11, 7, 11], p),                      # 南の壁
+        box([5, 2, 6], [6, 7, 10], p),                        # 西の壁
+        box([10, 2, 6], [11, 7, 10], p),                      # 東の壁
+        box([5, 7, 5], [11, 7.5, 6], g, False),               # 金の縁
+        box([5, 7, 10], [11, 7.5, 11], g, False),
+        box([5, 7, 6], [6, 7.5, 10], g, False),
+        box([10, 7, 6], [11, 7.5, 10], g, False),
+        box([6, 5, 6], [10, 5.25, 10], t, False, ('up',)),    # 紅茶（縁より低い）
+        box([11, 5, 7.5], [12.75, 5.75, 8.5], p),             # 取っ手（上・下・外側）
+        box([11, 2.75, 7.5], [12.75, 3.5, 8.5], p),
+        box([12, 3.5, 7.5], [12.75, 5, 8.5], p),
+    ]
+
+
 def models(write_json, assets):
     mb = assets / 'models' / 'block'
     mi = assets / 'models' / 'item'
     bs = assets / 'blockstates'
+    # 置いたティーカップ（取っ手が、置いた人から見て右に来るように回す）
+    write_json(mb / 'teacup.json', {'textures': {'porcelain': f'{MODID}:block/teacup_porcelain', 'gold': f'{MODID}:block/teacup_gold',
+                                                 'tea': f'{MODID}:block/teacup_tea', 'particle': f'{MODID}:block/teacup_porcelain'},
+                                    'elements': teacup_elements()})
+    write_json(bs / 'teacup.json', {'variants': {
+        'facing=north': {'model': f'{MODID}:block/teacup'}, 'facing=east': {'model': f'{MODID}:block/teacup', 'y': 90},
+        'facing=south': {'model': f'{MODID}:block/teacup', 'y': 180}, 'facing=west': {'model': f'{MODID}:block/teacup', 'y': 270}}})
     for iid in ('meteorite_crust', 'meteoric_iron_chunk', 'meteorite_core', 'fulgurite_block'):
         write_json(mb / f'{iid}.json', {'parent': 'minecraft:block/cube_all', 'textures': {'all': f'{MODID}:block/{iid}'}})
         write_json(mi / f'{iid}.json', {'parent': f'{MODID}:block/{iid}'})
@@ -256,7 +346,7 @@ def models(write_json, assets):
         'facing=north': {'model': model, 'x': 90}, 'facing=south': {'model': model, 'x': 90, 'y': 180},
         'facing=east': {'model': model, 'x': 90, 'y': 90}, 'facing=west': {'model': model, 'x': 90, 'y': 270}}})
     write_json(mi / 'stardust_cluster.json', {'parent': 'minecraft:item/generated',
-                                              'textures': {'layer0': f'{MODID}:block/stardust_cluster'}})
+                                              'textures': {'layer0': f'{MODID}:item/stardust_cluster'}})
     # ケラウノス放電塔（装置のモデルを、塔の立体で置き換える。向きの回転は装置と同じ状態定義のまま）
     for suffix, on in (('', False), ('_on', True)):
         write_json(mb / f'keraunos_tower{suffix}.json', {
@@ -287,6 +377,11 @@ def _ore_like(block, item, lo, hi):
 
 def loot(write_json, data):
     lt = data / 'loot_table' / 'blocks'
+    # 置いたティーカップ: 染めた色ごと、アンドロイドの装飾のティーカップに戻る
+    write_json(lt / 'teacup.json', {'type': 'minecraft:block', 'pools': [{
+        'rolls': 1, 'conditions': [{'condition': 'minecraft:survives_explosion'}],
+        'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:android_teacup', 'functions': [
+            {'function': 'minecraft:copy_components', 'source': 'block_entity', 'include': ['minecraft:dyed_color']}]}]}]})
     write_json(lt / 'meteoric_iron_chunk.json', _ore_like('meteoric_iron_chunk', 'raw_meteoric_iron', 2, 3))
     write_json(lt / 'stardust_cluster.json', _ore_like('stardust_cluster', 'stardust', 2, 4))
     # 隕石の核: 隕鉄の原石と星屑をまとめて（シルクタッチならブロックそのもの。置いてもコンパスは指さない）

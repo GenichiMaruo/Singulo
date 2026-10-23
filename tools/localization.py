@@ -8,6 +8,11 @@ ROOT = Path(__file__).resolve().parent.parent
 LANG = ROOT / 'src/generated/resources/assets/singulo/lang'
 LOCALES = ('zh_cn', 'zh_tw', 'ko_kr')
 FORMAT = re.compile(r'%(?:(\d+)\$)?([-+#0 ]*\d*(?:\.\d+)?[sdf])|%%')
+# Refer to the same named controls/items in menus, tooltips and handbook instructions.
+TERMINOLOGY = {
+    'zh_cn': {'自动弹出': '自动排出'},
+    'ko_kr': {'보호막 탑': '실드 타워', '냉원자 트랩': '냉각 원자 트랩', '제어 유닛': '제어 장치'},
+}
 
 
 def arguments(text):
@@ -23,6 +28,12 @@ def arguments(text):
 
 
 def generate(reference, check=False):
+    japanese = json.loads((LANG / 'ja_jp.json').read_text(encoding='utf-8'))
+    if set(japanese) != set(reference):
+        raise ValueError(f'ja_jp: missing or extra keys: {set(japanese) ^ set(reference)}')
+    for key, target in japanese.items():
+        if arguments(reference[key]) != arguments(target):
+            raise ValueError(f'ja_jp: format arguments differ: {key}')
     for locale in LOCALES:
         catalog = json.loads((ROOT / f'tools/locales/{locale}.json').read_text(encoding='utf-8'))
         if set(catalog) != set(reference):
@@ -37,6 +48,9 @@ def generate(reference, check=False):
                 raise ValueError(f'{locale}: incomplete translation: {key}')
             if arguments(source) != arguments(target):
                 raise ValueError(f'{locale}: format arguments differ: {key}')
+            for inconsistent, preferred in TERMINOLOGY.get(locale, {}).items():
+                if inconsistent in target:
+                    raise ValueError(f'{locale}: inconsistent terminology in {key}: use {preferred}')
             translations[key] = target
         path = LANG / f'{locale}.json'
         if check:

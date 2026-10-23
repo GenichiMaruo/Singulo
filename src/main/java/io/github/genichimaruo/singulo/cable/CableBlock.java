@@ -133,7 +133,7 @@ public class CableBlock extends BaseEntityBlock {
     protected BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level,
                                      BlockPos pos, BlockPos neighborPos) {
         if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
-            cable.invalidateNetwork();
+            cable.invalidateForNeighbor(neighborPos);
         }
         return withStraight(state.setValue(CONNECTIONS.get(dir), level instanceof Level l ? connects(l, pos, dir)
                 : neighborState.getBlock() instanceof CableBlock));
@@ -143,7 +143,7 @@ public class CableBlock extends BaseEntityBlock {
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean moving) {
         // ブロックエンティティだけが変わった場合（装置の設置直後など）も接続を取り直す
         if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
-            cable.invalidateNetwork();
+            cable.invalidateForNeighbor(fromPos);
         }
         BlockState updated = state;
         for (Direction dir : Direction.values()) {
@@ -157,8 +157,9 @@ public class CableBlock extends BaseEntityBlock {
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
-        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof CableBlockEntity cable) {
-            cable.invalidateNetwork();
+        if (!state.is(newState.getBlock())) {
+            if (level.isClientSide) CableBlockEntity.clearConnectedDisplay(level,pos);
+            else if (level.getBlockEntity(pos) instanceof CableBlockEntity cable) cable.invalidateNetwork();
         }
         super.onRemove(state, level, pos, newState, moving);
     }
@@ -181,7 +182,7 @@ public class CableBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
             Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type,
-                io.github.genichimaruo.singulo.registry.SinguloBlockEntities.CABLE.get(), CableBlockEntity::serverTick);
+        // A central network publishes active display samples; individual cable blocks never tick.
+        return null;
     }
 }

@@ -1,0 +1,17 @@
+// Development-only runtime and visual harness for 0.11.0; never part of ordinary build or release JARs.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/v011-src'))
+        sourceSets.main.java.srcDir(file('tools/review/runtime-src'))
+        neoForge.runs.client {
+            gameDirectory = file('build/v011-review')
+            systemProperty 'singulo.v011Output', file('build/v011-review/screenshots').absolutePath
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+            programArgument '--width'
+            programArgument '1280'
+            programArgument '--height'
+            programArgument '800'
+        }
+    }
+}
