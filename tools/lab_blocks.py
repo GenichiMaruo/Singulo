@@ -646,6 +646,7 @@ def textures(tb, save_plain):
         name = 'lab_rayleigh_panel' if lab else 'rayleigh_panel'
         save(rayleigh_casing(lab), tb / f'{name}_side.png')
         save_plain(rayleigh_bottom(lab), tb / f'{name}_bottom.png')
+        save_plain(rayleigh_bottom(lab, True), tb / f'{name}_bottom_lit.png')
         save(rayleigh_top(lab), tb / f'{name}_top.png')
         save_plain(rayleigh_icon(lab), tb / f'{name}_sky.png')
     save(paper(), tb / 'paper_stack_top.png')
@@ -660,7 +661,6 @@ def textures(tb, save_plain):
 
 GLOW = {'block_light': 15, 'sky_light': 15}
 FACING_Y = {'north': 0, 'east': 90, 'south': 180, 'west': 270}
-        save_plain(rayleigh_bottom(lab, True), tb / f'{name}_bottom_lit.png')
 SIMPLE = ('lab_panel', 'lab_panel_lined', 'lab_tiles', 'lab_frame', 'pressure_hull', 'welded_hatch', 'bulkhead')
 
 
