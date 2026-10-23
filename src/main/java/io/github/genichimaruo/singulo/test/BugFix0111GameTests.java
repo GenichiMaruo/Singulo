@@ -114,13 +114,15 @@ public final class BugFix0111GameTests {
     @GameTest(template = EMPTY, timeoutTicks = 120)
     public static void androidsIgnoreZeroGravity(GameTestHelper helper) {
         helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
+        helper.setBlock(new BlockPos(2, 1, 4), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
+        helper.setBlock(new BlockPos(2, 1, 3), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
         android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 3, 2))));
         android.setPersistenceRequired();
         helper.getLevel().addFreshEntity(android);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(2, 3, 2));
+        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(2, 3, 4));   // 押し合わないよう、別の列に
         helper.runAtTickTime(40, () -> {
             helper.assertTrue(ZeroGravity.weightless(zombie), "ふつうの生き物が無重力にならない");
             helper.assertFalse(ZeroGravity.weightless(android), "アンドロイドまで無重力になった");
