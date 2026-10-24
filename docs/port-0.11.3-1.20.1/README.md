@@ -18,6 +18,6 @@ bash ./gradlew -Ploader=forge --no-configuration-cache -I tools/review/rayleigh.
 bash ./gradlew -Ploader=forge --no-configuration-cache -I tools/review/rejoin.gradle runClient -PwithEmbeddium
 ```
 
-必須GameTestは9群・529件、Mekanism連携は各ローダー2件。CIはさらに両ローダーの実クライアントGUIと、Embeddium / DHの光量・画像比較・同一クライアントで5回の再入場を必須とする。描画検査用のJavaソースは配布JARへ含めない。
+必須GameTestは9群・530件、Mekanism連携は各ローダー2件。CIはさらに両ローダーの実クライアントGUIと、Embeddium / DHの光量・画像比較・同一クライアントで5回の再入場を必須とする。描画検査用のJavaソースは配布JARへ含めない。
 
 成功した検証の配布JARだけを昇格し、`v0.11.3-1.20.1F` / `v0.11.3-1.20.1N` でCurseForgeへ公開する。GitHub ReleasesにJARは添付しない。

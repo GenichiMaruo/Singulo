@@ -85,6 +85,14 @@ public final class RayleighReviewHarness {
         mc.player.setYRot(180); mc.player.setXRot(48);
         mc.options.fov().set(60);
         if (++wait < 150) return;
+        // The first mesh can precede the initial skylight packet on a fresh
+        // world. Rebuild after lighting settles, then render it before capture.
+        if (wait == 150) {
+            require(phase != 1 || mc.level.getBrightness(LightLayer.SKY, SAMPLE) == 15,
+                    "Clear-noon fixture skylight has not settled");
+            mc.levelRenderer.allChanged();
+        }
+        if (wait < 230) return;
         NativeImage image = lightmap(mc);
         if (net.minecraftforge.fml.ModList.get().isLoaded("distanthorizons")) DistantHorizonsReviewHarness.verify(image);
         require(image.getWidth() == 16 && image.getHeight() == 512, "No separate local-noon lightmap rows");

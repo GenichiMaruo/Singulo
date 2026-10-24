@@ -182,13 +182,31 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
     @Override
     public net.minecraft.resources.ResourceLocation getId() { return id(); }
 
-    // The id is supplied by RecipeManager in 1.20.1. A weak identity map avoids
-    // changing recipe equality or the constructor used throughout the game tests.
-    private static final java.util.Map<MachineRecipe, net.minecraft.resources.ResourceLocation> IDS =
-            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
-    public MachineRecipe withId(net.minecraft.resources.ResourceLocation id) { IDS.put(this, id); return this; }
+    // Legacy recipes receive ids outside their constructor. Use weak *identity*
+    // keys: equal recipes from a later login must not inherit an older weak key,
+    // and mutable ingredient/stack hashes must never invalidate their ids.
+    private static final java.lang.ref.ReferenceQueue<MachineRecipe> ID_QUEUE = new java.lang.ref.ReferenceQueue<>();
+    private static final java.util.Map<RecipeKey, net.minecraft.resources.ResourceLocation> IDS = new java.util.HashMap<>();
+    private static final class RecipeKey extends java.lang.ref.WeakReference<MachineRecipe> {
+        private final int hash;
+        RecipeKey(MachineRecipe recipe) { super(recipe, ID_QUEUE); hash = System.identityHashCode(recipe); }
+        @Override public int hashCode() { return hash; }
+        @Override public boolean equals(Object other) {
+            return this == other || other instanceof RecipeKey key && get() != null && get() == key.get();
+        }
+    }
+    private static void drainIds() {
+        java.lang.ref.Reference<? extends MachineRecipe> key;
+        while ((key = ID_QUEUE.poll()) != null) IDS.remove(key);
+    }
+    public MachineRecipe withId(net.minecraft.resources.ResourceLocation id) {
+        synchronized (IDS) { drainIds(); IDS.put(new RecipeKey(this), id); }
+        return this;
+    }
     public MachineRecipe value() { return this; }
-    public net.minecraft.resources.ResourceLocation id() { return IDS.getOrDefault(this, io.github.genichimaruo.singulo.Singulo.id(station)); }
+    public net.minecraft.resources.ResourceLocation id() {
+        synchronized (IDS) { drainIds(); return IDS.getOrDefault(new RecipeKey(this), io.github.genichimaruo.singulo.Singulo.id(station)); }
+    }
 
     public static final class Serializer implements RecipeSerializer<MachineRecipe> {
         public MachineRecipe fromJson(net.minecraft.resources.ResourceLocation id, com.google.gson.JsonObject json) {
@@ -221,8 +239,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             }
             var recipe = new MachineRecipe(json.get("station").getAsString(), integer(json,"stage",1), integer(json,"time",1), integer(json,"energy",0), ingredients, fluids, mass,
                     json.has("restore") ? Optional.of(Ingredient.fromJson(json.get("restore"))) : Optional.empty(), result, outputs, integer(json,"min_size",0), integer(json,"priority",0), json.has("byproduct") ? readOutput(json.getAsJsonObject("byproduct")) : ItemStack.EMPTY);
-            IDS.put(recipe,id);
-            return recipe;
+            return recipe.withId(id);
         }
         private static ItemStack readOutput(com.google.gson.JsonObject json) {
             return new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(
@@ -237,7 +254,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             ItemStack result = buf.readItem();
             var outputs = buf.readList(FluidStack::readFromPacket);
             var recipe = new MachineRecipe(buf.readUtf(),buf.readVarInt(),buf.readVarInt(),buf.readVarInt(),ingredients,fluids,mass,restore,result,outputs,buf.readVarInt(),buf.readVarInt(),buf.readItem());
-            IDS.put(recipe,id); return recipe;
+            return recipe.withId(id);
         }
         public void toNetwork(FriendlyByteBuf buf, MachineRecipe r) {
             buf.writeCollection(r.ingredients(), (b,v) -> { v.ingredient().toNetwork(b); b.writeVarInt(v.count()); b.writeVarInt(v.uses()); });
