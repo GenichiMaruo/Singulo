@@ -25,6 +25,7 @@ public final class RayleighReviewHarness {
     private static final BlockPos SAMPLE = new BlockPos(3, 241, 3);
     private static int phase, ticks, wait;
     private static volatile boolean ready;
+    private static boolean requestedLight;
     private static int[] reference;
     private static Path output() { return Path.of(System.getProperty("singulo.rayleighOutput")); }
     private static void require(boolean condition, String message) { if (!condition) throw new AssertionError(message); }
@@ -89,6 +90,18 @@ public final class RayleighReviewHarness {
         // world. Rebuild after lighting settles, then render it before capture.
         if (wait == 150) {
             if (phase == 1 && mc.level.getBrightness(LightLayer.SKY, SAMPLE) != 15) {
+                if (!requestedLight) {
+                    requestedLight = true;
+                    mc.getSingleplayerServer().execute(() -> {
+                        var level = mc.getSingleplayerServer().overworld();
+                        var engine = level.getChunkSource().getLightEngine();
+                        var data = engine.getLayerListener(LightLayer.SKY).getDataLayerData(net.minecraft.core.SectionPos.of(SAMPLE));
+                        Singulo.LOGGER.info("RAYLEIGH_FIXTURE server native data={}", data == null ? "null" : data.get(3, 1, 3));
+                        level.getServer().getPlayerList().getPlayers().get(0).connection.send(
+                                new net.minecraft.network.protocol.game.ClientboundLightUpdatePacket(
+                                        new net.minecraft.world.level.ChunkPos(SAMPLE), engine, null, null));
+                    });
+                }
                 if (ticks % 100 == 0) {
                     Singulo.LOGGER.info("RAYLEIGH_FIXTURE client sky={} open={} dimensionSky={} roof={}",
                             mc.level.getBrightness(LightLayer.SKY, SAMPLE), mc.level.canSeeSky(SAMPLE),
