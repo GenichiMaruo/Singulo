@@ -27,6 +27,7 @@
     "SodiumRayleighPipelineMixin",
     "SodiumRayleighVertexMixin",
     "SodiumRayleighColorMixin",
-    "SodiumRayleighShaderMixin"
+    "SodiumRayleighShaderMixin",
+    "DistantHorizonsLightmapMixin"
   ]
 }

@@ -104,15 +104,16 @@ jobs:
           bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PtestNamespace=singulo_rayleigh
           python3 tools/review/prepare_rayleigh.py
           python3 -m pip install Pillow==13.0.0
-      - name: Compare real Sodium sunlight against clear noon
+      - name: Compare real Sodium and DH sunlight against clear noon
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
           ALSOFT_DRIVERS: 'null'
         run: |
-          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rayleigh.gradle runClient -PwithSodium
+          xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/rayleigh.gradle runClient -PwithSodium -PwithDistantHorizons
           grep -q 'SINGULO_SODIUM_NOON_VERTEX_COMPLETE 241' build/rayleigh-review/logs/latest.log
           grep -q 'SINGULO_SODIUM_NOON_EMISSIVE_COMPLETE' build/rayleigh-review/logs/latest.log
           grep -q 'SINGULO_RAYLEIGH_COMPLETE 256 4' build/rayleigh-review/logs/latest.log
+          test "$(grep -c 'SINGULO_DH_LIGHTMAP_COMPLETE 256' build/rayleigh-review/logs/latest.log)" -eq 4
           grep -Fq "Resource pack 'mod/singulo' indicates the following shaders should be ignored: light.glsl" build/rayleigh-review/logs/latest.log
           if grep -q 'Resource pack: mod/singulo' build/rayleigh-review/logs/latest.log; then
             echo 'Singulo still triggers the Sodium shader compatibility warning'

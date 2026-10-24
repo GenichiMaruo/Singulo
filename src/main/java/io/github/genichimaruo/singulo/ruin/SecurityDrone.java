@@ -184,7 +184,7 @@ public class SecurityDrone extends Monster {
     void shoot(LivingEntity target) {
         int t = tier() - 1;
         Vec3 from = position().add(0, getBbHeight() * 0.35, 0).add(getLookAngle().scale(0.5));
-        HorizonBolt bolt = new HorizonBolt(level(), this).style(COLORS[t], 0.55F, BOLT_DAMAGE[t]);
+        HorizonBolt bolt = new HorizonBolt(level(), this).style(COLORS[t], 0.55F, BOLT_DAMAGE[t]).armored(true);
         if (tier() == 3) {
             bolt.homing(target);
         }

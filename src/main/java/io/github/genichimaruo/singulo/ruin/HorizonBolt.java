@@ -20,7 +20,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * 光弾（ホライズン・ウォーデンと警備ドローンが撃つ）。重力を受けずにまっすぐ飛び、当たった相手に魔法ダメージを与える。
+ * 光弾（ホライズン・ウォーデンと警備ドローンが撃つ）。重力を受けずに飛ぶ。既定は魔法ダメージ、ドローンの弾は防具で減る飛び道具。
  * 追いかける光弾は、狙った相手へゆるく曲がる。見た目は光る球（色と大きさは撃った側が決める、専用の描画）。
  */
 public class HorizonBolt extends ThrowableItemProjectile {
