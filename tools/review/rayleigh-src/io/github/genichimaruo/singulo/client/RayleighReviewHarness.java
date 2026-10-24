@@ -68,6 +68,9 @@ public final class RayleighReviewHarness {
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null || mc.getOverlay() != null) return;
         if (phase == 0) {
+            if (net.minecraftforge.fml.ModList.get().isLoaded("embeddium")) {
+                Class.forName("io.github.genichimaruo.singulo.client.SodiumNoonReviewHarness").getMethod("verify").invoke(null);
+            }
             Files.createDirectories(output()); phase = 1;
             mc.getSingleplayerServer().execute(() -> prepare(mc.getSingleplayerServer().overworld())); return;
         }
@@ -83,6 +86,7 @@ public final class RayleighReviewHarness {
         mc.options.fov().set(60);
         if (++wait < 150) return;
         NativeImage image = lightmap(mc);
+        if (net.minecraftforge.fml.ModList.get().isLoaded("distanthorizons")) DistantHorizonsReviewHarness.verify(image);
         require(image.getWidth() == 16 && image.getHeight() == 512, "No separate local-noon lightmap rows");
         if (phase == 1) {
             require(mc.level.getSkyDarken(1) == 1, "Reference is not clear noon: " + mc.level.getSkyDarken(1));
@@ -100,6 +104,10 @@ public final class RayleighReviewHarness {
                 level.setRainLevel(1); level.setThunderLevel(1); level.updateSkyBrightness(); ready = true;
             });
         } else if (phase == 2) {
+            if (net.minecraftforge.fml.ModList.get().isLoaded("embeddium")) {
+                Class.forName("io.github.genichimaruo.singulo.client.SodiumNoonReviewHarness")
+                        .getMethod("verifyEmissive", RayleighSky.LightSnapshot.class).invoke(null, RayleighSky.snapshot(mc.level));
+            }
             require(mc.level.getDayTime() == 18000, "Time update not received");
             for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) require(image.getPixelRGBA(x, y * 16) == reference[y * 16 + x], "Night/weather changed local-noon colors");
             require(image.getPixelRGBA(0, 15) != reference[240], "Outside world also became noon");

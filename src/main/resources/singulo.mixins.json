@@ -23,7 +23,13 @@
     "RayleighAmbientLightMixin",
     "RayleighSmoothLightMixin",
     "RayleighFluidLightMixin",
-    "RayleighQuadLightMixin"
+    "RayleighQuadLightMixin",
+    "SodiumRayleighSliceMixin",
+    "SodiumRayleighPipelineMixin",
+    "SodiumRayleighVertexMixin",
+    "SodiumRayleighColorMixin",
+    "SodiumRayleighShaderMixin",
+    "DistantHorizonsLightmapMixin"
   ],
   "refmap": "singulo.refmap.json"
 }

@@ -100,16 +100,92 @@ public final class RuinGameTests {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         helper.setBlock(POS, SinguloBlocks.RUIN_GUARD_DOCK.get());
         GuardDockBlockEntity dock = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
-        dock.setTier(2);
-        dock.launch(helper.getLevel());
-        List<SecurityDrone> drones = helper.getLevel().getEntitiesOfClass(SecurityDrone.class,
-                new AABB(helper.absolutePos(POS)).inflate(4));
-        helper.assertTrue(drones.size() == 3, "段階2のドックは3機出撃する: " + drones.size());
-        for (SecurityDrone d : drones) {
-            helper.assertTrue(d.tier() == 2 && d.getMaxHealth() == 14, "段階2のドローンはHP14");
-            helper.assertTrue(d.isNoGravity(), "ドローンが飛んでいない");
+        for (int tier = 1; tier <= 3; tier++) {
+            dock.setTier(tier);
+            dock.launch(helper.getLevel());
+            List<SecurityDrone> drones = helper.getLevel().getEntitiesOfClass(SecurityDrone.class,
+                    new AABB(helper.absolutePos(POS)).inflate(4));
+            helper.assertTrue(drones.size() == (tier == 1 ? 2 : 3), "ドック1個の出撃数が2〜3機ではない: " + drones.size());
+            for (SecurityDrone d : drones) {
+                helper.assertTrue(d.tier() == tier && d.getMaxHealth() == (tier == 1 ? 6 : tier == 2 ? 14 : 24), "段階と体力が不一致");
+                helper.assertTrue(d.isNoGravity(), "ドローンが飛んでいない");
+                d.discard();
+            }
         }
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void droneBoltsAreReducedByArmor(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above());
+        var bare = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS.east(2));
+        var armored = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS.west(2));
+        armored.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).setBaseValue(20);
+        armored.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS).setBaseValue(8);
+        bare.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).setBaseValue(0);
+        drone.setTier(3);
+        var shoot = SecurityDrone.class.getDeclaredMethod("shoot", net.minecraft.world.entity.LivingEntity.class);
+        shoot.setAccessible(true); shoot.invoke(drone, bare);
+        var bolts = helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.HorizonBolt.class,
+                drone.getBoundingBox().inflate(3), bolt -> bolt.getOwner() == drone);
+        helper.assertTrue(bolts.size() == 1 && bolts.get(0).armored(), "実際のドローン光弾が防具を無視する");
+        var hit = io.github.genichimaruo.singulo.ruin.HorizonBolt.class.getDeclaredMethod("onHitEntity", net.minecraft.world.phys.EntityHitResult.class);
+        hit.setAccessible(true);
+        var movement = new net.minecraft.world.phys.Vec3(0.1, 0.2, -0.15);
+        bare.setDeltaMovement(movement); armored.setDeltaMovement(movement);
+        float beforeBare = bare.getHealth(), beforeArmored = armored.getHealth();
+        hit.invoke(bolts.get(0), new net.minecraft.world.phys.EntityHitResult(bare));
+        hit.invoke(bolts.get(0), new net.minecraft.world.phys.EntityHitResult(armored));
+        helper.assertTrue(beforeBare - bare.getHealth() > 0 && beforeArmored - armored.getHealth() < (beforeBare - bare.getHealth()) / 2,
+                "防具がドローン光弾を十分に軽減しない");
+        helper.assertTrue(bare.getDeltaMovement().equals(movement) && armored.getDeltaMovement().equals(movement), "ドローン光弾が移動速度を変えた");
+        bolts.forEach(net.minecraft.world.entity.Entity::discard); drone.discard(); bare.discard(); armored.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY, timeoutTicks = 160)
+    public static void healthyDroneDescendsAndCannotShootFromHighAbove(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 12, 3));
+        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS);
+        target.setNoAi(true); target.setNoGravity(true);
+        target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);
+        target.setHealth(1000); drone.setTarget(target);
+        var shoot = SecurityDrone.class.getDeclaredMethod("shoot", net.minecraft.world.entity.LivingEntity.class);
+        shoot.setAccessible(true); shoot.invoke(drone, target);
+        helper.assertTrue(helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.HorizonBolt.class,
+                drone.getBoundingBox().inflate(3), bolt -> bolt.getOwner() == drone).isEmpty(), "高空から射撃できてしまう");
+        helper.runAtTickTime(120, () -> {
+            helper.assertFalse(drone.crippled(), "高度検査中に壊れかけになった");
+            helper.assertTrue(drone.getY() <= target.getY() + 2.8, "健康なドローンが高空に留まる: " + (drone.getY() - target.getY()));
+            drone.discard(); target.discard(); helper.succeed();
+        });
+    }
+
+    @GameTest(template = EMPTY)
+    public static void droneRamAndPulsePreserveVictimMovement(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above()); drone.setTier(3);
+        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS.east());
+        var movement = new net.minecraft.world.phys.Vec3(0.13, 0.21, -0.17);
+        target.setDeltaMovement(movement); drone.setTarget(target);
+        var setState = SecurityDrone.class.getDeclaredMethod("setState", int.class); setState.setAccessible(true);
+        setState.invoke(drone, SecurityDrone.STATE_RAM);
+        Class<?> goalType = java.util.Arrays.stream(SecurityDrone.class.getDeclaredClasses()).filter(c -> c.getSimpleName().equals("CombatGoal")).findFirst().orElseThrow();
+        var constructor = goalType.getDeclaredConstructor(SecurityDrone.class); constructor.setAccessible(true);
+        var tick = goalType.getDeclaredMethod("tick"); tick.setAccessible(true);
+        float before = target.getHealth(); tick.invoke(constructor.newInstance(drone));
+        helper.assertTrue(target.getHealth() < before && target.getDeltaMovement().equals(movement), "突進でダメージがないか、吹き飛ばされた");
+        target.invulnerableTime = 0;
+        var pulse = SecurityDrone.class.getDeclaredMethod("pulse", net.minecraft.server.level.ServerLevel.class); pulse.setAccessible(true);
+        before = target.getHealth(); pulse.invoke(drone, helper.getLevel());
+        helper.assertTrue(target.getHealth() < before && target.getDeltaMovement().equals(movement), "パルスでダメージがないか、吹き飛ばされた");
+        helper.assertTrue(target.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN), "パルスの鈍足まで失われた");
+        target.invulnerableTime = 0;
+        target.hurt(helper.getLevel().damageSources().mobAttack(target), 1);
+        helper.assertFalse(target.getDeltaMovement().equals(movement), "他の攻撃のノックバックまで無効化された");
+        drone.discard(); target.discard(); helper.succeed();
     }
 
     /** 体力が半分を切ったドローンは壊れかけになり、地面から1.5ブロックより上へは飛べない（高い所にいれば沈む）。 */

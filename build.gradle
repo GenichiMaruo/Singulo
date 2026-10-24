@@ -82,6 +82,7 @@ configurations {
 }
 
 repositories {
+    maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
     // JEI（レシピの表示）
     maven {
         name = 'BlameJared'
@@ -96,6 +97,7 @@ repositories {
 repositories { maven { url = "https://modmaven.dev/"; content { includeGroup "mekanism" } } }
 
 dependencies {
+    modCompileOnly('maven.modrinth:embeddium:UTbfe5d1') { transitive = false }
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
     if (providers.gradleProperty("withMekanism").isPresent()) { modRuntimeOnly "mekanism:Mekanism:${mekanism_version}" }
     // JEI は任意の連携。API だけでコンパイルし、開発中の起動では本体も入れる
@@ -172,8 +174,8 @@ var verifyGameTestResults = tasks.register('verifyGameTestResults') {
             throw new GradleException('GameTestServer did not report a successful nonempty test run; inspect build/<loader>/gametest/logs/latest.log')
         }
         def namespace = selectedGameTestNamespace
-        def expected = ['singulo': 348, 'singulo_automation': 75, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 28, 'singulo_cable': 16, 'singulo_rayleigh': 8, 'singulo_panel_review': 6, 'singulo_mekanism': 2][namespace]
-        if (namespace == 'singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review') expected = 525
+        def expected = ['singulo': 351, 'singulo_automation': 75, 'singulo_reactor': 21, 'singulo_prototype': 10, 'singulo_progression': 13, 'singulo_lab': 28, 'singulo_cable': 16, 'singulo_rayleigh': 9, 'singulo_panel_review': 6, 'singulo_mekanism': 2][namespace]
+        if (namespace == 'singulo,singulo_automation,singulo_reactor,singulo_prototype,singulo_progression,singulo_lab,singulo_cable,singulo_rayleigh,singulo_panel_review') expected = 529
         if (expected != null && result.group(1).toInteger() != expected) {
             throw new GradleException("Expected ${expected} required tests for ${namespace}, found ${result.group(1)}")
         }

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-manifest = json.loads((ROOT / 'docs/port-0.11.1-1.20.1/recipe-parity.json').read_text())
+manifest = json.loads((ROOT / 'docs/port-0.11.3-1.20.1/recipe-parity.json').read_text())
 root = ROOT / 'src/generated/resources/data/singulo/recipes'
 actual = {}
 for path in root.rglob('*.json'):

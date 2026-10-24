@@ -15,6 +15,9 @@ for target in (root / 'saves/Review', root / 'screenshots'):
     if target.exists():
         shutil.rmtree(target)
 shutil.copytree(source, root / 'saves/Review')
+for name in ('region', 'entities', 'poi', 'DIM-1', 'DIM1'):
+    shutil.rmtree(root / 'saves/Review' / name, ignore_errors=True)
+(root / 'saves/Review/data/forcedchunks.dat').unlink(missing_ok=True)
 (root / 'options.txt').write_text(
     'lang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:4\nsimulationDistance:5\npauseOnLostFocus:false\nonboardAccessibility:false\n',
     encoding='utf-8')

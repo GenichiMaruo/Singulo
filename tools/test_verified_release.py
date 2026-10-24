@@ -13,7 +13,7 @@ class UnifiedReleaseTests(unittest.TestCase):
         self.repo = 'owner/repo'
         jobs = [f'build-and-gametest ({loader}, {ns})'
                 for loader in ('forge', 'neoforge') for ns in release.GROUPS]
-        jobs += ['optional-mekanism (forge)', 'optional-mekanism (neoforge)']
+        jobs += ['optional-mekanism (forge)', 'optional-mekanism (neoforge)', 'renderer-lighting (forge)', 'renderer-lighting (neoforge)']
         self.responses = {
             'actions/runs/1': {'conclusion': 'success', 'status': 'completed',
                               'event': 'pull_request', 'path': '.github/workflows/pr-validation.yml',

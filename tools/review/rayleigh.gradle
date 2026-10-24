@@ -2,6 +2,15 @@
 allprojects {
     afterEvaluate {
         sourceSets.main.java.srcDir(file('tools/review/rayleigh-src'))
+        if (providers.gradleProperty('withEmbeddium').isPresent()) {
+            dependencies.add('modRuntimeOnly', 'maven.modrinth:embeddium:UTbfe5d1') { transitive = false }
+        }
+        if (providers.gradleProperty('withDistantHorizons').isPresent()) {
+            dependencies.add('modRuntimeOnly', 'maven.modrinth:distanthorizons:6UnEfsRQ') { transitive = false }
+        }
+        if (providers.gradleProperty('rendererModsDir').isPresent()) {
+            dependencies.add('modRuntimeOnly', fileTree(providers.gradleProperty('rendererModsDir').get()) { include '*.jar' })
+        }
         legacyForge.runs.client {
             gameDirectory = layout.buildDirectory.dir('rayleigh-review').get().asFile
             systemProperty 'singulo.rayleighOutput', layout.buildDirectory.dir('rayleigh-review/screenshots').get().asFile.absolutePath
