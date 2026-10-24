@@ -43,9 +43,8 @@ public class WormholeStabilizerScreen extends AbstractContainerScreen<WormholeSt
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (Panel.inside(mouseX, mouseY, leftPos + BAR_X - 1, topPos + BAR_Y - 1, 8, BAR_H + 2)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.energy",
-                    String.format("%,d", menu.value(WormholeStabilizerMenu.D_ENERGY)),
-                    String.format("%,d", menu.value(WormholeStabilizerMenu.D_CAPACITY))), mouseX, mouseY);
+            g.renderComponentTooltip(font, Panel.energyLines(menu.value(WormholeStabilizerMenu.D_ENERGY),
+                    menu.value(WormholeStabilizerMenu.D_CAPACITY)), mouseX, mouseY);
         }
     }
 

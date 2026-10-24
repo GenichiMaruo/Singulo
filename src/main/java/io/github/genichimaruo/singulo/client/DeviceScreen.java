@@ -147,18 +147,9 @@ public class DeviceScreen extends AbstractContainerScreen<DeviceMenu> {
         return n == io.github.genichimaruo.singulo.wormhole.WormholeMouthBlockEntity.UNLIMITED ? "∞" : power(n);
     }
 
-    /** 大きな電力（FE/t）を読みやすく（k・M・G）。 */
+    /** 大きな電力（FE/t）を読みやすく（K・M・G。Shift で正確な値）。 */
     private static String power(long fe) {
-        if (fe >= 1_000_000_000L) {
-            return String.format("%.2f G", fe / 1e9);
-        }
-        if (fe >= 1_000_000L) {
-            return String.format("%.1f M", fe / 1e6);
-        }
-        if (fe >= 1_000L) {
-            return String.format("%.1f k", fe / 1e3);
-        }
-        return String.valueOf(fe);
+        return io.github.genichimaruo.singulo.energy.EnergyText.of(fe);
     }
 
     // ------------------------------------------------------------------ 宇宙の配色の部品

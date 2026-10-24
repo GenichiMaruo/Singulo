@@ -159,8 +159,11 @@ public class NeutrinoScannerItem extends SinguloItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        tooltip.add(Component.translatable("tooltip.singulo.energy", energy(stack).getEnergyStored(), CAPACITY)
+        tooltip.add(Component.translatable("tooltip.singulo.energy", io.github.genichimaruo.singulo.energy.EnergyText.of(energy(stack).getEnergyStored()), io.github.genichimaruo.singulo.energy.EnergyText.of(CAPACITY))
                 .withStyle(ChatFormatting.GRAY));
+        if (io.github.genichimaruo.singulo.energy.EnergyText.abbreviated(CAPACITY)) {
+            tooltip.add(io.github.genichimaruo.singulo.energy.EnergyText.hint());
+        }
         tooltip.add(Component.translatable("tooltip.singulo.scanner_tier", tier(stack), MAX_TIER).withStyle(ChatFormatting.GRAY));
     }
 }

@@ -32,9 +32,8 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
                     mouseX, mouseY);
         }
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + 17, 8, 52)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.energy",
-                    menu.value(CatalystDeviceBlockEntity.D_ENERGY), menu.value(CatalystDeviceBlockEntity.D_CAPACITY)),
-                    mouseX, mouseY);
+            g.renderComponentTooltip(font, Panel.energyLines(menu.value(CatalystDeviceBlockEntity.D_ENERGY),
+                    menu.value(CatalystDeviceBlockEntity.D_CAPACITY)), mouseX, mouseY);
         }
     }
 
@@ -161,9 +160,9 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
                         out.add(Component.translatable("gui.singulo.device.exotic", menu.value(CatalystDeviceBlockEntity.D_EXTRA)));
                     }
                     case INERTIAL_STABILIZER -> out.add(Component.translatable("gui.singulo.device.radius_blocks", value));
-                    case QUANTUM_HEAT_ENGINE -> out.add(Component.translatable("gui.singulo.device.output", value));
+                    case QUANTUM_HEAT_ENGINE -> out.add(Component.translatable("gui.singulo.device.output", io.github.genichimaruo.singulo.energy.EnergyText.of(value)));
                     case DEGENERATE_FURNACE -> {
-                        out.add(Component.translatable("gui.singulo.device.output", value));
+                        out.add(Component.translatable("gui.singulo.device.output", io.github.genichimaruo.singulo.energy.EnergyText.of(value)));
                         out.add(Component.translatable("gui.singulo.device.fuel", menu.value(CatalystDeviceBlockEntity.D_EXTRA)));
                     }
                     case PROBE_STATION -> {
@@ -173,7 +172,7 @@ public class CatalystDeviceScreen extends AbstractContainerScreen<CatalystDevice
                 }
                 int usage = menu.value(CatalystDeviceBlockEntity.D_USAGE);
                 if (usage > 0) {
-                    out.add(Component.translatable("gui.singulo.device.usage", usage));
+                    out.add(Component.translatable("gui.singulo.device.usage", io.github.genichimaruo.singulo.energy.EnergyText.of(usage)));
                 }
                 out.add(Component.translatable("gui.singulo.catalyst.effect",
                         menu.value(CatalystDeviceBlockEntity.D_SPEED_X100) / 100.0,

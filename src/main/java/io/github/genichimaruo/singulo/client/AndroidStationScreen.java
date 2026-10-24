@@ -68,8 +68,8 @@ public class AndroidStationScreen extends AbstractContainerScreen<AndroidStation
             return;                                      // 経路のページでは、様子・動き方の段は出していない
         }
         if (Panel.inside(mouseX, mouseY, leftPos + BAR_X, topPos + 18, 10, 104)) {
-            g.renderTooltip(font, Component.literal(menu.value(AndroidStationBlockEntity.D_ENERGY) + " / "
-                    + menu.value(AndroidStationBlockEntity.D_CAPACITY) + " FE"), mouseX, mouseY);
+            g.renderComponentTooltip(font, Panel.energyLines(menu.value(AndroidStationBlockEntity.D_ENERGY),
+                    menu.value(AndroidStationBlockEntity.D_CAPACITY)), mouseX, mouseY);
         }
         for (int i = 0; i < MODES; i++) {
             if (Panel.inside(mouseX, mouseY, modeX(i), topPos + MODE_Y, MODE_W, 16)) {

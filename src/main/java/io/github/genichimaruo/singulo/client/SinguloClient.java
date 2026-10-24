@@ -288,6 +288,8 @@ public final class SinguloClient {
 
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+        // 電力の数: Shift を押している間は正確な値
+        io.github.genichimaruo.singulo.energy.EnergyText.detail = net.minecraft.client.gui.screens.Screen::hasShiftDown;
         // 作業位置カード: 記録済みなら絵を切り替える
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),

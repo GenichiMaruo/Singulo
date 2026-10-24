@@ -94,7 +94,10 @@ public class AndroidChargerItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         int stored = energy(stack).getEnergyStored();
-        tooltip.add(Component.translatable("tooltip.singulo.energy", stored, CAPACITY).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.singulo.energy", io.github.genichimaruo.singulo.energy.EnergyText.of(stored), io.github.genichimaruo.singulo.energy.EnergyText.of(CAPACITY)).withStyle(ChatFormatting.GRAY));
+        if (io.github.genichimaruo.singulo.energy.EnergyText.abbreviated(CAPACITY)) {
+            tooltip.add(io.github.genichimaruo.singulo.energy.EnergyText.hint());
+        }
         tooltip.add(Component.translatable("tooltip.singulo.android_charger.charges", stored / PER_ANDROID).withStyle(ChatFormatting.AQUA));
     }
 }

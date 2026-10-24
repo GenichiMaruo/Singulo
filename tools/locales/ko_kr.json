@@ -5048,8 +5048,8 @@
     "translation": "출력 슬롯이나 탱크가 가득 찼습니다. 꺼내거나 면 설정에서 자동 배출을 켜세요."
   },
   "gui.singulo.reason.select_hint": {
-    "source": "Pick what to make with the button below the output.",
-    "translation": "출력 아래 버튼으로 만들 것을 지정하세요"
+    "source": "Pick what to make with the button next to the output.",
+    "translation": "출력 옆 버튼으로 만들 것을 지정하세요"
   },
   "gui.singulo.reason.too_small": {
     "source": "- Needs size %s or more (now %s)",
@@ -5383,6 +5383,14 @@
     "source": "- Restores: %s",
     "translation": "・복원할 물건: %s"
   },
+  "gui.singulo.select.rows_less": {
+    "source": "Show fewer rows",
+    "translation": "표시할 줄 줄이기"
+  },
+  "gui.singulo.select.rows_more": {
+    "source": "Show more rows",
+    "translation": "표시할 줄 늘리기"
+  },
   "gui.singulo.select.title": {
     "source": "Make",
     "translation": "만들 것"
@@ -5410,6 +5418,10 @@
   "gui.singulo.shield.permit_on": {
     "source": "Permit: only %s players may build inside",
     "translation": "허가증: %s명만 내부에서 작업할 수 있음"
+  },
+  "gui.singulo.shift_detail": {
+    "source": "Shift: exact values",
+    "translation": "Shift: 정확한 값"
   },
   "gui.singulo.sides.adjacent": {
     "source": "Adjacent block: %s",

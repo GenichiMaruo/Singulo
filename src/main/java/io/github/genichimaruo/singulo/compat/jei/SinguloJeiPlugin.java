@@ -49,6 +49,19 @@ public class SinguloJeiPlugin implements IModPlugin {
         return t.isMultiblock() ? SinguloBlocks.CONTROLLERS.get(t).get() : SinguloBlocks.MACHINES.get(t).get();
     }
 
+    /** 枠の外の右レールに JEI の一覧が重ならないようにする。 */
+    @Override
+    public void registerGuiHandlers(mezz.jei.api.registration.IGuiHandlerRegistration registration) {
+        registration.addGenericGuiContainerHandler(io.github.genichimaruo.singulo.client.FramedScreen.class,
+                new mezz.jei.api.gui.handlers.IGuiContainerHandler<io.github.genichimaruo.singulo.client.FramedScreen<?>>() {
+                    @Override
+                    public java.util.List<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(
+                            io.github.genichimaruo.singulo.client.FramedScreen<?> screen) {
+                        return screen.extraAreas();
+                    }
+                });
+    }
+
     /** 作業指令台の記録のページへ、作業台のレシピを「+」で置く。 */
     @Override
     public void registerRecipeTransferHandlers(mezz.jei.api.registration.IRecipeTransferRegistration registration) {

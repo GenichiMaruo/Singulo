@@ -5048,8 +5048,8 @@
     "translation": "输出槽或输出储罐已满。请取出物品，或在面设置中开启自动输出。"
   },
   "gui.singulo.reason.select_hint": {
-    "source": "Pick what to make with the button below the output.",
-    "translation": "请用输出栏下方的按钮指定要制作的物品"
+    "source": "Pick what to make with the button next to the output.",
+    "translation": "请用输出栏旁边的按钮指定要制作的物品"
   },
   "gui.singulo.reason.too_small": {
     "source": "- Needs size %s or more (now %s)",
@@ -5383,6 +5383,14 @@
     "source": "- Restores: %s",
     "translation": "・修复对象：%s"
   },
+  "gui.singulo.select.rows_less": {
+    "source": "Show fewer rows",
+    "translation": "显示更少行"
+  },
+  "gui.singulo.select.rows_more": {
+    "source": "Show more rows",
+    "translation": "显示更多行"
+  },
   "gui.singulo.select.title": {
     "source": "Make",
     "translation": "制作目标"
@@ -5410,6 +5418,10 @@
   "gui.singulo.shield.permit_on": {
     "source": "Permit: only %s players may build inside",
     "translation": "许可证：只有 %s 名玩家可在内部建造"
+  },
+  "gui.singulo.shift_detail": {
+    "source": "Shift: exact values",
+    "translation": "Shift：精确数值"
   },
   "gui.singulo.sides.adjacent": {
     "source": "Adjacent block: %s",

@@ -123,20 +123,23 @@ public final class MachineGuiReviewHarness {
                 var entries = io.github.genichimaruo.singulo.machine.RecipeSelection.selectable(mc.level, type);
                 if (screen % 3 == 0) {
                     value(data, MachineBlockEntity.D_SELECTED, entries.size());
-                    hover(mc, menu.layout.width, menu.layout.outputX + 8, 64);
+                    hover(mc, menu.layout.width, menu.layout.selectX + 8, menu.layout.selectY + 8);
                 } else {
-                    var open = MachineScreen.class.getDeclaredField("selectorOpen");
+                    var open = MachineScreen.class.getDeclaredField("selector");
                     open.setAccessible(true);
-                    open.setBoolean(gui, true);
+                    ((Popup) open.get(gui)).open = true;
                     var scroll = MachineScreen.class.getDeclaredField("selectorScroll");
                     scroll.setAccessible(true);
                     scroll.setInt(gui, screen % 3 == 2 ? Math.max(0, (entries.size() + 9) / 9 - 3) : 0);
                 }
             }
             if (SIDES) {
-                var open = MachineScreen.class.getDeclaredField("sidesOpen");
+                var open = MachineScreen.class.getDeclaredField("sides");
                 open.setAccessible(true);
-                open.setBoolean(gui, true);
+                ((Popup) open.get(gui)).open = true;
+                var layout = MachineScreen.class.getDeclaredMethod("layoutPopups");
+                layout.setAccessible(true);
+                layout.invoke(gui);
                 var quads = MachineScreen.class.getDeclaredMethod("cubeQuads");
                 quads.setAccessible(true);
                 @SuppressWarnings("unchecked") var faces = (java.util.List<SideCube.Quad>) quads.invoke(gui);
@@ -149,6 +152,7 @@ public final class MachineGuiReviewHarness {
             int titleWidth = mc.font.width(title), statusWidth = mc.font.width(Component.translatable("gui.singulo.status.no_power"));
             metrics.add(LANGUAGES[language] + "\t" + type.id() + "\t" + titleWidth + "\t" + statusWidth + "\t" + menu.layout.width);
             for (var slot : menu.slots) {
+                if (slot.x == menu.layout.upgradeX && slot.y == menu.layout.upgradeY) continue;   // 右レールの強化の段
                 if (slot.x < 1 || slot.x + 16 >= menu.layout.width || slot.y < 16 || slot.y + 16 > MachineLayout.HEIGHT - 4)
                     throw new IllegalStateException("Slot outside panel: " + type + " " + slot.x + "," + slot.y);
             }

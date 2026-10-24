@@ -31,8 +31,8 @@ public class GeneratorSlotsScreen extends AbstractContainerScreen<GeneratorSlots
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + 17, 8, BAR_H)) {
-            Panel.tooltip(g, font, java.util.List.of(Component.translatable("gui.singulo.energy",
-                    menu.value(GeneratorSlotsMenu.D_ENERGY), menu.value(GeneratorSlotsMenu.D_CAPACITY))), 160, mouseX, mouseY);
+            Panel.tooltip(g, font, Panel.energyLines(menu.value(GeneratorSlotsMenu.D_ENERGY), menu.value(GeneratorSlotsMenu.D_CAPACITY)),
+                    160, mouseX, mouseY);
         }
         var in = menu.getSlot(0);
         if (!in.hasItem() && menu.getCarried().isEmpty()
@@ -83,7 +83,7 @@ public class GeneratorSlotsScreen extends AbstractContainerScreen<GeneratorSlots
                     : Component.translatable("gui.singulo.generator_slots.catalyst", left / 10), x, y, w, left < 0 ? WARN : 0xFF8A5AD0);
             AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.generator_slots.water", fluid, cap), x, y + 11, w, BLUE);
         }
-        AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.energy_rate", String.format("%.1f", rate)), x, y + 33, w, Panel.TEXT);
+        AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(rate)), x, y + 33, w, Panel.TEXT);
         if (menu.value(GeneratorSlotsMenu.D_STANDBY) != 0) {
             AndroidStationScreen.fit(g, font, Component.translatable("gui.singulo.generator_slots.standby"), x, y + 44, w, 0xFF8A949E);
         }

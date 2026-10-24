@@ -195,7 +195,7 @@ public class PenroseReactorScreen extends AbstractContainerScreen<PenroseReactor
                     String.format("%.3f", menu.value(PenroseReactorBlockEntity.D_SPIN_X1000) / 1000.0), target));
             out.add(Component.translatable("gui.singulo.reactor.eta",
                     String.format("%.1f", menu.value(PenroseReactorBlockEntity.D_ETA_X10000) / 100.0)));
-            out.add(Component.translatable("gui.singulo.reactor.output", String.format("%,d", menu.output())));
+            out.add(Component.translatable("gui.singulo.reactor.output", io.github.genichimaruo.singulo.energy.EnergyText.of(menu.output())));
         } else {
             out.add(Component.translatable("gui.singulo.reactor.spin", "-", target));
         }

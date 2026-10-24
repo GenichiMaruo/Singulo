@@ -18,8 +18,7 @@ public class ThermoelectricGeneratorScreen extends AbstractContainerScreen<Therm
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
         if (Panel.inside(mouseX, mouseY, leftPos + 8, topPos + 17, 8, 62)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.energy",
-                    menu.value(ThermoelectricGeneratorBlockEntity.D_ENERGY),
+            g.renderComponentTooltip(font, Panel.energyLines(menu.value(ThermoelectricGeneratorBlockEntity.D_ENERGY),
                     menu.value(ThermoelectricGeneratorBlockEntity.D_CAPACITY)), mouseX, mouseY);
         }
     }
@@ -48,7 +47,7 @@ public class ThermoelectricGeneratorScreen extends AbstractContainerScreen<Therm
         g.drawString(font, Component.translatable("gui.singulo.thermo.delta", Math.max(0, hot - cold)), x, y + 22,
                 Panel.TEXT, false);
         double rate = menu.value(ThermoelectricGeneratorBlockEntity.D_RATE_X100) / 100.0;
-        g.drawString(font, Component.translatable("gui.singulo.energy_rate", String.format("%.1f", rate)), x, y + 33,
+        g.drawString(font, Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(rate)), x, y + 33,
                 Panel.TEXT, false);
         int coolant = menu.value(ThermoelectricGeneratorBlockEntity.D_FLUID);
         if (coolant >= 0) {
