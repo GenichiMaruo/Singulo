@@ -29,3 +29,8 @@ for name in ("region", "entities", "poi", "DIM-1", "DIM1"):
     "tutorialStep:none\nlang:ja_jp\nguiScale:2\nmaxFps:30\nrenderDistance:2\nsimulationDistance:5\npauseOnLostFocus:false\n",
     encoding="utf-8",
 )
+
+# Forge's optional early OpenGL window has a short initialization timeout that
+# can expire under software-rendered CI. The actual game window remains tested.
+(root / 'config').mkdir(exist_ok=True)
+(root / 'config/fml.toml').write_text('earlyWindowControl = false\n', encoding='utf-8')
