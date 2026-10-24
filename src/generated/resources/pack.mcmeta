@@ -2,5 +2,10 @@
   "pack": {
     "description": "Singulo generated resources",
     "pack_format": 34
+  },
+  "sodium": {
+    "ignored_shaders": [
+      "light.glsl"
+    ]
   }
 }

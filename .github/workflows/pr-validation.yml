@@ -113,6 +113,11 @@ jobs:
           grep -q 'SINGULO_SODIUM_NOON_VERTEX_COMPLETE 241' build/rayleigh-review/logs/latest.log
           grep -q 'SINGULO_SODIUM_NOON_EMISSIVE_COMPLETE' build/rayleigh-review/logs/latest.log
           grep -q 'SINGULO_RAYLEIGH_COMPLETE 256 4' build/rayleigh-review/logs/latest.log
+          grep -Fq "Resource pack 'mod/singulo' indicates the following shaders should be ignored: light.glsl" build/rayleigh-review/logs/latest.log
+          if grep -q 'Resource pack: mod/singulo' build/rayleigh-review/logs/latest.log; then
+            echo 'Singulo still triggers the Sodium shader compatibility warning'
+            exit 1
+          fi
           python3 tools/review/check_rayleigh_png.py build/rayleigh-review/screenshots
       - name: Save Sodium lighting evidence
         if: always()
