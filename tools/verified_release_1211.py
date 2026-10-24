@@ -29,8 +29,8 @@ def inspect(repo, run_id, tag, source):
             and run['head_repository']['full_name'] == repo):
         raise RuntimeError('Expected successful PR validation in this repository')
     jobs = api(repo, f'actions/runs/{run_id}/jobs?per_page=100')['jobs']
-    if len(jobs) != 2 or {j['name'] for j in jobs} != {'build-and-gametest', 'optional-mekanism'} or any(j['conclusion'] != 'success' for j in jobs):
-        raise RuntimeError('The NeoForge/GUI job and real Mekanism validation must succeed')
+    if len(jobs) != 3 or {j['name'] for j in jobs} != {'build-and-gametest', 'optional-mekanism', 'sodium-lighting'} or any(j['conclusion'] != 'success' for j in jobs):
+        raise RuntimeError('The NeoForge/GUI job, real Mekanism validation and Sodium lighting validation must succeed')
     ref = api(repo, f'git/ref/tags/{tag}')['object']
     while ref['type'] == 'tag':
         ref = api(repo, 'git/tags/' + ref['sha'])['object']

@@ -22,6 +22,11 @@
     "RayleighAmbientLightMixin",
     "RayleighSmoothLightMixin",
     "RayleighFluidLightMixin",
-    "RayleighQuadLightMixin"
+    "RayleighQuadLightMixin",
+    "SodiumRayleighSliceMixin",
+    "SodiumRayleighPipelineMixin",
+    "SodiumRayleighVertexMixin",
+    "SodiumRayleighColorMixin",
+    "SodiumRayleighShaderMixin"
   ]
 }

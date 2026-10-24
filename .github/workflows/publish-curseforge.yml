@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       verified_run_id:
-        description: 'Successful PR validation with NeoForge, GUI and Mekanism'
+        description: 'Successful PR validation with NeoForge, GUI, Mekanism and Sodium lighting'
         required: true
         type: string
       release_tag:

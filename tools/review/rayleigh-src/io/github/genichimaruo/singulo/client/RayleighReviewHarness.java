@@ -67,6 +67,9 @@ public final class RayleighReviewHarness {
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null || mc.getOverlay() != null) return;
         if (phase == 0) {
+            if (net.neoforged.fml.ModList.get().isLoaded("sodium")) {
+                Class.forName("io.github.genichimaruo.singulo.client.SodiumNoonReviewHarness").getMethod("verify").invoke(null);
+            }
             Files.createDirectories(output()); phase = 1;
             mc.getSingleplayerServer().execute(() -> prepare(mc.getSingleplayerServer().overworld())); return;
         }
@@ -99,6 +102,10 @@ public final class RayleighReviewHarness {
                 level.setRainLevel(1); level.setThunderLevel(1); level.updateSkyBrightness(); ready = true;
             });
         } else if (phase == 2) {
+            if (net.neoforged.fml.ModList.get().isLoaded("sodium")) {
+                Class.forName("io.github.genichimaruo.singulo.client.SodiumNoonReviewHarness")
+                        .getMethod("verifyEmissive", RayleighSky.LightSnapshot.class).invoke(null, RayleighSky.snapshot(mc.level));
+            }
             require(mc.level.getDayTime() == 18000, "Time update not received");
             for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) require(image.getPixelRGBA(x, y * 16) == reference[y * 16 + x], "Night/weather changed local-noon colors");
             require(image.getPixelRGBA(0, 15) != reference[240], "Outside world also became noon");
