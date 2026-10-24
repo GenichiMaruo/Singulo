@@ -85,6 +85,7 @@ public final class RayleighReviewHarness {
         mc.options.fov().set(60);
         if (++wait < 150) return;
         NativeImage image = lightmap(mc);
+        if (net.neoforged.fml.ModList.get().isLoaded("distanthorizons")) DistantHorizonsReviewHarness.verify(image);
         require(image.getWidth() == 16 && image.getHeight() == 512, "No separate local-noon lightmap rows");
         if (phase == 1) {
             require(mc.level.getSkyDarken(1) == 1, "Reference is not clear noon: " + mc.level.getSkyDarken(1));

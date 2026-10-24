@@ -5,6 +5,9 @@ allprojects {
         if (providers.gradleProperty('withSodium').isPresent()) {
             dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
         }
+        if (providers.gradleProperty('withDistantHorizons').isPresent()) {
+            dependencies.add('localRuntime', 'maven.modrinth:distanthorizons:9w34y8ai') { transitive = false }
+        }
         if (providers.gradleProperty('rendererModsDir').isPresent()) {
             dependencies.add('localRuntime', fileTree(providers.gradleProperty('rendererModsDir').get()) { include '*.jar' })
         }

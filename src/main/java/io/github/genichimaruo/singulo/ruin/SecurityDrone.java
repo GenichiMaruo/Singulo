@@ -15,6 +15,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -35,7 +36,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * 白い警備ドローン。遺構の警備機ドックからだけ出撃する。強さは3段階（地表観測拠点=1、研究棟=2、封鎖培養施設と最終実験施設=3）。
  * 相手の周りを回りながら光弾を撃ち（段階2は3連射、段階3は追尾の3連射）、ときどき止まってレンズを光らせてから突進する。
- * 段階3は近づかれると、ためてから電磁パルスの輪を放つ（ダメージ・吹き飛ばし・鈍足）。何も落とさないので、トラップで稼げない。
+ * 段階3は近づかれると、ためてから電磁パルスの輪を放つ（ダメージ・鈍足）。攻撃で相手を吹き飛ばさない。
  * 体力が {@link #CRIPPLED_AT} を切ると壊れかけになり、地面から {@link #LOW_FLIGHT} ブロックより上へは飛べなくなる（煙と火花を出す）。
  */
 public class SecurityDrone extends Monster {
@@ -59,6 +60,8 @@ public class SecurityDrone extends Monster {
     /** 壊れかけになる体力の割合と、壊れかけで飛べる地面からの高さ（ブロック）。 */
     static final float CRIPPLED_AT = 0.5F;
     static final double LOW_FLIGHT = 1.5;
+    static final double MAX_FLIGHT = 2.5;
+    static final double COMBAT_HEIGHT = 1.25;
     /** 地面を探す深さ（これより下に足場がなければ、地面は見つからない扱いで沈み続ける）。 */
     static final int GROUND_SEARCH = 12;
     static final double PULSE_RADIUS = 4.5;
@@ -158,20 +161,28 @@ public class SecurityDrone extends Monster {
         return getY() - GROUND_SEARCH;
     }
 
-    /** 壊れかけなら、地面から {@link #LOW_FLIGHT} より上にいられない（上にいれば沈む）。煙と火花をときどき出す。 */
+    private double flightCeiling() {
+        double height = crippled() ? LOW_FLIGHT : MAX_FLIGHT;
+        double ceiling = groundBelow() + height;
+        LivingEntity target = getTarget();
+        return target != null && target.isAlive() ? Math.min(ceiling, target.getY() + height) : ceiling;
+    }
+
+    /** 高空からは降下する。壊れかけならさらに低く飛び、煙と火花を出す。 */
     @Override
     public void aiStep() {
         super.aiStep();
-        if (!(level() instanceof ServerLevel level) || !crippled() || !isAlive()) {
+        if (!(level() instanceof ServerLevel level) || !isAlive()) {
             return;
         }
-        double ceiling = groundBelow() + LOW_FLIGHT;
+        double ceiling = flightCeiling();
         Vec3 v = getDeltaMovement();
         if (getY() > ceiling) {
-            setDeltaMovement(v.x, Math.min(v.y, -0.12), v.z);
+            setDeltaMovement(v.x, Math.min(v.y, -0.18), v.z);
         } else if (v.y > 0 && getY() + v.y > ceiling) {
             setDeltaMovement(v.x, Math.max(0, ceiling - getY()), v.z);
         }
+        if (!crippled()) return;
         if (tickCount % 6 == 0) {
             level.sendParticles(ParticleTypes.SMOKE, getX(), getY() + 0.3, getZ(), 1, 0.15, 0.1, 0.15, 0.01);
         }
@@ -182,9 +193,10 @@ public class SecurityDrone extends Monster {
 
     /** 光弾を1発撃つ（段階3は追尾）。 */
     void shoot(LivingEntity target) {
+        if (getY() > Math.min(flightCeiling(), target.getY() + MAX_FLIGHT) + 0.25) return;
         int t = tier() - 1;
         Vec3 from = position().add(0, getBbHeight() * 0.35, 0).add(getLookAngle().scale(0.5));
-        HorizonBolt bolt = new HorizonBolt(level(), this).style(COLORS[t], 0.55F, BOLT_DAMAGE[t]);
+        HorizonBolt bolt = new HorizonBolt(level(), this).style(COLORS[t], 0.55F, BOLT_DAMAGE[t]).armored(true);
         if (tier() == 3) {
             bolt.homing(target);
         }
@@ -209,12 +221,23 @@ public class SecurityDrone extends Monster {
             if (e.distanceTo(this) > PULSE_RADIUS) {
                 continue;
             }
-            e.hurt(damageSources().mobAttack(this), PULSE_DAMAGE);
+            hurtWithoutKnockback(e, damageSources().mobAttack(this), PULSE_DAMAGE);
             e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1));
-            Vec3 out = e.position().subtract(position()).normalize().scale(0.9).add(0, 0.35, 0);
-            e.setDeltaMovement(out);
-            e.hurtMarked = true;
         }
+    }
+
+    /** Keep existing movement (including jumps), suppress only this hit's impulse. */
+    static boolean hurtWithoutKnockback(Entity target, DamageSource source, float damage) {
+        Vec3 velocity = target.getDeltaMovement();
+        try { return target.hurt(source, damage); }
+        finally { target.setDeltaMovement(velocity); }
+    }
+
+    @Override
+    public boolean doHurtTarget(Entity target) {
+        Vec3 velocity = target.getDeltaMovement();
+        try { return super.doHurtTarget(target); }
+        finally { target.setDeltaMovement(velocity); }
     }
 
     @Override
@@ -335,8 +358,6 @@ public class SecurityDrone extends Monster {
                     level.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 0.3, getZ(), 1, 0.05, 0.05, 0.05, 0);
                     if (distanceToSqr(target) < 1.8 * 1.8) {
                         doHurtTarget(target);
-                        target.setDeltaMovement(target.getDeltaMovement().add(ramDir.scale(0.8)).add(0, 0.25, 0));
-                        target.hurtMarked = true;
                         timer = 0;
                     }
                     if (--timer <= 0 || horizontalCollision || verticalCollision) {
@@ -364,10 +385,8 @@ public class SecurityDrone extends Monster {
         private void orbit(ServerLevel level, LivingEntity target) {
             orbitAngle += 0.035;
             double r = 6;
-            Vec3 want = target.position().add(Math.cos(orbitAngle) * r, target.getBbHeight() + 1.8, Math.sin(orbitAngle) * r);
-            if (crippled()) {
-                want = new Vec3(want.x, Math.min(want.y, groundBelow() + LOW_FLIGHT - 0.5), want.z);   // 壊れかけは地面すれすれを回る
-            }
+            Vec3 want = target.position().add(Math.cos(orbitAngle) * r, COMBAT_HEIGHT, Math.sin(orbitAngle) * r);
+            want = new Vec3(want.x, Math.min(want.y, flightCeiling() - 0.5), want.z);
             getMoveControl().setWantedPosition(want.x, want.y, want.z, 1.1);
             getLookControl().setLookAt(target, 30, 30);
             boolean seen = hasLineOfSight(target);
