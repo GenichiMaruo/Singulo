@@ -12,6 +12,23 @@ import net.minecraftforge.gametest.*;
 @GameTestHolder(Singulo.MODID)
 @PrefixGameTestTemplate(false)
 public final class RecipeIndexGameTests {
+    @GameTest(template = "empty")
+    public static void equalRecipesKeepIndependentIdsAcrossLogins(GameTestHelper h) {
+        var first = new MachineRecipe("cryogenic_cooling_tower", 2, 20, 10, List.of(), List.of(),
+                Optional.empty(), Optional.empty(), net.minecraft.world.item.ItemStack.EMPTY, List.of(), 0, 0,
+                net.minecraft.world.item.ItemStack.EMPTY);
+        var second = new MachineRecipe(first.station(), first.stage(), first.time(), first.energy(),
+                first.ingredients(), first.fluidIngredients(), first.mass(), first.restore(), first.result(),
+                first.fluidResults(), first.minSize(), first.priority(), first.byproduct());
+        h.assertTrue(first.equals(second), "Fixture must reproduce equal recipe instances");
+        var id1 = Singulo.id("id_login_one");
+        var id2 = Singulo.id("id_login_two");
+        first.withId(id1); second.withId(id2);
+        h.assertTrue(first.getId().equals(id1) && second.getId().equals(id2),
+                "Equal recipe instances overwrite each other's ids across logins");
+        h.succeed();
+    }
+
     private static List<MachineRecipe> legacy(GameTestHelper h, MachineType type) {
         var raw = h.getLevel().getRecipeManager().getAllRecipesFor(SinguloRecipes.MACHINE.get()).stream()
                 .filter(r -> r.value().station().equals(type.id())).toList();

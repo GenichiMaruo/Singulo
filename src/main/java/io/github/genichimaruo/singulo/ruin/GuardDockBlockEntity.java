@@ -47,9 +47,9 @@ public class GuardDockBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    /** 1回の出撃の数。 */
+    /** ドック1個の出撃数。段階1は2機、段階2〜3は3機。 */
     public int waveSize() {
-        return tier + 1;
+        return Math.min(3, tier + 1);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, GuardDockBlockEntity be) {

@@ -15,6 +15,10 @@ public final class RayleighLighting {
     private RayleighLighting() {}
 
     public static Level level(BlockAndTintGetter view) {
+        // Renderer snapshots (notably Sodium's LevelSlice) deliberately do not expose a
+        // light engine. Only the vanilla world/region views support our lightmap banks;
+        // leave other renderers' packed lighting untouched, without probing their engine.
+        if (!(view instanceof Level) && !(view instanceof net.minecraft.client.renderer.chunk.RenderChunkRegion)) return null;
         return view.getLightEngine() instanceof RayleighLightAccess access ? access.singulo$level() : null;
     }
     /** Convert a public combined SKY query back to its two independent render contributions. */

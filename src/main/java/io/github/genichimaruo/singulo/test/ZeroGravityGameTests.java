@@ -81,7 +81,9 @@ public final class ZeroGravityGameTests {
     /** 4,096枚（以前の上限）を超える大きな集まりでも、すべてのパネルに電力が届く。17×17×17 = 4,913 枚（読み込まれた範囲に収まる立方体）。 */
     @GameTest(template = EMPTY, timeoutTicks = 200, batch = "large_panels")
     public static void largePanelGroupIsFullyPowered(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        // The 17-cube and its north-side power source exceed the empty
+        // template. All their chunks must tick before the timed assertion.
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper, 17);
         var level = helper.getLevel();
         BlockPos origin = helper.absolutePos(new BlockPos(0, 2, 0));
         int side = 17;

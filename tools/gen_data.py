@@ -3944,7 +3944,12 @@ def main():
     craters_data()
     java_content()
     java_config()
-    write_json(RES / 'pack.mcmeta', {'pack': {'description': 'Singulo generated resources', 'pack_format': 34}})
+    # Sodium ignores the vanilla include and uses our dedicated terrain shader integration.
+    # Acknowledge only this known-compatible override; keep warnings for other shader files.
+    write_json(RES / 'pack.mcmeta', {
+        'pack': {'description': 'Singulo generated resources', 'pack_format': 34},
+        'sodium': {'ignored_shaders': ['light.glsl']},
+    })
     # レシピの画像と一覧（docs/recipes）
     import recipe_images
     images = recipe_images.render_all(RECIPES, ORDER, STAGE_NAMES)
