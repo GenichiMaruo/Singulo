@@ -30,6 +30,11 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
 
     // ------------------------------------------------------------------ 各画面が決めること
 
+    /** プレイヤーのインベントリを出すか（出さない画面は溝も見出しもない）。 */
+    protected boolean hasInventory() {
+        return true;
+    }
+
     /** 右レールのその段（GuiFrame.RAIL_*）を使うか。 */
     protected boolean railUsed(int row) {
         return false;
@@ -150,16 +155,18 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
                 drawRailTab(g, row, mouseX, mouseY);
             }
         }
-        Panel.groove(g, skin, x + 7, y + GuiFrame.grooveY(imageHeight), imageWidth - 14);
-        int ix = x + GuiFrame.inventoryX(imageWidth);
-        int iy = y + GuiFrame.inventoryY(imageHeight);
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                Panel.slot(g, skin, ix + col * 18, iy + row * 18);
+        if (hasInventory()) {
+            Panel.groove(g, skin, x + 7, y + GuiFrame.grooveY(imageHeight), imageWidth - 14);
+            int ix = x + GuiFrame.inventoryX(imageWidth);
+            int iy = y + GuiFrame.inventoryY(imageHeight);
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 9; col++) {
+                    Panel.slot(g, skin, ix + col * 18, iy + row * 18);
+                }
             }
-        }
-        for (int col = 0; col < 9; col++) {
-            Panel.slot(g, skin, ix + col * 18, y + GuiFrame.hotbarY(imageHeight));
+            for (int col = 0; col < 9; col++) {
+                Panel.slot(g, skin, ix + col * 18, y + GuiFrame.hotbarY(imageHeight));
+            }
         }
         Boolean on = powered();
         if (on != null) {
@@ -183,7 +190,88 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
         if (status != null) {
             Panel.chip(g, skin, headerRight(), GuiFrame.POWER_Y, status, statusColor());
         }
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
+        if (hasInventory()) {
+            g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, skin.text(), false);
+        }
+    }
+
+    // ------------------------------------------------------------------ アイコンと値
+
+    /** 画面に出した「アイコンと値」の場所と、重ねたときの説明（毎フレーム描き直す）。 */
+    private final List<Stat> stats = new ArrayList<>();
+
+    private record Stat(int x, int y, int w, int h, List<Component> tooltip) {}
+
+    /** 「アイコンと値」の行の間隔。 */
+    protected static final int STAT_PITCH = 11;
+
+    /** 装置固有の部分で使える縦の範囲（ヘッダーの下から、溝の上か枠の下端の手前まで）の上端と下端（下端は含まない）。 */
+    protected int contentTop() {
+        return GuiFrame.HEADER - 1;
+    }
+
+    protected int contentEnd() {
+        return hasInventory() ? GuiFrame.grooveY(imageHeight) : imageHeight - 2;
+    }
+
+    /** 高さ height の物を、装置固有の部分の上下中央に置くときの上端。 */
+    protected int centeredY(int height) {
+        return contentTop() + (contentEnd() - contentTop() - height + 1) / 2;
+    }
+
+    /** rows 行の「アイコンと値」を上下中央に並べるときの、1行目の高さ。 */
+    protected int statsTop(int rows) {
+        return centeredY(rows * STAT_PITCH - 3);
+    }
+
+    /** 毎フレームの描画の最初に呼ぶ。 */
+    protected void clearStats() {
+        stats.clear();
+    }
+
+    /** アイコンと短い値（文の代わり）。x, y は枠の左上からの位置。重ねると tooltip を出す。 */
+    protected void stat(GuiGraphics g, int x, int y, Panel.Icon icon, int iconColor, String value, int color, List<Component> tooltip) {
+        Panel.icon(g, leftPos + x, topPos + y, icon, iconColor);
+        g.drawString(font, value, leftPos + x + 10, topPos + y, color, false);
+        stats.add(new Stat(leftPos + x, topPos + y - 1, 10 + font.width(value), 10, tooltip));
+    }
+
+    /** アイコンと小さな横長のゲージ（液体の量など。数は重ねると出る）。 */
+    protected void statBar(GuiGraphics g, int x, int y, Panel.Icon icon, int iconColor, int width, double fraction, int color,
+                           List<Component> tooltip) {
+        Panel.icon(g, leftPos + x, topPos + y, icon, iconColor);
+        int bx = leftPos + x + 11;
+        int by = topPos + y + 1;
+        Panel.well(g, skin, bx, by, width, 5);
+        int filled = (int) Math.round(width * Math.max(0, Math.min(1, fraction)));
+        if (filled > 0) {
+            g.fill(bx, by, bx + filled, by + 5, color);
+            Panel.glass(g, bx, by, filled, 5);
+        }
+        stats.add(new Stat(leftPos + x, topPos + y - 1, 12 + width, 10, tooltip));
+    }
+
+    /** 重ねている「アイコンと値」のツールチップ。出したら true。 */
+    protected boolean renderStatTooltips(GuiGraphics g, int mouseX, int mouseY) {
+        for (Stat s : stats) {
+            if (!s.tooltip().isEmpty() && Panel.inside(mouseX, mouseY, s.x(), s.y(), s.w(), s.h())) {
+                Panel.tooltip(g, font, s.tooltip(), 200, mouseX, mouseY);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 専用スロットの凹みと、空のときに入れる物のグレーの見本。 */
+    protected void ghostSlot(GuiGraphics g, int x, int y, net.minecraft.world.inventory.Slot slot, net.minecraft.world.item.ItemStack ghost) {
+        Panel.slot(g, skin, x, y);
+        if (!slot.hasItem() && !ghost.isEmpty()) {
+            g.pose().pushPose();
+            g.renderItem(ghost, x, y);
+            g.pose().translate(0, 0, 200);
+            g.fill(x, y, x + 16, y + 16, 0xA0000000 | (skin.fill() & 0xFFFFFF));
+            g.pose().popPose();
+        }
     }
 
     @Override

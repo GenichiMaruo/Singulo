@@ -350,6 +350,61 @@ final class Panel {
     private static final String[] MINUS = {"xxxxx"};
     private static final String[] STRUCTURE = {"xxxxxxx", "x..x..x", "x..x..x", "xxxxxxx", "x..x..x", "x..x..x", "xxxxxxx"};
 
+    /** 値の行のアイコン（7×8 まで）。 */
+    enum Icon { FLAME, SNOW, BOLT, DROP, PERCENT, HOURGLASS, IN, OUT, RANGE, SPEED, INFO, STAR, PERSON }
+
+    private static final String[] FLAME = {
+            "...x...", "..xx...", "..xxx..", ".xxxx.x", ".xxxxxx", "xxx.xxx", "xx...xx", ".xxxxx."};
+    private static final String[] SNOW = {
+            "x..x..x", ".x.x.x.", "..xxx..", "xxxxxxx", "..xxx..", ".x.x.x.", "x..x..x"};
+    private static final String[] PERCENT = {
+            "xx...x.", "xx..x..", "...x...", "..x....", ".x..xx.", "x...xx."};
+    private static final String[] HOURGLASS = {
+            "xxxxxxx", ".x...x.", "..x.x..", "...x...", "..x.x..", ".x...x.", "xxxxxxx"};
+    private static final String[] IN = {
+            "...x...", "...x...", ".x.x.x.", "..xxx..", "...x...", "x.....x", "xxxxxxx"};
+    private static final String[] OUT = {
+            "...x...", "..xxx..", ".x.x.x.", "...x...", "...x...", "x.....x", "xxxxxxx"};
+
+    private static final String[] RANGE = {
+            "..xxx..", ".x...x.", "x..x..x", "x.xxx.x", "x..x..x", ".x...x.", "..xxx.."};
+    private static final String[] SPEED = {"x..x...", ".x..x..", "..x..x.", ".x..x..", "x..x..."};
+    private static final String[] INFO = {
+            ".xxxxx.", "x..x..x", "x.....x", "x..x..x", "x..x..x", "x..x..x", ".xxxxx."};
+    private static final String[] STAR = {
+            "...x...", "..xxx..", "xxxxxxx", ".xxxxx.", "..xxx..", ".xx.xx.", "x.....x"};
+    private static final String[] PERSON = {"..xxx..", "..xxx..", "...x...", ".xxxxx.", "x.xxx.x", "..x.x..", "..x.x.."};
+
+    static void icon(GuiGraphics g, int x, int y, Icon icon, int c) {
+        switch (icon) {
+            case FLAME -> sprite(g, x, y, FLAME, c);
+            case SNOW -> sprite(g, x, y, SNOW, c);
+            case BOLT -> boltIcon(g, x, y, c);
+            case DROP -> sprite(g, x, y, DROP, c);
+            case PERCENT -> sprite(g, x, y + 1, PERCENT, c);
+            case HOURGLASS -> sprite(g, x, y, HOURGLASS, c);
+            case IN -> sprite(g, x, y, IN, c);
+            case OUT -> sprite(g, x, y, OUT, c);
+            case RANGE -> sprite(g, x, y, RANGE, c);
+            case SPEED -> sprite(g, x, y + 1, SPEED, c);
+            case INFO -> sprite(g, x, y, INFO, c);
+            case STAR -> sprite(g, x, y, STAR, c);
+            case PERSON -> sprite(g, x, y, PERSON, c);
+        }
+    }
+
+    /** 彫り込んだ下向きの矢印（入口から出口へ、9×9）。 */
+    static void downArrow(GuiGraphics g, GuiSkin s, int x, int y) {
+        for (int pass = 0; pass < 2; pass++) {
+            int c = pass == 0 ? s.arrowHi() : s.arrow();
+            int oy = pass == 0 ? 1 : 0;
+            g.fill(x + 3, y + oy, x + 6, y + 5 + oy, c);
+            for (int i = 0; i < 5; i++) {
+                g.fill(x + i, y + 4 + i + oy, x + 9 - i, y + 5 + i + oy, c);
+            }
+        }
+    }
+
     /** 自動（ぐるりと回る矢印、9×10）。 */
     static void autoIcon(GuiGraphics g, int x, int y, int c) {
         sprite(g, x, y, AUTO, c);

@@ -21,7 +21,7 @@ public final class MachineGuiReviewHarness {
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 8;
+    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 12;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen, wait;
     private static boolean shown;
@@ -156,6 +156,48 @@ public final class MachineGuiReviewHarness {
                 if (slot.x < 1 || slot.x + 16 >= menu.layout.width || slot.y < 16 || slot.y + 16 > MachineLayout.HEIGHT - 4)
                     throw new IllegalStateException("Slot outside panel: " + type + " " + slot.x + "," + slot.y);
             }
+        } else if (extra == 8) {
+            // SMES: 50M のうち 12.3M、受け取り 1.2K・送り出し 3.4K
+            SyncedInts data = SyncedInts.client(SmesMenu.COUNT);
+            value(data, SmesMenu.D_STORED, 12_300_000);
+            value(data, SmesMenu.D_CAPACITY, 50_000_000);
+            value(data, SmesMenu.D_IN, 1_200);
+            value(data, SmesMenu.D_OUT, 3_400);
+            value(data, SmesMenu.D_RATE, 100_000);
+            mc.setScreen(new SmesScreen(new SmesMenu(0, mc.player.getInventory(), BlockPos.ZERO, data), mc.player.getInventory(),
+                    Component.translatable("block.singulo.smes_cell")));
+            metrics.add(LANGUAGES[language] + "	smes	0	0	176");
+        } else if (extra == 9) {
+            // 熱電発電機: 1300 K と 300 K、45 FE/t、液体窒素 800 mB
+            SyncedInts data = SyncedInts.client(ThermoelectricGeneratorBlockEntity.COUNT);
+            value(data, ThermoelectricGeneratorBlockEntity.D_HOT, 1300);
+            value(data, ThermoelectricGeneratorBlockEntity.D_COLD, 300);
+            value(data, ThermoelectricGeneratorBlockEntity.D_RATE_X100, 4500);
+            value(data, ThermoelectricGeneratorBlockEntity.D_ENERGY, 40_000);
+            value(data, ThermoelectricGeneratorBlockEntity.D_CAPACITY, 100_000);
+            value(data, ThermoelectricGeneratorBlockEntity.D_FLUID, 800);
+            mc.setScreen(new ThermoelectricGeneratorScreen(new ThermoelectricGeneratorMenu(0, BlockPos.ZERO, data), mc.player.getInventory(),
+                    Component.translatable("block.singulo.thermoelectric_generator")));
+            metrics.add(LANGUAGES[language] + "	thermo	0	0	176");
+        } else if (extra == 10 || extra == 11) {
+            // 触媒装置: 動いているシールド塔（半径・段階・許可証・消費・効果）と、触媒のないアンカー
+            boolean shield = extra == 10;
+            var kind = shield ? CatalystDeviceBlockEntity.Kind.SHIELD_TOWER : CatalystDeviceBlockEntity.Kind.WORLDLINE_ANCHOR;
+            SyncedInts data = SyncedInts.client(CatalystDeviceBlockEntity.COUNT);
+            value(data, CatalystDeviceBlockEntity.D_ENERGY, 640_000);
+            value(data, CatalystDeviceBlockEntity.D_CAPACITY, 1_000_000);
+            value(data, CatalystDeviceBlockEntity.D_STATUS, (shield ? CatalystDeviceBlockEntity.Status.RUNNING
+                    : CatalystDeviceBlockEntity.Status.NO_CATALYST).ordinal());
+            value(data, CatalystDeviceBlockEntity.D_VALUE, 32);
+            value(data, CatalystDeviceBlockEntity.D_USAGE, 2_500);
+            value(data, CatalystDeviceBlockEntity.D_SPEED_X100, 125);
+            value(data, CatalystDeviceBlockEntity.D_WEAR_X100, 80);
+            value(data, CatalystDeviceBlockEntity.D_EXTRA, 5);
+            value(data, CatalystDeviceBlockEntity.D_ENABLED, 1);
+            var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO, kind, new ItemStackHandler(2), data);
+            mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(),
+                    Component.translatable(shield ? "block.singulo.shield_tower_core" : "block.singulo.worldline_anchor_small")));
+            metrics.add(LANGUAGES[language] + "	catalyst-" + extra + "	0	0	176");
         } else {
             int variant = extra == 7 ? 2 : extra, kind = variant / 2;
             SyncedInts data = SyncedInts.client(GeneratorSlotsMenu.COUNT);

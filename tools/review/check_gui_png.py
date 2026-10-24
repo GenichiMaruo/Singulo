@@ -64,40 +64,40 @@ pathlib.Path(_build + "/gui-review/inventory-pixels.json").write_text(json.dumps
 print(json.dumps(results))
 
 # Actual exported pixels, not just successful screen opens: long machine names must
-# not draw their dark title glyphs into the orange NO_POWER label's header region.
+# not draw their title glyphs into the header status chip, and the NO_POWER chip must show its amber icon.
 metrics_path = pathlib.Path(_build + "/gui-review/machine-font-metrics.tsv")
 if metrics_path.exists():
     rows = [line.split('\t') for line in metrics_path.read_text().splitlines()]
-    if len(rows) != 120:
-        raise SystemExit(f"Expected 120 machine GUI fixtures, got {len(rows)}")
+    if len(rows) != 140:
+        raise SystemExit(f"Expected 140 machine GUI fixtures, got {len(rows)}")
     locales = ('ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr')
     checked_headers = 0
     rate_reference = None
     for locale in locales:
         entries = [r for r in rows if r[0] == locale]
-        if len(entries) != 24:
-            raise SystemExit(f"Expected 24 fixtures for {locale}, got {len(entries)}")
+        if len(entries) != 28:
+            raise SystemExit(f"Expected 28 fixtures for {locale}, got {len(entries)}")
         for index, entry in enumerate(entries[:16]):
             _, name, title_width, status_width, panel_width = entry
-            panel_width, status_width = int(panel_width), int(status_width)
-            width, height, channels, pixels = rgba(root / f"machine-{locale}-{index:02d}.png", max_row=104)
+            panel_width = int(panel_width)
+            width, height, channels, pixels = rgba(root / f"machine-{locale}-{index:02d}.png", max_row=120)
             assert (width, height) == (854, 480)
-            left, top = (width - panel_width * 2) // 2, (height - 166 * 2) // 2
-            label_width = min(status_width, (panel_width - 20) // 2)
-            x0, x1 = left + (panel_width - 8 - label_width) * 2, left + (panel_width - 8) * 2
+            # Machine frames are 184 tall; the status chip is 19 wide, right edge 19 px from the frame edge.
+            left, top = (width - panel_width * 2) // 2, (height - 184 * 2) // 2
+            x0, x1 = left + (panel_width - 38) * 2, left + (panel_width - 19) * 2
             colors = [tuple(pixels[y][x * channels:x * channels + 3])
-                      for y in range(top + 12, top + 30) for x in range(x0, x1)]
-            dark_title = any(55 <= r <= 65 and 65 <= g <= 75 and 75 <= b <= 85 for r, g, b in colors)
-            orange_status = any(180 <= r <= 200 and 115 <= g <= 140 and 25 <= b <= 40 for r, g, b in colors)
-            if dark_title or not orange_status:
-                raise SystemExit(f"{locale}/{name}: title/status overlap or missing status glyphs in PNG")
+                      for y in range(top + 8, top + 30) for x in range(x0, x1)]
+            title_ink = any(45 <= r <= 57 and 58 <= g <= 70 and 68 <= b <= 80 for r, g, b in colors)
+            amber_icon = any(r >= 225 and 165 <= g <= 195 and 60 <= b <= 100 for r, g, b in colors)
+            if title_ink or not amber_icon:
+                raise SystemExit(f"{locale}/{name}: title/status overlap or missing status icon in PNG")
             checked_headers += 1
         # ASCII output is language-independent. Catch stale/corrupt font-atlas pixels
         # after language changes rather than counting an unreadable capture as success.
-        width, height, channels, pixels = rgba(root / f"machine-{locale}-18.png", max_row=194)
+        width, height, channels, pixels = rgba(root / f"machine-{locale}-18.png", max_row=240)
         left, top = (width - 176 * 2) // 2, (height - 166 * 2) // 2
-        rate = [bytes(pixels[y][(left + 44) * channels:(left + 224) * channels])
-                for y in range(top + 102, top + 120)]
+        rate = [bytes(pixels[y][(left + 44) * channels:(left + 160) * channels])
+                for y in range(top + 100, top + 120)]
         if rate_reference is None:
             rate_reference = rate
         elif rate != rate_reference:

@@ -13,8 +13,10 @@ import net.minecraft.world.item.ItemStack;
 
 /** アンドロイド納品口の画面。27スロットの箱と、名前（作業指令台で納品先を選ぶときに出る。名前をクリックで変える）。 */
 public class DeliveryPortMenu extends AbstractContainerMenu {
-    public static final int WIDTH = 176, HEIGHT = 168;
-    public static final int BOX_X = 8, BOX_Y = 22, INV_X = 8, INV_Y = 86, HOTBAR_Y = 144;
+    public static final int WIDTH = 176, HEIGHT = 184;
+    public static final int BOX_X = 8, BOX_Y = 24, INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH),
+            INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT),
+            HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
 
     private final BlockPos pos;
 
