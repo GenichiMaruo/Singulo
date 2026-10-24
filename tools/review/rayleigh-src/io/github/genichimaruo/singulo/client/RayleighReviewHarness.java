@@ -88,8 +88,19 @@ public final class RayleighReviewHarness {
         // The first mesh can precede the initial skylight packet on a fresh
         // world. Rebuild after lighting settles, then render it before capture.
         if (wait == 150) {
-            require(phase != 1 || mc.level.getBrightness(LightLayer.SKY, SAMPLE) == 15,
-                    "Clear-noon fixture skylight has not settled");
+            if (phase == 1 && mc.level.getBrightness(LightLayer.SKY, SAMPLE) != 15) {
+                if (ticks % 100 == 0) {
+                    Singulo.LOGGER.info("RAYLEIGH_FIXTURE client sky={} open={} dimensionSky={} roof={}",
+                            mc.level.getBrightness(LightLayer.SKY, SAMPLE), mc.level.canSeeSky(SAMPLE),
+                            mc.level.dimensionType().hasSkyLight(), mc.level.getBlockState(SAMPLE.atY(246)));
+                    mc.getSingleplayerServer().execute(() -> {
+                        var level = mc.getSingleplayerServer().overworld();
+                        Singulo.LOGGER.info("RAYLEIGH_FIXTURE server sky={} open={} roof={}",
+                                level.getBrightness(LightLayer.SKY, SAMPLE), level.canSeeSky(SAMPLE), level.getBlockState(SAMPLE.atY(246)));
+                    });
+                }
+                wait = 149; return;
+            }
             mc.levelRenderer.allChanged();
         }
         if (wait < 230) return;
