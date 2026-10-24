@@ -4,11 +4,14 @@ import it.unimi.dsi.fastutil.longs.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -49,13 +52,13 @@ public final class RayleighSky {
         Field field = FIELDS.computeIfAbsent(level, ignored -> new Field());
         synchronized (field) {
             if (level.isClientSide) field.ownerThread = Thread.currentThread();
-            if (field.panels.add(pos.asLong())) { index(field, pos, 1); field.dirty = true; }
+            if (field.panels.add(pos.asLong())) { index(field, pos, 1); field.invalidations.incrementAndGet(); }
         }
     }
     public static void unregister(Level level, BlockPos pos) {
         Field field = FIELDS.get(level);
         if (field != null) synchronized (field) {
-            if (field.panels.remove(pos.asLong())) { index(field, pos, -1); field.dirty = true; }
+            if (field.panels.remove(pos.asLong())) { index(field, pos, -1); field.invalidations.incrementAndGet(); }
         }
     }
     public static void forgetLevel(Level level) { FIELDS.remove(level); }
@@ -64,16 +67,15 @@ public final class RayleighSky {
     public static void changed(Level level, BlockPos pos) {
         Field field = FIELDS.get(level);
         if (field == null) return;
-        synchronized (field) {
-            if (field.affectedChunks.containsKey(ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4))) field.dirty = true;
-        }
+        // The light worker must never wait for a rebuild which could depend on that worker.
+        if (field.affectedChunks.containsKey(ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4))) field.invalidations.incrementAndGet();
     }
 
     private static void index(Field field, BlockPos panel, int delta) {
         for (int x = (panel.getX() - 15) >> 4; x <= (panel.getX() + 15) >> 4; x++)
             for (int z = (panel.getZ() - 15) >> 4; z <= (panel.getZ() + 15) >> 4; z++) {
                 long key = ChunkPos.asLong(x, z);
-                int count = field.affectedChunks.get(key) + delta;
+                int count = field.affectedChunks.getOrDefault(key, 0) + delta;
                 if (count == 0) field.affectedChunks.remove(key); else field.affectedChunks.put(key, count);
             }
     }
@@ -81,9 +83,7 @@ public final class RayleighSky {
     /** Chunk borders can open/close diffusion paths even when the source chunk stays loaded. */
     public static void chunkChanged(Level level, ChunkPos pos) {
         Field field = FIELDS.get(level);
-        if (field != null) synchronized (field) {
-            if (field.affectedChunks.containsKey(pos.toLong())) field.dirty = true;
-        }
+        if (field != null && field.affectedChunks.containsKey(pos.toLong())) field.invalidations.incrementAndGet();
     }
 
     public static int light(Level level, BlockPos pos) {
@@ -91,7 +91,7 @@ public final class RayleighSky {
         if (field == null) return 0;
         // Render/light workers only read a completed immutable snapshot. Never make a server
         // light worker wait for main-thread chunk access while holding the field lock.
-        if (field.dirty && (level.isClientSide ? field.ownerThread == Thread.currentThread()
+        if (field.builtVersion != field.invalidations.get() && (level.isClientSide ? field.ownerThread == Thread.currentThread()
                 : level.getServer() != null && level.getServer().isSameThread())) {
             synchronized (field) { refresh(level, field); }
         }
@@ -113,21 +113,26 @@ public final class RayleighSky {
     }
 
     private static void refresh(Level level, Field field) {
-        if (!field.dirty || field.building) return;
+        long version = field.invalidations.get();
+        if (field.builtVersion == version || field.building) return;
         field.building = true;
         try {
             Long2ByteOpenHashMap light = new Long2ByteOpenHashMap();
             LongArrayFIFOQueue queue = new LongArrayFIFOQueue();
+            Long2ObjectMap<LevelChunk> chunks = new Long2ObjectOpenHashMap<>();
             BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
             // Vanilla skylight seeds every unobstructed cell in each source column at 15.
             // Only subsequent diffusion loses at least one level per step, including downward steps.
             for (long panel : field.panels) {
                 pos.set(panel);
-                if (!level.hasChunkAt(pos) || !RayleighPanelBlock.lit(level, pos)) continue;
+                LevelChunk chunk = loadedChunk(level, chunks, pos);
+                if (chunk == null) continue;
+                BlockState panelState = chunk.getBlockState(pos);
+                if (!(panelState.getBlock() instanceof RayleighPanelBlock) || !panelState.getValue(RayleighPanelBlock.LIT)) continue;
                 BlockState previous = null;
                 for (int y = pos.getY() - 1; y >= level.getMinBuildHeight(); y--) {
                     pos.setY(y);
-                    BlockState state = level.getBlockState(pos);
+                    BlockState state = chunk.getBlockState(pos);
                     if (state.getLightBlock(level, pos) != 0 || occludes(level, pos.above(), previous, pos, state, Direction.DOWN)) break;
                     if (light.put(pos.asLong(), (byte) 15) != 15) queue.enqueue(pos.asLong());
                     previous = state;
@@ -139,13 +144,17 @@ public final class RayleighSky {
                 int strength = light.get(packed);
                 if (strength <= 1) continue;
                 pos.set(packed);
-                BlockState state = level.getBlockState(pos);
+                LevelChunk chunk = loadedChunk(level, chunks, pos);
+                if (chunk == null) continue;
+                BlockState state = chunk.getBlockState(pos);
                 for (Direction direction : DIRECTIONS) {
                     next.setWithOffset(pos, direction);
-                    if (level.isOutsideBuildHeight(next) || !level.hasChunkAt(next)) continue;
+                    if (level.isOutsideBuildHeight(next)) continue;
                     long key = next.asLong();
                     if (light.get(key) >= strength - 1) continue;
-                    BlockState neighbor = level.getBlockState(next);
+                    LevelChunk neighborChunk = loadedChunk(level, chunks, next);
+                    if (neighborChunk == null) continue;
+                    BlockState neighbor = neighborChunk.getBlockState(next);
                     int candidate = strength - Math.max(1, neighbor.getLightBlock(level, next));
                     if (candidate > light.get(key) && !occludes(level, pos, state, next, neighbor, direction)) {
                         light.put(key, (byte) candidate);
@@ -163,8 +172,19 @@ public final class RayleighSky {
             }
             field.light = light;
             field.snapshot = new LightSnapshot(light);
-            field.dirty = false;
+            // Keep notifications arriving during this rebuild pending for the next rebuild.
+            field.builtVersion = version;
         } finally { field.building = false; }
+    }
+
+    private static LevelChunk loadedChunk(Level level, Long2ObjectMap<LevelChunk> chunks, BlockPos pos) {
+        long key = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
+        if (!chunks.containsKey(key)) {
+            // hasChunkAt only tests tickets on the server; getBlockState can still wait for FULL.
+            // getChunkNow never waits for generation/light work, including during reconnect.
+            chunks.put(key, level.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4));
+        }
+        return chunks.get(key);
     }
 
     private static boolean occludes(Level level, BlockPos from, BlockState source, BlockPos to, BlockState target, Direction direction) {
@@ -175,12 +195,13 @@ public final class RayleighSky {
 
     private static final class Field {
         final LongSet panels = new LongOpenHashSet();
-        final Long2IntOpenHashMap affectedChunks = new Long2IntOpenHashMap();
+        final Map<Long, Integer> affectedChunks = new ConcurrentHashMap<>();
         Thread ownerThread;
         volatile Long2ByteOpenHashMap light = new Long2ByteOpenHashMap();
         volatile LightSnapshot snapshot = LightSnapshot.EMPTY;
         LongSet changedSections = new LongOpenHashSet();
-        volatile boolean dirty = true;
+        final AtomicLong invalidations = new AtomicLong(1);
+        volatile long builtVersion;
         boolean building;
     }
 }

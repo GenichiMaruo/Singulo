@@ -61,3 +61,21 @@ CIにもSodium単体の実クライアント検証・全241段階の頂点検査
 Sodium単体とSodium＋Iris（シェーダーパック無効）で、スキャナーが `light.glsl` のメタデータを読み取ったログがあり、`Resource pack: mod/singulo` の互換性レポートは出なくなった。メタデータ受理を知らせるログ自体はSodiumの仕様でWARNレベルに残るが、ゲーム内の非互換警告は発生しない。
 
 両構成で晴天正午・雨天深夜・再点灯の84,000画素比較が一致し、消灯時の暗化も確認。Iris併用の初回だけ再点灯画像が暗いままになる不一致があり、クライアントの照明値検査は成功していた。再起動して同じ検証を実行すると一致したため、この一過性の描画不一致の原因が解消されたとは断定しない。証跡は `build/review-0112-pack-warning-iris.log`（初回）、`build/review-0112-pack-warning-iris-retry.log`（再検証成功）、`build/review-0112-pack-warning-sodium.log`（Sodium単体成功）。今回の変更はパックのメタデータと生成元、CIの警告回帰検査のみで、照明コードは変更していない。
+
+### パネル付近での退出・再入場停止
+
+追加報告の `run/logs/latest.log` はSodiumなしの開発クライアント。同じセーブ `run/saves/test` のコピーを `build/rejoin-user-review/` に作り、保存されたプレイヤー位置と視点を維持して調査した。元のセーブは変更していない。
+
+ポーズ画面の保存を挟んだ反復テストで停止を再現した。`build/review-0112-rejoin-paused-threads.txt` では、サーバースレッドが `RayleighSky.refresh()` の `Field` モニターを保持したまま `Level.getBlockState()` → `ServerChunkCache.getChunk()` の完了待ち。そのチャンクの照明初期化ワーカーが `RayleighSky.chunkChanged()` で同じモニターを待っていた。描画スレッドも内部サーバーの終了待ちに入り、画面だけが読み込み／保存中のままになる。
+
+`ServerChunkCache.hasChunk()` はチケットの存在を確認するため、従来の `hasChunkAt()` の後でも `getBlockState()` が未完了のチャンクを待つ場合がある。再計算では `getChunkNow()` でその場で取得できるチャンクだけを使用し、ブロック状態をチャンクから直接読む。未読込の隣接チャンクは光の探索対象にしない。
+
+照明ワーカーが呼ぶ `changed()` / `chunkChanged()` は再計算モニターを取得しない。影響範囲のチャンク索引を並行読取可能にし、変更通知をアトミックな世代番号に置換した。再計算中に到着した変更を、完了時のdirty解除で失わない。公開済みの描画スナップショットは従来どおり不変。
+
+回帰テスト `lightWorkerNotificationsNeverWaitForSunlightRebuild` は再計算モニターを保持した状態で別スレッドから両方の変更通知を呼び、待ち合わせが完了することと照明値を検査する。開発用 `tools/review/rejoin.gradle` はパネル256枚を視界に入れ、ポーズ→退出→タイトル→同じワールドへ再入場を反復し、90秒進行しなければ全スレッドを記録して失敗する。`-PrejoinGameDir=<コピーしたゲームフォルダ> -PrejoinExisting` は既存コピーの位置・視点を維持する。CIにもSodiumでの5回の入場検証を追加。
+
+修正後、停止を再現した同じワールドのコピーで5回の入場と4回のタイトル復帰を完走（`build/review-0112-rejoin-user-fixed.log`）。
+
+Sodium 0.6.13＋Iris 1.8.12（シェーダーパック無効）でも同じコピーで5回の入場に成功（`build/review-0112-rejoin-user-sodium-iris-fixed.log`）。照明のPNG比較は84,000画素で晴天正午・雨天深夜・再点灯が完全一致し、消灯時は暗くなる（`build/review-0112-rejoin-lighting-fixed.log`、`build/rayleigh-review/screenshots/pixels.json`）。互換性警告の再発もなし。
+
+追加した回帰テストを含む必須GameTest 512件がすべて成功（`build/review-0112-rejoin-gametest.log`）。配布検査の要求件数も512件に更新し、公開処理のPythonテスト10件も成功。最後に通常の `build prepareClientRun` を実行し、検証用クラスを除いた配布JARと `run/` を使う開発起動設定へ戻した。

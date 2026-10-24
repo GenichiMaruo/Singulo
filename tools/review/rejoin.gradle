@@ -1,0 +1,18 @@
+// Development-only same-process world re-entry regression.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/rejoin-src'))
+        if (providers.gradleProperty('withSodium').isPresent()) {
+            dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
+        }
+        if (providers.gradleProperty('rendererModsDir').isPresent()) {
+            dependencies.add('localRuntime', fileTree(providers.gradleProperty('rendererModsDir').get()) { include '*.jar' })
+        }
+        neoForge.runs.client {
+            gameDirectory = file(providers.gradleProperty('rejoinGameDir').getOrElse('build/rayleigh-review'))
+            if (providers.gradleProperty('rejoinExisting').isPresent()) systemProperty 'singulo.rejoinExisting', 'true'
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'Review'
+        }
+    }
+}

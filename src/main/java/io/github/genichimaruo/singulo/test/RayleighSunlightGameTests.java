@@ -23,6 +23,23 @@ public final class RayleighSunlightGameTests {
     }
     private static int sunlight(GameTestHelper h, BlockPos pos) { return RayleighSky.light(h.getLevel(), h.absolutePos(pos)); }
 
+    @GameTest(template = "empty")
+    public static void lightWorkerNotificationsNeverWaitForSunlightRebuild(GameTestHelper h) throws Exception {
+        room(h, 6);
+        h.assertTrue(sunlight(h, SAMPLE) == 15, "Missing sunlight fixture");
+        var fields = RayleighSky.class.getDeclaredField("FIELDS"); fields.setAccessible(true);
+        Object rebuilding = ((java.util.Map<?, ?>) fields.get(null)).get(h.getLevel());
+        // Model the observed deadlock: the server owns the rebuild lock while lighting
+        // must finish chunk initialization. Both worker notifications must return anyway.
+        synchronized (rebuilding) {
+            var block = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.changed(h.getLevel(), h.absolutePos(SAMPLE)));
+            var chunk = java.util.concurrent.CompletableFuture.runAsync(() -> RayleighSky.chunkChanged(h.getLevel(), new net.minecraft.world.level.ChunkPos(h.absolutePos(SAMPLE))));
+            java.util.concurrent.CompletableFuture.allOf(block, chunk).get(2, java.util.concurrent.TimeUnit.SECONDS);
+        }
+        h.assertTrue(sunlight(h, SAMPLE) == 15, "Worker notification broke rebuilt sunlight");
+        h.succeed();
+    }
+
     @GameTest(template = "empty", timeoutTicks = 400)
     public static void actualSkyAndRawLightEqualClearNoonEvenWithNightDarkening(GameTestHelper h) {
         room(h, 6);
