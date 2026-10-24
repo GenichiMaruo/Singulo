@@ -19,7 +19,7 @@ class ProvenanceTests(unittest.TestCase):
             'actions/runs/1': {'status': 'completed', 'conclusion': 'success', 'event': 'pull_request',
                               'path': '.github/workflows/pr-validation.yml', 'head_repository': {'full_name': 'owner/repo'},
                               'head_sha': self.sha, 'run_attempt': 1},
-            'actions/runs/1/jobs?per_page=100': {'jobs': [{'name': n, 'conclusion': 'success'} for n in ['build-and-gametest', 'optional-mekanism']]},
+            'actions/runs/1/jobs?per_page=100': {'jobs': [{'name': n, 'conclusion': 'success'} for n in ['build-and-gametest', 'optional-mekanism', 'sodium-lighting']]},
             'git/ref/tags/v0.8.1': {'object': {'type': 'commit', 'sha': self.sha}},
             'git/commits/' + self.sha: {'tree': {'sha': self.tree}},
             'git/commits/' + self.tested: {'tree': {'sha': self.tree}},
@@ -38,13 +38,18 @@ class ProvenanceTests(unittest.TestCase):
         self.assertEqual(m['tested_commit'], self.tested)
 
     def test_mekanism_failure_blocks_upload(self):
-        self.data['actions/runs/1/jobs?per_page=100']['jobs'][-1]['conclusion'] = 'failure'
+        self.data['actions/runs/1/jobs?per_page=100']['jobs'][1]['conclusion'] = 'failure'
         with self.assertRaisesRegex(RuntimeError, 'Mekanism validation'):
             self.inspect()
 
     def test_leftover_forge_job_is_rejected(self):
         self.data['actions/runs/1/jobs?per_page=100']['jobs'].append({'name': 'forge', 'conclusion': 'success'})
         with self.assertRaisesRegex(RuntimeError, 'Mekanism validation'):
+            self.inspect()
+
+    def test_sodium_lighting_failure_blocks_upload(self):
+        self.data['actions/runs/1/jobs?per_page=100']['jobs'][2]['conclusion'] = 'failure'
+        with self.assertRaisesRegex(RuntimeError, 'Sodium lighting validation'):
             self.inspect()
 
     def test_missing_artifact_is_rejected(self):

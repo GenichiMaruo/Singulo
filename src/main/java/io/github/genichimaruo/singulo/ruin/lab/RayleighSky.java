@@ -19,6 +19,32 @@ public final class RayleighSky {
     private static final Direction[] DIRECTIONS = Direction.values();
     private RayleighSky() {}
 
+    /** Published immutable field for renderer workers. Does not access chunks or a light engine. */
+    public static LightSnapshot snapshot(Level level) {
+        Field field = FIELDS.get(level);
+        return field == null ? LightSnapshot.EMPTY : field.snapshot;
+    }
+
+    public static final class LightSnapshot {
+        private static final LightSnapshot EMPTY = new LightSnapshot(new Long2ByteOpenHashMap());
+        private final Long2ByteOpenHashMap light;
+        private final LongSet nearbySections = new LongOpenHashSet();
+
+        private LightSnapshot(Long2ByteOpenHashMap light) {
+            this.light = light;
+            LongSet sections = new LongOpenHashSet();
+            for (long pos : light.keySet()) sections.add(SectionPos.blockToSection(pos));
+            for (long section : sections) {
+                for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) for (int z = -1; z <= 1; z++) {
+                    nearbySections.add(SectionPos.asLong(SectionPos.x(section) + x, SectionPos.y(section) + y, SectionPos.z(section) + z));
+                }
+            }
+        }
+
+        public int light(int x, int y, int z) { return light.get(BlockPos.asLong(x, y, z)); }
+        public boolean near(BlockPos pos) { return nearbySections.contains(SectionPos.asLong(pos)); }
+    }
+
     public static void register(Level level, BlockPos pos) {
         Field field = FIELDS.computeIfAbsent(level, ignored -> new Field());
         synchronized (field) {
@@ -136,6 +162,7 @@ public final class RayleighSky {
                 }
             }
             field.light = light;
+            field.snapshot = new LightSnapshot(light);
             field.dirty = false;
         } finally { field.building = false; }
     }
@@ -151,6 +178,7 @@ public final class RayleighSky {
         final Long2IntOpenHashMap affectedChunks = new Long2IntOpenHashMap();
         Thread ownerThread;
         volatile Long2ByteOpenHashMap light = new Long2ByteOpenHashMap();
+        volatile LightSnapshot snapshot = LightSnapshot.EMPTY;
         LongSet changedSections = new LongOpenHashSet();
         volatile boolean dirty = true;
         boolean building;

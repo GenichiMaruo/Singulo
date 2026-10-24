@@ -79,6 +79,11 @@ configurations {
 }
 
 repositories {
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
     // JEI（レシピの表示）
     maven {
         name = 'BlameJared'
@@ -99,6 +104,8 @@ repositories {
 }
 
 dependencies {
+    // Optional Sodium 0.6.13 integration API only; never bundle or require the renderer.
+    compileOnly('maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
     // JEI は任意の連携。API だけでコンパイルし、開発中の起動では本体も入れる
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"

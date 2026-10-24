@@ -77,8 +77,16 @@ public final class RayleighSunlightGameTests {
         room(h, 6);
         BlockPos panel = new BlockPos(2, 6, 2);
         h.assertTrue(sunlight(h, SAMPLE) == 15, "Missing source");
+        BlockPos sample = h.absolutePos(SAMPLE);
+        var rendered = RayleighSky.snapshot(h.getLevel());
+        h.assertTrue(rendered.near(sample) && rendered.light(sample.getX(), sample.getY(), sample.getZ()) == 15,
+                "Renderer did not capture the completed sunlight field");
         h.setBlock(panel, SinguloBlocks.LAB_RAYLEIGH_PANEL.get());
         h.assertTrue(sunlight(h, SAMPLE) == 0, "Power loss leaves stale sunlight");
+        h.assertTrue(rendered.light(sample.getX(), sample.getY(), sample.getZ()) == 15,
+                "A queued renderer snapshot was mutated after capture");
+        h.assertTrue(RayleighSky.snapshot(h.getLevel()).light(sample.getX(), sample.getY(), sample.getZ()) == 0,
+                "A new renderer snapshot retained disabled sunlight");
         h.setBlock(panel, SinguloBlocks.LAB_RAYLEIGH_PANEL.get().defaultBlockState().setValue(RayleighPanelBlock.LIT, true));
         var be = (RayleighPanelBlockEntity) h.getBlockEntity(panel);
         be.onChunkUnloaded();

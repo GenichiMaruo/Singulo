@@ -2,6 +2,12 @@
 allprojects {
     afterEvaluate {
         sourceSets.main.java.srcDir(file('tools/review/rayleigh-src'))
+        if (providers.gradleProperty('withSodium').isPresent()) {
+            dependencies.add('localRuntime', 'maven.modrinth:sodium:Pb3OXVqC') { transitive = false }
+        }
+        if (providers.gradleProperty('rendererModsDir').isPresent()) {
+            dependencies.add('localRuntime', fileTree(providers.gradleProperty('rendererModsDir').get()) { include '*.jar' })
+        }
         neoForge.runs.client {
             gameDirectory = file('build/rayleigh-review')
             systemProperty 'singulo.rayleighOutput', file('build/rayleigh-review/screenshots').absolutePath
