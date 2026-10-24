@@ -155,9 +155,11 @@ public class HorizonBolt extends ThrowableItemProjectile {
         super.onHitEntity(result);
         Entity hit = result.getEntity();
         if (hit != getOwner() && !RuinGuards.isGuard(hit)) {
-            hit.hurt(piercing ? io.github.genichimaruo.singulo.registry.SinguloDamageTypes.tidal(level(), getOwner())
+            var source = piercing ? io.github.genichimaruo.singulo.registry.SinguloDamageTypes.tidal(level(), getOwner())
                     : armored ? damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null)
-                    : damageSources().indirectMagic(this, getOwner()), damage);
+                    : damageSources().indirectMagic(this, getOwner());
+            if (getOwner() instanceof SecurityDrone) SecurityDrone.hurtWithoutKnockback(hit, source, damage);
+            else hit.hurt(source, damage);
         }
     }
 
