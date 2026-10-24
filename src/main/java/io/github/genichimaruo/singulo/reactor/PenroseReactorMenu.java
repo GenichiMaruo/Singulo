@@ -19,17 +19,19 @@ public class PenroseReactorMenu extends AbstractContainerMenu {
     public static final int BUTTON_IGNITE = 0, BUTTON_SPIN = 1, BUTTON_HARVEST = 2;
     /** 投入間隔の設定は BUTTON_INTERVAL + 間隔（tick）で送る。 */
     public static final int BUTTON_INTERVAL = 1000;
-    public static final int WIDTH = 200;
+    public static final int WIDTH = 212;
     public static final int HEIGHT = 228;
+    /** 中身は幅200で設計してあり、枠の中央に置くために右へずらす量。 */
+    public static final int CONTENT_X = (WIDTH - 200) / 2;
     /** 持ち物の位置。 */
-    public static final int INV_X = 20;
+    public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH);
     public static final int INV_Y = 146;
     public static final int HOTBAR_Y = 204;
     /** スロットの位置（menu と screen で共有）。 */
     public static final int[][] SLOT_POS = {
-            {10, 22}, {10, 46},                 // 種・燃料
-            {32, 22}, {32, 46}, {32, 70},       // ジェット・ホーキング・エルゴ
-            {176, 22}, {176, 42}, {176, 62}, {176, 82}, // 副産物
+            {CONTENT_X + 10, 22}, {CONTENT_X + 10, 46},                 // 種・燃料
+            {CONTENT_X + 32, 22}, {CONTENT_X + 32, 46}, {CONTENT_X + 32, 70},       // ジェット・ホーキング・エルゴ
+            {CONTENT_X + 176, 22}, {CONTENT_X + 176, 42}, {CONTENT_X + 176, 62}, {CONTENT_X + 176, 82}, // 副産物
     };
 
     private final BlockPos pos;

@@ -68,15 +68,15 @@ print(json.dumps(results))
 metrics_path = pathlib.Path(_build + "/gui-review/machine-font-metrics.tsv")
 if metrics_path.exists():
     rows = [line.split('\t') for line in metrics_path.read_text().splitlines()]
-    if len(rows) != 140:
-        raise SystemExit(f"Expected 140 machine GUI fixtures, got {len(rows)}")
+    if len(rows) != 190:
+        raise SystemExit(f"Expected 190 machine GUI fixtures, got {len(rows)}")
     locales = ('ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr')
     checked_headers = 0
     rate_reference = None
     for locale in locales:
         entries = [r for r in rows if r[0] == locale]
-        if len(entries) != 28:
-            raise SystemExit(f"Expected 28 fixtures for {locale}, got {len(entries)}")
+        if len(entries) != 38:
+            raise SystemExit(f"Expected 38 fixtures for {locale}, got {len(entries)}")
         for index, entry in enumerate(entries[:16]):
             _, name, title_width, status_width, panel_width = entry
             panel_width = int(panel_width)

@@ -65,8 +65,8 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
 
     protected void togglePower() {}
 
-    protected Component powerTooltip() {
-        return Component.translatable(Boolean.TRUE.equals(powered()) ? "gui.singulo.power.on" : "gui.singulo.power.off");
+    protected List<Component> powerTooltip() {
+        return List.of(Component.translatable(Boolean.TRUE.equals(powered()) ? "gui.singulo.power.on" : "gui.singulo.power.off"));
     }
 
     /** 電源の左に置く、その画面だけのヘッダーの部品の幅。この分だけ状態表示が左に寄る。 */
@@ -251,7 +251,12 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
         stats.add(new Stat(leftPos + x, topPos + y - 1, 12 + width, 10, tooltip));
     }
 
-    /** 重ねている「アイコンと値」のツールチップ。出したら true。 */
+    /** 範囲（枠の左上からの位置）に重ねたときの説明（絵や記号の説明。毎フレーム描き直す）。 */
+    protected void area(int x, int y, int w, int h, List<Component> tooltip) {
+        stats.add(new Stat(leftPos + x, topPos + y, w, h, tooltip));
+    }
+
+    /** 重ねている「アイコンと値」と範囲のツールチップ。出したら true。 */
     protected boolean renderStatTooltips(GuiGraphics g, int mouseX, int mouseY) {
         for (Stat s : stats) {
             if (!s.tooltip().isEmpty() && Panel.inside(mouseX, mouseY, s.x(), s.y(), s.w(), s.h())) {
@@ -296,7 +301,7 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
         }
         int[] p = powerRect();
         if (powered() != null && Panel.inside(mouseX, mouseY, p[0], p[1], p[2], p[3])) {
-            g.renderTooltip(font, powerTooltip(), mouseX, mouseY);
+            Panel.tooltip(g, font, powerTooltip(), 200, mouseX, mouseY);
             return true;
         }
         for (int row = 0; row < GuiFrame.RAIL_ROWS; row++) {

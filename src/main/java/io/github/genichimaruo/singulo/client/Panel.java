@@ -351,7 +351,7 @@ final class Panel {
     private static final String[] STRUCTURE = {"xxxxxxx", "x..x..x", "x..x..x", "xxxxxxx", "x..x..x", "x..x..x", "xxxxxxx"};
 
     /** 値の行のアイコン（7×8 まで）。 */
-    enum Icon { FLAME, SNOW, BOLT, DROP, PERCENT, HOURGLASS, IN, OUT, RANGE, SPEED, INFO, STAR, PERSON }
+    enum Icon { FLAME, SNOW, BOLT, DROP, PERCENT, HOURGLASS, IN, OUT, RANGE, SPEED, INFO, STAR, PERSON, BOX, ORB }
 
     private static final String[] FLAME = {
             "...x...", "..xx...", "..xxx..", ".xxxx.x", ".xxxxxx", "xxx.xxx", "xx...xx", ".xxxxx."};
@@ -373,6 +373,7 @@ final class Panel {
             ".xxxxx.", "x..x..x", "x.....x", "x..x..x", "x..x..x", "x..x..x", ".xxxxx."};
     private static final String[] STAR = {
             "...x...", "..xxx..", "xxxxxxx", ".xxxxx.", "..xxx..", ".xx.xx.", "x.....x"};
+    private static final String[] ORB = {"..xxx..", ".xxxxx.", "xx.xxxx", "xxxxxxx", "xxxxxxx", ".xxxxx.", "..xxx.."};
     private static final String[] PERSON = {"..xxx..", "..xxx..", "...x...", ".xxxxx.", "x.xxx.x", "..x.x..", "..x.x.."};
 
     static void icon(GuiGraphics g, int x, int y, Icon icon, int c) {
@@ -390,6 +391,8 @@ final class Panel {
             case INFO -> sprite(g, x, y, INFO, c);
             case STAR -> sprite(g, x, y, STAR, c);
             case PERSON -> sprite(g, x, y, PERSON, c);
+            case BOX -> sprite(g, x - 1, y, BOX, c);
+            case ORB -> sprite(g, x, y, ORB, c);
         }
     }
 

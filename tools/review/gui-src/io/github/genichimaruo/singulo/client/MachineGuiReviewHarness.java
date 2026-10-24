@@ -21,7 +21,7 @@ public final class MachineGuiReviewHarness {
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 12;
+    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 22;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen, wait;
     private static boolean shown;
@@ -198,6 +198,109 @@ public final class MachineGuiReviewHarness {
             mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(),
                     Component.translatable(shield ? "block.singulo.shield_tower_core" : "block.singulo.worldline_anchor_small")));
             metrics.add(LANGUAGES[language] + "	catalyst-" + extra + "	0	0	176");
+        } else if (extra >= 12 && extra <= 18) {
+            // スロットの少ない装置（DeviceMenu）7種類。どれも動いている状態の値
+            var kind = DeviceMenu.Kind.values()[extra - 12];
+            SyncedInts data = SyncedInts.client(kind.data);
+            switch (kind) {
+                case WORMHOLE_GENERATOR -> {
+                    value(data, DeviceMenu.Gen.FORMED, 1);
+                    value(data, DeviceMenu.Gen.PROGRESS, 120);
+                    value(data, DeviceMenu.Gen.RECEIVED, 2_000_000);
+                    value(data, DeviceMenu.Gen.REQUIRED, 5_000_000);
+                }
+                case WORMHOLE_MOUTH -> {
+                    value(data, DeviceMenu.Mouth.SIZE, 1);
+                    value(data, DeviceMenu.Mouth.TARGET, 2);
+                    value(data, DeviceMenu.Mouth.PARTNER, 2);
+                    value(data, DeviceMenu.Mouth.PX, 120);
+                    value(data, DeviceMenu.Mouth.PY, 64);
+                    value(data, DeviceMenu.Mouth.PZ, -340);
+                    value(data, DeviceMenu.Mouth.CROSS, 1);
+                    value(data, DeviceMenu.Mouth.TICKS_PER_MATTER, 18_000);
+                    value(data, DeviceMenu.Mouth.GRACE, 1_200);
+                    value(data, DeviceMenu.Mouth.PORTS, 3);
+                    value(data, DeviceMenu.Mouth.PORT_LIMIT, 4);
+                }
+                case WORMHOLE_PORT -> {
+                    value(data, DeviceMenu.Port.STATE, DeviceMenu.Port.STATE_LINKED);
+                    value(data, DeviceMenu.Port.SIZE, 1);
+                    value(data, DeviceMenu.Port.ENERGY, 2);
+                    value(data, DeviceMenu.Port.ITEMS, 1);
+                    value(data, DeviceMenu.Port.FLUIDS, 0);
+                    value(data, DeviceMenu.Port.CHANNEL, 37);
+                    value(data, DeviceMenu.Port.RANK, 2);
+                    value(data, DeviceMenu.Port.LIMIT, 4);
+                }
+                case CONTAINMENT_TANK -> {
+                    value(data, DeviceMenu.Tank.AMOUNT, 24_000);
+                    value(data, DeviceMenu.Tank.CAPACITY, 64_000);
+                    value(data, DeviceMenu.Tank.CONTAINED, 1);
+                    value(data, DeviceMenu.Tank.ENERGY, 300_000);
+                    value(data, DeviceMenu.Tank.ENERGY_MAX, 500_000);
+                }
+                case HALO_COLLECTOR -> {
+                    value(data, DeviceMenu.Halo.RATE, 12);
+                    value(data, DeviceMenu.Halo.AMOUNT, 600);
+                    value(data, DeviceMenu.Halo.BUFFER, 1_000);
+                    value(data, DeviceMenu.Halo.ENERGY, 80_000);
+                    value(data, DeviceMenu.Halo.ENERGY_MAX, 200_000);
+                    value(data, DeviceMenu.Halo.CORE, 1);
+                    value(data, DeviceMenu.Halo.CORE_MASS, 1_250);
+                }
+                case MUON_COLLECTOR -> {
+                    value(data, DeviceMenu.Muon.RATE, 6);
+                    value(data, DeviceMenu.Muon.Y, 160);
+                    value(data, DeviceMenu.Muon.SKY, 1);
+                    value(data, DeviceMenu.Muon.PROGRESS, 45);
+                }
+                case DETECTOR -> {
+                    value(data, DeviceMenu.Detector.ENERGY, 900_000);
+                    value(data, DeviceMenu.Detector.ENERGY_MAX, 1_000_000);
+                    value(data, DeviceMenu.Detector.OBSERVED, 1);
+                    value(data, DeviceMenu.Detector.FOUND, 1);
+                    value(data, DeviceMenu.Detector.DIRECTION, 3);
+                    value(data, DeviceMenu.Detector.BAND, 2);
+                    value(data, DeviceMenu.Detector.COST, 250_000);
+                }
+            }
+            var menu = new DeviceMenu(0, mc.player.getInventory(), kind, BlockPos.ZERO, new ItemStackHandler(Math.max(1, kind.slots)), data, null);
+            mc.setScreen(new DeviceScreen(menu, mc.player.getInventory(), Component.literal(kind.name().toLowerCase())));
+            metrics.add(LANGUAGES[language] + "\tdevice-" + kind.name().toLowerCase() + "\t0\t0\t" + DeviceMenu.WIDTH);
+        } else if (extra == 19) {
+            // ワームホール固定化装置: 片方の喉が固定化中、もう片方は燃料・電力待ち
+            SyncedInts data = SyncedInts.client(io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu.COUNT);
+            value(data, io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu.D_PROGRESS_0,
+                    io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity.STABILIZE_TICKS * 45 / 100);
+            value(data, io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu.D_ENERGY, 600_000);
+            value(data, io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu.D_CAPACITY, 1_000_000);
+            ItemStackHandler items = new ItemStackHandler(io.github.genichimaruo.singulo.wormhole.WormholeStabilizerBlockEntity.SLOTS);
+            items.setStackInSlot(1, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("unstable_wormhole_mouth"))));
+            var menu = new io.github.genichimaruo.singulo.wormhole.WormholeStabilizerMenu(0, mc.player.getInventory(), BlockPos.ZERO, items, data, null);
+            mc.setScreen(new WormholeStabilizerScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.wormhole_stabilizer")));
+            metrics.add(LANGUAGES[language] + "\tstabilizer\t0\t0\t212");
+        } else if (extra == 20) {
+            // ペンローズ・リアクター: 発電モードで稼働中
+            SyncedInts data = SyncedInts.client(io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.COUNT);
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_STATE,
+                    io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.State.RUNNING.ordinal());
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_MASS_X10, 3_125);
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_SPIN_X1000, 912);
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_ETA_X10000, 4_210);
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_OUT_LO, 250_000_000);
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_BUFFER_MFE, 12_300);
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_TARGET, 2);
+            value(data, io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.D_HARVEST, 1);
+            var menu = new io.github.genichimaruo.singulo.reactor.PenroseReactorMenu(0, mc.player.getInventory(), BlockPos.ZERO,
+                    new ItemStackHandler(io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.SLOTS), data, null);
+            mc.setScreen(new PenroseReactorScreen(menu, mc.player.getInventory(), Component.literal("penrose_reactor")));
+            metrics.add(LANGUAGES[language] + "\tpenrose\t0\t0\t212");
+        } else if (extra == 21) {
+            // 創世炉の核（核のブロックがないので未形成の見た目）
+            var menu = new io.github.genichimaruo.singulo.genesis.GenesisCoreMenu(0, mc.player.getInventory(), BlockPos.ZERO,
+                    new net.minecraft.world.SimpleContainer(1), new net.minecraft.world.SimpleContainer(1));
+            mc.setScreen(new GenesisCoreScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.genesis_core")));
+            metrics.add(LANGUAGES[language] + "\tgenesis\t0\t0\t248");
         } else {
             int variant = extra == 7 ? 2 : extra, kind = variant / 2;
             SyncedInts data = SyncedInts.client(GeneratorSlotsMenu.COUNT);
