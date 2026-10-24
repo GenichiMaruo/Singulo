@@ -115,6 +115,7 @@ public final class V011ReviewHarness {
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null || mc.getOverlay() != null) return;
         if (phase == 0) {
+            verifyDetachedLightView();
             phase = 1;
             mc.getSingleplayerServer().execute(() -> prepare(mc.getSingleplayerServer().overworld()));
             return;
@@ -162,6 +163,21 @@ public final class V011ReviewHarness {
                 wait = 0;
             }
         }
+    }
+
+    /** Sodium-like snapshots must never be asked for a live light engine, even off-thread. */
+    private static void verifyDetachedLightView() throws Exception {
+        var view = (net.minecraft.world.level.BlockAndTintGetter) java.lang.reflect.Proxy.newProxyInstance(
+                V011ReviewHarness.class.getClassLoader(), new Class<?>[] {net.minecraft.world.level.BlockAndTintGetter.class},
+                (proxy, method, args) -> { throw new UnsupportedOperationException("Snapshot access: " + method.getName()); });
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            int packed = 0x00A00070;
+            if (RayleighLighting.level(view) != null || RayleighLighting.pack(view, BlockPos.ZERO, packed) != packed
+                    || RayleighLighting.tag(view, BlockPos.ZERO, packed) != packed) {
+                throw new AssertionError("Detached renderer lighting was changed");
+            }
+        }).get(10, java.util.concurrent.TimeUnit.SECONDS);
+        Singulo.LOGGER.info("SINGULO_DETACHED_LIGHT_VIEW_PASSED");
     }
 
     private static void applyFlows(Minecraft mc) {

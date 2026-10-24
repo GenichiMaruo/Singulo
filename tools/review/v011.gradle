@@ -2,6 +2,10 @@
 allprojects {
     afterEvaluate {
         sourceSets.main.java.srcDir(file('tools/review/v011-src'))
+        // Optional real renderer compatibility checks; never add these mods to production dependencies.
+        if (providers.gradleProperty('rendererModsDir').isPresent()) {
+            dependencies.add('localRuntime', fileTree(providers.gradleProperty('rendererModsDir').get()) { include '*.jar' })
+        }
         neoForge.runs.client {
             gameDirectory = file('build/v011-review')
             systemProperty 'singulo.v011Output', file('build/v011-review/screenshots').absolutePath
