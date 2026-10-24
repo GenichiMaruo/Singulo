@@ -15,7 +15,7 @@ public final class SodiumRayleighPipeline implements LightPipeline {
     private final LightPipeline natural;
     private final QuadLightData noon = new QuadLightData();
     private LightPipeline artificial;
-    private long epoch = Long.MIN_VALUE;
+    private int epoch = Integer.MIN_VALUE;
 
     public SodiumRayleighPipeline(LightDataAccess source, LightMode mode, LightPipeline natural) {
         this.source = source;

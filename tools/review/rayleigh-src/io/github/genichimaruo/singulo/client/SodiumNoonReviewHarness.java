@@ -20,7 +20,7 @@ public final class SodiumNoonReviewHarness {
                 new Class<?>[] {net.minecraft.world.level.BlockAndTintGetter.class, SodiumRayleighView.class},
                 (proxy, method, args) -> switch (method.getName()) {
                     case "singulo$sunlight" -> sunlight;
-                    case "singulo$lightEpoch" -> 1L;
+                    case "singulo$lightEpoch" -> 1;
                     case "getShade" -> 1F;
                     default -> throw new AssertionError("Unexpected live view access: " + method.getName());
                 });

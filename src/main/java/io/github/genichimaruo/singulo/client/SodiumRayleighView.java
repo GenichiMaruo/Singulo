@@ -5,5 +5,5 @@ import io.github.genichimaruo.singulo.ruin.lab.RayleighSky;
 /** A Sodium chunk-build snapshot, never a live-world/light-engine lookup. */
 public interface SodiumRayleighView {
     RayleighSky.LightSnapshot singulo$sunlight();
-    long singulo$lightEpoch();
+    int singulo$lightEpoch();
 }

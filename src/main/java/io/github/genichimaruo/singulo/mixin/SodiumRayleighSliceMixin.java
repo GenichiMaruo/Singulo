@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class SodiumRayleighSliceMixin implements SodiumRayleighView {
     @Shadow @Final public ClientLevel world;
     @Unique private RayleighSky.LightSnapshot singulo$sunlight;
-    @Unique private long singulo$epoch;
+    @Unique private int singulo$epoch;
 
     @Inject(method = "copyData", at = @At("RETURN"))
     private void singulo$capture(@Coerce Object context, CallbackInfo ci) {
@@ -21,5 +21,5 @@ public abstract class SodiumRayleighSliceMixin implements SodiumRayleighView {
     }
 
     @Override public RayleighSky.LightSnapshot singulo$sunlight() { return singulo$sunlight; }
-    @Override public long singulo$lightEpoch() { return singulo$epoch; }
+    @Override public int singulo$lightEpoch() { return singulo$epoch; }
 }
