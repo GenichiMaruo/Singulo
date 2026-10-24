@@ -8,4 +8,6 @@ For **Minecraft 1.20.1 / Forge or NeoForge**, Java 17.
 - Lower drone combat flight to roughly 1.25 blocks above the target's feet, with a 2.5-block flight ceiling above the ground or target. Drones descend from excessive heights and cannot fire from far overhead; damaged drones retain their lower flight ceiling.
 - Remove knockback from drone bolts, rams and electromagnetic pulses while preserving the victim's existing movement. Pulse damage and slowness remain.
 
+- Preserve machine recipe IDs across repeated world logins to prevent duplicate-recipe synchronization failures.
+
 Also includes the 0.11.2 lighting snapshot and world re-entry fixes. On 1.20.1, optional accelerated terrain lighting is integrated with Embeddium 0.3.31 instead of Sodium 0.6.13. Third-party shader packs are outside this compatibility check.
