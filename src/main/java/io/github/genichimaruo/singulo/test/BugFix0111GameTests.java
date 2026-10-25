@@ -215,7 +215,7 @@ public final class BugFix0111GameTests {
 
     /** アンドロイドは無重力の空間では宙を飛び、上にある行き先へも上がっていける（重力の属性は変えない）。外に出れば歩く。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
-    public static void androidsFlyInZeroGravity(GameTestHelper helper) {
+    public static void androidsFlyInZeroGravity(GameTestHelper helper) throws Exception {
         io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (int x = 1; x <= 3; x++) {
             for (int z = 1; z <= 3; z++) {
@@ -225,6 +225,13 @@ public final class BugFix0111GameTests {
         helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(new BlockPos(5, 1, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
         BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        // This test drives navigation itself; nearby fixtures must not supply
+        // combat targets or random walking goals that replace its destination.
+        for (String name : List.of("goalSelector", "targetSelector")) {
+            var field = net.minecraft.world.entity.Mob.class.getDeclaredField(name);
+            field.setAccessible(true);
+            ((net.minecraft.world.entity.ai.goal.GoalSelector) field.get(android)).removeAllGoals(goal -> true);
+        }
         android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 2, 1))));
         android.setPersistenceRequired();
         helper.getLevel().addFreshEntity(android);

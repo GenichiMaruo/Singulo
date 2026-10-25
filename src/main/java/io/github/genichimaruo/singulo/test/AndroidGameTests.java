@@ -1010,7 +1010,7 @@ public final class AndroidGameTests {
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 640,
+        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 640,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         int[] most = {0};
@@ -1058,7 +1058,7 @@ public final class AndroidGameTests {
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
+        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         int[] trips = {0};
@@ -1206,7 +1206,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, RACK);
         rack.items().setStackInSlot(0, bench);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "量子アンドロイド作業台で注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
