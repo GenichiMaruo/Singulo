@@ -1001,6 +1001,7 @@ public final class AndroidGameTests {
     /** 射撃型（シエル）は内蔵のバックパックも作業に使う: 持ち物の5枠に収まらない量（板材640個 = 10スタック）を作るとき、バックパックの枠にも入れる。 */
     @GameTest(template = EMPTY, timeoutTicks = 6000)
     public static void gunnerUsesBuiltInPackForCrafting(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 64);
         net.minecraft.world.level.block.entity.ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CHEST);
         chest.setItem(1, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
@@ -1033,6 +1034,7 @@ public final class AndroidGameTests {
     /** 同じ種類の別の物も使うレシピ（どの板材でも作れる棒）があっても、全部持てるなら素材は1回でまとめて取る（射撃型の内蔵バックパック）。 */
     @GameTest(template = EMPTY, timeoutTicks = 6000)
     public static void variantRecipesFetchInOneTrip(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var console = workshop(helper, 22);
         java.util.List<ItemStack> sticks = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         sticks.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
@@ -1179,6 +1181,7 @@ public final class AndroidGameTests {
      */
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void upperWorkbenchTiers(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var level = helper.getLevel();
         net.minecraft.world.level.block.Block[] benches = {SinguloBlocks.ANDROID_WORKBENCH.get(), SinguloBlocks.ADVANCED_ANDROID_WORKBENCH.get(),
                 SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get()};
@@ -1219,6 +1222,7 @@ public final class AndroidGameTests {
      */
     @GameTest(template = EMPTY)
     public static void processingFacesFollowMachineFacing(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var state = net.minecraft.world.level.block.Blocks.FURNACE.defaultBlockState()
                 .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, net.minecraft.core.Direction.EAST);
         net.minecraft.core.Direction[] expect = {net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST,
@@ -2680,6 +2684,7 @@ public final class AndroidGameTests {
      */
     @GameTest(template = EMPTY, timeoutTicks = 160)
     public static void androidBlocksOpenEyesWhenUsed(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var lit = io.github.genichimaruo.singulo.machine.AbstractMachineBlock.LIT;
         var used = java.util.List.of(SinguloBlocks.ANDROID_SUPPLY_PORT.get(), SinguloBlocks.ANDROID_WORKBENCH.get(),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get(), SinguloBlocks.ANDROID_DELIVERY_PORT.get(), SinguloBlocks.ANDROID_RECIPE_RACK.get());

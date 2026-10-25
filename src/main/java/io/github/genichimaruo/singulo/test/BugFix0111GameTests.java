@@ -45,6 +45,7 @@ public final class BugFix0111GameTests {
 
     @GameTest(template = "empty")
     public static void alternativesRespectTheActualCraftingSlot(GameTestHelper helper) throws Exception {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         var pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         var console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
@@ -186,6 +187,7 @@ public final class BugFix0111GameTests {
      */
     @GameTest(template = EMPTY, timeoutTicks = 100)
     public static void receiverHoldsNoBuffer(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         BlockPos zero = new BlockPos(2, 1, 2), box = new BlockPos(2, 1, 3), receiver = new BlockPos(3, 1, 2), source = new BlockPos(4, 1, 2);
         helper.setBlock(zero, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(box, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
@@ -214,6 +216,7 @@ public final class BugFix0111GameTests {
     /** アンドロイドは無重力の空間では宙を飛び、上にある行き先へも上がっていける（重力の属性は変えない）。外に出れば歩く。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void androidsFlyInZeroGravity(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         for (int x = 1; x <= 3; x++) {
             for (int z = 1; z <= 3; z++) {
                 helper.setBlock(new BlockPos(x, 1, z), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
@@ -277,6 +280,7 @@ public final class BugFix0111GameTests {
     /** アンドロイドは水の中でも自由に動け、おぼれない（空気も体力も減らない）。水中で止まっている間は充電が減らず、泳ぐと減る。 */
     @GameTest(template = EMPTY, timeoutTicks = 160)
     public static void androidsSwimWithoutDrowning(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         pool(helper);
         BladeAndroid a = swimmer(helper, RuinAndroid.CHARGE_MAX);
         a.makeGuard(null, helper.absolutePos(new BlockPos(3, 0, 3)), RuinAndroid.MODE_GUARD, 30);   // 持ち場にいて、うろうろ泳がない
@@ -306,6 +310,7 @@ public final class BugFix0111GameTests {
     /** 水中で充電が切れ、近くに陸がなければ、水面まで浮かび上がって充電する（日が出ていればソーラー、出ていなければあお向けに浮かぶ）。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void androidsSurfaceToChargeWithoutLand(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         pool(helper);
         BladeAndroid a = swimmer(helper, 2);
         swimUntilEmpty(helper, a);
@@ -320,6 +325,7 @@ public final class BugFix0111GameTests {
     /** 上に水面がない水の中（ガラスの天井の下）で充電が切れると、浮かび上がらずに底まで沈み、座って充電する。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void androidsChargeOnSeabedUnderCeiling(GameTestHelper helper) {
+        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
         pool(helper);
         for (int x = 1; x <= 5; x++) {
             for (int z = 1; z <= 5; z++) {
