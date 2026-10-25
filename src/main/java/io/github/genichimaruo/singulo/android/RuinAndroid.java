@@ -2536,7 +2536,11 @@ public abstract class RuinAndroid extends Monster {
      * 進入禁止ゾーンは地上と同じく避ける。
      */
     private net.minecraft.world.entity.ai.navigation.PathNavigation createFlightNavigation(Level level) {
-        var nav = new net.minecraft.world.entity.ai.navigation.FlyingPathNavigation(this, level) {
+        // Explicit constructor parameters avoid duplicate names from legacy mapping metadata.
+        class AndroidFlightNavigation extends net.minecraft.world.entity.ai.navigation.FlyingPathNavigation {
+            AndroidFlightNavigation(net.minecraft.world.entity.Mob flyingMob, Level flyingLevel) {
+                super(flyingMob, flyingLevel);
+            }
             /**
              * 行き先まで、間にブロックがなければ、道の点（ブロックの格子に沿った階段のような道）をたどらずに、行き先へまっすぐ向かう
              * （点ごとに曲がって、左右にふらふら動かないように）。
@@ -2584,7 +2588,8 @@ public abstract class RuinAndroid extends Monster {
                 this.nodeEvaluator.setCanPassDoors(true);
                 return new net.minecraft.world.level.pathfinder.PathFinder(this.nodeEvaluator, maxVisitedNodes);
             }
-        };
+        }
+        var nav = new AndroidFlightNavigation(this, level);
         nav.setCanPassDoors(true);
         nav.setCanFloat(true);
         return nav;
