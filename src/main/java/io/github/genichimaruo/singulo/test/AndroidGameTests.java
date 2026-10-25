@@ -73,6 +73,18 @@ public final class AndroidGameTests {
 
     /** 電力・設計メモリ・キットのあるステーションを置く。 */
     private static AndroidStationBlockEntity station(GameTestHelper helper, int kits) {
+        var level = helper.getLevel();
+        var pos = helper.absolutePos(STATION);
+        // Accelerated tests can outrun asynchronous ticket promotion. Wait for
+        // the fixture's chunk to tick before starting its 40-tick print clock.
+        level.setChunkForced(pos.getX() >> 4, pos.getZ() >> 4, true);
+        level.getChunkAt(pos);
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
+        level.getServer().managedBlock(() -> {
+            level.getChunkSource().pollTask();
+            return level.isPositionEntityTicking(pos) || System.nanoTime() >= deadline;
+        });
+        helper.assertTrue(level.isPositionEntityTicking(pos), "Station fixture chunk did not become ticking");
         helper.setBlock(STATION, SinguloBlocks.ANDROID_STATION.get());
         AndroidStationBlockEntity s = helper.getBlockEntity(STATION);
         s.energy().setEnergy(AndroidStationBlockEntity.CAPACITY);
