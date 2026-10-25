@@ -158,6 +158,11 @@ public final class AndroidGameTests {
                     + " hp=" + a.getHealth() + "/" + before);
             // 体力を知らせる（毎秒）のを待って、コンパレーターの値を見る
             helper.runAfterDelay(25, () -> {
+                // Recovery and the periodic report coincide every 100 entity ticks.
+                a.setHealth(a.getMaxHealth() / 2);
+                a.tickCount = 100;
+                a.tick();
+                helper.assertTrue(a.getHealth() > a.getMaxHealth() / 2, "Recovery did not run at the report boundary");
                 int signal = s.signal();
                 int want = (int) Math.ceil(15 * a.getHealth() / a.getMaxHealth());
                 helper.assertTrue(signal == want, "コンパレーターの値が体力と合わない: " + signal + " / " + want);

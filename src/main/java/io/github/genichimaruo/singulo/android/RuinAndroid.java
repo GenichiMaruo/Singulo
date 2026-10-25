@@ -2298,6 +2298,12 @@ public abstract class RuinAndroid extends Monster {
             spend(1);                                     // 水中を泳いでいる間は、水をかいて進むのに充電を使う（止まっていれば減らない）
         }
         entityData.set(ALERT, getTarget() != null && active());
+        if (printed() && state() != STATE_LOW_POWER && getHealth() < getMaxHealth() && tickCount % REGEN_INTERVAL == 0
+                && charge() > maxCharge() * REGEN_MIN_CHARGE + REGEN_COST) {
+            // 減った体力は、充電を少しずつ使いながら、ゆっくり直る（充電が少ないときは、充電を残すために直さない）
+            setCharge(charge() - REGEN_COST);
+            heal(1);
+        }
         if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
             if (level().getBlockEntity(home) instanceof AndroidStationBlockEntity station && station.manages(getUUID())) {
                 pushEscort();
@@ -2316,12 +2322,6 @@ public abstract class RuinAndroid extends Monster {
             setTarget(null);
             setState(STATE_RETREAT);
             playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.power_down"), 0.7F, 1.3F);
-        }
-        if (printed() && state() != STATE_LOW_POWER && getHealth() < getMaxHealth() && tickCount % REGEN_INTERVAL == 0
-                && charge() > maxCharge() * REGEN_MIN_CHARGE + REGEN_COST) {
-            // 減った体力は、充電を少しずつ使いながら、ゆっくり直る（充電が少ないときは、充電を残すために直さない）
-            setCharge(charge() - REGEN_COST);
-            heal(1);
         }
         if (guard && printed() && charging(state()) && state() != STATE_CHARGING && getHealth() < getMaxHealth() * retreatPercent / 100F) {
             // 充電中（ステーションの上を除く。ステーションは体力も直す）でも、体力が減ったら自己修理キットを使う
