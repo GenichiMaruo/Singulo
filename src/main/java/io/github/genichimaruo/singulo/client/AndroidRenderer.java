@@ -1003,9 +1003,11 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.popPose();
                     continue;
                 }
+                // 蓋は筒よりほんの少し太く、ガラスの上下の面は蓋から少し離す（同じ面が重なると、境目がちらつく）
                 VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
-                FxDraw.box(pose, metal, lo, y0 - 0.35F / 16, z0, hi, y0, z1, light, 0x8C94A2, 255);
-                FxDraw.box(pose, metal, lo, y1, z0, hi, y1 + 0.35F / 16, z1, light, 0x8C94A2, 255);
+                float lip = 0.06F / 16, gap = 0.02F / 16;
+                FxDraw.box(pose, metal, lo - lip, y0 - 0.35F / 16, z0 - lip, hi + lip, y0, z1 + lip, light, 0x8C94A2, 255);
+                FxDraw.box(pose, metal, lo - lip, y1, z0 - lip, hi + lip, y1 + 0.35F / 16, z1 + lip, light, 0x8C94A2, 255);
                 float fill = android.tankFill(i);
                 net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
                 if (fluid != null && fill > 0) {
@@ -1017,7 +1019,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                             FluidDraw.gaseous(fluid) ? 170 : 235);
                 }
                 VertexConsumer glass = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
-                FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
+                FxDraw.box(pose, glass, lo, y0 + gap, z0, hi, y1 - gap, z1, light, 0xDDEEF8, 70);
                 pose.popPose();
             }
         }
@@ -1033,7 +1035,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             int steel = 0xB4BCC8, dark = 0x6E7684;
             FxDraw.box(pose, metal, lo, y0 - 0.3F * p, z0, hi, y1 - 0.4F * p, z1, light, steel, 255);                            // 胴
             float inset = 0.25F * p;
-            FxDraw.box(pose, metal, lo + inset, y1 - 0.4F * p, z0 + inset, hi - inset, y1 + 0.2F * p, z1 - inset, light, dark, 255);   // 肩
+            FxDraw.box(pose, metal, lo + inset, y1 - 0.39F * p, z0 + inset, hi - inset, y1 + 0.2F * p, z1 - inset, light, dark, 255);  // 肩（胴の上の面と重ねない）
             float mx = (lo + hi) / 2, mz = (z0 + z1) / 2, v = 0.3F * p;
             FxDraw.box(pose, metal, mx - v, y1 + 0.2F * p, mz - v, mx + v, y1 + 0.8F * p, mz + v, light, 0x5A606C, 255);          // バルブ
             FxDraw.box(pose, metal, mx - 0.5F * p, y1 + 0.8F * p, mz - 0.15F * p, mx + 0.5F * p, y1 + 1.0F * p, mz + 0.15F * p, light, 0xE2BA5C, 255);
@@ -1046,7 +1048,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, metal, wx0, wy0, wz - 0.02F * p, wx1, wy1, wz, light, 0x2A3040, 255);
             if (!id.isEmpty() && fill > 0) {
                 VertexConsumer chem = buffers.getBuffer(RenderType.entityTranslucent(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
-                FluidDraw.chemicalBox(pose, chem, id, wx0, wy0, wz - 0.04F * p, wx1, wy0 + (wy1 - wy0) * Math.min(1, fill), wz - 0.02F * p, light, 235);
+                FluidDraw.chemicalBox(pose, chem, id, wx0, wy0, wz - 0.045F * p, wx1, wy0 + (wy1 - wy0) * Math.min(1, fill), wz - 0.025F * p, light, 235);
             }
         }
     }
