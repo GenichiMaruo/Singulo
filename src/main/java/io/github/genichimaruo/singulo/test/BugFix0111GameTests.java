@@ -44,6 +44,35 @@ public final class BugFix0111GameTests {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)));
     }
 
+    @GameTest(template = "empty")
+    public static void alternativesRespectTheActualCraftingSlot(GameTestHelper helper) throws Exception {
+        var pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        var console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) helper.getBlockEntity(pos);
+        var broad = net.minecraft.world.item.crafting.Ingredient.of(Items.OAK_PLANKS, Items.BIRCH_PLANKS);
+        var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(Items.OAK_PLANKS));
+        grid.set(1, new ItemStack(Items.OAK_PLANKS));
+        var method = console.getClass().getDeclaredMethod("validAlternatives", net.minecraft.world.item.crafting.CraftingRecipe.class,
+                List.class, int.class, net.minecraft.world.item.crafting.Ingredient.class);
+        method.setAccessible(true);
+        // Vanilla permits mirrored shapes: keep a second row to disambiguate orientation.
+        var recipe = new net.minecraft.world.item.crafting.ShapedRecipe("", net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                net.minecraft.world.item.crafting.ShapedRecipePattern.of(java.util.Map.of('A', broad,
+                        'B', net.minecraft.world.item.crafting.Ingredient.of(Items.OAK_PLANKS),
+                        'C', net.minecraft.world.item.crafting.Ingredient.of(Items.COBBLESTONE)), "AB", "C "), new ItemStack(Items.STICK));
+        grid.set(3, new ItemStack(Items.COBBLESTONE));
+        helper.assertTrue((Boolean) method.invoke(console, recipe, grid, 0, broad), "Valid alternatives were rejected");
+        helper.assertTrue(!(Boolean) method.invoke(console, recipe, grid, 1, broad), "A different slot's broad ingredient leaked into a strict slot");
+        var assign = console.getClass().getDeclaredMethod("alternativeSlots", net.minecraft.world.item.crafting.CraftingRecipe.class, List.class);
+        assign.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        var slots = (List<net.minecraft.world.item.crafting.Ingredient>) assign.invoke(null, recipe, grid);
+        helper.assertTrue(slots.get(0) == broad && slots.get(1).getItems().length == 1,
+                "Shaped ingredients were not assigned to their actual positions");
+        helper.succeed();
+    }
+
     @GameTest(template = EMPTY)
     public static void generatedRoomLightsUseTheirLevers(GameTestHelper helper) {
         var level = helper.getLevel();

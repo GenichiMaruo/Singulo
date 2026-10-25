@@ -2368,22 +2368,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     private List<String> alternatives(List<ItemStack> grid) {
         List<String> out = new ArrayList<>();
-        List<net.minecraft.world.item.crafting.Ingredient> ings = List.of();
+        net.minecraft.world.item.crafting.CraftingRecipe matched = null;
         if (level instanceof ServerLevel server) {
             net.minecraft.core.NonNullList<ItemStack> g = net.minecraft.core.NonNullList.withSize(GRID, ItemStack.EMPTY);
             for (int i = 0; i < GRID; i++) {
                 g.set(i, grid.get(i).copyWithCount(1));
             }
             var input = net.minecraft.world.item.crafting.CraftingInput.of(3, 3, g);
-            ings = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
-                    .map(h -> (List<net.minecraft.world.item.crafting.Ingredient>) h.value().getIngredients()).orElse(List.of());
+            matched = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
+                    .map(h -> h.value()).orElse(null);
         }
+        var assigned = alternativeSlots(matched, grid);
         for (int i = 0; i < grid.size(); i++) {
             ItemStack s = grid.get(i);
             String alt = "";
             if (!s.isEmpty() && (variantMask >> i & 1) != 0) {
-                for (var ing : ings) {
-                    if (!ing.isEmpty() && ing.test(s) && ing.getItems().length > 1) {
+                for (var ing : List.of(assigned.get(i))) {
+                    if (!ing.isEmpty() && ing.test(s) && ing.getItems().length > 1
+                            && validAlternatives(matched, grid, i, ing)) {
                         alt = ItemCount.key(ing);
                         break;
                     }
@@ -2392,6 +2394,50 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             out.add(alt);
         }
         return out;
+    }
+
+    /** Assign each physical slot once, including the chosen shaped orientation. */
+    private static List<net.minecraft.world.item.crafting.Ingredient> alternativeSlots(
+            net.minecraft.world.item.crafting.CraftingRecipe recipe, List<ItemStack> grid) {
+        var empty = net.minecraft.world.item.crafting.Ingredient.EMPTY;
+        List<net.minecraft.world.item.crafting.Ingredient> out = new ArrayList<>(java.util.Collections.nCopies(grid.size(), empty));
+        if (recipe instanceof net.minecraft.world.item.crafting.ShapedRecipe shaped) {
+            int left = 3, top = 3;
+            for (int i = 0; i < grid.size(); i++) if (!grid.get(i).isEmpty()) {
+                left = Math.min(left, i % 3); top = Math.min(top, i / 3);
+            }
+            for (boolean mirror : new boolean[]{false, true}) {
+                boolean matches = true;
+                for (int y = 0; y < shaped.getHeight(); y++) for (int x = 0; x < shaped.getWidth(); x++) {
+                    int index = (top + y) * 3 + left + x;
+                    var ingredient = shaped.getIngredients().get(y * shaped.getWidth() + (mirror ? shaped.getWidth() - 1 - x : x));
+                    if (index >= grid.size() || !ingredient.test(grid.get(index))) matches = false;
+                    else out.set(index, ingredient);
+                }
+                if (matches) return out;
+                java.util.Collections.fill(out, empty);
+            }
+        } else if (recipe instanceof net.minecraft.world.item.crafting.ShapelessRecipe) {
+            List<Integer> slots = new ArrayList<>();
+            List<ItemStack> inputs = new ArrayList<>();
+            for (int i = 0; i < grid.size(); i++) if (!grid.get(i).isEmpty()) { slots.add(i); inputs.add(grid.get(i)); }
+            int[] mapping = net.neoforged.neoforge.common.util.RecipeMatcher.findMatches(inputs, recipe.getIngredients());
+            if (mapping != null) for (int i = 0; i < mapping.length; i++) out.set(slots.get(i), recipe.getIngredients().get(mapping[i]));
+        }
+        return out;
+    }
+
+    /** Overlapping ingredients must not broaden a different shaped slot. */
+    private boolean validAlternatives(net.minecraft.world.item.crafting.CraftingRecipe recipe,
+                                      List<ItemStack> grid, int slot,
+                                      net.minecraft.world.item.crafting.Ingredient ingredient) {
+        if (recipe == null || level == null) return false;
+        List<ItemStack> probe = new ArrayList<>(grid);
+        for (ItemStack candidate : ingredient.getItems()) {
+            probe.set(slot, candidate.copyWithCount(1));
+            if (!recipe.matches(net.minecraft.world.item.crafting.CraftingInput.of(3, 3, probe), level)) return false;
+        }
+        return true;
     }
 
     /**
