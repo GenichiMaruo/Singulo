@@ -33,6 +33,8 @@ import org.joml.Quaternionf;
 public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     /** 体の大きさ（モデルはプレイヤーの大きさで作り、少し縮める）。 */
     static final float SCALE = 0.85F;
+    /** 画面の中（インベントリの全身）に描いている間だけ true。世界の座標で描く飾りは、体の座標で描き直す。 */
+    static boolean inGui;
 
     public enum Variant {
         BLADE("blade_android", BladeAndroid.ACCENT, AndroidModel.BLADE_LAYER, false),
@@ -1624,6 +1626,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             if (m.whipHandle == null || !(android instanceof WhipAndroid whip) || android.weaponStowed()) {
                 return;
             }
+            if (inGui) {
+                hangInGui(pose, m, age, buffers);
+                return;
+            }
             Vec3 camera = entityRenderDispatcher.camera.getPosition();
             pose.pushPose();
             m.toWhip(pose);
@@ -1698,6 +1704,35 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             // 光は足し合わせで描く（深度を書かないので、交差した板どうしが隠し合ってちらつかない）
             drawWhip(hand, ctrl, end, side, wave, tension, age, buffers.getBuffer(RenderType.lightning()),
                     android.active() || RuinAndroid.charging(state) ? 1F : 0.4F);
+        }
+
+        /**
+         * 画面の中の姿（インベントリの全身）: 世界の座標やカメラは使えないので、体の座標のまま、床へ垂れた形で描く。
+         * 体の座標は下が +y・前が -z で、足もとは y = 1.501、長さはブロックを SCALE で割った値。
+         */
+        private void hangInGui(PoseStack pose, AndroidModel m, float age, MultiBufferSource buffers) {
+            PoseStack local = new PoseStack();
+            m.toWhip(local);
+            org.joml.Vector3f h = local.last().pose().transformPosition(new org.joml.Vector3f());
+            Vec3 hand = new Vec3(h.x, h.y, h.z);
+            double floor = 1.501 - 0.03 / SCALE;
+            Vec3 back = new Vec3(0, 0, 1 / SCALE);                  // 後ろ（ブロック1つ分）
+            Vec3 side = new Vec3(hand.x < 0 ? -1 / SCALE : 1 / SCALE, 0, 0);   // 持つ手の側
+            float sway = Mth.sin(age * 0.08F) * 0.06F;
+            Vec3 end = new Vec3(hand.x, floor, hand.z).add(back.scale(1.15)).add(side.scale(0.25 + sway));
+            Vec3 ctrl = new Vec3(hand.x, 1.501 - 0.15 / SCALE, hand.z).add(side.scale(sway));
+            PoseStack.Pose last = pose.last();
+            VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+            int n = 20;
+            Vec3 prev = hand;
+            for (int i = 1; i <= n; i++) {
+                float s = (float) i / n;
+                Vec3 p = hand.scale((1 - s) * (1 - s)).add(ctrl.scale(2 * (1 - s) * s)).add(end.scale(s * s));
+                float width = Mth.lerp(s, 0.075F, 0.035F) / SCALE;
+                FxDraw.beam(last, vc, prev, p, width * 1.8F, variant.accent, 150);
+                FxDraw.beam(last, vc, prev, p, width * 0.55F, 0xFFFFFF, 235);
+                prev = p;
+            }
         }
 
         /** 柄の先 from から end まで、二次曲線に波を足した鞭。 */

@@ -608,8 +608,13 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         }
         RuinAndroid android = menu.android();
         if (android != null) {
-            InventoryScreen.renderEntityInInventoryFollowsMouse(g, px + 2, py + 2, px + PORTRAIT_W - 2, py + PORTRAIT_H - 18, 32, 0.0625F,
-                    mouseX, mouseY, android);
+            AndroidRenderer.inGui = true;
+            try {
+                InventoryScreen.renderEntityInInventoryFollowsMouse(g, px + 2, py + 2, px + PORTRAIT_W - 2, py + PORTRAIT_H - 18, 32, 0.0625F,
+                        mouseX, mouseY, android);
+            } finally {
+                AndroidRenderer.inGui = false;
+            }
         }
         // 吹き出し（姿の下）
         g.fill(px + 3, py + PORTRAIT_H - 16, px + PORTRAIT_W - 3, py + PORTRAIT_H - 2, 0xFFFFFFFF);
