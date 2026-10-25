@@ -2751,6 +2751,8 @@ SOUNDS = {
     'android.railgun_charge': ('android/railgun_charge', 'レールガンがためる', 'Railgun charges', 32),
     'android.railgun_fire': ('android/railgun_fire', 'レールガンが放たれる', 'Railgun fires', 64),
     'android.ring_inflate': ('android/ring_inflate', '浮き輪がふくらむ', 'Float ring inflates', 16),
+    # 画面のボタンを押した音（バニラのボタンと同じく、字幕は出さない）
+    'ui.click': ('ui/click', None, None, 16),
 }
 # 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
 SOUND_FALLBACKS = {
@@ -2854,8 +2856,11 @@ def sounds_json():
         else:
             missing.append(path)
             sounds = []
-        out[name] = {'subtitle': f'subtitles.{MODID}.{name}', 'sounds': sounds}
-        UI_LANG[f'subtitles.{MODID}.{name}'] = (ja, en)
+        if ja is None:
+            out[name] = {'sounds': sounds}
+        else:
+            out[name] = {'subtitle': f'subtitles.{MODID}.{name}', 'sounds': sounds}
+            UI_LANG[f'subtitles.{MODID}.{name}'] = (ja, en)
     unused = sorted(str(p.relative_to(base)).replace('\\', '/')[:-4] for p in base.rglob('*.ogg')
                     if str(p.relative_to(base)).replace('\\', '/')[:-4] not in used)
     if missing:

@@ -1,8 +1,11 @@
 package io.github.genichimaruo.singulo.client;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import org.joml.Vector3f;
 
 /**
  * GUIの部品を描く（テクスチャ画像を使わない）。光は左上から、段差は1pxまで。
@@ -21,6 +24,17 @@ final class Panel {
 
     private static final int SHADOW = 0x66000000;
     private static final int SHADOW_SOFT = 0x2E000000;
+
+    /** 前のフレームで描いた、押せるもの（ボタン・タブ）の場所。画面の座標で {x0, y0, x1, y1}。押したときの音に使う（UiClick）。 */
+    static final List<int[]> CLICKABLE = new ArrayList<>();
+
+    /** 押せるものを描いた場所を覚える（renderLabels の中のように、ずらした座標で描いていても画面の座標に直す）。 */
+    static void clickable(GuiGraphics g, int x, int y, int w, int h) {
+        var m = g.pose().last().pose();
+        Vector3f a = m.transformPosition(x, y, 0, new Vector3f());
+        Vector3f b = m.transformPosition(x + w, y + h, 0, new Vector3f());
+        CLICKABLE.add(new int[]{Math.round(a.x), Math.round(a.y), Math.round(b.x), Math.round(b.y)});
+    }
 
     enum Press { NORMAL, HOVER, PRESSED, ON, DISABLED }
 
@@ -225,6 +239,9 @@ final class Panel {
 
     /** ボタン。押している間は明暗が逆になり、返り値（中身を下げる量）が1になる。 */
     static int button(GuiGraphics g, GuiSkin s, int x, int y, int w, int h, Press state) {
+        if (state != Press.DISABLED) {
+            clickable(g, x, y, w, h);
+        }
         int edge = state == Press.HOVER ? s.accent() : state == Press.DISABLED ? s.lo() : s.outline();
         g.fill(x + 1, y, x + w - 1, y + 1, edge);
         g.fill(x + 1, y + h - 1, x + w - 1, y + h, edge);
@@ -290,6 +307,7 @@ final class Panel {
     static void railTab(GuiGraphics g, GuiSkin s, int x, int y, boolean connected, boolean hover, int frameY, int frameH) {
         int tw = connected ? 23 : 21;
         int h = 22;
+        clickable(g, x, y, tw, h);
         g.fill(x + 2, y + h, x + tw + 1, y + h + 1, SHADOW);
         g.fill(x + tw, y + 2, x + tw + 1, y + h, SHADOW);
         g.fill(x, y, x + tw - 1, y + 1, hover ? s.accent() : s.outline());

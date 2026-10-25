@@ -1225,3 +1225,14 @@ def android_ring_inflate(d, seed):
     rush = highpass(pink(0.45, seed), 1200) * env([(0, 0), (0.02, 1), (0.45, 0)], 0.45) * 0.5
     squeak = sine(glide(900, 1400, 0.12)) * perc(0.12, 0.01, 0.08) * 0.15
     return mix(pop, (rush, 0.02), (squeak, 0.35))
+
+
+# =================================================================== 画面
+
+@recipe('ui/click', level=-20)
+def ui_click(d, seed):
+    # 軽いスイッチ: カチッという接点、小さな筐体の響き、澄んだ短い電子音
+    snap = tick(4200, 0.03, seed) * 1.0
+    body = resonator(white(0.002, seed) * 1.0, 1150, 0.035) * 3
+    blip = sine(glide(1900, 1500, 0.06)) * perc(0.06, 0.001, 0.02) * 0.25
+    return mix(snap, body, (blip, 0.004))

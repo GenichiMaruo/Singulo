@@ -1584,5 +1584,13 @@
         "attenuation_distance": 16
       }
     ]
+  },
+  "ui.click": {
+    "sounds": [
+      {
+        "name": "singulo:ui/click",
+        "attenuation_distance": 16
+      }
+    ]
   }
 }
