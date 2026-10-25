@@ -2550,4 +2550,44 @@ public final class AndroidGameTests {
                 "高さ0のメガネに値が残り、高さ0の新品と重ならない");
         helper.succeed();
     }
+
+    /**
+     * 組立ステーションは電力がある間、作業台や資材口などはアンドロイドが使っている間だけ、正面の顔が目を開ける（LIT）。
+     * 作業台などは電力を使わない（電源を隣に置いても目を開けない）。使われなくなると、しばらくして目を閉じる。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 160)
+    public static void androidBlocksOpenEyesWhenUsed(GameTestHelper helper) {
+        var lit = io.github.genichimaruo.singulo.machine.AbstractMachineBlock.LIT;
+        var used = java.util.List.of(SinguloBlocks.ANDROID_SUPPLY_PORT.get(), SinguloBlocks.ANDROID_WORKBENCH.get(),
+                SinguloBlocks.ANDROID_WORK_CONSOLE.get(), SinguloBlocks.ANDROID_DELIVERY_PORT.get(), SinguloBlocks.ANDROID_RECIPE_RACK.get());
+        for (int i = 0; i < used.size(); i++) {
+            helper.setBlock(new BlockPos(1 + i, 1, 1), used.get(i));
+            helper.setBlock(new BlockPos(1 + i, 1, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
+        }
+        BlockPos station = new BlockPos(1, 1, 4), plain = new BlockPos(3, 1, 4);
+        helper.setBlock(station, SinguloBlocks.ANDROID_STATION.get());
+        helper.setBlock(station.south(), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
+        helper.setBlock(plain, SinguloBlocks.ANDROID_STATION.get());
+        helper.runAtTickTime(20, () -> {
+            for (int i = 0; i < used.size(); i++) {
+                helper.assertFalse(helper.getBlockState(new BlockPos(1 + i, 1, 1)).getValue(lit), "使われていないのに目を開けている: " + used.get(i));
+                helper.assertTrue(helper.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                        helper.absolutePos(new BlockPos(1 + i, 1, 1)), null) == null, "電力を受け取る: " + used.get(i));
+                io.github.genichimaruo.singulo.android.work.AndroidEyes.wake(helper.getLevel(), helper.absolutePos(new BlockPos(1 + i, 1, 1)));
+            }
+            helper.assertTrue(helper.getBlockState(station).getValue(lit), "電力があるのにステーションが目を閉じている");
+            helper.assertFalse(helper.getBlockState(plain).getValue(lit), "電力がないのにステーションが目を開けている");
+        });
+        helper.runAtTickTime(30, () -> {
+            for (int i = 0; i < used.size(); i++) {
+                helper.assertTrue(helper.getBlockState(new BlockPos(1 + i, 1, 1)).getValue(lit), "使われたのに目を開けない: " + used.get(i));
+            }
+        });
+        helper.runAtTickTime(20 + io.github.genichimaruo.singulo.android.work.AndroidEyes.AWAKE + 10, () -> {
+            for (int i = 0; i < used.size(); i++) {
+                helper.assertFalse(helper.getBlockState(new BlockPos(1 + i, 1, 1)).getValue(lit), "使われなくなっても目を開けている: " + used.get(i));
+            }
+            helper.succeed();
+        });
+    }
 }

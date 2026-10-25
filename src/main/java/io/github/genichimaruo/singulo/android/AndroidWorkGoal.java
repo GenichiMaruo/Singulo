@@ -498,6 +498,9 @@ final class AndroidWorkGoal extends Goal {
         if (android.state() != RuinAndroid.STATE_CRAFTING) {
             android.setState(RuinAndroid.STATE_CRAFTING);
         }
+        if (step.recipe() != null && level.getGameTime() % 20 == 0) {
+            c.wakeRacks(at, step.recipe());        // 使っているレシピの棚も、目を開ける
+        }
         if (step.recipe() != null && step.recipe().processing()) {
             process(level, c, job, step);
             return;
@@ -2274,6 +2277,7 @@ final class AndroidWorkGoal extends Goal {
 
     /** 止まって、ブロックの方を向く（体も頭もすぐ向け、上下も合わせる）。need tick そうしていたら true。 */
     private Boolean face(BlockPos target, int need) {
+        io.github.genichimaruo.singulo.android.work.AndroidEyes.wake(android.level(), target);   // 使う装置が目を開ける
         android.getNavigation().stop();
         android.setDeltaMovement(android.getDeltaMovement().multiply(0, 1, 0));
         Vec3 look = Vec3.atCenterOf(target);

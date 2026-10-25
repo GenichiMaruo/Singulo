@@ -48,7 +48,15 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * </ul>
  */
 public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
-        MenuProvider {
+        MenuProvider, AndroidEyes.Holder {
+    /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
+    protected final AndroidEyes eyes = new AndroidEyes();
+
+    @Override
+    public AndroidEyes eyes() {
+        return eyes;
+    }
+
     /** つなげるブロックと、注文に使えるアンドロイドの、指令台からの距離。 */
     public static final double LINK_RANGE = 64;
     public static final double WORKER_RANGE = 64;
@@ -318,6 +326,21 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             rack.entries(level, out);
         }
         return out;
+    }
+
+    /** その場所でそのレシピを作っている: レシピが並んでいる棚の顔が目を開ける（場所と完成品で見分ける）。 */
+    public void wakeRacks(BlockPos location, RecipeData recipe) {
+        List<RecipeRackBlockEntity.Entry> entries = new ArrayList<>();
+        for (RecipeRackBlockEntity rack : linked(RecipeRackBlockEntity.class)) {
+            entries.clear();
+            rack.entries(level, entries);
+            for (RecipeRackBlockEntity.Entry e : entries) {
+                if (e.location().equals(location) && ItemStack.isSameItemSameComponents(e.recipe().output(), recipe.output())) {
+                    AndroidEyes.wake(level, rack.getBlockPos());
+                    break;
+                }
+            }
+        }
     }
 
     public WorkPlanner.Plan plan(ItemStack target, long count) {
@@ -2512,6 +2535,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     // ------------------------------------------------------------------ 毎 tick
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, WorkConsoleBlockEntity be) {
+        be.eyes.tick(level, pos, state);
         if (level.getGameTime() % 20 == 0) {
             be.tick((ServerLevel) level);
         }

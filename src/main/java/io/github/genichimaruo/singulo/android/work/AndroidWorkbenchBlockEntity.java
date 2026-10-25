@@ -25,7 +25,16 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * <p>段階（{@link #tier}）が上の台ほど速く作り、預かり箱も大きく、アンドロイドの充電の減りも少ない: 段階2 は4倍速・27枠、
  * 段階3（改良型）は8倍速・54枠・減り6割、段階4（量子）は20倍速・81枠・減り3割。上の段階の台は、前の段階の台を素材にして作る。
  */
-public class AndroidWorkbenchBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener {
+public class AndroidWorkbenchBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+        AndroidEyes.Holder {
+    /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
+    protected final AndroidEyes eyes = new AndroidEyes();
+
+    @Override
+    public AndroidEyes eyes() {
+        return eyes;
+    }
+
     /** 段階2の台で作る1回の時間（バニラの作業台 2秒 → 0.5秒）。 */
     public static final int CRAFT_TICKS = 10;
     /** 段階2の台の預かり箱の枠の数。 */

@@ -20,7 +20,16 @@ import net.minecraft.world.level.block.state.BlockState;
  * 作業指令台を記録した作業位置カードで右クリックすると、その指令台につながる（同じ指令台なら外れる）。
  * 何も持たずにシフト右クリックすると、どの指令台につながっているかをアクションバーに出す。
  */
-public abstract class WorkLinkedBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener {
+public abstract class WorkLinkedBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
+        AndroidEyes.Holder {
+    /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
+    protected final AndroidEyes eyes = new AndroidEyes();
+
+    @Override
+    public AndroidEyes eyes() {
+        return eyes;
+    }
+
     /** つながっている作業指令台（なければ null）。 */
     @Nullable
     private BlockPos console;
