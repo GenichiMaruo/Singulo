@@ -58,7 +58,7 @@ public class RecipeCardItem extends Item {
                 tooltip.add(Component.translatable("tooltip.singulo.recipe_card.faces",
                         Component.translatable("gui.singulo.recipe_encoder.face." + data.inputFaceKey()),
                         Component.translatable("gui.singulo.recipe_encoder.face." + data.outputFaceKey()),
-                        Component.translatable("gui.singulo.recipe_encoder.face." + (data.fuelFace() == null ? "auto" : data.fuelFace().getName())))
+                        Component.translatable("gui.singulo.recipe_encoder.face." + data.fuelFaceKey()))
                         .withStyle(ChatFormatting.DARK_AQUA));
             }
             if (!data.fuel().isEmpty()) {

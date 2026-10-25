@@ -934,10 +934,14 @@ UI_LANG = {
     'gui.singulo.recipe_encoder.face.west': ('西', 'West'),
     'gui.singulo.recipe_encoder.face.east': ('東', 'East'),
     'gui.singulo.recipe_encoder.face.auto': ('自動', 'Auto'),
+    'gui.singulo.recipe_encoder.face.front': ('正面', 'Front'),
+    'gui.singulo.recipe_encoder.face.back': ('背面', 'Back'),
+    'gui.singulo.recipe_encoder.face.left': ('左', 'Left'),
+    'gui.singulo.recipe_encoder.face.right': ('右', 'Right'),
     'gui.singulo.recipe_encoder.face_button.in': ('入 %s', 'In: %s'),
     'gui.singulo.recipe_encoder.face_button.out': ('出 %s', 'Out: %s'),
     'gui.singulo.recipe_encoder.face_button.fuel': ('燃 %s', 'Fuel: %s'),
-    'gui.singulo.recipe_encoder.face_button.in.hint': ('装置のどの面から素材を入れるか（クリックで切り替え、右クリックで逆順）。自動: 上・横・下の順に、その素材を受け付ける面から入れる（ふつうはこれでよい）。東西南北は世界の向き', 'Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Directions are world directions'),
+    'gui.singulo.recipe_encoder.face_button.in.hint': ('装置のどの面から素材を入れるか（クリックで切り替え、右クリックで逆順）。自動: 上・横・下の順に、その素材を受け付ける面から入れる（ふつうはこれでよい）。正面・背面・左・右は装置の向きから見た面（左右は正面から見て）、東西南北は世界の向き', 'Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Front, back, left and right are relative to the way the machine faces (left and right as seen from the front); compass directions are world directions'),
     'gui.singulo.recipe_encoder.face_button.out.hint': ('装置のどの面からできた物を取り出すか（クリックで切り替え、右クリックで逆順）。自動: 下・横・上の順に、できた物を取り出せる面から（かまどの仲間は下）', 'Which face of the machine products are taken out from (click to change, right-click to go back). Auto: tries bottom, sides, then top, and uses the first face the products come out of (furnaces use the bottom)'),
     'gui.singulo.recipe_encoder.face_button.fuel.hint': ('装置のどの面から燃料を入れるか。自動: アンドロイドが立っている横の面（かまどなら燃料の欄）', 'Which face of the machine fuel goes in through. Auto: the side the android stands at (a furnace\'s fuel slot)'),
     'tooltip.singulo.recipe_card.faces': ('面: 入れる %s・取り出す %s・燃料 %s', 'Faces: in %s, out %s, fuel %s'),
@@ -1609,9 +1613,9 @@ def models():
                 if iid == 'android_station':
                     # 上面は印刷床（光の走査線が往復する。blocks_extra3.station_top）
                     model['textures']['top'] = f'{MODID}:block/android_station_top'
-                if iid == 'android_workbench':
-                    # 上面は 3×3 のマスの作業面（blocks_extra3.workbench_top）
-                    model['textures']['top'] = f'{MODID}:block/android_workbench_top'
+                if iid.endswith('android_workbench'):
+                    # 上面は 3×3 のマスの作業面（blocks_extra3.workbench_top。段階ごとに格子の色が違う）
+                    model['textures']['top'] = f'{MODID}:block/{iid}_top'
                 if skin:
                     # マルチブロックのコントローラは、部品と同じ外装で包む（見た目をそろえる）
                     for key in ('top', 'side', 'bottom', 'particle'):
@@ -3520,6 +3524,7 @@ TAB_GROUPS = [
                  'android_backpack_upgrade', 'android_reinforced_backpack_upgrade', 'android_large_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade',
                  'android_mining_upgrade', 'android_felling_upgrade',
                  'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
+                 'advanced_android_workbench', 'quantum_android_workbench',
                  'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
                  'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_glasses', 'android_cape', 'android_scarf',
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',

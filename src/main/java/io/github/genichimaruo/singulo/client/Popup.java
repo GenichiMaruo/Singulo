@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
  */
 final class Popup {
     /** 上の帯（つかむところ）の高さ。 */
-    static final int BAR = 11;
+    static final int BAR = 13;
     private static final Map<String, int[]> OFFSETS = new HashMap<>();
 
     private final String key;
@@ -56,7 +56,7 @@ final class Popup {
     }
 
     private int[] closeRect() {
-        return new int[]{x + w - 11, y + 2, 9, 9};
+        return new int[]{x + w - 11, y + 3, 9, 9};
     }
 
     /** 枠・帯（つまみの印）・閉じるボタン。 */
@@ -68,8 +68,8 @@ final class Popup {
         // つまみの印（点の列）
         int gx = x + w / 2 - 9;
         for (int i = 0; i < 6; i++) {
-            g.fill(gx + i * 3, y + 4, gx + i * 3 + 1, y + 5, s.dim());
-            g.fill(gx + i * 3 + 1, y + 7, gx + i * 3 + 2, y + 8, s.dim());
+            g.fill(gx + i * 3, y + 5, gx + i * 3 + 1, y + 6, s.dim());
+            g.fill(gx + i * 3 + 1, y + 8, gx + i * 3 + 2, y + 9, s.dim());
         }
         int[] c = closeRect();
         boolean hover = Panel.inside(mouseX, mouseY, c[0], c[1], c[2], c[3]);

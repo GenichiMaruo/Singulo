@@ -53,8 +53,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     /** 一覧の行数のほかの、画面の高さ（ヘッダー・下の段・インベントリ）。 */
     private static final int BASE_HEIGHT = 138;
     /** 注文タブの下の段（インベントリの見出しのすぐ上）: 検索欄・並びのボタン・逆順のボタン・JEI 連携のボタン・行の増減。 */
-    private static final int SEARCH_H = 12, SEARCH_X = 7, SEARCH_W = 60,
-            SORT_X = 69, SORT_W = 40, REV_X = 111, REV_W = 12, JEI_X = 125, JEI_W = 20, ROWS_LESS_X = 147, ROWS_MORE_X = 159, ROWS_BTN_W = 10;
+    private static final int SEARCH_H = 12, SEARCH_X = 7, SEARCH_W = 86,
+            SORT_X = 95, SORT_W = 14, REV_X = 111, REV_W = 12, JEI_X = 125, JEI_W = 20, ROWS_LESS_X = 147, ROWS_MORE_X = 159, ROWS_BTN_W = 10;
     private static final String[] SORTS = {"default", "name", "count", "mod", "craftable"};
     private static final int ROW_H = 18;
     private static final int LINK_H = 13;
@@ -69,7 +69,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
      * 窓（注文の確認・注文の詳しい様子・レシピ登録）の幅と高さ。中身は前の画面の座標のまま、窓の中へずらして描く
      * （{@link #pickX()} など。注文の確認は y 27 から、詳しい様子は y 24 から、レシピ登録は y 29 から）。
      */
-    private static final int POP_W = 246, PICK_H = Popup.BAR + 1 + BUTTON_Y + BUTTON_H + 4 - 25, RECORD_H = Popup.BAR + 1 + 84,
+    private static final int POP_W = 246, PICK_H = Popup.BAR + 1 + BUTTON_Y + BUTTON_H + 4 - 25, RECORD_H = Popup.BAR + 1 + WorkConsoleMenu.RECORD_BODY_H,
             DETAIL_H_POP = Popup.BAR + 1 + 85;
     /** 作っている最中の物の枠の色。 */
     private static final int MAKING = 0xFFF0B040;
@@ -97,6 +97,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
     private int detail = -1;
     private int detailScroll, workerScroll;
     private static final int DETAIL_ROWS = 5, DETAIL_H = 16;
+    /** 窓を描く奥行きの始まり（下の画面の物の絵と数より手前）。窓ごとに 300 ずつ手前へ。 */
+    private static final int POPUP_Z = 500;
     /** 窓: 注文の確認（picking があるあいだ開く）・詳しい様子（detail があるあいだ）・レシピ登録。stack の後ろほど手前に描く。 */
     private final Popup orderPop = new Popup("console.order");
     private final Popup detailPop = new Popup("console.detail");
@@ -236,8 +238,9 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         recordPop.layout(leftPos, topPos, POP_W, RECORD_H, dx, bottom - RECORD_H, width, height);
         for (int i = WorkConsoleMenu.SLOT_GRID; i < WorkConsoleMenu.SLOT_OUTBOX; i++) {
             net.minecraft.world.inventory.Slot s = menu.getSlot(i);
-            s.x = recordX() - leftPos + recordSlotBase[i][0];
-            s.y = recordY() - topPos + recordSlotBase[i][1];
+            boolean moved = i == WorkConsoleMenu.SLOT_RESULT && procedure();      // 手順モードの作る物は、手順のボタンの下へ
+            s.x = recordX() - leftPos + (moved ? WorkConsoleMenu.RESULT_PROC_X : recordSlotBase[i][0]);
+            s.y = recordY() - topPos + (moved ? WorkConsoleMenu.RESULT_PROC_Y : recordSlotBase[i][1]);
         }
         if (countBox != null) {
             countBox.setX(pickX() + 28);
@@ -262,12 +265,17 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         return detailPop.bodyY() - 22;
     }
 
+    /** レシピ登録の窓の中身の原点（窓の中身の左上。メニューの座標はここから）。 */
     private int recordX() {
-        return recordPop.x - 1;
+        return recordPop.x;
     }
 
     private int recordY() {
-        return recordPop.bodyY() - 25;
+        return recordPop.bodyY();
+    }
+
+    private boolean procedure() {
+        return menu.mode() == WorkConsoleBlockEntity.MODE_PROCEDURE;
     }
 
     /** マウスの下の、いちばん手前の窓（なければ null）。 */
@@ -956,7 +964,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         }
         int[][] buttons = {{WorkConsoleMenu.CLEAR_CARD_X, WorkConsoleMenu.CLEAR_CARD_Y, WorkConsoleMenu.BUTTON_CLEAR_CARD, WorkConsoleMenu.ICON_W},
                 {WorkConsoleMenu.ENCODE_X, WorkConsoleMenu.ENCODE_Y, WorkConsoleMenu.BUTTON_ENCODE, WorkConsoleMenu.BUTTON_W},
-                {WorkConsoleMenu.CLEAR_X, WorkConsoleMenu.CLEAR_Y, WorkConsoleMenu.BUTTON_CLEAR, WorkConsoleMenu.ICON_W}};
+                {WorkConsoleMenu.CLEAR_X, WorkConsoleMenu.CLEAR_Y, WorkConsoleMenu.BUTTON_CLEAR, WorkConsoleMenu.BUTTON_W}};
         for (int[] b : buttons) {
             if (Panel.inside(mouseX, mouseY, x + b[0], y + b[1], b[3], WorkConsoleMenu.BUTTON_H)) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, b[2]);
@@ -1009,8 +1017,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         layoutPopups();
         tips.clear();
         super.render(g, mouseX, mouseY, partialTick);
-        // 窓は下の画面（物の絵や数も）より手前に、後ろに積んだものほど手前に描く
-        int z = 300;
+        // 窓は下の画面（スロットの物の数は z 300 あたり）より手前に、後ろに積んだものほど手前に描く
+        int z = POPUP_Z;
         for (Popup p : List.copyOf(stack)) {
             if (!p.open) {
                 continue;
@@ -1026,13 +1034,13 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 renderRecordPopup(g, mouseX, mouseY);
             }
             g.pose().popPose();
-            z += 200;
+            z += 300;
         }
         Popup top = popupAt(mouseX, mouseY);
         g.pose().pushPose();
         g.pose().translate(0, 0, z);
         ItemStack carried = menu.getCarried();
-        if (!carried.isEmpty() && z > 300) {
+        if (!carried.isEmpty() && z > POPUP_Z) {
             g.renderItem(carried, mouseX - 8, mouseY - 8);          // 持っている物は、窓の上でも手前に
             g.renderItemDecorations(font, carried, mouseX - 8, mouseY - 8);
         }
@@ -1100,11 +1108,34 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         return false;
     }
 
-    /** 並べ替えの記号（長さの違う3本の横線。8×7）。 */
-    private static void sortIcon(GuiGraphics g, int x, int y, int c) {
-        g.fill(x, y, x + 8, y + 1, c);
-        g.fill(x, y + 3, x + 6, y + 4, c);
-        g.fill(x, y + 6, x + 3, y + 7, c);
+    /**
+     * 今の並びのアイコン（8×7）: 指令台の順は同じ長さの3本線、名前は「A」、数は高さの違う棒、mod は箱、作れる物は光る印。
+     */
+    private static void sortIcon(GuiGraphics g, String mode, int x, int y, int c, int accent) {
+        switch (mode) {
+            case "name" -> {
+                g.fill(x + 2, y, x + 5, y + 1, c);                  // A
+                g.fill(x + 1, y + 1, x + 2, y + 7, c);
+                g.fill(x + 5, y + 1, x + 6, y + 7, c);
+                g.fill(x + 2, y + 4, x + 5, y + 5, c);
+                g.fill(x + 7, y + 6, x + 8, y + 7, accent);         // 並びの印
+            }
+            case "count" -> {
+                g.fill(x, y + 1, x + 2, y + 7, c);                  // 多い順の棒
+                g.fill(x + 3, y + 3, x + 5, y + 7, c);
+                g.fill(x + 6, y + 5, x + 8, y + 7, c);
+            }
+            case "mod" -> Panel.icon(g, x, y, Panel.Icon.BOX, c);
+            case "craftable" -> {
+                g.fill(x + 1, y + 1, x + 7, y + 7, Panel.SEAM);     // 一覧の作れる印（左上の水色）と同じ形
+                g.fill(x + 1, y + 1, x + 4, y + 4, 0xFF78D2F0);
+            }
+            default -> {
+                g.fill(x, y, x + 8, y + 1, c);                      // 指令台の順
+                g.fill(x, y + 3, x + 8, y + 4, c);
+                g.fill(x, y + 6, x + 8, y + 7, c);
+            }
+        }
     }
 
     /** ごみ箱の記号（7×8）。 */
@@ -1159,7 +1190,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         int tx = p.x + 4;
         if (icon != null && !icon.isEmpty()) {
             g.pose().pushPose();
-            g.pose().translate(tx, p.y + 1, 0);
+            g.pose().translate(tx, p.y + 3, 0);
             g.pose().scale(0.5F, 0.5F, 1);
             g.renderItem(icon, 0, 0);
             g.pose().popPose();
@@ -1167,7 +1198,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         }
         g.pose().pushPose();
         g.pose().translate(0, 0, 200);
-        AndroidStationScreen.fit(g, font, name, tx, p.y + 2, p.x + p.w / 2 - 12 - tx, skin.text());
+        AndroidStationScreen.fit(g, font, name, tx, p.y + 3, p.x + p.w / 2 - 12 - tx, skin.text());
         g.pose().popPose();
     }
 
@@ -1338,7 +1369,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.ENCODE_X, y + WorkConsoleMenu.ENCODE_Y, WorkConsoleMenu.BUTTON_W,
                 WorkConsoleMenu.BUTTON_H)) {
             g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.encode.hint"), 160), mouseX, mouseY);
-        } else if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.CLEAR_X, y + WorkConsoleMenu.CLEAR_Y, WorkConsoleMenu.ICON_W,
+        } else if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.CLEAR_X, y + WorkConsoleMenu.CLEAR_Y, WorkConsoleMenu.BUTTON_W,
                 WorkConsoleMenu.BUTTON_H)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.recipe_encoder.clear"), mouseX, mouseY);
         } else if (Panel.inside(mouseX, mouseY, x + WorkConsoleMenu.CLEAR_CARD_X, y + WorkConsoleMenu.CLEAR_CARD_Y, WorkConsoleMenu.ICON_W,
@@ -1395,8 +1426,10 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel_mode.hint"), 180), mouseX, mouseY);
         } else if (hoveredFace(mouseX, mouseY) >= 0) {
             String[] keys = {"in", "out", "fuel"};
-            g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[hoveredFace(mouseX, mouseY)]
-                    + ".hint"), 180), mouseX, mouseY);
+            int i = hoveredFace(mouseX, mouseY);
+            Panel.tooltip(g, font, List.of(Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[i], faceName(i)),
+                    Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[i] + ".hint").withStyle(net.minecraft.ChatFormatting.GRAY)),
+                    200, mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_FUEL && !hoveredSlot.hasItem()) {
             g.renderTooltip(font, font.split(Component.translatable("gui.singulo.recipe_encoder.fuel.hint"), 180), mouseX, mouseY);
         } else if (hoveredSlot != null && hoveredSlot.index == WorkConsoleMenu.SLOT_STOCK && !hoveredSlot.hasItem()) {
@@ -1432,10 +1465,10 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         return (menu.faces() & io.github.genichimaruo.singulo.android.work.RecipeData.FUEL_FILL) != 0;
     }
 
-    /** 面の名前（上・下・北・南・西・東・自動）。 */
-    private static Component faceName(int value) {
-        return Component.translatable("gui.singulo.recipe_encoder.face." + (value == io.github.genichimaruo.singulo.android.work.RecipeData.FACE_AUTO
-                ? "auto" : net.minecraft.core.Direction.from3DDataValue(value).getName()));
+    /** 役目 role（0 入れる、1 取り出す、2 燃料）の面の名前（自動・上・下・正面・背面・左・右・北・南・西・東）。 */
+    private Component faceName(int role) {
+        return Component.translatable("gui.singulo.recipe_encoder.face." + io.github.genichimaruo.singulo.android.work.RecipeData.faceChoiceKey(
+                io.github.genichimaruo.singulo.android.work.RecipeData.faceChoice(menu.faces(), role)));
     }
 
     /** 手順モードで、次に足す手順が数の上限・レバーの扱いを持つか（ボタンを出す）。 */
@@ -1614,21 +1647,27 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         }
         button(g, x + WorkConsoleMenu.ENCODE_X, y + WorkConsoleMenu.ENCODE_Y, WorkConsoleMenu.BUTTON_W, WorkConsoleMenu.BUTTON_H, true, mouseX, mouseY);
         button(g, x + WorkConsoleMenu.MODE_X, y + WorkConsoleMenu.MODE_Y, WorkConsoleMenu.BUTTON_W, WorkConsoleMenu.BUTTON_H, false, mouseX, mouseY);
-        int[][] trash = {{WorkConsoleMenu.CLEAR_X, WorkConsoleMenu.CLEAR_Y}, {WorkConsoleMenu.CLEAR_CARD_X, WorkConsoleMenu.CLEAR_CARD_Y}};
+        // ごみ箱のボタン: 見本消去（右の列いっぱい）とレシピ消去（カードの右の小さなボタン）
+        int[][] trash = {{WorkConsoleMenu.CLEAR_X, WorkConsoleMenu.CLEAR_Y, WorkConsoleMenu.BUTTON_W},
+                {WorkConsoleMenu.CLEAR_CARD_X, WorkConsoleMenu.CLEAR_CARD_Y, WorkConsoleMenu.ICON_W}};
         for (int[] b : trash) {
-            boolean hover = Panel.inside(mouseX, mouseY, x + b[0], y + b[1], WorkConsoleMenu.ICON_W, WorkConsoleMenu.BUTTON_H);
-            int d = Panel.button(g, skin, x + b[0], y + b[1], WorkConsoleMenu.ICON_W, WorkConsoleMenu.BUTTON_H,
-                    hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
-            trashIcon(g, x + b[0] + 4, y + b[1] + 3 + d, hover ? GuiSkin.BAD : skin.text());
+            boolean hover = Panel.inside(mouseX, mouseY, x + b[0], y + b[1], b[2], WorkConsoleMenu.BUTTON_H);
+            int d = Panel.button(g, skin, x + b[0], y + b[1], b[2], WorkConsoleMenu.BUTTON_H, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+            trashIcon(g, x + b[0] + (b[2] - 7) / 2, y + b[1] + 3 + d, hover ? GuiSkin.BAD : skin.text());
         }
         if (optionShown()) {
             button(g, x + WorkConsoleMenu.OPTION_X, y + WorkConsoleMenu.OPTION_Y, WorkConsoleMenu.OPTION_W, WorkConsoleMenu.OPTION_H, false, mouseX,
                     mouseY);
         }
         if (menu.processing()) {
+            // 面のボタン: 役目のアイコン（入れる・取り出す・燃料）と面の名前
+            Panel.Icon[] icons = {Panel.Icon.IN, Panel.Icon.OUT, Panel.Icon.FLAME};
             for (int i = 0; i < 3; i++) {
-                button(g, x + WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP), y + WorkConsoleMenu.FACE_Y,
-                        WorkConsoleMenu.FACE_W, WorkConsoleMenu.FACE_H, false, mouseX, mouseY);
+                int bx = x + WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP);
+                boolean hover = Panel.inside(mouseX, mouseY, bx, y + WorkConsoleMenu.FACE_Y, WorkConsoleMenu.FACE_W, WorkConsoleMenu.FACE_H);
+                int d = Panel.button(g, skin, bx, y + WorkConsoleMenu.FACE_Y, WorkConsoleMenu.FACE_W, WorkConsoleMenu.FACE_H,
+                        hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+                Panel.icon(g, bx + 3, y + WorkConsoleMenu.FACE_Y + 3 + d, icons[i], i == 2 ? 0xFFE0A050 : skin.accent());
             }
             button(g, x + WorkConsoleMenu.FUEL_MODE_X, y + WorkConsoleMenu.FUEL_MODE_Y, WorkConsoleMenu.FUEL_MODE_W, WorkConsoleMenu.FUEL_MODE_H,
                     fuelFill(), mouseX, mouseY);
@@ -1645,7 +1684,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             // 同じ種類も使う欄は、アクセントの縁で囲む
             for (int i = 0; i < io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.GRID; i++) {
                 if (menu.variant(i) && menu.getSlot(WorkConsoleMenu.SLOT_GRID + i).hasItem()) {
-                    g.renderOutline(x + gridSlotX(i) - 2, y + gridSlotY(i) - 2, 20, 20, skin.accent());
+                    g.renderOutline(x + gridSlotX(i) - 1, y + gridSlotY(i) - 1, 18, 18, skin.accent());   // 欄の縁の内側（隣の欄に重ねない）
                 }
             }
         }
@@ -1687,7 +1726,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
             g.drawString(font, "×", lx + WorkConsoleMenu.STEPS_W - 7, ry + 1, 0xFFE07070, false);
         }
         g.renderOutline(x + WorkConsoleMenu.PITEM_X - 3, y + WorkConsoleMenu.PITEM_Y - 3, 22, 22, Panel.GLOW);
-        g.renderOutline(x + WorkConsoleMenu.RESULT_X - 3, y + WorkConsoleMenu.RESULT_Y - 3, 22, 22, Panel.GLOW);
+        g.renderOutline(x + WorkConsoleMenu.RESULT_PROC_X - 3, y + WorkConsoleMenu.RESULT_PROC_Y - 3, 22, 22, Panel.GLOW);
     }
 
     /** 小さめの文字（3/4）を、cx を中心に、幅 maxWidth に収めて描く。 */
@@ -1773,7 +1812,7 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                 : Panel.inside(mouseX, mouseY, x + ROWS_MORE_X, y + searchY(), ROWS_BTN_W, SEARCH_H) ? Panel.Press.HOVER : Panel.Press.NORMAL);
         Panel.plusIcon(g, x + ROWS_MORE_X + 3, y + searchY() + 4 + dr, canMore ? skin.text() : skin.dim());
         button(g, x + SORT_X, y + searchY(), SORT_W, mouseX, mouseY, false, Component.empty());
-        sortIcon(g, x + SORT_X + (SORT_W - 8) / 2, y + searchY() + 3, skin.text());     // 並びの名前は、重ねたときの説明に
+        sortIcon(g, sortMode(), x + SORT_X + (SORT_W - 8) / 2, y + searchY() + 3, skin.text(), skin.accent());   // 並びの名前は、重ねたときの説明に
         button(g, x + REV_X, y + searchY(), REV_W, mouseX, mouseY, sortReversed(), Component.literal(sortReversed() ? "↑" : "↓"));
         if (jeiLoaded()) {
             button(g, x + JEI_X, y + searchY(), JEI_W, mouseX, mouseY, jeiSync(), Component.literal("JEI"));
@@ -2212,13 +2251,10 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
                         WorkConsoleMenu.OPTION_X + 1, WorkConsoleMenu.OPTION_Y + 2, WorkConsoleMenu.OPTION_W - 2, Panel.TEXT);
             }
         } else if (menu.processing()) {
-            // 面のボタン: 「入 上」「出 下」「燃 自動」
-            String[] keys = {"in", "out", "fuel"};
+            // 面のボタン: アイコンの右に面の名前（役目は重ねたときの説明に）
             for (int i = 0; i < 3; i++) {
-                int fv = menu.faces() >> (i * 3) & 7;
-                small(g, Component.translatable("gui.singulo.recipe_encoder.face_button." + keys[i], faceName(fv)),
-                        WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP) + WorkConsoleMenu.FACE_W / 2,
-                        WorkConsoleMenu.FACE_Y + 3, WorkConsoleMenu.FACE_W - 2, Panel.TEXT);
+                int bx = WorkConsoleMenu.FACE_X + i * (WorkConsoleMenu.FACE_W + WorkConsoleMenu.FACE_GAP);
+                AndroidStationScreen.fitCentered(g, font, faceName(i), bx + 12, WorkConsoleMenu.FACE_Y + 3, WorkConsoleMenu.FACE_W - 14, Panel.TEXT);
             }
             // 燃料を持ってくる量: 「N個」（燃料の欄の数ずつ）か「満タン」（装置に入るだけ）
             int fuelCount = Math.max(1, menu.getSlot(WorkConsoleMenu.SLOT_FUEL).getItem().getCount());

@@ -686,8 +686,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 作業台のレシピを作れるブロック（バニラの作業台か、アンドロイド作業台）。 */
     public static boolean isWorkbench(net.minecraft.world.level.block.Block block) {
-        return block instanceof net.minecraft.world.level.block.CraftingTableBlock
-                || block == io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORKBENCH.get();
+        return block instanceof net.minecraft.world.level.block.CraftingTableBlock || AndroidWorkbenchBlockEntity.tier(block) > 0;
     }
 
     static long maxCrafts(RecipeData recipe, int slots, long limit) {
@@ -1031,8 +1030,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.remaining() <= 0) {
                 continue;
             }
-            if (s.inProgress > 0 || locationBusy(s.location, s) || !canDo(a, s.recipe) || tankLimit(a, s.recipe) != Long.MAX_VALUE
-                    || s.recipe.variants()) {
+            if (s.inProgress > 0 || locationBusy(s.location, s) || !canDo(a, s.recipe) || tankLimit(a, s.recipe) != Long.MAX_VALUE) {
                 return null;                          // ほかのアンドロイドが作業中の工程、このアンドロイドにできない工程がある: 1工程ずつに分ける
             }
             for (int j : s.after) {
@@ -1089,6 +1087,21 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (WorkJob.Batch b : batch) {
             for (ItemCount in : b.recipe().inputs()) {
                 long need = in.count * b.crafts();
+                if (in.alt != null) {
+                    // 同じ種類の別の物も使う素材: 前の工程で作った合う物から使い、足りない分を（合う物ならどれでも）取りに行く
+                    long use = 0;
+                    for (ItemCount c : inv) {
+                        if (c.count > 0 && use < need && in.matches(c.item)) {
+                            long take = Math.min(c.count, need - use);
+                            c.count -= take;
+                            use += take;
+                        }
+                    }
+                    if (need > use) {
+                        ItemCount.addAlt(fetch, in.item, need - use, in.alt);
+                    }
+                    continue;
+                }
                 long have = ItemCount.get(inv, in.item);
                 long use = Math.min(have, need);
                 ItemCount.add(inv, in.item, -use);
@@ -1096,10 +1109,32 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             ItemCount.add(inv, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
         }
+        // 同じ種類の別の物は、取ってくる物が何種類かに分かれることがある: 分かれる分だけ、持ち物の枠を多めに見る
+        int mixed = 0;
         for (ItemCount c : fetch) {
-            if (c.count > 0 && o.held(null, c.item) < c.count) {
-                return null;                          // 予約した在庫で足りない
+            if (c.count <= 0) {
+                continue;
             }
+            if (c.alt == null) {
+                if (o.held(null, c.item) < c.count) {
+                    return null;                      // 予約した在庫で足りない
+                }
+                continue;
+            }
+            long held = 0;
+            List<ItemStack> kinds = new ArrayList<>();
+            for (WorkOrder.Holding h : o.held) {
+                if (c.matches(h.item)) {
+                    held += h.count;
+                    if (kinds.stream().noneMatch(k -> ItemStack.isSameItemSameComponents(k, h.item))) {
+                        kinds.add(h.item);
+                    }
+                }
+            }
+            if (held < c.count) {
+                return null;
+            }
+            mixed += Math.max(0, kinds.size() - 1);       // k 種類に分かれると、スタックは多くて k - 1 増える
         }
         fetch.removeIf(c -> c.count <= 0);
         // 持ち物の場所: 順に作りながら、一番多いときで数える
@@ -1124,7 +1159,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
         }
-        return peak <= slots ? fetch : null;
+        return peak + mixed <= slots ? fetch : null;
     }
 
     private static int stacks(List<ItemCount> list) {
@@ -2359,15 +2394,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
-    /** 加工モードの面を切り替える（which: 0 入れる面、1 取り出す面、2 燃料の面。どれも「自動」がある）。 */
+    /**
+     * 加工モードの面を切り替える（which: 0 入れる面、1 取り出す面、2 燃料の面）。
+     * 自動 → 上 → 下 → 正面 → 背面 → 左 → 右 → 北 → 南 → 西 → 東 → 自動 の順（back なら逆）。
+     */
     public void cycleFace(int which, boolean back) {
-        int shift = which * 3;
-        int cur = faces >> shift & 7;
-        int n = 7;                                           // 0〜5 と 自動（7）
-        int idx = cur == RecipeData.FACE_AUTO ? 6 : cur;
-        idx = Math.floorMod(idx + (back ? -1 : 1), n);
-        int value = idx == 6 ? RecipeData.FACE_AUTO : idx;
-        faces = faces & ~(7 << shift) | value << shift;
+        int choice = Math.floorMod(RecipeData.faceChoice(faces, which) + (back ? -1 : 1), RecipeData.FACE_CHOICES);
+        faces = RecipeData.withFaceChoice(faces, which, choice);
         setChanged();
     }
 

@@ -355,20 +355,32 @@ def station_top(k):
     return im
 
 
-def workbench_top():
+# 上面の段階ごとの色（外装の段階の色に合わせる。段階2 は水色、改良型（段階3）は紫、量子（段階4）は金）
+WORKBENCH_TOPS = {
+    2: dict(frame=(196, 202, 210), edge=(150, 156, 164), grid=(96, 190, 222), corner=(196, 202, 210)),
+    3: dict(frame=(200, 194, 216), edge=(146, 136, 170), grid=(160, 132, 228), corner=(190, 160, 255)),
+    4: dict(frame=(214, 204, 182), edge=(164, 148, 118), grid=(226, 172, 84), corner=(255, 190, 92)),
+}
+
+
+def workbench_top(tier=2):
     """アンドロイド作業台の上面: 白い外装の枠の中の濃い作業面に、バニラの作業台と同じ大きさの 3×3 の格子
-    （線は 1 ピクセル、マスの中は 2×2）。格子の線は水色、四隅に固定具。"""
+    （線は 1 ピクセル、マスの中は 2×2）。格子の線と四隅の固定具は段階の色（WORKBENCH_TOPS）。
+    量子（段階4）は、真ん中のマスがうっすら光る。"""
+    c = WORKBENCH_TOPS[tier]
     im, d = new((228, 232, 236, 255))
-    d.rectangle([0, 0, S - 1, S - 1], outline=(196, 202, 210, 255))
-    d.rectangle([1, 1, S - 2, S - 2], fill=(38, 44, 54, 255), outline=(150, 156, 164, 255))
+    d.rectangle([0, 0, S - 1, S - 1], outline=c['frame'] + (255,))
+    d.rectangle([1, 1, S - 2, S - 2], fill=(38, 44, 54, 255), outline=c['edge'] + (255,))
     for g in (3, 6, 9, 12):
-        d.line([(3, g), (12, g)], fill=(96, 190, 222, 255))
-        d.line([(g, 3), (g, 12)], fill=(96, 190, 222, 255))
+        d.line([(3, g), (12, g)], fill=c['grid'] + (255,))
+        d.line([(g, 3), (g, 12)], fill=c['grid'] + (255,))
     for cx in (4, 7, 10):
         for cy in (4, 7, 10):
             d.rectangle([cx, cy, cx + 1, cy + 1], fill=(58, 68, 82, 255))
+    if tier >= 4:
+        d.rectangle([7, 7, 8, 8], fill=mix((58, 68, 82), c['corner'], 0.45) + (255,))
     for x, y in ((1, 1), (S - 2, 1), (S - 2, S - 2), (1, S - 2)):
-        d.point((x, y), fill=(196, 202, 210, 255))
+        d.point((x, y), fill=c['corner'] + (255,))
     return im
 
 
@@ -453,6 +465,8 @@ def textures(tb, save, weather, write_json):
     # アンドロイド組立ステーションの上面（自作の装置なので汚しは入れない）
     save(_sheet([station_top(k) for k in range(ANIM_FRAMES)]), tb / 'android_station_top.png')
     save(workbench_top(), tb / 'android_workbench_top.png')
+    save(workbench_top(3), tb / 'advanced_android_workbench_top.png')
+    save(workbench_top(4), tb / 'quantum_android_workbench_top.png')
     write_json(tb / 'android_station_top.png.mcmeta', {'animation': {'frametime': 3, 'interpolate': True}})
 
 

@@ -505,6 +505,14 @@ DESC = {
                     '作った物がアンドロイドの持ち物に入りきらなければ、台の預かり箱に入れてあとで取りに来る（残った物は右クリックで受け取れる）。',
         'Where androids make crafting-table recipes, four times as fast as a vanilla crafting table. Record it on the Work Location Card in a recipe rack. '
         "Crafted items that do not fit in the android's inventory go into its holding box until the android comes back (right-click to take what is left)."),
+    '改良型アンドロイド作業台': ('アンドロイド作業台の上位版。バニラの作業台の8倍の速さで作り、預かり箱は54枠。アンドロイドの充電の減りは6割に減る。'
+                       '使い方はアンドロイド作業台と同じ。',
+                       'An upgraded Android Workbench. Androids craft eight times as fast as on a vanilla crafting table, and the holding box has 54 slots. '
+                       'Androids use 60% of the usual charge per craft. Used the same way as the Android Workbench.'),
+    '量子アンドロイド作業台': ('アンドロイド作業台の最上位版。バニラの作業台の20倍の速さで作り、預かり箱は81枠。アンドロイドの充電の減りは3割に減る。'
+                      '使い方はアンドロイド作業台と同じ。',
+                      'The top Android Workbench. Androids craft twenty times as fast as on a vanilla crafting table, and the holding box has 81 slots. '
+                      'Androids use 30% of the usual charge per craft. Used the same way as the Android Workbench.'),
     '作業位置カード': ('ブロックをシフト右クリックして位置を記録する（重なっていれば1枚だけ分けて記録する）。何もない所でシフト右クリックすると記録を消す。作業指令台を記録したカードで資材口・納品口・レシピ棚を右クリックすると、つながる。シフトを押すと記録したブロックの絵になる。',
         'Sneak-use on a block to record its position (one card is split off a stack). Sneak-use on nothing to clear it. Use a card holding a work console on a supply port, delivery port or recipe rack to link it. Hold Shift to see the recorded block.'),
     '範囲カード': ('ブロックを2つシフト右クリックして、その2つを角とする範囲を記録する（1辺128ブロックまで。重なっていれば1枚だけ分けて記録する）。'
@@ -611,6 +619,8 @@ DESC.update(_BLUEPRINT_DESC)
 # 長い説明の要約（説明欄にはこれだけを出し、Shift を押している間は説明の全文と作り方・使い道を出す）。名前: (日本語, 英語)
 SUMMARY = {
     'アンドロイド作業台': ('アンドロイドが速く作る作業台。入りきらない物を預かる。', 'A workbench androids craft on quickly. Holds what does not fit.'),
+    '改良型アンドロイド作業台': ('アンドロイドが8倍速で作る作業台。預かり箱は54枠。', 'Androids craft 8× as fast here. 54-slot holding box.'),
+    '量子アンドロイド作業台': ('アンドロイドが20倍速で作る作業台。預かり箱は81枠。', 'Androids craft 20× as fast here. 81-slot holding box.'),
     '隕石の核': ('隕石の芯の塊。掘ると隕鉄の原石と星屑が出る。',
         'The core of a meteorite. Mine it for raw meteoric iron and stardust.'),
     '衝撃発電パネル': ('落ちた高さで電力をため、重力パネルへ配る。落下ダメージを受けない。',

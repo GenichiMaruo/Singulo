@@ -193,7 +193,8 @@ public final class SinguloBlockEntities {
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity>> ANDROID_DELIVERY_PORT =
             REGISTER.register("android_delivery_port", () -> build(io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity::new, SinguloBlocks.ANDROID_DELIVERY_PORT.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ANDROID_WORKBENCH =
-            REGISTER.register("android_workbench", () -> build(io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, SinguloBlocks.ANDROID_WORKBENCH.get()));
+            REGISTER.register("android_workbench", () -> build(io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, SinguloBlocks.ANDROID_WORKBENCH.get(),
+                    SinguloBlocks.ADVANCED_ANDROID_WORKBENCH.get(), SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get()));
     public static final Supplier<BlockEntityType<io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity>> ANDROID_RECIPE_RACK =
             REGISTER.register("android_recipe_rack", () -> build(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity::new, SinguloBlocks.ANDROID_RECIPE_RACK.get()));
 

@@ -40,6 +40,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::clientSetup);
         modBus.addListener(SinguloKeys::register);
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
+        NeoForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
@@ -341,12 +342,12 @@ public final class SinguloClient {
         boolean hasUses = net.minecraft.client.resources.language.I18n.exists("uses.singulo." + id.getPath());
         boolean detailed = net.minecraft.client.gui.screens.Screen.hasShiftDown();
         java.util.List<Component> tip = event.getToolTip();
-        addWrapped(tip, hasSummary && !detailed ? summary : key, ChatFormatting.GRAY);
+        tip.add(Component.translatable(hasSummary && !detailed ? summary : key).withStyle(ChatFormatting.GRAY));
         if (detailed) {
             for (String k : new String[]{"howto", "uses"}) {
                 String full = k + ".singulo." + id.getPath();
                 if (net.minecraft.client.resources.language.I18n.exists(full)) {
-                    addWrapped(tip, full, ChatFormatting.DARK_AQUA);
+                    tip.add(Component.translatable(full).withStyle(ChatFormatting.DARK_AQUA));
                 }
             }
         } else if (hasSummary || hasHowto || hasUses) {
@@ -354,12 +355,12 @@ public final class SinguloClient {
         }
     }
 
-    /** 翻訳キー key の文を、説明欄の幅で折り返して足す。 */
-    private static void addWrapped(java.util.List<Component> tip, String key, ChatFormatting color) {
-        net.minecraft.client.gui.Font font = net.minecraft.client.Minecraft.getInstance().font;
-        for (net.minecraft.network.chat.FormattedText line : font.getSplitter().splitLines(Component.translatable(key), 220,
-                net.minecraft.network.chat.Style.EMPTY)) {
-            tip.add(Component.literal(line.getString()).withStyle(color));
+    /** 画面端で幅が狭くなる場合も、全文から一度だけ折り返す。 */
+    private static void sizeTooltip(net.neoforged.neoforge.client.event.RenderTooltipEvent.GatherComponents event) {
+        var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem());
+        if (Singulo.MODID.equals(id.getNamespace())) {
+            int width = event.getMaxWidth();
+            event.setMaxWidth(width > 0 ? Math.min(width, 220) : 220);
         }
     }
 

@@ -40,23 +40,27 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     public static final int PERMIT_X = FRAME_INSET + io.github.genichimaruo.singulo.machine.GuiFrame.railSlotX(WIDTH - 2 * FRAME_INSET),
             PERMIT_Y = io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_TOP + PAGE_TABS * TAB_PITCH + 3;
     /**
-     * レシピ登録の窓（画面の上に浮かぶ。スロットは画面が窓と一緒に動かす。ここの座標は窓の中の位置）: 見本の欄（3×3）、
-     * 矢印の先に作る物、右下にカードのストックと記録したカード、右端にボタン（上から 見本消去・モード・記録、カードの横にレシピ消去）。
+     * レシピ登録の窓の配置（窓の中身の左上からの位置。スロットは画面が窓と一緒に動かす）。
+     * 上の段: 左から 燃料（加工）・見本 3×3・矢印・作る物（とほかに出てくる物）。右端の列に モード・記録・見本消去のボタン。
+     * 下の段: 左にモードごとのボタン（作業台は「同じ種類」、加工は3つの面）、右端にカードのストック・記録したカード・レシピ消去。
+     * 手順モードは、左に手順の一覧、その右に作業位置カード2枚・物・作る物と、種類・足す・数のボタン。囲みの線どうしは重ねない。
      */
-    public static final int GRID_X = 30, GRID_Y = 31, RESULT_X = 118, RESULT_Y = 49, CARD_X = 170, CARD_Y = 89, STOCK_X = 146, STOCK_Y = 89;
-    public static final int BUTTON_X = 192, BUTTON_W = 48, BUTTON_H = 14;
-    /** 見本消去とレシピ消去は、ごみ箱のアイコンだけの小さなボタン（ICON_W 角。見本消去はモードの上の中央、レシピ消去はカードの右）。 */
-    public static final int ICON_W = 14;
-    public static final int CLEAR_X = BUTTON_X + (BUTTON_W - ICON_W) / 2, CLEAR_Y = 29, MODE_X = BUTTON_X, MODE_Y = 46, ENCODE_X = BUTTON_X, ENCODE_Y = 63,
-            CLEAR_CARD_X = CARD_X + 20, CLEAR_CARD_Y = 91;
+    public static final int RECORD_BODY_H = 88;
+    public static final int GRID_X = 32, GRID_Y = 6, RESULT_X = 122, RESULT_Y = 24;
+    public static final int BUTTON_X = 190, BUTTON_W = 48, BUTTON_H = 14;
+    public static final int MODE_X = BUTTON_X, MODE_Y = 6, ENCODE_X = BUTTON_X, ENCODE_Y = 24, CLEAR_X = BUTTON_X, CLEAR_Y = 42;
+    /** カードのストック・記録したカードと、その右のレシピ消去（ごみ箱のアイコンだけの小さなボタン、ICON_W 幅）。 */
+    public static final int STOCK_X = 190, STOCK_Y = 66, CARD_X = 210, CARD_Y = 66, ICON_W = 10, CLEAR_CARD_X = 228, CLEAR_CARD_Y = 67;
     /** 加工モードの燃料の欄（見本の左）。 */
-    public static final int FUEL_X = 8, FUEL_Y = 49;
-    /** 加工モードの、ほかに出てくる物の欄（作る物の下）。 */
-    public static final int EXTRA_X = 100, EXTRA_Y = 71;
-    /** 手順モード: 左に並べた手順の一覧、右に作業位置カード2枚と物の欄、その下に作る物、手順の種類と「足す」のボタン。 */
-    public static final int STEPS_X = 8, STEPS_Y = 29, STEPS_W = 100, STEP_H = 9;
-    public static final int LOC_A_X = 118, LOC_B_X = 136, LOC_Y = 29, PITEM_X = 160, PITEM_Y = 29;
-    public static final int KIND_X = 140, KIND_W = 24, ADD_X = 166, ADD_W = 24, SMALL_Y = 51, SMALL_H = 12;
+    public static final int FUEL_X = 8, FUEL_Y = 24;
+    /** 加工モードの、ほかに出てくる物の欄（作る物の右に2つ）。 */
+    public static final int EXTRA_X = 146, EXTRA_Y = 24;
+    /** 手順モード: 左に並べた手順の一覧、右に作業位置カード2枚と物の欄、その下に種類と「足す」のボタン、数のボタン、作る物。 */
+    public static final int STEPS_X = 8, STEPS_Y = 6, STEPS_W = 110, STEP_H = 9;
+    public static final int LOC_A_X = 124, LOC_B_X = 144, LOC_Y = 6, PITEM_X = 167, PITEM_Y = 6;
+    public static final int KIND_X = 124, KIND_W = 28, ADD_X = 154, ADD_W = 28, SMALL_Y = 30, SMALL_H = 12;
+    /** 手順モードでは、作る物の欄をここへ動かす（画面がスロットを動かす）。 */
+    public static final int RESULT_PROC_X = 167, RESULT_PROC_Y = 64;
     public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH),
             INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT),
             HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
@@ -72,13 +76,13 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             BUTTON_KIND_BACK = 6, BUTTON_REMOVE_STEP = 10, BUTTON_OPTION = 20, BUTTON_FACE = 30, BUTTON_FACE_BACK = 33, BUTTON_VARIANTS = 36,
             BUTTON_FUEL_FILL = 37, BUTTON_VARIANT_SLOT = 40, BUTTON_ADJUST = 100;
     /** 加工モードの、燃料を持ってくる量のボタン（燃料の欄の下）。 */
-    public static final int FUEL_MODE_X = 5, FUEL_MODE_Y = 71, FUEL_MODE_W = 22, FUEL_MODE_H = 11;
-    /** 作業台モードの「同じ種類の別の物も使う」をまとめて切り替えるアイコンのボタン（見本の下）。 */
-    public static final int VARIANTS_X = 30, VARIANTS_Y = 90, VARIANTS_W = 16, VARIANTS_H = 12;
-    /** 加工モードの面のボタン（見本の下に3つ: 入れる面・取り出す面・燃料の面）。 */
-    public static final int FACE_X = 30, FACE_Y = 90, FACE_W = 22, FACE_H = 11, FACE_GAP = 2;
+    public static final int FUEL_MODE_X = 6, FUEL_MODE_Y = 46, FUEL_MODE_W = 22, FUEL_MODE_H = 11;
+    /** 作業台モードの「同じ種類の別の物も使う」をまとめて切り替えるアイコンのボタン（下の段の左）。 */
+    public static final int VARIANTS_X = 32, VARIANTS_Y = 69, VARIANTS_W = 16, VARIANTS_H = 12;
+    /** 加工モードの面のボタン（下の段に3つ: 入れる面・取り出す面・燃料の面。アイコンと面の名前）。 */
+    public static final int FACE_X = 32, FACE_Y = 68, FACE_W = 48, FACE_H = 14, FACE_GAP = 2;
     /** 手順の数の上限・レバーの扱いのボタン（種類のボタンの下）。BUTTON_OPTION から +1、-1、+10、-10。 */
-    public static final int OPTION_X = 140, OPTION_Y = 65, OPTION_W = 50, OPTION_H = 12;
+    public static final int OPTION_X = 124, OPTION_Y = 46, OPTION_W = 58, OPTION_H = 12;
 
     private final BlockPos pos;
     private final Container encoder;

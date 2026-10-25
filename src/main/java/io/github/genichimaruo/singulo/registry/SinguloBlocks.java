@@ -189,6 +189,13 @@ public final class SinguloBlocks {
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ANDROID_WORKBENCH = BLOCKS.register(
             "android_workbench", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_WORKBENCH,
                     io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, (l, p, s, be) -> {}));
+    /** 上位のアンドロイド作業台（段階3・4。速く作り、預かり箱が大きい）。同じブロックエンティティで、段階はブロックで決まる。 */
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> ADVANCED_ANDROID_WORKBENCH = BLOCKS.register(
+            "advanced_android_workbench", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_WORKBENCH,
+                    io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, (l, p, s, be) -> {}));
+    public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity>> QUANTUM_ANDROID_WORKBENCH = BLOCKS.register(
+            "quantum_android_workbench", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_WORKBENCH,
+                    io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity::new, (l, p, s, be) -> {}));
     public static final DeferredBlock<SimpleMachineBlock<io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity>> ANDROID_RECIPE_RACK = BLOCKS.register(
             "android_recipe_rack", () -> new SimpleMachineBlock<>(machineProperties(), SinguloBlockEntities.ANDROID_RECIPE_RACK,
                     io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity::new, (l, p, s, be) -> {}));
