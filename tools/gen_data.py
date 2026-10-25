@@ -2061,6 +2061,16 @@ def art_textures():
                 sheet, frames = art16.machine_front(iid, stage_of(name), on)
                 path = tb / f'{iid}_front{"_on" if on else ""}.png'
                 art16.save(sheet, path)
+                if iid in art16.ANDROID_FACES:
+                    # 顔のバイザーは16pxの絵をそのまま拡大する（細かい表情を描き直さない）。まばたきも同じ動き
+                    hd = hb / f'{iid}_front{"_on" if on else ""}.png'
+                    art.save(sheet.resize((32, 32 * frames), __import__('PIL').Image.NEAREST), hd)
+                    for meta in (Path(str(path) + '.mcmeta'), Path(str(hd) + '.mcmeta')):
+                        if frames > 1:
+                            write_json(meta, art16.ANDROID_BLINK)
+                        elif meta.exists():
+                            meta.unlink()
+                    continue
                 if frames > 1:
                     write_json(Path(str(path) + '.mcmeta'), {'animation': {'frametime': 6, 'interpolate': True}})
                 art.save(art.machine_front(iid, stage_of(name), on), hb / f'{iid}_front{"_on" if on else ""}.png')
