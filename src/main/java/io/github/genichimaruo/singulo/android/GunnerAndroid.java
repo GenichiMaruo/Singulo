@@ -77,8 +77,8 @@ public class GunnerAndroid extends RuinAndroid {
     public static final double RAIL_RANGE = 32;
     /** レールガンの光線の太さ（当たり判定の半径）。 */
     public static final double RAIL_RADIUS = 0.55;
-    static final float SHOT_DAMAGE = 2.5F;
-    static final float RAIL_DAMAGE = 12;
+    static final float SHOT_DAMAGE = 3F;
+    static final float RAIL_DAMAGE = 14;
     /** 光弾・光線の光が残る tick。 */
     public static final int FLASH = 4;
 
