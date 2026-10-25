@@ -295,6 +295,19 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         torso.translateAndRotate(pose);
     }
 
+    /** 背負ったバックパックまでの変形（スラスターのノズルを付けるため）。 */
+    void toBackpack(PoseStack pose) {
+        toTorso(pose);
+        backpack.translateAndRotate(pose);
+    }
+
+    /** すねまでの変形（かかとのスラスターを付けるため）。 */
+    void toShin(PoseStack pose, boolean left) {
+        root.translateAndRotate(pose);
+        (left ? legL : legR).translateAndRotate(pose);
+        (left ? shinL : shinR).translateAndRotate(pose);
+    }
+
     /** 腰までの変形（腰の装飾）。 */
     void toHips(PoseStack pose) {
         root.translateAndRotate(pose);
@@ -425,7 +438,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         return state == RuinAndroid.STATE_LOW_POWER || state == RuinAndroid.STATE_CHARGING || state == RuinAndroid.STATE_SOLAR
                 || state == RuinAndroid.STATE_SOLAR_FOLD || state == RuinAndroid.STATE_RESTING || state == RuinAndroid.STATE_CRAFTING
                 || state == RuinAndroid.STATE_MINING || state == RuinAndroid.STATE_SIT || state == RuinAndroid.STATE_SIT_GROUND
-                || state == RuinAndroid.STATE_TEND || state == RuinAndroid.STATE_SWEEP;
+                || state == RuinAndroid.STATE_TEND || state == RuinAndroid.STATE_SWEEP || state == RuinAndroid.STATE_FLOAT_REST
+                || state == RuinAndroid.STATE_SEABED_REST;
     }
 
     /** 区切りが変わったら、前の絵の姿勢から新しい姿勢へ、なめらかに寄せる（どの型・どの行動の組み合わせでも）。 */
@@ -556,6 +570,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             case RuinAndroid.STATE_SOLAR -> solar(t, age);
             case RuinAndroid.STATE_SOLAR_FOLD -> solarFold(t, age);
             case RuinAndroid.STATE_RESTING, RuinAndroid.STATE_SIT_GROUND -> resting(t, age);
+            case RuinAndroid.STATE_FLOAT_REST -> floatingRest(t, age);
+            case RuinAndroid.STATE_SEABED_REST -> seabedRest(t, age);
             case RuinAndroid.STATE_SIT -> sittingOnChair(t, age);
             case RuinAndroid.STATE_TEND -> tending(t, age);
             case RuinAndroid.STATE_SWEEP -> sweeping(age);
@@ -1313,6 +1329,61 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         skirtBack.xRot += 0.35F * k;
         skirtTail.xRot += 0.4F * k;
         skirtTail.zRot += 0.3F * k;
+    }
+
+    /**
+     * 水上であお向けに浮かんで休む（体を寝かせるのは描画のほう）: 両腕を横へ大きく広げ、脚はそろえて少しだけ開き、頭は少し後ろへ。
+     * 手足が波にゆられて、ゆっくり漂う。
+     */
+    private void floatingRest(float t, float age) {
+        float k = ease(t / 14);
+        float drift = Mth.sin(age * 0.06F);
+        armL.zRot = Mth.lerp(k, armL.zRot, -1.25F - 0.08F * drift);
+        armR.zRot = Mth.lerp(k, armR.zRot, 1.25F + 0.08F * drift);
+        armL.xRot = Mth.lerp(k, armL.xRot, 0.1F);
+        armR.xRot = Mth.lerp(k, armR.xRot, 0.1F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.25F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.25F);
+        legL.xRot = Mth.lerp(k, legL.xRot, 0.05F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.05F);
+        legL.zRot = -(0.12F + 0.03F * drift) * k;
+        legR.zRot = (0.12F + 0.03F * drift) * k;
+        shinL.xRot = 0.15F * k;
+        shinR.xRot = 0.15F * k;
+        head.xRot = Mth.lerp(k, head.xRot, -0.35F + 0.04F * drift);
+        skirtFront.xRot -= 0.15F * k;
+    }
+
+    /**
+     * 水の底でひざを抱えて座って休む: 腰を底まで下げ、ひざを胸の前に立て、両腕でひざを抱える。頭はひざにのせるように少し下げ、
+     * 水にゆられて、体がゆっくり前後に揺れる。
+     */
+    private void seabedRest(float t, float age) {
+        float k = ease(t / 14);
+        float sway = Mth.sin(age * 0.05F);
+        hips.y += 10.5F * k;
+        legL.y += 10.5F * k;
+        legR.y += 10.5F * k;
+        // 太ももは前へ高く上げ（ひざを立てる）、すねは下へ折り返す
+        legL.xRot = -2.2F * k;
+        legR.xRot = -2.2F * k;
+        legL.yRot = 0.08F * k;
+        legR.yRot = -0.08F * k;
+        shinL.xRot = 2.3F * k;
+        shinR.xRot = 2.3F * k;
+        torso.xRot += (0.35F + 0.04F * sway) * k;
+        // 両腕は前へのばして、すねのまわりを抱える
+        armL.xRot = Mth.lerp(k, armL.xRot, -1.1F);
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.1F);
+        armL.zRot = Mth.lerp(k, armL.zRot, 0.35F);
+        armR.zRot = Mth.lerp(k, armR.zRot, -0.35F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.5F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.5F);
+        head.xRot = Mth.lerp(k, head.xRot, 0.3F + 0.03F * sway);
+        skirtFront.xRot -= 1.2F * k;
+        skirtLeft.zRot -= 0.5F * k;
+        skirtRight.zRot += 0.5F * k;
+        skirtBack.xRot += 0.3F * k;
     }
 
     /** 椅子・階段に座る: 腰を座面まで下げ、太ももを前へ水平に、すねは下へ垂らす。両手はひざの上。 */

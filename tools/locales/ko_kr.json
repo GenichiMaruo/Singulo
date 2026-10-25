@@ -2212,8 +2212,8 @@
     "translation": "중력장의 요동을 억제하는 부품."
   },
   "desc.singulo.gravity_panel_receiver": {
-    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It accepts any amount per tick and stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
-    "translation": "케이블에서 전력을 받아, 맞닿은 패널과 거기서 면으로 이어진 패널 전체에 나눠 준다(저중력·고중력 패널, 무중력 블록, 만든 레일리 산란 패널). 1틱에 얼마든지 받을 수 있고, 이어진 수가 아주 많아도 무거워지지 않는다. 전력이 부족하면 가까운 순으로 낼 수 있는 만큼만 작동한다. 우클릭으로 작동 중인 수와 전력을 본다."
+    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It stores no power and takes only what the joined panels use, so they work only while power keeps coming. It stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
+    "translation": "케이블에서 전력을 받아, 맞닿은 패널과 거기서 면으로 이어진 패널 전체에 나눠 준다(저중력·고중력 패널, 무중력 블록, 만든 레일리 산란 패널). 전력을 저장하지 않고, 이어진 패널이 쓰는 만큼만 받는다(전력이 오는 동안에만 작동한다). 이어진 수가 아주 많아도 무거워지지 않는다. 전력이 부족하면 가까운 순으로 낼 수 있는 만큼만 작동한다. 우클릭으로 작동 중인 수와 전력을 본다."
   },
   "desc.singulo.guardian_core": {
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
@@ -2984,8 +2984,8 @@
     "translation": "불안정한 웜홀 입구를 특이 물질로 안정시켜 설치할 수 있는 입구로 만듭니다."
   },
   "desc.singulo.zero_gravity_block": {
-    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Joins visually with its neighbours.",
-    "translation": "패널 수전기에서 전력이 오면 위의 공간(처음에는 5블록)이 무중력이 된다. 그 안에서는 점프 키로 위로, 웅크리기로 아래로 떠다니며 낙하 피해도 없다. 1개 30 FE/t. 높이는 무중력 컨트롤 박스로 바꿀 수 있다. 옆의 같은 블록과 모양이 이어진다."
+    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Androids fly inside it and can reach any height. Joins visually with its neighbours.",
+    "translation": "패널 수전기에서 전력이 오면 위의 공간(처음에는 5블록)이 무중력이 된다. 그 안에서는 점프 키로 위로, 웅크리기로 아래로 떠다니며 낙하 피해도 없다. 1개 30 FE/t. 높이는 무중력 컨트롤 박스로 바꿀 수 있다. 안드로이드는 무중력 속을 날아 위아래 어디로든 갈 수 있다. 옆의 같은 블록과 모양이 이어진다."
   },
   "desc.singulo.zero_gravity_controller": {
     "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Boxes on the same group share one height, and a broken box keeps its height as an item. Each extra block of height multiplies the power of every zero-gravity block by 1.4.",

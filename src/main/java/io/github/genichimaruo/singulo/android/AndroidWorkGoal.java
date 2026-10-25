@@ -2254,7 +2254,7 @@ final class AndroidWorkGoal extends Goal {
         }
         Vec3 goal = Vec3.atBottomCenterOf(standAt);
         Vec3 d = goal.subtract(android.position());
-        if (d.horizontalDistanceSqr() < CENTER * CENTER && Math.abs(d.y) < 0.6 && android.onGround()) {
+        if (d.horizontalDistanceSqr() < CENTER * CENTER && Math.abs(d.y) < 0.6 && (android.onGround() || android.floating())) {
             // 中央に着いた: ぴったり中央に立ち、ブロックの方を向く
             android.setPos(goal.x, android.getY(), goal.z);
             return face(target, need);

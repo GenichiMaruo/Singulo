@@ -44,6 +44,8 @@ import org.joml.Vector3f;
  */
 public abstract class RuinAndroid extends Monster {
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
+    /** 無重力の空間で、スラスターで飛んでいるか（手元でスラスターを描くため）。 */
+    private static final EntityDataAccessor<Boolean> FLOATING = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CHARGE = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
     /** 印刷の進み（0〜PRINT_TICKS。PRINT_TICKS で完成）。 */
     private static final EntityDataAccessor<Integer> PRINT = SynchedEntityData.defineId(RuinAndroid.class, EntityDataSerializers.INT);
@@ -84,6 +86,21 @@ public abstract class RuinAndroid extends Monster {
     public static final int STATE_MINING = 9;
     /** 拠点の暮らし（{@link AndroidLife}）: 椅子・階段に座る、地面に座る、植木鉢・作物に手をかざす、床を掃く。 */
     public static final int STATE_SIT = 90, STATE_SIT_GROUND = 91, STATE_TEND = 92, STATE_SWEEP = 93;
+    /** 減った体力の自然な回復: この tick ごとに体力1、そのたびに充電をこれだけ使う。充電がこの割合を切っていれば回復しない。 */
+    static final int REGEN_INTERVAL = 100, REGEN_COST = 15;
+    static final float REGEN_MIN_CHARGE = 0.1F;
+    /** 水上で、あお向けに浮かんで休みながら充電する（陸が近くになく、日が出ていないとき）。 */
+    public static final int STATE_FLOAT_REST = 94;
+    /** 水の底で、ひざを抱えて座って充電する（上に水面がない水の中。天井の下や水中の洞窟）。 */
+    public static final int STATE_SEABED_REST = 95;
+    /** 水中（頭まで水に入っている）を動いている間、この tick ごとに充電を1減らす。 */
+    static final int WATER_DRAIN_INTERVAL = 2;
+    /** 水中で充電するとき、陸を探す範囲（横のブロック数）。 */
+    static final int LAND_SEARCH = 12;
+    /** 充電切れから、この tick たっても陸に上がれなければ、あきらめて水面で充電する。 */
+    static final int LAND_GIVE_UP = 100;
+    /** 水の中で動くときの、1 tick に足す速さの割合と、毎 tick 残る速さの割合（ふつうの水の中より、ずっと速く軽く動ける）。 */
+    static final float SWIM_PUSH = 0.06F, SWIM_DRAG = 0.85F;           // ふつうは毎秒3ブロックほど（追従で急ぐときは、プレイヤーのダッシュ泳ぎにもついていける）
 
     /** 手の武器をしまっているか（作業台などで物を作っている間。両手を使うので。クライアントでも見える）。 */
     public boolean weaponStowed() {
@@ -324,6 +341,7 @@ public abstract class RuinAndroid extends Monster {
         super(type, level);
         this.xpReward = 8;
         setPersistenceRequired();
+        setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.WATER, 0);    // 水の中も自由に動ける
         setDropChance(net.minecraft.world.entity.EquipmentSlot.CHEST, 0);
         // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）。アップグレードは見た目と充電の満タンに出す
         inventory.addListener(c -> {
@@ -1505,6 +1523,7 @@ public abstract class RuinAndroid extends Monster {
                 .add(Attributes.MAX_HEALTH, 30)
                 .add(Attributes.ARMOR, 4)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
+                .add(Attributes.FLYING_SPEED, 0.4)               // 無重力の空間で飛ぶときの速さ
                 .add(Attributes.ATTACK_DAMAGE, 5)
                 .add(Attributes.FOLLOW_RANGE, 24)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.3)
@@ -1589,6 +1608,7 @@ public abstract class RuinAndroid extends Monster {
         }
         builder.define(PATROL_LOG, new CompoundTag());
         builder.define(BACKPACK, false);
+        builder.define(FLOATING, false);
         builder.define(WORKING, false);
         builder.define(ACTIVITY, ACT_NONE);
         builder.define(STALL, STALL_NONE);
@@ -2102,7 +2122,33 @@ public abstract class RuinAndroid extends Monster {
 
     /** 充電中の状態か（印刷台・ソーラー・座って・充電器）。 */
     public static boolean charging(int state) {
-        return state == STATE_CHARGING || state == STATE_SOLAR || state == STATE_RESTING || state == STATE_CHARGING_FOLLOW;
+        return state == STATE_CHARGING || state == STATE_SOLAR || state == STATE_RESTING || state == STATE_CHARGING_FOLLOW
+                || state == STATE_FLOAT_REST || state == STATE_SEABED_REST;
+    }
+
+    /** 水の中では息をしない（空気が減らず、おぼれない）。 */
+    @Override
+    protected int decreaseAirSupply(int air) {
+        return air;
+    }
+
+    /** 水の流れに押し流されない（自分で動く）。 */
+    @Override
+    public boolean isPushedByFluid() {
+        return false;
+    }
+
+    /** 水の中で自由に動いている間は、水の重さで遅くならず、宙を飛ぶように軽く速く動く。 */
+    @Override
+    public void travel(Vec3 input) {
+        if (isControlledByLocalInstance() && isInWater() && isNoGravity()) {
+            moveRelative(SWIM_PUSH, input);
+            move(net.minecraft.world.entity.MoverType.SELF, getDeltaMovement());
+            setDeltaMovement(getDeltaMovement().scale(SWIM_DRAG));
+            calculateEntityAnimation(false);
+            return;
+        }
+        super.travel(input);
     }
 
     public boolean printed() {
@@ -2171,7 +2217,13 @@ public abstract class RuinAndroid extends Monster {
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(0, new FloatGoal(this));
+        // 水の中は自由に泳ぐので、浮かび続けるのは溶岩の中だけ
+        goalSelector.addGoal(0, new FloatGoal(this) {
+            @Override
+            public boolean canUse() {
+                return isInLava() && super.canUse();
+            }
+        });
         goalSelector.addGoal(1, new PowerGoal());
         workGoal = new AndroidWorkGoal(this);
         goalSelector.addGoal(2, workGoal);
@@ -2209,6 +2261,7 @@ public abstract class RuinAndroid extends Monster {
     public void tick() {
         super.tick();
         if (level().isClientSide) {
+            tickThrusters();
             return;
         }
         stateTicks++;
@@ -2236,6 +2289,10 @@ public abstract class RuinAndroid extends Monster {
         }
         if (retreatCooldown > 0) {
             retreatCooldown--;
+        }
+        if (isUnderWater() && active() && tickCount % WATER_DRAIN_INTERVAL == 0
+                && new Vec3(getX() - xo, getY() - yo, getZ() - zo).lengthSqr() > 0.01 * 0.01) {
+            spend(1);                                     // 水中を泳いでいる間は、水をかいて進むのに充電を使う（止まっていれば減らない）
         }
         entityData.set(ALERT, getTarget() != null && active());
         if (guard && home != null && tickCount % 20 == 0 && level().isLoaded(home)) {
@@ -2332,9 +2389,244 @@ public abstract class RuinAndroid extends Monster {
     @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
+        updateFlight();
         if (!printed()) {
             getNavigation().stop();
         }
+    }
+
+    // ------------------------------------------------------------------ 無重力の中を飛ぶ
+
+    /** 地上の経路探しと動き（無重力に入ったとき、飛ぶものと入れ替える）。 */
+    @Nullable
+    private net.minecraft.world.entity.ai.navigation.PathNavigation groundNavigation, flightNavigation;
+    @Nullable
+    private net.minecraft.world.entity.ai.control.MoveControl groundMove, flightMove;
+    private boolean floating;
+    /** 水の中を泳いでいるか（入るのとやめるのに差をつけて、岸で切り替わり続けないようにする）と、水から出てからの tick。 */
+    private boolean swimming;
+    private int dryTicks;
+    /** スラスターの開き具合（0: たたんでいる、1: 開いて噴いている。手元だけ）。 */
+    private float thrusterOpen, thrusterOpenO;
+    /** 浮き輪のふくらみ具合（0〜1。水の中で充電が切れたり、水上で充電している間に出す。手元だけ）。 */
+    private float ringOpen, ringOpenO;
+
+    /** 浮き輪のふくらみ具合（0〜1）。 */
+    public float ringOpen(float partialTick) {
+        return Mth.lerp(partialTick, ringOpenO, ringOpen);
+    }
+    /** 動いてから、スラスターを開いたままにする残りの tick（止まるたびにすぐたたまないように。手元だけ）。 */
+    private int thrusterHold;
+
+    /** 無重力の空間で、宙を飛んで動いているか（手元でも分かる）。 */
+    public boolean floating() {
+        return level().isClientSide ? entityData.get(FLOATING) : floating;
+    }
+
+    /** スラスターの開き具合（0〜1。たたむ・開くのに 6 tick）。 */
+    public float thrusterOpen(float partialTick) {
+        return Mth.lerp(partialTick, thrusterOpenO, thrusterOpen);
+    }
+
+    /**
+     * 手元: 宙や水の中で動いている間だけスラスターを開く（止まって0.5秒たつか、充電中・充電切れならたたむ）。
+     * 噴いている間はノズルの後ろへ、薄い排気の粒（水中では泡）を少し残す。
+     */
+    private void tickThrusters() {
+        // 浮き輪: 水の中で充電切れ・充電中（水上）の間だけ、ぱっとふくらませる（5 tick）。浮かび上がる間は泡を出す
+        ringOpenO = ringOpen;
+        int st = state();
+        boolean ring = isInWater() && (st == STATE_LOW_POWER || charging(st) && st != STATE_CHARGING && st != STATE_SEABED_REST)
+                && hasWaterSurface();
+        if (st == STATE_SEABED_REST && tickCount % 30 == Math.floorMod(getId(), 30)) {
+            // 水の底で休んでいる間: ときどき口もとから泡がのぼる
+            level().addParticle(net.minecraft.core.particles.ParticleTypes.BUBBLE, getX(), getY() + 0.9, getZ(), 0, 0.08, 0);
+        }
+        ringOpen = Mth.clamp(ringOpen + (ring ? 1F : -1F) / 5, 0, 1);
+        if (ringOpen > 0.5F && getY() - yo > 0.1) {
+            for (int i = 0; i < 2; i++) {
+                level().addParticle(net.minecraft.core.particles.ParticleTypes.BUBBLE, getX() + (random.nextDouble() - 0.5) * 0.8, getY() + 0.5,
+                        getZ() + (random.nextDouble() - 0.5) * 0.8, 0, 0.1, 0);
+            }
+        }
+        thrusterOpenO = thrusterOpen;
+        double moved = new Vec3(getX() - xo, getY() - yo, getZ() - zo).lengthSqr();
+        thrusterHold = moved > 0.015 * 0.015 ? 10 : Math.max(0, thrusterHold - 1);
+        boolean thrust = entityData.get(FLOATING) && thrusterHold > 0 && !charging(state()) && state() != STATE_LOW_POWER;
+        thrusterOpen = Mth.clamp(thrusterOpen + (thrust ? 1F : -1F) / 6, 0, 1);
+        if (thrusterOpen < 1 || tickCount % 3 != 0) {
+            return;
+        }
+        double speed = new Vec3(getX() - xo, getY() - yo, getZ() - zo).length();
+        if (speed < 0.02 && random.nextInt(3) != 0) {
+            return;                                       // 止まって浮いている間は、たまにだけ
+        }
+        float yaw = yBodyRot * Mth.DEG_TO_RAD;
+        double backX = Mth.sin(yaw) * 0.22, backZ = -Mth.cos(yaw) * 0.22;   // 体の後ろ
+        double sideX = Mth.cos(yaw) * 0.24, sideZ = Mth.sin(yaw) * 0.24;   // バックパックの左右の主ノズルの先
+        int c = accent();
+        var dust = new net.minecraft.core.particles.DustParticleOptions(
+                new org.joml.Vector3f(((c >> 16) & 0xFF) / 255F, ((c >> 8) & 0xFF) / 255F, (c & 0xFF) / 255F), 0.45F);
+        boolean water = isInWater();
+        for (int side = -1; side <= 1; side += 2) {
+            level().addParticle(water ? net.minecraft.core.particles.ParticleTypes.BUBBLE : dust, getX() + backX + side * sideX,
+                    getY() + (this instanceof GunnerAndroid ? 0.95 : 0.7), getZ() + backZ + side * sideZ, backX * 0.2, water ? 0.02 : -0.04, backZ * 0.2);
+        }
+    }
+
+    /**
+     * 無重力ブロックの上の無重力の空間と、水の中にいる間は、上下にも自由に動いて、行きたい場所へまっすぐ向かう（重力の属性は変えず、
+     * 落ちないようにするだけ。経路探しと動きを飛ぶものに替える）。外へ出ると、ふつうに歩く。
+     */
+    private void updateFlight() {
+        // 泳ぐのは、水が腰まで来てから。やめるのは、水が足首より下になって少したってから（岸で毎 tick 切り替わって、上下に震えないように）
+        double depth = getFluidHeight(net.minecraft.tags.FluidTags.WATER);
+        if (swimming ? depth < 0.15 : depth > 0.6) {
+            if (!swimming || ++dryTicks >= 6) {
+                swimming = !swimming;
+                dryTicks = 0;
+            }
+        } else {
+            dryTicks = 0;
+        }
+        boolean zero = io.github.genichimaruo.singulo.gravity.ZeroGravity.inZone(level(), getX(), getY(), getZ()) || swimming;
+        if (isNoGravity() != zero) {
+            setNoGravity(zero);                           // 保存されていた浮き方も、今いる場所に合わせる
+        }
+        if (zero) {
+            resetFallDistance();
+        }
+        if (zero == floating) {
+            return;
+        }
+        floating = zero;
+        entityData.set(FLOATING, zero);
+        getNavigation().stop();
+        if (zero) {
+            if (flightNavigation == null) {
+                groundNavigation = navigation;
+                groundMove = moveControl;
+                flightNavigation = createFlightNavigation(level());
+                flightMove = new net.minecraft.world.entity.ai.control.FlyingMoveControl(this, 20, true);
+            }
+            navigation = flightNavigation;
+            moveControl = flightMove;
+            setDeltaMovement(getDeltaMovement().multiply(1, 0, 1));
+        } else if (groundNavigation != null) {
+            navigation = groundNavigation;
+            moveControl = groundMove;
+        }
+    }
+
+    /**
+     * 飛ぶときの経路探し: 無重力の空間の中はどこでも通れ、外へは足もとに床のある所だけ（宙に浮いたまま外へ出て落ちない）。
+     * 進入禁止ゾーンは地上と同じく避ける。
+     */
+    private net.minecraft.world.entity.ai.navigation.PathNavigation createFlightNavigation(Level level) {
+        var nav = new net.minecraft.world.entity.ai.navigation.FlyingPathNavigation(this, level) {
+            /**
+             * 行き先まで、間にブロックがなければ、道の点（ブロックの格子に沿った階段のような道）をたどらずに、行き先へまっすぐ向かう
+             * （点ごとに曲がって、左右にふらふら動かないように）。
+             */
+            @Override
+            public void tick() {
+                super.tick();
+                net.minecraft.world.level.pathfinder.Path path = getPath();
+                if (path == null || path.isDone()) {
+                    return;
+                }
+                Vec3 end = Vec3.atBottomCenterOf(path.getEndNode().asBlockPos());
+                if (mob.position().distanceToSqr(end) < 0.5 * 0.5) {
+                    path.setNextNodeIndex(path.getNodeCount());   // 着いた（途中の点を飛ばしても、道を終わりにする）
+                    return;
+                }
+                if (clearTo(end)) {
+                    mob.getMoveControl().setWantedPosition(end.x, end.y, end.z, speedModifier);
+                }
+            }
+
+            /** 体の高さの下・中・上の3本の線が、どれもブロックに当たらずに行き先へ届くか。 */
+            private boolean clearTo(Vec3 end) {
+                float h = mob.getBbHeight();
+                for (float k : new float[] {0.1F, 0.5F, 0.9F}) {
+                    Vec3 from = mob.position().add(0, h * k, 0), to = end.add(0, h * k, 0);
+                    if (level.clip(new net.minecraft.world.level.ClipContext(from, to, net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                            net.minecraft.world.level.ClipContext.Fluid.NONE, mob)).getType() != net.minecraft.world.phys.HitResult.Type.MISS) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            protected net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int maxVisitedNodes) {
+                this.nodeEvaluator = new net.minecraft.world.level.pathfinder.FlyNodeEvaluator() {
+                    @Override
+                    public net.minecraft.world.level.pathfinder.PathType getPathTypeOfMob(
+                            net.minecraft.world.level.pathfinder.PathfindingContext context, int x, int y, int z, net.minecraft.world.entity.Mob mob) {
+                        return mob instanceof RuinAndroid a && (a.forbidden(x, y, z) || !a.flyable(x, y, z))
+                                ? net.minecraft.world.level.pathfinder.PathType.BLOCKED : super.getPathTypeOfMob(context, x, y, z, mob);
+                    }
+                };
+                this.nodeEvaluator.setCanPassDoors(true);
+                return new net.minecraft.world.level.pathfinder.PathFinder(this.nodeEvaluator, maxVisitedNodes);
+            }
+        };
+        nav.setCanPassDoors(true);
+        nav.setCanFloat(true);
+        return nav;
+    }
+
+    // ------------------------------------------------------------------ 水の上で充電する
+
+    /** 充電切れのとき、充電器を持った持ち主のそばへ行く距離（追従中でなくても、この距離にいれば行く）。 */
+    static final double CHARGER_NEAR = 24;
+    /** 水の中で充電切れになったとき、上がる陸の場所（なければ null）。 */
+    @Nullable
+    private BlockPos landTarget;
+    /** 今の充電切れで、陸へ行くのをあきらめたか（まっすぐに近い道がなかった）。 */
+    private boolean landGaveUp;
+
+    /** 水面に浮かぶときの足の高さ（いる場所の水の、いちばん上の面から少し沈める。水の中でなければ今の高さ）。 */
+    public double floatY() {
+        BlockPos.MutableBlockPos p = blockPosition().mutable();
+        if (!level().getFluidState(p).is(net.minecraft.tags.FluidTags.WATER)) {
+            return getY();
+        }
+        while (p.getY() < level().getMaxBuildHeight() && level().getFluidState(p.above()).is(net.minecraft.tags.FluidTags.WATER)) {
+            p.move(net.minecraft.core.Direction.UP);
+        }
+        return p.getY() + 0.9 - 0.8;
+    }
+
+    /** 上に水面があるか（真上へたどって、水が空気で終わるか。天井や、どこまでも水なら false）。 */
+    public boolean hasWaterSurface() {
+        BlockPos.MutableBlockPos p = blockPosition().mutable();
+        for (int i = 0; i < 96 && p.getY() < level().getMaxBuildHeight(); i++) {
+            p.move(net.minecraft.core.Direction.UP);
+            if (!level().getFluidState(p).is(net.minecraft.tags.FluidTags.WATER)) {
+                return level().getBlockState(p).getCollisionShape(level(), p).isEmpty();
+            }
+        }
+        return false;
+    }
+
+    /** 水面に浮かんだまま止まる（ゆっくり上下に揺れる）。 */
+    void holdAtSurface() {
+        double target = floatY() + 0.03 * Math.sin(tickCount * 0.08);
+        double dy = Mth.clamp((target - getY()) * 0.2, -0.06, 0.06);
+        Vec3 v = getDeltaMovement();
+        setDeltaMovement(v.x * 0.5, dy, v.z * 0.5);
+    }
+
+    /** 飛んで通ってよい場所か: 無重力の空間の中か、水の中か、足もとに床がある所。 */
+    boolean flyable(int x, int y, int z) {
+        if (io.github.genichimaruo.singulo.gravity.ZeroGravity.inZone(level(), x + 0.5, y, z + 0.5)
+                || level().getFluidState(new BlockPos(x, y, z)).is(net.minecraft.tags.FluidTags.WATER)) {
+            return true;
+        }
+        BlockPos below = new BlockPos(x, y - 1, z);
+        return !level().getBlockState(below).getCollisionShape(level(), below).isEmpty();
     }
 
     @Override
@@ -2614,14 +2906,16 @@ public abstract class RuinAndroid extends Monster {
                     return;
                 }
                 double d = distanceTo(p);
-                if (d > 24 && p.onGround()) {
-                    // 離れすぎたら、持ち主のそばへ跳ぶ（ペットと同じ）
+                boolean swim = isInWater() || p.isInWater();
+                if (d > 24 && (p.onGround() || p.isInWater())) {
+                    // 離れすぎたら、持ち主のそばへ跳ぶ（ペットと同じ。泳いでいる持ち主のそばの水の中へも）
                     Vec3 back = p.position().subtract(p.getLookAngle().multiply(1, 0, 1).normalize().scale(2));
                     teleportTo(back.x, p.getY(), back.z);
                     getNavigation().stop();
                 } else if (d > 4) {
-                    if (getNavigation().isDone() || tickCount % 10 == 0) {
-                        getNavigation().moveTo(p, d > 10 ? 1.2 : 1.0);
+                    // 水の中では、離れるほど速く泳いで追いつく（持ち主はすぐ動くので、道も早めに引き直す）
+                    if (getNavigation().isDone() || tickCount % (swim ? 5 : 10) == 0) {
+                        getNavigation().moveTo(p, swim ? (d > 8 ? 2.0 : 1.5) : d > 10 ? 1.2 : 1.0);
                     }
                 } else {
                     getNavigation().stop();
@@ -2779,11 +3073,13 @@ public abstract class RuinAndroid extends Monster {
             if (!printed() || !(level() instanceof ServerLevel level)) {
                 return;
             }
-            if (state() == STATE_LOW_POWER && guard && mode == MODE_FOLLOW) {
-                // 追従中: 充電器を持った持ち主のほうがステーションより近いか、ステーションが遠すぎれば、持ち主のそばで充電する
+            if (state() == STATE_LOW_POWER) {
+                // 充電器を持った持ち主のほうがステーションより近いか、ステーションが遠すぎれば、持ち主のそばで充電する
+                // （追従中は遠くの持ち主へも、ほかのときは近くにいれば）
                 Player p = chargerOwner();
                 double dock = home == null ? Double.MAX_VALUE : Math.sqrt(Vec3.atBottomCenterOf(home.above()).distanceToSqr(position()));
-                if (p != null && (dock > DOCK_RANGE || distanceTo(p) < dock)) {
+                boolean near = guard && mode == MODE_FOLLOW || p != null && distanceTo(p) < CHARGER_NEAR;
+                if (p != null && near && (dock > DOCK_RANGE || distanceTo(p) < dock)) {
                     setState(STATE_CHARGING_FOLLOW);
                     return;
                 }
@@ -2797,6 +3093,13 @@ public abstract class RuinAndroid extends Monster {
                 if (stateTicks >= FOLD_TICKS) {
                     setState(STATE_IDLE);
                 }
+                return;
+            }
+            if (state() == STATE_LOW_POWER && isInWater() && getY() < floatY() - 0.6 && hasWaterSurface()) {
+                // 水の中で充電切れ: 浮き輪を出して、まず一気に水面まで浮かび上がる
+                getNavigation().stop();
+                Vec3 v = getDeltaMovement();
+                setDeltaMovement(v.x * 0.5, 0.3, v.z * 0.5);
                 return;
             }
             if (state() == STATE_LOW_POWER || state() == STATE_RETREAT) {
@@ -2813,6 +3116,10 @@ public abstract class RuinAndroid extends Monster {
                 // ステーションの上でほかのアンドロイドが充電中なら、そばで待って、どいたら交代で乗る（待つ間は座り込まない）
                 boolean taken = guard && h != null && dockTaken(level, h);
                 if (dock == null || dock.distanceToSqr(position()) > range * range || stateTicks > (guard ? 1200 : 400) && !taken) {
+                    if (isInWater()) {
+                        chargeFromWater(level);                   // 水の中: 陸へ上がるか、水面で充電する
+                        return;
+                    }
                     getNavigation().stop();
                     setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
                     playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
@@ -2843,6 +3150,12 @@ public abstract class RuinAndroid extends Monster {
             } else if (charging(state())) {
                 getNavigation().stop();
                 int s = state();
+                if (s == STATE_SEABED_REST) {
+                    Vec3 v = getDeltaMovement();
+                    setDeltaMovement(v.x * 0.5, -0.05, v.z * 0.5);  // 水の底に座ったまま
+                } else if (isInWater() && s != STATE_CHARGING_FOLLOW) {
+                    holdAtSurface();                              // 水上で充電中: 水面に浮かんだまま
+                }
                 if (s == STATE_CHARGING && home != null) {
                     // ステーション（印刷台）の真上の中心へ寄る
                     Vec3 c = Vec3.atBottomCenterOf(home.above());
@@ -2853,13 +3166,13 @@ public abstract class RuinAndroid extends Monster {
                         setPos(c.x, getY(), c.z);
                     }
                 }
-                // 外で充電中に日が沈んだり屋根の下に入ったら座る。座っていて日が出たらパネルを広げる
-                if (s != STATE_CHARGING && stateTicks % 40 == 0) {
+                // 外で充電中に日が沈んだり屋根の下に入ったら座る（水上ならあお向けに浮かぶ）。休んでいて日が出たらパネルを広げる
+                if (s != STATE_CHARGING && s != STATE_CHARGING_FOLLOW && stateTicks % 40 == 0) {
                     boolean sun = sunlit(level);
                     if (s == STATE_SOLAR && !sun) {
-                        setState(STATE_RESTING);
-                        s = STATE_RESTING;
-                    } else if (s == STATE_RESTING && sun) {
+                        s = isInWater() ? STATE_FLOAT_REST : STATE_RESTING;
+                        setState(s);
+                    } else if ((s == STATE_RESTING || s == STATE_FLOAT_REST) && sun) {
                         setState(STATE_SOLAR);
                         s = STATE_SOLAR;
                     }
@@ -2895,6 +3208,95 @@ public abstract class RuinAndroid extends Monster {
                     playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
                 }
             }
+        }
+
+        /**
+         * 水の中で充電切れ: 近くに陸があれば陸へ上がる（上がったら、ふつうにその場で充電する）。なければ水面で充電する。
+         * 陸があっても、しばらく（{@link #LAND_GIVE_UP} tick）上がれなければ、あきらめて水面で充電する。
+         */
+        private void chargeFromWater(ServerLevel level) {
+            if (!hasWaterSurface()) {
+                // 上に水面がない（天井の下・水中の洞窟）: 浮き輪は出さず、底まで沈んで座って充電する
+                getNavigation().stop();
+                if (!onGround()) {
+                    Vec3 v = getDeltaMovement();
+                    setDeltaMovement(v.x * 0.5, -0.15, v.z * 0.5);
+                    return;
+                }
+                setState(STATE_SEABED_REST);
+                playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.0F);
+                return;
+            }
+            if (stateTicks <= 1) {
+                landGaveUp = false;
+            }
+            if (stateTicks > LAND_GIVE_UP || landGaveUp) {
+                landTarget = null;                        // 陸へ行けない（道がない・遠回り）: 水面で充電する
+            } else if (landTarget == null || stateTicks % 40 == 1) {
+                landTarget = findLand(level);
+                if (landTarget != null && !nearlyStraight(landTarget)) {
+                    landTarget = null;                    // まっすぐに近い道で行けない陸は、目指さずにあきらめる
+                    landGaveUp = true;
+                }
+            }
+            if (landTarget != null) {
+                if (stateTicks % 10 == 1) {
+                    getNavigation().moveTo(landTarget.getX() + 0.5, landTarget.getY(), landTarget.getZ() + 0.5, 0.75);
+                }
+                return;
+            }
+            getNavigation().stop();
+            if (getY() < floatY() - 0.15) {
+                setDeltaMovement(getDeltaMovement().multiply(0.5, 0, 0.5).add(0, 0.12, 0));   // 水面へ浮かび上がる
+                return;
+            }
+            setState(sunlit(level) ? STATE_SOLAR : STATE_FLOAT_REST);
+            playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
+        }
+
+        /** その陸へ、まっすぐに近い道で行けるか（道があり、着けて、道のりがまっすぐの距離の1.5倍＋2マスまで）。 */
+        private boolean nearlyStraight(BlockPos target) {
+            net.minecraft.world.level.pathfinder.Path path = getNavigation().createPath(target, 0);
+            if (path == null || !path.canReach()) {
+                return false;
+            }
+            double length = 0;
+            for (int i = 1; i < path.getNodeCount(); i++) {
+                length += Math.sqrt(path.getNode(i).distanceToSqr(path.getNode(i - 1)));
+            }
+            return length <= Math.sqrt(target.distToCenterSqr(position())) * 1.5 + 2;
+        }
+
+        /** 近くの陸の、立てる場所（水でなく、上の2マスが空いていて、足もとが固い）。一番近いもの（なければ null）。 */
+        @Nullable
+        private BlockPos findLand(ServerLevel level) {
+            int top = (int) Math.floor(floatY()) + 1;
+            BlockPos best = null;
+            double bestDist = Double.MAX_VALUE;
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            for (int dx = -LAND_SEARCH; dx <= LAND_SEARCH; dx++) {
+                for (int dz = -LAND_SEARCH; dz <= LAND_SEARCH; dz++) {
+                    for (int y = top + 2; y >= top - 2; y--) {
+                        p.set(getBlockX() + dx, y, getBlockZ() + dz);
+                        if (standable(level, p)) {
+                            double d = p.distToCenterSqr(position());
+                            if (d < bestDist) {
+                                bestDist = d;
+                                best = p.immutable();
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return best;
+        }
+
+        private boolean standable(ServerLevel level, BlockPos p) {
+            BlockPos below = p.below();
+            return level.getFluidState(p).isEmpty() && level.getBlockState(p).getCollisionShape(level, p).isEmpty()
+                    && level.getBlockState(p.above()).getCollisionShape(level, p.above()).isEmpty() && level.getFluidState(below).isEmpty()
+                    && !level.getBlockState(below).getCollisionShape(level, below).isEmpty();
         }
 
         /** ステーションの上で、ほかのアンドロイドが充電・印刷されているか。 */

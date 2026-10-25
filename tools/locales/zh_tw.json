@@ -2212,8 +2212,8 @@
     "translation": "抑制重力場波動的部件。"
   },
   "desc.singulo.gravity_panel_receiver": {
-    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It accepts any amount per tick and stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
-    "translation": "從線纜接收電力，分配給相接的面板以及與其以面相連的全部面板（低重力、高重力面板，無重力方塊，製作的瑞利散射面板）。每刻可接收任意電量，即使相連數量極多也不會卡頓。電力不足時，按距離由近到遠只驅動付得起的數量。右鍵查看運行數量與耗電。"
+    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It stores no power and takes only what the joined panels use, so they work only while power keeps coming. It stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
+    "translation": "從線纜接收電力，分配給相接的面板以及與其以面相連的全部面板（低重力、高重力面板，無重力方塊，製作的瑞利散射面板）。不儲存電力，只接收相連面板所用的電量（只在有電力送達時運行）。即使相連數量極多也不會卡頓。電力不足時，按距離由近到遠只驅動付得起的數量。右鍵查看運行數量與耗電。"
   },
   "desc.singulo.guardian_core": {
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
@@ -2984,8 +2984,8 @@
     "translation": "以奇異物質穩定不穩定蟲洞入口，使其成為可以放置的入口。"
   },
   "desc.singulo.zero_gravity_block": {
-    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Joins visually with its neighbours.",
-    "translation": "由面板受電器供電時，上方的空間（初始為5格）會變成無重力。在其中按跳躍鍵向上、潛行向下漂浮，也不會受到摔落傷害。每個30 FE/t。高度可用無重力控制箱改變。與相鄰的同種方塊外觀相連。"
+    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Androids fly inside it and can reach any height. Joins visually with its neighbours.",
+    "translation": "由面板受電器供電時，上方的空間（初始為5格）會變成無重力。在其中按跳躍鍵向上、潛行向下漂浮，也不會受到摔落傷害。每個30 FE/t。高度可用無重力控制箱改變。仿生人會在無重力中飛行，可上下前往任何位置。與相鄰的同種方塊外觀相連。"
   },
   "desc.singulo.zero_gravity_controller": {
     "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Boxes on the same group share one height, and a broken box keeps its height as an item. Each extra block of height multiplies the power of every zero-gravity block by 1.4.",
