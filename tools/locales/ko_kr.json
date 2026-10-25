@@ -9855,6 +9855,38 @@
     "source": "Advanced anchor holds",
     "translation": "고급 앵커가 고정한다"
   },
+  "subtitles.singulo.android.charge_start": {
+    "source": "Android starts charging",
+    "translation": "안드로이드가 충전을 시작함"
+  },
+  "subtitles.singulo.android.charged": {
+    "source": "Android is fully charged",
+    "translation": "안드로이드가 완전히 충전됨"
+  },
+  "subtitles.singulo.android.gunner_shot": {
+    "source": "Pistol fires",
+    "translation": "소형 총이 발사됨"
+  },
+  "subtitles.singulo.android.power_down": {
+    "source": "Android powers down",
+    "translation": "안드로이드의 충전이 다 됨"
+  },
+  "subtitles.singulo.android.railgun_assemble": {
+    "source": "Railgun assembles",
+    "translation": "레일건이 조립됨"
+  },
+  "subtitles.singulo.android.railgun_charge": {
+    "source": "Railgun charges",
+    "translation": "레일건이 충전됨"
+  },
+  "subtitles.singulo.android.railgun_fire": {
+    "source": "Railgun fires",
+    "translation": "레일건이 발사됨"
+  },
+  "subtitles.singulo.android.ring_inflate": {
+    "source": "Float ring inflates",
+    "translation": "튜브가 부풀어 오름"
+  },
   "subtitles.singulo.archive_terminal_running": {
     "source": "Archive terminal reads",
     "translation": "기록 보관 단말기가 읽어 들인다"

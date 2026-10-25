@@ -1572,7 +1572,7 @@ public abstract class RuinAndroid extends Monster {
         setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.item.ItemStack.EMPTY);
         setTarget(null);
         getNavigation().stop();
-        playSound(SoundEvents.BEACON_DEACTIVATE, 0.9F, 1.4F);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.power_down"), 0.9F, 1.4F);
     }
 
     /** ステーションを失う（身寄りのないアンドロイドになり、新しいステーションでリンクし直せる）。 */
@@ -2111,7 +2111,10 @@ public abstract class RuinAndroid extends Monster {
         setCharge(0);
         setState(STATE_LOW_POWER);
         getNavigation().stop();
-        playSound(SoundEvents.BEACON_DEACTIVATE, 0.8F, 1.6F);
+        if (isInWater() && hasWaterSurface()) {
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.ring_inflate"), 0.8F, 1.0F);     // 浮き輪をふくらませて浮かび上がる
+        }
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.power_down"), 0.8F, 1.6F);
     }
 
     /** 攻撃できるか（充電があり、印刷が終わり、戻り・充電中でない）。 */
@@ -2312,7 +2315,7 @@ public abstract class RuinAndroid extends Monster {
             // 体力が減ったら（自己修理キットがなければ）、戦いをやめてステーションへ戻る
             setTarget(null);
             setState(STATE_RETREAT);
-            playSound(SoundEvents.BEACON_DEACTIVATE, 0.7F, 1.3F);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.power_down"), 0.7F, 1.3F);
         }
         if (printed() && state() != STATE_LOW_POWER && getHealth() < getMaxHealth() && tickCount % REGEN_INTERVAL == 0
                 && charge() > maxCharge() * REGEN_MIN_CHARGE + REGEN_COST) {
@@ -2389,7 +2392,7 @@ public abstract class RuinAndroid extends Monster {
                 if (guard && owner != null && level() instanceof ServerLevel server) {
                     io.github.genichimaruo.singulo.registry.PendingMilestones.award(server.getServer(), owner, "android_printed");
                 }
-                playSound(SoundEvents.BEACON_ACTIVATE, 0.8F, 1.8F);
+                playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.charged"), 0.8F, 1.8F);
             } else if (p % 6 == 0) {
                 playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 0.4F, 1.4F + p / (float) PRINT_TICKS);
             }
@@ -3132,7 +3135,7 @@ public abstract class RuinAndroid extends Monster {
                     }
                     getNavigation().stop();
                     setState(sunlit(level) ? STATE_SOLAR : STATE_RESTING);
-                    playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
+                    playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.charge_start"), 0.6F, 1.2F);
                     return;
                 }
                 if (taken && dock.distanceToSqr(position()) < WAIT_RADIUS * WAIT_RADIUS) {
@@ -3143,7 +3146,7 @@ public abstract class RuinAndroid extends Monster {
                 if (!taken && dock.distanceToSqr(position()) < 1.6 * 1.6) {
                     getNavigation().stop();
                     setState(STATE_CHARGING);
-                    playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.4F);
+                    playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.charge_start"), 0.6F, 1.4F);
                     // 「ありがとう」: 譲ってくれた仲間がそばにいれば、そちらを向いて返す
                     if (guard) {
                         for (RuinAndroid a : level.getEntitiesOfClass(RuinAndroid.class, getBoundingBox().inflate(4),
@@ -3215,7 +3218,7 @@ public abstract class RuinAndroid extends Monster {
                 if (charge() >= maxCharge() && healed) {
                     // ソーラーのときは、パネルをたたんでから戦いに戻る
                     setState(s == STATE_SOLAR ? STATE_SOLAR_FOLD : STATE_IDLE);
-                    playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
+                    playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.charged"), 0.7F, 1.9F);
                 }
             }
         }
@@ -3234,7 +3237,7 @@ public abstract class RuinAndroid extends Monster {
                     return;
                 }
                 setState(STATE_SEABED_REST);
-                playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.0F);
+                playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.charge_start"), 0.6F, 1.0F);
                 return;
             }
             if (stateTicks <= 1) {
@@ -3261,7 +3264,7 @@ public abstract class RuinAndroid extends Monster {
                 return;
             }
             setState(sunlit(level) ? STATE_SOLAR : STATE_FLOAT_REST);
-            playSound(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.2F);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.charge_start"), 0.6F, 1.2F);
         }
 
         /** その陸へ、まっすぐに近い道で行けるか（道があり、着けて、道のりがまっすぐの距離の1.5倍＋2マスまで）。 */
@@ -3352,7 +3355,7 @@ public abstract class RuinAndroid extends Monster {
             }
             if (charge() >= maxCharge()) {
                 setState(STATE_IDLE);
-                playSound(SoundEvents.BEACON_ACTIVATE, 0.7F, 1.9F);
+                playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.charged"), 0.7F, 1.9F);
             }
         }
 

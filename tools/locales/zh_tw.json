@@ -9855,6 +9855,38 @@
     "source": "Advanced anchor holds",
     "translation": "進階錨點錨定時空"
   },
+  "subtitles.singulo.android.charge_start": {
+    "source": "Android starts charging",
+    "translation": "仿生人開始充電"
+  },
+  "subtitles.singulo.android.charged": {
+    "source": "Android is fully charged",
+    "translation": "仿生人充滿電"
+  },
+  "subtitles.singulo.android.gunner_shot": {
+    "source": "Pistol fires",
+    "translation": "小型槍開火"
+  },
+  "subtitles.singulo.android.power_down": {
+    "source": "Android powers down",
+    "translation": "仿生人電量耗盡"
+  },
+  "subtitles.singulo.android.railgun_assemble": {
+    "source": "Railgun assembles",
+    "translation": "電磁砲組裝完成"
+  },
+  "subtitles.singulo.android.railgun_charge": {
+    "source": "Railgun charges",
+    "translation": "電磁砲蓄能"
+  },
+  "subtitles.singulo.android.railgun_fire": {
+    "source": "Railgun fires",
+    "translation": "電磁砲發射"
+  },
+  "subtitles.singulo.android.ring_inflate": {
+    "source": "Float ring inflates",
+    "translation": "泳圈鼓起"
+  },
   "subtitles.singulo.archive_terminal_running": {
     "source": "Archive terminal reads",
     "translation": "檔案終端讀取"

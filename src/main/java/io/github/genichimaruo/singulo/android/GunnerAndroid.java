@@ -259,8 +259,7 @@ public class GunnerAndroid extends RuinAndroid {
         setFx(from, to, SHOT_FROM, SHOT_AT);
         entityData.set(SHOT_FLASH, FLASH);
         // 銃声は遠くまで届かせる（音の届く距離は 16 × 音量 ブロック。1 を超えると近くでは最大の大きさで、遠くへ行くほど小さくなる）
-        playSound(SoundEvents.AMETHYST_BLOCK_HIT, PISTOL_SOUND_VOLUME, 1.9F);
-        playSound(SoundEvents.FIREWORK_ROCKET_BLAST, 0.35F, 1.8F);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.gunner_shot"), PISTOL_SOUND_VOLUME, 0.95F + random.nextFloat() * 0.1F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, to.x, to.y, to.z, 4, 0.1, 0.1, 0.1, 0.1);
         return true;
     }
@@ -309,8 +308,7 @@ public class GunnerAndroid extends RuinAndroid {
         }
         level.sendParticles(ParticleTypes.FLASH, end.x, end.y, end.z, 1, 0, 0, 0, 0);
         sparks(level, end, 12, 0.4);
-        playSound(SoundEvents.WARDEN_SONIC_BOOM, RAIL_SOUND_VOLUME, 1.6F);   // レールガンの轟音は、さらに遠くまで
-        playSound(SoundEvents.TRIDENT_THUNDER.value(), 0.5F, 1.8F);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_fire"), RAIL_SOUND_VOLUME, 1.0F);   // レールガンの轟音は、さらに遠くまで
         setDeltaMovement(getDeltaMovement().add(-dir.x * 0.35, 0.05, -dir.z * 0.35));
         hasImpulse = true;
         return hit.size();
@@ -496,7 +494,7 @@ public class GunnerAndroid extends RuinAndroid {
                     if (stateTicks >= RAIL_ASSEMBLE) {
                         aimRail(target);
                         setState(STATE_RAIL_CHARGE);
-                        playSound(SoundEvents.RESPAWN_ANCHOR_CHARGE, 0.9F, 1.4F);
+                        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_charge"), 0.9F, 1.0F);
                     }
                 }
                 case STATE_RAIL_CHARGE -> {
@@ -506,14 +504,7 @@ public class GunnerAndroid extends RuinAndroid {
                     } else {
                         getNavigation().stop();         // 狙いを固めた: もう相手を追わない（横へ避けられる）
                     }
-                    for (int i = 0; i < RAIL_STAGES.length; i++) {
-                        if (stateTicks == RAIL_STAGES[i]) {
-                            playSound(SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.2F + 0.3F * i);     // コイルが1つ灯る
-                        }
-                    }
-                    if (stateTicks == RAIL_CHARGE - RAIL_LOCK) {
-                        playSound(SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.9F);
-                    }
+                    // コイルが灯る音と、狙いが固まる音は、ためる音（android.railgun_charge）に入っている
                     if (stateTicks >= RAIL_CHARGE) {
                         setState(STATE_RAIL_FIRE);
                         fireRail(level);
@@ -589,7 +580,7 @@ public class GunnerAndroid extends RuinAndroid {
                 return;
             }
             if (nextRail <= 0 && dist >= 5 && dist < RAIL_RANGE * 0.8 && spend(COST_RAIL)) {
-                start(STATE_RAIL_ASSEMBLE, SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 1.2F);
+                start(STATE_RAIL_ASSEMBLE, io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_assemble"), 1.0F);
                 return;
             }
             if (ammo == 0) {

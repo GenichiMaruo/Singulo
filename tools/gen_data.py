@@ -2742,6 +2742,15 @@ SOUNDS = {
     'genesis.big_bang': ('genesis/big_bang', '宇宙が生まれる', 'A universe is born', 128),
     'genesis.sky': ('genesis/sky', '銀河が空へ昇る', 'A galaxy rises into the sky', 128),
     'genesis.synth': ('genesis/synth', '質量が生まれる', 'Mass is synthesized', 24),
+    # アンドロイド（0.12.0。バニラの音の代わり）
+    'android.power_down': ('android/power_down', 'アンドロイドの充電が切れる', 'Android powers down', 16),
+    'android.charge_start': ('android/charge_start', 'アンドロイドが充電を始める', 'Android starts charging', 16),
+    'android.charged': ('android/charged', 'アンドロイドの充電が満ちる', 'Android is fully charged', 16),
+    'android.gunner_shot': ('android/gunner_shot', '小型銃が撃たれる', 'Pistol fires', 32),
+    'android.railgun_assemble': ('android/railgun_assemble', 'レールガンが組み上がる', 'Railgun assembles', 24),
+    'android.railgun_charge': ('android/railgun_charge', 'レールガンがためる', 'Railgun charges', 32),
+    'android.railgun_fire': ('android/railgun_fire', 'レールガンが放たれる', 'Railgun fires', 64),
+    'android.ring_inflate': ('android/ring_inflate', '浮き輪がふくらむ', 'Float ring inflates', 16),
 }
 # 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
 SOUND_FALLBACKS = {

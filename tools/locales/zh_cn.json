@@ -9855,6 +9855,38 @@
     "source": "Advanced anchor holds",
     "translation": "高级世界线锚锁定时空"
   },
+  "subtitles.singulo.android.charge_start": {
+    "source": "Android starts charging",
+    "translation": "仿生人开始充电"
+  },
+  "subtitles.singulo.android.charged": {
+    "source": "Android is fully charged",
+    "translation": "仿生人充满电"
+  },
+  "subtitles.singulo.android.gunner_shot": {
+    "source": "Pistol fires",
+    "translation": "小型枪开火"
+  },
+  "subtitles.singulo.android.power_down": {
+    "source": "Android powers down",
+    "translation": "仿生人电量耗尽"
+  },
+  "subtitles.singulo.android.railgun_assemble": {
+    "source": "Railgun assembles",
+    "translation": "电磁炮组装完成"
+  },
+  "subtitles.singulo.android.railgun_charge": {
+    "source": "Railgun charges",
+    "translation": "电磁炮蓄能"
+  },
+  "subtitles.singulo.android.railgun_fire": {
+    "source": "Railgun fires",
+    "translation": "电磁炮发射"
+  },
+  "subtitles.singulo.android.ring_inflate": {
+    "source": "Float ring inflates",
+    "translation": "游泳圈鼓起"
+  },
   "subtitles.singulo.archive_terminal_running": {
     "source": "Archive terminal reads",
     "translation": "档案终端读取中"
