@@ -498,8 +498,8 @@
     "subtitle": "subtitles.singulo.foundry.emerge",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.activate",
-        "type": "event"
+        "name": "singulo:boss/foundry_emerge",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -507,8 +507,8 @@
     "subtitle": "subtitles.singulo.foundry.hurt",
     "sounds": [
       {
-        "name": "minecraft:entity.iron_golem.hurt",
-        "type": "event"
+        "name": "singulo:boss/foundry_hurt",
+        "attenuation_distance": 16
       }
     ]
   },
@@ -516,8 +516,8 @@
     "subtitle": "subtitles.singulo.foundry.arm_aim",
     "sounds": [
       {
-        "name": "minecraft:block.piston.extend",
-        "type": "event"
+        "name": "singulo:boss/foundry_arm_aim",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -525,8 +525,8 @@
     "subtitle": "subtitles.singulo.foundry.arm_grab",
     "sounds": [
       {
-        "name": "minecraft:entity.iron_golem.attack",
-        "type": "event"
+        "name": "singulo:boss/foundry_arm_grab",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -534,8 +534,8 @@
     "subtitle": "subtitles.singulo.foundry.press_aim",
     "sounds": [
       {
-        "name": "minecraft:block.vault.activate",
-        "type": "event"
+        "name": "singulo:boss/foundry_press_aim",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -543,8 +543,8 @@
     "subtitle": "subtitles.singulo.foundry.press_slam",
     "sounds": [
       {
-        "name": "minecraft:block.anvil.land",
-        "type": "event"
+        "name": "singulo:boss/foundry_press_slam",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -552,8 +552,8 @@
     "subtitle": "subtitles.singulo.foundry.conveyor_warn",
     "sounds": [
       {
-        "name": "minecraft:block.note_block.pling",
-        "type": "event"
+        "name": "singulo:boss/foundry_conveyor_warn",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -561,8 +561,8 @@
     "subtitle": "subtitles.singulo.foundry.conveyor_flip",
     "sounds": [
       {
-        "name": "minecraft:block.piston.contract",
-        "type": "event"
+        "name": "singulo:boss/foundry_conveyor_flip",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -570,8 +570,8 @@
     "subtitle": "subtitles.singulo.foundry.laser_aim",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.power_select",
-        "type": "event"
+        "name": "singulo:boss/foundry_laser_aim",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -579,8 +579,8 @@
     "subtitle": "subtitles.singulo.foundry.laser_fire",
     "sounds": [
       {
-        "name": "minecraft:entity.guardian.attack",
-        "type": "event"
+        "name": "singulo:boss/foundry_laser_fire",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -588,8 +588,8 @@
     "subtitle": "subtitles.singulo.foundry.print",
     "sounds": [
       {
-        "name": "minecraft:block.crafter.craft",
-        "type": "event"
+        "name": "singulo:boss/foundry_print",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -597,8 +597,8 @@
     "subtitle": "subtitles.singulo.foundry.line_break",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.deactivate",
-        "type": "event"
+        "name": "singulo:boss/foundry_line_break",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -606,8 +606,8 @@
     "subtitle": "subtitles.singulo.foundry.enrage",
     "sounds": [
       {
-        "name": "minecraft:block.respawn_anchor.charge",
-        "type": "event"
+        "name": "singulo:boss/foundry_enrage",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -615,8 +615,8 @@
     "subtitle": "subtitles.singulo.foundry.death",
     "sounds": [
       {
-        "name": "minecraft:entity.generic.explode",
-        "type": "event"
+        "name": "singulo:boss/foundry_death",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1174,7 +1174,11 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.hatchling",
     "sounds": [
       {
-        "name": "singulo:boss/ergosphere_leviathan_hatchling",
+        "name": "singulo:boss/ergosphere_leviathan_hatchling_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "singulo:boss/ergosphere_leviathan_hatchling_2",
         "attenuation_distance": 16
       }
     ]
@@ -1506,6 +1510,86 @@
       {
         "name": "singulo:genesis/synth_3",
         "attenuation_distance": 24
+      }
+    ]
+  },
+  "android.power_down": {
+    "subtitle": "subtitles.singulo.android.power_down",
+    "sounds": [
+      {
+        "name": "singulo:android/power_down",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "android.charge_start": {
+    "subtitle": "subtitles.singulo.android.charge_start",
+    "sounds": [
+      {
+        "name": "singulo:android/charge_start",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "android.charged": {
+    "subtitle": "subtitles.singulo.android.charged",
+    "sounds": [
+      {
+        "name": "singulo:android/charged",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "android.gunner_shot": {
+    "subtitle": "subtitles.singulo.android.gunner_shot",
+    "sounds": [
+      {
+        "name": "singulo:android/gunner_shot",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "android.railgun_assemble": {
+    "subtitle": "subtitles.singulo.android.railgun_assemble",
+    "sounds": [
+      {
+        "name": "singulo:android/railgun_assemble",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "android.railgun_charge": {
+    "subtitle": "subtitles.singulo.android.railgun_charge",
+    "sounds": [
+      {
+        "name": "singulo:android/railgun_charge",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "android.railgun_fire": {
+    "subtitle": "subtitles.singulo.android.railgun_fire",
+    "sounds": [
+      {
+        "name": "singulo:android/railgun_fire",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "android.ring_inflate": {
+    "subtitle": "subtitles.singulo.android.ring_inflate",
+    "sounds": [
+      {
+        "name": "singulo:android/ring_inflate",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "ui.click": {
+    "sounds": [
+      {
+        "name": "singulo:ui/click",
+        "attenuation_distance": 16
       }
     ]
   }

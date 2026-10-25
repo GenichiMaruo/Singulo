@@ -3,8 +3,9 @@ package io.github.genichimaruo.singulo.client;
 import io.github.genichimaruo.singulo.genesis.GenesisCoreBlockEntity;
 import io.github.genichimaruo.singulo.genesis.GenesisCoreMenu;
 import io.github.genichimaruo.singulo.genesis.MassSynthesis;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,163 +13,223 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 創世炉の画面。左に「生まれかけの宇宙」をのぞく窓、右に今の段階と次にすること、進みのバー、投入のスイッチ、出来上がりのスロット。
+ * 創世炉の画面（宇宙のスキン）。左に「生まれかけの宇宙」をのぞく窓、右に今の段階と進み（アイコン・バー・%）、
+ * 作る物の枠と出来上がりのスロット。投入のスイッチはヘッダー右上（ほかの装置の電源と同じ場所）。
  * <ul>
  *   <li>窓: 揺籃は種を待つ小さな光、種火は膨らむ火の玉、安定化は渦を巻く原始の宇宙（暴走の兆しで赤く震える）、
  *       誕生は閃光、完成は自分の銀河がゆっくり回る</li>
  *   <li>暴走の兆しが来ると、窓に赤い帯で「投入を止めろ」と出る（止めていれば水色の「抑えている」）</li>
+ *   <li>次にすることや電力の量は、段階の名前やバーに重ねると出る</li>
  * </ul>
  * 様子は核のブロックエンティティ（クライアントに同期されている写し）から読む。
  */
-public class GenesisCoreScreen extends AbstractContainerScreen<GenesisCoreMenu> {
-    private static final int BG = 0xFF090C17;
-    private static final int BG2 = 0xFF0E1324;
-    private static final int FRAME = 0xFF2B2350;
-    private static final int FRAME_HI = 0xFF5A4BA0;
-    private static final int TEXT = 0xFFD8E4FF;
-    private static final int DIM = 0xFF7F8AB0;
+public class GenesisCoreScreen extends FramedScreen<GenesisCoreMenu> {
     private static final int GOLD = 0xFFF2CC6A;
     private static final int CYAN = 0xFF64DCFF;
     private static final int MAGENTA = 0xFFE070FF;
     private static final int EMBER = 0xFFFF9A4A;
     private static final int RED = 0xFFFF5A5A;
-    private static final int SLOT = 0xFF05070E;
+    private static final int OX = GenesisCoreMenu.CONTENT_X;
     /** 窓（宇宙をのぞく）の位置と大きさ。 */
-    private static final int VIEW_X = 8, VIEW_Y = 16, VIEW = 84;
-    /** 右の欄の左端と幅。 */
-    private static final int PX = 100, PW = 128;
-    /** 投入のスイッチ。 */
-    private static final int FEED_X = PX, FEED_Y = 96;
-    /** 出来上がりスロットの左端（作る物の名前はここまで）。 */
-    private static final int OUTPUT_LEFT = GenesisCoreMenu.OUTPUT_X - 2;
+    private static final int VIEW_X = 8, VIEW_Y = 22, VIEW = 84;
+    /** 右の欄の左端と、バーの幅。 */
+    private static final int PX = 100, BAR_W = 84;
 
     public GenesisCoreScreen(GenesisCoreMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-        imageWidth = GenesisCoreMenu.WIDTH;
-        imageHeight = GenesisCoreMenu.HEIGHT;
-        inventoryLabelX = GenesisCoreMenu.INVENTORY_X;
-        inventoryLabelY = GenesisCoreMenu.INVENTORY_Y - 11;
+        super(menu, inventory, title, GenesisCoreMenu.WIDTH, GenesisCoreMenu.HEIGHT);
+        skin = GuiSkin.COSMIC;
     }
 
     private GenesisCoreBlockEntity core() {
         return minecraft == null || minecraft.player == null ? null : menu.core(minecraft.player);
     }
 
+    private int stage() {
+        GenesisCoreBlockEntity core = core();
+        return core == null ? GenesisCoreBlockEntity.UNFORMED : core.stage();
+    }
+
     private float time(float partialTick) {
         return minecraft != null && minecraft.level != null ? minecraft.level.getGameTime() + partialTick : 0;
     }
+
+    // ------------------------------------------------------------------ ヘッダー（段階・投入）
+
+    @Override
+    protected Panel.Status status() {
+        GenesisCoreBlockEntity core = core();
+        return switch (stage()) {
+            case GenesisCoreBlockEntity.UNFORMED -> Panel.Status.BROKEN;
+            case GenesisCoreBlockEntity.CRADLE -> Panel.Status.IDLE;
+            case GenesisCoreBlockEntity.STABILIZING -> core != null && core.surgeTicks() > 0 ? Panel.Status.WARN : Panel.Status.RUN;
+            default -> Panel.Status.RUN;
+        };
+    }
+
+    @Override
+    protected int statusColor() {
+        return switch (status()) {
+            case BROKEN -> GuiSkin.BAD;
+            case WARN -> GuiSkin.WARN;
+            case IDLE -> GuiSkin.IDLE;
+            default -> GuiSkin.OK;
+        };
+    }
+
+    @Override
+    protected Component statusText() {
+        return Component.translatable("gui.singulo.genesis.phase." + stage());
+    }
+
+    @Override
+    protected List<Component> statusTooltip() {
+        return List.of(Component.translatable("gui.singulo.genesis.hint." + stage()).withStyle(st -> st.withColor(0xFF8A949E)));
+    }
+
+    @Override
+    protected Boolean powered() {
+        GenesisCoreBlockEntity core = core();
+        return core != null && core.canToggleFeed() ? !core.manualStop() : null;
+    }
+
+    @Override
+    protected void togglePower() {
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, GenesisCoreMenu.BUTTON_FEED);
+        }
+    }
+
+    @Override
+    protected List<Component> powerTooltip() {
+        GenesisCoreBlockEntity core = core();
+        List<Component> lines = new ArrayList<>();
+        if (core == null) {
+            return lines;
+        }
+        String key = core.manualStop() ? "gui.singulo.genesis.screen.feed_off"
+                : core.feeding() ? "gui.singulo.genesis.screen.feed_on" : "gui.singulo.genesis.screen.feed_redstone";
+        lines.add(Component.translatable(key).withStyle(st -> st.withColor(core.feeding() ? 0xFF7CE0A0 : 0xFFFF9090)));
+        lines.add(Component.translatable("gui.singulo.genesis.screen.feed_tip"));
+        if (core.stage() == GenesisCoreBlockEntity.STABILIZING) {
+            // 止めても危険が全部止まるわけではないことを、押す前に知らせる
+            lines.add(Component.translatable("gui.singulo.genesis.screen.feed_tip_stabilizing").withStyle(st -> st.withColor(0xFF8A949E)));
+        }
+        return lines;
+    }
+
+    // ------------------------------------------------------------------ 描画
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
-        GenesisCoreBlockEntity core = core();
-        if (core != null && core.canToggleFeed() && Panel.inside(mouseX, mouseY, leftPos + FEED_X - 1, topPos + FEED_Y - 1, 12, 12)) {
-            if (core.stage() == GenesisCoreBlockEntity.STABILIZING) {
-                // 止めても危険が全部止まるわけではないことを、押す前に知らせる
-                java.util.List<net.minecraft.util.FormattedCharSequence> lines = new java.util.ArrayList<>();
-                lines.add(Component.translatable("gui.singulo.genesis.screen.feed_tip").getVisualOrderText());
-                lines.addAll(font.split(Component.translatable("gui.singulo.genesis.screen.feed_tip_stabilizing")
-                        .withStyle(net.minecraft.ChatFormatting.GRAY), 180));
-                g.renderTooltip(font, lines, mouseX, mouseY);
-            } else {
-                g.renderTooltip(font, Component.translatable("gui.singulo.genesis.screen.feed_tip"), mouseX, mouseY);
-            }
+        if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY)) {
+            return;
         }
         Slot out = menu.getSlot(0);
         if (out.isActive() && !out.hasItem() && Panel.inside(mouseX, mouseY, leftPos + out.x, topPos + out.y, 16, 16)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.genesis.screen.output"), mouseX, mouseY);
+            return;
         }
         Slot pick = menu.getSlot(GenesisCoreMenu.TEMPLATE_SLOT);
         if (pick.isActive() && Panel.inside(mouseX, mouseY, leftPos + pick.x, topPos + pick.y, 16, 16)) {
-            g.renderTooltip(font, java.util.List.of(Component.translatable("gui.singulo.genesis.screen.template_tip_1").getVisualOrderText(),
-                    Component.translatable("gui.singulo.genesis.screen.template_tip_2").getVisualOrderText()), mouseX, mouseY);
+            List<Component> lines = new ArrayList<>();
+            if (!pick.hasItem()) {
+                lines.add(Component.translatable("gui.singulo.genesis.screen.no_template"));
+            }
+            lines.add(Component.translatable("gui.singulo.genesis.screen.template_tip_1"));
+            lines.add(Component.translatable("gui.singulo.genesis.screen.template_tip_2").withStyle(st -> st.withColor(0xFF8A949E)));
+            Panel.tooltip(g, font, lines, 200, mouseX, mouseY);
             return;
         }
         renderTooltip(g, mouseX, mouseY);
     }
 
-    // ------------------------------------------------------------------ 背景
-
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
-        int x = leftPos;
+        clearStats();
+        drawFrame(g, mouseX, mouseY);
+        int x = leftPos + OX;
         int y = topPos;
         float t = time(partialTick);
-        background(g, x, y, t);
         GenesisCoreBlockEntity core = core();
-        int stage = core == null ? GenesisCoreBlockEntity.UNFORMED : core.stage();
         // 窓
         int vx = x + VIEW_X;
         int vy = y + VIEW_Y;
-        g.fill(vx - 1, vy - 1, vx + VIEW + 1, vy + VIEW + 1, FRAME_HI);
-        g.fill(vx, vy, vx + VIEW, vy + VIEW, 0xFF03040A);
+        Panel.inset(g, skin, vx - 1, vy - 1, VIEW + 2, VIEW + 2, 0xFF03040A);
         g.enableScissor(vx, vy, vx + VIEW, vy + VIEW);
         if (core != null) {
             drawCosmos(g, core, vx + VIEW / 2, vy + VIEW / 2, t);
         }
         g.disableScissor();
-        // 右の欄のバー
-        if (core != null) {
-            switch (stage) {
-                case GenesisCoreBlockEntity.KINDLING -> bar(g, x + PX, y + 62, PW, core.chargeFraction(), EMBER, 0xFFFFE0A0);
-                case GenesisCoreBlockEntity.STABILIZING -> {
-                    bar(g, x + PX, y + 60, PW, core.progressFraction(), CYAN, 0xFFC8F4FF);
-                    float k = core.instability() / 100F;
-                    bar(g, x + PX, y + 84, PW, k, Mth.hsvToRgb(0.33F * (1 - k), 0.8F, 1) | 0xFF000000, 0xFFFFFFFF);
-                }
-                case GenesisCoreBlockEntity.BIRTH -> bar(g, x + PX, y + 62, PW,
-                        Math.min(1, core.birthTicks() / (float) GenesisCoreBlockEntity.BIRTH_TICKS), GOLD, 0xFFFFF4D0);
-                case GenesisCoreBlockEntity.COMPLETE -> bar(g, x + PX, y + 84, 100, core.synthFraction(), MAGENTA, 0xFFFFD0FF);
-                default -> { }
-            }
-            if (core.canToggleFeed()) {
-                boolean hover = Panel.inside(mouseX, mouseY, x + FEED_X - 1, y + FEED_Y - 1, 12, 12);
-                Panel.powerButton(g, x + FEED_X, y + FEED_Y, !core.manualStop(), hover);
-            }
-        }
         // スロット
         for (Slot s : menu.slots) {
-            if (!s.isActive()) {
+            if (!s.isActive() || s.index > GenesisCoreMenu.TEMPLATE_SLOT) {
                 continue;
             }
-            int edge = s.index == 0 ? GOLD : s.index == GenesisCoreMenu.TEMPLATE_SLOT ? MAGENTA : 0xFF2E3658;
-            g.fill(x + s.x - 1, y + s.y - 1, x + s.x + 17, y + s.y + 17, edge);
-            g.fill(x + s.x, y + s.y, x + s.x + 16, y + s.y + 16, SLOT);
+            Panel.slot(g, skin, leftPos + s.x, topPos + s.y);
+            g.renderOutline(leftPos + s.x - 2, topPos + s.y - 2, 20, 20, s.index == 0 ? GOLD : MAGENTA);
+        }
+        if (core != null) {
+            drawPanel(g, core);
         }
     }
 
-    private void background(GuiGraphics g, int x, int y, float t) {
-        int w = imageWidth;
-        int h = imageHeight;
-        g.fill(x, y, x + w, y + h, FRAME);
-        g.fill(x + 1, y + 1, x + w - 1, y + h - 1, FRAME_HI);
-        g.fill(x + 2, y + 2, x + w - 2, y + h - 2, BG);
-        g.fillGradient(x + 2, y + 2, x + w - 2, y + 112, BG2, BG);
-        for (int i = 0; i < w - 12; i++) {
-            float k = 0.5F + 0.5F * Mth.sin(i * 0.05F - t * 0.06F);
-            g.fill(x + 6 + i, y + 3, x + 7 + i, y + 4, lerp(GOLD, MAGENTA, k));
+    /** 右の欄: 段階の名前と、段階ごとの進み（アイコン・バー・%）。説明は重ねると出る。 */
+    private void drawPanel(GuiGraphics g, GenesisCoreBlockEntity core) {
+        int stage = core.stage();
+        Component phase = Component.translatable("gui.singulo.genesis.phase." + stage);
+        stat(g, OX + PX, 24, Panel.Icon.INFO, phaseColor(stage), phase.getString(), phaseColor(stage),
+                List.of(phase, Component.translatable("gui.singulo.genesis.hint." + stage).withStyle(st -> st.withColor(0xFF8A949E))));
+        String intake = GenesisCoreBlockEntity.formatFe(core.intake());
+        Component intakeLine = Component.translatable("gui.singulo.genesis.screen.intake", intake);
+        switch (stage) {
+            case GenesisCoreBlockEntity.KINDLING -> {
+                barRow(g, 40, Panel.Icon.FLAME, EMBER, core.chargeFraction(), List.of(
+                        Component.translatable("gui.singulo.genesis.screen.charge"),
+                        Component.literal(GenesisCoreBlockEntity.formatFe(core.chargeFraction() * GenesisCoreBlockEntity.seedEnergy())
+                                + " / " + GenesisCoreBlockEntity.formatFe(GenesisCoreBlockEntity.seedEnergy()))));
+                stat(g, OX + PX, 54, Panel.Icon.BOLT, Panel.GLOW, intake + "/t", skin.text(), List.of(intakeLine,
+                        Component.translatable("gui.singulo.genesis.screen.intake_cap",
+                                GenesisCoreBlockEntity.formatFe(GenesisCoreBlockEntity.maxInput())).withStyle(st -> st.withColor(0xFF8A949E))));
+            }
+            case GenesisCoreBlockEntity.STABILIZING -> {
+                barRow(g, 40, Panel.Icon.STAR, CYAN, core.progressFraction(),
+                        List.of(Component.translatable("gui.singulo.genesis.screen.progress")));
+                float k = core.instability() / 100F;
+                barRow(g, 52, Panel.Icon.FLAME, core.instability() > 60 ? RED : skin.dim(), k,
+                        Mth.hsvToRgb(0.33F * (1 - k), 0.8F, 1) | 0xFF000000, List.of(Component.translatable("gui.singulo.genesis.screen.instability")));
+                boolean enough = core.intake() + 1 >= GenesisCoreBlockEntity.upkeep();
+                stat(g, OX + PX, 66, Panel.Icon.BOLT, enough ? Panel.GLOW : RED, intake + "/t", enough ? skin.text() : RED, List.of(intakeLine));
+            }
+            case GenesisCoreBlockEntity.BIRTH -> barRow(g, 40, Panel.Icon.STAR, GOLD,
+                    Math.min(1, core.birthTicks() / (float) GenesisCoreBlockEntity.BIRTH_TICKS),
+                    List.of(Component.translatable("gui.singulo.genesis.screen.birth")));
+            case GenesisCoreBlockEntity.COMPLETE -> {
+                ItemStack template = core.template();
+                MassSynthesis.Entry e = MassSynthesis.INSTANCE.entry(template);
+                if (!template.isEmpty() && e != null) {
+                    String cost = GenesisCoreBlockEntity.formatFe(MassSynthesis.cost(e));
+                    stat(g, GenesisCoreMenu.TEMPLATE_X + 22, GenesisCoreMenu.TEMPLATE_Y + 4, Panel.Icon.BOLT, Panel.GLOW, cost, skin.text(),
+                            List.of(template.getHoverName(), Component.translatable("gui.singulo.genesis.screen.cost", cost)));
+                    barRow(g, 74, Panel.Icon.STAR, MAGENTA, core.synthFraction(),
+                            List.of(Component.translatable("gui.singulo.genesis.screen.synth", percent(core.synthFraction()))));
+                }
+                stat(g, OX + PX, 86, Panel.Icon.BOLT, Panel.GLOW, intake + "/t", skin.text(), List.of(intakeLine));
+            }
+            default -> { }
         }
-        long seed = 0x5EED0F6E4E5157L;
-        for (int i = 0; i < 70; i++) {
-            seed = seed * 6364136223846793005L + 1442695040888963407L;
-            int sx = (int) Math.floorMod(seed >>> 20, (long) (w - 8)) + 4;
-            int sy = (int) Math.floorMod(seed >>> 40, (long) (h - 10)) + 6;
-            float tw = 0.5F + 0.5F * Mth.sin(t * 0.07F + i * 1.7F);
-            g.fill(x + sx, y + sy, x + sx + 1, y + sy + 1, ((int) (30 + 110 * tw) << 24) | 0xCFE0FF);
-        }
-        g.fill(x + 8, y + 112, x + w - 8, y + 113, FRAME_HI);
     }
 
-    /** 横長のバー（6px）。上の縁を明るくする。 */
-    private static void bar(GuiGraphics g, int x, int y, int w, float fraction, int color, int highlight) {
-        g.fill(x - 1, y - 1, x + w + 1, y + 7, FRAME_HI);
-        g.fill(x, y, x + w, y + 6, SLOT);
-        int filled = Math.round(w * Mth.clamp(fraction, 0, 1));
-        if (filled > 0) {
-            g.fill(x, y, x + filled, y + 6, color);
-            g.fill(x, y, x + filled, y + 1, highlight);
-        }
+    /** アイコン・横長のバー・% の1行（右の欄）。 */
+    private void barRow(GuiGraphics g, int y, Panel.Icon icon, int color, float fraction, List<Component> tooltip) {
+        barRow(g, y, icon, color, fraction, color, tooltip);
+    }
+
+    private void barRow(GuiGraphics g, int y, Panel.Icon icon, int iconColor, float fraction, int barColor, List<Component> tooltip) {
+        statBar(g, OX + PX, y, icon, iconColor, BAR_W, fraction, barColor, tooltip);
+        String pct = percent(fraction);
+        g.drawString(font, pct, leftPos + OX + PX + 11 + BAR_W + 4, topPos + y, skin.text(), false);
     }
 
     // ------------------------------------------------------------------ 窓の中の宇宙
@@ -293,108 +354,30 @@ public class GenesisCoreScreen extends AbstractContainerScreen<GenesisCoreMenu> 
     }
 
     private static int lerp(int a, int b, float k) {
-        int r = (int) Mth.lerp(k, (a >> 16) & 0xFF, (b >> 16) & 0xFF);
-        int gg = (int) Mth.lerp(k, (a >> 8) & 0xFF, (b >> 8) & 0xFF);
-        int bb = (int) Mth.lerp(k, a & 0xFF, b & 0xFF);
-        return 0xFF000000 | (r << 16) | (gg << 8) | bb;
+        return GuiSkin.mix(a, b, Mth.clamp(k, 0, 1));
     }
 
-    // ------------------------------------------------------------------ 文字
+    // ------------------------------------------------------------------ 暴走の兆し（窓の上の帯）
 
     @Override
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        g.drawString(font, title, VIEW_X, 6, GOLD, false);
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, DIM, false);
+        drawLabels(g);
         GenesisCoreBlockEntity core = core();
-        if (core == null) {
+        if (core == null || core.stage() != GenesisCoreBlockEntity.STABILIZING || core.surgeTicks() <= 0) {
             return;
         }
-        int stage = core.stage();
-        float t = time(0);
-        // 段階と、次にすること
-        g.drawString(font, Component.translatable("gui.singulo.genesis.phase." + stage), PX, 18, phaseColor(stage), false);
-        int y = 30;
-        for (var seq : font.split(Component.translatable("gui.singulo.genesis.hint." + stage), PW)) {
-            if (y > 42) {
-                break;
-            }
-            g.drawString(font, seq, PX, y, DIM, false);
-            y += 10;
-        }
-        String intake = GenesisCoreBlockEntity.formatFe(core.intake());
-        switch (stage) {
-            case GenesisCoreBlockEntity.KINDLING -> {
-                pair(g, "gui.singulo.genesis.screen.charge", percent(core.chargeFraction()), 52, EMBER);
-                g.drawString(font, GenesisCoreBlockEntity.formatFe(core.chargeFraction() * GenesisCoreBlockEntity.seedEnergy())
-                        + " / " + GenesisCoreBlockEntity.formatFe(GenesisCoreBlockEntity.seedEnergy()), PX, 72, DIM, false);
-                g.drawString(font, Component.translatable("gui.singulo.genesis.screen.intake_cap",
-                        GenesisCoreBlockEntity.formatFe(GenesisCoreBlockEntity.maxInput())), PX, 82, DIM, false);
-            }
-            case GenesisCoreBlockEntity.STABILIZING -> {
-                pair(g, "gui.singulo.genesis.screen.progress", percent(core.progressFraction()), 50, CYAN);
-                pair(g, "gui.singulo.genesis.screen.instability", percent(core.instability() / 100F), 74,
-                        core.instability() > 60 ? RED : TEXT);
-            }
-            case GenesisCoreBlockEntity.BIRTH -> pair(g, "gui.singulo.genesis.screen.birth",
-                    percent(Math.min(1, core.birthTicks() / (float) GenesisCoreBlockEntity.BIRTH_TICKS)), 52, GOLD);
-            case GenesisCoreBlockEntity.COMPLETE -> {
-                ItemStack template = core.template();
-                MassSynthesis.Entry e = MassSynthesis.INSTANCE.entry(template);
-                if (template.isEmpty() || e == null) {
-                    g.drawString(font, Component.translatable("gui.singulo.genesis.screen.no_template"), PX + 20, 54, DIM, false);
-                } else {
-                    g.drawString(font, fit(template.getHoverName().getString(), OUTPUT_LEFT - PX - 24), PX + 20, 50, TEXT, false);
-                    g.drawString(font, fit(Component.translatable("gui.singulo.genesis.screen.cost",
-                            GenesisCoreBlockEntity.formatFe(MassSynthesis.cost(e))).getString(), OUTPUT_LEFT - PX - 24), PX + 20, 60, DIM, false);
-                    g.drawString(font, Component.translatable("gui.singulo.genesis.screen.synth", percent(core.synthFraction())),
-                            PX, 74, MAGENTA, false);
-                }
-            }
-            default -> { }
-        }
-        // 投入のスイッチ
-        if (core.canToggleFeed()) {
-            String key = core.manualStop() ? "gui.singulo.genesis.screen.feed_off"
-                    : core.feeding() ? "gui.singulo.genesis.screen.feed_on" : "gui.singulo.genesis.screen.feed_redstone";
-            g.drawString(font, Component.translatable(key), FEED_X + 15, FEED_Y + 1, core.feeding() ? 0xFF7CE0A0 : 0xFFFF9090, false);
-        }
-        // 窓の下: 受電と維持
-        if (stage == GenesisCoreBlockEntity.KINDLING) {
-            g.drawString(font, Component.translatable("gui.singulo.genesis.screen.intake", intake), VIEW_X, VIEW_Y + VIEW + 3, TEXT, false);
-        } else if (stage == GenesisCoreBlockEntity.STABILIZING) {
-            g.drawString(font, Component.translatable("gui.singulo.genesis.screen.intake", intake), VIEW_X, VIEW_Y + VIEW + 3,
-                    core.intake() + 1 >= GenesisCoreBlockEntity.upkeep() ? TEXT : RED, false);
-        } else if (stage == GenesisCoreBlockEntity.COMPLETE) {
-            g.drawString(font, Component.translatable("gui.singulo.genesis.screen.intake", intake), VIEW_X, VIEW_Y + VIEW + 3, TEXT, false);
-        }
-        // 暴走の兆し
-        if (stage == GenesisCoreBlockEntity.STABILIZING && core.surgeTicks() > 0) {
-            boolean held = !core.feeding();
-            if (held || ((int) (t / 6)) % 2 == 0) {
-                Component c = Component.translatable(held ? "gui.singulo.genesis.screen.surge_held" : "gui.singulo.genesis.screen.surge");
-                var lines = font.split(c, VIEW - 6);
-                int top = VIEW_Y + VIEW - 3 - lines.size() * 10;
-                g.fill(VIEW_X, top - 2, VIEW_X + VIEW, VIEW_Y + VIEW - 1, held ? 0xC0103848 : 0xC0601010);
-                for (var seq : lines) {
-                    g.drawString(font, seq, VIEW_X + VIEW / 2 - font.width(seq) / 2, top, held ? CYAN : 0xFFFFE0E0, false);
-                    top += 10;
-                }
+        boolean held = !core.feeding();
+        if (held || ((int) (time(0) / 6)) % 2 == 0) {
+            Component c = Component.translatable(held ? "gui.singulo.genesis.screen.surge_held" : "gui.singulo.genesis.screen.surge");
+            var lines = font.split(c, VIEW - 6);
+            int left = OX + VIEW_X;
+            int top = VIEW_Y + VIEW - 3 - lines.size() * 10;
+            g.fill(left, top - 2, left + VIEW, VIEW_Y + VIEW - 1, held ? 0xC0103848 : 0xC0601010);
+            for (var seq : lines) {
+                g.drawString(font, seq, left + VIEW / 2 - font.width(seq) / 2, top, held ? CYAN : 0xFFFFE0E0, false);
+                top += 10;
             }
         }
-    }
-
-    /** 幅に収まらない文字列は末尾を「…」で切る。 */
-    private String fit(String text, int width) {
-        if (font.width(text) <= width) {
-            return text;
-        }
-        return font.plainSubstrByWidth(text, width - font.width("…")) + "…";
-    }
-
-    /** 「名前　値」を1行に（値は右寄せ）。 */
-    private void pair(GuiGraphics g, String key, String value, int y, int color) {
-        g.drawString(font, Component.translatable(key), PX, y, TEXT, false);
-        g.drawString(font, value, PX + PW - font.width(value), y, color, false);
     }
 
     private static int phaseColor(int stage) {
@@ -414,11 +397,7 @@ public class GenesisCoreScreen extends AbstractContainerScreen<GenesisCoreMenu> 
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        GenesisCoreBlockEntity core = core();
-        if (button == 0 && core != null && core.canToggleFeed()
-                && Panel.inside(mouseX, mouseY, leftPos + FEED_X - 1, topPos + FEED_Y - 1, 12, 12)
-                && minecraft != null && minecraft.gameMode != null) {
-            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, GenesisCoreMenu.BUTTON_FEED);
+        if (clickFrame(mouseX, mouseY, button)) {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

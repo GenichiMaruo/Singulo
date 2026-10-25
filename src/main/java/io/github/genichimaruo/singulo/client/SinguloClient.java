@@ -41,6 +41,7 @@ public final class SinguloClient {
         modBus.addListener(SinguloClient::clientSetup);
         modBus.addListener(SinguloKeys::register);
         MinecraftForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
+        MinecraftForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         MinecraftForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
@@ -58,23 +59,14 @@ public final class SinguloClient {
         MinecraftForge.EVENT_BUS.addListener(RayleighLighting::tick);
         MinecraftForge.EVENT_BUS.addListener(SinguloKeys::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(SinguloKeys::onScreenKey);
+        MinecraftForge.EVENT_BUS.addListener(UiClick::onRender);
+        MinecraftForge.EVENT_BUS.addListener(UiClick::onMouse);
         MinecraftForge.EVENT_BUS.addListener(BlackHolePull::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(BlackHoleAmbience::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(MachineSounds::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(BossSounds::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(GravityBootsClient::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(SinguloKeys::onInteraction);
-        if (Boolean.getBoolean("singulo.clientSmokeTest")) MinecraftForge.EVENT_BUS.addListener(SinguloClient::smokeTest);
-    }
-
-    private static void smokeTest(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
-        var minecraft = net.minecraft.client.Minecraft.getInstance();
-        if (event.phase == net.minecraftforge.event.TickEvent.Phase.END
-                && minecraft.screen instanceof net.minecraft.client.gui.screens.TitleScreen
-                && minecraft.getOverlay() == null) {
-            org.slf4j.LoggerFactory.getLogger(SinguloClient.class).info("Singulo client smoke test passed: title screen and resources loaded");
-            minecraft.stop();
-        }
     }
 
     static void clearWorldState() {
@@ -302,7 +294,8 @@ public final class SinguloClient {
 
     /** 探索コンパスの針の向き（バニラのコンパスと同じ「angle」）。 */
     private static void clientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
-        event.enqueueWork(SinguloClient::registerScreens);
+        // 電力の数: Shift を押している間は正確な値
+        io.github.genichimaruo.singulo.energy.EnergyText.detail = net.minecraft.client.gui.screens.Screen::hasShiftDown;
         // 作業位置カード: 記録済みなら絵を切り替える
         event.enqueueWork(() -> net.minecraft.client.renderer.item.ItemProperties.register(
                 io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get(), Singulo.id("recorded"),
@@ -354,12 +347,12 @@ public final class SinguloClient {
         boolean hasUses = net.minecraft.client.resources.language.I18n.exists("uses.singulo." + id.getPath());
         boolean detailed = net.minecraft.client.gui.screens.Screen.hasShiftDown();
         java.util.List<Component> tip = event.getToolTip();
-        addWrapped(tip, hasSummary && !detailed ? summary : key, ChatFormatting.GRAY);
+        tip.add(Component.translatable(hasSummary && !detailed ? summary : key).withStyle(ChatFormatting.GRAY));
         if (detailed) {
             for (String k : new String[]{"howto", "uses"}) {
                 String full = k + ".singulo." + id.getPath();
                 if (net.minecraft.client.resources.language.I18n.exists(full)) {
-                    addWrapped(tip, full, ChatFormatting.DARK_AQUA);
+                    tip.add(Component.translatable(full).withStyle(ChatFormatting.DARK_AQUA));
                 }
             }
         } else if (hasSummary || hasHowto || hasUses) {
@@ -367,12 +360,12 @@ public final class SinguloClient {
         }
     }
 
-    /** 翻訳キー key の文を、説明欄の幅で折り返して足す。 */
-    private static void addWrapped(java.util.List<Component> tip, String key, ChatFormatting color) {
-        net.minecraft.client.gui.Font font = net.minecraft.client.Minecraft.getInstance().font;
-        for (net.minecraft.network.chat.FormattedText line : font.getSplitter().splitLines(Component.translatable(key), 220,
-                net.minecraft.network.chat.Style.EMPTY)) {
-            tip.add(Component.literal(line.getString()).withStyle(color));
+    /** 画面端で幅が狭くなる場合も、全文から一度だけ折り返す。 */
+    private static void sizeTooltip(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents event) {
+        var id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem());
+        if (Singulo.MODID.equals(id.getNamespace())) {
+            int width = event.getMaxWidth();
+            event.setMaxWidth(width > 0 ? Math.min(width, 220) : 220);
         }
     }
 
@@ -383,4 +376,5 @@ public final class SinguloClient {
             public int getTintColor() { return color; }
         };
     }
+
 }

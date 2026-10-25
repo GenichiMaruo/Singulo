@@ -15,26 +15,26 @@ import net.minecraftforge.items.SlotItemHandler;
 
 /** アンドロイド組立ステーションの画面。設計メモリ・キットなどと許可証のスロット、アンドロイドの様子、動き方の設定。 */
 public class AndroidStationMenu extends AbstractContainerMenu {
-    public static final int WIDTH = 254;
+    public static final int WIDTH = 248;
     public static final int HEIGHT = 240;
-    /** 左の列（中心 x=26）。強化の段だけは、転送と生産のアップグレードを横に2つ並べる。 */
-    public static final int MEMORY_X = 18, MEMORY_Y = 30;
+    /** 左の列（中心 x=26。見出しの文字はなく、空のスロットに入れる物の見本）。強化の段だけは、転送と生産のアップグレードを横に2つ並べる。 */
+    public static final int MEMORY_X = 18, MEMORY_Y = 24;
     /** キットの段は、キットと工場式印刷ユニットを横に2つ並べる。 */
-    public static final int KIT_X = 8, KIT_Y = 56;
-    public static final int PRINT_UNIT_X = 28, PRINT_UNIT_Y = 56;
-    public static final int UPGRADE_X = 8, UPGRADE_Y = 82;
-    public static final int PRODUCTION_X = 28, PRODUCTION_Y = 82;
-    public static final int STOCK_X = 18, STOCK_Y = 108;
-    public static final int PERMIT_X = 18, PERMIT_Y = 134;
+    public static final int KIT_X = 8, KIT_Y = 46;
+    public static final int PRINT_UNIT_X = 28, PRINT_UNIT_Y = 46;
+    public static final int UPGRADE_X = 8, UPGRADE_Y = 68;
+    public static final int PRODUCTION_X = 28, PRODUCTION_Y = 68;
+    public static final int STOCK_X = 18, STOCK_Y = 90;
+    public static final int PERMIT_X = 18, PERMIT_Y = 112;
     /** 巡回路の欄（動き方が巡回のとき、追従の設定の段に8つ並べる）。 */
-    public static final int ROUTE_X = 61, ROUTE_Y = 111;
-    /** 経路のページ（題の右の「経路」で切り替える）: 4行（経由地点・対象範囲・進入禁止ゾーン2つ）。 */
-    public static final int RULE_Y = 40, RULE_ROW = 19;
+    public static final int ROUTE_X = 61, ROUTE_Y = 104;
+    /** 経路のページ（右レールの設定の段で切り替える）: 4行（経由地点・対象範囲・進入禁止ゾーン2つ）。 */
+    public static final int RULE_Y = 36, RULE_ROW = 19;
     public static final int[] RULE_COL_X = {66, 106, 146, 164};
     /** 持ち物は横幅の中央に。 */
-    public static final int INV_X = (WIDTH - 162) / 2 + 1;
-    public static final int INV_Y = 160;
-    public static final int HOTBAR_Y = 218;
+    public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH);
+    public static final int INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT);
+    public static final int HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
 
     private final BlockPos pos;
     private final SyncedInts data;

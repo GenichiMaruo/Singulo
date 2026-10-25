@@ -20,13 +20,16 @@ import net.minecraft.world.item.ItemStack;
 public class GenesisCoreMenu extends AbstractContainerMenu {
     public static final int BUTTON_FEED = 0;
     /** 画面の大きさと、スロットの位置。 */
-    public static final int WIDTH = 236, HEIGHT = 206;
-    public static final int OUTPUT_X = 210, OUTPUT_Y = 50;
+    public static final int WIDTH = 248, HEIGHT = 206;
+    /** 中身は幅236で設計してあり、枠の中央に置くために右へずらす量。 */
+    public static final int CONTENT_X = (WIDTH - 236) / 2;
+    public static final int OUTPUT_X = CONTENT_X + 210, OUTPUT_Y = 50;
     /** 作る物の枠（見本を置く。持っている物は減らない）。 */
-    public static final int TEMPLATE_SLOT = 1, TEMPLATE_X = 100, TEMPLATE_Y = 50;
+    public static final int TEMPLATE_SLOT = 1, TEMPLATE_X = CONTENT_X + 100, TEMPLATE_Y = 50;
     /** インベントリのスロットの始まり。 */
     static final int FIRST_INVENTORY = 2;
-    public static final int INVENTORY_X = 38, INVENTORY_Y = 124;
+    public static final int INVENTORY_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH),
+            INVENTORY_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT);
 
     private final BlockPos pos;
 

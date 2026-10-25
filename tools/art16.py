@@ -429,8 +429,73 @@ def creative_front(on, frame=0, frames=CREATIVE_FRAMES):
     return im
 
 
+# ---------------------------------------------------------------- アンドロイドの装置（正面は顔の形のバイザー）
+
+# どの装置も同じ顔（色だけ段階で変わる）
+ANDROID_FACES = ('android_station', 'android_work_console', 'android_supply_port', 'android_delivery_port',
+                 'android_recipe_rack', 'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench')
+# 動いている間のまばたき: コマ0が開いた目、コマ1が閉じた目。ふだんは開けていて、ときどき1回か2回つぶる（time は tick）
+ANDROID_BLINK = {'animation': {'interpolate': False, 'frames': [
+    {'index': 0, 'time': 90}, {'index': 1, 'time': 3},
+    {'index': 0, 'time': 55}, {'index': 1, 'time': 3}, {'index': 0, 'time': 4}, {'index': 1, 'time': 3},
+    {'index': 0, 'time': 120}, {'index': 1, 'time': 3}]}}
+
+
+def android_front(iid, stage, on, blink=False):
+    """アンドロイドの装置の正面の1コマ: 四角いバイザーに、段階の色で光る顔。
+    動いている間は、離れぎみの目（左上に光）とほっぺ、小さな笑った口（blink なら目をつぶった瞬間）。
+    止まっている間は、目を閉じて眠っている。"""
+    t = TIERS[stage]
+    im = casing(stage, 'side', seed=stable_hash(iid) % 97)
+    d = ImageDraw.Draw(im)
+    # バイザー（縁は段階の金属）
+    d.rectangle([2, 3, 13, 12], fill=rgba(t['trim']))
+    glass = (22, 32, 44) if on else (16, 22, 30)
+    d.rectangle([3, 4, 12, 11], fill=rgba(glass))
+    c = t['glow']
+    px = lambda x, y, col: d.point((x, y), fill=rgba(col))
+    pink = (255, 135, 165)
+    if not on:
+        # 眠っている: 下へ弧を描く閉じた目、うっすらほっぺ、小さな口
+        lid = mix(c, glass, 0.55)
+        for x0 in (3, 9):
+            px(x0, 6, lid)
+            px(x0 + 1, 7, lid)
+            px(x0 + 2, 7, lid)
+            px(x0 + 3, 6, lid)
+        for x in (3, 4, 11, 12):
+            px(x, 8, mix(pink, glass, 0.75))
+        px(7, 10, mix(c, glass, 0.7))
+        px(8, 10, mix(c, glass, 0.7))
+        return im
+    lit = mix(c, lighten(c, 0.35), 0.55)
+    # 目（2x2）: 左上に白い光。まばたきの瞬間は、下の段だけの横線
+    for ex in (4, 10):
+        if blink:
+            px(ex, 7, lit)
+            px(ex + 1, 7, lit)
+        else:
+            d.rectangle([ex, 6, ex + 1, 7], fill=rgba(lit))
+            px(ex, 6, (255, 255, 255))
+    # ほっぺ（目の下）
+    for x in (3, 4, 11, 12):
+        px(x, 8, mix(pink, glass, 0.3))
+    # 小さな笑った口
+    px(6, 9, lit)
+    px(7, 10, lit)
+    px(8, 10, lit)
+    px(9, 9, lit)
+    return im
+
+
 def machine_front(iid, stage, on):
-    """正面のテクスチャと、動く場合のコマ数を返す。段階3以上の稼働中は8コマ。"""
+    """正面のテクスチャと、動く場合のコマ数を返す。段階3以上の稼働中は8コマ（アンドロイドの装置は、まばたきの2コマ）。"""
+    if iid in ANDROID_FACES:
+        frames = 2 if on else 1
+        sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
+        for f in range(frames):
+            sheet.paste(android_front(iid, stage, on, f == 1), (0, S * f))
+        return sheet, frames
     frames = 8 if on and stage >= 3 or iid == 'creative_energy_source' else 1
     sheet = Image.new('RGBA', (S, S * frames), (0, 0, 0, 0))
     for f in range(frames):

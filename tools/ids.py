@@ -172,6 +172,8 @@ MOD = {
     'アンドロイド納品口': ('android_delivery_port', 'Android Delivery Port', 'machine'),
     'アンドロイドレシピ棚': ('android_recipe_rack', 'Android Recipe Rack', 'machine'),
     'アンドロイド作業台': ('android_workbench', 'Android Workbench', 'machine'),
+    '改良型アンドロイド作業台': ('advanced_android_workbench', 'Advanced Android Workbench', 'machine'),
+    '量子アンドロイド作業台': ('quantum_android_workbench', 'Quantum Android Workbench', 'machine'),
     '作業位置カード': ('work_location_card', 'Work Location Card', 'tool'),
     '範囲カード': ('area_card', 'Area Card', 'tool'),
     '測量メガネ': ('survey_glasses', 'Survey Glasses', 'tool'),

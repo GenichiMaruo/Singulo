@@ -71,46 +71,114 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
-     * 加工モードで、装置のどの面から入れ・取り出し・燃料を入れるか（Direction の番号を3ビットずつ: 入れる面、取り出す面、燃料の面）。
-     * 燃料の面が {@link #FACE_AUTO} なら、アンドロイドの立っている横の面。既定は 上・下・自動。
+     * 加工モードで、装置のどの面から入れ・取り出し・燃料を入れるか（役目ごとに3ビット: 入れる面、取り出す面、燃料の面）。
+     * 値は Direction の番号（上・下・東西南北）か {@link #FACE_AUTO}。役目の {@link #RELATIVE} ビットが立っていれば、値 0〜3 は
+     * 装置の向きから見た面（正面・背面・左・右。左右は正面から見て）。燃料の面が自動なら、アンドロイドの立っている横の面。既定は 自動・自動・自動。
      */
     public static final int FACE_AUTO = 7;
     public static final int DEFAULT_FACES = faces(FACE_AUTO, FACE_AUTO, FACE_AUTO);
     /** faces の10ビット目: 燃料を、装置に入るだけ持ってくる（なければ、燃料の欄の数ずつ。入りきらない分は持ってこない）。 */
     public static final int FUEL_FILL = 1 << 9;
+    /** faces の11〜13ビット目: 役目（0 入れる、1 取り出す、2 燃料）の面が、装置の向きから見た面か（RELATIVE << 役目）。 */
+    public static final int RELATIVE = 1 << 10;
+    /** 装置の向きから見た面の名前の鍵（値 0〜3）。 */
+    public static final String[] RELATIVE_KEYS = {"front", "back", "left", "right"};
+    /** 面の選び方の数（自動・上・下・正面・背面・左・右・北・南・西・東）。{@link #faceChoice} の番号。 */
+    public static final int FACE_CHOICES = 11;
 
     public static int faces(int in, int out, int fuel) {
         return (in & 7) | (out & 7) << 3 | (fuel & 7) << 6;
     }
 
-    /** 素材を入れる面（自動なら上。実際に入れる面は {@link MachineWatch#inputFace} で決める）。 */
-    public net.minecraft.core.Direction inputFace() {
-        return face(faces & 7, net.minecraft.core.Direction.UP);
+    /** 役目 role の面の選び方の番号（0 自動、1 上、2 下、3〜6 正面・背面・左・右、7〜10 北・南・西・東）。 */
+    public static int faceChoice(int faces, int role) {
+        int v = faces >> (role * 3) & 7;
+        if ((faces & RELATIVE << role) != 0) {
+            return 3 + (v & 3);
+        }
+        return v == FACE_AUTO || v > 5 ? 0 : v == 1 ? 1 : v == 0 ? 2 : 5 + v;
+    }
+
+    /** faces の役目 role を、選び方の番号 choice（{@link #faceChoice}）にしたもの。 */
+    public static int withFaceChoice(int faces, int role, int choice) {
+        int v = choice == 0 ? FACE_AUTO : choice == 1 ? 1 : choice == 2 ? 0 : choice <= 6 ? choice - 3 : choice - 5;
+        int out = faces & ~(7 << (role * 3)) & ~(RELATIVE << role) | v << (role * 3);
+        return choice >= 3 && choice <= 6 ? out | RELATIVE << role : out;
+    }
+
+    /** 選び方の番号の名前の鍵（auto・up・down・front…・north…）。 */
+    public static String faceChoiceKey(int choice) {
+        return switch (choice) {
+            case 0 -> "auto";
+            case 1 -> "up";
+            case 2 -> "down";
+            case 3, 4, 5, 6 -> RELATIVE_KEYS[choice - 3];
+            default -> net.minecraft.core.Direction.from3DDataValue(choice - 5).getName();
+        };
+    }
+
+    /** 役目 role の面（自動なら fallback）。装置の向きから見た面は、装置のブロックの向き（なければ北が正面）で決める。 */
+    private net.minecraft.core.Direction face(int role, net.minecraft.world.level.block.state.BlockState machine,
+                                              net.minecraft.core.Direction fallback) {
+        int v = faces >> (role * 3) & 7;
+        if ((faces & RELATIVE << role) != 0) {
+            net.minecraft.core.Direction front = facing(machine);
+            return switch (v & 3) {
+                case 0 -> front;
+                case 1 -> front.getOpposite();
+                case 2 -> front.getClockWise();                // 正面から見て左（正面に向き合う人の左手）
+                default -> front.getCounterClockWise();
+            };
+        }
+        return v < 6 ? net.minecraft.core.Direction.from3DDataValue(v) : fallback;
+    }
+
+    /** 装置の正面の向き（横向きの向きを持たないブロックは北）。 */
+    private static net.minecraft.core.Direction facing(net.minecraft.world.level.block.state.BlockState state) {
+        if (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING)) {
+            return state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING);
+        }
+        if (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING)) {
+            net.minecraft.core.Direction d = state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING);
+            if (d.getAxis().isHorizontal()) {
+                return d;
+            }
+        }
+        return net.minecraft.core.Direction.NORTH;
+    }
+
+    private boolean auto(int role) {
+        return (faces & RELATIVE << role) == 0 && (faces >> (role * 3) & 7) == FACE_AUTO;
+    }
+
+    /** 素材を入れる面（自動なら上。実際に入れる面は {@link MachineWatch#inputFace} で決める）。machine: 装置のブロック。 */
+    public net.minecraft.core.Direction inputFace(net.minecraft.world.level.block.state.BlockState machine) {
+        return face(0, machine, net.minecraft.core.Direction.UP);
     }
 
     /** 素材を入れる面が自動（上・横・下の順に、その素材を受け付ける面から入れる）か。 */
     public boolean inputAuto() {
-        return (faces & 7) == FACE_AUTO;
+        return auto(0);
     }
 
-    /** 素材を入れる面の名前の鍵（up・north…・auto）。 */
+    /** 素材を入れる面の名前の鍵（auto・up・front・north…）。 */
     public String inputFaceKey() {
-        return inputAuto() ? "auto" : inputFace().getName();
+        return faceChoiceKey(faceChoice(faces, 0));
     }
 
     /** できた物を取り出す面（自動なら下。実際に取り出す面は {@link MachineWatch#outputFace} で決める）。 */
-    public net.minecraft.core.Direction outputFace() {
-        return face(faces >> 3 & 7, net.minecraft.core.Direction.DOWN);
+    public net.minecraft.core.Direction outputFace(net.minecraft.world.level.block.state.BlockState machine) {
+        return face(1, machine, net.minecraft.core.Direction.DOWN);
     }
 
     /** 取り出す面が自動（下・横・上の順に、できた物が取り出せる面から。かまどの仲間は下）か。 */
     public boolean outputAuto() {
-        return (faces >> 3 & 7) == FACE_AUTO;
+        return auto(1);
     }
 
-    /** 取り出す面の名前の鍵（down・north…・auto）。 */
+    /** 取り出す面の名前の鍵。 */
     public String outputFaceKey() {
-        return outputAuto() ? "auto" : outputFace().getName();
+        return faceChoiceKey(faceChoice(faces, 1));
     }
 
     /** 燃料を、装置に入るだけ持ってくるか。 */
@@ -120,13 +188,13 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
 
     /** 燃料を入れる面（自動なら null）。 */
     @Nullable
-    public net.minecraft.core.Direction fuelFace() {
-        int f = faces >> 6 & 7;
-        return f == FACE_AUTO ? null : face(f, net.minecraft.core.Direction.NORTH);
+    public net.minecraft.core.Direction fuelFace(net.minecraft.world.level.block.state.BlockState machine) {
+        return auto(2) ? null : face(2, machine, net.minecraft.core.Direction.NORTH);
     }
 
-    private static net.minecraft.core.Direction face(int i, net.minecraft.core.Direction fallback) {
-        return i < 6 ? net.minecraft.core.Direction.from3DDataValue(i) : fallback;
+    /** 燃料を入れる面の名前の鍵。 */
+    public String fuelFaceKey() {
+        return faceChoiceKey(faceChoice(faces, 2));
     }
 
     /** 加工モードのレシピ（fuel: 燃料が切れたら取りに行く燃料と、1回に持ってくる数。空なら取りに行かない）。 */

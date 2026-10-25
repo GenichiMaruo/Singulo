@@ -54,6 +54,7 @@ public class DeliveryPortBlockEntity extends WorkLinkedBlockEntity {
 
     /** 中身を隣の箱へ出す（0.5秒ごと）。 */
     public static void serverTick(Level level, BlockPos pos, BlockState state, DeliveryPortBlockEntity be) {
+        be.eyes.tick(level, pos, state);
         if ((level.getGameTime() + 5) % 10 == 0) {
             SupplyPortBlockEntity.pushOut(level, pos, be.contents);
         }

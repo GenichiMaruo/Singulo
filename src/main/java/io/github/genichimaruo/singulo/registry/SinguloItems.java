@@ -313,6 +313,8 @@ public final class SinguloItems {
         block(SinguloBlocks.ANDROID_DELIVERY_PORT, 2);
         block(SinguloBlocks.ANDROID_RECIPE_RACK, 2);
         block(SinguloBlocks.ANDROID_WORKBENCH, 2);
+        block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);
+        block(SinguloBlocks.QUANTUM_ANDROID_WORKBENCH, 4);
         TAB_ORDER.add(ANDROID_CHARGER);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);

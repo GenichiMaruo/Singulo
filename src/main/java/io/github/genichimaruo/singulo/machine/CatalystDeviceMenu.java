@@ -14,14 +14,14 @@ import net.minecraftforge.items.ItemStackHandler;
 
 /** 触媒装置の画面。触媒スロットと（装置によって）燃料か許可証のスロット、状態表示。 */
 public class CatalystDeviceMenu extends AbstractContainerMenu {
-    public static final int SLOT_X = 80;
-    /** 画面の高さと持ち物の位置（状態の文を6〜7行まで出せるように）。 */
-    public static final int HEIGHT = 204;
-    public static final int INV_Y = 122;
-    public static final int HOTBAR_Y = 180;
-    public static final int SLOT_Y = 22;
-    /** 2つ目のスロット（燃料・許可証）の位置。 */
-    public static final int EXTRA_X = 146;
+    /** 触媒スロット（右上）。状態はアイコンと値で出すので、画面は標準の高さ。 */
+    public static final int SLOT_X = 130;
+    public static final int HEIGHT = 166;
+    public static final int INV_Y = GuiFrame.inventoryY(HEIGHT);
+    public static final int HOTBAR_Y = GuiFrame.hotbarY(HEIGHT);
+    public static final int SLOT_Y = 24;
+    /** 2つ目のスロット（燃料・許可証）の位置（触媒スロットの右）。 */
+    public static final int EXTRA_X = 150;
 
     private final BlockPos pos;
     private final CatalystDeviceBlockEntity.Kind kind;

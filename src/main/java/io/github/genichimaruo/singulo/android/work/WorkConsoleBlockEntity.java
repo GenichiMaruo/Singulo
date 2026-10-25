@@ -48,7 +48,15 @@ import io.github.genichimaruo.singulo.network.SinguloNetwork;
  * </ul>
  */
 public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
-        MenuProvider {
+        MenuProvider, AndroidEyes.Holder {
+    /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
+    protected final AndroidEyes eyes = new AndroidEyes();
+
+    @Override
+    public AndroidEyes eyes() {
+        return eyes;
+    }
+
     /** つなげるブロックと、注文に使えるアンドロイドの、指令台からの距離。 */
     public static final double LINK_RANGE = 64;
     public static final double WORKER_RANGE = 64;
@@ -107,14 +115,15 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private int stepOption;
     /** 加工モードで記録する、入れる面・取り出す面・燃料の面（{@link RecipeData#faces}）。 */
     private int faces = RecipeData.DEFAULT_FACES;
-    /** 作業台モードで、同じ種類の別の物も使うレシピとして記録するか。 */
-    private boolean variants;
+    /** 作業台モードで、同じ種類の別の物も使う見本の欄（ビット i が欄 i）。 */
+    private int variantMask;
+    public static final int ALL_VARIANTS = (1 << GRID) - 1;
     /** 手順モードで並べた手順。 */
     private final List<ProcedureStep> procSteps = new ArrayList<>();
     private final net.minecraft.world.inventory.ContainerData modeData = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
-            return index == 0 ? mode : index == 1 ? stepKind : index == 2 ? stepOption : index == 3 ? faces : variants ? 1 : 0;
+            return index == 0 ? mode : index == 1 ? stepKind : index == 2 ? stepOption : index == 3 ? faces : variantMask;
         }
 
         @Override
@@ -128,7 +137,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             } else if (index == 3) {
                 faces = value;
             } else {
-                variants = value != 0;
+                variantMask = value & ALL_VARIANTS;
             }
         }
 
@@ -317,6 +326,21 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             rack.entries(level, out);
         }
         return out;
+    }
+
+    /** その場所でそのレシピを作っている: レシピが並んでいる棚の顔が目を開ける（場所と完成品で見分ける）。 */
+    public void wakeRacks(BlockPos location, RecipeData recipe) {
+        List<RecipeRackBlockEntity.Entry> entries = new ArrayList<>();
+        for (RecipeRackBlockEntity rack : linked(RecipeRackBlockEntity.class)) {
+            entries.clear();
+            rack.entries(level, entries);
+            for (RecipeRackBlockEntity.Entry e : entries) {
+                if (e.location().equals(location) && ItemStack.isSameItemSameTags(e.recipe().output(), recipe.output())) {
+                    AndroidEyes.wake(level, rack.getBlockPos());
+                    break;
+                }
+            }
+        }
     }
 
     public WorkPlanner.Plan plan(ItemStack target, long count) {
@@ -685,8 +709,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 作業台のレシピを作れるブロック（バニラの作業台か、アンドロイド作業台）。 */
     public static boolean isWorkbench(net.minecraft.world.level.block.Block block) {
-        return block instanceof net.minecraft.world.level.block.CraftingTableBlock
-                || block == io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORKBENCH.get();
+        return block instanceof net.minecraft.world.level.block.CraftingTableBlock || AndroidWorkbenchBlockEntity.tier(block) > 0;
     }
 
     static long maxCrafts(RecipeData recipe, int slots, long limit) {
@@ -1030,8 +1053,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.remaining() <= 0) {
                 continue;
             }
-            if (s.inProgress > 0 || locationBusy(s.location, s) || !canDo(a, s.recipe) || tankLimit(a, s.recipe) != Long.MAX_VALUE
-                    || s.recipe.variants()) {
+            if (s.inProgress > 0 || locationBusy(s.location, s) || !canDo(a, s.recipe) || tankLimit(a, s.recipe) != Long.MAX_VALUE) {
                 return null;                          // ほかのアンドロイドが作業中の工程、このアンドロイドにできない工程がある: 1工程ずつに分ける
             }
             for (int j : s.after) {
@@ -1088,6 +1110,21 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (WorkJob.Batch b : batch) {
             for (ItemCount in : b.recipe().inputs()) {
                 long need = in.count * b.crafts();
+                if (in.alt != null) {
+                    // 同じ種類の別の物も使う素材: 前の工程で作った合う物から使い、足りない分を（合う物ならどれでも）取りに行く
+                    long use = 0;
+                    for (ItemCount c : inv) {
+                        if (c.count > 0 && use < need && in.matches(c.item)) {
+                            long take = Math.min(c.count, need - use);
+                            c.count -= take;
+                            use += take;
+                        }
+                    }
+                    if (need > use) {
+                        ItemCount.addAlt(fetch, in.item, need - use, in.alt);
+                    }
+                    continue;
+                }
                 long have = ItemCount.get(inv, in.item);
                 long use = Math.min(have, need);
                 ItemCount.add(inv, in.item, -use);
@@ -1095,10 +1132,32 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             ItemCount.add(inv, b.recipe().outputKey(), (long) b.recipe().outputCount() * b.crafts());
         }
+        // 同じ種類の別の物は、取ってくる物が何種類かに分かれることがある: 分かれる分だけ、持ち物の枠を多めに見る
+        int mixed = 0;
         for (ItemCount c : fetch) {
-            if (c.count > 0 && o.held(null, c.item) < c.count) {
-                return null;                          // 予約した在庫で足りない
+            if (c.count <= 0) {
+                continue;
             }
+            if (c.alt == null) {
+                if (o.held(null, c.item) < c.count) {
+                    return null;                      // 予約した在庫で足りない
+                }
+                continue;
+            }
+            long held = 0;
+            List<ItemStack> kinds = new ArrayList<>();
+            for (WorkOrder.Holding h : o.held) {
+                if (c.matches(h.item)) {
+                    held += h.count;
+                    if (kinds.stream().noneMatch(k -> ItemStack.isSameItemSameTags(k, h.item))) {
+                        kinds.add(h.item);
+                    }
+                }
+            }
+            if (held < c.count) {
+                return null;
+            }
+            mixed += Math.max(0, kinds.size() - 1);       // k 種類に分かれると、スタックは多くて k - 1 増える
         }
         fetch.removeIf(c -> c.count <= 0);
         // 持ち物の場所: 順に作りながら、一番多いときで数える
@@ -1123,7 +1182,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
         }
-        return peak <= slots ? fetch : null;
+        return peak + mixed <= slots ? fetch : null;
     }
 
     private static int stacks(List<ItemCount> list) {
@@ -2261,7 +2320,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
             RecipeData.processing(grid, result.copy(), extras, encoder.getItem(FUEL), faces).write(card, level.registryAccess());
-        } else if (variants) {
+        } else if (variantMask != 0) {
             RecipeData.crafting(grid, result.copy(), alternatives(grid)).write(card, level.registryAccess());
         } else {
             new RecipeData(grid, result.copy()).write(card, level.registryAccess());
@@ -2306,10 +2365,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 足せなければ、その理由。
      */
     @Nullable
-    /** 同じ種類の別の物も使うかを切り替える（作業台モード）。 */
+    /** 同じ種類の別の物も使うかを、全部の欄でまとめて切り替える（作業台モード。全部オンなら全部オフ、そうでなければ全部オン）。 */
     public void toggleVariants() {
-        variants = !variants;
+        variantMask = variantMask == ALL_VARIANTS ? 0 : ALL_VARIANTS;
         setChanged();
+    }
+
+    /** 見本の欄 i だけ、同じ種類の別の物も使うかを切り替える（作業台モード）。 */
+    public void toggleVariantSlot(int i) {
+        if (i >= 0 && i < GRID) {
+            variantMask ^= 1 << i;
+            setChanged();
+        }
     }
 
     /** 加工モードの燃料を持ってくる量を切り替える（燃料の欄の数ずつ ⇔ 装置に入るだけ）。 */
@@ -2324,21 +2391,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     private List<String> alternatives(List<ItemStack> grid) {
         List<String> out = new ArrayList<>();
-        List<net.minecraft.world.item.crafting.Ingredient> ings = List.of();
+        net.minecraft.world.item.crafting.CraftingRecipe matched = null;
         if (level instanceof ServerLevel server) {
             net.minecraft.core.NonNullList<ItemStack> g = net.minecraft.core.NonNullList.withSize(GRID, ItemStack.EMPTY);
             for (int i = 0; i < GRID; i++) {
                 g.set(i, grid.get(i).copyWithCount(1));
             }
             var input = io.github.genichimaruo.singulo.compat.CraftingInput.of(3, 3, g);
-            ings = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
-                    .map(h -> (List<net.minecraft.world.item.crafting.Ingredient>) h.getIngredients()).orElse(List.of());
+            matched = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
+                    .orElse(null);
         }
-        for (ItemStack s : grid) {
+        var assigned = alternativeSlots(matched, grid);
+        for (int i = 0; i < grid.size(); i++) {
+            ItemStack s = grid.get(i);
             String alt = "";
-            if (!s.isEmpty()) {
-                for (var ing : ings) {
-                    if (!ing.isEmpty() && ing.test(s) && ing.getItems().length > 1) {
+            if (!s.isEmpty() && (variantMask >> i & 1) != 0) {
+                for (var ing : List.of(assigned.get(i))) {
+                    if (!ing.isEmpty() && ing.test(s) && ing.getItems().length > 1
+                            && validAlternatives(matched, grid, i, ing)) {
                         alt = ItemCount.key(ing);
                         break;
                     }
@@ -2349,15 +2419,57 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
-    /** 加工モードの面を切り替える（which: 0 入れる面、1 取り出す面、2 燃料の面。どれも「自動」がある）。 */
+    /** Assign each physical slot once, including the chosen shaped orientation. */
+    private static List<net.minecraft.world.item.crafting.Ingredient> alternativeSlots(
+            net.minecraft.world.item.crafting.CraftingRecipe recipe, List<ItemStack> grid) {
+        var empty = net.minecraft.world.item.crafting.Ingredient.EMPTY;
+        List<net.minecraft.world.item.crafting.Ingredient> out = new ArrayList<>(java.util.Collections.nCopies(grid.size(), empty));
+        if (recipe instanceof net.minecraft.world.item.crafting.ShapedRecipe shaped) {
+            int left = 3, top = 3;
+            for (int i = 0; i < grid.size(); i++) if (!grid.get(i).isEmpty()) {
+                left = Math.min(left, i % 3); top = Math.min(top, i / 3);
+            }
+            for (boolean mirror : new boolean[]{false, true}) {
+                boolean matches = true;
+                for (int y = 0; y < shaped.getHeight(); y++) for (int x = 0; x < shaped.getWidth(); x++) {
+                    int index = (top + y) * 3 + left + x;
+                    var ingredient = shaped.getIngredients().get(y * shaped.getWidth() + (mirror ? shaped.getWidth() - 1 - x : x));
+                    if (index >= grid.size() || !ingredient.test(grid.get(index))) matches = false;
+                    else out.set(index, ingredient);
+                }
+                if (matches) return out;
+                java.util.Collections.fill(out, empty);
+            }
+        } else if (recipe instanceof net.minecraft.world.item.crafting.ShapelessRecipe) {
+            List<Integer> slots = new ArrayList<>();
+            List<ItemStack> inputs = new ArrayList<>();
+            for (int i = 0; i < grid.size(); i++) if (!grid.get(i).isEmpty()) { slots.add(i); inputs.add(grid.get(i)); }
+            int[] mapping = net.minecraftforge.common.util.RecipeMatcher.findMatches(inputs, recipe.getIngredients());
+            if (mapping != null) for (int i = 0; i < mapping.length; i++) out.set(slots.get(i), recipe.getIngredients().get(mapping[i]));
+        }
+        return out;
+    }
+
+    /** Overlapping ingredients must not broaden a different shaped slot. */
+    private boolean validAlternatives(net.minecraft.world.item.crafting.CraftingRecipe recipe,
+                                      List<ItemStack> grid, int slot,
+                                      net.minecraft.world.item.crafting.Ingredient ingredient) {
+        if (recipe == null || level == null) return false;
+        List<ItemStack> probe = new ArrayList<>(grid);
+        for (ItemStack candidate : ingredient.getItems()) {
+            probe.set(slot, candidate.copyWithCount(1));
+            if (!recipe.matches(io.github.genichimaruo.singulo.compat.CraftingInput.of(3, 3, probe), level)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * 加工モードの面を切り替える（which: 0 入れる面、1 取り出す面、2 燃料の面）。
+     * 自動 → 上 → 下 → 正面 → 背面 → 左 → 右 → 北 → 南 → 西 → 東 → 自動 の順（back なら逆）。
+     */
     public void cycleFace(int which, boolean back) {
-        int shift = which * 3;
-        int cur = faces >> shift & 7;
-        int n = 7;                                           // 0〜5 と 自動（7）
-        int idx = cur == RecipeData.FACE_AUTO ? 6 : cur;
-        idx = Math.floorMod(idx + (back ? -1 : 1), n);
-        int value = idx == 6 ? RecipeData.FACE_AUTO : idx;
-        faces = faces & ~(7 << shift) | value << shift;
+        int choice = Math.floorMod(RecipeData.faceChoice(faces, which) + (back ? -1 : 1), RecipeData.FACE_CHOICES);
+        faces = RecipeData.withFaceChoice(faces, which, choice);
         setChanged();
     }
 
@@ -2423,6 +2535,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     // ------------------------------------------------------------------ 毎 tick
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, WorkConsoleBlockEntity be) {
+        be.eyes.tick(level, pos, state);
         if (level.getGameTime() % 20 == 0) {
             be.tick((ServerLevel) level);
         }
@@ -2601,7 +2714,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         tag.putInt("step_kind", stepKind);
         tag.putInt("step_option", stepOption);
         tag.putInt("faces", faces);
-        tag.putBoolean("variants", variants);
+        tag.putInt("variant_mask", variantMask);
         ListTag ps = new ListTag();
         for (ProcedureStep s : procSteps) {
             ps.add(s.save(registries));
@@ -2676,7 +2789,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         stepKind = Math.floorMod(tag.getInt("step_kind"), ProcedureStep.KINDS);
         stepOption = tag.contains("step_option") ? tag.getInt("step_option") : ProcedureStep.defaultOption(stepKind);
         faces = tag.contains("faces") ? tag.getInt("faces") : RecipeData.DEFAULT_FACES;
-        variants = tag.getBoolean("variants");
+        // 0.11 までは全部の欄でまとめた切り替えだった
+        variantMask = tag.contains("variant_mask") ? tag.getInt("variant_mask") & ALL_VARIANTS
+                : tag.getBoolean("variants") ? ALL_VARIANTS : 0;
         procSteps.clear();
         for (Tag t : tag.getList("proc_steps", Tag.TAG_COMPOUND)) {
             if (procSteps.size() < RecipeData.MAX_STEPS) {

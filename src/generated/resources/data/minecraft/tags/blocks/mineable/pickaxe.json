@@ -49,6 +49,8 @@
     "singulo:android_delivery_port",
     "singulo:android_recipe_rack",
     "singulo:android_workbench",
+    "singulo:advanced_android_workbench",
+    "singulo:quantum_android_workbench",
     "singulo:neutrino_observatory",
     "singulo:inertial_stabilizer",
     "singulo:echo_resonator",

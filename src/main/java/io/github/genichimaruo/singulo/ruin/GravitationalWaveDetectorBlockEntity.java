@@ -92,7 +92,7 @@ public class GravitationalWaveDetectorBlockEntity extends BlockEntity implements
     /** 観測: 電力を使って、いちばん近い重力異常点の方角と距離帯を調べる（画面に出し、チャットにも残す）。 */
     public boolean observe(ServerPlayer player) {
         if (!energy.consume(OBSERVATION_COST)) {
-            player.displayClientMessage(Component.translatable("gui.singulo.detector.no_power", OBSERVATION_COST), true);
+            player.displayClientMessage(Component.translatable("gui.singulo.detector.no_power", io.github.genichimaruo.singulo.energy.EnergyText.of(OBSERVATION_COST)), true);
             return false;
         }
         Level level = player.level();

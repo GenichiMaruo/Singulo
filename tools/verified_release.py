@@ -93,8 +93,8 @@ def promote(metadata, artifact_dir, output, jar_name):
         raise RuntimeError("The tested production JARs have different contents")
     root = artifact_dir / metadata["artifacts"]["singulo"]["name"]
     gui_log = one((p for p in root.rglob("latest.log") if "gui-review" in p.parts), "GUI completion log")
-    if "SINGULO_GUI_COMPLETE 22" not in gui_log.read_text() or len(list((gui_log.parents[1] / "screenshots").glob("*.png"))) != 142:
-        raise RuntimeError("Missing complete 142-screen GUI validation")
+    if "SINGULO_GUI_COMPLETE 22" not in gui_log.read_text() or len(list((gui_log.parents[1] / "screenshots").glob("*.png"))) != 212:
+        raise RuntimeError("Missing complete 212-screen GUI validation")
     gui = gui_log.read_text()
     for marker in ("SINGULO_SEARCH_COMPLETE", "SINGULO_JEI_SYNC_COMPLETE", "SINGULO_HANDBOOK_SEARCH_COMPLETE"):
         if marker not in gui:
@@ -103,11 +103,11 @@ def promote(metadata, artifact_dir, output, jar_name):
     pixel_results = json.loads(pixels.read_text())
     if len(pixel_results) != 3 or sum(row["checked_empty_slot_centers"] for row in pixel_results) != 105:
         raise RuntimeError("Missing 105-point inventory verification")
-    if "SINGULO_MACHINE_GUI_COMPLETE 120" not in gui:
+    if "SINGULO_MACHINE_GUI_COMPLETE 190" not in gui:
         raise RuntimeError("Missing machine GUI validation")
     machine = json.loads(one(root.rglob("machine-pixels.json"), "machine pixel verification").read_text())
     if (set(machine["languages"]) != {"ja_jp", "en_us", "zh_cn", "zh_tw", "ko_kr"}
-            or len(machine["languages"]) != 5 or machine["machine_captures"] != 120
+            or len(machine["languages"]) != 5 or machine["machine_captures"] != 190
             or machine["headers_without_title_status_overlap"] != 80 or machine["generator_font_probes"] != 5):
         raise RuntimeError("Incomplete machine GUI pixel verification")
     output.parent.mkdir(parents=True, exist_ok=True)
