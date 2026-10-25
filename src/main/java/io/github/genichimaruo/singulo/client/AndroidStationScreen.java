@@ -144,7 +144,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                     menu.value(AndroidStationBlockEntity.D_CAPACITY)), mouseX, mouseY);
         }
         for (int i = 0; i < MODES; i++) {
-            if (Panel.inside(mouseX, mouseY, modeX(i), topPos + MODE_Y, MODE_W, 16)) {
+            if (Panel.inside(mouseX, mouseY, modeX(i), topPos + MODE_Y, modeW(i), 16)) {
                 g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.mode." + i + ".hint"), 180),
                         mouseX, mouseY);
             }
@@ -184,7 +184,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             return;                                  // 追従の設定（追従中に戦うか・追従する人）の段は、巡回の設定に置き換わっている
         }
         for (int i = 0; i < 2; i++) {
-            if (Panel.inside(mouseX, mouseY, escortX(i), topPos + ESCORT_Y, ESCORT_W, 16)) {
+            if (Panel.inside(mouseX, mouseY, escortX(i), topPos + ESCORT_Y, escortW(i), 16)) {
                 g.renderTooltip(font, font.split(Component.translatable(ESCORT_KEYS[i] + ".hint"), 180), mouseX, mouseY);
             }
         }
@@ -215,6 +215,11 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         return leftPos + INFO_X + i * (MODE_W + 3);
     }
 
+    /** 割り切れずに余った分は最後のボタンが受け持つ（右端を情報欄の右端に揃える）。 */
+    private static int modeW(int i) {
+        return i == MODES - 1 ? INFO_W - i * (MODE_W + 3) : MODE_W;
+    }
+
     /** 巡回の設定のボタンの文字の鍵（周回/往復・夜だけ・立ち止まる時間）。 */
     private static final String[] PATROL_KEYS = {"gui.singulo.android_station.patrol.order", "gui.singulo.android_station.patrol.night",
             "gui.singulo.android_station.patrol.dwell"};
@@ -241,6 +246,10 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
 
     private int escortX(int i) {
         return leftPos + INFO_X + i * (ESCORT_W + 3);
+    }
+
+    private static int escortW(int i) {
+        return i == 1 ? INFO_W - (ESCORT_W + 3) : ESCORT_W;
     }
 
     /** 許可証に登録された人数。 */
@@ -362,7 +371,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         if (minecraft != null && minecraft.gameMode != null) {
             int id = -1;
             for (int i = 0; i < MODES; i++) {
-                if (Panel.inside(mouseX, mouseY, modeX(i), topPos + MODE_Y, MODE_W, 16)) {
+                if (Panel.inside(mouseX, mouseY, modeX(i), topPos + MODE_Y, modeW(i), 16)) {
                     id = i == io.github.genichimaruo.singulo.android.RuinAndroid.MODE_PATROL ? AndroidStationBlockEntity.BUTTON_MODE_PATROL : i;
                 }
             }
@@ -382,7 +391,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 }
             } else {
                 for (int i = 0; i < 2; i++) {
-                    if (Panel.inside(mouseX, mouseY, escortX(i), topPos + ESCORT_Y, ESCORT_W, 16)) {
+                    if (Panel.inside(mouseX, mouseY, escortX(i), topPos + ESCORT_Y, escortW(i), 16)) {
                         id = ESCORT_BUTTONS[i];
                     }
                 }
@@ -459,7 +468,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 List.of(Component.translatable("gui.singulo.android_station.charge").copy().append(" " + charge + "%")));
         int mode = menu.value(AndroidStationBlockEntity.D_MODE);
         for (int i = 0; i < MODES; i++) {
-            button(g, modeX(i), y + MODE_Y, MODE_W, 16, i == mode, Panel.inside(mouseX, mouseY, modeX(i), y + MODE_Y, MODE_W, 16));
+            button(g, modeX(i), y + MODE_Y, modeW(i), 16, i == mode, Panel.inside(mouseX, mouseY, modeX(i), y + MODE_Y, modeW(i), 16));
         }
         button(g, x + MINUS_X, y + RETREAT_Y, 16, 16, false, Panel.inside(mouseX, mouseY, x + MINUS_X, y + RETREAT_Y, 16, 16));
         Panel.minusIcon(g, x + MINUS_X + 6, y + RETREAT_Y + 6, skin.text());
@@ -484,11 +493,11 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         int escort = menu.value(AndroidStationBlockEntity.D_ESCORT);
         for (int i = 0; i < 2; i++) {
             boolean on = i == escort;
-            boolean hover = Panel.inside(mouseX, mouseY, escortX(i), y + ESCORT_Y, ESCORT_W, 16);
+            boolean hover = Panel.inside(mouseX, mouseY, escortX(i), y + ESCORT_Y, escortW(i), 16);
             if (following()) {
-                button(g, escortX(i), y + ESCORT_Y, ESCORT_W, 16, on, hover);
+                button(g, escortX(i), y + ESCORT_Y, escortW(i), 16, on, hover);
             } else {
-                Panel.button(g, skin, escortX(i), y + ESCORT_Y, ESCORT_W, 16, Panel.Press.DISABLED);
+                Panel.button(g, skin, escortX(i), y + ESCORT_Y, escortW(i), 16, Panel.Press.DISABLED);
             }
         }
         if (permitMembers() > 0) {
@@ -556,7 +565,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         } else {
             for (int i = 0; i < 2; i++) {
                 int color = !following() ? skin.dim() : i == escort ? skin.onAccent() : skin.text();
-                fitCentered(g, font, Component.translatable(ESCORT_KEYS[i]), INFO_X + i * (ESCORT_W + 3) + 2, ESCORT_Y + 4, ESCORT_W - 4, color);
+                fitCentered(g, font, Component.translatable(ESCORT_KEYS[i]), INFO_X + i * (ESCORT_W + 3) + 2, ESCORT_Y + 4, escortW(i) - 4, color);
             }
             if (permitMembers() > 0) {
                 fitCentered(g, font, Component.translatable("gui.singulo.android_station.leader", leaderName()), INFO_X + 2, LEADER_Y + 4,
@@ -568,7 +577,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         int mode = menu.value(AndroidStationBlockEntity.D_MODE);
         for (int i = 0; i < MODES; i++) {
             fitCentered(g, font, Component.translatable("gui.singulo.android_station.mode." + i), INFO_X + i * (MODE_W + 3) + 2,
-                    MODE_Y + 4, MODE_W - 4, i == mode ? skin.onAccent() : skin.text());
+                    MODE_Y + 4, modeW(i) - 4, i == mode ? skin.onAccent() : skin.text());
         }
         boolean low = menu.value(AndroidStationBlockEntity.D_KIND) >= 0 && menu.value(AndroidStationBlockEntity.D_HP) > 0
                 && menu.value(AndroidStationBlockEntity.D_HP) < menu.value(AndroidStationBlockEntity.D_RETREAT);
