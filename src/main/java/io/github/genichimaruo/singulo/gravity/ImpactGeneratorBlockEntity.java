@@ -77,6 +77,11 @@ public class ImpactGeneratorBlockEntity extends GravityReceiverBlockEntity {
     }
 
     @Override
+    protected boolean buffered() {
+        return true;                                  // 発電した電力はためておく
+    }
+
+    @Override
     protected long capacity() {
         return CAPACITY;
     }

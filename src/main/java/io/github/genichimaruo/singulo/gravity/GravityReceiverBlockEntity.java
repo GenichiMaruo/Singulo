@@ -24,9 +24,10 @@ import net.minecraft.world.level.block.state.BlockState;
  * 1枚が毎tick使う電力は種類で決まる: 低重力・高重力は {@link #perPanel()}、レイリー散乱パネルは {@link #RAYLEIGH_COST}、
  * 無重力ブロックは集まりの無重力の高さで決まる（{@link ZeroGravity#costPerBlock}。コントロールボックスで変える）。
  * <p>
- * 同じパネルの集まりに受電器が何台つながっていてもよい。どの受電器も、1台で集まり全体を働かせられるだけの電力をためられ、
- * 1 tick にいくらでも受け取れる（受け取るのは足りない分だけ）。パネルごとに、パネルを伝った最短経路で
- * いちばん近い受電器が払い、その受電器が払えなければ、ほかの受電器（位置の小さい順）が払う。どこからも払えないパネルは止まる。
+ * 受電器は電力をためない: 集まり全体の1 tick 分のうち、まだ届いていない分だけを受け取り、次に配るときに使い切る（余りは捨てる）。
+ * 電力が届き続けている間だけパネルが働き、止まればすぐ止まる（コントロールボックスを壊して安くなっても、ためた分で働き続けない）。
+ * 同じパネルの集まりに受電器が何台つながっていてもよい（受電器どうしの電力は合わせて使う）。衝撃発電パネルは発電した電力をためておき、
+ * パネルごとに、パネルを伝った最短経路でいちばん近い衝撃発電パネルが払う。どこからも払えないパネルは止まる。
  * <p>
  * 重くならないように: 集まりの形は、まとめ役（位置がいちばん小さい受電器）が {@link #scanInterval} tick ごとに1回の幅優先探索で調べ直す
  * （どの受電器がいちばん近いかも同じ探索で決まる）。どの受電器も自分の受け持ちを払えるふつうの tick は、受電器の数だけの計算で済み、
@@ -94,7 +95,8 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     private final LongEnergyStorage energy = new LongEnergyStorage() {
         @Override
         public long receiveLong(long amount, boolean simulate) {
-            long take = Math.max(0, Math.min(amount, capacity() - stored));
+            long room = buffered() ? capacity() - stored : groupDemand - groupInbox();     // ためない受電器は、足りない分だけ
+            long take = Math.max(0, Math.min(amount, room));
             if (!simulate && take > 0) {
                 stored += take;
                 setChanged();
@@ -145,9 +147,28 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         return energy;
     }
 
-    /** ためておける量: 集まり全体の1 tick 分（パネルがなくても1枚分）。どの受電器も1台で全部を働かせられる。 */
+    /** 電力をためておくか（受電器はためない。衝撃発電パネルは発電した分をためる）。 */
+    protected boolean buffered() {
+        return false;
+    }
+
+    /** 受け取れる量の上限: 受電器は集まり全体の1 tick 分（パネルがなくても1枚分）。 */
     protected long capacity() {
         return Math.max(perPanel(), groupDemand);
+    }
+
+    /** 同じ集まりのためない受電器に、いま届いている電力の合計（次に配るときに使う分）。 */
+    private long groupInbox() {
+        if (level == null || receivers.isEmpty()) {
+            return stored;
+        }
+        long sum = 0;
+        for (BlockPos r : receivers) {
+            if (level.isLoaded(r) && level.getBlockEntity(r) instanceof GravityReceiverBlockEntity other && !other.buffered()) {
+                sum = ZeroGravity.saturatedAdd(sum, other.stored);
+            }
+        }
+        return receivers.contains(worldPosition) ? sum : ZeroGravity.saturatedAdd(sum, stored);
     }
 
     /** たまっている電力。 */
@@ -372,16 +393,26 @@ public class GravityReceiverBlockEntity extends BlockEntity {
         }
     }
 
-    /** パネルごとに、近い受電器から払える分だけ払って働かせる。 */
+    /**
+     * パネルごとに、いちばん近い受電器から払える分だけ払って働かせる。近い受電器だけで払えなければ、ためない受電器どうしは
+     * 届いた電力を合わせて払う（近い順に使い、いちばん多く払った受電器が払ったことにする）。衝撃発電パネルは自分のためた分だけで払う。
+     * 配り終えたら、ためない受電器の電力は0にする（余りは捨てる）。
+     */
     private void distribute(Level level) {
         int rc = receivers.size();
         GravityReceiverBlockEntity[] group = new GravityReceiverBlockEntity[rc];
         long[] budget = new long[rc];
+        boolean[] pooled = new boolean[rc];
+        long pool = 0;
         for (int r = 0; r < rc; r++) {
             BlockPos pos = receivers.get(r);
             if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof GravityReceiverBlockEntity other && !other.isRemoved()) {
                 group[r] = other;
                 budget[r] = other.stored;
+                if (!other.buffered()) {
+                    pooled[r] = true;
+                    pool = ZeroGravity.saturatedAdd(pool, other.stored);
+                }
             }
         }
         int count = order.length;
@@ -407,17 +438,38 @@ public class GravityReceiverBlockEntity extends BlockEntity {
                 int first = nearest[i];
                 if (group[first] != null && budget[first] >= c) {
                     payer = first;
+                    budget[first] -= c;
+                    if (pooled[first]) {
+                        pool -= c;
+                    }
+                } else if (pool >= c) {
+                    // ためない受電器の電力を合わせて払う（近い受電器から、次に位置の小さい順に）
+                    long need = c, most = 0;
+                    for (int k = -1; k < rc && need > 0; k++) {
+                        int r = k < 0 ? first : k;
+                        if (k >= 0 && r == first || group[r] == null || !pooled[r] || budget[r] <= 0) {
+                            continue;
+                        }
+                        long take = Math.min(need, budget[r]);
+                        budget[r] -= take;
+                        need -= take;
+                        if (take > most) {
+                            most = take;
+                            payer = r;
+                        }
+                    }
+                    pool -= c;
                 } else {
                     for (int r = 0; r < rc; r++) {
-                        if (r != first && group[r] != null && budget[r] >= c) {
+                        if (r != first && group[r] != null && !pooled[r] && budget[r] >= c) {
                             payer = r;
+                            budget[r] -= c;
                             break;
                         }
                     }
                 }
                 boolean want = payer >= 0;
                 if (want) {
-                    budget[payer] -= c;
                     supplied[payer]++;
                     paid[payer] = ZeroGravity.saturatedAdd(paid[payer], c);
                     lit++;
@@ -439,8 +491,9 @@ public class GravityReceiverBlockEntity extends BlockEntity {
             if (other == null) {
                 continue;
             }
-            if (other.stored != budget[r]) {
-                other.stored = budget[r];
+            long left = pooled[r] ? 0 : budget[r];                 // ためない受電器は、使い残しを捨てる
+            if (other.stored != left) {
+                other.stored = left;
                 other.setChanged();
             }
             other.supplying = supplied[r];
@@ -512,12 +565,14 @@ public class GravityReceiverBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putLong("energy", stored);
+        if (buffered()) {
+            tag.putLong("energy", stored);
+        }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        stored = Math.max(0, tag.getLong("energy"));
+        stored = buffered() ? Math.max(0, tag.getLong("energy")) : 0;      // 受電器はためないので、前の分は持ち越さない
     }
 }
