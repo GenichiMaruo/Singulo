@@ -2314,6 +2314,16 @@ public abstract class RuinAndroid extends Monster {
             setState(STATE_RETREAT);
             playSound(SoundEvents.BEACON_DEACTIVATE, 0.7F, 1.3F);
         }
+        if (printed() && state() != STATE_LOW_POWER && getHealth() < getMaxHealth() && tickCount % REGEN_INTERVAL == 0
+                && charge() > maxCharge() * REGEN_MIN_CHARGE + REGEN_COST) {
+            // 減った体力は、充電を少しずつ使いながら、ゆっくり直る（充電が少ないときは、充電を残すために直さない）
+            setCharge(charge() - REGEN_COST);
+            heal(1);
+        }
+        if (guard && printed() && charging(state()) && state() != STATE_CHARGING && getHealth() < getMaxHealth() * retreatPercent / 100F) {
+            // 充電中（ステーションの上を除く。ステーションは体力も直す）でも、体力が減ったら自己修理キットを使う
+            useRepairKit((ServerLevel) level());
+        }
         if (guard && printed() && active() && mode != MODE_FOLLOW && getTarget() == null && !isWorking() && home != null
                 && retreatCooldown <= 0 && tickCount % 20 == 7 && getHealth() < getMaxHealth()
                 && tickCount - getLastHurtByMobTimestamp() > 100 && level().getBlockEntity(home) instanceof AndroidStationBlockEntity) {
