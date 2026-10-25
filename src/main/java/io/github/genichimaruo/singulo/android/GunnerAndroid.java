@@ -506,17 +506,19 @@ public class GunnerAndroid extends RuinAndroid {
                     }
                     // コイルが灯る音と、狙いが固まる音は、ためる音（android.railgun_charge）に入っている
                     if (stateTicks >= RAIL_CHARGE) {
-                        setState(STATE_RAIL_FIRE);
-                        fireRail(level);
+                        // ためている間に相手が物陰へ隠れた: 撃たずに諦めて、しまう
+                        if (hasLineOfSight(target) && !blocked(level, muzzle(true), target.getBoundingBox().getCenter())) {
+                            setState(STATE_RAIL_FIRE);
+                            fireRail(level);
+                        } else {
+                            stowRail();
+                        }
                     }
                 }
                 case STATE_RAIL_FIRE -> {
                     getNavigation().stop();
                     if (stateTicks >= RAIL_FIRE) {
-                        setState(STATE_RAIL_STOW);
-                        playSound(SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 0.8F, 1.5F);
-                        nextRail = 160 + random.nextInt(80);
-                        nextBurst = 30;
+                        stowRail();
                     }
                 }
                 case STATE_HOP -> {
@@ -592,6 +594,14 @@ public class GunnerAndroid extends RuinAndroid {
             if (nextBurst <= 0 && dist < SHOT_RANGE && reloadTicks < 0 && spend(COST_BURST)) {
                 start(STATE_SHOT, SoundEvents.CROSSBOW_LOADING_END.value(), 1.6F);
             }
+        }
+
+        /** レールガンをしまい、次に組み上げるまで間をあける。 */
+        private void stowRail() {
+            setState(STATE_RAIL_STOW);
+            playSound(SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 0.8F, 1.5F);
+            nextRail = 160 + random.nextInt(80);
+            nextBurst = 30;
         }
 
         private void start(int s, net.minecraft.sounds.SoundEvent sound, float pitch) {
