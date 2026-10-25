@@ -506,7 +506,8 @@ public class GunnerAndroid extends RuinAndroid {
                     }
                 }
                 case STATE_HOP -> {
-                    if (stateTicks >= HOP && onGround()) {
+                    // 着地したら終わり（水の中や無重力では着地しないので、時間で終える）
+                    if (stateTicks >= HOP && (onGround() || floating()) || stateTicks >= HOP * 4) {
                         setState(STATE_IDLE);
                         hopCooldown = 50;
                         nextBurst = Math.min(nextBurst, 6);

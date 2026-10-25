@@ -289,7 +289,7 @@ public class AxeAndroid extends RuinAndroid {
                     start(STATE_SLAM_WINDUP, SoundEvents.BEACON_ACTIVATE, 0.7F);
                     return;
                 }
-                if (dist >= 4 && dist < 10 && onGround() && spend(COST_LEAP)) {
+                if (dist >= 4 && dist < 10 && onGround() && !floating() && spend(COST_LEAP)) {
                     start(STATE_LEAP_WINDUP, SoundEvents.BEACON_POWER_SELECT, 0.6F);
                     return;
                 }
