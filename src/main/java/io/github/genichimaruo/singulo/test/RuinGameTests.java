@@ -142,6 +142,11 @@ public final class RuinGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 160)
     public static void healthyDroneDescendsAndCannotShootFromHighAbove(GameTestHelper helper) throws Exception {
         var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 12, 3));
+        // Other simultaneous fixtures create players. Keep this altitude test's
+        // manually assigned target instead of letting player acquisition replace it.
+        var selectors = net.minecraft.world.entity.Mob.class.getDeclaredField("targetSelector");
+        selectors.setAccessible(true);
+        ((net.minecraft.world.entity.ai.goal.GoalSelector) selectors.get(drone)).removeAllGoals(goal -> true);
         var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS);
         target.setNoAi(true); target.setNoGravity(true);
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);

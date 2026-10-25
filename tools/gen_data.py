@@ -624,7 +624,14 @@ UI_LANG = {
     'gui.singulo.select.auto': ('作るもの: 自動', 'Make: automatic'),
     'gui.singulo.select.auto_short': ('自', 'A'),
     'gui.singulo.select.title': ('作るもの', 'Make'),
-    'gui.singulo.reason.select_hint': ('出力の下のボタンで作るものを指定してください', 'Pick what to make with the button below the output.'),
+    'gui.singulo.recipe_encoder.variants.some': ('一部の欄だけ同じ種類', 'Some slots: any variant'),
+    'gui.singulo.recipe_encoder.variant_slot.on': ('この欄: 同じ種類も使う', 'This slot: any variant'),
+    'gui.singulo.recipe_encoder.variant_slot.off': ('この欄: 見本と同じ物だけ', 'This slot: exact item only'),
+    'gui.singulo.recipe_encoder.variant_slot.hint': ('クリックで切り替え（レシピに合う同じ種類の物を使う）', 'Click to toggle (uses other items of the same kind that fit the recipe)'),
+    'gui.singulo.shift_detail': ('Shift: 正確な値', 'Shift: exact values'),
+    'gui.singulo.select.rows_more': ('表示する行を増やす', 'Show more rows'),
+    'gui.singulo.select.rows_less': ('表示する行を減らす', 'Show fewer rows'),
+    'gui.singulo.reason.select_hint': ('出力の右のボタンで作るものを指定してください', 'Pick what to make with the button next to the output.'),
     'gui.singulo.reason.extra': ('%s の材料は揃っていますが、使わない物も入っているので、自動では作りません', 'The materials for %s are in, but so are items it does not use, so it is not made automatically.'),
     'gui.singulo.reason.ambiguous': ('%s の材料は揃っていますが、ほかのレシピの途中と同じ組み合わせなので、入れ終わって3秒たってから作り始めます', 'The materials for %s are in, but the same mix appears while loading other recipes, so it starts 3 seconds after you stop adding items.'),
     'gui.singulo.reason.label.extra': ('余分な材料', 'Extra items'),
@@ -927,10 +934,14 @@ UI_LANG = {
     'gui.singulo.recipe_encoder.face.west': ('西', 'West'),
     'gui.singulo.recipe_encoder.face.east': ('東', 'East'),
     'gui.singulo.recipe_encoder.face.auto': ('自動', 'Auto'),
+    'gui.singulo.recipe_encoder.face.front': ('正面', 'Front'),
+    'gui.singulo.recipe_encoder.face.back': ('背面', 'Back'),
+    'gui.singulo.recipe_encoder.face.left': ('左', 'Left'),
+    'gui.singulo.recipe_encoder.face.right': ('右', 'Right'),
     'gui.singulo.recipe_encoder.face_button.in': ('入 %s', 'In: %s'),
     'gui.singulo.recipe_encoder.face_button.out': ('出 %s', 'Out: %s'),
     'gui.singulo.recipe_encoder.face_button.fuel': ('燃 %s', 'Fuel: %s'),
-    'gui.singulo.recipe_encoder.face_button.in.hint': ('装置のどの面から素材を入れるか（クリックで切り替え、右クリックで逆順）。自動: 上・横・下の順に、その素材を受け付ける面から入れる（ふつうはこれでよい）。東西南北は世界の向き', 'Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Directions are world directions'),
+    'gui.singulo.recipe_encoder.face_button.in.hint': ('装置のどの面から素材を入れるか（クリックで切り替え、右クリックで逆順）。自動: 上・横・下の順に、その素材を受け付ける面から入れる（ふつうはこれでよい）。正面・背面・左・右は装置の向きから見た面（左右は正面から見て）、東西南北は世界の向き', 'Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Front, back, left and right are relative to the way the machine faces (left and right as seen from the front); compass directions are world directions'),
     'gui.singulo.recipe_encoder.face_button.out.hint': ('装置のどの面からできた物を取り出すか（クリックで切り替え、右クリックで逆順）。自動: 下・横・上の順に、できた物を取り出せる面から（かまどの仲間は下）', 'Which face of the machine products are taken out from (click to change, right-click to go back). Auto: tries bottom, sides, then top, and uses the first face the products come out of (furnaces use the bottom)'),
     'gui.singulo.recipe_encoder.face_button.fuel.hint': ('装置のどの面から燃料を入れるか。自動: アンドロイドが立っている横の面（かまどなら燃料の欄）', 'Which face of the machine fuel goes in through. Auto: the side the android stands at (a furnace\'s fuel slot)'),
     'tooltip.singulo.recipe_card.faces': ('面: 入れる %s・取り出す %s・燃料 %s', 'Faces: in %s, out %s, fuel %s'),
@@ -1028,7 +1039,7 @@ UI_LANG = {
     'gui.singulo.work_console.stock': ('在庫: %s', 'In stock: %s'),
     'gui.singulo.work_console.craftable': ('作れる', 'Craftable'),
     'gui.singulo.android.pack.builtin': ('内蔵', 'Built-in'),
-    'gui.singulo.work_console.search.hint': ('検索（@ で mod）', 'Search (@ for mod)'),
+    'gui.singulo.work_console.search.hint': ('検索', 'Search'),
     'gui.singulo.work_console.no_match': ('検索に合う物がない', 'Nothing matches the search'),
     'gui.singulo.work_console.search.help': ('名前で絞り込む。@ で始めると mod で絞り込む（例: @singulo）。空白で区切ると、すべてに合う物だけ。右クリックで消す',
                                              'Filter by name. Start with @ to filter by mod (e.g. @singulo). Separate words with spaces to match all of them. Right-click to clear'),
@@ -1602,9 +1613,9 @@ def models():
                 if iid == 'android_station':
                     # 上面は印刷床（光の走査線が往復する。blocks_extra3.station_top）
                     model['textures']['top'] = f'{MODID}:block/android_station_top'
-                if iid == 'android_workbench':
-                    # 上面は 3×3 のマスの作業面（blocks_extra3.workbench_top）
-                    model['textures']['top'] = f'{MODID}:block/android_workbench_top'
+                if iid.endswith('android_workbench'):
+                    # 上面は 3×3 のマスの作業面（blocks_extra3.workbench_top。段階ごとに格子の色が違う）
+                    model['textures']['top'] = f'{MODID}:block/{iid}_top'
                 if skin:
                     # マルチブロックのコントローラは、部品と同じ外装で包む（見た目をそろえる）
                     for key in ('top', 'side', 'bottom', 'particle'):
@@ -2050,6 +2061,16 @@ def art_textures():
                 sheet, frames = art16.machine_front(iid, stage_of(name), on)
                 path = tb / f'{iid}_front{"_on" if on else ""}.png'
                 art16.save(sheet, path)
+                if iid in art16.ANDROID_FACES:
+                    # 顔のバイザーは16pxの絵をそのまま拡大する（細かい表情を描き直さない）。まばたきも同じ動き
+                    hd = hb / f'{iid}_front{"_on" if on else ""}.png'
+                    art.save(sheet.resize((32, 32 * frames), __import__('PIL').Image.NEAREST), hd)
+                    for meta in (Path(str(path) + '.mcmeta'), Path(str(hd) + '.mcmeta')):
+                        if frames > 1:
+                            write_json(meta, art16.ANDROID_BLINK)
+                        elif meta.exists():
+                            meta.unlink()
+                    continue
                 if frames > 1:
                     write_json(Path(str(path) + '.mcmeta'), {'animation': {'frametime': 6, 'interpolate': True}})
                 art.save(art.machine_front(iid, stage_of(name), on), hb / f'{iid}_front{"_on" if on else ""}.png')
@@ -2731,6 +2752,17 @@ SOUNDS = {
     'genesis.big_bang': ('genesis/big_bang', '宇宙が生まれる', 'A universe is born', 128),
     'genesis.sky': ('genesis/sky', '銀河が空へ昇る', 'A galaxy rises into the sky', 128),
     'genesis.synth': ('genesis/synth', '質量が生まれる', 'Mass is synthesized', 24),
+    # アンドロイド（0.12.0。バニラの音の代わり）
+    'android.power_down': ('android/power_down', 'アンドロイドの充電が切れる', 'Android powers down', 16),
+    'android.charge_start': ('android/charge_start', 'アンドロイドが充電を始める', 'Android starts charging', 16),
+    'android.charged': ('android/charged', 'アンドロイドの充電が満ちる', 'Android is fully charged', 16),
+    'android.gunner_shot': ('android/gunner_shot', '小型銃が撃たれる', 'Pistol fires', 32),
+    'android.railgun_assemble': ('android/railgun_assemble', 'レールガンが組み上がる', 'Railgun assembles', 24),
+    'android.railgun_charge': ('android/railgun_charge', 'レールガンがためる', 'Railgun charges', 32),
+    'android.railgun_fire': ('android/railgun_fire', 'レールガンが放たれる', 'Railgun fires', 64),
+    'android.ring_inflate': ('android/ring_inflate', '浮き輪がふくらむ', 'Float ring inflates', 16),
+    # 画面のボタンを押した音（バニラのボタンと同じく、字幕は出さない）
+    'ui.click': ('ui/click', None, None, 16),
 }
 # 音のファイルがまだないときに代わりに鳴らすバニラの音（ファイルを置けば自動でそちらに替わる）
 SOUND_FALLBACKS = {
@@ -2834,8 +2866,11 @@ def sounds_json():
         else:
             missing.append(path)
             sounds = []
-        out[name] = {'subtitle': f'subtitles.{MODID}.{name}', 'sounds': sounds}
-        UI_LANG[f'subtitles.{MODID}.{name}'] = (ja, en)
+        if ja is None:
+            out[name] = {'sounds': sounds}
+        else:
+            out[name] = {'subtitle': f'subtitles.{MODID}.{name}', 'sounds': sounds}
+            UI_LANG[f'subtitles.{MODID}.{name}'] = (ja, en)
     unused = sorted(str(p.relative_to(base)).replace('\\', '/')[:-4] for p in base.rglob('*.ogg')
                     if str(p.relative_to(base)).replace('\\', '/')[:-4] not in used)
     if missing:
@@ -3513,6 +3548,7 @@ TAB_GROUPS = [
                  'android_backpack_upgrade', 'android_reinforced_backpack_upgrade', 'android_large_backpack_upgrade', 'android_tank_upgrade', 'android_gas_tank_upgrade', 'android_dual_tank_upgrade',
                  'android_mining_upgrade', 'android_felling_upgrade',
                  'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack', 'android_workbench',
+                 'advanced_android_workbench', 'quantum_android_workbench',
                  'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
                  'android_ribbon', 'android_hair_flower', 'android_beret', 'android_headdress', 'android_glasses', 'android_cape', 'android_scarf',
                  'android_waist_ribbon', 'android_book', 'android_bouquet', 'unfired_teacup', 'android_teacup', 'android_umbrella',

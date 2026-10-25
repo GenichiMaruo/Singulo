@@ -1016,7 +1016,7 @@ CHAPTERS = [
          'ない。空なら取りに行かない）。素材置き場になく、レシピで作れるなら、燃料を作る注文を自動で出す（作るあいだ、アンドロイドはほかの作業をする）。\n'
          '・確率で出る物: できた数が足りなければ、足りない分の素材を素材置き場から取って、集まるまで作り直す（素材がなければ、そろうまで待つ）。収穫・伐採・牧場では、まだ育つ物があれば育つのを待つ（20分まで）。アメジストは育ち'
          'きった塊だけ取り、芽生えたアメジストは壊さない。\n'
-         '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。作った物がアンドロイドの持ち物に入りきらないときは、足元に落とさずに台の預かり箱へ入れ、あとで取りに来る（取りに来られなくなった物は、右クリックで受け取れる）。預かり箱に物があるあいだは、台の上にその物が浮かぶ。',
+         '・アンドロイド作業台: バニラの作業台の4倍の速さで作る。作った物がアンドロイドの持ち物に入りきらないときは、足元に落とさずに台の預かり箱へ入れ、あとで取りに来る（取りに来られなくなった物は、右クリックで受け取れる）。預かり箱に物があるあいだは、台の上にその物が浮かぶ。上位の改良型（8倍速・54枠・充電の減り6割）と量子（20倍速・81枠・充電の減り3割）は、前の段階の台を素材にして作る。',
          'Farming, fluids and fuel',
          '- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole tr'
          'ees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk '
@@ -1038,7 +1038,8 @@ CHAPTERS = [
          'amethyst is never broken.\n'
          "- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's "
          "inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them "
-         "(right-click to take anything left behind). While the holding box has items, one of them floats above the workbench."),
+         "(right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. "
+         "The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier."),
         ('trouble', '止まっているとき',
          'アンドロイドが止まっているときは、理由を次の場所で確かめられます。\n'
          '・アンドロイドの画面の状態のページ: 吹き出しに赤い字で理由が出る。\n'

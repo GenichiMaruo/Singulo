@@ -18,13 +18,15 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 /** ワームホール固定化装置の画面。左右の2つの喉（口を入れる）と、エキゾチック物質・口の筐体。 */
 public class WormholeStabilizerMenu extends AbstractContainerMenu {
     public static final int D_PROGRESS_0 = 0, D_PROGRESS_1 = 1, D_ENERGY = 2, D_CAPACITY = 3, COUNT = 4;
-    public static final int WIDTH = 200;
+    public static final int WIDTH = 212;
     public static final int HEIGHT = 206;
+    /** 中身は幅200で設計してあり、枠の中央に置くために右へずらす量。 */
+    public static final int CONTENT_X = (WIDTH - 200) / 2;
     /** スロットの位置（menu と screen で共有）: 左の喉・右の喉・燃料・筐体。 */
-    public static final int[][] SLOT_POS = {{38, 46}, {146, 46}, {92, 88}, {116, 88}};
-    public static final int INV_X = 20;
-    public static final int INV_Y = 124;
-    public static final int HOTBAR_Y = 182;
+    public static final int[][] SLOT_POS = {{CONTENT_X + 38, 46}, {CONTENT_X + 146, 46}, {CONTENT_X + 92, 88}, {CONTENT_X + 116, 88}};
+    public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH);
+    public static final int INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT);
+    public static final int HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
 
     private final BlockPos pos;
     private final SyncedInts data;

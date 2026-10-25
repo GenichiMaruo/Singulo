@@ -1,0 +1,37 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:android_workbench"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:quantum_computing_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "tag": "c:plates/steel"
+      },
+      "count": 4
+    }
+  ],
+  "result": {
+    "id": "singulo:advanced_android_workbench",
+    "count": 1
+  }
+}

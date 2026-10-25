@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,15 +17,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
 
-public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
+public class MachineScreen extends FramedScreen<MachineMenu> {
     private static final int MODE_SIZE = 16;
 
     public MachineScreen(MachineMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-        imageWidth = menu.layout.width;
-        imageHeight = MachineLayout.HEIGHT;
-        inventoryLabelX = menu.layout.inventoryX;
-        inventoryLabelY = imageHeight - 94;
+        super(menu, inventory, title, menu.layout.width, MachineLayout.HEIGHT);
     }
 
     private MachineLayout layout() {
@@ -42,14 +37,14 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     private io.github.genichimaruo.singulo.machine.MachineDiagnosis.Result idleReason;
     private int reasonTimer;
 
-    private MachineBlockEntity.Status status() {
+    private MachineBlockEntity.Status machineStatus() {
         return MachineBlockEntity.Status.values()[menu.value(MachineBlockEntity.D_STATUS)];
     }
 
     @Override
     protected void containerTick() {
         super.containerTick();
-        if (status() != MachineBlockEntity.Status.IDLE || menu.value(MachineBlockEntity.D_MODE) > 0 || Minecraft.getInstance().level == null) {
+        if (machineStatus() != MachineBlockEntity.Status.IDLE || menu.value(MachineBlockEntity.D_MODE) > 0 || Minecraft.getInstance().level == null) {
             idleReason = null;
             return;
         }
@@ -70,9 +65,10 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
                 menu.value(MachineBlockEntity.D_STRUCTURE), type().selectsRecipe() ? selectedHolder() : null);
     }
 
-    /** 右上の状態の文字。待機中で理由が分かれば、理由を短く出す。 */
-    private Component statusText() {
-        MachineBlockEntity.Status status = status();
+    /** ヘッダー右の状態。待機中で理由が分かれば、理由を短く出す。 */
+    @Override
+    protected Component statusText() {
+        MachineBlockEntity.Status status = machineStatus();
         if (status == MachineBlockEntity.Status.IDLE && idleReason != null
                 && idleReason.kind() != io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.EMPTY) {
             return Component.translatable("gui.singulo.reason.label." + idleReason.kind().name().toLowerCase());
@@ -80,21 +76,38 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         return Component.translatable("gui.singulo.status." + status.name().toLowerCase());
     }
 
-    /** Reserve independent header regions; translated status labels may be wider than the machine name. */
-    private int statusWidth() {
-        return Math.min(font.width(statusText()), (imageWidth - 20) / 2);
+    @Override
+    protected int statusColor() {
+        boolean waiting = idleReason == null || idleReason.kind() == io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.EMPTY;
+        return switch (machineStatus()) {
+            case RUNNING -> GuiSkin.OK;
+            case NOT_FORMED -> GuiSkin.BAD;
+            case OFF -> GuiSkin.IDLE;
+            case IDLE -> waiting ? GuiSkin.IDLE : GuiSkin.WARN;
+            default -> GuiSkin.WARN;
+        };
     }
 
-    private int statusX() {
-        return imageWidth - 8 - statusWidth();
+    @Override
+    protected Panel.Status status() {
+        boolean waiting = idleReason == null || idleReason.kind() == io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.EMPTY;
+        return switch (machineStatus()) {
+            case RUNNING -> Panel.Status.RUN;
+            case IDLE -> waiting ? Panel.Status.IDLE : Panel.Status.WARN;
+            case NO_POWER -> Panel.Status.NO_POWER;
+            case OUTPUT_FULL -> Panel.Status.FULL;
+            case NOT_FORMED -> Panel.Status.BROKEN;
+            case OFF -> Panel.Status.OFF;
+        };
     }
 
-    /** 状態の文字に重ねたときの説明（どうすれば動くか）。 */
-    private List<Component> statusTooltip() {
-        return switch (status()) {
+    /** 状態に重ねたときの説明（どうすれば動くか）。 */
+    @Override
+    protected List<Component> statusTooltip() {
+        return switch (machineStatus()) {
             case IDLE -> idleReason == null ? List.of() : idleReason.lines();
-            case NO_POWER -> List.of(Component.translatable("gui.singulo.reason.no_power", menu.value(MachineBlockEntity.D_USAGE),
-                    menu.value(MachineBlockEntity.D_ENERGY)));
+            case NO_POWER -> List.of(Component.translatable("gui.singulo.reason.no_power", io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_USAGE)),
+                    io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_ENERGY))));
             case OUTPUT_FULL -> List.of(Component.translatable("gui.singulo.reason.output_full"));
             case NOT_FORMED -> List.of(Component.translatable("gui.singulo.reason.not_formed"));
             case OFF -> List.of(Component.translatable("gui.singulo.reason.off"));
@@ -102,8 +115,8 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         };
     }
 
-    /** 面の設定の画面を開いているか。開いている間は装置の部分にかぶせて描く。 */
-    private boolean sidesOpen;
+    /** 面の設定の窓。 */
+    private final Popup sides = new Popup("machine.sides");
     /** 0 はアイテム、1 以降はタンクごと（1 + タンクの番号、MachineBlockEntity.sideChannels）。 */
     private int sidesChannel;
     private static final int FACE = 18;
@@ -117,11 +130,11 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     private boolean cubeDragged;
 
     private float cubeX() {
-        return leftPos + layout().sideColumnX / 2F;
+        return sides.x + sides.w / 2F;
     }
 
     private float cubeY() {
-        return topPos + 46;
+        return sides.bodyY() + OVERLAY_H / 2F;
     }
 
     private java.util.List<SideCube.Quad> cubeQuads() {
@@ -139,25 +152,44 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        layoutPopups();
         super.render(g, mouseX, mouseY, partialTick);
-        if (sidesOpen) {
+        if (sides.open) {
             renderSides(g, mouseX, mouseY);
-            return;
         }
-        if (selectorOpen) {
+        if (selector.open) {
             renderSelector(g, mouseX, mouseY);
-            return;
         }
-        renderTooltip(g, mouseX, mouseY);
-        renderOwnTooltips(g, mouseX, mouseY);
+        if (!overPopup(mouseX, mouseY)) {
+            // 窓より手前に出す
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 400);
+            renderTooltip(g, mouseX, mouseY);
+            renderOwnTooltips(g, mouseX, mouseY);
+            g.pose().popPose();
+        }
+    }
+
+    @Override
+    protected List<Popup> popups() {
+        return List.of(selector, sides);
+    }
+
+    /** 窓の大きさと位置。初めて開くときは、下端を装置の部分の下端（インベントリの見出しの上）に合わせる。 */
+    private void layoutPopups() {
+        int bottom = io.github.genichimaruo.singulo.machine.GuiFrame.contentBottom(imageHeight);
+        int sh = Popup.BAR + 1 + OVERLAY_H;
+        sides.layout(leftPos, topPos, imageWidth - 8, sh, 4, bottom - sh, width, height);
+        int ph = Popup.BAR + 1 + selectRows() * 18 + 8;
+        selector.layout(leftPos, topPos, imageWidth - 8, ph, 4, bottom - ph, width, height);
     }
 
     // ------------------------------------------------------------------ 面の設定
 
     /** 面のボタンの位置（十字の展開図。中央が正面）。 */
     private int[] facePos(io.github.genichimaruo.singulo.machine.SideConfig.Face f) {
-        int cx = leftPos + layout().sideColumnX / 2 - FACE / 2;
-        int cy = topPos + 36;
+        int cx = leftPos + imageWidth / 2 - FACE / 2;
+        int cy = topPos + 38;
         return switch (f) {
             case FRONT -> new int[]{cx, cy};
             case TOP -> new int[]{cx, cy - FACE - 2};
@@ -210,8 +242,22 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         return mode == on ? 0 : on;
     }
 
-    private int tabWidth(String label, int index) {
-        return font.width(label) + 8 + (index > 0 ? 6 : 0);
+    /** 面の設定のタブ（板の左に縦に並ぶ記号のボタン）。 */
+    private int[] tabRect(int index) {
+        return new int[]{sides.x + 4, sides.bodyY() + 4 + index * 15, 13, 13};
+    }
+
+    /** 凡例の色見本（板の右に縦に並ぶ。重ねると意味が出る）。 */
+    private int[] legendRect(int index) {
+        return new int[]{sides.x + sides.w - 15, sides.bodyY() + 20 + index * 11, 9, 9};
+    }
+
+    /** 今のタブで選べるモード（アイテムは4つ、タンクは無効と入力か出力）。 */
+    private int[] legendModes() {
+        if (channelTank() < 0) {
+            return new int[]{0, 1, 2, 3};
+        }
+        return new int[]{0, channelIsInputTank() ? io.github.genichimaruo.singulo.machine.SideConfig.INPUT : io.github.genichimaruo.singulo.machine.SideConfig.OUTPUT};
     }
 
     /** 面の色: アイテムはモードの色、タンクは使う面だけそのタンクの色。 */
@@ -226,56 +272,97 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         return menu.value(MachineBlockEntity.D_FLAGS);
     }
 
-    /** 電源スイッチと、材料なしのレシピのスイッチ（右の列の下）。 */
-    private int[] powerPos() {
-        return new int[]{leftPos + layout().sideColumnX + 2, topPos + 60, 10, 10};
+    @Override
+    protected Boolean powered() {
+        return (flags() & MachineBlockEntity.FLAG_ENABLED) != 0;
     }
 
+    @Override
+    protected void togglePower() {
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_POWER);
+        }
+    }
+
+    /** 材料なしのレシピのスイッチ（ヘッダーの電源の左）。 */
     private int[] freePos() {
-        return new int[]{leftPos + layout().sideColumnX + 13, topPos + 60, 10, 10};
+        return new int[]{leftPos + io.github.genichimaruo.singulo.machine.GuiFrame.powerX(imageWidth) - 13,
+                topPos + io.github.genichimaruo.singulo.machine.GuiFrame.POWER_Y, 11, 11};
     }
 
     private boolean showsFreeSwitch() {
         return (flags() & MachineBlockEntity.FLAG_HAS_FREE) != 0;
     }
 
-    private void drawSwitches(GuiGraphics g, int mouseX, int mouseY) {
-        int[] p = powerPos();
-        Panel.powerButton(g, p[0], p[1], (flags() & MachineBlockEntity.FLAG_ENABLED) != 0,
-                Panel.inside(mouseX, mouseY, p[0], p[1], p[2], p[3]));
+    @Override
+    protected int headerReserved() {
+        return showsFreeSwitch() ? 13 : 0;
+    }
+
+    /** 稲妻の印（電力だけで作る）。作らないときは斜線を重ねる。 */
+    private void drawFreeSwitch(GuiGraphics g, int mouseX, int mouseY) {
         if (!showsFreeSwitch()) {
             return;
         }
-        int c = 0xFFFFFFFF;
         boolean free = (flags() & MachineBlockEntity.FLAG_MAKE_FREE) != 0;
         int[] f = freePos();
-        boolean fh = Panel.inside(mouseX, mouseY, f[0], f[1], f[2], f[3]);
-        g.fill(f[0] - 1, f[1] - 1, f[0] + f[2] + 1, f[1] + f[3] + 1, Panel.WELL_EDGE);
-        g.fill(f[0], f[1], f[0] + f[2], f[1] + f[3], free ? (fh ? Panel.GLOW : 0xFF3A9CC0) : (fh ? 0xFFB0B8C0 : 0xFF9AA2AA));
-        // 稲妻の印（電力だけで作る）。作らないときは斜線を重ねる
-        g.fill(f[0] + 5, f[1] + 1, f[0] + 7, f[1] + 3, c);
-        g.fill(f[0] + 4, f[1] + 3, f[0] + 6, f[1] + 5, c);
-        g.fill(f[0] + 3, f[1] + 5, f[0] + 7, f[1] + 6, c);
-        g.fill(f[0] + 5, f[1] + 6, f[0] + 7, f[1] + 7, c);
-        g.fill(f[0] + 4, f[1] + 7, f[0] + 6, f[1] + 9, c);
+        boolean hover = Panel.inside(mouseX, mouseY, f[0], f[1], f[2], f[3]);
+        int d = Panel.button(g, skin, f[0], f[1], f[2], f[3], free ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        Panel.boltIcon(g, f[0] + 2, f[1] + 2 + d, free ? skin.onAccent() : skin.text());
         if (!free) {
-            for (int i = 0; i < 9; i++) {
-                g.fill(f[0] + 1 + i, f[1] + 8 - i, f[0] + 2 + i, f[1] + 9 - i, 0xFFB05050);
+            for (int i = 0; i < 7; i++) {
+                g.fill(f[0] + 2 + i, f[1] + 8 - i + d, f[0] + 3 + i, f[1] + 9 - i + d, 0xFFD85050);
             }
         }
     }
 
-    /** 面の設定ボタンの左端（右の列の中央）。 */
-    private int sidesButtonX() {
-        return layout().sideColumnX + (MachineLayout.SIDE_COLUMN - MachineLayout.SIDES_SIZE) / 2;
+    // ------------------------------------------------------------------ 右レール
+
+    @Override
+    protected boolean railUsed(int row) {
+        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE
+                || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS && hasSides();
     }
 
-    /** 自動排出の全体スイッチの位置（設定の右下）。 */
-    private int[] masterPos() {
-        String text = Component.translatable("gui.singulo.sides.master_on").getString();
-        int w = font.width(text) + 8;
-        return new int[]{leftPos + layout().sideColumnX - 8 - w, topPos + 14 + 3, w, 11};
+    @Override
+    protected boolean railConnected(int row) {
+        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE || sides.open;
     }
+
+    @Override
+    protected void drawRail(GuiGraphics g, int row, int x, int y, boolean hover) {
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
+            Panel.sidesIcon(g, x, y);
+            return;
+        }
+        drawSpecialSlot(g, leftPos + layout().upgradeX, topPos + layout().upgradeY, 0, type().upgradeSlot(), "monopole_upgrade");
+    }
+
+    @Override
+    protected boolean clickRail(int row, int button) {
+        if (row != io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
+            return false;
+        }
+        sides.open = !sides.open;
+        selector.open = false;
+        return true;
+    }
+
+    @Override
+    protected Component railTooltip(int row) {
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
+            return Component.translatable("gui.singulo.sides.button");
+        }
+        return menu.getSlot(type().upgradeSlot()).getItem().isEmpty() ? Component.translatable("gui.singulo.slot.upgrade") : null;
+    }
+
+    /** 自動排出の全体スイッチの位置（板の右上）。 */
+    private int[] masterPos() {
+        return new int[]{sides.x + sides.w - 17, sides.bodyY() + 4, 13, 13};
+    }
+
+    /** 面の設定の窓の中身の高さ。 */
+    private static final int OVERLAY_H = 66;
 
     private int sidesPacked() {
         return menu.value(MachineBlockEntity.sidesIndex(type()) + sidesChannel);
@@ -284,26 +371,19 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     private void renderSides(GuiGraphics g, int mouseX, int mouseY) {
         g.pose().pushPose();
         g.pose().translate(0, 0, 400);
-        int x = leftPos + 4;
-        int y = topPos + 14;
-        int w = layout().sideColumnX - 8;
-        int h = 66;
-        g.fill(x, y, x + w, y + h, 0xF0E9EDF0);
-        g.fill(x, y, x + w, y + 1, Panel.SEAM);
-        // タブ（タンクのタブはそのタンクの色。選んでいなければ左に色の印）
-        List<String> tabs = sideTabs();
-        int tx = x + 4;
-        for (int i = 0; i < tabs.size(); i++) {
-            int tw = tabWidth(tabs.get(i), i);
-            int color = i == 0 ? 0xFF2A6F8A : tankColor(i - 1);
-            g.fill(tx, y + 3, tx + tw, y + 14, i == sidesChannel ? color : Panel.SHADE);
-            int text = tx + 4;
-            if (i > 0) {
-                g.fill(tx + 3, y + 5, tx + 7, y + 12, color);
-                text += 6;
+        sides.draw(g, skin, mouseX, mouseY);
+        // タブ: アイテムは箱、タンクはそのタンクの色のしずく（入れるタンクは下向き、出すタンクは上向きの矢印）
+        int tabs = sideTabs().size();
+        for (int i = 0; i < tabs; i++) {
+            int[] t = tabRect(i);
+            boolean on = i == sidesChannel;
+            boolean hover = Panel.inside(mouseX, mouseY, t[0], t[1], t[2], t[3]);
+            int d = Panel.button(g, skin, t[0], t[1], t[2], t[3], on ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+            if (i == 0) {
+                Panel.boxIcon(g, t[0] + 2, t[1] + 3 + d, on ? skin.onAccent() : skin.text());
+            } else {
+                Panel.dropIcon(g, t[0] + 3, t[1] + 2 + d, tankColor(i - 1), i - 1 < type().fluidInputs());
             }
-            g.drawString(font, tabs.get(i), text, y + 5, i == sidesChannel ? 0xFFFFFFFF : Panel.TEXT, false);
-            tx += tw + 2;
         }
         int packed = sidesPacked();
         var quads = cubeQuads();
@@ -316,15 +396,19 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         if (!channelIsInputTank()) {
             int[] mp = masterPos();
             boolean mh = Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3]);
-            g.fill(mp[0], mp[1], mp[0] + mp[2], mp[1] + mp[3], master ? (mh ? 0xFF6ACB8A : 0xFF50B870) : (mh ? 0xFFB0B8C0 : 0xFF9AA2AA));
-            g.drawString(font, Component.translatable(master ? "gui.singulo.sides.master_on" : "gui.singulo.sides.master_off"),
-                    mp[0] + 4, mp[1] + 2, 0xFFFFFFFF, false);
+            int d = Panel.button(g, skin, mp[0], mp[1], mp[2], mp[3], master ? Panel.Press.ON : mh ? Panel.Press.HOVER : Panel.Press.NORMAL);
+            Panel.ejectIcon(g, mp[0] + 2, mp[1] + 2 + d, master ? skin.onAccent() : skin.text());
         }
-        // 凡例
-        int ly = y + h - 10;
-        String legend = channelTank() < 0 ? "gui.singulo.sides.legend"
-                : channelIsInputTank() ? "gui.singulo.sides.legend_tank_in" : "gui.singulo.sides.legend_tank_out";
-        g.drawString(font, Component.translatable(legend), x + 4, ly, Panel.TEXT, false);
+        // 凡例: 色見本だけ（重ねるとモードの名前）
+        int[] modes = legendModes();
+        for (int i = 0; i < modes.length; i++) {
+            int[] r = legendRect(i);
+            Panel.inset(g, skin, r[0], r[1], r[2], r[3], faceColor(modes[i]));
+        }
+        List<Component> tip = sidesTooltip(mouseX, mouseY, master);
+        if (!tip.isEmpty()) {
+            Panel.tooltip(g, font, tip, 200, mouseX, mouseY);
+        }
         if (hovered != null) {
             int mode = io.github.genichimaruo.singulo.machine.SideConfig.mode(packed, hovered);
             List<Component> lines = new ArrayList<>();
@@ -349,18 +433,37 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         g.pose().popPose();
     }
 
-    private boolean clickSides(double mouseX, double mouseY, int button) {
-        int x = leftPos + 4;
-        int y = topPos + 14;
-        int tx = x + 4;
+    /** 面の設定の板の記号に重ねたときの名前。 */
+    private List<Component> sidesTooltip(int mouseX, int mouseY, boolean master) {
         List<String> tabs = sideTabs();
         for (int i = 0; i < tabs.size(); i++) {
-            int tw = tabWidth(tabs.get(i), i);
-            if (Panel.inside(mouseX, mouseY, tx, y + 3, tw, 11)) {
+            int[] t = tabRect(i);
+            if (Panel.inside(mouseX, mouseY, t[0], t[1], t[2], t[3])) {
+                return List.of(Component.literal(tabs.get(i)));
+            }
+        }
+        int[] mp = masterPos();
+        if (!channelIsInputTank() && Panel.inside(mouseX, mouseY, mp[0], mp[1], mp[2], mp[3])) {
+            return List.of(Component.translatable(master ? "gui.singulo.sides.master_on" : "gui.singulo.sides.master_off"));
+        }
+        int[] modes = legendModes();
+        for (int i = 0; i < modes.length; i++) {
+            int[] r = legendRect(i);
+            if (Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
+                return List.of(Component.translatable("gui.singulo.sides.mode." + modes[i]));
+            }
+        }
+        return List.of();
+    }
+
+    private boolean clickSides(double mouseX, double mouseY, int button) {
+        List<String> tabs = sideTabs();
+        for (int i = 0; i < tabs.size(); i++) {
+            int[] t = tabRect(i);
+            if (Panel.inside(mouseX, mouseY, t[0], t[1], t[2], t[3])) {
                 sidesChannel = i;
                 return true;
             }
-            tx += tw + 2;
         }
         int packed = sidesPacked();
         int[] mp = masterPos();
@@ -400,7 +503,10 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
-        if (sidesOpen && cubePress >= 0) {
+        if (selector.drag(leftPos, topPos, mouseX, mouseY) || sides.drag(leftPos, topPos, mouseX, mouseY)) {
+            return true;
+        }
+        if (sides.open && cubePress >= 0) {
             if (Math.abs(mouseX - pressX) + Math.abs(mouseY - pressY) > 3) {
                 cubeDragged = true;
             }
@@ -414,7 +520,10 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (sidesOpen && cubePress >= 0 && button == cubePress) {
+        if (selector.release() | sides.release()) {
+            return true;
+        }
+        if (sides.open && cubePress >= 0 && button == cubePress) {
             if (!cubeDragged) {
                 var face = cube.pick(cubeQuads(), mouseX, mouseY);
                 if (face != null) {
@@ -431,12 +540,13 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         int x = leftPos;
         int y = topPos;
-        Panel.background(g, x, y, imageWidth, imageHeight);
+        drawFrame(g, mouseX, mouseY);
+        drawFreeSwitch(g, mouseX, mouseY);
         MachineLayout l = layout();
 
         int energy = menu.value(MachineBlockEntity.D_ENERGY);
         int capacity = Math.max(1, menu.value(MachineBlockEntity.D_CAPACITY));
-        Panel.verticalBar(g, x + MachineLayout.ENERGY_X, y + MachineLayout.TOP, 8, MachineLayout.BAR_HEIGHT,
+        Panel.gauge(g, skin, x + MachineLayout.ENERGY_X, y + MachineLayout.TOP, 8, MachineLayout.BAR_HEIGHT,
                 (double) energy / capacity, Panel.GLOW);
 
         for (int i = 0; i < l.fluidInX.length; i++) {
@@ -446,54 +556,32 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             drawTank(g, x + l.fluidOutX[i], y + MachineLayout.TOP, type().fluidInputs() + i);
         }
         for (int i = 0; i < type().inputSlots(); i++) {
-            Panel.slot(g, x + l.inputX[i], y + l.inputY[i]);
+            Panel.slot(g, skin, x + l.inputX[i], y + l.inputY[i]);
         }
         for (int i = 0; i < type().outputSlots(); i++) {
-            Panel.slot(g, x + l.outputX, y + l.outputY[i]);
+            Panel.slot(g, skin, x + l.outputX, y + l.outputY[i]);
         }
-        // 右端の列: 単極子アップグレードと面の設定ボタン
-        g.fill(x + l.sideColumnX, y + 14, x + l.sideColumnX + 1, y + 76, Panel.SEAM);
-        drawSpecialSlot(g, x + l.sideColumnX + 4, y + MachineLayout.UPGRADE_Y, 0xFFB48CFF, type().upgradeSlot(), "monopole_upgrade");
-        if (hasSides()) {
-            int sbx = x + sidesButtonX();
-            int sby = y + MachineLayout.SIDES_Y;
-            int bs = MachineLayout.SIDES_SIZE;
-            boolean hover = Panel.inside(mouseX, mouseY, sbx, sby, bs, bs);
-            g.fill(sbx - 1, sby - 1, sbx + bs + 1, sby + bs + 1, Panel.WELL_EDGE);
-            g.fill(sbx, sby, sbx + bs, sby + bs, sidesOpen ? 0xFF2A6F8A : hover ? Panel.GLOW : Panel.SHADE);
-            // 立方体の展開図の小さなアイコン
-            int ic = sidesOpen ? 0xFFFFFFFF : Panel.TEXT;
-            g.fill(sbx + 4, sby + 2, sbx + 6, sby + 4, ic);
-            g.fill(sbx + 2, sby + 4, sbx + 8, sby + 6, ic);
-            g.fill(sbx + 4, sby + 6, sbx + 6, sby + 8, ic);
-        }
-        drawSwitches(g, mouseX, mouseY);
         if (type().hasCatalystSlot()) {
             drawSpecialSlot(g, x + l.catalystX, y + l.catalystY, Panel.AMBER, type().catalystSlot(), "time_crystal_catalyst");
         }
         int progress = menu.value(MachineBlockEntity.D_PROGRESS);
         int max = Math.max(1, menu.value(MachineBlockEntity.D_MAX_PROGRESS));
-        Panel.arrow(g, x + l.arrowX, y + MachineLayout.ARROW_Y, (double) progress / max);
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                Panel.slot(g, x + l.inventoryX + col * 18, y + 84 + row * 18);
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            Panel.slot(g, x + l.inventoryX + col * 18, y + 142);
-        }
+        Panel.arrow(g, skin, x + l.arrowX, y + l.arrowY, (double) progress / max);
 
         if (type().massMode()) {
             int bx = x + l.modeX;
-            int by = y + MachineLayout.MODE_Y;
-            Panel.well(g, bx, by, MODE_SIZE, MODE_SIZE);
+            int by = y + l.modeY;
+            boolean hover = Panel.inside(mouseX, mouseY, bx, by, MODE_SIZE, MODE_SIZE);
+            Panel.button(g, skin, bx - 1, by - 1, MODE_SIZE + 2, MODE_SIZE + 2, hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
             g.renderItem(modeIcon(), bx, by);
             int target = menu.value(MachineBlockEntity.D_MASS_TARGET);
             if (target > 0) {
-                Panel.well(g, bx + MODE_SIZE + 4, by + 5, 48, 6);
+                int mx = x + l.massBarX;
+                Panel.well(g, skin, mx, by + 5, l.massBarWidth, 6);
                 double f = (double) menu.value(MachineBlockEntity.D_MASS) / target;
-                g.fill(bx + MODE_SIZE + 4, by + 5, bx + MODE_SIZE + 4 + (int) Math.round(48 * Math.min(1, f)), by + 11, Panel.GLOW);
+                int filled = (int) Math.round(l.massBarWidth * Math.min(1, f));
+                g.fill(mx, by + 5, mx + filled, by + 11, Panel.GLOW);
+                Panel.glass(g, mx, by + 5, filled, 6);
             }
         }
         if (type().selectsRecipe()) {
@@ -503,16 +591,33 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     // ------------------------------------------------------------------ 作るものの指定
 
-    /** 作るものを選ぶ画面を開いているか。開いている間は装置の部分にかぶせて描く。 */
-    private boolean selectorOpen;
+    /** 作るものを選ぶ窓。 */
+    private final Popup selector = new Popup("machine.select");
     /** 選ぶ画面の、上から隠れている行の数。 */
     private int selectorScroll;
-    private static final int SELECT_COLUMNS = 9;
-    private static final int SELECT_ROWS = 3;
-
-    /** 作るものボタン（出力スロットの下）。 */
+    /** 作るものボタン（出力スロットの右）。 */
     private int[] selectPos() {
-        return new int[]{leftPos + layout().outputX, topPos + 56, 16, 16};
+        return new int[]{leftPos + layout().selectX, topPos + layout().selectY, 16, 16};
+    }
+
+    /** 選ぶ板の行数（設定の値を、画面に収まる数までにする）。 */
+    private int selectRows() {
+        return Math.max(2, Math.min(io.github.genichimaruo.singulo.generated.ClientConfig.SELECTOR_ROWS.get(), maxSelectRows()));
+    }
+
+    /** 画面の高さに入る行数。 */
+    private int maxSelectRows() {
+        return Math.max(2, Math.min(8, (height - 4 - Popup.BAR - 1 - 8) / 18));
+    }
+
+    private int selectColumns() {
+        return (imageWidth - 8 - 8 - 14) / 18;
+    }
+
+    private void setSelectRows(int rows) {
+        var value = io.github.genichimaruo.singulo.generated.ClientConfig.SELECTOR_ROWS;
+        value.set(Math.max(2, Math.min(rows, maxSelectRows())));
+        value.save();
     }
 
     @javax.annotation.Nullable
@@ -534,13 +639,12 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int[] p = selectPos();
         boolean hover = Panel.inside(mouseX, mouseY, p[0], p[1], p[2], p[3]);
         RecipeHolder<MachineRecipe> selected = selectedHolder();
-        g.fill(p[0] - 2, p[1] - 2, p[0] + 18, p[1] + 18, selected != null ? 0xFF3A9CC0 : hover ? Panel.GLOW : Panel.WELL_EDGE);
-        Panel.slot(g, p[0], p[1]);
+        Panel.button(g, skin, p[0] - 2, p[1] - 2, 20, 20, selected != null ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        Panel.slot(g, skin, p[0], p[1]);
         if (selected != null) {
             g.renderItem(selected.value().result(), p[0], p[1]);
         } else {
-            String a = Component.translatable("gui.singulo.select.auto_short").getString();
-            g.drawString(font, a, p[0] + 8 - font.width(a) / 2, p[1] + 4, 0xFFB8C2CC, false);
+            Panel.autoIcon(g, p[0] + 4, p[1] + 3, 0xFFB8C2CC);
         }
     }
 
@@ -578,21 +682,33 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         return matched;
     }
 
-    /** 選ぶ画面の枠（装置の部分にかぶせる）。 */
+    /** 選ぶ窓の中身（帯の下）。行を増やすと窓は下端を保ったまま上へ伸びる。 */
     private int[] selectorBox() {
-        return new int[]{leftPos + 4, topPos + 14, layout().sideColumnX - 8, 66};
+        return new int[]{selector.x, selector.bodyY(), selector.w, selectRows() * 18 + 8};
     }
 
     private int[] cellPos(int visibleIndex) {
         int[] box = selectorBox();
-        int x0 = box[0] + (box[2] - SELECT_COLUMNS * 18) / 2;
-        return new int[]{x0 + (visibleIndex % SELECT_COLUMNS) * 18, box[1] + 12 + (visibleIndex / SELECT_COLUMNS) * 18};
+        int cols = selectColumns();
+        return new int[]{box[0] + 4 + (visibleIndex % cols) * 18, box[1] + 4 + (visibleIndex / cols) * 18};
+    }
+
+    /** 板の右の列: 行を増やす・減らすボタンと、スクロールバー。 */
+    private int[] rowsMorePos() {
+        int[] box = selectorBox();
+        return new int[]{box[0] + box[2] - 15, box[1] + 4, 11, 10};
+    }
+
+    private int[] rowsLessPos() {
+        int[] box = selectorBox();
+        return new int[]{box[0] + box[2] - 15, box[1] + 15, 11, 10};
     }
 
     /** 画面上の位置にある並びの番号（なければ -1）。 */
     private int entryAt(double mouseX, double mouseY, int count) {
-        for (int v = 0; v < SELECT_COLUMNS * SELECT_ROWS; v++) {
-            int index = selectorScroll * SELECT_COLUMNS + v;
+        int cols = selectColumns();
+        for (int v = 0; v < cols * selectRows(); v++) {
+            int index = selectorScroll * cols + v;
             if (index >= count) {
                 break;
             }
@@ -608,21 +724,40 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         g.pose().pushPose();
         g.pose().translate(0, 0, 400);
         int[] box = selectorBox();
-        g.fill(box[0], box[1], box[0] + box[2], box[1] + box[3], 0xF0E9EDF0);
-        g.fill(box[0], box[1], box[0] + box[2], box[1] + 1, Panel.SEAM);
+        selector.draw(g, skin, mouseX, mouseY);
         List<RecipeHolder<MachineRecipe>> entries = selectorEntries();
-        int rows = (entries.size() + SELECT_COLUMNS - 1) / SELECT_COLUMNS;
-        selectorScroll = Math.max(0, Math.min(selectorScroll, rows - SELECT_ROWS));
-        g.drawString(font, Component.translatable("gui.singulo.select.title"), box[0] + 4, box[1] + 2, Panel.TEXT, false);
-        if (rows > SELECT_ROWS) {
-            String page = (selectorScroll + 1) + "-" + Math.min(rows, selectorScroll + SELECT_ROWS) + "/" + rows;
-            g.drawString(font, page, box[0] + box[2] - 4 - font.width(page), box[1] + 2, 0xFF8A949E, false);
+        int cols = selectColumns();
+        int visibleRows = selectRows();
+        int rows = (entries.size() + cols - 1) / cols;
+        selectorScroll = Math.max(0, Math.min(selectorScroll, rows - visibleRows));
+        // 行を増やす・減らす
+        int[] more = rowsMorePos();
+        int[] less = rowsLessPos();
+        boolean canMore = visibleRows < maxSelectRows();
+        boolean canLess = visibleRows > 2;
+        int dm = Panel.button(g, skin, more[0], more[1], more[2], more[3], !canMore ? Panel.Press.DISABLED
+                : Panel.inside(mouseX, mouseY, more[0], more[1], more[2], more[3]) ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        Panel.plusIcon(g, more[0] + 3, more[1] + 2 + dm, canMore ? skin.text() : skin.dim());
+        int dl = Panel.button(g, skin, less[0], less[1], less[2], less[3], !canLess ? Panel.Press.DISABLED
+                : Panel.inside(mouseX, mouseY, less[0], less[1], less[2], less[3]) ? Panel.Press.HOVER : Panel.Press.NORMAL);
+        Panel.minusIcon(g, less[0] + 3, less[1] + 2 + dl, canLess ? skin.text() : skin.dim());
+        // スクロールバー（隠れている行があるときだけつまみを出す）
+        int trackX = more[0] + 3;
+        int trackY = less[1] + less[3] + 3;
+        int trackH = box[1] + box[3] - 5 - trackY;
+        if (trackH > 4) {
+            Panel.well(g, skin, trackX, trackY, 5, trackH);
+            if (rows > visibleRows) {
+                int thumb = Math.max(4, trackH * visibleRows / rows);
+                int ty = trackY + (trackH - thumb) * selectorScroll / Math.max(1, rows - visibleRows);
+                Panel.button(g, skin, trackX, ty, 5, thumb, Panel.Press.NORMAL);
+            }
         }
         RecipeHolder<MachineRecipe> selected = selectedHolder();
         List<ItemStack> inputs = recipeInputs();
         int hovered = entryAt(mouseX, mouseY, entries.size());
-        for (int v = 0; v < SELECT_COLUMNS * SELECT_ROWS; v++) {
-            int index = selectorScroll * SELECT_COLUMNS + v;
+        for (int v = 0; v < cols * visibleRows; v++) {
+            int index = selectorScroll * cols + v;
             if (index >= entries.size()) {
                 break;
             }
@@ -630,12 +765,13 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             int[] c = cellPos(v);
             boolean isSelected = h == null ? selected == null : selected != null && selected.id().equals(h.id());
             boolean ready = h != null && h.value().plan(inputs) != null;
-            int frame = isSelected ? 0xFF3A9CC0 : index == hovered ? Panel.GLOW : ready ? 0xFF50B870 : Panel.SEAM;
-            g.fill(c[0], c[1], c[0] + 18, c[1] + 18, frame);
-            g.fill(c[0] + 1, c[1] + 1, c[0] + 17, c[1] + 17, Panel.WELL);
+            Panel.slot(g, skin, c[0] + 1, c[1] + 1);
+            int ring = isSelected ? skin.accent() : index == hovered ? Panel.GLOW : ready ? GuiSkin.OK : 0;
+            if (ring != 0) {
+                g.renderOutline(c[0], c[1], 18, 18, ring);
+            }
             if (h == null) {
-                String a = Component.translatable("gui.singulo.select.auto_short").getString();
-                g.drawString(font, a, c[0] + 9 - font.width(a) / 2, c[1] + 5, 0xFFE9EDF0, false);
+                Panel.autoIcon(g, c[0] + 5, c[1] + 4, 0xFFE9EDF0);
             } else {
                 g.renderItem(h.value().result(), c[0] + 1, c[1] + 1);
                 g.renderItemDecorations(font, h.value().result(), c[0] + 1, c[1] + 1);
@@ -643,6 +779,10 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         }
         if (hovered >= 0) {
             Panel.tooltip(g, font, selectorTooltip(entries.get(hovered)), 230, mouseX, mouseY);
+        } else if (canMore && Panel.inside(mouseX, mouseY, more[0], more[1], more[2], more[3])) {
+            g.renderTooltip(font, Component.translatable("gui.singulo.select.rows_more"), mouseX, mouseY);
+        } else if (canLess && Panel.inside(mouseX, mouseY, less[0], less[1], less[2], less[3])) {
+            g.renderTooltip(font, Component.translatable("gui.singulo.select.rows_less"), mouseX, mouseY);
         }
         g.pose().popPose();
     }
@@ -675,6 +815,16 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
     }
 
     private boolean clickSelector(double mouseX, double mouseY) {
+        int[] more = rowsMorePos();
+        if (Panel.inside(mouseX, mouseY, more[0], more[1], more[2], more[3])) {
+            setSelectRows(selectRows() + 1);
+            return true;
+        }
+        int[] less = rowsLessPos();
+        if (Panel.inside(mouseX, mouseY, less[0], less[1], less[2], less[3])) {
+            setSelectRows(selectRows() - 1);
+            return true;
+        }
         List<RecipeHolder<MachineRecipe>> entries = selectorEntries();
         int index = entryAt(mouseX, mouseY, entries.size());
         if (index < 0 || minecraft == null || minecraft.gameMode == null) {
@@ -685,13 +835,12 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         int id = h == null || level == null ? -1 : io.github.genichimaruo.singulo.machine.RecipeSelection.indexOf(level, type(), h.id());
         minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id < 0 ? MachineMenu.BUTTON_CLEAR_SELECTION
                 : MachineMenu.BUTTON_SELECT + id);
-        selectorOpen = false;
         return true;
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (selectorOpen) {
+        if (selector.contains(mouseX, mouseY)) {
             selectorScroll = Math.max(0, selectorScroll - (int) Math.signum(scrollY));
             return true;
         }
@@ -700,40 +849,40 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        AndroidStationScreen.fit(g, font, title, titleLabelX, titleLabelY, statusX() - titleLabelX - 4, Panel.TEXT);
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
-        MachineBlockEntity.Status status = status();
-        Component text = statusText();
-        boolean waiting = status == MachineBlockEntity.Status.IDLE && (idleReason == null
-                || idleReason.kind() == io.github.genichimaruo.singulo.machine.MachineDiagnosis.Kind.EMPTY);
-        int color = switch (status) {
-            case RUNNING -> 0xFF3A9CC0;
-            case NOT_FORMED -> 0xFFC05050;
-            case OFF -> 0xFF8A949E;
-            case IDLE -> waiting ? 0xFF8A949E : 0xFFC08020;
-            default -> 0xFFC08020;
-        };
-        AndroidStationScreen.fit(g, font, text, statusX(), titleLabelY, statusWidth(), color);
-        int size = menu.value(MachineBlockEntity.D_STRUCTURE);
-        if (size > 0) {
-            Component info = Component.translatable("gui.singulo.structure." + type().id(), size);
-            g.drawString(font, info, imageWidth - 8 - font.width(info), inventoryLabelY, Panel.TEXT, false);
+        drawLabels(g);
+        int[] r = structureRect();
+        if (r != null) {
+            Panel.structureIcon(g, r[0] - leftPos, r[1] - topPos + 1, skin.dim());
+            g.drawString(font, String.valueOf(menu.value(MachineBlockEntity.D_STRUCTURE)), r[0] - leftPos + 10, inventoryLabelY, skin.dim(), false);
         }
+    }
+
+    /** マルチブロックの大きさ（格子の記号と数。見出しの行の右端。説明はツールチップ）。 */
+    @javax.annotation.Nullable
+    private int[] structureRect() {
+        int size = menu.value(MachineBlockEntity.D_STRUCTURE);
+        if (size <= 0) {
+            return null;
+        }
+        int w = 10 + font.width(String.valueOf(size));
+        return new int[]{leftPos + imageWidth - 8 - w, topPos + inventoryLabelY - 1, w, 10};
     }
 
     private void drawTank(GuiGraphics g, int x, int y, int tank) {
         int fluidId = menu.value(MachineBlockEntity.D_TANKS + tank * 2);
         int amount = menu.value(MachineBlockEntity.D_TANKS + tank * 2 + 1);
         if (hasSides()) {
-            // 面の設定のタブと同じ色の枠（このタンクがどの面を使うかを色で対応させる）
-            g.fill(x - 2, y - 2, x + MachineLayout.TANK_WIDTH + 2, y + MachineLayout.BAR_HEIGHT + 2, tankColor(tank));
+            // 面の設定のタブと同じ色の縁（このタンクがどの面を使うかを色で対応させる）
+            g.renderOutline(x - 2, y - 2, MachineLayout.TANK_WIDTH + 4, MachineLayout.BAR_HEIGHT + 4, tankColor(tank));
         }
         if (fluidId > 0) {
             Fluid fluid = BuiltInRegistries.FLUID.byId(fluidId - 1);
-            FluidGauge.draw(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT,
-                    (double) amount / MachineType.TANK_CAPACITY, fluid);
+            double fraction = (double) amount / MachineType.TANK_CAPACITY;
+            FluidGauge.draw(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT, fraction, fluid);
+            int filled = (int) Math.round(MachineLayout.BAR_HEIGHT * Math.min(1, fraction));
+            Panel.glass(g, x, y + MachineLayout.BAR_HEIGHT - filled, MachineLayout.TANK_WIDTH, filled);
         } else {
-            Panel.well(g, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT);
+            Panel.well(g, skin, x, y, MachineLayout.TANK_WIDTH, MachineLayout.BAR_HEIGHT);
         }
     }
 
@@ -755,21 +904,13 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         MachineLayout l = layout();
         int x = leftPos;
         int y = topPos;
-        if (Panel.inside(mouseX, mouseY, x + titleLabelX, y + titleLabelY - 1, statusX() - titleLabelX - 4, 10)
-                && font.width(title) > statusX() - titleLabelX - 4) {
-            Panel.tooltip(g, font, List.of(title), 200, mouseX, mouseY);
+        if (renderFrameTooltips(g, mouseX, mouseY)) {
             return;
         }
-        if (Panel.inside(mouseX, mouseY, x + statusX(), y + titleLabelY - 1, statusWidth(), 10)) {
-            List<Component> lines = statusTooltip();
-            if (!lines.isEmpty()) {
-                Panel.tooltip(g, font, lines, 200, mouseX, mouseY);
-                return;
-            }
-        }
-        if (hasSides() && Panel.inside(mouseX, mouseY, x + sidesButtonX(), y + MachineLayout.SIDES_Y, MachineLayout.SIDES_SIZE,
-                MachineLayout.SIDES_SIZE)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.sides.button"), mouseX, mouseY);
+        int[] sr = structureRect();
+        if (sr != null && Panel.inside(mouseX, mouseY, sr[0], sr[1], sr[2], sr[3])) {
+            g.renderTooltip(font, Component.translatable("gui.singulo.structure." + type().id(), menu.value(MachineBlockEntity.D_STRUCTURE)),
+                    mouseX, mouseY);
             return;
         }
         int[] sp = selectPos();
@@ -784,21 +925,10 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             Panel.tooltip(g, font, lines, 220, mouseX, mouseY);
             return;
         }
-        int[] pp = powerPos();
-        if (Panel.inside(mouseX, mouseY, pp[0], pp[1], pp[2], pp[3])) {
-            g.renderTooltip(font, Component.translatable((flags() & MachineBlockEntity.FLAG_ENABLED) != 0
-                    ? "gui.singulo.power.on" : "gui.singulo.power.off"), mouseX, mouseY);
-            return;
-        }
         int[] fp = freePos();
         if (showsFreeSwitch() && Panel.inside(mouseX, mouseY, fp[0], fp[1], fp[2], fp[3])) {
             g.renderTooltip(font, Component.translatable((flags() & MachineBlockEntity.FLAG_MAKE_FREE) != 0
                     ? "gui.singulo.make_free.on" : "gui.singulo.make_free.off"), mouseX, mouseY);
-            return;
-        }
-        if (menu.getSlot(type().upgradeSlot()).getItem().isEmpty()
-                && Panel.inside(mouseX, mouseY, x + l.sideColumnX + 4, y + MachineLayout.UPGRADE_Y, 16, 16)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.slot.upgrade"), mouseX, mouseY);
             return;
         }
         if (type().hasCatalystSlot() && menu.getSlot(type().catalystSlot()).getItem().isEmpty()
@@ -807,12 +937,11 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
             return;
         }
         if (Panel.inside(mouseX, mouseY, x + MachineLayout.ENERGY_X, y + MachineLayout.TOP, 8, MachineLayout.BAR_HEIGHT)) {
-            List<Component> lines = new ArrayList<>();
-            lines.add(Component.translatable("gui.singulo.energy",
-                    menu.value(MachineBlockEntity.D_ENERGY), menu.value(MachineBlockEntity.D_CAPACITY)));
             int usage = menu.value(MachineBlockEntity.D_USAGE);
+            List<Component> lines = new ArrayList<>(Panel.energyLines(menu.value(MachineBlockEntity.D_ENERGY),
+                    menu.value(MachineBlockEntity.D_CAPACITY)));
             if (usage > 0) {
-                lines.add(Component.translatable("gui.singulo.energy_rate", usage));
+                lines.add(1, Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(usage)));
             }
             g.renderComponentTooltip(font, lines, mouseX, mouseY);
             return;
@@ -830,7 +959,7 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
                 return;
             }
         }
-        if (type().massMode() && Panel.inside(mouseX, mouseY, x + l.modeX, y + MachineLayout.MODE_Y, MODE_SIZE, MODE_SIZE)) {
+        if (type().massMode() && Panel.inside(mouseX, mouseY, x + l.modeX, y + l.modeY, MODE_SIZE, MODE_SIZE)) {
             int mode = menu.value(MachineBlockEntity.D_MODE);
             List<Component> lines = new ArrayList<>();
             List<RecipeHolder<MachineRecipe>> list = massRecipes();
@@ -848,15 +977,17 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
         }
     }
 
-    /** 専用スロット: 色つきの枠と、空のときは薄い見本のアイコン。 */
+    /** 専用スロット: 色つきの縁（frame が 0 なら縁なし）と、空のときは薄い見本のアイコン。 */
     private void drawSpecialSlot(GuiGraphics g, int sx, int sy, int frame, int slotIndex, String ghost) {
-        g.fill(sx - 2, sy - 2, sx + 18, sy + 18, frame);
-        Panel.slot(g, sx, sy);
+        if (frame != 0) {
+            g.renderOutline(sx - 2, sy - 2, 20, 20, frame);
+        }
+        Panel.slot(g, skin, sx, sy);
         if (menu.getSlot(menuIndexOf(slotIndex)).getItem().isEmpty()) {
             g.pose().pushPose();
             g.renderItem(new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id(ghost))), sx, sy);
             g.pose().translate(0, 0, 200);
-            g.fill(sx, sy, sx + 16, sy + 16, 0xA039424A);
+            g.fill(sx, sy, sx + 16, sy + 16, 0xA0000000 | (skin.fill() & 0xFFFFFF));
             g.pose().popPose();
         }
     }
@@ -868,56 +999,42 @@ public class MachineScreen extends AbstractContainerScreen<MachineMenu> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (hasSides() && Panel.inside(mouseX, mouseY, leftPos + sidesButtonX(), topPos + MachineLayout.SIDES_Y,
-                MachineLayout.SIDES_SIZE, MachineLayout.SIDES_SIZE)) {
-            sidesOpen = !sidesOpen;
-            selectorOpen = false;
+        layoutPopups();
+        // 窓の中のクリックは下の画面に届かない（手前の窓から順に）
+        if (selector.open && (selector.clickChrome(mouseX, mouseY) || selector.contains(mouseX, mouseY))) {
+            if (selector.open && !selector.overClose(mouseX, mouseY)) {
+                clickSelector(mouseX, mouseY);
+            }
             return true;
         }
-        if (type().selectsRecipe() && !sidesOpen) {
+        if (sides.open && (sides.clickChrome(mouseX, mouseY) || sides.contains(mouseX, mouseY))) {
+            if (sides.open && mouseY >= sides.bodyY()) {
+                clickSides(mouseX, mouseY, button);
+            }
+            return true;
+        }
+        if (clickFrame(mouseX, mouseY, button)) {
+            return true;
+        }
+        int[] fp = freePos();
+        if (showsFreeSwitch() && Panel.inside(mouseX, mouseY, fp[0], fp[1], fp[2], fp[3]) && minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_MAKE_FREE);
+            return true;
+        }
+        if (type().selectsRecipe()) {
             int[] sp = selectPos();
             if (Panel.inside(mouseX, mouseY, sp[0], sp[1], sp[2], sp[3])) {
                 if (button == 1 && minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_CLEAR_SELECTION);
-                    selectorOpen = false;
                 } else {
-                    selectorOpen = !selectorOpen;
+                    selector.open = !selector.open;
+                    sides.open = false;
                     selectorScroll = 0;
                 }
                 return true;
             }
-            if (selectorOpen) {
-                if (clickSelector(mouseX, mouseY)) {
-                    return true;
-                }
-                int[] box = selectorBox();
-                if (Panel.inside(mouseX, mouseY, box[0], box[1], box[2], box[3])) {
-                    return true;                                   // 選ぶ画面の中は装置のスロットを触らない
-                }
-                selectorOpen = false;
-            }
         }
-        if (sidesOpen) {
-            if (clickSides(mouseX, mouseY, button)) {
-                return true;
-            }
-            if (mouseY < topPos + 80) {
-                return true;                                       // 設定中は装置のスロットを触らない
-            }
-        }
-        if (!sidesOpen && minecraft != null && minecraft.gameMode != null) {
-            int[] pp = powerPos();
-            if (Panel.inside(mouseX, mouseY, pp[0], pp[1], pp[2], pp[3])) {
-                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_POWER);
-                return true;
-            }
-            int[] fp = freePos();
-            if (showsFreeSwitch() && Panel.inside(mouseX, mouseY, fp[0], fp[1], fp[2], fp[3])) {
-                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_MAKE_FREE);
-                return true;
-            }
-        }
-        if (type().massMode() && Panel.inside(mouseX, mouseY, leftPos + layout().modeX, topPos + MachineLayout.MODE_Y,
+        if (type().massMode() && Panel.inside(mouseX, mouseY, leftPos + layout().modeX, topPos + layout().modeY,
                 MODE_SIZE, MODE_SIZE) && minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_CYCLE_MODE);
             return true;

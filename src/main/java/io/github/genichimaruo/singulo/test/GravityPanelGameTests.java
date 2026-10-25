@@ -122,14 +122,17 @@ public final class GravityPanelGameTests {
         });
     }
 
-    /** どちらにも十分な電力があれば、パネルごとに近いほうの受電器が払う。 */
+    /**
+     * どちらにも受け持ちの分の電力があれば、パネルごとに近いほうの受電器が払う（受電器は集まり全体の1 tick 分までしか受け取らないので、
+     * 半分ずつ届ける）。
+     */
     @GameTest(template = EMPTY, timeoutTicks = 60)
     public static void nearestReceiverPaysForEachPanel(GameTestHelper helper) {
         GravityReceiverBlockEntity[] r = twoReceivers(helper);
         int per = GravityReceiverBlockEntity.perPanel();
         helper.onEachTick(() -> {
-            r[0].energy().receiveLong(6L * per, false);
-            r[1].energy().receiveLong(6L * per, false);
+            r[0].energy().receiveLong(3L * per, false);
+            r[1].energy().receiveLong(3L * per, false);
         });
         helper.runAtTickTime(30, () -> {
             helper.assertTrue(r[0].supplyingPanels() == 3 && r[1].supplyingPanels() == 3,

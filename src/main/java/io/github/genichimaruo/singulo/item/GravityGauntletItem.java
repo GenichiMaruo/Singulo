@@ -392,8 +392,11 @@ public class GravityGauntletItem extends SinguloItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        tooltip.add(Component.translatable("tooltip.singulo.energy", energy(stack).getEnergyStored(), capacity())
+        tooltip.add(Component.translatable("tooltip.singulo.energy", io.github.genichimaruo.singulo.energy.EnergyText.of(energy(stack).getEnergyStored()), io.github.genichimaruo.singulo.energy.EnergyText.of(capacity()))
                 .withStyle(ChatFormatting.GRAY));
+        if (io.github.genichimaruo.singulo.energy.EnergyText.abbreviated(capacity())) {
+            tooltip.add(io.github.genichimaruo.singulo.energy.EnergyText.hint());
+        }
         tooltip.add(Component.translatable("tooltip.singulo.gauntlet.mode", modeName(mode(stack))).withStyle(ChatFormatting.GRAY));
         if (supportsCone()) {
             tooltip.add(Component.translatable(cone(stack) ? "gauntlet.singulo.area.cone" : "gauntlet.singulo.area.single")

@@ -77,8 +77,8 @@ public class GunnerAndroid extends RuinAndroid {
     public static final double RAIL_RANGE = 32;
     /** レールガンの光線の太さ（当たり判定の半径）。 */
     public static final double RAIL_RADIUS = 0.55;
-    static final float SHOT_DAMAGE = 2.5F;
-    static final float RAIL_DAMAGE = 12;
+    static final float SHOT_DAMAGE = 3F;
+    static final float RAIL_DAMAGE = 14;
     /** 光弾・光線の光が残る tick。 */
     public static final int FLASH = 4;
 
@@ -259,8 +259,7 @@ public class GunnerAndroid extends RuinAndroid {
         setFx(from, to, SHOT_FROM, SHOT_AT);
         entityData.set(SHOT_FLASH, FLASH);
         // 銃声は遠くまで届かせる（音の届く距離は 16 × 音量 ブロック。1 を超えると近くでは最大の大きさで、遠くへ行くほど小さくなる）
-        playSound(SoundEvents.AMETHYST_BLOCK_HIT, PISTOL_SOUND_VOLUME, 1.9F);
-        playSound(SoundEvents.FIREWORK_ROCKET_BLAST, 0.35F, 1.8F);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.gunner_shot"), PISTOL_SOUND_VOLUME, 0.95F + random.nextFloat() * 0.1F);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, to.x, to.y, to.z, 4, 0.1, 0.1, 0.1, 0.1);
         return true;
     }
@@ -309,8 +308,7 @@ public class GunnerAndroid extends RuinAndroid {
         }
         level.sendParticles(ParticleTypes.FLASH, end.x, end.y, end.z, 1, 0, 0, 0, 0);
         sparks(level, end, 12, 0.4);
-        playSound(SoundEvents.WARDEN_SONIC_BOOM, RAIL_SOUND_VOLUME, 1.6F);   // レールガンの轟音は、さらに遠くまで
-        playSound(SoundEvents.TRIDENT_THUNDER.value(), 0.5F, 1.8F);
+        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_fire"), RAIL_SOUND_VOLUME, 1.0F);   // レールガンの轟音は、さらに遠くまで
         setDeltaMovement(getDeltaMovement().add(-dir.x * 0.35, 0.05, -dir.z * 0.35));
         hasImpulse = true;
         return hit.size();
@@ -335,6 +333,21 @@ public class GunnerAndroid extends RuinAndroid {
 
     /** リロードの仕草を始めてからの tick（-1 はリロードしていない）。カートリッジを押し込む音・満ちた音を鳴らす。 */
     private int reloadTicks = -1;
+    /** カートリッジ1本で撃てる数と、今の残り（撃てた数だけ減り、リロードで満ちる。障害物で撃てなかった分は減らない）。 */
+    static final int MAGAZINE = 3;
+    private int ammo = MAGAZINE;
+
+    /** リロードの仕草を始める（空のカートリッジを抜く）。終わると弾が満ちる（途中で構えたら、やり直し）。 */
+    private void startReload() {
+        gesture(GESTURE_RELOAD, null);
+        reloadTicks = 0;
+        playSound(SoundEvents.CROSSBOW_LOADING_START.value(), 0.5F, 1.8F);
+    }
+
+    /** 今の弾の残り。 */
+    public int ammo() {
+        return ammo;
+    }
     /** 相手を倒してから、小型銃を一回すのを待つ残りの tick（0 は待っていない）。 */
     private int twirlWait;
 
@@ -362,7 +375,14 @@ public class GunnerAndroid extends RuinAndroid {
                 } else if (reloadTicks == RELOAD_DONE) {
                     playSound(SoundEvents.CROSSBOW_LOADING_END.value(), 0.5F, 2.0F);       // エネルギーが満ちた
                     reloadTicks = -1;
+                    ammo = MAGAZINE;
                 }
+            }
+            // 敵がいなくなって、弾が減っていれば、手が空いたときにリロードしておく
+            LivingEntity foe = getTarget();
+            if (ammo < MAGAZINE && reloadTicks < 0 && state() == STATE_IDLE && active() && (foe == null || !foe.isAlive())
+                    && gesture() == GESTURE_NONE) {
+                startReload();
             }
             if (twirlWait > 0) {
                 twirlWait--;
@@ -391,8 +411,9 @@ public class GunnerAndroid extends RuinAndroid {
         private int nextBurst = 20;
         private int nextRail = 80;
         private int hopCooldown;
-        /** 今の3連射で撃った数。 */
+        /** 今の連射で撃った数と、次に撃てる tick（撃てたら5 tick あける。障害物で撃てなければ、向けたまま毎 tick 試す）。 */
         private int shots;
+        private int nextShot;
 
         CombatGoal() {
             setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
@@ -449,19 +470,19 @@ public class GunnerAndroid extends RuinAndroid {
             switch (s) {
                 case STATE_SHOT -> {
                     boolean aimed = hold(target);
-                    if (shots < SHOT_TICKS.length && stateTicks >= SHOT_TICKS[shots] && aimed) {
-                        shoot(level, target);
+                    // 撃てたときだけ弾が減る（間に障害物があれば撃たずに、向けたまま次の tick も試す）
+                    if (ammo > 0 && stateTicks >= nextShot && aimed && shoot(level, target)) {
+                        ammo--;
                         shots++;
+                        nextShot = stateTicks + SHOT_TICKS[1] - SHOT_TICKS[0];
                     }
-                    // 3発撃ったら少し構えを残して下ろす（向けないまま長引いたら、あきらめる）
-                    if (shots >= SHOT_TICKS.length && stateTicks >= SHOT || stateTicks >= SHOT + 20) {
+                    // 撃ち切ったら少し構えを残して下ろし、リロードする。撃てないまま長引いたら、弾は残したまま下ろす
+                    boolean empty = ammo == 0 && stateTicks >= nextShot;
+                    if (empty || stateTicks >= SHOT + 20) {
                         setState(STATE_IDLE);
                         nextBurst = 26 + random.nextInt(16);
-                        if (shots >= SHOT_TICKS.length) {
-                            // 撃ち切った: エネルギーカートリッジを交換する仕草
-                            gesture(GESTURE_RELOAD, null);
-                            reloadTicks = 0;
-                            playSound(SoundEvents.CROSSBOW_LOADING_START.value(), 0.5F, 1.8F);     // 空のカートリッジを抜く
+                        if (ammo == 0) {
+                            startReload();
                         }
                     }
                 }
@@ -473,7 +494,7 @@ public class GunnerAndroid extends RuinAndroid {
                     if (stateTicks >= RAIL_ASSEMBLE) {
                         aimRail(target);
                         setState(STATE_RAIL_CHARGE);
-                        playSound(SoundEvents.RESPAWN_ANCHOR_CHARGE, 0.9F, 1.4F);
+                        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_charge"), 0.9F, 1.0F);
                     }
                 }
                 case STATE_RAIL_CHARGE -> {
@@ -483,30 +504,26 @@ public class GunnerAndroid extends RuinAndroid {
                     } else {
                         getNavigation().stop();         // 狙いを固めた: もう相手を追わない（横へ避けられる）
                     }
-                    for (int i = 0; i < RAIL_STAGES.length; i++) {
-                        if (stateTicks == RAIL_STAGES[i]) {
-                            playSound(SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.2F + 0.3F * i);     // コイルが1つ灯る
-                        }
-                    }
-                    if (stateTicks == RAIL_CHARGE - RAIL_LOCK) {
-                        playSound(SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.9F);
-                    }
+                    // コイルが灯る音と、狙いが固まる音は、ためる音（android.railgun_charge）に入っている
                     if (stateTicks >= RAIL_CHARGE) {
-                        setState(STATE_RAIL_FIRE);
-                        fireRail(level);
+                        // ためている間に相手が物陰へ隠れた: 撃たずに諦めて、しまう
+                        if (hasLineOfSight(target) && !blocked(level, muzzle(true), target.getBoundingBox().getCenter())) {
+                            setState(STATE_RAIL_FIRE);
+                            fireRail(level);
+                        } else {
+                            stowRail();
+                        }
                     }
                 }
                 case STATE_RAIL_FIRE -> {
                     getNavigation().stop();
                     if (stateTicks >= RAIL_FIRE) {
-                        setState(STATE_RAIL_STOW);
-                        playSound(SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 0.8F, 1.5F);
-                        nextRail = 160 + random.nextInt(80);
-                        nextBurst = 30;
+                        stowRail();
                     }
                 }
                 case STATE_HOP -> {
-                    if (stateTicks >= HOP && onGround()) {
+                    // 着地したら終わり（水の中や無重力では着地しないので、時間で終える）
+                    if (stateTicks >= HOP && (onGround() || floating()) || stateTicks >= HOP * 4) {
                         setState(STATE_IDLE);
                         hopCooldown = 50;
                         nextBurst = Math.min(nextBurst, 6);
@@ -536,8 +553,9 @@ public class GunnerAndroid extends RuinAndroid {
             nextBurst--;
             nextRail--;
             hopCooldown--;
-            boolean seen = hasLineOfSight(target);
-            if (dist < 3.2 && hopCooldown <= 0 && onGround() && spend(COST_HOP)) {
+            // 銃口から相手まで、間に障害物がないか（目では見えていても、柵などで撃てないなら撃たずに、撃てる場所へ動く）
+            boolean seen = hasLineOfSight(target) && !blocked(level, muzzle(false), target.getBoundingBox().getCenter());
+            if (dist < 3.2 && hopCooldown <= 0 && onGround() && !floating() && spend(COST_HOP)) {
                 // 近すぎる: 相手から離れる向きへ跳ぶ
                 Vec3 away = position().subtract(target.position()).multiply(1, 0, 1);
                 away = away.lengthSqr() < 1e-4 ? Vec3.directionFromRotation(0, yBodyRot + 180) : away.normalize();
@@ -564,17 +582,32 @@ public class GunnerAndroid extends RuinAndroid {
                 return;
             }
             if (nextRail <= 0 && dist >= 5 && dist < RAIL_RANGE * 0.8 && spend(COST_RAIL)) {
-                start(STATE_RAIL_ASSEMBLE, SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 1.2F);
+                start(STATE_RAIL_ASSEMBLE, io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.railgun_assemble"), 1.0F);
                 return;
             }
-            if (nextBurst <= 0 && dist < SHOT_RANGE && spend(COST_BURST)) {
+            if (ammo == 0) {
+                if (reloadTicks < 0) {
+                    startReload();                         // 弾がない（リロードが途中で止まった）: 先にリロードする
+                }
+                return;
+            }
+            if (nextBurst <= 0 && dist < SHOT_RANGE && reloadTicks < 0 && spend(COST_BURST)) {
                 start(STATE_SHOT, SoundEvents.CROSSBOW_LOADING_END.value(), 1.6F);
             }
+        }
+
+        /** レールガンをしまい、次に組み上げるまで間をあける。 */
+        private void stowRail() {
+            setState(STATE_RAIL_STOW);
+            playSound(SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 0.8F, 1.5F);
+            nextRail = 160 + random.nextInt(80);
+            nextBurst = 30;
         }
 
         private void start(int s, net.minecraft.sounds.SoundEvent sound, float pitch) {
             if (active()) {
                 shots = 0;
+                nextShot = SHOT_TICKS[0];
                 setState(s);
                 playSound(sound, 0.8F, pitch);
             }

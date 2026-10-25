@@ -594,6 +594,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     // ------------------------------------------------------------------ 毎 tick
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AndroidStationBlockEntity be) {
+        // 電力がたまっている間は、正面の顔が目を開ける
+        io.github.genichimaruo.singulo.android.work.AndroidEyes.setLit(level, pos, state, be.energy.getEnergyStored() > 0);
         be.tick((ServerLevel) level);
     }
 

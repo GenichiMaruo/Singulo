@@ -63,6 +63,8 @@ public final class SinguloSounds {
             "foundry.emerge", "foundry.hurt", "foundry.arm_aim", "foundry.arm_grab", "foundry.press_aim", "foundry.press_slam",
             "foundry.conveyor_warn", "foundry.conveyor_flip", "foundry.laser_aim", "foundry.laser_fire", "foundry.print",
             "foundry.line_break", "foundry.enrage", "foundry.death",
+            "android.power_down", "android.charge_start", "android.charged", "android.gunner_shot", "android.railgun_assemble", "android.railgun_charge",
+            "android.railgun_fire", "android.ring_inflate", "ui.click",
     };
 
     static {

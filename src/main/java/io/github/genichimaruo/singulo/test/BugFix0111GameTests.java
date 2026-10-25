@@ -44,6 +44,35 @@ public final class BugFix0111GameTests {
         return new ItemStack(BuiltInRegistries.ITEM.get(Singulo.id(id)));
     }
 
+    @GameTest(template = "empty")
+    public static void alternativesRespectTheActualCraftingSlot(GameTestHelper helper) throws Exception {
+        var pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        var console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) helper.getBlockEntity(pos);
+        var broad = net.minecraft.world.item.crafting.Ingredient.of(Items.OAK_PLANKS, Items.BIRCH_PLANKS);
+        var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(Items.OAK_PLANKS));
+        grid.set(1, new ItemStack(Items.OAK_PLANKS));
+        var method = console.getClass().getDeclaredMethod("validAlternatives", net.minecraft.world.item.crafting.CraftingRecipe.class,
+                List.class, int.class, net.minecraft.world.item.crafting.Ingredient.class);
+        method.setAccessible(true);
+        // Vanilla permits mirrored shapes: keep a second row to disambiguate orientation.
+        var recipe = new net.minecraft.world.item.crafting.ShapedRecipe("", net.minecraft.world.item.crafting.CraftingBookCategory.MISC,
+                net.minecraft.world.item.crafting.ShapedRecipePattern.of(java.util.Map.of('A', broad,
+                        'B', net.minecraft.world.item.crafting.Ingredient.of(Items.OAK_PLANKS),
+                        'C', net.minecraft.world.item.crafting.Ingredient.of(Items.COBBLESTONE)), "AB", "C "), new ItemStack(Items.STICK));
+        grid.set(3, new ItemStack(Items.COBBLESTONE));
+        helper.assertTrue((Boolean) method.invoke(console, recipe, grid, 0, broad), "Valid alternatives were rejected");
+        helper.assertTrue(!(Boolean) method.invoke(console, recipe, grid, 1, broad), "A different slot's broad ingredient leaked into a strict slot");
+        var assign = console.getClass().getDeclaredMethod("alternativeSlots", net.minecraft.world.item.crafting.CraftingRecipe.class, List.class);
+        assign.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        var slots = (List<net.minecraft.world.item.crafting.Ingredient>) assign.invoke(null, recipe, grid);
+        helper.assertTrue(slots.get(0) == broad && slots.get(1).getItems().length == 1,
+                "Shaped ingredients were not assigned to their actual positions");
+        helper.succeed();
+    }
+
     @GameTest(template = EMPTY)
     public static void generatedRoomLightsUseTheirLevers(GameTestHelper helper) {
         var level = helper.getLevel();
@@ -146,7 +175,163 @@ public final class BugFix0111GameTests {
         helper.succeed();
     }
 
-    /** アンドロイドは無重力の中でも重力が変わらず、自分で歩ける。ふつうの生き物は無重力になる。 */
+    /**
+     * パネル受電器は電力をためない: 集まり全体の1 tick 分を超えては受け取らず、電力が届かなくなると、すぐ無重力が止まる
+     * （コントロールボックスを高くしてから壊しても、ためた電力で働き続けない）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 100)
+    public static void receiverHoldsNoBuffer(GameTestHelper helper) {
+        BlockPos zero = new BlockPos(2, 1, 2), box = new BlockPos(2, 1, 3), receiver = new BlockPos(3, 1, 2), source = new BlockPos(4, 1, 2);
+        helper.setBlock(zero, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
+        helper.setBlock(box, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
+        helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
+        helper.setBlock(source, SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
+        ZeroGravityControllerBlockEntity c = helper.getBlockEntity(box);
+        c.setHeight(12);
+        var level = helper.getLevel();
+        BlockPos abs = helper.absolutePos(zero);
+        helper.runAtTickTime(30, () -> {
+            io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity r = helper.getBlockEntity(receiver);
+            helper.assertTrue(ZeroGravity.inZone(level, abs.getX() + 0.5, abs.getY() + 1, abs.getZ() + 0.5), "電力があるのに無重力にならない");
+            long demand = r.demand();
+            long took = r.energy().receiveLong(Long.MAX_VALUE / 2, false);
+            helper.assertTrue(r.stored() <= demand, "1 tick 分より多く受け取った: " + r.stored() + " / " + demand + "（" + took + "）");
+            helper.setBlock(source, Blocks.AIR);                 // 電力を止め、ボックスも壊す（安い高さに戻る）
+            helper.setBlock(box, Blocks.AIR);
+        });
+        helper.runAtTickTime(40, () -> {
+            helper.assertFalse(ZeroGravity.inZone(level, abs.getX() + 0.5, abs.getY() + 1, abs.getZ() + 0.5), "電力がないのに無重力が続く");
+            helper.assertFalse(level.getBlockState(abs).getValue(io.github.genichimaruo.singulo.gravity.GravityPanelBlock.POWERED), "電力がないのに働いている");
+            helper.succeed();
+        });
+    }
+
+    /** アンドロイドは無重力の空間では宙を飛び、上にある行き先へも上がっていける（重力の属性は変えない）。外に出れば歩く。 */
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void androidsFlyInZeroGravity(GameTestHelper helper) {
+        for (int x = 1; x <= 3; x++) {
+            for (int z = 1; z <= 3; z++) {
+                helper.setBlock(new BlockPos(x, 1, z), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
+            }
+        }
+        helper.setBlock(new BlockPos(4, 1, 2), SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
+        helper.setBlock(new BlockPos(5, 1, 2), SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
+        BladeAndroid android = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        android.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 2, 1))));
+        android.setPersistenceRequired();
+        helper.getLevel().addFreshEntity(android);
+        Vec3 up = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 5, 3)));
+        helper.onEachTick(() -> {
+            if (android.floating() && android.getNavigation().isDone() && android.position().distanceToSqr(up) > 0.5) {
+                android.getNavigation().moveTo(up.x, up.y, up.z, 1.0);
+            }
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(android.floating(), "無重力の中で飛ばない: " + android.position().subtract(Vec3.atLowerCornerOf(helper.absolutePos(BlockPos.ZERO))));
+            helper.assertFalse(ZeroGravity.weightless(android), "アンドロイドの重力の属性が変わった");
+            helper.assertTrue(android.position().distanceToSqr(up) < 1.5, "上の行き先まで飛べない: " + android.position() + " → " + up);
+            android.discard();
+        });
+    }
+
+    /** 水の池（ガラスで囲み、上はガラスの縁が水面より4マス高い。立てる陸はない）。下の角が (1, 1, 1)、水は y 1〜4。 */
+    private static void pool(GameTestHelper helper) {
+        for (int x = 0; x <= 6; x++) {
+            for (int z = 0; z <= 6; z++) {
+                for (int y = 0; y <= 8; y++) {
+                    boolean wall = x == 0 || x == 6 || z == 0 || z == 6 || y == 0;
+                    helper.setBlock(new BlockPos(x, y, z), wall ? Blocks.GLASS.defaultBlockState()
+                            : y <= 4 ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState());
+                }
+            }
+        }
+    }
+
+    /** 充電が切れるまで、池の底を行ったり来たり泳がせる（水中は泳いでいる間だけ充電が減る）。 */
+    private static void swimUntilEmpty(GameTestHelper helper, BladeAndroid a) {
+        Vec3[] goals = {Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 5))), Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 1, 1)))};
+        helper.onEachTick(() -> {
+            if (a.state() == RuinAndroid.STATE_IDLE && a.getNavigation().isDone()) {
+                Vec3 to = goals[(int) (helper.getTick() / 15 % 2)];
+                a.getNavigation().moveTo(to.x, to.y, to.z, 1.0);
+            }
+        });
+    }
+
+    private static BladeAndroid swimmer(GameTestHelper helper, int charge) {
+        BladeAndroid a = SinguloEntities.BLADE_ANDROID.get().create(helper.getLevel());
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 1, 3))));
+        a.setPersistenceRequired();
+        net.minecraft.nbt.CompoundTag saved = a.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        saved.putInt("charge", charge);
+        a.load(saved);
+        helper.getLevel().addFreshEntity(a);
+        return a;
+    }
+
+    /** アンドロイドは水の中でも自由に動け、おぼれない（空気も体力も減らない）。水中で止まっている間は充電が減らず、泳ぐと減る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 160)
+    public static void androidsSwimWithoutDrowning(GameTestHelper helper) {
+        pool(helper);
+        BladeAndroid a = swimmer(helper, RuinAndroid.CHARGE_MAX);
+        a.makeGuard(null, helper.absolutePos(new BlockPos(3, 0, 3)), RuinAndroid.MODE_GUARD, 30);   // 持ち場にいて、うろうろ泳がない
+        int[] at = new int[2];
+        helper.runAtTickTime(40, () -> at[0] = a.charge());           // 置いた直後に落ち着くまでの動きは数えない
+        helper.runAtTickTime(70, () -> {
+            helper.assertTrue(a.getAirSupply() == a.getMaxAirSupply(), "水の中で空気が減る: " + a.getAirSupply());
+            helper.assertTrue(a.getHealth() == a.getMaxHealth(), "水の中で体力が減る: " + a.getHealth());
+            helper.assertTrue(a.floating(), "水の中で自由に動けない");
+            helper.assertTrue(a.charge() == at[0], "水中で止まっているのに充電が減る: " + at[0] + " → " + a.charge());
+            at[1] = a.charge();
+        });
+        Vec3[] goals = {Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(5, 1, 5))), Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(1, 1, 1)))};
+        helper.onEachTick(() -> {
+            if (helper.getTick() > 70 && a.getNavigation().isDone()) {
+                Vec3 to = goals[(int) (helper.getTick() / 15 % 2)];            // 池の中を行ったり来たり泳ぐ
+                a.getNavigation().moveTo(to.x, to.y, to.z, 1.0);
+            }
+        });
+        helper.runAtTickTime(110, () -> {
+            helper.assertTrue(a.charge() < at[1], "水中を泳いでも充電が減らない: " + a.position() + " under=" + a.isUnderWater());
+            a.discard();
+            helper.succeed();
+        });
+    }
+
+    /** 水中で充電が切れ、近くに陸がなければ、水面まで浮かび上がって充電する（日が出ていればソーラー、出ていなければあお向けに浮かぶ）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void androidsSurfaceToChargeWithoutLand(GameTestHelper helper) {
+        pool(helper);
+        BladeAndroid a = swimmer(helper, 2);
+        swimUntilEmpty(helper, a);
+        helper.succeedWhen(() -> {
+            int s = a.state();
+            helper.assertTrue(s == RuinAndroid.STATE_SOLAR || s == RuinAndroid.STATE_FLOAT_REST, "水面で充電しない: state=" + s);
+            helper.assertTrue(Math.abs(a.getY() - a.floatY()) < 0.4, "水面に浮かんでいない: y=" + a.getY());
+            a.discard();
+        });
+    }
+
+    /** 上に水面がない水の中（ガラスの天井の下）で充電が切れると、浮かび上がらずに底まで沈み、座って充電する。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void androidsChargeOnSeabedUnderCeiling(GameTestHelper helper) {
+        pool(helper);
+        for (int x = 1; x <= 5; x++) {
+            for (int z = 1; z <= 5; z++) {
+                helper.setBlock(new BlockPos(x, 5, z), Blocks.GLASS);         // 水のすぐ上を天井でふさぐ
+            }
+        }
+        BladeAndroid a = swimmer(helper, 2);
+        a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(3, 3, 3))));
+        swimUntilEmpty(helper, a);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(a.state() == RuinAndroid.STATE_SEABED_REST, "水の底で充電しない: state=" + a.state());
+            helper.assertTrue(a.getY() < helper.absolutePos(new BlockPos(3, 1, 3)).getY() + 0.3, "底まで沈まない: y=" + a.getY());
+            a.discard();
+        });
+    }
+
+    /** アンドロイドは無重力の中でも重力の属性が変わらない（宙を飛んで動く）。ふつうの生き物は無重力になる。 */
     @GameTest(template = EMPTY, timeoutTicks = 120)
     public static void androidsIgnoreZeroGravity(GameTestHelper helper) {
         helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());

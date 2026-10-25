@@ -117,7 +117,7 @@ public final class MachineWatch {
 
     /** 取り出す面のどれかから、物か流体を出し入れできるか。 */
     public static boolean handlesOutput(Level level, BlockPos at, RecipeData r) {
-        for (net.minecraft.core.Direction d : r.outputAuto() ? OUT_ORDER : new net.minecraft.core.Direction[] {r.outputFace()}) {
+        for (net.minecraft.core.Direction d : r.outputAuto() ? OUT_ORDER : new net.minecraft.core.Direction[] {r.outputFace(level.getBlockState(at))}) {
             if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
             }
@@ -132,7 +132,7 @@ public final class MachineWatch {
     @javax.annotation.Nullable
     public static net.minecraft.core.Direction outputFace(Level level, BlockPos at, RecipeData r) {
         if (!r.outputAuto()) {
-            return r.outputFace();
+            return r.outputFace(level.getBlockState(at));
         }
         if (level.getBlockEntity(at) instanceof AbstractFurnaceBlockEntity) {
             return net.minecraft.core.Direction.DOWN;
@@ -166,13 +166,13 @@ public final class MachineWatch {
     }
 
     /** 素材を入れるときに試す面（記録した面か、自動なら上・横・下の順）。 */
-    private static net.minecraft.core.Direction[] inputFaces(RecipeData r) {
-        return r.inputAuto() ? AUTO_ORDER : new net.minecraft.core.Direction[] {r.inputFace()};
+    private static net.minecraft.core.Direction[] inputFaces(Level level, BlockPos at, RecipeData r) {
+        return r.inputAuto() ? AUTO_ORDER : new net.minecraft.core.Direction[] {r.inputFace(level.getBlockState(at))};
     }
 
     /** 素材を入れる面のどれかから、物か流体を出し入れできるか（装置として使えるか）。 */
     public static boolean handlesInput(Level level, BlockPos at, RecipeData r) {
-        for (net.minecraft.core.Direction d : inputFaces(r)) {
+        for (net.minecraft.core.Direction d : inputFaces(level, at, r)) {
             if (level.getCapability(Capabilities.ItemHandler.BLOCK, at, d) != null || LiquidStores.handles(level, at, d)) {
                 return true;
             }
@@ -187,7 +187,7 @@ public final class MachineWatch {
     @javax.annotation.Nullable
     public static net.minecraft.core.Direction inputFace(Level level, BlockPos at, RecipeData r, ItemStack item) {
         if (!r.inputAuto()) {
-            return r.inputFace();
+            return r.inputFace(level.getBlockState(at));
         }
         for (net.minecraft.core.Direction d : AUTO_ORDER) {
             if (accepts(level, at, d, item)) {
@@ -237,7 +237,7 @@ public final class MachineWatch {
                 continue;
             }
             boolean ok = false;
-            for (net.minecraft.core.Direction face : inputFaces(r)) {
+            for (net.minecraft.core.Direction face : inputFaces(level, at, r)) {
                 if (level.getBlockEntity(at) instanceof net.minecraft.world.WorldlyContainer wc) {
                     ok |= placeable(wc, face, need.item);
                 } else {
@@ -259,7 +259,7 @@ public final class MachineWatch {
     public static long held(Level level, BlockPos at, RecipeData r) {
         long n = 0;
         for (ItemCount need : r.inputs()) {
-            for (net.minecraft.core.Direction d : inputFaces(r)) {
+            for (net.minecraft.core.Direction d : inputFaces(level, at, r)) {
                 long here = 0;
                 if (FluidSamples.liquid(need.item)) {
                     here = LiquidStores.machine(level, at, d).amount(need.item);

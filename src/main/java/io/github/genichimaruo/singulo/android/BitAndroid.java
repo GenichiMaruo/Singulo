@@ -495,7 +495,7 @@ public class BitAndroid extends RuinAndroid {
                         // 斬ったら、後ろへ跳んで間合いを取る
                         Vec3 back = position().subtract(target.position()).multiply(1, 0, 1);
                         back = back.lengthSqr() < 1e-4 ? Vec3.directionFromRotation(0, yBodyRot + 180) : back.normalize();
-                        setDeltaMovement(back.x * 0.9, 0.38, back.z * 0.9);
+                        setDeltaMovement(back.x * 0.9, floating() ? 0 : 0.38, back.z * 0.9);      // 水の中・無重力では、跳ねずに下がる
                         hasImpulse = true;
                         setState(STATE_BACKSTEP);
                         playSound(SoundEvents.TRIDENT_RIPTIDE_2.value(), 0.6F, 1.9F);
@@ -503,7 +503,8 @@ public class BitAndroid extends RuinAndroid {
                 }
                 case STATE_BACKSTEP -> {
                     getLookControl().setLookAt(target, 60, 60);
-                    if (stateTicks >= BACKSTEP && onGround()) {
+                    // 着地したら終わり（水の中や無重力では着地しないので、時間で終える）
+                    if (stateTicks >= BACKSTEP && (onGround() || floating()) || stateTicks >= BACKSTEP * 4) {
                         finish(25);
                     }
                 }

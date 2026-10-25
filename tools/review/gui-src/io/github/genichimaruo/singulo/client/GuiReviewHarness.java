@@ -129,12 +129,13 @@ public final class GuiReviewHarness {
                 capture(mc, "console-record-procedure");
                 var method = WorkConsoleScreen.class.getDeclaredMethod("openPicking", ItemStack.class);
                 method.setAccessible(true);
+                ((Popup) field(mc.screen, "recordPop")).open = false;
                 method.invoke(mc.screen, new ItemStack(Items.OAK_PLANKS));
-                int x = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
-                int y = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
-                mc.screen.mouseClicked(x + 110, y + 42, 0);
+                int[] fresh = ((WorkConsoleScreen) mc.screen).freshButton();
+                mc.screen.mouseClicked(fresh[0] + fresh[2] / 2, fresh[1] + fresh[3] / 2, 0);
                 if (!(Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not enable");
-                mc.screen.mouseClicked(x + 110, y + 42, 0);
+                fresh = ((WorkConsoleScreen) mc.screen).freshButton();
+                mc.screen.mouseClicked(fresh[0] + fresh[2] / 2, fresh[1] + fresh[3] / 2, 0);
                 if ((Boolean) field(mc.screen, "fresh")) throw new IllegalStateException("New order toggle did not disable");
                 phase++;
             }
@@ -160,10 +161,9 @@ public final class GuiReviewHarness {
             }
             case 14 -> {
                 capture(mc, "console-detail");
-                int left = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
-                int top = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
-                mc.screen.mouseScrolled(left + 20, top + 50, 0, -1);
-                mc.screen.mouseScrolled(left + 200, top + 50, 0, -1);
+                int[] cols = ((WorkConsoleScreen) mc.screen).detailColumns();
+                mc.screen.mouseScrolled(cols[0], cols[1], 0, -1);
+                mc.screen.mouseScrolled(cols[2], cols[3], 0, -1);
                 phase++;
             }
             case 15 -> {
@@ -204,8 +204,11 @@ public final class GuiReviewHarness {
                     throw new IllegalStateException("Patrol button did not reach server");
                 }
                 capture(mc, "station-patrol-ja-854x480");
-                mc.screen.mouseClicked((mc.getWindow().getGuiScaledWidth() - AndroidStationMenu.WIDTH) / 2 + 190,
-                        (mc.getWindow().getGuiScaledHeight() - AndroidStationMenu.HEIGHT) / 2 + 8, 0);
+                // 経路のページは右レールの設定の段で開く
+                mc.screen.mouseClicked((mc.getWindow().getGuiScaledWidth() - AndroidStationMenu.WIDTH) / 2
+                                + io.github.genichimaruo.singulo.machine.GuiFrame.railX(AndroidStationMenu.WIDTH) + 8,
+                        (mc.getWindow().getGuiScaledHeight() - AndroidStationMenu.HEIGHT) / 2
+                                + io.github.genichimaruo.singulo.machine.GuiFrame.railY(io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) + 8, 0);
                 phase++;
             }
             case 23 -> {
@@ -313,10 +316,9 @@ public final class GuiReviewHarness {
         if (mc.screen != screen) throw new IllegalStateException("Inventory hotkey closed a focused search");
         box.setFocused(false);
         box.setValue("");
-        int left = (mc.getWindow().getGuiScaledWidth() - WorkConsoleMenu.WIDTH) / 2;
-        int top = (mc.getWindow().getGuiScaledHeight() - WorkConsoleMenu.HEIGHT) / 2;
+        int[] sort = screen.sortButton();
         for (int i = 0; i < 5; i++) {
-            screen.mouseClicked(left + 130, top + 128, 0);
+            screen.mouseClicked(sort[0] + sort[2] / 2, sort[1] + sort[3] / 2, 0);
             if (((List<?>) entries.invoke(screen)).size() != initial) throw new IllegalStateException("Sort lost entries");
         }
         if (net.neoforged.fml.ModList.get().isLoaded("jei")) {
@@ -415,7 +417,11 @@ public final class GuiReviewHarness {
                 }
                 long active = mc.player.containerMenu.slots.stream().filter(net.minecraft.world.inventory.Slot::isActive).count();
                 Singulo.LOGGER.info("SINGULO_GUI_INVENTORY {} active={} pixel={}", name, active, Integer.toHexString(pixel));
-                if (pixel != 0xFF988F8B) {
+                // スロットの中はアンドロイドのスキンの色（その子のアクセントで少し染まる）。NativeImage は ABGR
+                var android = ((AndroidMenu) mc.player.containerMenu).android();
+                int fill = GuiSkin.android(android == null ? 0x78E1FF : android.accent()).fill();
+                int expected = 0xFF000000 | (fill & 0xFF) << 16 | (fill & 0xFF00) | (fill >> 16 & 0xFF);
+                if (pixel != expected) {
                     throw new IllegalStateException("Player inventory background missing in " + name);
                 }
             }
