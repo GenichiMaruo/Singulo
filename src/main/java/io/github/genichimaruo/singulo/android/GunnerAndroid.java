@@ -335,6 +335,21 @@ public class GunnerAndroid extends RuinAndroid {
 
     /** リロードの仕草を始めてからの tick（-1 はリロードしていない）。カートリッジを押し込む音・満ちた音を鳴らす。 */
     private int reloadTicks = -1;
+    /** カートリッジ1本で撃てる数と、今の残り（撃てた数だけ減り、リロードで満ちる。障害物で撃てなかった分は減らない）。 */
+    static final int MAGAZINE = 3;
+    private int ammo = MAGAZINE;
+
+    /** リロードの仕草を始める（空のカートリッジを抜く）。終わると弾が満ちる（途中で構えたら、やり直し）。 */
+    private void startReload() {
+        gesture(GESTURE_RELOAD, null);
+        reloadTicks = 0;
+        playSound(SoundEvents.CROSSBOW_LOADING_START.value(), 0.5F, 1.8F);
+    }
+
+    /** 今の弾の残り。 */
+    public int ammo() {
+        return ammo;
+    }
     /** 相手を倒してから、小型銃を一回すのを待つ残りの tick（0 は待っていない）。 */
     private int twirlWait;
 
@@ -362,7 +377,14 @@ public class GunnerAndroid extends RuinAndroid {
                 } else if (reloadTicks == RELOAD_DONE) {
                     playSound(SoundEvents.CROSSBOW_LOADING_END.value(), 0.5F, 2.0F);       // エネルギーが満ちた
                     reloadTicks = -1;
+                    ammo = MAGAZINE;
                 }
+            }
+            // 敵がいなくなって、弾が減っていれば、手が空いたときにリロードしておく
+            LivingEntity foe = getTarget();
+            if (ammo < MAGAZINE && reloadTicks < 0 && state() == STATE_IDLE && active() && (foe == null || !foe.isAlive())
+                    && gesture() == GESTURE_NONE) {
+                startReload();
             }
             if (twirlWait > 0) {
                 twirlWait--;
@@ -391,8 +413,9 @@ public class GunnerAndroid extends RuinAndroid {
         private int nextBurst = 20;
         private int nextRail = 80;
         private int hopCooldown;
-        /** 今の3連射で撃った数。 */
+        /** 今の連射で撃った数と、次に撃てる tick（撃てたら5 tick あける。障害物で撃てなければ、向けたまま毎 tick 試す）。 */
         private int shots;
+        private int nextShot;
 
         CombatGoal() {
             setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
@@ -449,19 +472,19 @@ public class GunnerAndroid extends RuinAndroid {
             switch (s) {
                 case STATE_SHOT -> {
                     boolean aimed = hold(target);
-                    if (shots < SHOT_TICKS.length && stateTicks >= SHOT_TICKS[shots] && aimed) {
-                        shoot(level, target);
+                    // 撃てたときだけ弾が減る（間に障害物があれば撃たずに、向けたまま次の tick も試す）
+                    if (ammo > 0 && stateTicks >= nextShot && aimed && shoot(level, target)) {
+                        ammo--;
                         shots++;
+                        nextShot = stateTicks + SHOT_TICKS[1] - SHOT_TICKS[0];
                     }
-                    // 3発撃ったら少し構えを残して下ろす（向けないまま長引いたら、あきらめる）
-                    if (shots >= SHOT_TICKS.length && stateTicks >= SHOT || stateTicks >= SHOT + 20) {
+                    // 撃ち切ったら少し構えを残して下ろし、リロードする。撃てないまま長引いたら、弾は残したまま下ろす
+                    boolean empty = ammo == 0 && stateTicks >= nextShot;
+                    if (empty || stateTicks >= SHOT + 20) {
                         setState(STATE_IDLE);
                         nextBurst = 26 + random.nextInt(16);
-                        if (shots >= SHOT_TICKS.length) {
-                            // 撃ち切った: エネルギーカートリッジを交換する仕草
-                            gesture(GESTURE_RELOAD, null);
-                            reloadTicks = 0;
-                            playSound(SoundEvents.CROSSBOW_LOADING_START.value(), 0.5F, 1.8F);     // 空のカートリッジを抜く
+                        if (ammo == 0) {
+                            startReload();
                         }
                     }
                 }
@@ -537,8 +560,9 @@ public class GunnerAndroid extends RuinAndroid {
             nextBurst--;
             nextRail--;
             hopCooldown--;
-            boolean seen = hasLineOfSight(target);
-            if (dist < 3.2 && hopCooldown <= 0 && onGround() && spend(COST_HOP)) {
+            // 銃口から相手まで、間に障害物がないか（目では見えていても、柵などで撃てないなら撃たずに、撃てる場所へ動く）
+            boolean seen = hasLineOfSight(target) && !blocked(level, muzzle(false), target.getBoundingBox().getCenter());
+            if (dist < 3.2 && hopCooldown <= 0 && onGround() && !floating() && spend(COST_HOP)) {
                 // 近すぎる: 相手から離れる向きへ跳ぶ
                 Vec3 away = position().subtract(target.position()).multiply(1, 0, 1);
                 away = away.lengthSqr() < 1e-4 ? Vec3.directionFromRotation(0, yBodyRot + 180) : away.normalize();
@@ -568,7 +592,13 @@ public class GunnerAndroid extends RuinAndroid {
                 start(STATE_RAIL_ASSEMBLE, SoundEvents.ARMOR_EQUIP_NETHERITE.value(), 1.2F);
                 return;
             }
-            if (nextBurst <= 0 && dist < SHOT_RANGE && spend(COST_BURST)) {
+            if (ammo == 0) {
+                if (reloadTicks < 0) {
+                    startReload();                         // 弾がない（リロードが途中で止まった）: 先にリロードする
+                }
+                return;
+            }
+            if (nextBurst <= 0 && dist < SHOT_RANGE && reloadTicks < 0 && spend(COST_BURST)) {
                 start(STATE_SHOT, SoundEvents.CROSSBOW_LOADING_END.value(), 1.6F);
             }
         }
@@ -576,6 +606,7 @@ public class GunnerAndroid extends RuinAndroid {
         private void start(int s, net.minecraft.sounds.SoundEvent sound, float pitch) {
             if (active()) {
                 shots = 0;
+                nextShot = SHOT_TICKS[0];
                 setState(s);
                 playSound(sound, 0.8F, pitch);
             }
