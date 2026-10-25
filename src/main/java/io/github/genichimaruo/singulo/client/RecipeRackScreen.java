@@ -4,7 +4,7 @@ import io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity;
 import io.github.genichimaruo.singulo.android.work.RecipeRackMenu;
 import io.github.genichimaruo.singulo.android.work.WorkLocationCardItem;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -12,15 +12,11 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * アンドロイドレシピ棚の画面。左の列（作業位置カード）は、カードの代わりに記録したブロックの絵で見せる。
- * 左の列と右の8列の間に、行ごとの細い矢印を描く。
+ * 左の列と右の8列の間に、行ごとの細い矢印を描く。空のスロットには入れるカードのグレーの見本。
  */
-public class RecipeRackScreen extends AbstractContainerScreen<RecipeRackMenu> {
+public class RecipeRackScreen extends FramedScreen<RecipeRackMenu> {
     public RecipeRackScreen(RecipeRackMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-        imageWidth = RecipeRackMenu.WIDTH;
-        imageHeight = RecipeRackMenu.HEIGHT;
-        inventoryLabelX = RecipeRackMenu.INV_X;
-        inventoryLabelY = RecipeRackMenu.INV_Y - 11;
+        super(menu, inventory, title, RecipeRackMenu.WIDTH, RecipeRackMenu.HEIGHT);
     }
 
     @Override
@@ -28,21 +24,29 @@ public class RecipeRackScreen extends AbstractContainerScreen<RecipeRackMenu> {
         renderBackground(g);
         super.render(g, mouseX, mouseY, partialTick);
         renderTooltip(g, mouseX, mouseY);
+        renderFrameTooltips(g, mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         int x = leftPos;
         int y = topPos;
-        Panel.background(g, x, y, imageWidth, imageHeight);
-        for (Slot s : menu.slots) {
-            Panel.slot(g, x + s.x, y + s.y);
+        drawFrame(g, mouseX, mouseY);
+        ItemStack location = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("work_location_card")));
+        ItemStack recipe = new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("recipe_card")));
+        for (int i = 0; i < RecipeRackBlockEntity.SLOTS; i++) {
+            Slot s = menu.getSlot(i);
+            ghostSlot(g, x + s.x, y + s.y, s, i % RecipeRackBlockEntity.COLS == 0 ? location : recipe);
         }
         for (int row = 0; row < RecipeRackBlockEntity.ROWS; row++) {
             int ry = y + RecipeRackMenu.GRID_Y + row * 18 + 7;
-            // 行の矢印（作業位置 → レシピ）
-            g.fill(x + RecipeRackMenu.LOC_X + 19, ry, x + RecipeRackMenu.CARD_X - 4, ry + 2, Panel.SEAM);
-            g.fill(x + RecipeRackMenu.CARD_X - 5, ry - 1, x + RecipeRackMenu.CARD_X - 3, ry + 3, Panel.SEAM);
+            // 行の矢印（作業位置 → レシピ）。彫り込み
+            for (int pass = 0; pass < 2; pass++) {
+                int c = pass == 0 ? skin.arrowHi() : skin.arrow();
+                int oy = pass == 0 ? 1 : 0;
+                g.fill(x + RecipeRackMenu.LOC_X + 19, ry + oy, x + RecipeRackMenu.CARD_X - 4, ry + 2 + oy, c);
+                g.fill(x + RecipeRackMenu.CARD_X - 5, ry - 1 + oy, x + RecipeRackMenu.CARD_X - 3, ry + 3 + oy, c);
+            }
         }
     }
 
@@ -65,12 +69,5 @@ public class RecipeRackScreen extends AbstractContainerScreen<RecipeRackMenu> {
             }
         }
         }
-    }
-
-    @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        renderLocations(g);
-        AndroidStationScreen.fit(g, font, title, 8, 6, imageWidth - 16, Panel.TEXT);
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Panel.TEXT, false);
     }
 }

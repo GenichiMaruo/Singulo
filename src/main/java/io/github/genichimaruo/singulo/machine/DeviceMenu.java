@@ -85,18 +85,20 @@ public class DeviceMenu extends AbstractContainerMenu {
         boolean onButton(ServerPlayer player, int id);
     }
 
-    public static final int WIDTH = 200;
+    public static final int WIDTH = 212;
     public static final int HEIGHT = 206;
-    public static final int INV_X = 20;
-    public static final int INV_Y = 124;
-    public static final int HOTBAR_Y = 182;
+    /** 中身は幅200で設計してあり、枠の中央に置くために右へずらす量。 */
+    public static final int CONTENT_X = (WIDTH - 200) / 2;
+    public static final int INV_X = GuiFrame.inventoryX(WIDTH);
+    public static final int INV_Y = GuiFrame.inventoryY(HEIGHT);
+    public static final int HOTBAR_Y = GuiFrame.hotbarY(HEIGHT);
 
     /** スロットの位置（menu と screen で共有）。 */
     public static int[][] slotPos(Kind kind) {
         return switch (kind) {
-            case WORMHOLE_GENERATOR -> new int[][]{{62, 84}, {122, 84}};
-            case WORMHOLE_MOUTH -> new int[][]{{20, 84}};
-            case MUON_COLLECTOR -> new int[][]{{150, 60}};
+            case WORMHOLE_GENERATOR -> new int[][]{{CONTENT_X + 62, 84}, {CONTENT_X + 122, 84}};
+            case WORMHOLE_MOUTH -> new int[][]{{CONTENT_X + 20, 84}};
+            case MUON_COLLECTOR -> new int[][]{{CONTENT_X + 150, 60}};
             default -> new int[0][];
         };
     }

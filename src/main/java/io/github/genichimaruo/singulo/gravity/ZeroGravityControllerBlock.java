@@ -40,7 +40,7 @@ public class ZeroGravityControllerBlock extends BaseEntityBlock {
             be.setHeight(player.isSecondaryUseActive() ? be.height() - 1
                     : be.height() == Integer.MAX_VALUE ? Integer.MAX_VALUE : be.height() + 1);
             player.displayClientMessage(Component.translatable("message.singulo.zero_gravity_controller.height", be.height(),
-                    ZeroGravity.costPerBlock(be.height())), true);
+                    io.github.genichimaruo.singulo.energy.EnergyText.of(ZeroGravity.costPerBlock(be.height()))), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

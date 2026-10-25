@@ -86,16 +86,16 @@ class ArtifactPromotionTests(unittest.TestCase):
                     (logs / 'latest.log').write_text(f'All {count} required tests passed')
                 gui = root / 'singulo/gui-review'
                 (gui / 'screenshots').mkdir(parents=True)
-                for index in range(142):
+                for index in range(212):
                     (gui / 'screenshots' / f'{index}.png').touch()
                 (gui / 'logs').mkdir()
                 markers = ['SINGULO_GUI_COMPLETE 22', 'SINGULO_SEARCH_COMPLETE', 'SINGULO_JEI_SYNC_COMPLETE']
                 if defect != 'handbook':
                     markers.append('SINGULO_HANDBOOK_SEARCH_COMPLETE')
                 if defect != 'machine_marker':
-                    markers.append('SINGULO_MACHINE_GUI_COMPLETE 120')
+                    markers.append('SINGULO_MACHINE_GUI_COMPLETE 190')
                 (gui / 'machine-pixels.json').write_text(json.dumps({'languages': ['ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'],
-                    'machine_captures': 120, 'headers_without_title_status_overlap': 79 if defect == 'machine_pixels' else 80, 'generator_font_probes': 5}))
+                    'machine_captures': 190, 'headers_without_title_status_overlap': 79 if defect == 'machine_pixels' else 80, 'generator_font_probes': 5}))
                 (gui / 'logs/latest.log').write_text('\n'.join(markers))
                 (gui / 'inventory-pixels.json').write_text(json.dumps([
                     {'checked_empty_slot_centers': 35}, {'checked_empty_slot_centers': 35},

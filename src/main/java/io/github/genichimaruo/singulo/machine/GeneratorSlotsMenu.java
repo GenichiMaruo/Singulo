@@ -21,7 +21,7 @@ public class GeneratorSlotsMenu extends AbstractContainerMenu {
     public static final int D_HOT = 0, D_RATE_X100 = 1, D_ENERGY = 2, D_CAPACITY = 3, D_FLUID = 4, D_FLUID_CAP = 5, D_EXTRA = 6,
             D_STANDBY = 7, COUNT = 8;
     public static final int WIDTH = 176, HEIGHT = 166;
-    public static final int IN_X = 134, IN_Y = 22, OUT_X = 134, OUT_Y = 56;
+    public static final int IN_X = 134, IN_Y = 21, OUT_X = 134, OUT_Y = 51;
     public static final int INV_Y = 84;
 
     private final BlockPos pos;

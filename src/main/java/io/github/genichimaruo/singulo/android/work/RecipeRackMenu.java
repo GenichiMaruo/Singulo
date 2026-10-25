@@ -14,10 +14,12 @@ import net.minecraftforge.items.SlotItemHandler;
 
 /** アンドロイドレシピ棚の画面。6行 × [作業位置カード1枚 | レシピカード8枚]。 */
 public class RecipeRackMenu extends AbstractContainerMenu {
-    public static final int WIDTH = 194, HEIGHT = 222;
-    /** 左の列（作業位置カード）と、右の8列（レシピカード）の間を少しあける。 */
-    public static final int LOC_X = 10, CARD_X = 36, GRID_Y = 18;
-    public static final int INV_X = (WIDTH - 162) / 2 + 1, INV_Y = 140, HOTBAR_Y = 198;
+    public static final int WIDTH = 212, HEIGHT = 230;
+    /** 左の列（作業位置カード）と、右の8列（レシピカード）の間を少しあける。全体を枠の中央に置く。 */
+    public static final int LOC_X = 21, CARD_X = 47, GRID_Y = 22;
+    public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH),
+            INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT),
+            HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
 
     private final BlockPos pos;
 

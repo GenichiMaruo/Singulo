@@ -99,6 +99,8 @@ final class AndroidWorkGoal extends Goal {
     /** まとめた作業の、今作っている工程の番号。 */
     private int batchIndex;
     private int craftTimer;
+    /** 上位のアンドロイド作業台で、まだ作っていない分のたまった時間（1回分に満たない端数を次の音へ持ち越す）。 */
+    private int craftBank;
     /** 向かっているブロックと、その目の前の立つ場所。着いてからの時間。 */
     @Nullable
     private BlockPos goalBlock;
@@ -201,7 +203,7 @@ final class AndroidWorkGoal extends Goal {
                 pickups.add(new WorkConsoleBlockEntity.Pickup(BlockPos.of(pt.getLong("point")), items));
             }
         }
-        travel = wait = craftTimer = stalled = mineIdle = machineWait = 0;
+        travel = wait = craftTimer = craftBank = stalled = mineIdle = machineWait = 0;
         stopMining();
         mineSkip.clear();
         ranchSkip.clear();
@@ -259,6 +261,7 @@ final class AndroidWorkGoal extends Goal {
         travel = 0;
         crafted = 0;
         craftTimer = 0;
+        craftBank = 0;
         batchIndex = 0;
         inserted = 0;
         collected = 0;
@@ -496,28 +499,46 @@ final class AndroidWorkGoal extends Goal {
         if (android.state() != RuinAndroid.STATE_CRAFTING) {
             android.setState(RuinAndroid.STATE_CRAFTING);
         }
+        if (step.recipe() != null && level.getGameTime() % 20 == 0) {
+            c.wakeRacks(at, step.recipe());        // 使っているレシピの棚も、目を開ける
+        }
         if (step.recipe() != null && step.recipe().processing()) {
             process(level, c, job, step);
             return;
         }
-        boolean fast = android.level().getBlockState(at).is(io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORKBENCH.get());
-        if (++craftTimer < android.workTicks(fast ? io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity.CRAFT_TICKS : CRAFT_TICKS)) {
+        // 1回あたりの時間（per）と、音と火花の間隔（beat）。上位のアンドロイド作業台は、1回の音でまとめて何回分も作る
+        // （作る速さは per のまま。たまった時間を craftBank に持ち越すので、割り切れない分もずれない）
+        net.minecraft.world.level.block.Block block = android.level().getBlockState(at).getBlock();
+        int bench = io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity.craftTicks(block);
+        int per = Math.max(1, android.workTicks(bench > 0 ? bench : CRAFT_TICKS));
+        int beat = bench > 0 ? Math.max(per, android.workTicks(io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity.beatTicks(block)))
+                : per;
+        if (++craftTimer < beat) {
             return;
         }
+        craftBank += craftTimer;
         craftTimer = 0;
-        if (android.charge() < CRAFT_COST) {
-            android.spend(CRAFT_COST);
+        // 1回あたりの充電の減り（上位のアンドロイド作業台ほど少ない）
+        int cost = bench > 0 ? io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity.craftCost(block) : CRAFT_COST;
+        if (android.charge() < cost) {
+            android.spend(cost);
             return;
         }
-        if (!craftOnce(level, c, job, at, step.recipe())) {
+        long n = Math.min(Math.min(craftBank / per, step.crafts() - crafted), Math.max(1, android.charge() / cost));
+        craftBank -= craftBank / per * per;
+        int made = 0;
+        while (made < n && craftOnce(level, c, job, at, step.recipe())) {
+            made++;
+        }
+        if (made == 0) {
             android.setState(RuinAndroid.STATE_IDLE);
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
             return;
         }
         android.playSound(SoundEvents.VILLAGER_WORK_TOOLSMITH, 0.6F, 1.4F);
         android.sparks(level, Vec3.atCenterOf(at).add(0, 0.6, 0), 4, 0.25);
-        crafted++;
-        android.spend(CRAFT_COST);              // 製作済みの回数は、充電切れでも下で確定する
+        crafted += made;
+        android.spend(cost * made);             // 製作済みの回数は、充電切れでも下で確定する
         if (crafted >= step.crafts()) {
             // この工程を作り終えた: 次の工程（次の作業場所）へ。全部終われば、納品か片付けへ
             // （作る姿勢は、歩き出すまで続ける。ここで立ち姿に戻すと、続けて作るときに頭が一瞬ガクッと動くので）
@@ -712,8 +733,9 @@ final class AndroidWorkGoal extends Goal {
 
     /** 燃料を入れる面: 記録した面か、自動なら、装置から見てアンドロイドのいる横の面（かまどなら燃料の欄）。 */
     private Direction fuelSide(BlockPos machine, RecipeData r) {
-        if (r.fuelFace() != null) {
-            return r.fuelFace();
+        Direction set = r.fuelFace(android.level().getBlockState(machine));
+        if (set != null) {
+            return set;
         }
         Vec3 d = android.position().subtract(Vec3.atCenterOf(machine));
         Direction dir = Direction.getNearest(d.x, 0, d.z);
@@ -2230,7 +2252,7 @@ final class AndroidWorkGoal extends Goal {
         }
         Vec3 goal = Vec3.atBottomCenterOf(standAt);
         Vec3 d = goal.subtract(android.position());
-        if (d.horizontalDistanceSqr() < CENTER * CENTER && Math.abs(d.y) < 0.6 && android.onGround()) {
+        if (d.horizontalDistanceSqr() < CENTER * CENTER && Math.abs(d.y) < 0.6 && (android.onGround() || android.floating())) {
             // 中央に着いた: ぴったり中央に立ち、ブロックの方を向く
             android.setPos(goal.x, android.getY(), goal.z);
             return face(target, need);
@@ -2250,6 +2272,7 @@ final class AndroidWorkGoal extends Goal {
 
     /** 止まって、ブロックの方を向く（体も頭もすぐ向け、上下も合わせる）。need tick そうしていたら true。 */
     private Boolean face(BlockPos target, int need) {
+        io.github.genichimaruo.singulo.android.work.AndroidEyes.wake(android.level(), target);   // 使う装置が目を開ける
         android.getNavigation().stop();
         android.setDeltaMovement(android.getDeltaMovement().multiply(0, 1, 0));
         Vec3 look = Vec3.atCenterOf(target);

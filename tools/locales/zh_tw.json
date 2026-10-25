@@ -591,6 +591,10 @@
     "source": "Accelerator Tube",
     "translation": "加速管"
   },
+  "block.singulo.advanced_android_workbench": {
+    "source": "Advanced Android Workbench",
+    "translation": "改良型仿生人工作台"
+  },
   "block.singulo.android_barrier_glass": {
     "source": "Android Barrier Glass",
     "translation": "仿生人阻隔玻璃"
@@ -1067,6 +1071,10 @@
     "source": "Autonomous Probe Station",
     "translation": "自動探測站"
   },
+  "block.singulo.quantum_android_workbench": {
+    "source": "Quantum Android Workbench",
+    "translation": "量子仿生人工作台"
+  },
   "block.singulo.quantum_heat_engine": {
     "source": "Quantum Heat Engine",
     "translation": "量子熱機"
@@ -1470,6 +1478,10 @@
   "desc.singulo.accelerator_tube": {
     "source": "Tube segment of the Particle Accelerator ring.",
     "translation": "粒子加速器環的管段。"
+  },
+  "desc.singulo.advanced_android_workbench": {
+    "source": "An upgraded Android Workbench. Androids craft eight times as fast as on a vanilla crafting table, and the holding box has 54 slots. Androids use 60% of the usual charge per craft. Used the same way as the Android Workbench.",
+    "translation": "仿生人工作台的上位版本。速度是原版工作台的8倍，暫存箱有54格。仿生人的電量消耗降為6成。用法與仿生人工作台相同。"
   },
   "desc.singulo.afterglow_wings": {
     "source": "Wings of crystal feathers born from the Last Archivist's light. Wear them on your chest to glide; sneak while gliding to beat them and surge ahead. No fall damage.",
@@ -2200,8 +2212,8 @@
     "translation": "抑制重力場波動的部件。"
   },
   "desc.singulo.gravity_panel_receiver": {
-    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It accepts any amount per tick and stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
-    "translation": "從線纜接收電力，分配給相接的面板以及與其以面相連的全部面板（低重力、高重力面板，無重力方塊，製作的瑞利散射面板）。每刻可接收任意電量，即使相連數量極多也不會卡頓。電力不足時，按距離由近到遠只驅動付得起的數量。右鍵查看運行數量與耗電。"
+    "source": "Takes power from cables and feeds every panel touching it and everything joined to those (low- and high-gravity panels, zero-gravity blocks and built Rayleigh sky panels). It stores no power and takes only what the joined panels use, so they work only while power keeps coming. It stays light even with huge numbers of panels. When power runs short, only the nearest panels it can pay for work. Right-click to see how many are active and the power they use.",
+    "translation": "從線纜接收電力，分配給相接的面板以及與其以面相連的全部面板（低重力、高重力面板，無重力方塊，製作的瑞利散射面板）。不儲存電力，只接收相連面板所用的電量（只在有電力送達時運行）。即使相連數量極多也不會卡頓。電力不足時，按距離由近到遠只驅動付得起的數量。右鍵查看運行數量與耗電。"
   },
   "desc.singulo.guardian_core": {
     "source": "The seal in the floor of a ruin boss room. It wakes the ruin's guardian when a challenger enters. Unbreakable.",
@@ -2502,6 +2514,10 @@
   "desc.singulo.procedure_card": {
     "source": "Records up to eight steps and what they produce, in the procedure mode of a work console's Record tab. Steps can insert, extract, mine, harvest, fell, breed, shear, milk, cull or use a block (levers and buttons). The places are stored on the card, so it works in a recipe rack row without a Work Location Card. Mining needs a Mining Upgrade and felling a Felling Upgrade.",
     "translation": "在作業指令台「記錄」的步驟模式中，記錄最多8個步驟及其產物。步驟有放入、取出、採掘、收穫、伐木、繁殖、剪毛、擠奶、處理、操作（拉桿或按鈕）。位置記錄在卡中，因此可放在配方架中沒有作業位置卡的行。採掘需要採掘升級，伐木需要伐木升級。"
+  },
+  "desc.singulo.quantum_android_workbench": {
+    "source": "The top Android Workbench. Androids craft twenty times as fast as on a vanilla crafting table, and the holding box has 81 slots. Androids use 30% of the usual charge per craft. Used the same way as the Android Workbench.",
+    "translation": "仿生人工作台的最高版本。速度是原版工作台的20倍，暫存箱有81格。仿生人的電量消耗降為3成。用法與仿生人工作台相同。"
   },
   "desc.singulo.quantum_computing_module": {
     "source": "A computing module that uses quantum states.",
@@ -2968,8 +2984,8 @@
     "translation": "以奇異物質穩定不穩定蟲洞入口，使其成為可以放置的入口。"
   },
   "desc.singulo.zero_gravity_block": {
-    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Joins visually with its neighbours.",
-    "translation": "由面板受電器供電時，上方的空間（初始為5格）會變成無重力。在其中按跳躍鍵向上、潛行向下漂浮，也不會受到摔落傷害。每個30 FE/t。高度可用無重力控制箱改變。與相鄰的同種方塊外觀相連。"
+    "source": "When powered by a panel receiver, the space above it (5 blocks at first) becomes weightless: hold jump to drift up, sneak to drift down, and there is no fall damage. 30 FE/t each. A zero-gravity control box changes the height. Androids fly inside it and can reach any height. Joins visually with its neighbours.",
+    "translation": "由面板受電器供電時，上方的空間（初始為5格）會變成無重力。在其中按跳躍鍵向上、潛行向下漂浮，也不會受到摔落傷害。每個30 FE/t。高度可用無重力控制箱改變。仿生人會在無重力中飛行，可上下前往任何位置。與相鄰的同種方塊外觀相連。"
   },
   "desc.singulo.zero_gravity_controller": {
     "source": "Attached to zero-gravity blocks, it sets the weightless height for all the joined blocks (right-click to raise it by one, sneak-right-click to lower it; no limit). Boxes on the same group share one height, and a broken box keeps its height as an item. Each extra block of height multiplies the power of every zero-gravity block by 1.4.",
@@ -5048,8 +5064,8 @@
     "translation": "輸出槽或輸出儲槽已滿。請取出物品，或在面設定中開啟自動輸出。"
   },
   "gui.singulo.reason.select_hint": {
-    "source": "Pick what to make with the button below the output.",
-    "translation": "請用輸出欄下方的按鈕指定要製作的物品"
+    "source": "Pick what to make with the button next to the output.",
+    "translation": "請用輸出欄旁邊的按鈕指定要製作的物品"
   },
   "gui.singulo.reason.too_small": {
     "source": "- Needs size %s or more (now %s)",
@@ -5091,6 +5107,10 @@
     "source": "Auto",
     "translation": "自動"
   },
+  "gui.singulo.recipe_encoder.face.back": {
+    "source": "Back",
+    "translation": "背面"
+  },
   "gui.singulo.recipe_encoder.face.down": {
     "source": "Bottom",
     "translation": "下"
@@ -5099,9 +5119,21 @@
     "source": "East",
     "translation": "東"
   },
+  "gui.singulo.recipe_encoder.face.front": {
+    "source": "Front",
+    "translation": "正面"
+  },
+  "gui.singulo.recipe_encoder.face.left": {
+    "source": "Left",
+    "translation": "左"
+  },
   "gui.singulo.recipe_encoder.face.north": {
     "source": "North",
     "translation": "北"
+  },
+  "gui.singulo.recipe_encoder.face.right": {
+    "source": "Right",
+    "translation": "右"
   },
   "gui.singulo.recipe_encoder.face.south": {
     "source": "South",
@@ -5128,8 +5160,8 @@
     "translation": "入 %s"
   },
   "gui.singulo.recipe_encoder.face_button.in.hint": {
-    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Directions are world directions",
-    "translation": "從裝置的哪個面放入材料（點擊切換，右鍵反向）。自動：依上、側面、下的順序，從接受該材料的面放入（通常這樣就行）。東南西北為世界方向"
+    "source": "Which face of the machine materials go in through (click to change, right-click to go back). Auto: tries top, sides, then bottom, and uses the first face that takes the material (usually all you need). Front, back, left and right are relative to the way the machine faces (left and right as seen from the front); compass directions are world directions",
+    "translation": "從裝置的哪個面放入材料（點擊切換，右鍵反向）。自動：依上、側面、下的順序，從接受該材料的面放入（通常這樣就行）。正面、背面、左、右是從裝置朝向看的面（左右為從正面看），東南西北為世界方向"
   },
   "gui.singulo.recipe_encoder.face_button.out": {
     "source": "Out: %s",
@@ -5303,6 +5335,18 @@
     "source": "What to do with a lever (click to change). Buttons, doors, trapdoors and the like are always used like a right-click",
     "translation": "如何操作拉桿（點擊變更）。按鈕、門、活板門等總是與右鍵相同"
   },
+  "gui.singulo.recipe_encoder.variant_slot.hint": {
+    "source": "Click to toggle (uses other items of the same kind that fit the recipe)",
+    "translation": "點擊切換（使用符合配方的同類物品）"
+  },
+  "gui.singulo.recipe_encoder.variant_slot.off": {
+    "source": "This slot: exact item only",
+    "translation": "此格：僅限與樣本相同的物品"
+  },
+  "gui.singulo.recipe_encoder.variant_slot.on": {
+    "source": "This slot: any variant",
+    "translation": "此格：也使用同類物品"
+  },
   "gui.singulo.recipe_encoder.variants.hint": {
     "source": "Any variant: use anything the recipe accepts in that slot, not just the pattern item (any wood planks, for example). Same item only: use exactly the pattern items",
     "translation": "同類也可：即使不是樣本中的物品，也會使用配方認可的同類物品（各種木板等）。僅相同物品：只使用與樣本相同的物品"
@@ -5314,6 +5358,10 @@
   "gui.singulo.recipe_encoder.variants.on": {
     "source": "Any variant",
     "translation": "同類也可"
+  },
+  "gui.singulo.recipe_encoder.variants.some": {
+    "source": "Some slots: any variant",
+    "translation": "部分格子可用同類物品"
   },
   "gui.singulo.route.hint.0": {
     "source": "Moving into or out of the area, androids pass the waypoint",
@@ -5383,6 +5431,14 @@
     "source": "- Restores: %s",
     "translation": "・修復對象：%s"
   },
+  "gui.singulo.select.rows_less": {
+    "source": "Show fewer rows",
+    "translation": "顯示更少列"
+  },
+  "gui.singulo.select.rows_more": {
+    "source": "Show more rows",
+    "translation": "顯示更多列"
+  },
   "gui.singulo.select.title": {
     "source": "Make",
     "translation": "製作目標"
@@ -5410,6 +5466,10 @@
   "gui.singulo.shield.permit_on": {
     "source": "Permit: only %s players may build inside",
     "translation": "許可證：只有 %s 名玩家可在內部建造"
+  },
+  "gui.singulo.shift_detail": {
+    "source": "Shift: exact values",
+    "translation": "Shift：精確數值"
   },
   "gui.singulo.sides.adjacent": {
     "source": "Adjacent block: %s",
@@ -6000,8 +6060,8 @@
     "translation": "依名稱篩選。以 @ 開頭則依模組篩選（例：@singulo）。以空格分隔時只保留全部符合的物品。右鍵清除"
   },
   "gui.singulo.work_console.search.hint": {
-    "source": "Search (@ for mod)",
-    "translation": "搜尋（@ 搜模組）"
+    "source": "Search",
+    "translation": "搜尋"
   },
   "gui.singulo.work_console.signal.off": {
     "source": "Redstone signal: off",
@@ -6244,8 +6304,8 @@
     "translation": "仿生人的裝飾"
   },
   "guide.singulo.androids.farm.body": {
-    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench.",
-    "translation": "・農活：收穫（收取成熟的作物並補種。甘蔗和仙人掌保留根部）、伐木（整棵砍樹並補種樹苗。需要伐木升級）、繁殖（餵食增加到設定數量）、剪毛・擠奶（會帶上空桶）、處理（超過設定數量的部分）。不會碰有名字、拴著、被馴服的動物和幼崽。\n・操作：使用拉桿（開・關・切換）、按鈕、門等。用來驅動機關。\n・液體與氣體：資材口和指令台旁的儲罐也是資材存放處。在加工模式或步驟的樣本欄中用桶等容器點擊，或用 JEI 的「+」，即可放置流體（滾輪每次 100 mB，Shift 每次 1000 mB）。裝有儲罐升級的仿生人會把流體運到裝置。製作流體的訂單會放入資材存放處的儲罐。\n・燃料：在加工模式的燃料欄放入燃料後記錄，裝置燃料耗盡時會從資材存放處取來該燃料放入（每次按設定的數量，或用欄下方的按鈕設為「加滿」則帶來裝置能放入的量。兩種都不會帶來放不下的部分。留空則不去取）。資材存放處沒有且有配方可以製作時，會自動下單製作燃料（製作期間仿生人會做其他作業）。\n・機率產出：產出數量不足時，從資材存放處取用不足部分的材料，重複製作直到收集齊（材料不足時會等到備齊）。收穫、伐木、牧場中若還有會生長的東西，會等待其生長（最多 20 分鐘）。紫水晶只收取完全長成的晶簇，不會破壞紫水晶母岩。\n・仿生人工作台：製作速度是原版工作台的 4 倍。做出的物品裝不進仿生人的物品欄時，不會掉在腳下，而是放進作業台的暫存箱，之後再來取（取不了的物品可以右鍵取出）。暫存箱裡有物品時，工作台上方會浮現其中一件。"
+    "source": "- Farming: Harvest (picks ripe crops and replants; sugar cane and cactus keep their base), Fell (cuts whole trees and replants saplings; needs a Felling Upgrade), Breed (feeds animals up to a set number), Shear and Milk (empty buckets are taken along) and Cull (anything above a set number). Named, leashed and tamed animals and babies are left alone.\n- Use: flips levers (on, off or toggle), presses buttons, opens doors and so on, to drive contraptions.\n- Liquids and gases: tanks next to supply ports or the console join the stockpile. Click a pattern slot in processing or procedure mode with a bucket or other fluid container, or use JEI's + button, to place a fluid (scroll for 100 mB steps, Shift for 1000 mB). Androids with a Tank Upgrade carry fluids to machines. Orders that make a fluid fill the stockpile tanks.\n- Fuel: record a fuel in the fuel slot of the processing mode, and when the machine runs out, androids fetch that fuel from the stockpile and load it (the count you set each time, or as much as fits with the Fill button below the slot; never more than the machine can take. Leave it empty to never fetch fuel). If the stockpile has none and there is a recipe for it, an order to make the fuel is placed automatically (the androids do other work meanwhile).\n- Chance outputs: if fewer come out than planned, materials for the rest are taken from the stockpile and the step repeats until enough is collected (if materials run short, it waits). Harvesting, felling and ranching wait for things that are still growing (up to 20 minutes). Amethyst: only full clusters are picked, and budding amethyst is never broken.\n- Android Workbench: crafts four times as fast as a vanilla crafting table. When crafted items do not fit in the android's inventory, they go into the workbench's holding box instead of onto the ground, and the android comes back for them (right-click to take anything left behind). While the holding box has items, one of them floats above the workbench. The upgraded Advanced (8×, 54 slots, 60% charge use) and Quantum (20×, 81 slots, 30% charge use) workbenches are made from the previous tier.",
+    "translation": "・農活：收穫（收取成熟的作物並補種。甘蔗和仙人掌保留根部）、伐木（整棵砍樹並補種樹苗。需要伐木升級）、繁殖（餵食增加到設定數量）、剪毛・擠奶（會帶上空桶）、處理（超過設定數量的部分）。不會碰有名字、拴著、被馴服的動物和幼崽。\n・操作：使用拉桿（開・關・切換）、按鈕、門等。用來驅動機關。\n・液體與氣體：資材口和指令台旁的儲罐也是資材存放處。在加工模式或步驟的樣本欄中用桶等容器點擊，或用 JEI 的「+」，即可放置流體（滾輪每次 100 mB，Shift 每次 1000 mB）。裝有儲罐升級的仿生人會把流體運到裝置。製作流體的訂單會放入資材存放處的儲罐。\n・燃料：在加工模式的燃料欄放入燃料後記錄，裝置燃料耗盡時會從資材存放處取來該燃料放入（每次按設定的數量，或用欄下方的按鈕設為「加滿」則帶來裝置能放入的量。兩種都不會帶來放不下的部分。留空則不去取）。資材存放處沒有且有配方可以製作時，會自動下單製作燃料（製作期間仿生人會做其他作業）。\n・機率產出：產出數量不足時，從資材存放處取用不足部分的材料，重複製作直到收集齊（材料不足時會等到備齊）。收穫、伐木、牧場中若還有會生長的東西，會等待其生長（最多 20 分鐘）。紫水晶只收取完全長成的晶簇，不會破壞紫水晶母岩。\n・仿生人工作台：製作速度是原版工作台的 4 倍。做出的物品裝不進仿生人的物品欄時，不會掉在腳下，而是放進作業台的暫存箱，之後再來取（取不了的物品可以右鍵取出）。暫存箱裡有物品時，工作台上方會浮現其中一件。上位的改良型（8倍速·54格·電量消耗6成）和量子型（20倍速·81格·電量消耗3成）以前一階段的工作台為材料製作。"
   },
   "guide.singulo.androids.farm.title": {
     "source": "Farming, fluids and fuel",
@@ -6826,6 +6886,10 @@
   "howto.singulo.accelerator_tube": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.advanced_android_workbench": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製造地：精密組裝台（第 3 階段）"
   },
   "howto.singulo.android_armor_plate": {
     "source": "Made in: Precision Assembler (stage 2)",
@@ -7666,6 +7730,10 @@
   "howto.singulo.procedure_card": {
     "source": "Made in: Crafting Table (stage 2)",
     "translation": "製造地：工作台（第 2 階段）"
+  },
+  "howto.singulo.quantum_android_workbench": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "製造地：精密組裝台（第 4 階段）"
   },
   "howto.singulo.quantum_computing_module": {
     "source": "Made in: Precision Assembler (stage 3)",
@@ -9787,6 +9855,38 @@
     "source": "Advanced anchor holds",
     "translation": "進階錨點錨定時空"
   },
+  "subtitles.singulo.android.charge_start": {
+    "source": "Android starts charging",
+    "translation": "仿生人開始充電"
+  },
+  "subtitles.singulo.android.charged": {
+    "source": "Android is fully charged",
+    "translation": "仿生人充滿電"
+  },
+  "subtitles.singulo.android.gunner_shot": {
+    "source": "Pistol fires",
+    "translation": "小型槍開火"
+  },
+  "subtitles.singulo.android.power_down": {
+    "source": "Android powers down",
+    "translation": "仿生人電量耗盡"
+  },
+  "subtitles.singulo.android.railgun_assemble": {
+    "source": "Railgun assembles",
+    "translation": "電磁砲組裝完成"
+  },
+  "subtitles.singulo.android.railgun_charge": {
+    "source": "Railgun charges",
+    "translation": "電磁砲蓄能"
+  },
+  "subtitles.singulo.android.railgun_fire": {
+    "source": "Railgun fires",
+    "translation": "電磁砲發射"
+  },
+  "subtitles.singulo.android.ring_inflate": {
+    "source": "Float ring inflates",
+    "translation": "泳圈鼓起"
+  },
   "subtitles.singulo.archive_terminal_running": {
     "source": "Archive terminal reads",
     "translation": "檔案終端讀取"
@@ -10427,6 +10527,10 @@
     "source": "Wormhole stabilizer runs",
     "translation": "蟲洞穩定器運行"
   },
+  "summary.singulo.advanced_android_workbench": {
+    "source": "Androids craft 8× as fast here. 54-slot holding box.",
+    "translation": "仿生人以8倍速度製作的工作台。暫存箱54格。"
+  },
   "summary.singulo.android_backpack_upgrade": {
     "source": "Adds 12 inventory slots to an android.",
     "translation": "仿生人物品欄 +12 格。"
@@ -10558,6 +10662,10 @@
   "summary.singulo.procedure_card": {
     "source": "Records up to eight work steps for androids.",
     "translation": "記錄要讓仿生人執行的作業步驟（最多 8 個）。"
+  },
+  "summary.singulo.quantum_android_workbench": {
+    "source": "Androids craft 20× as fast here. 81-slot holding box.",
+    "translation": "仿生人以20倍速度製作的工作台。暫存箱81格。"
   },
   "summary.singulo.rayleigh_panel": {
     "source": "A powered ceiling panel that provides midday sunlight below.",
@@ -10907,6 +11015,10 @@
     "source": "Used in: Particle Accelerator",
     "translation": "用於：粒子加速器"
   },
+  "uses.singulo.advanced_android_workbench": {
+    "source": "Used in: Quantum Android Workbench",
+    "translation": "用於：量子仿生人工作台"
+  },
   "uses.singulo.android_backpack_upgrade": {
     "source": "Used in: Reinforced Backpack Upgrade",
     "translation": "用於：強化背包升級"
@@ -10934,6 +11046,10 @@
   "uses.singulo.android_tank_upgrade": {
     "source": "Used in: Gas & Liquid Upgrade",
     "translation": "用於：氣體與液體升級"
+  },
+  "uses.singulo.android_workbench": {
+    "source": "Used in: Advanced Android Workbench",
+    "translation": "用於：改良型仿生人工作台"
   },
   "uses.singulo.anomaly_sample": {
     "source": "Used in: Singularity Core",
@@ -11340,8 +11456,8 @@
     "translation": "用於：資料卡（觀測日誌）"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 24 more",
-    "translation": "用於：大型背包升級、簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、相位同步板 等 24 個"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 25 more",
+    "translation": "用於：大型背包升級、簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、相位同步板 等 25 個"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11360,8 +11476,8 @@
     "translation": "用於：無瑕廢墟磁磚、無瑕廢墟柱、無瑕廢墟導光板"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 18 more",
-    "translation": "用於：量子熱機、重力波探測器、微中子觀測站、簡併壓縮爐控制器、卡西米爾腔控制器 等 18 個"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 20 more",
+    "translation": "用於：量子熱機、重力波探測器、微中子觀測站、簡併壓縮爐控制器、卡西米爾腔控制器 等 20 個"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -11448,12 +11564,12 @@
     "translation": "用於：基本框架、鋼板、壓縮機、移設扳手、無瑕廢墟柱 等 1 個"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 83 more",
-    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 83 個"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 84 more",
+    "translation": "用於：白色面板、黑色強化面板、白色滑動門、黑色強化玻璃、冷卻塔底座 等 84 個"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 57 more",
-    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 57 個"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 59 more",
+    "translation": "用於：超導線材、聚焦磁鐵、加速器控制器、催化反應器、低溫渦輪機 等 59 個"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",

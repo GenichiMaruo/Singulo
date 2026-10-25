@@ -183,7 +183,7 @@ public class HydrogenFuelCellBlockEntity extends BlockEntity implements Abstract
     @Override
     public void openMenu(ServerPlayer player) {
         Component status = standby ? Component.translatable("message.singulo.fuel_cell.standby")
-                : Component.translatable("gui.singulo.energy_rate", String.format("%.1f", rate));
+                : Component.translatable("gui.singulo.energy_rate", io.github.genichimaruo.singulo.energy.EnergyText.of(rate));
         player.displayClientMessage(Component.translatable("message.singulo.fuel_cell.status",
                 hydrogen.getFluidAmount(), HYDROGEN_TANK, oxygen.getFluidAmount(), OXYGEN_TANK,
                 energy.getEnergyStored(), energy.getMaxEnergyStored(), status), true);

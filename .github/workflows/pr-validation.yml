@@ -90,8 +90,8 @@ jobs:
       - name: Require GUI captures
         if: matrix.namespace == 'singulo'
         run: |
-          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 142
-          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 120' build/${{ matrix.loader }}/gui-review/logs/latest.log
+          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 212
+          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 190' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_GUI_COMPLETE 22' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_JEI_SYNC_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log

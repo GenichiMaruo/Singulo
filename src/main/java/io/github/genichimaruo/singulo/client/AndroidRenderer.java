@@ -33,6 +33,8 @@ import org.joml.Quaternionf;
 public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     /** 体の大きさ（モデルはプレイヤーの大きさで作り、少し縮める）。 */
     static final float SCALE = 0.85F;
+    /** 画面の中（インベントリの全身）に描いている間だけ true。世界の座標で描く飾りは、体の座標で描き直す。 */
+    static boolean inGui;
 
     public enum Variant {
         BLADE("blade_android", BladeAndroid.ACCENT, AndroidModel.BLADE_LAYER, false),
@@ -104,6 +106,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Solar(this));
         addLayer(new Pickaxe(this));
         addLayer(new Tanks(this));
+        addLayer(new Thrusters(this));
+        addLayer(new SwimRing(this));
         addLayer(new Accessories(this));
         addLayer(new Blink(this));
         addLayer(new ArmorGlint(this));
@@ -117,6 +121,41 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     @Override
     protected void scale(RuinAndroid android, PoseStack pose, float partialTick) {
         pose.scale(SCALE, SCALE, SCALE);
+    }
+
+    /**
+     * 無重力や水の中で飛んでいる間は、進む向きへ体を少し傾ける（前へ進めば前のめり、横へ進めばそちらへ）。
+     * 水上であお向けに浮かんで休むときは、体を寝かせて、波でゆっくり揺らす。
+     */
+    @Override
+    protected void setupRotations(RuinAndroid android, PoseStack pose, float bob, float yBodyRot, float partialTick) {
+        super.setupRotations(android, pose, bob, yBodyRot, partialTick);
+        if (android.state() == RuinAndroid.STATE_FLOAT_REST) {
+            float k = Mth.clamp(android.stateTime(partialTick) / 14, 0, 1);
+            k = k * k * (3 - 2 * k);
+            float age = android.tickCount + partialTick;
+            float mid = android.getBbHeight() * 0.5F;
+            pose.translate(0, mid, 0);
+            pose.mulPose(Axis.XP.rotationDegrees(84 * k + 2 * Mth.sin(age * 0.07F)));      // 上が後ろへ: あお向け
+            pose.mulPose(Axis.ZP.rotationDegrees(4 * Mth.sin(age * 0.05F) * k));
+            pose.translate(0, -mid, 0);
+            return;
+        }
+        float open = android.thrusterOpen(partialTick);
+        if (open <= 0) {
+            return;
+        }
+        double vx = android.getX() - android.xo, vz = android.getZ() - android.zo;
+        float yaw = yBodyRot * Mth.DEG_TO_RAD;
+        double forward = -vx * Mth.sin(yaw) + vz * Mth.cos(yaw);
+        double side = vx * Mth.cos(yaw) + vz * Mth.sin(yaw);
+        float pitch = -(float) Mth.clamp(forward * 70, -10, 18) * open;    // 上を前（-Z）へ: 前のめり
+        float roll = (float) Mth.clamp(side * 50, -10, 10) * open;
+        float mid = android.getBbHeight() * 0.5F;
+        pose.translate(0, mid, 0);
+        pose.mulPose(Axis.XP.rotationDegrees(pitch));
+        pose.mulPose(Axis.ZP.rotationDegrees(roll));
+        pose.translate(0, -mid, 0);
     }
 
     @Override
@@ -257,6 +296,26 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
 
         private GlowCore(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
                          boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
+            super(name, format, mode, size, crumbling, sort, setup, clear);
+        }
+    }
+
+    /**
+     * スラスターの炎の描き方: RenderType.lightning と同じく光を足して描くが、奥行きを書かない（書くと、あとから描かれる
+     * 透ける物（後ろのリボンなど）が、炎の奥にあるとして消えてしまう）。円錐の内側の面も描く。
+     */
+    private static final class Exhaust extends RenderType {
+        static final RenderType TYPE = create("singulo_exhaust", com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR,
+                com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
+                        .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
+                        .setWriteMaskState(COLOR_WRITE)
+                        .setTransparencyState(LIGHTNING_TRANSPARENCY)
+                        .setCullState(NO_CULL)
+                        .setOutputState(WEATHER_TARGET)
+                        .createCompositeState(false));
+
+        private Exhaust(String name, com.mojang.blaze3d.vertex.VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode, int size,
+                        boolean crumbling, boolean sort, Runnable setup, Runnable clear) {
             super(name, format, mode, size, crumbling, sort, setup, clear);
         }
     }
@@ -826,7 +885,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 return;
             }
             int alpha = 255;
-            if (state == RuinAndroid.STATE_CHARGING || state == RuinAndroid.STATE_RESTING) {
+            if (state == RuinAndroid.STATE_CHARGING || state == RuinAndroid.STATE_RESTING || state == RuinAndroid.STATE_FLOAT_REST
+                    || state == RuinAndroid.STATE_SEABED_REST) {
                 alpha = (int) (70 + 60 * Mth.sin(ageInTicks * 0.15F));
             }
             VertexConsumer vc = buffers.getBuffer(RenderType.eyes(variant.glow));
@@ -975,6 +1035,160 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     /**
      * タンクアップグレード: 腰の左右に、ガラスの筒を1本ずつ。中の流体の色で、入っている高さまで満たす。上下に金属のふた。
      */
+    /**
+     * スラスター（無重力の空間で飛ぶとき）。バックパックの左右の側面に主ノズル2つ（下へ、外と少し後ろへ開いて噴く。腰の後ろの
+     * バッテリーに炎がかからない。射撃型は背負ったレールガンを避けて、上寄りから後ろへ強めに噴く）、両かかとに小さな補助ノズル。
+     * 無重力に入るとノズルが開いて出てきて、外へ出るとたたまれる。炎は芯の白い光と、そのまわりのプラズマの炎の二重の円錐で、
+     * 進む速さと向きで長さと明るさが変わり（前や上へ進むほど主ノズルが、上へ上がるほどかかとが強く噴く）、少しずつゆらぐ。
+     */
+    final class Thrusters extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final int SIDES = 10;
+
+        Thrusters(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            float open = android.thrusterOpen(partialTick);
+            if (open <= 0 || android.isInvisible()) {
+                return;
+            }
+            float ease = open * open * (3 - 2 * open);
+            double vx = android.getX() - android.xo, vy = android.getY() - android.yo, vz = android.getZ() - android.zo;
+            double horizontal = Math.sqrt(vx * vx + vz * vz);
+            // 噴く強さ（浮いているだけでも少し噴く）。上へ上がるほどかかと、前へ進むほど主ノズルが強い。下りるときは弱める
+            float main = (float) Mth.clamp(0.35 + horizontal * 5 + Math.max(vy, 0) * 4 - Math.max(-vy, 0) * 3, 0.15, 1.2) * ease;
+            float heel = (float) Mth.clamp(0.3 + Math.max(vy, 0) * 8 + horizontal * 1.5 - Math.max(-vy, 0) * 4, 0.1, 1.2) * ease;
+            int plasma = FxDraw.lerpRgb(variant.accent, 0x7FE8FF, 0.45F);
+            AndroidModel m = getParentModel();
+            for (int side = -1; side <= 1; side += 2) {
+                // 主ノズル: バックパックの左右の側面の下寄り。外へ開いて噴く（腰の後ろのバッテリーやスカートに炎がかからない）
+                // 射撃型は背中の低い所にレールガンを斜めに背負うので、側面の上寄りから、後ろへ強めに噴いて銃の後ろを通す
+                boolean gunner = android instanceof io.github.genichimaruo.singulo.android.GunnerAndroid;
+                pose.pushPose();
+                m.toBackpack(pose);
+                pose.translate(side * 3.3F / 16, (gunner ? -6F : -2.5F) / 16, 1.5F / 16);
+                pose.mulPose(Axis.ZP.rotationDegrees(-side * (gunner ? 15 : 32)));
+                pose.mulPose(Axis.XP.rotationDegrees(gunner ? 55 : 16));
+                nozzle(pose, buffers, light, ease, 0.075F, android, age, side, main, plasma, 0.62F);
+                pose.popPose();
+                // 補助ノズル: かかとの後ろ
+                pose.pushPose();
+                m.toShin(pose, side < 0);
+                pose.translate(0, 5.6F / 16, 1.3F / 16);
+                pose.mulPose(Axis.XP.rotationDegrees(14));
+                nozzle(pose, buffers, light, ease, 0.05F, android, age, side + 3, heel, plasma, 0.4F);
+                pose.popPose();
+            }
+        }
+
+        /**
+         * ノズル1つ（今の pose の原点が付け根、+Y が噴く向き）。size: ノズルの口の幅。ノズルは開き具合で根元から伸びて出てくる。
+         * power: 噴く強さ（炎の長さと明るさ）。reach: 一番強いときの炎の長さ（ブロック）。
+         */
+        private void nozzle(PoseStack pose, MultiBufferSource buffers, int light, float open, float size,
+                            RuinAndroid android, float age, int seed, float power, int plasma, float reach) {
+            VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));   // 炎の描き先へ替えたあとなので、毎回取り直す
+            float h = size * 0.9F * open;
+            float r = size / 2;
+            // 根元の台座と、口の広がったベル（暗い金属と明るい縁）
+            FxDraw.box(pose, metal, -r * 0.8F, 0, -r * 0.8F, r * 0.8F, h * 0.45F, r * 0.8F, light, 0x3A4048);
+            FxDraw.box(pose, metal, -r, h * 0.45F, -r, r, h, r, light, 0x8C949E);
+            if (open < 0.6F) {
+                return;
+            }
+            // 口の奥の光
+            VertexConsumer fx = buffers.getBuffer(Exhaust.TYPE);
+            glowBox(pose, fx, -r * 0.7F, h - 0.004F, -r * 0.7F, r * 0.7F, h + 0.002F, r * 0.7F, 0xE8FBFF, (int) (200 * Math.min(1, power)));
+            // 炎: ゆらぎ（ノズルごとに位相をずらす）
+            float phase = android.getId() * 1.7F + seed * 2.3F;
+            float flicker = 0.86F + 0.09F * Mth.sin(age * 1.9F + phase) + 0.05F * Mth.sin(age * 4.7F + phase * 1.3F);
+            float length = (0.08F + reach * power) * flicker;
+            pose.pushPose();
+            pose.translate(0, h, 0);
+            cone(pose, fx, r * 1.05F, length, plasma, (int) Mth.clamp(150 * power, 40, 190));
+            cone(pose, fx, r * 0.5F, length * 0.5F, 0xF2FDFF, (int) Mth.clamp(230 * power, 70, 240));
+            pose.popPose();
+        }
+
+        /** 炎の円錐（原点の輪から +Y へ。3分の1ほどで少しふくらみ、先へ向かって細く薄くなる。光を足す描き方）。 */
+        private void cone(PoseStack pose, VertexConsumer vc, float radius, float length, int rgb, int alpha) {
+            PoseStack.Pose p = pose.last();
+            int red = (rgb >> 16) & 0xFF, green = (rgb >> 8) & 0xFF, blue = rgb & 0xFF;
+            float[] ys = {0, length * 0.32F, length};
+            float[] rs = {radius, radius * 1.15F, 0};
+            int[] as = {alpha, (int) (alpha * 0.7F), 0};
+            for (int ring = 0; ring < 2; ring++) {
+                for (int i = 0; i < SIDES; i++) {
+                    float a0 = Mth.TWO_PI * i / SIDES, a1 = Mth.TWO_PI * (i + 1) / SIDES;
+                    float c0 = Mth.cos(a0), s0 = Mth.sin(a0), c1 = Mth.cos(a1), s1 = Mth.sin(a1);
+                    vc.vertex(p.pose(), rs[ring] * c0, ys[ring], rs[ring] * s0).color(red, green, blue, as[ring]).endVertex();
+                    vc.vertex(p.pose(), rs[ring] * c1, ys[ring], rs[ring] * s1).color(red, green, blue, as[ring]).endVertex();
+                    vc.vertex(p.pose(), rs[ring + 1] * c1, ys[ring + 1], rs[ring + 1] * s1).color(red, green, blue, as[ring + 1]).endVertex();
+                    vc.vertex(p.pose(), rs[ring + 1] * c0, ys[ring + 1], rs[ring + 1] * s0).color(red, green, blue, as[ring + 1]).endVertex();
+                }
+            }
+        }
+    }
+
+    /**
+     * 浮き輪（水の中で充電が切れたとき、ぱっとふくらんで水面まで連れていく。水上で充電している間も付けている）。
+     * マイクラらしく、四角い管を八角形につないだ輪（前後左右の4本はアクセントの色、角の4つは白のしま）。管は上下の角を1段ずつ
+     * 落として、ふっくらした断面にする。ふくらむときは少し大きくなってから落ち着く。空気を入れる口が前に付いている。
+     */
+    final class SwimRing extends RenderLayer<RuinAndroid, AndroidModel> {
+
+        SwimRing(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            float k = android.ringOpen(partialTick);
+            if (k <= 0 || android.isInvisible()) {
+                return;
+            }
+            // ぱっとふくらむ（少し大きくなりすぎてから戻る）
+            float pop = k < 1 ? k * (1.25F - 0.25F * k) + 0.15F * Mth.sin(k * Mth.PI) : 1;
+            pose.pushPose();
+            getParentModel().toHips(pose);
+            pose.translate(0, -1.2F / 16, 0);
+            pose.scale(pop, pop, pop);
+            VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
+            float p = 1 / 16F;
+            int accent = variant.accent, white = 0xF8FAFC;
+            // 前後左右のまっすぐな管（ピクセル単位: 内側 4.5、外側 7.5、高さ ±1.5）
+            for (int side = 0; side < 4; side++) {
+                pose.pushPose();
+                pose.mulPose(Axis.YP.rotationDegrees(90 * side));
+                tube(pose, vc, light, -3.2F * p, 3.2F * p, 4.5F * p, 7.5F * p, accent);
+                pose.popPose();
+            }
+            // 角の管（斜め45度。白）
+            for (int corner = 0; corner < 4; corner++) {
+                pose.pushPose();
+                pose.mulPose(Axis.YP.rotationDegrees(45 + 90 * corner));
+                tube(pose, vc, light, -2.0F * p, 2.0F * p, 5.0F * p, 8.0F * p, white);   // まっすぐな管の端どうしをつなぐ
+                pose.popPose();
+            }
+            // 空気を入れる口（前の管の上）
+            FxDraw.box(pose, vc, -0.5F * p, -2.1F * p, -6.5F * p, 0.5F * p, -1.4F * p, -5.5F * p, light, white, 255);
+            pose.popPose();
+        }
+
+        /**
+         * 管の1本（x0..x1 の長さ、中心から z0..z1 の前の向き（-Z）の位置）。四角い管の上下の外側の角を1段落として、ふっくらさせる。
+         */
+        private void tube(PoseStack pose, VertexConsumer vc, int light, float x0, float x1, float z0, float z1, int rgb) {
+            float p = 1 / 16F, h = 1.5F * p, step = 0.5F * p;
+            FxDraw.box(pose, vc, x0, -h + step, -z1, x1, h - step, -z0, light, rgb, 255);                    // 太い真ん中
+            FxDraw.box(pose, vc, x0, -h, -z1 + step, x1, h, -z0 - step, light, rgb, 255);                    // 上下の面（角を落とした内側）
+        }
+    }
+
     final class Tanks extends RenderLayer<RuinAndroid, AndroidModel> {
         Tanks(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
             super(parent);
@@ -1003,9 +1217,11 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                     pose.popPose();
                     continue;
                 }
+                // 蓋は筒よりほんの少し太く、ガラスの上下の面は蓋から少し離す（同じ面が重なると、境目がちらつく）
                 VertexConsumer metal = buffers.getBuffer(RenderType.entityCutoutNoCull(FxDraw.WHITE));
-                FxDraw.box(pose, metal, lo, y0 - 0.35F / 16, z0, hi, y0, z1, light, 0x8C94A2, 255);
-                FxDraw.box(pose, metal, lo, y1, z0, hi, y1 + 0.35F / 16, z1, light, 0x8C94A2, 255);
+                float lip = 0.06F / 16, gap = 0.02F / 16;
+                FxDraw.box(pose, metal, lo - lip, y0 - 0.35F / 16, z0 - lip, hi + lip, y0, z1 + lip, light, 0x8C94A2, 255);
+                FxDraw.box(pose, metal, lo - lip, y1, z0 - lip, hi + lip, y1 + 0.35F / 16, z1 + lip, light, 0x8C94A2, 255);
                 float fill = android.tankFill(i);
                 net.minecraft.world.level.material.Fluid fluid = android.tankFluid(i);
                 if (fluid != null && fill > 0) {
@@ -1017,7 +1233,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                             FluidDraw.gaseous(fluid) ? 170 : 235);
                 }
                 VertexConsumer glass = buffers.getBuffer(RenderType.entityTranslucent(FxDraw.WHITE));
-                FxDraw.box(pose, glass, lo, y0, z0, hi, y1, z1, light, 0xDDEEF8, 70);
+                FxDraw.box(pose, glass, lo, y0 + gap, z0, hi, y1 - gap, z1, light, 0xDDEEF8, 70);
                 pose.popPose();
             }
         }
@@ -1033,7 +1249,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             int steel = 0xB4BCC8, dark = 0x6E7684;
             FxDraw.box(pose, metal, lo, y0 - 0.3F * p, z0, hi, y1 - 0.4F * p, z1, light, steel, 255);                            // 胴
             float inset = 0.25F * p;
-            FxDraw.box(pose, metal, lo + inset, y1 - 0.4F * p, z0 + inset, hi - inset, y1 + 0.2F * p, z1 - inset, light, dark, 255);   // 肩
+            FxDraw.box(pose, metal, lo + inset, y1 - 0.39F * p, z0 + inset, hi - inset, y1 + 0.2F * p, z1 - inset, light, dark, 255);  // 肩（胴の上の面と重ねない）
             float mx = (lo + hi) / 2, mz = (z0 + z1) / 2, v = 0.3F * p;
             FxDraw.box(pose, metal, mx - v, y1 + 0.2F * p, mz - v, mx + v, y1 + 0.8F * p, mz + v, light, 0x5A606C, 255);          // バルブ
             FxDraw.box(pose, metal, mx - 0.5F * p, y1 + 0.8F * p, mz - 0.15F * p, mx + 0.5F * p, y1 + 1.0F * p, mz + 0.15F * p, light, 0xE2BA5C, 255);
@@ -1046,7 +1262,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             FxDraw.box(pose, metal, wx0, wy0, wz - 0.02F * p, wx1, wy1, wz, light, 0x2A3040, 255);
             if (!id.isEmpty() && fill > 0) {
                 VertexConsumer chem = buffers.getBuffer(RenderType.entityTranslucent(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
-                FluidDraw.chemicalBox(pose, chem, id, wx0, wy0, wz - 0.04F * p, wx1, wy0 + (wy1 - wy0) * Math.min(1, fill), wz - 0.02F * p, light, 235);
+                FluidDraw.chemicalBox(pose, chem, id, wx0, wy0, wz - 0.045F * p, wx1, wy0 + (wy1 - wy0) * Math.min(1, fill), wz - 0.025F * p, light, 235);
             }
         }
     }
@@ -1410,6 +1626,10 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             if (m.whipHandle == null || !(android instanceof WhipAndroid whip) || android.weaponStowed()) {
                 return;
             }
+            if (inGui) {
+                hangInGui(pose, m, age, buffers);
+                return;
+            }
             Vec3 camera = entityRenderDispatcher.camera.getPosition();
             pose.pushPose();
             m.toWhip(pose);
@@ -1484,6 +1704,35 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             // 光は足し合わせで描く（深度を書かないので、交差した板どうしが隠し合ってちらつかない）
             drawWhip(hand, ctrl, end, side, wave, tension, age, buffers.getBuffer(RenderType.lightning()),
                     android.active() || RuinAndroid.charging(state) ? 1F : 0.4F);
+        }
+
+        /**
+         * 画面の中の姿（インベントリの全身）: 世界の座標やカメラは使えないので、体の座標のまま、床へ垂れた形で描く。
+         * 体の座標は下が +y・前が -z で、足もとは y = 1.501、長さはブロックを SCALE で割った値。
+         */
+        private void hangInGui(PoseStack pose, AndroidModel m, float age, MultiBufferSource buffers) {
+            PoseStack local = new PoseStack();
+            m.toWhip(local);
+            org.joml.Vector3f h = local.last().pose().transformPosition(new org.joml.Vector3f());
+            Vec3 hand = new Vec3(h.x, h.y, h.z);
+            double floor = 1.501 - 0.03 / SCALE;
+            Vec3 back = new Vec3(0, 0, 1 / SCALE);                  // 後ろ（ブロック1つ分）
+            Vec3 side = new Vec3(hand.x < 0 ? -1 / SCALE : 1 / SCALE, 0, 0);   // 持つ手の側
+            float sway = Mth.sin(age * 0.08F) * 0.06F;
+            Vec3 end = new Vec3(hand.x, floor, hand.z).add(back.scale(1.15)).add(side.scale(0.25 + sway));
+            Vec3 ctrl = new Vec3(hand.x, 1.501 - 0.15 / SCALE, hand.z).add(side.scale(sway));
+            PoseStack.Pose last = pose.last();
+            VertexConsumer vc = buffers.getBuffer(RenderType.lightning());
+            int n = 20;
+            Vec3 prev = hand;
+            for (int i = 1; i <= n; i++) {
+                float s = (float) i / n;
+                Vec3 p = hand.scale((1 - s) * (1 - s)).add(ctrl.scale(2 * (1 - s) * s)).add(end.scale(s * s));
+                float width = Mth.lerp(s, 0.075F, 0.035F) / SCALE;
+                FxDraw.beam(last, vc, prev, p, width * 1.8F, variant.accent, 150);
+                FxDraw.beam(last, vc, prev, p, width * 0.55F, 0xFFFFFF, 235);
+                prev = p;
+            }
         }
 
         /** 柄の先 from から end まで、二次曲線に波を足した鞭。 */

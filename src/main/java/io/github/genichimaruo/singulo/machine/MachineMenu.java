@@ -74,7 +74,7 @@ public class MachineMenu extends AbstractContainerMenu {
                 }
             });
         }
-        addSlot(new NotifyingItemSlot(handler, type.upgradeSlot(), layout.sideColumnX + 4, MachineLayout.UPGRADE_Y) {
+        addSlot(new NotifyingItemSlot(handler, type.upgradeSlot(), layout.upgradeX, layout.upgradeY) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return MachineBlockEntity.isUpgrade(stack);
@@ -87,11 +87,11 @@ public class MachineMenu extends AbstractContainerMenu {
         });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inventory, col + row * 9 + 9, layout.inventoryX + col * 18, 84 + row * 18));
+                addSlot(new Slot(inventory, col + row * 9 + 9, layout.inventoryX + col * 18, GuiFrame.inventoryY(MachineLayout.HEIGHT) + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inventory, col, layout.inventoryX + col * 18, 142));
+            addSlot(new Slot(inventory, col, layout.inventoryX + col * 18, GuiFrame.hotbarY(MachineLayout.HEIGHT)));
         }
         addDataSlots(data);
     }
