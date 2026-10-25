@@ -5303,6 +5303,18 @@
     "source": "What to do with a lever (click to change). Buttons, doors, trapdoors and the like are always used like a right-click",
     "translation": "如何操作拉桿（點擊變更）。按鈕、門、活板門等總是與右鍵相同"
   },
+  "gui.singulo.recipe_encoder.variant_slot.hint": {
+    "source": "Click to toggle (uses other items of the same kind that fit the recipe)",
+    "translation": "點擊切換（使用符合配方的同類物品）"
+  },
+  "gui.singulo.recipe_encoder.variant_slot.off": {
+    "source": "This slot: exact item only",
+    "translation": "此格：僅限與樣本相同的物品"
+  },
+  "gui.singulo.recipe_encoder.variant_slot.on": {
+    "source": "This slot: any variant",
+    "translation": "此格：也使用同類物品"
+  },
   "gui.singulo.recipe_encoder.variants.hint": {
     "source": "Any variant: use anything the recipe accepts in that slot, not just the pattern item (any wood planks, for example). Same item only: use exactly the pattern items",
     "translation": "同類也可：即使不是樣本中的物品，也會使用配方認可的同類物品（各種木板等）。僅相同物品：只使用與樣本相同的物品"
@@ -5314,6 +5326,10 @@
   "gui.singulo.recipe_encoder.variants.on": {
     "source": "Any variant",
     "translation": "同類也可"
+  },
+  "gui.singulo.recipe_encoder.variants.some": {
+    "source": "Some slots: any variant",
+    "translation": "部分格子可用同類物品"
   },
   "gui.singulo.route.hint.0": {
     "source": "Moving into or out of the area, androids pass the waypoint",
@@ -6012,8 +6028,8 @@
     "translation": "依名稱篩選。以 @ 開頭則依模組篩選（例：@singulo）。以空格分隔時只保留全部符合的物品。右鍵清除"
   },
   "gui.singulo.work_console.search.hint": {
-    "source": "Search (@ for mod)",
-    "translation": "搜尋（@ 搜模組）"
+    "source": "Search",
+    "translation": "搜尋"
   },
   "gui.singulo.work_console.signal.off": {
     "source": "Redstone signal: off",

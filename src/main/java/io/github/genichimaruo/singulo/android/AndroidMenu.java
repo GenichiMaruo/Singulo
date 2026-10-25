@@ -22,22 +22,22 @@ import net.minecraft.world.item.ItemStack;
  * ページは画面（クライアント）だけが切り替え、見えないページのスロットは隠す。
  */
 public class AndroidMenu extends AbstractContainerMenu {
-    public static final int WIDTH = 210;
+    public static final int WIDTH = 212;
     public static final int HEIGHT = 216;
     /** 修理・装甲のスロットと解体のボタンを、同じ間隔（22）で並べる。 */
-    public static final int REPAIR_X = 96, REPAIR_Y = 102;
-    public static final int PLATE_X = 134, PLATE_Y = 102;
-    public static final int DISMANTLE_X = 172, DISMANTLE_Y = 104;
-    /** 装備と持ち物のページ: 左にアップグレードの列、中ほどにバックパック（6×4）、右に持ち物の列（5）。 */
-    public static final int UPGRADE_X = 22, BATTERY_Y = 32, BACKPACK_Y = 60, MINING_Y = 88;
+    public static final int REPAIR_X = 96, REPAIR_Y = 98;
+    public static final int PLATE_X = 134, PLATE_Y = 98;
+    public static final int DISMANTLE_X = 172, DISMANTLE_Y = 100;
+    /** 装備と持ち物のページ: 左にアップグレードの列、中ほどにバックパック（6×4）、右に持ち物の列（5）。上の段をそろえる。 */
+    public static final int UPGRADE_X = 22, BATTERY_Y = 24, BACKPACK_Y = 48, MINING_Y = 72;
     /** 道具の枠（採掘・伐採）と、収納の枠（バックパック・タンク）は、左右に並べる。 */
     public static final int MINING_X = 12, FELLING_X = 32, BACKPACK_X = 12, TANK_X = 32;
-    public static final int PACK_X = 58, PACK_Y = 32;
-    public static final int CARRY_X = 184, CARRY_Y = 32;
-    public static final int WORK_X = 8, WORK_Y = 108, WORK_W = 44, WORK_H = 14;
-    public static final int INV_X = (WIDTH - 162) / 2 + 1;
-    public static final int INV_Y = 134;
-    public static final int HOTBAR_Y = 192;
+    public static final int PACK_X = 58, PACK_Y = 24;
+    public static final int CARRY_X = 186, CARRY_Y = 24;
+    public static final int WORK_X = 8, WORK_Y = 96, WORK_W = 44, WORK_H = 14;
+    public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH);
+    public static final int INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT);
+    public static final int HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
 
     public static final int PAGE_STATUS = 0, PAGE_GEAR = 1, PAGE_DECOR = 2, PAGE_LOG = 3, PAGES = 4;
     /** 装飾のページ: 姿の右に、頭・背中/腰・手の枠を縦に並べる。 */

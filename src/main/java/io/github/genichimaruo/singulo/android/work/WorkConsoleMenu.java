@@ -22,59 +22,70 @@ import net.neoforged.neoforge.items.SlotItemHandler;
  * 作業指令台の画面。スロット: 0 許可証（つながりのページ）、1〜9 記録の見本（物は減らない）、10 作る物（表示だけ）、
  * 11 記録したカード、12 未記録のカードのストック、13〜14 加工モードの、ほかに出てくる物、15〜16 手順モードの作業位置カード、
  * 17 手順モードの物、18 加工モードの燃料（記録のページ。メニューのスロット番号 = 記録の欄の番号 + 1）、19〜45 納品箱、
- * そのあとプレイヤーの持ち物（注文の確認中は隠す）。
+ * そのあとプレイヤーの持ち物。
  * 注文できる物や進み具合は、サーバーから {@link WorkConsoleViewPayload} で届く。ボタン: 0 記録、1 見本を消す、2 カードのレシピを消す、
  * 3 モードの切り替え、4 手順の種類の切り替え、5 手順を足す、{@link #BUTTON_REMOVE_STEP} から 手順を消す、
  * {@link #BUTTON_ADJUST} から 数の増減（スロットごとに4つ: +1、-1、+10、-10）。
  */
 public class WorkConsoleMenu extends AbstractContainerMenu {
-    public static final int WIDTH = 256, HEIGHT = 236;
-    public static final int PERMIT_X = 230, PERMIT_Y = 116;
     /**
-     * 記録のページ: 見本の欄（3×3）、矢印の先に作る物、右下にカードのストックと記録したカード、右端にボタン（上から 見本消去・モード・記録、
-     * カードの横にレシピ消去）。下の区切り線（y 118）より上に収める。
+     * 幅はインベントリに合わせた 176。高さは注文の一覧の行数（設定 workOrderRows）で変わり、画面がインベントリを動かす
+     * （ここの HEIGHT とインベントリの位置は既定の5行のとき）。
      */
-    public static final int GRID_X = 30, GRID_Y = 40, RESULT_X = 118, RESULT_Y = 58, CARD_X = 174, CARD_Y = 98, STOCK_X = 148, STOCK_Y = 98;
-    public static final int BUTTON_X = 200, BUTTON_W = 48, BUTTON_H = 14;
-    public static final int CLEAR_X = BUTTON_X, CLEAR_Y = 38, MODE_X = BUTTON_X, MODE_Y = 55, ENCODE_X = BUTTON_X, ENCODE_Y = 72,
-            CLEAR_CARD_X = BUTTON_X, CLEAR_CARD_Y = 100;
+    public static final int WIDTH = 176, HEIGHT = 228;
+    /** 枠を画面の箱から内側に描く量（0）。 */
+    public static final int FRAME_INSET = 0;
+    /** 枠の右にはみ出すタブ: ページ7つと、その下の許可証の段。 */
+    public static final int TAB_PITCH = 23, PAGE_TABS = 7;
+    public static final int PERMIT_X = FRAME_INSET + io.github.genichimaruo.singulo.machine.GuiFrame.railSlotX(WIDTH - 2 * FRAME_INSET),
+            PERMIT_Y = io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_TOP + PAGE_TABS * TAB_PITCH + 3;
+    /**
+     * レシピ登録の窓（画面の上に浮かぶ。スロットは画面が窓と一緒に動かす。ここの座標は窓の中の位置）: 見本の欄（3×3）、
+     * 矢印の先に作る物、右下にカードのストックと記録したカード、右端にボタン（上から 見本消去・モード・記録、カードの横にレシピ消去）。
+     */
+    public static final int GRID_X = 30, GRID_Y = 31, RESULT_X = 118, RESULT_Y = 49, CARD_X = 170, CARD_Y = 89, STOCK_X = 146, STOCK_Y = 89;
+    public static final int BUTTON_X = 192, BUTTON_W = 48, BUTTON_H = 14;
+    /** 見本消去とレシピ消去は、ごみ箱のアイコンだけの小さなボタン（ICON_W 角。見本消去はモードの上の中央、レシピ消去はカードの右）。 */
+    public static final int ICON_W = 14;
+    public static final int CLEAR_X = BUTTON_X + (BUTTON_W - ICON_W) / 2, CLEAR_Y = 29, MODE_X = BUTTON_X, MODE_Y = 46, ENCODE_X = BUTTON_X, ENCODE_Y = 63,
+            CLEAR_CARD_X = CARD_X + 20, CLEAR_CARD_Y = 91;
     /** 加工モードの燃料の欄（見本の左）。 */
-    public static final int FUEL_X = 8, FUEL_Y = 58;
+    public static final int FUEL_X = 8, FUEL_Y = 49;
     /** 加工モードの、ほかに出てくる物の欄（作る物の下）。 */
-    public static final int EXTRA_X = 100, EXTRA_Y = 80;
+    public static final int EXTRA_X = 100, EXTRA_Y = 71;
     /** 手順モード: 左に並べた手順の一覧、右に作業位置カード2枚と物の欄、その下に作る物、手順の種類と「足す」のボタン。 */
-    public static final int STEPS_X = 8, STEPS_Y = 38, STEPS_W = 100, STEP_H = 9;
-    public static final int LOC_A_X = 118, LOC_B_X = 136, LOC_Y = 38, PITEM_X = 160, PITEM_Y = 38;
-    public static final int KIND_X = 140, KIND_W = 26, ADD_X = 168, ADD_W = 26, SMALL_Y = 60, SMALL_H = 12;
-    public static final int INV_X = (WIDTH - 162) / 2 + 1, INV_Y = 154, HOTBAR_Y = 212;
+    public static final int STEPS_X = 8, STEPS_Y = 29, STEPS_W = 100, STEP_H = 9;
+    public static final int LOC_A_X = 118, LOC_B_X = 136, LOC_Y = 29, PITEM_X = 160, PITEM_Y = 29;
+    public static final int KIND_X = 140, KIND_W = 24, ADD_X = 166, ADD_W = 24, SMALL_Y = 51, SMALL_H = 12;
+    public static final int INV_X = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryX(WIDTH),
+            INV_Y = io.github.genichimaruo.singulo.machine.GuiFrame.inventoryY(HEIGHT),
+            HOTBAR_Y = io.github.genichimaruo.singulo.machine.GuiFrame.hotbarY(HEIGHT);
     /** 納品箱のページ: 9×3。 */
-    public static final int OUTBOX_X = INV_X, OUTBOX_Y = 44;
+    public static final int OUTBOX_X = INV_X, OUTBOX_Y = 35;
     public static final int SLOT_PERMIT = 0, SLOT_GRID = 1, SLOT_RESULT = 10, SLOT_CARD = 11, SLOT_STOCK = 12, SLOT_EXTRA = 13,
             SLOT_LOC_A = 15, SLOT_LOC_B = 16, SLOT_PITEM = 17, SLOT_FUEL = 18, SLOT_OUTBOX = 19,
             SLOT_ROUTE = SLOT_OUTBOX + WorkConsoleBlockEntity.OUTBOX_SLOTS, OWN = SLOT_ROUTE + PathRule.SLOTS;
     /** 経路のページ: 4行（経由地点・対象範囲・進入禁止ゾーン2つ）。 */
-    public static final int ROUTE_X = 66, ROUTE_Y = 46, ROUTE_ROW = 19;
-    public static final int[] ROUTE_COL_X = {ROUTE_X, ROUTE_X + 40, ROUTE_X + 80, ROUTE_X + 98};
+    public static final int ROUTE_X = 24, ROUTE_Y = 37, ROUTE_ROW = 19;
+    public static final int[] ROUTE_COL_X = {ROUTE_X, ROUTE_X + 38, ROUTE_X + 90, ROUTE_X + 108};
     public static final int BUTTON_ENCODE = 0, BUTTON_CLEAR = 1, BUTTON_CLEAR_CARD = 2, BUTTON_MODE = 3, BUTTON_KIND = 4, BUTTON_ADD = 5,
             BUTTON_KIND_BACK = 6, BUTTON_REMOVE_STEP = 10, BUTTON_OPTION = 20, BUTTON_FACE = 30, BUTTON_FACE_BACK = 33, BUTTON_VARIANTS = 36,
-            BUTTON_FUEL_FILL = 37, BUTTON_ADJUST = 100;
+            BUTTON_FUEL_FILL = 37, BUTTON_VARIANT_SLOT = 40, BUTTON_ADJUST = 100;
     /** 加工モードの、燃料を持ってくる量のボタン（燃料の欄の下）。 */
-    public static final int FUEL_MODE_X = 5, FUEL_MODE_Y = 80, FUEL_MODE_W = 22, FUEL_MODE_H = 11;
-    /** 作業台モードの「同じ種類の別の物も使う」の切り替え（見本の下）。 */
-    public static final int VARIANTS_X = 30, VARIANTS_Y = 99, VARIANTS_W = 76, VARIANTS_H = 11;
+    public static final int FUEL_MODE_X = 5, FUEL_MODE_Y = 71, FUEL_MODE_W = 22, FUEL_MODE_H = 11;
+    /** 作業台モードの「同じ種類の別の物も使う」をまとめて切り替えるアイコンのボタン（見本の下）。 */
+    public static final int VARIANTS_X = 30, VARIANTS_Y = 90, VARIANTS_W = 16, VARIANTS_H = 12;
     /** 加工モードの面のボタン（見本の下に3つ: 入れる面・取り出す面・燃料の面）。 */
-    public static final int FACE_X = 30, FACE_Y = 99, FACE_W = 22, FACE_H = 11, FACE_GAP = 2;
+    public static final int FACE_X = 30, FACE_Y = 90, FACE_W = 22, FACE_H = 11, FACE_GAP = 2;
     /** 手順の数の上限・レバーの扱いのボタン（種類のボタンの下）。BUTTON_OPTION から +1、-1、+10、-10。 */
-    public static final int OPTION_X = 140, OPTION_Y = 74, OPTION_W = 54, OPTION_H = 12;
+    public static final int OPTION_X = 140, OPTION_Y = 65, OPTION_W = 50, OPTION_H = 12;
 
     private final BlockPos pos;
     private final Container encoder;
     private final Player player;
     /** 記録のモード（0: 作業台、1: 加工）。 */
     private final net.minecraft.world.inventory.ContainerData mode;
-    /** 画面（クライアント）が決める、スロットを見せるか。 */
-    private boolean showInventory = true;
-    private boolean showPermit;
+    /** 画面（クライアント）が決める、スロットを見せるか（レシピ登録の窓・納品箱・経路のページ）。 */
     private boolean showEncoder;
     private boolean showOutbox;
     private boolean showRoutes;
@@ -91,12 +102,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         this.player = inventory.player;
         this.mode = mode;
         addDataSlots(mode);
-        addSlot(new SlotItemHandler(permit, 0, PERMIT_X, PERMIT_Y) {
-            @Override
-            public boolean isActive() {
-                return showPermit && showInventory;
-            }
-        });
+        addSlot(new SlotItemHandler(permit, 0, PERMIT_X, PERMIT_Y));      // 枠の外のタブにあるので、どのページでも触れる
         for (int i = 0; i < WorkConsoleBlockEntity.GRID; i++) {
             addSlot(new EncoderSlot(encoder, i, GRID_X + (i % 3) * 18, GRID_Y + (i / 3) * 18, false) {
                 @Override
@@ -156,7 +162,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             addSlot(new Slot(outbox, i, OUTBOX_X + (i % 9) * 18, OUTBOX_Y + (i / 9) * 18) {
                 @Override
                 public boolean isActive() {
-                    return showOutbox && showInventory;
+                    return showOutbox;
                 }
             });
         }
@@ -165,7 +171,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
             addSlot(new SlotItemHandler(routes, i, ROUTE_COL_X[col], ROUTE_Y + (i / PathRule.COLS) * ROUTE_ROW) {
                 @Override
                 public boolean isActive() {
-                    return showRoutes && showInventory;
+                    return showRoutes;
                 }
 
                 @Override
@@ -176,21 +182,11 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
-                    @Override
-                    public boolean isActive() {
-                        return showInventory;
-                    }
-                });
+                addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inventory, col, INV_X + col * 18, HOTBAR_Y) {
-                @Override
-                public boolean isActive() {
-                    return showInventory;
-                }
-            });
+            addSlot(new Slot(inventory, col, INV_X + col * 18, HOTBAR_Y));
         }
     }
 
@@ -205,7 +201,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
 
         @Override
         public boolean isActive() {
-            return showEncoder && showInventory;
+            return showEncoder;
         }
 
         @Override
@@ -249,9 +245,14 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         return mode.get(1);
     }
 
-    /** 作業台モードで、同じ種類の別の物も使うレシピとして記録するか。 */
-    public boolean variants() {
-        return mode.get(4) != 0;
+    /** 作業台モードで、同じ種類の別の物も使う見本の欄（ビット i が欄 i）。 */
+    public int variantMask() {
+        return mode.get(4);
+    }
+
+    /** 見本の欄 i で、同じ種類の別の物も使うか。 */
+    public boolean variant(int i) {
+        return (variantMask() >> i & 1) != 0;
     }
 
     /** 加工モードで記録する面（{@link RecipeData#faces}）。 */
@@ -278,9 +279,7 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         return pos;
     }
 
-    public void setVisibility(boolean inventory, boolean permit, boolean encoder, boolean outbox, boolean routes) {
-        this.showInventory = inventory;
-        this.showPermit = permit;
+    public void setVisibility(boolean encoder, boolean outbox, boolean routes) {
         this.showEncoder = encoder;
         this.showOutbox = outbox;
         this.showRoutes = routes;
@@ -354,6 +353,10 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
         }
         if (id == BUTTON_VARIANTS) {
             c.toggleVariants();
+            return true;
+        }
+        if (id >= BUTTON_VARIANT_SLOT && id < BUTTON_VARIANT_SLOT + WorkConsoleBlockEntity.GRID) {
+            c.toggleVariantSlot(id - BUTTON_VARIANT_SLOT);
             return true;
         }
         if (id == BUTTON_FUEL_FILL) {

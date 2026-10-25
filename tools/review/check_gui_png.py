@@ -49,15 +49,18 @@ results = []
 for name in ("android-status", "android-gear", "android-decor"):
     width, height, channels, rows = rgba(root / (name + ".png"))
     assert (width, height) == (1280, 800)
-    left, top, scale = (640 - 210) // 2, (400 - 216) // 2, 2
-    points = [(25 + col * 18 + 8, 134 + row * 18 + 8) for row in range(3) for col in range(9)]
-    points += [(25 + col * 18 + 8, 192 + 8) for col in range(1, 9)]
+    # The android skin tints the slot fill with the android's accent, so check that every empty slot centre
+    # shows the same mid-grey fill rather than one fixed colour.
+    left, top, scale = (640 - 212) // 2, (400 - 216) // 2, 2
+    inv_x = (212 - 162) // 2 + 1
+    points = [(inv_x + col * 18 + 8, 134 + row * 18 + 8) for row in range(3) for col in range(9)]
+    points += [(inv_x + col * 18 + 8, 192 + 8) for col in range(1, 9)]
     pixels = []
     for x, y in points:
         x, y = (left + x) * scale, (top + y) * scale
         pixel = tuple(rows[y][x * channels:x * channels + 3])
         pixels.append(pixel)
-        if pixel != (139, 143, 152):
+        if pixel != pixels[0] or not all(60 <= c <= 150 for c in pixel):
             raise SystemExit(f"{name}: missing player inventory at {x},{y}: {pixel}")
     results.append({"screen": name, "checked_empty_slot_centers": len(points), "rgb": pixels[0]})
 pathlib.Path(_build + "/gui-review/inventory-pixels.json").write_text(json.dumps(results, indent=2), encoding="utf-8")

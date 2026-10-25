@@ -115,10 +115,32 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
 
     // ------------------------------------------------------------------ 位置
 
+    /**
+     * 枠を画面の箱の左右からどれだけ内側に描くか。中身が幅いっぱいに並ぶ画面（作業指令台）は、
+     * 中身の座標を変えずに、枠だけを標準の幅にするのに使う（インベントリは枠の中央のまま）。
+     */
+    protected int frameInset() {
+        return 0;
+    }
+
+    /** 枠の左端（画面の座標）と幅。 */
+    protected int frameX() {
+        return leftPos + frameInset();
+    }
+
+    protected int frameWidth() {
+        return imageWidth - 2 * frameInset();
+    }
+
+    /** 枠の外に出す、画面ごとの部品の範囲（クリックしても物を捨てず、JEI の一覧も避ける）。 */
+    protected List<int[]> outsideAreas() {
+        return List.of();
+    }
+
     /** ヘッダーの右側の部品が始まる位置（電源と、画面ごとの部品の左）。 */
     protected int headerRight() {
-        int right = powered() != null ? GuiFrame.powerX(imageWidth) - 4 : imageWidth - 6;
-        return right - headerReserved();
+        int right = powered() != null ? GuiFrame.powerX(frameWidth()) - 4 : frameWidth() - 6;
+        return frameInset() + right - headerReserved();
     }
 
     private int statusLeft() {
@@ -130,34 +152,35 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     private int[] railRect(int row) {
-        return new int[]{leftPos + GuiFrame.railX(imageWidth), topPos + GuiFrame.railY(row), GuiFrame.RAIL_WIDTH - 1, GuiFrame.RAIL_TAB};
+        return new int[]{frameX() + GuiFrame.railX(frameWidth()), topPos + GuiFrame.railY(row), GuiFrame.RAIL_WIDTH - 1, GuiFrame.RAIL_TAB};
     }
 
     private int[] powerRect() {
-        return new int[]{leftPos + GuiFrame.powerX(imageWidth), topPos + GuiFrame.POWER_Y, GuiFrame.POWER_SIZE, GuiFrame.POWER_SIZE};
+        return new int[]{frameX() + GuiFrame.powerX(frameWidth()), topPos + GuiFrame.POWER_Y, GuiFrame.POWER_SIZE, GuiFrame.POWER_SIZE};
     }
 
     // ------------------------------------------------------------------ 描画
 
     /** 枠・ヘッダー・右レール・溝・インベントリの凹み・電源（画面の座標で描く）。 */
     protected void drawFrame(GuiGraphics g, int mouseX, int mouseY) {
-        int x = leftPos;
+        int x = frameX();
         int y = topPos;
+        int w = frameWidth();
         for (int row = 0; row < GuiFrame.RAIL_ROWS; row++) {
             if (railUsed(row) && !railConnected(row)) {
                 drawRailTab(g, row, mouseX, mouseY);
             }
         }
-        Panel.frame(g, skin, x, y, imageWidth, imageHeight);
-        Panel.header(g, skin, x, y, imageWidth);
+        Panel.frame(g, skin, x, y, w, imageHeight);
+        Panel.header(g, skin, x, y, w);
         for (int row = 0; row < GuiFrame.RAIL_ROWS; row++) {
             if (railUsed(row) && railConnected(row)) {
                 drawRailTab(g, row, mouseX, mouseY);
             }
         }
         if (hasInventory()) {
-            Panel.groove(g, skin, x + 7, y + GuiFrame.grooveY(imageHeight), imageWidth - 14);
-            int ix = x + GuiFrame.inventoryX(imageWidth);
+            Panel.groove(g, skin, x + 7, y + GuiFrame.grooveY(imageHeight), w - 14);
+            int ix = x + GuiFrame.inventoryX(w);
             int iy = y + GuiFrame.inventoryY(imageHeight);
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
@@ -348,7 +371,15 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     /** 右レールは枠の外にあるが、そこをクリックしても持っている物を捨てない。 */
     @Override
     protected boolean hasClickedOutside(double mouseX, double mouseY, int left, int top, int button) {
-        return super.hasClickedOutside(mouseX, mouseY, left, top, button) && !onRail(mouseX, mouseY) && !overPopup(mouseX, mouseY);
+        if (!super.hasClickedOutside(mouseX, mouseY, left, top, button) || onRail(mouseX, mouseY) || overPopup(mouseX, mouseY)) {
+            return false;
+        }
+        for (int[] r : outsideAreas()) {
+            if (Panel.inside(mouseX, mouseY, r[0], r[1], r[2], r[3])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** 枠の外に出ている部分（JEI の一覧が重ならないようにする）。 */
@@ -364,6 +395,9 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
             if (p.open) {
                 areas.add(new Rect2i(p.x, p.y, p.w + 1, p.h + 1));
             }
+        }
+        for (int[] r : outsideAreas()) {
+            areas.add(new Rect2i(r[0], r[1], r[2] + 2, r[3] + 2));
         }
         return areas;
     }

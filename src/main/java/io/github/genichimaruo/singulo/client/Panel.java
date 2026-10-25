@@ -445,6 +445,15 @@ final class Panel {
         sprite(g, x, y, STRUCTURE, c);
     }
 
+    private static final String[] GEAR = {
+            "....xxx....", ".xx.xxx.xx.", ".xxxxxxxxx.", "..xxxxxxx..", "xxxxx.xxxxx", "xxxx...xxxx", "xxxxx.xxxxx",
+            "..xxxxxxx..", ".xxxxxxxxx.", ".xx.xxx.xx.", "....xxx...."};
+
+    /** 歯車（設定、11×11）。 */
+    static void gearIcon(GuiGraphics g, int x, int y, int c) {
+        sprite(g, x, y, GEAR, c);
+    }
+
     /** 稲妻の印（電力だけで作るスイッチ）。 */
     static void boltIcon(GuiGraphics g, int x, int y, int c) {
         g.fill(x + 4, y, x + 6, y + 2, c);

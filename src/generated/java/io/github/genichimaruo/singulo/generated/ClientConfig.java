@@ -16,6 +16,7 @@ public final class ClientConfig {
     public static final ModConfigSpec.ConfigValue<String> WORK_ORDER_SORT;
     public static final ModConfigSpec.BooleanValue WORK_ORDER_SORT_REVERSED;
     public static final ModConfigSpec.BooleanValue WORK_ORDER_JEI_SYNC;
+    public static final ModConfigSpec.IntValue WORK_ORDER_ROWS;
     public static final ModConfigSpec.IntValue SELECTOR_ROWS;
     public static final ModConfigSpec SPEC;
 
@@ -29,6 +30,7 @@ public final class ClientConfig {
         ModConfigSpec.ConfigValue<String> WORK_ORDER_SORT_;
         ModConfigSpec.BooleanValue WORK_ORDER_SORT_REVERSED_;
         ModConfigSpec.BooleanValue WORK_ORDER_JEI_SYNC_;
+        ModConfigSpec.IntValue WORK_ORDER_ROWS_;
         ModConfigSpec.IntValue SELECTOR_ROWS_;
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
         b.push("render");
@@ -52,6 +54,8 @@ public final class ClientConfig {
         WORK_ORDER_SORT_REVERSED_ = b.define("workOrderSortReversed", false);
         b.comment("注文タブの検索欄を JEI の検索欄と連携する（JEI を入れているときだけ。画面のボタンでも変えられる）", "範囲: true / false");
         WORK_ORDER_JEI_SYNC_ = b.define("workOrderJeiSync", false);
+        b.comment("アンドロイド作業指令台の注文タブの物の一覧の行数。6行以上にすると、注文タブではプレイヤーのインベントリを隠してその場所も使う（画面の下の段のボタンでも変えられる）", "範囲: 3〜10（整数）");
+        WORK_ORDER_ROWS_ = b.defineInRange("workOrderRows", 5, 3, 10);
         b.comment("装置の「作るもの」を選ぶ板の行数。板はインベントリの見出しの上から上へ伸び、画面に収まる行数までになる（板の右上のボタンでも変えられる）", "範囲: 2〜8（整数）");
         SELECTOR_ROWS_ = b.defineInRange("selectorRows", 3, 2, 8);
         b.pop();
@@ -64,6 +68,7 @@ public final class ClientConfig {
         WORK_ORDER_SORT = WORK_ORDER_SORT_;
         WORK_ORDER_SORT_REVERSED = WORK_ORDER_SORT_REVERSED_;
         WORK_ORDER_JEI_SYNC = WORK_ORDER_JEI_SYNC_;
+        WORK_ORDER_ROWS = WORK_ORDER_ROWS_;
         SELECTOR_ROWS = SELECTOR_ROWS_;
         SPEC = b.build();
     }

@@ -107,14 +107,15 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     private int stepOption;
     /** 加工モードで記録する、入れる面・取り出す面・燃料の面（{@link RecipeData#faces}）。 */
     private int faces = RecipeData.DEFAULT_FACES;
-    /** 作業台モードで、同じ種類の別の物も使うレシピとして記録するか。 */
-    private boolean variants;
+    /** 作業台モードで、同じ種類の別の物も使う見本の欄（ビット i が欄 i）。 */
+    private int variantMask;
+    public static final int ALL_VARIANTS = (1 << GRID) - 1;
     /** 手順モードで並べた手順。 */
     private final List<ProcedureStep> procSteps = new ArrayList<>();
     private final net.minecraft.world.inventory.ContainerData modeData = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
-            return index == 0 ? mode : index == 1 ? stepKind : index == 2 ? stepOption : index == 3 ? faces : variants ? 1 : 0;
+            return index == 0 ? mode : index == 1 ? stepKind : index == 2 ? stepOption : index == 3 ? faces : variantMask;
         }
 
         @Override
@@ -128,7 +129,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             } else if (index == 3) {
                 faces = value;
             } else {
-                variants = value != 0;
+                variantMask = value & ALL_VARIANTS;
             }
         }
 
@@ -2261,7 +2262,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
             }
             RecipeData.processing(grid, result.copy(), extras, encoder.getItem(FUEL), faces).write(card, level.registryAccess());
-        } else if (variants) {
+        } else if (variantMask != 0) {
             RecipeData.crafting(grid, result.copy(), alternatives(grid)).write(card, level.registryAccess());
         } else {
             new RecipeData(grid, result.copy()).write(card, level.registryAccess());
@@ -2306,10 +2307,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      * 足せなければ、その理由。
      */
     @Nullable
-    /** 同じ種類の別の物も使うかを切り替える（作業台モード）。 */
+    /** 同じ種類の別の物も使うかを、全部の欄でまとめて切り替える（作業台モード。全部オンなら全部オフ、そうでなければ全部オン）。 */
     public void toggleVariants() {
-        variants = !variants;
+        variantMask = variantMask == ALL_VARIANTS ? 0 : ALL_VARIANTS;
         setChanged();
+    }
+
+    /** 見本の欄 i だけ、同じ種類の別の物も使うかを切り替える（作業台モード）。 */
+    public void toggleVariantSlot(int i) {
+        if (i >= 0 && i < GRID) {
+            variantMask ^= 1 << i;
+            setChanged();
+        }
     }
 
     /** 加工モードの燃料を持ってくる量を切り替える（燃料の欄の数ずつ ⇔ 装置に入るだけ）。 */
@@ -2334,9 +2343,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             ings = server.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, server)
                     .map(h -> (List<net.minecraft.world.item.crafting.Ingredient>) h.value().getIngredients()).orElse(List.of());
         }
-        for (ItemStack s : grid) {
+        for (int i = 0; i < grid.size(); i++) {
+            ItemStack s = grid.get(i);
             String alt = "";
-            if (!s.isEmpty()) {
+            if (!s.isEmpty() && (variantMask >> i & 1) != 0) {
                 for (var ing : ings) {
                     if (!ing.isEmpty() && ing.test(s) && ing.getItems().length > 1) {
                         alt = ItemCount.key(ing);
@@ -2600,7 +2610,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         tag.putInt("step_kind", stepKind);
         tag.putInt("step_option", stepOption);
         tag.putInt("faces", faces);
-        tag.putBoolean("variants", variants);
+        tag.putInt("variant_mask", variantMask);
         ListTag ps = new ListTag();
         for (ProcedureStep s : procSteps) {
             ps.add(s.save(registries));
@@ -2674,7 +2684,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         stepKind = Math.floorMod(tag.getInt("step_kind"), ProcedureStep.KINDS);
         stepOption = tag.contains("step_option") ? tag.getInt("step_option") : ProcedureStep.defaultOption(stepKind);
         faces = tag.contains("faces") ? tag.getInt("faces") : RecipeData.DEFAULT_FACES;
-        variants = tag.getBoolean("variants");
+        // 0.11 までは全部の欄でまとめた切り替えだった
+        variantMask = tag.contains("variant_mask") ? tag.getInt("variant_mask") & ALL_VARIANTS
+                : tag.getBoolean("variants") ? ALL_VARIANTS : 0;
         procSteps.clear();
         for (Tag t : tag.getList("proc_steps", Tag.TAG_COMPOUND)) {
             if (procSteps.size() < RecipeData.MAX_STEPS) {
