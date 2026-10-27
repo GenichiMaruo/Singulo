@@ -11714,5 +11714,9 @@
   "subtitles.singulo.last_archivist.inhale": {
     "source": "The singularity draws in",
     "translation": "奇點吸入一切"
+  },
+  "subtitles.singulo.horizon_warden.hurt": {
+    "source": "Horizon Warden hurts",
+    "translation": "視界守衛受傷"
   }
 }

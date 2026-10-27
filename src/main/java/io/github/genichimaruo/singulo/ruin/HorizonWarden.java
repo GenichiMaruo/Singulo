@@ -1420,7 +1420,7 @@ public class HorizonWarden extends Monster {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.IRON_GOLEM_HURT;
+        return io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.hurt");
     }
 
     @Override

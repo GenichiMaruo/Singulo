@@ -45,7 +45,7 @@ public final class SinguloSounds {
             "gravity_remnant.lift", "gravity_remnant.slam", "gravity_remnant.well_loop", "gravity_remnant.death_collapse",
             "gravity_remnant.death_implode", "horizon_warden.emerge", "horizon_warden.phase", "horizon_warden.beam_charge",
             "horizon_warden.beam_fire", "horizon_warden.laser_loop", "horizon_warden.sweep", "horizon_warden.grip",
-            "horizon_warden.shockwave", "horizon_warden.death", "horizon_warden.ambient", "guardian_core.awaken", "vault.unseal",
+            "horizon_warden.shockwave", "horizon_warden.death", "horizon_warden.ambient", "horizon_warden.hurt", "guardian_core.awaken", "vault.unseal",
             "keraunos_tower.charge", "keraunos_tower.discharge", "keraunos_tower.mode", "impact_generator.absorb",
             "deep_sea_collector.collect", "void_collector.collect", "fulgurite.form",
             "ergosphere_leviathan.emerge", "ergosphere_leviathan.ambient", "ergosphere_leviathan.hurt", "ergosphere_leviathan.roar",

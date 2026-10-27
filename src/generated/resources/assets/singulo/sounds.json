@@ -507,7 +507,15 @@
     "subtitle": "subtitles.singulo.foundry.hurt",
     "sounds": [
       {
-        "name": "singulo:boss/foundry_hurt",
+        "name": "singulo:boss/foundry_hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "singulo:boss/foundry_hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "singulo:boss/foundry_hurt_3",
         "attenuation_distance": 16
       }
     ]
@@ -650,7 +658,15 @@
     "subtitle": "subtitles.singulo.echo_sentinel.hurt",
     "sounds": [
       {
-        "name": "singulo:boss/echo_sentinel_hurt",
+        "name": "singulo:boss/echo_sentinel_hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "singulo:boss/echo_sentinel_hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "singulo:boss/echo_sentinel_hurt_3",
         "attenuation_distance": 16
       }
     ]
@@ -816,7 +832,15 @@
     "subtitle": "subtitles.singulo.gravity_remnant.hurt",
     "sounds": [
       {
-        "name": "singulo:boss/gravity_remnant_hurt",
+        "name": "singulo:boss/gravity_remnant_hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "singulo:boss/gravity_remnant_hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "singulo:boss/gravity_remnant_hurt_3",
         "attenuation_distance": 16
       }
     ]
@@ -991,6 +1015,23 @@
       }
     ]
   },
+  "horizon_warden.hurt": {
+    "subtitle": "subtitles.singulo.horizon_warden.hurt",
+    "sounds": [
+      {
+        "name": "singulo:boss/horizon_warden_hurt_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:boss/horizon_warden_hurt_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:boss/horizon_warden_hurt_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
   "guardian_core.awaken": {
     "subtitle": "subtitles.singulo.guardian_core.awaken",
     "sounds": [
@@ -1102,7 +1143,15 @@
     "subtitle": "subtitles.singulo.ergosphere_leviathan.hurt",
     "sounds": [
       {
-        "name": "singulo:boss/ergosphere_leviathan_hurt",
+        "name": "singulo:boss/ergosphere_leviathan_hurt_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/ergosphere_leviathan_hurt_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/ergosphere_leviathan_hurt_3",
         "attenuation_distance": 20
       }
     ]
@@ -1414,7 +1463,15 @@
     "subtitle": "subtitles.singulo.last_archivist.hurt",
     "sounds": [
       {
-        "name": "singulo:boss/last_archivist_hurt",
+        "name": "singulo:boss/last_archivist_hurt_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/last_archivist_hurt_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "singulo:boss/last_archivist_hurt_3",
         "attenuation_distance": 20
       }
     ]

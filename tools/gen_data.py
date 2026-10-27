@@ -2698,6 +2698,7 @@ SOUNDS = {
     'horizon_warden.shockwave': ('boss/horizon_warden_shockwave', '衝撃波が走る', 'Shockwave', 32),
     'horizon_warden.death': ('boss/horizon_warden_death', 'ホライズン・ウォーデンが崩れ落ちる', 'Horizon Warden falls', 48),
     'horizon_warden.ambient': ('boss/horizon_warden_ambient', 'ホライズン・ウォーデンがうなる', 'Horizon Warden hums', 20),
+    'horizon_warden.hurt': ('boss/horizon_warden_hurt', 'ホライズン・ウォーデンが傷つく', 'Horizon Warden hurts', 24),
     'guardian_core.awaken': ('boss/guardian_core_awaken', '封印核が目覚める', 'Guardian core awakens', 32),
     'vault.unseal': ('boss/vault_unseal', '保管庫の力場が消える', 'Vault field dissipates', 24),
     'keraunos_tower.charge': ('machine/keraunos_tower_charge', '放電塔が充電する', 'Discharge tower charges', 24),

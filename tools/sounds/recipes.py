@@ -534,10 +534,14 @@ def foundry_emerge(d, seed):
     return reverb(mix(startup, clanks, (alarm(1.2, 660, 440, 3) * 0.2, 1.8), (impact(1.0, 45, seed, 0.6), 3.0)), 0.9, 0.3)
 
 
-@recipe('boss/foundry_hurt', level=BOSS)
+@recipe('boss/foundry_hurt', level=BOSS, variants=3)
 def foundry_hurt(d, seed):
-    grind = bandpass(saw(glide(160, 110, 0.5)) + white(0.5, seed) * 0.4, 900, 2) * perc(0.5, 0.005, 0.3)
-    return mix(clank(330, 0.5, seed) * 0.7, grind * 0.5)
+    # 装甲が殴られて鳴り、怒った機械が低くうなる（うなりは歪んで落ちていく）
+    r = rng(seed)
+    clang = _metal_hit(seed, 90 + 30 * r.random(), 1.2, 0.8)
+    snarl = drive(lowpass(saw(glide(95 + 20 * r.random(), 55, 0.7, 0.8)) + 0.5 * square(glide(48, 30, 0.7)), 900), 3.0)         * env([(0, 0), (0.02, 1), (0.5, 0.6), (0.7, 0)], 0.7) * 0.6
+    burst = bandpass(white(0.25, seed), 2500, 1.5) * perc(0.25, 0.002, 0.08) * 0.5
+    return reverb(mix(clang, snarl, burst), 0.8, 0.3, 2500, 0.6)
 
 
 @recipe('boss/foundry_arm_aim')
@@ -631,9 +635,16 @@ def echo_ambient(d, seed):
     return fit(echo(mix(whisper * 0.5, chime(600 * 1.5 ** rng(seed).integers(0, 3), 1.2, seed) * 0.2), 0.28, 0.5, 4), 2.5)
 
 
-@recipe('boss/echo_sentinel_hurt', level=BOSS)
+@recipe('boss/echo_sentinel_hurt', level=BOSS, variants=3)
 def echo_hurt(d, seed):
-    return _glitch(mix(chime(700, 0.4, seed) * 0.6, zap(0.25, 3000, 500, seed) * 0.6), seed)
+    # 像が乱れる: 引き裂かれた声のような高い叫びが、崩れたデジタルの音になって落ちる
+    r = rng(seed)
+    f0 = 520 + 120 * r.random()
+    shriek = voices(0.55, (f0, f0 * 1.06, f0 * 1.5), 'i', seed, 0.3, 0.02) * 0.05
+    shriek = sum(bandpass(shriek, f, 3) for f in (1200, 2600)) * env([(0, 0), (0.02, 1), (0.55, 0)], 0.55)
+    tear = sine(glide(1400, 120, 0.5, 0.5)) * perc(0.5, 0.005, 0.2) * 0.4
+    under = sub_drop(0.6, 90, 30) * 0.5
+    return reverb(mix(_glitch(mix(shriek, tear), seed), under, zap(0.15, 4000, 300, seed) * 0.4), 0.85, 0.35, 4000, 0.6)
 
 
 @recipe('boss/echo_sentinel_bolt')
@@ -734,10 +745,14 @@ def remnant_ambient(d, seed):
     return groan * 0.8 + throb(2.5, 1.5, 33, 0.7) * 0.6
 
 
-@recipe('boss/gravity_remnant_hurt', level=BOSS)
+@recipe('boss/gravity_remnant_hurt', level=BOSS, variants=3)
 def remnant_hurt(d, seed):
+    # 殻の瓦礫が砕け、奥の核が低くうめく（重力に引かれて音程が沈む）
+    r = rng(seed)
     rock = lowpass(white(0.4, seed), 2500) * perc(0.4, 0.002, 0.1)
-    return mix(rock, thump(65, 0.35, 0.2, seed) * 0.7, (rock * 0.5, 0.06))
+    groan = drive(roar(0.8, 48 + 10 * r.random(), seed, 0.9, (300, 650, 1800), env([(0, 1.1), (0.8, 0.6)], 0.8)), 2.0) * 0.6
+    return reverb(mix(rock, (rock * 0.5, 0.06), thump(45, 0.4, 0.2, seed) * 0.9, (groan, 0.03), sub_drop(0.8, 70, 22) * 0.7),
+                  0.85, 0.3, 1800, 0.7)
 
 
 @recipe('boss/gravity_remnant_debris_launch', level=BOSS)
@@ -864,6 +879,16 @@ def warden_death(d, seed):
     return reverb(mix(fall, sparks, *pops, (suck, 2.75), (collapse, 4.5)), 0.95, 0.35, 1800, 2.0)
 
 
+@recipe('boss/horizon_warden_hurt', level=BOSS, variants=3)
+def warden_hurt(d, seed):
+    # 巨体の装甲が鈍く鳴り、胸の炉心が歪んだ低い咆哮を上げる
+    r = rng(seed)
+    clang = _metal_hit(seed, 60 + 25 * r.random(), 1.4, 1.0)
+    growl = drive(roar(0.8, 40 + 10 * r.random(), seed, 0.7, (300, 600, 1500)), 2.5) * 0.7
+    warp = sine(glide(160, 35, 0.6, 0.5)) * perc(0.6, 0.005, 0.3) * 0.5
+    return reverb(mix(clang, (growl, 0.02), warp), 0.9, 0.35, 1800, 0.9)
+
+
 @recipe('boss/horizon_warden_ambient', level=BOSS - 3, variants=3)
 def warden_ambient(d, seed):
     f = 50 + 15 * rng(seed).random()
@@ -910,10 +935,16 @@ def lev_ambient(d, seed):
     return reverb(a, 0.95, 0.4, 2000, 1.2)
 
 
-@recipe('boss/ergosphere_leviathan_hurt', level=BOSS)
+@recipe('boss/ergosphere_leviathan_hurt', level=BOSS, variants=3)
 def lev_hurt(d, seed):
-    screech = bandpass(saw(glide(700, 400, 0.6)) + white(0.6, seed) * 0.5, 1500, 2) * perc(0.6, 0.01, 0.3)
-    return mix(screech * 0.8, clank(500, 0.4, seed) * 0.3)
+    # 怒った巨大な獣の唸り: 喉の奥の低いうなりに、引きつった高い叫びが重なり、鱗がきしむ
+    r = rng(seed)
+    f0 = 52 + 14 * r.random()
+    growl = roar(0.9, f0, seed, 1.0, (380, 760, 2000), env([(0, 0.85), (0.15, 1.15), (0.9, 0.7)], 0.9))
+    shriek = bandpass(saw(glide(f0 * 9, f0 * 6, 0.7, 0.6)) + pink(0.7, seed) * 0.6, 1800, 3)         * env([(0, 0), (0.05, 1), (0.7, 0)], 0.7) * 0.35
+    scales = lowpass(crackle(0.5, 60, seed, 0.01), 1500) * 1.5
+    hit = mix(thump(40, 0.45, 0.3, seed) * 1.1, sub_drop(0.7, 80, 25) * 0.6)
+    return reverb(mix(drive(growl, 2.2) * 0.9, shriek, scales, hit), 0.92, 0.35, 2000, 0.9)
 
 
 @recipe('boss/ergosphere_leviathan_roar', level=BIG)
@@ -1027,11 +1058,15 @@ def arch_ambient(d, seed):
     return reverb(voices(2.8, (root, root * 1.5), 'u', seed, 0.25) * 0.05 * env([(0, 0), (1, 1), (2.8, 0)], 2.8), 0.95, 0.5, 2500, 1.0)
 
 
-@recipe('boss/last_archivist_hurt', level=BOSS)
+@recipe('boss/last_archivist_hurt', level=BOSS, variants=3)
 def arch_hurt(d, seed):
-    wobble = chime(880, 0.8, seed) * (1 + 0.5 * lfo(12, 0.8))
-    gasp = voices(0.6, (440, 466), 'e', seed) * 0.03 * perc(0.6, 0.02, 0.3, 2)
-    return rich(mix(wobble * 0.5, chime(932, 0.8, seed + 1) * 0.4, gasp, glass(0.5, seed, 8) * 0.3), seed, 0.1, 0.4)
+    # 不協和の合唱がひきつって叫び、光の結晶がひび割れる。最後に低い響きが残る
+    r = rng(seed)
+    f = 220 + 40 * r.random()
+    cry = voices(0.8, (f, f * 1.06, f * 1.41, f * 2.12), 'a', seed, 0.2, 0.012) * 0.04         * env([(0, 0), (0.03, 1), (0.25, 0.7), (0.8, 0)], 0.8)
+    crack = mix(glass(0.5, seed, 10) * 0.5, zap(0.12, 6000, 900, seed) * 0.3)
+    swell = whoosh(0.35, 3000, 300, 2, seed, 0.6)[::-1] * 0.5
+    return reverb(mix(swell, (cry, 0.3), (crack, 0.3), (sub_drop(0.9, 70, 25) * 0.7, 0.3)), 0.95, 0.4, 4000, 1.0)
 
 
 @recipe('boss/last_archivist_phase', level=BIG)
