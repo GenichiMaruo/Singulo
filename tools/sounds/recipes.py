@@ -853,8 +853,15 @@ def warden_shockwave(d, seed):
 
 @recipe('boss/horizon_warden_death', level=BIG)
 def warden_death(d, seed):
-    fall = voices(5.0, (110, 82.5, 55), 'u', seed, 0.1) * 0.04 * env([(0, 1), (5, 0)], 5.0)
-    return reverb(mix(boom(3.0, 30, seed, 0.6), fall, (boom(3.0, 24, seed + 1, 0.3) * 0.8, 1.6), (sub_drop(3.0, 70, 18), 2.0)), 0.95, 0.35, 1800, 2.0)
+    # 倒されたときの演出（5 秒）に合わせる: 0〜2.75 秒 外装が 0.45 秒ごとに爆ぜて剥がれ、火花が散る
+    # → 2.75〜4.5 秒 胸の特異点がふくらんで光を吸い込む → 4.5 秒 一点へつぶれて閃光と衝撃波
+    pops = [(mix(impact(0.6, 55 + 10 * (i % 3), seed + i, 0.6), _metal_hit(seed + 20 + i, 110 + 30 * (i % 4), 0.7, 0.8)), 0.05 + 0.45 * i)
+            for i in range(7)]
+    sparks = scatter(2.8, [lambda s: zap(0.1, 5000, 1200, s) * 0.4], 18, seed) * 0.6
+    fall = voices(4.5, (110, 82.5, 55), 'u', seed, 0.1) * 0.04 * env([(0, 1), (4.5, 0.2)], 4.5)
+    suck = mix(whoosh(1.75, 5000, 120, 2, seed + 1, 0.6)[::-1] * 1.0, throb(1.75, 4, 45, 0.9) * env([(0, 0), (1.75, 1)], 1.75) * 0.6)
+    collapse = mix(boom(3.0, 26, seed + 2, 0.7) * 1.3, sub_drop(2.5, 90, 18) * 1.1, whoosh(1.8, 3000, 200, 1.5, seed + 3, 0.5) * 0.7)
+    return reverb(mix(fall, sparks, *pops, (suck, 2.75), (collapse, 4.5)), 0.95, 0.35, 1800, 2.0)
 
 
 @recipe('boss/horizon_warden_ambient', level=BOSS - 3, variants=3)
