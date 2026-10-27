@@ -599,16 +599,18 @@ public class ErgosphereLeviathan extends RuinBoss {
      * 出現の間のボスバー: 小さな蛇が飛び出すと「エルゴ球の蛇」として現れ、呑まれる顎の動きに合わせて削り取られる。
      * 呑まれたあとは本来の名前に替わり、昇り終えるまでに満ちていく。
      */
+    /** 呑まれるときの、顎の動きに合わせたボスバーの残り（呑み込み始めの次の tick から 1 tick ずつ）。 */
+    private static final float[] SWALLOW_BITES = {0.62F, 0.28F, 0.28F, 0.08F, 0.08F, 0F};
+
     private void emergeBar(int t) {
         if (t == EMERGE_VORTEX) {
             bossBar.setName(Component.translatable("entity.singulo.ergosphere_leviathan.hatchling"));
             bossBar.setProgress(1);
             bossBar.setVisible(true);
-        } else if (t > SWALLOW && t <= SWALLOW + 6) {
-            // ひと噛みごとに大きく削れる
-            bossBar.setProgress(t <= SWALLOW + 1 ? 0.62F : t <= SWALLOW + 3 ? 0.28F : t <= SWALLOW + 5 ? 0.08F : 0);
+        } else if (t > SWALLOW && t <= SWALLOW + SWALLOW_BITES.length) {
+            bossBar.setProgress(SWALLOW_BITES[t - SWALLOW - 1]);      // ひと噛みごとに大きく削れる
         } else if (t == SWALLOW_END) {
-            setBarName(barName());
+            refreshBarName();
             bossBar.setProgress(0);
         } else if (t > SWALLOW_END) {
             bossBar.setProgress(Math.min(1, (float) (t - SWALLOW_END) / (EMERGE_TICKS - SWALLOW_END - 10)));

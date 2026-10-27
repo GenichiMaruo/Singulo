@@ -121,12 +121,17 @@ void main() {
     // 歪みのない所や拡大される所（1画素の写す広さが1画素以下）はそのまま読む（画面全体がぼやけないように）。
     // 縮められる所だけ、1画素を超えた分に応じてならす
     float spread = clamp(max(length(dx), length(dy)) / px - 1.0, 0.0, 1.0);
-    dx *= min(1.0, cap / max(length(dx), 1e-7)) * spread;
-    dy *= min(1.0, cap / max(length(dy), 1e-7)) * spread;
-    vec3 c = 0.25 * (texture(Sampler0, clamp(p + 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
-                   + texture(Sampler0, clamp(p - 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
-                   + texture(Sampler0, clamp(p + 0.25 * dx - 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
-                   + texture(Sampler0, clamp(p - 0.25 * dx - 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb);
+    vec3 c;
+    if (spread <= 0.0) {
+        c = textureLod(Sampler0, p, 0.0).rgb;
+    } else {
+        dx *= min(1.0, cap / max(length(dx), 1e-7)) * spread;
+        dy *= min(1.0, cap / max(length(dy), 1e-7)) * spread;
+        c = 0.25 * (textureLod(Sampler0, clamp(p + 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995)), 0.0).rgb
+                  + textureLod(Sampler0, clamp(p - 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995)), 0.0).rgb
+                  + textureLod(Sampler0, clamp(p + 0.25 * dx - 0.25 * dy, vec2(0.0005), vec2(0.9995)), 0.0).rgb
+                  + textureLod(Sampler0, clamp(p - 0.25 * dx - 0.25 * dy, vec2(0.0005), vec2(0.9995)), 0.0).rgb);
+    }
     c += vec3(1.0, 0.92, 0.82) * ring * 0.55;
     c = mix(c, vec3(0.0), dark);
     fragColor = vec4(c, 1.0);

@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.registry.SinguloBlocks;
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
+import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -231,7 +232,7 @@ public class GravityRemnant extends RuinBoss {
             level.sendParticles(ParticleTypes.SQUID_INK, c.x, c.y, c.z, 3, 1.5, 1.5, 1.5, 0.02);
         }
         if (t == 1) {
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.emerge"), 2.5F, 1.0F);
+            playSound(SinguloSounds.get("gravity_remnant.emerge"), 2.5F, 1.0F);
         }
     }
 
@@ -239,7 +240,7 @@ public class GravityRemnant extends RuinBoss {
     protected void onEmerged(ServerLevel level) {
         level.sendParticles(ParticleTypes.SONIC_BOOM, getX(), getY() + 0.6, getZ(), 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() - 1.5, getZ(), 10, 3, 0.3, 3, 0);
-        level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.slam"), SoundSource.HOSTILE, 3.0F, 0.8F);
+        level.playSound(null, blockPosition(), SinguloSounds.get("gravity_remnant.slam"), SoundSource.HOSTILE, 3.0F, 0.8F);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(8), e -> e != this)) {
             Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
             if (push.lengthSqr() > 1e-4) {
@@ -321,7 +322,7 @@ public class GravityRemnant extends RuinBoss {
             level().addFreshEntity(debris);
         }
         if (n > 0) {
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.debris_launch"), 1.5F, 1.0F);
+            playSound(SinguloSounds.get("gravity_remnant.debris_launch"), 1.5F, 1.0F);
         }
         return n;
     }
@@ -346,7 +347,7 @@ public class GravityRemnant extends RuinBoss {
         }
         if (shell() == 0 && ++bareTicks >= pace(REGROW_DELAY) - GATHER_TICKS) {
             entityData.set(GATHER, GATHER_TICKS);
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.shell_regrow"), 2.0F, 1.0F);
+            playSound(SinguloSounds.get("gravity_remnant.shell_regrow"), 2.0F, 1.0F);
         }
     }
 
@@ -359,7 +360,7 @@ public class GravityRemnant extends RuinBoss {
             e.hurtMarked = true;
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, e.getX(), e.getY() + 0.5, e.getZ(), 20, 0.4, 0.4, 0.4, 0.05);
         }
-        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.lift"), 2.0F, 1.0F);
+        playSound(SinguloSounds.get("gravity_remnant.lift"), 2.0F, 1.0F);
     }
 
     private void tickFlip(ServerLevel level) {
@@ -386,7 +387,7 @@ public class GravityRemnant extends RuinBoss {
             e.hurtMarked = true;
             level.sendParticles(ParticleTypes.SQUID_INK, e.getX(), e.getY() + 1, e.getZ(), 10, 0.3, 0.5, 0.3, 0.02);
         }
-        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.slam"), 2.0F, 1.0F);
+        playSound(SinguloSounds.get("gravity_remnant.slam"), 2.0F, 1.0F);
         // 覚醒した個体は、本気になると叩きつけたあともう1度浮かせることがある
         if (awakened() && wellOpen() && !chainedFlip && random.nextFloat() < 0.5F) {
             chainedFlip = true;
@@ -506,7 +507,7 @@ public class GravityRemnant extends RuinBoss {
         entityData.set(FLIP, 0);
         entityData.set(GATHER, 0);
         if (level() instanceof ServerLevel) {
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.death_collapse"), 2.5F, 1.0F);
+            playSound(SinguloSounds.get("gravity_remnant.death_collapse"), 2.5F, 1.0F);
         }
     }
 
@@ -544,7 +545,7 @@ public class GravityRemnant extends RuinBoss {
             int beat = Math.max(4, 16 - t / 4);
             if (t % beat == 0) {
                 level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 30, 0.2, 0.2, 0.2, 0.6);
-                level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.pulse"),
+                level.playSound(null, blockPosition(), SinguloSounds.get("gravity_remnant.pulse"),
                         SoundSource.HOSTILE, 2.0F, 0.9F + t * 0.006F);
             }
         } else if (t < DEATH_TICKS - 6) {
@@ -565,7 +566,7 @@ public class GravityRemnant extends RuinBoss {
             }
             if (t == DEATH_TICKS - 8) {
                 // 爆縮の音は頭に一瞬の静けさがあるので、少し早めに鳴らす
-                level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.death_implode"), SoundSource.HOSTILE, 3.0F, 1.0F);
+                level.playSound(null, blockPosition(), SinguloSounds.get("gravity_remnant.death_implode"), SoundSource.HOSTILE, 3.0F, 1.0F);
             }
         } else if (t == DEATH_TICKS - 6) {
             // 一点につぶれて弾ける（ダメージはない）
@@ -590,7 +591,7 @@ public class GravityRemnant extends RuinBoss {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.hurt");
+        return SinguloSounds.get("gravity_remnant.hurt");
     }
 
     @Override

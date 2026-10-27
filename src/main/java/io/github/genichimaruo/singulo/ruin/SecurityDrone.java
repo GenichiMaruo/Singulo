@@ -1,5 +1,6 @@
 package io.github.genichimaruo.singulo.ruin;
 
+import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
@@ -188,7 +189,7 @@ public class SecurityDrone extends Monster {
         }
         if (random.nextInt(25) == 0) {
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 0.3, getZ(), 3, 0.2, 0.1, 0.2, 0.05);
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("security_drone.sputter"), 0.6F, 0.9F + random.nextFloat() * 0.3F);
+            playSound(SinguloSounds.get("security_drone.sputter"), 0.6F, 0.9F + random.nextFloat() * 0.3F);
         }
     }
 

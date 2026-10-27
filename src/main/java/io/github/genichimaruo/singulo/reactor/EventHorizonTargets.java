@@ -15,8 +15,8 @@ public final class EventHorizonTargets {
      */
     public static boolean edibleBlock(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
                                       net.minecraft.world.level.block.state.BlockState state, boolean fluids) {
-        return !state.isAir() && state.getDestroySpeed(level, pos) >= 0 && level.getBlockEntity(pos) == null
-                && (fluids || state.getFluidState().isEmpty());
+        return !state.isAir() && (fluids || state.getFluidState().isEmpty()) && state.getDestroySpeed(level, pos) >= 0
+                && level.getBlockEntity(pos) == null;
     }
 
     /** ボスの落とし物（アイテム・経験値オーブ）の印。ブラックホールに引き寄せられず、飲み込まれない（倒した報酬が失われないように）。 */

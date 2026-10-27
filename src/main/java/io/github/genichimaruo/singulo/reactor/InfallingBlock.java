@@ -28,6 +28,8 @@ public class InfallingBlock extends Entity {
     private static final EntityDataAccessor<Float> HORIZON = SynchedEntityData.defineId(InfallingBlock.class, EntityDataSerializers.FLOAT);
     /** 吸い込まれきるまでの上限（これを過ぎたら消す）。 */
     static final int LIFETIME = 120;
+    /** 行き先（炉心の中心）。生まれたあと変わらないので、同期された値から作っておく。 */
+    private Vec3 target = Vec3.ZERO;
 
     public InfallingBlock(EntityType<? extends InfallingBlock> type, Level level) {
         super(type, level);
@@ -39,6 +41,7 @@ public class InfallingBlock extends Entity {
         setPos(at.x, at.y, at.z);
         entityData.set(BLOCK, block);
         entityData.set(TARGET, new Vector3f((float) target.x, (float) target.y, (float) target.z));
+        this.target = target;
         entityData.set(START, (float) Math.max(0.5, at.distanceTo(target)));
         entityData.set(HORIZON, (float) horizon);
     }
@@ -55,14 +58,21 @@ public class InfallingBlock extends Entity {
         return entityData.get(BLOCK);
     }
 
-    public Vec3 target() {
-        Vector3f t = entityData.get(TARGET);
-        return new Vec3(t.x, t.y, t.z);
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (TARGET.equals(key)) {
+            Vector3f t = entityData.get(TARGET);
+            target = new Vec3(t.x, t.y, t.z);
+        }
     }
 
-    /** 吸い込まれた割合（0: 崩れたばかり、1: 地平線に届いた）。描画の伸び縮みに使う。 */
-    public float fall(float partialTick) {
-        Vec3 p = getPosition(partialTick);
+    public Vec3 target() {
+        return target;
+    }
+
+    /** 位置 p での、吸い込まれた割合（0: 崩れたばかり、1: 地平線に届いた）。描画の伸び縮みに使う。 */
+    public float fall(Vec3 p) {
         float horizon = entityData.get(HORIZON);
         float start = entityData.get(START);
         return (float) Math.max(0, Math.min(1, 1 - (p.distanceTo(target()) - horizon) / Math.max(0.1, start - horizon)));

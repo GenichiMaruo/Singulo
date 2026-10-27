@@ -20,6 +20,9 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import static io.github.genichimaruo.singulo.client.FxDraw.glow;
+import static io.github.genichimaruo.singulo.client.FxDraw.orient;
+
 /**
  * エルゴ球の大蛇。体力で3つの姿を描き分ける。
  * <ol>
@@ -53,10 +56,6 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         return FxDraw.WHITE;
     }
 
-    static VertexConsumer glow(MultiBufferSource buffers) {
-        return buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE));
-    }
-
     @Override
     public void render(ErgosphereLeviathan e, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         float t = e.tickCount + partialTick;
@@ -69,10 +68,12 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         boolean hasHome = !e.homePos().equals(net.minecraft.core.BlockPos.ZERO);
         int state = e.state();
         int form = e.form();
+        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
+        BlockState plate = ErgosphereLeviathan.plate();
         if (hasHome) {
             renderVortex(e, emerge, emergeT, death, state, t, partialTick, core, origin, camera, pose, buffers);
             if (emerge < 1 && emergeT >= ErgosphereLeviathan.EMERGE_VORTEX && emergeT < ErgosphereLeviathan.SWALLOW + 8) {
-                renderHatchling(e, emergeT, t, core, origin, camera, pose, buffers, light);
+                renderHatchling(e, emergeT, t, core, origin, camera, pose, buffers, blocks, plate, light);
             }
         }
         boolean underground = emerge < 1 && emergeT < ErgosphereLeviathan.SWALLOW
@@ -100,9 +101,6 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
                 seam = 0xFFFFFF;
             }
         }
-        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
-        BlockState plate = ErgosphereLeviathan.plate();
-
         renderWake(e, form, origin, t, pose, buffers);
         // 尾から頭へ
         for (int i = n - 1; i >= 0; i--) {
@@ -161,12 +159,20 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         return Mth.clamp((death - start) / 0.1F, 0, 1);
     }
 
-    /** +Z を dir に向ける回転。 */
-    static Quaternionf orient(Vec3 dir) {
-        Vec3 d = dir.lengthSqr() < 1e-6 ? new Vec3(0, 0, 1) : dir.normalize();
-        float yaw = (float) Math.atan2(d.x, d.z);
-        float pitch = (float) -Math.asin(Mth.clamp(d.y, -1, 1));
-        return new Quaternionf().rotateY(yaw).rotateX(pitch);
+    /**
+     * 鱗の板を1枚描く: 体の軸（Z）のまわりに roll 度回し、lift だけ外へ、z だけ前へ出し、pitch 度起こして、
+     * sx × sy × sz の大きさのブロックとして描く。
+     */
+    static void plate(PoseStack pose, MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState state, int light, float roll,
+                      float lift, float z, float pitch, float sx, float sy, float sz) {
+        pose.pushPose();
+        pose.mulPose(Axis.ZP.rotationDegrees(roll));
+        pose.translate(0, lift, z);
+        pose.mulPose(Axis.XP.rotationDegrees(pitch));
+        pose.scale(sx, sy, sz);
+        pose.translate(-0.5, 0, -0.5);
+        blocks.renderSingleBlock(state, pose, buffers, light, OverlayTexture.NO_OVERLAY);
+        pose.popPose();
     }
 
     // ------------------------------------------------------------------ 姿1: 装甲
@@ -182,16 +188,10 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         pose.mulPose(Axis.ZP.rotationDegrees(roll));
         FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r * 0.62F, 0x050208, 0);
         if (peel < 1) {
+            float s = 1 - peel;
             for (int k = 0; k < 4; k++) {
-                pose.pushPose();
-                pose.mulPose(Axis.ZP.rotationDegrees(k * 90 + (i % 2) * 45));
-                pose.translate(0, r * 0.55F + peel * 2.5F, 0);
-                pose.mulPose(Axis.XP.rotationDegrees(-14 - peel * 120));
-                float s = 1 - peel;
-                pose.scale(r * 1.25F * s, r * 0.3F * s, r * 1.35F * s);
-                pose.translate(-0.5, 0, -0.5);
-                blocks.renderSingleBlock(plate, pose, buffers, light, OverlayTexture.NO_OVERLAY);
-                pose.popPose();
+                plate(pose, buffers, blocks, plate, light, k * 90 + (i % 2) * 45, r * 0.55F + peel * 2.5F, 0, -14 - peel * 120,
+                        r * 1.25F * s, r * 0.3F * s, r * 1.35F * s);
             }
         }
         // 別の描き方の入れ物を取ると前の入れ物は閉じられるので、光の入れ物は取り直す
@@ -205,31 +205,35 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             pose.popPose();
         }
         if (i == n - 1) {
-            tailFin(pose, glow, r, seam, seamAlpha, t);
+            tailFin(pose, glow, r * 0.8F, 1.4F, 0.9F, 0.2F, 12, seam, (int) (200 * seamAlpha), t);
         }
         pose.popPose();
         if (i == n - 1 && seamAlpha > 0.05F) {
-            tailCore(local, r, seamAlpha, t, camera, pose, glow);
+            tailCore(local, r * 2.6F + 0.2F * Mth.sin(t * 0.4F), r * 1.2F, (int) (210 * seamAlpha), (int) (230 * seamAlpha), camera, pose, glow);
         }
     }
 
-    private static void tailFin(PoseStack pose, VertexConsumer glow, float r, int rgb, float alpha, float t) {
+    /** 尾びれ: 尾の back だけ後ろに、十字に重ねた2枚の光の三日月が、speed の速さで swing 度ゆらぐ。 */
+    private static void tailFin(PoseStack pose, VertexConsumer glow, float back, float outer, float inner, float speed, float swing, int rgb,
+                                int alpha, float t) {
         pose.pushPose();
-        pose.translate(0, 0, -r * 0.8F);
+        pose.translate(0, 0, -back);
         for (int k = 0; k < 2; k++) {
             pose.pushPose();
-            pose.mulPose(Axis.ZP.rotationDegrees(k * 90 + Mth.sin(t * 0.2F) * 12));
-            FxDraw.crescent(pose.last(), glow, 120, 240, 1.4F, 0.9F, rgb, (int) (200 * alpha));
+            pose.mulPose(Axis.ZP.rotationDegrees(k * 90 + Mth.sin(t * speed) * swing));
+            FxDraw.crescent(pose.last(), glow, 120, 240, outer, inner, rgb, alpha);
             pose.popPose();
         }
         pose.popPose();
     }
 
-    private static void tailCore(Vec3 local, float r, float alpha, float t, Quaternionf camera, PoseStack pose, VertexConsumer glow) {
+    /** 尾の芯: 金のにじみと白い芯。 */
+    private static void tailCore(Vec3 local, float outer, float inner, int outerAlpha, int innerAlpha, Quaternionf camera, PoseStack pose,
+                                 VertexConsumer glow) {
         pose.pushPose();
         pose.translate(local.x, local.y, local.z);
-        FxDraw.billboard(pose, glow, camera, r * 2.6F + 0.2F * Mth.sin(t * 0.4F), CORE, (int) (210 * alpha));
-        FxDraw.billboard(pose, glow, camera, r * 1.2F, 0xFFFFFF, (int) (230 * alpha));
+        FxDraw.billboard(pose, glow, camera, outer, CORE, outerAlpha);
+        FxDraw.billboard(pose, glow, camera, inner, 0xFFFFFF, innerAlpha);
         pose.popPose();
     }
 
@@ -258,14 +262,14 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             pose.popPose();
         }
         if (i == n - 1) {
-            tailFin(pose, glow, r, SEAM_HOT, alpha * s, t);
+            tailFin(pose, glow, r * 0.8F, 1.4F, 0.9F, 0.2F, 12, SEAM_HOT, (int) (200 * alpha * s), t);
         }
         pose.popPose();
         // 背骨（この節から頭側の節まで）
         FxDraw.beam(pose.last(), glow, local, next, 0.22F * s, BONE, (int) (230 * alpha));
         FxDraw.beam(pose.last(), glow, local, next, 0.6F * s, SEAM, (int) (80 * alpha));
         if (i == n - 1 && alpha > 0.05F) {
-            tailCore(local, r * s, alpha, t, camera, pose, glow);
+            tailCore(local, r * s * 2.6F + 0.2F * Mth.sin(t * 0.4F), r * s * 1.2F, (int) (210 * alpha), (int) (230 * alpha), camera, pose, glow);
         }
     }
 
@@ -348,6 +352,20 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
 
     // ------------------------------------------------------------------ 頭
 
+    /** 頭の上と左右の板（回し・外へ・大きさ x y z・起こし）。下顎は開き方で変わるので別に描く。 */
+    private static final float[][] HEAD_PLATES = {{0, 0.62F, 1.7F, 0.34F, 2.0F, -8}, {68, 0.6F, 1.3F, 0.3F, 1.8F, -10},
+            {-68, 0.6F, 1.3F, 0.3F, 1.8F, -10}};
+
+    /** 鱗を楔のように重ねた頭（上・左右・下顎）。peel は剥がれた割合（外へ飛び、小さくなる）。 */
+    static void headPlates(PoseStack pose, MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState state, int light,
+                           float jawLift, float jawPitch, float peel) {
+        float s = 1 - peel;
+        for (float[] p : HEAD_PLATES) {
+            plate(pose, buffers, blocks, state, light, p[0], p[1] + peel * 2.5F, 0.15F, p[5] - peel * 100, p[2] * s, p[3] * s, p[4] * s);
+        }
+        plate(pose, buffers, blocks, state, light, 180, jawLift + peel * 2.5F, 0.15F, jawPitch - peel * 100, 1.2F * s, 0.28F * s, 1.6F * s);
+    }
+
     private static void renderHead(ErgosphereLeviathan e, int form, Vec3 local, Vec3 fwd, float peel, boolean windup, float alpha,
                                    float emergeT, float emerge, float t, float partialTick, Vec3 origin, Quaternionf camera, PoseStack pose,
                                    MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState plate, int light) {
@@ -360,19 +378,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), (form == 2 ? 0.6F : 0.78F) * s,
                 form == 3 ? 0x000000 : 0x050208, 0);
         if (form == 1 && peel < 1) {
-            // 鱗を楔のように重ねた頭（上・左右・下顎）
-            float[][] plates = {{0, 0.62F, 1.7F, 0.34F, 2.0F, -8}, {68, 0.6F, 1.3F, 0.3F, 1.8F, -10}, {-68, 0.6F, 1.3F, 0.3F, 1.8F, -10},
-                    {180, 0.55F + 0.25F * mouthOpen, 1.2F, 0.28F, 1.6F, -6 - 18 * mouthOpen}};
-            for (float[] p : plates) {
-                pose.pushPose();
-                pose.mulPose(Axis.ZP.rotationDegrees(p[0]));
-                pose.translate(0, p[1] + peel * 2.5F, 0.15F);
-                pose.mulPose(Axis.XP.rotationDegrees(p[5] - peel * 100));
-                pose.scale(p[2] * s, p[3] * s, p[4] * s);
-                pose.translate(-0.5, 0, -0.5);
-                blocks.renderSingleBlock(plate, pose, buffers, light, OverlayTexture.NO_OVERLAY);
-                pose.popPose();
-            }
+            headPlates(pose, buffers, blocks, plate, light, 0.55F + 0.25F * mouthOpen, -6 - 18 * mouthOpen, peel);
         }
         VertexConsumer glow = glow(buffers);
         if (form == 2) {
@@ -691,16 +697,15 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
      * 鱗の板を重ねた細い体（尾へ細くなる）、節の継ぎ目を頭から尾へ走る菫の光、背の小さな棘、
      * 楔の板を重ねた頭と光る目、口の小さな渦、光る尾びれと尾の芯を持つ。泳ぐと体が左右にくねる。
      * 渦が閉じたあと頼りなく漂って炉心の上に止まり、真下から噴き上がった大蛇の顎へ吸い込まれて消える。
+     * 黒い体と鱗を先にまとめて描き、光はあとでまとめて描く（描き方を何度も切り替えない）。
      */
     private static void renderHatchling(ErgosphereLeviathan e, float emergeT, float t, Vec3 core, Vec3 origin, Quaternionf camera,
-                                        PoseStack pose, MultiBufferSource buffers, int light) {
+                                        PoseStack pose, MultiBufferSource buffers, BlockRenderDispatcher blocks, BlockState plate, int light) {
         float swallow = Mth.clamp((emergeT - ErgosphereLeviathan.SWALLOW) / 5F, 0, 1);
         float scale = Mth.clamp((emergeT - ErgosphereLeviathan.EMERGE_VORTEX) / 8F, 0, 1) * (1 - swallow);
         if (scale <= 0.01F) {
             return;
         }
-        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
-        BlockState plate = ErgosphereLeviathan.plate();
         Vec3 mouth = e.position().add(0, e.getBbHeight(), 0);
         // 節の位置: 頭の跡をさかのぼり、進む向きと直角に左右へくねらせる（尾ほど大きく）
         Vec3[] at = new Vec3[HATCH_SEGMENTS];
@@ -714,29 +719,56 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             }
             at[k] = p.lerp(mouth, Math.min(1, swallow * (1 + k * 0.25F)));
         }
-        // 尾から頭へ
+        // 体の節（尾から頭へ）の向きと太さ
+        Quaternionf[] turn = new Quaternionf[HATCH_SEGMENTS];
+        float[] radius = new float[HATCH_SEGMENTS];
+        for (int k = 1; k < HATCH_SEGMENTS; k++) {
+            turn[k] = orient(at[k - 1].subtract(at[k])).rotateZ(Mth.sin(t * 0.3F - k) * 10 * Mth.DEG_TO_RAD);
+            radius[k] = Mth.lerp((k - 1) / (float) (HATCH_SEGMENTS - 2), 0.3F, 0.11F) * scale;
+        }
+        Vec3 head = at[0].subtract(origin);
+        Quaternionf q = orient(at[0].subtract(at[1]));
+        float hr = 0.36F * scale;
+        float jaw = 0.5F + 0.5F * Mth.sin(t * 0.35F);
+
+        // ---- 黒い体と鱗の板
+        VertexConsumer solid = buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE));
         for (int k = HATCH_SEGMENTS - 1; k >= 1; k--) {
             Vec3 local = at[k].subtract(origin);
-            Vec3 fwd = at[k - 1].subtract(at[k]);
-            float r = Mth.lerp((k - 1) / (float) (HATCH_SEGMENTS - 2), 0.3F, 0.11F) * scale;
+            float r = radius[k];
+            pose.pushPose();
+            pose.translate(local.x, local.y, local.z);
+            pose.mulPose(turn[k]);
+            FxDraw.sphere(pose.last(), solid, r * 0.7F, 0x0A0612, 0);
+            // 上と左右の3枚。若いので小さく、少し開き気味
+            for (int s = -1; s <= 1; s++) {
+                plate(pose, buffers, blocks, plate, light, s * 70, r * 0.6F, 0, -18, r * 1.3F, r * 0.32F, r * 1.6F);
+            }
+            pose.popPose();
+        }
+        pose.pushPose();
+        pose.translate(head.x, head.y, head.z);
+        pose.mulPose(q);
+        FxDraw.sphere(pose.last(), solid, hr * 0.75F, 0x0A0612, 0);
+        pose.pushPose();
+        pose.scale(hr, hr, hr);
+        headPlates(pose, buffers, blocks, plate, light, 0.55F + 0.15F * jaw, -6 - 12 * jaw, 0);       // 下顎は小さく開け閉めする
+        pose.popPose();
+        pose.pushPose();
+        pose.translate(0, -0.05F * hr, 1.0F * hr);
+        FxDraw.sphere(pose.last(), solid, hr * (0.3F + 0.15F * jaw), 0x000000, 0);           // 口の小さな渦の黒
+        pose.popPose();
+        pose.popPose();
+
+        // ---- 光
+        VertexConsumer glow = glow(buffers);
+        for (int k = HATCH_SEGMENTS - 1; k >= 1; k--) {
+            Vec3 local = at[k].subtract(origin);
+            float r = radius[k];
             float wave = 0.5F + 0.5F * Mth.sin(t * 0.5F - k * 0.8F);
             pose.pushPose();
             pose.translate(local.x, local.y, local.z);
-            pose.mulPose(orient(fwd));
-            pose.mulPose(Axis.ZP.rotationDegrees(Mth.sin(t * 0.3F - k) * 10));
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r * 0.7F, 0x0A0612, 0);
-            // 鱗の板（上と左右の3枚。若いので小さく、少し開き気味）
-            for (int q = -1; q <= 1; q++) {
-                pose.pushPose();
-                pose.mulPose(Axis.ZP.rotationDegrees(q * 70));
-                pose.translate(0, r * 0.6F, 0);
-                pose.mulPose(Axis.XP.rotationDegrees(-18));
-                pose.scale(r * 1.3F, r * 0.32F, r * 1.6F);
-                pose.translate(-0.5, 0, -0.5);
-                blocks.renderSingleBlock(plate, pose, buffers, light, OverlayTexture.NO_OVERLAY);
-                pose.popPose();
-            }
-            VertexConsumer glow = glow(buffers);
+            pose.mulPose(turn[k]);
             // 継ぎ目の光（頭から尾へ脈が走る）
             pose.pushPose();
             pose.translate(0, 0, r * 0.75F);
@@ -751,55 +783,18 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             LastArchivistRenderer.blade(pose, glow, 1, r * 1.3F, r * 0.5F, SEAM, (int) (200 * scale), SEAM_HOT, 0);
             pose.popPose();
             if (k == HATCH_SEGMENTS - 1) {
-                // 尾びれ（2枚の光の三日月がゆらぐ）
-                pose.pushPose();
-                pose.translate(0, 0, -r * 0.9F);
-                for (int f = 0; f < 2; f++) {
-                    pose.pushPose();
-                    pose.mulPose(Axis.ZP.rotationDegrees(f * 90 + Mth.sin(t * 0.6F) * 20));
-                    FxDraw.crescent(pose.last(), glow, 120, 240, 0.45F * scale, 0.28F * scale, SEAM, (int) (210 * scale));
-                    pose.popPose();
-                }
-                pose.popPose();
+                tailFin(pose, glow, r * 0.9F, 0.45F * scale, 0.28F * scale, 0.6F, 20, SEAM, (int) (210 * scale), t);
             }
             pose.popPose();
             if (k == HATCH_SEGMENTS - 1) {
-                pose.pushPose();
-                pose.translate(local.x, local.y, local.z);
-                FxDraw.billboard(pose, glow, camera, r * 3F + 0.05F * Mth.sin(t * 0.7F), CORE, (int) (200 * scale));
-                FxDraw.billboard(pose, glow, camera, r * 1.3F, 0xFFFFFF, (int) (220 * scale));
-                pose.popPose();
+                tailCore(local, r * 3F + 0.05F * Mth.sin(t * 0.7F), r * 1.3F, (int) (200 * scale), (int) (220 * scale), camera, pose, glow);
             }
         }
-        // 頭
-        Vec3 head = at[0].subtract(origin);
-        Vec3 headFwd = at[0].subtract(at[1]);
-        Quaternionf q = orient(headFwd);
-        float hr = 0.36F * scale;
-        float jaw = 0.5F + 0.5F * Mth.sin(t * 0.35F);
         pose.pushPose();
         pose.translate(head.x, head.y, head.z);
         pose.mulPose(q);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), hr * 0.75F, 0x0A0612, 0);
-        // 楔の板を重ねた頭（上・左右・下顎。下顎は小さく開け閉めする）
-        float[][] plates = {{0, 0.62F, 1.7F, 0.34F, 2.0F, -8}, {68, 0.6F, 1.3F, 0.3F, 1.8F, -10}, {-68, 0.6F, 1.3F, 0.3F, 1.8F, -10},
-                {180, 0.55F + 0.15F * jaw, 1.2F, 0.28F, 1.6F, -6 - 12 * jaw}};
-        for (float[] pl : plates) {
-            pose.pushPose();
-            pose.mulPose(Axis.ZP.rotationDegrees(pl[0]));
-            pose.translate(0, pl[1] * hr, 0.15F * hr);
-            pose.mulPose(Axis.XP.rotationDegrees(pl[5]));
-            pose.scale(pl[2] * hr, pl[3] * hr, pl[4] * hr);
-            pose.translate(-0.5, 0, -0.5);
-            blocks.renderSingleBlock(plate, pose, buffers, light, OverlayTexture.NO_OVERLAY);
-            pose.popPose();
-        }
-        VertexConsumer glow;
-        // 口の小さな渦
         pose.pushPose();
         pose.translate(0, -0.05F * hr, 1.0F * hr);
-        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), hr * (0.3F + 0.15F * jaw), 0x000000, 0);
-        glow = glow(buffers);
         pose.mulPose(Axis.XP.rotationDegrees(90));
         pose.mulPose(Axis.YP.rotationDegrees(t * 12));
         FxDraw.ring(pose.last(), glow, hr * 0.35F, hr * 0.7F, SEAM, (int) (190 * scale), 0);

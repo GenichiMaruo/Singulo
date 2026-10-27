@@ -367,8 +367,8 @@ def penrose_ignition(d, seed):
     power = 0.25 * wake + 0.75 * inject
     # リングを巡る光: 回転の速さが上がっていくうなりと、巡る風
     spin_rate = 0.4 + 3.5 * power ** 2 + 14 * collapse ** 2
-    phase = np.cumsum(spin_rate) / SR
-    whirl = bandpass(pink(D, seed), 300 + 1500 * power + 2500 * collapse, 2) * (0.6 + 0.4 * np.sin(2 * np.pi * phase))         * (0.15 + 0.6 * power + 0.5 * collapse)
+    whirl = (bandpass(pink(D, seed), 300 + 1500 * power + 2500 * collapse, 2) * (0.6 + 0.4 * sine(spin_rate))
+             * (0.15 + 0.6 * power + 0.5 * collapse))
     f = 30 + 40 * power + 120 * collapse ** 2
     drone = (sine(f * (1 + 0.003 * lfo(0.3, D))) * 0.7 + saw(f * 2) * 0.12) * (0.25 + 0.5 * power + 0.3 * collapse)
     # ポートが灯る音（12 個、少しずつ高く）
@@ -376,7 +376,7 @@ def penrose_ignition(d, seed):
     # 注入: 流れ込む電流と、速まる種の鼓動、高まる唸り
     current = buzz(55, D, 1800, seed) * inject * 0.18 * (1 - 0.6 * collapse)
     beat_rate = 0.8 + 3.5 * inject + 6 * collapse
-    beat = np.sin(np.pi * (np.cumsum(beat_rate) / SR)) ** 8
+    beat = sine(beat_rate / 2) ** 8
     pulse = sine(48, D) * beat * (0.2 + 0.6 * inject) * (inject > 0)
     rise = riser(7.6, 60, 700, seed + 1, 0.4) * 0.5
     sing = whine(glide(180, 900, 7.6, 1.4), 7.6, 0.005, 6) * env([(0, 0), (7.6, 0.18)], 7.6)
@@ -384,8 +384,7 @@ def penrose_ignition(d, seed):
     suck = whoosh(2.4, 6000, 150, 2, seed + 2, 0.5)[::-1] * 1.1
     dive = sine(glide(400, 40, 2.4, 0.6)) * env([(0, 0), (2.0, 0.6), (2.4, 0)], 2.4)
     out = mix(whirl, drone, ports, current, pulse, (rise, 6.0), (sing, 6.0), (suck, 13.6), (dive, 13.6))
-    out = fit(reverb(out, 0.85, 0.3, 3000, 0.0), D)
-    return out * np.concatenate([np.ones(int((D - 0.03) * SR)), np.linspace(1, 0, len(out) - int((D - 0.03) * SR))])
+    return fade(fit(reverb(out, 0.85, 0.3, 3000, 0.0), D), 0, 0.03)
 
 
 @recipe('machine/probe_station_launch')
@@ -559,7 +558,8 @@ def foundry_hurt(d, seed):
     # 装甲が殴られて鳴り、怒った機械が低くうなる（うなりは歪んで落ちていく）
     r = rng(seed)
     clang = _metal_hit(seed, 90 + 30 * r.random(), 1.2, 0.8)
-    snarl = drive(lowpass(saw(glide(95 + 20 * r.random(), 55, 0.7, 0.8)) + 0.5 * square(glide(48, 30, 0.7)), 900), 3.0)         * env([(0, 0), (0.02, 1), (0.5, 0.6), (0.7, 0)], 0.7) * 0.6
+    snarl = (drive(lowpass(saw(glide(95 + 20 * r.random(), 55, 0.7, 0.8)) + 0.5 * square(glide(48, 30, 0.7)), 900), 3.0)
+             * env([(0, 0), (0.02, 1), (0.5, 0.6), (0.7, 0)], 0.7) * 0.6)
     burst = bandpass(white(0.25, seed), 2500, 1.5) * perc(0.25, 0.002, 0.08) * 0.5
     return reverb(mix(clang, snarl, burst), 0.8, 0.3, 2500, 0.6)
 
@@ -961,7 +961,8 @@ def lev_hurt(d, seed):
     r = rng(seed)
     f0 = 52 + 14 * r.random()
     growl = roar(0.9, f0, seed, 1.0, (380, 760, 2000), env([(0, 0.85), (0.15, 1.15), (0.9, 0.7)], 0.9))
-    shriek = bandpass(saw(glide(f0 * 9, f0 * 6, 0.7, 0.6)) + pink(0.7, seed) * 0.6, 1800, 3)         * env([(0, 0), (0.05, 1), (0.7, 0)], 0.7) * 0.35
+    shriek = (bandpass(saw(glide(f0 * 9, f0 * 6, 0.7, 0.6)) + pink(0.7, seed) * 0.6, 1800, 3)
+              * env([(0, 0), (0.05, 1), (0.7, 0)], 0.7) * 0.35)
     scales = lowpass(crackle(0.5, 60, seed, 0.01), 1500) * 1.5
     hit = mix(thump(40, 0.45, 0.3, seed) * 1.1, sub_drop(0.7, 80, 25) * 0.6)
     return reverb(mix(drive(growl, 2.2) * 0.9, shriek, scales, hit), 0.92, 0.35, 2000, 0.9)
@@ -1083,7 +1084,8 @@ def arch_hurt(d, seed):
     # 不協和の合唱がひきつって叫び、光の結晶がひび割れる。最後に低い響きが残る
     r = rng(seed)
     f = 220 + 40 * r.random()
-    cry = voices(0.8, (f, f * 1.06, f * 1.41, f * 2.12), 'a', seed, 0.2, 0.012) * 0.04         * env([(0, 0), (0.03, 1), (0.25, 0.7), (0.8, 0)], 0.8)
+    cry = (voices(0.8, (f, f * 1.06, f * 1.41, f * 2.12), 'a', seed, 0.2, 0.012) * 0.04
+           * env([(0, 0), (0.03, 1), (0.25, 0.7), (0.8, 0)], 0.8))
     crack = mix(glass(0.5, seed, 10) * 0.5, zap(0.12, 6000, 900, seed) * 0.3)
     swell = whoosh(0.35, 3000, 300, 2, seed, 0.6)[::-1] * 0.5
     return reverb(mix(swell, (cry, 0.3), (crack, 0.3), (sub_drop(0.9, 70, 25) * 0.7, 0.3)), 0.95, 0.4, 4000, 1.0)

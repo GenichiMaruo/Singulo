@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
+import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -175,7 +176,7 @@ public class HorizonBolt extends ThrowableItemProjectile {
         if (!level().isClientSide) {
             if (level() instanceof ServerLevel server) {
                 server.sendParticles(ParticleTypes.FLASH, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
-                server.playSound(null, getX(), getY(), getZ(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.bolt_hit"),
+                server.playSound(null, getX(), getY(), getZ(), SinguloSounds.get("horizon_warden.bolt_hit"),
                         net.minecraft.sounds.SoundSource.HOSTILE, 1.5F, 0.9F + random.nextFloat() * 0.2F);
             }
             discard();

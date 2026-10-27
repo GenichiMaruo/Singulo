@@ -150,9 +150,9 @@ public abstract class RuinBoss extends Monster {
         bossBar.setColor(awakenedColor());
     }
 
-    /** いまのボスバーの本来の名前（演出で一時的に別の名前を出していても、こちらは変わらない）。 */
-    protected Component barName() {
-        return barName != null ? barName : getDisplayName();
+    /** ボスバーを本来の名前に戻す（演出で一時的に別の名前を出したあとや、人数が変わったとき）。 */
+    protected void refreshBarName() {
+        setBarName(barName != null ? barName : getDisplayName());
     }
 
     /** ボスバーの名前を変える（2人以上で挑んでいれば人数を添える）。 */
@@ -179,7 +179,7 @@ public abstract class RuinBoss extends Monster {
         }
         rescaleHealth(BossScaling.healthFactor(n) / BossScaling.healthFactor(participants));
         participants = n;
-        setBarName(barName != null ? barName : getDisplayName());
+        refreshBarName();
     }
 
     // ------------------------------------------------------------------ 落とし物

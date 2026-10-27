@@ -2,6 +2,7 @@ package io.github.genichimaruo.singulo.ruin;
 
 import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.registry.SinguloDamageTypes;
+import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -346,13 +347,13 @@ public class HorizonWarden extends Monster {
                     4, 1.2, 0.1, 1.2, 0.05);
         }
         if (t == 1) {
-            level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.emerge"), SoundSource.HOSTILE, 3.0F, 1.0F);
+            level.playSound(null, blockPosition(), SinguloSounds.get("horizon_warden.emerge"), SoundSource.HOSTILE, 3.0F, 1.0F);
         }
         if (left <= 0) {
             // 目覚め: 衝撃波で近くの者を押し返し、戦いが始まる
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.SONIC_BOOM, core.x, core.y, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION, getX(), getY() + 0.3, getZ(), 12, 3, 0.2, 3, 0);
-            level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.shockwave"), SoundSource.HOSTILE, 3.0F, 0.85F);
+            level.playSound(null, blockPosition(), SinguloSounds.get("horizon_warden.shockwave"), SoundSource.HOSTILE, 3.0F, 0.85F);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(8), e -> e != this)) {
                 Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
                 if (push.lengthSqr() > 1e-4) {
@@ -707,11 +708,11 @@ public class HorizonWarden extends Monster {
             // 外装が剥がれ、破片が周りを回り始める
             level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 1.5, getZ(), 4, 0.6, 0.8, 0.6, 0);
             level.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 1.8, getZ(), 40, 0.8, 1.0, 0.8, 0.15);
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.phase"), 3.0F, 1.0F);
+            playSound(SinguloSounds.get("horizon_warden.phase"), 3.0F, 1.0F);
         } else if (phase == 3) {
             // 炉心が赤く燃え、宙に浮く
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, getX(), getY() + 2, getZ(), 80, 1.0, 1.2, 1.0, 0.3);
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.phase"), 3.0F, 0.85F);
+            playSound(SinguloSounds.get("horizon_warden.phase"), 3.0F, 0.85F);
         }
         specialCooldown = pace(GRAVITY_INTERVAL / 2);
     }
@@ -720,7 +721,7 @@ public class HorizonWarden extends Monster {
     public void deploySingularity(Vec3 at) {
         level().addFreshEntity(new WardenSingularity(level(), this, at));
         specialCooldown = pace(40);
-        level().playSound(null, at.x, at.y, at.z, io.github.genichimaruo.singulo.registry.SinguloSounds.BLACK_HOLE_FORMATION.get(),
+        level().playSound(null, at.x, at.y, at.z, SinguloSounds.BLACK_HOLE_FORMATION.get(),
                 getSoundSource(), 1.6F, 1.4F);
     }
 
@@ -804,7 +805,7 @@ public class HorizonWarden extends Monster {
     public void startSweep() {
         entityData.set(SWEEP, SWEEP_TICKS);
         specialCooldown = pace(30);
-        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.sweep"), 2.0F, 1.0F);
+        playSound(SinguloSounds.get("horizon_warden.sweep"), 2.0F, 1.0F);
     }
 
     private void tickSweep(ServerLevel level, @Nullable LivingEntity target) {
@@ -905,7 +906,7 @@ public class HorizonWarden extends Monster {
         entityData.set(GRIP, GRIP_WARN + GRIP_HOLD);
         entityData.set(GRIP_TARGET, target.getId());
         specialCooldown = pace(30);
-        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.grip"), 2.5F, 1.0F);
+        playSound(SinguloSounds.get("horizon_warden.grip"), 2.5F, 1.0F);
     }
 
     private void tickGrip(ServerLevel level) {
@@ -974,7 +975,7 @@ public class HorizonWarden extends Monster {
         shockHit.clear();
         specialCooldown = pace(30);
         swing(InteractionHand.MAIN_HAND);
-        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.shockwave"), 3.0F, 1.0F);
+        playSound(SinguloSounds.get("horizon_warden.shockwave"), 3.0F, 1.0F);
         level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 0.2, getZ(), 2, 0.3, 0, 0.3, 0);
     }
 
@@ -1019,7 +1020,7 @@ public class HorizonWarden extends Monster {
         beamDir = target.getEyePosition().subtract(corePosition()).normalize();
         updateBeamEnd();
         specialCooldown = pace(30);
-        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.beam_charge"), 3.0F, 1.0F);
+        playSound(SinguloSounds.get("horizon_warden.beam_charge"), 3.0F, 1.0F);
     }
 
     private void tickBeam(ServerLevel level, @Nullable LivingEntity target) {
@@ -1064,7 +1065,7 @@ public class HorizonWarden extends Monster {
     /** ビームを撃つ: 線上にいる相手に、防具を無視するダメージと吹き飛ばし（フェーズ2からは壁の向こうまで届く）。 */
     private void fireBeam(ServerLevel level, Vec3 from, Vec3 end) {
         entityData.set(BEAM_FLASH, 8);
-        playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.beam_fire"), 3.5F, 1.0F);
+        playSound(SinguloSounds.get("horizon_warden.beam_fire"), 3.5F, 1.0F);
         Vec3 dir = end.subtract(from).normalize();
         AABB box = new AABB(from, end).inflate(1.0);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != this && e.isAlive() && !RuinGuards.isGuard(e))) {
@@ -1282,7 +1283,7 @@ public class HorizonWarden extends Monster {
         }
         if (hit && level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getY() + 1, target.getZ(), 1, 0, 0, 0, 0);
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.sweep"), 1.6F, 1.25F);
+            playSound(SinguloSounds.get("horizon_warden.sweep"), 1.6F, 1.25F);
         }
         return hit;
     }
@@ -1302,7 +1303,7 @@ public class HorizonWarden extends Monster {
                     io.github.genichimaruo.singulo.registry.SinguloTriggers.milestone(player, "defeat/horizon_warden");
                 }
             }
-            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.death"), 3.5F, 1.0F);
+            playSound(SinguloSounds.get("horizon_warden.death"), 3.5F, 1.0F);
             if (console != null && level.getBlockEntity(console) instanceof SealConsoleBlockEntity c) {
                 c.onWardenDefeated(level);
             }
@@ -1421,7 +1422,7 @@ public class HorizonWarden extends Monster {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.hurt");
+        return SinguloSounds.get("horizon_warden.hurt");
     }
 
     @Override

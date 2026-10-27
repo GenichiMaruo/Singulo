@@ -1,13 +1,19 @@
 package io.github.genichimaruo.singulo.client;
 
+import io.github.genichimaruo.singulo.android.RuinAndroid;
 import io.github.genichimaruo.singulo.registry.SinguloSounds;
 import io.github.genichimaruo.singulo.ruin.EchoSentinel;
+import io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan;
+import io.github.genichimaruo.singulo.ruin.FoundryOverseer;
 import io.github.genichimaruo.singulo.ruin.GravityRemnant;
 import io.github.genichimaruo.singulo.ruin.HorizonWarden;
+import io.github.genichimaruo.singulo.ruin.LastArchivist;
 import io.github.genichimaruo.singulo.ruin.RuinBoss;
+import io.github.genichimaruo.singulo.ruin.WardenSingularity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -31,8 +37,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
  */
 final class BossSounds {
     static final double RANGE = 48;
-    /** 鳴らしている音（実体の番号と音の名前 → 音）。 */
-    private static final Map<String, EntityLoop> PLAYING = new HashMap<>();
+    /** 鳴らしている音（実体の番号と音の名前から作った番号 → 音）。 */
+    private static final Map<Long, EntityLoop> PLAYING = new HashMap<>();
 
     private BossSounds() {}
 
@@ -42,6 +48,24 @@ final class BossSounds {
         PLAYING.clear();
     }
 
+    /**
+     * ボスごとの声: 音の名前の頭（"&lt;頭&gt;.drone" と "&lt;頭&gt;.ambient"）、気配の音があるか、うなりと気配の大きさ。
+     * うなりの大きさは 1 を超えると遠くまで届く（部屋の外からでも気配がわかるように）。分身の気配は本体より少し小さく。
+     */
+    private record Voice(String prefix, boolean ambient, float droneVolume, float presenceVolume) {}
+
+    @Nullable
+    private static Voice voice(Entity e) {
+        return switch (e) {
+            case EchoSentinel s -> new Voice("echo_sentinel", true, 1.8F, s.isMinion() ? 0.6F : 1.2F);
+            case GravityRemnant g -> new Voice("gravity_remnant", true, 1.8F, 1.2F);
+            case HorizonWarden w -> new Voice("horizon_warden", true, 2.2F, 1.4F);
+            case ErgosphereLeviathan l -> new Voice("ergosphere_leviathan", true, 2.2F, 1.2F);
+            case LastArchivist a -> new Voice("last_archivist", true, 1.8F, 1.2F);
+            case FoundryOverseer f -> new Voice("foundry", false, 1.8F, 0F);
+            default -> null;
+        };
+    }
 
     static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
@@ -54,89 +78,31 @@ final class BossSounds {
         }
         PLAYING.values().removeIf(loop -> loop.isStopped() || !mc.getSoundManager().isActive(loop));
         AABB box = mc.player.getBoundingBox().inflate(RANGE);
-        for (LivingEntity boss : mc.level.getEntitiesOfClass(LivingEntity.class, box,
-                e -> e instanceof RuinBoss || e instanceof HorizonWarden)) {
-            String drone = droneSound(boss);
-            if (drone != null && !(boss instanceof RuinBoss b && b.isMinion())) {
-                keep(mc, boss, drone, droneVolume(boss), true, e -> !e.isRemoved());
+        for (Entity e : mc.level.getEntitiesOfClass(Entity.class, box,
+                e -> e instanceof RuinBoss || e instanceof HorizonWarden || e instanceof WardenSingularity || e instanceof RuinAndroid)) {
+            Voice v = voice(e);
+            if (v != null) {
+                if (!(e instanceof RuinBoss b && b.isMinion())) {
+                    keep(mc, e, v.prefix() + ".drone", v.droneVolume(), true, x -> !x.isRemoved());
+                }
+                if (v.ambient()) {
+                    keep(mc, e, v.prefix() + ".ambient", v.presenceVolume(), false, BossSounds::present);
+                }
             }
-            String presence = presenceSound(boss);
-            if (presence != null) {
-                keep(mc, boss, presence, presenceVolume(boss), false, BossSounds::present);
+            switch (e) {
+                case GravityRemnant g when g.wellOpen() ->
+                        keep(mc, g, "gravity_remnant.well_loop", 1.6F, true, x -> x instanceof GravityRemnant r && r.wellOpen() && !r.isDeadOrDying());
+                // 特異点が引き込んでいる間の重いうなり
+                case WardenSingularity s -> keep(mc, s, "gravity_remnant.well_loop", 1.4F, true, x -> !x.isRemoved());
+                // スラスターを開いて飛んで・泳いでいる間の噴射音
+                case RuinAndroid a when a.thrusterOpen(1) > 0.5F ->
+                        keep(mc, a, "android.thruster", 0.5F, true, x -> x instanceof RuinAndroid r && r.thrusterOpen(1) > 0.3F && r.isAlive());
+                case HorizonWarden w when w.laserTicks() > 0 ->
+                        keep(mc, w, "horizon_warden.laser_loop", 1.8F, true, x -> x instanceof HorizonWarden h && h.laserTicks() > 0 && !h.isDeadOrDying());
+                default -> {
+                }
             }
         }
-        for (GravityRemnant r : mc.level.getEntitiesOfClass(GravityRemnant.class, box, GravityRemnant::wellOpen)) {
-            keep(mc, r, "gravity_remnant.well_loop", 1.6F, true, e -> e instanceof GravityRemnant g && g.wellOpen() && !g.isDeadOrDying());
-        }
-        for (io.github.genichimaruo.singulo.ruin.WardenSingularity s : mc.level.getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.WardenSingularity.class, box)) {
-            // 特異点が引き込んでいる間の重いうなり
-            keep(mc, s, "gravity_remnant.well_loop", 1.4F, true, e -> !e.isRemoved());
-        }
-        for (io.github.genichimaruo.singulo.android.RuinAndroid a : mc.level.getEntitiesOfClass(io.github.genichimaruo.singulo.android.RuinAndroid.class,
-                box, a -> a.thrusterOpen(1) > 0.5F)) {
-            // スラスターを開いて飛んで・泳いでいる間の噴射音
-            keep(mc, a, "android.thruster", 0.5F, true,
-                    e -> e instanceof io.github.genichimaruo.singulo.android.RuinAndroid r && r.thrusterOpen(1) > 0.3F && r.isAlive());
-        }
-        for (HorizonWarden w : mc.level.getEntitiesOfClass(HorizonWarden.class, box, w -> w.laserTicks() > 0)) {
-            keep(mc, w, "horizon_warden.laser_loop", 1.8F, true, e -> e instanceof HorizonWarden h && h.laserTicks() > 0 && !h.isDeadOrDying());
-        }
-    }
-
-    /** ボスごとの低いうなり（くり返し）。 */
-    private static String droneSound(Entity e) {
-        if (e instanceof EchoSentinel) {
-            return "echo_sentinel.drone";
-        }
-        if (e instanceof GravityRemnant) {
-            return "gravity_remnant.drone";
-        }
-        if (e instanceof HorizonWarden) {
-            return "horizon_warden.drone";
-        }
-        if (e instanceof io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan) {
-            return "ergosphere_leviathan.drone";
-        }
-        if (e instanceof io.github.genichimaruo.singulo.ruin.LastArchivist) {
-            return "last_archivist.drone";
-        }
-        if (e instanceof io.github.genichimaruo.singulo.ruin.FoundryOverseer) {
-            return "foundry.drone";
-        }
-        return null;
-    }
-
-    /** うなりの大きさ（1を超えると遠くまで届く。部屋の外からでも気配がわかるように）。 */
-    private static float droneVolume(Entity e) {
-        return e instanceof io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan || e instanceof HorizonWarden ? 2.2F : 1.8F;
-    }
-
-    /** ボスごとの気配の音。 */
-    private static String presenceSound(Entity e) {
-        if (e instanceof EchoSentinel) {
-            return "echo_sentinel.ambient";
-        }
-        if (e instanceof GravityRemnant) {
-            return "gravity_remnant.ambient";
-        }
-        if (e instanceof HorizonWarden) {
-            return "horizon_warden.ambient";
-        }
-        if (e instanceof io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan) {
-            return "ergosphere_leviathan.ambient";
-        }
-        if (e instanceof io.github.genichimaruo.singulo.ruin.LastArchivist) {
-            return "last_archivist.ambient";
-        }
-        return null;
-    }
-
-    /** 分身の気配は本体より少し小さく（数が増えても騒がしくなりすぎないように）。 */
-    private static float presenceVolume(Entity e) {
-        if (e instanceof EchoSentinel s && s.isMinion()) {
-            return 0.6F;
-        }
-        return e instanceof HorizonWarden ? 1.4F : 1.2F;
     }
 
     /** 気配を鳴らすとき: 生きていて、出現と倒されたときの演出のあいだでない。 */
@@ -151,7 +117,7 @@ final class BossSounds {
     }
 
     private static void keep(Minecraft mc, Entity e, String sound, float volume, boolean loop, Predicate<Entity> on) {
-        String key = e.getId() + "/" + sound;
+        long key = (long) e.getId() << 32 | (sound.hashCode() & 0xFFFFFFFFL);
         if (on.test(e) && !PLAYING.containsKey(key)) {
             EntityLoop s = new EntityLoop(e, sound, volume, loop, on);
             PLAYING.put(key, s);

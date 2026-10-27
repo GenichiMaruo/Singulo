@@ -5,7 +5,6 @@ import com.mojang.math.Axis;
 import io.github.genichimaruo.singulo.reactor.InfallingBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -29,11 +28,12 @@ public class InfallingBlockRenderer extends EntityRenderer<InfallingBlock> {
     @Override
     public void render(InfallingBlock e, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         float t = e.tickCount + partialTick;
-        float k = e.fall(partialTick);
-        Vec3 to = e.target().subtract(e.getPosition(partialTick));
+        Vec3 at = e.getPosition(partialTick);
+        float k = e.fall(at);
+        Vec3 to = e.target().subtract(at);
         pose.pushPose();
         // 中心の向きを Z にそろえ、Z へ伸ばして X・Y を細くする
-        pose.mulPose(ErgosphereLeviathanRenderer.orient(to));
+        pose.mulPose(FxDraw.orient(to));
         float thin = 0.8F * (1 - 0.75F * k * k);
         float stretch = 0.8F * (1 + 2.2F * k * k);
         pose.mulPose(Axis.ZP.rotationDegrees(t * 14));
@@ -45,7 +45,7 @@ public class InfallingBlockRenderer extends EntityRenderer<InfallingBlock> {
         // 中心へ向かう淡い光の尾（後ろ側へ）
         if (to.lengthSqr() > 1e-4) {
             Vec3 tail = to.normalize().scale(-(0.6 + 1.4 * k));
-            FxDraw.beam(pose.last(), buffers.getBuffer(RenderType.entityTranslucentEmissive(FxDraw.WHITE)), Vec3.ZERO, tail,
+            FxDraw.beam(pose.last(), FxDraw.glow(buffers), Vec3.ZERO, tail,
                     0.25F * (1 - 0.5F * k), 0x9C7BFF, (int) (40 + 90 * k));
         }
         super.render(e, yaw, partialTick, pose, buffers, light);
