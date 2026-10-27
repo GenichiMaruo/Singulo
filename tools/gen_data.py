@@ -1345,7 +1345,7 @@ UI_LANG = {
     'gui.singulo.archivist.tide_final': ('もう、どこにも落ちられない。', 'There is nowhere left to fall.'),
     'gui.singulo.archivist.death_1': ('……長い、夢を見ていた。', '...I have been dreaming a long dream.'),
     'gui.singulo.archivist.death_2': ('記録は、読む者がいて初めて記録になる。', 'A record is only a record when someone reads it.'),
-    'gui.singulo.archivist.death_3': ('ありがとう。投入を止めるその手を、離さないで。', 'Thank you. Never let go of the hand that stops the feed.'),
+    'gui.singulo.archivist.death_3': ('ありがとう。どうか、止めるべき時に止められる人でいて。', 'Thank you. Never let go of the hand that stops the feed.'),
     'gui.singulo.archivist.reset': ('挑戦者がいなくなり、記録者は時間の場へ還っていった。コンソールには終焉の記録が残されている',
                                     'No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console'),
     'gui.singulo.guardian.awakened.echo_sentinel': ('記録保管室の残響が形をとった。残響の番人が現れた',

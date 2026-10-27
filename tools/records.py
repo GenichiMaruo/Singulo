@@ -62,7 +62,7 @@ RECORDS = [
     ('r19', 5, '点火記録（断片）', '……点火に成功。出力は予想の……違う、スピンが止まらない……エディントン限界を超えて……投入を止めろ……',
      'Ignition Record (fragment)', '...ignition successful. Output is... no, the spin will not stop... past the Eddington limit... stop the feed...'),
     ('r20', 5, '最後の記録', '我々は、すべての質量をエネルギーに変えようとした。炉はその願いを叶えた。都市も、山も、海も。'
-     '残ったのは、重力の異常と、守護機と、この記録だけだ。これを読む者へ。投入を止めるその手を、決して離すな。',
+     '残ったのは、重力の異常と、守護機と、この記録だけだ。これを読む者へ。炉に何かを注ぎ込むなら、止めるべき時に必ず止めろ。我々には、それができなかった。',
      'The Last Record', 'We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. '
      'All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.'),
 ]
