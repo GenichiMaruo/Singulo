@@ -72,7 +72,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         if (hasHome) {
             renderVortex(e, emerge, emergeT, death, state, t, partialTick, core, origin, camera, pose, buffers);
             if (emerge < 1 && emergeT >= ErgosphereLeviathan.EMERGE_VORTEX && emergeT < ErgosphereLeviathan.SWALLOW + 8) {
-                renderHatchling(e, emergeT, t, core, origin, camera, pose, buffers);
+                renderHatchling(e, emergeT, t, core, origin, camera, pose, buffers, light);
             }
         }
         boolean underground = emerge < 1 && emergeT < ErgosphereLeviathan.SWALLOW
@@ -682,38 +682,163 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
 
     // ------------------------------------------------------------------ 出現の小さな蛇
 
+    /** 小さな蛇の節の数と、節の間隔（出現の tick で、跡をさかのぼる幅）。 */
+    private static final int HATCH_SEGMENTS = 7;
+    private static final float HATCH_LAG = 2.2F;
+
     /**
-     * 出現の前半に炉心の渦から飛び出す小さな蛇（4節）。渦が閉じたあと頼りなく漂って炉心の上に止まり、
-     * 真下から噴き上がった大蛇の顎へ吸い込まれて消える。
+     * 出現の前半に炉心の渦から飛び出す小さな蛇。大蛇の装甲の姿をそのまま小さくした幼体で、
+     * 鱗の板を重ねた細い体（尾へ細くなる）、節の継ぎ目を頭から尾へ走る菫の光、背の小さな棘、
+     * 楔の板を重ねた頭と光る目、口の小さな渦、光る尾びれと尾の芯を持つ。泳ぐと体が左右にくねる。
+     * 渦が閉じたあと頼りなく漂って炉心の上に止まり、真下から噴き上がった大蛇の顎へ吸い込まれて消える。
      */
     private static void renderHatchling(ErgosphereLeviathan e, float emergeT, float t, Vec3 core, Vec3 origin, Quaternionf camera,
-                                        PoseStack pose, MultiBufferSource buffers) {
+                                        PoseStack pose, MultiBufferSource buffers, int light) {
         float swallow = Mth.clamp((emergeT - ErgosphereLeviathan.SWALLOW) / 5F, 0, 1);
-        float scale = Mth.clamp((emergeT - ErgosphereLeviathan.EMERGE_VORTEX) / 10F, 0, 1) * (1 - swallow);
+        float scale = Mth.clamp((emergeT - ErgosphereLeviathan.EMERGE_VORTEX) / 8F, 0, 1) * (1 - swallow);
         if (scale <= 0.01F) {
             return;
         }
+        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
+        BlockState plate = ErgosphereLeviathan.plate();
         Vec3 mouth = e.position().add(0, e.getBbHeight(), 0);
-        Vec3 prev = null;
-        for (int k = 0; k < 4; k++) {
-            Vec3 p = ErgosphereLeviathan.hatchlingPos(core, emergeT - k * 3);
-            p = p.lerp(mouth, swallow);
-            Vec3 l = p.subtract(origin);
-            float r = (0.32F - k * 0.05F) * scale;
+        // 節の位置: 頭の跡をさかのぼり、進む向きと直角に左右へくねらせる（尾ほど大きく）
+        Vec3[] at = new Vec3[HATCH_SEGMENTS + 1];
+        for (int k = 0; k <= HATCH_SEGMENTS; k++) {
+            float back = emergeT - k * HATCH_LAG;
+            Vec3 p = ErgosphereLeviathan.hatchlingPos(core, back);
+            Vec3 ahead = ErgosphereLeviathan.hatchlingPos(core, back + 1).subtract(p);
+            Vec3 side = new Vec3(-ahead.z, 0, ahead.x);
+            if (side.lengthSqr() > 1e-6) {
+                p = p.add(side.normalize().scale(Mth.sin(t * 0.55F - k * 0.9F) * 0.06F * k * scale));
+            }
+            at[k] = p.lerp(mouth, Math.min(1, swallow * (1 + k * 0.25F)));
+        }
+        // 尾から頭へ
+        for (int k = HATCH_SEGMENTS - 1; k >= 1; k--) {
+            Vec3 local = at[k].subtract(origin);
+            Vec3 fwd = at[k - 1].subtract(at[k]);
+            float r = Mth.lerp((k - 1) / (float) (HATCH_SEGMENTS - 2), 0.3F, 0.11F) * scale;
+            float wave = 0.5F + 0.5F * Mth.sin(t * 0.5F - k * 0.8F);
             pose.pushPose();
-            pose.translate(l.x, l.y, l.z);
-            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r, 0x1A1424, 0);
+            pose.translate(local.x, local.y, local.z);
+            pose.mulPose(orient(fwd));
+            pose.mulPose(Axis.ZP.rotationDegrees(Mth.sin(t * 0.3F - k) * 10));
+            FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), r * 0.7F, 0x0A0612, 0);
+            // 鱗の板（上と左右の3枚。若いので小さく、少し開き気味）
+            for (int q = -1; q <= 1; q++) {
+                pose.pushPose();
+                pose.mulPose(Axis.ZP.rotationDegrees(q * 70));
+                pose.translate(0, r * 0.6F, 0);
+                pose.mulPose(Axis.XP.rotationDegrees(-18));
+                pose.scale(r * 1.3F, r * 0.32F, r * 1.6F);
+                pose.translate(-0.5, 0, -0.5);
+                blocks.renderSingleBlock(plate, pose, buffers, light, OverlayTexture.NO_OVERLAY);
+                pose.popPose();
+            }
             VertexConsumer glow = glow(buffers);
-            if (k == 0) {
-                FxDraw.billboard(pose, glow, camera, 0.35F * scale, EYE, 220);
-            } else {
-                FxDraw.billboard(pose, glow, camera, r * 2.2F, SEAM, 120);
+            // 継ぎ目の光（頭から尾へ脈が走る）
+            pose.pushPose();
+            pose.translate(0, 0, r * 0.75F);
+            pose.mulPose(Axis.XP.rotationDegrees(90));
+            FxDraw.ring(pose.last(), glow, r * 0.7F, r * 1.05F, wave > 0.85F ? SEAM_HOT : SEAM, (int) (110 + 120 * wave), 0);
+            pose.popPose();
+            // 背の小さな棘
+            pose.pushPose();
+            pose.translate(0, r * 0.85F, 0);
+            pose.mulPose(Axis.ZP.rotationDegrees(90));
+            pose.mulPose(Axis.YP.rotationDegrees(-35));
+            LastArchivistRenderer.blade(pose, glow, 1, r * 1.3F, r * 0.5F, SEAM, (int) (200 * scale), SEAM_HOT, 0);
+            pose.popPose();
+            if (k == HATCH_SEGMENTS - 1) {
+                // 尾びれ（2枚の光の三日月がゆらぐ）
+                pose.pushPose();
+                pose.translate(0, 0, -r * 0.9F);
+                for (int f = 0; f < 2; f++) {
+                    pose.pushPose();
+                    pose.mulPose(Axis.ZP.rotationDegrees(f * 90 + Mth.sin(t * 0.6F) * 20));
+                    FxDraw.crescent(pose.last(), glow, 120, 240, 0.45F * scale, 0.28F * scale, SEAM, (int) (210 * scale));
+                    pose.popPose();
+                }
+                pose.popPose();
             }
             pose.popPose();
-            if (prev != null) {
-                FxDraw.beam(pose.last(), glow(buffers), prev.subtract(origin), l, 0.12F * scale, SEAM, 160);
+            if (k == HATCH_SEGMENTS - 1) {
+                pose.pushPose();
+                pose.translate(local.x, local.y, local.z);
+                FxDraw.billboard(pose, glow, camera, r * 3F + 0.05F * Mth.sin(t * 0.7F), CORE, (int) (200 * scale));
+                FxDraw.billboard(pose, glow, camera, r * 1.3F, 0xFFFFFF, (int) (220 * scale));
+                pose.popPose();
             }
-            prev = p;
+        }
+        // 頭
+        Vec3 head = at[0].subtract(origin);
+        Vec3 headFwd = at[0].subtract(at[1]);
+        Quaternionf q = orient(headFwd);
+        float hr = 0.36F * scale;
+        float jaw = 0.5F + 0.5F * Mth.sin(t * 0.35F);
+        pose.pushPose();
+        pose.translate(head.x, head.y, head.z);
+        pose.mulPose(q);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), hr * 0.75F, 0x0A0612, 0);
+        // 楔の板を重ねた頭（上・左右・下顎。下顎は小さく開け閉めする）
+        float[][] plates = {{0, 0.62F, 1.7F, 0.34F, 2.0F, -8}, {68, 0.6F, 1.3F, 0.3F, 1.8F, -10}, {-68, 0.6F, 1.3F, 0.3F, 1.8F, -10},
+                {180, 0.55F + 0.15F * jaw, 1.2F, 0.28F, 1.6F, -6 - 12 * jaw}};
+        for (float[] pl : plates) {
+            pose.pushPose();
+            pose.mulPose(Axis.ZP.rotationDegrees(pl[0]));
+            pose.translate(0, pl[1] * hr, 0.15F * hr);
+            pose.mulPose(Axis.XP.rotationDegrees(pl[5]));
+            pose.scale(pl[2] * hr, pl[3] * hr, pl[4] * hr);
+            pose.translate(-0.5, 0, -0.5);
+            blocks.renderSingleBlock(plate, pose, buffers, light, OverlayTexture.NO_OVERLAY);
+            pose.popPose();
+        }
+        VertexConsumer glow;
+        // 口の小さな渦
+        pose.pushPose();
+        pose.translate(0, -0.05F * hr, 1.0F * hr);
+        FxDraw.sphere(pose.last(), buffers.getBuffer(RenderType.entitySolid(FxDraw.WHITE)), hr * (0.3F + 0.15F * jaw), 0x000000, 0);
+        glow = glow(buffers);
+        pose.mulPose(Axis.XP.rotationDegrees(90));
+        pose.mulPose(Axis.YP.rotationDegrees(t * 12));
+        FxDraw.ring(pose.last(), glow, hr * 0.35F, hr * 0.7F, SEAM, (int) (190 * scale), 0);
+        pose.popPose();
+        // 小さな角（後ろ上へ2本）
+        for (int side = -1; side <= 1; side += 2) {
+            pose.pushPose();
+            pose.translate(side * 0.35F * hr, 0.6F * hr, -0.2F * hr);
+            pose.mulPose(Axis.YP.rotationDegrees(side * 90 + side * 35));
+            pose.mulPose(Axis.ZP.rotationDegrees(side * 30));
+            LastArchivistRenderer.blade(pose, glow, side, hr * 1.4F, hr * 0.35F, SEAM_HOT, (int) (220 * scale), 0xFFFFFF, 0);
+            pose.popPose();
+        }
+        pose.popPose();
+        // 目（カメラを向く光。芯は白く、ときどきまばたく）
+        float blink = (t % 50) < 3 ? 0.2F : 1F;
+        for (int side = -1; side <= 1; side += 2) {
+            Vector3f ep = q.transform(new Vector3f(side * 0.5F * hr, 0.3F * hr, 0.72F * hr));
+            pose.pushPose();
+            pose.translate(head.x + ep.x, head.y + ep.y, head.z + ep.z);
+            FxDraw.billboard(pose, glow, camera, 0.32F * scale, EYE, (int) (230 * scale * blink));
+            FxDraw.billboard(pose, glow, camera, 0.12F * scale, 0xFFFFFF, (int) (255 * scale * blink));
+            pose.popPose();
+        }
+        // 体のまわりの淡いにじみと、泳いだ跡の光の粒
+        for (int k = 0; k <= HATCH_SEGMENTS; k += 2) {
+            Vec3 l = at[k].subtract(origin);
+            pose.pushPose();
+            pose.translate(l.x, l.y, l.z);
+            FxDraw.billboard(pose, glow, camera, 1.1F * scale, 0x3A1670, (int) (60 * scale));
+            pose.popPose();
+        }
+        for (int k = 0; k < 6; k++) {
+            float back = emergeT - HATCH_SEGMENTS * HATCH_LAG - k * 2.5F;
+            Vec3 l = ErgosphereLeviathan.hatchlingPos(core, back).lerp(mouth, swallow).subtract(origin);
+            pose.pushPose();
+            pose.translate(l.x, l.y + 0.1 * Mth.sin(t * 0.4F + k), l.z);
+            FxDraw.billboard(pose, glow, camera, 0.12F * scale * (1 - k / 6F), SEAM_HOT, (int) (170 * scale * (1 - k / 6F)));
+            pose.popPose();
         }
     }
 
