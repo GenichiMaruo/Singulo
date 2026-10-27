@@ -11718,5 +11718,33 @@
   "subtitles.singulo.horizon_warden.hurt": {
     "source": "Horizon Warden hurts",
     "translation": "지평선 감시자가 상처 입는다"
+  },
+  "subtitles.singulo.android.blade_cast": {
+    "source": "Light pillars summoned",
+    "translation": "빛기둥을 부른다"
+  },
+  "subtitles.singulo.android.tend": {
+    "source": "Android tends a plant",
+    "translation": "안드로이드가 식물을 돌본다"
+  },
+  "subtitles.singulo.android.sweep": {
+    "source": "Android sweeps",
+    "translation": "안드로이드가 바닥을 쓴다"
+  },
+  "subtitles.singulo.android.chatter": {
+    "source": "Androids chatter",
+    "translation": "안드로이드가 수다를 떤다"
+  },
+  "subtitles.singulo.horizon_warden.bolt_hit": {
+    "source": "Light bolt bursts",
+    "translation": "광탄이 터진다"
+  },
+  "subtitles.singulo.last_archivist.floor_fade": {
+    "source": "Hologram floor fades",
+    "translation": "홀로그램 바닥이 사라진다"
+  },
+  "subtitles.singulo.security_drone.sputter": {
+    "source": "Drone sparks",
+    "translation": "드론이 불꽃을 튀긴다"
   }
 }

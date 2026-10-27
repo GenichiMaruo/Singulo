@@ -477,6 +477,8 @@ public class EchoSentinel extends RuinBoss {
         setDeltaMovement(Vec3.ZERO);
         level.sendParticles(ParticleTypes.END_ROD, before.x, before.y + 1.2, before.z, 20, 0.3, 0.8, 0.3, 0.1);
         level.sendParticles(ParticleTypes.END_ROD, back.x, back.y + 1.2, back.z, 20, 0.3, 0.8, 0.3, 0.1);
+        level.playSound(null, before.x, before.y, before.z, SinguloSounds.get("echo_sentinel.blink"), SoundSource.HOSTILE, 1.5F, 0.9F);
+        playSound(SinguloSounds.get("echo_sentinel.blink"), 1.5F, 1.1F);
     }
 
     /** 相手がこちらを見ているか（視線の先、約40度以内で、間に壁がない）。 */

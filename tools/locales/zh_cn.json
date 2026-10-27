@@ -11718,5 +11718,33 @@
   "subtitles.singulo.horizon_warden.hurt": {
     "source": "Horizon Warden hurts",
     "translation": "视界守卫受伤"
+  },
+  "subtitles.singulo.android.blade_cast": {
+    "source": "Light pillars summoned",
+    "translation": "召唤光柱"
+  },
+  "subtitles.singulo.android.tend": {
+    "source": "Android tends a plant",
+    "translation": "仿生人照料植物"
+  },
+  "subtitles.singulo.android.sweep": {
+    "source": "Android sweeps",
+    "translation": "仿生人扫地"
+  },
+  "subtitles.singulo.android.chatter": {
+    "source": "Androids chatter",
+    "translation": "仿生人闲聊"
+  },
+  "subtitles.singulo.horizon_warden.bolt_hit": {
+    "source": "Light bolt bursts",
+    "translation": "光弹炸裂"
+  },
+  "subtitles.singulo.last_archivist.floor_fade": {
+    "source": "Hologram floor fades",
+    "translation": "全息地板消散"
+  },
+  "subtitles.singulo.security_drone.sputter": {
+    "source": "Drone sparks",
+    "translation": "无人机迸出火花"
   }
 }

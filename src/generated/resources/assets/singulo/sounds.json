@@ -1385,6 +1385,85 @@
       }
     ]
   },
+  "android.blade_cast": {
+    "subtitle": "subtitles.singulo.android.blade_cast",
+    "sounds": [
+      {
+        "name": "singulo:android/blade_cast",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "android.tend": {
+    "subtitle": "subtitles.singulo.android.tend",
+    "sounds": [
+      {
+        "name": "singulo:android/tend",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "android.sweep": {
+    "subtitle": "subtitles.singulo.android.sweep",
+    "sounds": [
+      {
+        "name": "singulo:android/sweep",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "android.chatter": {
+    "subtitle": "subtitles.singulo.android.chatter",
+    "sounds": [
+      {
+        "name": "singulo:android/chatter_1",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "singulo:android/chatter_2",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "singulo:android/chatter_3",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "android.thruster": {
+    "sounds": [
+      {
+        "name": "singulo:android/thruster",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "horizon_warden.bolt_hit": {
+    "subtitle": "subtitles.singulo.horizon_warden.bolt_hit",
+    "sounds": [
+      {
+        "name": "singulo:boss/horizon_warden_bolt_hit",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "last_archivist.floor_fade": {
+    "subtitle": "subtitles.singulo.last_archivist.floor_fade",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_floor_fade",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "security_drone.sputter": {
+    "subtitle": "subtitles.singulo.security_drone.sputter",
+    "sounds": [
+      {
+        "name": "singulo:ruin/security_drone_sputter",
+        "attenuation_distance": 16
+      }
+    ]
+  },
   "ergosphere_leviathan.drone": {
     "sounds": [
       {

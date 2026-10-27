@@ -1464,3 +1464,71 @@ def archivist_inhale(d, seed):
     suck = whoosh(D, 5000, 120, 2, seed, 0.6)[::-1] * 1.0
     swell = mix(riser(D, 30, 400, seed, 0.3) * 0.7, throb(D, 3, 48, 0.8) * 0.5 * env([(0, 0), (D, 1)], D))
     return reverb(mix(suck, swell), 0.9, 0.3, 2000, 0.6)
+
+
+# =================================================================== 見た目だけで音がなかった所
+
+@recipe('android/blade_cast', level=-18)
+def android_blade_cast(d, seed):
+    # 光刃型が光柱を呼ぶ: 澄んだ光が足元から立ち上がる
+    return reverb(mix(riser(0.5, 300, 2500, seed, 0.3) * 0.5, chime(1320, 0.9, seed, 1.2) * 0.4, (chime(1980, 0.8, seed + 1) * 0.3, 0.06),
+                      zap(0.15, 5000, 1500, seed) * 0.25), 0.8, 0.3, 5000, 0.6)
+
+
+@recipe('android/tend', level=-24)
+def android_tend(d, seed):
+    # 植木に手をかざす: 小さなきらめき
+    return reverb(mix(shimmer(0.7, 25, 2200, 2, 0.4, seed) * 0.6, chime(1760, 0.6, seed, 0.8) * 0.2), 0.6, 0.3, 6000, 0.4)
+
+
+@recipe('android/sweep', level=-24)
+def android_sweep(d, seed):
+    # ほうきで床を掃く: さっと擦れる音
+    swish = bandpass(pink(0.35, seed), glide(1800, 3500, 0.35), 1.5) * env([(0, 0), (0.08, 1), (0.35, 0)], 0.35)
+    return mix(swish, highpass(white(0.25, seed + 1), 4000) * perc(0.25, 0.01, 0.1) * 0.3)
+
+
+@recipe('android/chatter', level=-22, variants=3)
+def android_chatter(d, seed):
+    # 仲間と話す: 小さな電子音のおしゃべり（音程の上下する短いさえずり）
+    r = rng(seed)
+    parts = []
+    at = 0.0
+    for k in range(int(r.integers(3, 6))):
+        f0 = 900 + 700 * r.random()
+        f1 = f0 * r.uniform(0.7, 1.5)
+        dur = r.uniform(0.05, 0.11)
+        parts.append((sine(glide(f0, f1, dur)) * perc(dur, 0.005, dur * 0.6) * 0.5 + square(glide(f0, f1, dur)) * perc(dur, 0.005, dur * 0.4) * 0.08, at))
+        at += dur + r.uniform(0.02, 0.06)
+    return reverb(mix(*parts), 0.4, 0.2, 6000, 0.2)
+
+
+@machine('android/thruster', level=-24)
+def android_thruster(d, seed):
+    # スラスターの噴射: 細い炎のゴーッという音と、小刻みな揺らぎ
+    t = t_axis(d)
+    jet = bandpass(pink(d, seed), 900 + 300 * np.sin(2 * np.pi * 0.5 * t), 1.2) * (0.85 + 0.15 * lfo(13, d))
+    roar_ = lowpass(brown(d, seed + 1), 400) * 0.8
+    return mix(jet, roar_, highpass(white(d, seed + 2), 5000) * 0.08)
+
+
+@recipe('boss/horizon_warden_bolt_hit', level=BOSS)
+def warden_bolt_hit(d, seed):
+    # 光弾が当たってはじける
+    return reverb(mix(zap(0.25, 4000, 300, seed) * 0.7, impact(0.5, 70, seed, 0.3) * 0.7, ring_burst(0.5, 500, seed) * 0.4), 0.7, 0.25, 4000, 0.4)
+
+
+@recipe('boss/last_archivist_floor_fade', level=BOSS)
+def archivist_floor_fade(d, seed):
+    # 戦いが終わり、ホログラムの床がほどけて消える
+    D = 2.5
+    fade = shimmer(D, 50, 1500, 3, 0.3, seed) * env([(0, 1), (D, 0)], D) * 0.6
+    down = sine(glide(880, 220, D, 0.6)) * env([(0, 0), (0.1, 0.4), (D, 0)], D) * 0.4
+    return reverb(mix(fade, down, crackle(1.2, 40, seed, 0.004) * 0.8), 0.9, 0.4, 5000, 1.0)
+
+
+@recipe('ruin/security_drone_sputter', level=-20)
+def drone_sputter(d, seed):
+    # 壊れかけたドローン: ぱちっと火花が散り、回路がじりじり言う
+    return mix(zap(0.12, 5000, 900, seed) * 0.7, lowpass(crackle(0.4, 80, seed, 0.005), 3000) * 1.2,
+               (buzz(120, 0.2, 2000, seed) * perc(0.2, 0.005, 0.1) * 0.3, 0.05))

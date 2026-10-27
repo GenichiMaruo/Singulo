@@ -532,6 +532,10 @@ final class AndroidLife extends Goal {
         }
         if (left % 10 == 0) {
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y + 0.3, c.z, 2, 0.25, 0.2, 0.25, 0);
+            if (left % 30 == 0) {
+                level.playSound(null, c.x, c.y, c.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.tend"), net.minecraft.sounds.SoundSource.NEUTRAL, 0.4F,
+                        0.9F + android.getRandom().nextFloat() * 0.3F);
+            }
         }
     }
 
@@ -546,6 +550,8 @@ final class AndroidLife extends Goal {
         if (left % 8 == 0) {
             Vec3 front = android.position().add(Vec3.directionFromRotation(0, android.getYRot()).scale(0.7));
             level.sendParticles(ParticleTypes.POOF, front.x, front.y + 0.1, front.z, 1, 0.2, 0.02, 0.2, 0.005);
+            level.playSound(null, front.x, front.y, front.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.sweep"), net.minecraft.sounds.SoundSource.NEUTRAL, 0.35F,
+                    0.9F + android.getRandom().nextFloat() * 0.25F);
         }
         if (left % 40 == 0) {
             android.setYRot(android.getYRot() + 25);       // 少しずつ向きを変えながら掃く
@@ -609,6 +615,7 @@ final class AndroidLife extends Goal {
             android.gesture(android.getRandom().nextInt(3) == 0 ? RuinAndroid.GESTURE_NOD : RuinAndroid.GESTURE_TALK, partner);
             level.sendParticles(ParticleTypes.NOTE, android.getX(), android.getEyeY() + 0.6, android.getZ(), 1, 0, 0, 0,
                     android.getRandom().nextInt(24) / 24.0);
+            android.playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.chatter"), 0.5F, 0.9F + android.getRandom().nextFloat() * 0.3F);
         }
     }
 

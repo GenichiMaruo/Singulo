@@ -175,6 +175,8 @@ public class HorizonBolt extends ThrowableItemProjectile {
         if (!level().isClientSide) {
             if (level() instanceof ServerLevel server) {
                 server.sendParticles(ParticleTypes.FLASH, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
+                server.playSound(null, getX(), getY(), getZ(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.bolt_hit"),
+                        net.minecraft.sounds.SoundSource.HOSTILE, 1.5F, 0.9F + random.nextFloat() * 0.2F);
             }
             discard();
         }

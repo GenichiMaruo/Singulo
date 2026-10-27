@@ -24,7 +24,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
  *   <li>気配: 生きている間ずっと、ボスごとの音を途切れずに鳴らし続ける（1つ鳴り終わるとすぐ次。バリエーションはランダム）。
  *       出現と倒されたときの演出のあいだは、演出の音に任せて止める</li>
  *   <li>重力の澱: 体力半分からの重力井戸のうなり（くり返し）</li>
- *   <li>ホライズン・ウォーデン: レーザーを照射している間の焼き切る音（くり返し）</li>
+ *   <li>ホライズン・ウォーデン: レーザーを照射している間の焼き切る音（くり返し）と、特異点が引き込んでいる間のうなり</li>
+ *   <li>アンドロイド: スラスターを開いている間の噴射音（くり返し。ボスではないが、同じ仕組みで鳴らす）</li>
  * </ul>
  * 技が終わる・倒される・見えなくなると止まる。
  */
@@ -66,6 +67,16 @@ final class BossSounds {
         }
         for (GravityRemnant r : mc.level.getEntitiesOfClass(GravityRemnant.class, box, GravityRemnant::wellOpen)) {
             keep(mc, r, "gravity_remnant.well_loop", 1.6F, true, e -> e instanceof GravityRemnant g && g.wellOpen() && !g.isDeadOrDying());
+        }
+        for (io.github.genichimaruo.singulo.ruin.WardenSingularity s : mc.level.getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.WardenSingularity.class, box)) {
+            // 特異点が引き込んでいる間の重いうなり
+            keep(mc, s, "gravity_remnant.well_loop", 1.4F, true, e -> !e.isRemoved());
+        }
+        for (io.github.genichimaruo.singulo.android.RuinAndroid a : mc.level.getEntitiesOfClass(io.github.genichimaruo.singulo.android.RuinAndroid.class,
+                box, a -> a.thrusterOpen(1) > 0.5F)) {
+            // スラスターを開いて飛んで・泳いでいる間の噴射音
+            keep(mc, a, "android.thruster", 0.5F, true,
+                    e -> e instanceof io.github.genichimaruo.singulo.android.RuinAndroid r && r.thrusterOpen(1) > 0.3F && r.isAlive());
         }
         for (HorizonWarden w : mc.level.getEntitiesOfClass(HorizonWarden.class, box, w -> w.laserTicks() > 0)) {
             keep(mc, w, "horizon_warden.laser_loop", 1.8F, true, e -> e instanceof HorizonWarden h && h.laserTicks() > 0 && !h.isDeadOrDying());

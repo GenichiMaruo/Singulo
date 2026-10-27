@@ -1282,6 +1282,7 @@ public class HorizonWarden extends Monster {
         }
         if (hit && level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getY() + 1, target.getZ(), 1, 0, 0, 0, 0);
+            playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.sweep"), 1.6F, 1.25F);
         }
         return hit;
     }

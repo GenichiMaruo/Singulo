@@ -2736,6 +2736,14 @@ SOUNDS = {
     'gravity_remnant.pulse': ('boss/gravity_remnant_pulse', '核が脈打つ', 'Core throbs', 24),
     'last_archivist.dissolve': ('boss/last_archivist_dissolve', '体が光の塵になる', 'Body dissolves into light', 32),
     'last_archivist.inhale': ('boss/last_archivist_inhale', '特異点が吸い込む', 'The singularity draws in', 48),
+    'android.blade_cast': ('android/blade_cast', '光柱を呼ぶ', 'Light pillars summoned', 24),
+    'android.tend': ('android/tend', 'アンドロイドが植物の世話をする', 'Android tends a plant', 12),
+    'android.sweep': ('android/sweep', 'アンドロイドが床を掃く', 'Android sweeps', 12),
+    'android.chatter': ('android/chatter', 'アンドロイドがおしゃべりする', 'Androids chatter', 12),
+    'android.thruster': ('android/thruster', None, None, 16),  # くり返し鳴るので字幕は出さない
+    'horizon_warden.bolt_hit': ('boss/horizon_warden_bolt_hit', '光弾がはじける', 'Light bolt bursts', 24),
+    'last_archivist.floor_fade': ('boss/last_archivist_floor_fade', 'ホログラムの床が消える', 'Hologram floor fades', 32),
+    'security_drone.sputter': ('ruin/security_drone_sputter', 'ドローンが火花を散らす', 'Drone sparks', 16),
     # ボスのうなり（出現から倒されるまでくり返す。ずっと鳴るので字幕は出さない）
     'ergosphere_leviathan.drone': ('boss/ergosphere_leviathan_drone', None, None, 64),
     'horizon_warden.drone': ('boss/horizon_warden_drone', None, None, 64),
