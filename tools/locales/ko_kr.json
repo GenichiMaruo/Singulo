@@ -11690,5 +11690,29 @@
   "subtitles.singulo.ergosphere_leviathan.rise": {
     "source": "The Leviathan spirals upward",
     "translation": "거대 뱀이 소용돌이치며 솟아오른다"
+  },
+  "subtitles.singulo.foundry.online": {
+    "source": "Foundry comes online",
+    "translation": "파운드리가 가동된다"
+  },
+  "subtitles.singulo.foundry.dying": {
+    "source": "Motors wind down",
+    "translation": "모터가 멈춰 간다"
+  },
+  "subtitles.singulo.echo_sentinel.awake": {
+    "source": "Echo Sentinel awakens",
+    "translation": "잔향의 파수꾼이 깨어난다"
+  },
+  "subtitles.singulo.gravity_remnant.pulse": {
+    "source": "Core throbs",
+    "translation": "핵이 맥동한다"
+  },
+  "subtitles.singulo.last_archivist.dissolve": {
+    "source": "Body dissolves into light",
+    "translation": "몸이 빛의 먼지가 된다"
+  },
+  "subtitles.singulo.last_archivist.inhale": {
+    "source": "The singularity draws in",
+    "translation": "특이점이 빨아들인다"
   }
 }

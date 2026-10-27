@@ -1282,6 +1282,60 @@
       }
     ]
   },
+  "foundry.online": {
+    "subtitle": "subtitles.singulo.foundry.online",
+    "sounds": [
+      {
+        "name": "singulo:boss/foundry_online",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "foundry.dying": {
+    "subtitle": "subtitles.singulo.foundry.dying",
+    "sounds": [
+      {
+        "name": "singulo:boss/foundry_dying",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "echo_sentinel.awake": {
+    "subtitle": "subtitles.singulo.echo_sentinel.awake",
+    "sounds": [
+      {
+        "name": "singulo:boss/echo_sentinel_awake",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "gravity_remnant.pulse": {
+    "subtitle": "subtitles.singulo.gravity_remnant.pulse",
+    "sounds": [
+      {
+        "name": "singulo:boss/gravity_remnant_pulse",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "last_archivist.dissolve": {
+    "subtitle": "subtitles.singulo.last_archivist.dissolve",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_dissolve",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "last_archivist.inhale": {
+    "subtitle": "subtitles.singulo.last_archivist.inhale",
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_inhale",
+        "attenuation_distance": 48
+      }
+    ]
+  },
   "ergosphere_leviathan.drone": {
     "sounds": [
       {

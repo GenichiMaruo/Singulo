@@ -1339,3 +1339,57 @@ def lev_rise(d, seed):
     debris = scatter(D, [lambda s: impact(0.4, 50 + 20 * (s % 3), s, 0.3)], 10, seed + 2) * 0.35
     moan = _song(4.2, 55, 105, seed, 'o') * 0.7
     return reverb(mix((swirl + rumble) * fade, debris * fade, moan), 0.95, 0.35, 1800, 1.0)
+
+
+# =================================================================== ボスの演出の切れ目を埋める音
+
+@recipe('boss/foundry_online', level=BIG)
+def foundry_online(d, seed):
+    # 目覚め: 重いリレーが入り、電力が一気に流れ込み、単眼が灯る
+    relay = mix(_metal_hit(seed, 80, 1.3, 1.0), thump(45, 0.5, 0.3, seed) * 1.2)
+    surge = mix(riser(0.6, 60, 900, seed, 0.3) * 0.7, hum(55, 1.8, (1, 2, 3, 4), (1, 0.6, 0.4, 0.2)) * env([(0, 0), (0.15, 1), (1.8, 0)], 1.8) * 0.6)
+    eye = beep(1320, 0.25, 'square') * 0.25
+    return reverb(mix(surge, (relay, 0.55), (eye, 0.75), (zap(0.2, 5000, 800, seed) * 0.3, 0.6)), 0.85, 0.3, 3000, 1.0)
+
+
+@recipe('boss/foundry_dying', level=BOSS)
+def foundry_dying(d, seed):
+    # 倒れていく: モーターが回転を落とし、火花が途切れ途切れに散り、装甲がきしむ
+    D = 2.7
+    motor = lowpass(saw(glide(140, 25, D, 0.7)) * 0.5 + square(glide(280, 50, D, 0.7)) * 0.15, 1200) * env([(0, 1), (D, 0)], D)
+    sparks = scatter(D, [lambda s: zap(0.12, 4500, 900, s) * 0.5, lambda s: tick(3000, 0.03, s)], 14, seed) * 0.6
+    groan = mix(*[(_metal_hit(seed + i, 60 + 15 * i, 0.6, 1.0), 0.4 + 0.7 * i) for i in range(3)])
+    return reverb(mix(motor, sparks, groan), 0.85, 0.3, 2500, 0.8)
+
+
+@recipe('boss/echo_sentinel_awake', level=BOSS)
+def echo_awake(d, seed):
+    # 姿を結び終える: 澄んだ光がはじけ、結晶の和音が広がる
+    bloom = mix(ring_burst(1.0, 330, seed) * 0.8, chime(660, 1.8, seed, 1.2) * 0.4, (chime(990, 1.6, seed + 1) * 0.3, 0.05))
+    return reverb(mix(bloom, shimmer(1.6, 30, 1500, 3, 0.5, seed) * 0.3, sub_drop(1.0, 80, 30) * 0.5), 0.9, 0.35, 5000, 1.0)
+
+
+@recipe('boss/gravity_remnant_pulse', level=BOSS)
+def remnant_pulse(d, seed):
+    # 核の不安定な鼓動: 低い鼓動と、まわりを一瞬吸い込むうねり
+    return reverb(mix(thump(36, 0.45, 0.15, seed) * 1.2, (sine(glide(70, 30, 0.5), 0.5) * perc(0.5, 0.01, 0.25) * 0.6),
+                      whoosh(0.4, 900, 150, 2, seed, 0.6)[::-1] * 0.3), 0.7, 0.25, 1500, 0.4)
+
+
+@recipe('boss/last_archivist_dissolve', level=BOSS)
+def archivist_dissolve(d, seed):
+    # 体が足元から金の塵になって昇る: きらめきが高く昇り、合唱がほどけていく
+    D = 3.0
+    dust = shimmer(D, 40, 1800, 3, 0.4, seed) * env([(0, 0), (0.4, 1), (D, 0.3)], D) * 0.6
+    rise = bandpass(pink(D, seed), glide(600, 4000, D), 2) * env([(0, 0), (0.5, 1), (D, 0)], D) * 0.6
+    choir = voices(D, (233.1, 349.2, 466.2), 'a', seed, 0.1) * 0.025 * env([(0, 1), (D, 0)], D)
+    return reverb(mix(dust, rise, choir), 0.95, 0.4, 5000, 1.2)
+
+
+@recipe('boss/last_archivist_inhale', level=BIG)
+def archivist_inhale(d, seed):
+    # 頭の特異点が光と塵を吸い込み、ふくらんでいく
+    D = 2.9
+    suck = whoosh(D, 5000, 120, 2, seed, 0.6)[::-1] * 1.0
+    swell = mix(riser(D, 30, 400, seed, 0.3) * 0.7, throb(D, 3, 48, 0.8) * 0.5 * env([(0, 0), (D, 1)], D))
+    return reverb(mix(suck, swell), 0.9, 0.3, 2000, 0.6)

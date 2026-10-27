@@ -2729,6 +2729,12 @@ SOUNDS = {
     'ergosphere_leviathan.storm': ('boss/ergosphere_leviathan_storm', '特異点が降る', 'Singularities rain', 32),
     'ergosphere_leviathan.burst': ('boss/ergosphere_leviathan_burst', '床が裂けて何かが噴き上がる', 'Something bursts from the floor', 64),
     'ergosphere_leviathan.rise': ('boss/ergosphere_leviathan_rise', '大蛇が渦を巻いて昇る', 'The Leviathan spirals upward', 48),
+    'foundry.online': ('boss/foundry_online', 'ファウンドリが動き出す', 'Foundry comes online', 32),
+    'foundry.dying': ('boss/foundry_dying', 'モーターが力尽きていく', 'Motors wind down', 24),
+    'echo_sentinel.awake': ('boss/echo_sentinel_awake', '残響の番人が目覚める', 'Echo Sentinel awakens', 32),
+    'gravity_remnant.pulse': ('boss/gravity_remnant_pulse', '核が脈打つ', 'Core throbs', 24),
+    'last_archivist.dissolve': ('boss/last_archivist_dissolve', '体が光の塵になる', 'Body dissolves into light', 32),
+    'last_archivist.inhale': ('boss/last_archivist_inhale', '特異点が吸い込む', 'The singularity draws in', 48),
     # ボスのうなり（出現から倒されるまでくり返す。ずっと鳴るので字幕は出さない）
     'ergosphere_leviathan.drone': ('boss/ergosphere_leviathan_drone', None, None, 64),
     'horizon_warden.drone': ('boss/horizon_warden_drone', None, None, 64),

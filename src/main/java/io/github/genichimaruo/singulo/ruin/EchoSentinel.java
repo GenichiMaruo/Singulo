@@ -321,6 +321,7 @@ public class EchoSentinel extends RuinBoss {
     protected void onEmerged(ServerLevel level) {
         level.sendParticles(ParticleTypes.FLASH, getX(), getY() + 1.2, getZ(), 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 1.2, getZ(), 40, 0.4, 0.8, 0.4, 0.15);
+        playSound(SinguloSounds.get("echo_sentinel.awake"), 2.5F, 1.0F);
     }
 
     // ------------------------------------------------------------------ 戦闘
@@ -748,9 +749,8 @@ public class EchoSentinel extends RuinBoss {
             for (BlockPos p : projectors) {
                 if (level.getBlockState(p).is(SinguloBlocks.ECHO_PROJECTOR.get())) {
                     level.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.getX() + 0.5, p.getY() + 1.0, p.getZ() + 0.5, 12, 0.2, 0.2, 0.2, 0.2);
-                    if (t == 2) {
-                        level.playSound(null, p, SinguloSounds.get("echo_projector.power_down"), SoundSource.HOSTILE, 1.0F, 1.0F);
-                    }
+                    level.playSound(null, p, SinguloSounds.get("echo_projector.power_down"), SoundSource.HOSTILE,
+                            t == 2 ? 1.0F : 0.7F, t == 2 ? 1.0F : 0.75F);
                 }
             }
         }

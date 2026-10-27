@@ -11690,5 +11690,29 @@
   "subtitles.singulo.ergosphere_leviathan.rise": {
     "source": "The Leviathan spirals upward",
     "translation": "巨蛇盘旋而上"
+  },
+  "subtitles.singulo.foundry.online": {
+    "source": "Foundry comes online",
+    "translation": "铸造厂开始运转"
+  },
+  "subtitles.singulo.foundry.dying": {
+    "source": "Motors wind down",
+    "translation": "马达逐渐停转"
+  },
+  "subtitles.singulo.echo_sentinel.awake": {
+    "source": "Echo Sentinel awakens",
+    "translation": "残响守卫苏醒"
+  },
+  "subtitles.singulo.gravity_remnant.pulse": {
+    "source": "Core throbs",
+    "translation": "核心搏动"
+  },
+  "subtitles.singulo.last_archivist.dissolve": {
+    "source": "Body dissolves into light",
+    "translation": "身躯化为光尘"
+  },
+  "subtitles.singulo.last_archivist.inhale": {
+    "source": "The singularity draws in",
+    "translation": "奇点吸入一切"
   }
 }

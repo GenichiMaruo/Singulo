@@ -420,6 +420,7 @@ public class LastArchivist extends RuinBoss {
             playSound(SinguloSounds.get("last_archivist.phase"), 3.0F, 1.0F);
         }
         if (t == 185) {
+            playSound(SinguloSounds.get("last_archivist.nova"), 4.0F, 0.8F);   // 目覚めの閃光と、床を走る衝撃波
             level.sendParticles(ParticleTypes.FLASH, c.x, c.y + CHEST_Y, c.z, 2, 0.1, 0.1, 0.1, 0);
             level.sendParticles(ParticleTypes.END_ROD, c.x, c.y + CHEST_Y, c.z, 100, 0.3, 0.3, 0.3, 0.5);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(10), e -> e != this && !RuinGuards.isGuard(e))) {
@@ -1473,6 +1474,12 @@ public class LastArchivist extends RuinBoss {
         }
         if (t == 60) {
             broadcastLine(level, "gui.singulo.archivist.death_2");
+        }
+        if (t == 78) {
+            level.playSound(null, blockPosition(), SinguloSounds.get("last_archivist.dissolve"), SoundSource.HOSTILE, 3.0F, 1.0F);
+        }
+        if (t == 116) {
+            level.playSound(null, blockPosition(), SinguloSounds.get("last_archivist.inhale"), SoundSource.HOSTILE, 3.5F, 1.0F);
         }
         if (t >= 120 && t < 170) {
             for (int i = 0; i < 6; i++) {

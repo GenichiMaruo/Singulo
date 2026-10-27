@@ -239,7 +239,7 @@ public class GravityRemnant extends RuinBoss {
     protected void onEmerged(ServerLevel level) {
         level.sendParticles(ParticleTypes.SONIC_BOOM, getX(), getY() + 0.6, getZ(), 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() - 1.5, getZ(), 10, 3, 0.3, 3, 0);
-        level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.5F, 0.5F);
+        level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.slam"), SoundSource.HOSTILE, 3.0F, 0.8F);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(8), e -> e != this)) {
             Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
             if (push.lengthSqr() > 1e-4) {
@@ -544,6 +544,8 @@ public class GravityRemnant extends RuinBoss {
             int beat = Math.max(4, 16 - t / 4);
             if (t % beat == 0) {
                 level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 30, 0.2, 0.2, 0.2, 0.6);
+                level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("gravity_remnant.pulse"),
+                        SoundSource.HOSTILE, 2.0F, 0.9F + t * 0.006F);
             }
         } else if (t < DEATH_TICKS - 6) {
             // 吸い込みながら縮む
