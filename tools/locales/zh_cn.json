@@ -3048,8 +3048,8 @@
     "translation": "炉实现了那个愿望——城市、山峦、海洋，尽数化去。留下的只有重力异常，和记录。"
   },
   "ending.singulo.line.3": {
-    "source": "You read those records and lit the same fire. And you never let go of the hand that stops the feed.",
-    "translation": "你读了那些记录，点燃了同样的炉火。而你始终没有放开那只停止投料的手。"
+    "source": "You read those records and lit the same fire. And you never forgot to stop when it was time to stop.",
+    "translation": "你读了那些记录，点燃了同样的炉火。而你，始终记得在该停下的时候停下。"
   },
   "ending.singulo.line.4": {
     "source": "And now the energy has become mass again, then stars, then a galaxy.",
@@ -3932,8 +3932,8 @@
     "translation": "记录，只有在有人阅读时才成为记录。"
   },
   "gui.singulo.archivist.death_3": {
-    "source": "Thank you. Never let go of the hand that stops the feed.",
-    "translation": "谢谢你。请不要放开那只停止投料的手。"
+    "source": "Thank you. Please be someone who can stop when it is time to.",
+    "translation": "谢谢你。请做一个在该停下时能够停下的人。"
   },
   "gui.singulo.archivist.emerge_1": {
     "source": "...Someone has read the records.",
@@ -9688,8 +9688,8 @@
     "translation": "点火记录（片段）"
   },
   "record.singulo.r20.body": {
-    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.",
-    "translation": "我们曾想把一切质量都化为能量。反应堆实现了这个愿望——城市、山脉、海洋。留下的只有重力异常、守卫，以及这份记录。致读到这份记录的人：那只停止投料的手，绝不要放开。"
+    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: if you feed the reactor, stop when it is time to stop. We could not.",
+    "translation": "我们曾想把一切质量都化为能量。反应堆实现了这个愿望——城市、山脉、海洋。留下的只有重力异常、守卫，以及这份记录。致读到这份记录的人：如果你要向反应堆投入什么，该停下的时候，一定要停下。我们没能做到。"
   },
   "record.singulo.r20.title": {
     "source": "The Last Record",
@@ -9704,8 +9704,8 @@
     "translation": "最后一页"
   },
   "record.singulo.x02.body": {
-    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they know the hand that stops the feed.",
-    "translation": "所有质量都化作了能量。我们用那座炉的火，再一次孕育了一个宇宙。星辰点亮，银河旋转。总有一天，那里也会诞生留下记录的某人。愿那个人，知道那只停止投料的手。"
+    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they, too, know when to stop.",
+    "translation": "所有质量都化作了能量。我们用那座炉的火，再一次孕育了一个宇宙。星辰点亮，银河旋转。总有一天，那里也会诞生留下记录的某人。愿那个人，也能在该停下的时候停下。"
   },
   "record.singulo.x02.title": {
     "source": "The First Page",

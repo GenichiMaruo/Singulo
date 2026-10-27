@@ -64,7 +64,7 @@ RECORDS = [
     ('r20', 5, '最後の記録', '我々は、すべての質量をエネルギーに変えようとした。炉はその願いを叶えた。都市も、山も、海も。'
      '残ったのは、重力の異常と、守護機と、この記録だけだ。これを読む者へ。炉に何かを注ぎ込むなら、止めるべき時に必ず止めろ。我々には、それができなかった。',
      'The Last Record', 'We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. '
-     'All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.'),
+     'All that remains is the anomaly, the warden and this record. To whoever reads this: if you feed the reactor, stop when it is time to stop. We could not.'),
 ]
 
 # 最後の記録者を倒すと加わる記録。形は RECORDS と同じ
@@ -79,10 +79,10 @@ FINAL_RECORDS = [
 # 創世炉で宇宙を生むと加わる記録。x03 は最後の記録者を倒した人だけ
 GENESIS_RECORDS = [
     ('x02', 5, '最初の頁', 'すべての質量は、エネルギーになった。その炉の火で、私たちはもう一度、宇宙をひとつ生み出した。星がともり、銀河が渦を巻く。'
-     'いつかそこにも、記録を残す誰かが生まれるだろう。その誰かもまた、投入を止める手を離さずにいられますように。', 'The First Page',
+     'いつかそこにも、記録を残す誰かが生まれるだろう。その誰かもまた、止めるべき時に止められますように。', 'The First Page',
      'All mass became energy. With that same fire, we made a universe once more. '
      'Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. '
-     'May they know the hand that stops the feed.'),
+     'May they, too, know when to stop.'),
     ('x03', 5, '記録者への返信', '最後の頁の先に、新しい最初の頁を書いた。眠る番人へ。あなたの記録は読まれ、そして宇宙になった。もう見張らなくていい。'
      'これからは、私たちが火を見守る。', 'A Reply to the Archivist',
      'Beyond the last page, I wrote a new first page. To the watcher who sleeps: your records were read, '

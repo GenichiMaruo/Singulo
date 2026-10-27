@@ -3048,8 +3048,8 @@
     "translation": "반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과, 기록뿐이었다."
   },
   "ending.singulo.line.3": {
-    "source": "You read those records and lit the same fire. And you never let go of the hand that stops the feed.",
-    "translation": "당신은 그 기록을 읽고, 같은 불을 지폈다. 그리고 투입을 멈추는 손을 끝내 놓지 않았다."
+    "source": "You read those records and lit the same fire. And you never forgot to stop when it was time to stop.",
+    "translation": "당신은 그 기록을 읽고, 같은 불을 지폈다. 그리고 멈춰야 할 때 멈추는 것을 잊지 않았다."
   },
   "ending.singulo.line.4": {
     "source": "And now the energy has become mass again, then stars, then a galaxy.",
@@ -3932,8 +3932,8 @@
     "translation": "기록은 읽는 이가 있어야 비로소 기록이 된다."
   },
   "gui.singulo.archivist.death_3": {
-    "source": "Thank you. Never let go of the hand that stops the feed.",
-    "translation": "고맙다. 투입을 멈추는 손을, 결코 놓지 마라."
+    "source": "Thank you. Please be someone who can stop when it is time to.",
+    "translation": "고마워. 부디, 멈춰야 할 때 멈출 수 있는 사람이 되어 줘."
   },
   "gui.singulo.archivist.emerge_1": {
     "source": "...Someone has read the records.",
@@ -9688,8 +9688,8 @@
     "translation": "점화 기록(조각)"
   },
   "record.singulo.r20.body": {
-    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.",
-    "translation": "우리는 모든 질량을 에너지로 바꾸려 했다. 반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과 감시자, 그리고 이 기록뿐이다. 이 글을 읽는 이에게. 투입을 멈추는 손을, 결코 놓지 마라."
+    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: if you feed the reactor, stop when it is time to stop. We could not.",
+    "translation": "우리는 모든 질량을 에너지로 바꾸려 했다. 반응로는 그 소원을 들어주었다. 도시도, 산도, 바다도. 남은 것은 중력의 이상과 감시자, 그리고 이 기록뿐이다. 이 글을 읽는 이에게. 반응로에 무언가를 쏟아붓는다면, 멈춰야 할 때 반드시 멈춰라. 우리는 그러지 못했다."
   },
   "record.singulo.r20.title": {
     "source": "The Last Record",
@@ -9704,8 +9704,8 @@
     "translation": "마지막 페이지"
   },
   "record.singulo.x02.body": {
-    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they know the hand that stops the feed.",
-    "translation": "모든 질량은 에너지가 되었다. 그 같은 불로, 우리는 다시 한번 우주를 하나 만들었다. 별이 켜지고, 은하가 소용돌이친다. 언젠가 그곳에서도 기록을 남길 누군가가 태어나겠지. 그 누군가가, 투입을 멈추는 손을 알게 되기를."
+    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they, too, know when to stop.",
+    "translation": "모든 질량은 에너지가 되었다. 그 같은 불로, 우리는 다시 한번 우주를 하나 만들었다. 별이 켜지고, 은하가 소용돌이친다. 언젠가 그곳에서도 기록을 남길 누군가가 태어나겠지. 그 누군가도, 멈춰야 할 때 멈출 수 있기를."
   },
   "record.singulo.x02.title": {
     "source": "The First Page",
