@@ -65,6 +65,7 @@ public final class SinguloSounds {
             "foundry.line_break", "foundry.enrage", "foundry.death",
             "android.power_down", "android.charge_start", "android.charged", "android.gunner_shot", "android.railgun_assemble", "android.railgun_charge",
             "android.railgun_fire", "android.ring_inflate", "ui.click",
+            "ergosphere_leviathan.burst", "ergosphere_leviathan.rise", "ergosphere_leviathan.drone", "horizon_warden.drone", "echo_sentinel.drone", "gravity_remnant.drone", "foundry.drone", "last_archivist.drone",
     };
 
     static {

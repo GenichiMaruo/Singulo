@@ -3115,6 +3115,10 @@
     "source": "Awakened Ergosphere Leviathan",
     "translation": "覺醒的能層巨蛇"
   },
+  "entity.singulo.ergosphere_leviathan.hatchling": {
+    "source": "Ergosphere Serpent",
+    "translation": "能層之蛇"
+  },
   "entity.singulo.ergosphere_leviathan.wyrm": {
     "source": "Ergosphere Wyrm",
     "translation": "能層之龍"
@@ -4762,10 +4766,6 @@
   "gui.singulo.leviathan.submerge": {
     "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
     "translation": "巨蛇潛入了爐心的漩渦。漩渦擴張，光被吸了進去……"
-  },
-  "gui.singulo.leviathan.swallow": {
-    "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
-    "translation": "——地板裂開，巨大的顎將牠一口吞下。能層巨蛇現身了"
   },
   "gui.singulo.leviathan.tide": {
     "source": "The core vortex opens and drags everything in... Run against the pull!",
@@ -11682,5 +11682,13 @@
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",
     "translation": "用於：鉨"
+  },
+  "subtitles.singulo.ergosphere_leviathan.burst": {
+    "source": "Something bursts from the floor",
+    "translation": "地板裂開，有東西噴湧而出"
+  },
+  "subtitles.singulo.ergosphere_leviathan.rise": {
+    "source": "The Leviathan spirals upward",
+    "translation": "巨蛇盤旋而上"
   }
 }

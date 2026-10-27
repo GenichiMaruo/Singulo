@@ -352,7 +352,7 @@ public class HorizonWarden extends Monster {
             // 目覚め: 衝撃波で近くの者を押し返し、戦いが始まる
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.SONIC_BOOM, core.x, core.y, core.z, 1, 0, 0, 0, 0);
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION, getX(), getY() + 0.3, getZ(), 12, 3, 0.2, 3, 0);
-            level.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.5F, 0.6F);
+            level.playSound(null, blockPosition(), io.github.genichimaruo.singulo.registry.SinguloSounds.get("horizon_warden.shockwave"), SoundSource.HOSTILE, 3.0F, 0.85F);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(8), e -> e != this)) {
                 Vec3 push = e.position().subtract(position()).multiply(1, 0, 1);
                 if (push.lengthSqr() > 1e-4) {

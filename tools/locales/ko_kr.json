@@ -3115,6 +3115,10 @@
     "source": "Awakened Ergosphere Leviathan",
     "translation": "각성한 에르고구의 거대 뱀"
   },
+  "entity.singulo.ergosphere_leviathan.hatchling": {
+    "source": "Ergosphere Serpent",
+    "translation": "에르고구의 뱀"
+  },
   "entity.singulo.ergosphere_leviathan.wyrm": {
     "source": "Ergosphere Wyrm",
     "translation": "에르고구의 용"
@@ -4762,10 +4766,6 @@
   "gui.singulo.leviathan.submerge": {
     "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
     "translation": "거대 뱀이 노심의 소용돌이로 잠수합니다. 소용돌이가 넓어지며 빛을 빨아들입니다……"
-  },
-  "gui.singulo.leviathan.swallow": {
-    "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
-    "translation": "――바닥이 갈라지고 거대한 턱이 그것을 통째로 삼켰습니다. 에르고구의 거대 뱀이 모습을 드러냈습니다"
   },
   "gui.singulo.leviathan.tide": {
     "source": "The core vortex opens and drags everything in... Run against the pull!",
@@ -11682,5 +11682,13 @@
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",
     "translation": "사용 대상: 니호늄"
+  },
+  "subtitles.singulo.ergosphere_leviathan.burst": {
+    "source": "Something bursts from the floor",
+    "translation": "바닥이 갈라지며 무언가가 솟구친다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.rise": {
+    "source": "The Leviathan spirals upward",
+    "translation": "거대 뱀이 소용돌이치며 솟아오른다"
   }
 }

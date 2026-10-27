@@ -1264,6 +1264,72 @@
       }
     ]
   },
+  "ergosphere_leviathan.burst": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.burst",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_burst",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ergosphere_leviathan.rise": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.rise",
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_rise",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ergosphere_leviathan.drone": {
+    "sounds": [
+      {
+        "name": "singulo:boss/ergosphere_leviathan_drone",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "horizon_warden.drone": {
+    "sounds": [
+      {
+        "name": "singulo:boss/horizon_warden_drone",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "echo_sentinel.drone": {
+    "sounds": [
+      {
+        "name": "singulo:boss/echo_sentinel_drone",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "gravity_remnant.drone": {
+    "sounds": [
+      {
+        "name": "singulo:boss/gravity_remnant_drone",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "foundry.drone": {
+    "sounds": [
+      {
+        "name": "singulo:boss/foundry_drone",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "last_archivist.drone": {
+    "sounds": [
+      {
+        "name": "singulo:boss/last_archivist_drone",
+        "attenuation_distance": 64
+      }
+    ]
+  },
   "last_archivist.emerge": {
     "subtitle": "subtitles.singulo.last_archivist.emerge",
     "sounds": [

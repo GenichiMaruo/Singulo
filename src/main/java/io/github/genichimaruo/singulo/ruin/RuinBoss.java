@@ -150,6 +150,11 @@ public abstract class RuinBoss extends Monster {
         bossBar.setColor(awakenedColor());
     }
 
+    /** いまのボスバーの本来の名前（演出で一時的に別の名前を出していても、こちらは変わらない）。 */
+    protected Component barName() {
+        return barName != null ? barName : getDisplayName();
+    }
+
     /** ボスバーの名前を変える（2人以上で挑んでいれば人数を添える）。 */
     protected void setBarName(Component name) {
         barName = name;

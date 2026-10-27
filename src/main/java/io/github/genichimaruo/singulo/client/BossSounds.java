@@ -20,6 +20,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 /**
  * ボスの体から鳴る音。
  * <ul>
+ *   <li>うなり: 出現の演出の始まりから、倒されて体が消えるまで、ボスごとの不気味な低いうなりを切れ目なくくり返す（分身は鳴らさない）</li>
  *   <li>気配: 生きている間ずっと、ボスごとの音を途切れずに鳴らし続ける（1つ鳴り終わるとすぐ次。バリエーションはランダム）。
  *       出現と倒されたときの演出のあいだは、演出の音に任せて止める</li>
  *   <li>重力の澱: 体力半分からの重力井戸のうなり（くり返し）</li>
@@ -54,6 +55,10 @@ final class BossSounds {
         AABB box = mc.player.getBoundingBox().inflate(RANGE);
         for (LivingEntity boss : mc.level.getEntitiesOfClass(LivingEntity.class, box,
                 e -> e instanceof RuinBoss || e instanceof HorizonWarden)) {
+            String drone = droneSound(boss);
+            if (drone != null && !(boss instanceof RuinBoss b && b.isMinion())) {
+                keep(mc, boss, drone, droneVolume(boss), true, e -> !e.isRemoved());
+            }
             String presence = presenceSound(boss);
             if (presence != null) {
                 keep(mc, boss, presence, presenceVolume(boss), false, BossSounds::present);
@@ -65,6 +70,34 @@ final class BossSounds {
         for (HorizonWarden w : mc.level.getEntitiesOfClass(HorizonWarden.class, box, w -> w.laserTicks() > 0)) {
             keep(mc, w, "horizon_warden.laser_loop", 1.8F, true, e -> e instanceof HorizonWarden h && h.laserTicks() > 0 && !h.isDeadOrDying());
         }
+    }
+
+    /** ボスごとの低いうなり（くり返し）。 */
+    private static String droneSound(Entity e) {
+        if (e instanceof EchoSentinel) {
+            return "echo_sentinel.drone";
+        }
+        if (e instanceof GravityRemnant) {
+            return "gravity_remnant.drone";
+        }
+        if (e instanceof HorizonWarden) {
+            return "horizon_warden.drone";
+        }
+        if (e instanceof io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan) {
+            return "ergosphere_leviathan.drone";
+        }
+        if (e instanceof io.github.genichimaruo.singulo.ruin.LastArchivist) {
+            return "last_archivist.drone";
+        }
+        if (e instanceof io.github.genichimaruo.singulo.ruin.FoundryOverseer) {
+            return "foundry.drone";
+        }
+        return null;
+    }
+
+    /** うなりの大きさ（1を超えると遠くまで届く。部屋の外からでも気配がわかるように）。 */
+    private static float droneVolume(Entity e) {
+        return e instanceof io.github.genichimaruo.singulo.ruin.ErgosphereLeviathan || e instanceof HorizonWarden ? 2.2F : 1.8F;
     }
 
     /** ボスごとの気配の音。 */

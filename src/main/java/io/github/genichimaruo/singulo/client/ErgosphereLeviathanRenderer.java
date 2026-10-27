@@ -683,12 +683,12 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
     // ------------------------------------------------------------------ 出現の小さな蛇
 
     /**
-     * 出現の前半に炉心から這い出す小さな蛇（4節）。頼りなく泳いで炉心の上に止まり、
+     * 出現の前半に炉心の渦から飛び出す小さな蛇（4節）。渦が閉じたあと頼りなく漂って炉心の上に止まり、
      * 真下から噴き上がった大蛇の顎へ吸い込まれて消える。
      */
     private static void renderHatchling(ErgosphereLeviathan e, float emergeT, float t, Vec3 core, Vec3 origin, Quaternionf camera,
                                         PoseStack pose, MultiBufferSource buffers) {
-        float swallow = Mth.clamp((emergeT - ErgosphereLeviathan.SWALLOW) / 8F, 0, 1);
+        float swallow = Mth.clamp((emergeT - ErgosphereLeviathan.SWALLOW) / 5F, 0, 1);
         float scale = Mth.clamp((emergeT - ErgosphereLeviathan.EMERGE_VORTEX) / 10F, 0, 1) * (1 - swallow);
         if (scale <= 0.01F) {
             return;
@@ -747,12 +747,19 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
                 size *= Math.max(0.05F, (flashAt - death) / 0.08F);
             }
         } else if (emerge < 1) {
+            // 渦が開いて小さな蛇を吐き出し、すぐ閉じる。しばらく何もなく、前ぶれなく大きく開いて大蛇が噴き上がる
             if (emergeT < ErgosphereLeviathan.EMERGE_VORTEX) {
                 size = emergeT / ErgosphereLeviathan.EMERGE_VORTEX * 0.6F;
+            } else if (emergeT < ErgosphereLeviathan.RIFT_CLOSE) {
+                float c = (emergeT - ErgosphereLeviathan.EMERGE_VORTEX) / (ErgosphereLeviathan.RIFT_CLOSE - ErgosphereLeviathan.EMERGE_VORTEX);
+                size = 0.6F * (1 - c * c * (3 - 2 * c));
+            } else if (emergeT < ErgosphereLeviathan.RIFT_SNAP) {
+                size = 0;
             } else if (emergeT < ErgosphereLeviathan.SWALLOW) {
-                size = 0.6F + 0.4F * Mth.clamp((emergeT - (ErgosphereLeviathan.HATCH_SETTLE - 10)) / 20F, 0, 1);
+                size = 1.3F * Mth.clamp((emergeT - ErgosphereLeviathan.RIFT_SNAP) / 1.5F, 0, 1);
+                flash = Mth.clamp((emergeT - ErgosphereLeviathan.RIFT_SNAP) / 2F, 0, 1) * 0.6F;
             } else {
-                size = 1 - (emergeT - ErgosphereLeviathan.SWALLOW) / (ErgosphereLeviathan.EMERGE_TICKS - ErgosphereLeviathan.SWALLOW);
+                size = 1.3F * (1 - (emergeT - ErgosphereLeviathan.SWALLOW) / (ErgosphereLeviathan.EMERGE_TICKS - ErgosphereLeviathan.SWALLOW));
                 flash = Mth.clamp(1 - (emergeT - ErgosphereLeviathan.SWALLOW) / 12F, 0, 1);
             }
         } else if (state == ErgosphereLeviathan.SUBMERGE) {
