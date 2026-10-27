@@ -341,8 +341,37 @@ def wormhole_open(d, seed):
 
 @recipe('machine/penrose_reactor_ignition', level=BOSS)
 def penrose_ignition(d, seed):
-    ignite = mix(riser(2.0, 40, 400, seed), (boom(2.5, 30, seed, 0.5), 1.9), (lowpass(brown(3.0, seed), 600) * env([(0, 0), (0.3, 1), (3, 0.3)], 3.0) * 0.8, 2.0))
-    return reverb(ignite, 0.8, 0.3)
+    # 点火の演出（16 秒）に合わせる。鳴り終わる瞬間に炉心ができる（そこで形成の音が鳴る）
+    # 目覚め 0〜6 秒: リングを光が巡り始め、抽出ポートが 0.5 秒ごとに 1 つずつ灯る
+    # 注入 6〜13.6 秒: 12 のポートから光が流れ込み、種が脈打ちながら膨らむ
+    # 崩壊 13.6〜16 秒: すべてが中心へ絞り込まれ、吸い込まれる
+    D = 16.0
+    t = t_axis(D)
+    wake = np.clip(t / 6, 0, 1)
+    inject = np.clip((t - 6) / 7.6, 0, 1)
+    collapse = np.clip((t - 13.6) / 2.4, 0, 1)
+    power = 0.25 * wake + 0.75 * inject
+    # リングを巡る光: 回転の速さが上がっていくうなりと、巡る風
+    spin_rate = 0.4 + 3.5 * power ** 2 + 14 * collapse ** 2
+    phase = np.cumsum(spin_rate) / SR
+    whirl = bandpass(pink(D, seed), 300 + 1500 * power + 2500 * collapse, 2) * (0.6 + 0.4 * np.sin(2 * np.pi * phase))         * (0.15 + 0.6 * power + 0.5 * collapse)
+    f = 30 + 40 * power + 120 * collapse ** 2
+    drone = (sine(f * (1 + 0.003 * lfo(0.3, D))) * 0.7 + saw(f * 2) * 0.12) * (0.25 + 0.5 * power + 0.3 * collapse)
+    # ポートが灯る音（12 個、少しずつ高く）
+    ports = mix(*[(mix(chime(330 * 2 ** (i / 12), 1.4, seed + i, 0.8) * 0.18, tick(2500, 0.03, seed + i) * 0.3), 0.5 * i) for i in range(12)])
+    # 注入: 流れ込む電流と、速まる種の鼓動、高まる唸り
+    current = buzz(55, D, 1800, seed) * inject * 0.18 * (1 - 0.6 * collapse)
+    beat_rate = 0.8 + 3.5 * inject + 6 * collapse
+    beat = np.sin(np.pi * (np.cumsum(beat_rate) / SR)) ** 8
+    pulse = sine(48, D) * beat * (0.2 + 0.6 * inject) * (inject > 0)
+    rise = riser(7.6, 60, 700, seed + 1, 0.4) * 0.5
+    sing = whine(glide(180, 900, 7.6, 1.4), 7.6, 0.005, 6) * env([(0, 0), (7.6, 0.18)], 7.6)
+    # 崩壊: 吸い込みの風が高まり、音程が一気に落ちる
+    suck = whoosh(2.4, 6000, 150, 2, seed + 2, 0.5)[::-1] * 1.1
+    dive = sine(glide(400, 40, 2.4, 0.6)) * env([(0, 0), (2.0, 0.6), (2.4, 0)], 2.4)
+    out = mix(whirl, drone, ports, current, pulse, (rise, 6.0), (sing, 6.0), (suck, 13.6), (dive, 13.6))
+    out = reverb(out, 0.85, 0.3, 3000, 0.0)
+    return fit(out, D) * np.concatenate([np.ones(int((D - 0.03) * SR)), np.linspace(1, 0, len(out) - int((D - 0.03) * SR))])
 
 
 @recipe('machine/probe_station_launch')

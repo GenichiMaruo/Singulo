@@ -182,9 +182,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     /** 点火を始めてからの tick と、点火の電力が満ちたか。 */
     private int ignitionElapsed;
     private boolean ignitionCharged;
-    /** 点火の演出の長さ（16秒）。最後の IGNITION_SOUND_TICKS（点火の音の長さ、10秒）のあいだ点火の音が鳴り、鳴り終わる瞬間に炉心ができる。 */
+    /** 点火の演出の長さ（16秒）。最後の IGNITION_SOUND_TICKS（点火の音の長さ、演出と同じ16秒）のあいだ点火の音が鳴り、鳴り終わる瞬間に炉心ができる。 */
     public static final int IGNITION_SEQUENCE_TICKS = 320;
-    public static final int IGNITION_SOUND_TICKS = 200;
+    public static final int IGNITION_SOUND_TICKS = IGNITION_SEQUENCE_TICKS;
     private double pelletCarry;
     private int jetTimer;
     private int hawkingTimer;
@@ -421,7 +421,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         ignitionPeak = Math.max(ignitionPeak, receivedThisTick);
         receivedThisTick = 0;
         ignitionReachable = ignitionStored + ignitionBandwidth * Math.max(0, ignitionTicks);
-        if (ignitionElapsed == IGNITION_SEQUENCE_TICKS - IGNITION_SOUND_TICKS) {
+        if (ignitionElapsed == IGNITION_SEQUENCE_TICKS - IGNITION_SOUND_TICKS + 1) {
             // 点火の音（鳴り終わる瞬間に炉心ができる）
             Vec3 core = coreCenter();
             level.playSound(null, core.x, core.y, core.z, io.github.genichimaruo.singulo.registry.SinguloSounds.get("penrose_reactor_ignition"),
