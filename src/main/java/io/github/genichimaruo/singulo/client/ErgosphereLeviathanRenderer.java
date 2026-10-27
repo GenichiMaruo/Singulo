@@ -703,8 +703,8 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
         BlockState plate = ErgosphereLeviathan.plate();
         Vec3 mouth = e.position().add(0, e.getBbHeight(), 0);
         // 節の位置: 頭の跡をさかのぼり、進む向きと直角に左右へくねらせる（尾ほど大きく）
-        Vec3[] at = new Vec3[HATCH_SEGMENTS + 1];
-        for (int k = 0; k <= HATCH_SEGMENTS; k++) {
+        Vec3[] at = new Vec3[HATCH_SEGMENTS];
+        for (int k = 0; k < HATCH_SEGMENTS; k++) {
             float back = emergeT - k * HATCH_LAG;
             Vec3 p = ErgosphereLeviathan.hatchlingPos(core, back);
             Vec3 ahead = ErgosphereLeviathan.hatchlingPos(core, back + 1).subtract(p);
@@ -825,7 +825,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
             pose.popPose();
         }
         // 体のまわりの淡いにじみと、泳いだ跡の光の粒
-        for (int k = 0; k <= HATCH_SEGMENTS; k += 2) {
+        for (int k = 0; k < HATCH_SEGMENTS; k += 2) {
             Vec3 l = at[k].subtract(origin);
             pose.pushPose();
             pose.translate(l.x, l.y, l.z);
@@ -882,7 +882,7 @@ public class ErgosphereLeviathanRenderer extends EntityRenderer<ErgosphereLeviat
                 size = 0;
             } else if (emergeT < ErgosphereLeviathan.SWALLOW) {
                 size = 1.3F * Mth.clamp((emergeT - ErgosphereLeviathan.RIFT_SNAP) / 1.5F, 0, 1);
-                flash = Mth.clamp((emergeT - ErgosphereLeviathan.RIFT_SNAP) / 2F, 0, 1) * 0.6F;
+                flash = Mth.clamp((emergeT - ErgosphereLeviathan.RIFT_SNAP) / (ErgosphereLeviathan.SWALLOW - ErgosphereLeviathan.RIFT_SNAP), 0, 1);
             } else {
                 size = 1.3F * (1 - (emergeT - ErgosphereLeviathan.SWALLOW) / (ErgosphereLeviathan.EMERGE_TICKS - ErgosphereLeviathan.SWALLOW));
                 flash = Mth.clamp(1 - (emergeT - ErgosphereLeviathan.SWALLOW) / 12F, 0, 1);

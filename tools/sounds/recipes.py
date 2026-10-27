@@ -384,8 +384,8 @@ def penrose_ignition(d, seed):
     suck = whoosh(2.4, 6000, 150, 2, seed + 2, 0.5)[::-1] * 1.1
     dive = sine(glide(400, 40, 2.4, 0.6)) * env([(0, 0), (2.0, 0.6), (2.4, 0)], 2.4)
     out = mix(whirl, drone, ports, current, pulse, (rise, 6.0), (sing, 6.0), (suck, 13.6), (dive, 13.6))
-    out = reverb(out, 0.85, 0.3, 3000, 0.0)
-    return fit(out, D) * np.concatenate([np.ones(int((D - 0.03) * SR)), np.linspace(1, 0, len(out) - int((D - 0.03) * SR))])
+    out = fit(reverb(out, 0.85, 0.3, 3000, 0.0), D)
+    return out * np.concatenate([np.ones(int((D - 0.03) * SR)), np.linspace(1, 0, len(out) - int((D - 0.03) * SR))])
 
 
 @recipe('machine/probe_station_launch')

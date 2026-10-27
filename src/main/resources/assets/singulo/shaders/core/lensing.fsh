@@ -116,9 +116,13 @@ void main() {
     vec2 dx = dFdx(p);
     vec2 dy = dFdy(p);
     vec2 texel = 1.0 / vec2(textureSize(Sampler0, 0));
-    float cap = 3.0 * max(texel.x, texel.y);
-    dx *= min(1.0, cap / max(length(dx), 1e-7));
-    dy *= min(1.0, cap / max(length(dy), 1e-7));
+    float px = max(texel.x, texel.y);
+    float cap = 3.0 * px;
+    // 歪みのない所や拡大される所（1画素の写す広さが1画素以下）はそのまま読む（画面全体がぼやけないように）。
+    // 縮められる所だけ、1画素を超えた分に応じてならす
+    float spread = clamp(max(length(dx), length(dy)) / px - 1.0, 0.0, 1.0);
+    dx *= min(1.0, cap / max(length(dx), 1e-7)) * spread;
+    dy *= min(1.0, cap / max(length(dy), 1e-7)) * spread;
     vec3 c = 0.25 * (texture(Sampler0, clamp(p + 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
                    + texture(Sampler0, clamp(p - 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
                    + texture(Sampler0, clamp(p + 0.25 * dx - 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb

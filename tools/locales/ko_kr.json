@@ -3139,6 +3139,10 @@
     "source": "Gravity Debris",
     "translation": "잔해"
   },
+  "entity.singulo.infalling_block": {
+    "source": "Infalling Block",
+    "translation": "빨려드는 블록"
+  },
   "entity.singulo.gravity_remnant": {
     "source": "Gravity Remnant",
     "translation": "중력 잔재"
@@ -11701,7 +11705,7 @@
   },
   "subtitles.singulo.echo_sentinel.awake": {
     "source": "Echo Sentinel awakens",
-    "translation": "잔향의 파수꾼이 깨어난다"
+    "translation": "메아리 파수꾼이 깨어난다"
   },
   "subtitles.singulo.gravity_remnant.pulse": {
     "source": "Core throbs",

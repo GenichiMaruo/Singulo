@@ -273,6 +273,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         if (!formed) {
             if (state == State.IGNITING) {
                 state = State.DORMANT;
+                stopIgnitionSound(level);                 // 点火の途中で形が崩れた: 鳴り始めた点火の音も止める
             }
             if (state != State.RUNNING) {
                 state = State.UNFORMED;
@@ -671,34 +672,53 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     /** 炉心がブロックを崩して吸い込む範囲（中心からのブロック数。リングの内側）と、間隔・一度に崩す数。 */
     public static final double DEVOUR_RADIUS = Structures.REACTOR_RADIUS - 1.5;
     static final int DEVOUR_INTERVAL = 4, DEVOUR_PER_STEP = 2;
+    /** 何も崩すものがなかったとき、次に探すまで休む tick（空の炉心で毎回範囲じゅうを見ないように）。 */
+    static final int DEVOUR_IDLE = 40;
+    /** 吸い込む範囲の中の位置（中心からのずれ）を、近い順に並べたもの。 */
+    private static final java.util.List<BlockPos> DEVOUR_OFFSETS = devourOffsets();
+    private long devourRestUntil;
+
+    private static java.util.List<BlockPos> devourOffsets() {
+        int r = (int) Math.ceil(DEVOUR_RADIUS);
+        java.util.List<BlockPos> out = new java.util.ArrayList<>();
+        for (BlockPos p : BlockPos.betweenClosed(-r, -r, -r, r, r, r)) {
+            if (p.getX() * p.getX() + p.getY() * p.getY() + p.getZ() * p.getZ() <= DEVOUR_RADIUS * DEVOUR_RADIUS) {
+                out.add(p.immutable());
+            }
+        }
+        out.sort(java.util.Comparator.comparingInt(p -> p.getX() * p.getX() + p.getY() * p.getY() + p.getZ() * p.getZ()));
+        return java.util.List.copyOf(out);
+    }
 
     /**
      * リングの内側に置かれたブロックを、中心に近いものから崩して吸い込む（落とし物は出ない）。液体は消す。
      * 壊せないブロック・中身を持つブロック（チェストなど）・シールドタワーに守られた所は崩さない。
+     * 制御装置は中心から5ブロック下（範囲の外）にあり、中身を持つので崩れない。
      */
     private void devourBlocks(ServerLevel level, Vec3 c, double horizon) {
-        if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.shielded(level, c, 4)) {
+        if (level.getGameTime() < devourRestUntil) {
             return;
         }
-        int r = (int) Math.ceil(DEVOUR_RADIUS);
         BlockPos at = BlockPos.containing(c);
-        java.util.List<BlockPos> near = new java.util.ArrayList<>();
-        for (BlockPos p : BlockPos.betweenClosed(at.offset(-r, -r, -r), at.offset(r, r, r))) {
-            if (Vec3.atCenterOf(p).distanceToSqr(c) > DEVOUR_RADIUS * DEVOUR_RADIUS || p.equals(worldPosition)) {
+        java.util.List<BlockPos> near = new java.util.ArrayList<>(DEVOUR_PER_STEP);
+        BlockPos.MutableBlockPos q = new BlockPos.MutableBlockPos();
+        for (BlockPos o : DEVOUR_OFFSETS) {
+            q.setWithOffset(at, o);
+            BlockState s = level.getBlockState(q);
+            if (s.isAir() || s.getDestroySpeed(level, q) < 0 || level.getBlockEntity(q) != null
+                    || io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.shielded(level, Vec3.atCenterOf(q), 4)) {
                 continue;
             }
-            BlockState s = level.getBlockState(p);
-            if (s.isAir() || s.getDestroySpeed(level, p) < 0 || level.getBlockEntity(p) != null) {
-                continue;
+            near.add(q.immutable());
+            if (near.size() >= DEVOUR_PER_STEP) {
+                break;
             }
-            near.add(p.immutable());
         }
         if (near.isEmpty()) {
+            devourRestUntil = level.getGameTime() + DEVOUR_IDLE;
             return;
         }
-        near.sort(java.util.Comparator.comparingDouble(p -> Vec3.atCenterOf(p).distanceToSqr(c)));
-        for (int i = 0; i < Math.min(DEVOUR_PER_STEP, near.size()); i++) {
-            BlockPos p = near.get(i);
+        for (BlockPos p : near) {
             BlockState s = level.getBlockState(p);
             boolean liquid = s.getBlock() instanceof net.minecraft.world.level.block.LiquidBlock;
             if (s.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)
@@ -1349,6 +1369,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
     public void setRemoved() {
         if (level != null && !chunkUnloading) {
             link(level, ports, null);
+            if (state == State.IGNITING && level instanceof ServerLevel server) {
+                stopIgnitionSound(server);                // 点火中に制御装置が壊された
+            }
         }
         CLIENT_LOADED.remove(this);
         if (level != null) {

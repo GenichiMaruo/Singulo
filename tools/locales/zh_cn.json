@@ -3139,6 +3139,10 @@
     "source": "Gravity Debris",
     "translation": "瓦砾"
   },
+  "entity.singulo.infalling_block": {
+    "source": "Infalling Block",
+    "translation": "坠入的方块"
+  },
   "entity.singulo.gravity_remnant": {
     "source": "Gravity Remnant",
     "translation": "重力残渣"
@@ -11701,7 +11705,7 @@
   },
   "subtitles.singulo.echo_sentinel.awake": {
     "source": "Echo Sentinel awakens",
-    "translation": "残响守卫苏醒"
+    "translation": "回响守卫苏醒"
   },
   "subtitles.singulo.gravity_remnant.pulse": {
     "source": "Core throbs",

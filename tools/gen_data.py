@@ -1285,6 +1285,7 @@ UI_LANG = {
     'entity.singulo.echo_sentinel': ('残響の番人', 'Echo Sentinel'),
     'entity.singulo.gravity_remnant': ('重力の澱', 'Gravity Remnant'),
     'entity.singulo.gravity_debris': ('瓦礫', 'Gravity Debris'),
+    'entity.singulo.infalling_block': ('崩れ落ちるブロック', 'Infalling Block'),
     'entity.singulo.foundry_overseer': ('統括AI「ファウンドリ」', 'Foundry Overseer'),
     'entity.singulo.foundry_overseer.awakened': ('覚醒したファウンドリ', 'Awakened Foundry Overseer'),
     'item.singulo.foundry_overseer_spawn_egg': ('ファウンドリのスポーンエッグ', 'Foundry Overseer Spawn Egg'),

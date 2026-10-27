@@ -450,7 +450,7 @@ public final class ReactorGameTests {
             helper.setBlock(stone, net.minecraft.world.level.block.Blocks.STONE);
             helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
         });
-        helper.runAtTickTime(lit + 40, () -> {
+        helper.runAtTickTime(lit + 60, () -> {
             helper.assertTrue(helper.getBlockState(stone).isAir(), "リングの内側のブロックが吸い込まれない");
             helper.assertTrue(helper.getBlockState(chest).is(net.minecraft.world.level.block.Blocks.CHEST), "中身を持つブロックまで崩した");
             helper.succeed();
