@@ -35,11 +35,14 @@ def machine(path, level=MACHINE):
 
 # =================================================================== ブラックホール
 
-@machine('black_hole/ambient_loop', level=-22)
+@machine('black_hole/ambient_loop', level=-13)
 def black_hole_ambient(d, seed):
+    # 重い脈動（小さなスピーカーでも聞こえるよう、同じ高さの倍音を重ねる）と、渦を巻く風、ホーキング放射のかすかな雑音
     swirl = bandpass(pink(d, seed), 180 + 120 * lfo(1 / 3, d), 2) * (0.6 + 0.4 * lfo(1 / 3, d))
     hawking = highpass(white(d, seed + 1), 6000) * 0.05 * (1 + lfo(0.5, d))
-    return throb(d, 1 / 3, 32, 0.6) * 1.2 + sine(21, d) * 0.6 + swirl * 0.7 + hawking
+    beat = 1 - 0.6 * 0.5 * (1 + np.cos(2 * np.pi / 3 * t_axis(d)))
+    body = hum(32, d, (1, 2, 3, 4), (1, 0.7, 0.45, 0.25), 0.004, seed) * beat
+    return throb(d, 1 / 3, 32, 0.6) * 1.2 + sine(21, d) * 0.6 + body * 0.6 + swirl * 0.8 + hawking
 
 
 @recipe('black_hole/devour', level=BOSS, variants=3)
@@ -525,9 +528,15 @@ def wall_jump(d, seed):
     return mix(thump(110, 0.12, 0.4, seed) * 0.6, spring, whoosh(0.35, 400, 2500, 1.5, seed, 0.6) * 0.5)
 
 
-@recipe('item/dimensional_pocket_open')
+@recipe('item/dimensional_pocket_open', level=-14)
 def pocket_open(d, seed):
-    return reverb(mix(whoosh(0.5, 300, 4000, 2, seed, 1.5) * 0.5, (shimmer(0.6, 15, 1500, 2.5, 0.35, seed) * 0.3, 0.2)), 0.6, 0.3)
+    # 開く: 短く空間がめくれる音と、下から上へ澄んだ2音。最後にほんの少しのきらめき
+    fwip = bandpass(pink(0.22, seed), glide(600, 3500, 0.22), 2) * env([(0, 0), (0.12, 1), (0.22, 0)], 0.22) * 0.5
+    tone = mix(sine(660, 0.3) * perc(0.3, 0.005, 0.18) * 0.35, (sine(990, 0.45) * perc(0.45, 0.005, 0.28) * 0.35, 0.08),
+               (sine(1980, 0.3) * perc(0.3, 0.005, 0.12) * 0.08, 0.08))
+    body = mix(sine(glide(160, 240, 0.15)) * perc(0.15, 0.005, 0.08) * 0.45, lowpass(pink(0.2, seed + 1), 500) * perc(0.2, 0.01, 0.1) * 0.3)
+    sparkle = shimmer(0.3, 10, 2400, 2, 0.25, seed) * 0.12
+    return drive(reverb(mix(fwip, body, (tone, 0.06), (sparkle, 0.14)), 0.4, 0.18, 6000, 0.3) * 2.2, 1.6)
 
 
 @recipe('item/dimensional_pocket_close')
