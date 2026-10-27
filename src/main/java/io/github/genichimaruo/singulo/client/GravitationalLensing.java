@@ -262,6 +262,8 @@ public final class GravitationalLensing {
                 copy.destroyBuffers();
             }
             copy = new TextureTarget(w, h, false, Minecraft.ON_OSX);
+            // 歪めて拡大した所が画素のかたまりに見えないよう、なめらかに補間して読む
+            copy.setFilterMode(GL11.GL_LINEAR);
         }
         // 今の画面をコピーし、それを歪めて元の画面に描き直す
         GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, main.frameBufferId);

@@ -110,7 +110,19 @@ void main() {
     p = lens(p, Lens1, Sphere1, ring, dark);
     p = lens(p, Lens2, Sphere2, ring, dark);
     p = lens(p, Lens3, Sphere3, ring, dark);
-    vec3 c = texture(Sampler0, p).rgb;
+    // 1ピクセルが写す範囲（歪んだ先での広さ）を4点でならす。拡大される所が画素のかたまりに、縮められる所がちらつく
+    // ノイズにならないように（低い解像度ほど目立つので、どの画面の大きさでも同じに見えるようにする）。
+    // 境目（手前のものとの切れ目など）をまたいでにじまないよう、ならす幅は数画素までにとどめる
+    vec2 dx = dFdx(p);
+    vec2 dy = dFdy(p);
+    vec2 texel = 1.0 / vec2(textureSize(Sampler0, 0));
+    float cap = 3.0 * max(texel.x, texel.y);
+    dx *= min(1.0, cap / max(length(dx), 1e-7));
+    dy *= min(1.0, cap / max(length(dy), 1e-7));
+    vec3 c = 0.25 * (texture(Sampler0, clamp(p + 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
+                   + texture(Sampler0, clamp(p - 0.25 * dx + 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
+                   + texture(Sampler0, clamp(p + 0.25 * dx - 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb
+                   + texture(Sampler0, clamp(p - 0.25 * dx - 0.25 * dy, vec2(0.0005), vec2(0.9995))).rgb);
     c += vec3(1.0, 0.92, 0.82) * ring * 0.55;
     c = mix(c, vec3(0.0), dark);
     fragColor = vec4(c, 1.0);
