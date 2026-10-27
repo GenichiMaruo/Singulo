@@ -704,8 +704,7 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         BlockPos.MutableBlockPos q = new BlockPos.MutableBlockPos();
         for (BlockPos o : DEVOUR_OFFSETS) {
             q.setWithOffset(at, o);
-            BlockState s = level.getBlockState(q);
-            if (s.isAir() || s.getDestroySpeed(level, q) < 0 || level.getBlockEntity(q) != null
+            if (!EventHorizonTargets.edibleBlock(level, q, level.getBlockState(q), true)
                     || io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.shielded(level, Vec3.atCenterOf(q), 4)) {
                 continue;
             }
@@ -913,11 +912,8 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
         // まわりの物も巻き込む（壊せない物と、入れ物などのブロックエンティティは残す）
         int r = COLLAPSE_RADIUS;
         for (BlockPos p : BlockPos.betweenClosed(c.offset(-r, -r, -r), c.offset(r, r, r))) {
-            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition)) {
-                continue;
-            }
-            BlockState s = level.getBlockState(p);
-            if (s.isAir() || s.getDestroySpeed(level, p) < 0 || level.getBlockEntity(p) != null || !s.getFluidState().isEmpty()) {
+            if (p.distSqr(c) > r * r || picked.contains(p) || p.equals(worldPosition)
+                    || !EventHorizonTargets.edibleBlock(level, p, level.getBlockState(p), false)) {
                 continue;
             }
             picked.add(p.immutable());

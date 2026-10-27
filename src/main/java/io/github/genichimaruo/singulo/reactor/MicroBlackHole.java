@@ -73,8 +73,7 @@ public class MicroBlackHole extends Entity {
                 if (Vec3.atCenterOf(p).distanceToSqr(c) > EAT_RADIUS * EAT_RADIUS) {
                     continue;
                 }
-                BlockState s = level.getBlockState(p);
-                if (s.isAir() || s.getDestroySpeed(level, p) < 0 || level.getBlockEntity(p) != null) {
+                if (!EventHorizonTargets.edibleBlock(level, p, level.getBlockState(p), true)) {
                     continue;
                 }
                 near.add(p.immutable());
