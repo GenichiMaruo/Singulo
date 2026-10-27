@@ -42,6 +42,17 @@ def black_hole_ambient(d, seed):
     return throb(d, 1 / 3, 32, 0.6) * 1.2 + sine(21, d) * 0.6 + swirl * 0.7 + hawking
 
 
+@recipe('black_hole/devour', level=BOSS, variants=3)
+def black_hole_devour(d, seed):
+    # 炉心がブロックを崩して吸い込む: 石が砕けてきしみ、渦へ引き込まれる風が高まって、低く落ちる
+    r = rng(seed)
+    crack = mix(lowpass(white(0.25, seed), 3000) * perc(0.25, 0.002, 0.07), (lowpass(white(0.2, seed + 1), 2000) * perc(0.2, 0.002, 0.05) * 0.6, 0.05),
+                lowpass(crackle(0.5, 50, seed, 0.008), 1800) * 1.2)
+    pull = whoosh(0.9, 2500, 150, 2, seed + 2, 0.6)[::-1] * 0.8
+    sink = sine(glide(180 + 60 * r.random(), 35, 0.9, 0.5)) * env([(0, 0), (0.5, 0.5), (0.9, 0)], 0.9) * 0.6
+    return reverb(mix(crack, (pull, 0.05), (sink, 0.1)), 0.8, 0.3, 2500, 0.6)
+
+
 @recipe('black_hole/formation', level=BIG)
 def black_hole_formation(d, seed):
     pull = riser(2.6, 60, 900, seed) * 0.8

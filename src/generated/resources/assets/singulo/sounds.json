@@ -17,6 +17,23 @@
       }
     ]
   },
+  "black_hole.devour": {
+    "subtitle": "subtitles.singulo.black_hole.devour",
+    "sounds": [
+      {
+        "name": "singulo:black_hole/devour_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:black_hole/devour_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "singulo:black_hole/devour_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
   "kiln_running": {
     "subtitle": "subtitles.singulo.kiln_running",
     "sounds": [

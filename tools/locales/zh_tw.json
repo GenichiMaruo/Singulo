@@ -11746,5 +11746,9 @@
   "subtitles.singulo.security_drone.sputter": {
     "source": "Drone sparks",
     "translation": "無人機迸出火花"
+  },
+  "subtitles.singulo.black_hole.devour": {
+    "source": "Blocks get pulled into the core",
+    "translation": "方塊被吸入核心"
   }
 }

@@ -21,8 +21,8 @@ public final class EventHorizonTargets {
 
     /** クリエイティブ・スペクテイターのプレイヤーと、壁に掛けたもの（額縁・絵画）は除く。 */
     static boolean affected(Entity e) {
-        if (e.isSpectator() || e.isRemoved()) {
-            return false;
+        if (e.isSpectator() || e.isRemoved() || e instanceof InfallingBlock) {
+            return false;                                  // 崩れて落ちていくブロックは、自分で炉心へ落ちる
         }
         if (e instanceof Player p && (p.isCreative() || p.isSpectator())) {
             return false;

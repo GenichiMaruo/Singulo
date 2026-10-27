@@ -2592,6 +2592,7 @@ def warden_textures(te, save):
 SOUNDS = {
     'black_hole.ambient': ('black_hole/ambient_loop', 'ブラックホールがうなる', 'Black hole hums', 32),
     'black_hole.formation': ('black_hole/formation', 'ブラックホールができる', 'Black hole forms', 48),
+    'black_hole.devour': ('black_hole/devour', 'ブロックが炉心へ吸い込まれる', 'Blocks get pulled into the core', 24),
     'kiln_running': ('machine/kiln_running', '焼成炉が燃える', 'Kiln roars', 16),
     'compressor_running': ('machine/compressor_running', '圧縮機がプレスする', 'Compressor presses', 16),
     'electrolyzer_running': ('machine/electrolyzer_running', '電解槽が泡立つ', 'Electrolyzer bubbles', 16),

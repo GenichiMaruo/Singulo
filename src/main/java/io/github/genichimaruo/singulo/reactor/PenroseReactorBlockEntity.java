@@ -655,6 +655,9 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                 }
             }
         }
+        if (kill && formed && level.getGameTime() % DEVOUR_INTERVAL == 0) {
+            devourBlocks(level, c, horizon);
+        }
         int interval = ServerConfig.SPEC.isLoaded() ? ServerConfig.PULL_CHECK_INTERVAL_TICKS.get() : 5;
         int tidal = ServerConfig.SPEC.isLoaded() ? ServerConfig.TIDAL_DAMAGE_RADIUS.get() : 4;
         if (tidal > 0 && level.getGameTime() % 10 < interval && level.getGameTime() % interval == 0) {
@@ -662,6 +665,58 @@ public class PenroseReactorBlockEntity extends BlockEntity implements MenuProvid
                     e -> e.position().distanceTo(c) <= tidal && EventHorizonTargets.affected(e))) {
                 e.hurt(SinguloDamageTypes.tidal(level, null), 4.0F);
             }
+        }
+    }
+
+    /** 炉心がブロックを崩して吸い込む範囲（中心からのブロック数。リングの内側）と、間隔・一度に崩す数。 */
+    public static final double DEVOUR_RADIUS = Structures.REACTOR_RADIUS - 1.5;
+    static final int DEVOUR_INTERVAL = 4, DEVOUR_PER_STEP = 2;
+
+    /**
+     * リングの内側に置かれたブロックを、中心に近いものから崩して吸い込む（落とし物は出ない）。液体は消す。
+     * 壊せないブロック・中身を持つブロック（チェストなど）・シールドタワーに守られた所は崩さない。
+     */
+    private void devourBlocks(ServerLevel level, Vec3 c, double horizon) {
+        if (io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity.shielded(level, c, 4)) {
+            return;
+        }
+        int r = (int) Math.ceil(DEVOUR_RADIUS);
+        BlockPos at = BlockPos.containing(c);
+        java.util.List<BlockPos> near = new java.util.ArrayList<>();
+        for (BlockPos p : BlockPos.betweenClosed(at.offset(-r, -r, -r), at.offset(r, r, r))) {
+            if (Vec3.atCenterOf(p).distanceToSqr(c) > DEVOUR_RADIUS * DEVOUR_RADIUS || p.equals(worldPosition)) {
+                continue;
+            }
+            BlockState s = level.getBlockState(p);
+            if (s.isAir() || s.getDestroySpeed(level, p) < 0 || level.getBlockEntity(p) != null) {
+                continue;
+            }
+            near.add(p.immutable());
+        }
+        if (near.isEmpty()) {
+            return;
+        }
+        near.sort(java.util.Comparator.comparingDouble(p -> Vec3.atCenterOf(p).distanceToSqr(c)));
+        for (int i = 0; i < Math.min(DEVOUR_PER_STEP, near.size()); i++) {
+            BlockPos p = near.get(i);
+            BlockState s = level.getBlockState(p);
+            boolean liquid = s.getBlock() instanceof net.minecraft.world.level.block.LiquidBlock;
+            if (s.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)
+                    && s.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)) {
+                s = s.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, false);
+            }
+            level.setBlock(p, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            Vec3 from = Vec3.atCenterOf(p);
+            if (liquid) {
+                level.sendParticles(net.minecraft.core.particles.ParticleTypes.SPLASH, from.x, from.y, from.z, 6, 0.3, 0.3, 0.3, 0.1);
+                continue;
+            }
+            // 崩れる粒と、引きはがされた塊が渦を巻いて炉心へ落ちていく
+            level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK, s), from.x, from.y, from.z,
+                    10, 0.3, 0.3, 0.3, 0.05);
+            level.addFreshEntity(new InfallingBlock(level, from, s, c, horizon));
+            level.playSound(null, p, io.github.genichimaruo.singulo.registry.SinguloSounds.get("black_hole.devour"),
+                    net.minecraft.sounds.SoundSource.BLOCKS, 1.4F, 0.85F + level.random.nextFloat() * 0.3F);
         }
     }
 
