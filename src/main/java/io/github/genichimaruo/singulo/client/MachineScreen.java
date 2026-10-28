@@ -822,8 +822,12 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         for (MachineRecipe.ItemInput in : r.ingredients()) {
             ItemStack[] options = in.ingredient().getItems();
             Component name = options.length > 0 ? options[0].getHoverName() : Component.literal("?");
-            lines.add(Component.translatable(in.uses() > 0 ? "gui.singulo.select.uses" : "gui.singulo.select.item", name,
-                    in.uses() > 0 ? in.uses() : in.count()).withStyle(s -> s.withColor(0xFF8A949E)));
+            boolean catalyst = in.uses() > 0 && options.length > 0 && io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(options[0]);
+            Component line = catalyst ? Component.translatable("gui.singulo.select.lifetime", name,
+                    io.github.genichimaruo.singulo.item.UsesItem.lifetime(in.uses()))
+                    : Component.translatable(in.uses() > 0 ? "gui.singulo.select.uses" : "gui.singulo.select.item", name,
+                    in.uses() > 0 ? in.uses() : in.count());
+            lines.add(line.copy().withStyle(s -> s.withColor(0xFF8A949E)));
         }
         for (MachineRecipe.FluidInput in : r.fluidIngredients()) {
             lines.add(Component.translatable("gui.singulo.select.fluid", in.fluid().getFluidType().getDescription(), in.amount())

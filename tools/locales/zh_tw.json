@@ -5043,6 +5043,10 @@
     "source": "- %s: %s more needed",
     "translation": "・%s：還需要 %s 個"
   },
+  "gui.singulo.reason.need_lifetime": {
+    "source": "- %s with at least %s of lifetime left",
+    "translation": "・需要 %s（剩餘壽命至少 %s）"
+  },
   "gui.singulo.reason.need_uses": {
     "source": "- %s with at least %s uses left",
     "translation": "・需要剩餘 %2$s 次以上的 %1$s"
@@ -5430,6 +5434,10 @@
   "gui.singulo.select.item": {
     "source": "- %s x%s",
     "translation": "・%s ×%s"
+  },
+  "gui.singulo.select.lifetime": {
+    "source": "- %s (%s of lifetime)",
+    "translation": "・%s（壽命 %s）"
   },
   "gui.singulo.select.restore": {
     "source": "- Restores: %s",
@@ -9043,6 +9051,10 @@
     "source": "Found in",
     "translation": "發現於"
   },
+  "jei.singulo.lifetime": {
+    "source": "Uses %s of lifetime",
+    "translation": "消耗 %s 壽命"
+  },
   "jei.singulo.mass": {
     "source": "Mass %s",
     "translation": "質量 %1$s"
@@ -10899,6 +10911,14 @@
     "source": "Works from your inventory · Use to switch mode",
     "translation": "放在物品欄中即可生效 · 右鍵切換模式"
   },
+  "tooltip.singulo.min_sec": {
+    "source": "%s min %s s",
+    "translation": "%s 分 %s 秒"
+  },
+  "tooltip.singulo.minutes": {
+    "source": "%s min",
+    "translation": "%s 分鐘"
+  },
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "混合：8個組成Lv2"
@@ -11010,6 +11030,10 @@
   "tooltip.singulo.sealed.locked": {
     "source": "Sealed",
     "translation": "已封印"
+  },
+  "tooltip.singulo.seconds": {
+    "source": "%s s",
+    "translation": "%s 秒"
   },
   "tooltip.singulo.stage": {
     "source": "Stage %s: %s",

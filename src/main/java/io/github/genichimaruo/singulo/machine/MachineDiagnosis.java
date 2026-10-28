@@ -101,7 +101,10 @@ public final class MachineDiagnosis {
             Component name = options.length > 0 ? options[0].getHoverName() : Component.literal("?");
             if (in.uses() > 0) {
                 if (inputs.stream().noneMatch(s -> in.usesFrom(s) > 0)) {
-                    lines.add(Component.translatable("gui.singulo.reason.need_uses", name, in.uses()));
+                    boolean catalyst = options.length > 0 && io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(options[0]);
+                    lines.add(catalyst ? Component.translatable("gui.singulo.reason.need_lifetime", name,
+                            io.github.genichimaruo.singulo.item.UsesItem.lifetime(in.uses()))
+                            : Component.translatable("gui.singulo.reason.need_uses", name, in.uses()));
                 }
                 continue;
             }

@@ -5043,6 +5043,10 @@
     "source": "- %s: %s more needed",
     "translation": "・%s: %s개 더 필요"
   },
+  "gui.singulo.reason.need_lifetime": {
+    "source": "- %s with at least %s of lifetime left",
+    "translation": "・%s 필요 (남은 수명 %s 이상)"
+  },
   "gui.singulo.reason.need_uses": {
     "source": "- %s with at least %s uses left",
     "translation": "・남은 횟수가 %2$s회 이상인 %1$s 필요"
@@ -5430,6 +5434,10 @@
   "gui.singulo.select.item": {
     "source": "- %s x%s",
     "translation": "・%s ×%s"
+  },
+  "gui.singulo.select.lifetime": {
+    "source": "- %s (%s of lifetime)",
+    "translation": "・%s (수명 %s)"
   },
   "gui.singulo.select.restore": {
     "source": "- Restores: %s",
@@ -9043,6 +9051,10 @@
     "source": "Found in",
     "translation": "입수"
   },
+  "jei.singulo.lifetime": {
+    "source": "Uses %s of lifetime",
+    "translation": "수명 %s 사용"
+  },
   "jei.singulo.mass": {
     "source": "Mass %s",
     "translation": "질량 %s"
@@ -10899,6 +10911,14 @@
     "source": "Works from your inventory · Use to switch mode",
     "translation": "인벤토리에 있기만 해도 작동 · 우클릭으로 모드 전환"
   },
+  "tooltip.singulo.min_sec": {
+    "source": "%s min %s s",
+    "translation": "%s분 %s초"
+  },
+  "tooltip.singulo.minutes": {
+    "source": "%s min",
+    "translation": "%s분"
+  },
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "혼합: 8개로 Lv2가 됨"
@@ -11010,6 +11030,10 @@
   "tooltip.singulo.sealed.locked": {
     "source": "Sealed",
     "translation": "봉인됨"
+  },
+  "tooltip.singulo.seconds": {
+    "source": "%s s",
+    "translation": "%s초"
   },
   "tooltip.singulo.stage": {
     "source": "Stage %s: %s",

@@ -61,7 +61,7 @@ public class UsesItem extends SinguloItem {
         UsesData data = UsesHelper.get(stack);
         if (catalyst) {
             tooltip.add(Component.translatable("tooltip.singulo.lifetime",
-                    formatTicks(data.remaining()), formatTicks(data.max())).withStyle(ChatFormatting.GRAY));
+                    lifetime(data.remaining()), lifetime(data.max())).withStyle(ChatFormatting.GRAY));
         } else {
             tooltip.add(Component.translatable("tooltip.singulo.uses", data.remaining(), data.max())
                     .withStyle(ChatFormatting.GRAY));
@@ -76,13 +76,19 @@ public class UsesItem extends SinguloItem {
         }
     }
 
+    /** 触媒の寿命（tick）を「45分」「12分30秒」「40秒」の形にする。触媒の使用回数はどこでもこの形で見せる。 */
+    public static Component lifetime(int ticks) {
+        int seconds = Math.max(0, ticks) / 20;
+        int minutes = seconds / 60;
+        if (minutes == 0) {
+            return Component.translatable("tooltip.singulo.seconds", seconds);
+        }
+        return seconds % 60 == 0 ? Component.translatable("tooltip.singulo.minutes", minutes)
+                : Component.translatable("tooltip.singulo.min_sec", minutes, seconds % 60);
+    }
+
     /** 触媒（寿命で数える物）か。 */
     public static boolean isCatalyst(ItemStack stack) {
         return stack.getItem() instanceof UsesItem u && u.isCatalyst();
-    }
-
-    static String formatTicks(int ticks) {
-        int seconds = ticks / 20;
-        return String.format("%d:%02d", seconds / 60, seconds % 60);
     }
 }

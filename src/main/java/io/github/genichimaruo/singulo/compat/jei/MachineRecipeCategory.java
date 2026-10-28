@@ -1,6 +1,10 @@
 package io.github.genichimaruo.singulo.compat.jei;
 
 import io.github.genichimaruo.singulo.item.CatalystHelper;
+import io.github.genichimaruo.singulo.item.UsesData;
+import io.github.genichimaruo.singulo.item.UsesHelper;
+import io.github.genichimaruo.singulo.item.UsesItem;
+import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.machine.MachineType;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import java.util.Arrays;
@@ -115,6 +119,20 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
         return Math.max(1, itemColumns);
     }
 
+    /**
+     * 材料の見せ方。触媒を寿命で使う材料は、使う分だけ残った触媒として見せる（アイテムの寿命のバーが、新品のうち使う割合になる）。
+     */
+    private static ItemStack shown(ItemStack s, MachineRecipe.ItemInput in) {
+        ItemStack out = s.copyWithCount(Math.max(1, in.count()));
+        if (in.uses() > 0 && UsesItem.isCatalyst(out)) {
+            int max = UsesHelper.get(out).max();
+            if (in.uses() < max) {
+                out.set(SinguloComponents.USES.get(), new UsesData(max - in.uses(), max, 0));
+            }
+        }
+        return out;
+    }
+
     /** 装置で触媒スロットに入れる材料か（触媒スロットを持つ装置の、触媒の材料）。 */
     private boolean inCatalystSlot(MachineRecipe.ItemInput in) {
         return type.hasCatalystSlot() && Arrays.stream(in.ingredient().getItems()).anyMatch(s -> CatalystHelper.tierOf(s) > 0);
@@ -139,14 +157,16 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
                 y = 1 + (i / itemColumns()) * 18;
                 i++;
             }
-            List<ItemStack> stacks = Arrays.stream(in.ingredient().getItems()).map(s -> s.copyWithCount(Math.max(1, in.count()))).toList();
+            List<ItemStack> stacks = Arrays.stream(in.ingredient().getItems()).map(s -> shown(s, in)).toList();
             IRecipeSlotBuilder s = builder.addSlot(RecipeIngredientRole.INPUT, x, y).setBackground(slot, -1, -1)
                     .addIngredients(VanillaTypes.ITEM_STACK, stacks);
             if (in.uses() > 0) {
                 int uses = in.uses();
                 boolean higher = in.tier() > 0;
+                boolean catalyst = !stacks.isEmpty() && UsesItem.isCatalyst(stacks.get(0));
                 s.addRichTooltipCallback((view, tooltip) -> {
-                    tooltip.add(Component.translatable("jei.singulo.uses", uses).withStyle(ChatFormatting.GOLD));
+                    tooltip.add((catalyst ? Component.translatable("jei.singulo.lifetime", UsesItem.lifetime(uses))
+                            : Component.translatable("jei.singulo.uses", uses)).withStyle(ChatFormatting.GOLD));
                     if (higher) {
                         tooltip.add(Component.translatable("jei.singulo.higher_tier").withStyle(ChatFormatting.GRAY));
                     }
