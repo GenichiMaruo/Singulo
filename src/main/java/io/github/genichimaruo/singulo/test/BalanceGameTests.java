@@ -375,4 +375,26 @@ public final class BalanceGameTests {
                     "BE凝縮触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));
         });
     }
+
+    /** 予備が新品で埋まっていても、搬入した使いかけの触媒を受け取る: 装填中のものを満タンにして予備へ重ね、使いかけの残りを先に使う。 */
+    @GameTest(template = EMPTY)
+    public static void automationMergesPartlyUsedCatalyst(GameTestHelper helper) {
+        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
+        int slot = m.type().catalystSlot();
+        int max = UsesHelper.get(new ItemStack(item("time_crystal_catalyst"))).max();
+        ItemStack worn = new ItemStack(item("time_crystal_catalyst"));
+        worn.set(SinguloComponents.USES.get(), new UsesData(10_000, max, 0));
+        m.items().insertItem(slot, worn, false);
+        m.magazine().tick(m.items(), slot, s -> s);                      // 装填（使用 10,000）
+        m.items().insertItem(slot, new ItemStack(item("time_crystal_catalyst"), 2), false);
+        ItemStack partial = new ItemStack(item("time_crystal_catalyst"));
+        partial.set(SinguloComponents.USES.get(), new UsesData(max - 30_000, max, 0));   // 残り 30,000
+        ItemStack rest = m.automationItems().insertItem(slot, partial, false);
+        helper.assertTrue(rest.isEmpty(), "予備が新品のとき、使いかけの触媒を受け取らない");
+        helper.assertTrue(m.items().getStackInSlot(slot).getCount() == 3, "満タンにした触媒が新品として予備に重ならない: "
+                + m.items().getStackInSlot(slot).getCount());
+        helper.assertTrue(UsesHelper.remaining(m.magazine().loaded()) == 20_000,
+                "使いかけの残りを装填しない: " + UsesHelper.remaining(m.magazine().loaded()));
+        helper.succeed();
+    }
 }

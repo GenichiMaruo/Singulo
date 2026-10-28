@@ -1045,6 +1045,31 @@ final class AndroidWorkGoal extends Goal {
         return moved;
     }
 
+    /** 持ち物から need に合う物を最大 limit 個、装置へ入れる（触媒は寿命の短いものから）。入れた数。 */
+    private long insertFromCarry(net.neoforged.neoforge.items.IItemHandler h, ItemCount need, long limit) {
+        java.util.List<Integer> slots = new java.util.ArrayList<>();
+        for (int slot : android.carrySlots()) {
+            if (need.matches(android.inventory().getItem(slot))) {
+                slots.add(slot);
+            }
+        }
+        slots.sort(java.util.Comparator.comparingInt(slot -> ItemCount.lifeOrder(android.inventory().getItem(slot))));
+        long moved = 0;
+        for (int slot : slots) {
+            ItemStack s = android.inventory().getItem(slot);
+            if (moved >= limit) {
+                break;
+            }
+            int give = (int) Math.min(s.getCount(), limit - moved);
+            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(h, s.copyWithCount(give), false);
+            int in = give - rest.getCount();
+            moved += in;
+            android.inventory().setItem(slot, s.copyWithCount(s.getCount() - in));
+        }
+        android.compactCarry();
+        return moved;
+    }
+
     /** 装置から what を最大 limit 個、持ち物へ取り出す。取り出した数。 */
     private long extractToCarry(net.neoforged.neoforge.items.IItemHandler h, ItemStack what, long limit) {
         long moved = 0;
@@ -2150,7 +2175,7 @@ final class AndroidWorkGoal extends Goal {
             }
             processingPending = new java.util.ArrayList<>();
             for (ItemCount input : inputs) {
-                processingPending.add(new ItemCount(input.item, input.count));
+                processingPending.add(new ItemCount(input.item, input.count, input.alt));
             }
             processingPaid = false;
         }
@@ -2170,7 +2195,7 @@ final class AndroidWorkGoal extends Goal {
                     moved = put;
                 }
             } else if (in != null && !liquid) {
-                moved = insertFromCarry(in, need.item, need.count);
+                moved = insertFromCarry(in, need, need.count);
             }
             if (moved > 0) {
                 if (!processingPaid) {

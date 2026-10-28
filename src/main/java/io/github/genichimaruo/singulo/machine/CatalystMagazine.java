@@ -167,6 +167,47 @@ public final class CatalystMagazine {
     }
 
     /** 予備の使いかけ s から、装填中のものの空きの分だけ使用回数を移す。空になった殻は返す物へ。 */
+    /**
+     * 予備に重ねられない使いかけの触媒 s（count 1）を、搬入で受け取る（予備が新品で埋まっているとき）。装填中のものへ寿命を移し、
+     * 装填中のものが満タンになれば新品として予備へ重ねて、s の残りを装填する（使いかけから先に使う）。受け取れなければ false。
+     */
+    public boolean absorb(ItemStack s, IItemHandlerModifiable supply, int slot, boolean simulate) {
+        ItemStack reserve = supply.getStackInSlot(slot);
+        if (loaded.isEmpty() || reserve.isEmpty() || s.getCount() != 1 || !sameKind(loaded, s)
+                || s.getItem() instanceof CreativeCatalystItem || UsesHelper.get(s).used() <= 0) {
+            return false;
+        }
+        UsesData into = UsesHelper.get(loaded);
+        UsesData from = UsesHelper.get(s);
+        int moved = Math.min(from.remaining(), into.used());
+        if (from.remaining() > moved) {
+            // 装填中のものが満タンになる: 新品として予備に重なるときだけ受け取る
+            ItemStack full = loaded.copyWithCount(1);
+            full.remove(SinguloComponents.USES.get());
+            if (into.max() != UsesHelper.baseMax(full) || into.repairs() != 0 || !ItemStack.isSameItemSameComponents(full, reserve)
+                    || reserve.getCount() >= SUPPLY_LIMIT) {
+                return false;
+            }
+            if (!simulate) {
+                supply.setStackInSlot(slot, reserve.copyWithCount(reserve.getCount() + 1));
+                loaded = UsesHelper.consume(s.copy(), moved);
+                changed.run();
+            }
+            return true;
+        }
+        if (!simulate) {
+            ItemStack target = loaded.copy();
+            target.set(SinguloComponents.USES.get(), new UsesData(into.used() - moved, into.max(), into.repairs()));
+            loaded = target;
+            ItemStack shell = UsesHelper.consume(s.copy(), moved);
+            if (!shell.isEmpty()) {
+                returns.add(shell);                           // 空の殻（失活触媒）
+            }
+            changed.run();
+        }
+        return true;
+    }
+
     private void merge(IItemHandlerModifiable supply, int slot, ItemStack s) {
         UsesData into = UsesHelper.get(loaded);
         UsesData from = UsesHelper.get(s);

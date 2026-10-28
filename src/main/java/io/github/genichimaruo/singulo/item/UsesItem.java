@@ -76,6 +76,11 @@ public class UsesItem extends SinguloItem {
         }
     }
 
+    /** 触媒（寿命で数える物）か。 */
+    public static boolean isCatalyst(ItemStack stack) {
+        return stack.getItem() instanceof UsesItem u && u.isCatalyst();
+    }
+
     static String formatTicks(int ticks) {
         int seconds = ticks / 20;
         return String.format("%d:%02d", seconds / 60, seconds % 60);

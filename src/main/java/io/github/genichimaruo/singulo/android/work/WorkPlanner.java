@@ -101,9 +101,15 @@ public final class WorkPlanner {
             plan.limited = true;
             return;
         }
-        for (int pass = 0; pass < (alt == null ? 1 : 2) && amount > 0; pass++) {
-            amount = take(context.stock, plan.fromStock, item, amount, alt, pass);
-            amount = take(context.surplus, null, item, amount, alt, pass);
+        if (alt != null && io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(item)) {
+            // 触媒: 使いかけも新品も同じ物として、寿命の短いものから使う
+            amount = takeShortLived(context.stock, plan.fromStock, amount, alt);
+            amount = takeShortLived(context.surplus, null, amount, alt);
+        } else {
+            for (int pass = 0; pass < (alt == null ? 1 : 2) && amount > 0; pass++) {
+                amount = take(context.stock, plan.fromStock, item, amount, alt, pass);
+                amount = take(context.surplus, null, item, amount, alt, pass);
+            }
         }
         if (amount <= 0) {
             return;
@@ -142,6 +148,30 @@ public final class WorkPlanner {
         }
         plan.steps.add(new Step(recipe, crafts, amount));
         ItemCount.add(context.surplus, item, crafts * per - amount);
+    }
+
+    /** stock のうち alt に合う物を、寿命の短い順に取る。 */
+    private static long takeShortLived(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved, long amount,
+                                       net.minecraft.world.item.crafting.Ingredient alt) {
+        List<ItemCount> found = new java.util.ArrayList<>();
+        for (ItemCount c : stock) {
+            if (c.count > 0 && c.alt == null && alt.test(c.item)) {
+                found.add(c);
+            }
+        }
+        found.sort(java.util.Comparator.comparingInt(c -> ItemCount.lifeOrder(c.item)));
+        for (ItemCount c : found) {
+            if (amount <= 0) {
+                break;
+            }
+            long take = Math.min(c.count, amount);
+            c.count -= take;
+            amount -= take;
+            if (reserved != null) {
+                ItemCount.add(reserved, c.item, take);
+            }
+        }
+        return amount;
     }
 
     private static long take(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved,

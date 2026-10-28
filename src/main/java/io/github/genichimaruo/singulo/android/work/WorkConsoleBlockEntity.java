@@ -1623,7 +1623,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                     if (left <= 0) {
                         break;
                     }
-                    for (ItemCount have : itemsAt(stores.get(i), c)) {
+                    // 触媒は寿命の短いものから
+                    List<ItemCount> found = itemsAt(stores.get(i), c);
+                    found.sort(java.util.Comparator.comparingInt(have -> ItemCount.lifeOrder(have.item)));
+                    for (ItemCount have : found) {
                         long here = have.count;
                         for (WorkOrder other : orders) {
                             here -= other.held(points.get(i), have.item);

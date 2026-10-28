@@ -395,6 +395,11 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             net.minecraft.world.item.crafting.Ingredient alt = processing() ? null : alt(i);
             if (alt != null) {
                 ItemCount.addAlt(out, s, 1, alt);          // 同じ種類の別の物も使う
+            } else if (io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(s)) {
+                // 触媒は、使いかけでも同じ物として数える（寿命の短いものから使う）
+                ItemStack fresh = s.copyWithCount(1);
+                fresh.remove(io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get());
+                ItemCount.addAlt(out, fresh, processing() ? s.getCount() : 1, net.minecraft.world.item.crafting.Ingredient.of(s.getItem()));
             } else {
                 ItemCount.add(out, FluidSamples.key(s), processing() ? FluidSamples.amount(s) : 1);
             }

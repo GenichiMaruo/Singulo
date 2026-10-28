@@ -61,6 +61,12 @@ public final class ItemCount {
         list.add(new ItemCount(stack, count, alt));
     }
 
+    /** 寿命の短い順に並べるときの鍵: 触媒は残りの寿命、ほかの物は同じ（並びを変えない）。 */
+    public static int lifeOrder(ItemStack stack) {
+        return io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(stack)
+                ? io.github.genichimaruo.singulo.item.UsesHelper.remaining(stack) : 0;
+    }
+
     /** 同じ数え方か比べるための文字（材料の中身を書いたもの）。 */
     public static String key(Ingredient alt) {
         return Ingredient.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, alt).result().map(Object::toString).orElse("");

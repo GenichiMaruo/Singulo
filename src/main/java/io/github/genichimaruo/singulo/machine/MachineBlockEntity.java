@@ -1335,7 +1335,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return slot < type.inputSlots() || slot == type.catalystSlot() ? items.insertItem(slot, stack, simulate) : stack;
+            if (slot == type.catalystSlot()) {
+                // 予備の新品に重ならない使いかけの触媒は、装填中のものと合わせて受け取る
+                ItemStack rest = items.insertItem(slot, stack, simulate);
+                return !rest.isEmpty() && magazine.absorb(rest, items, slot, simulate) ? ItemStack.EMPTY : rest;
+            }
+            return slot < type.inputSlots() ? items.insertItem(slot, stack, simulate) : stack;
         }
 
         @Override
