@@ -6404,8 +6404,8 @@
     "translation": "촉매"
   },
   "guide.singulo.catalysts.slots.body": {
-    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). Nothing else fits.\nA used-up catalyst becomes a spent catalyst. In the Catalytic Reactor, about 25% of it can be recovered as material for the catalyst one tier lower.",
-    "translation": "촉매를 쓰는 장치에는 촉매만 들어가는 전용 슬롯(화면에서 촉매 표시가 있는 칸)이 있습니다. 다른 아이템은 들어가지 않습니다.\n다 쓴 촉매는 소모된 촉매가 됩니다. 촉매 반응기에서 약 25%를 한 티어 아래 촉매의 재료로 회수할 수 있습니다."
+    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
+    "translation": "촉매를 쓰는 장치에는 촉매만 들어가는 전용 슬롯(화면에서 촉매 표시가 있는 칸)이 있습니다. 같은 촉매를 16개까지 예비로 쌓을 수 있습니다.\n장치는 하나를 안에 장전해서 쓰며, 슬롯 아래 게이지에 남은 양이 표시됩니다. 다 쓰면 소모된 촉매를 내보내고(기계는 출력 슬롯, 촉매 장치는 왼쪽 출구) 예비에서 다음 촉매를 바로 장전하므로 멈추지 않습니다.\n쓰다 남은 같은 종류의 촉매를 넣으면 남은 수명이 장전 중인 촉매로 합쳐지고, 빈 껍데기는 소모된 촉매로 나옵니다. 다른 종류를 넣으면 장전 중인 촉매를 출구로 돌려보내고 교체합니다. 예비가 비어 있을 때 슬롯을 클릭하면 장전 중인 촉매를 꺼낼 수 있습니다.\n소모된 촉매는 촉매 반응기에서 약 25%를 한 티어 아래 촉매의 재료로 회수할 수 있습니다."
   },
   "guide.singulo.catalysts.slots.title": {
     "source": "Catalyst slots and recycling",
@@ -11758,5 +11758,21 @@
   "subtitles.singulo.black_hole.devour": {
     "source": "Blocks get pulled into the core",
     "translation": "블록이 노심으로 빨려 들어간다"
+  },
+  "gui.singulo.catalyst.loaded": {
+    "source": "Loaded: %s (%s%% left)",
+    "translation": "장전 중: %s (남은 양 %s%%)"
+  },
+  "gui.singulo.catalyst.loaded_hint": {
+    "source": "When it runs out, the spent catalyst comes out and the next one loads from the reserve. Partly used catalysts you add are merged in.",
+    "translation": "다 쓰면 소모된 촉매를 내보내고 예비에서 다음 촉매를 장전합니다. 쓰다 남은 촉매를 넣으면 남은 양을 합칩니다"
+  },
+  "gui.singulo.catalyst.eject_hint": {
+    "source": "Click to take out the loaded catalyst",
+    "translation": "클릭하면 장전 중인 촉매를 꺼냅니다"
+  },
+  "gui.singulo.catalyst.spent_slot": {
+    "source": "Spent catalyst output",
+    "translation": "소모된 촉매 출구"
   }
 }

@@ -252,7 +252,7 @@ public final class Stage5RomanceGameTests {
             helper.assertTrue(anchor.embedded() && anchor.loadedRadius() == AdvancedWorldlineAnchorBlockEntity.EMBEDDED_RADIUS,
                     "コアを埋め込んでも最大半径にならない: " + anchor.loadedRadius());
             helper.assertTrue(anchor.status() == CatalystDeviceBlockEntity.Status.RUNNING, "電力なしで止まった: " + anchor.status());
-            helper.assertTrue(anchor.catalystSlot().getStackInSlot(0).isEmpty(), "埋め込み後も触媒が残っている");
+            helper.assertTrue(anchor.catalyst().isEmpty(), "埋め込み後も触媒が残っている");
             helper.succeed();
         });
     }

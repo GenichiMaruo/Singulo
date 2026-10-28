@@ -502,12 +502,9 @@ CHAPTERS = [
          'ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE '
          'condensate catalyst takes one muon catalyst and 40 seconds).'),
         ('slots', '触媒スロットとリサイクル',
-         '触媒を使う装置には、触媒だけが入る専用スロットがあります（画面で触媒のマークが付いた枠）。ほかのアイテムは入りません。\n'
-         '使い切った触媒は失活触媒になります。触媒反応器で、1ティア下の触媒の材料として約25%を回収できます。',
+         '触媒を使う装置には、触媒だけが入る専用スロットがあります（画面で触媒のマークが付いた枠）。同じ触媒を16個まで予備として積めます。\n装置は1個を中に装填して使い、スロットの下のゲージに残りが出ます。使い切ると失活触媒を出し（機械は出力スロット、触媒装置は左の出口）、予備から次をすぐ装填するので止まりません。\n使いかけの触媒を入れると、装填中のものと同じ種類なら残りをまとめ、空になった殻を失活触媒として出します。違う種類を入れると、装填中のものを出口へ返して入れ替えます。予備が空のときにスロットをクリックすると、装填中の触媒を取り出せます。\n失活触媒は触媒反応器で、1ティア下の触媒の材料として約25%を回収できます。',
          'Catalyst slots and recycling',
-         'Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with '
-         'a catalyst icon). Nothing else fits.\nA used-up catalyst becomes a spent catalyst. In the Catalytic '
-         'Reactor, about 25% of it can be recovered as material for the catalyst one tier lower.'),
+         'Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.'),
         ('time', '時間の場',
          'Pリアクターの引力帯では時間が遅れ、触媒の減りが×0.5（装置は×0.8）。Tシリンダーの範囲では逆に×2。'
          '重なると打ち消し合います。触媒倉庫を炉の近くに置くと長持ちします。',

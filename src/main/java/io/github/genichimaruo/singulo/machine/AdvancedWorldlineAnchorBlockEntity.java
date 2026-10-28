@@ -75,9 +75,10 @@ public class AdvancedWorldlineAnchorBlockEntity extends WorldlineAnchorBlockEnti
             return false;
         }
         embedded = true;
-        // 入っていた触媒は外に出す（埋め込み後は使わない）
+        // 入っていた触媒（予備と装填中のもの）は外に出す（埋め込み後は使わない）
         net.minecraft.world.level.block.Block.popResource(level, worldPosition, slot.getStackInSlot(0));
         slot.setStackInSlot(0, ItemStack.EMPTY);
+        net.minecraft.world.level.block.Block.popResource(level, worldPosition, magazine.eject());
         setChanged();
         return true;
     }

@@ -142,8 +142,8 @@ public final class Stage5WormholeGameTests {
             IEnergyStorage energy = helper.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, a, null);
             IFluidHandler fluids = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, a, null);
             helper.assertTrue(items != null && energy != null && fluids != null, "ポートが能力を持たない");
-            // 向こうのチェスト（27）とアンカーの触媒スロット（1）が並んで見える
-            helper.assertTrue(items.getSlots() == 28, "向こうの入れ物のスロットが見えない: " + items.getSlots());
+            // 向こうのチェスト（27）と、アンカーの触媒スロット・失活触媒の出口（2）が並んで見える
+            helper.assertTrue(items.getSlots() == 29, "向こうの入れ物のスロットが見えない: " + items.getSlots());
             ItemStack rest = new ItemStack(Items.IRON_INGOT, 16);
             for (int i = 0; i < items.getSlots() && !rest.isEmpty(); i++) {
                 rest = items.insertItem(i, rest, false);

@@ -49,7 +49,7 @@ public class ProbeStationBlockEntity extends CatalystDeviceBlockEntity {
         public ItemStack insertItem(int s, ItemStack stack, boolean simulate) {
             return stack;
         }
-    });
+    }, spentOut());
     private final List<Target> targets = new ArrayList<>();
     private int progress;
 

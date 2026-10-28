@@ -12,8 +12,11 @@ public class UsesItem extends SinguloItem {
     private final int defaultMax;
     private final boolean catalyst;
 
+    /** 触媒の重ねられる数（新品どうしだけ重なる。使いかけは残りが違うので重ならない）。装置の触媒スロットに積める予備の数と同じ。 */
+    public static final int CATALYST_STACK = 16;
+
     public UsesItem(Properties properties, int stage, int defaultMax, boolean catalyst) {
-        super(properties.stacksTo(catalyst ? 1 : 64), stage, false);
+        super(properties.stacksTo(catalyst ? CATALYST_STACK : 64), stage, false);
         this.defaultMax = defaultMax;
         this.catalyst = catalyst;
     }
@@ -26,11 +29,11 @@ public class UsesItem extends SinguloItem {
         return catalyst;
     }
 
-    /** Fresh originals and restored parts stack; worn items keep individual usage state. */
+    /** 新品（と復元品）は重なる（触媒は {@link #CATALYST_STACK} 個まで）。使いかけはそれぞれ残りが違うので1個ずつ。 */
     @Override
     public int getMaxStackSize(ItemStack stack) {
         UsesData data = UsesHelper.get(stack);
-        return catalyst || data.used() > 0 || data.remaining() == 0 ? 1 : super.getMaxStackSize(stack);
+        return data.used() > 0 || data.remaining() == 0 ? 1 : super.getMaxStackSize(stack);
     }
 
     @Override

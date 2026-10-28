@@ -90,7 +90,7 @@ public final class BalanceGameTests {
         helper.runAtTickTime(400, () -> {
             helper.assertTrue(fresh.items().getStackInSlot(fresh.type().outputSlot()).is(item("time_crystal_module")),
                     "新品の時間結晶からモジュールができない");
-            ItemStack left = fresh.items().getStackInSlot(fresh.type().catalystSlot());
+            ItemStack left = fresh.catalyst();
             helper.assertTrue(left.is(item("time_crystal_catalyst")) && UsesHelper.remaining(left) == max - 36_000,
                     "切り出したあとに触媒が15分ぶん残っていない: " + UsesHelper.remaining(left));
             helper.assertTrue(weak.items().getStackInSlot(weak.type().outputSlot()).isEmpty(),
@@ -110,7 +110,7 @@ public final class BalanceGameTests {
         engine.catalystSlot().insertItem(0, new ItemStack(item("bose_condensate_catalyst")), false);
         helper.runAtTickTime(20, () -> {
             helper.assertTrue(engine.status() == CatalystDeviceBlockEntity.Status.STANDBY, "満充電なのに待機しない: " + engine.status());
-            helper.assertTrue(UsesHelper.get(engine.catalystSlot().getStackInSlot(0)).used() == 0, "待機中に触媒が減った");
+            helper.assertTrue(UsesHelper.get(engine.catalyst()).used() == 0, "待機中に触媒が減った");
             // 蓄電が減ると再開する
             engine.energy().setEnergy(0);
         });

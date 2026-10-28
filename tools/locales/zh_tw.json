@@ -6404,8 +6404,8 @@
     "translation": "催化劑"
   },
   "guide.singulo.catalysts.slots.body": {
-    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). Nothing else fits.\nA used-up catalyst becomes a spent catalyst. In the Catalytic Reactor, about 25% of it can be recovered as material for the catalyst one tier lower.",
-    "translation": "使用催化劑的裝置有只能放入催化劑的專用槽（介面中帶有催化劑標記的格子），其他物品放不進去。\n用盡的催化劑會變成失活催化劑。在催化反應器中，約 25% 可回收為低一級催化劑的材料。"
+    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
+    "translation": "使用催化劑的裝置有只能放入催化劑的專用槽（介面中帶有催化劑標記的格子），可以疊放最多 16 個相同的催化劑作為備用。\n裝置會把其中一個裝填進去使用，槽下方的計量條顯示剩餘量。用盡後會送出失活催化劑（機器送到輸出槽，催化裝置送到左側的出口），並立刻從備用中裝填下一個，因此不會停機。\n放入用過一部分的同種催化劑時，剩餘壽命會併入裝填中的那個，空殼會作為失活催化劑送出。放入不同種類時，裝填中的會被退回出口並替換。備用為空時點擊槽，可以取出裝填中的催化劑。\n在催化反應器中，失活催化劑約 25% 可回收為低一級催化劑的材料。"
   },
   "guide.singulo.catalysts.slots.title": {
     "source": "Catalyst slots and recycling",
@@ -11758,5 +11758,21 @@
   "subtitles.singulo.black_hole.devour": {
     "source": "Blocks get pulled into the core",
     "translation": "方塊被吸入核心"
+  },
+  "gui.singulo.catalyst.loaded": {
+    "source": "Loaded: %s (%s%% left)",
+    "translation": "裝填中：%s（剩餘 %s%%）"
+  },
+  "gui.singulo.catalyst.loaded_hint": {
+    "source": "When it runs out, the spent catalyst comes out and the next one loads from the reserve. Partly used catalysts you add are merged in.",
+    "translation": "用盡後會送出失活催化劑，並從備用中裝填下一個。放入用過一部分的催化劑時會合併剩餘量"
+  },
+  "gui.singulo.catalyst.eject_hint": {
+    "source": "Click to take out the loaded catalyst",
+    "translation": "點擊取出裝填中的催化劑"
+  },
+  "gui.singulo.catalyst.spent_slot": {
+    "source": "Spent catalyst output",
+    "translation": "失活催化劑出口"
   }
 }

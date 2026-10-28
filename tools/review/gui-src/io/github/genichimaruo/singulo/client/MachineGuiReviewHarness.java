@@ -194,7 +194,7 @@ public final class MachineGuiReviewHarness {
             value(data, CatalystDeviceBlockEntity.D_WEAR_X100, 80);
             value(data, CatalystDeviceBlockEntity.D_EXTRA, 5);
             value(data, CatalystDeviceBlockEntity.D_ENABLED, 1);
-            var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO, kind, new ItemStackHandler(2), data);
+            var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO, kind, new ItemStackHandler(2), new ItemStackHandler(1), data);
             mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(),
                     Component.translatable(shield ? "block.singulo.shield_tower_core" : "block.singulo.worldline_anchor_small")));
             metrics.add(LANGUAGES[language] + "	catalyst-" + extra + "	0	0	176");

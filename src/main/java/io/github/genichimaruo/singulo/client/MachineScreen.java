@@ -562,7 +562,15 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             Panel.slot(g, skin, x + l.outputX, y + l.outputY[i]);
         }
         if (type().hasCatalystSlot()) {
-            drawSpecialSlot(g, x + l.catalystX, y + l.catalystY, Panel.AMBER, type().catalystSlot(), "time_crystal_catalyst");
+            boolean empty = menu.getSlot(menuIndexOf(type().catalystSlot())).getItem().isEmpty();
+            int loaded = menu.value(MachineBlockEntity.D_LOADED_ITEM);
+            if (!empty || loaded < 0) {
+                drawSpecialSlot(g, x + l.catalystX, y + l.catalystY, Panel.AMBER, type().catalystSlot(), "time_crystal_catalyst");
+            } else {
+                g.renderOutline(x + l.catalystX - 2, y + l.catalystY - 2, 20, 20, Panel.AMBER);
+                Panel.slot(g, skin, x + l.catalystX, y + l.catalystY);
+            }
+            drawLoadedCatalyst(g, x + l.catalystX, y + l.catalystY, loaded, menu.value(MachineBlockEntity.D_LOADED_FILL), empty);
         }
         int progress = menu.value(MachineBlockEntity.D_PROGRESS);
         int max = Math.max(1, menu.value(MachineBlockEntity.D_MAX_PROGRESS));
@@ -931,10 +939,17 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
                     ? "gui.singulo.make_free.on" : "gui.singulo.make_free.off"), mouseX, mouseY);
             return;
         }
-        if (type().hasCatalystSlot() && menu.getSlot(type().catalystSlot()).getItem().isEmpty()
-                && Panel.inside(mouseX, mouseY, x + l.catalystX, y + l.catalystY, 16, 16)) {
-            g.renderTooltip(font, Component.translatable("gui.singulo.slot.catalyst"), mouseX, mouseY);
-            return;
+        if (type().hasCatalystSlot() && Panel.inside(mouseX, mouseY, x + l.catalystX, y + l.catalystY, 16, 22)) {
+            boolean empty = menu.getSlot(menuIndexOf(type().catalystSlot())).getItem().isEmpty();
+            List<Component> loaded = loadedCatalystLines(menu.value(MachineBlockEntity.D_LOADED_ITEM), menu.value(MachineBlockEntity.D_LOADED_FILL), empty);
+            if (loaded != null && (empty || mouseY >= y + l.catalystY + 17)) {
+                g.renderComponentTooltip(font, loaded, mouseX, mouseY);
+                return;
+            }
+            if (empty) {
+                g.renderTooltip(font, Component.translatable("gui.singulo.slot.catalyst"), mouseX, mouseY);
+                return;
+            }
         }
         if (Panel.inside(mouseX, mouseY, x + MachineLayout.ENERGY_X, y + MachineLayout.TOP, 8, MachineLayout.BAR_HEIGHT)) {
             int usage = menu.value(MachineBlockEntity.D_USAGE);
@@ -1014,6 +1029,13 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             return true;
         }
         if (clickFrame(mouseX, mouseY, button)) {
+            return true;
+        }
+        if (type().hasCatalystSlot() && menu.getCarried().isEmpty() && minecraft != null && minecraft.gameMode != null
+                && menu.getSlot(menuIndexOf(type().catalystSlot())).getItem().isEmpty() && menu.value(MachineBlockEntity.D_LOADED_ITEM) >= 0
+                && Panel.inside(mouseX, mouseY, leftPos + layout().catalystX, topPos + layout().catalystY, 16, 16)) {
+            // 予備が空の触媒スロットをクリック: 装填中の触媒を取り出す
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, MachineMenu.BUTTON_EJECT_CATALYST);
             return true;
         }
         int[] fp = freePos();

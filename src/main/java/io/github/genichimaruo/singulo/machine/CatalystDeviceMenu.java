@@ -22,13 +22,15 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
     public static final int SLOT_Y = 24;
     /** 2つ目のスロット（燃料・許可証）の位置（触媒スロットの右）。 */
     public static final int EXTRA_X = 150;
+    /** 失活触媒の出口（触媒スロットの左）。 */
+    public static final int SPENT_X = 110;
 
     private final BlockPos pos;
     private final CatalystDeviceBlockEntity.Kind kind;
     private final SyncedInts data;
 
     public CatalystDeviceMenu(int containerId, Inventory inventory, BlockPos pos, CatalystDeviceBlockEntity.Kind kind,
-                              IItemHandler slot, SyncedInts data) {
+                              IItemHandler slot, IItemHandler spent, SyncedInts data) {
         super(SinguloMenus.CATALYST_DEVICE.get(), containerId);
         this.pos = pos;
         this.kind = kind;
@@ -47,6 +49,13 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
                 }
             });
         }
+        // 失活触媒の出口（取り出すだけ）
+        addSlot(new NotifyingItemSlot(spent, 0, SPENT_X, SLOT_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return false;
+            }
+        });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, INV_Y + row * 18));
@@ -62,7 +71,7 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
         BlockPos pos = buf.readBlockPos();
         CatalystDeviceBlockEntity.Kind kind = CatalystDeviceBlockEntity.Kind.values()[buf.readVarInt()];
         return new CatalystDeviceMenu(containerId, inventory, pos, kind, new ItemStackHandler(kind.extraSlot() != null ? 2 : 1),
-                SyncedInts.client(CatalystDeviceBlockEntity.COUNT));
+                new ItemStackHandler(1), SyncedInts.client(CatalystDeviceBlockEntity.COUNT));
     }
 
     public CatalystDeviceBlockEntity.Kind kind() {
@@ -73,7 +82,12 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
         return data.getInt(index);
     }
 
-    public static final int BUTTON_POWER = 0;
+    public static final int BUTTON_POWER = 0, BUTTON_EJECT = 1;
+
+    /** 失活触媒の出口のスロットの番号。 */
+    public int spentIndex() {
+        return kind.extraSlot() != null ? 2 : 1;
+    }
 
     public BlockPos pos() { return pos; }
 
@@ -81,6 +95,10 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(Player player, int id) {
         if (id == BUTTON_POWER && player.level().getBlockEntity(pos) instanceof CatalystDeviceBlockEntity device) {
             device.togglePower();
+            return true;
+        }
+        if (id == BUTTON_EJECT && player.level().getBlockEntity(pos) instanceof CatalystDeviceBlockEntity device) {
+            device.ejectLoaded(player);
             return true;
         }
         return false;
@@ -94,7 +112,7 @@ public class CatalystDeviceMenu extends AbstractContainerMenu {
         }
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
-        int device = kind.extraSlot() != null ? 2 : 1;
+        int device = spentIndex() + 1;
         if (index < device) {
             if (!moveItemStackTo(stack, device, slots.size(), true)) {
                 return ItemStack.EMPTY;

@@ -173,7 +173,7 @@ public final class RelocationGameTests {
                 player.setItemInHand(InteractionHand.MAIN_HAND,packed);
                 ((BlockItem)packed.getItem()).place(new BlockPlaceContext(context(player,h.absolutePos(b))));
                 WorldlineAnchorBlockEntity restored=h.getBlockEntity(b);
-                h.assertTrue(restored!=null && !restored.catalystSlot().getStackInSlot(0).isEmpty(),"Anchor lost its catalyst");
+                h.assertTrue(restored!=null && !restored.catalyst().isEmpty(),"Anchor lost its catalyst");
             } finally {player.discard();}
         });
         h.runAtTickTime(30,()->{

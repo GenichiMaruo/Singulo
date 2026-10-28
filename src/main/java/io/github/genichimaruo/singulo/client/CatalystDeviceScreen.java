@@ -38,6 +38,18 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (menu.getCarried().isEmpty() && !menu.getSlot(0).hasItem() && value(CatalystDeviceBlockEntity.D_LOADED_ITEM) >= 0
+                && minecraft != null && minecraft.gameMode != null
+                && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
+            // 予備が空の触媒スロットをクリック: 装填中の触媒を取り出す
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, CatalystDeviceMenu.BUTTON_EJECT);
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     protected Boolean powered() {
         return value(CatalystDeviceBlockEntity.D_ENABLED) != 0;
     }
@@ -103,8 +115,16 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
         if (renderFrameTooltips(g, mouseX, mouseY) || renderStatTooltips(g, mouseX, mouseY) || !menu.getCarried().isEmpty()) {
             return;
         }
-        if (!menu.getSlot(0).hasItem() && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
+        boolean empty = !menu.getSlot(0).hasItem();
+        List<Component> loaded = loadedCatalystLines(value(CatalystDeviceBlockEntity.D_LOADED_ITEM), value(CatalystDeviceBlockEntity.D_LOADED_FILL), empty);
+        if (Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 22)
+                && loaded != null && (empty || mouseY >= topPos + CatalystDeviceMenu.SLOT_Y + 17)) {
+            g.renderComponentTooltip(font, loaded, mouseX, mouseY);
+        } else if (empty && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
             g.renderTooltip(font, Component.translatable("gui.singulo.catalyst.none"), mouseX, mouseY);
+        } else if (!menu.getSlot(menu.spentIndex()).hasItem()
+                && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.SPENT_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
+            g.renderTooltip(font, Component.translatable("gui.singulo.catalyst.spent_slot"), mouseX, mouseY);
         } else if (menu.kind().extraSlot() != null && !menu.getSlot(1).hasItem()
                 && Panel.inside(mouseX, mouseY, leftPos + CatalystDeviceMenu.EXTRA_X, topPos + CatalystDeviceMenu.SLOT_Y, 16, 16)) {
             g.renderTooltip(font, Component.translatable(menu.kind().extraSlot()), mouseX, mouseY);
@@ -120,8 +140,19 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
         drawFrame(g, mouseX, mouseY);
         int capacity = Math.max(1, value(CatalystDeviceBlockEntity.D_CAPACITY));
         Panel.gauge(g, skin, leftPos + 8, topPos + centeredY(BAR_H + 2) + 1, 8, BAR_H, (double) value(CatalystDeviceBlockEntity.D_ENERGY) / capacity, Panel.GLOW);
-        ghostSlot(g, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, menu.getSlot(0),
-                new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("muon_catalyst"))));
+        int loaded = value(CatalystDeviceBlockEntity.D_LOADED_ITEM);
+        boolean empty = !menu.getSlot(0).hasItem();
+        if (empty && loaded >= 0) {
+            Panel.slot(g, skin, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y);
+        } else {
+            ghostSlot(g, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, menu.getSlot(0),
+                    new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("muon_catalyst"))));
+        }
+        drawLoadedCatalyst(g, leftPos + CatalystDeviceMenu.SLOT_X, topPos + CatalystDeviceMenu.SLOT_Y, loaded,
+                value(CatalystDeviceBlockEntity.D_LOADED_FILL), empty);
+        // 失活触媒の出口（取り出すだけ）
+        ghostSlot(g, leftPos + CatalystDeviceMenu.SPENT_X, topPos + CatalystDeviceMenu.SLOT_Y, menu.getSlot(menu.spentIndex()),
+                new ItemStack(BuiltInRegistries.ITEM.get(io.github.genichimaruo.singulo.Singulo.id("spent_muon_catalyst"))));
         if (menu.kind().extraSlot() != null) {
             Panel.slot(g, skin, leftPos + CatalystDeviceMenu.EXTRA_X, topPos + CatalystDeviceMenu.SLOT_Y);
             if (!menu.getSlot(1).hasItem()) {
