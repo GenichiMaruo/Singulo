@@ -75,7 +75,8 @@ WindowsのPowerShellでは `./gradlew.bat` を使います。ビルドしたJAR�
 
 | 場所 | 内容 |
 | --- | --- |
-| `src/main/java/` | mod本体とGameTest |
+| `src/main/java/` | mod本体。既存GameTestは別のソースセットでコンパイル |
+| `src/gameTest/java/` | 新しいGameTestと検査専用ヘルパー（製品JARには含めない） |
 | `tools/recipes.py`, `tools/config_spec.py`, `tools/ids.py` | レシピ・設定・登録名の生成元 |
 | `tools/guide.py`, `tools/descriptions.py` | ゲーム内ハンドブックとアイテム説明の生成元 |
 | `tools/gen_data.py` | 検証後に `src/generated/` とレシピ画像を再生成 |
@@ -88,3 +89,5 @@ uv run --no-project --python 3.12 tools/check_models.py
 ```
 
 `gen_data.py` は生成ディレクトリを作り直します。生成物への手修正は残りません。レシピと設定はサーバー設定・データパックによって変わるため、説明書の数値は既定値です。
+
+開発中の検査と短い再実行の方法は[テストの実行と追加](docs/development/testing.md)を参照してください。

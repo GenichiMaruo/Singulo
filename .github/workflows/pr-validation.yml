@@ -24,6 +24,9 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: gradle
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Validate translations and models
         run: |
           python3 tools/localization.py --check
@@ -31,26 +34,14 @@ jobs:
           python3 tools/check_models.py
           python3 tools/check_advancements.py
           python3 tools/check_supporters.py
-          python3 tools/test_release_1211.py
+          python3 -m unittest discover -s tools -p 'test_*.py'
+          python3 tools/check_gametests.py --inventory
       - name: Build and run required GameTests
         shell: bash
         run: |
           bash ./gradlew --no-daemon --max-workers=2 build runGameTestServer -PtestTickRate=200
       - name: Require all NeoForge GameTests
         run: python3 tools/check_release_1211.py --loader neoforge --build-dir build
-      - name: Check production JAR excludes GUI harness
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          import zipfile
-          jars = list(pathlib.Path("build/libs").glob("*.jar"))
-          if not jars:
-              raise SystemExit("No production JAR found")
-          for path in jars:
-              with zipfile.ZipFile(path) as jar:
-                  if any("GuiReviewHarness" in name or "Stage6ReviewHarness" in name for name in jar.namelist()):
-                      raise SystemExit("Development GUI harness leaked into " + str(path))
-          PY
       - name: Prepare disposable GUI review world
         run: python3 tools/review/prepare_gui.py
       - name: Run real client GUI smoke
@@ -60,12 +51,14 @@ jobs:
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle runClient -PmachineGuiReview
       - name: Require GUI captures
         run: |
-          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 212
-          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 190' build/gui-review/logs/latest.log
+          test "$(ls build/gui-review/screenshots/*.png | wc -l)" -eq 227
+          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 205' build/gui-review/logs/latest.log
           grep -q 'SINGULO_GUI_COMPLETE 22' build/gui-review/logs/latest.log
           grep -q 'SINGULO_SEARCH_COMPLETE' build/gui-review/logs/latest.log
           grep -q 'SINGULO_HANDBOOK_SEARCH_COMPLETE' build/gui-review/logs/latest.log
           grep -q 'SINGULO_JEI_SYNC_COMPLETE' build/gui-review/logs/latest.log
+      - name: Install PNG validation dependency
+        run: python3 -m pip install -r tools/review/requirements.txt
       - name: Verify inventory pixels in exported PNGs
         run: python3 tools/review/check_gui_png.py
       - name: Save build outputs and validation logs
@@ -102,8 +95,9 @@ jobs:
       - name: Prepare disposable light review world
         run: |
           bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PtestNamespace=singulo_rayleigh
+          python3 tools/check_gametests.py --namespaces singulo_rayleigh
           python3 tools/review/prepare_rayleigh.py
-          python3 -m pip install Pillow==13.0.0
+          python3 -m pip install -r tools/review/requirements.txt
       - name: Compare real Sodium and DH sunlight against clear noon
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -152,10 +146,14 @@ jobs:
       - name: Run optional chemical integration tests against real Mekanism
         run: bash ./gradlew --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism
       - name: Require completed nonempty integration tests
-        run: grep -E 'All 1 required tests passed' build/gametest/logs/latest.log
+        run: |
+          grep -E 'All 1 required tests passed' build/gametest/logs/latest.log
+          python3 tools/check_gametests.py --namespaces singulo_mekanism
       - name: Save integration logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mekanism-validation-${{ github.sha }}
-          path: build/gametest/logs/
+          path: |
+            build/gametest/logs/
+            build/reports/gametest/
