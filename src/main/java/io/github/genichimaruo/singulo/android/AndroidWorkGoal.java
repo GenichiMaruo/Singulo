@@ -322,6 +322,9 @@ final class AndroidWorkGoal extends Goal {
         }
         WorkJob job = android.workJob;
         if (job == null) {
+            // Stable per-worker phases spread initial requests and periodic retries across ticks.
+            // Keep lease heartbeats and cancellation checks above this gate responsive every tick.
+            if (Math.floorMod(level.getGameTime(), 8) != Math.floorMod(android.getUUID().hashCode(), 8)) return;
             begin(c.requestJob(android));
             job = android.workJob;
         }
