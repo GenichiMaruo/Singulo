@@ -420,7 +420,7 @@ public final class Stage2GameTests {
         helper.assertTrue(turbine.legacyNotice(), "前の版のタービンが知らせない");
         turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
         helper.assertTrue(turbine.legacyNotice(), "保存し直すと知らせを忘れる");
-        turbine.noticeIfLegacy(helper.makeMockServerPlayerInLevel());
+        turbine.noticeIfLegacy(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper));
         helper.assertTrue(!turbine.legacyNotice(), "画面を開いても知らせが残る");
         turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
         helper.assertTrue(!turbine.legacyNotice(), "知らせたあと保存し直すと、また知らせる");

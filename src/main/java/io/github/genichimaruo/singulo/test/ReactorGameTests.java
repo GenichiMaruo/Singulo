@@ -68,7 +68,7 @@ public final class ReactorGameTests {
         return helper.getBlockEntity(CONTROLLER);
     }
 
-    @GameTest(template = HUGE, batch = BATCH)
+    @GameTest(template = "empty", batch = BATCH)
     public static void accretionEfficiencyFollowsSpin(GameTestHelper helper) {
         double still = PenroseReactorBlockEntity.efficiency(0);
         double extremal = PenroseReactorBlockEntity.efficiency(1);

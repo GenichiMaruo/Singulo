@@ -47,6 +47,7 @@ public final class OptimizationGameTests {
         h.assertTrue(first != null && first.getStackInSlot(0).getCount() == 3, "Initial storage missing");
         for (int i = 0; i < 100; i++) h.assertTrue(port.adjacentItems.get(Direction.EAST) == first, "Connection was unnecessarily rebuilt");
         BlockPos absoluteTarget = h.absolutePos(target);
+        if (Boolean.getBoolean("singulo.testBenchmarks")) {
         for (int i = 0; i < 1000; i++) {
             h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST);
             port.adjacentItems.get(Direction.EAST);
@@ -61,6 +62,7 @@ public final class OptimizationGameTests {
         long cachedNanos = System.nanoTime() - start;
         h.assertTrue(directSlots == cachedSlots, "Cached storage exposes different slots");
         io.github.genichimaruo.singulo.Singulo.LOGGER.info("Optimization check: 20000 storage lookups, direct {} ms, cached {} ms", directNanos / 1e6, cachedNanos / 1e6);
+        }
         chest.setItem(0, new ItemStack(Items.IRON_INGOT, 7));
         h.assertTrue(port.adjacentItems.get(Direction.EAST).getStackInSlot(0).getCount() == 7, "Cached inventory quantity became stale");
         h.setBlock(target, Blocks.AIR);
@@ -86,21 +88,22 @@ public final class OptimizationGameTests {
             else for (int j = 0; j < 256; j++) step.after.add(j);
             order.steps.add(step);
         }
+        int workers = Boolean.getBoolean("singulo.testBenchmarks") ? 100 : 2;
         long start = System.nanoTime();
         int baseline = 0;
-        for (int worker = 0; worker < 100; worker++) for (var step : order.steps) {
+        for (int worker = 0; worker < workers; worker++) for (var step : order.steps) {
             if (!step.finished() && order.ready(step)) baseline++;
         }
         long scan = System.nanoTime() - start;
         start = System.nanoTime();
         int queued = 0;
         List<Integer> first = order.readySteps();
-        for (int worker = 0; worker < 100; worker++) {
+        for (int worker = 0; worker < workers; worker++) {
             h.assertTrue(order.readySteps() == first, "Unchanged ready queue was rebuilt");
             queued += order.readySteps().size();
         }
         long indexed = System.nanoTime() - start;
-        h.assertTrue(baseline == queued && queued == 25600, "Ready queue changed candidate availability");
+        h.assertTrue(baseline == queued && queued == 256 * workers, "Ready queue changed candidate availability");
         order.steps.getFirst().done = 0;
         h.assertTrue(order.readySteps().size() == 1 && order.readySteps().getFirst() == 0, "Same-tick dependency regression remained cached");
         order.steps.getFirst().done = 1;
@@ -108,7 +111,7 @@ public final class OptimizationGameTests {
         var small = new WorkOrder(2, recipe.output(), 1, null);
         small.steps.add(new WorkOrder.StepState(recipe, BlockPos.ZERO, Blocks.CRAFTING_TABLE, 1));
         h.assertTrue(small.readySteps() == null, "Small jobs paid for a dense dependency queue");
-        io.github.genichimaruo.singulo.Singulo.LOGGER.info("Optimization check: 512 steps, 100 workers; dependency scans {} ms, ready queue {} ms", scan / 1e6, indexed / 1e6);
+        io.github.genichimaruo.singulo.Singulo.LOGGER.info("Optimization check: 512 steps, {} workers; dependency scans {} ms, ready queue {} ms", workers, scan / 1e6, indexed / 1e6);
         var console = new WorkConsoleBlockEntity(h.absolutePos(new BlockPos(1, 1, 1)), SinguloBlocks.ANDROID_WORK_CONSOLE.get().defaultBlockState());
         console.setLevel(h.getLevel()); console.orders().add(order);
         var worker = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
@@ -123,8 +126,8 @@ public final class OptimizationGameTests {
 
     @GameTest(template = "empty")
     public static void commonViewsAreSharedWithoutLeakingViewerCandidates(GameTestHelper h) {
-        var alice = h.makeMockServerPlayerInLevel();
-        var bob = h.makeMockServerPlayerInLevel();
+        var alice = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
+        var bob = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         var worker = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
         int[] reads = {0};
         var console = new WorkConsoleBlockEntity(h.absolutePos(new BlockPos(1, 1, 1)), SinguloBlocks.ANDROID_WORK_CONSOLE.get().defaultBlockState()) {

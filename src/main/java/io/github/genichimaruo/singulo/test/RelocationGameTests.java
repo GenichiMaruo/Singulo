@@ -34,9 +34,9 @@ public final class RelocationGameTests {
         original.setSide(0,SideConfig.Face.TOP,SideConfig.NONE,false);
         original.setEjectEnabled(0,true);
         int sides=original.itemSides().packed();
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        var viewer=h.makeMockServerPlayerInLevel();
+        var viewer=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         viewer.setPos(Vec3.atCenterOf(h.absolutePos(a)));
         viewer.containerMenu = new MachineMenu(1, viewer.getInventory(), original);
         try {
@@ -73,7 +73,7 @@ public final class RelocationGameTests {
         BlockPos a=new BlockPos(2,1,2), chest=new BlockPos(4,1,2);
         h.setBlock(a,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
         h.setBlock(chest,net.minecraft.world.level.block.Blocks.CHEST);
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
             player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
@@ -93,7 +93,7 @@ public final class RelocationGameTests {
                 SinguloBlocks.PROBE_STATION, SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER,
                 SinguloBlocks.SHIELD_TOWER_CORE, SinguloBlocks.TIPLER_CORE);
         BlockPos a=new BlockPos(2,1,2), b=new BlockPos(5,1,2);
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             for(var block:blocks) {
                 player.getInventory().clearContent();
@@ -133,7 +133,7 @@ public final class RelocationGameTests {
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
         MachineBlockEntity machine=h.getBlockEntity(pos);
         machine.items().setStackInSlot(0,new ItemStack(Items.COAL,13));
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             player.setPos(Vec3.atCenterOf(h.absolutePos(pos)));
             for(int n=0;n<36;n++) player.getInventory().setItem(n,new ItemStack(Items.DIRT,64));
@@ -159,7 +159,7 @@ public final class RelocationGameTests {
         original.catalystSlot().insertItem(0,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst"))),false);
         h.runAtTickTime(10,()->{
             h.assertTrue(original.loadedRadius()>=0,"Anchor did not start before packing");
-            var player=h.makeMockServerPlayerInLevel();
+            var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
             try {
                 var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
                 player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
@@ -191,7 +191,7 @@ public final class RelocationGameTests {
         for(int x=1;x<=5;x++) h.setBlock(new BlockPos(x,1,2),copper);
         h.setBlock(new BlockPos(6,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         h.setBlock(new BlockPos(1,1,4),copper);
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         try {
             var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
@@ -232,7 +232,7 @@ public final class RelocationGameTests {
         MachineBlockEntity kiln = h.getBlockEntity(machine);
         kiln.items().setStackInSlot(0, new ItemStack(Items.COAL, 13));
         for (int x = 1; x <= 3; x++) h.setBlock(new BlockPos(x, 1, 4), SinguloBlocks.COPPER_WIRE.get());
-        var player = h.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         java.util.function.Consumer<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> protect = event -> {
             if (event.getPlayer() == player && (event.getPos().equals(h.absolutePos(machine))

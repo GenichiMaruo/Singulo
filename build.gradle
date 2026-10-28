@@ -11,6 +11,35 @@ group = mod_group_id
 sourceSets.main.resources.srcDir('src/generated/resources')
 sourceSets.main.java.srcDir('src/generated/java')
 
+// Compile integration fixtures separately: never ship test classes in the mod JAR.
+sourceSets {
+    gameTest {
+        java.srcDir('src/main/java')
+        java.srcDir('src/gameTest/java')
+        // Narrow local reruns compile/register only these classes; full CI uses no filter.
+        def selected = providers.gradleProperty('testClasses').getOrElse('').split(',').findAll { !it.isBlank() }
+        if (selected.any { !(it ==~ /[A-Za-z][A-Za-z0-9]*GameTests/) }) {
+            throw new GradleException('testClasses expects comma-separated GameTests class names')
+        }
+        for (name in selected) {
+            if (fileTree('src/main/java').matching { include "**/${name}.java" }.isEmpty()
+                    && fileTree('src/gameTest/java').matching { include "**/${name}.java" }.isEmpty()) {
+                throw new GradleException("Unknown GameTest class: ${name}")
+            }
+        }
+        java.include(selected.isEmpty() ? ['**/*GameTests.java'] : selected.collect { "**/${it}.java" })
+        java.include('**/test/TestBuild.java', '**/test/harness/**')
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+sourceSets.main.java.exclude('**/*GameTests.java', '**/test/TestBuild.java')
+configurations {
+    gameTestImplementation.extendsFrom implementation
+    gameTestCompileOnly.extendsFrom compileOnly
+    gameTestRuntimeOnly.extendsFrom runtimeOnly, localRuntime
+}
+
 base {
     archivesName = mod_name
 }
@@ -24,6 +53,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
     version = project.neo_version
+    addModdingDependenciesTo(sourceSets.gameTest)
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -51,6 +81,8 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_prototype,singulo_progression,singulo_gunner,singulo_cable,singulo_rayleigh,singulo_panel_review,singulo_scaling')
             // テストは tick で数えるので、時計を速めても結果は変わらない（-PtestTickRate=20 で普通の速さ）
             systemProperty 'singulo.gameTestTickRate', providers.gradleProperty('testTickRate').getOrElse('200')
+            systemProperty 'singulo.testBenchmarks', providers.gradleProperty('testBenchmarks').getOrElse('false')
+            systemProperty 'singulo.testReport', file('build/reports/gametest/results.json').absolutePath
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -61,6 +93,7 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gameTest)
         }
     }
 }
@@ -69,6 +102,7 @@ neoForge {
 // （世界線アンカーが読み込み続けるチャンクの反応炉・ワームホールなどが動き続け、回を重ねるほど遅く・不安定になる）。
 var cleanGameTestWorld = tasks.register('cleanGameTestWorld', Delete) {
     delete layout.projectDirectory.dir('build/gametest/world')
+    delete layout.projectDirectory.dir('build/reports/gametest')
 }
 tasks.matching { it.name == 'runGameTestServer' }.configureEach {
     dependsOn cleanGameTestWorld

@@ -47,7 +47,7 @@ public final class SealedGameTests {
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
         SealedContainerBlockEntity box = helper.getBlockEntity(pos);
         box.sealWithLoot();
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         box.interact(player, ItemStack.EMPTY);
         box.interact(player, item("quantum_key"));
@@ -85,7 +85,7 @@ public final class SealedGameTests {
         SealedContainerBlockEntity box = helper.getBlockEntity(pos);
         helper.assertTrue(box.phase() == Phase.OPEN, "置いたばかりなのに封印されている");
         box.setItem(3, new ItemStack(Items.EMERALD, 5));
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setShiftKeyDown(true);
         box.interact(player, item("magnetic_key"));
         helper.assertTrue(box.phase() == Phase.SEALING, "鍵を持ってスニークしても封印されない");
@@ -111,7 +111,7 @@ public final class SealedGameTests {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.SEALED_CONTAINERS.get(0).get());
         SealedContainerBlockEntity box = helper.getBlockEntity(pos);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             player.setShiftKeyDown(true);
@@ -208,7 +208,7 @@ public final class SealedGameTests {
     /** 次元ポケットの中身はプレイヤーに付いていて、開き直しても残る。 */
     @GameTest(template = EMPTY)
     public static void dimensionalPocketKeepsContents(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         DimensionalPocketItem.Pocket first = new DimensionalPocketItem.Pocket(player);
         first.setItem(5, new ItemStack(Items.GOLD_INGOT, 7));
         first.setChanged();
@@ -220,7 +220,7 @@ public final class SealedGameTests {
     /** 重力ブーツを履いていると落下ダメージを受けない。 */
     @GameTest(template = EMPTY)
     public static void gravityBootsPreventFallDamage(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setItemSlot(EquipmentSlot.FEET, new ItemStack(SinguloItems.GRAVITY_BOOTS.get()));
         float before = player.getHealth();
         player.causeFallDamage(30, 1.0F, player.damageSources().fall());

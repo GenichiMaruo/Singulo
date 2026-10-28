@@ -279,7 +279,7 @@ public final class Stage4GameTests {
 
     @GameTest(template = EMPTY)
     public static void probeStationFetchesFromDiscoveredObservationPost(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             RuinDiscovery.record(player, "observation_post", new BlockPos(100, 64, 100));
             RuinDiscovery.record(player, "culture_facility", new BlockPos(200, -40, 200));   // 常に手動

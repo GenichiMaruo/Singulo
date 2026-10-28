@@ -158,7 +158,7 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, batch = "android_guard_hp", timeoutTicks = 160)
     public static void guardIgnoresPlayersAndReportsHealth(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
             RuinAndroid a = androids(helper).get(0);
             float before = a.getHealth();
@@ -303,7 +303,7 @@ public final class AndroidGameTests {
         BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
         guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
         BladeAndroid ruin = SinguloEntities.BLADE_ANDROID.get().create(level);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         List<LivingEntity> spared = List.of(SinguloEntities.GRAVITY_REMNANT.get().create(level), EntityType.COW.create(level),
                 EntityType.VILLAGER.create(level), player);
@@ -421,9 +421,9 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void permitAndFollowSettings(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
-        var stranger = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var friend = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var stranger = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -467,8 +467,8 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void removedMemberLosesAndroidScreen(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var friend = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -622,7 +622,7 @@ public final class AndroidGameTests {
         a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
         a.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.containerMenu.setCarried(new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET));
         helper.assertTrue(a.useTankContainer(player, 0), "水入りバケツでタンクに入れられない");
         var water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1);
@@ -829,7 +829,7 @@ public final class AndroidGameTests {
             helper.assertTrue(slot != RuinAndroid.PACK_START + 20, "ティアより後ろの枠を作業に使う");
         }
         helper.assertTrue(a.inventory().getItem(RuinAndroid.PACK_START + 20).getCount() == 5, "ティアより後ろの枠の物が消えた");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
         net.minecraft.world.inventory.Slot backpack = menu.slots.stream()
                 .filter(s -> s.container == a.inventory() && s.getContainerSlot() == RuinAndroid.SLOT_BACKPACK).findFirst().orElseThrow();
@@ -900,7 +900,7 @@ public final class AndroidGameTests {
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
         net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -934,7 +934,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
         io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity port = helper.getBlockEntity(SUPPLY2);
-        port.useItem(helper.makeMockServerPlayerInLevel(), link, net.minecraft.world.InteractionHand.MAIN_HAND);
+        port.useItem(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), link, net.minecraft.world.InteractionHand.MAIN_HAND);
         return port;
     }
 
@@ -966,7 +966,7 @@ public final class AndroidGameTests {
         net.minecraft.world.level.block.entity.ChestBlockEntity far = helper.getBlockEntity(CHEST2);
         far.setItem(0, new ItemStack(planks, 4));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1016,7 +1016,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(item("time_crystal_module")), 1,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(item("time_crystal_module")), 1,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1043,7 +1043,7 @@ public final class AndroidGameTests {
         net.minecraft.world.level.block.entity.ChestBlockEntity near = helper.getBlockEntity(CHEST);
         near.setItem(1, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 2));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(stick), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(stick), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1083,7 +1083,7 @@ public final class AndroidGameTests {
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 640,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 640,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         int[] most = {0};
@@ -1130,7 +1130,7 @@ public final class AndroidGameTests {
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         int[] trips = {0};
@@ -1178,7 +1178,7 @@ public final class AndroidGameTests {
         if (backpack) {
             a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
         }
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         java.util.Map<String, Integer> dropped = new java.util.TreeMap<>();
@@ -1212,7 +1212,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(0, bench);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity wb = helper.getBlockEntity(TABLE);
@@ -1276,7 +1276,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(0, bench);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "量子アンドロイド作業台で注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1333,7 +1333,7 @@ public final class AndroidGameTests {
                 helper.getBlockState(TABLE));
         copy.loadWithComponents(tag, helper.getLevel().registryAccess());
         helper.assertTrue(copy.buffer().getStackInSlot(0).getCount() == 10, "保存すると預かり箱の物が消える");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         wb.openMenu(player);
         helper.assertTrue(wb.bufferEmpty() && player.getInventory().countItem(net.minecraft.world.item.Items.OAK_FENCE) == 10,
                 "右クリックで預かり箱の物を受け取れない");
@@ -1397,7 +1397,7 @@ public final class AndroidGameTests {
                 CompoundTag saved = a.saveWithoutId(new CompoundTag());
                 saved.putInt("charge", 25);                        // 2回作ると切れる
                 a.load(saved);
-                var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
+                var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
                         List.of(a.getUUID()), helper.absolutePos(DELIVERY));
                 helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
             }
@@ -1526,7 +1526,7 @@ public final class AndroidGameTests {
         a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.assertTrue(a.isWorking(), "アンドロイドが作業中にならない");
@@ -1564,7 +1564,7 @@ public final class AndroidGameTests {
             helper.getLevel().addFreshEntity(a);
             crew.add(a);
         }
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         // Other concurrently running fixtures may also have unowned guards in range.
         var candidates = console.candidates(player);
         helper.assertTrue(candidates.containsAll(crew), "用意した3体が選べる候補にならない");
@@ -1607,7 +1607,7 @@ public final class AndroidGameTests {
             helper.getLevel().addFreshEntity(a);
         }
         capable.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         for (boolean gui : List.of(false, true)) {
             var ids = gui ? List.of(small.getUUID(), capable.getUUID()) : List.<java.util.UUID>of();
             var error = console.start(player, new ItemStack(Items.CAKE), 1, ids, gui, helper.absolutePos(DELIVERY));
@@ -1677,7 +1677,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
@@ -1717,7 +1717,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(item("time_crystal_module")), 3,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(item("time_crystal_module")), 3,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1771,7 +1771,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(item("time_crystal_module")), 1,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(item("time_crystal_module")), 1,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1813,7 +1813,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1850,7 +1850,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         boolean[] fuelOrdered = {false};
@@ -1888,7 +1888,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error != null && error.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
                 && t.getKey().equals("gui.singulo.work_console.error.wrong_face"), "入れる面の間違いを断らない: " + error);
@@ -1922,7 +1922,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 4, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "鉄インゴットを注文できない: " + (error == null ? "" : error.getString()));
@@ -1967,7 +1967,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(2, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "白樺の板材で棒を注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1998,7 +1998,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -2023,7 +2023,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);   // 場所のカードがない行
         BladeAndroid plain = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack cobble = new ItemStack(net.minecraft.world.item.Items.COBBLESTONE);
         helper.assertTrue(console.start(player, cobble, 2, List.of(plain.getUUID()), helper.absolutePos(DELIVERY)) != null,
                 "採掘アップグレードなしで採掘の注文ができた");
@@ -2050,7 +2050,7 @@ public final class AndroidGameTests {
         net.minecraft.world.level.block.entity.ChestBlockEntity seed = helper.getBlockEntity(CHEST);
         seed.setItem(5, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.register(player, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 4,
                 io.github.genichimaruo.singulo.android.work.StandingOrder.KEEP, null, List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.assertTrue(error == null, "登録できない: " + (error == null ? "" : error.getString()));
@@ -2074,7 +2074,7 @@ public final class AndroidGameTests {
     public static void standingOrderOnPulse(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         console.register(player, new ItemStack(net.minecraft.world.item.Items.STICK), 4,
                 io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE, helper.absolutePos(DELIVERY), List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.runAfterDelay(60, () -> {
@@ -2094,7 +2094,7 @@ public final class AndroidGameTests {
     public static void workingAndroidFightsBack(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         net.minecraft.world.entity.monster.Zombie[] attacker = {null};
         helper.startSequence()
@@ -2146,7 +2146,7 @@ public final class AndroidGameTests {
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 2, 5)),
                 helper.absolutePos(new BlockPos(1, 2, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -2167,7 +2167,7 @@ public final class AndroidGameTests {
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 1, 5)),
                 helper.absolutePos(new BlockPos(2, 3, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD, 4));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD), 4,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD), 4,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -2190,7 +2190,7 @@ public final class AndroidGameTests {
         procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL, helper.absolutePos(new BlockPos(0, 1, 5)),
                 helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 3));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         BladeAndroid plain = worker(helper, false);
         helper.assertTrue(console.start(player, new ItemStack(net.minecraft.world.item.Items.OAK_LOG), 3, List.of(plain.getUUID()),
                 helper.absolutePos(DELIVERY)) != null, "伐採アップグレードなしで伐採の注文ができた");
@@ -2218,7 +2218,7 @@ public final class AndroidGameTests {
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, helper.absolutePos(new BlockPos(0, 1, 5)),
                 helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL), 1,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL), 1,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -2240,7 +2240,7 @@ public final class AndroidGameTests {
         ItemStack worn = a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD);
         helper.assertTrue(worn.is(item("android_ribbon")), "頭の装飾が伝わらない");
         helper.assertTrue(((io.github.genichimaruo.singulo.android.AndroidAccessoryItem) worn.getItem()).color(worn) == 0x123456, "染めた色が使われない");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
         helper.assertFalse(menu.getSlot(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND)
                 .mayPlace(new ItemStack(item("android_cape"))), "手の枠にマントが入る");
@@ -2260,7 +2260,7 @@ public final class AndroidGameTests {
         chest.setItem(0, new ItemStack(planks, 3));
         BladeAndroid a = worker(helper, false);
         a.setNoAi(true);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(planks), 3, List.of(a.getUUID()), null);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(planks), 3, List.of(a.getUUID()), null);
         helper.assertTrue(error == null, "在庫の納品を注文できない");
         var job = console.requestJob(a);
         var pickups = console.planPickup(job, a.blockPosition());
@@ -2405,7 +2405,7 @@ public final class AndroidGameTests {
         for (int i = 0; i < 4; i++) {
             a.inventory().setItem(RuinAndroid.CARRY_START + i, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
         }
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         boolean[] dropped = {false};
@@ -2470,7 +2470,7 @@ public final class AndroidGameTests {
     public static void androidResumesCraftAfterReload(GameTestHelper helper) {
         var console = workshop(helper, 1);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない");
         helper.startSequence()
@@ -2561,9 +2561,9 @@ public final class AndroidGameTests {
     public static void workLinksEnforcePermissionChanges(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
-        var stranger = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var friend = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var stranger = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         friend.moveTo(Vec3.atCenterOf(helper.absolutePos(SUPPLY)));
         console.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
@@ -2839,7 +2839,7 @@ public final class AndroidGameTests {
                 SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get());
         rack.items().setStackInSlot(0, loc);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
                 4096, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "Bulk order was rejected: " + error);
         var port = (io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity) helper.getBlockEntity(DELIVERY);
@@ -2950,7 +2950,7 @@ public final class AndroidGameTests {
     public static void partialWorkbenchBatchIsCountedOnlyOnce(GameTestHelper helper) {
         var console = workshop(helper, 64);
         BladeAndroid a = worker(helper, false); a.setNoAi(true);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
                 256, List.of(a.getUUID()), null);
         helper.assertTrue(error == null, "Could not start partial-batch fixture");
         var job = console.requestJob(a);
@@ -2970,7 +2970,7 @@ public final class AndroidGameTests {
         net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
         for (int i = 0; i < 5; i++) chest.setItem(i, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
         BladeAndroid a = worker(helper, false); a.setNoAi(true);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
                 1280, List.of(a.getUUID()), null);
         helper.assertTrue(error == null, "Could not plan buffered crafting");
         var job = console.requestJob(a);

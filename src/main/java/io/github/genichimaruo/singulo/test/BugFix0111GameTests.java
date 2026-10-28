@@ -136,7 +136,7 @@ public final class BugFix0111GameTests {
         // 両方壊して、ひとつだけ置き直す: 残っていた高さ 9 のまま
         helper.setBlock(boxA, Blocks.AIR);
         helper.setBlock(boxB, Blocks.AIR);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.setItemInHand(InteractionHand.MAIN_HAND, dropped);
             BlockPos at = helper.absolutePos(boxA);
@@ -156,7 +156,7 @@ public final class BugFix0111GameTests {
         BlockPos projector = new BlockPos(1, 1, 1), line = new BlockPos(3, 1, 1);
         helper.setBlock(projector, SinguloBlocks.ECHO_PROJECTOR.get());
         helper.setBlock(line, SinguloBlocks.FACTORY_LINE.get());
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             var level = helper.getLevel();
             BlockPos pa = helper.absolutePos(projector), pl = helper.absolutePos(line);

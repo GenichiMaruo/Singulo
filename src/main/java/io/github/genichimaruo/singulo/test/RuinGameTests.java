@@ -139,47 +139,30 @@ public final class RuinGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 600, batch = "drone_altitude")
+    @GameTest(template = "huge", batch = "drone_altitude", timeoutTicks = 240)
     public static void healthyDroneDescendsAndCannotShootFromHighAbove(GameTestHelper helper) throws Exception {
-        var level = helper.getLevel();
-        BlockPos floor = helper.absolutePos(POS).offset(0, 64, 256);
-        var forced = new java.util.ArrayList<net.minecraft.world.level.ChunkPos>();
-        for (int x = (floor.getX() - 12) >> 4; x <= (floor.getX() + 12) >> 4; x++) {
-            for (int z = (floor.getZ() - 12) >> 4; z <= (floor.getZ() + 12) >> 4; z++) {
-                var chunk = new net.minecraft.world.level.ChunkPos(x, z);
-                if (!level.getForcedChunks().contains(chunk.toLong())) { level.setChunkForced(x, z, true); forced.add(chunk); }
-            }
+        // All flight coordinates belong to the template: its chunks are already entity-ticking.
+        // Teleporting into a separately forced, still-loading chunk races that guarantee.
+        BlockPos floor = new BlockPos(7, 0, 7);
+        for (BlockPos pos : BlockPos.betweenClosed(0, 0, 0, 14, 0, 14)) {
+            helper.setBlock(pos, net.minecraft.world.level.block.Blocks.STONE);
         }
-        for (BlockPos pos : BlockPos.betweenClosed(floor.offset(-12, 0, -12), floor.offset(12, 0, 12))) {
-            level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
-        }
-        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 12, 3));
-        // Other simultaneous fixtures create players. Keep this altitude test's
-        // manually assigned target instead of letting player acquisition replace it.
-        var selectors = net.minecraft.world.entity.Mob.class.getDeclaredField("targetSelector");
-        selectors.setAccessible(true);
-        ((net.minecraft.world.entity.ai.goal.GoalSelector) selectors.get(drone)).removeAllGoals(goal -> true);
-        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS);
-        target.moveTo(floor.above().getCenter());
-        drone.moveTo(floor.above(12).getCenter());
+        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), floor.above(12));
+        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, floor.above());
         target.setNoAi(true); target.setNoGravity(true);
-        Runnable cleanup = () -> {
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(() -> {
             drone.discard(); target.discard();
-            for (var chunk : forced) level.setChunkForced(chunk.x, chunk.z, false);
-        };
-        helper.runAtTickTime(590, cleanup);
+        });
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);
         target.setHealth(1000); drone.setTarget(target);
         var shoot = SecurityDrone.class.getDeclaredMethod("shoot", net.minecraft.world.entity.LivingEntity.class);
         shoot.setAccessible(true); shoot.invoke(drone, target);
         helper.assertTrue(helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.HorizonBolt.class,
                 drone.getBoundingBox().inflate(3), bolt -> bolt.getOwner() == drone).isEmpty(), "高空から射撃できてしまう");
-        // Count actual entity ticks: accelerated GameTests can run ahead of chunk ticket promotion.
         helper.succeedWhen(() -> {
-            helper.assertTrue(drone.tickCount >= 120, "Waiting for the drone's entity-ticking chunk");
+            helper.assertTrue(drone.tickCount >= 120, "Waiting for 120 actual drone ticks");
             helper.assertFalse(drone.crippled(), "高度検査中に壊れかけになった");
             helper.assertTrue(drone.getY() <= target.getY() + 2.8, "健康なドローンが高空に留まる: " + (drone.getY() - target.getY()));
-            cleanup.run();
         });
     }
 
@@ -320,7 +303,7 @@ public final class RuinGameTests {
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
         RuinCacheBlockEntity cache = helper.getBlockEntity(pos);
         cache.setRuin("observation_post");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setShiftKeyDown(true);
         net.minecraft.world.item.ItemStack compass = new net.minecraft.world.item.ItemStack(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get());

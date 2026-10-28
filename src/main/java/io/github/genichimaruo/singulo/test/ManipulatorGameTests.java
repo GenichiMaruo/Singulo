@@ -60,7 +60,7 @@ public final class ManipulatorGameTests {
     /** 右クリックでためて離すと、持ち上げたモブが前へ飛んでいき、1秒は持ち上げられない。 */
     @GameTest(template = "huge", timeoutTicks = 140)
     public static void manipulatorChargeAndThrow(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(2, 1, 1));
@@ -103,7 +103,7 @@ public final class ManipulatorGameTests {
     /** 円錐（G キー）で持ち上げていても、ためて離すと投げられる。 */
     @GameTest(template = "huge", timeoutTicks = 140)
     public static void manipulatorThrowInConeMode(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             net.minecraft.core.BlockPos base = helper.absolutePos(new net.minecraft.core.BlockPos(7, 1, 1));

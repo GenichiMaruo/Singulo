@@ -39,7 +39,7 @@ public final class GenesisGameTests {
     @GameTest(template = LARGE, timeoutTicks = 120)
     public static void formsAndKindlesWithSeed(GameTestHelper helper) {
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.succeedWhen(() -> {
             helper.assertTrue(core.formed() && core.stage() == GenesisCoreBlockEntity.CRADLE, "形ができて揺籃になる");
             if (core.stage() == GenesisCoreBlockEntity.CRADLE) {
@@ -58,7 +58,7 @@ public final class GenesisGameTests {
     @GameTest(template = LARGE, timeoutTicks = 100)
     public static void missingPylonStaysUnformed(GameTestHelper helper) {
         GenesisCoreBlockEntity core = build(helper, true);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAfterDelay(60, () -> {
             helper.assertFalse(core.formed(), "柱が欠けていると形ができない");
             helper.assertFalse(core.useItem(player, new ItemStack(GenesisCoreBlockEntity.primordialSeed())), "種を受け付けない");
@@ -71,7 +71,7 @@ public final class GenesisGameTests {
     @GameTest(template = LARGE, timeoutTicks = 140)
     public static void redstoneStopsTheFeed(GameTestHelper helper) {
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAfterDelay(50, () -> {
             helper.assertTrue(core.useItem(player, new ItemStack(GenesisCoreBlockEntity.primordialSeed())), "種火が始まる");
             helper.setBlock(CORE.below(), Blocks.REDSTONE_BLOCK);
@@ -91,7 +91,7 @@ public final class GenesisGameTests {
     @GameTest(template = LARGE, timeoutTicks = 140)
     public static void screenTogglesFeedAndHandsOutput(GameTestHelper helper) {
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAfterDelay(50, () -> {
             helper.assertTrue(core.useItem(player, new ItemStack(GenesisCoreBlockEntity.primordialSeed())), "種火が始まる");
             var menu = new io.github.genichimaruo.singulo.genesis.GenesisCoreMenu(0, player.getInventory(), helper.absolutePos(CORE),
@@ -117,7 +117,7 @@ public final class GenesisGameTests {
     @GameTest(template = LARGE, timeoutTicks = 100)
     public static void completedCoreRemembersAndPicksFromScreen(GameTestHelper helper) {
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var registries = helper.getLevel().registryAccess();
         net.minecraft.nbt.CompoundTag done = new net.minecraft.nbt.CompoundTag();
         done.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
@@ -185,7 +185,7 @@ public final class GenesisGameTests {
         core.loadCustomOnly(done, helper.getLevel().registryAccess());
         ItemStack fancy = new ItemStack(Items.DIAMOND);
         fancy.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("宝"));
-        helper.assertTrue(core.chooseTemplate(helper.makeMockServerPlayerInLevel(), fancy), "ダイヤモンドを登録できない");
+        helper.assertTrue(core.chooseTemplate(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), fancy), "ダイヤモンドを登録できない");
         helper.assertTrue(core.template().is(Items.DIAMOND) && !core.template().has(net.minecraft.core.component.DataComponents.CUSTOM_NAME),
                 "見本の名前まで写している");
         helper.succeed();

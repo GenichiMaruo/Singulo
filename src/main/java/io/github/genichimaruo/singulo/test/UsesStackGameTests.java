@@ -66,7 +66,7 @@ public final class UsesStackGameTests {
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.ARCHIVE_TERMINAL).get());
         MachineBlockEntity archive=h.getBlockEntity(pos);
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             player.getInventory().setItem(9,item("quantum_data_fragment",64));
             MachineMenu menu=new MachineMenu(1,player.getInventory(),archive);

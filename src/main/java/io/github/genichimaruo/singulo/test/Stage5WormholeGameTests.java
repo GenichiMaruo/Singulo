@@ -324,7 +324,7 @@ public final class Stage5WormholeGameTests {
 
     @GameTest(template = EMPTY)
     public static void manipulatorConeAndDarkMatterFuel(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.getAbilities().instabuild = false;
             BlockPos at = helper.absolutePos(new BlockPos(1, 1, 4));
