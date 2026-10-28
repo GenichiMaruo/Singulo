@@ -529,6 +529,10 @@ final class AndroidWorkGoal extends Goal {
         while (made < n && craftOnce(level, c, job, at, step.recipe())) {
             made++;
         }
+        if (made == 0 && craftStorageFull) {
+            pauseCraft(c, job);
+            return;
+        }
         if (made == 0) {
             android.setState(RuinAndroid.STATE_IDLE);
             fail(c, job, WorkConsoleBlockEntity.Failure.BAD_RECIPE);
@@ -537,13 +541,27 @@ final class AndroidWorkGoal extends Goal {
         android.playSound(SoundEvents.VILLAGER_WORK_TOOLSMITH, 0.6F, 1.4F);
         android.sparks(level, Vec3.atCenterOf(at).add(0, 0.6, 0), 4, 0.25);
         crafted += made;
-        android.spend(cost * made);             // 製作済みの回数は、充電切れでも下で確定する
+        android.spend(cost * made);
+        if (craftStorageFull) {
+            pauseCraft(c, job);
+            return;
+        }
+        // 製作済みの回数は、充電切れでも下で確定する
         if (crafted >= step.crafts()) {
             // この工程を作り終えた: 次の工程（次の作業場所）へ。全部終われば、納品か片付けへ
             // （作る姿勢は、歩き出すまで続ける。ここで立ち姿に戻すと、続けて作るときに頭が一瞬ガクッと動くので）
             crafted = 0;
             batchIndex++;
         }
+    }
+
+    private boolean craftStorageFull;
+
+    private void pauseCraft(WorkConsoleBlockEntity console, WorkJob job) {
+        console.completePartialCraft(job, batchIndex, crafted);
+        crafted = 0;
+        android.setStall(RuinAndroid.STALL_FULL);
+        afterJob(console, job);
     }
 
     /**
@@ -2345,6 +2363,7 @@ final class AndroidWorkGoal extends Goal {
      * 素材が足りない・レシピが合わないときは false（何も減らさない）。
      */
     private boolean craftOnce(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, BlockPos at, @Nullable RecipeData recipe) {
+        craftStorageFull = false;
         if (recipe == null) {
             return false;
         }
@@ -2358,43 +2377,59 @@ final class AndroidWorkGoal extends Goal {
         if (match.isEmpty()) {
             return false;
         }
+        int[] carry = android.carrySlots();
+        int[] used = new int[carry.length];
         for (ItemCount in : recipe.inputs()) {
-            int have = 0;
-            for (int slot : android.carrySlots()) {
-                if (in.matches(android.inventory().getItem(slot))) {
-                    have += android.inventory().getItem(slot).getCount();
+            long left = in.count;
+            for (int i = 0; i < carry.length && left > 0; i++) {
+                ItemStack held = android.inventory().getItem(carry[i]);
+                if (in.matches(held)) {
+                    int take = (int) Math.min(left, held.getCount() - used[i]);
+                    used[i] += take; left -= take;
                 }
             }
-            if (have < in.count) {
-                return false;
-            }
+            if (left > 0) return false;
         }
         ItemStack result = match.get().value().assemble(input, level.registryAccess());
         NonNullList<ItemStack> remaining = match.get().value().getRemainingItems(input);
-        for (ItemCount in : recipe.inputs()) {
-            android.takeFromCarry(in.item, (int) in.count);
+        return commitCraft(level, c, job, at, used, result, remaining);
+    }
+
+    /** Simulate consumption and every output together; commit only if no item needs to be dropped. */
+    private boolean commitCraft(ServerLevel level, WorkConsoleBlockEntity console, WorkJob job, BlockPos at,
+                                int[] used, ItemStack result, NonNullList<ItemStack> remaining) {
+        int[] slots = android.carrySlots();
+        var carried = new net.neoforged.neoforge.items.ItemStackHandler(slots.length);
+        for (int i = 0; i < slots.length; i++) {
+            ItemStack before = android.inventory().getItem(slots[i]);
+            carried.setStackInSlot(i, before.copyWithCount(before.getCount() - used[i]));
         }
-        keepCrafted(level, c, job, at, result);
-        for (ItemStack r : remaining) {
-            if (!r.isEmpty()) {
-                keepCrafted(level, c, job, at, r);
+        var bench = level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity b ? b : null;
+        net.neoforged.neoforge.items.ItemStackHandler stored = null;
+        var outputs = new java.util.ArrayList<ItemStack>();
+        outputs.add(result); outputs.addAll(remaining);
+        for (ItemStack output : outputs) {
+            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(carried, output.copy(), false);
+            if (!rest.isEmpty() && bench != null) {
+                // Most crafts fit in the carry inventory. Snapshot the larger bench only on overflow.
+                if (stored == null) {
+                    stored = new net.neoforged.neoforge.items.ItemStackHandler(bench.buffer().getSlots());
+                    for (int i = 0; i < stored.getSlots(); i++) stored.setStackInSlot(i, bench.buffer().getStackInSlot(i).copy());
+                }
+                rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(stored, rest, false);
+            }
+            if (!rest.isEmpty()) { craftStorageFull = true; return false; }
+        }
+        for (int i = 0; i < slots.length; i++) android.inventory().setItem(slots[i], carried.getStackInSlot(i));
+        for (int i = 0; stored != null && i < stored.getSlots(); i++) {
+            ItemStack before = bench.buffer().getStackInSlot(i), after = stored.getStackInSlot(i);
+            int added = after.getCount() - before.getCount();
+            if (added > 0) {
+                bench.buffer().setStackInSlot(i, after);
+                console.holdBuffered(job, at, after, added);
             }
         }
         return true;
-    }
-
-    /**
-     * 作った物を持ち物に入れる。入りきらなければ、アンドロイド作業台の預かり箱へ入れて、この注文の物として予約する
-     * （あとの工程や納品で取りに来る）。預かり箱もいっぱい、またはバニラの作業台なら、足元に落とす。
-     */
-    private void keepCrafted(ServerLevel level, WorkConsoleBlockEntity c, WorkJob job, BlockPos at, ItemStack stack) {
-        ItemStack rest = android.addToCarry(stack);
-        if (!rest.isEmpty() && level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity bench) {
-            ItemStack left = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(bench.buffer(), rest, false);
-            c.holdBuffered(job, at, rest, rest.getCount() - left.getCount());
-            rest = left;
-        }
-        drop(rest);
     }
 
     /**
@@ -2476,20 +2511,7 @@ final class AndroidWorkGoal extends Goal {
         }
         ItemStack result = match.get().value().assemble(input, level.registryAccess());
         NonNullList<ItemStack> remaining = match.get().value().getRemainingItems(input);
-        for (int j = 0; j < carry.length; j++) {
-            if (used[j] > 0) {
-                ItemStack s = android.inventory().getItem(carry[j]);
-                android.inventory().setItem(carry[j], s.copyWithCount(s.getCount() - used[j]));
-            }
-        }
-        android.compactCarry();
-        keepCrafted(level, c, job, at, result);
-        for (ItemStack r : remaining) {
-            if (!r.isEmpty()) {
-                keepCrafted(level, c, job, at, r);
-            }
-        }
-        return true;
+        return commitCraft(level, c, job, at, used, result, remaining);
     }
 
     /**

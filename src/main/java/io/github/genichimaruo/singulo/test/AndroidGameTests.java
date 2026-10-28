@@ -2606,13 +2606,15 @@ public final class AndroidGameTests {
                 SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get());
         rack.items().setStackInSlot(0, loc);
         BladeAndroid a = worker(helper, false);
-        a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_large_backpack_upgrade")));
         var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
                 4096, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "Bulk order was rejected: " + error);
         var port = (io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity) helper.getBlockEntity(DELIVERY);
         int[] delivered = {0};
+        boolean[] buffered = {false};
+        var bench = (io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity) helper.getBlockEntity(TABLE);
         helper.onEachTick(() -> {
+            buffered[0] |= !bench.bufferEmpty();
             for (int slot = 0; slot < port.handler().getSlots(); slot++) {
                 ItemStack result = port.handler().extractItem(slot, 64, false);
                 helper.assertTrue(result.isEmpty() || result.is(net.minecraft.world.item.Items.OAK_PLANKS), "Unexpected delivery");
@@ -2623,10 +2625,125 @@ public final class AndroidGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered[0] == 4096 && console.orders().isEmpty(),
                     "Bulk job incomplete: delivered=" + delivered[0] + " orders=" + console.orders().size() + " activity=" + a.activity());
+            helper.assertTrue(buffered[0] && bench.bufferEmpty(), "Workbench storage was not used and drained");
             helper.assertTrue(chest.isEmpty(), "Bulk job left reserved raw materials behind");
             helper.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     new AABB(helper.absolutePos(TABLE)).inflate(8)).isEmpty(), "Bulk crafting dropped inventory overflow");
             a.discard();
         });
+    }
+
+    /** Full carry and full bench must not consume ingredients or drop products; freeing storage resumes crafting. */
+    @GameTest(template = EMPTY)
+    public static void workbenchCraftIsAtomicWhenStorageFills(GameTestHelper helper) throws Exception {
+        var console = workshop(helper, 0);
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        var bench = (io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity) helper.getBlockEntity(TABLE);
+        BladeAndroid a = worker(helper, false);
+        a.setNoAi(true);
+        for (int slot : a.carrySlots()) a.inventory().setItem(slot, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+        int input = a.carrySlots()[0];
+        a.inventory().setItem(input, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        for (int slot = 0; slot < bench.buffer().getSlots(); slot++) bench.buffer().setStackInSlot(slot, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 64));
+        var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
+        var recipe = new io.github.genichimaruo.singulo.android.work.RecipeData(grid, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4));
+        var order = new io.github.genichimaruo.singulo.android.work.WorkOrder(900, recipe.output(), 4, null);
+        console.orders().add(order);
+        var job = new io.github.genichimaruo.singulo.android.work.WorkJob(
+                io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, 900, 1, 0, List.of(), List.of(), true);
+        Class<?> type = Class.forName("io.github.genichimaruo.singulo.android.AndroidWorkGoal");
+        var constructor = type.getDeclaredConstructor(RuinAndroid.class); constructor.setAccessible(true);
+        var goal = constructor.newInstance(a);
+        var craft = type.getDeclaredMethod("craftOnce", net.minecraft.server.level.ServerLevel.class,
+                io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.class,
+                io.github.genichimaruo.singulo.android.work.WorkJob.class, BlockPos.class,
+                io.github.genichimaruo.singulo.android.work.RecipeData.class);
+        craft.setAccessible(true);
+        helper.assertFalse((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Craft succeeded without output space");
+        helper.assertTrue(a.inventory().getItem(input).getCount() == 64 && order.held.isEmpty(), "Full storage consumed materials or created a reservation");
+        bench.buffer().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 60));
+        helper.assertTrue((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Craft did not resume into a partial stack");
+        helper.assertTrue(a.inventory().getItem(input).getCount() == 63 && bench.buffer().getStackInSlot(0).getCount() == 64,
+                "Craft did not conserve materials and output");
+        helper.assertTrue(order.held(helper.absolutePos(TABLE), recipe.output()) == 4, "Craft claimed someone else's stored products");
+        helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                new AABB(helper.absolutePos(TABLE)).inflate(8)).isEmpty(), "Craft overflow dropped an item");
+        a.discard(); helper.succeed();
+    }
+
+    /** Products and crafting remainders are checked together, including alternate ingredient cards. */
+    @GameTest(template = EMPTY)
+    public static void workbenchReservesSpaceForEveryReturnedBottle(GameTestHelper helper) throws Exception {
+        var console = workshop(helper, 0);
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        var bench = (io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity) helper.getBlockEntity(TABLE);
+        BladeAndroid a = worker(helper, false); a.setNoAi(true);
+        var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        for (int i : new int[] {0, 1, 3, 4}) grid.set(i, new ItemStack(net.minecraft.world.item.Items.HONEY_BOTTLE));
+        Class<?> type = Class.forName("io.github.genichimaruo.singulo.android.AndroidWorkGoal");
+        var constructor = type.getDeclaredConstructor(RuinAndroid.class); constructor.setAccessible(true);
+        var goal = constructor.newInstance(a);
+        var craft = type.getDeclaredMethod("craftOnce", net.minecraft.server.level.ServerLevel.class,
+                io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.class,
+                io.github.genichimaruo.singulo.android.work.WorkJob.class, BlockPos.class,
+                io.github.genichimaruo.singulo.android.work.RecipeData.class); craft.setAccessible(true);
+        var job = new io.github.genichimaruo.singulo.android.work.WorkJob(
+                io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, 901, 1, 0, List.of(), List.of(), true);
+        for (boolean variants : new boolean[] {false, true}) {
+            for (int slot : a.carrySlots()) a.inventory().setItem(slot, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+            int input = a.carrySlots()[0];
+            a.inventory().setItem(input, new ItemStack(net.minecraft.world.item.Items.HONEY_BOTTLE, 16));
+            for (int slot = 0; slot < bench.buffer().getSlots(); slot++) bench.buffer().setStackInSlot(slot, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 64));
+            bench.buffer().setStackInSlot(0, ItemStack.EMPTY);
+            var alts = new java.util.ArrayList<String>(java.util.Collections.nCopies(9, ""));
+            if (variants) for (int n : new int[] {0, 1, 3, 4}) alts.set(n,
+                    io.github.genichimaruo.singulo.android.work.ItemCount.key(net.minecraft.world.item.crafting.Ingredient.of(net.minecraft.world.item.Items.HONEY_BOTTLE)));
+            var recipe = io.github.genichimaruo.singulo.android.work.RecipeData.crafting(grid,
+                    new ItemStack(net.minecraft.world.item.Items.HONEY_BLOCK), alts);
+            helper.assertFalse((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Returned bottles overflowed storage");
+            helper.assertTrue(a.inventory().getItem(input).getCount() == 16 && bench.buffer().getStackInSlot(0).isEmpty(), "Rejected craft changed inventory");
+            bench.buffer().setStackInSlot(1, ItemStack.EMPTY);
+            helper.assertTrue((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Craft did not resume with remainder space");
+            helper.assertTrue(a.inventory().getItem(input).getCount() == 12
+                    && bench.buffer().getStackInSlot(0).is(net.minecraft.world.item.Items.HONEY_BLOCK)
+                    && bench.buffer().getStackInSlot(1).is(net.minecraft.world.item.Items.GLASS_BOTTLE)
+                    && bench.buffer().getStackInSlot(1).getCount() == 4, "Products or returned bottles were lost");
+        }
+        a.discard(); helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void partialWorkbenchBatchIsCountedOnlyOnce(GameTestHelper helper) {
+        var console = workshop(helper, 64);
+        BladeAndroid a = worker(helper, false); a.setNoAi(true);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+                256, List.of(a.getUUID()), null);
+        helper.assertTrue(error == null, "Could not start partial-batch fixture");
+        var job = console.requestJob(a);
+        var order = console.orders().getFirst();
+        helper.assertTrue(job.type() == io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, "No crafting lease");
+        console.completePartialCraft(job, 0, 5);
+        console.completePartialCraft(job, 0, 5);
+        helper.assertTrue(order.steps.getFirst().done == 5 && order.steps.getFirst().inProgress == 0
+                && order.steps.getFirst().remaining() == order.steps.getFirst().total - 5, "Partial completion duplicated progress or kept the lease");
+        a.discard(); helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void workbenchBufferExpandsBatchWithoutExpandingCarry(GameTestHelper helper) {
+        var console = workshop(helper, 64);
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        for (int i = 0; i < 5; i++) chest.setItem(i, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        BladeAndroid a = worker(helper, false); a.setNoAi(true);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+                1280, List.of(a.getUUID()), null);
+        helper.assertTrue(error == null, "Could not plan buffered crafting");
+        var job = console.requestJob(a);
+        helper.assertTrue(a.carryCapacity() == 5 && job.batch().size() == 1 && job.batch().getFirst().crafts() == 320,
+                "Workbench storage did not expand the batch while retaining five carry slots: " + job);
+        helper.assertTrue(job.fetch().size() == 1 && job.fetch().getFirst().count == 320, "Material pickup exceeds carry capacity");
+        a.discard(); helper.succeed();
     }
 }

@@ -757,6 +757,26 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return lo;
     }
 
+    /** Inputs must travel in the worker; a dedicated bench can hold the expanding output. */
+    private long workbenchCrafts(WorkOrder.StepState step, int slots) {
+        RecipeData recipe = step.recipe;
+        if (recipe.processing() || recipe.procedure() || recipe.variants() || level == null || !level.isLoaded(step.location)
+                || !(level.getBlockEntity(step.location) instanceof AndroidWorkbenchBlockEntity bench)) {
+            return maxCrafts(recipe, slots, step.remaining());
+        }
+        int free = 0;
+        for (int i = 0; i < bench.buffer().getSlots(); i++) if (bench.buffer().getStackInSlot(i).isEmpty()) free++;
+        long lo = 0, hi = maxCrafts(recipe, slots + free, step.remaining());
+        List<ItemCount> inputs = recipe.inputs();
+        while (lo < hi) {
+            long mid = lo + (hi - lo + 1) / 2;
+            int needed = 0;
+            for (ItemCount input : inputs) needed += stacks(input.item, input.count * mid);
+            if (needed <= slots) lo = mid; else hi = mid - 1;
+        }
+        return lo;
+    }
+
     /** carried から、crafts 回分の素材を除いた残り（作っている間ずっと持っている物）。 */
     private static List<ItemCount> rest(List<ItemCount> carried, RecipeData recipe, long crafts) {
         List<ItemCount> rest = new ArrayList<>();
@@ -958,7 +978,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             if (s.remaining() <= 0 || !o.ready(s) || locationBusy(busy, s.location, s) || !canDo(a, s.recipe) || fuelBlocked(s)) {
                 continue;
             }
-            long k = Math.min(maxCrafts(s.recipe, slots, s.remaining()), tankLimit(a, s.recipe));
+            long k = Math.min(workbenchCrafts(s, slots), tankLimit(a, s.recipe));
             if (k <= 0) {
                 tooSmall = true;
                 continue;
@@ -1806,6 +1826,19 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
         finishIfDone(o);
         setChanged();
+    }
+
+    /** Release a crafting lease without redoing already completed crafts when storage fills. */
+    public void completePartialCraft(WorkJob job, int current, long crafts) {
+        if (lease(job.jobId()) == null) return;
+        WorkOrder order = order(job.orderId());
+        if (order != null && current >= 0 && current < job.batch().size()) {
+            WorkJob.Batch batch = job.batch().get(current);
+            if (batch.step() >= 0 && batch.step() < order.steps.size()) {
+                order.steps.get(batch.step()).done += Math.max(0, Math.min(batch.crafts(), crafts));
+            }
+        }
+        completeUpTo(job, current - 1);
     }
 
     /** 受け渡し場所で、そこにある物を持ち物へ取り出す（全部そろわなければ取らない）。 */
