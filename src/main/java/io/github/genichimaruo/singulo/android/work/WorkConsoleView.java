@@ -120,7 +120,8 @@ public final class WorkConsoleView {
         for (BlockPos p : c.links()) {
             CompoundTag lt = new CompoundTag();
             lt.putLong("pos", p.asLong());
-            boolean ok = player.level().getBlockEntity(p) instanceof WorkLinkedBlockEntity b && c.getBlockPos().equals(b.console());
+            boolean ok = player.level().isLoaded(p) && player.level().getBlockEntity(p) instanceof WorkLinkedBlockEntity b
+                    && c.getBlockPos().equals(b.console());
             lt.putInt("kind", ok ? ((WorkLinkedBlockEntity) player.level().getBlockEntity(p)).linkKind().ordinal() : -1);
             ls.add(lt);
         }
@@ -211,6 +212,7 @@ public final class WorkConsoleView {
         t.putLong("count", plan.count);
         t.putBoolean("ok", plan.ok());
         t.putBoolean("loop", plan.loop);
+        t.putBoolean("limited", plan.limited);
         long crafts = 0;
         boolean mining = false, felling = false, fluids = FluidSamples.is(plan.target), chems = ChemicalSamples.is(plan.target);
         for (WorkPlanner.Step s : plan.steps) {

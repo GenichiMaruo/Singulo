@@ -1471,6 +1471,7 @@
   "gui.singulo.work_console.done": "Delivered %s ×%s",
   "gui.singulo.work_console.empty": "Nothing to order (link supply ports and recipe racks)",
   "gui.singulo.work_console.error.capacity": "No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)",
+  "gui.singulo.work_console.error.limit": "Order too complex. Stock intermediates and split the order",
   "gui.singulo.work_console.error.loop": "The recipes loop",
   "gui.singulo.work_console.error.missing": "Not enough materials",
   "gui.singulo.work_console.error.no_android": "No free android is chosen",

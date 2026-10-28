@@ -5887,6 +5887,10 @@
     "source": "No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)",
     "translation": "沒有能一次搬運 %s 所需材料的仿生人（需要背包，流體則需要儲罐升級）"
   },
+  "gui.singulo.work_console.error.limit": {
+    "source": "Order too complex. Stock intermediates and split the order",
+    "translation": "訂單過於複雜。請準備中間材料並拆分訂單"
+  },
   "gui.singulo.work_console.error.loop": {
     "source": "The recipes loop",
     "translation": "配方形成了循環"

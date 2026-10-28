@@ -180,8 +180,9 @@ public final class WorkOrder {
         for (int i = 0; i < steps.size(); i++) {
             StepState s = steps.get(i);
             s.after.clear();
+            List<ItemCount> inputs = s.recipe.inputs();
             for (int j = 0; j < i; j++) {
-                for (ItemCount in : s.recipe.inputs()) {
+                for (ItemCount in : inputs) {
                     if (ItemStack.isSameItemSameComponents(in.item, steps.get(j).recipe.output())) {
                         s.after.add(j);
                         break;

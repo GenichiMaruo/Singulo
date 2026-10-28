@@ -1471,6 +1471,7 @@
   "gui.singulo.work_console.done": "%s ×%s を納品した",
   "gui.singulo.work_console.empty": "注文できる物がない（資材口とレシピ棚をつなぐ）",
   "gui.singulo.work_console.error.capacity": "%s の素材を一度に運べるアンドロイドがいない（バックパックか、流体ならタンクアップグレードが必要）",
+  "gui.singulo.work_console.error.limit": "注文が大きすぎます。中間素材を用意して分けて注文してください",
   "gui.singulo.work_console.error.loop": "レシピがループしている",
   "gui.singulo.work_console.error.missing": "素材が足りない",
   "gui.singulo.work_console.error.no_android": "手の空いたアンドロイドを選んでいない",

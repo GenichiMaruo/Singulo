@@ -5887,6 +5887,10 @@
     "source": "No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)",
     "translation": "%s 의 재료를 한 번에 나를 수 있는 안드로이드가 없습니다(백팩이, 유체라면 탱크 업그레이드가 필요)"
   },
+  "gui.singulo.work_console.error.limit": {
+    "source": "Order too complex. Stock intermediates and split the order",
+    "translation": "주문이 너무 복잡합니다. 중간 재료를 준비하고 주문을 나누세요"
+  },
   "gui.singulo.work_console.error.loop": {
     "source": "The recipes loop",
     "translation": "레시피가 순환합니다"

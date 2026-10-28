@@ -1007,6 +1007,7 @@ UI_LANG = {
     'message.singulo.work_link.info': ('つながっている作業指令台：%s, %s, %s', 'Linked to the work console at %s, %s, %s'),
     'message.singulo.supply_port.storages': ('（ストレージ %s 個）', ' (%s storages)'),
     'gui.singulo.work_console.locked': ('この作業指令台の許可証に登録されていない', 'You are not on this work console\'s permit'),
+    'gui.singulo.work_console.error.limit': ('注文が大きすぎます。中間素材を用意して分けて注文してください', 'Order too complex. Stock intermediates and split the order'),
     'gui.singulo.work_console.error.loop': ('レシピがループしている', 'The recipes loop'),
     'gui.singulo.work_console.error.missing': ('素材が足りない', 'Not enough materials'),
     'gui.singulo.work_console.error.no_android': ('手の空いたアンドロイドを選んでいない', 'No free android is chosen'),

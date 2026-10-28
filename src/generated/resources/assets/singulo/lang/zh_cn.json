@@ -1471,6 +1471,7 @@
   "gui.singulo.work_console.done": "已交付 %s ×%s",
   "gui.singulo.work_console.empty": "没有可订购的物品（连接资材口和配方架）",
   "gui.singulo.work_console.error.capacity": "没有能一次搬运 %s 所需材料的仿生人（需要背包，流体则需要储罐升级）",
+  "gui.singulo.work_console.error.limit": "订单过于复杂。请准备中间材料并拆分订单",
   "gui.singulo.work_console.error.loop": "配方形成了循环",
   "gui.singulo.work_console.error.missing": "材料不足",
   "gui.singulo.work_console.error.no_android": "没有选择空闲的仿生人",

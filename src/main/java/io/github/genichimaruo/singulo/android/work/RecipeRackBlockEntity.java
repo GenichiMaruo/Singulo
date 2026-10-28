@@ -21,10 +21,24 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  */
 public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
     public static final int ROWS = 6, COLS = 9, SLOTS = ROWS * COLS;
+    private final ItemStack[] decodedCards = new ItemStack[SLOTS];
+    private final RecipeData[] decodedRecipes = new RecipeData[SLOTS];
+
+    /** Decode unchanged card NBT once. Compare components too, so in-place card edits are observed. */
+    private RecipeData recipe(int slot, HolderLookup.Provider registries) {
+        ItemStack card = items.getStackInSlot(slot);
+        if (decodedCards[slot] == null || !ItemStack.isSameItemSameComponents(decodedCards[slot], card)) {
+            decodedCards[slot] = card.copy();
+            decodedRecipes[slot] = RecipeData.read(card, registries);
+        }
+        return decodedRecipes[slot];
+    }
 
     private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
+            decodedCards[slot] = null;
+            decodedRecipes[slot] = null;
             setChanged();
         }
 
@@ -66,14 +80,16 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
             BlockPos pos = WorkLocationCardItem.pos(loc);
             boolean here = pos != null && WorkLocationCardItem.sameDimension(loc, level);
             for (int col = 1; col < COLS; col++) {
-                RecipeData data = RecipeData.read(items.getStackInSlot(row * COLS + col), registries);
+                RecipeData data = recipe(row * COLS + col, registries);
                 if (data == null) {
                     continue;
                 }
                 if (data.procedure()) {
                     if (!data.steps().isEmpty()) {
                         BlockPos first = data.steps().get(0).pos();
-                        out.add(new Entry(data, first, level.getBlockState(first).getBlock()));
+                        // Reading the catalogue must never load a remote procedure's chunk.
+                        out.add(new Entry(data, first, level.isLoaded(first) ? level.getBlockState(first).getBlock()
+                                : net.minecraft.world.level.block.Blocks.AIR));
                     }
                 } else if (here) {
                     out.add(new Entry(data, pos, WorkLocationCardItem.block(loc)));
@@ -113,5 +129,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
         CompoundTag inv = tag.getCompound("items");
         inv.putInt("Size", SLOTS);
         items.deserializeNBT(registries, inv);
+        java.util.Arrays.fill(decodedCards, null);
+        java.util.Arrays.fill(decodedRecipes, null);
     }
 }

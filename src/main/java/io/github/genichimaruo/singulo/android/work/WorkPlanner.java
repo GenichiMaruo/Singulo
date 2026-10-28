@@ -14,6 +14,26 @@ import net.minecraft.world.item.ItemStack;
  */
 public final class WorkPlanner {
     private static final int MAX_DEPTH = 24;
+    private static final int MAX_STEPS = 1024, MAX_VISITS = 8192;
+    // Leave headroom for sums and progress percentages in execution and GUI code.
+    private static final long MAX_AMOUNT = Long.MAX_VALUE / (MAX_VISITS * 1024L);
+
+    private record Key(net.minecraft.world.item.Item item, net.minecraft.core.component.DataComponentPatch components) {
+        static Key of(ItemStack item) {
+            ItemStack key = FluidSamples.key(item);
+            return new Key(key.getItem(), key.getComponentsPatch());
+        }
+    }
+
+    private static final class Context {
+        final java.util.Map<Key, RecipeRackBlockEntity.Entry> recipes = new java.util.HashMap<>();
+        final List<ItemCount> stock, surplus = new ArrayList<>();
+        int visits;
+        Context(List<RecipeRackBlockEntity.Entry> entries, List<ItemCount> stock) {
+            this.stock = stock;
+            for (var entry : entries) recipes.putIfAbsent(Key.of(entry.recipe().outputKey()), entry);
+        }
+    }
 
     private WorkPlanner() {}
 
@@ -30,6 +50,12 @@ public final class WorkPlanner {
         public final List<ItemCount> missing = new ArrayList<>();
         /** ループするレシピがあった。 */
         public boolean loop;
+        /** Work/quantity limits are different from an actual recipe cycle. */
+        public boolean limited;
+
+        public String failureKey() {
+            return "gui.singulo.work_console.error." + (limited ? "limit" : loop ? "loop" : "missing");
+        }
 
         Plan(ItemStack target, long count) {
             this.target = FluidSamples.key(target);
@@ -37,7 +63,7 @@ public final class WorkPlanner {
         }
 
         public boolean ok() {
-            return missing.isEmpty() && !loop;
+            return missing.isEmpty() && !loop && !limited;
         }
 
         /** 必要な素材の一覧（在庫から使う物と、足りない物）。 */
@@ -58,73 +84,69 @@ public final class WorkPlanner {
      */
     public static Plan plan(ItemStack target, long count, List<RecipeRackBlockEntity.Entry> recipes, List<ItemCount> stock) {
         Plan plan = new Plan(target, count);
-        need(plan, target, count, null, recipes, stock, new ArrayList<>());
+        need(plan, target, count, null, new Context(recipes, stock), new ArrayList<>());
         return plan;
     }
 
-    /** item を amount 個そろえる。alt があれば、在庫の同じ種類の別の物も使う（使った物そのものを予約する）。 */
-    private static void need(Plan plan, ItemStack item, long amount, @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt,
-                             List<RecipeRackBlockEntity.Entry> recipes, List<ItemCount> stock, List<ItemStack> path) {
-        // 在庫から使う（同じ物を先に。同じ種類の別の物も使うなら、そのあと別の物も）
-        for (int pass = 0; pass < (alt == null ? 1 : 2) && amount > 0; pass++) {
-            for (ItemCount c : stock) {
-                if (c.count <= 0 || c.alt != null) {
-                    continue;
-                }
-                boolean ok = pass == 0 ? c.matches(item) : alt.test(c.item) && !c.matches(item);
-                if (!ok) {
-                    continue;
-                }
-                long take = Math.min(c.count, amount);
-                c.count -= take;
-                amount -= take;
-                ItemCount.add(plan.fromStock, c.item, take);
-                if (amount <= 0) {
-                    break;
-                }
-            }
-        }
-        if (amount <= 0) {
+    /** Use real stock and previously planned surplus separately; only real stock is reserved. */
+    private static void need(Plan plan, ItemStack item, long amount,
+                             @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt,
+                             Context context, List<Key> path) {
+        if (plan.limited) return;
+        if (++context.visits > MAX_VISITS || amount < 0 || amount > MAX_AMOUNT) {
+            plan.limited = true;
             return;
         }
-        RecipeRackBlockEntity.Entry recipe = null;
-        for (RecipeRackBlockEntity.Entry e : recipes) {
-            if (ItemStack.isSameItemSameComponents(e.recipe().outputKey(), FluidSamples.key(item))) {
-                recipe = e;
-                break;
-            }
+        for (int pass = 0; pass < (alt == null ? 1 : 2) && amount > 0; pass++) {
+            amount = take(context.stock, plan.fromStock, item, amount, alt, pass);
+            amount = take(context.surplus, null, item, amount, alt, pass);
         }
-        boolean looping = false;
-        for (ItemStack p : path) {
-            looping |= ItemStack.isSameItemSameComponents(p, item);
-        }
-        if (recipe == null || looping || path.size() >= MAX_DEPTH) {
+        if (amount <= 0) return;
+        Key key = Key.of(item);
+        RecipeRackBlockEntity.Entry recipe = context.recipes.get(key);
+        if (recipe == null || path.contains(key)) {
             plan.loop |= recipe != null;
             ItemCount.add(plan.missing, item, amount);
             return;
         }
+        if (path.size() >= MAX_DEPTH || plan.steps.size() >= MAX_STEPS) {
+            plan.limited = true;
+            return;
+        }
         int per = recipe.recipe().outputCount();
-        long crafts = (amount + per - 1) / per;
-        path.add(item);
+        long crafts = 1 + (amount - 1) / per;
+        path.add(key);
         for (ItemCount in : recipe.recipe().inputs()) {
-            need(plan, in.item, in.count * crafts, in.alt, recipes, stock, path);
+            if (in.count < 0 || in.count > MAX_AMOUNT / crafts) {
+                plan.limited = true;
+                break;
+            }
+            need(plan, in.item, in.count * crafts, in.alt, context, path);
+            if (plan.limited) break;
         }
         path.remove(path.size() - 1);
-        plan.steps.add(new Step(recipe, crafts, amount));
-        // 余った分は、あとで使える在庫になる（素材置き場へ戻すので）
-        long surplus = crafts * per - amount;
-        if (surplus > 0) {
-            boolean found = false;
-            for (ItemCount c : stock) {
-                if (c.matches(item)) {
-                    c.count += surplus;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                stock.add(new ItemCount(item, surplus));
-            }
+        if (plan.limited) return;
+        if (plan.steps.size() >= MAX_STEPS) {
+            plan.limited = true;
+            return;
         }
+        plan.steps.add(new Step(recipe, crafts, amount));
+        ItemCount.add(context.surplus, item, crafts * per - amount);
+    }
+
+    private static long take(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved,
+                             ItemStack item, long amount,
+                             @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt, int pass) {
+        for (ItemCount c : stock) {
+            if (amount <= 0) break;
+            if (c.count <= 0 || c.alt != null) continue;
+            boolean matches = pass == 0 ? c.matches(item) : alt != null && alt.test(c.item) && !c.matches(item);
+            if (!matches) continue;
+            long take = Math.min(c.count, amount);
+            c.count -= take;
+            amount -= take;
+            if (reserved != null) ItemCount.add(reserved, c.item, take);
+        }
+        return amount;
     }
 }

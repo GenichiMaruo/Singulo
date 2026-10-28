@@ -1471,6 +1471,7 @@
   "gui.singulo.work_console.done": "%s ×%s 납품했습니다",
   "gui.singulo.work_console.empty": "주문할 수 있는 것이 없습니다(자재구와 레시피 선반을 연결)",
   "gui.singulo.work_console.error.capacity": "%s 의 재료를 한 번에 나를 수 있는 안드로이드가 없습니다(백팩이, 유체라면 탱크 업그레이드가 필요)",
+  "gui.singulo.work_console.error.limit": "주문이 너무 복잡합니다. 중간 재료를 준비하고 주문을 나누세요",
   "gui.singulo.work_console.error.loop": "레시피가 순환합니다",
   "gui.singulo.work_console.error.missing": "재료가 부족합니다",
   "gui.singulo.work_console.error.no_android": "한가한 안드로이드를 고르지 않았습니다",
