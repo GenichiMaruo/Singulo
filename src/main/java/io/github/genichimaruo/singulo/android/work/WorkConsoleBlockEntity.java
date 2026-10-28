@@ -2699,16 +2699,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
         // 画面を開いている人に、様子を送る
+        CompoundTag common = null;
         for (ServerPlayer p : level.players()) {
-            if (p.containerMenu instanceof WorkConsoleMenu menu && worldPosition.equals(menu.pos())) {
-                sendView(p, menu.containerId, null);
+            if (p.containerMenu instanceof WorkConsoleMenu menu && worldPosition.equals(menu.pos()) && mayOperate(p)) {
+                if (common == null) common = WorkConsoleView.common(this);
+                sendSnapshot(p, menu.containerId, WorkConsoleView.forPlayer(this, p, null, common), false);
             }
         }
     }
 
     /** 画面に様子を送る（plan は計算の結果。なければ null）。 */
     public void sendView(ServerPlayer player, int containerId, @Nullable CompoundTag plan) {
-        PacketDistributor.sendToPlayer(player, new WorkConsoleViewPayload(containerId, WorkConsoleView.build(this, player, plan)));
+        sendSnapshot(player, containerId, WorkConsoleView.build(this, player, plan), true);
+    }
+
+    private void sendSnapshot(ServerPlayer player, int containerId, CompoundTag snapshot, boolean force) {
+        if (player.containerMenu instanceof WorkConsoleMenu menu && menu.containerId == containerId && (menu.shouldSend(snapshot) || force)) {
+            PacketDistributor.sendToPlayer(player, new WorkConsoleViewPayload(containerId, snapshot));
+        }
     }
 
     // ------------------------------------------------------------------ 画面
