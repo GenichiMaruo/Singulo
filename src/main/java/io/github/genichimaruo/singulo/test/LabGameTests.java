@@ -56,8 +56,9 @@ public final class LabGameTests {
             for (String need : List.of(LabLayout.ENTRANCE, LabLayout.REACTOR, LabLayout.BOSS, LabLayout.SUBSTATION, "control", "loading_dock", LabLayout.FREIGHT_LIFT)) {
                 helper.assertTrue(names.contains(need), "種 " + seed + ": " + need + " がない");
             }
-            helper.assertTrue(names.stream().distinct().count() == names.size() || names.stream().filter(n -> n.startsWith("annex_")).count() > 1,
-                    "種 " + seed + ": 同じ部屋が2つある: " + names);
+            var uniqueRooms = names.stream().filter(n -> !n.startsWith("annex_")).toList();
+            helper.assertTrue(uniqueRooms.stream().distinct().count() == uniqueRooms.size(),
+                    "種 " + seed + ": 同じ主要な部屋が2つある: " + names);
             helper.assertTrue(names.size() >= 12, "種 " + seed + ": 部屋が少ない: " + names.size());
             for (int i = 0; i < l.rooms.size(); i++) {
                 BoundingBox bi = l.rooms.get(i).box();
@@ -222,7 +223,7 @@ public final class LabGameTests {
     /** 部品を、テストの場所の絶対座標の範囲（チャンクの区切りの代わりに全体）で描く。 */
     private static void draw(GameTestHelper helper, net.minecraft.world.level.levelgen.structure.StructurePiece piece) {
         var level = helper.getLevel();
-        piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(),
+        piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), net.minecraft.util.RandomSource.create(0),
                 piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(piece.getBoundingBox().getCenter()), piece.getBoundingBox().getCenter());
     }
 

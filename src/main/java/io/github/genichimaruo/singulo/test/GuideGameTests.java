@@ -57,6 +57,7 @@ public final class GuideGameTests {
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
         server.getPlayerList().placeNewPlayer(connection, player, cookie);
+        io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper, player);
         var pos = helper.absolutePos(new net.minecraft.core.BlockPos(4, 2, 4));
         player.teleportTo(helper.getLevel(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);

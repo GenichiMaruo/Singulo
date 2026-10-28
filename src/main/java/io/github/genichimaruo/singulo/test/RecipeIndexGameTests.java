@@ -38,15 +38,15 @@ public final class RecipeIndexGameTests {
         for (int i = 0; i < 3; i++) h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), MachineType.PRECISION_ASSEMBLER) == stable,
                 "Repeated queries rebuild lists");
         if (Boolean.getBoolean("singulo.testBenchmarks")) {
-        var type = MachineType.PRECISION_ASSEMBLER;
-        var cached = MachineBlockEntity.stationRecipes(h.getLevel(), type);
-        long start = System.nanoTime();
-        for (int i = 0; i < 10_000; i++)
-            h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), type) == cached, "Repeated queries rebuild lists");
-        long indexed = System.nanoTime() - start;
-        start = System.nanoTime();
-        for (int i = 0; i < 10_000; i++) legacy(h, type);
-        Singulo.LOGGER.info("SINGULO_RECIPE_INDEX_BENCH queries=10000 indexedNs={} previousNs={}", indexed, System.nanoTime() - start);
+            var type = MachineType.PRECISION_ASSEMBLER;
+            var cached = MachineBlockEntity.stationRecipes(h.getLevel(), type);
+            long start = System.nanoTime();
+            for (int i = 0; i < 10_000; i++)
+                h.assertTrue(MachineBlockEntity.stationRecipes(h.getLevel(), type) == cached, "Repeated queries rebuild lists");
+            long indexed = System.nanoTime() - start;
+            start = System.nanoTime();
+            for (int i = 0; i < 10_000; i++) legacy(h, type);
+            Singulo.LOGGER.info("SINGULO_RECIPE_INDEX_BENCH queries=10000 indexedNs={} previousNs={}", indexed, System.nanoTime() - start);
         }
         h.succeed();
     }

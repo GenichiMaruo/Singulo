@@ -12,10 +12,14 @@ import net.minecraft.gametest.framework.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /** Development-only, per-test evidence. Missing/duplicate results fail validation. */
 @EventBusSubscriber(modid = Singulo.MODID)
 public final class TestReports implements TestReporter {
+    private static TestReports active;
+    private long lastProgress = System.nanoTime();
     private final List<Result> results = new ArrayList<>();
     private final List<String> expected;
     private final Path output;
@@ -31,8 +35,24 @@ public final class TestReports implements TestReporter {
     public static void start(ServerStartedEvent event) {
         String output = System.getProperty("singulo.testReport");
         if (event.getServer() instanceof GameTestServer && output != null) {
-            GlobalTestReporter.replaceWith(new TestReports(Path.of(output)));
+            active = new TestReports(Path.of(output));
+            GlobalTestReporter.replaceWith(active);
         }
+    }
+
+    @SubscribeEvent
+    public static void watch(ServerTickEvent.Post event) {
+        // Vanilla timeout counting only begins after structure chunks are ticking.
+        // A lost chunk ticket can otherwise wait forever without a timeout failure.
+        if (active != null && event.getServer() instanceof GameTestServer
+                && System.nanoTime() - active.lastProgress > 120_000_000_000L) {
+            throw new IllegalStateException("GameTests made no completion progress for 120 seconds; inspect chunk tickets and fixture cleanup");
+        }
+    }
+
+    @SubscribeEvent
+    public static void stop(ServerStoppedEvent event) {
+        if (event.getServer() instanceof GameTestServer) active = null;
     }
 
     private record Result(String name, String batch, String template, boolean required,
@@ -41,6 +61,7 @@ public final class TestReports implements TestReporter {
                           List<String> expected, List<Result> results) {}
 
     private void record(GameTestInfo test, String status) {
+        lastProgress = System.nanoTime();
         results.add(new Result(test.getTestName(), test.getTestFunction().batchName(), test.getStructureName(),
                 test.isRequired(), status, test.getRunTime(), test.getTimeoutTicks()));
     }

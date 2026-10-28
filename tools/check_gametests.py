@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parent.parent
+OPTIONAL_NAMESPACES = {'singulo_mekanism'}
 DEFAULT_NAMESPACES = ('singulo', 'singulo_prototype', 'singulo_progression', 'singulo_gunner',
                       'singulo_cable', 'singulo_rayleigh', 'singulo_panel_review', 'singulo_scaling')
 
@@ -22,6 +23,8 @@ def inventory(root=ROOT):
             text = text.replace('@net.neoforged.neoforge.gametest.', '@')
             if '@GameTest(' not in text:
                 continue
+            if not path.name.endswith('GameTests.java'):
+                raise RuntimeError('Test file must belong to the gameTest source set: ' + str(path.relative_to(root)))
             holder = re.search(r'@GameTestHolder\(([^)]+)\)', text)
             if not holder or '@PrefixGameTestTemplate(false)' not in text:
                 raise RuntimeError(f'Unsupported test holder/prefix: {path.relative_to(root)}')
@@ -79,6 +82,9 @@ def validate_report(report, expected):
 
 def check(root, namespaces=DEFAULT_NAMESPACES, source=ROOT, classes=()):
     entries = inventory(source)
+    unknown = {e['namespace'] for e in entries} - set(DEFAULT_NAMESPACES) - OPTIONAL_NAMESPACES
+    if unknown:
+        raise RuntimeError('Test namespace is absent from the full suite configuration')
     namespaces = set(namespaces)
     if namespaces - {e['namespace'] for e in entries}:
         raise RuntimeError('Unknown/empty test namespace')

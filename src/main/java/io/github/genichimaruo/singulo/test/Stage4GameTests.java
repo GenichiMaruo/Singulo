@@ -152,7 +152,7 @@ public final class Stage4GameTests {
 
     // ------------------------------------------------------------------ 時間結晶
 
-    @GameTest(template = EMPTY, timeoutTicks = 25_000)
+    @GameTest(template = EMPTY)
     public static void incubatorPurityHalvesLifeWhenHalfUnderpowered(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.TIME_CRYSTAL_INCUBATOR).get());
@@ -162,16 +162,21 @@ public final class Stage4GameTests {
         m.items().setStackInSlot(2, new ItemStack(item("entangled_element"), 2));
         m.items().setStackInSlot(3, new ItemStack(item("phase_sync_plate")));
         m.items().setStackInSlot(4, new ItemStack(item("bose_condensate_catalyst")));
-        int[] tick = {0};
-        // 育成の前半は要求（30 kFE/t）の半分しか渡さず、後半は満たす
-        helper.onEachTick(() -> m.energy().setEnergy(tick[0]++ < 7_200 ? 15_000 : m.energy().getMaxEnergyStored()));
-        helper.succeedWhen(() -> {
-            ItemStack out = m.items().getStackInSlot(m.type().outputSlot());
-            helper.assertTrue(out.is(item("time_crystal_catalyst")), "時間結晶触媒が育たない");
-            int life = UsesHelper.get(out).max();
-            int full = 45 * 60 * 20;
-            helper.assertTrue(Math.abs(life - full / 2) <= full / 20, "純度約50%で寿命が半分にならない: " + life + " / " + full);
-        });
+        // Test the entire default growth cycle through the real controller, without
+        // ticking every other fixture/world entity 14,400 times. Other incubator
+        // tests retain normal scheduled BE ticking and recipe/config integration.
+        int tick = 0;
+        for (; tick < 25_000 && m.items().getStackInSlot(m.type().outputSlot()).isEmpty(); tick++) {
+            m.energy().setEnergy(tick < 7_200 ? 15_000 : m.energy().getMaxEnergyStored());
+            MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
+        }
+        ItemStack out = m.items().getStackInSlot(m.type().outputSlot());
+        helper.assertTrue(out.is(item("time_crystal_catalyst")), "時間結晶触媒が育たない");
+        int life = UsesHelper.get(out).max();
+        int full = 45 * 60 * 20;
+        helper.assertTrue(Math.abs(life - full / 2) <= full / 20, "純度約50%で寿命が半分にならない: " + life + " / " + full);
+        helper.assertTrue(tick >= 14_000 && tick <= 15_000, "Default growth duration changed: " + tick);
+        helper.succeed();
     }
 
     /** 触媒でない物の時間加工（銅ブロック → 錆びた銅）は、電力が少しずつしか来なければ進まない（触媒の育成だけが不足でも進む）。 */

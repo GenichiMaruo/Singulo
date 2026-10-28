@@ -276,6 +276,7 @@ public final class BalanceGameTests {
     @GameTest(template = EMPTY, batch = "balance_anchor", timeoutTicks = 40)
     public static void loweredAnchorLimitIsEnforced(GameTestHelper helper) {
         int old = ServerConfig.MAX_ANCHORS_PER_PLAYER.get();
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(() -> ServerConfig.MAX_ANCHORS_PER_PLAYER.set(old));
         ServerConfig.MAX_ANCHORS_PER_PLAYER.set(3);
         UUID owner = UUID.randomUUID();
         List<WorldlineAnchorBlockEntity> anchors = new ArrayList<>();

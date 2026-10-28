@@ -148,7 +148,7 @@ public final class ScalingGameTests {
 
     @GameTest(template = "empty")
     public static void rejectedAreaDoesNotConsumeStackedCards(GameTestHelper h) {
-        var player = h.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setShiftKeyDown(true);
         ItemStack cards = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.AREA_CARD.get(), 8);
         BlockPos first = h.absolutePos(new BlockPos(1, 1, 1));

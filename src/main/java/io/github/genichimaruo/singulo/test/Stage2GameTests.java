@@ -53,13 +53,16 @@ public final class Stage2GameTests {
     // ------------------------------------------------------------------ 極低温冷却塔
 
     private static final BlockPos TOWER_CONTROLLER = new BlockPos(2, 1, 0);
-    private static BlockPos towerPort;
+    private static BlockPos towerPort(GameTestHelper helper) {
+        return TestBuild.at(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER,
+                TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 1, 1, 0);
+    }
 
     /** 高さ height の冷却塔を (0..4, 0.., 0..4) に建て、手前の面の下から2段目の左の外装板を搬入出ポートにする。 */
     private static MachineBlockEntity buildTower(GameTestHelper helper, int height) {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
                 net.minecraft.core.Direction.SOUTH, height);
-        towerPort = TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
+        TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
                 net.minecraft.core.Direction.SOUTH, height, 1, 1, 0);
         MachineBlockEntity controller = helper.getBlockEntity(TOWER_CONTROLLER);
         controller.energy().setEnergy(controller.energy().getMaxEnergyStored());
@@ -84,7 +87,7 @@ public final class Stage2GameTests {
     @GameTest(template = TALL, timeoutTicks = 150)
     public static void replacedPortAtSamePositionRelinks(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
-        BlockPos port = towerPort;
+        BlockPos port = towerPort(helper);
         BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
         helper.runAtTickTime(40, () -> {
             helper.assertTrue(helper.getLevel().getBlockEntity(port) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
@@ -158,7 +161,7 @@ public final class Stage2GameTests {
     @GameTest(template = TALL, timeoutTicks = 200)
     public static void coolingTowerMakesLiquidNitrogen(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
-        BlockPos port = towerPort;
+        BlockPos port = towerPort(helper);
         // 高さ7では液体ヘリウムは作れない（高さ10以上が必要）
         tower.automationFluids().fill(new FluidStack(fluid("helium"), 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {

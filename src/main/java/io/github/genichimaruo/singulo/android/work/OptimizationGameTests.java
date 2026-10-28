@@ -48,20 +48,20 @@ public final class OptimizationGameTests {
         for (int i = 0; i < 100; i++) h.assertTrue(port.adjacentItems.get(Direction.EAST) == first, "Connection was unnecessarily rebuilt");
         BlockPos absoluteTarget = h.absolutePos(target);
         if (Boolean.getBoolean("singulo.testBenchmarks")) {
-        for (int i = 0; i < 1000; i++) {
-            h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST);
-            port.adjacentItems.get(Direction.EAST);
-        }
-        long start = System.nanoTime();
-        long directSlots = 0, cachedSlots = 0;
-        for (int i = 0; i < 20000; i++) directSlots += h.getLevel().getCapability(
-                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST).getSlots();
-        long directNanos = System.nanoTime() - start;
-        start = System.nanoTime();
-        for (int i = 0; i < 20000; i++) cachedSlots += port.adjacentItems.get(Direction.EAST).getSlots();
-        long cachedNanos = System.nanoTime() - start;
-        h.assertTrue(directSlots == cachedSlots, "Cached storage exposes different slots");
-        io.github.genichimaruo.singulo.Singulo.LOGGER.info("Optimization check: 20000 storage lookups, direct {} ms, cached {} ms", directNanos / 1e6, cachedNanos / 1e6);
+            for (int i = 0; i < 1000; i++) {
+                h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST);
+                port.adjacentItems.get(Direction.EAST);
+            }
+            long start = System.nanoTime();
+            long directSlots = 0, cachedSlots = 0;
+            for (int i = 0; i < 20000; i++) directSlots += h.getLevel().getCapability(
+                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, absoluteTarget, Direction.WEST).getSlots();
+            long directNanos = System.nanoTime() - start;
+            start = System.nanoTime();
+            for (int i = 0; i < 20000; i++) cachedSlots += port.adjacentItems.get(Direction.EAST).getSlots();
+            long cachedNanos = System.nanoTime() - start;
+            h.assertTrue(directSlots == cachedSlots, "Cached storage exposes different slots");
+            io.github.genichimaruo.singulo.Singulo.LOGGER.info("Optimization check: 20000 storage lookups, direct {} ms, cached {} ms", directNanos / 1e6, cachedNanos / 1e6);
         }
         chest.setItem(0, new ItemStack(Items.IRON_INGOT, 7));
         h.assertTrue(port.adjacentItems.get(Direction.EAST).getStackInSlot(0).getCount() == 7, "Cached inventory quantity became stale");

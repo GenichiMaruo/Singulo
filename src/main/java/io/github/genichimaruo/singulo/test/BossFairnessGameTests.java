@@ -56,6 +56,7 @@ public final class BossFairnessGameTests {
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
         server.getPlayerList().placeNewPlayer(connection, p, cookie);
+        io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper, p);
         p.setGameMode(GameType.SURVIVAL);
         p.teleportTo(helper.getLevel(), feet.x, feet.y, feet.z, 0, 0);
         helper.assertTrue(!p.isCreative() && p.isAlive(), "サバイバルの挑戦者を用意できない");

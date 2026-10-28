@@ -23,7 +23,10 @@ public final class TestScope implements GameTestListener {
 
     @SuppressWarnings("removal")
     public static ServerPlayer player(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        return ownPlayer(helper, helper.makeMockServerPlayerInLevel());
+    }
+
+    public static ServerPlayer ownPlayer(GameTestHelper helper, ServerPlayer player) {
         of(helper).defer(() -> {
             // discard() removes the entity but leaves vanilla's login/player list populated.
             if (player.getServer().getPlayerList().getPlayer(player.getUUID()) == player)

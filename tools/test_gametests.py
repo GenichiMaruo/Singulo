@@ -3,7 +3,7 @@ import copy
 from pathlib import Path
 import tempfile
 import unittest
-from check_gametests import inventory, validate_report
+from check_gametests import check, inventory, validate_report
 
 
 class ReportTests(unittest.TestCase):
@@ -61,21 +61,29 @@ class InventoryTests(unittest.TestCase):
                 'public static void ' + method + '(GameTestHelper h) throws Exception { h.succeed(); } }')
 
     def test_comments_and_annotations_are_understood(self):
-        (self.dir / 'Example.java').write_text('// @GameTest(not a real declaration)\n' + self.source())
+        (self.dir / 'ExampleGameTests.java').write_text('// @GameTest(not a real declaration)\n' + self.source())
         self.assertEqual(inventory(self.root)[0]['name'], 'example')
 
     def test_duplicate_names_across_classes_are_rejected(self):
-        (self.dir / 'A.java').write_text(self.source('A'))
-        (self.dir / 'B.java').write_text(self.source('B'))
+        (self.dir / 'AGameTests.java').write_text(self.source('A'))
+        (self.dir / 'BGameTests.java').write_text(self.source('B'))
         with self.assertRaisesRegex(RuntimeError, 'Duplicate'): inventory(self.root)
 
     def test_incompatible_declarations_fail_instead_of_being_skipped(self):
         for attrs in ['template = EMPTY, required = false', 'template = EMPTY, attempts = 3']:
             with self.subTest(attrs=attrs):
-                (self.dir / 'Example.java').write_text(self.source(attrs=attrs))
+                (self.dir / 'ExampleGameTests.java').write_text(self.source(attrs=attrs))
                 with self.assertRaises(RuntimeError): inventory(self.root)
-        (self.dir / 'Example.java').write_text(self.source().replace('public static void', 'public void'))
+        (self.dir / 'ExampleGameTests.java').write_text(self.source().replace('public static void', 'public void'))
         with self.assertRaisesRegex(RuntimeError, 'Unparsed'): inventory(self.root)
+
+    def test_test_outside_the_development_source_pattern_is_rejected(self):
+        (self.dir / 'Example.java').write_text(self.source())
+        with self.assertRaisesRegex(RuntimeError, 'source set'): inventory(self.root)
+
+    def test_new_namespace_cannot_silently_escape_the_full_suite(self):
+        (self.dir / 'ExampleGameTests.java').write_text(self.source().replace('Singulo.MODID', '"unlisted"'))
+        with self.assertRaisesRegex(RuntimeError, 'namespace is absent'): check(self.root, source=self.root)
 
     def test_absent_source_is_not_zero_test_success(self):
         with self.assertRaisesRegex(RuntimeError, 'No GameTests'): inventory(self.root)
