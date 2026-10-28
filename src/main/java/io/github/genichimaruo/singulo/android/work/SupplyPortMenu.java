@@ -108,7 +108,8 @@ public class SupplyPortMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (!(player.level().getBlockEntity(pos) instanceof SupplyPortBlockEntity port) || !port.mayOperate(player)) {
+        if (id < 0 || id >= SupplyPortBlockEntity.ENTRIES * 3
+                || !(player.level().getBlockEntity(pos) instanceof SupplyPortBlockEntity port) || !port.mayOperate(player)) {
             return false;
         }
         int i = id / 3;
@@ -124,6 +125,9 @@ public class SupplyPortMenu extends AbstractContainerMenu {
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         int own = SupplyPortBlockEntity.ENTRIES;
+        if (index < 0 || index >= slots.size()) {
+            return ItemStack.EMPTY;
+        }
         if (index < own) {
             entries.setItem(index, ItemStack.EMPTY);
             return ItemStack.EMPTY;
