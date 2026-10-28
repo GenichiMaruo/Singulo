@@ -678,6 +678,9 @@ final class AndroidWorkGoal extends Goal {
             int take = 0;
             if (ItemStack.isSameItemSameComponents(s, r.output())) {
                 take = (int) Math.min(s.getCount(), want - collected);     // ほかの人の分までは取らない
+            } else if (io.github.genichimaruo.singulo.item.UsesHelper.isSpentCatalyst(s)) {
+                // 使い切った触媒: 記録していなくても持ち帰る（出口に残すと、次にできた物の出口がふさがる）
+                take = s.getCount();
             } else {
                 for (ItemStack e : r.extras()) {
                     if (ItemStack.isSameItemSameComponents(s, e)) {

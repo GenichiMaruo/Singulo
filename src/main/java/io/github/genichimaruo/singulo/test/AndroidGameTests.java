@@ -1557,6 +1557,56 @@ public final class AndroidGameTests {
         });
     }
 
+    /**
+     * 触媒を使う装置の失活触媒: 記録していなくても持ち帰る。精密組立台は出口が1つなので、残すと次のモジュールが出られない
+     * （時間結晶触媒2個からモジュール3個。1個目は2個目の途中で、2個目は3個目で使い切る）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 3000)
+    public static void androidTakesSpentCatalystsOut(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos at = new BlockPos(0, 1, 3);
+        helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity m = helper.getBlockEntity(at);
+        helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
+        m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("time_crystal_catalyst"), 2), false);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(item("optical_lattice_substrate"), 3));
+        chest.setItem(2, new ItemStack(item("steel_plate"), 6));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(at),
+                level.getBlockState(helper.absolutePos(at)).getBlock());
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(item("optical_lattice_substrate")));
+        in.set(1, new ItemStack(item("steel_plate"), 2));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(item("time_crystal_module")), List.of(),
+                ItemStack.EMPTY).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(item("time_crystal_module")), 3,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, item("time_crystal_module")) == 3, "失活触媒で出口がふさがり、モジュールが3つ届かない: "
+                    + delivered(helper, item("time_crystal_module")));
+            // 最後の1個は、最後のモジュールを取り出したあとに出口へ出るので、次の作業で持ち帰る
+            int left = 0;
+            for (int k = 0; k < m.type().outputSlots(); k++) {
+                ItemStack o = m.items().getStackInSlot(m.type().outputSlot() + k);
+                left += o.is(item("spent_time_crystal_catalyst")) ? o.getCount() : 0;
+            }
+            for (ItemStack waiting : m.magazine().contents()) {
+                left += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
+            }
+            helper.assertTrue(left <= 1, "使い切った触媒を持ち帰らない（装置に " + left + " 個）");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
     /** 燃料の「満タン」: 燃料が切れたら、1個ずつではなく、装置に入るだけ（在庫の石炭5個を全部）持ってくる。 */
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void androidFillsFuel(GameTestHelper helper) {

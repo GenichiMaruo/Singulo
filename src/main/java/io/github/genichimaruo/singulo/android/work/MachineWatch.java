@@ -155,8 +155,11 @@ public final class MachineWatch {
         return null;
     }
 
-    /** レシピで出てくる物（主な物か副産物）か。 */
+    /** レシピで出てくる物（主な物か副産物。触媒を使う装置から出る失活触媒も）か。 */
     private static boolean producedBy(RecipeData r, ItemStack s) {
+        if (io.github.genichimaruo.singulo.item.UsesHelper.isSpentCatalyst(s)) {
+            return true;
+        }
         for (ItemStack o : r.outputs()) {
             if (ItemStack.isSameItemSameComponents(o, s)) {
                 return true;

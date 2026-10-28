@@ -70,6 +70,15 @@ public final class UsesHelper {
         return exhausted(stack, next);
     }
 
+    /** 使い切った触媒（失活触媒）か。 */
+    public static boolean isSpentCatalyst(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        return Singulo.MODID.equals(id.getNamespace()) && GeneratedContent.SPENT_FORM.containsValue(id.getPath());
+    }
+
     private static ItemStack exhausted(ItemStack stack, UsesData data) {
         if (!(stack.getItem() instanceof UsesItem uses)) {
             return ItemStack.EMPTY;
