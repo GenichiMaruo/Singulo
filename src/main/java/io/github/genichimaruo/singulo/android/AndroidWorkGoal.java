@@ -208,6 +208,7 @@ final class AndroidWorkGoal extends Goal {
         ranchSkip.clear();
         ranchTarget = null;
         goalBlock = standAt = fuelTrip = null;
+        pathRetry.reset();
         dropPoints = null;
     }
 
@@ -253,6 +254,7 @@ final class AndroidWorkGoal extends Goal {
     /** 新しい作業を始める（持っている物で続ける作業なら、取りに行く段階を飛ばす）。 */
     private void begin(WorkJob job) {
         android.workJob = job;
+        pathRetry.reset();
         phase = job.carried() ? 1 : 0;
         returning = false;
         pickups = null;
@@ -557,6 +559,9 @@ final class AndroidWorkGoal extends Goal {
             batchIndex++;
         }
     }
+
+    private final io.github.genichimaruo.singulo.android.work.PathRetry pathRetry =
+            new io.github.genichimaruo.singulo.android.work.PathRetry();
 
     private boolean craftStorageFull;
 
@@ -1096,7 +1101,7 @@ final class AndroidWorkGoal extends Goal {
                         stopMining();
                         return;
                     }
-                } else if (travel % 20 == 1 || android.getNavigation().isDone()) {
+                } else if (pathRetry.allow(target, android.level().getGameTime(), android.getNavigation().isDone() ? 10 : 20)) {
                     net.minecraft.world.level.pathfinder.Path path = android.getNavigation().createPath(target, 1);   // ブロックの隣まで
                     if (path != null && android.getNavigation().moveTo(path, 1.0)) {
                         return;
@@ -1204,7 +1209,7 @@ final class AndroidWorkGoal extends Goal {
             }
             return null;
         }
-        if (travel % 20 == 1 || android.getNavigation().isDone()) {
+        if (pathRetry.allow(target, android.level().getGameTime(), android.getNavigation().isDone() ? 10 : 20)) {
             net.minecraft.world.level.pathfinder.Path path = android.getNavigation().createPath(target, 1);
             if (path != null && android.getNavigation().moveTo(path, 1.0)) {
                 return false;
@@ -1231,7 +1236,7 @@ final class AndroidWorkGoal extends Goal {
             travel = 0;
             return null;
         }
-        if (travel % 10 == 1 || android.getNavigation().isDone()) {
+        if (pathRetry.allow(target.blockPosition(), android.level().getGameTime(), 10)) {
             android.getNavigation().moveTo(target, 1.0);
         }
         return false;
