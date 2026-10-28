@@ -60,6 +60,17 @@ public class SinguloJeiPlugin implements IModPlugin {
                         return screen.extraAreas();
                     }
                 });
+        // 装置の画面の進捗の矢印をクリックすると、その装置で作れるものを JEI で出す
+        registration.addGuiContainerHandler(io.github.genichimaruo.singulo.client.MachineScreen.class,
+                new mezz.jei.api.gui.handlers.IGuiContainerHandler<io.github.genichimaruo.singulo.client.MachineScreen>() {
+                    @Override
+                    public java.util.Collection<mezz.jei.api.gui.handlers.IGuiClickableArea> getGuiClickableAreas(
+                            io.github.genichimaruo.singulo.client.MachineScreen screen, double mouseX, double mouseY) {
+                        net.minecraft.client.renderer.Rect2i a = screen.arrowArea();
+                        return List.of(mezz.jei.api.gui.handlers.IGuiClickableArea.createBasic(a.getX(), a.getY(),
+                                a.getWidth(), a.getHeight(), TYPES.get(screen.machineType())));
+                    }
+                });
     }
 
     /** 作業指令台の記録のページへ、作業台のレシピを「+」で置く。 */

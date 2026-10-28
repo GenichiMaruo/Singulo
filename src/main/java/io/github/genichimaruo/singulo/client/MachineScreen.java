@@ -32,6 +32,16 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         return menu.type();
     }
 
+    /** この画面の装置（JEI の連携用）。 */
+    public MachineType machineType() {
+        return type();
+    }
+
+    /** 進捗の矢印の範囲（画面の左上からの位置。JEI の連携で、クリックするとレシピを出す）。 */
+    public net.minecraft.client.renderer.Rect2i arrowArea() {
+        return new net.minecraft.client.renderer.Rect2i(layout().arrowX, layout().arrowY, 22, 16);
+    }
+
     /** 待機している理由（待機中だけ、何 tick かごとに調べ直す）。 */
     @javax.annotation.Nullable
     private io.github.genichimaruo.singulo.machine.MachineDiagnosis.Result idleReason;
