@@ -174,8 +174,10 @@ public final class WorkConsoleView {
     static CompoundTag forPlayer(WorkConsoleBlockEntity c, ServerPlayer player, @Nullable CompoundTag plan, CompoundTag common) {
         HolderLookup.Provider reg = player.level().registryAccess();
         CompoundTag t = new CompoundTag();
-        // Shared fields are immutable after construction; only the top-level tag differs per viewer.
-        for (String key : common.getAllKeys()) t.put(key, common.get(key));
+        // 共通の部分は作ったあと変えない。見る人ごとに違うのは、いちばん上の項目だけ
+        for (String key : common.getAllKeys()) {
+            t.put(key, common.get(key));
+        }
         // 使えるアンドロイド
         ListTag as = new ListTag();
         for (RuinAndroid a : c.candidates(player)) {
@@ -192,7 +194,9 @@ public final class WorkConsoleView {
             as.add(at);
         }
         t.put("androids", as);
-        if (plan != null) t.put("plan", plan);
+        if (plan != null) {
+            t.put("plan", plan);
+        }
         return t;
     }
 

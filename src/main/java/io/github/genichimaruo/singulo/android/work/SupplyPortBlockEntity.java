@@ -41,7 +41,9 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                               List<net.neoforged.neoforge.fluids.capability.IFluidHandler> out) {
         for (Direction d : Direction.values()) {
             BlockPos p = from.relative(d);
-            if (!level.isLoaded(p)) continue;
+            if (!level.isLoaded(p)) {
+                continue;
+            }
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
@@ -54,7 +56,9 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
 
     /** box の中身を、pos の隣のストレージへ移す（作業のブロックは除く）。1回で1スタックずつ。 */
     static void pushOut(Level level, BlockPos pos, net.minecraft.world.Container box) {
-        if (box.isEmpty()) return;
+        if (box.isEmpty()) {
+            return;
+        }
         List<IItemHandler> targets = new java.util.ArrayList<>();
         collect(level, pos, new java.util.HashSet<>(), targets);
         if (targets.isEmpty()) {
@@ -85,7 +89,9 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                 : owner instanceof WorkLinkedBlockEntity linked ? linked.adjacentItems : null;
         for (Direction d : Direction.values()) {
             BlockPos p = from.relative(d);
-            if (!level.isLoaded(p)) continue;
+            if (!level.isLoaded(p)) {
+                continue;
+            }
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }

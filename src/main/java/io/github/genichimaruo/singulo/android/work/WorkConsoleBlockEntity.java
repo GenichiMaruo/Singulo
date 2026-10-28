@@ -51,8 +51,16 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         MenuProvider, AndroidEyes.Holder {
     final AdjacentItemStores adjacentItems = new AdjacentItemStores(this);
 
-    @Override public void setRemoved() { adjacentItems.clear(); super.setRemoved(); }
-    @Override public void clearRemoved() { super.clearRemoved(); adjacentItems.clear(); }
+    @Override
+    public void setRemoved() {
+        adjacentItems.clear();
+        super.setRemoved();
+    }
+    @Override
+    public void clearRemoved() {
+        super.clearRemoved();
+        adjacentItems.clear();
+    }
 
     /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
     protected final AndroidEyes eyes = new AndroidEyes();
@@ -655,8 +663,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 登録した注文のきっかけを調べて、要れば注文する（毎秒）。 */
     private void runStanding(ServerLevel level) {
-        // These checks only reserve items. Reuse one physical inventory snapshot, but subtract
-        // current reservations again for each order so simultaneous orders cannot double-book it.
+        // ここでは在庫を予約するだけ。実際の在庫は1回だけ数えて使い回すが、予約済みの分は注文ごとに引き直す
+        // （同時に出す注文が、同じ物を二重に当てにしないように）
         List<ItemCount> stock = null;
         for (StandingOrder s : standing) {
             if (s.activeOrder >= 0) {
@@ -674,7 +682,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 s.reason = null;
                 continue;
             } else {
-                if (stock == null) stock = stock();
+                if (stock == null) {
+                    stock = stock();
+                }
                 want = Math.max(0, s.count - ItemCount.get(stock, s.target));
             }
             if (want <= 0) {
@@ -684,7 +694,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             }
             Player actor = actorFor(level, s.registrant);
             int id = nextOrderId;
-            if (stock == null) stock = stock();
+            if (stock == null) {
+                stock = stock();
+            }
             Component why = start(actor, s.target, want, s.androids, s.destination, s.toStock(), s.androids.isEmpty(), false, stock);
             if (why == null) {
                 s.activeOrder = id;
@@ -744,8 +756,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     static long maxCrafts(RecipeData recipe, int slots, long limit, List<ItemCount> carried) {
         long lo = 0, hi = limit;
-        // Every completed batch must fit its outputs, even before counting other carried items.
-        // Avoid simulating thousands of impossible crafts for each waiting worker.
+        // できた物は、ほかの持ち物を数える前から収まっていなければならない。待っている作業者ごとに、
+        // 収まるはずのない何千回もの試算をしないよう、先に上限を絞る
         for (ItemStack output : recipe.outputs()) {
             if (!output.isEmpty() && !FluidSamples.liquid(output)) {
                 hi = Math.min(hi, (long) slots * Math.max(1, output.getMaxStackSize()) / Math.max(1, output.getCount()));
@@ -762,7 +774,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return lo;
     }
 
-    /** Inputs must travel in the worker; a dedicated bench can hold the expanding output. */
+    /** 作業台で作る回数: 素材は作業者が持ち運ぶが、増えていくできた物は作業台の預かり箱にも置ける。 */
     private long workbenchCrafts(WorkOrder.StepState step, int slots) {
         RecipeData recipe = step.recipe;
         if (recipe.processing() || recipe.procedure() || recipe.variants() || level == null || !level.isLoaded(step.location)
@@ -770,14 +782,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             return maxCrafts(recipe, slots, step.remaining());
         }
         int free = 0;
-        for (int i = 0; i < bench.buffer().getSlots(); i++) if (bench.buffer().getStackInSlot(i).isEmpty()) free++;
+        for (int i = 0; i < bench.buffer().getSlots(); i++) {
+            if (bench.buffer().getStackInSlot(i).isEmpty()) {
+                free++;
+            }
+        }
         long lo = 0, hi = maxCrafts(recipe, slots + free, step.remaining());
         List<ItemCount> inputs = recipe.inputs();
         while (lo < hi) {
             long mid = lo + (hi - lo + 1) / 2;
             int needed = 0;
-            for (ItemCount input : inputs) needed += stacks(input.item, input.count * mid);
-            if (needed <= slots) lo = mid; else hi = mid - 1;
+            for (ItemCount input : inputs) {
+                needed += stacks(input.item, input.count * mid);
+            }
+            if (needed <= slots) {
+                lo = mid;
+            } else {
+                hi = mid - 1;
+            }
         }
         return lo;
     }
@@ -1016,8 +1038,8 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (canDeliver(o) && !carrying) {
             long left = o.count - o.delivered - o.deliverInProgress;
             if (!o.stepsFinished()) {
-                // During production only dispatch products already reserved in storage.
-                // Other workers may still be making the remaining output.
+                // 作っている間は、倉庫に予約済みの完成品だけを届ける
+                // 残りは、ほかの作業者がまだ作っているかもしれない
                 left = Math.min(left, Math.max(0, o.held(null, o.target) - o.deliverInProgress));
             }
             if (o.toStock && left > 0) {
@@ -1101,12 +1123,16 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return null;
     }
 
-    /** Deliver completed batches early, unless another unfinished step still needs this product.
-     * Otherwise a 4096-item order requires 4096 free storage spaces before any delivery starts. */
+    /**
+     * 作り終えた分は、まだ終わっていないほかの工程がその物を使わない限り、早めに届ける
+     * （でないと、4096個の注文では、届け始める前に4096個分の置き場が要る）。
+     */
     private static boolean canDeliver(WorkOrder order) {
         for (WorkOrder.StepState step : order.steps) {
             if (!step.finished()) for (ItemCount input : step.recipe.inputs()) {
-                if (input.matches(order.target)) return false;
+                if (input.matches(order.target)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -1325,16 +1351,20 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     private record BusyLocations(java.util.Map<BlockPos, Integer> parked, Set<BlockPos> leased) {}
 
-    /** One snapshot per scheduling decision, never a tick cache: the next worker sees new leases. */
+    /** 作業を決めるたびに1回だけ数える（tick ごとには覚えない。次の作業者は新しい受け持ちを見る）。 */
     private BusyLocations busyLocations() {
         var parked = new java.util.HashMap<BlockPos, Integer>();
         Set<BlockPos> leased = new HashSet<>();
         for (WorkOrder order : orders) for (WorkOrder.StepState step : order.steps) {
-            if (step.parked > 0) parked.merge(step.location, 1, Integer::sum);
+            if (step.parked > 0) {
+                parked.merge(step.location, 1, Integer::sum);
+            }
         }
         for (WorkJob.Lease lease : leases) {
             if (lease.job.type() == WorkJob.Type.CRAFT || lease.job.type() == WorkJob.Type.COLLECT) {
-                for (WorkJob.Batch batch : lease.job.batch()) leased.add(batch.location());
+                for (WorkJob.Batch batch : lease.job.batch()) {
+                    leased.add(batch.location());
+                }
             }
         }
         return new BusyLocations(parked, leased);
@@ -1839,9 +1869,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         setChanged();
     }
 
-    /** Release a crafting lease without redoing already completed crafts when storage fills. */
+    /** 置き場がいっぱいになったとき、作り終えた分はやり直さずに、作る作業の受け持ちを手放す。 */
     public void completePartialCraft(WorkJob job, int current, long crafts) {
-        if (lease(job.jobId()) == null) return;
+        if (lease(job.jobId()) == null) {
+            return;
+        }
         WorkOrder order = order(job.orderId());
         if (order != null && current >= 0 && current < job.batch().size()) {
             WorkJob.Batch batch = job.batch().get(current);
@@ -2702,7 +2734,9 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         CompoundTag common = null;
         for (ServerPlayer p : level.players()) {
             if (p.containerMenu instanceof WorkConsoleMenu menu && worldPosition.equals(menu.pos()) && mayOperate(p)) {
-                if (common == null) common = WorkConsoleView.common(this);
+                if (common == null) {
+                    common = WorkConsoleView.common(this);
+                }
                 sendSnapshot(p, menu.containerId, WorkConsoleView.forPlayer(this, p, null, common), false);
             }
         }

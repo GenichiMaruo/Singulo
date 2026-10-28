@@ -290,27 +290,27 @@ public final class ScalingGameTests {
         BlockPos expected = new BlockPos(127, 127, 127), result = null;
         for (int tick = 0; tick < 20 && result == null; tick++) {
             calls[0] = 0;
-            result = search.find(box, 1, BlockPos.ZERO, tick, p -> {
+            result = search.find(box, WorkAreaSearch.Order.TOP_DOWN, BlockPos.ZERO, tick, p -> {
                 calls[0]++;
                 return p.equals(expected) || p.equals(BlockPos.ZERO);
             });
             h.assertTrue(calls[0] <= WorkAreaSearch.PER_TICK, "One area search exceeded its tick budget");
             if (result == null) {
                 int before = calls[0];
-                search.find(box, 1, BlockPos.ZERO, tick, p -> { calls[0]++; return false; });
+                search.find(box, WorkAreaSearch.Order.TOP_DOWN, BlockPos.ZERO, tick, p -> { calls[0]++; return false; });
                 h.assertTrue(calls[0] == before, "Repeated polls bypassed the tick budget");
             }
         }
         h.assertTrue(expected.equals(result), "Large scan lost the highest layer or nearest target");
         search.reset();
-        result = search.find(box, -1, BlockPos.ZERO, 100, p -> p.equals(BlockPos.ZERO));
-        for (int tick = 101; result == null && tick < 120; tick++) result = search.find(box, -1, BlockPos.ZERO, tick, p -> p.equals(BlockPos.ZERO));
+        result = search.find(box, WorkAreaSearch.Order.BOTTOM_UP, BlockPos.ZERO, 100, p -> p.equals(BlockPos.ZERO));
+        for (int tick = 101; result == null && tick < 120; tick++) result = search.find(box, WorkAreaSearch.Order.BOTTOM_UP, BlockPos.ZERO, tick, p -> p.equals(BlockPos.ZERO));
         h.assertTrue(BlockPos.ZERO.equals(result), "Bottom-first search changed priority");
         search.reset();
         var plane = new net.minecraft.world.level.levelgen.structure.BoundingBox(0, 0, 0, 127, 0, 127);
-        search.find(plane, 0, BlockPos.ZERO, 200, p -> p.equals(BlockPos.ZERO));
+        search.find(plane, WorkAreaSearch.Order.NEAREST, BlockPos.ZERO, 200, p -> p.equals(BlockPos.ZERO));
         for (int tick = 201; tick < 220 && search.pending(); tick++) {
-            h.assertTrue(search.find(plane, 0, BlockPos.ZERO, tick, p -> false) == null, "Removed candidate remained usable");
+            h.assertTrue(search.find(plane, WorkAreaSearch.Order.NEAREST, BlockPos.ZERO, tick, p -> false) == null, "Removed candidate remained usable");
         }
         h.assertFalse(search.pending(), "Area search did not finish");
         h.succeed();

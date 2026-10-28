@@ -75,7 +75,9 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
                 }
             });
 
-    public static void clearAlternatives() { ALT_CACHE.clear(); }
+    public static void clearAlternatives() {
+        ALT_CACHE.clear();
+    }
 
     /**
      * 加工モードで、装置のどの面から入れ・取り出し・燃料を入れるか（役目ごとに3ビット: 入れる面、取り出す面、燃料の面）。

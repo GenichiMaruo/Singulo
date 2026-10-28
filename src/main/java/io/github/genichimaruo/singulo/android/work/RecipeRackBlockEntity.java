@@ -24,7 +24,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
     private final ItemStack[] decodedCards = new ItemStack[SLOTS];
     private final RecipeData[] decodedRecipes = new RecipeData[SLOTS];
 
-    /** Decode unchanged card NBT once. Compare components too, so in-place card edits are observed. */
+    /** 変わっていないカードは1回だけ読む。部品（コンポーネント）も比べるので、カードを書き換えればちゃんと読み直す。 */
     private RecipeData recipe(int slot, HolderLookup.Provider registries) {
         ItemStack card = items.getStackInSlot(slot);
         if (decodedCards[slot] == null || !ItemStack.isSameItemSameComponents(decodedCards[slot], card)) {
@@ -87,7 +87,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
                 if (data.procedure()) {
                     if (!data.steps().isEmpty()) {
                         BlockPos first = data.steps().get(0).pos();
-                        // Reading the catalogue must never load a remote procedure's chunk.
+                        // 一覧を読むだけで、遠くの手順の場所のチャンクを読み込まない
                         out.add(new Entry(data, first, level.isLoaded(first) ? level.getBlockState(first).getBlock()
                                 : net.minecraft.world.level.block.Blocks.AIR));
                     }

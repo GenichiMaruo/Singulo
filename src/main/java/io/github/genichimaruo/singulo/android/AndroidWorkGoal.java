@@ -1,11 +1,16 @@
 package io.github.genichimaruo.singulo.android;
 
+import io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity;
 import io.github.genichimaruo.singulo.android.work.FluidSamples;
 import io.github.genichimaruo.singulo.android.work.ItemCount;
 import io.github.genichimaruo.singulo.android.work.RecipeData;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity;
+import io.github.genichimaruo.singulo.android.work.PathRetry;
+import io.github.genichimaruo.singulo.android.work.WorkAreaSearch;
 import io.github.genichimaruo.singulo.android.work.WorkJob;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,6 +25,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 /**
  * 作業（自動化）: 作業指令台から作業をもらって進める。
@@ -324,9 +331,11 @@ final class AndroidWorkGoal extends Goal {
         }
         WorkJob job = android.workJob;
         if (job == null) {
-            // Stable per-worker phases spread initial requests and periodic retries across ticks.
-            // Keep lease heartbeats and cancellation checks above this gate responsive every tick.
-            if (Math.floorMod(level.getGameTime(), 8) != Math.floorMod(android.getUUID().hashCode(), 8)) return;
+            // 作業の頼みは、作業者ごとに決まった tick にだけ出す（大勢の作業者の頼みが同じ tick に重ならないように）。
+            // 預かりの更新や取り消しの確かめは、この上で毎 tick 続ける
+            if (Math.floorMod(level.getGameTime(), REQUEST_PHASES) != Math.floorMod(android.getUUID().hashCode(), REQUEST_PHASES)) {
+                return;
+            }
             begin(c.requestJob(android));
             job = android.workJob;
         }
@@ -560,8 +569,10 @@ final class AndroidWorkGoal extends Goal {
         }
     }
 
-    private final io.github.genichimaruo.singulo.android.work.PathRetry pathRetry =
-            new io.github.genichimaruo.singulo.android.work.PathRetry();
+    /** 作業の頼みを出す tick を、作業者ごとに分ける数。 */
+    private static final int REQUEST_PHASES = 8;
+    /** 同じ行き先への経路探しを間引く。 */
+    private final PathRetry pathRetry = new PathRetry();
 
     private boolean craftStorageFull;
 
@@ -1064,7 +1075,9 @@ final class AndroidWorkGoal extends Goal {
             mineTimer = 0;
             travel = 0;
             if (mineTarget == null) {
-                if (areaSearch.pending()) return;
+                if (areaSearch.pending()) {
+                    return;                               // 広い範囲を探している途中（次の tick に続きを探す）
+                }
                 // 掘る物がない（丸石製造機なら、戻るのを待つ）。範囲のそばで待つ
                 if (android.state() == RuinAndroid.STATE_MINING) {
                     android.setState(RuinAndroid.STATE_IDLE);
@@ -1172,14 +1185,13 @@ final class AndroidWorkGoal extends Goal {
     /** 範囲の中で、条件に合う一番近いブロック（なければ null）。 */
     @Nullable
     private BlockPos nearestInArea(net.minecraft.world.level.levelgen.structure.BoundingBox box, java.util.function.Predicate<BlockPos> ok) {
-        return areaSearch.find(box, 0, android.blockPosition(), android.level().getGameTime(),
+        return areaSearch.find(box, WorkAreaSearch.Order.NEAREST, android.blockPosition(), android.level().getGameTime(),
                 p -> android.level().isLoaded(p) && !mineSkip.contains(p) && ok.test(p));
     }
 
-    private final io.github.genichimaruo.singulo.android.work.WorkAreaSearch areaSearch =
-            new io.github.genichimaruo.singulo.android.work.WorkAreaSearch();
-    private final io.github.genichimaruo.singulo.android.work.WorkAreaSearch growthSearch =
-            new io.github.genichimaruo.singulo.android.work.WorkAreaSearch();
+    /** 作業範囲の中の探しもの（採掘・伐採の場所と、育ちきった作物）。何 tick かに分けて探す。 */
+    private final WorkAreaSearch areaSearch = new WorkAreaSearch();
+    private final WorkAreaSearch growthSearch = new WorkAreaSearch();
 
     /**
      * ブロックのそば（手が届く所）まで近づく。着いたら true、歩いているあいだ false、たどり着けなければ null。
@@ -1278,7 +1290,7 @@ final class AndroidWorkGoal extends Goal {
         net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
         switch (ps.kind()) {
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL -> {
-                BlockPos found = growthSearch.find(box, 2, android.blockPosition(), level.getGameTime(),
+                BlockPos found = growthSearch.find(box, WorkAreaSearch.Order.ANY, android.blockPosition(), level.getGameTime(),
                         p -> level.isLoaded(p) && grows(level, p, ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL));
                 return found != null || growthSearch.pending();
 
@@ -1460,7 +1472,9 @@ final class AndroidWorkGoal extends Goal {
             mineTarget = nearestInArea(ps.area(), p -> harvestable(level, p));
             travel = 0;
             if (mineTarget == null) {
-                if (areaSearch.pending()) return;
+                if (areaSearch.pending()) {
+                    return;                               // 広い範囲を探している途中（次の tick に続きを探す）
+                }
                 idleNear(c, job, ps, FARM_IDLE_TICKS);
                 return;
             }
@@ -1630,12 +1644,14 @@ final class AndroidWorkGoal extends Goal {
         if (mineTarget == null) {
             // 一番下の段の原木（同じ段では近い順）を根元にする
             net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
-            mineTarget = areaSearch.find(box, -1, android.blockPosition(), level.getGameTime(),
+            mineTarget = areaSearch.find(box, WorkAreaSearch.Order.BOTTOM_UP, android.blockPosition(), level.getGameTime(),
                     p -> level.isLoaded(p) && !mineSkip.contains(p) && level.getBlockState(p).is(net.minecraft.tags.BlockTags.LOGS)
                             && !level.getBlockState(p.below()).is(net.minecraft.tags.BlockTags.LOGS));
             travel = 0;
             if (mineTarget == null) {
-                if (areaSearch.pending()) return;
+                if (areaSearch.pending()) {
+                    return;                               // 広い範囲を探している途中（次の tick に続きを探す）
+                }
                 idleNear(c, job, ps, FARM_IDLE_TICKS);
                 return;
             }
@@ -2069,7 +2085,7 @@ final class AndroidWorkGoal extends Goal {
     private BlockPos findMineTarget(ServerLevel level, io.github.genichimaruo.singulo.android.work.ProcedureStep ps, ItemStack tool,
                                     WorkConsoleBlockEntity c) {
         net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
-        return areaSearch.find(box, 1, android.blockPosition(), level.getGameTime(),
+        return areaSearch.find(box, WorkAreaSearch.Order.TOP_DOWN, android.blockPosition(), level.getGameTime(),
                 p -> level.isLoaded(p) && mineable(level, p, tool, c));
     }
 
@@ -2393,44 +2409,59 @@ final class AndroidWorkGoal extends Goal {
                 ItemStack held = android.inventory().getItem(carry[i]);
                 if (in.matches(held)) {
                     int take = (int) Math.min(left, held.getCount() - used[i]);
-                    used[i] += take; left -= take;
+                    used[i] += take;
+                    left -= take;
                 }
             }
-            if (left > 0) return false;
+            if (left > 0) {
+                return false;
+            }
         }
         ItemStack result = match.get().value().assemble(input, level.registryAccess());
         NonNullList<ItemStack> remaining = match.get().value().getRemainingItems(input);
         return commitCraft(level, c, job, at, used, result, remaining);
     }
 
-    /** Simulate consumption and every output together; commit only if no item needs to be dropped. */
+    /**
+     * 素材を使い、できた物と残る物（バケツなど）をすべて持ち物へ入れてみて、どれも落とさずに収まるときだけ確定する。
+     * 持ち物に入りきらない分は、作業台の預かり箱へ入れる。収まらなければ何も変えずに false（{@link #craftStorageFull}）。
+     */
     private boolean commitCraft(ServerLevel level, WorkConsoleBlockEntity console, WorkJob job, BlockPos at,
                                 int[] used, ItemStack result, NonNullList<ItemStack> remaining) {
         int[] slots = android.carrySlots();
-        var carried = new net.neoforged.neoforge.items.ItemStackHandler(slots.length);
+        var carried = new ItemStackHandler(slots.length);
         for (int i = 0; i < slots.length; i++) {
             ItemStack before = android.inventory().getItem(slots[i]);
             carried.setStackInSlot(i, before.copyWithCount(before.getCount() - used[i]));
         }
-        var bench = level.getBlockEntity(at) instanceof io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity b ? b : null;
-        net.neoforged.neoforge.items.ItemStackHandler stored = null;
-        var outputs = new java.util.ArrayList<ItemStack>();
-        outputs.add(result); outputs.addAll(remaining);
+        var bench = level.getBlockEntity(at) instanceof AndroidWorkbenchBlockEntity b ? b : null;
+        ItemStackHandler stored = null;
+        List<ItemStack> outputs = new ArrayList<>();
+        outputs.add(result);
+        outputs.addAll(remaining);
         for (ItemStack output : outputs) {
-            ItemStack rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(carried, output.copy(), false);
+            ItemStack rest = ItemHandlerHelper.insertItemStacked(carried, output.copy(), false);
             if (!rest.isEmpty() && bench != null) {
-                // Most crafts fit in the carry inventory. Snapshot the larger bench only on overflow.
+                // たいていは持ち物に収まる。あふれたときだけ、作業台の預かり箱の写しを作って入れてみる
                 if (stored == null) {
-                    stored = new net.neoforged.neoforge.items.ItemStackHandler(bench.buffer().getSlots());
-                    for (int i = 0; i < stored.getSlots(); i++) stored.setStackInSlot(i, bench.buffer().getStackInSlot(i).copy());
+                    stored = new ItemStackHandler(bench.buffer().getSlots());
+                    for (int i = 0; i < stored.getSlots(); i++) {
+                        stored.setStackInSlot(i, bench.buffer().getStackInSlot(i).copy());
+                    }
                 }
-                rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(stored, rest, false);
+                rest = ItemHandlerHelper.insertItemStacked(stored, rest, false);
             }
-            if (!rest.isEmpty()) { craftStorageFull = true; return false; }
+            if (!rest.isEmpty()) {
+                craftStorageFull = true;
+                return false;
+            }
         }
-        for (int i = 0; i < slots.length; i++) android.inventory().setItem(slots[i], carried.getStackInSlot(i));
+        for (int i = 0; i < slots.length; i++) {
+            android.inventory().setItem(slots[i], carried.getStackInSlot(i));
+        }
         for (int i = 0; stored != null && i < stored.getSlots(); i++) {
-            ItemStack before = bench.buffer().getStackInSlot(i), after = stored.getStackInSlot(i);
+            ItemStack before = bench.buffer().getStackInSlot(i);
+            ItemStack after = stored.getStackInSlot(i);
             int added = after.getCount() - before.getCount();
             if (added > 0) {
                 bench.buffer().setStackInSlot(i, after);

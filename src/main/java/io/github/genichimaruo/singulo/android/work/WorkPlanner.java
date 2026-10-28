@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 public final class WorkPlanner {
     private static final int MAX_DEPTH = 24;
     private static final int MAX_STEPS = 1024, MAX_VISITS = 8192;
-    // Leave headroom for sums and progress percentages in execution and GUI code.
+    // 実行と画面で、合計や進み具合の割合を計算してもあふれないよう、余裕を残す
     private static final long MAX_AMOUNT = Long.MAX_VALUE / (MAX_VISITS * 1024L);
 
     private record Key(net.minecraft.world.item.Item item, net.minecraft.core.component.DataComponentMap components) {
@@ -31,7 +31,9 @@ public final class WorkPlanner {
         int visits;
         Context(List<RecipeRackBlockEntity.Entry> entries, List<ItemCount> stock) {
             this.stock = stock;
-            for (var entry : entries) recipes.putIfAbsent(Key.of(entry.recipe().outputKey()), entry);
+            for (var entry : entries) {
+                recipes.putIfAbsent(Key.of(entry.recipe().outputKey()), entry);
+            }
         }
     }
 
@@ -50,7 +52,7 @@ public final class WorkPlanner {
         public final List<ItemCount> missing = new ArrayList<>();
         /** ループするレシピがあった。 */
         public boolean loop;
-        /** Work/quantity limits are different from an actual recipe cycle. */
+        /** 作業量・数の上限による失敗（レシピの循環とは別）。 */
         public boolean limited;
 
         public String failureKey() {
@@ -88,11 +90,13 @@ public final class WorkPlanner {
         return plan;
     }
 
-    /** Use real stock and previously planned surplus separately; only real stock is reserved. */
+    /** 実際の在庫と、先に計画した工程の余りを分けて使う（予約するのは実際の在庫だけ）。 */
     private static void need(Plan plan, ItemStack item, long amount,
                              @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt,
                              Context context, List<Key> path) {
-        if (plan.limited) return;
+        if (plan.limited) {
+            return;
+        }
         if (++context.visits > MAX_VISITS || amount < 0 || amount > MAX_AMOUNT) {
             plan.limited = true;
             return;
@@ -101,7 +105,9 @@ public final class WorkPlanner {
             amount = take(context.stock, plan.fromStock, item, amount, alt, pass);
             amount = take(context.surplus, null, item, amount, alt, pass);
         }
-        if (amount <= 0) return;
+        if (amount <= 0) {
+            return;
+        }
         Key key = Key.of(item);
         RecipeRackBlockEntity.Entry recipe = context.recipes.get(key);
         if (recipe == null || path.contains(key)) {
@@ -122,10 +128,14 @@ public final class WorkPlanner {
                 break;
             }
             need(plan, in.item, in.count * crafts, in.alt, context, path);
-            if (plan.limited) break;
+            if (plan.limited) {
+                break;
+            }
         }
         path.remove(path.size() - 1);
-        if (plan.limited) return;
+        if (plan.limited) {
+            return;
+        }
         if (plan.steps.size() >= MAX_STEPS) {
             plan.limited = true;
             return;
@@ -138,14 +148,22 @@ public final class WorkPlanner {
                              ItemStack item, long amount,
                              @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt, int pass) {
         for (ItemCount c : stock) {
-            if (amount <= 0) break;
-            if (c.count <= 0 || c.alt != null) continue;
+            if (amount <= 0) {
+                break;
+            }
+            if (c.count <= 0 || c.alt != null) {
+                continue;
+            }
             boolean matches = pass == 0 ? c.matches(item) : alt != null && alt.test(c.item) && !c.matches(item);
-            if (!matches) continue;
+            if (!matches) {
+                continue;
+            }
             long take = Math.min(c.count, amount);
             c.count -= take;
             amount -= take;
-            if (reserved != null) ItemCount.add(reserved, c.item, take);
+            if (reserved != null) {
+                ItemCount.add(reserved, c.item, take);
+            }
         }
         return amount;
     }

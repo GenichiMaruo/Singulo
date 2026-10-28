@@ -197,27 +197,39 @@ public final class WorkOrder {
     private boolean[] frontierFinished;
     private List<Integer> frontier;
 
-    /** A cached ready queue for dense dependency graphs. Small/simple orders keep the direct scan.
-     * Validate completion flags on every decision, including completions made earlier in this tick. */
+    /**
+     * 依存の多い注文では、取りかかれる工程の一覧を覚えておく（小さな注文や単純な注文は、毎回そのまま調べる）。
+     * 工程が終わったかどうかは、この tick のうちに終わったものも含めて、毎回確かめる。
+     */
     @Nullable
     public List<Integer> readySteps() {
         if (frontierSize != steps.size()) {
             frontierSize = steps.size();
             long edges = 0;
-            for (StepState step : steps) edges += step.after.size();
+            for (StepState step : steps) {
+                edges += step.after.size();
+            }
             denseDependencies = steps.size() >= 32 && edges >= (long) steps.size() * 4;
             frontier = null;
         }
-        if (!denseDependencies) return null;
+        if (!denseDependencies) {
+            return null;
+        }
         boolean changed = frontier == null;
-        if (!changed) for (int i = 0; i < steps.size(); i++) {
-            if (frontierFinished[i] != steps.get(i).finished()) { changed = true; break; }
+        for (int i = 0; !changed && i < steps.size(); i++) {
+            changed = frontierFinished[i] != steps.get(i).finished();
         }
         if (changed) {
             frontierFinished = new boolean[steps.size()];
-            for (int i = 0; i < steps.size(); i++) frontierFinished[i] = steps.get(i).finished();
+            for (int i = 0; i < steps.size(); i++) {
+                frontierFinished[i] = steps.get(i).finished();
+            }
             var ready = new ArrayList<Integer>();
-            for (int i = 0; i < steps.size(); i++) if (!frontierFinished[i] && ready(steps.get(i))) ready.add(i);
+            for (int i = 0; i < steps.size(); i++) {
+                if (!frontierFinished[i] && ready(steps.get(i))) {
+                    ready.add(i);
+                }
+            }
             frontier = List.copyOf(ready);
         }
         return frontier;

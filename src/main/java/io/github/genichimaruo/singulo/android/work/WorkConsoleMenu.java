@@ -292,9 +292,11 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     /** 様子を受け取る（クライアント）。 */
     @Nullable private CompoundTag lastSentView;
 
-    /** Server-side snapshot belongs to this menu, so closing/reopening always receives a full view. */
+    /** サーバーで最後に送った画面の中身（画面ごとに持つので、閉じて開き直せばいつも全部を送る）。 */
     boolean shouldSend(CompoundTag snapshot) {
-        if (snapshot.equals(lastSentView)) return false;
+        if (snapshot.equals(lastSentView)) {
+            return false;
+        }
         lastSentView = snapshot;
         return true;
     }

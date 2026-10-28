@@ -57,7 +57,7 @@ public class AreaCardItem extends Item {
                 player.displayClientMessage(Component.translatable("message.singulo.area_card.too_large", MAX_SIZE), true);
                 return InteractionResult.FAIL;
             }
-            // Validate before splitting: a rejected second corner must not consume a stacked card.
+            // 分ける前に確かめる: 2つ目の角が受け付けられなければ、重ねたカードを減らさない
             ItemStack card = held.getCount() > 1 ? held.split(1) : held;
             if (finishing) {
                 recordSecond(card, pos);

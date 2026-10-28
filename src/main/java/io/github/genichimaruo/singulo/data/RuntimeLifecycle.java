@@ -69,7 +69,7 @@ public final class RuntimeLifecycle {
 
     @SubscribeEvent
     public static void tagsUpdated(net.neoforged.neoforge.event.TagsUpdatedEvent event) {
-        // Ingredient resolves tag contents lazily and then caches them. Drop old definitions on reload.
+        // 材料はタグの中身をあとから解決して覚える。再読み込みのときは古い定義を捨てる
         io.github.genichimaruo.singulo.android.work.RecipeData.clearAlternatives();
     }
 

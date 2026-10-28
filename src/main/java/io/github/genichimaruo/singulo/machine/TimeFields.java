@@ -28,13 +28,16 @@ public final class TimeFields {
         }
     }
 
-    /** World-free values: weak level keys must not be retained through their index. */
+    /** ワールドごとの場の索引（値はワールドを持たないので、使い終えたワールドは消える）。 */
     private static final Map<Level, Index> FIELDS = new WeakHashMap<>();
+    /** これより多くのチャンクにまたがる大きな場は、チャンクごとに登録せず別に持つ。 */
+    private static final int MAX_INDEXED_CHUNKS = 1024;
 
+    /** 場の索引: 持ち主ごとと、場がかかるチャンクごと（その場所にかかる場だけを調べるため）。 */
     private static final class Index {
         final Map<BlockPos, Field> owners = new HashMap<>();
         final Map<Long, Map<BlockPos, Field>> chunks = new HashMap<>();
-        // Normal configured radii touch at most 81 chunks. Keep unexpected huge radii bounded too.
+        /** チャンクごとに登録しない大きな場（ふつうの設定の半径なら、かかるチャンクは81まで）。 */
         final Map<BlockPos, Field> wide = new HashMap<>();
 
         void index(Field f, boolean add) {
@@ -42,26 +45,37 @@ public final class TimeFields {
             int maxX = (int) (((long) f.center.getX() + f.radius) >> 4);
             int minZ = (int) (((long) f.center.getZ() - f.radius) >> 4);
             int maxZ = (int) (((long) f.center.getZ() + f.radius) >> 4);
-            if ((long) (maxX - minX + 1) * (maxZ - minZ + 1) > 1024) {
-                if (add) wide.put(f.owner, f); else wide.remove(f.owner);
+            if ((long) (maxX - minX + 1) * (maxZ - minZ + 1) > MAX_INDEXED_CHUNKS) {
+                if (add) {
+                    wide.put(f.owner, f);
+                } else {
+                    wide.remove(f.owner);
+                }
                 return;
             }
-            for (int x = minX; x <= maxX; x++) for (int z = minZ; z <= maxZ; z++) {
-                long key = ChunkPos.asLong(x, z);
-                if (add) chunks.computeIfAbsent(key, k -> new HashMap<>()).put(f.owner, f);
-                else {
+            for (int x = minX; x <= maxX; x++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    long key = ChunkPos.asLong(x, z);
+                    if (add) {
+                        chunks.computeIfAbsent(key, k -> new HashMap<>()).put(f.owner, f);
+                        continue;
+                    }
                     Map<BlockPos, Field> bucket = chunks.get(key);
                     if (bucket != null) {
                         bucket.remove(f.owner);
-                        if (bucket.isEmpty()) chunks.remove(key);
+                        if (bucket.isEmpty()) {
+                            chunks.remove(key);
+                        }
                     }
                 }
             }
         }
     }
 
-    /** Release runtime references when this level closes. */
-    public static void forgetLevel(Level level) { FIELDS.remove(level); }
+    /** ワールドを閉じるとき、そのワールドの場を忘れる。 */
+    public static void forgetLevel(Level level) {
+        FIELDS.remove(level);
+    }
 
     /** 場を張る（radius が 0 以下なら外す）。owner は装置の位置、center は場の中心。 */
     public static void set(Level level, BlockPos owner, BlockPos center, int radius, boolean accelerate) {
@@ -71,11 +85,15 @@ public final class TimeFields {
         }
         Index index = FIELDS.computeIfAbsent(level, l -> new Index());
         Field previous = index.owners.get(owner);
-        // Active generators publish every tick; unchanged fields must not rebuild the index.
+        // 動いている装置は毎 tick 場を張り直す。変わっていなければ索引を作り直さない
         if (previous != null && previous.center.equals(center) && previous.radius == radius
-                && previous.accelerate == accelerate) return;
+                && previous.accelerate == accelerate) {
+            return;
+        }
         Field field = new Field(owner.immutable(), center.immutable(), radius, accelerate);
-        if (previous != null) index.index(previous, false);
+        if (previous != null) {
+            index.index(previous, false);
+        }
         index.owners.put(field.owner, field);
         index.index(field, true);
     }
@@ -84,8 +102,12 @@ public final class TimeFields {
         Index index = FIELDS.get(level);
         if (index != null) {
             Field removed = index.owners.remove(owner);
-            if (removed != null) index.index(removed, false);
-            if (index.owners.isEmpty()) FIELDS.remove(level);
+            if (removed != null) {
+                index.index(removed, false);
+            }
+            if (index.owners.isEmpty()) {
+                FIELDS.remove(level);
+            }
         }
     }
 
@@ -96,20 +118,31 @@ public final class TimeFields {
             return 0;
         }
         Map<BlockPos, Field> nearby = index.chunks.get(ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4));
-        int flags = flags(nearby, pos, 0);
-        if (flags != 3) flags = flags(index.wide, pos, flags);
-        return flags == 1 ? 1 : flags == 2 ? -1 : 0;
+        int found = covering(nearby, pos, 0);
+        if (found != BOTH) {
+            found = covering(index.wide, pos, found);
+        }
+        // 加速と膨張が重なると打ち消し合う
+        return found == ACCELERATE ? 1 : found == DILATE ? -1 : 0;
     }
 
-    private static int flags(Map<BlockPos, Field> fields, BlockPos pos, int flags) {
-        if (fields == null) return flags;
+    /** その場所にかかっている場の種類（ビット）。 */
+    private static final int ACCELERATE = 1, DILATE = 2, BOTH = ACCELERATE | DILATE;
+
+    /** fields のうち pos にかかる場の種類を found に足す（両方そろえばそこでやめる）。 */
+    private static int covering(Map<BlockPos, Field> fields, BlockPos pos, int found) {
+        if (fields == null) {
+            return found;
+        }
         for (Field f : fields.values()) {
             if (f.covers(pos)) {
-                flags |= f.accelerate ? 1 : 2;
-                if (flags == 3) break;
+                found |= f.accelerate ? ACCELERATE : DILATE;
+                if (found == BOTH) {
+                    break;
+                }
             }
         }
-        return flags;
+        return found;
     }
 
     /** 処理速度の倍率。 */
