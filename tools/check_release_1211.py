@@ -7,7 +7,7 @@ import tomllib
 import zipfile
 
 # 0.9.0 以降の 1.21.1 は NeoForge 版のみ（Forge 版は 0.8.1 まで）
-COUNTS = {'neoforge': 527}
+COUNTS = {'neoforge': 539}
 
 
 def validate(root, loader, name=None):

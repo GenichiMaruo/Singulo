@@ -13,11 +13,13 @@ public final class WorkAreaSearch {
     private BlockPos origin, best;
     private double distance;
     private boolean pending;
+    private final BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 
     public boolean pending() { return pending; }
     public void reset() { pending = false; box = null; best = null; }
 
-    /** order: 0 nearest, 1 highest layer first, -1 lowest layer first, 2 any match. */
+    /** order: 0 nearest, 1 highest layer first, -1 lowest layer first, 2 any match.
+     * The predicate receives a temporary mutable position and must not retain it. */
     public BlockPos find(BoundingBox area, int order, BlockPos from, long now, Predicate<BlockPos> matches) {
         if (now != tick) { tick = now; used = 0; }
         if (!pending || !same(area) || this.order != order) {
@@ -27,10 +29,10 @@ public final class WorkAreaSearch {
         }
         while (used < PER_TICK - 1) {
             used++;
-            BlockPos at = new BlockPos(x, y, z);
+            BlockPos at = cursor.set(x, y, z);
             if (matches.test(at)) {
                 double d = at.distSqr(origin);
-                if (d < distance) { best = at; distance = d; }
+                if (d < distance) { best = at.immutable(); distance = d; }
                 if (order == 2) { pending = false; return best; }
             }
             if (++x <= box.maxX()) continue;

@@ -139,7 +139,7 @@ public final class RuinGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 160)
+    @GameTest(template = EMPTY, timeoutTicks = 600, batch = "drone_altitude")
     public static void healthyDroneDescendsAndCannotShootFromHighAbove(GameTestHelper helper) throws Exception {
         var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 12, 3));
         // Other simultaneous fixtures create players. Keep this altitude test's
@@ -155,10 +155,12 @@ public final class RuinGameTests {
         shoot.setAccessible(true); shoot.invoke(drone, target);
         helper.assertTrue(helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.HorizonBolt.class,
                 drone.getBoundingBox().inflate(3), bolt -> bolt.getOwner() == drone).isEmpty(), "高空から射撃できてしまう");
-        helper.runAtTickTime(120, () -> {
+        // Count actual entity ticks: accelerated GameTests can run ahead of chunk ticket promotion.
+        helper.succeedWhen(() -> {
+            helper.assertTrue(drone.tickCount >= 120, "Waiting for the drone's entity-ticking chunk");
             helper.assertFalse(drone.crippled(), "高度検査中に壊れかけになった");
             helper.assertTrue(drone.getY() <= target.getY() + 2.8, "健康なドローンが高空に留まる: " + (drone.getY() - target.getY()));
-            drone.discard(); target.discard(); helper.succeed();
+            drone.discard(); target.discard();
         });
     }
 

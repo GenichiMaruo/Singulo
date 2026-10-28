@@ -2590,4 +2590,43 @@ public final class AndroidGameTests {
             helper.succeed();
         });
     }
+
+    /** Actual AI crafts and delivers 4096 items while the destination is emptied as a hopper would. */
+    @GameTest(template = EMPTY, timeoutTicks = 18000, batch = "scaling_delivery")
+    public static void fourThousandPlanksCraftAndDeliverExactly(GameTestHelper helper) {
+        floor(helper);
+        var console = workshop(helper, 64);
+        var level = helper.getLevel();
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        for (int i = 0; i < 16; i++) chest.setItem(i, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        helper.setBlock(TABLE, SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get());
+        var rack = (io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity) helper.getBlockEntity(RACK);
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(TABLE),
+                SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get());
+        rack.items().setStackInSlot(0, loc);
+        BladeAndroid a = worker(helper, false);
+        a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_large_backpack_upgrade")));
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+                4096, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "Bulk order was rejected: " + error);
+        var port = (io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity) helper.getBlockEntity(DELIVERY);
+        int[] delivered = {0};
+        helper.onEachTick(() -> {
+            for (int slot = 0; slot < port.handler().getSlots(); slot++) {
+                ItemStack result = port.handler().extractItem(slot, 64, false);
+                helper.assertTrue(result.isEmpty() || result.is(net.minecraft.world.item.Items.OAK_PLANKS), "Unexpected delivery");
+                delivered[0] += result.getCount();
+            }
+            helper.assertTrue(delivered[0] <= 4096, "Bulk delivery duplicated output");
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered[0] == 4096 && console.orders().isEmpty(),
+                    "Bulk job incomplete: delivered=" + delivered[0] + " orders=" + console.orders().size() + " activity=" + a.activity());
+            helper.assertTrue(chest.isEmpty(), "Bulk job left reserved raw materials behind");
+            helper.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(TABLE)).inflate(8)).isEmpty(), "Bulk crafting dropped inventory overflow");
+            a.discard();
+        });
+    }
 }

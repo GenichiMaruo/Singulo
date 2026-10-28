@@ -48,7 +48,7 @@ neoForge {
             // Keep tests separate from development worlds and local server settings.
             gameDirectory = project.file('build/gametest')
             // -PtestNamespace=... で一部のテストだけ走らせられる（既定は全部）
-            systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_prototype,singulo_progression,singulo_gunner,singulo_cable,singulo_rayleigh,singulo_panel_review')
+            systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('testNamespace').getOrElse('singulo,singulo_prototype,singulo_progression,singulo_gunner,singulo_cable,singulo_rayleigh,singulo_panel_review,singulo_scaling')
             // テストは tick で数えるので、時計を速めても結果は変わらない（-PtestTickRate=20 で普通の速さ）
             systemProperty 'singulo.gameTestTickRate', providers.gradleProperty('testTickRate').getOrElse('200')
         }

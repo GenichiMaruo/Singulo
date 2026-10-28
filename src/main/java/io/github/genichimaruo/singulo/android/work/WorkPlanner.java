@@ -18,10 +18,10 @@ public final class WorkPlanner {
     // Leave headroom for sums and progress percentages in execution and GUI code.
     private static final long MAX_AMOUNT = Long.MAX_VALUE / (MAX_VISITS * 1024L);
 
-    private record Key(net.minecraft.world.item.Item item, net.minecraft.core.component.DataComponentPatch components) {
+    private record Key(net.minecraft.world.item.Item item, net.minecraft.core.component.DataComponentMap components) {
         static Key of(ItemStack item) {
             ItemStack key = FluidSamples.key(item);
-            return new Key(key.getItem(), key.getComponentsPatch());
+            return new Key(key.getItem(), key.getComponents());
         }
     }
 

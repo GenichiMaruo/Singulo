@@ -739,6 +739,13 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
      */
     static long maxCrafts(RecipeData recipe, int slots, long limit, List<ItemCount> carried) {
         long lo = 0, hi = limit;
+        // Every completed batch must fit its outputs, even before counting other carried items.
+        // Avoid simulating thousands of impossible crafts for each waiting worker.
+        for (ItemStack output : recipe.outputs()) {
+            if (!output.isEmpty() && !FluidSamples.liquid(output)) {
+                hi = Math.min(hi, (long) slots * Math.max(1, output.getMaxStackSize()) / Math.max(1, output.getCount()));
+            }
+        }
         while (lo < hi) {                                     // 収まる回数は、回数を増やすほど収まりにくくなるので二分探索
             long mid = (lo + hi + 1) / 2;
             if (peakStacks(recipe, mid, rest(carried, recipe, mid)) <= slots) {
