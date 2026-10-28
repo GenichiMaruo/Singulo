@@ -807,7 +807,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         for (int i = 0; i < type.recipeSlots(); i++) {
             int slot = type.recipeSlot(i);
             if (slot == type.catalystSlot()) {
-                list.add(magazine.current(items, slot));             // 触媒は装填中のもの（まだなら予備）で照合する
+                list.add(magazine.pooled(items, slot));              // 触媒は装填中のものと予備の同じ触媒を合わせた残りで照合する
             } else {
                 list.add(pendingReturns.get(slot) ? ItemStack.EMPTY : items.getStackInSlot(slot));
             }

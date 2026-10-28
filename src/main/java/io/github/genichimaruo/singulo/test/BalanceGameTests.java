@@ -303,4 +303,35 @@ public final class BalanceGameTests {
             }
         });
     }
+
+    /**
+     * 1回に触媒の残りより多く使うレシピ（時間結晶モジュールは1個で36,000）でも、予備に同じ触媒があれば、
+     * 装填中のものの残りを使い切って次の触媒から続けて使い、続けて作れる（時間結晶触媒2個でモジュール2個）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 700)
+    public static void timeCrystalModulesContinueIntoTheNextCatalyst(GameTestHelper helper) {
+        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
+        int max = UsesHelper.get(new ItemStack(item("time_crystal_catalyst"))).max();
+        m.items().insertItem(0, new ItemStack(item("optical_lattice_substrate"), 2), false);
+        m.items().insertItem(1, new ItemStack(item("steel_plate"), 4), false);
+        helper.assertTrue(m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("time_crystal_catalyst"), 2), false).isEmpty(),
+                "時間結晶触媒2個を予備に積めない");
+        helper.succeedWhen(() -> {
+            int made = 0;
+            int spent = 0;
+            for (int k = 0; k < m.type().outputSlots(); k++) {
+                ItemStack out = m.items().getStackInSlot(m.type().outputSlot() + k);
+                made += out.is(item("time_crystal_module")) ? out.getCount() : 0;
+                spent += out.is(item("spent_time_crystal_catalyst")) ? out.getCount() : 0;
+            }
+            // 出力スロットがモジュールでふさがっていれば、失活触媒は装置の中で出口が空くのを待つ
+            for (ItemStack waiting : m.magazine().contents()) {
+                spent += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
+            }
+            helper.assertTrue(made == 2, "残りと次の触媒を合わせて、続けて作れない: " + made);
+            helper.assertTrue(spent == 1, "使い切った1個目が失活触媒として出ない: " + spent);
+            helper.assertTrue(UsesHelper.remaining(m.catalyst()) == 2 * max - 72_000,
+                    "2個目の触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));
+        });
+    }
 }

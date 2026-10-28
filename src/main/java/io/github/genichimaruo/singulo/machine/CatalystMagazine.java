@@ -53,6 +53,26 @@ public final class CatalystMagazine {
         return s.isEmpty() ? s : s.copyWithCount(1);       // 予備は何個積んであっても、使うのは1個
     }
 
+    /**
+     * レシピの照合に使う触媒: 装填中のものの残りに、予備の同じ触媒の残りを足した1個として見せる
+     * （1回に装填中のものの残りより多く使うレシピでも、使い切ったあとは次の触媒から続けて使える）。
+     */
+    public ItemStack pooled(IItemHandlerModifiable supply, int slot) {
+        ItemStack first = current(supply, slot);
+        if (loaded.isEmpty() || first.getItem() instanceof CreativeCatalystItem) {
+            return first;
+        }
+        ItemStack s = supply.getStackInSlot(slot);
+        long total = UsesHelper.remaining(loaded);
+        if (!s.isEmpty() && sameKind(loaded, s)) {
+            total += (long) UsesHelper.remaining(s) * s.getCount();
+        }
+        ItemStack view = loaded.copy();
+        int all = (int) Math.min(Integer.MAX_VALUE, total);
+        view.set(SinguloComponents.USES.get(), new UsesData(0, all, UsesHelper.get(loaded).repairs()));
+        return view;
+    }
+
     /** 装填中の触媒の残りの割合（0〜1。なければ 0）。 */
     public float fill() {
         if (loaded.isEmpty() || loaded.getItem() instanceof CreativeCatalystItem) {
@@ -90,20 +110,24 @@ public final class CatalystMagazine {
         }
     }
 
-    /** amount 回ぶん使う。使い切ったら失活触媒を返す物へ回し、予備から次の1個をすぐ装填する。 */
+    /**
+     * amount 回ぶん使う。装填中のものを使い切ったら失活触媒を返す物へ回し、予備から次の1個を装填して、
+     * 足りない分はその触媒から続けて使う。
+     */
     public void consume(int amount, IItemHandlerModifiable supply, int slot) {
-        if (loaded.isEmpty() || amount <= 0) {
-            return;
-        }
-        ItemStack after = UsesHelper.consume(loaded, amount);
-        if (!after.isEmpty() && CatalystHelper.tierOf(after) > 0 && UsesHelper.remaining(after) > 0) {
-            loaded = after;
-        } else {
-            if (!after.isEmpty()) {
-                returns.add(after);
+        while (amount > 0 && !loaded.isEmpty()) {
+            int take = loaded.getItem() instanceof CreativeCatalystItem ? amount : Math.min(amount, UsesHelper.remaining(loaded));
+            amount -= take;
+            ItemStack after = UsesHelper.consume(loaded, take);
+            if (!after.isEmpty() && CatalystHelper.tierOf(after) > 0 && UsesHelper.remaining(after) > 0) {
+                loaded = after;
+            } else {
+                if (!after.isEmpty()) {
+                    returns.add(after);
+                }
+                loaded = ItemStack.EMPTY;
+                load(supply, slot);
             }
-            loaded = ItemStack.EMPTY;
-            load(supply, slot);
         }
         changed.run();
     }
