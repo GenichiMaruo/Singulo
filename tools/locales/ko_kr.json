@@ -5659,6 +5659,30 @@
     "source": "Side %s",
     "translation": "한 변 %s"
   },
+  "gui.singulo.supply_port.entry": {
+    "source": "Priority item",
+    "translation": "우선 아이템"
+  },
+  "gui.singulo.supply_port.entry.hint": {
+    "source": "Click with an item to register it (click empty-handed to clear)",
+    "translation": "아이템을 들고 클릭하면 등록 (빈손으로 클릭하면 해제)"
+  },
+  "gui.singulo.supply_port.mode.0": {
+    "source": "Priority for taking and returning",
+    "translation": "꺼내기와 반납에서 우선"
+  },
+  "gui.singulo.supply_port.mode.1": {
+    "source": "Priority for taking",
+    "translation": "꺼내기에서 우선"
+  },
+  "gui.singulo.supply_port.mode.2": {
+    "source": "Priority for returning",
+    "translation": "반납에서 우선"
+  },
+  "gui.singulo.supply_port.rank": {
+    "source": "Priority %s (1 goes first)",
+    "translation": "우선순위 %s (1이 가장 먼저)"
+  },
   "gui.singulo.supporters.count": {
     "source": "Supporters: %s / 100",
     "translation": "후원자: %s / 100"
@@ -6392,8 +6416,8 @@
     "translation": "스테이션 업그레이드"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
-    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n- \"새로\": 켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\").\n- 주문 목록에서는 만드는 중인 아이템에 주황색 테두리가 붙습니다. 진행 중인 주문의 \"↻\"로 같은 아이템을 다시 주문할 수 있습니다. 재료를 기다리는 주문에는 부족한 아이템과 수가 나옵니다(행에 커서를 올리면 전부).\n- 화면에서 낸 주문은 끝났을 때, 재료를 기다리며 1분 이상 멈췄을 때, 취소되었을 때 주문한 사람에게 채팅으로 알립니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +12·18·24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\n- Supply port priorities: right-click a supply port to register up to 8 items, each with a priority (1 goes first) for taking, returning or both. Registered items are taken from and returned to the highest-priority port first (the next one when it is full). Sneak-right-click shows the linked console.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "자신의 안드로이드에게 제작대 제작을 맡길 수 있습니다.\n1. 안드로이드 작업 지령대를 놓고, 작업 위치 카드로 웅크리고 우클릭해 기록합니다. 그 카드로 레시피 선반(늘리려면 자재구·납품구도)을 우클릭하면 지령대에 연결됩니다(64블록 이내).\n2. 지령대(와 자재구) 옆에 상자를 놓습니다(재료 보관소). 안드로이드는 재료가 실제로 들어 있는 곳을 돌며 꺼냅니다. 완성품은 주문에서 고른 납품처(지령대의 납품함이나 이름을 붙인 납품구)에 도착합니다.\n3. 지령대의 \"기록\"에서 3×3에 견본을 놓고(물건은 줄지 않음. JEI의 \"+\"로도 놓을 수 있음) 레시피 카드에 기록합니다.\n4. 레시피 선반 한 줄의 왼쪽에 제작대를 기록한 작업 위치 카드를, 오른쪽에 레시피 카드를 놓습니다.\n5. 지령대의 \"주문\"에서 만들 것과 개수를 고르고, 재료가 충분한지 확인한 뒤 안드로이드를 골라 작업을 시작합니다. 레시피가 있는 중간 재료도 스스로 만듭니다.\n- \"새로\": 켜면 재고에 있는 완성품은 쓰지 않고 주문한 수만큼 새로 만듭니다(예: 철 도끼가 3개 있고 2개 더 갖고 싶을 때는 \"2\").\n- 주문 목록에서는 만드는 중인 아이템에 주황색 테두리가 붙습니다. 진행 중인 주문의 \"↻\"로 같은 아이템을 다시 주문할 수 있습니다. 재료를 기다리는 주문에는 부족한 아이템과 수가 나옵니다(행에 커서를 올리면 전부).\n- 화면에서 낸 주문은 끝났을 때, 재료를 기다리며 1분 이상 멈췄을 때, 취소되었을 때 주문한 사람에게 채팅으로 알립니다.\n・자재구 우선: 자재구를 우클릭하면 아이템마다 우선순위(1이 가장 먼저)와 꺼내기·반납 중 어디에 적용할지를 최대 8개까지 등록할 수 있습니다. 등록한 아이템은 순위가 높은 자재구에서 먼저 꺼내고 먼저 반납합니다(가득 차면 다음 장소로). 웅크리고 우클릭하면 연결된 지령대를 표시합니다.\n안드로이드는 한 번에 5칸(백팩이 있으면 +12·18·24)씩 나릅니다. 작업 중에는 소지품을 꺼낼 수 없고, 주문이 끝나면 원래 움직임으로 돌아갑니다. 작업 중인 안드로이드에게도 같은 지령대의 다른 주문을 맡길 수 있습니다(손이 비면 그것도 합니다). 도착할 수 없는 곳이 있으면 그 주문은 취소됩니다."
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",

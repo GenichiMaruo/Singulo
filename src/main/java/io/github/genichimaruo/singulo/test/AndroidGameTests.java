@@ -923,6 +923,83 @@ public final class AndroidGameTests {
         return helper.getBlockEntity(CONSOLE);
     }
 
+    /** 2つ目の資材口（隣にチェスト）。指令台から遠い隅に置き、指令台につなぐ。 */
+    private static final BlockPos SUPPLY2 = new BlockPos(6, 1, 5), CHEST2 = new BlockPos(6, 1, 6);
+
+    private static io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity secondPort(GameTestHelper helper) {
+        var level = helper.getLevel();
+        helper.setBlock(SUPPLY2, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
+        helper.setBlock(CHEST2, net.minecraft.world.level.block.Blocks.CHEST);
+        ItemStack link = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
+                SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity port = helper.getBlockEntity(SUPPLY2);
+        port.useItem(helper.makeMockServerPlayerInLevel(), link, net.minecraft.world.InteractionHand.MAIN_HAND);
+        return port;
+    }
+
+    private static int countIn(GameTestHelper helper, BlockPos chestPos, net.minecraft.world.item.Item item) {
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(chestPos);
+        int n = 0;
+        for (int i = 0; i < chest.getContainerSize(); i++) {
+            n += chest.getItem(i).is(item) ? chest.getItem(i).getCount() : 0;
+        }
+        return n;
+    }
+
+    /** 資材口の優先の取り出し: 登録した資材口から先に取る（近くの資材口にも同じ物があっても）。登録は保存しても残る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void supplyPortTakePriority(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var port = secondPort(helper);
+        var planks = net.minecraft.world.item.Items.OAK_PLANKS;
+        port.entries().setItem(0, new ItemStack(planks));
+        port.cycleMode(0);                                                  // 両方 → 取り出し
+        helper.assertTrue(port.priority(new ItemStack(planks), true) == 9 && port.priority(new ItemStack(planks), false) == 0,
+                "取り出しだけの登録の優先度が合わない");
+        var tag = port.saveWithoutMetadata(helper.getLevel().registryAccess());
+        port.entries().setItem(0, ItemStack.EMPTY);
+        port.loadWithComponents(tag, helper.getLevel().registryAccess());
+        helper.assertTrue(port.priority(new ItemStack(planks), true) == 9, "優先の登録が保存されない");
+        net.minecraft.world.level.block.entity.ChestBlockEntity near = helper.getBlockEntity(CHEST);
+        near.setItem(1, new ItemStack(planks, 4));
+        net.minecraft.world.level.block.entity.ChestBlockEntity far = helper.getBlockEntity(CHEST2);
+        far.setItem(0, new ItemStack(planks, 4));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+            helper.assertTrue(countIn(helper, CHEST2, planks) == 2 && countIn(helper, CHEST, planks) == 4,
+                    "優先の資材口から板材を取らない（近く " + countIn(helper, CHEST, planks) + "、優先 " + countIn(helper, CHEST2, planks) + "）");
+            a.discard();
+        });
+    }
+
+    /** 資材口の優先の返却: 余った物は、登録した資材口へ戻す（近くの資材口ではなく）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void supplyPortReturnPriority(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var port = secondPort(helper);
+        var stick = net.minecraft.world.item.Items.STICK;
+        port.entries().setItem(0, new ItemStack(stick));
+        port.cycleMode(0);
+        port.cycleMode(0);                                                  // 両方 → 取り出し → 返却
+        net.minecraft.world.level.block.entity.ChestBlockEntity near = helper.getBlockEntity(CHEST);
+        near.setItem(1, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 2));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(stick), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, stick) == 2, "棒が2本届かない");
+            helper.assertTrue(countIn(helper, CHEST2, stick) == 2 && countIn(helper, CHEST, stick) == 0,
+                    "余った棒を優先の資材口へ戻さない（近く " + countIn(helper, CHEST, stick) + "、優先 " + countIn(helper, CHEST2, stick) + "）");
+            a.discard();
+        });
+    }
+
     /** オークのフェンス50個（原木 → 板材 → 棒 → フェンスの3工程）を作らせても、持ち物からあふれた物を地面に落とさない。 */
     @GameTest(template = EMPTY, timeoutTicks = 6000)
     public static void fiftyFencesNeverDrop(GameTestHelper helper) {

@@ -981,6 +981,8 @@ CHAPTERS = [
          '・注文の一覧では、作っている最中の物に橙の枠が付く。進行中の注文の「↻」で、同じ物をもう一度注文できる。'
          '素材を待っている注文には、足りない物と数が出る（行にカーソルを合わせると全部）。\n'
          '・画面から出した注文は、できたとき・1分以上素材を待って止まったとき・取り消されたときに、注文した人へチャットで知らせる。\n'
+         '・資材口の優先: 資材口を右クリックすると、アイテムごとに優先順位（1がいちばん先）と、取り出し・返却のどちらに効くかを8件まで登録できる。'
+         '登録した物は、順位の高い資材口から先に取り出し、先に戻す（いっぱいなら次の場所へ）。シフト右クリックで、つながっている指令台を表示。\n'
          'アンドロイドは5スロット（バックパックで+12・18・24）ずつ運びます。作業中は持ち物を取り出せず、終わると元の動き方に戻ります。'
          '作業中のアンドロイドにも、同じ指令台の次の注文を受け持たせられます（手が空いたら、そちらもする）。'
          'たどり着けない場所があると、その注文は取り消されます。',
@@ -998,6 +1000,9 @@ CHAPTERS = [
          '- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. '
          'An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n'
          '- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\n'
+         '- Supply port priorities: right-click a supply port to register up to 8 items, each with a priority (1 goes first) for taking, '
+         'returning or both. Registered items are taken from and returned to the highest-priority port first (the next one when it is '
+         'full). Sneak-right-click shows the linked console.\n'
          'Androids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes '
          'back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. '
          'If a place cannot be reached, the order is cancelled.'),

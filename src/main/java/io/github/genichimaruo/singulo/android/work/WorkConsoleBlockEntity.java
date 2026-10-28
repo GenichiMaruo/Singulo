@@ -1411,6 +1411,66 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
+    /** 受け渡し場所 point での item の優先度（資材口の優先の登録。take は取り出し、そうでなければ返却。登録がなければ 0）。 */
+    public int priority(BlockPos point, ItemStack item, boolean take) {
+        return level != null && level.getBlockEntity(point) instanceof SupplyPortBlockEntity port ? port.priority(item, take) : 0;
+    }
+
+    /** 受け渡し場所の番号を、item を取り出す順に並べる（優先度の高い順。同じなら元の順: 指令台、資材口）。 */
+    private List<Integer> takeOrder(List<BlockPos> points, ItemStack item) {
+        List<Integer> order = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            order.add(i);
+        }
+        order.sort(java.util.Comparator.comparingInt(i -> -priority(points.get(i), item, true)));
+        return order;
+    }
+
+    /** item を戻す場所として、point が candidates のどこよりも優先度が低くないか。 */
+    private boolean returnsHere(BlockPos point, ItemStack item, java.util.Collection<BlockPos> candidates) {
+        int here = priority(point, item, false);
+        for (BlockPos p : candidates) {
+            if (priority(p, item, false) > here) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 持ち物を戻しに行く次の場所: candidates のうち、持ち物のどれかをいちばん優先して受け取る場所（優先の登録がなければ、
+     * いちばん近い場所）。同じ優先度なら from に近い方。
+     */
+    public BlockPos nextReturnPoint(RuinAndroid a, List<BlockPos> candidates, BlockPos from) {
+        BlockPos pick = null;
+        int pickScore = -1;
+        for (BlockPos p : candidates) {
+            int score = 0;
+            for (int slot : a.carrySlots()) {
+                ItemStack s = a.inventory().getItem(slot);
+                if (!s.isEmpty()) {
+                    score = Math.max(score, priority(p, s, false));
+                }
+            }
+            if (score > pickScore || score == pickScore && p.distSqr(from) < pick.distSqr(from)) {
+                pick = p;
+                pickScore = score;
+            }
+        }
+        return pick;
+    }
+
+    /** 持ち物のどれかが、candidates のうちで point に戻したい物か（戻しきれずに残ったなら、そこはいっぱい）。 */
+    public boolean returnsAnyHere(RuinAndroid a, BlockPos point, java.util.Collection<BlockPos> candidates) {
+        for (int slot : a.carrySlots()) {
+            ItemStack s = a.inventory().getItem(slot);
+            if (!s.isEmpty() && returnsHere(point, s, candidates)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** 受け渡し場所の隣のストレージ。アンドロイド作業台なら、その預かり箱（作った物があふれたときに入れた所）。 */
     public List<IItemHandler> storagesAt(BlockPos point, Set<BlockPos> seen) {
         List<IItemHandler> out = new ArrayList<>();
@@ -1558,8 +1618,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         for (ItemCount c : need) {
             long left = c.count;
             if (c.alt != null) {
-                // 同じ種類の別の物も使う: 受け渡し場所ごとに、合う物そのものを予約する
-                for (int i = 0; i < points.size() && left > 0; i++) {
+                // 同じ種類の別の物も使う: 受け渡し場所ごとに、合う物そのものを予約する（優先の登録の高い場所から）
+                for (int i : takeOrder(points, c.item)) {
+                    if (left <= 0) {
+                        break;
+                    }
                     for (ItemCount have : itemsAt(stores.get(i), c)) {
                         long here = have.count;
                         for (WorkOrder other : orders) {
@@ -1578,7 +1641,10 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 }
                 continue;
             }
-            for (int i = 0; i < points.size() && left > 0; i++) {
+            for (int i : takeOrder(points, c.item)) {
+                if (left <= 0) {
+                    break;
+                }
                 long here = countAt(points.get(i), c.item, stores.get(i));
                 for (WorkOrder other : orders) {
                     here -= other.held(points.get(i), c.item);
@@ -1608,14 +1674,23 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
-    /** 燃料 fuel の、ほかの注文が予約していない在庫がある受け渡し場所のうち、from に一番近い所（なければ null）。 */
+    /**
+     * 燃料 fuel の、ほかの注文が予約していない在庫がある受け渡し場所のうち、取り出しの優先度がいちばん高く、
+     * 同じなら from に一番近い所（なければ null）。
+     */
     @Nullable
     public BlockPos fuelPoint(ItemStack fuel, BlockPos from) {
         BlockPos best = null;
+        int bestPriority = -1;
         Set<BlockPos> seen = new HashSet<>();
         for (BlockPos p : supplyPoints()) {
-            if (loose(p, fuel, storagesAt(p, seen)) > 0 && (best == null || p.distSqr(from) < best.distSqr(from))) {
+            if (loose(p, fuel, storagesAt(p, seen)) <= 0) {
+                continue;
+            }
+            int priority = priority(p, fuel, true);
+            if (priority > bestPriority || priority == bestPriority && p.distSqr(from) < best.distSqr(from)) {
                 best = p;
+                bestPriority = priority;
             }
         }
         return best;
@@ -1975,12 +2050,25 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
 
     /** 持ち物を、受け渡し場所 point の隣のストレージへ戻す。全部戻せたら true（入りきらなければ残る。ほかの場所へ回る）。 */
     public boolean depositAt(RuinAndroid a, @Nullable WorkJob job, BlockPos point) {
+        return depositAt(a, job, point, null);
+    }
+
+    /**
+     * 持ち物を point へ戻す。candidates があれば、そのうちのほかの場所の方が返却の優先度が高い物は戻さずに持っておく
+     * （その物の分は false になる。あとでその場所へ戻しに行く）。
+     */
+    public boolean depositAt(RuinAndroid a, @Nullable WorkJob job, BlockPos point, @Nullable java.util.Collection<BlockPos> candidates) {
         WorkOrder o = job == null ? null : order(job.orderId());
         List<IItemHandler> stores = storagesAt(point, new HashSet<>());
         boolean all = true;
+        boolean kept = false;
         for (int slot : a.carrySlots()) {
             ItemStack s = a.inventory().getItem(slot);
             if (s.isEmpty()) {
+                continue;
+            }
+            if (candidates != null && !returnsHere(point, s, candidates)) {
+                kept = true;
                 continue;
             }
             ItemStack rest = s.copy();
@@ -2014,20 +2102,24 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
             o.status = WorkOrder.RUNNING;
         }
         setChanged();
-        return all;
+        return all && !kept;
     }
 
     /** 注文の納品先（納品口がなくなっていれば、指令台）。 */
     public BlockPos destination(WorkJob job) {
         WorkOrder o = order(job.orderId());
         if (o != null && o.toStock) {
-            // 素材置き場へ入れる: ストレージのある受け渡し場所（指令台を先に）
+            // 素材置き場へ入れる: ストレージのある受け渡し場所（返却の優先度の高い場所、同じなら指令台を先に）
+            BlockPos best = null;
+            int bestPriority = -1;
             for (BlockPos p : supplyPoints()) {
-                if (!storagesAt(p, new HashSet<>()).isEmpty()) {
-                    return p;
+                int priority = priority(p, o.target, false);
+                if (priority > bestPriority && !storagesAt(p, new HashSet<>()).isEmpty()) {
+                    best = p;
+                    bestPriority = priority;
                 }
             }
-            return worldPosition;
+            return best != null ? best : worldPosition;
         }
         return o != null && o.destination != null && deliveryPort(o.destination) != null ? o.destination : worldPosition;
     }

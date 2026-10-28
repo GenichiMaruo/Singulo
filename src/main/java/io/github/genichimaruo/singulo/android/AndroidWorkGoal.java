@@ -120,7 +120,9 @@ final class AndroidWorkGoal extends Goal {
     /** 持ち物を戻しに回る受け渡し場所（近い順。いっぱいなら次へ）と、次に行く番号、たどり着けた所があるか。 */
     @Nullable
     private java.util.List<BlockPos> dropPoints;
-    private int dropIndex;
+    /** 今戻しに行っている場所（dropPoints のうち。着くか、たどり着けなければ外して選び直す）。 */
+    @Nullable
+    private BlockPos dropTarget;
     private boolean dropReached;
 
     AndroidWorkGoal(RuinAndroid android) {
@@ -405,11 +407,10 @@ final class AndroidWorkGoal extends Goal {
         }
         if (dropPoints == null) {
             dropPoints = c.supplyPoints();
-            dropPoints.sort(java.util.Comparator.comparingDouble(p -> p.distSqr(android.blockPosition())));
-            dropIndex = 0;
+            dropTarget = null;
             dropReached = false;
         }
-        if (dropIndex >= dropPoints.size()) {
+        if (dropPoints.isEmpty()) {
             boolean reached = dropReached;
             dropPoints = null;
             if (!reached) {
@@ -418,18 +419,26 @@ final class AndroidWorkGoal extends Goal {
             wait = WAIT_TICKS;
             return false;
         }
-        BlockPos point = dropPoints.get(dropIndex);
+        if (dropTarget == null) {
+            dropTarget = c.nextReturnPoint(android, dropPoints, android.blockPosition());
+        }
+        BlockPos point = dropTarget;
         Boolean at = go(point, HANDOVER_TICKS);
         if (at == null) {
-            dropIndex++;
+            dropPoints.remove(point);
+            dropTarget = null;
         } else if (at) {
             dropReached = true;
-            if (c.depositAt(android, job, point)) {
+            // 返却の優先の登録があれば、ほかの場所の方が優先する物は持ったまま次へ
+            if (c.depositAt(android, job, point, dropPoints)) {
                 dropPoints = null;
                 return true;
             }
-            dropIndex++;                       // ここはいっぱい: 次の場所へ
-            android.setStall(RuinAndroid.STALL_FULL);
+            if (c.returnsAnyHere(android, point, dropPoints)) {
+                android.setStall(RuinAndroid.STALL_FULL);     // ここに戻したい物が入りきらない: いっぱい
+            }
+            dropPoints.remove(point);
+            dropTarget = null;
         }
         return false;
     }
@@ -2231,7 +2240,7 @@ final class AndroidWorkGoal extends Goal {
             if (depositFirst) {
                 // 前の作業の残りを、ここで戻してから取る。戻しきれなければ、この作業はあとにして、ほかの場所へ戻しに行く
                 depositFirst = false;
-                if (!c.depositAt(android, WorkJob.simple(WorkJob.Type.DEPOSIT, leftoverOrder), p.point())) {
+                if (!c.depositAt(android, WorkJob.simple(WorkJob.Type.DEPOSIT, leftoverOrder), p.point(), c.supplyPoints())) {
                     fail(c, job, WorkConsoleBlockEntity.Failure.DEFERRED);
                     returning = true;
                     return;

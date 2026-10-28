@@ -5659,6 +5659,30 @@
     "source": "Side %s",
     "translation": "边长 %s"
   },
+  "gui.singulo.supply_port.entry": {
+    "source": "Priority item",
+    "translation": "优先物品"
+  },
+  "gui.singulo.supply_port.entry.hint": {
+    "source": "Click with an item to register it (click empty-handed to clear)",
+    "translation": "手持物品点击即可登记（空手点击则清除）"
+  },
+  "gui.singulo.supply_port.mode.0": {
+    "source": "Priority for taking and returning",
+    "translation": "取出和归还时优先"
+  },
+  "gui.singulo.supply_port.mode.1": {
+    "source": "Priority for taking",
+    "translation": "取出时优先"
+  },
+  "gui.singulo.supply_port.mode.2": {
+    "source": "Priority for returning",
+    "translation": "归还时优先"
+  },
+  "gui.singulo.supply_port.rank": {
+    "source": "Priority %s (1 goes first)",
+    "translation": "优先顺序 %s（1 最先）"
+  },
   "gui.singulo.supporters.count": {
     "source": "Supporters: %s / 100",
     "translation": "支持者：%s / 100"
@@ -6392,8 +6416,8 @@
     "translation": "组装站的升级"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
-    "translation": "可以把工作台的合成交给自己的仿生人。\n1. 放置仿生人作业指令台，用作业位置卡潜行右键来记录它。用这张卡右键配方架（要增加的话还有资材口和交付口），就会连接到指令台（64 格以内）。\n2. 在指令台（和资材口）旁边放箱子（资材存放处）。仿生人会到实际放有材料的地方去取。成品会送到下单时选择的交付目标（指令台的交付箱或命名过的交付口）。\n3. 在指令台的“记录”的 3×3 中摆放样本（物品不会减少，也可用 JEI 的“+”），记录到配方卡上。\n4. 在配方架某一行的左边放记录了工作台的作业位置卡，右边排列配方卡。\n5. 在指令台的“订单”中选择物品和数量，确认材料足够，选择仿生人后开始作业。有配方的中间材料也会自己制作。\n- “新做”：开启后，不使用库存中的成品，而是新做订购的数量（例如有 3 把铁斧、还想要 2 把时，订购“2”）。\n- 在订单列表中，正在制作的物品会带有橙色边框。进行中订单的“↻”可以再次订购同一物品。等待材料的订单会显示缺少的物品和数量（把光标移到该行可看到全部）。\n- 从画面下达的订单在完成时、等待材料停止超过 1 分钟时、被取消时，会在聊天栏通知下单的人。\n仿生人每次搬运 5 格（有背包时 +12、18 或 24）。作业中无法取出它的物品，订单完成后会回到原来的行动方式。作业中的仿生人也可以承担同一指令台的其他订单（空闲时也会去做）。有无法到达的地方时，该订单会被取消。"
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\n- Supply port priorities: right-click a supply port to register up to 8 items, each with a priority (1 goes first) for taking, returning or both. Registered items are taken from and returned to the highest-priority port first (the next one when it is full). Sneak-right-click shows the linked console.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "可以把工作台的合成交给自己的仿生人。\n1. 放置仿生人作业指令台，用作业位置卡潜行右键来记录它。用这张卡右键配方架（要增加的话还有资材口和交付口），就会连接到指令台（64 格以内）。\n2. 在指令台（和资材口）旁边放箱子（资材存放处）。仿生人会到实际放有材料的地方去取。成品会送到下单时选择的交付目标（指令台的交付箱或命名过的交付口）。\n3. 在指令台的“记录”的 3×3 中摆放样本（物品不会减少，也可用 JEI 的“+”），记录到配方卡上。\n4. 在配方架某一行的左边放记录了工作台的作业位置卡，右边排列配方卡。\n5. 在指令台的“订单”中选择物品和数量，确认材料足够，选择仿生人后开始作业。有配方的中间材料也会自己制作。\n- “新做”：开启后，不使用库存中的成品，而是新做订购的数量（例如有 3 把铁斧、还想要 2 把时，订购“2”）。\n- 在订单列表中，正在制作的物品会带有橙色边框。进行中订单的“↻”可以再次订购同一物品。等待材料的订单会显示缺少的物品和数量（把光标移到该行可看到全部）。\n- 从画面下达的订单在完成时、等待材料停止超过 1 分钟时、被取消时，会在聊天栏通知下单的人。\n・资材口的优先：右键点击资材口，可登记最多 8 种物品，并为每种设定优先顺序（1 最先）以及作用于取出、归还还是两者。已登记的物品会先从顺序最高的资材口取出、先归还到那里（满了就换下一个地方）。潜行右键点击可显示连接的指令台。\n仿生人每次搬运 5 格（有背包时 +12、18 或 24）。作业中无法取出它的物品，订单完成后会回到原来的行动方式。作业中的仿生人也可以承担同一指令台的其他订单（空闲时也会去做）。有无法到达的地方时，该订单会被取消。"
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
