@@ -141,6 +141,18 @@ public final class RuinGameTests {
 
     @GameTest(template = EMPTY, timeoutTicks = 600, batch = "drone_altitude")
     public static void healthyDroneDescendsAndCannotShootFromHighAbove(GameTestHelper helper) throws Exception {
+        var level = helper.getLevel();
+        BlockPos floor = helper.absolutePos(POS).offset(0, 64, 256);
+        var forced = new java.util.ArrayList<net.minecraft.world.level.ChunkPos>();
+        for (int x = (floor.getX() - 12) >> 4; x <= (floor.getX() + 12) >> 4; x++) {
+            for (int z = (floor.getZ() - 12) >> 4; z <= (floor.getZ() + 12) >> 4; z++) {
+                var chunk = new net.minecraft.world.level.ChunkPos(x, z);
+                if (!level.getForcedChunks().contains(chunk.toLong())) { level.setChunkForced(x, z, true); forced.add(chunk); }
+            }
+        }
+        for (BlockPos pos : BlockPos.betweenClosed(floor.offset(-12, 0, -12), floor.offset(12, 0, 12))) {
+            level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+        }
         var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 12, 3));
         // Other simultaneous fixtures create players. Keep this altitude test's
         // manually assigned target instead of letting player acquisition replace it.
@@ -148,7 +160,14 @@ public final class RuinGameTests {
         selectors.setAccessible(true);
         ((net.minecraft.world.entity.ai.goal.GoalSelector) selectors.get(drone)).removeAllGoals(goal -> true);
         var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS);
+        target.moveTo(floor.above().getCenter());
+        drone.moveTo(floor.above(12).getCenter());
         target.setNoAi(true); target.setNoGravity(true);
+        Runnable cleanup = () -> {
+            drone.discard(); target.discard();
+            for (var chunk : forced) level.setChunkForced(chunk.x, chunk.z, false);
+        };
+        helper.runAtTickTime(590, cleanup);
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);
         target.setHealth(1000); drone.setTarget(target);
         var shoot = SecurityDrone.class.getDeclaredMethod("shoot", net.minecraft.world.entity.LivingEntity.class);
@@ -160,7 +179,7 @@ public final class RuinGameTests {
             helper.assertTrue(drone.tickCount >= 120, "Waiting for the drone's entity-ticking chunk");
             helper.assertFalse(drone.crippled(), "高度検査中に壊れかけになった");
             helper.assertTrue(drone.getY() <= target.getY() + 2.8, "健康なドローンが高空に留まる: " + (drone.getY() - target.getY()));
-            drone.discard(); target.discard();
+            cleanup.run();
         });
     }
 
