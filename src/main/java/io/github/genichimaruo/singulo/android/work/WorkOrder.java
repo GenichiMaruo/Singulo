@@ -192,6 +192,37 @@ public final class WorkOrder {
         }
     }
 
+    private int frontierSize = -1;
+    private boolean denseDependencies;
+    private boolean[] frontierFinished;
+    private List<Integer> frontier;
+
+    /** A cached ready queue for dense dependency graphs. Small/simple orders keep the direct scan.
+     * Validate completion flags on every decision, including completions made earlier in this tick. */
+    @Nullable
+    public List<Integer> readySteps() {
+        if (frontierSize != steps.size()) {
+            frontierSize = steps.size();
+            long edges = 0;
+            for (StepState step : steps) edges += step.after.size();
+            denseDependencies = steps.size() >= 32 && edges >= (long) steps.size() * 4;
+            frontier = null;
+        }
+        if (!denseDependencies) return null;
+        boolean changed = frontier == null;
+        if (!changed) for (int i = 0; i < steps.size(); i++) {
+            if (frontierFinished[i] != steps.get(i).finished()) { changed = true; break; }
+        }
+        if (changed) {
+            frontierFinished = new boolean[steps.size()];
+            for (int i = 0; i < steps.size(); i++) frontierFinished[i] = steps.get(i).finished();
+            var ready = new ArrayList<Integer>();
+            for (int i = 0; i < steps.size(); i++) if (!frontierFinished[i] && ready(steps.get(i))) ready.add(i);
+            frontier = List.copyOf(ready);
+        }
+        return frontier;
+    }
+
     public boolean ready(StepState s) {
         for (int j : s.after) {
             if (!steps.get(j).finished()) {

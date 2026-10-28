@@ -978,9 +978,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         int best = -1;
         long bestK = 0;
         double bestDist = Double.MAX_VALUE;
-        for (int i = 0; i < o.steps.size(); i++) {
+        List<Integer> ready = o.readySteps();
+        for (int index = 0; index < (ready == null ? o.steps.size() : ready.size()); index++) {
+            int i = ready == null ? index : ready.get(index);
             WorkOrder.StepState s = o.steps.get(i);
-            if (s.remaining() <= 0 || !o.ready(s) || locationBusy(busy, s.location, s) || !canDo(a, s.recipe) || fuelBlocked(s)) {
+            if (s.remaining() <= 0 || (ready == null && !o.ready(s)) || locationBusy(busy, s.location, s) || !canDo(a, s.recipe) || fuelBlocked(s)) {
                 continue;
             }
             long k = Math.min(workbenchCrafts(s, slots), tankLimit(a, s.recipe));
@@ -1057,9 +1059,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         if (o == null) {
             return null;
         }
-        for (int i = 0; i < o.steps.size(); i++) {
+        List<Integer> ready = o.readySteps();
+        for (int index = 0; index < (ready == null ? o.steps.size() : ready.size()); index++) {
+            int i = ready == null ? index : ready.get(index);
             WorkOrder.StepState s = o.steps.get(i);
-            if (s.remaining() <= 0 || !o.ready(s) || locationBusy(busy, s.location, s) || !canDo(a, s.recipe)) {
+            if (s.remaining() <= 0 || (ready == null && !o.ready(s)) || locationBusy(busy, s.location, s) || !canDo(a, s.recipe)) {
                 continue;
             }
             // 持ち物の素材で何回作れるか（素材の要らない手順（採掘だけなど）は、空いている場所に収まるだけ）
@@ -1116,6 +1120,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
     @Nullable
     private WorkJob batchJob(WorkOrder o, int slots, RuinAndroid a, BusyLocations busy) {
         List<Integer> open = new ArrayList<>();
+        java.util.BitSet planned = new java.util.BitSet(o.steps.size());
         for (int i = 0; i < o.steps.size(); i++) {
             WorkOrder.StepState s = o.steps.get(i);
             if (s.remaining() <= 0) {
@@ -1125,11 +1130,12 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
                 return null;                          // ほかのアンドロイドが作業中の工程、このアンドロイドにできない工程がある: 1工程ずつに分ける
             }
             for (int j : s.after) {
-                if (!o.steps.get(j).finished() && !open.contains(j)) {
+                if (!o.steps.get(j).finished() && !planned.get(j)) {
                     return null;
                 }
             }
             open.add(i);
+            planned.set(i);
         }
         if (open.size() < 2) {
             return null;                              // 1工程だけなら、ふつうの作業で十分
