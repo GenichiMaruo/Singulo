@@ -41,6 +41,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                               List<net.neoforged.neoforge.fluids.capability.IFluidHandler> out) {
         for (Direction d : Direction.values()) {
             BlockPos p = from.relative(d);
+            if (!level.isLoaded(p)) continue;
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
@@ -53,6 +54,7 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
 
     /** box の中身を、pos の隣のストレージへ移す（作業のブロックは除く）。1回で1スタックずつ。 */
     static void pushOut(Level level, BlockPos pos, net.minecraft.world.Container box) {
+        if (box.isEmpty()) return;
         List<IItemHandler> targets = new java.util.ArrayList<>();
         collect(level, pos, new java.util.HashSet<>(), targets);
         if (targets.isEmpty()) {
@@ -78,12 +80,16 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
 
     /** from の隣（6方向）のストレージを集める（作業指令台・資材口・納品口・レシピ棚は除く）。 */
     static void collect(Level level, BlockPos from, Set<BlockPos> seen, List<IItemHandler> out) {
+        var owner = level.isLoaded(from) ? level.getBlockEntity(from) : null;
+        AdjacentItemStores cache = owner instanceof WorkConsoleBlockEntity console ? console.adjacentItems
+                : owner instanceof WorkLinkedBlockEntity linked ? linked.adjacentItems : null;
         for (Direction d : Direction.values()) {
             BlockPos p = from.relative(d);
+            if (!level.isLoaded(p)) continue;
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
-            IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, p, d.getOpposite());
+            IItemHandler h = cache == null ? level.getCapability(Capabilities.ItemHandler.BLOCK, p, d.getOpposite()) : cache.get(d);
             if (h == null) {
                 continue;
             }

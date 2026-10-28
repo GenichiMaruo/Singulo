@@ -49,6 +49,11 @@ import net.neoforged.neoforge.network.PacketDistributor;
  */
 public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         MenuProvider, AndroidEyes.Holder {
+    final AdjacentItemStores adjacentItems = new AdjacentItemStores(this);
+
+    @Override public void setRemoved() { adjacentItems.clear(); super.setRemoved(); }
+    @Override public void clearRemoved() { super.clearRemoved(); adjacentItems.clear(); }
+
     /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
     protected final AndroidEyes eyes = new AndroidEyes();
 
