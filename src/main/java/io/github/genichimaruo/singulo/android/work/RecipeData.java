@@ -68,7 +68,14 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
 
     /** 材料の文字を読んだもの（何度も読まないように）。 */
     private static final java.util.Map<String, java.util.Optional<net.minecraft.world.item.crafting.Ingredient>> ALT_CACHE =
-            new java.util.concurrent.ConcurrentHashMap<>();
+            java.util.Collections.synchronizedMap(new java.util.LinkedHashMap<>(128, 0.75F, true) {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<String, java.util.Optional<net.minecraft.world.item.crafting.Ingredient>> e) {
+                    return size() > 1024;
+                }
+            });
+
+    public static void clearAlternatives() { ALT_CACHE.clear(); }
 
     /**
      * 加工モードで、装置のどの面から入れ・取り出し・燃料を入れるか（役目ごとに3ビット: 入れる面、取り出す面、燃料の面）。

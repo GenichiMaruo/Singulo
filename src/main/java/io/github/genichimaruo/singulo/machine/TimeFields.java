@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ChunkPos;
 
 /**
  * 時間の流れを変える場（ワールドごと）。
@@ -27,8 +28,37 @@ public final class TimeFields {
         }
     }
 
-    /** 場の持ち主（装置の位置）→ 場。 */
-    private static final Map<Level, Map<BlockPos, Field>> FIELDS = new WeakHashMap<>();
+    /** World-free values: weak level keys must not be retained through their index. */
+    private static final Map<Level, Index> FIELDS = new WeakHashMap<>();
+
+    private static final class Index {
+        final Map<BlockPos, Field> owners = new HashMap<>();
+        final Map<Long, Map<BlockPos, Field>> chunks = new HashMap<>();
+        // Normal configured radii touch at most 81 chunks. Keep unexpected huge radii bounded too.
+        final Map<BlockPos, Field> wide = new HashMap<>();
+
+        void index(Field f, boolean add) {
+            int minX = (int) (((long) f.center.getX() - f.radius) >> 4);
+            int maxX = (int) (((long) f.center.getX() + f.radius) >> 4);
+            int minZ = (int) (((long) f.center.getZ() - f.radius) >> 4);
+            int maxZ = (int) (((long) f.center.getZ() + f.radius) >> 4);
+            if ((long) (maxX - minX + 1) * (maxZ - minZ + 1) > 1024) {
+                if (add) wide.put(f.owner, f); else wide.remove(f.owner);
+                return;
+            }
+            for (int x = minX; x <= maxX; x++) for (int z = minZ; z <= maxZ; z++) {
+                long key = ChunkPos.asLong(x, z);
+                if (add) chunks.computeIfAbsent(key, k -> new HashMap<>()).put(f.owner, f);
+                else {
+                    Map<BlockPos, Field> bucket = chunks.get(key);
+                    if (bucket != null) {
+                        bucket.remove(f.owner);
+                        if (bucket.isEmpty()) chunks.remove(key);
+                    }
+                }
+            }
+        }
+    }
 
     /** Release runtime references when this level closes. */
     public static void forgetLevel(Level level) { FIELDS.remove(level); }
@@ -39,35 +69,47 @@ public final class TimeFields {
             remove(level, owner);
             return;
         }
-        FIELDS.computeIfAbsent(level, l -> new HashMap<>()).put(owner.immutable(),
-                new Field(owner.immutable(), center.immutable(), radius, accelerate));
+        Index index = FIELDS.computeIfAbsent(level, l -> new Index());
+        Field previous = index.owners.get(owner);
+        // Active generators publish every tick; unchanged fields must not rebuild the index.
+        if (previous != null && previous.center.equals(center) && previous.radius == radius
+                && previous.accelerate == accelerate) return;
+        Field field = new Field(owner.immutable(), center.immutable(), radius, accelerate);
+        if (previous != null) index.index(previous, false);
+        index.owners.put(field.owner, field);
+        index.index(field, true);
     }
 
     public static void remove(Level level, BlockPos owner) {
-        Map<BlockPos, Field> map = FIELDS.get(level);
-        if (map != null) {
-            map.remove(owner);
+        Index index = FIELDS.get(level);
+        if (index != null) {
+            Field removed = index.owners.remove(owner);
+            if (removed != null) index.index(removed, false);
+            if (index.owners.isEmpty()) FIELDS.remove(level);
         }
     }
 
     /** その場所の状態。0 は普通、1 は加速、-1 は膨張。 */
     public static int state(Level level, BlockPos pos) {
-        Map<BlockPos, Field> map = FIELDS.get(level);
-        if (map == null || map.isEmpty()) {
+        Index index = FIELDS.get(level);
+        if (index == null) {
             return 0;
         }
-        boolean accel = false;
-        boolean dilate = false;
-        for (Field f : map.values()) {
+        Map<BlockPos, Field> nearby = index.chunks.get(ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4));
+        int flags = flags(nearby, pos, 0);
+        if (flags != 3) flags = flags(index.wide, pos, flags);
+        return flags == 1 ? 1 : flags == 2 ? -1 : 0;
+    }
+
+    private static int flags(Map<BlockPos, Field> fields, BlockPos pos, int flags) {
+        if (fields == null) return flags;
+        for (Field f : fields.values()) {
             if (f.covers(pos)) {
-                if (f.accelerate) {
-                    accel = true;
-                } else {
-                    dilate = true;
-                }
+                flags |= f.accelerate ? 1 : 2;
+                if (flags == 3) break;
             }
         }
-        return accel == dilate ? 0 : accel ? 1 : -1;
+        return flags;
     }
 
     /** 処理速度の倍率。 */

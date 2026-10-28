@@ -1038,6 +1038,7 @@ final class AndroidWorkGoal extends Goal {
             mineTimer = 0;
             travel = 0;
             if (mineTarget == null) {
+                if (areaSearch.pending()) return;
                 // 掘る物がない（丸石製造機なら、戻るのを待つ）。範囲のそばで待つ
                 if (android.state() == RuinAndroid.STATE_MINING) {
                     android.setState(RuinAndroid.STATE_IDLE);
@@ -1145,20 +1146,14 @@ final class AndroidWorkGoal extends Goal {
     /** 範囲の中で、条件に合う一番近いブロック（なければ null）。 */
     @Nullable
     private BlockPos nearestInArea(net.minecraft.world.level.levelgen.structure.BoundingBox box, java.util.function.Predicate<BlockPos> ok) {
-        BlockPos best = null;
-        double bestDist = 0;
-        for (BlockPos p : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
-            if (!android.level().isLoaded(p) || mineSkip.contains(p) || !ok.test(p)) {
-                continue;
-            }
-            double d = p.distSqr(android.blockPosition());
-            if (best == null || d < bestDist) {
-                best = p.immutable();
-                bestDist = d;
-            }
-        }
-        return best;
+        return areaSearch.find(box, 0, android.blockPosition(), android.level().getGameTime(),
+                p -> android.level().isLoaded(p) && !mineSkip.contains(p) && ok.test(p));
     }
+
+    private final io.github.genichimaruo.singulo.android.work.WorkAreaSearch areaSearch =
+            new io.github.genichimaruo.singulo.android.work.WorkAreaSearch();
+    private final io.github.genichimaruo.singulo.android.work.WorkAreaSearch growthSearch =
+            new io.github.genichimaruo.singulo.android.work.WorkAreaSearch();
 
     /**
      * ブロックのそば（手が届く所）まで近づく。着いたら true、歩いているあいだ false、たどり着けなければ null。
@@ -1235,7 +1230,7 @@ final class AndroidWorkGoal extends Goal {
             moveNear(ps.pos());
         }
         // まだ育つ物（若い作物・苗木・毛を刈った羊・子ども・アメジストの芽）があれば、育つのを待つ（長く待つ）
-        if (mineIdle % 100 == 0) {
+        if (mineIdle % 100 == 0 || growthSearch.pending()) {
             growing = android.level() instanceof ServerLevel level && growing(level, ps);
         }
         if (growing) {
@@ -1253,16 +1248,14 @@ final class AndroidWorkGoal extends Goal {
     private boolean growing;
 
     /** 範囲に、まだ育つ物があるか。 */
-    private static boolean growing(ServerLevel level, io.github.genichimaruo.singulo.android.work.ProcedureStep ps) {
+    private boolean growing(ServerLevel level, io.github.genichimaruo.singulo.android.work.ProcedureStep ps) {
         net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
         switch (ps.kind()) {
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL -> {
-                for (BlockPos p : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
-                    if (level.isLoaded(p) && grows(level, p, ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL)) {
-                        return true;
-                    }
-                }
-                return false;
+                BlockPos found = growthSearch.find(box, 2, android.blockPosition(), level.getGameTime(),
+                        p -> level.isLoaded(p) && grows(level, p, ps.kind() == io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL));
+                return found != null || growthSearch.pending();
+
             }
             case io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, io.github.genichimaruo.singulo.android.work.ProcedureStep.CULL -> {
                 return !level.getEntitiesOfClass(net.minecraft.world.entity.animal.Animal.class, pen(ps),
@@ -1441,6 +1434,7 @@ final class AndroidWorkGoal extends Goal {
             mineTarget = nearestInArea(ps.area(), p -> harvestable(level, p));
             travel = 0;
             if (mineTarget == null) {
+                if (areaSearch.pending()) return;
                 idleNear(c, job, ps, FARM_IDLE_TICKS);
                 return;
             }
@@ -1610,13 +1604,12 @@ final class AndroidWorkGoal extends Goal {
         if (mineTarget == null) {
             // 一番下の段の原木（同じ段では近い順）を根元にする
             net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
-            for (int y = box.minY(); y <= box.maxY() && mineTarget == null; y++) {
-                mineTarget = nearestInArea(new net.minecraft.world.level.levelgen.structure.BoundingBox(box.minX(), y, box.minZ(), box.maxX(), y,
-                        box.maxZ()), p -> level.getBlockState(p).is(net.minecraft.tags.BlockTags.LOGS)
-                        && !level.getBlockState(p.below()).is(net.minecraft.tags.BlockTags.LOGS));
-            }
+            mineTarget = areaSearch.find(box, -1, android.blockPosition(), level.getGameTime(),
+                    p -> level.isLoaded(p) && !mineSkip.contains(p) && level.getBlockState(p).is(net.minecraft.tags.BlockTags.LOGS)
+                            && !level.getBlockState(p.below()).is(net.minecraft.tags.BlockTags.LOGS));
             travel = 0;
             if (mineTarget == null) {
+                if (areaSearch.pending()) return;
                 idleNear(c, job, ps, FARM_IDLE_TICKS);
                 return;
             }
@@ -1996,6 +1989,8 @@ final class AndroidWorkGoal extends Goal {
             level.destroyBlockProgress(android.getId(), mineTarget, -1);
         }
         mineTarget = null;
+        areaSearch.reset();
+        growthSearch.reset();
         mineTimer = 0;
         mineSettled = false;
     }
@@ -2048,24 +2043,8 @@ final class AndroidWorkGoal extends Goal {
     private BlockPos findMineTarget(ServerLevel level, io.github.genichimaruo.singulo.android.work.ProcedureStep ps, ItemStack tool,
                                     WorkConsoleBlockEntity c) {
         net.minecraft.world.level.levelgen.structure.BoundingBox box = ps.area();
-        BlockPos best = null;
-        double bestDist = 0;
-        for (int y = box.maxY(); y >= box.minY() && best == null; y--) {
-            for (int x = box.minX(); x <= box.maxX(); x++) {
-                for (int z = box.minZ(); z <= box.maxZ(); z++) {
-                    BlockPos p = new BlockPos(x, y, z);
-                    if (!level.isLoaded(p) || !mineable(level, p, tool, c)) {
-                        continue;
-                    }
-                    double d = p.distSqr(android.blockPosition());
-                    if (best == null || d < bestDist) {
-                        best = p;
-                        bestDist = d;
-                    }
-                }
-            }
-        }
-        return best;
+        return areaSearch.find(box, 1, android.blockPosition(), level.getGameTime(),
+                p -> level.isLoaded(p) && mineable(level, p, tool, c));
     }
 
     /** 掘ってよいかを確かめるときの「だれとして」: 注文した人（いなければ指令台の持ち主）の代わりのプレイヤー。 */

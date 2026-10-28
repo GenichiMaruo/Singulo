@@ -49,14 +49,17 @@ public class AreaCardItem extends Item {
         if (!level.isClientSide) {
             BlockPos pos = context.getClickedPos();
             ItemStack held = context.getItemInHand();
+            BlockPos first = first(held);
+            boolean finishing = first != null && second(held) == null && sameDimension(held, level);
+            if (finishing && (Math.abs((long) first.getX() - pos.getX()) >= MAX_SIZE
+                    || Math.abs((long) first.getY() - pos.getY()) >= MAX_SIZE
+                    || Math.abs((long) first.getZ() - pos.getZ()) >= MAX_SIZE)) {
+                player.displayClientMessage(Component.translatable("message.singulo.area_card.too_large", MAX_SIZE), true);
+                return InteractionResult.FAIL;
+            }
+            // Validate before splitting: a rejected second corner must not consume a stacked card.
             ItemStack card = held.getCount() > 1 ? held.split(1) : held;
-            BlockPos first = first(card);
-            if (first != null && second(card) == null && sameDimension(card, level)) {
-                if (Math.abs(first.getX() - pos.getX()) >= MAX_SIZE || Math.abs(first.getY() - pos.getY()) >= MAX_SIZE
-                        || Math.abs(first.getZ() - pos.getZ()) >= MAX_SIZE) {
-                    player.displayClientMessage(Component.translatable("message.singulo.area_card.too_large", MAX_SIZE), true);
-                    return InteractionResult.FAIL;
-                }
+            if (finishing) {
                 recordSecond(card, pos);
                 BoundingBox box = box(card);
                 player.displayClientMessage(Component.translatable("message.singulo.area_card.recorded", box.getXSpan(), box.getYSpan(),
