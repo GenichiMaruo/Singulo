@@ -17,6 +17,8 @@ public final class ItemCount {
     /** 同じ種類として数える物（なければ null: 見本と同じ物だけ）。 */
     @Nullable
     public final Ingredient alt;
+    /** 在庫の物: これがある資材口の、取り出しの優先度のいちばん高いもの（優先の登録がなければ 0）。 */
+    public int takePriority;
 
     public ItemCount(ItemStack item, long count) {
         this(item, count, null);
@@ -59,6 +61,20 @@ public final class ItemCount {
             }
         }
         list.add(new ItemCount(stack, count, alt));
+    }
+
+    /** 在庫の一覧に足し、その物の取り出しの優先度を priority 以上にする。 */
+    public static void addRanked(List<ItemCount> list, ItemStack stack, long count, int priority) {
+        if (stack.isEmpty() || count == 0) {
+            return;
+        }
+        add(list, stack, count);
+        for (ItemCount c : list) {
+            if (c.alt == null && c.matches(stack)) {
+                c.takePriority = Math.max(c.takePriority, priority);
+                return;
+            }
+        }
     }
 
     /** 寿命の短い順に並べるときの鍵: 触媒は残りの寿命、ほかの物は同じ（並びを変えない）。 */

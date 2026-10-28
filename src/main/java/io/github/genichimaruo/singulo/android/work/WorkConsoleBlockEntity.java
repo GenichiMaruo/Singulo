@@ -305,13 +305,18 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         return out;
     }
 
-    /** 素材置き場の中身の合計。 */
+    /** 素材置き場の中身の合計（物ごとに、それがある資材口の取り出しの優先度も覚える）。 */
     public List<ItemCount> stock() {
         List<ItemCount> out = new ArrayList<>();
-        for (IItemHandler h : storages()) {
-            for (int i = 0; i < h.getSlots(); i++) {
-                ItemStack s = h.getStackInSlot(i);
-                ItemCount.add(out, s, s.getCount());
+        Set<BlockPos> stores = new HashSet<>();
+        for (BlockPos p : supplyPoints()) {
+            List<IItemHandler> here = new ArrayList<>();
+            SupplyPortBlockEntity.collect(level, p, stores, here);
+            for (IItemHandler h : here) {
+                for (int i = 0; i < h.getSlots(); i++) {
+                    ItemStack s = h.getStackInSlot(i);
+                    ItemCount.addRanked(out, s, s.getCount(), s.isEmpty() ? 0 : priority(p, s, true));
+                }
             }
         }
         Set<BlockPos> seen = new HashSet<>();
@@ -330,6 +335,7 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         List<ItemCount> out = new ArrayList<>();
         for (ItemCount actual : stock) {
             ItemCount c = new ItemCount(actual.item, actual.count);
+            c.takePriority = actual.takePriority;
             for (WorkOrder o : orders) {
                 c.count -= o.outstanding(c.item);
             }

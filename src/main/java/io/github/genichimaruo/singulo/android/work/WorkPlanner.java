@@ -101,15 +101,14 @@ public final class WorkPlanner {
             plan.limited = true;
             return;
         }
-        if (alt != null && io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(item)) {
-            // 触媒: 使いかけも新品も同じ物として、寿命の短いものから使う
-            amount = takeShortLived(context.stock, plan.fromStock, amount, alt);
-            amount = takeShortLived(context.surplus, null, amount, alt);
+        if (alt != null) {
+            // 同じ種類の別の物も使う: 取り出しの優先度の高い資材口にある物から。同じなら、触媒は寿命の短いもの、
+            // ほかの物は見本と同じ物から
+            amount = takeRanked(context.stock, plan.fromStock, item, amount, alt);
+            amount = takeRanked(context.surplus, null, item, amount, alt);
         } else {
-            for (int pass = 0; pass < (alt == null ? 1 : 2) && amount > 0; pass++) {
-                amount = take(context.stock, plan.fromStock, item, amount, alt, pass);
-                amount = take(context.surplus, null, item, amount, alt, pass);
-            }
+            amount = take(context.stock, plan.fromStock, item, amount);
+            amount = take(context.surplus, null, item, amount);
         }
         if (amount <= 0) {
             return;
@@ -150,16 +149,18 @@ public final class WorkPlanner {
         ItemCount.add(context.surplus, item, crafts * per - amount);
     }
 
-    /** stock のうち alt に合う物を、寿命の短い順に取る。 */
-    private static long takeShortLived(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved, long amount,
-                                       net.minecraft.world.item.crafting.Ingredient alt) {
+    /** stock のうち alt に合う物を、取り出しの優先度の高い順（同じなら、触媒は寿命の短い順、ほかは見本と同じ物から）に取る。 */
+    private static long takeRanked(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved, ItemStack item,
+                                   long amount, net.minecraft.world.item.crafting.Ingredient alt) {
         List<ItemCount> found = new java.util.ArrayList<>();
         for (ItemCount c : stock) {
             if (c.count > 0 && c.alt == null && alt.test(c.item)) {
                 found.add(c);
             }
         }
-        found.sort(java.util.Comparator.comparingInt(c -> ItemCount.lifeOrder(c.item)));
+        boolean catalyst = io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(item);
+        found.sort(java.util.Comparator.<ItemCount>comparingInt(c -> -c.takePriority)
+                .thenComparingInt(c -> catalyst ? ItemCount.lifeOrder(c.item) : c.matches(item) ? 0 : 1));
         for (ItemCount c : found) {
             if (amount <= 0) {
                 break;
@@ -174,9 +175,9 @@ public final class WorkPlanner {
         return amount;
     }
 
+    /** stock のうち item と同じ物を取る。 */
     private static long take(List<ItemCount> stock, @javax.annotation.Nullable List<ItemCount> reserved,
-                             ItemStack item, long amount,
-                             @javax.annotation.Nullable net.minecraft.world.item.crafting.Ingredient alt, int pass) {
+                             ItemStack item, long amount) {
         for (ItemCount c : stock) {
             if (amount <= 0) {
                 break;
@@ -184,8 +185,7 @@ public final class WorkPlanner {
             if (c.count <= 0 || c.alt != null) {
                 continue;
             }
-            boolean matches = pass == 0 ? c.matches(item) : alt != null && alt.test(c.item) && !c.matches(item);
-            if (!matches) {
+            if (!c.matches(item)) {
                 continue;
             }
             long take = Math.min(c.count, amount);

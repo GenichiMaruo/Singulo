@@ -977,6 +977,60 @@ public final class AndroidGameTests {
         });
     }
 
+    /**
+     * 取り出しの優先は、寿命の短い順より先: 近くの資材口に使いかけの時間結晶触媒、優先を登録した資材口に新品があれば、
+     * 優先した資材口の新品を使う（使いかけは残る）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void supplyPortPriorityBeatsShortLife(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var port = secondPort(helper);
+        var level = helper.getLevel();
+        var catalyst = item("time_crystal_catalyst");
+        port.entries().setItem(0, new ItemStack(catalyst));
+        BlockPos at = new BlockPos(0, 1, 3);
+        helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity m = helper.getBlockEntity(at);
+        helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
+        int max = io.github.genichimaruo.singulo.item.UsesHelper.get(new ItemStack(catalyst)).max();
+        ItemStack worn = new ItemStack(catalyst);
+        worn.set(io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get(),
+                new io.github.genichimaruo.singulo.item.UsesData(max - 40_000, max, 0));
+        net.minecraft.world.level.block.entity.ChestBlockEntity near = helper.getBlockEntity(CHEST);
+        near.setItem(1, worn);
+        near.setItem(2, new ItemStack(item("optical_lattice_substrate")));
+        near.setItem(3, new ItemStack(item("steel_plate"), 2));
+        net.minecraft.world.level.block.entity.ChestBlockEntity far = helper.getBlockEntity(CHEST2);
+        far.setItem(0, new ItemStack(catalyst));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(at),
+                level.getBlockState(helper.absolutePos(at)).getBlock());
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(item("optical_lattice_substrate")));
+        in.set(1, new ItemStack(item("steel_plate"), 2));
+        in.set(2, new ItemStack(catalyst));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(item("time_crystal_module")), List.of(),
+                ItemStack.EMPTY).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(item("time_crystal_module")), 1,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, item("time_crystal_module")) == 1, "モジュールが届かない");
+            helper.assertTrue(countIn(helper, CHEST2, catalyst) == 0, "優先した資材口の新品を使わない");
+            boolean wornLeft = false;
+            for (int i = 0; i < near.getContainerSize(); i++) {
+                wornLeft |= near.getItem(i).is(catalyst) && io.github.genichimaruo.singulo.item.UsesHelper.remaining(near.getItem(i)) == 40_000;
+            }
+            helper.assertTrue(wornLeft, "優先していない資材口の使いかけを使った");
+            a.discard();
+        });
+    }
+
     /** 資材口の優先の返却: 余った物は、登録した資材口へ戻す（近くの資材口ではなく）。 */
     @GameTest(template = EMPTY, timeoutTicks = 2400)
     public static void supplyPortReturnPriority(GameTestHelper helper) {
