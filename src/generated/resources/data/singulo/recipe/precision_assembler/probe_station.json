@@ -40,6 +40,13 @@
         "item": "singulo:sentinel_core"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "tier": 3,
+      "uses": 36000
     }
   ],
   "result": {

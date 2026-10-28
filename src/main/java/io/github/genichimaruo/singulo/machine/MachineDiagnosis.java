@@ -1,6 +1,5 @@
 package io.github.genichimaruo.singulo.machine;
 
-import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -101,7 +100,7 @@ public final class MachineDiagnosis {
             ItemStack[] options = in.ingredient().getItems();
             Component name = options.length > 0 ? options[0].getHoverName() : Component.literal("?");
             if (in.uses() > 0) {
-                if (inputs.stream().noneMatch(s -> in.ingredient().test(s) && UsesHelper.canUse(s, in.uses()))) {
+                if (inputs.stream().noneMatch(s -> in.usesFrom(s) > 0)) {
                     lines.add(Component.translatable("gui.singulo.reason.need_uses", name, in.uses()));
                 }
                 continue;

@@ -297,7 +297,7 @@ public final class BossRoomGameTests {
         r.kill();
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
-            helper.assertTrue(dropped(helper, item("degenerate_nucleus")) == 2, "縮退核を2つ落とさない: " + dropped(helper, item("degenerate_nucleus")));
+            helper.assertTrue(dropped(helper, item("degenerate_nucleus")) == 3, "縮退核を3つ落とさない: " + dropped(helper, item("degenerate_nucleus")));
             helper.succeed();
         });
     }

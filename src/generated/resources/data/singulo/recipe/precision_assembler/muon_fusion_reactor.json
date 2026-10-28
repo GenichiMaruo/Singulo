@@ -27,7 +27,8 @@
       "ingredient": {
         "item": "singulo:muon_catalyst"
       },
-      "count": 1
+      "tier": 2,
+      "uses": 24000
     },
     {
       "ingredient": {

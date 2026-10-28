@@ -650,6 +650,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             if (hasOverclock()) {
                 speed *= 3;
             }
+            // 上位の触媒で払うレシピは速く進む
+            MachineRecipe.Plan plan = found.value().plan(found.value().isMassRecipe() ? inputsExceptMassSlot() : inputs);
+            if (plan != null) {
+                speed *= plan.speed();
+            }
             maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
             if (fixedEnergyPerCraft(found.value())) {
                 // 1回あたりの電力（レシピの電力 × 時間）を、速さ・単極子・オーバークロックによらず保つ

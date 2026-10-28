@@ -255,18 +255,19 @@ CHAPTERS = [
     ('stage3', 'singulo:quantum_computing_module', '段階3 量子', 'Stage 3: Quantum', [
         ('flow', '段階3の流れ',
          'この段階でやること:\n'
-         '1. 量子もつれ合成器とレーザー冷却器を作る。\n'
+         '1. 量子もつれ合成器とレーザー冷却器を作る（段階3の装置はミュオン触媒を1個ずつ使う。レーザー冷却器には研究棟の残響の番人が落とす番人の投影核も要る）。\n'
          '2. 量子熱機関で発電する（BE凝縮触媒で 200 kFE/t。作るまではミュオン触媒で25%の仮運転）。\n'
          '3. レーザー冷却器でBE凝縮触媒（ティア3）と光格子基板を作る。\n'
          '4. 深海圧力収集器を早めに置き、高圧結晶を貯めておく（あとで殻とアンビルに約30個）。\n'
          '5. 研究棟の保管庫で探索コンパスを調整し、封鎖培養施設を探す。時間結晶の種と培養データを集める（奥の重力の澱を倒すと保管庫が開く）。同じ調整で地下アンドロイド研究所も探せる。\n'
-         '6. 時間結晶の種と培養データがそろったら、段階4の時間結晶育成槽へ進む。\n'
+         '6. 時間結晶の種・培養データ・縮退核（重力の澱が落とす）がそろったら、段階4の時間結晶育成槽へ進む。\n'
          'つまずきやすい所:\n'
          '・封鎖培養施設がつらい: 極低温区画と強い警備機がいる。防具と回復をそろえ、護衛のアンドロイドを連れていく。\n'
          '・重力の澱に浮かされる: 落下が痛いので、重力ブーツや衝撃発電パネルが助けになる。',
          'Stage 3 at a glance',
          'What to do:\n'
-         '1. Build an Entanglement Synthesizer and a Laser Cooler.\n'
+         '1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the '
+         "Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n"
          '2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs a'
          't 25% on muon catalysts).\n'
          '3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n'
@@ -275,7 +276,8 @@ CHAPTERS = [
          "5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds"
          ' and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Und'
          'erground Android Laboratory.\n'
-         '6. With seeds and culture data, move on to the Time Crystal Incubator of stage 4.\n'
+         '6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time '
+         'Crystal Incubator of stage 4.\n'
          'Common sticking points:\n'
          '- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing an'
          'd your guard androids.\n'
@@ -491,7 +493,8 @@ CHAPTERS = [
          '・装置と同じティア: 標準\n・1つ上: 速度+25%、減り−20%（2つ上まで重なる）\n・1つ下: 速度0.5倍、減り2倍（発電機は出力が定格の25%）\n・2つ下: 使えない\n'
          '残りが減るほど必要電力が増え（最大1.6倍）、電力が80%を割ると不完全反応で減りが1.5倍になります。\n'
          'この決まりは触媒枠で「運転」する装置（アンカー・スタビライザー・発電機・シールドなど）のものです。加工装置のレシピに材料として書かれた触媒は、'
-         '個数か寿命を決まった分だけ使い、速さは変わりません（例: BE凝縮触媒の加工はミュオン触媒1個で40秒）。',
+         '寿命を決まった分だけ使います（丸ごと1個なら新品1個ぶん）。そのティア以上の触媒で払え、上位の触媒は1段ごとに減りが−20%・速さが+25%（2段まで）。'
+         '下位の触媒では払えません。',
          'Tiers and effects',
          'Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: '
          'standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: '
@@ -499,8 +502,27 @@ CHAPTERS = [
          'catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions '
          'make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, '
          'stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an '
-         'ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE '
-         'condensate catalyst takes one muon catalyst and 40 seconds).'),
+         "ingredient, it uses a fixed amount of life (a whole catalyst means one fresh catalyst's worth). Any catalyst "
+         'of that tier or higher can pay: each tier higher wears 20% less and works 25% quicker (up to two tiers). Lower '
+         'tiers cannot pay.'),
+        ('keys', '装置の鍵になる触媒',
+         '上位の段階の装置は、作るときに1つ前の段階の触媒を新品1個ぶん使います（精密組立台の触媒スロットに入れる。上位の触媒なら少なくて済む）。\n'
+         '・段階3の装置（量子もつれ合成器・レーザー冷却器・量子熱機関など）: ミュオン触媒\n'
+         '・段階4の装置（時間結晶育成槽・自動探査機ステーション・虚空捕集器・マルチブロックのコントローラなど）: BE凝縮触媒\n'
+         '・段階5の装置: 時間結晶触媒（多くは時間結晶モジュールとして）\n'
+         '次のティアの触媒を作る装置には、番人の戦利品も要ります。レーザー冷却器（BE凝縮触媒）には残響の番人の番人の投影核、'
+         '時間結晶育成槽（時間結晶触媒）には重力の澱の縮退核が要り、シンギュラリティ・コアは休眠した特異点の種から始まります。',
+         'Catalysts as machine keys',
+         'Higher-stage machines use one fresh catalyst of the previous stage when you build them (put it in the '
+         "Precision Assembler's catalyst slot; a higher-tier catalyst uses less).\n"
+         '- Stage 3 machines (Entanglement Synthesizer, Laser Cooler, Quantum Heat Engine and more): muon catalyst\n'
+         '- Stage 4 machines (Time Crystal Incubator, Autonomous Probe Station, Void Collector, multiblock controllers '
+         'and more): BE condensate catalyst\n'
+         '- Stage 5 machines: time crystal catalyst (mostly as Time Crystal Modules)\n'
+         "The machines that make the next tier's catalyst also need a guardian's spoils: the Laser Cooler (BE "
+         'condensate) needs a Sentinel Projection Core from the Echo Sentinel, the Time Crystal Incubator (time '
+         'crystal) needs a Degenerate Nucleus from the Gravity Remnant, and the Singularity Core starts from the '
+         'Dormant Singularity Seed.'),
         ('slots', '触媒スロットとリサイクル',
          '触媒を使う装置には、触媒だけが入る専用スロットがあります（画面で触媒のマークが付いた枠）。同じ触媒を16個まで予備として積めます。\n装置は1個を中に装填して使い、スロットの下のゲージに残りが出ます。使い切ると失活触媒を出し（機械は出力スロット、触媒装置は左の出口）、予備から次をすぐ装填するので止まりません。\n使いかけの触媒を入れると、装填中のものと同じ種類なら残りをまとめ、空になった殻を失活触媒として出します。違う種類を入れると、装填中のものを出口へ返して入れ替えます。予備が空のときにスロットをクリックすると、装填中の触媒を取り出せます。\n失活触媒は触媒反応器で、1ティア下の触媒の材料として約25%を回収できます。',
          'Catalyst slots and recycling',

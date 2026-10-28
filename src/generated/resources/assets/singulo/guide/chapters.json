@@ -74,6 +74,7 @@
       "icon": "singulo:muon_catalyst",
       "pages": [
         "catalysts.tiers",
+        "catalysts.keys",
         "catalysts.slots",
         "catalysts.time"
       ]

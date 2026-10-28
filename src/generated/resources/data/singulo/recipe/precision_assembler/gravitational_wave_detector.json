@@ -34,6 +34,13 @@
         "item": "minecraft:compass"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:muon_catalyst"
+      },
+      "tier": 2,
+      "uses": 24000
     }
   ],
   "result": {

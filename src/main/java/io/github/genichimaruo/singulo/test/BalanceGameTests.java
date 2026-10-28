@@ -334,4 +334,45 @@ public final class BalanceGameTests {
                     "2個目の触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));
         });
     }
+
+    /** 触媒を寿命で使うレシピは上位の触媒でも払える（1段ごとに使用回数−20%・速さ+25%）。下位の触媒では払えず、両方あれば下位で払う。 */
+    @GameTest(template = EMPTY)
+    public static void higherTierCatalystPaysRecipes(GameTestHelper helper) {
+        MachineRecipe r = adjusted(helper, "precision_assembler/time_crystal_module");
+        ItemStack lattice = new ItemStack(item("optical_lattice_substrate"));
+        ItemStack steel = new ItemStack(item("steel_plate"), 2);
+        int need = 36_000;
+        MachineRecipe.Plan core = r.plan(List.of(new ItemStack(item("singularity_core")), lattice, steel));
+        helper.assertTrue(core != null, "1段上のシンギュラリティ・コアで払えない");
+        helper.assertTrue(core.uses()[0] == need * 8 / 10, "1段上の触媒の使用回数が−20%にならない: " + core.uses()[0]);
+        helper.assertTrue(Math.abs(core.speed() - 1.25) < 1e-9, "1段上の触媒で速くならない: " + core.speed());
+        helper.assertTrue(r.plan(List.of(new ItemStack(item("bose_condensate_catalyst")), lattice, steel)) == null,
+                "1段下の触媒で払えてしまう");
+        MachineRecipe.Plan both = r.plan(List.of(new ItemStack(item("singularity_core")), new ItemStack(item("time_crystal_catalyst")), lattice, steel));
+        helper.assertTrue(both != null && both.uses()[0] == 0 && both.uses()[1] == need && both.speed() == 1,
+                "同じティアの触媒があるのに上位の触媒で払う");
+        helper.succeed();
+    }
+
+    /** 量子段階の装置はミュオン触媒1個ぶんの寿命が要る。BE凝縮触媒なら寿命の減りが−20%で作れる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void machineKeyCatalystIsPaidFromTheSlot(GameTestHelper helper) {
+        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
+        m.items().insertItem(0, new ItemStack(item("basic_frame")), false);
+        m.items().insertItem(1, new ItemStack(item("quantum_computing_module")), false);
+        m.items().insertItem(2, new ItemStack(item("superconducting_coil"), 4), false);
+        m.items().insertItem(3, new ItemStack(item("steel_plate"), 4), false);
+        int max = UsesHelper.get(new ItemStack(item("bose_condensate_catalyst"))).max();
+        helper.assertTrue(m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("bose_condensate_catalyst")), false).isEmpty(),
+                "BE凝縮触媒を触媒スロットに入れられない");
+        helper.succeedWhen(() -> {
+            boolean made = false;
+            for (int k = 0; k < m.type().outputSlots(); k++) {
+                made |= m.items().getStackInSlot(m.type().outputSlot() + k).is(item("quantum_heat_engine"));
+            }
+            helper.assertTrue(made, "量子熱機関ができない");
+            helper.assertTrue(UsesHelper.remaining(m.catalyst()) == max - 24_000 * 8 / 10,
+                    "BE凝縮触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));
+        });
+    }
 }

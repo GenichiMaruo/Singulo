@@ -6403,6 +6403,14 @@
     "source": "Catalysts",
     "translation": "催化剂"
   },
+  "guide.singulo.catalysts.keys.body": {
+    "source": "Higher-stage machines use one fresh catalyst of the previous stage when you build them (put it in the Precision Assembler's catalyst slot; a higher-tier catalyst uses less).\n- Stage 3 machines (Entanglement Synthesizer, Laser Cooler, Quantum Heat Engine and more): muon catalyst\n- Stage 4 machines (Time Crystal Incubator, Autonomous Probe Station, Void Collector, multiblock controllers and more): BE condensate catalyst\n- Stage 5 machines: time crystal catalyst (mostly as Time Crystal Modules)\nThe machines that make the next tier's catalyst also need a guardian's spoils: the Laser Cooler (BE condensate) needs a Sentinel Projection Core from the Echo Sentinel, the Time Crystal Incubator (time crystal) needs a Degenerate Nucleus from the Gravity Remnant, and the Singularity Core starts from the Dormant Singularity Seed.",
+    "translation": "更高阶段的装置在制作时，会消耗上一阶段的催化剂新品 1 个的寿命（放进精密组装台的催化剂槽；更高级的催化剂消耗更少）。\n- 第 3 阶段的装置（量子纠缠合成器、激光冷却器、量子热机等）：缪子催化剂\n- 第 4 阶段的装置（时间晶体育成槽、自动探测站、虚空收集器、多方块结构的控制器等）：玻色凝聚态催化剂\n- 第 5 阶段的装置：时间晶体催化剂（多以时间晶体模块的形式）\n制作下一级催化剂的装置还需要守卫的战利品：激光冷却器（玻色凝聚态）需要回响守卫的守卫投影核心，时间晶体育成槽（时间晶体）需要重力残渣的简并核，奇点核心则从休眠奇点种子开始。"
+  },
+  "guide.singulo.catalysts.keys.title": {
+    "source": "Catalysts as machine keys",
+    "translation": "作为装置钥匙的催化剂"
+  },
   "guide.singulo.catalysts.slots.body": {
     "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
     "translation": "使用催化剂的装置有只能放入催化剂的专用槽位（界面中带催化剂标记的格子），可以叠放最多 16 个相同的催化剂作为备用。\n装置会把其中一个装填进去使用，槽位下方的计量条显示剩余量。用尽后会送出失活催化剂（机器送到输出槽，催化装置送到左侧的出口），并立刻从备用中装填下一个，因此不会停机。\n放入用过一部分的同种催化剂时，剩余寿命会并入装填中的那个，空壳会作为失活催化剂送出。放入不同种类时，装填中的会被退回出口并替换。备用为空时点击槽位，可以取出装填中的催化剂。\n在催化反应器中，失活催化剂约 25% 可回收为低一级催化剂的材料。"
@@ -6412,8 +6420,8 @@
     "translation": "催化剂槽和回收"
   },
   "guide.singulo.catalysts.tiers.body": {
-    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE condensate catalyst takes one muon catalyst and 40 seconds).",
-    "translation": "缪子（2）、玻色凝聚态（3）、时间晶体（4）、奇点核心（5）。\n- 与装置同级：标准\n- 高一级：速度 +25%，消耗 −20%（最多叠加到高两级）\n- 低一级：速度 ×0.5，消耗 ×2（发电机输出为额定的 25%）\n- 低两级：无法使用\n剩余越少，所需电力越多（最多 ×1.6）；电力低于 80% 时会因反应不完全而使消耗 ×1.5。\n这些规则适用于通过催化剂槽运行的装置（锚、稳定器、发电机、护盾等）。加工配方中作为材料列出的催化剂，只消耗固定数量或寿命，速度不变（例如：玻色凝聚态催化剂的加工需要 1 个缪子催化剂，耗时 40 秒）。"
+    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed amount of life (a whole catalyst means one fresh catalyst's worth). Any catalyst of that tier or higher can pay: each tier higher wears 20% less and works 25% quicker (up to two tiers). Lower tiers cannot pay.",
+    "translation": "缪子（2）、玻色凝聚态（3）、时间晶体（4）、奇点核心（5）。\n- 与装置同级：标准\n- 高一级：速度 +25%，消耗 −20%（最多叠加到高两级）\n- 低一级：速度 ×0.5，消耗 ×2（发电机输出为额定的 25%）\n- 低两级：无法使用\n剩余越少，所需电力越多（最多 ×1.6）；电力低于 80% 时会因反应不完全而使消耗 ×1.5。\n这些规则适用于通过催化剂槽运行的装置（锚、稳定器、发电机、护盾等）。加工配方中作为材料列出的催化剂，只消耗固定的寿命（整个 1 个即新品 1 个的寿命）。同级或更高级的催化剂都能支付：每高一级，消耗 −20%、速度 +25%（最多两级）。低级的催化剂无法支付。"
   },
   "guide.singulo.catalysts.tiers.title": {
     "source": "Tiers and effects",
@@ -6764,8 +6772,8 @@
     "translation": "第三阶段：量子"
   },
   "guide.singulo.stage3.flow.body": {
-    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler.\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds and culture data, move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
-    "translation": "这一阶段要做的事：\n1. 制作量子纠缠合成器和激光冷却器。\n2. 用量子热机发电（玻色凝聚态催化剂下 200 kFE/t；做出来之前可用缪子催化剂以 25% 试运行）。\n3. 用激光冷却器制作玻色凝聚态催化剂（第 3 级）和光学晶格基板。\n4. 尽早放置深海压力收集器，储存高压晶体（之后外壳和砧需要约 30 个）。\n5. 在研究楼的保管库调整探索罗盘，寻找封闭培养设施。收集时间晶体种子和培养数据（打倒深处的重力残渣后保管库会打开）。同样的调整也能找到地下仿生人研究所。\n6. 备齐时间晶体种子和培养数据后，进入第 4 阶段的时间晶体育成槽。\n容易卡住的地方：\n・封闭培养设施很难：有极低温区域和强力警备机。备好防具和回复，带上护卫仿生人。\n・被重力残渣抛起：摔落很痛，重力靴或冲击发电面板会有帮助。"
+    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
+    "translation": "这一阶段要做的事：\n1. 制作量子纠缠合成器和激光冷却器（第 3 阶段的装置各消耗 1 个缪子催化剂；激光冷却器还需要研究楼的回响守卫掉落的守卫投影核心）。\n2. 用量子热机发电（玻色凝聚态催化剂下 200 kFE/t；做出来之前可用缪子催化剂以 25% 试运行）。\n3. 用激光冷却器制作玻色凝聚态催化剂（第 3 级）和光学晶格基板。\n4. 尽早放置深海压力收集器，储存高压晶体（之后外壳和砧需要约 30 个）。\n5. 在研究楼的保管库调整探索罗盘，寻找封闭培养设施。收集时间晶体种子和培养数据（打倒深处的重力残渣后保管库会打开）。同样的调整也能找到地下仿生人研究所。\n6. 备齐时间晶体种子、培养数据和简并核（重力残渣掉落）后，进入第 4 阶段的时间晶体育成槽。\n容易卡住的地方：\n・封闭培养设施很难：有极低温区域和强力警备机。备好防具和回复，带上护卫仿生人。\n・被重力残渣抛起：摔落很痛，重力靴或冲击发电面板会有帮助。"
   },
   "guide.singulo.stage3.flow.title": {
     "source": "Stage 3 at a glance",
@@ -9075,6 +9083,10 @@
     "source": "Uses %s",
     "translation": "消耗 %s 次使用次数"
   },
+  "jei.singulo.higher_tier": {
+    "source": "A higher-tier catalyst also works (each tier: −20%% wear, +25%% speed)",
+    "translation": "更高阶的催化剂也可以（每高一阶：损耗−20%%、速度+25%%）"
+  },
   "key.categories.singulo": {
     "source": "Singulo",
     "translation": "Singulo"
@@ -11128,8 +11140,8 @@
     "translation": "用于：废墟面板、破裂的废墟面板、长满青苔的废墟面板、瓷砖废墟面板、通风废墟面板 等 2 个"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Time Crystal Catalyst",
-    "translation": "用于：时间晶体催化剂"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
+    "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、时间晶体催化剂、简并热炉控制器 等 3 个"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11308,8 +11320,8 @@
     "translation": "用于：反应堆外壳、奇点种子、奇点核心、中微子灵敏度模块 Mk3、封印容器（时间锁） 等 1 个"
   },
   "uses.singulo.degenerate_nucleus": {
-    "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
-    "translation": "用于：奇点封装器、奇点种子、引力子操控器、觉醒重力核"
+    "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
+    "translation": "用于：时间晶体育成槽、奇点封装器、奇点种子、引力子操控器、觉醒重力核"
   },
   "uses.singulo.degenerate_precursor": {
     "source": "Used in: Degenerate Matter Shell",
@@ -11436,8 +11448,8 @@
     "translation": "用于：缪子催化剂"
   },
   "uses.singulo.muon_catalyst": {
-    "source": "Used in: Muon-Catalyzed Fusion Reactor, BE Condensate Catalyst",
-    "translation": "用于：缪子催化核聚变炉、玻色凝聚态催化剂"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, Entanglement Synthesizer, Laser Cooler, BE Condensate Catalyst, Quantum Heat Engine and 6 more",
+    "translation": "用于：缪子催化核聚变炉、量子纠缠合成器、激光冷却器、玻色凝聚态催化剂、量子热机 等 6 个"
   },
   "uses.singulo.neutrino_scanner": {
     "source": "Used in: Neutrino Observatory",
@@ -11532,8 +11544,8 @@
     "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.sentinel_core": {
-    "source": "Used in: Echo Resonator, Time Crystal Incubator, Autonomous Probe Station, Awakened Echo Core",
-    "translation": "用于：回响共鸣器、时间晶体育成槽、自动探测站、觉醒回响核"
+    "source": "Used in: Laser Cooler, Echo Resonator, Autonomous Probe Station, Awakened Echo Core",
+    "translation": "用于：激光冷却器、回响共鸣器、自动探测站、觉醒回响核"
   },
   "uses.singulo.shield_tower_body": {
     "source": "Used in: Event Horizon Shield Tower",
@@ -11588,8 +11600,8 @@
     "translation": "用于：热电发电机、冲击发电面板、珀耳帖冷却器"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
-    "translation": "用于：奇异物质、奇点核心、时间晶体模块"
+    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
+    "translation": "用于：奇异物质、奇点核心、晕收集器、时间晶体模块"
   },
   "uses.singulo.time_crystal_module": {
     "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 2 more",

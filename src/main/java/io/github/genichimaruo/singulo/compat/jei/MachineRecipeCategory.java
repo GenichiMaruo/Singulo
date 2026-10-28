@@ -77,8 +77,13 @@ public class MachineRecipeCategory implements IRecipeCategory<MachineRecipe> {
                     .addIngredients(VanillaTypes.ITEM_STACK, stacks);
             if (in.uses() > 0) {
                 int uses = in.uses();
-                s.addRichTooltipCallback((view, tooltip) -> tooltip.add(
-                        Component.translatable("jei.singulo.uses", uses).withStyle(ChatFormatting.GOLD)));
+                boolean higher = in.tier() > 0;
+                s.addRichTooltipCallback((view, tooltip) -> {
+                    tooltip.add(Component.translatable("jei.singulo.uses", uses).withStyle(ChatFormatting.GOLD));
+                    if (higher) {
+                        tooltip.add(Component.translatable("jei.singulo.higher_tier").withStyle(ChatFormatting.GRAY));
+                    }
+                });
             }
             i++;
         }

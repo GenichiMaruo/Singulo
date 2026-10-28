@@ -63,6 +63,8 @@ BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ru
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
+# レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
+CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
 
 
 def stage_of(name):
@@ -141,7 +143,14 @@ def item_inputs(inputs, recipe_name):
             if (recipe_name, name) in ACCEPTS_SPENT:
                 kind, value = 'tag', f'{MODID}:{MOD[name][0]}s'
             entry = {'ingredient': ingredient_json(kind, value)}
-            if isinstance(q, F) and q.denominator != 1:
+            if name in CATALYST_TIERS and (recipe_name, name) not in ACCEPTS_SPENT:
+                # 触媒は寿命で払う（丸ごと1個なら新品1個ぶんの寿命）。上位の触媒でも払える
+                if q != 1 and (not isinstance(q, F) or q.denominator == 1):
+                    warn(f'{recipe_name}: {name} ×{q} は触媒枠1つに入らない')
+                q = F(q)
+                entry['tier'] = CATALYST_TIERS[name]
+                entry['uses'] = int(q * max_uses(name))
+            elif isinstance(q, F) and q.denominator != 1:
                 uses = q * max_uses(name)
                 if uses.denominator != 1 or uses <= 0:
                     warn(f'{recipe_name}: {name} ×{q} が使用回数の整数にならない（最大 {max_uses(name)}）')
@@ -725,6 +734,8 @@ UI_LANG = {
     'tooltip.singulo.creative_energy.hint': ('無限の電力を隣へ送っている', 'Pushing infinite energy to neighbours'),
     'pack.singulo.hd': ('Singulo HD（32×32 のテクスチャ）', 'Singulo HD (32×32 textures)'),
     'jei.singulo.uses': ('使用回数を %s 使う', 'Uses %s'),
+    'jei.singulo.higher_tier': ('上位の触媒でも可（1段ごとに寿命の減り−20%%・速さ+25%%）',
+                                'A higher-tier catalyst also works (each tier: −20%% wear, +25%% speed)'),
     'jei.singulo.mass': ('質量 %s', 'Mass %s'),
     'jei.singulo.metal_mass': ('金属質量 %s', 'Metal mass %s'),
     'jei.singulo.time_energy': ('%s 秒・%s FE/t', '%s s · %s FE/t'),
@@ -3261,7 +3272,7 @@ ANDROID_FACTORY_LOOT = [('精密アクチュエーター', 2, 3), ('アンドロ
 # 番人の落とす物: 番人 → [(アイテム, 最小, 最大)]
 BOSS_LOOT = {
     'echo_sentinel': [('番人の投影核', 2, 2), ('クリスタルメモリ', 1, 2)],
-    'gravity_remnant': [('縮退核', 2, 2), ('高圧結晶', 2, 4)],
+    'gravity_remnant': [('縮退核', 3, 3), ('高圧結晶', 2, 4)],
     'ergosphere_leviathan': [('渦の断章', 1, 1), ('エキゾチック物質', 4, 6), ('H凝縮体', 2, 3)],
     'foundry_overseer': [('精密アクチュエーター', 3, 4), ('アンドロイドキット', 1, 2)],
 }
@@ -3832,7 +3843,7 @@ def validate():
                 errs.append(f'製作場所が後の段階: {n}(段階{r["stage"]}) @ {st}(段階{RECIPES[st]["stage"]})')
         if r['station'] == '作業台' and sum(r['inputs'].values()) > WORKBENCH_MAX_ITEMS:
             errs.append(f'作業台の枠を超える: {n}（{sum(r["inputs"].values())}個）')
-        if r['station'] == '精密組立台' and len(r['inputs']) > ASSEMBLER_MAX_KINDS:
+        if r['station'] == '精密組立台' and len([k for k in r['inputs'] if k not in CATALYST_TIERS]) > ASSEMBLER_MAX_KINDS:
             errs.append(f'精密組立台の入力枠を超える: {n}（{len(r["inputs"])}種類）')
 
     # レシピの循環

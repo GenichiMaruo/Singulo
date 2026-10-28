@@ -3,6 +3,7 @@ package io.github.genichimaruo.singulo.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.List;
@@ -30,7 +31,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
  * @param station      処理する装置の id（MachineType#id）
  * @param time         処理時間（tick）
  * @param energy       処理中の消費電力（FE/t）
- * @param ingredients  アイテム材料。uses &gt; 0 のものは消費せず使用回数を減らす
+ * @param ingredients  アイテム材料。uses &gt; 0 のものは消費せず使用回数を減らす。tier &gt; 0 のものはそのティア以上の触媒で払える
  * @param mass         質量材料（圧縮機の質量モード）
  * @param restore      修復・復元の対象。成果物は対象の使用回数を回復したもの
  * @param minSize      マルチブロックの大きさの下限（冷却塔の高さなど）。0なら条件なし
@@ -42,17 +43,42 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                             ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct)
         implements Recipe<MachineRecipe.Input> {
 
-    public record ItemInput(Ingredient ingredient, int count, int uses) {
+    /**
+     * アイテム材料。tier &gt; 0 は触媒の寿命で払う材料で、ingredient（そのティアの触媒）のほか、上位の触媒でも払える。
+     * 上位の触媒は1段ごとに使用回数−20%・処理速度+25%（2段まで。触媒を使う装置と同じ規則）。
+     */
+    public record ItemInput(Ingredient ingredient, int count, int uses, int tier) {
         public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(ItemInput::ingredient),
                 Codec.INT.optionalFieldOf("count", 1).forGetter(ItemInput::count),
-                Codec.INT.optionalFieldOf("uses", 0).forGetter(ItemInput::uses)
+                Codec.INT.optionalFieldOf("uses", 0).forGetter(ItemInput::uses),
+                Codec.INT.optionalFieldOf("tier", 0).forGetter(ItemInput::tier)
         ).apply(i, ItemInput::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = StreamCodec.composite(
                 Ingredient.CONTENTS_STREAM_CODEC, ItemInput::ingredient,
                 ByteBufCodecs.VAR_INT, ItemInput::count,
                 ByteBufCodecs.VAR_INT, ItemInput::uses,
+                ByteBufCodecs.VAR_INT, ItemInput::tier,
                 ItemInput::new);
+
+        public ItemInput(Ingredient ingredient, int count, int uses) {
+            this(ingredient, count, uses, 0);
+        }
+
+        /** 使用回数で払う材料を stack で払うときの使用回数。払えなければ 0。 */
+        public int usesFrom(ItemStack stack) {
+            int pay = uses;
+            if (tier > 0) {
+                int have = CatalystHelper.tierOf(stack);
+                if (have < tier) {
+                    return 0;
+                }
+                pay = CatalystHelper.higherUses(uses, have - tier);
+            } else if (!ingredient.test(stack)) {
+                return 0;
+            }
+            return UsesHelper.canUse(stack, pay) ? pay : 0;
+        }
     }
 
     public record FluidInput(Fluid fluid, int amount) {
@@ -96,9 +122,9 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     /**
      * 材料の取り方。consume[i] はスロット i から減らす個数、uses[i] はスロット i のアイテムから減らす使用回数、
-     * restoreSlot は修復対象のスロット（なければ -1）。
+     * restoreSlot は修復対象のスロット（なければ -1）、speed は上位の触媒で払ったときの処理速度の倍率。
      */
-    public record Plan(int[] consume, int[] uses, int restoreSlot) {}
+    public record Plan(int[] consume, int[] uses, int restoreSlot, double speed) {}
 
     public static final MapCodec<MachineRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.STRING.fieldOf("station").forGetter(MachineRecipe::station),
@@ -171,21 +197,31 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 return null;
             }
         }
+        double speed = 1;
         for (ItemInput in : ingredients) {
             if (in.uses() > 0) {
+                // 払えるもののうち、ティアのいちばん低い触媒で払う（上位の触媒はとっておく）
                 int found = -1;
+                int foundTier = 0;
                 for (int i = 0; i < n; i++) {
                     ItemStack s = slots.get(i);
-                    if (!claimed[i] && in.ingredient().test(s) && UsesHelper.canUse(s, in.uses())) {
+                    if (claimed[i] || in.usesFrom(s) == 0) {
+                        continue;
+                    }
+                    int tier = CatalystHelper.tierOf(s);
+                    if (found < 0 || tier < foundTier) {
                         found = i;
-                        break;
+                        foundTier = tier;
                     }
                 }
                 if (found < 0) {
                     return null;
                 }
                 claimed[found] = true;
-                uses[found] = in.uses();
+                uses[found] = in.usesFrom(slots.get(found));
+                if (in.tier() > 0) {
+                    speed *= CatalystHelper.higherSpeed(foundTier - in.tier());
+                }
                 continue;
             }
             int need = in.count();
@@ -203,7 +239,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 return null;
             }
         }
-        return new Plan(consume, uses, restoreSlot);
+        return new Plan(consume, uses, restoreSlot, speed);
     }
 
     public boolean isMassRecipe() {

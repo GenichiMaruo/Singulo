@@ -33,7 +33,8 @@
       "ingredient": {
         "item": "singulo:bose_condensate_catalyst"
       },
-      "count": 1
+      "tier": 3,
+      "uses": 36000
     }
   ],
   "result": {

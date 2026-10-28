@@ -6403,6 +6403,14 @@
     "source": "Catalysts",
     "translation": "촉매"
   },
+  "guide.singulo.catalysts.keys.body": {
+    "source": "Higher-stage machines use one fresh catalyst of the previous stage when you build them (put it in the Precision Assembler's catalyst slot; a higher-tier catalyst uses less).\n- Stage 3 machines (Entanglement Synthesizer, Laser Cooler, Quantum Heat Engine and more): muon catalyst\n- Stage 4 machines (Time Crystal Incubator, Autonomous Probe Station, Void Collector, multiblock controllers and more): BE condensate catalyst\n- Stage 5 machines: time crystal catalyst (mostly as Time Crystal Modules)\nThe machines that make the next tier's catalyst also need a guardian's spoils: the Laser Cooler (BE condensate) needs a Sentinel Projection Core from the Echo Sentinel, the Time Crystal Incubator (time crystal) needs a Degenerate Nucleus from the Gravity Remnant, and the Singularity Core starts from the Dormant Singularity Seed.",
+    "translation": "상위 단계의 장치는 만들 때 이전 단계의 촉매를 새 촉매 1개분의 수명만큼 씁니다(정밀 조립기의 촉매 슬롯에 넣습니다. 상위 촉매라면 덜 씁니다).\n- 3단계 장치(양자 얽힘 합성기, 레이저 냉각기, 양자 열기관 등): 뮤온 촉매\n- 4단계 장치(시간 결정 배양기, 자동 탐사기 기지, 공허 수집기, 멀티블록 제어 장치 등): BE 응축 촉매\n- 5단계 장치: 시간 결정 촉매(대부분 시간 결정 모듈로)\n다음 티어의 촉매를 만드는 장치에는 파수꾼의 전리품도 필요합니다. 레이저 냉각기(BE 응축)에는 메아리 파수꾼의 파수꾼 투영 핵, 시간 결정 배양기(시간 결정)에는 중력 잔재의 축퇴 핵이 필요하고, 특이점 코어는 휴면 특이점 씨앗에서 시작합니다."
+  },
+  "guide.singulo.catalysts.keys.title": {
+    "source": "Catalysts as machine keys",
+    "translation": "장치의 열쇠가 되는 촉매"
+  },
   "guide.singulo.catalysts.slots.body": {
     "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
     "translation": "촉매를 쓰는 장치에는 촉매만 들어가는 전용 슬롯(화면에서 촉매 표시가 있는 칸)이 있습니다. 같은 촉매를 16개까지 예비로 쌓을 수 있습니다.\n장치는 하나를 안에 장전해서 쓰며, 슬롯 아래 게이지에 남은 양이 표시됩니다. 다 쓰면 소모된 촉매를 내보내고(기계는 출력 슬롯, 촉매 장치는 왼쪽 출구) 예비에서 다음 촉매를 바로 장전하므로 멈추지 않습니다.\n쓰다 남은 같은 종류의 촉매를 넣으면 남은 수명이 장전 중인 촉매로 합쳐지고, 빈 껍데기는 소모된 촉매로 나옵니다. 다른 종류를 넣으면 장전 중인 촉매를 출구로 돌려보내고 교체합니다. 예비가 비어 있을 때 슬롯을 클릭하면 장전 중인 촉매를 꺼낼 수 있습니다.\n소모된 촉매는 촉매 반응기에서 약 25%를 한 티어 아래 촉매의 재료로 회수할 수 있습니다."
@@ -6412,8 +6420,8 @@
     "translation": "촉매 슬롯 및 재활용"
   },
   "guide.singulo.catalysts.tiers.body": {
-    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE condensate catalyst takes one muon catalyst and 40 seconds).",
-    "translation": "뮤온(2), BE 응축(3), 시간 결정(4), 특이점 코어(5).\n- 장치와 같은 티어: 표준\n- 한 티어 높음: 속도 +25%, 소모 −20%(두 티어 높은 것까지 겹침)\n- 한 티어 낮음: 속도 ×0.5, 소모 ×2(발전기는 정격 출력의 25%)\n- 두 티어 낮음: 사용 불가\n남은 양이 줄수록 필요 전력이 늘고(최대 ×1.6), 전력이 80% 아래로 떨어지면 불완전 반응으로 소모가 ×1.5가 됩니다.\n이 규칙은 촉매 슬롯으로 가동하는 장치(앵커, 안정기, 발전기, 보호막 등)에 적용됩니다. 가공 레시피에 재료로 적힌 촉매는 정해진 개수나 수명만큼만 쓰며 속도는 변하지 않습니다(예: BE 응축 촉매 가공에는 뮤온 촉매 1개와 40초가 듭니다)."
+    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed amount of life (a whole catalyst means one fresh catalyst's worth). Any catalyst of that tier or higher can pay: each tier higher wears 20% less and works 25% quicker (up to two tiers). Lower tiers cannot pay.",
+    "translation": "뮤온(2), BE 응축(3), 시간 결정(4), 특이점 코어(5).\n- 장치와 같은 티어: 표준\n- 한 티어 높음: 속도 +25%, 소모 −20%(두 티어 높은 것까지 겹침)\n- 한 티어 낮음: 속도 ×0.5, 소모 ×2(발전기는 정격 출력의 25%)\n- 두 티어 낮음: 사용 불가\n남은 양이 줄수록 필요 전력이 늘고(최대 ×1.6), 전력이 80% 아래로 떨어지면 불완전 반응으로 소모가 ×1.5가 됩니다.\n이 규칙은 촉매 슬롯으로 가동하는 장치(앵커, 안정기, 발전기, 보호막 등)에 적용됩니다. 가공 레시피에 재료로 적힌 촉매는 정해진 수명만큼 씁니다(통째로 1개라면 새 촉매 1개분). 그 티어 이상의 촉매로 낼 수 있으며, 한 단계 위마다 소모 −20%, 속도 +25%입니다(두 단계까지). 하위 촉매로는 낼 수 없습니다."
   },
   "guide.singulo.catalysts.tiers.title": {
     "source": "Tiers and effects",
@@ -6764,8 +6772,8 @@
     "translation": "3단계: 양자"
   },
   "guide.singulo.stage3.flow.body": {
-    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler.\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds and culture data, move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
-    "translation": "이 단계에서 할 일:\n1. 양자 얽힘 합성기와 레이저 냉각기를 만듭니다.\n2. 양자 열기관으로 발전합니다(BE 응축 촉매로 200 kFE/t. 만들기 전까지는 뮤온 촉매로 25% 시험 운전).\n3. 레이저 냉각기로 BE 응축 촉매(3티어)와 광학 격자 기판을 만듭니다.\n4. 심해 압력 수집기를 일찍 놓아 고압 결정을 모아 둡니다(나중에 껍질과 모루에 약 30개).\n5. 연구동의 보관고에서 나침반을 조정해 봉쇄 배양 시설을 찾습니다. 시간 결정 씨앗과 배양 데이터를 모읍니다(안쪽의 중력 잔재을 쓰러뜨리면 보관고가 열립니다). 같은 조정으로 지하 안드로이드 연구소도 찾을 수 있습니다.\n6. 씨앗과 배양 데이터가 갖춰지면 4단계의 시간 결정 배양기로 넘어갑니다.\n막히기 쉬운 곳:\n・봉쇄 배양 시설이 힘듦: 극저온 구역과 강한 경비기가 있습니다. 방어구와 회복을 갖추고 호위 안드로이드를 데려가세요.\n・중력 잔재에 띄워짐: 낙하가 아프므로 중력 부츠나 충격 발전 패널이 도움이 됩니다."
+    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
+    "translation": "이 단계에서 할 일:\n1. 양자 얽힘 합성기와 레이저 냉각기를 만듭니다(3단계 장치는 뮤온 촉매를 1개씩 씁니다. 레이저 냉각기에는 연구동의 메아리 파수꾼이 떨어뜨리는 파수꾼 투영 핵도 필요합니다).\n2. 양자 열기관으로 발전합니다(BE 응축 촉매로 200 kFE/t. 만들기 전까지는 뮤온 촉매로 25% 시험 운전).\n3. 레이저 냉각기로 BE 응축 촉매(3티어)와 광학 격자 기판을 만듭니다.\n4. 심해 압력 수집기를 일찍 놓아 고압 결정을 모아 둡니다(나중에 껍질과 모루에 약 30개).\n5. 연구동의 보관고에서 나침반을 조정해 봉쇄 배양 시설을 찾습니다. 시간 결정 씨앗과 배양 데이터를 모읍니다(안쪽의 중력 잔재을 쓰러뜨리면 보관고가 열립니다). 같은 조정으로 지하 안드로이드 연구소도 찾을 수 있습니다.\n6. 씨앗, 배양 데이터, 축퇴 핵(중력 잔재가 떨어뜨림)이 갖춰지면 4단계의 시간 결정 배양기로 넘어갑니다.\n막히기 쉬운 곳:\n・봉쇄 배양 시설이 힘듦: 극저온 구역과 강한 경비기가 있습니다. 방어구와 회복을 갖추고 호위 안드로이드를 데려가세요.\n・중력 잔재에 띄워짐: 낙하가 아프므로 중력 부츠나 충격 발전 패널이 도움이 됩니다."
   },
   "guide.singulo.stage3.flow.title": {
     "source": "Stage 3 at a glance",
@@ -9075,6 +9083,10 @@
     "source": "Uses %s",
     "translation": "사용 횟수 %s 소모"
   },
+  "jei.singulo.higher_tier": {
+    "source": "A higher-tier catalyst also works (each tier: −20%% wear, +25%% speed)",
+    "translation": "상위 티어 촉매도 사용 가능 (한 단계마다 소모 −20%%, 속도 +25%%)"
+  },
   "key.categories.singulo": {
     "source": "Singulo",
     "translation": "Singulo"
@@ -11128,8 +11140,8 @@
     "translation": "사용 대상: 폐허 패널, 깨진 폐허 패널, 이끼 낀 폐허 패널, 타일 폐허 패널, 통풍 폐허 패널 외 2개"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Time Crystal Catalyst",
-    "translation": "사용 제품: 시간 결정 촉매"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
+    "translation": "사용 대상: 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 시간 결정 촉매, 축퇴 열로 제어기 외 3개"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11308,8 +11320,8 @@
     "translation": "사용 대상: 반응로 외피, 특이점 씨앗, 특이점 코어, 중성미자 감도 모듈 Mk3, 봉인 컨테이너 (시간 잠금) 외 1개"
   },
   "uses.singulo.degenerate_nucleus": {
-    "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
-    "translation": "사용 대상: 특이점 캡슐화기, 특이점 씨앗, 중력자 조작기, 각성의 중력핵"
+    "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
+    "translation": "사용 대상: 시간 결정 배양기, 특이점 캡슐화기, 특이점 씨앗, 중력자 조작기, 각성의 중력핵"
   },
   "uses.singulo.degenerate_precursor": {
     "source": "Used in: Degenerate Matter Shell",
@@ -11436,8 +11448,8 @@
     "translation": "사용 제품: 뮤온 촉매"
   },
   "uses.singulo.muon_catalyst": {
-    "source": "Used in: Muon-Catalyzed Fusion Reactor, BE Condensate Catalyst",
-    "translation": "사용 대상: 뮤온 촉매 핵융합로, BE 응축 촉매"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, Entanglement Synthesizer, Laser Cooler, BE Condensate Catalyst, Quantum Heat Engine and 6 more",
+    "translation": "사용 대상: 뮤온 촉매 핵융합로, 양자 얽힘 합성기, 레이저 냉각기, BE 응축 촉매, 양자 열기관 외 6개"
   },
   "uses.singulo.neutrino_scanner": {
     "source": "Used in: Neutrino Observatory",
@@ -11532,8 +11544,8 @@
     "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.sentinel_core": {
-    "source": "Used in: Echo Resonator, Time Crystal Incubator, Autonomous Probe Station, Awakened Echo Core",
-    "translation": "사용 대상: 메아리 공명기, 시간 결정 배양기, 자동 탐사기 기지, 각성의 메아리핵"
+    "source": "Used in: Laser Cooler, Echo Resonator, Autonomous Probe Station, Awakened Echo Core",
+    "translation": "사용 대상: 레이저 냉각기, 메아리 공명기, 자동 탐사기 기지, 각성의 메아리핵"
   },
   "uses.singulo.shield_tower_body": {
     "source": "Used in: Event Horizon Shield Tower",
@@ -11588,8 +11600,8 @@
     "translation": "사용 대상: 열전 발전기, 충격 발전 패널, 펠티에 냉각기"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
-    "translation": "사용 대상: 특이 물질, 특이점 코어, 시간 결정 모듈"
+    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
+    "translation": "사용 대상: 특이 물질, 특이점 코어, 헤일로 수집기, 시간 결정 모듈"
   },
   "uses.singulo.time_crystal_module": {
     "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 2 more",
