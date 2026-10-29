@@ -180,8 +180,9 @@ public final class WorkOrder {
         for (int i = 0; i < steps.size(); i++) {
             StepState s = steps.get(i);
             s.after.clear();
+            List<ItemCount> inputs = s.recipe.inputs();
             for (int j = 0; j < i; j++) {
-                for (ItemCount in : s.recipe.inputs()) {
+                for (ItemCount in : inputs) {
                     if (ItemStack.isSameItemSameComponents(in.item, steps.get(j).recipe.output())) {
                         s.after.add(j);
                         break;
@@ -189,6 +190,49 @@ public final class WorkOrder {
                 }
             }
         }
+    }
+
+    private int frontierSize = -1;
+    private boolean denseDependencies;
+    private boolean[] frontierFinished;
+    private List<Integer> frontier;
+
+    /**
+     * 依存の多い注文では、取りかかれる工程の一覧を覚えておく（小さな注文や単純な注文は、毎回そのまま調べる）。
+     * 工程が終わったかどうかは、この tick のうちに終わったものも含めて、毎回確かめる。
+     */
+    @Nullable
+    public List<Integer> readySteps() {
+        if (frontierSize != steps.size()) {
+            frontierSize = steps.size();
+            long edges = 0;
+            for (StepState step : steps) {
+                edges += step.after.size();
+            }
+            denseDependencies = steps.size() >= 32 && edges >= (long) steps.size() * 4;
+            frontier = null;
+        }
+        if (!denseDependencies) {
+            return null;
+        }
+        boolean changed = frontier == null;
+        for (int i = 0; !changed && i < steps.size(); i++) {
+            changed = frontierFinished[i] != steps.get(i).finished();
+        }
+        if (changed) {
+            frontierFinished = new boolean[steps.size()];
+            for (int i = 0; i < steps.size(); i++) {
+                frontierFinished[i] = steps.get(i).finished();
+            }
+            var ready = new ArrayList<Integer>();
+            for (int i = 0; i < steps.size(); i++) {
+                if (!frontierFinished[i] && ready(steps.get(i))) {
+                    ready.add(i);
+                }
+            }
+            frontier = List.copyOf(ready);
+        }
+        return frontier;
     }
 
     public boolean ready(StepState s) {

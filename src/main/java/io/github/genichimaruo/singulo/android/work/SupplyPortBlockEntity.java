@@ -18,10 +18,154 @@ import net.neoforged.neoforge.items.IItemHandler;
  * アンドロイド資材口。隣（6方向）のストレージ（チェストなど）を、作業の素材置き場としてつなぐ。
  * アンドロイドはここへ来て、素材を取り、できた物や副産物を戻す。作業指令台も資材口を兼ねるので、
  * 素材置き場を増やしたい・離れた所にも置きたいときに使う。
+ * <p>
+ * 優先の登録（{@link #ENTRIES} 件）: アイテムごとに優先順位（1がいちばん先）と、取り出し・返却のどちらに効くかを決める。
+ * 登録した物は、順位の高い資材口から先に取り出し、先に返す（いっぱいなら次の場所へ）。登録していない物は、これまでどおり。
  */
 public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
+    public static final int ENTRIES = 8;
+    public static final int MAX_RANK = 9;
+    /** 優先が効く向き。 */
+    public static final int MODE_BOTH = 0, MODE_TAKE = 1, MODE_RETURN = 2, MODES = 3;
+
+    /** 登録したアイテム（1個ずつ。中身は持たない見本）。 */
+    private final net.minecraft.world.SimpleContainer entries = new net.minecraft.world.SimpleContainer(ENTRIES) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            SupplyPortBlockEntity.this.entryChanged();
+        }
+    };
+    private final int[] ranks = new int[ENTRIES];
+    private final int[] modes = new int[ENTRIES];
+    /** 画面へ送る値: 0〜7 は順位、8〜15 は向き。 */
+    private final net.minecraft.world.inventory.ContainerData data = new net.minecraft.world.inventory.ContainerData() {
+        @Override
+        public int get(int index) {
+            return index < ENTRIES ? ranks[index] : modes[index - ENTRIES];
+        }
+
+        @Override
+        public void set(int index, int value) {
+            if (index < ENTRIES) {
+                ranks[index] = value;
+            } else {
+                modes[index - ENTRIES] = value;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return ENTRIES * 2;
+        }
+    };
+
     public SupplyPortBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.ANDROID_SUPPLY_PORT.get(), pos, state);
+        java.util.Arrays.fill(ranks, 1);
+    }
+
+    public net.minecraft.world.Container entries() {
+        return entries;
+    }
+
+    public net.minecraft.world.inventory.ContainerData entryData() {
+        return data;
+    }
+
+    /** 登録を変えた: 空いた欄の順位と向きは初めに戻す。 */
+    private void entryChanged() {
+        for (int i = 0; i < ENTRIES; i++) {
+            if (entries.getItem(i).isEmpty()) {
+                ranks[i] = 1;
+                modes[i] = MODE_BOTH;
+            }
+        }
+        setChanged();
+    }
+
+    /** i 番の登録の順位を delta だけ変える（1〜{@link #MAX_RANK}）。 */
+    public void shiftRank(int i, int delta) {
+        if (i >= 0 && i < ENTRIES && !entries.getItem(i).isEmpty()) {
+            ranks[i] = Math.max(1, Math.min(MAX_RANK, ranks[i] + delta));
+            setChanged();
+        }
+    }
+
+    /** i 番の登録の向きを次へ（両方 → 取り出し → 返却）。 */
+    public void cycleMode(int i) {
+        if (i >= 0 && i < ENTRIES && !entries.getItem(i).isEmpty()) {
+            modes[i] = (modes[i] + 1) % MODES;
+            setChanged();
+        }
+    }
+
+    /**
+     * item の優先度（大きいほど先）。登録した順位 1〜9 を 9〜1 にする。take は取り出し、そうでなければ返却。
+     * 登録していなければ（その向きに効く登録がなければ） 0。
+     */
+    public int priority(net.minecraft.world.item.ItemStack item, boolean take) {
+        int best = 0;
+        for (int i = 0; i < ENTRIES; i++) {
+            net.minecraft.world.item.ItemStack e = entries.getItem(i);
+            if (e.isEmpty() || !net.minecraft.world.item.ItemStack.isSameItem(e, item)
+                    || modes[i] == (take ? MODE_RETURN : MODE_TAKE)) {
+                continue;
+            }
+            best = Math.max(best, MAX_RANK + 1 - ranks[i]);
+        }
+        return best;
+    }
+
+    @Override
+    protected boolean openScreen(ServerPlayer player) {
+        if (!mayOperate(player)) {
+            player.displayClientMessage(Component.translatable("gui.singulo.work_console.locked"), true);
+            return true;
+        }
+        player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inv, p) -> new SupplyPortMenu(id, inv, worldPosition, entries, data),
+                Component.translatable(getBlockState().getBlock().getDescriptionId())), buf -> buf.writeBlockPos(worldPosition));
+        return true;
+    }
+
+    @Override
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+        for (int i = 0; i < ENTRIES; i++) {
+            net.minecraft.world.item.ItemStack e = entries.getItem(i);
+            if (e.isEmpty()) {
+                continue;
+            }
+            net.minecraft.nbt.CompoundTag t = new net.minecraft.nbt.CompoundTag();
+            t.putInt("slot", i);
+            t.put("item", e.save(registries));
+            t.putInt("rank", ranks[i]);
+            t.putInt("mode", modes[i]);
+            list.add(t);
+        }
+        if (!list.isEmpty()) {
+            tag.put("priorities", list);
+        }
+    }
+
+    @Override
+    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        for (int i = 0; i < ENTRIES; i++) {
+            entries.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        net.minecraft.nbt.ListTag list = tag.getList("priorities", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        for (int k = 0; k < list.size(); k++) {
+            net.minecraft.nbt.CompoundTag t = list.getCompound(k);
+            int i = t.getInt("slot");
+            if (i < 0 || i >= ENTRIES) {
+                continue;
+            }
+            entries.setItem(i, net.minecraft.world.item.ItemStack.parseOptional(registries, t.getCompound("item")));
+            ranks[i] = Math.max(1, Math.min(MAX_RANK, t.getInt("rank")));
+            modes[i] = Math.floorMod(t.getInt("mode"), MODES);
+        }
     }
 
     @Override
@@ -41,6 +185,9 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
                               List<net.neoforged.neoforge.fluids.capability.IFluidHandler> out) {
         for (Direction d : Direction.values()) {
             BlockPos p = from.relative(d);
+            if (!level.isLoaded(p)) {
+                continue;
+            }
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
@@ -53,6 +200,9 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
 
     /** box の中身を、pos の隣のストレージへ移す（作業のブロックは除く）。1回で1スタックずつ。 */
     static void pushOut(Level level, BlockPos pos, net.minecraft.world.Container box) {
+        if (box.isEmpty()) {
+            return;
+        }
         List<IItemHandler> targets = new java.util.ArrayList<>();
         collect(level, pos, new java.util.HashSet<>(), targets);
         if (targets.isEmpty()) {
@@ -78,12 +228,18 @@ public class SupplyPortBlockEntity extends WorkLinkedBlockEntity {
 
     /** from の隣（6方向）のストレージを集める（作業指令台・資材口・納品口・レシピ棚は除く）。 */
     static void collect(Level level, BlockPos from, Set<BlockPos> seen, List<IItemHandler> out) {
+        var owner = level.isLoaded(from) ? level.getBlockEntity(from) : null;
+        AdjacentItemStores cache = owner instanceof WorkConsoleBlockEntity console ? console.adjacentItems
+                : owner instanceof WorkLinkedBlockEntity linked ? linked.adjacentItems : null;
         for (Direction d : Direction.values()) {
             BlockPos p = from.relative(d);
+            if (!level.isLoaded(p)) {
+                continue;
+            }
             if (level.getBlockEntity(p) instanceof WorkLinkedBlockEntity || level.getBlockEntity(p) instanceof WorkConsoleBlockEntity) {
                 continue;
             }
-            IItemHandler h = level.getCapability(Capabilities.ItemHandler.BLOCK, p, d.getOpposite());
+            IItemHandler h = cache == null ? level.getCapability(Capabilities.ItemHandler.BLOCK, p, d.getOpposite()) : cache.get(d);
             if (h == null) {
                 continue;
             }

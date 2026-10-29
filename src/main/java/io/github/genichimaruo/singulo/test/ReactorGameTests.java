@@ -68,7 +68,7 @@ public final class ReactorGameTests {
         return helper.getBlockEntity(CONTROLLER);
     }
 
-    @GameTest(template = HUGE, batch = BATCH)
+    @GameTest(template = "empty", batch = BATCH)
     public static void accretionEfficiencyFollowsSpin(GameTestHelper helper) {
         double still = PenroseReactorBlockEntity.efficiency(0);
         double extremal = PenroseReactorBlockEntity.efficiency(1);
@@ -432,6 +432,28 @@ public final class ReactorGameTests {
             helper.assertTrue(helper.getLevel().getBlockEntity(helper.absolutePos(CONTROLLER)) instanceof PenroseReactorBlockEntity re
                     && re.state() == PenroseReactorBlockEntity.State.RUNNING && re.mass() > 4000, "組み直しても取り込まない");
             helper.assertBlockNotPresent(SinguloBlocks.ROGUE_BLACK_HOLE.get(), CENTER);
+        });
+    }
+
+    /** 炉心が稼働している間、リングの内側に置いたブロックは崩れて吸い込まれる（中身を持つブロックは崩さない）。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 520)
+    public static void runningCoreDevoursBlocksInsideTheRing(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
+        helper.runAtTickTime(3, () -> helper.assertTrue(r.ignite(), "点火を始められない"));
+        helper.onEachTick(() -> r.energy().receiveEnergy(300_000_000, false));
+        BlockPos stone = CENTER.offset(3, 0, 0);
+        BlockPos chest = CENTER.offset(-3, 0, 0);
+        int lit = 3 + PenroseReactorBlockEntity.IGNITION_SEQUENCE_TICKS + 10;
+        helper.runAtTickTime(lit, () -> {
+            helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.RUNNING, "点火して稼働しない");
+            helper.setBlock(stone, net.minecraft.world.level.block.Blocks.STONE);
+            helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
+        });
+        helper.runAtTickTime(lit + 60, () -> {
+            helper.assertTrue(helper.getBlockState(stone).isAir(), "リングの内側のブロックが吸い込まれない");
+            helper.assertTrue(helper.getBlockState(chest).is(net.minecraft.world.level.block.Blocks.CHEST), "中身を持つブロックまで崩した");
+            helper.succeed();
         });
     }
 }

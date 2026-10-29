@@ -5,44 +5,22 @@ _parser.add_argument('--build-dir', default='build')
 _build = _parser.parse_args().build_dir
 import json
 import pathlib
-import struct
-import zlib
+from PIL import Image
+
 
 def rgba(path, max_row=None):
-    data = path.read_bytes()
-    assert data[:8] == b"\x89PNG\r\n\x1a\n"
-    at, payload = 8, bytearray()
-    while at < len(data):
-        size = struct.unpack(">I", data[at:at + 4])[0]
-        kind = data[at + 4:at + 8]
-        body = data[at + 8:at + 8 + size]
-        at += size + 12
-        if kind == b"IHDR":
-            width, height, depth, color, compression, filtering, interlace = struct.unpack(">IIBBBBB", body)
-            assert depth == 8 and color in (2, 6) and interlace == 0
-        elif kind == b"IDAT":
-            payload.extend(body)
-    channels = 4 if color == 6 else 3
-    stride = width * channels
-    raw = zlib.decompress(payload)
-    previous = bytearray(stride)
-    rows = []
-    def paeth(a, b, c):
-        p = a + b - c
-        distances = abs(p - a), abs(p - b), abs(p - c)
-        return (a, b, c)[distances.index(min(distances))]
-    for y in range(min(height, max_row or height)):
-        start = y * (stride + 1)
-        mode, row = raw[start], bytearray(raw[start + 1:start + 1 + stride])
-        for x in range(stride):
-            a = row[x - channels] if x >= channels else 0
-            b = previous[x]
-            c = previous[x - channels] if x >= channels else 0
-            predictor = (0, a, b, (a + b) // 2, paeth(a, b, c))[mode]
-            row[x] = (row[x] + predictor) & 255
-        rows.append(row)
-        previous = row
-    return width, height, channels, rows
+    # Decode PNG filters in Pillow's native code. The former Python byte-by-byte
+    # decoder computed all five filter predictors for every channel of every row.
+    with Image.open(path) as source:
+        if source.format != "PNG":
+            raise ValueError("Not a PNG: " + str(path))
+        image = source.convert("RGBA")
+        width, height = image.size
+        if max_row is not None:
+            image = image.crop((0, 0, width, min(height, max_row)))
+        raw = image.tobytes()
+    stride = width * 4
+    return width, height, 4, [raw[i:i + stride] for i in range(0, len(raw), stride)]
 
 root = pathlib.Path(_build + "/gui-review/screenshots")
 results = []
@@ -71,15 +49,20 @@ print(json.dumps(results))
 metrics_path = pathlib.Path(_build + "/gui-review/machine-font-metrics.tsv")
 if metrics_path.exists():
     rows = [line.split('\t') for line in metrics_path.read_text().splitlines()]
-    if len(rows) != 190:
-        raise SystemExit(f"Expected 190 machine GUI fixtures, got {len(rows)}")
+    if len(rows) != 220:
+        raise SystemExit(f"Expected 220 machine GUI fixtures, got {len(rows)}")
     locales = ('ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr')
     checked_headers = 0
     rate_reference = None
     for locale in locales:
         entries = [r for r in rows if r[0] == locale]
-        if len(entries) != 38:
-            raise SystemExit(f"Expected 38 fixtures for {locale}, got {len(entries)}")
+        if len(entries) != 44:
+            raise SystemExit(f"Expected 44 fixtures for {locale}, got {len(entries)}")
+        for index in range(len(entries)):
+            capture = root / f"machine-{locale}-{index:02d}.png"
+            with Image.open(capture) as png:
+                if png.format != 'PNG' or png.size != (854, 480) or png.convert('RGB').getbbox() is None:
+                    raise SystemExit(f"{locale}/{index}: invalid, blank or wrong-sized GUI capture")
         for index, entry in enumerate(entries[:16]):
             _, name, title_width, status_width, panel_width = entry
             panel_width = int(panel_width)
@@ -105,7 +88,32 @@ if metrics_path.exists():
             rate_reference = rate
         elif rate != rate_reference:
             raise SystemExit(f"{locale}: generator ASCII glyph pixels differ after language switch")
+    supply_slots = 0
+    for locale in locales:
+        entries = [r for r in rows if r[0] == locale]
+        captures = []
+        for state in range(3):
+            matches = [i for i, row in enumerate(entries) if row[1] == f"supply-{state}"]
+            if len(matches) != 1:
+                raise SystemExit(f"{locale}: missing/duplicate supply port fixture")
+            capture = root / f"machine-{locale}-{matches[0]:02d}.png"
+            width, height, channels, pixels = rgba(capture)
+            if (width, height) != (854, 480):
+                raise SystemExit("Unexpected supply port viewport")
+            captures.append(capture.read_bytes())
+            if state == 2:
+                continue  # The intentionally open tooltip may cover inventory slots.
+            left, top = (width - 176 * 2) // 2, (height - 206 * 2) // 2
+            # GuiFrame inventoryY(206)=124, hotbarY(206)=182; slot centers add 8.
+            points = [(8 + col * 18 + 8, 124 + row * 18 + 8) for row in range(3) for col in range(9)]
+            points += [(8 + col * 18 + 8, 182 + 8) for col in range(1, 9)]
+            samples = [tuple(pixels[top + y * 2][(left + x * 2) * channels:(left + x * 2) * channels + 3]) for x, y in points]
+            if len(set(samples)) != 1 or not all(60 <= c <= 150 for c in samples[0]):
+                raise SystemExit(f"{locale}: supply port inventory is missing/overlapped")
+            supply_slots += len(samples)
+        if captures[1] == captures[2]:
+            raise SystemExit(f"{locale}: supply port tooltip was not rendered")
     summary = {"languages": list(locales), "machine_captures": len(rows),
-               "headers_without_title_status_overlap": checked_headers, "generator_font_probes": 5}
+               "headers_without_title_status_overlap": checked_headers, "generator_font_probes": 5, "supply_port_inventory_slots": supply_slots, "supply_port_tooltips": 5}
     pathlib.Path(_build + "/gui-review/machine-pixels.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary))

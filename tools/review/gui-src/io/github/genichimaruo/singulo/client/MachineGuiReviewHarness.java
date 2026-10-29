@@ -21,10 +21,12 @@ public final class MachineGuiReviewHarness {
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 22;
+    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 28;
     private static final List<String> metrics = new ArrayList<>();
-    private static int language, screen, wait;
+    private static int language, screen;
+    private static long renderedFrames, shownFrame;
     private static boolean shown;
+    private static net.minecraft.client.gui.screens.Screen fixture;
     private static int hoverX = -1, hoverY;
 
     static void start(Minecraft mc) {
@@ -40,16 +42,26 @@ public final class MachineGuiReviewHarness {
         // All fixtures use the same installed font resources. Reload translations synchronously,
         // without repeatedly destroying font atlases while JEI rebuilds its ingredient filter.
         mc.getLanguageManager().onResourceManagerReload(mc.getResourceManager());
-        wait = 0;
+    }
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void rendered(net.neoforged.neoforge.client.event.RenderFrameEvent.Post event) {
+        renderedFrames++;
     }
 
     static void tick(Minecraft mc) throws Exception {
-        if (mc.getOverlay() != null || ++wait % 6 != 0) return;
+        if (mc.getOverlay() != null) return;
         if (!shown) {
             show(mc);
             shown = true;
+            shownFrame = renderedFrames;
+            fixture = mc.screen;
             return;
         }
+        // Capture after actual completed renders, not an arbitrary twelve-tick delay.
+        // Several client ticks can happen in one frame on a slow CI renderer.
+        if (renderedFrames - shownFrame < 2) return;
+        if (mc.screen != fixture) throw new IllegalStateException("GUI fixture closed/replaced before capture");
         Path output = Path.of(System.getProperty("singulo.guiReviewOutput"));
         String name = (SELECTOR ? "selector-" : SIDES ? "sides-" : "machine-") + LANGUAGES[language] + "-" + String.format("%02d", screen);
         try (var pixels = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
@@ -194,7 +206,7 @@ public final class MachineGuiReviewHarness {
             value(data, CatalystDeviceBlockEntity.D_WEAR_X100, 80);
             value(data, CatalystDeviceBlockEntity.D_EXTRA, 5);
             value(data, CatalystDeviceBlockEntity.D_ENABLED, 1);
-            var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO, kind, new ItemStackHandler(2), data);
+            var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO, kind, new ItemStackHandler(2), new ItemStackHandler(1), data);
             mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(),
                     Component.translatable(shield ? "block.singulo.shield_tower_core" : "block.singulo.worldline_anchor_small")));
             metrics.add(LANGUAGES[language] + "	catalyst-" + extra + "	0	0	176");
@@ -301,6 +313,45 @@ public final class MachineGuiReviewHarness {
                     new net.minecraft.world.SimpleContainer(1), new net.minecraft.world.SimpleContainer(1));
             mc.setScreen(new GenesisCoreScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.genesis_core")));
             metrics.add(LANGUAGES[language] + "\tgenesis\t0\t0\t248");
+        } else if (extra >= 22 && extra <= 24) {
+            // Empty, fully configured, and a translated mode tooltip in every language.
+            var entries = new net.minecraft.world.SimpleContainer(io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity.ENTRIES);
+            var data = new net.minecraft.world.inventory.SimpleContainerData(entries.getContainerSize() * 2);
+            if (extra > 22) {
+                var samples = new net.minecraft.world.item.Item[] {net.minecraft.world.item.Items.IRON_INGOT,
+                        net.minecraft.world.item.Items.GOLD_INGOT, net.minecraft.world.item.Items.DIAMOND,
+                        net.minecraft.world.item.Items.COPPER_INGOT, net.minecraft.world.item.Items.REDSTONE,
+                        net.minecraft.world.item.Items.LAPIS_LAZULI, net.minecraft.world.item.Items.EMERALD,
+                        net.minecraft.world.item.Items.NETHERITE_INGOT};
+                for (int i = 0; i < samples.length; i++) {
+                    entries.setItem(i, new net.minecraft.world.item.ItemStack(samples[i]));
+                    data.set(i, i == 7 ? 9 : i + 1);
+                    data.set(samples.length + i, i % 3);
+                }
+            }
+            var menu = new io.github.genichimaruo.singulo.android.work.SupplyPortMenu(0, mc.player.getInventory(), BlockPos.ZERO, entries, data);
+            mc.setScreen(new SupplyPortScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.android_supply_port")));
+            if (extra == 24) hover(mc, menu.WIDTH, menu.HEIGHT, menu.entryX(7) + 25, menu.entryY(7) + 7);
+            for (var slot : menu.slots) {
+                if (slot.x < 1 || slot.x + 16 >= menu.WIDTH || slot.y < 16 || slot.y + 16 > menu.HEIGHT - 4)
+                    throw new IllegalStateException("Supply port slot outside panel");
+            }
+            metrics.add(LANGUAGES[language] + "\tsupply-" + (extra - 22) + "\t0\t0\t176");
+        } else if (extra >= 25) {
+            var status = new CatalystDeviceBlockEntity.Status[] {CatalystDeviceBlockEntity.Status.WAITING,
+                    CatalystDeviceBlockEntity.Status.OUTPUT_FULL, CatalystDeviceBlockEntity.Status.NEEDS_UPGRADE}[extra - 25];
+            SyncedInts data = SyncedInts.client(CatalystDeviceBlockEntity.COUNT);
+            value(data, CatalystDeviceBlockEntity.D_STATUS, status.ordinal());
+            value(data, CatalystDeviceBlockEntity.D_EXTRA, 25);
+            value(data, CatalystDeviceBlockEntity.D_VALUE, 300);
+            value(data, CatalystDeviceBlockEntity.D_ENABLED, 1);
+            value(data, CatalystDeviceBlockEntity.D_ENERGY, 50_000);
+            value(data, CatalystDeviceBlockEntity.D_CAPACITY, 100_000);
+            var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO,
+                    CatalystDeviceBlockEntity.Kind.PROBE_STATION, new ItemStackHandler(1), new ItemStackHandler(1), data);
+            mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.probe_station")));
+            hover(mc, 176, CatalystDeviceMenu.HEIGHT, 146, 9);
+            metrics.add(LANGUAGES[language] + "\tprobe-" + status.name().toLowerCase() + "\t0\t0\t176");
         } else {
             int variant = extra == 7 ? 2 : extra, kind = variant / 2;
             SyncedInts data = SyncedInts.client(GeneratorSlotsMenu.COUNT);
@@ -321,8 +372,12 @@ public final class MachineGuiReviewHarness {
         }
     }
     private static void hover(Minecraft mc, int width, int x, int y) {
+        hover(mc, width, MachineLayout.HEIGHT, x, y);
+    }
+
+    private static void hover(Minecraft mc, int width, int height, int x, int y) {
         double left = (mc.getWindow().getGuiScaledWidth() - width) / 2;
-        double top = (mc.getWindow().getGuiScaledHeight() - MachineLayout.HEIGHT) / 2;
+        double top = (mc.getWindow().getGuiScaledHeight() - height) / 2;
         hoverX = (int) left + x;
         hoverY = (int) top + y;
     }
@@ -336,7 +391,11 @@ public final class MachineGuiReviewHarness {
             var method = MachineScreen.class.getDeclaredMethod(SIDES ? "renderSides" : "renderOwnTooltips", net.minecraft.client.gui.GuiGraphics.class, int.class, int.class);
             method.setAccessible(true);
             method.invoke(screen, event.getGuiGraphics(), hoverX, hoverY);
+        } else if (event.getScreen() instanceof SupplyPortScreen screen) {
+            screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
         } else if (event.getScreen() instanceof GeneratorSlotsScreen screen) {
+            screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
+        } else if (event.getScreen() instanceof CatalystDeviceScreen screen) {
             screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
         }
     }

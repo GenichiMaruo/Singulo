@@ -28,6 +28,12 @@
         "item": "singulo:exotic_matter"
       },
       "count": 8
+    },
+    {
+      "ingredient": {
+        "item": "singulo:anomaly_sample"
+      },
+      "uses": 1
     }
   ],
   "result": {

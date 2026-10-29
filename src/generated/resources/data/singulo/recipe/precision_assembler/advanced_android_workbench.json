@@ -28,6 +28,13 @@
         "tag": "c:plates/steel"
       },
       "count": 4
+    },
+    {
+      "ingredient": {
+        "item": "singulo:muon_catalyst"
+      },
+      "tier": 2,
+      "uses": 24000
     }
   ],
   "result": {

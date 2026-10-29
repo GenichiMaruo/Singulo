@@ -79,7 +79,7 @@ public final class BlueprintRecipeGameTests {
     /** 置いた施設灯・サーバーラックは動いている状態、非常灯は赤く光る状態で置かれる。 */
     @GameTest(template = EMPTY)
     public static void placedLabLightsAreOn(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             BlockPos floor = new BlockPos(2, 1, 2);
             for (var block : List.of(SinguloBlocks.FACILITY_LIGHT.get(), SinguloBlocks.SERVER_RACK.get())) {

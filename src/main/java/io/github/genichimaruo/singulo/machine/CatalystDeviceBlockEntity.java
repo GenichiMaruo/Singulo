@@ -34,7 +34,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
      * STANDBY: 発電機の蓄電がいっぱいなので待機中（燃料・触媒を使わない）。LIMITED: 持ち主のアンカーが上限に達している。
      * 番号で同期するので、新しい値は後ろに足す。
      */
-    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET, OFF, STANDBY, LIMITED }
+    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET, OFF, STANDBY, LIMITED, WAITING, OUTPUT_FULL, NEEDS_UPGRADE }
 
     /** 画面の種類（表示する行が違う）。 */
     public enum Kind {
@@ -62,7 +62,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     }
 
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_STATUS = 2, D_VALUE = 3, D_USAGE = 4, D_SPEED_X100 = 5,
-            D_WEAR_X100 = 6, D_EXTRA = 7, D_ENABLED = 8, COUNT = 9;
+            D_WEAR_X100 = 6, D_EXTRA = 7, D_ENABLED = 8, D_LOADED_ITEM = 9, D_LOADED_FILL = 10, COUNT = 11;
 
     protected final ItemStackHandler slot = new ItemStackHandler(1) {
         @Override
@@ -72,9 +72,18 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
         @Override
         public int getSlotLimit(int s) {
-            return 1;
+            return CatalystMagazine.SUPPLY_LIMIT;
         }
 
+        @Override
+        protected void onContentsChanged(int s) {
+            setChanged();
+        }
+    };
+    /** 触媒の装填（触媒スロットは予備の置き場。使う1個は中に装填する）。 */
+    protected final CatalystMagazine magazine = new CatalystMagazine(this::setChanged);
+    /** 使い切った失活触媒と、入れ替えで外した使いかけの出口（取り出すだけ）。 */
+    protected final ItemStackHandler spent = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int s) {
             setChanged();
@@ -98,8 +107,41 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         return energy;
     }
 
+    /** 触媒の予備の置き場（スロット）。 */
     public ItemStackHandler catalystSlot() {
         return slot;
+    }
+
+    /** いま使っている触媒（装填中のもの。まだなければ予備のいちばん上）。 */
+    public ItemStack catalyst() {
+        return magazine.current(slot, 0);
+    }
+
+    public CatalystMagazine magazine() {
+        return magazine;
+    }
+
+    /** 失活触媒の出口。 */
+    public ItemStackHandler spentSlot() {
+        return spent;
+    }
+
+    /** パイプやホッパーが失活触媒を取り出せる口（入れられない）。 */
+    protected net.neoforged.neoforge.items.IItemHandlerModifiable spentOut() {
+        return new net.neoforged.neoforge.items.wrapper.RangedWrapper(spent, 0, 1) {
+            @Override
+            public ItemStack insertItem(int s, ItemStack stack, boolean simulate) {
+                return stack;
+            }
+        };
+    }
+
+    /** 画面から: 装填中の触媒をプレイヤーへ取り出す。 */
+    public void ejectLoaded(Player player) {
+        ItemStack out = magazine.eject();
+        if (!out.isEmpty() && !player.getInventory().add(out)) {
+            player.drop(out, false);
+        }
     }
 
     public Status status() {
@@ -173,9 +215,9 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         return slot;
     }
 
-    /** パイプやホッパーから見えるアイテムの入れ物。 */
+    /** パイプやホッパーから見えるアイテムの入れ物（触媒を入れ、失活触媒を取り出す）。 */
     public net.neoforged.neoforge.items.IItemHandler automationItems() {
-        return slot;
+        return new net.neoforged.neoforge.items.wrapper.CombinedInvWrapper(slot, spentOut());
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CatalystDeviceBlockEntity be) {
@@ -183,7 +225,8 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        ItemStack catalyst = slot.getStackInSlot(0);
+        magazine.tick(slot, 0, s -> spent.insertItem(0, s, false));
+        ItemStack catalyst = catalyst();
         CatalystHelper.Effect effect = CatalystHelper.effect(machineTier(), catalyst);
         boolean active = false;
         lastUsage = 0;
@@ -221,7 +264,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
                 int whole = (int) wear;
                 if (whole > 0) {
                     wear -= whole;
-                    slot.setStackInSlot(0, UsesHelper.consume(catalyst, whole));
+                    magazine.consume(whole, slot, 0);
                 }
                 active = true;
             }
@@ -250,9 +293,13 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
         }
     }
 
-    /** ブロックが壊されたとき。触媒を落とす。 */
+    /** ブロックが壊されたとき。予備の触媒・装填中の触媒・出口の失活触媒を落とす。 */
     public void onBroken(Level level) {
         Block.popResource(level, worldPosition, slot.getStackInSlot(0));
+        for (ItemStack s : magazine.contents()) {
+            Block.popResource(level, worldPosition, s);
+        }
+        Block.popResource(level, worldPosition, spent.getStackInSlot(0));
     }
 
     // ------------------------------------------------------------------ GUI
@@ -268,6 +315,8 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
             case D_WEAR_X100 -> (int) Math.round(lastEffect.consumption() * 100);
             case D_EXTRA -> extraValue();
             case D_ENABLED -> enabled ? 1 : 0;
+            case D_LOADED_ITEM -> magazine.loadedItemId();
+            case D_LOADED_FILL -> Math.round(magazine.fill() * 1000);
             default -> 0;
         });
     }
@@ -279,7 +328,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new CatalystDeviceMenu(containerId, inventory, worldPosition, kind(), menuItems(), syncData());
+        return new CatalystDeviceMenu(containerId, inventory, worldPosition, kind(), menuItems(), spent, syncData());
     }
 
     @Override
@@ -294,6 +343,8 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("catalyst", slot.serializeNBT(registries));
+        tag.put("magazine", magazine.save(registries));
+        tag.put("spent", spent.serializeNBT(registries));
         tag.putInt("energy", energy.getEnergyStored());
         tag.putDouble("wear", wear);
         tag.putBoolean("enabled", enabled);
@@ -303,6 +354,8 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         slot.deserializeNBT(registries, tag.getCompound("catalyst"));
+        magazine.load(tag.getCompound("magazine"), registries);
+        spent.deserializeNBT(registries, tag.getCompound("spent"));
         energy.setEnergy(tag.getInt("energy"));
         wear = tag.getDouble("wear");
         enabled = !tag.contains("enabled") || tag.getBoolean("enabled");

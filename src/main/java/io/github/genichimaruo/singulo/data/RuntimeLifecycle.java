@@ -60,10 +60,17 @@ public final class RuntimeLifecycle {
 
     @SubscribeEvent
     public static void stopped(ServerStoppedEvent event) {
+        io.github.genichimaruo.singulo.android.work.RecipeData.clearAlternatives();
         GravitonManipulatorItem.clearRuntime();
         MachineRecipeIndex.clear();
         RecipeSelection.clear();
         RecipeTweaks.invalidate();
+    }
+
+    @SubscribeEvent
+    public static void tagsUpdated(net.neoforged.neoforge.event.TagsUpdatedEvent event) {
+        // 材料はタグの中身をあとから解決して覚える。再読み込みのときは古い定義を捨てる
+        io.github.genichimaruo.singulo.android.work.RecipeData.clearAlternatives();
     }
 
     @SubscribeEvent

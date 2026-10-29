@@ -167,7 +167,7 @@ public final class RecipeSelectionGameTests {
         int before = indexOf(helper, "quantum_computing_module");
         var selected = RecipeSelection.byIndex(helper.getLevel(), m.type(), before);
         m.selectRecipe(before);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var menu = new io.github.genichimaruo.singulo.machine.MachineMenu(1, player.getInventory(), m);
         helper.assertTrue(menu.value(MachineBlockEntity.D_SELECTED) == before + 1, "Initial choice not synchronized");
         try {

@@ -1,0 +1,30 @@
+{
+  "type": "singulo:smes_upgrade",
+  "category": "misc",
+  "pattern": [
+    "QTQ",
+    "CSC",
+    " M "
+  ],
+  "key": {
+    "Q": {
+      "item": "singulo:entangled_element"
+    },
+    "T": {
+      "item": "singulo:toroidal_magnetic_coil"
+    },
+    "C": {
+      "item": "singulo:coolant_cartridge"
+    },
+    "S": {
+      "item": "singulo:smes_cell"
+    },
+    "M": {
+      "item": "singulo:time_crystal_module"
+    }
+  },
+  "result": {
+    "id": "singulo:smes_module",
+    "count": 1
+  }
+}

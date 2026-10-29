@@ -1,0 +1,9 @@
+// Development-only export of effective recipes and actual blueprint block counts.
+allprojects {
+    afterEvaluate {
+        sourceSets.main.java.srcDir(file('tools/review/balance-src'))
+        neoForge.runs.gameTestServer {
+            systemProperty 'singulo.balanceOutput', file('build/balance/runtime.json').absolutePath
+        }
+    }
+}

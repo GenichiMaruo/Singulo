@@ -2,7 +2,7 @@
   "type": "singulo:machine",
   "station": "time_crystal_incubator",
   "stage": 4,
-  "time": 14400,
+  "time": 9600,
   "energy": 30000,
   "ingredients": [
     {
@@ -33,7 +33,8 @@
       "ingredient": {
         "item": "singulo:bose_condensate_catalyst"
       },
-      "count": 1
+      "tier": 3,
+      "uses": 36000
     }
   ],
   "result": {

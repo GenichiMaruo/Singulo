@@ -24,7 +24,11 @@ public final class WorkConsoleView {
     private WorkConsoleView() {}
 
     public static CompoundTag build(WorkConsoleBlockEntity c, ServerPlayer player, @Nullable CompoundTag plan) {
-        HolderLookup.Provider reg = player.level().registryAccess();
+        return forPlayer(c, player, plan, common(c));
+    }
+
+    static CompoundTag common(WorkConsoleBlockEntity c) {
+        HolderLookup.Provider reg = c.getLevel().registryAccess();
         CompoundTag t = new CompoundTag();
         // 手順モードで並べた手順
         net.minecraft.nbt.ListTag proc = new net.minecraft.nbt.ListTag();
@@ -120,8 +124,9 @@ public final class WorkConsoleView {
         for (BlockPos p : c.links()) {
             CompoundTag lt = new CompoundTag();
             lt.putLong("pos", p.asLong());
-            boolean ok = player.level().getBlockEntity(p) instanceof WorkLinkedBlockEntity b && c.getBlockPos().equals(b.console());
-            lt.putInt("kind", ok ? ((WorkLinkedBlockEntity) player.level().getBlockEntity(p)).linkKind().ordinal() : -1);
+            boolean ok = c.getLevel().isLoaded(p) && c.getLevel().getBlockEntity(p) instanceof WorkLinkedBlockEntity b
+                    && c.getBlockPos().equals(b.console());
+            lt.putInt("kind", ok ? ((WorkLinkedBlockEntity) c.getLevel().getBlockEntity(p)).linkKind().ordinal() : -1);
             ls.add(lt);
         }
         t.put("links", ls);
@@ -142,22 +147,6 @@ public final class WorkConsoleView {
             ds.add(dt);
         }
         t.put("deliveries", ds);
-        // 使えるアンドロイド
-        ListTag as = new ListTag();
-        for (RuinAndroid a : c.candidates(player)) {
-            CompoundTag at = new CompoundTag();
-            at.putUUID("id", a.getUUID());
-            at.putString("name", Component.Serializer.toJson(a.nickname(), reg));
-            at.putBoolean("busy", c.busy(a));
-            at.putInt("slots", a.isWorking() ? a.carryCapacity() : a.freeCarry());
-            at.putInt("accent", a.accent());
-            at.putBoolean("miner", a.canMine());
-            at.putBoolean("feller", a.canFell());
-            at.putBoolean("tank", a.hasTank());
-            at.putBoolean("chem_tank", a.hasChemTank());
-            as.add(at);
-        }
-        t.put("androids", as);
         // 登録した注文
         ListTag ss = new ListTag();
         List<ItemCount> inStock = c.standing().isEmpty() ? List.of() : c.stock();
@@ -179,6 +168,32 @@ public final class WorkConsoleView {
         if (c.message() != null) {
             t.putString("message", Component.Serializer.toJson(c.message(), reg));
         }
+        return t;
+    }
+
+    static CompoundTag forPlayer(WorkConsoleBlockEntity c, ServerPlayer player, @Nullable CompoundTag plan, CompoundTag common) {
+        HolderLookup.Provider reg = player.level().registryAccess();
+        CompoundTag t = new CompoundTag();
+        // 共通の部分は作ったあと変えない。見る人ごとに違うのは、いちばん上の項目だけ
+        for (String key : common.getAllKeys()) {
+            t.put(key, common.get(key));
+        }
+        // 使えるアンドロイド
+        ListTag as = new ListTag();
+        for (RuinAndroid a : c.candidates(player)) {
+            CompoundTag at = new CompoundTag();
+            at.putUUID("id", a.getUUID());
+            at.putString("name", Component.Serializer.toJson(a.nickname(), reg));
+            at.putBoolean("busy", c.busy(a));
+            at.putInt("slots", a.isWorking() ? a.carryCapacity() : a.freeCarry());
+            at.putInt("accent", a.accent());
+            at.putBoolean("miner", a.canMine());
+            at.putBoolean("feller", a.canFell());
+            at.putBoolean("tank", a.hasTank());
+            at.putBoolean("chem_tank", a.hasChemTank());
+            as.add(at);
+        }
+        t.put("androids", as);
         if (plan != null) {
             t.put("plan", plan);
         }
@@ -211,6 +226,7 @@ public final class WorkConsoleView {
         t.putLong("count", plan.count);
         t.putBoolean("ok", plan.ok());
         t.putBoolean("loop", plan.loop);
+        t.putBoolean("limited", plan.limited);
         long crafts = 0;
         boolean mining = false, felling = false, fluids = FluidSamples.is(plan.target), chems = ChemicalSamples.is(plan.target);
         for (WorkPlanner.Step s : plan.steps) {

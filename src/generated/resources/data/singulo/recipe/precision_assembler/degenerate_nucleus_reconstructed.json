@@ -1,0 +1,38 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 1800,
+  "energy": 50000,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:degenerate_precursor"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:phase_sync_plate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:quantum_computing_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:time_crystal_catalyst"
+      },
+      "tier": 4,
+      "uses": 4500
+    }
+  ],
+  "result": {
+    "id": "singulo:degenerate_nucleus",
+    "count": 1
+  }
+}

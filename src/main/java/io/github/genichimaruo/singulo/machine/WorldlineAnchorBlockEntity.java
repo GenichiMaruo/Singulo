@@ -191,7 +191,7 @@ public class WorldlineAnchorBlockEntity extends CatalystDeviceBlockEntity {
 
     /** 動いているときの半径。 */
     protected int activeRadius() {
-        return radiusFor(slot.getStackInSlot(0));
+        return radiusFor(catalyst());
     }
 
     @Override

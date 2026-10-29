@@ -70,15 +70,16 @@ def promote(metadata, artifacts, output):
         validate(root, loader, name)
         gui = (root / 'gui-review/logs/latest.log').read_text()
         pixels = json.loads((root / 'gui-review/inventory-pixels.json').read_text())
-        if 'SINGULO_GUI_COMPLETE 22' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or 'SINGULO_HANDBOOK_SEARCH_COMPLETE' not in gui or 'SINGULO_MACHINE_GUI_COMPLETE 190' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 212:
+        if 'SINGULO_GUI_COMPLETE 22' not in gui or 'SINGULO_SEARCH_COMPLETE' not in gui or 'SINGULO_HANDBOOK_SEARCH_COMPLETE' not in gui or 'SINGULO_MACHINE_GUI_COMPLETE 205' not in gui or len(list((root / 'gui-review/screenshots').glob('*.png'))) != 227:
             raise RuntimeError('Missing real GUI/search validation for ' + loader)
         if 'SINGULO_JEI_SYNC_COMPLETE' not in gui:
             raise RuntimeError('Missing bidirectional JEI search validation')
         if len(pixels) != 3 or sum(p['checked_empty_slot_centers'] for p in pixels) != 105:
             raise RuntimeError('Missing inventory PNG verification for ' + loader)
         machine = json.loads((root / 'gui-review/machine-pixels.json').read_text())
-        if (machine.get('machine_captures') != 190 or machine.get('headers_without_title_status_overlap') != 80
+        if (machine.get('machine_captures') != 205 or machine.get('headers_without_title_status_overlap') != 80
                 or machine.get('generator_font_probes') != 5
+                or machine.get('supply_port_inventory_slots') != 350 or machine.get('supply_port_tooltips') != 5
                 or set(machine.get('languages', [])) != {'ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'}):
             raise RuntimeError('Missing machine PNG verification for ' + loader)
         target = output / name

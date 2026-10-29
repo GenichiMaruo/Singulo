@@ -88,9 +88,10 @@ public final class BalanceGameTests {
         helper.assertTrue(fresh.items().insertItem(fresh.type().catalystSlot(), good, false).isEmpty(), "触媒枠に入らない");
         helper.assertTrue(weak.items().insertItem(weak.type().catalystSlot(), worn, false).isEmpty(), "触媒枠に入らない");
         helper.runAtTickTime(400, () -> {
-            helper.assertTrue(fresh.items().getStackInSlot(fresh.type().outputSlot()).is(item("time_crystal_module")),
+            helper.assertTrue(fresh.items().getStackInSlot(fresh.type().outputSlot()).is(item("time_crystal_module"))
+                    && fresh.items().getStackInSlot(fresh.type().outputSlot()).getCount() == 4,
                     "新品の時間結晶からモジュールができない");
-            ItemStack left = fresh.items().getStackInSlot(fresh.type().catalystSlot());
+            ItemStack left = fresh.catalyst();
             helper.assertTrue(left.is(item("time_crystal_catalyst")) && UsesHelper.remaining(left) == max - 36_000,
                     "切り出したあとに触媒が15分ぶん残っていない: " + UsesHelper.remaining(left));
             helper.assertTrue(weak.items().getStackInSlot(weak.type().outputSlot()).isEmpty(),
@@ -110,7 +111,7 @@ public final class BalanceGameTests {
         engine.catalystSlot().insertItem(0, new ItemStack(item("bose_condensate_catalyst")), false);
         helper.runAtTickTime(20, () -> {
             helper.assertTrue(engine.status() == CatalystDeviceBlockEntity.Status.STANDBY, "満充電なのに待機しない: " + engine.status());
-            helper.assertTrue(UsesHelper.get(engine.catalystSlot().getStackInSlot(0)).used() == 0, "待機中に触媒が減った");
+            helper.assertTrue(UsesHelper.get(engine.catalyst()).used() == 0, "待機中に触媒が減った");
             // 蓄電が減ると再開する
             engine.energy().setEnergy(0);
         });
@@ -276,6 +277,7 @@ public final class BalanceGameTests {
     @GameTest(template = EMPTY, batch = "balance_anchor", timeoutTicks = 40)
     public static void loweredAnchorLimitIsEnforced(GameTestHelper helper) {
         int old = ServerConfig.MAX_ANCHORS_PER_PLAYER.get();
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(() -> ServerConfig.MAX_ANCHORS_PER_PLAYER.set(old));
         ServerConfig.MAX_ANCHORS_PER_PLAYER.set(3);
         UUID owner = UUID.randomUUID();
         List<WorldlineAnchorBlockEntity> anchors = new ArrayList<>();
@@ -302,5 +304,99 @@ public final class BalanceGameTests {
                 anchors.forEach(a -> a.onBroken(helper.getLevel()));
             }
         });
+    }
+
+    /**
+     * 1回に触媒の残りより多く使うレシピ（時間結晶モジュールは1個で36,000）でも、予備に同じ触媒があれば、
+     * 装填中のものの残りを使い切って次の触媒から続けて使い、続けて作れる（時間結晶触媒2個でモジュール2個）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 700)
+    public static void timeCrystalModulesContinueIntoTheNextCatalyst(GameTestHelper helper) {
+        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
+        int max = UsesHelper.get(new ItemStack(item("time_crystal_catalyst"))).max();
+        m.items().insertItem(0, new ItemStack(item("optical_lattice_substrate"), 2), false);
+        m.items().insertItem(1, new ItemStack(item("steel_plate"), 4), false);
+        helper.assertTrue(m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("time_crystal_catalyst"), 2), false).isEmpty(),
+                "時間結晶触媒2個を予備に積めない");
+        helper.succeedWhen(() -> {
+            int made = 0;
+            int spent = 0;
+            for (int k = 0; k < m.type().outputSlots(); k++) {
+                ItemStack out = m.items().getStackInSlot(m.type().outputSlot() + k);
+                made += out.is(item("time_crystal_module")) ? out.getCount() : 0;
+                spent += out.is(item("spent_time_crystal_catalyst")) ? out.getCount() : 0;
+            }
+            // 出力スロットがモジュールでふさがっていれば、失活触媒は装置の中で出口が空くのを待つ
+            for (ItemStack waiting : m.magazine().contents()) {
+                spent += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
+            }
+            helper.assertTrue(made == 8, "残りと次の触媒を合わせて、続けて作れない: " + made);
+            helper.assertTrue(spent == 1, "使い切った1個目が失活触媒として出ない: " + spent);
+            helper.assertTrue(UsesHelper.remaining(m.catalyst()) == 2 * max - 72_000,
+                    "2個目の触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));
+        });
+    }
+
+    /** 触媒を寿命で使うレシピは上位の触媒でも払える（1段ごとに使用回数−20%・速さ+25%）。下位の触媒では払えず、両方あれば下位で払う。 */
+    @GameTest(template = EMPTY)
+    public static void higherTierCatalystPaysRecipes(GameTestHelper helper) {
+        MachineRecipe r = adjusted(helper, "precision_assembler/time_crystal_module");
+        ItemStack lattice = new ItemStack(item("optical_lattice_substrate"));
+        ItemStack steel = new ItemStack(item("steel_plate"), 2);
+        int need = 36_000;
+        MachineRecipe.Plan core = r.plan(List.of(new ItemStack(item("singularity_core")), lattice, steel));
+        helper.assertTrue(core != null, "1段上のシンギュラリティ・コアで払えない");
+        helper.assertTrue(core.uses()[0] == need * 8 / 10, "1段上の触媒の使用回数が−20%にならない: " + core.uses()[0]);
+        helper.assertTrue(Math.abs(core.speed() - 1.25) < 1e-9, "1段上の触媒で速くならない: " + core.speed());
+        helper.assertTrue(r.plan(List.of(new ItemStack(item("bose_condensate_catalyst")), lattice, steel)) == null,
+                "1段下の触媒で払えてしまう");
+        MachineRecipe.Plan both = r.plan(List.of(new ItemStack(item("singularity_core")), new ItemStack(item("time_crystal_catalyst")), lattice, steel));
+        helper.assertTrue(both != null && both.uses()[0] == 0 && both.uses()[1] == need && both.speed() == 1,
+                "同じティアの触媒があるのに上位の触媒で払う");
+        helper.succeed();
+    }
+
+    /** 量子段階の装置はミュオン触媒1個ぶんの寿命が要る。BE凝縮触媒なら寿命の減りが−20%で作れる。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void machineKeyCatalystIsPaidFromTheSlot(GameTestHelper helper) {
+        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
+        m.items().insertItem(0, new ItemStack(item("basic_frame")), false);
+        m.items().insertItem(1, new ItemStack(item("quantum_computing_module")), false);
+        m.items().insertItem(2, new ItemStack(item("superconducting_coil"), 4), false);
+        m.items().insertItem(3, new ItemStack(item("steel_plate"), 4), false);
+        int max = UsesHelper.get(new ItemStack(item("bose_condensate_catalyst"))).max();
+        helper.assertTrue(m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("bose_condensate_catalyst")), false).isEmpty(),
+                "BE凝縮触媒を触媒スロットに入れられない");
+        helper.succeedWhen(() -> {
+            boolean made = false;
+            for (int k = 0; k < m.type().outputSlots(); k++) {
+                made |= m.items().getStackInSlot(m.type().outputSlot() + k).is(item("quantum_heat_engine"));
+            }
+            helper.assertTrue(made, "量子熱機関ができない");
+            helper.assertTrue(UsesHelper.remaining(m.catalyst()) == max - 24_000 * 8 / 10,
+                    "BE凝縮触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));
+        });
+    }
+
+    /** 予備が新品で埋まっていても、搬入した使いかけの触媒を受け取る: 装填中のものを満タンにして予備へ重ね、使いかけの残りを先に使う。 */
+    @GameTest(template = EMPTY)
+    public static void automationMergesPartlyUsedCatalyst(GameTestHelper helper) {
+        MachineBlockEntity m = assembler(helper, new BlockPos(1, 1, 1));
+        int slot = m.type().catalystSlot();
+        int max = UsesHelper.get(new ItemStack(item("time_crystal_catalyst"))).max();
+        ItemStack worn = new ItemStack(item("time_crystal_catalyst"));
+        worn.set(SinguloComponents.USES.get(), new UsesData(10_000, max, 0));
+        m.items().insertItem(slot, worn, false);
+        m.magazine().tick(m.items(), slot, s -> s);                      // 装填（使用 10,000）
+        m.items().insertItem(slot, new ItemStack(item("time_crystal_catalyst"), 2), false);
+        ItemStack partial = new ItemStack(item("time_crystal_catalyst"));
+        partial.set(SinguloComponents.USES.get(), new UsesData(max - 30_000, max, 0));   // 残り 30,000
+        ItemStack rest = m.automationItems().insertItem(slot, partial, false);
+        helper.assertTrue(rest.isEmpty(), "予備が新品のとき、使いかけの触媒を受け取らない");
+        helper.assertTrue(m.items().getStackInSlot(slot).getCount() == 3, "満タンにした触媒が新品として予備に重ならない: "
+                + m.items().getStackInSlot(slot).getCount());
+        helper.assertTrue(UsesHelper.remaining(m.magazine().loaded()) == 20_000,
+                "使いかけの残りを装填しない: " + UsesHelper.remaining(m.magazine().loaded()));
+        helper.succeed();
     }
 }

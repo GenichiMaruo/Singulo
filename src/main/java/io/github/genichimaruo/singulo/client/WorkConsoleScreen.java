@@ -2327,7 +2327,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         } else if (plan == null || planDelay > 0) {
             status = Component.translatable("gui.singulo.work_console.planning");
         } else if (!plan.getBoolean("ok")) {
-            status = Component.translatable(plan.getBoolean("loop") ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
+            status = Component.translatable(plan.getBoolean("limited") ? "gui.singulo.work_console.error.limit"
+                    : plan.getBoolean("loop") ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
             color = RED;
         } else {
             status = Component.translatable("gui.singulo.work_console.plan", plan.getInt("steps"), plan.getLong("crafts"));

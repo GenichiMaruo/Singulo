@@ -184,6 +184,10 @@ public final class BossRoomGameTests {
         BlockPos home = helper.absolutePos(CORE);
         net.minecraft.world.level.ChunkPos pushed = new net.minecraft.world.level.ChunkPos(home.offset(14, 0, 0));
         boolean wasForced = helper.getLevel().getForcedChunks().contains(pushed.toLong());
+        // The GameTest batch runner releases forced tickets even after failure.
+        // A completion listener runs after that runner may have started the next batch;
+        // it must not release a ticket now owned by the next fixture.
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(s::discard);
         helper.getLevel().setChunkForced(pushed.x, pushed.z, true);
         s.teleportTo(home.getX() + 14.5, home.getY() + 2, home.getZ() + 0.5);
         helper.startSequence().thenWaitUntil(() -> {
@@ -297,7 +301,7 @@ public final class BossRoomGameTests {
         r.kill();
         helper.runAtTickTime(5, () -> {
             helper.assertFalse(((RuinCacheBlockEntity) helper.getBlockEntity(VAULT)).isSealed(), "倒しても保管庫が開かない");
-            helper.assertTrue(dropped(helper, item("degenerate_nucleus")) == 2, "縮退核を2つ落とさない: " + dropped(helper, item("degenerate_nucleus")));
+            helper.assertTrue(dropped(helper, item("degenerate_nucleus")) == 3, "縮退核を3つ落とさない: " + dropped(helper, item("degenerate_nucleus")));
             helper.succeed();
         });
     }
@@ -491,7 +495,7 @@ public final class BossRoomGameTests {
 
     /** 覚醒戦をやめて離れると、番人は戻り、覚醒核が封印核の上に返る。部屋の仕掛けは直さない（核に手が届くように）。 */
     @GameTest(template = EMPTY, batch = BATCH + "_19", timeoutTicks = 300)
-    public static void abandonedAwakenedFightReturnsCore(GameTestHelper helper) {
+    public static void abandonedAwakenedRoomFightReturnsCore(GameTestHelper helper) {
         GuardianCoreBlockEntity core = clearedRoom(helper, "culture_facility");
         RuinBoss boss = core.awakenAwakened(helper.getLevel(), null, stack("awakening_gravity_core"));
         boss.skipEmerging();

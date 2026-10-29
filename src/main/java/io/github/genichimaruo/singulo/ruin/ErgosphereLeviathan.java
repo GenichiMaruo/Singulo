@@ -131,11 +131,12 @@ public class ErgosphereLeviathan extends RuinBoss {
         return BossScaling.hardMode() ? 1.0 : NORMAL_HEALTH_FACTOR;
     }
 
-    // ---- 出現: 渦が開く → 小さな蛇が這い出して泳ぐ → 真下から顎が噴き上がって丸呑み → 螺旋を描いて昇る
-    public static final int EMERGE_TICKS = 220;
-    public static final int EMERGE_VORTEX = 30;
-    /** 小さな蛇が炉心の上に戻って止まる tick と、大蛇が噴き上がる tick、飲み込み終える tick。 */
-    public static final int HATCH_SETTLE = 100, SWALLOW = 110, SWALLOW_END = 126;
+    // ---- 出現: 渦が開く → 小さな蛇が飛び出し、渦は閉じる → 小さな蛇が漂う → 急に渦が開き、大蛇が噴き上がって丸呑み → 螺旋を描いて昇る
+    public static final int EMERGE_TICKS = 230;
+    /** 小さな蛇が飛び出す tick と、渦が閉じ終える tick。 */
+    public static final int EMERGE_VORTEX = 30, RIFT_CLOSE = 42;
+    /** 小さな蛇が炉心の上に戻って止まる tick、渦が急に開く tick、大蛇が噴き上がる tick、飲み込み終える tick。 */
+    public static final int HATCH_SETTLE = 118, RIFT_SNAP = 122, SWALLOW = 125, SWALLOW_END = 135;
 
     public static final int DEATH_TICKS = 120;
     /** 倒されたとき、身をよじってから沈み始めるまで・沈み終えるまで。 */
@@ -513,7 +514,7 @@ public class ErgosphereLeviathan extends RuinBoss {
     /** 出現の演出の小さな蛇の位置（炉心の上。t は出現の tick）。クライアントの描画と同じ式。 */
     public static Vec3 hatchlingPos(Vec3 core, float t) {
         float k = Mth.clamp((t - EMERGE_VORTEX) / (HATCH_SETTLE - EMERGE_VORTEX), 0, 1);
-        float rise = Mth.clamp(k / 0.2F, 0, 1);
+        float rise = Mth.clamp(k / 0.1F, 0, 1);              // 渦から勢いよく飛び出す
         float r = 3.0F * Mth.clamp(k / 0.25F, 0, 1) * (1 - Mth.clamp((k - 0.75F) / 0.25F, 0, 1));
         float a = k * Mth.TWO_PI * 2;
         float y = -0.5F + 2.7F * rise + 0.3F * Mth.sin(t * 0.3F);
@@ -526,8 +527,9 @@ public class ErgosphereLeviathan extends RuinBoss {
             return;
         }
         Vec3 core = Vec3.atBottomCenterOf(home).add(0, 1.0, 0);
+        emergeBar(t);
         if (t < SWALLOW) {
-            // 大蛇の頭はまだ炉心の下。渦が開き、小さな蛇が這い出して泳ぐ
+            // 大蛇の頭はまだ炉心の下。渦が開いて小さな蛇が飛び出し、渦は閉じる。小さな蛇はしばらく漂う
             setPos(core.x, core.y - 4, core.z);
             if (t <= EMERGE_VORTEX) {
                 for (int i = 0; i < 4; i++) {
@@ -541,24 +543,24 @@ public class ErgosphereLeviathan extends RuinBoss {
                 level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.emerge"), SoundSource.HOSTILE, 2.0F, 1.0F);
             }
             if (t == EMERGE_VORTEX) {
+                level.sendParticles(ParticleTypes.REVERSE_PORTAL, core.x, core.y + 0.5, core.z, 30, 0.4, 0.4, 0.4, 0.4);
                 level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.5F, 1.0F);
             }
-            if (t > EMERGE_VORTEX && t % 20 == 0) {
+            if (t > EMERGE_VORTEX && t < HATCH_SETTLE && (t - EMERGE_VORTEX) % 16 == 0) {
                 Vec3 h = hatchlingPos(core, t);
-                level.playSound(null, h.x, h.y, h.z, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.0F, 1.15F);
+                level.playSound(null, h.x, h.y, h.z, SinguloSounds.get("ergosphere_leviathan.hatchling"), SoundSource.HOSTILE, 1.0F,
+                        1.05F + 0.15F * random.nextFloat());
             }
-            if (t >= HATCH_SETTLE - 10) {
-                // 床が震え、割れ目から塵が噴く
+            if (t == RIFT_SNAP) {
+                // 前ぶれなく渦が開き、床が裂ける
+                level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.burst"), SoundSource.HOSTILE, 4.0F, 1.0F);
                 level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE_TILES.defaultBlockState()),
-                        core.x, core.y - 0.5, core.z, 12, 2.5, 0.1, 2.5, 0.25);
-                if (t == HATCH_SETTLE - 10) {
-                    level.playSound(null, home, SinguloSounds.get("ergosphere_leviathan.rumble"), SoundSource.HOSTILE, 3.5F, 1.0F);
-                }
+                        core.x, core.y - 0.5, core.z, 40, 2.5, 0.1, 2.5, 0.35);
             }
             return;
         }
         if (t < SWALLOW_END) {
-            // 真下から顎が噴き上がり、小さな蛇を丸呑みにする
+            // 真下から顎がすごい勢いで噴き上がり、小さな蛇を丸呑みにする
             double k = (double) (t - SWALLOW) / (SWALLOW_END - SWALLOW);
             Vec3 at = core.add(0, -2 + 7 * Math.sqrt(k), 0);
             setPos(at.x, at.y - getBbHeight() / 2, at.z);
@@ -569,12 +571,14 @@ public class ErgosphereLeviathan extends RuinBoss {
                 level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE_TILES.defaultBlockState()),
                         core.x, core.y, core.z, 80, 2.5, 0.5, 2.5, 0.5);
                 playSound(SinguloSounds.get("ergosphere_leviathan.roar"), 4.0F, 0.7F);
-                broadcastLine(level, "gui.singulo.leviathan.swallow");
             }
-            if (t == SWALLOW + 5) {
+            if (t == SWALLOW + 4) {
                 playSound(SinguloSounds.get("ergosphere_leviathan.swallow"), 3.0F, 1.0F);
             }
             return;
+        }
+        if (t == SWALLOW_END) {
+            playSound(SinguloSounds.get("ergosphere_leviathan.rise"), 4.0F, 1.0F);
         }
         // 螺旋を描いて泳ぐ高さまで昇る（体は跡をなぞって炉心から引き出される）
         double k = (double) (t - SWALLOW_END) / (EMERGE_TICKS - SWALLOW_END);
@@ -588,6 +592,28 @@ public class ErgosphereLeviathan extends RuinBoss {
         if (t % 3 == 0) {
             level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DEEPSLATE_TILES.defaultBlockState()),
                     core.x, core.y, core.z, 8, 0.8, 0.2, 0.8, 0.2);
+        }
+    }
+
+    /**
+     * 出現の間のボスバー: 小さな蛇が飛び出すと「エルゴ球の蛇」として現れ、呑まれる顎の動きに合わせて削り取られる。
+     * 呑まれたあとは本来の名前に替わり、昇り終えるまでに満ちていく。
+     */
+    /** 呑まれるときの、顎の動きに合わせたボスバーの残り（呑み込み始めの次の tick から 1 tick ずつ）。 */
+    private static final float[] SWALLOW_BITES = {0.62F, 0.28F, 0.28F, 0.08F, 0.08F, 0F};
+
+    private void emergeBar(int t) {
+        if (t == EMERGE_VORTEX) {
+            bossBar.setName(Component.translatable("entity.singulo.ergosphere_leviathan.hatchling"));
+            bossBar.setProgress(1);
+            bossBar.setVisible(true);
+        } else if (t > SWALLOW && t <= SWALLOW + SWALLOW_BITES.length) {
+            bossBar.setProgress(SWALLOW_BITES[t - SWALLOW - 1]);      // ひと噛みごとに大きく削れる
+        } else if (t == SWALLOW_END) {
+            refreshBarName();
+            bossBar.setProgress(0);
+        } else if (t > SWALLOW_END) {
+            bossBar.setProgress(Math.min(1, (float) (t - SWALLOW_END) / (EMERGE_TICKS - SWALLOW_END - 10)));
         }
     }
 

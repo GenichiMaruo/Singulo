@@ -76,7 +76,7 @@ public final class ExtrasGameTests {
         MachineBlockEntity to = helper.getBlockEntity(b);
         from.setSide(0, SideConfig.Face.TOP, SideConfig.INPUT, false);
         from.setSide(0, SideConfig.Face.BACK, SideConfig.OUTPUT, true);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             ItemStack card = new ItemStack(SinguloItems.SETTINGS_CARD.get());
             player.setItemInHand(InteractionHand.MAIN_HAND, card);

@@ -139,26 +139,30 @@ public final class RuinGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 160)
+    @GameTest(template = "huge", batch = "drone_altitude", timeoutTicks = 240)
     public static void healthyDroneDescendsAndCannotShootFromHighAbove(GameTestHelper helper) throws Exception {
-        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 12, 3));
-        // Other simultaneous fixtures create players. Keep this altitude test's
-        // manually assigned target instead of letting player acquisition replace it.
-        var selectors = net.minecraft.world.entity.Mob.class.getDeclaredField("targetSelector");
-        selectors.setAccessible(true);
-        ((net.minecraft.world.entity.ai.goal.GoalSelector) selectors.get(drone)).removeAllGoals(goal -> true);
-        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS);
+        // All flight coordinates belong to the template: its chunks are already entity-ticking.
+        // Teleporting into a separately forced, still-loading chunk races that guarantee.
+        BlockPos floor = new BlockPos(7, 0, 7);
+        for (BlockPos pos : BlockPos.betweenClosed(0, 0, 0, 14, 0, 14)) {
+            helper.setBlock(pos, net.minecraft.world.level.block.Blocks.STONE);
+        }
+        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), floor.above(12));
+        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, floor.above());
         target.setNoAi(true); target.setNoGravity(true);
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(() -> {
+            drone.discard(); target.discard();
+        });
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);
         target.setHealth(1000); drone.setTarget(target);
         var shoot = SecurityDrone.class.getDeclaredMethod("shoot", net.minecraft.world.entity.LivingEntity.class);
         shoot.setAccessible(true); shoot.invoke(drone, target);
         helper.assertTrue(helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.HorizonBolt.class,
                 drone.getBoundingBox().inflate(3), bolt -> bolt.getOwner() == drone).isEmpty(), "高空から射撃できてしまう");
-        helper.runAtTickTime(120, () -> {
+        helper.succeedWhen(() -> {
+            helper.assertTrue(drone.tickCount >= 120, "Waiting for 120 actual drone ticks");
             helper.assertFalse(drone.crippled(), "高度検査中に壊れかけになった");
             helper.assertTrue(drone.getY() <= target.getY() + 2.8, "健康なドローンが高空に留まる: " + (drone.getY() - target.getY()));
-            drone.discard(); target.discard(); helper.succeed();
         });
     }
 
@@ -299,7 +303,7 @@ public final class RuinGameTests {
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
         RuinCacheBlockEntity cache = helper.getBlockEntity(pos);
         cache.setRuin("observation_post");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setShiftKeyDown(true);
         net.minecraft.world.item.ItemStack compass = new net.minecraft.world.item.ItemStack(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get());

@@ -44,7 +44,7 @@ public final class HazardGameTests {
         helper.runAtTickTime(120, () -> {
             helper.assertTrue(s.converted() >= 1, "ストレンジ物質に変わらない: " + s.converted());
             helper.assertBlockPresent(SinguloBlocks.STRANGELET.get(), pos);
-            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
             try {
                 player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
                 ItemStack bottle = new ItemStack(SinguloItems.MAGNETIC_BOTTLE.get());

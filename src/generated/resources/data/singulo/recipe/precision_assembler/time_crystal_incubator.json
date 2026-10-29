@@ -37,9 +37,16 @@
     },
     {
       "ingredient": {
-        "item": "singulo:sentinel_core"
+        "item": "singulo:degenerate_nucleus"
       },
       "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:bose_condensate_catalyst"
+      },
+      "tier": 3,
+      "uses": 36000
     }
   ],
   "result": {

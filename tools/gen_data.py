@@ -63,6 +63,8 @@ BLOCK_KINDS = ('block', 'machine', 'part_block', 'part_glass', 'ruin_block', 'ru
 CABLES = {'copper_wire': (200, 120, 70), 'superconducting_cable': (120, 200, 240), 'topological_wire': (190, 170, 255),
           'horizon_bus': (20, 20, 26)}
 CATALYST_MINUTES = {'ミュオン触媒': 20, 'BE凝縮触媒': 30, '時間結晶触媒': 45, 'シンギュラリティ・コア': 60}
+# レシピで触媒を使うとき、そのティア以上の触媒で払える（CatalystHelper.tierOf と同じ）
+CATALYST_TIERS = {'ミュオン触媒': 2, 'BE凝縮触媒': 3, '時間結晶触媒': 4, 'シンギュラリティ・コア': 5}
 
 
 def stage_of(name):
@@ -141,7 +143,14 @@ def item_inputs(inputs, recipe_name):
             if (recipe_name, name) in ACCEPTS_SPENT:
                 kind, value = 'tag', f'{MODID}:{MOD[name][0]}s'
             entry = {'ingredient': ingredient_json(kind, value)}
-            if isinstance(q, F) and q.denominator != 1:
+            if name in CATALYST_TIERS and (recipe_name, name) not in ACCEPTS_SPENT:
+                # 触媒は寿命で払う（丸ごと1個なら新品1個ぶんの寿命）。上位の触媒でも払える
+                if q != 1 and (not isinstance(q, F) or q.denominator == 1):
+                    warn(f'{recipe_name}: {name} ×{q} は触媒枠1つに入らない')
+                q = F(q)
+                entry['tier'] = CATALYST_TIERS[name]
+                entry['uses'] = int(q * max_uses(name))
+            elif isinstance(q, F) and q.denominator != 1:
                 uses = q * max_uses(name)
                 if uses.denominator != 1 or uses <= 0:
                     warn(f'{recipe_name}: {name} ×{q} が使用回数の整数にならない（最大 {max_uses(name)}）')
@@ -218,7 +227,7 @@ def recipe_files():
                     one, _, _ = item_inputs({mat: 1}, name)
                     key_json[ch] = one[0]['ingredient']
                 add(f'crafting/{rid}', {
-                    'type': 'minecraft:crafting_shaped',
+                    'type': 'singulo:smes_upgrade' if name == 'SMESモジュール（セルから）' else 'minecraft:crafting_shaped',
                     'category': 'misc',
                     'pattern': [row.ljust(width) for row in rows],
                     'key': key_json,
@@ -330,6 +339,9 @@ UI_LANG = {
     'tooltip.singulo.planned': ('動作は未実装。素材として使える', 'Not functional yet; usable as a material'),
     'tooltip.singulo.uses': ('使用回数 %s / %s', 'Uses %s / %s'),
     'tooltip.singulo.lifetime': ('寿命 %s / %s', 'Lifetime %s / %s'),
+    'tooltip.singulo.seconds': ('%s秒', '%s s'),
+    'tooltip.singulo.min_sec': ('%s分%s秒', '%s min %s s'),
+    'tooltip.singulo.minutes': ('%s分', '%s min'),
     'tooltip.singulo.repairs': ('修復 %s / %s 回', 'Repaired %s / %s times'),
     'tooltip.singulo.worn_out': ('使い切った。対応する装置で修復できる', 'Exhausted. Repair it in the matching machine'),
     'tooltip.singulo.beyond_repair': ('これ以上は修復できない', 'Beyond repair'),
@@ -400,6 +412,8 @@ UI_LANG = {
     'gui.singulo.device.standby.hint': ('燃料と触媒は減らない。蓄電が75%を割ると再開する', 'Fuel and catalyst are not used. Resumes when storage falls under 75%.'),
     'gui.singulo.anchor.limited': ('アンカーの上限（1人 %s 台）に達している', 'Anchor limit reached (%s per player)'),
     'gui.singulo.device.fuel': ('燃料 %s 個', 'Fuel: %s'),
+    'gui.singulo.probe.waiting': ('遺構の再訪待ち', 'Waiting to revisit'),
+    'gui.singulo.probe.upgrade': ('研究棟には最上位触媒が必要', 'Research needs a Singularity Core'),
     'gui.singulo.probe.no_target': ('飛んでいける遺構がない', 'No known ruins'),
     'gui.singulo.probe.targets': ('登録した遺構 %s か所', '%s ruins registered'),
     'gui.singulo.probe.return': ('次の帰還まで %s 秒', 'Next return in %s s'),
@@ -408,6 +422,16 @@ UI_LANG = {
     'gui.singulo.catalyst.none': ('触媒を入れてください', 'Insert a catalyst'),
     'gui.singulo.catalyst.unusable': ('この触媒はティアが低すぎる', 'Catalyst tier too low'),
     'gui.singulo.catalyst.effect': ('速度×%s ・ 消費×%s', 'Speed ×%s · Wear ×%s'),
+    'gui.singulo.catalyst.loaded': ('装填中: %s（残り %s%%）', 'Loaded: %s (%s%% left)'),
+    'gui.singulo.catalyst.loaded_hint': ('使い切ると失活触媒を出し、予備から次を装填します。使いかけの触媒を入れると残りをまとめます', 'When it runs out, the spent catalyst comes out and the next one loads from the reserve. Partly used catalysts you add are merged in.'),
+    'gui.singulo.catalyst.eject_hint': ('クリックで装填中の触媒を取り出す', 'Click to take out the loaded catalyst'),
+    'gui.singulo.catalyst.spent_slot': ('失活触媒の出口', 'Spent catalyst output'),
+    'gui.singulo.supply_port.entry': ('優先するアイテム', 'Priority item'),
+    'gui.singulo.supply_port.entry.hint': ('アイテムを持ってクリックで登録（何も持たずにクリックで外す）', 'Click with an item to register it (click empty-handed to clear)'),
+    'gui.singulo.supply_port.mode.0': ('取り出しと返却で優先', 'Priority for taking and returning'),
+    'gui.singulo.supply_port.mode.1': ('取り出しで優先', 'Priority for taking'),
+    'gui.singulo.supply_port.mode.2': ('返却で優先', 'Priority for returning'),
+    'gui.singulo.supply_port.rank': ('優先順位 %s（1がいちばん先）', 'Priority %s (1 goes first)'),
     'gui.singulo.catalyst.underpowered': ('電力不足: 触媒の減りが速い', 'Underpowered: catalyst wears faster'),
     'gui.singulo.device.radius_chunks': ('半径 %s チャンク', 'Radius %s chunks'),
     'gui.singulo.device.radius_blocks': ('半径 %s ブロック', 'Radius %s blocks'),
@@ -610,12 +634,14 @@ UI_LANG = {
     'gui.singulo.reason.making': ('作ろうとしているもの: %s', 'Trying to make: %s'),
     'gui.singulo.reason.need_item': ('・%s があと %s 個要る', '- %s: %s more needed'),
     'gui.singulo.reason.need_uses': ('・%s（残り %s 回以上）が要る', '- %s with at least %s uses left'),
+    'gui.singulo.reason.need_lifetime': ('・%s（寿命が %s 以上残ったもの）が要る', '- %s with at least %s of lifetime left'),
     'gui.singulo.reason.need_fluid': ('・%s があと %s mB 要る（1回に %s mB）', '- %s: %s mB more needed (%s mB per craft)'),
     'gui.singulo.reason.too_small': ('・大きさが %s 以上要る（今は %s）', '- Needs size %s or more (now %s)'),
     'gui.singulo.reason.arrange': ('・数は足りています。同じ材料を別々のスロットに分けて入れてみてください', '- The amounts are there. Try putting each material in its own slot.'),
     'gui.singulo.select.restore': ('・復元する物: %s', '- Restores: %s'),
     'gui.singulo.select.fluid': ('・%s %s mB', '- %s %s mB'),
     'gui.singulo.select.uses': ('・%s（%s 回分）', '- %s (%s uses)'),
+    'gui.singulo.select.lifetime': ('・%s（寿命 %s）', '- %s (%s of lifetime)'),
     'gui.singulo.select.item': ('・%s ×%s', '- %s x%s'),
     'gui.singulo.select.button_hint': ('クリックで選ぶ・右クリックで自動に戻す', 'Click to choose; right-click for automatic.'),
     'gui.singulo.select.fixed_hint': ('このレシピだけを作る。ほかの物が入っていても使わない', 'Makes only this recipe; anything else inside is left alone.'),
@@ -721,6 +747,9 @@ UI_LANG = {
     'tooltip.singulo.creative_energy.hint': ('無限の電力を隣へ送っている', 'Pushing infinite energy to neighbours'),
     'pack.singulo.hd': ('Singulo HD（32×32 のテクスチャ）', 'Singulo HD (32×32 textures)'),
     'jei.singulo.uses': ('使用回数を %s 使う', 'Uses %s'),
+    'jei.singulo.lifetime': ('寿命を %s 使う', 'Uses %s of lifetime'),
+    'jei.singulo.higher_tier': ('上位の触媒でも可（1段ごとに寿命の減り−20%%・速さ+25%%）',
+                                'A higher-tier catalyst also works (each tier: −20%% wear, +25%% speed)'),
     'jei.singulo.mass': ('質量 %s', 'Mass %s'),
     'jei.singulo.metal_mass': ('金属質量 %s', 'Metal mass %s'),
     'jei.singulo.time_energy': ('%s 秒・%s FE/t', '%s s · %s FE/t'),
@@ -1007,6 +1036,7 @@ UI_LANG = {
     'message.singulo.work_link.info': ('つながっている作業指令台：%s, %s, %s', 'Linked to the work console at %s, %s, %s'),
     'message.singulo.supply_port.storages': ('（ストレージ %s 個）', ' (%s storages)'),
     'gui.singulo.work_console.locked': ('この作業指令台の許可証に登録されていない', 'You are not on this work console\'s permit'),
+    'gui.singulo.work_console.error.limit': ('注文が大きすぎます。中間素材を用意して分けて注文してください', 'Order too complex. Stock intermediates and split the order'),
     'gui.singulo.work_console.error.loop': ('レシピがループしている', 'The recipes loop'),
     'gui.singulo.work_console.error.missing': ('素材が足りない', 'Not enough materials'),
     'gui.singulo.work_console.error.no_android': ('手の空いたアンドロイドを選んでいない', 'No free android is chosen'),
@@ -1285,6 +1315,7 @@ UI_LANG = {
     'entity.singulo.echo_sentinel': ('残響の番人', 'Echo Sentinel'),
     'entity.singulo.gravity_remnant': ('重力の澱', 'Gravity Remnant'),
     'entity.singulo.gravity_debris': ('瓦礫', 'Gravity Debris'),
+    'entity.singulo.infalling_block': ('崩れ落ちるブロック', 'Infalling Block'),
     'entity.singulo.foundry_overseer': ('統括AI「ファウンドリ」', 'Foundry Overseer'),
     'entity.singulo.foundry_overseer.awakened': ('覚醒したファウンドリ', 'Awakened Foundry Overseer'),
     'item.singulo.foundry_overseer_spawn_egg': ('ファウンドリのスポーンエッグ', 'Foundry Overseer Spawn Egg'),
@@ -1300,6 +1331,8 @@ UI_LANG = {
     'item.singulo.gravity_remnant_spawn_egg': ('重力の澱のスポーンエッグ', 'Gravity Remnant Spawn Egg'),
     'entity.singulo.ergosphere_leviathan': ('エルゴ球の大蛇', 'Ergosphere Leviathan'),
     'entity.singulo.ergosphere_leviathan.awakened': ('覚醒したエルゴ球の大蛇', 'Awakened Ergosphere Leviathan'),
+    # 出現の演出で、大蛇に呑まれる小さな蛇のボスバー（呑まれると大蛇の名前に替わる）
+    'entity.singulo.ergosphere_leviathan.hatchling': ('エルゴ球の蛇', 'Ergosphere Serpent'),
     'item.singulo.ergosphere_leviathan_spawn_egg': ('エルゴ球の大蛇のスポーンエッグ', 'Ergosphere Leviathan Spawn Egg'),
     'entity.singulo.last_archivist': ('最後の記録者', 'The Last Archivist'),
     'item.singulo.last_archivist_spawn_egg': ('最後の記録者のスポーンエッグ', 'Last Archivist Spawn Egg'),
@@ -1307,8 +1340,6 @@ UI_LANG = {
                                                            'A vortex opens in the dead core. Something small crawls out...'),
     'entity.singulo.ergosphere_leviathan.wyrm': ('エルゴ球の龍', 'Ergosphere Wyrm'),
     'entity.singulo.ergosphere_leviathan.wyrm.awakened': ('覚醒したエルゴ球の龍', 'Awakened Ergosphere Wyrm'),
-    'gui.singulo.leviathan.swallow': ('――床が裂け、巨大な顎がそれを丸呑みにした。エルゴ球の大蛇が姿を現した',
-                                      '--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises'),
     'gui.singulo.leviathan.reignite': ('炉心の渦が呼び覚まされていく……', 'The dead core is waking...'),
     'gui.singulo.leviathan.reignite_hint': ('封じ込め柱の陰に隠れろ！', 'Hide behind a containment pillar!'),
     'gui.singulo.leviathan.quake': ('大蛇が高く昇り、身を丸めた……　衝撃の輪が来たら跳べ！', 'The Leviathan rises and curls up... Jump over the shockwaves!'),
@@ -1345,7 +1376,7 @@ UI_LANG = {
     'gui.singulo.archivist.tide_final': ('もう、どこにも落ちられない。', 'There is nowhere left to fall.'),
     'gui.singulo.archivist.death_1': ('……長い、夢を見ていた。', '...I have been dreaming a long dream.'),
     'gui.singulo.archivist.death_2': ('記録は、読む者がいて初めて記録になる。', 'A record is only a record when someone reads it.'),
-    'gui.singulo.archivist.death_3': ('ありがとう。投入を止めるその手を、離さないで。', 'Thank you. Never let go of the hand that stops the feed.'),
+    'gui.singulo.archivist.death_3': ('ありがとう。どうか、止めるべき時に止められる人でいて。', 'Thank you. Please be someone who can stop when it is time to.'),
     'gui.singulo.archivist.reset': ('挑戦者がいなくなり、記録者は時間の場へ還っていった。コンソールには終焉の記録が残されている',
                                     'No challenger remains. The Archivist returns to the time field, leaving the Terminus Record on the console'),
     'gui.singulo.guardian.awakened.echo_sentinel': ('記録保管室の残響が形をとった。残響の番人が現れた',
@@ -1479,8 +1510,8 @@ UI_LANG = {
                               'Once, a civilization tried to turn all mass into energy.'),
     'ending.singulo.line.2': ('炉はその願いを叶えた。都市も、山も、海も。残ったのは重力の異常と、記録だけだった。',
                               'The reactor granted that wish: the cities, the mountains, the sea. Only the anomaly and the records remained.'),
-    'ending.singulo.line.3': ('あなたはその記録を読み、同じ炉に火を入れた。そして、投入を止める手を離さなかった。',
-                              'You read those records and lit the same fire. And you never let go of the hand that stops the feed.'),
+    'ending.singulo.line.3': ('あなたはその記録を読み、同じ炉に火を入れた。そして、止めるべき時に止めることを忘れなかった。',
+                              'You read those records and lit the same fire. And you never forgot to stop when it was time to stop.'),
     'ending.singulo.line.4': ('そして今、エネルギーは質量に戻り、星になり、銀河になった。',
                               'And now the energy has become mass again, then stars, then a galaxy.'),
     'ending.singulo.line.5': ('夜空を見上げてほしい。あの光は、あなたが生んだ宇宙だ。',
@@ -2592,6 +2623,7 @@ def warden_textures(te, save):
 SOUNDS = {
     'black_hole.ambient': ('black_hole/ambient_loop', 'ブラックホールがうなる', 'Black hole hums', 32),
     'black_hole.formation': ('black_hole/formation', 'ブラックホールができる', 'Black hole forms', 48),
+    'black_hole.devour': ('black_hole/devour', 'ブロックが炉心へ吸い込まれる', 'Blocks get pulled into the core', 24),
     'kiln_running': ('machine/kiln_running', '焼成炉が燃える', 'Kiln roars', 16),
     'compressor_running': ('machine/compressor_running', '圧縮機がプレスする', 'Compressor presses', 16),
     'electrolyzer_running': ('machine/electrolyzer_running', '電解槽が泡立つ', 'Electrolyzer bubbles', 16),
@@ -2698,6 +2730,7 @@ SOUNDS = {
     'horizon_warden.shockwave': ('boss/horizon_warden_shockwave', '衝撃波が走る', 'Shockwave', 32),
     'horizon_warden.death': ('boss/horizon_warden_death', 'ホライズン・ウォーデンが崩れ落ちる', 'Horizon Warden falls', 48),
     'horizon_warden.ambient': ('boss/horizon_warden_ambient', 'ホライズン・ウォーデンがうなる', 'Horizon Warden hums', 20),
+    'horizon_warden.hurt': ('boss/horizon_warden_hurt', 'ホライズン・ウォーデンが傷つく', 'Horizon Warden hurts', 24),
     'guardian_core.awaken': ('boss/guardian_core_awaken', '封印核が目覚める', 'Guardian core awakens', 32),
     'vault.unseal': ('boss/vault_unseal', '保管庫の力場が消える', 'Vault field dissipates', 24),
     'keraunos_tower.charge': ('machine/keraunos_tower_charge', '放電塔が充電する', 'Discharge tower charges', 24),
@@ -2727,6 +2760,29 @@ SOUNDS = {
     'ergosphere_leviathan.jet_charge': ('boss/ergosphere_leviathan_jet_charge', '角に光が集まる', 'Light gathers in the horns', 32),
     'ergosphere_leviathan.jet': ('boss/ergosphere_leviathan_jet', '相対論的ジェットが薙ぐ', 'Relativistic jets sweep', 48),
     'ergosphere_leviathan.storm': ('boss/ergosphere_leviathan_storm', '特異点が降る', 'Singularities rain', 32),
+    'ergosphere_leviathan.burst': ('boss/ergosphere_leviathan_burst', '床が裂けて何かが噴き上がる', 'Something bursts from the floor', 64),
+    'ergosphere_leviathan.rise': ('boss/ergosphere_leviathan_rise', '大蛇が渦を巻いて昇る', 'The Leviathan spirals upward', 48),
+    'foundry.online': ('boss/foundry_online', 'ファウンドリが動き出す', 'Foundry comes online', 32),
+    'foundry.dying': ('boss/foundry_dying', 'モーターが力尽きていく', 'Motors wind down', 24),
+    'echo_sentinel.awake': ('boss/echo_sentinel_awake', '残響の番人が目覚める', 'Echo Sentinel awakens', 32),
+    'gravity_remnant.pulse': ('boss/gravity_remnant_pulse', '核が脈打つ', 'Core throbs', 24),
+    'last_archivist.dissolve': ('boss/last_archivist_dissolve', '体が光の塵になる', 'Body dissolves into light', 32),
+    'last_archivist.inhale': ('boss/last_archivist_inhale', '特異点が吸い込む', 'The singularity draws in', 48),
+    'android.blade_cast': ('android/blade_cast', '光柱を呼ぶ', 'Light pillars summoned', 24),
+    'android.tend': ('android/tend', 'アンドロイドが植物の世話をする', 'Android tends a plant', 12),
+    'android.sweep': ('android/sweep', 'アンドロイドが床を掃く', 'Android sweeps', 12),
+    'android.chatter': ('android/chatter', 'アンドロイドがおしゃべりする', 'Androids chatter', 12),
+    'android.thruster': ('android/thruster', None, None, 16),  # くり返し鳴るので字幕は出さない
+    'horizon_warden.bolt_hit': ('boss/horizon_warden_bolt_hit', '光弾がはじける', 'Light bolt bursts', 24),
+    'last_archivist.floor_fade': ('boss/last_archivist_floor_fade', 'ホログラムの床が消える', 'Hologram floor fades', 32),
+    'security_drone.sputter': ('ruin/security_drone_sputter', 'ドローンが火花を散らす', 'Drone sparks', 16),
+    # ボスのうなり（出現から倒されるまでくり返す。ずっと鳴るので字幕は出さない）
+    'ergosphere_leviathan.drone': ('boss/ergosphere_leviathan_drone', None, None, 64),
+    'horizon_warden.drone': ('boss/horizon_warden_drone', None, None, 64),
+    'echo_sentinel.drone': ('boss/echo_sentinel_drone', None, None, 64),
+    'gravity_remnant.drone': ('boss/gravity_remnant_drone', None, None, 64),
+    'foundry.drone': ('boss/foundry_drone', None, None, 64),
+    'last_archivist.drone': ('boss/last_archivist_drone', None, None, 64),
     'last_archivist.emerge': ('boss/last_archivist_emerge', '記録が集まる', 'Records gather', 48),
     'last_archivist.ambient': ('boss/last_archivist_ambient', '最後の記録者がささやく', 'The Last Archivist whispers', 24),
     'last_archivist.hurt': ('boss/last_archivist_hurt', '光輪が揺らぐ', 'The halo wavers', 20),
@@ -3230,7 +3286,7 @@ ANDROID_FACTORY_LOOT = [('精密アクチュエーター', 2, 3), ('アンドロ
 # 番人の落とす物: 番人 → [(アイテム, 最小, 最大)]
 BOSS_LOOT = {
     'echo_sentinel': [('番人の投影核', 2, 2), ('クリスタルメモリ', 1, 2)],
-    'gravity_remnant': [('縮退核', 2, 2), ('高圧結晶', 2, 4)],
+    'gravity_remnant': [('縮退核', 3, 3), ('高圧結晶', 2, 4)],
     'ergosphere_leviathan': [('渦の断章', 1, 1), ('エキゾチック物質', 4, 6), ('H凝縮体', 2, 3)],
     'foundry_overseer': [('精密アクチュエーター', 3, 4), ('アンドロイドキット', 1, 2)],
 }
@@ -3801,7 +3857,7 @@ def validate():
                 errs.append(f'製作場所が後の段階: {n}(段階{r["stage"]}) @ {st}(段階{RECIPES[st]["stage"]})')
         if r['station'] == '作業台' and sum(r['inputs'].values()) > WORKBENCH_MAX_ITEMS:
             errs.append(f'作業台の枠を超える: {n}（{sum(r["inputs"].values())}個）')
-        if r['station'] == '精密組立台' and len(r['inputs']) > ASSEMBLER_MAX_KINDS:
+        if r['station'] == '精密組立台' and len([k for k in r['inputs'] if k not in CATALYST_TIERS]) > ASSEMBLER_MAX_KINDS:
             errs.append(f'精密組立台の入力枠を超える: {n}（{len(r["inputs"])}種類）')
 
     # レシピの循環

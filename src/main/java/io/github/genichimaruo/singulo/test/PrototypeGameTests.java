@@ -52,7 +52,7 @@ public final class PrototypeGameTests {
     @GameTest(template = "empty")
     @SuppressWarnings("removal")
     public static void prototypeMemoriesMissingFirst(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         Set<AndroidKind> got = new HashSet<>();
         got.add(PrototypeMemories.next(player, player.getRandom()));
         got.add(PrototypeMemories.next(player, player.getRandom()));

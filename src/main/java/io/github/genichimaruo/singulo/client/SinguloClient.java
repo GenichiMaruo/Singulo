@@ -142,6 +142,7 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.ECHO_SENTINEL.get(), EchoSentinelRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_REMNANT.get(), GravityRemnantRenderer::new);
         event.registerEntityRenderer(SinguloEntities.GRAVITY_DEBRIS.get(), GravityDebrisRenderer::new);
+        event.registerEntityRenderer(SinguloEntities.INFALLING_BLOCK.get(), InfallingBlockRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ERGOSPHERE_LEVIATHAN.get(), ErgosphereLeviathanRenderer::new);
         event.registerEntityRenderer(SinguloEntities.LAST_ARCHIVIST.get(), LastArchivistRenderer::new);
         event.registerEntityRenderer(SinguloEntities.FOUNDRY_OVERSEER.get(), FoundryOverseerRenderer::new);
@@ -231,6 +232,7 @@ public final class SinguloClient {
         event.register(SinguloMenus.ANDROID_WORK_CONSOLE.get(), WorkConsoleScreen::new);
         event.register(SinguloMenus.ANDROID_RECIPE_RACK.get(), RecipeRackScreen::new);
         event.register(SinguloMenus.ANDROID_DELIVERY_PORT.get(), DeliveryPortScreen::new);
+        event.register(SinguloMenus.ANDROID_SUPPLY_PORT.get(), SupplyPortScreen::new);
     }
 
     /** 作業位置カードとレシピカードは、シフトを押している間、中身の絵を重ねて見せる。 */

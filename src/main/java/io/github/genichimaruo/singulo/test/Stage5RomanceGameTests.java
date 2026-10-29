@@ -162,7 +162,7 @@ public final class Stage5RomanceGameTests {
     @GameTest(template = HUGE, batch = "shield_permit", timeoutTicks = 80)
     public static void shieldPermitLocksOutsiders(GameTestHelper helper) {
         ShieldTowerBlockEntity shield = buildShield(helper, "time_crystal_catalyst");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack permit = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.SHIELD_PERMIT.get());
         shield.permit().setStackInSlot(0, permit);
         BlockPos inside = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -252,7 +252,7 @@ public final class Stage5RomanceGameTests {
             helper.assertTrue(anchor.embedded() && anchor.loadedRadius() == AdvancedWorldlineAnchorBlockEntity.EMBEDDED_RADIUS,
                     "コアを埋め込んでも最大半径にならない: " + anchor.loadedRadius());
             helper.assertTrue(anchor.status() == CatalystDeviceBlockEntity.Status.RUNNING, "電力なしで止まった: " + anchor.status());
-            helper.assertTrue(anchor.catalystSlot().getStackInSlot(0).isEmpty(), "埋め込み後も触媒が残っている");
+            helper.assertTrue(anchor.catalyst().isEmpty(), "埋め込み後も触媒が残っている");
             helper.succeed();
         });
     }
@@ -313,7 +313,7 @@ public final class Stage5RomanceGameTests {
 
     @GameTest(template = EMPTY)
     public static void metricDriveChangesGravityAndUsesExoticMatter(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.getAbilities().instabuild = false;
             ItemStack drive = new ItemStack(SinguloItems.METRIC_DRIVE.get());

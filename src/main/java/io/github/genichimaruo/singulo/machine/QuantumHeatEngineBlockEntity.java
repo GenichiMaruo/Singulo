@@ -46,7 +46,7 @@ public class QuantumHeatEngineBlockEntity extends CatalystDeviceBlockEntity {
     @Override
     protected void apply(ServerLevel level, CatalystHelper.Effect effect, boolean active) {
         output = active ? (int) Math.round(ServerConfig.QUANTUM_ENGINE_OUTPUT.get()
-                * CatalystHelper.generatorOutput(MACHINE_TIER, catalystSlot().getStackInSlot(0), effect)
+                * CatalystHelper.generatorOutput(MACHINE_TIER, catalyst(), effect)
                 * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get()) : 0;
         if (output > 0) {
             energy.generate(output);

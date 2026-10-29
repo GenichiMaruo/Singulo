@@ -32,7 +32,7 @@ public final class MachineRefillGameTests {
     private static void refillCompressor(GameTestHelper h, boolean shift) {
         MachineBlockEntity machine=machine(h,new BlockPos(2,1,2),MachineType.COMPRESSOR);
         machine.items().setStackInSlot(0,new ItemStack(Items.CHARCOAL,4));
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         MachineMenu menu=new MachineMenu(1,player.getInventory(),machine);
         h.onEachTick(()->machine.energy().setEnergy(machine.energy().getMaxEnergyStored()));
         h.startSequence()
@@ -64,7 +64,7 @@ public final class MachineRefillGameTests {
         var kiln=machine(h,new BlockPos(2,1,2),MachineType.KILN);
         var reactor=machine(h,new BlockPos(5,1,2),MachineType.CATALYTIC_REACTOR);
         var machines=List.of(kiln,reactor);
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         var menus=List.of(new MachineMenu(1,player.getInventory(),kiln),new MachineMenu(2,player.getInventory(),reactor));
         kiln.items().setStackInSlot(0,item("nihonium",3));
         reactor.items().setStackInSlot(0,item("spent_muon_catalyst",5));
@@ -89,6 +89,12 @@ public final class MachineRefillGameTests {
     }
     private static void checkMenuMerge(GameTestHelper h, Player player, String name, int size, int target, ItemStack fuel,
             java.util.function.Function<net.neoforged.neoforge.items.IItemHandler, net.minecraft.world.inventory.AbstractContainerMenu> factory) {
+        checkMenuMerge(h, player, name, size, size, target, fuel, factory);
+    }
+
+    /** firstPlayerSlot: メニューの中で、プレイヤーの持ち物が始まる番号（装置のスロットのほかに出口などがあればその分あと）。 */
+    private static void checkMenuMerge(GameTestHelper h, Player player, String name, int size, int firstPlayerSlot, int target, ItemStack fuel,
+            java.util.function.Function<net.neoforged.neoforge.items.IItemHandler, net.minecraft.world.inventory.AbstractContainerMenu> factory) {
         class Inventory extends net.neoforged.neoforge.items.ItemStackHandler {
             int changes;
             Inventory() { super(size); }
@@ -100,20 +106,20 @@ public final class MachineRefillGameTests {
         player.getInventory().setItem(9,fuel.copyWithCount(2));
         var menu=factory.apply(inventory);
         int before=inventory.changes;
-        menu.quickMoveStack(player,size);
+        menu.quickMoveStack(player,firstPlayerSlot);
         h.assertTrue(inventory.getStackInSlot(target).getCount()==3,"Fuel did not merge: "+name);
         h.assertTrue(inventory.changes>before,"GUI did not notify the inventory: "+name);
     }
 
     @GameTest(template="empty")
     public static void otherDeviceMenusNotifyInventoryWhenShiftMergingFuel(GameTestHelper h) {
-        var player=h.makeMockServerPlayerInLevel();
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             var pos=h.absolutePos(new BlockPos(2,1,2));
             checkMenuMerge(h,player,"generator",2,0,new ItemStack(Items.CHARCOAL),
                     inv->new GeneratorSlotsMenu(1,player.getInventory(),pos,0,inv,SyncedInts.client(GeneratorSlotsMenu.COUNT)));
-            checkMenuMerge(h,player,"catalyst device",2,1,item("compressed_block_2",1),
-                    inv->new CatalystDeviceMenu(1,player.getInventory(),pos,CatalystDeviceBlockEntity.Kind.DEGENERATE_FURNACE,inv,SyncedInts.client(CatalystDeviceBlockEntity.COUNT)));
+            checkMenuMerge(h,player,"catalyst device",2,3,1,item("compressed_block_2",1),
+                    inv->new CatalystDeviceMenu(1,player.getInventory(),pos,CatalystDeviceBlockEntity.Kind.DEGENERATE_FURNACE,inv,new net.neoforged.neoforge.items.ItemStackHandler(1),SyncedInts.client(CatalystDeviceBlockEntity.COUNT)));
             checkMenuMerge(h,player,"wormhole mouth",1,0,item("exotic_matter",1),
                     inv->new DeviceMenu(1,player.getInventory(),DeviceMenu.Kind.WORMHOLE_MOUTH,pos,inv,SyncedInts.client(DeviceMenu.Mouth.COUNT),null));
             checkMenuMerge(h,player,"reactor",io.github.genichimaruo.singulo.reactor.PenroseReactorBlockEntity.SLOTS,1,new ItemStack(Items.COBBLESTONE),

@@ -290,6 +290,17 @@ public class WorkConsoleMenu extends AbstractContainerMenu {
     }
 
     /** 様子を受け取る（クライアント）。 */
+    @Nullable private CompoundTag lastSentView;
+
+    /** サーバーで最後に送った画面の中身（画面ごとに持つので、閉じて開き直せばいつも全部を送る）。 */
+    boolean shouldSend(CompoundTag snapshot) {
+        if (snapshot.equals(lastSentView)) {
+            return false;
+        }
+        lastSentView = snapshot;
+        return true;
+    }
+
     void receive(CompoundTag view) {
         this.view = view;
         viewVersion++;

@@ -158,7 +158,7 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, batch = "android_guard_hp", timeoutTicks = 160)
     public static void guardIgnoresPlayersAndReportsHealth(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAtTickTime(RuinAndroid.PRINT_TICKS + 30, () -> {
             RuinAndroid a = androids(helper).get(0);
             float before = a.getHealth();
@@ -303,7 +303,7 @@ public final class AndroidGameTests {
         BladeAndroid guard = SinguloEntities.BLADE_ANDROID.get().create(level);
         guard.makeGuard(null, helper.absolutePos(STATION), RuinAndroid.MODE_GUARD, 30);
         BladeAndroid ruin = SinguloEntities.BLADE_ANDROID.get().create(level);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         List<LivingEntity> spared = List.of(SinguloEntities.GRAVITY_REMNANT.get().create(level), EntityType.COW.create(level),
                 EntityType.VILLAGER.create(level), player);
@@ -421,9 +421,9 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 400)
     public static void permitAndFollowSettings(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
-        var stranger = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var friend = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var stranger = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -467,8 +467,8 @@ public final class AndroidGameTests {
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void removedMemberLosesAndroidScreen(GameTestHelper helper) {
         AndroidStationBlockEntity s = station(helper, 1);
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var friend = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         s.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
         io.github.genichimaruo.singulo.item.ShieldPermitItem.add(permit, owner);
@@ -622,7 +622,7 @@ public final class AndroidGameTests {
         a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
         a.inventory().setItem(RuinAndroid.SLOT_TANK, new ItemStack(item("android_tank_upgrade")));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.containerMenu.setCarried(new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET));
         helper.assertTrue(a.useTankContainer(player, 0), "水入りバケツでタンクに入れられない");
         var water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1);
@@ -829,7 +829,7 @@ public final class AndroidGameTests {
             helper.assertTrue(slot != RuinAndroid.PACK_START + 20, "ティアより後ろの枠を作業に使う");
         }
         helper.assertTrue(a.inventory().getItem(RuinAndroid.PACK_START + 20).getCount() == 5, "ティアより後ろの枠の物が消えた");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
         net.minecraft.world.inventory.Slot backpack = menu.slots.stream()
                 .filter(s -> s.container == a.inventory() && s.getContainerSlot() == RuinAndroid.SLOT_BACKPACK).findFirst().orElseThrow();
@@ -900,7 +900,7 @@ public final class AndroidGameTests {
         helper.setBlock(TABLE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
         net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
         chest.setItem(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, logs));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack link = new ItemStack(item("work_location_card"));
         io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
                 SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -921,6 +921,137 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(1, recipeCard(helper, planks, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4)));
         rack.items().setStackInSlot(2, recipeCard(helper, sticks, new ItemStack(net.minecraft.world.item.Items.STICK, 4)));
         return helper.getBlockEntity(CONSOLE);
+    }
+
+    /** 2つ目の資材口（隣にチェスト）。指令台から遠い隅に置き、指令台につなぐ。 */
+    private static final BlockPos SUPPLY2 = new BlockPos(6, 1, 5), CHEST2 = new BlockPos(6, 1, 6);
+
+    private static io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity secondPort(GameTestHelper helper) {
+        var level = helper.getLevel();
+        helper.setBlock(SUPPLY2, SinguloBlocks.ANDROID_SUPPLY_PORT.get());
+        helper.setBlock(CHEST2, net.minecraft.world.level.block.Blocks.CHEST);
+        ItemStack link = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(link, level, helper.absolutePos(CONSOLE),
+                SinguloBlocks.ANDROID_WORK_CONSOLE.get());
+        io.github.genichimaruo.singulo.android.work.SupplyPortBlockEntity port = helper.getBlockEntity(SUPPLY2);
+        port.useItem(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), link, net.minecraft.world.InteractionHand.MAIN_HAND);
+        return port;
+    }
+
+    private static int countIn(GameTestHelper helper, BlockPos chestPos, net.minecraft.world.item.Item item) {
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(chestPos);
+        int n = 0;
+        for (int i = 0; i < chest.getContainerSize(); i++) {
+            n += chest.getItem(i).is(item) ? chest.getItem(i).getCount() : 0;
+        }
+        return n;
+    }
+
+    /** 資材口の優先の取り出し: 登録した資材口から先に取る（近くの資材口にも同じ物があっても）。登録は保存しても残る。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void supplyPortTakePriority(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var port = secondPort(helper);
+        var planks = net.minecraft.world.item.Items.OAK_PLANKS;
+        port.entries().setItem(0, new ItemStack(planks));
+        port.cycleMode(0);                                                  // 両方 → 取り出し
+        helper.assertTrue(port.priority(new ItemStack(planks), true) == 9 && port.priority(new ItemStack(planks), false) == 0,
+                "取り出しだけの登録の優先度が合わない");
+        var tag = port.saveWithoutMetadata(helper.getLevel().registryAccess());
+        port.entries().setItem(0, ItemStack.EMPTY);
+        port.loadWithComponents(tag, helper.getLevel().registryAccess());
+        helper.assertTrue(port.priority(new ItemStack(planks), true) == 9, "優先の登録が保存されない");
+        net.minecraft.world.level.block.entity.ChestBlockEntity near = helper.getBlockEntity(CHEST);
+        near.setItem(1, new ItemStack(planks, 4));
+        net.minecraft.world.level.block.entity.ChestBlockEntity far = helper.getBlockEntity(CHEST2);
+        far.setItem(0, new ItemStack(planks, 4));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.STICK) == 4, "棒が4本届かない");
+            helper.assertTrue(countIn(helper, CHEST2, planks) == 2 && countIn(helper, CHEST, planks) == 4,
+                    "優先の資材口から板材を取らない（近く " + countIn(helper, CHEST, planks) + "、優先 " + countIn(helper, CHEST2, planks) + "）");
+            a.discard();
+        });
+    }
+
+    /**
+     * 取り出しの優先は、寿命の短い順より先: 近くの資材口に使いかけの時間結晶触媒、優先を登録した資材口に新品があれば、
+     * 優先した資材口の新品を使う（使いかけは残る）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void supplyPortPriorityBeatsShortLife(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var port = secondPort(helper);
+        var level = helper.getLevel();
+        var catalyst = item("time_crystal_catalyst");
+        port.entries().setItem(0, new ItemStack(catalyst));
+        BlockPos at = new BlockPos(0, 1, 3);
+        helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity m = helper.getBlockEntity(at);
+        helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
+        int max = io.github.genichimaruo.singulo.item.UsesHelper.get(new ItemStack(catalyst)).max();
+        ItemStack worn = new ItemStack(catalyst);
+        worn.set(io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get(),
+                new io.github.genichimaruo.singulo.item.UsesData(max - 40_000, max, 0));
+        net.minecraft.world.level.block.entity.ChestBlockEntity near = helper.getBlockEntity(CHEST);
+        near.setItem(1, worn);
+        near.setItem(2, new ItemStack(item("optical_lattice_substrate")));
+        near.setItem(3, new ItemStack(item("steel_plate"), 2));
+        net.minecraft.world.level.block.entity.ChestBlockEntity far = helper.getBlockEntity(CHEST2);
+        far.setItem(0, new ItemStack(catalyst));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(at),
+                level.getBlockState(helper.absolutePos(at)).getBlock());
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(item("optical_lattice_substrate")));
+        in.set(1, new ItemStack(item("steel_plate"), 2));
+        in.set(2, new ItemStack(catalyst));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(item("time_crystal_module")), List.of(),
+                ItemStack.EMPTY).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(item("time_crystal_module")), 1,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, item("time_crystal_module")) == 1, "モジュールが届かない");
+            helper.assertTrue(countIn(helper, CHEST2, catalyst) == 0, "優先した資材口の新品を使わない");
+            boolean wornLeft = false;
+            for (int i = 0; i < near.getContainerSize(); i++) {
+                wornLeft |= near.getItem(i).is(catalyst) && io.github.genichimaruo.singulo.item.UsesHelper.remaining(near.getItem(i)) == 40_000;
+            }
+            helper.assertTrue(wornLeft, "優先していない資材口の使いかけを使った");
+            a.discard();
+        });
+    }
+
+    /** 資材口の優先の返却: 余った物は、登録した資材口へ戻す（近くの資材口ではなく）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void supplyPortReturnPriority(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var port = secondPort(helper);
+        var stick = net.minecraft.world.item.Items.STICK;
+        port.entries().setItem(0, new ItemStack(stick));
+        port.cycleMode(0);
+        port.cycleMode(0);                                                  // 両方 → 取り出し → 返却
+        net.minecraft.world.level.block.entity.ChestBlockEntity near = helper.getBlockEntity(CHEST);
+        near.setItem(1, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 2));
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(stick), 2,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, stick) == 2, "棒が2本届かない");
+            helper.assertTrue(countIn(helper, CHEST2, stick) == 2 && countIn(helper, CHEST, stick) == 0,
+                    "余った棒を優先の資材口へ戻さない（近く " + countIn(helper, CHEST, stick) + "、優先 " + countIn(helper, CHEST2, stick) + "）");
+            a.discard();
+        });
     }
 
     /** オークのフェンス50個（原木 → 板材 → 棒 → フェンスの3工程）を作らせても、持ち物からあふれた物を地面に落とさない。 */
@@ -952,7 +1083,7 @@ public final class AndroidGameTests {
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 640,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 640,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         int[] most = {0};
@@ -999,7 +1130,7 @@ public final class AndroidGameTests {
         g.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         g.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(g);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
                 List.of(g.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         int[] trips = {0};
@@ -1047,7 +1178,7 @@ public final class AndroidGameTests {
         if (backpack) {
             a.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
         }
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_FENCE), 50,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         java.util.Map<String, Integer> dropped = new java.util.TreeMap<>();
@@ -1081,7 +1212,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(0, bench);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity wb = helper.getBlockEntity(TABLE);
@@ -1145,7 +1276,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(0, bench);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "量子アンドロイド作業台で注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1202,7 +1333,7 @@ public final class AndroidGameTests {
                 helper.getBlockState(TABLE));
         copy.loadWithComponents(tag, helper.getLevel().registryAccess());
         helper.assertTrue(copy.buffer().getStackInSlot(0).getCount() == 10, "保存すると預かり箱の物が消える");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         wb.openMenu(player);
         helper.assertTrue(wb.bufferEmpty() && player.getInventory().countItem(net.minecraft.world.item.Items.OAK_FENCE) == 10,
                 "右クリックで預かり箱の物を受け取れない");
@@ -1266,7 +1397,7 @@ public final class AndroidGameTests {
                 CompoundTag saved = a.saveWithoutId(new CompoundTag());
                 saved.putInt("charge", 25);                        // 2回作ると切れる
                 a.load(saved);
-                var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
+                var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 16,
                         List.of(a.getUUID()), helper.absolutePos(DELIVERY));
                 helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
             }
@@ -1395,7 +1526,7 @@ public final class AndroidGameTests {
         a.makeGuard(null, helper.absolutePos(new BlockPos(2, 1, 4)), RuinAndroid.MODE_GUARD, 30);
         a.moveTo(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2))));
         helper.getLevel().addFreshEntity(a);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.assertTrue(a.isWorking(), "アンドロイドが作業中にならない");
@@ -1433,7 +1564,7 @@ public final class AndroidGameTests {
             helper.getLevel().addFreshEntity(a);
             crew.add(a);
         }
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         // Other concurrently running fixtures may also have unowned guards in range.
         var candidates = console.candidates(player);
         helper.assertTrue(candidates.containsAll(crew), "用意した3体が選べる候補にならない");
@@ -1476,7 +1607,7 @@ public final class AndroidGameTests {
             helper.getLevel().addFreshEntity(a);
         }
         capable.inventory().setItem(RuinAndroid.SLOT_BACKPACK, new ItemStack(item("android_backpack_upgrade")));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         for (boolean gui : List.of(false, true)) {
             var ids = gui ? List.of(small.getUUID(), capable.getUUID()) : List.<java.util.UUID>of();
             var error = console.start(player, new ItemStack(Items.CAKE), 1, ids, gui, helper.absolutePos(DELIVERY));
@@ -1546,13 +1677,115 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
             helper.assertTrue(delivered(helper, net.minecraft.world.item.Items.IRON_INGOT) == 2, "鉄インゴットが2つ届かない");
             helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /**
+     * 触媒を使う装置の失活触媒: 記録していなくても持ち帰る。精密組立台は出口が1つなので、残すと次のモジュールが出られない
+     * （時間結晶触媒2個からモジュール3個。1個目は2個目の途中で、2個目は3個目で使い切る）。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 3000)
+    public static void androidTakesSpentCatalystsOut(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos at = new BlockPos(0, 1, 3);
+        helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity m = helper.getBlockEntity(at);
+        helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
+        m.items().insertItem(m.type().catalystSlot(), new ItemStack(item("time_crystal_catalyst"), 2), false);
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, new ItemStack(item("optical_lattice_substrate"), 3));
+        chest.setItem(2, new ItemStack(item("steel_plate"), 6));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(at),
+                level.getBlockState(helper.absolutePos(at)).getBlock());
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(item("optical_lattice_substrate")));
+        in.set(1, new ItemStack(item("steel_plate"), 2));
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(item("time_crystal_module")), List.of(),
+                ItemStack.EMPTY).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(item("time_crystal_module")), 3,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, item("time_crystal_module")) == 3, "失活触媒で出口がふさがり、モジュールが3つ届かない: "
+                    + delivered(helper, item("time_crystal_module")));
+            // 最後の1個は、最後のモジュールを取り出したあとに出口へ出るので、次の作業で持ち帰る
+            int left = 0;
+            for (int k = 0; k < m.type().outputSlots(); k++) {
+                ItemStack o = m.items().getStackInSlot(m.type().outputSlot() + k);
+                left += o.is(item("spent_time_crystal_catalyst")) ? o.getCount() : 0;
+            }
+            for (ItemStack waiting : m.magazine().contents()) {
+                left += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
+            }
+            helper.assertTrue(left <= 1, "使い切った触媒を持ち帰らない（装置に " + left + " 個）");
+            helper.assertTrue(console.orders().isEmpty(), "注文が終わらない");
+            a.discard();
+        });
+    }
+
+    /** 触媒は使いかけでも使い、寿命の短いものから使う（新品の時間結晶触媒は残る）。 */
+    @GameTest(template = EMPTY, timeoutTicks = 2400)
+    public static void androidUsesShortLivedCatalystFirst(GameTestHelper helper) {
+        var console = workshop(helper, 0);
+        var level = helper.getLevel();
+        BlockPos at = new BlockPos(0, 1, 3);
+        helper.setBlock(at, SinguloBlocks.MACHINES.get(io.github.genichimaruo.singulo.machine.MachineType.PRECISION_ASSEMBLER).get());
+        io.github.genichimaruo.singulo.machine.MachineBlockEntity m = helper.getBlockEntity(at);
+        helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
+        ItemStack fresh = new ItemStack(item("time_crystal_catalyst"));
+        int max = io.github.genichimaruo.singulo.item.UsesHelper.get(fresh).max();
+        ItemStack worn = new ItemStack(item("time_crystal_catalyst"));
+        worn.set(io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get(),
+                new io.github.genichimaruo.singulo.item.UsesData(max - 40_000, max, 0));       // 残り 40,000（モジュール1個ぶん）
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        chest.setItem(1, fresh);
+        chest.setItem(2, worn);
+        chest.setItem(3, new ItemStack(item("optical_lattice_substrate")));
+        chest.setItem(4, new ItemStack(item("steel_plate"), 2));
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(at),
+                level.getBlockState(helper.absolutePos(at)).getBlock());
+        java.util.List<ItemStack> in = new java.util.ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        in.set(0, new ItemStack(item("optical_lattice_substrate")));
+        in.set(1, new ItemStack(item("steel_plate"), 2));
+        in.set(2, new ItemStack(item("time_crystal_catalyst")));                            // 記録した見本は新品
+        ItemStack card = new ItemStack(item("recipe_card"));
+        io.github.genichimaruo.singulo.android.work.RecipeData.processing(in, new ItemStack(item("time_crystal_module")), List.of(),
+                ItemStack.EMPTY).write(card, level.registryAccess());
+        io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
+        rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(item("time_crystal_module")), 1,
+                List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered(helper, item("time_crystal_module")) == 1, "モジュールが届かない");
+            boolean freshLeft = false;
+            boolean wornLeft = false;
+            for (int i = 0; i < chest.getContainerSize(); i++) {
+                ItemStack s = chest.getItem(i);
+                if (s.is(item("time_crystal_catalyst"))) {
+                    freshLeft |= io.github.genichimaruo.singulo.item.UsesHelper.remaining(s) == max;
+                    wornLeft |= io.github.genichimaruo.singulo.item.UsesHelper.remaining(s) < max;
+                }
+            }
+            helper.assertTrue(freshLeft && !wornLeft, "寿命の短い触媒から使わない（新品が残る " + freshLeft + "、使いかけが残る " + wornLeft + "）");
             a.discard();
         });
     }
@@ -1580,7 +1813,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1617,7 +1850,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         boolean[] fuelOrdered = {false};
@@ -1655,7 +1888,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error != null && error.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
                 && t.getKey().equals("gui.singulo.work_console.error.wrong_face"), "入れる面の間違いを断らない: " + error);
@@ -1689,7 +1922,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.start(player, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 4, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "鉄インゴットを注文できない: " + (error == null ? "" : error.getString()));
@@ -1734,7 +1967,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(2, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 4,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "白樺の板材で棒を注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1765,7 +1998,7 @@ public final class AndroidGameTests {
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS, loc);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS + 1, card);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.IRON_INGOT), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1790,7 +2023,7 @@ public final class AndroidGameTests {
         io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity rack = helper.getBlockEntity(RACK);
         rack.items().setStackInSlot(io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity.COLS * 2 + 1, card);   // 場所のカードがない行
         BladeAndroid plain = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         ItemStack cobble = new ItemStack(net.minecraft.world.item.Items.COBBLESTONE);
         helper.assertTrue(console.start(player, cobble, 2, List.of(plain.getUUID()), helper.absolutePos(DELIVERY)) != null,
                 "採掘アップグレードなしで採掘の注文ができた");
@@ -1817,7 +2050,7 @@ public final class AndroidGameTests {
         net.minecraft.world.level.block.entity.ChestBlockEntity seed = helper.getBlockEntity(CHEST);
         seed.setItem(5, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS));
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var error = console.register(player, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 4,
                 io.github.genichimaruo.singulo.android.work.StandingOrder.KEEP, null, List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.assertTrue(error == null, "登録できない: " + (error == null ? "" : error.getString()));
@@ -1841,7 +2074,7 @@ public final class AndroidGameTests {
     public static void standingOrderOnPulse(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         console.register(player, new ItemStack(net.minecraft.world.item.Items.STICK), 4,
                 io.github.genichimaruo.singulo.android.work.StandingOrder.PULSE, helper.absolutePos(DELIVERY), List.of(a.getUUID()));   // 並んで動くほかのテストのアンドロイドを巻き込まない
         helper.runAfterDelay(60, () -> {
@@ -1861,7 +2094,7 @@ public final class AndroidGameTests {
     public static void workingAndroidFightsBack(GameTestHelper helper) {
         var console = workshop(helper, 2);
         BladeAndroid a = worker(helper, false);
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         console.start(player, new ItemStack(net.minecraft.world.item.Items.STICK), 8, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         net.minecraft.world.entity.monster.Zombie[] attacker = {null};
         helper.startSequence()
@@ -1913,7 +2146,7 @@ public final class AndroidGameTests {
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 2, 5)),
                 helper.absolutePos(new BlockPos(1, 2, 5)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHEAT, 2));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.WHEAT), 2, List.of(a.getUUID()),
                 helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1934,7 +2167,7 @@ public final class AndroidGameTests {
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.HARVEST, helper.absolutePos(new BlockPos(0, 1, 5)),
                 helper.absolutePos(new BlockPos(2, 3, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD, 4));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD), 4,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD), 4,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -1957,7 +2190,7 @@ public final class AndroidGameTests {
         procedureCard(helper, List.of(new io.github.genichimaruo.singulo.android.work.ProcedureStep(
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.FELL, helper.absolutePos(new BlockPos(0, 1, 5)),
                 helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 3));
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         BladeAndroid plain = worker(helper, false);
         helper.assertTrue(console.start(player, new ItemStack(net.minecraft.world.item.Items.OAK_LOG), 3, List.of(plain.getUUID()),
                 helper.absolutePos(DELIVERY)) != null, "伐採アップグレードなしで伐採の注文ができた");
@@ -1985,7 +2218,7 @@ public final class AndroidGameTests {
                 io.github.genichimaruo.singulo.android.work.ProcedureStep.SHEAR, helper.absolutePos(new BlockPos(0, 1, 5)),
                 helper.absolutePos(new BlockPos(2, 1, 7)), ItemStack.EMPTY)), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL));
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL), 1,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.WHITE_WOOL), 1,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         helper.succeedWhen(() -> {
@@ -2007,7 +2240,7 @@ public final class AndroidGameTests {
         ItemStack worn = a.decor(io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HEAD);
         helper.assertTrue(worn.is(item("android_ribbon")), "頭の装飾が伝わらない");
         helper.assertTrue(((io.github.genichimaruo.singulo.android.AndroidAccessoryItem) worn.getItem()).color(worn) == 0x123456, "染めた色が使われない");
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var menu = new io.github.genichimaruo.singulo.android.AndroidMenu(1, player.getInventory(), a);
         helper.assertFalse(menu.getSlot(RuinAndroid.SLOT_DECOR + io.github.genichimaruo.singulo.android.AndroidAccessoryItem.HAND)
                 .mayPlace(new ItemStack(item("android_cape"))), "手の枠にマントが入る");
@@ -2027,7 +2260,7 @@ public final class AndroidGameTests {
         chest.setItem(0, new ItemStack(planks, 3));
         BladeAndroid a = worker(helper, false);
         a.setNoAi(true);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(planks), 3, List.of(a.getUUID()), null);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(planks), 3, List.of(a.getUUID()), null);
         helper.assertTrue(error == null, "在庫の納品を注文できない");
         var job = console.requestJob(a);
         var pickups = console.planPickup(job, a.blockPosition());
@@ -2172,7 +2405,7 @@ public final class AndroidGameTests {
         for (int i = 0; i < 4; i++) {
             a.inventory().setItem(RuinAndroid.CARRY_START + i, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
         }
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE), 2,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.COBBLESTONE), 2,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない: " + (error == null ? "" : error.getString()));
         boolean[] dropped = {false};
@@ -2237,7 +2470,7 @@ public final class AndroidGameTests {
     public static void androidResumesCraftAfterReload(GameTestHelper helper) {
         var console = workshop(helper, 1);
         BladeAndroid a = worker(helper, false);
-        var error = console.start(helper.makeMockServerPlayerInLevel(), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.STICK), 8,
                 List.of(a.getUUID()), helper.absolutePos(DELIVERY));
         helper.assertTrue(error == null, "注文できない");
         helper.startSequence()
@@ -2328,9 +2561,9 @@ public final class AndroidGameTests {
     public static void workLinksEnforcePermissionChanges(GameTestHelper helper) {
         var console = workshop(helper, 0);
         var level = helper.getLevel();
-        var owner = helper.makeMockServerPlayerInLevel();
-        var friend = helper.makeMockServerPlayerInLevel();
-        var stranger = helper.makeMockServerPlayerInLevel();
+        var owner = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var friend = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
+        var stranger = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         friend.moveTo(Vec3.atCenterOf(helper.absolutePos(SUPPLY)));
         console.setOwner(owner.getUUID());
         ItemStack permit = new ItemStack(item("shield_permit"));
@@ -2589,5 +2822,161 @@ public final class AndroidGameTests {
             }
             helper.succeed();
         });
+    }
+
+    /** Actual AI crafts and delivers 4096 items while the destination is emptied as a hopper would. */
+    @GameTest(template = EMPTY, timeoutTicks = 18000, batch = "scaling_delivery")
+    public static void fourThousandPlanksCraftAndDeliverExactly(GameTestHelper helper) {
+        floor(helper);
+        var console = workshop(helper, 64);
+        var level = helper.getLevel();
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        for (int i = 0; i < 16; i++) chest.setItem(i, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        helper.setBlock(TABLE, SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get());
+        var rack = (io.github.genichimaruo.singulo.android.work.RecipeRackBlockEntity) helper.getBlockEntity(RACK);
+        ItemStack loc = new ItemStack(item("work_location_card"));
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(loc, level, helper.absolutePos(TABLE),
+                SinguloBlocks.QUANTUM_ANDROID_WORKBENCH.get());
+        rack.items().setStackInSlot(0, loc);
+        BladeAndroid a = worker(helper, false);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+                4096, List.of(a.getUUID()), helper.absolutePos(DELIVERY));
+        helper.assertTrue(error == null, "Bulk order was rejected: " + error);
+        var port = (io.github.genichimaruo.singulo.android.work.DeliveryPortBlockEntity) helper.getBlockEntity(DELIVERY);
+        int[] delivered = {0};
+        boolean[] buffered = {false};
+        var bench = (io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity) helper.getBlockEntity(TABLE);
+        helper.onEachTick(() -> {
+            buffered[0] |= !bench.bufferEmpty();
+            for (int slot = 0; slot < port.handler().getSlots(); slot++) {
+                ItemStack result = port.handler().extractItem(slot, 64, false);
+                helper.assertTrue(result.isEmpty() || result.is(net.minecraft.world.item.Items.OAK_PLANKS), "Unexpected delivery");
+                delivered[0] += result.getCount();
+            }
+            helper.assertTrue(delivered[0] <= 4096, "Bulk delivery duplicated output");
+        });
+        helper.succeedWhen(() -> {
+            helper.assertTrue(delivered[0] == 4096 && console.orders().isEmpty(),
+                    "Bulk job incomplete: delivered=" + delivered[0] + " orders=" + console.orders().size() + " activity=" + a.activity());
+            helper.assertTrue(buffered[0] && bench.bufferEmpty(), "Workbench storage was not used and drained");
+            helper.assertTrue(chest.isEmpty(), "Bulk job left reserved raw materials behind");
+            helper.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                    new AABB(helper.absolutePos(TABLE)).inflate(8)).isEmpty(), "Bulk crafting dropped inventory overflow");
+            a.discard();
+        });
+    }
+
+    /** Full carry and full bench must not consume ingredients or drop products; freeing storage resumes crafting. */
+    @GameTest(template = EMPTY)
+    public static void workbenchCraftIsAtomicWhenStorageFills(GameTestHelper helper) throws Exception {
+        var console = workshop(helper, 0);
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        var bench = (io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity) helper.getBlockEntity(TABLE);
+        BladeAndroid a = worker(helper, false);
+        a.setNoAi(true);
+        for (int slot : a.carrySlots()) a.inventory().setItem(slot, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+        int input = a.carrySlots()[0];
+        a.inventory().setItem(input, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        for (int slot = 0; slot < bench.buffer().getSlots(); slot++) bench.buffer().setStackInSlot(slot, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 64));
+        var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        grid.set(0, new ItemStack(net.minecraft.world.item.Items.OAK_LOG));
+        var recipe = new io.github.genichimaruo.singulo.android.work.RecipeData(grid, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 4));
+        var order = new io.github.genichimaruo.singulo.android.work.WorkOrder(900, recipe.output(), 4, null);
+        console.orders().add(order);
+        var job = new io.github.genichimaruo.singulo.android.work.WorkJob(
+                io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, 900, 1, 0, List.of(), List.of(), true);
+        Class<?> type = Class.forName("io.github.genichimaruo.singulo.android.AndroidWorkGoal");
+        var constructor = type.getDeclaredConstructor(RuinAndroid.class); constructor.setAccessible(true);
+        var goal = constructor.newInstance(a);
+        var craft = type.getDeclaredMethod("craftOnce", net.minecraft.server.level.ServerLevel.class,
+                io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.class,
+                io.github.genichimaruo.singulo.android.work.WorkJob.class, BlockPos.class,
+                io.github.genichimaruo.singulo.android.work.RecipeData.class);
+        craft.setAccessible(true);
+        helper.assertFalse((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Craft succeeded without output space");
+        helper.assertTrue(a.inventory().getItem(input).getCount() == 64 && order.held.isEmpty(), "Full storage consumed materials or created a reservation");
+        bench.buffer().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS, 60));
+        helper.assertTrue((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Craft did not resume into a partial stack");
+        helper.assertTrue(a.inventory().getItem(input).getCount() == 63 && bench.buffer().getStackInSlot(0).getCount() == 64,
+                "Craft did not conserve materials and output");
+        helper.assertTrue(order.held(helper.absolutePos(TABLE), recipe.output()) == 4, "Craft claimed someone else's stored products");
+        helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                new AABB(helper.absolutePos(TABLE)).inflate(8)).isEmpty(), "Craft overflow dropped an item");
+        a.discard(); helper.succeed();
+    }
+
+    /** Products and crafting remainders are checked together, including alternate ingredient cards. */
+    @GameTest(template = EMPTY)
+    public static void workbenchReservesSpaceForEveryReturnedBottle(GameTestHelper helper) throws Exception {
+        var console = workshop(helper, 0);
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        var bench = (io.github.genichimaruo.singulo.android.work.AndroidWorkbenchBlockEntity) helper.getBlockEntity(TABLE);
+        BladeAndroid a = worker(helper, false); a.setNoAi(true);
+        var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        for (int i : new int[] {0, 1, 3, 4}) grid.set(i, new ItemStack(net.minecraft.world.item.Items.HONEY_BOTTLE));
+        Class<?> type = Class.forName("io.github.genichimaruo.singulo.android.AndroidWorkGoal");
+        var constructor = type.getDeclaredConstructor(RuinAndroid.class); constructor.setAccessible(true);
+        var goal = constructor.newInstance(a);
+        var craft = type.getDeclaredMethod("craftOnce", net.minecraft.server.level.ServerLevel.class,
+                io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity.class,
+                io.github.genichimaruo.singulo.android.work.WorkJob.class, BlockPos.class,
+                io.github.genichimaruo.singulo.android.work.RecipeData.class); craft.setAccessible(true);
+        var job = new io.github.genichimaruo.singulo.android.work.WorkJob(
+                io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, 901, 1, 0, List.of(), List.of(), true);
+        for (boolean variants : new boolean[] {false, true}) {
+            for (int slot : a.carrySlots()) a.inventory().setItem(slot, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+            int input = a.carrySlots()[0];
+            a.inventory().setItem(input, new ItemStack(net.minecraft.world.item.Items.HONEY_BOTTLE, 16));
+            for (int slot = 0; slot < bench.buffer().getSlots(); slot++) bench.buffer().setStackInSlot(slot, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 64));
+            bench.buffer().setStackInSlot(0, ItemStack.EMPTY);
+            var alts = new java.util.ArrayList<String>(java.util.Collections.nCopies(9, ""));
+            if (variants) for (int n : new int[] {0, 1, 3, 4}) alts.set(n,
+                    io.github.genichimaruo.singulo.android.work.ItemCount.key(net.minecraft.world.item.crafting.Ingredient.of(net.minecraft.world.item.Items.HONEY_BOTTLE)));
+            var recipe = io.github.genichimaruo.singulo.android.work.RecipeData.crafting(grid,
+                    new ItemStack(net.minecraft.world.item.Items.HONEY_BLOCK), alts);
+            helper.assertFalse((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Returned bottles overflowed storage");
+            helper.assertTrue(a.inventory().getItem(input).getCount() == 16 && bench.buffer().getStackInSlot(0).isEmpty(), "Rejected craft changed inventory");
+            bench.buffer().setStackInSlot(1, ItemStack.EMPTY);
+            helper.assertTrue((Boolean) craft.invoke(goal, helper.getLevel(), console, job, helper.absolutePos(TABLE), recipe), "Craft did not resume with remainder space");
+            helper.assertTrue(a.inventory().getItem(input).getCount() == 12
+                    && bench.buffer().getStackInSlot(0).is(net.minecraft.world.item.Items.HONEY_BLOCK)
+                    && bench.buffer().getStackInSlot(1).is(net.minecraft.world.item.Items.GLASS_BOTTLE)
+                    && bench.buffer().getStackInSlot(1).getCount() == 4, "Products or returned bottles were lost");
+        }
+        a.discard(); helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void partialWorkbenchBatchIsCountedOnlyOnce(GameTestHelper helper) {
+        var console = workshop(helper, 64);
+        BladeAndroid a = worker(helper, false); a.setNoAi(true);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+                256, List.of(a.getUUID()), null);
+        helper.assertTrue(error == null, "Could not start partial-batch fixture");
+        var job = console.requestJob(a);
+        var order = console.orders().getFirst();
+        helper.assertTrue(job.type() == io.github.genichimaruo.singulo.android.work.WorkJob.Type.CRAFT, "No crafting lease");
+        console.completePartialCraft(job, 0, 5);
+        console.completePartialCraft(job, 0, 5);
+        helper.assertTrue(order.steps.getFirst().done == 5 && order.steps.getFirst().inProgress == 0
+                && order.steps.getFirst().remaining() == order.steps.getFirst().total - 5, "Partial completion duplicated progress or kept the lease");
+        a.discard(); helper.succeed();
+    }
+
+    @GameTest(template = EMPTY)
+    public static void workbenchBufferExpandsBatchWithoutExpandingCarry(GameTestHelper helper) {
+        var console = workshop(helper, 64);
+        helper.setBlock(TABLE, SinguloBlocks.ANDROID_WORKBENCH.get());
+        net.minecraft.world.level.block.entity.ChestBlockEntity chest = helper.getBlockEntity(CHEST);
+        for (int i = 0; i < 5; i++) chest.setItem(i, new ItemStack(net.minecraft.world.item.Items.OAK_LOG, 64));
+        BladeAndroid a = worker(helper, false); a.setNoAi(true);
+        var error = console.start(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS),
+                1280, List.of(a.getUUID()), null);
+        helper.assertTrue(error == null, "Could not plan buffered crafting");
+        var job = console.requestJob(a);
+        helper.assertTrue(a.carryCapacity() == 5 && job.batch().size() == 1 && job.batch().getFirst().crafts() == 320,
+                "Workbench storage did not expand the batch while retaining five carry slots: " + job);
+        helper.assertTrue(job.fetch().size() == 1 && job.fetch().getFirst().count == 320, "Material pickup exceeds carry capacity");
+        a.discard(); helper.succeed();
     }
 }

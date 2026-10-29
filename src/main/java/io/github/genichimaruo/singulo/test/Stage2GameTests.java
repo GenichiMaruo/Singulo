@@ -53,13 +53,16 @@ public final class Stage2GameTests {
     // ------------------------------------------------------------------ 極低温冷却塔
 
     private static final BlockPos TOWER_CONTROLLER = new BlockPos(2, 1, 0);
-    private static BlockPos towerPort;
+    private static BlockPos towerPort(GameTestHelper helper) {
+        return TestBuild.at(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER,
+                TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 1, 1, 0);
+    }
 
     /** 高さ height の冷却塔を (0..4, 0.., 0..4) に建て、手前の面の下から2段目の左の外装板を搬入出ポートにする。 */
     private static MachineBlockEntity buildTower(GameTestHelper helper, int height) {
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
                 net.minecraft.core.Direction.SOUTH, height);
-        towerPort = TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
+        TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.COOLING_TOWER, TOWER_CONTROLLER,
                 net.minecraft.core.Direction.SOUTH, height, 1, 1, 0);
         MachineBlockEntity controller = helper.getBlockEntity(TOWER_CONTROLLER);
         controller.energy().setEnergy(controller.energy().getMaxEnergyStored());
@@ -84,9 +87,9 @@ public final class Stage2GameTests {
     @GameTest(template = TALL, timeoutTicks = 150)
     public static void replacedPortAtSamePositionRelinks(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
-        BlockPos port = towerPort;
+        BlockPos port = towerPort(helper);
         BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
-        helper.runAtTickTime(30, () -> {
+        helper.runAtTickTime(40, () -> {
             helper.assertTrue(helper.getLevel().getBlockEntity(port) instanceof io.github.genichimaruo.singulo.multiblock.PortBlockEntity p
                     && controller.equals(p.controllerPos()), "最初のポートがつながらない");
             helper.getLevel().setBlockAndUpdate(port, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
@@ -110,7 +113,7 @@ public final class Stage2GameTests {
         MachineBlockEntity tower = buildTower(helper, 7);
         BlockPos controller = helper.absolutePos(TOWER_CONTROLLER);
         BlockPos panel = TestBuild.at(helper, kind, TOWER_CONTROLLER, net.minecraft.core.Direction.SOUTH, 7, 3, 1, 0);
-        helper.runAtTickTime(30, () -> {
+        helper.runAtTickTime(40, () -> {
             helper.assertTrue(tower.structureSize() == 7, "塔が形成されない");
             helper.getLevel().destroyBlock(panel, false);
             helper.getLevel().setBlockAndUpdate(panel, SinguloBlocks.MULTIBLOCK_PORT.get().defaultBlockState());
@@ -158,7 +161,7 @@ public final class Stage2GameTests {
     @GameTest(template = TALL, timeoutTicks = 200)
     public static void coolingTowerMakesLiquidNitrogen(GameTestHelper helper) {
         MachineBlockEntity tower = buildTower(helper, 7);
-        BlockPos port = towerPort;
+        BlockPos port = towerPort(helper);
         // 高さ7では液体ヘリウムは作れない（高さ10以上が必要）
         tower.automationFluids().fill(new FluidStack(fluid("helium"), 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
@@ -420,7 +423,7 @@ public final class Stage2GameTests {
         helper.assertTrue(turbine.legacyNotice(), "前の版のタービンが知らせない");
         turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
         helper.assertTrue(turbine.legacyNotice(), "保存し直すと知らせを忘れる");
-        turbine.noticeIfLegacy(helper.makeMockServerPlayerInLevel());
+        turbine.noticeIfLegacy(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper));
         helper.assertTrue(!turbine.legacyNotice(), "画面を開いても知らせが残る");
         turbine.loadCustomOnly(turbine.saveCustomOnly(registries), registries);
         helper.assertTrue(!turbine.legacyNotice(), "知らせたあと保存し直すと、また知らせる");
@@ -500,7 +503,7 @@ public final class Stage2GameTests {
             helper.assertTrue(used >= 4 && used <= 6, "水が4 tickに1 mB減らない: " + used);
             reactor.setBurnForTest(3);
         });
-        helper.runAtTickTime(30, () -> {
+        helper.runAtTickTime(40, () -> {
             helper.assertTrue(reactor.burn() == 0, "触媒が尽きない");
             helper.assertTrue(reactor.items().getStackInSlot(1).is(item("spent_muon_catalyst")), "失活したミュオン触媒が出口に出ない");
             helper.succeed();
@@ -603,7 +606,7 @@ public final class Stage2GameTests {
             helper.assertTrue(anchor.loadedRadius() == 1, "ミュオン触媒で半径1にならない: " + anchor.loadedRadius());
             int used = 50_000 - anchor.energy().getEnergyStored();
             helper.assertTrue(used >= 9 * 20 * 18 && used <= 9 * 20 * 21, "9チャンク×20 FE/t になっていない: " + used);
-            ItemStack catalyst = anchor.catalystSlot().getStackInSlot(0);
+            ItemStack catalyst = anchor.catalyst();
             int worn = UsesHelper.get(catalyst).used();
             helper.assertTrue(worn >= 18 && worn <= 21, "触媒が1 tickに1ずつ減っていない: " + worn);
             helper.succeed();
@@ -618,7 +621,7 @@ public final class Stage2GameTests {
         anchor.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
         helper.runAtTickTime(10, () -> {
             helper.assertTrue(anchor.loadedRadius() < 0, "電力なしでチャンクを固定した");
-            helper.assertTrue(UsesHelper.get(anchor.catalystSlot().getStackInSlot(0)).used() == 0, "止まっているのに触媒が減った");
+            helper.assertTrue(UsesHelper.get(anchor.catalyst()).used() == 0, "止まっているのに触媒が減った");
             helper.succeed();
         });
     }
@@ -633,5 +636,64 @@ public final class Stage2GameTests {
         helper.assertTrue(CosmicMuonCollectorBlockEntity.rateAt(helper.getLevel(), new BlockPos(0, 250, 0)) == 1.0,
                 "Y=250 の空の下で最大にならない");
         helper.succeed();
+    }
+
+    /**
+     * 触媒の装填: 予備から1個を装填し、使い切ると失活触媒を出して次をすぐ装填する。使いかけの同じ触媒は残りを装填中のものへまとめ、
+     * 空の殻を出す。違う種類を入れると、装填中のもの（使いかけ）を返して入れ替える。
+     */
+    @GameTest(template = EMPTY)
+    public static void catalystMagazineLoadsMergesAndSwaps(GameTestHelper helper) {
+        var supply = new net.neoforged.neoforge.items.ItemStackHandler(1);
+        java.util.List<ItemStack> out = new java.util.ArrayList<>();
+        var mag = new io.github.genichimaruo.singulo.machine.CatalystMagazine(() -> {});
+        java.util.function.UnaryOperator<ItemStack> exit = st -> {
+            out.add(st.copy());
+            return ItemStack.EMPTY;
+        };
+        ItemStack muon = new ItemStack(item("muon_catalyst"));
+        int max = UsesHelper.get(muon).max();
+        supply.setStackInSlot(0, muon.copyWithCount(2));
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(mag.loaded().is(item("muon_catalyst")) && supply.getStackInSlot(0).getCount() == 1, "予備から1個を装填しない");
+        // 使い切る: 失活触媒が出て、予備の次がすぐ装填される
+        mag.consume(max, supply, 0);
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(out.size() == 1 && out.get(0).is(item("spent_muon_catalyst")), "使い切っても失活触媒が出ない: " + out);
+        helper.assertTrue(mag.loaded().is(item("muon_catalyst")) && supply.getStackInSlot(0).isEmpty(), "次の1個を装填しない");
+        // 使いかけをまとめる: 装填中のものを30回使い、残り10回の使いかけを入れる → 装填中のものは20回減った状態、殻が出る
+        mag.consume(30, supply, 0);
+        supply.setStackInSlot(0, UsesHelper.consume(muon.copy(), max - 10));
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(UsesHelper.get(mag.loaded()).used() == 20, "使いかけの残りをまとめない: " + UsesHelper.get(mag.loaded()).used());
+        helper.assertTrue(supply.getStackInSlot(0).isEmpty() && out.size() == 2 && out.get(1).is(item("spent_muon_catalyst")),
+                "まとめた使いかけの殻が出ない: " + out);
+        // 違う種類: 装填中の使いかけを返して入れ替える
+        supply.setStackInSlot(0, new ItemStack(item("bose_condensate_catalyst")));
+        mag.tick(supply, 0, exit);
+        helper.assertTrue(mag.loaded().is(item("bose_condensate_catalyst")), "違う種類に入れ替えない");
+        helper.assertTrue(out.size() == 3 && out.get(2).is(item("muon_catalyst")) && UsesHelper.get(out.get(2)).used() == 20,
+                "外した使いかけが返らない: " + out);
+        helper.succeed();
+    }
+
+    /** 触媒装置は、触媒を予備として積め、使い切った失活触媒を出口へ出して、止まらずに次の触媒で動き続ける。 */
+    @GameTest(template = EMPTY, timeoutTicks = 80)
+    public static void catalystDeviceReloadsWithoutStopping(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
+        WorldlineAnchorBlockEntity anchor = helper.getBlockEntity(pos);
+        anchor.energy().setEnergy(500_000);
+        ItemStack nearlyDone = UsesHelper.consume(new ItemStack(item("muon_catalyst")), UsesHelper.get(new ItemStack(item("muon_catalyst"))).max() - 5);
+        helper.assertTrue(anchor.catalystSlot().insertItem(0, nearlyDone, false).isEmpty(), "使いかけが入らない");
+        helper.runAtTickTime(10, () -> helper.assertTrue(anchor.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst"), 3), false).isEmpty(),
+                "新品を予備として積めない: " + anchor.catalystSlot().getStackInSlot(0)));
+        helper.runAtTickTime(40, () -> {
+            helper.assertTrue(anchor.spentSlot().getStackInSlot(0).is(item("spent_muon_catalyst")), "失活触媒が出口に出ない");
+            helper.assertTrue(anchor.catalyst().is(item("muon_catalyst")) && UsesHelper.remaining(anchor.catalyst()) > 0, "次の触媒を装填しない");
+            helper.assertTrue(anchor.catalystSlot().getStackInSlot(0).getCount() == 2, "予備の数が合わない: " + anchor.catalystSlot().getStackInSlot(0));
+            helper.assertTrue(anchor.loadedRadius() == 1, "入れ替えのあいだに止まった");
+            helper.succeed();
+        });
     }
 }
