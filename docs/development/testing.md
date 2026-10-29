@@ -2,7 +2,7 @@
 
 ## 全体の検証
 
-Minecraft 1.21.1 / Java 21 / NeoForge。現在は通常のGameTest 574件、Mekanismを入れる専用GameTest 1件、検証ツールの単体テスト37件。GUIは通常22画面と5言語×44画面を同じクライアントで確認する。Sodium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
+Minecraft 1.21.1 / Java 21 / NeoForge。現在は通常のGameTest 592件、Mekanismを入れる専用GameTest 1件、検証ツールの単体テスト37件。GUIは通常22画面と5言語×44画面を同じクライアントで確認する。Sodium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
 
 ```sh
 python3 -m unittest discover -s tools -p 'test_*.py'
@@ -55,7 +55,19 @@ GUIの自動操作は`tools/review/`に置く。機械の固定データによ�
 
 PNGはPillowで読み取る。旧デコーダーとの全RGB値の一致を確認している。撮影数や検査範囲を変更するときは、CI、画素検証、公開用の証跡確認、その単体テストを一緒に更新する。
 
+## JEIの配置・素材転送の検査
+
+JEIの配置・素材転送だけを確認する場合は、`prepare_gui.py`と同様に`build/gametest/world`を`build/jei-review/saves/Review`へ複製し、`build/jei-review/options.txt`に`guiScale:2`を指定して、次を実行する。
+
+```sh
+bash ./gradlew --no-configuration-cache -I tools/review/jei.gradle runClient
+```
+
+圧縮機（通常・質量）・ペルチェ冷却器・精密組立台を5言語で描画し、枠の重なりと範囲を検査する。`build/jei-review/screenshots/`に画像を保存する。登録済みJEIハンドラから素材転送パケットを送り、サーバーで必要個数・レシピ指定・重複がないことを確認する。成功ログは`SINGULO_JEI_LAYOUT_COMPLETE`（5言語）と`SINGULO_JEI_TRANSFER_COMPLETE`。さらに、移動したレシピ選択・入出力設定ポップアップ越しにJEIの矢印を操作できないこと、閉じると操作が戻ること、面設定の初期表示で正面を選べて回転後は裏面も選べることを検査する（`SINGULO_POPUP_INPUT_COMPLETE`）。検証後は通常の`build`を実行し、検証コードを製品JARから除外する。
+
 ## テストの追加・保守方針
+
+容量アップグレードの検査は`CapacityUpgradeGameTests`と`AssemblerPowerGameTests`で、通常容量・受電上限、Mk1〜Mk3、旧インベントリ移行、交換・取り外し時の余剰電力、実レシピの連続製作を確認する。上記JEIクライアント検査では専用枠と速度枠の同時装着を3段階×5言語で撮影する（`SINGULO_CAPACITY_GUI_COMPLETE`、`screenshots/capacity-mk*-*.png`）。
 
 - 新しいGameTestは`src/gameTest/java/`内の`*GameTests.java`へ置く。既存の`src/main/java/**/GameTests.java`もGradleの`gameTest`ソースセットに振り分け、製品JARには含めない。
 - `@GameTestHolder`と`@PrefixGameTestTemplate(false)`を付け、メソッド名は全クラスで重複させない。新しい名前空間を作るときは、Gradleと検査ツールの既定一覧を更新する。
