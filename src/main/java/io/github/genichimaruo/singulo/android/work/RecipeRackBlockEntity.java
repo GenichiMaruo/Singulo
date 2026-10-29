@@ -1,10 +1,12 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import net.minecraft.core.HolderLookup;
+
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,10 +23,24 @@ import net.minecraftforge.items.ItemStackHandler;
  */
 public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
     public static final int ROWS = 6, COLS = 9, SLOTS = ROWS * COLS;
+    private final ItemStack[] decodedCards = new ItemStack[SLOTS];
+    private final RecipeData[] decodedRecipes = new RecipeData[SLOTS];
+
+    /** 変わっていないカードは1回だけ読む。部品（コンポーネント）も比べるので、カードを書き換えればちゃんと読み直す。 */
+    private RecipeData recipe(int slot, HolderLookup.Provider registries) {
+        ItemStack card = items.getStackInSlot(slot);
+        if (decodedCards[slot] == null || !ItemStack.isSameItemSameTags(decodedCards[slot], card)) {
+            decodedCards[slot] = card.copy();
+            decodedRecipes[slot] = RecipeData.read(card, registries);
+        }
+        return decodedRecipes[slot];
+    }
 
     private final ItemStackHandler items = new ItemStackHandler(SLOTS) {
         @Override
         protected void onContentsChanged(int slot) {
+            decodedCards[slot] = null;
+            decodedRecipes[slot] = null;
             setChanged();
         }
 
@@ -66,14 +82,16 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
             BlockPos pos = WorkLocationCardItem.pos(loc);
             boolean here = pos != null && WorkLocationCardItem.sameDimension(loc, level);
             for (int col = 1; col < COLS; col++) {
-                RecipeData data = RecipeData.read(items.getStackInSlot(row * COLS + col), registries);
+                RecipeData data = recipe(row * COLS + col, registries);
                 if (data == null) {
                     continue;
                 }
                 if (data.procedure()) {
                     if (!data.steps().isEmpty()) {
                         BlockPos first = data.steps().get(0).pos();
-                        out.add(new Entry(data, first, level.getBlockState(first).getBlock()));
+                        // 一覧を読むだけで、遠くの手順の場所のチャンクを読み込まない
+                        out.add(new Entry(data, first, level.isLoaded(first) ? level.getBlockState(first).getBlock()
+                                : net.minecraft.world.level.block.Blocks.AIR));
                     }
                 } else if (here) {
                     out.add(new Entry(data, pos, WorkLocationCardItem.block(loc)));
@@ -113,5 +131,7 @@ public class RecipeRackBlockEntity extends WorkLinkedBlockEntity {
         CompoundTag inv = tag.getCompound("items");
         inv.putInt("Size", SLOTS);
         items.deserializeNBT(inv);
+        java.util.Arrays.fill(decodedCards, null);
+        java.util.Arrays.fill(decodedRecipes, null);
     }
 }

@@ -46,8 +46,7 @@ public final class CatalystHelper {
         }
         int diff = tier - machineTier;
         if (diff >= 1) {
-            int steps = Math.min(diff, 2);
-            return new Effect(true, 1 + 0.25 * steps, 1 - 0.2 * steps);
+            return new Effect(true, higherSpeed(diff), higherConsumption(diff));
         }
         if (diff == 0) {
             return new Effect(true, 1, 1);
@@ -56,6 +55,21 @@ public final class CatalystHelper {
             return new Effect(true, lowerTierSpeed(), lowerTierConsumption());
         }
         return Effect.NONE;
+    }
+
+    /** steps 段上の触媒の速度倍率（1段ごとに+25%、2段まで）。 */
+    public static double higherSpeed(int steps) {
+        return 1 + 0.25 * Math.min(Math.max(steps, 0), 2);
+    }
+
+    /** steps 段上の触媒の消費倍率（1段ごとに−20%、2段まで）。 */
+    public static double higherConsumption(int steps) {
+        return 1 - 0.2 * Math.min(Math.max(steps, 0), 2);
+    }
+
+    /** レシピが求める使用回数 uses を steps 段上の触媒で払うときの使用回数。 */
+    public static int higherUses(int uses, int steps) {
+        return Math.max(1, (int) Math.ceil(uses * higherConsumption(steps)));
     }
 
     /**

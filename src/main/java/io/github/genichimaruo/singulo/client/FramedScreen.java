@@ -52,6 +52,54 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
         return false;
     }
 
+    // ------------------------------------------------------------------ 装填中の触媒
+
+    /** 装填中の触媒（同期された番号から。なければ空）。 */
+    protected static net.minecraft.world.item.ItemStack loadedCatalyst(int itemId) {
+        return itemId < 0 ? net.minecraft.world.item.ItemStack.EMPTY
+                : new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.byId(itemId));
+    }
+
+    /**
+     * 触媒スロット（sx, sy）の下の細いゲージに、装填中の触媒の残りを出す。予備が空なら、スロットに装填中の触媒を薄く出す。
+     * fillPermille は残りの千分率。
+     */
+    protected void drawLoadedCatalyst(GuiGraphics g, int sx, int sy, int itemId, int fillPermille, boolean supplyEmpty) {
+        net.minecraft.world.item.ItemStack loaded = loadedCatalyst(itemId);
+        Panel.well(g, skin, sx, sy + 19, 16, 2);
+        if (loaded.isEmpty()) {
+            return;
+        }
+        int w = Math.round(16 * Math.min(1000, Math.max(0, fillPermille)) / 1000F);
+        if (w > 0) {
+            g.fill(sx, sy + 19, sx + w, sy + 21, Panel.AMBER);
+            Panel.glass(g, sx, sy + 19, w, 2);
+        }
+        if (supplyEmpty) {
+            g.pose().pushPose();
+            g.renderItem(loaded, sx, sy);
+            g.pose().translate(0, 0, 200);
+            g.fill(sx, sy, sx + 16, sy + 16, 0x80000000 | (skin.fill() & 0xFFFFFF));
+            g.pose().popPose();
+        }
+    }
+
+    /** 触媒スロットとゲージの上にカーソルがあるときの説明（装填中のものがなければ null）。 */
+    @Nullable
+    protected List<Component> loadedCatalystLines(int itemId, int fillPermille, boolean supplyEmpty) {
+        net.minecraft.world.item.ItemStack loaded = loadedCatalyst(itemId);
+        if (loaded.isEmpty()) {
+            return null;
+        }
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("gui.singulo.catalyst.loaded", loaded.getHoverName(), Math.round(fillPermille / 10F)));
+        lines.add(Component.translatable("gui.singulo.catalyst.loaded_hint").withStyle(st -> st.withColor(0xFF8A949E)));
+        if (supplyEmpty) {
+            lines.add(Component.translatable("gui.singulo.catalyst.eject_hint").withStyle(st -> st.withColor(0xFF8A949E)));
+        }
+        return lines;
+    }
+
     @Nullable
     protected Component railTooltip(int row) {
         return null;
@@ -341,6 +389,14 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
     }
 
     // ------------------------------------------------------------------ 操作
+
+    /**
+     * 電源と右レールのクリックは、どの画面でも受け付ける（自分で mouseClicked を書く画面は、先に clickFrame を呼ぶ）。
+     */
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return clickFrame(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+    }
 
     /** 電源と右レールのクリック。扱ったら true。 */
     protected boolean clickFrame(double mouseX, double mouseY, int button) {

@@ -34,7 +34,7 @@ public final class RuntimeLifecycleGameTests {
 
     @GameTest(template = "empty", batch = "lifecycle_cleanup")
     public static void closingLevelReleasesLiveDeviceRegistryAndFields(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var level = h.getLevel().getServer().getLevel(Level.NETHER);
         var pos = h.absolutePos(new BlockPos(2, 1, 2)).atY(200);
         var port = new WormholePortBlockEntity(pos, SinguloBlocks.WORMHOLE_PORT.get().defaultBlockState());
@@ -54,7 +54,7 @@ public final class RuntimeLifecycleGameTests {
 
     @GameTest(template = "empty", batch = "lifecycle_cleanup")
     public static void closingLevelDiscardsPendingFormationEffects(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var level = h.getLevel().getServer().getLevel(Level.NETHER);
         var pos = h.absolutePos(new BlockPos(2, 1, 2)).atY(200);
         FormationEffect.play(level, pos, 0, 0, 0);
@@ -72,8 +72,7 @@ public final class RuntimeLifecycleGameTests {
 
     @GameTest(template = "empty", batch = "lifecycle_cleanup")
     public static void logoutAndDimensionChangeClearHeldInput(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SinguloItems.GRAVITON_MANIPULATOR.get()));
         try {
             GravitonManipulatorItem.setInput(player, true, true);
@@ -89,9 +88,9 @@ public final class RuntimeLifecycleGameTests {
 
     @GameTest(template = "empty", batch = "lifecycle_cleanup")
     public static void expiredCombatAttributionReleasesBossReference(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         boolean old = ServerConfig.BOSS_COMBAT_LOG.get();
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         var boss = h.spawn(SinguloEntities.ECHO_SENTINEL.get(), new BlockPos(4, 1, 4));
         try {
             ServerConfig.BOSS_COMBAT_LOG.set(true);

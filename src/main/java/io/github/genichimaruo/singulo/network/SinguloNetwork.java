@@ -10,7 +10,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 /** Versioned Forge 1.20.1 channel; handlers execute on the game thread. */
 public final class SinguloNetwork {
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(Singulo.id("main"),
-            () -> "4", "4"::equals, "4"::equals);
+            () -> "5", "5"::equals, "5"::equals);
     public static void register() {
         CHANNEL.messageBuilder(ToggleAreaPayload.class, 0, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(ToggleAreaPayload::encode).decoder(ToggleAreaPayload::decode)

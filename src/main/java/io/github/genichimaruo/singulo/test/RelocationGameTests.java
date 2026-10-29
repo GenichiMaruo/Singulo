@@ -24,10 +24,10 @@ public final class RelocationGameTests {
 
     @GameTest(template="empty")
     public static void wrenchPreservesContentsFluidsEnergyAndSidesOnPlacement(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos a=new BlockPos(2,1,2), b=new BlockPos(5,1,2);
         h.setBlock(a,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity original=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, a);
+        MachineBlockEntity original=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, a);
         original.items().setStackInSlot(0,new ItemStack(Items.COAL,13));
         original.items().setStackInSlot(original.type().outputSlot(),new ItemStack(Items.IRON_INGOT,7));
         original.energy().receiveEnergy(1234,false);
@@ -35,9 +35,9 @@ public final class RelocationGameTests {
         original.setSide(0,SideConfig.Face.TOP,SideConfig.NONE,false);
         original.setEjectEnabled(0,true);
         int sides=original.itemSides().packed();
-        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        var viewer=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var viewer=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         viewer.setPos(Vec3.atCenterOf(h.absolutePos(a)));
         viewer.containerMenu = new MachineMenu(1, viewer.getInventory(), original);
         try {
@@ -59,7 +59,7 @@ public final class RelocationGameTests {
             player.setShiftKeyDown(false);
             player.setItemInHand(InteractionHand.MAIN_HAND,packed);
             ((BlockItem)packed.getItem()).place(new BlockPlaceContext(context(player,h.absolutePos(b))));
-            MachineBlockEntity restored=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, b);
+            MachineBlockEntity restored=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, b);
             h.assertTrue(restored!=null,"Packed machine could not be placed");
             h.assertTrue(restored.items().getStackInSlot(0).getCount()==13 && restored.items().getStackInSlot(restored.type().outputSlot()).getCount()==7,"Inventory not preserved");
             h.assertTrue(restored.energy().getEnergyStored()==1234,"Energy not preserved");
@@ -71,37 +71,37 @@ public final class RelocationGameTests {
 
     @GameTest(template="empty")
     public static void wrenchRequiresSneakingAndIgnoresOtherInventories(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos a=new BlockPos(2,1,2), chest=new BlockPos(4,1,2);
         h.setBlock(a,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
         h.setBlock(chest,net.minecraft.world.level.block.Blocks.CHEST);
-        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
             player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
             wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(a)));
-            h.assertTrue(io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, a)!=null,"Ordinary click packed a device");
+            h.assertTrue(io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, a)!=null,"Ordinary click packed a device");
             player.setShiftKeyDown(true);
             wrench.getItem().onItemUseFirst(wrench,context(player,h.absolutePos(chest)));
-            h.assertTrue(io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, chest)!=null,"Wrench packed an unrelated inventory");
+            h.assertTrue(io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, chest)!=null,"Wrench packed an unrelated inventory");
         } finally {player.discard();}
         h.succeed();
     }
     @GameTest(template="empty")
     public static void wrenchRetainsGeneratorAndCatalystDeviceState(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var blocks=java.util.List.of(SinguloBlocks.THERMOELECTRIC_GENERATOR, SinguloBlocks.SMES_CELL, SinguloBlocks.SMES_MODULE,
                 SinguloBlocks.CRYOGENIC_TURBINE, SinguloBlocks.HYDROGEN_FUEL_CELL, SinguloBlocks.MUON_FUSION_REACTOR,
                 SinguloBlocks.COSMIC_MUON_COLLECTOR, SinguloBlocks.QUANTUM_HEAT_ENGINE, SinguloBlocks.INERTIAL_STABILIZER,
                 SinguloBlocks.PROBE_STATION, SinguloBlocks.DEGENERATE_FURNACE_CONTROLLER,
                 SinguloBlocks.SHIELD_TOWER_CORE, SinguloBlocks.TIPLER_CORE);
         BlockPos a=new BlockPos(2,1,2), b=new BlockPos(5,1,2);
-        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             for(var block:blocks) {
                 player.getInventory().clearContent();
                 h.setBlock(a,block.get());
-                var before=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, a);
+                var before=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, a);
                 var tag=before.saveWithoutMetadata();
                 // Every audited generator/storage/catalyst device persists this buffer.
                 if(tag.contains("energy")) tag.putInt("energy",1234);
@@ -120,7 +120,7 @@ public final class RelocationGameTests {
                 player.setShiftKeyDown(false);
                 player.setItemInHand(InteractionHand.MAIN_HAND,packed);
                 ((BlockItem)packed.getItem()).place(new BlockPlaceContext(context(player,h.absolutePos(b))));
-                var after=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, b);
+                var after=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, b);
                 h.assertTrue(after!=null && expected.equals(after.saveWithoutMetadata()),"Device state changed on relocation: "+block.getId());
                 // Clear the empty test fixture without running its production loot path.
                 h.getLevel().removeBlockEntity(h.absolutePos(b));
@@ -132,12 +132,12 @@ public final class RelocationGameTests {
 
     @GameTest(template="empty")
     public static void wrenchDropsOnePackedDeviceWhenInventoryIsFull(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos pos=new BlockPos(2,1,2);
         h.setBlock(pos,SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity machine=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, pos);
+        MachineBlockEntity machine=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
         machine.items().setStackInSlot(0,new ItemStack(Items.COAL,13));
-        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         try {
             player.setPos(Vec3.atCenterOf(h.absolutePos(pos)));
             for(int n=0;n<36;n++) player.getInventory().setItem(n,new ItemStack(Items.DIRT,64));
@@ -154,17 +154,17 @@ public final class RelocationGameTests {
 
     @GameTest(template="empty", timeoutTicks=60)
     public static void relocatingAnchorReleasesOldTicketsAndRestartsAtNewPosition(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos a=new BlockPos(2,1,2), b=new BlockPos(5,1,2);
         h.setBlock(a,SinguloBlocks.WORLDLINE_ANCHOR_SMALL.get());
-        WorldlineAnchorBlockEntity original=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, a);
+        WorldlineAnchorBlockEntity original=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, a);
         var owner=java.util.UUID.randomUUID();
         original.setOwner(owner);
         original.energy().setEnergy(original.energy().getMaxEnergyStored());
         original.catalystSlot().insertItem(0,new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("muon_catalyst"))),false);
         h.runAtTickTime(10,()->{
             h.assertTrue(original.loadedRadius()>=0,"Anchor did not start before packing");
-            var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+            var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
             try {
                 var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
                 player.setItemInHand(InteractionHand.MAIN_HAND,wrench);
@@ -177,12 +177,12 @@ public final class RelocationGameTests {
                 player.setShiftKeyDown(false);
                 player.setItemInHand(InteractionHand.MAIN_HAND,packed);
                 ((BlockItem)packed.getItem()).place(new BlockPlaceContext(context(player,h.absolutePos(b))));
-                WorldlineAnchorBlockEntity restored=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, b);
-                h.assertTrue(restored!=null && !restored.catalystSlot().getStackInSlot(0).isEmpty(),"Anchor lost its catalyst");
+                WorldlineAnchorBlockEntity restored=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, b);
+                h.assertTrue(restored!=null && !restored.catalyst().isEmpty(),"Anchor lost its catalyst");
             } finally {player.discard();}
         });
         h.runAtTickTime(30,()->{
-            WorldlineAnchorBlockEntity restored=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, b);
+            WorldlineAnchorBlockEntity restored=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, b);
             h.assertTrue(restored.loadedRadius()>=0,"Relocated anchor did not create new position tickets");
             restored.prepareForRelocation();
             h.succeed();
@@ -192,12 +192,12 @@ public final class RelocationGameTests {
     /** ケーブル撤去モード: 使うと1本、スニークするとつながった同じケーブルをまとめて回収する。ほかの種類のケーブルは残す。 */
     @GameTest(template="empty")
     public static void wrenchCableModeTakesBackCables(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var copper=SinguloBlocks.COPPER_WIRE.get();
         for(int x=1;x<=5;x++) h.setBlock(new BlockPos(x,1,2),copper);
         h.setBlock(new BlockPos(6,1,2),SinguloBlocks.SUPERCONDUCTING_CABLE.get());
         h.setBlock(new BlockPos(1,1,4),copper);
-        var player=io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player=io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         try {
             var wrench=new ItemStack(SinguloItems.RELOCATION_WRENCH.get());
@@ -233,13 +233,13 @@ public final class RelocationGameTests {
 
     @GameTest(template="empty")
     public static void wrenchRespectsCanceledBreaksForEachBlock(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         BlockPos machine = new BlockPos(2, 1, 2);
         h.setBlock(machine, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, machine);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, machine);
         kiln.items().setStackInSlot(0, new ItemStack(Items.COAL, 13));
         for (int x = 1; x <= 3; x++) h.setBlock(new BlockPos(x, 1, 4), SinguloBlocks.COPPER_WIRE.get());
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(h);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(h);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> protect = event -> {
             if (event.getPlayer() == player && (event.getPos().equals(h.absolutePos(machine))

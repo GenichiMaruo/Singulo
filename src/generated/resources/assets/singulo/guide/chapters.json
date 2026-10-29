@@ -74,6 +74,7 @@
       "icon": "singulo:muon_catalyst",
       "pages": [
         "catalysts.tiers",
+        "catalysts.keys",
         "catalysts.slots",
         "catalysts.time"
       ]
@@ -148,6 +149,15 @@
       "icon": "minecraft:tnt",
       "pages": [
         "hazards.list"
+      ]
+    },
+    {
+      "id": "factory_expansion",
+      "icon": "singulo:smes_module",
+      "pages": [
+        "factory_expansion.upgrades",
+        "factory_expansion.probes",
+        "factory_expansion.limits"
       ]
     }
   ]

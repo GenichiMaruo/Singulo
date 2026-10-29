@@ -3,7 +3,7 @@ package io.github.genichimaruo.singulo.android.work;
 import io.github.genichimaruo.singulo.machine.AbstractMachineBlock;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
@@ -22,6 +22,19 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public abstract class WorkLinkedBlockEntity extends BlockEntity implements AbstractMachineBlock.MenuOpener, AbstractMachineBlock.BreakListener,
         AndroidEyes.Holder {
+    final AdjacentItemStores adjacentItems = new AdjacentItemStores(this);
+
+    @Override
+    public void setRemoved() {
+        adjacentItems.clear();
+        super.setRemoved();
+    }
+    @Override
+    public void clearRemoved() {
+        super.clearRemoved();
+        adjacentItems.clear();
+    }
+
     /** 正面の顔（アンドロイドが使っている間は目を開ける）。 */
     protected final AndroidEyes eyes = new AndroidEyes();
 

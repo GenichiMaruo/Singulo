@@ -369,7 +369,7 @@ final class Panel {
     private static final String[] STRUCTURE = {"xxxxxxx", "x..x..x", "x..x..x", "xxxxxxx", "x..x..x", "x..x..x", "xxxxxxx"};
 
     /** 値の行のアイコン（7×8 まで）。 */
-    enum Icon { FLAME, SNOW, BOLT, DROP, PERCENT, HOURGLASS, IN, OUT, RANGE, SPEED, INFO, STAR, PERSON, BOX, ORB }
+    enum Icon { FLAME, SNOW, BOLT, DROP, PERCENT, HOURGLASS, IN, OUT, IN_OUT, RANGE, SPEED, INFO, STAR, PERSON, BOX, ORB }
 
     private static final String[] FLAME = {
             "...x...", "..xx...", "..xxx..", ".xxxx.x", ".xxxxxx", "xxx.xxx", "xx...xx", ".xxxxx."};
@@ -383,6 +383,9 @@ final class Panel {
             "...x...", "...x...", ".x.x.x.", "..xxx..", "...x...", "x.....x", "xxxxxxx"};
     private static final String[] OUT = {
             "...x...", "..xxx..", ".x.x.x.", "...x...", "...x...", "x.....x", "xxxxxxx"};
+    /** 出し入れの両方（上向きと下向きの矢印）。 */
+    private static final String[] IN_OUT = {
+            ".x...x.", "xxx..x.", ".x...x.", ".x...x.", ".x...x.", ".x..xxx", ".x...x."};
 
     private static final String[] RANGE = {
             "..xxx..", ".x...x.", "x..x..x", "x.xxx.x", "x..x..x", ".x...x.", "..xxx.."};
@@ -404,6 +407,7 @@ final class Panel {
             case HOURGLASS -> sprite(g, x, y, HOURGLASS, c);
             case IN -> sprite(g, x, y, IN, c);
             case OUT -> sprite(g, x, y, OUT, c);
+            case IN_OUT -> sprite(g, x, y, IN_OUT, c);
             case RANGE -> sprite(g, x, y, RANGE, c);
             case SPEED -> sprite(g, x, y + 1, SPEED, c);
             case INFO -> sprite(g, x, y, INFO, c);

@@ -32,15 +32,15 @@ public final class GenesisGameTests {
         for (int i = missingPylon ? 1 : 0; i < GenesisCoreBlockEntity.PYLONS.length; i++) {
             helper.setBlock(CORE.offset(GenesisCoreBlockEntity.PYLONS[i]), SinguloBlocks.SIMPLE.get("genesis_pylon").get());
         }
-        return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CORE);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CORE);
     }
 
     /** 形ができると揺籃になり、原初の種で種火が始まる。種火は 1 tick に genesisMaxInput までしか受け取らない。 */
     @GameTest(setupTicks = 20, template = LARGE, timeoutTicks = 120)
     public static void formsAndKindlesWithSeed(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.succeedWhen(() -> {
             helper.assertTrue(core.formed() && core.stage() == GenesisCoreBlockEntity.CRADLE, "形ができて揺籃になる");
             if (core.stage() == GenesisCoreBlockEntity.CRADLE) {
@@ -58,9 +58,9 @@ public final class GenesisGameTests {
     /** 柱が1本でも欠けていると形ができず、原初の種も受け付けない。 */
     @GameTest(setupTicks = 20, template = LARGE, timeoutTicks = 100)
     public static void missingPylonStaysUnformed(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GenesisCoreBlockEntity core = build(helper, true);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAfterDelay(60, () -> {
             helper.assertFalse(core.formed(), "柱が欠けていると形ができない");
             helper.assertFalse(core.useItem(player, new ItemStack(GenesisCoreBlockEntity.primordialSeed())), "種を受け付けない");
@@ -72,9 +72,9 @@ public final class GenesisGameTests {
     /** 核に赤石信号を入れると投入が止まり、電力を受け取らない（暴走の兆しへの備え）。 */
     @GameTest(setupTicks = 20, template = LARGE, timeoutTicks = 140)
     public static void redstoneStopsTheFeed(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAfterDelay(50, () -> {
             helper.assertTrue(core.useItem(player, new ItemStack(GenesisCoreBlockEntity.primordialSeed())), "種火が始まる");
             helper.setBlock(CORE.below(), Blocks.REDSTONE_BLOCK);
@@ -93,9 +93,9 @@ public final class GenesisGameTests {
     /** 画面のスイッチで投入を止め／再開でき、出来上がりスロットからシフトクリックでインベントリへ受け取れる（入れることはできない）。 */
     @GameTest(setupTicks = 20, template = LARGE, timeoutTicks = 140)
     public static void screenTogglesFeedAndHandsOutput(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         helper.runAfterDelay(50, () -> {
             helper.assertTrue(core.useItem(player, new ItemStack(GenesisCoreBlockEntity.primordialSeed())), "種火が始まる");
             var menu = new io.github.genichimaruo.singulo.genesis.GenesisCoreMenu(0, player.getInventory(), helper.absolutePos(CORE),
@@ -120,9 +120,9 @@ public final class GenesisGameTests {
      */
     @GameTest(setupTicks = 20, template = LARGE, timeoutTicks = 100)
     public static void completedCoreRemembersAndPicksFromScreen(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         GenesisCoreBlockEntity core = build(helper, false);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var registries = helper.getLevel().registryAccess();
         net.minecraft.nbt.CompoundTag done = new net.minecraft.nbt.CompoundTag();
         done.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
@@ -153,7 +153,7 @@ public final class GenesisGameTests {
         BlockPos other = new BlockPos(1, 1, 1);
         helper.setBlock(other, SinguloBlocks.GENESIS_CORE.get());
         net.minecraft.world.item.BlockItem.updateCustomBlockEntityTag(helper.getLevel(), player, helper.absolutePos(other), drop);
-        GenesisCoreBlockEntity moved = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, other);
+        GenesisCoreBlockEntity moved = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, other);
         helper.assertTrue(moved.stage() == GenesisCoreBlockEntity.COMPLETE, "置き直しても完成のまま: " + moved.stage());
         helper.assertTrue(moved.galaxySeed() == 12345L, "銀河の記憶が残る");
         helper.assertTrue(moved.template().is(Items.EMERALD), "作る物も残る");
@@ -163,12 +163,12 @@ public final class GenesisGameTests {
     /** 受電の上限をとても大きく設定しても（設定で許される範囲）、蓄えの大きさがあふれずに受電できる。 */
     @GameTest(setupTicks = 20, template = LARGE)
     public static void hugeInputSettingStillAccepts(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         long old = io.github.genichimaruo.singulo.generated.ServerConfig.GENESIS_MAX_INPUT.get();
         try {
             io.github.genichimaruo.singulo.generated.ServerConfig.GENESIS_MAX_INPUT.set(1L << 61);
             helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
-            GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CORE);
+            GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CORE);
             net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
             tag.putInt("stage", GenesisCoreBlockEntity.KINDLING);
             tag.putBoolean("formed", true);
@@ -184,15 +184,15 @@ public final class GenesisGameTests {
     /** 作る物は素の形で登録される（見本のエンチャント・名前は写さない）。 */
     @GameTest(setupTicks = 20, template = LARGE)
     public static void templateIsThePlainItem(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
-        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CORE);
+        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CORE);
         net.minecraft.nbt.CompoundTag done = new net.minecraft.nbt.CompoundTag();
         done.putInt("stage", GenesisCoreBlockEntity.COMPLETE);
         core.load(done);
         ItemStack fancy = new ItemStack(Items.DIAMOND);
-        fancy.setHoverName( net.minecraft.network.chat.Component.literal("宝"));
-        helper.assertTrue(core.chooseTemplate(io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper), fancy), "ダイヤモンドを登録できない");
+        fancy.setHoverName(net.minecraft.network.chat.Component.literal("宝"));
+        helper.assertTrue(core.chooseTemplate(io.github.genichimaruo.singulo.test.harness.TestScope.player(helper), fancy), "ダイヤモンドを登録できない");
         helper.assertTrue(core.template().is(Items.DIAMOND) && !core.template().hasCustomHoverName(),
                 "見本の名前まで写している");
         helper.succeed();
@@ -204,10 +204,10 @@ public final class GenesisGameTests {
      */
     @GameTest(setupTicks = 20, template = LARGE)
     public static void legacyTemplateLoadsAsPlainItem(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var registries = helper.getLevel().registryAccess();
         helper.setBlock(CORE, SinguloBlocks.GENESIS_CORE.get());
-        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CORE);
+        GenesisCoreBlockEntity core = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CORE);
         ItemStack sample = new ItemStack(Items.TRIDENT);
         sample.setHoverName( net.minecraft.network.chat.Component.literal("古い見本"));
         sample.enchant(net.minecraft.world.item.enchantment.Enchantments.LOYALTY, 3);
@@ -240,7 +240,7 @@ public final class GenesisGameTests {
     /** 質量生成の電力は希少度ごとに10倍。表にない物は作れず、ネザースターは伝説（希少度4）。 */
     @GameTest(setupTicks = 20, template = LARGE)
     public static void synthesisCostScalesByRarity(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MassSynthesis.Entry stone = MassSynthesis.INSTANCE.entry(new ItemStack(Items.STONE));
         MassSynthesis.Entry diamond = MassSynthesis.INSTANCE.entry(new ItemStack(Items.DIAMOND));
         MassSynthesis.Entry star = MassSynthesis.INSTANCE.entry(new ItemStack(Items.NETHER_STAR));
@@ -272,7 +272,7 @@ public final class GenesisGameTests {
      */
     @GameTest(setupTicks = 20, template = LARGE)
     public static void synthesizedItemsNeverFeedAProfit(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         var registries = level.registryAccess();
         var itemRegistry = net.minecraft.core.registries.BuiltInRegistries.ITEM;

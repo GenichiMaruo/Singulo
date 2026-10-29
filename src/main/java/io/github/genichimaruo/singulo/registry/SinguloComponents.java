@@ -41,7 +41,11 @@ public final class SinguloComponents {
                 .getOrThrow(false, message -> { throw new IllegalArgumentException(message); }));
     }
     public static void remove(ItemStack stack, Key<?> key) {
-        if (stack.getTag() != null) stack.getTag().remove(key.name());
+        if (stack.getTag() != null) {
+            stack.getTag().remove(key.name());
+            // Vanilla distinguishes an absent tag from an empty compound when stacking.
+            if (stack.getTag().isEmpty()) stack.setTag(null);
+        }
     }
     public static final Supplier<Key<io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content>> CHEMICAL_SAMPLE = key("chemical_sample", io.github.genichimaruo.singulo.android.work.ChemicalSamples.Content.CODEC);
     private SinguloComponents() {}

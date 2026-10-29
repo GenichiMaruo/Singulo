@@ -46,7 +46,7 @@ public final class BlueprintRecipeGameTests {
 
     @GameTest(template = EMPTY)
     public static void blueprintStaysAfterCrafting(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         ItemStack bp = new ItemStack(SinguloItems.BLUEPRINT_LAB_FURNITURE.get()), paper = new ItemStack(Items.PAPER), none = ItemStack.EMPTY;
         // 書類の山: 「紙 紙 / 設計図 紙 / 紙」の並べ方で作れる
@@ -80,8 +80,7 @@ public final class BlueprintRecipeGameTests {
     /** 置いた施設灯・サーバーラックは動いている状態、非常灯は赤く光る状態で置かれる。 */
     @GameTest(template = EMPTY)
     public static void placedLabLightsAreOn(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             BlockPos floor = new BlockPos(2, 1, 2);
             for (var block : List.of(SinguloBlocks.FACILITY_LIGHT.get(), SinguloBlocks.SERVER_RACK.get())) {

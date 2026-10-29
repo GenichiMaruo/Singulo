@@ -41,7 +41,7 @@ public final class MekanismGameTests {
      */
     @GameTest(template = EMPTY)
     public static void chemicalTanks(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.assertTrue(Chemicals.present(), "Mekanism が入っていない（-PwithMekanism で走らせる）");
         BlockPos consolePos = new BlockPos(1, 1, 1), tankPos = consolePos.above();
         helper.setBlock(consolePos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
@@ -58,7 +58,7 @@ public final class MekanismGameTests {
                     "化学物質の挿入シミュレーションがタンクを変えた");
             long put = store.insert("mekanism:hydrogen", 5000, false);
             helper.assertTrue(put == 5000, "ケミカルタンクに水素が入らない: " + put);
-            WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, consolePos);
+            WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, consolePos);
             ItemStack hydrogen = ChemicalSamples.of("mekanism:hydrogen", 1);
             helper.assertTrue(ItemCount.get(console.stock(), hydrogen) == 5000, "素材置き場の在庫に水素が数えられない");
             // 指令台はタンクの下（入れるだけの面）にあるが、出せる面（前）から取り出せる
@@ -97,7 +97,7 @@ public final class MekanismGameTests {
     /** All four 10.4 chemical families keep separate IDs and conserve their amounts. */
     @GameTest(template = EMPTY, batch = "chemical_families")
     public static void allChemicalFamiliesUseTypedKeys(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var tankItem = BuiltInRegistries.ITEM.get(new ResourceLocation("mekanism", "basic_chemical_tank"));
         for (String id : new String[]{"mekanism:hydrogen", "infusion|mekanism:carbon", "pigment|mekanism:red", "slurry|mekanism:dirty_iron"}) {
             helper.assertTrue(Chemicals.exists(id), "Missing chemical family: " + id);

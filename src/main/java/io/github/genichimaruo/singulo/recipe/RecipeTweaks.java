@@ -218,7 +218,7 @@ public final class RecipeTweaks {
                     int def = u.defaultMax();
                     if (def > 0 && fresh != def) {
                         int scaled = (int) Math.max(1, Math.min(fresh, Math.round((double) in.uses() * fresh / def)));
-                        items.set(i, new MachineRecipe.ItemInput(in.ingredient(), in.count(), scaled));
+                        items.set(i, new MachineRecipe.ItemInput(in.ingredient(), in.count(), scaled, in.tier()));
                     }
                     break;
                 }
@@ -231,7 +231,7 @@ public final class RecipeTweaks {
             for (int i = 0; i < items.size(); i++) {
                 MachineRecipe.ItemInput in = items.get(i);
                 if (isStar(in.ingredient()) && in.ingredient().test(new ItemStack(artificial))) {
-                    items.set(i, new MachineRecipe.ItemInput(Ingredient.of(Items.NETHER_STAR), in.count(), in.uses()));
+                    items.set(i, new MachineRecipe.ItemInput(Ingredient.of(Items.NETHER_STAR), in.count(), in.uses(), in.tier()));
                 }
             }
         }

@@ -42,7 +42,7 @@ public final class Stage3GameTests {
     /** 装置を置き、テストの間ずっと電力を満たしておく（電源の代わり）。 */
     private static MachineBlockEntity poweredMachine(GameTestHelper helper, MachineType type) {
         helper.setBlock(POS, SinguloBlocks.MACHINES.get(type).get());
-        MachineBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
+        MachineBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, POS);
         helper.onEachTick(() -> be.energy().setEnergy(be.energy().getMaxEnergyStored()));
         return be;
     }
@@ -53,7 +53,7 @@ public final class Stage3GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 700)
     public static void synthesizerMakesEntangledPairs(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity m = poweredMachine(helper, MachineType.ENTANGLEMENT_SYNTHESIZER);
         m.items().setStackInSlot(0, new ItemStack(Items.QUARTZ, 2));
         m.items().setStackInSlot(1, new ItemStack(Items.AMETHYST_SHARD, 2));
@@ -69,7 +69,7 @@ public final class Stage3GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void laserCoolerMakesColdAtoms(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity m = poweredMachine(helper, MachineType.LASER_COOLER);
         m.items().setStackInSlot(0, new ItemStack(item("stardust")));
         m.items().setStackInSlot(1, new ItemStack(Items.QUARTZ));
@@ -84,7 +84,7 @@ public final class Stage3GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 900)
     public static void laserCoolerMakesBoseCatalystFromSpentMuon(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity m = poweredMachine(helper, MachineType.LASER_COOLER);
         m.items().setStackInSlot(0, new ItemStack(item("cold_atoms"), 4));
         m.items().setStackInSlot(1, new ItemStack(item("superconducting_wire"), 2));
@@ -98,7 +98,7 @@ public final class Stage3GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 2500)
     public static void echoResonatorCopiesShardKeepingTemplate(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity m = poweredMachine(helper, MachineType.ECHO_RESONATOR);
         m.items().setStackInSlot(0, new ItemStack(Items.ECHO_SHARD));
         m.items().setStackInSlot(1, new ItemStack(Items.SCULK, 16));
@@ -114,13 +114,13 @@ public final class Stage3GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void quantumHeatEngineOutputDependsOnCatalystTier(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos a = new BlockPos(1, 1, 1);
         BlockPos b = new BlockPos(5, 1, 5);
         helper.setBlock(a, SinguloBlocks.QUANTUM_HEAT_ENGINE.get());
         helper.setBlock(b, SinguloBlocks.QUANTUM_HEAT_ENGINE.get());
-        QuantumHeatEngineBlockEntity bose = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, a);
-        QuantumHeatEngineBlockEntity muon = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, b);
+        QuantumHeatEngineBlockEntity bose = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, a);
+        QuantumHeatEngineBlockEntity muon = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, b);
         bose.catalystSlot().insertItem(0, new ItemStack(item("bose_condensate_catalyst")), false);
         muon.catalystSlot().insertItem(0, new ItemStack(item("muon_catalyst")), false);
         helper.runAtTickTime(10, () -> {
@@ -136,7 +136,7 @@ public final class Stage3GameTests {
     private static void blastDirt(GameTestHelper helper, boolean powered) {
         BlockPos stabilizerPos = new BlockPos(1, 1, 1);
         helper.setBlock(stabilizerPos, SinguloBlocks.INERTIAL_STABILIZER.get());
-        InertialStabilizerBlockEntity stabilizer = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, stabilizerPos);
+        InertialStabilizerBlockEntity stabilizer = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, stabilizerPos);
         if (powered) {
             stabilizer.energy().setEnergy(stabilizer.energy().getMaxEnergyStored());
         }
@@ -160,20 +160,20 @@ public final class Stage3GameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void inertialStabilizerStopsExplosionDamage(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         blastDirt(helper, true);
     }
 
     /** 対照: 電力のないスタビライザーは守らない（同じ爆発で土が壊れることの確認）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void unpoweredStabilizerDoesNotProtect(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         blastDirt(helper, false);
     }
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void gauntletTargetsAndCharging(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.assertTrue(GravityGauntletItem.canAffect(helper.spawn(EntityType.ZOMBIE, POS)), "ゾンビ（HP20）を操れない");
         helper.assertTrue(!GravityGauntletItem.canAffect(helper.spawn(EntityType.IRON_GOLEM, POS.east(2))),
                 "アイアンゴーレム（HP100）を操れてしまう");

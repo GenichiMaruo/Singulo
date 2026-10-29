@@ -1,5 +1,7 @@
 package io.github.genichimaruo.singulo.client;
 
+import net.minecraft.core.HolderLookup;
+
 import io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity;
 import io.github.genichimaruo.singulo.android.work.WorkConsoleMenu;
@@ -15,7 +17,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -2335,7 +2337,8 @@ public class WorkConsoleScreen extends FramedScreen<WorkConsoleMenu> {
         } else if (plan == null || planDelay > 0) {
             status = Component.translatable("gui.singulo.work_console.planning");
         } else if (!plan.getBoolean("ok")) {
-            status = Component.translatable(plan.getBoolean("loop") ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
+            status = Component.translatable(plan.getBoolean("limited") ? "gui.singulo.work_console.error.limit"
+                    : plan.getBoolean("loop") ? "gui.singulo.work_console.error.loop" : "gui.singulo.work_console.error.missing");
             color = RED;
         } else {
             status = Component.translatable("gui.singulo.work_console.plan", plan.getInt("steps"), plan.getLong("crafts"));

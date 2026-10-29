@@ -23,8 +23,7 @@ public final class GuideGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void decodedRecordsUnlockInOrder(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        ServerPlayer player = TestBuild.mockPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.getAbilities().instabuild = false;
             ItemStack rec = new ItemStack(SinguloItems.DECODED_RECORD.get(), 2);
@@ -42,7 +41,7 @@ public final class GuideGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void advancementsAreLoaded(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var advancements = helper.getLevel().getServer().getAdvancements();
         for (String id : new String[]{"root", "tower", "ignite", "records"}) {
             Advancement h = advancements.getAdvancement(Singulo.id(id));
@@ -57,6 +56,7 @@ public final class GuideGameTests {
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
         server.getPlayerList().placeNewPlayer(connection, player);
+        io.github.genichimaruo.singulo.test.harness.TestScope.ownPlayer(helper, player);
         var pos = helper.absolutePos(new net.minecraft.core.BlockPos(4, 2, 4));
         player.teleportTo(helper.getLevel(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
@@ -71,8 +71,7 @@ public final class GuideGameTests {
     /** 親の未達成は発火条件にしない。協力討伐の通知は正しい実績だけを解除する。 */
     @GameTest(template = EMPTY)
     public static void milestonesMatchAndDoNotRequireParents(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             io.github.genichimaruo.singulo.registry.SinguloTriggers.milestone(player, "defeat/foundry_overseer");
             helper.assertTrue(done(player, "foundry"), "親が未達成だと討伐実績を受け取れない");
@@ -88,8 +87,7 @@ public final class GuideGameTests {
     /** 2種類のメモリは同時に必要。旧型のメモリは、どれか1種類でよい。 */
     @GameTest(template = EMPTY)
     public static void memoryAdvancementsUseAnyAndAllCorrectly(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             var inventory = player.getInventory();
             var axe = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(Singulo.id("android_memory_axe")));
@@ -114,7 +112,7 @@ public final class GuideGameTests {
     /** ログアウト中の注文完了を保存し、再起動後のログインで本人だけへ通知する。 */
     @GameTest(template = EMPTY)
     public static void offlineMilestonesSurviveSaveAndAreDeliveredOnce(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var server = helper.getLevel().getServer();
         var owner = java.util.UUID.randomUUID();
         io.github.genichimaruo.singulo.registry.PendingMilestones.award(server, owner, "android_order_complete");
@@ -143,8 +141,7 @@ public final class GuideGameTests {
     /** 本物の印刷完了と指令台の完了処理から、持ち主・注文者へ通知がつながる。 */
     @GameTest(template = EMPTY, batch = "progression_completion", timeoutTicks = 100)
     public static void printingAndDeliveryEmitOwnerMilestones(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        ServerPlayer player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var bit = io.github.genichimaruo.singulo.registry.SinguloEntities.BIT_ANDROID.get().create(helper.getLevel());
         bit.setNoAi(true);
         bit.setNoGravity(true);
@@ -154,7 +151,7 @@ public final class GuideGameTests {
         helper.getLevel().addFreshEntity(bit);
         var consolePos = new net.minecraft.core.BlockPos(1, 1, 1);
         helper.setBlock(consolePos, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, consolePos);
+        io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, consolePos);
         var order = new io.github.genichimaruo.singulo.android.work.WorkOrder(1, new ItemStack(net.minecraft.world.item.Items.OAK_PLANKS), 4, player.getUUID());
         console.orders().add(order);
         helper.runAtTickTime(10, () -> {
@@ -177,10 +174,10 @@ public final class GuideGameTests {
     /** ラストヒット以外の生存者にも与え、クリエイティブには与えない。 */
     @GameTest(template = EMPTY, batch = "progression_boss", timeoutTicks = 30)
     public static void normalBossCreditsSurvivingChallengers(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         ServerPlayer first = player(helper, java.util.UUID.randomUUID());
         ServerPlayer second = player(helper, java.util.UUID.randomUUID());
-        ServerPlayer creative = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        ServerPlayer creative = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         var at = net.minecraft.world.phys.Vec3.atBottomCenterOf(helper.absolutePos(new net.minecraft.core.BlockPos(4, 2, 4)));
         first.setPos(at); second.setPos(at); creative.setPos(at);
         first.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);

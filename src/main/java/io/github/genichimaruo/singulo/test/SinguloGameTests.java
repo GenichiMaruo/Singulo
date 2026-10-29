@@ -38,14 +38,14 @@ public final class SinguloGameTests {
 
     private static MachineBlockEntity machine(GameTestHelper helper, MachineType type) {
         helper.setBlock(MACHINE, SinguloBlocks.MACHINES.get(type).get());
-        MachineBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, MACHINE);
+        MachineBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, MACHINE);
         be.energy().setEnergy(MachineType.ENERGY_CAPACITY);
         return be;
     }
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void kilnMakesSteel(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         kiln.items().setStackInSlot(0, new ItemStack(item("steel_blend")));
         helper.succeedWhen(() -> helper.assertTrue(
@@ -54,7 +54,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void kilnWithoutPowerWaits(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         kiln.energy().setEnergy(0);
         kiln.items().setStackInSlot(0, new ItemStack(item("steel_blend")));
@@ -66,7 +66,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void compressorMassModeMakesPellet(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         var recipes = MachineBlockEntity.massRecipes(helper.getLevel(), MachineType.COMPRESSOR);
         int index = -1;
@@ -89,7 +89,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void compressorMakesSteelPlate(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         compressor.items().setStackInSlot(0, new ItemStack(item("steel_ingot")));
         helper.succeedWhen(() -> helper.assertTrue(
@@ -98,7 +98,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 300)
     public static void assemblerMakesQuantumModule(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity assembler = machine(helper, MachineType.PRECISION_ASSEMBLER);
         assembler.items().setStackInSlot(0, new ItemStack(item("entangled_element"), 5));
         assembler.items().setStackInSlot(5, new ItemStack(item("basic_circuit")));
@@ -112,7 +112,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void electrolyzerSplitsWater(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
         electrolyzer.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
         helper.succeedWhen(() -> {
@@ -128,7 +128,7 @@ public final class SinguloGameTests {
     /** 圧縮機で方解石を砕くと石灰粉が2個。石灰粉はセラミックの骨粉の代わり（タグ singulo:ceramic_flux）になる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void compressorCrushesCalciteIntoLimestonePowder(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         compressor.items().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.CALCITE));
         helper.assertTrue(new ItemStack(item("limestone_powder")).is(net.minecraft.tags.TagKey.create(
@@ -142,7 +142,7 @@ public final class SinguloGameTests {
     /** 圧縮機で木炭3個を砕くと炭素粉が2個。炭素粉は鋼の素などで石炭の代わり（タグ singulo:carbon）になる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void compressorTurnsCharcoalIntoCarbonDust(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         compressor.items().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.CHARCOAL, 3));
         helper.assertTrue(new ItemStack(item("carbon_dust")).is(net.minecraft.tags.TagKey.create(
@@ -157,7 +157,7 @@ public final class SinguloGameTests {
     /** 隕鉄の原石は、溶鉱炉だけでなく焼成炉でも隕鉄インゴットに焼ける。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void kilnSmeltsRawMeteoricIron(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
         kiln.items().setStackInSlot(0, new ItemStack(item("raw_meteoric_iron")));
@@ -168,7 +168,7 @@ public final class SinguloGameTests {
     /** 純酸素転炉: 焼成炉に鉄2・石炭1・酸素250 mB で鋼鉄インゴット2。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void kilnBlowsOxygenIntoSteel(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
         kiln.items().setStackInSlot(0, new ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 2));
@@ -183,7 +183,7 @@ public final class SinguloGameTests {
     /** 蛍光体: 焼成炉で未焼成の蛍光体を焼くと、グロウストーンダスト4個。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void kilnFiresPhosphorIntoGlowstone(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity kiln = machine(helper, MachineType.KILN);
         helper.onEachTick(() -> kiln.energy().setEnergy(MachineType.ENERGY_CAPACITY));
         kiln.items().setStackInSlot(0, new ItemStack(item("unfired_phosphor")));
@@ -196,7 +196,7 @@ public final class SinguloGameTests {
     /** ペルチェ冷却器: 水1,000 mB を凍らせて氷1個。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void peltierCoolerFreezesWater(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity cooler = machine(helper, MachineType.PELTIER_COOLER);
         helper.onEachTick(() -> cooler.energy().setEnergy(MachineType.ENERGY_CAPACITY));
         cooler.automationFluids().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
@@ -207,7 +207,7 @@ public final class SinguloGameTests {
     /** 圧縮機で鉄のチェストプレート（インゴット8個）を砕くと、鉄の塊48個（インゴット約5個ぶん）。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void compressorRecyclesIronArmor(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity compressor = machine(helper, MachineType.COMPRESSOR);
         helper.onEachTick(() -> compressor.energy().setEnergy(MachineType.ENERGY_CAPACITY));
         ItemStack worn = new ItemStack(net.minecraft.world.item.Items.IRON_CHESTPLATE);
@@ -225,7 +225,7 @@ public final class SinguloGameTests {
      */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void electrolyzerHydrogenCostIgnoresMonopole(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
         electrolyzer.items().setStackInSlot(MachineType.ELECTROLYZER.upgradeSlot(), new ItemStack(item("monopole_upgrade")));
         helper.onEachTick(() -> electrolyzer.energy().setEnergy(MachineType.ENERGY_CAPACITY));
@@ -245,7 +245,7 @@ public final class SinguloGameTests {
     /** 待機の理由:空・作れない材料・液体不足（何がいくつ足りないか）を見分ける。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void idleMachineExplainsWhy(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         var none = java.util.List.<FluidStack>of(FluidStack.EMPTY, FluidStack.EMPTY, FluidStack.EMPTY);
         var empty = io.github.genichimaruo.singulo.machine.MachineDiagnosis.idle(level, MachineType.ELECTROLYZER, java.util.List.of(), none, -1);
@@ -263,7 +263,7 @@ public final class SinguloGameTests {
     /** 液体キャニスター: 水を注いで電解槽を動かし、空いたキャニスターで水素を汲む。重ねたままでは出し入れしない。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void fluidCanisterCarriesAnyFluid(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity electrolyzer = machine(helper, MachineType.ELECTROLYZER);
         ItemStack canister = new ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.FLUID_CANISTER.get());
         helper.assertTrue(io.github.genichimaruo.singulo.item.FluidCanisterItem.handler(canister.copyWithCount(2))
@@ -285,7 +285,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void archiveCopiesObservationLog(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity archive = machine(helper, MachineType.ARCHIVE_TERMINAL);
         archive.items().setStackInSlot(0, new ItemStack(item("observation_log")));
         archive.items().setStackInSlot(1, new ItemStack(item("blank_data_card"), 4));
@@ -300,7 +300,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 500)
     public static void archiveRestoresControlUnit(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         MachineBlockEntity archive = machine(helper, MachineType.ARCHIVE_TERMINAL);
         archive.items().setStackInSlot(0, new ItemStack(item("degraded_control_unit")));
         archive.items().setStackInSlot(1, new ItemStack(item("basic_circuit")));
@@ -316,7 +316,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void usesWearAndRepairLimit(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         ItemStack unit = new ItemStack(item("control_unit"));
         ItemStack worn = UsesHelper.consume(unit, 16);
         helper.assertTrue(worn.is(item("degraded_control_unit")), "使い切ったら劣化品に戻る");
@@ -339,11 +339,11 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void thermoelectricCampfireBlueIce(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.CAMPFIRE);
         helper.setBlock(MACHINE.east(), Blocks.BLUE_ICE);
-        ThermoelectricGeneratorBlockEntity gen = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, MACHINE);
+        ThermoelectricGeneratorBlockEntity gen = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, MACHINE);
         helper.runAtTickTime(60, () -> {
             // 焚き火 800 K と青氷 243 K → ΔT 557 K、0.10 × 557 ≈ 55.7 FE/t。最初の走査まで（テスト開始のずれを含めて）最大20 tick かかる
             int energy = gen.energy().getEnergyStored();
@@ -355,7 +355,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 400)
     public static void thermoelectricLavaMeltsIce(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(MACHINE, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(MACHINE.west(), Blocks.MAGMA_BLOCK);
         helper.setBlock(MACHINE.east(), Blocks.SNOW_BLOCK);
@@ -365,7 +365,7 @@ public final class SinguloGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void copperWireCarriesPower(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos gen = new BlockPos(1, 1, 1);
         helper.setBlock(gen, SinguloBlocks.THERMOELECTRIC_GENERATOR.get());
         helper.setBlock(gen.west(), Blocks.CAMPFIRE);
@@ -375,17 +375,17 @@ public final class SinguloGameTests {
         }
         BlockPos kilnPos = new BlockPos(5, 1, 1);
         helper.setBlock(kilnPos, SinguloBlocks.MACHINES.get(MachineType.KILN).get());
-        MachineBlockEntity kiln = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, kilnPos);
+        MachineBlockEntity kiln = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, kilnPos);
         helper.succeedWhen(() -> helper.assertTrue(kiln.energy().getEnergyStored() > 200,
                 "導線の先の焼成炉に電力が届かない: " + kiln.energy().getEnergyStored()));
     }
     /** Odd hydrogen amounts must not create credit for gas that was never removed from the tank. */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 30)
     public static void fuelCellKeepsUnpairedHydrogenUntilOxygenPairIsComplete(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.HYDROGEN_FUEL_CELL.get());
-        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        io.github.genichimaruo.singulo.machine.HydrogenFuelCellBlockEntity cell = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         cell.fluids().fill(new FluidStack(SinguloFluids.get("hydrogen"), 3), IFluidHandler.FluidAction.EXECUTE);
         cell.fluids().fill(new FluidStack(SinguloFluids.get("oxygen"), 2), IFluidHandler.FluidAction.EXECUTE);
         helper.runAtTickTime(5, () -> {
@@ -406,7 +406,7 @@ public final class SinguloGameTests {
     /** 張り替えで余った下位のケーブル: 銅導線は焼成炉で銅に戻り、超伝導ケーブル・トポロジカル導線の材料にもなる。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void spareCablesAreRecycled(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var recipes = helper.getLevel().getRecipeManager();
         helper.assertTrue(recipes.byKey(Singulo.id("crafting/superconducting_cable_from_copper_wire")).isPresent(), "銅導線で超伝導ケーブルを作れない");
         helper.assertTrue(recipes.byKey(Singulo.id("cryogenic_cooling_tower/topological_wire_from_superconducting_cable")).isPresent(),

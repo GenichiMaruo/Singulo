@@ -48,14 +48,14 @@ public final class RuinGameTests {
 
     private static RuinCacheBlockEntity cache(GameTestHelper helper, String ruin) {
         helper.setBlock(POS, SinguloBlocks.RUIN_CACHE.get());
-        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
+        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, POS);
         cache.setRuin(ruin);
         return cache;
     }
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void observationPostCacheHoldsOneExpedition(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         RuinCacheBlockEntity cache = cache(helper, "observation_post");
         cache.refillIfDue(helper.getLevel(), 1000);
         int logs = count(cache, item("observation_log"));
@@ -67,7 +67,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void cacheRegeneratesAfterSevenDays(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         RuinCacheBlockEntity cache = cache(helper, "observation_post");
         long t = 1000;
         cache.refillIfDue(helper.getLevel(), t);
@@ -82,7 +82,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void dormantSeedOnlyOnFirstFill(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         RuinCacheBlockEntity cache = cache(helper, "final_lab");
         cache.refillIfDue(helper.getLevel(), 0);
         helper.assertTrue(count(cache, item("dormant_singularity_seed")) == 1, "初回に休眠した特異点の種が1個入らない");
@@ -97,9 +97,9 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void guardDockLaunchesTieredDrones(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(POS, SinguloBlocks.RUIN_GUARD_DOCK.get());
-        GuardDockBlockEntity dock = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, POS);
+        GuardDockBlockEntity dock = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, POS);
         for (int tier = 1; tier <= 3; tier++) {
             dock.setTier(tier);
             dock.launch(helper.getLevel());
@@ -117,7 +117,7 @@ public final class RuinGameTests {
 
     @GameTest(template = EMPTY)
     public static void droneBoltsAreReducedByArmor(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above());
         var bare = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS.east(2));
         var armored = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS.west(2));
@@ -144,33 +144,36 @@ public final class RuinGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY, timeoutTicks = 160)
+    @GameTest(template = "huge", batch = "drone_altitude", timeoutTicks = 240)
     public static void healthyDroneDescendsAndCannotShootFromHighAbove(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 12, 3));
-        // Other simultaneous fixtures create players. Keep this altitude test's
-        // manually assigned target instead of letting player acquisition replace it.
-        var selectors = net.minecraft.world.entity.Mob.class.getDeclaredField("targetSelector");
-        selectors.setAccessible(true);
-        ((net.minecraft.world.entity.ai.goal.GoalSelector) selectors.get(drone)).removeAllGoals(goal -> true);
-        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS);
+        // All flight coordinates belong to the template: its chunks are already entity-ticking.
+        // Teleporting into a separately forced, still-loading chunk races that guarantee.
+        BlockPos floor = new BlockPos(7, 0, 7);
+        for (BlockPos pos : BlockPos.betweenClosed(0, 0, 0, 14, 0, 14)) {
+            helper.setBlock(pos, net.minecraft.world.level.block.Blocks.STONE);
+        }
+        var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), floor.above(12));
+        var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, floor.above());
         target.setNoAi(true); target.setNoGravity(true);
+        io.github.genichimaruo.singulo.test.harness.TestScope.of(helper).defer(() -> {
+            drone.discard(); target.discard();
+        });
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);
         target.setHealth(1000); drone.setTarget(target);
         var shoot = SecurityDrone.class.getDeclaredMethod("shoot", net.minecraft.world.entity.LivingEntity.class);
         shoot.setAccessible(true); shoot.invoke(drone, target);
         helper.assertTrue(helper.getLevel().getEntitiesOfClass(io.github.genichimaruo.singulo.ruin.HorizonBolt.class,
                 drone.getBoundingBox().inflate(3), bolt -> bolt.getOwner() == drone).isEmpty(), "高空から射撃できてしまう");
-        helper.runAtTickTime(120, () -> {
+        helper.succeedWhen(() -> {
+            helper.assertTrue(drone.tickCount >= 120, "Waiting for 120 actual drone ticks");
             helper.assertFalse(drone.crippled(), "高度検査中に壊れかけになった");
             helper.assertTrue(drone.getY() <= target.getY() + 2.8, "健康なドローンが高空に留まる: " + (drone.getY() - target.getY()));
-            drone.discard(); target.discard(); helper.succeed();
         });
     }
 
     @GameTest(template = EMPTY)
     public static void droneRamAndPulsePreserveVictimMovement(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above()); drone.setTier(3);
         var target = helper.spawn(net.minecraft.world.entity.EntityType.ZOMBIE, POS.east());
         var movement = new net.minecraft.world.phys.Vec3(0.13, 0.21, -0.17);
@@ -196,7 +199,7 @@ public final class RuinGameTests {
     /** 体力が半分を切ったドローンは壊れかけになり、地面から1.5ブロックより上へは飛べない（高い所にいれば沈む）。 */
     @GameTest(template = EMPTY, timeoutTicks = 120)
     public static void crippledDroneFliesLow(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         SecurityDrone drone = helper.spawn(io.github.genichimaruo.singulo.registry.SinguloEntities.SECURITY_DRONE.get(), new BlockPos(3, 6, 3));
         drone.setTier(1);
         helper.assertFalse(drone.crippled(), "無傷のドローンが壊れかけになっている");
@@ -211,7 +214,7 @@ public final class RuinGameTests {
 
     @GameTest(template = EMPTY)
     public static void droneDropsNothing(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         SecurityDrone drone = helper.spawn(SinguloEntities.SECURITY_DRONE.get(), POS.above());
         drone.setTier(3);
         helper.assertTrue(drone.getMaxHealth() == 24, "段階3のドローンはHP24");
@@ -225,7 +228,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void detectorDescribesDirectionAndBand(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos origin = new BlockPos(0, 64, 0);
         // サーバー側の翻訳に頼らないよう、翻訳キーで確かめる
         String northeast = translationKeys(GravitationalWaveDetectorBlockEntity.describe(origin, new BlockPos(400, 64, -400)));
@@ -253,7 +256,7 @@ public final class RuinGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void ruinTemplatesHaveCacheAndGuards(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         // 地下アンドロイド研究所は部屋の型紙を並べるので、LabGameTests で確かめる
         for (String ruin : List.of("observation_post", "research_building", "culture_facility", "final_lab", "sunken_reactor")) {
             Optional<StructureTemplate> template = helper.getLevel().getStructureManager().get(Singulo.id("ruins/" + ruin));
@@ -288,7 +291,7 @@ public final class RuinGameTests {
     /** /singulo ruin と同じ置き方で、遺構を丸ごと建てられる（保管庫に遺構IDが入る）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void ruinCommandPlacesRuin(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos center = helper.absolutePos(new BlockPos(4, 1, 4));
         net.minecraft.core.Vec3i size = io.github.genichimaruo.singulo.command.SinguloCommands.placeRuin(
                 helper.getLevel(), "observation_post", center);
@@ -307,12 +310,12 @@ public final class RuinGameTests {
     /** 探索コンパスは、攻略した遺構の保管庫で調整するまで、次の遺構を探せない。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void compassUnlocksNextRuinOnlyAfterClearing(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.RUIN_CACHE.get());
-        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        RuinCacheBlockEntity cache = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         cache.setRuin("observation_post");
-        var player = TestBuild.mockPlayer(helper);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         player.setShiftKeyDown(true);
         net.minecraft.world.item.ItemStack compass = new net.minecraft.world.item.ItemStack(
                 io.github.genichimaruo.singulo.registry.SinguloItems.EXPLORER_COMPASS.get());

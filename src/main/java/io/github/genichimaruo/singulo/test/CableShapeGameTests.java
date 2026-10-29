@@ -21,7 +21,7 @@ public final class CableShapeGameTests {
 
     @GameTest(setupTicks = 20, template = "empty")
     public static void straightCableKeepsProfile(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (int z = 1; z <= 3; z++) {
             helper.setBlock(new BlockPos(3, 1, z), SinguloBlocks.TOPOLOGICAL_WIRE.get());
         }

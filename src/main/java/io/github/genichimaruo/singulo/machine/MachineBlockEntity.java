@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -50,7 +50,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
      */
     public static final int D_PROGRESS = 0, D_MAX_PROGRESS = 1, D_ENERGY = 2, D_CAPACITY = 3, D_USAGE = 4,
             D_STATUS = 5, D_MODE = 6, D_MASS = 7, D_MASS_TARGET = 8, D_STRUCTURE = 9, D_FLAGS = 10, D_SELECTED = 11,
-            D_TANKS = 12;
+            D_LOADED_ITEM = 12, D_LOADED_FILL = 13, D_TANKS = 14;
     /** 動かす（電源スイッチ）・材料なしのレシピも作る・材料なしのレシピがある。 */
     public static final int FLAG_ENABLED = 1, FLAG_MAKE_FREE = 2, FLAG_HAS_FREE = 4;
 
@@ -58,6 +58,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     private final ItemStackHandler items;
     /** Exhausted recipe tools waiting for space in the normal output slots. */
     private final java.util.BitSet pendingReturns = new java.util.BitSet();
+    /** 触媒の装填（触媒スロットのある装置だけ使う）。触媒スロットは予備の置き場で、使う1個は中に装填する。 */
+    private final CatalystMagazine magazine = new CatalystMagazine(this::markDirty);
     private final FluidTank[] tanks;
     private final SinguloEnergyStorage energy;
     private final IItemHandler automationItems;
@@ -116,13 +118,15 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
             @Override
             protected int getStackLimit(int slot, ItemStack stack) {
-                return (slot < type.inputSlots() || slot == type.catalystSlot()) && UsesHelper.hasUses(stack)
-                        ? 1 : super.getStackLimit(slot, stack);
+                if (slot == type.catalystSlot()) {
+                    return Math.min(CatalystMagazine.SUPPLY_LIMIT, super.getStackLimit(slot, stack));
+                }
+                return slot < type.inputSlots() && UsesHelper.hasUses(stack) ? 1 : super.getStackLimit(slot, stack);
             }
 
             @Override
             public int getSlotLimit(int slot) {
-                return slot == type.upgradeSlot() || slot == type.catalystSlot() ? 1 : 64;
+                return slot == type.upgradeSlot() ? 1 : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
             }
         };
         this.tanks = new FluidTank[type.tanks()];
@@ -183,6 +187,24 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     /** オーバークロック・チップが挿さっているか（処理速度×3、電力×4）。 */
     public boolean hasOverclock() {
         return isOverclockChip(items.getStackInSlot(type.upgradeSlot()));
+    }
+
+    /** 触媒の装填。 */
+    public CatalystMagazine magazine() {
+        return magazine;
+    }
+
+    /** いま使っている触媒（装填中のもの。まだなければ予備のいちばん上）。触媒スロットのない装置では空。 */
+    public ItemStack catalyst() {
+        return type.hasCatalystSlot() ? magazine.current(items, type.catalystSlot()) : ItemStack.EMPTY;
+    }
+
+    /** 画面から: 装填中の触媒をプレイヤーへ取り出す。 */
+    public void ejectLoaded(net.minecraft.world.entity.player.Player player) {
+        ItemStack out = magazine.eject();
+        if (!out.isEmpty() && !player.getInventory().add(out)) {
+            player.drop(out, false);
+        }
     }
 
     /** そのスロットにそのアイテムを入れてよいか（触媒は専用スロットだけ、アップグレードはアップグレード枠だけ）。 */
@@ -471,6 +493,10 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     protected void tick(Level level, BlockPos pos, BlockState state) {
         refreshRecipeSnapshot();
         flushReturns();
+        if (type.hasCatalystSlot()) {
+            // 失活触媒・外した使いかけは出力スロットへ。予備との合流・入れ替え・装填もここで
+            magazine.tick(items, type.catalystSlot(), s -> insertOutput(s, false));
+        }
         if (level.getGameTime() % 10 == 0 && usesSideConfig()) {
             autoEject(level);
         }
@@ -621,6 +647,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             }
             if (hasOverclock()) {
                 speed *= 3;
+            }
+            // 上位の触媒で払うレシピは速く進む
+            MachineRecipe.Plan plan = found.value().plan(found.value().isMassRecipe() ? inputsExceptMassSlot() : inputs);
+            if (plan != null) {
+                speed *= plan.speed();
             }
             maxProgress = Math.max(1, (int) Math.round(found.value().time() / speed));
             if (fixedEnergyPerCraft(found.value())) {
@@ -778,7 +809,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         List<ItemStack> list = new ArrayList<>(type.recipeSlots());
         for (int i = 0; i < type.recipeSlots(); i++) {
             int slot = type.recipeSlot(i);
-            list.add(pendingReturns.get(slot) ? ItemStack.EMPTY : items.getStackInSlot(slot));
+            if (slot == type.catalystSlot()) {
+                list.add(magazine.pooled(items, slot));              // 触媒は装填中のものと予備の同じ触媒を合わせた残りで照合する
+            } else {
+                list.add(pendingReturns.get(slot) ? ItemStack.EMPTY : items.getStackInSlot(slot));
+            }
         }
         return list;
     }
@@ -958,6 +993,21 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         }
         for (int i = 0; i < type.recipeSlots(); i++) {
             int slot = type.recipeSlot(i);
+            if (slot == type.catalystSlot()) {
+                if (plan.uses()[i] > 0) {
+                    if (magazine.loaded().isEmpty()) {
+                        magazine.tick(items, slot, s -> insertOutput(s, false));
+                    }
+                    magazine.consume(plan.uses()[i], items, slot);
+                }
+                for (int k = 0; k < plan.consume()[i]; k++) {
+                    // 触媒そのものを材料として使う: 装填中のものから（なければ予備から）
+                    if (magazine.eject().isEmpty()) {
+                        items.extractItem(slot, 1, false);
+                    }
+                }
+                continue;
+            }
             if (plan.uses()[i] > 0) {
                 ItemStack used = UsesHelper.consume(items.getStackInSlot(slot), plan.uses()[i]);
                 items.setStackInSlot(slot, used);
@@ -1051,6 +1101,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             case D_MASS_TARGET -> massTarget();
             case D_STRUCTURE -> structureSize();
             case D_SELECTED -> selectedIndex() + 1;
+            case D_LOADED_ITEM -> magazine.loadedItemId();
+            case D_LOADED_FILL -> Math.round(magazine.fill() * 1000);
             case D_FLAGS -> (enabled ? FLAG_ENABLED : 0) | (makeFree ? FLAG_MAKE_FREE : 0) | (hasFree ? FLAG_HAS_FREE : 0);
             default -> {
                 if (index >= sidesIndex(type)) {
@@ -1103,6 +1155,9 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         for (int i = 0; i < items.getSlots(); i++) {
             Block.popResource(level, pos, items.getStackInSlot(i));
         }
+        for (ItemStack s : magazine.contents()) {
+            Block.popResource(level, pos, s);
+        }
         hydrogenLeak(level, pos);
     }
 
@@ -1150,6 +1205,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         tag.putLong("inputs_changed_at", inputsChangedAt);
         tag.put("items", items.serializeNBT());
         tag.putIntArray("pending_returns", pendingReturns.stream().toArray());
+        tag.put("magazine", magazine.save());
         tag.putIntArray("slot_layout", new int[]{type.inputSlots(), type.outputSlots()});
         tag.putInt("item_sides", itemSides.packed());
         tag.putBoolean("eject_master", true);
@@ -1193,6 +1249,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
+        magazine.load(tag.getCompound("magazine"));
         // スロット数が変わった古いデータでも読めるよう、いったん別の入れ物に読んでから写す
         ItemStackHandler loaded = new ItemStackHandler();
         loaded.deserializeNBT(tag.getCompound("items"));
@@ -1276,7 +1333,12 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return slot < type.inputSlots() || slot == type.catalystSlot() ? items.insertItem(slot, stack, simulate) : stack;
+            if (slot == type.catalystSlot()) {
+                // 予備の新品に重ならない使いかけの触媒は、装填中のものと合わせて受け取る
+                ItemStack rest = items.insertItem(slot, stack, simulate);
+                return !rest.isEmpty() && magazine.absorb(rest, items, slot, simulate) ? ItemStack.EMPTY : rest;
+            }
+            return slot < type.inputSlots() ? items.insertItem(slot, stack, simulate) : stack;
         }
 
         @Override

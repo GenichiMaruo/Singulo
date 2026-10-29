@@ -4,7 +4,7 @@ import gzip
 import struct
 from pathlib import Path
 
-OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "main" / "resources" / "data" / "singulo" / "structures"
+OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "gameTest" / "resources" / "data" / "singulo" / "structures"
 # 名前 → (幅, 高さ, 奥行き)
 TEMPLATES = {"empty": (8, 8, 8), "tall": (5, 13, 5), "large": (9, 11, 9), "huge": (15, 15, 15), "reactor_isolated": (64, 15, 64), "crater": (64, 24, 64)}
 DATA_VERSION = 3465  # 1.20.1
@@ -65,7 +65,7 @@ def main():
     write("empty", *TEMPLATES["empty"], namespace="singulo_reactor")
     write("reactor_isolated", *TEMPLATES["reactor_isolated"], namespace="singulo_reactor")
     # 分けて実行する群も同じ空テンプレートを使う。寸法変更時に複製を取り残さない。
-    for namespace, templates in {'singulo_mekanism': ('empty',), 'singulo_prototype': ('empty', 'huge'),
+    for namespace, templates in {'singulo_scaling': ('empty',), 'singulo_mekanism': ('empty',), 'singulo_prototype': ('empty', 'huge'),
                                  'singulo_progression': ('empty',), 'singulo_lab': ('empty', 'huge'), 'singulo_rayleigh': ('empty',), 'singulo_panel_review': ('empty',), 'singulo_cable': ('empty', 'tall', 'huge')}.items():
         target = OUT_DIR.parent.parent / namespace / 'structures'
         target.mkdir(parents=True, exist_ok=True)

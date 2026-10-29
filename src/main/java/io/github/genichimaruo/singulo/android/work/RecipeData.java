@@ -1,9 +1,11 @@
 package io.github.genichimaruo.singulo.android.work;
 
+import net.minecraft.core.HolderLookup;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.core.NonNullList;
 
 import net.minecraft.nbt.CompoundTag;
@@ -68,7 +70,16 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
 
     /** 材料の文字を読んだもの（何度も読まないように）。 */
     private static final java.util.Map<String, java.util.Optional<net.minecraft.world.item.crafting.Ingredient>> ALT_CACHE =
-            new java.util.concurrent.ConcurrentHashMap<>();
+            java.util.Collections.synchronizedMap(new java.util.LinkedHashMap<>(128, 0.75F, true) {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<String, java.util.Optional<net.minecraft.world.item.crafting.Ingredient>> e) {
+                    return size() > 1024;
+                }
+            });
+
+    public static void clearAlternatives() {
+        ALT_CACHE.clear();
+    }
 
     /**
      * 加工モードで、装置のどの面から入れ・取り出し・燃料を入れるか（役目ごとに3ビット: 入れる面、取り出す面、燃料の面）。
@@ -384,6 +395,11 @@ public record RecipeData(String mode, List<ItemStack> grid, ItemStack output, Li
             net.minecraft.world.item.crafting.Ingredient alt = processing() ? null : alt(i);
             if (alt != null) {
                 ItemCount.addAlt(out, s, 1, alt);          // 同じ種類の別の物も使う
+            } else if (io.github.genichimaruo.singulo.item.UsesItem.isCatalyst(s)) {
+                // 触媒は、使いかけでも同じ物として数える（寿命の短いものから使う）
+                ItemStack fresh = s.copyWithCount(1);
+                io.github.genichimaruo.singulo.registry.SinguloComponents.remove(fresh, io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get());
+                ItemCount.addAlt(out, fresh, processing() ? s.getCount() : 1, net.minecraft.world.item.crafting.Ingredient.of(s.getItem()));
             } else {
                 ItemCount.add(out, FluidSamples.key(s), processing() ? FluidSamples.amount(s) : 1);
             }

@@ -3048,8 +3048,8 @@
     "translation": "爐實現了那個願望。城市、山巒、海洋，盡皆如此。留下的，只有重力的異常與記錄。"
   },
   "ending.singulo.line.3": {
-    "source": "You read those records and lit the same fire. And you never let go of the hand that stops the feed.",
-    "translation": "你讀了那些記錄，在同樣的爐中點起了火。而你，始終沒有放開那隻停止投料的手。"
+    "source": "You read those records and lit the same fire. And you never forgot to stop when it was time to stop.",
+    "translation": "你讀了那些記錄，在同樣的爐中點起了火。而你，始終記得在該停下的時候停下。"
   },
   "ending.singulo.line.4": {
     "source": "And now the energy has become mass again, then stars, then a galaxy.",
@@ -3115,6 +3115,10 @@
     "source": "Awakened Ergosphere Leviathan",
     "translation": "覺醒的能層巨蛇"
   },
+  "entity.singulo.ergosphere_leviathan.hatchling": {
+    "source": "Ergosphere Serpent",
+    "translation": "能層之蛇"
+  },
   "entity.singulo.ergosphere_leviathan.wyrm": {
     "source": "Ergosphere Wyrm",
     "translation": "能層之龍"
@@ -3134,6 +3138,10 @@
   "entity.singulo.gravity_debris": {
     "source": "Gravity Debris",
     "translation": "瓦礫"
+  },
+  "entity.singulo.infalling_block": {
+    "source": "Infalling Block",
+    "translation": "墜入的方塊"
   },
   "entity.singulo.gravity_remnant": {
     "source": "Gravity Remnant",
@@ -3928,8 +3936,8 @@
     "translation": "記錄，只有在有人閱讀時才成為記錄。"
   },
   "gui.singulo.archivist.death_3": {
-    "source": "Thank you. Never let go of the hand that stops the feed.",
-    "translation": "謝謝你。請不要放開那隻停止投料的手。"
+    "source": "Thank you. Please be someone who can stop when it is time to.",
+    "translation": "謝謝你。請做一個在該停下時能夠停下的人。"
   },
   "gui.singulo.archivist.emerge_1": {
     "source": "...Someone has read the records.",
@@ -4763,10 +4771,6 @@
     "source": "The Leviathan dives into the core vortex. The vortex widens and swallows the light...",
     "translation": "巨蛇潛入了爐心的漩渦。漩渦擴張，光被吸了進去……"
   },
-  "gui.singulo.leviathan.swallow": {
-    "source": "--The floor splits and colossal jaws swallow it whole. The Ergosphere Leviathan rises",
-    "translation": "——地板裂開，巨大的顎將牠一口吞下。能層巨蛇現身了"
-  },
   "gui.singulo.leviathan.tide": {
     "source": "The core vortex opens and drags everything in... Run against the pull!",
     "translation": "爐心之渦張開，吞噬一切……逆著引力向外跑！"
@@ -5038,6 +5042,10 @@
   "gui.singulo.reason.need_item": {
     "source": "- %s: %s more needed",
     "translation": "・%s：還需要 %s 個"
+  },
+  "gui.singulo.reason.need_lifetime": {
+    "source": "- %s with at least %s of lifetime left",
+    "translation": "・需要 %s（剩餘壽命至少 %s）"
   },
   "gui.singulo.reason.need_uses": {
     "source": "- %s with at least %s uses left",
@@ -5427,6 +5435,10 @@
     "source": "- %s x%s",
     "translation": "・%s ×%s"
   },
+  "gui.singulo.select.lifetime": {
+    "source": "- %s (%s of lifetime)",
+    "translation": "・%s（壽命 %s）"
+  },
   "gui.singulo.select.restore": {
     "source": "- Restores: %s",
     "translation": "・修復對象：%s"
@@ -5655,6 +5667,30 @@
     "source": "Side %s",
     "translation": "邊長 %s"
   },
+  "gui.singulo.supply_port.entry": {
+    "source": "Priority item",
+    "translation": "優先物品"
+  },
+  "gui.singulo.supply_port.entry.hint": {
+    "source": "Click with an item to register it (click empty-handed to clear)",
+    "translation": "手持物品點擊即可登記（空手點擊則清除）"
+  },
+  "gui.singulo.supply_port.mode.0": {
+    "source": "Priority for taking and returning",
+    "translation": "取出和歸還時優先"
+  },
+  "gui.singulo.supply_port.mode.1": {
+    "source": "Priority for taking",
+    "translation": "取出時優先"
+  },
+  "gui.singulo.supply_port.mode.2": {
+    "source": "Priority for returning",
+    "translation": "歸還時優先"
+  },
+  "gui.singulo.supply_port.rank": {
+    "source": "Priority %s (1 goes first)",
+    "translation": "優先順序 %s（1 最先）"
+  },
   "gui.singulo.supporters.count": {
     "source": "Supporters: %s / 100",
     "translation": "支持者：%s / 100"
@@ -5882,6 +5918,10 @@
   "gui.singulo.work_console.error.capacity": {
     "source": "No chosen android can carry the materials for %s at once (a backpack is needed, or a Tank Upgrade for fluids)",
     "translation": "沒有能一次搬運 %s 所需材料的仿生人（需要背包，流體則需要儲罐升級）"
+  },
+  "gui.singulo.work_console.error.limit": {
+    "source": "Order too complex. Stock intermediates and split the order",
+    "translation": "訂單過於複雜。請準備中間材料並拆分訂單"
   },
   "gui.singulo.work_console.error.loop": {
     "source": "The recipes loop",
@@ -6384,8 +6424,8 @@
     "translation": "組裝站的升級"
   },
   "guide.singulo.androids.work.body": {
-    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
-    "translation": "可以把工作台的合成交給自己的仿生人。\n1. 放置仿生人作業指令台，用作業位置卡潛行右鍵來記錄它。用這張卡右鍵配方架（要增加的話還有資材口和交付口），就會連接到指令台（64 格以內）。\n2. 在指令台（和資材口）旁邊放箱子（資材存放處）。仿生人會到實際放有材料的地方去取。成品會送到下單時選擇的交付目標（指令台的交付箱或命名過的交付口）。\n3. 在指令台的「記錄」的 3×3 中擺放樣本（物品不會減少，也可用 JEI 的「+」），記錄到配方卡上。\n4. 在配方架某一行的左邊放記錄了工作台的作業位置卡，右邊排列配方卡。\n5. 在指令台的「訂單」中選擇物品和數量，確認材料足夠，選擇仿生人後開始作業。有配方的中間材料也會自己製作。\n- 「新做」：開啟後，不使用庫存中的成品，而是新做訂購的數量（例如有 3 把鐵斧、還想要 2 把時，訂購「2」）。\n- 在訂單列表中，正在製作的物品會帶有橙色邊框。進行中訂單的「↻」可以再次訂購同一物品。等待材料的訂單會顯示缺少的物品和數量（把游標移到該行可看到全部）。\n- 從畫面下達的訂單在完成時、等待材料停止超過 1 分鐘時、被取消時，會在聊天欄通知下單的人。\n仿生人每次搬運 5 格（有背包時 +12、18 或 24）。作業中無法取出它的物品，訂單完成後會回到原來的行動方式。作業中的仿生人也可以承擔同一指令台的其他訂單（空閒時也會去做）。有無法到達的地方時，該訂單會被取消。"
+    "source": "Your androids can take over crafting table work.\n1. Place an Android Work Console and sneak-use a Work Location Card on it to record it. Use that card on recipe racks (and extra supply ports and delivery ports) to link them to the console (within 64 blocks).\n2. Put chests next to the console (or a supply port) as the stockpile. Androids go round the places that actually hold the materials. Finished orders go to the destination chosen in the order: the console's outbox or a named delivery port.\n3. In the console's Record tab, lay out a 3×3 pattern (nothing is used up; JEI's + button works too) and record it onto a recipe card.\n4. In a recipe rack row, put a Work Location Card holding a crafting table on the left and the recipe cards on the right.\n5. In the console's Order tab, pick an item and amount, check the materials are in stock, choose androids and press Start. Intermediate materials are crafted too when there is a recipe for them.\n- New: when on, finished items already in storage are not used and the whole amount is crafted new (for example, with 3 iron axes in storage, order 2 to get 2 more).\n- In the Order tab, items being made have an orange frame. The ↻ button on a running order orders the same item again. An order waiting for materials shows what is missing and how many (hover over the row for the full list).\n- Orders placed from the screen send the orderer a chat message when they finish, when they have been stuck waiting for materials for a minute, or when they are cancelled.\n- Supply port priorities: right-click a supply port to register up to 8 items, each with a priority (1 goes first) for taking, returning or both. Registered items are taken from and returned to the highest-priority port first (the next one when it is full). Sneak-right-click shows the linked console.\nAndroids carry 5 slots at a time (+12, 18 or 24 with a backpack). You cannot take items from a working android; when the order is done it goes back to its usual mode. A working android can also take on more orders from the same console and works on them when it is free. If a place cannot be reached, the order is cancelled.",
+    "translation": "可以把工作台的合成交給自己的仿生人。\n1. 放置仿生人作業指令台，用作業位置卡潛行右鍵來記錄它。用這張卡右鍵配方架（要增加的話還有資材口和交付口），就會連接到指令台（64 格以內）。\n2. 在指令台（和資材口）旁邊放箱子（資材存放處）。仿生人會到實際放有材料的地方去取。成品會送到下單時選擇的交付目標（指令台的交付箱或命名過的交付口）。\n3. 在指令台的「記錄」的 3×3 中擺放樣本（物品不會減少，也可用 JEI 的「+」），記錄到配方卡上。\n4. 在配方架某一行的左邊放記錄了工作台的作業位置卡，右邊排列配方卡。\n5. 在指令台的「訂單」中選擇物品和數量，確認材料足夠，選擇仿生人後開始作業。有配方的中間材料也會自己製作。\n- 「新做」：開啟後，不使用庫存中的成品，而是新做訂購的數量（例如有 3 把鐵斧、還想要 2 把時，訂購「2」）。\n- 在訂單列表中，正在製作的物品會帶有橙色邊框。進行中訂單的「↻」可以再次訂購同一物品。等待材料的訂單會顯示缺少的物品和數量（把游標移到該行可看到全部）。\n- 從畫面下達的訂單在完成時、等待材料停止超過 1 分鐘時、被取消時，會在聊天欄通知下單的人。\n・資材口的優先：右鍵點擊資材口，可登記最多 8 種物品，並為每種設定優先順序（1 最先）以及作用於取出、歸還還是兩者。已登記的物品會先從順序最高的資材口取出、先歸還到那裡（滿了就換下一個地方）。潛行右鍵點擊可顯示連接的指令台。\n仿生人每次搬運 5 格（有背包時 +12、18 或 24）。作業中無法取出它的物品，訂單完成後會回到原來的行動方式。作業中的仿生人也可以承擔同一指令台的其他訂單（空閒時也會去做）。有無法到達的地方時，該訂單會被取消。"
   },
   "guide.singulo.androids.work.title": {
     "source": "Work automation",
@@ -6395,17 +6435,25 @@
     "source": "Catalysts",
     "translation": "催化劑"
   },
+  "guide.singulo.catalysts.keys.body": {
+    "source": "Higher-stage machines use one fresh catalyst of the previous stage when you build them (put it in the Precision Assembler's catalyst slot; a higher-tier catalyst uses less).\n- Stage 3 machines (Entanglement Synthesizer, Laser Cooler, Quantum Heat Engine and more): muon catalyst\n- Stage 4 machines (Time Crystal Incubator, Autonomous Probe Station, Void Collector, multiblock controllers and more): BE condensate catalyst\n- Stage 5 machines: time crystal catalyst (mostly as Time Crystal Modules)\nThe machines that make the next tier's catalyst also need a guardian's spoils: the Laser Cooler (BE condensate) needs a Sentinel Projection Core from the Echo Sentinel, the Time Crystal Incubator (time crystal) needs a Degenerate Nucleus from the Gravity Remnant, and the Singularity Core starts from the Dormant Singularity Seed.",
+    "translation": "更高階段的裝置在製作時，會消耗上一階段的催化劑新品 1 個的壽命（放進精密組裝台的催化劑槽；更高級的催化劑消耗更少）。\n- 第 3 階段的裝置（量子糾纏合成器、雷射冷卻器、量子熱機等）：緲子催化劑\n- 第 4 階段的裝置（時間晶體培育槽、自動探測站、虛空收集器、多方塊結構的控制器等）：玻色凝聚態催化劑\n- 第 5 階段的裝置：時間晶體催化劑（多以時間晶體模組的形式）\n製作下一級催化劑的裝置還需要守衛的戰利品：雷射冷卻器（玻色凝聚態）需要回聲守衛的守衛投影核心，時間晶體培育槽（時間晶體）需要重力殘渣的簡併核，奇點核心則從休眠奇點種子開始。"
+  },
+  "guide.singulo.catalysts.keys.title": {
+    "source": "Catalysts as machine keys",
+    "translation": "作為裝置鑰匙的催化劑"
+  },
   "guide.singulo.catalysts.slots.body": {
-    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). Nothing else fits.\nA used-up catalyst becomes a spent catalyst. In the Catalytic Reactor, about 25% of it can be recovered as material for the catalyst one tier lower.",
-    "translation": "使用催化劑的裝置有只能放入催化劑的專用槽（介面中帶有催化劑標記的格子），其他物品放不進去。\n用盡的催化劑會變成失活催化劑。在催化反應器中，約 25% 可回收為低一級催化劑的材料。"
+    "source": "Machines that use catalysts have a dedicated slot that accepts only catalysts (the slot marked with a catalyst icon). It holds up to 16 of the same catalyst as a reserve.\nThe machine loads one, and the gauge under the slot shows what is left. When it is used up, the spent catalyst comes out (to the output slots on machines, to the exit on the left on catalyst devices) and the next one loads from the reserve right away, so nothing stops.\nAdd a partly used catalyst of the same kind and its remaining life is merged into the loaded one; the empty shell comes out as a spent catalyst. Add a different kind and the loaded one goes to the exit and is replaced. Click the slot while the reserve is empty to take out the loaded catalyst.\nIn the Catalytic Reactor, about 25% of a spent catalyst can be recovered as material for the catalyst one tier lower.",
+    "translation": "使用催化劑的裝置有只能放入催化劑的專用槽（介面中帶有催化劑標記的格子），可以疊放最多 16 個相同的催化劑作為備用。\n裝置會把其中一個裝填進去使用，槽下方的計量條顯示剩餘量。用盡後會送出失活催化劑（機器送到輸出槽，催化裝置送到左側的出口），並立刻從備用中裝填下一個，因此不會停機。\n放入用過一部分的同種催化劑時，剩餘壽命會併入裝填中的那個，空殼會作為失活催化劑送出。放入不同種類時，裝填中的會被退回出口並替換。備用為空時點擊槽，可以取出裝填中的催化劑。\n在催化反應器中，失活催化劑約 25% 可回收為低一級催化劑的材料。"
   },
   "guide.singulo.catalysts.slots.title": {
     "source": "Catalyst slots and recycling",
     "translation": "催化劑槽及回收"
   },
   "guide.singulo.catalysts.tiers.body": {
-    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed count or amount of life and the speed does not change (for example, a BE condensate catalyst takes one muon catalyst and 40 seconds).",
-    "translation": "緲子（2）、玻色凝聚態（3）、時間晶體（4）、奇點核心（5）。\n- 與裝置同級：標準\n- 高一級：速度 +25%，消耗 −20%（最多疊加到高兩級）\n- 低一級：速度 ×0.5，消耗 ×2（發電機輸出為額定的 25%）\n- 低兩級：無法使用\n剩餘越少，所需電力越多（最多 ×1.6）；電力低於 80% 時會因反應不完全而使消耗 ×1.5。\n這些規則適用於靠催化劑槽運轉的裝置（錨、穩定器、發電機、護盾等）。加工配方中作為材料列出的催化劑，只消耗固定數量或壽命，速度不變（例如：玻色凝聚態催化劑的加工需要 1 個緲子催化劑，耗時 40 秒）。"
+    "source": "Muon (2), BE condensate (3), time crystal (4), Singularity Core (5).\n- Same tier as the machine: standard\n- One tier higher: speed +25%, wear −20% (stacks up to two tiers higher)\n- One tier lower: ×0.5 speed, ×2 wear (generators run at 25% of their rated output)\n- Two tiers lower: unusable\nAs a catalyst wears down, the power it needs rises (up to ×1.6); below 80% power, incomplete reactions make it wear ×1.5 faster.\nThese rules apply to devices that run on a catalyst slot (anchors, stabilizers, generators, shields and so on). When a processing recipe lists a catalyst as an ingredient, it uses a fixed amount of life (a whole catalyst means one fresh catalyst's worth). Any catalyst of that tier or higher can pay: each tier higher wears 20% less and works 25% quicker (up to two tiers). Lower tiers cannot pay.",
+    "translation": "緲子（2）、玻色凝聚態（3）、時間晶體（4）、奇點核心（5）。\n- 與裝置同級：標準\n- 高一級：速度 +25%，消耗 −20%（最多疊加到高兩級）\n- 低一級：速度 ×0.5，消耗 ×2（發電機輸出為額定的 25%）\n- 低兩級：無法使用\n剩餘越少，所需電力越多（最多 ×1.6）；電力低於 80% 時會因反應不完全而使消耗 ×1.5。\n這些規則適用於靠催化劑槽運轉的裝置（錨、穩定器、發電機、護盾等）。加工配方中作為材料列出的催化劑，只消耗固定的壽命（整個 1 個即新品 1 個的壽命）。同級或更高級的催化劑都能支付：每高一級，消耗 −20%、速度 +25%（最多兩級）。低級的催化劑無法支付。"
   },
   "guide.singulo.catalysts.tiers.title": {
     "source": "Tiers and effects",
@@ -6756,8 +6804,8 @@
     "translation": "第三階段：量子"
   },
   "guide.singulo.stage3.flow.body": {
-    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler.\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds and culture data, move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
-    "translation": "這一階段要做的事：\n1. 製作量子糾纏合成器和雷射冷卻器。\n2. 用量子熱機發電（玻色凝聚態催化劑下 200 kFE/t；做出來之前可用緲子催化劑以 25% 試運轉）。\n3. 用雷射冷卻器製作玻色凝聚態催化劑（第 3 級）和光學晶格基板。\n4. 儘早放置深海壓力收集器，儲存高壓晶體（之後外殼和鐵砧需要約 30 個）。\n5. 在研究棟的保管庫調整探索羅盤，尋找封閉培養設施。收集時間晶體種子和培養資料（打倒深處的重力殘渣後保管庫會打開）。同樣的調整也能找到地下仿生人研究所。\n6. 備齊時間晶體種子和培養資料後，進入第 4 階段的時間晶體培育槽。\n容易卡住的地方：\n・封閉培養設施很難：有極低溫區域和強力警備機。備好防具和回復，帶上護衛仿生人。\n・被重力殘渣拋起：摔落很痛，重力靴或衝擊發電面板會有幫助。"
+    "source": "What to do:\n1. Build an Entanglement Synthesizer and a Laser Cooler (stage 3 machines each use one muon catalyst; the Laser Cooler also needs a Sentinel Projection Core from the Research Building's Echo Sentinel).\n2. Generate power with the Quantum Heat Engine (200 kFE/t on BE catalysts; until you have them, it test-runs at 25% on muon catalysts).\n3. Make BE condensate catalysts (tier 3) and optical lattice substrates in the Laser Cooler.\n4. Place Deep-Sea Pressure Collectors early and stockpile high-pressure crystals (shells and anvils need about 30 later).\n5. Tune the compass at the Research Building's cache and find the Culture Facility. Collect time crystal seeds and culture data (beat the Gravity Remnant at the back to open the cache). The same tuning also finds the Underground Android Laboratory.\n6. With seeds, culture data and a Degenerate Nucleus (dropped by the Gravity Remnant), move on to the Time Crystal Incubator of stage 4.\nCommon sticking points:\n- The Culture Facility is tough: it has a cryogenic section and strong security units. Bring armor, healing and your guard androids.\n- The Gravity Remnant throws you up: falls hurt, so Gravity Boots or Impact Generators help.",
+    "translation": "這一階段要做的事：\n1. 製作量子糾纏合成器和雷射冷卻器（第 3 階段的裝置各消耗 1 個緲子催化劑；雷射冷卻器還需要研究棟的回聲守衛掉落的守衛投影核心）。\n2. 用量子熱機發電（玻色凝聚態催化劑下 200 kFE/t；做出來之前可用緲子催化劑以 25% 試運轉）。\n3. 用雷射冷卻器製作玻色凝聚態催化劑（第 3 級）和光學晶格基板。\n4. 儘早放置深海壓力收集器，儲存高壓晶體（之後外殼和鐵砧需要約 30 個）。\n5. 在研究棟的保管庫調整探索羅盤，尋找封閉培養設施。收集時間晶體種子和培養資料（打倒深處的重力殘渣後保管庫會打開）。同樣的調整也能找到地下仿生人研究所。\n6. 備齊時間晶體種子、培養資料和簡併核（重力殘渣掉落）後，進入第 4 階段的時間晶體培育槽。\n容易卡住的地方：\n・封閉培養設施很難：有極低溫區域和強力警備機。備好防具和回復，帶上護衛仿生人。\n・被重力殘渣拋起：摔落很痛，重力靴或衝擊發電面板會有幫助。"
   },
   "guide.singulo.stage3.flow.title": {
     "source": "Stage 3 at a glance",
@@ -6808,8 +6856,8 @@
     "translation": "大型發電與自動化"
   },
   "guide.singulo.stage4.time.body": {
-    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
-    "translation": "培育槽在 12 分鐘的實際運轉時間內培育時間晶體。供電達到需求的 80%（24 kFE/t）以上時純度不變；低於此值的時間會降低純度和壽命。\n設備（爐心控制器、奇點封裝器、護盾塔核心等）使用時間晶體模組：精密組裝台從催化劑槽中的晶體切下新品壽命的 2/3（預設設定下為 30 分鐘），剩餘部分（預設 15 分鐘）可用於奇異物質或作為核心材料。剩餘壽命不足此值的晶體（用過的或純度低的）無法切割；壽命設定和預設會按比例改變所需量。兩台培育槽可避免設備用和運轉用相互爭奪。\n卡西米爾腔（5×5×5，頂部和底部為鏡面）製造奇異物質。"
+    "source": "The incubator grows time crystals over 8 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) into four modules from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
+    "translation": "培養槽以實際運行時間培育時間晶體，需8分鐘。供電達到需求的80%（24 kFE/t）以上時不降低純度；低於此值的時間占比會降低純度和壽命。\n爐心控制裝置、奇點封裝器、護盾塔核心等設備使用時間晶體模組。精密組裝台從催化劑槽中的晶體切取新品壽命的2/3（預設30分鐘），製成4個模組，餘下預設15分鐘仍可用於奇異物質加工或核心。剩餘壽命不足的晶體無法加工，壽命設定和預設也會按比例改變需求。建造與運行會爭用催化劑，建議準備兩個培養槽。\nC空腔是5×5×5的真空容器，頂底內側為鏡面，使用時間晶體催化劑製造奇異物質和軸子凝聚體。"
   },
   "guide.singulo.stage4.time.title": {
     "source": "Time crystals and exotic matter",
@@ -7896,8 +7944,8 @@
     "translation": "製造地：製作台（第 2 階段）"
   },
   "howto.singulo.smes_module": {
-    "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "製造地：精密組裝台（第 4 階段）"
+    "source": "Made in: Crafting Table (stage 4)",
+    "translation": "製作：工作台（階段4）"
   },
   "howto.singulo.steel_blend": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -9003,6 +9051,10 @@
     "source": "Found in",
     "translation": "發現於"
   },
+  "jei.singulo.lifetime": {
+    "source": "Uses %s of lifetime",
+    "translation": "消耗 %s 壽命"
+  },
   "jei.singulo.mass": {
     "source": "Mass %s",
     "translation": "質量 %1$s"
@@ -9066,6 +9118,10 @@
   "jei.singulo.uses": {
     "source": "Uses %s",
     "translation": "消耗 %1$s 次使用次數"
+  },
+  "jei.singulo.higher_tier": {
+    "source": "A higher-tier catalyst also works (each tier: −20%% wear, +25%% speed)",
+    "translation": "更高階的催化劑也可以（每高一階：損耗−20%%、速度+25%%）"
   },
   "key.categories.singulo": {
     "source": "Singulo",
@@ -9688,8 +9744,8 @@
     "translation": "點火記錄（片段）"
   },
   "record.singulo.r20.body": {
-    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: never let go of the hand that stops the feed.",
-    "translation": "我們曾想把一切質量都化為能量。反應爐實現了這個願望──城市、山脈、海洋。留下的只有重力異常、守衛，以及這份記錄。致讀到這份記錄的人：那隻停止投料的手，絕不要放開。"
+    "source": "We wanted to turn all mass into energy. The reactor granted that wish — the cities, the mountains, the sea. All that remains is the anomaly, the warden and this record. To whoever reads this: if you feed the reactor, stop when it is time to stop. We could not.",
+    "translation": "我們曾想把一切質量都化為能量。反應爐實現了這個願望──城市、山脈、海洋。留下的只有重力異常、守衛，以及這份記錄。致讀到這份記錄的人：如果你要向反應爐投入什麼，該停下的時候，一定要停下。我們沒能做到。"
   },
   "record.singulo.r20.title": {
     "source": "The Last Record",
@@ -9704,8 +9760,8 @@
     "translation": "最後一頁"
   },
   "record.singulo.x02.body": {
-    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they know the hand that stops the feed.",
-    "translation": "所有的質量都化為了能量。我們用那座爐的火，再一次孕育了一個宇宙。星辰點亮，銀河旋轉。總有一天，那裡也會誕生留下記錄的某個人。願那個人，懂得那隻停止投料的手。"
+    "source": "All mass became energy. With that same fire, we made a universe once more. Stars kindle and a galaxy turns. Someday someone there will be born to keep records of their own. May they, too, know when to stop.",
+    "translation": "所有的質量都化為了能量。我們用那座爐的火，再一次孕育了一個宇宙。星辰點亮，銀河旋轉。總有一天，那裡也會誕生留下記錄的某個人。願那個人，也能在該停下的時候停下。"
   },
   "record.singulo.x02.title": {
     "source": "The First Page",
@@ -10855,6 +10911,14 @@
     "source": "Works from your inventory · Use to switch mode",
     "translation": "放在物品欄中即可生效 · 右鍵切換模式"
   },
+  "tooltip.singulo.min_sec": {
+    "source": "%s min %s s",
+    "translation": "%s 分 %s 秒"
+  },
+  "tooltip.singulo.minutes": {
+    "source": "%s min",
+    "translation": "%s 分鐘"
+  },
   "tooltip.singulo.mixed_source": {
     "source": "Mixed: 8 make a Lv2",
     "translation": "混合：8個組成Lv2"
@@ -10967,6 +11031,10 @@
     "source": "Sealed",
     "translation": "已封印"
   },
+  "tooltip.singulo.seconds": {
+    "source": "%s s",
+    "translation": "%s 秒"
+  },
   "tooltip.singulo.stage": {
     "source": "Stage %s: %s",
     "translation": "階段 %1$s: %2$s"
@@ -11052,8 +11120,8 @@
     "translation": "用於：改良型仿生人工作台"
   },
   "uses.singulo.anomaly_sample": {
-    "source": "Used in: Singularity Core",
-    "translation": "用於：奇點核心"
+    "source": "Used in: Singularity Core, Primordial Seed",
+    "translation": "用途：奇點核心、原初之種"
   },
   "uses.singulo.artificial_star_core": {
     "source": "Used in: Genesis Core, Primordial Seed",
@@ -11120,8 +11188,8 @@
     "translation": "用於：廢墟面板、破裂的廢墟面板、長滿青苔的廢墟面板、磁磚廢墟面板、通風廢墟面板 等 2 個"
   },
   "uses.singulo.bose_condensate_catalyst": {
-    "source": "Used in: Time Crystal Catalyst",
-    "translation": "用於：時間晶體催化劑"
+    "source": "Used in: Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Time Crystal Catalyst, Degenerate Furnace Controller and 3 more",
+    "translation": "用於：簡併壓縮爐控制器、卡西米爾腔控制器、時間晶體培育槽、時間晶體催化劑、簡併熱爐控制器 等 3 個"
   },
   "uses.singulo.casimir_cavity_controller": {
     "source": "Used in: C-Cavity",
@@ -11300,8 +11368,8 @@
     "translation": "用於：反應爐外殼、奇點種子、奇點核心、微中子靈敏度模組 Mk3、封印容器（時間鎖） 等 1 個"
   },
   "uses.singulo.degenerate_nucleus": {
-    "source": "Used in: Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
-    "translation": "用於：奇點封裝器、奇點種子、重力子操控器、覺醒重力核"
+    "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
+    "translation": "用於：時間晶體培育槽、奇點封裝器、奇點種子、重力子操控器、覺醒重力核"
   },
   "uses.singulo.degenerate_precursor": {
     "source": "Used in: Degenerate Matter Shell",
@@ -11428,8 +11496,8 @@
     "translation": "用於：緲子催化劑"
   },
   "uses.singulo.muon_catalyst": {
-    "source": "Used in: Muon-Catalyzed Fusion Reactor, BE Condensate Catalyst",
-    "translation": "用於：緲子催化核融合爐、玻色凝聚態催化劑"
+    "source": "Used in: Muon-Catalyzed Fusion Reactor, Entanglement Synthesizer, Laser Cooler, BE Condensate Catalyst, Quantum Heat Engine and 6 more",
+    "translation": "用於：緲子催化核融合爐、量子糾纏合成器、雷射冷卻器、玻色凝聚態催化劑、量子熱機 等 6 個"
   },
   "uses.singulo.neutrino_scanner": {
     "source": "Used in: Neutrino Observatory",
@@ -11524,8 +11592,8 @@
     "translation": "用於：封印容器（奇點鎖）"
   },
   "uses.singulo.sentinel_core": {
-    "source": "Used in: Echo Resonator, Time Crystal Incubator, Autonomous Probe Station, Awakened Echo Core",
-    "translation": "用於：回聲共鳴器、時間晶體培育槽、自動探測站、覺醒回聲核"
+    "source": "Used in: Laser Cooler, Echo Resonator, Autonomous Probe Station, Awakened Echo Core",
+    "translation": "用於：雷射冷卻器、回聲共鳴器、自動探測站、覺醒回聲核"
   },
   "uses.singulo.shield_tower_body": {
     "source": "Used in: Event Horizon Shield Tower",
@@ -11580,12 +11648,12 @@
     "translation": "用於：熱電發電機、衝擊發電面板、珀耳帖冷卻器"
   },
   "uses.singulo.time_crystal_catalyst": {
-    "source": "Used in: Exotic Matter, Singularity Core, Time Crystal Module",
-    "translation": "用於：奇異物質、奇點核心、時間晶體模組"
+    "source": "Used in: Exotic Matter, Singularity Core, Halo Collector, Time Crystal Module",
+    "translation": "用於：奇異物質、奇點核心、暈收集器、時間晶體模組"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 2 more",
-    "translation": "用於：爐心控制器、奇點封裝器、護盾塔核心、重力子操控器、蒂普勒核心 等 2 個"
+    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
+    "translation": "用途：SMES 模組、爐心控制裝置、奇點封裝器、護盾塔核心、引力子操縱器及另外3項"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11682,5 +11750,125 @@
   "uses.singulo.zinc_ingot": {
     "source": "Used in: Nihonium",
     "translation": "用於：鉨"
+  },
+  "subtitles.singulo.ergosphere_leviathan.burst": {
+    "source": "Something bursts from the floor",
+    "translation": "地板裂開，有東西噴湧而出"
+  },
+  "subtitles.singulo.ergosphere_leviathan.rise": {
+    "source": "The Leviathan spirals upward",
+    "translation": "巨蛇盤旋而上"
+  },
+  "subtitles.singulo.foundry.online": {
+    "source": "Foundry comes online",
+    "translation": "鑄造廠開始運轉"
+  },
+  "subtitles.singulo.foundry.dying": {
+    "source": "Motors wind down",
+    "translation": "馬達逐漸停轉"
+  },
+  "subtitles.singulo.echo_sentinel.awake": {
+    "source": "Echo Sentinel awakens",
+    "translation": "回聲守衛甦醒"
+  },
+  "subtitles.singulo.gravity_remnant.pulse": {
+    "source": "Core throbs",
+    "translation": "核心搏動"
+  },
+  "subtitles.singulo.last_archivist.dissolve": {
+    "source": "Body dissolves into light",
+    "translation": "身軀化為光塵"
+  },
+  "subtitles.singulo.last_archivist.inhale": {
+    "source": "The singularity draws in",
+    "translation": "奇點吸入一切"
+  },
+  "subtitles.singulo.horizon_warden.hurt": {
+    "source": "Horizon Warden hurts",
+    "translation": "視界守衛受傷"
+  },
+  "subtitles.singulo.android.blade_cast": {
+    "source": "Light pillars summoned",
+    "translation": "召喚光柱"
+  },
+  "subtitles.singulo.android.tend": {
+    "source": "Android tends a plant",
+    "translation": "仿生人照料植物"
+  },
+  "subtitles.singulo.android.sweep": {
+    "source": "Android sweeps",
+    "translation": "仿生人掃地"
+  },
+  "subtitles.singulo.android.chatter": {
+    "source": "Androids chatter",
+    "translation": "仿生人閒聊"
+  },
+  "subtitles.singulo.horizon_warden.bolt_hit": {
+    "source": "Light bolt bursts",
+    "translation": "光彈炸裂"
+  },
+  "subtitles.singulo.last_archivist.floor_fade": {
+    "source": "Hologram floor fades",
+    "translation": "全像地板消散"
+  },
+  "subtitles.singulo.security_drone.sputter": {
+    "source": "Drone sparks",
+    "translation": "無人機迸出火花"
+  },
+  "subtitles.singulo.black_hole.devour": {
+    "source": "Blocks get pulled into the core",
+    "translation": "方塊被吸入核心"
+  },
+  "gui.singulo.catalyst.loaded": {
+    "source": "Loaded: %s (%s%% left)",
+    "translation": "裝填中：%s（剩餘 %s%%）"
+  },
+  "gui.singulo.catalyst.loaded_hint": {
+    "source": "When it runs out, the spent catalyst comes out and the next one loads from the reserve. Partly used catalysts you add are merged in.",
+    "translation": "用盡後會送出失活催化劑，並從備用中裝填下一個。放入用過一部分的催化劑時會合併剩餘量"
+  },
+  "gui.singulo.catalyst.eject_hint": {
+    "source": "Click to take out the loaded catalyst",
+    "translation": "點擊取出裝填中的催化劑"
+  },
+  "gui.singulo.catalyst.spent_slot": {
+    "source": "Spent catalyst output",
+    "translation": "失活催化劑出口"
+  },
+  "gui.singulo.probe.waiting": {
+    "source": "Waiting to revisit",
+    "translation": "等待遺構再訪"
+  },
+  "gui.singulo.probe.upgrade": {
+    "source": "Research needs a Singularity Core",
+    "translation": "研究樓需要奇點核心"
+  },
+  "guide.singulo.factory_expansion": {
+    "source": "Factory Expansion",
+    "translation": "工廠擴建"
+  },
+  "guide.singulo.factory_expansion.upgrades.title": {
+    "source": "Production and storage after unlocking",
+    "translation": "解鎖後的生產與儲能"
+  },
+  "guide.singulo.factory_expansion.upgrades.body": {
+    "source": "After producing a BE catalyst, reconstruct projection cores with quantum modules, optical lattices, meteoric iron and catalyst life. Once you have time catalysts, degenerate nuclei can also be reconstructed. The first research and culture bosses are still required, but factory expansion no longer requires repeated fights.\nThirty minutes of catalyst life makes four Time Crystal Modules. Large SMES units need this part. A shaped upgrade uses an old SMES Cell at the centre and preserves its stored energy. Existing cables can also be upgraded from copper to superconducting, topological and horizon wiring.",
+    "translation": "製成BE催化劑後，可用量子運算模組、光學晶格基板、隕鐵及催化劑壽命重構投影核心。擁有時間催化劑後，也能重構簡併核。首次研究樓和培養設施首領戰仍不可省略，但擴建工廠不再需要反覆討伐。\n30分鐘催化劑壽命可製成4個時間晶體模組。大型SMES需要此部件。定形升級配方將舊SMES 電池置於中央，並保留其中儲存的電能。舊電纜也可從銅導線依序升級為超導電纜、拓撲導線和視界匯流排。"
+  },
+  "guide.singulo.factory_expansion.probes.title": {
+    "source": "Probes and the final unlock",
+    "translation": "探測器與最終解鎖"
+  },
+  "guide.singulo.factory_expansion.probes.body": {
+    "source": "With a same-tier catalyst, a probe visits one ruin in five minutes and returns half the manual loot. Destinations are visited in turn. Waiting for regeneration or output space consumes no power or catalyst. Overflow cargo is saved and must be unloaded before another mission.\nA loaded Singularity Core also permits research-building collection; time catalysts only permit observation posts. Culture facilities, final labs, sunken reactors and android facilities remain manual.\nA Primordial Seed also requires one use of a restored anomaly sample from the final lab. Sunken loot alone can no longer bypass the final lab.",
+    "translation": "使用同級催化劑時，探測器每5分鐘造訪一處遺構，帶回手動回收量的一半。各地點依序造訪，等待再生或輸出空間時不消耗電力及催化劑。放不下的貨物會保存，卸貨前不執行下一任務。\n裝入奇點核心作為催化劑後，也能回收研究樓；時間催化劑僅支援觀測站。培養設施、最終實驗設施、水下爐心及安卓設施仍須手動探索。\n原初之種還需要最終實驗設施復原異常樣本的1次使用次數。僅靠水下戰利品無法再跳過最終實驗設施。"
+  },
+  "guide.singulo.factory_expansion.limits.title": {
+    "source": "Mass, output and ignition",
+    "translation": "質量、輸出與點火"
+  },
+  "guide.singulo.factory_expansion.limits.body": {
+    "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
+    "translation": "金屬壓縮Lv2的質量為81。鐵塊或銅塊每個質量為3，因此Lv1需3塊，Lv2需27塊，相當於243個錠。可用銅代替鐵。熱電偶與熱交換核心的用途有限，無須一開始大量囤積。\nP反應爐須在10秒內接收50 GFE才能點火。每個SMES 模組容量為2 GFE，至少需要25個滿足總容量。單個輸出上限為100 MFE/t，須至少3個並聯，總傳輸速率達到250 MFE/t以上。\n點火後初始質量500、自旋0時，維持燃料供給的持續發電量約為28.6 MFE/t。2.1 GFE/t是傳輸上限，並非初始發電量。先發展質量、自旋與儲能，再為創世爐供電。"
   }
 }

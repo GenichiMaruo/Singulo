@@ -45,10 +45,10 @@ public final class BugFix0111GameTests {
 
     @GameTest(template = "empty")
     public static void alternativesRespectTheActualCraftingSlot(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        var console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        var console = (io.github.genichimaruo.singulo.android.work.WorkConsoleBlockEntity) io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         var broad = net.minecraft.world.item.crafting.Ingredient.of(Items.OAK_PLANKS, Items.BIRCH_PLANKS);
         var grid = new java.util.ArrayList<ItemStack>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
         grid.set(0, new ItemStack(Items.OAK_PLANKS));
@@ -77,7 +77,7 @@ public final class BugFix0111GameTests {
 
     @GameTest(template = EMPTY)
     public static void generatedRoomLightsUseTheirLevers(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         var template = level.getStructureManager().getOrCreate(Singulo.id("lab/private_rooms"));
         BlockPos origin = helper.absolutePos(new BlockPos(0, 40, 0));
@@ -97,15 +97,15 @@ public final class BugFix0111GameTests {
 
     @GameTest(template = EMPTY)
     public static void controllersShareHeightAcrossMixedPanels(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(new BlockPos(1, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.RAYLEIGH_PANEL.get());
         helper.setBlock(new BlockPos(3, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         BlockPos a = new BlockPos(1, 1, 3), b = new BlockPos(3, 1, 3);
         helper.setBlock(a, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(b, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ZeroGravityControllerBlockEntity first = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, a);
-        ZeroGravityControllerBlockEntity second = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, b);
+        ZeroGravityControllerBlockEntity first = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, a);
+        ZeroGravityControllerBlockEntity second = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, b);
         first.setHeight(9);
         helper.assertTrue(second.height() == 9, "Mixed power group must share its height");
         second.setHeight(3);
@@ -119,15 +119,15 @@ public final class BugFix0111GameTests {
      */
     @GameTest(template = EMPTY)
     public static void controllersShareAndKeepTheirHeight(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos a = new BlockPos(1, 1, 2), b = new BlockPos(2, 1, 2), boxA = new BlockPos(1, 1, 3), boxB = new BlockPos(2, 1, 1);
         helper.setBlock(a, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(b, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(boxA, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(boxB, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
-        ZeroGravityControllerBlockEntity first = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, boxA);
+        ZeroGravityControllerBlockEntity first = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, boxA);
         first.setHeight(9);
-        ZeroGravityControllerBlockEntity second = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, boxB);
+        ZeroGravityControllerBlockEntity second = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, boxB);
         helper.assertTrue(second.height() == 9, "別のボックスに高さが共有されない: " + second.height());
         // 壊したときのアイテムに高さが残る
         var level = helper.getLevel();
@@ -141,7 +141,7 @@ public final class BugFix0111GameTests {
         // 両方壊して、ひとつだけ置き直す: 残っていた高さ 9 のまま
         helper.setBlock(boxA, Blocks.AIR);
         helper.setBlock(boxB, Blocks.AIR);
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.setItemInHand(InteractionHand.MAIN_HAND, dropped);
             BlockPos at = helper.absolutePos(boxA);
@@ -150,7 +150,7 @@ public final class BugFix0111GameTests {
         } finally {
             player.discard();
         }
-        ZeroGravityControllerBlockEntity again = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, boxA);
+        ZeroGravityControllerBlockEntity again = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, boxA);
         helper.assertTrue(again != null && again.height() == 9, "置き直すと高さが戻ってしまう: " + (again == null ? -1 : again.height()));
         helper.succeed();
     }
@@ -158,11 +158,11 @@ public final class BugFix0111GameTests {
     /** ボスが出現している演出の間は、残響投影器・製造ラインを壊せない（壊す速さが0）。 */
     @GameTest(template = EMPTY)
     public static void arenaFixturesHoldDuringEmergence(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos projector = new BlockPos(1, 1, 1), line = new BlockPos(3, 1, 1);
         helper.setBlock(projector, SinguloBlocks.ECHO_PROJECTOR.get());
         helper.setBlock(line, SinguloBlocks.FACTORY_LINE.get());
-        var player = io.github.genichimaruo.singulo.compat.Legacy.mockServerPlayer(helper);
+        var player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             var level = helper.getLevel();
             BlockPos pa = helper.absolutePos(projector), pl = helper.absolutePos(line);
@@ -187,18 +187,18 @@ public final class BugFix0111GameTests {
      */
     @GameTest(template = EMPTY, timeoutTicks = 100)
     public static void receiverHoldsNoBuffer(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos zero = new BlockPos(2, 1, 2), box = new BlockPos(2, 1, 3), receiver = new BlockPos(3, 1, 2), source = new BlockPos(4, 1, 2);
         helper.setBlock(zero, SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(box, SinguloBlocks.ZERO_GRAVITY_CONTROLLER.get());
         helper.setBlock(receiver, SinguloBlocks.GRAVITY_PANEL_RECEIVER.get());
         helper.setBlock(source, SinguloBlocks.CREATIVE_ENERGY_SOURCE.get());
-        ZeroGravityControllerBlockEntity c = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, box);
+        ZeroGravityControllerBlockEntity c = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, box);
         c.setHeight(12);
         var level = helper.getLevel();
         BlockPos abs = helper.absolutePos(zero);
         helper.runAtTickTime(30, () -> {
-            io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity r = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, receiver);
+            io.github.genichimaruo.singulo.gravity.GravityReceiverBlockEntity r = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, receiver);
             helper.assertTrue(ZeroGravity.inZone(level, abs.getX() + 0.5, abs.getY() + 1, abs.getZ() + 0.5), "電力があるのに無重力にならない");
             long demand = r.demand();
             long took = r.energy().receiveLong(Long.MAX_VALUE / 2, false);
@@ -216,7 +216,7 @@ public final class BugFix0111GameTests {
     /** アンドロイドは無重力の空間では宙を飛び、上にある行き先へも上がっていける（重力の属性は変えない）。外に出れば歩く。 */
     @GameTest(template = EMPTY, timeoutTicks = 200)
     public static void androidsFlyInZeroGravity(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         for (int x = 1; x <= 3; x++) {
             for (int z = 1; z <= 3; z++) {
                 helper.setBlock(new BlockPos(x, 1, z), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
@@ -287,7 +287,7 @@ public final class BugFix0111GameTests {
     /** アンドロイドは水の中でも自由に動け、おぼれない（空気も体力も減らない）。水中で止まっている間は充電が減らず、泳ぐと減る。 */
     @GameTest(template = EMPTY, timeoutTicks = 160)
     public static void androidsSwimWithoutDrowning(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         pool(helper);
         BladeAndroid a = swimmer(helper, RuinAndroid.CHARGE_MAX);
         a.makeGuard(null, helper.absolutePos(new BlockPos(3, 0, 3)), RuinAndroid.MODE_GUARD, 30);   // 持ち場にいて、うろうろ泳がない
@@ -317,7 +317,7 @@ public final class BugFix0111GameTests {
     /** 水中で充電が切れ、近くに陸がなければ、水面まで浮かび上がって充電する（日が出ていればソーラー、出ていなければあお向けに浮かぶ）。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void androidsSurfaceToChargeWithoutLand(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         pool(helper);
         BladeAndroid a = swimmer(helper, 2);
         swimUntilEmpty(helper, a);
@@ -332,7 +332,7 @@ public final class BugFix0111GameTests {
     /** 上に水面がない水の中（ガラスの天井の下）で充電が切れると、浮かび上がらずに底まで沈み、座って充電する。 */
     @GameTest(template = EMPTY, timeoutTicks = 300)
     public static void androidsChargeOnSeabedUnderCeiling(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         pool(helper);
         for (int x = 1; x <= 5; x++) {
             for (int z = 1; z <= 5; z++) {
@@ -352,7 +352,7 @@ public final class BugFix0111GameTests {
     /** アンドロイドは無重力の中でも重力の属性が変わらない（宙を飛んで動く）。ふつうの生き物は無重力になる。 */
     @GameTest(template = EMPTY, timeoutTicks = 120)
     public static void androidsIgnoreZeroGravity(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(new BlockPos(2, 1, 2), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(new BlockPos(2, 1, 4), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
         helper.setBlock(new BlockPos(2, 1, 3), SinguloBlocks.ZERO_GRAVITY_BLOCK.get());
@@ -375,9 +375,9 @@ public final class BugFix0111GameTests {
     /** アンドロイドが精密組立台に入れるときは、アンドロイドの作りたいレシピが指定される（材料の一部が別のレシピと同じでも）。 */
     @GameTest(template = EMPTY)
     public static void androidChoosesItsRecipe(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         helper.setBlock(new BlockPos(1, 1, 1), SinguloBlocks.MACHINES.get(MachineType.PRECISION_ASSEMBLER).get());
-        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, new BlockPos(1, 1, 1));
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, new BlockPos(1, 1, 1));
         m.selectFor(item("tipler_bearing"), List.of(item("steel_plate"), item("superconducting_coil")));
         helper.assertTrue(m.selectedRecipe() != null && m.selectedRecipe().getPath().equals("precision_assembler/tipler_bearing"),
                 "アンドロイドのレシピが指定されない: " + m.selectedRecipe());
@@ -387,7 +387,7 @@ public final class BugFix0111GameTests {
     /** 印刷台・警備機ドックの個体だけがドロップ表を持つ。ふつうに出した（スポーンエッグなどの）個体は持たない。 */
     @GameTest(template = EMPTY)
     public static void onlyFacilitySpawnsDropLoot(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         BladeAndroid plain = SinguloEntities.BLADE_ANDROID.get().create(level);
         BladeAndroid printed = SinguloEntities.BLADE_ANDROID.get().create(level);
@@ -411,7 +411,7 @@ public final class BugFix0111GameTests {
     /** 居室灯: レッドストーンの信号（レバー）が入ると点き、切れると消える。 */
     @GameTest(template = EMPTY, timeoutTicks = 60)
     public static void roomLightFollowsRedstone(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos light = new BlockPos(2, 2, 2);
         helper.setBlock(light, SinguloBlocks.ROOM_LIGHT.get());
         helper.assertFalse(helper.getBlockState(light).getValue(RoomLightBlock.LIT), "信号がないのに点いている");
@@ -427,7 +427,7 @@ public final class BugFix0111GameTests {
     /** 動力炉の部屋の型紙を回して置くと、制御盤（とほかの向きのある物）も部屋に合わせて回る。 */
     @GameTest(template = EMPTY)
     public static void reactorConsoleTurnsWithItsRoom(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var level = helper.getLevel();
         var template = level.getStructureManager().getOrCreate(Singulo.id("lab/reactor"));
         BlockPos origin = helper.absolutePos(new BlockPos(0, 40, 0));

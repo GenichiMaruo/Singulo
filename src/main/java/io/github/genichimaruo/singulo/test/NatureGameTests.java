@@ -28,14 +28,14 @@ public final class NatureGameTests {
     /** ケラウノス放電塔: 電力をためて撃つと、砂の上の避雷針へ雷が飛び、砂が雷ガラス塊になる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 120)
     public static void keraunosTowerTurnsSandIntoFulgurite(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos tower = new BlockPos(1, 1, 1);
         BlockPos sand = new BlockPos(5, 1, 5);
         helper.setBlock(tower, SinguloBlocks.KERAUNOS_TOWER.get());
         helper.setBlock(sand.below(), Blocks.STONE);
         helper.setBlock(sand, Blocks.SAND);
         helper.setBlock(sand.above(), Blocks.LIGHTNING_ROD);
-        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, tower);
+        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, tower);
         be.energy().setEnergy(be.energy().getMaxEnergyStored());
         helper.assertTrue(be.fire(null), "撃てない");
         helper.assertFalse(be.fire(null), "ためている間にもう一度撃てる");
@@ -50,10 +50,10 @@ public final class NatureGameTests {
     /** 避雷針がないと撃たない（電力も使わない）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void keraunosTowerNeedsALightningRod(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos tower = new BlockPos(1, 1, 1);
         helper.setBlock(tower, SinguloBlocks.KERAUNOS_TOWER.get());
-        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, tower);
+        KeraunosTowerBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, tower);
         be.energy().setEnergy(be.energy().getMaxEnergyStored());
         helper.assertFalse(be.fire(null), "避雷針がないのに撃った");
         helper.assertTrue(be.energy().getEnergyStored() == be.energy().getMaxEnergyStored(), "撃たないのに電力を使った");
@@ -63,7 +63,7 @@ public final class NatureGameTests {
     /** 自然の雷でも、砂の上の避雷針に落ちれば雷ガラス塊ができる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 40)
     public static void naturalLightningOnRodMakesFulgurite(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos sand = new BlockPos(3, 1, 3);
         helper.setBlock(sand.below(), Blocks.STONE);
         helper.setBlock(sand, Blocks.SAND);
@@ -81,7 +81,7 @@ public final class NatureGameTests {
     /** クレーターに最初からある溶融殻だけが、隣に星屑の結晶を育てる。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void naturalCrustGrowsStardust(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos natural = new BlockPos(2, 2, 2);
         BlockPos placed = new BlockPos(5, 2, 5);
         helper.setBlock(natural, SinguloBlocks.METEORITE_CRUST.get().defaultBlockState().setValue(MeteoriteCrustBlock.NATURAL, true));
@@ -114,7 +114,7 @@ public final class NatureGameTests {
     /** 深海圧力収集器は水の深さを数え、浅い所や陸では動かない。虚空捕集器はジ・エンドの外では動かない。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void collectorsNeedTheirPlace(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos sea = new BlockPos(2, 1, 2);
         helper.setBlock(sea, SinguloBlocks.DEEP_SEA_COLLECTOR.get());
         for (int y = 2; y <= 6; y++) {
@@ -122,7 +122,7 @@ public final class NatureGameTests {
         }
         var level = helper.getLevel();
         helper.assertTrue(DeepSeaCollectorBlockEntity.depth(level, helper.absolutePos(sea)) == 5, "水の深さの数え方が違う");
-        DeepSeaCollectorBlockEntity collector = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, sea);
+        DeepSeaCollectorBlockEntity collector = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, sea);
         helper.assertTrue(collector.rate() == 0 && DeepSeaCollectorBlockEntity.depth(level, helper.absolutePos(sea)) < DeepSeaCollectorBlockEntity.MIN_DEPTH,
                 "浅いのに動く");
         BlockPos voidPos = new BlockPos(5, 3, 5);
@@ -134,7 +134,7 @@ public final class NatureGameTests {
     /** 隕石コンパスの探し方: 区画の輪の順ではなく、実際の距離でいちばん近い核を選ぶ（区画の端・負の座標・掘り出し済み・候補なし）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void meteorCompassPicksTheTrulyNearestCore(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         int spacing = 28;
         BlockPos sameCell = new BlockPos(89, 17, 7);
         BlockPos nextCell = new BlockPos(713, 17, 103);
@@ -164,7 +164,7 @@ public final class NatureGameTests {
     /** 0.4.0 までのクレーターの型紙（保存された構造が参照する）が元の名前で残り、読み戻した構造の大きさが変わらない。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void legacyCraterTemplatesStillLoad(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         net.minecraft.server.level.ServerLevel level = helper.getLevel();
         var manager = level.getServer().getStructureManager();
         var context = net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext.fromLevel(level);
@@ -196,7 +196,7 @@ public final class NatureGameTests {
     // 広い専用の試験構造に描く。1.20.1では試験外チャンクを同期読み込みすると初期化中に待機する。
     @GameTest(setupTicks = 20, template = "crater", batch = "meteor_crater", timeoutTicks = 100)
     public static void craterIsCarvedIntoTheGround(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         net.minecraft.server.level.ServerLevel level = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(32, 0, 32));
         var heightmap = net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE;

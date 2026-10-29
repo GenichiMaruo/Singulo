@@ -22,7 +22,7 @@ public final class CableCapacityGameTests {
     private static SmesCellBlockEntity sink(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos,SinguloBlocks.SMES_MODULE.get().defaultBlockState()
                 .setValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.FACING,Direction.SOUTH));
-        return io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, pos);
+        return io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, pos);
     }
     private static void superCable(GameTestHelper h, BlockPos pos) {
         h.setBlock(pos,SinguloBlocks.SUPERCONDUCTING_CABLE.get());
@@ -30,7 +30,7 @@ public final class CableCapacityGameTests {
 
     @GameTest(template="empty")
     public static void unusedCopperBranchDoesNotThrottleSuperconductingRoute(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var entry=new BlockPos(2,1,2);
         superCable(h,entry);
         superCable(h,entry.east());
@@ -46,7 +46,7 @@ public final class CableCapacityGameTests {
 
     @GameTest(template="empty")
     public static void activeCopperBranchIsLimitedWithoutThrottlingMainRoute(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var entry=new BlockPos(2,1,1);
         superCable(h,entry);
         superCable(h,entry.east());
@@ -69,7 +69,7 @@ public final class CableCapacityGameTests {
 
     @GameTest(template="empty",timeoutTicks=20)
     public static void sharedCableBudgetIncludesAllSourcesAndResetsNextTick(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var a=new BlockPos(2,1,2);
         var b=new BlockPos(2,1,4);
         superCable(h,a);
@@ -92,7 +92,7 @@ public final class CableCapacityGameTests {
 
     @GameTest(template="empty")
     public static void simulationSharesTrunkBudgetBetweenDestinations(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var entry=new BlockPos(2,1,2);
         superCable(h,entry);
         h.setBlock(entry.east(),SinguloBlocks.COPPER_WIRE.get());
@@ -109,7 +109,7 @@ public final class CableCapacityGameTests {
 
     @GameTest(template="empty")
     public static void disjointRoutesDoNotShareOneNetworkWideBudget(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var left=new BlockPos(2,1,2);
         var right=new BlockPos(4,1,2);
         superCable(h,left);
@@ -129,14 +129,14 @@ public final class CableCapacityGameTests {
 
     @GameTest(template="tall",timeoutTicks=100)
     public static void coolingTowerReceivesFullSuperconductingPowerBesideCopperBranch(GameTestHelper h) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(h);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(h);
         var controller=new BlockPos(2,1,2);
         TestBuild.build(h,Blueprints.Kind.COOLING_TOWER,controller,Direction.SOUTH,7);
         var output=TestBuild.port(h,Blueprints.Kind.COOLING_TOWER,controller,Direction.SOUTH,7,1,1,0);
         var cable=output.north();
         h.getLevel().setBlockAndUpdate(cable,SinguloBlocks.SUPERCONDUCTING_CABLE.get().defaultBlockState());
         h.getLevel().setBlockAndUpdate(cable.north(),SinguloBlocks.COPPER_WIRE.get().defaultBlockState());
-        MachineBlockEntity tower=io.github.genichimaruo.singulo.compat.Legacy.blockEntity(h, controller);
+        MachineBlockEntity tower=io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(h, controller);
         h.startSequence().thenWaitUntil(()->h.assertTrue(tower.structureSize()==7,"Cooling tower not formed"))
                 .thenExecute(()->{
                     tower.energy().setEnergy(0);

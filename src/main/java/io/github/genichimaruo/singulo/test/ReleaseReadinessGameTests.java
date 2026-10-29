@@ -46,10 +46,10 @@ public final class ReleaseReadinessGameTests {
     /** 前の注文の余りを戻す際、別注文の「素材を取りに行かない作業」を借りっぱなしにしない。 */
     @GameTest(template = "empty", batch = "release_lease")
     public static void leftoverDepositDoesNotAbandonNextLease(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         var at = new BlockPos(1, 1, 1);
         helper.setBlock(at, SinguloBlocks.ANDROID_WORK_CONSOLE.get());
-        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, at);
+        WorkConsoleBlockEntity console = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, at);
         RuinAndroid android = guard(helper);
         android.assignWork(helper.absolutePos(at), 1); // 注文1は完了して一覧から消えている
         android.addToCarry(new ItemStack(Items.DIRT)); // 作業で出た余り。私物にはしない
@@ -79,7 +79,7 @@ public final class ReleaseReadinessGameTests {
     /** 片付けで拾い、まだしまっていない物は、護衛が倒れても消えない。 */
     @GameTest(template = "empty", batch = "release_tidy", timeoutTicks = 60)
     public static void tidyItemsSurviveAndroidDeath(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         RuinAndroid android = guard(helper);
         Object life = field(android, RuinAndroid.class, "life");
         var drop = new ItemEntity(helper.getLevel(), android.getX(), android.getY(), android.getZ(), new ItemStack(Items.DIAMOND, 7));
@@ -102,7 +102,7 @@ public final class ReleaseReadinessGameTests {
     /** 同種の討伐をまとめても、報告済みの分や別の古い行を二重に数えない。 */
     @GameTest(template = "empty", batch = "release_report")
     public static void patrolReportCountsOnlyUnreportedKills(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         RuinAndroid android = guard(helper);
         Object patrol = field(android, RuinAndroid.class, "patrol");
         var kill = patrol.getClass().getDeclaredMethod("onKill", net.minecraft.server.level.ServerLevel.class, net.minecraft.world.entity.LivingEntity.class);
@@ -135,7 +135,7 @@ public final class ReleaseReadinessGameTests {
     /** 頭上を塞がれた椅子を選んで、体をブロック内へ移動しない。空けた後は使える。 */
     @GameTest(template = "empty", batch = "release_seat")
     public static void sittingRequiresSpaceForTheAndroid(GameTestHelper helper) throws Exception {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         RuinAndroid android = guard(helper);
         var at = new BlockPos(4, 1, 2);
         helper.setBlock(at, Blocks.OAK_STAIRS);

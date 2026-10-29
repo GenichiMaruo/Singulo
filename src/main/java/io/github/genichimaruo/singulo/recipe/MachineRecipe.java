@@ -1,11 +1,12 @@
 package io.github.genichimaruo.singulo.recipe;
 
+import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.item.UsesHelper;
 import io.github.genichimaruo.singulo.registry.SinguloRecipes;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -24,7 +25,7 @@ import net.minecraftforge.fluids.FluidStack;
  * @param station      処理する装置の id（MachineType#id）
  * @param time         処理時間（tick）
  * @param energy       処理中の消費電力（FE/t）
- * @param ingredients  アイテム材料。uses &gt; 0 のものは消費せず使用回数を減らす
+ * @param ingredients  アイテム材料。uses &gt; 0 のものは消費せず使用回数を減らす。tier &gt; 0 のものはそのティア以上の触媒で払える
  * @param mass         質量材料（圧縮機の質量モード）
  * @param restore      修復・復元の対象。成果物は対象の使用回数を回復したもの
  * @param minSize      マルチブロックの大きさの下限（冷却塔の高さなど）。0なら条件なし
@@ -36,7 +37,29 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                             ItemStack result, List<FluidStack> fluidResults, int minSize, int priority, ItemStack byproduct)
         implements Recipe<MachineRecipe.Input> {
 
-    public record ItemInput(Ingredient ingredient, int count, int uses) {
+    /**
+     * アイテム材料。tier &gt; 0 は触媒の寿命で払う材料で、ingredient（そのティアの触媒）のほか、上位の触媒でも払える。
+     * 上位の触媒は1段ごとに使用回数−20%・処理速度+25%（2段まで。触媒を使う装置と同じ規則）。
+     */
+    public record ItemInput(Ingredient ingredient, int count, int uses, int tier) {
+        public ItemInput(Ingredient ingredient, int count, int uses) {
+            this(ingredient, count, uses, 0);
+        }
+
+        /** 使用回数で払う材料を stack で払うときの使用回数。払えなければ 0。 */
+        public int usesFrom(ItemStack stack) {
+            int pay = uses;
+            if (tier > 0) {
+                int have = CatalystHelper.tierOf(stack);
+                if (have < tier) {
+                    return 0;
+                }
+                pay = CatalystHelper.higherUses(uses, have - tier);
+            } else if (!ingredient.test(stack)) {
+                return 0;
+            }
+            return UsesHelper.canUse(stack, pay) ? pay : 0;
+        }
     }
 
     public record FluidInput(Fluid fluid, int amount) {
@@ -66,9 +89,9 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     /**
      * 材料の取り方。consume[i] はスロット i から減らす個数、uses[i] はスロット i のアイテムから減らす使用回数、
-     * restoreSlot は修復対象のスロット（なければ -1）。
+     * restoreSlot は修復対象のスロット（なければ -1）、speed は上位の触媒で払ったときの処理速度の倍率。
      */
-    public record Plan(int[] consume, int[] uses, int restoreSlot) {}
+    public record Plan(int[] consume, int[] uses, int restoreSlot, double speed) {}
 
     /** 入力スロットから材料を取れるなら、その取り方を返す。 */
     @Nullable
@@ -97,21 +120,31 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 return null;
             }
         }
+        double speed = 1;
         for (ItemInput in : ingredients) {
             if (in.uses() > 0) {
+                // 払えるもののうち、ティアのいちばん低い触媒で払う（上位の触媒はとっておく）
                 int found = -1;
+                int foundTier = 0;
                 for (int i = 0; i < n; i++) {
                     ItemStack s = slots.get(i);
-                    if (!claimed[i] && in.ingredient().test(s) && UsesHelper.canUse(s, in.uses())) {
+                    if (claimed[i] || in.usesFrom(s) == 0) {
+                        continue;
+                    }
+                    int tier = CatalystHelper.tierOf(s);
+                    if (found < 0 || tier < foundTier) {
                         found = i;
-                        break;
+                        foundTier = tier;
                     }
                 }
                 if (found < 0) {
                     return null;
                 }
                 claimed[found] = true;
-                uses[found] = in.uses();
+                uses[found] = in.usesFrom(slots.get(found));
+                if (in.tier() > 0) {
+                    speed *= CatalystHelper.higherSpeed(foundTier - in.tier());
+                }
                 continue;
             }
             int need = in.count();
@@ -129,7 +162,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
                 return null;
             }
         }
-        return new Plan(consume, uses, restoreSlot);
+        return new Plan(consume, uses, restoreSlot, speed);
     }
 
     public boolean isMassRecipe() {
@@ -213,7 +246,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             var ingredients = new java.util.ArrayList<ItemInput>();
             if (json.has("ingredients")) for (var e : json.getAsJsonArray("ingredients")) {
                 var o = e.getAsJsonObject();
-                ingredients.add(new ItemInput(Ingredient.fromJson(o.get("ingredient")), integer(o, "count", 1), integer(o, "uses", 0)));
+                ingredients.add(new ItemInput(Ingredient.fromJson(o.get("ingredient")), integer(o, "count", 1), integer(o, "uses", 0), integer(o, "tier", 0)));
             }
             var fluids = new java.util.ArrayList<FluidInput>();
             if (json.has("fluid_ingredients")) for (var e : json.getAsJsonArray("fluid_ingredients")) {
@@ -247,7 +280,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
         }
         private static int integer(com.google.gson.JsonObject o, String key, int fallback) { return o.has(key) ? o.get(key).getAsInt() : fallback; }
         public MachineRecipe fromNetwork(net.minecraft.resources.ResourceLocation id, FriendlyByteBuf buf) {
-            var ingredients = buf.readList(b -> new ItemInput(Ingredient.fromNetwork(b), b.readVarInt(), b.readVarInt()));
+            var ingredients = buf.readList(b -> new ItemInput(Ingredient.fromNetwork(b), b.readVarInt(), b.readVarInt(), b.readVarInt()));
             var fluids = buf.readList(b -> new FluidInput(net.minecraft.core.registries.BuiltInRegistries.FLUID.byId(b.readVarInt()), b.readVarInt()));
             Optional<MassInput> mass = buf.readBoolean() ? Optional.of(new MassInput(buf.readDouble(),buf.readBoolean())) : Optional.empty();
             Optional<Ingredient> restore = buf.readBoolean() ? Optional.of(Ingredient.fromNetwork(buf)) : Optional.empty();
@@ -257,7 +290,7 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
             return recipe.withId(id);
         }
         public void toNetwork(FriendlyByteBuf buf, MachineRecipe r) {
-            buf.writeCollection(r.ingredients(), (b,v) -> { v.ingredient().toNetwork(b); b.writeVarInt(v.count()); b.writeVarInt(v.uses()); });
+            buf.writeCollection(r.ingredients(), (b,v) -> { v.ingredient().toNetwork(b); b.writeVarInt(v.count()); b.writeVarInt(v.uses()); b.writeVarInt(v.tier()); });
             buf.writeCollection(r.fluidIngredients(), (b,v) -> { b.writeVarInt(net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(v.fluid())); b.writeVarInt(v.amount()); });
             buf.writeBoolean(r.mass().isPresent()); r.mass().ifPresent(v -> { buf.writeDouble(v.amount()); buf.writeBoolean(v.metalOnly()); });
             buf.writeBoolean(r.restore().isPresent()); r.restore().ifPresent(v -> v.toNetwork(buf));

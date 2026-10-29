@@ -5,7 +5,7 @@ import io.github.genichimaruo.singulo.generated.ServerConfig;
 import io.github.genichimaruo.singulo.item.CatalystHelper;
 import io.github.genichimaruo.singulo.registry.SinguloBlockEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -47,6 +47,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
         }
     };
     private final IItemHandler automation = new CombinedInvWrapper(slot, fuel);
+    private final IItemHandler pipes = new CombinedInvWrapper(slot, fuel, spentOut());
     private int burn;
     private int output;
     private int formed;
@@ -127,7 +128,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
             }
             burn--;
             output = (int) Math.min(Integer.MAX_VALUE, Math.round(ServerConfig.DEGENERATE_FURNACE_OUTPUT.get()
-                    * CatalystHelper.generatorOutput(MACHINE_TIER, catalystSlot().getStackInSlot(0), effect)
+                    * CatalystHelper.generatorOutput(MACHINE_TIER, catalyst(), effect)
                     * ServerConfig.GENERATOR_OUTPUT_MULTIPLIER.get()));
             energy.generate(output);
         }
@@ -146,7 +147,7 @@ public class DegenerateFurnaceBlockEntity extends CatalystDeviceBlockEntity {
 
     @Override
     public IItemHandler automationItems() {
-        return automation;
+        return pipes;
     }
 
     @Override

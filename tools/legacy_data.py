@@ -50,7 +50,7 @@ def convert(path: Path, obj):
                 if count is not None:
                     pool['rolls'] = count['count']
                     functions.remove(count)
-    if 'recipes' in parts and obj.get('type', '').startswith('minecraft:'):
+    if 'recipes' in parts and (obj.get('type', '').startswith('minecraft:') or obj.get('type') == 'singulo:smes_upgrade'):
         result = obj.get('result')
         if isinstance(result, dict) and 'id' in result: result['item'] = result.pop('id')
     # 1.20.1 advancement item predicates use an array of item ids.

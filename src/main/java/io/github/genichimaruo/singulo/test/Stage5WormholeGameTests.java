@@ -55,10 +55,10 @@ public final class Stage5WormholeGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 260)
     public static void wormholeGeneratorMakesPairWithOneGigawattForTenSeconds(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR, GENERATOR,
                 net.minecraft.core.Direction.SOUTH, 5);
-        WormholeGeneratorBlockEntity gen = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, GENERATOR);
+        WormholeGeneratorBlockEntity gen = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, GENERATOR);
         helper.onEachTick(() -> gen.energy().receiveEnergy(Integer.MAX_VALUE, false));
         helper.runAtTickTime(100, () -> helper.assertTrue(gen.output().getStackInSlot(0).isEmpty(), "10秒たつ前にできた"));
         helper.succeedWhen(() -> {
@@ -75,12 +75,12 @@ public final class Stage5WormholeGameTests {
     /** 外殻の代わりにマルチブロック搬入出ポートを置いても形成でき、ポートから電力を入れ、できた口を取り出せる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 100)
     public static void wormholeGeneratorIoPortAnywhere(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         TestBuild.build(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR, GENERATOR,
                 net.minecraft.core.Direction.SOUTH, 5);
         BlockPos portPos = (TestBuild.port(helper, io.github.genichimaruo.singulo.multiblock.Blueprints.Kind.WORMHOLE_GENERATOR,
                 GENERATOR, net.minecraft.core.Direction.SOUTH, 5, 3, 4, 3));                // 天井の角寄り
-        WormholeGeneratorBlockEntity gen = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, GENERATOR);
+        WormholeGeneratorBlockEntity gen = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, GENERATOR);
         helper.succeedWhen(() -> {
             helper.assertTrue(gen.formed(), "ポートを置くと形成されない");
             var energy = io.github.genichimaruo.singulo.compat.Capabilities.get(helper.getLevel(), io.github.genichimaruo.singulo.compat.Capabilities.EnergyStorage.BLOCK, portPos, null);
@@ -92,10 +92,10 @@ public final class Stage5WormholeGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 200)
     public static void stabilizerSealsMouthsAndRejectsExpiredOnes(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.WORMHOLE_STABILIZER.get());
-        WormholeStabilizerBlockEntity st = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        WormholeStabilizerBlockEntity st = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         helper.onEachTick(() -> st.energy().setEnergy(st.energy().getMaxEnergyStored()));
         ItemStack[] pair = UnstableMouthItem.createPair(helper.getLevel());
         long pairId = SinguloComponents.get(pair[0], SinguloComponents.WORMHOLE.get()).pair();
@@ -122,7 +122,7 @@ public final class Stage5WormholeGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void wormholePortsLinkEnergyItemsAndFluids(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         long pair = helper.getLevel().random.nextLong();
         BlockPos mouthA = new BlockPos(1, 1, 1);
         BlockPos mouthB = new BlockPos(6, 1, 6);
@@ -130,7 +130,7 @@ public final class Stage5WormholeGameTests {
         BlockPos portB = new BlockPos(5, 1, 6);
         for (BlockPos m : new BlockPos[]{mouthA, mouthB}) {
             helper.setBlock(m, SinguloBlocks.WORMHOLE_MOUTH.get());
-            WormholeMouthBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, m);
+            WormholeMouthBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, m);
             be.setData(new WormholeData(pair, 0));
             be.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 4), false);
         }
@@ -146,24 +146,24 @@ public final class Stage5WormholeGameTests {
             IEnergyStorage energy = Capabilities.get(helper.getLevel(), Capabilities.EnergyStorage.BLOCK, a, null);
             IFluidHandler fluids = Capabilities.get(helper.getLevel(), Capabilities.FluidHandler.BLOCK, a, null);
             helper.assertTrue(items != null && energy != null && fluids != null, "ポートが能力を持たない");
-            // 向こうのチェスト（27）とアンカーの触媒スロット（1）が並んで見える
-            helper.assertTrue(items.getSlots() == 28, "向こうの入れ物のスロットが見えない: " + items.getSlots());
+            // 向こうのチェスト（27）と、アンカーの触媒スロット・失活触媒の出口（2）が並んで見える
+            helper.assertTrue(items.getSlots() == 29, "向こうの入れ物のスロットが見えない: " + items.getSlots());
             ItemStack rest = new ItemStack(Items.IRON_INGOT, 16);
             for (int i = 0; i < items.getSlots() && !rest.isEmpty(); i++) {
                 rest = items.insertItem(i, rest, false);
             }
             helper.assertTrue(rest.getCount() == 8, "喉3×3 の帯域（8個/tick）で止まらない: 残り " + rest.getCount());
-            ChestBlockEntity chest = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, portB.west());
+            ChestBlockEntity chest = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, portB.west());
             helper.assertTrue(chest.getItem(0).getCount() == 8, "向こうのチェストに届かない");
             // 向こう側で電力を受けられるのはタンクとアンカー
             int sent = energy.receiveEnergy(1000, false);
-            WorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, portB.north());
-            ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, portB.above());
+            WorldlineAnchorBlockEntity anchor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, portB.north());
+            ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, portB.above());
             int arrived = anchor.energy().getEnergyStored() + tank.energy().getEnergyStored();
             helper.assertTrue(sent == 1000 && arrived == 1000, "電力が向こうへ届かない: " + sent + " / " + arrived);
             int filled = fluids.fill(ContainmentTankBlockEntity.darkMatter(500), IFluidHandler.FluidAction.EXECUTE);
             helper.assertTrue(filled == 500 && tank.amount() == 500, "液体が向こうへ届かない: " + filled);
-            WormholeMouthBlockEntity ma = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, mouthA);
+            WormholeMouthBlockEntity ma = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, mouthA);
             helper.assertTrue(ma.partner() != null, "対の口が見つからない");
             helper.succeed();
         });
@@ -172,7 +172,7 @@ public final class Stage5WormholeGameTests {
     /** ポート番号がちがうとつながらず、そろえるとつながる。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void wormholePortsLinkOnlyMatchingChannels(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         long pair = helper.getLevel().random.nextLong();
         BlockPos mouthA = new BlockPos(1, 1, 1);
         BlockPos mouthB = new BlockPos(6, 1, 6);
@@ -180,15 +180,15 @@ public final class Stage5WormholeGameTests {
         BlockPos portB = new BlockPos(5, 1, 6);
         for (BlockPos m : new BlockPos[]{mouthA, mouthB}) {
             helper.setBlock(m, SinguloBlocks.WORMHOLE_MOUTH.get());
-            WormholeMouthBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, m);
+            WormholeMouthBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, m);
             be.setData(new WormholeData(pair, 0));
             be.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 4), false);
         }
         helper.setBlock(portA, SinguloBlocks.WORMHOLE_PORT.get());
         helper.setBlock(portB, SinguloBlocks.WORMHOLE_PORT.get());
         helper.setBlock(portB.west(), Blocks.CHEST);
-        io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity a = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, portA);
-        io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity b = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, portB);
+        io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity a = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, portA);
+        io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity b = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, portB);
         a.setChannel(42);
         b.setChannel(7);
         helper.runAtTickTime(5, () -> {
@@ -209,13 +209,13 @@ public final class Stage5WormholeGameTests {
     /** 3×3 の喉で働けるポートは口に近い順に8個まで。9個目は止まり、光らない。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 60)
     public static void wormholeMouthRunsOnlyNearestPorts(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         long pair = helper.getLevel().random.nextLong();
         BlockPos mouthA = new BlockPos(1, 1, 1);
         BlockPos mouthB = new BlockPos(1, 3, 6);
         for (BlockPos m : new BlockPos[]{mouthA, mouthB}) {
             helper.setBlock(m, SinguloBlocks.WORMHOLE_MOUTH.get());
-            WormholeMouthBlockEntity be = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, m);
+            WormholeMouthBlockEntity be = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, m);
             be.setData(new WormholeData(pair, 0, true));
             be.fuel().insertItem(0, new ItemStack(item("exotic_matter"), 4), false);
         }
@@ -231,10 +231,10 @@ public final class Stage5WormholeGameTests {
             helper.setBlock(p, SinguloBlocks.WORMHOLE_PORT.get());
         }
         helper.runAtTickTime(25, () -> {
-            WormholeMouthBlockEntity a = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, mouthA);
+            WormholeMouthBlockEntity a = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, mouthA);
             helper.assertTrue(a.portLimit() == 8 && a.rankedPorts().size() == 9, "ポートの数え方が違う: " + a.rankedPorts().size());
             for (BlockPos p : ports) {
-                io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity port = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, p);
+                io.github.genichimaruo.singulo.wormhole.WormholePortBlockEntity port = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, p);
                 boolean lit = helper.getBlockState(p).getValue(io.github.genichimaruo.singulo.machine.AbstractMachineBlock.LIT);
                 if (p.equals(far)) {
                     helper.assertFalse(port.active() || lit, "上限を超えたポートが働いている");
@@ -249,10 +249,10 @@ public final class Stage5WormholeGameTests {
     /** 燃料が切れても口は消えずに閉じて休み、エキゾチック物質を入れるとまた開く。 */
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 800)
     public static void wormholeMouthClosesInsteadOfVanishing(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.WORMHOLE_MOUTH.get());
-        WormholeMouthBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        WormholeMouthBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         m.setData(new WormholeData(helper.getLevel().random.nextLong(), 0, true));
         helper.runAtTickTime(WormholeMouthBlockEntity.SHRINK_TICKS + 20, () -> {
             helper.assertBlockPresent(SinguloBlocks.WORMHOLE_MOUTH.get(), pos);
@@ -268,12 +268,12 @@ public final class Stage5WormholeGameTests {
     /** 初めて置いた口は、燃料なしでも5分開いている。置き直した口は閉じた状態から。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void wormholeMouthFirstPlacementGrace(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         ItemStack fresh = new ItemStack(SinguloBlocks.WORMHOLE_MOUTH.get());
         SinguloComponents.set(fresh, SinguloComponents.WORMHOLE.get(), new WormholeData(5, 0));
         BlockPos first = new BlockPos(2, 1, 2);
         helper.setBlock(first, SinguloBlocks.WORMHOLE_MOUTH.get());
-        WormholeMouthBlockEntity a = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, first);
+        WormholeMouthBlockEntity a = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, first);
         a.applyComponentsFromItemStack(fresh);
         helper.assertTrue(a.grace() == WormholeMouthBlockEntity.GRACE_TICKS && a.size() == 1, "初めて置いた口に猶予がない");
         helper.assertTrue(a.data() != null && a.data().placed(), "置いた印がつかない");
@@ -281,7 +281,7 @@ public final class Stage5WormholeGameTests {
         SinguloComponents.set(again, SinguloComponents.WORMHOLE.get(), a.data());
         BlockPos second = new BlockPos(5, 1, 5);
         helper.setBlock(second, SinguloBlocks.WORMHOLE_MOUTH.get());
-        WormholeMouthBlockEntity b = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, second);
+        WormholeMouthBlockEntity b = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, second);
         b.applyComponentsFromItemStack(again);
         helper.assertTrue(b.grace() == 0 && b.size() == 0, "置き直した口にまで猶予がつく");
         helper.succeed();
@@ -289,10 +289,10 @@ public final class Stage5WormholeGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void wormholeMouthUpkeepScalesWithThroatArea(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.WORMHOLE_MOUTH.get());
-        WormholeMouthBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        WormholeMouthBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         helper.assertTrue(WormholeMouthBlockEntity.area(1) == 9 && WormholeMouthBlockEntity.area(3) == 49, "喉の面積が違う");
         helper.assertTrue(Math.abs(m.upkeepPerTick() - 1.0) < 1e-9, "3×3 の維持費が基準と違う");
         helper.succeed();
@@ -302,10 +302,10 @@ public final class Stage5WormholeGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY, timeoutTicks = 80)
     public static void containmentTankLeaksWithoutPowerAndKeepsContentsAsItem(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(3, 1, 3);
         helper.setBlock(pos, SinguloBlocks.CONTAINMENT_TANK.get());
-        ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         helper.assertTrue(tank.tank().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE) == 0,
                 "ダークマター以外も入る");
         tank.tank().fill(ContainmentTankBlockEntity.darkMatter(5000), IFluidHandler.FluidAction.EXECUTE);
@@ -322,7 +322,7 @@ public final class Stage5WormholeGameTests {
                 SinguloComponents.set(stack, SinguloComponents.DARK_MATTER.get(), before);
                 BlockPos other = new BlockPos(5, 1, 5);
                 helper.setBlock(other, SinguloBlocks.CONTAINMENT_TANK.get());
-                ContainmentTankBlockEntity placed = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, other);
+                ContainmentTankBlockEntity placed = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, other);
                 placed.applyComponentsFromItemStack(stack);
                 helper.assertTrue(placed.amount() == before, "置き直すと中身が戻らない");
                 helper.succeed();
@@ -334,8 +334,7 @@ public final class Stage5WormholeGameTests {
 
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void manipulatorConeAndDarkMatterFuel(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
-        ServerPlayer player = TestBuild.mockPlayer(helper);
+        ServerPlayer player = io.github.genichimaruo.singulo.test.harness.TestScope.player(helper);
         try {
             player.getAbilities().instabuild = false;
             BlockPos at = helper.absolutePos(new BlockPos(1, 1, 4));

@@ -37,9 +37,16 @@
     },
     {
       "ingredient": {
-        "tag": "forge:glass/colorless"
+        "item": "singulo:sentinel_core"
       },
-      "count": 2
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:muon_catalyst"
+      },
+      "tier": 2,
+      "uses": 24000
     }
   ],
   "result": {

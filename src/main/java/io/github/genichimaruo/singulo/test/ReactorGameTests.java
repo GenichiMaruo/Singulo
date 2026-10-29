@@ -76,13 +76,13 @@ public final class ReactorGameTests {
         }
         helper.setBlock(PORT, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(CONTROLLER, SinguloBlocks.CORE_CONTROLLER.get());
-        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONTROLLER);
+        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONTROLLER);
         return reactor;
     }
 
-    @GameTest(setupTicks = 20, template = HUGE, batch = "reactor_isolated_accretionEfficiencyFollowsSpin")
+    @GameTest(template = "empty", batch = BATCH)
     public static void accretionEfficiencyFollowsSpin(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         double still = PenroseReactorBlockEntity.efficiency(0);
         double extremal = PenroseReactorBlockEntity.efficiency(1);
         helper.assertTrue(Math.abs(still - 0.0572) < 0.001, "無回転の降着効率は約5.7%: " + still);
@@ -94,7 +94,7 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 100, batch = "reactor_isolated_reactorFormsAndPortsForwardEnergy")
     public static void reactorFormsAndPortsForwardEnergy(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         helper.succeedWhen(() -> {
             helper.assertTrue(r.isFormed(), "13×13×13 のリアクターとして形成されない");
@@ -107,7 +107,7 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 420, batch = "reactor_isolated_ignitionNeeds50GFEWithinTenSeconds")
     public static void ignitionNeeds50GFEWithinTenSeconds(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
         helper.runAtTickTime(3, () -> helper.assertTrue(r.ignite(), "点火を始められない"));
@@ -142,7 +142,7 @@ public final class ReactorGameTests {
     /** 組み立てる前に抽出ポートへ敷いたホライズン・バスからも、点火の電力が入ること（形成したら接続し直す）。 */
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 600, batch = "reactor_isolated_ignitionPowerThroughPortCableLaidBeforeForming")
     public static void ignitionPowerThroughPortCableLaidBeforeForming(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos port = PORT;
         net.minecraft.core.Direction d = outward(port);
         helper.setBlock(port.relative(d), SinguloBlocks.HORIZON_BUS.get());
@@ -160,7 +160,7 @@ public final class ReactorGameTests {
     /** ホライズン・バスは 1 tick に int の上限（約 2.1 GFE）を超えて運ぶ: 50 GFE の点火電力が数 tick で入る。 */
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 160, batch = "reactor_isolated_horizonBusCarriesBeyondIntPerTick")
     public static void horizonBusCarriesBeyondIntPerTick(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos port = PORT;
         net.minecraft.core.Direction d = outward(port);
         PenroseReactorBlockEntity r = build(helper);
@@ -178,7 +178,7 @@ public final class ReactorGameTests {
     /** 抽出ポートと炉心質量警報器はリングの炉殻のどこに置いてもよく、警報器は質量が上限に達すると赤石信号を出す。 */
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 100, batch = "reactor_isolated_portsAndAlarmsAnywhereOnRings")
     public static void portsAndAlarmsAnywhereOnRings(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         build(helper);
         java.util.List<BlockPos> shells = Structures.reactorLayout(CENTER).entrySet().stream()
                 .filter(e -> e.getValue() == MultiblockPart.Role.REACTOR_SHELL).map(Map.Entry::getKey).filter(p -> !p.equals(PORT)).toList();
@@ -186,7 +186,7 @@ public final class ReactorGameTests {
         BlockPos alarm = shells.get(40);
         helper.setBlock(port2, SinguloBlocks.EXTRACTION_PORT.get());
         helper.setBlock(alarm, SinguloBlocks.REACTOR_MASS_ALARM.get());
-        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, CONTROLLER);
+        PenroseReactorBlockEntity reactor = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, CONTROLLER);
         helper.runAtTickTime(3, () -> reactor.forceCore(PenroseReactorBlockEntity.MAX_MASS + 100, 0));
         helper.succeedWhen(() -> {
             Structures.Reactor r = Structures.findReactor(helper.getLevel(), helper.absolutePos(CONTROLLER));
@@ -202,7 +202,7 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 400, batch = "reactor_isolated_ignitionFailsWithoutEnoughPowerButKeepsSeed")
     public static void ignitionFailsWithoutEnoughPowerButKeepsSeed(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
         // 100 MFE/t（トポロジカル導線）では10秒で 20 GFE にしかならない
@@ -218,7 +218,7 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 200, batch = "reactor_isolated_eddingtonLimitCapsFuel")
     public static void eddingtonLimitCapsFuel(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
         // 無回転（η 約5.7%、1個あたり約1.1 GFE）なら、5秒ぶん投入しても蓄電（40 GFE）は満ちない
@@ -236,7 +236,7 @@ public final class ReactorGameTests {
     /** リングの内側に入ったものは中心へ吸い込まれ、どんなに頑丈でも（無敵・耐性・体力・不死のトーテム）必ず死ぬ。 */
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 200, batch = "reactor_isolated_eventHorizonKillsEvenTheToughest")
     public static void eventHorizonKillsEvenTheToughest(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, CENTER.offset(3, -1, 0));
@@ -254,7 +254,7 @@ public final class ReactorGameTests {
     // 同じ組のほかの炉心（蒸発の爆発など）に巻き込まれないよう、1つだけの組で動かす
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 200, batch = "reactor_isolated_outsideTheRingsOnlyWeakPull")
     public static void outsideTheRingsOnlyWeakPull(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(2000, 0));
         // 日の光で燃えないハスク（テストの時刻によって死なないように）
@@ -271,7 +271,7 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 400, batch = "reactor_isolated_smallCoreEvaporatesAndBursts")
     public static void smallCoreEvaporatesAndBursts(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> r.forceCore(104, 0));
         helper.succeedWhen(() -> {
@@ -283,7 +283,7 @@ public final class ReactorGameTests {
 
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 6800, batch = "reactor_isolated_smallCoreRadiatesHawkingCondensate")
     public static void smallCoreRadiatesHawkingCondensate(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_HAWKING, new ItemStack(item("hawking_collector")));
         helper.startSequence()
@@ -297,7 +297,7 @@ public final class ReactorGameTests {
     /** 点火したばかりの炉心（質量500）でも、そのままホーキング凝縮体ができる（蒸発で縮むのを待たなくてよい）。 */
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 6800, batch = "reactor_isolated_freshlyIgnitedCoreRadiatesHawkingCondensate")
     public static void freshlyIgnitedCoreRadiatesHawkingCondensate(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_HAWKING, new ItemStack(item("hawking_collector")));
         // This is the unfed-core test: ambient mobs/falling-block drops must not
@@ -323,7 +323,7 @@ public final class ReactorGameTests {
 
     @GameTest(template = HUGE, setupTicks = 20, timeoutTicks = 2000, batch = "reactor_isolated_ergosphereYieldsExoticMatterAndSpinsDown")
     public static void ergosphereYieldsExoticMatterAndSpinsDown(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_ERGO, new ItemStack(item("ergosphere_ring")));
         // Simulate a natural water source immediately above the fixture ceiling.
@@ -340,7 +340,7 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 100, batch = "reactor_isolated_tidalZoneAndPull")
     public static void tidalZoneAndPull(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         Zombie zombie = helper.spawn(EntityType.ZOMBIE, CENTER.offset(2, 0, 0));
         zombie.setNoAi(true);
@@ -364,7 +364,7 @@ public final class ReactorGameTests {
     /** 回収運転: 質量が上限（480）を超えるならペレットを入れず、H凝縮体のできる質量に保つ。 */
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 200, batch = "reactor_isolated_harvestModeKeepsMassBelowCeiling")
     public static void harvestModeKeepsMassBelowCeiling(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_FUEL, new ItemStack(item("mass_pellet"), 64));
         helper.runAtTickTime(3, () -> {
@@ -382,7 +382,7 @@ public final class ReactorGameTests {
     /** 回収運転: 育ちすぎた炉心は毎秒2ずつ質量を放出して戻る。 */
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 200, batch = "reactor_isolated_harvestModeShedsOvergrownCore")
     public static void harvestModeShedsOvergrownCore(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         helper.runAtTickTime(3, () -> {
             r.forceCore(1000, 0);
@@ -397,10 +397,10 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = "empty", timeoutTicks = 6200)
     public static void encapsulatorMakesSingularityCore(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, SinguloBlocks.MACHINES.get(MachineType.SINGULARITY_ENCAPSULATOR).get());
-        MachineBlockEntity m = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, pos);
+        MachineBlockEntity m = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, pos);
         helper.onEachTick(() -> m.energy().setEnergy(m.energy().getMaxEnergyStored()));
         m.items().setStackInSlot(0, new ItemStack(item("degenerate_matter_shell")));
         m.items().setStackInSlot(1, new ItemStack(item("hawking_condensate"), 4));
@@ -416,14 +416,14 @@ public final class ReactorGameTests {
 
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 120, batch = "reactor_isolated_haloCollectorGathersDarkMatterAndCoreAcceptsIt")
     public static void haloCollectorGathersDarkMatterAndCoreAcceptsIt(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         BlockPos collectorPos = CENTER.offset(-6, -6, -6);
         BlockPos tankPos = CENTER.offset(-5, -6, -6);
         helper.setBlock(collectorPos, SinguloBlocks.HALO_COLLECTOR.get());
         helper.setBlock(tankPos, SinguloBlocks.CONTAINMENT_TANK.get());
-        io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity collector = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, collectorPos);
-        io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.compat.Legacy.blockEntity(helper, tankPos);
+        io.github.genichimaruo.singulo.darkmatter.HaloCollectorBlockEntity collector = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, collectorPos);
+        io.github.genichimaruo.singulo.darkmatter.ContainmentTankBlockEntity tank = io.github.genichimaruo.singulo.test.harness.TestFixtures.blockEntity(helper, tankPos);
         helper.onEachTick(() -> {
             collector.energy().setEnergy(collector.energy().getMaxEnergyStored());
             tank.energy().setEnergy(tank.energy().getMaxEnergyStored());
@@ -450,7 +450,7 @@ public final class ReactorGameTests {
     /** ペレットでは炉心質量が上限を超えない（投入間隔を最短にしても、崩壊は起きない）。 */
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 120, batch = "reactor_isolated_pelletsNeverOverfillCore")
     public static void pelletsNeverOverfillCore(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         // This measures pellet feeding only. Foreign items are deliberately allowed
         // to exceed MAX_MASS (covered by overfilledReactorCollapsesAndCanBeRecaptured).
         // build() seals the common fixture. Remove ambient entities as well for this unfed measurement.
@@ -479,7 +479,7 @@ public final class ReactorGameTests {
      */
     @GameTest(setupTicks = 20, template = HUGE, timeoutTicks = 320, batch = "reactor_isolated_overfilledReactorCollapsesAndCanBeRecaptured")
     public static void overfilledReactorCollapsesAndCanBeRecaptured(GameTestHelper helper) {
-        io.github.genichimaruo.singulo.compat.Legacy.isolateFixture(helper);
+        io.github.genichimaruo.singulo.test.harness.TestFixtures.isolateFixture(helper);
         PenroseReactorBlockEntity r = build(helper);
         double start = PenroseReactorBlockEntity.MAX_MASS + PenroseReactorBlockEntity.COLLAPSE_MARGIN - 0.5;
         helper.runAtTickTime(3, () -> r.forceCore(start, 0.3));
@@ -502,6 +502,28 @@ public final class ReactorGameTests {
             helper.assertTrue(helper.getLevel().getBlockEntity(helper.absolutePos(CONTROLLER)) instanceof PenroseReactorBlockEntity re
                     && re.state() == PenroseReactorBlockEntity.State.RUNNING && re.mass() > 4000, "組み直しても取り込まない");
             helper.assertBlockNotPresent(SinguloBlocks.ROGUE_BLACK_HOLE.get(), CENTER);
+        });
+    }
+
+    /** 炉心が稼働している間、リングの内側に置いたブロックは崩れて吸い込まれる（中身を持つブロックは崩さない）。 */
+    @GameTest(template = HUGE, batch = BATCH, timeoutTicks = 520)
+    public static void runningCoreDevoursBlocksInsideTheRing(GameTestHelper helper) {
+        PenroseReactorBlockEntity r = build(helper);
+        r.items().setStackInSlot(PenroseReactorBlockEntity.SLOT_SEED, new ItemStack(item("singularity_seed")));
+        helper.runAtTickTime(3, () -> helper.assertTrue(r.ignite(), "点火を始められない"));
+        helper.onEachTick(() -> r.energy().receiveEnergy(300_000_000, false));
+        BlockPos stone = CENTER.offset(3, 0, 0);
+        BlockPos chest = CENTER.offset(-3, 0, 0);
+        int lit = 3 + PenroseReactorBlockEntity.IGNITION_SEQUENCE_TICKS + 10;
+        helper.runAtTickTime(lit, () -> {
+            helper.assertTrue(r.state() == PenroseReactorBlockEntity.State.RUNNING, "点火して稼働しない");
+            helper.setBlock(stone, net.minecraft.world.level.block.Blocks.STONE);
+            helper.setBlock(chest, net.minecraft.world.level.block.Blocks.CHEST);
+        });
+        helper.runAtTickTime(lit + 60, () -> {
+            helper.assertTrue(helper.getBlockState(stone).isAir(), "リングの内側のブロックが吸い込まれない");
+            helper.assertTrue(helper.getBlockState(chest).is(net.minecraft.world.level.block.Blocks.CHEST), "中身を持つブロックまで崩した");
+            helper.succeed();
         });
     }
 }

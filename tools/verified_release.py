@@ -28,7 +28,8 @@ def inspect(repo, run_id, tag, source, loader):
             and run["head_repository"]["full_name"] == repo):
         raise RuntimeError("Source must be a successful PR or 1.20.1 branch validation in this repository")
     jobs = api(repo, f"actions/runs/{run_id}/jobs?per_page=100")["jobs"]
-    expected_jobs = {f"build-and-gametest ({variant}, {ns})" for variant in ("forge", "neoforge") for ns in GROUPS} | {f"optional-mekanism ({variant})" for variant in ("forge", "neoforge")} | {f"renderer-lighting ({variant})" for variant in ("forge", "neoforge")}
+    expected_jobs = {'build-and-gametest (forge)', 'build-and-gametest (neoforge)',
+                     'optional-mekanism', 'renderer-lighting'}
     if len(jobs) != len(expected_jobs) or {j["name"] for j in jobs} != expected_jobs or any(j["conclusion"] != "success" for j in jobs):
         raise RuntimeError("All required validation jobs must have succeeded")
     ref = api(repo, f"git/ref/tags/{tag}")["object"]
@@ -43,14 +44,14 @@ def inspect(repo, run_id, tag, source, loader):
     selected = {}
     tested_commits = set()
     for artifact in artifacts:
-        match = re.fullmatch(rf"pr-validation-([0-9a-f]{{40}})-{loader}-(singulo(?:_[a-z]+)*)", artifact["name"])
+        match = re.fullmatch(rf"pr-validation-([0-9a-f]{{40}})-{loader}-(full)", artifact["name"])
         if match:
             ns = match[2]
             if artifact["expired"] or ns in selected:
                 raise RuntimeError("Expired or ambiguous validation artifacts")
             tested_commits.add(match[1])
             selected[ns] = {"id": artifact["id"], "name": artifact["name"]}
-    if set(selected) != set(GROUPS) or len(tested_commits) != 1:
+    if set(selected) != {"full"} or len(tested_commits) != 1:
         raise RuntimeError("Expected all required namespace artifacts from one tested merge commit")
     tested_commit = tested_commits.pop()
     if api(repo, f"git/commits/{tested_commit}")["tree"]["sha"] != tree:
@@ -81,20 +82,21 @@ def content_hash(path):
 
 
 def promote(metadata, artifact_dir, output, jar_name):
-    jars = {}
-    for ns, expected in GROUPS.items():
-        root = artifact_dir / metadata["artifacts"][ns]["name"]
-        jars[ns] = one(root.rglob(jar_name), f"{ns} production JAR")
-        log = one((p for p in root.rglob("latest.log") if "gametest" in p.parts), f"{ns} GameTest log")
-        found = re.search(r"All ([1-9][0-9]*) required tests passed", log.read_text())
-        if not found or int(found[1]) != expected:
-            raise RuntimeError(f"Missing successful {expected}-test completion for {ns}")
-    if len({content_hash(jar) for jar in jars.values()}) != 1:
-        raise RuntimeError("The tested production JARs have different contents")
-    root = artifact_dir / metadata["artifacts"]["singulo"]["name"]
+    root = artifact_dir / metadata["artifacts"]["full"]["name"]
+    jar = one(root.rglob(jar_name), "production JAR")
+    log = one((p for p in root.rglob("latest.log") if "gametest" in p.parts), "GameTest log")
+    expected_count = sum(GROUPS.values())
+    if re.findall(r"All ([0-9]+) required tests passed", log.read_text()) != [str(expected_count)]:
+        raise RuntimeError("Missing successful full-suite completion")
+    from check_gametests import inventory, DEFAULT_NAMESPACES, validate_report
+    expected = [e['name'] for e in inventory() if e['namespace'] in DEFAULT_NAMESPACES]
+    if len(expected) != expected_count:
+        raise RuntimeError("Release count differs from source inventory")
+    report = one(root.rglob("reports/gametest/results.json"), "per-test report")
+    validate_report(json.loads(report.read_text()), expected)
     gui_log = one((p for p in root.rglob("latest.log") if "gui-review" in p.parts), "GUI completion log")
-    if "SINGULO_GUI_COMPLETE 22" not in gui_log.read_text() or len(list((gui_log.parents[1] / "screenshots").glob("*.png"))) != 212:
-        raise RuntimeError("Missing complete 212-screen GUI validation")
+    if "SINGULO_GUI_COMPLETE 22" not in gui_log.read_text() or len(list((gui_log.parents[1] / "screenshots").glob("*.png"))) != 242:
+        raise RuntimeError("Missing complete 242-screen GUI validation")
     gui = gui_log.read_text()
     for marker in ("SINGULO_SEARCH_COMPLETE", "SINGULO_JEI_SYNC_COMPLETE", "SINGULO_HANDBOOK_SEARCH_COMPLETE"):
         if marker not in gui:
@@ -103,15 +105,16 @@ def promote(metadata, artifact_dir, output, jar_name):
     pixel_results = json.loads(pixels.read_text())
     if len(pixel_results) != 3 or sum(row["checked_empty_slot_centers"] for row in pixel_results) != 105:
         raise RuntimeError("Missing 105-point inventory verification")
-    if "SINGULO_MACHINE_GUI_COMPLETE 190" not in gui:
+    if "SINGULO_MACHINE_GUI_COMPLETE 220" not in gui:
         raise RuntimeError("Missing machine GUI validation")
     machine = json.loads(one(root.rglob("machine-pixels.json"), "machine pixel verification").read_text())
     if (set(machine["languages"]) != {"ja_jp", "en_us", "zh_cn", "zh_tw", "ko_kr"}
-            or len(machine["languages"]) != 5 or machine["machine_captures"] != 190
+            or len(machine["languages"]) != 5 or machine["machine_captures"] != 220
+            or machine.get("supply_port_inventory_slots") != 350 or machine.get("supply_port_tooltips") != 5
             or machine["headers_without_title_status_overlap"] != 80 or machine["generator_font_probes"] != 5):
         raise RuntimeError("Incomplete machine GUI pixel verification")
     output.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(jars["singulo"], output)
+    shutil.copyfile(jar, output)
     metadata["jar_sha256"] = hashlib.sha256(output.read_bytes()).hexdigest()
     metadata["jar_content_sha256"] = content_hash(output)
     print(f"Promoted {output.name}: {metadata['jar_sha256']}")
