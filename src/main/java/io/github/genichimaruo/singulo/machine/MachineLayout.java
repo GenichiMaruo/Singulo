@@ -44,6 +44,8 @@ public final class MachineLayout {
     /** 単極子アップグレードのスロット（右レールの強化の段）。 */
     public final int upgradeX;
     public final int upgradeY;
+    public final int capacityX;
+    public final int capacityY;
 
     public MachineLayout(MachineType type) {
         int n = type.inputSlots();
@@ -107,6 +109,8 @@ public final class MachineLayout {
         inventoryX = GuiFrame.inventoryX(width);
         upgradeX = GuiFrame.railSlotX(width);
         upgradeY = GuiFrame.railSlotY(GuiFrame.RAIL_UPGRADE);
+        capacityX = GuiFrame.railSlotX(width);
+        capacityY = GuiFrame.railSlotY(GuiFrame.RAIL_AUTOMATION);
     }
 
     private static int[] shifted(int[] xs, int shift) {

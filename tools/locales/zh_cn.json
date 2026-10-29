@@ -11128,8 +11128,8 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 48 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 48 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 49 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 49 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
@@ -11416,8 +11416,8 @@
     "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 28 more",
-    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 28 个"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 29 more",
+    "translation": "用于：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 29 个"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11524,8 +11524,8 @@
     "translation": "用于：数据卡（观测日志）"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 25 more",
-    "translation": "用于：大型背包升级、简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、相位同步板 等 25 个"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 26 more",
+    "translation": "用于：大型背包升级、简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、相位同步板 等 26 个"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11632,12 +11632,12 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 84 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 84 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 85 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 85 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 59 more",
-    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 59 个"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 62 more",
+    "translation": "用于：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 62 个"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
@@ -11652,8 +11652,8 @@
     "translation": "用于：奇异物质、奇点核心、晕收集器、时间晶体模块"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
-    "translation": "用途：SMES 模块、炉心控制装置、奇点封装器、护盾塔核心、引力子操纵器等另外3项"
+    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 4 more",
+    "translation": "用途：SMES 模块、炉心控制装置、奇点封装器、护盾塔核心、引力子操纵器等另外4项"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11870,5 +11870,57 @@
   "guide.singulo.factory_expansion.limits.body": {
     "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
     "translation": "金属压缩Lv2的质量为81。铁块或铜块每个质量为3，因此Lv1需3块，Lv2需27块，相当于243个锭。可用铜代替铁。热电偶和热交换核心的用途有限，无须一开始大量囤积。\nP反应堆需在10秒内接收50 GFE才能点火。每个SMES 模块容量为2 GFE，至少需要25个满足总容量。单个输出上限为100 MFE/t，须至少3个并联，总传输速率达到250 MFE/t以上。\n点火后初始质量500、自旋0时，维持燃料供给的持续发电量约为28.6 MFE/t。2.1 GFE/t是传输上限，并非初始发电量。先发展质量、自旋和储能，再为创世炉供电。"
+  },
+  "desc.singulo.capacity_upgrade_1": {
+    "source": "Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.",
+    "translation": "在加工机器的容量专用槽安装一个后，储能容量至少为1,000,000 FE。可与速度升级同时使用，不改变接收上限。取下时保留多余电能，降至容量以下前停止接收。"
+  },
+  "desc.singulo.capacity_upgrade_2": {
+    "source": "Made from Mk1. Raises a processing machine’s buffer to at least 4,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "由Mk1制作。加工机器的储能容量至少为4,000,000 FE。在容量专用槽安装一个，不改变接收上限。"
+  },
+  "desc.singulo.capacity_upgrade_3": {
+    "source": "Made from Mk2. Raises a processing machine’s buffer to at least 40,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "由Mk2制作。加工机器的储能容量至少为40,000,000 FE。在容量专用槽安装一个，不改变接收上限。"
+  },
+  "gui.singulo.reason.capacity_upgrade": {
+    "source": "Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot",
+    "translation": "每刻需要 %s FE。请在专用槽中安装容量升级 Mk%s 或更高版本"
+  },
+  "gui.singulo.slot.capacity_upgrade": {
+    "source": "Capacity upgrade slot (Mk1–Mk3)",
+    "translation": "容量升级专用槽（Mk1–Mk3）"
+  },
+  "howto.singulo.capacity_upgrade_1": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制造地：工作台（第 2 阶段）"
+  },
+  "howto.singulo.capacity_upgrade_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "制造地：精密组装台（第 3 阶段）"
+  },
+  "howto.singulo.capacity_upgrade_3": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "制造地：精密组装台（第 4 阶段）"
+  },
+  "item.singulo.capacity_upgrade_1": {
+    "source": "Capacity Upgrade Mk1",
+    "translation": "容量升级 Mk1"
+  },
+  "item.singulo.capacity_upgrade_2": {
+    "source": "Capacity Upgrade Mk2",
+    "translation": "容量升级 Mk2"
+  },
+  "item.singulo.capacity_upgrade_3": {
+    "source": "Capacity Upgrade Mk3",
+    "translation": "容量升级 Mk3"
+  },
+  "uses.singulo.capacity_upgrade_1": {
+    "source": "Used in: Capacity Upgrade Mk2",
+    "translation": "用途：容量升级 Mk2"
+  },
+  "uses.singulo.capacity_upgrade_2": {
+    "source": "Used in: Capacity Upgrade Mk3",
+    "translation": "用途：容量升级 Mk3"
   }
 }

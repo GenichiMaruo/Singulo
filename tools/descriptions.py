@@ -5,6 +5,12 @@ gen_data.py がレシピから自動で足すので、ここには書かない�
 """
 
 DESC = {
+    '容量アップグレード（Mk1）': ('加工装置の容量専用枠に1個装着すると、蓄電容量が最低1,000,000 FEになる。速度アップグレードと併用でき、受電上限は変えない。取り外し時の余剰電力は保持し、容量内に減るまで受電しない。',
+                                  'Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.'),
+    '容量アップグレード（Mk2）': ('Mk1から作る容量アップグレード。加工装置の蓄電容量が最低4,000,000 FEになる。専用枠に1個だけ装着し、受電上限は変えない。',
+                                  'Made from Mk1. Raises a processing machine’s buffer to at least 4,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.'),
+    '容量アップグレード（Mk3）': ('Mk2から作る容量アップグレード。加工装置の蓄電容量が最低40,000,000 FEになる。専用枠に1個だけ装着し、受電上限は変えない。',
+                                  'Made from Mk2. Raises a processing machine’s buffer to at least 40,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.'),
     # ---------------------------------------------------------------- 段階1 起動
     '鋼の素': ('鉄と炭素を混ぜた鋼鉄の原料。', 'A blend of iron and carbon.'),
     '鋼鉄インゴット': ('丈夫な構造用金属。', 'A sturdy structural metal.'),

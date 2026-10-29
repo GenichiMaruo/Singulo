@@ -13,6 +13,7 @@ public class SinguloEnergyStorage extends EnergyStorage {
 
     @Override
     public int receiveEnergy(int toReceive, boolean simulate) {
+        if (energy >= capacity || toReceive <= 0) return 0;
         int r = super.receiveEnergy(toReceive, simulate);
         if (r > 0 && !simulate) {
             onChange.run();
@@ -42,7 +43,7 @@ public class SinguloEnergyStorage extends EnergyStorage {
     /** 発電機が電力を生む。入り切らなかった分は捨てる。 */
     public void generate(int amount) {
         int before = energy;
-        energy = (int) Math.min(capacity, (long) energy + amount);
+        energy = (int) Math.max(before, Math.min(capacity, (long) energy + amount));
         if (energy != before) {
             onChange.run();
         }
@@ -51,4 +52,10 @@ public class SinguloEnergyStorage extends EnergyStorage {
     public void setEnergy(int value) {
         energy = Math.max(0, Math.min(capacity, value));
     }
+
+    /** Downgrading never destroys stored energy. Reception stays blocked until surplus is spent. */
+    public void resizeCapacity(int value) { capacity = Math.max(1, value); }
+
+    /** Restore pre-existing charge even if a removed upgrade or migration reduced the capacity. */
+    public void restoreEnergy(int value) { energy = Math.max(0, value); }
 }

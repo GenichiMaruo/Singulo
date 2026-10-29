@@ -109,6 +109,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
                     inputsChangedAt = level.getGameTime();          // 人・ホッパー・アンドロイドが入れ替えた（装置が使った分は数えない）
                 }
                 markDirty();
+                if (slot == type.capacitySlot() && energy != null) refreshEnergyCapacity();
             }
 
             @Override
@@ -126,7 +127,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
             @Override
             public int getSlotLimit(int slot) {
-                return slot == type.upgradeSlot() ? 1 : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
+                return slot == type.upgradeSlot() || slot == type.capacitySlot() ? 1
+                        : slot == type.catalystSlot() ? CatalystMagazine.SUPPLY_LIMIT : 64;
             }
         };
         this.tanks = new FluidTank[type.tanks()];
@@ -139,7 +141,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
             };
         }
         int capacity = type.energyCapacity();
-        this.energy = new SinguloEnergyStorage(capacity, capacity / 10, 0, this::setChanged);
+        this.energy = new SinguloEnergyStorage(capacity, type.energyReceiveLimit(), 0, this::setChanged);
         this.automationItems = new AutomationItems();
         this.automationFluids = new AutomationFluids();
         this.tankSides = createTankSides(type);
@@ -155,6 +157,11 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
 
     public SinguloEnergyStorage energy() {
         return energy;
+    }
+
+    private void refreshEnergyCapacity() {
+        energy.resizeCapacity(Math.max(type.energyCapacity(), CapacityUpgrades.capacity(
+                CapacityUpgrades.tier(items.getStackInSlot(type.capacitySlot())))));
     }
 
     public IItemHandler automationItems() {
@@ -210,6 +217,7 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
     /** そのスロットにそのアイテムを入れてよいか（触媒は専用スロットだけ、アップグレードはアップグレード枠だけ）。 */
     public boolean slotAccepts(int slot, ItemStack stack) {
         if (pendingReturns.get(slot)) return false;
+        if (slot == type.capacitySlot()) return CapacityUpgrades.tier(stack) > 0;
         if (slot == type.upgradeSlot()) {
             return isUpgrade(stack);
         }
@@ -1306,7 +1314,8 @@ public class MachineBlockEntity extends BlockEntity implements MenuProvider, Abs
         for (int i = 0; i < tanks.length && i < tankList.size(); i++) {
             tanks[i].readFromNBT(registries, tankList.getCompound(i));
         }
-        energy.setEnergy(tag.getInt("energy"));
+        refreshEnergyCapacity();
+        energy.restoreEnergy(tag.getInt("energy"));
         progress = tag.getInt("progress");
         mode = tag.getInt("mode");
         selectedRecipe = tag.contains("selected_recipe") ? ResourceLocation.tryParse(tag.getString("selected_recipe")) : null;

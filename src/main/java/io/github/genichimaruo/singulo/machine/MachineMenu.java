@@ -82,6 +82,12 @@ public class MachineMenu extends AbstractContainerMenu {
                 return 1;
             }
         });
+        addSlot(new NotifyingItemSlot(handler, type.capacitySlot(), layout.capacityX, layout.capacityY) {
+            @Override
+            public boolean mayPlace(ItemStack stack) { return CapacityUpgrades.tier(stack) > 0; }
+            @Override
+            public int getMaxStackSize() { return 1; }
+        });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, layout.inventoryX + col * 18, GuiFrame.inventoryY(MachineLayout.HEIGHT) + row * 18));
@@ -135,12 +141,14 @@ public class MachineMenu extends AbstractContainerMenu {
         ItemStack stack = slot.getItem();
         ItemStack original = stack.copy();
         int machineSlots = type.itemSlots();
-        int upgradeIndex = machineSlots - 1;                 // メニュー上の並び: 入力・出力・（触媒）・アップグレード
-        int catalystIndex = type.hasCatalystSlot() ? machineSlots - 2 : -1;
+        int upgradeIndex = type.upgradeSlot();
+        int catalystIndex = type.catalystSlot();
         if (index < machineSlots) {
             if (!moveItemStackTo(stack, machineSlots, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
+        } else if (CapacityUpgrades.tier(stack) > 0) {
+            if (!moveItemStackTo(stack, type.capacitySlot(), type.capacitySlot() + 1, false)) return ItemStack.EMPTY;
         } else if (MachineBlockEntity.isUpgrade(stack)) {
             if (!moveItemStackTo(stack, upgradeIndex, upgradeIndex + 1, false)) {
                 return ItemStack.EMPTY;

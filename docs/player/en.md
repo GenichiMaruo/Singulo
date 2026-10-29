@@ -203,6 +203,8 @@ Restored parts and original records exhausted during processing become item outp
 
 ## Precision Assembler recipe selection
 
+The Precision Assembler normally stores 100,000 FE and accepts up to 4,000,000 FE per reception. Install one Capacity Upgrade Mk1, Mk2 or Mk3 in the dedicated slot on the right rail for 1,000,000, 4,000,000 or 40,000,000 FE. Craft Mk1 on a stage-2 crafting table; craft Mk2 and Mk3 in the assembler using the previous tier as an ingredient. The separate slot supports speed upgrades at the same time, and intake limits stay unchanged. Removing or replacing an upgrade preserves surplus charge, including charge from older versions, and blocks further reception until the buffer falls below capacity. Recipes whose per-tick cost exceeds the normal buffer, such as the Mk3 sensitivity module, require a capacity upgrade; JEI shows this requirement.
+
 Without a chosen recipe, the Precision Assembler starts crafting when the kinds of items inside exactly match a recipe. A mix that could also be part of another recipe starts only after items have stopped going in for 3 seconds. Choose a recipe with the button below the output slot to craft only that one; the choice is saved, and other items may be present. Androids select their recorded recipe before inserting materials. The Singularity Encapsulator works the same way.
 
 ## Facility blueprints

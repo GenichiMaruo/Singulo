@@ -11128,8 +11128,8 @@
     "translation": "사용 대상: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 48 more",
-    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 48개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 49 more",
+    "translation": "사용 대상: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 49개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 26 more",
@@ -11416,8 +11416,8 @@
     "translation": "사용 대상: 봉인 컨테이너 (특이점 잠금)"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 28 more",
-    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 28개"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 29 more",
+    "translation": "사용 대상: 지평선 버스, 중력장 안정기, 소형 블랙홀 용기, 블랙홀 폭탄, 호킹 수집기 외 29개"
   },
   "uses.singulo.focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11524,8 +11524,8 @@
     "translation": "사용 제품: 데이터 카드(관측 로그)"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 25 more",
-    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 25개"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 26 more",
+    "translation": "사용 대상: 대형 백팩 업그레이드, 축퇴 압축로 제어기, 카시미르 공동 제어기, 시간 결정 배양기, 위상 동기판 외 26개"
   },
   "uses.singulo.phase_sync_plate": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11632,12 +11632,12 @@
     "translation": "사용 대상: 기본 프레임, 강판, 압축기, 이전 렌치, 온전한 폐허 기둥 외 1개"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 84 more",
-    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 84개"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 85 more",
+    "translation": "사용 대상: 흰색 패널, 검은 강화 패널, 흰색 슬라이딩 도어, 검은 강화 유리, 냉각탑 베이스 외 85개"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 59 more",
-    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 59개"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 62 more",
+    "translation": "사용 대상: 초전도 선재, 집속 자석, 가속기 제어기, 촉매 반응기, 극저온 터빈 외 62개"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube, Topological Wire and 1 more",
@@ -11652,8 +11652,8 @@
     "translation": "사용 대상: 특이 물질, 특이점 코어, 헤일로 수집기, 시간 결정 모듈"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
-    "translation": "용도: SMES 모듈, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 그래비톤 조작기 외 3종"
+    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 4 more",
+    "translation": "용도: SMES 모듈, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 그래비톤 조작기 외 4종"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11870,5 +11870,57 @@
   "guide.singulo.factory_expansion.limits.body": {
     "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
     "translation": "금속 압축 Lv2의 질량은 81입니다. 철이나 구리 블록은 하나당 질량 3이므로 Lv1은 3블록, Lv2는 27블록, 즉 주괴 243개를 씁니다. 철 대신 구리도 가능합니다. 열전대와 열교환 코어는 용도가 한정되어 처음부터 많이 비축할 필요는 없습니다.\nP 리액터 점화에는 10초 안에 50 GFE를 공급해야 합니다. SMES 모듈 하나당 2 GFE이므로 용량만으로는 최소 25개가 필요합니다. 모듈 하나의 출력 한도는 100 MFE/t이므로 적어도 3개를 병렬로 연결하고 합계 250 MFE/t 이상의 전송량을 확보해야 합니다.\n점화 직후 질량 500, 스핀 0에서 연료를 유지하면 지속 출력은 약 28.6 MFE/t입니다. 2.1 GFE/t는 전송 상한이며 초기 발전량이 아닙니다. 질량, 스핀과 저장 시설을 갖춘 후 창세로에 전력을 공급하세요."
+  },
+  "desc.singulo.capacity_upgrade_1": {
+    "source": "Install one in a processing machine’s capacity slot for a minimum buffer of 1,000,000 FE. Works alongside speed upgrades; intake limits stay unchanged. Removing it preserves surplus charge and blocks reception until the buffer falls below capacity.",
+    "translation": "가공 기계의 용량 전용 칸에 하나를 장착하면 저장 용량이 최소 1,000,000 FE가 됩니다. 속도 업그레이드와 함께 사용하며 수전 한도는 바뀌지 않습니다. 제거해도 초과 전력을 보존하며 용량 아래로 줄어들 때까지 전력을 받지 않습니다."
+  },
+  "desc.singulo.capacity_upgrade_2": {
+    "source": "Made from Mk1. Raises a processing machine’s buffer to at least 4,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "Mk1으로 만듭니다. 가공 기계의 저장 용량을 최소 4,000,000 FE로 늘립니다. 용량 전용 칸에 하나만 장착하며 수전 한도는 바뀌지 않습니다."
+  },
+  "desc.singulo.capacity_upgrade_3": {
+    "source": "Made from Mk2. Raises a processing machine’s buffer to at least 40,000,000 FE. Install one in the dedicated capacity slot; intake limits stay unchanged.",
+    "translation": "Mk2로 만듭니다. 가공 기계의 저장 용량을 최소 40,000,000 FE로 늘립니다. 용량 전용 칸에 하나만 장착하며 수전 한도는 바뀌지 않습니다."
+  },
+  "gui.singulo.reason.capacity_upgrade": {
+    "source": "Needs %s FE per tick. Install Capacity Upgrade Mk%s or higher in its dedicated slot",
+    "translation": "틱당 %s FE가 필요합니다. 전용 칸에 용량 업그레이드 Mk%s 이상을 장착하세요"
+  },
+  "gui.singulo.slot.capacity_upgrade": {
+    "source": "Capacity upgrade slot (Mk1–Mk3)",
+    "translation": "용량 업그레이드 전용 칸 (Mk1–Mk3)"
+  },
+  "howto.singulo.capacity_upgrade_1": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작 장소: 제작대 (2단계)"
+  },
+  "howto.singulo.capacity_upgrade_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작 장소: 정밀 조립기 (3단계)"
+  },
+  "howto.singulo.capacity_upgrade_3": {
+    "source": "Made in: Precision Assembler (stage 4)",
+    "translation": "제작 장소: 정밀 조립기 (4단계)"
+  },
+  "item.singulo.capacity_upgrade_1": {
+    "source": "Capacity Upgrade Mk1",
+    "translation": "용량 업그레이드 Mk1"
+  },
+  "item.singulo.capacity_upgrade_2": {
+    "source": "Capacity Upgrade Mk2",
+    "translation": "용량 업그레이드 Mk2"
+  },
+  "item.singulo.capacity_upgrade_3": {
+    "source": "Capacity Upgrade Mk3",
+    "translation": "용량 업그레이드 Mk3"
+  },
+  "uses.singulo.capacity_upgrade_1": {
+    "source": "Used in: Capacity Upgrade Mk2",
+    "translation": "사용처: 용량 업그레이드 Mk2"
+  },
+  "uses.singulo.capacity_upgrade_2": {
+    "source": "Used in: Capacity Upgrade Mk3",
+    "translation": "사용처: 용량 업그레이드 Mk3"
   }
 }

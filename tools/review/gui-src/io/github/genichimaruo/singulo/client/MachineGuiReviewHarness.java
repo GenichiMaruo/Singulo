@@ -165,6 +165,7 @@ public final class MachineGuiReviewHarness {
             metrics.add(LANGUAGES[language] + "\t" + type.id() + "\t" + titleWidth + "\t" + statusWidth + "\t" + menu.layout.width);
             for (var slot : menu.slots) {
                 if (slot.x == menu.layout.upgradeX && slot.y == menu.layout.upgradeY) continue;   // 右レールの強化の段
+                if (slot.x == menu.layout.capacityX && slot.y == menu.layout.capacityY) continue;
                 if (slot.x < 1 || slot.x + 16 >= menu.layout.width || slot.y < 16 || slot.y + 16 > MachineLayout.HEIGHT - 4)
                     throw new IllegalStateException("Slot outside panel: " + type + " " + slot.x + "," + slot.y);
             }

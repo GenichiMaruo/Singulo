@@ -116,7 +116,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     protected List<Component> statusTooltip() {
         return switch (machineStatus()) {
             case IDLE -> idleReason == null ? List.of() : idleReason.lines();
-            case NO_POWER -> List.of(Component.translatable("gui.singulo.reason.no_power", io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_USAGE)),
+            case NO_POWER -> menu.value(MachineBlockEntity.D_USAGE) > menu.value(MachineBlockEntity.D_CAPACITY)
+                    ? List.of(Component.translatable("gui.singulo.reason.capacity_upgrade",
+                            io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_USAGE)),
+                            io.github.genichimaruo.singulo.machine.CapacityUpgrades.requiredTier(menu.value(MachineBlockEntity.D_USAGE))))
+                    : List.of(Component.translatable("gui.singulo.reason.no_power", io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_USAGE)),
                     io.github.genichimaruo.singulo.energy.EnergyText.of(menu.value(MachineBlockEntity.D_ENERGY))));
             case OUTPUT_FULL -> List.of(Component.translatable("gui.singulo.reason.output_full"));
             case NOT_FORMED -> List.of(Component.translatable("gui.singulo.reason.not_formed"));
@@ -331,12 +335,14 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
     @Override
     protected boolean railUsed(int row) {
         return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE
+                || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION
                 || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS && hasSides();
     }
 
     @Override
     protected boolean railConnected(int row) {
-        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE || sides.open;
+        return row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE
+                || row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION || sides.open;
     }
 
     @Override
@@ -345,7 +351,11 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
             Panel.sidesIcon(g, x, y);
             return;
         }
-        drawSpecialSlot(g, leftPos + layout().upgradeX, topPos + layout().upgradeY, 0, type().upgradeSlot(), "monopole_upgrade");
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION) {
+            drawSpecialSlot(g, leftPos + layout().capacityX, topPos + layout().capacityY, 0, type().capacitySlot(), "capacity_upgrade_1");
+        } else {
+            drawSpecialSlot(g, leftPos + layout().upgradeX, topPos + layout().upgradeY, 0, type().upgradeSlot(), "monopole_upgrade");
+        }
     }
 
     @Override
@@ -363,6 +373,8 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
             return Component.translatable("gui.singulo.sides.button");
         }
+        if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_AUTOMATION)
+            return menu.getSlot(type().capacitySlot()).getItem().isEmpty() ? Component.translatable("gui.singulo.slot.capacity_upgrade") : null;
         return menu.getSlot(type().upgradeSlot()).getItem().isEmpty() ? Component.translatable("gui.singulo.slot.upgrade") : null;
     }
 

@@ -2222,6 +2222,9 @@ ITEM_ART = {
     'temporal_key': lambda: seal_key(3),
     'singularity_key': lambda: seal_key(4),
     'overclock_chip': lambda: overclock_chip(),
+    'capacity_upgrade_1': lambda: capacity_upgrade(1),
+    'capacity_upgrade_2': lambda: capacity_upgrade(2),
+    'capacity_upgrade_3': lambda: capacity_upgrade(3),
     'gravity_boots': lambda: gravity_boots(),
     'catalyst_stabilizer': lambda: catalyst_stabilizer(),
     'dimensional_pocket': lambda: dimensional_pocket(),
@@ -2245,6 +2248,18 @@ def seal_key(tier):
     for k in range(tier):
         d.point((13 - k * 2, 10), fill=(120, 126, 140, 255))
     d.point((2, 6), fill=(255, 255, 255, 255))
+    return im
+
+
+def capacity_upgrade(tier):
+    """A capacitor cartridge with one, two or three illuminated charge cells."""
+    im, d = new()
+    color = ((70, 175, 240), (175, 120, 250), (245, 190, 70))[tier - 1]
+    d.rectangle([2, 3, 13, 12], fill=(42, 48, 60, 255), outline=(170, 185, 200, 255))
+    d.rectangle([5, 1, 10, 2], fill=(195, 185, 140, 255))
+    for i in range(3):
+        d.rectangle([4 + i * 3, 5, 5 + i * 3, 10], fill=rgba(color if i < tier else (65, 75, 85)))
+    d.point((3, 4), fill=(255, 255, 255, 255))
     return im
 
 
