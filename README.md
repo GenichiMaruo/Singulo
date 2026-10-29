@@ -1,6 +1,6 @@
 # Singulo
 
-[日本語](docs/manual-ja.md) · [English](docs/manual-en.md) · [简体中文](docs/manual-zh-cn.md) · [繁體中文](docs/manual-zh-tw.md) · [한국어](docs/manual-ko-kr.md) · [レシピ一覧](docs/recipes/README.md)
+[日本語](docs/player/ja.md) · [English](docs/player/en.md) · [简体中文](docs/player/zh-cn.md) · [繁體中文](docs/player/zh-tw.md) · [한국어](docs/player/ko-kr.md) · [レシピ一覧](docs/recipes/README.md)
 
 **熱電発電から始めて、回転ブラックホールを運用し、最後は宇宙をひとつ生み出す工業modです。**
 Minecraft 1.21.1（NeoForge）と 1.20.1（Forge / NeoForge）向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
@@ -31,7 +31,7 @@ Download mod JARs from CurseForge. GitHub Releases contain release notes and a l
 - **アンドロイドに作業を頼む** — 作業指令台で製作・加工・採掘を注文し、手順カードで農作業や装置の操作も任せられます。在庫やレッドストーンで注文を自動化でき、流体搬送用のタンクや装飾も付けられます。
 - **みんなで挑む** — ボスは挑戦者の人数に合わせて強くなり、全員の攻撃がそれぞれ通ります。報酬は戦いが始まったときの人数ぶん。
 
-**Singulo** is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge / NeoForge). Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/manual-en.md).
+**Singulo** is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge / NeoForge). Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/player/en.md).
 
 ## 遊び始めるには
 
@@ -42,12 +42,11 @@ In 0.10.0, the Muon-Catalyzed Fusion Reactor supplies stage 2 power, while the C
 
 初めてワールドに入ると **Singulo ハンドブック**を受け取ります。右クリックで開き、鋼鉄・セラミック・基礎回路から始めましょう。アイテムの説明はカーソルを合わせると表示され、Shiftで作り方と使い道を確認できます。
 
-- [日本語の説明書](docs/manual-ja.md) — 初期手順、進行、装置、探索、危険とよくあるつまずき。
-- [English manual](docs/manual-en.md) — The same player guide in English.
-- [简体中文](docs/manual-zh-cn.md) / [繁體中文](docs/manual-zh-tw.md) / [한국어](docs/manual-ko-kr.md) — ゲーム内翻訳と各言語の説明書。
-- [画像付きレシピ一覧](docs/recipes/README.md) / [詳細なレシピ資料](singulo_recipes.md) — 材料や製作工程を調べるときに。
-- [説明と実装の照合記録](docs/documentation-audit.md) — 修正したずれと、確認に使った実装。
-- [設計書](singulo_plan.md) — 開発の背景と構想。現行の遊び方は上の説明書を参照してください。
+- [日本語の説明書](docs/player/ja.md) — 初期手順、進行、装置、探索、危険とよくあるつまずき。
+- [English manual](docs/player/en.md) — The same player guide in English.
+- [简体中文](docs/player/zh-cn.md) / [繁體中文](docs/player/zh-tw.md) / [한국어](docs/player/ko-kr.md) — ゲーム内翻訳と各言語の説明書。
+- [画像付きレシピ一覧](docs/recipes/README.md) — 材料や製作工程を調べるときに。
+- [説明と実装の照合記録](docs/0.13.0/README.md) — 修正したずれと、確認に使った実装。
 
 ## 作者を支援する
 
@@ -71,7 +70,7 @@ Singulo を気に入ってもらえたら、[Ko-fi](https://ko-fi.com/graycat9) 
 
 WindowsのPowerShellでは `./gradlew.bat` を使います。JARは `build/forge/libs/*F.jar` と `build/neoforge/libs/*N.jar`、テスト結果は各 `build/<loader>/gametest/` に出力します。開発用ワールドは `run/<loader>/` に分離しています。
 
-両ローダーの依存バージョンは `gradle.properties` の `forge_version` / `neoforge_version` で管理します。共通ソース・レシピ・翻訳への変更は、両ローダーでCIを通してから統合してください。[統合構成・検証・公開手順](docs/development-1.20.1.md)も参照してください。
+両ローダーの依存バージョンは `gradle.properties` の `forge_version` / `neoforge_version` で管理します。共通ソース・レシピ・翻訳への変更は、両ローダーでCIを通してから統合してください。[統合構成・検証・公開手順](docs/0.13.0/port-1.20.1.md)も参照してください。
 
 | 場所 | 内容 |
 | --- | --- |
@@ -80,7 +79,7 @@ WindowsのPowerShellでは `./gradlew.bat` を使います。JARは `build/forge
 | `tools/guide.py`, `tools/descriptions.py` | ゲーム内ハンドブックとアイテム説明の生成元 |
 | `tools/gen_data.py` | 検証後に `src/generated/` とレシピ画像を再生成 |
 | `src/generated/` | 生成物。変更は生成元で行う |
-| `docs/manual-ja.md`, `docs/manual-en.md` | 日本語・英語のプレイヤー向け説明書 |
+| `docs/player/ja.md`, `docs/player/en.md` | 日本語・英語のプレイヤー向け説明書 |
 
 ```sh
 uv run --no-project --python 3.12 --with pillow tools/gen_data.py

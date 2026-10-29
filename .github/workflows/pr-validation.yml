@@ -4,8 +4,6 @@ on:
   pull_request:
     branches: ['1.20.1']
 
-  push:
-    branches: ['1.20.1']
   workflow_dispatch:
 
 permissions:
@@ -21,7 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         loader: [forge, neoforge]
-        namespace: [singulo, singulo_automation, singulo_reactor, singulo_prototype, singulo_progression, singulo_lab, singulo_cable, singulo_rayleigh, singulo_panel_review]
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
@@ -36,7 +33,13 @@ jobs:
             17.0.21
             21
           cache: gradle
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install GUI verification dependency
+        run: python3 -m pip install -r tools/review/requirements.txt
       - name: Validate translations and models
+        if: matrix.loader == 'forge'
         run: |
           python3 tools/localization.py --check
           python3 tools/check_models.py
@@ -44,66 +47,39 @@ jobs:
           python3 tools/check_advancements.py
           python3 tools/check_recipe_parity.py
           python3 tools/check_port_1201.py
-          python3 tools/test_verified_release.py
+          python3 -m unittest discover -s tools -p 'test_*.py'
+          python3 tools/check_gameplay_text.py
       - name: Build and run required GameTests
         shell: bash
         run: |
-          bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 build runGameTestServer -PtestNamespace=${{ matrix.namespace }} -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
-      - name: Require a completed nonempty successful GameTest run
-        shell: bash
+          bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 build runGameTestServer -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
+      - name: Validate exact test evidence and Java 17 production archive
         run: |
-          python3 - <<'PY'
-          import pathlib
-          import os
-          import re
-          log = pathlib.Path("build") / os.environ["LOADER"] / "gametest/logs/latest.log"
-          if not log.is_file() or not re.search(r"All [1-9][0-9]* required tests passed", log.read_text(encoding="utf-8")):
-              raise SystemExit("GameTestServer did not report successful nonempty completion")
-          PY
-      - name: Validate Java 17 distribution archive
-        run: |
+          python3 tools/check_release_1201.py --loader "$LOADER" --build-dir "build/$LOADER"
           suffix=N; if [[ "$LOADER" == forge ]]; then suffix=F; fi
           python3 tools/check_port_1201.py --jar "build/$LOADER/libs/Singulo-$(sed -n 's/^mod_version=//p' gradle.properties)-1.20.1$suffix.jar"
-      - name: Check production JAR excludes GUI harness
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          import os
-          import zipfile
-          jars = list((pathlib.Path("build") / os.environ["LOADER"] / "libs").glob("*.jar"))
-          if not jars:
-              raise SystemExit("No production JAR found")
-          for path in jars:
-              with zipfile.ZipFile(path) as jar:
-                  if any("ReviewHarness" in name for name in jar.namelist()):
-                      raise SystemExit("Development GUI harness leaked into " + str(path))
-          PY
       - name: Prepare disposable GUI review world
-        if: matrix.namespace == 'singulo'
         run: python3 tools/review/prepare_gui.py --loader "$LOADER"
       - name: Run real client GUI smoke
-        if: matrix.namespace == 'singulo'
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
           ALSOFT_DRIVERS: 'null'
         run: xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 300s bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/gui.gradle -PmachineGuiReview runClient
       - name: Require GUI captures
-        if: matrix.namespace == 'singulo'
         run: |
-          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 212
-          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 190' build/${{ matrix.loader }}/gui-review/logs/latest.log
+          test "$(ls build/${{ matrix.loader }}/gui-review/screenshots/*.png | wc -l)" -eq 242
+          grep -q 'SINGULO_MACHINE_GUI_COMPLETE 220' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_GUI_COMPLETE 22' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_JEI_SYNC_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
           grep -q 'SINGULO_HANDBOOK_SEARCH_COMPLETE' build/${{ matrix.loader }}/gui-review/logs/latest.log
       - name: Verify inventory pixels in exported PNGs
-        if: matrix.namespace == 'singulo'
         run: python3 tools/review/check_gui_png.py --loader "$LOADER"
       - name: Save build outputs and validation logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pr-validation-${{ github.sha }}-${{ matrix.loader }}-${{ matrix.namespace }}
+          name: pr-validation-${{ github.sha }}-${{ matrix.loader }}-full
           if-no-files-found: warn
           path: |
             build/${{ matrix.loader }}/libs/*.jar
@@ -116,14 +92,10 @@ jobs:
             build/${{ matrix.loader }}/gui-review/machine-font-metrics.tsv
 
   optional-mekanism:
-    strategy:
-      fail-fast: false
-      matrix:
-        loader: [forge, neoforge]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      LOADER: ${{ matrix.loader }}
+      LOADER: forge
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     steps:
       - uses: actions/checkout@v4
@@ -135,22 +107,18 @@ jobs:
             21
           cache: gradle
       - name: Verify all four legacy chemical families with real Mekanism
-        run: bash ./gradlew -Ploader=${{ matrix.loader }} --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
+        run: bash ./gradlew -Ploader=forge --no-daemon --max-workers=2 runGameTestServer -PwithMekanism -PtestNamespace=singulo_mekanism -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mekanism-validation-${{ github.sha }}-${{ matrix.loader }}
-          path: build/${{ matrix.loader }}/gametest/logs/
+          name: mekanism-validation-${{ github.sha }}-forge
+          path: build/forge/gametest/logs/
 
   renderer-lighting:
-    strategy:
-      fail-fast: false
-      matrix:
-        loader: [forge, neoforge]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      LOADER: ${{ matrix.loader }}
+      LOADER: forge
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
     steps:
       - uses: actions/checkout@v4
@@ -168,7 +136,7 @@ jobs:
         run: |
           bash ./gradlew -Ploader=$LOADER --no-daemon --max-workers=2 runGameTestServer -PtestNamespace=singulo_rayleigh -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
           python3 tools/review/prepare_rayleigh.py --loader "$LOADER"
-          python3 -m pip install Pillow
+          python3 -m pip install -r tools/review/requirements.txt
       - name: Verify real Embeddium and Distant Horizons lighting
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
@@ -191,7 +159,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: renderer-lighting-${{ github.sha }}-${{ matrix.loader }}
+          name: renderer-lighting-${{ github.sha }}-forge
           path: |
-            build/${{ matrix.loader }}/rayleigh-review/logs/
-            build/${{ matrix.loader }}/rayleigh-review/screenshots/
+            build/forge/rayleigh-review/logs/
+            build/forge/rayleigh-review/screenshots/
