@@ -82,13 +82,13 @@ class PromotionTests(unittest.TestCase):
         (self.root / 'libs' / self.jar).write_bytes(b'the exact validated jar')
         self.metadata = {'mod_name': 'Singulo', 'version': '0.10.0',
                          'artifacts': {'neoforge': {'name': 'validated'}}}
-        self.markers = 'SINGULO_GUI_COMPLETE 22\nSINGULO_MACHINE_GUI_COMPLETE 205\nSINGULO_SEARCH_COMPLETE\nSINGULO_HANDBOOK_SEARCH_COMPLETE\nSINGULO_JEI_SYNC_COMPLETE\n'
+        self.markers = 'SINGULO_GUI_COMPLETE 22\nSINGULO_MACHINE_GUI_COMPLETE 220\nSINGULO_SEARCH_COMPLETE\nSINGULO_HANDBOOK_SEARCH_COMPLETE\nSINGULO_JEI_SYNC_COMPLETE\n'
         (self.gui / 'logs/latest.log').write_text(self.markers)
         (self.gui / 'inventory-pixels.json').write_text(json.dumps([{'checked_empty_slot_centers': 35}] * 3))
-        self.machine = {'languages': ['ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'], 'machine_captures': 205,
+        self.machine = {'languages': ['ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr'], 'machine_captures': 220,
                         'headers_without_title_status_overlap': 80, 'generator_font_probes': 5, 'supply_port_inventory_slots': 350, 'supply_port_tooltips': 5}
         (self.gui / 'machine-pixels.json').write_text(json.dumps(self.machine))
-        for i in range(227):
+        for i in range(242):
             (self.gui / 'screenshots' / f'{i}.png').touch()
 
     def promote(self):
@@ -100,7 +100,7 @@ class PromotionTests(unittest.TestCase):
         self.assertEqual((self.base / 'output' / self.jar).read_bytes(), b'the exact validated jar')
 
     def test_legacy_gui_completion_is_not_enough(self):
-        (self.gui / 'logs/latest.log').write_text(self.markers.replace('SINGULO_MACHINE_GUI_COMPLETE 205\n', ''))
+        (self.gui / 'logs/latest.log').write_text(self.markers.replace('SINGULO_MACHINE_GUI_COMPLETE 220\n', ''))
         with self.assertRaisesRegex(RuntimeError, 'GUI/search validation'):
             self.promote()
 
