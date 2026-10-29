@@ -111,6 +111,19 @@ public class MachineMenu extends AbstractContainerMenu {
         return data.getInt(index);
     }
 
+    /** Active catalyst is stored outside the editable reserve slot. Never move it during JEI transfer. */
+    public ItemStack loadedCatalyst() {
+        if (machine != null) return machine.magazine().loaded().copy();
+        int item = value(MachineBlockEntity.D_LOADED_ITEM);
+        if (!type.hasCatalystSlot() || item < 0) return ItemStack.EMPTY;
+        ItemStack stack = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.byId(item));
+        int max = io.github.genichimaruo.singulo.item.UsesHelper.baseMax(stack);
+        int remaining = (int) Math.ceil(max * (value(MachineBlockEntity.D_LOADED_FILL) + 0.5) / 1000.0);
+        stack.set(io.github.genichimaruo.singulo.registry.SinguloComponents.USES.get(),
+                new io.github.genichimaruo.singulo.item.UsesData(Math.max(0, max - remaining), max, 0));
+        return stack;
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (machine == null) {

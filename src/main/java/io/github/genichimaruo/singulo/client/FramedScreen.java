@@ -155,6 +155,11 @@ public abstract class FramedScreen<M extends AbstractContainerMenu> extends Abst
         return false;
     }
 
+    /** JEI supplies GUI-relative coordinates; popup bounds are in screen coordinates. */
+    public boolean popupBlocksGuiInput(double guiMouseX, double guiMouseY) {
+        return overPopup(leftPos + guiMouseX, topPos + guiMouseY);
+    }
+
     /** 窓の下にあるスロットは、窓の上にマウスがある間は反応しない。 */
     @Override
     protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY) {

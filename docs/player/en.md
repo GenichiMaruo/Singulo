@@ -17,6 +17,7 @@ Superconductivity, particle accelerators, the Casimir effect and Hawking radiati
 - **Minecraft 1.21.1**, with a compatible **NeoForge 21.1.256 or later** build for that Minecraft version. Minecraft runs on Java 21.
 - Put the Singulo JAR in `mods/`. Multiplayer needs the mod on both the client and server.
 - JEI is optional. Its integration shows machine recipes and multiblock construction information.
+- With a machine screen open, JEI's + button moves one recipe's item ingredients from your inventory. Shift-click transfers as many sets as fit. Catalysts go into their dedicated slot; the Precision Assembler and Singularity Encapsulator also select that recipe. Supply fluids and compressor mass separately.
 - Singulo supplies energy cables. Compatible transport mods can provide pipes for item and fluid automation.
 
 For building from source, see the [development instructions in the README](../../README.md#開発するには).
