@@ -6857,7 +6857,7 @@
   },
   "guide.singulo.stage4.time.body": {
     "source": "The incubator grows time crystals over 8 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) into four modules from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
-    "translation": "배양기는 실제 가동 시간 8분 동안 시간 결정을 기릅니다. 요구 전력의 80%(24 kFE/t) 이상이면 순도가 유지되고, 그보다 낮은 시간의 비율만큼 순도와 수명이 줄어듭니다.\n노심 제어 장치, 특이점 봉입대, 실드 타워 코어 등은 시간 결정 모듈을 사용합니다. 정밀 조립대는 촉매 슬롯의 결정에서 새 결정 수명의 2/3(기본 30분)를 잘라 모듈 4개를 만들고, 남은 기본 15분은 이종 물질 가공이나 코어에 쓸 수 있습니다. 수명이 부족한 결정은 가공할 수 없으며 수명 설정과 프리셋에 따라 요구량도 비례합니다. 건설용과 운전용이 촉매를 함께 쓰므로 배양기 두 대가 편리합니다.\nC 공동은 위아래 안쪽이 거울인 5×5×5 진공 용기로, 시간 결정 촉매를 써서 이종 물질과 액시온 응축체를 만듭니다."
+    "translation": "배양기는 실제 가동 시간 8분 동안 시간 결정을 기릅니다. 요구 전력의 80%(24 kFE/t) 이상이면 순도가 유지되고, 그보다 낮은 시간의 비율만큼 순도와 수명이 줄어듭니다.\n노심 제어기, 특이점 캡슐화기, 실드 타워 코어 등은 시간 결정 모듈을 사용합니다. 정밀 조립기는 촉매 슬롯의 결정에서 새 결정 수명의 2/3(기본 30분)를 잘라 모듈 4개를 만들고, 남은 기본 15분은 이종 물질 가공이나 코어에 쓸 수 있습니다. 수명이 부족한 결정은 가공할 수 없으며 수명 설정과 프리셋에 따라 요구량도 비례합니다. 건설용과 운전용이 촉매를 함께 쓰므로 배양기 두 대가 편리합니다.\nC 공동은 위아래 안쪽이 거울인 5×5×5 진공 용기로, 시간 결정 촉매를 써서 이종 물질과 액시온 응축체를 만듭니다."
   },
   "guide.singulo.stage4.time.title": {
     "source": "Time crystals and exotic matter",
@@ -11653,7 +11653,7 @@
   },
   "uses.singulo.time_crystal_module": {
     "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
-    "translation": "용도: SMES 모듈, 노심 제어 장치, 특이점 봉입대, 실드 타워 코어, 그래비톤 조작기 외 3종"
+    "translation": "용도: SMES 모듈, 노심 제어기, 특이점 캡슐화기, 실드 타워 코어, 그래비톤 조작기 외 3종"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11853,7 +11853,7 @@
   },
   "guide.singulo.factory_expansion.upgrades.body": {
     "source": "After producing a BE catalyst, reconstruct projection cores with quantum modules, optical lattices, meteoric iron and catalyst life. Once you have time catalysts, degenerate nuclei can also be reconstructed. The first research and culture bosses are still required, but factory expansion no longer requires repeated fights.\nThirty minutes of catalyst life makes four Time Crystal Modules. Large SMES units need this part. A shaped upgrade uses an old SMES Cell at the centre and preserves its stored energy. Existing cables can also be upgraded from copper to superconducting, topological and horizon wiring.",
-    "translation": "BE 촉매를 생산하면 양자 연산 모듈, 광격자 기판, 운철과 촉매 수명으로 투영 코어를 재구성할 수 있습니다. 시간 촉매를 얻은 뒤에는 축퇴핵도 재구성할 수 있습니다. 연구동과 배양 시설의 첫 보스는 여전히 필수지만, 공장 확장을 위해 같은 전투를 반복할 필요는 없습니다.\n촉매 수명 30분으로 시간 결정 모듈 4개를 만듭니다. 대형 SMES에는 이 부품이 필요합니다. 정형 강화 조합에서 기존 SMES 셀을 중앙에 놓으면 저장된 전력도 이어받습니다. 기존 배선도 구리 전선에서 초전도 케이블, 위상 전선, 지평선 버스로 차례로 전환할 수 있습니다."
+    "translation": "BE 촉매를 생산하면 양자 연산 모듈, 광학 격자 기판, 운철과 촉매 수명으로 파수꾼 투영 핵를 재구성할 수 있습니다. 시간 촉매를 얻은 뒤에는 축퇴 핵도 재구성할 수 있습니다. 연구동과 배양 시설의 첫 보스는 여전히 필수지만, 공장 확장을 위해 같은 전투를 반복할 필요는 없습니다.\n촉매 수명 30분으로 시간 결정 모듈 4개를 만듭니다. 대형 SMES에는 이 부품이 필요합니다. 정형 강화 조합에서 기존 SMES 셀을 중앙에 놓으면 저장된 전력도 이어받습니다. 기존 배선도 구리 전선에서 초전도 케이블, 위상 전선, 지평선 버스로 차례로 전환할 수 있습니다."
   },
   "guide.singulo.factory_expansion.probes.title": {
     "source": "Probes and the final unlock",
@@ -11861,7 +11861,7 @@
   },
   "guide.singulo.factory_expansion.probes.body": {
     "source": "With a same-tier catalyst, a probe visits one ruin in five minutes and returns half the manual loot. Destinations are visited in turn. Waiting for regeneration or output space consumes no power or catalyst. Overflow cargo is saved and must be unloaded before another mission.\nA loaded Singularity Core also permits research-building collection; time catalysts only permit observation posts. Culture facilities, final labs, sunken reactors and android facilities remain manual.\nA Primordial Seed also requires one use of a restored anomaly sample from the final lab. Sunken loot alone can no longer bypass the final lab.",
-    "translation": "동일 단계 촉매를 사용할 때 탐사기는 5분마다 유적 한 곳을 방문하고 수동 회수량의 절반을 가져옵니다. 등록 지점을 차례로 방문하며, 재생이나 출력 공간을 기다릴 때는 전력과 촉매를 쓰지 않습니다. 넘친 화물은 저장하고 하역 전까지 다음 임무를 시작하지 않습니다.\n특이점 코어를 촉매로 장전하면 연구동도 회수할 수 있습니다. 시간 촉매로는 관측 거점까지만 가능합니다. 배양 시설, 최종 실험 시설, 수몰 노심, 안드로이드 시설은 계속 수동 탐사가 필요합니다.\n원초의 씨앗에는 최종 실험 시설에서 복원한 이상 표본의 사용 횟수 1회도 필요합니다. 해저 전리품만으로 최종 실험 시설을 건너뛸 수 없습니다."
+    "translation": "동일 단계 촉매를 사용할 때 탐사기는 5분마다 유적 한 곳을 방문하고 수동 회수량의 절반을 가져옵니다. 등록 지점을 차례로 방문하며, 재생이나 출력 공간을 기다릴 때는 전력과 촉매를 쓰지 않습니다. 넘친 화물은 저장하고 하역 전까지 다음 임무를 시작하지 않습니다.\n특이점 코어를 촉매로 장전하면 연구동도 회수할 수 있습니다. 시간 촉매로는 관측 거점까지만 가능합니다. 배양 시설, 최종 실험 시설, 수몰 노심, 안드로이드 시설은 계속 수동 탐사가 필요합니다.\n원초의 씨앗에는 최종 실험 시설에서 복원한 이상 샘플의 사용 횟수 1회도 필요합니다. 해저 전리품만으로 최종 실험 시설을 건너뛸 수 없습니다."
   },
   "guide.singulo.factory_expansion.limits.title": {
     "source": "Mass, output and ignition",

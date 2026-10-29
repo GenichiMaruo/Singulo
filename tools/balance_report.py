@@ -9,7 +9,7 @@ import os
 import json
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / 'docs/reviews/balance-0.13.0'
+OUT = ROOT / 'docs/0.13.0/balance-adjusted'
 
 
 def number(value):
@@ -20,7 +20,7 @@ def render():
     global OUT
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out-dir', type=Path, default=OUT)
-    parser.add_argument('--report', default='../game-balance-0.13.0.md')
+    parser.add_argument('--report', default='../balance-adjustment.md')
     args = parser.parse_args()
     OUT = args.out_dir
     cache = ROOT / 'build/balance/plot-cache'

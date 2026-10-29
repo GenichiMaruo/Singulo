@@ -121,8 +121,8 @@ Hover over any item to see what it does.
 Hold **Shift** to see how it is made and what it is used for.
 With **JEI** installed, you can also browse every machine recipe and multiblock layout.
 
-- [English manual](https://github.com/GenichiMaruo/Singulo/blob/main/docs/manual-en.md)
-- [Japanese manual (日本語の説明書)](https://github.com/GenichiMaruo/Singulo/blob/main/docs/manual-ja.md)
+- [English manual](https://github.com/GenichiMaruo/Singulo/blob/1.21.1/docs/player/en.md)
+- [Japanese manual (日本語の説明書)](https://github.com/GenichiMaruo/Singulo/blob/1.21.1/docs/player/ja.md)
 - [Recipe gallery with pictures](https://github.com/GenichiMaruo/Singulo/blob/main/docs/recipes/README.md)
 
 ## Requirements and downloads

@@ -1,6 +1,6 @@
 # Singulo
 
-[日本語](docs/manual-ja.md) · [English](docs/manual-en.md) · [简体中文](docs/manual-zh-cn.md) · [繁體中文](docs/manual-zh-tw.md) · [한국어](docs/manual-ko-kr.md) · [レシピ一覧](docs/recipes/README.md)
+[日本語](docs/player/ja.md) · [English](docs/player/en.md) · [简体中文](docs/player/zh-cn.md) · [繁體中文](docs/player/zh-tw.md) · [한국어](docs/player/ko-kr.md) · [レシピ一覧](docs/recipes/README.md)
 
 **熱電発電から始めて、回転ブラックホールを運用し、最後は宇宙をひとつ生み出す工業modです。**
 Minecraft 1.21.1（NeoForge）と 1.20.1（Forge / NeoForge）向け。旧文明の遺構で記録や部品を回収し、工場で復元・加工して、極低温・量子・時間・特異点の技術へ進みます。物理学を題材にしたゲームで、現実の物理を完全に再現するシミュレーターではありません。
@@ -22,11 +22,6 @@ Forge support for Minecraft 1.21.1 ended with 0.8.1; from 0.9.0 on, 1.21.1 is Ne
 
 ファイル名は `Singulo-<版>-<Minecraft><ローダー>` で、末尾は `N = NeoForge`、`F = Forge` です。配布JARは [CurseForgeの全配布ファイル / All files](https://www.curseforge.com/minecraft/mc-mods/singulo/files/all) からダウンロードしてください。[GitHub Releases](https://github.com/GenichiMaruo/Singulo/releases) では変更履歴を確認できます。
 
-## 0.8.0の統合内容（Minecraft 1.21.1 / NeoForge）
-
-作業の連続処理、範囲カード・経路指定、巡回警備と記録、待機中の仕草、地下研究所と製造統括AI、試作機アルマ／ノクス、73件の実績ツリーを追加します。Mekanism導入時は化学物質の運搬にも対応します。
-この節はソースの統合内容です。配布済みファイルはダウンロード先で確認してください。1.20.1向けは引き続き別ブランチで管理します。
-
 ## 何ができる？
 
 - **工場を育てる** — 温度差で発電し、素材の焼成・圧縮・電解から超伝導や量子部品の生産へ進む、5段階の技術体系。
@@ -36,26 +31,17 @@ Forge support for Minecraft 1.21.1 ended with 0.8.1; from 0.9.0 on, 1.21.1 is Ne
 - **重力と時空を使う** — 重力操作の道具、拠点を守るシールド、対応装置の時間加速、チャンクローダー、遠隔拠点間で電力・アイテム・液体をつなぐワームホール。
 - **宇宙を生む** — 最終目標の「創世炉」で、ブラックホールの電力から宇宙をひとつ生み出します。生まれた銀河は夜空に昇り、炉はその後、電力から物を作り出す質量生成ができるようになります。
 - **アンドロイドと戦い、仲間にする** — 遺構の印刷台から出撃する3種類のアンドロイドを倒して設計メモリを集め、組立ステーションで自分の護衛を印刷。迎撃・徘徊・追従を選び、装備や名前も付けられます。
-- **アンドロイドに作業を頼む** — 0.7.0の作業指令台で製作・加工・採掘を注文し、手順カードで農作業や装置の操作も任せられます。在庫やレッドストーンで注文を自動化でき、流体搬送用のタンクや装飾も付けられます。
+- **アンドロイドに作業を頼む** — 作業指令台で製作・加工・採掘を注文し、手順カードで農作業や装置の操作も任せられます。在庫やレッドストーンで注文を自動化でき、流体搬送用のタンクや装飾も付けられます。
 - **みんなで挑む** — ボスは挑戦者の人数に合わせて強くなり、全員の攻撃がそれぞれ通ります。報酬は戦いが始まったときの人数ぶん。
 
-**Singulo** is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge / NeoForge). Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/manual-en.md).
+**Singulo** is a technology mod for Minecraft 1.21.1 (NeoForge) and 1.20.1 (Forge / NeoForge). Build a factory, recover lost technology from guarded ruins, and progress from thermoelectric generators to a rotating black hole reactor. Late-game tools add gravity control, shields, time fields and wormhole logistics, ruin androids can be defeated and rebuilt as your own guards, and the final goal, the Genesis Engine, uses a black hole's power to create a universe. Start with the [English manual](docs/player/en.md).
 
-## 遊び始めるには
+## ドキュメント
 
-0.7.0では、アンドロイドの作業自動化・追加アップグレード・装飾を1.20.1のForge / NeoForgeにも対応させました。[NeoForge版](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.7.0-1.20.1N-r1)・[Forge版](https://github.com/GenichiMaruo/Singulo/releases/tag/v0.7.0-1.20.1F-r2)から選んでください。両版のCurseForge配布・検証記録は[移植検証の記録](docs/reviews/port-0.7.0-1.20.1-findings.md)を参照してください。
-Version 0.7.0 brings Android work automation, additional upgrades and decorations to Minecraft 1.20.1 on both Forge and NeoForge. Choose the matching loader above. The `1.21.1` branch is dedicated to Minecraft 1.21.1 (NeoForge).
-
-上の表の Minecraft とローダーが必要です（1.21.1 版なら NeoForge **21.1.256以上**）。modのJARをクライアントとサーバーの `mods/` に入れます。JEIは任意で、レシピとマルチブロックの案内に対応しています。
-
-初めてワールドに入ると **Singulo ハンドブック**を受け取ります。右クリックで開き、鋼鉄・セラミック・基礎回路から始めましょう。アイテムの説明はカーソルを合わせると表示され、Shiftで作り方と使い道を確認できます。
-
-- [日本語の説明書](docs/manual-ja.md) — 初期手順、進行、装置、探索、危険とよくあるつまずき。
-- [English manual](docs/manual-en.md) — The same player guide in English.
-- [简体中文](docs/manual-zh-cn.md) / [繁體中文](docs/manual-zh-tw.md) / [한국어](docs/manual-ko-kr.md) — ゲーム内翻訳と各言語の説明書。
-- [画像付きレシピ一覧](docs/recipes/README.md) / [詳細なレシピ資料](singulo_recipes.md) — 材料や製作工程を調べるときに。
-- [説明と実装の照合記録](docs/documentation-audit.md) — 修正したずれと、確認に使った実装。
-- [設計書](singulo_plan.md) — 開発の背景と構想。現行の遊び方は上の説明書を参照してください。
+- [遊び方・開発資料の入口](docs/README.md)
+- [日本語](docs/player/ja.md) · [English](docs/player/en.md) · [简体中文](docs/player/zh-cn.md) · [繁體中文](docs/player/zh-tw.md) · [한국어](docs/player/ko-kr.md)
+- [画像付きレシピ](docs/recipes/README.md)
+- [0.13.0の変更と検証](docs/0.13.0/README.md) · [課題](issue.md)
 
 ## 作者を支援する
 
@@ -63,31 +49,11 @@ Singulo を気に入ってもらえたら、[Ko-fi](https://ko-fi.com/graycat9) 
 
 ## 開発するには
 
-Java 21を用意し、`JAVA_HOME` をその場所へ設定します。Gradleは呼び出し元のJavaを使用し、Minecraftのコンパイルと実行にはJava 21のツールチェーンを使います。
+Java 21を用意し、対象ブランチを確認してください。Minecraft 1.20.1は別ブランチ`1.20.1`で管理します。
 
 ```sh
-./gradlew build
-./gradlew runClient
-./gradlew runGameTestServer
+bash ./gradlew build
+bash ./gradlew runClient
 ```
 
-WindowsのPowerShellでは `./gradlew.bat` を使います。ビルドしたJARは `build/libs/` に出力されます。
-
-| 場所 | 内容 |
-| --- | --- |
-| `src/main/java/` | mod本体。既存GameTestは別のソースセットでコンパイル |
-| `src/gameTest/java/` | 新しいGameTestと検査専用ヘルパー（製品JARには含めない） |
-| `tools/recipes.py`, `tools/config_spec.py`, `tools/ids.py` | レシピ・設定・登録名の生成元 |
-| `tools/guide.py`, `tools/descriptions.py` | ゲーム内ハンドブックとアイテム説明の生成元 |
-| `tools/gen_data.py` | 検証後に `src/generated/` とレシピ画像を再生成 |
-| `src/generated/` | 生成物。変更は生成元で行う |
-| `docs/manual-ja.md`, `docs/manual-en.md` | 日本語・英語のプレイヤー向け説明書 |
-
-```sh
-uv run --no-project --python 3.12 --with pillow tools/gen_data.py
-uv run --no-project --python 3.12 tools/check_models.py
-```
-
-`gen_data.py` は生成ディレクトリを作り直します。生成物への手修正は残りません。レシピと設定はサーバー設定・データパックによって変わるため、説明書の数値は既定値です。
-
-開発中の検査と短い再実行の方法は[テストの実行と追加](docs/development/testing.md)を参照してください。
+生成元・実装時の条件は[開発ガイド](docs/development/README.md)、短い再検証と全体検査は[テスト手順](docs/development/testing.md)、配布は[公開手順](docs/development/releasing.md)を参照してください。
