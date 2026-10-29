@@ -20,7 +20,8 @@ import org.joml.Vector3f;
  */
 final class SideCube {
     /** 回転（度）。左右と上下。 */
-    float yaw = -35;
+    // Visible faces point toward +Z; turn NORTH (-Z), the machine's front, toward the viewer.
+    float yaw = 145;
     float pitch = 25;
 
     record Quad(SideConfig.Face face, float[] xs, float[] ys, float depth, float light) {
