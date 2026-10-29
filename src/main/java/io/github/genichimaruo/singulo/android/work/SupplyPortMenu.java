@@ -36,17 +36,7 @@ public class SupplyPortMenu extends AbstractContainerMenu {
         this.entries = entries;
         this.data = data;
         for (int i = 0; i < SupplyPortBlockEntity.ENTRIES; i++) {
-            addSlot(new Slot(entries, i, entryX(i), entryY(i)) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return false;
-                }
-
-                @Override
-                public boolean mayPickup(Player player) {
-                    return false;
-                }
-            });
+            addSlot(new SampleSlot(entries, i, entryX(i), entryY(i)));
         }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -57,6 +47,13 @@ public class SupplyPortMenu extends AbstractContainerMenu {
             addSlot(new Slot(inventory, col, INV_X + col * 18, HOTBAR_Y));
         }
         addDataSlots(data);
+    }
+
+    /** Explicit constructor avoids duplicate synthetic parameter names in legacy mappings. */
+    private static final class SampleSlot extends Slot {
+        SampleSlot(Container entries, int index, int x, int y) { super(entries, index, x, y); }
+        @Override public boolean mayPlace(ItemStack stack) { return false; }
+        @Override public boolean mayPickup(Player player) { return false; }
     }
 
     public static SupplyPortMenu client(int id, Inventory inventory, FriendlyByteBuf buf) {
