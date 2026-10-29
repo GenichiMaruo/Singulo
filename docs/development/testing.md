@@ -2,7 +2,7 @@
 
 ## 全体の検証
 
-Minecraft 1.21.1 / Java 21 / NeoForge。現在は通常のGameTest 565件、Mekanismを入れる専用GameTest 1件、検証ツールの単体テスト37件。GUIは通常22画面と5言語×41画面を同じクライアントで確認する。Sodium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
+Minecraft 1.21.1 / Java 21 / NeoForge。現在は通常のGameTest 574件、Mekanismを入れる専用GameTest 1件、検証ツールの単体テスト37件。GUIは通常22画面と5言語×44画面を同じクライアントで確認する。Sodium・Distant Horizonsの照明比較と再入場は別のクライアント検査を行う。
 
 ```sh
 python3 -m unittest discover -s tools -p 'test_*.py'
@@ -51,7 +51,7 @@ xvfb-run -a -s '-screen 0 1280x800x24' timeout 300s bash ./gradlew --no-configur
 python3 tools/review/check_gui_png.py
 ```
 
-GUIの自動操作は`tools/review/`に置く。機械の固定データによる画面は、画面切替後に実際の描画が2フレーム完了してから撮影する。単にtickが一定回数過ぎるのを待たない。全205枚について、画像の存在・寸法・黒画面でないことを検査し、文字と状態表示、インベントリ、資材口のツールチップは追加の画素検査を行う。
+GUIの自動操作は`tools/review/`に置く。機械の固定データによる画面は、画面切替後に実際の描画が2フレーム完了してから撮影する。単にtickが一定回数過ぎるのを待たない。全220枚について、画像の存在・寸法・黒画面でないことを検査し、文字と状態表示、インベントリ、資材口のツールチップは追加の画素検査を行う。
 
 PNGはPillowで読み取る。旧デコーダーとの全RGB値の一致を確認している。撮影数や検査範囲を変更するときは、CI、画素検証、公開用の証跡確認、その単体テストを一緒に更新する。
 

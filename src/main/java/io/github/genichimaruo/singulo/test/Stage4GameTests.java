@@ -162,12 +162,13 @@ public final class Stage4GameTests {
         m.items().setStackInSlot(2, new ItemStack(item("entangled_element"), 2));
         m.items().setStackInSlot(3, new ItemStack(item("phase_sync_plate")));
         m.items().setStackInSlot(4, new ItemStack(item("bose_condensate_catalyst")));
-        // Test the entire default growth cycle through the real controller, without
-        // ticking every other fixture/world entity 14,400 times. Other incubator
+        // Test the entire configured growth cycle through the real controller, without
+        // ticking every other fixture/world entity once for every simulated growth tick. Other incubator
         // tests retain normal scheduled BE ticking and recipe/config integration.
+        int growth = io.github.genichimaruo.singulo.generated.ServerConfig.TIME_CRYSTAL_GROWTH_TICKS.get();
         int tick = 0;
-        for (; tick < 25_000 && m.items().getStackInSlot(m.type().outputSlot()).isEmpty(); tick++) {
-            m.energy().setEnergy(tick < 7_200 ? 15_000 : m.energy().getMaxEnergyStored());
+        for (; tick < growth + 200 && m.items().getStackInSlot(m.type().outputSlot()).isEmpty(); tick++) {
+            m.energy().setEnergy(tick < growth / 2 ? 15_000 : m.energy().getMaxEnergyStored());
             MachineBlockEntity.serverTick(helper.getLevel(), m.getBlockPos(), m.getBlockState(), m);
         }
         ItemStack out = m.items().getStackInSlot(m.type().outputSlot());
@@ -175,7 +176,7 @@ public final class Stage4GameTests {
         int life = UsesHelper.get(out).max();
         int full = 45 * 60 * 20;
         helper.assertTrue(Math.abs(life - full / 2) <= full / 20, "純度約50%で寿命が半分にならない: " + life + " / " + full);
-        helper.assertTrue(tick >= 14_000 && tick <= 15_000, "Default growth duration changed: " + tick);
+        helper.assertTrue(Math.abs(tick - growth) <= 2, "Configured growth duration was not honored: " + tick + " / " + growth);
         helper.succeed();
     }
 

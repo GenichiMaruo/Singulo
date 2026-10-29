@@ -227,7 +227,7 @@ def recipe_files():
                     one, _, _ = item_inputs({mat: 1}, name)
                     key_json[ch] = one[0]['ingredient']
                 add(f'crafting/{rid}', {
-                    'type': 'minecraft:crafting_shaped',
+                    'type': 'singulo:smes_upgrade' if name == 'SMESモジュール（セルから）' else 'minecraft:crafting_shaped',
                     'category': 'misc',
                     'pattern': [row.ljust(width) for row in rows],
                     'key': key_json,
@@ -412,6 +412,8 @@ UI_LANG = {
     'gui.singulo.device.standby.hint': ('燃料と触媒は減らない。蓄電が75%を割ると再開する', 'Fuel and catalyst are not used. Resumes when storage falls under 75%.'),
     'gui.singulo.anchor.limited': ('アンカーの上限（1人 %s 台）に達している', 'Anchor limit reached (%s per player)'),
     'gui.singulo.device.fuel': ('燃料 %s 個', 'Fuel: %s'),
+    'gui.singulo.probe.waiting': ('遺構の再訪待ち', 'Waiting to revisit'),
+    'gui.singulo.probe.upgrade': ('研究棟には最上位触媒が必要', 'Research needs a Singularity Core'),
     'gui.singulo.probe.no_target': ('飛んでいける遺構がない', 'No known ruins'),
     'gui.singulo.probe.targets': ('登録した遺構 %s か所', '%s ruins registered'),
     'gui.singulo.probe.return': ('次の帰還まで %s 秒', 'Next return in %s s'),

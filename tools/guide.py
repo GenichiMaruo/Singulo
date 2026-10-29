@@ -345,18 +345,18 @@ CHAPTERS = [
          'and only 8 are needed for Lv2. There are also compressed metal blocks made of metals only.\nThe '
          'Degenerate Compactor (a closed 5×5×5 press) makes degenerate matter shells and reactor shell blocks.'),
         ('time', '時間結晶とエキゾチック物質',
-         '時間結晶育成槽は、実際に動いた時間で触媒を育てます（12分）。要求の80%（24 kFE/t）以上の電力なら純度は落ちません。'
+         '時間結晶育成槽は、実際に動いた時間で触媒を育てます（8分）。要求の80%（24 kFE/t）以上の電力なら純度は落ちません。'
          'それを割った時間の割合だけ純度が下がり、寿命も短くなります。\n'
          '設備（炉心制御装置・特異点封入台・シールド発生塔コアなど）には、時間結晶を精密組立台で「時間結晶モジュール」に加工して使います。'
-         '触媒枠の時間結晶から新品の寿命の2/3（既定の設定で30分）を切り出し、残り（既定で15分）の触媒はエキゾチック物質の加工やコアの材料に使えます。'
+         '触媒枠の時間結晶から新品の寿命の2/3（既定の設定で30分）を切り出してモジュール4個にし、残り（既定で15分）の触媒はエキゾチック物質の加工やコアの材料に使えます。'
          '残りの寿命がそれに満たない触媒（使いかけ・純度の低いもの）からは作れません。寿命の設定やプリセットを変えると、切り出す量も比例して変わります。'
          '設備用と運転用の取り合いになるので、育成槽は2台あると楽です。\n'
          'C空洞（5×5×5 の真空容器、天面と底面の内側が鏡面）は、時間結晶触媒を使ってエキゾチック物質とアクシオン凝縮体を作ります。',
          'Time crystals and exotic matter',
-         'The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; '
+         'The incubator grows time crystals over 8 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; '
          'time spent below that lowers purity and lifetime.\n'
          'Equipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts '
-         'two thirds of a fresh crystal\'s life (30 minutes with default settings) from the crystal in its catalyst slot, and the rest (15 minutes by default) '
+         'two thirds of a fresh crystal\'s life (30 minutes with default settings) into four modules from the crystal in its catalyst slot, and the rest (15 minutes by default) '
          'stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime '
          'settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\n'
          'The C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.'),
@@ -1199,3 +1199,32 @@ CHAPTERS = [
          'blocks and does not spread inside a shield). Contain and collect it with a Magnetic Bottle.'),
     ]),
 ]
+
+# バランス調整後の増設・蓄電・自動回収の手順。
+CHAPTERS.append(('factory_expansion', 'singulo:smes_module', '工場の増設', 'Factory Expansion', [
+    ('upgrades', '解禁後の量産と蓄電',
+     'BE触媒を作ったら、投影核を量子演算モジュール・光格子基板・隕鉄と触媒の寿命から再構成できます。時間触媒を作った後は縮退核も再構成でき、同じボスを繰り返さずに装置を増設できます。初回の研究棟・培養施設攻略は必要です。\n'
+     '時間結晶モジュールは30分相当の寿命から4個作れます。大型SMESはこの部品が必要です。定形レシピの中央に旧SMESセルを置く強化ルートもあり、蓄電済みの電力を引き継ぎます。配線も銅導線→超伝導ケーブル→トポロジカル導線→ホライズン・バスへ転用できます。',
+     'Production and storage after unlocking',
+     'After producing a BE catalyst, reconstruct projection cores with quantum modules, optical lattices, meteoric iron and catalyst life. Once you have time catalysts, degenerate nuclei can also be reconstructed. The first research and culture bosses are still required, but factory expansion no longer requires repeated fights.\n'
+     'Thirty minutes of catalyst life makes four Time Crystal Modules. Large SMES units need this part. A shaped upgrade uses an old SMES Cell at the centre and preserves its stored energy. Existing cables can also be upgraded from copper to superconducting, topological and horizon wiring.'),
+    ('probes', '探査機と最後の解禁',
+     '同ティアの触媒なら探査機は5分で1か所へ行き、回収量は手動の半分です。登録地点は順番に回り、再訪待ち・出力満杯では電力も触媒も使いません。入り切らない回収物は保存し、取り出されるまで次へ行きません。\n'
+     'シンギュラリティ・コアを触媒として装填すると研究棟も回収できます。時間触媒では観測拠点までです。培養施設・最終実験施設・海底炉心・アンドロイド施設は手動のままです。\n'
+     '原初の種には最終実験施設のアノマリー・サンプル1使用回数も必要です。海底だけで最終施設を省略することはできません。',
+     'Probes and the final unlock',
+     'With a same-tier catalyst, a probe visits one ruin in five minutes and returns half the manual loot. Destinations are visited in turn. Waiting for regeneration or output space consumes no power or catalyst. Overflow cargo is saved and must be unloaded before another mission.\n'
+     'A loaded Singularity Core also permits research-building collection; time catalysts only permit observation posts. Culture facilities, final labs, sunken reactors and android facilities remain manual.\n'
+     'A Primordial Seed also requires one use of a restored anomaly sample from the final lab. Sunken loot alone can no longer bypass the final lab.'),
+]))
+
+for _chapter in CHAPTERS:
+    if _chapter[0] == 'factory_expansion':
+        _chapter[4].append(('limits', '質量・出力・点火の目安',
+            '金属の圧縮Lv2は質量81です。鉄・銅ブロックは1個で質量3なので、Lv1に3ブロック、Lv2に27ブロック（インゴット243個相当）を使います。鉄だけでなく銅も選べます。専用部品の熱電対・熱交換コアは用途が限られるので、最初から大量に作りすぎる必要はありません。\n'
+            'Pリアクターは50 GFEを10秒以内に受け取って点火します。2 GFEのSMESモジュールなら容量上は25基が最低です。1基の出力上限は100 MFE/tなので、少なくとも3基を並列に接続し、全体を250 MFE/t以上で送れるようにします。\n'
+            '質量500・スピン0の点火直後は、燃料供給を維持して約28.6 MFE/tです。2.1 GFE/tは転送上限で、最初からその量を発電するわけではありません。炉心の成長・スピン・蓄電を整えてから創世炉へ進みます。',
+            'Mass, output and ignition',
+            'Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\n'
+            'The P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\n'
+            'At initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.'))

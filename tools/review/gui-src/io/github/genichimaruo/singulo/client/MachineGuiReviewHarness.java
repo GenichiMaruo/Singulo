@@ -21,7 +21,7 @@ public final class MachineGuiReviewHarness {
             && Boolean.getBoolean("singulo.selectorGuiReview");
     private static boolean SIDES = !COMBINED && Boolean.getBoolean("singulo.sidesGuiReview");
     private static boolean SELECTOR = !COMBINED && Boolean.getBoolean("singulo.selectorGuiReview");
-    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 25;
+    private static int SCREENS = SELECTOR ? 6 : SIDES ? 1 : MachineType.values().length + 28;
     private static final List<String> metrics = new ArrayList<>();
     private static int language, screen;
     private static long renderedFrames, shownFrame;
@@ -337,6 +337,21 @@ public final class MachineGuiReviewHarness {
                     throw new IllegalStateException("Supply port slot outside panel");
             }
             metrics.add(LANGUAGES[language] + "\tsupply-" + (extra - 22) + "\t0\t0\t176");
+        } else if (extra >= 25) {
+            var status = new CatalystDeviceBlockEntity.Status[] {CatalystDeviceBlockEntity.Status.WAITING,
+                    CatalystDeviceBlockEntity.Status.OUTPUT_FULL, CatalystDeviceBlockEntity.Status.NEEDS_UPGRADE}[extra - 25];
+            SyncedInts data = SyncedInts.client(CatalystDeviceBlockEntity.COUNT);
+            value(data, CatalystDeviceBlockEntity.D_STATUS, status.ordinal());
+            value(data, CatalystDeviceBlockEntity.D_EXTRA, 25);
+            value(data, CatalystDeviceBlockEntity.D_VALUE, 300);
+            value(data, CatalystDeviceBlockEntity.D_ENABLED, 1);
+            value(data, CatalystDeviceBlockEntity.D_ENERGY, 50_000);
+            value(data, CatalystDeviceBlockEntity.D_CAPACITY, 100_000);
+            var menu = new CatalystDeviceMenu(0, mc.player.getInventory(), BlockPos.ZERO,
+                    CatalystDeviceBlockEntity.Kind.PROBE_STATION, new ItemStackHandler(1), new ItemStackHandler(1), data);
+            mc.setScreen(new CatalystDeviceScreen(menu, mc.player.getInventory(), Component.translatable("block.singulo.probe_station")));
+            hover(mc, 176, CatalystDeviceMenu.HEIGHT, 146, 9);
+            metrics.add(LANGUAGES[language] + "\tprobe-" + status.name().toLowerCase() + "\t0\t0\t176");
         } else {
             int variant = extra == 7 ? 2 : extra, kind = variant / 2;
             SyncedInts data = SyncedInts.client(GeneratorSlotsMenu.COUNT);
@@ -379,6 +394,8 @@ public final class MachineGuiReviewHarness {
         } else if (event.getScreen() instanceof SupplyPortScreen screen) {
             screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
         } else if (event.getScreen() instanceof GeneratorSlotsScreen screen) {
+            screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
+        } else if (event.getScreen() instanceof CatalystDeviceScreen screen) {
             screen.render(event.getGuiGraphics(), hoverX, hoverY, 0);
         }
     }

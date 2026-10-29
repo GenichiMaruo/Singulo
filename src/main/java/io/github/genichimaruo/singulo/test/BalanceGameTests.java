@@ -88,7 +88,8 @@ public final class BalanceGameTests {
         helper.assertTrue(fresh.items().insertItem(fresh.type().catalystSlot(), good, false).isEmpty(), "触媒枠に入らない");
         helper.assertTrue(weak.items().insertItem(weak.type().catalystSlot(), worn, false).isEmpty(), "触媒枠に入らない");
         helper.runAtTickTime(400, () -> {
-            helper.assertTrue(fresh.items().getStackInSlot(fresh.type().outputSlot()).is(item("time_crystal_module")),
+            helper.assertTrue(fresh.items().getStackInSlot(fresh.type().outputSlot()).is(item("time_crystal_module"))
+                    && fresh.items().getStackInSlot(fresh.type().outputSlot()).getCount() == 4,
                     "新品の時間結晶からモジュールができない");
             ItemStack left = fresh.catalyst();
             helper.assertTrue(left.is(item("time_crystal_catalyst")) && UsesHelper.remaining(left) == max - 36_000,
@@ -329,7 +330,7 @@ public final class BalanceGameTests {
             for (ItemStack waiting : m.magazine().contents()) {
                 spent += waiting.is(item("spent_time_crystal_catalyst")) ? waiting.getCount() : 0;
             }
-            helper.assertTrue(made == 2, "残りと次の触媒を合わせて、続けて作れない: " + made);
+            helper.assertTrue(made == 8, "残りと次の触媒を合わせて、続けて作れない: " + made);
             helper.assertTrue(spent == 1, "使い切った1個目が失活触媒として出ない: " + spent);
             helper.assertTrue(UsesHelper.remaining(m.catalyst()) == 2 * max - 72_000,
                     "2個目の触媒の残りが合わない: " + UsesHelper.remaining(m.catalyst()));

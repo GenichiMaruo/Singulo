@@ -258,8 +258,8 @@ public final class ServerConfig {
         UNDERPOWER_CONSUMPTION_ = b.defineInRange("underpowerConsumption", 1.5, 1.0, 10.0);
         b.comment("失活触媒から1ティア下の原料を回収できる割合（既定0.25で失活触媒4個から1個。0でリサイクルなし）", "範囲: 0.0〜1.0");
         SPENT_RECYCLE_RATIO_ = b.defineInRange("spentRecycleRatio", 0.25, 0.0, 1.0);
-        b.comment("時間結晶の育成に要る稼働tick（既定12分）", "範囲: 20〜1,000,000（tick）");
-        TIME_CRYSTAL_GROWTH_TICKS_ = b.defineInRange("timeCrystalGrowthTicks", 14400, 20, 1000000);
+        b.comment("時間結晶の育成に要る稼働tick（既定8分）", "範囲: 20〜1,000,000（tick）");
+        TIME_CRYSTAL_GROWTH_TICKS_ = b.defineInRange("timeCrystalGrowthTicks", 9600, 20, 1000000);
         b.pop();
         b.push("compression");
         b.comment("縮退物質殻1個に要る岩石の圧縮ブロックLv3", "範囲: 0〜9（整数）");

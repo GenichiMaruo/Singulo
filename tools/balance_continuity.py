@@ -4,6 +4,7 @@ Uses the same effective recipes and canonical-route assumptions as balance_audit
 Counts gross production, not a sum of incompatible tiers or recipe stage labels.
 """
 import csv
+import argparse
 import json
 import os
 from pathlib import Path
@@ -32,6 +33,12 @@ def produced(model, item, summary):
 
 
 def main():
+    global OUT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out-dir', type=Path, default=OUT)
+    parser.add_argument('--report', default='../material-continuity-0.13.0.md')
+    args = parser.parse_args()
+    OUT = args.out_dir
     cache = ROOT / 'build/balance/plot-cache'
     cache.mkdir(parents=True, exist_ok=True)
     os.environ.setdefault('MPLCONFIGDIR', str(cache))
@@ -96,7 +103,7 @@ def main():
             w.writerow([row['id'], row['name'], row['stage'], row.get('unit', 'item'),
                         *[len(row['consumers'][str(t)]) for t in range(1, 6)],
                         *[row['kit_production'][str(t)] for t in range(1, 6)]])
-    lines = ['# 素材の継続需要：全件表', '', '[評価条件・判定](../material-continuity-0.13.0.md)を参照。', '',
+    lines = ['# 素材の継続需要：全件表', '', f'[評価条件・判定]({args.report})を参照。', '',
              '消費先数は標準ルートで各装置の部品を再帰展開した件数。同一装置内は一度だけ数える。',
              'コントローラ単体と完成構造を含み、全装置の同時建設台数ではない。素材自体の出力は消費先から除く。',
              '専用の外装・窓なども掲載するが、後のティアで使わないこと自体を問題と判定しない。',

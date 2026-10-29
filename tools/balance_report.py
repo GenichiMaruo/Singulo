@@ -4,6 +4,7 @@ Run after balance_audit.py. Plotting requires matplotlib; arithmetic tests do no
 """
 from pathlib import Path
 import csv
+import argparse
 import os
 import json
 
@@ -16,6 +17,12 @@ def number(value):
 
 
 def render():
+    global OUT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out-dir', type=Path, default=OUT)
+    parser.add_argument('--report', default='../game-balance-0.13.0.md')
+    args = parser.parse_args()
+    OUT = args.out_dir
     cache = ROOT / 'build/balance/plot-cache'
     cache.mkdir(parents=True, exist_ok=True)
     os.environ.setdefault('MPLCONFIGDIR', str(cache))
@@ -35,7 +42,7 @@ def render():
                 for resource, quantity in machine[basis]['raw'].items():
                     writer.writerow([machine['stage'], machine['id'], machine['name'], basis, resource, quantity])
     lines = ['# 全装置の原料内訳（0.13.0開発版）', '',
-             '評価条件は[本報告](../game-balance-0.13.0.md)を参照。初回一式＝整数バッチ、平均＝余剰を使い切る場合。',
+             f'評価条件は[本報告]({args.report})を参照。初回一式＝整数バッチ、平均＝余剰を使い切る場合。',
              '下位加工設備は既設とし、その建設費は各行へ重ねていない。完成構造とコントローラを二重加算しないこと。',
              '水などの液体はmB、その他は個。石炭欄は材料用で、かまど燃料は別記。消耗品の残使用回数はJSONに収録。',
              '加工時間は全工程の仕事量の合計で、並列工場での経過時間ではない。', '']

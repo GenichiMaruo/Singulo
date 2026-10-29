@@ -6856,8 +6856,8 @@
     "translation": "大功率及自动化"
   },
   "guide.singulo.stage4.time.body": {
-    "source": "The incubator grows time crystals over 12 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
-    "translation": "育成槽在 12 分钟的实际运行时间内培育时间晶体。供电达到需求的 80%（24 kFE/t）以上时纯度不变；低于此值的时间会降低纯度和寿命。\n设备（炉心控制器、奇点封装器、盾塔核心等）使用时间晶体模块：精密组装台从催化剂槽中的晶体切下新品寿命的 2/3（默认设置下为 30 分钟），剩余部分（默认 15 分钟）可用于奇异物质或作为核心材料。剩余寿命不足此值的晶体（用过的或纯度低的）无法切割；寿命设置和预设会按比例改变所需量。两台育成槽可避免设备用和运行用相互争夺。\n卡西米尔腔（5×5×5，顶部和底部为镜面）制造奇异物质。"
+    "source": "The incubator grows time crystals over 8 minutes of real running time. At 80% of the requested power (24 kFE/t) or more purity is kept; time spent below that lowers purity and lifetime.\nEquipment (core controller, singularity encapsulator, shield tower core and more) takes Time Crystal Modules: the precision assembler cuts two thirds of a fresh crystal's life (30 minutes with default settings) into four modules from the crystal in its catalyst slot, and the rest (15 minutes by default) stays usable for exotic matter or as a core ingredient. Crystals with less life left than that (used or low-purity ones) cannot be cut; lifetime settings and presets scale the amount. Two incubators keep equipment and running needs from competing.\nThe C-Cavity (5×5×5, mirror top and bottom) makes exotic matter.",
+    "translation": "培养槽以实际运行时间培育时间晶体，需8分钟。供电达到需求的80%（24 kFE/t）以上时不降低纯度；低于此值的时间占比会降低纯度和寿命。\n炉心控制装置、奇点封装台、护盾塔核心等设备使用时间晶体模块。精密组装台从催化剂槽中的晶体切取新品寿命的2/3（默认30分钟），制成4个模块，余下默认15分钟仍可用于奇异物质加工或核心。剩余寿命不足的晶体无法加工，寿命设置和预设也会按比例改变需求。建造与运行会争用催化剂，建议准备两个培养槽。\nC空腔是5×5×5的真空容器，顶底内侧为镜面，使用时间晶体催化剂制造奇异物质和轴子凝聚体。"
   },
   "guide.singulo.stage4.time.title": {
     "source": "Time crystals and exotic matter",
@@ -7944,8 +7944,8 @@
     "translation": "制造地：工作台（第 2 阶段）"
   },
   "howto.singulo.smes_module": {
-    "source": "Made in: Precision Assembler (stage 4)",
-    "translation": "制造地：精密组装台（第 4 阶段）"
+    "source": "Made in: Crafting Table (stage 4)",
+    "translation": "制作：工作台（阶段4）"
   },
   "howto.singulo.steel_blend": {
     "source": "Made in: Crafting Table (stage 1)",
@@ -11120,8 +11120,8 @@
     "translation": "用于：改良型仿生人工作台"
   },
   "uses.singulo.anomaly_sample": {
-    "source": "Used in: Singularity Core",
-    "translation": "用于：奇点核心"
+    "source": "Used in: Singularity Core, Primordial Seed",
+    "translation": "用途：奇点核心、原初之种"
   },
   "uses.singulo.artificial_star_core": {
     "source": "Used in: Genesis Core, Primordial Seed",
@@ -11652,8 +11652,8 @@
     "translation": "用于：奇异物质、奇点核心、晕收集器、时间晶体模块"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator, T-Core and 2 more",
-    "translation": "用于：炉心控制器、奇点封装器、盾塔核心、引力子操控器、蒂普勒核心 等 2 个"
+    "source": "Used in: SMES Module, Core Controller, Singularity Encapsulator, Shield Tower Core, Graviton Manipulator and 3 more",
+    "translation": "用途：SMES模块、炉心控制装置、奇点封装台、护盾塔核心、引力子操纵器等另外3项"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -11834,5 +11834,41 @@
   "gui.singulo.catalyst.spent_slot": {
     "source": "Spent catalyst output",
     "translation": "失活催化剂出口"
+  },
+  "gui.singulo.probe.waiting": {
+    "source": "Waiting to revisit",
+    "translation": "等待遗构再访"
+  },
+  "gui.singulo.probe.upgrade": {
+    "source": "Research needs a Singularity Core",
+    "translation": "研究楼需要奇点核心"
+  },
+  "guide.singulo.factory_expansion": {
+    "source": "Factory Expansion",
+    "translation": "工厂扩建"
+  },
+  "guide.singulo.factory_expansion.upgrades.title": {
+    "source": "Production and storage after unlocking",
+    "translation": "解锁后的生产与储能"
+  },
+  "guide.singulo.factory_expansion.upgrades.body": {
+    "source": "After producing a BE catalyst, reconstruct projection cores with quantum modules, optical lattices, meteoric iron and catalyst life. Once you have time catalysts, degenerate nuclei can also be reconstructed. The first research and culture bosses are still required, but factory expansion no longer requires repeated fights.\nThirty minutes of catalyst life makes four Time Crystal Modules. Large SMES units need this part. A shaped upgrade uses an old SMES Cell at the centre and preserves its stored energy. Existing cables can also be upgraded from copper to superconducting, topological and horizon wiring.",
+    "translation": "制成BE催化剂后，可用量子计算模块、光晶格基板、陨铁和催化剂寿命重构投影核心。拥有时间催化剂后，也能重构简并核。首次研究楼和培养设施首领战仍不可省略，但扩建工厂不再需要反复讨伐。\n30分钟催化剂寿命可制成4个时间晶体模块。大型SMES需要此部件。定形升级配方将旧SMES单元置于中央，并保留其储存的电能。旧电缆也可从铜导线依次升级为超导电缆、拓扑导线和视界总线。"
+  },
+  "guide.singulo.factory_expansion.probes.title": {
+    "source": "Probes and the final unlock",
+    "translation": "探测器与最终解锁"
+  },
+  "guide.singulo.factory_expansion.probes.body": {
+    "source": "With a same-tier catalyst, a probe visits one ruin in five minutes and returns half the manual loot. Destinations are visited in turn. Waiting for regeneration or output space consumes no power or catalyst. Overflow cargo is saved and must be unloaded before another mission.\nA loaded Singularity Core also permits research-building collection; time catalysts only permit observation posts. Culture facilities, final labs, sunken reactors and android facilities remain manual.\nA Primordial Seed also requires one use of a restored anomaly sample from the final lab. Sunken loot alone can no longer bypass the final lab.",
+    "translation": "使用同级催化剂时，探测器每5分钟访问一处遗构，带回手动回收量的一半。各地点依次访问，等待再生或输出空间时不消耗电力和催化剂。放不下的货物会保存，卸货前不执行下一任务。\n装入奇点核心作为催化剂后，也能回收研究楼；时间催化剂仅支持观测站。培养设施、最终实验设施、水下炉心和安卓设施仍需手动探索。\n原初之种还需要最终实验设施复原异常样本的1次使用次数。仅靠水下战利品无法再跳过最终实验设施。"
+  },
+  "guide.singulo.factory_expansion.limits.title": {
+    "source": "Mass, output and ignition",
+    "translation": "质量、输出与点火"
+  },
+  "guide.singulo.factory_expansion.limits.body": {
+    "source": "Compressed metal Lv2 has mass 81. An iron or copper block has mass 3, so Lv1 uses 3 blocks and Lv2 uses 27 blocks, or 243 ingots. Copper can replace iron. Thermocouples and heat-exchange cores have limited uses, so large stockpiles are unnecessary.\nThe P-Reactor needs 50 GFE within 10 seconds to ignite. At 2 GFE each, 25 SMES Modules are the capacity minimum. Each can output at most 100 MFE/t, so connect at least three in parallel and provide an aggregate transfer rate of at least 250 MFE/t.\nAt initial mass 500 and spin 0, sustained generation with fuel supply is about 28.6 MFE/t. The 2.1 GFE/t transfer cap is not the initial generation rate. Develop mass, spin and storage before powering Genesis.",
+    "translation": "金属压缩Lv2的质量为81。铁块或铜块每个质量为3，因此Lv1需3块，Lv2需27块，相当于243个锭。可用铜代替铁。热电偶和热交换核心的用途有限，无须一开始大量囤积。\nP反应堆需在10秒内接收50 GFE才能点火。每个SMES模块容量为2 GFE，至少需要25个满足总容量。单个输出上限为100 MFE/t，须至少3个并联，总传输速率达到250 MFE/t以上。\n点火后初始质量500、自旋0时，维持燃料供给的持续发电量约为28.6 MFE/t。2.1 GFE/t是传输上限，并非初始发电量。先发展质量、自旋和储能，再为创世炉供电。"
   }
 }

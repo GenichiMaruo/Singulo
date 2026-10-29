@@ -150,6 +150,15 @@
       "pages": [
         "hazards.list"
       ]
+    },
+    {
+      "id": "factory_expansion",
+      "icon": "singulo:smes_module",
+      "pages": [
+        "factory_expansion.upgrades",
+        "factory_expansion.probes",
+        "factory_expansion.limits"
+      ]
     }
   ]
 }

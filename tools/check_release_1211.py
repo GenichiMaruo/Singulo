@@ -8,7 +8,7 @@ import zipfile
 from check_gametests import check
 
 # 0.9.0 以降の 1.21.1 は NeoForge 版のみ（Forge 版は 0.8.1 まで）
-COUNTS = {'neoforge': 565}
+COUNTS = {'neoforge': 574}
 
 
 def validate(root, loader, name=None):

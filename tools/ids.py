@@ -443,6 +443,9 @@ MOD = {
 
 # recipes.py で mod の成果物として書かれているが、実体はバニラのアイテム
 OUTPUT_ALIASES = {
+    '番人の投影核（再構成）': 'singulo:sentinel_core',
+    '縮退核（再構成）': 'singulo:degenerate_nucleus',
+    'SMESモジュール（セルから）': 'singulo:smes_module',
     '縮退物質殻（ストレンジ物質）': 'singulo:degenerate_matter_shell',
     'ミュオン束（リサイクル）': 'singulo:muon_bundle',
     'ミュオン触媒（リサイクル）': 'singulo:muon_catalyst',
@@ -503,6 +506,9 @@ OUTPUT_ALIASES = {
 
 # 同じ成果物の別レシピの、レシピのファイル名（成果物のIDのままだと、同じ装置の中で重なるもの）
 ALIAS_RECIPE_IDS = {
+    '番人の投影核（再構成）': 'sentinel_core_reconstructed',
+    '縮退核（再構成）': 'degenerate_nucleus_reconstructed',
+    'SMESモジュール（セルから）': 'smes_module_from_cell',
     '砂利（粉砕）': 'gravel_from_cobblestone',
     '砂（粉砕）': 'sand_from_gravel',
     '砂（砂岩）': 'sand_from_sandstone',

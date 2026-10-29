@@ -34,7 +34,7 @@ public abstract class CatalystDeviceBlockEntity extends BlockEntity implements M
      * STANDBY: 発電機の蓄電がいっぱいなので待機中（燃料・触媒を使わない）。LIMITED: 持ち主のアンカーが上限に達している。
      * 番号で同期するので、新しい値は後ろに足す。
      */
-    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET, OFF, STANDBY, LIMITED }
+    public enum Status { NO_CATALYST, UNUSABLE, RUNNING, UNDERPOWERED, NO_POWER, NOT_FORMED, NO_FUEL, NO_TARGET, OFF, STANDBY, LIMITED, WAITING, OUTPUT_FULL, NEEDS_UPGRADE }
 
     /** 画面の種類（表示する行が違う）。 */
     public enum Kind {

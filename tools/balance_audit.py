@@ -57,7 +57,7 @@ class Model:
         self.all=list(runtime['recipes'])
         for p in sorted((ROOT/'src/generated/resources/data/singulo/recipe').rglob('*.json')):
             r=json.loads(p.read_text())
-            if r['type'].startswith('minecraft:'):
+            if r['type'].startswith('minecraft:') or r['type']=='singulo:smes_upgrade':
                 row=self.parse(r,'singulo:'+str(p.relative_to(ROOT/'src/generated/resources/data/singulo/recipe'))[:-5])
                 if row:self.all.append(row)
         self.all += [row for name,r in self.vanilla.items() if (row:=self.parse(r,'minecraft:'+name))]
@@ -139,7 +139,8 @@ class Model:
 
     def parse(self,r,rid):
         kind=r['type'];ins=[]
-        if kind=='minecraft:crafting_shaped':
+        if kind=='singulo:smes_upgrade':kind='minecraft:crafting_shaped'
+        if kind in {'minecraft:crafting_shaped','singulo:smes_upgrade'}:
             counts=Counter(''.join(r['pattern']));ins=[{'options':self.options(v),'count':counts[k],'uses':0,'tier':0} for k,v in r['key'].items()]
         elif kind=='minecraft:crafting_shapeless':ins=[{'options':self.options(i),'count':1,'uses':0,'tier':0} for i in r['ingredients']]
         elif kind in {'minecraft:smelting','minecraft:blasting'}:ins=[{'options':self.options(r['ingredient']),'count':1,'uses':0,'tier':0}]
@@ -188,7 +189,7 @@ class Bill:
         if item.startswith('singulo:blueprint_'):
             self.assets.add(item);return
         r=self.model.routes.get(item)
-        if item in NATURAL or item.startswith('fluid:minecraft:') or r is None:
+        if (item in NATURAL and item not in getattr(self.model, 'manufactured_loot', set())) or item.startswith('fluid:minecraft:') or r is None:
             self.raw[item]+=q;return
         n=q/F(r['count']);n=F(math.ceil(n)) if self.integer else n
         self.operations[r['id']]+=n
@@ -300,6 +301,23 @@ def main():
     ending.need('analysis:genesis_engine/7',1);ending.need('singulo:primordial_seed',1)
     for iid,count in [('singulo:degenerate_furnace',20),('singulo:time_crystal_catalyst',20)]:ending.need(iid,count)
     scenarios['ending_without_reactor']=ending.summary()
+    # Compare expanded factories after their initial boss-gated infrastructure exists.
+    for part in ['sentinel_core','degenerate_nucleus']:
+        m.routes['singulo:'+part]=next(row for row in m.all if row['id']=='singulo:precision_assembler/'+part+'_reconstructed')
+    for device, part in [('laser_cooler','sentinel_core'),('time_crystal_incubator','degenerate_nucleus')]:
+        m.manufactured_loot=set()
+        loot=Bill(m,True);loot.need('singulo:'+device,16)
+        m.manufactured_loot={'singulo:'+part}
+        factory=Bill(m,True);factory.need('singulo:'+device,16)
+        scenarios['scale16_'+device+'_loot']=loot.summary()
+        scenarios['scale16_'+device+'_factory']=factory.summary()
+    m.manufactured_loot=set()
+    cell=Bill(m,True);cell.stock['singulo:smes_cell']=1
+    upgraded=m.routes['singulo:smes_module']
+    m.routes['singulo:smes_module']=next(row for row in m.all if row['id']=='singulo:crafting/smes_module_from_cell')
+    cell.need('singulo:smes_module',1)
+    scenarios['smes_upgrade_owned_cell']=cell.summary()
+    m.routes['singulo:smes_module']=upgraded
     gates={}
     bosses=['sentinel','remnant','warden','leviathan','foundry','wither']
     for banned in [[],*[[b] for b in bosses],['wither','leviathan'],bosses]:

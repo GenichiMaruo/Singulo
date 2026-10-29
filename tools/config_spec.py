@@ -61,7 +61,7 @@ SERVER = [
     ('catalyst', 'underpowerThreshold', '0.8', '0.0〜1.0', '要求電力のこの割合を下回ると不完全反応になる'),
     ('catalyst', 'underpowerConsumption', '1.5', '1.0〜10.0', '不完全反応時の触媒消費倍率'),
     ('catalyst', 'spentRecycleRatio', '0.25', '0.0〜1.0', '失活触媒から1ティア下の原料を回収できる割合（既定0.25で失活触媒4個から1個。0でリサイクルなし）'),
-    ('catalyst', 'timeCrystalGrowthTicks', '14400', '20〜1,000,000（tick）', '時間結晶の育成に要る稼働tick（既定12分）'),
+    ('catalyst', 'timeCrystalGrowthTicks', '9600', '20〜1,000,000（tick）', '時間結晶の育成に要る稼働tick（既定8分）'),
 
     # 圧縮・質量
     ('compression', 'shellRockLv3', '4', '0〜9（整数）', '縮退物質殻1個に要る岩石の圧縮ブロックLv3'),

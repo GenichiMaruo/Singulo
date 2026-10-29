@@ -49,15 +49,15 @@ print(json.dumps(results))
 metrics_path = pathlib.Path(_build + "/gui-review/machine-font-metrics.tsv")
 if metrics_path.exists():
     rows = [line.split('\t') for line in metrics_path.read_text().splitlines()]
-    if len(rows) != 205:
-        raise SystemExit(f"Expected 205 machine GUI fixtures, got {len(rows)}")
+    if len(rows) != 220:
+        raise SystemExit(f"Expected 220 machine GUI fixtures, got {len(rows)}")
     locales = ('ja_jp', 'en_us', 'zh_cn', 'zh_tw', 'ko_kr')
     checked_headers = 0
     rate_reference = None
     for locale in locales:
         entries = [r for r in rows if r[0] == locale]
-        if len(entries) != 41:
-            raise SystemExit(f"Expected 41 fixtures for {locale}, got {len(entries)}")
+        if len(entries) != 44:
+            raise SystemExit(f"Expected 44 fixtures for {locale}, got {len(entries)}")
         for index in range(len(entries)):
             capture = root / f"machine-{locale}-{index:02d}.png"
             with Image.open(capture) as png:

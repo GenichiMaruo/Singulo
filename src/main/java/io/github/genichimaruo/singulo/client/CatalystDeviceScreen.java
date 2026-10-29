@@ -68,7 +68,7 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
             case NO_POWER -> Panel.Status.NO_POWER;
             case NOT_FORMED -> Panel.Status.BROKEN;
             case OFF -> Panel.Status.OFF;
-            case STANDBY -> Panel.Status.IDLE;
+            case STANDBY, WAITING -> Panel.Status.IDLE;
             default -> Panel.Status.WARN;
         };
     }
@@ -78,7 +78,7 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
         return switch (deviceStatus()) {
             case RUNNING -> GuiSkin.OK;
             case NOT_FORMED -> GuiSkin.BAD;
-            case OFF, STANDBY -> GuiSkin.IDLE;
+            case OFF, STANDBY, WAITING -> GuiSkin.IDLE;
             default -> GuiSkin.WARN;
         };
     }
@@ -97,6 +97,9 @@ public class CatalystDeviceScreen extends FramedScreen<CatalystDeviceMenu> {
             case LIMITED -> Component.translatable("gui.singulo.anchor.limited",
                     io.github.genichimaruo.singulo.machine.WorldlineAnchorBlockEntity.anchorLimit());
             case UNDERPOWERED -> Component.translatable("gui.singulo.catalyst.underpowered");
+            case WAITING -> Component.translatable("gui.singulo.probe.waiting");
+            case OUTPUT_FULL -> Component.translatable("gui.singulo.status.output_full");
+            case NEEDS_UPGRADE -> Component.translatable("gui.singulo.probe.upgrade");
             case RUNNING -> Component.translatable("gui.singulo.status.running");
         };
     }
